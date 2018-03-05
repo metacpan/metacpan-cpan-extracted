@@ -1,23 +1,26 @@
 package Yancy;
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 # ABSTRACT: A simple CMS for administrating data
 
 #pod =head1 SYNOPSIS
 #pod
-#pod     ### Standalone app
-#pod     $ yancy daemon
-#pod
 #pod     ### Mojolicious plugin
 #pod     use Mojolicious::Lite;
 #pod     plugin Yancy => { ... };
+#pod
+#pod     ### Standalone app
+#pod     $ yancy daemon
 #pod
 #pod =head1 DESCRIPTION
 #pod
 #pod =begin html
 #pod
 #pod <p>
-#pod   <img alt="Screenshot"
+#pod   <img alt="Screenshot of list of Futurama characters"
 #pod     src="https://raw.github.com/preaction/Yancy/master/eg/screenshot.png?raw=true"
+#pod     width="600px">
+#pod   <img alt="Screenshot of editing form for a person"
+#pod     src="https://raw.github.com/preaction/Yancy/master/eg/screenshot-edit.png?raw=true"
 #pod     width="600px">
 #pod </p>
 #pod
@@ -49,8 +52,24 @@ our $VERSION = '0.020';
 #pod =head2 Mojolicious Plugin
 #pod
 #pod Yancy is primarily a Mojolicious plugin to ease development and
-#pod management of Mojolicious applications. For information on how to use
-#pod Yancy as a Mojolicious plugin, see L<Mojolicious::Plugin::Yancy>.
+#pod management of Mojolicious applications. Yancy provides:
+#pod
+#pod =over
+#pod
+#pod =item *
+#pod
+#pod L<Helpers|Mojolicious::Plugin::Yancy/HELPERS> to access data, validate
+#pod forms
+#pod
+#pod =item *
+#pod
+#pod L<Templates|Mojolicious::Plugin::Yancy/TEMPLATES> which you can override
+#pod to customize the Yancy editor's appearance
+#pod
+#pod =back
+#pod
+#pod For information on how to use Yancy as a Mojolicious plugin, see
+#pod L<Mojolicious::Plugin::Yancy>.
 #pod
 #pod =head2 Standalone App
 #pod
@@ -64,6 +83,22 @@ our $VERSION = '0.020';
 #pod This application creates a REST API using the standard
 #pod L<OpenAPI|http://openapis.org> API specification. The API spec document
 #pod is located at C</yancy/api>.
+#pod
+#pod =head2 Yancy Plugins
+#pod
+#pod Yancy comes with plugins to enhance your website.
+#pod
+#pod =over
+#pod
+#pod =item *
+#pod
+#pod L<The Auth::Basic plugin/Yancy::Plugin::Auth::Basic> provides a simple,
+#pod password-based authentication system for the Yancy editor and your
+#pod website.
+#pod
+#pod =back
+#pod
+#pod More development will be happening here soon!
 #pod
 #pod =head1 CONFIGURATION
 #pod
@@ -133,22 +168,25 @@ Yancy - A simple CMS for administrating data
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
-
-    ### Standalone app
-    $ yancy daemon
 
     ### Mojolicious plugin
     use Mojolicious::Lite;
     plugin Yancy => { ... };
 
+    ### Standalone app
+    $ yancy daemon
+
 =head1 DESCRIPTION
 
 =for html <p>
-  <img alt="Screenshot"
+  <img alt="Screenshot of list of Futurama characters"
     src="https://raw.github.com/preaction/Yancy/master/eg/screenshot.png?raw=true"
+    width="600px">
+  <img alt="Screenshot of editing form for a person"
+    src="https://raw.github.com/preaction/Yancy/master/eg/screenshot-edit.png?raw=true"
     width="600px">
 </p>
 
@@ -178,8 +216,24 @@ ORM|Yancy::Backend::Dbic>
 =head2 Mojolicious Plugin
 
 Yancy is primarily a Mojolicious plugin to ease development and
-management of Mojolicious applications. For information on how to use
-Yancy as a Mojolicious plugin, see L<Mojolicious::Plugin::Yancy>.
+management of Mojolicious applications. Yancy provides:
+
+=over
+
+=item *
+
+L<Helpers|Mojolicious::Plugin::Yancy/HELPERS> to access data, validate
+forms
+
+=item *
+
+L<Templates|Mojolicious::Plugin::Yancy/TEMPLATES> which you can override
+to customize the Yancy editor's appearance
+
+=back
+
+For information on how to use Yancy as a Mojolicious plugin, see
+L<Mojolicious::Plugin::Yancy>.
 
 =head2 Standalone App
 
@@ -193,6 +247,22 @@ L<Yancy::Help::Standalone>.
 This application creates a REST API using the standard
 L<OpenAPI|http://openapis.org> API specification. The API spec document
 is located at C</yancy/api>.
+
+=head2 Yancy Plugins
+
+Yancy comes with plugins to enhance your website.
+
+=over
+
+=item *
+
+L<The Auth::Basic plugin/Yancy::Plugin::Auth::Basic> provides a simple,
+password-based authentication system for the Yancy editor and your
+website.
+
+=back
+
+More development will be happening here soon!
 
 =head1 CONFIGURATION
 

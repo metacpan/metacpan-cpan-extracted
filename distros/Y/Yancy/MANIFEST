@@ -10,6 +10,7 @@ README
 bin/yancy
 cpanfile
 dist.ini
+eg/screenshot-edit.png
 eg/screenshot.png
 eg/templates/not_found.html.ep
 eg/templates/people.html.ep
@@ -40,12 +41,14 @@ lib/Yancy/Backend/Dbic.pm
 lib/Yancy/Backend/Mysql.pm
 lib/Yancy/Backend/Pg.pm
 lib/Yancy/Backend/Sqlite.pm
+lib/Yancy/Controller/Yancy.pm
 lib/Yancy/Controller/Yancy/API.pm
 lib/Yancy/Controller/Yancy/MultiTenant.pm
 lib/Yancy/Help/Config.pod
 lib/Yancy/Help/Standalone.pod
 lib/Yancy/Plugin/Auth/Basic.pm
 lib/Yancy/Util.pm
+share/run_backend_tests.sh
 share/update_resources.sh
 t/00-compile.t
 t/00-report-prereqs.dd
@@ -57,6 +60,7 @@ t/backend/pg.t
 t/backend/sqlite.t
 t/cms.t
 t/controller/multi_tenant.t
+t/controller/yancy.t
 t/filter.t
 t/helpers.t
 t/lib/Local/BackendTestSchema.pm
@@ -74,6 +78,10 @@ t/share/config.pl
 t/share/mysql.sql
 t/share/pg.sql
 t/share/sqlite.sql
+t/share/templates/blog_delete.html.ep
+t/share/templates/blog_edit.html.ep
+t/share/templates/blog_list.html.ep
+t/share/templates/blog_view.html.ep
 t/share/templates/people.html.ep
 t/share/templates/people/index.html.ep
 t/share/withindex/templates/index.html.ep

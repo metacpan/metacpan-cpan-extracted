@@ -15,7 +15,7 @@ use Test2::Harness::Util qw/write_file_atomic/;
 use Test2::Harness::Util::File::JSONL();
 use Test2::Harness::Run::Queue();
 
-our $VERSION = '0.001053';
+our $VERSION = '0.001054';
 
 use Test2::Harness::Util::HashBase qw{
     -pid
@@ -69,7 +69,6 @@ sub init {
     $self->{+JOBS_SEEN} = {};
 
     $self->read_jobs();
-    $self->preload_queue();
 }
 
 sub read_jobs {
@@ -79,7 +78,7 @@ sub read_jobs {
     return unless $jobs->exists;
 
     my $jobs_seen = $self->{+JOBS_SEEN};
-    for my $job ($jobs->read) {
+    for my $job ($jobs->poll) {
         $jobs_seen->{$job->{job_id}}++;
     }
 }
@@ -89,7 +88,7 @@ sub preload_queue {
 
     my $run = $self->{+RUN};
 
-    return $self->poll_tasks unless $run->finite;
+    return unless $run->finite;
 
     my $wait_time = $self->{+WAIT_TIME};
     until ($self->{+QUEUE_ENDED}) {
@@ -114,8 +113,6 @@ sub poll_tasks {
     my $added = 0;
     for my $item ($queue->poll) {
         my ($spos, $epos, $task) = @$item;
-
-        next if $task && $self->{+JOBS_SEEN}->{$task->{job_id}}++;
 
         $added++;
 
@@ -255,6 +252,7 @@ sub _next {
     my $end_cb    = $self->{+END_LOOP_CB};
     my $list      = $self->{+PENDING}->{$stage} ||= [];
     my $wait_time = $self->{+WAIT_TIME};
+    my $jobs_seen = $self->{+JOBS_SEEN};
 
     my $max = $self->{+RUN}->job_count || 1;
     my $slow = $max - 1;
@@ -275,8 +273,14 @@ sub _next {
         $self->poll_tasks;
         $self->wait_on_jobs;
 
-        next unless @$list;
         next unless $self->lock;
+
+        $self->read_jobs;
+        @$list = grep { !$jobs_seen->{$_->{job_id}} } @$list;
+        unless (@$list) {
+            $self->unlock;
+            next;
+        }
 
         my $running = 0;
         my %cats;
@@ -314,11 +318,3 @@ sub _next {
 }
 
 1;
-
-__END__
-    long       => 1,
-    medium     => 1,
-    general    => 1,
-    isolation  => 1,
-    immiscible => 1,
-

@@ -1,0 +1,6 @@
+name = "WWW-FCM-HTTP"
+badges = ["travis"]
+authority="cpan:XAICRON"
+
+module_maker="ModuleBuildTiny"
+

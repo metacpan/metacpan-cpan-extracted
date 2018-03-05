@@ -13,6 +13,9 @@ Geo::WebService::Elevation::USGS - Elevation queries against USGS web services.
 
 =head1 NOTICE
 
+B<< Version 0.106_01 changes the default value of the
+C<'compatible'> attribute to C<0> (i.e. false). >>
+
 The GIS data web service this module was originally based on has gone
 the way of the dodo. This release uses the NED service, which is similar
 but simpler. I have taken advantage of the new service's ability to
@@ -52,19 +55,22 @@ deprecated:
 * Methods C<getElevation()> and C<getAllElevations()>. The
 C<elevation()> method will remain.
 
-Starting with release 0.104_01, all deprecated functionality will warn
-every time it is used. Six months after that it will become fatal.
-After a further six months, all code related to the deprecated
-functionality will be removed.
+Starting with release 0.104_01, all deprecated functionality warns
+every time it is used. The plan was to make these fatal in another six
+months, but that fell in the cracks, and when I revisited it I thought
+the change in the default value of the C<'compatible'> attribute (to
+false, see below) was disruptive enough that I would make it a release
+by itself. The current plan is to delay making the deprecated methods
+fatal the C<compatible> attribute becomes fatal.
 
 In the meantime you can suppress the warnings with
 
  no warnings qw{ deprecated };
 
-At the point where the deprecated functionality warns on every use, the
-C<compatible> attribute will also become deprecated. Six months after
-that, its default will become false, and it will warn when set true. Six
-months after that it will become a fatal error to use it.
+The C<compatible> attribute is deprecated as of release 0.104_01. As of
+release 0.106_01 it will warn when set true. In the first
+release after September 1 2018 it will warn on any use. Six months after
+that, it will become a fatal error to use it.
 
 =head1 DESCRIPTION
 
@@ -117,10 +123,15 @@ use JSON;
 use LWP::UserAgent;
 use Scalar::Util 1.10 qw{ blessed looks_like_number };
 
-our $VERSION = '0.106';
+our $VERSION = '0.107';
 
 use constant BEST_DATA_SET => -1;
 use constant USGS_URL => 'http://nationalmap.gov/epqs/pqs.php';
+
+use constant ARRAY_REF	=> ref [];
+use constant CODE_REF	=> ref sub {};
+use constant HASH_REF	=> ref {};
+use constant REGEXP_REF	=> ref qr{};
 
 my $using_time_hires;
 {
@@ -169,7 +180,7 @@ sub new {
     shift;
     my $self = {
 	carp	=> 0,
-	compatible	=> 1,
+	compatible	=> 0,
 	croak	=> 1,
 	default_ns	=> 'http://gisdata.usgs.gov/XMLWebServices2/',
 	error	=> undef,
@@ -259,6 +270,9 @@ attribute is true:
 
 * If called in scalar context the return will be a reference to an array
 whose single element is the results hash.
+
+B<Note> that as of version 0.106_01, the default for this
+attribute is B<false>.
 
 You can also pass a C<Geo::Point>, C<GPS::Point>, or C<Net::GPSD::Point>
 object in lieu of the C<$lat> and C<$lon> arguments. If you do this,
@@ -359,7 +373,7 @@ or a hash whose {Elevation} key supplies the elevation value.
 sub is_valid {
     my $ele = pop;
     my $ref = ref $ele;
-    if ($ref eq 'HASH') {
+    if ( HASH_REF eq $ref ) {
 	$ele = $ele->{Elevation};
     } elsif ($ref) {
 	croak "$ref reference not understood";
@@ -407,7 +421,7 @@ result in an exception being thrown.
 
 sub _set_hook {
     my ( $self, $name, $val ) = @_;
-    ref $val eq 'CODE'
+    CODE_REF eq ref $val
 	or croak "Attribute $name must be a code reference";
     return( $self->{$name} = $val );
 }
@@ -431,7 +445,9 @@ sub _set_literal {
 }
 
 {
-    my %supported = map {$_ => 1} qw{ARRAY CODE HASH Regexp};
+    my %supported = map { $_ => 1 } ARRAY_REF, CODE_REF, HASH_REF,
+	REGEXP_REF;
+
     sub _set_source {
 	my ($self, $name, $val) = @_;
 	my $ref = ref $val;
@@ -691,7 +707,7 @@ sub _request {
 
     my $rslt = exists $self->{_hack_result} ? do {
 	my $data = delete $self->{_hack_result};
-	'CODE' eq ref $data ? $data->( $self, %arg ) : $data;
+	CODE_REF eq ref $data ? $data->( $self, %arg ) : $data;
     } : $ua->request( $rqst );
 
     $self->{trace}
@@ -708,7 +724,7 @@ sub _request {
     foreach my $key (
 	qw{ USGS_Elevation_Point_Query_Service Elevation_Query }
     ) {
-	'HASH' eq ref $rslt
+	HASH_REF eq ref $rslt
 	    and exists $rslt->{$key}
 	    or return $self->_error(
 	    "Elevation result is missing element {$key}" );
@@ -759,8 +775,11 @@ The default is 0 (i.e. false).
 This boolean attribute determines whether this object attempts to make
 returned data consistent with the old GIS server.
 
-The default is C<1> (i.e. true) for the moment, but see the
-L<NOTICE|/NOTICE> above for plans to change this.
+The default was C<1> (i.e. true) when it was introduced in version
+0.100, but as of version 0.106_01, and per the deprecation
+plan, it is C<0> (i.e. false). Like the other deprecated attributes any
+use of it will eventually become fatal. See the L<NOTICE|/NOTICE> above
+for details.
 
 =head3 croak (boolean)
 
@@ -960,7 +979,7 @@ Thomas R. Wyant, III; F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2016 Thomas R. Wyant, III
+Copyright (C) 2008-2018 Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

@@ -1,5 +1,5 @@
 package Business::RO::TaxDeduction::Types;
-$Business::RO::TaxDeduction::Types::VERSION = '0.011';
+$Business::RO::TaxDeduction::Types::VERSION = '0.012';
 # ABSTRACT: Types for the TaxDeduction module
 
 use 5.010001;
@@ -36,7 +36,7 @@ Business::RO::TaxDeduction::Types - Types for the TaxDeduction module
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -65,7 +65,7 @@ coerced to 4.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ștefan Suciu.
+This software is copyright (c) 2018 by Ștefan Suciu.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

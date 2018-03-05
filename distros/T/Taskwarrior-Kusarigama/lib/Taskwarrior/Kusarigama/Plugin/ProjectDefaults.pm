@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::ProjectDefaults;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: assign project-level defaults when creating tasks
-$Taskwarrior::Kusarigama::Plugin::ProjectDefaults::VERSION = '0.7.0';
+$Taskwarrior::Kusarigama::Plugin::ProjectDefaults::VERSION = '0.8.0';
 
 use 5.10.0;
 use strict;
@@ -60,7 +60,7 @@ Taskwarrior::Kusarigama::Plugin::ProjectDefaults - assign project-level defaults
 
 =head1 VERSION
 
-version 0.7.0
+version 0.8.0
 
 =head1 DESCRIPTION
 

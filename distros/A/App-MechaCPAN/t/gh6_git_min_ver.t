@@ -13,8 +13,8 @@ if ( !&App::MechaCPAN::has_git )
   plan skip_all => 'Cannot test has_git without git';
 }
 
-my $above_git = &App::MechaCPAN::_git_str + 1;
-my $below_git = &App::MechaCPAN::_git_str - 1;
+my $above_git = &App::MechaCPAN::min_git_ver + 1;
+my $below_git = &App::MechaCPAN::min_git_ver - 1;
 
 {
   no strict 'refs';

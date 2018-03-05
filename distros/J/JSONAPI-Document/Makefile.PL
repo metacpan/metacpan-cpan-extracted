@@ -24,10 +24,11 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "DBD::SQLite" => 0,
     "Test::DBIx::Class" => "0.52",
+    "Test::MockModule" => 0,
     "Test::Most" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "0.3",
+  "VERSION" => "0.4",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,6 +41,7 @@ my %FallbackPrereqs = (
   "Lingua::EN::Inflexion" => 0,
   "Moo" => 0,
   "Test::DBIx::Class" => "0.52",
+  "Test::MockModule" => 0,
   "Test::Most" => 0,
   "Test::Pod" => 0
 );

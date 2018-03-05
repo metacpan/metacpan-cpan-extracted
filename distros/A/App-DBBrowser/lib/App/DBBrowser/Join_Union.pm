@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.001';
+our $VERSION = '2.003';
 
 use Clone           qw( clone );
 use List::MoreUtils qw( any );
@@ -108,7 +108,8 @@ sub union_tables {
                 }
                 else {
                     delete $sf->{union_all} if $sf->{union_all};
-                    $union = clone( $backup_union );
+                    #$union = clone( $backup_union );
+                    $union = $backup_union;
                     last UNION_COLUMN;
                 }
             }
@@ -295,7 +296,8 @@ sub join_tables {
                         next MASTER;
                     }
                     else {
-                        $join = clone( $backup_master );
+                        #$join = clone( $backup_master );
+                        $join = $backup_master;
                         next JOIN;
                     }
                 }
@@ -339,12 +341,14 @@ sub join_tables {
                     { prompt => 'Choose PRIMARY KEY column:', undef => $sf->{i}{_reset} }
                 );
                 if ( ! defined $pk_col ) {
-                    $join = clone( $backup_join );
+                    #$join = clone( $backup_join );
+                    $join = $backup_join;
                     next JOIN;
                 }
                 if ( $pk_col eq $sf->{i}{_continue} ) {
                     if ( @{$join->{primary_keys}} == @{$backup_join->{primary_keys}} ) {
-                        $join = clone( $backup_join );
+                        #$join = clone( $backup_join );
+                        $join = $backup_join;
                         next JOIN;
                     }
                     last ON;
@@ -360,7 +364,8 @@ sub join_tables {
                     { prompt => 'Choose FOREIGN KEY column:', undef => $sf->{i}{_reset} }
                 );
                 if ( ! defined $fk_col ) {
-                    $join = clone( $backup_join );
+                    #$join = clone( $backup_join );
+                    $join = $backup_join;
                     next JOIN;
                 }
                 $fk_col =~ s/^-\s//;

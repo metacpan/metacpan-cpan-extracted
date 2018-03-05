@@ -5,7 +5,7 @@ use warnings;
 
 use Encode;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub index {
 	my $io_file = shift;
@@ -555,7 +555,7 @@ Clipland GmbH L<http://www.clipland.com/>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2013-2017 Clipland GmbH. All rights reserved.
+Copyright 2013-2018 Clipland GmbH. All rights reserved.
 
 This library is free software, dual-licensed under L<GPLv3|http://www.gnu.org/licenses/gpl>/L<AL2|http://opensource.org/licenses/Artistic-2.0>.
 You can redistribute it and/or modify it under the same terms as Perl itself.

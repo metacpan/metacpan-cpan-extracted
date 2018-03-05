@@ -21,10 +21,11 @@ no_index:
     - t
 requires:
   App::Environ: '0.18'
+  Carp: '0'
   Cpanel::JSON::XS: '0'
   IO::Socket: '0'
   perl: '5.010001'
 resources:
   repository: https://github.com/kak-tus/App-Environ-ClickHouse-Proxy.git
-version: '0.3'
+version: '0.5'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

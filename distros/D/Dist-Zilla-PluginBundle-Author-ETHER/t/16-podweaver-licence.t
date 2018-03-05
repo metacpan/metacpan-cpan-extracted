@@ -9,6 +9,8 @@ use Test::Deep;
 use Path::Tiny;
 use PadWalker 'closed_over';
 
+use Test::File::ShareDir -share => { -dist => { 'Dist-Zilla-PluginBundle-Author-ETHER' => 'share' } };
+
 use lib 't/lib';
 use Helper;
 use NoNetworkHits;

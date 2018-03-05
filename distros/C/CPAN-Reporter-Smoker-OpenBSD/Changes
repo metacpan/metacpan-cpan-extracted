@@ -1,10 +1,60 @@
 ==================================================
-Changes from 2017-02-26 00:00:00 +0000 to present.
+Changes from 2017-03-04 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.012 at 2018-02-26 02:25:58 +0000
+version 0.015 at 2018-03-04 15:17:30 +0000
 ------------------------------------------
+
+  Change: e2864f9749c7f514e56417f69f62276e4f50fb81
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-04 12:15:12 +0000
+
+    Fixed minor bug on dblock testing
+
+    Changed the requirement to have a readable/writeable prefs_dir for
+    testing dblock, which tests failed on some CPAN smokers. 
+
+  Change: 12cc180ec726f61eb35ffbc7eed14181447941d6
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-03 14:54:05 +0000
+
+    More fixes added to the tests 
+
+  Change: e367ba4f0a2825d1785a6bf4659e90af34e4bfdd
+  Author: Alceu Rodrigues de Freitas Junior <cin_afreitas@uolinc.com>
+  Date : 2018-03-02 15:35:44 +0000
+
+    Issue #3 
+
+  Change: 8c1e4c2861f1e0025e21965865c5136499e4d1c3
+  Author: Alceu Rodrigues de Freitas Junior <cin_afreitas@uolinc.com>
+  Date : 2018-03-02 13:38:29 +0000
+
+    Added most basic validation of scripts 
+
+  Change: ed3aeefa4297f33c3a3aaa47fdbcc5cad9c829e5
+  Author: Alceu Rodrigues de Freitas Junior <cin_afreitas@uolinc.com>
+  Date : 2018-02-28 14:05:35 +0000
+
+    Bug fixes with dblock 
+
+  Change: d95217af3824edec99d6d2b8e81356400bec8414
+  Author: Alceu Rodrigues de Freitas Junior <cin_afreitas@uolinc.com>
+  Date : 2018-02-28 13:58:25 +0000
+
+    Refactoring and more testing
+
+    Refactored the functionality of dblock into
+    CPAN::Reporter::Smoker::OpenBSD to make it easier for testing. Added
+    a tests and related distroprefs to validate everything is working
+    fine. 
+
+  Change: b799298b0ed3ea12d56cb40c2140207af3589a26
+  Author: Alceu Rodrigues de Freitas Junior <cin_afreitas@uolinc.com>
+  Date : 2018-02-28 11:33:25 +0000
+
+    Fixed introduced bug with dblock 
 
   Change: 7ad9b861993ed12d46ada9828f782caa7d107d9d
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>

@@ -1,5 +1,9 @@
 Revision history for Perl extension Plack-Middleware-Session-Simple
 
+0.04 2018-03-03T04:48:26Z
+
+    - Some doc fix. Thanks vividsnow and bayashi.
+
 0.03 2014-10-20T14:20:03Z
 
     - add serializer option

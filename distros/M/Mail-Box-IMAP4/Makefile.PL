@@ -4,7 +4,7 @@ require 5.010;
 
 use IO::Handle;
 
-my $VERSION = '3.002';
+my $VERSION = '3.003';
 
 my %prereq =
   ( Date::Parse      => 0
@@ -64,7 +64,20 @@ WriteMakefile
  , AUTHOR     => 'Mark Overmeer'
  , ABSTRACT   => 'Mail::Box connector via IMAP4'
  , PREREQ_PM  => \%prereq
- , LICENSE    => 'perl'
+ , LICENSE    => 'perl_5'
+
+ , META_MERGE =>
+      { 'meta-spec' => { version => 2 }
+      , resources  =>
+          { repository =>
+              { type => 'git'
+              , url  => 'https://github.com/markov2/perl5-Mail-Box-IMAP4.git'
+              , web  => 'https://github.com/markov2/perl5-Mail-Box-IMAP4'
+              }
+          , homepage => 'http://perl.overmeer.net/CPAN/'
+          , license  => [ 'http://dev.perl.org/licenses/' ]
+          }
+      }
  );
 
 ### used by oodist during production of distribution
@@ -73,12 +86,11 @@ sub MY::postamble { <<'__POSTAMBLE' }
 # for DIST
 RAWDIR          = ../public_html/mail-box-imap4/raw
 DISTDIR         = ../public_html/mail-box-imap4/source
-EXTENDS			= ../MailMessage:../MailTransport:../MailBox4
+EXTENDS			= ../Mail-Message:../Mail-Transport:../../perl/MailBox4
 
 # for POD
 FIRST_YEAR      = 2001
 EMAIL           = perl@overmeer.net
-WEBSITE         = http://perl.overmeer.net/mailbox/
-PODTAIL         = ../MailBox-shared-podtail
+WEBSITE         = http://perl.overmeer.net/CPAN/
 
 __POSTAMBLE

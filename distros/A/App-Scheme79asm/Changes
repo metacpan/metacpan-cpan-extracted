@@ -1,5 +1,10 @@
 Revision history for Perl extension App::Scheme79asm.
 
+0.003 2018-03-03T11:58+00:00
+ - Fix value of T
+ - Fix treatment of negative addresses
+ - Add print_binary16 to print memory in binary format
+
 0.002 2018-02-17T12:21+00:00
  - More documentation
 

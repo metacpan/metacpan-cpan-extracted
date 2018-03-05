@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -32,17 +32,14 @@ use Math::PlanePath::CoprimeColumns;
 use Math::PlanePath::GcdRationals;
 *_gcd = \&Math::PlanePath::GcdRationals::_gcd;
 
-# uncomment this to run the ### lines
-#use Smart::Comments;
-
-require Math::PlanePath::ImaginaryHalf;
+use Math::PlanePath::ImaginaryHalf;
 
 
 #------------------------------------------------------------------------------
 # VERSION
 
 {
-  my $want_version = 125;
+  my $want_version = 126;
   ok ($Math::PlanePath::ImaginaryHalf::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::ImaginaryHalf->VERSION,  $want_version,

@@ -1,11 +1,15 @@
 Business-RO-TaxDeduction
 ========================
 Ștefan Suciu
-2016-06-05
+2018-03-04
 
-Version: 0.010
+Version: 0.012
 
 A Romanian salary tax deduction calculator.
+
+Updated for 2018, but unfortunately there is no more an official
+formula for calculating the tax deduction, so the module is using
+tables for returning the correct (I hope) amount.
 
 Starting with the v0.010 version, there is a new optional `year`
 parameter that can be used to choose between the current regulations

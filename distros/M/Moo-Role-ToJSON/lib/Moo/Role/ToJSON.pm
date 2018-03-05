@@ -5,7 +5,7 @@ use Moo::Role;
 
 # ABSTRACT: a Moo role for a TO_JSON method
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has serializable_attributes => (
     is  => 'lazy',
@@ -87,7 +87,7 @@ L<Moo::Role::ToJSON> implements the following attributes.
 
 =head2 serializable_attributes
 
-    # optionally override serialized columns on instantiation
+    # optionally override serialized attributes on instantiation
     my $message = My::Message->new(
         serializable_attributes => [qw/feel_like_sharing message secret/]
     );
@@ -123,6 +123,10 @@ must return an C<ARRAY> reference.
 Returns a C<HASH> reference representing your object. This is intended to be
 used by any C<encode_json> function that checks for the availability of the
 C<TO_JSON> method for blessed objects.
+
+=head2 EXAMPLES
+
+See C<t/complete.t> for a complete example.
 
 =head1 AUTHOR
 

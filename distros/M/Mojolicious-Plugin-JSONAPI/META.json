@@ -48,7 +48,7 @@
    "provides" : {
       "Mojolicious::Plugin::JSONAPI" : {
          "file" : "lib/Mojolicious/Plugin/JSONAPI.pm",
-         "version" : "0.3"
+         "version" : "0.4"
       }
    },
    "release_status" : "stable",
@@ -58,7 +58,7 @@
          "web" : "https://github.com/ziali088/mojolicious-plugin-jsonapi.git"
       }
    },
-   "version" : "0.3",
+   "version" : "0.4",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],

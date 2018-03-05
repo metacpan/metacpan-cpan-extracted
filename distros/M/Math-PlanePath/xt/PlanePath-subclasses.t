@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -50,6 +50,27 @@ my @modules = (
                # elsewhere and are skipped if not available to test
 
                # module list begin
+
+               'AlternateTerdragon',
+               'AlternateTerdragon,arms=2',
+               'AlternateTerdragon,arms=3',
+               'AlternateTerdragon,arms=4',
+               'AlternateTerdragon,arms=5',
+               'AlternateTerdragon,arms=6',
+
+               'TerdragonRounded',
+               'TerdragonRounded,arms=2',
+               'TerdragonRounded,arms=3',
+               'TerdragonRounded,arms=4',
+               'TerdragonRounded,arms=5',
+               'TerdragonRounded,arms=6',
+
+               'TerdragonCurve',
+               'TerdragonCurve,arms=2',
+               'TerdragonCurve,arms=3',
+               'TerdragonCurve,arms=4',
+               'TerdragonCurve,arms=5',
+               'TerdragonCurve,arms=6',
 
                'SquareReplicate',
 
@@ -449,20 +470,6 @@ my @modules = (
                'DragonRounded,arms=2',
                'DragonRounded,arms=3',
                'DragonRounded,arms=4',
-
-               'TerdragonCurve',
-               'TerdragonCurve,arms=2',
-               'TerdragonCurve,arms=3',
-               'TerdragonCurve,arms=4',
-               'TerdragonCurve,arms=5',
-               'TerdragonCurve,arms=6',
-
-               'TerdragonRounded',
-               'TerdragonRounded,arms=2',
-               'TerdragonRounded,arms=3',
-               'TerdragonRounded,arms=4',
-               'TerdragonRounded,arms=5',
-               'TerdragonRounded,arms=6',
 
                'DragonCurve',
                'DragonCurve,arms=2',
@@ -879,7 +886,7 @@ BEGIN {
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 125;
+my $want_version = 126;
 
 ok ($Math::PlanePath::VERSION, $want_version, 'VERSION variable');
 ok (Math::PlanePath->VERSION,  $want_version, 'VERSION class method');
@@ -937,12 +944,14 @@ my %xy_maximum_duplication =
    'Math::PlanePath::R5DragonCurve' => 2,
    'Math::PlanePath::CCurve' => 9999,
    'Math::PlanePath::AlternatePaper' => 2,
+   'Math::PlanePath::AlternateTerdragon' => 3,
    'Math::PlanePath::TerdragonCurve' => 3,
    'Math::PlanePath::KochSnowflakes' => 2,
    'Math::PlanePath::QuadricIslands' => 2,
   );
 my %xy_maximum_duplication_at_origin =
   ('Math::PlanePath::DragonCurve' => 4,
+   'Math::PlanePath::AlternateTerdragon' => 6,
    'Math::PlanePath::TerdragonCurve' => 6,
    'Math::PlanePath::R5DragonCurve' => 4,
   );

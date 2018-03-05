@@ -4,6 +4,11 @@
 
 Any::Daemon - basic needs for a daemon
 
+=head1 INHERITANCE
+
+ Any::Daemon is extended by
+   Any::Daemon::HTTP
+
 =head1 SYNOPSIS
 
   use Any::Daemon;
@@ -28,7 +33,7 @@ reports to any logging mechanism you like.
 
 The code for this module is in use for many different daemons, some
 with heavy load (a few dozen requests per second)  Have a look in
-the examples directory!  Also, you may like Any::Daemon::HTTP
+the examples directory!  Also, you may like L<Any::Daemon::HTTP|Any::Daemon::HTTP>
 
 =head1 METHODS
 
@@ -149,20 +154,14 @@ daemons as trigger for reconfiguration.
 
 =head1 SEE ALSO
 
-This module is part of Any-Daemon distribution version 0.94,
-built on March 10, 2014. Website: F<http://perl.overmeer.net/>
-All modules in this suite:
-L</Any::Daemon>,
-L</IOMux>, and
-L</IOMux::HTTP>.
-
-Please post questions or ideas to F<perl@overmeer.net>
+This module is part of Any-Daemon distribution version 0.95,
+built on March 04, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2011-2014 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2011-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

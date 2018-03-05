@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.1.7';
 our $ENABLE_DEBUG = 0;
 
 require XSLoader;
@@ -19,28 +19,27 @@ AVLTree - Perl extension for efficient creation and manipulation of AVL balanced
 
 =head1 VERSION
 
-Version 0.01
+Version 0.1.7
 
 =head1 DESCRIPTION
 
-This module provides a simple and fast implementation of AVL balanced trees.
+This module provides a simple and fast implementation of B<AVL balanced binary trees>.
 It uses the Perl XS extension mechanism by providing a tiny wrapper around 
 an efficient C library which does the core of the work. Preliminary benchmarking 
 shows this module one order of magnitude faster than a pure perl implementation.
 
 The nodes of an AVL tree object can hold any kind of item, as long as each 
-one of these has an element which can be used to define a partial order on 
-the set of possible items. This is specified by providing, upon tree construction,
+one of these can be used or has an element that can be use to define a partial order 
+on the set of possible items. This is specified by providing, upon tree construction,
 a reference to a function for comparing any two of the possible items.
 
 The underlying C library is a reinterpretation of the C library originally 
-developed by Julienne Walker. This library has been adapted for dealing 
-directly with Perl (SV) variables.
+developed by Julienne Walker L<http://www.eternallyconfuzzled.com/jsw_home.aspx>. 
+This library has been adapted for dealing directly with Perl (SV) variables.
 
 The module at the moment is in beta stage but it is usable. It provides methods 
 for creating and querying an AVL tree, get its size and insert and remove elements 
-from it. No methods exist to traverse the tree at this stage, but I promise this
-functionality is going to be implemented very soon.
+from it. Additionaly, it is possible to traverse the tree in forward/reverse order.
 
 =head1 SYNOPSIS
 
@@ -114,11 +113,21 @@ functionality is going to be implemented very soon.
     print "Item with id $id not found\n";
   }
 
+  # forward tree traversal
+  my $item = $tree->first();
+  print "First item: ", $item, "\n";
+
+  while($item = $tree->next()) {
+    print $item, "\n";
+  }
+
+  # and similarly for reverse iteratio, using last/prev methods
+
   ...
 
 =head1 METHODS
 
-=head2 new
+=head2 C<new>
 
   Arg [1]     : (required) A reference to a subroutine
   
@@ -135,7 +144,7 @@ functionality is going to be implemented very soon.
   Status      : Unstable, interface might change to accomodate suitable defaults, 
                 e.g. numbers
 
-=head2 find
+=head2 C<find>
 
   Arg [1]     : Item to search, can be defined just in terms of the attribute
                 with which the items in the tree are compared. 
@@ -154,7 +163,7 @@ functionality is going to be implemented very soon.
   Caller      : General
   Status      : Unstable
 
-=head2 insert
+=head2 C<insert>
 
   Arg [1]     : An item to insert in the tree.
   
@@ -169,7 +178,7 @@ functionality is going to be implemented very soon.
   Caller      : General
   Status      : Unstable
 
-=head2 remove
+=head2 C<remove>
 
   Arg[1]      : An item to remove from the tree
   
@@ -183,7 +192,7 @@ functionality is going to be implemented very soon.
   Caller      : General
   Status      : Unstable
 
-=head2 size
+=head2 C<size>
 
   Arg[...]    : None
   
@@ -197,16 +206,73 @@ functionality is going to be implemented very soon.
   Caller      : General
   Status      : Unstable
 
+=head1 TREE TRAVERSAL METHODS
+
+=head2 C<first>
+
+  Arg [...]   : None
+  
+  Example     : my $item = $tree->first;
+
+  Description : Returns the first element as specified by the order defined by the tree.
+
+  Returntype  : The item, if found, as stored in the tree or undef
+                if the tree is empty.
+  Exceptions  : None
+  Caller      : General
+  Status      : Unstable
+
+=head2 C<last>
+
+  Arg [...]   : None
+
+  Example     : my $item = $tree->last;
+
+  Description : Returns the last element as specified by the order defined by the tree.
+
+  Returntype  : The item, if found, as stored in the tree or undef
+                if the tree is empty.
+  Exceptions  : None
+  Caller      : General
+  Status      : Unstable
+
+=head2 C<next>
+
+  Arg [...]   : None
+
+  Example     : my $item = $tree->first;
+                print $item, "\n";
+                while($item = $tree->next) { print $item, "\n"; }
+
+  Description : Returns the next element as specified by the order defined by the tree.
+
+  Returntype  : The item, if found, as stored in the tree or undef
+                if the tree is empty.
+  Exceptions  : None
+  Caller      : General
+  Status      : Unstable
+
+=head2 C<prev>
+
+  Arg [...]   : None
+
+  Example     : my $item = $tree->last;
+                print $item, "\n";
+                while($item = $tree->prev) { print $item, "\n"; }
+
+  Description : Returns the previous element as specified by the order defined by the tree.
+
+  Returntype  : The item, if found, as stored in the tree or undef
+                if the tree is empty.
+  Exceptions  : None
+  Caller      : General
+  Status      : Unstable
+
 =head1 DEPENDENCIES
 
-AVLTree requires Carp and Test::More and Test::LeakTrace to run the tests during installation.
+AVLTree requires Carp and Test::More, Test::Deep and Test::LeakTrace to run the tests during installation.
 If you want to run the benchmarks in the scripts directory, you need to install the Benchmark 
 and List::Util modules.
-
-=head1 CHANGES
-
-0.01 2017-12-18
-   * First release to CPAN, partial port of jsw_avltree AVL tree C library, traversal methods not implemented.
 
 =head1 EXPORT
 
@@ -214,8 +280,10 @@ None
 
 =head1 SEE ALSO
 
-There are of course other modules which provide this functionality, see e.g. Tree::AVL, Btrees.
+If you want to get a deeper insight into the module, you should of course take a look at the excellent AVL 
+tree library developed by Julienne Walker L<http://www.eternallyconfuzzled.com/jsw_home.aspx>. 
 
+There are of course other modules which provide this functionality, see e.g. Tree::AVL, Btrees.
 You can appreciate the power of this module by running some benchmarking against the above.
 If you've installed from source, go to the installation directory and:  
 
@@ -283,13 +351,12 @@ http://www.eternallyconfuzzled.com/Libraries.aspx
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Alessandro Vullo.
+Copyright [2017-2018] Alessandro Vullo.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
 See L<http://dev.perl.org/licenses/> for more information.
-
 
 =cut

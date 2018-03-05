@@ -50,7 +50,7 @@
             "Module::Load" : "0",
             "Stream::Buffered" : "0",
             "WWW::Form::UrlEncoded" : "0.23",
-            "perl" : "5.008005"
+            "perl" : "5.008001"
          },
          "suggests" : {
             "WWW::Form::UrlEncoded::XS" : "0.23"
@@ -68,7 +68,7 @@
    "provides" : {
       "HTTP::Entity::Parser" : {
          "file" : "lib/HTTP/Entity/Parser.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       },
       "HTTP::Entity::Parser::JSON" : {
          "file" : "lib/HTTP/Entity/Parser/JSON.pm"
@@ -94,9 +94,10 @@
          "web" : "https://github.com/kazeburo/HTTP-Entity-Parser"
       }
    },
-   "version" : "0.20",
+   "version" : "0.21",
    "x_contributors" : [
       "Karen Etheridge <ether@cpan.org>",
+      "Shoichi Kaji <skaji@cpan.org>",
       "Todd Rinaldo <toddr@cpan.org>",
       "moznion <moznion@gmail.com>"
    ],

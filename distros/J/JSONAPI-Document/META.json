@@ -38,6 +38,7 @@
             "Carp" : "0",
             "DBD::SQLite" : "0",
             "Test::DBIx::Class" : "0.52",
+            "Test::MockModule" : "0",
             "Test::Most" : "0",
             "Test::Pod" : "0",
             "perl" : "5.010"
@@ -47,7 +48,7 @@
    "provides" : {
       "JSONAPI::Document" : {
          "file" : "lib/JSONAPI/Document.pm",
-         "version" : "0.3"
+         "version" : "0.4"
       }
    },
    "release_status" : "stable",
@@ -57,7 +58,7 @@
          "web" : "https://github.com/ziali088/jsonapi-document.git"
       }
    },
-   "version" : "0.3",
+   "version" : "0.4",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],

@@ -18,7 +18,7 @@ my %module_build_args = (
     "Thomas Klausner <domm\@cpan.org>"
   ],
   "dist_name" => "Plack-Middleware-StatsPerRequest",
-  "dist_version" => "0.900",
+  "dist_version" => "0.901",
   "license" => "perl",
   "module_name" => "Plack::Middleware::StatsPerRequest",
   "recursive_test_files" => 1,

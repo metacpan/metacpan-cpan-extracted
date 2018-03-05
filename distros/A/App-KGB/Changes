@@ -1,3 +1,13 @@
+1.44 (2018-03-03)
+  [ Damyan Ivanov ]
+  * bot/webhook: shorten git hashes in URLs
+    (as a fallback when URL shortening has problems or is not configured)
+  * webhook: no heuristics when determining which params are arrays
+  * webhook/pipeline: add support for pipeline_only_status URL parameter
+    (multiple values)
+    (Closes: #891870)
+  * webhook: colorize pipeline success/failure in reverse green/red
+
 1.43 (2018-03-02)
   [ Damyan Ivanov ]
   * improve pipeline notifications

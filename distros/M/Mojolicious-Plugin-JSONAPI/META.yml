@@ -22,7 +22,7 @@ name: Mojolicious-Plugin-JSONAPI
 provides:
   Mojolicious::Plugin::JSONAPI:
     file: lib/Mojolicious/Plugin/JSONAPI.pm
-    version: '0.3'
+    version: '0.4'
 requires:
   JSONAPI::Document: '0'
   Lingua::EN::Inflexion: '0'
@@ -30,7 +30,7 @@ requires:
   perl: '5.010'
 resources:
   repository: https://github.com/ziali088/mojolicious-plugin-jsonapi.git
-version: '0.3'
+version: '0.4'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -4,7 +4,7 @@
       "Michael Wayne Arnold <marmanold@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "lectionary",
       "rcl",
@@ -64,15 +64,15 @@
    "provides" : {
       "Date::Lectionary" : {
          "file" : "lib/Date/Lectionary.pm",
-         "version" : "1.20180109"
+         "version" : "1.20180302"
       },
       "Date::Lectionary::Day" : {
          "file" : "lib/Date/Lectionary/Day.pm",
-         "version" : "1.20180109"
+         "version" : "1.20180302"
       },
       "Date::Lectionary::Year" : {
          "file" : "lib/Date/Lectionary/Year.pm",
-         "version" : "1.20180109"
+         "version" : "1.20180302"
       }
    },
    "release_status" : "stable",
@@ -83,7 +83,7 @@
          "web" : "https://github.com/marmanold/Date-Lectionary"
       }
    },
-   "version" : "1.20180109",
+   "version" : "1.20180302",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_twitter" : "https://www.twitter.com/marmanold/"
 }

@@ -6,11 +6,11 @@ Steemit::WsClient - perl library for interacting with the steemit websocket serv
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 
 =head1 SYNOPSIS
@@ -181,24 +181,7 @@ so one example on how to get 200 discussions would be
          start_permlink => $discussion->{permlink},
    });
 
-
-=head2 vote
-
-this requires you to initialize the module with your private posting key like this:
-
-
-   my $steem = Steemit::WsClient->new(
-      posting_key => 'copy this one from the steemit site',
-
-   );
-
-   $steem->vote($discossion,$weight)
-
-weight is optional default is 10000 wich equals to 100%
-
-
 =cut
-
 sub _request {
    my( $self, $api, $method, @params ) = @_;
    my $response = $self->ua->post( $self->url, json => {
@@ -317,13 +300,132 @@ sub _get_api_definition {
    )
 }
 
-sub vote {
-   my( $self, $discussion, $weight ) = @_;
 
-   my $permlink = $discussion->{permlink};
-   my $author   = $discussion->{author};
+=head2 vote
+
+this requires you to initialize the module with your private posting key like this:
+
+
+   my $steem = Steemit::WsClient->new(
+      posting_key => 'copy this one from the steemit site',
+
+   );
+
+   $steem->vote($discussion,$weight)
+
+weight is optional default is 10000 wich equals to 100%
+
+
+=cut
+
+
+sub vote {
+   my( $self, @discussions ) = @_;
+
+   my $weight;
+   $weight = pop @discussions, unless ref $discussions[-1];
    $weight   = $weight // 10000;
    my $voter = $self->get_key_references([$self->public_posting_key])->[0][0];
+
+   my @operations = map { [
+         vote => {
+            voter    => $voter,
+            author   => $_->{author},
+            permlink => $_->{permlink},
+            weight   => $weight,
+         }
+      ]
+      } @discussions;
+   return $self->_broadcast_transaction(@operations);
+}
+
+=head2 comment
+
+this requires you to initialize the module with your private posting key like this:
+
+
+   my $steem = Steemit::WsClient->new(
+      posting_key => 'copy this one from the steemit site',
+
+   );
+
+   $steem->comment(
+         "parent_author"   => $parent_author,
+         "parent_permlink" => $parent_permlink,
+         "author"          => $author,
+         "permlink"        => $permlink,
+         "title"           => $title,
+         "body"            => $body,
+         "json_metadata"   => $json_metadata,
+   )
+
+you need at least a permlink and body
+fill the parent parameters to comment on an existing post
+json metadata can be already a json string or a perl hash
+
+=cut
+
+sub comment {
+   my( $self, %params ) = @_;
+
+   my $parent_author   = $params{parent_author} // '';
+   my $parent_permlink = $params{parent_permlink} // '';
+   my $permlink        = $params{permlink} or die "permlink missing for comment";
+   my $title           = $params{title} // '';
+   my $body            = $params{body} or die "body missing for comment";
+
+   my $json_metadata   = $params{json_metadata} // {};
+   if( ref $json_metadata ){
+      $json_metadata = encode_json( $json_metadata);
+   }
+
+   my $author = $self->get_key_references([$self->public_posting_key])->[0][0];
+
+   my $operation = [
+      comment => {
+         "parent_author"   => $parent_author,
+         "parent_permlink" => $parent_permlink,
+         "author"          => $author,
+         "permlink"        => $permlink,
+         "title"           => $title,
+         "body"            => $body,
+         "json_metadata"   => $json_metadata,
+      }
+   ];
+   return $self->_broadcast_transaction($operation);
+}
+
+=head2 delete_comment
+
+   $steem->delete_comment(
+      author => $author,
+      permlink => $permlink
+   )
+
+you need the permlink
+author will be filled with the user of your posting key if missing
+
+=cut
+
+sub delete_comment {
+   my( $self, %params ) = @_;
+
+   my $permlink = $params{permlink} or die "permlink missing for comment";
+
+   my $author   = $params{author} // $self->get_key_references([$self->public_posting_key])->[0][0];
+
+   my $operation = [
+      delete_comment => {
+            "author"          => $author,
+            "permlink"        => $permlink,
+      }
+   ];
+   return $self->_broadcast_transaction($operation);
+}
+
+
+sub _broadcast_transaction {
+   my( $self, @operations ) = @_;
 
    my $properties = $self->get_dynamic_global_properties();
 
@@ -344,14 +446,7 @@ sub vote {
       ref_block_num => ( $block_number - 1 )& 0xffff,
       ref_block_prefix => unpack( "xxxxV", pack('H*',$ref_block_id)),
       expiration       => $expiration,
-      operations       => [[
-         vote => {
-            voter => $voter,
-            author => $author,
-            permlink => $permlink,
-            weight   => $weight,
-         }
-      ]],
+      operations       => [@operations],
       extensions => [],
       signatures => [],
    };
@@ -363,7 +458,13 @@ sub vote {
    $i += 4;
    $i += 27;
 
-   $transaction->{signatures} = [ join('', map { unpack 'H*', $_->as_bytes} ($i,$r,$s ) ) ];
+   my $signature = join('', map { unpack 'H*', $_ } ( pack("C", $i ), map { $_->as_bytes} ($r,$s )) );
+   unless( Steemit::ECDSA::is_signature_canonical_canonical( pack "H*", $signature ) ){
+      die "signature $signature is not canonical";
+   }
+
+   $transaction->{signatures} = [ $signature ];
+
 
    $self->_request('network_broadcast_api','broadcast_transaction_synchronous',$transaction);
 }
@@ -429,31 +530,27 @@ sub _serialize_transaction_message  {
 
    $serialized_transaction .= pack "C", scalar( @{ $transaction->{operations} });
 
-   my $operation_count = 0;
+   require Steemit::OperationSerializer;
+   my $op_ser = Steemit::OperationSerializer->new;
+
    for my $operation ( @{ $transaction->{operations} } ) {
 
       my ($operation_name,$operations_parameters) = @$operation;
-
-      ##operation id
-      $serialized_transaction .= pack "C", 0;
-
-      $serialized_transaction .= pack "C", length $operations_parameters->{voter};
-      $serialized_transaction .= pack "A*", $operations_parameters->{voter};
-
-      $serialized_transaction .= pack "C", length $operations_parameters->{author};
-      $serialized_transaction .= pack "A*", $operations_parameters->{author};
-
-      $serialized_transaction .= pack "C", length $operations_parameters->{permlink};
-      $serialized_transaction .= pack "A*", $operations_parameters->{permlink};
-
-      $serialized_transaction .= pack "s", $operations_parameters->{weight};
+      $serialized_transaction .= $op_ser->serialize_operation(
+         $operation_name,
+         $operations_parameters,
+      );
    }
+
    #extentions in case we realy need them at some point we will have to implement this is a less nive way ;)
    die "extentions not supported" if $transaction->{extensions} and $transaction->{extensions}[0];
    $serialized_transaction .= pack 'H*', '00';
 
    return pack( 'H*', ( '0' x 64 )).$serialized_transaction;
 }
+
+
+
 
 
 

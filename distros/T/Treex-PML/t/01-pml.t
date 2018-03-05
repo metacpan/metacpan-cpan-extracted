@@ -114,13 +114,15 @@ example10_schema.xml
   ok (Treex::PML::does($schema,'Treex::PML::Schema'),'loaded PML schema '.$file);
   ok (Treex::PML::does($schema->get_root_decl,'Treex::PML::Schema::Decl'),'get root declaration');
   $schema->set_url($tempfile);
-  my $dump = Data::Dumper->new([$schema],['schema'])->Dump;
-  $dump=~s/'-##' => \d+/'-##' => 0/g;
+  my $dump = Data::Dumper->new([$schema],['schema'])
+    ->Sortkeys(1)->Indent(0)->Dump;
+  $dump=~s/'-#(#?)' => \d+/'-#$1' => 0/g;
   $schema->write({filename => $tempfile});
   my $schema2 = Treex::PML::Factory->createPMLSchema({filename=>$tempfile});
   $schema2->set_url($tempfile);
-  my $dump2 = Data::Dumper->new([$schema],['schema'])->Dump;
-  $dump2=~s/'-##' => \d+/'-##' => 0/g;
+  my $dump2 = Data::Dumper->new([$schema2],['schema'])
+    ->Sortkeys(1)->Indent(0)->Dump;
+  $dump2=~s/'-#(#?)' => \d+/'-#$1' => 0/g;
   is($dump,$dump2,"Compare read/write/read PML schema ".$file);
 
 }

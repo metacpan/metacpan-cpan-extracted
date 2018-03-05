@@ -88,4 +88,15 @@ $oo = $c->include(inline => "<%= piwik_tag 'opt-out-link', begin %>Opt Out!<% en
 
 like($oo, qr{<a href=".+" rel="nofollow">Opt Out!</a>}, 'opt-out-link');
 
+# Retry with secure base url
+$app->plugin(Piwik => {
+  url => 'https://sojolicio.us/piwik'
+});
+
+$oo = $app->piwik_tag('opt-out');
+
+like($oo, qr{https://sojolicio\.us/}, 'Opt-Out');
+
+
+
 done_testing;

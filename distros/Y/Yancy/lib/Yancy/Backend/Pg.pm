@@ -1,5 +1,5 @@
 package Yancy::Backend::Pg;
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 # ABSTRACT: A backend for Postgres using Mojo::Pg
 
 #pod =head1 SYNOPSIS
@@ -149,7 +149,7 @@ sub list {
     }
     #; say $query;
     return {
-        rows => $pg->db->query( $query, @params )->hashes,
+        items => $pg->db->query( $query, @params )->hashes,
         total => $pg->db->query( $total_query, @total_params )->hash->{total},
     };
 
@@ -277,7 +277,7 @@ Yancy::Backend::Pg - A backend for Postgres using Mojo::Pg
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

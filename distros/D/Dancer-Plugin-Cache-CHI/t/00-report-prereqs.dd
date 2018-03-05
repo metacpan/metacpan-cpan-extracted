@@ -1,0 +1,44 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0.96',
+                                      'Test::Vars' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'CHI' => '0',
+                                      'Carp' => '0',
+                                      'Dancer' => '1.32',
+                                      'Dancer::Factory::Hook' => '0',
+                                      'Dancer::Plugin' => '0',
+                                      'Dancer::Response' => '0',
+                                      'Dancer::SharedData' => '0',
+                                      'Moo' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Dancer::Test' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0',
+                                   'lib' => '0',
+                                   'perl' => 'v5.10.0'
+                                 }
+                 }
+     };
+  $x;
+ }

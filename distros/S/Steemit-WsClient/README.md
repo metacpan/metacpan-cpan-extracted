@@ -8,6 +8,7 @@ Version 0.09
 
 # SYNOPSIS
 
+```perl
     use Steemit::WsClient;
 
     my $foo = Steemit::WsClient->new();
@@ -38,6 +39,7 @@ Version 0.09
     }
 
     say "Average reputation of the last 99 utopian authors: ". ( int( $reputation_sum / scalar(@$authors) )  / 100 );
+```
 
 # DEPENDENCIES
 
@@ -164,9 +166,42 @@ this requires you to initialize the module with your private posting key like th
 
     );
 
-    $steem->vote($discossion,$weight)
+    $steem->vote($discussion,$weight)
 
 weight is optional default is 10000 wich equals to 100%
+
+## comment
+
+this requires you to initialize the module with your private posting key like this:
+
+    my $steem = Steemit::WsClient->new(
+       posting_key => 'copy this one from the steemit site',
+
+    );
+
+    $steem->comment(
+          "parent_author"   => $parent_author,
+          "parent_permlink" => $parent_permlink,
+          "author"          => $author,
+          "permlink"        => $permlink,
+          "title"           => $title,
+          "body"            => $body,
+          "json_metadata"   => $json_metadata,
+    )
+
+you need at least a permlink and body
+fill the parent parameters to comment on an existing post
+json metadata can be already a json string or a perl hash
+
+## delete\_comment
+
+    $steem->delete_comment(
+       author => $author,
+       permlink => $permlink
+    )
+
+you need the permlink
+author will be filled with the user of your posting key if missing
 
 # REPOSITORY
 

@@ -30,7 +30,7 @@ use strict;
 use List::Util 'min','max';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 125;
+$VERSION = 126;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',

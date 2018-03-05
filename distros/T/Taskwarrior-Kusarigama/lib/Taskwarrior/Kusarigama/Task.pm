@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Task;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: per-task Taskwarrior::Kusarigama::Wrapper
-$Taskwarrior::Kusarigama::Task::VERSION = '0.7.0';
+$Taskwarrior::Kusarigama::Task::VERSION = '0.8.0';
 use strict;
 
 use experimental 'postderef';
@@ -42,27 +42,25 @@ sub clone {
 
     my $cloned = Clone::clone($self);
 
-    delete $cloned->{$_} for qw/ id uuid entry modified urgency status /;
+    delete $cloned->{$_} for qw/ id uuid entry modified end urgency status /;
 
     return $self->new( $self->{_wrapper}, $cloned );
+}
+
+sub data {
+    my $self = shift;
+    require List::Util;
+    return { List::Util::pairgrep( sub { $a !~ /^_/ }, %$self ) }
 }
 
 sub save {
     my $self = shift;
     
-    require Path::Tiny;
-    require JSON;
-    my $file = Path::Tiny->tempfile;
-    require List::Util;
+    my $new = $self->{_wrapper}->save($self->data);
 
-    $file->spew( JSON::to_json( [ { List::Util::pairgrep( sub { $a !~ /^_/ }, %$self ) } ] ) );
-
-    $self->{_wrapper}->RUN('import', "".$file );
-
-    my ( $new ) = $self->{_wrapper}->export('+LATEST');
-
-    delete $self->{$_} for keys %$self;
-    $self->{$_} = $new->{$_} for keys %$new;
+    %$self = %$new;
+    # delete $self->{$_} for keys %$self;
+    # $self->{$_} = $new->{$_} for keys %$new;
 
     return  $self;
 }
@@ -104,7 +102,7 @@ Taskwarrior::Kusarigama::Task - per-task Taskwarrior::Kusarigama::Wrapper
 
 =head1 VERSION
 
-version 0.7.0
+version 0.8.0
 
 =head1 SYNOPSIS
 

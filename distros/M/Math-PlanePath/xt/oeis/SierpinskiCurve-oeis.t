@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -30,9 +30,6 @@ use MyOEIS;
 use Math::PlanePath::SierpinskiCurve;
 use Math::NumSeq::PlanePathDelta;
 use Math::NumSeq::PlanePathTurn;
-
-# uncomment this to run the ### lines
-#use Smart::Comments '###';
 
 
 #------------------------------------------------------------------------------

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.0.16, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Cookie::Baker::XS:
     file: lib/Cookie/Baker/XS.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Exporter: '0'
   perl: '5.008001'
@@ -34,5 +34,5 @@ resources:
   bugtracker: https://github.com/kazeburo/Cookie-Baker-XS/issues
   homepage: https://github.com/kazeburo/Cookie-Baker-XS
   repository: git://github.com/kazeburo/Cookie-Baker-XS.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

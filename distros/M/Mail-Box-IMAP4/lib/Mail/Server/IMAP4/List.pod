@@ -31,14 +31,14 @@ L<Mail::Box::Identity|Mail::Box::Identity> and L<Mail::Box::Collection|Mail::Box
 mean that the folders will not be opened to answer these questions.
 
  -Option   --Default
-  delimeter  '/'
+  delimiter  '/'
   folders    <from user>
   inbox      <from user>
   user       <undef>
 
 =over 2
 
-=item delimeter => STRING|CODE
+=item delimiter => STRING|CODE
 
 Either the constant delimiter, or a code reference which will get passed
 a folder name and should return the delimiter string used in that name.
@@ -74,7 +74,7 @@ must get reported.
 Returns the delimiter string.  The foldername is only required when a
 CODE reference was specified at initiation.
 
-example: setting-up an IMAP4 delimeter
+example: setting-up an IMAP4 delimiter
 
  sub delim($)
  {   my $path = shift;
@@ -144,35 +144,12 @@ sections 6.3.8 (LIST question) and 7.2.2 (LIST answer)
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box-IMAP4 distribution version 3.002,
-built on June 29, 2017.
-
-Do not forget to read
-L<Mail::Box-Overview>,
-L<Mail::Box-Cookbook>, and
-L<Mail::Box-Index>.
-Examples are included in the Mail-Box distribution, directories 'examples'
-and 'scripts'.
-
-Browseable manuals, papers, and other released material van be found
-at  Website: F<http://perl.overmeer.net/mailbox/>
-
-The central modules (in separate distributions) in the MailBox suite are:
-L<Mail::Message>,
-L<Mail::Box>,
-L<Mail::Box::IMAP4>,
-L<Mail::Box::POP3>,
-L<Mail::Box::Parser::C>,
-L<Mail::Box::Dbx> (unpublished),
-L<Mail::Transport>,
-L<Object::Realize::Later>, and
-L<User::Identity>.
-
-Please post questions or ideas to the author F<markov@cpan.org>.
+This module is part of Mail-Box-IMAP4 distribution version 3.003,
+built on March 04, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2001-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

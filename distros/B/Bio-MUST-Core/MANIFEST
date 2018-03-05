@@ -12,6 +12,7 @@ bin/ali2phylip.pl
 bin/app-len-ids-ali.pl
 bin/change-ids-ali.pl
 bin/classify-ali.pl
+bin/clust2mapper.pl
 bin/fasta2ali.pl
 bin/fetch-tax.pl
 bin/format-tree.pl
@@ -345,6 +346,7 @@ test/taxdump/nodes_u1.dmp
 test/temp.fasta
 test/temp_degap.fasta
 test/temp_degap_nowrap.fasta
+test/temp_prefix.fasta
 test/test-delta.rates
 test/test-othr.meansiterates
 test/test-self.meansiterates
@@ -357,6 +359,7 @@ test/tricky.names
 test/tricky.tax
 test/uc_seqs.ali
 test/unaligned.ali
+test/underscores.idm
 test/uniq.ali
 test/unrooted-bp.grp
 test/unrooted-bp.nbs

@@ -17,11 +17,11 @@ Date::Lectionary::Year - Cycle Year for the Lectionary
 
 =head1 VERSION
 
-Version 1.20180109
+Version 1.20180302
 
 =cut
 
-our $VERSION = '1.20180109';
+our $VERSION = '1.20180302';
 
 =head1 SYNOPSIS
 

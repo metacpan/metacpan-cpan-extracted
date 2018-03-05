@@ -1,0 +1,7 @@
+---
+comment: Tests hang smoker
+disabled: 1
+match:
+  distribution: ^AWWAIID/Devel-ebug
+  env:
+    PERLBREW_PERL: cperl-5.24.3

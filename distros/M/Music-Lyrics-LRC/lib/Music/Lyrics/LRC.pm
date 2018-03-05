@@ -13,7 +13,7 @@ use Carp;
 use English '-no_match_vars';
 
 # Declare package version
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 # Patterns to match elements of the LRC file; these are somewhat tolerant
 our %RE = (
@@ -272,7 +272,7 @@ Music::Lyrics::LRC - Manipulate LRC karaoke timed lyrics files
 
 =head1 VERSION
 
-Version 0.13
+Version 0.15
 
 =head1 DESCRIPTION
 
@@ -309,9 +309,9 @@ Constructor method. Accepts a hash with one attribute C<verbose>. This
 specifies whether the module will C<warn> explicitly when it cannot parse an
 input line from a file. It defaults to 0.
 
-    my $lrc = MRC::Lyrics::LRC->new();
+    my $lrc = Music::Lyrics::LRC->new();
     ...
-    my $lrc_verbose = MRC::Lyrics::LRC->new(verbose => 1);
+    my $lrc_verbose = Music::Lyrics::LRC->new(verbose => 1);
     ...
 
 =head2 C<lyrics()>

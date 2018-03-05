@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,7 +20,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION';
-$VERSION = 125;
+$VERSION = 126;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -344,16 +344,16 @@ sub xyxy_to_n_list_either {
   my @n1 = $self->xy_to_n_list($x1,$y1) or return;
   my @n2 = $self->xy_to_n_list($x2,$y2) or return;
   my $arms = $self->arms_count;
-  my @n;
+  my @n_list;
   foreach my $n1 (@n1) {
     foreach my $n2 (@n2) {
       if (abs($n1 - $n2) == $arms) {
-        push @n, _min($n1,$n2);
+        push @n_list, _min($n1,$n2);
       }
     }
   }
-  @n = sort {$a<=>$b} @n;
-  return @n;
+  @n_list = sort {$a<=>$b} @n_list;
+  return @n_list;
 }
 sub xyxy_to_n_either {
   my $self = shift;
@@ -709,6 +709,7 @@ related things are further down like C<Math::PlanePath::Base::Xyzzy>.
     TerdragonCurve         ternary dragon
     TerdragonRounded       ternary dragon rounded corners
     TerdragonMidpoint      ternary dragon segment midpoints
+    AlternateTerdragon     alternate ternary dragon
     R5DragonCurve          radix-5 dragon curve
     R5DragonMidpoint       radix-5 dragon curve midpoints
     CCurve                 "C" curve
@@ -1087,12 +1088,12 @@ C<dy_minimum()> is 0.
 =cut
 
 # =item C<@dxdy_list = $path-E<gt>dxdy_list()>
-# 
+#
 # If C<$path> has a finite set of dX,dY steps then return them as a list.
 # If C<$path> has an infinite set of dX,dY steps then return an empty list.
-# 
+#
 #     $dx1,$dy1, $dx2,$dy2, $dx3,$dy3, ...
-# 
+#
 # The points are returned in order of angle around starting from East
 # (dXE<gt>0,dY=0), and by increasing length among those of the same angle.  If
 # dX=0,dY=0 occurs (which it doesn't in any current path) then that would be
@@ -1139,7 +1140,6 @@ and so have a maximum, though that's unusual.
       Path always below      |\
       has maximum S=X+Y      | \
                                 \  S=X+Y
-
 
 =item C<$sum = $path-E<gt>sumabsxy_minimum()>
 
@@ -1742,6 +1742,7 @@ C<KochPeaks> and C<GosperIslands>.
                   SierpinskiTriangle, SierpinskiArrowhead,
                   SierpinskiArrowheadCentres,
                   TerdragonCurve, TerdragonRounded, TerdragonMidpoint,
+                  AlternateTerdragon,
                   UlamWarburton, UlamWarburtonQuarter (each level)
       4         KochCurve, KochPeaks, KochSnowflakes, KochSquareflakes,
                   LTiling,
@@ -1823,13 +1824,41 @@ sqrt(3) scale factor before rotating or the result will be skewed.  60
 degree rotations can be made within the integer X,Y coordinates directly as
 follows, all giving integer X,Y results.
 
-    (X-3Y)/2, (Y+X)/2       rotate +60   (anti-clockwise)
-    (X+3Y)/2, (Y-X)/2       rotate -60   (clockwise)
-    -(X+3Y)/2, (X-Y)/2      rotate +120
-    (3Y-X)/2, -(X+Y)/2      rotate -120
+    ( X-3Y)/2, ( X+Y)/2     rotate +60   (anti-clockwise)
+    ( X+3Y)/2, (-X+Y)/2     rotate -60   (clockwise)
+    (-X-3Y)/2, ( X-Y)/2     rotate +120
+    (-X+3Y)/2, (-X-Y)/2     rotate -120
     -X,-Y                   rotate 180
 
-    (X+3Y)/2, (X-Y)/2       mirror across the X=3*Y twelfth line
+    (X+3Y)/2, (X-Y)/2       mirror across the X=3*Y twelfth (30deg)
+
+=cut
+
+# GP-DEFINE  sqrt3i = quadgen(-12);
+# GP-Test  sqrt3i^2 == -3
+# GP-DEFINE  w6 =  1/2 + 1/2*sqrt3i;
+# GP-DEFINE  w3 = -1/2 + 1/2*sqrt3i;
+# GP-DEFINE  b12 = 3/2 + 1/2*sqrt3i;
+
+# rot +/-60
+# GP-Test   ('x/2 + 'y*sqrt3i/2)*w6 \
+# GP-Test   == (('x - 3*'y)/2)*1/2  + (( 'x + 'y)/2)*sqrt3i/2
+
+# GP-Test   ('x/2 + 'y*sqrt3i/2)/w6 \
+# GP-Test   == (('x + 3*'y)/2)*1/2  + ((-'x + 'y)/2)*sqrt3i/2
+
+# rot +/-120
+# GP-Test   ('x/2 + 'y*sqrt3i/2)*w3 \
+# GP-Test   == ((-'x - 3*'y)/2)*1/2  + (( 'x - 'y)/2)*sqrt3i/2
+
+# GP-Test   ('x/2 + 'y*sqrt3i/2)/w3 \
+# GP-Test   == ((-'x + 3*'y)/2)*1/2  + ((-'x - 'y)/2)*sqrt3i/2
+
+# mirror across 30deg
+# GP-Test   conj(('x/2 + 'y*sqrt3i/2)/b12)*b12 \
+# GP-Test   == (('x + 3*'y)/2)*1/2  + (('x - 'y)/2)*sqrt3i/2
+
+=pod
 
 The sqrt(3) factor can be worked into a hypotenuse radial distance
 calculation as follows if comparing distances from the origin.
@@ -2036,10 +2065,10 @@ The following methods have base implementations calling C<xy_to_n()>.
 A subclass might implement them directly if it can be done more efficiently.
 
     xy_is_visited()          defined(xy_to_n($x,$y))
-    xyxy_to_n()              \ 
+    xyxy_to_n()              \
     xyxy_to_n_either()       | calling xy_to_n_list()
-    xyxy_to_n_list()         | 
-    xyxy_to_n_list_either()  / 
+    xyxy_to_n_list()         |
+    xyxy_to_n_list_either()  /
 
 Paths such as C<SquareSpiral> which fill the plane have C<xy_is_visited()>
 always true, so for them
@@ -2197,6 +2226,7 @@ L<Math::PlanePath::AlternatePaperMidpoint>,
 L<Math::PlanePath::TerdragonCurve>,
 L<Math::PlanePath::TerdragonRounded>,
 L<Math::PlanePath::TerdragonMidpoint>,
+L<Math::PlanePath::AlternateTerdragon>,
 L<Math::PlanePath::R5DragonCurve>,
 L<Math::PlanePath::R5DragonMidpoint>,
 L<Math::PlanePath::CCurve>

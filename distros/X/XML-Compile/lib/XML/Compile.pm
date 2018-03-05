@@ -1,15 +1,18 @@
-# Copyrights 2006-2017 by [Mark Overmeer].
+# Copyrights 2006-2018 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-
-use warnings;
-use strict;
+# This code is part of distribution XML-Compile.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile;
 use vars '$VERSION';
-$VERSION = '1.59';
+$VERSION = '1.60';
 
+
+use warnings;
+use strict;
 
 use Log::Report 'xml-compile';
 use XML::LibXML;

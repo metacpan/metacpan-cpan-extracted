@@ -9,21 +9,14 @@
 # housekeeping
 ########################################################################
 
-package Object::Trampoline  1.42;
-use v5.12;
+package Object::Trampoline  v1.30.1;
+use v5.24;
 
 use Carp;
 
 ########################################################################
 # package variables
 ########################################################################
-
-# minimal sanity check for valid class name, used in both
-# O::T and O::T::U.
-
-my $pkg_rx      = qr{^ [_A-Za-z](?:\w*) (?:::\w+)* $}x;
-
-my $bounce_pkg  = 'Object::Trampoline::Bounce';
 
 ########################################################################
 # AUTOLOAD is the only public interface
@@ -50,13 +43,6 @@ my $bounce_pkg  = 'Object::Trampoline::Bounce';
 
 our $AUTOLOAD = '';
 
-sub delayed
-{
-    my ( $undef, $handler, @argz ) = @_;
-
-    bless sub { $handler->( @argz ) }, $bounce_pkg
-}
-
 AUTOLOAD
 {
     # discard this class: once here it is used up.
@@ -72,7 +58,7 @@ AUTOLOAD
 
     my $sub     = sub { $proto->$method( @argz ) };
 
-    bless $sub, $bounce_pkg
+    bless $sub, 'Object::Trampoline::Bounce'
 }
 
 ########################################################################
@@ -93,38 +79,22 @@ use Carp;
 
 *VERSION = \$Object::Trampoline::VERSION;
 
-our $AUTOLOAD = '';
-
 ########################################################################
 # AUTOLOAD is the only public interface
 ########################################################################
+    
+our $AUTOLOAD = '';
 
 AUTOLOAD
 {
     # this version does slightly more work since it 
     # has to put using the module into the caller's
     # class before calling the constructor.
-    #
-    # the eval is unavoidable since use requires the 
-    # module's package name as a bareword.
 
     my ( undef, $proto, @argz ) = @_;
 
     $proto
     or croak "Object::Trampoline::Use: false prototype.";
-
-    # sanity check: the prototype is words glued together with 
-    # double-colons. not perfect but worthwhile since most 
-    # injection attempts will at least require a path or space.
-
-    for( split '::' => $proto )
-    {
-        /\W/ and croak
-        "Botched trampoline_use: '$_' invalid module name";
-    }
-
-    # Note: add a sanity pre-check w/ warning for non-existant
-    # module.
 
     my $method  = ( split /::/, $AUTOLOAD )[ -1 ];
     my $caller  = caller;
@@ -179,6 +149,8 @@ use Carp;
 use Scalar::Util    qw( blessed         );
 use Symbol          qw( qualify_to_ref  );
 
+# version is defined by the main package.
+
 *VERSION = \$Object::Trampoline::VERSION;
 
 our $AUTOLOAD = '';
@@ -210,6 +182,7 @@ AUTOLOAD
 }
 
 # re-route methods from UNIVERSAL through the bounce.
+# allows $trampoline->VERSION to do the right thing.
 
 for my $name ( keys %{ $::{ 'UNIVERSAL::' } } )
 {
@@ -221,6 +194,8 @@ for my $name ( keys %{ $::{ 'UNIVERSAL::' } } )
         goto &AUTOLOAD
     };
 }
+
+
 
 # stub destroy dodges AUTOLOAD for unused trampolines.
 
@@ -287,86 +262,6 @@ simplifies runtime definition of handler classes.
 
     # Note: isa and can are overloaded. Calling $lazy->isa will
     # convert the object and return the corret type.
-
-    # you use a module that does not check for forks and will
-    # fail if the object is created prior to forking. adding
-    # a sanity check in the constructor will delay the check
-    # until the object is used. using O::T::B delays the check
-    # but still makes the object available (e.g., for export
-    # to other modules).
-
-    packge WhatEver;
-
-    my $parent  = $$;
-
-    sub new
-    {
-        my $obj = &construct;
-
-        $object->initialize( @_ );
-
-        $object
-    }
-
-    sub initialize
-    {
-        $$ != $parent
-        or die "Creating WhatEver in parent process";
-        
-        # safe to create the object
-
-        my ( $obj, @argz ) = @_;
-
-        ...
-    }
-
-    ...
-
-    my $post_fork_object
-    = bless sub { WhatEver->new( ... ) }, 'Object::Trampoline::Bounce';
-
-    # there are times it is convienent to delay calling 
-    # a lexical sub, say a factory object or lexically-
-    # scoped utility sub.
-    # 
-    # lacking the name of a method and a class, this has to use
-    # different mechanism. calling O::T::delayed with a subref
-    # and arguments will delay calling the subref until the object
-    # is accessed.
-    #
-    # note that this will fail if $handler is not a subref; for 
-    # calling methods by name use the syntax described above.
-
-    my $handler
-    = sub
-    {
-        # extract connect values at runtime.
-
-        DBI->connect( @Database{ qw( dsn usr pwd attr ) } );
-    };
-
-    my $dbh = Object::Trampoline->delayed( $handler, @argz );
-
-    # or 
-
-    my $gen_dbh
-    = do
-    {
-        # extract DBConfig at compile time, delay 
-        # constructing the object. this gives the 
-        # advantage of validating the arguments at
-        # compile time, delaying the actual construction.
-
-        my $dsn     = $Database{ dsn } or die "...";
-        my $user    = ... ;
-        my $pass    = ... ;
-        my $attr    = ... ;
-
-        sub { DBI->connect( $dsn, $user, $pass, $attr ) }
-    };
-
-    my $dbh = Object::Trampoline->delayed( $gen_dbh );
-
 
 =head1 DESCRIPTION
 

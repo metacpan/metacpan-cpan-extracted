@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -29,7 +29,7 @@ BEGIN { MyTestHelpers::nowarnings(); }
 #use Smart::Comments '###';
 
 
-my $test_count = (tests => 447)[1];
+my $test_count = (tests => 455)[1];
 plan tests => $test_count;
 
 # version 1.14 for abs() overload
@@ -331,6 +331,21 @@ my @modules = (
                'DiagonalsOctant,direction=up',
                'DiagonalsAlternating',
 
+               'AlternateTerdragon',
+               'AlternateTerdragon,arms=1',
+               'AlternateTerdragon,arms=2',
+               'AlternateTerdragon,arms=6',
+
+               'TerdragonCurve',
+               'TerdragonCurve,arms=1',
+               'TerdragonCurve,arms=2',
+               'TerdragonCurve,arms=6',
+
+               'TerdragonMidpoint',
+               'TerdragonMidpoint,arms=1',
+               'TerdragonMidpoint,arms=2',
+               'TerdragonMidpoint,arms=6',
+
                'TerdragonRounded',
                'TerdragonRounded,arms=1',
                'TerdragonRounded,arms=2',
@@ -361,16 +376,6 @@ my @modules = (
                'WunderlichSerpentine,radix=5,serpentine_type=coil',
 
                'CretanLabyrinth',
-
-               'TerdragonMidpoint',
-               'TerdragonMidpoint,arms=1',
-               'TerdragonMidpoint,arms=2',
-               'TerdragonMidpoint,arms=6',
-
-               'TerdragonCurve',
-               'TerdragonCurve,arms=1',
-               'TerdragonCurve,arms=2',
-               'TerdragonCurve,arms=6',
 
                'OctagramSpiral',
                'AnvilSpiral',

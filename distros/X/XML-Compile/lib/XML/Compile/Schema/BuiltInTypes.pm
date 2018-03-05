@@ -1,22 +1,27 @@
-# Copyrights 2006-2017 by [Mark Overmeer].
+# Copyrights 2006-2018 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
-no warnings 'recursion';
+# This code is part of distribution XML-Compile.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::Schema::BuiltInTypes;
 use vars '$VERSION';
-$VERSION = '1.59';
+$VERSION = '1.60';
 
 use base 'Exporter';
+
+use warnings;
+use strict;
+use utf8;
+no warnings 'recursion';
 
 our @EXPORT = qw/%builtin_types builtin_type_info/;
 
 our %builtin_types;
 
-use Log::Report     'xml-compile', syntax => 'SHORT';
+use Log::Report     'xml-compile';
 use POSIX           qw/strftime/;
 use Math::BigInt;
 use Math::BigFloat;
@@ -491,6 +496,8 @@ $builtin_types{yearMonthDuration} =
  , extends => 'duration'
  };
 
+#-------------
+
 
 $builtin_types{string} =
  { example => 'example'
@@ -517,7 +524,7 @@ $builtin_types{language} =
 #  NCName matches pattern [\i-[:]][\c-[:]]*
 sub _ncname($)
 {  (my $name = $_[0]) =~ s/\s//;
-   $name =~ m/^[a-zA-Z_](?:[\w.-]*)$/;
+   $name =~ m/^[[:alpha:]_](?:[\w.-]*)$/;
 }
 
 my $ids = 0;
@@ -635,6 +642,8 @@ $builtin_types{NOTATION} =
  {
    extends => 'anyAtomicType'
  };
+
+#-------------
 
 
 $builtin_types{binary} = { example => 'binary string' };

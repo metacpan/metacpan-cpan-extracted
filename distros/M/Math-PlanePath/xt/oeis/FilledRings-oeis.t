@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013 Kevin Ryde
+# Copyright 2012, 2013, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -30,8 +30,6 @@ use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
-# uncomment this to run the ### lines
-#use Smart::Comments '###';
 
 #------------------------------------------------------------------------------
 # A036704 -- count |z|<=n+1/2

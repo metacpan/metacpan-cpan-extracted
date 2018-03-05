@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -28,7 +28,7 @@ use List::Util;
 *min = \&Math::PlanePath::_min;
 
 use vars '$VERSION','@ISA';
-$VERSION = 125;
+$VERSION = 126;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 
@@ -3380,6 +3380,10 @@ sub characteristic_smaller {
 { package Math::PlanePath::TerdragonMidpoint;
   use constant _NumSeq_Coord_TRSquared_min => 4; # either X=2,Y=0 or X=1,Y=1
   use constant _NumSeq_Coord_ExperimentalParity_max => 0;  # even always
+}
+{ package Math::PlanePath::AlternateTerdragon;
+  use constant _NumSeq_Coord_ExperimentalParity_max => 0;  # even always
+  use constant _NumSeq_Coord_n_list_max => 3;
 }
 { package Math::PlanePath::R5DragonCurve;
   use constant _NumSeq_Coord_n_list_max => 2;

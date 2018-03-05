@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::Biblio::Dumper;
 # ABSTRACT: Class dumping a Koha Catalog
-$Koha::Contrib::Tamil::Biblio::Dumper::VERSION = '0.053';
+$Koha::Contrib::Tamil::Biblio::Dumper::VERSION = '0.054';
 use Moose;
 
 extends 'AnyEvent::Processor';
@@ -79,7 +79,10 @@ before 'run' => sub {
     $self->sth($sth);
 
     $self->sth_marcxml( $self->koha->dbh->prepare(
-        "SELECT marcxml FROM biblioitems WHERE biblionumber=?" ) );
+        $self->koha->_old_marc_biblio_sub
+        ? "SELECT marcxml FROM biblioitems WHERE biblionumber=?"
+        : "SELECT metadata FROM biblio_metadata WHERE biblionumber=?"
+    ) );
 
     $query = "SELECT * FROM items WHERE biblionumber=?";
     $query .= " AND $where" if $where;
@@ -169,7 +172,7 @@ Koha::Contrib::Tamil::Biblio::Dumper - Class dumping a Koha Catalog
 
 =head1 VERSION
 
-version 0.053
+version 0.054
 
 =head1 SYNOPSIS
 

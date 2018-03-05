@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 lib/Mail/Box/POP3.pm
 lib/Mail/Box/POP3.pod
 lib/Mail/Box/POP3/Message.pm
@@ -20,5 +21,6 @@ t/original/0002
 t/original/0003
 t/original/0004
 t/server
+xt/99pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

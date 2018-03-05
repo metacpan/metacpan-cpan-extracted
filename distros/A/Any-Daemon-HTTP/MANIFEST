@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 examples/apache.pl
 lib/Any/Daemon/HTTP.pm
 lib/Any/Daemon/HTTP.pod

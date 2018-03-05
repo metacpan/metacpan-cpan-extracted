@@ -1,5 +1,14 @@
 Revision history for App-MechaCPAN
 
+0.23  2018-03-05 00:29:51 EST
+  - Fix a bug where if a path has a perl like verion in it would cause t/13
+    to fail.
+  - Added some diag statements to help track down other cpantesters issues
+
+0.22  2018-03-02 10:02:08 EST
+  - Hotfix a bug with the minimum git test so it uses a known version (the
+    minimum we support) instead of the version the machine happens to have
+
 0.21  2018-03-02 00:37:55 EST
   - Having two distributions list the same module in provides is no longer
     immediately fatal.

@@ -1,5 +1,5 @@
 package Business::RO::TaxDeduction;
-$Business::RO::TaxDeduction::VERSION = '0.011';
+$Business::RO::TaxDeduction::VERSION = '0.012';
 # ABSTRACT: Romanian salary tax deduction calculator
 
 use 5.010001;
@@ -14,6 +14,7 @@ use Business::RO::TaxDeduction::Types qw(
 );
 use Business::RO::TaxDeduction::Amount;
 use Business::RO::TaxDeduction::Ranges;
+use Business::RO::TaxDeduction::Table;
 
 has 'vbl' => (
     is       => 'ro',
@@ -24,7 +25,7 @@ has 'vbl' => (
 has 'year' => (
     is       => 'ro',
     isa      => Int,
-    default  => sub { 2016 },
+    default  => sub { 2018 },
 );
 
 has 'persons' => (
@@ -68,6 +69,9 @@ has 'ten' => (
 sub tax_deduction {
     my $self   = shift;
     my $vbl    = $self->_round_to_int( $self->vbl );
+
+    return $self->_amount_for_2018 if $self->year >= 2018;
+
     my $amount = $self->deduction->amount;
     if ( $vbl <= $self->vbl_min ) {
         return $amount;
@@ -105,6 +109,16 @@ sub _round_to_tens {
     return $afloor->bsub($amodulo)->badd( $self->ten );
 }
 
+sub _amount_for_2018 {
+    my $self = shift;
+    my $table =  Business::RO::TaxDeduction::Table->new(
+        year    => $self->year,
+        persons => $self->persons,
+        vbl     => $self->vbl,
+    );
+    return $table->deduction;
+}
+
 1;
 
 __END__
@@ -119,7 +133,7 @@ Business::RO::TaxDeduction - Romanian salary tax deduction calculator
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -162,6 +176,10 @@ C<Business::RO::TaxDeduction::Amount> object instance.
 
 A Math::BigFloat object instance for 10.
 
+=head3 five
+
+A Math::BigFloat object instance for 5.
+
 =head2 INSTANCE METHODS
 
 =head3 tax_deduction
@@ -197,7 +215,7 @@ when amount minus floor(amount) gives something like 7.105427357601e-15.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ștefan Suciu.
+This software is copyright (c) 2018 by Ștefan Suciu.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

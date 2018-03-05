@@ -292,6 +292,7 @@ event Ok => sub {
 EOT
 
 $dump = dump_events($events, %base, show_empty => 1, include_fields => [qw/xxx/]);
+$dump =~ s/^\s*call subtest_uuid => undef\s*;\n//gm;
 is("$dump\n", <<"EOT", "show_empty (array)") || diag $dump;
 array {
     event Ok => sub {

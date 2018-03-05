@@ -51,13 +51,13 @@ There is no XS implementation of bake\_cookie yet.
         Cookie's expires date time. Several formats are supported
 
             expires => time + 24 * 60 * 60 # epoch time
-            expires => 'Wed, 03-Nov-2010 20:54:16 GMT' 
+            expires => 'Wed, 03-Nov-2010 20:54:16 GMT'
             expires => '+30s' # 30 seconds from now
             expires => '+10m' # ten minutes from now
-            expires => '+1h'  # one hour from now 
+            expires => '+1h'  # one hour from now
             expires => '-1d'  # yesterday (i.e. "ASAP!")
             expires => '+3M'  # in three months
-            expires => '+10y' # in ten years time
+            expires => '+10y' # in ten years time (60*60*24*365*10 seconds)
             expires => 'now'  #immediately
 
     - path
@@ -74,10 +74,10 @@ There is no XS implementation of bake\_cookie yet.
 
 - crush\_cookie
 
-    Parses cookie string and returns a hashref. 
+    Parses cookie string and returns a hashref.
 
         my $cookies_hashref = crush_cookie($headers->header('Cookie'));
-        my $cookie_value = $cookies_hashref->{cookie_name}  
+        my $cookie_value = $cookies_hashref->{cookie_name}
 
 # SEE ALSO
 

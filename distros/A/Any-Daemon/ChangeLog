@@ -1,5 +1,16 @@
 
-version history of Any::Daemon
+== history of distribution Any-Daemon
+
+version 0.95: Sun  4 Mar 12:00:31 CET 2018
+
+	Fixes:
+	- seed random each process with a different value.
+
+	Improvements:
+	- minor cleanups
+	- upgrade startup log to 'notice'
+	- correctly reported child die code
+	- convert to GIT on GitHub
 
 version 0.94: Mon Mar 10 16:12:13 CET 2014
 

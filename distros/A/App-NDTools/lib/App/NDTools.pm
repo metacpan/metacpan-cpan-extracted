@@ -3,30 +3,29 @@ package App::NDTools;
 use strict;
 use warnings;
 
-our $VERSION = "0.5.1";
-
 =head1 NAME
 
-App::NDTools - diff/patch/process/query tools for nested structures
+App::NDTools - command line tools for nested structures
 
 =begin html
 
 <a href="https://travis-ci.org/mr-mixas/NDTools"><img src="https://travis-ci.org/mr-mixas/NDTools.svg?branch=master" alt="CI"></a>
+<a href='https://coveralls.io/github/mr-mixas/NDTools?branch=master'><img src='https://coveralls.io/repos/github/mr-mixas/NDTools/badge.svg?branch=master' alt='Coverage Status'/></a>
 <a href="https://badge.fury.io/pl/App-NDTools"><img src="https://badge.fury.io/pl/App-NDTools.svg" alt="CPAN version"></a>
 
 =end html
 
-=head1 SYNOPSIS
+=head1 VERSION
 
-    nd* --help|--version
-    nd* [OPTIONS] <arguments>
+Version 0.5.2
 
-See exact list of options, examples and exit codes for each tool in it's man
-page.
+=cut
+
+our $VERSION = "0.5.2";
 
 =head1 DESCRIPTION
 
-Nested structures often requires quite complex processing, this tools aimed to
+Nested structures quite often require complex processing, this tools aimed to
 solve some "pain in the neck" cases without writing any code.
 
 =head1 TOOLS

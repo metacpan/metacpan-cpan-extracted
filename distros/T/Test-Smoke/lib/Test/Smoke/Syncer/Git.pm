@@ -45,7 +45,7 @@ For the proxy-repository we do:
     git remote prune origin
     git reset --hard origin/$gitbranch
 
-For the worknig-repository we do:
+For the working-repository we do:
 
     git clean -dfx
     git fetch --all
@@ -70,7 +70,7 @@ sub sync {
             '2>&1'
         );
         if ( my $gitexit = $gitbin->exitcode ) {
-            croak("Cannot make inital clone: $self->{gitbin} exit $gitexit");
+            croak("Cannot make initial clone: $self->{gitbin} exit $gitexit");
         }
         $self->log_debug($cloneout);
     }

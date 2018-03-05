@@ -1,5 +1,9 @@
 Revision history for Perl extension Locale-Scope
 
+0.04 2018-03-04T08:44:16Z
+
+    - Check ${^SAFE_LOCALES} after 5.27.9
+
 0.03 2014-05-18T22:22:58Z
 
     - [FIXED] prereqs.

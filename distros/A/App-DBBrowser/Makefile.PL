@@ -60,7 +60,7 @@ WriteMakefile(
         'Spreadsheet::Read'      => 0,
         'Term::Choose'           => '1.512',
         'Term::Choose::LineFold' => '1.512',
-        'Term::Choose::Util'     => '0.057',
+        'Term::Choose::Util'     => '0.059',
         'Term::Form'             => '0.313',
         'Term::TablePrint'       => '0.064',
         'Text::CSV'              => 0,

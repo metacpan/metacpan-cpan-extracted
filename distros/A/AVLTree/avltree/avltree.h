@@ -42,7 +42,7 @@ typedef void  (*rel_f) ( SV* p );
 /* AVL tree functions */
 avltree_t     *avltree_new ( cmp_f cmp, dup_f dup, rel_f rel );
 void           avltree_delete ( avltree_t *tree );
-SV            *avltree_find ( avltree_t *tree, SV *data );
+SV            *avltree_find ( pTHX_ avltree_t *tree, SV *data );
 int            avltree_insert ( avltree_t *tree, SV *data );
 int            avltree_erase ( avltree_t *tree, SV *data );
 size_t         avltree_size ( avltree_t *tree );
@@ -50,10 +50,10 @@ size_t         avltree_size ( avltree_t *tree );
 /* Traversal functions */
 avltrav_t *avltnew ( void );
 void       avltdelete ( avltrav_t *trav );
-SV        *avltfirst ( avltrav_t *trav, avltree_t *tree );
-SV        *avltlast ( avltrav_t *trav, avltree_t *tree );
-SV        *avltnext ( avltrav_t *trav );
-SV        *avltprev ( avltrav_t *trav );
+SV        *avltfirst (pTHX_ avltrav_t *trav, avltree_t *tree );
+SV        *avltlast (pTHX_ avltrav_t *trav, avltree_t *tree );
+SV        *avltnext (pTHX_ avltrav_t *trav );
+SV        *avltprev (pTHX_ avltrav_t *trav );
 
 #ifdef __cplusplus
 }

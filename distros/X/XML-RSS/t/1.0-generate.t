@@ -15,9 +15,9 @@ use constant DATE_TEMPLATE_PUB   => "%c GMT";
 my ($current_date, $short_date, $pub_date);
 
 BEGIN {
-  $current_date = &POSIX::strftime(DATE_TEMPLATE_LONG, gmtime);
-  $short_date   = &POSIX::strftime(DATE_TEMPLATE_SHORT, gmtime);
-  $pub_date     = &POSIX::strftime(DATE_TEMPLATE_PUB,   gmtime);
+    $current_date = &POSIX::strftime(DATE_TEMPLATE_LONG, gmtime);
+    $short_date   = &POSIX::strftime(DATE_TEMPLATE_SHORT, gmtime);
+    $pub_date     = &POSIX::strftime(DATE_TEMPLATE_PUB,   gmtime);
 }
 
 use constant RSS_VERSION    => "1.0";
@@ -44,48 +44,48 @@ cmp_ok($rss->{'xml:base'},"eq",RSS_XML_BASE,"Base is ".RSS_XML_BASE);
 
 # 6-16
 ok($rss->channel(
-		 'title'          => "Test 1.0 Feed",
-		 'link'           => "http://example.com/",
-		 'description'    => "To lead by example",
-		 'image'          => "http://example.com/example.gif",
-		 'textinput'      => 'http://example.com/search.pl',
-		 'dc' => {
-			  date => $current_date,
-			 },
-		),"Set RSS channel");
+        'title'          => "Test 1.0 Feed",
+        'link'           => "http://example.com/",
+        'description'    => "To lead by example",
+        'image'          => "http://example.com/example.gif",
+        'textinput'      => 'http://example.com/search.pl',
+        'dc' => {
+            date => $current_date,
+        },
+    ),"Set RSS channel");
 
 ok($rss->image(
-	       'title'       => 'Test Image',
-	       'url'         => 'http://example.com/example.gif',
-	       'link'        => 'http://example.com/',
-	       'description' => 'Test Image',
-	       'height'      => '25',
-	       'weight'      => '144',
-	      ),"Set RSS image");
+'title'       => 'Test Image',
+'url'         => 'http://example.com/example.gif',
+'link'        => 'http://example.com/',
+'description' => 'Test Image',
+'height'      => '25',
+'weight'      => '144',
+),"Set RSS image");
 
 ok($rss->textinput(
-		   'title'       => 'Search',
-		   'description' => 'Search for an example',
-		   'name'        => 'q',
-		   'link'        => 'http://example.com/search.pl',
-		  ),"Set RSS text input");
+'title'       => 'Search',
+'description' => 'Search for an example',
+'name'        => 'q',
+'link'        => 'http://example.com/search.pl',
+),"Set RSS text input");
 
 ok($rss->add_item(
-		  'title'       => RSS_ITEM_TITLE,
-		  'link'        => RSS_ITEM_LINK,
-		  'description' => RSS_ITEM_DESC,
-		  'dc' => {
-			   creator => RSS_CREATOR,
-			   dc      => $short_date,
-			  },
-		 ),"Set one RSS item");
+'title'       => RSS_ITEM_TITLE,
+'link'        => RSS_ITEM_LINK,
+'description' => RSS_ITEM_DESC,
+'dc' => {
+creator => RSS_CREATOR,
+dc      => $short_date,
+},
+),"Set one RSS item");
 
 
 ok($rss->add_module(prefix=>RSS_MOD_PREFIX,uri=>RSS_MOD_URI),
-   "Added namespace:".RSS_MOD_PREFIX);
+"Added namespace:".RSS_MOD_PREFIX);
 
 ok($rss->add_module(prefix=>'creativeCommons',uri=>'http://backend.userland.com/creativeCommonsRssModule'),
-   "Added namespace with uppercase letters in prefix");
+"Added namespace with uppercase letters in prefix");
 
 # Dunno - some degree of weirdness
 # with the constant that I don't
@@ -93,23 +93,23 @@ ok($rss->add_module(prefix=>'creativeCommons',uri=>'http://backend.userland.com/
 my $uri = RSS_MOD_URI;
 
 cmp_ok($rss->{modules}->{$uri},
-       "eq",
-       RSS_MOD_PREFIX,
-       "Namespace URI is ".RSS_MOD_URI);
+"eq",
+RSS_MOD_PREFIX,
+"Namespace URI is ".RSS_MOD_URI);
 
 my $as_string = $rss->as_string();
 my $len = length($as_string);
 ok($len,"RSS feed has '$len' characters");
 
 ok($rss->save(RSS_SAVEAS),
-   "Wrote to disk: ".RSS_SAVEAS);
+"Wrote to disk: ".RSS_SAVEAS);
 
 my $file_contents;
 {
-    local $/;
-    open I, "<", RSS_SAVEAS();
-    $file_contents = <I>;
-    close(I);
+local $/;
+open I, "<", RSS_SAVEAS();
+$file_contents = <I>;
+close(I);
 }
 
 cmp_ok($file_contents,"eq",$as_string,RSS_SAVEAS." contains the as_string() result");
@@ -119,15 +119,15 @@ is($@,'',"Parsed ".RSS_SAVEAS);
 
 # 17
 cmp_ok($rss->{channel}->{dc}{date},
-       "eq",
-       $current_date,
-       "dc:date:".$current_date);
+    "eq",
+    $current_date,
+    "dc:date:".$current_date);
 
 # 18
 cmp_ok(keys(%{$rss->{namespaces}}),
-       ">=",
-       1,
-       "RSS feed has atleast one namespace");
+    ">=",
+    1,
+    "RSS feed has atleast one namespace");
 
 # 19
 cmp_ok($rss->{'xml:base'}, "eq", RSS_XML_BASE, "Base is still ".RSS_XML_BASE);

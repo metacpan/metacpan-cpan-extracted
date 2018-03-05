@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -26,10 +26,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 
-# uncomment this to run the ### lines
-# use Smart::Comments;
-
-require Math::PlanePath;
+use Math::PlanePath;
 
 my $have_64bits = ((1 << 63) != 0);
 my $modulo_64bit_dodginess = ($have_64bits

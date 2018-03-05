@@ -13,7 +13,7 @@ use Struct::Path 0.80 qw(path path_delta);
 use Struct::Path::PerlStyle 0.80 qw(str2path path2str);
 use Term::ANSIColor qw(colored);
 
-sub VERSION() { '0.31' }
+our $VERSION = '0.33';
 
 my $JSON = JSON->new->canonical->allow_nonref;
 
@@ -40,13 +40,10 @@ sub check_args {
     my $self = shift;
 
     if ($self->{OPTS}->{show}) {
-        unless (@_) {
-            log_error { "At least one argument expected when --show used" };
-            return undef;
-        }
+        die_fatal "At least one argument expected when --show used", 1
+            unless (@_);
     } elsif (@_ < 2) {
-        log_error { "At least two arguments expected for diff" };
-        return undef;
+        die_fatal "At least two arguments expected for diff", 1;
     }
 
     return $self;
@@ -54,6 +51,8 @@ sub check_args {
 
 sub configure {
     my $self = shift;
+
+    $self->SUPER::configure();
 
     $self->{OPTS}->{colors} = -t STDOUT ? 1 : 0
         unless (defined $self->{OPTS}->{colors});
@@ -276,9 +275,6 @@ sub dump_term {
 
 sub exec {
     my $self = shift;
-
-    $self->check_args(@{$self->{ARGV}}) or die_fatal undef, 1;
-
     my @items;
 
     while (@{$self->{ARGV}}) {

@@ -5,13 +5,14 @@ WriteMakefile(
   NAME              => 'Algorithm::ConstructDFA2',
   VERSION_FROM      => 'lib/Algorithm/ConstructDFA2.pm', # finds $VERSION
   PREREQ_PM         => {
-    'DBD::SQLite' => '1.5',
+    'DBD::SQLite' => '1.54',
     'Types::Standard' => 0,
     'List::UtilsBy' => 0,
     'List::Util' => 0,
     'Moo' => 0,
     'Memoize' => 0,
     'Log::Any' => 0,
+    'JSON' => 0,
     'DBI' => '1.635',
   },
   TEST_REQUIRES       => {

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -32,7 +32,7 @@ use lib 'xt';
 use MyOEIS;
 
 # uncomment this to run the ### lines
-# use Smart::Comments;
+use Smart::Comments;
 
 # # skip low zeros
 # # 1 left
@@ -41,6 +41,45 @@ use MyOEIS;
 
 # 1*3^k  left
 # 2*3^k  right
+
+{
+  # arms=6 sample points for the POD
+
+  require Math::PlanePath::TerdragonCurve;
+  my $path = Math::PlanePath::TerdragonCurve->new (arms => 6);
+  my $show = sub {
+    my ($x,$y) = @_;
+    my @n_list = $path->xy_to_n_list($x,$y);
+    [join(',',@n_list)];
+  };
+
+  print "
+                  \\         /             \\           /
+                   \\       /               \\         /
+                --- @{$show->(-1,1)} ---------------- @{$show->(1,1)} ---
+                  /        \\               /         \\
+     \\           /          \\             /           \\          /
+      \\         /            \\           /             \\        /
+    --- @{$show->(-2,0)} ------------- @{$show->(0,0)} -------------- @{$show->(2,0)} ---
+      /         \\            /           \\             /        \\
+     /           \\          /             \\           /          \\
+                  \\        /               \\         /
+               --- @{$show->(-1,-1)} ---------------- @{$show->(1,-1)} ---
+                  /        \\               /         \\
+                 /          \\             /           \\
+";
+  exit 0;
+}
+
+{
+  require Math::PlanePath::TerdragonMidpoint;
+  # my $path = Math::PlanePath::TerdragonMidpoint->new;
+  my $path = Math::PlanePath::TerdragonCurve->new;
+  require POSIX;
+  my @n_list = $path->xy_to_n_list(POSIX::DBL_MAX(),POSIX::DBL_MAX());
+  ### @n_list
+  exit 0;
+}
 
 {
   # A062756 == 1-abs(A229215)  mod 3
@@ -1526,7 +1565,7 @@ sub dxdy_to_dir6 {
 }
 
 # per KochCurve.t
-sub dxdy_to_dir {
+sub dxdy_to_dir3 {
   my ($dx,$dy) = @_;
   if ($dy == 0) {
     if ($dx == 2) { return 0/2; }
@@ -1597,3 +1636,57 @@ sub digit_above_lowest_two {
   $n = int($n/3);
   return ($n % 3);
 }
+
+
+#------------------------------------------------------------------------------
+# Old xy_to_n_list based on TerdragonMidpoint::xy_to_n
+
+
+# maximum extent -- no, not quite right
+#
+#          .----*
+#           \
+#       *----.
+#
+# Two triangle heights, so
+#     rnext = 2 * r * sqrt(3)/2
+#           = r * sqrt(3)
+#     rsquared_next = 3 * rsquared
+# Initial X=2,Y=0 is rsquared=4
+# then X=3,Y=1 is 3*3+3*1*1 = 9+3 = 12 = 4*3
+# then X=3,Y=3 is 3*3+3*3*3 = 9+3 = 36 = 4*3^2
+#
+# my @try_dx = (2, 1, -1, -2, -1,  1);
+# my @try_dy = (0, 1,  1, 0,  -1, -1);
+#
+  # my $xm = 2*$x;  # doubled out
+  # my $ym = 2*$y;
+  # foreach my $i (0 .. $#try_dx) {
+  #   my $t = $self->Math::PlanePath::TerdragonMidpoint::xy_to_n
+  #     ($xm+$try_dx[$i], $ym+$try_dy[$i]);
+  # 
+  #   ### try: ($xm+$try_dx[$i]).",".($ym+$try_dy[$i])
+  #   ### $t
+  # 
+  #   next unless defined $t;
+  # 
+  #   # function call here to get our n_to_xy(), not the overridden method
+  #   # when in TerdragonRounded or other subclass
+  #   my ($tx,$ty) = n_to_xy($self,$t)
+  #     or next;
+  # 
+  #   if ($tx == $x && $ty == $y) {
+  #     ### found: $t
+  #     if (@n_list && $t < $n_list[0]) {
+  #       unshift @n_list, $t;
+  #     } elsif (@n_list && $t < $n_list[-1]) {
+  #       splice @n_list, -1,0, $t;
+  #     } else {
+  #       push @n_list, $t;
+  #     }
+  #     if (@n_list == 3) {
+  #       return @n_list;
+  #     }
+  #   }
+  # }
+  # return @n_list;

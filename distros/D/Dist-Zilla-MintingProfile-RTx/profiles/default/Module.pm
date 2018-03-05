@@ -33,15 +33,9 @@ May need root permissions
 
 =item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
 
-If you are using RT 4.2 or greater, add this line:
+Add this line:
 
     Plugin('{{$name}}');
-
-For RT 4.0, add this line:
-
-    Set(@Plugins, qw({{$name}}));
-
-or add C<{{$name}}> to your existing C<@Plugins> line.
 
 =item Clear your mason cache
 
@@ -55,15 +49,16 @@ or add C<{{$name}}> to your existing C<@Plugins> line.
 
 Best Practical Solutions, LLC E<lt>modules@bestpractical.comE<gt>
 
-=head1 BUGS
+=for html <p>All bugs should be reported via email to <a
+href="mailto:bug-{{$dist->name}}@rt.cpan.org">bug-{{$dist->name}}@rt.cpan.org</a>
+or via the web at <a
+href="http://rt.cpan.org/Public/Dist/Display.html?Name={{$dist->name}}">rt.cpan.org</a>.</p>
 
-All bugs should be reported via email to
-
-    L<bug-{{$dist->name}}@rt.cpan.org|mailto:bug-{{$dist->name}}@rt.cpan.org>
-
-or via the web at
-
-    L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name={{$dist->name}}>.
+=for text
+    All bugs should be reported via email to
+        bug-{{$dist->name}}@rt.cpan.org
+    or via the web at
+        http://rt.cpan.org/Public/Dist/Display.html?Name={{$dist->name}}
 
 =head1 LICENSE AND COPYRIGHT
 

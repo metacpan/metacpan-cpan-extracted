@@ -4,7 +4,7 @@
       "Masahiro Nagano <kazeburo@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v1.1.0",
+   "generated_by" : "Minilla/v3.0.16",
    "license" : [
       "perl_5"
    ],
@@ -28,9 +28,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "CPAN::Meta" : "0",
-            "CPAN::Meta::Prereqs" : "0",
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
@@ -67,7 +65,7 @@
    "provides" : {
       "Plack::Middleware::Session::Simple" : {
          "file" : "lib/Plack/Middleware/Session/Simple.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Plack::Middleware::Session::Simple::Session" : {
          "file" : "lib/Plack/Middleware/Session/Simple.pm"
@@ -84,5 +82,10 @@
          "web" : "https://github.com/kazeburo/Plack-Middleware-Session-Simple"
       }
    },
-   "version" : "0.03"
+   "version" : "0.04",
+   "x_contributors" : [
+      "bayashi <bayashi@cpan.org>",
+      "vividsnow <vividsnow@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

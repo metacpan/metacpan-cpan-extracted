@@ -12,6 +12,8 @@ use JSON::MaybeXS;
 use List::Util 'max';
 use Pod::Weaver::PluginBundle::Default;
 
+use Test::File::ShareDir -share => { -dist => { 'Dist-Zilla-PluginBundle-Author-ETHER' => 'share' } };
+
 use lib 't/lib';
 use Helper;
 use NoNetworkHits;

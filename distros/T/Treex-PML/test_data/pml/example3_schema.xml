@@ -16,7 +16,6 @@
 	<element name="NP" role="#NODE" type="nonterminal.type"/>
 	<element name="PP" role="#NODE" type="nonterminal.type"/>
 	<element name="ADVP" role="#NODE" type="nonterminal.type"/>
-	<!-- etc. -->
       </sequence>
     </container>
   </type>

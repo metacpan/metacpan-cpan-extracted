@@ -36,5 +36,5 @@ requires:
 resources:
   homepage: http://user42.tuxfamily.org/math-planepath/index.html
   license: http://www.gnu.org/licenses/gpl.html
-version: '125'
+version: '126'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

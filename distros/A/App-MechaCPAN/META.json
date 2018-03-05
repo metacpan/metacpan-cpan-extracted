@@ -4,7 +4,7 @@
       "Jon Gentle <cpan@atrodo.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -48,7 +48,18 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.21",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/atrodo/App-MechaCPAN/issues"
+      },
+      "homepage" : "https://github.com/atrodo/App-MechaCPAN",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/atrodo/App-MechaCPAN.git",
+         "web" : "https://github.com/atrodo/App-MechaCPAN"
+      }
+   },
+   "version" : "0.23",
    "x_contributors" : [
       "Greg Arnold <greg@arnoldassociates.com>",
       "Jon Gentle <atrodo@atrodo.org>"

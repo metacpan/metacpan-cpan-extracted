@@ -2,14 +2,18 @@
 
 BEGIN {
   unless ($ENV{RELEASE_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for release candidate testing');
+    print qq{1..0 # SKIP these tests are for release candidate testing\n};
+    exit
   }
 }
 
 
-use Test::More;
-eval 'use Test::CPAN::Changes';
-plan skip_all => 'Test::CPAN::Changes required for this test' if $@;
-changes_ok();
+use strict;
+use warnings;
+
+use Test::More 0.96 tests => 2;
+use_ok('Test::CPAN::Changes');
+subtest 'changes_ok' => sub {
+    changes_file_ok('Changes');
+};
 done_testing();

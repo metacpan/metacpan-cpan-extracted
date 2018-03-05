@@ -2,11 +2,12 @@ use ExtUtils::MakeMaker;
 
 use 5.008;
 
-my $version = '0.26';
+my $version = '0.27';
 
 WriteMakefile
  ( NAME	 	=> 'Any::Daemon::HTTP'
  , VERSION	=> $version
+
  , PREREQ_PM    =>
    { Any::Daemon      => '0.93'
    , URI              => 0
@@ -31,23 +32,34 @@ WriteMakefile
    , Digest::MD5      => '2.53'
    }
 
- , EXE_FILES    => []
  , AUTHOR       => 'Mark Overmeer'
- , ABSTRACT     => 'preforking http server'
- , LICENSE      => 'perl'
+ , ABSTRACT     => 'Generic http server'
+
+ , META_MERGE =>
+      { 'meta-spec' => { version => 2 }
+      , resources  =>
+         { repository =>
+            { type => 'git'
+            , url  => 'https://github.com/markov2/perl5-Any-Daemon-HTTP.git'
+            , web  => 'https://github.com/markov2/perl5-Any-Daemon-HTTP'
+            }
+         , homepage => 'http://perl.overmeer.net/CPAN/'
+         , license  => [ 'http://dev.perl.org/licenses/' ]
+         }
+      }
  );
 
 ### used by oodist during production of distribution
 sub MY::postamble { <<'__POSTAMBLE' }
 
 # for DIST
-EXTENDS		= ../AnyDaemon
+EXTENDS		    = ../Any-Daemon
 RAWDIR          = ../public_html/any-daemon-http/raw
 DISTDIR         = ../public_html/any-daemon-http/source
-LICENSE         = artistic
 
 # for POD
 FIRST_YEAR      = 2013
-EMAIL           = perl@overmeer.net
+EMAIL           = markov@cpan.org
 WEBSITE         = http://perl.overmeer.net/any-daemon/
+
 __POSTAMBLE

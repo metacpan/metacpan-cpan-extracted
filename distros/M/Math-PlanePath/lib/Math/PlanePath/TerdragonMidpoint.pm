@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -31,7 +31,7 @@ use List::Util 'min'; # 'max'
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 125;
+$VERSION = 126;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 
@@ -44,7 +44,7 @@ use Math::PlanePath::Base::Digits
 *_divrem_mutate = \&Math::PlanePath::_divrem_mutate;
 
 # uncomment this to run the ### lines
-#use Smart::Comments;
+# use Smart::Comments;
 
 
 use constant n_start => 0;
@@ -409,11 +409,13 @@ sub xy_to_n {
     my $k = 2*(12*($y%12) + ($x%12));
     my $dx = $yx_to_dxdy[$k++];
     if (! defined $dx) {
-      ### not a visited point ...
+      ### not a visited point: "k=$k"
+      ### x mod 12: $x%12
+      ### y mod 12: $y%12
       return undef;
     }
 
-    ### at: "$x,$y (k=$k)  n=$n  digit=$digit k=$k  offset=$yx_to_dxdy[$k-1],$yx_to_dxdy[$k] to ".($x+$yx_to_dxdy[$k-1]).",".($y+$yx_to_dxdy[$k])
+    ### at: "$x,$y (k=$k)  digit=$digit k=$k  offset=$yx_to_dxdy[$k-1],$yx_to_dxdy[$k] to ".($x+$yx_to_dxdy[$k-1]).",".($y+$yx_to_dxdy[$k])
 
     push @ndigits, $digit;
     $x += $dx;
@@ -703,7 +705,7 @@ multiple arms, numbered starting from 0.
 =head2 X,Y to N
 
 An X,Y point can be turned into N by dividing out digits of a complex base
-w+1 where
+b=w+1 where
 
     w = 1/2 + i * sqrt(3)/2            w^2     w
       = 6th root of unity                 \   /
@@ -805,7 +807,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

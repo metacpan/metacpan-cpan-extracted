@@ -3,6 +3,8 @@
 # Jan 2016  M.Eckardt, imunixx GmbH			<Matthias.Eckardt@imunixx.de>
 # SDG
 ############################################################################
+# make testdb TEST_FILE=mytest.pl
+############################################################################
 use strict;
 use Script::Toolbox qw(:all);
 use Script::Toolbox::TableO;
@@ -35,21 +37,23 @@ my $O = {
 sub testCheckBox(){
 
     my $x;
-       $x = CheckBox('Head1',',AAA,BBB,ccc','ccc'       );
-       $x = CheckBox('Head2',',AAA,BBB,ccc','ccc|AAA'   );
-       $x = CheckBox('Head3',',AAA,BBB,ccc'             );
-       $x = CheckBox('Head4',',AAA,BBB,ccc','ccc',   1  );
+       $x = CheckBox('CheckBox ccc-selected.',',AAA,BBB,ccc','ccc'       );
+       $x = CheckBox('CheckBox ccc-AAA-selected.',',AAA,BBB,ccc','ccc|AAA'   );
+       $x = CheckBox('CheckBox nothing selected.',',AAA,BBB,ccc'             );
+       $x = RadioButton('RadioButtonCheckBox no preselect  (one option must be selected).',',AAA,BBB,ccc',undef,1     );
+       $x = RadioButton('RadioButtonCheckBox with 1 preselect.',',AAA,BBB,ccc','ccc',   1  );
 
     my $m = Script::Toolbox::Util::Menus->new();
-       $x = CheckBox('Head5',',AAA,BBB,ccc','ccc',    0,$m);
-       $x = CheckBox('Head6',',AAA,BBB,ccc','ccc|AAA',0,$m);
-       $x = CheckBox('Head7',',AAA,BBB,ccc',undef,    0,$m);
-       $x = CheckBox('Head8',',AAA,BBB,ccc','ccc|AAA',1,$m);
+       $x = CheckBox('CheckBox ccc-selected preselect and menu container.',',AAA,BBB,ccc','ccc',    ,$m);
+       $x = CheckBox('CheckBox ccc-AAA-selected and menu container usage.',',AAA,BBB,ccc','ccc|AAA',,$m);
+       $x = CheckBox('CheckBox nothing selected and menu container usage.',',AAA,BBB,ccc',undef,    ,$m);
+       $x = RadioButton('RadioButtonCheckBox ccc-selected (use only first preselect pattern).',',AAA,BBB,ccc','ccc|AAA',$m);
+       $x = RadioButton('RadioButtonCheckBox nothing selected (unmatching preselect pattern).',',AAA,BBB,ccc','ssc|67A',$m);
 
-       $x = CheckBox('Head9',',AAA,BBB,ccc','ccc',    0,$m,'testmenu');
-       $x = CheckBox('HeadA',',AAA,BBB,ccc','ccc|AAA',0,$m,'testmenu');
-       $x = CheckBox('HeadB',',AAA,BBB,ccc',undef,    0,$m,'testmenu');
-       $x = CheckBox('HeadC',',AAA,BBB,ccc','ccc',    1,$m,'testmenu');
+       $x = CheckBox('Initialize testmenu.',',AAA,BBB,ccc','ccc',           $m,'testmenu');
+       $x = CheckBox('Same select state.',',AAA,BBB,ccc','ccc|AAA',         $m,'testmenu');
+       $x = CheckBox('Same select state.',',AAA,BBB,ccc',undef,             $m,'testmenu');
+       $x = RadioButton('Change into RadioButton CB.',',AAA,BBB,ccc','ccc', $m,'testmenu');
     return;
 }
 

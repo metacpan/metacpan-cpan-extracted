@@ -1,0 +1,17 @@
+Makefile
+Makefile.old
+*.tar.gz
+*.bak
+pm_to_blib
+blib/
+.releaserc
+cover_db
+firefox-versions/
+MYMETA.*
+db/
+log/
+local-lib/
+image_store/
+example/flowjs-temp-uploads
+example/user-uploads
+HTTP-Upload-FlowJs-*/

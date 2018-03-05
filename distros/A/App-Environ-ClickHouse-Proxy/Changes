@@ -1,3 +1,9 @@
+0.5 2018-03-04
+  - More userfriendly in case of errors.
+
+0.4 2018-03-04
+  - Don't print all message/stacktrace in case of send error.
+
 0.3 2017-10-28
   - Undef support.
 

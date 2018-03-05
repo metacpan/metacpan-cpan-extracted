@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2015 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2015, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -26,9 +26,6 @@ use MyTestHelpers;
 
 my $test_count = (tests => 648)[1];
 plan tests => $test_count;
-
-# uncomment this to run the ### lines
-#use Smart::Comments '###';
 
 
 if (! eval { require Math::BigInt::Lite; 1 }) {

@@ -16,13 +16,21 @@ WriteMakefile(
     'Mojolicious' => 4.88
   },
   LICENSE      => 'artistic_2',
-  META_MERGE   => {
+  (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
     requires  => {perl => '5.010001'},
     resources => {
       license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
-      repository  => 'https://github.com/Akron/Mojolicious-Plugin-Piwik'
+      repository  => {
+        type => 'git',
+        web => 'https://github.com/Akron/Mojolicious-Plugin-Piwik',
+        url => 'https://github.com/Akron/Mojolicious-Plugin-Piwik.git',
+      },
+      bugtracker  => {
+        web => 'https://github.com/Akron/Mojolicious-Plugin-Piwik/issues',
+      }
     }
-  },
+  }) : (),
+  ),
   MIN_PERL_VERSION => '5.010001',
   test => {TESTS => 't/*.t'}
 );

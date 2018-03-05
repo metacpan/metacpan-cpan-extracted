@@ -2,36 +2,23 @@
 # with anything earlier than 5.008.
 
 use 5.008;
-use strict;
 
+use Module::FromPerlVer;
 use ExtUtils::MakeMaker;
 
-my $dest    = 'lib/FindBin/libs.pm';
-
-my $from 
-= ref $^V && v5.14 le $^V 
-? 'libs_curr_pm'
-: 'libs_old_pm'
-;
-
--e $dest && unlink $dest;
--e $dest && die "Failed unlink: '$dest' ($!)"; 
-
-link $from => $dest;
-
-[ -e $dest ] || die "Failed link: '$dest' ($!)";
-
-print STDOUT "Installing: '$from' ($dest)\n";
-
-our $VERSION = '2.15_02';
+our $VERSION = '2.016002';
 $VERSION = eval $VERSION;
 
 WriteMakefile
 (
-    NAME            => 'FindBin::libs',
+    qw
+    (
+        NAME            FindBin::libs
+        ABSTRACT_FROM   lib/FindBin/libs.pm
+        LICENSE         perl
+    ),
+	AUTHOR     	    => 'Steven Lembark <lembark@wrkhors.com>',
     VERSION         => $VERSION,
-    ABSTRACT_FROM   => $dest,
-    LICENSE         => 'perl',
     PREREQ_PM       =>
     {
         # standard distro, particular versions 
@@ -39,16 +26,17 @@ WriteMakefile
 
 		qw
         (
-            strict          0
+            strict              0
 
-            Carp            0
-            Cwd             0
-            FindBin         0
-            Symbol          0
-            File::Spec      0
-            File::Temp      0
-            List::Util      0
-            Test::More      0
+            Carp                0
+            Cwd                 3.73
+            FindBin             0
+            Symbol              0
+            File::Spec          0
+            File::Temp          0
+            List::Util          0
+            Module::FromPerlVer 0.000005
+            Test::More          0
         )
     },
 );

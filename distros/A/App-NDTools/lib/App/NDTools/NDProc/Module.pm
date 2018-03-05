@@ -14,7 +14,6 @@ use Struct::Path 0.80 qw(path);
 use Struct::Path::PerlStyle 0.80 qw(str2path path2str);
 
 sub MODINFO { "n/a" }
-sub VERSION { "n/a" }
 
 sub arg_opts {
     my $self = shift;

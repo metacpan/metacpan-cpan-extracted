@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -26,17 +26,14 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 
-# uncomment this to run the ### lines
-# use Smart::Comments;
-
-require Math::PlanePath::QuintetReplicate;
+use Math::PlanePath::QuintetReplicate;
 
 
 #------------------------------------------------------------------------------
 # VERSION
 
 {
-  my $want_version = 125;
+  my $want_version = 126;
   ok ($Math::PlanePath::QuintetReplicate::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::QuintetReplicate->VERSION,  $want_version,

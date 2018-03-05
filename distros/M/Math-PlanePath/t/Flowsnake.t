@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -26,17 +26,14 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 
-# uncomment this to run the ### lines
-#use Devel::Comments;
-
-require Math::PlanePath::Flowsnake;
+use Math::PlanePath::Flowsnake;
 
 
 #------------------------------------------------------------------------------
 # VERSION
 
 {
-  my $want_version = 125;
+  my $want_version = 126;
   ok ($Math::PlanePath::Flowsnake::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::Flowsnake->VERSION,  $want_version,

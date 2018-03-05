@@ -1,0 +1,60 @@
+NAME
+
+Jacode - Perl program for Japanese character code conversion
+
+SYNOPSIS
+
+    use FindBin;
+    use lib "$FindBin::Bin/lib";
+    use Jacode;
+
+    Jacode::convert(\$line, $OUTPUT_encoding [, $INPUT_encoding [, $option]])
+    Jacode::xxx2yyy(\$line [, $option])
+    Jacode::to($OUTPUT_encoding, $line [, $INPUT_encoding [, $option]])
+    Jacode::jis($line [, $INPUT_encoding [, $option]])
+    Jacode::euc($line [, $INPUT_encoding [, $option]])
+    Jacode::sjis($line [, $INPUT_encoding [, $option]])
+    Jacode::utf8($line [, $INPUT_encoding [, $option]])
+    Jacode::jis_inout($JIS_Kanji_IN, $ASCII_IN)
+    Jacode::get_inout($string)
+    Jacode::cache()
+    Jacode::nocache()
+    Jacode::flushcache()
+    Jacode::flush()
+    Jacode::h2z_xxx(\$line)
+    Jacode::z2h_xxx(\$line)
+    Jacode::tr(\$line, $from, $to [, $option])
+    Jacode::trans($line, $from, $to [, $option])
+    Jacode::init()
+
+INSTALLATION
+
+   To test this software, type the following:
+
+   make test
+
+   To install this software, copy 'Jacode.pm' to any directory of @INC.
+
+AUTHOR
+
+    Copyright (c) 2018 INABA Hitoshi
+
+LICENSE AND COPYRIGHT
+
+    This software is free software;
+
+    Use and redistribution for ANY PURPOSE are granted as long as all
+    copyright notices are retained.  Redistribution with modification
+    is allowed provided that you make your modified version obviously
+    distinguishable from the original one.  THIS SOFTWARE IS PROVIDED
+    BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES ARE
+    DISCLAIMED.
+
+    This software is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+
+    perl, jcode.pl, jacode.pl, jacode4e.pl, Sjis.pm, pkf, Modern::Open
+

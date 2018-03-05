@@ -1,0 +1,44 @@
+Revision history for LWP::UserAgent::Caching-Simple
+
+0.06  2018-03-04 VANHOESEL
+
+      [ Merge pull request #4 from THEMA-MEDIA/allow_headers_in_get_from_json ]
+      - Remove cruft
+      - Remove useless comment about 'more control over cache'
+      - Remove unused modules
+
+      [ Merge pull request #3 from THEMA-MEDIA/allow_headers_in_get_from_json ]
+      - Allow headers in get from json
+      - Update POD
+      - Update example, so it reflects current changes.
+      - Pass all params in 'get_from_json' and add 'Accept'
+
+0.05  2018-03-02 VANHOESEL
+
+      - fix decoding
+
+0.04  2018-02-16 VANHOESEL
+
+      - and minor changes, 80char limit
+      - add shebang to example file
+      
+      [ Merge pull request #2 from anirvan/patch-1 ]
+      - Spelling and POD fixes
+
+0.03  2016-12-22 VANHOESEL
+
+      [ Merge pull request #1 from THEMA-MEDIA/built_in_useragent ]
+      - get_from_json added for simplicity
+      - bug fixes: using LWP::UserAgent::Caching minimal version 0.03
+
+0.02  2016-12-19 VANHOESEL
+
+      - N/A
+
+0.01  2016-12-03 VANHOESEL
+
+      [ getting ready for Londen Perl Workshop 2016 ]
+      - simple!
+      - Update README.md
+      - Initial commit
+      

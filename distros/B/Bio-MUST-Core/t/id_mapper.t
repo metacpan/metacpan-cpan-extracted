@@ -271,4 +271,21 @@ my @abbr_org_ids = map { $_->[1] } @long2abbr_org_ids;
         'got expected org_mapper abbr_ids from abbr_ids';
 }
 
+my %exp_family_for = (
+    'Chlamydomonas reinhardtii@1' => 'aox1',
+    'Chlorella vulgaris@2'        => 'aox2',
+    'Dunaliella salina@3'         => 'aox3',
+);
+
+{   # quick test to check auto-handling of underscore in valid ids
+    my $infile = file('test', 'underscores.idm');
+    my $mapper = $class->load($infile);
+    while (my ($key, $exp_fam) = each %exp_family_for) {
+        my $got_fam = Bio::MUST::Core::SeqId->new(
+            full_id => $mapper->long_id_for($key)
+        )->family;
+        cmp_ok $got_fam, 'eq', $exp_fam, "got expected family for: $key";
+    }
+}
+
 done_testing;

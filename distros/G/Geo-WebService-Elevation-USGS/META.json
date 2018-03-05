@@ -4,13 +4,13 @@
       "Tom Wyant (wyant at cpan dot org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Geo-WebService-Elevation-USGS",
    "no_index" : {
@@ -44,7 +44,7 @@
    "provides" : {
       "Geo::WebService::Elevation::USGS" : {
          "file" : "lib/Geo/WebService/Elevation/USGS.pm",
-         "version" : "0.106"
+         "version" : "0.107"
       }
    },
    "release_status" : "stable",
@@ -62,6 +62,6 @@
          "web" : "https://github.com/trwyant/perl-Geo-WebService-Elevation-USGS"
       }
    },
-   "version" : "0.106",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.107",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

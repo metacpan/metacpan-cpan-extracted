@@ -32,4 +32,4 @@ resources:
   IRC: irc://irc.perl.org/#smoke
   homepage: http://perl5.test-smoke.org/
   repository: git://github.com/abeltje/Test-Smoke.git
-version: '1.71'
+version: '1.72'

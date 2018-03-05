@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 TODO
 examples/document/README
 examples/document/has_schema.pl

@@ -1,7 +1,5 @@
 package Plack::Middleware::AccessLog::Structured;
-{
-  $Plack::Middleware::AccessLog::Structured::VERSION = '0.001000';
-}
+$Plack::Middleware::AccessLog::Structured::VERSION = '0.001002';
 use parent qw(Plack::Middleware);
 
 # ABSTRACT: Access log middleware which creates structured log messages
@@ -40,12 +38,12 @@ sub call {
 
 	my $t_before = Time::HiRes::time();
 	my $res = $self->app->($env);
-	my $t_after = Time::HiRes::time();
 
 	return $self->response_cb($res, sub {
 		my ($cb_res) = @_;
 
-		my $h = Plack::Util::headers($res->[1]);
+		my $t_after = Time::HiRes::time();
+		my $h = Plack::Util::headers($cb_res->[1]);
 		my $content_type = $h->get('Content-Type');
 		my $log_entry = {
 			class            => ref($self),
@@ -64,7 +62,7 @@ sub call {
 			hostname         => hostname(),
 			# Response data
 			response_status  => $cb_res->[0],
-			content_length   => Plack::Util::content_length($res->[2]) || $h->get('Content-Length'),
+			content_length   => Plack::Util::content_length($cb_res->[2]) || $h->get('Content-Length'),
 			content_type     => defined $content_type ? "$content_type" : undef,
 			# Timing
 			request_duration => ( $t_after - $t_before ) * 1000,
@@ -104,7 +102,10 @@ sub _safe {
 1;
 
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -112,7 +113,7 @@ Plack::Middleware::AccessLog::Structured - Access log middleware which creates s
 
 =head1 VERSION
 
-version 0.001000
+version 0.001002
 
 =head1 SYNOPSIS
 
@@ -223,10 +224,9 @@ Manfred Stock <mstock@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Manfred Stock.
+This software is copyright (c) 2018 by Manfred Stock.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

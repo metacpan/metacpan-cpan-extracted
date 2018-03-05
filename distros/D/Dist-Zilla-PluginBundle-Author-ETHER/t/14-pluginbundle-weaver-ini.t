@@ -10,6 +10,8 @@ use Path::Tiny;
 use File::pushd 'pushd';
 use Dist::Zilla::Tester;
 
+use Test::File::ShareDir -share => { -dist => { 'Dist-Zilla-PluginBundle-Author-ETHER' => 'share' } };
+
 use lib 't/lib';
 use Helper;
 use NoNetworkHits;

@@ -2,7 +2,7 @@ package Bio::MUST::Core::Ali;
 # ABSTRACT: Multiple sequence alignment
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Core::Ali::VERSION = '0.180230';
+$Bio::MUST::Core::Ali::VERSION = '0.180630';
 use Moose;
 use namespace::autoclean;
 
@@ -23,6 +23,8 @@ use Bio::MUST::Core::Types;
 use Bio::MUST::Core::Constants qw(:gaps :files);
 use aliased 'Bio::MUST::Core::Seq';
 use aliased 'Bio::MUST::Core::SeqMask';
+
+# TODO: add information about methods available in Ali-like objects
 
 # ATTRIBUTES
 
@@ -481,18 +483,20 @@ sub store_fasta {
 }
 
 
-# TODO: allow not shortening ids
-# TODO: allow specifying auto-unlink?
-
-sub temp_fasta {                            ## no critic (RequireArgUnpacking)
+sub temp_fasta {
     my $self = shift;
+    my $args = shift // {};             # HashRef (should not be empty...)
+
+    # abbreviate ids (possibly using a custom prefix)
+    my $prefix = $args->{id_prefix};
+    delete $args->{id_prefix};          # not necessarily required
+    my $mapper = $self->std_mapper($prefix);
+    $self->shorten_ids($mapper);
 
     # write temporary .fasta file using standard abbr_ids
     # ...and restore long_ids afterwards
-    my $mapper = $self->std_mapper;
-    $self->shorten_ids($mapper);
     my $out = File::Temp->new(UNLINK => 0, EXLOCK => 0, SUFFIX => '.fasta');
-    $self->store_fasta($out->filename, @_);     # note the currying
+    $self->store_fasta($out->filename, $args);
     $self->restore_ids($mapper);
     ### filename: $out->filename
 
@@ -735,7 +739,7 @@ Bio::MUST::Core::Ali - Multiple sequence alignment
 
 =head1 VERSION
 
-version 0.180230
+version 0.180630
 
 =head1 SYNOPSIS
 
@@ -914,7 +918,7 @@ exists for the specified id, this method will return C<undef>.
     my $seq = $ali->get_seq_with_id($id);
     croak "Seq $id not found in Ali!" unless defined $seq;
 
-This method accepts just one argument (and not an array slice).
+This method accepts just one argument.
 
 =head2 set_seq
 
@@ -1355,6 +1359,12 @@ In list context, returns the IdMapper object along with temporary filename.
     ...
 
 This method accepts the same optional argument hash as C<store_fasta>.
+However, an additional option (C<id_prefix>) is available to control the way
+abbreviated sequence ids are prefixed by the C<std_mapper> method (see
+L<Bio::MUST::Core::Listable>).
+
+    my $infile1 = $ali1->temp_fasta( { id_prefix => 'file1-' } );
+    my $infile2 = $ali2->temp_fasta( { id_prefix => 'file2-' } );
 
 =head2 load_phylip
 

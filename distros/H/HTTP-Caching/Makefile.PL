@@ -33,4 +33,15 @@ WriteMakefile(
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'HTTP-Caching-*' },
+    (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/THEMA-MEDIA/HTTP-Caching.git',
+                web  => 'https://github.com/THEMA-MEDIA/HTTP-Caching',
+            },
+        }})
+     : ()
+    ),
 );

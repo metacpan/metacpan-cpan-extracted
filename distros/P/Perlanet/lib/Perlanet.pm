@@ -18,7 +18,7 @@ use XML::Feed;
 use vars qw{$VERSION};
 
 BEGIN {
-  $VERSION = '1.1.1';
+  $VERSION = '1.1.2';
 }
 
 with 'MooseX::Traits';
@@ -410,11 +410,6 @@ sub run {
 See L<http://wiki.github.com/davorg/perlanet/issues>
 
 =head1 SUPPORT
-
-There is a mailing list which acts as both a place for developers to talk
-about maintaining and improving Perlanet and also for users to get support.
-You can sign up to this list at
-L<http://lists.mag-sol.com/mailman/listinfo/perlanet>
 
 To report bugs in Perlanet, please use the CPAN request tracker. You can
 either use the web page at

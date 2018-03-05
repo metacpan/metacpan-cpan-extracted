@@ -1,15 +1,19 @@
-# Copyrights 2007-2017 by [Mark Overmeer].
+# Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# This code is part of distribution XML-Compile-SOAP.  Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::SOAP::Util;
 use vars '$VERSION';
-$VERSION = '3.22';
+$VERSION = '3.23';
 
 use base 'Exporter';
+
+use warnings;
+use strict;
 
 my @soap10 = qw/SOAP11HTTP WSDL11HTTP WSDL11MIME SOAP11ENV/;
 my @soap11 = qw/SOAP11ENV SOAP11ENC SOAP11NEXT SOAP11HTTP WSDL11SOAP/;

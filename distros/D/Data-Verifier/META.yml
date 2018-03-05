@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: 0
   perl: 5.006
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,4 +34,5 @@ resources:
   bugtracker: https://github.com/Manwar/data-verifier/issues
   homepage: https://github.com/Manwar/data-verifier
   repository: https://github.com/Manwar/data-verifier.git
-version: 0.61
+version: 0.62
+x_serialization_backend: 'YAML::Tiny version 1.56'

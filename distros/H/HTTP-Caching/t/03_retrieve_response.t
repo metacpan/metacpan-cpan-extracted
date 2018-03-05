@@ -3,6 +3,7 @@ use Test::MockObject;
 
 use Carp;
 
+use HTTP::Caching::DeprecationWarning ':hide';
 use HTTP::Caching;
 
 use HTTP::Request;

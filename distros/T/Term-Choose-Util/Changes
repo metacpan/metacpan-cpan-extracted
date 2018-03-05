@@ -1,6 +1,16 @@
 Revision history for Term::Choose::Util
 
 
+0.059   2018-03-03
+        - Bugfix: operator '//' not available in Perl 5.8.
+
+0.058   2018-03-02
+        - Removed the option 'current' from all subroutines.
+
+0.057   2018-03-01
+        - "choose_a_subset": removed the option 'current'.
+        - "choose_a_number": removed the option 'current'.
+
 0.056   2018-02-10
         - Added the option "info".
         - Update documentation.

@@ -1,0 +1,14 @@
+[
+   {
+      "Edit" : [
+         {
+            "id" : "edit_settings",
+            "label" : "Settings"
+         },
+         {
+            "id" : "edit_find",
+            "label" : "Find"
+         }
+      ]
+   }
+]

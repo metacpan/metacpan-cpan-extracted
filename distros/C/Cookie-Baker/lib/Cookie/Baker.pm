@@ -7,7 +7,7 @@ use base qw/Exporter/;
 use URI::Escape;
 
 BEGIN {
-    our $VERSION = "0.08";
+    our $VERSION = "0.09";
     our @EXPORT = qw/bake_cookie crush_cookie/;
     my $use_pp = $ENV{COOKIE_BAKER_PP};
     if (!$use_pp) {
@@ -78,7 +78,7 @@ sub _date {
     }
     my($sec, $min, $hour, $mday, $mon, $year, $wday) = gmtime($expires_at);
     $year += 1900;
-    # (cookies use '-' as date separator, HTTP uses ' ')    
+    # (cookies use '-' as date separator, HTTP uses ' ')
     return sprintf("%s, %02d-%s-%04d %02d:%02d:%02d GMT",
                    $WDAY[$wday], $mday, $MON[$mon], $year, $hour, $min, $sec);
 }
@@ -170,13 +170,13 @@ Cookie's domain.
 Cookie's expires date time. Several formats are supported
 
   expires => time + 24 * 60 * 60 # epoch time
-  expires => 'Wed, 03-Nov-2010 20:54:16 GMT' 
+  expires => 'Wed, 03-Nov-2010 20:54:16 GMT'
   expires => '+30s' # 30 seconds from now
   expires => '+10m' # ten minutes from now
-  expires => '+1h'  # one hour from now 
+  expires => '+1h'  # one hour from now
   expires => '-1d'  # yesterday (i.e. "ASAP!")
   expires => '+3M'  # in three months
-  expires => '+10y' # in ten years time
+  expires => '+10y' # in ten years time (60*60*24*365*10 seconds)
   expires => 'now'  #immediately
 
 =item path
@@ -195,10 +195,10 @@ If true, sets secure flag. false by default.
 
 =item crush_cookie
 
-Parses cookie string and returns a hashref. 
+Parses cookie string and returns a hashref.
 
     my $cookies_hashref = crush_cookie($headers->header('Cookie'));
-    my $cookie_value = $cookies_hashref->{cookie_name}  
+    my $cookie_value = $cookies_hashref->{cookie_name}
 
 =back
 
@@ -220,4 +220,3 @@ it under the same terms as Perl itself.
 Masahiro Nagano E<lt>kazeburo@gmail.comE<gt>
 
 =cut
-

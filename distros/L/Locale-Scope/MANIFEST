@@ -3,6 +3,7 @@ Changes
 LICENSE
 META.json
 README.md
+builder/MyBuilder.pm
 cpanfile
 lib/Locale/Scope.pm
 minil.toml

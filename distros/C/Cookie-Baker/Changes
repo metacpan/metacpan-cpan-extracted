@@ -1,5 +1,9 @@
 Revision history for Perl extension Cookie-Baker
 
+0.09 2018-03-03T04:33:20Z
+
+   - +Ny means +N*60*60*24*365 seconds
+
 0.08 2017-07-18T03:36:55Z
 
    - Disallow , as a delimiter

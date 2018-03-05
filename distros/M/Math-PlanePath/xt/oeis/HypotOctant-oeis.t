@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -30,9 +30,6 @@ use MyOEIS;
 
 use List::Util 'min', 'max';
 use Math::PlanePath::HypotOctant;
-
-# uncomment this to run the ### lines
-#use Smart::Comments '###';
 
 
 # #------------------------------------------------------------------------------

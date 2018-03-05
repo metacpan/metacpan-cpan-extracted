@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6;
+plan tests => 7;
 
 my @module_files = (
     'Business/RO/TaxDeduction.pm',
     'Business/RO/TaxDeduction/Amount.pm',
     'Business/RO/TaxDeduction/Ranges.pm',
     'Business/RO/TaxDeduction/Role/Utils.pm',
+    'Business/RO/TaxDeduction/Table.pm',
     'Business/RO/TaxDeduction/Types.pm'
 );
 

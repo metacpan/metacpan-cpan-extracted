@@ -6,7 +6,7 @@ LWP::UserAgent::Caching - HTTP::Casing based UserAgent, finally done right
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 use strict;
 use warnings;
@@ -60,9 +60,9 @@ after a non-error response returned by a non-safe request (like DELETE).
 
 =head1 METHODS
 
-Since it's a subclass of the standard LWP::UserAgent, it inherrits all those. In
+Since it's a subclass of the standard LWP::UserAgent, it inherits all those. In
 this module we also implemented the shortcuts from L<HTTP::Request::Common> so
-that tehy will not call the parrent class
+that they will not call the parent class
 
 =head1 SEE ALSO
 
@@ -90,8 +90,10 @@ sub new {
 }
 
 sub request {
-    $_[1]->headers->user_agent( $_[0]->agent ); # FIX: only set during request
-    return shift->{http_caching}->make_request(@_);
+    my $self = shift;
+    my $rqst = shift->clone;
+    $self->prepare_request($rqst);
+    return $self->{http_caching}->make_request($rqst, @_);
 }
 
 

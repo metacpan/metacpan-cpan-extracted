@@ -172,7 +172,7 @@ void avltree_delete ( avltree_t *tree )
   free ( tree );
 }
 
-SV *avltree_find ( avltree_t *tree, SV *data )
+SV *avltree_find (pTHX_ avltree_t *tree, SV *data )
 {
   avlnode_t *it = tree->root;
 
@@ -358,7 +358,7 @@ void avltdelete ( avltrav_t *trav )
   First step in traversal,
   handles min and max
 */
-static SV *start ( avltrav_t *trav, avltree_t *tree, int dir )
+static SV *start (pTHX_ avltrav_t *trav, avltree_t *tree, int dir )
 {
   trav->tree = tree;
   trav->it = tree->root;
@@ -379,7 +379,7 @@ static SV *start ( avltrav_t *trav, avltree_t *tree, int dir )
   Subsequent traversal steps,
   handles ascending and descending
 */
-static SV *move ( avltrav_t *trav, int dir )
+static SV *move (pTHX_ avltrav_t *trav, int dir )
 {
   if ( trav->it->link[dir] != NULL ) {
     /* Continue down this branch */
@@ -409,22 +409,22 @@ static SV *move ( avltrav_t *trav, int dir )
   return trav->it == NULL ? &PL_sv_undef : trav->it->data;
 }
 
-SV *avltfirst ( avltrav_t *trav, avltree_t *tree )
+SV *avltfirst (pTHX_ avltrav_t *trav, avltree_t *tree )
 {
-  return start ( trav, tree, 0 ); /* Min value */
+  return start (aTHX_ trav, tree, 0 ); /* Min value */
 }
 
-SV *avltlast ( avltrav_t *trav, avltree_t *tree )
+SV *avltlast (pTHX_ avltrav_t *trav, avltree_t *tree )
 {
-  return start ( trav, tree, 1 ); /* Max value */
+  return start (aTHX_ trav, tree, 1 ); /* Max value */
 }
 
-SV *avltnext ( avltrav_t *trav )
+SV *avltnext (pTHX_ avltrav_t *trav )
 {
-  return move ( trav, 1 ); /* Toward larger items */
+  return move (aTHX_ trav, 1 ); /* Toward larger items */
 }
 
-SV *avltprev ( avltrav_t *trav )
+SV *avltprev (pTHX_ avltrav_t *trav )
 {
-  return move ( trav, 0 ); /* Toward smaller items */
+  return move (aTHX_ trav, 0 ); /* Toward smaller items */
 }

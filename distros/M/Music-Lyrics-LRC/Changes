@@ -1,5 +1,13 @@
 Revision history for Music-Lyrics-LRC
 
+0.15    2018-03-05
+
+ - Fix botched Changes file for previous release...
+
+0.14    2018-03-05
+
+ - Correct fatal error in documentation example code
+
 0.13    2018-02-21
 
  - Fix botched Changes file for previous release...

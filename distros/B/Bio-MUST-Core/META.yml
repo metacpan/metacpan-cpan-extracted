@@ -17,6 +17,7 @@ meta-spec:
 name: Bio-MUST-Core
 requires:
   Algorithm::NeedlemanWunsch: '0'
+  Bio::FastParsers: '0.180470'
   Bio::LITE::Taxonomy::NCBI: '0.10'
   Bio::LITE::Taxonomy::NCBI::Gi2taxid: '0'
   Bio::Phylo::IO: '0'
@@ -53,6 +54,7 @@ requires:
   Test::Most: '0'
   Tie::IxHash: '0'
   Try::Tiny: '0'
+  Try::Tiny::Warnings: '0'
   XML::Bare: '0.53'
   YAML::XS: '0'
   aliased: '0'
@@ -62,5 +64,5 @@ requires:
   perl: '5.013002'
   strict: '0'
   warnings: '0'
-version: '0.180230'
+version: '0.180630'
 x_serialization_backend: 'YAML::Tiny version 1.69'

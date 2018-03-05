@@ -42,9 +42,15 @@ use Cwd;
 my $R = getcwd;
 
 my $ua = LWP::UserAgent->new();
-my $webhook_url =
-    sprintf( 'http://%s:%d/webhook/?channel=test&network=local&use_color=0',
-    $test_bot->addr, $test_bot->port );
+my $webhook_url = sprintf(
+    'http://%s:%d/webhook/?%s',
+    $test_bot->addr,
+    $test_bot->port,
+    join( '&',
+        'channel=test', 'network=local',
+        'use_color=0',  'pipeline_only_status=success',
+        'pipeline_only_status=failure' )
+);
 
 sub webhook_post {
     return $ua->post(
@@ -53,6 +59,15 @@ sub webhook_post {
         Content        => to_json( shift, { utf8 => 1 } ),
     );
 }
+
+my $resp = webhook_post(
+    {   object_kind => 'pipeline',
+        user        => { name => 'Test User' },
+        project     => { name => 'test-repo', },
+        object_attributes =>
+            { id => 42, status => 'created' },
+    }
+);
 
 my $resp = webhook_post(
     {   object_kind => 'pipeline',
@@ -97,6 +112,27 @@ TestBot->expect(
         'test-rep',
         '43',
         '* [1 hour, 1 minute and 6 seconds] success (staging: created; build-image: success)',
+    )
+);
+
+$resp = webhook_post(
+    {   object_kind => 'pipeline',
+        user        => { name => 'Test User' },
+        project     => { name => 'test-rep', },
+        object_attributes =>
+            { id => 43, status => 'failure' },
+    }
+);
+
+is( $resp->code, 202, 'pipeline event response status is 202' ) or diag $resp->as_string;
+
+TestBot->expect(
+    join( ' ',
+        '#test Test User',
+        'pipeline',
+        'test-rep',
+        '43',
+        '* failure',
     )
 );
 

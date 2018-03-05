@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013 Kevin Ryde
+# Copyright 2012, 2013, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -31,9 +31,6 @@ plan tests => 1;
 use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
-
-# uncomment this to run the ### lines
-#use Devel::Comments '###';
 
 
 use Math::NumSeq::OEIS::Catalogue::Plugin::BuiltinTable;

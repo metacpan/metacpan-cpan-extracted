@@ -15,13 +15,24 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => '0',
     },
     BUILD_REQUIRES => {
-		       'Test::More' => '0',
-		       'Test::LeakTrace' => '0'
+	'Test::More' => '0',
+	'Test::Deep' => '0',
+	'Test::LeakTrace' => '0'
     },
     PREREQ_PM => {
         #'ABC'              => '1.6',
         #'Foo::Bar::Module' => '5.0401',
     },
+    META_MERGE => {
+	'meta-spec' => { version => 2 },
+        resources => {
+        repository => {
+            type => 'git',
+            url  => 'https://github.com/avullo/AVLTree.git',
+            web  => 'https://github.com/avullo/AVLTree',
+        },
+     },
+},	      
     LIBS      => [''],   # e.g., '-lm',
     DEFINE    => '-DENABLE_DEBUG', # e.g., '-DHAVE_SOMETHING'	      
     INC       => '-Iavltree',     # e.g., '-I/usr/include/other'

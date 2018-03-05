@@ -7,7 +7,7 @@ BEGIN {
     $lib = 't/Factory';
     mkpath("$lib/JSON", $ENV{TEST_VERBOSE});
 }
-use lib 'inc';
+use lib 'lib/inc';
 use lib $lib;
 
 # Do not import, it will find installed JSON::PP/XS :(

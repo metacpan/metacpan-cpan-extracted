@@ -29,7 +29,7 @@ resources:
   bugtracker: https://github.com/kwakwaversal/moo-role-tojson/issues
   homepage: https://github.com/kwakwaversal/moo-role-tojson
   repository: https://github.com/kwakwaversal/moo-role-tojson.git
-version: '0.01'
+version: '0.02'
 x_contributors:
   - 'Paul Williams <kwakwaversal@gmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

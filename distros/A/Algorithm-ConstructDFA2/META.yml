@@ -25,8 +25,9 @@ no_index:
     - t
     - inc
 requires:
-  DBD::SQLite: '1.5'
+  DBD::SQLite: '1.54'
   DBI: '1.635'
+  JSON: '0'
   List::Util: '0'
   List::UtilsBy: '0'
   Log::Any: '0'
@@ -35,5 +36,5 @@ requires:
   Types::Standard: '0'
 resources:
   repository: https://github.com/hoehrmann/Algorithm-ConstructDFA2.git
-version: '0.04'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

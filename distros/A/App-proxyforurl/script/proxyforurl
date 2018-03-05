@@ -50,7 +50,7 @@ __DATA__
 <html>
 <head>
   <title>PAC file tester</title>
-  %= stylesheet "http://yui.yahooapis.com/pure/0.6.0/pure-min.css"
+  %= stylesheet "//unpkg.com/purecss@1.0.0/build/pure-min.css"
   %= stylesheet begin
     form { max-width: 50em; margin: 3em auto; }
     textarea { height: 18em; }
@@ -79,7 +79,7 @@ __DATA__
   <label for="rule">Rule</label>
   <input type="text" id="rule" readonly="readonly" class="pure-input-1">
   <p class="footer">
-    Powered by <a href="https://metacpan.org/pod/App::proxyforurl#DESCRIPTION">proxyforurl</a>.
+    Powered by <a href="//metacpan.org/pod/App::proxyforurl#DESCRIPTION">proxyforurl</a>.
   </p>
 % end
 %= javascript '/pac.js'

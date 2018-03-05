@@ -1,67 +1,71 @@
 Revision history for Dancer::Plugin::Cache::CHI
 
-1.4.0 2013-01-07
- [ENHANCEMENTS]
- - Now Dancer 2 compatible.
+1.5.0 2018-03-04
+  [ ENHANCEMENTS ]
+    - remove dead Dancer2 code.
+    - bump Dancer dependency to a more recent version.
+    - minor refactoring.
 
- [STATISTICS]
- - code churn: 5 files changed, 146 insertions(+), 56 deletions(-)
+  [ STATISTICS ]
+    - code churn: 8 files changed, 125 insertions(+), 86 deletions(-)
+
+1.4.0 2013-01-07
+  [ ENHANCEMENTS ]
+    - Now Dancer 2 compatible.
 
 1.3.1 2012-09-26
- [BUG FIXES]
- - working around regression in Dancer 1.31
+  [ BUG FIXES ]
+    - working around regression in Dancer 1.31
 
- [STATISTICS]
- - code churn: 3 files changed, 15 insertions(+), 4 deletions(-)
+  [ STATISTICS ]
+    - code churn: 3 files changed, 15 insertions(+), 4 deletions(-)
 
 1.3.0 2011-12-06
- [BUG FIXES]
- - doc typo corrected (thanks Perlover!) [GH#7]
+  [ BUG FIXES ]
+    - doc typo corrected (thanks Perlover!) [GH#7]
 
- [ENHANCEMENTS]
- - cache namespaces support now provided. [GH#8] Patch by Perlover.
+  [ ENHANCEMENTS ]
+    - cache namespaces support now provided. [GH#8] Patch by Perlover.
 
 1.2.0 2011-10-15
- [BUG FIXES]
- - add test for 'cache_remove'
- - Change log was messed up by dzil plugin
+  [ BUG FIXES ]
+    - add test for 'cache_remove'
+    - Change log was messed up by dzil plugin
 
- [ENHANCEMENTS]
- - add 'before_create_cache' hook
- - now http headers of cached response are saved as well, and we're not
-   using 'halt' anymore. (patch by Perlover)
- - new configuration option 'honor_no_cache' for client-side
-   'Cache-Control: no-cache' or 'Pragma: no-cache'. (original patch and
-   idea by Perlover)
- - cache keys used by 'cache_page' can be customized via
-   'cache_page_key_generator'.
+  [ ENHANCEMENTS ]
+    - add 'before_create_cache' hook
+    - now http headers of cached response are saved as well, and we're not
+      using 'halt' anymore. (patch by Perlover)
+    - new configuration option 'honor_no_cache' for client-side
+      'Cache-Control: no-cache' or 'Pragma: no-cache'. (original patch and
+      idea by Perlover)
+    - cache keys used by 'cache_page' can be customized via
+      'cache_page_key_generator'.
 
 1.1.0 2011-08-24
- [ENHANCEMENTS]
- - add 'cache_remove' helper function. Patch by  David Precious. [GH#1]
+  [ ENHANCEMENTS ]
+    - add 'cache_remove' helper function. Patch by  David Precious. [GH#1]
 
 1.0.2 2011-07-17
- [BUG FIXES]
- - fix 'check_page_cache'. Looks like the behavior of 'halt' changed since
-   the last release of D::P::C::CHI.
+  [ BUG FIXES ]
+    - fix 'check_page_cache'. Looks like the behavior of 'halt' changed
+      since the last release of D::P::C::CHI.
 
 1.0.1 2011-04-04
- - report-version seems to be causing problems.
+  - report-version seems to be causing problems.
 
 1.0.0 2011-04-02
- - Re-brand the dist as Dancer::Plugin::Cache::CHI.
+  - Re-brand the dist as Dancer::Plugin::Cache::CHI.
 
 0.2.2 2011-04-02
- - Dancer::Plugin::Cache deprecated in favor of Dancer::Plugin::Cache::CHI
+  - Dancer::Plugin::Cache deprecated in favor of Dancer::Plugin::Cache::CHI
 
 0.2.1 2011-03-20
- - Requires Dancer > 1.150
+  - Requires Dancer > 1.150
 
 0.2.0 2011-03-19
- - Add cache helper functions. Thanks to David Precious for the suggestion.
-
- [RT#66714]
+  - Add cache helper functions. Thanks to David Precious for the
+    suggestion.  [RT#66714]
 
 0.1.0 2011-03-16
- - Initial release, unleashed unto an unsuspecting world.
-
+  - Initial release, unleashed unto an unsuspecting world.

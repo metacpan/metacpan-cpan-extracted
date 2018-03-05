@@ -1,5 +1,9 @@
 Revision history for Perl extension HTTP-Entity-Parser
 
+0.21 2018-03-03T04:51:32Z
+
+   - Relax minimum perl version to 5.8.1
+
 0.20 2017-07-18T03:54:04Z
 
    - [fixed] Throws exception when psgi.input is undef #6

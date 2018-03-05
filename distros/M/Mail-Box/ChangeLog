@@ -1,5 +1,19 @@
 
-===== ChangeLog of Mail::Box version 3.*
+===== ChangeLog of distribution Mail-Box version 3.*
+
+verison 3.005: Sun Mar  4 21:48:38 CET 2018
+
+	Changes:
+	- code trusted on "perl -w", but now added many "use warnings".
+
+	Improvements:
+	- spell fixes rt.cpan.org #12400 [Damyan Ivanov] (Debian)
+	- remove license file: now in README.md
+	  rt.cpan.org#124057 [Petr Pisar]
+	- remove Mail/Box-Shorts.pod: already consumed somewhere else
+	  rt.cpan.org#124056 [Petr Pisar]
+	- converted to GIT, publish to  GitHub
+	- check produced pods
 
 version 3.004: Fri 22 Dec 09:46:28 CET 2017
 

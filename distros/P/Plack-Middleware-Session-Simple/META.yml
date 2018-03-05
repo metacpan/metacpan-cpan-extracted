@@ -10,11 +10,9 @@ build_requires:
   Test::Requires: '0.07'
   Test::TCP: '2.01'
 configure_requires:
-  CPAN::Meta: '0'
-  CPAN::Meta::Prereqs: '0'
-  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v1.1.0, CPAN::Meta::Converter version 2.141170'
+generated_by: 'Minilla/v3.0.16, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,7 +31,7 @@ no_index:
 provides:
   Plack::Middleware::Session::Simple:
     file: lib/Plack/Middleware/Session/Simple.pm
-    version: '0.03'
+    version: '0.04'
   Plack::Middleware::Session::Simple::Session:
     file: lib/Plack/Middleware/Session/Simple.pm
 requires:
@@ -48,4 +46,8 @@ resources:
   bugtracker: https://github.com/kazeburo/Plack-Middleware-Session-Simple/issues
   homepage: https://github.com/kazeburo/Plack-Middleware-Session-Simple
   repository: git://github.com/kazeburo/Plack-Middleware-Session-Simple.git
-version: '0.03'
+version: '0.04'
+x_contributors:
+  - 'bayashi <bayashi@cpan.org>'
+  - 'vividsnow <vividsnow@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

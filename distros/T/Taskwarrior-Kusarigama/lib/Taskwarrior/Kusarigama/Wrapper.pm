@@ -1,7 +1,7 @@
 package  Taskwarrior::Kusarigama::Wrapper;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: interface to the taskwarrior's 'task' command
-$Taskwarrior::Kusarigama::Wrapper::VERSION = '0.7.0';
+$Taskwarrior::Kusarigama::Wrapper::VERSION = '0.8.0';
 
 # TODO use Test::Pod::Snippet for that example ^^^
 
@@ -105,7 +105,25 @@ sub _parse_args($self,$cmd,@args) {
     if( @args and ref $args[0] eq 'ARRAY' ) {
         unshift @command, map {  $self->_map_to_arg($_) } ( shift @args )->@*;
     }
-    return [ @command, map { $self->_map_to_arg($_) } @args ];
+    my @stdin;
+    push @stdin, ${pop @args} if @args and ref $args[-1] eq 'SCALAR';
+    return ( [ @command, map { $self->_map_to_arg($_) } @args ], @stdin );
+}
+
+sub save {
+    my( $self, $task ) = @_;
+
+    require JSON;
+
+    my $id = $task->{uuid} || '+LATEST';
+
+    my $json = JSON::to_json([ $task ]);
+
+    $self->RUN('import', \$json );
+
+    my ( $new ) = $self->export($id);
+
+    return $new;
 }
 
 sub export {
@@ -142,7 +160,7 @@ Taskwarrior::Kusarigama::Wrapper - interface to the taskwarrior's 'task' command
 
 =head1 VERSION
 
-version 0.7.0
+version 0.8.0
 
 =head1 SYNOPSIS
 

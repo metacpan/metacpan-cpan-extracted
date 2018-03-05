@@ -19,7 +19,7 @@ our @ISA = qw(Script::Toolbox::Util Script::Toolbox::Util::Opt Exporter);
 our %EXPORT_TAGS = ( 'all' => [ qw(Open Log Exit Table Usage Dir File FileC
 						           System Now Menue KeyMap Stat TmpFile
                                    DataMenue Menu DataMenu
-                                   CheckBox
+                                   CheckBox RadioButton
                                   )]);
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
@@ -28,7 +28,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.57';
+our $VERSION = '0.58';
 
 
 # Preloaded methods go here.

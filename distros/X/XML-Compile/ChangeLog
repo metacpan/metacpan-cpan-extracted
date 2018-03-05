@@ -6,6 +6,15 @@ Mark Overmeer.
 
 Plans and unwanted limitations? see README.todo
 
+version 1.60: Sun Mar  4 22:53:03 CET 2018
+
+	Fixes:
+	- accept non-ascii word characters in NCName type [Aleksei Y Ananev]
+	- use of facets with nested simpletypes [Aleksei Y Ananev]
+
+	Improvements:
+	- convert to GIT, publish on GitHub.
+
 version 1.59: Thu 28 Dec 11:29:27 CET 2017
 
 	Improvements:
@@ -1465,6 +1474,8 @@ version 0.77: Sun Apr 13 00:45:28 CEST 2008
 	- XML::RegExp version mix-up... lowered required release
 	  from 0.03 to 0.02 [Alan Wind]
 
+version 0.76: Mistake
+
 version 0.75: Sat Apr 12 09:57:29 CEST 2008
 
 	Fixes:
@@ -2322,3 +2333,4 @@ version 0.02: Mon Aug 14 13:42:02 CEST 2006
 
 	- and many more...
 
+version 0.01: Not released

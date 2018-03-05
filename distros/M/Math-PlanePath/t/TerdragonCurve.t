@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,23 +20,20 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 632;
+plan tests => 659;
 
 use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 
-# uncomment this to run the ### lines
-# use Smart::Comments;
-
-require Math::PlanePath::TerdragonCurve;
+use Math::PlanePath::TerdragonCurve;
 
 
 #------------------------------------------------------------------------------
 # VERSION
 
 {
-  my $want_version = 125;
+  my $want_version = 126;
   ok ($Math::PlanePath::TerdragonCurve::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::TerdragonCurve->VERSION,  $want_version,
@@ -62,6 +59,30 @@ require Math::PlanePath::TerdragonCurve;
 }
 
 #------------------------------------------------------------------------------
+
+# digit rotations used by xy_to_n_list()
+{
+  my @digit_to_x = ([0,2,1],  [0,-1,-2],  [0,-1, 1]);
+  my @digit_to_y = ([0,0,1],  [0, 1, 0],  [0,-1,-1]);
+
+  foreach my $a (0,1,2) {
+    my $x = $digit_to_x[0]->[$a];
+    my $y = $digit_to_y[0]->[$a];
+
+    ($x,$y) = (($x+3*$y)/-2,  # rotate +120
+               ($x-$y)/2);
+    ok ($x == $digit_to_x[1]->[$a], 1);
+    ok ($y == $digit_to_y[1]->[$a], 1);
+
+    ($x,$y) = (($x+3*$y)/-2,  # rotate +120
+               ($x-$y)/2);
+    ok ($x == $digit_to_x[2]->[$a], 1);
+    ok ($y == $digit_to_y[2]->[$a], 1);
+  }
+}
+
+
+#------------------------------------------------------------------------------
 # xyxy_to_n()
 
 {
@@ -70,6 +91,58 @@ require Math::PlanePath::TerdragonCurve;
   ok ($path->xyxy_to_n(0,0, 1,1),  undef);
 }
 
+#------------------------------------------------------------------------------
+# xy_to_n_list()
+
+{
+  my $path = Math::PlanePath::TerdragonCurve->new (arms => 2);
+  {
+    my @n_list = $path->xy_to_n_list(1,1);
+    ok (join(',',@n_list), '3,4,10');
+  }
+  {
+    my @n_list = $path->xy_to_n_list(-1,1);
+    ok (join(',',@n_list), '5,11');
+  }
+}
+
+# at 0,0
+foreach my $arms (1 .. 6) {
+  my $path = Math::PlanePath::TerdragonCurve->new (arms => $arms);
+  my @got_n_list = $path->xy_to_n_list(0,0);
+  my $got_n_list = join(',',@got_n_list);
+  my $want_n_list = join(',', 0 .. $arms-1);
+  ok ($got_n_list, $want_n_list);
+}
+
+{
+  # arms=6 points shown in the POD
+  #
+  #             --- 8,13,31 ---------------- 7,12,30 ---
+  #               /        \               /         \
+  #  \           /          \             /           \          /
+  #   \         /            \           /             \        /
+  # --- 9,14,32 ------------- 0,1,2,3,4,5 -------------- 6,17,35 ---
+  #   /         \            /           \             /        \
+  #  /           \          /             \           /          \
+  #               \        /               \         /
+  #            --- 10,15,33 ---------------- 11,16,34 ---
+
+  my $path = Math::PlanePath::TerdragonCurve->new (arms => 6);
+  foreach my $elem ([-1, 1, '8,13,31'],
+                    [ 1, 1, '7,12,30'],
+                    [-2, 0, '9,14,32'],
+                    [ 0, 0, '0,1,2,3,4,5'],
+                    [ 2, 0, '6,17,35'],
+                    [-1,-1, '10,15,33'],
+                    [ 1,-1, '11,16,34'],
+                   ) {
+    my ($x,$y, $want_n_list) = @$elem;
+    my @got_n_list = $path->xy_to_n_list($x,$y);
+    my $got_n_list = join(',',@got_n_list);
+    ok ($got_n_list, $want_n_list);
+  }
+}
 
 #------------------------------------------------------------------------------
 # level_to_n_range()
@@ -131,7 +204,7 @@ require Math::PlanePath::TerdragonCurve;
 
 {
   # per KochCurve.t, 0=straight, 1=+120 degrees, 2=+240 degrees
-  sub dxdy_to_dir {
+  sub dxdy_to_dir3 {
     my ($dx,$dy) = @_;
     if ($dy == 0) {
       if ($dx == 2) { return 0/2; }
@@ -150,7 +223,7 @@ require Math::PlanePath::TerdragonCurve;
   sub path_n_dir {
     my ($path, $n) = @_;
     my ($dx,$dy) = $path->n_to_dxdy($n) or die "Oops, no point at ",$n;
-    return dxdy_to_dir ($dx, $dy);
+    return dxdy_to_dir3 ($dx, $dy);
   }
 
   # return 0 for left, 1 for right
@@ -316,4 +389,5 @@ foreach my $arms (1 .. 4) {
   }
 }
 
+#------------------------------------------------------------------------------
 exit 0;

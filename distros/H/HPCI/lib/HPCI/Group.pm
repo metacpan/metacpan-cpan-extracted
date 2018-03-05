@@ -9,6 +9,7 @@ use Carp;
 use Data::Dumper;
 use File::ShareDir;
 use File::Path qw(make_path);
+use File::Spec;
 use Time::HiRes qw(usleep gettimeofday);
 use Try::Tiny;
 use DateTime;
@@ -275,52 +276,12 @@ corresponding location in the long-term storage.
 
 See the documentation for HPCI::File for details on writing new classes.
 
-=cut
+=head2 storage_class
 
-# sub _create_HPCIFileGen {
-#     my $class = shift;
-#     load $class;
-#     $class->generator( @_ );
-# }
-# 
-# subtype 'HPCIFileGen',
-#     as 'CodeRef';
-# 
-# coerce 'HPCIFileGen',
-#     from 'Str',      via { _create_HPCIFileGen(  $_ ) },
-#     from 'ArrayRef', via { _create_HPCIFileGen( @$_ ) };
-# 
-# sub _create_HPCIFileGenHash {
-#     my $key = shift;
-#     return { $key => _create_HPCIFileGen( @_ ) };
-# }
-# 
-# subtype 'HPCIFileGenHash',
-#     as 'HashRef[HPCIFileGen]',
-#     where { keys %$_ == 1 };
-# 
-# coerce 'HPCIFileGenHash',
-#     from 'ArrayRef[Str]', via { _create_HPCIFileGenHash( @$_ ) };
-# 
-# subtype 'HPCIFileList',
-#     as 'ArrayRef[HPCIFileGenHash]';
-# 
-# coerce 'HPCIFileList',
-#     from 'ArrayRef[ArrayRef[Str]]', via { _create_HPCIFileGenHash( @$_ ) for @$_ };
-# 
-# has 'storage_classes' => (
-#     is      => 'ro',
-#     isa     => 'HPCIFileList',
-#     default => sub { [ ] },
-#     coerce  => 1,
-# );
-
-=head2 storage_class (internal)
-
-The name of key to use to select a storage class from the storage_classes
-attribute for files that do no have an explicit class given.
-
-Defaults to C<'default'>.
+The default storage class attribute for files that do not
+have an explicit class given and are not covered by an element in
+storage_classes.  This is a (sub-)class of HPCI::File, the default
+is HPCI::File.
 
 =cut
 
@@ -328,13 +289,40 @@ has 'storage_class' => (
     is      => 'ro',
     isa     => 'HPCIFileGen',
     lazy    => 1,
-    default => sub {
-        # HPCI::File::Classes::generator('HPCI::File') },
+    default => sub { HPCI::File::Classes::generator('HPCI::File') },
+);
+
+=head2 file_params
+
+A hash containing the param list for files that need params.
+Providing them here means that they do not have to be written
+out in full every time the file is used through the program.
+
+You can use the method add_file_params to augment the hash, so
+the file info can be provided in the sectio of code that creates
+the stage(s) that use that file, rather than having to list them
+all in one place.
+
+Defaults to an empty hash.
+
+=cut
+
+has 'file_params' => (
+    is      => 'bare',
+    isa     => 'HashRef',
+    trigger => sub {
         my $self = shift;
-        $self->debug("Setting default storage class for group");
-        HPCI::File::Classes::generator('HPCI::File')
+        $self->add_file_params( @_ );
     },
 );
+
+has '_file_info' => (
+    is      => 'ro',
+    isa     => 'HashRef',
+    lazy    => 1,
+    default => sub { { } },
+);
+
 
 =head2 _unique_name (internal)
 
@@ -751,6 +739,28 @@ regexp carefully is necessary in any case.)
         $self->_pre_reqs->{$dep}{$pre_req} = 1;
         $self->_blocked->{$dep}            = 1;
         delete $self->_ready->{$dep};
+    };
+
+=head2 $group->add_file_params
+
+Augment the file_params list with additioal files.
+Provide either a hashref or a list of value pairs,
+in either case, the pairs are filename as the key,
+and params as the value.
+
+=cut
+
+    method add_file_params => sub {
+        my $self = shift;
+        my $fi   = $self->_file_info;
+        my $args = $_[0];
+        $args    = { @_ } unless ref $args eq 'HashRef';
+        while ( my ($k,$v) = each %$args ) {
+            $self->_croak( "file params value for $k must be a hash ref" )
+                unless (ref($v) eq 'HashRef');
+            $k = File::Spec->rel2abs($k);
+            $fi->{$k}{params} = $v;
+        }
     };
 
 =head2 $group->execute

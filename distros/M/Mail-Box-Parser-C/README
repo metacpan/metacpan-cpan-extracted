@@ -1,12 +1,25 @@
-Mail/Box/Parser/C
-=================
+=== README for Mail-Box-Parser-C version 3.009
+=   Generated on Sun Mar  4 17:16:30 2018 by OODoc 2.02
 
-INSTALLATION
+There are various ways to install this module:
 
-To install (under UNIX/Linux) this module type the following:
+ (1) if you have a command-line, you can do:
+       perl -MCPAN -e 'install <any package from this distribution>'
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+ (2) if you use Windows, have a look at http://ppm.activestate.com/
+
+ (3) if you have downloaded this module manually (as root/administrator)
+       gzip -d Mail-Box-Parser-C-3.009.tar.gz
+       tar -xf Mail-Box-Parser-C-3.009.tar
+       cd Mail-Box-Parser-C-3.009
+       perl Makefile.PL
+       make          # optional
+       make test     # optional
+       make install
+
+For usage, see the included manual-pages or
+    http://search.cpan.org/dist/Mail-Box-Parser-C-3.009/
+
+Please report problems to
+    http://rt.cpan.org/Dist/Display.html?Queue=Mail-Box-Parser-C
 

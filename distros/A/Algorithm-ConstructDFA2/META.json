@@ -32,8 +32,9 @@
       },
       "runtime" : {
          "requires" : {
-            "DBD::SQLite" : "1.5",
+            "DBD::SQLite" : "1.54",
             "DBI" : "1.635",
+            "JSON" : "0",
             "List::Util" : "0",
             "List::UtilsBy" : "0",
             "Log::Any" : "0",
@@ -62,6 +63,6 @@
          "web" : "https://github.com/hoehrmann/Algorithm-ConstructDFA2"
       }
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -71,7 +71,7 @@ sub list {
         $last = $#rows;
     }
     my $retval = {
-        rows => [ @rows[ $first .. $last ] ],
+        items => [ @rows[ $first .. $last ] ],
         total => scalar @rows,
     };
     #; use Data::Dumper;
@@ -83,12 +83,14 @@ sub set {
     my ( $self, $coll, $id, $params ) = @_;
     my $id_field = $self->{collections}{ $coll }{ 'x-id-field' } || 'id';
     $params->{ $id_field } = $id;
-    $COLLECTIONS{ $coll }{ $id } = $params;
+    $COLLECTIONS{ $coll }{ $id } = { %{ $COLLECTIONS{ $coll }{ $id } || {} }, %$params };
+    return;
 }
 
 sub delete {
     my ( $self, $coll, $id ) = @_;
     delete $COLLECTIONS{ $coll }{ $id };
+    return;
 }
 
 sub read_schema {

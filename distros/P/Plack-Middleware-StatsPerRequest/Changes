@@ -1,5 +1,11 @@
 Revision history for Plack::Middleware::StatsPerRequest
 
+0.901   2018-03-02T07:45:22
+    - add has_headers
+    - use usleep in test to sleep 1.5 secs to work around some
+      windows test fails
+
+
 0.900   2018-02-27T16:19:42
     - add tests & docs
 

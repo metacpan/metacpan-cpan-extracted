@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.001';
+our $VERSION = '2.003';
 
 use Scalar::Util qw( looks_like_number );
 
@@ -236,7 +236,7 @@ sub epoch_to_datetime {
     # mysql: FROM_UNIXTIME doesn't work with negative timestamps
     return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d %H:%i:%s')"    if $sf->driver eq 'mysql';
 
-    return "(TO_TIMESTAMP(${col}::bigint/$interval))::timestamp"  if $sf->driver eq 'Pg';
+    return "TO_TIMESTAMP(${col}::bigint/$interval)::timestamp"    if $sf->driver eq 'Pg';
 }
 
 
@@ -249,8 +249,12 @@ sub epoch_to_date {
 
     return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d')"        if $sf->driver eq 'mysql';
 
-    return "(TO_TIMESTAMP(${col}::bigint/$interval))::date"  if $sf->driver eq 'Pg';
+    return "TO_TIMESTAMP(${col}::bigint/$interval)::date"    if $sf->driver eq 'Pg';
 }
+
+
+
+
 
 
 sub truncate {
@@ -299,7 +303,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.001
+Version 2.003
 
 =head1 DESCRIPTION
 

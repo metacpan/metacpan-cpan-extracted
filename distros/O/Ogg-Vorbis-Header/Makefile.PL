@@ -13,6 +13,13 @@ WriteMakefile(
     META_MERGE => {
        'meta-spec' => { version => 2 },
        dynamic_config => 0,
+      resources => {
+        repository => {
+          type => 'git',
+          url  => 'https://github.com/davorg/Ogg-Vorbis-Header.git',
+          web  => 'https://github.com/davorg/Ogg-Vorbis-Header',
+        },
+      },
     },
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM => 'Header.pm', # retrieve abstract from module

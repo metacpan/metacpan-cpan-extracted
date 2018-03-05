@@ -60,12 +60,15 @@ sub _merge_prereqs {
 }
 
 my @include = qw(
+  Encode
   JSON::PP
   Sub::Name
   YAML
   autodie
   Dist::CheckConflicts
   Pod::Elemental::PerlMunger
+  Text::Template
+  Module::CoreList
 );
 
 my @exclude = qw(

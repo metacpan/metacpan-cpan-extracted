@@ -8,7 +8,7 @@ use App::NDTools::Slurp qw(s_dump);
 use Log::Log4Cli;
 use Struct::Diff qw();
 
-sub VERSION() { '0.06' };
+our $VERSION = '0.08';
 
 sub arg_opts {
     my $self = shift;
@@ -16,6 +16,15 @@ sub arg_opts {
     return (
         $self->SUPER::arg_opts(),
     );
+}
+
+sub check_args {
+    my $self = shift;
+
+    die_fatal "One or two arguments expected", 1
+        if (@{$self->{ARGV}} < 1 or @{$self->{ARGV}} > 2);
+
+    return $self;
 }
 
 sub defaults {
@@ -36,9 +45,6 @@ sub dump {
 
 sub exec {
     my $self = shift;
-
-    die_fatal "One or two arguments expected", 1
-        if (@{$self->{ARGV}} < 1 or @{$self->{ARGV}} > 2);
 
     my $uri = shift @{$self->{ARGV}};
     my $struct = $self->load_struct($uri, $self->{OPTS}->{ifmt});

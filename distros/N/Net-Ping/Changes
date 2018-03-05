@@ -1,6 +1,10 @@
 CHANGES
 -------
 
+2.64  Sat Mar  3 15:56:14 CET 2018 (rurban)
+       Bugfixes
+        - use NIx_NOSERV flag for windows (PR #6 by chorny)
+
 2.63  Sun Nov 26 18:56:04 CET 2017 (rurban)
        Bugfixes
         - Keep v5.002 - v5.6 support

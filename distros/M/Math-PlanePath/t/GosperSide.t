@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -26,17 +26,14 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 
-# uncomment this to run the ### lines
-#use Smart::Comments;
-
-require Math::PlanePath::GosperSide;
+use Math::PlanePath::GosperSide;
 
 
 #------------------------------------------------------------------------------
 # VERSION
 
 {
-  my $want_version = 125;
+  my $want_version = 126;
   ok ($Math::PlanePath::GosperSide::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::GosperSide->VERSION,  $want_version,
@@ -168,7 +165,7 @@ require Math::PlanePath::GosperSide;
     }
   }
 
-  sub dxdy_to_dir {
+  sub dxdy_to_dir6 {
     my ($dx,$dy) = @_;
     if ($dy == 0) {
       if ($dx == 2) { return 0; }
@@ -194,7 +191,7 @@ require Math::PlanePath::GosperSide;
   my ($x, $y) = $path->n_to_xy($n++);
   my $dx = $x - $prev_x;
   my $dy = $y - $prev_y;
-  my $prev_dir = dxdy_to_dir($dx,$dy);
+  my $prev_dir = dxdy_to_dir6($dx,$dy);
 
   while ($n < 1000) {
     $prev_x = $x;
@@ -203,7 +200,7 @@ require Math::PlanePath::GosperSide;
     ($x,$y) = $path->n_to_xy($n);
     $dx = $x - $prev_x;
     $dy = $y - $prev_y;
-    my $dir = dxdy_to_dir($dx,$dy);
+    my $dir = dxdy_to_dir6($dx,$dy);
 
     my $got_turn = ($dir - $prev_dir + 6) % 6;
     my $want_turn = n_to_turn_calculated($n-1) % 6;
@@ -247,7 +244,7 @@ require Math::PlanePath::GosperSide;
     my ($next_x,$next_y) = $path->n_to_xy($n+1);
     my $dx = $next_x - $x;
     my $dy = $next_y - $y;
-    my $path_dir = dxdy_to_dir($dx,$dy);
+    my $path_dir = dxdy_to_dir6($dx,$dy);
     my $calc_dir = n_to_dir_calculated($n) % 6;
 
     if ($path_dir != $calc_dir) {

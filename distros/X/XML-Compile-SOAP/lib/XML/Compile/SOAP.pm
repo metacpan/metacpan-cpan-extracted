@@ -1,16 +1,21 @@
-# Copyrights 2007-2017 by [Mark Overmeer].
+# Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# This code is part of distribution XML-Compile-SOAP.  Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::SOAP;
 use vars '$VERSION';
-$VERSION = '3.22';
+$VERSION = '3.23';
 
+
+use warnings;
+use strict;
 
 use Log::Report          'xml-compile-soap';
+
 use XML::Compile         ();
 use XML::Compile::Util   qw(SCHEMA2001 SCHEMA2001i pack_type
    unpack_type type_of_node);
@@ -176,9 +181,10 @@ sub _sender(@)
         my $doc   = delete $copy{_doc}
           || XML::LibXML::Document->new('1.0', $charset || 'UTF-8');
 
-        my %data;
-        $data{$_}  = delete $copy{$_} for qw/Header Body/;
-        $data{Body} ||= {};
+        my %data = (
+            Body   => delete $copy{Body} || {},
+            Header => delete $copy{Header},
+        );
 
         foreach my $label (@$hlabels)
         {   exists $copy{$label} or next;
@@ -203,7 +209,7 @@ sub _sender(@)
         @mtom = ();   # filled via hook
 
 #use Data::Dumper;
-#warn Dumper \%data;
+#warn "REPROCESSED: ", Dumper \%data;
         my $root = $envelope->($doc, \%data)
             or return;
 
@@ -237,8 +243,10 @@ sub _writer_hook($$@)
             }
         }
 
-        warning __x"unused values {names}", names => [keys %data]
-            if keys %data;
+        if(keys %data)
+        {   warning __x"unused values {names}", names => [keys %data];
+            trace "expected: ". join ' ', sort keys +{@do};
+		}
 
         my $node = $doc->createElement($tag);
         $node->appendChild($_) for @childs;
@@ -297,6 +305,8 @@ sub _writer_body_rpclit_hook($$$$$)
    +{ type => $type, replace => $code };
 }
 
+*_writer_body_rpcenc_hook = \&_writer_body_rpclit_hook;
+
 sub _writer_header($)
 {   my ($self, $args) = @_;
     my (@rules, @hlabels);
@@ -307,10 +317,18 @@ sub _writer_header($)
     foreach my $h (ref $header eq 'ARRAY' ? @$header : $header)
     {   my $part    = $h->{parts}[0];
         my $label   = $part->{name};
-        my $element = $part->{element};
-        my $code    = $part->{writer}
-         || $self->_writer($element, %$args
-              , include_namespaces => sub {$_[0] ne $soapenv && $_[2]});
+        my $code    = $part->{writer};
+        if($part->{element})
+        {   $code ||= $self->_writer_part_element($args, $part);
+        }
+        elsif(my $type = $part->{type})
+        {   $code ||= $self->_writer_part_type($args, $part);
+			$label = (unpack_type $part->{name})[1];
+        }
+        else
+        {   error __x"header part {name} has neither `element' nor `type'"
+              , name => $label;
+        }
 
         push @rules, $label => $code;
         push @hlabels, $label;
@@ -336,14 +354,14 @@ sub _writer_body($)
     {   my $label  = $part->{name};
         my $code;
         if($part->{element})
-        {   $code  = $self->_writer_body_element($args, $part);
+        {   $code  = $self->_writer_part_element($args, $part);
         }
         elsif(my $type = $part->{type})
-        {   $code  = $self->_writer_body_type($args, $part);
-            $label = (unpack_type $part->{name})[1];
+        {   $code  = $self->_writer_part_type($args, $part);
+			$label = (unpack_type $part->{name})[1];
         }
         else
-        {   error __x"part {name} has neither `element' nor `type' specified"
+        {   error __x"body part {name} has neither `element' nor `type'"
               , name => $label;
         }
 
@@ -354,7 +372,7 @@ sub _writer_body($)
     (\@rules, \@blabels);
 }
 
-sub _writer_body_element($$)
+sub _writer_part_element($$)
 {   my ($self, $args, $part) = @_;
     my $element = $part->{element};
     my $soapenv = $self->envelopeNS;
@@ -366,7 +384,7 @@ sub _writer_body_element($$)
       );
 }
 
-sub _writer_body_type($$)
+sub _writer_part_type($$)
 {   my ($self, $args, $part) = @_;
 
     $args->{style} eq 'rpc'
@@ -432,7 +450,6 @@ sub _receiver(@)
             or error __x"receiving operation requires procedure name with RPC";
 
         my $use = $args{use} || $args{body}{use} || 'literal';
-#warn "RPC READER BODY $use";
         $body = $use eq 'literal'
            ? $self->_reader_body_rpclit_wrapper($procedure, $body)
            : $self->_reader_body_rpcenc_wrapper($procedure, $body);

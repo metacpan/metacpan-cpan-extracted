@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -149,9 +149,9 @@ our $VERSION = '0.020';
 #pod
 #pod =over
 #pod
-#pod =item * limit - The number of rows to return
+#pod =item * limit - The number of items to return
 #pod
-#pod =item * offset - The number of rows to skip before returning rows
+#pod =item * offset - The number of items to skip before returning items
 #pod
 #pod =back
 #pod
@@ -372,7 +372,7 @@ sub register {
 
     $app->helper( 'yancy.list' => sub {
         my ( $c, @args ) = @_;
-        return @{ $c->yancy->backend->list( @args )->{rows} };
+        return @{ $c->yancy->backend->list( @args )->{items} };
     } );
     for my $be_method ( qw( get delete ) ) {
         $app->helper( 'yancy.' . $be_method => sub {
@@ -513,13 +513,13 @@ sub _build_openapi_spec {
                         description => 'List of items',
                         schema => {
                             type => 'object',
-                            required => [qw( rows total )],
+                            required => [qw( items total )],
                             properties => {
                                 total => {
                                     type => 'integer',
                                     description => 'The total number of items available',
                                 },
-                                rows => {
+                                items => {
                                     type => 'array',
                                     description => 'This page of items',
                                     items => { '$ref' => "#/definitions/${name}Item" },
@@ -705,7 +705,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -860,9 +860,9 @@ C<\%opt> is a hash of options with the following keys:
 
 =over
 
-=item * limit - The number of rows to return
+=item * limit - The number of items to return
 
-=item * offset - The number of rows to skip before returning rows
+=item * offset - The number of items to skip before returning items
 
 =back
 

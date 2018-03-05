@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps;
 use strict;
 use warnings;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 use List::Util 'first';
 
@@ -81,7 +81,7 @@ sub new {
 	} else {
 	    $linuxdistrocodename = $get_linux_info->()->{linuxdistrocodename};
 	}
-    } elsif (($os eq 'freebsd') || ($os eq 'openbsd')) {
+    } elsif (($os eq 'freebsd') || ($os eq 'openbsd') || ($os eq 'dragonfly')) {
 	# Note: don't use $Config{osvers}, as this is just the OS
 	# version of the system which built the current perl, not the
 	# actually running OS version.
@@ -93,7 +93,7 @@ sub new {
     }
 
     if (!$installer) {
-	if      ($os eq 'freebsd') {
+	if      ($os eq 'freebsd' || $os eq 'dragonfly') {
 	    $installer = 'pkg';
 	} elsif ($os eq 'gnukfreebsd') {
 	    $installer = 'apt-get';
@@ -543,7 +543,7 @@ sub _filter_uninstalled_packages {
 	$find_missing_packages = '_find_missing_deb_packages';
     } elsif (($self->{installer} eq 'yum') || ($self->{installer} eq 'dnf')) {
 	$find_missing_packages = '_find_missing_rpm_packages';
-    } elsif ($self->{os} eq 'freebsd') {
+    } elsif ($self->{os} eq 'freebsd' || $self->{os} eq 'dragonfly') {
 	$find_missing_packages = '_find_missing_freebsd_pkg_packages';
     } elsif ($self->{os} eq 'openbsd') {
 	$find_missing_packages = '_find_missing_openbsd_pkg_packages';
@@ -705,6 +705,8 @@ distributions:
 =item Fedora-like distributions: C<yum> or C<dnf>
 
 =item FreeBSD: C<pkg>
+
+=item DragonFly BSD: C<pkg>
 
 =item Windows: C<chocolatey>
 
@@ -998,7 +1000,7 @@ L<https://twitter.com/jscook2345> Justin Cook.
 
 Max Maischein (CORION) - Windows/chocolatey support
 
-David Dick (DDICK) - OpenBSD and Fedora support
+David Dick (DDICK) - OpenBSD, DragonFly BSD and Fedora support
 
 =head1 AUTHOR
 

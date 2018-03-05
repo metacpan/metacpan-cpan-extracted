@@ -1,16 +1,27 @@
 package Business::RO::TaxDeduction::Role::Utils;
-$Business::RO::TaxDeduction::Role::Utils::VERSION = '0.011';
+$Business::RO::TaxDeduction::Role::Utils::VERSION = '0.012';
 # ABSTRACT: A utility role
 
 use Moo::Role;
 use Business::RO::TaxDeduction::Types qw(
     Int
+    TaxPersons
+);
+
+has 'persons' => (
+    is       => 'ro',
+    isa      => TaxPersons,
+    required => 1,
+    coerce   => sub {
+        $_[0] >= 4 ? 4 : $_[0];
+    },
+    default  => sub { 0 },
 );
 
 has 'year' => (
     is       => 'ro',
     isa      => Int,
-    default  => sub { 2016 },
+    default  => sub { 2018 },
 );
 
 has 'base_year' => (
@@ -19,6 +30,9 @@ has 'base_year' => (
     lazy     => 1,
     default  => sub {
         my $self = shift;
+        if ($self->year >= 2018) {
+            return 2018;
+        }
         if ($self->year >= 2016) {
             return 2016;
         }
@@ -45,7 +59,7 @@ Business::RO::TaxDeduction::Role::Utils - A utility role
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -60,6 +74,10 @@ TaxDeduction::Amount and TaxDeduction::Ranges modules.
 =head1 INTERFACE
 
 =head2 ATTRIBUTES
+
+=head3 persons
+
+Number of persons.  Coerced to 4 if is greater than 4.
 
 =head3 year
 
@@ -80,7 +98,7 @@ or 2016.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ștefan Suciu.
+This software is copyright (c) 2018 by Ștefan Suciu.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

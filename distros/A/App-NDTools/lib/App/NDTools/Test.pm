@@ -6,6 +6,7 @@ use parent qw(Exporter);
 
 use Capture::Tiny qw(capture);
 use Data::Dumper;
+use Scalar::Util qw(blessed);
 use Test::More;
 
 our @EXPORT = qw(
@@ -38,7 +39,28 @@ sub run_ok {
         return;
     }
 
-    my ($out, $err, $exit) = capture { system(@{$t{cmd}}) };
+    my ($out, $err, $exit);
+    if (eval { $t{cmd}->[0]->isa('App::NDTools::NDTool') }) {
+        my $tool = shift @{$t{cmd}};
+
+        ($out, $err) = capture {
+            local $Log::Log4Cli::LEVEL = 0; # reset loglevel
+            eval { $tool->new(@{$t{cmd}})->exec() }
+        };
+
+        if (blessed($@) and $@->isa('Log::Log4Cli::Exception')) {
+            $err .= $@->{LOG_MESSAGE};
+            $exit = $@->{EXIT_CODE};
+        } else {
+            $err .= $@;
+            $exit = 255;
+        }
+
+        unshift @{$t{cmd}}, $tool;
+    } else { # assume it's binary
+        ($out, $err, $exit) = capture { system(@{$t{cmd}}) };
+        $exit = $exit >> 8;
+    }
 
     subtest $t{name} => sub {
 
@@ -46,7 +68,7 @@ sub run_ok {
             next if (exists $t{$std} and not defined $t{$std}); # set to undef to skip test
             $t{$std} = '' unless (exists $t{$std});             # silence expected by default
 
-            my $desc = uc($std) . " check for $t{name}: [" . join(" ", @{$t{cmd}}) ."]";
+            my $desc = uc($std) . " check for $t{name}: [@{$t{cmd}}]";
             my $data = $std eq 'stdout' ? $out : $err;
 
             if (ref $t{$std} eq 'CODE') {
@@ -61,8 +83,8 @@ sub run_ok {
         if (not exists $t{exit} or defined $t{exit}) {  # set to undef to skip test
             $t{exit} = 0 unless exists $t{exit};        # defailt exit code
             is(
-                $exit >> 8, $t{exit},
-                "Exit code check for $t{name}: [" . join(" ", @{$t{cmd}}) ."]"
+                $exit, $t{exit},
+                "Exit code check for $t{name}: [@{$t{cmd}}]"
             );
         }
 

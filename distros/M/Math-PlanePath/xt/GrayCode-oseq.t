@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013 Kevin Ryde
+# Copyright 2012, 2013, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -34,9 +34,6 @@ use Math::PlanePath::Base::Digits
   'digit_join_lowtohigh';
 use Math::PlanePath::GrayCode;
 use Math::PlanePath::Diagonals;
-
-# uncomment this to run the ### lines
-#use Smart::Comments '###';
 
 sub numeq_array {
   my ($a1, $a2) = @_;

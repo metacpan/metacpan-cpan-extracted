@@ -3,6 +3,7 @@ abstract: 'Perl extension for efficient creation and manipulation of AVL balance
 author:
   - 'Alessandro Vullo <avullo@cpan.org>'
 build_requires:
+  Test::Deep: '0'
   Test::LeakTrace: '0'
   Test::More: '0'
 configure_requires:
@@ -20,5 +21,7 @@ no_index:
     - inc
 requires:
   perl: '5.008'
-version: '0.01'
+resources:
+  repository: https://github.com/avullo/AVLTree.git
+version: v0.1.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

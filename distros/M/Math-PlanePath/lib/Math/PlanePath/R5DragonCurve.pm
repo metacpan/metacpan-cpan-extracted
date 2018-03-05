@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -24,7 +24,7 @@ use List::Util 'min'; # 'max'
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 125;
+$VERSION = 126;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',
@@ -705,6 +705,18 @@ L<http://oeis.org/A175337> (etc)
     arms=4
       A165211    abs(dY), being 0,1,0,1,1,0,1,0 repeating
 
+=head1 HOUSE OF GRAPHS
+
+House of Graphs entries for the R5 dragon curve as a graph include
+
+=over
+
+=item level=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=25149>
+
+=item level=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=25147>
+
+=back
+
 =head1 SEE ALSO
 
 L<Math::PlanePath>,
@@ -717,7 +729,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

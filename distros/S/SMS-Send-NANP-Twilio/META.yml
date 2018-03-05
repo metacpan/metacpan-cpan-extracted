@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               SMS-Send-NANP-Twilio
-version:            0.03
+version:            0.04
 abstract:           SMS::Send driver for Twilio
 author:
     - Michael Davis <mdavis@localdomain>
@@ -11,6 +11,7 @@ configure_requires:
 build_requires:
     ExtUtils::MakeMaker:  0
 requires:
+    DateTime:             0
     JSON::XS:             0
     SMS::Send::Driver::WebService:  0.06
     URI:                  0

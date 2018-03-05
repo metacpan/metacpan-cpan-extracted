@@ -4,7 +4,7 @@
       "Theo van Hoesel <Th.J.v.Hoesel@THEMA-MEDIA.nl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -41,5 +41,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.05"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/THEMA-MEDIA/LWP-UserAgent-Caching-Simple.git",
+         "web" : "https://github.com/THEMA-MEDIA/LWP-UserAgent-Caching-Simple"
+      }
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -32,7 +32,7 @@ use strict;
 use Carp 'croak';
 
 use vars '$VERSION','@ISA';
-$VERSION = 125;
+$VERSION = 126;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 
@@ -1095,6 +1095,17 @@ sub characteristic_non_decreasing {
 { package Math::PlanePath::TerdragonMidpoint;
   use constant _NumSeq_Turn_Turn4_max => 3;
 }
+{ package Math::PlanePath::AlternateTerdragon;
+  use constant _NumSeq_Turn_Turn4_min => 1;
+  use constant _NumSeq_Turn_Turn4_max => 3;
+  # use constant _NumSeq_Turn_oeis_anum =>
+  #   { 'arms=1' =>
+  #     { 
+  #       # Not quite, A156595 OFFSET=0, whereas here N=1 first turn
+  #       # Right => 'A156595',
+  #     },
+  #   };
+}
 { package Math::PlanePath::R5DragonCurve;
   use constant _NumSeq_Turn_Turn4_min => 1;  # right or left turn always
 # # Not quite,    OFFSET=0 values 0,0,1,1,0
@@ -1845,7 +1856,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

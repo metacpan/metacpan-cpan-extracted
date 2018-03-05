@@ -6,12 +6,12 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.001';
+our $VERSION = '2.003';
 
 use File::Basename qw( basename );
 
 use Term::Choose       qw( choose );
-use Term::Choose::Util qw( choose_a_subset settings_menu choose_dirs );
+use Term::Choose::Util qw( choose_a_subset settings_menu );
 use Term::Form         qw();
 
 use App::DBBrowser::Auxil;
@@ -338,18 +338,6 @@ sub __group_readline_db {
         }
         $sf->{i}{write_config}++;
     }
-}
-
-sub __choose_dirs_wrap_db {
-    my ( $sf, $db_o, $section, $opt ) = @_;
-    my $current = $db_o->{$section}{$opt};
-    # Choose_dirs
-    my $dirs = choose_dirs( { mouse => $sf->{o}{table}{mouse}, current => $current } );
-    return if ! defined $dirs;
-    return if ! @$dirs;
-    $db_o->{$section}{$opt} = $dirs;
-    $sf->{i}{write_config}++;
-    return;
 }
 
 

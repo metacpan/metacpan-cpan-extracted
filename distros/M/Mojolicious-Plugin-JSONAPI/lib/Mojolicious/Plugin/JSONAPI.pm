@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::JSONAPI;
-$Mojolicious::Plugin::JSONAPI::VERSION = '0.3';
+$Mojolicious::Plugin::JSONAPI::VERSION = '0.4';
 use Mojo::Base 'Mojolicious::Plugin';
 
 use JSONAPI::Document;
@@ -16,9 +16,8 @@ sub register {
     $app->types->type(
         json => [ 'application/vnd.api+json', 'application/json' ] );
 
-    my $namespace = exists( $args->{namespace} ) ? $args->{namespace} : 'api';
-    $self->create_route_helpers( $app, $namespace );
-    $self->create_data_helpers($app);
+    $self->create_route_helpers( $app, $args->{namespace} );
+    $self->create_data_helpers($app, { kebab_case_attrs => $args->{kebab_case_attrs} });
     $self->create_error_helpers($app);
 }
 
@@ -39,28 +38,23 @@ sub create_route_helpers {
             my $action_plural   = $resource->plural;
             $_ =~ s/-/_/g for ( $action_singular, $action_plural );
 
-            my $base_path =
-              $namespace ? "/$namespace/$resource_plural" : "/$resource_plural";
+            my $base_path = (!$spec->{router} && $namespace) ? "/$namespace/$resource_plural" : "/$resource_plural";
+            my $router = $spec->{router} ? $spec->{router} : $app->routes;
             my $controller = $spec->{controller} || "api-$resource_plural";
 
-            my $r =
-              $app->routes->under($base_path)->to( controller => $controller );
+            my $r = $router->any($base_path)->to( controller => $controller );
             $r->get('/')->to( action => "fetch_${action_plural}" );
             $r->post('/')->to( action => "post_${action_singular}" );
             foreach my $method (qw/get patch delete/) {
-                $r->$method("/:${action_singular}_id")
-                  ->to( action => "${method}_${action_singular}" );
+                $r->$method("/:${action_singular}_id")->to( action => "${method}_${action_singular}" );
             }
 
             foreach my $relationship ( @{ $spec->{relationships} } ) {
-                my $path =
-                  "/:${action_singular}_id/relationships/${relationship}";
+                my $path ="/:${action_singular}_id/relationships/${relationship}";
                 my $relationship_action = $relationship;
                 $relationship_action =~ s/-/_/g;
                 foreach my $method (qw/get post patch delete/) {
-                    $r->$method($path)
-                      ->to(
-                        action => "${method}_related_${relationship_action}" );
+                    $r->$method($path)->to(action => "${method}_related_${relationship_action}" );
                 }
             }
         }
@@ -68,9 +62,9 @@ sub create_route_helpers {
 }
 
 sub create_data_helpers {
-    my ( $self, $app ) = @_;
+    my ( $self, $app, $args ) = @_;
 
-    my $jsonapi = JSONAPI::Document->new();
+    my $jsonapi = JSONAPI::Document->new($args);
 
     $app->helper(
         resource_document => sub {
@@ -134,7 +128,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 SYNOPSIS
 
@@ -201,6 +195,11 @@ See L<http://jsonapi.org/> for the JSON API specification. At the time of writin
 The prefix that's added to all routes, defaults to 'api'. You can also provided an empty string as the namespace,
 meaing no prefix will be added.
 
+=item C<kebab_case_attrs>
+
+This is passed to the constructor of C<JSONAPI::Document> which will kebab case the attribute keys of each
+record (i.e. '_' to '-').
+
 =back
 
 =head1 HELPERS
@@ -215,16 +214,50 @@ Creates a set of routes for the given resource. C<$spec> is a hash reference tha
         relationships   => ['author', 'comments'], # default is []
     }
 
-C<resource> should be a singular noun, which will be turned into it's pluralised version (e.g. "post" -> "posts").
+=over
 
-Specifying C<relationships> will create additional routes that fall under the resource.
+=item C<resource I<Str>>
+
+The resources name. Should be a singular noun, which will be turned into it's pluralised
+version (e.g. "post" -> "posts") automatically where necessary.
+
+=item C<controller I<Str>>
+
+The controller name where the actions are to be stored. Defaults to "api-{resource}", where
+resource is in its pluralised form.
 
 Routes will point to controller actions, the names of which follow the pattern C<{http_method}_{resource}>, with
 dashes replaced with underscores (i.e. 'email-templates' -> 'email_templates').
 
+=item C<router I<Mojolicious::Routes>>
+
+The parent route to use for the resource. Optional.
+
+Provide your own router if you plan to use L<under|http://mojolicious.org/perldoc/Mojolicious/Routes/Route#under>
+for your resource.
+
+B<NOTE>: Providing your own router assumes that the router is under the same namespace already, so the resource
+routes won't specify the namespace themselves.
+
+Usage:
+
+ my $under_api = $r->under('/api')->to('OAuth#is_authenticated');
+ $self->resource_routes({
+     router => $under_api,
+     resource => 'post',
+ });
+
+=item C<relationships I<ArrayRef>>
+
+The relationships belonging to the resource. Defaults to an empty array ref.
+
+Specifying C<relationships> will create additional routes that fall under the resource.
+
 B<NOTE>: Your relationships should be in the correct form (singular/plural) based on the relationship in your
 schema management system. For example, if you have a resource called 'post' and it has many 'comments', make
 sure comments is passed in as a plural noun.
+
+=back
 
 =head2 render_error(I<Str> $status, I<ArrayRef> $errors, I<HashRef> $data. I<HashRef> $meta)
 

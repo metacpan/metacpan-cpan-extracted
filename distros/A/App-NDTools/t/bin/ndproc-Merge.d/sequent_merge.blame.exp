@@ -9,7 +9,7 @@
          "mtime" : 1462431002
       },
       "rule_id" : 0,
-      "source" : "../../_data/cfg.beta.json"
+      "source" : "_cfg.beta.json"
    },
    {
       "A" : {
@@ -20,6 +20,6 @@
          "mtime" : 1462431003
       },
       "rule_id" : 1,
-      "source" : "../../_data/cfg.gamma.json"
+      "source" : "_cfg.gamma.json"
    }
 ]

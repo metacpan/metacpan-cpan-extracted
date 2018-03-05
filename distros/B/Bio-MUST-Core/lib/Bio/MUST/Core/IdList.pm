@@ -1,6 +1,6 @@
 package Bio::MUST::Core::IdList;
 # ABSTRACT: Id list for selecting specific sequences
-$Bio::MUST::Core::IdList::VERSION = '0.180230';
+$Bio::MUST::Core::IdList::VERSION = '0.180630';
 use Moose;
 use namespace::autoclean;
 
@@ -70,7 +70,7 @@ sub _build_index_for {
 
 sub all_seq_ids {
     my $self = shift;
-    return map { SeqId->new(full_id => $_) } $self->all_ids;
+    return map { SeqId->new( full_id => $_ ) } $self->all_ids;
 }
 
 
@@ -272,7 +272,7 @@ Bio::MUST::Core::IdList - Id list for selecting specific sequences
 
 =head1 VERSION
 
-version 0.180230
+version 0.180630
 
 =head1 SYNOPSIS
 

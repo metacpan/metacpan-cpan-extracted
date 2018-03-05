@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2015 Kevin Ryde
+# Copyright 2012, 2013, 2015, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -27,13 +27,11 @@ use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
-use Math::PlanePath::CornerReplicate;
 use Math::PlanePath::Base::Digits 'bit_split_lowtohigh';
 
-# uncomment this to run the ### lines
-#use Smart::Comments '###';
-
+use Math::PlanePath::CornerReplicate;
 my $crep = Math::PlanePath::CornerReplicate->new;
+
 
 #------------------------------------------------------------------------------
 # A139351 - HammingDist(X,Y) = count 1-bits at even bit positions in N    

@@ -5,3 +5,7 @@
 ^pm_to_blib$
 ^blib/
 \.git
+\.travis\.yml
+appveyor\.yml
+MYMETA\.yml
+MYMETA\.json

@@ -19,7 +19,7 @@ use warnings;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.22'; # version template
+  $VERSION='2.24'; # version template
 }
 use strict;
 

@@ -20,5 +20,9 @@ bin/ajpeg2gif
 bin/ajpegtran
 debian/playajpeg.desktop
 debian/image-ajpeg.xml
+js/ajpeg.js
+js/example.html
+js/frame1.jpg
+js/frames_delay77.ajpeg
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -4,7 +4,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 # VERSION
 
-version 0.3
+version 0.4
 
 # SYNOPSIS
 
@@ -69,6 +69,11 @@ See [http://jsonapi.org/](http://jsonapi.org/) for the JSON API specification. A
     The prefix that's added to all routes, defaults to 'api'. You can also provided an empty string as the namespace,
     meaing no prefix will be added.
 
+- `kebab_case_attrs`
+
+    This is passed to the constructor of `JSONAPI::Document` which will kebab case the attribute keys of each
+    record (i.e. '\_' to '-').
+
 # HELPERS
 
 ## resource\_routes(_HashRef_ $spec)
@@ -81,16 +86,46 @@ Creates a set of routes for the given resource. `$spec` is a hash reference that
         relationships   => ['author', 'comments'], # default is []
     }
 
-`resource` should be a singular noun, which will be turned into it's pluralised version (e.g. "post" -> "posts").
+- `resource _Str_`
 
-Specifying `relationships` will create additional routes that fall under the resource.
+    The resources name. Should be a singular noun, which will be turned into it's pluralised
+    version (e.g. "post" -> "posts") automatically where necessary.
 
-Routes will point to controller actions, the names of which follow the pattern `{http_method}_{resource}`, with
-dashes replaced with underscores (i.e. 'email-templates' -> 'email\_templates').
+- `controller _Str_`
 
-**NOTE**: Your relationships should be in the correct form (singular/plural) based on the relationship in your
-schema management system. For example, if you have a resource called 'post' and it has many 'comments', make
-sure comments is passed in as a plural noun.
+    The controller name where the actions are to be stored. Defaults to "api-{resource}", where
+    resource is in its pluralised form.
+
+    Routes will point to controller actions, the names of which follow the pattern `{http_method}_{resource}`, with
+    dashes replaced with underscores (i.e. 'email-templates' -> 'email\_templates').
+
+- `router _Mojolicious::Routes_`
+
+    The parent route to use for the resource. Optional.
+
+    Provide your own router if you plan to use [under](http://mojolicious.org/perldoc/Mojolicious/Routes/Route#under)
+    for your resource.
+
+    **NOTE**: Providing your own router assumes that the router is under the same namespace already, so the resource
+    routes won't specify the namespace themselves.
+
+    Usage:
+
+        my $under_api = $r->under('/api')->to('OAuth#is_authenticated');
+        $self->resource_routes({
+            router => $under_api,
+            resource => 'post',
+        });
+
+- `relationships _ArrayRef_`
+
+    The relationships belonging to the resource. Defaults to an empty array ref.
+
+    Specifying `relationships` will create additional routes that fall under the resource.
+
+    **NOTE**: Your relationships should be in the correct form (singular/plural) based on the relationship in your
+    schema management system. For example, if you have a resource called 'post' and it has many 'comments', make
+    sure comments is passed in as a plural noun.
 
 ## render\_error(_Str_ $status, _ArrayRef_ $errors, _HashRef_ $data. _HashRef_ $meta)
 

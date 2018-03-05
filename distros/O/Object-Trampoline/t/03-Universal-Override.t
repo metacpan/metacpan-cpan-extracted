@@ -1,5 +1,5 @@
 package Testify;
-use v5.12;
+use v5.24;
 
 use Object::Trampoline;
 use Test::More;
@@ -8,8 +8,11 @@ use Scalar::Util    qw( blessed );
 
 my $expect = 'Foo::Bar';
 
-for my $name ( keys %{ $::{ 'UNIVERSAL::' } } )
+while( my( $name, $ref ) = each %{ $::{ 'UNIVERSAL::' } } )
 {
+    *{ $ref }{ CODE }
+    or next;
+
     note "Checking: '$name'";
 
     my $t1  = Object::Trampoline->bim( $expect => qw( a b ) );

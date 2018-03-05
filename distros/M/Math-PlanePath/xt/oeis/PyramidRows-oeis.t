@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -31,8 +31,46 @@ use MyOEIS;
 
 use Math::PlanePath::PyramidRows;
 
-# uncomment this to run the ### lines
-#use Smart::Comments '###';
+
+#------------------------------------------------------------------------------
+# A079824 sum of digits on step=1 downward diagonals
+
+MyOEIS::compare_values
+  (anum => 'A079824',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::PyramidRows->new (n_start => 1, step => 1);
+     my @got;
+     foreach my $y (0 .. $count-1) {
+       my $total = 0;
+       for (my $i = 0; ; $i++) {
+         my $n = $path->xy_to_n($i,$y-$i);
+         last if ! defined $n;
+         $total += $n;
+       }
+       push @got, $total;
+     }
+     return \@got;
+   });
+
+# A079823 concatenation of digits on step=1 downward diagonals
+MyOEIS::compare_values
+  (anum => 'A079823',
+   func => sub {
+     my ($count) = @_;
+     my $path = Math::PlanePath::PyramidRows->new (n_start => 1, step => 1);
+     my @got;
+     foreach my $y (0 .. $count-1) {
+       my $concat = '';
+       for (my $i = 0; ; $i++) {
+         my $n = $path->xy_to_n($i,$y-$i);
+         last if ! defined $n;
+         $concat .= $n;
+       }
+       push @got, $concat;
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------

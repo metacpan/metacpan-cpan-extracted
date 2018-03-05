@@ -9,6 +9,7 @@ use Business::RO::TaxDeduction;
 
 test_deduction(2005);
 test_deduction(2016);
+test_deduction(2018);
 
 sub test_deduction {
     my $year = shift;

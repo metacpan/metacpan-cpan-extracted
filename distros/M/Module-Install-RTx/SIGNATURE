@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,37 +12,31 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA512
+Hash: SHA1
 
-SHA1 66b194f18556cae3b54c790289141db5a56b4640 Changes
+SHA1 8f8ba526bc19bee49dd7dd563d24841d0779227f Changes
 SHA1 bf6f8d52a10788b2e0d127051eab93688f81c576 MANIFEST
-SHA1 a72d58ee958ad5a9cf88c142d9e0b2271996604b META.yml
-SHA1 54352bf8559e544a8bfcc58375b10c4d0ce1812d Makefile.PL
+SHA1 bff75cc623f6b71212dad2af456c787b3247710a META.yml
+SHA1 258848460a236d170c69633b32ea779ff2277c64 Makefile.PL
 SHA1 4a2a7fd6ee2b8a227d9dbe49db418beeb7aca315 README
-SHA1 05a17c51aceb6435a1eac17137f19911a09e5050 inc/Module/Install.pm
-SHA1 dc73c2baf4357ad1cc884146147f557a50a29300 inc/Module/Install/Base.pm
-SHA1 4f77eb02e104324b08a047585c498146b045613b inc/Module/Install/Makefile.pm
-SHA1 2f5be6af6098acf6d786a4a7299a34d0c6c04ef9 inc/Module/Install/Metadata.pm
+SHA1 c3f8f9f2a209f80b7ca3c8af3a6b1b7b408ad620 inc/Module/Install.pm
+SHA1 de30b539a326675c42e6ad360fddb05902d621be inc/Module/Install/Base.pm
+SHA1 b84cf97b12f8e5ef37bea54e33ddce32dff804d1 inc/Module/Install/Makefile.pm
+SHA1 0d9fd69718198fcd1560214c4f23fcaa44f8395e inc/Module/Install/Metadata.pm
 SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
-SHA1 6661285caedfe012cb5a1ca915a422ffc292ae2b inc/Module/Install/WriteAll.pm
-SHA1 0aa61d10f71878606a3ff3a2cfff3677dc6303da lib/Module/Install/RTx.pm
+SHA1 6a91e14bbecc64e9c8e2261dfa4b360641d152e4 inc/Module/Install/WriteAll.pm
+SHA1 eb4ce427d8c259e5f6d89f029b5ca0717edffb3f lib/Module/Install/RTx.pm
 SHA1 a106b75598df1e2b04ed388ba62133d6ac4040b2 lib/Module/Install/RTx/Remove.pm
-SHA1 662fa6cbe121225cc3b834b509c4f7d2398f5c86 lib/Module/Install/RTx/Runtime.pm
+SHA1 725fb082249290a1d28c673de380a6a73d711da5 lib/Module/Install/RTx/Runtime.pm
 SHA1 d1273fb540399cb1cb61dc519c34315dfdf7b15a t/1-basic.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
+Version: GnuPG v1.4.15 (Darwin)
 
-iQIcBAEBCgAGBQJYq2roAAoJEJHs6NvKxcMFjNcP/3t29MBSSAvfLCL125SSB7gr
-IRsjUbvEuGtOFgw6uTkeOoNYGMIDH5KhP+jY+DAR0Q7Er1RFJYwlmO6OVf+3maCg
-p4i7MP1Z+nqkmLxv54of2GzUjsiZ0kEWmFM6NSYOermpUXrJBiiO3aSKZL3QSDFO
-0fUIXJJcCWsp5fOp+cQ5PAYAqUMCcfQXulElLTKe+sza7A3WdNgBZo/k8BsDdzHB
-pn3EuwZFbXOkvKsuIeoPbeibTtGRuBoOP6cvz8zoPxKRgdPxbMOXC7GfI+M8Jx9O
-birfq4gRvqmochK7d5UaVFFuy2odBd01uSIPFn4EHB8SHgUb9fGsF6JdPTeYgXO0
-3EDP6nz0WmO47tB1xdCRuetfL5QVzlSk76jh+C5HBxVB+MTfsAjgmRA94oRKZd1l
-NFnfewlMouNeVZIsOqeqYsRlOLHJiUaxAPlujS/zIMDOdTm0UB0tOcZbnhZIX1lU
-zzLp5u28ORHynV993F4Fem0TxRHqKe2E4MUKE7xsgN6aC3lUvB/0BuMCmnSq1YsX
-hejo2ut1nnUHvXeb5ptBvE/+gn9YVfSOo/c+J4sgvlKgbkXRLKScGRqWdcBIYoL9
-0Rxe4JGlQBgDjf9N+dUP8pHYSD/n7ekRxEotctzu2Eu0oahUIB10auhauRzi5E3D
-R90p5/Pi2WUWRpXWcFts
-=VMia
+iQEcBAEBAgAGBQJama++AAoJEI1a+/f/jPtrDG8H/it17gnH+f4f5XOSPPM1GSaM
+af8A6CoAgC/OnKl4TWaFMVpsw9XRij+48YPyK+Rm1vU32k+wBR+tKMyoIPCmiVvw
+mFyKjLU4GK49GZVWO2RRIlsnB4lJp1+giSV4EfELGKqK6JHqU96h3oNOgtVFqOfq
+2kjyI3RfVvHIPgE/z1mMs80X1omc6tKUyl2/z9Csz5kE+IEZPeF7S/4HK8enUYFL
+Nf6sJ4cr7E730wbG5KoW6LNYZ6iN3QqDc1IJYGUnAJzVVtSXsC9sqpxJxEPAkZeb
+q3WTyy9H1oer/GHWkVM2IvuSPBBH7eDOEgHM167mh5xWCeX4krrH79F2GyRDEpo=
+=0raM
 -----END PGP SIGNATURE-----

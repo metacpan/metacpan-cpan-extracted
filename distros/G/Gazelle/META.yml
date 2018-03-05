@@ -11,9 +11,9 @@ build_requires:
   Test::TCP: '2'
 configure_requires:
   Devel::CheckCompiler: '0.04'
-  Module::Build: '0.38'
+  Module::Build: '0.4005'
 dynamic_config: 0
-generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.0.16, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,33 +32,34 @@ no_index:
 provides:
   Gazelle:
     file: lib/Gazelle.pm
-    version: '0.46'
+    version: '0.48'
   Plack::Handler::Gazelle:
     file: lib/Plack/Handler/Gazelle.pm
-    version: '0.46'
+    version: '0.48'
 requires:
   Guard: '0'
   Parallel::Prefork: '0.18'
   Plack: '1.0037'
   Server::Starter: '0'
   Stream::Buffered: '0'
-  Try::Tiny: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/kazeburo/Gazelle/issues
   homepage: https://github.com/kazeburo/Gazelle
   repository: git://github.com/kazeburo/Gazelle.git
-version: '0.46'
+version: '0.48'
 x_authority: cpan:KAZEBURO
 x_contributors:
-  - 'mattn <mattn.jp@gmail.com>'
-  - 'bayashi <bayashi@cpan.org>'
-  - "Arthur Axel 'fREW' Schmidt <frioux@gmail.com>"
-  - 'Syohei YOSHIDA <syohex@gmail.com>'
   - 'Alex Hunsaker <badalex@gmail.com>'
+  - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
+  - "Arthur Axel 'fREW' Schmidt <frioux@gmail.com>"
+  - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
   - 'Ichinose Shogo <shogo82148@gmail.com>'
-  - 'Shlomi Fish <shlomif@shlomifish.org>'
-  - 'meru_akimbo <merukatoruayu0@gmail.com>'
-  - 'karupanerura <karupa@cpan.org>'
   - 'Mark Ellis <mark.ellis@cartridgesave.co.uk>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  - 'Shlomi Fish <shlomif@shlomifish.org>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'bayashi <bayashi@cpan.org>'
+  - 'karupanerura <karupa@cpan.org>'
+  - 'mattn <mattn.jp@gmail.com>'
+  - 'meru_akimbo <merukatoruayu0@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

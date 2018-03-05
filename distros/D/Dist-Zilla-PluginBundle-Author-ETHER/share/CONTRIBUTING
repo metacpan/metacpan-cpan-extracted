@@ -98,7 +98,8 @@ Once installed, here are some dzil commands you might try:
 
 You can learn more about Dist::Zilla at http://dzil.org/.
 {{
-if ((my $link = $dist->distmeta->{resources}{repository}{web}) =~ /github/) {
+my $link = $dist->distmeta->{resources}{repository}{web};
+if ($link and $link =~ /github/) {
 "\n" . 'The code for this distribution is hosted at GitHub. The repository is:
 ' . $link . '
 You can submit code changes by forking the repository, pushing your code

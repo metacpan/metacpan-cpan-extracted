@@ -9,8 +9,9 @@ use Moo;
 use Memoize;
 use Log::Any qw//;
 use DBI;
+use JSON;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 has 'input_alphabet' => (
   is       => 'ro',
@@ -73,6 +74,14 @@ has '_log' => (
   },
 );
 
+has '_json' => (
+  is       => 'rw',
+  required => 0,
+  default  => sub {
+    JSON->new->canonical(1)->indent(0)->ascii(1)
+  },
+);
+
 sub BUILD {
   my ($self) = @_;
 
@@ -101,15 +110,10 @@ sub BUILD {
   });
 
   $self->_dbh->sqlite_create_function( '_canonical', 1, sub {
-
-    return "" unless defined $_[0];
-
-    # Since SQLite's GROUP_CONCAT does not guarantee ordering,
+    # Since SQLite's json_group_array does not guarantee ordering,
     # we sort the items in the list ourselves here.
-    my @vertices = sort { $a <=> $b }
-      uniq _vertex_str_to_vertices(@_);
-
-    return _vertex_str_from_vertices(@vertices);
+    my @vertices = $self->_vertex_str_to_vertices(@_);
+    return $self->_vertex_str_from_vertices(@vertices);
   });
 
   ###################################################################
@@ -268,24 +272,35 @@ sub _deploy_schema {
     -- DFA State Composition
     -----------------------------------------------------------------
 
-    CREATE TABLE Configuration (
-      state INTEGER NOT NULL,
-      vertex INTEGER NOT NULL,
-      UNIQUE(state, vertex),
-      FOREIGN KEY (state)
-        REFERENCES State(state_id)
-        ON DELETE CASCADE
-        ON UPDATE NO ACTION,
-      FOREIGN KEY (vertex)
-        REFERENCES Vertex(value)
-        ON DELETE NO ACTION
-        ON UPDATE NO ACTION
-    );
+    CREATE VIEW Configuration AS
+    SELECT
+      State.state_id AS state,
+      each.value AS vertex
+    FROM
+      State
+        INNER JOIN json_each(State.vertex_str) each;
 
-    CREATE INDEX Configuration_idx_vertex ON Configuration (vertex);
-
-    -- can use covering index instead
-    -- CREATE INDEX Configuration_idx_state ON Configuration (state);
+    CREATE TRIGGER
+      trigger_Configuration_delete
+    INSTEAD OF DELETE ON
+      Configuration
+    FOR EACH ROW BEGIN
+      UPDATE
+        State
+      SET
+        vertex_str = _canonical((
+          SELECT
+            json_group_array(c.vertex)
+          FROM
+            Configuration c
+          WHERE
+            c.vertex <> OLD.vertex
+          GROUP BY
+            c.state
+        ))
+      WHERE
+        State.state_id = OLD.state;
+    END;
 
     -----------------------------------------------------------------
     -- Input Graph Vertex Match data
@@ -471,11 +486,17 @@ sub _init_epsilon_closure {
 }
 
 sub _vertex_str_from_vertices {
-  return join(" ", @_);
+  my ($self, @vertices) = @_;
+
+  return $self->_json->encode([
+    nsort_by { $_ } uniq(grep { defined } @vertices)
+  ]);
 }
 
 sub _vertex_str_to_vertices {
-  return split(" ", shift());
+  my ($self, $vertex_str) = @_;
+
+  return @{ $self->_json->decode($vertex_str) };
 }
 
 sub _find_state_id_by_vertex_str {
@@ -505,38 +526,21 @@ sub _find_or_create_state_from_vertex_str {
 
   $state_id = $self->_dbh->sqlite_last_insert_rowid();
 
-  # NOTE: This would fail if one of the vertices does not exist
-  # in the database yet, probably due to find_or_create_state_id
-  # with vertices not passed in the constructor. It is not clear
-  # whether that is a good thing to catch errors, or a usability
-  # problem. Adding a trigger to Configuration or inserting the
-  # vertices here is probably a performance problem though, so
-  # adding vertices should be done by find_or_create_state_id if
-  # at all.
-
-  my $sth2 = $self->_dbh->prepare(q{
-    INSERT INTO Configuration(state, vertex) VALUES (?, ?)
-  });
-
-  $sth2->execute($state_id, $_)
-    for _vertex_str_to_vertices($vertex_str);
-
   $self->_dbh->commit();
-
   return $state_id;
 }
 
 sub _vertex_str_from_partial_list {
   my ($self, @vertices) = @_;
 
-  return "" unless @vertices;
+  return $self->_vertex_str_from_vertices() unless @vertices;
 
   my $escaped_roots = join ", ", map {
     $self->_dbh->quote($_)
   } @vertices;
 
   my ($vertex_str) = $self->_dbh->selectrow_array(qq{
-    SELECT _canonical(GROUP_CONCAT(closure.e_reachable, " "))
+    SELECT _canonical(json_group_array(closure.e_reachable))
     FROM Closure
     WHERE root IN ($escaped_roots)
   });
@@ -564,7 +568,7 @@ sub cleanup_dead_states {
   my ($self, $vertices_accept) = @_;
 
   $self->_dbh->sqlite_create_function( '_vertices_accept', 1, sub {
-    my @vertices = _vertex_str_to_vertices(@_);
+    my @vertices = $self->_vertex_str_to_vertices(@_);
     return !! $vertices_accept->(@vertices);
   });
 
@@ -580,6 +584,10 @@ sub cleanup_dead_states {
   my @accepting = map { @$_ } $self->_dbh->selectall_array(q{
     SELECT state FROM accepting
   });
+
+  # NOTE: this also renames states in transitions involving
+  # possible start states, but they would then simply have no
+  # transitions, which should be fine.
 
   $self->_dbh->do(q{
     WITH RECURSIVE all_living(state) AS (
@@ -618,7 +626,7 @@ sub compute_some_transitions {
     SELECT
         s.state_id AS src 
       , i.value AS input
-      , _canonical(GROUP_CONCAT(closure.e_reachable, " "))
+      , _canonical(json_group_array(closure.e_reachable))
           AS dst_vertex_str
     FROM 
       state s 

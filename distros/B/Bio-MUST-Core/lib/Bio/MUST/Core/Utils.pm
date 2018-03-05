@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Utils;
 # ABSTRACT: Utility functions for enabling multiple file processing
-$Bio::MUST::Core::Utils::VERSION = '0.180230';
+$Bio::MUST::Core::Utils::VERSION = '0.180630';
 use strict;
 use warnings;
 use autodie;
@@ -103,7 +103,7 @@ Bio::MUST::Core::Utils - Utility functions for enabling multiple file processing
 
 =head1 VERSION
 
-version 0.180230
+version 0.180630
 
 =head1 SYNOPSIS
 

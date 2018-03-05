@@ -25,11 +25,11 @@ Date::Lectionary::Day - Determines the Day in the Christian Liturgical Year
 
 =head1 VERSION
 
-Version 1.20180109
+Version 1.20180302
 
 =cut
 
-our $VERSION = '1.20180109';
+our $VERSION = '1.20180302';
 
 =head1 SYNOPSIS
 
@@ -465,7 +465,7 @@ sub _buildMoveableDays {
     #Moveable holidays in July
     elsif ( $date->mon == 7 ) {
         if ( $date->mday == 22 && $lectionary eq 'acna' ) {
-            return "St. Mary of Magdala";
+            return "St. Mary Magdalene";
         }
         if ( $date->mday == 25 && $lectionary eq 'acna' ) {
             return "St. James";

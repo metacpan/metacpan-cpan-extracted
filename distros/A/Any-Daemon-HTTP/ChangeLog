@@ -1,4 +1,14 @@
-===== version history for Any::Daemon::HTTP
+== history for distribution Any-Daemon-HTTP
+
+version 0.27: Sun  4 Mar 12:26:01 CET 2018
+
+	Fixes:
+	- ::VirtualHost::new(handlers) now initialized via ::addHandler()
+	- do only randomize max_conn when large enough.
+
+	Improvements:
+	- ::VirtualHost::new(handler) alternative for ::new(handlers)
+	- convert to GIT and GitHub
 
 version 0.26: Mon Sep 19 23:18:38 CEST 2016
 

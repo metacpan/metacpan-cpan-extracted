@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Lingua::EN::Opinion;
+
+my $input_file = shift || die "Usage: perl $0 /some/file.txt\n";
+my $emotion    = shift || 'anger,anticipation,disgust,fear,joy,negative,positive,sadness,surprise,trust';
+
+my @emotions = split /,/, $emotion;
+
+my $opinion = Lingua::EN::Opinion->new( file => $input_file );
+$opinion->nrc_sentiment();
+
+my %score;
+@score{ @{ $opinion->sentences } } = @{ $opinion->nrc_scores };
+
+for my $value ( @emotions ) {
+    print "Sentence with the most $value:\n",
+        [ map {"$score{$_}{$value} => $_"} sort { $score{$a}{$value} <=> $score{$b}{$value} } @{ $opinion->sentences } ]->[-1],
+        "\n";
+}

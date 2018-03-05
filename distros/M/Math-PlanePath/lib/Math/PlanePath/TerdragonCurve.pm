@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -51,7 +51,7 @@ use Math::PlanePath::Base::Digits
   'round_up_pow';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 125;
+$VERSION = 126;
 @ISA = ('Math::PlanePath');
 
 use Math::PlanePath::TerdragonMidpoint;
@@ -209,73 +209,93 @@ sub xy_is_visited {
   }
 }
 
-# maximum extent -- no, not quite right
-#
-#          .----*
-#           \
-#       *----.
-#
-# Two triangle heights, so
-#     rnext = 2 * r * sqrt(3)/2
-#           = r * sqrt(3)
-#     rsquared_next = 3 * rsquared
-# Initial X=2,Y=0 is rsquared=4
-# then X=3,Y=1 is 3*3+3*1*1 = 9+3 = 12 = 4*3
-# then X=3,Y=3 is 3*3+3*3*3 = 9+3 = 36 = 4*3^2
-#
-my @try_dx = (2, 1, -1, -2, -1,  1);
-my @try_dy = (0, 1,  1, 0,  -1, -1);
-
 sub xy_to_n {
   return scalar((shift->xy_to_n_list(@_))[0]);
 }
 sub xy_to_n_list {
-  my ($self, $x, $y) = @_;
+  my ($self, $x,$y) = @_;
   ### TerdragonCurve xy_to_n_list(): "$x, $y"
 
   $x = round_nearest($x);
   $y = round_nearest($y);
+  {
+    # nothing at an odd point, and trap overflows in $x+$y dividing out b
+    my $sum = abs($x) + abs($y);
+    if (is_infinite($sum)) { return $sum; }  # infinity
+    if ($sum % 2) { return; }
+  }
 
-  if (is_infinite($x)) {
-    return $x;  # infinity
+  if ($x==0 && $y==0) {
+    return 0 .. $self->{'arms'}-1;
   }
-  if (is_infinite($y)) {
-    return $y;  # infinity
-  }
+
+  my $arms_count = $self->arms_count;
+  my $zero = ($x * 0 * $y); # inherit bignum 0
 
   my @n_list;
-  my $xm = 2*$x;  # doubled out
-  my $ym = 2*$y;
-  foreach my $i (0 .. $#try_dx) {
-    my $t = $self->Math::PlanePath::TerdragonMidpoint::xy_to_n
-      ($xm+$try_dx[$i], $ym+$try_dy[$i]);
-
-    ### try: ($xm+$try_dx[$i]).",".($ym+$try_dy[$i])
-    ### $t
-
-    next unless defined $t;
-
-    # function call here to get our n_to_xy(), not the overridden method
-    # when in TerdragonRounded or other subclass
-    my ($tx,$ty) = n_to_xy($self,$t)
-      or next;
-
-    if ($tx == $x && $ty == $y) {
-      ### found: $t
-      if (@n_list && $t < $n_list[0]) {
-        unshift @n_list, $t;
-      } elsif (@n_list && $t < $n_list[-1]) {
-        splice @n_list, -1,0, $t;
-      } else {
-        push @n_list, $t;
-      }
-      if (@n_list == 3) {
-        return @n_list;
-      }
+  foreach my $d (0,1,2) {
+    my ($ndigits,$arm) = _xy_d_to_ndigits_and_arm($x,$y,$d);
+    next if $arm >= $arms_count;
+    my $odd = ($arm & 1);
+    if ($odd) {
+      @$ndigits = (map {2-$_} @$ndigits);
+      ### flip to: $ndigits
     }
+    push @n_list,
+      (digit_join_lowtohigh($ndigits, 3, $zero) + $odd) * $arms_count + $arm;
   }
-  return @n_list;
+
+  ### @n_list
+  return sort {$a<=>$b} @n_list;
 }
+
+my @x_to_digit = (0, 2, 1);  # digit = -X mod 3
+my @digit_to_x = ([0,2,1],  [0,-1,-2],  [0,-1, 1]);
+my @digit_to_y = ([0,0,1],  [0, 1, 0],  [0,-1,-1]);
+
+# $d = 0,1,2 for segment leaving $x,$y at direction $d*120 degrees.
+# For odd arms the digits are 0<->2 reversals.
+sub _xy_d_to_ndigits_and_arm {
+  my ($x,$y, $d) = @_;
+  my @ndigits;
+  my $arm;
+  for (;;) {
+    ### at: "$x,$y d=$d"
+    if ($x==0 && $y==0) { $arm = 2*$d; last; }
+    if ($d==0 && $x==-2 && $y==0) { $arm = 3; last; }
+    if ($d==2 && $x==1  && $y==1) { $arm = 1; last; }
+    if ($d==1 && $x==1  && $y==-1) { $arm = 5; last; }
+
+    my $digit = $x_to_digit[$x%3];
+    push @ndigits, $digit;
+
+    if ($digit == 1) { $d = ($d-1) % 3; }
+    $x -= $digit_to_x[$d]->[$digit];
+    $y -= $digit_to_y[$d]->[$digit];
+
+    ### $digit
+    ### new d: $d
+    ### subtract: "$digit_to_x[$d]->[$digit],$digit_to_y[$d]->[$digit] to $x,$y"
+
+    # ### assert: ($x+$y) % 2 == 0
+    # ### assert: $x % 3 == 0
+    # ### assert: ($y-$x/3) % 2 == 0
+    ($x,$y) = (($x+$y)/2,    # divide b = w6+1
+               ($y-$x/3)/2);
+  }
+  ### $arm
+  ### @ndigits
+  return (\@ndigits, $arm);
+}
+# x+y*w3
+# (x-y)+y*w3
+# x/2 + y*sqrt3i/2
+# sqrt3i/2 = w3+1/2
+# x/2 + y*(w3+1/2) == 1/2*(x+y) + y*w3
+# a = x+y = (x+3*y)/2
+# GP-Test  my(x=0,y=0); (-x)%3 == 0
+# GP-Test  my(x=2,y=0); (-x)%3 == 1
+# GP-Test  my(x=1,y=1); (-x)%3 == 2
 
 # minimum  -- no, not quite right
 #
@@ -309,6 +329,8 @@ sub rect_to_n_range {
           * $self->{'arms'});
 }
 
+# direction
+#
 my @dir6_to_dx   = (2, 1,-1,-2, -1, 1);
 my @dir6_to_dy   = (0, 1, 1, 0, -1,-1);
 my @digit_to_nextturn = (2,-2);
@@ -380,7 +402,7 @@ sub n_to_level {
 sub _UNDOCUMENTED__right_boundary_i_to_n {
   my ($self, $i) = @_;
   my @digits = _digit_split_mix23_lowtohigh($i);
-  for (my $i = $#digits; $i >= 1; $i--) {   # high to low
+  for ($i = $#digits; $i >= 1; $i--) {   # high to low
     if ($digits[$i] == 1 && $digits[$i-1] != 0) {
       $digits[$i] = 2;
     }
@@ -651,7 +673,7 @@ __END__
 # return (2*$i + $j - $k, $j+$k);
 
 
-=for stopwords eg Ryde Dragon Math-PlanePath Nlevel Knuth et al vertices doublings OEIS Online terdragon ie morphism si,sj,sk dX,dY Pari rhombi dX si
+=for stopwords eg Ryde Dragon Math-PlanePath Nlevel Knuth et al vertices doublings OEIS terdragon ie morphism si,sj,sk dX,dY Pari rhombi dX si Ns unexpand unpoint
 
 =head1 NAME
 
@@ -848,17 +870,23 @@ For example C<arms =E<gt> 6> begins as follows.  N=0,6,12,18,etc is the
 first arm (the same shape as the plain curve above), then N=1,7,13,19 the
 second, N=2,8,14,20 the third, etc.
 
+=cut
+
+# generated by code in devel/terdragon.pl
+
+=pod
+
                   \         /             \           /
                    \       /               \         /
-                --- 8/13/31 ---------------- 7/12/30 ---
+                --- 8,13,31 ---------------- 7,12,30 ---
                   /        \               /         \
      \           /          \             /           \          /
       \         /            \           /             \        /
-    --- 9/14/32 ------------- 0/1/2/3/4/5 -------------- 6/17/35 ---
+    --- 9,14,32 ------------- 0,1,2,3,4,5 -------------- 6,17,35 ---
       /         \            /           \             /        \
      /           \          /             \           /          \
                   \        /               \         /
-               --- 10/15/33 ---------------- 11/16/34 ---
+               --- 10,15,33 ---------------- 11,16,34 ---
                   /        \               /         \
                  /          \             /           \
 
@@ -902,7 +930,7 @@ Return a list of N point numbers for coordinates C<$x,$y>.
 
 The origin 0,0 has C<arms_count()> many N since it's the starting point for
 each arm.  Other points have up to 3 Ns for a given C<$x,$y>.  If arms=6
-then every C<$x,$y> except the origin has exactly 3 Ns.
+then every even C<$x,$y> except the origin has exactly 3 Ns.
 
 =back
 
@@ -1070,17 +1098,9 @@ segment for digit 1 is rotated +120 degrees.
 
 =head2 X,Y to N
 
-The current code applies C<TerdragonMidpoint> C<xy_to_n()> to calculate six
-candidate N from the six edges around a point.  Those N values which convert
-back to the target X,Y by C<n_to_xy()> are the results for
-C<xy_to_n_list()>.
-
-The six edges are three going towards the point and three going away.  The
-midpoint calculation gives N-1 for the towards and N for the away.  Is there
-a good way to tell which edge will be the smaller?  Or just which 3 edges
-lead away?  It would be directions 0,2,4 for the even arms and 1,3,5 for the
-odd ones, but identifying the boundaries of those arms to know which is
-which is difficult.
+The current code find digits of N low to high by a remainder on X,Y to get
+the lowest then subtract and divide to unexpand.  See "unpoint" in the
+author's mathematical write-up for details.
 
 =head2 X,Y Visited
 
@@ -1166,6 +1186,17 @@ with a left turn at N=1.
                 also arms=3 level Y at 3*3^level
     A103312   same
 
+=head1 HOUSE OF GRAPHS
+
+House of Graphs entries for the terdragon as a graph include
+
+=over
+
+=item level=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21138>
+
+=item level=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21140>
+
+=back
 
 =head1 SEE ALSO
 
@@ -1187,7 +1218,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

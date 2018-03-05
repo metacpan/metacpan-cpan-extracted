@@ -394,9 +394,9 @@ sub OnTimer {
 		delete($self->{resize});
 	}
 
-	$self->{dc} = Wx::PaintDC->new($self->{panel}) unless $self->{dc}; # can't remember if it's ok to store a DC
+	my $dc = Wx::PaintDC->new($self->{panel});
 
-	$self->{dc}->SetUserScale($self->{scale},$self->{scale});
+	$dc->SetUserScale($self->{scale},$self->{scale});
 
 	my $frame = $self->{frames}->[ $self->{index} ];
 
@@ -412,7 +412,8 @@ sub OnTimer {
 		}else{
 			$self->status(" displaying frame ". sprintf('%-3s',$self->{index}) ." for ". sprintf('%3s',$delay) ."ms");
 		}
-		$self->{dc}->DrawBitmap($frame->{bitmap}, 0,0, 1);
+
+		$dc->DrawBitmap($frame->{bitmap}, 0,0, 1);
 	}else{
 		$self->status(" Frame bitmap error!");
 	}

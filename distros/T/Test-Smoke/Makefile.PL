@@ -39,26 +39,26 @@ $iscript = 'INSTALLSCRIPT';
 
 my %install = ( );
 unless ( @ARGV ) {
-my $dft_install = exists $ENV{SMOKE_INSTDIR} && $ENV{SMOKE_INSTDIR} ne ""
-    ? $ENV{SMOKE_INSTDIR}
-    : catdir( updir(), 'smoke' );
-$dft_install = rel2abs( $dft_install );
+    my $dft_install = exists $ENV{SMOKE_INSTDIR} && $ENV{SMOKE_INSTDIR} ne ""
+        ? $ENV{SMOKE_INSTDIR}
+        : catdir( updir(), 'smoke' );
+    $dft_install = rel2abs( $dft_install );
 
-my $install_dir = $dft_install;
-if (!$ENV{AUTOMATED_TESTING}) {
-    # So CPAN.pm will ask for install-directory!
-    local $ENV{PERL_MM_USE_DEFAULT};
-    $install_dir = dir_prompt(
-        "Where would you like to install Test::Smoke?\n",
-        $dft_install
+    my $install_dir = $dft_install;
+    if (!$ENV{AUTOMATED_TESTING}) {
+        # So CPAN.pm will ask for install-directory!
+        local $ENV{PERL_MM_USE_DEFAULT};
+        $install_dir = dir_prompt(
+            "Where would you like to install Test::Smoke?\n",
+            $dft_install
+        );
+    }
+
+    %install = (
+        PREFIX   => $install_dir,
+        $iscript => $install_dir,
+        LIB      => "$install_dir/lib",
     );
-}
-
-%install = (
-    PREFIX   => $install_dir,
-    $iscript => $install_dir,
-    LIB      => $install_dir
-);
 }
 my @scripts = qw(
     synctree.pl patchtree.pl mailrpt.pl W32Configure.pl
@@ -152,8 +152,8 @@ my %wm = (
         ($test_requires eq 'PREREQ_PM' ? %TEST_REQUIRES : ()),
         %extra_deps,
     },
-    PMLIBDIRS     => [qw/ lib inc /],
-    EXE_FILES     => \@scripts,
+    PMLIBDIRS     => [qw/ lib /],
+    EXE_FILES     => [map "bin/$_", @scripts],
     test          => {
         TESTS => 't/*.t t/app/*.t',
     }

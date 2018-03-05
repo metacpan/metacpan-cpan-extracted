@@ -4,7 +4,7 @@ use warnings;
 
 use Test2::IPC;
 
-our $VERSION = '0.000100';
+our $VERSION = '0.000102';
 
 our @CARP_NOT = qw/Test2::Util::HashBase/;
 
@@ -108,7 +108,13 @@ sub _pre_filter {
 
         my $attached = $self->{+_ATTACHED};
         return $e if $attached && @$attached && $attached->[0] == $$ && $attached->[1] == get_tid;
-        $e->trace->throw("You must attach to an AsyncSubtest before you can send events to it from another process or thread");
+        require Data::Dumper;
+        my $dump = Data::Dumper::Dumper($e);
+        $e->trace->throw(<<"        EOT");
+You must attach to an AsyncSubtest before you can send events to it from another process or thread.
+Here is a dump of the commit which triggered this exception:
+$dump
+        EOT
         return;
     };
 }

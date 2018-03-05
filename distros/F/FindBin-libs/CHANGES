@@ -1,0 +1,525 @@
+2.16.2 Sun Mar  4 15:42:32 CST 2018
+
+Require Cwd 3.73 to avoid issue with infinite recursion in
+abs_path. Hopefully this fixes issues with FB::l croaking
+on sanity check for "abs_path '//'" (RT #124335).
+
+If this doesn't work I'll have to replace the abs_path check with "-e 
+'/.' && -e '/..'" as test for working abs_path (vs. using rel2abs).
+
+2.16.1  Sun Feb 25 16:53:30 CST 2018
+
+Require Module::FromPerlVer 0.000005, avoids bug in 0.000004 that
+calls the wrong sub to make the source copy.
+
+2.16    Sun Feb 25 16:53:30 CST 2018
+
+Replace various hacks in Makefile.PL with Module::FromPerlVer. At this 
+point there may be multiple versions going forward which use features 
+of Perl after 5.14; older versions will be frozen (aside from bugfixes).
+
+Note that the new arrangement leaves ./lib out of the tarball: it is 
+created by Module::FromPerlVer from ./version/<appropriate>/lib when 
+Makefile.PL is processed.
+
+This file is now CHANGES.
+
+2.15.02 Tue Jan 30 12:18:00 CST 2018
+
+use explicit LICENSE key in Extutils metadata.
+
+2.15.01 Fri Jan 26 10:10:37 CST 2018
+
+Add 'same terms as perl 5.24 or any later version' license.
+
+2.15    Tue Sep  1 14:33:49 CDT 2015
+
+Explictly export empty string w/ scalar export if no lib's found
+to avoid undefined variable errors in caller.
+
+Added test for explicitly looking up non-existant directory and
+exporting it as a scalar.
+
+Test cleanups.
+
+2.14    Tue Sep  1 13:55:19 CDT 2015
+
+Minor refactoring: Return immediately from import if no lib's are found.
+
+Minor comment and POD issues.
+
+2.13    Thu Jan 15 11:26:45 CST 2015
+
+Patch old version, thanks to Dominic Humphries.
+
+Use v5.14 in new version.
+
+2.11    Tue Sep  2 13:28:18 CDT 2014
+
+"append" causes appends array exports from multiple searches using the 
+same variable to append (vs. overwrite) their values. default is old 
+behavior (i.e., "noappend" which overwrites).
+
+e.g., from t/10*t:
+
+    FindBin::libs->import
+    (
+        qw
+        (
+            base=foo
+            subdir=etc
+            subonly
+            export=etc
+            append
+        )
+    );
+    FindBin::libs->import
+    (
+        qw
+        (
+            base=bar
+            subdir=etc
+            subonly
+            export=etc
+            append
+        )
+    );
+
+generates:
+
+    # Second pass looks for bar/etc:[
+    #   '/sandbox/lembark/Modules/FindBin-libs/foo/etc',
+    #   '/sandbox/lembark/Modules/FindBin-libs/bar/etc'
+    # ]
+
+
+Main use is finding, say, multiple ./etc dir's and exporting
+them all into a search list for config files. 
+
+Given:
+
+    ./myproj/etc
+    ./shared/etc
+
+then #! code in ./myproj/bin could:
+
+    use FindBin::libs qw( export base=etc                       );    
+    use FindBin::libs qw( export base=shared subdir=etc subonly );
+
+and get @etc of ( .../myproj/etc, .../shared/etc ). 
+
+The old behavior, 'noappend' overwrites the variable (which can be
+handy for re-setting the dirs also).
+
+2.10    Tue Sep  2 10:30:12 CDT 2014
+
+"scalar" seems to work; update POD so that people know to use it.
+
+2.07    Mon Jul 28 02:48:49 CDT 2014
+
+Try one more time to deal with version issues.
+
+2.01    Sat Jul 26 01:52:46 CDT 2014
+
+Version numbers now come from the current build rather than Makefile.PL.
+Upping the version to v2.00 makes it easier to keep track of it all.
+Makefile uses stringy, .pm uses v-string.
+Hopefully that will keep everyone happy.
+
+For libs_curr:
+
+Avoid truncating dirent's with embedded newlines in taint-hack
+by using single-line mode: m{ (.+) }xs
+
+Add "scalar" option to export the first directory found only as
+a scalar (vs list). Mainly useful with things like config dir's
+where the first one will always be used in any case:
+
+    use FindBin::libs qw( base=etc scalar );
+
+exports "$etc" rather than "@etc" (saves using $etc[0]
+everyplace). Also works with 
+
+    use FindBin::libs qw( base=etc export=config scalar );
+
+to export $config rather than an array.
+
+Added some examples.
+
+Replace given block to avoid nastygrams from post-5.16 perls.
+
+Add stub libs.pm as placeholder for version.
+
+Finally remembered to fix typo (thanks to x.guimard).
+
+
+1.11   Wed Jul  2 22:34:00 CDT 2014
+
+R.I.P. Build.PL.
+see Makefile.PL
+
+Fix broken assignment of rel2abs from Cwd rather than 
+File::Spec::Functions.
+
+Add test for abs_path or rel2abs surviving both '//' and 'cwd' --
+if neither of them is available or working the rest of this is
+a waste.
+
+Note: I don't have access to windows for testing. If any of this
+fails please contact me and we can figure out what is wrong.
+
+
+1.9.1   Tue May 27 08:20:41 CDT 2014
+
+Minor cleanup blows up in 5.12; works in 5.14. Given that 5.20 is
+about to be on the street: the current version is pushed 
+up to 5.14 (i.e., if ref $^V and v5.14 le $^V then the 
+installed version is *_curr, otherwise it is *_5_8).
+
+1.9     Sat May 24 09:15:15 CDT 2014
+
+Minor cleanup in handling abs_path replacement.
+Seems to work for people with original issue so this one goes
+on CPAN.
+
+
+1.8.1   Sun Mar 23 14:29:44 CDT 2014
+
+Assign local abs_path rather than shuffle the symbol table after using Cwd.
+Avoids issues with munging symbol table in Cwd itself.
+
+1.8 Tue May 28 21:04:30 CDT 2013
+
+Update to work with v5.18
+
+1.7 Thu Mar 14 15:23:30 GMT 2013
+
+Up version to 1.7, avoids issues with mutliple dots.
+
+1.65.2 Tue Feb 19 20:00:27 CST 2013
+
+Fix tests for Windows (thanks to Alexandr Ciornii 
+for patches).
+
+1.65.1 Sat Dec 22 22:47:55 CST 2012
+
+Pod Errors.
+
+1.65
+
+Skip unusable tests on windows; use abs_path for
+path checks to avoid symlinks botching the tests.
+
+Cleanups in libs_curr.pm to use 5.10 features.
+
+Add "blib" option to prefer "blib" to "lib" at the 
+first level only where blib exists, mainly for use
+in testing.
+
+1.64
+
+Update Build.PL to use '0' instead of '>0' for the
+dependencies. 
+
+
+1.63 
+
+Avoid indexing the older version by splitting the
+package name onto a separate line in the source. 
+
+
+1.62 Tue Feb 14 14:11:17 EST 2012
+
+Switch to Module::Build. This allows installing a 
+single file based on $^V of the Perl used for
+installation. This leaves a single "libs.pm" 
+insalled as either the source's 5.8 version or 
+the newer one for 5.10 or later.
+
+I have no way to test this on Windows or VMS;
+any feedback would be appreciated.
+
+1.61 Fri Feb 10 11:10:30 EST 2012
+
+$^V does not compare gracefully prior to 5.10 or
+5.12 (not sure which). Either way, this leaves the
+comparison of $^V useless. Choices are unpack and
+printf or use Config to get the version.
+
+So... libs.pm now uses Config and version to generate
+comparable objects. 
+
+1.59 Tue Dec 20 17:05:10 CST 2011
+
+Fix typo; update tests to expliclty include
+both of the back-end modules.
+
+1.58 Fri Dec 16 13:06:42 CST 2011
+
+Hopefully the metadata is un-screwed up enough for
+the thing to succeed at this point.
+
+1.57 Fri Dec 16 12:26:13 CST 2011
+
+So much for midnight hacks... simplified
+the test for older versions: libs.pm is
+the current version, libs_5_8.pm is stable
+for the older perl's.
+
+1.56 Thu Nov 24 10:26:00 CST 2011
+
+Added "use if $^V < v5.12" to pull in version
+of code useful with v5.8 and later. Basically
+this just puts a rather thin layer in front of
+the older code vs. newer (which will use switches
+for some of the logic, among other things). 
+
+1.55 Wed Nov 23 16:50:57 CST 2011
+
+Fix version-string bug in Makefile.PL
+
+1.54 Wed Nov  9 17:00:09 CST 2011
+
+OK, seems to make more sense if the code
+uses 5.10, which is still supported.
+
+1.53 Sun Oct  9 11:02:50 CDT 2011
+
+oops... should have upped the module version number
+when I upped the Perl version... also makes more sense
+to use v-strings at this point with v5.12.
+
+1.52 Fri Sep  9 17:10:29 EDT 2011
+
+Add "realbin" option that bases the lookup on 
+$FindBin::RealBin. This allows a command line
+executable to be symlinked back to wherever it
+lives and find configuration files adjacent
+to the "real" file. This saves having to symlink
+the configuration files next to the symlinked
+executable.
+
+Up the use to v5.10 now that 5.8 is no longer
+supported.
+
+1.51    Thu Sep  2 18:26:55 EDT 2010
+
+Fix MANIFEST.
+Internal changes.
+
+1.43 Thu Sep  2 12:34:52 EDT 2010
+
+Fix bug that required use=1 instead of "use" alone in 
+argument processing.
+
+Add POD for mixing git repositories using git repository
+as base with  ( subdir=lib subonly ).
+
+1.41 Sat Jun 13 23:02:36 EDT 2009
+
+Fix errors in tests 06, 07.
+
+1.40 Wed Jun 10 07:22:48 EDT 2009
+
+Blindly regex the lib's before returning them
+from find_libs. This avoids issues running 
+tainted.
+
+1.39 Tue Jun  9 18:14:02 EDT 2009
+
+Remove an extraneous $DB::single.
+
+1.38 Tue Jun  9 17:00:29 EDT 2009
+
+Catch: "-T" doesn't like eval-ed code. 
+Fix:
+    require lib;
+    lib->import( @lib_dirs )
+
+It doesn't seem as though lib depends on 
+the caller's namespace, so there isn't
+any harm in calling it this way. Otherwise
+I'll have to find some other way of working
+around -T.
+
+
+1.36 Mon Mar 31 19:06:25 EDT 2008
+
+Add tests for mulitple use or require + multiple
+calls to import. Check that calling import once
+with a subdir followed by a second without any
+arg's still gives the same results (t/0[67]).
+
+Update Makefile.PL to use 5.00601.
+
+1.35 Fri Mar 30 13:05:45 EDT 2007
+
+Add additional check for broken abs_path on W32.
+
+Update tests to add ./bin for cases where the 
+
+O/S does not supply one.
+
+1.34 Thu Mar 29 15:42:26 EDT 2007
+
+Add block eval for 'abs_path' calls in the 
+sub-dir checks to avoid croaking MS platforms 
+(not an issue for *NIX or VMS that I can tell). 
+
+1.33 Tue Feb  6 11:40:10 EST 2007
+
+Add subdir and subonly to look below the ./lib
+dir's for things like ../lib/perl5.
+
+1.32 Sat Jan 20 15:58:36 EST 2007
+
+Repair botched MANIFEST
+
+1.31 Thu Dec  7 14:34:24 EST 2006
+
+POD
+
+./exmaple/p5run sets PERL5LIB and exec's whatever else
+is on the command line.
+
+MANIFEST cleanups
+
+1.30 Thu Dec  7 14:34:24 EST 2006
+
+Added 'p5lib' to prefix the lib's found to $ENV{ PERL5LIB }.
+
+POD for p5lib, doc cleanups.
+
+1.26 Tue Aug  1 12:26:13 EDT 2006
+
+- Added Bin argument to allow overriding $FindBin::Bin
+  as the root of all evil.
+
+1.25 Fri Mar  3 08:37:49 EST 2006
+
+- POD: using prove without a blib.
+
+1.23 Mon Feb 27 12:49:02 EST 2006
+
+- Fix paren bug in catpath.
+
+- Update POD format bugs.
+
+1.21 Wed Feb  8 16:20:44 EST 2006
+
+- Trying to fix regex oddity on VMS...
+
+- Use ".+" to untaint $FindBin::Bin instead of "(.+)/?".
+
+1.20 Sun Jan 29 19:29:03 EST 2006
+
+- Use File::Spec to split, assemble directory paths. 
+
+- Optinally stub Cwd::abs_path if it failes to resolve
+  cwd at startup.
+
+- Replaced test.pl with t/*.t.
+
+- POD
+
+1.07 Thu Sep  8 09:33:29 EDT 2005
+
+- RedHat Enterprise Version 4 has a bug that leaves $FindBin::Bin
+  with a trailing slash. Fix is to regex it off before using the
+  variable.
+
+- Added "debug" argument to set $DB::single = 1 after processing
+  the arguments; saves having to hack the code to test where the 
+  things come from.
+
+1.06 Sat Apr 30 00:24:23 EDT 2005
+
+- Set print to undef -- should've been that way
+  to begin with.
+
+1.05 Thu Nov  4 17:35:31 EST 2004
+
+- Wrap abs_path in an eval to handle systems that die on
+  non-existant directories.
+
+1.03 Wed Oct 20 12:03:30 EDT 2004
+
+- Fix doc bug -- added /jowbloe/ below /home on the 
+  sandbox examples.
+
+1.03 Tue Oct 19 17:13:04 EDT 2004
+
+- Update doc's to include sandbox manglement.
+
+1.02 Thu Jun 10 14:26:53 CDT 2004
+
+- Fix typo in version number.
+
+1.01 Mon May 31 21:13:13 CDT 2004
+
+- Modify the split for ignored arguments to ignore whitespace
+  around the comma separators. This only applies to cases where
+  the caller doesn't use qw() for the arguments and ends up 
+  with something like: 'ignore=/, /foo'.
+
+- Repair default arg's to successfully ignore '/' and
+  '/usr' by default.
+
+- Eval symlink creation to handle systems without symlinks.
+
+  Caveat utilitor: this module has only been tested by me on
+  *NIX, the assumed directory separation on '/' is most
+  likely broken on ms-dos, VMS, or related filesystems. If
+  any currently available *NIX lacks symlinks please warn
+  me, otherwise YMMV.
+
+- Cleaned up some comments.
+
+1.00 Mon Mar 22 11:18:45 CST 2004
+
+- Up the version number. Thing seems stable enough to call it
+  1.00 at this point.
+
+- Reverse the order of CHANGES, with most recent at the top.
+
+0.18 Tue Mar 16 22:22:02 CST 2004
+
+- Added -e test before abs_path to avoid nastygrams
+  from Cwd on abs_path of dangling links.
+
+0.17 Mon Mar  8 23:25:20 CST 2004
+
+- Removed leftover $DB::single (d'oh...)
+
+0.16 Sat Jan 24 14:52:23 CST 2004
+
+- Replaced 0 with undef for default print. noprint is
+  now the default.
+
+0.15 Sat Jan 24 14:46:22 CST 2004
+
+- POD
+
+0.14 Wed Dec  3 12:23:42 CST 2003
+
+- Modify Makefile.PL to use ABSTRACT_FROM, NAME entry of POD to 
+  add abstract.
+
+- Added notes to README.
+
+- Included test for bogus directory (unless you DO have a 
+  ./frobnicatorium) w/ exported array empty.
+
+0.13 Wed Dec  3 10:12:13 CST 2003
+
+- pod for sandbox description.
+
+0.11 Wed Nov 26 16:08:35 CST 2003
+
+- Fixed switch bug for handling print/noprint & verbose.
+- test.pl failed on Solaris due to /bin -> /usr/bin, test
+  changed to regex from eq.
+
+0.10 Mon Nov 24 16:06:22 CST 2003
+
+Initial release.

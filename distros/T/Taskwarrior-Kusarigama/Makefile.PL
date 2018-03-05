@@ -59,11 +59,12 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Test::Deep" => 0,
     "Test::MockObject" => 0,
     "Test::MockObject::Extends" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.7.0",
+  "VERSION" => "0.8.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -101,6 +102,7 @@ my %FallbackPrereqs = (
   "Symbol" => 0,
   "Template::Mustache" => 0,
   "Term::ANSIScreen" => 0,
+  "Test::Deep" => 0,
   "Test::MockObject" => 0,
   "Test::MockObject::Extends" => 0,
   "Test::More" => 0,

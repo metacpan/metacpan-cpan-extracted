@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.132-16-g73ecf21
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.134-5-gf11b9e2
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.133';
+our $VERSION = '0.135';
 
 use Moose;
 with
@@ -291,7 +291,6 @@ sub configure
         # BeforeBuild
         # [ 'EnsurePrereqsInstalled' ], # FIXME: use options to make this less annoying!
         [ 'PromptIfStale' => 'stale modules, build' => { phase => 'build', module => [ $self->meta->name ] } ],
-        [ 'PromptIfStale' => 'stale modules, release' => { phase => 'release', check_all_plugins => 1, check_all_prereqs => 1 } ],
 
         # ExecFiles
         (-d ($self->payload->{'ExecDir.dir'} // 'script') || any { /^ExecDir\./ } keys %{ $self->payload })
@@ -325,7 +324,7 @@ sub configure
         [ 'MojibakeTests'       => { ':version' => '0.8' } ],
         [ 'Test::ReportPrereqs' => { ':version' => '0.022', verify_prereqs => 1,
             version_extractor => ( ( any { $_ ne 'MakeMaker' } $self->installer ) ? 'Module::Metadata' : 'ExtUtils::MakeMaker' ),
-            include => [ sort ( qw(autodie JSON::PP Sub::Name YAML), $self->_plugin_removed('PodCoverageTests') ? () : 'Pod::Coverage' ) ] } ],
+            include => [ sort ( qw(autodie Encode JSON::PP Sub::Name YAML), $self->_plugin_removed('PodCoverageTests') ? () : 'Pod::Coverage' ) ] } ],
         [ 'Test::Portability'   => { ':version' => '2.000007' } ],
         [ 'Test::CleanNamespaces' => { ':version' => '0.006' } ],
 
@@ -394,6 +393,7 @@ sub configure
         [ 'CheckStrictVersion'  => { decimal_only => 1 } ],
         'CheckMetaResources',
         'EnsureLatestPerl',
+        [ 'PromptIfStale' => 'stale modules, release' => { phase => 'release', check_all_plugins => 1, check_all_prereqs => 1 } ],
 
         # if in airplane mode, allow our uncommitted dist.ini edit which sets 'airplane = 1'
         [ 'Git::Check'          => 'initial check' => { allow_dirty => [ $self->airplane ? 'dist.ini' : '' ] } ],
@@ -429,6 +429,7 @@ sub configure
 
     # plugins to do with calculating, munging, incrementing versions
     $self->add_bundle('@Git::VersionManager' => {
+        # no minimum version needed yet
         'RewriteVersion::Transitional.global' => 1,
         'RewriteVersion::Transitional.fallback_version_provider' => 'Git::NextVersion',
         'RewriteVersion::Transitional.version_regexp' => '^v([\d._]+)(-TRIAL)?$',
@@ -607,7 +608,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.133
+version 0.135
 
 =head1 SYNOPSIS
 
@@ -631,10 +632,6 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     [PromptIfStale / stale modules, build]
     phase = build
     module = Dist::Zilla::Plugin::Author::ETHER
-    [PromptIfStale / stale modules, release]
-    phase = release
-    check_all_plugins = 1
-    check_all_prereqs = 1
 
 
     ;;; ExecFiles
@@ -733,6 +730,7 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     :version = 0.022
     verify_prereqs = 1
     version_extractor = Module::Metadata
+    include = Encode
     include = JSON::PP
     include = Pod::Coverage
     include = Sub::Name
@@ -858,6 +856,10 @@ following F<dist.ini> (following the preamble), minus some optimizations:
 
     [CheckMetaResources]
     [EnsureLatestPerl]
+    [PromptIfStale / stale modules, release]
+    phase = release
+    check_all_plugins = 1
+    check_all_prereqs = 1
 
     [Git::Check / initial check]
     allow_dirty =

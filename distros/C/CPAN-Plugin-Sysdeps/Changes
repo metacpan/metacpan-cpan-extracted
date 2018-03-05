@@ -1,5 +1,9 @@
 Revision history for Perl extension CPAN::Plugin::Sysdeps.
 
+0.46  2018-03-03
+	- add DragonFly BSD support (by David Dick)
+	- mapping updates (by David Dick and Slaven Rezic)
+
 0.45  2018-02-24
 	- add Fedora (dnf) support (by David Dick)
 	- add OpenBSD (pkg_add) support (by David Dick)

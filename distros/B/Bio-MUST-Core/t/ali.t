@@ -382,17 +382,18 @@ my @exp_nomiss_lens = (56, 54, 48, 54, 44, 50, 48, 50, 52, 34);
         args => { degap => 1, chunk => -1 },
     );
 
-    is_deeply [ map { $_->full_id } $ali->all_seq_ids ], \@exp_full_ids,
-        'rightly restored original ids after temp file creation';
-
     cmp_store(
         obj => $ali, method => 'temp_fasta',
         file => 'temp.fasta',
         test => 'wrote expected temp .fasta file (no degapping side-effect)',
     );
 
-    is_deeply [ map { $_->full_id } $ali->all_seq_ids ], \@exp_full_ids,
-        'rightly restored original ids after temp file creation';
+    cmp_store(
+        obj => $ali, method => 'temp_fasta',
+        file => 'temp_prefix.fasta',
+        test => 'wrote expected temp .fasta file (custom std_mapper prefix)',
+        args => { id_prefix => 'myseq' },
+    );
 }
 
 # TODO: check that mutators indeed return the Ali object?

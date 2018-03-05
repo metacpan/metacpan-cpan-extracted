@@ -1,6 +1,13 @@
 Revision history for App-DBBrowser
 
 
+2.003    2018-03-04
+        - Update Insert module.
+
+2.002    2018-03-02
+        - Bugfix in Insert module.
+        - Bugfix in Table module.
+
 2.001    2018-03-01
         - Bugfix: don't close the Temp file handle zu early.
         - Minimum version "Term::Choose::Util" is "0.057".

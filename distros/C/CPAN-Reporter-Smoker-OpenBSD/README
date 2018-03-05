@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution CPAN-Reporter-Smoker-OpenBSD,
-version 0.012:
+version 0.015:
 
   set of scripts to manage a CPAN::Reporter::Smoker on OpenBSD
 

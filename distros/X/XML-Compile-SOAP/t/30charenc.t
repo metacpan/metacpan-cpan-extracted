@@ -66,7 +66,7 @@ sub fake_server(@)
     # Check the request
 
     isa_ok($request, 'HTTP::Request');
-    is($request->header('Content-Type'), 'text/xml; charset=utf-8');
+    is(lc($request->header('Content-Type')), 'text/xml; charset=utf-8');
 
     my $decoded_content = $request->decoded_content;
     ok(utf8::is_utf8($decoded_content), 'decoded_content is utf8');

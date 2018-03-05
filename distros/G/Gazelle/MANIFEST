@@ -21,6 +21,7 @@ t/07_chunked_req.t
 t/08_chunked_zero_length.t
 t/09_bigpost.t
 t/10_child_exit.t
+t/14interim_response.t
 t/TestUtils.pm
 lib/Plack/Handler/picohttpparser/Jamfile
 lib/Plack/Handler/picohttpparser/Makefile

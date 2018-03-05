@@ -2,7 +2,7 @@
 use v5.22;
 use strict;
 use warnings;
-use Test::More tests => 55;
+use Test::More tests => 56;
 use Test::Exception;
 
 use Time::Piece;
@@ -126,8 +126,8 @@ $sunday = Date::Lectionary->new(
 );
 is(
     $sunday->day->name,
-    "St. Mary of Magdala",
-    'Validating that 2017-07-22 returns [St. Mary of Magdala].'
+    "St. Mary Magdalene",
+    'Validating that 2017-07-22 returns [St. Mary Magdalene].'
 );
 
 $sunday = Date::Lectionary->new(
@@ -527,4 +527,14 @@ is(
     $sunday->day->name,
     "Saturday of Easter Week",
     'Validating that 2019-04-27 returns [Saturday of Easter Week] for the RCL.'
+);
+
+$sunday = Date::Lectionary->new(
+    'date'       => Time::Piece->strptime( "2019-07-22", "%Y-%m-%d" ),
+    'lectionary' => 'acna'
+);
+is(
+    $sunday->day->name,
+    "St. Mary Magdalene",
+    'Validating that 2019-07-22 returns [St. Mary Magdalene] for the ACNA lectionary.'
 );

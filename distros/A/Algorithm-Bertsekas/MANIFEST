@@ -2,5 +2,7 @@ Build.PL
 Changes
 MANIFEST
 Makefile.PL
+META.json
+META.yml
 README
 lib/Algorithm/Bertsekas.pm

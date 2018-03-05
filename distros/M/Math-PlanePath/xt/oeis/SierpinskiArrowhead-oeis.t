@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,7 +20,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 14;
+plan tests => 7;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -29,9 +29,6 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 use Math::PlanePath::SierpinskiCurve;
 use Math::NumSeq::PlanePathTurn;
-
-# uncomment this to run the ### lines
-#use Smart::Comments '###';
 
 
 #------------------------------------------------------------------------------
@@ -50,6 +47,30 @@ MyOEIS::compare_values
      }
      return \@got;
    });
+
+# A189706 = lowest non-1 and its position
+MyOEIS::compare_values
+  (anum => q{A189706},
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     foreach my $i (0 .. $count-1) {
+       push @got, lowest_non_1_xor_position($i);
+     }
+     return \@got;
+   });
+sub lowest_non_1_xor_position {
+  my ($n) = @_;
+  my $ret = 1;
+  while (($n % 3) == 1) {
+    $ret ^= 1;             # flip for trailing 1s
+    $n = int($n/3);
+  }
+  if (($n % 3) == 0) {
+    $ret ^= 1;
+  }
+  return $ret;
+}
 
 #------------------------------------------------------------------------------
 # A189707 - (N+1)/2 of positions of odd N left turns
@@ -107,6 +128,54 @@ MyOEIS::compare_values
      }
      return \@got;
    });
+
+# A156595 = lowest non-2 and its position starting at n=0
+MyOEIS::compare_values
+  (anum => q{A156595},
+   name => 'A156595 by lowest non-2 and position',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     foreach my $i (0 .. $count-1) {
+       push @got, lowest_non_2_xor_position($i);
+     }
+     return \@got;
+   });
+sub lowest_non_2_xor_position {
+  my ($n) = @_;
+  my $ret = 1;
+  while (($n % 3) == 2) {
+    $ret ^= 1;             # flip for trailing 1s
+    $n = int($n/3);
+  }
+  if (($n % 3) == 0) {
+    $ret ^= 1;
+  }
+  return $ret;
+}
+
+# A156595 = lowest non-0 and its position starting at n=1 (per seq OFFSET)
+MyOEIS::compare_values
+  (anum => q{A156595},
+   name => 'A156595 by lowest non-0 and position',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     foreach my $i (0 .. $count-1) {
+       push @got, lowest_non_0_xor_position($i);
+     }
+     return \@got;
+   });
+sub lowest_non_0_xor_position {
+  my ($n) = @_;
+  my $ret = 0;
+  while (($n % 3) == 2) {
+    $ret ^= 1;             # flip for trailing 1s
+    $n = int($n/3);
+  }
+  $ret ^= ($n % 3);
+  return $ret & 1;
+}
 
 #------------------------------------------------------------------------------
 

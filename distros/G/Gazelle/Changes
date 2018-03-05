@@ -1,5 +1,13 @@
 Revision history for Perl extension Gazelle
 
+0.48 2018-03-05T00:05:15Z
+
+ - remove Try::Tiny deps.
+
+0.47 2018-03-03T23:57:48Z
+
+ - introduced psgix.informational that supported in Starlet
+
 0.46 2016-07-05T06:41:37Z
 
  - do not shutdown if server_starter was used (Thank you zhanghjster)
@@ -149,4 +157,3 @@ Revision history for Perl extension Gazelle
 0.01 2014-11-12T05:45:55Z
 
     - original version
-

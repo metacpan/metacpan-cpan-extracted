@@ -1,3 +1,10 @@
+0.008   2018-03-04 (PERLANCAR)
+
+	- Update to newer version of perlbrew ('available from' after each
+	  perl in 'perlbrew available', and 'installed on' after each perl
+	  in 'perlbrew list').
+
+
 0.007   2017-07-10 (PERLANCAR)
 
 	- No functional changes.

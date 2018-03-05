@@ -78,23 +78,27 @@
    "provides" : {
       "Business::RO::TaxDeduction" : {
          "file" : "lib/Business/RO/TaxDeduction.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Business::RO::TaxDeduction::Amount" : {
          "file" : "lib/Business/RO/TaxDeduction/Amount.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Business::RO::TaxDeduction::Ranges" : {
          "file" : "lib/Business/RO/TaxDeduction/Ranges.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Business::RO::TaxDeduction::Role::Utils" : {
          "file" : "lib/Business/RO/TaxDeduction/Role/Utils.pm",
-         "version" : "0.011"
+         "version" : "0.012"
+      },
+      "Business::RO::TaxDeduction::Table" : {
+         "file" : "lib/Business/RO/TaxDeduction/Table.pm",
+         "version" : "0.012"
       },
       "Business::RO::TaxDeduction::Types" : {
          "file" : "lib/Business/RO/TaxDeduction/Types.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       }
    },
    "release_status" : "stable",
@@ -107,7 +111,7 @@
          "url" : "http://github.com/stefansbv/perl-business-ro-taxdeduction/"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.020002"

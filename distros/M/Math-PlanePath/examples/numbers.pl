@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -216,6 +216,8 @@ my @all_classes = ('SquareSpiral',
                    'CubicBase',
                    'CubicBase,radix=4',
                    'SquareReplicate',
+                   'SquareReplicate,numbering_type=rotate-4',
+                   'SquareReplicate,numbering_type=rotate-8',
                    'CornerReplicate',
                    'LTiling',
                    'LTiling,L_fill=ends',
@@ -228,6 +230,7 @@ my @all_classes = ('SquareSpiral',
                    'FlowsnakeCentres',
                    'FlowsnakeCentres,arms=3',
                    'GosperReplicate',
+                   'GosperReplicate,numbering_type=rotate',
                    'GosperIslands',
                    'GosperSide',
 
@@ -235,6 +238,7 @@ my @all_classes = ('SquareSpiral',
                    'QuintetCurve,arms=4',
                    'QuintetCentres',
                    'QuintetReplicate',
+                   'QuintetReplicate,numbering_type=rotate',
 
                    'KochCurve',
                    'KochPeaks',
@@ -287,6 +291,8 @@ my @all_classes = ('SquareSpiral',
                    'TerdragonRounded,arms=6',
                    'TerdragonMidpoint',
                    'TerdragonMidpoint,arms=6',
+                   'AlternateTerdragon',
+                   'AlternateTerdragon,arms=6',
                    'R5DragonCurve',
                    'R5DragonCurve,arms=4',
                    'R5DragonMidpoint',

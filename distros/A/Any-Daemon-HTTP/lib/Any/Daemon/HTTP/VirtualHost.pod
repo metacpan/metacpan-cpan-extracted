@@ -27,13 +27,13 @@ Any::Daemon::HTTP::VirtualHost - webserver virtual hosts
 
 =head1 DESCRIPTION
 
-These virtual host definitions are used by L<Any::Daemon::HTTP|Any::Daemon::HTTP>, to
-implement (server) name based data seperation.  Its features resemble those
-of Apache virtual hosts.
+These virtual host (vhost) configuration are used by L<Any::Daemon::HTTP|Any::Daemon::HTTP>,
+to implement (server) name based data separation.  Its features resemble
+those of Apache virtual hosts.
 
-Each virtual host usually has to L<Any::Daemon::HTTP::Directory|Any::Daemon::HTTP::Directory> slaves: one
-which describes the permissions for user directories (url paths in the
-form C< /~user/ >) and one for data outside the user space.
+Each vhost usually has two L<Any::Daemon::HTTP::Directory|Any::Daemon::HTTP::Directory> slaves:
+one which describes the permissions for user directories (url paths in the
+form C< /~user/ >), the other for data outside the user space.
 
 =head1 METHODS
 
@@ -50,6 +50,7 @@ by using these options.
   aliases      []
   directories  <see text>
   documents    <undef>
+  handler      undef
   handlers     {}
   name         <required>
   proxies      undef
@@ -77,7 +78,11 @@ most free L<Any::Daemon::HTTP::Directory|Any::Daemon::HTTP::Directory> object.  
 access restrictions, then do not use this option but the C<directories>
 option.
 
-=item handlers => CODE|HASH
+=item handler => CODE|METHOD|HASH
+
+Alias for C<handlers>.
+
+=item handlers => CODE|METHOD|HASH
 
 The keys are path names, part of the request URIs.  The values are
 CODE-references, called when that URI is addressed.  The access rules
@@ -138,7 +143,7 @@ Returns the primary name for this server.
 
 =over 4
 
-=item $obj-E<gt>B<addHandler>(CODE|$method|PAIRS|HASH)
+=item $obj-E<gt>B<addHandler>(CODE|METHOD|PAIRS|HASH)
 
 Handlers are called to dynamically generate responses, for instance
 to fill-in templates.  The L</DETAILS> section below explains how
@@ -163,7 +168,7 @@ example:
 
 =item $obj-E<gt>B<addHandlers>($params)
 
-Same as L<addHandler()|Any::Daemon::HTTP::VirtualHost/"Handler">.
+Alias for L<addHandler()|Any::Daemon::HTTP::VirtualHost/"Handler">.
 
 =item $obj-E<gt>B<findHandler>($uri|$path|@segments)
 
@@ -239,7 +244,8 @@ L<Any::Daemon::HTTP::Proxy::new()|Any::Daemon::HTTP::Proxy/"Constructors"> to cr
 =head2 Handlers
 
 Handlers are called to dynamically generate responses, for instance
-to fill-in templates.
+to fill-in templates.  In other frameworks, they are called 'routes'
+or 'get'.
 
 When a request for an URI is received, it is first checked whether
 a static file can fulfil the request.  If not, a search is started
@@ -369,9 +375,9 @@ B<. Example: rewrite URI>
      $uri;
   }
 
-=head2 Using Template::Toolkit
+=head2 Using Template Toolkit
 
-Connecting this server to the popular Template::Toolkit webpage
+Connecting this server to the popular Template Toolkit web-page
 framework is quite simple:
 
   # Use TT only for pages under /status
@@ -379,10 +385,12 @@ framework is quite simple:
 
   sub ttStatus($$$$)
   {   my ($self, $session, $request, $uri, $tree) = @_;;
+
+      # Often, this object is global or an attribute
       my $template = Template->new(...);
 
       my $output;
-      my $values = {};  # collect the values
+      my $values = {...};  # collect the values
       $template->process($fn, $values, \$output)
           or die $template->error, "\n";
 
@@ -392,19 +400,18 @@ framework is quite simple:
         );
   }
 
-See Log::Report::Extract::Template if you need translations
-as well.
+See Log::Report::Template if you need translations as well.
 
 =head1 SEE ALSO
 
-This module is part of Any-Daemon-HTTP distribution version 0.26,
-built on September 19, 2016. Website: F<http://perl.overmeer.net/any-daemon/>
+This module is part of Any-Daemon-HTTP distribution version 0.27,
+built on March 04, 2018. Website: F<http://perl.overmeer.net/any-daemon/>
 
 =head1 LICENSE
 
-Copyrights 2013-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2013-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

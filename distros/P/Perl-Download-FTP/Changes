@@ -1,5 +1,9 @@
 Revision history for Perl module Perl::Download::FTP
 
+0.04 Fri Mar  2 19:39:04 EST 2018
+    - Add module Perl::Download::FTP::Distribution to provide
+      FTP download of latest release of a CPAN library
+
 0.03 Mon Dec  4 17:40:44 EST 2017
     - Touch-ups to documentation.
 

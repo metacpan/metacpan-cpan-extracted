@@ -2,9 +2,9 @@ NAME
     App::ShellCompleter::perlbrew - Shell completion for perlbrew
 
 VERSION
-    This document describes version 0.007 of App::ShellCompleter::perlbrew
+    This document describes version 0.008 of App::ShellCompleter::perlbrew
     (from Perl distribution App-ShellCompleter-perlbrew), released on
-    2017-07-10.
+    2018-03-04.
 
 SYNOPSIS
     See _perlbrew included in this distribution.
@@ -32,7 +32,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

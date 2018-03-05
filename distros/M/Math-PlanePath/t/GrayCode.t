@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -48,7 +48,7 @@ sub binary_to_decimal {
 # VERSION
 
 {
-  my $want_version = 125;
+  my $want_version = 126;
   ok ($Math::PlanePath::GrayCode::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::GrayCode->VERSION,  $want_version,
@@ -291,7 +291,7 @@ sub is_pow2 {
 }
 
 # with Y reckoned increasing upwards
-sub dxdy_to_dir {
+sub dxdy_to_dir4 {
   my ($dx, $dy) = @_;
   if ($dx > 0) { return 0; }  # east
   if ($dx < 0) { return 2; }  # west
@@ -303,7 +303,7 @@ sub dxdy_to_dir {
 sub path_n_dir {
   my ($path, $n) = @_;
   my ($dx,$dy) = $path->n_to_dxdy($n) or die "Oops, no point at ",$n;
-  return dxdy_to_dir ($dx, $dy);
+  return dxdy_to_dir4 ($dx, $dy);
 }
 # return 0,1,2,3 to the left
 sub path_n_turn {

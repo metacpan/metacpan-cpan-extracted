@@ -1,6 +1,12 @@
 
 ===== ChangeLog of Mail::Box::POP3 version 3.*
 
+version 3.004: Sun Mar  4 15:17:07 CET 2018
+
+	Improvements:
+	- typo  rt.cpan.org#124013 [Damyan Ivanov] (debian)
+	- convert to GIT and GitHub.
+
 version 3.003: Sun 16 Jul 13:00:16 CEST 2017
 
 	Improvements:

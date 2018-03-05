@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use lib '.';
 use t::CasualEntity;
 use Test::More;
 

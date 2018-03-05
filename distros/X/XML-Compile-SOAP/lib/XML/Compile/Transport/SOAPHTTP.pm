@@ -1,17 +1,22 @@
-# Copyrights 2007-2017 by [Mark Overmeer].
+# Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# This code is part of distribution XML-Compile-SOAP.  Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::Transport::SOAPHTTP;
 use vars '$VERSION';
-$VERSION = '3.22';
+$VERSION = '3.23';
 
 use base 'XML::Compile::Transport';
 
-use Log::Report 'xml-compile-soap', syntax => 'SHORT';
+use warnings;
+use strict;
+
+use Log::Report    'xml-compile-soap';
+
 use XML::Compile::SOAP::Util qw/SOAP11ENV SOAP11HTTP/;
 use XML::Compile   ();
 
@@ -88,8 +93,12 @@ sub _prepare_call($)
     my $header   = $args->{header}   || HTTP::Headers->new;
     $self->headerAddVersions($header);
 
-    my $content_type;
+	# There is probably never a real HTTP server on the other side, but
+    # HTTP/1.1 requires this.
+	$header->header(Host => $1)
+        if +($args->{endpoint} // '') =~ m!^\w+\://([^/:]+)!;
 
+    my $content_type;
     if($version eq 'SOAP11')
     {   $mime  ||= ref $soap ? $soap->mimeType : 'text/xml';
         $content_type = qq{$mime; charset=$charset};

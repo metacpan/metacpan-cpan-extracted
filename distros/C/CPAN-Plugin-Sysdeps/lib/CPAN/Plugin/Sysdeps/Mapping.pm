@@ -3,11 +3,12 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 # shortcuts
 #  os and distros
 use constant os_freebsd  => (os => 'freebsd');
+use constant os_dragonfly => (os => 'dragonfly');
 use constant os_openbsd  => (os => 'openbsd');
 use constant os_windows  => (os => 'MSWin32');
 use constant os_darwin   => (os => 'darwin'); # really means installer=homebrew
@@ -198,6 +199,8 @@ sub mapping {
      [cpanmod => 'Archive::SevenZip',
       [os_freebsd,
        [package => 'p7zip']],
+      [os_dragonfly,
+       [package => 'p7zip']],
       [like_debian,
        [package => 'p7zip-full']]],
 
@@ -239,6 +242,8 @@ sub mapping {
      [cpanmod => 'Audio::CD',
       [os_freebsd,
        [package => 'libcdaudio']],
+      [os_dragonfly,
+       [package => 'libcdaudio']],
       [like_debian,
        [package => 'libcdaudio-dev']],
       [like_fedora,
@@ -261,6 +266,8 @@ sub mapping {
      [cpanmod => 'Audio::GSM',
       [os_freebsd,
        [package => 'gsm']],
+      [os_dragonfly,
+       [package => 'gsm']],
       [like_debian,
        [package => 'libgsm1-dev']],
       [like_fedora,
@@ -281,8 +288,9 @@ sub mapping {
      ],
 
      [cpanmod => 'Audio::Ofa',
-      [os_freebsd,
-       [package => 'libofa']],
+      ## from freebsd's MOVED: "2017-03-01|Has expired: MusicDNS service has been discontinued"
+      #[os_freebsd,
+      # [package => 'libofa']],
       [like_debian,
        [package => 'libofa0-dev']]],
 
@@ -389,7 +397,7 @@ sub mapping {
       [os_freebsd,
        [package => 'libmemcache']],
       [like_debian,
-       [linuxdistrocodename => ['squeeze', 'wheezy'],
+       [linuxdistrocodename => ['squeeze', 'wheezy', 'xenial'], # but tests fail on xenial
 	[package => 'libmemcache-dev']],
        [package => []], # in jessie there's no package containing include/memcache.h
       ]],
@@ -405,6 +413,8 @@ sub mapping {
 
      [cpanmod => ['Cairo', 'Prima::Cairo'],
       [os_freebsd,
+       [package => 'cairo']],
+      [os_dragonfly,
        [package => 'cairo']],
       [os_openbsd,
        [package => 'cairo']],
@@ -470,10 +480,14 @@ sub mapping {
        [package => 'libcomedi-dev']],
      ],
 
+     [cpanmod => 'CommonMark',
+      [os_freebsd,
+       [package => 'cmark']],
+     ],
+
      [cpanmod => 'Compress::LZMA::Simple',
-      ## in the meanwhile, lzma is part of the base install
-      #[os_freebsd,
-      # [package => 'lzmalib']],
+      [os_freebsd,
+       [package => 'lzmalib']],
      ],
       
      [cpanmod => 'Compress::Raw::Lzma',
@@ -729,6 +743,8 @@ sub mapping {
      [cpanmod => 'DBD::Firebird',
       [os_freebsd,
        [package => 'firebird25-server']],
+      [os_dragonfly,
+       [package => 'firebird25-server']],
       [like_debian,
        [before_debian_stretch,
 	[package => 'firebird-dev']],
@@ -741,6 +757,8 @@ sub mapping {
      [cpanmod => 'DBD::mysql',
       [os_freebsd,
        [package => 'mysql-connector-c | mysql57-client | mysql56-client | mysql55-client | mariadb101-client | mariadb100-client | mariadb55-client | percona56-client | percona55-client']],
+      [os_dragonfly,
+       [package => 'mariadb101-client | mariadb100-client | mariadb55-client-5.5.58']],
       [os_openbsd,
        [package => 'mariadb-client']],
       [like_debian,
@@ -758,6 +776,8 @@ sub mapping {
      [cpanmod => 'DBD::ODBC',
       [os_freebsd,
        [package => 'unixODBC']],
+      [os_dragonfly,
+       [package => 'unixODBC']],
       [like_debian,
        [package => 'unixodbc-dev']],
       [like_fedora,
@@ -769,6 +789,8 @@ sub mapping {
      [cpanmod => 'DBD::Pg',
       [os_freebsd,
        [package => 'postgresql95-server | postgresql93-server']],
+      [os_dragonfly,
+       [package => 'postgresql10-server | postgresql96-server | postgresql94-server | postgresql93-server | postgresql92-server']],
       [os_openbsd,
        [package => 'postgresql-server']],
       [like_debian,
@@ -849,6 +871,8 @@ sub mapping {
      
      [cpanmod => 'DNS::LDNS',
       [os_freebsd,
+       [package => 'ldns']],
+      [os_dragonfly,
        [package => 'ldns']],
       [like_debian,
        [package => 'libldns-dev']],
@@ -1035,6 +1059,8 @@ sub mapping {
      [cpanmod => 'GD',
       [os_freebsd,
        [package => 'libgd']],
+      [os_dragonfly,
+       [package => 'libgd']],
       [os_openbsd,
        [package => 'gd']],
       [like_debian,
@@ -1189,6 +1215,8 @@ sub mapping {
       [os_freebsd,
        [package => 'gnupg1'] #  XXX what about gnupg (version 2)?
       ],
+      [os_dragonfly,
+       [package => 'gnupg']],
       [os_openbsd,
        [package => 'gnupg']],
       [like_debian,
@@ -1641,6 +1669,15 @@ sub mapping {
        [package => 'iptables-devel']],
      ],
 
+     [cpanmod => 'JavaScript::Lite',
+      [os_freebsd,
+       [package => 'spidermonkey24 | spidermonkey185 | spidermonkey170 | spidermonkey17',]], # needs something like INC=-I/usr/local/include/js-17.0, but does not work (tried 170 and 185)
+      [like_debian,
+       [package => 'libmozjs185-dev']], # needs something like INC=-I/usr/include/js, but does not work
+      [like_fedora,
+       [package => 'js-devel']],
+     ],
+
      [cpanmod => 'JavaScript::V8',
       [os_freebsd,
        [package => 'v8']],
@@ -1684,6 +1721,13 @@ sub mapping {
 	[package => 'libvisa-dev']],
        [package => []], # not available anymore in stretch
       ],
+     ],
+
+     [cpanmod => 'Language::MzScheme',
+      [os_freebsd,
+       [package => 'racket']], # would need something like -I/usr/local/include/racket, but compilation still fails
+      [like_debian,
+       [package => ['racket', 'racket-common']]], # would need something like -I/usr/include/racket, but compilation still fails
      ],
 
      # XXX needs verification; maybe more latex-related modules should be listed here?
@@ -2120,6 +2164,8 @@ sub mapping {
      ],
 
      ## conflicts with avahi-app on FreeBSD
+     ## With avahi-app installed, -I/usr/local/include/avahi-compat-howl needs to be specified
+     ## but then the test suite fails
      #[cpanmod => "Net::Rendezvous::Publish::Backend::Howl",
      # [os_freebsd,
      #  [package => 'howl']],
@@ -2214,6 +2260,8 @@ sub mapping {
      [cpanmod => 'OpenGL',
       [os_freebsd,
        [package => 'freeglut']],
+      [os_dragonfly,
+       [package => 'freeglut']],
       [like_debian,
        [package => ['freeglut3-dev', 'libxmu-dev', 'libxi-dev']]],
       [like_fedora,
@@ -2248,6 +2296,8 @@ sub mapping {
 
      [cpanmod => 'Pango',
       [os_freebsd,
+       [package => 'pango']],
+      [os_dragonfly,
        [package => 'pango']],
       [os_openbsd,
        [package => 'pango']],
@@ -2617,7 +2667,10 @@ sub mapping {
        [package => 'ja-kakasi']],
       [like_debian,
        # but there are linking errors on Debian
-       [package => 'libkakasi2-dev']]],
+       [package => 'libkakasi2-dev']],
+      [os_darwin,
+       [package => 'kakasi']],
+     ],
 
      [cpanmod => 'Text::Migemo',
       [os_freebsd,
@@ -2688,6 +2741,8 @@ sub mapping {
 
      [cpanmod => 'Unix::Statgrab',
       [os_freebsd,
+       [package => 'libstatgrab']],
+      [os_dragonfly,
        [package => 'libstatgrab']],
       [os_openbsd,
 	# doesn't work
@@ -2810,6 +2865,8 @@ sub mapping {
      [cpanmod => 'XML::LibXML',
       [os_freebsd,
        [package => 'libxml2']],
+      [os_dragonfly,
+       [package => 'libxml2']],
       [os_openbsd,
 	# doesn't work at the moment
        [package => 'libxml2']],
@@ -2822,6 +2879,8 @@ sub mapping {
      [cpanmod => 'XML::LibXSLT',
       [os_freebsd,
        [package => 'libxslt']],
+      [os_dragonfly,
+       [package => 'libxslt']],
       [os_openbsd,
        [package => 'libxslt']],
       [like_debian,
@@ -2831,6 +2890,8 @@ sub mapping {
 
      [cpanmod => 'XML::Parser',
       [os_freebsd,
+       [package => 'expat']],
+      [os_dragonfly,
        [package => 'expat']],
       [os_openbsd,
        [package => 'expat']],
@@ -2898,6 +2959,8 @@ sub mapping {
      [cpanmod => 'X11::Xlib',
       [os_freebsd,
        [package => 'libXtst']],
+      [os_dragonfly,
+       [package => 'libXtst']],
       [like_debian,
        [package => 'libxtst-dev']],
       [like_fedora,
@@ -2907,6 +2970,8 @@ sub mapping {
      [cpanmod => 'ZMQ::FFI',
       [os_freebsd,
        [package => 'libzmq4']], # seems to hang with nonthreaded perls on freebsd, wait-and-kill rule exists
+      [os_dragonfly,
+       [package => 'libzmq4']],
       [like_debian,
        [linuxdistrocodename => [qw(squeeze wheezy jessie xenial)],
 	[package => 'libzmq-dev']],
@@ -2918,6 +2983,8 @@ sub mapping {
      [cpanmod => 'ZMQ::LibZMQ4',
       [os_freebsd,
        [package => 'libzmq4']], # seems to hang with nonthreaded perls on freebsd, wait-and-kill rule exists (?)
+      [os_dragonfly,
+       [package => 'libzmq4']],
       [like_debian,
 #       [linuxdistrocodename => [qw(squeeze wheezy jessie)],
 #	[package => []]], # libzmq5 is ZMQ4.1 (!); according to http://zeromq.org/distro:debian only available in experimental (and probably sid)

@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Basic;
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 # ABSTRACT: A simple auth module for a site
 
 #pod =encoding utf8
@@ -337,7 +337,7 @@ sub register {
     $app->helper( 'yancy.auth.get_user' => sub {
         my ( $c, $username ) = @_;
         return $username_field
-            ? $c->yancy->backend->list( $coll, { $username_field => $username }, { limit => 1 } )->{rows}[0]
+            ? $c->yancy->backend->list( $coll, { $username_field => $username }, { limit => 1 } )->{items}[0]
             : $c->yancy->backend->get( $coll, $username );
     } );
     $app->helper( 'yancy.auth.current_user' => sub {
@@ -404,7 +404,7 @@ Yancy::Plugin::Auth::Basic - A simple auth module for a site
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 DESCRIPTION
 

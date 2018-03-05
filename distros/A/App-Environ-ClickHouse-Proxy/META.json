@@ -35,6 +35,7 @@
       "runtime" : {
          "requires" : {
             "App::Environ" : "0.18",
+            "Carp" : "0",
             "Cpanel::JSON::XS" : "0",
             "IO::Socket" : "0",
             "perl" : "5.010001"
@@ -49,6 +50,6 @@
          "web" : "https://github.com/kak-tus/App-Environ-ClickHouse-Proxy"
       }
    },
-   "version" : "0.3",
+   "version" : "0.5",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

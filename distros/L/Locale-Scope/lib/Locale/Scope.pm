@@ -3,14 +3,14 @@ use 5.008005;
 use strict;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use parent qw/Exporter/;
 our @EXPORT_OK = qw/locale_scope/;
 
 use POSIX qw/setlocale/;
 
-sub locale_scope { __PACKAGE__->new(@_) }
+sub locale_scope { unshift @_, __PACKAGE__; goto \&new }
 
 sub new {
     my ($class, $category, $locale) = @_;
@@ -28,6 +28,8 @@ sub DESTROY {
 
 1;
 __END__
+
+=for stopwords setlocale(3)
 
 =encoding utf-8
 

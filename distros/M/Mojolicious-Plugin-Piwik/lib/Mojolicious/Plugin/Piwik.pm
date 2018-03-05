@@ -4,7 +4,7 @@ use Mojo::ByteStream 'b';
 use Mojo::UserAgent;
 use Mojo::IOLoop;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 # Todo:
 # - Better test tracking API support
@@ -45,18 +45,18 @@ sub register {
       # Use opt-out tag
       my %opt;
       if ($_[0] && index(lc $_[0], 'opt-out') == 0) {
-	my $opt_out = shift;
+        my $opt_out = shift;
 
-	# Get iframe content
-	my $cb = ref $_[-1] eq 'CODE' ? pop : 0;
+        # Get iframe content
+        my $cb = ref $_[-1] eq 'CODE' ? pop : 0;
 
-	# Accept parameters
-	%opt = @_;
-	$opt{out} = $opt_out;
-	$opt{cb}  = $cb;
+        # Accept parameters
+        %opt = @_;
+        $opt{out} = $opt_out;
+        $opt{cb}  = $cb;
 
-	# Empty arguments
-	@_ = ();
+        # Empty arguments
+        @_ = ();
       };
 
       my $site_id = shift || $plugin_param->{site_id} || 1;
@@ -65,35 +65,41 @@ sub register {
       # No piwik url
       return b('<!-- No Piwik-URL given -->') unless $url;
 
+      my $prot = 'http';
+
       # Clear url
       for ($url) {
-	s{^https?:/*}{}i;
-	s{piwik\.(?:php|js)$}{}i;
-	s{(?<!/)$}{/};
+        if (s{^http(s?):/*}{}i) {
+          $prot = 'https' if $1;
+        };
+        s{piwik\.(?:php|js)$}{}i;
+        s{(?<!/)$}{/};
       };
 
       # Render opt-out tag
       if (my $opt_out = delete $opt{out}) {
 
-	# Get protocol
-	my $req_url = $c->req->url;
-	my $prot = $req_url->scheme ? lc $req_url->scheme : 'http';
+        # Upgrade protocol if embedded in https page
+        if ($prot ne 'https') {
+          my $req_url = $c->req->url;
+          $prot = $req_url->scheme ? lc $req_url->scheme : 'http';
+        };
 
-	my $cb = delete $opt{cb};
-	my $oo_url = "${prot}://${url}index.php?module=CoreAdminHome&action=optOut";
+        my $cb = delete $opt{cb};
+        my $oo_url = "${prot}://${url}index.php?module=CoreAdminHome&action=optOut";
 
-	if ($opt_out eq 'opt-out-link') {
-	  $opt{href} = $oo_url;
-	  $opt{rel} //= 'nofollow';
-	  return $c->tag('a', %opt, ($cb || sub { 'Piwik Opt-Out' }));
-	};
+        if ($opt_out eq 'opt-out-link') {
+          $opt{href} = $oo_url;
+          $opt{rel} //= 'nofollow';
+          return $c->tag('a', %opt, ($cb || sub { 'Piwik Opt-Out' }));
+        };
 
-	$opt{src} = $oo_url;
-	$opt{width}  ||= '600px';
-	$opt{height} ||= '200px';
-	$opt{frameborder} ||= 'no';
+        $opt{src} = $oo_url;
+        $opt{width}  ||= '600px';
+        $opt{height} ||= '200px';
+        $opt{frameborder} ||= 'no';
 
-	return $c->tag('iframe', %opt, ($cb || sub { '' }));
+        return $c->tag('iframe', %opt, ($cb || sub { '' }));
       };
 
       # Create piwik tag
@@ -106,7 +112,7 @@ d=document,g=d.createElement('script'),s=d.getElementsByTagName('script')[0];
 if(!s){s=d.getElementsByTagName('head')[0].firstChild};
 with(g){type='text/javascript';defer=async=true;
 src=u+'piwik.js';s.parentNode.insertBefore(g,s)}})();</script>
-<noscript><img src="http://${url}piwik.php?idSite=${site_id}&amp;rec=1" alt=""
+<noscript><img src="${prot}://${url}piwik.php?idSite=${site_id}&amp;rec=1" alt=""
 style="border:0" /></noscript>
 SCRIPTTAG
     });
@@ -123,8 +129,9 @@ SCRIPTTAG
       # Get piwik url
       my $url = delete($param->{url}) || $plugin_param->{url};
 
-
-      $url =~ s{^(?:https?:)?//}{}i;
+      if ($url =~ s{^(?:http(s)?:)?//}{}i && $1) {
+        $param->{secure} = 1;
+      };
       $url = ($param->{secure} ? 'https' : 'http') . '://' . $url;
 
       # Create request URL
@@ -132,105 +139,105 @@ SCRIPTTAG
 
       # Site id
       my $site_id = $param->{site_id} ||
-	            $param->{idSite}  ||
-	            $param->{idsite}  ||
-                    $plugin_param->{site_id} || 1;
+        $param->{idSite}  ||
+        $param->{idsite}  ||
+        $plugin_param->{site_id} || 1;
 
       # delete unused parameters
       delete @{$param}{qw/site_id idSite idsite format module method/};
 
       # Token Auth
       my $token_auth = delete $param->{token_auth} ||
-	               $plugin_param->{token_auth} || 'anonymous';
+        $plugin_param->{token_auth} || 'anonymous';
 
       # Tracking API
       if (lc $method eq 'track') {
 
-	$url->path('piwik.php');
+        $url->path('piwik.php');
 
-	# Request Headers
-	my $header = $c->req->headers;
+        # Request Headers
+        my $header = $c->req->headers;
 
-	# Respect do not track
-	return if $header->dnt;
+        # Respect do not track
+        return if $header->dnt;
 
-	# Set default values
-	for ($param)  {
-	  $_->{ua}     //= $header->user_agent if $header->user_agent;
-	  $_->{urlref} //= $header->referrer   if $header->referrer;
-	  $_->{rand}     = int(rand(10_000));
-	  $_->{rec}      = 1;
-	  $_->{apiv}     = 1;
-	  $_->{url}      = delete $_->{action_url} || $c->url_for->to_abs;
+        # Set default values
+        for ($param)  {
+          $_->{ua}     //= $header->user_agent if $header->user_agent;
+          $_->{urlref} //= $header->referrer   if $header->referrer;
+          $_->{rand}     = int(rand(10_000));
+          $_->{rec}      = 1;
+          $_->{apiv}     = 1;
+          $_->{url}      = delete $_->{action_url} || $c->url_for->to_abs;
 
-	  # Todo: maybe make optional with parameter
-	  # $_->{_id} = rand ...
-	};
+          # Todo: maybe make optional with parameter
+          # $_->{_id} = rand ...
+        };
 
-	# Resolution
-	if ($param->{res} && ref $param->{res}) {
-	  $param->{res} = join 'x', @{$param->{res}}[0, 1];
-	};
+        # Resolution
+        if ($param->{res} && ref $param->{res}) {
+          $param->{res} = join 'x', @{$param->{res}}[0, 1];
+        };
 
-	$url->query(
-	  idsite => ref $site_id ? $site_id->[0] : $site_id,
-	  format => 'JSON'
-	);
+        $url->query(
+          idsite => ref $site_id ? $site_id->[0] : $site_id,
+          format => 'JSON'
+        );
 
-	$url->query({token_auth => $token_auth}) if $token_auth;
+        $url->query({token_auth => $token_auth}) if $token_auth;
       }
 
       # Analysis API
       else {
 
-	# Create request method
-	$url->query(
-	  module => 'API',
-	  method => $method,
-	  format => 'JSON',
-	  idSite => ref $site_id ? join(',', @$site_id) : $site_id,
-	  token_auth => $token_auth
-	);
+        # Create request method
+        $url->query(
+          module => 'API',
+          method => $method,
+          format => 'JSON',
+          idSite => ref $site_id ? join(',', @$site_id) : $site_id,
+          token_auth => $token_auth
+        );
 
-	# Urls
-	if ($param->{urls}) {
+        # Urls
+        if ($param->{urls}) {
 
-	  # Urls is arrayref
-	  if (ref $param->{urls}) {
-	    my $i = 0;
-	    foreach (@{$param->{urls}}) {
-	      $url->query({ 'urls[' . $i++ . ']' => $_ });
-	    };
-	  }
+          # Urls is arrayref
+          if (ref $param->{urls}) {
+            my $i = 0;
+            foreach (@{$param->{urls}}) {
+              $url->query({ 'urls[' . $i++ . ']' => $_ });
+            };
+          }
 
-	  # Urls as string
-	  else {
-	    $url->query({urls => $param->{urls}});
-	  };
-	  delete $param->{urls};
-	};
+          # Urls as string
+          else {
+            $url->query({urls => $param->{urls}});
+          };
+          delete $param->{urls};
+        };
 
-	# Range with periods
-	if ($param->{period}) {
+        # Range with periods
+        if ($param->{period}) {
 
-	  # Delete period
-	  my $period = lc delete $param->{period};
+          # Delete period
+          my $period = lc delete $param->{period};
 
-	  # Delete date
-	  my $date = delete $param->{date};
+          # Delete date
+          my $date = delete $param->{date};
 
-	  # Get range
-	  if ($period eq 'range') {
-	    $date = ref $date ? join(',', @$date) : $date;
-	  };
+          # Get range
+          if ($period eq 'range') {
+            $date = ref $date ? join(',', @$date) : $date;
+          };
 
-	  if ($period =~ m/^(?:day|week|month|year|range)$/) {
-	    $url->query({
-	      period => $period,
-	      date   => $date
-	    });
-	  };
-	};
+          if ($period =~ m/^(?:day|week|month|year|range)$/) {
+            $url->query({
+              period => $period,
+              date   => $date
+            });
+          };
+        };
       };
 
       # Todo: Handle Filter
@@ -248,33 +255,33 @@ SCRIPTTAG
 
       # Blocking
       unless ($cb) {
-	my $tx = $ua->get($url);
+        my $tx = $ua->get($url);
 
-	# Return prepared response
-	return _prepare_response($tx->res) if $tx->success;
+        # Return prepared response
+        return _prepare_response($tx->res) if $tx->success;
 
-	return;
+        return;
       }
 
       # Non-Blocking
       else {
 
-	# Create delay object
-	my $delay = Mojo::IOLoop->delay(
-	  sub {
-	    # Return prepared response
-	    my $res = pop->success;
+        # Create delay object
+        my $delay = Mojo::IOLoop->delay(
+          sub {
+            # Return prepared response
+            my $res = pop->success;
 
-	    # Release callback with json object
-	    $cb->( $res ? _prepare_response($res) : {} );
-	  }
-	);
+            # Release callback with json object
+            $cb->( $res ? _prepare_response($res) : {} );
+          }
+        );
 
-	# Get resource non-blocking
-	$ua->get($url => $delay->begin);
+        # Get resource non-blocking
+        $ua->get($url => $delay->begin);
 
-	# Start IOLoop if not started already
-	$delay->wait unless Mojo::IOLoop->is_running;
+        # Start IOLoop if not started already
+        $delay->wait unless Mojo::IOLoop->is_running;
       };
     });
 
@@ -289,6 +296,7 @@ SCRIPTTAG
     }
   );
 };
+
 
 # Treat response different
 sub _prepare_response {
@@ -339,7 +347,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::Piwik - Use Piwik in Mojolicious
+Mojolicious::Plugin::Piwik - Use Matomo (Piwik) in Mojolicious
 
 
 =head1 SYNOPSIS
@@ -360,7 +368,7 @@ Mojolicious::Plugin::Piwik - Use Piwik in Mojolicious
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::Piwik> is a simple plugin for embedding
-L<Piwik|http://piwik.org/> Analysis in your Mojolicious app.
+L<Matomo (Piwik)|https://matomo.org/> Analysis in your Mojolicious app.
 Please respect the privacy of your visitors and do not track
 more information than necessary!
 
@@ -401,7 +409,7 @@ Accepts the following parameters:
 
 =item
 
-C<url> - URL of your Piwik instance.
+C<url> - URL of your Matomo (Piwik) instance.
 
 =item
 
@@ -415,7 +423,8 @@ defaults to C<false> otherwise.
 
 =item
 
-C<token_auth> - Token for authentication. Used only for the Piwik API.
+C<token_auth> - Token for authentication.
+Used only for the Piwik API.
 
 =back
 
@@ -431,6 +440,7 @@ file with the key C<Piwik> or on registration
   %= piwik_tag
   %= piwik_tag 1
   %= piwik_tag 1, 'piwik.khm.li'
+  %= piwik_tag 1, 'https://piwik.khm.li'
 
 Renders a script tag that asynchronously loads the Piwik
 javascript file from your Piwik instance.
@@ -441,24 +451,24 @@ was registered.
 This tag should be included at the bottom
 of the body tag of each website you want to analyse.
 
+The special C<opt-out> tag renders an
+L<iframe|https://matomo.org/faq/general/faq_20000/>
+helping your visitors to disallow tracking via javascript.
+
   %= piwik_tag 'opt-out', width => 400
 
-The special C<opt-out> tag renders an
-L<iframe|http://piwik.org/privacy/#toc-step-3-include-a-web-analytics-opt-out-feature-on-your-site-using-an-iframe>
-helping your visitors to disallow tracking via javascript.
 See the L<default tag helper|Mojolicious::Plugin::TagHelpers/tag>
 for explanation of usage.
-
-  <%= piwik_tag 'opt-out-link', begin %>Opt Out<% end %>
-  # <a href="..." rel="nofollow">Opt Out</a>
 
 The special C<opt-out-link> renders an anchor link
 to the opt-out page to be used if the visitor does
 not allow third party cookies.
+
+  <%= piwik_tag 'opt-out-link', begin %>Opt Out<% end %>
+  # <a href="..." rel="nofollow">Opt Out</a>
+
 See the L<default tag helper|Mojolicious::Plugin::TagHelpers/tag>
 for explanation of usage.
-
-B<The 'opt-out' and 'opt-out-link' options are EXPERIMENTAL and may change in further releases!>
 
 
 =head2 piwik_api
@@ -490,13 +500,15 @@ Sends an API request and returns the response as a hash
 or array reference (the decoded JSON response).
 Accepts the API method, a hash reference
 with request parameters as described in the
-L<Piwik API|http://piwik.org/docs/analytics-api/>, and
+L<Piwik API|https://matomo.org/docs/analytics-api/>, and
 optionally a callback, if the request is meant to be non-blocking.
 
-The L<Tracking API|http://piwik.org/docs/tracking-api/reference/>
+The L<Tracking API|https://matomo.org/docs/tracking-api/reference/>
 uses the method name C<Track> and will forward user agent and
 referrer information based on the controller request as well as the
-url of the requested resource, unless Do-Not-Track is activated.
+url of the requested resource, unless
+L<Do-Not-Track|https://www.eff.org/issues/do-not-track>
+is activated.
 The ip address is not forwarded.
 
   $c->piwik_api(
@@ -525,8 +537,9 @@ Defaults to the url given when the plugin was registered.
 
 =item
 
-C<secure> - Boolean value that indicates a request using the https scheme.
-Defaults to false.
+C<secure> - Boolean value that indicates a request using the C<https> scheme.
+Defaults to false, in case the C<url> is given without or
+with a C<http> scheme.
 
 =back
 
@@ -587,7 +600,7 @@ and run C<make test>, for example:
 
   {
     token_auth => '123456abcdefghijklmnopqrstuvwxyz',
-    url => 'http://piwik.khm.li/',
+    url => 'https://piwik.khm.li/',
     site_id => 1,
     action_url => 'http://khm.li/Test',
     action_name => 'Märchen/Test'
@@ -608,18 +621,18 @@ L<Mojolicious>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2016, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2012-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it and/or
 modify it under the terms of the Artistic License version 2.0.
 
-Please make sure you are using Piwik in compliance to the law.
+Please make sure you are using Matomo (Piwik) in compliance to the law.
 For german users,
-L<this information|https://www.datenschutzzentrum.de/tracking/piwik/>
-(last accessed on 2013-03-03)
+L<this information|https://www.datenschutzzentrum.de/uploads/projekte/verbraucherdatenschutz/20110315-webanalyse-piwik.pdf>
+(last accessed on 2018-02-27)
 may help you to design your service correctly.
 
 This plugin was developed for
-L<khm.li - Kinder- und Hausmärchen der Brüder Grimm|http://khm.li/>.
+L<khm.li - Kinder- und Hausmärchen der Brüder Grimm|https://khm.li/>.
 
 =cut

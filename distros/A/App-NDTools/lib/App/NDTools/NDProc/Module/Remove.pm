@@ -8,8 +8,9 @@ use Log::Log4Cli;
 use Struct::Path 0.80 qw(path);
 use Struct::Path::PerlStyle 0.80 qw(str2path path2str);
 
+our $VERSION = '0.09';
+
 sub MODINFO { "Remove specified parts from structure" }
-sub VERSION { "0.08" }
 
 sub arg_opts {
     my $self = shift;

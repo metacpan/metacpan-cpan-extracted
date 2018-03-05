@@ -89,7 +89,7 @@ sub get {
 
     my ($dirname, $filename) = $self->_sanitize_path( $path );
 
-    if ($dirname) {
+    if ($dirname && $dirname ne '.') {
         $self->log()->debug('Change dir to ' . $dirname );
         if (!$ftp->cwd($dirname)) {
             $self->log()->info("Cannot change working directory $dirname");
@@ -126,7 +126,7 @@ sub get_keys {
 
     my $ftp = $self->_client();
 
-    if ($dirname) {
+    if ($dirname  && $dirname ne '.') {
         $self->log()->debug('Change dir to ' . $dirname );
         if (!$ftp->cwd($dirname)) {
             $self->log()->info("Cannot change working directory $dirname");
@@ -186,7 +186,7 @@ sub set {
     my $tmpdir = tempdir( CLEANUP => 1 );
     my ($fh, $source) = tempfile( DIR => $tmpdir );
 
-    open FILE, ">$source" || die "Unable to open file for writing";
+    open FILE, ">$source" || $self->__log_and_die("Unable to open file for writing");
     print FILE $content;
     close FILE;
 
@@ -194,14 +194,16 @@ sub set {
 
     my ($dirname, $filename) = $self->_sanitize_path( $file, $data );
 
-    if ($dirname) {
+    if ($dirname && $dirname ne '.') {
         $self->log()->debug('Change dir to ' . $dirname );
-        $ftp->cwd($dirname) or die "Cannot change working directory ", $ftp->message;
+        $ftp->cwd($dirname) or
+            $self->__log_and_die('Cannot change working directory: ' . $ftp->message);
     }
 
 
     $self->log()->debug('Send put '. $source . ' => ' . $filename );
-    $ftp->put( $source, $filename) or die "put failed " . $ftp->message;
+    $ftp->put( $source, $filename)
+        or $self->__log_and_die('put failed: ' . $ftp->message);
 
     $ftp->quit;
 
@@ -230,16 +232,14 @@ sub _sanitize_path {
         $self->log()->debug('Process template ' . $pattern);
         $template->process( \$pattern, { ARGS => \@args, DATA => $data }, \$file) || die "Error processing file template.";
         if ($file =~ m{[\/\\]}) {
-            $self->log()->error('Target file name contains directory seperator! Consider using path instead.');
-            die "Target file name contains directory seperator! Consider using path instead.";
+            $self->__log_and_die('Target file name contains directory seperator! Consider using path instead.');
         }
     } else {
         $self->log()->debug('Neither target pattern nor file set, join arguments');
 
         map {
             if ($_ =~ /\.\.|\//) {
-                $self->log()->error("args contains invalid characters (double dot or slash)");
-                die "args contains invalid characters (double dot or slash)";
+                $self->__log_and_die("args contains invalid characters (double dot or slash)");
             }
         } @args;
         $file = join("/", @args);
@@ -265,7 +265,7 @@ sub _client {
         'Passive' => (not $self->active()),
         'Debug' => $self->debug(),
         'Port' => $self->port(),
-        ) or die sprintf("Cannot connect to %s (%s)", $self->LOCATION(), $@);
+    ) or $self->__log_and_die(sprintf("Cannot connect to %s (%s)", $self->LOCATION(), $@));
 
     if ($self->username()) {
         $ftp->login($self->username(),$self->password())
@@ -286,6 +286,16 @@ sub _client {
     }
 
     return $ftp;
+
+}
+
+sub __log_and_die {
+
+    my $self = shift;
+    my $error = shift;
+
+    $self->log()->error($error);
+    die $error;
 
 }
 

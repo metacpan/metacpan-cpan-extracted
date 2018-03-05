@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.001';
+our $VERSION = '2.003';
 
 use Clone           qw( clone );
 use List::MoreUtils qw( any first_index );
@@ -87,7 +87,8 @@ sub on_table {
                 else {
                     $stmt_type = 'Select';
                     $old_idx = 1;
-                    $sql = clone $backup_sql;
+                    #$sql = clone $backup_sql;
+                    $sql = $backup_sql;
                 }
                 next CUSTOMIZE;
             }
@@ -115,6 +116,8 @@ sub on_table {
             if ( ! ( $sql->{select_type} eq '*' || $sql->{select_type} eq 'chosen_cols' ) ) {
                 $ax->reset_sql( $sql );
             }
+            my $prev_chosen_cols = $sql->{chosen_cols};
+            my $prev_select_type = $sql->{select_type};
             $sql->{chosen_cols} = [];
             $sql->{select_type} = 'chosen_cols';
 
@@ -131,7 +134,8 @@ sub on_table {
                         pop @{$sql->{chosen_cols}};
                         next COLUMNS;
                     }
-                    $sql = clone( $backup_sql );
+                    $sql->{chosen_cols} = $prev_chosen_cols;
+                    $sql->{select_type} = $prev_select_type;
                     last COLUMNS;
                 }
                 if ( $chosen_cols[0] eq $sf->{i}{ok} ) {
@@ -152,6 +156,7 @@ sub on_table {
             }
         }
         elsif ( $custom eq $cu{'distinct'} ) {
+            my $prev_distinct_stmt = $sql->{distinct_stmt};
             $sql->{distinct_stmt} = '';
 
             DISTINCT: while ( 1 ) {
@@ -166,7 +171,7 @@ sub on_table {
                         $sql->{distinct_stmt} = '';
                         next DISTINCT;
                     }
-                    $sql = clone( $backup_sql );
+                    $sql->{distinct_stmt} = $prev_distinct_stmt;
                     last DISTINCT;
                 }
                 elsif ( $select_distinct eq $sf->{i}{ok} ) {
@@ -179,6 +184,8 @@ sub on_table {
             if ( $sql->{select_type} eq '*' || $sql->{select_type} eq 'chosen_cols' ) {
                 $ax->reset_sql( $sql );
             }
+            my $prev_aggr_cols   = $sql->{aggr_cols};
+            my $prev_select_type = $sql->{select_type};
             $sql->{aggr_cols} = [];
             $sql->{select_type} = 'aggr_and_group_by_cols';
 
@@ -193,7 +200,8 @@ sub on_table {
                         pop @{$sql->{aggr_cols}};
                         next AGGREGATE;
                     }
-                    $sql = clone( $backup_sql );
+                    $sql->{aggr_cols}   = $prev_aggr_cols;
+                    $sql->{select_type} = $prev_select_type;
                     last AGGREGATE;
                 }
                 if ( $aggr eq $sf->{i}{ok} ) {
@@ -239,6 +247,8 @@ sub on_table {
         }
         elsif ( $custom eq $cu{'set'} ) {
             my $trs = Term::Form->new();
+            my $prev_set_args = $sql->{set_args};
+            my $prev_set_stmt = $sql->{set_stmt};
             my $col_sep = ' ';
             $sql->{set_args} = [];
             $sql->{set_stmt} = " SET";
@@ -255,7 +265,8 @@ sub on_table {
                         ( $sql->{set_args}, $sql->{set_stmt}, $col_sep ) = @{pop @$bu};
                         next SET;
                     }
-                    $sql = clone( $backup_sql );
+                    $sql->{set_args} = $prev_set_args;
+                    $sql->{set_stmt} = $prev_set_stmt;
                     last SET;
                 }
                 if ( $col eq $sf->{i}{ok} ) {
@@ -274,7 +285,8 @@ sub on_table {
                         ( $sql->{set_args}, $sql->{set_stmt}, $col_sep ) = @{pop @$bu};
                         next SET;
                     }
-                    $sql = clone( $backup_sql );
+                    $sql->{set_args} = $prev_set_args;
+                    $sql->{set_stmt} = $prev_set_stmt;
                     last SET;
                 }
                 $sql->{set_stmt} .= ' ' . '?';
@@ -285,6 +297,8 @@ sub on_table {
         elsif ( $custom eq $cu{'where'} ) {
             my @cols = ( @{$sql->{cols}}, @{$sql->{modified_cols}} );
             my $AND_OR = ' ';
+            my $prev_where_args = $sql->{where_args};
+            my $prev_where_stmt = $sql->{where_stmt};
             $sql->{where_args} = [];
             $sql->{where_stmt} = " WHERE";
             my $unclosed = 0;
@@ -306,7 +320,9 @@ sub on_table {
                         ( $sql->{where_args}, $sql->{where_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
                         next WHERE;
                     }
-                    $sql = clone( $backup_sql );
+                    # use of "restore $backup_sql" would be wrong in Delete and Update
+                    $sql->{where_args} = $prev_where_args;
+                    $sql->{where_stmt} = $prev_where_stmt;
                     last WHERE;
                 }
                 if ( $quote_col eq $sf->{i}{ok} ) {
@@ -353,6 +369,9 @@ sub on_table {
             if ( $sql->{select_type} eq '*' || $sql->{select_type} eq 'chosen_cols' ) {
                 $ax->reset_sql( $sql );
             }
+            my $prev_select_type   = $sql->{select_type};
+            my $prev_group_by_stmt = $sql->{group_by_stmt};
+            my $prev_group_by_cols = $sql->{group_by_cols};
             $sql->{group_by_stmt} = " GROUP BY";
             $sql->{group_by_cols} = [];
             $sql->{select_type} = 'aggr_and_group_by_cols';
@@ -370,7 +389,9 @@ sub on_table {
                         $sql->{group_by_stmt} = " GROUP BY " . join ', ', @{$sql->{group_by_cols}};
                         next GROUP_BY;
                     }
-                    $sql = clone( $backup_sql );
+                    $sql->{group_by_stmt} = $prev_group_by_stmt;
+                    $sql->{group_by_cols} = $prev_group_by_cols;
+                    $sql->{select_type}   = $prev_select_type;
                     last GROUP_BY;
                 }
                 if ( $col eq $sf->{i}{ok} ) {
@@ -378,7 +399,9 @@ sub on_table {
                         $sql->{group_by_stmt} = '';
                         if ( ! @{$sql->{aggr_cols}} ) {
                             $sql->{select_type} = '*';
-                            $sql = clone( $backup_sql );
+                            #$sql->{group_by_stmt} = $prev_group_by_stmt; ###
+                            #$sql->{group_by_cols} = $prev_group_by_cols; ###
+                            #$sql->{select_type}   = $prev_select_type;   ###
                             last GROUP_BY;
                         }
                     }
@@ -391,6 +414,8 @@ sub on_table {
         }
         elsif ( $custom eq $cu{'having'} ) {
             my $AND_OR = ' ';
+            my $prev_having_args = $sql->{having_args};
+            my $prev_having_stmt = $sql->{having_stmt};
             $sql->{having_args} = [];
             $sql->{having_stmt} = " HAVING";
             my $unclosed = 0;
@@ -412,7 +437,8 @@ sub on_table {
                         ( $sql->{having_args}, $sql->{having_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
                         next HAVING;
                     }
-                    $sql = clone( $backup_sql );
+                    $sql->{having_args} = $prev_having_args;
+                    $sql->{having_stmt} = $prev_having_stmt;
                     last HAVING;
                 }
                 if ( $aggr eq $sf->{i}{ok} ) {
@@ -499,6 +525,7 @@ sub on_table {
                 }
             }
             my $col_sep = ' ';
+            my $prev_order_by_stmt = $sql->{order_by_stmt};
             $sql->{order_by_stmt} = " ORDER BY";
             my $bu = [];
 
@@ -513,7 +540,7 @@ sub on_table {
                         ( $sql->{order_by_stmt}, $col_sep ) = @{pop @$bu};
                         next ORDER_BY;
                     }
-                    $sql = clone( $backup_sql );
+                    $sql->{order_by_stmt} = $prev_order_by_stmt;
                     last ORDER_BY;
                 }
                 if ( $col eq $sf->{i}{ok} ) {
@@ -538,7 +565,9 @@ sub on_table {
             }
         }
         elsif ( $custom eq $cu{'limit'} ) {
-            $sql->{limit_stmt} = '';
+            my $prev_limit_stmt  = $sql->{limit_stmt};
+            my $prev_offset_stmt = $sql->{offset_stmt};
+            $sql->{limit_stmt}  = '';
             $sql->{offset_stmt} = '';
             my $bu = [];
 
@@ -554,7 +583,8 @@ sub on_table {
                         ( $sql->{limit_stmt}, $sql->{offset_stmt} )  = @{pop @$bu};
                         next LIMIT;
                     }
-                    $sql = clone( $backup_sql );
+                    $sql->{limit_stmt}  = $prev_limit_stmt;
+                    $sql->{offset_stmt} = $prev_offset_stmt;
                     last LIMIT;
                 }
                 if ( $choice eq $sf->{i}{ok} ) {
@@ -604,8 +634,10 @@ sub on_table {
                 if ( $ok ) {
                     $ok = $sf->commit_sql( $sql, [ $stmt_type ], $dbh );
                 }
-                $sql = clone $backup_sql;
                 $stmt_type = 'Select';
+                #$sql = clone $backup_sql;
+                $sql = $backup_sql;
+                next CUSTOMIZE;
             }
             $old_idx = 1;
         }
@@ -664,7 +696,8 @@ sub on_table {
             my $ok = $sf->commit_sql( $sql, [ $stmt_type ], $dbh );
             $stmt_type = 'Select';
             $old_idx = 1;
-            $sql = clone $backup_sql;
+            #$sql = clone $backup_sql;
+            $sql = $backup_sql;
             next CUSTOMIZE;
         }
         else {

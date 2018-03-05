@@ -330,6 +330,9 @@ sub read_conf ($) {
 
     $conf->{colors}{prop_change} //= 'underline';
 
+    $conf->{colors}{success}     //= 'reverse green';
+    $conf->{colors}{failure}     //= 'reverse red';
+
     $KGB::debug = $conf->{debug} if exists $conf->{debug};
     $conf->{pid_dir}
         = Cwd::realpath( $conf->{pid_dir} // '/var/run/kgb-bot' );
@@ -1488,6 +1491,9 @@ C<gitlab_webhook_*> event, asynchronously.
 
 =cut
 
+my @array_webhook_params = qw( channel pipeline_only_status );
+my %array_webhook_params = map( ( $_ => 1 ), @array_webhook_params );
+
 sub webhook_request {
     my ( $request, $response, $dirmatch ) = @_[ ARG0 .. ARG2 ];
 
@@ -1599,15 +1605,12 @@ sub webhook_request {
     KGB->debug('Body check passed');
 
     # form a CGI-like param hash
-    my $param = {};
+    my $param = { map( ( $_ => [] ), @array_webhook_params ) };
     my $uri = URI->new( $request->url );
     my @query = $request->uri->query_form;
     while ( my( $key, $value ) = splice( @query, 0, 2 ) ) {
-        next unless length $value;
-
-        if ( exists $param->{$key} ) {
-            $param->{$key} = [ $param->{$key} ] unless ref $param->{$key};
-            push @{ $param->{$key} }, $value;
+        if ( $array_webhook_params{$key} ) {
+            push @{ $param->{$key} }, $value if length $value;
         }
         else {
             $param->{$key} = $value;
@@ -1616,8 +1619,7 @@ sub webhook_request {
 
     $param->{use_irc_notices} = 1 unless exists $param->{use_irc_notices};
 
-    my @channels = $param->{channel} // ();
-    @channels = @{ $channels[0] } if ref $channels[0];
+    my @channels = @{ $param->{channel} };
     s/^(?!#)/#/ for @channels;
     push @channels, @{ $KGB::config->{broadcast_channels} }
         unless $param->{private};
@@ -1638,12 +1640,21 @@ sub webhook_request {
     return $_[KERNEL]->post( $_[SENDER], DONE => $response );
 }
 
+sub monkey_shorten_git_hashes {
+    my $url = shift;
+
+    $url =~ s/\b[0-9a-f]{7}\K[0-9a-f]{33}\b//g;
+
+    return $url;
+}
+
 my $shortener_loaded = 0;
 
 sub shorten_url {
-    my $service = $KGB::config->{short_url_service} or return shift;
-
     my $url = shift;
+
+    my $service = $KGB::config->{short_url_service}
+        or return monkey_shorten_git_hashes($url);
 
     unless ($shortener_loaded) {
         my $ok = eval {
@@ -1667,13 +1678,13 @@ sub shorten_url {
         KGB->out(
             "Failure while calling URL shortening service '$service' for '$url': $@"
         );
-        return $url;
+        return monkey_shorten_git_hashes($url);
     }
 
     return $short_url if defined($short_url);
 
     KGB->out("URL shortening service '$service' failed to shorten '$url'.");
-    return $url;
+    return monkey_shorten_git_hashes($url);
 }
 
 sub to_irc {
@@ -2328,6 +2339,13 @@ sub gitlab_webhook_pipeline {
 
     my $id = $body->{object_attributes}{id};
     my $status = $body->{object_attributes}{status};
+
+    return
+        if @{ $opts->{pipeline_only_status} }
+        and not grep { $_ eq $status } @{ $opts->{pipeline_only_status} };
+
+    $status = colorize( $status => $status )
+        if $status =~ /^(?:success|failure)$/;
 
     my $log;
     if ( my $duration = $body->{object_attributes}{duration} ) {

@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -23,7 +23,7 @@ use strict;
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 125;
+$VERSION = 126;
 use Math::PlanePath;
 @ISA = ('Math::PlanePath');
 *_divrem_mutate = \&Math::PlanePath::_divrem_mutate;
@@ -36,7 +36,7 @@ use Math::PlanePath::Base::Digits
 use Math::PlanePath::TerdragonCurve;
 
 # uncomment this to run the ### lines
-#use Smart::Comments;
+# use Smart::Comments;
 
 
 use constant n_start => 0;
@@ -130,13 +130,16 @@ sub xy_to_n {
   $x = round_nearest($x);
   $y = round_nearest($y);
 
-  if (($x+$y) % 2) {
-    return undef;
+  {
+    my $sum = 3*$y + $x;
+    if (is_infinite($sum)) { return $sum; }
+    $sum %= 6;
+    unless ($sum == 2 || $sum == 4) { return undef; }
   }
 
   ($x,$y) = (($x-3*$y)/2,   # rotate +60
              ($x+$y)/2);
-  ### rot: "$x,$y"
+  ### rotated: "$x,$y"
 
   my @n_list = $self->Math::PlanePath::TerdragonCurve::xy_to_n_list ($x, $y);
   ### @n_list
@@ -144,6 +147,8 @@ sub xy_to_n {
   my $arms_count = $self->{'arms'};
   foreach my $n (@n_list) {
     my $arm = _divrem_mutate ($n, $arms_count);
+    ### $arm
+    ### remainder: $n
 
     my $mod = $n % 9;
     if ($mod == 2) {
@@ -394,7 +399,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

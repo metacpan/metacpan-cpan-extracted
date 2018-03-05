@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -37,7 +37,7 @@ BEGIN { MyTestHelpers::nowarnings(); }
 # use Smart::Comments '###';
 
 
-my $test_count = (tests => 474)[1];
+my $test_count = (tests => 482)[1];
 plan tests => $test_count;
 
 if (! eval { require Math::BigRat; 1 }) {
@@ -524,6 +524,11 @@ my @modules = (
                'DiagonalsOctant',
                'DiagonalsOctant,direction=up',
                'DiagonalsAlternating',
+
+               'AlternateTerdragon',
+               'AlternateTerdragon,arms=1',
+               'AlternateTerdragon,arms=2',
+               'AlternateTerdragon,arms=6',
 
                'TerdragonMidpoint',
                'TerdragonMidpoint,arms=1',

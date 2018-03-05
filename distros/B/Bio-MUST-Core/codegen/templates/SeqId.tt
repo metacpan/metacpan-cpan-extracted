@@ -599,6 +599,7 @@ sub clean_strain {
     $strain =~ s{\b substr \b}{}xmsgi;
     $strain =~ s{\b strain \b}{}xmsgi;
     $strain =~ s{\b subsp  \b}{}xmsgi;
+    $strain =~ s{\b ssp\.    }{}xmsgi;
     $strain =~ s{\b str    \b}{}xmsgi;
     $strain =~ tr/A-Za-z0-9//cd;        # delete non-alphanumeric chars
 

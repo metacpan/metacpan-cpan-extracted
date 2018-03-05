@@ -4,14 +4,14 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Inline C => 'DATA',
 					LIBS => '-logg -lvorbis -lvorbisfile',
 					INC => '-I/inc',
 					AUTO_INCLUDE => '#include "inc/vcedit.h"',
 					AUTO_INCLUDE => '#include "inc/vcedit.c"',
-					VERSION => '0.05',
+					VERSION => '0.06',
 					NAME => 'Ogg::Vorbis::Header';
 
 # constructors

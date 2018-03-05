@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2015 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2015, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -28,13 +28,11 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
 use Math::PlanePath::PeanoCurve;
+my $peano  = Math::PlanePath::PeanoCurve->new;
+
 use Math::PlanePath::Diagonals;
 use Math::PlanePath::ZOrderCurve;
 
-# uncomment this to run the ### lines
-#use Smart::Comments '###';
-
-my $peano  = Math::PlanePath::PeanoCurve->new;
 
 #------------------------------------------------------------------------------
 # A163334 -- diagonals same axis

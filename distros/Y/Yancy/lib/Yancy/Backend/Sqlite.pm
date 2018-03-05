@@ -1,5 +1,5 @@
 package Yancy::Backend::Sqlite;
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 # ABSTRACT: A backend for SQLite using Mojo::SQLite
 
 #pod =head1 SYNOPSIS
@@ -152,7 +152,7 @@ sub list {
     }
     #; say $query;
     return {
-        rows => $sqlite->db->query( $query, @params )->hashes,
+        items => $sqlite->db->query( $query, @params )->hashes,
         total => $sqlite->db->query( $total_query, @total_params )->hash->{total},
     };
 
@@ -273,7 +273,7 @@ Yancy::Backend::Sqlite - A backend for SQLite using Mojo::SQLite
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

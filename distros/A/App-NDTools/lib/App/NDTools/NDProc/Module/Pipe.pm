@@ -10,8 +10,9 @@ use App::NDTools::Slurp qw(s_decode s_encode);
 use Struct::Path 0.80 qw(path);
 use Struct::Path::PerlStyle 0.80 qw(str2path);
 
+our $VERSION = '0.05';
+
 sub MODINFO { "Modify structure using external process" }
-sub VERSION { "0.04" }
 
 sub arg_opts {
     my $self = shift;

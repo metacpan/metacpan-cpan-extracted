@@ -1,5 +1,5 @@
 package Yancy::Backend::Dbic;
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 # ABSTRACT: A backend for DBIx::Class schemas
 
 #pod =head1 SYNOPSIS
@@ -146,7 +146,7 @@ sub list {
         $rs_opt{ offset } = $opt->{offset};
     }
     my $rs = $self->_rs( $coll, $params, \%rs_opt );
-    return { rows => [ $rs->all ], total => $self->_rs( $coll, $params )->count };
+    return { items => [ $rs->all ], total => $self->_rs( $coll, $params )->count };
 }
 
 sub set {
@@ -236,7 +236,7 @@ Yancy::Backend::Dbic - A backend for DBIx::Class schemas
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

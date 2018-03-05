@@ -4,7 +4,7 @@ require 5.010;
 
 use IO::Handle;
 
-my $VERSION = '3.004';
+my $VERSION = '3.005';
 
 my %prereq =
  ( Carp           => 0
@@ -71,24 +71,36 @@ WriteMakefile
  ( NAME       => 'Mail::Box'
  , VERSION    => $VERSION
  , AUTHOR     => 'Mark Overmeer'
- , ABSTRACT   => 'E-mail handling'
+ , ABSTRACT   => 'complete E-mail handling suite'
  , PREREQ_PM  => \%prereq
- , LICENSE    => 'perl'
+ , LICENSE    => 'perl_5'
+
+ , META_MERGE =>
+      { 'meta-spec' => { version => 2 }
+      , resources  =>
+          { repository =>
+              { type => 'git'
+              , url  => 'https://github.com/markov2/perl5-Mail-Box.git'
+              , web  => 'https://github.com/markov2/perl5-Mail-Box'
+              }
+          , homepage => 'http://perl.overmeer.net/CPAN/'
+          , license  => [ 'http://dev.perl.org/licenses/' ]
+          }
+      }
  );
 
 ### used by oodist during production of distribution
 sub MY::postamble { <<'__POSTAMBLE' }
 
 # for DIST
-RAWDIR          = ../public_html/mailbox/raw
-DISTDIR         = ../public_html/mailbox/source
-EXTENDS         = ../UserIdentity:../MimeTypes:../ORL:../MailTools2:../MailBoxC:../MailMessage:../MailTransport:../MailIMAP:../MailPOP:../MailDbx
+RAWDIR          = ../public_html/mail-box/raw
+DISTDIR         = ../public_html/mail-box/source
+EXTENDS         = ../User-Identity:../MIME-Types:../Object-Realize-Later:../MailTools:../Mail-Box-Parser-C:../Mail-Message:../Mail-Transport:../Mail-Box-IMAP4:../Mail-Box-POP3:../../perl/MailDbx:../HTML-FromMail
 
 # for POD
 FIRST_YEAR      = 2001
-EMAIL           = perl@overmeer.net
-WEBSITE         = http://perl.overmeer.net/mailbox/
-PODTAIL         = ../MailBox-shared-podtail
+EMAIL           = markov@cpan.org
+WEBSITE         = http://perl.overmeer.net/CPAN/
 
 # for HTML
 HTML_OUTPUT     = ../public_html/mailbox/html

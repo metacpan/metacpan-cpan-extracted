@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/karupanerura/Locale-Scope.png?branch=master)](https://travis-ci.org/karupanerura/Locale-Scope)
+[![Build Status](https://travis-ci.org/karupanerura/Locale-Scope.svg?branch=master)](https://travis-ci.org/karupanerura/Locale-Scope)
 # NAME
 
 Locale::Scope - scope based setlocale(3)

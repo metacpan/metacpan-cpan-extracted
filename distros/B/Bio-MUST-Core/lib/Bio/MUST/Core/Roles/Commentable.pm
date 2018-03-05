@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Roles::Commentable;
 # ABSTRACT: Commentable Moose role for storable objects
-$Bio::MUST::Core::Roles::Commentable::VERSION = '0.180230';
+$Bio::MUST::Core::Roles::Commentable::VERSION = '0.180630';
 use Moose::Role;
 
 use autodie;
@@ -64,7 +64,7 @@ Bio::MUST::Core::Roles::Commentable - Commentable Moose role for storable object
 
 =head1 VERSION
 
-version 0.180230
+version 0.180630
 
 =head1 SYNOPSIS
 

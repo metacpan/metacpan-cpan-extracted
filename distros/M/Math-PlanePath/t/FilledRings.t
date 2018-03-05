@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -28,14 +28,12 @@ BEGIN { MyTestHelpers::nowarnings(); }
 
 use Math::PlanePath::FilledRings;
 
-# uncomment this to run the ### lines
-#use Smart::Comments;
 
 #------------------------------------------------------------------------------
 # VERSION
 
 {
-  my $want_version = 125;
+  my $want_version = 126;
   ok ($Math::PlanePath::FilledRings::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::FilledRings->VERSION,  $want_version,

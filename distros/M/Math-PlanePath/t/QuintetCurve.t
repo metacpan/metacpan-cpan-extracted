@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -26,17 +26,14 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 
-# uncomment this to run the ### lines
-#use Smart::Comments;
-
-require Math::PlanePath::QuintetCurve;
+use Math::PlanePath::QuintetCurve;
 
 
 #------------------------------------------------------------------------------
 # VERSION
 
 {
-  my $want_version = 125;
+  my $want_version = 126;
   ok ($Math::PlanePath::QuintetCurve::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::QuintetCurve->VERSION,  $want_version,
@@ -76,7 +73,7 @@ require Math::PlanePath::QuintetCurve;
 # turn sequence
 
 {
-  sub dxdy_to_dir {
+  sub dxdy_to_dir4 {
     my ($dx,$dy) = @_;
     if ($dy == 0) {
       if ($dx == 1) { return 0; }
@@ -100,7 +97,7 @@ require Math::PlanePath::QuintetCurve;
   my ($x, $y) = $path->n_to_xy($n++);
   my $dx = $x - $prev_x;
   my $dy = $y - $prev_y;
-  my $prev_dir = dxdy_to_dir($dx,$dy);
+  my $prev_dir = dxdy_to_dir4($dx,$dy);
 
   while ($n < 1000) {
     $prev_x = $x;
@@ -109,7 +106,7 @@ require Math::PlanePath::QuintetCurve;
     ($x,$y) = $path->n_to_xy($n);
     $dx = $x - $prev_x;
     $dy = $y - $prev_y;
-    my $dir = dxdy_to_dir($dx,$dy);
+    my $dir = dxdy_to_dir4($dx,$dy);
 
     my $want_turn = ($dir - $prev_dir) % 4;
     if ($want_turn == 3) { $want_turn = -1; }

@@ -1,3 +1,8 @@
+0.13 2018-03-04
+ - Drop 4.0 documentation and default to 4.2-4.4 compat
+ - Better formatting for bugs section
+ - gplv2 => gpl_2 for better compatibility
+
 0.12 2014-07-01
  - Default to using modules@bestpractical.com as the author, not the
    individual author

@@ -1,0 +1,27 @@
+.gitignore
+.travis.yml
+Changes
+example/plack-server.psgi
+example/static/index.html
+lib/HTTP/Upload/FlowJs.pm
+lib/HTTP/Upload/FlowJs/Examples.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+README.mkdn
+t/00-load.t
+t/002_http_upload_disallowedContentType.t
+t/003_http_upload_flowjs.t
+t/004_js-config.t
+xt/99-changes.t
+xt/99-compile.t
+xt/99-manifest.t
+xt/99-pod.t
+xt/99-synopsis.t
+xt/99-todo.t
+xt/99-unix-text.t
+xt/99-versions.t
+xt/meta-lint.t

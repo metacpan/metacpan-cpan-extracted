@@ -4,7 +4,7 @@
       "Nils Diewald"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -41,11 +41,8 @@
    "resources" : {
       "license" : [
          "http://www.opensource.org/licenses/artistic-license-2.0"
-      ],
-      "repository" : {
-         "url" : "https://github.com/Akron/Mojolicious-Plugin-Piwik"
-      }
+      ]
    },
-   "version" : "0.19",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.20",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

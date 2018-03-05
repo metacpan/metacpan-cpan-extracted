@@ -2,8 +2,35 @@ package CPAN::Reporter::Smoker::OpenBSD;
 use warnings;
 use strict;
 use Exporter 'import';
-our @EXPORT_OK = qw(is_distro_ok);
-our $VERSION = '0.012'; # VERSION
+use CPAN;
+use CPAN::HandleConfig;
+our @EXPORT_OK = qw(is_distro_ok block_distro);
+our $VERSION = '0.015'; # VERSION
+#
+=pod
+
+=head1 NAME
+
+CPAN::Reporter::Smoker::OpenBSD - set of scripts to manage a CPAN::Reporter::Smoker on OpenBSD
+
+=head1 DESCRIPTION
+
+This module exports some functions used to manage a smoker testing machine based L<CPAN::Reporter>.
+
+
+=head1 EXPORTS
+
+Only the C<sub> C<is_distro_ok> is exported, if explicit requested.
+
+=head2 is_distro_ok
+
+Expects as parameter a string in the format <AUTHOR>/<DISTRIBUTION>.
+
+It executes some very basic testing against the string.
+
+Returns true or false depending if the string passes the tests. It will also C<warn> if things are not going OK.
+
+=cut
 
 sub is_distro_ok {
     my $distro = shift;
@@ -21,15 +48,74 @@ sub is_distro_ok {
     }
 }
 
-=pod
+=head2 block_distro
 
-=head1 NAME
+Blocks a distribution to be tested under the smoker by using a distroprefs file.
 
-CPAN::Reporter::Smoker::OpenBSD - set of scripts to manage a CPAN::Reporter::Smoker on OpenBSD
+Expects as parameters:
 
-=head1 DESCRIPTION
+=over
 
-This module is mainly Pod: you want to take a look at the following programs documentation:
+=item 1.
+
+a distribution name (for example, "JOHNDOE/Some-Distro-Name").
+
+=item 2.
+
+The perl interpreter which is in execution, for example, "perl-5.24.3".
+
+=item 3.
+
+An comment to include in the distroprefs file.
+
+=back
+
+It returns a hash reference containing keys/values that could be directly
+serialized to YAML (or other format) but the C<full_path> key, that contains
+a suggest complete path to the distroprefs file (based on the L<CPAN> C<prefs_dir> configuration
+client.
+
+If there is an already file created as defined in C<full_path> key, it will C<warn> and return C<undef>.
+
+=cut
+
+sub block_distro {
+    my ($distro, $perlbrew_perl, $comment) = @_;
+    my $distribution = '^' . $distro;
+    my $filename     = "$distro.yml";
+    $filename =~ s/\//./;
+
+    my %data = (
+        comment => $comment || 'Tests hang smoker',
+        match   => { distribution  => $distribution, 
+                     env           => { 
+                          PERLBREW_PERL => $perlbrew_perl
+                        },
+                    },
+        disabled => 1
+    );
+
+    CPAN::HandleConfig->load;
+    my $prefs_dir = $CPAN::Config->{prefs_dir};
+    die "$prefs_dir does not exist or it is not readable\n" unless ( -d $prefs_dir );
+    my $full_path = File::Spec->catfile( $prefs_dir, $filename );
+
+    if ( -f $full_path ) {
+        warn "$full_path already exists, will not overwrite it.";
+        return;
+    }
+    else {
+        $data{full_path} = $full_path;
+        return \%data;
+    }
+}
+
+=head1 SEE ALSO
+
+For more details about those programs interact with the smoker and L<CPAN::Reporter>, be sure
+to read the documentation about L<CPAN> client, especially the part about DistroPrefs.
+
+You will also want to take a look at the following programs documentation:
 
 =over
 
@@ -46,18 +132,6 @@ C<perldoc dblock>
 C<perldoc mirror_cleanup>
 
 =back
-
-=head1 EXPORTS
-
-Only the C<sub> C<is_distro_ok> is exported, if explicit requested.
-
-=head2 is_distro_ok
-
-Expects as parameter a string in the format <AUTHOR>/<DISTRIBUTION>.
-
-It executes some very basic testing against the string.
-
-Returns true or false depending if the string passes the tests. It will also C<warn> if things are not going OK.
 
 =head1 AUTHOR
 

@@ -4,8 +4,8 @@ use warnings;
 use Test::More tests => 29;
 
 BEGIN {
-  use_ok("XML::RSS");
-  use_ok("POSIX");
+    use_ok("XML::RSS");
+    use_ok("POSIX");
 }
 
 use constant DATE_TEMPLATE_LONG  => "%Y-%m-%dT%H:%M:%S%z";
@@ -42,53 +42,53 @@ is( $rss->{'xml:base'}, RSS_XML_BASE, 'Base is ' . RSS_XML_BASE );
 # are required.
 
 ok( $rss->channel(
-		 'title'        => "Test 2.0 Feed",
-		 'link'         => "http://example.com/",
-		 'description'  => "",
-		 'language'     => 'en-us',
-		 copyright      => 'Copyright 2002',
-		 pubDate        => $current_date,
-		 lastBuildDate  => $current_date,
-		 docs           => 'http://backend.userland.com/rss',
-		 managingEditor => 'editor\@example.com',
-		 webMaster      => 'webmaster\@example.com',
-		 category       => 'MyCategory',
-		 ttl            => '60',
-		 'generator'    => 'XML::RSS Test',
-		), "Set RSS channel" );
+        'title'        => "Test 2.0 Feed",
+        'link'         => "http://example.com/",
+        'description'  => "",
+        'language'     => 'en-us',
+        copyright      => 'Copyright 2002',
+        pubDate        => $current_date,
+        lastBuildDate  => $current_date,
+        docs           => 'http://backend.userland.com/rss',
+        managingEditor => 'editor\@example.com',
+        webMaster      => 'webmaster\@example.com',
+        category       => 'MyCategory',
+        ttl            => '60',
+        'generator'    => 'XML::RSS Test',
+    ), "Set RSS channel" );
 
 ok($rss->image(
-	       title       => 'Test Image',
-	       url         => 'http://example.com/example.gif',
-	       'link'      => 'http://example.com/',
-	       description => 'Test Image',
-	       height      => '25',
-	       weight      => '144',
-	      ), "Set RSS image" );
+        title       => 'Test Image',
+        url         => 'http://example.com/example.gif',
+        'link'      => 'http://example.com/',
+        description => 'Test Image',
+        height      => '25',
+        weight      => '144',
+    ), "Set RSS image" );
 
 ok($rss->textinput(
-		   title       => 'Search',
-		   description => 'Search for an example',
-		   name        => 'q',
-		   'link'      => 'http://example.com/search.pl',
-		  ), "Set RSS text input" );
+        title       => 'Search',
+        description => 'Search for an example',
+        name        => 'q',
+        'link'      => 'http://example.com/search.pl',
+    ), "Set RSS text input" );
 
 ok($rss->add_item(
-		  title       => RSS_ITEM_TITLE,
-		  'link'      => RSS_ITEM_LINK,
-		  description => RSS_ITEM_DESC,
-		  author      => RSS_CREATOR,
-		  category    => 'MyCategory',
-		  comments    => "http://example.com/$short_date/comments.html",
-		  permaLink   => "http://example.com/$short_date",
-		  pubDate     => $pub_date,
-		  source      => 'my brain',
-		  sourceUrl   => 'http://example.com',
-		  enclosure   => { type=>"application/x-bittorrent", url => 'http://127.0.0.1/torrents/The_Passion_of_Dave_Winer.torrent' },
-		 ), "Set one RSS item" );
+        title       => RSS_ITEM_TITLE,
+        'link'      => RSS_ITEM_LINK,
+        description => RSS_ITEM_DESC,
+        author      => RSS_CREATOR,
+        category    => 'MyCategory',
+        comments    => "http://example.com/$short_date/comments.html",
+        permaLink   => "http://example.com/$short_date",
+        pubDate     => $pub_date,
+        source      => 'my brain',
+        sourceUrl   => 'http://example.com',
+        enclosure   => { type=>"application/x-bittorrent", url => 'http://127.0.0.1/torrents/The_Passion_of_Dave_Winer.torrent' },
+    ), "Set one RSS item" );
 
 ok( $rss->add_module( prefix => RSS_MOD_PREFIX, uri => RSS_MOD_URI ),
-	"Added module: " . RSS_MOD_PREFIX );
+"Added module: " . RSS_MOD_PREFIX );
 
 my $uri = RSS_MOD_URI;
 
@@ -105,10 +105,10 @@ ok( $rss->save(RSS_SAVEAS), "Wrote to disk: " . RSS_SAVEAS );
 
 my $file_contents;
 {
-    local $/;
-    open I, "<", RSS_SAVEAS();
-    $file_contents = <I>;
-    close(I);
+local $/;
+open I, "<", RSS_SAVEAS();
+$file_contents = <I>;
+close(I);
 }
 
 is($file_contents,$as_string,RSS_SAVEAS." contains the as_string() result");
@@ -118,14 +118,14 @@ eval { $rss->parsefile( RSS_SAVEAS ) };
 is( $@, '', "Parsed " . RSS_SAVEAS );
 
 is( $rss->{channel}->{lastBuildDate}, $current_date,
-       "Last built: " . $current_date );
+"Last built: " . $current_date );
 
 is( $rss->{channel}->{category}, 'MyCategory', 'channel->{category}');
 
 is( $rss->{'xml:base'}, RSS_XML_BASE, 'Base has been reparsed');
 
 cmp_ok( keys %{ $rss->{namespaces} }, ">=", 1,
-       "RSS feed has at least one namespace");
+"RSS feed has at least one namespace");
 
 my $prefix = RSS_BLOGCHANNEL_PREFIX;
 ok( exists $rss->{namespaces}->{$prefix}, "$prefix namespace is registered" );
@@ -146,7 +146,7 @@ is( $rss->{items}->[0]->{author},      RSS_CREATOR,    RSS_CREATOR    );
 
 eval
 {
-    $rss->save(".");
+$rss->save(".");
 };
 
 ok ($@ =~ m{\ACannot open file \. for write},

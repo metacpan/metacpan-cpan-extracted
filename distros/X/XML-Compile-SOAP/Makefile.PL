@@ -1,8 +1,8 @@
 use ExtUtils::MakeMaker;
 
-use 5.008;
+use 5.010;
 
-my $version = '3.22';
+my $version = '3.23';
 
 my $prereq =
    { XML::Compile         => '1.58'
@@ -51,18 +51,31 @@ __CHANGES_307
 }
 
 WriteMakefile
- ( NAME	 	=> 'XML::Compile::SOAP'
- , VERSION	=> $version
- , PREREQ_PM    => $prereq
- , AUTHOR       => 'Mark Overmeer'
- , ABSTRACT     => 'SOAP version 1.1'
- , LICENSE      => 'perl'
+ ( NAME	      => 'XML::Compile::SOAP'
+ , VERSION    => $version
+ , PREREQ_PM  => $prereq
+ , AUTHOR     => 'Mark Overmeer <markov@cpan.org>'
+ , ABSTRACT   => 'SOAP version 1.1'
+ , LICENSE    => 'perl_5'
+
+ , META_MERGE =>
+      { 'meta-spec' => { version => 2 }
+      , resources  =>
+          { repository =>
+              { type => 'git'
+              , url  => 'https://github.com/markov2/perl5-XML-Compile-SOAP.git'
+              , web  => 'https://github.com/markov2/perl5-XML-Compile-SOAP'
+              }
+          , homepage => 'http://perl.overmeer.net/CPAN/'
+          , license  => [ 'http://dev.perl.org/licenses/' ]
+          }
+      }
  );
 
 ### used by oodist during production of distribution
 sub MY::postamble { <<'__POSTAMBLE' }
 
-EXTENDS		= ../XMLCompile:../XMLDaemon:../XMLTester:../XMLCache:../XMLWSDL:../XMLSOAP12:../XMLSOAPEv:../XMLWSA
+EXTENDS		= ../XML-Compile:../../perl/XMLDaemon:../../perl/XMLTester:../XML-Compile-Cache:../../perl/XMLWSDL:../../perl/XMLSOAP12:../../perl/XMLSOAPEv:../../perl/XMLWSA
 
 # for DIST
 RAWDIR          = ../public_html/xml-compile-soap/raw
@@ -71,7 +84,7 @@ SKIP_LINKS      = XML::LibXML
 
 # for POD
 FIRST_YEAR      = 2007
-EMAIL           = perl@overmeer.net
-WEBSITE         = http://perl.overmeer.net/xml-compile/
-PODTAIL	        = ../XML-shared-podtail
+EMAIL           = markov@cpan.org
+WEBSITE         = http://perl.overmeer.net/CPAN/
+
 __POSTAMBLE

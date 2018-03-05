@@ -1,7 +1,7 @@
 package App::ShellCompleter::perlbrew;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2018-03-04'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -32,60 +32,62 @@ sub list_available_perls {
     }
     my $available = File::Slurper::read_text($tmp_path);
     my @res;
-    for (split /^/, $available) {
-        s/^[i ] //;
-        chomp;
-        push @res, $_;
+    for my $line (split /^/, $available) {
+        $line =~ s/\s+(available from|INSTALLED on).+//;
+        $line =~ s/^i?\s*//;
+        chomp $line;
+        push @res, $line;
     }
     @res;
 }
 
 sub list_available_perl_versions {
     my @res;
-    for (list_available_perls()) {
-        s/\D+(?=\d)//;
-        push @res, $_;
+    for my $line (list_available_perls()) {
+        $line =~ s/\D+(?=\d)//;
+        push @res, $line;
     }
     @res;
 }
 
 sub list_installed_perls {
     my @res;
-    for (split /^/, `perlbrew list`) {
-        s/^[* ] //;
-        s/ \(.+\)$//; # alias
-        chomp;
-        push @res, $_;
+    for my $line (split /^/, `perlbrew list`) {
+        $line =~ s/\s+\(installed on.+?\)//;
+        $line =~ s/^\s*[* ] //;
+        $line =~ s/ \(.+\)$//; # alias
+        chomp $line;
+        push @res, $line;
     }
     @res;
 }
 
 sub list_installed_perl_versions {
     my @res;
-    for (list_installed_perls()) {
-        next unless /\d/;
-        s/\D+(?=\d)//;
-        push @res, $_;
+    for my $line (list_installed_perls()) {
+        next unless $line =~ /\d/;
+        $line =~ s/\D+(?=\d)//;
+        push @res, $line;
     }
     @res;
 }
 
 sub list_perl_aliases {
     my @res;
-    for (split /^/, `perlbrew list`) {
-        s/^[* ] //;
-        s/ \(.+\)$// or next; # alias
-        chomp;
-        push @res, $_;
+    for my $line (split /^/, `perlbrew list`) {
+        $line =~ s/^[* ] //;
+        $line =~ s/ \(.+\)$// or next; # alias
+        chomp $line;
+        push @res, $line;
     }
     @res;
 }
 
 sub list_perl_libs {
     my @res;
-    for (split /^/, `perlbrew lib list`) {
-        chomp;
-        push @res, $_;
+    for my $line (split /^/, `perlbrew lib list`) {
+        chomp $line;
+        push @res, $line;
     }
     @res;
 }
@@ -156,7 +158,7 @@ App::ShellCompleter::perlbrew - Shell completion for perlbrew
 
 =head1 VERSION
 
-This document describes version 0.007 of App::ShellCompleter::perlbrew (from Perl distribution App-ShellCompleter-perlbrew), released on 2017-07-10.
+This document describes version 0.008 of App::ShellCompleter::perlbrew (from Perl distribution App-ShellCompleter-perlbrew), released on 2018-03-04.
 
 =head1 SYNOPSIS
 
@@ -190,7 +192,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

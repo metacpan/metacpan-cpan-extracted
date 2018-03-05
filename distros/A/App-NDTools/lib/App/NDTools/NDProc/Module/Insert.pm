@@ -9,8 +9,9 @@ use Scalar::Util qw(looks_like_number);
 use Struct::Path 0.80 qw(path);
 use Struct::Path::PerlStyle 0.80 qw(str2path);
 
+our $VERSION = '0.13';
+
 sub MODINFO { "Insert value into structure" }
-sub VERSION { "0.12" }
 
 sub arg_opts {
     my $self = shift;

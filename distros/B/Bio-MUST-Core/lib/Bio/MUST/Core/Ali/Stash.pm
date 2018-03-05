@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Ali::Stash;
 # ABSTRACT: Thin wrapper for an indexed Ali read from disk
-$Bio::MUST::Core::Ali::Stash::VERSION = '0.180230';
+$Bio::MUST::Core::Ali::Stash::VERSION = '0.180630';
 use Moose;
 use namespace::autoclean;
 
@@ -75,14 +75,10 @@ sub load {
     my $infile = shift;
     my $args   = shift // {};           # HashRef (should not be empty...)
 
-    ### Loading database <$infile>...
-    ### Please be patient...
     my $seqs = Ali->load($infile);
        $seqs->dont_guess;
-    ### Done!
 
     if ( $args->{truncate_ids} ) {
-        ### Truncating ids on first whitespace...
         my $mapper = $seqs->regex_mapper( q{}, $DEF_ID );
         $seqs->shorten_ids($mapper);
     }
@@ -103,7 +99,7 @@ Bio::MUST::Core::Ali::Stash - Thin wrapper for an indexed Ali read from disk
 
 =head1 VERSION
 
-version 0.180230
+version 0.180630
 
 =head1 SYNOPSIS
 
@@ -154,8 +150,8 @@ residing on disk and cannot be altered once loaded. Its sequences are supposed
 not to be aligned but aligned FASTA files are also processed correctly. By
 default, the full-length sequence ids are indexed. If the first word of each
 id (non-whitespace containing string or accession) is unique across the
-database, it can be used instead via the C<truncate_ids> option of the C<load>
-method (see the SYNOPSIS for an example).
+database, it can be used instead via the option C<<truncate_ids => 1>> of the
+C<load> method (see the SYNOPSIS for an example).
 
 While this class is more efficient than the standard C<Ali>, it is way slower
 at reading large sequence databases than specialized external programs such as

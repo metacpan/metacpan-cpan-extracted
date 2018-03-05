@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use GD::Graph::lines;
+use Lingua::EN::Opinion;
+use List::Util qw( min max );
+use Math::CMA qw( central_moving_averages );
+
+my $input_file = shift || die "Usage: perl $0 /some/file.txt\n";
+my $cma        = shift || 0;  # To use central_moving_averages
+my $param      = shift || 1;  # distance for cma, bins for averaged_score
+my $width      = shift || 800;
+my $height     = shift || 400;
+
+my $opinion = Lingua::EN::Opinion->new( file => $input_file );
+
+$opinion->analyze();
+
+my $averaged = $cma ? [ central_moving_averages( $param, $opinion->scores ) ]
+                    : $opinion->averaged_score($param);
+
+my @data = ( 
+    [ 1 .. @$averaged ],
+    $averaged,
+);
+
+my $graph = GD::Graph::lines->new( $width, $height );
+
+$graph->set( 
+    x_label     => 'Sentence',
+    y_label     => 'Negative/Positive',
+    title       => 'Emotion Over Time',
+    transparent => 0,
+    dclrs       => [qw( black )],
+    y_max_value => max( @$averaged ),
+    y_min_value => min( @$averaged ),
+);
+
+my $gd = $graph->plot(\@data);
+
+print $gd->png;

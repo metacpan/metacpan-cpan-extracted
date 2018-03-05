@@ -1,5 +1,5 @@
-=== README for Any-Daemon-HTTP version 0.26
-=   Generated on Mon Sep 19 23:18:45 2016 by OODoc 2.02
+=== README for Any-Daemon-HTTP version 0.27
+=   Generated on Sun Mar  4 12:24:55 2018 by OODoc 2.02
 
 There are various ways to install this module:
 
@@ -9,16 +9,16 @@ There are various ways to install this module:
  (2) if you use Windows, have a look at http://ppm.activestate.com/
 
  (3) if you have downloaded this module manually (as root/administrator)
-       gzip -d Any-Daemon-HTTP-0.26.tar.gz
-       tar -xf Any-Daemon-HTTP-0.26.tar
-       cd Any-Daemon-HTTP-0.26
+       gzip -d Any-Daemon-HTTP-0.27.tar.gz
+       tar -xf Any-Daemon-HTTP-0.27.tar
+       cd Any-Daemon-HTTP-0.27
        perl Makefile.PL
        make          # optional
        make test     # optional
        make install
 
 For usage, see the included manual-pages or
-    http://search.cpan.org/dist/Any-Daemon-HTTP-0.26/
+    http://search.cpan.org/dist/Any-Daemon-HTTP-0.27/
 
 Please report problems to
     http://rt.cpan.org/Dist/Display.html?Queue=Any-Daemon-HTTP

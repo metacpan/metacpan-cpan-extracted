@@ -37,7 +37,7 @@ WriteMakefile(
         'Hash::Merge::Extra'        => 0.06,
         'IPC::Run3'                 => 0,
         'JSON'                      => 0,
-        'Log::Log4Cli'              => "0.20",
+        'Log::Log4Cli'              => 0.21,
         'Module::Find'              => 0,
         'Struct::Diff'              => 0.94,
         'Struct::Path'              => 0.81,
@@ -49,10 +49,3 @@ WriteMakefile(
     test  => { TESTS => 't/*.t t/lib/*.t t/bin/*.t' },
 );
 
-sub MY::postamble {
-    return <<'EXTRA';
-
-PATH := $(shell pwd -P):$(PATH)
-
-EXTRA
-}

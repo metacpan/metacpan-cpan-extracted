@@ -32,31 +32,8 @@
             font-size: .75rem;
             text-transform: uppercase;
         }
-
-        @media (min-width: 575.98px) {
-            /* Force sidebar to always be open on larger screens */
-            #sidebar-collapse.collapse {
-                display: block;
-            }
-        }
-
-        @media (max-width: 575.98px) {
-            .sidebar {
-                position: absolute;
-                top: 0;
-                left: 0;
-                bottom: auto;
-                right: 0;
-                padding-top: 0;
-                z-index: 10;
-                box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .1);
-            }
-            .sidebar-collapse {
-                height: 0;
-            }
-            main {
-                margin-top: 66px;
-            }
+        .sidebar .sidebar-top {
+            display: none;
         }
 
         .data-table tbody tr:nth-child( even ) > div {
@@ -83,13 +60,15 @@
             display: none;
         }
 
-        .markdownEditor {
+        .markdown-editor-panels {
+            width: calc( 100% - 2px );
             height: 50vh;
             border: 1px solid #ccc;
             border-radius: .25em;
         }
 
-        .markdownEditor textarea, .markdownEditor div {
+        .markdown-editor-panels > div,
+        .markdown-editor-panels > textarea {
             display: inline-block;
             width: 49%;
             height: 100%;
@@ -99,7 +78,7 @@
             overflow: scroll;
         }
 
-        .markdownEditor textarea {
+        div.markdown-editor-panels > textarea {
             border: none;
             border-right: 1px solid #ccc;
             resize: none;
@@ -114,13 +93,64 @@
         .is-invalid + .invalid-feedback {
             display: block;
         }
+
+        @media (min-width: 575.98px) {
+            /* Force sidebar to always be open on larger screens */
+            #sidebar-collapse.collapse {
+                display: block;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .markdown-preview {
+                display: none;
+            }
+            .markdown-editor .collapse {
+                display: inline-block;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .sidebar {
+                position: absolute;
+                top: 0;
+                left: 0;
+                bottom: auto;
+                right: 0;
+                padding-top: 0;
+                z-index: 10;
+                box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .1);
+            }
+            .sidebar-collapse {
+                height: 0;
+            }
+            .sidebar .sidebar-top {
+                display: flex;
+            }
+            main {
+                margin-top: 66px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            div.markdown-editor-panels > div,
+            div.markdown-editor-panels > textarea {
+                display: block;
+                width: 100%;
+            }
+            div.markdown-editor-panels > div.collapse,
+            div.markdown-editor-panels > textarea.collapse {
+                display: none;
+            }
+        }
+
     </style>
 % end
 
 <main id="app" class="container-fluid">
 
     <div class="sidebar col-sm-3 col-md-3 col-lg-2">
-        <div class="bg-dark p-2 justify-content-between d-sm-none d-flex">
+        <div class="bg-dark p-2 justify-content-between sidebar-top">
             <button class="btn btn-outline-light" type="button"
                 data-toggle="collapse" data-target="#sidebar-collapse"
                 aria-controls="sidebar-collapse" aria-expanded="false"
@@ -223,7 +253,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <template v-for="( row, i ) in rows">
+                    <template v-for="( row, i ) in items">
                     <tr :class="openedRow == i ? 'open' : ''">
                         <!-- <td style="width: 2em"><input type="checkbox"></td> -->
                         <td style="width: 5em">
@@ -247,7 +277,7 @@
                                 <h4 class="alert-heading">Error Saving Item</h4>
                                 <p class="mb-0">Error from server: {{ error.saveItem }}</p>
                             </div>
-                            <item-form v-if="openedRow == i" v-model="rows[i]"
+                            <item-form v-if="openedRow == i" v-model="items[i]"
                                 :schema="operations['set'].schema"
                                 @close="toggleRow(i)" @input="saveItem(i)"
                                 :error="formError"
@@ -258,7 +288,7 @@
                 </tbody>
             </table>
 
-            <p v-if="rows.length == 0">
+            <p v-if="items.length == 0">
                 No items found.
                 <a href="#" @click.prevent="showAddItem()">Create an item</a>.
             </p>
@@ -389,9 +419,18 @@
                 > No
             </label>
         </div>
-        <div v-if="fieldType == 'markdown'" class="markdownEditor">
-            <textarea v-model="$data._value" @change="input"></textarea>
-            <div v-html="html"></div>
+        <div v-if="fieldType == 'markdown'" class="markdown-editor">
+            <div class="markdown-editor-button-bar mb-1">
+                <button type="button" class="btn btn-outline-secondary markdown-preview"
+                    :class="{active:showHtml}" @click.prevent="showHtml = !showHtml"
+                >
+                    Preview
+                </button>
+            </div>
+            <div class="markdown-editor-panels">
+                <textarea v-model="$data._value" @change="input" :class="{collapse:showHtml}"></textarea>
+                <div v-html="html" :class="{collapse:!showHtml}"></div>
+            </div>
         </div>
     </div>
 </template>

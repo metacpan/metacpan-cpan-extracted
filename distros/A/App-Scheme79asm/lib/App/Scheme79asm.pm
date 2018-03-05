@@ -8,7 +8,7 @@ use Data::Dumper qw/Dumper/;
 use Data::SExpression qw/consp scalarp/;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 our %TYPES = (
 	LIST => 0,
@@ -32,7 +32,7 @@ our %TYPES = (
 	CONS => 3,
 	ATOM => 4,
 	PROGN => 5,
-	MAKELIST => 6,
+	'REVERSE-LIST' => 6,
 	FUNCALL => 7,
 );
 
@@ -77,6 +77,7 @@ sub process {
 		die "Type is not a number or symbol: $type\n"
 	}
 
+	$addr += (1 << $self->{addr_bits}) if $addr < 0;
 	die "Type too large: $type\n" unless $type < (1 << $self->{type_bits});
 	die "Addr too large: $addr\n" unless $addr < (1 << $self->{addr_bits});
 	my $result = ($type << $self->{addr_bits}) + $addr;
@@ -115,14 +116,26 @@ sub new {
 	$args{addr_bits} //= 8;
 	$args{freeptr} //= 6;
 	$args{memory} //= [0, 0, (1<<$args{addr_bits}), (1<<$args{addr_bits}), 0, 0, 0];
-	$args{symbols}{NIL} = 0;
-	$args{symbols}{T} = 1;
-	$args{nsymbols} = 2;
+	$args{symbols}{T} = 2;
+	$args{nsymbols} = 3;
 	$args{comment} = ['(cdr part of NIL)', '(car part of NIL)', '(cdr part of T)', '(car part of T)', '(free storage pointer)', '', '(result of computation)'];
 	bless \%args, $class
 }
 
-sub print {
+sub print_binary16 {
+	my ($self, $fh) = @_;
+	$fh //= \*STDOUT;
+
+	die "addr_bits + type_bits >= 16\n"if $self->{addr_bits} + $self->{type_bits} > 16;
+
+	my $length = @{$self->{memory}};
+	print $fh pack('n', $length);
+	for (@{$self->{memory}}) {
+		print $fh pack('n', $_)
+	}
+}
+
+sub print_verilog {
 	my ($self, $fh) = @_;
 	$fh //= \*STDOUT;
 
@@ -141,13 +154,20 @@ sub print {
 		$index = sprintf $index_format, $index;
 		say $fh "mem[$index] <= $val;$spaces // $comment"
 	}
-}
 
-sub parse_and_print {
+}
+sub parse_and_print_binary16 {
 	my ($self, $string, $fh) = @_;
 	$self->parse($string);
 	$self->finish;
-	$self->print($fh);
+	$self->print_binary16($fh);
+}
+
+sub parse_and_print_verilog {
+	my ($self, $string, $fh) = @_;
+	$self->parse($string);
+	$self->finish;
+	$self->print_verilog($fh);
 }
 
 1;
@@ -163,7 +183,7 @@ App::Scheme79asm - assemble sexp to Verilog ROM for SIMPLE processor
 
   use App::Scheme79asm;
   my $asm = App::Scheme79asm->new(type_bits => 3, addr_bits => 5);
-  $asm->parse_and_print('(number 70)');
+  $asm->parse_and_print_verilog('(number 70)');
 
 =head1 DESCRIPTION
 
@@ -235,7 +255,7 @@ The available primitives are:
 
 =item PROGN
 
-=item MAKELIST
+=item REVERSE-LIST
 
 =item FUNCALL
 
@@ -280,11 +300,12 @@ comment for C<< $memory->[$i] >>.
 =item symbols
 
 The initial symbol map, as a hashref from symbol name to the index of
-that symbol. Defaults to C<< {NIL => 0, T => 1} >>.
+that symbol. Defaults to C<< {T => 2} >>.
 
 =item nsymbols
 
-The number of distinct symbols in the initial symbols map (default 2).
+The number to give to the "next" symbol (default 3, because T is
+defined to be 2).
 
 =back
 
@@ -300,15 +321,29 @@ Move the last pointer to position 5, and put the free pointer at
 position 4. After all sequences of S-expressions have been given to
 B<parse>, this method should be called.
 
-=item $asm->B<print>([I<$fh>])
+=item $asm->B<print_binary16>([I<$fh>])
+
+Print the length of the memory (as a big-endian 16-bit value),
+followed by the memory contents as a sequence of big-endian 16-bit
+values to the given filehandle (default STDOUT). Dies if
+C<addr_bits + type_bits> is more than 16.
+
+Big-endian 16-bit values can be decoded with C<unpack 'n', $value>.
+
+=item $asm->B<print_verilog>([I<$fh>])
 
 Print a block of Verilog code assigning the memory contents to an
 array named C<mem> to the given filehandle (default STDOUT).
 
-=item $asm->B<parse_and_print>(I<$string>[, I<$fh>])
+=item $asm->B<parse_and_print_binary16>(I<$string>[, I<$fh>])
 
 Convenience method that calls B<parse>($string), B<finish>, and then
-B<print>($fh).
+B<print_binary16>($fh).
+
+=item $asm->B<parse_and_print_verilog>(I<$string>[, I<$fh>])
+
+Convenience method that calls B<parse>($string), B<finish>, and then
+B<print_verilog>($fh).
 
 =back
 

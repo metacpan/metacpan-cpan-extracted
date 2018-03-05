@@ -1,5 +1,9 @@
 Revision history for perl distribution App-proxyforurl
 
+0.07 2018-03-03T15:33:27+0100
+ - Fix pure-min.css URL
+ - Fix loading application in tests
+
 0.06 2016-12-11T09:53:45+0100
  - Fix dnsDomainIs() should not use a regex matcher #2
 

@@ -12,8 +12,9 @@ use Storable qw(dclone);
 use Struct::Path 0.80 qw(implicit_step path);
 use Struct::Path::PerlStyle 0.80 qw(str2path path2str);
 
+our $VERSION = '0.15';
+
 sub MODINFO { "Merge structures according provided rules" }
-sub VERSION { "0.14" }
 
 sub arg_opts {
     my $self = shift;

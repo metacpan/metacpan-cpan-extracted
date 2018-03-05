@@ -6,14 +6,14 @@ use Hashids::Util ':all';
 use Moo;
 use namespace::clean;
 
-our $VERSION = "1.001000";
+our $VERSION = "1.001001";
 
 has salt => ( is => 'ro', default => '' );
 
 has minHashLength => (
     is  => 'ro',
     isa => sub {
-        croak "$_[0] must be a positive number" unless $_[0] =~ /^\d+$/;
+        croak "$_[0] must be a positive number" unless $_[0] =~ /^[0-9]+$/;
     },
     default => 0
 );
@@ -128,7 +128,7 @@ sub encode {
     my ( $self, @num ) = @_;
 
     return '' unless @num;
-    map { return '' unless defined and /^\d+$/ } @num;
+    map { return '' unless defined and /^[0-9]+$/ } @num;
 
     my $num = [ map { bignum($_) } @num ];
 

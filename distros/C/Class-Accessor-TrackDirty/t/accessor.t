@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use lib '.';
 use t::TestEntity;
 use Test::More;
 

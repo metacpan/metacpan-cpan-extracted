@@ -1,6 +1,7 @@
 use Test::Most tests => 2;
 use Test::MockObject;
 
+use HTTP::Caching::DeprecationWarning ':hide';
 use HTTP::Caching;
 
 $HTTP::Caching::DEBUG = 0; # so we get nice helpful messages back

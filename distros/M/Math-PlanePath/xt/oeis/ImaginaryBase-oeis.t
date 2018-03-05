@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013 Kevin Ryde
+# Copyright 2012, 2013, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -31,9 +31,6 @@ use Math::PlanePath::ImaginaryBase;
 use Math::PlanePath::Diagonals;
 use Math::PlanePath::Base::Digits
   'bit_split_lowtohigh';
-
-# uncomment this to run the ### lines
-# use Smart::Comments '###';
 
 
 #------------------------------------------------------------------------------

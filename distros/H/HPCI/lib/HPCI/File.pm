@@ -7,10 +7,13 @@ use warnings;
 use strict;
 use Carp;
 use Data::Dumper;
+use YAML qw/LoadFile DumpFile/;
+use Digest::MD5::File qw(file_md5_hex);
 
 use Moose;
 
 use MooseX::Types::Path::Class qw(Dir File);
+use Moose::Util::TypeConstraints;
 
 =head1 NAME
 
@@ -35,6 +38,12 @@ default, and additionally, the files attribute can contain a
 C<fileclass> component that over-rides either of those defaults for
 the one stage.
 
+=head1 ATTRIBUTES
+
+=head2 file
+
+The name of the file.
+
 =cut
 
 has 'file' => (
@@ -43,11 +52,145 @@ has 'file' => (
     coerce  => 1
 );
 
+=head2 abs_file
+
+The absolute pathname of the file. Not fully used yet.
+
+=cut
+
+has 'abs_file' => (
+    is       => 'ro',
+    isa      => File,
+    lazy     => 1,
+    init_arg => undef,
+    default  => sub { $_[0]->file->absolute },
+);
+
 use overload '""' => '_stringify';
 
 sub _stringify {
-    "" . (shift->file);
+    # "" . (shift->file);
+    "" . (shift->abs_file);
 }
+
+
+=head2 sum
+
+Boolean, indicates whether checksums are used for this file.  If they are,
+the checksum is kept in a YAML file B<file>.sum.  This YAML file contains
+an array of hashes.  Each hash has the keys 'type' and 'sum'. For each checksum
+type requested (default is 'md5' at present, will expand to include 'sha1' in
+the future) there is an entry in the array containing the checksum computed for
+the corresponding method.
+
+=cut
+
+has 'sum' => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => '',
+);
+
+has '_sum_file' => (
+    is       => 'ro',
+    isa      => File,
+    lazy     => 1,
+    init_arg => undef,
+    coerce   => 1,
+    default  => sub {
+        my $self = shift;
+        # return undef unless $self->sum;
+        my $file = $self->file;
+        my $dir  = $file->dir;
+        my $base = $file->basename;
+        return "$dir/$base.sum";
+    },
+);
+
+=head2 sum_generate_in
+
+A boolean value, default is false.
+
+Specifies the action taken if the file is used for input and the
+B<file>.sum checksum file is either not present or if it is older than B<file>.
+
+When B<false> is specified, the stage is failed.
+
+When B<TRUE> is specified, the checksum is computed and B<FILE>.sum is saved,
+and then the stage is allowed to run normally.
+
+The default is B<FALSE> to ensure that changes to input data files are
+done deliberately - an accidental edit should be considered an error.
+
+You would set the value to B<TRUE> when first receiving a newly downloaded
+file from an outside source.  When a file is created as an 'out' file, the
+sum is always created (if the B<sum> attribute is true), so the default of
+B<FALSE> does not cause problems for later stages.
+
+=cut
+
+has 'sum_generate_in' => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => 0,
+);
+
+=head2 sum_validate_in
+
+This can be given a string ('timestamp', 'once', 'always') to indicate how
+vigourously the checksum is validated.
+
+The default is 'once'.
+
+The setting 'timestamp' accepts the file as valid if the B<file>.sum files exists
+and is newer than B<file>.  (If it is older, then B<sum_generate_in> controls
+how it is handled.)
+
+The setting 'once' loads the B<file>.sum data, and verifies the checksum(s)
+explicitly the first time the file is used for input, but accepted as valid
+after that point of the tiemstamps have not changed.  (This avoids recomputing
+the checksum(s) for every stage that reuses the same file.
+
+The setting 'always' validates the checksum(s) for every stage that uses the
+file.
+
+=cut
+
+enum 'ValidateIn', [qw(timestamp once always)];
+
+has 'sum_validate_in' => (
+    is      => 'ro',
+    isa     => 'ValidateIn',
+    default => 'once',
+);
+
+has '_sum_info' => (
+    is      => 'rw',
+    isa     => 'Maybe[ArrayRef[HashRef]]',
+);
+
+has '_sum_status' => (
+    is       => 'ro',
+    isa      => 'HashRef',
+    default  => sub { return {} },
+    init_arg => undef,
+);
+
+has 'stage'  => (
+    is       => 'ro',
+    isa      => 'Object',
+    required => 1,
+    weak_ref => 1,
+    handles  => {
+        debug      => 'debug',
+        info       => 'info',
+        warn       => 'warn',
+        error      => 'error',
+        fatal      => 'fatal',
+
+        _file_info => '_file_info',
+    },
+);
 
 =pod
 
@@ -139,26 +282,90 @@ sub has_shared_working_storage {
     1;
 }
 
-sub exists {
+sub exists_base_file {
     my $self = shift;
     my $stat = $self->file->stat;
-    $stat && -e $stat
+    return $stat && -e $stat;
 }
 
-# sub exists_script {
-    # return "-e $_[0]";
-# }
+sub exists_valid_sum {
+    my $self = shift;  # the file for $self must exists
+    $self->sum or return 1;  # if sum is turned off, it is valid by default
+    my $file  = $self->file;
+    my $fts   = file_timestamp( $file );
+    my $sfile = $self->_sum_file;
+    my $sts   = file_timestamp( $sfile );
+    my $fi    = $self->_file_info->{"".$self->file} //= {};
+    if ($sts && $sts <= $fts) {
+        # sum file is up to date - determie whether we need to validate the value this time
+        my $vi = $self->sum_validate_in;
+        return 1 if $vi eq 'timestamp';
+        return 1 if $vi eq 'once' && exists $fi->{sum_ts} && $fi->{sum_ts} == $sts;
+        my $filesum = $fi->{sum} //= LoadFile($sfile);
+        $fi->{sum_ts} = $sts;
+        $self->_croak( "sum file ($sfile): multiple checksum types not supported yet" )
+            if 1 != scalar @$filesum;
+        my $type = $filesum->[0]{type};
+        my $sum  = $filesum->[0]{sum};
+        $self->_croak( "sum file ($sfile): checksum type other than MD5 ($type) not supported yet" )
+            if $type ne 'MD5';
+        my $actsum = file_md5_hex($self->file);
+        if ($sum ne $actsum) {
+            $self->error( "sum file ($sfile): computed checksum does not match" );
+            return 0;
+        }
+        return 1;
+    }
+    else {
+        # sum file missing or old - determine whether to (re)create it or abort
+        if ($self->sum_generate_in) {
+            my $filesum = $fi->{sum} = [];
+            $filesum->[0]{type} = 'MD5';
+            $filesum->[0]{sum}  = file_md5_hex($self->file);
+            DumpFile( $sfile, $filesum );
+            $fi->{sum_ts} = file_timestamp( $sfile );
+            $self->warn( "sum file ($sfile): (re-)generated sum for input file" );
+            return 1;
+        }
+        else {
+            $self->error( "sum file ($sfile): missing or out of date" );
+            return 0;
+        }
+    }
+}
 
-sub timestamp {
+sub valid_in_file {
     my $self = shift;
-    my $stat = $self->file->stat // return undef;
+    return $self->exists_base_file && $self->exists_valid_sum;
+}
+
+sub exists_out_file {
+    my $self = shift;
+    return $self->exists_base_file;
+}
+
+sub file_timestamp {
+    my $file = shift;
+    my $stat = $file->stat // return undef;
     -e $stat ? -M $stat : undef;
 }
 
-# do nothing for the normal case
-# but over-ride to copy when long-term storage is not working storage
+sub timestamp {
+    file_timestamp( $_[0]->file );
+}
+
+# generate a sum file is desired
+# but extend to copy when long-term storage is not working storage
 sub accepted_for_out {
-    1;
+    my $self = shift;
+    if ($self->sum) {
+        my $info = {};
+        my $sfile = $self->_sum_file;
+        $info->{type} = 'MD5';
+        $info->{sum}  = file_md5_hex($self->file);
+        DumpFile( $sfile, [ $info ] );
+        $self->info( "sum file ($sfile): generated sum for output file" );
+    }
 }
 
 sub delete {
@@ -179,7 +386,7 @@ use Moose::Util::TypeConstraints;
 
 sub generator {
 	my ($class,@args) = @_;
-	return sub { $class->new( file => $_[0], @args ) };
+	return sub { $class->new( file => @_, @args ) };
 }
 
 subtype 'HPCIFileGen',

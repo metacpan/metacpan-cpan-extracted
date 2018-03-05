@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Inline::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,5 +20,7 @@ no_index:
 requires:
   Inline: '0.44'
   Inline::C: '0'
-version: '0.05'
+resources:
+  repository: https://github.com/davorg/Ogg-Vorbis-Header.git
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

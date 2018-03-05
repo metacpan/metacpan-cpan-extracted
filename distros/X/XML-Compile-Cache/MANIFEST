@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 lib/XML/Compile/Cache.pm
 lib/XML/Compile/Cache.pod
 t/01use.t

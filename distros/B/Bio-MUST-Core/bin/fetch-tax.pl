@@ -57,7 +57,22 @@ if (@ARGV_levels) {
 
 ### --item-type: $ARGV_item_type
 
+# method and anon sub dispatch tables...
+# ... for reading infiles
 my $method = $ARGV_from_must ? 'load_lis' : 'load';
+
+# .. and for fetching taxon_ids from items
+my %fetch_from = (
+    mustid => sub { map { $tax->get_taxid_from_seq_id($_)   } @_ },
+    baseid => sub { map { $tax->get_taxid_from_seq_id($_)   }
+                    map { $_ . '@1'                         } @_ },
+    gi     => sub { map { $tax->get_taxid_from_seq_id($_)   }
+                    map { $_ =~ $PKEYONLY ? 'gi|' . $_ : $_ } @_ },
+            # we let ..._from_seq_id doing the GI number parsing
+    name   => sub { map { $tax->get_taxid_from_name(  $_)   } @_ },
+            # we directly use ..._from_name to use the whole item
+    taxid  => sub { @_ },
+);
 
 for my $infile (@ARGV_infiles) {
 
@@ -73,31 +88,10 @@ for my $infile (@ARGV_infiles) {
         $_
     } $list->all_ids;
 
-    # tweak list items to suit mapping methods then fetch taxon_ids
-    my @taxon_ids;
-    given ($ARGV_item_type) {
-        when ('mustid') {
-            @taxon_ids = map { $tax->get_taxid_from_seq_id($_)   } @items;
-        }
-        when ('baseid') {
-            @taxon_ids = map { $tax->get_taxid_from_seq_id($_)   }
-                         map { $_ . '@1'                         } @items;
-        }
-        when ('gi')     {
-            @taxon_ids = map { $tax->get_taxid_from_seq_id($_)   }
-                         map { $_ =~ $PKEYONLY ? 'gi|' . $_ : $_ } @items;
-        }       # we let ..._from_seq_id doing the GI number parsing
-        when ('name')   {
-            @taxon_ids = map { $tax->get_taxid_from_name(  $_)   } @items;
-        }       # we directly use ..._from_name to use the whole item
-        when ('taxid')  {
-            @taxon_ids =                                           @items;
-        }
-    }
-
     my @rows;
 
-    # fetch and assemble taxonomy lines
+    # fetch taxon_ids and assemble taxonomy lines
+    my @taxon_ids = $fetch_from{$ARGV_item_type}->(@items);
     my $ea = each_array @items, @taxon_ids;
     while (my ($item, $taxon_id) = $ea->() ) {
 
@@ -113,8 +107,9 @@ for my $infile (@ARGV_infiles) {
 
                 # build base MUST id...
                 $must_id = SeqId->new_with(
-                    org      => $org,
-                    taxon_id => $taxon_id
+                    org         => $org,
+                    taxon_id    => $taxon_id,
+                    keep_strain => $ARGV_keep_strain,
                 )->full_id;
 
                 # ... and NCBI lineage
@@ -156,9 +151,6 @@ for my $infile (@ARGV_infiles) {
     say {$out} join $sep, @{$_} for @rows;
 }
 
-
-# TODO: add option keep-strain!
-
 __END__
 
 =pod
@@ -169,7 +161,7 @@ fetch-tax.pl - Fetch information from the NCBI Taxonomy database
 
 =head1 VERSION
 
-version 0.180230
+version 0.180630
 
 =head1 USAGE
 
@@ -233,6 +225,12 @@ L<setup-taxdir.pl> for details).
 =for Euclid: str.type:       /mustid|baseid|name|taxid|gi/
     str.type.error: <str> must be one of mustid, baseid, name, taxid or gi (not str)
     str.default:    'mustid'
+
+=item --keep-strain
+
+Include the NCBI strain in the generated mustid [default: no]. The original
+strain is slightly transformed and stripped of its non-alphanumeric characters
+for maximal compatibility with other software.
 
 =item --missing=<str>
 

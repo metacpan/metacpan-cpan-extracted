@@ -3,33 +3,38 @@ abstract: 'Mail::Box connector via POP3'
 author:
   - 'Mark Overmeer'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Mail-Box-POP3
 no_index:
   directory:
     - t
     - inc
 requires:
-  Carp: 0
-  Digest::MD5: 0
-  File::Basename: 0
-  File::Spec: 0
-  IO::Socket: 0
-  List::Util: 0
-  Mail::Box::FastScalar: 3
-  Mail::Box::Net: 3
-  Mail::Box::Parser::Perl: 3
-  Mail::Box::Test: 3
-  Mail::Reporter: 3
-  Mail::Transport::Receive: 3
-  Socket: 0
-  Test::More: 0
-version: 3.003
+  Carp: '0'
+  Digest::MD5: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  IO::Socket: '0'
+  List::Util: '0'
+  Mail::Box::FastScalar: '3'
+  Mail::Box::Net: '3'
+  Mail::Box::Parser::Perl: '3'
+  Mail::Box::Test: '3'
+  Mail::Reporter: '3'
+  Mail::Transport::Receive: '3'
+  Socket: '0'
+  Test::More: '0'
+resources:
+  homepage: http://perl.overmeer.net/CPAN/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/markov2/perl5-Mail-Box-POP3.git
+version: '3.004'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

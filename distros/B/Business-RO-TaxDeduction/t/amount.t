@@ -43,18 +43,39 @@ subtest 'Test for persons number range' => sub {
 
     ok $ded = Business::RO::TaxDeduction::Amount->new(
         persons => 0,
+        year    => 2016,
         ), 'new instance';
     is $ded->amount, 300, '2016 and 0 persons';
 
     ok $ded = Business::RO::TaxDeduction::Amount->new(
         persons => 4,
+        year    => 2016,
         ), 'new instance';
     is $ded->amount, 800, '2016 and 4 persons';
 
     ok $ded = Business::RO::TaxDeduction::Amount->new(
         persons => 5,
+        year    => 2016,
         ), 'new instance';
     is $ded->amount, 800, '2016 and 5 persons';
+
+    ok $ded = Business::RO::TaxDeduction::Amount->new(
+        persons => 0,
+        year    => 2018,
+        ), 'new instance';
+    is $ded->amount, 510, '2018 and 0 persons';
+
+    ok $ded = Business::RO::TaxDeduction::Amount->new(
+        persons => 4,
+        year    => 2018,
+        ), 'new instance';
+    is $ded->amount, 1310, '2018 and 4 persons';
+
+    ok $ded = Business::RO::TaxDeduction::Amount->new(
+        persons => 5,
+        year    => 2018,
+        ), 'new instance';
+    is $ded->amount, 1310, '2018 and 5 persons';
 };
 
 done_testing;

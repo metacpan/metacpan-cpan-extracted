@@ -45,9 +45,12 @@ my $build = Module::Build->new(
         meta_merge => {
             resources =>
             {
-                repository => "git://github.com/davorg/perlanet.git",
-                homepage => "http://code.mag-sol.com/Perlanet/",
-                MailingList => "http://lists.mag-sol.com/mailman/listinfo/perlanet",
+		repository => {
+                type => 'git',
+                    url  => 'git://github.com/davorg/perlanet.git',
+                    web  => 'https://github.com/davorg/perlanet',
+                },
+                homepage => "http://perlanet.mag-sol.com/",
             },
             keywords =>
             [

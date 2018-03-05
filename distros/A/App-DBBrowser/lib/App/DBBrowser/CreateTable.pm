@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.001';
+our $VERSION = '2.003';
 
 use File::Basename qw( basename );
 use List::Util     qw( none any );
@@ -77,6 +77,7 @@ sub __table_name {
     TABLENAME: while ( 1 ) {
         my $trs = Term::Form->new( 'tn' );
         my $info = 'DB: ' . basename( $data->{db} );
+        # filename
         # Readline
         $table = $trs->readline( 'Table name: ' );
         if ( ! length $table ) {
@@ -109,7 +110,7 @@ sub create_new_table {
     my %cu = ( create_table_plain      => '- plain',
                create_table_form_copy  => '- Copy & Paste',
                create_table_form_file  => '- From File',
-               settings                => '  Settings'
+               settings                => '  SETTINGS'
     );
     my $old_idx = 0;
 

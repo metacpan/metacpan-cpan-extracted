@@ -1,5 +1,10 @@
 Revision history for Text::Template
 
+1.51  2018-03-04
+    - Add test for nested tags breakage that happened in v1.46
+    - Turn off strict+warnings in sections where template code is eval'ed
+      [github #9]
+
 1.50  2018-02-10
   *** Revert support for identical start/end delimiters (e.g.: @@foo@@, XXfooXX)
       due to breakage with nested tags (see

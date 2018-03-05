@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Digest::SHA();
 use MIME::Base64();
-use Test::More tests => 320;
+use Test::More tests => 330;
 use Cwd();
 use Firefox::Marionette qw(:all);
 use Config;
@@ -15,11 +15,26 @@ use HTTP::Response();
 my $segv_detected;
 my $at_least_one_success;
 
+my $test_time_limit = 80;
+
+sub out_of_time {
+	diag("Testing has been running for " . (time - $^T) . " seconds");
+	if (time - $^T > $test_time_limit) {
+		return 1;
+	} else {
+		return;
+	}
+}
+
 sub start_firefox {
 	my ($require_visible, %parameters) = @_;
 	my $skip_message;
 	if ($segv_detected) {
 		$skip_message = "Previous SEGV detected.  Trying to shutdown tests as fast as possible";
+		return ($skip_message, undef);
+	}
+	if (out_of_time()) {
+		$skip_message = "Running out of time.  Trying to shutdown tests as fast as possible";
 		return ($skip_message, undef);
 	}
         my $firefox;
@@ -320,13 +335,13 @@ SKIP: {
 SKIP: {
 	my $daemon = HTTP::Daemon->new() || die "Failed to create HTTP::Daemon";
 	my $localPort = URI->new($daemon->url())->port();
-	my $proxy = Firefox::Marionette::Proxy->new( type => 'manual', http => 'localhost:' . $localPort, https => 'proxy.example.org:4343', ftp => 'ftp.example.org:2121', none => [ 'local.example.org' ], socks => 'socks.example.org:1081' );
+	my $proxy = Firefox::Marionette::Proxy->new( http => 'localhost:' . $localPort, https => 'proxy.example.org:4343', ftp => 'ftp.example.org:2121', none => [ 'local.example.org' ], socks => 'socks.example.org:1081' );
 	($skip_message, $firefox) = start_firefox(0, debug => 1, sleep_time_in_ms => 5, profile => $profile, capabilities => Firefox::Marionette::Capabilities->new(proxy => $proxy, moz_headless => 1, accept_insecure_certs => 1, page_load_strategy => 'eager', moz_webdriver_click => 1, moz_accessibility_checks => 1));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 17);
+		skip($skip_message, 18);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to known values");
 	ok($firefox->sleep_time_in_ms() == 5, "\$firefox->sleep_time_in_ms() is 5 milliseconds");
@@ -440,7 +455,7 @@ SKIP: {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 232);
+		skip($skip_message, 238);
 	}
 	ok($firefox, "Firefox has started in Marionette mode without defined capabilities, but with a defined profile and debug turned off");
 	ok($firefox->go(URI->new("https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html")), "https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html has been loaded");
@@ -497,7 +512,7 @@ SKIP: {
 		chomp $@;
 		if ($firefox->addons()) {
 			diag("\$firefox->switch_to_window(\$window_id) is not working for $major_version.$minor_version:$@");
-			skip("\$firefox->switch_to_window(\$window_id) is not working for $major_version.$minor_version:$@", 213);
+			skip("\$firefox->switch_to_window(\$window_id) is not working for $major_version.$minor_version:$@", 219);
 		}
 	};
 	ok($result, "\$firefox->switch_to_window() used to move back to the original window:$@");
@@ -509,7 +524,7 @@ SKIP: {
 		local $TODO = "Switch to shadow root can be broken";
 		ok($element, "Switched to target1 shadow root");
 	}
-	ok($firefox->find('//frame[@name="target1"]')->switch_to_frame(), "Switched to target1 frame");
+	ok($firefox->list('//frame[@name="target1"]')->switch_to_frame(), "Switched to target1 frame");
 	ok($firefox->active_frame()->isa('Firefox::Marionette::Element'), "\$firefox->active_frame() returns a Firefox::Marionette::Element object");
 	ok($firefox->switch_to_parent_frame(), "Switched to parent frame");
 	foreach my $handle ($firefox->close_current_chrome_window_handle()) {
@@ -765,10 +780,19 @@ SKIP: {
 	my $css_rule;
 	ok($css_rule = $firefox->find('//input[@id="search-input"]')->css('display'), "The value of the css rule 'display' is '$css_rule'");
 	ok($result = $firefox->find('//input[@id="search-input"]')->is_enabled() =~ /^[01]$/, "is_enabled returns 0 or 1:$result");
+	eval { $firefox->is_enabled({}) };
+	ok((ref $@ eq 'Firefox::Marionette::Exception'), "is_enabled throws exception for bad parameters:$@");
 	ok($result = $firefox->find('//input[@id="search-input"]')->is_displayed() =~ /^[01]$/, "is_displayed returns 0 or 1:$result");
+	eval { $firefox->is_displayed({}) };
+	ok((ref $@ eq 'Firefox::Marionette::Exception'), "is_displayed throws exception for bad parameters:$@");
 	ok($result = $firefox->find('//input[@id="search-input"]')->is_selected() =~ /^[01]$/, "is_selected returns 0 or 1:$result");
+	eval { $firefox->is_selected({}) };
+	ok((ref $@ eq 'Firefox::Marionette::Exception'), "is_selected throws exception for bad parameters:$@");
 	ok($firefox->find('//input[@id="search-input"]')->clear(), "Clearing the element directly");
+	ok((!defined $firefox->find_id('search-input')->attribute('value')) && ($firefox->find_id('search-input')->property('value') eq ''), "Initial property and attribute values are empty for 'search-input'");
 	ok($firefox->find('//input[@id="search-input"]')->send_keys('Test::More'), "Sent 'Test::More' to the 'search-input' field directly to the element");
+	ok(!defined $firefox->find_id('search-input')->attribute('value'), "attribute for 'search-input' is still not defined ");
+	ok($firefox->find_id('search-input')->property('value') eq 'Test::More', "property for 'search-input' is now 'Test::More'");
 	ok($firefox->find('//input[@id="search-input"]')->clear(), "Clearing the element directly");
 	foreach my $element ($firefox->find_elements('//input[@id="search-input"]')) {
 		ok($firefox->send_keys($element, 'Test::More'), "Sent 'Test::More' to the 'search-input' field via the browser");
@@ -845,16 +869,28 @@ SKIP: {
 	my $cookie = Firefox::Marionette::Cookie->new(name => 'BonusCookie', value => 'who really cares about privacy', expiry => time + 500000);
 	ok($firefox->add_cookie($cookie), "\$firefox->add_cookie() adds a Firefox::Marionette::Cookie without a domain");
 	ok($firefox->find_id('search-input')->clear()->find_id('search-input')->type('Test::More'), "Sent 'Test::More' to the 'search-input' field directly to the element");
+	if (out_of_time()) {
+		skip("Running out of time.  Trying to shutdown tests as fast as possible", 31);
+	}
 	foreach my $element ($firefox->find_name('lucky')) {
+		local $SIG{ALRM} = sub { die "alarm during clicking download\n" };
+		alarm 15;
+		my $result;
 		eval {
-			ok($firefox->click($element), "Clicked the \"I'm Feeling Lucky\" button");
+			$result = $firefox->click($element);
+			alarm 0;
 		} or do {
+			alarm 0;
 			if ($@ =~ /^(Firefox exited with a 11|Firefox killed by a SEGV signal \(11\))/) {
 				$segv_detected = 1;
 				diag(qq[SEGV crash when pressing "I'm feeling Lucky" on metacpan.org:$@]);
 				skip("Firefox crashed during navigation to a new page", 31);
-			}	
+			} elsif ($@ =~ /alarm during clicking download/) {
+				diag(qq[Timeout when pressing "I'm feeling Lucky" on metacpan.org:$@]);
+				skip("Firefox timeout during navigation to a new page", 31);
+			}
 		};
+		ok($result, "Clicked the \"I'm Feeling Lucky\" button");
 	}
 	ok($firefox->bye(sub { $firefox->find_id('search-input') })->await(sub { $firefox->find_partial('Download') })->click(), "Clicked on the download link");
 	while(!$firefox->downloads()) {
@@ -984,17 +1020,26 @@ SKIP: {
 }
 
 SKIP: {
+	local %ENV = %ENV;
+	my $localPort = 8080;
+	$ENV{http_proxy} = 'https://localhost:' . $localPort;
+	$ENV{https_proxy} = 'https://proxy2.example.org:4343';
+	$ENV{ftp_proxy} = 'ftp://ftp2.example.org:2121';
 	($skip_message, $firefox) = start_firefox(1, visible => 1);
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 7);
+		skip($skip_message, 11);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with visible set to 1");
 	my $capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 	ok(!$capabilities->moz_headless(), "\$capabilities->moz_headless() is set to false");
+	ok($capabilities->proxy()->type() eq 'manual', "\$capabilities->proxy()->type() is 'manual'");
+	ok($capabilities->proxy()->http() eq 'localhost:' . $localPort, "\$capabilities->proxy()->http() is 'localhost:" . $localPort . "':" . $capabilities->proxy()->http());
+	ok($capabilities->proxy()->https() eq 'proxy2.example.org:4343', "\$capabilities->proxy()->https() is 'proxy2.example.org:4343'");
+	ok($capabilities->proxy()->ftp() eq 'ftp2.example.org:2121', "\$capabilities->proxy()->ftp() is 'ftp2.example.org:2121'");
 	SKIP: {
 		if ((exists $ENV{XAUTHORITY}) && (defined $ENV{XAUTHORITY}) && ($ENV{XAUTHORITY} =~ /xvfb/smxi)) {
 			skip("Unable to change firefox screen size when xvfb is running", 3);	

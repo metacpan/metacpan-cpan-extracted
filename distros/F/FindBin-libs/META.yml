@@ -1,13 +1,13 @@
 ---
 abstract: "locate and a 'use lib' or export  directories based on $FindBin::Bin."
 author:
-  - unknown
+  - 'Steven Lembark <lembark@wrkhors.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,13 +19,14 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  Cwd: '0'
+  Cwd: '3.73'
   File::Spec: '0'
   File::Temp: '0'
   FindBin: '0'
   List::Util: '0'
+  Module::FromPerlVer: '0.000005'
   Symbol: '0'
   Test::More: '0'
   strict: '0'
-version: 2.1502
+version: 2.016002
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

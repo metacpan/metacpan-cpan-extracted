@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
   "NAME" => "CPAN::Reporter::Smoker::OpenBSD",
   "PREREQ_PM" => {
     "CPAN" => 0,
+    "CPAN::HandleConfig" => 0,
     "CPAN::Mini" => "1.111016",
     "DBI" => "1.636",
     "Exporter" => 0,
@@ -41,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Warnings" => "0.026"
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.015",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +51,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "CPAN" => 0,
+  "CPAN::HandleConfig" => 0,
   "CPAN::Mini" => "1.111016",
   "DBI" => "1.636",
   "Exporter" => 0,

@@ -1,0 +1,53 @@
+---
+abstract: 'HTTP Client for Firebase Cloud Messaging'
+author:
+  - 'xaicron <xaicron@gmail.com>'
+build_requires:
+  Test::Fake::HTTPD: '0'
+  Test::More: '0.98'
+  Test::SharedFork: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.16, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-FCM-HTTP
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WWW::FCM::HTTP:
+    file: lib/WWW/FCM/HTTP.pm
+    version: '0.01'
+  WWW::FCM::HTTP::Constants:
+    file: lib/WWW/FCM/HTTP/Constants.pm
+  WWW::FCM::HTTP::Response:
+    file: lib/WWW/FCM/HTTP/Response.pm
+  WWW::FCM::HTTP::Response::Result:
+    file: lib/WWW/FCM/HTTP/Response/Result.pm
+  WWW::FCM::HTTP::Response::ResultSet:
+    file: lib/WWW/FCM/HTTP/Response/ResultSet.pm
+requires:
+  Class::Accessor::Lite: '0'
+  JSON: '0'
+  LWP::ConnCache: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/xaicron/p5-WWW-FCM-HTTP/issues
+  homepage: https://github.com/xaicron/p5-WWW-FCM-HTTP
+  repository: git://github.com/xaicron/p5-WWW-FCM-HTTP.git
+version: '0.01'
+x_authority: cpan:XAICRON
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

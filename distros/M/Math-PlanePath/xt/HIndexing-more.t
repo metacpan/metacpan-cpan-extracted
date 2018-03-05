@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2014 Kevin Ryde
+# Copyright 2014, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -29,9 +29,6 @@ use lib 't','xt';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
-
-# uncomment this to run the ### lines
-#use Smart::Comments '###';
 
 
 #------------------------------------------------------------------------------

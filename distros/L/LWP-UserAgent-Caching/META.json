@@ -41,6 +41,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.05",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/THEMA-MEDIA/LWP-UserAgent-Caching.git",
+         "web" : "https://github.com/THEMA-MEDIA/LWP-UserAgent-Caching"
+      }
+   },
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

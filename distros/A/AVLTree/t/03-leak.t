@@ -5,7 +5,7 @@ use strict;
 use warnings FATAL => 'all';
 
 use constant HAS_LEAKTRACE => eval{ require Test::LeakTrace };
-use Test::More HAS_LEAKTRACE ? (tests => 9) : (skip_all => 'require Test::LeakTrace');
+use Test::More HAS_LEAKTRACE ? (tests => 10) : (skip_all => 'require Test::LeakTrace');
 use Test::LeakTrace;
 use Carp;
 
@@ -95,5 +95,20 @@ no_leaks_ok {
   $tree->remove({ id => 1 }); # unsuccessful removal
   $tree->remove({ id => 10 }); # successful removal
 } 'After inserting&removing';
+
+no_leaks_ok {
+  my $tree = AVLTree->new(\&cmp_custom);
+  map { $tree->insert($_) }
+    ({ id => 10, data => 'ten' },
+     { id => 20, data => 'twenty' },
+     { id => 30, data => 'thirty' },
+     { id => 40, data => 'forty' },
+     { id => 50, data => 'fifty' },
+     { id => 25, data => 'twneryfive' });  
+
+  my $item = $tree->first;
+  while ($item = $tree->next) {}
+} 'Tree traversal';
+
 
 diag( "Testing memory leaking AVLTree $AVLTree::VERSION, Perl $], $^X" );

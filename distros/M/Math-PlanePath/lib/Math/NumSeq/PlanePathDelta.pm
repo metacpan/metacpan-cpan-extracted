@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -41,7 +41,7 @@ use Carp 'croak';
 use List::Util 'max';
 
 use vars '$VERSION','@ISA';
-$VERSION = 125;
+$VERSION = 126;
 use Math::NumSeq;
 use Math::NumSeq::Base::IterateIth;
 @ISA = ('Math::NumSeq::Base::IterateIth',
@@ -2591,6 +2591,25 @@ sub _dxdy_to_dir4 {
   use constant _NumSeq_Delta_TDist_non_decreasing => 1;  # triangular
   use constant _NumSeq_Delta_TDSquared_max => 4;             # triangular
 }
+{ package Math::PlanePath::AlternateTerdragon;
+  use constant _NumSeq_Delta_dSumAbs_min => -2;
+  use constant _NumSeq_Delta_dSumAbs_max => 2;
+  use constant _NumSeq_Delta_dAbsDiff_min => -2;
+  use constant _NumSeq_Delta_dAbsDiff_max => 2;
+
+  use constant _NumSeq_Delta_dRadius_min => -2;  # at N=...?
+  use constant _NumSeq_Delta_dRadius_max => 2;   # at N=0
+
+  use constant _NumSeq_Delta_dTRadius_min => -2;
+  use constant _NumSeq_Delta_dTRadius_max => 2;
+
+  use constant _NumSeq_Delta_TDir6_integer => 1;
+
+  use constant _NumSeq_Delta_DSquared_min => 2;
+  use constant _NumSeq_Delta_DSquared_max => 4;
+  use constant _NumSeq_Delta_TDist_non_decreasing => 1;  # triangular
+  use constant _NumSeq_Delta_TDSquared_max => 4;  # triangular
+}
 { package Math::PlanePath::ComplexPlus;
   use constant _NumSeq_Dir4_max_is_supremum => 1;
   use constant _NumSeq_Delta_Dir4_integer => 0;
@@ -4577,7 +4596,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

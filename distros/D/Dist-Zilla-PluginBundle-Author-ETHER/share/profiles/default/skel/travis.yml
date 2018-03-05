@@ -12,8 +12,8 @@ perl:
     use List::Util 'first';
     my @all_perl_releases = reverse sort keys %Module::CoreList::released;
     my $latest_stable_perl = first { /^5\.(\d{3})/; defined $1 and $1 % 2 == 0 } @all_perl_releases;
-    my ($minor_ver) = $latest_stable_perl =~ /^5\.(\d+)000/;
-    join "\n", map { '  - "5.' . $_ . '"' } reverse grep { $_ % 2 == 0 } (8 .. $minor_ver);
+    my ($major_ver) = $latest_stable_perl =~ /^5\.(\d{3})/;
+    join "\n", map { '  - "5.' . $_ . '"' } reverse grep { $_ % 2 == 0 } (8 .. $major_ver);
 }}
 env:
   global:

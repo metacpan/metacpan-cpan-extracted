@@ -1,4 +1,10 @@
-Revision history for Struct-Path-JsonPointer
+Revision history for App-NDTools
+
+0.5.2   2018-03-04
+        - tests fixed
+        - dist and docs corrected
+        - refactorings
+        - fix failures with some Getopt::Long versions
 
 0.5.1   2018-02-09
         - nddiff: diff multiple arguments supported

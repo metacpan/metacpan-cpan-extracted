@@ -11,6 +11,8 @@ dist.ini
 lib/JSONAPI/Document.pm
 t/001-load.t
 t/002-documents.t
+t/003-attributes.t
+t/004-kebab.t
 t/author-pod-syntax.t
 t/etc/schema.json
 t/lib/Test/JSONAPI.pm

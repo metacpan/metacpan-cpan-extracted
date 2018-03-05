@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::EnsureLatestPerl; # git description: v0.005-2-gffd82be
+package Dist::Zilla::Plugin::EnsureLatestPerl; # git description: v0.006-4-g9a59ce0
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Ensure the author is releasing using the latest Perl
 # KEYWORDS: plugin release develop author perl version latest
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use Moose;
 with 'Dist::Zilla::Role::BeforeRelease';
@@ -57,7 +57,7 @@ sub before_release
     my $latest_stable_perl = first { /^5\.(\d{3})/; defined $1 and $1 % 2 == 0 } @all_perl_releases;
     my $latest_dev_perl = first { /^5\.(\d{3})/; defined $1 and $1 % 2 == 1 } @all_perl_releases;
 
-    $self->log_fatal([ 'current perl (%s) is neither the current stable nor development perl (%s, %s) -- %s',
+    $self->log_fatal([ 'current perl (%s) is neither the latest stable nor development perl (%s, %s) -- %s',
             $], $latest_stable_perl, $latest_dev_perl, $error_suffix ])
         if "$]" ne $latest_stable_perl and "$]" ne $latest_dev_perl;
 }
@@ -76,7 +76,7 @@ Dist::Zilla::Plugin::EnsureLatestPerl - Ensure the author is releasing using the
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

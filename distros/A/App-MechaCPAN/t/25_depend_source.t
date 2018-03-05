@@ -1,6 +1,7 @@
 use strict;
 use FindBin;
 use Test::More;
+BEGIN { diag("(BEGIN) Try::Tiny => $INC{'Try/Tiny.pm'}"); }
 use Config;
 use Cwd qw/cwd/;
 use File::Temp qw/tempdir/;
@@ -21,13 +22,20 @@ my $options = {
     'Try::Tiny' => 'E/ET/ETHER/Try-Tiny-0.24.tar.gz',
   },
 };
+
+diag("cwd => $dir");
+diag("Try::Tiny => $INC{'Try/Tiny.pm'}");
+
 is( App::MechaCPAN::Install->go( $options, "$lib" ), 0, 'Can use a source' );
+diag("Try::Tiny => $INC{'Try/Tiny.pm'}");
 is( cwd, $dir, 'Returned to whence it started' );
 
 ok( -e "$dir/local/lib/perl5/$lib.pm", "Library file $lib exists" );
 ok( -e "$dir/local/lib/perl5/$deplib.pm", "Library file $deplib exists" );
+diag("Try::Tiny => $INC{'Try/Tiny.pm'}");
 
 require_ok("$dir/local/lib/perl5/$deplib.pm");
+diag("Try::Tiny => $INC{'Try/Tiny.pm'}");
 is( $Try::Tiny::VERSION, '0.24', "The correct version was installed" );
 
 chdir $pwd;

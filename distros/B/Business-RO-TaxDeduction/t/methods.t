@@ -35,13 +35,15 @@ subtest 'Test for round_to_ten' => sub {
         [ 249.49, 250 ],
         [ 251,    260 ],
     );
-    foreach my $amount (@test_data) {
+    foreach my $rec (@test_data) {
         ok my $brtd = Business::RO::TaxDeduction->new(
             year    => 2016,
             vbl     => 999,
             persons => 0,
         ), "new instance";
-        is $brtd->_round_to_tens($amount->[0]), $amount->[1], "round to ten";
+        my $amount = $rec->[0];
+        my $expect = $rec->[1];
+        is $brtd->_round_to_tens($amount), $expect, "round $amount to tens got $expect";
     }
 };
 
@@ -49,8 +51,8 @@ subtest 'Test for failure and defaults' => sub {
     ok my $brtd = Business::RO::TaxDeduction->new(
         vbl     => 999,
     ), "new instance";
-    is $brtd->tax_deduction, 300,
-        "Tax for year 2016 (default),  persons 0 (default) and VBL = 999";
+    is $brtd->tax_deduction, 510,
+        "Tax for year 2018 (default),  persons 0 (default) and VBL = 999";
 
     throws_ok {
         Business::RO::TaxDeduction->new();

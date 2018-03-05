@@ -1,6 +1,7 @@
 use Test::Most tests => 1;
 use Test::MockObject;
 
+use HTTP::Caching::DeprecationWarning ':hide';
 use HTTP::Caching;
 
 use HTTP::Request;

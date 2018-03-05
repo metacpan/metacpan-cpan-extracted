@@ -1,5 +1,9 @@
 Revision history for Perl extension Cookie-Baker-XS
 
+0.09 2018-03-03T04:37:36Z
+
+   - just bump up version. PP requires newer version number
+
 0.08 2017-07-18T03:39:50Z
 
     - Disallow , as delimiter

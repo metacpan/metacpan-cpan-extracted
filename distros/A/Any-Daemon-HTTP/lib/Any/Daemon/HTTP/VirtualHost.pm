@@ -1,13 +1,18 @@
-# Copyrights 2013-2016 by [Mark Overmeer].
+# Copyrights 2013-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# This code is part of distribution Any-Daemon-HTTP. Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Any::Daemon::HTTP::VirtualHost;
 use vars '$VERSION';
-$VERSION = '0.26';
+$VERSION = '0.27';
+
+
+use warnings;
+use strict;
 
 use Log::Report    'any-daemon-http';
 
@@ -42,7 +47,8 @@ sub init($)
       : $aliases eq 'AUTO'      ? [ $self->generateAliases($name) ]
       :                           [ $aliases ];
 
-    $self->{ADHV_handlers} = $args->{handler} || $args->{handlers} || {};
+    $self->addHandler($args->{handlers} || $args->{handler});
+
     $self->{ADHV_rewrite}  = $self->_rewrite_call($args->{rewrite});
     $self->{ADHV_redirect} = $self->_redirect_call($args->{redirect});
     $self->{ADHV_udirs}    = $self->_user_dirs($args->{user_dirs});

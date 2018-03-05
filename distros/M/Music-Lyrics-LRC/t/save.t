@@ -12,7 +12,7 @@ use Test::More tests => 2;
 
 use Music::Lyrics::LRC;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 my $lrc = Music::Lyrics::LRC->new();
 $lrc->set_tag( 'foo', 'bar' );

@@ -13,6 +13,7 @@ use Image::Animated::JPEG;
 use Path::Tiny;
 use File::Glob ':bsd_glob';
 use Pod::Usage;
+use IPC::System::Simple; # seems more widespread than Capture::Tiny
 
 Getopt::Long::Configure('no_ignore_case');
 GetOptions(
@@ -87,20 +88,21 @@ if($left || $right || $top || $bottom || $middle || $midleft || $midright){
 	my @dir = grep { /\.jpg$/ } readdir($dh);
 	print "ajpegtran: test file: $dir[2] \n" if $debug;
 
-	my $test = `identify $dir[0]`;
+	# my $test = `identify $dir[0]`;
+	my $test = IPC::System::Simple::capture("identify", $dir[0]);
 	my ($w,$h) = $test =~ /JPEG\s(\d+)x(\d+)\s/;
 	print "ajpegtran: test result (w:$w h:$h) from $test \n" if $debug;
 
 	# -crop WxH+X+Y		=> Crop the image to a rectangular region of width W and height  H, starting  at point X,Y.
 	my ($W,$H,$X,$Y);
 	if($left){
-		($W,$H,$X,$Y) = ( ($w / 2), $h, 0, 0 );
+		($W,$H,$X,$Y) = ( int($w / 2), int($h), 0, 0 );
 	}elsif($right){
-		($W,$H,$X,$Y) = ( ($w / 2), $h, ($w / 2), 0 );
+		($W,$H,$X,$Y) = ( int($w / 2), int($h), int($w / 2), 0 );
 	}elsif($top){
-		($W,$H,$X,$Y) = ($w, ($h / 2), 0, 0 );
+		($W,$H,$X,$Y) = (int($w), int($h / 2), 0, 0 );
 	}elsif($bottom){
-		($W,$H,$X,$Y) = ($w, ($h / 2), 0, ($h / 2) );
+		($W,$H,$X,$Y) = (int($w), int($h / 2), 0, int($h / 2) );
 	}elsif($middle){
 		($W,$H,$X,$Y) = ( int($w / 3), $h, int($w / 3), 0 );
 	}elsif($midleft){

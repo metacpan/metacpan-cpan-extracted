@@ -34,5 +34,5 @@ requires:
   warnings: '0'
 resources:
   repository: git://github.com/domm/Plack-Middleware-StatsPerRequest.git
-version: '0.900'
+version: '0.901'
 x_serialization_backend: 'YAML::Tiny version 1.69'

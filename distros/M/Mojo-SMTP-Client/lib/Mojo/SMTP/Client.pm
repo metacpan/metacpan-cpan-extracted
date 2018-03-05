@@ -11,7 +11,7 @@ use Mojo::SMTP::Client::Exception;
 use Scalar::Util 'weaken';
 use Carp;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use constant {
 	CMD_OK       => 2,
@@ -72,6 +72,8 @@ sub new {
 		$delay->pass($resp);
 	};
 	
+	$self->{cmds} = [];
+	
 	$self;
 }
 
@@ -81,8 +83,6 @@ sub send {
 	
 	my @steps;
 	$self->{nb} = $cb ? 1 : 0;
-	
-	delete $self->{new_cmd};
 	
 	# user changed SMTP server or server sent smth while it shouldn't
 	if ($self->{stream} && (($self->{server} ne $self->_server) ||
@@ -123,7 +123,7 @@ sub send {
 			Mojo::SMTP::Client::Exception::Stream->throw($_[0]) unless eval { *{$_[0]} };
 			
 			$self->_make_stream($_[0], $self->_ioloop);
-			$self->_read_response($delay->begin, 0);
+			$self->_read_response($delay->begin);
 			$self->{expected_code} = CMD_OK;
 		},
 		# check response
@@ -137,16 +137,14 @@ sub send {
 		$self->{stream}->start;
 	}
 	
-	push @steps, $self->_make_cmd_steps(0, @_);
+	push @{$self->{cmds}}, @_;
+	push @steps, $self->_make_cmd_steps();
 	
 	# non-blocking
 	my $delay = $self->{delay} = Mojo::IOLoop::Delay->new(ioloop => $self->_ioloop)->steps(@steps);
-	$delay->catch(sub {
-		$delay->emit(finish => $_[0]);
-	});
-	$delay->on(finish => sub {
+	$delay->finally($self->{finally} = sub {
 		if ($cb) {
-			my $r = $_[1];
+			my $r = $_[0];
 			unless ($r->isa('Mojo::SMTP::Client::Response')) {
 				# some error occured, which throwed an exception
 				$r = Mojo::SMTP::Client::Response->new('', error => $r);
@@ -155,6 +153,7 @@ sub send {
 			$cb->($self, $r);
 			$cb = undef;
 			delete $self->{delay};
+			delete $self->{finally};
 		}
 	});
 	
@@ -173,17 +172,7 @@ sub prepend_cmd {
 	my $self = shift;
 	croak "no active `send' calls" unless exists $self->{delay};
 	
-	my $remaining = $self->{delay}->remaining;
-	my $i;
-	
-	for ($i=0; $i<@$remaining; $i++) {
-		if (exists $self->{new_cmd}{$remaining->[$i]}) {
-			last;
-		}
-	}
-	
-	croak "no commands in the queue, can't prepend to nothing" if $i == @$remaining;
-	splice @$remaining, $i, 0, $self->_make_cmd_steps(1, @_);
+	unshift @{ $self->{cmds} }, @_;
 }
 
 sub _ioloop {
@@ -202,9 +191,10 @@ sub _make_stream {
 	weaken $self;
 	my $error_handler = sub {
 		delete($self->{cleanup_cb})->() if $self->{cleanup_cb};
-		$self->{delay}->remaining([]); # remove remaining steps
 		$self->_rm_stream();
-		$self->{delay}->emit(finish => $_[0]);
+		
+		# Remaining delay steps skipped automatically somehow (at least for now)
+		$self->{finally}->($_[0]);
 	};
 	
 	$self->{stream} = Mojo::IOLoop::Stream->new($sock);
@@ -222,289 +212,349 @@ sub _make_stream {
 }
 
 sub _make_cmd_steps {
-	my ($self, $prepend, @cmd) = @_;
+	my ($self) = @_;
 	
-	weaken $self;
-	my @steps;
+	my ($cmd, $arg) = splice @{ $self->{cmds} }, 0, 2;
+	unless ($cmd) {
+		# no more commands
+		if ($self->{stream}) {
+			$self->{stream}->timeout(0);
+			$self->{stream}->stop;
+		}
+		return;
+	}
 	
-	for (my $i=0; $i<@cmd; $i+=2) {
-		my $mi = $i+1;
-		
-		if ($cmd[$i] eq 'hello') { # EHLO/HELO
-			push @steps, $self->_new_cmd(sub {
-				my $delay = shift;
-				$self->_write_cmd('EHLO ' . $cmd[$mi], CMD_EHLO);
-				$self->_read_response($delay->begin, !$prepend && $mi == $#cmd);
-				$self->{expected_code} = CMD_OK;
-			}), 
-			sub {
-				eval { $self->{resp_checker}->(@_); $_[1]->{checked} = 1 };
-				if (my $e = $@) {
-					die $e unless $e->isa('Mojo::SMTP::Client::Response');
-					my $delay = shift;
-					
-					$self->{stream}->start if !$prepend && $mi == $#cmd; # XXX: _read_response may stop stream
-					$self->_write_cmd('HELO ' . $cmd[$mi], CMD_HELO);
-					$self->_read_response($delay->begin, !$prepend && $mi == $#cmd);
-				}
-			},
-			sub {
+	if ( my $sub = $self->can("_cmd_$cmd") ) {
+		return (
+			$self->$sub($arg), sub {
 				my ($delay, $resp) = @_;
-				return $delay->pass($resp) if delete $resp->{checked};
-				$self->{resp_checker}->($delay, $resp);
+				
+				$delay->pass($resp);
+				$delay->steps( $self->_make_cmd_steps() );
 			}
+		);
+	}
+	
+	croak 'unrecognized command: ', $cmd;
+}
+
+# EHLO/HELO
+sub _cmd_hello {
+	my ($self, $arg) = @_;
+	weaken $self;
+	
+	return (
+		sub {
+			my $delay = shift;
+			$self->_write_cmd('EHLO ' . $arg, CMD_EHLO);
+			$self->_read_response($delay->begin);
+			$self->{expected_code} = CMD_OK;
+		}, 
+		sub {
+			eval { $self->{resp_checker}->(@_); $_[1]->{checked} = 1 };
+			if (my $e = $@) {
+				die $e unless $e->isa('Mojo::SMTP::Client::Response');
+				my $delay = shift;
+				
+				$self->_write_cmd('HELO ' . $arg, CMD_HELO);
+				$self->_read_response($delay->begin);
+			}
+		},
+		sub {
+			my ($delay, $resp) = @_;
+			return $delay->pass($resp) if delete $resp->{checked};
+			$self->{resp_checker}->($delay, $resp);
 		}
-		elsif ($cmd[$i] eq 'starttls') { # STARTTLS
-			require IO::Socket::SSL and IO::Socket::SSL->VERSION(0.98);
+	);
+}
+
+# STARTTLS
+sub _cmd_starttls {
+	my ($self, $arg) = @_;
+	weaken $self;
+	
+	require IO::Socket::SSL and IO::Socket::SSL->VERSION(0.98);
+	
+	return (
+		sub {
+			my $delay = shift;
+			$self->_write_cmd('STARTTLS', CMD_STARTTLS);
+			$self->_read_response($delay->begin);
+			$self->{expected_code} = CMD_OK;
+		},
+		$self->{resp_checker},
+		sub {
+			my $delay = shift;
+			$self->{stream}->stop;
+			$self->{stream}->timeout(0);
 			
-			push @steps, $self->_new_cmd(sub {
-				my $delay = shift;
-				$self->_write_cmd('STARTTLS', CMD_STARTTLS);
-				$self->_read_response($delay->begin, !$prepend && $mi == $#cmd);
-				$self->{expected_code} = CMD_OK;
-			}),
-			$self->{resp_checker},
-			sub {
-				my $delay = shift;
-				$self->{stream}->stop;
-				$self->{stream}->timeout(0);
-				
-				my ($tls_cb, $tid, $loop, $sock);
-				
-				my $error_handler = sub {
-					$loop->remove($tid);
-					$loop->reactor->remove($sock);
-					$sock = undef;
-					$tls_cb->($delay, 0, @_>=2 ? $_[1] : 'Inactivity timeout');
-					$tls_cb = $delay = undef;
-				};
-				
-				$sock = IO::Socket::SSL->start_SSL(
-					$self->{stream}->steal_handle,
-					SSL_ca_file         => $self->tls_ca,
-					SSL_cert_file       => $self->tls_cert,
-					SSL_key_file        => $self->tls_key,
-					SSL_verify_mode     => $self->tls_ca ? 0x01 : 0x00,
-					SSL_verifycn_name   => $self->address,
-					SSL_verifycn_scheme => $self->tls_ca ? 'smtp' : undef,
-					SSL_startHandshake  => 0,
-					SSL_error_trap      => $error_handler
-				)
-				or return $delay->pass(0, $IO::Socket::SSL::SSL_ERROR);
-				
-				$tls_cb = $delay->begin;
-				$loop = $self->_ioloop;
-				
-				$tid = $loop->timer($self->inactivity_timeout => $error_handler);
-				
-				$loop->reactor->io($sock => sub {
-					if ($sock->connect_SSL) {
-						$loop->remove($tid);
-						$loop->reactor->remove($sock);
-						$self->_make_stream($sock, $loop);
-						$self->{starttls} = 1;
-						$sock = $loop = undef;
-						$tls_cb->($delay, 1);
-						$tls_cb = $delay = undef;
-						return;
-					}
-					
-					return $loop->reactor->watch($sock, 1, 0)
-						if $IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_READ();
-					return $loop->reactor->watch($sock, 0, 1)
-						if $IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_WRITE();
-					
-				})->watch($sock, 0, 1);
-			},
-			sub {
-				my ($delay, $success, $error) = @_;
-				unless ($success) {
-					$self->_rm_stream();
-					Mojo::SMTP::Client::Exception::Stream->throw($error);
-				}
-				
-				$delay->pass;
-			}
-		}
-		elsif ($cmd[$i] eq 'auth') { # AUTH
-			my $type = lc($cmd[$mi]->{type} // 'plain');
-			my $set_auth_ok = sub {
-				my $delay = shift;
-				$self->{authorized} = 1;
-				$delay->pass;
+			my ($tls_cb, $tid, $loop, $sock);
+			
+			my $error_handler = sub {
+				$loop->remove($tid);
+				$loop->reactor->remove($sock);
+				$sock = undef;
+				$tls_cb->($delay, 0, @_>=2 ? $_[1] : 'Inactivity timeout');
+				$tls_cb = $delay = undef;
 			};
 			
-			if ($type eq 'plain') {
-				push @steps, $self->_new_cmd(sub {
-					my $delay = shift;
-					$self->_write_cmd('AUTH PLAIN '.b64_encode(join("\0", '', $cmd[$mi]->{login}, $cmd[$mi]->{password}), ''), CMD_AUTH);
-					$self->_read_response($delay->begin, !$prepend && $mi == $#cmd);
-					$self->{expected_code} = CMD_OK;
-				}),
-				$self->{resp_checker},
-				$set_auth_ok;
-			}
-			elsif ($type eq 'login') {
-				push @steps,
-				# start auth
-				$self->_new_cmd(sub {
-					my $delay = shift;
-					$self->_write_cmd('AUTH LOGIN', CMD_AUTH);
-					$self->_read_response($delay->begin, 0);
-					$self->{expected_code} = CMD_MORE;
-				}),
-				$self->{resp_checker},
-				# send username
-				$self->_new_cmd(sub {
-					my $delay = shift;
-					$self->_write_cmd(b64_encode($cmd[$mi]->{login}, ''), CMD_AUTH);
-					$self->_read_response($delay->begin, 0);
-					$self->{expected_code} = CMD_MORE;
-				}),
-				$self->{resp_checker},
-				# send password
-				$self->_new_cmd(sub {
-					my $delay = shift;
-					$self->_write_cmd(b64_encode($cmd[$mi]->{password}, ''), CMD_AUTH);
-					$self->_read_response($delay->begin, !$prepend && $mi == $#cmd);
-					$self->{expected_code} = CMD_OK;
-				}),
-				$self->{resp_checker},
-				$set_auth_ok;
-			}
-			else {
-			    croak 'unrecognized auth method: ', $type;
-			}
-		}
-		elsif ($cmd[$i] eq 'from') { # FROM
-			push @steps, $self->_new_cmd(sub {
-				my $delay = shift;
-				$self->_write_cmd('MAIL FROM:<'.$cmd[$mi].'>', CMD_FROM);
-				$self->_read_response($delay->begin, !$prepend && $mi == $#cmd);
-				$self->{expected_code} = CMD_OK;
-			}),
-			$self->{resp_checker}
-		}
-		elsif ($cmd[$i] eq 'to') { # TO
-			my $cur = 0;
-			my $count = ref $cmd[$mi] ? @{$cmd[$mi]} : 1;
+			$sock = IO::Socket::SSL->start_SSL(
+				$self->{stream}->steal_handle,
+				SSL_ca_file         => $self->tls_ca,
+				SSL_cert_file       => $self->tls_cert,
+				SSL_key_file        => $self->tls_key,
+				SSL_verify_mode     => $self->tls_ca ? 0x01 : 0x00,
+				SSL_verifycn_name   => $self->address,
+				SSL_verifycn_scheme => $self->tls_ca ? 'smtp' : undef,
+				SSL_startHandshake  => 0,
+				SSL_error_trap      => $error_handler
+			)
+			or return $delay->pass(0, $IO::Socket::SSL::SSL_ERROR);
 			
-			for my $to (ref $cmd[$mi] ? @{$cmd[$mi]} : $cmd[$mi]) {
-				my $j = ++$cur;
-				push @steps, $self->_new_cmd(sub {
-					my $delay = shift;
-					$self->_write_cmd('RCPT TO:<'.$to.'>', CMD_TO);
-					$self->_read_response($delay->begin, !$prepend && $mi == $#cmd && $j == $count);
-					$self->{expected_code} = CMD_OK;
-				}),
-				$self->{resp_checker}
-			}
-		}
-		elsif ($cmd[$i] eq 'data') { # DATA
-			push @steps, $self->_new_cmd(sub {
-				my $delay = shift;
-				$self->_write_cmd('DATA', CMD_DATA);
-				$self->_read_response($delay->begin, 0);
-				$self->{expected_code} = CMD_MORE;
-			}),
-			$self->{resp_checker};
+			$tls_cb = $delay->begin;
+			$loop = $self->_ioloop;
 			
-			if (ref $cmd[$mi] eq 'CODE') {
-				my ($data_writer, $data_writer_cb);
-				my $was_nl;
-				my $last_ch;
+			$tid = $loop->timer($self->inactivity_timeout => $error_handler);
+			
+			$loop->reactor->io($sock => sub {
+				if ($sock->connect_SSL) {
+					$loop->remove($tid);
+					$loop->reactor->remove($sock);
+					$self->_make_stream($sock, $loop);
+					$self->{starttls} = 1;
+					$sock = $loop = undef;
+					$tls_cb->($delay, 1);
+					$tls_cb = $delay = undef;
+					return;
+				}
 				
-				$data_writer = sub {
-					my $delay = shift;
-					unless ($data_writer_cb) {
-						$data_writer_cb = $delay->begin;
-						$self->{cleanup_cb} = sub {
-							undef $data_writer;
-						};
-					}
-					
-					my $data = $cmd[$mi]->();
-					$data = $$data if ref $data;
-					
-					unless (length($data) > 0) {
-						$self->_write_cmd(($was_nl ? '' : Mojo::SMTP::Client::Response::CRLF).'.', CMD_DATA_END);
-						$self->_read_response($data_writer_cb, !$prepend && $mi == $#cmd);
-						$self->{expected_code} = CMD_OK;
-						return delete($self->{cleanup_cb})->();
-					}
-					# The following part if heavily inspired by Net::Cmd
-					my $first_ch = '';
-					# We have not send anything yet, so last_ch = "\012" means we are at the start of a line (^. -> ..)
-					$last_ch = "\012" unless defined $last_ch;
-					if ($last_ch eq "\015") {
-						# Remove \012 so it does not get prefixed with another \015 below
-						# and escape the . if there is one following it because the fixup
-						# below will not find it
-						$first_ch = "\012" if $data =~ s/^\012(\.?)/$1$1/;
-					}
-					elsif ($last_ch eq "\012") {
-						# Fixup below will not find the . as the first character of the buffer
-						$first_ch = "." if $data =~ /^\./;
-					}
-					$data =~ s/\015?\012(\.?)/\015\012$1$1/g;
-					substr($data, 0, 0) = $first_ch;
-					$last_ch = substr($data, -1, 1);
-					$was_nl = _has_nl($data);
-					$self->{stream}->write($data, $data_writer);
-				};
+				return $loop->reactor->watch($sock, 1, 0)
+					if $IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_READ();
+				return $loop->reactor->watch($sock, 0, 1)
+					if $IO::Socket::SSL::SSL_ERROR == IO::Socket::SSL::SSL_WANT_WRITE();
 				
-				push @steps, $data_writer, $self->{resp_checker};
-			}
-			else {
-				push @steps, sub {
-					my $delay = shift;
-					(ref $cmd[$mi] ? ${$cmd[$mi]} : $cmd[$mi]) =~ s/\015?\012(\.?)/\015\012$1$1/g; # turn . into .. if it's first character of the line and normalize newline
-					$self->{stream}->write(ref $cmd[$mi] ? ${$cmd[$mi]} : $cmd[$mi], $delay->begin);
-				},
-				sub {
-					my $delay = shift;
-					$self->_write_cmd((_has_nl($cmd[$mi]) ? '' : Mojo::SMTP::Client::Response::CRLF).'.', CMD_DATA_END);
-					$self->_read_response($delay->begin, !$prepend && $mi == $#cmd);
-					$self->{expected_code} = CMD_OK;
-				},
-				$self->{resp_checker}
-			}
-		}
-		elsif ($cmd[$i] eq 'reset') { # RESET
-			push @steps, $self->_new_cmd(sub {
-				my $delay = shift;
-				$self->_write_cmd('RSET', CMD_RESET);
-				$self->_read_response($delay->begin, !$prepend && $mi == $#cmd);
-				$self->{expected_code} = CMD_OK;
-			}),
-			$self->{resp_checker}
-		}
-		elsif ($cmd[$i] eq 'quit') { # QUIT
-			push @steps, $self->_new_cmd(sub {
-				my $delay = shift;
-				$self->_write_cmd('QUIT', CMD_QUIT);
-				$self->_read_response($delay->begin, !$prepend && $mi == $#cmd);
-				$self->{expected_code} = CMD_OK;
-			}),
-			$self->{resp_checker}, sub {
-				my $delay = shift;
+			})->watch($sock, 0, 1);
+		},
+		sub {
+			my ($delay, $success, $error) = @_;
+			unless ($success) {
 				$self->_rm_stream();
-				$delay->pass(@_);
+				Mojo::SMTP::Client::Exception::Stream->throw($error);
 			}
+			
+			$delay->pass;
 		}
-		else {
-			croak 'unrecognized command: ', $cmd[$i];
-		}
+	);
+}
+
+# AUTH
+sub _cmd_auth {
+	my ($self, $arg) = @_;
+	weaken $self;
+	
+	my $type = lc($arg->{type} // 'plain');
+	
+	my $set_auth_ok = sub {
+		my $delay = shift;
+		$self->{authorized} = 1;
+		$delay->pass;
+	};
+	
+	if ($type eq 'plain') {
+		return (
+			sub {
+				my $delay = shift;
+				$self->_write_cmd('AUTH PLAIN '.b64_encode(join("\0", '', $arg->{login}, $arg->{password}), ''), CMD_AUTH);
+				$self->_read_response($delay->begin);
+				$self->{expected_code} = CMD_OK;
+			},
+			$self->{resp_checker},
+			$set_auth_ok
+		);
+	}
+	
+	if ($type eq 'login') {
+		return (
+			# start auth
+			sub {
+				my $delay = shift;
+				$self->_write_cmd('AUTH LOGIN', CMD_AUTH);
+				$self->_read_response($delay->begin);
+				$self->{expected_code} = CMD_MORE;
+			},
+			$self->{resp_checker},
+			# send username
+			sub {
+				my $delay = shift;
+				$self->_write_cmd(b64_encode($arg->{login}, ''), CMD_AUTH);
+				$self->_read_response($delay->begin);
+				$self->{expected_code} = CMD_MORE;
+			},
+			$self->{resp_checker},
+			# send password
+			sub {
+				my $delay = shift;
+				$self->_write_cmd(b64_encode($arg->{password}, ''), CMD_AUTH);
+				$self->_read_response($delay->begin);
+				$self->{expected_code} = CMD_OK;
+			},
+			$self->{resp_checker},
+			$set_auth_ok
+		);
+	}
+	
+	croak 'unrecognized auth method: ', $type;
+}
+
+# FROM
+sub _cmd_from {
+	my ($self, $arg) = @_;
+	weaken $self;
+	
+	return (
+		sub {
+			my $delay = shift;
+			$self->_write_cmd('MAIL FROM:<'.$arg.'>', CMD_FROM);
+			$self->_read_response($delay->begin);
+			$self->{expected_code} = CMD_OK;
+		},
+		$self->{resp_checker}
+	);
+}
+
+# TO
+sub _cmd_to {
+	my ($self, $arg) = @_;
+	weaken $self;
+	
+	my @steps;
+	
+	for my $to (ref $arg ? @$arg : $arg) {
+		push @steps, sub {
+			my $delay = shift;
+			$self->_write_cmd('RCPT TO:<'.$to.'>', CMD_TO);
+			$self->_read_response($delay->begin);
+			$self->{expected_code} = CMD_OK;
+		},
+		$self->{resp_checker}
 	}
 	
 	return @steps;
 }
 
-sub _new_cmd {
-	my ($self, $sub) = @_;
+# DATA
+sub _cmd_data {
+	my ($self, $arg) = @_;
+	weaken $self;
 	
-	$self->{new_cmd}{$sub} = 1;
-	$sub;
+	my @steps;
+	
+	push @steps, sub {
+		my $delay = shift;
+		$self->_write_cmd('DATA', CMD_DATA);
+		$self->_read_response($delay->begin);
+		$self->{expected_code} = CMD_MORE;
+	},
+	$self->{resp_checker};
+	
+	if (ref $arg eq 'CODE') {
+		my ($data_writer, $data_writer_cb);
+		my $was_nl;
+		my $last_ch;
+		
+		$data_writer = sub {
+			my $delay = shift;
+			unless ($data_writer_cb) {
+				$data_writer_cb = $delay->begin;
+				$self->{cleanup_cb} = sub {
+					undef $data_writer;
+				};
+			}
+			
+			my $data = $arg->();
+			$data = $$data if ref $data;
+			
+			unless (length($data) > 0) {
+				$self->_write_cmd(($was_nl ? '' : Mojo::SMTP::Client::Response::CRLF).'.', CMD_DATA_END);
+				$self->_read_response($data_writer_cb);
+				$self->{expected_code} = CMD_OK;
+				return delete($self->{cleanup_cb})->();
+			}
+			# The following part if heavily inspired by Net::Cmd
+			my $first_ch = '';
+			# We have not send anything yet, so last_ch = "\012" means we are at the start of a line (^. -> ..)
+			$last_ch = "\012" unless defined $last_ch;
+			if ($last_ch eq "\015") {
+				# Remove \012 so it does not get prefixed with another \015 below
+				# and escape the . if there is one following it because the fixup
+				# below will not find it
+				$first_ch = "\012" if $data =~ s/^\012(\.?)/$1$1/;
+			}
+			elsif ($last_ch eq "\012") {
+				# Fixup below will not find the . as the first character of the buffer
+				$first_ch = "." if $data =~ /^\./;
+			}
+			$data =~ s/\015?\012(\.?)/\015\012$1$1/g;
+			substr($data, 0, 0) = $first_ch;
+			$last_ch = substr($data, -1, 1);
+			$was_nl = _has_nl($data);
+			$self->{stream}->write($data, $data_writer);
+		};
+		
+		push @steps, $data_writer, $self->{resp_checker};
+	}
+	else {
+		push @steps, sub {
+			my $delay = shift;
+			(ref $arg ? $$arg : $arg) =~ s/\015?\012(\.?)/\015\012$1$1/g; # turn . into .. if it's first character of the line and normalize newline
+			$self->{stream}->write(ref $arg ? $$arg : $arg, $delay->begin);
+		},
+		sub {
+			my $delay = shift;
+			$self->_write_cmd((_has_nl($arg) ? '' : Mojo::SMTP::Client::Response::CRLF).'.', CMD_DATA_END);
+			$self->_read_response($delay->begin);
+			$self->{expected_code} = CMD_OK;
+		},
+		$self->{resp_checker}
+	}
+	
+	return @steps;
+}
+
+# RESET
+sub _cmd_reset {
+	my ($self, $arg) = @_;
+	weaken $self;
+	
+	return (
+		sub {
+			my $delay = shift;
+			$self->_write_cmd('RSET', CMD_RESET);
+			$self->_read_response($delay->begin);
+			$self->{expected_code} = CMD_OK;
+		},
+		$self->{resp_checker}
+	);
+}
+
+# QUIT
+sub _cmd_quit {
+	my ($self, $arg) = @_;
+	weaken $self;
+	
+	return (
+		sub {
+			my $delay = shift;
+			$self->_write_cmd('QUIT', CMD_QUIT);
+			$self->_read_response($delay->begin);
+			$self->{expected_code} = CMD_OK;
+		},
+		$self->{resp_checker}, sub {
+			my $delay = shift;
+			$self->_rm_stream();
+			$delay->pass(@_);
+		}
+	);
 }
 
 sub _write_cmd {
@@ -514,7 +564,7 @@ sub _write_cmd {
 }
 
 sub _read_response {
-	my ($self, $cb, $last) = @_;
+	my ($self, $cb) = @_;
 	$self->{stream}->timeout($self->inactivity_timeout);
 	my $resp = '';
 	
@@ -522,10 +572,6 @@ sub _read_response {
 		$resp .= $_[-1];
 		if ($resp =~ /^\d+(?:\s[^\n]*)?\n$/m) {
 			$self->{stream}->unsubscribe('read');
-			if ($last) {
-				$self->{stream}->timeout(0);
-				$self->{stream}->stop;
-			}
 			$cb->($self, Mojo::SMTP::Client::Response->new($resp));
 		}
 	});

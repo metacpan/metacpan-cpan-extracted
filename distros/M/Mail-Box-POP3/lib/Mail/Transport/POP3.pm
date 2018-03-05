@@ -1,16 +1,19 @@
-# Copyrights 2001-2017 by [Mark Overmeer].
+# Copyrights 2001-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-
-use strict;
-use warnings;
+# This code is part of distribution Mail-Box-POP3.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Mail::Transport::POP3;
 use vars '$VERSION';
-$VERSION = '3.003';
+$VERSION = '3.004';
 
 use base 'Mail::Transport::Receive';
+
+use strict;
+use warnings;
 
 use IO::Socket  ();
 use Socket      qw/$CRLF/;

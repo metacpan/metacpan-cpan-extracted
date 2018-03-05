@@ -1,5 +1,6 @@
 use Test::Most tests => 1;
 
+use HTTP::Caching::DeprecationWarning ':hide';
 use HTTP::Caching;
 
 use HTTP::Request;

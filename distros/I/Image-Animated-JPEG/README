@@ -50,6 +50,9 @@ Please refer to the [Official Specifications](SPECIFICATIONS.md) for details.
 Bundled with this distribution is a reference implementation, written in Perl,
 [Image::Animated::JPEG](http://search.cpan.org/perldoc?Image::Animated::JPEG).
 
+As of version 0.02, the distribution comes with an experimental/wip JavaScript
+implementation to parse and display AJPEG animations in a browser.
+
 ### INSTALLATION
 
 To install this implementation and accompanying scripts, do this on
@@ -98,7 +101,7 @@ Clipland GmbH, [clipland.com](http://www.clipland.com/)
 
 ## COPYRIGHT & LICENSE
 
-Copyright 2013-2017 Clipland GmbH. All rights reserved.
+Copyright 2013-2018 Clipland GmbH. All rights reserved.
 
 This library is free software, dual-licensed under [GPLv3](http://www.gnu.org/licenses/gpl)
 and [Perl Artistic 2](http://opensource.org/licenses/Artistic-2.0).

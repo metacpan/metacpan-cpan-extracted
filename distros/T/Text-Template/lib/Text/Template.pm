@@ -10,7 +10,7 @@
 #
 
 package Text::Template;
-$Text::Template::VERSION = '1.50';
+$Text::Template::VERSION = '1.51';
 # ABSTRACT: Expand template text with embedded Perl
 
 use strict;
@@ -370,6 +370,9 @@ sub fill_in {
             my $fi_eval_err = '';
 
             if ($fi_safe) {
+                no strict;
+                no warnings;
+
                 $fi_safe->reval(q{undef $OUT});
                 $fi_res      = $fi_safe->reval($fi_progtext);
                 $fi_eval_err = $@;
@@ -377,6 +380,9 @@ sub fill_in {
                 $fi_res = $OUT if defined $OUT;
             }
             else {
+                no strict;
+                no warnings;
+
                 my $OUT;
                 $fi_res      = eval $fi_progtext;
                 $fi_eval_err = $@;
@@ -593,7 +599,7 @@ Text::Template - Expand template text with embedded Perl
 
 =head1 VERSION
 
-version 1.50
+version 1.51
 
 =head1 SYNOPSIS
 

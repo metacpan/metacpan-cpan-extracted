@@ -1,3 +1,10 @@
+1.811   2018-03-05 (PERLANCAR)
+
+	- Introduce new hook_config_file_section.
+
+	- [doc] Remove documentation of old attribute.
+
+
 1.810   2017-12-11 (PERLANCAR)
 
         - [Experimental] Observe PERINCI_CMDLINE_OUTPUT_DIR to save program

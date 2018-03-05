@@ -78,8 +78,9 @@ sub get_databases {
         return;
     }
     elsif ( $choice eq $change ) {
-        my $info = 'cur: ' . join( ', ', @$dirs );
-        my $new_dirs = choose_dirs( { info => $info } );
+        my $info = '<< ' . join( ', ', @$dirs );
+        my $name = 'OK ';
+        my $new_dirs = choose_dirs( { info => $info, name => $name } );
         if ( defined $new_dirs && @$new_dirs ) {
             $dirs = $new_dirs;
         }

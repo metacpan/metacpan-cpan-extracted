@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -30,7 +30,7 @@ use List::Util 'min'; # 'max'
 *max = \&Math::PlanePath::_max;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 125;
+$VERSION = 126;
 use Math::PlanePath;
 use Math::PlanePath::Base::NSEW;
 @ISA = ('Math::PlanePath::Base::NSEW',
@@ -1576,6 +1576,21 @@ first turn, whereas for the path here that's N=1.
     arms=3
       A001196   N on X axis, base 4 digits 0,3 only
 
+=head1 HOUSE OF GRAPHS
+
+House of Graphs entries for the alternate paperfolding curve as a graph
+include
+
+=over
+
+=item level=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27008>
+
+=item level=4, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27010>
+
+=item level=5, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27012>
+
+=back
+
 =head1 SEE ALSO
 
 L<Math::PlanePath>,
@@ -1600,7 +1615,7 @@ L<http://user42.tuxfamily.org/math-planepath/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 This file is part of Math-PlanePath.
 

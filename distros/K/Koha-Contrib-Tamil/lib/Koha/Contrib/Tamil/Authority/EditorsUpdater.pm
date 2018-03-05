@@ -1,5 +1,5 @@
 package Koha::Contrib::Tamil::Authority::EditorsUpdater;
-$Koha::Contrib::Tamil::Authority::EditorsUpdater::VERSION = '0.053';
+$Koha::Contrib::Tamil::Authority::EditorsUpdater::VERSION = '0.054';
 use Moose;
 
 extends 'AnyEvent::Processor';
@@ -68,7 +68,7 @@ Koha::Contrib::Tamil::Authority::EditorsUpdater
 
 =head1 VERSION
 
-version 0.053
+version 0.054
 
 =head1 AUTHOR
 

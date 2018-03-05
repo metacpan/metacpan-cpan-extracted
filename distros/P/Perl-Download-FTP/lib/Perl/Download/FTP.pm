@@ -7,7 +7,7 @@ use Net::FTP;
 use File::Copy;
 use Cwd;
 use File::Spec;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 
@@ -35,7 +35,7 @@ Perl::Download::FTP - Identify Perl releases and download the most recent via FT
     $latest_release = $self->get_latest_release( {
         compression     => 'gz',
         type            => 'dev',
-        dir             => '/path/to/download',
+        path            => '/path/to/download',
         verbose         => 1,
     } );
 
@@ -677,7 +677,7 @@ it and/or modify it under the same terms as Perl itself.
 The full text of the license can be found in the
 LICENSE file included with this module.
 
-Copyright James E Keenan 2017.  All rights reserved.
+Copyright James E Keenan 2018.  All rights reserved.
 
 =head1 SEE ALSO
 

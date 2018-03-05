@@ -2,9 +2,8 @@ use Mojo::Base -strict;
 use Test::Mojo;
 use Test::More;
 
-plan skip_all => 'touch README.pod' unless -e 'README.pod';
-
-do 'script/proxyforurl' or die $@;
+plan skip_all => 'script/proxyforurl not found' unless -e 'script/proxyforurl';
+do './script/proxyforurl' or die $@;
 my $t = Test::Mojo->new;
 
 $t->get_ok('/within?ip=x&net=y&mask=z')->status_is(400)->content_is('IP or Net is missing.');

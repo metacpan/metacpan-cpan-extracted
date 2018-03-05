@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011 Kevin Ryde
+# Copyright 2010, 2011, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -30,7 +30,6 @@ use Smart::Comments;
 
 {
   # vs spectrum
-  require Image::Base::Text;
   my $prev = 0;
   my $diff_total = 0;
   my $diff_count = 0;

@@ -26,24 +26,30 @@ like($app->piwik_tag(2), qr{setSiteId',2}, 'SiteId');
 
 like($app->piwik_tag(
   2 => 'http://sojolicio.us/piwik/piwik.php'
-), qr{'://sojolicio.us/piwik/'}, 'URL');
+), qr{'://sojolicio\.us/piwik/'}, 'URL');
 like($app->piwik_tag(
   2 => 'http://sojolicio.us/piwik/piwik.php'
 ), qr{setSiteId',2}, 'SiteId');
 
 like($app->piwik_tag(
   3 => 'https://sojolicio.us/piwik/piwik.js'
-), qr{'://sojolicio.us/piwik/'}, 'URL');
+), qr{'://sojolicio\.us/piwik/'}, 'URL');
 like($app->piwik_tag(
   3 => 'http://sojolicio.us/piwik/piwik.js'
 ), qr{setSiteId',3}, 'SiteId');
 
 like($app->piwik_tag(
   4 => 'sojolicio.us/piwik'
-), qr{'://sojolicio.us/piwik/'}, 'URL');
+), qr{'://sojolicio\.us/piwik/'}, 'URL');
+
 like($app->piwik_tag(
   4 => 'sojolicio.us/piwik'
 ), qr{setSiteId',4}, 'SiteId');
+
+like($app->piwik_tag(
+  4 => 'sojolicio.us/piwik'
+), qr{'://sojolicio\.us/piwik/'}, 'URL');
+
 
 $app->mode('development');
 

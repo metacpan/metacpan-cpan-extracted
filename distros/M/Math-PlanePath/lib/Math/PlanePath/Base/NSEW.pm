@@ -21,7 +21,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION';
-$VERSION = 125;
+$VERSION = 126;
 
 use constant dx_minimum => -1; # NSEW straight only
 use constant dx_maximum => 1;

@@ -78,7 +78,8 @@ Vue.component('edit-field', {
             max: this.schema.maximum,
             readonly: this.schema.readOnly,
             writeonly: this.schema.writeOnly,
-            _value: this.value
+            _value: this.value,
+            showHtml: false
         };
     },
     methods: {
@@ -208,7 +209,7 @@ var app = new Vue({
             deleteIndex: null,
             addingItem: false,
             newItem: {},
-            rows: [],
+            items: [],
             columns: [],
             total: 0,
             currentPage: ( current.page ? parseInt( current.page ) : 1 ),
@@ -368,7 +369,7 @@ var app = new Vue({
                         return;
                     }
 
-                    self.rows = data.rows;
+                    self.items = data.items;
                     self.total = data.total;
                     self.columns = self.getListColumns( self.currentCollection ),
                     self.fetching = false;
@@ -411,8 +412,8 @@ var app = new Vue({
         saveItem: function (i) {
             var self = this,
                 coll = this.collections[ this.currentCollection ],
-                value = this.prepareSaveItem( this.rows[i], coll.operations['set'].schema ),
-                url = this.fillUrl( coll.operations['set'].url, this.rows[i] );
+                value = this.prepareSaveItem( this.items[i], coll.operations['set'].schema ),
+                url = this.fillUrl( coll.operations['set'].url, this.items[i] );
             delete this.error.saveItem;
             this.$set( this, 'formError', {} );
             $.ajax(
@@ -424,7 +425,7 @@ var app = new Vue({
                 }
             ).done(
                 function ( data, status, jqXHR ) {
-                    self.rows[i] = data;
+                    self.items[i] = data;
                     self.toggleRow( i );
                     self.$set( self.info, 'saveItem', true );
                     setTimeout( function () {
@@ -460,7 +461,7 @@ var app = new Vue({
                 }
             ).done(
                 function ( data, status, jqXHR ) {
-                    self.rows.unshift( data );
+                    self.items.unshift( data );
                     self.cancelAddItem();
                     self.$set( self.info, 'addItem', true );
                     setTimeout( function () {
@@ -556,7 +557,7 @@ var app = new Vue({
                 self = this,
                 coll = this.collections[ this.currentCollection ],
                 value = $( '#data-' + i ).val(),
-                url = this.fillUrl( coll.operations['delete'].url, this.rows[i] );
+                url = this.fillUrl( coll.operations['delete'].url, this.items[i] );
             $.ajax(
                 {
                     url: url,
@@ -566,7 +567,7 @@ var app = new Vue({
             ).done(
                 function ( data, status, jqXHR ) {
                     self.cancelDeleteItem();
-                    self.rows.splice(i,1);
+                    self.items.splice(i,1);
                 }
             ).fail(
                 function ( jqXHR, status ) {

@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.180230';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.180630';
 use Moose;
 use namespace::autoclean;
 
@@ -13,6 +13,8 @@ use Smart::Comments '###';
 
 use MooseX::Storage;
 with Storage('io' => 'StorableFile');
+
+use Moose::Util::TypeConstraints;
 
 use Algorithm::NeedlemanWunsch;
 use Carp;
@@ -25,6 +27,7 @@ use Path::Class qw(dir file);
 use POSIX;
 use Scalar::Util qw(looks_like_number);
 use Try::Tiny;
+use Try::Tiny::Warnings;
 use XML::Bare;
 
 use Bio::LITE::Taxonomy::NCBI::Gi2taxid qw(new_dict);
@@ -432,16 +435,20 @@ sub _match_code {                           ## no critic (RequireArgUnpacking)
 # methods also use arrays as in/out data structures (for consistency).
 # Not quite... We use wantarray when needed now.
 
-# TODO: check this
-# around qr{ _from_seq_id | _from_legacy_seq_id \z }xms => sub {
-around qr{ _from_seq_id \z }xms => sub {
+around qr{ _from_seq_id \z | _from_legacy_seq_id \z }xms => sub {
     my $method = shift;
     my $self   = shift;
     my $seq_id = shift;
 
-    # coerce to SeqId if needed
-    $seq_id = SeqId->new( full_id => $seq_id )
-        unless ref $seq_id && $seq_id->isa(SeqId);
+    # coerce plain strings to SeqId...
+    # ... but do not touch (stringified) lineages (and SeqIds)
+    match_on_type $seq_id => (
+        'Bio::MUST::Core::Types::Lineage' => sub { },
+        'Str' => sub {
+            $seq_id = SeqId->new( full_id => $seq_id )
+        },
+        => sub { },
+    );
 
     return $self->$method($seq_id, @_);
 };
@@ -534,8 +541,6 @@ sub get_taxid_from_legacy_seq_id {
         unless $query_strain;
     $query_strain = lc SeqId->clean_strain($query_strain);
 
-
-
     # fetch hash containing 'strain => taxid' pairs
     # original clean code using native delegation:
     # my $taxid_for = $self->get_strain_taxid_for($org_key);
@@ -579,8 +584,31 @@ sub get_taxid_from_legacy_seq_id {
 
 
 
-sub get_taxonomy_from_seq_id {              ## no critic (RequireArgUnpacking)
-    return shift->_taxonomy_from_seq_id_(0, @_);
+sub get_taxonomy_from_seq_id {
+    my $self   = shift;
+    my $seq_id = shift;
+
+    return match_on_type $seq_id => (
+
+        # regular case: $seq_id is a Bio::MUST::Core::SeqId
+        'Bio::MUST::Core::SeqId' => sub {
+            $self->_taxonomy_from_seq_id_(0, $seq_id);
+        },
+
+        # optimizations for 'seq_ids' already being lineages (e.g., LCAs)
+        # examine context for returning plain array or ArrayRef
+
+        # case 1: stringified lineage that must be split on semicolons
+        'Bio::MUST::Core::Types::Lineage' => sub {
+            my @taxonomy = split q{; }, $seq_id;
+            wantarray ? @taxonomy : \@taxonomy;
+        },
+
+        # case 2: ArrayRef that just must be dereferenced
+        ArrayRef => sub {
+            wantarray ? @$seq_id : $seq_id
+        },
+    );
 }
 
 
@@ -1234,9 +1262,10 @@ sub update_cache {
     my $self = shift;
 
     my $cachefile = file($self->tax_dir, $CACHEDB);
+    ### Updating binary cache file: $cachefile->stringify
     $self->store($cachefile);
 
-    ### Updated binary cache file!
+    ### Done!
     return 1;
 }
 
@@ -1318,7 +1347,6 @@ sub setup_taxdir {
     # return true on success (only check main files)
     if ( -r file($tax_dir, 'names.dmp') && -r file($tax_dir, 'nodes.dmp') ) {
         ### Successfully wrote taxid files!
-        ### Done!
         return 1;
     }
 
@@ -1392,10 +1420,18 @@ sub _make_gca_files {
 
             my ($accession, $taxon_id, $species_taxon_id)
                 = (split /\t/xms, $line)[0,5,6];
-            my @taxonomy = $tax->get_taxonomy($taxon_id);
+
+            # fetch taxonomy and org using taxon_id
+            # Note: we try to deal with occasionally out-of-sync NCBI files
+            # that spew a lot of undef warnings in Bio::LITE::Taxonomy
+            my @taxonomy;
+            try_fatal_warnings { @taxonomy = $tax->get_taxonomy($taxon_id) };
+            unless (@taxonomy) {
+                carp 'Warning: NCBI assembly reports and Taxonomy'
+                    . "out-of-sync for: $taxon_id; skipping $accession!";
+                next LINE;
+            }
             my $org = $taxonomy[-1];
-            # TODO: how to deal with desynchronized taxdump/assembly reports
-            # generating a lot of undef warnings in Bio::LITE::Taxonomy?
 
             # use parent taxon_id if no taxon_id for strain
             if ($species_taxon_id == $taxon_id) {
@@ -1526,6 +1562,8 @@ sub _make_gca_files {
 # These changes will occur in January 2014. We will be releasing more
 # information as the date approaches.
 
+no Moose::Util::TypeConstraints;
+
 __PACKAGE__->meta->make_immutable;
 1;
 
@@ -1539,7 +1577,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.180230
+version 0.180630
 
 =head1 SYNOPSIS
 

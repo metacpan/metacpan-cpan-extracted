@@ -22,7 +22,7 @@ use Plack::Util::Accessor qw/
     serializer
 /;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 sub prepare_app {
     my $self = shift;
@@ -220,7 +220,7 @@ Plack::Middleware::Session::Simple - Make Session Simple
     
     builder {
         enable 'Session::Simple',
-            store => Cache::Memcached::Fast->new({servers=>[..]}),
+            store => Cache::Memcached::Fast::Safe->new({servers=>[..]}),
             cookie_name => 'myapp_session';
         $app
     };
@@ -253,8 +253,8 @@ If disabled, Plack::Middleware::Session::Simple does not output Set-Cookie heade
 
     builder {
         enable 'Session::Simple',
-            cache => Cache::Memcached::Fast->new({servers=>[..]}),
-            session_key => 'myapp_session',
+            store => Cache::Memcached::Fast::Safe->new({servers=>[..]}),
+            cookie_name => 'myapp_session',
             keep_empty => 0;
         mount '/' => sub {
             my $env = shift;

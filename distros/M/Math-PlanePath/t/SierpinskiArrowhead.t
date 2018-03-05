@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,23 +20,20 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 165;
+plan tests => 168;
 
 use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 
-# uncomment this to run the ### lines
-#use Smart::Comments;
-
-require Math::PlanePath::SierpinskiArrowhead;
+use Math::PlanePath::SierpinskiArrowhead;
 
 
 #------------------------------------------------------------------------------
 # VERSION
 
 {
-  my $want_version = 125;
+  my $want_version = 126;
   ok ($Math::PlanePath::SierpinskiArrowhead::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::SierpinskiArrowhead->VERSION,  $want_version,
@@ -70,6 +67,138 @@ require Math::PlanePath::SierpinskiArrowhead;
   ok ($path->x_negative, 1, 'x_negative()');
   ok ($path->y_negative, 0, 'y_negative()');
 }
+
+
+#------------------------------------------------------------------------------
+# turn claimed in the POD
+
+sub dxdy_to_dir6 {
+  my ($dx,$dy) = @_;
+  if ($dy == 0) {
+    if ($dx == 2) { return 0; }
+    if ($dx == -2) { return 3; }
+  }
+  if ($dy == 1) {
+    if ($dx == 1) { return 1; }
+    if ($dx == -1) { return 2; }
+  }
+  if ($dy == -1) {
+    if ($dx == 1) { return 5; }
+    if ($dx == -1) { return 4; }
+  }
+  die "unrecognised $dx,$dy";
+}
+sub path_n_dir {
+  my ($path, $n) = @_;
+  my ($dx,$dy) = $path->n_to_dxdy($n) or die "Oops, no point at ",$n;
+  return dxdy_to_dir6 ($dx, $dy);
+}
+# return +/- dir6
+sub path_n_turn {
+  my ($path, $n) = @_;
+  my $prev_dir = path_n_dir ($path, $n-1);
+  my $dir = path_n_dir ($path, $n);
+  my $turn = ($dir - $prev_dir + 6) % 6;  # "+3" to stay +ve for "use integer"
+  if ($turn >= 4) { $turn -= 6; }
+  return $turn;
+}
+
+# return 1 for left, -1 for right
+sub calc_n_turn {
+  my ($n) = @_;
+  my $ret = 1;  # left
+  while ($n && ($n % 3) == 0) {
+    $ret = -$ret;           # flip for low 0s
+    $n = int($n/3);
+  }
+  $n = int($n/3);           # skip lowest non-0
+  while ($n) {
+    if (($n % 3) == 1) {
+      $ret = -$ret;         # flip for all 1s
+    }
+    $n = int($n/3);
+  }
+  return $ret;
+}
+
+{
+  my $path = Math::PlanePath::SierpinskiArrowhead->new;
+  my $bad = 0;
+  foreach my $n ($path->n_start + 1 .. 500) {
+    {
+      my $path_turn = path_n_turn ($path, $n);
+      my $calc_turn = calc_n_turn ($n);
+      if ($path_turn != $calc_turn) {
+        MyTestHelpers::diag ("turn n=$n  path $path_turn calc $calc_turn");
+        last if $bad++ > 10;
+      }
+    }
+  }
+  ok ($bad, 0, "turn sequence");
+}
+
+sub LowestNonTwo {
+  my ($n) = @_;
+  while (($n % 3) == 2) { $n = int($n/3); }
+  return $n % 3;
+}
+sub CountLowTwos {
+  my ($n) = @_;
+  my $ret = 0;
+  while (($n % 3) == 2) { $n = int($n/3); $ret++; }
+  return $ret;
+}
+# lowest non-2 and its position claimed in the POD
+sub calc_m_even_is_right {
+  my ($m) = @_;
+  return (LowestNonTwo($m-1) + CountLowTwos($m-1)) % 2;
+}
+{
+  my $path = Math::PlanePath::SierpinskiArrowhead->new;
+  my $bad = 0;
+  foreach my $m ($path->n_start + 1 .. 500) {
+    my $n = 2*$m;
+    my $path_turn = (path_n_turn ($path, 2*$m) == -1 ? 1 : 0);
+    my $calc_turn = calc_m_even_is_right ($m);
+    if ($path_turn != $calc_turn) {
+      MyTestHelpers::diag ("turn n=2*$m  path $path_turn calc $calc_turn");
+      last if $bad++ > 10;
+    }
+  }
+  ok ($bad, 0, "turn sequence");
+}
+
+sub LowestNonOne {
+  my ($n) = @_;
+  while (($n % 3) == 1) { $n = int($n/3); }
+  return $n % 3;
+}
+sub CountLowOnes {
+  my ($n) = @_;
+  my $ret = 0;
+  while (($n % 3) == 1) { $n = int($n/3); $ret++; }
+  return $ret;
+}
+# lowest non-2 and its position claimed in the POD
+sub calc_m_odd_is_right {
+  my ($m) = @_;
+  return ((LowestNonOne($m)/2) + CountLowOnes($m)) % 2;
+}
+{
+  my $path = Math::PlanePath::SierpinskiArrowhead->new;
+  my $bad = 0;
+  foreach my $m ($path->n_start + 1 .. 500) {
+    my $n = 2*$m;
+    my $path_turn = (path_n_turn ($path, 2*$m+1) == -1 ? 1 : 0);
+    my $calc_turn = calc_m_odd_is_right ($m);
+    if ($path_turn != $calc_turn) {
+      MyTestHelpers::diag ("turn n=2*$m  path $path_turn calc $calc_turn");
+      last if $bad++ > 10;
+    }
+  }
+  ok ($bad, 0, "turn sequence");
+}
+
 
 
 #------------------------------------------------------------------------------
@@ -207,4 +336,5 @@ require Math::PlanePath::SierpinskiArrowhead;
   }
 }
 
+#------------------------------------------------------------------------------
 exit 0;

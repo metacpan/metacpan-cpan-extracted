@@ -1,17 +1,21 @@
-# Copyrights 2008-2016 by [Mark Overmeer].
+# Copyrights 2008-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# This code is part of distribution XML-Compile.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::Cache;
 use vars '$VERSION';
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 use base 'XML::Compile::Schema';
 
-use Log::Report 'xml-compile-cache', syntax => 'SHORT';
+use warnings;
+use strict;
+
+use Log::Report 'xml-compile-cache';
 
 use XML::Compile::Util   qw/pack_type unpack_type/;
 use List::Util           qw/first/;
@@ -586,6 +590,11 @@ sub _convertAnyTyped(@)
 {   my ($self, $type, $nodes, $path, $read) = @_;
 
     my $key     = $read->keyRewrite($type);
+	if(defined(my $blocked = $read->blocked($path, complexType => $type)))
+    {   trace "skipping blocked $type";
+        return ();
+    }
+
     my $reader  = try { $self->reader($type) };
     if($@)
     {   trace "cannot auto-convert 'any': ".$@->wasFatal->message;

@@ -10,10 +10,9 @@ use POSIX qw(EINTR EAGAIN EWOULDBLOCK);
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
 use Parallel::Prefork;
 use Server::Starter ();
-use Try::Tiny;
 use Guard;
 
-our $VERSION = "0.46";
+our $VERSION = "0.48";
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -28,8 +27,11 @@ sub new {
     my($class, %args) = @_;
 
     # setup before instantiation
-    my $listen_sock;
-    if (defined $ENV{SERVER_STARTER_PORT}) {
+    if ($args{listen_sock}) {
+        $args{host} = $args{listen_sock}->sockhost;
+        $args{port} = $args{listen_sock}->sockport;
+    }
+    elsif (defined $ENV{SERVER_STARTER_PORT}) {
         my ($hostport, $fd) = %{Server::Starter::server_ports()};
         if ($hostport =~ /(.*):(\d+)/) {
             $args{host} = $1;
@@ -37,10 +39,10 @@ sub new {
         } else {
             $args{port} = $hostport;
         }
-        $listen_sock = IO::Socket::INET->new(
+        $args{listen_sock} = IO::Socket::INET->new(
             Proto => 'tcp',
         ) or die "failed to create socket:$!";
-        $listen_sock->fdopen($fd, 'w')
+        $args{listen_sock}->fdopen($fd, 'w')
             or die "failed to bind to listening socket:$!";
     }
 
@@ -58,7 +60,7 @@ sub new {
     my $self = bless {
         server_software      => $args{server_software} || $class,
         server_ready         => $args{server_ready} || sub {},
-        listen_sock          => $listen_sock,
+        listen_sock          => $args{listen_sock},
         host                 => $args{host} || 0,
         port                 => $args{port} || 8080,
         timeout              => $args{timeout} || 300,
@@ -211,6 +213,10 @@ sub run {
                     } else {
                         $env->{'psgi.input'} = $null_io;
                     }
+                    $env->{'psgix.informational'} = sub {
+                        my ($status,$headers) = @_;
+                        write_informational_response($conn, $self->{timeout}, $status, $headers);
+                    };
                     $res = Plack::Util::run_app $app, $env;
                     my $use_chunked = $env->{"SERVER_PROTOCOL"} eq 'HTTP/1.1' ? 1 : 0;
                     if (ref $res eq 'ARRAY') {
@@ -292,5 +298,3 @@ sub _handle_response {
 }
 
 1;
-
-

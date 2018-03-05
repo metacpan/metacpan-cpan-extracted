@@ -24,7 +24,7 @@ use vars
     qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE $AUTOLOAD $INIT $DEBUG %SPEED_MAP
     $NOSUCH $BIGINT $REPEATERS/;
 
-$VERSION = '3.47';
+$VERSION = '3.49';
 
 =head1 NAME
 
@@ -32,7 +32,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.47
+SNMP::Info - Version 3.49
 
 =head1 AUTHOR
 
@@ -765,6 +765,12 @@ L<SNMP::Info::Layer3::CiscoSwitch> for details.
 Subclass for Avaya/Nortel Contivity/VPN Routers.  
 
 See documentation in L<SNMP::Info::Layer3::Contivity> for details.
+
+=item SNMP::Info::Layer3::Cumulus
+
+Subclass for Cumulus Networks Routers.  
+
+See documentation in L<SNMP::Info::Layer3::Cumulus> for details.
 
 =item SNMP::Info::Layer3::DLink
 
@@ -1585,6 +1591,7 @@ sub device_type {
         41112 => 'SNMP::Info::Layer2::Ubiquiti',
         4413 => 'SNMP::Info::Layer2::Ubiquiti',
         30803 => 'SNMP::Info::Layer3::VyOS',
+        40310 => 'SNMP::Info::Layer3::Cumulus',
     );
 
     my %l2sysoidmap = (

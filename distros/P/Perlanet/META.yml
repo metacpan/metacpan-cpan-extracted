@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 keywords:
   - aggregate
   - aggregator
@@ -27,7 +27,7 @@ name: Perlanet
 provides:
   Perlanet:
     file: lib/Perlanet.pm
-    version: v1.1.1
+    version: v1.1.2
   Perlanet::Entry:
     file: lib/Perlanet/Entry.pm
   Perlanet::Feed:
@@ -70,9 +70,7 @@ requires:
   namespace::autoclean: '0'
   perl: v5.6.0
 resources:
-  MailingList: http://lists.mag-sol.com/mailman/listinfo/perlanet
-  homepage: http://code.mag-sol.com/Perlanet/
+  homepage: http://perlanet.mag-sol.com/
   license: http://dev.perl.org/licenses/
-  repository: git://github.com/davorg/perlanet.git
-version: v1.1.1
+version: v1.1.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

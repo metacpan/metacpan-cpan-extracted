@@ -104,7 +104,7 @@ TestBot->expect(
         'master b9b5587 test-repo',
         'mod-one file-one rm-one',
         '* Commit three files (add, mod, rm)',
-        '* http://git/b9b55876e288bba29d1579d308eea5758bc148ef' )
+        '* http://git/b9b5587' )
 );
 
 $resp = webhook_post(
@@ -157,7 +157,7 @@ TestBot->expect(
         'master b9b5587 test-repo',
         'mod-one file-one rm-one',
         '* Commit three files (add, mod, rm)',
-        '* http://git/b9b55876e288bba29d1579d308eea5758bc148ef' )
+        '* http://git/b9b5587' )
 );
 
 

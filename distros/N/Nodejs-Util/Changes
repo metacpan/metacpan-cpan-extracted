@@ -1,3 +1,8 @@
+0.010   2018-03-04 (PERLANCAR)
+
+	- [test] Fix comparing paths [RT#124072].
+
+
 0.009   2018-01-07 (PERLANCAR)
 
 	- No functional changes.

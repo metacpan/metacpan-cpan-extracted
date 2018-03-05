@@ -1,17 +1,22 @@
-# Copyrights 2007-2017 by [Mark Overmeer].
+# Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# This code is part of distribution XML-Compile-SOAP.  Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::SOAP::Server;
 use vars '$VERSION';
-$VERSION = '3.22';
+$VERSION = '3.23';
 
 
-use Log::Report 'xml-compile-soap', syntax => 'SHORT';
+use warnings;
+use strict;
 
+use Log::Report             'xml-compile-soap';
+
+use XML::Compile::Util       qw/unpack_type/;
 use XML::Compile::SOAP::Util qw/:soap11/;
 use HTTP::Status qw/RC_OK RC_BAD_REQUEST RC_NOT_ACCEPTABLE
    RC_INTERNAL_SERVER_ERROR/;
@@ -68,7 +73,7 @@ sub compileHandler(@)
 
         my $answer = $callback->($self, $data, $session);
         unless(defined $answer)
-        {   notice __x"procedure {name} did not produce an answer", name=> $name;
+        {   notice __x"procedure {name} did not produce an answer", name=>$name;
             return ( RC_INTERNAL_SERVER_ERROR, 'no answer produced'
                    , $self->faultNoAnswerProduced($name));
         }
@@ -97,16 +102,35 @@ sub compileHandler(@)
 
 sub compileFilter(@)
 {   my ($self, %args) = @_;
-    my $nodetype;
-    if(my $first  = $args{body}{parts}[0])
-    {   $nodetype = $first->{element}
-          || $args{body}{procedure};  # rpc-literal "type"
+
+    my $need_node;
+    if($args{style} eq 'rpc')
+    {   # RPC-style wraps the body parameters in the procedure name.  That's
+        # a logical construction.
+        $need_node = $args{body}{procedure} or panic;
+    }
+    else
+    {   # Document-style does *not* contain the procedure name anywhere!  We
+        # can only base the selection on the type of the elements.  Therefore,
+        # procedure selection is often based on HTTP header (which was created
+        # for other purposes.
+		my $first = $args{body}{parts}[0] or panic;
+        $need_node = $first->{element} or panic;
     }
 
-    # called with (XML, INFO)
-      defined $nodetype
-    ? sub { my $f =  $_[1]->{body}[0]; defined $f && $f eq $nodetype }
-    : sub { !defined $_[1]->{body}[0] };  # empty body
+    my ($need_ns, $need_local) = $need_node ? unpack_type($need_node) : ();
+
+    # The returned code-ref is called with (XML, INFO)
+    sub {
+        my ($xml, $info) = @_;
+#use Data::Dumper;
+#warn Dumper \@_;
+#warn $_[0]->toString;
+        (my $body) = $xml->getChildrenByLocalName('Body');
+        (my $has)  = $body->getElementsByTagNameNS($need_ns, $need_local);
+#warn $has->toString;
+        defined $has;
+    };
 }
 
 

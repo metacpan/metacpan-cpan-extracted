@@ -1,32 +1,39 @@
-use v5.8;
+use v5.24;
 
 use Object::Trampoline;
 
-use Scalar::Util    qw( blessed );
-use Test::More      qw( tests 12 );
+use Test::More;
+use Scalar::Util    qw( blessed reftype );
 
 # create three trampolines. note that "frobnicate" is the
 # constructor for each of them.
 
-my $abc = Object::Trampoline->frobnicate( 'abc', foo => 'bar' );
-my $ijk = Object::Trampoline->frobnicate( 'ijk', foo => 'bar' );
-my $xyz = Object::Trampoline->frobnicate( 'xyz', foo => 'bar' );
+my $ot  = 'Object::Trampoline';
+my $otb = 'Object::Trampoline::Bounce';
+
+my $abc = $ot->frobnicate( 'abc', foo => 'bar' );
+my $ijk = $ot->frobnicate( 'ijk', foo => 'bar' );
+my $xyz = $ot->frobnicate( 'xyz', foo => 'bar' );
 
 # at this point all three objects are blessed into O::T::Bounce.
 
-is( blessed $abc, 'Object::Trampoline::Bounce', 'abc is a trampoline' );
-is( blessed $ijk, 'Object::Trampoline::Bounce', 'ijk is a trampoline' );
-is( blessed $xyz, 'Object::Trampoline::Bounce', 'xyz is a trampoline' );
+for my $obj ( $abc, $ijk, $xyz )
+{
+    state $blessed  = Scalar::Util->can( 'blessed' );
+    
+    my $pkg = $obj->$blessed;
 
-# at this point a method is called using the 
-# objects. this converts them from O::T::B
-# into whatever would've been constructed 
-# in the first place by the original calls
-# to the constructor ("frobnicate").
+    is $pkg, $otb, "obj isa '$pkg' ($otb)";
+}
 
-my $abc_value = $abc->foo;
-my $ijk_value = $ijk->bar;
-my $xyz_value = $xyz->baz;
+# at this point a method is called using the objects. this 
+# converts them from O::T::B into whatever would've been 
+# constructed in the first place by the original calls to 
+# the constructor ("frobnicate").
+
+my $abc_expect  = $abc->foo;
+my $ijk_expect  = $ijk->bar;
+my $xyz_expect  = $xyz->baz;
 
 # at this point all three objects should be 
 # blessed into their respective classes.
@@ -34,17 +41,29 @@ my $xyz_value = $xyz->baz;
 # two sanity checks: the ref's have changed
 # and they each have different data structures.
 
-is( blessed $abc, 'abc', 'abc is now an abc' );
-is( blessed $ijk, 'ijk', 'ijk is now an ijk' );
-is( blessed $xyz, 'xyz', 'xyz is now an xyz' );
+my $abc_class   = blessed $abc;
+my $ijk_class   = blessed $ijk;
+my $xyz_class   = blessed $xyz;
 
-ok( $abc->{foo}     eq 'bar', 'abc is a hashref'    );
-ok( $ijk->[1]       eq 'bar', 'ijk is an arrayref'  );
-ok( ( $xyz->() )[1] eq 'bar', 'xyz is a subref'     );
+my $abc_type    = reftype $abc;
+my $ijk_type    = reftype $ijk;
+my $xyz_type    = reftype $xyz;
 
-ok( $abc_value eq 'abc', 'abc calls the correct foo' );
-ok( $ijk_value eq 'ijk', 'ijk calls the correct foo' );
-ok( $xyz_value eq 'xyz', 'xyz calls the correct foo' );
+my $abc_found   = eval { $abc->{ foo }      };
+my $ijk_found   = eval { $ijk->[ 1 ]        };
+my $xyz_found   = eval { ( $xyz->() )[1]    };
+
+is $abc_class, $abc_expect, "abc is '$abc_class' ($abc_expect)";
+is $ijk_class, $ijk_expect, "ijk is '$ijk_class' ($ijk_expect)";
+is $xyz_class, $xyz_expect, "xyz is '$xyz_class' ($xyz_expect)";
+
+ok $abc_type  eq 'HASH' , "abc is $abc_type (HASH)";
+ok $ijk_type  eq 'ARRAY', "ijk is $ijk_type (ARRAY)";
+ok $xyz_type  eq 'CODE' , "xyz is $xyz_type (CODE)";
+
+is $abc_found, 'bar', 'abc {foo} is bar';
+is $ijk_found, 'bar', 'ijk [1]   is bar';
+is $xyz_found, 'bar', 'xyz returns  bar';
 
 {
     package abc;
@@ -86,5 +105,7 @@ ok( $xyz_value eq 'xyz', 'xyz calls the correct foo' );
 
     sub baz { __PACKAGE__ };
 }
+
+done_testing;
 
 __END__

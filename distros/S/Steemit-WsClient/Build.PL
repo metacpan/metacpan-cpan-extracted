@@ -27,7 +27,6 @@ my $builder = Module::Build->new(
         'Date::Calc'       => '0',
         'Math::EllipticCurve::Prime'  => '0',
         'Crypt::RIPEMD160' => '0',
-        'Bytes::Random::Secure' => '0.05',
     },
     recommends => {
     },

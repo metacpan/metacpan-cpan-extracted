@@ -1,3 +1,13 @@
+0.61 - added initial checksum support
+     - handles in and out files
+	 - delete and rename still to come
+	 - need to add tests to ensure that relative and absolute files are
+	   resolved smoothly
+	 - copy files structure to internal _use_files structure
+	   - turn pathnames into HPCI::File objects
+	   - clean up all the alternative structure layout options
+	 - squashed a Heisenbug in t/20-skipstage.t
+
 0.60 - added HPCI::File class for managing file info
      - reworked stage->files attribute to use file class info
 	 - added storage_class and storage_classes to group and stage to select

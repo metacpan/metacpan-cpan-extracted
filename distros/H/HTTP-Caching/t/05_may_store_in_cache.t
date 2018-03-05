@@ -1,5 +1,6 @@
 use Test::Most tests => 11;
 
+use HTTP::Caching::DeprecationWarning ':hide';
 use HTTP::Caching;
 
 $HTTP::Caching::DEBUG = 1; # so we get nice helpful messages back

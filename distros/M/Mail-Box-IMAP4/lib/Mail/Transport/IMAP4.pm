@@ -1,16 +1,19 @@
-# Copyrights 2001-2017 by [Mark Overmeer].
+# Copyrights 2001-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-
-use strict;
-use warnings;
+# This code is part of distribution Mail-Box-IMAP4.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Mail::Transport::IMAP4;
 use vars '$VERSION';
-$VERSION = '3.002';
+$VERSION = '3.003';
 
 use base 'Mail::Transport::Receive';
+
+use strict;
+use warnings;
 
 use Digest::HMAC_MD5;   # only availability check for CRAM_MD5
 use Mail::IMAPClient;

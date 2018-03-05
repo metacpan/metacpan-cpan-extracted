@@ -2,7 +2,7 @@ package App::proxyforurl;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 1;
 
@@ -14,7 +14,7 @@ App::proxyforurl - An online proxy PAC file parser
 
 =head1 VERSION
 
-0.06
+0.07
 
 =head1 DESCRIPTION
 
@@ -49,7 +49,7 @@ intput is.
 
 =back
 
-=head2 DISCLAIMER
+=head1 DISCLAIMER
 
 The parsing is done using good old C<eval()> on the client side, which means
 that the pasted PAC file could in theory contain code which could steal

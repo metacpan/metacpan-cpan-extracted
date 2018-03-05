@@ -1,8 +1,8 @@
-use v5.12;
+use v5.24;
+
 use lib qw( t );
 
 use Object::Trampoline;
-
 use Test::More;
 
 use Symbol      qw( qualify_to_ref );

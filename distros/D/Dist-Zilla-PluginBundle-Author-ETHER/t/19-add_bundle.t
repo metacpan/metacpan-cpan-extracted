@@ -9,6 +9,8 @@ use Test::Fatal;
 use Path::Tiny;
 use Moose::Util 'find_meta';
 
+use Test::File::ShareDir -share => { -dist => { 'Dist-Zilla-PluginBundle-Author-ETHER' => 'share' } };
+
 use lib 't/lib';
 use Helper;
 use NoNetworkHits;

@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Lingua::EN::Opinion;
+
+my $input_file = shift || die "Usage: perl $0 /some/file.txt\n";
+
+my $opinion = Lingua::EN::Opinion->new( file => $input_file );
+$opinion->analyze();
+
+my %score;
+@score{ @{ $opinion->sentences } } = @{ $opinion->scores };
+
+for my $valence (qw( positive negative )) {
+    print "Most $valence sentence:\n",
+        [ map {"$score{$_} => $_"} sort { $score{$a} <=> $score{$b} } @{ $opinion->sentences } ]->[-1],
+        "\n";
+}

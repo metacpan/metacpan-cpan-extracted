@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Base;
 
-our $DATE = '2017-12-11'; # DATE
-our $VERSION = '1.810'; # VERSION
+our $DATE = '2018-03-05'; # DATE
+our $VERSION = '1.811'; # VERSION
 
 use 5.010001;
 use strict;
@@ -122,6 +122,7 @@ has default_dry_run => (
 
 # role: requires 'hook_before_run'
 # role: requires 'hook_before_read_config_file'
+# role: requires 'hook_config_file_section'
 # role: requires 'hook_after_read_config_file'
 # role: requires 'hook_after_parse_argv'
 # role: requires 'hook_before_action'
@@ -680,19 +681,26 @@ sub _read_config {
 
     my ($self, $r) = @_;
 
-    #log_trace("[pericmd] Finding config files ...");
+    my $hook_section;
+    if ($self->can("hook_config_file_section")) {
+        $hook_section = sub {
+            my ($section_name, $section_content) = @_;
+            $self->hook_config_file_section(
+                $r, $section_name, $section_content);
+        };
+    }
+
     my $res = Perinci::CmdLine::Util::Config::read_config(
         config_paths     => $r->{config_paths},
         config_filename  => $self->config_filename,
         config_dirs      => $self->config_dirs,
         program_name     => $self->program_name,
+        hook_section     => $hook_section,
     );
     die $res unless $res->[0] == 200;
     $r->{config} = $res->[2];
     $r->{read_config_files} = $res->[3]{'func.read_files'};
     $r->{_config_section_read_order} = $res->[3]{'func.section_read_order'}; # we currently don't want to publish this request key
-    #log_trace("[pericmd] Read config files: %s",
-    #             $r->{'read_config_files'});
 }
 
 sub __min(@) {
@@ -1659,7 +1667,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.810 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2017-12-11.
+This document describes version 1.811 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2018-03-05.
 
 =head1 DESCRIPTION
 
@@ -1732,9 +1740,14 @@ being done, e.g. an argument called C<foo_bar> will become command-line option
 C<--foo-bar>. Command-line aliases from metadata are also added to the
 C<Getopt::Long> spec.
 
-It is also at this step that we read config file (if C<read_config> attribute is
-true). We run C<hook_before_read_config_file> first. Some ideas to do in this
-hook: setting default config profile.
+Config file: It is also at this step that we read config file (if C<read_config>
+attribute is true). We run C<hook_before_read_config_file> first. Some ideas to
+do in this hook: setting default config profile. For each found config section,
+we also run C<hook_config_file_section> first. The hook will be fed C<< ($r,
+$section_name, $section_content) >> and should return 200 status or 204 (no
+content) to skip this config section or 4xx/5xx to terminate config reading with
+an error message. After config files are read, we run
+C<hook_after_read_config_file>.
 
 We then pass the spec to C<Getopt::Long::GetOptions>, we get function arguments.
 
@@ -2368,12 +2381,6 @@ Shown in verbose help message, if description from function metadata is unset.
 For grouping or categorizing subcommands, e.g. when displaying list of
 subcommands.
 
-=item * C<log_any_app> (bool, optional)
-
-Whether to load Log::Any::App, default is true. For subcommands that need fast
-startup you can try turning this off for said subcommands. See L</"LOGGING"> for
-more details.
-
 =item * C<use_utf8> (bool, optional)
 
 Whether to issue L<< binmode(STDOUT, ":utf8") >>. See L</"LOGGING"> for more
@@ -2641,7 +2648,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

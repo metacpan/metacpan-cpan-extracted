@@ -1,5 +1,5 @@
 package Business::RO::TaxDeduction::Ranges;
-$Business::RO::TaxDeduction::Ranges::VERSION = '0.011';
+$Business::RO::TaxDeduction::Ranges::VERSION = '0.012';
 # ABSTRACT: Deduction ranges by year
 
 use 5.010001;
@@ -18,6 +18,7 @@ has 'vbl_min' => (
         my $self = shift;
         return 1000 if $self->base_year == 2005;
         return 1500 if $self->base_year == 2016;
+        return 1950 if $self->base_year == 2018;
         die "Not a valid year: " . $self->base_year;
     },
 );
@@ -30,6 +31,7 @@ has 'vbl_max' => (
         my $self = shift;
         return 3000 if $self->base_year == 2005;
         return 3000 if $self->base_year == 2016;
+        return 3600 if $self->base_year == 2018;
         die "Not a valid year: " . $self->base_year;
     },
 );
@@ -42,6 +44,7 @@ has 'f_min' => (
         my $self = shift;
         return 1000 if $self->base_year == 2005;
         return 1500 if $self->base_year == 2016;
+        return 1950 if $self->base_year == 2018;
         die "Not a valid year: " . $self->base_year;
     },
 );
@@ -54,6 +57,7 @@ has 'f_max' => (
         my $self = shift;
         return 2000 if $self->base_year == 2005;
         return 1500 if $self->base_year == 2016;
+        return 1700 if $self->base_year == 2018;
         die "Not a valid year: " . $self->base_year;
     },
 );
@@ -72,7 +76,7 @@ Business::RO::TaxDeduction::Ranges - Deduction ranges by year
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -90,6 +94,8 @@ version 0.011
 
 Data module.  This module holds data used in the tax deduction
 formula.
+
+NOTE: No tax deduction formula for 2018.
 
 =head1 INTERFACE
 
@@ -125,7 +131,7 @@ The amount used in the tax deduction formula:
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ștefan Suciu.
+This software is copyright (c) 2018 by Ștefan Suciu.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 use Benchmark 'cmpthese';
-use Moo::Role::ToJSON;
 
 # ABSTRACT: benchmark is_attribute_serializable
 

@@ -1,6 +1,6 @@
 =head1 NAME
 
-Template::Provider::Pandoc - expand Markdown templates to HTML
+Template::Provider::Pandoc - pre-process templates with Pandoc
 
 =head1 SYNOPSIS
 
@@ -16,7 +16,7 @@ Template::Provider::Pandoc - expand Markdown templates to HTML
 =head1 DESCRIPTION
 
 Template::Provider::Pandoc is an extension to the Template Toolkit
-which automatically converts Markdown files into HTML before they are
+which automatically processes templates using Pandoc before they are
 processed by TT.
 
 =head1 USAGE
@@ -25,7 +25,7 @@ Like any Template provider module, you will usually use this module by
 creating an instance of the object and passing that in the
 C<LOAD_TEMPLATES> parameter to the Template module's C<new> method.
 
-This module can accept all of the standard parameters that can be passed
+This module accepts all of the standard parameters that can be passed
 to any Template provider module. See L<Template::Provider> for the full
 list.
 
@@ -75,23 +75,53 @@ use strict;
 use warnings;
 use 5.010;
 
-use parent 'Template::Provider';
-use Pandoc;
+use Moose;
+use MooseX::NonMoose;
+extends 'Template::Provider';
 
-our $VERSION = '0.0.2';
+use Pandoc ();
 
-my $pandoc;
+our $VERSION = '0.0.3';
 
-my $default_extensions = {
-  md   => 'markdown',
-};
-my $default_output_format = 'html';
+has pandoc => (
+  isa => 'Pandoc',
+  is  => 'ro',
+  lazy_build => 1,
+  handles => [qw[convert]],
+);
 
-sub _init {
+sub _build_pandoc {
+  return Pandoc->new;
+}
+
+has default_extensions => (
+  isa => 'HashRef',
+  is  => 'ro',
+  lazy_build => 1,
+);
+
+sub _build_default_extensions {
+  return {
+    md => 'markdown',
+  };
+}
+
+has default_output_format => (
+  isa => 'Str',
+  is  => 'ro',
+  lazy_build => 1,
+);
+
+sub _build_default_output_format {
+  return 'html';
+}
+
+before _init  => sub {
   my $self = shift;
   my ($opts) = @_;
 
-  my $exts = $default_extensions;
+  my $exts = $self->default_extensions;
+
   if (exists $opts->{EXTENSIONS}) {
     $exts->{$_} = $opts->{EXTENSIONS}{$_} for keys %{$opts->{EXTENSIONS}};
     delete $opts->{EXTENSIONS};
@@ -99,16 +129,16 @@ sub _init {
 
   $self->{EXTENSIONS} = $exts;
 
-  $self->{OUTPUT_FORMAT} = $opts->{OUTPUT_FORMAT} // $default_output_format;
+  $self->{OUTPUT_FORMAT} =
+    $opts->{OUTPUT_FORMAT} // $self->default_output_format;
+};
 
-  return $self->SUPER::_init($opts);
-}
-
-sub _template_content {
+around _template_content => sub {
+  my $orig = shift;
   my $self = shift;
   my ($path) = @_;
 
-  my ($data, $error, $mod_date) = $self->SUPER::_template_content($path);
+  my ($data, $error, $mod_date) = $self->$orig(@_);
 
   my $done = 0;
 
@@ -116,8 +146,7 @@ sub _template_content {
     next if $_ eq '*';
     if ($path =~ /\.\Q$_\E$/) {
       if (defined $self->{EXTENSIONS}{$_}) {
-        $pandoc //= pandoc;
-        $data = $pandoc->convert(
+        $data = $self->convert(
           $self->{EXTENSIONS}{$_} => $self->{OUTPUT_FORMAT}, $data
         );
       }
@@ -127,14 +156,18 @@ sub _template_content {
   }
 
   if (!$done and exists $self->{EXTENSIONS}{'*'}) {
-    $data = $pandoc->convert(
+    $data = $self->convert(
       $self->{EXTENSIONS}{'*'} => $self->{OUTPUT_FORMAT}, $data
     );
   }
 
   return ($data, $error, $mod_date) if wantarray;
   return $data;
-}
+};
+
+no Moose;
+# no need to fiddle with inline_constructor here
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -151,7 +184,6 @@ modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Template>, L<Template::Provider>, L<Pandoc>,
-L<Template::Provider>.
+L<Template>, L<Template::Provider>, L<Pandoc>.
 
 =cut

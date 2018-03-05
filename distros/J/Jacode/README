@@ -1,0 +1,113 @@
+NAME
+
+jacode - Perl program for Japanese character code conversion
+
+SYNOPSIS
+
+    require 'jacode.pl';
+
+    # note: You can use either of the package of 'jcode' and 'jacode'
+
+    jacode::convert(\$line, $OUTPUT_encoding [, $INPUT_encoding [, $option]])
+    jacode::xxx2yyy(\$line [, $option])
+    jacode::to($OUTPUT_encoding, $line [, $INPUT_encoding [, $option]])
+    jacode::jis($line [, $INPUT_encoding [, $option]])
+    jacode::euc($line [, $INPUT_encoding [, $option]])
+    jacode::sjis($line [, $INPUT_encoding [, $option]])
+    jacode::utf8($line [, $INPUT_encoding [, $option]])
+    jacode::jis_inout($JIS_Kanji_IN, $ASCII_IN)
+    jacode::get_inout($string)
+    jacode::cache()
+    jacode::nocache()
+    jacode::flushcache()
+    jacode::flush()
+    jacode::h2z_xxx(\$line)
+    jacode::z2h_xxx(\$line)
+    jacode::getcode(\$line)
+    jacode::tr(\$line, $from, $to [, $option])
+    jacode::trans($line, $from, $to [, $option])
+    jacode::init()
+    $jacode::convf{'xxx', 'yyy'}
+    $jacode::z2hf{'xxx'}
+    $jacode::h2zf{'xxx'}
+
+    &jcode'convert(*line, $OUTPUT_encoding [, $INPUT_encoding [, $option]])
+    &jcode'xxx2yyy(*line [, $option])
+    &jcode'to($OUTPUT_encoding, $line [, $INPUT_encoding [, $option]])
+    &jcode'jis($line [, $INPUT_encoding [, $option]])
+    &jcode'euc($line [, $INPUT_encoding [, $option]])
+    &jcode'sjis($line [, $INPUT_encoding [, $option]])
+    &jcode'utf8($line [, $INPUT_encoding [, $option]])
+    &jcode'jis_inout($JIS_Kanji_IN, $ASCII_IN)
+    &jcode'get_inout($string)
+    &jcode'cache()
+    &jcode'nocache()
+    &jcode'flushcache()
+    &jcode'flush()
+    &jcode'h2z_xxx(*line)
+    &jcode'z2h_xxx(*line)
+    &jcode'getcode(*line)
+    &jcode'tr(*line, $from, $to [, $option])
+    &jcode'trans($line, $from, $to [, $option])
+    &jcode'init()
+    $jcode'convf{'xxx', 'yyy'}
+    $jcode'z2hf{'xxx'}
+    $jcode'h2zf{'xxx'}
+
+ABSTRACT
+
+    This software has upper compatibility to jcode.pl and multiple inheritance
+    both stable jcode.pl library and active Encode module.
+
+    * jcode.pl upper compatible
+    * pkf command upper compatible
+    * Perl4 script also Perl5 script
+    * Powered by Encode::from_to (Yes, not only Japanese!)
+    * future-proof software
+    * Support HALFWIDTH KATAKANA
+    * Support UTF-8 by cp932 to Unicode table
+        http://unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP932.TXT
+        http://support.microsoft.com/kb/170559/ja
+        (JIS X 0221:2007 BASIC JAPANESE and COMMON JAPANESE)
+    * Hidden UTF8 flag
+    * No Object oriented
+    * Maintain the traditional programming
+
+INSTALLATION
+
+   To test this software, type the following:
+
+   make test
+
+   To install this software, copy 'jacode.pl' to any directory of @INC.
+
+DEPENDENCIES
+
+    This software requires perl 4.036 or later.
+
+AUTHOR
+
+    Copyright (c) 1992,1993,1994 Kazumasa Utashiro
+    Copyright (c) 1995-2000 Kazumasa Utashiro
+    Copyright (c) 2002 Kazumasa Utashiro
+    Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018 INABA Hitoshi
+
+LICENSE AND COPYRIGHT
+
+    This software is free software;
+
+    Use and redistribution for ANY PURPOSE are granted as long as all
+    copyright notices are retained.  Redistribution with modification
+    is allowed provided that you make your modified version obviously
+    distinguishable from the original one.  THIS SOFTWARE IS PROVIDED
+    BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES ARE
+    DISCLAIMED.
+
+    This software is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+
+    perl, jcode.pl, jacode4e.pl, Jacode.pm, Sjis.pm, pkf, Modern::Open
+

@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Types;
 # ABSTRACT: Distribution-wide Moose types for Bio::MUST::Core
-$Bio::MUST::Core::Types::VERSION = '0.180230';
+$Bio::MUST::Core::Types::VERSION = '0.180630';
 use Moose::Util::TypeConstraints;
 
 use autodie;
@@ -107,8 +107,15 @@ coerce 'Bio::MUST::Core::Types::Seq'
     => via { ( my $seq = tr{-\n}{*}dr ) =~ s{\A ([^*]+) \* \z}{$1}xms; $seq }
 ;   # Note: s/// only modifies plain seqs ending in '*'
 
+# subtype for a stringified NCBI Taxonomy lineage
+subtype 'Bio::MUST::Core::Types::Lineage'
+    => as 'Str'
+    => where { tr/;// || m/\A cellular \s organisms/xms || m/\A Viruses/xms }
+;
+
 class_type('Path::Class::Dir');
 class_type('Path::Class::File');
+class_type('File::Temp');
 
 # auto-build Ali/Stash from various source types...
 # useful in Bio::MUST::Drivers modules
@@ -184,7 +191,7 @@ coerce 'Bio::MUST::Core::Types::Dir'
     => via { dir( glob $_ ) }
 ;
 
-# === borrowed from Bio::FastParsers to avoid depending on this module
+# === in part borrowed from Bio::FastParsers to avoid dependency
 # TODO: find a way to avoid this repetition of code
 
 # subtype for 'file' attributes
@@ -196,6 +203,9 @@ subtype 'Bio::MUST::Core::Types::File'
 # ... and allow fixing '~/' paths on the fly (through glob)
 # ... and allow delegating to Path::Class::File methods (e.g., remove)
 coerce 'Bio::MUST::Core::Types::File'
+    => from 'File::Temp'                    # useful for Drivers
+    => via { file( $_->filename ) }
+
     => from 'Str'
     => via { file( glob $_ ) }
 ;
@@ -215,7 +225,7 @@ Bio::MUST::Core::Types - Distribution-wide Moose types for Bio::MUST::Core
 
 =head1 VERSION
 
-version 0.180230
+version 0.180630
 
 =head1 SYNOPSIS
 

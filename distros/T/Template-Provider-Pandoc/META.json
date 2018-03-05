@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Template-Provider-Pandoc",
    "no_index" : {
@@ -32,6 +32,8 @@
       },
       "runtime" : {
          "requires" : {
+            "Moose" : "0",
+            "MooseX::NonMoose" : "0",
             "Pandoc" : "0",
             "Template" : "0",
             "perl" : "5.010000"
@@ -42,10 +44,10 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/davorg/template-provider-markdown-pandoc.git",
-         "web" : "https://github.com/davorg/template-provider-markdown-pandoc"
+         "url" : "https://github.com/davorg/template-provider-pandoc.git",
+         "web" : "https://github.com/davorg/template-provider-pandoc"
       }
    },
-   "version" : "v0.0.2",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "v0.0.3",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

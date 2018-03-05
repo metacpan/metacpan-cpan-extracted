@@ -43,7 +43,7 @@
    "provides" : {
       "Music::Lyrics::LRC" : {
          "file" : "lib/Music/Lyrics/LRC.pm",
-         "version" : "0.13"
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "web" : "https://sanctum.geek.nz/cgit/Music-Lyrics-LRC.git/"
       }
    },
-   "version" : "0.13",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

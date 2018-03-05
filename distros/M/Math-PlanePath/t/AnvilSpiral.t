@@ -33,7 +33,7 @@ require Math::PlanePath::AnvilSpiral;
 # VERSION
 
 {
-  my $want_version = 125;
+  my $want_version = 126;
   ok ($Math::PlanePath::AnvilSpiral::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::AnvilSpiral->VERSION,  $want_version,

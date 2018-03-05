@@ -257,7 +257,7 @@ sub run_a_test {
                     # close $fd;
                     # return undef;
                 # },
-                command => "echo hi > $workdir/f.$file",
+                command => "sleep 1;echo hi > $workdir/f.$file",
                 files => {
                     out => { req => "$workdir/f.$file" }
                 },

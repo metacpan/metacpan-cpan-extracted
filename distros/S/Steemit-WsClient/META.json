@@ -28,7 +28,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Bytes::Random::Secure" : "0.05",
             "Crypt::RIPEMD160" : "0",
             "Date::Calc" : "0",
             "Digest::SHA" : "0",
@@ -48,9 +47,12 @@
       "Steemit::ECDSA" : {
          "file" : "lib/Steemit/ECDSA.pm"
       },
+      "Steemit::OperationSerializer" : {
+         "file" : "lib/Steemit/OperationSerializer.pm"
+      },
       "Steemit::WsClient" : {
          "file" : "lib/Steemit/WsClient.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -59,6 +61,6 @@
          "http://opensource.org/licenses/artistic-license-2.0.php"
       ]
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

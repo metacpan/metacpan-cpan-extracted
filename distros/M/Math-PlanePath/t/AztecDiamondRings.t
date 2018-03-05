@@ -33,7 +33,7 @@ require Math::PlanePath::AztecDiamondRings;
 # VERSION
 
 {
-  my $want_version = 125;
+  my $want_version = 126;
   ok ($Math::PlanePath::AztecDiamondRings::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::AztecDiamondRings->VERSION,  $want_version,

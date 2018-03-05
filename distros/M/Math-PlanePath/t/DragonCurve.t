@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -20,23 +20,20 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 624;
+plan tests => 628;
 
 use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 
-# uncomment this to run the ### lines
-#use Devel::Comments;
-
-require Math::PlanePath::DragonCurve;
+use Math::PlanePath::DragonCurve;
 
 
 #------------------------------------------------------------------------------
 # VERSION
 
 {
-  my $want_version = 125;
+  my $want_version = 126;
   ok ($Math::PlanePath::DragonCurve::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::DragonCurve->VERSION,  $want_version,
@@ -219,6 +216,18 @@ require Math::PlanePath::DragonCurve;
   my @pnames = map {$_->{'name'}}
     Math::PlanePath::DragonCurve->parameter_info_list;
   ok (join(',',@pnames), 'arms');
+}
+
+
+#------------------------------------------------------------------------------
+# xyxy_to_n_list()
+
+foreach my $arms (1 .. 4) {
+  my $path = Math::PlanePath::DragonCurve->new (arms => $arms);
+  my @got_n_list = $path->xy_to_n_list(0,0);
+  my $got_n_list = join(',',@got_n_list);
+  my $want_n_list = join(',', 0 .. $arms-1);
+  ok ($got_n_list, $want_n_list);
 }
 
 

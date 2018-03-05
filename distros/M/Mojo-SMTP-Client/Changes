@@ -1,5 +1,8 @@
 Revision history for Perl extension Mojo::SMTP::Client
 
+0.15  Fri Mar  2 19:53:40 +07 2018
+    - Final fixes for compatibility with latest Mojo::IOLoop::Delay (#rt124562)
+
 0.14  Wed Nov 29 00:39:40 DST 2017
     - Temporary fix for Mojolicious 7.49+ (#gh7)
 

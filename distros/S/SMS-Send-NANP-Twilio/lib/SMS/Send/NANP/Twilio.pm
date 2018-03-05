@@ -5,7 +5,7 @@ use URI;
 use JSON::XS qw{decode_json};
 use base qw{SMS::Send::Driver::WebService};
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 

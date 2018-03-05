@@ -1,5 +1,5 @@
 Name:           perl-SMS-Send-NANP-Twilio
-Version:        0.03
+Version:        0.04
 Release:        1%{?dist}
 Summary:        SMS::Send driver for Twilio
 License:        perl
@@ -9,6 +9,7 @@ Source0:        http://www.cpan.org/modules/by-module/SMS/SMS-Send-NANP-Twilio-%
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(DateTime)
 BuildRequires:  perl(JSON::XS)
 BuildRequires:  perl(SMS::Send)
 BuildRequires:  perl(SMS::Send::Driver::WebService) >= 0.06

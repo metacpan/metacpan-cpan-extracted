@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -57,7 +57,7 @@ sub want_planepath {
   # return 0 unless $planepath =~ /SierpinskiArrowheadC/;
   # return 0 unless $planepath =~ /TriangleSpiralSkewed/;
   # return 0 unless $planepath =~ /^Rows/;
-  # return 0 unless $planepath =~ /DiagonalRationals/;
+  return 0 unless $planepath =~ /AlternateTerdragon/;
   return 1;
 }
 sub want_coordinate {

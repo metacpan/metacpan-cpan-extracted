@@ -84,7 +84,7 @@ TestBot->expect(
         '05master b9b5587 06test-repo',
         '10mod-one 03file-one 04rm-one',
         '* Commit three files (add, mod, rm)',
-        '* 14http://git/b9b55876e288bba29d1579d308eea5758bc148ef' )
+        '* 14http://git/b9b5587' )
 );
 
 TestBot->expect(
@@ -93,7 +93,7 @@ TestBot->expect(
         '05master 284ffdd 06test-repo',
         '10(6 files)',
         '* Commit six files (2×(add, mod, rm))',
-        '* 14http://git/284ffdd4c525547f6ae848d768fff92ff9a89743' )
+        '* 14http://git/284ffdd' )
 );
 
 diag `cat t/bot/kgb-bot.log`;

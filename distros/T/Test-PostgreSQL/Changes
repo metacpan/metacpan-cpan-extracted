@@ -1,5 +1,10 @@
 Revision history for Perl extension Test::PostgreSQL.
 
+1.24
+    - Adds support for UNIX socket connections to PostgreSQL
+    - Adds psql method to retrieve appropriate CLI parameters
+    - Recognize devel PostgreSQL versions
+
 1.23
     - Fix missing META files RT:121425
 1.22

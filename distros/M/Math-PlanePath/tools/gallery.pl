@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -45,6 +45,11 @@ my %seen_filename;
 
 foreach my $elem
   (
+   ['alternate-terdragon-small.png',
+    'math-image --path=AlternateTerdragon --lines --scale=5 --size=32 --offset=-3,-7'],
+   ['alternate-terdragon-big.png',
+    'math-image --path=AlternateTerdragon --lines --figure=point --scale=4 --size=200 --offset=0,-40'],
+
    ['hilbert-sides-small.png',
     'math-image --path=HilbertSides --lines --scale=2 --size=32 --figure=point'],
    ['hilbert-sides-big.png',

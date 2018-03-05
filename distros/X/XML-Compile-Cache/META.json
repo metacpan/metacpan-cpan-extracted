@@ -4,13 +4,13 @@
       "Mark Overmeer"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "XML-Compile-Cache",
    "no_index" : {
@@ -32,14 +32,26 @@
       },
       "runtime" : {
          "requires" : {
-            "Log::Report" : "0.19",
+            "Log::Report" : "1.26",
             "Test::More" : "0.54",
-            "XML::Compile" : "1.48",
+            "XML::Compile" : "1.6",
             "XML::Compile::Tester" : "0.02",
             "XML::LibXML::Simple" : "0.95"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.05"
+   "resources" : {
+      "homepage" : "http://perl.overmeer.net/CPAN/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/markov2/perl5-XML-Compile-Cache.git",
+         "web" : "https://github.com/markov2/perl5-XML-Compile-Cache"
+      }
+   },
+   "version" : "1.06",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

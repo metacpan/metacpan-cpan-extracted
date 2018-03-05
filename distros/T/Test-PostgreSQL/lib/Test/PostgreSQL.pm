@@ -13,7 +13,7 @@ use File::Which;
 use POSIX qw(SIGQUIT SIGKILL WNOHANG getuid setuid);
 use User::pwent;
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 our $errstr;
 
 # Deprecate use of %Defaults as we want to remove this package global
@@ -94,6 +94,13 @@ has base_dir => (
   },
 );
 
+has socket_dir => (
+  is => "ro",
+  isa => Str,
+  lazy => 1,
+  default => method () { File::Spec->catdir( $self->base_dir, 'tmp' ) },
+);
+
 has initdb => (
   is => "ro",
   isa => Str,
@@ -116,6 +123,12 @@ has extra_initdb_args => (
   default => "",
 );
 
+has unix_socket => (
+  is  => "ro",
+  isa     => Bool,
+  default => 0,
+);
+
 has pg_ctl => (
   is => "ro",
   isa => Maybe[Str],
@@ -128,7 +141,7 @@ method _pg_ctl_builder() {
   if ( $prog ) {
       # we only use pg_ctl if Pg version is >= 9
       my $ret = qx/"$prog" --version/;
-      if ( $ret =~ /(\d+)\./ && $1 >= 9 ) {
+      if ( $ret =~ /(\d+)(?:\.|devel)/ && $1 >= 9 ) {
           return $prog;
       }
       warn "pg_ctl version earlier than 9";
@@ -136,6 +149,31 @@ method _pg_ctl_builder() {
   }
   return;
 }
+
+has psql => (
+    is => 'ro',
+    isa => Str,
+    lazy => 1,
+    default => method () { $self->_find_program('psql') || die $errstr },
+);
+
+has psql_args => (
+    is => 'lazy',
+    isa => Str,
+);
+
+method _build_psql_args() {
+    return '-U postgres -d test -h '.
+        ($self->unix_socket ? $self->socket_dir : '127.0.0.1') .
+        ' -p ' . $self->port
+        . $self->extra_psql_args;
+}
+
+has extra_psql_args => (
+    is => 'ro',
+    isa => Str,
+    default => '',
+);
 
 has pid => (
   is => "rw",
@@ -176,7 +214,9 @@ has postmaster_args => (
 );
 
 method _build_postmaster_args() {
-    return "-h 127.0.0.1 -F " . $self->extra_postmaster_args;
+    return "-h ".
+        ($self->unix_socket ? "''" : "127.0.0.1") .
+        " -F " . $self->extra_postmaster_args;
 }
 
 has extra_postmaster_args => (
@@ -237,7 +277,14 @@ sub dsn {
 
 sub _default_args {
     my ($self, %args) = @_;
-    $args{host} ||= '127.0.0.1';
+    # If we're doing socket-only (IE, not listening on localhost),
+    # then provide the path to the socket
+    if ($self->{unix_socket}) {
+        $args{host} //= $self->socket_dir;
+    } else {
+        $args{host} ||= '127.0.0.1';
+    }
+
     $args{port} ||= $self->port;
     $args{user} ||= 'postgres';
     $args{dbname} ||= 'test';
@@ -304,7 +351,7 @@ method _try_start($port) {
             join( ' ',
                 $self->postmaster_args, '-p',
                 $port,                  '-k',
-                File::Spec->catdir( $self->base_dir, 'tmp' ) )
+                $self->socket_dir)
         );
         $self->setuid_cmd(@cmd);
 
@@ -344,7 +391,7 @@ method _try_start($port) {
                 $self->postmaster_args,
                 '-p', $port,
                 '-D', File::Spec->catdir($self->base_dir, 'data'),
-                '-k', File::Spec->catdir($self->base_dir, 'tmp'),
+                '-k', $self->socket_dir,
             );
             exec($cmd);
             die "failed to launch postmaster:$?";
@@ -445,7 +492,7 @@ method setup() {
         chown $self->uid, -1, $self->base_dir
             or die "failed to chown dir:" . $self->base_dir . ":$!";
     }
-    my $tmpdir = File::Spec->catfile($self->base_dir, 'tmp');
+    my $tmpdir = $self->socket_dir;
     if (mkdir $tmpdir) {
         if ($self->uid) {
             chown $self->uid, -1, $tmpdir
@@ -626,6 +673,29 @@ Defaults to C<-h 127.0.0.1 -F>
 
 Extra args to be appended to L</postmaster_args>
 
+=head2 psql
+
+Path to C<psql> client which is part of the PostgreSQL distribution.
+
+C<psql> can be used to run SQL scripts against the temporary database created
+by L</new>:
+
+    my $pgsql = Test::PostgreSQL->new();
+    my $psql = $pgsql->psql;
+    
+    my $out = `$psql -f /path/to/script.sql 2>&1`;
+    
+    die "Error executing script.sql: $out" unless $? == 0;
+
+=head2 psql_args
+
+Command line arguments necessary for C<psql> to connect to the correct PostgreSQL
+instance. Defaults to C<-U postgres -d test -h 127.0.0.1 -p $self->port>
+
+=head2 extra_psql_args
+
+Extra args to be appended to L</psql_args>.
+
 =head2 dsn
 
 Builds and returns dsn by using given parameters (if any).  Default username is
@@ -658,6 +728,13 @@ Stops postmaster.
 =head2 setup
 
 Setups the PostgreSQL instance.
+
+=head2 unix_socket
+
+Whether to only connect via UNIX sockets; if false (the default),
+connections can occur via localhost. [This changes the L</dsn>
+returned to only give the UNIX socket directory, and avoids any issues with
+conflicting TCP ports on localhost.]
 
 =head1 ENVIRONMENT
 

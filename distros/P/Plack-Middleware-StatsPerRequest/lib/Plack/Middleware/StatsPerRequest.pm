@@ -2,7 +2,7 @@ package Plack::Middleware::StatsPerRequest;
 
 # ABSTRACT: Measure HTTP stats on each request
 
-our $VERSION = '0.900';
+our $VERSION = '0.901';
 
 use strict;
 use warnings;
@@ -10,7 +10,8 @@ use 5.010;
 use Time::HiRes qw();
 
 use parent 'Plack::Middleware';
-use Plack::Util::Accessor qw( app_name metric_name path_cleanups add_headers long_request );
+use Plack::Util::Accessor
+    qw( app_name metric_name path_cleanups add_headers has_headers long_request );
 use Plack::Request;
 use Log::Any qw($log);
 use Measure::Everything 1.002 qw($stats);
@@ -19,10 +20,19 @@ use HTTP::Headers::Fast;
 sub prepare_app {
     my $self = shift;
 
-    $self->app_name('unknown') unless $self->app_name;
+    $self->app_name('unknown')         unless $self->app_name;
     $self->metric_name('http_request') unless $self->metric_name;
-    $self->path_cleanups([\&replace_idish]) unless $self->path_cleanups;
+    $self->path_cleanups( [ \&replace_idish ] ) unless $self->path_cleanups;
     $self->long_request(5) unless defined $self->long_request;
+    foreach my $check (qw(add_headers has_headers)) {
+        my $val = $self->$check;
+        if ( $val && ref($val) ne 'ARRAY' ) {
+            $log->warn(
+                "Plack::Middleware::StatsPerRequest $check has to be an ARRAYREF, ignoring $val"
+            );
+            $self->$check(undef);
+        }
+    }
 }
 
 sub call {
@@ -43,7 +53,7 @@ sub call {
             $elapsed = sprintf( '%5f', $elapsed ) if $elapsed < .0001;
 
             my $path = $env->{PATH_INFO};
-            foreach my $callback (@{$self->path_cleanups}) {
+            foreach my $callback ( @{ $self->path_cleanups } ) {
                 $path = $callback->($path);
             }
 
@@ -53,27 +63,28 @@ sub call {
                 app    => $self->app_name,
                 path   => $path,
             );
-            if (my $headers_to_add = $self->add_headers) {
+            if ( my $headers_to_add = $self->add_headers ) {
+                $req = Plack::Request->new($env);
                 foreach my $header (@$headers_to_add) {
-                    $req = Plack::Request->new( $env );
-                    $tags{'header_'.lc($header)} = $req->header($header) // 'not_set';
+                    $tags{ 'header_' . lc($header) } = $req->header($header)
+                        // 'not_set';
+                }
+            }
+            if ( my $has_headers = $self->has_headers ) {
+                $req ||= Plack::Request->new($env);
+                foreach my $header (@$has_headers) {
+                    $tags{ 'has_header_' . lc($header) } =
+                        $req->header($header) ? 1 : 0;
                 }
             }
 
             eval {
-                $stats->write(
-                    $self->metric_name,
-                    { request_time => $elapsed, hit => 1 },
-                    \%tags
-                );
-                if ( $self->long_request &&  $elapsed > $self->long_request ) {
+                $stats->write( $self->metric_name,
+                    { request_time => $elapsed, hit => 1 }, \%tags );
+                if ( $self->long_request && $elapsed > $self->long_request ) {
                     $req ||= Plack::Request->new($env);
-                    $log->warnf(
-                        "Long request, took %f: %s %s",
-                        $elapsed,
-                        $req->method,
-                        $req->request_uri
-                    );
+                    $log->warnf( "Long request, took %f: %s %s",
+                        $elapsed, $req->method, $req->request_uri );
                 }
             };
             if ($@) {
@@ -86,13 +97,14 @@ sub call {
 
 sub replace_idish {
     my $path = shift;
-    $path = lc($path . '/');
+    $path = lc( $path . '/' );
 
     $path =~ s{/[a-f0-9\-.]+\@[a-z0-9\-.]+/}{/:msgid/}g;
     $path =~ s{/[a-f0-9]+\/[a-f0-9\/]+/}{/:hexpath/}g;
 
     $path =~ s([a-f0-9]{40})(:sha1)g;
-    $path =~ s([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})(:uuid)g;
+    $path =~
+        s([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})(:uuid)g;
     $path =~ s(\d{6,})(:int)g;
     $path =~ s{\d+x\d+}{:imgdim}g;
 
@@ -100,7 +112,7 @@ sub replace_idish {
     $path =~ s(/[^/]{55,}/)(/:long/)g;
     $path =~ s(/[a-f0-9\-]{8,}/)(/:hex/)g;
 
-    return substr($path, 0, -1);
+    return substr( $path, 0, -1 );
 }
 
 "42nd birthday release";
@@ -117,7 +129,7 @@ Plack::Middleware::StatsPerRequest - Measure HTTP stats on each request
 
 =head1 VERSION
 
-version 0.900
+version 0.901
 
 =head1 SYNOPSIS
 
@@ -194,6 +206,18 @@ values.
    # header_accept-language=Accept-Language
 
 If a header is not sent by a client, a value of C<not_set> will be reported.
+
+=head3 has_headers
+
+A list of HTTP header fields. Default to C<[ ]> (empty list).
+
+Checks if a HTTP header is set, and adds a tag containing 1 or 0. This
+makes sense if you just what to count if a header was sent, but don't
+care about it's content (eg a bearer token):
+
+   enable "Plack::Middleware::StatsPerRequest",
+            has_headers => [ 'Authorization' ];
+   # has_header_authorization=1
 
 =head3 long_request
 

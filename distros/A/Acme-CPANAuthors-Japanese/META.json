@@ -4,7 +4,7 @@
       "Kenichi Ishigaki <ishigaki@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker::CPANfile" : "0.07"
+            "ExtUtils::MakeMaker::CPANfile" : "0.08"
          }
       },
       "runtime" : {
@@ -48,5 +48,6 @@
          "url" : "https://github.com/charsbar/acme-cpanauthors-japanese"
       }
    },
-   "version" : "0.161210"
+   "version" : "0.180304",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

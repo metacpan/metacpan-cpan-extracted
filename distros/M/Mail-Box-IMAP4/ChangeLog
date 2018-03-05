@@ -1,5 +1,13 @@
 
-===== ChangeLog of Mail::Box::IMAP4 version 3.*
+===== history of Mail-Box-IMAP4
+
+version 3.003: Sun Mar  4 14:58:04 CET 2018
+
+	Improvements:
+	- spell fixes in pod.
+	  rt.cpan.org#124012 [Damyan Ivanov]
+	- add pod tester
+	- convert to GIT and GitHub
 
 version 3.002: Thu 29 Jun 15:21:39 CEST 2017
 

@@ -6,6 +6,9 @@
 # ======================================================================
 
 use strict;
-use Test::More tests => 1;
+use Test::More tests => 2;
 
+my @warnings;
+$SIG{__WARN__} = sub { push @warnings, @_ };
 use_ok('String::Format');
+is_deeply \@warnings, [], 'No warnings';

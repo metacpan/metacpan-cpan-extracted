@@ -3,7 +3,7 @@
 package Main;
 # PODNAME: koha-index
 # ABSTRACT: Index Koha biblio/authority records
-$Main::VERSION = '0.053';
+$Main::VERSION = '0.054';
 use 5.010;
 use utf8;
 use warnings;
@@ -30,7 +30,7 @@ koha-index - Index Koha biblio/authority records
 
 =head1 VERSION
 
-version 0.053
+version 0.054
 
 =head1 SYNOPSIS
 

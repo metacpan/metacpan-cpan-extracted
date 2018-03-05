@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -26,17 +26,14 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 
-# uncomment this to run the ### lines
-# use Smart::Comments;
-
-require Math::PlanePath::AlternatePaper;
+use Math::PlanePath::AlternatePaper;
 
 
 #------------------------------------------------------------------------------
 # VERSION
 
 {
-  my $want_version = 125;
+  my $want_version = 126;
   ok ($Math::PlanePath::AlternatePaper::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::AlternatePaper->VERSION,  $want_version,
@@ -165,7 +162,7 @@ foreach my $arms (1 .. 8) {
 
 {
   # with Y reckoned increasing upwards
-  sub dxdy_to_dir {
+  sub dxdy_to_dir4 {
     my ($dx, $dy) = @_;
     if ($dx > 0) { return 0; }  # east
     if ($dx < 0) { return 2; }  # west
@@ -175,7 +172,7 @@ foreach my $arms (1 .. 8) {
   sub path_n_dir {
     my ($path, $n) = @_;
     my ($dx,$dy) = $path->n_to_dxdy($n) or die "Oops, no point at ",$n;
-    return dxdy_to_dir ($dx, $dy);
+    return dxdy_to_dir4 ($dx, $dy);
   }
   # return 1 for left, 0 for right
   sub path_n_turn {

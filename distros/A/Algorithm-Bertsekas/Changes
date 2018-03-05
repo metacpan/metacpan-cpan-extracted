@@ -6,6 +6,9 @@ SYNOPSIS
 
 DESCRIPTION
 
+    Version 0.25 (Algorithm::Bertsekas-0.25 Released on 03th Mar 2018)
+		1. little changes and improvements.
+		
     Version 0.23 (Algorithm::Bertsekas-0.23 Released on 27th Feb 2018)
 	    1. Added the 'delete_multiple_columns' subroutine.
 		2. some improvements.

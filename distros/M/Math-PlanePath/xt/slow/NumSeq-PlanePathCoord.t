@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -404,6 +404,13 @@ my @modules = (
 
                # module list begin
 
+               'AlternateTerdragon',
+               'AlternateTerdragon,arms=2',
+               'AlternateTerdragon,arms=3',
+               'AlternateTerdragon,arms=4',
+               'AlternateTerdragon,arms=5',
+               'AlternateTerdragon,arms=6',
+
                'VogelFloret',
                'VogelFloret,rotation_type=sqrt2',
                'VogelFloret,rotation_type=sqrt3',
@@ -765,7 +772,6 @@ my @modules = (
                'TerdragonMidpoint,arms=4',
                'TerdragonMidpoint,arms=5',
                'TerdragonMidpoint,arms=6',
-
 
                'HexSpiral',
                'HexSpiral,wider=1',

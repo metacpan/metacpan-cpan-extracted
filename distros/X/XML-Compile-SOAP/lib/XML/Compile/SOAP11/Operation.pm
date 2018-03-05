@@ -1,17 +1,22 @@
-# Copyrights 2007-2017 by [Mark Overmeer].
+# Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# This code is part of distribution XML-Compile-SOAP.  Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::SOAP11::Operation;
 use vars '$VERSION';
-$VERSION = '3.22';
+$VERSION = '3.23';
 
 use base 'XML::Compile::SOAP::Operation';
 
-use Log::Report 'xml-compile-soap', syntax => 'SHORT';
+use warnings;
+use strict;
+
+use Log::Report 'xml-compile-soap';
+
 use List::Util  'first';
 
 use XML::Compile::Util       qw/pack_type unpack_type/;
@@ -222,7 +227,7 @@ sub addHeader($$$%)
 sub compileHandler(@)
 {   my ($self, %args) = @_;
 
-    my $soap = $soap11_server{$self->{schemas}}
+    my $soap  = $soap11_server{$self->{schemas}}
       ||= XML::Compile::SOAP11::Server->new(schemas => $self->{schemas});
     my $style = $args{style} ||= $self->style;
 
@@ -231,9 +236,10 @@ sub compileHandler(@)
 
     $args{encode}   ||= $soap->_sender(@so, %args);
     $args{decode}   ||= $soap->_receiver(@ro, %args);
-    $args{selector} ||= $soap->compileFilter(%{$self->{input_def}});
     $args{kind}     ||= $self->kind;
     $args{name}       = $self->name;
+    $args{selector} ||= $soap->compileFilter(%{$self->{input_def}},
+		style => $style);
 
     $args{callback} = XML::Compile::SOAP::Extension
       ->soap11HandlerWrapper($self, $args{callback}, \%args);
@@ -333,7 +339,7 @@ sub explain($$$@)
 
         my $type = $schema->prefixed($value) || $value;
         push @main, ''
-          , "# Body part '$name' is $kind $type"
+          , "# Body part '$name' is content for $kind $type"
           , ($kind eq 'type' && $recurse ? "# See fake element '$name'" : ())
           , "my \$$name = {};";
         push @struct, "    $name => \$$name,";

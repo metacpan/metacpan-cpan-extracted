@@ -1,5 +1,5 @@
 package Yancy::Backend::Mysql;
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 # ABSTRACT: A backend for MySQL using Mojo::mysql
 
 #pod =head1 SYNOPSIS
@@ -151,7 +151,7 @@ sub list {
     }
     #; say $query;
     return {
-        rows => $mysql->db->query( $query, @params )->hashes,
+        items => $mysql->db->query( $query, @params )->hashes,
         total => $mysql->db->query( $total_query, @total_params )->hash->{total},
     };
 }
@@ -266,7 +266,7 @@ Yancy::Backend::Mysql - A backend for MySQL using Mojo::mysql
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

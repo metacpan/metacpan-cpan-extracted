@@ -13,7 +13,7 @@
          }
       },
       "rule_id" : 1,
-      "source" : "../../_data/cfg.beta.json"
+      "source" : "_cfg.beta.json"
    },
    {
       "A" : {
@@ -22,7 +22,7 @@
          }
       },
       "rule_id" : 2,
-      "source" : "../../_data/cfg.gamma.json"
+      "source" : "_cfg.gamma.json"
    },
    {
       "A" : {

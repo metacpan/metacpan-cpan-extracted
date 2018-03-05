@@ -1,6 +1,6 @@
 App-NDTools
 
-App::NDTools - diff/patch/process/query command line tools for nested data
+App::NDTools - command line tools for nested structures
 structures
 
 INSTALLATION
@@ -17,21 +17,21 @@ SUPPORT AND DOCUMENTATION
 After installing, you can find documentation for this module with the
 perldoc command.
 
-    perldoc JSON::Patch
+    perldoc App::NDTools
 
 You can also look for information at:
 
     RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=JSON-Patch
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-NDTools
 
     AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/JSON-Patch
+        http://annocpan.org/dist/App-NDTools
 
     CPAN Ratings
-        http://cpanratings.perl.org/d/JSON-Patch
+        http://cpanratings.perl.org/d/App-NDTools
 
     Search CPAN
-        http://search.cpan.org/dist/JSON-Patch/
+        http://search.cpan.org/dist/App-NDTools
 
 
 LICENSE AND COPYRIGHT

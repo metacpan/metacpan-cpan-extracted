@@ -8,6 +8,7 @@ use strict;
 use Carp;
 use Data::Dumper;
 use HPCI::File;
+use File::Spec;
 
 use List::Util qw(first);
 use Scalar::Util 'blessed';
@@ -608,11 +609,14 @@ has 'group' => (
     weak_ref => 1,
     required => 1,
     handles  => {
-        debug => 'debug',
-        info  => 'info',
-        warn  => 'warn',
-        error => 'error',
-        fatal => 'fatal',
+        debug       => 'debug',
+        info        => 'info',
+        warn        => 'warn',
+        error       => 'error',
+        fatal       => 'fatal',
+
+        file_params => 'file_params',
+        _file_info  => '_file_info',
     },
 );
 
@@ -641,12 +645,7 @@ has 'storage_class' => (
     isa      => 'HPCIFileGen',
 	lazy     => 1,
 	default  => sub {
-        # $_[0]->group->storage_class
-        my $self = shift;
-        my $group = $self->group // do {
-            die "Huh? group is undef!";
-        };
-        return $group->storage_class
+        $_[0]->group->storage_class
     },
     required => 1,
 );
@@ -896,18 +895,32 @@ sub _get_file_obj {
     my $self = shift;
     my $file = shift;
     if (my $ref = ref($file)) {
-        $self->_croak( "Element in files attribute is not a pathname or HPCI::File (sub)class. Type is $ref, value is $file" )
-            unless blessed $file && $file->isa("HPCI::File");
-        return $file;
+        if ($ref eq 'ARRAY') {
+            return $self->_generate_file( @$file );
+        }
+        elsif (blessed $file && $file->isa("HPCI::File")) {
+            return $file;
+        }
+        else {
+            $self->_croak( "Element in files attribute is not a pathname, a pathname plus args array, or a HPCI::File (sub)class. Type is $ref, value is $file" )
+        }
     }
-    return $self->_generate_file( $file );
+    else {
+        return $self->_generate_file( $file );
+    }
 }
 
 sub _generate_file {
     my $self = shift;
-    my $path = shift;
+    my $path = File::Spec->rel2abs(shift);
     # TODO: add search through storage_classes list here
-    return $self->storage_class->( $path );
+    my $known = $self->_file_info->{$path} //= {};
+    return $known->{file} //= $self->storage_class->(
+        $path,
+        stage => $self,
+        %{ $known->{params} // {} },
+        @_
+    );
 }
 
 =head2 state, is_ready, is_blocked, is_pass, is_fail
@@ -1051,14 +1064,14 @@ after '_analyse_completion_state' => sub {
             my $fs_delay = $self->group->file_system_delay;
           FILE:
             while ( my ($type, $fileval) = each %$outfiles ) {
-                for my $file ( $self->_scalar_list($fileval) ) {
-                    while ($fs_delay && ! $file->exists) {
+                for my $file ( @$fileval ) {
+                    while ($fs_delay && ! $file->exists_out_file) {
                         my $sleep_time = ($fs_delay > 5) ? 5 : $fs_delay;
                         $fs_delay -= $sleep_time;
                         sleep $sleep_time;
                     }
                     my $timestamp;
-                    if ($file->exists) {
+                    if ($file->exists_out_file) {
                         if ( ($timestamp = $file->timestamp)
                                 <= $script_time) {
                             $file->accepted_for_out;
@@ -1109,17 +1122,6 @@ after '_analyse_completion_state' => sub {
     }
 };
 
-# take a value that can be either a scalar or a ArrayRef
-# return a list of scalars
-sub _scalar_list {
-    my $self = shift;
-    my $val  = shift;
-    !defined $val         ? ()
-    : ref $val eq 'ARRAY' ? @$val
-    : ! ref $val          ? $val
-    : $self->_croak('neither a scalar nor an arrayref: '.ref($val).' '.Dumper($val));
-}
-
 # check whether criteria are satisfied to skip executing the stage
 sub _can_be_skipped {
     my $self = shift;
@@ -1164,7 +1166,8 @@ sub _files_ready_to_start_stage {
     my $retval = 1; # success unless missing file(s) found
     if (my $in = $files->{in}) {
         while ( my ($type, $fileval) = each %$in ) {
-            for my $file ($self->_scalar_list($fileval)) {
+            for my $file (@$fileval) {
+                unless ($file->valid_in_file || $type ne 'req') {
                 # need to check exist on opt files in case
                 #   the driver needs to take special action to
                 #   make it available to the stage when it runs
@@ -1174,8 +1177,6 @@ sub _files_ready_to_start_stage {
                 # first one we notice - let them fix everything for
                 # the next run instead of needing separate extra
                 # funs to be notified of each successive issue
-                if ( ! $file->exists
-                        && $type eq 'req') {
                     $self->error("Required input file ($file) not present");
                     $self->_set_failure_info(
                         "Failed stage ("
@@ -1192,7 +1193,7 @@ sub _files_ready_to_start_stage {
         # our @HPCI::ScriptSource::post_success_commands;
         if (my $in = $unshared->{in}) {
             while ( my ($type, $fileval) = each %$in ) {
-                for my $file ($self->_scalar_list($fileval)) {
+                for my $file (@$fileval) {
                     my $exists = $self->_unshared_file_exists_for_in($file);
                     my $get = $self->_unshared_file_download_for_in($file);
                     push @HPCI::ScriptSource::pre_commands, "if $exists\n";
@@ -1209,7 +1210,8 @@ sub _files_ready_to_start_stage {
         }
         if (my $out = $unshared->{out}) {
             while ( my ($type, $fileval) = each %$out ) {
-                for my $file ($self->_scalar_list($fileval)) {
+                # for my $file ($self->_scalar_list($fileval)) {
+                for my $file (@$fileval) {
                     my $exists = $self->_unshared_file_exists_for_out($file);
                     my $put = $self->_unshared_file_upload_for_out($file);
                     push @HPCI::ScriptSource::post_success_commands, "if $exists\n";
@@ -1290,7 +1292,7 @@ sub _files_actions_after_success {
             $self->_rename_file( @$pair );
         }
     }
-    for my $file ($self->_scalar_list( $self->files->{delete} ) ) {
+    for my $file ( @{ $self->files->{delete} } ) {
         $file->delete if $file->exists;
     }
 }

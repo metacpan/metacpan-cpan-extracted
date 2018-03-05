@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 package Email::Address;
-# ABSTRACT: RFC 2822 Address Parsing and Creation
-$Email::Address::VERSION = '1.908';
+# ABSTRACT: (DEPRECATED) RFC 2822 Address Parsing and Creation
+$Email::Address::VERSION = '1.909';
 our $COMMENT_NEST_LEVEL ||= 1;
 our $STRINGIFY          ||= 'format';
 our $COLLAPSE_SPACES      = 1 unless defined $COLLAPSE_SPACES; # I miss //=
@@ -17,6 +17,14 @@ our $COLLAPSE_SPACES      = 1 unless defined $COLLAPSE_SPACES; # I miss //=
 #pod   print $address->format;
 #pod
 #pod =head1 DESCRIPTION
+#pod
+#pod B<ACHTUNG!> This module has a vulnerability
+#pod (L<CVE-2015-7686|https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-7686>)
+#pod which allows remote attackers to cause denial of service.   In other words,
+#pod sometimes it takes way too long to process certain kinds of input.  Maybe
+#pod someday this will be fixed.  Until then, use
+#pod L<B<Email::Address::XS>|Email::Address::XS> instead which has backward
+#pod compatible API.
 #pod
 #pod This class implements a regex-based RFC 2822 parser that locates email
 #pod addresses in strings and returns a list of C<Email::Address> objects found.
@@ -152,6 +160,12 @@ sub __dump {
 #pod   my @addrs = Email::Address->parse(
 #pod     q[me@local, Casey <me@local>, "Casey" <me@local> (West)]
 #pod   );
+#pod
+#pod B<ACHTUNG!> This is where that vulnerability mentioned above lies.  Do not use
+#pod this method with untrusted user input.
+#pod
+#pod Use method L<parse from the Email::Address::XS module|Email::Address::XS/parse>
+#pod instead.
 #pod
 #pod This method returns a list of C<Email::Address> objects it finds in the input
 #pod string.  B<Please note> that it returns a list, and expects that it may find
@@ -532,11 +546,11 @@ use overload '""' => 'as_string', fallback => 1;
 
 =head1 NAME
 
-Email::Address - RFC 2822 Address Parsing and Creation
+Email::Address - (DEPRECATED) RFC 2822 Address Parsing and Creation
 
 =head1 VERSION
 
-version 1.908
+version 1.909
 
 =head1 SYNOPSIS
 
@@ -548,6 +562,14 @@ version 1.908
   print $address->format;
 
 =head1 DESCRIPTION
+
+B<ACHTUNG!> This module has a vulnerability
+(L<CVE-2015-7686|https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-7686>)
+which allows remote attackers to cause denial of service.   In other words,
+sometimes it takes way too long to process certain kinds of input.  Maybe
+someday this will be fixed.  Until then, use
+L<B<Email::Address::XS>|Email::Address::XS> instead which has backward
+compatible API.
 
 This class implements a regex-based RFC 2822 parser that locates email
 addresses in strings and returns a list of C<Email::Address> objects found.
@@ -608,6 +630,12 @@ following comment.
   my @addrs = Email::Address->parse(
     q[me@local, Casey <me@local>, "Casey" <me@local> (West)]
   );
+
+B<ACHTUNG!> This is where that vulnerability mentioned above lies.  Do not use
+this method with untrusted user input.
+
+Use method L<parse from the Email::Address::XS module|Email::Address::XS/parse>
+instead.
 
 This method returns a list of C<Email::Address> objects it finds in the input
 string.  B<Please note> that it returns a list, and expects that it may find
@@ -803,7 +831,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Vandiver David Golden Steinbrunner Glenn Fowler Ruslan Zakirov William Yardley
+=for stopwords Alex Vandiver David Golden Steinbrunner Glenn Fowler Kevin Falcone Pali Ruslan Zakirov William Yardley
 
 =over 4
 
@@ -822,6 +850,14 @@ David Steinbrunner <dsteinbrunner@pobox.com>
 =item *
 
 Glenn Fowler <cebjyre@cpan.org>
+
+=item *
+
+Kevin Falcone <kevin@jibsheet.com>
+
+=item *
+
+Pali <pali@cpan.org>
 
 =item *
 

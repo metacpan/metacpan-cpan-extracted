@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.141170'
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,8 +22,9 @@ no_index:
 requires:
   Data::Dumper: '0'
   IO::String: '0'
+  IPC::System::Simple: '0'
   Image::MetaData::JPEG: '0'
   perl: '5.004'
 resources:
   repository: https://github.com/clipland/animated-jpeg.git
-version: '0.01'
+version: '0.02'

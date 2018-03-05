@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2015 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2015, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -26,9 +26,6 @@ use lib 't','xt';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
-
-# uncomment this to run the ### lines
-#use Devel::Comments '###';
 
 use Math::PlanePath::CellularRule54;
 my $path = Math::PlanePath::CellularRule54->new;

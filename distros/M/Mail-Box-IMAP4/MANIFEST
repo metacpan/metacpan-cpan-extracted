@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 lib/Mail/Box/IMAP4.pm
 lib/Mail/Box/IMAP4.pod
 lib/Mail/Box/IMAP4/Head.pm
@@ -25,5 +26,6 @@ t/11client-write.t
 t/12client-flags.t
 t/20server-fetch.t
 t/21server-list.t
+xt/99pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

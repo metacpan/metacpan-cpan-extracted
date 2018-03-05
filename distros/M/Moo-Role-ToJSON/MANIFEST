@@ -12,4 +12,5 @@ lib/Moo/Role/ToJSON.pm
 scripts/benchmark.pl
 t/author-pod-syntax.t
 t/basic.t
+t/complete.t
 t/synopsis.t

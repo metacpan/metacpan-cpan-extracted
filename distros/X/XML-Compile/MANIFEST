@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 README.todo
 bin/schema2example
 bin/xml2json
@@ -74,6 +75,7 @@ t/40seq.t
 t/41choice.t
 t/42all.t
 t/43group.t
+t/44ctext.t
 t/44stres.t
 t/45ctcext.t
 t/45ctcres.t

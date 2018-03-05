@@ -24,7 +24,7 @@ $app->plugin(Piwik => {
 # API test
 my $url = $app->piwik_api_url('API.get' => {
   site_id => [4,5],
-  urls => ['http://grimms-abenteuer.de/', 'http://khm.li/'],
+  urls => ['https://grimms-abenteuer.de/', 'https://khm.li/'],
   period => 'range',
   date => ['2012-11-01', '2012-12-01'],
   secure => 1
@@ -72,6 +72,7 @@ ok($url = $app->piwik_api_url(
 
 ok(my $ua = Mojo::UserAgent->new, 'New Mojo::UserAgent');
 ok(my $json = $ua->get($url)->res->json, 'Get JSON');
+
 like($json->{value}, qr{^[\.0-9]+$}, 'API.getPiwikVersion');
 
 ok($url = $app->piwik_api_url(

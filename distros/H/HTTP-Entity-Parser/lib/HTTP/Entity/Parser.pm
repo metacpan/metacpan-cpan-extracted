@@ -1,12 +1,12 @@
 package HTTP::Entity::Parser;
 
-use 5.008005;
+use 5.008001;
 use strict;
 use warnings;
 use Stream::Buffered;
 use Module::Load;
 
-our $VERSION = "0.20";
+our $VERSION = "0.21";
 
 our $BUFFER_LENGTH = 65536;
 

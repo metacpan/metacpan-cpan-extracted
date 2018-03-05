@@ -1,6 +1,6 @@
 package Bio::MUST::Core::IdMapper;
 # ABSTRACT: Id mapper for translating sequence ids
-$Bio::MUST::Core::IdMapper::VERSION = '0.180230';
+$Bio::MUST::Core::IdMapper::VERSION = '0.180630';
 use Moose;
 use namespace::autoclean;
 
@@ -52,15 +52,24 @@ has '_' . $_ . '_id_for' => (
 
 ## no critic (ProhibitUnusedPrivateSubroutines)
 
+# same note as in IdList.pm about SeqId objects
+
 sub _build_long_id_for {
     my $self = shift;
-    return { mesh @{ $self->abbr_ids }, @{ $self->long_ids } };
-}
 
+    my @abbr_ids = map { $_->full_id } $self->all_abbr_seq_ids;
+    my @long_ids = map { $_->full_id } $self->all_long_seq_ids;
+
+    return { mesh @abbr_ids, @long_ids };
+}
 
 sub _build_abbr_id_for {
     my $self = shift;
-    return { mesh @{ $self->long_ids }, @{ $self->abbr_ids } };
+
+    my @abbr_ids = map { $_->full_id } $self->all_abbr_seq_ids;
+    my @long_ids = map { $_->full_id } $self->all_long_seq_ids;
+
+    return { mesh @long_ids, @abbr_ids };
 }
 
 ## use critic
@@ -86,14 +95,14 @@ sub BUILD {
 
 sub all_long_seq_ids {
     my $self = shift;
-    return map { SeqId->new(full_id => $_) } $self->all_long_ids;
+    return map { SeqId->new( full_id => $_ ) } $self->all_long_ids;
 }
 
 
 
 sub all_abbr_seq_ids {
     my $self = shift;
-    return map { SeqId->new(full_id => $_) } $self->all_abbr_ids;
+    return map { SeqId->new( full_id => $_ ) } $self->all_abbr_ids;
 }
 
 
@@ -175,7 +184,7 @@ Bio::MUST::Core::IdMapper - Id mapper for translating sequence ids
 
 =head1 VERSION
 
-version 0.180230
+version 0.180630
 
 =head1 SYNOPSIS
 

@@ -29,6 +29,11 @@ severity	= harsh
 
 severity	= gentle
 
+[Perl::Critic::Policy::Subroutines::ProhibitUnusedPrivateSubroutines]
+
+severity	= stern
+private_name_regex	= _(?!_)\w+
+
 [Perl::Critic::Policy::Subroutines::RequireArgUnpacking]
 
 allow_delegation_to		= _latlon

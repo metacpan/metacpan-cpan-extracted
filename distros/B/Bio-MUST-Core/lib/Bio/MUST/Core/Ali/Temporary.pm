@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Ali::Temporary;
 # ABSTRACT: Thin wrapper for a temporary mapped Ali written on disk
-$Bio::MUST::Core::Ali::Temporary::VERSION = '0.180230';
+$Bio::MUST::Core::Ali::Temporary::VERSION = '0.180630';
 use Moose;
 use namespace::autoclean;
 
@@ -78,6 +78,7 @@ sub BUILD {
     my $self = shift;
 
     # remove persistent key (if any) from args before temp_fasta call
+    # TODO: work out whether this is really needed
     my %args = %{ $self->args };
     delete $args{persistent};
 
@@ -123,7 +124,7 @@ Bio::MUST::Core::Ali::Temporary - Thin wrapper for a temporary mapped Ali writte
 
 =head1 VERSION
 
-version 0.180230
+version 0.180630
 
 =head1 SYNOPSIS
 
@@ -222,12 +223,12 @@ When specified this optional attribute is passed to the C<temp_fasta> method
 of the internal C<Ali> object. Its purpose is to allow the fine-tuning of the
 format of the associated temporary FASTA file.
 
-By default, its contents is C<clean => 1> and C<degap => 1>, so as to generate
-a FASTA file of degapped sequences where ambiguous and missing states are
-replaced by C<X>.
+By default, its contents is C<<clean => 1>> and C<<degap => 1>>, so as to
+generate a FASTA file of degapped sequences where ambiguous and missing states
+are replaced by C<X>.
 
 Additionally, if you want to keep your temporary files around for debugging
-purposes, you can pass the option C<persistent => 1>. This will disable the
+purposes, you can pass the option C<<persistent => 1>>. This will disable the
 autoremoval of the file on object destruction.
 
 =head2 file

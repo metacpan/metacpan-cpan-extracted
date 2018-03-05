@@ -1,3 +1,8 @@
+0.107		2018-03-03	T. R. Wyant
+    Default 'compatible' attribute to 0 (false).
+
+    Use manifest constants for reference names.
+
 0.106		2016-03-24	T. R. Wyant
   Track change in reported elevation of test point.
 

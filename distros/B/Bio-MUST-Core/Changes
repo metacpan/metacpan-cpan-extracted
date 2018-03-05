@@ -1,3 +1,13 @@
+0.180630  2018-03-04 01:54:45+01:00 Europe/Brussels
+    - Additions
+      - binaries: new script clust2mapper.pl (to reflect clusters in tree formatting)
+      - binaries: added option --keep-strain to fetch-tax.pl
+    - Changes
+      - IdMapper: improved handling of underscore-containing (valid) ids
+      - Taxonomy: get_taxonomy_from_seq_id now also accepts lineages (stringified or as ArrayRefs)
+    - Fixes
+      - Taxonomy: setup-taxdir.pl should be more robust to out-of-sync NCBI files
+
 0.180230  2018-01-23 23:44:19+01:00 Europe/Brussels
     - Additions
       - Ali: added option to allow more control on FASTA file format
@@ -6,7 +16,7 @@
     - Changes
       - GeneticCode::Factory: hard-coded NCBI gc.prt file for robustness
     - Fixes
-      - IdList:: fixed regression bug preventing FortyTwo to work
+      - IdList: fixed regression bug preventing FortyTwo to work
       - Taxonomy: improved robustness of setup-taxdir.pl-related methods
       - Taxonomy: better described dependencies for more robust deployment
 

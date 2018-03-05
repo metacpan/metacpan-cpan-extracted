@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.001';
+our $VERSION = '2.003';
 
 use File::Basename        qw( fileparse );
 use File::Spec::Functions qw( catfile );
@@ -571,9 +571,12 @@ sub __group_readline {
 
 sub __choose_a_dir_wrap {
     my ( $sf, $section, $opt ) = @_;
-    my $current = $sf->{o}{$section}{$opt};
+    my $info;
+    if ( defined $sf->{o}{$section}{$opt} ) {
+        $info = '<< ' . $sf->{o}{$section}{$opt};
+    }
     # Choose_a_dir
-    my $dir = choose_a_dir( { mouse => $sf->{o}{table}{mouse}, current => $current } );
+    my $dir = choose_a_dir( { mouse => $sf->{o}{table}{mouse}, info => $info, name => 'OK ' } );
     return if ! length $dir;
     $sf->{o}{$section}{$opt} = $dir;
     $sf->{i}{write_config}++;

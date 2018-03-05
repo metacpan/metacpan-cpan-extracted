@@ -5,10 +5,10 @@ use YAML::XS 0.63 qw(DumpFile);
 use File::Spec;
 use Getopt::Long;
 use Pod::Usage 1.69;
-use CPAN;
-use CPAN::Reporter::Smoker::OpenBSD qw(is_distro_ok);
+use CPAN::Reporter::Smoker::OpenBSD qw(is_distro_ok block_distro);
+use Config;
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.015'; # VERSION
 my ( $distro, $help, $version_check, $comment );
 
 GetOptions(
@@ -27,29 +27,21 @@ if ($version_check) {
 
 pod2usage( -exitval => 1, -verbose => 1 ) unless ( is_distro_ok($distro) );
 
-my $distribution = '^' . $distro;
-my $filename     = "$distro.yml";
-$filename =~ s/\//./;
-my %data = (
-    comment => $comment || 'Tests hang smoker',
-    match    => { distribution  => $distribution },
-    env      => { PERLBREW_PERL => $ENV{PERLBREW_PERL} },
-    disabled => 1
-);
+my $perl_version;
 
-CPAN::HandleConfig->load;
-my $prefs_dir = $CPAN::Config->{prefs_dir};
-die "$prefs_dir does not exist or it is not readable\n"
-  unless ( -d $prefs_dir );
-my $full_path = File::Spec->catfile( $prefs_dir, $filename );
+if (exists($ENV{PERLBREW_ROOT})) {
+    $perl_version = $ENV{PERLBREW_PERL};
+} else {
+    $perl_version = 'perl-'. $Config{version};
+}
 
-if ( -f $full_path ) {
-    warn "$full_path already exists, will not overwrite it.";
+unless (my $data_ref = block_distro($distro, $perl_version, ($comment || 'Tests hang smoker'))) {
     exit(1);
+} else {
+    my $path = delete($data_ref->{full_path});
+    DumpFile($path, $data_ref);
 }
-else {
-    DumpFile( $full_path, \%data );
-}
+
 
 __END__
 

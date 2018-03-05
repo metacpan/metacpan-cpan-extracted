@@ -53,7 +53,7 @@ sub go
   my ( $src_tz, $version ) = _get_targz( $src // $pv_ver );
 
   # If _get_targz couldn't find a version, guess based on the file
-  if ( !$version && $src_tz =~ $perl5_ver_re )
+  if ( !$version && $src_tz =~ m($perl5_ver_re [^/]* $)xms )
   {
     my $major = $1;
     my $minor = $2;
@@ -144,7 +144,6 @@ sub go
 
   my $skip_tests = $opts->{'skip-tests'};
 
-  error $verstr;
   if ( !$skip_tests && $opts->{'smart-tests'} )
   {
     $skip_tests = $pv_ver eq $version;

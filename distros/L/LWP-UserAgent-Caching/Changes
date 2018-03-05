@@ -1,0 +1,38 @@
+Revision history for LWP::UserAgent::Caching
+
+0.07  2018-03-04 VANHOESEL
+
+      [ Merge pull request #3 from manwar/add-changes-file ]
+      - Proposed Changes file.
+
+0.06  2018-03-03 VANHOESEL
+
+      [ Merge pull request #2 from THEMA-MEDIA/include_default_headers ]
+      - change example
+      - prepare headers for a cloned request
+
+      [ Merge pull request #1 from manwar/minor-typo-in-pod ]
+      - Fixed minor typo in the pod.
+
+0.05  2018-03-01 VANHOESEL
+
+      [ in need of some love ]
+      - various fixes
+      - fix User-Agent request header
+
+0.04  2016-12-22 VANHOESEL
+
+      - N/A
+
+0.03  2016-12-19 VANHOESEL
+
+      - N/A
+
+0.02  2016-12-03 VANHOESEL
+
+      [ getting ready for the London Perl Workshop 2016 ]
+      - Adding basic tests and shortcuts for COMMON methods
+
+0.01  2016-12-03 VANHOESEL
+
+      - First draft released.

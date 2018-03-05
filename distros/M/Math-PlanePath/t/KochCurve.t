@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -26,17 +26,14 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings(); }
 
-# uncomment this to run the ### lines
-#use Devel::Comments;
-
-require Math::PlanePath::KochCurve;
+use Math::PlanePath::KochCurve;
 
 
 #------------------------------------------------------------------------------
 # VERSION
 
 {
-  my $want_version = 125;
+  my $want_version = 126;
   ok ($Math::PlanePath::KochCurve::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::KochCurve->VERSION,  $want_version,
@@ -237,7 +234,7 @@ sub random_quarter {
 # turn sequence
 
 {
-  sub dxdy_to_dir {
+  sub dxdy_to_dir6 {
     my ($dx,$dy) = @_;
     if ($dy == 0) {
       if ($dx == 2) { return 0; }
@@ -289,13 +286,13 @@ sub random_quarter {
   my ($x, $y) = $path->n_to_xy($n);
   my $prev_dx = $x - $prev_x;
   my $prev_dy = $y - $prev_y;
-  my $prev_dir = dxdy_to_dir($prev_dx,$prev_dy);
+  my $prev_dir = dxdy_to_dir6($prev_dx,$prev_dy);
 
   while ($n < 1000) {
     my ($next_x,$next_y) = $path->n_to_xy($n+1);
     my $dx = $next_x - $x;
     my $dy = $next_y - $y;
-    my $dir = dxdy_to_dir($dx,$dy);
+    my $dir = dxdy_to_dir6($dx,$dy);
 
     my $got_turn = ($dir - $prev_dir) % 6;
     my $want_turn = calc_n_to_turn($n) % 6;

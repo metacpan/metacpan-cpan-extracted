@@ -18,7 +18,8 @@ WriteMakefile
                           : (),
                    'XML::CompactTree' => '0.03',
                    'XML::LibXML' => '1.69',
-                   'XML::Writer' => '0.606'
+                   'XML::Writer' => '0.606',
+                   'XML::SAX' => 0,
                  },
   'INSTALLDIRS' => 'site',
   'EXE_FILES' => [],

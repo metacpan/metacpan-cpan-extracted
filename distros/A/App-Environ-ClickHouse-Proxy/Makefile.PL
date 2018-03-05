@@ -12,6 +12,7 @@ WriteMakefile(
     'App::Environ'     => '0.18',
     'IO::Socket'       => 0,
     'Cpanel::JSON::XS' => 0,
+    'Carp'             => 0,
   },
   ABSTRACT_FROM => 'lib/App/Environ/ClickHouse/Proxy.pm',
   AUTHOR        => 'Andrey Kuzmin <kak-tus@mail.ru>',

@@ -1,3 +1,21 @@
+2.039014 - 2018-03-03
+
+  [BUG FIXES]
+
+  * #372 fix inventory doesn't work with only one device
+
+2.039013 - 2018-03-02
+
+  [ENHANCEMENTS]
+
+  * #379 avoid displaying phone or wap icon alongside nodes
+
+2.039012 - 2018-03-02
+
+  [NEW FEATURES]
+
+  * #36 gather and display LLDP Remote Inventory data
+
 2.039011 - 2018-02-25
 
   [ENHANCEMENTS]

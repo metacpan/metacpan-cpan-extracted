@@ -4,7 +4,7 @@
       "Mark Overmeer"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -50,5 +50,17 @@
       }
    },
    "release_status" : "stable",
-   "version" : "3.003"
+   "resources" : {
+      "homepage" : "http://perl.overmeer.net/CPAN/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/markov2/perl5-Mail-Box-POP3.git",
+         "web" : "https://github.com/markov2/perl5-Mail-Box-POP3"
+      }
+   },
+   "version" : "3.004",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

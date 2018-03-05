@@ -1,5 +1,9 @@
 Revision history for Perl module Koha::Contrib::Tamil
 
+0.054 2018-03-05
+
+  - Update koha-dump-biblio for Koha 17.11
+
 0.053 2018-02-28
 
   - Update koha-coce-url for Koha 17.11

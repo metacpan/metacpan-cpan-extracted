@@ -1,6 +1,16 @@
-use v5.8;
-use Test::More ( tests => 1 );
+use v5.24;
+use Test::More;
 
-use_ok( 'Object::Trampoline' );
+my $madness = 'Object::Trampoline';
+
+use_ok $madness;
+
+ok $madness->can( 'VERSION' ), "$madness can VERSION";
+
+ok $a = $madness->VERSION, "$madness has a \$VERSION";
+
+note "Module version is: '$a'";
+
+done_testing;
 
 __END__

@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 examples/net.pl
 lib/Any/Daemon.pm
 lib/Any/Daemon.pod

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013 Kevin Ryde
+# Copyright 2012, 2013, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -29,9 +29,6 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
 use Math::PlanePath::TheodorusSpiral;
-
-# uncomment this to run the ### lines
-#use Smart::Comments '###';
 
 
 #------------------------------------------------------------------------------

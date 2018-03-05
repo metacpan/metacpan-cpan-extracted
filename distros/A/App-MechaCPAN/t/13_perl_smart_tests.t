@@ -11,7 +11,8 @@ if ( $^O eq 'MSWin32' )
   plan skip_all => 'Cannot build perl on Win32';
 }
 
-my $fake_ver = '5.12.0';
+my $fake_ver  = '5.12.0';
+my $fake_perl = "$FindBin::Bin/../test_dists/FakePerl-$fake_ver.tar.gz";
 
 my $pwd = cwd;
 my $tmpdir = tempdir( TEMPLATE => File::Spec->tmpdir . "/mechacpan_t_XXXXXXXX", CLEANUP => 1 );
@@ -26,7 +27,7 @@ my $_rm = \&App::MechaCPAN::Perl::_run_make;
 local *App::MechaCPAN::Perl::_run_make = sub { $state_rans{ $_[0] } = 1; $_rm->(@_); };
 
 is(
-  App::MechaCPAN::main( 'perl', "$FindBin::Bin/../test_dists/FakePerl-$fake_ver.tar.gz" ),
+  App::MechaCPAN::main( 'perl', $fake_perl ),
   0,
   'Can install "perl" from a tar.gz'
 );
@@ -35,7 +36,7 @@ is( $state_rans{test_harness}, 1, 'Tests were ran by default' );
 
 %state_rans = ();
 is(
-  App::MechaCPAN::main( 'perl', { 'smart-tests' => 1 }, "$FindBin::Bin/../test_dists/FakePerl-$fake_ver.tar.gz" ),
+  App::MechaCPAN::main( 'perl', { 'smart-tests' => 1 }, $fake_perl ),
   0,
   'Can run with "smart-tests"',
 );
@@ -46,9 +47,10 @@ is( $state_rans{test_harness}, 1, 'Tests were ran by with no perl-version' );
   open my $fh, '>', '.perl-version';
   print $fh '5.10.0';
 }
+
 %state_rans = ();
 is(
-  App::MechaCPAN::main( 'perl', { 'smart-tests' => 1 }, "$FindBin::Bin/../test_dists/FakePerl-$fake_ver.tar.gz" ),
+  App::MechaCPAN::main( 'perl', { 'smart-tests' => 1 }, $fake_perl ),
   0,
   'Can run with "smart-tests"',
 );
@@ -61,7 +63,7 @@ is( $state_rans{test_harness}, 1, 'Tests were ran by with a different perl-versi
 }
 %state_rans = ();
 is(
-  App::MechaCPAN::main( 'perl', { 'smart-tests' => 1 }, "$FindBin::Bin/../test_dists/FakePerl-$fake_ver.tar.gz" ),
+  App::MechaCPAN::main( 'perl', { 'smart-tests' => 1 }, $fake_perl ),
   0,
   'Can run with "smart-tests"',
 );

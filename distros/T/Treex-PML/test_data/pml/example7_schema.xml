@@ -25,7 +25,6 @@
           <value>NP</value>
           <value>PP</value>
           <value>ADVP</value>
-          <!-- etc. -->
         </choice>
       </member>
       <member name="w.rf">

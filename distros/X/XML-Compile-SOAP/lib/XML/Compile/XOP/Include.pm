@@ -1,20 +1,24 @@
-# Copyrights 2007-2017 by [Mark Overmeer].
+# Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# This code is part of distribution XML-Compile-SOAP.  Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::XOP::Include;
 use vars '$VERSION';
-$VERSION = '3.22';
+$VERSION = '3.23';
 
 
-use Log::Report 'xml-compile-soap', syntax => 'SHORT';
+use warnings;
+use strict;
+
+use Log::Report       'xml-compile-soap';
 use XML::Compile::SOAP::Util qw/:xop10/;
-use HTTP::Message            ();
-use File::Slurp::Tiny        qw/read_file write_file/;
-use Encode                   qw/decode FB_CROAK/;
+use HTTP::Message     ();
+use File::Slurp::Tiny qw/read_file write_file/;
+use Encode            qw/decode FB_CROAK/;
 
 
 use overload '""'     => 'content'

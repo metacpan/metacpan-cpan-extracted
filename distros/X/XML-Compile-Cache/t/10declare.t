@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 use warnings;
 use strict;
 
@@ -83,6 +83,7 @@ cmp_ok($r1b, '==', $r1, 'cached code ref');
 
 my $w1 = try { $cache->writer('me:test1') };
 my $msg = $@ ? $@->wasFatal->message : '';
+
 ok(!defined $w1, 'no writer for test1 declared');
 is($msg->toString, 'type me:test1 is only declared as reader');
 

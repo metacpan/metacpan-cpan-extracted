@@ -1,0 +1,45 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Animated JPEG example</title>
+
+	<script type="text/javascript" src="ajpeg.js"></script>
+</head>
+
+<body>
+	<h1>Animated JPEG</h1>
+
+	<h2>Add support for AJPEG via Javascript</h2>
+
+	<p>
+		Animated JPEG is not supported in any popular browser. This
+		situation can be changed by adding a small javascript library
+		which parses .ajpeg files and displays them as intended.
+	</p>
+
+	<p>
+		This library looks for image-tags on load, in case the referenced
+		image has the .ajpeg suffix, the file in the src attribute is then
+		downloaded via XMLHttpRequest, parsed and
+		the contained frames are then drawn in-place.
+	</p>
+
+	<img src="frame1.jpg" width="100" height="100">
+
+	<img src="frames_delay77.ajpeg" width="100" height="100">
+
+	<h2>How to try this example</h2>
+
+	<p>
+		Change into the directory where this file here resides. Fire
+		up a simple webserver, for example:
+		<br>
+		<br><i>python -m SimpleHTTPServer</i>
+		<br>
+		<br>and open <a href="http://localhost:8000/example.html">example.html</a>.
+	</p>
+
+</body>
+</html>

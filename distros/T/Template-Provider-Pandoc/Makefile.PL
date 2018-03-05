@@ -10,6 +10,8 @@ WriteMakefile(
   PREREQ_PM    => {
     Template => 0,
     Pandoc   => 0,
+    Moose    => 0,
+    MooseX::NonMoose => 0,
   },
 
   META_MERGE    => {
@@ -17,8 +19,8 @@ WriteMakefile(
     resources => {
       repository => {
         type => 'git',
-        url  => 'https://github.com/davorg/template-provider-markdown-pandoc.git',
-        web  => 'https://github.com/davorg/template-provider-markdown-pandoc',
+        url  => 'https://github.com/davorg/template-provider-pandoc.git',
+        web  => 'https://github.com/davorg/template-provider-pandoc',
       },
     },
   }

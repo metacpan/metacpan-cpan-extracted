@@ -12,6 +12,8 @@ use Measure::Everything qw($stats);
 use Log::Any::Test;
 use Log::Any qw($log);
 
+use Time::HiRes qw(usleep);
+
 my $app = sub {
     my $env = shift;
 
@@ -210,9 +212,96 @@ subtest 'add_headers' => sub {
     $stats->reset;
 };
 
+subtest 'has_headers' => sub {
+
+    my $handler = builder {
+        enable "Plack::Middleware::StatsPerRequest",
+            has_headers => [ 'X-SOME-HEADER', 'Accept-Language' ];
+        $app
+    };
+
+    my @tests = (
+        [   { 'Accept-Language' => 'en-US,en;q=0.5' },
+            {   'has_header_accept-language' => 1,
+                'has_header_x-some-header'   => 0
+            }
+        ],
+        [   { 'x-some-header' => 'foo' },
+            {   'has_header_accept-language' => 0,
+                'has_header_x-some-header'   => 1
+            }
+        ], [
+            {   'Accept-Language' => 'en-US,en;q=0.5',
+                'x-some-header'   => 'foo'
+            },
+            {   'has_header_accept-language' => 1,
+                'has_header_x-some-header'   => 1
+            }
+        ], [
+            {   'X-SOME-OTHER'    => 1,
+                'Accept-Language' => 'en-US,en;q=0.5',
+                'x-some-header'   => 'foo'
+            },
+            {   'has_header_accept-language' => 1,
+                'has_header_x-some-header'   => 1
+            }
+        ],
+    );
+
+    test_psgi(
+        app    => $handler,
+        client => sub {
+            my $cb = shift;
+
+            foreach my $t (@tests) {
+                my $res = $cb->( GET "http://localhost", %{ $t->[0] } );
+                is( $res->code, 200, 'request' );
+            }
+        }
+    );
+
+    my $collected = $stats->get_stats;
+    for ( my $i = 0; $i < @tests; $i++ ) {
+        subtest 'stats for request ' . $i => sub {
+            my $data   = $collected->[$i];
+            my $expect = $tests[$i]->[1];
+            while ( my ( $header, $value ) = each %$expect ) {
+                is( $data->[2]{$header},
+                    $value, 'got has_header ' . $header . ': ' . $value );
+            }
+            is( $data->[2]{'header_x-some-other'},
+                undef, 'no has_header_x-some-other' );
+        };
+    }
+
+    $stats->reset;
+};
+
+subtest 'add/has_headers not an array' => sub {
+    $log->clear;
+    my $handler = builder {
+        enable "Plack::Middleware::StatsPerRequest",
+            has_headers => 'X-SOME-HEADER',
+            add_headers => 'Accept-Language';
+        $app
+    };
+
+    my $msgs = $log->msgs;
+    like(
+        $msgs->[0]{message},
+        qr/add_headers has to be an ARRAYREF, ignoring Accept-Language/,
+        'got warning about bad add_headers'
+    );
+    like(
+        $msgs->[1]{message},
+        qr/has_headers has to be an ARRAYREF, ignoring X-SOME-HEADER/,
+        'got warning about bad has_headers'
+    );
+};
+
 my $slow_app = sub {
     my $env = shift;
-    sleep(1);
+    usleep(1_500_000);
     return [ 200, [ 'Content-Type' => 'text/plain' ],
         ['measure everything!'] ];
 };

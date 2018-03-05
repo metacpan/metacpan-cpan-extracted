@@ -1,3 +1,4 @@
+BEGIN { push @INC, '.' }
 use inc::Module::Install;
 
 name	        'Module-Install-RTx';

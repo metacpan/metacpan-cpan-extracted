@@ -10,6 +10,7 @@ debian/source/format
 debian/watch
 devel/alternate-paper-midpoint.pl
 devel/alternate-paper.pl
+devel/alternate-terdragon.pl
 devel/archimedean.pl
 devel/aztec-diamond.pl
 devel/beta-omega.pl
@@ -105,6 +106,7 @@ devel/lib/Math/PlanePath/ZeckendorfTerms-oeis.t
 devel/lib/Math/PlanePath/ZeckendorfTerms.pm
 devel/lib/Math/square-radical.pl
 devel/lib/Math/SquareRadical.pm
+devel/lib/MyFLAT.pm
 devel/Makefile
 devel/mephisto-waltz.logo
 devel/misc.pl
@@ -122,6 +124,7 @@ devel/r5.pl
 devel/rationals-tree.pl
 devel/run.pl
 devel/sacks.pl
+devel/sierpinski-arrowhead-centres.pl
 devel/sierpinski-arrowhead-stars.pl
 devel/sierpinski-arrowhead.pl
 devel/sierpinski-curve.pl
@@ -175,6 +178,7 @@ lib/Math/NumSeq/PlanePathTurn.pm
 lib/Math/PlanePath.pm
 lib/Math/PlanePath/AlternatePaper.pm
 lib/Math/PlanePath/AlternatePaperMidpoint.pm
+lib/Math/PlanePath/AlternateTerdragon.pm
 lib/Math/PlanePath/AnvilSpiral.pm
 lib/Math/PlanePath/AR2W2Curve.pm
 lib/Math/PlanePath/ArchimedeanChords.pm
@@ -298,6 +302,7 @@ MANIFEST.SKIP
 SIGNATURE
 t/AlternatePaper.t
 t/AlternatePaperMidpoint.t
+t/AlternateTerdragon.t
 t/AnvilSpiral.t
 t/ArchimedeanChords.t
 t/AztecDiamondRings.t
@@ -445,6 +450,7 @@ xt/oeis-duplicate.t
 xt/oeis-xrefs.t
 xt/oeis/AlternatePaper-oeis.t
 xt/oeis/AlternatePaperMidpoint-oeis.t
+xt/oeis/AlternateTerdragon-oeis.t
 xt/oeis/AnvilSpiral-oeis.t
 xt/oeis/CCurve-oeis.t
 xt/oeis/CellularRule-oeis.t

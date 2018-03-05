@@ -23,7 +23,7 @@ use vars qw($VERSION @EXPORT);
 use Exporter;
 use base qw(Exporter);
 
-$VERSION = '1.17';
+$VERSION = '1.18';
 @EXPORT = qw(stringf);
 
 sub _replace {
@@ -72,7 +72,7 @@ my $regex = qr/
                 (-)?          # left-align, rather than right
                 (\d*)?        # (optional) minimum field width
                 (?:\.(\d*))?  # (optional) maximum field width
-                ({.*?})?      # (optional) stuff inside
+                (\{.*?\})?    # (optional) stuff inside
                 (\S)          # actual format character
              )/x;
 sub stringf {

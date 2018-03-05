@@ -1,5 +1,14 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.135     2018-03-04 19:47:45Z
+          - fix CONTRIBUTING template that might sometimes generate an
+            undefined warning (tickling tests with AUTHOR_TESTING=1 under
+            Text::Template 1.48)
+
+0.134     2018-03-03 08:44:42Z
+          - always report installed version of Encode in
+            t/00-report-prereqs.t, as it is called by core code (PerlIO).
+
 0.133     2018-01-14 08:25:00Z
           - new 'plugin_prereq_phase' and 'plugin_prereq_relationship'
             configuration options, which control whether and how to inject

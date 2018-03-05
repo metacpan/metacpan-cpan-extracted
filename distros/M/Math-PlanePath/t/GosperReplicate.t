@@ -36,7 +36,7 @@ require Math::PlanePath::GosperReplicate;
 # VERSION
 
 {
-  my $want_version = 125;
+  my $want_version = 126;
   ok ($Math::PlanePath::GosperReplicate::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::GosperReplicate->VERSION,  $want_version,

@@ -13,6 +13,9 @@ cpanfile
 dist.ini
 lib/CPAN/Reporter/Smoker/OpenBSD.pm
 t/basic.t
+t/dblock.t
+t/distroprefs/AWWAIID.Devel-ebug.yml
+t/scripts.t
 xt/001-pod.t
 xt/002-pod-coverage.t
 xt/kwalitee.t

@@ -1,5 +1,5 @@
 package JSONAPI::Document;
-$JSONAPI::Document::VERSION = '0.3';
+$JSONAPI::Document::VERSION = '0.4';
 # ABSTRACT: Turn DBIx results into JSON API documents.
 
 use Moo;
@@ -7,18 +7,26 @@ use Moo;
 use Lingua::EN::Inflexion ();
 use Carp                  ();
 
+has kebab_case_attrs => (
+    is      => 'ro',
+    default => sub { 0 }
+);
+
+has attributes_via => (
+    is      => 'ro',
+    default => sub { 'get_inflated_columns' },
+);
+
 sub compound_resource_document {
     my ( $self, $row, $options ) = @_;
 
-    my $document =
-      $self->resource_document( $row, { with_relationships => 1 } );
+    my $document = $self->resource_document( $row, { with_relationships => 1 } );
 
     my @includes;
     my @relationships =
       @{ $options->{includes} // [] } || $row->result_source->relationships();
     foreach my $relation ( sort @relationships ) {
-        my $result = $self->_related_resource_documents( $row, $relation,
-            { with_attributes => 1 } );
+        my $result = $self->_related_resource_documents( $row, $relation, { with_attributes => 1 } );
         if ($result) {
             push @includes, @$result;
         }
@@ -35,22 +43,23 @@ sub resource_documents {
     $options //= {};
 
     my @results = $resultset->all();
-    return {
-        data => [ map { $self->resource_document( $_, $options ) } @results ],
-    };
+    return { data => [ map { $self->resource_document( $_, $options ) } @results ], };
 }
 
 sub resource_document {
     my ( $self, $row, $options ) = @_;
-    Carp::confess('No row provided or not a DBIx::Class:Row instance')
-      unless $row && $row->isa('DBIx::Class::Row');
+    Carp::confess('No row provided') unless $row;
 
     $options //= {};
+    my $attrs_method       = $options->{attributes_via} // $self->attributes_via;
+    my $with_kebab_case    = $options->{kebab_case_attrs} // $self->kebab_case_attrs;
+    my $with_relationships = $options->{with_relationships};
+    my $includes           = $options->{includes};
 
     my $type = lc( $row->result_source->source_name() );
     my $noun = Lingua::EN::Inflexion::noun($type);
 
-    my %columns = $row->get_inflated_columns();
+    my %columns = $row->$attrs_method();
     my $id      = delete $columns{id} // $row->id;
 
     unless ( $type && $id ) {
@@ -60,16 +69,19 @@ sub resource_document {
     }
 
     my %relationships;
-    if ( $options->{with_relationships} ) {
-        my @relations = @{ $options->{relationships} // [] }
-          || $row->result_source->relationships();
+    if ($with_relationships) {
+        my @relations = $includes ? @$includes : $row->result_source->relationships();
         foreach my $rel (@relations) {
             if ( $row->has_relationship($rel) ) {
-                my $docs = $self->_related_resource_documents( $row, $rel );
+                my $docs = $self->_related_resource_documents( $row, $rel, $options );
                 $docs = $docs->[0] if ( scalar(@$docs) == 1 );
                 $relationships{$rel} = { data => $docs };
             }
         }
+    }
+
+    if ($with_kebab_case) {
+        %columns = _kebab_case(%columns);
     }
 
     my %document;
@@ -88,6 +100,9 @@ sub resource_document {
 sub _related_resource_documents {
     my ( $self, $row, $relation, $options ) = @_;
     $options //= {};
+    my $with_attributes = $options->{with_attributes};
+    my $with_kebab_case = $options->{kebab_case_attrs} // $self->kebab_case_attrs;
+    my $attrs_method    = $options->{attributes_via} // $self->attributes_via;
 
     my @results;
 
@@ -96,35 +111,46 @@ sub _related_resource_documents {
         my @rs = $row->$relation->all();
         foreach my $rel_row (@rs) {
             my %attributes;
-            if ( $options->{with_attributes} ) {
-                %attributes = $rel_row->get_inflated_columns();
+            if ($with_attributes) {
+                %attributes = $rel_row->$attrs_method();
+            }
+            if ($with_kebab_case) {
+                %attributes = _kebab_case(%attributes);
             }
 
             push @results,
               {
                 id   => delete $attributes{id} // $rel_row->id,
-                type => Lingua::EN::Inflexion::noun(
-                    lc( $rel_row->result_source->source_name() )
-                )->plural,
+                type => Lingua::EN::Inflexion::noun( lc( $rel_row->result_source->source_name() ) )->plural,
                 values(%attributes) ? ( attributes => \%attributes ) : (),
               };
         }
     }
     else {
-        my %attributes = $row->$relation->get_inflated_columns();
-        my $id         = delete $attributes{id} // $row->$relation->id;
-
+        my %attributes = $row->$relation->$attrs_method();
+        if ($with_kebab_case) {
+            %attributes = _kebab_case(%attributes);
+        }
         push @results,
           {
-            id   => $id,
-            type => Lingua::EN::Inflexion::noun(
-                lc( $row->$relation->result_source->source_name() )
-            )->plural,
-            $options->{with_attributes} ? ( attributes => \%attributes ) : (),
+            id   => delete $attributes{id} // $row->$relation->id,
+            type => Lingua::EN::Inflexion::noun( lc( $row->$relation->result_source->source_name() ) )->plural,
+            $with_attributes ? ( attributes => \%attributes ) : (),
           };
     }
 
     return \@results;
+}
+
+sub _kebab_case {
+    my (%row) = @_;
+    my %new_row;
+    foreach my $column ( keys(%row) ) {
+        my $value = $row{$column};
+        $column =~ s/_/-/g;
+        $new_row{$column} = $value;
+    }
+    return %new_row;
 }
 
 1;
@@ -139,7 +165,7 @@ JSONAPI::Document - Turn DBIx results into JSON API documents.
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 SYNOPSIS
 
@@ -177,9 +203,24 @@ library does using the L<source_name|https://metacpan.org/pod/DBIx::Class::Resul
 of the result row. The type is also pluralised using L<Linua::EN::Inflexion|https://metacpan.org/pod/Lingua::EN::Inflexion>
 while keeping relationship names intact (i.e. an 'author' relationship will still be called 'author', with the type 'authors').
 
+=head1 ATTRIBUTES
+
+=head2 kebab_case_attrs
+
+Boolean attribute; setting this will make the column keys for each document into
+kebab-cased-strings instead of snake_cased. Default is false.
+
+=head2 attributes_via
+
+The method name to use throughout the creation of the resource document(s) to
+get the attributes of the resources/relationships. This is useful if you
+have a object that layers your DBIx results, you can instruct this
+module to call that method instead of the default, which is
+L<get_inflated_columns|https://metacpan.org/pod/DBIx::Class::Row#get_inflated_columns>.
+
 =head1 METHODS
 
-=head2 compound_resource_document(I<DBIx::Class::Row> $row, I<HashRef> $options)
+=head2 compound_resource_document(I<DBIx::Class::Row|Object> $row, I<HashRef> $options)
 
 A compound document is one that includes the resource object
 along with the data of all its relationships.
@@ -218,7 +259,7 @@ query parameter in your application routes).
 
 =back
 
-=head2 resource_document(I<DBIx::Class::Row> $row, I<HashRef> $options)
+=head2 resource_document(I<DBIx::Class::Row|Object> $row, I<HashRef> $options)
 
 Builds a single resource document for the given result row. Will optionally
 include relationships that contain resource identifiers.
@@ -243,14 +284,14 @@ The following options can be given:
 If true, will introspect the rows relationships and include each
 of them in the relationships key of the document.
 
-=item C<relationships> I<ArrayRef>
+=item C<includes> I<ArrayRef>
 
 If C<with_relationships> is true, this optional array ref can be
 provided to include a subset of relations instead of all of them.
 
 =back
 
-=head2 resource_documents(I<DBIx::Class::Row> $row, I<HashRef> $options)
+=head2 resource_documents(I<DBIx::Class::Row|Object> $row, I<HashRef> $options)
 
 Builds the structure for multiple resource documents with a given resultset.
 

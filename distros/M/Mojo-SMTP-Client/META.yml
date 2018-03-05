@@ -3,22 +3,22 @@ abstract: 'non-blocking SMTP client based on Mojo::IOLoop'
 author:
   - 'Oleg G <oleg@cpan.org>'
 build_requires:
-  Test::More: 0.88
+  Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: 6.52
+  ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Mojo-SMTP-Client
 no_index:
   directory:
     - t
     - inc
 requires:
-  Mojolicious: 5
+  Mojolicious: '7.53'
 resources:
   repository: https://github.com/olegwtf/p5-Mojo-SMTP-Client
-version: 0.14
+version: '0.15'

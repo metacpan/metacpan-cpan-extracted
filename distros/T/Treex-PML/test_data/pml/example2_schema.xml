@@ -35,7 +35,6 @@
       <value>NP</value>
       <value>PP</value>
       <value>ADVP</value>
-      <!-- etc. -->
     </choice>
   </type>
 

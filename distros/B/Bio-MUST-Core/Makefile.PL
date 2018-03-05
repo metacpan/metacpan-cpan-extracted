@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
     "bin/app-len-ids-ali.pl",
     "bin/change-ids-ali.pl",
     "bin/classify-ali.pl",
+    "bin/clust2mapper.pl",
     "bin/fasta2ali.pl",
     "bin/fetch-tax.pl",
     "bin/format-tree.pl",
@@ -48,6 +49,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Bio::MUST::Core",
   "PREREQ_PM" => {
     "Algorithm::NeedlemanWunsch" => 0,
+    "Bio::FastParsers" => "0.180470",
     "Bio::LITE::Taxonomy::NCBI" => "0.10",
     "Bio::LITE::Taxonomy::NCBI::Gi2taxid" => 0,
     "Bio::Phylo::IO" => 0,
@@ -84,6 +86,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Tie::IxHash" => 0,
     "Try::Tiny" => 0,
+    "Try::Tiny::Warnings" => 0,
     "XML::Bare" => "0.53",
     "YAML::XS" => 0,
     "aliased" => 0,
@@ -96,7 +99,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::Deep" => 0
   },
-  "VERSION" => "0.180230",
+  "VERSION" => "0.180630",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -105,6 +108,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Algorithm::NeedlemanWunsch" => 0,
+  "Bio::FastParsers" => "0.180470",
   "Bio::LITE::Taxonomy::NCBI" => "0.10",
   "Bio::LITE::Taxonomy::NCBI::Gi2taxid" => 0,
   "Bio::Phylo::IO" => 0,
@@ -142,6 +146,7 @@ my %FallbackPrereqs = (
   "Test::Most" => 0,
   "Tie::IxHash" => 0,
   "Try::Tiny" => 0,
+  "Try::Tiny::Warnings" => 0,
   "XML::Bare" => "0.53",
   "YAML::XS" => 0,
   "aliased" => 0,

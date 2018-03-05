@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::Command::Morning;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: run taskwarrior's garbage collection
-$Taskwarrior::Kusarigama::Plugin::Command::Morning::VERSION = '0.7.0';
+$Taskwarrior::Kusarigama::Plugin::Command::Morning::VERSION = '0.8.0';
 
 use strict;
 use warnings;
@@ -34,7 +34,7 @@ Taskwarrior::Kusarigama::Plugin::Command::Morning - run taskwarrior's garbage co
 
 =head1 VERSION
 
-version 0.7.0
+version 0.8.0
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package App::Environ::ClickHouse::Proxy;
 
-our $VERSION = '0.3';
+our $VERSION = '0.5';
 
 use strict;
 use warnings;
@@ -9,6 +9,7 @@ use utf8;
 
 use App::Environ;
 use App::Environ::Config;
+use Carp qw( carp croak );
 use Cpanel::JSON::XS;
 use IO::Socket;
 
@@ -28,7 +29,7 @@ sub instance {
       Proto    => 'udp',
       PeerAddr => $config->{clickhouse_proxy}{host},
       PeerPort => $config->{clickhouse_proxy}{port},
-    ) or die "Could not create socket: $!\n";
+    ) or croak("Could not create socket: $!");
 
     $INSTANCE = bless { sock => $sock }, $class;
   }
@@ -70,7 +71,7 @@ sub send {
     version => 1,
   );
 
-  $self->{sock}->send( $JSON->encode( \%val ) ) or warn "Send error: $!\n";
+  $self->{sock}->send( $JSON->encode( \%val ) ) or carp("Send error: $!");
 
   return;
 }

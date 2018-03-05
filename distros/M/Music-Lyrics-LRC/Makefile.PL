@@ -28,7 +28,7 @@ WriteMakefile(
         'meta-spec' => { version => 2 },
         provides => {
             'Music::Lyrics::LRC' => {
-                version => '0.13',
+                version => '0.15',
                 file => 'lib/Music/Lyrics/LRC.pm',
             },
         },

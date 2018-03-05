@@ -1,5 +1,8 @@
 Revision history for Pod-Coverage-TrustPod
 
+0.100004  2018-03-04 22:46:25-05:00 America/New_York
+        - report more usefully when a regex can't be compiled
+
 0.100003  2013-11-05 18:54:26 America/New_York
           the string *EVERYTHING* is now a pattern meaning "trust everything"
 

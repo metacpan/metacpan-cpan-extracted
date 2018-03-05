@@ -1,0 +1,38 @@
+Revision history for Lingua-EN-Opinion
+
+0.06 2018-03-04 17:54:00
+    - Improve example scripts.
+    - Don't recompute the sentences if they exist.
+
+0.0505 2018-03-04 14:31:22
+    - Use the superior GD::Graph::lines module in the example scripts.
+
+0.0504 2018-03-04 10:38:50
+    - Fix nrc_sentiment() logic.
+
+0.0503 2018-03-04 10:11:59
+    - Improve documentation again!
+
+0.0502 2018-03-04 09:52:27
+    - Improve documentation a bit.
+
+0.0501 2018-03-03 20:22:25
+    - Add to the example scripts.
+
+0.05 2018-03-03 19:22:54
+    - Adjust nrc logic to tally sentence totals (not by words).
+
+0.04 2018-03-03 17:27:30
+    - Add, test and illustrate the nrc_sentiment() method.
+
+0.03 2018-03-03 12:17:54
+    - Add, test and illustrate the averaged_score() method.
+
+0.02 2018-03-03 10:04:45
+    - Add the ability analyze a string, instead of just a file.
+
+0.0101 2018-03-03 09:39:23
+    - Correct dist.ini links.
+
+0.01 2018-03-02 17:42:21
+    - Mint by Dist::Zilla.

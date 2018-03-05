@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/WWW/FCM/HTTP.pm
+lib/WWW/FCM/HTTP/Constants.pm
+lib/WWW/FCM/HTTP/Response.pm
+lib/WWW/FCM/HTTP/Response/Result.pm
+lib/WWW/FCM/HTTP/Response/ResultSet.pm
+minil.toml
+t/00_compile.t
+t/01_new.t
+t/02_send.t
+META.yml
+MANIFEST

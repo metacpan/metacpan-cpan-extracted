@@ -2,12 +2,11 @@ use Mojo::Base -strict;
 use Test::Mojo;
 use Test::More;
 
-plan skip_all => 'touch README.pod' unless -e 'README.pod';
-
-do 'script/proxyforurl' or die $@;
+plan skip_all => 'script/proxyforurl not found' unless -e 'script/proxyforurl';
+do './script/proxyforurl' or die $@;
 my $t = Test::Mojo->new;
 
-$t->get_ok('/')->status_is(200)->element_exists('a[href="https://metacpan.org/pod/App::proxyforurl#DESCRIPTION"]')
+$t->get_ok('/')->status_is(200)->element_exists('a[href="//metacpan.org/pod/App::proxyforurl#DESCRIPTION"]')
   ->element_exists('textarea#rules')->element_exists('input#url')->element_exists('input#host')
   ->element_exists('input#rule');
 

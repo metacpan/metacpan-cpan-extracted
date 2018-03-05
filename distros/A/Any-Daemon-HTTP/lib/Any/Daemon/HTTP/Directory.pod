@@ -7,7 +7,7 @@ Any::Daemon::HTTP::Directory - describe a server directory
 =head1 INHERITANCE
 
  Any::Daemon::HTTP::Directory
-   is a Any::Daemon::HTTP::Source
+   is an Any::Daemon::HTTP::Source
 
  Any::Daemon::HTTP::Directory is extended by
    Any::Daemon::HTTP::UserDirs
@@ -209,14 +209,14 @@ as produced by the "ls -l" command.
 
 =head1 SEE ALSO
 
-This module is part of Any-Daemon-HTTP distribution version 0.26,
-built on September 19, 2016. Website: F<http://perl.overmeer.net/any-daemon/>
+This module is part of Any-Daemon-HTTP distribution version 0.27,
+built on March 04, 2018. Website: F<http://perl.overmeer.net/any-daemon/>
 
 =head1 LICENSE
 
-Copyrights 2013-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2013-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

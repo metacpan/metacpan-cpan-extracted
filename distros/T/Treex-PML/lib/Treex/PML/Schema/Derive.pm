@@ -5,7 +5,7 @@ use warnings;
 
 use vars qw($VERSION);
 BEGIN {
-  $VERSION='2.22'; # version template
+  $VERSION='2.24'; # version template
 }
 no warnings 'uninitialized';
 use Carp;
@@ -85,7 +85,11 @@ sub simplify {
 	push @{$target_sequence->{-attributes}},'role'
 	  unless grep { $_ eq 'role' } @{$target_sequence->{-attributes}};
       }
-      $target_sequence->{content_pattern} = $derive_sequence->{content_pattern} if exists $derive_sequence->{content_pattern};
+      if (exists $derive_sequence->{content_pattern}) {
+        $target_sequence->{content_pattern} = $derive_sequence->{content_pattern};
+        push @{$target_sequence->{-attributes}},'content_pattern'
+	  unless grep { $_ eq 'content_pattern' } @{$target_sequence->{-attributes}};
+      }
       $target_sequence->{element} ||= {};
       my $elements = $target_sequence->{element};
       while (my ($element,$value) = each %{$derive_sequence->{element}}) {

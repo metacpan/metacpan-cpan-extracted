@@ -4,7 +4,7 @@
       "Dave Cross <dave@mag-sol.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4224",
    "keywords" : [
       "aggregate",
       "aggregator",
@@ -19,7 +19,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Perlanet",
    "prereqs" : {
@@ -65,7 +65,7 @@
    "provides" : {
       "Perlanet" : {
          "file" : "lib/Perlanet.pm",
-         "version" : "v1.1.1"
+         "version" : "v1.1.2"
       },
       "Perlanet::Entry" : {
          "file" : "lib/Perlanet/Entry.pm"
@@ -100,15 +100,11 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://code.mag-sol.com/Perlanet/",
+      "homepage" : "http://perlanet.mag-sol.com/",
       "license" : [
          "http://dev.perl.org/licenses/"
-      ],
-      "repository" : {
-         "url" : "git://github.com/davorg/perlanet.git"
-      },
-      "x_MailingList" : "http://lists.mag-sol.com/mailman/listinfo/perlanet"
+      ]
    },
-   "version" : "v1.1.1",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "v1.1.2",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

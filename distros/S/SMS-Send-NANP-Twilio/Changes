@@ -1,5 +1,10 @@
 Revision history for Perl extension SMS::Send::NANP::Twilio
 
+0.04 2018-03-02
+  - Added DateTime as build time requirement - RT 124633 (ANDK@cpan.org)
+    - Updated Makefile.PL
+    - Updated perl-SMS-Send-NANP-Twilio.spec
+
 0.03 2018-02-03
   - API BREAK
     - Changed sid property to API documented name MessagingServiceSid

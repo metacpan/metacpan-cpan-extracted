@@ -19,6 +19,7 @@ t/error.t
 t/exported.t
 t/hash.t
 t/inline-comment.t
+t/nested-tags.t
 t/ofh.t
 t/out.t
 t/prepend.t
@@ -29,3 +30,4 @@ t/safe2.t
 t/safe3.t
 t/strict.t
 t/taint.t
+t/warnings.t

@@ -37,7 +37,7 @@ my $path = Math::PlanePath::DigitGroups->new;
 # VERSION
 
 {
-  my $want_version = 125;
+  my $want_version = 126;
   ok ($Math::PlanePath::DigitGroups::VERSION, $want_version,
       'VERSION variable');
   ok (Math::PlanePath::DigitGroups->VERSION,  $want_version,

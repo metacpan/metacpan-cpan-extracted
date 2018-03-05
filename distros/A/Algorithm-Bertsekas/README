@@ -13,7 +13,7 @@ DESCRIPTION
  effectiveness is optimised (Maximised or Minimised)."
  
  "Each assignment problem has associated with a table or matrix. Generally, the rows contain the 
- jobs or people we wish to assign, and the columns comprise the tasks or objects we want them 
+ jobs (or persons) we wish to assign, and the columns comprise the tasks (or objects) we want them 
  assigned to. The numbers in the table are the costs associated with each particular assignment."
  
  One application is to find the (nearest/more distant) neighbors. 
@@ -28,10 +28,8 @@ SYNOPSIS
 
  my @array1 = ( 19, 74, 58,  1 )
  my @array2 = ( 94, 55, 90, 45, 56, 95, 90 );
- 
- my $min = $#array1 < $#array2 ? $#array1 : $#array2;
- my $max = $#array1 < $#array2 ? $#array2 : $#array1;
 
+ my @input_matrix;
  for my $i ( 0 .. $#array1 ){
    my @weight_function;		   
    for my $j ( 0 .. $#array2 ){
@@ -40,37 +38,39 @@ SYNOPSIS
       push @weight_function, $weight;
    }
    push @input_matrix, \@weight_function;
- } 
+ }
  
+ Alternatively, we can define the matrix with its elements:
+
+ my @input_matrix = (
+ [ 75, 36, 71, 26, 37, 76, 71 ],
+ [ 20, 19, 16, 29, 18, 21, 16 ],
+ [ 36,  3, 32, 13,  2, 37, 32 ],
+ [ 93, 54, 89, 44, 55, 94, 89 ]
+ );
+
       94 55 90 45 56 95 90
 
  19 [ 75 36 71 26 37 76 71 ]
  74 [ 20 19 16 29 18 21 16 ]
  58 [ 36  3 32 13  2 37 32 ]
   1 [ 93 54 89 44 55 94 89 ]
-
- @input_matrix = (
- [ 75, 36, 71, 26, 37, 76, 71 ],
- [ 20, 19, 16, 29, 18, 21, 16 ],
- [ 36,  3, 32, 13,  2, 37, 32 ],
- [ 93, 54, 89, 44, 55, 94, 89 ]
- );
  
  my ( $optimal, $assignement_ref, $output_index_ref ) = auction( matrix_ref => \@input_matrix, maximize_total_benefit => 1, verbose => 3 );
 
-Objective --> to Maximize the total benefit
+ Objective --> to Maximize the total benefit
  Number of left nodes: 4
  Number of right nodes: 7
  Number of edges: 28
 
-Solution
+ Solution
  Optimal assignment, sum of values = 230
  Feasible assignment condition: stepsize = 0.2 < 1/4 = 0.25
- Number of iterations: 18
+ Number of iterations 18
 
-Maximum index size    = [ 0  1  2  3  4  5  6 ]
-@output_index indexes = [ 5  3  6  0  2  1  4 ]
-@output_index values  = [76 29 32 93          ]
+ Maximum index size    = [ 0  1  2  3  4  5  6 ]
+ @output_index indexes = [ 5  3  6  0  2  1  4 ]
+ @output_index values  = [76 29 32 93          ]
 
  original matrix 4 x 7 with solution:
  [ 75   36   71   26   37   76** 71  ]
@@ -87,7 +87,6 @@ Maximum index size    = [ 0  1  2  3  4  5  6 ]
    indexes ( 5, 1 ), weight value =    ; sum of values = 230
    indexes ( 6, 4 ), weight value =    ; sum of values = 230
 
-
  Common use of the solution:
    
  foreach my $array1_index ( sort { $a <=> $b } keys %{$assignement_ref} ){     
@@ -96,17 +95,18 @@ Maximum index size    = [ 0  1  2  3  4  5  6 ]
    ...
  }
  
- for my $i (0 .. $max){
+ for my $i ( 0 .. $#{$output_index_ref} ){
    my $j = $output_index_ref->[$i];
    ...
  }
-
  
 OPTIONS
  
- matrix_ref => \@input_matrix     reference to array: matrix N x M.
- maximize_total_benefit => 0      0: minimize the total benefit ; 1: maximize the total benefit.
- verbose  => 3                    print messages on the screen, level of verbosity, 0: quiet; 1, 2, 3, 4, 9, 10: debug information.
+ matrix_ref => \@input_matrix,   reference to array: matrix N x M.
+ maximize_total_benefit => 0,    0: minimize the total benefit ; 1: maximize the total benefit.
+ inicial_stepsize       => 1,    auction algorithm terminates with a feasible assignment if the problem data are integer and stepsize < 1/min(N,M).
+ inicial_price          => 0,			
+ verbose                => 3,    print messages on the screen, level of verbosity, 0: quiet; 1, 2, 3, 4, 9, 10: debug information.
 
 EXPORT
 
@@ -144,7 +144,7 @@ AUTHOR
 	
 COPYRIGHT AND LICENSE
 
-Copyright (c) 2018 Claudio Fernandes de Souza Rodrigues.  All rights reserved.
+ Copyright (c) 2018 Claudio Fernandes de Souza Rodrigues.  All rights reserved.
 
-This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+ This program is free software; you can redistribute it and/or modify
+ it under the same terms as Perl itself.

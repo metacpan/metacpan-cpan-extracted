@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013 Kevin Ryde
+# Copyright 2012, 2013, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -28,9 +28,6 @@ BEGIN { MyTestHelpers::nowarnings(); }
 use MyOEIS;
 
 use Math::PlanePath::PowerArray;
-
-# uncomment this to run the ### lines
-#use Smart::Comments '###';
 
 require Math::NumSeq::PlanePathN;
 my $bigclass = Math::NumSeq::PlanePathN::_bigint();

@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Perl + Flow.js file upload</title>
+    <meta name="description"
+          content="HTTP::Upload::Flow html5 file upload extension with Perl backend"/>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+    <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+
+    <script src="http://flowjs.github.io/ng-flow/bower_components/flow.js/dist/flow.js"></script>
+  </head>
+<body>
+    <div class="container">
+      <header>
+        <h1><span class="logo"></span>Flow.js HTML5 file upload with Perl backend</h1>
+        <p>Flow.js is a JavaScript library providing multiple simultaneous,
+           stable and resumable uploads via the HTML5 File API. The library does
+           not require third party dependencies.</p>
+
+        <div class="libs">
+          <p class="view"><a href="https://github.com/flowjs/flow.js">Flow.js file upload core library <small>flowjs/flow.js</small></a></p>
+          <p class="view"><a href="https://github.com/Corion/HTTP-Upload-FlowJs">flow.js Perl module <small>HTTP::Upload::FlowJs</small></a></p>
+          <div class="clear"></div>
+        </div>
+      </header>
+      <section>
+        <div class="features well">
+          <span class="heading">Features:</span>
+          <ul>
+            <li>Pause/Resume upload</li>
+            <li>Recover lost upload</li>
+            <li>Error handling</li>
+            <li>Drag and Drop with folder reader</li>
+            <li>Custom upload buttons</li>
+            <li>Folder Upload</li>
+            <li>Queue management</li>
+            <li>File validation</li>
+            <li>Upload progress</li>
+            <li>Chunk uploads</li>
+          </ul>
+        </div>
+        <p>
+          The library is designed to introduce fault-tolerance into the upload
+          of large files through HTTP. This is done by splitting each file into
+          small chunks. Then, whenever the upload of a chunk fails, uploading is
+          retried until the procedure completes. This allows uploads to
+          automatically resume uploading after a network connection is lost
+          either locally or to the server. Additionally, it allows for users to
+          pause, resume and even recover uploads without losing state because
+          only the currently uploading chunks will be aborted, not the entire
+          upload.
+        </p>
+
+<h3>
+<a name="basic-example" class="anchor" href="#basic-example"><span class="octicon octicon-link"></span></a>Basic upload</h3>
+
+<div class="alert alert-warning">
+This is just an example of flow.js and the Perl
+backend. Files are uploaded, but deleted soonish afterwards.</div>
+
+<div id="message" class="well">Drop files to upload here</div>
+<span id="btnUpload" class="btn btn-default">Or click here to upload</span>
+<div id="uploadLog" scroll="auto">
+</div>
+<script>
+var flow;
+
+if( !flow ) {
+    flow = new Flow({
+        target : '/upload',
+        uploadMethod: 'POST',
+        // query: { session: config.conn_id },
+        // withCredentials: true, // If we need our cookie back
+        testChunks: true,
+        simultaneousUploads: 1,
+        forceChunkSize: true,
+        chunkSize: 10000, // so we actually get some requests to our server
+        attributes: { "accept":"image/*" }
+    });
+    if(! flow.support) {
+        console.log("Multipart upload support unavailable");
+    } else {
+        flow.assignDrop($('#message')); // Also the main/chat window?!
+        flow.assignBrowse($('#btnUpload'));
+        
+        flow.on('fileAdded', function(file, event){
+            console.log("Dropped file "+file.uniqueIdentifier);
+            flow.upload();
+        });
+        flow.on('filesSubmitted', function(file){
+            console.log(file.uniqueIdentifier+": "+file.progress+"%");
+            flow.upload();
+        });
+        flow.on('fileProgress', function(file){
+            console.log(file.uniqueIdentifier+": "+file.progress+"%");
+        });
+        flow.on('fileSuccess', function(file,message){
+            console.log(file,message);
+        });
+        flow.on('fileError', function(file, message){
+            $('#uploadLog').append(message+"<br />");
+            console.log(file, message);
+        });
+        flow.on('catchAll', function(message, x1, x2, x3){
+            console.log("flowjs: " + message, x1, x2, x3);
+        });
+    };
+};
+</script>
+
+  </body>
+</html>

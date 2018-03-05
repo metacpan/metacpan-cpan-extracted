@@ -1,5 +1,9 @@
 Revision history for Perl module XML::RSS
 
+1.60    2018-04-03
+    - Convert to Dist-Zilla.
+    - Add Travis-CI support.
+
 1.59    2016-03-01
     - Merge a pull request to add subcategory support.
         - https://github.com/shlomif/perl-XML-RSS/pull/4

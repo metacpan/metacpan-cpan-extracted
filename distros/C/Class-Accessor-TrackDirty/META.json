@@ -4,7 +4,7 @@
       "Masahiro Honma <hiratara@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.042, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.15",
+            "Dist::Milla" : "v1.0.18",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "0",
@@ -64,10 +64,12 @@
          "web" : "https://github.com/hiratara/p5-Class-Accessor-TrackDirty"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_contributors" : [
+      "Masahiro Honma <hira.tara@gmail.com>",
       "Masahiro Honma <tarara@hirataraDebian.hiratara.local>",
       "Neil Bowers <neil@bowers.com>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

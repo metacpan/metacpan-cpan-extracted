@@ -10,7 +10,7 @@ my $file = File::Spec->catfile(File::Spec->curdir(), "t", "data", "1.0", "rss1.0
 my $rss = XML::RSS->new(encode_output => 1);
 
 eval {
-	$rss->parsefile( $file );
+    $rss->parsefile( $file );
 };
 
 
@@ -20,7 +20,7 @@ eval {
 my $rss_str = $rss->as_string();
 my $rss2 = XML::RSS->new();
 eval {
-	$rss2->parse( $rss_str );
+    $rss2->parse( $rss_str );
 };
 
 unlike ($@, qr/invalid token/, "encode invalid characters" );

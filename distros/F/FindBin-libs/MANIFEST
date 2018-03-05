@@ -1,15 +1,12 @@
-Changes
+CHANGES
+README
+MANIFEST
+Makefile.PL
+version/v5.14/lib/FindBin/libs.pm
+version/v5.8/lib/FindBin/libs.pm
 example/multi_config_dir
 example/p5run
 example/single_config_dir
-libs_curr_pm
-libs_old_pm
-lib/FindBin/libs.pm
-Makefile.PL
-MANIFEST
-META.json
-META.yml
-README
 t/00-cwd-sanity.t
 t/01-use-ok.t
 t/02-export-base.t
@@ -22,3 +19,5 @@ t/09-base-subdir-scalar.t
 t/10-append-list.t
 t/11-noappend-list.t
 t/12-nonexist-export.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

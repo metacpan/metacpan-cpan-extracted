@@ -4,7 +4,7 @@
       "Cory G Watson <gphat@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -67,6 +67,7 @@
          "web" : "https://github.com/Manwar/data-verifier"
       }
    },
-   "version" : "0.61"
+   "version" : "0.62",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
 }
 

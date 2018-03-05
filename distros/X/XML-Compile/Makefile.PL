@@ -4,7 +4,7 @@ use 5.010;
 
 WriteMakefile
  ( NAME	 	=> 'XML::Compile'
- , VERSION	=> '1.59'
+ , VERSION	=> '1.60'
 
  , PREREQ_PM    =>
    { XML::LibXML               => 2.0107
@@ -29,9 +29,22 @@ WriteMakefile
    , 'bin/xml2json'
    , 'bin/schema2example'
    ]
- , AUTHOR       => 'Mark Overmeer'
- , ABSTRACT     => 'Compilation based XML processing'
- , LICENSE      => 'perl'
+ , AUTHOR     => 'Mark Overmeer <markov@cpan.org>'
+ , ABSTRACT   => 'Compilation based XML processing'
+ , LICENSE    => 'perl_5'
+
+ , META_MERGE =>
+      { 'meta-spec' => { version => 2 }
+      , resources  =>
+          { repository =>
+              { type => 'git'
+              , url  => 'https://github.com/markov2/perl5-XML-Compile.git'
+              , web  => 'https://github.com/markov2/perl5-XML-Compile'
+              }
+          , homepage => 'http://perl.overmeer.net/CPAN/'
+          , license  => [ 'http://dev.perl.org/licenses/' ]
+          }   
+      }
  );
 
 ### used by oodist during production of distribution
@@ -43,15 +56,14 @@ DISTDIR         = ../public_html/xml-compile/source
 SKIP_LINKS      = XML::LibXML
 
 # for POD
-EXTENDS		= ../XMLSOAP:../XMLSOAP12:../XMLDaemon:../XMLDumper:../XMLCache:../XMLSimple:../XMLTester:../XMLRewrite:../XMLRPC:../XMLSOAPEv:../XMLC14N:../XMLWSS:../WSSSIG:../XMLWSDL:../XMLSOAPMo:../XMLSOAPLi
+EXTENDS		= ../../perl/XMLSOAP:../../perl/XMLSOAP12:../../perl/XMLDaemon:../../perl/XMLDumper:../../perl/XMLCache:../../perl/XMLSimple:../../perl/XMLTester:../../perl/XMLRewrite:../../perl/XMLRPC:../../perl/XMLSOAPEv:../../perl/XMLC14N:../../perl/XMLWSS:../../perl/WSSSIG:../../perl/XMLWSDL:../../perl/XMLSOAPMo:../../perl/XMLSOAPLi
 FIRST_YEAR      = 2006
-EMAIL           = perl@overmeer.net
+EMAIL           = markov@cpan.org
 WEBSITE         = http://perl.overmeer.net/xml-compile/
-PODTAIL         = ../XML-shared-podtail
 
 # for HTML
-HTML_OUTPUT     = ../public_html/xml-compile/html
 HTML_DOCROOT    = /xml-compile/html
+HTML_OUTPUT     = ../public_html/xml-compile/html
 HTML_PACKAGE    = ../public_html/xml-compile/htmlpkg
 
 __POSTAMBLE

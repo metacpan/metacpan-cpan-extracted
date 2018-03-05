@@ -11,4 +11,5 @@ t/03multiple.t
 t/04subrefs.t
 t/05stringfactory.t
 t/06slash-n.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,27 +1,32 @@
-# Copyrights 2007-2017 by [Mark Overmeer].
+# Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# This code is part of distribution XML-Compile-SOAP.  Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::Transport;
 use vars '$VERSION';
-$VERSION = '3.22';
+$VERSION = '3.23';
 
 use base 'XML::Compile::SOAP::Extension';
 
-use Log::Report 'xml-compile-soap', syntax => 'SHORT';
+use warnings;
+use strict;
+
+use Log::Report     'xml-compile-soap';
+
 use Log::Report::Exception ();
 
-use XML::LibXML            ();
-use Time::HiRes            qw/time/;
+use XML::LibXML     ();
+use Time::HiRes     qw/time/;
 
 
 sub init($)
 {   my ($self, $args) = @_;
     $self->SUPER::init($args);
-    $self->{charset} = $args->{charset} || 'utf-8';
+    $self->{charset} = $args->{charset} || 'UTF-8';
 
     my $addr  = $args->{address} || 'http://localhost';
     my @addrs = ref $addr eq 'ARRAY' ? @$addr : $addr;

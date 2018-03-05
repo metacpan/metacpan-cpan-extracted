@@ -28,7 +28,7 @@ our @ISA = qw(Exporter);
 our %EXPORT_TAGS = ( 'all' => [ qw(Open Log Exit Table Usage Dir
                                File FileC System Now Menu KeyMap
                                Stat TmpFile DataMenu Menue DataMenue
-                               CheckBox
+                               CheckBox RadioButton
                                )] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
@@ -1363,6 +1363,18 @@ sub _setRadioButton($$$){
     $m->setValues($menuName,$lv);
     return;
 }
+
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+sub _isOneSelected($$){
+    my ($m,$name) = @_;
+
+    my $l = $m->getMatching($name,'^[^\s]+$','value','number');
+
+    return 1    if( @{$l} > 0);
+    return 0;
+}
+
 #------------------------------------------------------------------------------
 # Set all option value to of-state except for the selected.
 #------------------------------------------------------------------------------
@@ -1372,7 +1384,7 @@ sub _radioButton($$){
     while(1) {
         my $op = $m->run($name,1);
         my $cl = $m->currLabel($name);
-        last    if( $cl eq 'RETURN' );
+        last    if( $cl eq 'RETURN' && _isOneSelected($m,$name));
         _setRadioButton($m,$name,$cl);
     }
     return;
@@ -1404,12 +1416,13 @@ sub _checkDefaults($$$){
 
 #------------------------------------------------------------------------------
 # Display some options via menu.
-# defaults: me|dk|ek
+# defaults (like me|dk|ek) are preselected
 # Return a hash with two keys 'on' and 'off'. These keys points to arrays
 # with option labels. 'on' means the value of this option is not an empty
 # string.
+# Radio flag switches to radio button mode.
 #------------------------------------------------------------------------------
-sub CheckBox($$@){
+sub _CheckBox($$@){
     my ($header,$options,$defaults,$radio,$m,$menuName) = @_;
 
     $menuName = _checkMenuName($menuName);
@@ -1427,6 +1440,24 @@ sub CheckBox($$@){
     _cleanUpTmps($m);
     return $ret;
 } 
+#------------------------------------------------------------------------------
+# Multiple selections possible.
+#------------------------------------------------------------------------------
+sub CheckBox($$@){
+    my ($header,$options,$defaults,$m,$menuName) = @_;
+
+    return( _CheckBox($header,$options,$defaults,0,$m,$menuName));
+}
+
+#------------------------------------------------------------------------------
+# Only one option may and must be selected.
+#------------------------------------------------------------------------------
+sub RadioButton($$@){
+    my ($header,$options,$defaults,$m,$menuName) = @_;
+
+    return( _CheckBox($header,$options,$defaults,1,$m,$menuName));
+}
+
 1;
 __END__
 

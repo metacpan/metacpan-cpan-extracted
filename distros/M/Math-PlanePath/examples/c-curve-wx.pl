@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -30,6 +30,11 @@
 # selected they're in different colours.  (Though presently when line
 # segments overlap only one colour is shown.)
 #
+# The default is to draw one copy of the curve.  The toolbar control can
+# select various combinations of adjacent curves.  The names are supposed to
+# be suggestive, but it can help to decrease to curve level 0 to see each as
+# a single segment.
+#
 # Drawing is done with Math::PlanePath::CCurve and
 # Geometry::AffineTransform.  The drawing is not particularly efficient
 # since it runs through all segments, even those which are off-screen.  The
@@ -58,7 +63,7 @@ use Wx::Event;
 # use Smart::Comments;
 
 
-our $VERSION = 125;
+our $VERSION = 126;
 
 my $level = 5;
 my $scale = 1;
@@ -161,6 +166,28 @@ my @types_list
                    { x => 1, y => 0, rotate => 2 },
                    { x => 1, y => 1, rotate => 3 },,
                  ],
+     },
+     { name => '16',
+       copies => [ { x => 0, y => 0 },
+                   { x => 0, y => 0, rotate => 1 },
+                   { x => 0, y => 0, rotate => 2 },
+                   { x => 0, y => 0, rotate => 3 },
+
+                   { x =>  1, y =>  0, rotate => 2 },
+                   { x => -1, y =>  0 },
+                   { x =>  0, y => -1, rotate => 1 },
+                   { x =>  0, y => 1, rotate => 3 },
+
+                   { x => -1, y => 1 },
+                   { x => 0, y => 1 },
+                   { x => 1, y => 1, rotate => 3 }, # down
+                   { x => 1, y => 0, rotate => 3 },
+                   
+                   { x => 1, y => -1, rotate => 2 }, # bottom
+                   { x => 0, y => -1, rotate => 2 },
+                   { x => -1, y => -1, rotate => 1 }, # up
+                   { x => -1, y => 0, rotate => 1 },
+                 ]
      },
      { name => '24 Clipped',
        copies => [
@@ -789,15 +816,16 @@ sub OnPaint {
           }
         }
         $mx += $dy * $scale;   # dx,dy turned right -90deg
-        $my -= $dx * $scale;
+        $my -= $dx * $scale;   # for triangle top
 
         ($prev_x,$prev_y) = $affine->transform($prev_x,$prev_y);
         ($mx, $my) = $affine->transform($mx,$my);
         ($x,$y) = $affine->transform($x,$y);
         ### screen: "$prev_x, $prev_y to $x, $y"
 
-        if (xy_in_rect($x,$y, 0,$width,0,$height)
-            || xy_in_rect($prev_x,$prev_y, 0,0,$width,$height)) {
+        if (xy_in_rect($x,$y, 0,0,$width,$height)
+            || xy_in_rect($prev_x,$prev_y, 0,0,$width,$height)
+            || xy_in_rect($mx,$my, 0,0,$width,$height)) {
           if ($figure eq 'Triangles') {
             $dc->SetBrush ($brushes[$c]);
             $dc->SetPen ($pens[$c]);
@@ -836,7 +864,6 @@ sub OnPaint {
           } else { # $figure eq 'Lines'
             $dc->SetPen ($pens[$c]);
             $dc->DrawLine ($prev_x,$prev_y, $x,$y);
-            ($prev_x,$prev_y) = ($x,$y);
           }
         }
       }

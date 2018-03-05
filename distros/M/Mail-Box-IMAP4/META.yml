@@ -3,39 +3,44 @@ abstract: 'Mail::Box connector via IMAP4'
 author:
   - 'Mark Overmeer'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Mail-Box-IMAP4
 no_index:
   directory:
     - t
     - inc
 requires:
-  Date::Parse: 0
-  Digest::HMAC_MD5: 0
-  Digest::MD5: 0
-  File::Compare: 0
-  File::Copy: 0
-  File::Spec: 0
-  List::Util: 0
-  Mail::Box::Manage::User: 3
-  Mail::Box::Net: 3
-  Mail::Box::Search: 3
-  Mail::Box::Test: 3
-  Mail::IMAPClient: 0
-  Mail::Message: 3
-  Mail::Message::Body::Lines: 3
-  Mail::Message::Head::Complete: 3
-  Mail::Message::Head::Delayed: 3
-  Mail::Server: 3
-  Mail::Transport::Receive: 3
-  Scalar::Util: 0
-  Test::More: 0
-version: 3.002
+  Date::Parse: '0'
+  Digest::HMAC_MD5: '0'
+  Digest::MD5: '0'
+  File::Compare: '0'
+  File::Copy: '0'
+  File::Spec: '0'
+  List::Util: '0'
+  Mail::Box::Manage::User: '3'
+  Mail::Box::Net: '3'
+  Mail::Box::Search: '3'
+  Mail::Box::Test: '3'
+  Mail::IMAPClient: '0'
+  Mail::Message: '3'
+  Mail::Message::Body::Lines: '3'
+  Mail::Message::Head::Complete: '3'
+  Mail::Message::Head::Delayed: '3'
+  Mail::Server: '3'
+  Mail::Transport::Receive: '3'
+  Scalar::Util: '0'
+  Test::More: '0'
+resources:
+  homepage: http://perl.overmeer.net/CPAN/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/markov2/perl5-Mail-Box-IMAP4.git
+version: '3.003'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

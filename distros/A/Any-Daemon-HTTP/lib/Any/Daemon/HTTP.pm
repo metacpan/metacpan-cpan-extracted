@@ -1,15 +1,19 @@
-# Copyrights 2013-2016 by [Mark Overmeer].
+# Copyrights 2013-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# This code is part of distribution Any-Daemon-HTTP. Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Any::Daemon::HTTP;
 use vars '$VERSION';
-$VERSION = '0.26';
+$VERSION = '0.27';
 
 use base 'Any::Daemon';
+
+use warnings;
+use strict;
 
 use Log::Report      'any-daemon-http';
 
@@ -44,7 +48,7 @@ sub init($)
     my (@sockets, @hosts);
     foreach (@{$args}{qw/listen socket host/} )
     {   foreach my $conn (ref $_ eq 'ARRAY' ? @$_ : $_)
-        {   my ($socket, @host) = $self->_create_socket($_);
+        {   my ($socket, @host) = $self->_create_socket($conn);
             push @sockets, $socket if $socket;
             push @hosts, @host;
         }
@@ -329,7 +333,9 @@ sub run(%)
     $title         =~ s/ .*//;
     my ($req_count, $conn_count) = (0, 0);
     my $max_conn   = $args{max_conn_per_child} || 10_000;
-    $max_conn      = int(0.9 * $max_conn + rand(0.2 * $max_conn));
+    $max_conn      = int(0.9 * $max_conn + rand(0.2 * $max_conn))
+        if $max_conn > 10;
+
     my $max_req    = $args{max_req_per_child}  || 100_000;
     my $linger     = $args{linger};
 

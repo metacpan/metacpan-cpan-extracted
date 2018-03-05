@@ -6,6 +6,7 @@ META.yml
 Makefile.PL
 README
 README.FAQ
+README.md
 README.todo
 examples/build.pl
 examples/grep.pl
@@ -202,4 +203,5 @@ t/folders/maildir.src/new/110000042.l.43
 t/folders/mbox.cpy
 t/folders/mbox.src
 t/folders/mbox.win
+xt/99pod.t
 META.json                                Module JSON meta-data (added by MakeMaker)

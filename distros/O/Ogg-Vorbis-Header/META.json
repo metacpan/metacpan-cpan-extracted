@@ -4,13 +4,13 @@
       "Dan Pemstein <dan@lcws.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Ogg-Vorbis-Header",
    "no_index" : {
@@ -38,6 +38,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/davorg/Ogg-Vorbis-Header.git",
+         "web" : "https://github.com/davorg/Ogg-Vorbis-Header"
+      }
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

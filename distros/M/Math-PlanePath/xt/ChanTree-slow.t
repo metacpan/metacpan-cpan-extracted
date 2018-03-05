@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013 Kevin Ryde
+# Copyright 2012, 2013, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -32,10 +32,7 @@ use Math::PlanePath::CoprimeColumns;
 use Math::PlanePath::GcdRationals;
 *_gcd = \&Math::PlanePath::GcdRationals::_gcd;
 
-# uncomment this to run the ### lines
-#use Smart::Comments;
-
-require Math::PlanePath::ChanTree;
+use Math::PlanePath::ChanTree;
 
 #------------------------------------------------------------------------------
 # n_to_xy() reversal

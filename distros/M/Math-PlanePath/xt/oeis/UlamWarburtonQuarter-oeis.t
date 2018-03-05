@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -30,8 +30,6 @@ use MyOEIS;
 
 use Math::PlanePath::UlamWarburtonQuarter;
 
-# uncomment this to run the ### lines
-#use Smart::Comments '###';
 
 #------------------------------------------------------------------------------
 # A079318 - (3^(count 1-bits) + 1)/2, width of octant row

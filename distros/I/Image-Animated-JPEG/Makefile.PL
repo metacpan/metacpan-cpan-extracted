@@ -14,6 +14,7 @@ WriteMakefile(
 		"IO::String"	=> 0,
 		"Image::MetaData::JPEG"	=> 0,
 		"Data::Dumper"	=> 0,
+		"IPC::System::Simple"	=> 0,
 	},
 	TEST_REQUIRES	=> {
 		'Test::More'		=> 0,

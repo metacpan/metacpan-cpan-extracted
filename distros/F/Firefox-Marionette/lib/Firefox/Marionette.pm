@@ -40,7 +40,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.47';
+our $VERSION = '0.50';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -924,22 +924,6 @@ sub error_message {
                 }
             }
         }
-        else {
-            if ( POSIX::WIFSTOPPED($child_error) ) {
-                my $name = $self->_signal_name( POSIX::WTERMSIG($child_error) );
-                if ( defined $name ) {
-                    $message = "Firefox stopped by a $name signal ("
-                      . POSIX::WSTOPSIG($child_error) . q[)];
-                }
-                else {
-                    $message = 'Firefox stopped by a signal ('
-                      . POSIX::WSTOPSIG($child_error) . q[)];
-                }
-            }
-            elsif ( POSIX::WIFCONTINUED($child_error) ) {
-                $message = 'Firefox continuing';
-            }
-        }
     }
     return $message;
 }
@@ -1111,56 +1095,83 @@ sub _request_proxy {
         $build->{proxyAutoconfigUrl} = $proxy->pac()->as_string();
     }
     if ( $proxy->ftp() ) {
+        $build->{proxyType} ||= 'manual';
         $build->{ftpProxy} = $proxy->ftp();
-        if ( !$self->_is_new_hostport_okay() ) {
-            if ( $build->{ftpProxy} =~ s/:(\d+)$//smx ) {
-                $build->{ftpProxyPort} = $1 + 0;
-            }
-        }
     }
     if ( $proxy->http() ) {
+        $build->{proxyType} ||= 'manual';
         $build->{httpProxy} = $proxy->http();
-        if ( !$self->_is_new_hostport_okay() ) {
-            if ( $build->{httpProxy} =~ s/:(\d+)$//smx ) {
-                $build->{httpProxyPort} = $1 + 0;
-            }
-        }
     }
     if ( $proxy->none() ) {
+        $build->{proxyType} ||= 'manual';
         $build->{noProxy} = [ $proxy->none() ];
     }
     if ( $proxy->https() ) {
+        $build->{proxyType} ||= 'manual';
         $build->{sslProxy} = $proxy->https();
-        if ( !$self->_is_new_hostport_okay() ) {
-            if ( $build->{sslProxy} =~ s/:(\d+)$//smx ) {
-                $build->{sslProxyPort} = $1 + 0;
-            }
-        }
     }
     if ( $proxy->socks() ) {
+        $build->{proxyType} ||= 'manual';
         $build->{socksProxy} = $proxy->socks();
-        if ( !$self->_is_new_hostport_okay() ) {
-            if ( $build->{socksProxy} =~ s/:(\d+)$//smx ) {
-                $build->{socksProxyPort} = $1 + 0;
-            }
-        }
     }
     if ( $proxy->socks_version() ) {
+        $build->{proxyType} ||= 'manual';
         $build->{socksProxyVersion} = $build->{socksVersion} =
           $proxy->socks_version() + 0;
     }
     elsif ( $proxy->socks() ) {
+        $build->{proxyType} ||= 'manual';
         $build->{socksProxyVersion} = $build->{socksVersion} =
           _DEFAULT_SOCKS_VERSION();
     }
+    return $self->_convert_proxy_before_request($build);
+}
+
+sub _convert_proxy_before_request {
+    my ( $self, $build ) = @_;
+    if ( defined $build ) {
+        foreach my $key (qw(ftpProxy socksProxy sslProxy httpProxy)) {
+            if ( defined $build->{$key} ) {
+                if ( !$self->_is_new_hostport_okay() ) {
+                    if ( $build->{$key} =~ s/:(\d+)$//smx ) {
+                        $build->{ $key . 'Port' } = $1 + 0;
+                    }
+                }
+            }
+        }
+    }
     return $build;
+}
+
+sub _proxy_from_env {
+    my ($self) = @_;
+    my $build;
+    foreach my $key (qw(ftp all https http)) {
+        my $full_name = $key . '_proxy';
+        if ( $ENV{$full_name} ) {
+        }
+        elsif ( $ENV{ uc $full_name } ) {
+            $full_name = uc $full_name;
+        }
+        if ( $ENV{$full_name} ) {
+            $build->{proxyType} = 'manual';
+            my $uri       = URI->new("$ENV{$full_name}");
+            my $build_key = $key;
+            if ( $key eq 'https' ) {
+                $build_key = 'ssl';
+            }
+            $build->{ $build_key . 'Proxy' } = $uri->host_port();
+        }
+    }
+    return $self->_convert_proxy_before_request($build);
 }
 
 sub new_session {
     my ( $self, $capabilities ) = @_;
     my $parameters = {};
     if (   ( defined $capabilities )
-        && ( $capabilities->isa('Firefox::Marionette::Capabilities') ) )
+        && ( ref $capabilities )
+        && ( ref $capabilities eq 'Firefox::Marionette::Capabilities') )
     {
         my $actual = {};
         if ( defined $capabilities->accept_insecure_certs() ) {
@@ -1186,11 +1197,19 @@ sub new_session {
         if ( $capabilities->proxy() ) {
             $actual->{proxy} = $self->_request_proxy( $capabilities->proxy() );
         }
+        elsif ( my $env_proxy = $self->_proxy_from_env() ) {
+            $actual->{proxy} = $env_proxy;
+        }
         $parameters = $actual;    # for Mozilla 57 and after
         foreach my $key ( sort { $a cmp $b } keys %{$actual} ) {
             $parameters->{capabilities}->{requiredCapabilities}->{$key} =
               $actual->{$key};    # for Mozilla 56 (and below???)
         }
+    }
+    elsif ( my $env_proxy = $self->_proxy_from_env() ) {
+        $parameters->{proxy} = $env_proxy;    # for Mozilla 57 and after
+        $parameters->{capabilities}->{requiredCapabilities}->{proxy} =
+          $env_proxy;                         # for Mozilla 56 (and below???)
     }
     my $message_id = $self->_new_message_id();
     $self->_send_request(
@@ -1441,7 +1460,7 @@ sub is_selected {
     if (
         !(
                ( ref $element )
-            && ( $element->isa('Firefox::Marionette::Element') )
+            && ( ref $element eq 'Firefox::Marionette::Element' )
         )
       )
     {
@@ -1466,7 +1485,7 @@ sub is_enabled {
     if (
         !(
                ( ref $element )
-            && ( $element->isa('Firefox::Marionette::Element') )
+            && ( ref $element eq 'Firefox::Marionette::Element' )
         )
       )
     {
@@ -1491,7 +1510,7 @@ sub is_displayed {
     if (
         !(
                ( ref $element )
-            && ( $element->isa('Firefox::Marionette::Element') )
+            && ( ref $element eq 'Firefox::Marionette::Element' )
         )
       )
     {
@@ -1523,7 +1542,7 @@ sub type {
     if (
         !(
                ( ref $element )
-            && ( $element->isa('Firefox::Marionette::Element') )
+            && ( ref $element eq 'Firefox::Marionette::Element' )
         )
       )
     {
@@ -1589,7 +1608,6 @@ sub refresh {
 }
 
 my %_deprecated_commands = (
-    'WebDriver:GetCapabilities'              => 'getSessionCapabilities',
     'Marionette:Quit'                        => 'quitApplication',
     'Marionette:SetContext'                  => 'setContext',
     'Marionette:GetContext'                  => 'getContext',
@@ -1736,7 +1754,7 @@ sub tag_name {
     if (
         !(
                ( ref $element )
-            && ( $element->isa('Firefox::Marionette::Element') )
+            && ( ref $element eq 'Firefox::Marionette::Element' )
         )
       )
     {
@@ -1795,7 +1813,7 @@ sub rect {
     if (
         !(
                ( ref $element )
-            && ( $element->isa('Firefox::Marionette::Element') )
+            && ( ref $element eq 'Firefox::Marionette::Element' )
         )
       )
     {
@@ -1824,7 +1842,7 @@ sub text {
     if (
         !(
                ( ref $element )
-            && ( $element->isa('Firefox::Marionette::Element') )
+            && ( ref $element eq 'Firefox::Marionette::Element' )
         )
       )
     {
@@ -1848,7 +1866,7 @@ sub clear {
     if (
         !(
                ( ref $element )
-            && ( $element->isa('Firefox::Marionette::Element') )
+            && ( ref $element eq 'Firefox::Marionette::Element' )
         )
       )
     {
@@ -1872,7 +1890,7 @@ sub click {
     if (
         !(
                ( ref $element )
-            && ( $element->isa('Firefox::Marionette::Element') )
+            && ( ref $element eq 'Firefox::Marionette::Element' )
         )
       )
     {
@@ -2006,8 +2024,8 @@ sub selfie {
     my $message_id = $self->_new_message_id();
     my $parameters = {};
     my %extra;
-    if (   ( defined $element )
-        && ( $element->isa('Firefox::Marionette::Element') ) )
+    if ( ( ref $element )
+            && ( ref $element eq 'Firefox::Marionette::Element' ) )
     {
         $parameters = { id => $element->uuid() };
         %extra = @remaining;
@@ -2473,6 +2491,7 @@ sub accept_connections {
 
 sub async_script {
     my ( $self, $script, %parameters ) = @_;
+    delete $parameters{script};
     $parameters{args} ||= [];
     my $message_id = $self->_new_message_id();
     $self->_send_request(
@@ -2487,6 +2506,7 @@ sub async_script {
 
 sub script {
     my ( $self, $script, %parameters ) = @_;
+    delete $parameters{script};
     $parameters{args} ||= [];
     my $message_id = $self->_new_message_id();
     $self->_send_request(
@@ -2896,7 +2916,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.47
+Version 0.50
 
 =head1 SYNOPSIS
 
@@ -3123,6 +3143,14 @@ accepts an L<element|Firefox::Marionette::Element> as the first parameter and a 
 
 accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar attribute name as the second parameter.  It returns the initial value of the attribute with the supplied name.  This method will return the initial content, the L<property|Firefox::Marionette#property> method will return the current content.
 
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    my $element = $firefox->find_id('search_input');
+    !defined $element->attribute('value') or die "attribute is not defined!");
+    $element->type('Test::More');
+    !defined $element->attribute('value') or die "attribute is still not defined!");
+
 =head2 property
 
 accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar attribute name as the second parameter.  It returns the current value of the property with the supplied name.  This method will return the current content, the L<attribute|Firefox::Marionette#attribute> method will return the initial content.
@@ -3130,10 +3158,14 @@ accepts an L<element|Firefox::Marionette::Element> as the first parameter and a 
     use Firefox::Marionette();
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    my $element = $firefox->find_id('search_input');
+    $element->property('value') eq '' or die "Initial property is the empty string";
+    $element->type('Test::More');
+    $element->property('value') eq 'Test::More' or die "This property should have changed!";
 
 =head2 mime_types
 
-returns a list of MIME types that will be downloaded by firefox and available from the L<downloads|Firefox::Marionette#downloads> method
+returns a list of MIME types that will be downloaded by firefox and made available from the L<downloads|Firefox::Marionette#downloads> method
 
     use Firefox::Marionette();
     use v5.10;
@@ -3187,13 +3219,39 @@ returns true if any files in L<downloads|Firefox::Marionette#downloads> end in C
         say $path;
     }
 
-=head2 downloading
-
-returns true if any files in L<downloads|Firefox::Marionette#downloads> end in C<.part>
-
 =head2 script 
 
-accepts a scalar containing a javascript function that is executed in the browser.  Returns the result of the javascript function.
+accepts a scalar containing a javascript function that is executed in the browser, and an optional hash as a second parameter.  Allowed keys are below;
+
+=over 4
+
+=item * args - The reference to a list is the arguments passed to the script.
+
+=item * scriptTime - A timeout to override the default L<scripts|Firefox::Marionette::Timeouts#scripts> timeout.
+
+=item * sandbox - Name of the sandbox to evaluate the script in.  The sandbox is cached for later re-use on the same L<window|https://developer.mozilla.org/en-US/docs/Web/API/Window>object if C<newSandbox> is false.  If he parameter is undefined, the script is evaluated in a mutable sandbox.  If the parameter is "system", it will be evaluted in a sandbox with elevated system privileges, equivalent to chrome space.
+
+=item * newSandbox - Forces the script to be evaluated in a fresh sandbox.  Note that if it is undefined, the script will normally be evaluted in a fresh sandbox.
+
+=item * filename - Filename of the client's program where this script is evaluated.
+
+=item * line - Line in the client's program where this script is evaluated.
+
+=item * debug_script - Attach an L<onerror|https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror> event handler on the L<window|https://developer.mozilla.org/en-US/docs/Web/API/Window> object.  It does not differentiate content errors from chrome errors.
+
+=item * directInject - Evaluate the script without wrapping it in a function.
+
+=back
+
+Returns the result of the javascript function.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    if ($firefox->script('return window.find("lucky");')) {
+        # luckily!
+    }
 
 The executing javascript is subject to the L<scripts|Firefox::Marionette::Timeouts#scripts> timeout.
 
@@ -3206,6 +3264,11 @@ The executing javascript is subject to the L<scripts|Firefox::Marionette::Timeou
 =head2 html
 
 returns the page source of the content document.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    say Firefox::Marionette->new()->go('https://metacpan.org/')->html();
 
 =head2 context
 
@@ -3261,7 +3324,7 @@ accepts a subroutine reference as a parameter and then executes the subroutine. 
 
 =head2 sleep_time_in_ms
 
-accepts a new time to sleep in L<await|Firefox::Marionette#await> or L<bye|Firefox::Marionette#bye> methods and returns the previous time.  The defaule time is "1" millisecond.
+accepts a new time to sleep in L<await|Firefox::Marionette#await> or L<bye|Firefox::Marionette#bye> methods and returns the previous time.  The default time is "1" millisecond.
 
     use Firefox::Marionette();
 
@@ -3634,7 +3697,7 @@ The module was unable to read from the socket connected to firefox.  Maybe firef
 =head1 CONFIGURATION AND ENVIRONMENT
 
 Firefox::Marionette requires no configuration files or environment variables.  It will however use the DISPLAY and XAUTHORITY environment variables to try to connect to an X Server.
-
+It will also use the HTTP_PROXY, HTTPS_PROXY, FTP_PROXY and ALL_PROXY environment variables as defaults if the session L<capabilities|Firefox::Marionette::Capabilities> do not specify proxy information.
 
 =head1 DEPENDENCIES
 

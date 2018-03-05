@@ -6,9 +6,9 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.001';
+our $VERSION = '2.003';
 
-use Clone           qw( clone );
+#use Clone           qw( clone );
 use List::MoreUtils qw( first_index );
 
 use Term::Choose       qw( choose );
@@ -38,15 +38,15 @@ sub col_function {
     }
     if ( $cols_type eq 'chosen_cols' ) {
         if ( ! $sql->{orig_cols}{chosen_cols} ) {
-            @{$sql->{orig_cols}{'chosen_cols'}} = @{$sql->{chosen_cols}};
+            @{$sql->{orig_cols}{chosen_cols}} = @{$sql->{'chosen_cols'}};
         }
     }
     else {
         if ( @{$sql->{aggr_cols}} && ! $sql->{orig_cols}{aggr_cols} ) {
-            @{$sql->{orig_cols}{'aggr_cols'}} = @{$sql->{aggr_cols}};
+            @{$sql->{orig_cols}{aggr_cols}} = @{$sql->{'aggr_cols'}};
         }
         if ( @{$sql->{group_by_cols}} && ! $sql->{orig_cols}{group_by_cols} ) {
-            @{$sql->{orig_cols}{'group_by_cols'}} = @{$sql->{group_by_cols}};
+            @{$sql->{orig_cols}{group_by_cols}} = @{$sql->{'group_by_cols'}};
         }
     }
     my $changed = 0;
@@ -69,16 +69,18 @@ sub col_function {
             { %{$sf->{i}{lyt_stmt_v}}, index => 1, default => $default }
         );
         if ( ! defined $idx || ! defined $choices->[$idx] ) {
-            $sql = clone( $backup_sql );
+            #$sql = clone( $backup_sql );
+            $sql = $backup_sql;
             return;
         }
         if ( $choices->[$idx] eq $sf->{i}{_confirm} ) {
             if ( ! $changed ) {
-                $sql = clone( $backup_sql );
+                #$sql = clone( $backup_sql );
+                $sql = $backup_sql;
                 return;
             }
             $sql->{select_type} = 'chosen_cols' if $sql->{select_type} eq '*'; # makes the changes visible
-            return;
+            return 1;
         }
         ( my $qt_col = $choices->[$idx] ) =~ s/^\-\s//;
         $idx -= @pre;

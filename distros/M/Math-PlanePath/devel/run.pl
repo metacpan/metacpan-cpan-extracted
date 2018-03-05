@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Math-PlanePath.
 #
@@ -33,7 +33,6 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
   my $path_class;
   $path_class = 'Math::PlanePath::QuadricCurve';
   $path_class = 'Math::PlanePath::LTiling';
-  $path_class = 'Math::PlanePath::TerdragonCurve';
   $path_class = 'Math::PlanePath::TerdragonMidpoint';
   $path_class = 'Math::PlanePath::SierpinskiArrowhead';
   $path_class = 'Math::PlanePath::QuintetCentres';
@@ -44,7 +43,6 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
   $path_class = 'Math::PlanePath::NxNinv';
   $path_class = 'Math::PlanePath::Dispersion';
   $path_class = 'Math::PlanePath::KochSquareflakes';
-  $path_class = 'Math::PlanePath::TerdragonRounded';
   $path_class = 'Math::PlanePath::HilbertSpiral';
   $path_class = 'Math::PlanePath::GreekKeySpiral';
   $path_class = 'Math::PlanePath::ComplexMinus';
@@ -164,16 +162,20 @@ use Math::PlanePath::Base::Digits 'round_down_pow';
   $path_class = 'Math::PlanePath::QuintetCurve';
   $path_class = 'Math::PlanePath::SquareReplicate';
   $path_class = 'Math::PlanePath::QuintetReplicate';
+  $path_class = 'Math::PlanePath::AlternateTerdragon';
+  $path_class = 'Math::PlanePath::TerdragonRounded';
+  $path_class = 'Math::PlanePath::TerdragonCurve';
 
   my $lo = 0;
-  my $hi = 5**3;
+  my $hi = 40;
 
   Module::Load::load($path_class);
   my $path = $path_class->new
     (
-     numbering_type => 'rotate',
+     arms => 2,
+
+     # numbering_type => 'rotate',
      # k=>5,
-     # arms => 2,
      # align => 'right',
      # parts => 'left',
 
