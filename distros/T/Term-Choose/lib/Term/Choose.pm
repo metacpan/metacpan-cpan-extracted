@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.512';
+our $VERSION = '1.513';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -540,20 +540,20 @@ sub __choose {
         }
         elsif ( $key == CONTROL_SPACE ) {
             if ( $self->{wantarray} ) {
-                if ( $self->{pos}[ROW] == 0 ) {
+                #if ( $self->{pos}[ROW] == 0 ) {
                     for my $i ( 0 .. $#{$self->{rc2idx}} ) {
                         for my $j ( 0 .. $#{$self->{rc2idx}[$i]} ) {
                             $self->{marked}[$i][$j] = ! $self->{marked}[$i][$j];
                         }
                     }
-                }
-                else {
-                    for my $i ( $self->{p_begin} .. $self->{p_end} ) {
-                        for my $j ( 0 .. $#{$self->{rc2idx}[$i]} ) {
-                            $self->{marked}[$i][$j] = ! $self->{marked}[$i][$j];
-                        }
-                    }
-                }
+                #}
+                #else {
+                #    for my $i ( $self->{p_begin} .. $self->{p_end} ) {
+                #        for my $j ( 0 .. $#{$self->{rc2idx}[$i]} ) {
+                #            $self->{marked}[$i][$j] = ! $self->{marked}[$i][$j];
+                #        }
+                #    }
+                #}
                 if ( defined $self->{no_spacebar} ) {
                     $self->__marked_idx2rc( $self->{no_spacebar}, 0 );
                 }
@@ -1078,7 +1078,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.512
+Version 1.513
 
 =cut
 
@@ -1206,8 +1206,7 @@ If C<choose> is called in an I<list context>, the user can also mark an item wit
 C<choose> then returns - when C<Return> is pressed - the list of marked items including the highlighted item.
 
 In I<list context> C<Ctrl-SpaceBar> (or C<Ctrl-@>) inverts the choices: marked items are unmarked and unmarked items are
-marked. If the cursor is on the first row, C<Ctrl-SpaceBar> inverts the choices for the whole list else C<Ctrl-SpaceBar>
-inverts the choices for the current page.
+marked.
 
 =item *
 

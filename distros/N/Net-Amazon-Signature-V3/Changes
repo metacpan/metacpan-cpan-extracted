@@ -1,4 +1,13 @@
 Revision history for Net-Amazon-Signature-V3
 
+0.003     2018-03-05 15:46:03 CST-0600
+	* Re-release 0.002 to include `META.yml`
+
+0.002     2018-03-05 14:51:08 CST-0600
+	* Drop MooseX::AutoDestruct as unused
+	* Releasing to correct metadata (well, to take advantage of being able
+	  to classify requirements as needed for testing only).  Closes #1 --
+	  thanks, Dan Brook (@Grinzz)
+
 0.001     2012-10-29 10:56:31 PST8PDT
 	* first GA release!

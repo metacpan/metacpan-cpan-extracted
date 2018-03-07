@@ -6,42 +6,152 @@ our %args = map { split /\s*=\s*/ } @ARGV;
 our $LIBS = $args{ LIBS } || "-lmpfr -lgmp";
 our $INC = $args{ INC };
 
-$use_64_bit_int = 0; # Let perl decide whether to include 64-bit 'long long' support
-$use_long_double = 0;# Let perl decide whether to include 'long double' support
+$use_64_bit_int  = 0;     # Let perl decide whether to include 64-bit 'long long' support
+$use_long_double = 0;     # Let perl decide whether to include 'long double' support
+$have_decimal64  = undef; # Default value
+$have_float128   = undef; # Default value
 
-#$use_64_bit_int = -1; # Force exclusion of 64-bit 'long long' support
-#$use_long_double = -1;# Force exclusion of 'long double' support
+#$use_64_bit_int  = -1; # Uncomment to Force exclusion of 64-bit 'long long' support
+#$use_long_double = -1; # Uncomment to Force exclusion of 'long double' support
+#$have_decimal64  = -1; # Uncomment to Force exclusion of _Decimal64 support
+#$have_float128   = -1; # Uncomment to Force exclusion of __float128/_Float128 support
 
-#$use_64_bit_int = 1; # Force inclusion of 64-bit 'long long' support
-#$use_long_double = 1;# Force inclusion of 'long double' support
+#$use_64_bit_int  = 1; # Uncomment to Force inclusion of 64-bit 'long long' support
+#$use_long_double = 1; # Uncomment to Force inclusion of 'long double' support
+#$have_decimal64  = 1; # Uncomment to Force inclusion of _Decimal64 support
+#$have_float128   = 1; # Uncomment to Force inclusion of __float128/_Float128 support
 
-$have_decimal64 = 0;
-for(@ARGV) {
-  $have_decimal64 = 1 if $_ eq 'D64=1';
+$save = open SAVE, '>', 'save_config.txt';
+
+warn "Couldn't open save_config.txt for writing: $!" unless $save;
+
+############################################
+# Whether to build with _Decimal64 support #
+############################################
+
+if($have_decimal64) {$have_decimal64++} # $have_decimal64 is now either 0 or 2, depending
+                                        # upon which of the above lines was uncommented
+
+else { # we still need to determine whether_Decimal64 should be supported
+
+  for(@ARGV) {
+    $have_decimal64 = 1 if $_ eq 'D64=1';
+    $have_decimal64 = 0 if $_ eq 'D64=0';
+  }
+
+  if(!defined($have_decimal64)) { # _Decimal64 support still undetermined
+    my($mycc, $mylibs, $myinc) = ('', '', '');
+
+    if(@ARGV) {
+      for my $arg(@ARGV) {
+        $mycc   = (split /=/, $arg)[1] if $arg =~ /^cc=/i;
+        $mylibs = (split /=/, $arg)[1] if $arg =~ /^libs=/i;
+        $myinc  = (split /=/, $arg)[1] if $arg =~ /^inc=/i;
+      }
+    }
+
+    unless($mycc) {
+      $mycc = defined($Config{cc}) ? $Config{cc} : 'cc';
+    }
+
+    $mylibs = '-lmpfr -lgmp' unless $mylibs;
+
+    my $out = `$mycc -o have_d64.exe -x c have_d64.in 2>&1`;
+
+    if($out) {
+      print "$out\n";
+      if($save) {print SAVE "try_64 build: $out\n"}
+    }
+
+    unless(-e 'have_d64.exe') {$have_decimal64 = 0}
+
+    else { # _Decimal64 support still undetermined
+
+      my $out = `$mycc -o try_dec64.exe -x c try_dec64.in $myinc $mylibs 2>&1`;
+
+      if($out) {
+        print "$out\n";
+        if($save) {print SAVE "try_dec64 build: $out\n"}
+      }
+
+      if(-e 'try_dec64.exe') {
+        $out = $^O =~ /MSWin32/i ? `try_dec64.exe` : `./try_dec64.exe`;
+        if($out == 42) {$have_decimal64 = 1}
+        if($save) {print SAVE "try_dec64.exe: $out\n"}
+      }
+    }
+  }
 }
-#$have_decimal64 = 1; # Force inclusion of _Decimal64 support
-                      # This will also define MPFR_WANT_DECIMAL_FLOATS (as that needs to be defined
-                      # before mpfr.h is included).
 
 my $d64_message = $have_decimal64 ? "Attempting to build with _Decimal64 support\n"
                                   : "Building without _Decimal64 support\n";
 
-# We want to set $have_float128 to 1 if and only if:
-# the mpfr library was built with the configure option '--enable-float128' && either:
-#  $Config{nvtype} is '__float128'
-#   or
-#  Math::Float128 has been installed.
+###########################################
+###########################################
+# Whether to build with __foat128 support #
+###########################################
 
-$have_float128 = 0;
-for(@ARGV) {
-  $have_float128 = 1 if $_ eq 'F128=1';
+if($have_float128) {$have_float128++} # $have_float128 is now either 0 or 2, depending
+                                      # upon which of the above lines was uncommented
+
+else { # we still need to determine whether__float128 should be supported.
+
+  for(@ARGV) {
+    $have_float128 = 1 if $_ eq 'F128=1';
+    $have_float128 = 0 if $_ eq 'F128=0';
+  }
+
+  if(!defined($have_float128)) { # __float128 support still undetermined
+
+    print SAVE "\n\n" if $save;
+    my($mycc, $mylibs, $myinc) = ('', '', '');
+
+    if(@ARGV) {
+      for my $arg(@ARGV) {
+        $mycc   = (split /=/, $arg)[1] if $arg =~ /^cc=/i;
+        $mylibs = (split /=/, $arg)[1] if $arg =~ /^libs=/i;
+        $myinc  = (split /=/, $arg)[1] if $arg =~ /^inc=/i;
+      }
+    }
+
+    unless($mycc) {
+      $mycc = defined($Config{cc}) ? $Config{cc} : 'cc';
+    }
+
+    $mylibs = '-lmpfr -lgmp -lquadmath' unless $mylibs;
+
+    my $out = `$mycc -o have_f128.exe -x c have_f128.in 2>&1`;
+
+    if($out) {
+      print "$out\n";
+      if($save) {print SAVE "have_f128 build: $out\n"}
+    }
+
+    unless(-e 'have_f128.exe') {$have_float128 = 0}
+
+    else {
+      my $out = `$mycc -o try_flt128.exe -x c try_flt128.in $myinc $mylibs 2>&1`;
+
+      if($out) {
+        print "$out\n";
+        if($save) {print SAVE "try_flt128 build: $out\n"}
+      }
+
+      if(-e 'try_flt128.exe') {
+        $out = $^O =~ /MSWin32/i ? `try_flt128.exe` : `./try_flt128.exe`;
+        if($out == 42) {$have_float128 = 1}
+        if($save) {print SAVE "try_flt128.exe: $out\n"}
+      }
+    }
+  }
 }
-#$have_float128 = 1; # Force inclusion of __float128 support
-                      # This will also define MPFR_WANT_FLOAT128 (as that needs to be defined
-                      # before mpfr.h is included).
 
-my $float128_message = $have_float128 ? "Assuming that the mpfr library was built with __float128 support\n"
-                                  : "NOT assuming that the mpfr library was built with __float128 support\n";
+my $float128_message = $have_float128 ? "Attempting to build with __float128 support\n"
+                                      : "Building without __float128 support\n";
+
+####################################
+
+close SAVE or warn "Couldn't close save_config.txt";
 
 my $defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
 
@@ -81,16 +191,16 @@ print "If this is wrong, see the \"64-bit support\" section in the README\n\n";
 
 print "If this is wrong, see the \"64-bit support\" section in the README\n\n";
 
-($defines =~ /\-DNV_IS_FLOAT128/) ? print "Building with '__float128' support\n"
-                                 : print "Building without '__float128' support\n";
+($defines =~ /\-DNV_IS_FLOAT128/) ? print "Building with support for a __float128 NV\n"
+                                  : print "Building without support for a __float128 NV\n";
 
-print "If this is wrong, see the \"Float128 conversion\" section in the README\n\n";
+print "If this is wrong, see the \"__float128 NV\" conversion section in the README\n\n";
 
 print "\n$d64_message";
 print "If this is wrong, see the \"Decimal64 conversion\" section in the README\n\n";
 
 print "\n$float128_message";
-print "If this is wrong, see the \"Float128 conversion\" section in the README\n\n";
+print "If this is wrong, see the \"Math::Float128 conversion\" section in the README\n\n";
 
 $defines .= $Config::Config{byteorder} =~ /^1234/ ? " -DMPFR_HAVE_LENDIAN" : " -DMPFR_HAVE_BENDIAN";
 
@@ -110,6 +220,11 @@ if($^O =~ /MSWin32/i && $] < 5.022) {
   $defines .= " -D_WIN32_BIZARRE_INFNAN";
 }
 
+# NOTE: The '-lquadmath' link we provide below
+#       to 'LIBS' is generally not needed.
+#       It is, however, currently needed on at
+#       least some quadmath Cygwin builds.
+#             Jan 8 2018.
 
 my %options = (
   NAME => 'Math::MPFR',
@@ -117,11 +232,11 @@ my %options = (
   ABSTRACT => 'Perl interface to the MPFR (floating point) library',
   DEFINE   => $defines,
   LIBS => [
-    '-lmpfr -lgmp'
+    '-lmpfr -lgmp -lquadmath'
   ],
   LICENSE  => 'perl',
   VERSION_FROM => 'MPFR.pm',
-  clean   => { FILES => 'out1.txt out2.txt out3.txt out4.txt out5.txt out6.txt out7.txt save_child_setting.txt p_spec.txt fpif.txt' },
+  clean   => { FILES => '*.exe *.txt' },
   META_MERGE => {
    'meta-spec' => { version => 2 },
     resources => {

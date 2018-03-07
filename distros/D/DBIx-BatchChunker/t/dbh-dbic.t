@@ -367,11 +367,10 @@ subtest 'Runtime targeting (too fast)' => sub {
     my $range = $batch_chunker->max_id - $batch_chunker->min_id + 1;
     my $multiplier_range = ceil($range / $CHUNK_SIZE);
     my $right_changes    = ceil($calls / 5) - 1;
-    my $right_size       = $CHUNK_SIZE * 2 ** $right_changes;
 
     cmp_ok($calls,              '<',  $multiplier_range, 'Fewer coderef calls than normal');
     cmp_ok($max_time,           '<',  0.5,               'Never exceeded target time');
-    cmp_ok($max_size,           '==', $right_size,       'Right chunk size');
+    cmp_ok($max_size,           '>',  $CHUNK_SIZE,       'Larger chunk size');
     cmp_ok($chunk_size_changes, '==', $right_changes,    'Right number of chunk size changes');
 };
 

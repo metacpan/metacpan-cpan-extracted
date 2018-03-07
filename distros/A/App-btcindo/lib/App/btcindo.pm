@@ -1,7 +1,7 @@
 package App::btcindo;
 
-our $DATE = '2018-02-17'; # DATE
-our $VERSION = '0.020'; # VERSION
+our $DATE = '2018-03-06'; # DATE
+our $VERSION = '0.021'; # VERSION
 
 use 5.010001;
 use strict;
@@ -202,6 +202,35 @@ my %arg_0_currency = (
     },
 );
 
+my %args_public_api = (
+    method => {
+        schema => ['str*'],
+        default => 'GET',
+    },
+    uri => {
+        schema => ['str*', match => qr!\A/!],
+        pos => 0,
+        req => 1,
+    },
+    args => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'arg',
+        schema => ['hash*', of=>'str'],
+        pos => 1,
+        greedy => 1,
+    },
+);
+
+my %args_private_api = (
+    args => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'arg',
+        schema => ['hash*', of=>'str'],
+        pos => 1,
+        greedy => 1,
+    },
+);
+
 my $btcindo;
 
 sub _init {
@@ -241,12 +270,46 @@ sub pairs {
     [200, "OK", \@Market_Pairs];
 }
 
+$SPEC{public} = {
+    v => 1.1,
+    summary => 'Perform public API request',
+    args => {
+        %args_public_api,
+    },
+};
+sub public {
+    my %args = @_;
+
+    _init(\%args);
+    my $uri = $args{uri}; $uri = "/api$uri" unless $uri =~ m!\A/api/!; # XXX args
+    my $url = "https://vip.bitcoin.co.id$uri";
+    [200, "OK", $btcindo->_get_json($url)];
+}
+
+$SPEC{private} = {
+    v => 1.1,
+    summary => 'Perform private API (TAPI) request',
+    args => {
+        %args_private_api,
+    },
+};
+sub private {
+    my %args = @_;
+
+    _init(\%args);
+
+    my $args = $args{args};
+    my $method = delete $args->{method}
+        or return [400, "Please supply 'method' argument"];
+
+    [200, "OK", $btcindo->tapi($method, $method, $args)];
+}
+
 $SPEC{ticker} = {
     v => 1.1,
     summary => 'Show ticker',
     args => {
-        # currently only btc_idr is provided by the API so we comment this out
-        #%arg_0_pair,
+        %arg_0_pair,
     },
 };
 sub ticker {
@@ -259,6 +322,7 @@ $SPEC{trades} = {
     v => 1.1,
     summary => 'Show latest trades',
     args => {
+        %arg_0_pair,
         %arg_filter_type,
     },
 };
@@ -266,7 +330,9 @@ sub trades {
     my %args = @_;
     _init(\%args);
 
-    my $res = $btcindo->get_trades;
+    my $res = $btcindo->get_trades(
+        pair => $args{pair},
+    );
 
     my @rows;
     for my $row (@$res) {
@@ -292,6 +358,7 @@ $SPEC{depth} = {
     v => 1.1,
     summary => 'Show depth',
     args => {
+        %arg_0_pair,
         %arg_filter_type,
     },
 };
@@ -299,7 +366,9 @@ sub depth {
     my %args = @_;
     _init(\%args);
 
-    my $res = $btcindo->get_depth;
+    my $res = $btcindo->get_depth(
+        pair => $args{pair},
+    );
     my @rows;
     for my $type (keys %$res) {
         next if $args{type} && $type ne $args{type};
@@ -342,6 +411,7 @@ _
             default => 'day',
         },
         # XXX pair (API chartdata only available for btc_idr at the moment)
+        # %arg_0_pair,
     },
 };
 sub price_history {
@@ -350,6 +420,7 @@ sub price_history {
 
     my $res = $btcindo->get_price_history(
         period => $args{period},
+        # pair => $args{pair},
     )->{chart};
 
     my @rows;
@@ -1062,7 +1133,7 @@ App::btcindo - CLI for bitcoin.co.id (VIP)
 
 =head1 VERSION
 
-This document describes version 0.020 of App::btcindo (from Perl distribution App-btcindo), released on 2018-02-17.
+This document describes version 0.021 of App::btcindo (from Perl distribution App-btcindo), released on 2018-03-06.
 
 =head1 SYNOPSIS
 
@@ -1320,6 +1391,10 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<pair> => I<str> (default: "btc_idr")
+
+Pair.
+
 =item * B<type> => I<str>
 
 Filter by type (buy/sell).
@@ -1505,6 +1580,36 @@ that contains extra information.
 Return value:  (any)
 
 
+=head2 private
+
+Usage:
+
+ private(%args) -> [status, msg, result, meta]
+
+Perform private API (TAPI) request.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<args> => I<hash>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
 =head2 profit
 
 Usage:
@@ -1549,17 +1654,59 @@ that contains extra information.
 Return value:  (any)
 
 
+=head2 public
+
+Usage:
+
+ public(%args) -> [status, msg, result, meta]
+
+Perform public API request.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<args> => I<hash>
+
+=item * B<method> => I<str> (default: "GET")
+
+=item * B<uri>* => I<str>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
 =head2 ticker
 
 Usage:
 
- ticker() -> [status, msg, result, meta]
+ ticker(%args) -> [status, msg, result, meta]
 
 Show ticker.
 
 This function is not exported.
 
-No arguments.
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<pair> => I<str> (default: "btc_idr")
+
+Pair.
+
+=back
 
 Returns an enveloped result (an array).
 
@@ -1682,6 +1829,10 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<pair> => I<str> (default: "btc_idr")
+
+Pair.
 
 =item * B<type> => I<str>
 

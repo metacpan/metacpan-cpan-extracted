@@ -105,6 +105,8 @@ our $restart      = 0;
 our $shuttingdown = 0;
 our $painter;
 our $painter_dummy = App::KGB::Painter->new( { simulate => 1 } );
+my %stats;
+my $run_time_since = time;
 
 # for JSON::XS, used for debugging
 sub Net::IP::TO_JSON {
@@ -410,6 +412,27 @@ sub open_log {
             or die "Error closing stderr: $!\n";
     }
 }
+
+sub count {
+    my ($self, $counter);
+
+    $stats{$counter}++;
+}
+
+sub get_stats {
+    return \%stats;
+}
+
+sub get_run_seconds {
+    return time - $run_time_since;
+}
+
+sub reset_stats {
+    %stats = ();
+    $run_time_since = time;
+}
+
+1;
 
 package KGB::POE;
 
@@ -994,7 +1017,7 @@ sub irc_registered {
             version    => "KGB v$App::KGB::VERSION",
             userinfo   => "KGB v$App::KGB::VERSION",
             clientinfo => "VERSION USERINFO CLIENTINFO SOURCE",
-            source     => "http://alioth.debian.org/projects/kgb",
+            source     => "https://salsa.debian.org/kgb-team/kgb",
         )
     );
 
@@ -1221,8 +1244,12 @@ sub irc_notify {
     if ( exists $heap->{seen_idx}{$hash} ) {
         KGB->debug("'$part' seen recently\n");
 
+        KGB->count('suppressed_duplicate_notifications');
+
         return undef;
     }
+
+    KGB->count('notifications');
 
     my $alias = "irc_" . $KGB::config->{chanidx}{$chan}{network};
     $kernel->post( $alias => $method => $chan => $_ ) foreach (@$str);
@@ -1254,6 +1281,20 @@ sub irc_command {
                   "Tried /CTCP "
                 . $KGB::config->{networks}{$net}{nick}
                 . " VERSION?" );
+    }
+    elsif ( $command eq 'stats' ) {
+        my $stats = KGB->get_stats;
+        my $run_time = human_duration( KGB->get_run_seconds );
+        my $msg = "after $run_time: ";
+        $msg .=
+            %$stats
+            ? join( ', ', map( "$_:$stats->{$_}", sort keys %$stats ) )
+            : 'no stats yet';
+        return reply( $kernel, $net, $chan, $nick, $msg);
+    }
+    elsif ( $command eq 'statsreset' ) {
+        KGB->reset_stats;
+        return reply( $kernel, $net, $chan, $nick, 'Done' );
     }
     else {
         return reply( $kernel, $net, $chan, $nick,
@@ -1672,7 +1713,7 @@ sub shorten_url {
     }
 
     my $short_url;
-    my $ok = eval { short_link($url); 1 };
+    my $ok = eval { $short_url = short_link($url); 1 };
 
     unless ($ok) {
         KGB->out(
@@ -1681,10 +1722,14 @@ sub shorten_url {
         return monkey_shorten_git_hashes($url);
     }
 
-    return $short_url if defined($short_url);
+    unless ( defined $short_url ) {
+        KGB->out(
+            "URL shortening service '$service' failed to shorten '$url'.");
+        return monkey_shorten_git_hashes($url);
+    }
 
-    KGB->out("URL shortening service '$service' failed to shorten '$url'.");
-    return monkey_shorten_git_hashes($url);
+    KGB->count('URLs_shortened');
+    return $short_url;
 }
 
 sub to_irc {
@@ -1869,11 +1914,12 @@ sub gitlab_webhook_push {
         push @info, colorize( separator => '*' );
         push @info,
             colorize(
-            web => sprintf(
-                '%s/compare/%s...%s',
-                $body->{project}{homepage},
-                substr( $body->{before}, 0, 7 ),
-                substr( $body->{after},  0, 7 )
+            web => shorten_url(
+                sprintf(
+                    '%s/compare/%s...%s',
+                    $body->{project}{homepage}, $body->{before},
+                    $body->{after},
+                )
             )
             );
 

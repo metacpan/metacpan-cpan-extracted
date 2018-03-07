@@ -1,9 +1,12 @@
 Revision history for Perl extension JSONP.
 
+1.84
+
+	- fix bug on non-JSONP blessed objects convertion
+
 1.83
 
 	- remove unnedeed options when encoding JSON in serialize method
-
 
 1.82
 

@@ -5,8 +5,8 @@ NAME
 
 VERSION
 
-      This document describes v0.02 of Dist::Zilla::Plugin::Test::Legal
-      Released November 21, 2014 as part of Dist-Zilla-Plugin-Test-Legal.
+      This document describes v0.03 of Dist::Zilla::Plugin::Test::Legal
+      Released February 28, 2018 as part of Dist-Zilla-Plugin-Test-Legal.
 
 SYNOPSIS
 
@@ -44,7 +44,7 @@ SUPPORT
       A modern, open-source CPAN search engine, useful to view POD in HTML
       format.
 
-      http://metacpan.org/release/Dist-Zilla-Plugin-Test-Legal
+      https://metacpan.org/release/Dist-Zilla-Plugin-Test-Legal
 
       * Search CPAN
 
@@ -57,8 +57,7 @@ SUPPORT
       The RT ( Request Tracker ) website is the default bug/issue tracking
       system for CPAN.
 
-      https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-T
-      est-Legal
+      https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-Legal
 
       * AnnoCPAN
 
@@ -74,12 +73,6 @@ SUPPORT
 
       http://cpanratings.perl.org/d/Dist-Zilla-Plugin-Test-Legal
 
-      * CPAN Forum
-
-      The CPAN Forum is a web forum for discussing Perl modules.
-
-      http://cpanforum.com/dist/Dist-Zilla-Plugin-Test-Legal
-
       * CPANTS
 
       The CPANTS is a website that analyzes the Kwalitee ( code metrics )
@@ -89,8 +82,8 @@ SUPPORT
 
       * CPAN Testers
 
-      The CPAN Testers is a network of smokers who run automated tests on
-      uploaded CPAN distributions.
+      The CPAN Testers is a network of smoke testers who run automated
+      tests on uploaded CPAN distributions.
 
       http://www.cpantesters.org/distro/D/Dist-Zilla-Plugin-Test-Legal
 
@@ -137,6 +130,14 @@ INSTALLATION
     modules.
 
 CHANGES
+
+ Version 0.02 (2014-11-21T14:58:09+00:00)
+
+      * Brought dist up to date with dzil, added some dzil features, like
+      dzil bakeini
+
+      * Made test check for existence of dependent module and skip instead
+      of dying if it didn't exist.
 
  Version 0.01 (2012-01-03T20:17:03Z)
 

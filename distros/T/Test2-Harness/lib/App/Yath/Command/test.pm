@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '0.001054';
+our $VERSION = '0.001055';
 
 use Test2::Harness::Util::TestFile;
 use Test2::Harness::Feeder::Run;
@@ -652,7 +652,7 @@ Show version information
 
 Set a specific run-id
 
-(Default: current timestamp)
+(Default: a UUID)
 
 =item --no-long
 

@@ -11,8 +11,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include <gmp.h>
-#include <mpfr.h>
+
+#include "../math_mpfr_include.h"
 
 /* Squash some annoying compiler warnings (Microsoft compilers only). */
 

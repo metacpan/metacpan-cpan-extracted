@@ -1,8 +1,8 @@
-package Pcore::SMTP v0.4.3;
+package Pcore::SMTP v0.5.3;
 
 use Pcore -dist, -const, -class, -result;
 use Pcore::AE::Handle qw[:TLS_CTX];
-use Pcore::Util::Scalar qw[is_ref is_plain_arrayref];
+use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_plain_arrayref];
 use Pcore::Util::Data qw[from_b64 to_b64];
 use Pcore::Util::Text qw[encode_utf8];
 use Authen::SASL;
@@ -379,30 +379,102 @@ sub _RCPT_TO ( $self, $h, $to, $cb ) {
 }
 
 sub _DATA ( $self, $h, $args, $cb ) {
-    my $buf;
+    state $send_headers = sub ( $h, $args ) {
+        my $buf;
 
-    $buf .= qq[From: $args->{from}$CRLF] if $args->{from};
+        $buf .= qq[From: $args->{from}$CRLF] if $args->{from};
 
-    $buf .= qq[Reply-To: $args->{reply_to}$CRLF] if $args->{reply_to};
+        $buf .= qq[Reply-To: $args->{reply_to}$CRLF] if $args->{reply_to};
 
-    $buf .= qq[To: @{[ join q[, ], $args->{to}->@* ]}$CRLF] if $args->{to};
+        $buf .= qq[To: @{[ join q[, ], $args->{to}->@* ]}$CRLF] if $args->{to};
 
-    $buf .= qq[Cc: @{[ join q[, ], $args->{cc}->@* ]}$CRLF] if $args->{cc};
+        $buf .= qq[Cc: @{[ join q[, ], $args->{cc}->@* ]}$CRLF] if $args->{cc};
 
-    $buf .= qq[Subject: $args->{subject}$CRLF] if defined $args->{subject};
+        $buf .= 'Subject: ' . encode_utf8 $args->{subject} . $CRLF if defined $args->{subject};
 
-    $buf .= join( $CRLF, $args->{headers}->@* ) . $CRLF if $args->{headers} && $args->{headers}->@*;
+        $buf .= join( $CRLF, $args->{headers}->@* ) . $CRLF if $args->{headers} && $args->{headers}->@*;
 
-    $buf .= $CRLF;
+        my $boundary;
 
-    $buf .= is_ref $args->{body} ? $args->{body}->$* : $args->{body} if defined $args->{body};
+        if ( defined $args->{body} && is_plain_arrayref $args->{body} ) {
+            $boundary = P->random->bytes_hex(64);
 
-    # escape "."
-    $buf =~ s/\x0A[.]/\x0A../smg;
+            $buf .= qq[MIME-Version: 1.0$CRLF];
 
-    $buf .= qq[$CRLF.$CRLF];
+            $buf .= qq[Content-Type: multipart/mixed; BOUNDARY="$boundary"$CRLF];
+        }
 
-    encode_utf8($buf);
+        $buf .= $CRLF;
+
+        $h->push_write($buf);
+
+        return $boundary;
+    };
+
+    state $send_body = sub ( $h, $args, $boundary ) {
+        my $buf;
+
+        if ( defined $args->{body} ) {
+            if ( !is_ref $args->{body} ) {
+                $buf .= encode_utf8 $args->{body};
+            }
+            elsif ( is_plain_scalarref $args->{body} ) {
+                $buf .= encode_utf8 $args->{body}->$*;
+            }
+            elsif ( is_plain_arrayref $args->{body} ) {
+                state $pack_mime = sub ( $boundary, $headers, $body ) {
+                    my $part = '--' . $boundary . $CRLF;
+
+                    $part .= join( $CRLF, map { encode_utf8 $_} $headers->@* ) . $CRLF if defined $headers;
+
+                    $part .= 'Content-Transfer-Encoding: base64' . $CRLF;
+
+                    $part .= $CRLF;
+
+                    $part .= to_b64 encode_utf8 $body->$*;
+
+                    $part .= $CRLF;
+
+                    $part .= '--' . $boundary . $CRLF;
+
+                    return \$part;
+                };
+
+                for my $part ( $args->{body}->@* ) {
+                    if ( !is_ref $part || is_plain_scalarref $part ) {
+                        $buf .= $pack_mime->( $boundary, undef, is_plain_scalarref $part ? $part : \$part )->$*;
+                    }
+                    elsif ( is_plain_arrayref $part) {
+                        if ( !is_ref $part->[0] ) {
+                            my $headers = [    #
+                                qq[Content-Type: @{[P->path($part->[0])->mime_type]}; name="$part->[0]"],
+                                qq[Content-Disposition: attachment; filename="$part->[0]"],
+                            ];
+
+                            $buf .= $pack_mime->( $boundary, $headers, is_plain_scalarref $part->[1] ? $part->[1] : \$part->[1] )->$*;
+                        }
+                        else {
+                            $buf .= $pack_mime->( $boundary, $part->[0], is_plain_scalarref $part->[1] ? $part->[1] : \$part->[1] )->$*;
+                        }
+                    }
+                    else {
+                        die q[Invalid ref type];
+                    }
+                }
+            }
+            else {
+                die q[Invalid ref type];
+            }
+        }
+
+        $buf =~ s/\x0A[.]/\x0A../smg;
+
+        $buf .= qq[$CRLF.$CRLF];
+
+        $h->push_write($buf);
+
+        return;
+    };
 
     $h->push_write(qq[DATA$CRLF]);
 
@@ -413,7 +485,9 @@ sub _DATA ( $self, $h, $args, $cb ) {
                 $cb->($res);
             }
             else {
-                $h->push_write($buf);
+                my $boundary = $send_headers->( $h, $args );
+
+                $send_body->( $h, $args, $boundary );
 
                 $self->_read_response( $h, $cb );
             }
@@ -499,18 +573,20 @@ sub _read_response ( $self, $h, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 50                   | Subroutines::ProhibitExcessComplexity - Subroutine "sendmail" with high complexity score (29)                  |
+## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
+## |      | 50                   | * Subroutine "sendmail" with high complexity score (29)                                                        |
+## |      | 381                  | * Subroutine "_DATA" with high complexity score (28)                                                           |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 167                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 428                  | * Private subroutine/method '_RSET' declared but not used                                                      |
-## |      | 436                  | * Private subroutine/method '_VRFY' declared but not used                                                      |
-## |      | 442                  | * Private subroutine/method '_NOOP' declared but not used                                                      |
+## |      | 502                  | * Private subroutine/method '_RSET' declared but not used                                                      |
+## |      | 510                  | * Private subroutine/method '_VRFY' declared but not used                                                      |
+## |      | 516                  | * Private subroutine/method '_NOOP' declared but not used                                                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 437                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |    3 | 511                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 470, 472             | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
+## |    3 | 544, 546             | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 53                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
@@ -534,6 +610,9 @@ Pcore::SMTP - non-blocking SMTP protocol implementation
         password => 'password',
         tls      => 1,
     } );
+
+    # send email with two attachments
+    $message_body = [ [ 'filename1.ext', \$content1 ], [ 'filename2.ext', \$content2 ] ];
 
     $smtp->sendmail(
         from     => 'from@host',
@@ -560,11 +639,72 @@ AnyEvent based SMTP protocol implementation.
 
 =head1 METHODS
 
+=head2 new(\%args)
+
+Please, see L</SYNOPSIS>
+
+=head2 sendmail(%args)
+
+Where %args are:
+
+=over
+
+=item from
+
+from email address.
+
+=item reply_to
+
+reply to email address.
+
+=item to
+
+This argument can be either Scalar or ArrayRef[Scalar].
+
+=item cc
+
+This argument can be either Scalar or ArrayRef[Scalar].
+
+=item bcc
+
+This argument can be either Scalar or ArrayRef[Scalar].
+
+=item subject
+
+Email subject.
+
+=item body
+
+Email body. Can be Scalar|ScalarRef|ArrayRef[Scalar|ScalarRef|ArrayRef].
+
+If body is ArrayRef - email will be composed as multipart/mixed. Each part can be a C<$body> or C<\$body> or a C<[$headers, $body]>. If C<$headers> ia plain scalar - this will be a filename, and headers array will be generated. Or you can specify all required headers manually in ArrayRef.
+
+Examples:
+
+    $body = 'message body';
+
+    $body = \'message body';
+
+    $body = [ 'body1', \$body2, [ \@headers, $content ] ];
+
+    # send email with two file attachmants
+    $body = [ 'message body', [ 'filename1.txt', \$content1 ], [ 'filename2.txt', \$content2 ] ];
+
+    # manually specify headers
+    # send HTML email with 1 attachment
+    $body = [ [ ['Content-Type: text/html'], \$body ], [ 'filename1.txt', \$attachment ] ];
+
+=back
+
 =head1 NOTES
 
 If you are using gmail and get error 534 "Please log in via your web browser", go to L<https://myaccount.google.com/lesssecureapps> and allow less secure apps.
 
 =head1 SEE ALSO
+
+L<http://foundation.zurb.com/emails.html>
+
+L<https://habrahabr.ru/post/317810/>
 
 =head1 AUTHOR
 

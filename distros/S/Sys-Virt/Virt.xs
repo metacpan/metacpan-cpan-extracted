@@ -3358,7 +3358,6 @@ void get_all_domain_stats(con, stats, doms_sv=&PL_sv_undef, flags=0)
       if (SvOK(doms_sv)) {
 	  doms_av = (AV*)SvRV(doms_sv);
 	  ndoms = av_len(doms_av) + 1;
-	  fprintf(stderr, "Len %d\n", ndoms);
       } else {
           ndoms = 0;
       }
@@ -6679,6 +6678,17 @@ _lookup_by_volume(vol)
       RETVAL
 
 
+virStoragePoolPtr
+_lookup_by_target_path(con, path)
+      virConnectPtr con;
+      const char *path;
+    CODE:
+      if (!(RETVAL = virStoragePoolLookupByTargetPath(con, path)))
+          _croak_error();
+  OUTPUT:
+      RETVAL
+
+
 SV *
 get_uuid(pool)
       virStoragePoolPtr pool;
@@ -9488,4 +9498,5 @@ BOOT:
       REGISTER_CONSTANT(VIR_ERR_NO_CLIENT, ERR_NO_CLIENT);
       REGISTER_CONSTANT(VIR_ERR_AGENT_UNSYNCED, ERR_AGENT_UNSYNCED);
       REGISTER_CONSTANT(VIR_ERR_LIBSSH, ERR_LIBSSH);
+      REGISTER_CONSTANT(VIR_ERR_DEVICE_MISSING, ERR_DEVICE_MISSING);
     }

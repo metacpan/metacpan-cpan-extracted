@@ -1,16 +1,16 @@
 #
 # This file is part of Net-Amazon-Signature-V3
 #
-# This software is Copyright (c) 2012 by Chris Weyl.
+# This software is Copyright (c) 2018, 2012 by Chris Weyl.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Net::Amazon::Signature::V3;
-{
-  $Net::Amazon::Signature::V3::VERSION = '0.001';
-}
+our $AUTHORITY = 'cpan:RSRCHBOY';
+# git description: 0.002-1-g73b0d20
+$Net::Amazon::Signature::V3::VERSION = '0.003';
 
 # ABSTRACT: Sign AWS requests -- V3
 
@@ -18,6 +18,7 @@ use utf8;
 
 use Moose;
 use namespace::autoclean;
+use MooseX::AttributeShortcuts 0.015;
 use MooseX::Types::Common::String ':all';
 
 use HTTP::Date;
@@ -26,6 +27,8 @@ use MIME::Base64;
 
 has $_ => (is => 'ro', isa => NonEmptySimpleStr, required => 1)
     for qw{ id key };
+
+has trust_local_time => (is => 'ro', isa => 'Bool', builder => sub { 0 });
 
 # see route53-dg-20120229.pdf, page 98
 sub _time_string { time2str time }
@@ -63,7 +66,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =for :stopwords Chris Weyl AWS
 
@@ -73,7 +76,7 @@ Net::Amazon::Signature::V3 - Sign AWS requests -- V3
 
 =head1 VERSION
 
-This document describes version 0.001 of Net::Amazon::Signature::V3 - released October 29, 2012 as part of Net-Amazon-Signature-V3.
+This document describes version 0.003 of Net::Amazon::Signature::V3 - released March 05, 2018 as part of Net-Amazon-Signature-V3.
 
 =head1 SYNOPSIS
 
@@ -109,23 +112,14 @@ Please see those modules/websites for more information related to this module.
 
 =item *
 
-L<L<Net::Amazon::Route53> -- signed_headers() is largely based off of the code|L<Net::Amazon::Route53> -- signed_headers() is largely based off of the code>
-
-=item *
-
-L<inside L<Net::Amazon::Route53/request>.|inside L<Net::Amazon::Route53/request>.>
+L<Net::Amazon::Route53|Net::Amazon::Route53>
 
 =back
-
-=head1 SOURCE
-
-The development version is on github at L<http://github.com/RsrchBoy/net-amazon-signature-v3>
-and may be cloned from L<git://github.com/RsrchBoy/net-amazon-signature-v3.git>
 
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/RsrchBoy/net-amazon-signature-v3/issues
+L<https://github.com/rsrchboy/net-amazon-signature-v3/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -137,7 +131,7 @@ Chris Weyl <cweyl@alumni.drew.edu>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by Chris Weyl.
+This software is Copyright (c) 2018, 2012 by Chris Weyl.
 
 This is free software, licensed under:
 

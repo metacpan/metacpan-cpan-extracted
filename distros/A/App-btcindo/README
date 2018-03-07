@@ -2,8 +2,8 @@ NAME
     App::btcindo - CLI for bitcoin.co.id (VIP)
 
 VERSION
-    This document describes version 0.020 of App::btcindo (from Perl
-    distribution App-btcindo), released on 2018-02-17.
+    This document describes version 0.021 of App::btcindo (from Perl
+    distribution App-btcindo), released on 2018-03-06.
 
 SYNOPSIS
     Please see included script btcindo.
@@ -211,6 +211,10 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   pair => *str* (default: "btc_idr")
+
+        Pair.
+
     *   type => *str*
 
         Filter by type (buy/sell).
@@ -367,6 +371,30 @@ FUNCTIONS
 
     Return value: (any)
 
+  private
+    Usage:
+
+     private(%args) -> [status, msg, result, meta]
+
+    Perform private API (TAPI) request.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   args => *hash*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   profit
     Usage:
 
@@ -405,16 +433,48 @@ FUNCTIONS
 
     Return value: (any)
 
+  public
+    Usage:
+
+     public(%args) -> [status, msg, result, meta]
+
+    Perform public API request.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   args => *hash*
+
+    *   method => *str* (default: "GET")
+
+    *   uri* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   ticker
     Usage:
 
-     ticker() -> [status, msg, result, meta]
+     ticker(%args) -> [status, msg, result, meta]
 
     Show ticker.
 
     This function is not exported.
 
-    No arguments.
+    Arguments ('*' denotes required arguments):
+
+    *   pair => *str* (default: "btc_idr")
+
+        Pair.
 
     Returns an enveloped result (an array).
 
@@ -521,6 +581,10 @@ FUNCTIONS
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
+
+    *   pair => *str* (default: "btc_idr")
+
+        Pair.
 
     *   type => *str*
 

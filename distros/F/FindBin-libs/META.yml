@@ -1,5 +1,5 @@
 ---
-abstract: "locate and a 'use lib' or export  directories based on $FindBin::Bin."
+abstract: unknown
 author:
   - 'Steven Lembark <lembark@wrkhors.com>'
 build_requires:
@@ -28,5 +28,5 @@ requires:
   Symbol: '0'
   Test::More: '0'
   strict: '0'
-version: 2.016002
+version: '2.016004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

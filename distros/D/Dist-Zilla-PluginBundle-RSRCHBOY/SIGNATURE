@@ -12,49 +12,54 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 007d9eadef38d89600c372861a631e950cadab7e .travis.yml
-SHA1 bcd99ec128f35692ae9a057b4335d8faa25d3b76 Changes
-SHA1 5b15e69593fbd2bed598f2d6b615ea736ab5eb39 LICENSE
-SHA1 e31a851ec20b96dff17f1202cb21908c85b5b314 MANIFEST
-SHA1 58b70d9565bf66cf2cd2e14f412e00d672b3c48a META.json
-SHA1 f20c32ba85406e5ec2e8ccd5bee5ce11f72c3eed META.yml
-SHA1 d5496d00ccc03f8f83b1b3f4ced6056dc836f56a Makefile.PL
-SHA1 0b081b11304b25cdb1cd5e4fd16fbe461be6a2d4 README
-SHA1 b41d77884fd3cfeb3b920744711e2fe8bd18616b cpanfile
+SHA1 a76fa1dfc018a4cfd8b958516756622f64348161 .travis.yml
+SHA1 3d17abb0869384f707d0d66623d5d36ccd4749fd Changes
+SHA1 19ae5b002f3c3aa148f35fc852b290b82a83a3bb LICENSE
+SHA1 397820208397504a6370d042fe0e940650cb86a0 MANIFEST
+SHA1 79e40f21f95f345d79d92f639d57c52c52b7b990 META.json
+SHA1 a48a52ea0d8de17000508e0129fd423736f002bf META.yml
+SHA1 a54548a7cd64b0aa94e3e47ee787908a33816835 Makefile.PL
+SHA1 a4f00b90088f2c6db07d33ce55b73a436880e7e6 README
+SHA1 75bb37b8eec01e63f1f229a178820aa5f144544a cpanfile
 SHA1 bd099d252037835e971a9075f10a953b3ff8a8c2 dist.ini
-SHA1 500bc9d4cb560fe1059f33da7bc76e60da3d7b43 lib/Dist/Zilla/PluginBundle/RSRCHBOY.pm
-SHA1 cc4e5791ac630b3204ebb4080a020994ed263c74 lib/Pod/Weaver/PluginBundle/RSRCHBOY.pm
-SHA1 f64c46d19ee05fa78227fd399f7d7bfecb5c6de8 lib/Pod/Weaver/Section/RSRCHBOY/Authors.pm
-SHA1 0b7e40bab675eea65639d4dd52db79cd744e16b3 lib/Pod/Weaver/Section/RSRCHBOY/GeneratedAttributes.pm
-SHA1 72139f2d107f56f51e492feb91ebf54074882557 lib/Pod/Weaver/Section/RSRCHBOY/LazyAttributes.pm
-SHA1 6ff2a3a78a3a53f8d515362f437736e540939e57 lib/Pod/Weaver/Section/RSRCHBOY/RequiredAttributes.pm
-SHA1 7fdfc87df56e0bd36b9f108996b2541c692a80ca lib/Pod/Weaver/Section/RSRCHBOY/RoleParameters.pm
-SHA1 00299ffc3112f2302b034fe7e48ba136c5bf78d8 lib/Pod/Weaver/SectionBase/CollectWithIntro.pm
+SHA1 1a670f6f3555fb4ad893f84f5803e37585223080 lib/Dist/Zilla/PluginBundle/RSRCHBOY.pm
+SHA1 3a4acd975c57f337ceba4401853e6e6b8074c6d1 lib/Pod/Weaver/PluginBundle/RSRCHBOY.pm
+SHA1 ec9a2ede52cef054c0ab44294c55a1d670558bc6 lib/Pod/Weaver/Section/RSRCHBOY/Authors.pm
+SHA1 6686c16382d19634b828ec652259758c7393422d lib/Pod/Weaver/Section/RSRCHBOY/GeneratedAttributes.pm
+SHA1 9a4ff51ed4d71ef5b0e9e809573a02f6d698ae43 lib/Pod/Weaver/Section/RSRCHBOY/LazyAttributes.pm
+SHA1 146cb22e96de03be74f8b97265473586b147250b lib/Pod/Weaver/Section/RSRCHBOY/RequiredAttributes.pm
+SHA1 70dca4c8805a248efe59b6eaca096fc5449a0583 lib/Pod/Weaver/Section/RSRCHBOY/RoleParameters.pm
+SHA1 50d8b62c5fdb0714307ad532ca64ff498e2a1215 lib/Pod/Weaver/SectionBase/CollectWithIntro.pm
 SHA1 4bdb7637c377a4563e26e887313ef118c1d1a22d t/00-check-deps.t
-SHA1 6f26aea3ba2b0e0661ed5de56eea9766d3f62fa7 t/00-compile.t
-SHA1 8fad47edbd48000dd0ae35ef2da5b6c8f033f921 t/00-load.t
-SHA1 4f4ffd3980c5a7e2da76bbfd334f8083167acafd t/00-report-prereqs.dd
-SHA1 e83b2ff7cb31d331a14a18c239c20e55cb159743 t/00-report-prereqs.t
+SHA1 dd2ffa7616157e75768965ef43d04e8e4c8477fe t/00-compile.t
+SHA1 a7d99895839d361d0718b454d5551c673422b34d t/00-load.t
+SHA1 557d85491df35d91866131f45bcf193f2c433a5a t/00-report-prereqs.dd
+SHA1 be245669774c67f256fa4f23cedd50430939b294 t/00-report-prereqs.t
 SHA1 1f8b76f0a3ab2a7ca16c3e052c225aec1be4a1bc xt/author/eol.t
 SHA1 632ef0d3e5aa0a5951edf1f0d1a0379dfcf36832 xt/author/no-tabs.t
-SHA1 173c1c223ef2647f8d483269680bba12d38324dd xt/author/pod-coverage.t
-SHA1 38550127d166f9f06f5bdf3393fab33db3a30097 xt/author/pod-spell.t
-SHA1 c98161caef3779b7cb89bb36b309c7577bf8ea01 xt/author/pod-syntax.t
+SHA1 dcde09c880051b90a320edc427b5908e4e86ba74 xt/author/pod-coverage.t
+SHA1 41eab51c72a662bbabdef856f8c98680cf2a6ad0 xt/author/pod-linkcheck.t
+SHA1 31548cefdbf9c12d81c49ca93cc7a22cde772bc8 xt/author/pod-spell.t
+SHA1 7d4396dd1c0b8f0fde028ed8da90eb0af5cee1e3 xt/author/pod-syntax.t
 SHA1 a7948d34cfaad400286ea5d5fa6206c4c7e2552c xt/release/consistent-version.t
-SHA1 e7086fe389cdd879028a4aec6d731be0733b74f5 xt/release/has-version.t
-SHA1 2f5d14fc9b8a7a70b80e25aa11769062dd91acee xt/release/minimum-version.t
-SHA1 54c781393de57ca79c4fef3e8250c4074735de9b xt/release/no-smart-comments.t
-SHA1 64e657210e5dc9537f0007d48c808e8479f14fba xt/release/pod-linkcheck.t
+SHA1 3b67996436b4c76c40a93e12555b347df91b6db4 xt/release/has-version.t
+SHA1 0d60948c51af6bd5e3272c4b3a9e512837005873 xt/release/minimum-version.t
+SHA1 7ebae2867ffc1f13ec9dc3223977d4e7518e1364 xt/release/no-smart-comments.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJZETRyAAoJEJP6zjPp4XX4FHsH/10UYGpj4IQbEu9PZXcCgluu
-NUvhVSznMYsEZtSBkgFEXZwLB3IE8eYe21XKzSmvHHmW0ckbtXmzAOWflT9kPPBO
-S6OtE49FXa6kYUG+hj0LSWlktiqqbfhj1EVFXUabXO+mHN4lLuuh5JX/0zqbNDXl
-yjhZ9s7CshIVRbKXI6a5he3wtSll6x16lstbPD4POzKfCW6SUSBopUh8o2A55gq8
-UxaqpXQj4XpQkJJj9rnvZcm+qiLU0aDSICtZK0NLZzR1/NPI7v8uTrEqZlDsmM2X
-4yVLQc01C+bokuieMfIo8Y+NEQm6RT8QXjlVqiP1iFqEguiZoUOnFrVdhKrkpPo=
-=K8y4
+iQIzBAEBCgAdFiEECEuptPlweKA7ktv7LPV1bFK+zPYFAlqdt6gACgkQLPV1bFK+
+zPZORhAApGMwV7ZsVs25fAUf5Ljr/ENd11RmLPvCoUCkLGsEsffkvQ3k43/xYB/l
+8A8oZX0kqHgjpCqz12xmaOpNfxJ0oYDvNuGDCKY9fHpJy0XGNpaZulno67KlAOCR
+3BjoYO0qXdWqtRCp29xgC3Dz/Y3tKnhnXJqufmcHd51YJchJHIIF3haNO9Cp4iGa
+Pnd5kVv8Smw46SGdsshkMm68c9MpMzo1+9T2sikGFIRALMnG9m8lKWxj0TXOxn03
+7lCW8zMjDBtQXKh6iHjxrU4tquwosT3t1l2WD0bu9iNYjO+muPpy7shLtM9MDaVw
+AnsyhQZ+cR+Tmg5oZkqzluGWaBhBxDpU6Pl7IvYt4sWLLLTS1feu62SEB1MW+ap0
+lld+R2r3Z5bzYSxybmb9+0eJ8GWHIWEIWcyq29X+SheTk5g36cez3oDhChmK0fDR
+A9XKOmR7T6zHSlBsiZGYpoEe74mP6WQOsSQ4Leej67lJGHD6aOIOzH7ZAC5jnFKH
+Kn+z1KiCKNiiFOAhHVxZGw4MpwFhkRsX47jFVtUkEMGDAwI8qSpJRy0b9kMMZ49J
+kX3ZYCug3YthjJBL4VrDQgwJ5ZW9e8/6G8/bSuULfwqybwBJMpXHujlhCQLgPpps
+G7IIzuR1f5f0qc+Tux+NBAYTmg/P/Ny8+bK8S+e1WO5Hfh9pIpk=
+=ZHsb
 -----END PGP SIGNATURE-----

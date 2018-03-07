@@ -1,5 +1,5 @@
 package CGI::Application::Plugin::Authentication::Driver::HTPasswd;
-$CGI::Application::Plugin::Authentication::Driver::HTPasswd::VERSION = '0.22';
+$CGI::Application::Plugin::Authentication::Driver::HTPasswd::VERSION = '0.23';
 use strict;
 use warnings;
 

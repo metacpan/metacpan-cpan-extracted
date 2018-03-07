@@ -2,7 +2,7 @@ package App::Yath::Command::failed;
 use strict;
 use warnings;
 
-our $VERSION = '0.001054';
+our $VERSION = '0.001055';
 
 use Test2::Util qw/pkg_to_file/;
 
@@ -173,7 +173,7 @@ Show version information
 
 Set a specific run-id
 
-(Default: current timestamp)
+(Default: a UUID)
 
 =item --no-long
 

@@ -1,3 +1,16 @@
+4.01
+ - Automatically build Math::MPFR with __float128 support if mpfr_buildopt_float128_p() returns
+   true && 'F128=0' has not been provided as an argument to Makefile.PL.
+ - Automatically build Math::MPFR with _Decimal64 support if mpfr_buildopt_decimal_p() returns
+   true && 'D64=0' has not been provided as an argument to Makefile.PL.
+ - Make sure that _Float128 is a known type when MPFR_WANT_FLOAT128 is defined
+   (because it appears in mpfr.h in mpfr-4.1.0).
+ - Add '-lquadmath' to LIBS in Makefile.PL (as some Cygwin builds apparently want it).
+ - Prototype those subs specified in 'use subs'.
+ - Alter Prec.xs, Random.xs and V.xs to accommodate perl.h's defining (as of 5.28.7) of
+   INTMAX_C and UINTMAX_C.
+   (Replaced '#include <mpfr.h>' with '#include "../math_mpfr_include.h"
+
 4.0
  - Add Rmpfr_free_cache2 and Rmpfr_free_pool.
  - Add MPFR_RNDF rounding mode
@@ -19,7 +32,7 @@
  - Add Rmpfr_q_div and Rmpfr_z_div and use them in overload_div to replace the existing
    code (that was rounding twice).
  - Add overloading of comparisons with mpq_t and mpz_t
- - use mpfr library of version of mpfr_get_q (in preference to homegrown rendition) iff
+ - use mpfr library of version of mpfr_get_q (in preference to homegrown rendition) if
    MPFR_VERSION_MAJOR >= 4.
  - Workaround mpfr_get_float128() failure to round subnormals reliably. (Workaround was removed
    soon after - when the mpfr_get_float128 problem was fixed in mpfr source.)

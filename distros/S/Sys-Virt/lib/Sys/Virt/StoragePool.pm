@@ -62,6 +62,8 @@ sub _new {
 	}
     } elsif (exists $params{volume}) {
 	$self = Sys::Virt::StoragePool::_lookup_by_volume($params{volume});
+    } elsif (exists $params{target_path}) {
+	$self = Sys::Virt::StoragePool::_lookup_by_target_path($con,  $params{target_path});
     } elsif (exists $params{xml}) {
 	if ($params{nocreate}) {
 	    $self = Sys::Virt::StoragePool::_define_xml($con,  $params{xml});

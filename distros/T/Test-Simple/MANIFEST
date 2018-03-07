@@ -242,6 +242,7 @@ t/Test2/behavior/run_subtest_inherit.t
 t/Test2/behavior/special_names.t
 t/Test2/behavior/subtest_bailout.t
 t/Test2/behavior/trace_signature.t
+t/Test2/behavior/uuid.t
 t/Test2/legacy/TAP.t
 t/Test2/modules/API.t
 t/Test2/modules/API/Breakage.t

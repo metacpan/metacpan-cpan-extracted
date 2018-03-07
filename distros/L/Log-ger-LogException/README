@@ -2,7 +2,7 @@ NAME
     Log::ger::LogException - Log warn()/die()
 
 VERSION
-    version 0.001
+    version 0.002
 
 SYNOPSIS
      use Log::ger::LogException;

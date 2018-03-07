@@ -4,7 +4,7 @@
       "Alan Young <ayoung@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -29,6 +29,9 @@
          "requires" : {
             "Module::Build" : "0.4208",
             "Module::Build::Version" : "0"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
          }
       },
       "develop" : {
@@ -110,6 +113,7 @@
             "Dist::Zilla::Plugin::UploadToCPAN" : "0",
             "Dist::Zilla::Plugin::if::ENV" : "0",
             "Dist::Zilla::Plugin::if::not::ENV" : "0",
+            "Encode" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Weaver::Plugin::EnsureUniqueSections" : "0",
             "Pod::Weaver::Plugin::StopWords" : "0",
@@ -119,16 +123,26 @@
             "Pod::Weaver::Section::SeeAlso" : "0",
             "Pod::Weaver::Section::Support" : "0",
             "Pod::Weaver::Section::WarrantyDisclaimer" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::Perl_5" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
             "Test::CleanNamespaces" : "0.15",
+            "Test::ConsistentVersion" : "0",
             "Test::EOL" : "0",
             "Test::Kwalitee" : "1.21",
-            "Test::More" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0.96",
+            "Test::NoSmartComments" : "0",
             "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Pod::No404s" : "0",
             "Test::Spelling" : "0.12",
+            "Test::Vars" : "0",
             "Test::Version" : "1"
          }
       },
@@ -181,11 +195,13 @@
          "web" : "https://github.com/harleypig/Dist-Zilla-Plugin-Test-Legal"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_contributors" : [
       "Alan Young <harleypig@gmail.com>",
-      "Harley Pig <harleypig@gmail.com>",
-      "Сергей Романов <sromanov-dev@yandex.ru>"
-   ]
+      "Alan Young <harleypig@harleypig.com>",
+      "Moray <moray.jones@gmail.com>",
+      "\u0421\u0435\u0440\u0433\u0435\u0439 \u0420\u043e\u043c\u0430\u043d\u043e\u0432 <sromanov-dev@yandex.ru>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

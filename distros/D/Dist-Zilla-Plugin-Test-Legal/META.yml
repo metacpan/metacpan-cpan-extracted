@@ -27,7 +27,7 @@ configure_requires:
   Module::Build: '0.4208'
   Module::Build::Version: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -48,8 +48,10 @@ resources:
   bugtracker: https://github.com/harleypig/Dist-Zilla-Plugin-Test-Legal/issues
   homepage: https://metacpan.org/release/Dist-Zilla-Plugin-Test-Legal
   repository: git://github.com/harleypig/Dist-Zilla-Plugin-Test-Legal.git
-version: '0.02'
+version: '0.03'
 x_contributors:
   - 'Alan Young <harleypig@gmail.com>'
-  - 'Harley Pig <harleypig@gmail.com>'
+  - 'Alan Young <harleypig@harleypig.com>'
+  - 'Moray <moray.jones@gmail.com>'
   - 'Сергей Романов <sromanov-dev@yandex.ru>'
+x_serialization_backend: 'YAML::Tiny version 1.73'

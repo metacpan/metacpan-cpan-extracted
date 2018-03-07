@@ -11,6 +11,8 @@ print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
 print  "# Using gmp library version ", Math::MPFR::gmp_v(), "\n";
 
+my $arb = 2;
+
 my $double = 12345.5;
 my $ui = 4;
 my $si = -1369012;
@@ -64,7 +66,11 @@ else {
   else {warn "3b: ", $@ ? $@ : "\$\@ unexpectedly not set"}
 }
 
-if(RMPFR_PREC_MAX > RMPFR_PREC_MIN) {$ok .= 'c'}
+# Here we're also testing that RMPFR_PREC_MIN and RMPFR_PREC_MAX are
+# parsed as intended when the comparison is '<', '<=' or '<=>'.
+
+if(RMPFR_PREC_MIN < RMPFR_PREC_MAX && RMPFR_PREC_MAX <= RMPFR_PREC_MAX + $arb &&
+                                            RMPFR_PREC_MAX <=> RMPFR_PREC_MIN) {$ok .= 'c'}
 else {warn "RMPFR_PREC_MAX: ", RMPFR_PREC_MAX, "\nRMPFR_PREC_MIN: ", RMPFR_PREC_MIN, "\n"}
 
 if($ok eq 'abc') {print "ok 3\n"}

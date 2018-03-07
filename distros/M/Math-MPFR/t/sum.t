@@ -56,21 +56,21 @@ else {
   Rmpfr_free_cache();
 
   eval {Rmpfr_free_cache2(MPFR_FREE_LOCAL_CACHE);};
-  if($@ =~ /^Rmpfr_free_cache2 not implmented/) {print "ok 4\n"}
+  if($@ =~ /^Rmpfr_free_cache2 not implemented/) {print "ok 4\n"}
   else {
     warn "\$\@: $@\n";
     print "not ok 4\n";
   }
 
   eval {Rmpfr_free_cache2(MPFR_FREE_GLOBAL_CACHE);};
-  if($@ =~ /^Rmpfr_free_cache2 not implmented/) {print "ok 5\n"}
+  if($@ =~ /^Rmpfr_free_cache2 not implemented/) {print "ok 5\n"}
   else {
     warn "\$\@: $@\n";
     print "not ok 5\n";
   }
 
   eval {Rmpfr_free_pool();};
-  if($@ =~ /^Rmpfr_free_pool not implmented/) {print "ok 6\n"}
+  if($@ =~ /^Rmpfr_free_pool not implemented/) {print "ok 6\n"}
   else {
     warn "\$\@: $@\n";
     print "not ok 6\n";

@@ -24,6 +24,7 @@ requires:
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::date: '0'
   Data::Sah::Compiler::perl::TH::float: '0'
+  Data::Sah::Compiler::perl::TH::hash: '0'
   Data::Sah::Compiler::perl::TH::int: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   Finance::BTCIndo: '0.007'
@@ -37,7 +38,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-btcindo
   homepage: https://metacpan.org/release/App-btcindo
   repository: git://github.com/perlancar/perl-App-btcindo.git
-version: '0.020'
+version: '0.021'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

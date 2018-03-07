@@ -1,12 +1,14 @@
 Revision history for WWW-Session
 
+0.016  2018-03-06
+      Added support for PWM - thanks to Dane Buson
 0.015  2018-01-02
       Improved error handling for MH-Z14 sensor and prevent infinite loop if the sensor does not send back data
 0.014  2017-04-03
       Improved calculations for DSM501 dust sensor
       POD improvements
 0.013  2017-03-24
-      Added suport for BCM180 presure/temperature sensor
+      Added suport for BCM180 pressure/temperature sensor
 0.012  2017-03-24
       Implemented I2C support
 0.011  2017-03-22

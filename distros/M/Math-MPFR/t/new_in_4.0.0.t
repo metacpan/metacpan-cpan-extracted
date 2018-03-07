@@ -1,3 +1,10 @@
+
+#################################################################
+# NOTE: Not everything that's new in mpfr-4.0.0 is tested here. #
+# eg: MPFR_RNDF rounding and the new freeing of caches/pools    #
+#     are tested elsewhere in the test suite.                   #
+#################################################################
+
 use warnings;
 use strict;
 use Math::MPFR qw(:mpfr);

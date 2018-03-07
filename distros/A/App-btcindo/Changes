@@ -1,3 +1,11 @@
+0.021   2018-03-06 (PERLANCAR)
+
+        - Add subcommands: public, private.
+
+        - ticker, trades, depth: Add 'pair' argument. Finally pairs other than
+          'btc_idr' are supported by the public API.
+
+
 0.020   2018-02-17 (PERLANCAR)
 
 	- Add pair: ten_idr.

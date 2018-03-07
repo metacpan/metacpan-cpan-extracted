@@ -23,6 +23,7 @@ subtest "uniq_adj_ci" => sub {
 subtest "uniq_ci" => sub {
     #is_deeply([uniq   (qw/a b B a b C c/)], [qw/a b B C c/]);
     is_deeply([uniq_ci(qw/a b B a b C c/)], [qw/a b C/]);
+    is_deeply([uniq_ci("a","b","B",undef,"c",undef)], ["a","b",undef,"c"]);
 };
 
 DONE_TESTING:

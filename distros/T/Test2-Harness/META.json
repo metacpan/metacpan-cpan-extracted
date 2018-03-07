@@ -31,6 +31,7 @@
             "Config" : "0",
             "Cwd" : "0",
             "Data::Dumper" : "0",
+            "Data::UUID" : "1.148",
             "Exporter" : "0",
             "Fcntl" : "0",
             "File::Find" : "0",
@@ -96,7 +97,7 @@
          "url" : "http://github.com/Test-More/Test2-Harness/"
       }
    },
-   "version" : "0.001054",
+   "version" : "0.001055",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.00"
 }
 

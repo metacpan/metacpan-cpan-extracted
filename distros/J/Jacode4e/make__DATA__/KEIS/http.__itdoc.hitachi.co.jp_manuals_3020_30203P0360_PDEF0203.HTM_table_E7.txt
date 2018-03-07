@@ -1,0 +1,4 @@
+# http://itdoc.hitachi.co.jp/manuals/3020/30203P0360/PDEF0203.HTM
+# •\E-7@•¶Žš‚ª“ü‚ê‘Ö‚í‚é•¶Žš‚Ìˆê——
+# •¶Žš1 	KEIS90 	SJIS 	•¶Žš2 	KEIS90 	SJIS
+¼ 	A2BE 	81BC 	½ 	A2BF 	81BD

@@ -8,7 +8,7 @@ use Pod::Usage 1.69;
 use CPAN::Reporter::Smoker::OpenBSD qw(is_distro_ok block_distro);
 use Config;
 
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 my ( $distro, $help, $version_check, $comment );
 
 GetOptions(

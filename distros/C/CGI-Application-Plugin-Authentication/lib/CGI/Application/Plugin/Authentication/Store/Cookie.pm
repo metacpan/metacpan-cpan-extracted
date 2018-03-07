@@ -1,5 +1,5 @@
 package CGI::Application::Plugin::Authentication::Store::Cookie;
-$CGI::Application::Plugin::Authentication::Store::Cookie::VERSION = '0.22';
+$CGI::Application::Plugin::Authentication::Store::Cookie::VERSION = '0.23';
 use strict;
 use warnings;
 

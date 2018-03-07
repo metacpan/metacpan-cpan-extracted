@@ -812,6 +812,10 @@ Libvirt guest agent replies with wrong id to guest-sync command
 
 The libSSH operation failed
 
+=item Sys::Virt::Error::ERR_DEVICE_MISSING
+
+Libvirt fail to find the desired device.
+
 =back
 
 =head1 AUTHORS

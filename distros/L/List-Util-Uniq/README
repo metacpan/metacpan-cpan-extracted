@@ -2,17 +2,23 @@ NAME
     List::Util::Uniq - List utilities related to finding unique items
 
 VERSION
-    This document describes version 0.001 of List::Util::Uniq (from Perl
-    distribution List-Util-Uniq), released on 2018-02-21.
+    This document describes version 0.002 of List::Util::Uniq (from Perl
+    distribution List-Util-Uniq), released on 2018-03-06.
+
+SYNOPSIS
+     use List::Util::Uniq qw(uniq_adj uniq_adj_ci uniq_ci);
+
+     @res = uniq_adj(1, 4, 4, 3, 1, 1, 2); # 1, 4, 3, 1, 2
+     @res = uniq_adj_ci("a", "b", "B", "c", "a"); # "a", "b", "c", "a"
+     @res = uniq_ci("a", "b", "B", "c", "a"); # "a", "b", "c"
 
 FUNCTIONS
     Not exported by default but exportable.
 
   uniq_adj(@list) => LIST
     Remove *adjacent* duplicates from list, i.e. behave more like Unix
-    utility's uniq instead of List::MoreUtils's "uniq" function, e.g.
-
-     my @res = uniq(1, 4, 4, 3, 1, 1, 2); # 1, 4, 3, 1, 2
+    utility's uniq instead of List::MoreUtils's "uniq" function. Uses string
+    equality test.
 
   uniq_adj_ci(@list) => LIST
     Like "uniq_adj" except case-insensitive.
@@ -36,6 +42,8 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    List::Util
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 

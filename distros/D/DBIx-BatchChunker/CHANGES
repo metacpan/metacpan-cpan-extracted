@@ -10,3 +10,8 @@ Maintainer:      Grant Street Group <developers@grantstreet.com>
 
     - Initial release
 
+0.91        2018-02-16
+
+    - Some unit test fixes based on CPAN Matrix tests
+    - Fix Perl 5.8 failures and bring minimum Perl version to 5.8.1
+

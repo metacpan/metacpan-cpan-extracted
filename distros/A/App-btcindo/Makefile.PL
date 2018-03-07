@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::date" => 0,
     "Data::Sah::Compiler::perl::TH::float" => 0,
+    "Data::Sah::Compiler::perl::TH::hash" => 0,
     "Data::Sah::Compiler::perl::TH::int" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Finance::BTCIndo" => "0.007",
@@ -42,7 +43,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.020",
+  "VERSION" => "0.021",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,6 +58,7 @@ my %FallbackPrereqs = (
   "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::date" => 0,
   "Data::Sah::Compiler::perl::TH::float" => 0,
+  "Data::Sah::Compiler::perl::TH::hash" => 0,
   "Data::Sah::Compiler::perl::TH::int" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "File::Spec" => 0,

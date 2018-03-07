@@ -1,5 +1,5 @@
 {
-   "abstract" : "locate and a 'use lib' or export  directories based on $FindBin::Bin.",
+   "abstract" : "unknown",
    "author" : [
       "Steven Lembark <lembark@wrkhors.com>"
    ],
@@ -46,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : 2.016002,
+   "version" : "2.016004",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

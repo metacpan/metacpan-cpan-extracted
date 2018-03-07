@@ -2,7 +2,7 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
-                                        'perl' => 'v5.20.0'
+                                        'perl' => 'v5.18.0'
                                       }
                       },
        'develop' => {
@@ -115,7 +115,7 @@ do { my $x = {
                                       'autodie' => '0.20',
                                       'constant' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.20.0',
+                                      'perl' => 'v5.18.0',
                                       'strict' => '0',
                                       'utf8' => '0',
                                       'warnings' => '0'
@@ -132,8 +132,7 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'Test::CheckDeps' => '0.010',
                                    'Test::More' => '0.94',
-                                   'blib' => '1.01',
-                                   'perl' => 'v5.20.0'
+                                   'perl' => 'v5.18.0'
                                  }
                  }
      };

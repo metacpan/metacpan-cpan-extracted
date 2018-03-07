@@ -91,42 +91,66 @@ conversion between Math::Decimal64 (_Decimal64) and Math::MPFR (mpfr_t)
 objects.
 For this feature to be available you firstly need a compiler that has
 the _Decimal64 data type.
-Then you need to build and install Math::Decimal64.
-You'll also need to have the mpfr library built with _Decimal64 support.
-See the mpfr documentation for details of that aspect.
+You'll also need to have a recent version of the mpfr library that has
+been built with _Decimal64 support (ie that was configured with
+'--enable-decimal-float').
 
-If those pre-conditions are met, you also need to provide D64=1
-as a command line argument to 'perl Makefile.PL'. (Altenatively you
-could edit the Makefile.PL before building Math::MPFR and set its
-$have_decimal64 variable to 1.)
+This should all be detected and enabled automatically whenever these
+conditions are met.
 
-Similarly, ensuring that Decimal64 support is *not* built in can be
-achieved by omitting the D64=1 argument && by not altering the value
-assigned to $have_decimal64.
+To utilise mpfr's _Decimal64 functionality you also need to install
+Math::Decimal64.
+
+If you wish to override the automated procedure you can:
+1) avoid _Decimal64 support by providing D64=0 as an argument to the
+   Makefile.PL - ie run 'perl Makefile.PL D64=0';
+2) ensure _Decimal64 support by providing the argument D64=1.
+
+You can aternatively override the automated procedure by
+uncommenting one of a number of lines of code near the start of the
+Makefile.PL. (The comments in the Makefile.PL are a clear statement
+of what's required for this.)
+
+Note that forcing 'D64=1' will not work unless the conditions
+mentioned earlier in this section are met.
 
 =========================================================
 Conversion between Math::Float128 and Math::MPFR objects
 =========================================================
+
+If 'perl -V:nvtype' reports __float128, see also the section
+'Conversion between __float128 NV and Math::MPFR objects', below.
+This section deals only with conversion between Math::Float128 and
+Math::MPFR objects - and if your nvtype is __float128 there's
+probably nothing to be gained by calling on Math::Float128.
 
 The functions Rmpfr_set_FLOAT128 and Rmpfr_get_FLOAT128 allow
 conversion between Math::Float128 (__float128) and Math::MPFR (mpfr_t)
 objects.
 For this feature to be available you firstly need a compiler that has
 the __float128 data type.
-Then you need to build and install Math::Float128.
-You'll also need to have the mpfr library (version 4.0.0 at least)
-built with __float128 support. See the mpfr documentation for details
-of that aspect. (It's just a matter of providing Configure with the
---enable-float128 option when building mpfr-4.0.0 or later.)
+You'll also need to have a recent version (4.0.0 or later) of the mpfr
+library that has been built with __float128 support (ie that was
+configured with'--enable-float128').
 
-If those pre-conditions are met, you also need to provide F128=1
-as a command line argument to 'perl Makefile.PL'. (Altenatively you
-could edit the Makefile.PL before building Math::MPFR and set its
-$have_float128 variable to 1.)
+This should all be detected and enabled automatically whenever these
+conditions are met.
 
-Similarly, ensuring that __float128 support is *not* built in can be
-achieved by not providing the F128=1 argument && by not changing the
-value of $have_float128 in the Makefile.PL.
+To utilise mpfr's __float128 functionality in this way you also need
+to install Math::Float128.
+
+If you wish to override the automated detection you can:
+1) avoid __float128 support by providing F128=0 as an argument to the
+   Makefile.PL - ie run 'perl Makefile.PL F128=0';
+2) ensure __float128 support by providing the argument F128=1.
+
+You can aternatively override the automated procedure by
+uncommenting one of a number of lines of code near the start of the
+Makefile.PL. (The comments in the Makefile.PL are a clear statement
+of what's required for this.)
+
+Note that forcing inclusion of __float128 support will not work
+unless the conditions mentioned earlier in this section are met.
 
 ==========================================================
 Conversion between Math::LongDouble and Math::MPFR objects
@@ -149,6 +173,7 @@ nvtype is other than 'long double'.
 Conversion between __float128 NV and Math::MPFR objects
 =======================================================
 
+To determine your nvtype, run 'perl -V:nvtype'.
 As of perl-5.21.4 it is possible to build perl with an nvtype of
 __float128. This is achieved by specifying -Dusequadmath as a
 Configure arg .... but, it will not work for all architectures
@@ -161,12 +186,24 @@ the Rmpfr_set_float128() and Rmpfr_get_float128() functions.
 And the overloaded operations will also accept the __float128 NV
 arguments as one would want.
 
-However, for that to work, you also need to have built Math::MPFR
-by starting with:
+This should all be detected and enabled automatically whenever these
+conditions are met.
+NOTE: Even if the mpfr library was not built with __float128 support
+      and the conditions are therefore not met, you can still pass
+      and receive __float128 values to/from Math::MPFR by instead
+      using the functions Rmpfr_get_NV and Rmpfr_set_NV - but that
+      happens only if your nvtype is __float128.
 
-  perl Makefile.PL F128=1
+If you need/wish to override the automated procedure you can:
+1) avoid __float128 support by providing F128=0 as an argument to the
+   Makefile.PL - ie run 'perl Makefile.PL F128=0';
+2) ensure __float128 support by providing the argument F128=1.
 
-(Altenatively you could edit the Makefile.PL before building
-Math::MPFR and set its $have_float128 variable to 1.)
+You can aternatively override the automated procedure by
+uncommenting one of a number of lines of code near the start of the
+Makefile.PL. (The comments in the Makefile.PL are a clear statement
+of what's required for this.)
 
+Note that forcing inclusion of __float128 support will not work
+unless the conditions mentioned earlier in this section are met.
 

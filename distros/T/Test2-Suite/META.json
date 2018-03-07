@@ -29,6 +29,7 @@
          "requires" : {
             "B" : "0",
             "Carp" : "0",
+            "Data::Dumper" : "0",
             "Exporter" : "0",
             "Importer" : "0.024",
             "Module::Pluggable" : "2.7",
@@ -36,7 +37,7 @@
             "Scope::Guard" : "0",
             "Sub::Info" : "0.002",
             "Term::Table" : "0.002",
-            "Test2" : "1.302119",
+            "Test2" : "1.302127",
             "Time::HiRes" : "0",
             "overload" : "0",
             "perl" : "5.008001",
@@ -61,7 +62,7 @@
          "url" : "http://github.com/Test-More/Test2-Suite/"
       }
    },
-   "version" : "0.000102",
+   "version" : "0.000104",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.00"
 }
 

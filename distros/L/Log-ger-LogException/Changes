@@ -1,3 +1,8 @@
+0.002   2018-03-05 (PERLANCAR)
+
+	- Don't log die() if we're inside eval().
+
+
 0.001    2018-03-05 (PERLANCAR)
 
          - First release.

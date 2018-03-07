@@ -42,5 +42,5 @@ resources:
   bugtracker: https://github.com/MicroTechnology-Services/cgi-application-plugin-authentication/issues
   homepage: https://github.com/MicroTechnology-Services/cgi-application-plugin-authentication
   repository: https://github.com/MicroTechnology-Services/cgi-application-plugin-authentication.git
-version: '0.22'
+version: '0.23'
 x_serialization_backend: 'YAML::Tiny version 1.64'

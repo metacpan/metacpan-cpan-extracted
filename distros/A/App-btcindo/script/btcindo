@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-02-17'; # DATE
-our $VERSION = '0.020'; # VERSION
+our $DATE = '2018-03-06'; # DATE
+our $VERSION = '0.021'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,6 +14,9 @@ my $prefix = '/App/btcindo/';
 Perinci::CmdLine::Any->new(
     url => $prefix,
     subcommands => {
+        public          => { url => "${prefix}public" },
+        private         => { url => "${prefix}private" },
+
         # public
         ticker          => { url => "${prefix}ticker", },
         trades          => { url => "${prefix}trades", },
@@ -57,12 +60,12 @@ btcindo - CLI for bitcoin.co.id (VIP)
 
 =head1 VERSION
 
-This document describes version 0.020 of btcindo (from Perl distribution App-btcindo), released on 2018-02-17.
+This document describes version 0.021 of btcindo (from Perl distribution App-btcindo), released on 2018-03-06.
 
 =head1 SYNOPSIS
 
-First, create an account at L<bitcoin.co.id>, create the trade API key then
-insert the API key and secret key in F<~/.config/btcindo.conf>. Since the
+First, create an account at L<https://bitcoin.co.id>, create the trade API key
+then insert the API key and secret key in F<~/.config/btcindo.conf>. Since the
 configuration file contains the API secret key, please make sure that the
 permission of the file is set so that unauthorized users cannot read it (e.g.
 chmod it to 0600).
@@ -178,9 +181,17 @@ following data:
  [timestamp-in-unix-epoch, open, high, low, close]
 
 
+=head2 B<private>
+
+Perform private API (TAPI) request.
+
 =head2 B<profit>
 
 Calculate your profit.
+
+=head2 B<public>
+
+Perform public API request.
 
 =head2 B<ticker>
 
@@ -449,6 +460,18 @@ Valid values:
 
 =over
 
+=item B<--pair>=I<s>
+
+Pair.
+
+Default value:
+
+ "btc_idr"
+
+Valid values:
+
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+
 =item B<--type>=I<s>
 
 Filter by type (buy/sell).
@@ -533,6 +556,20 @@ Valid values:
 
 =back
 
+=head2 Options for subcommand private
+
+=over
+
+=item B<--arg>=I<s>%
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+
+=item B<--args-json>=I<s>
+
+See C<--arg>.
+
+=back
+
 =head2 Options for subcommand profit
 
 =over
@@ -560,6 +597,46 @@ Filter by beginning time.
 =item B<--time-to>=I<s>
 
 Filter by ending time.
+
+=back
+
+=head2 Options for subcommand public
+
+=over
+
+=item B<--arg>=I<s>%
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+
+=item B<--args-json>=I<s>
+
+See C<--arg>.
+
+=item B<--method>=I<s>
+
+Default value:
+
+ "GET"
+
+=item B<--uri>=I<s>*
+
+=back
+
+=head2 Options for subcommand ticker
+
+=over
+
+=item B<--pair>=I<s>
+
+Pair.
+
+Default value:
+
+ "btc_idr"
+
+Valid values:
+
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =back
 
@@ -680,6 +757,18 @@ Filter by ending time.
 =head2 Options for subcommand trades
 
 =over
+
+=item B<--pair>=I<s>
+
+Pair.
+
+Default value:
+
+ "btc_idr"
+
+Valid values:
+
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =item B<--type>=I<s>
 
@@ -816,6 +905,7 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand depth
 
+ pair (see --pair)
  type (see --type)
 
 =head2 Configuration for subcommand hold-details
@@ -843,6 +933,10 @@ List of available configuration parameters:
 
  period (see --period)
 
+=head2 Configuration for subcommand private
+
+ args (see --arg)
+
 =head2 Configuration for subcommand profit
 
  key (see --key)
@@ -851,8 +945,15 @@ List of available configuration parameters:
  time_from (see --time-from)
  time_to (see --time-to)
 
+=head2 Configuration for subcommand public
+
+ args (see --arg)
+ method (see --method)
+ uri (see --uri)
+
 =head2 Configuration for subcommand ticker
 
+ pair (see --pair)
 
 =head2 Configuration for subcommand trade
 
@@ -884,6 +985,7 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand trades
 
+ pair (see --pair)
  type (see --type)
 
 =head2 Configuration for subcommand tx-history

@@ -1,3 +1,10 @@
+0.002   2018-03-06 (PERLANCAR)
+
+	- Handle undef in uniq_ci() just like List::Util's uniq().
+
+        - Rework documentation: add Synopsis, mention List::Util.
+
+
 0.001   2018-02-21 (PERLANCAR)
 
         - First version, split from SHARYANTO-List-Util.

@@ -53,9 +53,7 @@ sub run_test {
 
     my $stage1 = $group->stage( @_ );
 
-    system( "(echo before; ls -l scratch) >&2" );
     my $ret = $group->execute();
-    system( "(echo after; ls -l scratch) >&2" );
 
     return $ret;
 }

@@ -1,5 +1,6 @@
 requires "B" => "0";
 requires "Carp" => "0";
+requires "Data::Dumper" => "0";
 requires "Exporter" => "0";
 requires "Importer" => "0.024";
 requires "Module::Pluggable" => "2.7";
@@ -7,7 +8,7 @@ requires "Scalar::Util" => "0";
 requires "Scope::Guard" => "0";
 requires "Sub::Info" => "0.002";
 requires "Term::Table" => "0.002";
-requires "Test2" => "1.302119";
+requires "Test2" => "1.302127";
 requires "Time::HiRes" => "0";
 requires "overload" => "0";
 requires "perl" => "5.008001";

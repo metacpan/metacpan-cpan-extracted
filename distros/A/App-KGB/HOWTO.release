@@ -1,13 +1,11 @@
 Steps for creating new releases
 ===============================
 
- * Bump version in lib/App/KGB.pm and script/kgb-bot
+ * Bump version in lib/App/KGB.pm
  * Update Changes and debian/changelog (git-dch)
  * `make distcheck`, update MANIFEST{,SKIP} as needed.
  * `make dist'
  * build/upload for Debian
-   + make orig to get a .orig.tar file.
- * upload to alioth
-   + https://alioth.debian.org/frs/admin/qrs.php?group_id=100408
+   + make orig to get a .orig.tar file in ../
  * upload to CPAN
-   + cpan-upload -u USERID App-KGB-*.tar.gz
+   + cpan-upload -u USERID ../App-KGB-*.tar.gz

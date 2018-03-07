@@ -2,7 +2,7 @@ use warnings;
 use strict;
 use Math::MPFR qw(:mpfr);
 
-print "1..6\n";
+print "1..18\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -33,3 +33,49 @@ eval{my $patches = Rmpfr_get_patches();};
 if(!$@) {print "ok 6\n"}
 else {print "not ok 6 $@\n"}
 
+# We now check that all of the "constants" (actually subroutines) listed
+# in MPFR.pm in 'use subs' are parsed as intended.
+
+my $arb = 3;
+
+if(MPFR_VERSION < MPFR_VERSION + $arb) {print "ok 7\n"}
+else {print "not ok 7\n"}
+
+if(MPFR_VERSION_MAJOR < MPFR_VERSION_MAJOR + $arb) {print "ok 8\n"}
+else {print "not ok 8\n"}
+
+if(MPFR_VERSION_MINOR < MPFR_VERSION_MINOR + $arb) {print "ok 9\n"}
+else {print "not ok 9\n"}
+
+if(MPFR_VERSION_PATCHLEVEL < MPFR_VERSION_PATCHLEVEL + $arb) {print "ok 10\n"}
+else {print "not ok 10\n"}
+
+{
+  no warnings 'numeric';
+  if(MPFR_VERSION_STRING < MPFR_VERSION_STRING + $arb) {print "ok 11\n"}
+  else {print "not ok 11\n"}
+}
+
+if(RMPFR_PREC_MIN < RMPFR_PREC_MIN + $arb) {print "ok 12\n"}
+else {print "not ok 12\n"}
+
+if(RMPFR_PREC_MAX < RMPFR_PREC_MAX + $arb) {print "ok 13\n"}
+else {print "not ok 13\n"}
+
+if(MPFR_DBL_DIG < MPFR_DBL_DIG + $arb) {print "ok 14\n"}
+else {print "not ok 14\n"}
+
+if(MPFR_LDBL_DIG < MPFR_LDBL_DIG + $arb) {print "ok 15\n"}
+else {print "not ok 15\n"}
+
+{
+  no warnings 'uninitialized';
+  if(MPFR_FLT128_DIG < MPFR_FLT128_DIG + $arb) {print "ok 16\n"}
+  else {print "not ok 16\n"}
+}
+
+if(Math::MPFR::GMP_LIMB_BITS < Math::MPFR::GMP_LIMB_BITS + $arb) {print "ok 17\n"}
+else {print "not ok 17\n"}
+
+if(Math::MPFR::GMP_NAIL_BITS < Math::MPFR::GMP_NAIL_BITS + $arb) {print "ok 18\n"}
+else {print "not ok 18\n"}

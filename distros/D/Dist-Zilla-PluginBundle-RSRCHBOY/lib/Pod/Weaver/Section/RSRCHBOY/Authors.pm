@@ -1,7 +1,7 @@
 #
 # This file is part of Dist-Zilla-PluginBundle-RSRCHBOY
 #
-# This software is Copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by Chris Weyl.
+# This software is Copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by Chris Weyl.
 #
 # This is free software, licensed under:
 #
@@ -9,7 +9,7 @@
 #
 package Pod::Weaver::Section::RSRCHBOY::Authors;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-$Pod::Weaver::Section::RSRCHBOY::Authors::VERSION = '0.075';
+$Pod::Weaver::Section::RSRCHBOY::Authors::VERSION = '0.077';
 # ABSTRACT: An AUTHORS section with materialistic pleasures
 
 use v5.10;
@@ -118,7 +118,7 @@ Pod::Weaver::Section::RSRCHBOY::Authors - An AUTHORS section with materialistic 
 
 =head1 VERSION
 
-This document describes version 0.075 of Pod::Weaver::Section::RSRCHBOY::Authors - released May 08, 2017 as part of Dist-Zilla-PluginBundle-RSRCHBOY.
+This document describes version 0.077 of Pod::Weaver::Section::RSRCHBOY::Authors - released March 05, 2018 as part of Dist-Zilla-PluginBundle-RSRCHBOY.
 
 =head1 DESCRIPTION
 
@@ -149,7 +149,7 @@ L<Dist::Zilla::PluginBundle::RSRCHBOY|Dist::Zilla::PluginBundle::RSRCHBOY>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/RsrchBoy/dist-zilla-pluginbundle-rsrchboy/issues>
+L<https://github.com/rsrchboy/dist-zilla-pluginbundle-rsrchboy/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -161,7 +161,7 @@ Chris Weyl <cweyl@alumni.drew.edu>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by Chris Weyl.
+This software is Copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by Chris Weyl.
 
 This is free software, licensed under:
 

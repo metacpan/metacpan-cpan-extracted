@@ -234,8 +234,8 @@ example:
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile-SOAP distribution version 3.23,
-built on March 04, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of XML-Compile-SOAP distribution version 3.24,
+built on March 06, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

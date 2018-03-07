@@ -4,7 +4,7 @@ DBIx::BatchChunker - Run large database changes safely
 
 # VERSION
 
-version 0.90
+version 0.91
 
 # SYNOPSIS
 

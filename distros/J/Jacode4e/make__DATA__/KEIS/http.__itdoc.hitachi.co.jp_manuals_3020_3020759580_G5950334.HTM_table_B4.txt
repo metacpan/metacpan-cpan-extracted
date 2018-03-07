@@ -1,0 +1,22 @@
+# http://itdoc.hitachi.co.jp/manuals/3020/3020759580/G5950334.HTM
+# 表B-4　けい線コードの対応
+# KEIS'83	KEIS'78	　	KEIS'83	KEIS'78
+# けい線	コード	コード	けい線	　	けい線	コード	コード	けい線
+┌	A8A3	AFA1	┌	　	┬	A8A8	AFB3	┬
+┌	A8AE	AFA2	┌	　	┬	A8B3	AFB4	┬
+┌	A8AE	AFA3※1	┏※1	　	┬	A8B3	AFB5※1	┳※1
+┐	A8A4	AFA4	┐	　	┴	A8AA	AFB6	┴
+┐	A8AF	AFA5	┐	　	┴	A8B5	AFB7	┴
+┐	A8AF	AFA6※1	┓※1	　	┴	A8B5	AFB8※1	┻※1
+└	A8A6	AFA7	└	　	┼	A8AB	AFB9	┼
+└	A8B1	AFA8	└	　	┼	A8B6	AFBA	┼
+└	A8B1	AFA9※1	┗※1	　	┼	A8B6	AFBB※1	╋※1
+┘	A8A5	AFAA	┘	　	─	A8A1	AFBC	─
+┘	A8B0	AFAB	┘	　	─	A8AC	AFBD	─
+┘	A8B0	AFAC※1	┛※1	　	─	A8AC	AFBE※1	━※1
+├	A8A7	AFAD	├	　	│	A8A2	AFBF	│
+├	A8B2	AFAE	├	　	│	A8AD	AFC0	│
+├	A8B2	AFAF※1	┣※1	　	│	A8AD	AFC1※1	┃※1
+┤	A8A9	AFB0	┤	　	│	A8AD	AFC2※1	※1※2
+┤	A8B4	AFB1	┤	　	│	A8AD	AFC3※1	※1※3
+┤	A8B4	AFB2※1	┫※1	　	│	A8AD	AFC4※1	※1※4

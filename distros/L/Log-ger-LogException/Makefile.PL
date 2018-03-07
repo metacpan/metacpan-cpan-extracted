@@ -16,6 +16,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Log::ger::LogException",
   "PREREQ_PM" => {
+    "Eval::Util" => 0,
     "Log::ger" => "0.023"
   },
   "TEST_REQUIRES" => {
@@ -24,7 +25,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,6 +33,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Eval::Util" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

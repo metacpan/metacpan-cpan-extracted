@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.512';
+our $VERSION = '1.513';
 
 use Exporter qw( import );
 
@@ -98,13 +98,8 @@ sub line_fold {
     if ( $string !~ /\n/ && print_columns( $init_tab . $string ) <= $avail_width ) {
         return $init_tab . $string;
     }
-#    my $trailer = '';
-#    if ( $string =~ /(\n+)\z/ ) {
-#        $trailer = $1;
-#    }
     my @paragraph;
 
-#    for my $row ( split "\n", $string ) {
     for my $row ( split "\n", $string, -1 ) { # -1 to keep trailing empty fields
         my @lines;
         $row =~ s/\s+\z//;
@@ -138,7 +133,6 @@ sub line_fold {
         }
         push( @paragraph, join( "\n", @lines ) );
     }
-#    return join( "\n", @paragraph ) . $trailer;
     return join( "\n", @paragraph );
 }
 

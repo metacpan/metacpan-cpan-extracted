@@ -2,7 +2,7 @@ package Test2::Util::Facets2Legacy;
 use strict;
 use warnings;
 
-our $VERSION = '1.302125';
+our $VERSION = '1.302128';
 
 use Carp qw/croak confess/;
 use Scalar::Util qw/blessed/;
@@ -109,6 +109,22 @@ sub terminate {
     my $facet_data = _get_facet_data(shift @_);
     return undef unless $facet_data->{control};
     return $facet_data->{control}->{terminate};
+}
+
+sub uuid {
+    my $in = shift;
+
+    my $facet_data = _get_facet_data($in);
+    return $facet_data->{about}->{uuid} if $facet_data->{about} && $facet_data->{about}->{uuid};
+
+    if (blessed($in) && $in->isa('Test2::Event')) {
+        my $meth = $in->can('uuid');
+        $meth = $in->can('SUPER::uuid') if $meth == \&uuid;
+        my $uuid = $in->$meth if $meth && $meth != \&uuid;
+        return $uuid if $uuid;
+    }
+
+    return undef;
 }
 
 1;

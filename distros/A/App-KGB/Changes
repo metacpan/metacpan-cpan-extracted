@@ -1,3 +1,12 @@
+1.45 (2018-03-06)
+  [ Damyan Ivanov ]
+  * point output of '/ctcp source' to salsa
+  * fix short url code after 97033851da793b345f5283fb96897d5f9b55b810
+  * collect some stats - run time, notification counts
+  * react to !stats and !statsreset
+  * update HOWTO.release
+  * shorten compare URLs
+
 1.44 (2018-03-03)
   [ Damyan Ivanov ]
   * bot/webhook: shorten git hashes in URLs

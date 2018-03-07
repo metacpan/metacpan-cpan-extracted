@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,38 +12,47 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 e3d9e1c25729920d11ae0341b652b8db3c13e592 Changes
-SHA1 60688d8c60c8cf8c1456e104165857ff961d119c INSTALL
-SHA1 05207cbc5971035849c1de2c7cb3babaeaccb6fb LICENSE
-SHA1 b3bec9f2b53620d290978d5d43a8743ee2e9d505 MANIFEST
-SHA1 576146fac97aec14032fd0391bfff639349f6418 META.json
-SHA1 c76f45e382cbc1ddae4af84ecc66d943b2fadd01 META.yml
-SHA1 f9251be1180b28f56416dc30baa5a79bd5033d5a Makefile.PL
-SHA1 9df0ba307b7e73c5ce0a5147c96cc3bfbfbd4feb README
+SHA1 a76fa1dfc018a4cfd8b958516756622f64348161 .travis.yml
+SHA1 80e640d97e5f5ddaf93f4c6f234b9607311b2a9a Changes
+SHA1 3301eb9996519f254fa3bc30c11616802f6b1d23 LICENSE
+SHA1 35fe2a4946d6adebee59f7e1309d7ec07a420d76 MANIFEST
+SHA1 088002adc1addf501dab78706441bf0b96472c2b META.json
+SHA1 0cf1246546b7c133f58115220017d6022961a3a7 META.yml
+SHA1 52730a2f11c5438214ef5800b26815714ef4803d Makefile.PL
+SHA1 7b5c1fc9d5e664553ba46c16b4432679abaefef7 README
+SHA1 912fa13d46e62c098099f640b6ca65a3179eabc1 cpanfile
 SHA1 c780947c9179f71de0dee2ef3fc26a466400766c dist.ini
-SHA1 5a9fad52fe0d54495d5bde03feea971bf9fc2015 lib/Net/Amazon/Signature/V3.pm
-SHA1 f43b5c14108a2a0951c4d6c6c0fff5ebc5fad90d t/00-compile.t
-SHA1 cee560efa524d8b457c632b4514626b152472a2b t/000-report-versions-tiny.t
-SHA1 38f1fd65ede7d82cb27a9e4faac7d419d85c93c5 t/author-pod-spell.t
+SHA1 8919c7e95b6fb976715a44d9bce7c9a9f0ec6ca8 lib/Net/Amazon/Signature/V3.pm
+SHA1 4bdb7637c377a4563e26e887313ef118c1d1a22d t/00-check-deps.t
+SHA1 d597b4618272f4014670859ec75978e58ccd2c60 t/00-compile.t
+SHA1 3c212fc8dc6ea26b551b8e693eb34b6f0a7b9d38 t/00-report-prereqs.dd
+SHA1 6973c68e7bdd0a97dea22826c69da3620b859372 t/00-report-prereqs.t
 SHA1 030fc515cb640d95f65ee34d4f383c7d2ea93d48 t/basic.t
-SHA1 9c3627ff37f4fd5bddc34bf46cf3359eaf76a060 t/release-consistent-version.t
-SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
-SHA1 89745d105726ba67dde6bdc8ff933b76ad2254de t/release-has-version.t
-SHA1 66d1379552b291f2a232b78dbab3396d6af2d304 t/release-no-smart-comments.t
-SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
-SHA1 8eaa48ad6b6736410ffcd1a391305b4eedfccaea t/release-pod-coverage.t
-SHA1 5bcfaae20cccae0399d6b64698cefdbd32284c69 t/release-pod-syntax.t
-SHA1 dd4c09d7bd9ba81fd9d0d4b97250c51ef1e69e79 t/release-portability.t
+SHA1 40e8c07d9afd0637af78beaf974f4acd3813d997 xt/author/eol.t
+SHA1 74d2baae0f258dc036e690c85a745111f1ebf85d xt/author/no-tabs.t
+SHA1 19e37e5031f07a57d7294229f14f9700e10dad41 xt/author/pod-coverage.t
+SHA1 c7cfda9f5e87491223c56a5641c83aa48379a480 xt/author/pod-linkcheck.t
+SHA1 c047f90772fdcfae24ce8d70221542f738e3d154 xt/author/pod-spell.t
+SHA1 d9e539e64d991d1f0d69dc5d3b3968b10c0f12f2 xt/author/pod-syntax.t
+SHA1 a7948d34cfaad400286ea5d5fa6206c4c7e2552c xt/release/consistent-version.t
+SHA1 9672a5d88400dc71833c253ece0e827a1279fb4b xt/release/has-version.t
+SHA1 29e07d26dd1e316c83b6133ae81b4bb940ce38ec xt/release/minimum-version.t
+SHA1 736465f1641b5484d4b89fcc4a540c3722ef3b1f xt/release/no-smart-comments.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
 
-iQEcBAEBAgAGBQJQjsNSAAoJEOd5N1CvIgQkrygH/jNvYABWMnlbgwayYNiKUcVi
-cYWangQiWx93naTlJtCgnnZGGZXZIZPsN6VIw6IEXPM15njOLzvejWGYwM8+eAz5
-ivxXtwXGwoJKkM+5NjQ0Db8h3h47l9WOyovT3fjsU2zK+FWU2GCrMTeD9Ar8v5tP
-AfuLlfV4VXomlVDeq1Gat69hTVMdW+D+xJBZgNqpP0WCG/EPlhPQ4vVm3m1rbhoZ
-/AZg1uBaLYrM5KS9lfonriVxqvIskeUgn1PtzWUpu1xLc5eOCDdi0f81fjrvTsVh
-HdE726D5L+YoW53XmpmcYaAelD5nX4fbIFI7tTEFeF3f4i+0ctNezCn9aOUfWQA=
-=4olx
+iQIzBAEBCgAdFiEECEuptPlweKA7ktv7LPV1bFK+zPYFAlqduqEACgkQLPV1bFK+
+zPbSeQ/9FGUxq0zHRtFIE8ztV+bgeoxZRO1jEes6o7YnAJyqI9Mx1Eu8HfUP7GTY
++5yTHmPz/oGX8Bd7YBMWb9Rfwc2ihdoqjRDzhyBoTs1wOmF3CbepQmtnQDsOEiXN
+lcKRuh/W+1bpj2sKeisi7qWRpFs7TsoXLmGPQdvgAk/o+Ibq8iceIUCNtAJwcDpd
+Pm2G30+rsyNYiehrRLvGZrHv/QYHF/lDx9KusTgeROyR9ccTR0BWFivya8pjckyy
+xlCCE1KGtyYat680qUDLERAt2qjcOh6eNtv8S8oonyqUx61aKMXyV4CbIx5Ar0/u
+I7WYYrNjmqmTjVICY3GWImkLGVY57eo5C1vZFtRGwqNmKz44D+0zcRnZHZyG4Wjo
++5cWIzJ/aXBQhNL16rrCUb88tLps7sVOcprXLdH72sxaQWoFZ+cEFjrhoG5saFQb
+mnJIVs5VEww2NvfM3iAMqeJGdofEKvTYM8Ppd+PHTQmKvXdACdbB5gb7HgroTwMM
+LjikLL2jNqfbyKKUS1FPCnsrmwqMWkPHnXmAP2Be/KwyEZMgAs7AaRn6nReYRymb
+BCM4JE3MpKU+YUcV362Y+fR2shiDTtOeo5XKb0gdIYfkF/pmVdpvJmfjm+zfReo3
+PqHOzpw9TTxv3p+0nXQ5PqNMNnaSdON2lcHYF0ZKWFHv5uKqYKE=
+=WEFI
 -----END PGP SIGNATURE-----

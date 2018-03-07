@@ -17,6 +17,7 @@ examples/rpc-literal/element.wsdl
 examples/rpc-literal/type.pl
 examples/rpc-literal/type.wsdl
 examples/salesforce/sf-info.pl
+examples/temperature/convert.wsdl
 examples/temperature/soap-lite.pl
 examples/temperature/xml-compile-soap.pl
 lib/XML/Compile/Operation.pm

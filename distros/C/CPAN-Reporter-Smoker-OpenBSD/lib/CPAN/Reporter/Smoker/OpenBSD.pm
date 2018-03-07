@@ -5,7 +5,7 @@ use Exporter 'import';
 use CPAN;
 use CPAN::HandleConfig;
 our @EXPORT_OK = qw(is_distro_ok block_distro);
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 #
 =pod
 

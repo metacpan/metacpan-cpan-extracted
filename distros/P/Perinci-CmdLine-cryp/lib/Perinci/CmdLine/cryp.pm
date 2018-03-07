@@ -1,7 +1,7 @@
 package Perinci::CmdLine::cryp;
 
-our $DATE = '2018-03-05'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-03-06'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -29,7 +29,7 @@ sub hook_config_file_section {
 }
 
 1;
-# ABSTRACT: Perinci::CmdLine::Lite to read entities from config
+# ABSTRACT: Perinci::CmdLine::Lite subclass to read entities from config
 
 __END__
 
@@ -39,11 +39,11 @@ __END__
 
 =head1 NAME
 
-Perinci::CmdLine::cryp - Perinci::CmdLine::Lite to read entities from config
+Perinci::CmdLine::cryp - Perinci::CmdLine::Lite subclass to read entities from config
 
 =head1 VERSION
 
-This document describes version 0.002 of Perinci::CmdLine::cryp (from Perl distribution Perinci-CmdLine-cryp), released on 2018-03-05.
+This document describes version 0.003 of Perinci::CmdLine::cryp (from Perl distribution Perinci-CmdLine-cryp), released on 2018-03-06.
 
 =head1 HOMEPAGE
 

@@ -1,5 +1,13 @@
 Revision history for Dist-Zilla-PluginBundle-RSRCHBOY
 
+0.077     2018-03-05 15:33:19 CST-0600
+	* Un-drop `MetaYML`, as it's apparently still useful
+
+0.076     2018-03-05 14:31:00 CST-0600
+	* RsrchBoy -> rsrchboy
+	* v5.20 is now our default minimum version for distributions
+	* Drop the misbehaving (or misused?) `MetaYML` plugin
+
 0.075     2017-05-08 22:15:56 CDT-0500
 	* Add CopyrightYearFromGit
 

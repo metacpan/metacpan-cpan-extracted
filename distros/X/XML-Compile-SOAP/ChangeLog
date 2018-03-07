@@ -1,6 +1,15 @@
 
 === version history of distribution XML-Compile-SOAP
 
+version 3.24: Tue  6 Mar 08:12:19 CET 2018
+
+	Fixes:
+	- Experimental keys on scalar
+	  rt.cpan.org#124688 [Slaven Rezic]
+
+	Improvements:
+	- add missing example wsdl
+
 version 3.23: Sun Mar  4 23:45:09 CET 2018
 
 	Fixes:

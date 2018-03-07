@@ -1,0 +1,37 @@
+# http://itdoc.hitachi.co.jp/manuals/3020/30203P0360/PDEF0203.HTM
+# 表E-1　印刷不可代替文字の印字が行われる場合に当てはまる文字の一覧
+# 文字 	KEIS90 	SJIS
+─ 	A8A1 	849F
+│ 	A8A2 	84A0
+┌ 	A8A3 	84A1
+┐ 	A8A4 	84A2
+┘ 	A8A5 	84A3
+└ 	A8A6 	84A4
+├ 	A8A7 	84A5
+┬ 	A8A8 	84A6
+┤ 	A8A9 	84A7
+┴ 	A8AA 	84A8
+┼ 	A8AB 	84A9
+━ 	A8AC 	84AA
+┃ 	A8AD 	84AB
+┏ 	A8AE 	84AC
+┓ 	A8AF 	84AD
+┛ 	A8B0 	84AE
+┗ 	A8B1 	84AF
+┣ 	A8B2 	84B0
+┳ 	A8B3 	84B1
+┫ 	A8B4 	84B2
+┻ 	A8B5 	84B3
+╋ 	A8B6 	84B4
+┠ 	A8B7 	84B5
+┯ 	A8B8 	84B6
+┨ 	A8B9 	84B7
+┷ 	A8BA 	84B8
+┿ 	A8BB 	84B9
+┝ 	A8BC 	84BA
+┰ 	A8BD 	84BB
+┥ 	A8BE 	84BC
+┸ 	A8BF 	84BD
+╂ 	A8C0 	84BE
+凜 	F4A5 	EAA3
+熙 	F4A6 	EAA4

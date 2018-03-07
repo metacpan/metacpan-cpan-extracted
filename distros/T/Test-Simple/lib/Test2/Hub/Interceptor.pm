@@ -2,7 +2,7 @@ package Test2::Hub::Interceptor;
 use strict;
 use warnings;
 
-our $VERSION = '1.302125';
+our $VERSION = '1.302128';
 
 
 use Test2::Hub::Interceptor::Terminator();
@@ -12,7 +12,7 @@ use Test2::Util::HashBase;
 
 sub init {
     my $self = shift;
-    $self->SUPER::init;
+    $self->SUPER::init();
     $self->{+NESTED} = 0;
 }
 

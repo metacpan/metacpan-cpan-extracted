@@ -206,7 +206,7 @@ Usage:
 use strict;
 use warnings;
 
-our $VERSION     = '0.015';
+our $VERSION     = '0.016';
 
 use Exporter 5.57 'import';
 
@@ -1628,6 +1628,41 @@ sub i2c_zip {
     my ($bytes, $data) = $self->send_i2c_command(PI_CMD_I2CZ, $handle, 0, $commands);
     
     return ($bytes, $data);
+}
+
+
+=head2 write_pwm
+
+Sets the voltage level on a GPIO pin to a value from 0-255 (PWM) 
+approximating a lower voltage.  Useful for dimming LEDs for example.
+
+Note: You first must set the pin mode to PI_OUTPUT
+
+Usage :
+
+    $pi->write_pwm(17, 255);
+or
+    $pi->write_pwm(17, 120);
+or
+    $pi->write_pwm(17, 0);
+
+Arguments:
+
+=over 4
+
+=item * arg1: gpio - GPIO to which you want to write
+
+=item * arg2: level - The voltage level that you want to write (one of 0-255)
+
+=back
+
+Note: This method will set the GPIO mode to "OUTPUT" and leave it like this
+
+=cut
+sub write_pwm {
+    my ($self,$gpio,$level) = @_;
+
+    return $self->send_command(PI_CMD_PWM,$gpio,$level);
 }
 
 ################################################################################################################################

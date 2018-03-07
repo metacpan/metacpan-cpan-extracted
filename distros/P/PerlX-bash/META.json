@@ -58,7 +58,7 @@
    "provides" : {
       "PerlX::bash" : {
          "file" : "lib/PerlX/bash.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/barefootcoder/perlx-bash"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

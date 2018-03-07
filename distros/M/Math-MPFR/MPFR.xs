@@ -2017,7 +2017,7 @@ void Rmpfr_free_cache2(unsigned int way) {
 #if MPFR_VERSION_MAJOR >= 4
      mpfr_free_cache2((mpfr_free_cache_t) way);
 #else
-     croak("Rmpfr_free_cache2 not implmented with this mpfr version (%s) - need 4.0.0 or later", MPFR_VERSION_STRING);
+     croak("Rmpfr_free_cache2 not implemented with this mpfr version (%s) - need 4.0.0 or later", MPFR_VERSION_STRING);
 #endif
 }
 
@@ -2025,7 +2025,7 @@ void Rmpfr_free_pool(void) {
 #if MPFR_VERSION_MAJOR >= 4
      mpfr_free_pool();
 #else
-     croak("Rmpfr_free_pool not implmented with this mpfr version (%s) - need 4.0.0 or later", MPFR_VERSION_STRING);
+     croak("Rmpfr_free_pool not implemented with this mpfr version (%s) - need 4.0.0 or later", MPFR_VERSION_STRING);
 #endif
 }
 
@@ -6760,7 +6760,7 @@ void _d_bytes_fr(pTHX_ mpfr_t * str, unsigned int bits) {
     croak("2nd arg to Math::MPFR::_d_bytes_fr must be 53");
 
   if(mpfr_get_prec(*str) != 53)
-    croak("Precison of 1st arg supplied to _d_bytes_fr must be 53, not %u", mpfr_get_prec(*str));
+    croak("Precision of 1st arg supplied to _d_bytes_fr must be 53, not %u", mpfr_get_prec(*str));
 
   if((size_t)bits != DBL_MANT_DIG)
     croak("2nd arg (%u) supplied to Math::MPFR::_d_bytes_fr does not match DBL_MANT_DIG (%u)", bits, DBL_MANT_DIG);
@@ -6853,7 +6853,7 @@ void _dd_bytes_fr(pTHX_ mpfr_t * str, unsigned int bits) {
     croak("2nd arg to Math::MPFR::_dd_bytes must be 106");
 
   if(mpfr_get_prec(*str) != 2098)
-    croak("Precison of 1st arg supplied to _dd_bytes_fr must be 2098, not %u", mpfr_get_prec(*str));
+    croak("Precision of 1st arg supplied to _dd_bytes_fr must be 2098, not %u", mpfr_get_prec(*str));
 
   mpfr_init2(temp, 2098);
 
@@ -6957,7 +6957,7 @@ void _ld_bytes_fr(pTHX_ mpfr_t * str, unsigned int bits) {
   }
 
   if(mpfr_get_prec(*str) != bits)
-    croak("Precison of 1st arg (%u) supplied to _ld_bytes_fr must match 2nd arg (%d)", mpfr_get_prec(*str), bits);
+    croak("Precision of 1st arg (%u) supplied to _ld_bytes_fr must match 2nd arg (%d)", mpfr_get_prec(*str), bits);
 
   if((size_t)bits != LDBL_MANT_DIG)
     croak("2nd arg (%u) supplied to Math::MPFR::_ld_bytes_fr does not match LDBL_MANT_DIG (%u)", bits, LDBL_MANT_DIG);
@@ -7055,7 +7055,7 @@ void _f128_bytes_fr(pTHX_ mpfr_t * str, unsigned int bits) {
     croak("2nd arg to Math::MPFR::_f128_bytes_fr must be 113");
 
   if(mpfr_get_prec(*str) != 113)
-    croak("Precison of 1st arg supplied to _f128_bytes_fr must be 113, not %u", mpfr_get_prec(*str));
+    croak("Precision of 1st arg supplied to _f128_bytes_fr must be 113, not %u", mpfr_get_prec(*str));
 
   if((size_t)bits != FLT128_MANT_DIG)
     croak("2nd arg (%u) supplied to Math::MPFR::_f128_bytes_fr does not match FLT128_MANT_DIG (%u)", bits, FLT128_MANT_DIG);
@@ -10773,6 +10773,9 @@ int
 _ivsize_bits ()
 
 
+PROTOTYPES: ENABLE
+
+
 SV *
 RMPFR_PREC_MAX ()
 CODE:
@@ -10785,6 +10788,9 @@ RMPFR_PREC_MIN ()
 CODE:
   RETVAL = RMPFR_PREC_MIN (aTHX);
 OUTPUT:  RETVAL
+
+
+PROTOTYPES: DISABLE
 
 
 SV *

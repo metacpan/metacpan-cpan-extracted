@@ -9,6 +9,7 @@ lib/PerlX/bash.pm
 t/capture.t
 t/dash-e.t
 t/dash-x.t
+t/head-tail.t
 t/lib/SkipUnlessBash.pm
 t/lib/TestUtilFuncs.pm
 t/path.t

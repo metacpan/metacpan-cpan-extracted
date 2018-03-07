@@ -1,5 +1,5 @@
 ---
-abstract: 'Perinci::CmdLine::Lite to read entities from config'
+abstract: 'Perinci::CmdLine::Lite subclass to read entities from config'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -27,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-cryp
   homepage: https://metacpan.org/release/Perinci-CmdLine-cryp
   repository: git://github.com/perlancar/perl-Perinci-CmdLine-cryp.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

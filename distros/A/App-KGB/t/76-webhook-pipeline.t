@@ -69,7 +69,10 @@ my $resp = webhook_post(
     }
 );
 
-my $resp = webhook_post(
+is( $resp->code, 202, 'pipeline event response status is 202' )
+    or diag $resp->as_string;
+
+$resp = webhook_post(
     {   object_kind => 'pipeline',
         user        => { name => 'Test User' },
         project     => { name => 'test-repo', },
@@ -78,7 +81,8 @@ my $resp = webhook_post(
     }
 );
 
-is( $resp->code, 202, 'pipeline event response status is 202' ) or diag $resp->as_string;
+is( $resp->code, 202, 'pipeline event response status is 202' )
+    or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',

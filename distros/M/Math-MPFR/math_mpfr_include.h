@@ -1,10 +1,10 @@
 /*************************************************
 Documentation of symbols defined by Math::MPFR
 
-NV_IS_LONG_DOUBLE        : Automatically defined by Makefile.PL iff
+NV_IS_LONG_DOUBLE        : Automatically defined by Makefile.PL if
                            $Config{nvtype} is 'long double'.
 
-NV_IS_FLOAT128           : Automatically defined by Makefile.PL iff
+NV_IS_FLOAT128           : Automatically defined by Makefile.PL if
                            $Config{nvtype} is __float128
                            If NV_IS_FLOAT128 is defined we include the
                            quadmath.h header.
@@ -57,7 +57,7 @@ MPFR_WANT_DECIMAL_FLOATS : The symbol needs to be defined (before mpfr.h is
                            there's no point (apparent to me) in defining it.
 
 HAVE_IEEE_754_LONG_DOUBLE :Used only by the test suite.
-                           Defined by Makefile.PL iff
+                           Defined by Makefile.PL if
                            ($Config{longdblkind} == 1 ||
                             $Config{longdblkind} == 2)
                            This implies that long double is the quad (128-bit)
@@ -65,7 +65,7 @@ HAVE_IEEE_754_LONG_DOUBLE :Used only by the test suite.
 
 HAVE_EXTENDED_PRECISION_LONG_DOUBLE :
                            Used only by the test suite.
-                           Defined by Makefile.PL iff
+                           Defined by Makefile.PL if
                            ($Config{longdblkind} == 3 ||
                             $Config{longdblkind} == 4)
                            This implies that nvtype is the extended
@@ -78,7 +78,7 @@ REQUIRED_LDBL_MANT_DIG   : Defined to float.h's LDBL_MANT_DIG unless
                            This is needed to ensure that the mpfr value is
                            an accurate rendition of the double-double value.
 
-MAXIMUM_ALLOWABLE_BASE   : Defined to 62 iff mpfr version >= 3.0.0.
+MAXIMUM_ALLOWABLE_BASE   : Defined to 62 if mpfr version >= 3.0.0.
                            Else defined to 32.
 
 CHECK_ROUNDING_VALUE     : Macro that checks (on mpfr-versions 2.x.x only)
@@ -128,12 +128,20 @@ _WIN32_BIZARRE_INFNAN    : Defined (on Windows only) when the perl version
 
 #include <stdio.h>
 
-#if defined MATH_MPFR_NEED_LONG_LONG_INT
+#if defined(MATH_MPFR_NEED_LONG_LONG_INT)
 #ifndef _MSC_VER
 #include <inttypes.h>
 #endif
 #endif
 
+/*
+ * In mpfr-4.1.0, the _Float128 type is exposed in mpfr.h if MPFR_WANT_FLOAT128 is defined.
+ * We fall back to defining it to __float128 if the _Float128 type is unknown.
+*/
+
+#if defined(MPFR_WANT_FLOAT128) && defined(__GNUC__) && !defined(__FLT128_MAX__) && !defined(_BITS_FLOATN_H)
+#define _Float128 __float128
+#endif
 
 #include <gmp.h>
 #include <mpfr.h>

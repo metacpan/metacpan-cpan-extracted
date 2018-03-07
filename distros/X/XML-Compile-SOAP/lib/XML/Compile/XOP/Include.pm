@@ -8,7 +8,7 @@
 
 package XML::Compile::XOP::Include;
 use vars '$VERSION';
-$VERSION = '3.23';
+$VERSION = '3.24';
 
 
 use warnings;

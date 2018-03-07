@@ -11,7 +11,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include <mpfr.h>
+
+#include "../math_mpfr_include.h"
 
 #ifdef OLDPERL
 #define SvUOK SvIsUV

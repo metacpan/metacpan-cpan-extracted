@@ -98,9 +98,9 @@ my %options = (
         [ 'user1', '123' ],
         [ 'user2', '123' ],
     );}
-   qr/Error executing class callback in prerun stage: Failed to prepare SQL statement:  near " "/,
+   qr/Error executing class callback in prerun stage: Failed to prepare SQL statement:  (near " "|incomplete input)/,
    "DBI syntax error";}
-   qr/DBD::SQLite::db prepare_cached failed: near " ": syntax error/, "DBD:SQLite";
+   qr/DBD::SQLite::db prepare_cached failed: (near " ": syntax error|incomplete input)/, "DBD:SQLite";
 }
 
 {

@@ -178,7 +178,7 @@ Rmpfr_nrandom Rmpfr_erandom Rmpfr_fmma Rmpfr_fmms Rmpfr_log_ui Rmpfr_gamma_inc R
 Rmpfr_round_nearest_away rndna
 );
 
-    our $VERSION = '4.0';
+    our $VERSION = '4.01';
     #$VERSION = eval $VERSION;
 
     DynaLoader::bootstrap Math::MPFR $VERSION;
@@ -396,7 +396,7 @@ sub new {
       if(!@_) {return Rmpfr_init()}
       }
 
-    # @_ can now contain a maximum of 2 args - the value, and iff the value is
+    # @_ can now contain a maximum of 2 args - the value, and if the value is
     # a string, (optionally) the base of the numeric string.
     if(@_ > 2) {die "Too many arguments supplied to new() - expected no more than two"}
 
@@ -553,16 +553,16 @@ sub Rmpfr_inits2_nobless {
     return @ret;
 }
 
-sub MPFR_VERSION {return _MPFR_VERSION()}
-sub MPFR_VERSION_MAJOR {return _MPFR_VERSION_MAJOR()}
-sub MPFR_VERSION_MINOR {return _MPFR_VERSION_MINOR()}
-sub MPFR_VERSION_PATCHLEVEL {return _MPFR_VERSION_PATCHLEVEL()}
-sub MPFR_VERSION_STRING {return _MPFR_VERSION_STRING()}
-sub MPFR_DBL_DIG {return _DBL_DIG()}
-sub MPFR_LDBL_DIG {return _LDBL_DIG()}
-sub MPFR_FLT128_DIG {return _FLT128_DIG()}
-sub GMP_LIMB_BITS {return _GMP_LIMB_BITS()}
-sub GMP_NAIL_BITS {return _GMP_NAIL_BITS()}
+sub MPFR_VERSION            () {return _MPFR_VERSION()}
+sub MPFR_VERSION_MAJOR      () {return _MPFR_VERSION_MAJOR()}
+sub MPFR_VERSION_MINOR      () {return _MPFR_VERSION_MINOR()}
+sub MPFR_VERSION_PATCHLEVEL () {return _MPFR_VERSION_PATCHLEVEL()}
+sub MPFR_VERSION_STRING     () {return _MPFR_VERSION_STRING()}
+sub MPFR_DBL_DIG            () {return _DBL_DIG()}
+sub MPFR_LDBL_DIG           () {return _LDBL_DIG()}
+sub MPFR_FLT128_DIG         () {return _FLT128_DIG()}
+sub GMP_LIMB_BITS           () {return _GMP_LIMB_BITS()}
+sub GMP_NAIL_BITS           () {return _GMP_NAIL_BITS()}
 
 sub mpfr_min_inter_prec {
     die "Wrong number of args to minimum_intermediate_prec()" if @_ != 3;

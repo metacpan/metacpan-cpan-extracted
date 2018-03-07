@@ -135,11 +135,11 @@ sub _trigger_mkdir {
 
 =head1 VERSION
 
-Version 0.61
+Version 0.62
 
 =cut
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 our $LocalConfigFound;
 

@@ -1,5 +1,12 @@
 Revision history for perl module Sys::Virt
 
+4.1.0 2018-03-05
+
+ - Add VIR_ERR_DEVICE_MISSING constants
+ - Remove use of Data::Dumper from example programs
+ - Remove accidental debug message in get_all_domain_stats
+ - Add virStoragePoolLookupByTargetPath API mapping
+
 4.0.0 2018-01-23
 
  - Fix check of return value from virStreamRecv*

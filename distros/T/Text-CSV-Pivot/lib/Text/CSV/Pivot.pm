@@ -1,6 +1,6 @@
 package Text::CSV::Pivot;
 
-$Text::CSV::Pivot::VERSION   = '0.01';
+$Text::CSV::Pivot::VERSION   = '0.03';
 $Text::CSV::Pivot::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Text::CSV::Pivot - Transform CSV file into Pivot Table format.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
@@ -41,7 +41,7 @@ so that others can also benefit.
 
 Below is sample data, I used for prototype as source csv file.
 
-    +----------------+-----------+-----------------+
+    +----------------+-----------+--------+--------+
     | Student        | Subject   | Result | Year   |
     +----------------+-----------+--------+--------+
     | Smith, John    | Music     | 7.0    | Year 1 |
@@ -203,7 +203,7 @@ case, we would want to skip the column "Year" in the output file, then C<col_ski
 would be [3]. All index related parameters except C<col_skip_idx> would expect number
 0 or more. The C<col_skip_idx> would expected an C<ArrayRef> of column index.
 
-    +----------------+-----------+-----------------+
+    +----------------+-----------+--------+--------+
     | Student        | Subject   | Result | Year   |
     +----------------+-----------+--------+--------+
     | Smith, John    | Music     | 7.0    | Year 1 |
@@ -218,9 +218,9 @@ would be [3]. All index related parameters except C<col_skip_idx> would expect n
     | Gabriel, Peter | Geography | 10.0   | Year 1 |
     +----------------+-----------+--------+--------+
 
-Let's assume, we want column "Student" to be our key column, the "Subject" column
-to provide us the new column name and "Result" column for the values. Also "Year"
-column to be skipped. Then the call would look like something below:
+Let's assume, we  want column C<"Student"> to be our key column, the C<"Subject">
+column to  provide us  the new column name and C<"Result"> column for the values.
+Also C<"Year"> column to be skipped.Then the call would look like something below:
 
     use strict; use warnings;
     use Text::CSV::Pivot;

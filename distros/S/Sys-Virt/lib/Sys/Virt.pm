@@ -78,7 +78,7 @@ use Sys::Virt::NWFilter;
 use Sys::Virt::DomainSnapshot;
 use Sys::Virt::Stream;
 
-our $VERSION = '4.0.0';
+our $VERSION = '4.1.0';
 require XSLoader;
 XSLoader::load('Sys::Virt', $VERSION);
 
@@ -996,6 +996,21 @@ sub get_storage_pool_by_volume {
     my $volume = shift;
 
     return Sys::Virt::StoragePool->_new(connection => $self, volume => $volume);
+}
+
+
+=item my $pool = $vmm->get_storage_pool_by_target_path($path)
+
+Return the storage pool with a target path of C<$path>. The returned object is
+an instance of the L<Sys::Virt::StoragePool> class.
+
+=cut
+
+sub get_storage_pool_by_target_path {
+    my $self = shift;
+    my $path = shift;
+
+    return Sys::Virt::StoragePool->_new(connection => $self, target_path => $path);
 }
 
 

@@ -1,10 +1,19 @@
 ==================================================
-Changes from 2017-03-04 00:00:00 +0000 to present.
+Changes from 2017-03-05 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.015 at 2018-03-04 15:17:30 +0000
+version 0.016 at 2018-03-05 17:17:21 +0000
 ------------------------------------------
+
+  Change: 4d915f4842dd71c4248945d8b4c1f4a2fbf477e7
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-05 14:16:18 +0000
+
+    Disable dblock testing with cpanplus
+
+    The cpanplus client doesn't use the concept of prefs_dir, so here we
+    are disabling the dblock tests with it. 
 
   Change: e2864f9749c7f514e56417f69f62276e4f50fb81
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>

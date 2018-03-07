@@ -1,5 +1,5 @@
 package CGI::Application::Plugin::Authentication::Driver::DBI;
-$CGI::Application::Plugin::Authentication::Driver::DBI::VERSION = '0.22';
+$CGI::Application::Plugin::Authentication::Driver::DBI::VERSION = '0.23';
 use strict;
 use warnings;
 

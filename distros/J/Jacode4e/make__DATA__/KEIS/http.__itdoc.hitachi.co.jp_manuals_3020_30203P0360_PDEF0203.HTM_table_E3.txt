@@ -1,0 +1,25 @@
+# http://itdoc.hitachi.co.jp/manuals/3020/30203P0360/PDEF0203.HTM
+# •\E-3@σ‚³‚κ‚ι`‚ª“ό‚κ‘Φ‚ν‚ι•¶‚Μκ——
+# •¶1 	KEIS90 	SJIS 	•¶2 	KEIS90 	SJIS
+± 	B0B3 	88B1 	ιΛ 	F2CD 	E9CB
+‰§ 	B2A9 	89A7 	ις 	F2F4 	E9F2
+a 	B3C2 	8A61 	εy 	E9DA 	E579
+h 	B3C9 	8A68 	 	D9F8 	9D98
+– 	B3F6 	8A96 	β} 	E3DE 	E27D
+Α 	B4C3 	8AC1 	σ 	DEF5 	9FF3
+Π 	B4D2 	8AD0 	ζ| 	EBDD 	E67C
+z 	B7DB 	8C7A 	θς 	F0F4 	E8F2
+{ 	B9DC 	8D7B 	αζ 	E2E8 	E1E6
+Η 	BCC9 	8EC7 	εA 	E9A2 	E541
+x 	BFD9 	9078 	θΥ 	F0D7 	E8D5
+‘G 	C1A8 	9147 	ζΛ 	ECCD 	E6CB
+’Ω 	C4DB 	92D9 	β 	D4E4 	9AE2
+“v 	C5D7 	9376 	αθ 	E2EA 	E1E8
+“ 	C5EE 	938E 	 	DBED 	9E8D
+““ 	C5F3 	9393 	· 	DEB9 	9FB7
+“τ 	C6F6 	93F4 	η 	EDEE 	E78E
+” 	C7E8 	9488 	εΆ 	EAA4 	E5A2
+•O 	C9B0 	954F 	w 	DBD8 	9E77
+–™ 	CBF9 	9699 	Τ 	D0D6 	98D4
+–χ 	CCF9 	96F7 	εM 	E9AE 	E54D
+U 	CFB6 	9855 	βΔ 	E4C6 	E2C4

@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.513   2018-03-06
+        - Ctrl-Spacebar affects all elements independently of the cursor position.
+
 1.512   2018-02-25
         - "line_fold": 'split' with limit -1 preserves trailing empty fields.
         - Warning if deprecated method "config" is used.

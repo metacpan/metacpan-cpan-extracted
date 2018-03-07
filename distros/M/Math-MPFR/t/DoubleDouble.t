@@ -458,7 +458,7 @@ if($test_nv2 > $test_nv1 && Math::MPFR::_has_longdouble()) {
   }
 
 
-  # For double-doubles less than 2**-1021, 53-bits of precision and 2098 bits of precison should
+  # For double-doubles less than 2**-1021, 53-bits of precision and 2098 bits of precision should
   # both store the same value.
 
   my $fr_53 = Rmpfr_init2(53);

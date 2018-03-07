@@ -11,7 +11,7 @@ use namespace::autoclean;
 use Moose;
 extends 'Dist::Zilla::Plugin::InlineFiles';
 
-our $VERSION = '0.02';  # VERSION
+our $VERSION = '0.03';  # VERSION
 
 __PACKAGE__->meta->make_immutable;
 
@@ -30,8 +30,8 @@ Dist::Zilla::Plugin::Test::Legal - common tests to check for copyright and licen
 
 =head1 VERSION
 
-  This document describes v0.02 of Dist::Zilla::Plugin::Test::Legal
-  Released November 21, 2014 as part of Dist-Zilla-Plugin-Test-Legal.
+  This document describes v0.03 of Dist::Zilla::Plugin::Test::Legal
+  Released February 28, 2018 as part of Dist-Zilla-Plugin-Test-Legal.
 
 =head1 SYNOPSIS
 
@@ -47,9 +47,9 @@ This module will add a L<Test::Legal> test as a release test to your module
 
 =over 4
 
-=item * L<Moose>
+=item * L<Moose|Moose>
 
-=item * L<namespace::autoclean>
+=item * L<namespace::autoclean|namespace::autoclean>
 
 =back
 
@@ -74,7 +74,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/Dist-Zilla-Plugin-Test-Legal>
+L<https://metacpan.org/release/Dist-Zilla-Plugin-Test-Legal>
 
 =item *
 
@@ -110,14 +110,6 @@ L<http://cpanratings.perl.org/d/Dist-Zilla-Plugin-Test-Legal>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/Dist-Zilla-Plugin-Test-Legal>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -128,7 +120,7 @@ L<http://cpants.cpanauthors.org/dist/Dist-Zilla-Plugin-Test-Legal>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/D/Dist-Zilla-Plugin-Test-Legal>
 
@@ -173,6 +165,20 @@ L<https://github.com/harleypig/Dist-Zilla-Plugin-Test-Legal>
 See perlmodinstall for information and options on installing Perl modules.
 
 =head1 CHANGES
+
+=head2 Version 0.02 (2014-11-21T14:58:09+00:00)
+
+=over 4
+
+=item *
+
+Brought dist up to date with dzil, added some dzil features, like dzil bakeini
+
+=item *
+
+Made test check for existence of dependent module and skip instead of dying if it didn't exist.
+
+=back
 
 =head2 Version 0.01 (2012-01-03T20:17:03Z)
 
@@ -225,11 +231,22 @@ __[ xt/release/test-legal.t ]__
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More qw(no_plan);
 
-eval 'use Test::Legal';
-plan skip_all => 'Test::Legal required for testing licenses'
-  if $@
+ SKIP: {
 
-copyright_ok;
-license_ok;
+     eval { require Test::Legal };
+
+     skip "Test::Legal required for testing licences" if $@;
+
+     eval { Test::Legal->import() };
+
+     BAIL_OUT "Test::Legal reported error on import so aborting tests: $@" if $@;
+
+     can_ok( __PACKAGE__, qw(copyright_ok license_ok) );
+
+     main->copyright_ok;
+
+     main->license_ok;
+
+};

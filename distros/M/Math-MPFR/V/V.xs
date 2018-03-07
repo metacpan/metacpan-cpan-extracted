@@ -12,8 +12,7 @@
 #include "XSUB.h"
 
 
-#include <gmp.h>
-#include <mpfr.h>
+#include "../math_mpfr_include.h"
 
 SV * ___GNU_MP_VERSION(pTHX) {
      return newSVuv(__GNU_MP_VERSION);

@@ -2,23 +2,22 @@
 # with anything earlier than 5.008.
 
 use 5.008;
+use version;
 
 use Module::FromPerlVer;
 use ExtUtils::MakeMaker;
 
-our $VERSION = '2.016002';
-$VERSION = eval $VERSION;
+my $version = '2.16.4'; 
 
 WriteMakefile
 (
     qw
     (
         NAME            FindBin::libs
-        ABSTRACT_FROM   lib/FindBin/libs.pm
         LICENSE         perl
     ),
+    VERSION         => version->parse( $version )->numify,
 	AUTHOR     	    => 'Steven Lembark <lembark@wrkhors.com>',
-    VERSION         => $VERSION,
     PREREQ_PM       =>
     {
         # standard distro, particular versions 
@@ -26,17 +25,17 @@ WriteMakefile
 
 		qw
         (
-            strict              0
+            Cwd                 3.73
+            Module::FromPerlVer 0.000005
 
             Carp                0
-            Cwd                 3.73
-            FindBin             0
-            Symbol              0
             File::Spec          0
             File::Temp          0
+            FindBin             0
             List::Util          0
-            Module::FromPerlVer 0.000005
             Test::More          0
+            Symbol              0
+            strict              0
         )
     },
 );

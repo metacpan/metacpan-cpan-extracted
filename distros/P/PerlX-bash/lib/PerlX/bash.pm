@@ -5,10 +5,10 @@ use warnings;
 
 use Exporter 'import';
 our @EXPORT = ('bash');
-our @EXPORT_OK = (@EXPORT, 'pwd');
+our @EXPORT_OK = (@EXPORT, qw< pwd head tail >);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 use Contextual::Return;
@@ -30,7 +30,7 @@ sub _process_bash_arg ()
 }
 
 
-sub bash
+sub bash (@)
 {
 	my (@opts, $capture);
 	my $exit_codes = [0..125];
@@ -100,6 +100,24 @@ use Cwd ();
 *pwd = \&Cwd::cwd;
 
 
+sub head
+{
+	my $num = shift;
+	$num = @_ + $num if $num < 0;
+#warn("# num is $num");
+	@_[0..$num-1];
+}
+
+sub tail
+{
+	my $num = shift;
+	return () unless $num;
+	$num = $num < 0 ? @_ + $num : $num - 1 ;
+#warn("# num is $num");
+	@_[$num..$#_];
+}
+
+
 1;
 
 # ABSTRACT: tighter integration between Perl and bash
@@ -118,7 +136,7 @@ PerlX::bash - tighter integration between Perl and bash
 
 =head1 VERSION
 
-This document describes version 0.02 of PerlX::bash.
+This document describes version 0.03 of PerlX::bash.
 
 =head1 SYNOPSIS
 

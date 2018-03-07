@@ -1,5 +1,5 @@
 package CGI::Application::Plugin::Authentication::Driver::Filter::crypt;
-$CGI::Application::Plugin::Authentication::Driver::Filter::crypt::VERSION = '0.22';
+$CGI::Application::Plugin::Authentication::Driver::Filter::crypt::VERSION = '0.23';
 use strict;
 use warnings;
 

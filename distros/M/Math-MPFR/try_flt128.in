@@ -1,0 +1,11 @@
+
+#include <stdio.h>
+#include <gmp.h>
+#include <mpfr.h>
+
+int main(void) {
+ if(mpfr_buildopt_float128_p())
+   printf("42");
+ else printf("mpfr_buildopt_float128_p() returned false");
+ return 0;
+}

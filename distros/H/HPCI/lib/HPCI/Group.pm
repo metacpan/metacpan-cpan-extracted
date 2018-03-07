@@ -754,10 +754,10 @@ and params as the value.
         my $self = shift;
         my $fi   = $self->_file_info;
         my $args = $_[0];
-        $args    = { @_ } unless ref $args eq 'HashRef';
+        $args    = { @_ } unless ref $args eq 'HASH';
         while ( my ($k,$v) = each %$args ) {
             $self->_croak( "file params value for $k must be a hash ref" )
-                unless (ref($v) eq 'HashRef');
+                unless (ref($v) eq 'HASH');
             $k = File::Spec->rel2abs($k);
             $fi->{$k}{params} = $v;
         }

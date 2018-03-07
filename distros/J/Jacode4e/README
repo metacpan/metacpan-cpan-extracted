@@ -1,0 +1,104 @@
+NAME
+
+    jacode4e.pl - jacode.pl-like program for enterprise
+
+SYNOPSIS
+
+    require 'jacode4e.pl';
+
+    jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, { %option }])
+
+ATTENTION
+
+    This software IS NOT "jacode.pl"!
+    If you want "jacode.pl", search it on CPAN again.
+
+ABSTRACT
+
+    This software has been developed for use promotion of JIS X 0213.
+
+    JIS X 0213 contains almost all of the characters used in everyday life in
+    Japan. In addition, JIS X 0213 was designed with consideration for use
+    in Shift_JIS environment. However, because it did not consider CP932, it
+    is not very popular.
+
+    "JIS X 0213 bridge" needs last one meter.
+
+    To solve the problem, jacode4e.pl proposes CP932X [shi:pi:kju:san'nikai].
+
+    CP932X implements JIS X 0213 over CP932.
+
+    We can continue to use CP932 data, application programs, databases, and
+    networks using CP932X.
+
+    This software doesn't support JIPS(J) and JIPS(E) officially. Because I
+    have no official documents about JIPS(J) and JIPS(E) by NEC Corporation.
+
+    This software can convert the following encodings to each other.
+
+      mnemonic      means
+      -----------------------------------------------------------------------
+      cp932x        CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
+      cp932         CP932
+      sjis2004      Shift_JIS-2004
+      cp00930       IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
+      keis78        HITACHI KEIS78
+      keis83        HITACHI KEIS83
+      keis90        HITACHI KEIS90
+      jef           FUJITSU JEF
+      jipsj         NEC JIPS(J)
+      jipse         NEC JIPS(E)
+      utf8          UTF-8
+      utf8jp        UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
+    -----------------------------------------------------------------------
+
+WHAT IS "CP932X"?
+
+    * "cp932x" as mnemonic
+    * CP932X is CP932
+    * Pronounce [si: pi: nain thri: tu: kai] in English
+    * Pronounce [shi: pi: kju: san' ni kai] in Japanese
+    * [si: pi: nain thri: tu: iks] is reserved for Microsoft Corporation ;-P
+    * CP932 upper compatible
+    * Supports JIS X 0213 character set
+    * Used ghost character "\x9C\x5A" as single shift code
+    * Used "\x9C\x5A\x9C\x5A" for single "\x9C\x5A"
+    * You can use private use characters you made
+    * You can use your operating system, network, and database.
+    * In most cases, application programs can be used as it is.
+
+INSTALLATION
+
+   To test this software, type the following:
+
+   make test
+
+   To install this software, copy 'jacode4e.pl' to any directory of @INC.
+
+DEPENDENCIES
+
+    This software requires perl 5.00503 or later.
+
+AUTHOR
+
+    Copyright (c) 2018 INABA Hitoshi
+
+LICENSE AND COPYRIGHT
+
+    This software is free software;
+
+    Use and redistribution for ANY PURPOSE are granted as long as all
+    copyright notices are retained.  Redistribution with modification
+    is allowed provided that you make your modified version obviously
+    distinguishable from the original one.  THIS SOFTWARE IS PROVIDED
+    BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES ARE
+    DISCLAIMED.
+
+    This software is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+
+    perl, jcode.pl, jacode.pl
+

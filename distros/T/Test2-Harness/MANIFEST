@@ -70,6 +70,7 @@ lib/Test2/Harness/Util/JSON.pm
 lib/Test2/Harness/Util/TapParser.pm
 lib/Test2/Harness/Util/Term.pm
 lib/Test2/Harness/Util/TestFile.pm
+lib/Test2/Harness/Util/UUID.pm
 lib/Test2/Harness/Watcher.pm
 lib/Test2/Tools/HarnessTester.pm
 scripts/yath

@@ -73,7 +73,7 @@
          "web" : "https://github.com/GrantStreetGroup/DBIx-BatchChunker"
       }
    },
-   "version" : "0.90",
+   "version" : "0.91",
    "x_authority" : "cpan:GSG",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

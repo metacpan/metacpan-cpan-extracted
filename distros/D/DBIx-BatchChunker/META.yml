@@ -41,6 +41,6 @@ resources:
   bugtracker: https://github.com/GrantStreetGroup/DBIx-BatchChunker/issues
   homepage: https://github.com/GrantStreetGroup/DBIx-BatchChunker
   repository: https://github.com/GrantStreetGroup/DBIx-BatchChunker.git
-version: '0.90'
+version: '0.91'
 x_authority: cpan:GSG
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

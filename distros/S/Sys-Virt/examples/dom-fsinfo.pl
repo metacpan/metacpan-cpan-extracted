@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 
-
 use strict;
 use warnings;
 
@@ -15,7 +14,6 @@ my $dom = $c->get_domain_by_name(shift @ARGV);
 
 my @fs = $dom->get_fs_info();
 
-use Data::Dumper;
-
-print Dumper($fs[0]);
-print Dumper($fs[1]);
+foreach my $fs (@fs) {
+    printf "%s (%s) at %s\n", $fs->{name}, $fs->{fstype}, $fs->{mountpoint};
+}

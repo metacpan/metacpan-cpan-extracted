@@ -1,5 +1,5 @@
 package CGI::Application::Plugin::Authentication::Driver::Generic;
-$CGI::Application::Plugin::Authentication::Driver::Generic::VERSION = '0.22';
+$CGI::Application::Plugin::Authentication::Driver::Generic::VERSION = '0.23';
 use strict;
 use warnings;
 

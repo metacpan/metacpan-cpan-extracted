@@ -1,0 +1,9 @@
+eurofxref-daily.xml
+lib/Finance/Currency/Convert/ECBdaily.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/test.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -8,7 +8,7 @@
 
 package XML::Compile::SOAP;
 use vars '$VERSION';
-$VERSION = '3.23';
+$VERSION = '3.24';
 
 
 use warnings;
@@ -245,7 +245,9 @@ sub _writer_hook($$@)
 
         if(keys %data)
         {   warning __x"unused values {names}", names => [keys %data];
-            trace "expected: ". join ' ', sort keys +{@do};
+            my @h = @do; my @keys;
+            while(@h) { push @keys, shift @h; shift @h}
+            trace "expected: ". join ' ', @keys;
 		}
 
         my $node = $doc->createElement($tag);

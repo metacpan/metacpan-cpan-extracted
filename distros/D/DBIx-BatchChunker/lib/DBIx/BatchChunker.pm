@@ -1,7 +1,7 @@
 package DBIx::BatchChunker;
 
 our $AUTHORITY = 'cpan:GSG';
-our $VERSION   = '0.90';
+our $VERSION   = '0.91';
 
 use Moo;
 
@@ -30,7 +30,7 @@ DBIx::BatchChunker - Run large database changes safely
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 SYNOPSIS
 
@@ -775,10 +775,10 @@ sub calculate_ranges {
         die 'Need at least a ResultSetColumn, ResultSet, or min/max statement handles to calculate ranges!';
     }
 
-    my $column_name = $self->id_name // '';
+    my $column_name = $self->id_name || '';
     $column_name =~ s/^\w+\.//;
 
-    my $progress = $self->progress_bar // Term::ProgressBar->new({
+    my $progress = $self->progress_bar || Term::ProgressBar->new({
         name   => 'Calculating ranges'.($column_name ? " for $column_name" : ''),
         count  => 2,
         ETA    => 'linear',
@@ -882,9 +882,9 @@ sub execute {
     }
 
     # Fire up the progress bar
-    my $progress = $self->progress_bar // Term::ProgressBar->new({
+    my $progress = $self->progress_bar || Term::ProgressBar->new({
         name   => $self->progress_name,
-        count  => $count // 1,
+        count  => $count || 1,
         ETA    => 'linear',
         silent => !(-t *STDERR && -t *STDIN),  # STDERR is what {fh} is set to use
     });
@@ -909,7 +909,7 @@ sub execute {
     # Da loop
     while ($ls->{prev_end} < $ls->{max_end} || $ls->{start}) {
         $ls->{multiplier_range} += $ls->{multiplier_step};
-        $ls->{start}           //= $ls->{prev_end} + 1;        # this could be already set because of early 'next' calls
+        $ls->{start}             = $ls->{prev_end} + 1 unless defined $ls->{start};   # this could be already set because of early 'next' calls
         $ls->{end}               = $ls->{start} + $ls->{multiplier_range} * $ls->{chunk_size} - 1;
         $ls->{chunk_count}       = undef;
 

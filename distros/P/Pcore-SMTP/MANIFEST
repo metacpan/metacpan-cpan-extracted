@@ -8,7 +8,6 @@ cpanfile
 lib/Build.PL
 lib/Pcore/Core/Event/Listener/Pipe/smtp.pm
 lib/Pcore/SMTP.pm
-lib/Pcore/SMTP/Message.pm
 share/dist-id.json
 share/dist.perl
 t/001.t

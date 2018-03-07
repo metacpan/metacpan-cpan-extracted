@@ -11,6 +11,11 @@ my $total_tests = 2;
 plan tests => $total_tests;
 
 SKIP: {
+
+    skip "Can only run those tests with cpan client, currently testing with cpanplus, version $ENV{PERL5_CPANPLUS_IS_VERSION}",
+      $total_tests
+      unless (not(exists($ENV{PERL5_CPANPLUS_IS_VERSION})));
+
     CPAN::HandleConfig->load;
     my $prefs_dir = $CPAN::Config->{prefs_dir};
 
