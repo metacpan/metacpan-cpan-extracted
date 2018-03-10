@@ -1,6 +1,6 @@
 package WWW::Google::URLShortener::Params;
 
-$WWW::Google::URLShortener::Params::VERSION   = '0.23';
+$WWW::Google::URLShortener::Params::VERSION   = '0.24';
 $WWW::Google::URLShortener::Params::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::URLShortener::Params - Placeholder for parameters for L<WWW::Google
 
 =head1 VERSION
 
-Version 0.23
+Version 0.24
 
 =cut
 
@@ -17,12 +17,9 @@ use 5.006;
 use strict; use warnings;
 use Data::Validate::URI qw(is_uri);
 use Data::Dumper;
+use parent 'Exporter';
 
-use vars qw(@ISA @EXPORT @EXPORT_OK);
-
-require Exporter;
-@ISA = qw(Exporter);
-@EXPORT_OK = qw(validate);
+our @EXPORT = qw(validate);
 
 sub check_url {
     my ($str) = @_;

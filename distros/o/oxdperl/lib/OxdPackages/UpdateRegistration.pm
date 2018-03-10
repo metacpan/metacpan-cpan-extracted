@@ -1,20 +1,44 @@
 #!/usr/bin/perl
 # UpdateRegistration.pm, a number as an object
 
-##########################################
-# Oxd client update site registration class
-#
-# Class is connecting to oXD-server via socket, and updating registered site data in gluu server.
-#
-# @package		Gluu-oxd-library
-# @subpackage	Libraries
-# @category	Relying Party (RP) and User Managed Access (UMA)
-# @author		Ourdesignz
-# @author		inderpal6785@gmail.com
-# @see	        OxdClientSocket
-# @see	        OxdClient
-# @see	        OxdConfig
-#######################################
+ ##
+ # Gluu-oxd-library
+ #
+ # An open source application library for Perl
+ #
+ # This content is released under the MIT License (MIT)
+ #
+ # Copyright (c) 2018, Gluu inc, USA, Austin
+ #
+ # Permission is hereby granted, free of charge, to any person obtaining a copy
+ # of this software and associated documentation files (the "Software"), to deal
+ # in the Software without restriction, including without limitation the rights
+ # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ # copies of the Software, and to permit persons to whom the Software is
+ # furnished to do so, subject to the following conditions:
+ #
+ # The above copyright notice and this permission notice shall be included in
+ # all copies or substantial portions of the Software.
+ #
+ # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ # THE SOFTWARE.
+ #
+ # @package		Gluu-oxd-library
+ # @version     	3.1.2
+ # @author		Ourdesignz, Sobhan Panda
+ # @author_email	inderpal6785@gmail.com, sobhan@centroxy.com
+ # @copyright		Copyright (c) 2018, Gluu inc federation (https://gluu.org/)
+ # @license		http://opensource.org/licenses/MIT	MIT License
+ # @link		https://gluu.org/
+ # @since		Version 3.1.2
+ # @filesource
+ #/
+
 
 use JSON::PP;
 
@@ -45,6 +69,9 @@ package UpdateRegistration;
 			# @var string $request_client_name                     OpenID provider client name
 			_request_client_name => shift,
 			
+			# @var string $request_client_secret_expires_at        OpenID provider client secret expires at
+			_request_client_secret_expires_at => shift,
+			
 			# @var array $request_acr_values                       Gluu login acr type, can be basic, duo, u2f, gplus and etc.
 			_request_acr_values => shift,
 			
@@ -58,7 +85,7 @@ package UpdateRegistration;
 			_request_client_request_uris => shift,
 			
 			# @var array $request_client_logout_uris
-			_request_client_logout_uris => shift,
+			_request_client_frontchannel_logout_uris => shift,
 			
 			# @var array $request_contacts
 			_request_contacts => shift,
@@ -80,6 +107,9 @@ package UpdateRegistration;
 			
 			# @var array $request_response_types                   OpenID Authentication response types
 			_request_response_types => shift,
+			
+			# @var array $request_protection_access_token          To protect the command with access token
+			_request_protection_access_token => shift,
 			
 			# Response parameter from oXD-server
 			# It is basic parameter for other protocols
@@ -138,21 +168,22 @@ package UpdateRegistration;
 		return $self->{_request_ui_locales};
 	}
 
+
     # @return array
     sub getRequestClientLogoutUris
-    {   
-		my( $self ) = @_;
-		return $self->{_request_client_logout_uris};
+    {
+        my( $self ) = @_;
+	return $self->{_request_client_frontchannel_logout_uris};
     }
 
     # @param array $request_client_logout_uris
     # @return void
     sub setRequestClientLogoutUris
     {
-        my ( $self, $request_client_logout_uris ) = @_;
-		$self->{_request_client_logout_uris} = $request_client_logout_uris if defined($request_client_logout_uris);
-		return $self->{_request_client_logout_uris};
-	}
+        my ( $self, $request_client_frontchannel_logout_uris ) = @_;
+	$self->{_request_client_frontchannel_logout_uris} = $request_client_frontchannel_logout_uris if defined($request_client_frontchannel_logout_uris);
+	return $self->{_request_client_frontchannel_logout_uris};
+    }
 
     
     # @return array
@@ -171,7 +202,24 @@ package UpdateRegistration;
 		$self->{_request_response_types} = $request_response_types if defined($request_response_types);
 		return $self->{_request_response_types};
 	}
+	
 
+    # @return array
+    sub getRequestProtectionAccessToken
+    {   
+		my( $self ) = @_;
+		return $self->{_request_protection_access_token};
+    }
+
+    
+    # @param array $request_request_protection_access_token
+    # @return void
+    sub setRequestProtectionAccessToken
+    {   
+		my ( $self, $request_protection_access_token ) = @_;
+		$self->{_request_protection_access_token} = $request_protection_access_token if defined($request_protection_access_token);
+		return $self->{_request_protection_access_token};
+	}
     
     # @return array
     sub getRequestGrantTypes
@@ -276,7 +324,7 @@ package UpdateRegistration;
     # @return void
     
     sub setRequestClientRequestUris
-    {   
+    {
 		my ( $self, $request_client_request_uris ) = @_;
 		$self->{_request_client_request_uris} = $request_client_request_uris if defined($request_client_request_uris);
 		return $self->{_request_client_request_uris};
@@ -353,14 +401,6 @@ package UpdateRegistration;
 		return $self->{_response_oxd_id};
 	}
 
-    
-    # @return string
-    
-    sub getRequestClientName
-    {
-		my( $self ) = @_;
-		return $self->{_request_client_name};
-	}
 
     
     # @param string $request_client_name
@@ -371,7 +411,36 @@ package UpdateRegistration;
 		$self->{_request_client_name} = $request_client_name if defined($request_client_name);
 		return $self->{_request_client_name};
 	}
+	
+	
+    # @return string
+    
+    sub getRequestClientName
+    {
+		my( $self ) = @_;
+		return $self->{_request_client_name};
+	}
 
+
+    # @param string $request_client_secret_expires_at
+    
+    sub setRequestClientSecretExpiresAt
+    {
+		my ( $self, $request_client_secret_expires_at ) = @_;
+		$self->{_request_client_secret_expires_at} = $request_client_secret_expires_at if defined($request_client_secret_expires_at);
+		return $self->{_request_client_secret_expires_at};
+	}
+	
+	
+    # @return string
+    
+    sub getRequestClientSecretExpiresAt
+    {
+		my( $self ) = @_;
+		return $self->{_request_client_secret_expires_at};
+	}
+    
+    
     
     # @param string $response_oxd_id
     # @return void
@@ -410,13 +479,72 @@ package UpdateRegistration;
     sub setCommand
     {
 		my ( $self, $command ) = @_;
-		$self->{_command} = 'update_site_registration';
+		$self->{_command} = 'update_site';
 		return $self->{_command};
 	}
-    
-    # Protocol parameter to oXD server
+	
+    # Protocol command to oXD to http server
     # @return void
     
+    sub sethttpCommand
+    {
+		my ( $self, $httpCommand ) = @_;
+		$self->{_httpcommand} = 'update-site';
+		return $self->{_httpcommand};
+	}
+    
+    # Method: setParams
+    # This method sets the parameters for update_site command.
+    # This module uses `request` method of OxdClient module for sending request to oxd-server
+    # 
+    # Parameters:
+    #
+    #	string $oxd_id - (Required) oxd Id from Client registration
+    #
+    #	string $authorization_redirect_uri - (Required) Uri to Redirect for Authorization
+    #
+    #	string $post_logout_redirect_uri - (Optional) Uri to Redirect after Logout
+    #
+    #	array $client_frontchannel_logout_uris - (Optional) Client Front Channel Logout URIs
+    #
+    #	array $response_types - (Optional) Response Types
+    #
+    #	array $grant_types - (Optional) Grant Types
+    #
+    #	array $scope - (Optional) Scope
+    #
+    #	array $acr_values - (Optional) ACR Values
+    #
+    #	string $client_name - (Optional) Client Name
+    #
+    #	numeric $client_secret_expires_at - (Optional) Used to extend client lifetime (milliseconds since 1970)
+    #
+    #	string $client_jwks_uri - (Optional) Client JWKS Uri
+    #
+    #	string $client_token_endpoint_auth_method - (Optional) Client Token Endpoint Auth Method
+    #
+    #	array $client_request_uris - (Optional) Client Request URIs
+    #
+    #	array $client_sector_identifier_uri - (Optional) Client Sector Identifier URIs
+    #
+    #	array $contacts - (Optional) Contacts
+    #
+    #	array $ui_locales - (Optional) UI Locales
+    #
+    #	array $claims_locales - (Optional) Claims Locales
+    #
+    #	string $protection_access_token - Protection Acccess Token. OPTIONAL for `oxd-server` but REQUIRED for `oxd-https-extension`
+    #
+    # Returns:
+    #	void
+    #
+    # This module uses `getResponseObject` method of OxdClient module for getting response from oxd.
+    # 
+    # *Example response from getResponseObject:*
+    # --- Code
+    # { "status": "ok" }
+    # ---
+    #
     sub setParams
     {
         my ( $self, $params ) = @_;
@@ -425,27 +553,28 @@ package UpdateRegistration;
             "oxd_id" => $self->getRequestOxdId(),
             "authorization_redirect_uri" => $self->getRequestAuthorizationRedirectUri(),
             "post_logout_redirect_uri" => $self->getRequestPostLogoutRedirectUri(),
-            "client_logout_uris"=> $self->getRequestClientLogoutUris(),
+            "client_frontchannel_logout_uris"=> $self->getRequestClientLogoutUris(),
             "response_types"=> $self->getRequestResponseTypes(),
             "grant_types" => $self->getRequestGrantTypes(),
             "scope" => $self->getRequestScope(),
             "acr_values" => $self->getRequestAcrValues(),
             "client_name" => $self->getRequestClientName(),
-            "client_secret_expires_at"=> 3080736637943,
+            "client_secret_expires_at" => $self->getRequestClientSecretExpiresAt(),
             "client_jwks_uri" => $self->getRequestClientJwksUri(),
             "client_token_endpoint_auth_method" => $self->getRequestClientTokenEndpointAuthMethod(),
             "client_request_uris" => $self->getRequestClientRequestUris(),
             "client_sector_identifier_uri" => $self->getRequestClientSectorIdentifierUri(),
             "contacts" => $self->getRequestContacts(),
             "ui_locales"=> $self->getRequestUiLocales(),
-            "claims_locales"=> $self->getRequestClaimsLocales()
+            "claims_locales"=> $self->getRequestClaimsLocales(),
+            "protection_access_token"=> $self->getRequestProtectionAccessToken()
         };
        
 		$self->{_params} = $paramsArray;
 		return $self->{_params};
         #print Dumper( $params );
         #return $paramsArray;
-        
+        #Clientsecretexpiresat:3080736637943;
     }	
 
 1;		# this 1; is neccessary for our class to work

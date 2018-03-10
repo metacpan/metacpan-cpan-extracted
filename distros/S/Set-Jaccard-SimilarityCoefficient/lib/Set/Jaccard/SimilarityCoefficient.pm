@@ -8,10 +8,10 @@ use Exception::Class qw(
   BadArgumentException
   DivideByZeroException
 );
-use Readonly qw( Scalar );
+use ReadonlyX;
 use Set::Scalar;
 
-our $VERSION = '0.5.1'; # VERSION
+our $VERSION = '1.6.1';
 
 ## no critic( Subroutines::ProhibitCallsToUnexportedSubs )
 # ------ Error messages
@@ -75,7 +75,7 @@ sub calc {
 #
 # This file is part of Set-Jaccard-SimilarityCoefficient
 #
-# This software is copyright (c) 2013 by Mark Leighton Fisher.
+# This software is copyright (c) 2018 by Mark Leighton Fisher.
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.

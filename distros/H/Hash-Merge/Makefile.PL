@@ -10,7 +10,7 @@ my %RUN_DEPS = (
     'Scalar::Util'  => 0,
 );
 my %CONFIGURE_DEPS = (
-    'ExtUtils::MakeMaker' => 0,
+    'ExtUtils::MakeMaker' => '6.64',
 );
 my %BUILD_DEPS = ();
 
@@ -43,6 +43,19 @@ WriteMakefile1(
         resources      => {
             repository => 'https://github.com/perl5-utils/Hash-Merge',
             license    => 'http://dev.perl.org/licenses/',
+        },
+        resources => {
+            homepage   => 'https://metacpan.org/release/Hash-Merge',
+            repository => {
+                url  => 'https://github.com/perl5-utils/Hash-Merge.git',
+                web  => 'https://github.com/perl5-utils/Hash-Merge',
+                type => 'git',
+            },
+            bugtracker => {
+                web    => 'http://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Merge',
+                mailto => 'hash-merge@rt.cpan.org',
+            },
+            license => 'http://dev.perl.org/licenses/',
         },
         prereqs => {
             develop => {
@@ -92,10 +105,11 @@ WriteMakefile1(
         q{Jens Rehsack <rehsack@cpan.org>},
         q{Stefan Hermes <hermes@cpan.org>},
     ],
-    PREREQ_PM      => \%RUN_DEPS,
-    BUILD_REQUIRES => \%BUILD_DEPS,
-    TEST_REQUIRES  => \%TEST_DEPS,
-    test           => {TESTS => join(' ', 't/*.t', 'xt/*.t', 't/Auto/*.t', 't/Clone/*.t', 't/Storable/*.t', 't/ClonePP/*.t')},
+    PREREQ_PM          => \%RUN_DEPS,
+    CONFIGURE_REQUIRES => \%CONFIGURE_DEPS,
+    BUILD_REQUIRES     => \%BUILD_DEPS,
+    TEST_REQUIRES      => \%TEST_DEPS,
+    test               => {TESTS => join(' ', 't/*.t', 'xt/*.t', 't/Auto/*.t', 't/Clone/*.t', 't/Storable/*.t', 't/ClonePP/*.t')},
     (-d 'Sandbox' ? (realclean => {FILES => join(' ', 't/Auto', 't/Clone', 't/Storable', 't/ClonePP', 'M*.bak')}) : ()),
 );
 
@@ -106,25 +120,17 @@ sub WriteMakefile1
     $eumm_version = eval $eumm_version;
     die "EXTRA_META is deprecated" if (exists($params{EXTRA_META}));
     die "License not specified"    if (!exists($params{LICENSE}));
-    if ($params{TEST_REQUIRES} and ($eumm_version < 6.6303))
-    {
-        if ($params{BUILD_REQUIRES})
-        {
-            $params{BUILD_REQUIRES} = {%{$params{BUILD_REQUIRES}}, %{$params{TEST_REQUIRES}}};
-        }
-        else
-        {
-            $params{BUILD_REQUIRES} = delete $params{TEST_REQUIRES};
-        }
-    }
-    if ($params{BUILD_REQUIRES} and ($eumm_version < 6.5503))
-    {
-
-        #EUMM 6.5502 has problems with BUILD_REQUIRES
-        $params{PREREQ_PM} =
-          {%{$params{PREREQ_PM} || {}}, %{$params{BUILD_REQUIRES}}};
-        delete $params{BUILD_REQUIRES};
-    }
+    $params{TEST_REQUIRES}
+      and $eumm_version < 6.6303
+      and $params{BUILD_REQUIRES} = {%{$params{BUILD_REQUIRES} || {}}, %{delete $params{TEST_REQUIRES}}};
+    #EUMM 6.5502 has problems with BUILD_REQUIRES
+    $params{BUILD_REQUIRES}
+      and $eumm_version < 6.5503
+      and $params{PREREQ_PM} = {%{$params{PREREQ_PM} || {}}, %{delete $params{BUILD_REQUIRES}}};
+    ref $params{AUTHOR}
+      and "ARRAY" eq ref $params{AUTHOR}
+      and $eumm_version < 6.5702
+      and $params{AUTHOR} = join(", ", @{$params{AUTHOR}});
     delete $params{CONFIGURE_REQUIRES}    if ($eumm_version < 6.52);
     delete $params{MIN_PERL_VERSION}      if ($eumm_version < 6.48);
     delete $params{META_MERGE}            if ($eumm_version < 6.46);

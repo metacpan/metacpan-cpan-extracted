@@ -16,7 +16,7 @@ use Array::Utils qw/intersect/;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('0.1.5');
+our $VERSION = version->new('0.1.6');
 our $NAME    = 'conf';
 our $OPTIONS = [
     'env|e',
@@ -137,7 +137,7 @@ App::VTide::Command::Conf - Show the current VTide configuration and environment
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Conf version 0.1.5
+This documentation refers to App::VTide::Command::Conf version 0.1.6
 
 =head1 SYNOPSIS
 

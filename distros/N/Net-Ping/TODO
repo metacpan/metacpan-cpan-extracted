@@ -1,20 +1,7 @@
 TODO list for Net::Ping (in case anyone is looking for things to do)
 
-- IPv6 support
-There is a patch on the CPAN RT for adding IPv6 support.  This needs to be looked over to
-determine what will work.  Now that Socket is on CPAN and Net::Ping assumes a recent version,
-I can assume that many of the IPv6 functions and constants are available.  Better yet, some
-options like IP_TOS and IP_TTL are not available on IPv6
-
-- modernization and general cleanup
-If I add the IPv6 changes from the patch (or something similar), we'll be up to seven optional
-parameters for new.  my $ping = Net::Ping->new(undef, undef, undef, undef, undef, undef, 'v6') 
-is just weird.  Initialization through a hash ref seems to be in order.  Other cleanups seem
-to be in order in the code.
-
-- warnings and strict
-It's time.  They need to be added to the module and to the tests.  I'll start with warnings
-across the board, cleanup as needed, then work on strict.
+- More IPv6 support
+Some options like IP_TOS and IP_TTL are not available on IPv6
 
 - POD rewriting
 Some things, such as the return from $p->ping(), are cryptic.  The location of the

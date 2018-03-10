@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.17'
 license: gpl3
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,4 +34,4 @@ resources:
   homepage: http://labs.consol.de
   license: http://opensource.org/licenses/gpl-3.0.html
   repository: https://github.com/sni/Monitoring-TT
-version: 1.0.1
+version: 1.0.2

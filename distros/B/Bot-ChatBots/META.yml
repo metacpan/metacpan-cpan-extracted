@@ -26,6 +26,7 @@ no_index:
     - t
     - xt
 requires:
+  IO::Socket::SSL: '2.056'
   Log::Any: '1.042'
   Module::Runtime: '0.014'
   Mojolicious: '7.10'
@@ -37,6 +38,6 @@ resources:
   bugtracker: https://github.com/polettix/Bot-ChatBots/issues
   homepage: https://github.com/polettix/Bot-ChatBots
   repository: https://github.com/polettix/Bot-ChatBots.git
-version: '0.008'
+version: '0.012'
 x_contributors:
   - 'Flavio Poletti <flavio@polettix.it>'

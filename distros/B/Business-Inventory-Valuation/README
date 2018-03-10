@@ -1,0 +1,104 @@
+NAME
+    Business::Inventory::Valuation - Calculate inventory value/unit price
+    (using LIFO or FIFO)
+
+VERSION
+    This document describes version 0.001 of Business::Inventory::Valuation
+    (from Perl distribution Business-Inventory-Valuation), released on
+    2018-03-09.
+
+SYNOPSIS
+     use Business::Inventory::Valuation;
+
+     my $biv = Business::Inventory::Valuation->new(
+         method                   => 'LIFO', # required. choose LIFO/FIFO
+     );
+
+     my ($units, $avgprice, @inv);
+
+     # buy: 100 units @1500
+     $biv->buy (100, 1500);
+     @inv = $biv->inventory;              # => ([100, 1500])
+     ($units, $avgprice) = $biv->summary; # => (100, 1500)
+
+     # buy more: 150 units @1600
+     $biv->buy (150, 1600);
+     @inv = $biv->inventory;              # => ([100, 1500], [150, 1600])
+     ($units, $avgprice) = $biv->summary; # => (250, 1560)
+
+     # sell: 50 units @1700
+     $biv->sell( 25, 1700);
+     @inv = $biv->inventory;              # => ([100, 1500], [100, 1600])
+     ($units, $avgprice) = $biv->summary; # => (200, 1550)
+
+     # buy: 200 units @1500
+     $biv->buy(200, 1500);
+     @inv = $biv->inventory;              # => ([100, 1500], [100, 1600], [200, 1500])
+     ($units, $avgprice) = $biv->summary; # => (400, 1525)
+
+     # sell: 350 units @1800
+     $biv->sell(350, 1800);
+     @inv = $biv->inventory;              # => ([50, 1500])
+     ($units, $avgprice) = $biv->summary; # => (50, 1500)
+
+     # sell: 60 units @1700
+     $biv->sell(60, 1800);                # dies!
+
+DESCRIPTION
+    This module can be used if you want to calculate average purchase price
+    from a series of purchases each with different prices (like when buying
+    stocks or cryptocurrencies) or want to value your inventory using
+    LIFO/FIFO method.
+
+    Keywords: average purchase price, inventory valuation, FIFO, LIFO.
+
+METHODS
+  new
+    Usage: Business::Inventory::Valuation->new(%args) => obj
+
+    Known arguments:
+
+    *   method => str ("LIFO"|"FIFO")
+
+  buy
+    Usage: $biv->buy($units, $unit_price)
+
+  sell
+    Usage: $biv->buy($units, $unit_price)
+
+    Will die if $units exceeds the number of units in inventory.
+
+  summary
+    Usage: $biv->summary => ($units, $avg_unit_price)
+
+    If inventory is empty, will return "<(0, undef)">.
+
+  inventory
+    Usage: $biv->inventory => @ary
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Business-Inventory-Valuation>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Business-Inventory-Valuation>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Business-Inventory-Va
+    luation>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

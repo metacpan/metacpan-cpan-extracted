@@ -1,34 +1,41 @@
 {
    "abstract" : "Calculate the Jaccard Similarity Coefficient of 2 sets",
    "author" : [
-      "Mark Leighton Fisher <fishe116@purdue.edu>"
+      "Mark Leighton Fisher <markleightonfisher@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Set-Jaccard-SimilarityCoefficient",
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::MinimumVersion" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008008"
+            "Exception::Class" : "1.42",
+            "ReadonlyX" : "1.00",
+            "Set::Scalar" : "1.29",
+            "Test::Most" : "0.34",
+            "perl" : "5.012000"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.5.1",
-   "x_contributors" : [
-      "Mark Leighton Fisher <markleightonfisher@gmail.com>"
-   ]
+   "version" : "1.6.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

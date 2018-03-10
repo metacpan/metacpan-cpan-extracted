@@ -4,7 +4,7 @@ use warnings;
 require Exporter;
 use parent qw(Exporter);
 use Carp;
-use App::Glacier::Command;
+use App::Glacier::Core;
 use App::Glacier::Timestamp;
 
 # new(CMD, VAULT, KEY, INIT)
@@ -51,7 +51,10 @@ sub _get_job {
 	    my $jid = $self->{_cmd}->glacier_eval(@{$self->{_init}});
 	    if ($self->{_cmd}->lasterr) {
 		if ($self->{_cmd}->lasterr('code') == 404) {
-		    $self->{_cmd}->abend(EX_TEMPFAIL, "vault is empty");
+		    $self->{_cmd}->abend(EX_TEMPFAIL,
+					 $self->{_cmd}->last_error_message
+					 . "\n"
+					 . "Try again later or use the --cached option to see the cached content.")
 		} else {
 		    $self->{_cmd}->abend(EX_FAILURE,
 					 "can't create job: ",

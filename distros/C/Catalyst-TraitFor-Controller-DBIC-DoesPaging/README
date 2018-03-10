@@ -1,16 +1,10 @@
-NAME
-    Catalyst::TraitFor::Controller::DBIC::DoesPaging - Helps you paginate,
-    search, sort, and more easily using DBIx::Class
-
-VERSION
-    version 1.001003
-
 SYNOPSIS
+
      package MyApp::Controller::Foo;
      use Moose;
      BEGIN { extends 'Catalyst::Controller' }
      with 'Catalyst::TraitFor::Controller::DBIC::DoesPaging';
-
+    
      sub people {
         my ($self, $c) = @_;
         my $people = $self->page_and_sort(
@@ -20,55 +14,55 @@ SYNOPSIS
      }
 
 DESCRIPTION
+
     This module helps you to map various DBIx::Class features to CGI
     parameters. For the most part that means it will help you search, sort,
     and paginate with a minimum of effort and thought.
 
 METHODS
+
     All methods take the context and a ResultSet as their arguments. All
     methods return a ResultSet.
 
-  page_and_sort
-     my $result = $self->page_and_sort($c, $c->model('DB::Foo'));
+ page_and_sort
+
+     my $result_rs  = $self->page_and_sort($c, $c->model('DB::Foo'));
 
     This is a helper method that will first "sort" your data and then
     "paginate" it.
 
-  paginate
-     my $result = $self->paginate($c, $c->model('DB::Foo'));
+ paginate
 
-    Paginates the passed in resultset based on the following CGI parameters:
+     my $result_rs  = $self->paginate($c, $c->model('DB::Foo'));
+
+    Paginates the passed in resultset based on the following CGI
+    parameters:
 
      start - first row to display
      limit - amount of rows per page
 
-  search
+ search
+
      my $searched_rs = $self->search($c, $c->model('DB::Foo'));
 
-    If the $resultset has a "controller_search" method it will call that
-    method on the passed in resultset with all of the CGI parameters. I like
-    to have this method look something like the following:
+    If the $resultset has a controller_search method it will call that
+    method on the passed in resultset with all of the CGI parameters. I
+    like to have this method look something like the following:
 
      # Base search dispatcher, defined in MyApp::Schema::ResultSet
      sub _build_search {
-        my $self           = shift;
-        my $dispatch_table = shift;
-        my $q              = shift;
-
-        my %search = ();
-        my %meta   = ();
-
+        my ($rs, $dispatch_table, $q) = @_;
+    
         foreach ( keys %{$q} ) {
            if ( my $fn = $dispatch_table->{$_} and $q->{$_} ) {
-              my ( $tmp_search, $tmp_meta ) = $fn->( $q->{$_} );
-              %search = ( %search, %{$tmp_search||{}} );
-              %meta   = ( %meta,   %{$tmp_meta||{}} );
+              my ( $search, $meta ) = $fn->( $q->{$_} );
+              $rs = $rs->search($search, $meta);
            }
         }
-
-        return $self->search(\%search, \%meta);
+    
+        return $rs;
      }
-
+    
      # search method in specific resultset
      sub controller_search {
         my $self   = shift;
@@ -85,41 +79,37 @@ METHODS
         },$params);
      }
 
-    If the "controller_search" method does not exist, this method will call
+    If the controller_search method does not exist, this method will call
     "simple_search" instead.
 
-  sort
-     my $result = $self->sort($c, $c->model('DB::Foo'));
+ sort
 
-    Exactly the same as search, except calls "controller_sort" or
+     my $result_rs  = $self->sort($c, $c->model('DB::Foo'));
+
+    Exactly the same as search, except calls controller_sort or
     "simple_sort". Here is how I use it:
 
      # Base sort dispatcher, defined in MyApp::Schema::ResultSet
      sub _build_sort {
-        my $self = shift;
-        my $dispatch_table = shift;
-        my $default = shift;
-        my $q = shift;
-
+        my ($self, $dispatch_table, $default, $q) = @_;
+    
         my %search = ();
         my %meta   = ();
-
+    
         my $direction = $q->{dir};
         my $sort      = $q->{sort};
-
+    
         if ( my $fn = $dispatch_table->{$sort} ) {
            my ( $tmp_search, $tmp_meta ) = $fn->( $direction );
-           %search = ( %search, %{$tmp_search||{}} );
-           %meta   = ( %meta,   %{$tmp_meta||{}} );
+           $self = $self->search( $tmp_search, $tmp_meta );
         } elsif ( $sort && $direction ) {
            my ( $tmp_search, $tmp_meta ) = $default->( $sort, $direction );
-           %search = ( %search, %{$tmp_search||{}} );
-           %meta   = ( %meta,   %{$tmp_meta||{}} );
+           $self = $self->search( $tmp_search, $tmp_meta );
         }
-
-        return $self->search(\%search, \%meta);
+    
+        return $self;
      }
-
+    
      # sort method in specific resultset
      sub controller_sort {
         my $self = shift;
@@ -140,8 +130,9 @@ METHODS
         },$params);
      }
 
-  simple_deletion
-     $self->simple_deletion($c, $c->model('DB::Foo'));
+ simple_deletion
+
+     my $deleted_ids = $self->simple_deletion($c, $c->model('DB::Foo'));
 
     Deletes from the passed in resultset based on the following CGI
     parameter:
@@ -153,18 +144,20 @@ METHODS
     has a multipk this will expect each tuple of PK's to be separated by
     commas.
 
-    Note that this method uses the "$rs->delete" method, as opposed to
-    "$rs->delete_all"
+    Note that this method uses the $rs->delete method, as opposed to
+    $rs->delete_all
 
-  simple_search
+ simple_search
+
      my $searched_rs = $self->simple_search($c, $c->model('DB::Foo'));
 
     Searches the resultset based on all fields in the request, except for
-    fields listed in "ignored_params". Searches with "$fieldname => { -like
-    => "%$value%" }". If there are multiple values for a CGI parameter it
-    will use all values via an "or".
+    fields listed in ignored_params. Searches with $fieldname => { -like =>
+    "%$value%" }. If there are multiple values for a CGI parameter it will
+    use all values via an or.
 
-  simple_sort
+ simple_sort
+
      my $sorted_rs = $self->simple_sort($c, $c->model('DB::Foo'));
 
     Sorts the passed in resultset based on the following CGI parameters:
@@ -173,28 +166,24 @@ METHODS
      dir  - direction to sort
 
 CONFIG VARIABLES
+
     page_size
-        Default size of a page. Defaults to 25.
+
+      Default size of a page. Defaults to 25.
 
     ignored_params
-        ArrayRef of params that will be ignored in simple_search, defaults
-        to:
 
-         [qw{limit start sort dir _dc rm xaction}]
+      ArrayRef of params that will be ignored in simple_search, defaults
+      to:
+
+       [qw{limit start sort dir _dc rm xaction}]
 
 SEE ALSO
+
     Web::Util::DBIC::Paging, which this module is a thin wrapper around
 
 CREDITS
+
     Thanks to Micro Technology Services, Inc. for funding the initial
     development of this module.
-
-AUTHOR
-    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2013 by Arthur Axel "fREW" Schmidt.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
 

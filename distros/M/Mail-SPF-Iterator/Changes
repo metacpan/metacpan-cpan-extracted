@@ -1,3 +1,8 @@
+1.114 2018-03-09
+- optionally have default SPF record which gets used for sites which don't
+  specify their own. Since this affects often smaller sites something like
+  'mx ~all' or 'mx/24 ~all' is useful.
+
 1.113 2016-05-17
 - fix bug in generating the Received-SPF header, introduced in 1.112
 - samples/spf-lookup.pl has now option to specify DNS server

@@ -3,7 +3,7 @@ package PPIx::Regexp::Constant;
 use strict;
 use warnings;
 
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 
 use base qw{ Exporter };
 
@@ -16,6 +16,7 @@ our @EXPORT_OK = qw{
     LITERAL_LEFT_CURLY_ALLOWED
     LITERAL_LEFT_CURLY_REMOVED_PHASE_1
     LITERAL_LEFT_CURLY_REMOVED_PHASE_2
+    LITERAL_LEFT_CURLY_REMOVED_PHASE_3
     MINIMUM_PERL
     MODIFIER_GROUP_MATCH_SEMANTICS
     MSG_PROHIBITED_BY_STRICT
@@ -35,9 +36,23 @@ use constant COOKIE_REGEX_SET	=> '])';
 use constant FALSE		=> 0;
 use constant TRUE		=> 1;
 
+# In the cases where an unescaped literal left curly 'could not' be a
+# quantifier, they are allowed. At least, that was the original idea.
+# But read on.
 use constant LITERAL_LEFT_CURLY_ALLOWED		=> undef;
+
+# 'Most' unescaped literal left curlys were removed in 5.26.
 use constant LITERAL_LEFT_CURLY_REMOVED_PHASE_1	=> '5.025001';
-use constant LITERAL_LEFT_CURLY_REMOVED_PHASE_2	=> undef;
+
+# Unescaped literal left curlys after literals and certain other
+# elements are scheduled to be removed in 5.30.
+use constant LITERAL_LEFT_CURLY_REMOVED_PHASE_2	=> undef;	# x{ 5.30
+
+# In 5.27.8 it was decided that unescaped literal left curlys after an
+# open paren will be removed in 5.32. This does not include the case
+# where the entire regex is delimited by parens -- they are still legal
+# there.
+use constant LITERAL_LEFT_CURLY_REMOVED_PHASE_3	=> undef;	# ({ 5.32
 
 use constant MINIMUM_PERL	=> '5.000';
 
@@ -144,6 +159,13 @@ The Perl version at which the second phase of unescaped literal left
 curly bracket removal took place. The value of this constant is
 C<undef>, but it will be assigned a value when the timing of the second
 phase is known.
+
+=head2 LITERAL_LEFT_CURLY_REMOVED_PHASE_3
+
+The Perl version at which the third phase of unescaped literal left
+curly bracket removal took place. This is the removal of curly brackets
+after a left parenthesis. The value of this constant is C<undef>, but it
+will be assigned a value when the timing of the second phase is known.
 
 =head2 MINIMUM_PERL
 

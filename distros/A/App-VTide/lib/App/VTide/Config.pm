@@ -15,7 +15,7 @@ use Path::Tiny;
 use YAML::Syck qw/ LoadFile /;
 use Hash::Merge::Simple qw/ merge /;
 
-our $VERSION = version->new('0.1.5');
+our $VERSION = version->new('0.1.6');
 
 has global_config => (
     is      => 'rw',
@@ -101,7 +101,7 @@ App::VTide::Config - Manage configuration for VTide
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Config version 0.1.5
+This documentation refers to App::VTide::Config version 0.1.6
 
 =head1 SYNOPSIS
 

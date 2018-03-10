@@ -2,7 +2,7 @@
 
 package Git::Hooks::Notify;
 # ABSTRACT: Git::Hooks plugin to notify users via email
-$Git::Hooks::Notify::VERSION = '2.6.3';
+$Git::Hooks::Notify::VERSION = '2.7.0';
 use 5.010;
 use utf8;
 use strict;
@@ -46,14 +46,14 @@ sub pretty_log {
 
         my $message = decode($encoding, $commit->raw_message . $commit->extra);
 
-        push @log, <<EOF;
+        push @log, <<EOS;
 
 commit $sha1$merge
 Author: $author
 Date:   $datetime
 
 $message
-EOF
+EOS
     }
 
     return join('', @log);
@@ -125,13 +125,13 @@ sub notify {
 
     $body .= "\n" if length $body;
 
-    $body .= <<"EOF";
+    $body .= <<EOS;
 REPOSITORY: $repository_name
 BRANCH: $branch
 PUSHED BY: $pusher
 FROM: $old_commit
 TO:   $new_commit
-EOF
+EOS
 
     if (my @paths = @{$rule->{paths}}) {
         $body .= join(' ', 'FILTER:', @paths) . "\n";
@@ -163,13 +163,13 @@ EOF
             $2 .
             '&nbsp;' x (8 - length($2))]egm;
 
-        $body = <<EOF;
+        $body = <<EOS;
 <html>
 <body style="font-family: monospace">
 $html
 </body>
 </html>
-EOF
+EOS
     } else {
         $body =~ s/\b[0-9a-f]{40}\b/sha1_link($git, ${^MATCH})/egp;
     }
@@ -240,7 +240,7 @@ sub notify_affected_refs {
                 $git->fault(
                     sprintf('I could not send mail to the following recipients: %s\n',
                             join(", ", $error->recipients)),
-                    {details => $error->message}
+                    {ref => $ref, details => $error->message}
                 );
                 ++$errors;
             };
@@ -269,7 +269,7 @@ Git::Hooks::Notify - Git::Hooks plugin to notify users via email
 
 =head1 VERSION
 
-version 2.6.3
+version 2.7.0
 
 =head1 SYNOPSIS
 

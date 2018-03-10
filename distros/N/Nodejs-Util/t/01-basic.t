@@ -123,9 +123,9 @@ sub path_eq {
 
     my ($path1, $path2) = @_;
     if (defined($path1) xor defined($path2)) {
-        nok("path '$path1' does not equal path '$path2'");
+        ok(0, "path '$path1' does not equal path '$path2'");
     } elsif (!defined($path1) and !defined($path2)) {
-        ok("path1 and path2 are both undef");
+        ok(1, "path1 and path2 are both undef");
     } else {
         is(abs_path($path1), abs_path($path2), "path $path1 eq path $path2");
     }
@@ -137,7 +137,7 @@ sub paths_eq {
     if (length $paths1 ne length $paths2) {
         diag("paths1 = ", explain $paths1);
         diag("paths2 = ", explain $paths2);
-        nok("paths1 ne paths2 (different length)");
+        ok(0, "paths1 ne paths2 (different length)");
     }
     for my $i (0..$#{$paths1}) {
         note "Comparing paths[$i]: ", explain($paths1->[$i]), " vs ", explain($paths2->[$i]);

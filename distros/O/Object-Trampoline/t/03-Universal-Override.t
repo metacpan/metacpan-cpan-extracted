@@ -8,20 +8,26 @@ use Scalar::Util    qw( blessed );
 
 my $expect = 'Foo::Bar';
 
-while( my( $name, $ref ) = each %{ $::{ 'UNIVERSAL::' } } )
+while( my( $name, $val ) = each %{ $::{ 'UNIVERSAL::' } } )
 {
-    *{ $ref }{ CODE }
-    or next;
+    state $sanity   = $Object::Trampoline::Bounce::is_override;
 
-    note "Checking: '$name'";
+    if( $sanity->( $name, $val ) )
+    {
+        note "Checking method: '$name'";
 
-    my $t1  = Object::Trampoline->bim( $expect => qw( a b ) );
+        my $t1  = Object::Trampoline->bim( $expect => qw( a b ) );
 
-    eval { $t1->$name( $expect ) };
+        eval { $t1->$name( $expect ) };
 
-    my $found   = blessed $t1;
+        my $found   = blessed $t1;
 
-    ok $found eq $expect,  "Object is '$found' ($expect)";
+        ok $found eq $expect,  "Object is '$found' ($expect)";
+    }
+    else
+    {
+        note "Skipping non-method: '$name'.";
+    }
 }
 
 done_testing;

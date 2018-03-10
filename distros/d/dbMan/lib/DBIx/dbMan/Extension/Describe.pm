@@ -2,12 +2,13 @@ package DBIx::dbMan::Extension::Describe;
 
 use strict;
 use base 'DBIx::dbMan::Extension';
+use Term::ANSIColor;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 1;
 
-sub IDENTIFICATION { return "000001-000032-000006"; }
+sub IDENTIFICATION { return "000001-000032-000007"; }
 
 sub preference { return 0; }
 
@@ -22,6 +23,9 @@ sub handle_action {
 			$obj->{-interface}->error("No current connection selected.");
 			return %action;
 		}	
+
+        my $colorized = $obj->{-mempool}->get('output_format') eq 'colortable';
+
 		if ($action{oper} eq 'complete') {
 			my $sth = $obj->{-dbi}->table_info();
 			my $ret = $sth->fetchall_arrayref();
@@ -45,13 +49,14 @@ sub handle_action {
 
 		my $table = new Text::FormatTable '| l | l | l | l | l |';
 		$table->rule;
-		$table->head('COLUMN','TYPE','SIZE','SCALE','NULLABLE');
+		$table->head(map { $colorized ? color( $obj->{-config}->tablecolor_head || 'bright_yellow' ) . $_ . color( $obj->{-config}->tablecolor_lines || 'reset' ) : $_; } 'COLUMN','TYPE','SIZE','SCALE','NULLABLE');
 		$table->rule;
 
 		my $sth = $obj->{-dbi}->prepare(q!SELECT * FROM !.$action{what}.q! WHERE 0 = 1!);
 		unless (defined $sth) {
 			$action{action} = 'OUTPUT';
-			$action{output} = $obj->{-dbi}->errstr()."\n";
+			$action{output} = '';
+            $obj->{-interface}->error( $obj->{-dbi}->errstr() );
 			$action{processed} = 1;
 			return %action;
 		}
@@ -66,7 +71,7 @@ sub handle_action {
 			my %nullcvt = qw/0 no 1 yes 2 unknown/;
 			$nullcvt{''} = 'no';
 			for (@{$sth->{NAME}}) {
-				$table->row($_,shift @type,shift @prec,shift @scale,$nullcvt{shift @null});
+				$table->row(map { $colorized ? color( $obj->{-config}->tablecolor_content || 'bright_white' ) . $_ . color( $obj->{-config}->tablecolor_lines || 'reset' ) : $_; } $_,shift @type,shift @prec,shift @scale,$nullcvt{shift @null});
 			}
 		} else {
 			$obj->{-interface}->error("Table $action{what} not found.");
@@ -75,7 +80,8 @@ sub handle_action {
 		$sth->finish;
 		$table->rule;
 		$action{action} = 'OUTPUT';
-		$action{output} = $table->render($obj->{-interface}->render_size);
+		$action{output} = ( $colorized ? color( $obj->{-config}->tablecolor_lines || 'reset' ) : '' )
+            . $table->render($obj->{-interface}->render_size) . ( $colorized ? color( 'reset' ) : '' );
 	}
 
 	$action{processed} = 1;

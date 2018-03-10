@@ -1,0 +1,63 @@
+## name Basic forward for/foreach
+## failures 2
+## cut
+
+for (%hash) {
+foreach (%hash) {
+
+## name forward for/foreach with variable
+## failures 2
+## cut
+
+for $foo (%hash) {
+foreach $foo (%hash) {
+
+## name forward for/foreach with lexical variable
+## failures 2
+## cut
+
+for my $foo (%hash) {
+foreach my $bar (%hash) {
+
+## name postfix variations
+## failures 4
+## cut
+
+print for %hash;
+print for %{$hash};
+print for %{ something() };
+print foreach %hash;
+
+# name reference variation
+## failures 8
+## cut
+
+for my $foo (%{$hash}) {
+foreach my $bar (%$hash) {
+for $foo (%{$hash}) {
+foreach $foo (%$hash) {
+for (%{$hash}) {
+foreach (%$hash) {
+print for %{$hash};
+print foreach %$hash;
+
+## name Correct patterns
+## failures 0
+## cut
+
+for my $foo (keys %hash) {
+for my $foo (values %hash) {
+foreach my $bar (keys %hash) {
+for $foo (values %hash) {
+foreach $foo (keys %hash) {
+for (values %hash) {
+foreach (keys %hash) {
+print for values %hash;
+print foreach keys %hash;
+print for ( values %hash );
+print foreach (keys %hash);
+print foreach (keys %{$hash});
+print foreach (keys %{ some_big_thing() });
+for my $k (%foo ? sort keys %foo : sort keys %bar) {
+for my $k (%{$foo} ? sort keys %{$foo} : sort keys %{$bar}) {
+for my $k (%{ func() } ? sort keys %{ func() } : sort keys %{ func() }) {

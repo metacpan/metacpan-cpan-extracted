@@ -2,7 +2,7 @@ package Test2::Workflow;
 use strict;
 use warnings;
 
-our $VERSION = '0.000104';
+our $VERSION = '0.000106';
 
 our @EXPORT_OK = qw/parse_args current_build build root_build init_root build_stack/;
 use base 'Exporter';
@@ -108,7 +108,7 @@ sub parse_args {
             my $hub = Test2::API::test2_stack->top;
             my $count = @$events;
             my $list = $count
-                ? "Overview of unseen events:\n" . join "" => map "    " . blessed($_) . " " . $_->trace->debug . "\n", @$events
+                ? "Overview of unseen events:\n" . join "" => map "    " . blessed($_) . " " . $_->trace($hub)->debug . "\n", @$events
                 : "";
             die <<"            EOT";
 Exception in build '$args->{name}' with $count unseen event(s).

@@ -20,21 +20,25 @@
 
 use 5.014_001;
 
-package Term::CLI  0.03002 {
+package Term::CLI  0.04004 {
 
 use Modern::Perl;
 use Text::ParseWords qw( parse_line );
 use Term::CLI::ReadLine;
 use FindBin;
 
+use Term::CLI::L10N;
+
 # Load all Term::CLI classes so the user doesn't have to.
 
+use Term::CLI::Argument::Bool;
 use Term::CLI::Argument::Enum;
 use Term::CLI::Argument::Filename;
 use Term::CLI::Argument::Number;
 use Term::CLI::Argument::Number::Float;
 use Term::CLI::Argument::Number::Int;
 use Term::CLI::Argument::String;
+
 use Term::CLI::Command;
 use Term::CLI::Command::Help;
 
@@ -141,7 +145,7 @@ sub _default_callback {
     my ($self, %args) = @_;
 
     if ($args{status} < 0) {
-        say STDERR "ERROR: ", $args{error};
+        say STDERR loc("ERROR"), ": ", $args{error};
     }
     return %args;
 }
@@ -164,7 +168,7 @@ sub _default_split {
         $text =~ s/^[$delim]+//;
         my @words = parse_line(qr{[$delim]+}, 0, $text);
         pop @words if @words and not defined $words[-1];
-        my $error = @words ? '' : 'Unbalanced quotes in input';
+        my $error = @words ? '' : loc('unbalanced quotes in input');
         return ($error, @words);
     }
     else {
@@ -367,7 +371,7 @@ sub execute {
         if length $error;
 
     if (@cmd == 0) {
-        $args{error} = "missing command";
+        $args{error} = loc("missing command");
         $args{status} = -1;
     }
     elsif (my $cmd_ref = $self->find_command($cmd[0])) {
@@ -397,7 +401,7 @@ Term::CLI - CLI interpreter based on Term::ReadLine
 
 =head1 VERSION
 
-version 0.03002
+version 0.04004
 
 =head1 SYNOPSIS
 

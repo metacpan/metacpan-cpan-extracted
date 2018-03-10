@@ -92,7 +92,7 @@ $resp = webhook_post(
             noteable_type => 'MergeRequest',
             url    => 'http://git/merge_requests/4242#note42',
         },
-        merge_request => { id => 4242 },
+        merge_request => { id => 424242, iid => 4242 },
     }
 );
 
@@ -103,7 +103,7 @@ TestBot->expect(
         '#test Test User',
         'test-repo',
         '42',
-        '* commented merge request #4242',
+        '* commented merge request !4242',
         '* http://git/merge_requests/4242#note42',
     )
 );
@@ -118,7 +118,7 @@ $resp = webhook_post(
             noteable_type => 'Issue',
             url    => 'http://git/issues/4242#note42',
         },
-        issue => { id => 4242 },
+        issue => { id => 424242, iid => 4242 },
     }
 );
 

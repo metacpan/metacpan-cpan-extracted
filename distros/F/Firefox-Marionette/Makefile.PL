@@ -112,6 +112,7 @@ WriteMakefile(
         'HTTP::Daemon'   => 0,
         'HTTP::Status'   => 0,
         'HTTP::Response' => 0,
+        'File::HomeDir'  => 0,
     },
     PREREQ_PM => {
 	'Config::INI::Reader' => 0,

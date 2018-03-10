@@ -1,15 +1,16 @@
 package Yancy;
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 # ABSTRACT: A simple CMS for administrating data
 
 #pod =head1 SYNOPSIS
 #pod
-#pod     ### Mojolicious plugin
 #pod     use Mojolicious::Lite;
-#pod     plugin Yancy => { ... };
-#pod
-#pod     ### Standalone app
-#pod     $ yancy daemon
+#pod     use Mojo::Pg; # Supported backends: Pg, MySQL, SQLite, DBIx::Class
+#pod     has pg => sub { Mojo::Pg->new( 'postgres:///myapp' ) };
+#pod     plugin Yancy => {
+#pod         backend => [ Pg => app->pg ],
+#pod         read_schema => 1,
+#pod     };
 #pod
 #pod =head1 DESCRIPTION
 #pod
@@ -92,7 +93,7 @@ our $VERSION = '0.021';
 #pod
 #pod =item *
 #pod
-#pod L<The Auth::Basic plugin/Yancy::Plugin::Auth::Basic> provides a simple,
+#pod L<The Auth::Basic plugin|Yancy::Plugin::Auth::Basic> provides a simple,
 #pod password-based authentication system for the Yancy editor and your
 #pod website.
 #pod
@@ -168,16 +169,17 @@ Yancy - A simple CMS for administrating data
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
-    ### Mojolicious plugin
     use Mojolicious::Lite;
-    plugin Yancy => { ... };
-
-    ### Standalone app
-    $ yancy daemon
+    use Mojo::Pg; # Supported backends: Pg, MySQL, SQLite, DBIx::Class
+    has pg => sub { Mojo::Pg->new( 'postgres:///myapp' ) };
+    plugin Yancy => {
+        backend => [ Pg => app->pg ],
+        read_schema => 1,
+    };
 
 =head1 DESCRIPTION
 
@@ -256,7 +258,7 @@ Yancy comes with plugins to enhance your website.
 
 =item *
 
-L<The Auth::Basic plugin/Yancy::Plugin::Auth::Basic> provides a simple,
+L<The Auth::Basic plugin|Yancy::Plugin::Auth::Basic> provides a simple,
 password-based authentication system for the Yancy editor and your
 website.
 

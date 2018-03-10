@@ -1,0 +1,40 @@
+NAME
+    Data::Sah::Coerce::perl::str::str_toupper - Coerce string to upper case
+
+VERSION
+    This document describes version 0.001 of
+    Data::Sah::Coerce::perl::str::str_toupper (from Perl distribution
+    Data-Sah-Coerce-perl-str-str_toupper), released on 2018-03-08.
+
+DESCRIPTION
+    The rule is not enabled by default. You can enable it in a schema using
+    e.g.:
+
+     ["str", "x.perl.coerce_rules"=>["str_toupper"]]
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Sah-Coerce-perl-str-str_toupper>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Sah-Coerce-perl-str-str_toupper>
+    .
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Coerce-perl-
+    str-str_toupper>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

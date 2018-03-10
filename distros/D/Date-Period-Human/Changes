@@ -1,5 +1,9 @@
 Changes for Date-Period-Human
 
+0.4.6  2018-03-09 07:33:14 CET
+		- Support "en_short" language, for shorthand relative dates (Thanks
+		bigpresh)
+
 0.4.5  2015-03-24 20:14:03 CET
 		- Support future dates (Thanks, isync)
 

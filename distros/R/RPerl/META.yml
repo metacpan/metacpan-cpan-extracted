@@ -78,5 +78,5 @@ resources:
   homepage: http://www.rperl.org
   license: http://dev.perl.org/licenses/
   repository: git://github.com/wbraswell/rperl.git
-version: '3.600000'
+version: '3.601000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

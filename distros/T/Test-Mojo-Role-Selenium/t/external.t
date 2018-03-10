@@ -1,12 +1,11 @@
-use Mojo::Base -strict;
-use Test::Mojo::WithRoles 'Selenium';
-use Test::More;
+use lib '.';
+use t::Helper;
 
 $ENV{MOJO_SELENIUM_DRIVER} ||= 'Selenium::Chrome';
 plan skip_all => 'TEST_SELENIUM=http://mojolicious.org'
   unless $ENV{TEST_SELENIUM} and $ENV{TEST_SELENIUM} =~ /^http/;
 
-my $t = Test::Mojo::WithRoles->new->setup_or_skip_all;
+my $t = t::Helper->t->setup_or_skip_all;
 
 $t->set_window_size([1024, 768]);
 

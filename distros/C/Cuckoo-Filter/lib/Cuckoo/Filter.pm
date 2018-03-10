@@ -2,10 +2,12 @@ package Cuckoo::Filter;
 
 use warnings;
 use strict;
-
-our $VERSION = "0.0.3";
+use Storable qw(nfreeze thaw);
+our $VERSION = "0.0.4";
 
 use Digest;
+
+our @serialize_keys = qw(bucket_size max_retry fingerprint_size buckets);
 
 sub new {
     my ($class, %params) = @_;
@@ -14,13 +16,13 @@ sub new {
         max_retry => 500,
         fingerprint_size => 3,
         %params,
-        item_count => 0,
     };
     $self->{digest} //= Digest->new("SHA-1");
     # init fixed array
-    $self->{buckets} = do {
+    $self->{buckets} //= do {
         my @buckets = ();
         $#buckets = $self->{bucket_size};
+        $self->{item_count} = 0;
         \@buckets
     };
 
@@ -111,6 +113,19 @@ sub count {
     return $self->{item_count};
 }
 
+sub serialize {
+    my $self = shift;
+    my %params = map { $_ => $self->{$_} } @serialize_keys;
+    return nfreeze \%params;
+}
+
+sub deserialize {
+    my ($serialized, $digest) = @_;
+    my $params = thaw($serialized);
+    $params->{digest} = $digest if $digest;
+    return Cuckoo::Filter->new(%$params);
+}
+
 1;
 __END__
 
@@ -167,6 +182,10 @@ you can inject another hash function here. e.x. fnv-1. L<Digest::base|http://sea
 =head2 C<< my $bool = $filter->delete($item); >>
 
 =head2 C<< my $count = $filter->count(); >>
+
+=head2 C<< my $serialized = $filter->serialize(); >>
+
+=head2 C<< my $filter = Cuckoo::Filter::deserialize($serialized); >>
 
 =head1 AUTHOR
 

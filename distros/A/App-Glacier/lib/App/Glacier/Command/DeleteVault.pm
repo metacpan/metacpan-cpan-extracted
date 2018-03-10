@@ -2,7 +2,7 @@ package App::Glacier::Command::DeleteVault;
 
 use strict;
 use warnings;
-use App::Glacier::Command;
+use App::Glacier::Core;
 use parent qw(App::Glacier::Command);
 use App::Glacier::HttpCatch;
 
@@ -27,11 +27,12 @@ B<glacier>(1).
 sub run {
     my $self = shift;
 
-    $self->abend(EX_USAGE, "one argument expected") unless $#_ == 0;
-    my $vault_name = shift;
+    $self->abend(EX_USAGE, "one argument expected")
+	unless $self->command_line == 1;
+    my $vault_name = ($self->command_line)[0];
     $self->glacier_eval('delete_vault', $vault_name);
     if ($self->lasterr) {
-	$self->abend(EX_FAILURE, "can't create: ", $self->last_error_message);
+	$self->abend(EX_FAILURE, "can't delete: ", $self->last_error_message);
     } else {
 	my $dir = $self->directory($vault_name);
 	$dir->drop

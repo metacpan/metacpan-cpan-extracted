@@ -1,5 +1,7 @@
 Revision history for Net-Hadoop-Oozie
 
+0.113 2018-03-06 BOOK
+
 0.112 2017-10-31 BURAK
     - Detect Kerberos with kerberos_enabled()
 

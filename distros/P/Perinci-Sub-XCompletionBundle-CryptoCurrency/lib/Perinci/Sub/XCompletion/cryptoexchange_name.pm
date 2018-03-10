@@ -1,7 +1,7 @@
 package Perinci::Sub::XCompletion::cryptoexchange_name;
 
-our $DATE = '2018-01-30'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-03-08'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -44,7 +44,7 @@ Perinci::Sub::XCompletion::cryptoexchange_name - Generate completion for cryptoc
 
 =head1 VERSION
 
-This document describes version 0.002 of Perinci::Sub::XCompletion::cryptoexchange_name (from Perl distribution Perinci-Sub-XCompletionBundle-CryptoCurrency), released on 2018-01-30.
+This document describes version 0.003 of Perinci::Sub::XCompletion::cryptoexchange_name (from Perl distribution Perinci-Sub-XCompletionBundle-CryptoCurrency), released on 2018-03-08.
 
 =head1 FUNCTIONS
 

@@ -1,0 +1,25 @@
+be able to open a record store read only
+
+ * conversion of old to new database ( command line maybe? )
+
+
+#-----------------------
+
+API documentation and testing
+
+open
+
+stow
+fetch
+delete
+
+empty
+empty_recycler
+recycle
+next_id
+has_id
+entry_count
+
+set_entry_count
+
+convert

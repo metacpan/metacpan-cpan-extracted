@@ -59,7 +59,7 @@ static int does_negate_pattern(git_attr_fnmatch *rule, git_attr_fnmatch *neg)
 	if (neg->flags & GIT_ATTR_FNMATCH_ICASE)
 		cmp = git__strncasecmp;
 	else
-		cmp = strncmp;
+		cmp = git__strncmp;
 
 	/* If lengths match we need to have an exact match */
 	if (rule->length == neg->length) {
@@ -540,6 +540,7 @@ int git_ignore_path_is_ignored(
 	git_ignores ignores;
 	unsigned int i;
 	git_attr_file *file;
+	git_dir_flag dir_flag = GIT_DIR_FLAG_UNKNOWN;
 
 	assert(repo && ignored && pathname);
 
@@ -548,7 +549,10 @@ int git_ignore_path_is_ignored(
 	memset(&path, 0, sizeof(path));
 	memset(&ignores, 0, sizeof(ignores));
 
-	if ((error = git_attr_path__init(&path, pathname, workdir, GIT_DIR_FLAG_UNKNOWN)) < 0 ||
+	if (git_repository_is_bare(repo))
+		dir_flag = GIT_DIR_FLAG_FALSE;
+
+	if ((error = git_attr_path__init(&path, pathname, workdir, dir_flag)) < 0 ||
 		(error = git_ignore__for_path(repo, path.path, &ignores)) < 0)
 		goto cleanup;
 

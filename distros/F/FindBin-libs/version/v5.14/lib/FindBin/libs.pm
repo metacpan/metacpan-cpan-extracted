@@ -1,19 +1,4 @@
 ########################################################################
-# libs_curr_pm
-#
-# use $FindBin::Bin to search for 'lib' directories and use them.
-#
-# default action is to look for dir's named "lib" and silently use
-# the lib's without exporting anything. print turns on a short 
-# message with the abs_path results, export pushes out a variable
-# (default name is the base value), verbose turns on decision output
-# and print. export takes an optional argument with the name of a
-# variable to export.
-#
-# 
-########################################################################
-
-########################################################################
 # housekeeping
 ########################################################################
 
@@ -54,7 +39,23 @@ BEGIN
 
     use Cwd qw( &abs_path &cwd );
 
-    unless( eval {abs_path '//';  abs_path cwd } )
+    if
+    (
+        # abs_path has a fixed bug dealing with infinite
+        # recursion. if upping the version of Cwd does 
+        # not fix this then the only other test I can 
+        # think of is ( -e '/.' && -e '/..' && -e '/../.' )
+
+        eval 
+        {
+            abs_path '//';
+            abs_path cwd
+        }
+    )
+    {
+        # abs_path seems clean on this platform.
+    }
+    else
     {
         # abs_path seems to be having problems,
         # fix is to stub it out.
@@ -1089,6 +1090,13 @@ For the moment, at least, this seems to work.
 =head2 Module::FromPerlVer
 
 Explains where the installed version comes from.
+
+=head2 Cwd
+
+A bug in Cwd was fixed with 3.73. That should, hopefully,
+fix the issue with FB::l croaking perl during testing.
+If it does not then I will have to modify the sanity check
+for using abs_path vs. rel2abs.
 
 =head1 AUTHOR
 

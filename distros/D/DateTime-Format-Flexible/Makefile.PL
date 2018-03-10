@@ -18,5 +18,7 @@ WriteMakefile(
     TEST_REQUIRES => {
         'Test::Simple'              => 0.44, # <-- auto added for tests
         'Test::MockTime'            => 0,
+        'Test::NoWarnings'          => 0,
+        'Test::Exception'           => 0,
     },
 );

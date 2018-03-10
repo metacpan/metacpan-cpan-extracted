@@ -18,7 +18,7 @@ my %module_build_args = (
     "Daniel Culver"
   ],
   "dist_name" => "Locale-Country-OFAC",
-  "dist_version" => "1.2.0",
+  "dist_version" => "1.3.0",
   "license" => "perl",
   "module_name" => "Locale::Country::OFAC",
   "recommends" => {},
@@ -26,7 +26,6 @@ my %module_build_args = (
   "requires" => {
     "Carp" => 0,
     "Exporter" => 0,
-    "List::Util" => 0,
     "Readonly" => "1.04",
     "perl" => "5.006"
   },
@@ -38,7 +37,6 @@ my %module_build_args = (
     "Readonly" => "1.04",
     "Test::Exception" => 0,
     "Test::More" => 0,
-    "Test::Most" => 0,
     "perl" => "5.006"
   }
 );
@@ -52,7 +50,6 @@ my %fallback_build_requires = (
   "Readonly" => "1.04",
   "Test::Exception" => 0,
   "Test::More" => 0,
-  "Test::Most" => 0,
   "perl" => "5.006"
 );
 

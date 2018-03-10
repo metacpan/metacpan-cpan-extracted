@@ -4,7 +4,7 @@
       "Petr Pajas (pajas@matfyz.cz)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -42,6 +42,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.8.5",
-   "x_serialization_backend" : "JSON::PP version 2.93"
+   "version" : "v1.8.6",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

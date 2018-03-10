@@ -35,9 +35,9 @@ requires:
   Test::Pod::Coverage: '0'
   Text::Trim: '0'
   Time::HiRes: '0'
-  URI: '0'
+  URI: '1.61'
   constant: '0'
 resources:
   repository: https://github.com/juliensobrier/Net-Google-SafeBrowsing4.git
-version: '0.6'
+version: '0.7'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -20,7 +20,7 @@
 
 use 5.014_001;
 
-package Term::CLI::Role::HelpText  0.03002 {
+package Term::CLI::Role::HelpText  0.04004 {
 
 use Modern::Perl;
 
@@ -79,8 +79,8 @@ sub get_options_summary {
                 $short_arg = "I<$1>";
             }
             elsif ($spec =~ /:(.*)$/) {
-                $long_arg = "[=<$1>]";
-                $short_arg = "[<$1>]";
+                $long_arg = "[=I<$1>]";
+                $short_arg = "[I<$1>]";
             }
             for my $optname (split(qr/\|/, $spec =~ s/^([^!+=:]+).*/$1/r)) {
                 if (length $optname == 1) {
@@ -126,13 +126,13 @@ sub usage_text {
     if ($args{with_arguments} and $self->has_arguments) {
         my @args;
         for my $arg ($self->arguments) {
-            my $name = 'I<'.$arg->name.'>';
-            my $str = $name;
+            #my $name = 'I<'.$arg->name.'>';
+            my $name = $arg->name;
+            my $str = $arg->max_occur > 1 ? "I<${name}1>" : "I<$name>";
 
             if ($arg->min_occur > 1) {
-                $str .= "1";
                 for my $n (2..$arg->min_occur) {
-                    $str .= " ${name}$n";
+                    $str .= " I<${name}$n>";
                 }
             }
 
@@ -140,15 +140,22 @@ sub usage_text {
                 $str .= ' ...';
             }
             elsif ($arg->max_occur == $arg->min_occur + 1) {
-                $str .= " ${name}".$arg->max_occur if $arg->max_occur > 1;
+                $str .= " [I<${name}".$arg->max_occur.">]" if $arg->max_occur > 1;
+            }
+            elsif ($arg->max_occur == 2 && $arg->min_occur <= 1) {
+                $str .= " [I<${name}".$arg->max_occur.">]";
             }
             elsif ($arg->max_occur > $arg->min_occur) {
-                $str .= "1" if $arg->min_occur <= 1;
-                $str .= " ... $name".$arg->max_occur;
+                $str .= ' ['
+                        . "I<$name".($arg->min_occur+1).">"
+                        . ' ... '
+                        . "I<$name".$arg->max_occur.">"
+                        . ']'
+                        ;
             }
 
             if ($arg->min_occur <= 0) {
-                $name = "[$name]";
+                $str = "[$str]";
             }
             push @args, $str;
         }
@@ -164,10 +171,7 @@ sub usage_text {
         }
         else {
             $sub_commands_text
-                = join('|', map { 'B<'.$_->name.'>' } @sub_commands);
-            if ($sub_commands_text =~ /\|/) {
-                $sub_commands_text = "{$sub_commands_text}";
-            }
+                = '{'.join('|', map { 'B<'.$_->name.'>' } @sub_commands).'}';
         }
         $usage_suffix .= ' ' if length $usage_suffix;
         $usage_suffix .= $sub_commands_text;
@@ -175,10 +179,7 @@ sub usage_text {
 
     $usage_suffix = " $usage_suffix" if length $usage_suffix;
 
-    my $opts = '';
-    if ($args{with_options}) {
-        $opts = $self->get_options_summary( with_options => $args{with_options} );
-    }
+    my $opts = $self->get_options_summary( with_options => $args{with_options} );
 
     if (length $opts) {
         return "$usage_prefix $opts$usage_suffix";
@@ -203,7 +204,7 @@ Term::CLI::Role::HelpText - Role for generating help text in Term::CLI
 
 =head1 VERSION
 
-version 0.03002
+version 0.04004
 
 =head1 SYNOPSIS
 

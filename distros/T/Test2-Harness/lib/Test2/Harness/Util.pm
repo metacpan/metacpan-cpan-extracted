@@ -2,7 +2,7 @@ package Test2::Harness::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.001055';
+our $VERSION = '0.001057';
 
 use Carp qw/confess/;
 use Importer Importer => 'import';
@@ -19,7 +19,16 @@ our @EXPORT_OK = qw{
     read_file
     write_file
     write_file_atomic
+    hub_truth
 };
+
+sub hub_truth {
+    my ($f) = @_;
+
+    return $f->{hubs}->[0] if $f->{hubs} && @{$f->{hubs}};
+    return $f->{trace} if $f->{trace};
+    return {};
+}
 
 sub fqmod {
     my ($prefix, $input) = @_;

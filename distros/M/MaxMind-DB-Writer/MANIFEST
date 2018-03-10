@@ -17,6 +17,8 @@ c/ppport.h
 c/tree.c
 c/tree.h
 c/uthash.h
+c/windows_mman.c
+c/windows_mman.h
 cpanfile
 dev-bin/regen-prototypes.pl
 dev-bin/uncrustify-all.sh

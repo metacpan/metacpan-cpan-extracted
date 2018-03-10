@@ -1,5 +1,5 @@
 package Net::Hadoop::Oozie::Constants;
-$Net::Hadoop::Oozie::Constants::VERSION = '0.112';
+$Net::Hadoop::Oozie::Constants::VERSION = '0.113';
 use 5.010;
 use strict;
 use warnings;
@@ -163,38 +163,23 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
-=head1 NAME
-
-Net::Hadoop::Oozie::Constants
-
-=head1 VERSION
-
-version 0.112
-
-=head1 SYNOPSIS
-
-    use Net::Hadoop::Constants;
-    # TODO
-
-=head1 DESCRIPTION
-
-Part of the Perl Oozie interface.
+=encoding utf8
 
 =head1 NAME
 
 Net::Hadoop::Oozie::Constants - Constants for Oozie
 
-=head1 AUTHOR
+=head1 VERSION
 
-David Morel <david.morel@amakuru.net>
+version 0.113
 
-=head1 COPYRIGHT AND LICENSE
+=head1 DESCRIPTION
 
-This software is copyright (c) 2015 by David Morel & Booking.com.
+Part of the Perl Oozie interface.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+=head1 SYNOPSIS
+
+    use Net::Hadoop::Constants;
+    # TODO
 
 =cut

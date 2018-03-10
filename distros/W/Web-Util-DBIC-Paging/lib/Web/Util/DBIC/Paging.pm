@@ -1,8 +1,5 @@
 package Web::Util::DBIC::Paging;
-{
-  $Web::Util::DBIC::Paging::VERSION = '0.001003';
-}
-
+$Web::Util::DBIC::Paging::VERSION = '0.001004';
 # ABSTRACT: Easily page, search, and sort DBIx::Class::ResultSets in a web context
 
 use strict;
@@ -17,6 +14,8 @@ use Sub::Exporter::Progressive -setup => {
    },
 };
 
+my $error = 'object passed is not a ::ResultSet, was a result passed thanks to wantarray?';
+
 sub page_and_sort {
    my ($type, $foo, $rs, $config) = @_;
    $rs = sort_rs($type, $foo, $rs);
@@ -25,6 +24,8 @@ sub page_and_sort {
 
 sub paginate {
    my ($type, $foo, $resultset, $config) = @_;
+
+   die $error unless $resultset->isa('DBIx::Class::ResultSet');
 
    $config ||= {};
 
@@ -44,6 +45,9 @@ sub paginate {
 
 sub search {
    my ($type, $foo, $rs, $config) = @_;
+
+   die $error unless $rs->isa('DBIx::Class::ResultSet');
+
    if ($rs->can('controller_search')) {
       my $q = _params_for($type, $foo);
       return $rs->controller_search($q);
@@ -54,6 +58,9 @@ sub search {
 
 sub sort_rs {
    my ($type, $foo, $rs) = @_;
+
+   die $error unless $rs->isa('DBIx::Class::ResultSet');
+
    if ($rs->can('controller_sort')) {
       my $q = _params_for($type, $foo);
       return $rs->controller_sort($q);
@@ -64,6 +71,8 @@ sub sort_rs {
 
 sub simple_deletion {
    my ($type, $foo, $rs) = @_;
+
+   die $error unless $rs->isa('DBIx::Class::ResultSet');
 
    my $params = _params_for($type, $foo);
    # param names should be configurable
@@ -89,6 +98,8 @@ sub simple_deletion {
 
 sub simple_search {
    my ($type, $foo, $rs, $config) = @_;
+
+   die $error unless $rs->isa('DBIx::Class::ResultSet');
 
    $config ||= {};
 
@@ -120,6 +131,8 @@ sub simple_search {
 
 sub simple_sort {
    my ($type, $foo, $rs) = @_;
+
+   die $error unless $rs->isa('DBIx::Class::ResultSet');
 
    my $params = _params_for($type, $foo);
    my %order_by;
@@ -168,13 +181,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Web::Util::DBIC::Paging - Easily page, search, and sort DBIx::Class::ResultSets in a web context
 
 =head1 VERSION
 
-version 0.001003
+version 0.001004
 
 =head1 SYNOPSIS
 
@@ -243,7 +258,7 @@ for a plain hashref.
 
 =head2 C<page_and_sort>
 
- my $result = page_and_sort(c => $c, $c->model('DB::Foo'));
+ my $result_rs  = page_and_sort(c => $c, $c->model('DB::Foo'));
 
 This is a helper method that will first L<sort|/sort_rs> your data and
 then L</paginate> it.  Valid configuration parameters are documented for each
@@ -251,7 +266,7 @@ of those methods.
 
 =head2 paginate
 
- my $result = paginate(c => $c, $c->model('DB::Foo'));
+ my $result_rs  = paginate(c => $c, $c->model('DB::Foo'));
 
 Paginates the passed in resultset based on the following parameters:
 
@@ -276,22 +291,16 @@ method look something like the following:
 
  # Base search dispatcher, defined in MyApp::Schema::ResultSet
  sub _build_search {
-    my $self           = shift;
-    my $dispatch_table = shift;
-    my $q              = shift;
-
-    my %search = ();
-    my %meta   = ();
+    my ($rs, $dispatch_table, $q) = @_;
 
     foreach ( keys %{$q} ) {
        if ( my $fn = $dispatch_table->{$_} and $q->{$_} ) {
-          my ( $tmp_search, $tmp_meta ) = $fn->( $q->{$_} );
-          %search = ( %search, %{$tmp_search||{}} );
-          %meta   = ( %meta,   %{$tmp_meta||{}} );
+          my ( $search, $meta ) = $fn->( $q->{$_} );
+          $rs = $rs->search($search, $meta);
        }
     }
 
-    return $self->search(\%search, \%meta);
+    return $rs;
  }
 
  # search method in specific resultset
@@ -315,17 +324,14 @@ L</simple_search> instead.
 
 =head2 sort_rs
 
- my $result = sort_rs(c => $c, $c->model('DB::Foo'));
+ my $result_rs  = sort_rs(c => $c, $c->model('DB::Foo'));
 
 Exactly the same as L</search>, except calls C<controller_sort> or L</simple_sort>.
 Here is how I use it:
 
  # Base sort dispatcher, defined in MyApp::Schema::ResultSet
  sub _build_sort {
-    my $self = shift;
-    my $dispatch_table = shift;
-    my $default = shift;
-    my $q = shift;
+    my ($self, $dispatch_table, $default, $q) = @_;
 
     my %search = ();
     my %meta   = ();
@@ -368,7 +374,7 @@ Here is how I use it:
 
 =head2 simple_deletion
 
- simple_deletion(c => $c, $c->model('DB::Foo'));
+ my $deleted_ids = simple_deletion(c => $c, $c->model('DB::Foo'));
 
 Deletes from the passed in resultset based on the sole CGI parameter,
 C<to_delete>, which must be a list of primary keys.
@@ -411,7 +417,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

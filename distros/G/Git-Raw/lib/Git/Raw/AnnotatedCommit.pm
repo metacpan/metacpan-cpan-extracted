@@ -1,5 +1,5 @@
 package Git::Raw::AnnotatedCommit;
-$Git::Raw::AnnotatedCommit::VERSION = '0.75';
+$Git::Raw::AnnotatedCommit::VERSION = '0.78';
 use strict;
 use warnings;
 use overload
@@ -14,7 +14,7 @@ Git::Raw::AnnotatedCommit - Git note class
 
 =head1 VERSION
 
-version 0.75
+version 0.78
 
 =head1 DESCRIPTION
 

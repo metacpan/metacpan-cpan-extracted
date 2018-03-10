@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/CryptoCurrencyUtils/list_coins
-# and generated automatically using Perinci::CmdLine::Gen version 0.484
+# and generated automatically using Perinci::CmdLine::Gen version 0.485
 
-our $DATE = '2018-02-05'; # DATE
+our $DATE = '2018-03-08'; # DATE
 our $DIST = 'App-CryptoCurrencyUtils'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ list-coins - List cryptocurrency coins
 
 =head1 VERSION
 
-This document describes version 0.010 of list-coins (from Perl distribution App-CryptoCurrencyUtils), released on 2018-02-05.
+This document describes version 0.011 of list-coins (from Perl distribution App-CryptoCurrencyUtils), released on 2018-03-08.
 
 =head1 SYNOPSIS
 
@@ -53,6 +53,24 @@ its list from L<https://coinmarketcap.com/>.
 =head1 OPTIONS
 
 C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--codes>
+
+Only list codes.
+
+=item B<--names>
+
+Only list names.
+
+=item B<--safenames>
+
+Only list safenames.
+
+=back
 
 =head2 Output options
 

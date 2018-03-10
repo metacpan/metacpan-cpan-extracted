@@ -1,7 +1,7 @@
 package Dist::Inkt::Role::ProcessDOAP;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.100';
+our $VERSION   = '0.110';
 
 use Moose::Role;
 use List::Util 'uniq';

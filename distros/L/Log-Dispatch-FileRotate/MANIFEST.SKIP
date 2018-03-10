@@ -15,3 +15,5 @@ error_log
 ^log\.conf$
 ^myerrs\.
 ^\.travis.yml$
+^\.appveyor\.cmd$
+^\.appveyor\.yml$

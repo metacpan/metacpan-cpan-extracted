@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder::XLS;
-$Data::TableReader::Decoder::XLS::VERSION = '0.005';
+$Data::TableReader::Decoder::XLS::VERSION = '0.006';
 use Moo 2;
 use Carp;
 extends 'Data::TableReader::Decoder::Spreadsheet';
@@ -44,12 +44,22 @@ Data::TableReader::Decoder::XLS - Access sheets/rows of a Microsoft Excel '97 wo
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 
 See L<Data::TableReader::Decoder::Spreadsheet>.
 This subclass simply parses the input using an instance of L<Spreadsheet::ParseExcel>.
+
+=head1 CLASS METHODS
+
+=head2 default_xls_module
+
+Initializes C<@Data::TableReader::Decoder::XLS::default_xls_module> to the first
+available module in the list of C<@Data::TableReader::Decoder::XLS::xls_probe_modules>
+and returns the cached value every time afterward.
+
+Those variables can be modified as needed, if you have other XLS modules available.
 
 =head1 AUTHOR
 
@@ -57,7 +67,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Michael Conrad.
+This software is copyright (c) 2018 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

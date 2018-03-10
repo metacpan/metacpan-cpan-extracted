@@ -1,5 +1,5 @@
 package App::CSE::Lucy::Highlight::Highlighter;
-$App::CSE::Lucy::Highlight::Highlighter::VERSION = '0.012';
+$App::CSE::Lucy::Highlight::Highlighter::VERSION = '0.013';
 use base qw/Lucy::Highlight::Highlighter/;
 
 use strict;

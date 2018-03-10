@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 # ABSTRACT: Basic controller for displaying content
 
 #pod =head1 SYNOPSIS
@@ -43,6 +43,36 @@ our $VERSION = '0.021';
 #pod website. Any user agent that requests JSON will get JSON instead of
 #pod HTML. For full details on how JSON clients are detected, see
 #pod L<Mojolicious::Guides::Rendering/Content negotiation>.
+#pod
+#pod =head1 DIAGNOSTICS
+#pod
+#pod =over
+#pod
+#pod =item Page not found
+#pod
+#pod If you get a C<404 Not Found> response or Mojolicious's "Page not found... yet!" page,
+#pod it could be from one of a few reasons:
+#pod
+#pod =over
+#pod
+#pod =item No route with the given path was found
+#pod
+#pod Check to make sure that your routes match the URL.
+#pod
+#pod =item Configured template not found
+#pod
+#pod Make sure the template is configured and named correctly and the correct format
+#pod and renderer are being used.
+#pod
+#pod =back
+#pod
+#pod The Mojolicious debug log will have more information. Make sure you are
+#pod logging at C<debug> level by running in C<development> mode (the
+#pod default), or setting the C<MOJO_LOG_LEVEL> environment variable to
+#pod C<debug>. See L<MODE in the Mojolicious
+#pod tutorial|Mojolicious::Guides::Tutorial/Mode> for more information.
+#pod
+#pod =back
 #pod
 #pod =head1 SEE ALSO
 #pod
@@ -261,6 +291,14 @@ sub get {
 #pod that fields can be pre-filled with initial data or new data by using GET
 #pod query parameters.
 #pod
+#pod This method is protected by L<Mojolicious's Cross-Site Request Forgery
+#pod (CSRF) protection|Mojolicious::Guides::Rendering/Cross-site request
+#pod forgery>. CSRF protection prevents other sites from tricking your users
+#pod into doing something on your site that they didn't intend, such as
+#pod editing or deleting content. You must add a C<< <%= csrf_field %> >> to
+#pod your form in order to delete an item successfully. See
+#pod L<Mojolicious::Guides::Rendering/Cross-site request forgery>.
+#pod
 #pod Displaying a form could be done as a separate route using the C<yancy#get>
 #pod method, but with more code:
 #pod
@@ -334,17 +372,31 @@ sub set {
         );
     }
 
+    if ( $c->accepts( 'html' ) && $c->validation->csrf_protect->has_error( 'csrf_token' ) ) {
+        $c->app->log->error( 'CSRF token validation failed' );
+        return $c->render(
+            status => 400,
+            item => $c->yancy->get( $coll_name => $id ),
+            errors => [
+                {
+                    message => 'CSRF token invalid.',
+                },
+            ],
+        );
+    }
+
     my $data = $c->req->params->to_hash;
-    my $item;
-    if ( $id ) {
+    delete $data->{csrf_token};
+    my $update = $id ? 1 : 0;
+    if ( $update ) {
         eval { $c->yancy->set( $coll_name, $id, $data ) };
-        $item = $c->yancy->get( $coll_name, $id );
     }
     else {
-        $item = eval { $c->yancy->create( $coll_name, $data ) };
+        $id = eval { $c->yancy->create( $coll_name, $data ) };
     }
 
     if ( my $errors = $@ ) {
+        my $item = $c->yancy->get( $coll_name, $id );
         $c->res->code( 400 );
         return $c->respond_to(
             json => { json => { errors => $errors } },
@@ -352,9 +404,10 @@ sub set {
         );
     }
 
+    my $item = $c->yancy->get( $coll_name, $id );
     return $c->respond_to(
         json => {
-            status => $id ? 200 : 201,
+            status => $update ? 200 : 201,
             json => $item,
         },
         html => sub {
@@ -418,6 +471,14 @@ sub set {
 #pod
 #pod =back
 #pod
+#pod This method is protected by L<Mojolicious's Cross-Site Request Forgery
+#pod (CSRF) protection|Mojolicious::Guides::Rendering/Cross-site request
+#pod forgery>.  CSRF protection prevents other sites from tricking your users
+#pod into doing something on your site that they didn't intend, such as
+#pod editing or deleting content.  You must add a C<< <%= csrf_field %> >> to
+#pod your form in order to delete an item successfully. See
+#pod L<Mojolicious::Guides::Rendering/Cross-site request forgery>.
+#pod
 #pod =cut
 
 sub delete {
@@ -442,6 +503,19 @@ sub delete {
                 },
             },
             html => { item => $item },
+        );
+    }
+
+    if ( $c->accepts( 'html' ) && $c->validation->csrf_protect->has_error( 'csrf_token' ) ) {
+        $c->app->log->error( 'CSRF token validation failed' );
+        return $c->render(
+            status => 400,
+            item => $c->yancy->get( $coll_name => $id ),
+            errors => [
+                {
+                    message => 'CSRF token invalid.',
+                },
+            ],
         );
     }
 
@@ -472,7 +546,7 @@ Yancy::Controller::Yancy - Basic controller for displaying content
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -690,6 +764,14 @@ L<Mojolicious::Plugin::TagHelpers> for more information. This also means
 that fields can be pre-filled with initial data or new data by using GET
 query parameters.
 
+This method is protected by L<Mojolicious's Cross-Site Request Forgery
+(CSRF) protection|Mojolicious::Guides::Rendering/Cross-site request
+forgery>. CSRF protection prevents other sites from tricking your users
+into doing something on your site that they didn't intend, such as
+editing or deleting content. You must add a C<< <%= csrf_field %> >> to
+your form in order to delete an item successfully. See
+L<Mojolicious::Guides::Rendering/Cross-site request forgery>.
+
 Displaying a form could be done as a separate route using the C<yancy#get>
 method, but with more code:
 
@@ -775,6 +857,44 @@ The following stash values are set by this method:
 
 The item that will be deleted. If displaying the form again after the item is deleted,
 this will be C<undef>.
+
+=back
+
+This method is protected by L<Mojolicious's Cross-Site Request Forgery
+(CSRF) protection|Mojolicious::Guides::Rendering/Cross-site request
+forgery>.  CSRF protection prevents other sites from tricking your users
+into doing something on your site that they didn't intend, such as
+editing or deleting content.  You must add a C<< <%= csrf_field %> >> to
+your form in order to delete an item successfully. See
+L<Mojolicious::Guides::Rendering/Cross-site request forgery>.
+
+=head1 DIAGNOSTICS
+
+=over
+
+=item Page not found
+
+If you get a C<404 Not Found> response or Mojolicious's "Page not found... yet!" page,
+it could be from one of a few reasons:
+
+=over
+
+=item No route with the given path was found
+
+Check to make sure that your routes match the URL.
+
+=item Configured template not found
+
+Make sure the template is configured and named correctly and the correct format
+and renderer are being used.
+
+=back
+
+The Mojolicious debug log will have more information. Make sure you are
+logging at C<debug> level by running in C<development> mode (the
+default), or setting the C<MOJO_LOG_LEVEL> environment variable to
+C<debug>. See L<MODE in the Mojolicious
+tutorial|Mojolicious::Guides::Tutorial/Mode> for more information.
 
 =back
 

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.50
+    Version 0.51
 
 SYNOPSIS
 
@@ -22,7 +22,7 @@ SYNOPSIS
     
         $firefox->find('//button[@name="lucky"]')->click();
     
-        $firefox->await(sub { $firefox->find_partial('Download') })->click();
+        $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click()
 
 DESCRIPTION
 
@@ -299,6 +299,33 @@ SUBROUTINES/METHODS
         $element->type('Test::More');
         $element->property('value') eq 'Test::More' or die "This property should have changed!";
 
+ interactive
+
+    returns true if document.readyState === "interactive" or if loaded is
+    true
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+        $firefox->find_id('search_input')->type('Type::More');
+        $firefox->find('//button[@name="lucky"]')->click();
+        while(!$firefox->interactive()) {
+            # redirecting to Test::More page
+        }
+
+ loaded
+
+    returns true if document.readyState === "complete"
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+        $firefox->find_id('search_input')->type('Type::More');
+        $firefox->find('//button[@name="lucky"]')->click();
+        while(!$firefox->loaded()) {
+            # redirecting to Test::More page
+        }
+
  mime_types
 
     returns a list of MIME types that will be downloaded by firefox and
@@ -327,7 +354,7 @@ SUBROUTINES/METHODS
     
         $firefox->find('//button[@name="lucky"]')->click();
     
-        $firefox->await(sub { $firefox->find_partial('Download') })->click();
+        $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click()
     
         while(!$firefox->downloads()) { sleep 1 }
     
@@ -347,7 +374,7 @@ SUBROUTINES/METHODS
     
         $firefox->find('//button[@name="lucky"]')->click();
     
-        $firefox->await(sub { $firefox->find_partial('Download') })->click();
+        $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click()
     
         while(!$firefox->downloads()) { sleep 1 }
     

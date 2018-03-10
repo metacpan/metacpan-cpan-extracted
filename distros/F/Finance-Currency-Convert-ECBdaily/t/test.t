@@ -22,5 +22,5 @@ use Test::More tests => 2;
  
 use_ok 'Finance::Currency::Convert::ECBdaily';
  
-is Finance::Currency::Convert::ECBdaily::convert(1, 'EUR', 'USD'), 1.2307, 'good answer';
+is Finance::Currency::Convert::ECBdaily::convert(1, 'EUR', 'EUR'), 1, 'good answer';
 

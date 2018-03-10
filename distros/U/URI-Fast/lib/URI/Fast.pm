@@ -1,9 +1,13 @@
 package URI::Fast;
+$URI::Fast::VERSION = '0.09';
 # ABSTRACT: A fast(er) URI parser
-$URI::Fast::VERSION = '0.06';
+
+use utf8;
+use strict;
+use warnings;
+no strict 'refs';
 
 use Carp;
-use URI::Encode::XS qw(uri_encode);
 use Inline C => 'lib/uri_fast.c';
 
 require Exporter;
@@ -13,51 +17,48 @@ our @EXPORT_OK = qw(uri uri_split);
 use overload '""' => sub{ $_[0]->to_string };
 
 sub uri ($) {
-  my $self = URI::Fast->new($_[0]);
-  $self->set_scheme('file') unless $self->get_scheme;
+  my $self = URI::Fast->new($_[0] // '');
+  $self->set_scheme('file', 0) unless $self->get_scheme;
   $self;
 }
 
-# Regexes used to validate characters present in string when attributes are
-# updated.
-my %LEGAL = (
-  scheme => qr/^[a-zA-Z][-.+a-zA-Z0-9]*$/,
-  port   => qr/^[0-9]+$/,
-);
-
 # Build a simple accessor for basic attributes
-foreach my $attr (qw(scheme auth query frag host port)) {
+foreach my $attr (qw(scheme usr pwd host port frag)) {
   my $s = "set_$attr";
   my $g = "get_$attr";
 
   *{__PACKAGE__ . "::$attr"} = sub {
     if (@_ == 2) {
-      if (exists $LEGAL{$attr} && $_[1] !~ $LEGAL{$attr}) {
-        croak "illegal chars in $attr";
-      }
-
-      $_[0]->$s( $_[1] );
+      $_[0]->$s($_[1], 0);
     }
 
-    $_[0]->$g();
+    if (defined wantarray) {
+      # It turns out that it is faster to call decode here than directly in
+      # url_fast.c due to the overhead of decoding utf8 and flipping the
+      # internal utf8 switch.
+      return decode( $_[0]->$g() );
+    }
   };
 }
 
-foreach my $attr (qw(usr pwd)) {
-  my $s = "set_$attr";
-  my $g = "get_$attr";
+sub auth {
+  my ($self, $val) = @_;
 
-  *{__PACKAGE__ . "::$attr"} = sub {
-    if (@_ == 2) {
-      if (exists $LEGAL{$attr} && $_[1] !~ $LEGAL{$attr}) {
-        croak "illegal chars in $attr";
-      }
-
-      $_[0]->$s( uri_encode( $_[1] ) );
+  if (@_ == 2) {
+    if (ref $val) {
+      $self->set_auth('', 1);
+      $self->set_usr($val->{usr}   // '', 1);
+      $self->set_pwd($val->{pwd}   // '', 1);
+      $self->set_host($val->{host} // '', 1);
+      $self->set_port($val->{port} // '', 0);
     }
+    else {
+      $self->set_auth($val, 0);
+    }
+  }
 
-    uri_decode( $_[0]->$g() );
-  };
+  return $self->get_auth
+    if defined wantarray;
 }
 
 # Path is slightly more complicated as it can parse the path
@@ -65,53 +66,64 @@ sub path {
   my ($self, $val) = @_;
 
   if (@_ == 2) {
-    $self->set_path(ref $val ? '/' . join('/', @$val) : $val);
+    $val = '/' . join '/', @$val if ref $val;
+    $self->set_path($val, 0);
   }
 
   if (wantarray) {
-    return $self->split_path;
+    return @{ $self->split_path };
   }
-  else {
-    $self->get_path;
+  elsif (defined wantarray) {
+    return decode($self->get_path);
   }
+}
+
+# Queries may be set with either a string or a hash ref
+sub query {
+  my ($self, $val) = @_;
+
+  if (@_ == 2) {
+    if (ref $val) {
+      $self->set_query('', 1);
+      $self->param($_, $val->{$_})
+        foreach keys %$val;
+    }
+    else {
+      $self->set_query($val, 0);
+    }
+  }
+
+  return unless defined(wantarray);         # void context
+  return $self->get_query unless wantarray; # scalar context
+  return %{ $self->query_hash };            # list context
+}
+
+sub query_keys {
+  keys %{ $_[0]->get_query_keys };
 }
 
 sub param {
   my ($self, $key, $val) = @_;
-  $key = uri_encode($key);
 
   if (@_ == 3) {
-    my $query = $self->get_query;
+    $val = ref     $val ? $val
+         : defined $val ? [$val]
+         : [];
 
-    # Wipe out current values for $key
-    $query =~ s/\b$key=[^&#]+&?//g;
-    $query =~ s/^&//;
-    $query =~ s/&$//;
-
-    # If $val is undefined, the parameter is deleted
-    if (defined $val) {
-      # Encode and attach values for param to query string
-      foreach (ref $val ? @$val : ($val)) {
-        $query .= '&' if $query;
-        $query .= $key . '=' . uri_encode($_);
-      }
-    }
-
-    $self->set_query($query);
+    $self->set_param($key, $val);
   }
 
-  my @params = $_[0]->get_param(uri_encode($_[1]))
-    or return;
+  # No return value in void context
+  return unless defined(wantarray) && $key;
 
-  return @params == 1
-    ? uri_decode($params[0])
-    : [ map{ uri_decode($_) } @params ];
+  my $params = $self->get_param($key);
+  return unless @$params;
+
+  return wantarray     ? @$params
+       : @$params == 1 ? $params->[0]
+                       : $params;
 }
 
-sub uri_decode ($) {
-  $_[0] =~ tr/+/ /;
-  URI::Encode::XS::uri_decode($_[0]);
-}
 
 1;
 
@@ -127,7 +139,7 @@ URI::Fast - A fast(er) URI parser
 
 =head1 VERSION
 
-version 0.06
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -148,28 +160,19 @@ version 0.06
 
 =head1 DESCRIPTION
 
-L<URI> is an excellent module. It is battle-tested, robust, and at this point
-handles nearly every edge case imaginable. It is often the case, however, that
-one just needs to grab the path string out of a URL. Or validate some query
-parameters. Et cetera. In those cases, L<URI> may seem like overkill and may,
-in fact, be much slower than a simpler solution, like L<URI::Split>.
-Unfortunately, L<URI::Split> is so bare bones that it does not even parse the
-authorization section or access or update query parameters.
+C<URI::Fast> is a faster alternative to L<URI>. It is written in C and provides
+basic parsing and modification of a URI.
 
-C<URI::Fast> aims to bridge the gap between the two extremes. It provides fast
-parsing without many of the frills of L<URI> while at the same time providing
-I<slightly> more than L<URI::Split> by returning an object with methods to
-access and update portions of the URI.
+L<URI> is an excellent module; it is battle-tested, robust, and handles many
+edge cases. As a result, it is rather slower than it would otherwise be for
+more trivial cases, such as inspecting the path or updating a single query
+parameter.
 
 =head1 EXPORTED SUBROUTINES
 
 =head2 uri
 
-Accepts a string, minimally parses it, and returns a L<URI::Fast> object.
-
-When initially created, only the scheme, authorization section, path, query
-string, and fragment are split out. Thesea are broken down in a lazy fashion
-as needed when a related attribute accessor is called.
+Accepts a URI string, minimally parses it, and returns a L<URI::Fast> object.
 
 =head1 ATTRIBUTES
 
@@ -178,7 +181,7 @@ the URI segment to be both retrieved and modified.
 
 =head2 scheme
 
-Defaults to C<file> if not present in the uri string.
+Defaults to C<file> if not present in the URI string.
 
 =head2 auth
 
@@ -189,8 +192,10 @@ port number:
   someone@hostname.com
   someone:secret@hostname.com:1234
 
-Accessing the following attributes may incur a small amount of extra overhead
-the first time they are called and the auth string is parsed.
+Setting this field may be done with a string (see the note below about
+L</ENCODING>) or a hash reference of individual field names (C<usr>, C<pwd>,
+C<host>, and C<sport>). In both cases, the existing values are completely
+replaced by the new values and any values not present are deleted.
 
 =head3 usr
 
@@ -226,19 +231,82 @@ The path may also be updated using either a string or an array ref of segments:
 
 The complete query string. Does not include the leading C<?>.
 
+=head3 query_keys
+
+Does a fast scan of the query string and returns a list of unique parameter
+names that appear in the query string.
+
+=head3 query_hash
+
+Scans the query string and returns a hash ref of key/value pairs. Values are
+returned as an array ref, as keys may appear multiple times.
+
 =head3 param
 
-Gets or sets a parameter value. The first time this is called, it incurs the
-overhead of parsing and decoding the query string.
+Gets or sets a parameter value. Setting a parameter value will replace existing
+values completely; the L</query> string will also be updated. Setting a
+parameter to C<undef> deletes the parameter from the URI.
 
-If the key appears more than once in the query string, the value returned will
-be an array ref of each of its values.
+  $uri->param('foo', ['bar', 'baz']);
+  $uri->param('fnord', 'slack');
 
-Setting the parameter will update the L</query> string.
+  my $value_scalar    = $uri->param('fnord'); # fnord appears once
+  my $value_array_ref = $uri->param('foo');   # foo appears twice
+  my @value_list      = $uri->param('foo');   # list context always yields a list
+
+  # Delete 'foo'
+  $uri->param('foo', undef);
 
 =head2 frag
 
 The fragment section of the URI, excluding the leading C<#>.
+
+=head1 ENCODING
+
+C<URI::Fast> tries to do the right thing in most cases with regard to reserved
+and non-ASCII characters. C<URI::Fast> will fully encode reserved and non-ASCII
+characters when setting C<individual> values. However, the "right thing" is a
+bit ambiguous when it comes to setting compound fields like L</auth>, L</path>,
+and L</query>.
+
+When setting these fields with a string value, reserved characters are expected
+to be present, and are therefore accepted as-is. However, any non-ASCII
+characters will be percent-encoded (since they are unambiguous and there is no
+risk of double-encoding them).
+
+  $uri->auth('someone:secret@Ῥόδος.com:1234');
+  print $uri->auth; # "someone:secret@%E1%BF%AC%CF%8C%CE%B4%CE%BF%CF%82.com:1234"
+
+On the other hand, when setting these fields with a I<reference> value, each
+field is fully percent-encoded:
+
+  $uri->auth({usr => 'some one', host => 'somewhere.com'});
+  print $uri->auth; # "some%20one@somewhere.com"
+
+The same goes for return values. For compound fields returning a string,
+non-ASCII characters are decoded but reserved characters are not. When
+returning a list or reference of the deconstructed field, individual values are
+decoded of both reserved and non-ASCII characters.
+
+=head2 encode
+
+Percent-encodes a string for use in a URI. By default, both reserved and UTF-8
+chars (C<! * ' ( ) ; : @ & = + $ , / ? # [ ] %>) are encoded.
+
+A second (optional) parameter provides a string containing any characters the
+caller does not wish to be decoded. An empty string will result in the default
+behavior described above.
+
+For example, to encode all characters in a query-like string I<except> for
+those used by the query:
+
+  my $encoded = URI::Fast::encode($some_string, '?&=');
+
+=head2 decode
+
+Decodes a percent-encoded string.
+
+  my $decoded = URI::Fast::decode($some_string);
 
 =head1 SPEED
 
@@ -257,6 +325,12 @@ The de facto standard.
 Written in C++ and purportedly very fast, but appears to only support Linux.
 
 =back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to L<ZipRecruiter|https://www.ziprecruiter.com> for encouraging their
+employees to contribute back to the open source ecosystem. Without their
+dedication to quality software development this distribution would not exist.
 
 =head1 AUTHOR
 

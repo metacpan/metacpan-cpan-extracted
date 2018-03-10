@@ -1,21 +1,21 @@
 {
    "abstract" : "check a remote host for reachability",
    "author" : [
-      "Steve Peters <steve@fisharerojo.org>",
       "Reini Urban <rurban@cpan.org>",
+      "Steve Peters <steve@fisharerojo.org>",
       "Matthew Musgrove <mr.muskrat@gmail.com>",
       "Karl Williamson <khw@cpan.org>",
       "Brian Fraser <fraserbn@gmail.com>",
       "Mark Gardner <mjgardner@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 8.3004, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Net-Ping",
    "no_index" : {
@@ -27,8 +27,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Text::Template" : "1.10"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -46,12 +45,10 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "repository" : {
-         "type" : "git",
-         "url" : "git://github.com/rurban/net-ping.git",
-         "web" : "https://github.com/rurban/net-ping"
-      }
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
    },
-   "version" : "2.64",
-   "x_serialization_backend" : "JSON::PP version 2.97001_04"
+   "version" : "2.66",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

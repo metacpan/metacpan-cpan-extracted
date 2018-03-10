@@ -2,7 +2,7 @@ package Test2::Hub;
 use strict;
 use warnings;
 
-our $VERSION = '1.302128';
+our $VERSION = '1.302130';
 
 
 use Carp qw/carp croak confess/;
@@ -277,6 +277,21 @@ sub remove_context_release {
 sub send {
     my $self = shift;
     my ($e) = @_;
+
+    $e->add_hub(
+        {
+            details => ref($self),
+
+            buffered => $self->{+BUFFERED},
+            hid      => $self->{+HID},
+            nested   => $self->{+NESTED},
+            pid      => $self->{+PID},
+            tid      => $self->{+TID},
+            uuid     => $self->{+UUID},
+
+            ipc => $self->{+IPC} ? 1 : 0,
+        }
+    );
 
     if ($self->{+_PRE_FILTERS}) {
         for (@{$self->{+_PRE_FILTERS}}) {

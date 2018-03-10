@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -392,6 +392,11 @@ sub register {
     $app->helper( 'yancy.set' => sub {
         my ( $c, $coll, $id, $item ) = @_;
         if ( my @errors = $c->yancy->validate( $coll, $item ) ) {
+            $c->app->log->error(
+                sprintf 'Error validating item with ID "%s" in collection "%s": %s',
+                $id, $coll,
+                join ', ', map { sprintf '%s (%s)', $_->{message}, $_->{path} // '/' } @errors
+            );
             die \@errors;
         }
         $item = $c->yancy->filter->apply( $coll, $item );
@@ -400,6 +405,11 @@ sub register {
     $app->helper( 'yancy.create' => sub {
         my ( $c, $coll, $item ) = @_;
         if ( my @errors = $c->yancy->validate( $coll, $item ) ) {
+            $c->app->log->error(
+                sprintf 'Error validating new item in collection "%s": %s',
+                $coll,
+                join ', ', map { sprintf '%s (%s)', $_->{message}, $_->{path} // '/' } @errors
+            );
             die \@errors;
         }
         $item = $c->yancy->filter->apply( $coll, $item );
@@ -550,7 +560,7 @@ sub _build_openapi_spec {
                 responses => {
                     201 => {
                         description => "Entry was created",
-                        schema => { '$ref' => "#/definitions/${name}Item" },
+                        schema => { '$ref' => "#/definitions/${name}Item/properties/${id_field}" },
                     },
                     400 => {
                         description => "New entry contains errors",
@@ -705,7 +715,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

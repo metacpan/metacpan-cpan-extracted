@@ -20,7 +20,7 @@
 
 use 5.014_001;
 
-package Term::CLI::Command::Help  0.03002 {
+package Term::CLI::Command::Help  0.04004 {
 
 use Modern::Perl;
 use Pod::Text::Termcap;
@@ -28,6 +28,7 @@ use List::Util qw( first );
 use File::Which;
 use Types::Standard qw( ArrayRef Str );
 use Getopt::Long qw( GetOptionsFromArray );
+use Term::CLI::L10N;
 
 my @PAGERS = (
     [qw(
@@ -38,7 +39,8 @@ my @PAGERS = (
     ['more'], ['pg'],
 );
 
-my @PAGER = 'cat';
+my @PAGER;
+
 if (my $pager = first { defined which($_->[0]) } @PAGERS) {
     @PAGER = @$pager;
 }
@@ -73,19 +75,15 @@ has '+options' => (
 
 has '+description' => (
     default => sub {
-        qq{Show help for any given command sequence.\n}
-        .qq{The C<--pod> option (or C<-p>) will cause raw POD\n}
-        .qq{to be shown.}
+        loc(qq{Show help for any given command sequence.\n}
+           .qq{The C<--pod> option (or C<-p>) will cause raw POD\n}
+           .qq{to be shown.});
     }
 );
 
 has '+summary' => (
-    default => sub { 'show help' },
+    default => sub { loc('show help') },
 );
-
-#has '+usage' => (
-    #default => sub { 'B<help> [I<cmd> ...]' },
-#);
 
 has '+_arguments' => (
     default => sub { [
@@ -120,6 +118,8 @@ sub _make_command_summary {
 
     my $text = '';
     my $over_width = int(($self->term->term_width - 4) / 3);
+    $over_width = 40 if $over_width > 40;
+
     my $full_pod = $pod_prefix."=over $over_width\n\n";
 
     for my $cmd_ref (@$commands) {
@@ -154,7 +154,7 @@ sub _get_help {
         my ($pod, $text)
             = $self->_make_command_summary(
                 cmd_path   => [],
-                pod_prefix => "=head2 Commands:\n\n",
+                pod_prefix => "=head2 ".loc("Commands").":\n\n",
                 commands   => [$self->root_node->commands]
             );
         return (%args, pod => $pod, text => $text);
@@ -181,18 +181,20 @@ sub _get_help {
     }
 
     my $last_cmd = pop @cmd_ref_path;
-    my $usage_prefix = join(' ', map { $_->usage_text(with_options => 'none', with_subcommands => 0) } @cmd_ref_path);
+    my $usage_prefix = join(' ',
+        map { $_->usage_text(with_options => 'none', with_subcommands => 0) }
+        @cmd_ref_path
+    );
     $usage_prefix .= ' ' if length $usage_prefix;
-    my $pod .= "=head2 Usage:\n\n";
+    my $pod .= "=head2 ".loc("Usage").":\n\n";
     for my $usage ($last_cmd->usage_text(with_options => 'both')) {
-        #$pod .= "=item $usage_prefix$usage\n\n";
         $pod .= "$usage_prefix$usage\n\n";
     }
     $pod =~ s/\n*$//s;
     $pod .= "\n\n";
 
     if (my $description = $cur_cmd_ref->description) {
-        $pod .= "=head2 Description:\n\n";
+        $pod .= "=head2 ".loc("Description").":\n\n";
         $pod .= $cur_cmd_ref->description;
     }
     elsif (my $summary = $cur_cmd_ref->summary) {
@@ -209,7 +211,7 @@ sub _get_help {
         my ($cmd_pod, $cmd_text) =
             $self->_make_command_summary(
                 cmd_path => \@cmd_path,
-                pod_prefix => "=head2 Sub-Commands:\n\n",
+                pod_prefix => "=head2 ".loc("Sub-Commands").":\n\n",
                 commands => [$cur_cmd_ref->commands],
             );
         $pod .= $cmd_pod;
@@ -261,9 +263,6 @@ sub complete_line {
         $cur_cmd_ref = $new_cmd_ref;
     }
 
-    #say STDERR "WORDS: <@words> (".int(@words)."); partial:<$partial>";
-    #say STDERR "CMDS: ".join(' ', $cur_cmd_ref->command_names);
-
     if (@words == 0) {
         return $cur_cmd_ref->name;
     }
@@ -293,18 +292,23 @@ sub _execute_help {
 
     my $pager_fh;
     my $pager_cmd = $self->pager;
-    { no warnings 'exec';
+
+    local( $::SIG{PIPE} ) = 'IGNORE'; # Temporarily avoid accidents.
+
+    if (@$pager_cmd) {
+        no warnings 'exec';
         if (!open $pager_fh, "|-", @{$pager_cmd}) {
             $args{status} = -1;
-            $args{error} = "cannot run '$$pager_cmd[0]': $!";
+            $args{error} = loc("cannot run '[_1]': [_2]", $$pager_cmd[0], $!);
             return %args;
         }
     }
+    elsif (!open $pager_fh, '>&', \*STDOUT) {
+        $args{status} = -1;
+        $args{error} = "dup(STDOUT): $!";
+        return %args;
+    }
 
-    #my $parser = Pod::Text::Termcap->new( width => $self->term_width - 4 );
-    #$parser->output_fh($pager_fh);
-    #$parser->parse_string_document($args{text});
-    
     print $pager_fh $args{text};
 
     if (!$pager_fh->close) {
@@ -328,7 +332,7 @@ Term::CLI::Command::Help - A generic 'help' command for Term::CLI
 
 =head1 VERSION
 
-version 0.03002
+version 0.04004
 
 =head1 SYNOPSIS
 
@@ -398,6 +402,11 @@ be a command line split on words, e.g.:
 
     OBJ->pager( [ 'cat', '-n', '-e' ] );
 
+If an empty list is provided, no external pager will
+be used, and output is printed to F<STDOUT> directly.
+
+See also the L<pager|/pager> method.
+
 =item B<summary> =E<gt>
 
 Override the default summary for the C<help> command.
@@ -418,6 +427,13 @@ Override the automatic usage string for the C<help> command.
 X<pager>
 
 Get or set the pager command.
+If an empty list is provided, no external pager will
+be used, and output is printed to F<STDOUT> directly.
+
+Example:
+
+    $help_cmd->pager([]); # Print directly to STDOUT.
+    $help_cmd->pager([ 'cat', '-n' ]); # Number output lines.
 
 =back
 
@@ -432,9 +448,9 @@ The C<help> command will try to pipe the formatted output through a suitable
 pager.
 
 At startup, the pager is selected from the following list, in order of
-preference: L<less>, L<more>, L<pg>, L<cat>.
+preference: L<less>, L<more>, L<pg>, F<STDOUT>.
 
-This can be overridden by supplying a value to the object's C<pager>
+This can be overridden by supplying a value to the object's L<pager|/pager>
 attribute.
 
 =head1 EXAMPLE

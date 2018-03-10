@@ -1,11 +1,9 @@
 package Plack::Auth::SSO::ResponseParser;
 
-use Catmandu::Sane;
+use strict;
 use Moo::Role;
 
-our $VERSION = "0.011";
-
-with "Catmandu::Logger";
+our $VERSION = "0.0131";
 
 requires "parse";
 

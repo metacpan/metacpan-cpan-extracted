@@ -94,42 +94,50 @@ sub generate_lookupuris {
 	my $self = shift;
 	my @uris = ();
 
-	$self->as_string() =~ /^(https?:\/\/)([^\/]+)(\/.*)$/i;
-	my ($scheme, $host, $path_query) = ($1, $2, $3);
+	$self->as_string() =~ /^(https?:\/\/)([^\/]+)(\/[^\?]*)(\??.*)$/i;
+	my ($scheme, $host, $path, $query) = ($1, $2, $3, $4);
 
 	# Collect host suffixes
 	my @domains = ();
 	if ($host !~ /^\d+\.\d+\.\d+\.\d+$/) {
 		my @parts = split(/\./, $host);
-		splice(@parts, 0, -6); # take 5 top most compoments
+		splice(@parts, 0, -6); # take 5 top most components
 
 		while (scalar(@parts) > 2) {
 			shift(@parts);
-			push(@domains, join(".", @parts) );
+			push(@domains, join(".", @parts));
 		}
 	}
 	push(@domains, $host);
 
 	# Collect path & query prefixes
 	my @paths = ();
-	my @parts = split(/\//, $path_query);
-	my $part_count = scalar(@parts);
-	$part_count = $part_count > 4 ? 4 : $part_count - 1; # limit to 4
-	my $previous = "";
-	for (my $i = 0; $i < $part_count; $i++) {
-		$previous .= "/" . $parts[$i] ."/";
-		push(@paths, $previous);
+	if ($path ne '/') {
+		my @parts = split(/\//, $path);
+		my $part_count = scalar(@parts);
+		$part_count = $part_count > 4 ? 4 : $part_count - 1; # limit to 4
+		my $previous = "";
+		
+		push(@paths, "/");
+		# Skip the first entry in @parts as it is always an empty string
+		for (my $i = 1; $i < $part_count; $i++) {
+			$previous .= "/" . $parts[$i] ."/";
+			push(@paths, $previous);
+		}
 	}
-	if ($path_query =~ /^([^\?]+)\?.*$/) {
-		push(@paths, $1);
+	push(@paths, $path);
+	if ($query =~ /^\?./) {
+		push(@paths, $path . $query);
 	}
-	push(@paths, $path_query);
 
 	# Assemble the list of Net::Google::SafeBrowsing4::URI objects
 	foreach my $domain (@domains) {
 		foreach my $path (@paths) {
 			my $gsb_uri = Net::Google::SafeBrowsing4::URI->new($scheme . $domain . $path);
-			push(@uris, $gsb_uri);
+			# @TODO Sub-URI of a valid URI should be a valid URI. Condition should not be necessary.
+			if (defined($gsb_uri)) {
+				push(@uris, $gsb_uri);
+			}
 		}
 	}
 
@@ -229,6 +237,9 @@ sub _normalize {
 	while ($modified_path =~ s/\/[^\/]+\/\.\.(?:\/|$)/\//sg) {};
 	# Eliminate double // slashes from path
 	$modified_path =~ s/\/\/+/\//sg;
+	if ($modified_path eq '') {
+		$modified_path = '/';
+	}
 	$uri_obj->path($modified_path);
 
 	# Fix some percent encoding

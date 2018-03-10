@@ -1,9 +1,7 @@
 NAME
-
     UV::Util - Some utility functions from libUV.
 
 WARNING
-
     UV::Util is being released as a learning process that will hopefully be
     folded into a more complete set of modules allowing use of libUV with
     Perl later. In other words, this will be more useful later. If it
@@ -12,16 +10,15 @@ WARNING
     or of anything I can do to make this better.
 
 SYNOPSIS
-
       #!/usr/bin/env perl
       use strict;
       use warnings;
       use feature ':5.14';
-    
+
       use Data::Dumper::Concise qw(Dumper);
       use UV::Util;
       use Syntax::Keyword::Try;
-    
+
       my $res;
       try {
         $res = UV::Util::cpu_info();
@@ -31,68 +28,45 @@ SYNOPSIS
       }
 
 DESCRIPTION
-
     This module provides access to a few of the functions in the
-    miscellaneous libUV <http://docs.libuv.org/en/v1.x/misc.html>
-    utilities. While it's extremely unlikely, all functions here can throw
-    an exception on error unless specifically stated otherwise in the
-    function's description.
+    miscellaneous libUV <http://docs.libuv.org/en/v1.x/misc.html> utilities.
+    While it's extremely unlikely, all functions here can throw an exception
+    on error unless specifically stated otherwise in the function's
+    description.
 
 CONSTANTS
-
     UV::Util makes the following constants available that represent
     different handle types
     <http://docs.libuv.org/en/latest/handle.html#c.uv_handle_type>.
 
- UV_UNKNOWN_HANDLE
-
- UV_ASYNC
-
- UV_CHECK
-
- UV_FS_EVENT
-
- UV_FS_POLL
-
- UV_HANDLE
-
- UV_IDLE
-
- UV_NAMED_PIPE
-
- UV_POLL
-
- UV_PREPARE
-
- UV_PROCESS
-
- UV_STREAM
-
- UV_TCP
-
- UV_TIMER
-
- UV_TTY
-
- UV_UDP
-
- UV_SIGNAL
-
- UV_FILE
-
- UV_HANDLE_TYPE_MAX
-
+  UV_UNKNOWN_HANDLE
+  UV_ASYNC
+  UV_CHECK
+  UV_FS_EVENT
+  UV_FS_POLL
+  UV_HANDLE
+  UV_IDLE
+  UV_NAMED_PIPE
+  UV_POLL
+  UV_PREPARE
+  UV_PROCESS
+  UV_STREAM
+  UV_TCP
+  UV_TIMER
+  UV_TTY
+  UV_UDP
+  UV_SIGNAL
+  UV_FILE
+  UV_HANDLE_TYPE_MAX
 FUNCTIONS
-
     All functions provided here provide a Perl interface to their libUV
     <http://docs.libuv.org/en/latest/misc.html> equivalents.
 
- cpu_info
-
+  cpu_info
         use Data::Dumper;
         use UV::Util;
         use Syntax::Keyword::Try;
-    
+
         my $res;
         try { $res = UV::Util::cpu_info(); }
         catch { die "Aw, man. $@"; }
@@ -124,14 +98,13 @@ FUNCTIONS
 
     This function <http://docs.libuv.org/en/v1.x/misc.html#c.uv_cpu_info>
     returns an array reference full of hashrefs. Each hashref represents an
-    available CPU on your system. cpu_times, model, and speed will be
+    available CPU on your system. "cpu_times", "model", and "speed" will be
     supplied for each.
 
- get_free_memory
-
+  get_free_memory
         use UV::Util;
         use Syntax::Keyword::Try;
-    
+
         my $res;
         try { $res = UV::Util::get_free_memory(); }
         catch { die "Aw, man. $@"; }
@@ -140,11 +113,10 @@ FUNCTIONS
     This function returns an unsigned integer representing the number of
     bytes of free memory available.
 
- get_total_memory
-
+  get_total_memory
         use UV::Util;
         use Syntax::Keyword::Try;
-    
+
         my $res;
         try { $res = UV::Util::get_total_memory(); }
         catch { die "Aw, man. $@"; }
@@ -153,12 +125,11 @@ FUNCTIONS
     This function returns an unsigned integer representing the number of
     bytes of total memory in the system.
 
- getrusage
-
+  getrusage
         use Data::Dumper;
         use UV::Util;
         use Syntax::Keyword::Try;
-    
+
         my $res;
         try { $res = UV::Util::getrusage(); }
         catch { die "Aw, man. $@"; }
@@ -185,43 +156,40 @@ FUNCTIONS
     This function <http://docs.libuv.org/en/v1.x/misc.html#c.uv_getrusage>
     returns a hash reference of resource metrics for the current process.
 
- guess_handle_type
-
+  guess_handle_type
         use UV::Util;
         use Syntax::Keyword::Try;
-    
+
         my $res;
         try { $res = UV::Util::guess_handle_type(\*STDIN); }
         catch { die "Aw, man. $@"; }
         say "yay!" if ($res == UV::Util::UV_TTY);
 
     This function
-    <http://docs.libuv.org/en/latest/misc.html#c.uv_guess_handle> takes in
-    a reference to a handle (e.g. \*STDIN) and returns an integer that
+    <http://docs.libuv.org/en/latest/misc.html#c.uv_guess_handle> takes in a
+    reference to a handle (e.g. "\*STDIN") and returns an integer that
     represents one of the CONSTANTS above.
 
- hrtime
-
+  hrtime
         use UV::Util;
-    
+
         # does not throw exceptions
         my $time = UV::Util::hrtime();
 
     This function <http://docs.libuv.org/en/latest/misc.html#c.uv_hrtime>
     returns the current high-resolution real time. This is expressed in
     nanoseconds. It is relative to an arbitrary time in the past. It is not
-    related to the time of day and therefore not subject to clock drift.
-    The primary use is for measuring performance between intervals.
+    related to the time of day and therefore not subject to clock drift. The
+    primary use is for measuring performance between intervals.
 
     Not every platform can support nanosecond resolution; however, this
     value will always be in nanoseconds.
 
- interface_addresses
-
+  interface_addresses
         use Data::Dumper qw(Dumper);
         use UV::Util;
         use Syntax::Keyword::Try;
-    
+
         my $res;
         try { $res = UV::Util::interface_addresses(); }
         catch { die "Aw, man. $@"; }
@@ -241,11 +209,10 @@ FUNCTIONS
     returns an array reference containing hash references representing each
     of your available interfaces.
 
- loadavg
-
+  loadavg
         use Data::Dumper qw(Dumper);
         use UV::Util;
-    
+
         # does not throw exceptions
         my $res = UV::Util::loadavg();
         say Dumper $res;
@@ -259,14 +226,13 @@ FUNCTIONS
     returns an array reference containing the load average
     <http://en.wikipedia.org/wiki/Load_(computing)>.
 
-    On Windows, this will always return [0,0,0] as it's not implemented.
+    On Windows, this will always return "[0,0,0]" as it's not implemented.
 
- resident_set_memory
-
+  resident_set_memory
         use Data::Dumper qw(Dumper);
         use UV::Util;
         use Syntax::Keyword::Try;
-    
+
         my $res;
         try { $res = UV::Util::resident_set_memory(); }
         catch { die "Aw, man. $@"; }
@@ -274,27 +240,25 @@ FUNCTIONS
 
     This function
     <http://docs.libuv.org/en/latest/misc.html#c.uv_resident_set_memory>
-    returns an unsigned integer representing the resident set size (RSS)
-    for the current process.
+    returns an unsigned integer representing the resident set size (RSS) for
+    the current process.
 
- uptime
-
+  uptime
         use Data::Dumper qw(Dumper);
         use UV::Util;
         use Syntax::Keyword::Try;
-    
+
         my $res;
-        try { $res = UV::Util::resident_set_memory(); }
+        try { $res = UV::Util::uptime(); }
         catch { die "Aw, man. $@"; }
-        say Dumper $res; # uptime
+        say Dumper $res; # 603468
 
     This function <http://docs.libuv.org/en/latest/misc.html#c.uv_uptime>
     returns a float representing the current system uptime.
 
- version
-
+  version
         use UV::Util;
-    
+
         say UV::Util::version();
         # 1.9.1
 
@@ -302,7 +266,6 @@ FUNCTIONS
     libUV version number as a string. Does not throw errors.
 
 COPYRIGHT AND LICENSE
-
     Copyright 2017, Chase Whitener.
 
     This library is free software; you can redistribute it and/or modify it

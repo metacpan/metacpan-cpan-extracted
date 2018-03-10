@@ -1,6 +1,6 @@
 package Lab::Moose;
-$Lab::Moose::VERSION = '3.621';
-#ABSTRACT: Convenient loaders and constructors for L<Lab::Moose::Instrument>, L<Lab::Moose::DataFolder> and L<Lab::Moose::DataFile>
+$Lab::Moose::VERSION = '3.622';
+#ABSTRACT: Convenient loaders and constructors for L<Lab::Moose::Instrument>, L<Lab::Moose::Sweep>, L<Lab::Moose::DataFolder> and L<Lab::Moose::DataFile>
 
 use warnings;
 use strict;
@@ -96,6 +96,7 @@ sub linspace {
     return ( @steps, $to );
 }
 
+
 sub sweep {
     my (%args) = validated_hash(
         \@_,
@@ -154,11 +155,11 @@ __END__
 
 =head1 NAME
 
-Lab::Moose - Convenient loaders and constructors for L<Lab::Moose::Instrument>, L<Lab::Moose::DataFolder> and L<Lab::Moose::DataFile>
+Lab::Moose - Convenient loaders and constructors for L<Lab::Moose::Instrument>, L<Lab::Moose::Sweep>, L<Lab::Moose::DataFolder> and L<Lab::Moose::DataFile>
 
 =head1 VERSION
 
-version 3.621
+version 3.622
 
 =head1 SYNOPSIS
 
@@ -195,7 +196,7 @@ Load an instrument driver module and call the constructor.
 Create instrument with new connection:
 
  my $instr = instrument(
-     instrument_type => 'RS_SMB',
+     type => 'RS_SMB',
      connection_type => 'VXI11',
      connection_options => {host => '192.168.2.23'},
      # other driver specific options
@@ -206,7 +207,7 @@ Create instrument with new connection:
 Create instrument with existing connection:
 
  my $instr = instrument(
-     instrument_type => $type,
+     type => $type,
      connection => $connection_object,
      # driver specific options
      foo => 'ON',
@@ -240,7 +241,7 @@ Load L<Lab::Moose::DataFolder> and call it's C<new> method with C<%args>.
 
 Load Lab::Moose::DataFile::C<$type> and call it's C<new> method with C<%args>.
 
-The default type is 'Gnuplot'.
+The default type is L<'Gnuplot'|Lab::Moose::DataFile::Gnuplot>.
 
 =head2 linspace
 
@@ -249,6 +250,10 @@ The default type is 'Gnuplot'.
 
  # create array without first point (-0.9, ..., 1)
  my @points = linspace(from => -1, to => 1, step => 0.1, exclude_from => 1);
+
+=head2 sweep/sweep_datafile
+
+These are described in a separate tutorial: L<Lab::Moose::Sweep::Tutorial>.
 
 =head1 COPYRIGHT AND LICENSE
 

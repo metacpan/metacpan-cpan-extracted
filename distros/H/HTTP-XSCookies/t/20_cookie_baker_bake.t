@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+use Data::Dumper;
 use Date::Parse;
 use Test::More;
 use HTTP::XSCookies qw[bake_cookie];
@@ -25,11 +26,14 @@ sub test_bake_simple {
         [ 't102', 'foo', { value => 'foo bar baz' }, 'foo=foo%20bar%20baz'],
         [ 't103', 'foo', { value => 'val', Expires => undef }, 'foo=val'],
         [ 't104', 'foo', { value => 'val', Path => '/' }, 'foo=val; Path=/'],
-        [ 't105', 'foo', { value => 'val', Path => '/', Secure => 1, HttpOnly => 0 }, 'foo=val; Path=/; Secure'],
-        [ 't106', 'foo', { value => 'val', Path => '/', Secure => 0, HttpOnly => 1 }, 'foo=val; Path=/; HttpOnly'],
-        [ 't107', 'foo', { value => 'val', Expires => 'foo' }, 'foo=val; Expires=foo'],
+        [ 't110', 'foo', { value => 'val', Path => '/', Secure => 1, HttpOnly => 0     }, 'foo=val; Path=/; Secure'],
+        [ 't111', 'foo', { value => 'val', Path => '/', Secure => 0, HttpOnly => "0"   }, 'foo=val; Path=/'],
+        [ 't112', 'foo', { value => 'val', Path => '/', Secure => 0, HttpOnly => undef }, 'foo=val; Path=/'],
+        [ 't113', 'foo', { value => 'val', Path => '/', Secure => 0, HttpOnly => 1     }, 'foo=val; Path=/; HttpOnly'],
+        [ 't114', 'foo', { value => 'val', Path => '/', Secure => 0, HttpOnly => "1"   }, 'foo=val; Path=/; HttpOnly'],
+        [ 't120', 'foo', { value => 'val', Expires => 'foo' }, 'foo=val; Expires=foo'],
         [
-            't108',
+            't130',
             'foo',
             {
                 value => 'val',
@@ -37,10 +41,12 @@ sub test_bake_simple {
             },
             sprintf('foo=val; Expires=%s', format_time($now + 24*60*60)),
         ],
+        [ 't140', 'foo', { value => [qw/bar baz/], Secure => 1 }, 'foo=bar%26baz; Secure' ],
     );
 
     for my $test (@tests) {
-        is( cookie_to_string(bake_cookie($test->[1], $test->[2])),
+        my $baked = bake_cookie($test->[1], $test->[2]);
+        is( cookie_to_string($baked),
             cookie_to_string($test->[3]),
             sprintf('%s - baked simple cookie', $test->[0] ));
     }
@@ -135,13 +141,21 @@ sub cookie_to_string {
     my %fields;
     for my $part (@parts) {
         my @p = split('=', $part);
-        next unless @p == 2;
-        $fields{$p[0]} = $p[1];
+        if (@p == 1) {
+            $fields{$p[0]} = $p[0];
+            next;
+        }
+        if (@p == 2) {
+            # printf STDERR ("cookie_to_string [%s]: [%s] [%s]\n", $part, $p[0], $p[1]);
+            $fields{$p[0]} = sprintf("%s=%s", $p[0], $p[1]);
+            next;
+        }
+        printf STDERR ("WTF? [%s]\n", $part);
     }
 
     $str = $first;
     for my $key (sort keys %fields) {
-        $str .= sprintf("; %s=%s", $key, $fields{$key});
+        $str .= sprintf("; %s", $fields{$key});
     }
     return $str;
 }

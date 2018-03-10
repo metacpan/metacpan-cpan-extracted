@@ -2,7 +2,7 @@ package Finance::Currency::Convert::ECBdaily;
 
 use vars qw/$VERSION $DATE $CHAT %currencies/;
 
-$VERSION = 0.01;
+$VERSION = 0.03;
 $DATE = "01 March 2018";
 
 =head1 NAME

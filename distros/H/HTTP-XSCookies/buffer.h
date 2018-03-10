@@ -33,18 +33,21 @@
 /*
  * Definition for a Buffer. Fields are:
  *
- * + pos: current position in buffer
+ * + rpos: current reading position in buffer
+ * + wpos: current writing position in buffer
  * + size: maximum size for buffer
  * + data: pointer to the underlying memory
  * + fixed: array for small buffers, whose size is adjusted so that
  *          it will make the Buffer be BUFFER_SIZEOF_DESIRED bytes.
  */
 typedef struct Buffer {
-    unsigned int pos;
+    unsigned int rpos;
+    unsigned int wpos;
     unsigned int size;
+    unsigned int unused_;  /* padding for allignment */
     char* data;
     char fixed[  BUFFER_SIZEOF_DESIRED
-               - 2*sizeof(unsigned int)
+               - 4*sizeof(unsigned int)
                - 1*sizeof(char*) ];
 } Buffer;
 
@@ -89,14 +92,16 @@ typedef struct Buffer {
  */
 #define buffer_wrap(buffer, src, length) \
     do { \
-        unsigned int l = (length); \
         buffer_zero(buffer); \
-        if (l == 0 && (src[0] != '\0')) { \
-            l = strlen(src); \
-        } \
-        (buffer)->size = l; \
+        (buffer)->size = (buffer)->wpos = (length); \
         (buffer)->data = (char*) src; \
     } while (0)
+
+/*
+ * Bytes still to be read.
+ */
+#define buffer_used(buffer) \
+    ( (buffer)->wpos - (buffer)->rpos )
 
 /*
  * Zero out buffer.
@@ -104,48 +109,51 @@ typedef struct Buffer {
 #define buffer_zero(buffer) \
     do { \
         (buffer)->size = 0; \
-        (buffer)->pos = 0; \
+        (buffer)->rpos = 0; \
+        (buffer)->wpos = 0; \
         (buffer)->data = 0; \
     } while (0)
 
 /*
- * Set buffer position to 0.
+ * Set buffer reading position to 0.
  */
 #define buffer_rewind(buffer) \
     do { \
-        (buffer)->pos = 0; \
+        (buffer)->rpos = 0; \
     } while (0)
 
 /*
- * Put a '\0' in the current position of buffer.
- */
-#define buffer_terminate(buffer) \
-    do { \
-        if ((buffer)->pos < (buffer)->size) { \
-            (buffer)->data[(buffer)->pos] = '\0'; \
-        } \
-    } while (0)
-
-/*
- * Rewind and terminate buffer.
+ * Set buffer writing position to 0.
  */
 #define buffer_reset(buffer) \
     do { \
         buffer_rewind(buffer); \
-        buffer_terminate(buffer); \
+        (buffer)->wpos = 0; \
     } while (0)
 
 /*
- * Append a given char* (with indicated, optional length) to the buffer.
- * If length is 0, compute it using strlen(source);
+ * Append a given char*, with indicated length, to the buffer.
  * If necessary, grow the buffer before appending.
  */
-#define buffer_append(buffer, source, length) \
+#define buffer_append_str(buffer, src, length) \
     do { \
-        unsigned int l = (length) ? (length) : strlen(source); \
+        unsigned int l = (length); \
         buffer_ensure_unused(buffer, l); \
-        memcpy((buffer)->data + (buffer)->pos, source, l); \
-        (buffer)->pos += l; \
+        memcpy((buffer)->data + (buffer)->wpos, src, l); \
+        (buffer)->wpos += l; \
+    } while (0)
+
+/*
+ * Append a given Buffer to the buffer.
+ * If necessary, grow the buffer before appending.
+ */
+#define buffer_append_buf(buffer, src) \
+    do { \
+        unsigned int l = (src)->wpos - (src)->rpos; \
+        buffer_ensure_unused(buffer, l); \
+        memcpy((buffer)->data + (buffer)->wpos, (src)->data + (src)->rpos, l); \
+        (buffer)->wpos += l; \
+        (src)->rpos += l; \
     } while (0)
 
 /*
@@ -154,9 +162,9 @@ typedef struct Buffer {
 #define buffer_ensure_unused(buffer, length) \
     do { \
         unsigned int needed = (length) + 1; \
-        unsigned int left = (buffer)->size - (buffer)->pos; \
+        unsigned int left = (buffer)->size - (buffer)->wpos; \
         if (left < needed) { \
-            buffer_ensure_total((buffer), (buffer)->pos + (length)); \
+            buffer_ensure_total((buffer), (buffer)->wpos + (length)); \
         } \
     } while (0)
 

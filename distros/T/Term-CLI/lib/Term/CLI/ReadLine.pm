@@ -20,7 +20,7 @@
 
 use 5.014_001;
 
-package Term::CLI::ReadLine  0.03002 {
+package Term::CLI::ReadLine  0.04004 {
 
 use Modern::Perl;
 
@@ -66,7 +66,7 @@ Term::CLI::ReadLine - maintain a single Term::ReadLine object
 
 =head1 VERSION
 
-version 0.03002
+version 0.04004
 
 =head1 SYNOPSIS
 

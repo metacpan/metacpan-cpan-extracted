@@ -1,62 +1,52 @@
 Revision history for Perl extension JSONP.
 
-1.84
+1.85
+	- add "rest" method switch
 
+1.84
 	- fix bug on non-JSONP blessed objects convertion
 
 1.83
-
 	- remove unnedeed options when encoding JSON in serialize method
 
 1.82
-
 	- add _is_root_element key to $self in run sub instead of doing it in constructor new sub
 
 1.81
-
 	- exclude colons as well from allowed chars for keys in autovivification
 
 1.80
-
 	- fix CPAN bug #123796
 	- allow all-digit keys for autovivification
 	- extend further allowed char class for keys in autovivification
 	- add couple tests
 
 1.79
-
 	- remove forgotten $VERSION print
 
 1.78
-
 	- allow much greater character set extent for keys in autovivification notation convenience. Now can be any Unicode codepoint that is not a POSIX punctuation char or control char, up to 1024 Unicode chars
 	- now boolean evaluation context does not turn anymore booleans into referenced scalars (bug)
 
 1.77
-
 	- allow much greater character set extent for keys in autovivification notation convenience. Now can be any Unicode letter, number, and spacing, up to 2048 Unicode chars
 	- increase allowed lenght for req and callback names to 64 ASCII chars
 	- now graft/stack calls do not assume anymore to be feeded with utf8 text
 
 1.76
-
 	- always serialize as ASCII with "\uxyzw" escaping for non-ascii chars to prevent any corruption for data traversing non-utf8 compatibile media streams 
 	- graft will keep to assume encoded UTF-8 JSON strings according to Postel's principle
 
 1.75
-
 	- fix bug on serialize when "pretty" is not defined
 
 1.74
-
 	- fix bug on serialize defaulting to "pretty" to true - thanks Robert Acock for reporting it
 
 1.73
-
 	- corrections on this "Changes" file and some typos in POD
 
 1.70
-
 	- make JSONP compatible with perlcritic
 	- fixed bug where JSONP returning 'true' and 'false' strings instead of true and false JSON values - thanks Robert Acock
 	- fixed bug preventing serialization of array nodes - thanks Robert Acock
@@ -66,14 +56,12 @@ Revision history for Perl extension JSONP.
 	- slight performance improvement in TO_JSON when serializing arrays - thanks Robert Acock
 
 1.61
-
 	- fixed a bug preventing replacement of a leaf with a new node
 	- introduction of pretty method call
 	- updated changelog and POD documentation
 	- addition of first battery of tests
 
 1.60
-
 	- now detecting boolean context, within it the deserialized JSON booleans ( \1 and \0 ) are recognized and can be used directly in conditionals without need to dereference them
 	- application/json content type now always recognized in POSTs and PUTs
 	- now returning "unclassified error" to frontend if sandboxed evalation crashes, in debug mode the eval error string will also be returned
@@ -81,36 +69,28 @@ Revision history for Perl extension JSONP.
 	- JSON serialization routine has been put inside an eval to prevent any crash due to corrupted/invalid UTF-8 text encoding in Perl data structures
 
 1.55
-
 	- renamed clashing error method with raiseError, addition of module version property in debug mode
 
 1.53
-
 	- fix bug about method having the same name of object property
 
 1.5.2
-
 	- explicitly ignore callback values when call isn't a GET
 
 1.5
-
 	- now autovivification a tree with the convenience feature and passing an undef to last element makes it a zero length string instead of a reference to a void hash
 	- fixed a runtime error occurring with undefined Content Types
 
 1.4.2
-
 	- now regeneration of session cookie is forced upon login (call to plugged login sub)
 
 1.4.1
-
 	- the module now returns correctly a meaningful error when submitted JSON (with application/json mimetype) is of an array type
 
 1.4
-
 	- added transparent support for POSTs and PUTs of application/json or application/javascript type
 
 1.3.1
-
 	- fixed bug: now mimetype for plain json is application/json, together application/javascript for JSONP
 	- little bug fixes for corner cases
 	

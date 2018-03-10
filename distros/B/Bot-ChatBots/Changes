@@ -1,3 +1,20 @@
+0.012  2018-03-10 07:15:40 CET
+   - make example RSS reader more general
+   - add missing dependency for IO::Socket::SSL
+
+0.010  2018-03-09 06:54:54 CET
+   - fix Copyright year in new modules' docs
+   - fix some links in new modules' docs
+   - release after 66 PASSes on CPAN Testers (Thanks!)
+
+0.009  2018-03-08 23:03:32 CET
+   - remove VERSION section from MojoPlugin.pm
+   - add parameter handler to install_route in WebHook
+   - set default parse_request in WebHook
+   - cleanup in documentation for WebHook
+   - added Poller and WebPoller
+   - added example on WebPoller
+
 0.008  2018-02-11 15:29:50 CET
    - release after 67 PASSes on CPAN Testers
 

@@ -1,48 +1,47 @@
 package Plack::Auth::SSO::ResponseParser::CAS;
 
-use Catmandu::Sane;
-use Catmandu::Util qw(:check :is);
+use strict;
+use utf8;
+use Data::Util qw(:check);
 use Moo;
 use XML::LibXML;
 use XML::LibXML::XPathContext;
-use namespace::clean;
 
-our $VERSION = "0.011";
+our $VERSION = "0.0131";
 
 with "Plack::Auth::SSO::ResponseParser";
-
-has xpath => (
-    is => "ro",
-    lazy => 1,
-    builder => "_build_xpath",
-    init_arg => undef
-);
-
-sub _build_xpath {
-    my $xpath = XML::LibXML::XPathContext->new();
-    $xpath->registerNs( "cas", "http://www.yale.edu/tp/cas" );
-    $xpath;
-}
 
 sub parse {
 
     my ( $self, $obj ) = @_;
 
-    $self->from_doc(
-        is_instance( $obj, "XML::LibXML" ) ? $obj : XML::LibXML->load_xml( string => $obj )
-    );
+    my $xpath;
+
+    if ( is_instance( $obj, "XML::LibXML" ) ) {
+
+        $xpath = XML::LibXML::XPathContext->new( $obj );
+
+    }
+    else {
+
+        $xpath = XML::LibXML::XPathContext->new(
+            XML::LibXML->load_xml( string => $obj )
+        );
+
+    }
+
+    $xpath->registerNs( "cas", "http://www.yale.edu/tp/cas" );
+    $self->from_doc( $xpath );
 
 }
 
 sub from_doc {
 
-    my ( $self, $libxml ) = @_;
-
-    my $xpath = $self->xpath();
+    my ( $self, $xpath ) = @_;
 
     my %attributes;
 
-    for my $attr ( $libxml->find( "/cas:serviceResponse/cas:authenticationSuccess/cas:attributes/child::*", $xpath )->get_nodelist() ) {
+    for my $attr ( $xpath->find( "/cas:serviceResponse/cas:authenticationSuccess/cas:attributes/child::*" )->get_nodelist() ) {
 
         my $key     = $attr->localname();
         my $value   = $attr->textContent();
@@ -72,7 +71,7 @@ sub from_doc {
     +{
         extra => {},
         info => \%attributes,
-        uid => $libxml->findvalue( "/cas:serviceResponse/cas:authenticationSuccess/cas:user", $xpath )
+        uid => $xpath->findvalue( "/cas:serviceResponse/cas:authenticationSuccess/cas:user" )
     };
 
 }

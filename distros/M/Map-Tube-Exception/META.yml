@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: 0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,88 +18,91 @@ name: Map-Tube-Exception
 provides:
   Map::Tube::Exception:
     file: lib/Map/Tube/Exception.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::DuplicateStationId:
     file: lib/Map/Tube/Exception/DuplicateStationId.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::DuplicateStationName:
     file: lib/Map/Tube/Exception/DuplicateStationName.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::FoundMultiLinedStation:
     file: lib/Map/Tube/Exception/FoundMultiLinedStation.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::FoundMultiLinkedStation:
     file: lib/Map/Tube/Exception/FoundMultiLinkedStation.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::FoundSelfLinkedStation:
     file: lib/Map/Tube/Exception/FoundSelfLinkedStation.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::FoundUnsupportedMap:
     file: lib/Map/Tube/Exception/FoundUnsupportedMap.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::FoundUnsupportedMapDataFormat:
     file: lib/Map/Tube/Exception/FoundUnsupportedMapDataFormat.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::FoundUnsupportedObject:
     file: lib/Map/Tube/Exception/FoundUnsupportedObject.pm
-    version: 3.13
+    version: 3.14
+  Map::Tube::Exception::InvalidColorHexCode:
+    file: lib/Map/Tube/Exception/InvalidColorHexCode.pm
+    version: 3.14
   Map::Tube::Exception::InvalidLineColor:
     file: lib/Map/Tube/Exception/InvalidLineColor.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::InvalidLineId:
     file: lib/Map/Tube/Exception/InvalidLineId.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::InvalidLineName:
     file: lib/Map/Tube/Exception/InvalidLineName.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::InvalidNodeObject:
     file: lib/Map/Tube/Exception/InvalidNodeObject.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::InvalidStationId:
     file: lib/Map/Tube/Exception/InvalidStationId.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::InvalidStationName:
     file: lib/Map/Tube/Exception/InvalidStationName.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::InvalidSupportedObject:
     file: lib/Map/Tube/Exception/InvalidSupportedObject.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::MalformedMapData:
     file: lib/Map/Tube/Exception/MalformedMapData.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::MissingLineId:
     file: lib/Map/Tube/Exception/MissingLineId.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::MissingLineName:
     file: lib/Map/Tube/Exception/MissingLineName.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::MissingMapData:
     file: lib/Map/Tube/Exception/MissingMapData.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::MissingNodeObject:
     file: lib/Map/Tube/Exception/MissingNodeObject.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::MissingPluginFormatter:
     file: lib/Map/Tube/Exception/MissingPluginFormatter.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::MissingPluginFuzzyFind:
     file: lib/Map/Tube/Exception/MissingPluginFuzzyFind.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::MissingPluginGraph:
     file: lib/Map/Tube/Exception/MissingPluginGraph.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::MissingStationId:
     file: lib/Map/Tube/Exception/MissingStationId.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::MissingStationName:
     file: lib/Map/Tube/Exception/MissingStationName.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::MissingSupportedMap:
     file: lib/Map/Tube/Exception/MissingSupportedMap.pm
-    version: 3.13
+    version: 3.14
   Map::Tube::Exception::MissingSupportedObject:
     file: lib/Map/Tube/Exception/MissingSupportedObject.pm
-    version: 3.13
+    version: 3.14
 requires:
   Data::Dumper: 0
   Moo: 2.000000
@@ -111,5 +114,5 @@ requires:
 resources:
   homepage: https://github.com/Manwar/Map-Tube-Exception
   repository: https://github.com/Manwar/Map-Tube-Exception.git
-version: 3.13
+version: 3.14
 x_serialization_backend: 'YAML::Tiny version 1.56'

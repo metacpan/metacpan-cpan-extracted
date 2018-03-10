@@ -1,25 +1,24 @@
 package Yancy::Backend::Pg;
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 # ABSTRACT: A backend for Postgres using Mojo::Pg
 
 #pod =head1 SYNOPSIS
 #pod
-#pod     # yancy.conf
-#pod     {
-#pod         backend => 'pg://user:pass@localhost/mydb',
-#pod         collections => {
-#pod             table_name => { ... },
-#pod         },
-#pod     }
-#pod
-#pod     # Plugin
+#pod     ### URL string
 #pod     use Mojolicious::Lite;
 #pod     plugin Yancy => {
 #pod         backend => 'pg://user:pass@localhost/mydb',
-#pod         collections => {
-#pod             table_name => { ... },
-#pod         },
+#pod         read_schema => 1,
 #pod     };
+#pod
+#pod     ### Mojo::Pg object
+#pod     use Mojolicious::Lite;
+#pod     use Mojo::Pg;
+#pod     plugin Yancy => {
+#pod         backend => { Pg => Mojo::Pg->new( 'postgres:///myapp' ) },
+#pod         read_schema => 1,
+#pod     };
+#pod
 #pod
 #pod =head1 DESCRIPTION
 #pod
@@ -124,7 +123,8 @@ sub new {
 
 sub create {
     my ( $self, $coll, $params ) = @_;
-    return $self->pg->db->insert( $coll, $params, { returning => '*' } )->hash;
+    my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
+    return $self->pg->db->insert( $coll, $params, { returning => $id_field } )->hash->{ $id_field };
 }
 
 sub get {
@@ -158,13 +158,13 @@ sub list {
 sub set {
     my ( $self, $coll, $id, $params ) = @_;
     my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
-    return $self->pg->db->update( $coll, $params, { $id_field => $id } );
+    return !!$self->pg->db->update( $coll, $params, { $id_field => $id } )->rows;
 }
 
 sub delete {
     my ( $self, $coll, $id ) = @_;
     my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
-    return $self->pg->db->delete( $coll, { $id_field => $id } );
+    return !!$self->pg->db->delete( $coll, { $id_field => $id } )->rows;
 }
 
 sub read_schema {
@@ -277,25 +277,23 @@ Yancy::Backend::Pg - A backend for Postgres using Mojo::Pg
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
-    # yancy.conf
-    {
-        backend => 'pg://user:pass@localhost/mydb',
-        collections => {
-            table_name => { ... },
-        },
-    }
-
-    # Plugin
+    ### URL string
     use Mojolicious::Lite;
     plugin Yancy => {
         backend => 'pg://user:pass@localhost/mydb',
-        collections => {
-            table_name => { ... },
-        },
+        read_schema => 1,
+    };
+
+    ### Mojo::Pg object
+    use Mojolicious::Lite;
+    use Mojo::Pg;
+    plugin Yancy => {
+        backend => { Pg => Mojo::Pg->new( 'postgres:///myapp' ) },
+        read_schema => 1,
     };
 
 =head1 DESCRIPTION

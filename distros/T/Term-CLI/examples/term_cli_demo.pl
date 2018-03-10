@@ -3,7 +3,8 @@
 # See https://robots.thoughtbot.com/tab-completion-in-gnu-readline
 
 use Modern::Perl;
-use lib qw( ../lib );
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 use Data::Dumper;
 use Term::CLI;
 use Term::CLI::Command;
@@ -11,6 +12,7 @@ use Term::CLI::Argument::Filename;
 use Term::CLI::Argument::Number::Float;
 use Term::CLI::Argument::Enum;
 use Term::CLI::Argument::String;
+use Term::CLI::L10N;
 
 my $test_1_cmd = Term::CLI::Command->new(
     name => 'test_1',
@@ -147,6 +149,26 @@ my $set_cmd = Term::CLI::Command->new(
                 return %args;
             }
         ),
+        Term::CLI::Command->new(
+            name => 'verbose',
+            summary => 'set verbose flag',
+            description => 'Set the verbose flag for the program.',
+            arguments => [
+                Term::CLI::Argument::Bool->new(name => 'bool',
+                    true_values  => [qw( 1 true on yes ok )],
+                    false_values => [qw( 1 false off no never )],
+                )
+
+            ],
+            callback => sub {
+                my ($self, %args) = @_;
+                return %args if $args{status} < 0;
+                my $args = $args{arguments};
+                my $bool = $args->[0];
+                say "Setting verbose to $bool";
+                return %args;
+            }
+        ),
     ],
 );
 
@@ -168,7 +190,7 @@ my $cli = Term::CLI->new(
         #say "path:", map { " ".$_->name } @$command_path;
 
         if ($args{status} < 0) {
-            say "** ERROR: $args{error}";
+            say "** ", loc("ERROR"), ": $args{error}";
             say "(status: $args{status})";
             $self->prompt("ERR[$args{status}]> ");
             return %args;

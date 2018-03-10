@@ -1,11 +1,15 @@
 package Set::IntSpan::Partition;
-
 use 5.008000;
 use strict;
 use warnings;
 use base qw(Exporter);
+use List::Util qw/min max/;
+use List::MoreUtils qw/uniq/;
+use List::UtilsBy qw/partition_by nsort_by/;
+use List::StackBy;
+use Set::IntSpan;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 our %EXPORT_TAGS = ( 'all' => [ qw(
 
@@ -55,65 +59,74 @@ sub intspan_partition {
 
 sub intspan_partition_map {
 
-  use Heap::MinMax qw//;
-  use List::Util qw/min max/;
-  use List::MoreUtils qw/uniq/;
+  my @intspans = @_;
 
-  my $heap = Heap::MinMax->new(fcompare => sub {
-    my ($x, $y) = @_;
-    return ( ($x->[0] <=> $y->[0]) || ($x->[1] <=> $y->[1]) );
-  });
+  my @stacks =
+    stack_by { $_->[0] }
+    sort { $a->[0] <=> $b->[0] }
+    map {
+      my $ix = $_;
+      map { [ @$_, $ix ] } $intspans[$_]->spans
+    } 0 .. $#intspans;
 
-  for (my $ix = 0; $ix < @_; ++$ix) {
-    my $obj = $_[$ix];
-    for ($obj->spans) {
-      $heap->insert([ $_->[0], $_->[1], [$ix] ]);
+  return unless @stacks;
+
+  my $min_overall = min(map { $_->[0] } map { @$_ } @stacks);
+  my $max_overall = max(map { $_->[1] } map { @$_ } @stacks);
+
+  push @{ $stacks[0] },
+    [ $min_overall,
+      $max_overall + 1, '' ];
+
+  push @stacks,[
+    [ $max_overall + 1,
+      $max_overall + 1, '' ] ];
+
+  for (my $ix = 0; $ix < @stacks - 1; ++$ix) {
+
+    my $max = min(
+      $stacks[$ix+1][0][0] - 1,
+      map { $_->[1] } @{ $stacks[$ix] },
+    );
+
+    my @current_stack =
+      map { [ $_->[0], min($_->[1], $max), $_->[2] ] }
+      @{ $stacks[$ix] };
+
+    my @new_stack =
+      grep { $_->[0] <= $_->[1] }
+      map { [ $max + 1, $_->[1], $_->[2] ] }
+      @{ $stacks[$ix] };
+
+    $stacks[$ix] = \@current_stack;
+
+    if ($max + 1 == $stacks[$ix+1][0][0]) {
+      push @{ $stacks[$ix+1] }, @new_stack;
+    } else {
+      splice @stacks, $ix+1, 0, \@new_stack;
     }
+
   }
 
-  my @result;
+  my %h = partition_by {
+    join ',', sort { $a cmp $b } uniq map { $_->[2] } @$_
+  } grep {
+    scalar @$_
+  } @stacks;
 
-  while (1) {
-    my $x = $heap->pop_min;
-    my $y = $heap->pop_min;
-
-    last unless defined $x;
-    push @result, $x unless defined $y;
-    last unless defined $y;
-
-    if ($x->[1] < $y->[0]) {
-      push @result, $x;
-      $heap->insert($y);
-      next;
-    }
-
-    my $min = min($x->[1], $y->[0]);
-    my $max = max(min($y->[0], $x->[1]), min($x->[1], $y->[1]));
-    my $XandY = [ $min, $max, [ @{$x->[2]}, @{$y->[2]} ] ];
-    my $prefX = [ $x->[0], $XandY->[0] - 1, $x->[2] ];
-    my $suffX = [ $XandY->[1] + 1, $x->[1], $x->[2] ];
-    my $onlyY = [ $XandY->[1] + 1, $y->[1], $y->[2] ];
-
-    for ($prefX, $suffX, $onlyY, $XandY) {
-      next unless $_->[0] <= $_->[1];
-      $heap->insert($_);
-    }
-  }
-
-  # group spans back into classes
-  my %group;
-  for my $item (@result) {
-    my $key = join ',', uniq sort @{ $item->[2] };
-    push @{ $group{$key} }, $item;
-  }
+  # TODO(bh): this could be nicer:
 
   my %map;
-  while (my ($k, $v) = each %group) {
-    my $class = Set::IntSpan->new([map {
-      [ $_->[0], $_->[1] ]
-    } @$v]);
-    push @{ $map{$_} }, $class for uniq map { @{ $_->[2] } } @$v;
+  while (my ($k, $v) = each %h) {
+    for my $in (split/,/, $k) {
+      my $class = Set::IntSpan->new([map {
+        [ $_->[0], $_->[1] ]
+      } grep { $_->[2] eq $in } map { @$_ } @$v]);
+      push @{ $map{$in} }, $class;
+    }
   }
+
+  delete $map{''};
 
   return %map;
 }

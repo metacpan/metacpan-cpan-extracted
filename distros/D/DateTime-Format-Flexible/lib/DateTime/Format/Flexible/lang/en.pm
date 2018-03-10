@@ -81,8 +81,20 @@ sub day_numbers
 sub hours
 {
     return (
-        noon     => '12:00:00' ,
-        midnight => '00:00:00' ,
+        noon     => '12:00:00',
+        midnight => '00:00:00',
+        one      => '01:00:00',
+        two      => '02:00:00',
+        three    => '03:00:00',
+        four     => '04:00:00',
+        five     => '05:00:00',
+        six      => '06:00:00',
+        seven    => '07:00:00',
+        eight    => '08:00:00',
+        nine     => '09:00:00',
+        ten      => '10:00:00',
+        eleven   => '11:00:00',
+        twelve   => '12:00:00',
     );
 }
 
@@ -106,12 +118,17 @@ sub parse_time
 
     return $date if ( not $date =~ m{\s?at\s?}mx );
 
-    my ( $pre, $time, $post ) = $date =~ m{\A(.+)\s?at\s?([\d\.:]+)(.+)?\z}mx;
+    my ( $pre, $time, $post ) = $date =~ m{\A(.+)?\s?at\s?([\d\.:]+)(.+)?\z}mx;
+
+    # this will remove warnings if we don't have values for some of the variables
+    # eg: not a date matches on the 'at' in date
+    $pre  ||= q{};
+    $time ||= q{};
+    $post ||= q{};
+
     # if there is an 'at' string, we want to remove any time that was set on the date by default
     # 20050612T12:13:14 <-- T12:13:14
     $pre =~ s{T[^\s]+}{};
-
-    $post ||= q{};
 
     $date = $pre . 'T' . $time . 'T' . $post;
     return $date;

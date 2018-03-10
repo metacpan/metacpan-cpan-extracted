@@ -2,7 +2,7 @@
 #
 #       Module:  Term::CLI::Base
 #
-#  Description:  Generic roel for Term::CLI classes
+#  Description:  Generic role for Term::CLI classes
 #
 #       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
 #      Created:  10/02/18
@@ -20,7 +20,7 @@
 
 use 5.014_001;
 
-package Term::CLI::Base  0.03002 {
+package Term::CLI::Base  0.04004 {
 
 use Modern::Perl;
 use Term::CLI::ReadLine;
@@ -62,7 +62,7 @@ Term::CLI::Base - generic base class for Term::CLI classes
 
 =head1 VERSION
 
-version 0.03002
+version 0.04004
 
 =head1 SYNOPSIS
 

@@ -16,13 +16,12 @@ our $VERSION=$HTTP::MultiGet::VERSION;
 
 =head1 NAME
 
-AnyEvent::HTTP::MultiGet - AnyEvent Loop Control Freindly LWP Like agent
+AnyEvent::HTTP::MultiGet - AnyEvent->condvar Control Freindly LWP Like agent
 
 =head1 SYNOPSIS
 
   use Modern::Perl;
   use AnyEvent::HTTP::MultiGet;
-  use AnyEvent::Loop;
 
   my $self=AnyEvent::HTTP::MultiGet->new();
   my $count=0;
@@ -34,6 +33,7 @@ AnyEvent::HTTP::MultiGet - AnyEvent Loop Control Freindly LWP Like agent
     push @todo,HTTP::Request->new(GET=>'https://news.com');
 
     my $total=2 + scalar(@todo);
+    my $cv=AnyEvent->condvar;
 
     my $code;
     $code=sub {
@@ -45,19 +45,18 @@ AnyEvent::HTTP::MultiGet - AnyEvent Loop Control Freindly LWP Like agent
         $self->run_next;
       }
       no warnings;
-      last TEST_LOOP if $total==$count;
+      $cv->send if $total==$count;
     };
     $self->add_cb($req,$code);
     $self->add_cb($req_b,$code);
     $self->run_next;
-    AnyEvent::Loop::run;
+    $cv->recv;
   }
 
 Handling Multiple large http requests at once
 
   use Modern::Perl;
   use AnyEvent::HTTP::MultiGet;
-  use AnyEvent::Loop;
 
   my $self=AnyEvent::HTTP::MultiGet->new();
   my $chunks=0;
@@ -91,6 +90,7 @@ Handling Multiple large http requests at once
     };
 
     my $code;
+    my $cb=AnyEvent->condvar;
     $code=sub {
        my ($obj,$request,$result)=@_;
       printf 'HTTP Response code: %i %s'."\n",$result->code,$request->url;
@@ -101,21 +101,21 @@ Handling Multiple large http requests at once
         $self->run_next;
       }
       no warnings;
-      last TEST_LOOP if $count==$total;
+      $cv->send if $count==$total;
     };
     $self->add_cb([$req,on_body=>$on_body],$code);
     $self->add_cb([$req_b,on_body=>$on_body],$code);
     $self->add_cb([$req_c,on_body=>$on_body],$code);
 
     $self->run_next;
-    AnyEvent::Loop::run;
+    $cv->recv;
   }
 
 
 
 =head1 DESCRIPTION
 
-This class provides an AnyEvent::Loop::run frienddly implementation of HTTP::MultiGet.
+This class provides an AnyEvent->condvar frienddly implementation of HTTP::MultiGet.
 
 =head1 OO Arguments and accessors
 

@@ -25,13 +25,12 @@ WriteMakefile(
        AUTHOR         => 'MaxiM Basunov <maxim.basunov@gmail.com>') : ()),
     LICENSE           => 'perl',
     LIBS              => [''], # e.g., '-lm'
-    DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
+    DEFINE            => $deflist, # e.g., '-DHAVE_SOMETHING'
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'
         # Un-comment this if you add C files to link with later:
     # OBJECT            => '$(O_FILES)', # link all the C files too
     TYPEMAPS          => ['type.map'],
     H                 => ['mrttypes.h',],
-    DEFINE            => $deflist,
     TEST_REQUIRES     => {
         'Test::Deep'      => '0', # or a minimum working version
     }

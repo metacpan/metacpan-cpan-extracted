@@ -8,7 +8,7 @@
 #
 
 package Log::Dispatch::FileRotate::Flock;
-$Log::Dispatch::FileRotate::Flock::VERSION = '1.34';
+$Log::Dispatch::FileRotate::Flock::VERSION = '1.35';
 # ABSTRACT: File Locking Functions for L<Log::Dispatch::FileRotate>
 
 use strict;
@@ -99,7 +99,7 @@ Log::Dispatch::FileRotate::Flock - File Locking Functions for L<Log::Dispatch::F
 
 =head1 VERSION
 
-version 1.34
+version 1.35
 
 =head1 SYNOPSIS
 
@@ -125,13 +125,17 @@ the file on success, nothing on failure.
 
 =head1 SOURCE
 
-The development version is on github at L<https://github.com/mschout/perl-log-dispatch-filerotate>
-and may be cloned from L<git://github.com/mschout/perl-log-dispatch-filerotate.git>
+The development version is on github at L<http://https://github.com/mschout/perl-log-dispatch-filerotate>
+and may be cloned from L<git://https://github.com/mschout/perl-log-dispatch-filerotate.git>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to bug-log-dispatch-filerotate@rt.cpan.org or through the web interface at:
- http://rt.cpan.org/Public/Dist/Display.html?Name=Log-Dispatch-FileRotate
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/mschout/perl-log-dispatch-filerotate/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 

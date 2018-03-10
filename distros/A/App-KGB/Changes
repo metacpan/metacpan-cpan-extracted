@@ -1,3 +1,18 @@
+1.46 (2018-03-08)
+  [ Damyan Ivanov ]
+  * webhook/push: add always_squash_branch parameter, 
+    defaults to [ 'upstream', 'upstream/master' ]
+  * fix stats counting
+  * bot: reload URL shortening module when the config is changed
+  * document short_url_service in kgb.conf(5)
+
+  [ James Clarke ]
+  * Use ! rather than # for GitLab merge requests
+  * Use iid rather than global id for merge requests and issues
+
+  [ gregor herrmann ]
+  * bot: rename "signed-tags" to "signed tags", as in the client.
+
 1.45 (2018-03-06)
   [ Damyan Ivanov ]
   * point output of '/ctcp source' to salsa

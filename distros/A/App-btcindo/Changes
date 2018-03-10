@@ -1,3 +1,8 @@
+0.022   2018-03-07 (PERLANCAR)
+
+	- [Bugfix] ticker didn't respect the --pair option.
+
+
 0.021   2018-03-06 (PERLANCAR)
 
         - Add subcommands: public, private.

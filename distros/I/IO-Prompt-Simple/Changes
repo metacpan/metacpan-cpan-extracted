@@ -1,5 +1,8 @@
 Revision history for Perl extension IO::Prompt::Simple
 
+0.07 2018-03-09T10:52:29Z
+    - fixed test (reported by yanick++, genehack++)
+
 0.06  Mon Oct 22 01:23:33 2012
     - repacking (suggested by miyagawa++)
 

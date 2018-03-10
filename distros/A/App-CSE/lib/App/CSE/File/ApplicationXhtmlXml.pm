@@ -1,5 +1,5 @@
 package App::CSE::File::ApplicationXhtmlXml;
-$App::CSE::File::ApplicationXhtmlXml::VERSION = '0.012';
+$App::CSE::File::ApplicationXhtmlXml::VERSION = '0.013';
 use Moose;
 extends qw/App::CSE::File::ApplicationXml/;
 

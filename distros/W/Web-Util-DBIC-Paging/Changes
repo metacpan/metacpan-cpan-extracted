@@ -1,5 +1,9 @@
 Revision history for Web-Util-DBIC-Paging
 
+0.001004  2018-03-09 15:14:46-06:00 America/Chicago
+ - ensure that the value passed was indeed a ResultSet
+ - better examples in documentation
+
 0.001003  2013-06-26 17:32:02 CST6CDT
  - Make simple_search search TEXT fields with -like (Gabriel Andrade)
 

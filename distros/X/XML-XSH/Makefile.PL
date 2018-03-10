@@ -1,5 +1,8 @@
 # $Id: Makefile.PL,v 1.20 2003/08/25 12:16:34 pajas Exp $
 
+die "DEPRECATED. Use XML::XSH2 instead.\n"
+    unless $ENV{XML_XSH_TRY_ANYWAY};
+
 use strict;
 
 use ExtUtils::MakeMaker;

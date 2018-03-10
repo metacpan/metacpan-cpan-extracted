@@ -13,6 +13,7 @@ lib/App/Glacier/Command/Put.pm
 lib/App/Glacier/Command/Sync.pm
 lib/App/Glacier/Config.pm
 lib/App/Glacier/Config/Locus.pm
+lib/App/Glacier/Core.pm
 lib/App/Glacier/DateTime.pm
 lib/App/Glacier/DB.pm
 lib/App/Glacier/DB/GDBM.pm
@@ -26,6 +27,7 @@ lib/App/Glacier/Job/FileRetrieval.pm
 lib/App/Glacier/Job/InventoryRetrieval.pm
 lib/App/Glacier/Progress.pm
 lib/App/Glacier/Timestamp.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README

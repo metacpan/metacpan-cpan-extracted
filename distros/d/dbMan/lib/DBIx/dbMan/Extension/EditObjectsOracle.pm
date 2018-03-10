@@ -3,12 +3,13 @@ package DBIx::dbMan::Extension::EditObjectsOracle;
 use strict;
 use base 'DBIx::dbMan::Extension';
 use Text::FormatTable;
+use Term::ANSIColor;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 1;
 
-sub IDENTIFICATION { return "000001-000045-000005"; }
+sub IDENTIFICATION { return "000001-000045-000006"; }
 
 sub preference { return 50; }
 
@@ -52,28 +53,30 @@ sub handle_action {
 					delete $action{processed};
 					return %action;
 				} else {
+                    my $colorized = $obj->{-mempool}->get('output_format') eq 'colortable';
 					$action{action} = 'OUTPUT';
 					$action{output} = "You must explicit say which object you want edit:\n";
 					my $tab = new Text::FormatTable '| l | l |';
 					$tab->rule;
 					my @schema = ();
 					push @schema,'SCHEMA' if $schema;
-					$tab->head(@schema,'NAME','TYPE');
+					$tab->head(map { $colorized ? color( $obj->{-config}->tablecolor_head || 'bright_yellow' ) . $_ . color( $obj->{-config}->tablecolor_lines || 'reset' ) : $_; } @schema,'NAME','TYPE');
 					$tab->rule;
 					for (@$d) {
 						my @item = ();
 						push @item,$schema if $schema;
-						$tab->row(@item,@$_);
+						$tab->row(map { $colorized ? color( $obj->{-config}->tablecolor_content || 'bright_white' ) . $_ . color( $obj->{-config}->tablecolor_lines || 'reset' ) : $_; } @item,@$_);
 					}
 					$tab->rule;
-					$action{output} .= $tab->render($obj->{-interface}->render_size);
+					$action{output} .= ( $colorized ? color( $obj->{-config}->tablecolor_lines || 'reset' ) : '' )
+                        . $tab->render($obj->{-interface}->render_size) . ( $colorized ? color( 'reset' ) : '' );
 				}
 			} else {
 				$obj->{-interface}->error("Object ".$action{what}." not found.");
 				return %action;
 			}
 		} else {
-			print DBI::errstr()."\n";
+			$obj->{-interface}->error( DBI::errstr() );
 		}
 	}
 

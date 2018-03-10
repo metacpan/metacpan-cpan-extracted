@@ -120,7 +120,9 @@ sub toString {
   my $lc = maxlen(map {$_->[3]} @hits);
   my $lr = maxlen(map {$_->[4]} @hits);
   return (
-	  "# Hit(s) $hits[0][0]-$hits[$#hits][0] of $hits->{nhits_}\n"
+	  "# Hit(s) $hits[0][0]-$hits[$#hits][0] of $hits->{nhits_}"
+	  .($hits->{hint_} ? " <HINT: $hits->{hint_}>" : '')
+	  ."\n"
 	  .join('', map {sprintf("%${ln}d: %-${lf}s  %${ll}s  %-${lc}s  %-${lr}s\n", @$_)} @hits)
 	 );
 }

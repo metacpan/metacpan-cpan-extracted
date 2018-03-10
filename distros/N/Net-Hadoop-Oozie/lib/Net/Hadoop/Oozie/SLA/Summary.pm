@@ -1,5 +1,5 @@
 package Net::Hadoop::Oozie::SLA::Summary;
-$Net::Hadoop::Oozie::SLA::Summary::VERSION = '0.112';
+$Net::Hadoop::Oozie::SLA::Summary::VERSION = '0.113';
 use 5.010;
 use warnings;
 use strict;
@@ -189,30 +189,28 @@ sub sla_miss_list {
 
 1;
 
+__END__
+
 =pod
 
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
-Net::Hadoop::Oozie::SLA::Summary
+Net::Hadoop::Oozie::Constants - Oozie SLA Summary
 
 =head1 VERSION
 
-version 0.112
-
-=head1 SYNOPSIS
-
-    use Net::Hadoop::Oozie::SLA::Summary;
-    # TODO
+version 0.113
 
 =head1 DESCRIPTION
 
 Part of the Perl Oozie interface.
 
-=head1 NAME
+=head1 SYNOPSIS
 
-Net::Hadoop::Oozie::Constants - Oozie SLA Summary
+    use Net::Hadoop::Oozie::SLA::Summary;
+    # TODO
 
 =head1 METHODS
 
@@ -224,21 +222,7 @@ TODO.
 
 L<Net::Hadoop::Oozie>, L<Net::Hadoop::Oozie::SLA>.
 
-=head1 AUTHOR
-
-David Morel <david.morel@amakuru.net>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015 by David Morel & Booking.com.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =cut
-
-__END__
-
 
 
 sample SLA record:

@@ -250,6 +250,15 @@ The separator before the commit log. Default: none.
 
 =back
 
+=head2 short_url_service I<name>
+
+The name of a WWW::Shorten module to use for URL-shortening. The leading
+C<WWW::Shorten::> part must be omitted.
+
+Default: none
+
+Example: Debli
+
 =head1 EXAMPLE CONFGURATION
 
  # vim: filetype=yaml
@@ -322,6 +331,7 @@ The separator before the commit log. Default: none.
  # available colors: black, navy, green, red, brown, purple, orange, yellow,
  #  lime, teal, aqua, blue, fuchsia, gray, silver, white
  # available modifiers: bold underline reverse
+ short_url_service: Debli
 
 =head1 SEE ALSO
 

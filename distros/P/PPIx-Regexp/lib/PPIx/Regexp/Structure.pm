@@ -29,7 +29,7 @@ L<PPIx::Regexp::Structure::Unknown|PPIx::Regexp::Structure::Unknown>.
 =head1 DESCRIPTION
 
 This class represents a bracketed construction of some sort. The
-brackets considered part of the structure, but not inside it. So the
+brackets are considered part of the structure, but not inside it. So the
 C<elements()> method returns the brackets if they are defined, but the
 C<children()> method does not.
 
@@ -53,7 +53,7 @@ use PPIx::Regexp::Constant qw{ STRUCTURE_UNKNOWN };
 use PPIx::Regexp::Util qw{ __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 
 use constant ELEMENT_UNKNOWN => STRUCTURE_UNKNOWN;
 
@@ -112,6 +112,13 @@ sub __new {
 
     return $self;
 }
+
+=head2 elements
+
+This override returns all components of the structure, including those
+that define it.
+
+=cut
 
 sub elements {
     my ( $self ) = @_;

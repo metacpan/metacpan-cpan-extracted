@@ -72,7 +72,7 @@ subtest 'basics - red' => sub {
                 expected => [255, 0, 0],
         );
         
-        bsic_tests(
+        convert_colour(
                 start => '#f00',
                 expected => [255, 0, 0],
         );

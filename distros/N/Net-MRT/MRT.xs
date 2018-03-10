@@ -20,7 +20,7 @@
 #  include <fcntl.h>
 #endif
 
-#include "ppport.h"
+//#include "ppport.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -508,7 +508,12 @@ PerlIO * f;
             {
                 snprintf(sbuff, SBUFF, "Message length too big at %lli", (intmax_t)msgpos);
                 hv_stores(rt, "error", newSVpv(sbuff, 0));
-                PerlIO_seek(f, mh.length, SEEK_CUR);
+                while (mh.length > 0) {
+                    auto remainder = (BUFFER_SIZE < mh.length ? BUFFER_SIZE : mh.length);
+                    printf("remaining: %d to do: %d %d\n", mh.length, remainder, BUFFER_SIZE); fflush(stdout);
+                    sz = PerlIO_read(f, &mh.message, remainder);
+                    mh.length -= remainder;
+                }
             } else {
                 # Try to read message
                 if (mh.length > 0)
@@ -557,7 +562,12 @@ PerlIO * f;
             if (mh.length > BUFFER_SIZE)
             {
                 snprintf(sbuff, SBUFF, "Message length too big at %lli", (intmax_t)msgpos);
-                PerlIO_seek(f, mh.length, SEEK_CUR);
+                while (mh.length > 0) {
+                    auto remainder = (BUFFER_SIZE < mh.length ? BUFFER_SIZE : mh.length);
+                    printf("remaining: %d to do: %d %d\n", mh.length, remainder, BUFFER_SIZE); fflush(stdout);
+                    sz = PerlIO_read(f, &mh.message, remainder);
+                    mh.length -= remainder;
+                }
                 ST(2) = newSVuv(-1);
                 ST(3) = newSVpv(sbuff, strlen(sbuff));
             } else {

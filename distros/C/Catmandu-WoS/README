@@ -7,6 +7,8 @@ MODULES
 
       * Catmandu::Importer::WoS
 
+      * Catmandu::Importer::WoSCitedReferences
+
 AUTHOR
 
     Nicolas Steenlant <nicolas.steenlant@ugent.be>

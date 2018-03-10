@@ -4,7 +4,9 @@ author:
   - 'Tom Heady (cpan@punch.net)'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::Exception: '0'
   Test::MockTime: '0'
+  Test::NoWarnings: '0'
   Test::Simple: '0.44'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -25,5 +27,5 @@ requires:
   DateTime::TimeZone: '0'
   List::MoreUtils: '0'
   Module::Pluggable: '0'
-version: '0.29'
+version: '0.30'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

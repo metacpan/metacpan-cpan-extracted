@@ -4,6 +4,11 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.622 2018-03-07
+
+  * Various minor documentation fixes
+  * Simplify file name of archived live plot
+
 3.621 2018-02-26
 
   * Enable creation of genereric Lab::Moose::Instrument objects

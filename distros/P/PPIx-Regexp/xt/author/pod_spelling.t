@@ -23,6 +23,7 @@ __DATA__
 Autoconf
 charnames
 errstr
+expl
 hocery
 indices
 infeasible
@@ -43,6 +44,7 @@ PPI
 ppi
 PPI's
 reblesses
+remov
 repl
 schild
 schildren

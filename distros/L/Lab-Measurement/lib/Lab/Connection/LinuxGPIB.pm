@@ -1,6 +1,6 @@
 package Lab::Connection::LinuxGPIB;
 #ABSTRACT: LinuxGPIB connection
-$Lab::Connection::LinuxGPIB::VERSION = '3.621';
+$Lab::Connection::LinuxGPIB::VERSION = '3.622';
 #
 # GPIB Connection class for Lab::Bus::LinuxGPIB
 #
@@ -99,7 +99,7 @@ Lab::Connection::LinuxGPIB - LinuxGPIB connection
 
 =head1 VERSION
 
-version 3.621
+version 3.622
 
 =head1 SYNOPSIS
 

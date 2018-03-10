@@ -3,7 +3,10 @@ package WebService::MODIS;
 use strict;
 use warnings;
 use Carp;
+use URI;
 use LWP::UserAgent;
+use HTTP::Cookies;
+use Net::Netrc;
 use File::Basename;
 use File::HomeDir;
 use File::Path qw(make_path);
@@ -17,7 +20,21 @@ our %EXPORT_TAGS = ( 'all' => [ qw(initCache readCache writeCache getCacheState 
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT      = qw(initCache readCache writeCache getCacheState getVersions isGlobal);
 
-our $VERSION = '1.6';
+our $VERSION = '2.0';
+
+## Redefine the authentication function
+{
+    no warnings 'redefine';
+    sub LWP::UserAgent::get_basic_credentials {
+        my ($self, $realm, $url, $isproxy) = @_;
+        my $uri = URI->new($url);
+        if (my $tuple = Net::Netrc->lookup($uri->host)) {
+            return ($tuple->login, $tuple->password);
+        } else {
+            croak "Did not find username/password for machine '".$uri->host."' in ~/.netrc!\n";
+        }
+    }
+}
 
 my %modisProducts     = ();
 my %modisDates        = ();
@@ -29,7 +46,7 @@ my $cacheDir;
 
 my $cacheState = '';
 
-my $BASE_URL = "http://e4ftl01.cr.usgs.gov";
+my $BASE_URL = "https://e4ftl01.cr.usgs.gov";
 my @DATA_DIR = ("MOLA", "MOLT", "MOTA");
 
 if (lc($^O) =~ /mswin/) {
@@ -211,7 +228,7 @@ sub product {
         if ($cacheState eq '') {
             carp "Cache not initialized or loaded, cannot check availability of '$_[0]'.";
         } else {
-            my $failed=1;
+            my $failed = 1;
             $failed = 0 if any { /$_[0]\.[0-9]{3}/ } (keys %modisProducts);
             croak "Product '$_[0]' not available!" if $failed;
         }
@@ -359,7 +376,7 @@ sub createUrl {
         my @cleanedDates = @dates;
         foreach (@dates) {
             my $failed = 0;
-            $failed=1 if none { /$_/ } @{$modisDates{$product}};
+            $failed = 1 if none { /$_/ } @{$modisDates{$product}};
             if ($failed) {
                 @cleanedDates = grep { $_ != $_ } @cleanedDates;
                 carp "Date '$_' not available! Removing it from list";
@@ -497,24 +514,16 @@ sub download {
     $nUrl = @{$self->{url}};
 
     if (! -d $self->{targetDir}) {
-      my $failed = 1;
-      make_path($self->targetDir) and $failed = 0;
-      if ($failed) {
-          croak "Cannot create directory '$self->{targetDir}': $!\n";
-      }
+        make_path($self->targetDir) or croak "Cannot create directory '$self->{targetDir}': $!\n";
     }
 
     # adjusted from http://stackoverflow.com/questions/6813726/continue-getting-a-partially-downloaded-file
-    my $ua = LWP::UserAgent->new();
+    my $ua = LWP::UserAgent->new(cookie_jar => HTTP::Cookies->new());
 
     for (my $i=0; $i < $nUrl; $i++) {
         my $file = $self->{targetDir}."/".basename(@{$self->{url}}[$i]);
         unlink($file) if ($self->{forceReload} && -f $file);
-        my $failed = 1;
-        open(my $fh, '>>:raw', $file) and $failed = 0;
-        if ($failed) {
-            croak "Cannot open '$file': $!\n";
-        }
+        open(my $fh, '>>:raw', $file) or croak "Cannot open '$file': $!\n";
         my $bytes = -s $file;
         my $res;
         if ( $bytes && ! $self->{forceReload}) {
@@ -538,7 +547,7 @@ sub download {
             #print "OK\n" if ($verbose && $status =~ /^20[06]/);
             #print "already complete\n" if ($verbose && $status =~ /^416/);
         } else {
-            print "DEBUG: $status what happend?";
+            print "Unknown STATUS: '$status'!\n";
         }
     }
 }

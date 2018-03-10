@@ -39,11 +39,12 @@ use PPIx::Regexp::Constant qw{
     LITERAL_LEFT_CURLY_ALLOWED
     LITERAL_LEFT_CURLY_REMOVED_PHASE_1
     LITERAL_LEFT_CURLY_REMOVED_PHASE_2
+    LITERAL_LEFT_CURLY_REMOVED_PHASE_3
     MINIMUM_PERL MSG_PROHIBITED_BY_STRICT
     TOKEN_UNKNOWN
 };
 
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 
 # Return true if the token can be quantified, and false otherwise
 # sub can_be_quantified { return };
@@ -71,11 +72,31 @@ sub perl_version_introduced {
     my %removed = (
 	q<{>	=> sub {
 	    my ( $self ) = @_;
-	    # Un-escaped literal left curlys are always allowed when
-	    # they begin the regexp or the group.
-	    my $prev = $self->sprevious_sibling()
-		or return LITERAL_LEFT_CURLY_ALLOWED;
-	    return $prev->__following_literal_left_curly_disallowed_in();
+
+	    my $prev;
+
+	    if ( $prev = $self->sprevious_sibling() ) {
+		# When an unescaped left curly follows something else in
+		# the same structure, the logic on whether it is allowed
+		# lives, for better or worse, on the sibling.
+		return $prev->__following_literal_left_curly_disallowed_in();
+	    } elsif ( $prev = $self->sprevious_element() ) {
+		# Perl 5.27.8 deprecated unescaped literal left curlys
+		# after a left paren that introduces a group. Therefore
+		# the left curly has no previous sibling. But the curly
+		# is still legal at the beginning of a regex, even one
+		# delimited by parens, so we can not return when we find
+		# a PPIx::Regexp::Token::Delimiter, which is a subclass
+		# of PPIx::Regexp::Token::Structure.
+		$prev->isa( 'PPIx::Regexp::Token::Structure' )
+		    and q<(> eq $prev->content()
+		    and not $prev->isa( 'PPIx::Regexp::Token::Delimiter' )
+		    and return LITERAL_LEFT_CURLY_REMOVED_PHASE_3;
+	    }
+	    # When this mess started, the idea was to always allow
+	    # unescaped literal left curlies that started a regex or a
+	    # group
+	    return LITERAL_LEFT_CURLY_ALLOWED;
 	},
     );
 

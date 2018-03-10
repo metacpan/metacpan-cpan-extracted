@@ -1,0 +1,44 @@
+---
+abstract: 'Fetch/build/stash Kent src from L<http://hgdownload.cse.ucsc.edu/admin/>'
+author:
+  - unknown
+build_requires:
+  Alien::Build::MM: '0.25'
+  Archive::Zip: '0'
+  Config: '0'
+  HTML::LinkExtor: '0'
+  HTTP::Tiny: '0.044'
+  Sort::Versions: '0'
+  URI: '0'
+  URI::Escape: '0'
+configure_requires:
+  Alien::Build: '1.19'
+  Alien::Build::MM: '0.25'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-KentSrc
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Build: '0.25'
+  perl: '5.008009'
+version: '0.4'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 1.37'
+  requires:
+    share:
+      Archive::Zip: '0'
+      Config: '0'
+      HTML::LinkExtor: '0'
+      HTTP::Tiny: '0.044'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

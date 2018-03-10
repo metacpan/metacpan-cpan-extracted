@@ -35,3 +35,8 @@ Revision history for Perl extension ModisDownload.
 1.6   Thu Dec  3 13:28:23 CET 2015
   - Removed initCache test, since it took too long
 
+2.0   Thu Mar  8 15:20:12 CET 2018
+  Authentication and therefore downloads are working again now. However, I had to add more dependencies to achieve that:
+  - included a cookie jar (HTTP::Cookies)
+  - Reading login/password from ~/.netrc
+  - TODO: include an interactive password dialog

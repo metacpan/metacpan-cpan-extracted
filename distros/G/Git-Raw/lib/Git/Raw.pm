@@ -1,5 +1,5 @@
 package Git::Raw;
-$Git::Raw::VERSION = '0.75';
+$Git::Raw::VERSION = '0.78';
 use strict;
 use warnings;
 
@@ -25,6 +25,7 @@ use Git::Raw::Stash;
 use Git::Raw::Stash::Progress;
 use Git::Raw::Tree;
 use Git::Raw::TransferProgress;
+use Git::Raw::Worktree;
 
 =for HTML
 <a href="https://travis-ci.org/jacquesg/p5-Git-Raw">
@@ -44,7 +45,7 @@ Git::Raw - Perl bindings to the Git linkable library (libgit2)
 
 =head1 VERSION
 
-version 0.75
+version 0.78
 
 =head1 DESCRIPTION
 

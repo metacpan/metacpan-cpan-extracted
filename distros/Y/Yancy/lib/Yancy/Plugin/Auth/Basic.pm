@@ -1,11 +1,10 @@
 package Yancy::Plugin::Auth::Basic;
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 # ABSTRACT: A simple auth module for a site
 
 #pod =encoding utf8
 #pod =head1 SYNOPSIS
 #pod
-#pod     # myapp.pl
 #pod     use Mojolicious::Lite;
 #pod     plugin Yancy => {
 #pod         backend => 'pg://localhost/mysite',
@@ -23,39 +22,11 @@ our $VERSION = '0.021';
 #pod     app->yancy->plugin( 'Auth::Basic' => {
 #pod         collection => 'users',
 #pod         username_field => 'username',
-#pod         password_field => 'password', # default
+#pod         password_field => 'password',
 #pod         password_digest => {
 #pod             type => 'SHA-1',
 #pod         },
 #pod     } );
-#pod
-#pod     # yancy.conf
-#pod     {
-#pod         backend => 'pg://localhost/mysite',
-#pod         collections => {
-#pod             users => {
-#pod                 required => [ 'username', 'password' ],
-#pod                 properties => {
-#pod                     id => { type => 'integer', readOnly => 1 },
-#pod                     username => { type => 'string' },
-#pod                     password => { type => 'string', format => 'password' },
-#pod                 },
-#pod             },
-#pod         },
-#pod         plugins => [
-#pod             [
-#pod                 'Auth::Basic', {
-#pod                     collection => 'users',
-#pod                     username_field => 'username',
-#pod                     password_field => 'password', # default
-#pod                     password_digest => {
-#pod                         type => 'SHA-1',
-#pod                     },
-#pod                 },
-#pod             ],
-#pod         ],
-#pod     }
-#pod
 #pod
 #pod =head1 DESCRIPTION
 #pod
@@ -404,7 +375,7 @@ Yancy::Plugin::Auth::Basic - A simple auth module for a site
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 
@@ -415,7 +386,6 @@ then authorized to use the administration application and API.
 =encoding utf8
 =head1 SYNOPSIS
 
-    # myapp.pl
     use Mojolicious::Lite;
     plugin Yancy => {
         backend => 'pg://localhost/mysite',
@@ -433,38 +403,11 @@ then authorized to use the administration application and API.
     app->yancy->plugin( 'Auth::Basic' => {
         collection => 'users',
         username_field => 'username',
-        password_field => 'password', # default
+        password_field => 'password',
         password_digest => {
             type => 'SHA-1',
         },
     } );
-
-    # yancy.conf
-    {
-        backend => 'pg://localhost/mysite',
-        collections => {
-            users => {
-                required => [ 'username', 'password' ],
-                properties => {
-                    id => { type => 'integer', readOnly => 1 },
-                    username => { type => 'string' },
-                    password => { type => 'string', format => 'password' },
-                },
-            },
-        },
-        plugins => [
-            [
-                'Auth::Basic', {
-                    collection => 'users',
-                    username_field => 'username',
-                    password_field => 'password', # default
-                    password_digest => {
-                        type => 'SHA-1',
-                    },
-                },
-            ],
-        ],
-    }
 
 =head1 CONFIGURATION
 

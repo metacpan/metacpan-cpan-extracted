@@ -1,8 +1,5 @@
 package Catalyst::TraitFor::Controller::DBIC::DoesPaging;
-{
-  $Catalyst::TraitFor::Controller::DBIC::DoesPaging::VERSION = '1.001003';
-}
-
+$Catalyst::TraitFor::Controller::DBIC::DoesPaging::VERSION = '1.001004';
 # ABSTRACT: Helps you paginate, search, sort, and more easily using DBIx::Class
 
 use Moose::Role;
@@ -46,13 +43,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Catalyst::TraitFor::Controller::DBIC::DoesPaging - Helps you paginate, search, sort, and more easily using DBIx::Class
 
 =head1 VERSION
 
-version 1.001003
+version 1.001004
 
 =head1 SYNOPSIS
 
@@ -82,14 +81,14 @@ return a ResultSet.
 
 =head2 page_and_sort
 
- my $result = $self->page_and_sort($c, $c->model('DB::Foo'));
+ my $result_rs  = $self->page_and_sort($c, $c->model('DB::Foo'));
 
 This is a helper method that will first L</sort> your data and then L</paginate>
 it.
 
 =head2 paginate
 
- my $result = $self->paginate($c, $c->model('DB::Foo'));
+ my $result_rs  = $self->paginate($c, $c->model('DB::Foo'));
 
 Paginates the passed in resultset based on the following CGI parameters:
 
@@ -106,22 +105,16 @@ method look something like the following:
 
  # Base search dispatcher, defined in MyApp::Schema::ResultSet
  sub _build_search {
-    my $self           = shift;
-    my $dispatch_table = shift;
-    my $q              = shift;
-
-    my %search = ();
-    my %meta   = ();
+    my ($rs, $dispatch_table, $q) = @_;
 
     foreach ( keys %{$q} ) {
        if ( my $fn = $dispatch_table->{$_} and $q->{$_} ) {
-          my ( $tmp_search, $tmp_meta ) = $fn->( $q->{$_} );
-          %search = ( %search, %{$tmp_search||{}} );
-          %meta   = ( %meta,   %{$tmp_meta||{}} );
+          my ( $search, $meta ) = $fn->( $q->{$_} );
+          $rs = $rs->search($search, $meta);
        }
     }
 
-    return $self->search(\%search, \%meta);
+    return $rs;
  }
 
  # search method in specific resultset
@@ -145,17 +138,14 @@ L</simple_search> instead.
 
 =head2 sort
 
- my $result = $self->sort($c, $c->model('DB::Foo'));
+ my $result_rs  = $self->sort($c, $c->model('DB::Foo'));
 
 Exactly the same as search, except calls C<controller_sort> or L</simple_sort>.
 Here is how I use it:
 
  # Base sort dispatcher, defined in MyApp::Schema::ResultSet
  sub _build_sort {
-    my $self = shift;
-    my $dispatch_table = shift;
-    my $default = shift;
-    my $q = shift;
+    my ($self, $dispatch_table, $default, $q) = @_;
 
     my %search = ();
     my %meta   = ();
@@ -165,15 +155,13 @@ Here is how I use it:
 
     if ( my $fn = $dispatch_table->{$sort} ) {
        my ( $tmp_search, $tmp_meta ) = $fn->( $direction );
-       %search = ( %search, %{$tmp_search||{}} );
-       %meta   = ( %meta,   %{$tmp_meta||{}} );
+       $self = $self->search( $tmp_search, $tmp_meta );
     } elsif ( $sort && $direction ) {
        my ( $tmp_search, $tmp_meta ) = $default->( $sort, $direction );
-       %search = ( %search, %{$tmp_search||{}} );
-       %meta   = ( %meta,   %{$tmp_meta||{}} );
+       $self = $self->search( $tmp_search, $tmp_meta );
     }
 
-    return $self->search(\%search, \%meta);
+    return $self;
  }
 
  # sort method in specific resultset
@@ -198,7 +186,7 @@ Here is how I use it:
 
 =head2 simple_deletion
 
- $self->simple_deletion($c, $c->model('DB::Foo'));
+ my $deleted_ids = $self->simple_deletion($c, $c->model('DB::Foo'));
 
 Deletes from the passed in resultset based on the following CGI parameter:
 
@@ -260,7 +248,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

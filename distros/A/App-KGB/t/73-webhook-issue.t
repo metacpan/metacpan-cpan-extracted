@@ -54,7 +54,8 @@ my $resp = webhook_post(
         user              => { name => 'Test User' },
         project           => { name => 'test-repo', },
         object_attributes => {
-            id     => 42,
+            id     => 4242,
+            iid    => 42,
             title  => "Issue title goes here",
             url    => 'http://git/issues/42',
             action => 'open',
@@ -68,7 +69,7 @@ TestBot->expect(
     join( ' ',
         '#test 03Test User',
         '05issues 06test-repo',
-        '42',
+        '#42',
         '03Issue title goes here',
         '* 14http://git/issues/42',
     )

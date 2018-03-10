@@ -1,7 +1,7 @@
 package App::Glacier::Command::Put;
 use strict;
 use warnings;
-use App::Glacier::Command;
+use App::Glacier::Core;
 use App::Glacier::DateTime;
 use App::Glacier::Job::InventoryRetrieval;
 use App::Glacier::Progress;
@@ -70,26 +70,30 @@ B<glacier>(1).
     
 =cut    
 
-sub getopt {
-    my ($self, %opts) = @_;
-    return $self->SUPER::getopt('jobs|j=i' => \$self->{_options}{jobs},
-				'quiet|q' => \$self->{_options}{quiet},
-				'rename|r' => \$self->{_options}{rename},
-				%opts);
+sub new {
+    my ($class, $argref, %opts) = @_;
+    $class->SUPER::new(
+	$argref,
+	optmap => {
+	    'jobs|j=i' => 'jobs',
+	    'quiet|q' => 'quiet',
+	    'rename|r' => 'rename'
+	}, %opts);
 }
 
 sub run {
     my $self = shift;
     if ($self->{_options}{rename}) {
 	$self->abend(EX_USAGE, "exactly three arguments expected")
-	    unless @_ == 3;
-	my ($vaultname, $localname, $remotename) = @_;
+	    unless $self->command_line == 3;
+	my ($vaultname, $localname, $remotename) = $self->command_line;
 	$self->_upload($vaultname, $localname, $remotename);
     } else {
-	$self->abend(EX_USAGE, "too few arguments") if @_ < 2;
-	my $vaultname = shift;
+	my @argv = $self->command_line;
+	$self->abend(EX_USAGE, "too few arguments") if @argv < 2;
+	my $vaultname = shift @argv;
 	my @failed_uploads;
-	foreach my $filename (@_) {
+	foreach my $filename (@argv) {
 	    eval {
 		$self->_upload($vaultname, $filename);
 	    };
@@ -102,7 +106,7 @@ sub run {
 	    }
 	}
 	if (@failed_uploads) {
-	    if (@failed_uploads == @_) {
+	    if (@failed_uploads == @argv) {
 		exit(EX_FAILURE);
 	    } else {
 		$self->error("the following files failed to upload: "

@@ -1,0 +1,331 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+no warnings 'numeric';
+
+use Data::ObjectStore;
+use Data::Dumper;
+
+my $db_dir = shift @ARGV;
+
+die "Usage: $0 <objectstore directory>" unless $db_dir;
+
+die "No object store found at $db_dir;" unless -d $db_dir;
+
+my $store = Data::ObjectStore->open_store( $db_dir );
+
+show( $store->load_root_container->_id );
+
+print ">";
+
+while( my $in = <STDIN> ) {
+    chomp $in;
+    interpret( $in );
+    print "\n>";
+}
+
+exit;
+
+sub interpret {
+    my $cmd = shift;
+
+    #
+    # SHOW the given ID, which is going to be a number
+    # greater than zero
+    #
+    if( $cmd > 0 ) {
+        show( $cmd );
+    } #SHOW
+
+    elsif( $cmd =~ /^\s*RECYCLE/i ) {
+        print "\nrunning recycler\n";
+        $store->run_recycler;
+        print "\ndone running recycler\n";
+        print "\n";
+    } #PURGE
+
+    elsif( $cmd =~ /^\s*SAVE/i ) {
+        print "Saving all\n";
+        $store->save;
+        print "Done\n";
+    } #STOW
+
+    elsif( $cmd =~ /^\s*EXIT/i ) {
+        if( $store->_has_dirty ) {
+            print "About to exit. There are things not saved. Proceed without saving (yes/N)? ";
+            my $yn = <STDIN>;
+            chomp $yn;
+            if( $yn eq 'yes' ) {
+                exit;
+            }
+            print "Exit aborted\n";
+        } else {
+            exit;
+        }
+    } #STOW
+
+    elsif( $cmd =~ /^\s*DELETE\s+(\d+)\s+(\S+)/ ) {
+        my( $from_id, $from_field ) = ( $1, $2 );
+
+        my $obj = $store->_fetch( $from_id );
+        my $r = ref( $obj );
+        if( $r eq 'ARRAY' ) {
+            unless( $from_field > 0 || $from_field eq '0' ) {
+                print "object $from_id is an array. Field must be numeric. Doing nothing\n";
+                return;
+            }
+            splice @$obj, $from_field, 1;
+            print "Removed index '$from_field' from list at $from_id.\n";
+        }
+        elsif( $r eq 'HASH' ) {
+            delete $obj->{$from_field};
+            print "Removed field '$from_field' from hash at $from_id.\n";
+        } else {
+            delete $obj->[1]{$from_field};
+            $store->_dirty( $obj, $from_id );
+            print "Removed field '$from_field' from object at $from_id.\n";
+        }
+    } #DELETE
+
+    elsif( $cmd =~ /^\s*ADD(LIST|OBJ|HASH|VAL|REF)\s+(\d+)\s+(\S+)(\s+(.*))?/ ) {
+        my( $type, $to_id, $to_field, $value ) = ( $1, $2, $3, $5 );
+        my $to_obj = $store->_fetch( $to_id );
+        my $to_r = ref( $to_obj );
+        if( $to_r eq 'ARRAY' ) {
+            unless( $to_field > 0 || $to_field eq '0' ) {
+                print "$to_id is an array. Field must be numeric. Doing nothing\n";
+                return;
+            }
+        } elsif( $to_r eq 'HASH' ) {
+            if( defined $to_obj->{$to_field} ) {
+                print "$to_id is an hash and there is already a value at $to_field. Doing nothing\n";
+                return;
+            }
+        } elsif( defined( $to_obj->[1]{$to_field} ) ) {
+            print "$to_id is an object and there is already a value at $to_field. Doing nothing\n";
+            return;
+        }
+
+        if( $type eq 'REF' ) {
+            # don't need to load the reference, just check it
+            if( $value == 0 ) {
+                print "Reference must be numeric\n";
+                return;
+            }
+            unless( $store->[0]->has_id( $value ) ) {
+                print "Reference $value not found.\n";
+                return;
+            }
+            
+            if( $to_r eq 'ARRAY' ) {
+                my $tied = tied @$to_obj;
+                splice @{$tied->[1]}, $to_field, 0, $value;
+                print "Added reference $value to list $to_id at field $to_field\n";
+            } elsif( $to_r eq 'HASH' ) {
+                my $tied = tied %$to_obj;
+                $tied->[1]->{$to_field} = $value;
+                print "Added reference $value to hash $to_id at field $to_field\n";
+            } else {
+                $to_obj->[1]{$to_field} = $value;
+                print "Added reference $value to object $to_id at field $to_field\n";
+            }
+            $store->_dirty( $to_obj, $to_id );
+            return;
+        }
+
+        if( $type eq 'LIST' ) {
+            $value = [];
+        } elsif( $type eq 'HASH' ) {
+            $value = {};
+        } elsif( $type eq 'OBJ' ) {
+            if( $value ) {
+                eval("use $value");
+                if( $@ ) {
+                    print "Error instantiating object of $value : $@. Doing nothing\n";
+                    return;
+                }
+            }
+            $value = $store->create_container($value); #value is class here
+        }
+
+        if( $to_r eq 'ARRAY' ) {
+            splice @$to_obj, $to_field, 0, $value;
+            print "Added $value to list $to_id at field $to_field\n";
+        } elsif( $to_r eq 'HASH' ) {
+            $to_obj->{$to_field} = $value;
+            print "Added $value to hash $to_id at field $to_field\n";
+        } else {
+            $to_obj->set( $to_field, $value );
+            print "Added $value to object $to_id at field $to_field\n";
+        }
+
+    } #ADD
+
+    elsif( $cmd =~ /^\s*MOVE\s+(\d+)\s+(\S+)\s+(\d+)\s+(\S+)/ ) {
+        my( $from_id, $from_field, $to_id, $to_field ) = ( $1, $2, $3, $4 );
+        my $to_obj = $store->_fetch( $to_id );
+        my $to_r = ref( $to_obj );
+
+        if( $to_r eq 'ARRAY' ) {
+            unless( $to_field > 0 || $to_field eq '0' ) {
+                print "object $to_id is an array. Field must be numeric. Doing nothing\n";
+                return;
+            }
+        }
+        elsif( $to_r eq 'HASH' ) {
+            if( defined($to_obj->{$to_field}) ) {
+                print "Hash at $to_id aready has a value in field '$to_field'. Doing nothing\n";
+                return;
+            }
+        } else {
+            if( defined($to_obj->[1]{$to_field}) ) {
+                print "Object at $to_id aready has a value in field '$to_field'. Doing nothing\n";
+                return;
+            }
+        }
+
+        my $from_obj = $store->_fetch( $from_id );
+        my $from_r = ref( $from_obj );
+        my $from_val;
+        if( $from_r eq 'ARRAY' ) {
+            unless( $from_field > 0 || $from_field eq '0' ) {
+                print "object $from_id is an array. Field must be numeric. Doing nothing\n";
+                return;
+            }
+            my $tied = tied @$from_obj;
+            $from_val = splice @{$tied->[1]}, $from_field, 1;
+        }
+        elsif( $from_r eq 'HASH' ) {
+            my $tied = tied %$from_obj;
+            $from_val = delete $tied->[1]->{$from_field};
+        }
+        else {
+            $from_val = delete $from_obj->[1]{$from_field};
+        }
+        $store->_dirty( $from_obj, $from_id );
+
+        if( $to_r eq 'ARRAY' ) {
+            my $tied = tied @$to_obj;
+            splice @{$tied->[1]}, $to_field, 0, $from_val;
+            print "Moved '$from_val' from '$from_id' field '$from_field' to list '$to_id' field '$to_field'\n";
+        }
+        elsif( $to_r eq 'HASH' ) {
+            my $tied = tied @$to_obj;
+            $tied->[1]{$to_field} = $from_val;
+            print "Moved '$from_val' from '$from_id' field '$from_field' to hash '$to_id' field '$to_field'\n";
+        } else {
+            $to_obj->[1]{$to_field} = $from_val;
+            print "Moved '$from_val' from '$from_id' field '$from_field' to object '$to_id' field '$to_field'\n";
+        }
+        $store->_dirty( $to_obj, $to_id );
+
+    } #MOVE
+    else {
+        print <<"END";
+To view a stored object, type its numeric id.
+Other Commands :
+     ADDREF to-id to-field existing-id
+        Attaches the existing reference ID to the object's field
+     ADDHASH to-id to-field
+        Creates a list and attaches it to the object's field
+     ADDLIST to-id to-field
+        Creates a list and attaches it to the object's field
+     ADDOBJ to-id to-field classname?
+        Creates a container and attaches it to the object's field
+     ADDVAL to-id to-field value
+        Attaches the string or number to the object's field
+     DELETE from-id from-field
+        removes the field from a given object
+     EXIT
+        exit this program
+     MOVE from-id from-field to-id to-field
+        moves the value of a field from one object to an other.
+     RECYCLE
+        run the recycler
+     SAVE
+        save any changes to the store
+     
+END
+    }
+} #interpret
+
+sub show {
+    my $id = shift;
+    my $obj = $store->_fetch( $id );
+    unless( $obj ) {
+        print "Nothing found for id $id\n";
+        return;
+    }
+    my $r = ref( $obj );
+    if( $r eq 'HASH' ) {
+        print "$id is hash with ".scalar(keys %$obj)." keys\n";
+        my $count = 0;
+        for my $key (sort keys %$obj) {
+            print "\t$key => ".$store->_xform_in( $obj->{$key} )."\n";
+            if( ++$count > 100 ) {
+                $count = 0;
+                print " .... more ..\n>";
+                my $in = <STDIN>;
+                chomp $in;
+                if( $in =~ /\S/ ) {
+                    interpret( $in );
+                    return;
+                }
+            }
+        }
+    }
+    elsif( $r eq 'ARRAY' ) {
+        print "$id is array with ".scalar(@$obj)." elements\n";
+        my $count = 0;
+        for( my $i=0; $i<@$obj; $i++ ) {
+            print "\t$i) ".$store->_xform_in( $obj->[$i] )."\n";
+            if( ++$count > 100 ) {
+                $count = 0;
+                print " .... more ..\n>";
+                my $in = <STDIN>;
+                chomp $in;
+                if( $in > 0 ) {
+                    show( $in );
+                    return;
+                }
+            }
+        }
+    }
+    else {
+        print "$id is $r\n\t".join("\n\t",map { "$_ => $obj->[1]{$_}" }
+                                 keys %{$obj->[1]} )."\n";
+    }
+} #show
+
+
+
+print "Enter an id to see the data at\n";
+print ">";
+
+while( my $in = <STDIN> ) {
+    chomp $in;
+
+    if( $in =~ /^(FULL\s+)?(\d+)$/ ) {
+        my $val = $store->_fetch( $2 );
+        if( length($val) < 1001 || $1 ) {
+            print $val."\n";
+        } else {
+            print substr( $val, 0, 1000 )."\n...(use FULL $2 to show all)";
+        }
+    } elsif( $in =~ /^SET (\d+) (.*)$/ ) {
+        $store->stow( $1, $2 );
+    } else {
+        print "Don't know how to show '$in'.\n";
+    }
+    
+    print "\n>";
+}
+
+exit;
+
+
+__END__
+
+a command line explorer for a Data::ObjectStore
+

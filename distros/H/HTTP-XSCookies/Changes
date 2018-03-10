@@ -1,3 +1,67 @@
+0.000019    2018-03-09
+            * Upgrade Devel::PPPort to version 3.36 to solve
+              compilation errors on older versions of Perl.
+
+0.000018    2018-03-09
+            * Try to sidestep a compilation failure for older Perls
+              by switching from av_top_index to av_tindex.
+            * Change the code to avoid, as far as I can see,
+              anything that might trigger an older C compiler.
+              Because it has only been 25 years since C90...
+
+0.000017    2018-03-07
+            * Optionally accept names without values, by adding
+              an optional parameter to crush_cookie that allows
+              the caller to say "please give me names without
+              a value, and set them to undef".  The default value
+              is zero, so you will not get these valueless names.
+            * Rework Buffer implementation,
+            * We now accept a cookie with a value that is an arrayref.
+              The values in the array get joined with '&', and then
+              the whole string is URL-encoded.  When crushing such a
+              cookie, the reverse applies.  This was suggested by
+              James Raspass (JRaspass in github); thanks!
+
+0.000016    2018-03-07
+            * Teach the parser about attributes with no value (like HttpOnly).
+              Reported by Nigel Gregoire (nfg in github); thanks!
+
+0.000015    2018-03-07
+            * Accept Perl boolean values when setting cookie attributes.
+              Thanks to Alex Pankoff (ccntrq in github) for reporting.
+            * Fix the tests for no-value attributes.
+
+0.000014    2017-07-25
+            * Try to support old versions of Windows without gmtime_s.
+
+0.000013    2017-07-22
+            * No changes.
+
+0.000012    2017-07-20
+            * Use C99 for solaris, attempting to support the platform.
+            * Add missing dependency on Date::Parse for testing.
+
+0.000011    2017-07-18
+            * Fix comparison of expiration times.
+            * Fix compilation error when memory checking is enabled.
+            * Fixed crash when uri encoding pound sign and other
+              large characters.
+
+0.000010    2017-07-14
+            * Stop using // comments.
+
+0.000009    2017-07-12
+            * Use Perl macros to manage memory.
+
+0.000008    2017-07-12
+            * Support compilation under Win32 / Win64.
+
+0.000007    2017-02-10
+            * Support SameSite attribute.
+
+0.000006    2016-08-15
+            * Improve perldoc.
+
 0.000005    2016-01-28
             * Switch all standard cookie field names to
               CamelCase, in accordance to RFC6265. Thanks to

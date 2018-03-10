@@ -1,7 +1,7 @@
 package Float::Util;
 
-our $DATE = '2018-03-04'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-03-09'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,7 +11,10 @@ use Config;
 use Exporter qw(import);
 our @EXPORT_OK = qw(is_exact);
 
-my $numsigfdigs = ($Config{usequadmath} ? 36 : 17)+1;
+my $numsigfdigs = (
+    $Config{nvsize} == 16 ? 36 :
+        $Config{nvsize} == 8 ? 17 :
+        die "Can't handle nvsize=$Config{nvsize}")+1;
 my $fmt = "%.${numsigfdigs}f";
 
 sub is_exact {
@@ -41,7 +44,7 @@ Float::Util - Utilities related to floating point numbers
 
 =head1 VERSION
 
-This document describes version 0.001 of Float::Util (from Perl distribution Float-Util), released on 2018-03-04.
+This document describes version 0.002 of Float::Util (from Perl distribution Float-Util), released on 2018-03-09.
 
 =head1 SYNOPSIS
 
@@ -80,6 +83,12 @@ patch to an existing test-file that illustrates the bug or desired
 feature.
 
 =head1 SEE ALSO
+
+L<https://en.wikipedia.org/wiki/Double-precision_floating-point_format>
+
+L<https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format>
+
+L<https://stackoverflow.com/questions/21146203/checking-if-floating-point-number-is-completely-convertibal-to-binary>
 
 =head1 AUTHOR
 

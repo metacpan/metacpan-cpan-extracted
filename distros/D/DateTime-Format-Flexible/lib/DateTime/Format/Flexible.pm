@@ -2,7 +2,7 @@ package DateTime::Format::Flexible;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use base 'DateTime::Format::Builder';
 
@@ -11,7 +11,7 @@ use DateTime::Infinite;
 
 use Carp 'croak';
 
-my $DELIM  = qr{(?:\\|\/|-|\.|\s)};
+my $DELIM  = qr{(?:\\|\/|-|'|\.|\s)};
 my $HMSDELIM = qr{(?:\.|:)};
 my $YEAR = qr{(\d{1,4})};
 my $MON = qr{([0-1]?\d)};
@@ -334,9 +334,9 @@ my $formats =
  ########################################################
  ##### bare times
  # HH:MM:SS
- { length => [5..8],
+ { length => [5..10],
    params => [ qw( hour minute second ) ] ,
-   regex => qr{\A$HMS\z} ,
+   regex => qr{\AT?${HMS}T?\z} ,
    postprocess => sub {
        my %args = @_;
        $args{parsed}{year} = __PACKAGE__->base->year;
@@ -344,10 +344,22 @@ my $formats =
        $args{parsed}{day} = __PACKAGE__->base->day;
    }
  },
+ # HH:MM:SS AM
+ { length => [7..13],
+   params => [ qw( hour minute second ampm ) ] ,
+   regex => qr{\AT?${HMS}T?\s?$AMPM\z} ,
+   postprocess => [sub {
+       my %args = @_;
+       $args{parsed}{year} = __PACKAGE__->base->year;
+       $args{parsed}{month} = __PACKAGE__->base->month;
+       $args{parsed}{day} = __PACKAGE__->base->day;
+   }, \&_fix_ampm]
+ },
+
  # HH:MM
- { length => [3..5],
+ { length => [3..7],
    params => [ qw( hour minute ) ] ,
-   regex => qr{\A$HM\z} ,
+   regex => qr{\AT?${HM}T?\z} ,
    postprocess => sub {
        my %args = @_;
        $args{parsed}{year} = __PACKAGE__->base->year;
@@ -379,6 +391,7 @@ my $formats =
    }, \&_fix_ampm ]
  } ,
 
+ ########################################################
  # Day of year
  # 1999345 => 1999, 345th day of year
  { length => [5,7],    params => [ qw( year doy ) ] ,
@@ -1035,7 +1048,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2007-2012 Tom Heady.
+Copyright 2007-2018 Tom Heady.
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of either:

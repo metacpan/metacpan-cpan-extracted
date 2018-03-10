@@ -1,13 +1,13 @@
 package Map::Tube::Exception::MalformedMapData;
 $Map::Tube::Exception::MalformedMapData::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::MalformedMapData::VERSION = '3.13';
+$Map::Tube::Exception::MalformedMapData::VERSION = '3.14';
 =head1 NAME
 
 Map::Tube::Exception::MalformedMapData - Represent 'malformed map data' exception.
 
 =head1 VERSION
 
-version 3.13
+version 3.14
 
 =cut
 

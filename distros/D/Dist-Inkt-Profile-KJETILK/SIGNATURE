@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 0eef094cfb7b724f6a5cf4e331d3f50c95d31d03 COPYRIGHT
+SHA1 0806c15c26625628e5af0018afaa4745b14eddc9 CREDITS
+SHA1 3400a9cc37d2a763153b67eb14a213e32ec05d46 Changes
+SHA1 00c5e7c85cec632809f3e732c8c3fe6d25a28714 INSTALL
+SHA1 2454ea67cbcfa62e76ec0cafc958c03287d7ab41 LICENSE
+SHA1 5341fa1fc95e6321f4be343e6de36de88362da82 MANIFEST
+SHA1 85fbee50de85d60d3ebf2df1c0d23603120a4a93 META.json
+SHA1 f18cd96cee66e76fa59f8ccf91a8b5085e99e923 META.yml
+SHA1 4c6b7824c716872d070db314cc15a4551e6c2953 Makefile.PL
+SHA1 f610b6cf2288de1caf567c0d0dd5726c01675d4d README
+SHA1 a3468921647e6e0f8fb5de1d596911ea415c70a9 dist.ini
+SHA1 36e8152669d4e39180fbc0bcacf487b058496bb2 doap.ttl
+SHA1 0e74b77755eaa0cb11fae8d07bf340b3a9f3b51c lib/Dist/Inkt/Profile/KJETILK.pm
+SHA1 7217a5c7b99c208161f1ae53efafeef9f7264069 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEDsyLxtCi6bk7pBcmf77o3zqeSqUFAlqgkqIACgkQf77o3zqe
+SqWoIg/+JB1qq0xQ0FBqEp/tv0kyROb2WGxLyh2gCm3duiOi9i66tqd7q9ESQukb
+WnnaPaTsU6AxbI9+Tyy0HA1Oc+RJ53FuOxaigWSmA4pjIpVmx2BSH+lS60UhNw9y
+9pjEAr60Gwie8955ak8kKxbWLLbQ+AAULOrMwtoAEnprsFYurwacSydZjP/ib115
+/vZOuLuy8y8jK1AQU0r+l5nh+ucJBLgRVgVty9RbBGGY0+9L4tvGSnVDGJ1AD7C7
+wgfnGHH9mzMPTYOeh5KXlo+XIjlDM2616DAoT8ITexzRXr4pn+zzKbOcm5rlHEqp
+lMEMXFJbGJZqL+0NN6MrK5uYo/HeHjJ2MewJ7RI8TN82fEGMwZDYctapVQBFvJBd
+PPJhmfn4KKdUoRI425YGQJmvr+JJ+VXIT9Q4lq8ffcDbaw3pWwJ82KswyNxaD+kW
+5L7p7yywW7/K35x7f+HJyyBKSjBhQrA222ZC0FTWtSI6CN/2GPG7iktNWlrVUTZa
+Sc2wqXl0gExcWQPf3I4ZxxHvGdcACyFpRu5lOaGLOR6r/CJ6pIZOkv7K26YIOlb8
+1Y6xGfUjKwRTePWwIMPhAC/bfGEzLKbyReORQGcLjapLHHpyoYBANmbvt93OLcVl
+wXDoDFVGIuijDmw87YA64WKu+IqSTijpqnrJPdNoQbb8Nvb3Nos=
+=u0XL
+-----END PGP SIGNATURE-----

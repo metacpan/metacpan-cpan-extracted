@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "File::Slurper" => 0,
     "Lingua::EN::Sentence" => 0,
-    "Moo" => 0,
+    "Moo" => 2,
     "Statistics::Lite" => 0,
     "namespace::clean" => 0,
     "strictures" => 2
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.0601",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +46,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Lingua::EN::Sentence" => 0,
-  "Moo" => 0,
+  "Moo" => 2,
   "Statistics::Lite" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,

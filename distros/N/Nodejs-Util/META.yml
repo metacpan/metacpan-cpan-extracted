@@ -31,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Nodejs-Util
   homepage: https://metacpan.org/release/Nodejs-Util
   repository: git://github.com/perlancar/perl-Nodejs-Util.git
-version: '0.010'
+version: '0.011'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

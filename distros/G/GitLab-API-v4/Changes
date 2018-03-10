@@ -1,5 +1,10 @@
 Revision history for Perl extension GitLab::API::v4.
 
+0.05 2018-03-06
+
+- Fixup gitlab-api-v4 to support parameters who's values are empty or have
+  whitespace in them.
+
 0.04 2018-02-03
 
 - Support parameters in the project method.

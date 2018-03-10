@@ -1,5 +1,15 @@
 Revision history for Perl extension Net::MRT.
 
+2018-03-07 0.05  MaxiM Basunov <maxim.basunov@gmail.com>
+    Bugfixes:
+        - PerlIO_seek replaced with read function to skip contents
+
+    Improvements:
+        - Message buffer size increased from 16k to 128k
+
+????-??-?? 0.0401 MaxiM Basunov <maxim.basunov@gmail.com>
+    Source code publicitly available on GitHub
+
 2014-01-14 0.04 MaxiM Basunov <maxim.basunov@gmail.com>
     Improvements:
         - NLRI fully decoded when MP_REACH_MLRI contain data in RFC4760 format

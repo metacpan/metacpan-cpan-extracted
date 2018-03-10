@@ -28,6 +28,7 @@ use Test::More;
 use Test::Exception;
 use FindBin;
 use Term::CLI::Argument::String;
+use Term::CLI::L10N;
 
 my $ARG_NAME= 'test_enum';
 
@@ -36,6 +37,9 @@ $::ENV{PATH} = '/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin';
 
 sub startup : Test(startup => 1) {
     my $self = shift;
+
+    Term::CLI::L10N->set_language('en');
+
     my $arg = Term::CLI::Argument::String->new(
         name => $ARG_NAME,
     );
@@ -65,6 +69,9 @@ sub check_validate: Test(6) {
     my $self = shift;
     my $arg = $self->{arg};
 
+    $arg->clear_min_len;
+    $arg->clear_max_len;
+
     ok( !defined $arg->validate(undef), "'undef' does not validate");
     is ( $arg->error, 'value must be defined',
         "error on 'undef' value is set correctly" );
@@ -84,6 +91,30 @@ sub check_validate: Test(6) {
     is ( $arg->error, '',
         "error is cleared on successful validation" );
 }
+
+sub check_limits: Test(5) {
+    my $self = shift;
+    my $arg = $self->{arg};
+
+    $arg->min_len(1);
+    $arg->max_len(2);
+
+    my $test_value = '';
+
+    ok( !defined $arg->validate($test_value), "'$test_value' does not validate");
+    like ( $arg->error, qr/too short/,
+        "error on short value is set correctly" );
+
+    $test_value = 'f';
+    ok( defined $arg->validate($test_value), "'$test_value' validates")
+        or diag("error is: ", $arg->error);
+
+    $test_value = 'foo';
+    ok( !defined $arg->validate($test_value), "'$test_value' does not validate");
+    like ( $arg->error, qr/too long/,
+        "error on long value is set correctly" );
+}
+
 
 }
 

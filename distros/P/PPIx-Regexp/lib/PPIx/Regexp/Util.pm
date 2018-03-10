@@ -10,9 +10,12 @@ use Scalar::Util qw{ blessed };
 
 use base qw{ Exporter };
 
-our @EXPORT_OK = qw{ __choose_tokenizer_class __instance __to_ordinal_en };
+our @EXPORT_OK = qw{
+    __choose_tokenizer_class __instance
+    __ns_can __to_ordinal_en
+};
 
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 
 {
 
@@ -75,6 +78,13 @@ sub __instance {
     return $object->isa( $class );
 }
 
+sub __ns_can {
+    my ( $class, $name ) = @_;
+    my $fqn = join '::', ref $class || $class, $name;
+    no strict qw{ refs };
+    return defined &$fqn ? \&$fqn : undef;
+}
+
 sub __to_ordinal_en {
     my ( $num ) = @_;
     $num += 0;
@@ -128,6 +138,11 @@ This module can export the following subroutines:
 This subroutine returns true if its first argument is an instance of the
 class specified by its second argument. Unlike C<UNIVERSAL::isa>, the
 result is always false unless the first argument is a reference.
+
+=head2 __ns_can
+
+This method is analogous to C<can()>, but returns a reference to the
+code only if it is actually implemented by the invoking name space.
 
 =head2 __to_ordinal_en
 

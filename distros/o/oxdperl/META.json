@@ -1,7 +1,7 @@
 {
-   "abstract" : "The great new oxdperl module!",
+   "abstract" : "oxdperl module 3.1.2",
    "author" : [
-      "Gaurav Chhabra <gaurav.chhabra6785@gmail.com>"
+      "Sobhan Panda <sobhan@centroxy.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
@@ -28,7 +28,7 @@
    "provides" : {
       "oxdperl" : {
          "file" : "lib/OxdPerlModule.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -37,5 +37,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01"
+   "version" : "0.03"
 }

@@ -1,11 +1,1 @@
-{
-  "op_host": "https://ce-prev-version.gluu.org",
-  "oxd_host_port":8099,
-  "authorization_redirect_uri" : "https://oxd-perl-example.com/login.cgi",
-  "post_logout_redirect_uri" : "https://oxd-perl-example.com/logout.cgi",
-  "scope" : [ "openid", "profile","uma_protection","uma_authorization" ],
-  "application_type" : "web",
-  "response_types" : ["code"],
-  "grant_types":["authorization_code"],
-  "acr_values" : [ "basic" ]
-}
+{"acr_values":[""],"client_secret":"85a5db45-8f53-4611-abe5-35394a8099e7","oxd_host_port":"8099","claims_redirect_uri":"https://client.example.com:8090/cgi-bin/perl_demo/uma.cgi","dynamic_registration":"true","scope":["openid","profile","email"],"post_logout_redirect_uri":"https://client.example.com:8090/cgi-bin/perl_demo/index.cgi","application_type":"web","client_id":"@!A531.9F38.8347.F83D!0001!3806.151C!0008!CF0E.739F.56AC.5507","op_host":"https://idp.centroxy.com","rest_service_url":"","resource_end_point":"https://client.example.com:44300/api/values","oxd_id":"c2964e5c-9b29-4c2b-b085-56d32511c00f","grant_types":["authorization_code","client_credentials"],"response_types":["code"],"connection_type":"local","client_name":"Perl_App","client_frontchannel_logout_uris":"https://client.example.com:8000/logout","authorization_redirect_uri":"https://client.example.com:8090/cgi-bin/perl_demo/login.cgi"}

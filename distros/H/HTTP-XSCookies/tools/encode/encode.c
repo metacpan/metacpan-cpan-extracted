@@ -67,9 +67,8 @@ static void decode_table(const char* name)
             int dig = 0;
 
             /*
-             * If the character is a valid hexadecimal digit,
-             * the table will contain its value; otherwise
-             * it will have a zero.
+             * If the character is a valid hexadecimal digit, the table will
+             * contain its value; otherwise it will have a zero.
              */
             if (x >= '0' && x <= '9') {
                 hex = 1;
@@ -171,10 +170,13 @@ static void state_table(const char* name)
         for (int state = 0; state < size; ++state) {
             int next = state;
             if (c == '\0' || c == ';') {
-                /* If we see the end and are in state NAME, we consider
-                 * it an error, because we demmand to at least have
-                 * seen an '='. */
-                if (state == URI_STATE_EQUALS ||
+                /*
+                 * If we see a separator or the end of the string, and are in
+                 * state NAME, we accept that in support of fields without
+                 * values, such as HttpOnly.
+                 */
+                if (state == URI_STATE_NAME ||
+                    state == URI_STATE_EQUALS ||
                     state == URI_STATE_VALUE) {
                     next = URI_STATE_END;
                 } else {
@@ -196,9 +198,11 @@ static void state_table(const char* name)
                     next = URI_STATE_ERROR;
                 }
             } else {
-                /* Any other character either marks the fact that
-                 * we are entering state NAME or VALUE, or that
-                 * we are remaining in those states. */
+                /*
+                 * Any other character either marks the fact that we are
+                 * entering state NAME or VALUE, or that we are remaining in
+                 * those states.
+                 */
                 if (state == URI_STATE_START) {
                     next = URI_STATE_NAME;
                 } else if (state == URI_STATE_EQUALS) {

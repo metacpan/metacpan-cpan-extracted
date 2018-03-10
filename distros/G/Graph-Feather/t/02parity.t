@@ -18,6 +18,7 @@ my @meta = map {
   _  delete_vertex               g v
   _  delete_vertices             g vs
   _  delete_edge                 g v v
+  _  delete_edges                g vs
   _  add_vertices                g vs
   _  add_edges                   g es
   vs vertices                    g
@@ -128,7 +129,10 @@ for my $i ( 0 .. 1000 ) {
     );
 
     my @args = map { $arg_map{$_}->() } @arg_types;
-    
+
+    # needs even number of vertices
+    next if $method_name eq 'delete_edges' and @args & 1;
+
     my @return_d;
     my @return_f;
 

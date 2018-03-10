@@ -1,5 +1,9 @@
 Revision history for Catalyst-TraitFor-Controller-DBIC-DoesPaging
 
+1.001004  2018-03-09 15:17:49-06:00 America/Chicago
+       - Modernize Examples in doc (Geoff Darling)
+       - Consistent doc examples (wesm)
+
 1.001003  2013-06-01 14:07:26 CST6CDT
        - Add missing dep
 

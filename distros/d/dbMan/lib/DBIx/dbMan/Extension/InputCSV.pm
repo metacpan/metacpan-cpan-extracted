@@ -5,11 +5,11 @@ use base 'DBIx::dbMan::Extension';
 use Text::CSV_XS;
 use FileHandle;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 1;
 
-sub IDENTIFICATION { return "000001-000041-000005"; }
+sub IDENTIFICATION { return "000001-000041-000006"; }
 
 sub preference { return 0; }
 
@@ -20,14 +20,22 @@ sub handle_action {
 
 	if ($action{action} eq 'CSV_IN') {
 		$action{action} = 'NONE';
-		my $csv = new Text::CSV_XS { quote_char => $action{opt_quote},
+		my $csv = new Text::CSV_XS { quote => $action{opt_quote},
 			eol => $action{opt_eol}, binary => 1,
-			sep_char => $action{opt_separator},
-			escape_char => $action{opt_escape},
+			sep_char => $action{opt_separator}, 
+			escape_char => $action{opt_escape}, 
 			allow_loose_escapes => $action{opt_allow_loose_escapes},
 			allow_loose_quotes => $action{opt_allow_loose_quotes} };
 
+        if ( ! defined $csv ) {
+            $obj->{ -interface }->error( 'Cannot initialize parser for CSV files.' );
+            return %action;
+        }
+
 		my $file = new FileHandle "<$action{file}";
+        if ( $obj->{ -interface }->is_utf8 ) {
+            binmode $file, ':utf8';
+        }
 		unless (defined $file) {
 			$obj->{-interface}->error("Can't load input CSV file $action{file}.");
 			return %action;

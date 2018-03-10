@@ -14,8 +14,8 @@ if ($> == 0) {
     plan skip_all => 'root user is exempt from file RW permissions restrictions';
 }
 
-use_ok 'Log::Dispatch';
-use_ok 'Log::Dispatch::FileRotate';
+use Log::Dispatch;
+use Log::Dispatch::FileRotate;
 
 my $tempdir = Path::Tiny->tempdir;
 

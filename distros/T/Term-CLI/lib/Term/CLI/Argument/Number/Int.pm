@@ -20,17 +20,21 @@
 
 use 5.014_001;
 
-package Term::CLI::Argument::Number::Int  0.03002 {
+package Term::CLI::Argument::Number::Int  0.04004 {
 
 use Modern::Perl;
-use POSIX qw( );
 use Moo;
 use namespace::clean;
 
 extends 'Term::CLI::Argument::Number';
 
 sub coerce_value {
-    return POSIX::strtol($_[1]);
+    my $val = $_[1];
+
+    if ($val =~ /^[+-]?\d+$/) {
+        return int($val);
+    }
+    return undef;
 }
 
 }
@@ -47,7 +51,7 @@ Term::CLI::Argument::Number::Int - class for integer arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.03002
+version 0.04004
 
 =head1 SYNOPSIS
 
@@ -92,13 +96,12 @@ Additionally:
 
 =item B<coerce_value> ( I<VALUE> )
 
-Overloaded to call L<POSIX::strtol|POSIX/strtol>.
+Overloaded to check for a valid integer value.
 
 =back
 
 =head1 SEE ALSO
 
-L<POSIX>(3p),
 L<Term::CLI::Argument::Number::Float>(3p),
 L<Term::CLI::Argument::Number>(3p),
 L<Term::CLI::Argument>(3p),

@@ -9,8 +9,8 @@ use Test::More;
 plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Perinci/Sub/XCompletion/cryptocurrency_symbol.pm',
-    'Perinci/Sub/XCompletion/cryptocurrency_symbol_or_name.pm',
+    'Perinci/Sub/XCompletion/cryptocurrency_code.pm',
+    'Perinci/Sub/XCompletion/cryptocurrency_code_or_name.pm',
     'Perinci/Sub/XCompletion/cryptoexchange_name.pm',
     'Perinci/Sub/XCompletionBundle/CryptoCurrency.pm'
 );

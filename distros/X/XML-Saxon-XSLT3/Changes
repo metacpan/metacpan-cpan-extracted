@@ -1,0 +1,5 @@
+Revision history for XML-Saxon-XSLT3
+
+0.009	Sat Mar 10 08:05:13 GMT 2018
+ - first version as XSLT3, using Alien::Saxon
+ - update Java code slightly for Saxon 9.8

@@ -12,7 +12,7 @@ use Digest::SHA;
 use JSON;
 use Want;
 
-our $VERSION = '1.84';
+our $VERSION = '1.85';
 
 =encoding utf8
 
@@ -292,6 +292,13 @@ sub run
 		$self->raiseError('invalid input JSON type (array)');
 	}
 
+	if($self->{_rest}){
+		my $name = $0;
+		$name =~ m{([^/]+)$};
+		$name = $1 // '';
+		$self->{params}->{req} = $name;
+	}
+
 	my $req = $self->{params}->{req} // '';
 	$req =~ /^([a-z][0-9a-zA-Z_]{1,63})$/; $req = $1 // '';
 	my $sid = $r->cookie('sid');
@@ -505,6 +512,21 @@ sub insecure
 	$self;
 }
 
+=head3 rest
+
+call this method if you want to omit the I<req> parameter and want that a sub with same name of the script will be called instead, so if your script will be I</var/www/cgi-bin/myscript> the sub I<myscript> will be called instead of the one passed with I<req> (that can be omitted at this point). You can pass a switch to this method (that will parsed as bool) to set it on or off. It could be useful if you want to pass a variable. If no switch (or undefined one) is passed, the switch will be set as true.
+
+=cut
+
+sub rest
+{
+	my ($self, $switch) = @_;
+	$switch = 1 unless defined $switch;
+	$switch = ! ! $switch;
+	$self->{_rest} = $switch;
+	$self;
+}
+
 =head3 set_session_expiration
 
 call this method with desired expiration time for cookie in B<seconds>, the default behavior is to keep the cookie until the end of session (until the browser is closed).
@@ -648,7 +670,7 @@ sub graft
 	my ($self, $name, $json) = @_;
 
 	eval{
-		$self->{$name} = JSON->new->decode($json);
+		$self->{$name} = JSON->new->decode($json // '');
 	};
 
 	return 0 if $@;

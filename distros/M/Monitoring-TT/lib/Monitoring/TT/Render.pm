@@ -234,6 +234,43 @@ sub join_hash_list {
 }
 
 #####################################################################
+
+=head2 lower
+
+    lower(str)
+
+    returns lower case string
+
+=cut
+sub lower {
+    return lc($_[0]);
+}
+
+#####################################################################
+
+=head2 services
+
+    services()
+
+    returns list of services
+
+=cut
+sub services {
+    my $tt = $Monitoring::TT::Render::tt;
+    if($tt->{'data'}->{'services'}) {
+        return($tt->{'data'}->{'services'});
+    }
+    my $reader = Monitoring::TT::Input::Nagios->new(montt => $tt);
+    my $data = $reader->read($tt->{'out'}.'/conf.d/', '');
+    my @services;
+    for my $o (@{$data}) {
+        push @services, $o if $o->{'type'} eq 'service';
+    }
+    $tt->{'data'}->{'services'} = \@services;
+    return($tt->{'data'}->{'services'});
+}
+
+#####################################################################
 sub _list {
     my($data) = @_;
     return([]) unless defined $data;

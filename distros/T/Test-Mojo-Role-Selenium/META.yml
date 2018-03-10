@@ -6,7 +6,7 @@ build_requires:
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
@@ -19,12 +19,11 @@ no_index:
     - inc
 requires:
   Class::Method::Modifiers: '2.00'
-  Mojolicious: '7.00'
+  Mojolicious: '7.42'
   Selenium::Remote::WebElement: '1.00'
-  Test::Mojo::WithRoles: '0.02'
 resources:
   bugtracker: https://github.com/jhthorsen/test-mojo-role-selenium/issues
   homepage: https://github.com/jhthorsen/test-mojo-role-selenium
   repository: https://github.com/jhthorsen/test-mojo-role-selenium.git
-version: '0.11'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

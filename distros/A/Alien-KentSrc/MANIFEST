@@ -1,0 +1,12 @@
+alienfile
+Changes
+cpanfile
+lib/Alien/KentSrc.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-basic.t
+t/01-compile.t
+t/02-files.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

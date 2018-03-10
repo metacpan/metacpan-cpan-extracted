@@ -1,3 +1,7 @@
+0.08 March 2018
+- Fix for delete_edges
+- add feather_delete_edges
+
 0.06 February 2018
 - Added get/set_(vertex/edge/graph)_attributes
 

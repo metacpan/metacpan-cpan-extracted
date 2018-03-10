@@ -19,7 +19,6 @@ no_index:
     - inc
 requires:
   LWP::Simple: '6.0'
-  XML::LibXML: '2.0'
   strict: '0'
   warnings: '0'
-version: '0.01'
+version: '0.03'

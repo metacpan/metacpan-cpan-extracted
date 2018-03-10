@@ -86,7 +86,7 @@ EOT
 TestBot->expect(
     join( ' ',
         '#test Test User',
-        'signed-tags 470fc2f test-repo',
+        'signed tags 470fc2f test-repo',
         'v5.8-plus',
         '* Tagging v5.8-plus',
         '* http://git/project/tags/v5.8-plus',

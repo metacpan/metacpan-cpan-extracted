@@ -1,0 +1,178 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Bot::ChatBots::Role::Poller - Bot::ChatBots Role for Pollers
+
+=head1 SYNOPSIS
+
+   package Something;
+   use Moo;
+   with 'Bot::ChatBots::Role::Poller';
+
+   sub poll {
+      my ($self, $callback, $args) = @_;
+      ...
+   }
+
+   sub parse_response {
+      my ($self, $data) = @_;
+      ...
+   }
+
+   sub normalize_record {
+      my ($self, $record) = @_;
+      ...
+   }
+   1;
+
+   # later that night...
+   my $something = Something->new(
+      interval => 30, # polling interval
+      processor => \&process_record,
+   );
+   Mojo::IOLoop->start;
+
+=head1 DESCRIPTION
+
+This is a poller role for bots. This role is actually a derivation of
+L<Bot::ChatBots::Role::Source>.
+
+A poller works like this:
+
+=over
+
+=item *
+
+L</schedule> installs a recurring call to whatever L</poller> returns.
+Nothing is executed until L<Mojo::IOLoop/start> is run.
+
+=item *
+
+L</poller> wraps a call to L</poll>, which is the real workhorse for
+fetching data. The wrapping is such that L</poll> will not be called if
+another instance of it is already running.
+
+=item *
+
+L</poll> - provided by your class - fetches new data and pushes this new
+data to a callback. This allows asynchronous implementations, e.g. based
+on L<Mojo::UserAgent> (which accepts a callback).
+
+=item *
+
+L</parse_response>, L</process_updates> and L</normalize_record> (required
+by the base L<Bot::ChatBots::Role::Source>) are then called for
+implementing the usual pipeline (parsing data into updates, process them
+and normalize the resulting records).
+
+=back
+
+=head2 What Should You Provide/Override
+
+This is what you should provide and probably override in the general case:
+
+=over
+
+=item *
+
+L</normalize_record> as per L<Bot::ChatBots::Role::Source>.
+
+=item *
+
+L</parse_response> is where you dissect received data into updates.
+
+=item *
+
+L</poll> is called regularly to fetch some updates.
+
+=back
+
+=head1 METHODS
+
+It should be safe to override the following methods in your classes
+composing this role.
+
+=begin COMMENT
+
+=head2 B<< BUILD >>
+
+calls L</schedule> upon construction.
+
+=end COMMENT
+
+=head2 B<< args >>
+
+   my $args_aref = $obj->args;
+
+Set a list of arguments eventually consumed by L</poll>, inside an array
+reference.
+
+=head2 B<< interval >>
+
+   my $interval = $obj->interval;
+
+Interval for scheduling calls to L</poll>.
+
+=head2 B<< poller >>
+
+   my $sub_ref = $obj->poller;
+
+Generate a sub reference that is called regularly.
+
+=head2 B<< schedule >>
+
+   $obj->schedule($interval);
+
+Set the recurrent polling. Called automatically upon object creation.
+
+=head1 REQUIRED METHODS
+
+This class defines a L<Moo::Role>, so it's not a standalone thing by
+itself. The following methods are I<required> to exist in the class that
+composes this role. Note that this role derives from
+L<Bot::ChatBots::Role::Source>, so its requirements have to be honored as
+well (namely, L<Bot::ChatBots::Role::Source/normalize_record>).
+
+=head2 B<< parse_response >>
+
+   my @updates = $obj->parse_response($data);
+
+This method is called with whatever data is returned by L</poll>, and is
+supposed to return a list of updates for further processing by
+L<Bot::ChatBots::Role::Source/process_updates>.
+
+=head2 B<< poll >>
+
+   $obj->poll($callback, $args);
+
+This method is supposed to fetch new data and feed it to the C<$callback>,
+like this:
+
+   $callback->($data);
+
+Whatever you set, it will be passed over to L</parse_response> where the
+actual parsing will be performed.
+
+=head1 SEE ALSO
+
+L<Bot::ChatBots>, L<Bot::ChatBots::Role::Source>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2018 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

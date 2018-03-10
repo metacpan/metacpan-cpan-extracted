@@ -1,6 +1,176 @@
+0.04004 -- 2018-03-10
+
+  [Bug Fixes]
+
+    - Don't check STDERR on pager error.
+        Something's off in checking STDERR when running an external
+        pager. Could be race condition? Anyway, we only care about
+        propagation of the exit status, so just test that.
+
+        Tests work in my dev. environment, but fail about 30-50% of
+        the time on CPAN testers.
+
+        Files modified:
+            t/065-Term-CLI-Command-Help.t
+            t/scripts/pager.pl
+
+0.04003 -- 2018-03-09
+
+  [Bug Fixes]
+
+    - Use custom script for pager error exit.
+        Running external commands in tests is not as easy
+        as it seems...
+
+        Files added:
+            t/scripts/pager.pl
+
+        Files modified:
+            t/065-Term-CLI-Command-Help.t
+
+  [Other Changes]
+
+    - Copy MANIFEST from D::Z build.
+
+        Files modified:
+            dist.ini
+
+    - Add MANIFEST from D::Z build.
+
+        Files added:
+            MANIFEST
+
+0.04002 -- 2018-03-09
+
+  [Bug Fixes]
+
+    - Ignore SIGPIPE in _execute_help -- closes #5
+
+        Files modified:
+            lib/Term/CLI/Command/Help.pm
+
+    - Select raw STDOUT for help output.
+
+        Files modified:
+            t/065-Term-CLI-Command-Help.t
+
+    - Fix English-centred error message check.
+
+        Files modified:
+            t/075-Term-CLI-History.t
+
+  [Features]
+
+    - Allow empty "pager" (dump to STDOUT)
+        Instead of falling back to "cat", fall back to
+        raw STDOUT printing. An empty pager list will
+        select STDOUT as well.
+
+        Files modified:
+            lib/Term/CLI/Command/Help.pm
+
+  [Other Changes]
+
+    - Clean up commented-out code.
+
+        Files modified:
+            lib/Term/CLI/Command/Help.pm
+
+0.04001 -- 2018-03-08
+
+  [Features]
+
+    - Multi-language support through Locale::Maketext.
+
+      Files: many
+
+    - Add min_len and max_len restrictions to
+      Term::CLI::Argument::String.
+
+      Files:
+        lib/Term/CLI/Argument/String.pm
+
+    - Improve usage text formatting.
+
+      Files:
+        lib/Term/CLI/Role/HelpText.pm
+
+  [New Modules]
+
+    - Add Term::CLI::L10N
+    - Add Term::CLI::L10N::en
+    - Add Term::CLI::L10N::nl
+
+      Files:
+        lib/Term/CLI/L10N.pm
+        lib/Term/CLI/L10N/en.pm
+        lib/Term/CLI/L10N/nl.pm
+
+    - Add Term::CLI::Argument::Bool
+
+      Files:
+        lib/Term/CLI/Argument/Bool.pm
+
+  [Bug Fixes]
+
+    - Fix various (POD and diagnostic message) typos.
+
+    - Don't use POSIX's strtod() and strtol() for number conversions;
+      rely on regex and looks_like_number() instead.
+
+      Files: 
+        lib/Term/CLI/Argument/Number.pm
+        lib/Term/CLI/Argument/Number/Float.pm
+        lib/Term/CLI/Argument/Number/Int.pm
+
+    - Tests now force the 'en' language where necessary.
+      Error messages are hard to verify without forcing
+      a particular language.
+
+      Files:
+        lib/Term/CLI/Role/HelpText.pm
+
+    - Fix usage text with variable number of arguments.
+
+      Files:
+        lib/Term/CLI/Role/HelpText.pm
+
+    - Check SUPER's validate with defined(), not boolean eval.
+
+      Files:
+        lib/Term/CLI/Argument/Enum.pm
+
+    - Fix "=over" size in command summary to a maximum.
+
+      Files:
+        lib/Term/CLI/Command/Help.pm
+
+    - Fix test on FreeBSD - closes #2
+
+      Error message from "cat" on invalid option differs from
+      Linux to FreeBSD. Just check for "cat:" in the error
+      message instead.
+
+      Files:
+        t/065-Term-CLI-Command-Help.t
+
+    - Fix tests for non-English locales - closes #3
+
+      Tests were assuming that external commands
+      communicate their diagnostics in English.
+
+      Files:
+        t/065-Term-CLI-Command-Help.t
+        t/075-Term-CLI-History.t
+
+    - Turn off "-T"
+
+      Files:
+        t/065-Term-CLI-Command-Help.t
+
 0.03002 -- 2018-02-26
 
-    [Bug Fixes]
+  [Bug Fixes]
 
     - Fix float comparision in test -- fixes #1
       On Perl installs compiled with -Duselongdouble,
@@ -8,20 +178,20 @@
 
     - dist.ini: add dependencies not picked up by AutoPrereqs
 
-    [Other Changes]
+  [Other Changes]
 
     - Update version and dependencies.
 
 0.03001 -- 2018-02-26
 
-    - Switch to using Dist::Zilla.
-    - Some code cleanups (remove unnecessary "use" clauses).
-    - Fix some POD pages.
+  - Switch to using Dist::Zilla.
+  - Some code cleanups (remove unnecessary "use" clauses).
+  - Fix some POD pages.
 
 0.02 -- 2018-02-24
-    
-    - Fix version numbers: package Foo 0.02 { ... }
+  
+  - Fix version numbers: package Foo 0.02 { ... }
 
 0.01 -- 2018-02-24
 
-    - First release.
+  - First release.

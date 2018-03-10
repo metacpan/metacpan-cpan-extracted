@@ -1,0 +1,132 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.012;
+use open qw/:std :utf8/;
+use Getopt::Long;
+use Mojo::IOLoop ();
+
+my $interval = 5;
+my $method   = 'get';
+my $url = 'https://lorem-rss.herokuapp.com/feed?unit=second&interval=3';
+GetOptions(
+   'interval|i=i' => \$interval,
+   'method|m=s'   => \$method,
+   'url|u=s'      => \$url
+) or die "error in command line arguments\n";
+
+my $poller = RSSPoller->new(
+   tx_args   => [$method => $url],
+   interval  => $interval,
+   processor => \&processor,
+);
+Mojo::IOLoop->start;
+
+sub processor {
+   my ($record) = @_;
+   state $n = 0;
+   my $p = $record->{payload};
+   $n++;
+   say "$n. $p->{title}\n   $p->{link}\n   $p->{description}";
+
+   # put a separator
+   my $batch = $record->{batch};
+   say(($batch->{count} == $batch->{total}) ? ('-' x 30) : '');
+
+   return $record;
+} ## end sub processor
+
+BEGIN {
+
+   package RSSPoller;
+   use strict;
+   use warnings;
+   use Moo;
+
+   with 'Bot::ChatBots::Role::WebPoller';
+
+   has _last_timestamp => (
+      is      => 'rw',
+      default => undef,
+   );
+
+   has _last_titles => (
+      is      => 'rw',
+      default => sub { return {} },
+   );
+
+   sub _extract_sorted_items {
+      my ($self, $res) = @_;
+      my @items;
+      $res->dom->find('item')->each(
+         sub {
+            my ($item, $n) = @_;
+            state $months =
+              [qw< Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec >];
+            state $id_of =
+              {map { $months->[$_] => ($_ + 1) } 0 .. $#$months};
+            my $title = $item->at('title')->text;
+            my $date  = $item->at('pubDate')->text;
+            my ($day, $mname, $year, $time) =
+              $date =~ m{,\s* (\d+) \s+ (\w+) \s+ (\d+) \s+ (\S+) \s}mxs;
+            my $tstamp = sprintf '%4d-%02d-%02d %s', $year,
+              $id_of->{$mname},
+              $day, $time;
+            push @items,
+              {
+               raw        => $item->to_string,
+               structured => {
+                  date        => $date,
+                  timestamp   => $tstamp,
+                  title       => $title,
+                  description => $item->at('description')->text,
+                  link        => $item->at('link')->text,
+               },
+              };
+         }
+      );
+      return sort {
+         $a->{structured}{timestamp} cmp $b->{structured}{timestamp}
+      } @items;
+   } ## end sub _extract_sorted_items
+
+   sub parse_response {
+      my ($self, $data) = @_;
+
+      # get all items, sorted by timestap
+      my @items = $self->_extract_sorted_items($data->{tx}->res);
+
+      # filter out stuff we already saw. We keep track of the last
+      # timestamp but also account for different items to have been
+      # generated at the same time, so we track them in last titles.
+      my $last_ts     = $self->_last_timestamp;
+      my $last_titles = $self->_last_titles;
+
+      my @retval;
+      for my $item (@items) {
+         my ($ts, $title) = @{$item->{structured}}{qw< timestamp title >};
+         $last_ts //= $ts;
+         next if $ts lt $last_ts;    # skip, too old
+         next
+           if ($ts eq $last_ts)
+           && exists($last_titles->{$title});    # skip, already done
+
+         push @retval, $item;
+         $last_titles = {} if $last_ts ne $ts;    # reset if newer
+         $last_titles->{$title} = 1;              # mark, in case
+         $last_ts = $ts;
+      } ## end for my $item (@items)
+      $self->_last_timestamp($last_ts);
+      $self->_last_titles($last_titles);
+
+      return @retval;
+   } ## end sub parse_response
+
+   sub normalize_record {
+      my ($self, $record) = @_;
+      $record->{payload} = $record->{update}{structured};
+      return $record;
+   }
+
+   1;
+} ## end BEGIN

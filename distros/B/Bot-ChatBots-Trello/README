@@ -1,0 +1,81 @@
+NAME
+
+    Bot::ChatBots::Trello - Trello adapter for Bot::ChatBots
+
+VERSION
+
+    This document describes Bot::ChatBots::Trello version 0.002.
+
+SYNOPSIS
+
+       # A minimal Trello Bot using WebHooks
+       use Mojolicious::Lite;
+       plugin 'Bot::ChatBots::Trello' => instances => [
+          [
+             'WebHook',
+             processor  => \&processor,
+             url        => $ENV{URL}, # whatever you think is good
+          ],
+          # more can follow here...
+       ];
+       app->start;
+       sub processor {
+          my $record = shift;
+          say $record->{payload}{action}{type} ' happened';
+          return $record;
+       }
+
+DESCRIPTION
+
+    This module allows you to to define Bot::ChatBots for Trello
+    <https://trello.com/>, a kanban boards online application.
+
+    Strictly speaking, this module is a Mojolicious plugin that allows you
+    to load and use Bot::ChatBots::Telegram::WebHook (see "SYNOPSIS" for a
+    quick example), providing a way to receive actions from Trello.
+
+    These modules rely upon Log::Any for emitting logging information; you
+    are encouraged to read that module's documentation for further
+    information. For what we are concerned, you have to remember that all
+    logs will be lost unless you configure Log::Any, e.g. to send messages
+    on standard output you can do this:
+
+       use Log::Any::Adapter qw< Stderr >;
+
+    If using the web hook, then you will probably want to send the logs
+    together with Mojolicious's logs, like this:
+
+       use Mojolicious::Lite;
+       use Log::Any::Adapter;
+       Log::Any::Adapter->set(MojoLog => logger => app->log);
+
+    The configuration above relies on the presence of
+    Log::Any::Adapter::MojoLog.
+
+METHODS
+
+    All the heavylifting is done by Bot::ChatBots::MojoPlugin.
+
+BUGS AND LIMITATIONS
+
+    Report bugs either through GitHub (patches welcome).
+
+SEE ALSO
+
+    Bot::ChatBots, Bot::ChatBots::Trello::WebHook.
+
+AUTHOR
+
+    Flavio Poletti <polettix@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2018 by Flavio Poletti <polettix@cpan.org>
+
+    This module is free software. You can redistribute it and/or modify it
+    under the terms of the Artistic License 2.0.
+
+    This program is distributed in the hope that it will be useful, but
+    without any warranty; without even the implied warranty of
+    merchantability or fitness for a particular purpose.
+

@@ -1,7 +1,7 @@
 # This Makefile is for the Monitoring::TT extension to perl.
 #
 # It was generated automatically by MakeMaker version
-# 7.04 (Revision: 70400) from the contents of
+# 7.1002 (Revision: 71002) from the contents of
 # Makefile.PL. Don't edit this file, edit Makefile.PL instead.
 #
 #       ANY CHANGES MADE HERE WILL BE LOST!
@@ -21,7 +21,7 @@
 #     NO_META => q[1]
 #     PREREQ_PM => { ExtUtils::MakeMaker=>q[6.36], File::BOM=>q[0], Perl::Critic::Policy::Dynamic::NoIndirect=>q[0], Perl::Critic::Policy::NamingConventions::ProhibitMixedCaseSubs=>q[0], Perl::Critic::Policy::ValuesAndExpressions::ProhibitAccessOfPrivateData=>q[0], Pod::Usage=>q[0], Template=>q[0], Test::Cmd=>q[0], Test::Perl::Critic=>q[0], Test::Pod=>q[1.4], Test::Pod::Coverage=>q[0] }
 #     TEST_REQUIRES => {  }
-#     VERSION => q[1.0.1]
+#     VERSION => q[1.0.2]
 #     VERSION_FROM => q[lib/Monitoring/TT.pm]
 #     dist => { PREOP=>q[$(PERL) -I. "-MModule::Install::Admin" -e "dist_preop(q($(DISTVNAME)))"] }
 #     realclean => { FILES=>q[MYMETA.yml] }
@@ -32,30 +32,30 @@
 
 # --- MakeMaker const_config section:
 
-# These definitions are from config.sh (via /home/sven/perl5/perlbrew/perls/perl-5.24.0/lib/5.24.0/x86_64-linux-thread-multi/Config.pm).
+# These definitions are from config.sh (via /usr/lib/x86_64-linux-gnu/perl/5.24/Config.pm).
 # They may have been overridden via Makefile.PL or on the command line.
 AR = ar
-CC = cc
+CC = x86_64-linux-gnu-gcc
 CCCDLFLAGS = -fPIC
 CCDLFLAGS = -Wl,-E
 DLEXT = so
 DLSRC = dl_dlopen.xs
 EXE_EXT = 
 FULL_AR = /usr/bin/ar
-LD = cc
-LDDLFLAGS = -shared -O2 -L/usr/local/lib -fstack-protector-strong
+LD = x86_64-linux-gnu-gcc
+LDDLFLAGS = -shared -L/usr/local/lib -fstack-protector-strong
 LDFLAGS =  -fstack-protector-strong -L/usr/local/lib
-LIBC = libc-2.19.so
+LIBC = libc-2.24.so
 LIB_EXT = .a
 OBJ_EXT = .o
 OSNAME = linux
-OSVERS = 3.16.0-4-amd64
+OSVERS = 3.16.0
 RANLIB = :
-SITELIBEXP = /home/sven/perl5/perlbrew/perls/perl-5.24.0/lib/site_perl/5.24.0
-SITEARCHEXP = /home/sven/perl5/perlbrew/perls/perl-5.24.0/lib/site_perl/5.24.0/x86_64-linux-thread-multi
+SITELIBEXP = /usr/local/share/perl/5.24.1
+SITEARCHEXP = /usr/local/lib/x86_64-linux-gnu/perl/5.24.1
 SO = so
-VENDORARCHEXP = 
-VENDORLIBEXP = 
+VENDORARCHEXP = /usr/lib/x86_64-linux-gnu/perl5/5.24
+VENDORLIBEXP = /usr/share/perl5
 
 
 # --- MakeMaker constants section:
@@ -64,11 +64,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Monitoring::TT
 NAME_SYM = Monitoring_TT
-VERSION = 1.0.1
+VERSION = 1.0.2
 VERSION_MACRO = VERSION
-VERSION_SYM = 1_0_1
+VERSION_SYM = 1_0_2
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 1.0.1
+XS_VERSION = 1.0.2
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -77,8 +77,8 @@ INST_BIN = blib/bin
 INST_LIB = blib/lib
 INST_MAN1DIR = blib/man1
 INST_MAN3DIR = blib/man3
-MAN1EXT = 1
-MAN3EXT = 3
+MAN1EXT = 1p
+MAN3EXT = 3pm
 INSTALLDIRS = site
 INSTALL_BASE = /home/sven/perl5
 DESTDIR = 
@@ -89,11 +89,11 @@ INSTALLSITELIB = $(INSTALL_BASE)/lib/perl5
 DESTINSTALLSITELIB = $(DESTDIR)$(INSTALLSITELIB)
 INSTALLVENDORLIB = $(INSTALL_BASE)/lib/perl5
 DESTINSTALLVENDORLIB = $(DESTDIR)$(INSTALLVENDORLIB)
-INSTALLARCHLIB = $(INSTALL_BASE)/lib/perl5/x86_64-linux-thread-multi
+INSTALLARCHLIB = $(INSTALL_BASE)/lib/perl5/x86_64-linux-gnu-thread-multi
 DESTINSTALLARCHLIB = $(DESTDIR)$(INSTALLARCHLIB)
-INSTALLSITEARCH = $(INSTALL_BASE)/lib/perl5/x86_64-linux-thread-multi
+INSTALLSITEARCH = $(INSTALL_BASE)/lib/perl5/x86_64-linux-gnu-thread-multi
 DESTINSTALLSITEARCH = $(DESTDIR)$(INSTALLSITEARCH)
-INSTALLVENDORARCH = $(INSTALL_BASE)/lib/perl5/x86_64-linux-thread-multi
+INSTALLVENDORARCH = $(INSTALL_BASE)/lib/perl5/x86_64-linux-gnu-thread-multi
 DESTINSTALLVENDORARCH = $(DESTDIR)$(INSTALLVENDORARCH)
 INSTALLBIN = $(INSTALL_BASE)/bin
 DESTINSTALLBIN = $(DESTDIR)$(INSTALLBIN)
@@ -120,17 +120,17 @@ DESTINSTALLSITEMAN3DIR = $(DESTDIR)$(INSTALLSITEMAN3DIR)
 INSTALLVENDORMAN3DIR = $(INSTALL_BASE)/man/man3
 DESTINSTALLVENDORMAN3DIR = $(DESTDIR)$(INSTALLVENDORMAN3DIR)
 PERL_LIB =
-PERL_ARCHLIB = /home/sven/perl5/perlbrew/perls/perl-5.24.0/lib/5.24.0/x86_64-linux-thread-multi
-PERL_ARCHLIBDEP = /home/sven/perl5/perlbrew/perls/perl-5.24.0/lib/5.24.0/x86_64-linux-thread-multi
+PERL_ARCHLIB = /usr/lib/x86_64-linux-gnu/perl/5.24
+PERL_ARCHLIBDEP = /usr/lib/x86_64-linux-gnu/perl/5.24
 LIBPERL_A = libperl.a
 FIRST_MAKEFILE = Makefile
 MAKEFILE_OLD = Makefile.old
 MAKE_APERL_FILE = Makefile.aperl
 PERLMAINCC = $(CC)
-PERL_INC = /home/sven/perl5/perlbrew/perls/perl-5.24.0/lib/5.24.0/x86_64-linux-thread-multi/CORE
-PERL_INCDEP = /home/sven/perl5/perlbrew/perls/perl-5.24.0/lib/5.24.0/x86_64-linux-thread-multi/CORE
-PERL = "/home/sven/perl5/perlbrew/perls/perl-5.24.0/bin/perl" "-Iinc"
-FULLPERL = "/home/sven/perl5/perlbrew/perls/perl-5.24.0/bin/perl" "-Iinc"
+PERL_INC = /usr/lib/x86_64-linux-gnu/perl/5.24/CORE
+PERL_INCDEP = /usr/lib/x86_64-linux-gnu/perl/5.24/CORE
+PERL = "/usr/bin/perl" "-Iinc"
+FULLPERL = "/usr/bin/perl" "-Iinc"
 ABSPERL = $(PERL)
 PERLRUN = $(PERL)
 FULLPERLRUN = $(FULLPERL)
@@ -143,9 +143,9 @@ PERM_DIR = 755
 PERM_RW = 644
 PERM_RWX = 755
 
-MAKEMAKER   = /home/sven/perl5/lib/perl5/ExtUtils/MakeMaker.pm
-MM_VERSION  = 7.04
-MM_REVISION = 70400
+MAKEMAKER   = /usr/share/perl/5.24/ExtUtils/MakeMaker.pm
+MM_VERSION  = 7.1002
+MM_REVISION = 71002
 
 # FULLEXT = Pathname for extension directory (eg Foo/Bar/Oracle).
 # BASEEXT = Basename part of FULLEXT. May be just equal FULLEXT. (eg Oracle)
@@ -234,7 +234,7 @@ PM_TO_BLIB = lib/Monitoring/TT.pm \
 
 
 # --- MakeMaker platform_constants section:
-MM_Unix_VERSION = 7.04
+MM_Unix_VERSION = 7.1002
 PERL_MALLOC_DEF = -DPERL_EXTMALLOC_DEF -Dmalloc=Perl_malloc -Dfree=Perl_mfree -Drealloc=Perl_realloc -Dcalloc=Perl_calloc
 
 
@@ -300,7 +300,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Monitoring-TT
-DISTVNAME = Monitoring-TT-1.0.1
+DISTVNAME = Monitoring-TT-1.0.2
 
 
 # --- MakeMaker macro section:
@@ -325,6 +325,7 @@ DISTVNAME = Monitoring-TT-1.0.1
 
 PASTHRU = LIBPERL_A="$(LIBPERL_A)"\
 	LINKTYPE="$(LINKTYPE)"\
+	LD="$(LD)"\
 	PREFIX="$(PREFIX)"\
 	INSTALL_BASE="$(INSTALL_BASE)"
 
@@ -464,7 +465,7 @@ manifypods : pure_all  \
 	lib/Monitoring/TT/Object/Host.pm \
 	lib/Monitoring/TT/Render.pm \
 	lib/Monitoring/TT/Utils.pm
-	$(NOECHO) $(POD2MAN) --section=3 --perm_rw=$(PERM_RW) -u \
+	$(NOECHO) $(POD2MAN) --section=$(MAN3EXT) --perm_rw=$(PERM_RW) -u \
 	  lib/Monitoring/TT.pm $(INST_MAN3DIR)/Monitoring::TT.$(MAN3EXT) \
 	  lib/Monitoring/TT/Identifier.pm $(INST_MAN3DIR)/Monitoring::TT::Identifier.$(MAN3EXT) \
 	  lib/Monitoring/TT/Input/CSV.pm $(INST_MAN3DIR)/Monitoring::TT::Input::CSV.$(MAN3EXT) \
@@ -534,7 +535,7 @@ realclean purge ::  clean realclean_subdirs
 	- $(RM_F) \
 	  $(MAKEFILE_OLD) $(FIRST_MAKEFILE) 
 	- $(RM_RF) \
-	  $(DISTVNAME) MYMETA.yml 
+	  MYMETA.yml $(DISTVNAME) 
 
 
 # --- MakeMaker metafile section:
@@ -625,12 +626,12 @@ disttest : distdir
 
 
 # --- MakeMaker dist_ci section:
-
 ci :
-	$(PERLRUN) "-MExtUtils::Manifest=maniread" \
-	  -e "@all = keys %{ maniread() };" \
-	  -e "print(qq{Executing $(CI) @all\n}); system(qq{$(CI) @all});" \
-	  -e "print(qq{Executing $(RCS_LABEL) ...\n}); system(qq{$(RCS_LABEL) @all});"
+	$(ABSPERLRUN) -MExtUtils::Manifest=maniread -e '@all = sort keys %{ maniread() };' \
+	  -e 'print(qq{Executing $(CI) @all\n});' \
+	  -e 'system(qq{$(CI) @all}) == 0 or die $$!;' \
+	  -e 'print(qq{Executing $(RCS_LABEL) ...\n});' \
+	  -e 'system(qq{$(RCS_LABEL) @all}) == 0 or die $$!;' --
 
 
 # --- MakeMaker distmeta section:
@@ -645,7 +646,7 @@ distmeta : create_distdir metafile
 
 
 # --- MakeMaker distsignature section:
-distsignature : create_distdir
+distsignature : distmeta
 	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) }' \
 	  -e '    or print "Could not add SIGNATURE to MANIFEST: $$$${'\''@'\''}\n"' --
 	$(NOECHO) cd $(DISTVNAME) && $(TOUCH) SIGNATURE
@@ -680,9 +681,7 @@ doc__install : doc_site_install
 	$(NOECHO) $(ECHO) INSTALLDIRS not defined, defaulting to INSTALLDIRS=site
 
 pure_perl_install :: all
-	$(NOECHO) $(MOD_INSTALL) \
-		read "$(PERL_ARCHLIB)/auto/$(FULLEXT)/.packlist" \
-		write "$(DESTINSTALLARCHLIB)/auto/$(FULLEXT)/.packlist" \
+	$(NOECHO) umask 022; $(MOD_INSTALL) \
 		"$(INST_LIB)" "$(DESTINSTALLPRIVLIB)" \
 		"$(INST_ARCHLIB)" "$(DESTINSTALLARCHLIB)" \
 		"$(INST_BIN)" "$(DESTINSTALLBIN)" \
@@ -694,7 +693,7 @@ pure_perl_install :: all
 
 
 pure_site_install :: all
-	$(NOECHO) $(MOD_INSTALL) \
+	$(NOECHO) umask 02; $(MOD_INSTALL) \
 		read "$(SITEARCHEXP)/auto/$(FULLEXT)/.packlist" \
 		write "$(DESTINSTALLSITEARCH)/auto/$(FULLEXT)/.packlist" \
 		"$(INST_LIB)" "$(DESTINSTALLSITELIB)" \
@@ -707,9 +706,7 @@ pure_site_install :: all
 		"$(PERL_ARCHLIB)/auto/$(FULLEXT)"
 
 pure_vendor_install :: all
-	$(NOECHO) $(MOD_INSTALL) \
-		read "$(VENDORARCHEXP)/auto/$(FULLEXT)/.packlist" \
-		write "$(DESTINSTALLVENDORARCH)/auto/$(FULLEXT)/.packlist" \
+	$(NOECHO) umask 022; $(MOD_INSTALL) \
 		"$(INST_LIB)" "$(DESTINSTALLVENDORLIB)" \
 		"$(INST_ARCHLIB)" "$(DESTINSTALLVENDORARCH)" \
 		"$(INST_BIN)" "$(DESTINSTALLVENDORBIN)" \
@@ -719,50 +716,30 @@ pure_vendor_install :: all
 
 
 doc_perl_install :: all
-	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLARCHLIB)/perllocal.pod"
-	-$(NOECHO) $(MKPATH) "$(DESTINSTALLARCHLIB)"
-	-$(NOECHO) $(DOC_INSTALL) \
-		"Module" "$(NAME)" \
-		"installed into" $(INSTALLPRIVLIB) \
-		LINKTYPE "$(LINKTYPE)" \
-		VERSION "$(VERSION)" \
-		EXE_FILES "$(EXE_FILES)" \
-		>> "$(DESTINSTALLARCHLIB)/perllocal.pod"
 
 doc_site_install :: all
-	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLARCHLIB)/perllocal.pod"
-	-$(NOECHO) $(MKPATH) "$(DESTINSTALLARCHLIB)"
-	-$(NOECHO) $(DOC_INSTALL) \
+	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLSITEARCH)/perllocal.pod"
+	-$(NOECHO) umask 02; $(MKPATH) "$(DESTINSTALLSITEARCH)"
+	-$(NOECHO) umask 02; $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
 		"installed into" $(INSTALLSITELIB) \
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
-		>> "$(DESTINSTALLARCHLIB)/perllocal.pod"
+		>> "$(DESTINSTALLSITEARCH)/perllocal.pod"
 
 doc_vendor_install :: all
-	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLARCHLIB)/perllocal.pod"
-	-$(NOECHO) $(MKPATH) "$(DESTINSTALLARCHLIB)"
-	-$(NOECHO) $(DOC_INSTALL) \
-		"Module" "$(NAME)" \
-		"installed into" $(INSTALLVENDORLIB) \
-		LINKTYPE "$(LINKTYPE)" \
-		VERSION "$(VERSION)" \
-		EXE_FILES "$(EXE_FILES)" \
-		>> "$(DESTINSTALLARCHLIB)/perllocal.pod"
 
 
 uninstall :: uninstall_from_$(INSTALLDIRS)dirs
 	$(NOECHO) $(NOOP)
 
 uninstall_from_perldirs ::
-	$(NOECHO) $(UNINSTALL) "$(PERL_ARCHLIB)/auto/$(FULLEXT)/.packlist"
 
 uninstall_from_sitedirs ::
 	$(NOECHO) $(UNINSTALL) "$(SITEARCHEXP)/auto/$(FULLEXT)/.packlist"
 
 uninstall_from_vendordirs ::
-	$(NOECHO) $(UNINSTALL) "$(VENDORARCHEXP)/auto/$(FULLEXT)/.packlist"
 
 
 # --- MakeMaker force section:
@@ -794,7 +771,7 @@ $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
 
 # --- MakeMaker makeaperl section ---
 MAP_TARGET    = perl
-FULLPERL      = "/home/sven/perl5/perlbrew/perls/perl-5.24.0/bin/perl"
+FULLPERL      = "/usr/bin/perl"
 
 $(MAP_TARGET) :: static $(MAKE_APERL_FILE)
 	$(MAKE) $(USEMAKEFILE) $(MAKE_APERL_FILE) $@
@@ -824,10 +801,10 @@ subdirs-test ::
 
 
 test_dynamic :: pure_all
-	PERL_DL_NONLAZY=1 $(FULLPERLRUN) "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness($(TEST_VERBOSE), 'inc', '$(INST_LIB)', '$(INST_ARCHLIB)')" $(TEST_FILES)
+	PERL_DL_NONLAZY=1 PERL_USE_UNSAFE_INC=1 $(FULLPERLRUN) "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness($(TEST_VERBOSE), 'inc', '$(INST_LIB)', '$(INST_ARCHLIB)')" $(TEST_FILES)
 
 testdb_dynamic :: pure_all
-	PERL_DL_NONLAZY=1 $(FULLPERLRUN) $(TESTDB_SW) "-Iinc" "-I$(INST_LIB)" "-I$(INST_ARCHLIB)" $(TEST_FILE)
+	PERL_DL_NONLAZY=1 PERL_USE_UNSAFE_INC=1 $(FULLPERLRUN) $(TESTDB_SW) "-Iinc" "-I$(INST_LIB)" "-I$(INST_ARCHLIB)" $(TEST_FILE)
 
 test_ : test_dynamic
 
@@ -852,7 +829,7 @@ ppd :
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Test::Perl::Critic" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Test::Pod" VERSION="1.4" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Test::Pod::Coverage" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-thread-multi-5.24" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-gnu-thread-multi-5.24" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    </IMPLEMENTATION>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '</SOFTPKG>' >> $(DISTNAME).ppd
@@ -882,7 +859,7 @@ pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 
 
 # End.
-# Postamble by Module::Install 1.16
+# Postamble by Module::Install 1.17
 # --- Module::Install::Admin::Makefile section:
 
 realclean purge ::

@@ -24,7 +24,7 @@ name: Lingua-EN-Opinion
 requires:
   File::Slurper: '0'
   Lingua::EN::Sentence: '0'
-  Moo: '0'
+  Moo: '2'
   Statistics::Lite: '0'
   namespace::clean: '0'
   perl: '5.006'
@@ -32,7 +32,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Lingua-EN-Opinion
   repository: https://github.com/ology/Lingua-EN-Opinion
-version: '0.06'
+version: '0.0601'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -229,6 +229,14 @@ x_Dist_Zilla:
           wordlist: Pod::Wordlist
       name: Test::PodSpelling
       version: '2.007005'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:

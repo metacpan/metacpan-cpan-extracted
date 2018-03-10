@@ -13,6 +13,7 @@ SIGNATURE
 dist.ini
 doap.ttl
 lib/Dist/Inkt/DOAP.pm
+lib/Dist/Inkt/Role/AddExternalRDF.pm
 lib/Dist/Inkt/Role/DetermineRightsFromRdf.pm
 lib/Dist/Inkt/Role/ProcessDOAP.pm
 lib/Dist/Inkt/Role/ProcessDOAPDeps.pm

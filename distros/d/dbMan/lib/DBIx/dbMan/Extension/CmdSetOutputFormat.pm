@@ -3,11 +3,11 @@ package DBIx::dbMan::Extension::CmdSetOutputFormat;
 use strict;
 use base 'DBIx::dbMan::Extension';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 1;
 
-sub IDENTIFICATION { return "000001-000025-000006"; }
+sub IDENTIFICATION { return "000001-000025-000007"; }
 
 sub preference { return 1000; }
 
@@ -46,8 +46,8 @@ sub handle_action {
 				$action{output} = "Output format $want selected.\n";
 				$obj->{-interface}->rebuild_menu();
 			} else {
-				$action{output} = "Unknown output format.\n".
-					"Registered formats: ".(join ',',sort @fmts)."\n";
+                $obj->{-interface}->error( 'Unknown output format.' );
+				$action{output} = "Registered formats: ".(join ',',sort @fmts)."\n";
 			}
 		}
 	}

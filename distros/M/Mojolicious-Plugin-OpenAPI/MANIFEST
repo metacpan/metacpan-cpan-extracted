@@ -21,6 +21,7 @@ t/default-value.t
 t/discriminator.t
 t/empty-string.t
 t/example-array-of-hashes.t
+t/formats.t
 t/headers.t
 t/issue-24-booleans-in-yaml-schema.t
 t/issue-48-refs.t
@@ -30,6 +31,7 @@ t/ref-param.t
 t/register.t
 t/renderer.t
 t/reply-spec.t
+t/response-code.t
 t/route-names.t
 t/security-disabled.t
 t/security.t

@@ -1,5 +1,7 @@
-gonzo/*
-.git/*
+gonzo/.*
+\.git/.*
+.*\.swp
 tools/encode/encode
 tools/encode/encode.o
 tools/encode/uri_tables.h
+HTTP-XSCookies-.*.tar.gz

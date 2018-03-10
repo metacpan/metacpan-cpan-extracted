@@ -12,7 +12,7 @@ use Monitoring::TT::Object;
 use Monitoring::TT::Render;
 use Monitoring::TT::Utils;
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.0.2';
 
 #####################################################################
 
@@ -53,6 +53,7 @@ sub new {
     for my $s (@{Monitoring::TT::Identifier::functions('Monitoring::TT::Render')}) {
         $self->{'tt_opts'}->{'PRE_DEFINE'}->{$s} = \&{'Monitoring::TT::Render::'.$s};
     }
+    $Monitoring::TT::Render::tt = $self;
 
     return $self;
 }
@@ -102,6 +103,7 @@ sub run {
     $self->_copy_static_files();
     $self->_build_dynamic_config();
     $self->_check_typos() unless $self->{'opt'}->{'templatefilter'};
+    $self->_post_process();
     $self->_print_stats() if $Monitoring::TT::Log::Verbose >= 2;
     $self->_run_hook('post', join(',', @{$self->{'in'}}));
     info('done');
@@ -237,7 +239,7 @@ sub _build_dynamic_object_config {
 
     mkdir($self->{'out'}.'/conf.d');
 
-    my $data = { hosts => [], contacts => []};
+    $self->{'data'} = { hosts => [], contacts => [] };
     for my $type (keys %{$input_types}) {
         my $typefilter = $self->{'opt'}->{substr($type,0,-1).'filter'};
         my $obj_list = [];
@@ -257,7 +259,7 @@ sub _build_dynamic_object_config {
         }
         # sort objects by name
         @{$obj_list} = sort {$a->{'name'} cmp $b->{'name'}} @{$obj_list};
-        $data->{$type} = $obj_list;
+        $self->{'data'}->{$type} = $obj_list;
 
         my $outfile = $self->{'out'}.'/conf.d/'.$type.'.cfg';
         info('writing: '.$outfile);
@@ -279,13 +281,11 @@ sub _build_dynamic_object_config {
             $outfile    = $self->{'out'}.'/conf.d/'.$outfile;
             debug('writing: '.$outfile);
             open(my $fh, '>', $outfile) or die('cannot write '.$outfile.': '.$!);
-            print $fh $self->_process_template($self->_read_replaced_template($file), $data);
+            print $fh $self->_process_template($self->_read_replaced_template($file), $self->{'data'});
             print $fh "\n";
             close($fh);
         }
     }
-
-    $self->{'data'} = $data;
 
     return;
 }
@@ -449,6 +449,27 @@ sub _process_template {
     $output =~ s/^\n//gmxo;
 
     return $output;
+}
+
+#####################################################################
+sub _post_process {
+    my($self) = @_;
+    my $out = $self->{'out'};
+    for my $in (@{$self->{'in'}}) {
+        for my $processor (sort glob($in.'/post_process*')) {
+            info('postprocessing with '.$processor);
+            if(!-x $processor) {
+                error("post processor ".$processor." must be executable");
+                next;
+            }
+            my $res = `$processor $out`;
+            my $rc = $?;
+            if($rc != 0) {
+                warn($res);
+            }
+        }
+    }
+    return;
 }
 
 #####################################################################
@@ -644,7 +665,7 @@ sub _check_typos {
     my($self) = @_;
     for my $type (qw/hosts contacts/) {
         for my $o (@{$self->{'data'}->{$type}}) {
-            if($o->{'type'}) {
+            if($o->{'type'} and $o->{'type'} ne 'contact') {
                 warn('unused type \''.$o->{'type'}.'\' defined in '.$o->{'file'}.':'.$o->{'line'}) unless defined $self->{$type.'possible_types'}->{$o->{'type'}};
             }
             if($o->{'tags'}) {

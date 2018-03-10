@@ -5,7 +5,7 @@ package Net::Google::SafeBrowsing4::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 =head1 NAME
 
@@ -424,7 +424,7 @@ sub full_hash_ok {
 
 =head2 get_full_hash_error()
 
-Save information about an unsuccessful attempt to retrieve a full hash
+Get information about an unsuccessful attempt to retrieve a full hash
 
 	my $info = $storage->get_full_hash_error(prefix => HEX);
 
@@ -461,6 +461,69 @@ Hash reference in the following format if there was an error:
 sub get_full_hash_error {
 	...
 }
+
+=head2 get_lists()
+
+Gets all threat list names from Google Safe Browsing stored.
+
+	my $lists = $storage->get_lists();
+
+Returns an array reference of all the lists:
+
+	[
+		{
+			'threatEntryType' => 'URL',
+			'threatType' => 'MALWARE',
+			'platformType' => 'ANY_PLATFORM'
+		},
+		{
+			'threatEntryType' => 'URL',
+			'threatType' => 'MALWARE',
+			'platformType' => 'WINDOWS'
+		},
+		...
+	]
+
+	or C<undef> on error.
+
+=cut
+
+
+sub get_lists {
+	...
+}
+
+
+=head2 save_lists()
+
+Store the threat list names from Google Safe Browsing.
+
+	my $lists = $storage->save_lists(
+			[
+			{
+				'threatEntryType' => 'URL',
+				'threatType' => 'MALWARE',
+				'platformType' => 'ANY_PLATFORM'
+			},
+			{
+				'threatEntryType' => 'URL',
+				'threatType' => 'MALWARE',
+				'platformType' => 'WINDOWS'
+			},
+			...
+		]
+	);
+
+	or C<undef> on error.
+
+=cut
+
+
+sub save_lists {
+	...
+}
+
+
 
 =head1 SEE ALSO
 

@@ -1,7 +1,7 @@
 == MonTT - Generate Monitoring Config with Template Toolkit
 
-Did you ever want to write sophisticated Nagios config files using
-the power of template toolkit?
+Did you ever want to write sophisticated Nagios/Naemon config files using
+the power of template toolkit? Basically this is a config preprocesseor.
 
 
 === Requirements
@@ -9,7 +9,7 @@ the power of template toolkit?
 You will need
 
   - Perl
-    - 'Template' module from CPAN
+  - 'Template' module from CPAN
 
 
 === Getting Started
@@ -39,16 +39,18 @@ For example:
   |       `-- switch.cfg
   |-- nagios.cfg
   |-- resource.cfg
-  `-- static                        # static files will just be copied into destination folder
-      `-- conf.d
-          |-- commands.cfg
-          `-- timeperiods.cfg
+  |-- static                        # static files will just be copied into destination folder
+  |   `-- conf.d
+  |       |-- commands.cfg
+  |       `-- timeperiods.cfg
+  |-- hooks                         # pre/post hooks
+  `-- post_process*                 # scripts will be run after processing is finished
 
-All files are nagios config files, but you may use template toolkit
-syntax to add some magic to those files. Any folder below conf.d
-expect 'apps', 'contacts' and 'hosts' will be processed only once. The
-'apps' and 'hosts' folder will be processed for every host, the
-'contact' folder for every contact.
+
+All files are nagios configuration files, but you may use template toolkit
+syntax to add some magic to those files. Any folder below conf.d except 'apps',
+'contacts' and 'hosts' will be processed only once. The 'apps' and 'hosts'
+folder will be processed for every host, the 'contact' folder for every contact.
 
 then run the montt processor:
 
@@ -86,3 +88,18 @@ The 'pre' hook is run before the export.
 ==== post
 
 The 'post' hook is run after the export.
+
+
+=== Post Processing
+
+Post Processor can be any script which matches `post_process*` in any of the
+input folders.
+
+All scripts will be run with a the output folders as argument.
+
+ex.:
+
+..................
+ inputfolder1/post_process.pl outputfolder
+..................
+

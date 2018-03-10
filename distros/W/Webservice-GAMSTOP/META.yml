@@ -1,0 +1,34 @@
+---
+abstract: 'GAMSTOP API Client Implementation'
+author:
+  - 'binary.com <BINARY@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Mojolicious::Lite: '0'
+  Test::CheckDeps: '0.010'
+  Test::Exception: '0.43'
+  Test::Mojo: '0'
+  Test::More: '0.98'
+  perl: '5.014000'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Webservice-GAMSTOP
+requires:
+  Email::Valid: '0'
+  Mojo::UserAgent: '0'
+  Moo: '0'
+  indirect: '0.37'
+resources:
+  bugtracker: https://github.com/binary-com/perl-Webservice-GAMSTOP/issues
+  repository: git://github.com/binary-com/perl-Webservice-GAMSTOP.git
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.66'

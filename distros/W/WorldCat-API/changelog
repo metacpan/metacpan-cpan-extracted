@@ -1,0 +1,4 @@
+0.001 Initial Commit
+0.002 Package Cleanup
+1.001 Fix descending version number error
+1.002 Conditionally skip API tests (for CPAN)

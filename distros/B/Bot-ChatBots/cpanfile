@@ -5,6 +5,7 @@ requires 'Module::Runtime', '0.014';
 requires 'Ouch',            '0.0410';
 requires 'Try::Tiny',       '0.27';
 requires 'Mojolicious',     '7.10';
+requires 'IO::Socket::SSL', '2.056';
 
 on test => sub {
    requires 'Test::More',      '0.88';

@@ -7,10 +7,7 @@
 
 #include "buffer.h"
 
-Buffer* url_decode(Buffer* src, int length,
-                   Buffer* tgt);
-
-Buffer* url_encode(Buffer* src, int length,
-                   Buffer* tgt);
+Buffer* url_decode(Buffer* src, Buffer* tgt);
+Buffer* url_encode(Buffer* src, Buffer* tgt);
 
 #endif

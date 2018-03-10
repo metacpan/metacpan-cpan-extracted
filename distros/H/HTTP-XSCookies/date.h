@@ -16,7 +16,7 @@
 
 #include "buffer.h"
 
-double date_compute(const char *date);
+double date_compute(const char *date, int len);
 
 Buffer* date_format(double date, Buffer* format);
 

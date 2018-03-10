@@ -6,7 +6,10 @@
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
-   "keywords" : [],
+   "keywords" : [
+      "Package Management Systems",
+      "Semantic Web"
+   ],
    "license" : [
       "perl_5"
    ],
@@ -62,47 +65,51 @@
    "provides" : {
       "Dist::Inkt::DOAP" : {
          "file" : "lib/Dist/Inkt/DOAP.pm",
-         "version" : "0.100"
+         "version" : "0.110"
+      },
+      "Dist::Inkt::Role::AddExternalRDF" : {
+         "file" : "lib/Dist/Inkt/Role/AddExternalRDF.pm",
+         "version" : "0.110"
       },
       "Dist::Inkt::Role::DetermineRightsFromRdf" : {
          "file" : "lib/Dist/Inkt/Role/DetermineRightsFromRdf.pm",
-         "version" : "0.100"
+         "version" : "0.110"
       },
       "Dist::Inkt::Role::ProcessDOAP" : {
          "file" : "lib/Dist/Inkt/Role/ProcessDOAP.pm",
-         "version" : "0.100"
+         "version" : "0.110"
       },
       "Dist::Inkt::Role::ProcessDOAPDeps" : {
          "file" : "lib/Dist/Inkt/Role/ProcessDOAPDeps.pm",
-         "version" : "0.100"
+         "version" : "0.110"
       },
       "Dist::Inkt::Role::RDFModel" : {
          "file" : "lib/Dist/Inkt/Role/RDFModel.pm",
-         "version" : "0.100"
+         "version" : "0.110"
       },
       "Dist::Inkt::Role::ReadMetaDir" : {
          "file" : "lib/Dist/Inkt/Role/ReadMetaDir.pm",
-         "version" : "0.100"
+         "version" : "0.110"
       },
       "Dist::Inkt::Role::Test::Changes" : {
          "file" : "lib/Dist/Inkt/Role/Test/Changes.pm",
-         "version" : "0.100"
+         "version" : "0.110"
       },
       "Dist::Inkt::Role::WriteCOPYRIGHT" : {
          "file" : "lib/Dist/Inkt/Role/WriteCOPYRIGHT.pm",
-         "version" : "0.100"
+         "version" : "0.110"
       },
       "Dist::Inkt::Role::WriteCREDITS" : {
          "file" : "lib/Dist/Inkt/Role/WriteCREDITS.pm",
-         "version" : "0.100"
+         "version" : "0.110"
       },
       "Dist::Inkt::Role::WriteChanges" : {
          "file" : "lib/Dist/Inkt/Role/WriteChanges.pm",
-         "version" : "0.100"
+         "version" : "0.110"
       },
       "Dist::Inkt::Role::WriteDOAP" : {
          "file" : "lib/Dist/Inkt/Role/WriteDOAP.pm",
-         "version" : "0.100"
+         "version" : "0.110"
       }
    },
    "release_status" : "stable",
@@ -122,7 +129,7 @@
       "x_IRC" : "irc://irc.perl.org/#perlrdf",
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Dist-Inkt-DOAP/project"
    },
-   "version" : "0.100",
+   "version" : "0.110",
    "x_serialization_backend" : "JSON::PP version 2.27300_01",
    "x_static_install" : 1
 }

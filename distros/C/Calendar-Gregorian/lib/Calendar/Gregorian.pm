@@ -1,6 +1,6 @@
 package Calendar::Gregorian;
 
-$Calendar::Gregorian::VERSION   = '0.15';
+$Calendar::Gregorian::VERSION   = '0.16';
 $Calendar::Gregorian::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Calendar::Gregorian - Interface to Gregorian Calendar.
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 
@@ -18,7 +18,7 @@ use Data::Dumper;
 
 use Date::Gregorian::Simple;
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 use overload q{""} => 'as_string', fallback => 1;
 
 has year  => (is => 'rw', predicate => 1);

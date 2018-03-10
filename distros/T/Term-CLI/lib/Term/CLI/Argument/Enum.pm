@@ -20,9 +20,10 @@
 
 use 5.014_001;
 
-package Term::CLI::Argument::Enum  0.03002 {
+package Term::CLI::Argument::Enum  0.04004 {
 
 use Modern::Perl;
+use Term::CLI::L10N;
 
 use Types::Standard qw(
     ArrayRef
@@ -43,18 +44,20 @@ has value_list => (
 sub validate {
     my ($self, $value) = @_;
 
-    $self->SUPER::validate($value) or return;
+    defined $self->SUPER::validate($value) or return;
 
     my @found = grep { rindex($_, $value, 0) == 0 } @{$self->value_list};
     if (@found == 0) {
-        return $self->set_error("not a valid value");
+        return $self->set_error(loc("not a valid value"));
     }
     elsif (@found == 1) {
         return $found[0];
     }
     else {
         @found = sort @found;
-        return $self->set_error("ambiguous value (matches: @found)");
+        return $self->set_error(
+            loc("ambiguous value (matches: [_1])", join(", ", @found))
+        );
     }
 }
 
@@ -86,7 +89,7 @@ Term::CLI::Argument::Enum - class for "enum" string arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.03002
+version 0.04004
 
 =head1 SYNOPSIS
 

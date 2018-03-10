@@ -1,19 +1,18 @@
 ---
 abstract: 'check a remote host for reachability'
 author:
-  - 'Steve Peters <steve@fisharerojo.org>'
   - 'Reini Urban <rurban@cpan.org>'
+  - 'Steve Peters <steve@fisharerojo.org>'
   - 'Matthew Musgrove <mr.muskrat@gmail.com>'
   - 'Karl Williamson <khw@cpan.org>'
   - 'Brian Fraser <fraserbn@gmail.com>'
   - 'Mark Gardner <mjgardner@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Text::Template: '1.10'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 8.3004, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150005'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,6 +27,6 @@ requires:
   Test::More: '0'
   Time::HiRes: '0'
 resources:
-  repository: git://github.com/rurban/net-ping.git
-version: '2.64'
+  license: http://dev.perl.org/licenses/
+version: '2.66'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

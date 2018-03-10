@@ -1,119 +1,128 @@
 
-Sat Mar  3 22:33:25 CST 2018
+- 1.50.3 Tue Aug  1 17:28:44 CDT 2017
 
-- 1.50.2
-- Fix t/03-Universal-Override.t to check whether the symbols
-  in UNIVERSAL have CODE and can reasonably be treated as 
-  methods (See RT 124441).
-- Update Makefile.PL to include Test::More.
+    Added boilerplate to override loop on UNIVERSAL to
+    avoid checking non-method names, non-coderef's or 
+    globs without a CODE slot value.
 
-Sun Feb 25 11:15:51 CST 2018
+    Use the sanity check in override test.
 
-- 1.50.1
-- use v5.24
-- put version into "package" line.
-- use vX.Y.Z notation.
-- remove unused regex.
-- renamed Changes to CHANGES.
-- test cleanups.
+    Bump version number in module.
 
-Fri Jul 26 12:09:17 CDT 2013
+- 1.50.2 Sat Mar  3 22:33:25 CST 2018
 
-- v1.30
-- use v5.12.
-- drop "use strict" (now built-in).
-- Remove regex check on prototype, allows using object to dispatch
-  constructor (allows dispatch via factory object).
-- Add overrides for UNIVERSAL class methods that dispatch into 
-  the AUTOLOAD ($trampoline->isa( X ) or can will return correct
-  value).
+    Fix t/03-Universal-Override.t to check whether the symbols
+    in UNIVERSAL have CODE and can reasonably be treated as 
+    methods (See RT 124441).
 
-Tue Jun 12 13:55:35 CDT 2012
+    Update Makefile.PL to include Test::More.
 
-- Minor test cleanups.
-- use v5.8.
+- 1.50.1 Sun Feb 25 11:15:51 CST 2018
 
-Wed Jul 22 20:13:17 EDT 2009
+    use v5.24
+    put version into "package" line.
+    use vX.Y.Z notation.
+    remove unused regex.
+    renamed Changes to CHANGES.
+    test cleanups.
 
-- Check that the use succeeded in eval.
+- v1.30 Fri Jul 26 12:09:17 CDT 2013
 
-- Check for a true value of the class on the
-  way in and constructor on the way out. 
+    use v5.12.
+    drop "use strict" (now built-in).
 
-- Replace "ref" with "blessed" to validate
-  object construction.
+    Remove regex check on prototype, allows using object to dispatch
+    constructor (allows dispatch via factory object).
 
-- Update the tests to use blessed also.
+    Add overrides for UNIVERSAL class methods that dispatch into 
+    the AUTOLOAD ($trampoline->isa( X ) or can will return correct
+    value).
 
-- Added a test for rejecting false classes
-  in the initial construction, failure to 
-  use the class on bounce.
+- Tue Jun 12 13:55:35 CDT 2012
 
-- Module now depends on Symbol (for testing)
-  and Scalar::Util (for operation) also; both
-  are core so it shouldn't cause any pain.
+    Minor test cleanups.
+    use v5.8.
 
-Thu Jan 26 17:43:45 EST 2006
+- Wed Jul 22 20:13:17 EDT 2009
 
-- Fixed typo in eval (dbkliv)
+    Check that the use succeeded in eval.
 
-- Update pod.
+    Check for a true value of the class on the
+    way in and constructor on the way out. 
 
-- Code cleanup: redispatching anon sub blows up with wierd
-  stack error in 5.8.4; not that much code to duplicate.
+    Replace "ref" with "blessed" to validate
+    object construction.
 
-Wed Jan 25 16:51:15 EST 2006
+    Update the tests to use blessed also.
 
-- use_class got too klutzy due to issues with bookkeeping
-  multiple calling classes. Feh... Added Object::Trampoline::Use
-  that does a use in the caller's package to get the object.
+    Added a test for rejecting false classes
+    in the initial construction, failure to 
+    use the class on bounce.
 
-- Upated the POD.
+    Module now depends on Symbol (for testing)
+    and Scalar::Util (for operation) also; both
+    are core so it shouldn't cause any pain.
 
-Tue Jan 24 18:00:50 EST 2006
+- Thu Jan 26 17:43:45 EST 2006
 
-- Add add'l argument for using the construcor class 
-  ('use_class').
+    Fixed typo in eval (dbkliv)
 
-- Update pod to reflect add'l argument.
+    Update pod.
 
-- Still need to add tests for this; but it at least
-  didn't break anything...
+    Code cleanup: redispatching anon sub blows up with wierd
+    stack error in 5.8.4; not that much code to duplicate.
 
-Mon Nov 21 17:51:06 EST 2005
+- Wed Jan 25 16:51:15 EST 2006
 
-- So far so good, up the thing to 1.00, add some 
-  more POD::::.
+    use_class got too klutzy due to issues with bookkeeping
+    multiple calling classes. Feh... Added Object::Trampoline::Use
+    that does a use in the caller's package to get the object.
 
-Mon Nov 21 12:55:16 EST 2005
+    Upated the POD.
 
-- Replace single $obj->can with if-block that first
-  attempts to get a subref then uses $obj->$name in
-  order to handle classes whose first non-constructor
-  method is an AUTOLOAD.
+- Tue Jan 24 18:00:50 EST 2006
 
-- Pod, debugging use.
+    Add add'l argument for using the construcor class 
+    ('use_class').
 
-Fri Nov 18 12:53:41 EST 2005
+    Update pod to reflect add'l argument.
 
-- POD, example of handle catalog module, notes.
+    Still need to add tests for this; but it at least
+    didn't break anything...
 
-Tue Nov  8 14:26:53 EST 2005
+- Mon Nov 21 17:51:06 EST 2005
 
-- Typos in POD, comments.
+    So far so good, up the thing to 1.00, add some 
+    more POD::::.
 
-- Added comments to 02.t
+ Mon Nov 21 12:55:16 EST 2005
+
+    Replace single $obj->can with if-block that first
+    attempts to get a subref then uses $obj->$name in
+    order to handle classes whose first non-constructor
+    method is an AUTOLOAD.
+
+    Pod, debugging use.
+
+- Fri Nov 18 12:53:41 EST 2005
+
+    POD, example of handle catalog module, notes.
+
+- Tue Nov  8 14:26:53 EST 2005
+
+    Typos in POD, comments.
+    Added comments to 02.t
 
 
-Tue Nov  1 14:08:06 EST 2005
+- Tue Nov  1 14:08:06 EST 2005
 
-- Modify Bounce's AUTOLOAD to eval the construction rather
-  than croak if it fails. This handles AUTOLOAD-ed constructors
-  (which $class->can( $name ) fails on). If you're really
-  perverted you can now even use O::T to generate objects of
-  type O::T...
+    Modify Bounce's AUTOLOAD to eval the construction rather
+    than croak if it fails. This handles AUTOLOAD-ed constructors
+    (which $class->can( $name ) fails on). If you're really
+    perverted you can now even use O::T to generate objects of
+    type O::T...
 
 
-Tue Oct 25 10:34:38 EDT 2005
+- Tue Oct 25 10:34:38 EDT 2005
 
-POD, README.
+    POD, README.

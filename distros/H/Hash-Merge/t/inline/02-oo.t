@@ -281,7 +281,7 @@ is_deeply(
 );
 is_deeply($rep{oo}, {foo => [{key => 'left'}, {key => 'right'},]}, 'Retainment Precedent - Object on Object');
 
-$merge->specify_behavior(
+$merge->add_behavior_spec(
     {
         SCALAR => {
             SCALAR => sub { $_[0] },
@@ -301,6 +301,14 @@ $merge->specify_behavior(
     },
     "My Behavior"
 );
+
+SCOPE: {
+    my $err;
+    local $SIG{__WARN__} = sub { $err = shift };
+    eval { $merge->specify_behavior( $merge->get_behavior_spec("My Behavior"), "My Behavior" ) };
+    $@ and $err = $@;
+    like($err, qr/already defined. Please take another name/, "Cannot add behavior spec twice");
+}
 
 my %cp = %{$merge->merge(\%left, \%right)};
 

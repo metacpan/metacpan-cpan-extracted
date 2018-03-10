@@ -33,14 +33,17 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Object::Trampoline" : "0",
             "Scalar::Util" : "0",
-            "Symbol" : "0",
+            "Symbol" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.50.2",
+   "version" : "v1.50.3",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

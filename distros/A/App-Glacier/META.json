@@ -1,5 +1,5 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "command line utility for accessing Amazon Glacier storage",
    "author" : [
       "Sergey Poznyakoff <gray@gnu.org>"
    ],
@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-Glacier",
    "no_index" : {
@@ -56,5 +56,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.00"
+   "version" : "2.00"
 }

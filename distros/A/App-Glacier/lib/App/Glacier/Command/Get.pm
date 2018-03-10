@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use threads;
 use threads::shared;
-use App::Glacier::Command;
+use App::Glacier::Core;
 use App::Glacier::Job::FileRetrieval;
 use App::Glacier::DateTime;
 use App::Glacier::Progress;
@@ -18,12 +18,13 @@ glacier get - download file from a vault
 =head1 SYNOPSIS
 
 B<glacier put>
-[B<-fiqt>]
+[B<-fikqt>]
 [B<--force>]    
 [B<--interactive>]    
 [B<-j> I<NJOBS>]
 [B<--jobs=>I<NJOBS>]
 [B<--no-clobber>]
+[B<--keep>]    
 [B<--quiet>]    
 [B<--test>]    
 I<VAULT>
@@ -58,7 +59,7 @@ The default is configured by the B<transfer.download.jobs> configuration
 statement.  If absent, the B<transfer.jobs> statement is used.  The
 default value is 16.    
     
-=item B<--no-clobber>
+=item B<-k>, B<--keep>, B<--no-clobber>
 
 Never overwrite existing files.
     
@@ -85,24 +86,35 @@ use constant {
     IFEXISTS_ASK => 2,
 };
     
-sub getopt {
-    my ($self, %opts) = @_;
-    $self->{_options}{ifexists} = IFEXISTS_OVERWRITE; # Default
-    $self->SUPER::getopt(
-	'interactive|i' => sub { $self->{_options}{ifexists} = IFEXISTS_ASK },
-	'force|f' => sub { $self->{_options}{ifexists} = IFEXISTS_OVERWRITE },
-	'no-clobber|f' => sub { $self->{_options}{ifexists} = IFEXISTS_KEEP },
-	'quiet|q' => \$self->{_options}{quiet},
-	'jobs|j=i' => \$self->{_options}{jobs},
-	'test|t' => \$self->{_options}{test},
+sub new {
+    my ($class, $argref, %opts) = @_;
+    my $self = $class->SUPER::new(
+	$argref,
+	optmap => {
+	    'interactive|i' => sub {
+		$_[0]->{_options}{ifexists} = IFEXISTS_ASK
+	    },
+	    'force|f' => sub {
+		$_[0]->{_options}{ifexists} = IFEXISTS_OVERWRITE
+	    },
+	    'no-clobber|keep|k' => sub {
+		$_[0]->{_options}{ifexists} = IFEXISTS_KEEP
+	    },
+	    'quiet|q' => 'quiet',
+	    'jobs|j=i' => 'jobs',
+	    'test|t' => 'test'
+	},
 	%opts);
+    $self->{_options}{ifexists} //= IFEXISTS_OVERWRITE;
+    return $self;
 }
 
 sub run {
     my $self = shift;
+
     $self->abend(EX_USAGE, "two or three arguments expected")
-	unless @_ == 2 || @_ == 3;
-    my ($vaultname, $filespec, $localname) = @_;
+	unless $self->command_line == 2 || $self->command_line == 3;
+    my ($vaultname, $filespec, $localname) = $self->command_line;
     $filespec =~ /^(?<file>.+?)(?:(?<!\\);(?<ver>\d+))?$/
 	or die "unexpected failure";
 

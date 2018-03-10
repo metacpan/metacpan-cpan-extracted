@@ -7,6 +7,7 @@ use utf8;
 # Copyright © 2008 Martín Ferrari
 # Copyright © 2008,2009,2010,2011,2012,2013,2018 Damyan Ivanov
 # Copyright © 2010 gregor herrmann
+# Copyright © 2018 James Clarke
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -414,7 +415,7 @@ sub open_log {
 }
 
 sub count {
-    my ($self, $counter);
+    my ($self, $counter) = @_;
 
     $stats{$counter}++;
 }
@@ -1532,7 +1533,8 @@ C<gitlab_webhook_*> event, asynchronously.
 
 =cut
 
-my @array_webhook_params = qw( channel pipeline_only_status );
+my @array_webhook_params =
+    qw( channel pipeline_only_status always_squash_branch );
 my %array_webhook_params = map( ( $_ => 1 ), @array_webhook_params );
 
 sub webhook_request {
@@ -1647,6 +1649,7 @@ sub webhook_request {
 
     # form a CGI-like param hash
     my $param = { map( ( $_ => [] ), @array_webhook_params ) };
+    $param->{always_squash_branch} = [ qw( upstream upstream/master ) ];
     my $uri = URI->new( $request->url );
     my @query = $request->uri->query_form;
     while ( my( $key, $value ) = splice( @query, 0, 2 ) ) {
@@ -1697,7 +1700,7 @@ sub shorten_url {
     my $service = $KGB::config->{short_url_service}
         or return monkey_shorten_git_hashes($url);
 
-    unless ($shortener_loaded) {
+    unless ($shortener_loaded and $shortener_loaded eq $service) {
         my $ok = eval {
             require WWW::Shorten;
             WWW::Shorten->import( $service, ':short' );
@@ -1709,7 +1712,7 @@ sub shorten_url {
             return $url;
         }
 
-        $shortener_loaded = 1;
+        $shortener_loaded = $service;
     }
 
     my $short_url;
@@ -1897,6 +1900,10 @@ sub gitlab_webhook_push {
     my $to_show_count = scalar @{ $body->{commits} };
     $to_show_count = $max_commits if $max_commits < $to_show_count;
 
+    if ( grep { $_ eq $branch } @{ $opts->{always_squash_branch} } ) {
+        $to_show_count = 0;
+    }
+
     if ( $to_show_count != $commit_count ) {
         # not all commits will be shown, prepend a summary of the push
         my @info;
@@ -1909,8 +1916,9 @@ sub gitlab_webhook_push {
             if $body->{checkout_sha};
         push @info, colorize( module => $module ) if $module ne '';
         push @info, colorize( separator => '*' ),
-            sprintf( 'pushed %d commits (first %d follow)',
-            $commit_count, $to_show_count );
+            sprintf( 'pushed %d commits', $commit_count );
+        push @info, sprintf( '(first %d follow)', $to_show_count )
+            if $to_show_count;
         push @info, colorize( separator => '*' );
         push @info,
             colorize(
@@ -1934,6 +1942,8 @@ sub gitlab_webhook_push {
 
     my $shown = 0;
     for my $commit ( @{ $body->{commits} } ) {
+        last if $shown + 1 > $to_show_count;
+
         my $path_string;
         my %dirs;
 
@@ -2031,7 +2041,6 @@ sub gitlab_webhook_push {
         );
 
         $shown++;
-        last if $shown >= $to_show_count;
     }
 }
 
@@ -2119,7 +2128,7 @@ sub gitlab_webhook_tag_push {
     my $branch = 'tags';
 
     my $message = $body->{message} // '';
-    $branch = 'signed-tags'
+    $branch = 'signed tags'
         if $message =~ s/-----BEGIN PGP SIGNATURE-----.*//s;
 
     my @info;
@@ -2198,7 +2207,7 @@ sub gitlab_webhook_issue {
     push @info, colorize( author   => $body->{user}{name} );
     push @info, colorize( branch   => 'issues' );
     push @info, colorize( module   => $module ) if $module ne '';
-    push @info, colorize( revision => $body->{object_attributes}{id} );
+    push @info, colorize( revision => '#' . $body->{object_attributes}{iid} );
     push @info, colorize( $action => $body->{object_attributes}{title} );
 
     my @string = join( ' ', @info );
@@ -2236,7 +2245,7 @@ sub gitlab_webhook_issue {
 
 my %note_descr = (
     Commit => 'commented commit ',
-    MergeRequest => 'commented merge request #',
+    MergeRequest => 'commented merge request !',
     Issue => 'commented issue #',
     Snippet => 'commented snippet #',
 );
@@ -2260,14 +2269,14 @@ sub gitlab_webhook_note {
             if $nt eq 'Commit'
             and $body->{commit}
             and $body->{commit}{id};
-        $log .= $body->{merge_request}{id}
+        $log .= $body->{merge_request}{iid}
             if $nt eq 'MergeRequest'
             and $body->{merge_request}
-            and $body->{merge_request}{id};
-        $log .= $body->{issue}{id}
+            and $body->{merge_request}{iid};
+        $log .= $body->{issue}{iid}
             if $nt eq 'Issue'
             and $body->{issue}
-            and $body->{issue}{id};
+            and $body->{issue}{iid};
         $log .= $body->{snippet}{id}
             if $nt eq 'Snippet'
             and $body->{snippet}
@@ -2312,8 +2321,8 @@ sub gitlab_webhook_merge_request {
 
     my $log =
           $body->{object_attributes}{action}
-        . ' of merge request #'
-        . $body->{object_attributes}{id};
+        . ' of merge request !'
+        . $body->{object_attributes}{iid};
 
     my @info;
 
@@ -2321,8 +2330,8 @@ sub gitlab_webhook_merge_request {
     push @info, colorize( branch => $body->{object_attributes}{target_branch} )
         if $body->{object_attributes}{target_branch};
     push @info, colorize( module => $module ) if $module ne '';
-    push @info, colorize( revision => $body->{object_attributes}{id} )
-        if $body->{object_attributes}{id};
+    push @info, colorize( revision => '!' . $body->{object_attributes}{iid} )
+        if $body->{object_attributes}{iid};
     push @info, colorize( separator => '*' ) . ' ' . $log;
 
     my @string = join( ' ', @info );

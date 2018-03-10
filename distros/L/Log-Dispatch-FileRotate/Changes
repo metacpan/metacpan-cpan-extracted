@@ -1,5 +1,13 @@
 Revision history for Perl extension Log::Dispatch::FileRotate.
 
+1.35 Wed 43 07 2018
+    - Fix lockfile race condition test in Strawberry Perl (Thanks Zak B. Elep)
+    - Skip file open failure test on Cygwin - chmod bahaviour varies on Cygwin
+      (Zak B. Elep)
+    - Minor test cleanups (Zak B. Elep)
+    - Fix "Use of "localtime" without parentheses" warning on older Perls
+    - Migrate issues/bug tracking from rt.cpan.org to Github issues.
+
 1.34 Wed 55 13 2017
     - We now use a a global Mutex object for each open file that gracefully
       handles locking between threads and across forks.  This fixes the

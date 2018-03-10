@@ -3,11 +3,11 @@ package DBIx::dbMan::Extension::CmdLongSQL;
 use strict;
 use base 'DBIx::dbMan::Extension';
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 1;
 
-sub IDENTIFICATION { return "000001-000055-000007"; }
+sub IDENTIFICATION { return "000001-000055-000008"; }
 
 sub preference { return 4000; }
 
@@ -50,7 +50,7 @@ sub handle_action {
 				$obj->{-interface}->prompt($obj->{prompt_num},'');
 				$obj->{-mempool}->set('long_buffer','');
 
-				my $history = new DBIx::dbMan::History -config => $obj->{-config};
+				my $history = new DBIx::dbMan::History -config => $obj->{-config}, -interface => $obj->{-interface};
 				my @buffer = $history->load();
 				pop @buffer while @buffer and $buffer[$#buffer] !~ /^\s*\\l/i;
 				pop @buffer if @buffer;

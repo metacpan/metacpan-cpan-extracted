@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Exception
 
+3.14  Fri Mar 09 17:15:00 2018
+      - Added exception for Invalid color hex code.
+
 3.13  Wed Jul 26 10:00:00 2017
       - Added exception for Malformed Map Data.
 

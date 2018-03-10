@@ -33,6 +33,7 @@ Packbuilder				T_GIT_REF
 Patch					T_GIT_REF
 PathSpec				T_GIT_REF
 PathSpec_MatchList		T_GIT_REF
+Rebase					T_GIT_REF
 Rebase_Operation		T_GIT_REF
 Reflog					T_GIT_REF
 Reflog_Entry			T_GIT_REF
@@ -47,6 +48,7 @@ Tree					T_GIT_REF
 Tree_Builder				T_GIT_REF
 Tree_Entry				T_GIT_REF
 Walker					T_GIT_REF
+Worktree				T_GIT_REF
 
 OUTPUT
 T_GIT_REF

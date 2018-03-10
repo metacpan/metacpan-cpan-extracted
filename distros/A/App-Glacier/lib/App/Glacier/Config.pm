@@ -17,6 +17,7 @@
 package App::Glacier::Config;
 
 use strict;
+use warnings;
 use Carp;
 use File::stat;
 use Storable qw(retrieve store);
@@ -210,13 +211,8 @@ sub new {
     my $v;
     my $err;
     
-    if (defined($v = delete $_{debug})) {
-	$self->{debug} = $v;
-    }
-
-    if (defined($v = delete $_{ci})) {
-	$self->{ci} = $v;
-    }
+    $self->{debug} = delete $_{debug} // 0;
+    $self->{ci} = delete $_{ci} // 0;
 
     if (defined($v = delete $_{parameters})) {
 	if (ref($v) eq 'HASH') {

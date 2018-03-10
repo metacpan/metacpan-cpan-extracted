@@ -19,10 +19,10 @@ if ($] < 5.008000) {
     plan skip_all => 'This test requires Perl 5.8.0 or later';
 }
 
-plan tests => 10;
+plan tests => 8;
 
-use_ok 'Log::Dispatch';
-use_ok 'Log::Dispatch::FileRotate';
+use Log::Dispatch;
+use Log::Dispatch::FileRotate;
 
 my $tempdir = Path::Tiny->tempdir;
 my $logfile = $tempdir->child('myerrs.log')->stringify;

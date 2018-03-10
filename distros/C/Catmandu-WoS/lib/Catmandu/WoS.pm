@@ -2,7 +2,7 @@ package Catmandu::WoS;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.02';
+our $VERSION = '0.0301';
 
 1;
 
@@ -19,6 +19,8 @@ Catmandu::WoS - Catmandu modules to work with the Web Of Science web services
 =over
 
 =item * L<Catmandu::Importer::WoS>
+
+=item * L<Catmandu::Importer::WoSCitedReferences>
 
 =back
 

@@ -47,7 +47,7 @@ my %base = (
     other_sort_order => 9000,
 
     include_fields => undef,
-    exclude_fields => {buffered => 1, nested => 1, subtest_id => 1, in_subtest => 1, is_subtest => 1},
+    exclude_fields => {buffered => 1, nested => 1, subtest_id => 1, in_subtest => 1, is_subtest => 1, hubs => 1},
 
     indent_sequence => '    ',
 
@@ -520,7 +520,7 @@ is("$dump\n", <<'EOT', "clean_fail_messages-off (event)") || diag $dump;
 event Diag => {message => "\nFailed test\nxxx\nyyy\nzzz"}
 EOT
 
-$dump = dump_event($events->[0], %base, field_order => {}, exclude_fields => {trace => 1});
+$dump = dump_event($events->[0], %base, field_order => {}, exclude_fields => {trace => 1, hubs => 1});
 is("$dump\n", <<"EOT", "field order (alphabetic fallback") || diag $dump;
 event Ok => sub {
     call effective_pass => 1;
@@ -529,7 +529,7 @@ event Ok => sub {
 }
 EOT
 
-$dump = dump_event($events->[0], %base, field_order => {name => 1, pass => 3, effective_pass => 2}, exclude_fields => {trace => 1});
+$dump = dump_event($events->[0], %base, field_order => {name => 1, pass => 3, effective_pass => 2}, exclude_fields => {trace => 1, hubs => 1});
 is("$dump\n", <<"EOT", "field order (specific weights)") || diag $dump;
 event Ok => sub {
     call name => 'pass';

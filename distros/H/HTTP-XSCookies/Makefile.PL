@@ -41,7 +41,23 @@ sub cflags {
     my $cflags = $self->SUPER::cflags(@_);
     my @cflags = split /\n/, $cflags;
 
-    $self->{CCFLAGS} .= ' -Wall';                # Flag all warnings
+    # turn on a bunch of warning flags
+    my @warning_flags_always = qw/
+        all
+        extra
+    /;
+    $self->{CCFLAGS} .= " -W$_" for @warning_flags_always;
+
+    # turn these flags on ONLY when compiling locally
+    my @warning_flags_gonzo = qw/
+        strict-prototypes
+        old-style-definition
+        missing-prototypes
+        missing-declarations
+        declaration-after-statement
+        parentheses
+    /;
+    # $self->{CCFLAGS} .= " -W$_" for @warning_flags_gonzo;
 
     # solaris refuses to compile unless we are using C99
     if ($^O eq 'solaris') {

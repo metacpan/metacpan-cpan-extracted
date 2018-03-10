@@ -5,10 +5,9 @@ WriteMakefile(
     'NAME'		=> 'Finance::Currency::Convert::ECBdaily',
     'VERSION_FROM'	=> 'lib/Finance/Currency/Convert/ECBdaily.pm', # finds $VERSION
     'PREREQ_PM'		=> {
-		    'strict'        => 0,
+		'strict'        => 0,
         'warnings'      => 0,
         'LWP::Simple'   => '6.0',
-		    'XML::LibXML'		=> '2.0',
 
     }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005

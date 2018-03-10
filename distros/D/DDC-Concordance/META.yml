@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,4 +30,5 @@ requires:
   perl: '5.01'
 resources:
   repository: svn://svn.code.sf.net/p/ddc-concordance/code/ddc-perl/
-version: '0.40'
+version: '0.41'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

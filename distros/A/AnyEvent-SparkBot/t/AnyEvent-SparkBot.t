@@ -18,6 +18,8 @@ my $self=$class->new(pingEvery=>1,logger=>$logger,token=>$token,on_message=>\&on
 isa_ok($self,$class);
 ok($self->can('start_connection'),'check for start_connection support');
 
+SKIP: {
+  skip '$ENV{RUN_HTTP_TESTS} not true', 3 unless $ENV{RUN_HTTP_TESTS};
 my $result=$self->getWsUrl;
 diag $string;
 $string='';
@@ -51,8 +53,10 @@ SKIP: {
   $self->connection->close;
 }
 
+}
 sub on_message {
   my ($self,$json,$message)=@_;
   
 }
+
 done_testing;

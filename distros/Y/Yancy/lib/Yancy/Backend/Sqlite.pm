@@ -1,24 +1,22 @@
 package Yancy::Backend::Sqlite;
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 # ABSTRACT: A backend for SQLite using Mojo::SQLite
 
 #pod =head1 SYNOPSIS
 #pod
-#pod     # yancy.conf
-#pod     {
-#pod         backend => 'sqlite:filename.db',
-#pod         collections => {
-#pod             table_name => { ... },
-#pod         },
-#pod     }
-#pod
-#pod     # Plugin
+#pod     ### URL string
 #pod     use Mojolicious::Lite;
 #pod     plugin Yancy => {
-#pod         backend => 'sqlite:filename.db',
-#pod         collections => {
-#pod             table_name => { ... },
-#pod         },
+#pod         backend => 'sqlite:data.db',
+#pod         read_schema => 1,
+#pod     };
+#pod
+#pod     ### Mojo::SQLite object
+#pod     use Mojolicious::Lite;
+#pod     use Mojo::SQLite;
+#pod     plugin Yancy => {
+#pod         backend => { Sqlite => Mojo::SQLite->new( 'sqlite:data.db' ) },
+#pod         read_schema => 1,
 #pod     };
 #pod
 #pod =head1 DESCRIPTION
@@ -126,8 +124,7 @@ sub create {
     my $inserted_id = $self->sqlite->db->insert( $coll, $params )->last_insert_id;
     # SQLite does not have a 'returning' syntax. Assume id field is correct
     # if passed, created otherwise:
-    return $self->get( $coll, $params->{$id_field} // $inserted_id )
-        || die "Could not fetch newly-created item (table missing primary key?)\n";
+    return $params->{$id_field} || $inserted_id;
 }
 
 sub get {
@@ -161,13 +158,13 @@ sub list {
 sub set {
     my ( $self, $coll, $id, $params ) = @_;
     my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
-    return $self->sqlite->db->update( $coll, $params, { $id_field => $id } );
+    return !!$self->sqlite->db->update( $coll, $params, { $id_field => $id } )->rows;
 }
 
 sub delete {
     my ( $self, $coll, $id ) = @_;
     my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
-    return $self->sqlite->db->delete( $coll, { $id_field => $id } );
+    return !!$self->sqlite->db->delete( $coll, { $id_field => $id } )->rows;
 }
 
 sub read_schema {
@@ -273,25 +270,23 @@ Yancy::Backend::Sqlite - A backend for SQLite using Mojo::SQLite
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
-    # yancy.conf
-    {
-        backend => 'sqlite:filename.db',
-        collections => {
-            table_name => { ... },
-        },
-    }
-
-    # Plugin
+    ### URL string
     use Mojolicious::Lite;
     plugin Yancy => {
-        backend => 'sqlite:filename.db',
-        collections => {
-            table_name => { ... },
-        },
+        backend => 'sqlite:data.db',
+        read_schema => 1,
+    };
+
+    ### Mojo::SQLite object
+    use Mojolicious::Lite;
+    use Mojo::SQLite;
+    plugin Yancy => {
+        backend => { Sqlite => Mojo::SQLite->new( 'sqlite:data.db' ) },
+        read_schema => 1,
     };
 
 =head1 DESCRIPTION

@@ -2,12 +2,13 @@ package DBIx::dbMan::Extension::Output;
 
 use strict;
 use base 'DBIx::dbMan::Extension';
+use utf8;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 1;
 
-sub IDENTIFICATION { return "000001-000016-000003"; }
+sub IDENTIFICATION { return "000001-000016-000004"; }
 
 sub preference { return -100; }
 

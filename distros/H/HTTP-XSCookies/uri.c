@@ -15,19 +15,15 @@
  */
 #define CAST_INDEX(x) (((unsigned char) (x)) & 0xff)
 
-Buffer* url_decode(Buffer* src, int length,
-                   Buffer* tgt)
+Buffer* url_decode(Buffer* src, Buffer* tgt)
 {
-    if (length < 0) {
-        length = src->size;
-    }
+    unsigned int s = src->rpos;
+    unsigned int t = tgt->wpos;
 
     /* check and maybe increase space in target */
-    buffer_ensure_unused(tgt, length);
+    buffer_ensure_unused(tgt, buffer_used(src));
 
-    int s = src->pos;
-    int t = tgt->pos;
-    while (s < (src->pos + length)) {
+    while (s < src->wpos) {
         if (src->data[s] == '%' &&
             isxdigit(src->data[s+1]) &&
             isxdigit(src->data[s+2])) {
@@ -42,25 +38,20 @@ Buffer* url_decode(Buffer* src, int length,
     }
 
     /* null-terminate target and return src as was left */
-    src->pos = s;
-    tgt->pos = t;
-    buffer_terminate(tgt);
+    src->rpos = s;
+    tgt->wpos = t;
     return src;
 }
 
-Buffer* url_encode(Buffer* src, int length,
-                   Buffer* tgt)
+Buffer* url_encode(Buffer* src, Buffer* tgt)
 {
-    if (length < 0) {
-        length = src->size;
-    }
+    unsigned int s = src->rpos;
+    unsigned int t = tgt->wpos;
 
     /* check and maybe increase space in target */
-    buffer_ensure_unused(tgt, 3 * length);
+    buffer_ensure_unused(tgt, 3 * buffer_used(src));
 
-    int s = src->pos;
-    int t = tgt->pos;
-    while (s < (src->pos + length)) {
+    while (s < src->wpos) {
         char* v = uri_encode_tbl[CAST_INDEX(src->data[s])];
 
         /* if current source character doesn't need to be encoded,
@@ -80,8 +71,7 @@ Buffer* url_encode(Buffer* src, int length,
     }
 
     /* null-terminate target and return src as was left */
-    src->pos = s;
-    tgt->pos = t;
-    buffer_terminate(tgt);
+    src->rpos = s;
+    tgt->wpos = t;
     return src;
 }

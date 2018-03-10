@@ -15,8 +15,8 @@
 #ifndef _MRTTYPES_H
 #define _MRTTYPES_H
 
-// 16k is large enough for BGP UPDATE message
-#define BUFFER_SIZE 16384
+// 16k isn't large enough for BGP UPDATE message
+#define BUFFER_SIZE 131072
 
 enum MRT_TYPES {
     MT_START            = 1,

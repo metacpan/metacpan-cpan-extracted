@@ -11,7 +11,7 @@ use base qw{ PPIx::Regexp::Structure };
 
 use Carp;
 
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 
 
 1;
@@ -25,7 +25,7 @@ PPIx::Regexp::Structure::Script_Run - Represent a script run group
 =head1 SYNOPSIS
 
  use PPIx::Regexp::Dumper;
- PPIx::Regexp::Dumper->new( 'qr{(+script_run:\d)}' )
+ PPIx::Regexp::Dumper->new( 'qr{(*script_run:\d)}' )
      ->print();
 
 =head1 INHERITANCE
@@ -38,7 +38,9 @@ C<PPIx::Regexp::Structure::Script_Run> has no descendants.
 =head1 DESCRIPTION
 
 This class represents a script run group. That is, the construction
-C<(+script_run:...)>. This is new with Perl 5.27.8.
+C<(+script_run:...)>, C<(*script_run:...)>, or C<(*sr:...)>. The first
+form was added in Perl 5.27.8 but retracted in favor of the second ant
+third forms (which are equivalent) in Perl 5.27.9.
 
 If this construction does not make it into Perl 5.28, this class will be
 retracted.

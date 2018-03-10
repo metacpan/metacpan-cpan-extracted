@@ -20,6 +20,7 @@ my $disc = Git::Raw::Repository -> discover(catfile($native_path, 'subdir'));
 
 is $repo -> path, "$path/.git/";
 is $disc -> path, "$path/.git/";
+is $repo -> commondir, "$path/.git/";
 
 is $repo -> workdir, "$path/";
 is $disc -> workdir, "$path/";
@@ -29,6 +30,8 @@ is $disc -> workdir($path), "$path/";
 
 is $repo -> is_empty, 1;
 is $disc -> is_empty, 1;
+
+ok (!$repo -> is_worktree);
 
 my $head = eval { $repo -> head };
 is $head, undef;
@@ -64,7 +67,7 @@ is $index -> version, 2;
 $index -> version(4);
 is $index -> version, 4;
 
-ok (eval { $index -> capabilities });
+ok (eval { $index -> capabilities; return 1 });
 
 my $caps_count = $index -> capabilities;
 is $caps_count, 3;
@@ -162,8 +165,8 @@ my $error = $@;
 ok ($error);
 isa_ok($error, 'Git::Raw::Error');
 is $error -> file, 't/01-repo.t';
-is $error -> line, 159;
-is "$error", "Invalid type for 'value', expected an integer at t/01-repo.t line 159";
+is $error -> line, 162;
+is "$error", "Invalid type for 'value', expected an integer at t/01-repo.t line 162";
 is $error -> code, Git::Raw::Error -> USAGE;
 like $error, qr/Invalid type/;
 is $error -> category, Git::Raw::Error::Category -> INTERNAL;

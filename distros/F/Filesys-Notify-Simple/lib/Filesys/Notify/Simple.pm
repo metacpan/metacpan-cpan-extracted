@@ -2,7 +2,7 @@ package Filesys::Notify::Simple;
 
 use strict;
 use 5.008_001;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Carp ();
 use Cwd;
@@ -36,7 +36,7 @@ sub init {
         $self->{watcher_cb} = \&wait_inotify2;
     } elsif ($^O eq 'darwin' && !NO_OPT && eval { require Mac::FSEvents; 1 }) {
         $self->{watcher_cb} = \&wait_fsevents;
-    } elsif ($^O eq 'freebsd' && !NO_OPT && eval { require Filesys::Notify::KQueue; 1 }) {
+    } elsif (($^O eq 'freebsd' || $^O eq 'openbsd') && !NO_OPT && eval { require Filesys::Notify::KQueue; 1 }) {
         $self->{watcher_cb} = \&wait_kqueue;
     } elsif ($^O eq 'MSWin32' && !NO_OPT && eval { require Win32::ChangeNotify; 1 }) {
         $self->{watcher_cb} = mk_wait_win32(0); # Not cygwin
@@ -55,7 +55,8 @@ sub wait_inotify2 {
 
     my $fs = _full_scan(@path);
     for my $path (keys %$fs) {
-        $inotify->watch($path, &IN_MODIFY|&IN_CREATE|&IN_DELETE|&IN_DELETE_SELF|&IN_MOVE_SELF|&IN_MOVE);
+        $inotify->watch($path, &IN_MODIFY|&IN_CREATE|&IN_DELETE|&IN_DELETE_SELF|&IN_MOVE_SELF|&IN_MOVE)
+            or Carp::croak("watch failed: $!");
     }
 
     return sub {
@@ -75,7 +76,7 @@ sub wait_fsevents {
 
     my %events;
     for my $path (@path) {
-        my $fsevents = Mac::FSEvents->new({ path => $path, latency => 1 });
+        my $fsevents = Mac::FSEvents->new({ path => $path, latency => 1, file_events => 1 });
         my $fh = $fsevents->watch;
         $sel->add($fh);
         $events{fileno $fh} = $fsevents;

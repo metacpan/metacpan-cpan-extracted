@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Plugin for fetching files using LWP
-our $VERSION = '1.37'; # VERSION
+our $VERSION = '1.39'; # VERSION
 
 
 has '+url' => '';
@@ -50,7 +50,7 @@ sub init
         type    => 'html',
         charset => $charset,
         base    => "$base",
-        content => $res->decoded_content,
+        content => $res->decoded_content || $res->content,
       };
     }
     elsif($type eq 'text/ftp-dir-listing')
@@ -58,7 +58,7 @@ sub init
       return {
         type => 'dir_listing',
         base => "$base",
-        content => $res->decoded_content,
+        content => $res->decoded_content || $res->content,
       };
     }
     else
@@ -89,7 +89,7 @@ Alien::Build::Plugin::Fetch::LWP - Plugin for fetching files using LWP
 
 =head1 VERSION
 
-version 1.37
+version 1.39
 
 =head1 SYNOPSIS
 

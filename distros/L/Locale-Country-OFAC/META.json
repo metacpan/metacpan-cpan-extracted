@@ -38,7 +38,6 @@
          "requires" : {
             "Carp" : "0",
             "Exporter" : "0",
-            "List::Util" : "0",
             "Readonly" : "1.04",
             "perl" : "5.006"
          }
@@ -51,23 +50,16 @@
             "Readonly" : "1.04",
             "Test::Exception" : "0",
             "Test::More" : "0",
-            "Test::Most" : "0",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/dculver1986/locale-country-ofac/issues"
-      },
-      "homepage" : "http://search.cpan.org/dist/Locale-Country-OFAC",
       "repository" : {
-         "type" : "git",
-         "url" : "git://github.com/dculver1986/locale-country-ofac.git",
-         "web" : "https://github.com/dculver1986/locale-country-ofac"
+         "web" : "https://github.com/dculver1986/Locale--Country--OFAC"
       }
    },
-   "version" : "1.2.0"
+   "version" : "1.3.0"
 }
 

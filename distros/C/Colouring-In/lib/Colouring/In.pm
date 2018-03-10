@@ -10,11 +10,11 @@ Colouring::In - color or colour.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 our %TOOL;
 
@@ -29,7 +29,7 @@ BEGIN {
 		num => sub { return $_[0] + 0; },
 		numIs => sub { return defined $_[0] && $_[0] =~ /^[0-9]+/; },
 		percent => sub { return ( $_[0] * 100 ) . '%'; },
-		depercent => sub { my $p = shift; $p =~ s/%$//; $p / 100; },
+		depercent => sub { my $p = shift; $p =~ s/%$//; return $p / 100; },
 		joinRgb => sub {
 			return join ',', map { $TOOL{clamp}( $TOOL{round}($_), 255 ); } @_;
 		},
@@ -78,9 +78,9 @@ BEGIN {
 			my $l = length $hex;
 			return $l != 6
 				? $l == 3
-					? map { hex( $_ . $_ ) } split //, $hex
+					? map { hex( $_ . $_ ) } $hex =~ m/./g
 					: die 'a misserable death',
-				: map { hex($_) } $hex =~ /.{2}/g;
+				: map { hex($_) } $hex =~ m/../g;
 		},
 		hsl2rgb => sub {
 			my ( $h, $s, $l, $a, $m1, $m2 ) = $TOOL{numbers}(shift);
@@ -118,23 +118,14 @@ BEGIN {
 }
 
 sub import {
-	my ($pkg, @exports) = @_;
-	my $caller = caller;
+       my ($pkg, @exports) = @_;
+       my $caller = caller;
 
-	if (scalar @exports) {
-		no strict 'refs';
-		*{"${caller}::${_}"} = \&{"${_[0]}::${_}"} foreach @exports;
-		return;
-	}
-
-	 eval '{
-	 	package ' . $caller . ';
-		use AutoLoader;
-		sub AUTOLOAD {
-			my ($package, $method) = our $AUTOLOAD =~ /^(.+)::(.+)$/;
-			return [ $method, @_ ];
-		}
-	}';	 #evil
+       if (scalar @exports) {
+               no strict 'refs';
+               *{"${caller}::${_}"} = \&{"${_[0]}::${_}"} foreach @exports;
+               return;
+       }
 }
 
 sub rgb {
@@ -317,11 +308,9 @@ sub fadeout {
 	my ($colour, $amt, $meth, $hsl) = @_;
 
 	($hsl, $colour) = $TOOL{hsl}($colour);
-
-	$hsl->{a} -= ($meth && $meth eq 'relative')
+	$hsl->{a} -= (($meth && $meth eq 'relative')
 		? $hsl->{a} * $TOOL{depercent}($amt)
- 		: $TOOL{depercent}($amt);
-
+ 		: $TOOL{depercent}($amt));
 	return $colour->hsla( $TOOL{hash2array}( $hsl, 'h', 's', 'l', 'a' ) );
 }
 

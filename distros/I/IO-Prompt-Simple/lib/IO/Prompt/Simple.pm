@@ -2,14 +2,14 @@ package IO::Prompt::Simple;
 
 use strict;
 use warnings;
-use 5.006001;
+use 5.008001;
 use base 'Exporter';
 
 BEGIN {
     $ENV{ANSI_COLORS_DISABLED} = 1 if $^O eq 'MSWin32';
 }
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 our @EXPORT = 'prompt';
 
@@ -481,11 +481,11 @@ This prevents automated processes from blocking on user input.
 
 =head1 AUTHOR
 
-xaicron E<lt>xaicron {at} cpan.orgE<gt>
+xaicron E<lt>xaicron {at} gmail.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2011 - 2012 xaicron.
+Copyright (C) 2011 Yuji Shimada (@xaicron).
 
 =head1 LICENSE
 

@@ -1,3 +1,19 @@
+20180308.1.0  2018-03-08 (PERLANCAR)
+
+          - No functional changes.
+
+          - Fix Changes.
+
+
+20180308  2018-03-08 (PERLANCAR)
+
+          - [Incompatible change] Rename 'symbol' to 'code', this applies to
+            method names (by_symbol -> by_code) as well as key returned (symbol
+            suggests special character like '$', etc)
+
+          - Update to CMC 2018-03-08 (no new/removed/changed coins).
+
+
 20180301  2018-03-01 (PERLANCAR)
 
           - Update to CMC 2018-03-01.

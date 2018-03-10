@@ -35,68 +35,25 @@ use warnings;
 
 use base qw{ PPIx::Regexp::Token::GroupType };
 
-our $VERSION = '0.055';
-
-{
-
-    my %explanation = (
-	'?'	=> q<Match one of the following '|'-delimited alternatives>,
-    );
-
-    sub __explanation {
-	return \%explanation;
-    }
-}
-
-sub perl_version_introduced {
-#   my ( $self ) = @_;
-    return '5.005';
-}
-
-# Return true if the token can be quantified, and false otherwise
-# sub can_be_quantified { return };
-
-=begin comment
-
-sub __PPIX_TOKENIZER__regexp {
-    my ( $class, $tokenizer, $character ) = @_;
-
-    # The optional escape is because any non-open-bracket character may
-    # appear as the regular expression delimiter.
-    if ( my $accept = $tokenizer->find_regexp(
-	    qr{ \A \\? \? \( }smx ) ) {
-
-	# Leave the left paren, since it belongs to the condition.
-	--$accept;
-
-	$tokenizer->expect( qw{
-	    PPIx::Regexp::Token::Condition
-	    } );
-
-	return $accept;
-
-    }
-
-    return;
-
-}
-
-=end comment
-
-=cut
-
-sub __defining_string {
-    return (
-	{ suffix => '(' },
-	'?',
-    );
-}
+our $VERSION = '0.056';
 
 sub __match_setup {
     my ( undef, $tokenizer ) = @_;	# Invocant unused
     $tokenizer->expect( qw{ PPIx::Regexp::Token::Condition } );
     return;
 }
+
+__PACKAGE__->__setup_class(
+    {
+	'?'	=> {
+	    expl	=> q<Match one of the following '|'-delimited alternatives>,
+	    intro	=> '5.005',
+	},
+    },
+    {
+	suffix	=> '(',
+    },
+);
 
 
 1;

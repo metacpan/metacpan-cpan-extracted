@@ -14,7 +14,7 @@ use constant DEBUG => $ENV{MOJO_SELENIUM_DEBUG} || 0;
 $ENV{TEST_SELENIUM} //= '0';
 $ENV{MOJO_SELENIUM_BASE_URL} ||= $ENV{TEST_SELENIUM} =~ /^http/ ? $ENV{TEST_SELENIUM} : '';
 
-our $VERSION = '0.11';
+our $VERSION = '0.14';
 
 my $SCRIPT_NAME = File::Basename::basename($0);
 my $SCREENSHOT  = 1;
@@ -41,7 +41,8 @@ has _live_base => sub {
   my $self = shift;
   return Mojo::URL->new($ENV{MOJO_SELENIUM_BASE_URL}) if $ENV{MOJO_SELENIUM_BASE_URL};
   $self->{live_port} = Mojo::IOLoop::Server->generate_port;
-  return Mojo::URL->new("http://127.0.0.1:$self->{live_port}");
+  my $test_hostname = $ENV{MOJO_SELENIUM_TEST_HOST} || '127.0.0.1';
+  return Mojo::URL->new("http://${test_hostname}:$self->{live_port}");
 };
 
 has _live_server => sub {
@@ -218,7 +219,8 @@ sub new {
   $self->ua(Test::Mojo::Role::Selenium::UserAgent->new->ioloop(Mojo::IOLoop->singleton));
   return $self if $ENV{MOJO_SELENIUM_BASE_URL};
   return $self unless my $app = shift;
-  return $self->app(ref $app ? $app : Mojo::Server->new->build_app($app));
+  my @args = @_ ? {config => {config_override => 1, %{shift()}}} : ();
+  return $self->app(ref $app ? $app : Mojo::Server->new->build_app($app, @args));
 }
 
 sub refresh { $_[0]->_proxy('refresh'); $_[0] }
@@ -447,12 +449,11 @@ Test::Mojo::Role::Selenium - Test::Mojo in a real browser
 =head2 External app
 
   use Mojo::Base -strict;
-  use Test::Mojo::WithRoles "Selenium";
   use Test::More;
 
   $ENV{MOJO_SELENIUM_DRIVER} ||= 'Selenium::Chrome';
 
-  my $t = Test::Mojo::WithRoles->new->setup_or_skip_all;
+  my $t = Test::Mojo->with_roles("+Selenium")->new->setup_or_skip_all;
 
   $t->navigate_ok('/perldoc')
     ->live_text_is('a[href="#GUIDES"]' => 'GUIDES');
@@ -469,10 +470,9 @@ Test::Mojo::Role::Selenium - Test::Mojo in a real browser
 =head2 Internal app
 
   use Mojo::Base -strict;
-  use Test::Mojo::WithRoles "Selenium";
   use Test::More;
 
-  my $t = Test::Mojo::WithRoles->new("MyApp")->setup_or_skip_all;
+  my $t = Test::Mojo->with_roles("+Selenium")->new("MyApp")->setup_or_skip_all;
 
   # All the standard Test::Mojo methods are available
   ok $t->isa("Test::Mojo");
@@ -557,6 +557,13 @@ Setting this variable will make this test send the requests to a remote server,
 instead of starting a local server. Note that this will disable L<Test::Mojo>
 methods such as L</status_is>, since L<Test::Mojo/tx> will not be set. See
 also L</CAVEAT>.
+
+=head2 MOJO_SELENIUM_TEST_HOST
+
+In some cases you may want to override the host of your test server, when
+running Selenium on a separate server or in a pod-style networking environment
+this still retains the automatically generated port. This will not disable the
+L<Test::Mojo> methods.
 
 =head2 MOJO_SELENIUM_DRIVER
 

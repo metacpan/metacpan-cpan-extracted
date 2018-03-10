@@ -1,7 +1,8 @@
 package Plack::Auth::SSO::ORCID;
 
-use Catmandu::Sane;
-use Catmandu::Util qw(:check :is);
+use strict;
+use utf8;
+use Data::Util qw(:check);
 use Moo;
 use Plack::Request;
 use Plack::Session;
@@ -10,9 +11,8 @@ use LWP::UserAgent;
 use WWW::ORCID;
 use JSON;
 use Plack::Auth::SSO::ResponseParser::ORCID;
-use namespace::clean;
 
-our $VERSION = "0.011";
+our $VERSION = "0.0131";
 
 with "Plack::Auth::SSO";
 
@@ -22,12 +22,12 @@ has sandbox => (
 );
 has client_id => (
     is => "ro",
-    isa => sub { check_string($_[0]); },
+    isa => sub { is_string($_[0]) or die("client_id should be string"); },
     required => 1
 );
 has client_secret => (
     is => "ro",
-    isa => sub { check_string($_[0]); },
+    isa => sub { is_string($_[0]) or die("client_secret should be string"); },
     required => 1
 );
 has orcid => (
@@ -143,7 +143,15 @@ sub to_app {
         #request phase
         else {
 
-            my $redirect_uri = URI->new( $self->uri_for($request->script_name) );
+            my $request_uri = $request->request_uri();
+            my $idx = index( $request_uri, "?" );
+            if ( $idx >= 0 ) {
+
+                $request_uri = substr( $request_uri, 0, $idx );
+
+            }
+
+            my $redirect_uri = URI->new( $self->uri_for($request_uri) );
             $redirect_uri->query_form({ _callback => "true" });
 
             my $auth_uri = $self->orcid()->authorize_url(

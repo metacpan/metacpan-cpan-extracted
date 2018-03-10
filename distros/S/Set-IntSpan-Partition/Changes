@@ -1,5 +1,8 @@
 Revision history for Perl extension Set::IntSpan::Partition.
 
+0.06 March 2018
+  - faster version of intspan_partition_map 
+
 0.04 February 2018
   - fix https://rt.cpan.org/Public/Bug/Display.html?id=123879
 

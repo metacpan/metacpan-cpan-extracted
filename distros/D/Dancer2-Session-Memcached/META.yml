@@ -20,7 +20,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,9 +29,10 @@ name: Dancer2-Session-Memcached
 provides:
   Dancer2::Session::Memcached:
     file: lib/Dancer2/Session/Memcached.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Cache::Memcached: '0'
+  Carp: '0'
   Dancer2: '0.15000'
   Dancer2::Core::Role::SessionFactory: '0'
   Moo: '0'
@@ -43,8 +44,11 @@ resources:
   bugtracker: https://github.com/PerlDancer/dancer2-session-memcached/issues
   homepage: https://github.com/PerlDancer/dancer2-session-memcached
   repository: https://github.com/PerlDancer/dancer2-session-memcached.git
-version: '0.005'
+version: '0.006'
 x_authority: cpan:YANICK
 x_contributors:
   - 'Peter Mottram <peter@sysnix.com>'
+  - 'Pierre Vigier <pierre.vigier@transfer-to.com>'
+  - 'Russell Jenkins <veryrusty@gmail.com>'
   - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+x_serialization_backend: 'YAML::Tiny version 1.67'

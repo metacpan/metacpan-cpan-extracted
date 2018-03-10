@@ -1,5 +1,5 @@
 package Net::Hadoop::Oozie::Role::Common;
-$Net::Hadoop::Oozie::Role::Common::VERSION = '0.112';
+$Net::Hadoop::Oozie::Role::Common::VERSION = '0.113';
 use 5.010;
 use strict;
 use warnings;
@@ -42,44 +42,30 @@ has 'oozie_uri' => (
 
 __END__
 
+
 =pod
 
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
-Net::Hadoop::Oozie::Role::Common
+Net::Hadoop::Oozie::Role::Common - Common methods for Oozie
 
 =head1 VERSION
 
-version 0.112
+version 0.113
+
+=head1 DESCRIPTION
+
+Part of the Perl Oozie interface.
 
 =head1 SYNOPSIS
 
     with 'Net::Hadoop::Oozie::Role::Common';
     # TODO
 
-=head1 DESCRIPTION
-
-Part of the Perl Oozie interface.
-
-=head1 NAME
-
-Net::Hadoop::Oozie::Role::Common - Common methods for Oozie
-
 =head1 SEE ALSO
 
 L<Net::Hadoop::Oozie>.
-
-=head1 AUTHOR
-
-David Morel <david.morel@amakuru.net>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015 by David Morel & Booking.com.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

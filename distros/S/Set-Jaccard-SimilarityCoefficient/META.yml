@@ -1,19 +1,22 @@
 ---
 abstract: 'Calculate the Jaccard Similarity Coefficient of 2 sets'
 author:
-  - 'Mark Leighton Fisher <fishe116@purdue.edu>'
+  - 'Mark Leighton Fisher <markleightonfisher@gmail.com>'
 build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Set-Jaccard-SimilarityCoefficient
 requires:
-  perl: 5.008008
-version: 0.5.1
-x_contributors:
-  - 'Mark Leighton Fisher <markleightonfisher@gmail.com>'
+  Exception::Class: '1.42'
+  ReadonlyX: '1.00'
+  Set::Scalar: '1.29'
+  Test::Most: '0.34'
+  perl: '5.012000'
+version: 1.6.1
+x_serialization_backend: 'YAML::Tiny version 1.69'

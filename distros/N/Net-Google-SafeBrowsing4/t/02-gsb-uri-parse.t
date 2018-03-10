@@ -94,6 +94,8 @@ my %uris = (
 	# Domain:port without scheme
 	'google.com:8999' => 'http://google.com/',
 	'google.com:8999/path/to/file.html?query=1' => 'http://google.com/path/to/file.html?query=1',
+	# Domain + query without slash
+	'http://www.domain.com?source=3Demail' => 'http://www.domain.com/?source=3Demail',
 );
 
 foreach my $uri (sort { ($a || '') cmp ($b || '') } @invalid_uris) {

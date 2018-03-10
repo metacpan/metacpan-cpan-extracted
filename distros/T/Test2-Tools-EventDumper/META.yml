@@ -19,5 +19,5 @@ requires:
 resources:
   bugtracker: http://github.com/Test-More/Test2-Tools-EventDumper/issues
   repository: http://github.com/Test-More/Test2-Tools-EventDumper/
-version: '0.000010'
+version: '0.000011'
 x_serialization_backend: 'YAML::Tiny version 1.70'

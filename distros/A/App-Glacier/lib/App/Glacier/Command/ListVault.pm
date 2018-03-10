@@ -2,7 +2,7 @@ package App::Glacier::Command::ListVault;
 
 use strict;
 use warnings;
-use App::Glacier::Command;
+use App::Glacier::Core;
 use parent qw(App::Glacier::Command);
 use App::Glacier::DateTime;
 use App::Glacier::Timestamp;
@@ -16,7 +16,8 @@ glacier ls - list vaults or archives
 =head1 SYNOPSIS
 
 B<glacier ls>
-[B<-SUdlhtr>]
+[B<-SUcdlhtr>]
+[B<--cached>]    
 [B<--human-readable>]
 [B<--sort=>B<none>|B<name>|B<time>|B<size>]
 [B<--reverse>]
@@ -53,6 +54,10 @@ Sort by file size, largest first.
 =item B<--sort=none>
 
 Don't sort names.    
+
+=item B<-c>, B<--cached>
+
+Display cached inventory content.    
     
 =item B<-d>, B<--directory>
 
@@ -136,8 +141,8 @@ B<strftime>(3).
 
 =cut    
 
-sub getopt {
-    my ($self, %opts) = @_;
+sub new {
+    my ($class, $argref, %opts) = @_;
     my %sort_vaults = (
 	none => undef,
 	name => sub {
@@ -168,38 +173,40 @@ sub getopt {
 	    $a->{Size} <=> $b->{Size}
 	}
     );
-    $self->{_options}{sort} = 'name';
-    my $rc = $self->SUPER::getopt(
-	'directory|d' => \$self->{_options}{d},
-	'l' => \$self->{_options}{l},
-	'sort=s' => \$self->{_options}{sort},
-	't' => sub { $self->{_options}{sort} = 'time' },
-	'S' => sub { $self->{_options}{sort} = 'size' },
-	'U' => sub { $self->{_options}{sort} = 'none' },
-	'human-readable|h' => \$self->{_options}{h},
-	'reverse|r' => \$self->{_options}{r},
-	'time-style=s' => sub { $self->set_time_style_option($_[1]) },
-	%opts);
-    return $rc unless $rc;
+    my $self = $class->SUPER::new(
+	$argref,
+	optmap => {
+	    'cached|c' => 'cached',
+	    'directory|d' => 'd',
+	    'l' => 'l',
+	    'sort=s' => 'sort',
+	    't' => sub { $_[0]->{_options}{sort} = 'time' },
+	    'S' => sub { $_[0]->{_options}{sort} = 'size' },
+	    'U' => sub { $_[0]->{_options}{sort} = 'none' },
+	    'human-readable|h' => 'h',
+	    'reverse|r' => 'r',
+	    'time-style=s' => sub { $_[0]->set_time_style_option($_[2]) }
+	}, %opts);
 
-    $self->{_options}{d} = 1 if (@ARGV == 0);
-
-    if (defined($self->{_options}{sort})) {
-	my $sortfun = $self->{_options}{d}
+    $self->{_options}{d} = 1 if ($self->command_line == 0);
+    $self->{_options}{sort} //= 'name';
+    
+    my $sortfun = $self->{_options}{d}
 	                ? \%sort_vaults : \%sort_archives;
-	$self->abend(EX_USAGE, "unknown sort field")
-	    unless exists($sortfun->{$self->{_options}{sort}});
-	$self->{_options}{sort} = $sortfun->{$self->{_options}{sort}};
-    }
+    $self->usage_error("unknown sort field")
+	unless exists($sortfun->{$self->{_options}{sort}});
+    $self->{_options}{sort} = $sortfun->{$self->{_options}{sort}};
+    
+    return $self;
 }
     
 sub run {
     my $self = shift;
     
     if ($self->{_options}{d}) {
-	$self->list_vaults($self->get_vault_list(@_));
+	$self->list_vaults($self->get_vault_list($self->command_line));
     } else {
-	$self->list_archives($self->get_vault_inventory(@_));
+	$self->list_archives($self->get_vault_inventory($self->command_line));
     }
 }
 
@@ -297,10 +304,12 @@ sub get_vault_inventory {
     $self->abend(EX_FAILURE, "no such vault: $vault_name")
 	unless defined $dir;
 
-    if ($dir->status == DIR_PENDING) {
-	require App::Glacier::Command::Sync;	
-	my $sync = new App::Glacier::Command::Sync;
-	$sync->sync($vault_name) or exit(EX_TEMPFAIL);
+    unless ($self->{_options}{cached}) {
+    	if ($dir->status == DIR_PENDING) {
+	    require App::Glacier::Command::Sync;	
+	    my $sync = clone App::Glacier::Command::Sync($self);
+	    $sync->sync($vault_name) or exit(EX_TEMPFAIL);
+    	}
     }
     
     my @glob;

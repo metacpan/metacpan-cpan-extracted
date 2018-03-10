@@ -1,5 +1,47 @@
 Revision history for Git-Raw
 
+0.78      2018-03-09 15:26:40+02:00 Africa/Johannesburg
+
+ - Ensure tests are not run in parallel
+
+0.77      2018-03-09 06:54:12+02:00 Africa/Johannesburg
+
+ - Fixed rebase tests. Use a well-known user and email (thanks, @eserte)
+
+0.76      2018-03-08 17:57:21+02:00 Africa/Johannesburg
+
+ - Update libgit2 to d11c4a1a4
+ - Added Repository methods:
+    + commondir()
+    + is_worktree()
+ - Index -> add_frombuffer() now accepts a mode (thanks, @ColMelvin)
+ - Added Worktree methods:
+    + add()
+    + lookup()
+    + list()
+    + is_locked()
+    + is_prunable()
+    + lock()
+    + unlock()
+    + validate()
+    + prune()
+    + repository()
+ - Added Diff methods:
+    + patchid()
+ - Added Repository methods:
+    + head_for_worktree()
+ - Added Rebase methods:
+    + new()
+    + abort()
+    + commit()
+    + current_operation()
+    + finish()
+    + inmemory_index()
+    + next()
+    + open()
+    + operation_count()
+    + operations()
+
 0.75      2018-01-25 20:49:37+02:00 Africa/Johannesburg
 
  - Fix notes testcases for the case where cores.notesRef is set,

@@ -26,13 +26,15 @@ no_index:
 provides:
   Acme::YAPC::Okinawa::Bus:
     file: lib/Acme/YAPC/Okinawa/Bus.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/AnaTofuZ/xs-Acme-YAPC-Okinawa-Bus/issues
   homepage: https://github.com/AnaTofuZ/xs-Acme-YAPC-Okinawa-Bus
   repository: git://github.com/AnaTofuZ/xs-Acme-YAPC-Okinawa-Bus.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:ANATOFUZ
+x_contributors:
+  - 'karupanerura <karupa@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -19,6 +19,7 @@ t/base.t
 t/data/tests.txt
 t/data/timezones.txt
 t/ddmmyyyy.t
+t/invalid.t
 t/lang-de.t
 t/lang-es.t
 t/lib/helper.pm

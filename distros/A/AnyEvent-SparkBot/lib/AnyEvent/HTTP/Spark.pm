@@ -9,12 +9,13 @@ use HTTP::Request::Common qw(POST);
 use Ref::Util qw(is_plain_arrayref is_plain_hashref);
 use URI::Escape qw(uri_escape_utf8);
 use namespace::clean;
+use Scalar::Util qw(looks_like_number);
+use AnyEvent;
 
 BEGIN { 
   no namespace::clean;
   with 'HTTP::MultiGet::Role','Log::LogMethods','AnyEvent::SparkBot::SharedRole';
 }
- 
 
 has api_url=>(
   isa=>Str,
@@ -23,19 +24,36 @@ has api_url=>(
   default=>'https://api.ciscospark.com/v1/',
 );
 
+has retryCount=>(
+  isa=>Int,
+  is=>'ro',
+  default=>1,
+);
+
+has retryAfter=>(
+  isa=>Int,
+  is=>'ro',
+  default=>10,
+);
+
+has retries=>(
+  isa=>HashRef,
+  is=>'ro',
+  default=>sub { return {} },
+);
+
 =head1 NAME
 
-AnyEvent::HTTP::Spark - HTTP Rest Client for Cisco Spark
+AnyEvent::HTTP::Spark - Syncrnous/Asyncrnous HTTP Rest Client for Cisco Spark
 
 =head1 SYNOPSIS
 
   use AnyEvent::HTTP::Spark;
-
   my $obj=new AnyEvent::HTTP::Spark(token=>$ENV{SPARK_TOKEN});
 
 =head1 DESCRIPTION
 
-THe HTTP Rest client used to interact with the Cisco Spark Web Service.
+Dual Nature Syncrnous/Asyncrnous AnyEvent friendly Spark v1 HTTP Client library.
 
 =head1 Moo Roles Used
 
@@ -58,6 +76,11 @@ Optional OO Arguments
   agent: AnyEvent::HTTP::MultiGet object
   api_url: https://api.ciscospark.com/v1/
     # sets the web service the requests point to
+  retryCount: 1, how many retries to attempt when getting a 429 error
+
+Options set at runtime
+
+  retries: anymous hash, used to trak AnyEvent->timer objects
 
 =cut
 
@@ -73,80 +96,59 @@ around BUILDARGS => sub {
   return $class->$org(@args);
 };
 
-=head1 OO Methods
+=head1 OO Web Methods and special Handlers
+
+Each web method has a blocking and a non blocking context.
+
+Any Method with a prefix of que_ can be called in either a blocking or a non blocking context.  Most people will use the blocking interface of the client.
+
+Non Blocking context for use with AnyEvent Loops
+
+  my $cb=sub {
+    my ($self,$id,$result,$request,$response)=@_;
+    if($result) {
+      print Dumper($result->get_data);
+    } else {
+      ...
+    }
+  };
+  my $id=$self->que_listPeople($cb,$args);
+  $self->agent->run_next;
+
+Blocking Context
+
+  my $result=$self->listPeople($args);
+  if($result) {
+    print Dumper($result->get_data);
+  } else {
+    die $result;
+  }
+
+
+=head1 People
+
+=head2 Get Me
 
 =over 4
 
-=item * my $id=$self->que_listPeople($cb,$args);
+=item * Blocking my $result=$self->getMe() 
 
-Ques a request to list people.
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
 
-$args is assumed to be a hash ref
+=item * Non-Blocking my $id=$self->que_getMe($cb) 
 
-Default arguments
-  maxResults: 100, sets the number of results
+Example Callback
 
-Search arguments ( use one set )
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
 
-Email Search
-  email: Someoen@somewhere.com
-
-Display Name Search
-
-  displayName: firstname lastname
-
-In theory you can paginate with this api call, although there is no documentation from cisco to validate this.  
- 
-=cut
-
-sub que_listPeople {
-  my ($self,$cb,$args)=@_;
-  my $url="people";
-
-  my $search={
-    maxResults=>100,
-    %{$args},
-  };
-  return $self->que_get($cb,$url,$search);
-}
-
-=item * my $id=$self->que_createPerson($cb,$data);
-
-Que's the creation of a person
-
-$data is expected to be an anonymous hash ref
-
-  emails:  string[]	
-  displayName:  string	
-  firstName:  string	
-  lastName:  string	
-  avatar:  string	
-  orgId:  string	
-  roles:  string[]	
-  licenses:  string[]
-
-=cut
-
-sub que_createPerson {
-  my ($self,$cb,$data)=@_;
-  return $self->que_post_json($cb,"people",$data);
-}
-
-=item * my $id=$self->que_getPerson($cb,$personId);
-
-Que's up a personId lookup.
-
-=cut
-
-sub que_getPerson {
-  my ($self,$cb,$personid)=@_;
-
-  return $self->que_get($cb,"people/$personid");
-}
-
-=item my $id=$self->que_getMe() 
-
-Que's a request to identify this current user.
+=item * Get Me Vendor Documentation: L<https://developer.ciscospark.com/endpoint-people-me-get.html>
 
 =cut
 
@@ -155,49 +157,1199 @@ sub que_getMe {
   return $self->que_get($cb,"people/me");
 }
 
-=item * my $id=$self->que_getMessage($cb,$messageId)
+=back
 
-Que's a request for a given messageId
+=head2 List People
 
-=cut
+=over 4
 
-sub que_getMessage {
-  my($self,$cb,$id)=@_;
-  return $self->que_get($cb,"messages/$id");
-}
+=item * Blocking my $result=$self->listPeople($hashRef)
 
-=item * my $id=$self->que_createMessage($cb,$data)
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
 
-Creates a message
+=item * Non-Blocking my $id=$self->que_listPeople($cb,$hashRef)
 
-$data is assumed to be an anonymous hash ref
+Example Callback
 
-keys/Values:
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
 
- roomId:	string	
- toPersonId:    string	
- toPersonEmail: string	
- text:          string	
- markdown:      string	
- files:         string[] 
-
-=cut
-
-sub que_createMessage {
-  my ($self,$cb,$data)=@_;
-
-  return $self->que_post_json($cb,"messages",$data);
-}
+=item * List People Vendor Documentation: L<https://developer.ciscospark.com/endpoint-people-get.html>
 
 =back
 
-=head2 Low Level Request functions
+=head2 Get Person
+
+=over 4
+
+=item * Blocking my $result=$self->getPerson($personId)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_getPerson($cb,$personId)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$personId)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Get Person Vendor Documentation: L<https://developer.ciscospark.com/endpoint-people-personId-get.html>
+
+=back
+
+=head2 Create Person
+
+=over 4
+
+=item * Blocking my $result=$self->createPerson($hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_createPerson($cb,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Create Person Vendor Documentation: L<https://developer.ciscospark.com/endpoint-people-post.html>
+
+=back
+
+=head2 Delete Person
+
+=over 4
+
+=item * Blocking my $result=$self->deletePerson($personId)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_deletePerson($cb,$personId)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$personId)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Delete Person Vendor Documentation: L<https://developer.ciscospark.com/endpoint-people-personId-delete.html>
+
+=back
+
+=head2 Update Person
+
+=over 4
+
+=item * Blocking my $result=$self->updatePerson($personId,$hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_updatePerson($cb,$personId,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$personId,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Update Person Vendor Documentation: L<https://developer.ciscospark.com/endpoint-people-personId-put.html>
+
+=back
+
+=head1 Rooms
+
+=head2 List Rooms
+
+=over 4
+
+=item * Blocking my $result=$self->listRooms($hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_listRooms($cb,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * List Rooms Vendor Documentation: L<https://developer.ciscospark.com/endpoint-rooms-get.html>
+
+=back
+
+=head2 Get Room
+
+=over 4
+
+=item * Blocking my $result=$self->getRoom($roomId)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_getRoom($cb,$roomId)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$roomId)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Get Room Vendor Documentation: L<https://developer.ciscospark.com/endpoint-rooms-roomId-get.html>
+
+=back
+
+=head2 Create Room
+
+=over 4
+
+=item * Blocking my $result=$self->createRoom($hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_createRoom($cb,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Create Room Vendor Documentation: L<https://developer.ciscospark.com/endpoint-rooms-post.html>
+
+=back
+
+=head2 Delete Room
+
+=over 4
+
+=item * Blocking my $result=$self->deleteRoom($roomId)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_deleteRoom($cb,$roomId)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$roomId)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Delete Room Vendor Documentation: L<https://developer.ciscospark.com/endpoint-rooms-roomId-delete.html>
+
+=back
+
+=head2 Update Room
+
+=over 4
+
+=item * Blocking my $result=$self->updateRoom($roomId,$hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_updateRoom($cb,$roomId,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$roomId,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Update Room Vendor Documentation: L<https://developer.ciscospark.com/endpoint-rooms-roomId-put.html>
+
+=back
+
+=head1 Memberships
+
+=head2 List Memberships
+
+=over 4
+
+=item * Blocking my $result=$self->listMemberships($hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_listMemberships($cb,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * List Memberships Vendor Documentation: L<https://developer.ciscospark.com/endpoint-memberships-get.html>
+
+=back
+
+=head2 Get Membership
+
+=over 4
+
+=item * Blocking my $result=$self->getMembership($membershipId)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_getMembership($cb,$membershipId)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$membershipId)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Get Membership Vendor Documentation: L<https://developer.ciscospark.com/endpoint-memberships-membershipId-get.html>
+
+=back
+
+=head2 Create Membership
+
+=over 4
+
+=item * Blocking my $result=$self->createMembership($hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_createMembership($cb,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Create Membership Vendor Documentation: L<https://developer.ciscospark.com/endpoint-memberships-post.html>
+
+=back
+
+=head2 Delete Membership
+
+=over 4
+
+=item * Blocking my $result=$self->deleteMembership($membershipId)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_deleteMembership($cb,$membershipId)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$membershipId)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Delete Membership Vendor Documentation: L<https://developer.ciscospark.com/endpoint-memberships-membershipId-delete.html>
+
+=back
+
+=head2 Update Membership
+
+=over 4
+
+=item * Blocking my $result=$self->updateMembership($membershipId,$hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_updateMembership($cb,$membershipId,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$membershipId,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Update Membership Vendor Documentation: L<https://developer.ciscospark.com/endpoint-memberships-membershipId-put.html>
+
+=back
+
+=head1 Messages
+
+=head2 List Messages
+
+Special Notes on bots for this method, bots can only list messages refering to the bot itself. This means there are 2 manditory arguments when using a bot.  If mentionedPeople is not set to the litteral string 'me' a bot will encounter a 403 error.
+
+$hashRef Required options
+
+  roomId: the id for the room
+  mentionedPeople: me
+
+=over 4
+
+=item * Blocking my $result=$self->listMessages($hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_listMessages($cb,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * List Messages Vendor Documentation: L<https://developer.ciscospark.com/endpoint-messages-get.html>
+
+=back
+
+=head2 Get Message
+
+=over 4
+
+=item * Blocking my $result=$self->getMessage($messageId)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_getMessage($cb,$messageId)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$messageId)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Get Message Vendor Documentation: L<https://developer.ciscospark.com/endpoint-messages-messageId-get.html>
+
+=back
+
+=head2 Create Message
+
+=over 4
+
+=item * Blocking my $result=$self->createMessage($hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_createMessage($cb,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Create Message Vendor Documentation: L<https://developer.ciscospark.com/endpoint-messages-post.html>
+
+=back
+
+=head2 Delete Message
+
+=over 4
+
+=item * Blocking my $result=$self->deleteMessage($messageId)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_deleteMessage($cb,$messageId)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$messageId)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Delete Message Vendor Documentation: L<https://developer.ciscospark.com/endpoint-messages-messageId-delete.html>
+
+=back
+
+=head1 Teams
+
+=head2 List Teams
+
+=over 4
+
+=item * Blocking my $result=$self->listTeams($hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_listTeams($cb,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * List Teams Vendor Documentation: L<https://developer.ciscospark.com/endpoint-teams-get.html>
+
+=back
+
+=head2 Get Team
+
+=over 4
+
+=item * Blocking my $result=$self->getTeam($teamId)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_getTeam($cb,$teamId)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$teamId)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Get Team Vendor Documentation: L<https://developer.ciscospark.com/endpoint-teams-teamId-get.html>
+
+=back
+
+=head2 Create Team
+
+=over 4
+
+=item * Blocking my $result=$self->createTeam($hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_createTeam($cb,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Create Team Vendor Documentation: L<https://developer.ciscospark.com/endpoint-teams-post.html>
+
+=back
+
+=head2 Delete Team
+
+=over 4
+
+=item * Blocking my $result=$self->deleteTeam($teamId)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_deleteTeam($cb,$teamId)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$teamId)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Delete Team Vendor Documentation: L<https://developer.ciscospark.com/endpoint-teams-teamId-delete.html>
+
+=back
+
+=head2 Update Team
+
+=over 4
+
+=item * Blocking my $result=$self->updateTeam($teamId,$hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_updateTeam($cb,$teamId,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$teamId,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Update Team Vendor Documentation: L<https://developer.ciscospark.com/endpoint-teams-teamId-put.html>
+
+=back
+
+=head1 Team Memberships
+
+=head2 List Team Memberships
+
+=over 4
+
+=item * Blocking my $result=$self->listTeamMemberships($hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_listTeamMemberships($cb,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * List Team Memberships Vendor Documentation: L<https://developer.ciscospark.com/endpoint-teammemberships-get.html>
+
+=back
+
+=head2 Get Team Membership
+
+=over 4
+
+=item * Blocking my $result=$self->getTeamMembership($teamMembershipId)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_getTeamMembership($cb,$teamMembershipId)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$teamMembershipId)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Get Team Membership Vendor Documentation: L<https://developer.ciscospark.com/endpoint-teammemberships-membershipId-get.html>
+
+=back
+
+=head2 Create Team Membership
+
+=over 4
+
+=item * Blocking my $result=$self->createTeamMembership($hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_createTeamMembership($cb,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Create Team Membership Vendor Documentation: L<https://developer.ciscospark.com/endpoint-teammemberships-post.html>
+
+=back
+
+=head2 Delete Team Membership
+
+=over 4
+
+=item * Blocking my $result=$self->deleteTeamMembership($teamMembershipId)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_deleteTeamMembership($cb,$teamMembershipId)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$teamMembershipId)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Delete Team Membership Vendor Documentation: L<https://developer.ciscospark.com/endpoint-teammemberships-membershipId-delete.html>
+
+=back
+
+=head2 Update Team Membership
+
+=over 4
+
+=item * Blocking my $result=$self->updateTeamMembership($teamMembershipId,$hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_updateTeamMembership($cb,$teamMembershipId,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$teamMembershipId,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Update Team Membership Vendor Documentation: L<https://developer.ciscospark.com/endpoint-teammemberships-membershipId-put.html>
+
+=back
+
+=head1 Webhooks
+
+=head2 List Webhooks
+
+=over 4
+
+=item * Blocking my $result=$self->listWebhooks($hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_listWebhooks($cb,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * List Webhooks Vendor Documentation: L<https://developer.ciscospark.com/endpoint-webhooks-get.html>
+
+=back
+
+=head2 Get Webhook
+
+=over 4
+
+=item * Blocking my $result=$self->getWebhook($webhookId)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_getWebhook($cb,$webhookId)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$webhookId)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Get Webhook Vendor Documentation: L<https://developer.ciscospark.com/endpoint-webhooks-webhookId-get.html>
+
+=back
+
+=head2 Create Webhook
+
+=over 4
+
+=item * Blocking my $result=$self->createWebhook($hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_createWebhook($cb,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Create Webhook Vendor Documentation: L<https://developer.ciscospark.com/endpoint-webhooks-post.html>
+
+=back
+
+=head2 Delete Webhook
+
+=over 4
+
+=item * Blocking my $result=$self->deleteWebhook($webhookId)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_deleteWebhook($cb,$webhookId)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$webhookId)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Delete Webhook Vendor Documentation: L<https://developer.ciscospark.com/endpoint-webhooks-webhookId-delete.html>
+
+=back
+
+=head2 Update Webhook
+
+=over 4
+
+=item * Blocking my $result=$self->updateWebhook($webhookId,$hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_updateWebhook($cb,$webhookId,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$webhookId,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Update Webhook Vendor Documentation: L<https://developer.ciscospark.com/endpoint-webhooks-webhookId-put.html>
+
+=back
+
+=head1 Organizations
+
+=head2 List Organizations
+
+=over 4
+
+=item * Blocking my $result=$self->listOrganizations($hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_listOrganizations($cb,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * List Organizations Vendor Documentation: L<https://developer.ciscospark.com/endpoint-organizations-get.html>
+
+=back
+
+=head2 Get Organization
+
+=over 4
+
+=item * Blocking my $result=$self->getOrganization($organizationId)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_getOrganization($cb,$organizationId)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$organizationId)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Get Organization Vendor Documentation: L<https://developer.ciscospark.com/endpoint-organizations-orgId-get.html>
+
+=back
+
+=head1 Licenses
+
+=head2 List Licenses
+
+=over 4
+
+=item * Blocking my $result=$self->listLicenses($hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_listLicenses($cb,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * List Licenses Vendor Documentation: L<https://developer.ciscospark.com/endpoint-licenses-get.html>
+
+=back
+
+=head2 Get License
+
+=over 4
+
+=item * Blocking my $result=$self->getLicense($licenseId)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_getLicense($cb,$licenseId)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$licenseId)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Get License Vendor Documentation: L<https://developer.ciscospark.com/endpoint-licenses-licenseId-get.html>
+
+=back
+
+=head1 Roles
+
+=head2 List Roles
+
+=over 4
+
+=item * Blocking my $result=$self->listRoles($hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_listRoles($cb,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * List Roles Vendor Documentation: L<https://developer.ciscospark.com/endpoint-roles-get.html>
+
+=back
+
+=head2 Get Role
+
+=over 4
+
+=item * Blocking my $result=$self->getRole($roleId)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_getRole($cb,$roleId)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$roleId)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Get Role Vendor Documentation: L<https://developer.ciscospark.com/endpoint-roles-roleId-get.html>
+
+=back
+
+=head1 Events
+
+=head2 List Events
+
+=over 4
+
+=item * Blocking my $result=$self->listEvents($hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_listEvents($cb,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * List Events Vendor Documentation: L<https://developer.ciscospark.com/endpoint-events-get.html>
+
+=back
+
+=head2 Get Event
+
+=over 4
+
+=item * Blocking my $result=$self->getEvent($eventId)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_getEvent($cb,$eventId)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$eventId)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=item * Get Event Vendor Documentation: L<https://developer.ciscospark.com/endpoint-events-eventId-get.html>
+
+=back
+
+=cut
+
+__PACKAGE__->_build_common("people",qw(list get create delete update));
+__PACKAGE__->_build_common("rooms",qw(list get create delete update));
+__PACKAGE__->_build_common("memberships",qw(list get create delete update));
+__PACKAGE__->_build_common("messages",qw(list get create delete));
+__PACKAGE__->_build_common("teams",qw(list get create delete update));
+__PACKAGE__->_build_common("team/memberships",qw(list get create delete update));
+__PACKAGE__->_build_common("webhooks",qw(list get create delete update));
+__PACKAGE__->_build_common("organizations",qw(list get));
+__PACKAGE__->_build_common("licenses",qw(list get));
+__PACKAGE__->_build_common("roles",qw(list get));
+__PACKAGE__->_build_common("events",qw(list get));
+
+sub _build_common {
+  my ($class,$path,@todo)=@_;
+  foreach my $method (@todo) {
+    my $label=$path;
+    $label=~ s/^(.)/uc($1)/se;
+    $label="que_".$method.$label;
+    my $code;
+    if($method ne 'list') {
+      $label=~ s/s$//s ;
+      $label=~ s/People/Person/s;
+    }
+    $label=~ s#/(.)#uc($1)#se;
+    
+    if($method eq 'list') {
+      $code=sub {
+        my ($self,$cb,$args)=@_;
+        my $url=$path;
+
+        my $run=sub {
+          my ($self,$id,$result,$request,$response)=@_;
+          $self->handle_paginate($id,$result,$request,$response,$cb);
+        };
+        return $self->que_get($run,$url,$args);
+      };
+    } elsif($method eq 'update') {
+      $code=sub {
+        my ($self,$cb,$targetId,$data)=@_;
+	return $self->queue_result($cb,$self->new_false("${method}Id is a requried argument")) unless defined($targetId);
+        return $self->que_put_json($cb,"$path/$targetId",$data);
+      };
+    } elsif($method eq 'get') {
+      $code=sub {
+        my ($self,$cb,$targetId,$data)=@_;
+	return $self->queue_result($cb,$self->new_false("${method}Id is a requried argument")) unless defined($targetId);
+        return $self->que_get($cb,"$path/$targetId",$data);
+      };
+    } elsif($method eq 'delete') {
+      $code=sub {
+        my ($self,$cb,$targetId,$data)=@_;
+	return $self->queue_result($cb,$self->new_false("${method}Id is a requried argument")) unless defined($targetId);
+        return $self->que_delete($cb,"$path/$targetId",$data);
+      };
+    } elsif($method eq 'create') {
+      $code=sub {
+        my ($self,$cb,$data)=@_;
+        return $self->que_post_json($cb,"$path",$data);
+      };
+    } else {
+      die "Er um.. $method isn't supported yet";
+    }
+    no strict 'refs';
+    *{$label}=$code;
+  }
+}
+
+=head1 Low Level Request functions
 
 This section documents low level request functions.
 
 =over 4
 
 =cut
+
+=item * $self->handle_paginate($id,$result,$request,$response,$cb) 
+
+Internal Method wrapper for parsing pagination headers.
+
+Example:
+
+  my $code=sub {
+    my ($self,$id,$result,$request,$response)=@_;
+    $self->handle_paginate($id,$result,$request,$response,$cb);
+  };
+  return $self->que_get($code,$url,$args);
+
+Pagination information can be found in the following result fields.
+
+  cursorPosition: last|next|prev|first
+  pageLink: (undef when cursorPosition eq 'last') Url to the next page
+
+=cut
+
+sub handle_paginate {
+  my ($self,$id,$result,$request,$response,$cb)=@_;
+   if($result) {
+     my $headers={$response->headers->flatten};
+     my $data=$result->get_data;
+     $data->{cursorPosition}='last';
+     $data->{pageLink}='';
+     if(exists $headers->{Link}) {
+       my $link=$headers->{Link};
+       if($link=~ /^<([^>]+)>;\s+rel="(\w+)"\s*$/s) {
+         $data->{pageLink}=$1;
+         $data->{cursorPosition}=$2;
+       }
+     } 
+  }
+
+  $cb->(@_);
+}
 
 =item * my $result=$self->build_post_json($url,$data);
 
@@ -226,12 +1378,83 @@ sub queue_builder {
   my ($self,$cb,$method,$url,$data)=@_;
 
   my $result=$self->$method($url,$data);
-
-  return $self->que_result($cb,$result) unless $result;
+  return $self->queue_result($cb,$result) unless $result;
   my $request=$result->get_data;
 
-  return $self->queue_request($request,$cb);
+  my $wrap;
+  my $count=$self->retryCount;
+  if($self->is_blocking) {
+    $wrap=sub {
+      my ($self,$id,$result,undef,$response)=@_;
+
+      return $cb->(@_) if $result or !($response->code==429 and $count-- >0);
+      my $timeout=looks_like_number($response->header('Retry-After')) ? $response->header('Retry-After') : $self->retryTimeout;
+      $self->log_warn("Request: $id recived a 429 response, will retry in $timeout seconds");
+      
+
+      if($count>0)  {
+        my $next_id=$self->queue_request($request,sub { 
+          my ($self,undef,$result,undef,$response)=@_;
+	  $wrap->($self,$id,$result,$request,$response);
+	});
+        $self->add_ids_for_blocking($next_id);
+        return $self->agent->run_next;
+      }
+
+      sleep $timeout;
+      my $code=sub {
+        my ($self,undef,$result,undef,$response)=@_;
+	$cb->($self,$id,$result,$request,$response);
+      };
+      
+      my $next_id=$self->queue_request($request,$code);
+      $self->add_ids_for_blocking($next_id);
+      $self->agent->run_next;
+    };
+  } else {
+    $wrap=sub {
+      my ($self,$id,$result,undef,$response)=@_;
+      return $cb->(@_) if $result or !($response->code==429 and $count-- >0);
+      my $timeout=looks_like_number($response->header('Retry-After')) ? $response->header('Retry-After') : $self->retryTimeout;
+      $self->log_warn("Request: $id recived a 429 response, will retry in $timeout seconds");
+
+      if($count>0)  {
+	my $ae;
+	$ae=AnyEvent->timer(after=>$timeout,cb=>sub {
+          my $next_id=$self->queue_request($request,sub { 
+            my ($self,undef,$result,undef,$response)=@_;
+	    $wrap->($self,$id,$result,$request,$response);
+	  });
+          $self->add_ids_for_blocking($next_id);
+          $self->agent->run_next;
+	  delete $self->retries->{$ae};
+	  undef $ae;
+	});
+	return $self->retries->{$ae}=$ae;
+      }
+      my $code=sub {
+        my ($self,undef,$result,undef,$response)=@_;
+	$cb->($self,$id,$result,$request,$response);
+      };
+
+      my $ae;
+      $ae=AnyEvent->timer(after=>$timeout,cb=>sub {
+        my $next_id=$self->queue_request($request,$code);
+        $self->add_ids_for_blocking($next_id);
+        $self->agent->run_next;
+	delete $self->retries->{$ae};
+	undef $ae;
+      });
+      return $self->retries->{$ae}=$ae;
+
+    };
+  }
+
+
+
+  return $self->queue_request($request,$wrap);
 }
+
 
 =item * my $id=$self->que_post_json($cb,$url,$data);
 
@@ -257,7 +1480,7 @@ sub build_put_json {
   my $json=eval {to_json($data)};
   return $self->new_false("Failed to convert \$data to json, error was $@") if $@;
 
-  my $request=new HTTP::Request(POST=>$uri,$self->default_headers,$json);
+  my $request=new HTTP::Request(PUT=>$uri,$self->default_headers,$json);
   return $self->new_true($request);
 }
 
@@ -355,7 +1578,7 @@ Que's a diy get request
 sub que_getRaw {
   my ($self,$cb,$url)=@_;
   my $req=HTTP::Request->new(GET=>$url,$self->default_headers);
-  return $self->queue_request($cb,$req);
+  return $self->queue_request($req,$cb);
 }
 
 =item * my $id=$self->que_get($cb,$url,$data);
@@ -468,9 +1691,11 @@ Internal handler for delete results
 sub handle_delete {
   my ($self,$cb,$id,undef,$request,$response)=@_;
   if($response->code==204) {
-    $cb->($id,$self->new_true({message=>'Deleted'}),$request,$response);
+    my $result=$self->new_true({message=>'Deleted'});
+    $cb->($self,$id,$result,$request,$response);
   } else {
-    $cb->($id,$self->new_false("Delete Failed, error was: ".$response->status_line),$request,$response);
+    my $result=$self->new_false("Delete Failed, error was: ".$response->status_line);
+    $cb->($self,$id,$result,$request,$response);
   }
 }
 

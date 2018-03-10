@@ -22,6 +22,7 @@ use Map::Tube::Exception::MissingPluginGraph;
 use Map::Tube::Exception::MissingSupportedMap;
 use Map::Tube::Exception::FoundUnsupportedMap;
 use Map::Tube::Exception::FoundUnsupportedObject;
+use Map::Tube::Exception::InvalidColorHexCode;
 
 use Moo;
 use namespace::clean;
@@ -243,6 +244,17 @@ sub test_found_unsupported_object {
         line_number => $caller[2] });
 }
 
+sub test_invalid_color_hex_code {
+    my @caller  = caller(0);
+    @caller     = caller(2) if $caller[3] eq '(eval)';
+
+    Map::Tube::Exception::InvalidLineId->throw({
+        method      => __PACKAGE__."::test_invalid_color_hex_code",
+        message     => "ERROR: Invalid color hex code.",
+        filename    => $caller[1],
+        line_number => $caller[2] });
+}
+
 package main;
 
 use 5.006;
@@ -309,5 +321,8 @@ like($@, qr/Found Unsupported Map/);
 
 eval { MTE->new->test_found_unsupported_object; };
 like($@, qr/Found Unsupported Object/);
+
+eval { MTE->new->test_invalid_color_hex_code; };
+like($@, qr/Invalid color hex code/);
 
 done_testing();

@@ -1,10 +1,11 @@
-use 5.006;
+use 5.008;
 
 use strict;
 use warnings;
 
 use lib qw{ inc };
-use base qw{ My::Module::Build };
+
+use My::Module::Build;
 use My::Module::Meta;
 
 use Module::Build;
@@ -24,6 +25,7 @@ my %args = (
     ),
 ##    dynamic_config => 1,
     license => 'perl',
+    add_to_cleanup	=> [ qw{ cover_db } ],
 );
 
 $mbv >= 0.28
@@ -35,3 +37,5 @@ $mbv >= 0.34
 my $bldr = My::Module::Build->new(%args);
 
 $bldr->create_build_script ();
+
+# ex: set textwidth=72 :

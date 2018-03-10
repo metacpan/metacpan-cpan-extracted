@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder;
-$Data::TableReader::Decoder::VERSION = '0.005';
+$Data::TableReader::Decoder::VERSION = '0.006';
 use Moo 2;
 
 # ABSTRACT: Base class for table decoders
@@ -7,7 +7,8 @@ use Moo 2;
 
 has file_name   => ( is => 'ro', required => 1 );
 has file_handle => ( is => 'ro', required => 1 );
-has log         => ( is => 'ro', required => 1 );
+has _log        => ( is => 'ro', required => 1 );
+*log= *_log; # back-compat, but deprecated since it doesn't match ->log on TableReader
 
 1;
 
@@ -23,7 +24,7 @@ Data::TableReader::Decoder - Base class for table decoders
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -43,13 +44,6 @@ Set by TableReader.  Useful for logging.
 
 Set by TableReader.  This is what the iterator should parse.
 
-=head2 log
-
-Set by TableReader.  Unlike the attribute of the same name on
-TableReader, this is always a coderef, to be called as:
-
-  $log->($level, $message);
-
 =head1 METHODS
 
 =head2 iterator
@@ -68,7 +62,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Michael Conrad.
+This software is copyright (c) 2018 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::Requires 'Hash::MultiValue';
 use Test::More;
+use FindBin qw($Bin);
+use lib "$Bin/../";
 use t::Util;
 
 test_prompt(

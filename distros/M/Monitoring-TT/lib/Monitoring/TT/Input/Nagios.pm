@@ -84,16 +84,25 @@ sub read {
         info("reading $type from $file");
 
         my $output   = "";
-        my $template = $self->{'montt'}->_process_template($self->{'montt'}->_read_replaced_template($file));
-        $self->{'montt'}->tt->process(\$template, {}, \$output) or $self->{'montt'}->_template_process_die($file, $data);
+        if($self->{'montt'}) {
+            my $template = $self->{'montt'}->_process_template($self->{'montt'}->_read_replaced_template($file));
+            $self->{'montt'}->tt->process(\$template, {}, \$output) or $self->{'montt'}->_template_process_die($file, $data);
+        } else {
+            open(my $fh, '<', $file) or die("cannot read: ".$file.': '.$!);
+            while(my $line = <$fh>) {
+                $output .= $line;
+            }
+            close($fh);
+        }
 
+        my $in_type;
         for my $line (split(/\n/mx, $output)) {
             next if substr($line, 0, 1) eq '#';
             next if $line =~ m/^\s*$/gmx;
             chomp($line);
             if($line =~ m/^\s*define\s+(\w+)($|\s|{)/mx) {
-                my $in_type = $1;
-                if($in_type.'s' ne $type) {
+                $in_type = $1;
+                if($type && $in_type.'s' ne $type) {
                     warn("unexpected input type '".$in_type."' in ".$file.':'.$.);
                     next;
                 }
@@ -109,26 +118,32 @@ sub read {
                     $current->{'groups'} = Monitoring::TT::Utils::parse_groups(delete $current->{'conf'}->{'_groups'});
 
                     # bring apps in shape
-                    $current->{'apps'} = Monitoring::TT::Utils::parse_tags(delete $current->{'conf'}->{'_apps'}) if $type eq 'hosts';
+                    $current->{'apps'} = Monitoring::TT::Utils::parse_tags(delete $current->{'conf'}->{'_apps'}) if $in_type eq 'host';
 
                     # transfer type and some other attributes
                     $current->{'type'}  = delete $current->{'conf'}->{'_type'};
                     $current->{'alias'} = $current->{'conf'}->{'alias'} || '';
 
-                    if($type eq 'hosts') {
+                    if($in_type eq 'host') {
                         $current->{'name'}    = $current->{'conf'}->{'host_name'}   || '';
                         $current->{'address'} = $current->{'conf'}->{'address'}     || '';
                         $current->{'groups'}  = $current->{'conf'}->{'host_groups'} || $current->{'conf'}->{'hostgroups'} || [];
                     }
-                    if($type eq 'contacts') {
+                    if($in_type eq 'contact') {
                         $current->{'name'}   = $current->{'conf'}->{'contact_name'}   || '';
                         $current->{'email'}  = $current->{'conf'}->{'email'}          || '';
                         $current->{'groups'} = $current->{'conf'}->{'contact_groups'} || $current->{'conf'}->{'contactgroups'} || [];
                     }
+                    if($in_type eq 'service') {
+                        $current->{'groups'}  = $current->{'conf'}->{'service_groups'} || $current->{'conf'}->{'servicegroups'} || [];
+                    }
+
+                    $current->{'type'} = $in_type unless $current->{'type'};
 
                     $current->{'file'} = delete $current->{'conf'}->{'_src'};
+                    $current->{'file'} = $file unless $current->{'file'};
                     $current->{'file'} =~ s/:(\d+)$//gmx;
-                    $current->{'line'} = $1;
+                    $current->{'line'} = defined $1 ? $1 : $.;
 
                     push @{$data}, $current;
                     $current = { 'conf' => {}};

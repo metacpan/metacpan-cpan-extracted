@@ -3,11 +3,11 @@ package DBIx::dbMan::Extension::OracleSQL;
 use strict;
 use base 'DBIx::dbMan::Extension';
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 1;
 
-sub IDENTIFICATION { return "000001-000038-000010"; }
+sub IDENTIFICATION { return "000001-000038-000011"; }
 
 sub preference { return 3999; }
 
@@ -24,7 +24,7 @@ sub handle_action {
 			$action{oracle_dbms} = 1;
 		}
 		if ($action{cmd} !~ /end;$/i) {
-			return %action if $action{cmd} =~ s/[;\/]$//;
+			return %action if $action{cmd} =~ s/(;|(?<!\*)\/)$//;
 		}
 	}
 	if ($action{action} eq 'SQL' and $action{oper} eq 'complete' and $obj->{-dbi}->driver eq 'Oracle') {

@@ -1,0 +1,43 @@
+---
+abstract: 'Git functions for Dist::Inkt'
+author:
+  - 'Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::KJETILK version 0.100, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Inkt-Role-Git
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Dist::Inkt::Role::Git:
+    file: lib/Dist/Inkt/Role/Git.pm
+    version: '0.001'
+requires:
+  Dist::Inkt: '0.001'
+  Git::Sub: '0'
+  Moose: '0'
+  Types::Standard: '0'
+  perl: '5.014'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Dist-Inkt-Role-Git/project
+  bugtracker: https://github.com/kjetilk/p5-dist-inkt-role-git/issues
+  homepage: https://metacpan.org/release/Dist-Inkt-Role-Git
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/kjetilk/p5-dist-inkt-role-git.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

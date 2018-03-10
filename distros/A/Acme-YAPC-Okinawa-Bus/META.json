@@ -54,7 +54,7 @@
    "provides" : {
       "Acme::YAPC::Okinawa::Bus" : {
          "file" : "lib/Acme/YAPC/Okinawa/Bus.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -68,7 +68,10 @@
          "web" : "https://github.com/AnaTofuZ/xs-Acme-YAPC-Okinawa-Bus"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:ANATOFUZ",
+   "x_contributors" : [
+      "karupanerura <karupa@cpan.org>"
+   ],
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

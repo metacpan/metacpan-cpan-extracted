@@ -7,40 +7,11 @@ use warnings;
 use base qw(Module::Install::Base);
 use vars qw($VERSION);
 
-$VERSION = '0.30';
-
-{
-
-    # these aren't defined until after _require_admin is run, so
-    # define them so prototypes are available during compilation.
-    sub io;
-    sub capture(&;@);
-
-#line 28
-
-    my $done = 0;
-
-    sub _require_admin {
-
-	# do this once to avoid redefinition warnings from IO::All
-	return if $done;
-
-	require IO::All;
-	IO::All->import( '-binary' );
-
-	require Capture::Tiny;
-	Capture::Tiny->import ( 'capture' );
-
-	return;
-    }
-
-}
+$VERSION = '0.22';
 
 sub readme_from {
   my $self = shift;
   return unless $self->is_admin;
-
-  _require_admin;
 
   # Input file
   my $in_file  = shift || $self->_all_from
@@ -79,8 +50,6 @@ sub readme_from {
     $out_file = $self->_readme_htm($in_file, $out_file, $options);
   } elsif ($format eq 'man') {
     $out_file = $self->_readme_man($in_file, $out_file, $options);
-  } elsif ($format eq 'md') {
-    $out_file = $self->_readme_md($in_file, $out_file, $options);
   } elsif ($format eq 'pdf') {
     $out_file = $self->_readme_pdf($in_file, $out_file, $options);
   }
@@ -98,10 +67,10 @@ sub _readme_txt {
   $out_file ||= 'README';
   require Pod::Text;
   my $parser = Pod::Text->new( @$options );
-  my $io = io->file($out_file)->open(">");
-  my $out_fh = $io->io_handle;
+  open my $out_fh, '>', $out_file or die "Could not write file $out_file:\n$!\n";
   $parser->output_fh( *$out_fh );
   $parser->parse_file( $in_file );
+  close $out_fh;
   return $out_file;
 }
 
@@ -110,14 +79,11 @@ sub _readme_htm {
   my ($self, $in_file, $out_file, $options) = @_;
   $out_file ||= 'README.htm';
   require Pod::Html;
-  my ($o) = capture {
-    Pod::Html::pod2html(
-      "--infile=$in_file",
-      "--outfile=-",
-      @$options,
-    );
-  };
-  io->file($out_file)->print($o);
+  Pod::Html::pod2html(
+    "--infile=$in_file",
+    "--outfile=$out_file",
+    @$options,
+  );
   # Remove temporary files if needed
   for my $file ('pod2htmd.tmp', 'pod2htmi.tmp') {
     if (-e $file) {
@@ -133,10 +99,7 @@ sub _readme_man {
   $out_file ||= 'README.1';
   require Pod::Man;
   my $parser = Pod::Man->new( @$options );
-  my $io = io->file($out_file)->open(">");
-  my $out_fh = $io->io_handle;
-  $parser->output_fh( *$out_fh );
-  $parser->parse_file( $in_file );
+  $parser->parse_from_file($in_file, $out_file);
   return $out_file;
 }
 
@@ -148,20 +111,11 @@ sub _readme_pdf {
     or die "Could not generate $out_file because pod2pdf could not be found\n";
   my $parser = App::pod2pdf->new( @$options );
   $parser->parse_from_file($in_file);
-  my ($o) = capture { $parser->output };
-  io->file($out_file)->print($o);
-  return $out_file;
-}
-
-sub _readme_md {
-  my ($self, $in_file, $out_file, $options) = @_;
-  $out_file ||= 'README.md';
-  require Pod::Markdown;
-  my $parser = Pod::Markdown->new( @$options );
-  my $io = io->file($out_file)->open(">");
-  my $out_fh = $io->io_handle;
-  $parser->output_fh( *$out_fh );
-  $parser->parse_file( $in_file );
+  open my $out_fh, '>', $out_file or die "Could not write file $out_file:\n$!\n";
+  select $out_fh;
+  $parser->output;
+  select STDOUT;
+  close $out_fh;
   return $out_file;
 }
 
@@ -180,5 +134,5 @@ sub _all_from {
 
 __END__
 
-#line 316
+#line 254
 

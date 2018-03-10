@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -20,8 +20,8 @@ Acme::YAPC::Okinawa::Bus - It's Tweet shere
 =head1 SYNOPSIS
 
     use Acme::YAPC::Okinawa::Bus;
-    say Acme::YAPC::Okinawa::Bus->time();
-    say Acme::YAPC::Okinawa::Bus->place();
+    say Acme::YAPC::Okinawa::Bus::time();
+    say Acme::YAPC::Okinawa::Bus::place();
 
 =head1 DESCRIPTION
 

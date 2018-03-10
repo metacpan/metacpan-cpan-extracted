@@ -1,5 +1,8 @@
 Revision history for Firefox-Marionette
 
+0.51  Sat Mar 10 15:44:00 2018
+       Adding loaded and interactive methods.
+
 0.50  Sun Mar  4 20:07:00 2018
        Adding test suite alarm for download test.
 

@@ -43,9 +43,9 @@
       "runtime" : {
          "requires" : {
             "Authen::CAS::Client" : "0",
-            "Carp" : "0",
-            "Catmandu" : "1.06",
             "Clone" : "0",
+            "Data::Util" : "0",
+            "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
             "Moo" : "0",
             "Moo::Role" : "0",
@@ -53,7 +53,6 @@
             "Plack::Middleware::Session" : "0",
             "URI" : "0",
             "WWW::ORCID" : "0",
-            "namespace::clean" : "0",
             "perl" : "v5.10.1"
          }
       }
@@ -70,7 +69,7 @@
          "web" : "https://github.com/LibreCat/Plack-Auth-SSO"
       }
    },
-   "version" : "0.011",
+   "version" : "0.0131",
    "x_contributors" : [
       "Nicolas Franck <njfranck@ca20c526.ugent.be>",
       "Nicolas Franck <njfranck@ca20c533.ugent.be>",

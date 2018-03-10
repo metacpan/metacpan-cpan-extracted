@@ -1,5 +1,9 @@
 Revision history for Perl extension UV-Util
 
+0.009     2018-03-08
+    - Add AppVeyor tests
+    - Move constants out in the same way as with UV
+
 0.008     2017-07-10
     - Bump version of Alien::libuv to 0.006 to add more diagnostics
     - Add more diagnostics to the tests

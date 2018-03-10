@@ -1,0 +1,65 @@
+# -*- mode: perl; -*-
+use strict;
+use warnings;
+use alienfile;
+use File::Spec::Functions qw{catfile};
+
+probe [ 'env | grep -q ^KENT_SRC=' ];
+probe [ 'env | grep -q ^MACHTYPE=' ];
+
+share {
+
+  requires 'Archive::Zip';
+
+  start_url 'http://hgdownload.cse.ucsc.edu/admin/';
+
+  plugin Download => (
+      filter => qr/\.zip$/,
+  		version => qr/v(\d+)\.zip$/,
+  );
+
+  plugin 'Extract' => ( format => 'zip' );
+
+  meta->before_hook(
+    build => sub {
+      my ($build) = @_;
+      chomp(my $type = `uname -m`);
+      $build->runtime_prop->{kent_machtype} = $type;
+      log("set MACHTYPE to $type");
+    }
+  );
+
+  build [
+    ## make jkweb.a
+    [ '%{make} -C src/lib CC=%{perl.config.cc} CFLAGS="-fPIC -g -Wall -O2"' ],
+    ## make htslib.a
+    [ '%{make} -C src/htslib CC=%{perl.config.cc} CFLAGS="-fPIC -g -Wall -O2"' ],
+    ## copy library files into place
+    [ 'mkdir -p %{.install.prefix}/lib/%{.runtime.kent_machtype}' ],
+    [ 'cp src/lib/%{.runtime.kent_machtype}/jkweb.a %{.install.prefix}/lib/%{.runtime.kent_machtype}/libjkweb.a' ],
+    [ 'cp src/lib/%{.runtime.kent_machtype}/jkweb.a %{.install.prefix}/lib/%{.runtime.kent_machtype}/jkweb.a' ],
+    [ 'cp src/htslib/libhts.a %{.install.prefix}/lib/%{.runtime.kent_machtype}/' ],
+    ## copy include files
+    [ 'mkdir -p %{.install.prefix}/inc' ],
+    [ 'cp src/inc/*.h %{.install.prefix}/inc' ],
+    [ 'mkdir -p %{.install.prefix}/inc/htslib' ],
+    [ 'cp src/htslib/htslib/*.h %{.install.prefix}/inc/htslib/' ],
+  ];
+
+  meta->after_hook(
+    gather_share => sub {
+      my ($build) = @_;
+      $build->runtime_prop->{version} =
+        join '.', split //, $build->runtime_prop->{version};
+      $build->runtime_prop->{cflags} = join ' ',
+        '-Wno-format',
+        '-Wformat=0',
+        join('', '-DMACHTYPE_', $build->runtime_prop->{kent_machtype}),
+        join('', '-I', catfile $build->install_prop->{prefix}, 'inc'),
+        ;
+      $build->runtime_prop->{libs} = join ' ',
+        join('', '-L', catfile $build->install_prop->{prefix}, 'lib', $build->runtime_prop->{kent_machtype}),
+        '-ljkweb', '-lhts', '-lz', '-lssl', '-lpthread';
+    },
+  );
+};

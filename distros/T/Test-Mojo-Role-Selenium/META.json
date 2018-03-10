@@ -3,7 +3,7 @@
    "author" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
@@ -21,9 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Test::More" : "0.88"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -33,9 +31,13 @@
       "runtime" : {
          "requires" : {
             "Class::Method::Modifiers" : "2.00",
-            "Mojolicious" : "7.00",
-            "Selenium::Remote::WebElement" : "1.00",
-            "Test::Mojo::WithRoles" : "0.02"
+            "Mojolicious" : "7.42",
+            "Selenium::Remote::WebElement" : "1.00"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
          }
       }
    },
@@ -46,9 +48,11 @@
       },
       "homepage" : "https://github.com/jhthorsen/test-mojo-role-selenium",
       "repository" : {
-         "url" : "https://github.com/jhthorsen/test-mojo-role-selenium.git"
+         "type" : "git",
+         "url" : "https://github.com/jhthorsen/test-mojo-role-selenium.git",
+         "web" : "https://github.com/jhthorsen/test-mojo-role-selenium"
       }
    },
-   "version" : "0.11",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,5 +1,5 @@
 package Git::Raw::Repository;
-$Git::Raw::Repository::VERSION = '0.75';
+$Git::Raw::Repository::VERSION = '0.78';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Repository - Git repository class
 
 =head1 VERSION
 
-version 0.75
+version 0.78
 
 =head1 SYNOPSIS
 
@@ -113,6 +113,14 @@ Create a new repository with neither backends nor config object.
 
 Retrieve the default L<Git::Raw::Config> of the repository.
 
+=head2 commondir( )
+
+Get the path of the shared common directory for this repository.
+
+=head2 is_worktree( )
+
+Check if the repository is a linked work tree.
+
 =head2 index( [$new_index] )
 
 Retrieve the index of the repository. If C<$new_index> is passed, it will be used
@@ -130,6 +138,10 @@ used as the object database. Returns a L<Git::Raw::Odb> object.
 Retrieve the L<Git::Raw::Reference> pointed by the HEAD of the repository. If
 the L<Git::Raw::Reference> C<$new_head> is passed, the HEAD of the repository
 will be changed to point to it.
+
+=head2 head_for_worktree( $worktree )
+
+Retrieve the L<Git::Raw::Reference> pointed by the HEAD of C<$worktree>.
 
 =head2 detach_head( $commitish )
 

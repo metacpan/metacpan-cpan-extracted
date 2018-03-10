@@ -1,5 +1,5 @@
 package Data::TableReader;
-$Data::TableReader::VERSION = '0.005';
+$Data::TableReader::VERSION = '0.006';
 use Moo 2;
 use Try::Tiny;
 use Carp;
@@ -27,20 +27,24 @@ has on_blank_row        => ( is => 'rw', default => sub { 'next' } );
 has on_validation_fail  => ( is => 'rw', default => sub { 'die' } );
 has log                 => ( is => 'rw', trigger => sub { shift->_clear_log } );
 
+# Open 'input' if it isn't already a file handle
 sub _build__file_handle {
 	my $self= shift;
 	my $i= $self->input;
 	return $i if ref($i) && (ref($i) eq 'GLOB' or ref($i)->can('read'));
 	open(my $fh, '<', $i) or croak "open($i): $!";
+	binmode $fh;
 	return $fh;
 }
 
+# Create ::Decoder instance either from user-supplied args, or by detecting input format
 sub _build_decoder {
 	my $self= shift;
 	my $decoder_arg= $self->_decoder_arg;
 	my ($class, @args);
 	if (!$decoder_arg) {
 		($class, @args)= $self->detect_input_format;
+		$self->_log->('trace', "Detected input format as %s", $class);
 	}
 	elsif (!ref $decoder_arg) {
 		$class= $decoder_arg;
@@ -64,14 +68,16 @@ sub _build_decoder {
 	$class= "Data::TableReader::Decoder::$class"
 		unless $class =~ /::/;
 	require_module($class) or croak "$class does not exist or is not installed";
+	$self->_log->('trace', 'Creating decoder %s on input %s', $class, $self->input);
 	return $class->new(
 		file_name   => ($self->input eq $self->_file_handle? '' : $self->input),
 		file_handle => $self->_file_handle,
-		log         => $self->_log,
+		_log        => $self->_log,
 		@args
 	);
 }
 
+# User supplies any old perl data, but this field should always be an arrayref of ::Field
 sub _coerce_field_list {
 	my ($list)= @_;
 	defined $list and ref $list eq 'ARRAY' or croak "'fields' must be a non-empty arrayref";
@@ -103,9 +109,13 @@ sub _build_header_row_combine {
 	max map { 1+($_->header_regex =~ /\\n/g) } $self->field_list;
 }
 
+# 'log' can be a variety of things, but '_log' will always be a coderef
 has _log => ( is => 'lazy', clearer => 1 );
 sub _build__log {
-	my $dest= shift->log;
+	_log_fn(shift->log);
+}
+sub _log_fn {
+	my $dest= shift;
 	!$dest? sub {
 		my ($level, $msg, @args)= @_;
 		return unless $level eq 'warn' or $level eq 'error';
@@ -120,8 +130,8 @@ sub _build__log {
 	}
 	: ref($dest)->can('info')? sub {
 		my ($level, $msg, @args)= @_;
-		$level.='f' if @args;
-		$dest->$level($msg, @args);
+		$dest->$level( @args? sprintf($msg, @args) : $msg )
+			if $dest->can('is_'.$level)->($dest);
 	}
 	: croak "Don't know how to log to $dest";
 }
@@ -141,11 +151,18 @@ sub detect_input_format {
 	my $fpos;
 	if (!defined $magic) {
 		my $fh= $self->_file_handle;
-		$fpos= tell $fh;
-		if (defined $fpos && $fpos >= 0) {
+		# Need to be able to seek.
+		if (seek($fh, 0, 1)) {
 			read($fh, $magic, 4096);
 			seek($fh, $fpos, 0) or croak "seek: $!";
-		} else {
+		}
+		elsif ($fh->can('ungets')) {
+			read($fh, $magic, 4096);
+			$fh->ungets($magic);
+		}
+		else {
+			$self->_log('notice',"Can't fully detect input format because handle is not seekable."
+				." Consider fully buffering the file, or using FileHandle::Unget");
 			$magic= '';
 		}
 	}
@@ -256,18 +273,29 @@ sub _find_table_in_dataset {
 	my @rows;
 	
 	# If header_row_at doesn't start at 1, seek forward
-	push @rows, $data_iter->() for 1..$start-1;
+	if ($start > 1) {
+		$self->_log->('trace', 'Skipping to row %s', $start);
+		push @rows, $data_iter->() for 1..$start-1;
+	}
 	
 	# Scan through the rows of the dataset up to the end of header_row_at, accumulating rows so that
 	# multi-line regexes can match.
 	for ($start .. $end) {
-		my $vals= $data_iter->() or last; # if undef, we reached end of dataset
+		my $vals= $data_iter->();
+		if (!$vals) { # if undef, we reached end of dataset
+			$self->_log->('trace', 'EOF');
+			last;
+		}
 		if ($row_accum > 1) {
 			push @rows, $vals;
 			splice @rows, 0, @rows-$row_accum; # only need to retain $row_accum number of rows
 			$vals= [ map { my $c= $_; join("\n", map $_->[$c], @rows) } 0 .. $#{$rows[-1]} ];
+			$stash->{context}= $row_accum.' rows ending at '.$data_iter->position;
+		} else {
+			$stash->{context}= $data_iter->position;
 		}
-		$stash->{context}= $data_iter->position.': ';
+		$self->_log->('trace', 'Checking for headers on %s', $stash->{context});
+		$stash->{context}.= ': ';
 		$stash->{col_map}= $self->static_field_order?
 			# If static field order, look for headers in sequence
 			$self->_match_headers_static($vals, $stash)
@@ -275,22 +303,24 @@ sub _find_table_in_dataset {
 			: $self->_match_headers_dynamic($vals, $stash);
 		return 1 if $stash->{col_map};
 		return if $stash->{fatal};
+		$self->_log->('debug', '%sNo match', $stash->{context});
 	}
 	$self->_log->('warn','No row in dataset matched full header requirements');
 	return;
 }
 
 sub _match_headers_static {
-	my ($self, $header, $cache)= @_;
+	my ($self, $header, $stash)= @_;
 	my $fields= $self->fields;
 	for my $i (0 .. $#$fields) {
 		next if $header->[$i] =~ $fields->[$i]->header_regex;
 		
 		# Field header doesn't match.  Start over on next row.
-		$self->_log->('debug','%sMissing field %s', $cache->{context}||'', $fields->[$i]->name);
+		$self->_log->('debug','%sMissing field %s', $stash->{context}||'', $fields->[$i]->name);
 		return;
 	}
 	# found a match for every field!
+	$self->_log->('debug','%sFound!', $stash->{context}||'');
 	return $fields;
 }
 
@@ -300,7 +330,8 @@ sub _match_headers_dynamic {
 	my %col_map;
 	my $fields= $self->fields;
 	my $free_fields=    $stash->{free_fields} ||= [
-		sort { $a->required? -1 : $b->required? 1 : 0 }	# Sort required first, to fail faster on non-matching rows
+		# Sort required fields to front, to fail faster on non-matching rows
+		sort { $a->required? -1 : $b->required? 1 : 0 }
 		grep { !$_->follows_list } @$fields
 	];
 	my $follows_fields= $stash->{follows_fields} ||= [
@@ -311,7 +342,7 @@ sub _match_headers_dynamic {
 		my @found= grep { $header->[$_] =~ $hr } 0 .. $#$header;
 		if (@found == 1) {
 			if ($col_map{$found[0]}) {
-				$self->_log->('warn','%sField %s and %s both match',
+				$self->_log->('info','%sField %s and %s both match',
 					$context, $f->name, $col_map{$found[0]}->name);
 				return;
 			}
@@ -322,20 +353,20 @@ sub _match_headers_dynamic {
 				# Array columns may be found more than once
 				$col_map{$_}= $f for @found;
 			} else {
-				$self->_log->('warn','%sField %s matches more than one column',
+				$self->_log->('info','%sField %s matches more than one column',
 					$context, $f->name);
 				return;
 			}
 		}
 		elsif ($f->required) {
-			$self->_log->('debug','%sNo match for required field %s', $context, $f->name);
+			$self->_log->('info','%sNo match for required field %s', $context, $f->name);
 			return;
 		}
 		# else Not required, and not found
 	}
 	# Need to have found at least one column (even if none required)
 	unless (keys %col_map) {
-		$self->_log->('debug','%sNo fields matched', $context);
+		$self->_log->('debug','%sNo field headers found', $context);
 		return;
 	}
 	# Now, check for any of the 'follows' fields, some of which might also be 'required'.
@@ -354,7 +385,7 @@ sub _match_headers_dynamic {
 				}
 				if (@match == 1) {
 					if ($found{$match[0]} && !$match[0]->array) {
-						$self->_log->('error','%sField %s matches multiple columns', 
+						$self->_log->('info','%sField %s matches multiple columns',
 							$context, $match[0]->name);
 						return;
 					}
@@ -363,7 +394,7 @@ sub _match_headers_dynamic {
 					$following{$match[0]->name}= $match[0];
 				}
 				elsif (@match > 1) {
-					$self->_log->('error','%sField %s and %s both match column %d',
+					$self->_log->('info','%sField %s and %s both match column %d',
 						$context, $match[0]->name, $match[1]->name, $i+1);
 					return;
 				}
@@ -374,8 +405,11 @@ sub _match_headers_dynamic {
 		}
 		# Check if any of the 'follows' fields were required
 		if (my @unfound= grep { !$found{$_} && $_->required } @$follows_fields) {
-			$self->_log->('debug','%sNo match for required field %s', $context, $_->name)
-				for @unfound;
+			$self->_log->('info','%sNo match for required %s %s', $context,
+				(@unfound > 1? ('fields', join(', ', map { $_->name } sort @unfound))
+					: ('field', $unfound[0]->name)
+				));
+			return;
 		}
 	}
 	# Now, if there are any un-claimed columns, handle per 'on_unknown_columns' setting.
@@ -619,7 +653,7 @@ Data::TableReader - Extract records from "dirty" tabular data sources
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -764,8 +798,6 @@ return one of the above values.
 
 =back
 
-If you want to get cleaner default log messages, i.e. to show to users, see L</log>.
-
 =head2 on_blank_rows
 
   on_blank_rows => 'next' # warn, and then skip the row(s)
@@ -783,7 +815,6 @@ records, and encounter a series of blank rows (defined as a row with no
 printable characters in any field) followed by non-blank rows.
 If you use the callback, it suppresses the default warning, since you can
 generate your own.
-If you want to get cleaner log messages, i.e. to show to users, see L</log>.
 
 The default is C<'next'>.
 
@@ -815,7 +846,6 @@ records, and one row fails its validation.  In addition to deciding an option,
 the callback gives you a chance to alter the record before C<'use'>ing it.
 If you use the callback, it suppresses the default warning, since you can
 generate your own.
-If you want to get cleaner log messages, i.e. to show to users, see L</log>.
 
 The default is 'die'.
 
@@ -900,13 +930,17 @@ returns all records in an arrayref.
 
   my $records= $tr->iterator->all;
 
+=head1 THANKS
+
+Portions of this software were funded by L<Ellis, Partners in Management Solutions|http://www.epmsonline.com/>.
+
 =head1 AUTHOR
 
 Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Michael Conrad.
+This software is copyright (c) 2018 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

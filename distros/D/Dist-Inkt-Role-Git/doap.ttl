@@ -1,0 +1,70 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix wot:   <http://xmlns.com/wot/0.1/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	rdfs:comment         "the same terms as the Perl 5 programming language system itself"@en.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-Role-Git/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap-deps:runtime-requirement [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.014"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "Moose"^^doap-deps:CpanId ], [ doap-deps:on "Git::Sub"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <https://github.com/kjetilk/p5-dist-inkt-role-git/issues>;
+	doap:created         "2018-03-08"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:download-page   <https://metacpan.org/release/Dist-Inkt-Role-Git>;
+	doap:homepage        <https://metacpan.org/release/Dist-Inkt-Role-Git>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:name            "Dist-Inkt-Role-Git";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Dist-Inkt-Role-Git/v_0-001>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/kjetilk/p5-dist-inkt-role-git>;
+		prov:has_provenance <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-dist-inkt-role-git&serialization=PROV-O#>;
+	];
+	doap:security-contact <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:shortdesc       "Git functions for Dist::Inkt"@en.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-Role-Git/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Dist-Inkt-Role-Git-0.001"^^xsd:string;
+	dc:issued            "2018-03-08"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/Dist-Inkt-Role-Git-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/kjetilk>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:kjetilk@cpan.org>;
+	foaf:name            "Kjetil Kjernsmo";
+	foaf:nick            "KJETILK", "KjetilK";
+	foaf:page            <https://metacpan.org/author/KJETILK>;
+	owl:sameAs           <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-dist-inkt-role-git&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me>;
+	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>;
+	wot:hasKey           _:B1.
+
+<http://www.kjetil.kjernsmo.net/foaf#me>
+	a                    foaf:Person;
+	foaf:homepage        <http://kjetil.kjernsmo.net/>;
+	foaf:mbox            <mailto:kjetilk@cpan.org>;
+	foaf:name            "Kjetil Kjernsmo";
+	foaf:nick            "KjetilK";
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>;
+	wot:hasKey           _:B1.
+
+_:B1
+	a                    wot:PubKey;
+	wot:fingerprint      "0ECC8BC6D0A2E9B93BA417267FBEE8DF3A9E4AA5".
+

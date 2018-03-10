@@ -14,7 +14,7 @@ Lab::Moose::Sweep::Tutorial - Documentation of high-level sweep framework
 
 =head1 VERSION
 
-version 3.621
+version 3.622
 
 =head1 Datafiles and datafolders
 
@@ -270,7 +270,7 @@ Let us add a simple line plot to our IV measurement:
 
 This will create a live line plot, which will be updated for each new data
 point. A copy of the plot will be saved in the output folder in png format with
-filename C<"${datafile}.plot.png">. You can change this filename with the
+filename C<"$datafile.png">. You can change this filename with the
 C<hard_copy> option:
 
  $datafile->add_plot(

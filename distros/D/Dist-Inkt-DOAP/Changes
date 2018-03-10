@@ -7,6 +7,10 @@ Bug tracker:  <https://github.com/kjetilk/p5-dist-inkt-doap/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+0.110	2018-03-07
+
+ - Added: Add a role to add data from sources outside the distribution.
+
 0.100	2017-12-22
 
  - Added: Use RDF::DOAP::Project method to find IRC channel.

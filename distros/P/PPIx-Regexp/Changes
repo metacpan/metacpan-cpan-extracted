@@ -1,3 +1,24 @@
+0.056		2018-03-07	T. R. Wyant
+    Support removal of unescaped literal left curlys after left parens,
+    which was deprecated in 5.27.8. No actual change in output yet,
+    since deprecation is not tracked, but the perl_version_removed()
+    logic is there.
+
+
+    Add next_element() and kin. These are analogous to next_sibling()
+    and kin, but will cross over from content proper into structure
+    (beginning and end delimiters, etc) and vice versa.
+
+    Correct requirements_for_perl() for impossible regular expression.
+    It now returns '! $]' when the components of the regexp are valid, but
+    none are valid under any specific version of Perl. It used to think all
+    Perls were OK when this happened.
+
+    Add the alpha_assertions introduced in 5.27.9.
+
+    Handle 5.27.9's change from +script_run to *script_run, and support
+    *sr as a synonym.
+
 0.055		2018-02-08	T. R. Wyant
     Tokenizer method prior() is now fatal. This was documented as
     package-private, but as it WAS documented, I am putting it through a

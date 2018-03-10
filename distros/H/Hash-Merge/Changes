@@ -1,5 +1,11 @@
 Revision history for Perl extension Hash::Merge.
 
+0.300	2018-03-09
+    - fix old EU::MM support (RT#123915)
+    - rename specify_behavior and improve SYNOPSIS (RT#123785)
+    - improve CI tests
+    - update resources information for META.json
+
 0.299       2017-11-20
     - Fixed behavior change if Hash contains blessed hashes (Thanks to
       David E. Wheeler)

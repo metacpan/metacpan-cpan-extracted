@@ -22,4 +22,4 @@ requires:
   URI: '0'
 resources:
   repository: https://github.com/noxxi/p5-mail-spf-iterator
-version: '1.113'
+version: '1.114'

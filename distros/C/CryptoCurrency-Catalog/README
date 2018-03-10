@@ -2,23 +2,23 @@ NAME
     CryptoCurrency::Catalog - Catalog of cryptocurrencies
 
 VERSION
-    This document describes version 20180301 of CryptoCurrency::Catalog
-    (from Perl distribution CryptoCurrency-Catalog), released on 2018-03-01.
+    This document describes version 20180308.1.0 of CryptoCurrency::Catalog
+    (from Perl distribution CryptoCurrency-Catalog), released on 2018-03-08.
 
 SYNOPSIS
      use CryptoCurrency::Catalog;
 
      my $cat = CryptoCurrency::Catalog->new;
 
-     my $record = $cat->by_symbol("ETH");        # => { symbol => "ETH", name=>"Ethereum", safename=>"ethereum" }
-     my $record = $cat->by_ticker("eth");        # alias for by_symbol(), lowercase also works
+     my $record = $cat->by_code("ETH");          # => { code=>"ETH", name=>"Ethereum", safename=>"ethereum" }
+     my $record = $cat->by_ticker("eth");        # alias for by_code(), lowercase also works
      my $record = $cat->by_name("Ethereum");     # note: case-sensitive
      my $record = $cat->by_safename("ethereum");
      my $record = $cat->by_slug("Ethereum");     # alias for by_safename(), mixed case also works
 
-     my @symbols = $cat->all_symbols(); # => ("BTC", "ETH", ...)
+     my @codes = $cat->all_codes(); # => ("BTC", "ETH", ...)
 
-     my @data = $cat->all_data; # => ({symbol=>"BTC", name=>"Bitcoin", safename=>"bitcoin"}, {...}, ...)
+     my @data = $cat->all_data; # => ({code=>"BTC", name=>"Bitcoin", safename=>"bitcoin"}, {...}, ...)
 
 DESCRIPTION
     This class attempts to provide a list/catalog of cryptocurrencies. The
@@ -26,27 +26,27 @@ DESCRIPTION
     Capitalizations website (<https://coinmarketcap.com/>, or CMC for
     short).
 
-    CMC does not provide unique symbols nor unique names, only unique
+    CMC does not provide unique codes nor unique names, only unique
     "safenames" (slugs). Whenever there is a clash, this catalog modifies
-    the clashing symbol and/or unique name to make symbol and name to be
-    unique again (usually the coin/token with the smaller market cap "loses"
-    the name).
+    the clashing code and/or unique name to make code and name to be unique
+    again (usually the coin/token with the smaller market cap "loses" the
+    name).
 
-    There is no guarantee that the symbol/name/safename of old/unlisted
-    coins or tokens will not be reused.
+    There is no guarantee that the code/name/safename of old/unlisted coins
+    or tokens will not be reused.
 
 METHODS
   new
-  by_symbol
+  by_code
   by_ticker
-    Alias for "by_symbol".
+    Alias for "by_code".
 
   by_name
   by_safename
   by_slug
     Alias for "by_safename".
 
-  all_symbols
+  all_codes
   all_data
 HOMEPAGE
     Please visit the project's homepage at

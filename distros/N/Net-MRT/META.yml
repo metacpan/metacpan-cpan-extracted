@@ -1,22 +1,21 @@
----
-abstract: 'Perl extension for decoding RFC6396 Multi-Threaded Routing Toolkit'
+--- #YAML:1.0
+name:               Net-MRT
+version:            0.05
+abstract:           Perl extension for decoding RFC6396 Multi-Threaded Routing Toolkit
 author:
-  - 'MaxiM Basunov <maxim.basunov@gmail.com>'
-build_requires:
-  ExtUtils::MakeMaker: 0
-  Test::Deep: 0
+    - MaxiM Basunov <maxim.basunov@gmail.com>
+license:            perl
+distribution_type:  module
 configure_requires:
-  ExtUtils::MakeMaker: 0
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.112621'
-license: perl
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
-name: Net-MRT
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:  {}
 no_index:
-  directory:
-    - t
-    - inc
-requires: {}
-version: 0.04
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -5,8 +5,8 @@ use warnings;
 use Test::More 0.88;
 use Path::Tiny 0.018;
 
-use_ok 'Log::Dispatch';
-use_ok 'Log::Dispatch::FileRotate';
+use Log::Dispatch;
+use Log::Dispatch::FileRotate;
 
 my $tempdir = Path::Tiny->tempdir;
 

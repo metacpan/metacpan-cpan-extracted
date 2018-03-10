@@ -1,5 +1,5 @@
 package Lab::Moose::DataFolder;
-$Lab::Moose::DataFolder::VERSION = '3.621';
+$Lab::Moose::DataFolder::VERSION = '3.622';
 #ABSTRACT: Create a data directory with meta data
 
 use 5.010;
@@ -180,7 +180,7 @@ Lab::Moose::DataFolder - Create a data directory with meta data
 
 =head1 VERSION
 
-version 3.621
+version 3.622
 
 =head1 DESCRIPTION
 
@@ -191,7 +191,9 @@ L<Lab::Moose::DataFile> objects which live inside the DataFolder.
 
 =head2 new
 
- my $folder = Lab::Moose::DataFolder(path => 'foldername');
+ my $folder = Lab::Moose::DataFolder->new(path => 'foldername');
+ # or equivalently use Lab::Moose loader:
+ use Lab::Moose; my $folder = datafolder(path => 'foldername');
 
 The actual foldername will consist of the C<path> argument and a numeric
 suffix. Calling this function repeatedly will create the directories
@@ -227,6 +229,7 @@ This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2018       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

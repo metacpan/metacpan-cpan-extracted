@@ -2,7 +2,7 @@ package App::Glacier::Command::Sync;
 
 use strict;
 use warnings;
-use App::Glacier::Command;
+use App::Glacier::Core;
 use parent qw(App::Glacier::Command);
 use App::Glacier::DateTime;
 use App::Glacier::Timestamp;
@@ -23,7 +23,7 @@ I<VAULT>
 
 =head1 DESCRIPTION
 
-Retrieves inventory for I<VAULT> and incorporates date into the local
+Retrieves inventory for I<VAULT> and incorporates it into the local
 directory.  Use this command if the local directory went out of sync
 or was otherwise clobbered.
 
@@ -48,17 +48,22 @@ B<glacier>(1).
     
 =cut
 
-sub getopt {
-    my ($self, %opts) = @_;
-    return $self->SUPER::getopt('force|f' => \$self->{_options}{force},
-				'delete|d' => \$self->{_options}{delete},
-				%opts);
+sub new {
+    my ($class, $argref, %opts) = @_;
+    $class->SUPER::new(
+	$argref,
+	optmap => {
+	    'force|f' => 'force',
+	    'delete|d' => 'delete'
+	},
+	%opts);
 }
 
 sub run {
     my $self = shift;
-    $self->abend(EX_USAGE, "one argument expected") unless $#_ == 0;
-    unless ($self->sync(shift, %{$self->{_options}})) {
+    $self->abend(EX_USAGE, "one argument expected")
+	unless $self->command_line == 1;
+    unless ($self->sync(($self->command_line)[0], %{$self->{_options}})) {
 	exit(EX_TEMPFAIL);
     }
 }

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use App::Glacier::Command::ListVault;
 use parent qw(App::Glacier::Command::ListVault);
-use App::Glacier::Command;
+use App::Glacier::Core;
 use App::Glacier::HttpCatch;
 
 =head1 NAME
@@ -32,13 +32,14 @@ B<glacier>(1).
 
 sub run {
     my $self = shift;
-
-    $self->abend(EX_USAGE, "at least two arguments expected") unless @_ >= 2;
-    my $vault_name = shift;
+    my @argv = $self->command_line;
+    $self->abend(EX_USAGE, "at least two arguments expected")
+	unless @argv >= 2;
+    my $vault_name = shift @argv;
     my $dir = $self->directory($vault_name);
     my $error = 0;
     my $success = 0;
-    foreach my $ref (@{$self->get_vault_inventory($vault_name, @_)}) {
+    foreach my $ref (@{$self->get_vault_inventory($vault_name, @argv)}) {
 	$self->glacier_eval('delete_archive', $vault_name, $ref->{ArchiveId});
 	if ($self->lasterr) {
 	    $self->error(EX_FAILURE,

@@ -4,19 +4,19 @@
       "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.142690",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Web-Util-DBIC-Paging",
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
@@ -26,14 +26,14 @@
       },
       "runtime" : {
          "requires" : {
-            "Sub::Exporter::Progressive" : "0.001010"
+            "Sub::Exporter::Progressive" : "0.00101"
          }
       },
       "test" : {
          "requires" : {
-            "DBIx::Class" : "0.08250",
+            "DBIx::Class" : "0.0825",
             "SQL::Translator" : "0.11016",
-            "Test::Deep" : "0.110",
+            "Test::Deep" : "0.11",
             "Test::More" : "0.98",
             "parent" : "0"
          }
@@ -50,6 +50,7 @@
          "web" : "http://github.com/frioux/Web-Util-DBIC-Paging"
       }
    },
-   "version" : "0.001003"
+   "version" : "0.001004",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

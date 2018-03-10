@@ -1,14 +1,17 @@
 package DBIx::dbMan::Interface::cmdline;
 
 use strict;
+use utf8;
 use DBIx::dbMan::History;
 use Term::Size;
 use Term::ReadKey;
 use Term::ReadLine;
+use Term::ANSIColor;
 use POSIX qw/setlocale LC_ALL/;
+
 use base 'DBIx::dbMan::Interface';
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 1;
 
@@ -38,7 +41,15 @@ sub init {
 sub hello {
     my $obj = shift;
 
+    if ( $obj->{-config}->use_color ) {
+        $obj->print( color( 'bright_yellow' ) );
+    }
+
     $obj->SUPER::hello( @_ );
+
+    if ( $obj->{-config}->use_color ) {
+        $obj->print( color( 'reset' ) );
+    }
 
     $obj->print( "UTF-8 workaround enabled.\n" ) if $obj->is_utf8;
 }
@@ -139,8 +150,16 @@ sub is_utf8 {
 sub print {
     my $obj = shift;
 
-    if ( $obj->is_utf8 ) {
-        binmode *STDOUT, ':utf8';
+    return $obj->SUPER::print( join '', @_ );
+}
+
+sub error {
+	my $obj = shift;
+
+    if ( $obj->{-config}->use_color ) {
+    	$obj->print( color( 'bright_red' ) . "ERROR: " . join ( '',@_ ) . color( 'reset' ) . "\n" );
     }
-    return $obj->SUPER::print( @_ );
+    else {
+    	$obj->print("ERROR: ",join '',@_,"\n");
+    }
 }

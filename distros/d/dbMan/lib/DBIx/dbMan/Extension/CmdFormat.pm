@@ -3,11 +3,11 @@ package DBIx::dbMan::Extension::CmdFormat;
 use strict;
 use base 'DBIx::dbMan::Extension';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 1;
 
-sub IDENTIFICATION { return "000001-000062-000003"; }
+sub IDENTIFICATION { return "000001-000062-000005"; }
 
 sub preference { return 2000; }
 
@@ -35,8 +35,8 @@ sub handle_action {
 					$action{output} = "Single output format set to $want.\n";
 				} else {
 					$action{action} = 'OUTPUT';
-					$action{output} = "Unknown output format.\n".
-						"Registered formats: ".(join ',',sort @fmts)."\n";
+                    $obj->{-interface}->error('Unknown output format.');
+					$action{output} = "Registered formats: ".(join ',',sort @fmts)."\n";
 				}
 			} else {
 				$obj->{-mempool}->set('single_output_format','');
@@ -49,13 +49,13 @@ sub handle_action {
 			$want =~ s/^\s+//;
 			my @fmts = $obj->{-mempool}->get_register('output_format');
 			my %fmts = ();  for (@fmts) { ++$fmts{$_}; }
-                        if ($fmts{$want}) {
-                                $obj->{-mempool}->set('output_format',$want);
+            if ($fmts{$want}) {
+                $obj->{-mempool}->set('output_format',$want);
 				delete $action{processed};
-                        } else {
+            } else {
 				$action{action} = 'OUTPUT';
-				$action{output} = "Unknown output format.\n".
-					"Registered formats: ".(join ',',sort @fmts)."\n";
+                $obj->{-interface}->error( 'Unknown output format.' );
+				$action{output} = "Registered formats: ".(join ',',sort @fmts)."\n";
 			}
 		}
 	}

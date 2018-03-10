@@ -1,3 +1,17 @@
+0.0131  2018-03-09 08:59:43 CET
+  - use request_uri instead of script_name to determine own url
+
+0.013  2018-03-07 10:03:34 CET
+  - remove dependency Catmandu
+  - Plack::Auth::SSO::CAS : show application error instead of redirecting to cas_url.
+  - response parser for CAS should also handle default namespaces
+  - remove dependency Carp
+  - remove depency namespace::clean
+
+0.012  2018-03-06 13:47:46 CET
+  - Authen::CAS::Client has implicit dependency LWP::Protocol::https
+  - remove environment variables from source code
+
 0.011  2018-02-27 13:58:36 CET
   - Renamed to Plack::Auth::SSO
 

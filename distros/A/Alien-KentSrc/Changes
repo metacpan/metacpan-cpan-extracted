@@ -1,0 +1,15 @@
+Revision history for perl distribution Alien-KentSrc
+
+0.4 2018-03-08T21:51:12+1300
+ - change timing of setting machtype to avoid when users set ALIEN_INSTALL_TYPE
+ - minimum perl is 5.8.9
+
+0.3 2018-03-07T13:13:29+1300
+ - include jkweb.a as well
+
+0.2 2018-03-07T11:36:27+1300
+ - resolve a pthread link issue
+ - travis testing on linux and osx
+
+0.1 2018-03-06T16:46:21+1300
+ - Started project

@@ -1,0 +1,42 @@
+---
+abstract: 'Trello adapter for Bot::ChatBots'
+author:
+  - 'Flavio Poletti <polettix@cpan.org>'
+build_requires:
+  Path::Tiny: '0.096'
+  Test::More: '0.88'
+  Test::Trap: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bot-ChatBots-Trello
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Bot::ChatBots: '0.010'
+  IO::Socket::SSL: '2.038'
+  Log::Any: '1.042'
+  Mojolicious: '7.08'
+  Moo: '2.002005'
+  Ouch: '0.0409'
+  Try::Tiny: '0.27'
+  namespace::clean: '0.27'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/polettix/Bot-ChatBots-Trello/issues
+  homepage: https://github.com/polettix/Bot-ChatBots-Trello
+  repository: https://github.com/polettix/Bot-ChatBots-Trello.git
+version: '0.002'
+x_contributors:
+  - 'Flavio Poletti <flavio@polettix.it>'

@@ -1,0 +1,73 @@
+{
+   "abstract" : "Git functions for Dist::Inkt",
+   "author" : [
+      "Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::KJETILK version 0.100, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Inkt-Role-Git",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Inkt" : "0.001",
+            "Git::Sub" : "0",
+            "Moose" : "0",
+            "Types::Standard" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Inkt::Role::Git" : {
+         "file" : "lib/Dist/Inkt/Role/Git.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kjetilk/p5-dist-inkt-role-git/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Dist-Inkt-Role-Git",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kjetilk/p5-dist-inkt-role-git.git",
+         "web" : "https://github.com/kjetilk/p5-dist-inkt-role-git"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Dist-Inkt-Role-Git/project"
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_static_install" : 1
+}

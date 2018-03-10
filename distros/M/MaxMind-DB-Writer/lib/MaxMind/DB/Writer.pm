@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.013002;
 
-our $VERSION = '0.300000';
+our $VERSION = '0.300001';
 
 1;
 
@@ -22,7 +22,7 @@ MaxMind::DB::Writer - Create MaxMind DB database files
 
 =head1 VERSION
 
-version 0.300000
+version 0.300001
 
 =head1 SYNOPSIS
 
@@ -109,13 +109,17 @@ Mark Fowler <mfowler@maxmind.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Florian Ragwitz Jan Bieron tjmather William Storey
+=for stopwords Florian Ragwitz Ilya M Jan Bieron tjmather William Storey
 
 =over 4
 
 =item *
 
 Florian Ragwitz <rafl@debian.org>
+
+=item *
+
+Ilya M <ilya77@gmail.com>
 
 =item *
 
@@ -133,7 +137,7 @@ William Storey <wstorey@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by MaxMind, Inc.
+This software is copyright (c) 2018 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

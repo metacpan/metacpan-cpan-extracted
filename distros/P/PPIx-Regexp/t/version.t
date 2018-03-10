@@ -327,14 +327,38 @@ class	'PPIx::Regexp::Token::GroupType::Assertion', note => 'Assertion',
 token	'?=', note => 'Positive lookahead';
 method	perl_version_introduced	=> MINIMUM_PERL, note => '5.3.7 perlre';
 method	perl_version_removed	=> undef;
+token	'*pla:', note => 'Positive lookahead';
+method	perl_version_introduced	=> '5.027009', note => '5.27.9 perlre';
+method	perl_version_removed	=> undef;
+token	'*positive_lookahead:', note => 'Positive lookahead';
+method	perl_version_introduced	=> '5.027009', note => '5.27.9 perlre';
+method	perl_version_removed	=> undef;
 token	'?!', note => 'Negative lookahead';
 method	perl_version_introduced	=> MINIMUM_PERL, note => '5.3.7 perlre';
+method	perl_version_removed	=> undef;
+token	'*nla:', note => 'Negative lookahead';
+method	perl_version_introduced	=> '5.027009', note => '5.27.9 perlre';
+method	perl_version_removed	=> undef;
+token	'*negative_lookahead:', note => 'Negative lookahead';
+method	perl_version_introduced	=> '5.027009', note => '5.27.9 perlre';
 method	perl_version_removed	=> undef;
 token	'?<=', note => 'Positive lookbehind';
 method	perl_version_introduced	=> '5.005', note => 'perl5005delta';
 method	perl_version_removed	=> undef;
+token	'*plb:', note => 'Positive lookbehind';
+method	perl_version_introduced	=> '5.027009', note => '5.27.9 perlre';
+method	perl_version_removed	=> undef;
+token	'*positive_lookbehind:', note => 'Positive lookbehind';
+method	perl_version_introduced	=> '5.027009', note => '5.27.9 perlre';
+method	perl_version_removed	=> undef;
 token	'?<!', note => 'Negative lookbehind';
 method	perl_version_introduced	=> '5.005', note => 'perl5005delta';
+method	perl_version_removed	=> undef;
+token	'*nlb:', note => 'Negative lookbehind';
+method	perl_version_introduced	=> '5.027009', note => '5.27.9 perlre';
+method	perl_version_removed	=> undef;
+token	'*negative_lookbehind:', note => 'Negative lookbehind';
+method	perl_version_introduced	=> '5.027009', note => '5.27.9 perlre';
 method	perl_version_removed	=> undef;
 
 class	'PPIx::Regexp::Token::GroupType::BranchReset',
@@ -738,6 +762,21 @@ class	'PPIx::Regexp::Token::GroupType::Script_Run',
 note	=> 'All characters must be in same script';
 token	'+script_run:';
 method	perl_version_introduced	=> '5.027008', note => 'perl5278delta';
+method	perl_version_removed	=> '5.027009';
+token	'*script_run:';
+method	perl_version_introduced	=> '5.027009', note => 'perl5279delta';
+method	perl_version_removed	=> undef;
+token	'*sr:';
+method	perl_version_introduced	=> '5.027009', note => 'perl5279delta';
+method	perl_version_removed	=> undef;
+
+class	'PPIx::Regexp::Token::GroupType::Atomic_Script_Run',
+note	=> 'All characters must be in same script, atomic version';
+token	'*atomic_script_run:';
+method	perl_version_introduced	=> '5.027009', note => 'perl5279delta';
+method	perl_version_removed	=> undef;
+token	'*asr:';
+method	perl_version_introduced	=> '5.027009', note => 'perl5279delta';
 method	perl_version_removed	=> undef;
 
 finis;

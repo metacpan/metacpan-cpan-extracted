@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy::API;
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 # ABSTRACT: An OpenAPI REST controller for the Yancy editor
 
 #pod =head1 DESCRIPTION
@@ -159,7 +159,7 @@ Yancy::Controller::Yancy::API - An OpenAPI REST controller for the Yancy editor
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 

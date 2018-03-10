@@ -1,0 +1,82 @@
+{
+   "abstract" : "a Dist::Inkt profile for KJETILK",
+   "author" : [
+      "Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::KJETILK version 0.101, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Inkt-Profile-KJETILK",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Inkt" : "0.024",
+            "Dist::Inkt::DOAP" : "0.110",
+            "Dist::Inkt::Role::Git" : "0",
+            "Dist::Inkt::Role::Release" : "0",
+            "Dist::Inkt::Role::Test::BumpedVersion" : "0",
+            "Dist::Inkt::Role::Test::Kwalitee" : "0",
+            "Dist::Inkt::Role::Test::SaneVersions" : "0",
+            "Dist::Inkt::Role::Test::TestSuite" : "0",
+            "Test::EOL" : "0",
+            "Test::Tabs" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Inkt::Profile::KJETILK" : {
+         "file" : "lib/Dist/Inkt/Profile/KJETILK.pm",
+         "version" : "0.101"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kjetilk/p5-dist-inkt-profile-tobyink/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Dist-Inkt-Profile-KJETILK",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kjetilk/p5-dist-inkt-profile-tobyink.git",
+         "web" : "https://github.com/kjetilk/p5-dist-inkt-profile-tobyink"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Dist-Inkt-Profile-KJETILK/project"
+   },
+   "version" : "0.101",
+   "x_contributors" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_static_install" : 1
+}

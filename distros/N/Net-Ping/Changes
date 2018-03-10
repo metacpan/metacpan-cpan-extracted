@@ -1,6 +1,30 @@
 CHANGES
 -------
 
+2.66  Thu Mar  8 16:44:03 CET 2018 (rurban)
+       Bugfixes
+       - Fixed icmpv6 ICMP_ECHOREPLY: nikolas@garofil.be RT 80479
+       - Fixed icmpv6 default family
+       - Simplify t/020_external.t
+       - Seperate timeout=0 and undef RT #97884
+       Features
+       - Added icmpv6 test.
+       - Added optional local tests hosts for the icmp tests:
+         TEST_PING_HOST and TEST_PING6_HOST
+       - allow sudo tests with local .git
+       - skip sudo test with asan leak detector on linux
+
+2.65  Wed Mar  7 09:38:51 CET 2018 (rurban)
+       META Changes
+       - strip wrong Text::Template dependency and generation for the README
+         https://rt.cpan.org/Public/Bug/Display.html?id=124693
+         This is in core.
+       - Changed repo name from net-ping to Net-Ping.
+       - Changed bugtracker to https://github.com/rurban/Net-Ping/issues
+       - Made Makefile.PL more stable for the CPAN release, support older
+         perl + EUMM versions.
+       - Fixed up TODO for IPv6
+
 2.64  Sat Mar  3 15:56:14 CET 2018 (rurban)
        Bugfixes
         - use NIx_NOSERV flag for windows (PR #6 by chorny)

@@ -9,11 +9,11 @@ use Test::More;
 plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Sah/Schema/cryptocurrency/symbol.pm',
-    'Sah/Schema/cryptocurrency/symbol_or_name.pm',
+    'Sah/Schema/cryptocurrency/code.pm',
+    'Sah/Schema/cryptocurrency/code_or_name.pm',
     'Sah/Schema/cryptoexchange/name.pm',
-    'Sah/SchemaR/cryptocurrency/symbol.pm',
-    'Sah/SchemaR/cryptocurrency/symbol_or_name.pm',
+    'Sah/SchemaR/cryptocurrency/code.pm',
+    'Sah/SchemaR/cryptocurrency/code_or_name.pm',
     'Sah/SchemaR/cryptoexchange/name.pm',
     'Sah/Schemas/CryptoCurrency.pm'
 );

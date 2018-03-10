@@ -6,11 +6,10 @@ WriteMakefile
     qw
     (
         NAME            Object::Trampoline
-        VERSION         1.50.2
+        VERSION         1.50.3
         ABSTRACT_FROM   ./lib/Object/Trampoline.pm
         LICENSE         perl
     ),
-
     AUTHOR      => 'Steven Lembark <lembark@wrkhors.com>',
     PREREQ_PM   =>
     {
@@ -19,11 +18,15 @@ WriteMakefile
         qw
         (
             Carp                0
-            Object::Trampoline  0
             Scalar::Util        0
             Symbol              0
-            Test::More          0
         )
     },
-
+    TEST_REQUIRES =>
+    {
+        qw
+        (
+            Test::More          0
+        )
+    }
 );

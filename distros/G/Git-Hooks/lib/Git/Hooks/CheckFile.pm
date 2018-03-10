@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckFile;
 # ABSTRACT: Git::Hooks plugin for checking files
-$Git::Hooks::CheckFile::VERSION = '2.6.3';
+$Git::Hooks::CheckFile::VERSION = '2.7.0';
 use 5.010;
 use utf8;
 use strict;
@@ -81,7 +81,7 @@ sub check_command {
         # $file to avoid confounding the user.
         $output =~ s/\Q$tmpfile\E/$file/g;
 
-        $git->fault($message, {details => $output});
+        $git->fault($message, {commit => $commit, details => $output});
         return;
     } else {
         # FIXME: What should we do with eventual output from a
@@ -125,6 +125,19 @@ sub check_new_files {
         unshift @{$re_checks{basename}{sizelimit}}, [qr/$regexp/, $bytes];
     }
 
+    # Grok the list of patterns to check for executable permissions
+    my %executable_checks;
+    foreach my $check (qw/executable not-executable/) {
+        foreach my $pattern ($git->get_config($CFG => $check)) {
+            if ($pattern =~ m/^qr(.)(.*)\g{1}/) {
+                $pattern = qr/$2/;
+            } else {
+                $pattern = glob_to_regex($pattern);
+            }
+            push @{$executable_checks{$check}}, $pattern;
+        }
+    }
+
     # Now we iterate through every new file and apply to them the matching
     # commands.
     my $errors = 0;
@@ -135,10 +148,9 @@ sub check_new_files {
 
         if (any  {$basename =~ $_} @{$re_checks{basename}{deny}} and
             none {$basename =~ $_} @{$re_checks{basename}{allow}}) {
-            $git->fault(<<"EOS");
+            $git->fault(<<EOS, {commit => $commit, option => 'basename.{allow,deny}'});
 The file '$file' basename is not allowed.
-Please, check the $CFG.basename.deny and
-$CFG.basename.allow options in your configuration.
+Please, check your configuration options.
 EOS
             ++$errors;
             next FILE;          # Don't botter checking the contents of invalid files
@@ -146,10 +158,9 @@ EOS
 
         if (any  {$file =~ $_} @{$re_checks{path}{deny}} and
             none {$file =~ $_} @{$re_checks{path}{allow}}) {
-            $git->fault(<<"EOS");
+            $git->fault(<<EOS, {commit => $commit, option => 'path.{allow,deny}'});
 The file '$file' path is not allowed.
-Please, check the $CFG.path.deny and
-$CFG.path.allow options in your configuration.
+Please, check your configuration options.
 EOS
             ++$errors;
             next FILE;          # Don't botter checking the contents of invalid files
@@ -166,12 +177,11 @@ EOS
         }
 
         if ($file_sizelimit && $file_sizelimit < $size) {
-            $git->fault(<<"EOS");
+            $git->fault(<<EOS, {commit => $commit, option => '[basename.]sizelimit'});
 The file '$file' is too big.
 
 It has $size bytes but the current limit is $file_sizelimit bytes.
-Please, check the $CFG.sizelimit and
-$CFG.basename.sizelimit options in your configuration.
+Please, check your configuration options.
 EOS
             ++$errors;
             next FILE;    # Don't botter checking the contents of huge files
@@ -181,9 +191,147 @@ EOS
             check_command($git, $commit, $file, $command)
                 or ++$errors;
         }
+
+        my $mode;
+
+        if (any {$basename =~ $_} @{$executable_checks{'executable'}}) {
+            $mode = $git->file_mode($commit, $file);
+            unless ($mode & 0b1) {
+                $git->fault(<<EOS, {commit => $commit, option => 'executable'});
+The file '$file' is not executable but should be.
+Please, check your configuration options.
+EOS
+                ++$errors;
+            }
+        }
+
+        if (any {$basename =~ $_} @{$executable_checks{'not-executable'}}) {
+            if (defined $mode) {
+                git->fault(<<EOS, {commit => $commit, option => '[not-]executable'});
+Configuration error: The file '$file' matches a 'executable' and a
+'not-executable' option simultaneously, which is inconsistent.
+Please, fix your configuration so that it matches only one of these options.
+EOS
+                ++$errors;
+            }
+            $mode = $git->file_mode($commit, $file);
+            if ($mode & 0b1) {
+                $git->fault(<<EOS, {commit => $commit, option => 'not-executable'});
+The file '$file' is executable but should not be.
+Please, check your configuration options.
+EOS
+                ++$errors;
+            }
+        }
     }
 
-    return $errors == 0;
+    return $errors;
+}
+
+sub deny_case_conflicts {
+    my ($git, $commit, $get_names_sub) = @_;
+
+    return 0 unless $git->get_config_boolean($CFG => 'deny-case-conflict');
+
+    # $get_names_sub is a reference to a function which returns the list of
+    # names of files added in $commit. We get a sub-ref instead of the actual
+    # list to avoid calling a git command before making sure above that we
+    # really need to check this. (NOTE: This may be premature optimization,
+    # which is the root of all evil, but I'm leaving it in for now.)
+    my @names = $get_names_sub->();
+
+    return 0 unless @names;     # No new names to check
+
+    # Grok the list of all files in the repository at $commit
+    my @ls_files = split /\0/, $git->run(qw/ls-tree -r -z --name-only --full-tree/,
+                                         $commit eq ':0' ? 'HEAD' : $commit);
+
+    my $errors = 0;
+
+    # Check if the new files conflict with each other
+    for (my $i = 0; $i < $#names; ++$i) {
+        for (my $j = $i + 1; $j <= $#names; ++$j) {
+            if (lc($names[$i]) eq lc($names[$j]) && $names[$i] ne $names[$j]) {
+                ++$errors;
+                $git->fault(<<EOS, {commit => $commit, option => 'deny-case-conflict'});
+This commit adds two files with names that will conflict
+with each other in the repository in case-insensitive
+filesystems:
+
+  $names[$i]
+  $names[$j]
+
+Please, rename the added files to avoid the conflict and amend your commit.
+EOS
+            }
+        }
+    }
+
+    # Check if the new files conflict with already existing files
+    foreach my $file (@ls_files) {
+        my $lc_file = lc $file;
+        foreach my $name (@names) {
+            my $lc_name = lc $name;
+            if ($lc_name eq $lc_file && $name ne $file) {
+                ++$errors;
+                $git->fault(<<EOS, {commit => $commit, option => 'deny-case-conflict'});
+This commit adds a file with a name that will conflict
+with the name of another file already existing in the repository
+in case-insensitive filesystems:
+
+  ADDED:    $name
+  EXISTING: $file
+
+Please, rename the added file to avoid the conflict and amend your commit.
+EOS
+            }
+        }
+    }
+
+    return $errors;
+}
+
+sub deny_token {
+    my ($git, $new_commit, $old_commit) = @_;
+
+    my $regex = $git->get_config($CFG => 'deny-token')
+        or return 0;
+
+    if ($git->version_lt('1.7.4')) {
+        $git->fault(<<EOS, {option => 'deny-token'});
+This option requires Git 1.7.4 or later but your Git is older.
+Please, upgrade your Git or disable this option.
+EOS
+        return 1;
+    }
+
+    my @diff;
+
+    if (! defined $new_commit) {
+        die 'Internal error: $new_commit must be defined';
+    } elsif ($new_commit eq ':0') {
+        @diff = $git->run(qw/diff-index -p --diff-filter=AM --ignore-submodules/,
+                          "-G$regex", 'HEAD');
+    } elsif (! defined $old_commit) {
+        @diff = $git->run(qw/diff-tree -p --diff-filter=AM --ignore-submodules/,
+                          "-G$regex", $new_commit);
+    } else {
+        @diff = $git->run(qw/diff-tree -p --diff-filter=AM --ignore-submodules/,
+                          "-G$regex", $old_commit, $new_commit);
+    }
+
+    # Extract only the lines showing addition of the $regex
+    @diff = grep {/^+.*?(?:$regex)/} @diff;
+
+    if (@diff) {
+        $git->fault(<<EOS, {option => 'deny-token', details => join("\n", @diff)});
+Invalid tokens detected in added lines.
+This option rejects lines matching $regex.
+Please, amend these lines and try again.
+EOS
+    }
+
+    return scalar @diff;
 }
 
 # This routine can act both as an update or a pre-receive hook.
@@ -198,8 +346,9 @@ sub check_affected_refs {
 
     foreach my $ref ($git->get_affected_refs()) {
         my ($old_commit, $new_commit) = $git->get_affected_ref_range($ref);
-        check_new_files($git, $new_commit, $git->filter_files_in_range('AM', $old_commit, $new_commit))
-            or ++$errors;
+        $errors += check_new_files($git, $new_commit, $git->filter_files_in_range('AM', $old_commit, $new_commit));
+        $errors += deny_case_conflicts($git, $new_commit, sub { $git->filter_files_in_range('ACR', $old_commit, $new_commit) });
+        $errors += deny_token($git, $new_commit, $old_commit);
     }
 
     return $errors == 0;
@@ -210,7 +359,13 @@ sub check_commit {
 
     _setup_config($git);
 
-    return check_new_files($git, ':0', $git->filter_files_in_index('AM'));
+    my $errors = 0;
+
+    $errors += check_new_files($git, ':0', $git->filter_files_in_index('AM'));
+    $errors += deny_case_conflicts($git, ':0', sub { $git->filter_files_in_index('ACR') });
+    $errors += deny_token($git, ':0');
+
+    return $errors == 0;
 }
 
 sub check_patchset {
@@ -220,7 +375,13 @@ sub check_patchset {
 
     return 1 if $git->im_admin();
 
-    return check_new_files($git, $opts->{'--commit'}, $git->filter_files_in_commit('AM', $opts->{'--commit'}));
+    my $errors = 0;
+
+    $errors += check_new_files($git, $opts->{'--commit'}, $git->filter_files_in_commit('AM', $opts->{'--commit'}));
+    $errors += deny_case_conflicts($git, $opts->{'--commit'}, sub { $git->filter_files_in_commit('ACR', $opts->{'--commit'}) });
+    $errors += deny_token($git, $opts->{'--commit'});
+
+    return $errors == 0;
 }
 
 INIT: {
@@ -248,7 +409,7 @@ Git::Hooks::CheckFile - Git::Hooks plugin for checking files
 
 =head1 VERSION
 
-version 2.6.3
+version 2.7.0
 
 =head1 SYNOPSIS
 
@@ -273,6 +434,16 @@ may configure it in a Git configuration file like this:
     path.deny = ^.
     path.allow = ^[a-zA-Z0-1/_.-]$
 
+    deny-case-conflict = true
+
+    deny-token = \\b(FIXME|TODO)\\b
+
+    executable = *.sh
+    executable = *.csh
+    executable = *.ksh
+    executable = *.zsh
+    not-executable = qr/\\.(?:c|cc|java|pl|pm|txt)$/
+
 The first section enables the plugin and defines the users C<joe> and C<molly>
 as administrators, effectivelly exempting them from any restrictions the plugin
 may impose.
@@ -289,6 +460,22 @@ than 1MiB, preventing careless users to commit huge binary files.
 The C<path.deny> and C<path.allow> options conspire to only allow the addition
 of files which names comprised of only a small set of characters, avoiding names
 which may cause problems.
+
+The C<deny-case-conflict> option rejects commits which add files with names that
+would conflict with each other or with the names of other files already in the
+repository in case-insensitive filesystems, such as the ones on Windows.
+
+The C<deny-token> option rejects commits which introduces lines
+containing the strings C<FIXME> or C<TODO>, as they are often committed by
+mistake.
+
+The C<executable> option rejects commits adding or modifying scripts (filenames
+with extensions F<.sh>, F<.csh>, F<.ksh>, and F<.zsh>) B<without> the executable
+permission, which is a common source of errors.
+
+The C<not-executable> option rejects commits adding or modifying source files
+(filenames with extensions F<.c>, F<.cc>, F<.java>, F<.pl>, F<.pm>, and F<.txt>)
+B<with> the executable permission.
 
 =head1 DESCRIPTION
 
@@ -319,7 +506,7 @@ option:
 
     git config --add githooks.plugin CheckFile
 
-=for Pod::Coverage check_command check_new_files check_affected_refs check_commit check_patchset
+=for Pod::Coverage check_command check_new_files deny_case_conflicts deny_token check_affected_refs check_commit check_patchset
 
 =head1 NAME
 
@@ -455,6 +642,56 @@ This directive denies files which full paths match REGEXP.
 
 This directive allows files which full paths match REGEXP. It's useful in
 the same way that B<githooks.checkfile.basename.deny> is.
+
+=head2 githooks.checkfile.deny-case-conflict BOOL
+
+This directive checks for newly added files that would conflict in
+case-insensitive filesystems.
+
+Git itself is case-sensitive with regards to file names. Many operating system's
+filesystems are case-sensitive too, such as Linux, macOS, and other Unix-derived
+systems. But Windows's filesystems are notoriously case-insensitive. So, if you
+want your repository to be absolutely safe for Windows users you don't want to
+add two files which filenames differ only in a case-sensitive manner. Enable
+this option to be safe
+
+Note that this check have to check the newly added files against all files
+already in the repository. It can be a little slow for large repositories. Take
+heed!
+
+=head2 githooks.checkfile.deny-token REGEXP
+
+This directive rejects commits or pushes which diff (patch) matches REGEXP. This
+is a multi-valued directive, i.e., you can specify it multiple times to check
+several REGEXes.
+
+It is useful to detect marks left by developers in the code while developing,
+such as FIXME or TODO. These marks are usually a reminder to fix things before
+commit, but as it so often happens, they end up being forgotten.
+
+Note that this option requires Git 1.7.4 or newer.
+
+=head2 githooks.checkfile.executable PATTERN
+
+This directive requires that all added or modified files with names matching
+PATTERN must have the executable permission. This allows you to detect common
+errors such as forgetting to set scripts as executable.
+
+PATTERN is specified as described in the C<githooks.checkfile.name> directive
+above.
+
+You can specify this option multiple times so that all PATTERNs are considered.
+
+=head2 githooks.checkfile.non-executable PATTERN
+
+This directive requires that all added or modified files with names matching
+PATTERN must B<not> have the executable permission. This allows you to detect
+common errors such as setting source code as executable.
+
+PATTERN is specified as described in the C<githooks.checkfile.name> directive
+above.
+
+You can specify this option multiple times so that all PATTERNs are considered.
 
 =head1 AUTHOR
 

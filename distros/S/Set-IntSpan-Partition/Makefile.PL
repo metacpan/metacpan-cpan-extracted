@@ -7,9 +7,10 @@ WriteMakefile(
   PREREQ_PM         => {
     'Test::More'         =>  0,
     'Set::IntSpan'       =>  0,
-    'Heap::MinMax'       =>  0,
     'List::Util'         =>  0,
     'List::MoreUtils'    =>  0,
+    'List::UtilsBy'      =>  0,
+    'List::StackBy'      =>  0,
   },
   ABSTRACT_FROM     => 'lib/Set/IntSpan/Partition.pm',
   AUTHOR            => 'Bjoern Hoehrmann <bjoern@hoehrmann.de>',

@@ -1,0 +1,12 @@
+% my $name = $Name || $NamePrefix . $CustomField->Id . '-Value';
+<input type="checkbox" name="<%$name%>" id="<%$name%>" \
+class="CF-<%$CustomField->id%>-Edit" value="1"<%$checked%> />
+<%INIT>
+my $checked = $Default ? ' checked' : '';
+</%INIT>
+<%ARGS>
+$CustomField => undef
+$NamePrefix => undef
+$Name => undef
+$Default => undef
+</%ARGS>

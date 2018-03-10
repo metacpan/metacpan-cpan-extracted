@@ -5,10 +5,10 @@ use warnings;
 use Test::More 0.88;
 use Path::Tiny 0.018;
 
-plan tests => 7;
+plan tests => 5;
 
-use_ok 'Log::Dispatch';
-use_ok 'Log::Dispatch::FileRotate';
+use Log::Dispatch;
+use Log::Dispatch::FileRotate;
 
 my $tempdir = Path::Tiny->tempdir;
 

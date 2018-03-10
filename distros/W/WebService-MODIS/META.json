@@ -4,7 +4,7 @@
       "Joerg Steinkamp <joergsteinkamp@yahoo.de>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -37,13 +37,16 @@
             "File::Basename" : "0",
             "File::HomeDir" : "0",
             "File::Path" : "0",
+            "HTTP::Cookies" : "0",
             "LWP::Online" : "0",
             "LWP::UserAgent" : "0",
-            "List::Util" : "1.33"
+            "List::Util" : "1.33",
+            "Net::Netrc" : "0",
+            "URI" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.6",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "2.0",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -59,7 +59,8 @@ my $resp = webhook_post(
         user              => { name => 'Test User' },
         project           => { name => 'test-repo', },
         object_attributes => {
-            id            => 42,
+            id            => 4242,
+            iid           => 42,
             target_branch => "nevermore",
             action        => 'open',
             url           => 'http://git/merge_requests/42',
@@ -73,8 +74,8 @@ TestBot->expect(
     join( ' ',
         '#test Test User',
         'nevermore test-repo',
-        '42',
-        '* open of merge request #42',
+        '!42',
+        '* open of merge request !42',
         '* http://git/merge_requests/42',
     )
 );

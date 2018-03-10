@@ -1,5 +1,5 @@
 package Git::Raw::Blame;
-$Git::Raw::Blame::VERSION = '0.75';
+$Git::Raw::Blame::VERSION = '0.78';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Blame - Git blame class
 
 =head1 VERSION
 
-version 0.75
+version 0.78
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -T
+#!/usr/bin/perl
 #
 # Copyright (C) 2018, Steven Bakker.
 #
@@ -29,6 +29,7 @@ use Test::Output;
 use Test::Exception;
 use FindBin;
 use Term::CLI;
+use Term::CLI::L10N;
 
 # Untaint the PATH.
 $::ENV{PATH} = '/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin';
@@ -36,6 +37,8 @@ $::ENV{PATH} = '/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin';
 sub startup : Test(startup => 1) {
     my $self = shift;
     my @commands;
+
+    Term::CLI::L10N->set_language('en');
 
     push @commands,Term::CLI::Command->new(
         name => 'cp',
@@ -50,7 +53,7 @@ sub startup : Test(startup => 1) {
     push @commands,Term::CLI::Command->new(
         name => 'mv',
         summary => 'move files/directories',
-        description => 'Move I<path>1 to I<path>2.',
+        description => 'Move I<path1> to I<path2>.',
         arguments => [
             Term::CLI::Argument::Filename->new(name => 'path', occur => 2),
         ],
@@ -64,7 +67,11 @@ sub startup : Test(startup => 1) {
         ],
     );
 
-    push @commands,Term::CLI::Command::Help->new();
+    my $help = Term::CLI::Command::Help->new(
+        pager => [], # Prevent SIGPIPE by dumping to STDOUT directly.
+    );
+
+    push @commands, $help;
 
     my $cli = Term::CLI->new(
         prompt => 'test> ',
@@ -77,9 +84,36 @@ sub startup : Test(startup => 1) {
     $self->{commands} = [@commands];
 }
 
-sub check_help : Test(17) {
+
+sub check_pager : Test(3) {
     my $self = shift;
     my $cli = $self->{cli};
+
+    my $n = 0;
+    my $pager = "$FindBin::Bin/scripts/does_not_exist";
+    while (-e $pager) {
+        $pager = "$FindBin::Bin/scripts/does_not_exist_".$n++;
+    }
+
+    $cli->find_command('help')->pager([ $pager ]);
+    my %args = $cli->execute('help');
+    ok($args{status} < 0, '"help" with non-existent pager results in an error');
+    like($args{error}, qr/cannot run '.*':/,
+        'error on non-existent pager is set correctly');
+
+    $pager = "$FindBin::Bin/scripts/pager.pl";
+    $cli->find_command('help')->pager([ 'perl', $pager, '-x' ]);
+
+    %args = $cli->execute('help');
+    ok($args{status} > 0, 'pager exit status propagates to status');
+}
+
+
+sub check_help : Test(13) {
+    my $self = shift;
+    my $cli = $self->{cli};
+
+    $cli->find_command('help')->pager( [] );
 
     stdout_like(
         sub { $cli->execute('help') },
@@ -118,7 +152,7 @@ sub check_help : Test(17) {
 
     stdout_like(
         sub { $cli->execute('help --pod mv') },
-        qr/=head2 Usage:.*B<mv> I<path>1 I<path>2/sm,
+        qr/=head2 Usage:.*B<mv> I<path1> I<path2>/sm,
         "'help --pod mv' returns POD command summary'",
     );
 
@@ -133,22 +167,6 @@ sub check_help : Test(17) {
     %args = $cli->execute('help --bad foo');
     ok($args{status} < 0, '"help --bad foo" results in an error');
     like($args{error}, qr/Unknown option: bad/, 'error is set correctly');
-
-    $cli->find_command('help')->pager([ '/does/not/exist' ]);
-    %args = $cli->execute('help');
-    ok($args{status} < 0, '"help" with non-existent pager results in an error');
-    like($args{error}, qr/cannot run '.*': No such file or directory/,
-        'error on non-existent pager is set correctly');
-
-    $cli->find_command('help')->pager([ 'cat', '-x' ]);
-
-    stderr_like(
-        sub { %args = $cli->execute('help') },
-        qr/cat: invalid option/,
-        '"help" with bad pager args results in an error',
-    );
-
-    ok($args{status} > 0, '"help" with bad pager args results in an error');
 
 }
 

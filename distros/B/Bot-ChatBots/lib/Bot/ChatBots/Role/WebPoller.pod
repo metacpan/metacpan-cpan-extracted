@@ -1,0 +1,106 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Bot::ChatBots::Role::WebPoller - Bot::ChatBots Role for Web Pollers
+
+=head1 SYNOPSIS
+
+   package Something;
+   use Moo;
+   with 'Bot::ChatBots::Role::WebPoller';
+
+   sub parse_response {
+      my ($self, $data) = @_;
+      ...
+   }
+
+   sub normalize_record {
+      my ($self, $record) = @_;
+      ...
+   }
+   1;
+
+   # later that night...
+   my $something = Something->new(
+      interval => 30, # polling interval, from Poller
+      ua => Mojo::UserAgent->new, # optional, with your options
+      tx_args => [qw< get http://example.com/whatever >],
+      processor => \&process_record,
+   );
+   Mojo::IOLoop->start;
+
+=head1 DESCRIPTION
+
+This is a poller role for bots, polling from URLs. This role is actually
+a derivation of L<Bot::ChatBots::Role::Poller>, adding a L</poll> method
+that implements what needed for fetching data via HTTP/HTTPS
+asynchronously.
+
+You MUST provide C<tx_args> upon construction, pointing to an array
+reference containing all parameters for fetching data. The contents of the
+array is a list compatible with L<Mojo::UserAgent/build_tx>.
+
+You can optionally configure a specific L<Mojo::UserAgent> as the C<ua>
+parameter, e.g. if you want to set specific parameters like a timeout.
+
+=head2 What Should You Provide/Override
+
+Whatever needed by L<Bot::ChatBots::Role::Poller>, except for L</poll>
+that is provided.
+
+=head1 METHODS
+
+It should be safe to override the following methods in your classes
+composing this role.
+
+=head2 B<< poll >>
+
+   $obj->poll($callback, $args);
+
+Fetches new data using the user agent L</ua> and fetching data with the
+request contained in L</tx_args>.
+
+=head2 B<< tx_args >>
+
+   my $array_ref = $obj->tx_args;
+
+Get an array ref with the "instructions" for fetching new data. Refer to
+L<Mojo::UserAgent/build_tx>, because it is used like this:
+
+   my $tx = $ua->build_tx(@$array_ref);
+
+=head2 B<< ua >>
+
+   my $ua = $obj->ua;
+
+Get the user agent object.
+
+
+=head1 REQUIRED METHODS
+
+See L<Bot::ChatBots::Role::Poller> and L<Bot::ChatBots::Role::Source>.
+
+=head1 SEE ALSO
+
+L<Bot::ChatBots>, L<Bot::ChatBots::Role::Poller>,
+L<Bot::ChatBots::Role::Source>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2018 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

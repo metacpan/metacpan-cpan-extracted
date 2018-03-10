@@ -32,9 +32,10 @@
       },
       "runtime" : {
          "requires" : {
-            "Heap::MinMax" : "0",
             "List::MoreUtils" : "0",
+            "List::StackBy" : "0",
             "List::Util" : "0",
+            "List::UtilsBy" : "0",
             "Set::IntSpan" : "0",
             "Test::More" : "0",
             "perl" : "5.008"
@@ -49,6 +50,6 @@
          "web" : "https://github.com/hoehrmann/Set-IntSpan-Partition"
       }
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -1,0 +1,8 @@
+Revision history for AnyEvent-SOCKS-Client
+
+TODO:
+* SOCKS4 support
+
+0.01    08.03.2018
+        First version, released on an unsuspecting world.
+

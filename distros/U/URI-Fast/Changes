@@ -1,3 +1,25 @@
+0.09 2018-03-08
+-constructor is more efficient
+-set_param does less copying, uses less memory
+-Bugfix: set_param incorrctly placed (or did not place) ampersands in some edge cases
+-Kwalitee fixes
+-Fix missing entries in v0.08's change log (oops)
+
+0.08 2018-03-07
+-Fix test dependency version causing cpan tester failures
+-Adopted URI::Encode::XS's encoding/decoding strategy
+-Reduced heap usage
+
+0.07 2018-03-06
+-UTF-8 support
+-New methods: query_keys, query_hash, encode, decode
+-Many methods rewritten in C/XS to make up for the added cost of UTF-8 support
+-Switch tests from using Test2::Bundle::Extended to Test2::V0
+-Bugfix: fix some missing test dependencies on restricted smoker setups
+-Bugfix: some unit tests were using the uri being tested as the test name,
+ triggering errors when the uri included a fragment (hash and newlines are
+ invalid in test names)
+
 0.06 2018-02-27
 -New ultra-fast parser and struct-based object written in C
 

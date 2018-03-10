@@ -1,5 +1,5 @@
 package Lingua::EN::Opinion::Emotion;
-$Lingua::EN::Opinion::Emotion::VERSION = '0.06';
+$Lingua::EN::Opinion::Emotion::VERSION = '0.0601';
 our $AUTHORITY = 'cpan:GENE';
 
 use Moo;
@@ -14214,7 +14214,7 @@ Lingua::EN::Opinion::Emotion
 
 =head1 VERSION
 
-version 0.06
+version 0.0601
 
 =head1 DESCRIPTION
 

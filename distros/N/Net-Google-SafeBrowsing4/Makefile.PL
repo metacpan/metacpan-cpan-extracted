@@ -23,7 +23,7 @@ WriteMakefile(
 		Test::LWP::UserAgent	=> 0,
 		Text::Trim		=> 0,
 		Time::HiRes		=> 0,
-		URI			=> 0,
+		URI			=> 1.61,
 		List::BinarySearch	=> 0,
 	},
 	META_MERGE => {

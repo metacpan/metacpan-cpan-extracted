@@ -18,7 +18,7 @@ use Net::Google::SafeBrowsing4::URI;
 
 our @EXPORT = qw(DATABASE_RESET INTERNAL_ERROR SERVER_ERROR NO_UPDATE NO_DATA SUCCESSFUL);
 
-our $VERSION = '0.6';
+our $VERSION = '0.7';
 
 =head1 NAME
 
@@ -61,7 +61,7 @@ IMPORTANT: Google Safe Browsing v4 requires an API key from Google: https://deve
 
 =head1 CONSTANTS
 
-Several  constants are exported by this module:
+Several constants are exported by this module:
 
 =over 4
 
@@ -87,7 +87,7 @@ No data was sent back by Google to the client, probably because the database is 
 
 =item SUCCESSFUL
 
-The operation was successful.
+The update operation was successful.
 
 
 =back
@@ -95,12 +95,12 @@ The operation was successful.
 =cut
 
 use constant {
-	DATABASE_RESET					=> -6,
+	DATABASE_RESET					=> -6,  # local database too old
 	INTERNAL_ERROR					=> -3,	# internal/parsing error
-	SERVER_ERROR					=> -2,	# Server sent an error back
-	NO_UPDATE						=> -1,	# no update (too early)
-	NO_DATA							=>  0,	# no data sent
-	SUCCESSFUL						=>  1,	# data sent
+	SERVER_ERROR					=> -2,	# server sent an error back
+	NO_UPDATE					=> -1,	# no update (too early)
+	NO_DATA						=>  0,	# no data sent
+	SUCCESSFUL					=>  1,	# data sent
 };
 
 
@@ -112,7 +112,7 @@ use constant {
 Create a Net::Google::SafeBrowsing4 object
 
 	my $gsb = Net::Google::SafeBrowsing4->new(
-		key		=> "my key",
+		key	=> "my key",
 		storage	=> Net::Google::SafeBrowsing4::Storage::File->new(path => '.'),
 		lists	=> ["*/ANY_PLATFORM/URL"],
 	);
@@ -127,7 +127,7 @@ Safe Browsing base URL. https://safebrowsing.googleapis.com by default
 
 =item key
 
-Required. Your Google Safe browsing API key
+Required. Your Google Safe Browsing API key
 
 =item storage
 
@@ -162,6 +162,11 @@ Optional. Network timeout setting for L<LWP::UserAgent> (60 seconds by default)
 
 Optional. List of accepted compressions for HTTP response. Enabling all supported compressions reported by L<HTTP::Message> by default.
 
+
+=item max_hash_request 
+
+Optional. maximum number of full hashes to request. (500 by default)
+
 =back
 
 =cut
@@ -173,7 +178,7 @@ sub new {
 		base		=> 'https://safebrowsing.googleapis.com',
 		lists		=> [],
 		all_lists	=> [],
-		key			=> '',
+		key		=> '',
 		version		=> '4',
 		last_error	=> '',
 		perf		=> 0,
@@ -181,8 +186,10 @@ sub new {
 		storage		=> undef,
 
 		http_agent	=> LWP::UserAgent->new(),
-		http_timeout => 60,
+		http_timeout	=> 60,
 		http_compression => '' . HTTP::Message->decodable(),
+		
+		max_hash_request => 500,
 
 		%args,
 	};
@@ -220,13 +227,13 @@ sub new {
 
 =head2 update()
 
-Perform a database update.
+Performs a database update.
 
 	$gsb->update();
 
-Return the status of the update (see the list of constants above): INTERNAL_ERROR, SERVER_ERROR, NO_UPDATE, NO_DATA or SUCCESSFUL
+Returns the status of the update (see the list of constants above): INTERNAL_ERROR, SERVER_ERROR, NO_UPDATE, NO_DATA or SUCCESSFUL
 
-This function can handle multiple lists at the same time. If one of the list should not be updated, it will automatically skip it and update the other one. It is faster to update all lists at once rather than doing them one by one.
+This function can handle multiple lists at the same time. If one of the lists should not be updated, it will automatically skip it and update the other one. It is faster to update all lists at once rather than doing them one by one.
 
 
 Arguments
@@ -257,7 +264,6 @@ sub update {
 	my $time = $self->{storage}->next_update();
 	if ($time > time() && $force == 0) {
 		$self->{logger} && $self->{logger}->debug("Too early to update the local storage");
-
 		return NO_UPDATE;
 	}
 	else {
@@ -294,11 +300,10 @@ sub update {
 	my $json = decode_json($response->decoded_content(encoding => 'none'));
 	my @data = @{ $json->{listUpdateResponses} };
 	foreach my $list (@data) {
-		my $threat = $list->{threatType};			# MALWARE
+		my $threat = $list->{threatType};		# MALWARE
 		my $threatEntry = $list->{threatEntryType};	# URL
 		my $platform = $list->{platformType};		# ANY_PLATFORM
-
-		my $update = $list->{responseType};			# FULL_UPDATE
+		my $update = $list->{responseType};		# FULL_UPDATE
 
 		# save and check the update
 		my @hex = ();
@@ -321,22 +326,22 @@ sub update {
 
 			my @hashes = $self->{storage}->save(
 				list => {
-					threatType 			=> $threat,
+					threatType 		=> $threat,
 					threatEntryType		=> $threatEntry,
 					platformType		=> $platform
 				},
 				override	=> ($list->{responseType} eq "FULL_UPDATE") ? 1 : 0,
-				add			=> [@hex],
+				add		=> [@hex],
 				remove 		=> [@remove],
 				'state'		=> $list->{newClientState},
 			);
 
 			my $check = trim encode_base64 sha256(@hashes);
 			if ($check ne $list->{checksum}->{sha256}) {
-				$self->{logger} && $self->{logger}->error("$threat/$platform/$threatEntry update error: checksum do not match: ", $check, " / ", $list->{checksum}->{sha256});
+				$self->{logger} && $self->{logger}->error("$threat/$platform/$threatEntry update error: checksum does not match: ", $check, " / ", $list->{checksum}->{sha256});
 				$self->{storage}->reset(
 					list => {
-						threatType 			=> $list->{threatType},
+						threatType 		=> $list->{threatType},
 						threatEntryType		=> $list->{threatEntryType},
 						platformType		=> $list->{platformType}
 					}
@@ -364,12 +369,75 @@ sub update {
 	return $result;
 }
 
+
+=head2 get_lists()
+
+Gets all threat list names from Google Safe Browsing and save them.
+
+	my $lists = $gsb->get_lists();
+
+Returns an array reference of all the lists:
+
+	[
+		{
+			'threatEntryType' => 'URL',
+			'threatType' => 'MALWARE',
+			'platformType' => 'ANY_PLATFORM'
+		},
+		{
+			'threatEntryType' => 'URL',
+			'threatType' => 'MALWARE',
+			'platformType' => 'WINDOWS'
+		},
+		...
+	]
+
+	or C<undef> on error. This method updates C<$gsb->{last_error}> field.
+
+=cut
+
+sub get_lists {
+	my ($self) = @_;
+
+	$self->{last_error} = '';
+	my $response = $self->{http_agent}->get(
+		$self->{base} . "/threatLists?key=" . $self->{key},
+		"Content-Type" => "application/json"
+	);
+	$self->{logger} && $self->{logger}->trace('Request:' . $response->request->as_string());
+	$self->{logger} && $self->{logger}->trace('Response:' . $response->as_string());
+
+	if (!$response->is_success()) {
+		$self->{last_error} = "get_lists: " . $response->status_line();
+		return undef;
+	}
+
+	my $info;
+	eval {
+		$info = decode_json($response->decoded_content(encoding => 'none'));
+	};
+	if ($@ || ref($info) ne 'HASH') {
+		$self->{last_error} = "get_lists: Invalid Response: " . ($@ || "Data is an array and not an object");
+		return undef;
+	}
+
+	if (!exists($info->{threatLists})) {
+		$self->{last_error} = "get_lists: Invalid Response: Data missing the right key";
+		return undef;
+	}
+	
+	$self->{storage}->save_lists($info->{threatLists});
+
+	return $info->{threatLists};
+}
+
+
 =head2 lookup()
 
-Lookup URL(s) against the Google Safe Browsing database.
+Looks up URL(s) against the Google Safe Browsing database.
 
 
-Returns the list of hashes, along with the list and any metadata, that matches the URL(s):
+Returns the list of hashes along with the list and any metadata that matches the URL(s):
 
 	(
 		{
@@ -407,7 +475,9 @@ Required. URL to lookup.
 
 sub lookup {
 	my ($self, %args) = @_;
-	my $lists = $args{lists} || $self->{lists} || [];
+	my $list_expressions = $args{lists} || $self->{lists} || [];
+	# List expressions may contain wildcards which need to be expanded
+	my $list_names = $self->make_lists(lists => $list_expressions);
 
 	if (!$args{url}) {
 		return ();
@@ -419,92 +489,100 @@ sub lookup {
 		$self->{logger} && $self->{logger}->error('Lookup() method accepts a single URI or list of URIs');
 		return ();
 	}
+	$self->{logger} && $self->{logger}->debug(sprintf("Requested to look up %d URIs", scalar(@{$args{url}})));
+
 
 	# Parse URI(s) and calculate hashes
-	my $start = time();
+	my $start;
+	$self->{perf} && ($start = time());
 	my $urls = {};
 	foreach my $url (@{$args{url}}) {
 		my $gsb_uri = Net::Google::SafeBrowsing4::URI->new($url);
 		if (!$gsb_uri) {
-			$self->{logger} && $self->{logger}->error('Failed to parse URI: '. $url);
+			$self->{logger} && $self->{logger}->error('Failed to parse URI: ' . $url);
 			next;
 		}
+		my $main_uri_hash = $gsb_uri->hash();
 
 		foreach my $sub_url ($gsb_uri->generate_lookupuris()) {
-			$urls->{ $sub_url->hash() } = $sub_url;
+			my $uri_hash = $sub_url->hash();
+			$urls->{$uri_hash} = $sub_url;
+			$urls->{$uri_hash}{hash} = $uri_hash;
+			$urls->{$uri_hash}{parent} = $main_uri_hash;
 		}
 	}
 	$self->{perf} && $self->{logger} && $self->{logger}->debug("Full hashes from URL(s): ", time() - $start,  "s ");
 
-	my $all_lists = $self->make_lists(lists => $lists);
-	my @matched_hashes = $self->lookup_suffix(lists => $all_lists, hashes => [keys(%$urls)]);
+	# Lookup hash prefixes in the local database
+	$self->{perf} && ($start = time());
+	my $lookup_hashes = { map { $_ => '' } keys(%$urls) };
+	$self->{logger} && $self->{logger}->debug(sprintf("Looking up prefixes for %d hashes in local db", scalar(keys(%$lookup_hashes))));
+	my @matched_prefixes = $self->{storage}->get_prefixes(hashes => [keys(%$lookup_hashes)], lists => $list_names);
+	if (scalar(@matched_prefixes) == 0) {
+		$self->{logger} && $self->{logger}->debug("No hit on local hash prefix lookup");
+		return ();
+	}
+	$self->{logger} && $self->{logger}->debug(sprintf(
+		"%d hits by %d prefixes in local database",
+		scalar(@matched_prefixes),
+		scalar(keys(%{ { map { $_->{prefix} => 1 } @matched_prefixes } }) )
+	));
 
-	# map urls to hashes in the resultset
-	foreach my $entry (@matched_hashes) {
+	# Mark hashes that were found in prefix db, drop others
+	map { $lookup_hashes->{$_->{hash}} = $_->{prefix} } @matched_prefixes;
+	map { delete($lookup_hashes->{$_}) if ($lookup_hashes->{$_} eq '') } keys(%$lookup_hashes);
+	$self->{perf} && $self->{logger} && $self->{logger}->debug("Find hash prefixes in local db: ", time() - $start,  "s ");
+
+
+	# Lookup full hashes in the local database
+	$self->{perf} && ($start = time());
+	$self->{logger} && $self->{logger}->debug(sprintf("Looking up %d full hashes in local db", scalar(keys(%$lookup_hashes))));
+	my @results = ();
+	foreach my $lookup_hash (keys(%$lookup_hashes)) {
+		# @TODO get_full_hashes should be able to look up multiple hashes at once (it could be faster)
+		my @hash_matches = $self->{storage}->get_full_hashes(hash => $lookup_hash, lists => $list_names);
+		if (scalar(@hash_matches) > 0) {
+			push(@results, @hash_matches);
+
+			# Delete all URI hashes that are based of a URI that was found on GSB
+			my %found_hashes = map { $_->{hash} => 1 } @hash_matches;
+			foreach my $found_hash (keys(%found_hashes)) {
+				map {
+					delete($lookup_hashes->{$_}) if ($urls->{$_}{parent} eq $urls->{$found_hash}{parent})
+				} keys(%$lookup_hashes);
+			}
+		}
+	}
+	$self->{logger} && $self->{logger}->debug(sprintf("%d unknown full hashes remained after local lookup", scalar(keys(%$lookup_hashes))));
+	$self->{perf} && $self->{logger} && $self->{logger}->debug("Stored hashes lookup: ", time() - $start,  "s ");
+
+
+	# Download full hashes for the remaining prefixes if needed
+	$self->{perf} && ($start = time());
+	my %needed_prefixes = map { $_ => 1 } values(%$lookup_hashes);
+	if (scalar(keys(%needed_prefixes)) > 0) {
+		my @lookup_prefixes = grep { exists($needed_prefixes{$_->{prefix}}) } @matched_prefixes;
+		my @retrieved_hashes = $self->request_full_hash(prefixes => [@lookup_prefixes]);
+		$self->{perf} && $self->{logger} && $self->{logger}->debug("Full hash request: ", time() - $start,  "s ");
+
+		$start = time();
+		my @matches = grep { exists($lookup_hashes->{$_->{hash}}) } @retrieved_hashes;
+		push(@results, @matches) if (scalar(@matches) > 0);
+		$self->{perf} && $self->{logger} && $self->{logger}->debug("Full hash check: ", time() - $start,  "s ");
+
+		$start = time();
+		$self->{storage}->add_full_hashes(hashes => [@retrieved_hashes], timestamp => time());
+		$self->{perf} && $self->{logger} && $self->{logger}->debug("Save full hashes: ", time() - $start,  "s ");
+	}
+
+
+	# Map urls to hashes in the resultset
+	foreach my $entry (@results) {
 		$entry->{lookup_url} = $urls->{$entry->{hash}}->as_string();
+		$entry->{original_url} = $urls->{$urls->{$entry->{hash}}->{parent}}->as_string();
 	}
 
-	return @matched_hashes;
-}
-
-
-=head2 get_lists()
-
-Get all threat list names from Google Safe Browsing.
-
-	my $lists = $gsb->get_lists();
-
-Return an array reference of all the lists:
-
-	[
-		{
-			'threatEntryType' => 'URL',
-			'threatType' => 'MALWARE',
-			'platformType' => 'ANY_PLATFORM'
-		},
-		{
-			'threatEntryType' => 'URL',
-			'threatType' => 'MALWARE',
-			'platformType' => 'WINDOWS'
-		},
-		...
-	]
-
-	or C<undef> on error. This method updates C<$gsb->{last_Error}> field.
-
-=cut
-
-sub get_lists {
-	my ($self) = @_;
-
-	$self->{last_error} = '';
-	my $response = $self->{http_agent}->get(
-		$self->{base} . "/threatLists?key=" . $self->{key},
-		"Content-Type" => "application/json"
-	);
-	$self->{logger} && $self->{logger}->trace('Request:' . $response->request->as_string());
-	$self->{logger} && $self->{logger}->trace('Response:' . $response->as_string());
-
-	if (!$response->is_success()) {
-		$self->{last_error} = "get_lists: ". $response->status_line();
-		return undef;
-	}
-
-	my $info;
-	eval {
-		$info = decode_json($response->decoded_content(encoding => 'none'));
-	};
-	if ($@ || ref($info) ne 'HASH') {
-		$self->{last_error} = "get_lists: Invalid Response: ". ($@ || "Data is an array not an object");
-		return undef;
-	}
-
-	if (!exists($info->{threatLists})) {
-		$self->{last_error} = "get_lists: Invalid Response: Data missing the right key";
-		return undef;
-	}
-
-	return $info->{threatLists};
+	return @results;
 }
 
 =pod
@@ -513,76 +591,10 @@ sub get_lists {
 
 These functions are not intended to be used externally.
 
-=head2 lookup_suffix()
-
-Lookup uri hashes..
-
-=cut
-
-sub lookup_suffix {
-	my ($self, %args) = @_;
-	my $lists = $args{lists} || croak("Missing lists\n");
-	my $lookup_hashes = { map { $_=> 1 } @{$args{hashes}} };
-	my @results = ();
-
-	$self->{logger} && $self->{logger}->debug(sprintf"Looking up prefixes for %d hashes\n", scalar(keys(%$lookup_hashes)));
-	# Local lookup
-	my $start = time();
-	my @prefixes = $self->{storage}->get_prefixes(hashes => [keys(%$lookup_hashes)], lists => $lists);
-	$self->{perf} && $self->{logger} && $self->{logger}->debug("Local lookup: ", time() - $start,  "s ");
-	if (scalar(@prefixes) == 0) {
-		$self->{logger} && $self->{logger}->debug("No hit in local lookup");
-		return ();
-	}
-	$self->{logger} && $self->{logger}->debug("Found ", scalar(@prefixes), " prefix(s) in local database");
-
-	# TODO: filter full hashes with prefixes
-
-	# get stored full hashes
-	$start = time();
-	my $found = 0;
-	foreach my $lookup_hash (keys(%$lookup_hashes)) {
-		# @TODO get_full_hashes should be able to look up multiple hashes at once (it could be faster)
-		my @matches = $self->{storage}->get_full_hashes(hash => $lookup_hash, lists => $lists);
-		if (scalar(@matches) > 0) {
-			$found += scalar(@matches);
-			map { delete($lookup_hashes->{$_->{hash}}) } @matches;
-			push(@results, @matches);
-		}
-	}
-	$self->{logger} && $self->{logger}->debug("Full hashes found locally: " . $found);
-	$self->{perf} && $self->{logger} && $self->{logger}->debug("Stored hashes lookup: ", time() - $start,  "s ");
-
-	if (scalar(keys(%$lookup_hashes)) == 0) {
-		return @results;
-	}
-
-	$self->{logger} && $self->{logger}->debug(sprintf"Looking up %d hashes\n", scalar(keys(%$lookup_hashes)));
-	if ($found > 0) {
-		# Resemble prefix list. Hashes found locally don't need to be queried.
-		@prefixes = $self->{storage}->get_prefixes(hashes => [keys(%$lookup_hashes)], lists => $lists);
-	}
-
-	# ask for new hashes
-	$start = time();
-	my @retrieved_hashes = $self->request_full_hash(prefixes => [ @prefixes ]);
-	$self->{perf} && $self->{logger} && $self->{logger}->debug("Full hash request: ", time() - $start,  "s ");
-
-	$start = time();
-	my @matches = grep { exists($lookup_hashes->{$_->{hash}}) } @retrieved_hashes;
-	push(@results, @matches) if (scalar(@matches) > 0);
-	$self->{perf} && $self->{logger} && $self->{logger}->debug("Full hash check: ", time() - $start,  "s ");
-
-	$start = time();
-	$self->{storage}->add_full_hashes(hashes => [@retrieved_hashes], timestamp => time());
-	$self->{perf} && $self->{logger} && $self->{logger}->debug("Save full hashes: ", time() - $start,  "s ");
-
-	return @results;
-}
 
 =head2 make_lists()
 
-Transform a list from a string ("MALWARE/*/*") into a list object.
+Transforms a list from a string expression (eg.: "MALWARE/*/*") into a list object.
 
 =cut
 
@@ -592,9 +604,12 @@ sub make_lists {
 
 	if (scalar(@lists) == 0) {
 		if (scalar(@{ $self->{all_lists} }) == 0) {
-			$self->{all_lists} = $self->get_lists();
+			my $lists = $self->{storage}->get_lists();
+			if (scalar(@$lists) == 0) {
+				$lists = $self->get_lists();
+			}
+			$self->{all_lists} = $lists;
 		}
-
 		return $self->{all_lists};
 	}
 
@@ -602,7 +617,7 @@ sub make_lists {
 	foreach my $list (@lists) {
 		$list = uc(trim($list));
 		if ($list !~ /^[*_A-Z]+\/[*_A-Z]+\/[*_A-Z]+$/) {
-			$self->{logger} && $self->{logger}->error("List is invalid format: $list - It must be in the form MALWARE/WINDOWS/URL or MALWARE/*/*");
+			$self->{logger} && $self->{logger}->error("List expression is in invalid format: $list - It must be in the form of MALWARE/WINDOWS/URL or MALWARE/*/*");
 			next;
 		}
 		if ($list =~ /\*/) {
@@ -626,7 +641,7 @@ sub make_lists {
 			my ($threat, $platform, $threatEntry) = split(/\//, $list);
 
 			push(@all, {
-				threatType			=> $threat,
+				threatType		=> $threat,
 				platformType		=> $platform,
 				threatEntryType		=> $threatEntry,
 			});
@@ -661,13 +676,12 @@ sub update_error {
 		: 0;
 
 	$self->{storage}->update_error('time' => $time, 'wait' => $wait, errors => $errors);
-
 }
 
 
 =head2 make_lists_for_update()
 
-Format the list objects for update requests.
+Formats the list objects for update requests.
 
 =cut
 
@@ -687,7 +701,7 @@ sub make_lists_for_update {
 
 =head2 request_full_hash()
 
-Request full full hashes for specific prefixes from Google.
+Requests full full hashes for specific prefixes from Google.
 
 =cut
 
@@ -702,86 +716,91 @@ sub request_full_hash {
 		},
 	};
 
-	my @lists = ();
-	my %hashes = ();
-	my %threats = ();
-	my %platforms = ();
-	my %threatEntries = ();
-	foreach my $info (@prefixes) {
-		if (
-			!defined(first {
-				$_->{threatType} eq $info->{list}->{threatType} &&
-				$_->{platformType} eq $info->{list}->{platformType} &&
-				$_->{threatEntryType} eq $info->{list}->{threatEntryType}
-			} @lists)
-		) {
-			push(@lists, $info->{list});
+	
+	my @full_hashes = ();
+	while (scalar @prefixes > 0) {
+		my @send = splice(@prefixes, 0, $self->{max_hash_request});
+	
+		my @lists = ();
+		my %hashes = ();
+		my %threats = ();
+		my %platforms = ();
+		my %threatEntries = ();
+		foreach my $info (@send) {
+			if (
+				!defined(first {
+					$_->{threatType} eq $info->{list}->{threatType} &&
+					$_->{platformType} eq $info->{list}->{platformType} &&
+					$_->{threatEntryType} eq $info->{list}->{threatEntryType}
+				} @lists)
+			) {
+				push(@lists, $info->{list});
+			}
+
+			$hashes{ trim(encode_base64($info->{prefix})) } = 1;
+			$threats{ $info->{list}->{threatType} } = 1;
+			$platforms{ $info->{list}->{platformType} } = 1;
+			$threatEntries{ $info->{list}->{threatEntryType} } = 1;
 		}
 
-		$hashes{ trim(encode_base64($info->{prefix})) } = 1;
-		$threats{ $info->{list}->{threatType} } = 1;
-		$platforms{ $info->{list}->{platformType} } = 1;
-		$threatEntries{ $info->{list}->{threatEntryType} } = 1;
+		# Get state for each list
+		$info->{clientStates} = [];
+		foreach my $list (@lists) {
+			push(@{ $info->{clientStates} }, $self->{storage}->get_state(list => $list));
+		}
+
+		$info->{threatInfo} = {
+			threatTypes		=> [ keys(%threats) ],
+			platformTypes 		=> [ keys(%platforms) ],
+			threatEntryTypes 	=> [ keys(%threatEntries) ],
+			threatEntries		=> [ map { { hash => $_ } } keys(%hashes) ],
+		};
+
+		my $response = $self->{http_agent}->post(
+			$self->{base} . "/fullHashes:find?key=" . $self->{key},
+			"Content-Type" => "application/json",
+			Content => encode_json($info)
+		);
+
+		$self->{logger} && $self->{logger}->trace($response->request()->as_string());
+		$self->{logger} && $self->{logger}->trace($response->as_string());
+
+		if (! $response->is_success()) {
+			$self->{logger} && $self->{logger}->error("Full hash request failed");
+			$self->{last_error} = "Full hash request failed";
+
+			# TODO
+	#		foreach my $info (keys keys %hashes) {
+	#			my $prefix = $info->{prefix};
+	#
+	#			my $errors = $self->{storage}->get_full_hash_error(prefix => $prefix);
+	#			if (defined $errors && (
+	#				$errors->{errors} >=2 			# backoff mode
+	#				|| $errors->{errors} == 1 && (time() - $errors->{timestamp}) > 5 * 60)) { # 5 minutes
+	#					$self->{storage}->full_hash_error(prefix => $prefix, timestamp => time()); # more complicate than this, need to check time between 2 errors
+	#			}
+	#		}
+		}
+		else {
+			$self->{logger} && $self->{logger}->debug("Full hash request OK");
+			
+			push(@full_hashes, $self->parse_full_hashes($response->decoded_content(encoding => 'none')));
+
+			# TODO
+	#		foreach my $prefix (@$prefixes) {
+	#			my $prefix = $info->{prefix};
+	#
+	#			$self->{storage}->full_hash_ok(prefix => $prefix, timestamp => time());
+	#		}
+		}
 	}
 
-	# get state for each list
-	$info->{clientStates} = [];
-	foreach my $list (@lists) {
-		push(@{ $info->{clientStates} }, $self->{storage}->get_state(list => $list));
-
-	}
-
-	$info->{threatInfo} = {
-		threatTypes			=> [ keys(%threats) ],
-		platformTypes 		=> [ keys(%platforms) ],
-		threatEntryTypes 	=> [ keys(%threatEntries) ],
-		threatEntries		=> [ map { { hash => $_ } } keys(%hashes) ],
-	};
-
-	my $response = $self->{http_agent}->post(
-		$self->{base} . "/fullHashes:find?key=" . $self->{key},
-		"Content-Type" => "application/json",
-		Content => encode_json($info)
-	);
-
-	$self->{logger} && $self->{logger}->trace($response->request()->as_string());
-	$self->{logger} && $self->{logger}->trace($response->as_string());
-
-	if (! $response->is_success()) {
-		$self->{logger} && $self->{logger}->error("Full hash request failed");
-		$self->{last_error} = "Full hash request failed";
-
-		# TODO
-#		foreach my $info (keys keys %hashes) {
-#			my $prefix = $info->{prefix};
-#
-#			my $errors = $self->{storage}->get_full_hash_error(prefix => $prefix);
-#			if (defined $errors && (
-#				$errors->{errors} >=2 			# backoff mode
-#				|| $errors->{errors} == 1 && (time() - $errors->{timestamp}) > 5 * 60)) { # 5 minutes
-#					$self->{storage}->full_hash_error(prefix => $prefix, timestamp => time()); # more complicate than this, need to check time between 2 errors
-#			}
-#		}
-
-		return ();
-	}
-	else {
-		$self->{logger} && $self->{logger}->debug("Full hash request OK");
-
-		# TODO
-#		foreach my $prefix (@$prefixes) {
-#			my $prefix = $info->{prefix};
-#
-#			$self->{storage}->full_hash_ok(prefix => $prefix, timestamp => time());
-#		}
-	}
-
-	return $self->parse_full_hashes($response->decoded_content(encoding => 'none'));
+	return @full_hashes;
 }
 
 =head2 parse_full_hashes()
 
-Process the request for full hashes from Google.
+Processes the request for full hashes from Google.
 
 =cut
 
@@ -800,7 +819,7 @@ sub parse_full_hashes {
 	my @hashes = ();
 	foreach my $match (@{ $info->{matches} }) {
 		my $list = {
-			threatType			=> $match->{threatType},
+			threatType		=> $match->{threatType},
 			platformType		=> $match->{platformType},
 			threatEntryType		=> $match->{threatEntryType},
 		};
@@ -820,7 +839,7 @@ sub parse_full_hashes {
 	my $wait = $info->{minimumWaitDuration} || 0; # "300.000s",
 	$wait =~ s/[a-z]//i;
 
-	my $negativeWait = $info->{negativeCacheDuration} || 0; #"300.000s"
+	my $negativeWait = $info->{negativeCacheDuration} || 0; # "300.000s"
 	$negativeWait =~ s/[a-z]//i;
 
 	return @hashes;
@@ -840,7 +859,7 @@ To use a proxy or select the network interface to use, simply create and set up 
 	# $ua->local_address("192.168.0.14");
 
 	my $gsb = Net::Google::SafeBrowsing4->new(
-		key			=> "my-api-key",
+		key		=> "my-api-key",
 		storage		=> Net::Google::SafeBrowsing4::Storage::File->new(path => "."),
 		http_agent	=> $ua,
 	);
@@ -880,7 +899,7 @@ Julien Sobrier, E<lt>julien@sobrier.netE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Julien Sobrier
+Copyright (C) 2017 by Julien Sobrier
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

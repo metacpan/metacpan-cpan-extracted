@@ -28,6 +28,7 @@ use Test::More;
 use Test::Exception;
 use FindBin;
 use Term::CLI::Argument::Enum;
+use Term::CLI::L10N;
 
 my $ARG_NAME= 'test_enum';
 my @ENUM_VALUES = qw( one two three );
@@ -37,6 +38,9 @@ $::ENV{PATH} = '/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin';
 
 sub startup : Test(startup => 1) {
     my $self = shift;
+
+    Term::CLI::L10N->set_language('en');
+
     my $arg = Term::CLI::Argument::Enum->new(
         name => $ARG_NAME,
         value_list => [@ENUM_VALUES]

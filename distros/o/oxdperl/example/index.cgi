@@ -10,8 +10,11 @@
  * @Created On: 21-10-2016
  * Author: Inderpal Singh
  * Email: inderpal@ourdesignz.com
- * Company: ourdesignz Pvt Ltd.
- * Company Website: http://wwww.ourdesignz.com
+ * Updated On: 08/14/2017
+ * Author: Sobhan Panda
+ * Email: sobhan@centroxy.com
+ * Company: Gluu Inc.
+ * Company Website: https://www.gluu.org/
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 =cut
@@ -26,7 +29,7 @@ use lib './modules';
 use JSON::PP;
 use CGI::Carp qw(fatalsToBrowser); # show errors in browser
 use CGI::Session;
-#Load Oxd Perl Module
+#Load oxd Perl Module
 use OxdPerlModule;
 
 # Create the CGI object
@@ -42,11 +45,35 @@ my $opHost = $object->getOpHost();
 my $oxdHostPort = $object->getOxdHostPort();
 my $authorizationRedirectUrl = $object->getAuthorizationRedirectUrl();
 my $postLogoutRedirectUrl = $object->setPostLogoutRedirectUrl();
+my $clientFrontChannelLogoutUrl = $object->getClientFrontChannelLogoutUris();
 my $scope = $object->getScope();
 my $applicationType = $object->getApplicationType();
 my $responseType = $object->getResponseType();
 my $grantType = $object->getGrantTypes();
 my $acrValues = $object->getAcrValues();
+my $oxd_id = $object->getOxdId();
+my $client_id = $object->getClientId();
+my $client_secret = $object->getClientSecret();
+
+#my $oxd_id = "1a571029-ed79-491c-8c27-f2a0a1385e5c";
+#$session->param('oxd_id', $oxd_id);
+my $client_name = 'Centroxy_Gluu';
+
+###Test
+# my $oxd_id = "584d9d83-1429-4611-80f6-2ef6694ff796";
+$session->param('oxd_id', $oxd_id);
+# print "oxd_id:".$session->param('oxd_id')."\n";
+
+# my $client_id = "@!1736.179E.AA60.16B2!0001!8F7C.B9AB!0008!0C19.FD14.2D7E.206D";
+$session->param('client_id', $client_id);
+# print "Client_id:".$session->param('client_id')."\n";
+
+# my $client_secret = "f33bf456-a7d7-46d1-b941-fa891ab34915";
+$session->param('client_secret', $client_secret);
+# print "Client_secret:".$session->param('client_secret')."\n";
+
+$session->param('op_host', $opHost);
+###Test
 
 
 # Output the HTTP header
@@ -64,7 +91,7 @@ print_page_header();
 print_html_head_section();
 print_html_body_section_top();
 # Process form if submitted; otherwise display it
-if($cgi->param("submit")) {
+if($cgi->param("OpenIDLogin")) {
 	# Parameters are defined, therefore the form has been submitted
 	display_results($cgi);
 } else {
@@ -73,7 +100,7 @@ if($cgi->param("submit")) {
 }
 
 print_html_body_section_bottom();
-
+print_Jquery_Validations();
 
 
 #$object->setRequestOpHost( "Mohd." );
@@ -97,11 +124,39 @@ sub print_html_head_section {
     print "<!DOCTYPE html>\n";
     print '<html lang="en">'."\n";
     print '<head>'."\n";
-    print '<title>Oxd Perl Application</title>'."\n";
+    print '<title>oxd Perl Application</title>'."\n";
     print '<meta charset="utf-8">'."\n";
     print '<meta name="viewport" content="width=device-width, initial-scale=1">'."\n";
     print '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">'."\n";
+    print '<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>'."\n";
     print "</head>\n";
+}
+
+sub print_Jquery_Validations {
+	print '<script type="text/javascript">
+
+	    $(document).ready(function() {
+		jQuery("#formLogin").hide();
+		
+		$(".rbLoginType").change(function() {
+		    switch($(this).val()) {
+			case "openid" :
+			    var formLogin = jQuery("#formLogin");
+			    var openIDLogin = jQuery("#openIDLogin");
+			    formLogin.hide();
+			    openIDLogin.show();
+			    break;
+			case "loginform" :
+			    var formLogin = jQuery("#formLogin");
+			    var openIDLogin = jQuery("#openIDLogin");
+			    formLogin.show();
+			    openIDLogin.hide();
+			    break;
+		    }
+		});
+		});
+
+</script>'
 }
 
 
@@ -109,7 +164,7 @@ sub print_html_body_section_top {
     # Create HTML body and show values from 1 - $max ($ncols per row)
     print '<body>'."\n";
     print '<div class="container">'."\n";
-    print '<h1>Oxd Perl Application</h1>'."\n";
+    print '<div class="jumbotron"><h1>Gluu oxd Perl Application</h1></div>'."\n";
    
 }
 
@@ -143,17 +198,30 @@ sub print_html_form {
 		print '<p>'.$error_message.'</p>';
 	}
 	print '<form name="gluu-form" action="index.cgi" method="post" >
+			<br><br>
+			<div runat="server" id="formLogin" visible="false" class="jumbotron">
 				<div class="form-group">
-					<label for="email">Your Email</label>
-					<input type="email" class="form-control" id="email" name="your_mail" placeholder="Email" value="'.$your_mail.'" />
+					<label for="username">User Name</label>
+					<input type="text" class="form-control" id="username" name="username" placeholder="Enter UserName" />
 				</div>
 				<div class="form-group">
-					<label for="gluu_server_url">Your Gluu server url</label>
-					<input type="text" class="form-control" id="gluu_server_url" name="gluu_server_url" placeholder="Gluu server url" value="'.$gluu_server_url.'"  />
+					<label for="password">Password</label>
+					<input type="text" class="form-control" id="password" name="password" placeholder="Enter Password" />
 				</div>
-				<input type="hidden" name="submit" value="Submit">
-				<input type="submit" name="submit" value="Login" class="btn btn-success" >
-			</form>'."\n";
+				<input type="button" name="Login" value="Login" class="btn btn-info" >
+				
+			</div>
+			<div runat="server" id="openIDLogin">
+				<input type="submit" name="OpenIDLogin" value="Login by OpenID Provider" id="OpenIDLogin" class="btn btn-success" >
+				<br><br>
+			</div>
+				<input type="radio" name="loginMode" id="openid" value="openid" checked class="rbLoginType"> Login by OpenID Provider<br>
+				<input type="radio" name="loginMode" id="loginform" value="loginform" class="rbLoginType"> Show Login form
+				
+			</form><br/><br/><br/><br/><br/>
+			<a href="settings.cgi" class="btn btn-default">Settings</a>
+			<a href="uma.cgi" class="btn btn-default" target="_blank">UMA</a>
+			'."\n";
 	print '</div>'."\n";
     print '</div>'."\n";
 }
@@ -167,7 +235,7 @@ sub validate_form
     my $error_message = "";
 
     $error_message .= "Please enter your email<br/>" if ( !$your_mail );
-    $error_message .= "Please specify your gluu url<br/>" if ( !$gluu_server_url );
+    $error_message .= "Please specify your Gluu url<br/>" if ( !$gluu_server_url );
     
     if ( $error_message )
     {
@@ -184,85 +252,101 @@ sub validate_form
 
 # Displays the results of the form
 sub display_results {
-	if ( validate_form ( ) ){
-		my $email = $cgi->param('your_mail');
-		my $gluu_server_url = $cgi->param('gluu_server_url');
+	my $email = $cgi->param('your_mail');
+	my $gluu_server_url = $cgi->param('gluu_server_url');
         
         print '<div class="row">'."\n";
         print '<div class="col-md-8">'."\n";
-		print $cgi->h4("Your Email: $email");
-		print $cgi->h4("Your Gluu server url:  $gluu_server_url");
+		#print $cgi->h4("Your Email: $email");
+		#print $cgi->h4("Your Gluu server url:  $gluu_server_url");
 		print '</div>';
 		print '</div>';
 		# in main program
 		#my $worker = Employee->new("Fred Flintstone", 1234, 40);
 		oxd_authentication($email, $gluu_server_url);
-		
-	}
+	
 }
+
+sub dynamic_op_check {
+	my $json;
+	{
+	  local $/; #Enable 'slurp' mode
+	  open my $fh, "<", "oxd-settings.json";
+	  $json = <$fh>;
+	  close $fh;
+	}
+	my $data = decode_json($json);
+	my $op_reg_type = $data->{dynamic_registration};
+	close $fh;
+	
+	return $op_reg_type;
+}
+
 
 sub oxd_authentication{
 	
-	my ($emal, $gluu_server_url) = @_;
+	my ($email, $gluu_server_url) = @_;
    
 	use Data::Dumper;
 	my $oxd_id = $session->param('oxd_id');
 	
-	#print $oxd_id ;
 	if($session->param('oxd_id') eq ""){
-		my $register_site = new OxdRegister( );
 		
- 		$register_site->setRequestOpHost($gluu_server_url);
-		$register_site->setRequestAcrValues($acrValues);
-		$register_site->setRequestAuthorizationRedirectUri($authorizationRedirectUrl);
-		$register_site->setRequestPostLogoutRedirectUri($postLogoutRedirectUrl);
-		$register_site->setRequestContacts([$emal]);
-		$register_site->setRequestGrantTypes($grantType);
-		$register_site->setRequestResponseTypes($responseType);
-		$register_site->setRequestScope($scope);
-		$register_site->setRequestApplicationType($applicationType);
-		$register_site->request();
-
-		if($register_site->getResponseOxdId()){
-			# storing data in the session
-			$session->param('oxd_id', $register_site->getResponseOxdId());
-			# retrieving data
-			my $oxd_id = $session->param('oxd_id');
-			$session->save_param($cgi, ["oxd_id"]);
-			
+		print '<h5><span style="color:red;">First go to setting page and get oxd_id, client_id and client_secret</span></h5>';
+		print '<br/><br/><a href="settings.cgi" class="btn btn-default">Settings</a>';
+		exit 0;
 		
-			$update_site_registration = new UpdateRegistration();
-			
-			$update_site_registration->setRequestAcrValues($acrValues);
-			$update_site_registration->setRequestOxdId($oxd_id);
-			$update_site_registration->setRequestAuthorizationRedirectUri($authorizationRedirectUrl);
-			$update_site_registration->setRequestPostLogoutRedirectUri($postLogoutRedirectUrl);
-			$update_site_registration->setRequestContacts([$emal]);
-			$update_site_registration->setRequestGrantTypes($grantType);
-			$update_site_registration->setRequestResponseTypes($responseType);
-			$update_site_registration->setRequestScope($scope);
-			$update_site_registration->request();
-			
-			$session->param('oxd_id', $update_site_registration->getResponseOxdId());
-			
-			
-		}
 	}
-
+	
+	my $is_dynamic_op = dynamic_op_check($opHost);
+	
+	my $protection_access_token = '';
+	if($session->param('client_id') && $session->param('client_secret') && $is_dynamic_op eq true) {
+		$protection_access_token = getClientToken_authentication();
+	}
+	
+	## Custom parameters : 'key' => 'value'
+	%customParams = ('param1' => 'value1', 'param2' => 'value2');
 	
 	$get_authorization_url = new GetAuthorizationUrl( );
 	$get_authorization_url->setRequestOxdId($session->param('oxd_id'));
 	$get_authorization_url->setRequestScope($scope);
 	$get_authorization_url->setRequestAcrValues($acrValues);
+	$get_authorization_url->setRequestPrompt('login');
+	$get_authorization_url->setRequestCustomParams(\%customParams);
+	$get_authorization_url->setRequestProtectionAccessToken($protection_access_token);
 	$get_authorization_url->request();
     my $oxdurl = $get_authorization_url->getResponseAuthorizationUrl();
     
-    #print $get_authorization_url->getResponseAuthorizationUrl();
-	#print "<META HTTP-EQUIV=refresh CONTENT=\"$t;URL=$oxdurl\">";
+    #print "<META HTTP-EQUIV=refresh CONTENT=\"$t;URL=$oxdurl\">";
 	print '<meta http-equiv="refresh" content="0;URL='.$oxdurl.'" />    ';
 
 
 	#exit 0;
+}
+
+sub getClientToken_authentication {
+	my $oxd_id = $session->param('oxd_id');
+	my $op_host = $session->param('op_host');
+	my $client_id = $session->param('client_id');
+	my $client_secret = $session->param('client_secret');
+	
+	if($client_id && $client_secret){
+		
+		$get_client_token = new GetClientToken( );
+		$get_client_token->setRequestClientId($client_id);
+		$get_client_token->setRequestClientSecret($client_secret);
+		$get_client_token->setRequestOpHost($opHost);
+		$get_client_token->request();
+		
+		my $clientAccessToken = $get_client_token->getResponseAccessToken();
+		$session->param('clientAccessToken', $clientAccessToken);
+		
+		return $clientAccessToken;
+	}
+	else {
+		return null;
+	}
 }
 
 sub server_side_ajax {

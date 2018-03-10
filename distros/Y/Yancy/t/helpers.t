@@ -78,6 +78,8 @@ my ( $backend_url, $backend, %items ) = init_backend(
     ],
 );
 
+local $ENV{MOJO_LOG_LEVEL} = 'error';
+
 my $t = Test::Mojo->new( 'Yancy', {
     backend => $backend_url,
     collections => $collections,
@@ -108,8 +110,9 @@ subtest 'get' => sub {
 
 subtest 'set' => sub {
     my $set_id = $items{people}[0]{id};
-    my $new_person = { name => 'Foo', email => 'doug@example.com', id => $set_id };
+    my $new_person = { name => 'Foo', email => 'doug@example.com' };
     $t->app->yancy->set( people => $set_id => { %{ $new_person } });
+    $new_person->{id} = $set_id;
     $new_person->{name} = 'foobar'; # filters are executed
     is_deeply $backend->get( people => $set_id ), $new_person;
 
@@ -117,6 +120,13 @@ subtest 'set' => sub {
         eval { $t->app->yancy->set( people => $set_id => {} ) };
         ok $@, 'set() dies';
         is blessed $@->[0], 'JSON::Validator::Error' or diag explain $@;
+        my $message = $@->[0]{message};
+        my $path = $@->[0]{path};
+        is $t->app->log->history->[-1][1], 'error',
+            'error message is logged at error level';
+        like $t->app->log->history->[-1][2], qr{Error validating item with ID "$set_id" in collection "people": $message \($path\)},
+            'error message is logged with JSON validation error';
+
         is_deeply $backend->get( people => $set_id ), $new_person,
             'person is not saved';
     };
@@ -125,16 +135,23 @@ subtest 'set' => sub {
 my $added_id;
 subtest 'create' => sub {
     my $new_person = { name => 'Bar', email => 'bar@example.com' };
-    my $got = $t->app->yancy->create( people => { %{ $new_person } });
+    my $got_id = $t->app->yancy->create( people => { %{ $new_person } });
     $new_person->{name} = 'foobar'; # filters are executed
-    $added_id = $new_person->{id} = $got->{id};
-    is_deeply $backend->get( people => $got->{id} ), $new_person;
+    $added_id = $new_person->{id} = $got_id;
+    is_deeply $backend->get( people => $got_id ), $new_person;
 
     my $count = $backend->list( 'people' )->{total};
     subtest 'create dies with missing fields' => sub {
         eval { $t->app->yancy->create( people => {} ) };
         ok $@, 'create() dies';
         is blessed $@->[0], 'JSON::Validator::Error' or diag explain $@;
+        my $message = $@->[0]{message};
+        my $path = $@->[0]{path};
+        is $t->app->log->history->[-1][1], 'error',
+            'error message is logged at error level';
+        like $t->app->log->history->[-1][2], qr{Error validating new item in collection "people": $message \($path\)},
+            'error message is logged with JSON validation error';
+
         is $backend->list( 'people' )->{total},
             $count, 'no new person was added';
     };

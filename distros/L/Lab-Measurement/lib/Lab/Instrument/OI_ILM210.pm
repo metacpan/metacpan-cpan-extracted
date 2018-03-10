@@ -1,6 +1,6 @@
 package Lab::Instrument::OI_ILM210;
 #ABSTRACT: Oxford Instruments ILM Intelligent Level Meter
-$Lab::Instrument::OI_ILM210::VERSION = '3.621';
+$Lab::Instrument::OI_ILM210::VERSION = '3.622';
 use strict;
 use Lab::Instrument;
 
@@ -42,7 +42,7 @@ Lab::Instrument::OI_ILM210 - Oxford Instruments ILM Intelligent Level Meter
 
 =head1 VERSION
 
-version 3.621
+version 3.622
 
 =head1 SYNOPSIS
 

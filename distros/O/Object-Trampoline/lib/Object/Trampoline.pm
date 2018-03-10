@@ -9,7 +9,7 @@
 # housekeeping
 ########################################################################
 
-package Object::Trampoline  v1.30.1;
+package Object::Trampoline  v1.30.2;
 use v5.24;
 
 use Carp;
@@ -69,7 +69,7 @@ AUTOLOAD
 ########################################################################
 
 package Object::Trampoline::Use;
-use v5.12;
+use v5.24;
 
 use Carp;
 
@@ -142,7 +142,7 @@ AUTOLOAD
 
 package Object::Trampoline::Bounce;
 
-use v5.12;
+use v5.24;
 
 use Carp;
 
@@ -184,27 +184,62 @@ AUTOLOAD
 # re-route methods from UNIVERSAL through the bounce.
 # allows $trampoline->VERSION to do the right thing.
 
-for my $name ( keys %{ $::{ 'UNIVERSAL::' } } )
+our $is_override
+= sub
 {
+    use Scalar::Util    qw( reftype );
+
+    # sub allows testing w/o reproducing the code.
+
+    my ( $name, $stash_val ) = @_;
+
+    $name   =~ /\W/
+    and return;
+
+    eval
+    {
+        # code or globs with a CODE slot
+        # are candidates for mapping.
+        #
+        # eval avoids issues de-referencing
+        # non-glob stash entries.
+        
+        'CODE' eq reftype $stash_val 
+        ? 1
+        : *{ $stash_val }{ CODE }
+        ? 1
+        : ''
+    }
+    or return;
+
+    1
+};
+
+while
+(
+    my ( $name, $stash_val ) 
+    = each %{ $::{ 'UNIVERSAL::' } }
+)
+{
+    # skip stash entries which cannot map to
+    # valid method names.
+
+    $is_override->( $name, $stash_val )
+    and
     *{ qualify_to_ref $name }
     = sub
     {
-        $AUTOLOAD = $name;
-        
+        $AUTOLOAD   = $name;
         goto &AUTOLOAD
     };
 }
-
-
 
 # stub destroy dodges AUTOLOAD for unused trampolines.
 
 DESTROY {}
 
 # keep require happy
-
 1
-
 __END__
 
 =head1 NAME

@@ -12,6 +12,7 @@ Mail::SPF::Iterator - iterative SPF lookup
 	$mailfrom, # from MAIL FROM:
 	$helo,     # from HELO|EHLO
 	$myname,   # optional: my hostname
+	{ default_spf => 'mx/24 ?all' }
     );
 
     # could be other resolvers too
@@ -74,7 +75,7 @@ See RFC4408 for SPF and RFC4406 for SenderID.
 
 =over 4
 
-=item new( IP, MAILFROM, HELO, [ MYNAME ] )
+=item new( IP, MAILFROM, HELO, [ MYNAME ], [ \%OPT ] )
 
 Construct a new Mail::SPF::Iterator object, which maintains the state
 between the steps of the iteration. For each new SPF check a new object has
@@ -91,6 +92,10 @@ according to the RFC but often is not.
 
 MYNAME is the name of the local host. It's only used if required by macros
 inside the SPF record.
+
+OPT is used for additional arguments. Currently only B<default_spf> is expected
+which is used to set a default SPF record in case no SPF/TXT records are
+returned from DNS (useful values are for example 'mx ?all' or 'mx/24 ?all').
 
 Returns the new object.
 
@@ -201,7 +206,7 @@ use warnings;
 
 package Mail::SPF::Iterator;
 
-our $VERSION = '1.113';
+our $VERSION = '1.114';
 
 use fields (
     # values given in or derived from params to new()
@@ -212,6 +217,7 @@ use fields (
     'sender',          # mailfrom|helo given in new()
     'domain',          # extracted from mailfrom|helo
     'identity',        # 'mailfrom' if sender is mailfrom, else 'helo'
+    'opt',             # additional options like default_spf
     # internal states and values
     'mech',            # list of unhandled mechanism for current SPF
     'include_stack',   # stack for handling includes
@@ -224,6 +230,7 @@ use fields (
     'explain_default', # default explanation of object specific
     'result',          # contains final result
     'tmpresult',       # contains the best result we have so far
+    'used_default_spf', # set to the default_spf from opt if used
 );
 
 use Net::DNS;
@@ -330,15 +337,17 @@ my %qual2rv = (
 ############################################################################
 # NEW
 # creates new SPF processing object
-# Args: ($class,$ip,$mailfrom,$helo,$myname)
+# Args: ($class,$ip,$mailfrom,$helo,?$myname,?\%opt)
 #  $ip: IP4/IP6 as string
 #  $mailfrom: user@domain of "mail from"
 #  $helo: info from helo|ehlo - should be domain name
-#  $myname: local name, used only for expanding macros
+#  $myname: local name, used only for expanding macros (optional)
+#  %opt: optional additional arguments
+#    default_spf => ... : default SPF record if none from DNS
 # Returns: $self
 ############################################################################
 sub new {
-    my ($class,$ip,$mailfrom,$helo,$myname) = @_;
+    my ($class,$ip,$mailfrom,$helo,$myname,$opt) = @_;
     my Mail::SPF::Iterator $self = fields::new($class);
 
     my $domain =
@@ -382,6 +391,7 @@ sub new {
 	redirect => undef,     # redirect from SPF record
 	explain => undef,      # explain from SPF record
 	result => undef,       # final result [ SPF_*, info, \%hash ]
+	opt => $opt,
     );
     return $self;
 }
@@ -482,6 +492,8 @@ sub lookup_blocking {
 sub mailheader {
     my Mail::SPF::Iterator $self = shift;
     my ($result,$info,$hash) = @{ $self->{result} || return };
+    $result .= " (using default SPF of \"$self->{used_default_spf}\")"
+	if $self->{used_default_spf};
     return $result ." ". join( "; ", map { 
 	# Quote: this is not exactly rfc2822 but should be enough
 	my $v = $hash->{$_};
@@ -657,7 +669,8 @@ sub next {
     # if there are unconnected CNAMEs they will be left in %cname
     my @names = ($qname);
     while ( %cname ) {
-	push @names, delete @cname{@names} or last;
+	push @names, grep { defined $_ } delete @cname{@names}
+	    or last;
     }
     if ( %cname ) {
 	# Report but ignore - XXX should we TempError instead?
@@ -1028,7 +1041,9 @@ sub _got_txt_spf {
     my Mail::SPF::Iterator $self = shift;
     my ($qtype,$rcode,$ans,$add) = @_;
 
-    for my $dummy ( @$ans ? (1):() ) {
+    {
+	last if ! @$ans;
+
 	# RFC4408 says in 4.5:
 	# 2. If any records of type SPF are in the set, then all records of
 	#    type TXT are discarded.
@@ -1089,7 +1104,21 @@ sub _got_txt_spf {
 	return (SPF_Noop);
     }
 
-    # otherwise it means that we got no SPF records
+    # otherwise it means that we got no SPF or TXT records
+
+    # if we have a default record and we are at the first level use this
+    if (!$self->{mech} and my $default = $self->{opt}{default_spf}) {
+	if (eval { $self->_parse_spf($default) }) {
+	    # good
+	    $self->{used_default_spf} = $default;
+	    return;
+	}
+	return (SPF_PermError,
+	    "checking default SPF for $self->{domain}",
+	    { problem => "invalid default SPF record: $@" }
+	);
+    }
+
     # return SPF_None if this was the initial query ($self->{mech} is undef)
     # and SPF_PermError if as a result from redirect or include
     # ($self->{mech} is [])

@@ -24,3 +24,5 @@
    Now supports Queing results without passing through the execution path
 1.008
   -- Role now checks for content length and if content is defined before trying to parse json.
+1.009
+  -- got rid of the last calls, now use AnyEvent->condvar

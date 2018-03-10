@@ -3,12 +3,13 @@ package DBIx::dbMan::Extension::HelpCommands;
 use strict;
 use base 'DBIx::dbMan::Extension';
 use Text::FormatTable;
+use Term::ANSIColor;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 1;
 
-sub IDENTIFICATION { return "000001-000010-000007"; }
+sub IDENTIFICATION { return "000001-000010-000008"; }
 
 sub preference { return 0; }
 
@@ -38,13 +39,19 @@ sub handle_action {
 				}
 			}
 			if (@help) {
+                my $colorized = $obj->{-mempool}->get('output_format') eq 'colortable';
 				my $table = new Text::FormatTable '| l l | l |';
 				$table->rule;
 				for (sort { $a->[0] cmp $b->[0] } @help) {
-					$table->row(' * ',@$_);
+					$table->row( map {
+                        my $r = $_;
+                        $r =~ s/(\S+)/color( $obj->{-config}->tablecolor_content || 'bright_white' ) . $1 . color( $obj->{-config}->tablecolor_lines || 'reset' )/sge if $colorized;
+                        $r; 
+                    } ' * ',@$_);
 				}
 				$table->rule;
-				$action{output} = $table->render($obj->{-interface}->render_size);
+				$action{output} = ( $colorized ? color( $obj->{-config}->tablecolor_lines || 'reset' ) : '' )
+                    . $table->render($obj->{-interface}->render_size) . ( $colorized ? color( 'reset' ) : '' );
 			} else {
 				$action{output} = "I havn't help for command ".$action{what}.".\n";
 			}

@@ -32,8 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Perinci::Sub::XCompletion::cryptocurrency_symbol" : "0",
-            "Perinci::Sub::XCompletion::cryptocurrency_symbol_or_name" : "0",
+            "Perinci::Sub::XCompletion::cryptocurrency_code" : "0",
+            "Perinci::Sub::XCompletion::cryptocurrency_code_or_name" : "0",
             "Perinci::Sub::XCompletion::cryptoexchange_name" : "0"
          }
       },
@@ -58,7 +58,7 @@
          "web" : "https://github.com/perlancar/perl-Sah-Schemas-CryptoCurrency"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -198,7 +198,7 @@
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
             "name" : "@Author::PERLANCAR/IfBuilt",
-            "version" : "0.02"
+            "version" : "0.03"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",

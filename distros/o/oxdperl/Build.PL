@@ -6,7 +6,7 @@ use Module::Build;
 my $builder = Module::Build->new(
     module_name         => 'oxdperl',
     license             => 'perl',
-    dist_author         => q{Gaurav Chhabra <gaurav.chhabra6785@gmail.com>},
+    dist_author         => q{Sobhan Panda <sobhan@centroxy.com>},
     dist_version_from   => 'lib/OxdPerlModule.pm',
     release_status      => 'stable',
     configure_requires => {

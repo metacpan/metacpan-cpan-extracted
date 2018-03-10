@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile::Gnuplot;
-$Lab::Moose::DataFile::Gnuplot::VERSION = '3.621';
+$Lab::Moose::DataFile::Gnuplot::VERSION = '3.622';
 #ABSTRACT: Text based data file ('Gnuplot style')
 
 use 5.010;
@@ -328,7 +328,11 @@ sub add_plot {
     my $hard_copy_terminal_options = delete $args{hard_copy_terminal_options};
     my $live                       = delete $args{live};
     if ( not defined $hard_copy ) {
-        $hard_copy = $self->filename() . '.plot.' . $hard_copy_terminal;
+        $hard_copy = $self->filename();
+
+        # Remove suffix
+        $hard_copy =~ s/\.\w*$//;
+        $hard_copy .= ".$hard_copy_terminal";
     }
 
     my %default_terminal_options;
@@ -478,7 +482,7 @@ Lab::Moose::DataFile::Gnuplot - Text based data file ('Gnuplot style')
 
 =head1 VERSION
 
-version 3.621
+version 3.622
 
 =head1 SYNOPSIS
 
@@ -495,17 +499,17 @@ version 3.621
      columns => [qw/time voltage temp/]
      );
 
+  # add live plot
   $file->add_plot(
      x => 'time',
      y => 'voltage',
      curve_options => {with => 'points'},
-     hard_copy => 'gnuplot-file-T-V.png',
   );
    
   $file->add_plot(
       x => 'time',
       y => 'temp',
-      hard_copy => 'gnuplot-file-T-Temp.png',
+      hard_copy => 'gnuplot-file-time-temp.png'
   );
 
  $file->log(time => 1, voltage => 2, temp => 3);
@@ -659,7 +663,9 @@ Default for 3D plots. Replot when finishing a block.
 
 =item * hard_copy        
 
-Create a copy of the plot in the data folder. Default: do not create hard copy.
+Filename for the copy of the plot in the data folder. Default: Switch datafile
+filename suffix of datafile to the $terminal, e.g. F<data.dat> =>
+F<data.png>. Mandatory if you add multiple plots to one datafile.
 
 =item * hard_copy_terminal
 

@@ -5,8 +5,8 @@ Acme::YAPC::Okinawa::Bus - It's Tweet shere
 # SYNOPSIS
 
     use Acme::YAPC::Okinawa::Bus;
-    say Acme::YAPC::Okinawa::Bus->time();
-    say Acme::YAPC::Okinawa::Bus->place();
+    say Acme::YAPC::Okinawa::Bus::time();
+    say Acme::YAPC::Okinawa::Bus::place();
 
 # DESCRIPTION
 

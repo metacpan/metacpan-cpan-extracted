@@ -1922,6 +1922,30 @@ value   ( perl_version_introduced => [], '5.023008' );
 value   ( perl_version_removed => [], undef );
 
 
+note	'next_element(), previous_element()';
+
+parse	( '/(x)/' );
+choose  ( child => 1, child => 0, child => 0 );	# 'x'
+navigate( previous_element => [] );
+class   ( 'PPIx::Regexp::Token::Structure' );
+content ( '(' );
+navigate( next_element	=> [] );
+class	( 'PPIx::Regexp::Token::Literal' );
+content	( 'x' );
+
+
+note	'snext_element(), sprevious_element()';
+
+parse	( '/ ( x ) /x' );
+choose  ( child => 1, child => 0, child => 0 );	# 'x'
+navigate( sprevious_element => [] );
+class   ( 'PPIx::Regexp::Token::Structure' );
+content ( '(' );
+navigate( snext_element	=> [] );
+class	( 'PPIx::Regexp::Token::Literal' );
+content	( 'x' );
+
+
 note	'accepts_perl(), requirements_for_perl()';
 
 parse	( '/x/' );

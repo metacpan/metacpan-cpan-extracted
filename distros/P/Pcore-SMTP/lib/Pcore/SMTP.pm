@@ -1,4 +1,4 @@
-package Pcore::SMTP v0.5.3;
+package Pcore::SMTP v0.5.5;
 
 use Pcore -dist, -const, -class, -result;
 use Pcore::AE::Handle qw[:TLS_CTX];
@@ -441,6 +441,8 @@ sub _DATA ( $self, $h, $args, $cb ) {
                 };
 
                 for my $part ( $args->{body}->@* ) {
+                    next if !defined $part;
+
                     if ( !is_ref $part || is_plain_scalarref $part ) {
                         $buf .= $pack_mime->( $boundary, undef, is_plain_scalarref $part ? $part : \$part )->$*;
                     }
@@ -467,9 +469,13 @@ sub _DATA ( $self, $h, $args, $cb ) {
             }
         }
 
-        $buf =~ s/\x0A[.]/\x0A../smg;
+        if ( defined $buf ) {
+            $buf =~ s/\x0A[.]/\x0A../smg;
 
-        $buf .= qq[$CRLF.$CRLF];
+            $buf .= $CRLF;
+        }
+
+        $buf .= qq[.$CRLF];
 
         $h->push_write($buf);
 
@@ -575,18 +581,18 @@ sub _read_response ( $self, $h, $cb ) {
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
 ## |      | 50                   | * Subroutine "sendmail" with high complexity score (29)                                                        |
-## |      | 381                  | * Subroutine "_DATA" with high complexity score (28)                                                           |
+## |      | 381                  | * Subroutine "_DATA" with high complexity score (30)                                                           |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 167                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 502                  | * Private subroutine/method '_RSET' declared but not used                                                      |
-## |      | 510                  | * Private subroutine/method '_VRFY' declared but not used                                                      |
-## |      | 516                  | * Private subroutine/method '_NOOP' declared but not used                                                      |
+## |      | 508                  | * Private subroutine/method '_RSET' declared but not used                                                      |
+## |      | 516                  | * Private subroutine/method '_VRFY' declared but not used                                                      |
+## |      | 522                  | * Private subroutine/method '_NOOP' declared but not used                                                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 511                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |    3 | 517                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 544, 546             | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
+## |    3 | 550, 552             | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 53                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

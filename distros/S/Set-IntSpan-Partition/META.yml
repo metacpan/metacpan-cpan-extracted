@@ -18,13 +18,14 @@ no_index:
     - t
     - inc
 requires:
-  Heap::MinMax: '0'
   List::MoreUtils: '0'
+  List::StackBy: '0'
   List::Util: '0'
+  List::UtilsBy: '0'
   Set::IntSpan: '0'
   Test::More: '0'
   perl: '5.008'
 resources:
   repository: https://github.com/hoehrmann/Set-IntSpan-Partition.git
-version: '0.04'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

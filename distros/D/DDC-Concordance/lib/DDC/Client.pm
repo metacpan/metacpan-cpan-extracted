@@ -39,11 +39,18 @@ our $ilen = 4;
 ## $dc = $CLASS_OR_OBJ->new(%args)
 ##  + %args:
 ##    (
+##     ##-- connection options
 ##     connect=>\%connectArgs,  ##-- passed to IO::Socket::INET->new()
 ##     mode   =>$queryMode,     ##-- one of 'table', 'html', 'text', 'json', or 'raw'; default='json' ('html' is not yet supported)
 ##     linger =>\@linger,       ##-- SO_LINGER socket option; default=[1,0]: immediate termination
 ##     ##
-##     ##-- hit parsing options
+##     ##-- query options (formerly only in DDC::Client::Distributed)
+##     start    =>$start,       ##-- index of first hit to fetch (default=0)
+##     limit    =>$limit,       ##-- maximum number of hits to fetch (default=10)
+##     timeout  =>$secs,        ##-- query timeout in seconds (lower bound, default=60)
+##     hint     =>$hint,        ##-- navigation hint (optional; default=undef: none)
+##     ##
+##     ##-- hit parsing options (mostly obsolete)
 ##     parseMeta=>$bool,        ##-- if true, hit metadata will be parsed to %$hit (default=1)
 ##     parseContext=>$bool,     ##-- if true, hit context data will be parsed to $hit->{ctx_} (default=1)
 ##     metaNames =>\@names,     ##-- metadata field names (default=undef (none))
@@ -68,7 +75,7 @@ our $ilen = 4;
 sub new {
   my ($that,%args) = @_;
   my %connect = (
-		 ##-- connect: defaults
+		 ##-- connection options
 		 PeerAddr=>'localhost',
 		 PeerPort=>50000,
 		 Proto=>'tcp',
@@ -81,11 +88,17 @@ sub new {
   delete($args{'connect'});
 
   my $dc =bless {
-		 ##-- connection args
+		 ##-- connection options
 		 connect=>\%connect,
 		 linger => [1,0],
 		 mode   =>'json',
 		 encoding => 'UTF-8',
+
+		 ##-- query options (formerly in DDC::Client::Distributed)
+		 start=>0,
+		 limit=>10,
+		 timeout=>60,
+		 hint=>undef,
 
 		 ##-- hit-parsing options
 		 parseMeta=>1,
@@ -217,24 +230,64 @@ sub loadOptFile {
 }
 
 ##======================================================================
-## open, close
+## Query requests (formerly in DDC::Client::Distributed)
 
-## $io_socket = $dc->open()
-sub open {
+## $buf = $dc->queryRaw($query_string)
+## $buf = $dc->queryRaw(\@raw_strings)
+sub queryRaw {
   my $dc = shift;
-  $dc->{sock} = IO::Socket::INET->new(%{$dc->{'connect'}})
-    or return undef;
-  $dc->{sock}->setsockopt(SOL_SOCKET, SO_LINGER, pack('II',@{$dc->{linger}})) if ($dc->{linger});
-  $dc->{sock}->autoflush(1);
-  return $dc->{sock};
+  my $buf = $dc->queryRawNC(@_);
+  $dc->close(); ##-- this apparently has to happen: bummer
+  return $buf;
 }
 
-## undef = $dc->close()
-sub close {
-  my $dc = shift;
-  $dc->{sock}->close() if (defined($dc->{sock}));
-  delete($dc->{sock});
+## $buf = $dc->queryRawNC($query_string)
+## $buf = $dc->queryRawNC(\@raw_strings)
+##  + guts for queryRaw() without implicit close()
+sub queryRawNC {
+  my ($dc,$query) = @_;
+  if (UNIVERSAL::isa($query,'ARRAY')) {
+    ##-- raw array: send raw data to DDC
+    $dc->send(join("\001",@$query));
+  }
+  elsif ($dc->{mode} =~ /^(?:raw|req)/i) {
+    ##-- "raw" or "request" mode: send raw request to DDC
+    $dc->send($query);
+  }
+  else {
+    ##-- query string: send 'run-query Distributed'
+    $dc->send(join("\001",
+		   "run_query Distributed",
+		   $query,
+		   $dc->{mode},
+		   join(' ', @$dc{qw(start limit timeout)}, ($dc->{hint} ? $dc->{hint} : qw()))));
+  }
+  ##-- get output buffer
+  return $dc->readData();
 }
+
+## @bufs = $dc->queryMulti($queryString1, $queryString2, ...)
+## @bufs = $dc->queryMulti(\@queryStrings1, \@queryStrings2, ...)
+sub queryMulti {
+  my $dc   = shift;
+  my @bufs = map {$dc->queryRawNC($_)} @_;
+  $dc->close(); ##-- this apparently has to happen: bummer
+  return @bufs;
+}
+
+## $obj = $dc->queryJson($query_string)
+## $obj = $dc->queryJson(\@raw_strings)
+sub queryJson {
+  my ($dc,$query) = @_;
+  return $dc->decodeJson($dc->queryRaw($query));
+}
+
+## $hits = $dc->query($query_string)
+sub query {
+  my ($dc,$query) = @_;
+  return $dc->parseData($dc->queryRaw($query));
+}
+
 
 ##======================================================================
 ## Common Requests
@@ -242,10 +295,17 @@ sub close {
 ## $rsp = $dc->request($request_string)
 sub request {
   my $dc = shift;
-  $dc->send($_[0]);
-  my $buf = $dc->readData();
+  my $buf = $dc->requestNC(@_);
   $dc->close();
   return $buf;
+}
+
+## $rsp = $dc->requestNC($request_string)
+##  + guts for request() which doesn't implicitly call close()
+sub requestNC {
+  my $dc = shift;
+  $dc->send($_[0]);
+  return $dc->readData();
 }
 
 ## $data = $dc->requestJson($request_string)
@@ -321,9 +381,60 @@ sub expand {
   return $dc->parseExpandTermsResponse($dc->expand_terms(@_));
 }
 
+## $buf = $dc->get_first_hits($query)
+## $buf = $dc->get_first_hits($query,$timeout?,$limit?,$hint?)
+sub get_first_hits {
+  my $dc = shift;
+  my $query = shift;
+  my $timeout = @_ ? shift : $dc->{timeout};
+  my $limit   = @_ ? shift : $dc->{limit};
+  my $hint    = @_ ? shift : $dc->{hint};
+  return $dc->request("get_first_hits $query\x{01}$timeout $limit".($hint ? " $hint" : ''));
+}
+
+## $buf = $dc->get_hit_strings($format?,$start?,$limit?)
+sub get_hit_strings {
+  my $dc = shift;
+  my $format  = @_ ? shift : ($dc->{mode} eq 'raw' ? 'json' : '');
+  my $start   = @_ ? shift : $dc->{start};
+  my $limit   = @_ ? shift : $dc->{limit};
+  return $dc->request("get_hit_strings $format\x{01}$start $limit");
+}
+
+
+## $buf = $dc->run_query($corpus,$query,$format?,$start?,$limit?,$timeout?,$hint?)
+sub run_query {
+  my $dc = shift;
+  my $corpus = shift;
+  my $query  = shift;
+  my $format = @_ ? shift : $dc->{mode};
+  my $start  = @_ ? shift : $dc->{start};
+  my $limit  = @_ ? shift : $dc->{limit};
+  my $timeout = @_ ? shift : $dc->{timeout};
+  my $hint    = @_ ? shift : $dc->{hint};
+  $corpus = 'Distributed' if (!defined($corpus));
+  return $dc->request("run_query $corpus\x{01}$query\x{01}$format\x{01}$start $limit $timeout".($hint ? " $hint" : ''));
+}
 
 ##======================================================================
 ## Low-level communications
+
+## $io_socket = $dc->open()
+sub open {
+  my $dc = shift;
+  $dc->{sock} = IO::Socket::INET->new(%{$dc->{'connect'}})
+    or return undef;
+  $dc->{sock}->setsockopt(SOL_SOCKET, SO_LINGER, pack('II',@{$dc->{linger}})) if ($dc->{linger});
+  $dc->{sock}->autoflush(1);
+  return $dc->{sock};
+}
+
+## undef = $dc->close()
+sub close {
+  my $dc = shift;
+  $dc->{sock}->close() if (defined($dc->{sock}));
+  delete($dc->{sock});
+}
 
 ## $encoded = $dc->ddc_encode(@message_strings)
 sub ddc_encode {
@@ -669,7 +780,7 @@ __END__
 
 =head1 NAME
 
-DDC::Client - Client socket utilities for DDC::Concordance
+DDC::Client - Client socket object and utilities for DDC::Concordance
 
 =head1 SYNOPSIS
 
@@ -681,27 +792,35 @@ DDC::Client - Client socket utilities for DDC::Concordance
  $dc = DDC::Client->new(PeerAddr=>'localhost',PeerPort=>50000);
 
  ##---------------------------------------------------------------------
- ## open, close
-
- $io_socket = $dc->open();
- undef      = $dc->close();
-
- ##---------------------------------------------------------------------
  ## Common Requests
 
- $rsp  = $dc->request($request);
- $data = $dc->requestJson($request);
+ $rsp     = $dc->request($request);           ##-- generic request
+ $rsp     = $dc->requestNC($request);         ##-- generic request, no close()
+ $data    = $dc->requestJson($request);       ##-- generic JSON request
 
- $version = $dc->version();
- $status  = $dc->status();
- $vstatus = $dc->vstatus();
- $info    = $dc->info();
+ $version = $dc->version();                   ##-- get server version string
+ $status  = $dc->status();                    ##-- get server status HASH-ref
+ $vstatus = $dc->vstatus();                   ##-- get verbose status HASH-ref
+ $info    = $dc->info();                      ##-- get server info HASH-ref
 
- $rsp     = $dc->expand_terms(\@pipeline, \@terms);
- @terms   = $dc->expand(\@pipeline, \@terms);
+ $rsp     = $dc->expand_terms(\@pipeline, \@terms);  ##-- raw term expansion
+ @terms   = $dc->expand(\@pipeline, \@terms);        ##-- parsed term expansion
+
+ $hits    = $dc->query($query_string);        ##-- fetch and parse hits
+ $hits    = $dc->queryJson($query_string);    ##-- fetch and parse JSON-formatted hits
+ $buf     = $dc->queryRaw($query_string);     ##-- fetch raw query result buffer
+ $buf     = $dc->queryRawNC($query_string);   ##-- fetch raw query result, no close()
+ @bufs    = $dc->queryMulti(@query_strings);  ##-- fetch multiple request results without intervening close()
+
+ $rsp     = $dc->get_first_hits($query);      ##-- low-level request
+ $rsp     = $dc->get_hit_strings();           ##-- low-level request
+ $rsp     = $dc->run_query($corpus,$query);   ##-- low-level request
 
  ##---------------------------------------------------------------------
  ## Low-level Communications
+
+ $io_socket = $dc->open();          ##-- open the connection
+ undef      = $dc->close();         ##-- close the connection
 
  $dc->send(@command);               ##-- send a command (prepends size)
  $dc->sendfh($fh,@command);         ##-- ... to specified filehandle
@@ -775,13 +894,21 @@ e.g. by setting:
 
 =over 4
 
-=item accepted %args:
+=item accepted %args are keys of %$dc:
 
  (
-  optFile  =>$filename,       ##-- parse meta names, separators from DDC *.opt file
+  ##-- connection options
   connect  =>\%connectArgs,   ##-- passed to IO::Socket::INET->new()
-  linger   =>\@linger,        ##-- SO_LINGER socket option (default=[1,0]: immediate termination)
   mode     =>$mode,           ##-- query mode; one of qw(json table text html raw); default='json'
+  linger   =>\@linger,        ##-- SO_LINGER socket option (default=[1,0]: immediate termination)
+ 
+  ##-- query options (formerly only in DDC::Client::Distributed)
+  start    =>$start,          ##-- index of first hit to fetch (default=0)
+  limit    =>$limit,          ##-- maximum number of hits to fetch (default=10)
+  timeout  =>$secs,           ##-- query timeout in seconds (lower bound, default=60)
+ 
+  ##-- hit parsing options (mostly obsolete)
+  optFile  =>$filename,       ##-- parse meta names, separators from DDC *.opt file
   parseMeta=>$bool,           ##-- if true, hit metadata will be parsed to $hit->{_meta} (default=1)
   parseContext=>$bool,        ##-- if true, hit context data will be parsed to $hit->{_ctx} (default=1)
   keepRaw  =>$bool,           ##-- if false, raw context buffer $hit->{_raw} will be deleted after parsing context data (default=false)
@@ -789,7 +916,7 @@ e.g. by setting:
   fieldSeparator => $str,     ##-- intra-token field separator (default="\x{1f}": ASCII unit separator); 'text' and 'table' modes only
   tokenSeparator => $str,     ##-- inter-token separator       (default="\x{1e}": ASCII record separator); 'text' and 'table' modes only
   metaNames      => \@names,  ##-- metadata names for 'text' and 'html' modes; default=none
-
+ 
   textHighlight => [$l0,$r0,$l1,$r1],  ##-- highlighting strings, text mode (default=[qw(&& && _& &_)])
   htmlHighlight => [$l0,$r0,$l1,$r1],  ##-- highlighting strings, html mode (default=[('<STRONG><FONT COLOR=red>','</FONT></STRONG>') x 2])
   tableHighlight => [$l0,$r0,$l1,$r1], ##-- highlighting strings, table mode (default=[qw(&& && _& &_)])
@@ -809,25 +936,71 @@ e.g. by setting:
 
 =cut
 
+  
 ##----------------------------------------------------------------
-## DESCRIPTION: DDC::Client: open, close
+## DESCRIPTION: DDC::Client::Distributed: Query Requests
 =pod
 
-=head2 open, close
+=head2 Querying
 
 =over 4
 
-=item open
+=item queryRaw
 
- $io_socket = $dc->open();
+ $buf = $dc->queryRaw($query_string);
 
-Open the underlying socket; returns undef on failure.
+Send a query string to the selected server and returns the raw result buffer.
+Implicitly close()s the connection.
 
-=item close
+=item queryRawNC
 
- undef = $dc->close();
+ $buf = $dc->queryRawNC($query_string);
 
-Closes the underlying socket if currently open.
+Send a query string to the selected server and returns the raw result buffer.
+No implicit close().
+
+=item queryMulti
+
+ @bufs = $dc->queryMulti(@query_strings);
+
+Sends a series of query strings or requests to the server, and returns a list of raw result buffers.
+Implicitly close()s the client after all requests have been sent,
+but not between individual requests.
+
+=item query
+
+ $hits = $dc->query($query_string);
+
+Send a query string to the selected server and parses the result into a list of hits.
+
+=item get_first_hits
+
+ $buf = $dc->get_first_hits($query,$timeout?,$limit?,$hint?);
+
+Requests IDs of the first $limit hit(s) for query $query, using optional navigation hint $hint,
+and returns the raw DDC response buffer.
+The optional parameters default to the %$dc keys of the same name.
+
+=item get_hit_strings
+
+ $buf = $dc->get_hit_strings($format?,$start?,$limit?)
+
+Requests the full strings for up to $limit hits beginning at logical offset $start
+formatted as $format.
+$format defaults to $dc-E<gt>{mode},
+and the remaining optional parameters default to the %$dc keys of the same name.
+
+=item run_query
+
+ $buf = $dc->run_query($corpus,$query,$format?,$start?,$limit?,$timeout?,$hint?)
+
+Requests a complete query evaluation of up to $limit hit(s) beginning at offset $start for query $query,
+formatted as $format with server-side timeout lower bound $timeout and optional navigation hint
+$hint.
+If $corpus is specified as C<undef>, it defaults to the string "Distributed".
+Optional parameters default to the %$dc keys of the same name.
+Note that this method returns the raw DDC response;
+see the L<query()|/query> method for a more comfortable alternative.
 
 =back
 
@@ -884,6 +1057,7 @@ wraps $dc-E<gt>L<requestJson|/requestJson>("vstatus $timeout").
 Get verbose server information;
 wraps $dc-E<gt>L<requestJson|/requestJson>("info $timeout").
 
+
 =item expand_terms
 
  $expandRaw = $dc->expand_terms($pipeline, $term);
@@ -905,6 +1079,40 @@ and parses the response with L<parseExpandTermsResponse|/parseExpandTermsRespons
 Returns an array C<@terms> of server expansions in list-context;
 in scalar context returns the reference \@terms to such an array.
 
+=item query
+
+ $hits = $dc->query($query_string);
+
+Send a query string to the selected server and parses the result into a
+L<DDC::HitList|DDC::HitList> object.
+
+=item queryRaw
+
+ $buf = $dc->queryRaw($query_string);
+ $buf = $dc->queryRaw(\@raw_strings);
+
+Send a query string to the selected server and returns the raw result buffer.
+The second form is equivalent to
+
+ $dc->queryRaw(join("\x01",@raw_strings));
+
+Implicitly close()s the connection.
+
+=item queryRawNC
+
+ $buf = $dc->queryRawNC($query_string);
+
+Send a query string to the selected server and returns the raw result buffer.
+No implicit close().
+
+=item queryMulti
+
+ @bufs = $dc->queryMulti(@query_strings);
+
+Sends a series of query strings or requests to the server, and returns a list of raw result buffers.
+Implicitly close()s the client after all requests have been sent,
+but not between individual requests.
+
 =back
 
 =cut
@@ -917,6 +1125,24 @@ in scalar context returns the reference \@terms to such an array.
 =head2 Low-level Communications
 
 =over 4
+
+=item open
+
+ $io_socket = $dc->open();
+
+Open the underlying socket; returns undef on failure.
+Most users will never need to call this method, since it will be called
+implicitly by higher-level methods such as L<requiest()|/request>, L<query()|/query>, L<status()|/status>
+if required.
+
+=item close
+
+ undef = $dc->close();
+
+Closes the underlying socket if currently open.
+Most users will never need to call this method, since it will be called
+implicitly by higher-level methods such as L<requiest()|/request>, L<query()|/query>, L<status()|/status>
+if required.
 
 =item send
 
@@ -1020,10 +1246,10 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006-2016 by Bryan Jurish
+Copyright (C) 2006-2018 by Bryan Jurish
 
 This package is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.14.2 or,
+it under the same terms as Perl itself, either Perl version 5.24.1 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut

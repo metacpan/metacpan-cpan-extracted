@@ -10,7 +10,9 @@ README.md
 dist.ini
 lib/Locale/Country/OFAC.pm
 t/00-compile.t
-t/01-get_sanction.t
+t/01-get_sanction_by_code.t
+t/02-is_region_sanctioned.t
+t/03-is_division_sanctioned.t
 t/author-critic.t
 t/author-test-eol.t
 t/release-cpan-changes.t

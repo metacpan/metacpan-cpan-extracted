@@ -1,0 +1,60 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "XML-Saxon-XSLT3",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Saxon" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Saxon" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Saxon" : "0",
+            "Inline::Java" : "0",
+            "XML::LibXML" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Alien::Saxon" : "0",
+            "Inline::Java" : "0",
+            "Test::More" : "0.88",
+            "XML::LibXML" : "1.60"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mohawk2/xml-saxon-xslt3",
+         "web" : "https://github.com/mohawk2/xml-saxon-xslt3"
+      }
+   },
+   "version" : "0.009",
+   "x_serialization_backend" : "JSON::PP version 2.97000"
+}

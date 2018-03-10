@@ -126,7 +126,7 @@ use warnings;
 use Carp;
 use Moose;
 
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 use overload
   q("")    => 'to_string',

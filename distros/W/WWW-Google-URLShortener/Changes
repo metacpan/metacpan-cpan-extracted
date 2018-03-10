@@ -1,5 +1,8 @@
 Revision history for WWW::Google::URLShortener
 
+0.24   Thu Mar 08 10:15:00 2018
+       - Improved method exporting.
+
 0.23   Thu Jun 29 14:35:00 2017
        - Added test scripts t/meta-json.t and t/meta-yml.t.
 

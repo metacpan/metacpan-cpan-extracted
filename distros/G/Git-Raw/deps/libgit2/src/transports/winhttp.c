@@ -18,6 +18,7 @@
 #include "remote.h"
 #include "repository.h"
 #include "global.h"
+#include "http.h"
 
 #include <wincrypt.h>
 #include <winhttp.h>
@@ -37,6 +38,14 @@
 #define DEFAULT_CONNECT_TIMEOUT 60000
 #ifndef WINHTTP_IGNORE_REQUEST_TOTAL_LENGTH
 #define WINHTTP_IGNORE_REQUEST_TOTAL_LENGTH 0
+#endif
+
+#ifndef WINHTTP_FLAG_SECURE_PROTOCOL_TLS_1_1
+# define WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_1 0x00000200
+#endif
+
+#ifndef WINHTTP_FLAG_SECURE_PROTOCOL_TLS_1_2
+# define WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_2 0x00000800
 #endif
 
 static const char *prefix_https = "https://";
@@ -701,21 +710,6 @@ static int winhttp_close_connection(winhttp_subtransport *t)
 	return ret;
 }
 
-static int user_agent(git_buf *ua)
-{
-	const char *custom = git_libgit2__user_agent();
-
-	git_buf_clear(ua);
-	git_buf_PUTS(ua, "git/1.0 (");
-
-	if (custom)
-		git_buf_puts(ua, custom);
-	else
-		git_buf_PUTS(ua, "libgit2 " LIBGIT2_VERSION);
-
-	return git_buf_putc(ua, ')');
-}
-
 static void CALLBACK winhttp_status(
 	HINTERNET connection,
 	DWORD_PTR ctx,
@@ -758,6 +752,10 @@ static int winhttp_connect(
 	int error = -1;
 	int default_timeout = TIMEOUT_INFINITE;
 	int default_connect_timeout = DEFAULT_CONNECT_TIMEOUT;
+	DWORD protocols =
+		WINHTTP_FLAG_SECURE_PROTOCOL_TLS1 |
+		WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_1 |
+		WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_2;
 
 	t->session = NULL;
 	t->connection = NULL;
@@ -772,7 +770,8 @@ static int winhttp_connect(
 		return -1;
 	}
 
-	if ((error = user_agent(&ua)) < 0) {
+
+	if ((error = git_http__user_agent(&ua)) < 0) {
 		git__free(wide_host);
 		return error;
 	}
@@ -798,6 +797,16 @@ static int winhttp_connect(
 		giterr_set(GITERR_OS, "failed to init WinHTTP");
 		goto on_error;
 	}
+
+	/*
+	 * Do a best-effort attempt to enable TLS 1.2 but allow this to
+	 * fail; if TLS 1.2 support is not available for some reason,
+	 * ignore the failure (it will keep the default protocols).
+	 */
+	WinHttpSetOption(t->session,
+		WINHTTP_OPTION_SECURE_PROTOCOLS,
+		&protocols,
+		sizeof(protocols));
 
 	if (!WinHttpSetTimeouts(t->session, default_timeout, default_connect_timeout, default_timeout, default_timeout)) {
 		giterr_set(GITERR_OS, "failed to set timeouts for WinHTTP");

@@ -4,6 +4,7 @@ use Modern::Perl;
 use Moo::Role;
 use MooX::Types::MooseLike::Base qw(:all);
 use AnyEvent::HTTP::MultiGet;
+use AnyEvent;
 use JSON qw();
 use Data::Dumper;
 use Carp qw(croak);
@@ -449,8 +450,9 @@ sub AUTOLOAD {
 
   my @ids=$self->$que_method($self->get_block_cb,@args);
   NO_BLOCK_LOOP: {
-    $t=AnyEvent->timer(after=>0,cb=>sub { no warnings; last NO_BLOCK_LOOP});
-    AnyEvent::Loop::run;
+    my $bl=AnyEvent->condvar;
+    $t=AnyEvent->timer(after=>0,cb=>sub { $bl->send});
+    $bl->recv;
   }
   undef $t;
 

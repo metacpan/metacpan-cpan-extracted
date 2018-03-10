@@ -7,13 +7,13 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'Test::More' => '0.96',
-                                      'Test::PAUSE::Permissions' => '0',
                                       'Test::Vars' => '0'
                                     }
                     },
        'runtime' => {
                       'requires' => {
                                       'Cache::Memcached' => '0',
+                                      'Carp' => '0',
                                       'Dancer2' => '0.15000',
                                       'Dancer2::Core::Role::SessionFactory' => '0',
                                       'Moo' => '0',

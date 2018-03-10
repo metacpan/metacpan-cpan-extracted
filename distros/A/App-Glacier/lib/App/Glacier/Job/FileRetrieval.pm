@@ -4,7 +4,7 @@ use warnings;
 
 require App::Glacier::Job::ArchiveRetrieval;
 use parent qw(App::Glacier::Job::ArchiveRetrieval);
-use App::Glacier::Command;
+use App::Glacier::Core;
 use Carp;
 
 # new(CMD, VAULT, FILE[, VERSION])

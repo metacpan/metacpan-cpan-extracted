@@ -1,6 +1,7 @@
 package App::Glacier::Config::Locus;
 
 use strict;
+use warnings;
 use Carp;
 
 require Exporter;

@@ -1,0 +1,11 @@
+Dist-Inkt-Profile-KJETILK
+=========================
+
+Created:      2018-03-07
+Home page:    <https://metacpan.org/release/Dist-Inkt-Profile-KJETILK>
+Bug tracker:  <https://github.com/kjetilk/p5-dist-inkt-profile-tobyink/issues>
+Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
+
+0.101	2018-03-08	Add the Git Role
+
+0.100	2018-03-07	Initial release based on Dist-Inkt-Profile-TOBYINK

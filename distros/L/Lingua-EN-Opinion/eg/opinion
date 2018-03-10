@@ -12,8 +12,9 @@ $opinion->analyze();
 my %score;
 @score{ @{ $opinion->sentences } } = @{ $opinion->scores };
 
-for my $valence (qw( positive negative )) {
-    print "Most $valence sentence:\n",
-        [ map {"$score{$_} => $_"} sort { $score{$a} <=> $score{$b} } @{ $opinion->sentences } ]->[-1],
-        "\n";
-}
+print "Most positive sentence:\n",
+    [ map {"$score{$_} => $_"} sort { $score{$a} <=> $score{$b} } @{ $opinion->sentences } ]->[-1],
+    "\n";
+print "Most negative sentence:\n",
+    [ map {"$score{$_} => $_"} sort { $score{$a} <=> $score{$b} } @{ $opinion->sentences } ]->[0],
+    "\n";

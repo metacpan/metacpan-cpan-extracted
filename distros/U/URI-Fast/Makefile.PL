@@ -17,21 +17,25 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "URI::Fast",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Exporter" => 0,
-    "Inline::C" => 0,
-    "URI::Encode::XS" => "0.07"
+    "Inline" => "0.80",
+    "Inline::C" => "0.78",
+    "parent" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Importer" => 0,
-    "Test2::Suite" => "0.000049",
+    "Test2" => "1.302125",
+    "Test2::Suite" => "0.000100",
+    "Test2::V0" => 0,
     "Test::LeakTrace" => "0.16",
     "Test::More" => 0,
     "Test::Pod" => "1.41",
+    "URI::Encode::XS" => "0.11",
     "URI::Split" => 0
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.09",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,17 +43,21 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "Importer" => 0,
-  "Inline::C" => 0,
-  "Test2::Suite" => "0.000049",
+  "Inline" => "0.80",
+  "Inline::C" => "0.78",
+  "Test2" => "1.302125",
+  "Test2::Suite" => "0.000100",
+  "Test2::V0" => 0,
   "Test::LeakTrace" => "0.16",
   "Test::More" => 0,
   "Test::Pod" => "1.41",
-  "URI::Encode::XS" => "0.07",
-  "URI::Split" => 0
+  "URI::Encode::XS" => "0.11",
+  "URI::Split" => 0,
+  "parent" => 0
 );
 
 

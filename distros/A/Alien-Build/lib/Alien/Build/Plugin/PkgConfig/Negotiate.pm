@@ -10,7 +10,7 @@ use Alien::Build::Util qw( _perl_config );
 use Carp ();
 
 # ABSTRACT: Package configuration negotiation plugin
-our $VERSION = '1.37'; # VERSION
+our $VERSION = '1.39'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -34,6 +34,8 @@ sub pick
   
   if(Alien::Build::Plugin::PkgConfig::CommandLine->available)
   {
+    # TODO: determine environment or flags necessary for using pkg-config
+    # on solaris 64 bit.
     if(! (_perl_config('osname') eq 'solaris' && _perl_config('ptrsize') == 8))
     {
       return 'PkgConfig::CommandLine';
@@ -91,7 +93,7 @@ Alien::Build::Plugin::PkgConfig::Negotiate - Package configuration negotiation p
 
 =head1 VERSION
 
-version 1.37
+version 1.39
 
 =head1 SYNOPSIS
 

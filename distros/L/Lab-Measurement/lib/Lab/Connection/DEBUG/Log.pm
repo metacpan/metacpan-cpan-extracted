@@ -1,6 +1,6 @@
 package Lab::Connection::DEBUG::Log;
 #ABSTRACT: Add logging capability to the DEBUG connection
-$Lab::Connection::DEBUG::Log::VERSION = '3.621';
+$Lab::Connection::DEBUG::Log::VERSION = '3.622';
 use 5.010;
 use warnings;
 use strict;
@@ -32,7 +32,7 @@ Lab::Connection::DEBUG::Log - Add logging capability to the DEBUG connection
 
 =head1 VERSION
 
-version 3.621
+version 3.622
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -66,7 +66,7 @@ use Log::Log4perl;
 use Data::Queue;
 use Scalar::Util qw(looks_like_number);
 Log::Log4perl->wrapper_register(__PACKAGE__);
-use AnyEvent::Loop;
+use AnyEvent;
 use Data::Dumper;
 use HTTP::Response;
 use HTTP::Headers;
@@ -84,7 +84,7 @@ BEGIN {
 with 'Log::LogMethods';
 with 'Data::Result::Moo';
 }
-our $VERSION='1.008';
+our $VERSION='1.009';
 
 sub BUILD {
   my ($self)=@_;
@@ -131,7 +131,16 @@ Arguments  for the call back
   id:  number for the object
   req: a new instance of $self->SENDER_CLASS
 
+Interal blocking control variables
+
+  loop_control: AnyEvent->condvar object
+
 =cut 
+
+has loop_control=>(
+  is=>'rw',
+  required=>0.
+);
 
 has loop_id=>(
   is=>'rw',
@@ -556,8 +565,7 @@ sub que_function {
         $self->log_info("A result outside of it's lifecycle has arived loop_id: $loop_id que_id: $id, but we are in loop_id: ".$self->loop_id);
         return;
       }
-      no warnings;
-      last LOOP_CONTROL;
+      $self->loop_control->send;
     } else {
       $self->log_debug("Que Count is at $self->{que_count}");
     }
@@ -588,17 +596,17 @@ sub block_loop : BENCHMARK_DEBUG {
   LOOP_CONTROL: {
     $self->in_control_loop(1);
     # make sure we don't run forever!
+    $self->loop_control(AnyEvent->condvar);
     $t=AnyEvent->timer(after=>$self->timeout,sub { 
       $result=$self->new_false("Timed out before we got a response");
       $self->log_error("Request Que timed out, Que Count is: ".$self->que_count);
+      $self->loop_control->send;
 
-      no warnings;
-      last LOOP_CONTROL;
     });
     $self->run_next;
-    last LOOP_CONTROL if $self->{que_count}<=0;
+    $self->loop_control->send if $self->{que_count}<=0;
 
-    AnyEvent::Loop::run;
+    $self->loop_control->recv;
   }
   undef $t;
   $self->in_control_loop(0);

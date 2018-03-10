@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder::XLSX;
-$Data::TableReader::Decoder::XLSX::VERSION = '0.005';
+$Data::TableReader::Decoder::XLSX::VERSION = '0.006';
 use Moo 2;
 use Carp;
 use Try::Tiny;
@@ -51,12 +51,22 @@ Data::TableReader::Decoder::XLSX - Access sheets/rows of a modern Microsoft Exce
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 
 See L<Data::TableReader::Decoder::Spreadsheet>.
 This subclass simply parses the input using an instance of L<Spreadsheet::ParseXLSX>.
+
+=head1 CLASS METHODS
+
+=head2 default_xlsx_module
+
+Initializes C<@Data::TableReader::Decoder::XLSX::default_xlsx_module> to the first
+available module in the list of C<@Data::TableReader::Decoder::XLSX::xlsx_probe_modules>
+and returns the cached value every time afterward.
+
+Those variables can be modified as needed, if you have other XLSX modules available.
 
 =head1 AUTHOR
 
@@ -64,7 +74,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Michael Conrad.
+This software is copyright (c) 2018 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

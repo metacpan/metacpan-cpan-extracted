@@ -18,6 +18,7 @@ eg/templates/people/index.html.ep
 eg/yancy.conf
 eg/yancy.data.json
 eg/yancy.null.conf
+eg/yancy.pl
 lib/Mojolicious/Plugin/Yancy.pm
 lib/Mojolicious/Plugin/Yancy/resources/public/yancy/app.js
 lib/Mojolicious/Plugin/Yancy/resources/public/yancy/bootstrap.css

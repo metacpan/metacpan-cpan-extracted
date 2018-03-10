@@ -172,6 +172,19 @@ config(self)
 	OUTPUT: RETVAL
 
 SV *
+commondir(self)
+	Repository self
+
+	PREINIT:
+		const char *path;
+
+	CODE:
+		path = git_repository_commondir(self -> repository);
+		RETVAL = newSVpv(path, 0);
+
+	OUTPUT: RETVAL
+
+SV *
 index(self, ...)
 	SV *self
 
@@ -271,6 +284,30 @@ head(self, ...)
 		}
 
 		rc = git_repository_head(&head, repo -> repository);
+		git_check_error(rc);
+
+		GIT_NEW_OBJ_WITH_MAGIC(
+			RETVAL, "Git::Raw::Reference", head, SvRV(self)
+		);
+
+	OUTPUT: RETVAL
+
+SV *
+head_for_worktree(self, worktree)
+	SV *self
+	SV *worktree
+
+	PREINIT:
+		int rc;
+
+		Reference head;
+		Repository repo;
+
+	CODE:
+		repo = GIT_SV_TO_PTR(Repository, self);
+
+		rc = git_repository_head_for_worktree(&head,
+			repo -> repository, git_ensure_pv(worktree, "worktree"));
 		git_check_error(rc);
 
 		GIT_NEW_OBJ_WITH_MAGIC(
@@ -541,6 +578,16 @@ status(self, opts, ...)
 		RETVAL = status_hv;
 
 	OUTPUT: RETVAL
+
+void
+is_worktree(self)
+	Repository self
+
+	PPCODE:
+		if (git_repository_is_worktree (self -> repository))
+			XSRETURN_YES;
+
+		XSRETURN_NO;
 
 SV *
 path_is_ignored(self, path)

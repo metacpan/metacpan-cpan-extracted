@@ -1160,7 +1160,7 @@ lib/RPerl/Test/Operator05BitwiseNegation/program_00_bad_03.pl
 lib/RPerl/Test/Operator05BitwiseNegation/program_00_bad_04.pl
 lib/RPerl/Test/Operator05BitwiseNegation/program_00_bad_05.pl
 lib/RPerl/Test/Operator05BitwiseNegation/program_00_bad_06.pl
-lib/RPerl/Test/Operator05BitwiseNegation/program_00_bad_07.pl
+lib/RPerl/Test/Operator05BitwiseNegation/program_00_bad_07.pl.DISABLED_CPAN_TESTERS
 lib/RPerl/Test/Operator05BitwiseNegation/program_00_bad_08.pl
 lib/RPerl/Test/Operator05BitwiseNegation/program_00_good.pl
 lib/RPerl/Test/Operator05BitwiseNegation/program_01_good.pl

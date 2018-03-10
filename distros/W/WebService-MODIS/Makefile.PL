@@ -6,8 +6,11 @@ WriteMakefile(
     VERSION_FROM      => 'lib/WebService/MODIS.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
     PREREQ_PM         => {
       'Carp'           => 0,
+      'URI'            => 0,
       'LWP::Online'    => 0,
       'LWP::UserAgent' => 0,
+      'HTTP::Cookies'  => 0,
+      'Net::Netrc'     => 0,
       'File::HomeDir'  => 0,
       'File::Path'     => 0,
       'File::Basename' => 0,

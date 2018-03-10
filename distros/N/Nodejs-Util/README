@@ -2,8 +2,8 @@ NAME
     Nodejs::Util - Utilities related to Node.js
 
 VERSION
-    This document describes version 0.010 of Nodejs::Util (from Perl
-    distribution Nodejs-Util), released on 2018-03-04.
+    This document describes version 0.011 of Nodejs::Util (from Perl
+    distribution Nodejs-Util), released on 2018-03-09.
 
 FUNCTIONS
   nodejs_available
@@ -100,13 +100,16 @@ FUNCTIONS
   nodejs_module_path
     Usage:
 
-     nodejs_module_path([ \%opts, ] $module)
+     nodejs_module_path([ \%opts, ] $module) => str|array
 
     Search module in filesystem according to Node.js rule described in
     <https://nodejs.org/api/modules.html>. $module can be either a
     relative/absolute path (e.g. "./bip39.js", "../bip39.js", or
     "/home/foo/bip39.js"), a filename (e.g. "bip39.js"), or a filename with
     the ".js" removed (e.g. "bip39").
+
+    Will return undef if no module is found, or string containing the found
+    path.
 
     Known options:
 
@@ -121,7 +124,7 @@ FUNCTIONS
     *   all => bool
 
         If set to true, will return an array of all found paths instead of
-        the first found path.
+        string containing the first found path.
 
 HOMEPAGE
     Please visit the project's homepage at

@@ -4,11 +4,11 @@
 #
 # Gluu-oxd-library
 #
-# An open source application library for PHP
+# An open source application library for Perl
 #
 # This content is released under the MIT License (MIT)
 #
-# Copyright (c) 2015, Gluu inc, USA, Austin
+# Copyright (c) 2018, Gluu inc, USA, Austin
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,13 +29,13 @@
 # THE SOFTWARE.
 #
 # @package	Gluu-oxd-library
-# @version 2.4.4
-# @author	Ourdesignz
-# @author		gaurav.chhabra6785@gmail.com
-# @copyright	Copyright (c) 2015, Gluu inc federation (https://gluu.org/)
+# @version      3.1.2
+# @author	Ourdesignz, Sobhan Panda
+# @author	gaurav.chhabra6785@gmail.com, sobhan@centroxy.com
+# @copyright	Copyright (c) 2018, Gluu inc federation (https://gluu.org/)
 # @license	http://opensource.org/licenses/MIT	MIT License
-# @link	https://gluu.org/
-# @since	Version 2.4.4
+# @link         https://gluu.org/
+# @since	Version 3.1.2
 # @filesource
 #/
 
@@ -55,6 +55,7 @@ use vars qw($VERSION);
 $VERSION = '0.01';
 use strict;
 use warnings;
+use JSON::PP;
 
 sub new{
     my $class = shift;
@@ -78,6 +79,9 @@ sub new{
         _post_logout_redirect_uri => shift,
         
 		# @static
+		# @var string $client_frontchannel_logout_uris              Client logout uri        
+        _client_frontchannel_logout_uris => shift,
+		# @static
 		# @var array $scope        For getting needed scopes from gluu-server
         _scope => shift,
        
@@ -96,6 +100,21 @@ sub new{
 		# @static
 		# @var array $acr_values        Gluu login acr type, can be basic, duo, u2f, gplus and etc.
         _acr_values => shift,
+        
+                # @static
+		# @var array $rest_service_url        Gluu rest service url
+        _rest_service_url => shift,
+        
+                # @static
+		# @var array $connection_type        Connection type, can be Socket or http.
+        _connection_type => shift,
+        
+        _oxd_id => shift,
+        _client_name => shift,
+        _client_id => shift,
+        _client_secret => shift,
+        _claims_redirect_uri => shift,
+        _resource_end_point => shift
     };
     
     # Print all the values just for clarification.
@@ -156,6 +175,18 @@ sub getPostLogoutRedirectUrl {
 }
 
 
+sub setClientFrontChannelLogoutUris {
+    my ( $self, $client_frontchannel_logout_uris ) = @_;
+    $self->{_client_frontchannel_logout_uris} = $client_frontchannel_logout_uris if defined($client_frontchannel_logout_uris);
+    return $self->{_client_frontchannel_logout_uris};
+}
+
+sub getClientFrontChannelLogoutUris {
+    my( $self ) = @_;
+    return $self->{_client_frontchannel_logout_uris};
+}
+
+
 sub setScope {
     my ( $self, $scope ) = @_;
     $self->{_scope} = $scope if defined($scope);
@@ -210,6 +241,101 @@ sub getAcrValues {
     my( $self ) = @_;
     return $self->{_acr_values};
 }
+
+sub setRestServiceUrl {
+    my ( $self, $rest_service_url ) = @_;
+    $self->{_rest_service_url} = $rest_service_url if defined($rest_service_url);
+    return $self->{_rest_service_url};
+}
+
+sub getRestServiceUrl {
+    my( $self ) = @_;
+    return $self->{_rest_service_url};
+}
+
+sub setConnectionType {
+    my ( $self, $connection_type ) = @_;
+    $self->{_connection_type} = $connection_type if defined($connection_type);
+    return $self->{_connection_type};
+}
+
+sub getConnectionType {
+    my( $self ) = @_;
+    return $self->{_connection_type};
+}
+
+
+sub setOxdId {
+    my ( $self, $oxd_id ) = @_;
+    $self->{_oxd_id} = $oxd_id if defined($oxd_id);
+    return $self->{_oxd_id};
+}
+
+sub getOxdId {
+    my( $self ) = @_;
+    return $self->{_oxd_id};
+}
+
+
+sub setClientName {
+    my ( $self, $clientName ) = @_;
+    $self->{_client_name} = $clientName if defined($clientName);
+    return $self->{_client_name};
+}
+
+sub getClientName {
+    my( $self ) = @_;
+    return $self->{_client_name};
+}
+
+
+sub setClientId {
+    my ( $self, $client_id ) = @_;
+    $self->{_client_id} = $client_id if defined($client_id);
+    return $self->{_client_id};
+}
+
+sub getClientId {
+    my( $self ) = @_;
+    return $self->{_client_id};
+}
+
+
+sub setClientSecret {
+    my ( $self, $client_secret ) = @_;
+    $self->{_client_secret} = $client_secret if defined($client_secret);
+    return $self->{_client_secret};
+}
+
+sub getClientSecret {
+    my( $self ) = @_;
+    return $self->{_client_secret};
+}
+
+
+sub setClaimsRedirectUri {
+    my ( $self, $claims_redirect_uri ) = @_;
+    $self->{_claims_redirect_uri} = $claims_redirect_uri if defined($claims_redirect_uri);
+    return $self->{_claims_redirect_uri};
+}
+
+sub getClaimsRedirectUri {
+    my( $self ) = @_;
+    return $self->{_claims_redirect_uri};
+}
+
+
+sub setResourceEndPoint {
+    my ( $self, $resource_end_point ) = @_;
+    $self->{_resource_end_point} = $resource_end_point if defined($resource_end_point);
+    return $self->{_resource_end_point};
+}
+
+sub getResourceEndPoint {
+    my( $self ) = @_;
+    return $self->{_resource_end_point};
+}
+
 sub json_read{
 	
 	my ($self) = @_;
@@ -251,24 +377,45 @@ sub json_read{
 	my $oxd_host_port = $configOBJECT->{oxd_host_port};
 	my $authorization_redirect_uri = $configOBJECT->{authorization_redirect_uri};
 	my $post_logout_redirect_uri = $configOBJECT->{post_logout_redirect_uri};
+	my $client_frontchannel_logout_uris = $configOBJECT->{client_frontchannel_logout_uris};
 	my $scope = $configOBJECT->{scope};
 	my $application_type = $configOBJECT->{application_type};
 	my $response_types = $configOBJECT->{response_types};
 	my $grant_types = $configOBJECT->{grant_types};
 	my $acr_values = $configOBJECT->{acr_values};
+	my $rest_service_url = $configOBJECT->{rest_service_url};
+	my $connection_type = $configOBJECT->{connection_type};
+	my $oxd_id = $configOBJECT->{oxd_id};
+	my $clientName = $configOBJECT->{client_name};
+	my $claims_redirect_uri = $configOBJECT->{claims_redirect_uri};
+	my $resource_end_point = $configOBJECT->{resource_end_point};
 	
 	#$self->new( $op_host, $oxd_host_port );
 	$self->setOpHost( $op_host );
 	$self->setOxdHostPort( $oxd_host_port );
 	$self->setAuthorizationRedirectUrl( $authorization_redirect_uri );
 	$self->setPostLogoutRedirectUrl( $post_logout_redirect_uri );
+	$self->setClientFrontChannelLogoutUris( $client_frontchannel_logout_uris );
 	$self->setScope( $scope );
 	$self->setApplicationType( $application_type );
 	$self->setResponseType( $response_types );
 	$self->setGrantTypes( $grant_types );
 	$self->setAcrValues( $acr_values );
+	$self->setRestServiceUrl( $rest_service_url );
+	$self->setConnectionType( $connection_type );
+	$self->setOxdId( $oxd_id );
+	$self->setClientName( $clientName );
+	$self->setClaimsRedirectUri( $claims_redirect_uri );
+	$self->setResourceEndPoint( $resource_end_point );
 	
-	    
+	if($configOBJECT->{client_id}){
+                my $client_id = $configOBJECT->{client_id};
+                $self->setClientId( $client_id );
+        }
+        if($configOBJECT->{client_secret}){
+                my $client_secret = $configOBJECT->{client_secret};
+                $self->setClientSecret( $client_secret );
+        }
 	
 	
 

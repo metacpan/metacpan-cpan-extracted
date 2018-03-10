@@ -19,4 +19,5 @@ for my $value ( @emotions ) {
     print "Sentence with the most $value:\n",
         [ map {"$score{$_}{$value} => $_"} sort { $score{$a}{$value} <=> $score{$b}{$value} } @{ $opinion->sentences } ]->[-1],
         "\n";
+    print "\n";
 }

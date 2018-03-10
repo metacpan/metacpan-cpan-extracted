@@ -18,6 +18,8 @@ no_index:
     - t
     - inc
 requires:
+  Curses: '1.08'
+  Curses::UI: '0.95'
   Cwd: '0'
   DBI: '1.20'
   Data::Dumper: '0'
@@ -31,5 +33,5 @@ requires:
   Term::Size: '0'
   Text::CSV_XS: '0'
   Text::FormatTable: '0'
-version: '0.44'
+version: '0.45'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

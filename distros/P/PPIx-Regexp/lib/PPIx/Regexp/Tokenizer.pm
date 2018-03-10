@@ -24,6 +24,7 @@ use PPIx::Regexp::Token::Control		();
 use PPIx::Regexp::Token::Delimiter		();
 use PPIx::Regexp::Token::Greediness		();
 use PPIx::Regexp::Token::GroupType::Assertion	();
+use PPIx::Regexp::Token::GroupType::Atomic_Script_Run	();
 use PPIx::Regexp::Token::GroupType::BranchReset	();
 use PPIx::Regexp::Token::GroupType::Code	();
 use PPIx::Regexp::Token::GroupType::Modifier	();
@@ -43,7 +44,7 @@ use PPIx::Regexp::Token::Whitespace		();
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 use Scalar::Util qw{ looks_like_number };
 
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 
 our $DEFAULT_POSTDEREF;
 defined $DEFAULT_POSTDEREF

@@ -1,25 +1,26 @@
 ---
 abstract: 'Easily page, search, and sort DBIx::Class::ResultSets in a web context'
 author:
-  - "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+  - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
 build_requires:
-  DBIx::Class: 0.08250
-  SQL::Translator: 0.11016
-  Test::Deep: 0.110
-  Test::More: 0.98
-  parent: 0
+  DBIx::Class: '0.0825'
+  SQL::Translator: '0.11016'
+  Test::Deep: '0.11'
+  Test::More: '0.98'
+  parent: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.142690'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Web-Util-DBIC-Paging
 requires:
-  Sub::Exporter::Progressive: 0.001010
+  Sub::Exporter::Progressive: '0.00101'
 resources:
   bugtracker: https://github.com/frioux/Web-Util-ExtPaging/issues
   repository: git://github.com/frioux/Web-Util-DBIC-Paging.git
-version: 0.001003
+version: '0.001004'
+x_serialization_backend: 'YAML::Tiny version 1.64'

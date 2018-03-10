@@ -8,7 +8,7 @@ use List::Util qw/sum/;
 use List::MoreUtils qw/uniq/;
 
 my $ran = 0;
-for my $round (1 .. 100) {
+for my $round (1 .. 1000) {
   my $number_of_spans = int rand(10);
 
   my @spans = map {
@@ -20,7 +20,9 @@ for my $round (1 .. 100) {
   while (my ($k, $v) = each %h) {
     my $all = Set::IntSpan->new;
     $all->U($_) for @$v;
-    ok($spans[$k]->equal($all), 'union same as parent');
+    ok($spans[$k]->equal($all), 'union same as parent') or diag(
+      join "\n", @spans
+    );
     my $sum = sum map { $_->size } @$v;
     ok($sum == $spans[$k]->size, 'same size');
     $ran += 2;
@@ -30,7 +32,9 @@ for my $round (1 .. 100) {
   my @new = uniq map @$_, values %h;
   my $old_str = join '!', sort map { "$_" } @old;
   my $new_str = join '!', sort map { "$_" } @new;
-  is($old_str, $new_str, '...');
+  is($old_str, $new_str, '...') or diag(
+      join "\n", @spans
+  );
   $ran++;
 }
 

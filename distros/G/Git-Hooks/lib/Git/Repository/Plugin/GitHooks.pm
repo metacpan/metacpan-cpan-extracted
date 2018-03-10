@@ -1,6 +1,6 @@
 package Git::Repository::Plugin::GitHooks;
 # ABSTRACT: A Git::Repository plugin with some goodies for hook developers
-$Git::Repository::Plugin::GitHooks::VERSION = '2.6.3';
+$Git::Repository::Plugin::GitHooks::VERSION = '2.7.0';
 use parent qw/Git::Repository::Plugin/;
 
 use 5.010;
@@ -35,7 +35,7 @@ sub _keywords {                 ## no critic (ProhibitUnusedPrivateSubroutines)
 
           get_current_branch get_sha1 get_head_or_empty_tree
 
-          blob file_size
+          blob file_size file_mode
 
           is_ref_enabled match_user im_admin
       /;
@@ -677,20 +677,88 @@ sub get_errors {
     return get_faults(@_);
 }
 
+sub _githooks_colors {
+    my ($git) = @_;
+
+    state $colors;
+
+    unless (defined $colors) {
+        # Check if we want to colorize the output, and if so, return a hash
+        # containing the default colors. Otherwise, return a hash containing no
+        # color codes at all.
+
+        # BUG: https://rt.cpan.org/Ticket/Display.html?id=124711. We can't
+        # invoke 'git config --get-colorbool' via Git::Repository because it
+        # deletes the TERM environment variable before invoking Git, which makes
+        # it think it shouldn't apply any colors. So, we have to shell out Git
+        # explicitly.
+
+        my $stdout_is_tty = -t STDOUT ? 'true' : 'false';
+        my $githooks_color = qx{git config --get-colorbool githooks.color $stdout_is_tty};
+        chomp $githooks_color;
+        if ($githooks_color eq 'true') {
+            $colors = {
+                header  => $git->run(qw/config --get-color githooks.color.header/,  'green'),
+                footer  => $git->run(qw/config --get-color githooks.color.footer/,  'green'),
+                context => $git->run(qw/config --get-color githooks.color.context/, 'red bold'),
+                message => $git->run(qw/config --get-color githooks.color.message/, 'yellow'),
+                details => '',
+                reset   => $git->run(qw/config --get-color/, '', 'reset'),
+            };
+        } else {
+            $colors = {
+                header  => '',
+                footer  => '',
+                context => '',
+                message => '',
+                details => '',
+                reset   => '',
+            };
+        }
+    }
+
+    return $colors;
+}
+
 sub fault {
     my ($git, $message, $info) = @_;
     $info //= {};
-    my $prefix = exists $info->{prefix} ? $info->{prefix} : caller(1);
+
+    my $colors = _githooks_colors($git);
+
+    my $msg;
+
+    {
+        my $prefix = $info->{prefix} || caller(1);
+        my @context;
+        if (my $commit = $info->{commit}) {
+            $commit = $commit->commit
+                if ref $commit; # It's a Git::Repository::Log object
+            $commit = $git->run('rev-parse', '--short', $commit)
+                if $commit =~ /^[0-9a-f]{40}$/; # It can be '<new>' or ':0' sometimes
+            push @context, "commit $commit";
+        }
+        if (my $ref = $info->{ref}) {
+            push @context, "on ref $ref";
+        }
+        if (my $option = $info->{option}) {
+            push @context, "violates option '$option'";
+        }
+        $msg = "$colors->{context}\[$prefix";
+        $msg .= ': ' . join(' ', @context) if @context;
+        $msg .= "]$colors->{reset}\n";
+    }
+
     chomp $message;             # strip trailing newlines
-    $message =~ s/\b[0-9a-f]{40}\b/$git->run('rev-parse', '--short', ${^MATCH})/egp; # shorten SHA1s in the message
-    my $fmtmsg = "\n[$prefix] $message";
+    $msg .= "\n$colors->{message}$message$colors->{reset}\n";
+
     if (my $details = $info->{details}) {
         $details =~ s/\n*$//s; # strip trailing newlines
         $details =~ s/^/  /gm; # prefix each line with two spaces
-        $fmtmsg .= ":\n\n$details\n";
+        $msg .= "\n$colors->{details}$details$colors->{reset}\n\n";
     }
-    $fmtmsg .= "\n";            # end in a newline
-    push @{$git->{_plugin_githooks}{faults}}, $fmtmsg;
+
+    push @{$git->{_plugin_githooks}{faults}}, $msg;
 
     # Return true to allow for the idiom: <expression> or $git->fault(...) and <next|last|return>;
     return 1;
@@ -701,26 +769,28 @@ sub get_faults {
 
     return unless exists $git->{_plugin_githooks}{faults};
 
+    my $colors = _githooks_colors($git);
+
     my $faults = '';
 
     if (my $header = $git->get_config(githooks => 'error-header')) {
-        $faults .= qx{$header} . "\n"; ## no critic (ProhibitBacktickOperators)
+        $faults .= $colors->{header} . qx{$header} . "$colors->{reset}\n"; ## no critic (ProhibitBacktickOperators)
     }
 
     $faults .= join("\n\n", @{$git->{_plugin_githooks}{faults}});
 
     if ($git->{_plugin_githooks}{hookname} =~ /^commit-msg|pre-commit$/
             && ! $git->get_config_boolean(githooks => 'abort-commit')) {
-        $faults .= <<"EOF";
+        $faults .= <<EOS;
 
 ATTENTION: To fix the problems in this commit, please consider amending it:
 
         git commit --amend
-EOF
+EOS
     }
 
     if (my $footer = $git->get_config(githooks => 'error-footer')) {
-        $faults .= "\n" . qx{$footer} . "\n"; ## no critic (ProhibitBacktickOperators)
+        $faults .= "\n$colors->{footer}" . qx{$footer} . "$colors->{reset}\n"; ## no critic (ProhibitBacktickOperators)
     }
 
     return $faults;
@@ -1131,6 +1201,40 @@ sub file_size {
     return $size;
 }
 
+sub file_mode {
+    my ($git, $rev, $file) = @_;
+
+    if ($rev eq ':0') {
+        my @diff_index = $git->run(qw/diff-index --cached --raw --no-color HEAD/, $file);
+
+        if (@diff_index == 1) {
+            if (my ($src_mode, $dst_mode, $rest) = $diff_index[0] =~ /^:(\d+) (\d+) (.*)/) {
+                return oct $dst_mode;
+            } else {
+                die "Internal error: cannot parse output of git-diff-idex:\n\n  $diff_index[0]";
+            }
+        } else {
+            die "Internal error: git-diff-index should return a single line";
+        }
+    } else {
+        my $path = path($file);
+        my @ls_tree = $git->run('ls-tree', "$rev:" . $path->dirname, $path->basename);
+
+        if (@ls_tree == 1) {
+            if (my ($mode, $type, $object, $file) =
+                    $ls_tree[0] =~ /^(\d+) ([a-z]+) ([a-z0-9]{40})\t(.+)/) {
+                return oct $mode;
+            } else {
+                die "Internal error: cannot parse output of git-ls-tree:\n\n  $ls_tree[0]";
+            }
+        } else {
+            die "Internal error: $rev:$file should be a blob";
+        }
+    }
+
+    die "Can't happen!";
+}
+
 sub is_ref_enabled {
     my ($git, $ref, @specs) = @_;
 
@@ -1254,7 +1358,7 @@ Git::Repository::Plugin::GitHooks - A Git::Repository plugin with some goodies f
 
 =head1 VERSION
 
-version 2.6.3
+version 2.7.0
 
 =head1 SYNOPSIS
 
@@ -1478,36 +1582,78 @@ C<INT> value are grokked with this method.
 =head2 fault MESSAGE INFO
 
 This method should be used by plugins to record consistent error or warning
-messages. It gets one or two arguments. MESSAGE is a one line string. INFO is an
-optional hash-ref which may contain additional information about the message
-with the following keys:
+messages. It gets one or two arguments. MESSAGE is a multi-line string
+explaining the error. INFO is an optional hash-ref which may contain additional
+information about the message, which will be used to complement it.
+
+A "complete" fault is formatted like this:
+
+  [PREFIX: CONTEXT]
+
+  MESSAGE
+
+    DETAILS
+
+PREFIX gives contextual information about the message. It can be set via the
+C<prefix> INFO hash key. If not, the package name of the function which called
+C<fault> is used, which usually happens to be the name of the plugin which
+detected the error.
+
+CONTEXT is additional contextual information, such as a reference name, a
+commit SHA-1, and a violated configuration option.
+
+MESSAGE is the multi-line error message.
+
+DETAILS is a multi-line string giving more details about the error. Usually
+showing error output from an external command.
+
+Besides the MESSAGE, which is required, and the PREFIX, which has a default
+value, all other items must be informed via the INFO hash-ref with the following
+keys:
 
 =over 4
 
-=item * prefix
+=item * B<prefix>
 
-A string giving contextual information about the error message. It's used as a
-prefix to the message. When absent, the prefix used is the package name of the
-function which called C<fault>, which is usually a Git::Hooks plugin name. So,
-the actual error message looks like this:
+A string giving broad contextual information about the error message. When
+absent, the prefix used is the package name of the function which called
+C<fault>, which is usually a Git::Hooks plugin name.
 
-  [PREFIX] MESSAGE
+=item * B<commit>
 
-=item * details
+The SHA-1 or a Git::Repository::Log object representing a commit. It is informed
+in the CONTEXT area like this (as a short SHA-1):
+
+  [PREFIX: commit SHA-1]
+
+=item * B<ref>
+
+The name of a Git reference (usually a branch). It is informed in the CONTEXT
+area like this:
+
+  [PREFIX: on ref REF]
+
+=item * B<option>
+
+The name of a configuration option related to the error message. It is informed
+in the CONTEXT area like this:
+
+  [PREFIX: violates option 'OPTION']
+
+=item * B<details>
 
 A string containing details about the error message. If present, it is appended
-to the line above, separated by an empty line, and with its lines prefixed by
-two spaces, like this:
-
-  [PREFIX] MESSAGE
-
-    DETAILS
-    MORE DETAILS...
+to the MESSAGE, separated by an empty line, and with its lines prefixed by two
+spaces.
 
 =back
 
 The method simply records the formatted error message and returns. It
 doesn't die.
+
+The messages can be colorized if they go to a terminal. This can be configured
+by the configuration options C<githooks.color> and C<< githooks.color.<slot> >>,
+which are explained in the section L<Git::Hooks/CONFIGURATION> documentation.
 
 =head2 get_faults
 
@@ -1772,6 +1918,11 @@ fetch its contents the method dies.
 =head2 file_size REV FILE
 
 Returns the size (in bytes) of FILE (a path relative to the repository root)
+in revision REV.
+
+=head2 file_mode REV FILE
+
+Returns the mode (as a number) of FILE (a path relative to the repository root)
 in revision REV.
 
 =head2 is_ref_enabled REF, SPECs...

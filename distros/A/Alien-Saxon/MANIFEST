@@ -1,0 +1,19 @@
+Changes
+lib/Alien/Saxon.pm
+Makefile.PL
+MANIFEST			This list of files
+SaxonHE9-8-0-7J/doc/img/logo_crop-mid-blue-background.gif
+SaxonHE9-8-0-7J/doc/img/saxonica_logo.gif
+SaxonHE9-8-0-7J/doc/index.html
+SaxonHE9-8-0-7J/doc/saxondocs.css
+SaxonHE9-8-0-7J/notices/CERN.txt
+SaxonHE9-8-0-7J/notices/JAMESCLARK.txt
+SaxonHE9-8-0-7J/notices/LICENSE.txt
+SaxonHE9-8-0-7J/notices/THAI.txt
+SaxonHE9-8-0-7J/notices/UNICODE.txt
+SaxonHE9-8-0-7J/saxon9-test.jar
+SaxonHE9-8-0-7J/saxon9-xqj.jar
+SaxonHE9-8-0-7J/saxon9he.jar
+t/basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -12,7 +12,7 @@ skip "Need an XLS parser", 1
 	unless try { Data::TableReader::Decoder::XLS->default_xls_module };
 subtest XLS => sub {
 	my $xls= new_ok( 'Data::TableReader::Decoder::XLS',
-		[ file_name => '', file_handle => open_data('AddressAuxData.xls'), log => sub {} ],
+		[ file_name => '', file_handle => open_data('AddressAuxData.xls'), _log => sub {} ],
 		'XLS decoder' );
 	run_test($xls);
 };
@@ -23,7 +23,7 @@ skip "Need an XLSX parser", 1
 	unless try { Data::TableReader::Decoder::XLSX->default_xlsx_module };
 subtest XLSX => sub {
 	my $xlsx= new_ok( 'Data::TableReader::Decoder::XLSX',
-		[ file_name => '', file_handle => open_data('AddressAuxData.xlsx'), log => sub {} ],
+		[ file_name => '', file_handle => open_data('AddressAuxData.xlsx'), _log => sub {} ],
 		'XLSX decoder' );
 	run_test($xlsx);
 };

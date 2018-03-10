@@ -1,21 +1,21 @@
 package Plack::Auth::SSO::CAS;
 
-use Catmandu::Sane;
-use Catmandu::Util qw(:check :is);
+use strict;
+use utf8;
+use Data::Util qw(:check);
 use Authen::CAS::Client;
 use Moo;
 use Plack::Request;
 use Plack::Session;
 use Plack::Auth::SSO::ResponseParser::CAS;
-use namespace::clean;
 
-our $VERSION = "0.011";
+our $VERSION = "0.0131";
 
 with "Plack::Auth::SSO";
 
 has cas_url => (
     is => "ro",
-    isa => sub { check_string($_[0]); },
+    isa => sub { is_string($_[0]) or die("cas_url should be string"); },
     required => 1
 );
 has cas => (
@@ -33,10 +33,6 @@ has response_parser => (
 
 sub _build_cas {
     my $self = $_[0];
-
-    #TODO
-    local $ENV{SSL_VERIFY_NONE}              = 1;
-    local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
     Authen::CAS::Client->new($self->cas_url());
 }
 sub _build_response_parser {
@@ -67,8 +63,14 @@ sub to_app {
 
         #ticket?
         my $ticket = $params->get("ticket");
+        my $request_uri = $request->request_uri();
+        my $idx = index( $request_uri, "?" );
+        if ( $idx >= 0 ) {
 
-        my $service = $self->uri_for($request->script_name());
+            $request_uri = substr( $request_uri, 0, $idx );
+
+        }
+        my $service = $self->uri_for($request_uri);
 
         if (is_string($ticket)) {
 
@@ -102,6 +104,17 @@ sub to_app {
                 ];
 
             }
+            #e.g. "Can't connect to localhost:8443 (certificate verify failed)"
+            elsif( $r->is_error() ) {
+
+                return [
+                    500,
+                    [ "Content-Type" => "text/html" ],
+                    [ $r->doc() ]
+                ];
+
+            }
+            #$r->is_failure() -> authenticationFailure: return to authentication url
 
         }
 

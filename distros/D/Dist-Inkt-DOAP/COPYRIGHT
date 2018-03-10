@@ -6,7 +6,6 @@ Source: https://metacpan.org/release/Dist-Inkt-DOAP
 Files: Changes
  META.json
  META.yml
- dist.ini
  doap.ttl
  lib/Dist/Inkt/Role/DetermineRightsFromRdf.pm
  lib/Dist/Inkt/Role/ProcessDOAP.pm
@@ -18,13 +17,7 @@ Files: Changes
  lib/Dist/Inkt/Role/WriteCREDITS.pm
  lib/Dist/Inkt/Role/WriteChanges.pm
  lib/Dist/Inkt/Role/WriteDOAP.pm
-Copyright: Copyright 2017 Kjetil Kjernsmo and Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: README
- README.pod
- lib/Dist/Inkt/DOAP.pm
-Copyright: This software is copyright (c) 2014 by Toby Inkster, 2017 by Kjetil Kjernsmo.
+Copyright: Copyright 2018 Kjetil Kjernsmo and Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -33,13 +26,27 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
+Files: README
+ README.pod
+ lib/Dist/Inkt/DOAP.pm
+Copyright: This software is copyright (c) 2014 by Toby Inkster, 2017 by Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: INSTALL
  LICENSE
 Copyright: Unknown
 License: Unknown
 
+Files: dist.ini
+Copyright: Copyright 2017 Kjetil Kjernsmo and Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/Dist/Inkt/Role/AddExternalRDF.pm
+Copyright: Copyright 2018 Kjetil Kjernsmo.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/01basic.t
@@ -47,14 +54,14 @@ Copyright: This software is copyright (c) 2014 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2017 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2017 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  

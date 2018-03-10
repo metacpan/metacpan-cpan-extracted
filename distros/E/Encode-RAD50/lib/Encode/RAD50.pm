@@ -69,9 +69,9 @@ package Encode::RAD50;
 use strict;
 use warnings;
 
-use base qw{Encode::Encoding};
+use parent qw{ Encode::Encoding };
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use Carp;
 use Encode qw{:fallback_all};
@@ -118,12 +118,12 @@ subroutine exported by Encode.
 =cut
 
 # The Encode::Encoding documentation says that decode() SHOULD modify
-# its $octets argument (the one after $self) if the $check argument is
-# true. If perlio_ok() is true, SHOULD becomes MUST. Perl::Critic does
-# not want us to do this, so we need to silence it.
+# its $octets argument (the one after the invocant) if the $check
+# argument is true. If perlio_ok() is true, SHOULD becomes MUST.
+# Perl::Critic does not want us to do this, so we need to silence it.
 
 sub decode {		## no critic (RequireArgUnpacking)
-    my ($self, undef, $check) = @_;
+    my ( undef, undef, $check ) = @_;	# Invocant unused
     $check ||= 0;
     $check &= $chk_mod;
     my $out = '';
@@ -172,7 +172,7 @@ subroutine exported by Encode.
 # argument as well.
 
 sub encode {		## no critic (RequireArgUnpacking)
-    my ($self, $string, $check) = @_;
+    my ( undef, $string, $check ) = @_;	# Invocant unused
     $check ||= 0;
     $check &= $chk_mod;
     length ($string) % 3 and
@@ -255,7 +255,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2005-2007, 2011-2016 by Thomas R. Wyant, III
+Copyright 2005-2007, 2011-2018 by Thomas R. Wyant, III
 (F<wyant at cpan dot org>). All rights reserved.
 
 PDP-11, RSTS-11, RSTS/E,  RSX-11, RSX-11M+, P/OS and RT-11 are
@@ -270,3 +270,5 @@ without any warranty; without even the implied warranty of
 merchantability or fitness for a particular purpose.
 
 =cut
+
+# ex: set textwidth=72 :

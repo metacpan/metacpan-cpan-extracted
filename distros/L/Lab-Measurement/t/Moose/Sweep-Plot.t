@@ -72,7 +72,7 @@ sub dummysource {
 
     my $foldername     = $sweep->foldername;
     my @files          = bsd_glob( catfile( $foldername, '*' ) );
-    my @expected_files = qw/data.dat data.dat.plot.png META.yml Sweep-Plot.t/;
+    my @expected_files = qw/data.dat data.png META.yml Sweep-Plot.t/;
     @expected_files = map { catfile( $foldername, $_ ) } @expected_files;
     is_deeply( \@files, \@expected_files, "output folder" );
 }

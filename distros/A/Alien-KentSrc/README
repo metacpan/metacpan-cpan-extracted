@@ -1,0 +1,32 @@
+NAME
+    Alien::KentSrc - Fetch/build/stash Kent src from
+    <http://hgdownload.cse.ucsc.edu/admin/>
+
+DESCRIPTION
+    Download, build and install Kent src library from
+    http://hgdownload.cse.ucsc.edu/admin/jksrc.vNNN.zip
+
+SYNOPSIS
+      use Alien::KentSrc;
+
+      say Alien::KentSrc->version;
+      $ENV{KENT_SRC} = Alien::KentSrc->dist_dir;
+      $ENV{MACHTYPE} = Alien::KentSrc->machtype;
+
+METHODS
+    In addition to those provide by the parent class Alien::Base,
+    Alien::KentSrc defines the following new methods.
+
+  machtype
+      # "x86_64"
+      Alien::KentSrc->machtype;
+
+    Return the MACHTYPE that *jkweb.a* was built with.
+
+AUTHOR
+    Roy Storey <kiwiroy@cpan.org>
+
+SEE ALSO
+    <http://hgdownload.cse.ucsc.edu/downloads.html#source_downloads>
+    <http://kentinformatics.com>
+

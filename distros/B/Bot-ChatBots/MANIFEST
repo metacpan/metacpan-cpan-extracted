@@ -8,12 +8,15 @@ META.yml
 README
 cpanfile
 dist.ini
+eg/lorem-rss
 lib/Bot/ChatBots.pm
 lib/Bot/ChatBots.pod
 lib/Bot/ChatBots/Auth.pm
 lib/Bot/ChatBots/Auth.pod
 lib/Bot/ChatBots/MojoPlugin.pm
 lib/Bot/ChatBots/MojoPlugin.pod
+lib/Bot/ChatBots/Role/Poller.pm
+lib/Bot/ChatBots/Role/Poller.pod
 lib/Bot/ChatBots/Role/Processor.pm
 lib/Bot/ChatBots/Role/Processor.pod
 lib/Bot/ChatBots/Role/Sender.pm
@@ -24,6 +27,8 @@ lib/Bot/ChatBots/Role/UserAgent.pm
 lib/Bot/ChatBots/Role/UserAgent.pod
 lib/Bot/ChatBots/Role/WebHook.pm
 lib/Bot/ChatBots/Role/WebHook.pod
+lib/Bot/ChatBots/Role/WebPoller.pm
+lib/Bot/ChatBots/Role/WebPoller.pod
 lib/Bot/ChatBots/Utils.pm
 lib/Bot/ChatBots/Utils.pod
 lib/Bot/ChatBots/Weak.pm

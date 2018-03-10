@@ -14,7 +14,7 @@ my $input= <<END;
 END
 open my $input_fh, '<', \$input or die;
 my $d= new_ok( 'Data::TableReader::Decoder::IdiotCSV',
-	[ file_name => '', file_handle => $input_fh, log => sub {} ],
+	[ file_name => '', file_handle => $input_fh, _log => sub {} ],
 	'IdiotCSV decoder' );
 
 ok( my $iter= $d->iterator, 'got iterator' );

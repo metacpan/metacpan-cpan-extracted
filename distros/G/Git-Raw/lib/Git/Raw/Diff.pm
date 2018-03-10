@@ -1,5 +1,5 @@
 package Git::Raw::Diff;
-$Git::Raw::Diff::VERSION = '0.75';
+$Git::Raw::Diff::VERSION = '0.78';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Diff - Git diff class
 
 =head1 VERSION
 
-version 0.75
+version 0.78
 
 =head1 DESCRIPTION
 
@@ -25,6 +25,10 @@ B<WARNING>: The API of this module is unstable and may change without warning
 =head2 new( $buffer )
 
 Create a diff from the content of a git patch.
+
+=head2 patchid( )
+
+Calculate the patch id.
 
 =head2 merge( $from )
 

@@ -1,5 +1,5 @@
 ---
-abstract: unknown
+abstract: 'command line utility for accessing Amazon Glacier storage'
 author:
   - 'Sergey Poznyakoff <gray@gnu.org>'
 build_requires:
@@ -38,4 +38,4 @@ requires:
   Scalar::Util: '1.47'
   Storable: '2.34'
   Term::ReadKey: '2.32'
-version: '1.00'
+version: '2.00'

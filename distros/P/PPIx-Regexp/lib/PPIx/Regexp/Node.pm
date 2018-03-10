@@ -42,7 +42,7 @@ use PPIx::Regexp::Constant qw{ FALSE MINIMUM_PERL NODE_UNKNOWN TRUE };
 use PPIx::Regexp::Util qw{ __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 
 use constant ELEMENT_UNKNOWN	=> NODE_UNKNOWN;
 
@@ -76,6 +76,8 @@ sub accepts_perl {
 # where it will be documented.
 sub __structured_requirements_for_perl {
     my ( $self, $rslt ) = @_;
+    $rslt ||= $self->__structured_requirements_for_any_perl();
+
     foreach my $elem ( $self->elements() ) {
 	$elem->__structured_requirements_for_perl( $rslt );
     }
@@ -146,7 +148,7 @@ C<PPIx::Regexp::Node> proper, it is the same as C<children()>.
 
 {
     no warnings qw{ once };
-    *elements = \&children;
+    *elements = \&children;	# sub slements
 }
 
 =head2 find
@@ -435,7 +437,7 @@ sub __nav {
     my ( $self, $child ) = @_;
     refaddr( $child->parent() ) == refaddr( $self )
 	or return;
-    my ( $method, $inx ) = $child->_my_inx()
+    my ( $method, $inx ) = $child->__my_nav()
 	or return;
 
     return ( $method => [ $inx ] );

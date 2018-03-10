@@ -20,10 +20,12 @@
 
 use 5.014_001;
 
-package Term::CLI::Argument  0.03002 {
+package Term::CLI::Argument  0.04004 {
 
 use Modern::Perl;
 use Moo;
+
+use Term::CLI::L10N;
 
 use Types::Standard qw( Int );
 
@@ -70,7 +72,7 @@ sub validate {
 
     $self->set_error('');
     if (!defined $value or $value eq '') {
-        return $self->set_error("value cannot be empty");
+        return $self->set_error(loc('value cannot be empty'));
     }
     return $value;
 }
@@ -89,7 +91,7 @@ Term::CLI::Argument - generic parent class for arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.03002
+version 0.04004
 
 =head1 SYNOPSIS
 

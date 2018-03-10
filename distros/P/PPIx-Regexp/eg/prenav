@@ -33,12 +33,22 @@ my %internal = (
 	    $obj, @args )->string();
     },
     help => sub {
-	pod2usage( {
-		-exitval	=> 'NOEXIT',
-		-verbose	=> 2,
-		-output		=> \*STDOUT,
-	    } );
-	return;
+	my ( $arg ) = @_;
+	my @extra;
+	if ( defined $arg ) {
+	    $arg =~ m/ \A [[:alpha:]_] \w* (?: :: [[:alpha:]_] \w* )* \z /smx
+		or die "Invalid module name $arg\n";
+	    ( my $fn = "$arg.pm" ) =~ s< :: ></>smxg;
+	    push @extra, '-input', exists $INC{$fn} ? $INC{$fn} :
+		_find_file_in_inc( $fn, "Can not find module $arg" );
+	}
+	pod2usage(
+	    -exitval	=> 'NOEXIT',
+	    -verbose	=> 2,
+	    -output		=> \*STDOUT,
+	    @extra,
+	);
+	return \'';
     },
     nav => sub {
 	return _safe( $obj->nav() );
@@ -56,7 +66,7 @@ my %internal = (
 sub _safe {
     my ( @args ) = @_;
     my $rslt = join ', ', map {
-	ref $_ eq 'ARRAY' ? '[ ' . _safe( @{ $_ } ) . ' ]' : "'$_'"
+	'ARRAY' eq ref $_ ? '[ ' . _safe( @{ $_ } ) . ' ]' : "'$_'"
     } @args;
     $rslt =~ s/ \[ \s+ \] /[]/smxg;
     $rslt =~ s/ ' ( \d+ ) ' /$1/smxg;
@@ -91,6 +101,20 @@ while ( defined ( my $buffer = $tr->readline( 'prenav> ' ) ) ) {
 	and $obj = $temp;
 }
 
+sub _find_file_in_inc {
+    my ( $fn, $msg ) = @_;
+    foreach my $dir ( @INC ) {
+	ref $dir	# Guard against code and objects in @INC
+	    and next;
+	my $path = "$dir/$fn";
+	-f $path
+	    and return $path;
+    }
+    $msg ||= "Can not find file $fn";
+    $msg =~ s/ (<! \n ) \z /\n/smx;
+    die $msg;
+}
+
 sub _format {
     my ( @args ) = @_;
     my $rslt;
@@ -98,8 +122,10 @@ sub _format {
     foreach my $thing ( @args ) {
 	if ( __instance( $thing, 'PPIx::Regexp::Element' ) ) {
 	    $rslt .= $thing->class() . "\t" . $thing->content() . "\n";
-	} elsif ( ref $thing eq 'ARRAY' ) {
+	} elsif ( 'ARRAY' eq ref $thing ) {
 	    $rslt .= _format( @{ $thing } );
+	} elsif ( 'SCALAR' eq ref $thing ) {
+	    $rslt .= ${ $thing };
 	} else {
 	    $rslt .= $thing =~ m/ \n /smx ? $thing :
 		$thing =~ m/ \A ' /smx ? "$thing\n" :
@@ -158,7 +184,7 @@ joining the results into a comma-delimited string.
 =item dump
 
 This command dumps the current object. Options to
-L<< PPIx::Regexp::Dumper->new()|PPIx::Regexp::Dumper/new> may be
+L<< PPIx::Regexp::Dumper->new()|PPIx::Regexp::Dumper/new >> may be
 specified as arguments to the command. See the L<SYNOPSIS|/SYNOPSIS> for
 an example.
 
@@ -169,6 +195,9 @@ This comamnd terminates the script.
 =item help
 
 This command displays this documentation.
+
+If you supply a module name as an argument, the documentation for that
+module will be displayed.
 
 =item nav
 

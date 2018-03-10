@@ -3,11 +3,11 @@ package DBIx::dbMan::Extension::SQLOutputInsert;
 use strict;
 use base 'DBIx::dbMan::Extension';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 1;
 
-sub IDENTIFICATION { return "000001-000070-000004"; }
+sub IDENTIFICATION { return "000001-000070-000005"; }
 
 sub preference { return 0; }
 
@@ -23,7 +23,7 @@ sub done {
 	$obj->{-mempool}->deregister('output_format','insert');
 	if ($obj->{-mempool}->get('output_format') eq 'insert') {
 		my @all_formats = $obj->{-mempool}->get_register('output_format');
-		$obj->{-mempool}->set('output_format',$all_formats[0]) if @all_formats;
+		$obj->{-mempool}->set('output_format',$all_formats ? $all_formats[0] : '');
 	}
 }
 	

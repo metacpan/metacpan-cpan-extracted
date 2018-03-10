@@ -6,8 +6,7 @@ Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml			Module meta-data (added by MakeMaker)
-README.md
-README.md.PL
+README
 t/000_load.t
 t/001_new.t
 t/010_pingecho.t
@@ -26,6 +25,7 @@ t/410_syn_host.t
 t/420_ping_syn_port.t
 t/450_service.t
 t/500_ping_icmp.t
+t/501_ping_icmpv6.t
 t/510_ping_udp.t
 t/520_icmp_ttl.t
 t/600_pod.t

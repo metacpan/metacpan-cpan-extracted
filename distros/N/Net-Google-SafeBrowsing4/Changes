@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::Google::SafeBrowsing4.
 
+0.7 Sun November 26 21:21:00 2014
+ - Save lists locally - issue 16
+ - Requets at most 500 full hashes (configurable) - issue 15
+
 0.6 Fri August 18 19:10:00 2017
 	- Fix manifest file
 

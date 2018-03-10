@@ -13,6 +13,7 @@ t/08-gsb-basic.t
 t/09-gsb-list.t
 t/10-gsb-storage-basic.t
 t/11-gsb-storage-file-basic.t
+t/12-gsb-storage-file.t
 lib/Net/Google/SafeBrowsing4.pm
 lib/Net/Google/SafeBrowsing4/URI.pm
 lib/Net/Google/SafeBrowsing4/Storage.pm

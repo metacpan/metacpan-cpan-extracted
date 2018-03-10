@@ -1,6 +1,6 @@
 package My::Module::Meta;
 
-use 5.006002;
+use 5.008;
 
 use strict;
 use warnings;
@@ -53,12 +53,12 @@ sub meta_merge {
 }
 
 sub requires {
-    my ( $self, @extra ) = @_;
+    my ( undef, @extra ) = @_;		# Invocant unused
 ##  if ( ! $self->distribution() ) {
 ##  }
     return +{
-	base			=> 0,
 	constant		=> 0,
+	parent			=> 0,
 	strict			=> 0,
 	warnings		=> 0,
 	'Carp'			=> 0,
@@ -69,7 +69,7 @@ sub requires {
 }
 
 sub requires_perl {
-    return 5.006002;
+    return 5.008;
 }
 
 
@@ -181,7 +181,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2016 by Thomas R. Wyant, III
+Copyright (C) 2010-2018 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

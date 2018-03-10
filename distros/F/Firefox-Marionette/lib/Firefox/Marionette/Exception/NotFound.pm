@@ -4,14 +4,16 @@ use strict;
 use warnings;
 use base qw(Firefox::Marionette::Exception::Response);
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 sub throw {
     my ( $class, $response, $parameters ) = @_;
     my $self = bless {
-        string => 'Failed to find '
+        string => $parameters->{using}
+        ? 'Failed to find '
           . $parameters->{using} . ' of "'
-          . $parameters->{value},
+          . $parameters->{value}
+        : 'Failed to find element',
         response   => $response,
         parameters => $parameters,
     }, $class;
@@ -27,7 +29,7 @@ Firefox::Marionette::Exception::NotFound - Represents a 'no such element' except
 
 =head1 VERSION
 
-Version 0.50
+Version 0.51
 
 =head1 SYNOPSIS
 

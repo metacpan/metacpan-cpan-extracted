@@ -8,11 +8,11 @@ BEGIN { import Term::ReadLine::Gnu qw/:prompt/; }
 use Term::ANSIColor;
 use DBI;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 1;
 
-sub IDENTIFICATION { return "000001-000005-000013"; }
+sub IDENTIFICATION { return "000001-000005-000014"; }
 
 sub preference { return 0; }
 
@@ -137,9 +137,13 @@ sub handle_action {
 			$action{action} = 'OUTPUT';
 			$action{output} = $obj->solve_open_error($error,$action{what});
 			$obj->{-interface}->rebuild_menu;
+
 		} elsif ($action{operation} eq 'reopen') {
 			my $reuse = 0;
 			$reuse = 1 if $obj->{-dbi}->current eq $action{what};
+
+            my $was = $obj->{-dbi}->current();
+            $obj->{-dbi}->set_current($action{what});
 
             my $trans_msg = '';
             if ($obj->{-dbi}->in_transaction()) {
@@ -155,14 +159,18 @@ sub handle_action {
 			$error = $obj->{-dbi}->open($action{what});
 			$action{output} .= $obj->solve_open_error($error,$action{what});
 
+            $error = $obj->{-dbi}->set_current($was);
 			if ($reuse) {
-				$error = $obj->{-dbi}->set_current($action{what});
 				$action{output} .= $obj->solve_use_error($error,$action{what});
 			}
 			$obj->{-interface}->add_to_actionlist({ action => 'NOTIFY', notify => 'connection_change' });
 			$obj->{-interface}->rebuild_menu;
+
 		} elsif ($action{operation} eq 'close') {
             my $trans_msg = '';
+            my $was = $obj->{-dbi}->current();
+            $obj->{-dbi}->set_current($action{what});
+
             if ($obj->{-dbi}->in_transaction()) {
                 $obj->{-dbi}->rollback;
                 $obj->{-dbi}->trans_end;
@@ -172,8 +180,12 @@ sub handle_action {
 			$action{action} = 'OUTPUT';
 			my $error = $obj->{-dbi}->close($action{what});
 			$action{output} = $trans_msg . $obj->solve_close_error($error,$action{what});
-			$obj->{-interface}->add_to_actionlist({ action => 'NOTIFY', notify => 'connection_change' });
+
+            $obj->{-dbi}->set_current($was);
 			$obj->{-interface}->rebuild_menu;
+			$obj->{-interface}->add_to_actionlist({ action => 'NOTIFY', notify => 'connection_change' });
+			$obj->{-interface}->add_to_actionlist({ action => 'TRANSACTION', operation => 'change' });
+
 		} elsif ($action{operation} eq 'use') {
 			$action{action} = 'OUTPUT';
 			my $error = $obj->{-dbi}->set_current($action{what});
@@ -181,6 +193,7 @@ sub handle_action {
 			$obj->{-interface}->rebuild_menu;
 			$obj->{-interface}->add_to_actionlist({ action => 'TRANSACTION', operation => 'change' });
 			$obj->{-interface}->add_to_actionlist({ action => 'NOTIFY', notify => 'connection_change' });
+
 		} elsif ($action{operation} eq 'show') {
 			my @list = @{$obj->{-dbi}->list($action{what})};
 			my $clist = '';
@@ -201,6 +214,7 @@ sub handle_action {
 			}
 			$action{action} = 'OUTPUT';
 			$action{output} = $clist;
+
 		} elsif ($action{operation} eq 'create') {
 			my %parm = ();
 			for (qw/driver dsn login password auto_login config prompt_color/) { $parm{$_} = $action{$_} || ''; }

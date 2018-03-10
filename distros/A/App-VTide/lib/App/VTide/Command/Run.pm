@@ -19,7 +19,7 @@ use IO::Prompt qw/prompt/;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('0.1.5');
+our $VERSION = version->new('0.1.6');
 our $NAME    = 'run';
 our $OPTIONS = [
     'name|n=s',
@@ -227,8 +227,7 @@ sub command {
         ? $params->{editor}{command}
         : $self->config->get->{editor}{command};
 
-    my @files;
-    my @globs  = ref $params->{edit} ? @{ $params->{edit} } : ( $params->{edit} );
+    my @globs = ref $params->{edit} ? @{ $params->{edit} } : ( $params->{edit} );
 
     eval { require Term::Title; }
         and Term::Title::set_titlebar($params->{title} || $globs[0]);
@@ -242,10 +241,27 @@ sub command {
     } or do { warn $@ };
 
     my $groups = $self->config->get->{editor}{files};
+    my @files = $self->_globs2files($groups, $helper, @globs);
+
+    return ( @$editor, @files );
+}
+
+sub _globs2files {
+    my ($self, $groups, $helper, @globs) = @_;
+    my @files;
+
     GLOB:
     while ( my $glob = shift @globs ) {
-        if ( $groups->{$glob} ) {
-            push @globs, @{ $groups->{$glob} };
+        my ($not_glob) = $glob =~ /^[!](.*)$/;
+
+        if ( $not_glob ) {
+            my %not_files = map { $_ => 1 }
+                $self->_globs2files($groups, $helper, $not_glob);
+            @files = grep { ! $not_files{$_} } @files;
+            next GLOB;
+        }
+        elsif ( $groups->{$glob} ) {
+            unshift @globs, @{ $groups->{$glob} };
             next GLOB;
         }
         elsif ( $helper ) {
@@ -256,7 +272,7 @@ sub command {
             } or do { warn $@ };
 
             if (@g) {
-                push @globs, @g;
+                unshift @globs, @g;
                 next GLOB;
             }
         }
@@ -264,7 +280,7 @@ sub command {
         push @files, $self->_dglob($glob);
     }
 
-    return ( @$editor, @files );
+    return @files;
 }
 
 sub _shell_quote {
@@ -331,7 +347,7 @@ App::VTide::Command::Run - Run a terminal command
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Run version 0.1.5
+This documentation refers to App::VTide::Command::Run version 0.1.6
 
 =head1 SYNOPSIS
 

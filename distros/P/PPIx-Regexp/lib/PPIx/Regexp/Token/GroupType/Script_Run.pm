@@ -11,20 +11,27 @@ use base qw{ PPIx::Regexp::Token::GroupType };
 
 use Carp;
 
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 
-sub __explanation {
-    return {
-	'+script_run:'	=> 'All characters must be in same script',
-    };
-}
+{
+    my $expl = 'All characters must be in same script';
 
-sub perl_version_introduced {
-    return '5.027008';
-}
-
-sub __defining_string {
-    return '+script_run:';
+    __PACKAGE__->__setup_class( {
+	    '+script_run:'	=> {
+		expl	=> $expl,
+		intro	=> '5.027008',
+		remov	=> '5.027009',
+	    },
+	    '*script_run:'	=> {
+		expl	=> $expl,
+		intro	=> '5.027009',
+	    },
+	    '*sr:'	=> {
+		expl	=> $expl,
+		intro	=> '5.027009',
+	    },
+	},
+    );
 }
 
 1;
@@ -38,7 +45,7 @@ PPIx::Regexp::Token::GroupType::Script_Run - Represent a script run specifier
 =head1 SYNOPSIS
 
  use PPIx::Regexp::Dumper;
- PPIx::Regexp::Dumper->new( 'qr{(+script_run:\d)}' )
+ PPIx::Regexp::Dumper->new( 'qr{(*script_run:\d)}' )
      ->print();
 
 =head1 INHERITANCE
@@ -51,8 +58,10 @@ C<PPIx::Regexp::Token::GroupType::Script_Run> has no descendants.
 =head1 DESCRIPTION
 
 This token represents the specifier for a script run - namely the
-C<'+script_run:'> that comes after the left parenthesis. This is new
-with Perl 5.27.8.
+C<'+script_run:'>, C<'*script_run:'>, or C<'*sr:'> that comes after the
+left parenthesis. The first form was added in Perl 5.27.8 but retracted
+in favor of the second ant third forms (which are equivalent) in Perl
+5.27.9.
 
 If this construction does not make it into Perl 5.28, this class will be
 retracted.

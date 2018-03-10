@@ -6,10 +6,6 @@
 
 Bot::ChatBots::MojoPlugin - Mojolicious Plugin base for Bot::ChatBots
 
-=head1 VERSION
-
-This document describes Bot::ChatBots::MojoPlugin version {{[ version ]}}.
-
 =head1 SYNOPSIS
 
    package Bot::ChatBots::Whatever;

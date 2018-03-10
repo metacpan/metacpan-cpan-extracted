@@ -16,6 +16,10 @@ unless (eval { require POSIX; 1 }) {
     plan skip_all => 'POSIX module is required for this test';
 }
 
+if ($^O eq 'cygwin') {
+    plan skip_all => 'chmod behavior varies on cygwin';
+}
+
 if ($> == 0) {
     plan skip_all => 'root user is exempt from file RW permissions restrictions';
 }
@@ -26,7 +30,7 @@ unless ($curloc eq $locale) {
     plan skip_all => "locale $locale is not available on this system";
 }
 
-use_ok 'Log::Dispatch::FileRotate';
+use Log::Dispatch::FileRotate;
 
 my $tempdir = Path::Tiny->tempdir;
 

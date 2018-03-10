@@ -3,12 +3,13 @@ package DBIx::dbMan::Extension::SQLOutputOldTable;
 use strict;
 use base 'DBIx::dbMan::Extension';
 use Data::ShowTable;
+use Term::ANSIColor;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 1;
 
-sub IDENTIFICATION { return "000001-000053-000005"; }
+sub IDENTIFICATION { return "000001-000053-000006"; }
 
 sub preference { return 0; }
 
@@ -19,6 +20,7 @@ sub init {
 	$obj->{-mempool}->register('output_format','oldtable');
 	$obj->{-mempool}->register('output_format','sqlplus');
 	$obj->{-mempool}->register('output_format','records');
+	$obj->{-mempool}->register('output_format','colorrecords');
 }
 
 sub done {
@@ -26,9 +28,10 @@ sub done {
 	$obj->{-mempool}->deregister('output_format','oldtable');
 	$obj->{-mempool}->deregister('output_format','sqlplus');
 	$obj->{-mempool}->deregister('output_format','records');
-	if ($obj->{-mempool}->get('output_format') =~ /^(oldtable|sqlplus|records)$/) {
+	$obj->{-mempool}->deregister('output_format','colorrecords');
+	if ($obj->{-mempool}->get('output_format') =~ /^(oldtable|sqlplus|(color)?records)$/) {
 		my @all_formats = $obj->{-mempool}->get_register('output_format');
-		$obj->{-mempool}->set('output_format',$all_formats[0]) if @all_formats;
+		$obj->{-mempool}->set('output_format',@all_formats ? $all_formats[0] : '');
 	}
 }
 	
@@ -37,7 +40,7 @@ sub handle_action {
 
 	$action{processed} = 1;
 	if ($action{action} eq 'SQL_OUTPUT') {
-		if ($obj->{-mempool}->get('output_format') =~ /^(oldtable|sqlplus|records)$/) {
+		if ($obj->{-mempool}->get('output_format') =~ /^(oldtable|sqlplus|(color)?records)$/) {
 			my @widths = ();
 			for ($action{fieldnames},@{$action{result}}) {
 				my $i = 0;
@@ -64,7 +67,7 @@ sub handle_action {
 						return () unless defined $action{result}->[$i];
 						return @{$action{result}->[$i++]};
 					}});
-			} elsif ($obj->{-mempool}->get('output_format') eq 'records') {
+			} elsif ( $obj->{-mempool}->get('output_format') =~ /^(color)?records$/ ) {
 				ShowListTable({
 					titles => $action{fieldnames},
 					types => [ map { 'text' } @{$action{fieldnames}} ],
@@ -96,6 +99,10 @@ sub handle_action {
 			}
 			unlink "/tmp/dbman.$$.showtable" if -f "/tmp/dbman.$$.showtable";
 			$action{action} = 'OUTPUT';
+            if ( $obj->{-mempool}->get('output_format') eq 'colorrecords' ) {
+                $table =~ s/^([^:]+):(.*)$/color( $obj->{-config}->tablecolor_head || 'bright_yellow' ) . $1 . color( $obj->{-config}->tablecolor_lines || 'reset' ) . ':' . color( $obj->{-config}->tablecolor_content || 'bright_white' ) . $2/meg;
+                $table .= color( 'reset' );
+            }
 			$action{output} = $table;
 			delete $action{processed};
 		}

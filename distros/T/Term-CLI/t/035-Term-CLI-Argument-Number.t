@@ -29,6 +29,7 @@ use Test::Exception;
 use FindBin;
 use Term::CLI::ReadLine;
 use Term::CLI::Argument::Number;
+use Term::CLI::L10N;
 
 my $ARG_NAME  = 'test_number';
 
@@ -37,6 +38,9 @@ $::ENV{PATH} = '/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin';
 
 sub startup : Test(startup => 1) {
     my $self = shift;
+
+    Term::CLI::L10N->set_language('en');
+
     my $arg = Term::CLI::Argument::Number->new(
         name => $ARG_NAME,
     );

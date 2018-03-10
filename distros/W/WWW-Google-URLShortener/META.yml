@@ -20,28 +20,28 @@ no_index:
 provides:
   WWW::Google::URLShortener:
     file: lib/WWW/Google/Shortener.pm
-    version: '0.23'
+    version: '0.24'
   WWW::Google::URLShortener::Analytics:
     file: lib/WWW/Google/Shortener/Analytics.pm
-    version: '0.23'
+    version: '0.24'
   WWW::Google::URLShortener::Analytics::Result:
     file: lib/WWW/Google/Shortener/Analytics/Result.pm
-    version: '0.23'
+    version: '0.24'
   WWW::Google::URLShortener::Analytics::Result::Browser:
     file: lib/WWW/Google/Shortener/Analytics/Result/Browser.pm
-    version: '0.23'
+    version: '0.24'
   WWW::Google::URLShortener::Analytics::Result::Country:
     file: lib/WWW/Google/Shortener/Analytics/Result/Country.pm
-    version: '0.23'
+    version: '0.24'
   WWW::Google::URLShortener::Analytics::Result::Platform:
     file: lib/WWW/Google/Shortener/Analytics/Result/Platform.pm
-    version: '0.23'
+    version: '0.24'
   WWW::Google::URLShortener::Analytics::Result::Referrer:
     file: lib/WWW/Google/Shortener/Analytics/Result/Referrer.pm
-    version: '0.23'
+    version: '0.24'
   WWW::Google::URLShortener::Params:
     file: lib/WWW/Google/Shortener/Params.pm
-    version: '0.23'
+    version: '0.24'
 requires:
   Data::Validate::Domain: '0.10'
   Data::Validate::URI: '0.06'
@@ -52,5 +52,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/WWW-Google-URLShortener.git
-version: '0.23'
+version: '0.24'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

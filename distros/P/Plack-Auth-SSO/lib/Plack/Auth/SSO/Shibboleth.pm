@@ -1,14 +1,15 @@
 package Plack::Auth::SSO::Shibboleth;
 
-use Catmandu::Sane;
-use Catmandu::Util qw(:check :is array_includes);
+use strict;
+use utf8;
+use feature qw(:5.10);
+use Data::Util qw(:check);
 use Moo;
 use Plack::Request;
 use Plack::Session;
 use JSON;
-use namespace::clean;
 
-our $VERSION = "0.011";
+our $VERSION = "0.0131";
 
 with "Plack::Auth::SSO";
 
@@ -17,32 +18,34 @@ with "Plack::Auth::SSO";
 has request_type => (
     is => "ro",
     isa => sub {
-        array_includes([qw(env header)],$_[0]) or die("request_type must be either 'env' or 'header'");
+        my $r = $_[0];
+        is_string( $r ) or die( "request_type should be string" );
+        $r eq "env" || $r eq "header" || die( "request_type must be either 'env' or 'header'" );
     },
     lazy => 1,
     default => sub { "env"; }
 );
 has shib_session_id_field => (
     is => "ro",
-    isa => sub { check_string($_[0]); },
+    isa => sub { is_string( $_[0] ) or die( "shib_session_id_field should be string" ); },
     lazy => 1,
     default => sub { "Shib-Session-ID"; }
 );
 has shib_application_id_field => (
     is => "ro",
-    isa => sub { check_string($_[0]); },
+    isa => sub { is_string( $_[0] ) or die( "shib_application_id_field should be string" ); },
     lazy => 1,
     default => sub { "Shib-Application-ID"; }
 );
 has uid_field => (
     is => "ro",
-    isa => sub { check_string($_[0]); },
+    isa => sub { is_string( $_[0] ) or die( "uid_field should be string" ); },
     lazy => 1,
     default => sub { "eppn"; }
 );
 has info_fields => (
     is => "ro",
-    isa => sub { check_array_ref($_[0]); },
+    isa => sub { is_array_ref( $_[0] ) or die( "info_fields should be array ref" ); },
     lazy => 1,
     default => sub { []; }
 );
@@ -209,42 +212,41 @@ Fields to be extracted from the environment/headers
 
 =head1 auth_sso output
 
+    {
 
-{
+        package => "Plack::Auth::SSO::Shibboleth",
 
-    package => "Plack::Auth::SSO::Shibboleth",
+        package_id => "Plack::Auth::SSO::Shibboleth",
 
-    package_id => "Plack::Auth::SSO::Shibboleth",
+        #configured by "uid_field"
+        uid => "<unique-identifier>",
 
-    #configured by "uid_field"
-    uid => "<unique-identifier>",
+        #configured by "info_fields". Empty otherwise
+        info => {
+            attr1 => "attr1",
+            attr2 => "attr2"
+        },
 
-    #configured by "info_fields". Empty otherwise
-    info => {
-        attr1 => "attr1",
-        attr2 => "attr2"
-    },
+        #Shibboleth headers/environment variables
+        extra => {
+            "Shib-Session-Id" => "..",
+            "Shib-Application-Id" => "..",
+            "Shib-Identity-Provider" => "https://path.to/shibboleth./idp",
+            "Shib-Authentication-Instant" => "",
+            "Shib-Authentication-Method" => "POST",
+            "Shib-AuthnContext-Class" => "..",
+            "Shib-AuthnContext-Decl" => "..",
+            "Shib-Handler" => "..",
+            "Shib-Session-Index" => ".."
+            "Shib-Cookie-Name" => ".."
+        },
 
-    #Shibboleth headers/environment variables
-    extra => {
-        "Shib-Session-Id" => "..",
-        "Shib-Application-Id" => "..",
-        "Shib-Identity-Provider" => "https://path.to/shibboleth./idp",
-        "Shib-Authentication-Instant" => "",
-        "Shib-Authentication-Method" => "POST",
-        "Shib-AuthnContext-Class" => "..",
-        "Shib-AuthnContext-Decl" => "..",
-        "Shib-Handler" => "..",
-        "Shib-Session-Index" => ".."
-        "Shib-Cookie-Name" => ".."
-    },
-
-    #We cannot access the original SAML response, so we rely on the headers/environment
-    response => {
-        content_type => "application/json",
-        content => "<headers/environment serialized as json>"
+        #We cannot access the original SAML response, so we rely on the headers/environment
+        response => {
+            content_type => "application/json",
+            content => "<headers/environment serialized as json>"
+        }
     }
-}
 
 =head1 GLOBAL SETUP
 
@@ -275,153 +277,153 @@ This module merely convert these attributes.
 
 =item plack application
 
-use Catmandu::Sane;
-use Catmandu::Util qw(:is);
-use Plack::Auth::SSO::Shibboleth;
-use Plack::Builder;
-use Plack::Session;
-use JSON;
+    use strict;
+    use Data::Util qw(:check);
+    use Plack::Auth::SSO::Shibboleth;
+    use Plack::Builder;
+    use Plack::Session;
+    use JSON;
 
-my $uri_base = "https://example.org";
+    my $uri_base = "https://example.org";
 
-builder {
+    builder {
 
-    enable "Session",
+        enable "Session",
 
-    #mod_shib should intercept all requests to this path
-    mount "/auth/shibboleth"  => Plack::Auth::SSO::Shibboleth->new(
-        uri_base => $uri_base,
-        authorization_path => "/authorize",
-        uid_field => "uid",
-        request_type => "header",
-        info_fields => [qw(mail organizational-unit-name givenname sn unscoped-affiliation entitlement persistent-id)]
-    )->to_app();
+        #mod_shib should intercept all requests to this path
+        mount "/auth/shibboleth"  => Plack::Auth::SSO::Shibboleth->new(
+            uri_base => $uri_base,
+            authorization_path => "/authorize",
+            uid_field => "uid",
+            request_type => "header",
+            info_fields => [qw(mail organizational-unit-name givenname sn unscoped-affiliation entitlement persistent-id)]
+        )->to_app();
 
-    mount "/authorize" => sub {
+        mount "/authorize" => sub {
 
-        my $env = shift;
-        my $session = Plack::Session->new($env);
+            my $env = shift;
+            my $session = Plack::Session->new($env);
 
-        #already logged in. What are you doing here?
-        if ( is_hash_ref( $session->get("user") ) ) {
+            #already logged in. What are you doing here?
+            if ( is_hash_ref( $session->get("user") ) ) {
 
-            return [
+                return [
+                    302,
+                    [ Location => "${uri_base}/authorized" ],
+                    []
+                ];
+
+            }
+
+            my $auth_sso = $session->get("auth_sso");
+
+            #not authenticated yet
+            unless($auth_sso){
+
+                return [
+                    302,
+                    [ "Location" => "${uri_base}/" ],
+                    []
+                ];
+
+            }
+
+            $session->set("user",{ uid => $auth_sso->{uid}, auth_sso => $auth_sso });
+
+            [
                 302,
                 [ Location => "${uri_base}/authorized" ],
                 []
             ];
 
-        }
+        };
+        mount "/authorized" => sub {
+            state $json = JSON->new->utf8(1);
 
-        my $auth_sso = $session->get("auth_sso");
+            my $env = shift;
+            my $session = Plack::Session->new($env);
+            my $user = $session->get("user");
 
-        #not authenticated yet
-        unless($auth_sso){
+            #not logged in
+            unless ( is_hash_ref( $user ) ) {
 
-            return [
-                302,
-                [ "Location" => "${uri_base}/" ],
-                []
+                return [
+                    401,
+                    [ "Content-Type" => "text/plain" ],
+                    [ "Forbidden" ]
+                ];
+
+            }
+
+            #logged in: show user his/her data
+            [
+                200,
+                [ "Content-Type" => "application/json" ],
+                [ $json->encode( $user ) ]
             ];
 
-        }
-
-        $session->set("user",{ uid => $auth_sso->{uid}, auth_sso => $auth_sso });
-
-        [
-            302,
-            [ Location => "${uri_base}/authorized" ],
-            []
-        ];
+        };
 
     };
-    mount "/authorized" => sub {
-        state $json = JSON->new->utf8(1);
-
-        my $env = shift;
-        my $session = Plack::Session->new($env);
-        my $user = $session->get("user");
-
-        #not logged in
-        unless ( is_hash_ref( $user ) ) {
-
-            return [
-                401,
-                [ "Content-Type" => "text/plain" ],
-                [ "Forbidden" ]
-            ];
-
-        }
-
-        #logged in: show user his/her data
-        [
-            200,
-            [ "Content-Type" => "application/json" ],
-            [ $json->encode( $user ) ]
-        ];
-
-    };
-
-};
 
 =item httpd.conf
 
-NameVirtualHost *:443
-<VirtualHost *:443 >
+    NameVirtualHost *:443
+    <VirtualHost *:443 >
 
-  ServerName example.org
+      ServerName example.org
 
-  #shibd is a background service, so it needs to know the domain and port
-  UseCanonicalName on
-  UseCanonicalPhysicalPort on
+      #shibd is a background service, so it needs to know the domain and port
+      UseCanonicalName on
+      UseCanonicalPhysicalPort on
 
-  #configure SSL
-  SSLEngine on
-  SSLProtocol all -SSLv2 -SSLv3
-  SSLHonorCipherOrder on
-  SSLCipherSuite "ALL:!ADH:!EXP:!LOW:!RC2:!SEED:!RC4:+HIGH:+MEDIUM HIGH:!SSLv2:!ADH:!aNULL:!eNULL:!NULL !PSK !SRP !DSS"
-  SSLCertificateFile /etc/httpd/ssl/server.pem
-  SSLCertificateKeyFile /etc/httpd/ssl/server.key
-  SSLCACertificateFile /etc/httpd/ssl/server.pem
+      #configure SSL
+      SSLEngine on
+      SSLProtocol all -SSLv2 -SSLv3
+      SSLHonorCipherOrder on
+      SSLCipherSuite "ALL:!ADH:!EXP:!LOW:!RC2:!SEED:!RC4:+HIGH:+MEDIUM HIGH:!SSLv2:!ADH:!aNULL:!eNULL:!NULL !PSK !SRP !DSS"
+      SSLCertificateFile /etc/httpd/ssl/server.pem
+      SSLCertificateKeyFile /etc/httpd/ssl/server.key
+      SSLCACertificateFile /etc/httpd/ssl/server.pem
 
-  #do not proxy Shibboleth paths
-  ProxyPass /shibboleth-sp !
-  ProxyPass /Shibboleth.sso !
+      #do not proxy Shibboleth paths
+      ProxyPass /shibboleth-sp !
+      ProxyPass /Shibboleth.sso !
 
-  #proxy all requests to background Plack application
-  ProxyPass / http://127.0.0.1:5000/
-  ProxyPassReverse / http://127.0.0.1:5000/
+      #proxy all requests to background Plack application
+      ProxyPass / http://127.0.0.1:5000/
+      ProxyPassReverse / http://127.0.0.1:5000/
 
-  #all request to /auth/shibboleth should be intercepted by mod_shib before
-  #sending to background plack application
-  <Location /auth/shibboleth>
+      #all request to /auth/shibboleth should be intercepted by mod_shib before
+      #sending to background plack application
+      <Location /auth/shibboleth>
 
-    AuthName "shibboleth"
-    AuthType shibboleth
-    Require valid-user
-    ShibRequestSetting requireSession true
-    ShibRequestSetting redirectToSSL 443
+        AuthName "shibboleth"
+        AuthType shibboleth
+        Require valid-user
+        ShibRequestSetting requireSession true
+        ShibRequestSetting redirectToSSL 443
 
-    #necessary to send the attributes in the headers
-    ShibUseHeaders On
-  </Location>
+        #necessary to send the attributes in the headers
+        ShibUseHeaders On
+      </Location>
 
-  #Path to metadata.xml
-  Alias /shibboleth-sp /var/www/html/shibboleth-sp
+      #Path to metadata.xml
+      Alias /shibboleth-sp /var/www/html/shibboleth-sp
 
-  #handler for Shibboleth Service Provider
-  <Location /Shibboleth.sso>
-    SetHandler shib-handler
-    ErrorDocument 403 /public/403.html
-  </Location>
+      #handler for Shibboleth Service Provider
+      <Location /Shibboleth.sso>
+        SetHandler shib-handler
+        ErrorDocument 403 /public/403.html
+      </Location>
 
-  ProxyRequests Off
-  <Proxy *>
-    Order Deny,Allow
-    Allow from all
-  </Proxy>
+      ProxyRequests Off
+      <Proxy *>
+        Order Deny,Allow
+        Allow from all
+      </Proxy>
 
-</VirtualHost>
+    </VirtualHost>
 
 =back
 

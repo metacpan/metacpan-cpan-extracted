@@ -40,7 +40,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -307,7 +307,7 @@ sub _launch_xvfb_if_required {
 
 sub _setup_arguments {
     my ( $self, %parameters ) = @_;
-    my @arguments = ('-marionette');
+    my @arguments = qw(-marionette);
 
     if ( $parameters{firefox_binary} ) {
         $self->{firefox_binary} = $parameters{firefox_binary};
@@ -1166,12 +1166,12 @@ sub _proxy_from_env {
     return $self->_convert_proxy_before_request($build);
 }
 
-sub new_session {
+sub _new_session_parameters {
     my ( $self, $capabilities ) = @_;
     my $parameters = {};
     if (   ( defined $capabilities )
         && ( ref $capabilities )
-        && ( ref $capabilities eq 'Firefox::Marionette::Capabilities') )
+        && ( ref $capabilities eq 'Firefox::Marionette::Capabilities' ) )
     {
         my $actual = {};
         if ( defined $capabilities->accept_insecure_certs() ) {
@@ -1211,6 +1211,12 @@ sub new_session {
         $parameters->{capabilities}->{requiredCapabilities}->{proxy} =
           $env_proxy;                         # for Mozilla 56 (and below???)
     }
+    return $parameters;
+}
+
+sub new_session {
+    my ( $self, $capabilities ) = @_;
+    my $parameters = $self->_new_session_parameters($capabilities);
     my $message_id = $self->_new_message_id();
     $self->_send_request(
         [
@@ -1633,7 +1639,7 @@ my %_deprecated_commands = (
     'WebDriver:FindElement'                  => 'findElement',
     'WebDriver:FindElements'                 => 'findElements',
     'WebDriver:Forward'                      => 'goForward',
-    'WebDriver:FullscreenWindow'             => 'fullscreenWindow',
+    'WebDriver:FullscreenWindow'             => 'fullscreen',
     'WebDriver:GetActiveElement'             => 'getActiveElement',
     'WebDriver:GetActiveFrame'               => 'getActiveFrame',
     'WebDriver:GetAlertText'                 => 'getTextFromDialog',
@@ -1659,7 +1665,6 @@ my %_deprecated_commands = (
     'WebDriver:IsElementDisplayed'           => 'isElementDisplayed',
     'WebDriver:IsElementEnabled'             => 'isElementEnabled',
     'WebDriver:IsElementSelected'            => 'isElementSelected',
-    'WebDriver:MinimizeWindow'               => 'minimizeWindow',
     'WebDriver:MaximizeWindow'               => 'maximizeWindow',
     'WebDriver:Navigate'                     => 'get',
     'WebDriver:NewSession'                   => 'newSession',
@@ -1989,10 +1994,14 @@ sub dismiss_alert {
 sub send_alert_text {
     my ( $self, $text ) = @_;
     my $message_id = $self->_new_message_id();
+    my $parameters = { text => $text };
+    if ( !$self->_is_new_sendkeys_okay() ) {
+        $parameters->{value} = [ split //smx, $text ];
+    }
     $self->_send_request(
         [
-            _COMMAND(), $message_id,
-            'WebDriver:SendAlertText', { text => $text }
+            _COMMAND(),                                 $message_id,
+            $self->_command('WebDriver:SendAlertText'), $parameters
         ]
     );
     my $response = $self->_get_response($message_id);
@@ -2024,8 +2033,8 @@ sub selfie {
     my $message_id = $self->_new_message_id();
     my $parameters = {};
     my %extra;
-    if ( ( ref $element )
-            && ( ref $element eq 'Firefox::Marionette::Element' ) )
+    if (   ( ref $element )
+        && ( ref $element eq 'Firefox::Marionette::Element' ) )
     {
         $parameters = { id => $element->uuid() };
         %extra = @remaining;
@@ -2504,6 +2513,25 @@ sub async_script {
     return $self;
 }
 
+sub interactive {
+    my ($self) = @_;
+    if ( $self->loaded() ) {
+        return 1;
+    }
+    else {
+        return $self->script(
+'if (document.readyState === "interactive") { return 1; } else { return 0 }'
+        );
+    }
+}
+
+sub loaded {
+    my ($self) = @_;
+    return $self->script(
+'if (document.readyState === "complete") { return 1; } else { return 0 }'
+    );
+}
+
 sub script {
     my ( $self, $script, %parameters ) = @_;
     delete $parameters{script};
@@ -2603,7 +2631,8 @@ sub switch_to_shadow_root {
     $self->_send_request(
         [
             _COMMAND(), $message_id,
-            'WebDriver:SwitchToShadowRoot', { element => $element->uuid() }
+            $self->_command('WebDriver:SwitchToShadowRoot'),
+            { id => $element->uuid() }
         ]
     );
     my $response = $self->_get_response($message_id);
@@ -2617,7 +2646,7 @@ sub switch_to_window {
         [
             _COMMAND(), $message_id,
             $self->_command('WebDriver:SwitchToWindow'),
-            { name => $window_handle }
+            { name => "$window_handle" }
         ]
     );
     my $response = $self->_get_response($message_id);
@@ -2673,8 +2702,14 @@ sub bye {
             if (
                 ( ref $EVAL_ERROR )
                 && (
-                    ref $EVAL_ERROR eq
-                    'Firefox::Marionette::Exception::NotFound' )
+                    (
+                        ref $EVAL_ERROR eq
+                        'Firefox::Marionette::Exception::NotFound'
+                    )
+                    || (
+                        ref $EVAL_ERROR eq
+                        'Firefox::Marionette::Exception::StaleElement' )
+                )
               )
             {
                 $found = 0;
@@ -2695,15 +2730,21 @@ sub await {
             if (
                 ( ref $EVAL_ERROR )
                 && (
-                    ref $EVAL_ERROR eq
-                    'Firefox::Marionette::Exception::NotFound' )
+                    (
+                        ref $EVAL_ERROR eq
+                        'Firefox::Marionette::Exception::NotFound'
+                    )
+                    || (
+                        ref $EVAL_ERROR eq
+                        'Firefox::Marionette::Exception::StaleElement' )
+                )
               )
             {
                 Time::HiRes::sleep(
                     $self->sleep_time_in_ms() / _MILLISECONDS_IN_ONE_SECOND() );
                 next;
             }
-            else {
+            elsif ( ref $EVAL_ERROR ) {
                 Carp::croak($EVAL_ERROR);
             }
         };
@@ -2916,7 +2957,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.50
+Version 0.51
 
 =head1 SYNOPSIS
 
@@ -2933,7 +2974,7 @@ Version 0.50
 
     $firefox->find('//button[@name="lucky"]')->click();
 
-    $firefox->await(sub { $firefox->find_partial('Download') })->click();
+    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click()
 
 =head1 DESCRIPTION
 
@@ -3163,6 +3204,32 @@ accepts an L<element|Firefox::Marionette::Element> as the first parameter and a 
     $element->type('Test::More');
     $element->property('value') eq 'Test::More' or die "This property should have changed!";
 
+=head2 interactive
+
+returns true if C<document.readyState === "interactive"> or if L<loaded|Firefox::Marionette#loaded> is true
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    $firefox->find_id('search_input')->type('Type::More');
+    $firefox->find('//button[@name="lucky"]')->click();
+    while(!$firefox->interactive()) {
+        # redirecting to Test::More page
+    }
+
+=head2 loaded
+
+returns true if C<document.readyState === "complete">
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    $firefox->find_id('search_input')->type('Type::More');
+    $firefox->find('//button[@name="lucky"]')->click();
+    while(!$firefox->loaded()) {
+        # redirecting to Test::More page
+    }
+
 =head2 mime_types
 
 returns a list of MIME types that will be downloaded by firefox and made available from the L<downloads|Firefox::Marionette#downloads> method
@@ -3189,7 +3256,7 @@ returns a list of file paths (including partial downloads) of downloads during t
 
     $firefox->find('//button[@name="lucky"]')->click();
 
-    $firefox->await(sub { $firefox->find_partial('Download') })->click();
+    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click()
 
     while(!$firefox->downloads()) { sleep 1 }
 
@@ -3209,7 +3276,7 @@ returns true if any files in L<downloads|Firefox::Marionette#downloads> end in C
 
     $firefox->find('//button[@name="lucky"]')->click();
 
-    $firefox->await(sub { $firefox->find_partial('Download') })->click();
+    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click()
 
     while(!$firefox->downloads()) { sleep 1 }
 

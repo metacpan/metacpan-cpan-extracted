@@ -21,6 +21,7 @@ lib/PPIx/Regexp/Node/Unknown.pm
 lib/PPIx/Regexp/StringTokenizer.pm
 lib/PPIx/Regexp/Structure.pm
 lib/PPIx/Regexp/Structure/Assertion.pm
+lib/PPIx/Regexp/Structure/Atomic_Script_Run.pm
 lib/PPIx/Regexp/Structure/BranchReset.pm
 lib/PPIx/Regexp/Structure/Capture.pm
 lib/PPIx/Regexp/Structure/CharClass.pm
@@ -53,6 +54,7 @@ lib/PPIx/Regexp/Token/Delimiter.pm
 lib/PPIx/Regexp/Token/Greediness.pm
 lib/PPIx/Regexp/Token/GroupType.pm
 lib/PPIx/Regexp/Token/GroupType/Assertion.pm
+lib/PPIx/Regexp/Token/GroupType/Atomic_Script_Run.pm
 lib/PPIx/Regexp/Token/GroupType/BranchReset.pm
 lib/PPIx/Regexp/Token/GroupType/Code.pm
 lib/PPIx/Regexp/Token/GroupType/Modifier.pm
@@ -99,4 +101,5 @@ xt/author/perlcriticrc
 xt/author/pod.t
 xt/author/pod_coverage.t
 xt/author/pod_spelling.t
+xt/author/unit_left_curly.t
 xt/author/unicode_short_charclass.t

@@ -34,30 +34,21 @@ use warnings;
 
 use base qw{ PPIx::Regexp::Token::GroupType };
 
-our $VERSION = '0.055';
-
-# Return true if the token can be quantified, and false otherwise
-# sub can_be_quantified { return };
+our $VERSION = '0.056';
 
 {
-
-    my %explanation = (
-	'?>'	=> 'Match subexpression without backtracking',
+    my $expl = 'Match subexpression without backtracking';
+    __PACKAGE__->__setup_class( {
+	    '?>'		=> {
+		expl	=> $expl,
+		intro	=> '5.005',
+	    },
+	    '*atomic:'	=> {
+		expl	=> $expl,
+		intro 	=>'5.027009',
+	    },
+	}
     );
-
-    sub __explanation {
-	return \%explanation;
-    }
-
-}
-
-sub perl_version_introduced {
-##  my ( $self ) = @_;		# Invocant unused
-    return '5.005';
-}
-
-sub __defining_string {
-    return '?>';
 }
 
 1;

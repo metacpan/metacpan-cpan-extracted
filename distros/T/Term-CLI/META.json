@@ -4,7 +4,7 @@
       "Steven Bakker <sbakker@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -28,15 +28,19 @@
       },
       "runtime" : {
          "requires" : {
+            "Exporter" : "0",
             "File::Which" : "0",
             "FindBin" : "0",
             "Getopt::Long" : "0",
             "List::Util" : "0",
+            "Locale::Maketext" : "0",
+            "Locale::Maketext::Lexicon::Gettext" : "0",
             "Modern::Perl" : "0",
             "Moo" : "0",
             "Moo::Role" : "0",
             "POSIX" : "0",
             "Pod::Text::Termcap" : "0",
+            "Scalar::Util" : "0",
             "Term::ReadLine" : "0",
             "Term::ReadLine::Gnu" : "0",
             "Text::ParseWords" : "0",
@@ -44,6 +48,7 @@
             "namespace::clean" : "0",
             "parent" : "0",
             "perl" : "5.014_001",
+            "subs" : "0",
             "warnings" : "0"
          }
       },
@@ -74,7 +79,7 @@
          "web" : "https://github.com/sbakker/perl-Term-CLI"
       }
    },
-   "version" : "0.03002",
+   "version" : "0.04004",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

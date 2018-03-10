@@ -5,16 +5,21 @@ use strict;
 use warnings FATAL => 'all';
 use OxdPackages::OxdConfig;
 use OxdPackages::OxdRegister;
+use OxdPackages::OxdSetupClient;
+use OxdPackages::OxdRemove;
+use OxdPackages::GetClientToken;
+use OxdPackages::IntrospectAccessToken;
 use OxdPackages::UpdateRegistration;
 use OxdPackages::GetAuthorizationUrl;
 use OxdPackages::GetTokenByCode;
+use OxdPackages::GetAccessTokenByRefreshToken;
 use OxdPackages::GetUserInfo;
 use OxdPackages::OxdLogout;
 use OxdPackages::UmaRsProtect;
-use OxdPackages::UmaRpAuthorizeRpt;
-use OxdPackages::UmaRpGetGat;
 use OxdPackages::UmaRpGetRpt;
+use OxdPackages::UmaIntrospectRpt;
 use OxdPackages::UmaRsCheckAccess;
+use OxdPackages::UmaRpGetClaimsGatheringUrl;
 
 =head1 NAME
 
@@ -67,8 +72,8 @@ Gaurav Chhabra, C<< <gaurav.chhabra6785 at gmail.com> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-oxdperl at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=oxdperl>.  I will be notified, and then you'll
+Please report any bugs or feature requests to C<bug-oxdperlmodule at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=OxdPerlModule>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 
@@ -87,19 +92,19 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker (report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=oxdperl>
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=OxdPerlModule>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/oxdperl>
+L<http://annocpan.org/dist/OxdPerlModule>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/oxdperl>
+L<http://cpanratings.perl.org/d/OxdPerlModule>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/oxdperl/>
+L<http://search.cpan.org/dist/OxdPerlModule/>
 
 =back
 
@@ -109,7 +114,7 @@ L<http://search.cpan.org/dist/oxdperl/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Gluu.
+Copyright 2017 Gaurav Chhabra.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

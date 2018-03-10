@@ -1,0 +1,6 @@
+name = "Plack-Middleware-ServerTiming"
+badges = ["travis"]
+authority="cpan:AKIYM"
+
+module_maker="ModuleBuildTiny"
+

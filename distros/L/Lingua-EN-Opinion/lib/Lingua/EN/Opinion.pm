@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Measure the emotional sentiment of text
 
-our $VERSION = '0.06';
+our $VERSION = '0.0601';
 
 use Moo;
 use strictures 2;
@@ -155,7 +155,7 @@ Lingua::EN::Opinion - Measure the emotional sentiment of text
 
 =head1 VERSION
 
-version 0.06
+version 0.0601
 
 =head1 SYNOPSIS
 

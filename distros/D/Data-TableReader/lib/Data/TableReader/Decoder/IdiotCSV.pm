@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder::IdiotCSV;
-$Data::TableReader::Decoder::IdiotCSV::VERSION = '0.005';
+$Data::TableReader::Decoder::IdiotCSV::VERSION = '0.006';
 use Moo 2;
 use Try::Tiny;
 use Carp;
@@ -36,7 +36,7 @@ Data::TableReader::Decoder::IdiotCSV - Access rows of a badly formatted comma-de
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -70,7 +70,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Michael Conrad.
+This software is copyright (c) 2018 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

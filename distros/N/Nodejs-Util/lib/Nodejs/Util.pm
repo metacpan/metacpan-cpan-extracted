@@ -1,7 +1,7 @@
 package Nodejs::Util;
 
-our $DATE = '2018-03-04'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2018-03-09'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -283,7 +283,7 @@ Nodejs::Util - Utilities related to Node.js
 
 =head1 VERSION
 
-This document describes version 0.010 of Nodejs::Util (from Perl distribution Nodejs-Util), released on 2018-03-04.
+This document describes version 0.011 of Nodejs::Util (from Perl distribution Nodejs-Util), released on 2018-03-09.
 
 =for Pod::Coverage ^(get_nodejs_path)$
 
@@ -398,13 +398,15 @@ Other options will be passed to C<IPC::System::Options>'s C<system()>.
 
 Usage:
 
- nodejs_module_path([ \%opts, ] $module)
+ nodejs_module_path([ \%opts, ] $module) => str|array
 
 Search module in filesystem according to Node.js rule described in
 L<https://nodejs.org/api/modules.html>. C<$module> can be either a
 relative/absolute path (e.g. C<./bip39.js>, C<../bip39.js>, or
 C</home/foo/bip39.js>), a filename (e.g. C<bip39.js>), or a filename with the
 C<.js> removed (e.g. C<bip39>).
+
+Will return undef if no module is found, or string containing the found path.
 
 Known options:
 
@@ -420,8 +422,8 @@ Use this directory instead of using C<Cwd::get_cwd()>.
 
 =item * all => bool
 
-If set to true, will return an array of all found paths instead of the first
-found path.
+If set to true, will return an array of all found paths instead of string
+containing the first found path.
 
 =back
 

@@ -127,7 +127,7 @@ $plot->plot(
 
     my @files = bsd_glob("$foldername/*");
     my @expected_files
-        = qw/AB_plot.png BC_plot.png file.dat file.dat.plot.png META.yml Plot.t/;
+        = qw/AB_plot.png BC_plot.png file.dat file.png META.yml Plot.t/;
     @expected_files = map { our_catfile( $foldername, $_ ) } @expected_files;
     is_deeply( \@files, \@expected_files, "output files" );
     warn "dir: $dir\n";

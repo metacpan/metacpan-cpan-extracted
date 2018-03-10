@@ -4,9 +4,10 @@ use warnings;
 package Dancer2::Session::Memcached;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Dancer 2 session storage with Cache::Memcached
-$Dancer2::Session::Memcached::VERSION = '0.005';
+$Dancer2::Session::Memcached::VERSION = '0.006';
 use Moo;
 use Cache::Memcached;
+use Carp qw/ croak /;
 
 use Types::Standard qw/ Str ArrayRef InstanceOf /;
 
@@ -43,6 +44,12 @@ has memcached_servers => (
     coerce   => $Servers->coercion,
 );
 
+has fatal_cluster_unreachable => (
+    is       => 'ro',
+    required => 0,
+    default  => sub { 0 },
+);
+
 #--------------------------------------------------------------------------#
 # Private attributes
 #--------------------------------------------------------------------------#
@@ -51,16 +58,47 @@ has _memcached => (
     is  => 'lazy',
     isa => InstanceOf ['Cache::Memcached'],
     handles => {
-        _retrieve => 'get',
-        _flush    => 'set',
         _destroy  => 'delete',
     },
 );
 
+sub _retrieve {
+    my ($self) = shift;
+
+    croak "Memcache cluster unreachable _retrieve"
+        if $self->fatal_cluster_unreachable && not keys %{$self->_memcached->stats(['misc'])};
+
+    return $self->_memcached->get( @_ );
+}
+
+sub _flush {
+    my ($self) = shift;
+
+    croak "Memcache cluster unreachable _flush"
+        if $self->fatal_cluster_unreachable && not keys %{$self->_memcached->stats(['misc'])};
+
+    return $self->_memcached->set( @_ );
+}
+
 # Adapted from Dancer::Session::Memcached
 sub _build__memcached {
     my ($self) = @_;
-    return Cache::Memcached->new( servers => $self->memcached_servers );
+
+    my $servers = $self->memcached_servers;
+
+    croak "The setting memcached_servers must be defined"
+      unless defined $servers;
+
+    $servers = [ split /,\s*/, $servers ];
+
+    # make sure the servers look good
+    foreach my $s (@$servers) {
+        if ( $s =~ /^\d+\.\d+\.\d+\.\d+$/ ) {
+            croak "server `$s' is invalid; port is missing, use `server:port'";
+        }
+    }
+
+    return Cache::Memcached->new( servers => $servers );
 }
 
 #--------------------------------------------------------------------------#
@@ -81,6 +119,12 @@ sub _change_id {
     $self->_destroy( $old_id );
 }
 
+# reject anything where the first two bytes are below \x20 once
+# Base64 decoded, ensuring Storable doesnt attempt to thaw such cruft.
+sub validate_id {
+    $_[1] =~ m/^[I-Za-z0-9_\-~][A-Za-z0-9_\-~]+$/;
+}
+
 1;
 
 
@@ -98,7 +142,7 @@ Dancer2::Session::Memcached - Dancer 2 session storage with Cache::Memcached
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -112,6 +156,7 @@ version 0.005
           - 10.0.1.31:11211
           - 10.0.1.32:11211
           - /var/sock/memcached
+        fatal_cluster_unreachable: 0
 
 =head1 DESCRIPTION
 
@@ -133,7 +178,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by David Golden.
+This software is Copyright (c) 2018, 2016 by David Golden.
 
 This is free software, licensed under:
 

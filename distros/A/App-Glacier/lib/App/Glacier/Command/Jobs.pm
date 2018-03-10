@@ -1,6 +1,7 @@
 package App::Glacier::Command::Jobs;
 use strict;
 use warnings;
+use App::Glacier::Core;
 use parent qw(App::Glacier::Command);
 use Carp;
 use Data::Dumper;
@@ -92,20 +93,22 @@ B<strftime>(3).
     
 =cut    
 
-sub getopt {
-    my ($self, %opts) = @_;
-    return $self->SUPER::getopt('time-style=s' => sub {
-				    $self->set_time_style_option($_[1]);
-				},
-				'long|l+' => \$self->{_options}{long},
-				'cached|c' => \$self->{_options}{cached},
-				%opts);
+sub new {
+    my ($class, $argref, %opts) = @_;
+    $class->SUPER::new(
+	$argref,
+        optmap => {
+	    'time-style=s' => sub { $_[0]->set_time_style_option($_[2]) },
+	    'long|l+' => 'long',
+	    'cached|c' => 'cached',
+	},
+	%opts);
 }
 
 sub run {
      my $self = shift;
 #     my $res = $self->glacier_eval('list_jobs');
-     $self->list(@_);
+     $self->list($self->command_line);
 }
 
 sub list {

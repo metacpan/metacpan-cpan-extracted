@@ -31,7 +31,7 @@ subtest settings => sub {
         other_sort_order => 9000,
 
         include_fields => undef,
-        exclude_fields => {buffered => 1, nested => 1, is_subtest => 1, in_subtest => 1, subtest_id => 1},
+        exclude_fields => {buffered => 1, nested => 1, is_subtest => 1, in_subtest => 1, subtest_id => 1, hubs => 1},
 
         indent_sequence => '    ',
 

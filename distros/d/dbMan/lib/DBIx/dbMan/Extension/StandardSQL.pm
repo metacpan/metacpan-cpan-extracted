@@ -7,7 +7,7 @@ our $VERSION = '0.14';
 
 1;
 
-sub IDENTIFICATION { return "000001-000014-000013"; }
+sub IDENTIFICATION { return "000001-000014-000014"; }
 
 sub preference { return 100; }
 
@@ -63,7 +63,8 @@ sub handle_action {
 			}
 			unless (defined $sth) {
 				$action{action} = 'OUTPUT';
-				$action{output} = $obj->{-dbi}->errstr()."\n";
+				$action{output} = '';
+                $obj->{-interface}->error( $obj->{-dbi}->errstr() );
 				$action{processed} = 1;
 
 				$obj->{-dbi}->longreadlen($lr) if $action{longreadlen};
@@ -76,8 +77,10 @@ sub handle_action {
 			};
             if ( $@ ) {
 				$action{action} = 'OUTPUT';
-                $action{ output } = ( $@ =~ /^Catched signal INT/ ) ? "Interrupted by user.\n" : $@;
+                $action{output} = '';
 				$action{processed} = 1;
+
+                $obj->{-interface}->error( ( $@ =~ /^Catched signal INT/ ) ? "Interrupted by user.\n" : $@ );
 
 				$obj->{-dbi}->longreadlen($lr) if $action{longreadlen};
 				$obj->{-interface}->nostatus unless $action{output_quiet};
@@ -109,8 +112,10 @@ sub handle_action {
                         $sth->finish;
 
                         $action{action} = 'OUTPUT';
-                        $action{ output } = ( $@ =~ /^Catched signal INT/ ) ? "Interrupted by user.\n" : $@;
+                        $action{output} = '';
                         $action{processed} = 1;
+
+                        $obj->{-interface}->error( ( $@ =~ /^Catched signal INT/ ) ? "Interrupted by user.\n" : $@ );
 
                         $obj->{-dbi}->longreadlen($lr) if $action{longreadlen};
                         $obj->{-interface}->nostatus unless $action{output_quiet};

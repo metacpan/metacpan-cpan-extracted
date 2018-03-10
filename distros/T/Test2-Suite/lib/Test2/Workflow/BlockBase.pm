@@ -2,7 +2,7 @@ package Test2::Workflow::BlockBase;
 use strict;
 use warnings;
 
-our $VERSION = '0.000104';
+our $VERSION = '0.000106';
 
 use Test2::Util::HashBase qw/code frame _info _lines/;
 use Sub::Info qw/sub_info/;
@@ -79,9 +79,22 @@ sub info {
 
 sub trace {
     my $self = shift;
+
+    my ($hub, %params) = @_;
+
+    croak "'hub' is required"
+        unless $hub;
+
     return Test2::Util::Trace->new(
         frame  => $self->frame,
         detail => $self->debug,
+
+        buffered => $hub->buffered,
+        nested   => $hub->nested,
+        hid      => $hub->hid,
+        huuid    => $hub->uuid,
+
+        %params,
     );
 }
 

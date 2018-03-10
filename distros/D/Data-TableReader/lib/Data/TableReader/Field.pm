@@ -1,5 +1,5 @@
 package Data::TableReader::Field;
-$Data::TableReader::Field::VERSION = '0.005';
+$Data::TableReader::Field::VERSION = '0.006';
 use Moo 2;
 
 # ABSTRACT: Field specification for Data::TableReader
@@ -48,7 +48,7 @@ Data::TableReader::Field - Field specification for Data::TableReader
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -165,6 +165,10 @@ and potentially capture blank-header columns that might not be part of the array
 it must follow a column named 'scores' there's no ambiguity; you get exactly any column
 starting from the header C<'Scores'> until a column of any other header.
 
+=head2 follows_list
+
+Convenience accessor for C<< @{ ->follows } >>.
+
 =head2 header_regex
 
 L</header>, coerced to a regex if it wasn't already
@@ -175,7 +179,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Michael Conrad.
+This software is copyright (c) 2018 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

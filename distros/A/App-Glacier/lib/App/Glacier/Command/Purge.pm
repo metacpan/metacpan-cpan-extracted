@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use App::Glacier::Command::ListVault;
 use parent qw(App::Glacier::Command::ListVault);
-use App::Glacier::Command;
+use App::Glacier::Core;
 
 =head1 NAME
 
@@ -42,20 +42,25 @@ B<glacier>(1).
     
 =cut
 
-sub getopt {
-    my ($self, %opts) = @_;
-    $self->{_options}{interactive} = 1;
-    $self->SUPER::getopt(
-	'interactive|i' => \$self->{_options}{interactive},
-	'force|f' => sub { $self->{_options}{interactive} = 0 },
+sub new {
+    my ($class, $argref, %opts) = @_;
+    my $self = $class->SUPER::new(
+	$argref,
+	optmap => {
+	    'interactive|i' => 'interactive',
+	    'force|f' => sub { $_[0]->{_options}{interactive} = 0 }
+	},
 	%opts);
+    $self->{_options}{interactive} //= 1;
+    $self
 }	
     
 sub run {
     my $self = shift;
 
-    $self->abend(EX_USAGE, "exactly one argument expected") unless @_ == 1;
-    my $vault_name = shift;
+    $self->abend(EX_USAGE, "exactly one argument expected")
+	unless $self->command_line == 1;
+    my $vault_name = ($self->command_line)[0];
     my $dir = $self->directory($vault_name);
     if ($self->{_options}{interactive}) {
 	unless ($self->getyn("delete all files in $vault_name")) {

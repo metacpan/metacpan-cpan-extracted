@@ -28,6 +28,8 @@ my @methods = qw{
 	full_hash_error
 	full_hash_ok
 	get_full_hash_error
+	get_lists
+	save_lists
 };
 
 can_ok("Net::Google::SafeBrowsing4::Storage::File", @methods);

@@ -32,4 +32,4 @@ resources:
   bugtracker: https://github.com/nrdvana/perl-Data-TableReader/issues
   homepage: https://github.com/nrdvana/perl-Data-TableReader
   repository: https://github.com/nrdvana/perl-Data-TableReader.git
-version: '0.005'
+version: '0.006'

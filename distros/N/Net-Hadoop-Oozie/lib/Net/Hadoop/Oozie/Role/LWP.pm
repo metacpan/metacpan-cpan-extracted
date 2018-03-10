@@ -1,5 +1,5 @@
 package Net::Hadoop::Oozie::Role::LWP;
-$Net::Hadoop::Oozie::Role::LWP::VERSION = '0.112';
+$Net::Hadoop::Oozie::Role::LWP::VERSION = '0.113';
 use 5.010;
 use strict;
 use warnings;
@@ -67,20 +67,22 @@ sub agent_request {
 
     my $headers = $response->headers;
     my $code    = $response->code;
-    my $info    = $content =~ m{\Q<b>description</b>\E\s+<u>(.+?)</u>}xmsi
-                    ? "$1 "
-                    : ''
-                    ;
-    my $extramsg = '';
-    if ( $code == 401 ) {
-        $extramsg = ( $headers->{'www-authenticate'} || '' ) eq 'Negotiate'
-                    ? eval { require LWP::Authen::Negotiate; 1; }
-                        ? q{ (Did you forget to run kinit?) }
-                        : q{ (LWP::Authen::Negotiate doesn't seem available) }
-                    : '';
-    }
 
-    confess sprintf '%s%s -> %s', $info . $extramsg, $response->status_line, $uri;
+    # collect additional error info
+    my @msg;
+    push @msg, $1
+      if $content =~ m{\Q<b>description</b>\E\s+<u>(.+?)</u>}xmsi;
+
+    push @msg, $headers->{'oozie-error-message'}
+      if $headers->{'oozie-error-message'};
+
+    push @msg, eval { require LWP::Authen::Negotiate; 1; }
+      ? q{(Did you forget to run kinit?)}
+      : q{(LWP::Authen::Negotiate doesn't seem available)}
+      if $code == 401
+          && ( $headers->{'www-authenticate'} || '' ) eq 'Negotiate';
+
+    confess sprintf '%s %s -> %s', "@msg", $response->status_line, $uri;
 }
 
 1;
@@ -89,28 +91,24 @@ __END__
 
 =pod
 
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
-Net::Hadoop::Oozie::Role::LWP
+Net::Hadoop::Oozie::Role::LWP - User agent for Oozie requests
 
 =head1 VERSION
 
-version 0.112
-
-=head1 SYNOPSIS
-
-    with 'Net::Hadoop::Oozie::Role::LWP';
-    # TODO
+version 0.113
 
 =head1 DESCRIPTION
 
 Part of the Perl Oozie interface.
 
-=head1 NAME
+=head1 SYNOPSIS
 
-Net::Hadoop::Oozie::Role::LWP - User agent for Oozie requests
+    with 'Net::Hadoop::Oozie::Role::LWP';
+    # TODO
 
 =head1 METHODS
 
@@ -121,16 +119,5 @@ TODO.
 =head1 SEE ALSO
 
 L<Net::Hadoop::Oozie>.
-
-=head1 AUTHOR
-
-David Morel <david.morel@amakuru.net>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015 by David Morel & Booking.com.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -15,6 +15,7 @@ L<PPIx::Regexp::Token|PPIx::Regexp::Token>.
 
 C<PPIx::Regexp::Token::GroupType> is the parent of
 L<PPIx::Regexp::Token::GroupType::Assertion|PPIx::Regexp::Token::GroupType::Assertion>,
+L<PPIx::Regexp::Token::GroupType::Atomic_Script_Run|PPIx::Regexp::Token::GroupType::Atomic_Script_Run>,
 L<PPIx::Regexp::Token::GroupType::BranchReset|PPIx::Regexp::Token::GroupType::BranchReset>,
 L<PPIx::Regexp::Token::GroupType::Code|PPIx::Regexp::Token::GroupType::Code>,
 L<PPIx::Regexp::Token::GroupType::Modifier|PPIx::Regexp::Token::GroupType::Modifier>,
@@ -44,7 +45,10 @@ use warnings;
 
 use base qw{ PPIx::Regexp::Token };
 
-our $VERSION = '0.055';
+use PPIx::Regexp::Constant qw{ MINIMUM_PERL };
+use PPIx::Regexp::Util qw{ __ns_can };
+
+our $VERSION = '0.056';
 
 # Return true if the token can be quantified, and false otherwise
 sub can_be_quantified { return };
@@ -144,6 +148,111 @@ This method need not be overridden. The default does nothing.
 =cut
 
 sub __match_setup {
+    return;
+}
+
+
+=head2 __setup_class
+
+ $class->__setup_class( \%definition, \%opt );
+
+This method is private to the C<PPIx-Regexp> package, and is documented
+for the author's benefit only. It may be changed or revoked without
+notice.
+
+This method uses the C<%definition> hash to create the
+C<__defining_string()>, C<explain()>, C<perl_version_introduced()>, and
+C<perl_version_removed()> methods for the calling class. Any of these
+that already exist will B<not> be replaced.
+
+The C<%definition> hash defines all the strings that specify tokens of
+the invoking class. You can not (unfortunately) use this mechanism if
+you need a regular expression to recognize a token that belongs to this
+class. The keys of the C<%definition> hash are strings that specify
+members of this class. The values are hashes that define the specific
+member of the class. The following values are supported:
+
+=over
+
+=item {expl}
+
+This is the explanation of the element, to be returned by the
+C<explain()> method.
+
+=item {intro}
+
+This is the Perl version that introduced the element, as a string. The
+default is the value of constant
+L<MINIMUM_PERL|PPIx::Regexp::Constant/MINIMUM_PERL>.
+
+=item {remov}
+
+This is the Perl version that removed the element, as a string. The
+default is C<undef>, meaning that the element is still present in the
+highest released version of Perl, whether development or production.
+
+=back
+
+The C<%opt> hash is optional, and defaults to the empty hash. It is
+used, basically, for ad-hocery. The supported keys are:
+
+=over
+
+=item {suffix}
+
+If this element is defined, the first element returned by the generated
+L<__defining_string()|/__defining_string> method is a hash containing
+this key and value.
+
+=back
+
+=cut
+
+sub __setup_class {
+    my ( $class, $def, $opt ) = @_;
+
+    $opt ||= {};
+
+    unless ( $class->__ns_can( '__defining_string' ) ) {
+	my $method = "${class}::__defining_string";
+	my @def_str = sort keys %{ $def };
+	defined $opt->{suffix}
+	    and unshift @def_str, {
+	    suffix	=> $opt->{suffix},
+	};
+	no strict qw{ refs };
+	*$method = sub {
+	    return @def_str;
+	};
+    }
+
+    unless ( $class->__ns_can( 'explain' ) ) {
+	my $method = "${class}::explain";
+	no strict qw{ refs };
+	*$method = sub {
+	    my ( $self ) = @_;
+	    return $def->{ $self->unescaped_content() }{expl};
+	};
+    }
+
+    unless ( $class->__ns_can( 'perl_version_introduced' ) ) {
+	my $method = "${class}::perl_version_introduced";
+	no strict qw{ refs };
+	*$method = sub {
+	    my ( $self ) = @_;
+	    return $def->{ $self->unescaped_content() }{intro} || MINIMUM_PERL;
+	};
+    }
+
+    unless ( $class->__ns_can( 'perl_version_removed' ) ) {
+	my $method = "${class}::perl_version_removed";
+	no strict qw{ refs };
+	*$method = sub {
+	    my ( $self ) = @_;
+	    return $def->{ $self->unescaped_content() }{remov};
+	};
+    }
+
     return;
 }
 

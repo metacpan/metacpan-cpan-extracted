@@ -1,49 +1,17 @@
 ==================================================
-Changes from 2015-12-10 00:00:00 +0000 to present.
+Changes from 2017-03-09 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.012 at 2016-12-09 15:14:29 +0000
+version 0.013 at 2018-03-09 14:02:45 +0000
 ------------------------------------------
 
-  Change: 1da48296929db6c0045b4a8028855045ad0b1dd4
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2016-12-09 15:11:18 +0000
+  Change: d0c33401bcc0ee5030a08e5ccc53578a8bdac571
+  Author: Jerome Eteve <jerome.eteve@guardian.co.uk>
+  Date : 2018-03-09 12:31:10 +0000
 
-    Nicer highlight 
+    Added scala indexing 
 
-------------------------------------------
-version 0.011 at 2016-12-09 13:39:45 +0000
-------------------------------------------
-
-  Change: 2b414513117d004e051369d3926fed33338780aa
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2016-12-09 13:39:45 +0000
-
-    Dont index skipped files in watcher 
-
-------------------------------------------
-version 0.010 at 2016-12-02 18:16:19 +0000
-------------------------------------------
-
-  Change: b75239e237d70073c6a28e271f0ec12417515819
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2016-12-02 18:16:19 +0000
-
-    Added .cseignore feature 
-
-  Change: cd7844d663d4f0bb7dda67603f7fed3e4d559084
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2015-08-26 16:00:44 +0000
-
-    Warn on unreadable files 
-
-  Change: 20d5ba1caa56b00a75417f810b556e32857eafc2
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2015-06-18 13:26:10 +0000
-
-    Specific progress bar version 
-
-================================================
-Plus 9 releases after 2015-12-10 00:00:00 +0000.
-================================================
+=================================================
+Plus 12 releases after 2017-03-09 00:00:00 +0000.
+=================================================

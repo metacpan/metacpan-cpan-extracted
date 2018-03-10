@@ -1,0 +1,32 @@
+Template-Nest version 0.01
+==========================
+
+Template::Nest - manipulate a generic template structure via a perl hash
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp
+  File::Spec
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2018 by Tom Gracey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

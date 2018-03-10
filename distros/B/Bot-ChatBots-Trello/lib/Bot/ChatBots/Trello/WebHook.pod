@@ -1,0 +1,233 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Bot::ChatBots::Trello::WebHook - Trello updates receiver, web hook
+
+=head1 SYNOPSIS
+
+   use Log::Any qw< $log >;
+   use Log::Any::Adapter;
+   use Mojolicious::Lite;
+   Log::Any::Adapter->set('Stderr');
+   plugin 'Bot::ChatBots::Trello' => instances => [
+      [
+         'WebHook',
+         processor  => \&processor,
+         register   => 1,
+         token      => $ENV{TOKEN},
+         unregister => 0,
+         url        => 'https://example.com:8443/mybot',
+      ],
+      # more can follow here...
+   ];
+   app->start;
+   sub processor { # tube-compliant
+      my $record = shift; # ... $record is normalized, by default
+
+      # ... your business logic goes here...
+      my $message = 'Howdy!';
+
+      # In a WebHook you're actually processing a HTTP Request from
+      # Trello, so you can set a response via Mojolicious
+      if (automatic_via_https_response()) { # WebHook only
+         $record->{response} = $message;
+      }
+      elsif (do_it_yourself_via_https_response()) { # WebHook only
+         $record->{source}{refs}{controller}->render(text => $message);
+         $record->{source}{flags}{rendered} = 1; # if Bot::ChatBot <= 0.006
+      }
+      elsif (automatic_via_sender()) { # same as LongPoll
+         $record->{send_response} = $message;
+      }
+      elsif (do_it_yourself_via_sender()) { # same as LongPoll
+         my $sender = $record->{source}{refs}{sender};
+         $sender->send_response($message, record => $record);
+      }
+      # else nothing is sent back, just a HTTP 204 by default
+
+      return $record; # follow on..
+   }
+
+=head1 DESCRIPTION
+
+This is an updates receiver and dispatcher for the Trello
+infrastructure. It connects to Trello's API for I<webhooks> style (i.e.
+waiting for push messages to arrive), so you need a routable address/port
+to get the ball rolling.
+
+Strictly speaking, you MUST only provide a L</processor> and L</url>. The
+latter is used to set a POST route, while the former is what is called
+whenever a new message arrives through that route.
+
+Initial releases do not provide access back to Trello via the API, so the
+registration must be carried over in some other way.
+
+
+=head1 ACCESSORS
+
+This class consumes the following roles, inheriting their accessors:
+
+=over
+
+=item *
+
+L<Bot::ChatBots::Role::WebHook>
+
+=over
+
+=item *
+
+L<Bot::ChatBots::Role::WebHook/app>
+
+=item *
+
+L<Bot::ChatBots::Role::WebHook/code>
+
+=item *
+
+L<Bot::ChatBots::Role::WebHook/method>
+
+=item *
+
+L<Bot::ChatBots::Role::WebHook/path>
+
+=item *
+
+L<Bot::ChatBots::Role::WebHook/url>
+
+=back
+
+=back
+
+=head1 METHODS
+
+This class consumes the following roles, inheriting their methods:
+
+=over
+
+=item *
+
+L<Bot::ChatBots::Role::WebHook>
+
+=back
+
+The following sections describe the addiitonal ones.
+
+=head2 B<< BUILD >>
+
+This method is called upon object construction. It takes care to call
+L</install_route> from L<Bot::ChatBots::Role::WebHook> so that you don't
+have to. It takes care to install both C<POST> and C<GET> routes, to make
+Trello happy.
+
+=head2 B<< new >>
+
+   my $obj = Bot::ChatBots::Trello::WebHook->new(%args);
+
+   # mostly used in Mojolicious applications
+   plugin 'Bot::ChatBots::Trello' => instances => [ [ 'WebHook', %args ] ];
+
+Create a new instance. Mostly used behind the scenes by
+L<Bot::ChatBots::MojoPlugin> as in the second example above.
+
+The arguments hash C<%hash> supports the following keys:
+
+=over
+
+=item C<***>
+
+all keys from L<Bot::ChatBots::Role::WebHook>
+
+=back
+
+=head2 B<< normalize_record >>
+
+   my $record = $self->normlize_record($input_record);
+
+Perform some normalization on the record to give it a more "general"
+shape. Which is still in a state of flux, so a look to the code might
+be helpful.
+
+So far you should find the following keys in the returned record:
+
+=over
+
+=item C<action>
+
+a hash reference with the following keys inside:
+
+=over
+
+=item C<type>
+
+whatever C<type> the incoming I<action> (notification from Trello) has
+
+=item C<subtype>
+
+whatever is contained in I<action.display.translationKey>
+
+=item C<item>
+
+the I<item type> is derived (if possible) from the type, based on whether
+it ends with C<Card>, C<List> or C<Board>. In this case, the relevant
+sub-hash from I<action.data> is extracted.
+
+=back
+
+=item C<payload>
+
+set to point to the same value as C<update>
+
+=item C<sender>
+
+set to the string C<unknown> until we figure out something better
+
+=item C<source>->C<technology>
+
+set to the string C<trello>
+
+=back
+
+=head2 B<< parse_request >>
+
+   my @updates = $obj->parse_request($req);
+
+Parse the request and extract updates from it. The current Trello
+WebHook API sends one single update per message. Returns the update.
+
+=head2 B<< process >>
+
+   my $outcome = $obj->process($record);
+
+Process a record. The main workhorse is inherited from
+L<Bot::ChatBots::Role::WebHook>, although this wraps around it to add
+automatic sending of a C<200 OK> response.
+
+When a response is rendered, C<< $record->{source}{flags}{rendered} >> is
+set to C<1> (or another integer I<true> value) to signal that rendering
+already happened (this should prevent the calling function from doing the
+rendering again).
+
+=head1 SEE ALSO
+
+L<Bot::ChatBots>, L<Bot::ChatBots::Role::WebHook>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016, 2018 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

@@ -1,0 +1,6 @@
+0.002  2018-03-10 07:20:48 CET
+   - requirement on Bot::ChatBots will have to be updated
+   - release after 67 PASSes in CPAN Testers (Thanks!)
+
+0.001  2018-03-09 23:55:06 CET
+   - first test release (TRIAL)

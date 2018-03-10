@@ -4,11 +4,11 @@
 #
 # Gluu-oxd-library
 #
-# An open source application library for PHP
+# An open source application library for Perl
 #
 # This content is released under the MIT License (MIT)
 #
-# Copyright (c) 2015, Gluu inc, USA, Austin
+# Copyright (c) 2018, Gluu inc, USA, Austin
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,13 +29,13 @@
 # THE SOFTWARE.
 #
 # @package	Gluu-oxd-library
-# @version 2.4.4
-# @author	Ourdesignz
-# @author		gaurav.chhabra6785@gmail.com
-# @copyright	Copyright (c) 2015, Gluu inc federation (https://gluu.org/)
+# @version 	3.1.2
+# @author	Ourdesignz, Sobhan Panda
+# @author_email	gaurav.chhabra6785@gmail.com, sobhan@centroxy.com
+# @copyright	Copyright (c) 2018, Gluu inc federation (https://gluu.org/)
 # @license	http://opensource.org/licenses/MIT	MIT License
-# @link	https://gluu.org/
-# @since	Version 2.4.4
+# @link		https://gluu.org/
+# @since	Version 3.1.2
 # @filesource
 #/
 
@@ -109,13 +109,19 @@ package OxdRegister;	# This is the &quot;Class&quot;
 			_request_client_request_uris => shift,
 			
 			# @var array _request_client_logout_uris
-			_request_client_logout_uris => shift,
+			_request_client_frontchannel_logout_uris => shift,
 			
 			# @var array _request_ui_locales
 			_request_ui_locales => shift,
 			
 			# @var array _request_claims_locales
 			_request_claims_locales => shift,
+			
+			# @var string _request_claims_redirect_uri
+			_request_claims_redirect_uri => shift,
+			
+			# @var array $request_protection_access_token          To protect the command with access token
+			_request_protection_access_token => shift,
 			
 			# Response parameter from oxd-server
 			# It is basic parameter for other protocols
@@ -143,20 +149,20 @@ package OxdRegister;	# This is the &quot;Class&quot;
 		return $self->{_request_client_name};
     }
 
-    # @param string $request_client_name
+    # Parameters: string $request_client_name
     sub setRequestClientName{
         my ( $self, $request_client_name ) = @_;
 		$self->{_request_client_name} = $request_client_name if defined($request_client_name);
 		return $self->{_request_client_name};
     }
     
-    # @return string
+    # Parameters: string $request_client_secret
     sub getRequestClientSecret{
         my( $self ) = @_;
 		return $self->{_request_client_secret};
     }
 
-    # @param string $request_client_secret
+    # Parameters: string $request_client_secret
     sub setRequestClientSecret{
         my ( $self, $request_client_secret ) = @_;
 		$self->{_request_client_secret} = $request_client_secret if defined($request_client_secret);
@@ -169,14 +175,14 @@ package OxdRegister;	# This is the &quot;Class&quot;
 		return $self->{_request_client_id};
     }
 
-    # @param string $request_client_id
+    # Parameters: string $request_client_id
     sub setRequestClientId{
         my ( $self, $request_client_id ) = @_;
 		$self->{_request_client_id} = $request_client_id if defined($request_client_id);
 		return $self->{_request_client_id};
     }
     
-    # @param string $request_op_host
+    # Parameters: string $request_op_host
     # @return void
     sub setRequestOpHost {
 		my ( $self, $request_op_host ) = @_;
@@ -190,18 +196,21 @@ package OxdRegister;	# This is the &quot;Class&quot;
 		return $self->{_request_op_host};
 	}
     
+    
     # @return array
-    sub getRequestClientLogoutUris{
+    sub getRequestClientLogoutUris
+    {
         my( $self ) = @_;
-		return $self->{_request_client_logout_uris};
+	return $self->{_request_client_frontchannel_logout_uris};
     }
 
-    # @param array $request_client_logout_uris
+    # Parameters: array $request_client_logout_uris
     # @return void
-    sub setRequestClientLogoutUris{
-        my ( $self, $request_client_logout_uris ) = @_;
-		$self->{_request_client_logout_uris} = $request_client_logout_uris if defined($request_client_logout_uris);
-		return $self->{_request_client_logout_uris};
+    sub setRequestClientLogoutUris
+    {
+        my ( $self, $request_client_frontchannel_logout_uris ) = @_;
+	$self->{_request_client_frontchannel_logout_uris} = $request_client_frontchannel_logout_uris if defined($request_client_frontchannel_logout_uris);
+	return $self->{_request_client_frontchannel_logout_uris};
     }
 	
 	# @return array
@@ -210,7 +219,7 @@ package OxdRegister;	# This is the &quot;Class&quot;
 		return $self->{_request_response_types};
     }
 
-    # @param array $request_response_types
+    # Parameters: array $request_response_types
     # @return void
     sub setRequestResponseTypes{
         my ( $self, $request_response_types ) = @_;
@@ -224,7 +233,7 @@ package OxdRegister;	# This is the &quot;Class&quot;
 		return $self->{_request_grant_types};
     }
 
-    # @param array $request_grant_types
+    # Parameters: array $request_grant_types
     # @return void
     sub setRequestGrantTypes{
         my ( $self, $request_grant_types ) = @_;
@@ -238,7 +247,7 @@ package OxdRegister;	# This is the &quot;Class&quot;
 		return $self->{_request_scope};
     }
 
-    # @param array $request_scope
+    # Parameters: array $request_scope
     # @return void
     sub setRequestScope{
         my ( $self, $request_scope ) = @_;
@@ -252,7 +261,7 @@ package OxdRegister;	# This is the &quot;Class&quot;
 		return $self->{_request_post_logout_redirect_uri};
     }
 
-    # @param string $request_post_logout_redirect_uri
+    # Parameters: string $request_post_logout_redirect_uri
     # @return void
     sub setRequestPostLogoutRedirectUri{
         my ( $self, $request_post_logout_redirect_uri ) = @_;
@@ -266,7 +275,7 @@ package OxdRegister;	# This is the &quot;Class&quot;
 		return $self->{_request_client_jwks_uri};
     }
 
-    # @param string $request_client_jwks_uri
+    # Parameters: string $request_client_jwks_uri
     # @return void
     sub setRequestClientJwksUri{
         my ( $self, $request_client_jwks_uri ) = @_;
@@ -280,7 +289,7 @@ package OxdRegister;	# This is the &quot;Class&quot;
 		return $self->{_request_client_sector_identifier_uri};
     }
 
-    # @param array $request_client_sector_identifier_uri
+    # Parameters: array $request_client_sector_identifier_uri
     sub setRequestClientSectorIdentifierUri{
         my ( $self, $request_client_sector_identifier_uri ) = @_;
 		$self->{_request_client_sector_identifier_uri} = $request_client_sector_identifier_uri if defined($request_client_sector_identifier_uri);
@@ -293,7 +302,7 @@ package OxdRegister;	# This is the &quot;Class&quot;
 		return $self->{_request_client_token_endpoint_auth_method};
     }
 
-    # @param string $request_client_token_endpoint_auth_method
+    # Parameters: string $request_client_token_endpoint_auth_method
     # @return void
     sub setRequestClientTokenEndpointAuthMethod{
         my ( $self, $request_client_token_endpoint_auth_method ) = @_;
@@ -301,13 +310,13 @@ package OxdRegister;	# This is the &quot;Class&quot;
 		return $self->{_request_client_token_endpoint_auth_method};
     }
 
-    # @return array
+    # Parameters: array
     sub getRequestClientRequestUris{
         my( $self ) = @_;
 		return $self->{_request_client_request_uris};
     }
 
-    # @param array $request_client_request_uris
+    # Parameters: array $request_client_request_uris
     # @return void
     sub setRequestClientRequestUris{
         my ( $self, $request_client_request_uris ) = @_;
@@ -321,7 +330,7 @@ package OxdRegister;	# This is the &quot;Class&quot;
 		return $self->{_request_application_type};
     }
 
-    # @param string $request_application_type
+    # Parameters: string $request_application_type
     # @return void
     sub setRequestApplicationType{
         my ( $self, $request_application_type ) = @_;
@@ -338,7 +347,7 @@ package OxdRegister;	# This is the &quot;Class&quot;
         return $self->{_request_authorization_redirect_uri};
     }
 
-    # @param string $request_authorization_redirect_uri
+    # Parameters: string $request_authorization_redirect_uri
     # @return void
     sub setRequestAuthorizationRedirectUri{
         my ( $self, $request_authorization_redirect_uri ) = @_;
@@ -352,7 +361,7 @@ package OxdRegister;	# This is the &quot;Class&quot;
 		return $self->{_request_acr_values};
     }
 
-    # @param array $request_acr_values
+    # Parameters: array $request_acr_values
     # @return void
     sub setRequestAcrValues{
         my ( $self, $request_acr_values ) = @_;
@@ -366,12 +375,25 @@ package OxdRegister;	# This is the &quot;Class&quot;
 		return $self->{_request_contacts};
     }
 
-    # @param array $request_contacts
+    # Parameters: array $request_contacts
     # @return void
     sub setRequestContacts{
         my ( $self, $request_contacts ) = @_;
 		$self->{_request_contacts} = $request_contacts if defined($request_contacts);
 		return $self->{_request_contacts};
+    }
+    
+    # @return string
+    sub getRequestClaimsRedirectUri {
+        my( $self ) = @_;
+		return $self->{_request_claims_redirect_uri};
+    }
+
+    # Parameters: string $request_claims_redirect_uri
+    sub setRequestClaimsRedirectUri {
+        my ( $self, $request_claims_redirect_uri ) = @_;
+		$self->{_request_claims_redirect_uri} = $request_claims_redirect_uri if defined($request_claims_redirect_uri);
+		return $self->{_request_claims_redirect_uri};
     }
 
     # @return string
@@ -394,7 +416,7 @@ package OxdRegister;	# This is the &quot;Class&quot;
 		return $self->{_request_ui_locales};
     }
 
-    # @param array $request_ui_locales
+    # Parameters: array $request_ui_locales
     sub setRequestUiLocales{
         my ( $self, $request_ui_locales ) = @_;
 		$self->{_request_ui_locales} = $request_ui_locales if defined($request_ui_locales);
@@ -407,12 +429,30 @@ package OxdRegister;	# This is the &quot;Class&quot;
 		return $self->{_request_claims_locales};
     }
 
-    # @param array $request_claims_locales
+    # Parameters: array $request_claims_locales
     sub setRequestClaimsLocales{
         my ( $self, $request_claims_locales ) = @_;
 		$self->{_request_claims_locales} = $request_claims_locales if defined($request_claims_locales);
 		return $self->{_request_claims_locales};
     }
+    
+    
+    # @return array
+    sub getRequestProtectionAccessToken
+    {   
+		my( $self ) = @_;
+		return $self->{_request_protection_access_token};
+    }
+
+    
+    # Parameters array $request_protection_access_token
+    # @return void
+    sub setRequestProtectionAccessToken
+    {   
+		my ( $self, $request_protection_access_token ) = @_;
+		$self->{_request_protection_access_token} = $request_protection_access_token if defined($request_protection_access_token);
+		return $self->{_request_protection_access_token};
+	}
 
     # Protocol command to oxd server
     # @return void
@@ -424,8 +464,74 @@ package OxdRegister;	# This is the &quot;Class&quot;
 		#return $command;
     }
     
-    # Protocol parameter to oxd server
+    # Protocol command to oxd to http server
     # @return void
+    sub sethttpCommand{
+		# my $command = 'register-site';
+        my ( $self, $httpCommand ) = @_;
+		$self->{_httpcommand} = 'register-site';
+		return $self->{_httpcommand};
+		#return $httpcommand;
+    }
+    
+    # Method: setParams
+    # This method sets the parameters for register_site command.
+    # This module uses `request` method of OxdClient module for sending request to oxd-server
+    # 
+    # Parameters:
+    #
+    #	string $authorization_redirect_uri - (Required) Uri to Redirect for Authorization
+    #
+    #	string $op_host - (Optional) Url that must points to a valid OpenID Connect Provider that supports client registration like Gluu Server.
+    #
+    #	string $post_logout_redirect_uri - (Optional) Uri to Redirect after Logout
+    #
+    #	string $application_type - (Optional) Application Type
+    #
+    #	array $response_types - (Optional) Response Types
+    #
+    #	array $grant_types - (Optional) Grant Types
+    #
+    #	array $scope - (Optional) Scope
+    #
+    #	array $acr_values - (Optional) ACR Values
+    #
+    #	string $client_name - (Optional) Client Name
+    #
+    #	string $client_jwks_uri - (Optional) Client JWKS Uri
+    #
+    #	string $client_token_endpoint_auth_method - (Optional) Client Token Endpoint Auth Method
+    #
+    #	array $client_request_uris - (Optional) Client Request URIs
+    #
+    #	array $client_frontchannel_logout_uris - (Optional) Client Front Channel Logout URIs
+    #
+    #	array $client_sector_identifier_uri - (Optional) Client Sector Identifier URIs
+    #
+    #	array $contacts - (Optional) Contacts
+    #
+    #	array $ui_locales - (Optional) UI Locales
+    #
+    #	array $claims_locales - (Optional) Claims Locales
+    #
+    #	string $client_id - (Optional) Client ID. If value presents, Ignores all other parameters and Skips new client registration forcing to use existing client. ClientSecret is REQUIRED if this parameter is set
+    #
+    #	string $client_secret - (Optional) Client Secret. Must be used together with ClientId.
+    #
+    #	array $claims_redirect_uri - (Optional) Claims Redirect URI.
+    #
+    #	string $protection_access_token - Protection Acccess Token. OPTIONAL for `oxd-server` but REQUIRED for `oxd-https-extension`
+    #
+    # Returns:
+    #	void
+    #
+    # This module uses `getResponseObject` method of OxdClient module for getting response from oxd.
+    # 
+    # *Example response from getResponseObject:*
+    # --- Code
+    # { "status":"ok", "data":{ "oxd_id":"c73134c8-c4ca-4bab-9baa-2e0ca20cc433" } }
+    # ---
+    #
     sub setParams{
 		
 		my ( $self, $params ) = @_;
@@ -443,13 +549,16 @@ package OxdRegister;	# This is the &quot;Class&quot;
             "client_jwks_uri" => $self->getRequestClientJwksUri(),
             "client_token_endpoint_auth_method" => $self->getRequestClientTokenEndpointAuthMethod(),
             "client_request_uris" => $self->getRequestClientRequestUris(),
-            "client_logout_uris"=> $self->getRequestClientLogoutUris(),
+            "client_frontchannel_logout_uris"=> $self->getRequestClientLogoutUris(),
             "client_sector_identifier_uri"=> $self->getRequestClientSectorIdentifierUri(),
             "contacts" => $self->getRequestContacts(),
             "ui_locales" => $self->getRequestUiLocales(),
             "claims_locales" => $self->getRequestClaimsLocales(),
-            "client_id"=> $self->getRequestClientId(),
-            "client_secret"=> $self->getRequestClientSecret()
+            "client_id" => $self->getRequestClientId(),
+            "client_secret" => $self->getRequestClientSecret(),
+            "protection_access_token"=> $self->getRequestProtectionAccessToken(),
+            "claims_redirect_uri" => $self->getRequestClaimsRedirectUri(),
+            "oxd_rp_programming_language" => 'perl'
         };
        
 		$self->{_params} = $paramsArray;

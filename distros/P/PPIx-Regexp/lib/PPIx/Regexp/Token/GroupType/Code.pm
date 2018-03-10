@@ -41,95 +41,33 @@ use warnings;
 
 use base qw{ PPIx::Regexp::Token::GroupType };
 
-use PPIx::Regexp::Constant qw{ MINIMUM_PERL };
-
-our $VERSION = '0.055';
-
-# Return true if the token can be quantified, and false otherwise
-# sub can_be_quantified { return };
-
-{
-
-    my %explanation = (
-	'??'	=> 'Evaluate code, use as regexp at this point',
-	'?p'	=> 'Evaluate code, use as regexp at this point (removed in 5.9.5)',
-	'?'		=> 'Evaluate code. Always matches.',
-    );
-
-    sub __explanation {
-	return \%explanation;
-    }
-
-}
-
-{
-    my %perl_version_introduced = (
-	'?'	=> '5.005',
-	'?p'	=> '5.005',	# Presumed. I can find no documentation.
-	'??'	=> '5.006',
-    );
-
-    sub perl_version_introduced {
-	my ( $self ) = @_;
-	return $perl_version_introduced{ $self->unescaped_content() } ||
-	    '5.005';
-    }
-
-}
-
-{
-
-    my %perl_version_removed = (
-	'?p'	=> '5.009005',
-    );
-
-    sub perl_version_removed {
-	my ( $self ) = @_;
-	return $perl_version_removed{ $self->content() };
-    }
-}
-
-=begin comment
-
-sub __PPIX_TOKENIZER__regexp {
-    my ( $class, $tokenizer, $character ) = @_;
-
-    # Recognize '?{', '??{', or '?p{', the latter deprecated in Perl
-    # 5.6, and removed in 5.10. The extra escapes are because the
-    # non-open-bracket characters may appear as delimiters to the
-    # expression.
-    if ( my $accept = $tokenizer->find_regexp(
-	    qr{ \A \\? \? \\? [?p]? \{ }smx ) ) {
-
-	--$accept;	# Don't want the curly bracket.
-
-	# Code token comes after.
-	$tokenizer->expect( 'PPIx::Regexp::Token::Code' );
-
-	return $accept;
-    }
-
-    return;
-}
-
-=end comment
-
-=cut
-
-sub __defining_string {
-    return (
-	{ suffix	=> '{' },
-	'?',
-	'??',
-	'?p',
-    );
-}
+our $VERSION = '0.056';
 
 sub __match_setup {
     my ( undef, $tokenizer ) = @_;	# Invocant unused
     $tokenizer->expect( qw{ PPIx::Regexp::Token::Code } );
     return;
 }
+
+__PACKAGE__->__setup_class( {
+	'??'	=> {
+	    expl	=> 'Evaluate code, use as regexp at this point',
+	    intro	=> '5.006',
+	},
+	'?p'	=> {
+	    expl	=> 'Evaluate code, use as regexp at this point (removed in 5.9.5)',
+	    intro	=> '5.005',	# Presumed. I can find no documentation.
+	    remov	=> '5.009005',
+	},
+	'?'		=> {
+	    expl	=> 'Evaluate code. Always matches.',
+	    intro	=> '5.005',
+	},
+    },
+    {
+	suffix	=> '{',
+    },
+);
 
 1;
 

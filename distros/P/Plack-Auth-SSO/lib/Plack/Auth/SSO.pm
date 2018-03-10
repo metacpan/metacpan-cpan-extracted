@@ -1,25 +1,22 @@
 package Plack::Auth::SSO;
 
-use Catmandu::Sane;
-use Catmandu::Util qw(check_string);
-use Carp;
+use strict;
+use utf8;
+use Data::Util qw(:check);
 use Moo::Role;
-use namespace::clean;
 
-our $VERSION = "0.011";
-
-with "Catmandu::Logger";
+our $VERSION = "0.0131";
 
 has session_key => (
     is       => "ro",
-    isa      => sub { check_string($_[0]); },
+    isa      => sub { is_string($_[0]) or die("session_key should be string"); },
     lazy     => 1,
     default  => sub { "auth_sso" },
     required => 1
 );
 has authorization_path => (
     is       => "ro",
-    isa      => sub { check_string($_[0]); },
+    isa      => sub { is_string($_[0]) or die("authorization_path should be string"); },
     lazy     => 1,
     default  => sub { "/"; },
     required => 1
@@ -31,7 +28,7 @@ has id => (
 );
 has uri_base => (
     is       => "ro",
-    isa      => sub { check_string($_[0]); },
+    isa      => sub { is_string($_[0]) or die("uri_base should be string"); },
     required => 1,
     default  => sub { "http://localhost:5000"; }
 );
@@ -72,6 +69,16 @@ sub set_auth_sso {
 
 Plack::Auth::SSO - role for Single Sign On (SSO) authentication
 
+=begin markdown
+
+# STATUS
+
+[![Build Status](https://travis-ci.org/LibreCat/Plack-Auth-SSO.svg?branch=master)](https://travis-ci.org/LibreCat/Plack-Auth-SSO)
+[![Coverage](https://coveralls.io/repos/LibreCat/Plack-Auth-SSO/badge.png?branch=master)](https://coveralls.io/r/LibreCat/Plack-Auth-SSO)
+[![CPANTS kwalitee](http://cpants.cpanauthors.org/dist/Plack-Auth-SSO.png)](http://cpants.cpanauthors.org/dist/Plack-Auth-SSO)
+
+=end markdown
+
 =head1 IMPLEMENTATIONS
 
 * SSO for Central Authentication System (CAS): L<Plack::Auth::SSO::CAS>
@@ -85,7 +92,7 @@ Plack::Auth::SSO - role for Single Sign On (SSO) authentication
     package MySSOAuth;
 
     use Moo;
-    use Catmandu::Util qw(:is);
+    use Data::Util qw(:check);
 
     with "Plack::Auth::SSO";
 

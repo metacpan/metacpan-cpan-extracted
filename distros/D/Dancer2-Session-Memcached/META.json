@@ -4,7 +4,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -22,13 +22,13 @@
       "develop" : {
          "requires" : {
             "Test::More" : "0.96",
-            "Test::PAUSE::Permissions" : "0",
             "Test::Vars" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Cache::Memcached" : "0",
+            "Carp" : "0",
             "Dancer2" : "0.15000",
             "Dancer2::Core::Role::SessionFactory" : "0",
             "Moo" : "0",
@@ -63,7 +63,7 @@
    "provides" : {
       "Dancer2::Session::Memcached" : {
          "file" : "lib/Dancer2/Session/Memcached.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -78,11 +78,14 @@
          "web" : "https://github.com/PerlDancer/dancer2-session-memcached"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_authority" : "cpan:YANICK",
    "x_contributors" : [
       "Peter Mottram <peter@sysnix.com>",
+      "Pierre Vigier <pierre.vigier@transfer-to.com>",
+      "Russell Jenkins <veryrusty@gmail.com>",
       "Yanick Champoux <yanick@babyl.dyndns.org>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.01"
 }
 

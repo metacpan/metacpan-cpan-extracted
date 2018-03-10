@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-03-06'; # DATE
-our $VERSION = '0.021'; # VERSION
+our $DATE = '2018-03-07'; # DATE
+our $VERSION = '0.022'; # VERSION
 
 use 5.010001;
 use strict;
@@ -60,7 +60,7 @@ btcindo - CLI for bitcoin.co.id (VIP)
 
 =head1 VERSION
 
-This document describes version 0.021 of btcindo (from Perl distribution App-btcindo), released on 2018-03-06.
+This document describes version 0.022 of btcindo (from Perl distribution App-btcindo), released on 2018-03-07.
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,66 @@
+{
+   "abstract" : "Don't write loops on hashes, only on keys and values of hashes",
+   "author" : [
+      "Sawyer X"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Perl-Critic-Policy-Variables-ProhibitLoopOnHash",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "List::Util" : "1.33",
+            "Perl::Critic" : "1.126",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Critic::Policy::Variables::ProhibitLoopOnHash" : {
+         "file" : "lib/Perl/Critic/Policy/Variables/ProhibitLoopOnHash.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/xsawyerx/perl-critic-policy-variables-prohibitlooponhash.git",
+         "web" : "https://github.com/xsawyerx/perl-critic-policy-variables-prohibitlooponhash"
+      }
+   },
+   "version" : "0.001",
+   "x_authority" : "cpan:XSAWYERX",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

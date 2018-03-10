@@ -53,7 +53,7 @@ use PPIx::Regexp::Token::Backreference	();
 use PPIx::Regexp::Token::Backtrack	();
 use PPIx::Regexp::Token::Recursion	();
 
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 
 # Return true if the token can be quantified, and false otherwise
 
@@ -189,6 +189,7 @@ sub is_quantifier {
 		'PPIx::Regexp::Token::GroupType::Subexpression',
 		'PPIx::Regexp::Token::GroupType::Switch',
 		'PPIx::Regexp::Token::GroupType::Script_Run',
+		'PPIx::Regexp::Token::GroupType::Atomic_Script_Run',
 	    );
 
 	    # Accept the parenthesis.

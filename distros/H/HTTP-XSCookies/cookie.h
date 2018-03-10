@@ -12,10 +12,10 @@
 Buffer* cookie_put_string(Buffer* cookie,
                           const char* name, int nlen,
                           const char* value, int vlen,
-                          int encode);
+                          int enc_nam, int enc_val);
 Buffer* cookie_put_date(Buffer* cookie,
                         const char* name, int nlen,
-                        const char* value);
+                        const char* value, int vlen);
 Buffer* cookie_put_integer(Buffer* cookie,
                           const char* name, int nlen,
                           long value);
@@ -23,7 +23,7 @@ Buffer* cookie_put_boolean(Buffer* cookie,
                           const char* name, int nlen,
                           int value);
 
-Buffer* cookie_get_pair(Buffer* cookie,
-                        Buffer* name, Buffer* value);
+int cookie_get_pair(Buffer* cookie,
+                    Buffer* name, Buffer* value);
 
 #endif

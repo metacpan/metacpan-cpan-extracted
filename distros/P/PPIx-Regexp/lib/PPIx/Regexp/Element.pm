@@ -49,7 +49,7 @@ use PPIx::Regexp::Constant qw{
     TRUE
 };
 
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 
 =head2 accepts_perl
 
@@ -338,6 +338,24 @@ sub modifier_asserted {
     return;
 }
 
+=head2 next_element
+
+This method returns the next element, or nothing if there is none.
+
+Unlike L<next_sibling()|/next_sibling>, this will cross from the content
+of a structure into the elements that define the structure, or vice
+versa.
+
+=cut
+
+sub next_element {
+    my ( $self ) = @_;
+    my $parent = $self->_parent()
+	or return;
+    my $inx = $self->__my_inx();
+    return ( $parent->elements() )[ $inx + 1 ];
+}
+
 =head2 next_sibling
 
 This method returns the element's next sibling, or nothing if there is
@@ -347,7 +365,7 @@ none.
 
 sub next_sibling {
     my ( $self ) = @_;
-    my ( $method, $inx ) = $self->_my_inx()
+    my ( $method, $inx ) = $self->__my_nav()
 	or return;
     return $self->_parent()->$method( $inx + 1 );
 }
@@ -416,16 +434,39 @@ sub perl_version_removed {
     return undef;	## no critic (ProhibitExplicitReturnUndef)
 }
 
+=head2 previous_element
+
+This method returns the previous element, or nothing if there is none.
+
+Unlike L<previous_sibling()|/previous_sibling>, this will cross from
+the content of a structure into the elements that define the structure,
+or vice versa.
+
+=cut
+
+sub previous_element {
+    my ( $self ) = @_;
+    my $parent = $self->_parent()
+	or return;
+    my $inx = $self->__my_inx()
+	or return;
+    return ( $parent->elements() )[ $inx - 1 ];
+}
+
 =head2 previous_sibling
 
 This method returns the element's previous sibling, or nothing if there
 is none.
 
+This method is analogous to the same-named L<PPI::Element|PPI::Element>
+method, in that it will not cross from the content of a structure into
+the elements that define the structure.
+
 =cut
 
 sub previous_sibling {
     my ( $self ) = @_;
-    my ( $method, $inx ) = $self->_my_inx()
+    my ( $method, $inx ) = $self->__my_nav()
 	or return;
     $inx or return;
     return $self->_parent()->$method( $inx - 1 );
@@ -439,6 +480,20 @@ This method returns a string representing the Perl requirements for a
 given module. This should only be used for informational purposes, as
 the format of the string may be subject to change.
 
+At the moment, the returns may be:
+
+ version <= $]
+ version <= $] < version
+ two or more of the above joined by '||'
+ ! $]
+
+The last means that, although all the components of the regular
+expression can be compiled by B<some> version of Perl, there is no
+version that will compile all of them.
+
+I reiterate: the returned string may be subject to change, maybe without
+warning.
+
 This method was added in version 0.051_01.
 
 =cut
@@ -446,11 +501,13 @@ This method was added in version 0.051_01.
 sub requirements_for_perl {
     my ( $self ) = @_;
     my @req;
-    foreach my $r ( @{ $self->__structured_requirements_for_perl( [] ) } ) {
+    foreach my $r ( @{ $self->__structured_requirements_for_perl() || [] } ) {
 	push @req, defined $r->{removed} ?
 	"$r->{introduced} <= \$] < $r->{removed}" :
 	"$r->{introduced} <= \$]";
     }
+    @req
+	or return '! $]';
     return join ' || ', @req;
 }
 
@@ -486,10 +543,41 @@ sub significant {
     return 1;
 }
 
+=head2 snext_element
+
+This method returns the next significant element, or nothing if
+there is none.
+
+Unlike L<snext_sibling()|/snext_sibling>, this will cross from
+the content of a structure into the elements that define the structure,
+or vice versa.
+
+=cut
+
+sub snext_element {
+    my ( $self ) = @_;
+    my $inx = $self->__my_inx();
+    my $parent = $self->_parent()
+	or return;
+    my @elem = $parent->elements();
+    while ( 1 ) {
+	$inx++;
+	$elem[$inx]
+	    or last;
+	$elem[$inx]->significant()
+	    and return $elem[$inx];
+    }
+    return;
+}
+
 =head2 snext_sibling
 
 This method returns the element's next significant sibling, or nothing
 if there is none.
+
+This method is analogous to the same-named L<PPI::Element|PPI::Element>
+method, in that it will not cross from the content of a structure into
+the elements that define the structure.
 
 =cut
 
@@ -502,10 +590,39 @@ sub snext_sibling {
     return;
 }
 
+=head2 sprevious_element
+
+This method returns the previous significant element, or nothing if
+there is none.
+
+Unlike L<sprevious_sibling()|/sprevious_sibling>, this will cross from
+the content of a structure into the elements that define the structure,
+or vice versa.
+
+=cut
+
+sub sprevious_element {
+    my ( $self ) = @_;
+    my $inx = $self->__my_inx()
+	or return;
+    my $parent = $self->_parent()
+	or return;
+    my @elem = $parent->elements();
+    while ( $inx ) {
+	$elem[--$inx]->significant()
+	    and return $elem[$inx];
+    }
+    return;
+}
+
 =head2 sprevious_sibling
 
 This method returns the element's previous significant sibling, or
 nothing if there is none.
+
+This method is analogous to the same-named L<PPI::Element|PPI::Element>
+method, in that it will not cross from the content of a structure into
+the elements that define the structure.
 
 =cut
 
@@ -523,34 +640,49 @@ sub sprevious_sibling {
 # stable. The exposure would be
 # sub structured_requirements_for_perl {
 #     my ( $self ) = @_;
-#     return $self->__structured_requirements_for_perl( [] );
+#     return $self->__structured_requirements_for_perl();
 # }
+# The return ia a reference to an array of hashes. Each hash contains
+# key {introduced} (the version the element was introduced) and MAYBE
+# key {removed} (the version the element was removed). There may be more
+# than one such, and their ranges will not overlap.
 sub __structured_requirements_for_perl {
     my ( $self, $rslt ) = @_;
-    if ( @{ $rslt } ) {
-	my @merged;
-	foreach my $left ( $self->__perl_requirements() ) {
-	    foreach my $right ( @{ $rslt } ) {
-		my $min = max( $left->{introduced}, $right->{introduced} );
-		my $max = defined $left->{removed} ?
-		    defined $right->{removed} ?
-			min( $left->{removed}, $right->{removed} ) :
-			$left->{removed} :
-		    $right->{removed};
-		defined $max
-		    and $max <= $min
-		    and next;
-		push @merged, {
-		    introduced	=> $min,
-		    removed		=> $max,
-		};
-	    }
+    $rslt ||= $self->__structured_requirements_for_any_perl();
+
+    my @merged;
+    foreach my $left ( $self->__perl_requirements() ) {
+	foreach my $right ( @{ $rslt } ) {
+	    my $min = max( $left->{introduced}, $right->{introduced} );
+	    my $max = defined $left->{removed} ?
+		defined $right->{removed} ?
+		    min( $left->{removed}, $right->{removed} ) :
+		    $left->{removed} :
+		$right->{removed};
+	    defined $max
+		and $max <= $min
+		and next;
+	    push @merged, {
+		introduced	=> $min,
+		removed		=> $max,
+	    };
 	}
-	@{ $rslt } = @merged;
-    } else {
-	@{ $rslt } = $self->__perl_requirements();
     }
+    @{ $rslt } = @merged;
+
     return $rslt;
+}
+
+# NOTE: This method is to be used ONLY to initialize
+# __structured_requirements_for_perl(). It returns a structure that
+# matches any Perl.
+sub __structured_requirements_for_any_perl {
+    return [
+	{
+	    introduced	=> MINIMUM_PERL,
+	    removed	=> undef,
+	},
+    ];
 }
 
 =head2 tokens
@@ -630,6 +762,21 @@ sub nav {
     return ( $parent->nav(), $parent->__nav( $self ) );
 }
 
+# Find our index among the parents children. If not found, just return.
+# Unlike __my_nav(), this just returns an index, which is appropriate
+# for ->element( $inx ), or would be if element() existed.
+
+sub __my_inx {
+    my ( $self ) = @_;
+    my $parent = $self->_parent() or return;
+    my $addr = refaddr( $self );
+    my $inx = firstidx { refaddr $_ == $addr } $parent->elements();
+    $inx < 0
+	and return;
+    return $inx;
+}
+
+
 # Find our location and index among the parent's children. If not found,
 # just returns.
 
@@ -637,7 +784,8 @@ sub nav {
     my %method_map = (
 	children => 'child',
     );
-    sub _my_inx {
+
+    sub __my_nav {
 	my ( $self ) = @_;
 	my $parent = $self->_parent() or return;
 	my $addr = refaddr( $self );

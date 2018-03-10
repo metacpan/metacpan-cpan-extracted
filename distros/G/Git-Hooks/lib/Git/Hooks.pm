@@ -1,6 +1,6 @@
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '2.6.3';
+$Git::Hooks::VERSION = '2.7.0';
 use 5.010;
 use strict;
 use warnings;
@@ -111,7 +111,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 2.6.3
+version 2.7.0
 
 =head1 SYNOPSIS
 
@@ -515,7 +515,7 @@ make this check work for other hooks as well:
             my $size = $git->file_size(":0:$name");
             if ($size > $LIMIT) {
                 $git->fault("File '$name' has $size bytes, more than our limit of $LIMIT",
-                            {prefix => 'CheckSize'});
+                            {prefix => 'CheckSize', commit => $commit});
                 ++$errors;
             }
         }
@@ -577,7 +577,7 @@ We just have to change the check_new_files function:
             my $size = $git->file_size(":0:$name");
             if ($size > $limit) {
                 $git->fault("File '$name' has $size bytes, more than our limit of $limit",
-                            {prefix => 'CheckSize'});
+                            {prefix => 'CheckSize', commit => $commit});
                 ++$errors;
             }
         }
@@ -1178,67 +1178,88 @@ users about how to get help from your site's Git gurus.
 
 You can also provide helpful messages specific to each enabled PLUGIN.
 
-=head1 TO-DO list
+=head2 githooks.color [never|auto|always]
 
-The following list is no order whatsoever. Any comments or other suggestion
-are welcome.
+This option tells if Git::Hooks's output should be colorized. It accepts the
+same values as Git's own C<color.ui> option. If it's not set, the C<color.ui>
+value is used by default. The meaning of each value is the following:
 
-=over
+=over 4
 
-=item * Support the WIN32 Platform
+=item B<never (or false)>
 
-=item * Improve documentation
+Do not use colors.
 
-Follow the advice in L<13 Things People Hate about Your Open Source
-Docs|http://blog.smartbear.com/careers/13-things-people-hate-about-your-open-source-docs/>
+=item B<auto (or true)>
 
-=item * I18N
+Use colors only if the messages go to a terminal. (This is the default value of
+C<color.ui> since Git 1.8.4.)
 
-Use Locale::TextDomain to internationalize it?
+=item B<always>
 
-=item * In CheckAcls implement DENY for ACL operations
-
-Along the lines of NFSv4 ACLs
-(L<http://tools.ietf.org/html/rfc5661#section-6>). I'm thinking about
-prefixing the what component with a '!'.
-
-=item * In CheckLog allow for stop words
-
-C<CheckLog.spelling> should have a way to register stop words.
-
-=item * CheckLog should check the footer of the commit log message
-
-The Gerrit default C<commit-msg> implements some checks that could be used
-here. Some other things to check:
-
-=over
-
-=item * L<Require Signed-off-by lines|https://github.com/icefox/git-hooks/blob/master/git_hooks/commit-msg/signed-off-by>
-
-=item * L<Duplicate Signed-off-by lines|https://github.com/icefox/git-hooks/blob/master/contrib/commit-msg/duplicate-signedoffby>
+Do use colors.
 
 =back
 
-=item * pre-commit or pre-push
+=head2 githooks.color.<slot> COLOR
 
-It would be nice to let the user decide in which of these two hooks he'd
-like to have his checks run. The idea would be to have a (default and
-per-plugin) configuration option called C<*.hook> accepting the options
-C<pre-commit> and C<pre-push> (defaulting for the former). This way the user
-would be able to make his checks run on any one of the hooks.
+Use customized colors for the Git::Hooks output colorization. B<< <slot> >>
+specifies which part of the output to use the specified color, as shown below.
 
-=item * Use the post-rewrite hook in CheckRewrite
+The COLOR value must comply with Git's color config type, which is explained in
+the L<git(1)> manpage, under the C<CONFIGURATION FILE/Values/color> section.
 
-The CheckRewrite plugin was written without resort to the post-rewrite hook,
-which I think was implemented later. It seems that it would make the
-implementation easier and more efficient. I would still use the pre-rebase
-hook to detect unsafe rebases before they're done, however there should
-exist an option to choose to postpone the check to after the rebase.
+The available I<slots> are the following:
 
-The pre-commit and post-commit hooks would be replaced by the post-rewrite
-though.
+=over 4
+
+=item B<header>
+
+The text output for the C<githooks.error-header> option. (Default value is "green".)
+
+=item B<footer>
+
+The text output for the C<githooks.error-footer> option. (Default value is "green".)
+
+=item B<context>
+
+The line containing the prefix and the context of error messages. (Default value is "red bold".)
+
+=item B<message>
+
+The error message proper. (Default value is "yellow".)
+
+=item B<details>
+
+The indented lines providing details for error messages. (Default value is empty.)
 
 =back
+
+=head1 GIT AND PERL COMPATIBILITY POLICY
+
+Currently L<Git::Hooks> require Perl 5.10 and Git 1.7.1.
+
+We try to be compatible with the Git and Perl native packages of the oldest
+L<Ubuntu LTS|https://www.ubuntu.com/info/release-end-of-life> and
+L<CentOS|https://wiki.centos.org/About/Product> Linux distributions still
+getting maintainance updates.
+
+  +-----------------------+------+--------+-------------+
+  | Distro                | Perl |   Git  | End of Life |
+  +-----------------------+------+--------+-------------+
+  | Ubuntu 14.04 (trusty) | 5.18 |  1.9.1 |   2019-04   |
+  | Ubuntu 16.04 (xenial) | 5.22 |  2.7.4 |   2021-04   |
+  | Ubuntu 18.04 (bionic) | 5.26 | 2.15.1 |   2023-04   |
+  | CentOS 6              | 5.10 |  1.7.1 |   2020-12   |
+  | CentOS 7              | 5.16 |  1.8.3 |   2024-07   |
+  +-----------------------+------+--------+-------------+
+
+As you can see, we're kept behind mostly by the slow pace of CentOS (actually,
+RHEL) releases.
+
+There are a few features of Git::Hooks which require newer Gits. If they're used
+with older Gits an appropriate error message tells the user to upgrade Git or to
+disable the feature.
 
 =head1 SEE ALSO
 

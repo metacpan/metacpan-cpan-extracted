@@ -40,19 +40,19 @@ name: MaxMind-DB-Writer
 provides:
   MaxMind::DB::Writer:
     file: lib/MaxMind/DB/Writer.pm
-    version: '0.300000'
+    version: '0.300001'
   MaxMind::DB::Writer::Serializer:
     file: lib/MaxMind/DB/Writer/Serializer.pm
-    version: '0.300000'
+    version: '0.300001'
   MaxMind::DB::Writer::Tree:
     file: lib/MaxMind/DB/Writer/Tree.pm
-    version: '0.300000'
+    version: '0.300001'
   MaxMind::DB::Writer::Tree::Processor::VisualizeTree:
     file: lib/MaxMind/DB/Writer/Tree/Processor/VisualizeTree.pm
-    version: '0.300000'
+    version: '0.300001'
   MaxMind::DB::Writer::Util:
     file: lib/MaxMind/DB/Writer/Util.pm
-    version: '0.300000'
+    version: '0.300001'
 requires:
   Carp: '0'
   Data::Dumper::Concise: '0'
@@ -88,10 +88,10 @@ resources:
   bugtracker: https://github.com/maxmind/MaxMind-DB-Writer-perl/issues
   homepage: http://metacpan.org/release/MaxMind-DB-Writer
   repository: git://github.com/maxmind/MaxMind-DB-Writer-perl.git
-version: '0.300000'
+version: '0.300001'
 x_Dist_Zilla:
   perl:
-    version: '5.026000'
+    version: '5.026001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
@@ -113,7 +113,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@MAXMIND/Git::GatherDir'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@MAXMIND/ManifestSkip'
@@ -149,7 +149,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::VersionProvider
       name: '@MAXMIND/MAXMIND::VersionProvider'
-      version: '0.83'
+      version: '0.84'
     -
       class: Dist::Zilla::Plugin::Authority
       name: '@MAXMIND/Authority'
@@ -308,7 +308,7 @@ x_Dist_Zilla:
             - zh
           wordlist: Pod::Wordlist
       name: '@MAXMIND/Test::PodSpelling'
-      version: '2.007004'
+      version: '2.007005'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@MAXMIND/PodSyntaxTests'
@@ -389,7 +389,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::Contributors
       name: '@MAXMIND/MAXMIND::Contributors'
-      version: '0.83'
+      version: '0.84'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
@@ -400,7 +400,7 @@ x_Dist_Zilla:
           order_by: name
           paths: []
       name: '@MAXMIND/Git::Contributors'
-      version: '0.030'
+      version: '0.032'
     -
       class: Dist::Zilla::Plugin::SurgicalPodWeaver
       config:
@@ -512,7 +512,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::WeaverConfig
       name: '@MAXMIND/MAXMIND::WeaverConfig'
-      version: '0.83'
+      version: '0.84'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -551,7 +551,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::License
       name: '@MAXMIND/MAXMIND::License'
-      version: '0.83'
+      version: '0.84'
     -
       class: Dist::Zilla::Plugin::CheckStrictVersion
       name: '@MAXMIND/CheckStrictVersion'
@@ -574,7 +574,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::CheckChangesHasContent
       name: '@MAXMIND/MAXMIND::CheckChangesHasContent'
-      version: '0.83'
+      version: '0.84'
     -
       class: Dist::Zilla::Plugin::MAXMIND::Git::CheckFor::CorrectBranch
       config:
@@ -582,7 +582,7 @@ x_Dist_Zilla:
           git_version: 2.14.1
           repo_root: .
       name: '@MAXMIND/MAXMIND::Git::CheckFor::CorrectBranch'
-      version: '0.83'
+      version: '0.84'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
@@ -594,7 +594,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::TidyAll
       name: '@MAXMIND/MAXMIND::TidyAll'
-      version: '0.83'
+      version: '0.84'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@MAXMIND/UploadToCPAN'
@@ -620,7 +620,7 @@ x_Dist_Zilla:
           git_version: 2.14.1
           repo_root: .
       name: '@MAXMIND/Git::Check'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -645,7 +645,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@MAXMIND/Commit generated files'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -653,7 +653,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.300000
+          tag: v0.300001
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -662,7 +662,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@MAXMIND/Git::Tag'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -674,7 +674,7 @@ x_Dist_Zilla:
           git_version: 2.14.1
           repo_root: .
       name: '@MAXMIND/Git::Push'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -685,7 +685,7 @@ x_Dist_Zilla:
           global: 0
           munge_makefile_pl: 1
       name: '@MAXMIND/BumpVersionAfterRelease'
-      version: '0.015'
+      version: '0.016'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -705,7 +705,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@MAXMIND/Commit version bump'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -717,7 +717,7 @@ x_Dist_Zilla:
           git_version: 2.14.1
           repo_root: .
       name: '@MAXMIND/Push version bump'
-      version: '2.042'
+      version: '2.043'
     -
       class: inc::MyModuleBuild
       config:
@@ -785,6 +785,7 @@ x_Dist_Zilla:
 x_authority: cpan:MAXMIND
 x_contributors:
   - 'Florian Ragwitz <rafl@debian.org>'
+  - 'Ilya M <ilya77@gmail.com>'
   - 'Jan Bieron <jbieron+github@gmail.com>'
   - 'tjmather <tjmather@maxmind.com>'
   - 'William Storey <wstorey@maxmind.com>'

@@ -1,3 +1,9 @@
+0.003   2018-03-08 (PERLANCAR)
+
+	- Rename module:
+	  Perinci::Sub::XCompletion::cryptocurrency_{symbol,code}*.
+
+
 0.002   2018-01-30 (PERLANCAR)
 
 	- Add completion: cryptoexchange_name.

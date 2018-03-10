@@ -1,7 +1,7 @@
 package Sah::SchemaR::cryptoexchange::name;
 
-our $DATE = '2018-01-30'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-03-08'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 our $rschema = ["str",[{summary=>"Cryptocurrency exchange name","x.completion"=>"cryptoexchange_name"}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::cryptoexchange::name - Cryptocurrency exchange name
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::cryptoexchange::name (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-01-30.
+This document describes version 0.004 of Sah::SchemaR::cryptoexchange::name (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-03-08.
 
 =head1 DESCRIPTION
 

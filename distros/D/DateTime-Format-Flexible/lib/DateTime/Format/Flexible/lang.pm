@@ -279,7 +279,15 @@ sub _fix_alpha_month
 
             return ( $date , $p );
         }
-    }
+
+        elsif( $date =~ m{\b$month_name\d.*\b}mxi )
+        {
+          $p->{ month } = $month_number;
+          $date =~ s{\b$month_name(\d.*)\b}{X${month_number}X$1}mxi;
+
+          return ( $date , $p );
+        }
+      }
     return ( $date , $p );
 }
 
@@ -327,7 +335,7 @@ sub _remove_day_names
     return $date;
 }
 
-# fix noon and midnight
+# fix noon and midnight, named hours
 sub _fix_hours
 {
     my ( $self , $plug , $date ) = @_;

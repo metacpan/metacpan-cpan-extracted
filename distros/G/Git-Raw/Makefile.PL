@@ -360,10 +360,9 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Pod" => "0.0",
     "Test::Pod::Coverage" => "0.0",
-    "Time::Local" => 0,
-    "blib" => "1.01"
+    "Time::Local" => 0
   },
-  "VERSION" => "0.75",
+  "VERSION" => "0.78",
   "test" => {
     "TESTS" => "t/*.t"
   }

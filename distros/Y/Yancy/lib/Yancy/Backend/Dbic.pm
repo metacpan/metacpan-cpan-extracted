@@ -1,24 +1,22 @@
 package Yancy::Backend::Dbic;
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 # ABSTRACT: A backend for DBIx::Class schemas
 
 #pod =head1 SYNOPSIS
 #pod
-#pod     # yancy.conf
-#pod     {
-#pod         backend => 'dbic://My::Schema/dbi:Pg:localhost',
-#pod         collections => {
-#pod             ResultSet => { ... },
-#pod         },
-#pod     }
-#pod
-#pod     # Plugin
+#pod     ### URL string
 #pod     use Mojolicious::Lite;
 #pod     plugin Yancy => {
 #pod         backend => 'dbic://My::Schema/dbi:Pg:localhost',
-#pod         collections => {
-#pod             ResultSet => { ... },
-#pod         },
+#pod         read_schema => 1,
+#pod     };
+#pod
+#pod     ### DBIx::Class::Schema object
+#pod     use Mojolicious::Lite;
+#pod     use My::Schema;
+#pod     plugin Yancy => {
+#pod         backend => { Dbic => My::Schema->connect( 'dbi:SQLite:myapp.db' ) },
+#pod         read_schema => 1,
 #pod     };
 #pod
 #pod =head1 DESCRIPTION
@@ -123,7 +121,8 @@ sub _rs {
 sub create {
     my ( $self, $coll, $params ) = @_;
     my $created = $self->dbic->resultset( $coll )->create( $params );
-    return { $created->get_columns };
+    my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
+    return $created->$id_field;
 }
 
 sub get {
@@ -151,12 +150,25 @@ sub list {
 
 sub set {
     my ( $self, $coll, $id, $params ) = @_;
-    return $self->dbic->resultset( $coll )->find( $id )->set_columns( $params )->update;
+    if ( my $row = $self->dbic->resultset( $coll )->find( $id ) ) {
+        $row->set_columns( $params );
+        if ( $row->is_changed ) {
+            $row->update;
+            return 1;
+        }
+    }
+    return 0;
 }
 
 sub delete {
     my ( $self, $coll, $id ) = @_;
-    $self->dbic->resultset( $coll )->find( $id )->delete;
+    # We assume that if we can find the row by ID, that the delete will
+    # succeed
+    if ( my $row = $self->dbic->resultset( $coll )->find( $id ) ) {
+        $row->delete;
+        return 1;
+    }
+    return 0;
 }
 
 sub read_schema {
@@ -236,25 +248,23 @@ Yancy::Backend::Dbic - A backend for DBIx::Class schemas
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
-    # yancy.conf
-    {
-        backend => 'dbic://My::Schema/dbi:Pg:localhost',
-        collections => {
-            ResultSet => { ... },
-        },
-    }
-
-    # Plugin
+    ### URL string
     use Mojolicious::Lite;
     plugin Yancy => {
         backend => 'dbic://My::Schema/dbi:Pg:localhost',
-        collections => {
-            ResultSet => { ... },
-        },
+        read_schema => 1,
+    };
+
+    ### DBIx::Class::Schema object
+    use Mojolicious::Lite;
+    use My::Schema;
+    plugin Yancy => {
+        backend => { Dbic => My::Schema->connect( 'dbi:SQLite:myapp.db' ) },
+        read_schema => 1,
     };
 
 =head1 DESCRIPTION

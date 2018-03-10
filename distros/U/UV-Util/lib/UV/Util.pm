@@ -1,6 +1,6 @@
 package UV::Util;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -9,14 +9,10 @@ use warnings;
 use Exporter qw(import);
 require XSLoader;
 
-our @EXPORT_OK  = qw(
+our @EXPORT_OK  = (@EXPORT_OK, qw(
     cpu_info get_free_memory get_total_memory getrusage guess_handle_type
     hrtime interface_addresses loadavg resident_set_memory version
-    UV_UNKNOWN_HANDLE UV_ASYNC UV_CHECK UV_FS_EVENT UV_FS_POLL
-    UV_HANDLE UV_IDLE UV_NAMED_PIPE UV_POLL UV_PREPARE UV_PROCESS
-    UV_STREAM UV_TCP UV_TIMER UV_TTY UV_UDP UV_SIGNAL UV_FILE
-    UV_HANDLE_TYPE_MAX
-);
+));
 
 XSLoader::load('UV::Util', $XS_VERSION);
 
@@ -306,9 +302,9 @@ current process.
     use Syntax::Keyword::Try;
 
     my $res;
-    try { $res = UV::Util::resident_set_memory(); }
+    try { $res = UV::Util::uptime(); }
     catch { die "Aw, man. $@"; }
-    say Dumper $res; # uptime
+    say Dumper $res; # 603468
 
 This L<function|http://docs.libuv.org/en/latest/misc.html#c.uv_uptime>
 returns a float representing the current system uptime.

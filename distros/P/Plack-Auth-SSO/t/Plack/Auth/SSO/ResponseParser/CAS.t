@@ -45,4 +45,38 @@ is_deeply(
     "cas:serviceResponse"
 );
 
+my $xml2 = <<EOF;
+<?xml version="1.0"?>
+<serviceResponse xmlns="http://www.yale.edu/tp/cas">
+    <authenticationSuccess>
+        <user>username</user>
+        <attributes>
+            <firstname>John</firstname>
+            <lastname>Doe</lastname>
+            <title>Mr.</title>
+            <email>jdoe\@example.org</email>
+            <affiliation>staff</affiliation>
+            <affiliation>faculty</affiliation>
+        </attributes>
+        <proxyGrantingTicket>PGTIOU-84678-8a9d...</proxyGrantingTicket>
+    </authenticationSuccess>
+</serviceResponse>
+EOF
+
+is_deeply(
+    $pkg->new()->parse( $xml2 ),
+    +{
+        uid => "username",
+        info => {
+            firstname => "John",
+            lastname => "Doe",
+            title => "Mr.",
+            email => "jdoe\@example.org",
+            affiliation => ["staff","faculty"]
+        },
+        extra => {}
+    },
+    "cas:serviceResponse"
+);
+
 done_testing;

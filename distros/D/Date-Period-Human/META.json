@@ -1,16 +1,16 @@
 {
    "abstract" : "Human readable date periods",
    "author" : [
-      "Peter Stuifzand <peter@stuifzand.eu>"
+      "Peter Stuifzand"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.3, Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 5.034, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Date-Period-Human",
    "no_index" : {
@@ -31,6 +31,7 @@
       },
       "develop" : {
          "requires" : {
+            "Dist::Milla" : "v1.0.15",
             "Test::Pod" : "1.41"
          }
       },
@@ -59,11 +60,12 @@
          "web" : "https://github.com/pstuifzand/date-period-human"
       }
    },
-   "version" : "0.4.5",
+   "version" : "0.4.6",
    "x_contributors" : [
-      "MAJESTIC <majestic@cpan.org>",
-      "Peter Stuifzand <peter.stuifzand@gmail.com>",
-      "isync <O.Zucker@web.de>"
+      "David Precious <davidp@preshweb.co.uk>",
+      "isync <O.Zucker@web.de>",
+      "Peter Stuifzand <peter@stuifzand.eu>",
+      "Peter Stuifzand <peter.stuifzand@gmail.com>"
    ]
 }
 

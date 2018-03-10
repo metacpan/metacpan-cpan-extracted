@@ -6,7 +6,8 @@ use warnings;
 use lib qw/t lib/;
 use Git::Hooks::Test ':all';
 use Path::Tiny;
-use Test::More tests => 19;
+use Test::More tests => 29;
+use Test::Requires::Git;
 
 my ($repo, $clone);
 
@@ -142,9 +143,64 @@ $repo->run(qw/config githooks.checkfile.path.allow txt/);
 
 check_can_commit('allow path', 'file.txt');
 
-$repo->run(qw/config --unset-all githooks.checkfile.path.deny/);
-$repo->run(qw/config --unset-all githooks.checkfile.path.allow/);
+$repo->run(qw/config --remove-section githooks.checkfile/);
 
+SKIP: {
+    skip "Non-Windows checks", 2 if $^O eq 'MSWin32';
+
+    check_can_commit('Allow commit case conflict by default', 'FILE.TXT');
+
+    $repo->run(qw/config githooks.checkfile.deny-case-conflict true/);
+
+    check_cannot_commit('Deny commit case conflict',
+                        qr/adds a file with a name that will conflict/,
+                        'File.Txt');
+
+    $repo->run(qw/reset --hard HEAD/);
+}
+
+SKIP: {
+    test_requires_git skip => 1, version_ge => '1.7.4';
+
+    $repo->run(qw/config --remove-section githooks.checkfile/);
+
+    $repo->run(qw/config githooks.checkfile.deny-token FIXME/);
+
+    check_cannot_commit('Deny commit if match FIXME',
+                        qr/Invalid tokens detected in added lines/,
+                        'file.txt',
+                        0,
+                        "FIXME: something\n",
+                    );
+
+    $repo->run(qw/reset --hard HEAD/);
+}
+
+$repo->run(qw/config --remove-section githooks.checkfile/);
+
+$repo->run(qw/config githooks.checkfile.executable *.sh/);
+
+$repo->run(qw/config githooks.checkfile.not-executable *.txt/);
+
+my $wc = path($repo->work_tree);
+
+$wc->child('script.sh')->touch()->chmod(0644);
+
+check_cannot_commit('executable fail', qr/is not executable but should be/, 'script.sh');
+
+$wc->child('script.sh')->chmod(0755);
+
+check_can_commit('executable succeed', 'script.sh');
+
+$wc->child('doc.txt')->touch()->chmod(0755);
+
+check_cannot_commit('not-executable fail', qr/is executable but should not be/, 'doc.txt');
+
+$wc->child('doc.txt')->chmod(0644);
+
+check_can_commit('not-executable succeed', 'doc.txt');
+
+
 # PRE-RECEIVE
 
 setup_repos();
@@ -168,3 +224,32 @@ $clone->run(qw/config githooks.checkfile.sizelimit 4/);
 check_can_push('small file', 'file.txt', 'truncate', '12');
 
 check_cannot_push('big file', qr/the current limit is/, 'file.txt', 'truncate', '123456789');
+
+$clone->run(qw/config --remove-section githooks.checkfile/);
+
+SKIP: {
+    skip "Non-Windows checks", 2 if $^O eq 'MSWin32';
+
+    check_can_push('Allow push case conflict by default', 'FILE2.TXT');
+
+    $clone->run(qw/config githooks.checkfile.deny-case-conflict true/);
+
+    check_cannot_push('Deny push case conflict',
+                      qr/adds a file with a name that will conflict/,
+                      'File2.Txt');
+}
+
+SKIP: {
+    test_requires_git skip => 1, version_ge => '1.7.4';
+
+    $clone->run(qw/config --remove-section githooks.checkfile/);
+
+    $clone->run(qw/config githooks.checkfile.deny-token FIXME/);
+
+    check_cannot_push('Deny push if match FIXME',
+                      qr/Invalid tokens detected in added lines/,
+                      'file.txt',
+                      0,
+                      "FIXME: something\n",
+                  );
+}

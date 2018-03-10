@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 sub _ANY_PORT           { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -136,6 +136,12 @@ sub new {
       )
       or Firefox::Marionette::Exception->throw(
         "Failed to create temporary directory:$EXTENDED_OS_ERROR");
+    $profile->set_value( 'browser.shell.checkDefaultBrowser',     'false', 0 );
+    $profile->set_value( 'browser.reader.detectedFirstArticle',   'true',  0 );
+    $profile->set_value( 'dom.disable_open_click_delay',          0,       0 );
+    $profile->set_value( 'app.update.auto',                       'false', 0 );
+    $profile->set_value( 'app.update.enabled',                    'false', 0 );
+    $profile->set_value( 'network.http. request.max-start-delay', '0',     0 );
     $profile->set_value( 'browser.startup.homepage', 'about:blank', 1 );
     $profile->set_value( 'browser.startup.homepage_override.mstone',
         'ignore', 1 );
@@ -264,7 +270,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 0.50
+Version 0.51
 
 =head1 SYNOPSIS
 

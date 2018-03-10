@@ -1,5 +1,16 @@
 Revision history for perl distribution Test-Mojo-Role-Selenium
 
+0.14 2018-03-08T21:04:31+0100
+ - Forgot to remove Carp::Always #4
+
+0.13 2018-03-08T20:49:34+0100
+ - Test::Mojo::WithRoles is no longer required
+ - new() can take config overrides #1 #3
+   Contributor: tomk3002
+
+0.12 2017-11-22T11:59:47+0100
+ - Add ENV variable to override Test::Mojo host
+
 0.11 2017-11-22T11:07:06+0100
  - Fix documentation order issue
  - Add support for finding elements by id, css, xpath, ...

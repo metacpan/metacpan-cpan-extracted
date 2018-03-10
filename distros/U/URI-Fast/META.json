@@ -26,9 +26,11 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "Exporter" : "0",
-            "Inline::C" : "0",
-            "URI::Encode::XS" : "0.07",
+            "Inline" : "0.80",
+            "Inline::C" : "0.78",
+            "parent" : "0",
             "perl" : "5.010"
          }
       },
@@ -39,11 +41,13 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
-            "Importer" : "0",
-            "Test2::Suite" : "0.000049",
+            "Test2" : "1.302125",
+            "Test2::Suite" : "0.000100",
+            "Test2::V0" : "0",
             "Test::LeakTrace" : "0.16",
             "Test::More" : "0",
             "Test::Pod" : "1.41",
+            "URI::Encode::XS" : "0.11",
             "URI::Split" : "0"
          }
       }
@@ -60,7 +64,7 @@
          "web" : "https://github.com/sysread/URI-Fast"
       }
    },
-   "version" : "0.06",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

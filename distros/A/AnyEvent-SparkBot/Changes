@@ -7,3 +7,25 @@
    The Perl 5 License (Artistic 1 & GPL 1 or later)
 0.004
   -- Pod fix ups
+1.004
+  -- Moved 1.xxx
+    -- Now Generate most of the http functions
+    -- All vendor HTTP Interface methods implemented
+    -- All Chat Object Methods implemented
+1.005
+  -- Fixed bug 124697 
+   -- Now use pure cpan modules for logging validation
+1.006
+  -- Pod clean ups
+1.007
+  -- Pod Updates
+  -- Documented $self->run_lookup
+  -- $self->run_lookup Retry-After header is now correctly supported
+  -- true non blocking unit testing added
+  -- Got advice from cisco about listMessages, apparently bots can only list messages that in rooms that refer to themselves.
+  -- Added far more extensive unit testing
+1.008
+  -- AnyEvent::HTTP::Spark, added support properly handling 429 response in both blocking and non blocking context, IE full Retry-After support has been added
+  -- AnyEvent::HTTP::Spark, documented new constructor arguments
+  -- AnyEvent::SparkBot $self->run_lookup is now just a shortcut, it is no longer a wrapper, but works just fine.
+  -- t/AnyEvent-SparkBot.t no longer tries to get to the internet without $ENV{RUN_HTTP_TESTS} being true

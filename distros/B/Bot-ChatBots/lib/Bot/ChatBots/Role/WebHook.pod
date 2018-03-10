@@ -40,9 +40,9 @@ Bot::ChatBots::Role::WebHook - Bot::ChatBots Role for WebHooks
 =head1 DESCRIPTION
 
 This is an updates receiver and dispatcher role for defining WebHooks
-(i.e. when the platform pushes updates through a webhook). It is most
-probably best used with C<Bot::ChatBots::Role::Source>, which provides
-some of the required methods.
+(i.e. when the platform pushes updates through a webhook). It inherits
+from C<Bot::ChatBots::Role::Source>, which provides some of the required
+methods.
 
 =head2 Operation Model
 
@@ -326,6 +326,13 @@ input arguments in C<%arg> are:
 
 =over
 
+=item C<handler>
+
+the handler to be installed, as a sub reference. Defaults to L</handler>,
+which is passed C<\%args>. You will generally not need to pass this, but
+sometimes (e.g. the Trello API) you have to install more than one route and
+specify some specific (although simple) action for them.
+
 =item C<method> 
 
 the method of the registered route. Defaults to L</method>. Note that it
@@ -343,39 +350,38 @@ default, L</app> is used to retrieve the routes via C<< $obj->app->routes
 
 =back
 
-=head2 B<< process >>
+=head2 B<< parse_request >>
 
-   my $outcome = $obj->process($hashref);
+   my @updates = $obj->parse_request($req);
 
-Process an incoming record. This is built starting from each single update
-returned by L</parse_request>, with additional data to provide context to
-the following processing elements (so that you can theoretically build
-a generic processor for updates coming from different sources).
+Parse a single L<Mojo::Message::Request> and return all the updates
+inside.
 
-See L</DESCRIPTION> for the shape of C<$hashref>.
+Defaults to just returning C<< $req->json >>, i.e. the JSON decoding of
+the request's content, which should work in most cases. You should
+override this method otherwise. For example, the Telegram Bot API only
+delivers one single update per call (so this default is sensible), while
+the Facebook Messenger API can deliver a batch of updates all in one
+single WebHook call (so it needs to be overridden).
 
-By default it is a thin wrapper around L</processor>, in order to ease
-your library's client to provide a processing sub reference.
+NOTE: up to and including version 0.008 this method used to be one of the
+L</REQUIRED METHODS>, the default was introduced later.
+
 
 =head1 REQUIRED METHODS
 
 This class defines a L<Moo::Role>, so it's not a standalone thing by
 itself. The following methods are I<required> to exist in the class that
-composes this role.
-
-=head2 B<< parse_request >>
-
-   my @updates = $obj->parse_request($c->req);
-
-Parse a single L<Mojo::Message::Request> and return all the updates
-inside. For some perspective, the Telegram Bot API only delivers one
-single update per call, while the Facebook Messenger API can deliver
-a batch of updates all in one single WebHook call.
+composes this role. Note that some of these methods are actually provided
+by L<Bot::ChatBots::Role::Source> and you are not required to provide them
+yourself (unless you want to override the defaults, of course).
 
 =head2 B<< process_updates >>
 
    my @processed = $obj->process_updates(%args); # OR
       @processed = $obj->process_updates(\%args);
+
+Provided by L<Bot::ChatBots::Role::Source>.
 
 Process the updates received via the webhook, called by L</handler>. The
 C<%args> will contain the following keys:

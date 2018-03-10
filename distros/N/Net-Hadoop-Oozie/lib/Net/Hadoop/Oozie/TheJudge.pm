@@ -1,5 +1,5 @@
 package Net::Hadoop::Oozie::TheJudge;
-$Net::Hadoop::Oozie::TheJudge::VERSION = '0.112';
+$Net::Hadoop::Oozie::TheJudge::VERSION = '0.113';
 use 5.010;
 use strict;
 use warnings;
@@ -157,26 +157,21 @@ sub question {
     # optionally with a weight like (0.9 ^ days(time - lastModifiedEpoch))
 }
 
-1;
+'Drokk';
 
 __END__
 
 =pod
 
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
-Net::Hadoop::Oozie::TheJudge
+Net::Hadoop::Oozie::TheJudge - Will tell you the verdict on coordinators
 
 =head1 VERSION
 
-version 0.112
-
-=head1 SYNOPSIS
-
-    use Net::Hadoop::TheJudge;
-    # TODO
+version 0.113
 
 =head1 SYNOPSIS
 
@@ -193,9 +188,13 @@ version 0.112
 
 Part of the Perl Oozie interface.
 
-=head1 NAME
+It is named after Judge Dredd, who is empowered to summarily arrest,
+convict, sentence, and execute criminals.
 
-Net::Hadoop::Oozie::TheJudge - Will tell you the verdict on coordinators
+=head1 SYNOPSIS
+
+    use Net::Hadoop::TheJudge;
+    # TODO
 
 =head1 ATTRIBUTES
 
@@ -216,16 +215,5 @@ The name of the program.
 =head2 question
 
 TODO.
-
-=head1 AUTHOR
-
-David Morel <david.morel@amakuru.net>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015 by David Morel & Booking.com.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

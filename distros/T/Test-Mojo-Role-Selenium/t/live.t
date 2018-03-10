@@ -1,13 +1,12 @@
 BEGIN { $ENV{TEST_SELENIUM} = 1 if $ENV{TEST_SELENIUM} }
-use Mojo::Base -strict;
-use Test::Mojo::WithRoles 'Selenium';
-use Test::More;
+use lib '.';
+use t::Helper;
 
 use Mojolicious::Lite;
 get '/'    => 'index';
 get '/app' => 'app';
 
-my $t = Test::Mojo::WithRoles->new->setup_or_skip_all;
+my $t = t::Helper->t->setup_or_skip_all;
 
 $t->driver_args({driver_class => 'Selenium::Chrome'});
 

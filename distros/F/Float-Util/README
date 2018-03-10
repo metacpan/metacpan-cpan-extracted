@@ -2,8 +2,8 @@ NAME
     Float::Util - Utilities related to floating point numbers
 
 VERSION
-    This document describes version 0.001 of Float::Util (from Perl
-    distribution Float-Util), released on 2018-03-04.
+    This document describes version 0.002 of Float::Util (from Perl
+    distribution Float-Util), released on 2018-03-09.
 
 SYNOPSIS
      use Float::Util qw(is_exact);
@@ -36,6 +36,14 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    <https://en.wikipedia.org/wiki/Double-precision_floating-point_format>
+
+    <https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format
+    >
+
+    <https://stackoverflow.com/questions/21146203/checking-if-floating-point
+    -number-is-completely-convertibal-to-binary>
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 

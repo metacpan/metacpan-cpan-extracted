@@ -2,7 +2,7 @@ package Test2::Tools::EventDumper;
 use strict;
 use warnings;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000011';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
@@ -42,7 +42,7 @@ my %DEFAULTS = (
     other_sort_order => 9000,
 
     include_fields => undef,
-    exclude_fields => {buffered => 1, nested => 1, in_subtest => 1, is_subtest => 1, subtest_id => 1},
+    exclude_fields => {buffered => 1, nested => 1, in_subtest => 1, is_subtest => 1, subtest_id => 1, hubs => 1},
 
     indent_sequence => '    ',
 
@@ -315,7 +315,7 @@ sub get_rows {
         unless $ref;
 
     return ( [], [ $func, $field, do_array_dump($val, $settings) ] )
-        if $ref eq 'ARRAY' && !grep { !$_->isa('Test2::Event') } @$val;
+        if $ref eq 'ARRAY' && !grep { !blessed($_) || !$_->isa('Test2::Event') } @$val;
 
     return [ $func, $field, 'T()', "Unknown value: " . (blessed($val) || $ref) ];
 }

@@ -1,3 +1,9 @@
+Version 0.006 - 2018-03-08
+ - Auto-detect CSV Unicode format by looking for BOM, unless handle
+   already has an IO layer to specify encoding.
+ - Improved logging, and logging API.  'log' attribute is no longer public
+   on Decoder objects.
+
 Version 0.005 - 2017-11-26
  - Remove 'filters' feature since it adds overhead and not much value
  - Fix bug when creating multiple parallel record iterators

@@ -3,9 +3,11 @@ package Firefox::Marionette::Response;
 use strict;
 use warnings;
 use Firefox::Marionette::Exception::NotFound();
+use Firefox::Marionette::Exception::NoSuchAlert();
+use Firefox::Marionette::Exception::StaleElement();
 use Firefox::Marionette::Exception::Response();
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 sub _TYPE_INDEX       { return 0 }
 sub _MESSAGE_ID_INDEX { return 1 }
@@ -23,6 +25,14 @@ sub new {
     if ( $response->error() ) {
         if ( $response->error()->{error} eq 'no such element' ) {
             Firefox::Marionette::Exception::NotFound->throw( $response,
+                $parameters );
+        }
+        elsif ( $response->error()->{error} eq 'stale element reference' ) {
+            Firefox::Marionette::Exception::StaleElement->throw( $response,
+                $parameters );
+        }
+        elsif ( $response->error()->{error} eq 'no such alert' ) {
+            Firefox::Marionette::Exception::NoSuchAlert->throw( $response,
                 $parameters );
         }
         else {
@@ -61,7 +71,7 @@ Firefox::Marionette::Response - Represents a Marionette protocol response
 
 =head1 VERSION
 
-Version 0.50
+Version 0.51
 
 =head1 SYNOPSIS
 

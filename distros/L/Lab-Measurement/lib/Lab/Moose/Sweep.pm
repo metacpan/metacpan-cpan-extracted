@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep;
-$Lab::Moose::Sweep::VERSION = '3.621';
+$Lab::Moose::Sweep::VERSION = '3.622';
 #ABSTRACT: Base class for high level sweeps
 
 # Step/List and Continuous sweep are implemented as subclasses
@@ -463,7 +463,7 @@ Lab::Moose::Sweep - Base class for high level sweeps
 
 =head1 VERSION
 
-version 3.621
+version 3.622
 
 =head1 DESCRIPTION
 

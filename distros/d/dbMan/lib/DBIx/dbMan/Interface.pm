@@ -4,7 +4,7 @@ use strict;
 use DBIx::dbMan::History;
 use Term::ANSIColor qw/colorstrip/;
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 1;
 
@@ -27,7 +27,17 @@ sub init {
 
 sub print {
 	my $obj = shift;
-    print $obj->{ -lang }->str( @_ );
+
+    my $s = join '', @_;
+
+    if ( $obj->is_utf8 ) {
+        binmode STDOUT, ':utf8';
+    }
+    else {
+        $s = $obj->{ -lang }->str( $s );
+    }
+
+    print $s;
 }
 
 sub trace {
@@ -163,7 +173,7 @@ sub loop {
             } until ($action{processed});
         };
         if ( $@ =~ /^Catched signal INT/ ) {
-            print "Interrupted by user.\n";
+            $obj->error( "Interrupted by user." );
         }
         elsif ( $@ ) {
             die $@;

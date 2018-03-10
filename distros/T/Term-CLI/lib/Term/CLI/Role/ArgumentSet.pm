@@ -20,7 +20,7 @@
 
 use 5.014_001;
 
-package Term::CLI::Role::ArgumentSet  0.03002 {
+package Term::CLI::Role::ArgumentSet  0.04004 {
 
 use Modern::Perl;
 
@@ -49,6 +49,14 @@ has _arguments => (
 
 sub arguments {
     return @{$_[0]->_arguments // []};
+}
+
+
+sub set_arguments {
+    my $self = shift;
+
+    $self->_set_arguments([]);
+    $self->add_argument(@_);
 }
 
 
@@ -90,7 +98,7 @@ Term::CLI::Role::ArgumentSet - Role for (sub-)commands in Term::CLI
 
 =head1 VERSION
 
-version 0.03002
+version 0.04004
 
 =head1 SYNOPSIS
 
@@ -157,11 +165,18 @@ references that are owned by this object.
 
 =over
 
+=item B<set_arguments> ( I<ARG>, ... )
+X<set_arguments>
+
+Reset the list of arguments to (I<ARG>, ...).
+Each I<ARG> should be a reference to a
+L<Term::CLI::Argument|Term::CLI::Argument> object.
+
 =item B<add_argument> ( I<ARG>, ... )
 X<add_argument>
 
-Add I<ARG>(s) to the argument set. I<ARG> should be
-a reference to 
+Add I<ARG>(s) to the argument set.
+Each I<ARG> should be a reference to a
 L<Term::CLI::Argument|Term::CLI::Argument> object.
 
 =item B<argument_names>

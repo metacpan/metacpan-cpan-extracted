@@ -1,5 +1,14 @@
 Revision history for App-VTide
 
+0.1.6   2018-03-07
+        Updating for release of version 0.1.6
+        Added perl 5.26 to travis builds (Ivan Wills)
+        Updated license date (Ivan Wills)
+        Cleaning up skip file (Ivan Wills)
+        Changed from push to unshift to maintain glob order (Ivan Wills)
+        Added ability to exclude files/globs from edits (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+
 0.1.5   2017-10-08
         Updating for release of version 0.1.5
         Documenting hew methods (Ivan Wills)

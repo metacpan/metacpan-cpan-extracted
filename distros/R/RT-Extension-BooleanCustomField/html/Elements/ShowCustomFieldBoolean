@@ -1,0 +1,8 @@
+<%init>
+use utf8;
+my $content = ($Object->LargeContent || $Object->Content) ? '&#10004;' : '-';
+</%init>
+<%$content|n%>
+<%ARGS>
+$Object
+</%ARGS>

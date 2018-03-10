@@ -4,8 +4,9 @@ use strict;
 use locale;
 use POSIX;
 use Locale::gettext;
+use utf8;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 1;
 

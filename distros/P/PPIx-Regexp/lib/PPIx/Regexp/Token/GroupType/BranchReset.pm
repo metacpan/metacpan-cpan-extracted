@@ -34,7 +34,9 @@ use warnings;
 
 use base qw{ PPIx::Regexp::Token::GroupType };
 
-our $VERSION = '0.055';
+our $VERSION = '0.056';
+
+=begin comment
 
 # Return true if the token can be quantified, and false otherwise
 # sub can_be_quantified { return };
@@ -56,6 +58,19 @@ sub perl_version_introduced {
 sub __defining_string {
     return '?|';
 }
+
+=end comment
+
+=cut
+
+__PACKAGE__->__setup_class(
+    {
+	'?|'	=> {
+	    expl	=> 'Re-use capture group numbers',
+	    intro	=> '5.009005',
+	},
+    },
+);
 
 1;
 

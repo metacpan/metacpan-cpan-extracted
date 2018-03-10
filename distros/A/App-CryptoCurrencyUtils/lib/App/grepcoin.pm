@@ -1,7 +1,7 @@
 package App::grepcoin;
 
-our $DATE = '2018-02-05'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2018-03-08'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -72,7 +72,7 @@ App::grepcoin - Grep cryptocurrency coins
 
 =head1 VERSION
 
-This document describes version 0.010 of App::grepcoin (from Perl distribution App-CryptoCurrencyUtils), released on 2018-02-05.
+This document describes version 0.011 of App::grepcoin (from Perl distribution App-CryptoCurrencyUtils), released on 2018-03-08.
 
 =head1 FUNCTIONS
 

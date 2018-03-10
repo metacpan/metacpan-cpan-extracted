@@ -7,16 +7,8 @@
 /* length of a string like "Sun, 08-Jan-2006 13:56:17 GMT"]" */
 #define DATE_FORMAT_LEN 29
 
-double date_compute(const char *date)
+double date_compute(const char *date, int len)
 {
-    /* special case when date is the string "now" */
-    if (date[0] == 'n' &&
-        date[1] == 'o' &&
-        date[2] == 'w' &&
-        date[3] == '\0') {
-        return time(0);
-    }
-
     int state = 0;
     int negative = -1;
     int part[2] = {0,0};
@@ -24,7 +16,24 @@ double date_compute(const char *date)
     double decimals = 1;
     char term = 's';
     int e = 0;
-    for (; date[e] != '\0'; ++e) {
+    double offset = 0.0;
+    time_t base = 0;
+
+    if (len < 0) {
+        len = strlen(date);
+    }
+    if (len <= 0) {
+        return -1;
+    }
+    /* special case when date is the string "now" */
+    if (len == 3 &&
+        date[0] == 'n' &&
+        date[1] == 'o' &&
+        date[2] == 'w') {
+        return time(0);
+    }
+
+    for (; e < len; ++e) {
         char c = date[e];
         if (isspace(c)) {
             if (state > 0) {
@@ -82,7 +91,7 @@ double date_compute(const char *date)
         return -1;
     }
 
-    double offset = (double) part[0];
+    offset = (double) part[0];
 
     /* digits only => epoch */
     if (state == 2 && negative < 0) {
@@ -118,7 +127,7 @@ double date_compute(const char *date)
         default:
             break;
     }
-    time_t base = time(0);
+    base = time(0);
     /* printf("time now %lu\n", (unsigned long) base); */
     return base + offset;
 }
@@ -165,7 +174,7 @@ Buffer* date_format(double date, Buffer* format)
 #endif
 
     buffer_ensure_unused(format, DATE_FORMAT_LEN);
-    sprintf(format->data,
+    sprintf(format->data + format->wpos,
             "%3s, %02d-%3s-%04d %02d:%02d:%02d %3s",
             Day[gmt.tm_wday % 7],
             gmt.tm_mday,
@@ -175,6 +184,6 @@ Buffer* date_format(double date, Buffer* format)
             gmt.tm_min,
             gmt.tm_sec,
             "GMT");
-    format->pos = DATE_FORMAT_LEN;
+    format->wpos += DATE_FORMAT_LEN;
     return format;
 }

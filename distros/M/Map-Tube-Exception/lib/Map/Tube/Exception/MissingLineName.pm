@@ -1,13 +1,13 @@
 package Map::Tube::Exception::MissingLineName;
 $Map::Tube::Exception::MissingLineName::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::MissingLineName::VERSION = '3.13';
+$Map::Tube::Exception::MissingLineName::VERSION = '3.14';
 =head1 NAME
 
 Map::Tube::Exception::MissingLineName - Represent 'missing line name' exception.
 
 =head1 VERSION
 
-version 3.13
+version 3.14
 
 =cut
 

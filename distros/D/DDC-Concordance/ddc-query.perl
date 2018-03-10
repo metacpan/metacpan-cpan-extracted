@@ -39,6 +39,7 @@ our %client = (
 	       connect=>{PeerAddr=>"localhost",PeerPort=>50011},
 	       start=>0,
 	       limit=>10,
+	       hint=>'',
 	       timeout=>60,
 	       mode=>'json',
 	       encoding=>'UTF-8',
@@ -92,6 +93,7 @@ GetOptions(##-- General
 	   'start|S=i' => \$client{start},
 	   'limit|l=i' => \$client{limit},
 	   'timeout|t=i' => \$client{timeout},
+	   'hint|H=s' => \$client{hint},
 	   'expand-pipeline|xpipe|pipe|xp|expand-chain|chain|xc=s' => \$expandChain,
 
 	   ##-- Hit Parsing
@@ -138,6 +140,12 @@ pod2usage({-msg=>"No query specified!", -exitval=>1, -verbose=>0}) if (!@ARGV);
 sub qtrace {
   return if (!$query_verbose);
   print STDERR "$prog: ", @_, "\n";
+}
+
+sub quotenp {
+  my $s = shift;
+  $s =~ s{([^[:print:]])}{sprintf("\\x{%0.2x}",ord($1))}ge;
+  return $s;
 }
 
 ##------------------------------------------------------------------------------
@@ -314,10 +322,10 @@ if (!$query_multi) {
 else {
   ##-- multi-query mode (e.g. get_first_hits + get_hit_strings)
 
-  print "#\n# MULTI:\n", map {"#  + $_->{query}\n"} @queries;
+  print "#\n# MULTI:\n", map {"#  + ".quotenp($_->{query})."\n"} @queries;
   my @bufs = $dclient->queryMulti(map {$_->{query}} @queries);
   for (my $i=0; $i <= $#queries; ++$i) {
-    print "#\n# QUERY: $queries[$i]{query}\n";
+    print "#\n# QUERY: ".quotenp($queries[$i]{query})."\n";
     showQueryResponse($queries[$i]{query},$bufs[$i]);
   }
 }
@@ -362,15 +370,16 @@ ddc-query.perl - distributed DDC query tool in perl
 
  Hit Selection Options:
   -corpora DDC_CORPORA              ##-- comma-separated list; default=none
-  -opt-file OPTFILE                 ##-- load DDC .opt file
-  -start FIRST_HIT                  ##-- default=0
-  -limit MAX_HITS                   ##-- default=10
+  -start FIRST_HIT                  ##-- offset of 1st hit to retrieve (default=0)
+  -limit MAX_HITS                   ##-- maximum number of hits to retrieve (default=10)
+  -hint HINT                        ##-- set optional navigation hint (default: empty string)
   -expand-chain PIPELINE            ##-- perform term expansion via PIPELINE rather than a retrieval query
 
  Hit Parsing Options
   -parse-meta   , -no-meta          ##-- do/don't parse hit metadata (default=do)
   -parse-context, -no-context       ##-- do/don't parse hit context  (default=do)
   -keep-raw     , -nokeep-raw       ##-- do/don't keep raw hit context (default=don't)
+  -opt-file OPTFILE                 ##-- load DDC .opt file?
   -field-names FIELDS               ##-- parse into named FIELDS (space-separated list; default=none)
   -word-separator REGEX             ##-- word separator regex for context parsing (default=' ')
   -field-separator REGEX            ##-- field separator regex for context parsing (default='\x{1f}' : ASCII unit separator)

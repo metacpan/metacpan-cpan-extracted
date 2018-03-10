@@ -1,7 +1,7 @@
 package App::btcindo;
 
-our $DATE = '2018-03-06'; # DATE
-our $VERSION = '0.021'; # VERSION
+our $DATE = '2018-03-07'; # DATE
+our $VERSION = '0.022'; # VERSION
 
 use 5.010001;
 use strict;
@@ -315,7 +315,7 @@ $SPEC{ticker} = {
 sub ticker {
     my %args = @_;
     _init(\%args);
-    [200, "OK", $btcindo->get_ticker->{ticker}];
+    [200, "OK", $btcindo->get_ticker(pair => $args{pair})->{ticker}];
 }
 
 $SPEC{trades} = {
@@ -1133,7 +1133,7 @@ App::btcindo - CLI for bitcoin.co.id (VIP)
 
 =head1 VERSION
 
-This document describes version 0.021 of App::btcindo (from Perl distribution App-btcindo), released on 2018-03-06.
+This document describes version 0.022 of App::btcindo (from Perl distribution App-btcindo), released on 2018-03-07.
 
 =head1 SYNOPSIS
 

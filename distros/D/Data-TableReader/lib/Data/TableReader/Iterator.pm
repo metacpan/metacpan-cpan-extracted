@@ -1,5 +1,5 @@
 package Data::TableReader::Iterator;
-$Data::TableReader::Iterator::VERSION = '0.005';
+$Data::TableReader::Iterator::VERSION = '0.006';
 use strict;
 use warnings;
 use Try::Tiny;
@@ -56,7 +56,7 @@ Data::TableReader::Iterator - Base class for iterators (blessed coderefs)
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -98,6 +98,14 @@ is not seekable this may return undef.
 
 =head1 METHODS
 
+=head2 new
+
+  $iter= Data::TableReader::Iterator->new( \&coderef, \%fields );
+
+The iterator is a blessed coderef.  The first argument is the coderef to be blessed,
+and the second argument is the magic hashref of fields to be made available as
+C<< $iter->_fields >>.
+
 =head2 tell
 
 If seeking is supported, this will return some value that can be passed to
@@ -123,7 +131,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Michael Conrad.
+This software is copyright (c) 2018 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

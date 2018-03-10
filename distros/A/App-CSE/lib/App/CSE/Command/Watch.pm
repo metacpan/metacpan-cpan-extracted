@@ -1,5 +1,5 @@
 package App::CSE::Command::Watch;
-$App::CSE::Command::Watch::VERSION = '0.012';
+$App::CSE::Command::Watch::VERSION = '0.013';
 use Moose;
 extends qw/App::CSE::Command/;
 with qw/App::CSE::Role::DirIndex/;

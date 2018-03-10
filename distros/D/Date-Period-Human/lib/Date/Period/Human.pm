@@ -6,7 +6,7 @@ use Carp;
 
 use Date::Calc qw/Delta_DHMS Today_and_Now N_Delta_YMDHMS/;
 
-our $VERSION='0.4.5';
+our $VERSION='0.4.6';
 
 use utf8; # umlauts in translations
 
@@ -266,6 +266,38 @@ sub _translate {
             time_in_years               => 'in %d years',
             time_in_over_years          => 'in over %d years',
         },
+        en_short => {
+            time_months_ago             => '%dm ago',
+            time_a_month_ago            => '1m ago',
+            time_years_ago              => '%dy ago',
+            time_a_year_ago             => '1y ago',
+            time_a_week_ago             => '1w ago',
+            time_weeks_ago              => '%dw ago',
+            time_num_days_ago           => '%dd ago',
+            time_yesterday_at           => '%02d:%02d yesterday',
+            time_hour_min_ago           => '%dh %dm ago',
+            time_minute_ago             => '%dm ago',
+            time_minutes_ago            => '%dm ago',
+            time_less_than_minute_ago   => '< 1m ago',
+            time_just_now               => 'just now',
+
+            time_in_less_than_minute    => 'in %ds',
+            time_in_minute              => 'in %dm',
+            time_in_minutes             => 'in %dm',
+            time_in_hour_minutes        => 'in %dh %dm',
+            time_in_hours_minutes       => 'in %dh %dm',
+            time_tomorrow_at            => 'tomorrow at %02d:%02d',
+            time_after_tomorrow_at      => 'the day after tomorrow at %02d:%02d',
+            time_in_num_days            => 'in %dd',
+            time_in_week                => 'in %dw',
+            time_in_weeks               => 'in %dw',
+            time_in_month               => 'in %dm',
+            time_in_months              => 'in %dm',
+            time_in_year                => 'in %dy',
+            time_in_over_year           => 'in > 1y',
+            time_in_years               => 'in %dy',
+            time_in_over_years          => 'in > %dy',
+        },
     );
 
     return sprintf($translation{$self->{lang}}{$key}, @values);
@@ -285,17 +317,21 @@ Date::Period::Human - Human readable date periods
     # Get a relative human readable date string
     my $s = $d->human_readable('2010-01-01 02:30:42');
 
-    # Now $s contains the relative date
+    # Now $s contains the relative date in human readable form, e.g. "1 year
+    # ago", "3 weeks ago", etc.
+
+    # Use English instead of the default Dutch
+    # my $d = Date::Period::Human->new({ lang => 'en' });
 
 =head1 DESCRIPTION
 
 Creates a string of relative time. This is useful when you're showing user
 created content, where it's nicer to show how long ago the item was posted
-instead of the date and time.
+(e.g. "3 weeks ago") instead of the date and time.
 
 This also solves the problem where you don't know the timezone of the user who
 is viewing the item. This is solved because you show relative time instead of
-absolute time in most cases. 
+absolute time in most cases.
 
 There is one case that isn't relative.
 
@@ -334,6 +370,10 @@ Or, $epoch (identified by regex /^\d+$/) and passed through gmtime().
 =head1 HOMEPAGE
 
 http://github.com/pstuifzand/date-period-human
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =head1 AUTHOR
 

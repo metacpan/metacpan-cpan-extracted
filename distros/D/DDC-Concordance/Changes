@@ -2,6 +2,11 @@
 ##
 ## Change log for perl distribution DDC-Concordance
 
+v0.41 Fri, 09 Mar 2018 09:48:31 +0100 moocow
+	+ DDC::Client::Distributed is now just a dummy wrapper for DDC::Client
+	+ added support for ddc-v2.1.9 navigation hints in run_query, get_first_hits
+	+ Kwic format also displays returned hints if available
+
 v0.40 Tue, 24 Oct 2017 15:16:03 +0200 moocow
 	+ added support for query type DDC::PP::CQAndImplicit (requires ddc >=v2.1.5)
 

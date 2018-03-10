@@ -1,0 +1,10 @@
+Changes
+lib/XML/Saxon/XSLT3.pm
+Makefile.PL
+MANIFEST			This list of files
+t/01basic.t
+xt/01pod.t
+xt/02pod_coverage.t
+xt/04eol.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

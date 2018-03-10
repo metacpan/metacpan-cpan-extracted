@@ -21,6 +21,7 @@ xt/author/perlcriticrc
 xt/author/executable.t
 xt/author/kwalitee.t
 xt/author/manifest.t
+xt/author/minimum_perl.t
 xt/author/pod.t
 xt/author/pod_coverage.t
 xt/author/pod_spelling.t

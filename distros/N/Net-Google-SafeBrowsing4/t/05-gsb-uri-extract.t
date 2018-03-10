@@ -34,6 +34,12 @@ my %uris = (
 		google.test/first/
 		google.test/
 	)},
+	'http://www.domain.com?source=3Demail' =>  { map { $_ => 1 } qw(
+		www.domain.com/?source=3Demail
+		www.domain.com/
+		domain.com/?source=3Demail
+		domain.com/
+	)},
 );
 
 foreach my $uri (keys(%uris)) {

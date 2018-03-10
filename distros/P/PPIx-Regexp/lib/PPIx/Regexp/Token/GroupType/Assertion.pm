@@ -34,44 +34,64 @@ use warnings;
 
 use base qw{ PPIx::Regexp::Token::GroupType };
 
-use PPIx::Regexp::Constant qw{ MINIMUM_PERL };
-
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 
 {
+	my $expl_nla	= 'Negative look-ahead assertion';
+	my $expl_nlb	= 'Negative look-behind assertion';
+	my $expl_pla	= 'Positive look-ahead assertion';
+	my $expl_plb	= 'Positive look-behind assertion';
 
-    my %explanation = (
-	'?!'	=> 'Negative look-ahead assertion',
-	'?<!'	=> 'Negative look-behind assertion',
-	'?<='	=> 'Positive look-behind assertion',
-	'?='	=> 'Positive look-ahead assertion',
-    );
+	__PACKAGE__->__setup_class( {
 
-    sub __explanation {
-	return \%explanation;
-    }
-
-}
-
-{
-
-    my %perl_version_introduced = (
-	'?<='	=> '5.005',
-	'?<!'	=> '5.005',
-    );
-
-    sub perl_version_introduced {
-	my ( $self ) = @_;
-	return $perl_version_introduced{ $self->unescaped_content() } ||
-	    MINIMUM_PERL;
-    }
-}
-
-# Return true if the token can be quantified, and false otherwise
-# sub can_be_quantified { return };
-
-sub __defining_string {
-    return ( '?=', '?<=', '?!', '?<!' );
+		'?!'	=> {
+		    expl	=> $expl_nla,
+		},
+		'*nla:'	=> {
+		    expl	=> $expl_nla,
+		    intro	=> '5.027009',
+		},
+		'*negative_lookahead:'	=> {
+		    expl	=> $expl_nla,
+		    intro	=> '5.027009',
+		},
+		'?<!'	=> {
+		    expl	=> $expl_nlb,
+		    intro	=> '5.005',
+		},
+		'*nlb:'	=> {
+		    expl	=> $expl_nlb,
+		    intro	=> '5.027009',
+		},
+		'*negative_lookbehind:'	=> {
+		    expl	=> $expl_nlb,
+		    intro	=> '5.027009',
+		},
+		'?='	=> {
+		    expl	=> $expl_pla,
+		},
+		'*pla:'	=> {
+		    expl	=> $expl_pla,
+		    intro	=> '5.027009',
+		},
+		'*positive_lookahead:'	=> {
+		    expl	=> $expl_pla,
+		    intro	=> '5.027009',
+		},
+		'?<='	=> {
+		    expl	=> $expl_plb,
+		    intro	=> '5.005',
+		},
+		'*plb:'	=> {
+		    expl	=> $expl_plb,
+		    intro	=> '5.027009',
+		},
+		'*positive_lookbehind:'	=> {
+		    expl	=> $expl_plb,
+		    intro	=> '5.027009',
+		},
+	    },
+	);
 }
 
 1;

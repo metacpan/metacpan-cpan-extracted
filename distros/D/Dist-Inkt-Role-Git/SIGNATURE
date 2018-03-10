@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 f564a321cacc971e1a4dc89902e1bc07a16ec1b1 COPYRIGHT
+SHA1 e3e0e39296ce1cb035cb7c372a53ac507bbbda5f CREDITS
+SHA1 fde97ea7f458c464cf0852a20610e80613b99cbe Changes
+SHA1 25ea49a64d4761d8539bba852bb88c544a5339a5 INSTALL
+SHA1 2454ea67cbcfa62e76ec0cafc958c03287d7ab41 LICENSE
+SHA1 bf10cdde1c3c2764fde4eeafbbf8a19c0179cdf2 MANIFEST
+SHA1 be3350bc4dbe531786318b8061ba570edb6461ab META.json
+SHA1 ccdd4e4de2a5298b7019371ff52c314231399adf META.yml
+SHA1 f9080db18343eab774bd7933da6128155b8c3efb Makefile.PL
+SHA1 671c25baaffc139912f5594224723e033a1ebde4 README
+SHA1 76c7f6988db21070a71ca8ee012f940377fed31f README.pod
+SHA1 f8a7560b1f1dab5482f154b495161d667361266b dist.ini
+SHA1 3d750ea3b3c511144a31175d733d6280c6dee4e8 doap.ttl
+SHA1 76c7f6988db21070a71ca8ee012f940377fed31f lib/Dist/Inkt/Role/Git.pm
+SHA1 6d614f5e6aaeed34aaa233d967ee109d85594a32 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEDsyLxtCi6bk7pBcmf77o3zqeSqUFAlqgj9MACgkQf77o3zqe
+SqXgMhAArUWoeHd70xIbXuSHxnRMM6ETZSC4CBQkPqR0PRHCrS+8ltKvVsc3RiZv
+nLV2sWmfVRfqZ92l+nMpBYzToEGseZz/p0yf5sJitRm5CpZw/faVmTVW5kbvIdqL
+xJkt9rQx4ggdfG4P2zyltVxHDWsmxO4p+9wEfyho1vlrx3IUXZZOOtTdU7KtkOmW
+b6jk9Tkj4CCol3f3BiN6xPkPC43Ida7aY/ewwSpfbJCzium7iMZGAr7zo/nop/rt
+RKSEGi+OmNl8VXOGIN8nb2oTHW8p2hOr+PzXuwP572x5Gt1iiVr/mL0bwHWCMqQG
+buGqCdpwdARFVe0bmwaNDU6GglXIb4cCUncSNZVLK3dm504zoA+JKJ/mkgIN78PA
+Pyf1jilwKIUq7GUj7LR3m4arOZbow9vgaEyqkbUf/M2G9fjV0bbba9vywVqCZQcR
+L6D1LWCqJTGQWEV41/IDzU4Rm7AKa99ciJYFEjUcWKXiKIILaIYlWbTiFck2UZEL
+o5dOkXYXt3JTXHg4Ailm+vEJJwOsRZstSQUfIbeAv6dn7/EVSKhMGEt2zfbaA29X
+/sGecllftwRqhse0nyoEQhvLvhSf+W405xDxvJPDnf1RiQt9ncmcNaWI3zJTamLP
+kK4JXT5XcAzDClFqkv1ZqetHzkdwXYXFHVGIOCbn7oO1zWH5pf8=
+=id8A
+-----END PGP SIGNATURE-----

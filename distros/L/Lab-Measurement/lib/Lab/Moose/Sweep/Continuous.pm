@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Continuous;
-$Lab::Moose::Sweep::Continuous::VERSION = '3.621';
+$Lab::Moose::Sweep::Continuous::VERSION = '3.622';
 #ABSTRACT: Base class for continuous sweeps (temperature, magnetic field)
 
 
@@ -170,7 +170,7 @@ Lab::Moose::Sweep::Continuous - Base class for continuous sweeps (temperature, m
 
 =head1 VERSION
 
-version 3.621
+version 3.622
 
 =head1 SYNOPSIS
 

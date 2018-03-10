@@ -20,7 +20,7 @@
 
 use 5.014_001;
 
-package Term::CLI::Argument::Filename  0.03002 {
+package Term::CLI::Argument::Filename  0.04004 {
 
 use Modern::Perl;
 use Moo;
@@ -58,7 +58,7 @@ Term::CLI::Argument::Filename - class for file name arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.03002
+version 0.04004
 
 =head1 SYNOPSIS
 

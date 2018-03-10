@@ -1,5 +1,5 @@
 package Net::Hadoop::Oozie;
-$Net::Hadoop::Oozie::VERSION = '0.112';
+$Net::Hadoop::Oozie::VERSION = '0.113';
 use 5.010;
 use strict;
 use warnings;
@@ -963,29 +963,25 @@ __END__
 
 =pod
 
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
-Net::Hadoop::Oozie
+Net::Hadoop::Oozie - Interface to various Oozie REST endpoints and utility methods.
 
 =head1 VERSION
 
-version 0.112
-
-=head1 SYNOPSIS
-
-    use Net::Hadoop::Oozie;
-    my $oozie = Net::Hadoop::Oozie->new( %options );
+version 0.113
 
 =head1 DESCRIPTION
 
 This module is a Perl interface to Oozie REST service endpoints and also include
 some utility methods for some bulk requests and some admin functionality.
 
-=head1 NAME
+=head1 SYNOPSIS
 
-Net::Hadoop::Oozie - Interface to various Oozie REST endpoints and utility methods.
+    use Net::Hadoop::Oozie;
+    my $oozie = Net::Hadoop::Oozie->new( %options );
 
 =head1 ACCESSORS
 
@@ -1113,7 +1109,7 @@ Optional parameters are listed below.
 
 If you want some variable interpolated in your script (like a date, an int,
 or whatever), pass it in the options you call the method with. if you pass
-C<< foo =E<62> 'bar', >> inside the workflow you will be able to use it as C<${foo}>.
+C<< foo => 'bar', >> inside the workflow you will be able to use it as C<${foo}>.
 
 =item Configuration properties
 
@@ -1167,6 +1163,7 @@ please) to check when it's done (untested code :-).
             die "job $jobid died";
         }
     }
+
 
 =head3 workflows
 
@@ -1286,16 +1283,5 @@ Returns an arrayref of suspended workflows:
     foreach my $wf ( @{ $suspended } ) {
         # do something
     }
-
-=head1 AUTHOR
-
-David Morel <david.morel@amakuru.net>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015 by David Morel & Booking.com.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

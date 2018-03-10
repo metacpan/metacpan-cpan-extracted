@@ -12,7 +12,7 @@ use Storable qw(nstore retrieve);
 use List::BinarySearch qw(binsearch);
 
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 =head1 NAME
 
@@ -86,7 +86,8 @@ sub new {
 		sticky		=> 0,
 		files => {
 			updates => "updates.gdb4",
-			full_hashes => "full_hashes.gsb4"
+			full_hashes => "full_hashes.gsb4",
+			lists => "lists.gsb4"
 		},
 		data => { },
 		%args,
@@ -359,10 +360,10 @@ sub get_prefixes {
 
 		foreach my $hash (@hashes) {
 			my $prefix = undef;
-			my $index = binsearch {substr($a,0,length($b)) cmp $b} $hash, @{ $db->{hashes} };
-			if (defined $index) {
+			my $index = binsearch {substr($a, 0, length($b)) cmp $b} $hash, @{$db->{hashes}};
+			if (defined($index)) {
 				$prefix = $db->{hashes}->[$index];
-				push(@data, { prefix => $prefix, list => $list });
+				push(@data, { prefix => $prefix, list => $list, hash => $hash });
 			}
 		}
 	}
@@ -473,16 +474,42 @@ sub close {
 	$self->{data} = { };
 }
 
+
+sub get_lists {
+	my ($self, %args) = @_;
+
+	my $file = path(join("/", $self->{path}, $self->{files}->{lists}));
+	
+	if (! -e $file) {
+		return [];
+	}
+	
+	my $db = retrieve($file);
+	return $db;
+}
+
+sub save_lists {
+	my ($self, $lists) = @_;
+	
+	my $file = path(join("/", $self->{path}, $self->{files}->{lists}));
+	nstore($lists, $file) or croak("Cannot save data to $file: $!\n");
+}
+
+
 =head1 CHANGELOG
 
 =over 4
-
 
 =item 0.1
 
 Initial release
 
+=item 0.3
+
+Add C<get_lists> and C<save_lists> methods.
+
 =back
+
 
 =head1 SEE ALSO
 

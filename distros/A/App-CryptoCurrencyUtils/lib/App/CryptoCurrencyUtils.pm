@@ -1,7 +1,7 @@
 package App::CryptoCurrencyUtils;
 
-our $DATE = '2018-02-05'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2018-03-08'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,7 +12,7 @@ our %SPEC;
 
 our %arg_coin = (
     coin => {
-        schema => 'cryptocurrency::symbol_or_name*',
+        schema => 'cryptocurrency::code_or_name*',
         req => 1,
         pos => 0,
     },
@@ -22,7 +22,7 @@ our %arg_coins = (
     coins => {
         'x.name.is_plural' => 1,
         'x.name.singular' => 'coin',
-        schema => ['array*', of=>'cryptocurrency::symbol_or_name*'],
+        schema => ['array*', of=>'cryptocurrency::code_or_name*'],
         req => 1,
         pos => 0,
         greedy => 1,
@@ -33,7 +33,7 @@ our %arg_coins_opt = (
     coins => {
         'x.name.is_plural' => 1,
         'x.name.singular' => 'coin',
-        schema => ['array*', of=>'cryptocurrency::symbol_or_name*'],
+        schema => ['array*', of=>'cryptocurrency::code_or_name*'],
         pos => 0,
         greedy => 1,
     },
@@ -127,11 +127,11 @@ sub coin_cmc_summary {
 
         my $cur;
         {
-            eval { $cur = $cat->by_symbol($cur0) };
+            eval { $cur = $cat->by_code($cur0) };
             last if $cur;
             eval { $cur = $cat->by_name($cur0) };
             last if $cur;
-            warn "No such cryptocurrency symbol/name '$cur0'";
+            warn "No such cryptocurrency code/name '$cur0'";
             next CURRENCY;
         }
 
@@ -147,7 +147,7 @@ sub coin_cmc_summary {
     }
 
     my $resmeta = {
-        'table.field_orders' => [qw/symbol name rank/, qr/^price_/ => sub { $_[0] cmp $_[1] }],
+        'table.field_orders' => [qw/code name rank/, qr/^price_/ => sub { $_[0] cmp $_[1] }],
     };
 
     [200, "OK", \@rows, $resmeta];
@@ -196,11 +196,11 @@ sub open_coin_cmc {
 
         my $cur;
         {
-            eval { $cur = $cat->by_symbol($cur0) };
+            eval { $cur = $cat->by_code($cur0) };
             last if $cur;
             eval { $cur = $cat->by_name($cur0) };
             last if $cur;
-            warn "No such cryptocurrency symbol/name '$cur0'";
+            warn "No such cryptocurrency code/name '$cur0'";
             next CURRENCY;
         }
 
@@ -238,17 +238,17 @@ sub open_coin_mno {
 
         my $cur;
         {
-            eval { $cur = $cat->by_symbol($cur0) };
+            eval { $cur = $cat->by_code($cur0) };
             last if $cur;
             eval { $cur = $cat->by_name($cur0) };
             last if $cur;
-            warn "No such cryptocurrency symbol/name '$cur0'";
+            warn "No such cryptocurrency code/name '$cur0'";
             next CURRENCY;
         }
 
         require Browser::Open;
         my $url = "https://masternodes.online/currencies/" .
-            URI::Escape::uri_escape($cur->{symbol})."/";
+            URI::Escape::uri_escape($cur->{code})."/";
         my $err = Browser::Open::open_browser($url);
         return [500, "Can't open browser for '$url'"] if $err;
     }
@@ -297,12 +297,37 @@ its list from <https://coinmarketcap.com/>.
 
 _
     args => {
+        codes => {
+            summary => 'Only list codes',
+            schema => 'true*',
+        },
+        safenames => {
+            summary => 'Only list safenames',
+            schema => 'true*',
+        },
+        names => {
+            summary => 'Only list names',
+            schema => 'true*',
+        },
+    },
+    args_rels => {
+        'choose_one' => [qw/codes safenames names/],
     },
 };
 sub list_coins {
     require CryptoCurrency::Catalog;
 
-    [200, "OK", [CryptoCurrency::Catalog->new->all_data]];
+    my %args = @_;
+
+    if ($args{codes}) {
+        [200, "OK", [map {$_->{code}} CryptoCurrency::Catalog->new->all_data]];
+    } elsif ($args{safenames}) {
+        [200, "OK", [map {$_->{safename}} CryptoCurrency::Catalog->new->all_data]];
+    } elsif ($args{names}) {
+        [200, "OK", [map {$_->{name}} CryptoCurrency::Catalog->new->all_data]];
+    } else {
+        [200, "OK", [CryptoCurrency::Catalog->new->all_data]];
+    }
 }
 
 
@@ -390,7 +415,7 @@ App::CryptoCurrencyUtils - CLI utilities related to cryptocurrencies
 
 =head1 VERSION
 
-This document describes version 0.010 of App::CryptoCurrencyUtils (from Perl distribution App-CryptoCurrencyUtils), released on 2018-02-05.
+This document describes version 0.011 of App::CryptoCurrencyUtils (from Perl distribution App-CryptoCurrencyUtils), released on 2018-03-08.
 
 =head1 DESCRIPTION
 
@@ -442,7 +467,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<coins> => I<array[cryptocurrency::symbol_or_name]>
+=item * B<coins> => I<array[cryptocurrency::code_or_name]>
 
 =item * B<convert> => I<str>
 
@@ -523,7 +548,7 @@ Return value:  (any)
 
 Usage:
 
- list_coins() -> [status, msg, result, meta]
+ list_coins(%args) -> [status, msg, result, meta]
 
 List cryptocurrency coins.
 
@@ -532,7 +557,23 @@ its list from L<https://coinmarketcap.com/>.
 
 This function is not exported.
 
-No arguments.
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<codes> => I<true>
+
+Only list codes.
+
+=item * B<names> => I<true>
+
+Only list names.
+
+=item * B<safenames> => I<true>
+
+Only list safenames.
+
+=back
 
 Returns an enveloped result (an array).
 
@@ -587,7 +628,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<coins>* => I<array[cryptocurrency::symbol_or_name]>
+=item * B<coins>* => I<array[cryptocurrency::code_or_name]>
 
 =back
 
@@ -620,7 +661,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<coins>* => I<array[cryptocurrency::symbol_or_name]>
+=item * B<coins>* => I<array[cryptocurrency::code_or_name]>
 
 =back
 

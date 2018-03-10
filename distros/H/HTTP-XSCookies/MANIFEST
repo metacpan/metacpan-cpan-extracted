@@ -1,3 +1,4 @@
+.gitignore
 baker.xs
 buffer.h
 Changes
@@ -20,6 +21,7 @@ uri.h
 t/10_bake_crush.t
 t/20_cookie_baker_bake.t
 t/20_cookie_baker_crush.t
+t/20_crush_no_value.t
 t/30_cookie_baker_xs.t
 t/80_memory_leak.t
 tools/bench.pl

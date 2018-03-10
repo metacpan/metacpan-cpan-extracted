@@ -10,10 +10,10 @@ if ($^O eq 'cygwin') {
     $ENV{TZ} = (split " ",(`date`)[0])[4];
 }
 
-use_ok 'Log::Dispatch';
-use_ok 'Log::Dispatch::Screen';
-use_ok 'Log::Dispatch::FileRotate';
-use_ok 'Date::Manip';
+use Log::Dispatch;
+use Log::Dispatch::Screen;
+use Log::Dispatch::FileRotate;
+use Date::Manip;
 
 my $tz;
 eval {

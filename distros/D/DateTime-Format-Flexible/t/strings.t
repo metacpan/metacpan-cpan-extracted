@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 23;
+use Test::More tests => 27;
 
 use DateTime::Format::Flexible;
 my $base = 'DateTime::Format::Flexible';
@@ -72,6 +72,30 @@ foreach my $string ( qw( now Now Today yesterday tomorrow overmorrow ) )
 
 {
     my ( $str , $method , $wanted )  = ( 'tomorrow at noon' , 'hms' , '12:00:00' );
+    my $dt = $base->parse_datetime( $str );
+    is ( $dt->$method , $wanted , "$str => $wanted with ->$method ($dt)" );
+}
+
+{
+    my ( $str , $method , $wanted )  = ( 'at noon' , 'hms' , '12:00:00' );
+    my $dt = $base->parse_datetime( $str );
+    is ( $dt->$method , $wanted , "$str => $wanted with ->$method ($dt)" );
+}
+
+{
+    my ( $str , $method , $wanted )  = ( 'at 12:43' , 'hms' , '12:43:00' );
+    my $dt = $base->parse_datetime( $str );
+    is ( $dt->$method , $wanted , "$str => $wanted with ->$method ($dt)" );
+}
+
+{
+    my ( $str , $method , $wanted )  = ( 'at one' , 'hms' , '01:00:00' );
+    my $dt = $base->parse_datetime( $str );
+    is ( $dt->$method , $wanted , "$str => $wanted with ->$method ($dt)" );
+}
+
+{
+    my ( $str , $method , $wanted )  = ( 'at one pm' , 'hms' , '13:00:00' );
     my $dt = $base->parse_datetime( $str );
     is ( $dt->$method , $wanted , "$str => $wanted with ->$method ($dt)" );
 }

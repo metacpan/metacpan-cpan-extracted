@@ -44,6 +44,10 @@ require_ok( 'PPIx::Regexp::Structure::Assertion' );
 class_isa_ok( 'PPIx::Regexp::Structure::Assertion',
     'PPIx::Regexp::Structure' );
 
+require_ok( 'PPIx::Regexp::Structure::Atomic_Script_Run' );
+class_isa_ok( 'PPIx::Regexp::Structure::Atomic_Script_Run',
+    'PPIx::Regexp::Structure' );
+
 require_ok( 'PPIx::Regexp::Structure::BranchReset' );
 class_isa_ok( 'PPIx::Regexp::Structure::BranchReset',
     'PPIx::Regexp::Structure' );
@@ -83,6 +87,10 @@ class_isa_ok( 'PPIx::Regexp::Structure::Regexp',
 require_ok( 'PPIx::Regexp::Structure::Replacement' );
 class_isa_ok( 'PPIx::Regexp::Structure::Replacement',
     'PPIx::Regexp::Structure::Main' );
+
+require_ok( 'PPIx::Regexp::Structure::Script_Run' );
+class_isa_ok( 'PPIx::Regexp::Structure::Script_Run',
+    'PPIx::Regexp::Structure' );
 
 require_ok( 'PPIx::Regexp::Structure::Subexpression' );
 class_isa_ok( 'PPIx::Regexp::Structure::Subexpression',
@@ -185,6 +193,12 @@ class_isa_ok( 'PPIx::Regexp::Token::GroupType::Assertion',
 isa_ok( PPIx::Regexp::Token::GroupType::Assertion->__new( 'xyzzy' ),
     'PPIx::Regexp::Token::GroupType::Assertion' );
 
+require_ok( 'PPIx::Regexp::Token::GroupType::Atomic_Script_Run' );
+class_isa_ok( 'PPIx::Regexp::Token::GroupType::Atomic_Script_Run',
+    'PPIx::Regexp::Token::GroupType' );
+isa_ok( PPIx::Regexp::Token::GroupType::Atomic_Script_Run->__new( 'xyzzy' ),
+    'PPIx::Regexp::Token::GroupType::Atomic_Script_Run' );
+
 require_ok( 'PPIx::Regexp::Token::GroupType::BranchReset' );
 class_isa_ok( 'PPIx::Regexp::Token::GroupType::BranchReset',
     'PPIx::Regexp::Token::GroupType' );
@@ -224,6 +238,12 @@ class_isa_ok( 'PPIx::Regexp::Token::GroupType::Subexpression',
     'PPIx::Regexp::Token::GroupType' );
 isa_ok( PPIx::Regexp::Token::GroupType::Subexpression->__new( 'xyzzy' ),
     'PPIx::Regexp::Token::GroupType::Subexpression' );
+
+require_ok( 'PPIx::Regexp::Token::GroupType::Script_Run' );
+class_isa_ok( 'PPIx::Regexp::Token::GroupType::Script_Run',
+    'PPIx::Regexp::Token::GroupType' );
+isa_ok( PPIx::Regexp::Token::GroupType::Script_Run->__new( 'xyzzy' ),
+    'PPIx::Regexp::Token::GroupType::Script_Run' );
 
 require_ok( 'PPIx::Regexp::Token::GroupType::Switch' );
 class_isa_ok( 'PPIx::Regexp::Token::GroupType::Switch',

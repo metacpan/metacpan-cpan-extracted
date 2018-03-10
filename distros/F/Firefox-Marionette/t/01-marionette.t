@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Digest::SHA();
 use MIME::Base64();
-use Test::More tests => 330;
+use Test::More tests => 335;
 use Cwd();
 use Firefox::Marionette qw(:all);
 use Config;
@@ -28,6 +28,21 @@ sub out_of_time {
 
 sub start_firefox {
 	my ($require_visible, %parameters) = @_;
+	if ($ENV{FIREFOX_BINARY}) {
+		$parameters{firefox_binary} = $ENV{FIREFOX_BINARY};
+		diag("Overriding firefox binary to $parameters{firefox_binary}");
+	}
+	if ($ENV{FIREFOX_VISIBLE}) {
+		$require_visible = 1;
+		if (!$parameters{visible}) {
+			$parameters{visible} = 1;
+		}
+		if ((defined $parameters{capabilities}) && ($parameters{capabilities}->moz_headless())) {
+			my $old = $parameters{capabilities};
+			$parameters{capabilities} = Firefox::Marionette::Capabilities->new(proxy => $old->proxy(), moz_headless => 0, accept_insecure_certs => $old->accept_insecure_certs(), page_load_strategy => $old->page_load_strategy(), moz_webdriver_click => $old->moz_webdriver_click(), moz_accessibility_checks => $old->moz_accessibility_checks());
+		}
+		diag("Overriding firefox visibility");
+	}
 	my $skip_message;
 	if ($segv_detected) {
 		$skip_message = "Previous SEGV detected.  Trying to shutdown tests as fast as possible";
@@ -122,7 +137,9 @@ sub start_firefox {
 
 umask 0;
 my $binary = 'firefox';
-if ( $^O eq 'MSWin32' ) {
+if ($ENV{FIREFOX_BINARY}) {
+	$binary = $ENV{FIREFOX_BINARY};
+} elsif ( $^O eq 'MSWin32' ) {
     my $program_files_key;
     foreach my $possible ( 'ProgramFiles(x86)', 'ProgramFiles' ) {
         if ( $ENV{$possible} ) {
@@ -188,6 +205,11 @@ if ($^O eq 'MSWin32') {
 			diag("$machine_id_path has not been created.  Please run 'sudo dbus-uuidgen --ensure=$machine_id_path'");
 		}
 	} elsif ($^O eq 'linux') {
+		if (-f '/etc/debian_version') {
+			diag("Debian Version is " . `cat /etc/debian_version`);
+		} elsif (-f '/etc/redhat-release') {
+			diag("Redhat Version is " . `cat /etc/redhat-release`);
+		}
 		`dpkg --help >/dev/null 2>/dev/null`;
 		if ($? == 0) {	
 			diag("Xvfb deb version is " . `dpkg -s Xvfb | perl -nle 'print if s/^Version:[ ]//smx'`);
@@ -253,7 +275,7 @@ SKIP: {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 34);
+		skip($skip_message, 38);
 	}
 	ok($firefox, "Firefox has started in Marionette mode");
 	ok((scalar grep { /^application\/pkcs10$/ } $firefox->mime_types()), "application/pkcs10 has been added to mime_types");
@@ -283,11 +305,19 @@ SKIP: {
 	my $old = $firefox->window_rect($new);
 	TODO: {
 		local $TODO = $major_version < 55 ? $capabilities->browser_version() . " probably does not have support for \$firefox->window_rect()->pos_x()" : q[];
-		ok(defined $old->pos_x() && $old->pos_x() =~ /^\-?\d+([.]\d+)?$/, "Window has a X position of " . ($old->pos_x() || q[]));
-		ok(defined $old->pos_y() && $old->pos_y() =~ /^\-?\d+([.]\d+)?$/, "Window has a Y position of " . ($old->pos_y() || q[]));
+		ok(defined $old->pos_x() && $old->pos_x() =~ /^\-?\d+([.]\d+)?$/, "Window used to have a X position of " . (defined $old->pos_x() ? $old->pos_x() : q[]));
+		ok(defined $old->pos_y() && $old->pos_y() =~ /^\-?\d+([.]\d+)?$/, "Window used to have a Y position of " . (defined $old->pos_y() ? $old->pos_y() : q[]));
 	}
-	ok($old->width() =~ /^\d+([.]\d+)?$/, "Window has a width of " . $old->width());
-	ok($old->height() =~ /^\d+([.]\d+)?$/, "Window has a height of " . $old->height());
+	ok($old->width() =~ /^\d+([.]\d+)?$/, "Window used to have a width of " . $old->width());
+	ok($old->height() =~ /^\d+([.]\d+)?$/, "Window used to have a height of " . $old->height());
+	my $new2 = $firefox->window_rect();
+	TODO: {
+		local $TODO = $major_version < 55 ? $capabilities->browser_version() . " probably does not have support for \$firefox->window_rect()->pos_x()" : q[];
+		ok(defined $new2->pos_x() && $new2->pos_x() == $new->pos_x(), "Window has a X position of " . $new->pos_x());
+		ok(defined $new2->pos_y() && $new2->pos_y() == $new->pos_y(), "Window has a Y position of " . $new->pos_y());
+	}
+	ok($new2->width() == $new->width(), "Window has a width of " . $new->width());
+	ok($new2->height() == $new->height(), "Window has a height of " . $new->height());
 	TODO: {
 		local $TODO = $major_version < 57 ? $capabilities->browser_version() . " probably does not have support for \$firefox->window_rect()->wstate()" : q[];
 		ok(defined $old->wstate() && $old->wstate() =~ /^\w+$/, "Window has a state of " . ($old->wstate() || q[]));
@@ -356,7 +386,7 @@ SKIP: {
 	ok($capabilities->moz_accessibility_checks() == 1, "\$capabilities->moz_accessibility_checks() is set to true");
 	TODO: {
 		local $TODO = $major_version < 56 ? $capabilities->browser_version() . " does not have support for -headless argument" : q[];
-		ok($capabilities->moz_headless() == 1, "\$capabilities->moz_headless() is set to true");
+		ok($capabilities->moz_headless() == 1 || $ENV{FIREFOX_VISIBLE} || 0, "\$capabilities->moz_headless() is set to " . ($ENV{FIREFOX_VISIBLE} ? 'true' : 'false'));
 	}
 	$capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
@@ -455,10 +485,11 @@ SKIP: {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 238);
+		skip($skip_message, 239);
 	}
 	ok($firefox, "Firefox has started in Marionette mode without defined capabilities, but with a defined profile and debug turned off");
 	ok($firefox->go(URI->new("https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html")), "https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html has been loaded");
+	ok($firefox->interactive() && $firefox->loaded(), "\$firefox->interactive() and \$firefox->loaded() are ok");
 	ok($firefox->window_handle() =~ /^\d+$/, "\$firefox->window_handle() is an integer:" . $firefox->window_handle());
 	ok($firefox->chrome_window_handle() =~ /^\d+$/, "\$firefox->chrome_window_handle() is an integer:" . $firefox->chrome_window_handle());
 	ok($firefox->chrome_window_handle() == $firefox->current_chrome_window_handle(), "\$firefox->chrome_window_handle() is equal to \$firefox->current_chrome_window_handle()");
@@ -505,22 +536,15 @@ SKIP: {
 			}
 		};
 	}
-	my $result;
-	eval {	
-		$result = $firefox->switch_to_window($original_window_handle);
-	} or do {
-		chomp $@;
-		if ($firefox->addons()) {
-			diag("\$firefox->switch_to_window(\$window_id) is not working for $major_version.$minor_version:$@");
-			skip("\$firefox->switch_to_window(\$window_id) is not working for $major_version.$minor_version:$@", 219);
-		}
-	};
-	ok($result, "\$firefox->switch_to_window() used to move back to the original window:$@");
+	ok($firefox->switch_to_window($original_window_handle), "\$firefox->switch_to_window() used to move back to the original window:$@");
 	TODO: {
 		my $element;
 		eval {
 			$element = $firefox->find('//frame[@name="target1"]')->switch_to_shadow_root();
 		};
+		if ($@) {
+			diag("Switch to shadow root is broken:$@");
+		}
 		local $TODO = "Switch to shadow root can be broken";
 		ok($element, "Switched to target1 shadow root");
 	}
@@ -779,15 +803,22 @@ SKIP: {
 	ok($count == 2, "Found elements with wantarray find_partial:$count");
 	my $css_rule;
 	ok($css_rule = $firefox->find('//input[@id="search-input"]')->css('display'), "The value of the css rule 'display' is '$css_rule'");
+	my $result;
 	ok($result = $firefox->find('//input[@id="search-input"]')->is_enabled() =~ /^[01]$/, "is_enabled returns 0 or 1:$result");
 	eval { $firefox->is_enabled({}) };
-	ok((ref $@ eq 'Firefox::Marionette::Exception'), "is_enabled throws exception for bad parameters:$@");
+	my $eval_string = "$@";
+	chomp $eval_string;
+	ok((ref $@ eq 'Firefox::Marionette::Exception'), "is_enabled throws exception for bad parameters:$eval_string");
 	ok($result = $firefox->find('//input[@id="search-input"]')->is_displayed() =~ /^[01]$/, "is_displayed returns 0 or 1:$result");
 	eval { $firefox->is_displayed({}) };
-	ok((ref $@ eq 'Firefox::Marionette::Exception'), "is_displayed throws exception for bad parameters:$@");
+	$eval_string = "$@";
+	chomp $eval_string;
+	ok((ref $@ eq 'Firefox::Marionette::Exception'), "is_displayed throws exception for bad parameters:$eval_string");
 	ok($result = $firefox->find('//input[@id="search-input"]')->is_selected() =~ /^[01]$/, "is_selected returns 0 or 1:$result");
 	eval { $firefox->is_selected({}) };
-	ok((ref $@ eq 'Firefox::Marionette::Exception'), "is_selected throws exception for bad parameters:$@");
+	$eval_string = "$@";
+	chomp $eval_string;
+	ok((ref $@ eq 'Firefox::Marionette::Exception'), "is_selected throws exception for bad parameters:$eval_string");
 	ok($firefox->find('//input[@id="search-input"]')->clear(), "Clearing the element directly");
 	ok((!defined $firefox->find_id('search-input')->attribute('value')) && ($firefox->find_id('search-input')->property('value') eq ''), "Initial property and attribute values are empty for 'search-input'");
 	ok($firefox->find('//input[@id="search-input"]')->send_keys('Test::More'), "Sent 'Test::More' to the 'search-input' field directly to the element");
@@ -834,16 +865,15 @@ SKIP: {
 		ok($actual_digest eq $correct_digest, "\$firefox->selfie(hash => 1, highlights => [ \$firefox->find('//button[\@name=\"lucky\"]') ]) returns the correct hex encoded SHA256 hash of the base64 encoded image");
 	}
 	my $clicked;
-	while ($firefox->uri() eq 'https://metacpan.org/') {
-		ELEMENT: foreach my $element ($firefox->find('//a[@href="https://fastapi.metacpan.org"]')) {
-			$clicked = 1;
+	ELEMENT: foreach my $element ($firefox->find('//a[@href="https://fastapi.metacpan.org"]')) {
+		if (($element->is_displayed()) && ($element->is_enabled())) {
 			$element->click();
-			sleep 2;
+			$clicked = 1;
 			last ELEMENT;
 		}
 	}
 	ok($clicked, "Clicked the API link");
-	ok($firefox->uri()->host() eq 'github.com', "\$firefox->uri()->host() is equal to github.com:" . $firefox->uri());
+	ok($firefox->await(sub { $firefox->uri()->host() eq 'github.com' }), "\$firefox->uri()->host() is equal to github.com:" . $firefox->uri());
 	my @cookies = $firefox->cookies();
 	ok($cookies[0]->name() =~ /\w/, "The first cookie name is '" . $cookies[0]->name() . "'");
 	ok($cookies[0]->value() =~ /\w/, "The first cookie value is '" . $cookies[0]->value() . "'");
@@ -860,10 +890,22 @@ SKIP: {
 	ok($firefox->delete_cookie($cookies[0]->name()), "\$firefox->delete_cookie('" . $cookies[0]->name() . "') deletes the specified cookie name");
 	ok(not(grep { $_->name() eq $cookies[0]->name() } $firefox->cookies()), "List of cookies no longer includes " . $cookies[0]->name());
 	ok($firefox->back(), "\$firefox->back() goes back one page");
+	while($firefox->uri()->host() ne 'metacpan.org') {
+		diag("Waiting to load previous page");
+		sleep 1;
+	}
 	ok($firefox->uri()->host() eq 'metacpan.org', "\$firefox->uri()->host() is equal to metacpan.org:" . $firefox->uri());
 	ok($firefox->forward(), "\$firefox->forward() goes forward one page");
+	while($firefox->uri()->host() ne 'github.com') {
+		diag("Waiting to load next page");
+		sleep 1;
+	}
 	ok($firefox->uri()->host() eq 'github.com', "\$firefox->uri()->host() is equal to github.com:" . $firefox->uri());
 	ok($firefox->back(), "\$firefox->back() goes back one page");
+	while($firefox->uri()->host() ne 'metacpan.org') {
+		diag("Waiting to load previous page (2)");
+		sleep 1;
+	}
 	ok($firefox->uri()->host() eq 'metacpan.org', "\$firefox->uri()->host() is equal to metacpan.org:" . $firefox->uri());
 	ok($firefox->script('return window.find("lucky");'), "metacpan.org contains the phrase 'lucky' in a 'window.find' javascript command");
 	my $cookie = Firefox::Marionette::Cookie->new(name => 'BonusCookie', value => 'who really cares about privacy', expiry => time + 500000);
@@ -872,71 +914,35 @@ SKIP: {
 	if (out_of_time()) {
 		skip("Running out of time.  Trying to shutdown tests as fast as possible", 31);
 	}
-	foreach my $element ($firefox->find_name('lucky')) {
-		local $SIG{ALRM} = sub { die "alarm during clicking download\n" };
-		alarm 15;
-		my $result;
-		eval {
-			$result = $firefox->click($element);
-			alarm 0;
-		} or do {
-			alarm 0;
-			if ($@ =~ /^(Firefox exited with a 11|Firefox killed by a SEGV signal \(11\))/) {
-				$segv_detected = 1;
-				diag(qq[SEGV crash when pressing "I'm feeling Lucky" on metacpan.org:$@]);
-				skip("Firefox crashed during navigation to a new page", 31);
-			} elsif ($@ =~ /alarm during clicking download/) {
-				diag(qq[Timeout when pressing "I'm feeling Lucky" on metacpan.org:$@]);
-				skip("Firefox timeout during navigation to a new page", 31);
-			}
-		};
-		ok($result, "Clicked the \"I'm Feeling Lucky\" button");
+	SKIP: {
+		ok($firefox->find_name('lucky')->click($element), "Clicked the \"I'm Feeling Lucky\" button");
+		diag("Going to Test::More page with a page load strategy of " . $capabilities->page_load_strategy());
+		ok($firefox->bye(sub { $firefox->find_id('search-input') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click(), "Clicked on the download link");
+		diag("Clicked download link");
+		while(!$firefox->downloads()) {
+			sleep 1;
+		}
+		while($firefox->downloading()) {
+			sleep 1;
+		}
+		$count = 0;
+		foreach my $path ($firefox->downloads()) {
+			diag("Downloaded $path");
+			$count += 1;
+		}
+		ok($count == 1, "Downloaded 1 files:$count");
 	}
-	ok($firefox->bye(sub { $firefox->find_id('search-input') })->await(sub { $firefox->find_partial('Download') })->click(), "Clicked on the download link");
-	while(!$firefox->downloads()) {
-		sleep 1;
-	}
-	while($firefox->downloading()) {
-		sleep 1;
-	}
-	$count = 0;
-	foreach my $path ($firefox->downloads()) {
-		diag("Downloaded $path");
-		$count += 1;
-	}
-	ok($count == 1, "Downloaded 1 files:$count");
 
 	my $alert_text = 'testing alert';
 	$firefox->script(qq[alert('$alert_text')]);
-	$result = undef;
-	eval {	
-		$result = $firefox->alert_text();
-	} or do {
-		chomp $@;
-		if (1 || $firefox->addons()) {
-			diag("\$firefox->alert_text() is not working for $major_version.$minor_version:$@");
-			skip("\$firefox->alert_text() is not working for $major_version.$minor_version:$@", 28);
-		}
-	};
-	ok($result eq $alert_text, "\$firefox->alert_text() correctly detects alert text:$@");
+	ok($firefox->alert_text() eq $alert_text, "\$firefox->alert_text() correctly detects alert text");
 	ok($firefox->dismiss_alert(), "\$firefox->dismiss_alert() dismisses alert box");
 	$capabilities = $firefox->capabilities();
 	my $version = $capabilities->browser_version();
 	my ($major_version, $minor_version, $patch_version) = split /[.]/, $version;
 	ok($firefox->async_script(qq[prompt("Please enter your name", "John Cole");]), "Started async script containing a prompt");
-	TODO: {
-		local $TODO = "\$firefox->async_script() not perfect in Firefox yet";
-		my $result;
-		eval {
-			$result = $firefox->send_alert_text("Roland Grelewicz");
-		};
-		ok($result, "\$firefox->send_alert_text() sends alert text");
-		$result = undef;
-		eval {
-			$result = $firefox->accept_dialog();
-		};
-		ok($result, "\$firefox->accept_dialog() accepts the dialog box");
-	}
+	ok($firefox->await(sub { $firefox->send_alert_text("Roland Grelewicz"); }), "\$firefox->send_alert_text() sends alert text:$@");
+	ok($firefox->accept_dialog(), "\$firefox->accept_dialog() accepts the dialog box");
 	ok($firefox->current_chrome_window_handle() =~ /^\d+$/, "Returned the current chrome window handle as an integer");
 	$capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
@@ -959,13 +965,12 @@ SKIP: {
 		ok($capabilities->moz_webdriver_click() =~ /^(1|0)$/, "\$capabilities->moz_webdriver_click() is a boolean:" . $capabilities->moz_webdriver_click());
 	}
 	ok($capabilities->platform_name() =~ /\w+/, "\$capabilities->platform_version() contains alpha characters:" . $capabilities->platform_name());
-	TODO: {
-		local $TODO = "\$firefox->dismiss_alert() not perfect yet";
-		eval {
-			$firefox->dismiss_alert();
-		};
-		ok($@, "Dismiss non-existant alert caused an exception to be thrown");
-	}
+	eval {
+		$firefox->dismiss_alert();
+	};
+	my $exception = "$@";
+	chomp $exception;
+	ok($@, "Dismiss non-existant alert caused an exception to be thrown:$exception");
 	my $install_id;
 	my $install_path = Cwd::abs_path("t/addons/test.xpi");
 	if ($^O eq 'cygwin') {
@@ -993,7 +998,7 @@ SKIP: {
 	ok($firefox, "Firefox has started in Marionette mode with visible set to 0");
 	my $capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
-	ok($capabilities->moz_headless(), "\$capabilities->moz_headless() is set to true");
+	ok($capabilities->moz_headless() || $ENV{FIREFOX_VISIBLE} || 0, "\$capabilities->moz_headless() is set to " . ($ENV{FIREFOX_VISIBLE} ? 'false' : 'true'));
 	ok($firefox->quit() == 0, "Firefox has closed with an exit status of 0:" . $firefox->child_error());
 }
 

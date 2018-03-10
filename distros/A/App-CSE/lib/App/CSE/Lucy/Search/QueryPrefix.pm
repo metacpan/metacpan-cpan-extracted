@@ -1,5 +1,5 @@
 package App::CSE::Lucy::Search::QueryPrefix;
-$App::CSE::Lucy::Search::QueryPrefix::VERSION = '0.012';
+$App::CSE::Lucy::Search::QueryPrefix::VERSION = '0.013';
 ## Copied from http://api.metacpan.org/source/CREAMYG/Lucy-0.3.3/sample/PrefixQuery.pm
 
 # Licensed to the Apache Software Foundation (ASF) under one or more
@@ -113,7 +113,7 @@ sub make_compiler {
 1;
 
 package App::CSE::Lucy::Search::PrefixCompiler;
-$App::CSE::Lucy::Search::PrefixCompiler::VERSION = '0.012';
+$App::CSE::Lucy::Search::PrefixCompiler::VERSION = '0.013';
 use base qw( Lucy::Search::Compiler );
 
 sub make_matcher {
@@ -165,7 +165,7 @@ sub make_matcher {
 }
 
 package App::CSE::Lucy::Search::PrefixMatcher;
-$App::CSE::Lucy::Search::PrefixMatcher::VERSION = '0.012';
+$App::CSE::Lucy::Search::PrefixMatcher::VERSION = '0.013';
 use base qw( Lucy::Search::Matcher );
 
 # Inside-out member vars.

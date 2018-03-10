@@ -42,7 +42,7 @@
          "url" : "http://github.com/Test-More/Test2-Tools-EventDumper/"
       }
    },
-   "version" : "0.000010",
+   "version" : "0.000011",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.00"
 }
 

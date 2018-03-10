@@ -33,6 +33,7 @@ use Term::CLI::Command;
 use Term::CLI::Argument::Enum;
 use Term::CLI::Argument::Filename;
 use Term::CLI::Argument::Number::Int;
+use Term::CLI::L10N;
 
 # Untaint the PATH.
 $::ENV{PATH} = '/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin';
@@ -40,6 +41,8 @@ $::ENV{PATH} = '/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin';
 sub startup : Test(startup => 5) {
     my $self = shift;
     my @commands;
+
+    Term::CLI::L10N->set_language('en');
 
     my $cp_cmd = Term::CLI::Command->new(
         name => 'cp',
@@ -289,7 +292,7 @@ sub check__split_line: Test(6) {
     $line = 'This is "an unbalanced quote';
     @expected = ();
     ($error, @got) = $cli->_split_line($line);
-    is($error, 'Unbalanced quotes in input', '_split_line returns correct error');
+    is($error, 'unbalanced quotes in input', '_split_line returns correct error');
     is_deeply(\@got, \@expected, '_split_line returns empty list on error');
 }
 

@@ -1,4 +1,4 @@
-Net-MRT version 0.01
+Net-MRT version 0.05
 ====================
 
 This module intended for decoding RFC6396 Multi-Threaded Routing Toolkit (MRT)
@@ -26,9 +26,14 @@ This module requires these other modules and libraries:
 
   No dependencies right now. Come back later.
 
+SOURCE CODE
+
+Source code also available on GitHub:
+http://github.com/mbasunov/net-mrt
+
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2013 MaxiM Basunov <maxim.basunov@gmail.com>
+Copyright (C) 2013-2014 MaxiM Basunov <maxim.basunov@gmail.com>
 All rights reserved.
 
 This program is free software; you may redistribute it and/or

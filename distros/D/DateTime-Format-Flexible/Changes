@@ -1,6 +1,22 @@
 Revision history for Perl module DateTime::Format::Flexible
 
-0.29 Web Feb 21 2018
+0.30 Fri Mar 09 2018
+  - add support for bare times with am/pm
+    - thanks Rod Taylor rt #124567
+  - add support for format JUL25'17
+    - thanks Rod Taylor rt #124596
+  - fix warnings with invalid strings that have 'at' in them
+    - example: not a date
+    - thanks Rod Taylor rt #124589
+
+  - add support for bare times with 'at'
+    - examples:
+      - at noon
+      - at one
+      - at one pm
+      - at 12:43
+
+0.29 Wed Feb 21 2018
   - add support for 19 February 2018 at 10:33
     - thanks Rod Taylor rt #124520
 

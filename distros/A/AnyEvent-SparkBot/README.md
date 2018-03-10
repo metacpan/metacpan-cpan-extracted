@@ -65,6 +65,8 @@ If you want to test this object with your token
   export TEST_EMAIL='User%'
   export TEST_PERSON_ID=xxxxx
   export TEST_MSG_ID=xxx
+  export TEST_TEAM=TeamX
+  export TEST_ROOM=RoomX
   perl MakeFile.PL
   make
   make test

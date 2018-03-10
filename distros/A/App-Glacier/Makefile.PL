@@ -7,8 +7,8 @@ use Pod::Find qw(pod_where);
 use Pod::Usage;
 
 WriteMakefile(NAME => 'App::Glacier',
-	      ABSTRACT_FROM => 'glacier',
-	      VERSION_FROM => 'glacier',
+	      ABSTRACT_FROM => 'lib/App/Glacier.pm',
+	      VERSION_FROM => 'lib/App/Glacier.pm',
 	      AUTHOR    =>      'Sergey Poznyakoff <gray@gnu.org>',
 	      LICENSE   =>      'gpl_3',
 	      EXE_FILES =>      [ 'glacier' ],
@@ -62,7 +62,8 @@ sub MY::postamble {
 all:: subcommand-manpages
 .PHONY: subcommand-manpages
 subcommand-manpages: manifypods
-	$(NOECHO) $(ECHO) Generating manpages for the subcommands    
+	$(NOECHO) $(ECHO) Generating manpages for the subcommands
+	$(NOECHO) $(FULLPERLRUN) -pe 's/App::Glacier\s+3/glacier 1/g;s/App::Glacier/glacier/g' $(INST_MAN3DIR)/App::Glacier.$(MAN3EXT) > $(INST_MAN1DIR)/glacier.$(MAN1EXT)
 _MAKE_
 ;
     push @INC, 'lib';
@@ -72,10 +73,10 @@ _MAKE_
 	$mod =~ s{\.pm$}{};
 	$mod =~ s{/}{::}g;
 	if (my $command = pod_command_name($mod)) {
-	    my $man1file = $command;
-	    $man1file =~ s/ /-/;
-	    $man1file .= '.$(MAN1EXT)';
-	    $s .= "\t\$(NOECHO)sed 's/$mod 3/$command 1/' \$(INST_MAN3DIR)/$mod.\$(MAN3EXT) > \$(INST_MAN1DIR)/$man1file\n"
+	    my $man1base = $command;
+	    $man1base =~ s/ /-/;
+	    my $man1file = $man1base . '.$(MAN1EXT)';
+	    $s .= "\t\$(NOECHO)\$(FULLPERLRUN) -pe 's/$mod\\s+3/$man1base 1/' \$(INST_MAN3DIR)/$mod.\$(MAN3EXT) > \$(INST_MAN1DIR)/$man1file\n"
 	}
     }
     pop @INC; 

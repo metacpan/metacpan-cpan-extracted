@@ -1,24 +1,22 @@
 package Yancy::Backend::Mysql;
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 # ABSTRACT: A backend for MySQL using Mojo::mysql
 
 #pod =head1 SYNOPSIS
 #pod
-#pod     # yancy.conf
-#pod     {
-#pod         backend => 'mysql://user:pass@localhost/mydb',
-#pod         collections => {
-#pod             table_name => { ... },
-#pod         },
-#pod     }
-#pod
-#pod     # Plugin
+#pod     ### URL string
 #pod     use Mojolicious::Lite;
 #pod     plugin Yancy => {
-#pod         backend => 'mysql://user:pass@localhost/mydb',
-#pod         collections => {
-#pod             table_name => { ... },
-#pod         },
+#pod         backend => 'mysql:///mydb',
+#pod         read_schema => 1,
+#pod     };
+#pod
+#pod     ### Mojo::mysql object
+#pod     use Mojolicious::Lite;
+#pod     use Mojo::mysql;
+#pod     plugin Yancy => {
+#pod         backend => { Mysql => Mojo::mysql->new( 'mysql:///mydb' ) },
+#pod         read_schema => 1,
 #pod     };
 #pod
 #pod =head1 DESCRIPTION
@@ -126,7 +124,9 @@ sub create {
     my ( $self, $coll, $params ) = @_;
     my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
     my $id = $self->mysql->db->insert( $coll, $params )->last_insert_id;
-    return $self->get( $coll, $params->{ $id_field } || $id );
+    # If we don't get an auto-incremented id or an exception, trust the
+    # ID was inserted correctly
+    return $id || $params->{ $id_field };
 }
 
 sub get {
@@ -159,13 +159,13 @@ sub list {
 sub set {
     my ( $self, $coll, $id, $params ) = @_;
     my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
-    return $self->mysql->db->update( $coll, $params, { $id_field => $id } );
+    return !!$self->mysql->db->update( $coll, $params, { $id_field => $id } )->rows;
 }
 
 sub delete {
     my ( $self, $coll, $id ) = @_;
     my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
-    return $self->mysql->db->delete( $coll, { $id_field => $id } );
+    return !!$self->mysql->db->delete( $coll, { $id_field => $id } )->rows;
 }
 
 sub read_schema {
@@ -266,25 +266,23 @@ Yancy::Backend::Mysql - A backend for MySQL using Mojo::mysql
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
-    # yancy.conf
-    {
-        backend => 'mysql://user:pass@localhost/mydb',
-        collections => {
-            table_name => { ... },
-        },
-    }
-
-    # Plugin
+    ### URL string
     use Mojolicious::Lite;
     plugin Yancy => {
-        backend => 'mysql://user:pass@localhost/mydb',
-        collections => {
-            table_name => { ... },
-        },
+        backend => 'mysql:///mydb',
+        read_schema => 1,
+    };
+
+    ### Mojo::mysql object
+    use Mojolicious::Lite;
+    use Mojo::mysql;
+    plugin Yancy => {
+        backend => { Mysql => Mojo::mysql->new( 'mysql:///mydb' ) },
+        read_schema => 1,
     };
 
 =head1 DESCRIPTION

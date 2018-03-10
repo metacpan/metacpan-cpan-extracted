@@ -1,0 +1,15 @@
+Revision history for Perl extension Plack-Middleware-ServerTiming
+
+0.03 2018-03-09T11:12:56Z
+
+    - add guard() for recoding elapsed time within the scope
+    - ignore undef as metric value
+
+0.02 2018-03-07T06:56:34Z
+
+    - add Plack::ServerTiming (@karupanerura++)
+
+0.01 2018-03-07T06:12:30Z
+
+    - original version
+

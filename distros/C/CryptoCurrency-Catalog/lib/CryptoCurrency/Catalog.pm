@@ -1,13 +1,13 @@
 package CryptoCurrency::Catalog;
 
-our $DATE = '2018-03-01'; # DATE
-our $VERSION = '20180301'; # VERSION
+our $DATE = '2018-03-08'; # DATE
+our $VERSION = '20180308.1.0'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
-my %by_symbol;
+my %by_code;
 my %by_name_lc;
 my %by_safename;
 my @all_data;
@@ -15,12 +15,12 @@ my @all_data;
 sub new {
     my $class = shift;
 
-    unless (keys %by_symbol) {
+    unless (keys %by_code) {
         while (defined(my $line = <DATA>)) {
             chomp $line;
             my @ff = split /\t/, $line;
-            my ($symbol, $name, $safename) = @ff;
-            $by_symbol{$symbol}     = \@ff;
+            my ($code, $name, $safename) = @ff;
+            $by_code{$code}         = \@ff;
             $by_name_lc{lc $name}   = \@ff;
             $by_safename{$safename} = \@ff;
             push @all_data, \@ff;
@@ -30,19 +30,19 @@ sub new {
     bless {}, $class;
 }
 
-sub by_symbol {
-    my ($self, $symbol) = @_;
-    $symbol = uc($symbol);
-    die "Can't find cryptocurrency with symbol '$symbol'"
-        unless $by_symbol{$symbol};
+sub by_code {
+    my ($self, $code) = @_;
+    $code = uc($code);
+    die "Can't find cryptocurrency with code '$code'"
+        unless $by_code{$code};
     return {
-        symbol=>$symbol,
-        name=>$by_symbol{$symbol}[1],
-        safename=>$by_symbol{$symbol}[2],
+        code=>$code,
+        name=>$by_code{$code}[1],
+        safename=>$by_code{$code}[2],
     };
 }
 
-sub by_ticker { by_symbol(@_) }
+sub by_ticker { by_code(@_) }
 
 sub by_name {
     my ($self, $name) = @_;
@@ -50,7 +50,7 @@ sub by_name {
         unless my $rec = $by_name_lc{lc $name};
     return {
         name=>$rec->[1],
-        symbol=>$rec->[0],
+        code=>$rec->[0],
         safename=>$rec->[2],
     };
 }
@@ -62,14 +62,14 @@ sub by_safename {
         unless $by_safename{$safename};
     return {
         safename=>$safename,
-        symbol=>$by_safename{$safename}[0],
+        code=>$by_safename{$safename}[0],
         name=>$by_safename{$safename}[1],
     };
 }
 
 sub by_slug { by_safename(@_) }
 
-sub all_symbols {
+sub all_codes {
     my $self = shift;
     my @res;
     for (@all_data) {
@@ -82,7 +82,7 @@ sub all_data {
     my $self = shift;
     my @res;
     for (@all_data) {
-        push @res, {symbol=>$_->[0], name=>$_->[1], safename=>$_->[2]};
+        push @res, {code=>$_->[0], name=>$_->[1], safename=>$_->[2]};
     }
     @res;
 }
@@ -100,7 +100,7 @@ CryptoCurrency::Catalog - Catalog of cryptocurrencies
 
 =head1 VERSION
 
-This document describes version 20180301 of CryptoCurrency::Catalog (from Perl distribution CryptoCurrency-Catalog), released on 2018-03-01.
+This document describes version 20180308.1.0 of CryptoCurrency::Catalog (from Perl distribution CryptoCurrency-Catalog), released on 2018-03-08.
 
 =head1 SYNOPSIS
 
@@ -108,15 +108,15 @@ This document describes version 20180301 of CryptoCurrency::Catalog (from Perl d
 
  my $cat = CryptoCurrency::Catalog->new;
 
- my $record = $cat->by_symbol("ETH");        # => { symbol => "ETH", name=>"Ethereum", safename=>"ethereum" }
- my $record = $cat->by_ticker("eth");        # alias for by_symbol(), lowercase also works
+ my $record = $cat->by_code("ETH");          # => { code=>"ETH", name=>"Ethereum", safename=>"ethereum" }
+ my $record = $cat->by_ticker("eth");        # alias for by_code(), lowercase also works
  my $record = $cat->by_name("Ethereum");     # note: case-sensitive
  my $record = $cat->by_safename("ethereum");
  my $record = $cat->by_slug("Ethereum");     # alias for by_safename(), mixed case also works
 
- my @symbols = $cat->all_symbols(); # => ("BTC", "ETH", ...)
+ my @codes = $cat->all_codes(); # => ("BTC", "ETH", ...)
 
- my @data = $cat->all_data; # => ({symbol=>"BTC", name=>"Bitcoin", safename=>"bitcoin"}, {...}, ...)
+ my @data = $cat->all_data; # => ({code=>"BTC", name=>"Bitcoin", safename=>"bitcoin"}, {...}, ...)
 
 =head1 DESCRIPTION
 
@@ -124,23 +124,23 @@ This class attempts to provide a list/catalog of cryptocurrencies. The main
 source for this catalog is the Cryptocurrency Market Capitalizations website
 (L<https://coinmarketcap.com/>, or CMC for short).
 
-CMC does not provide unique symbols nor unique names, only unique "safenames"
-(slugs). Whenever there is a clash, this catalog modifies the clashing symbol
-and/or unique name to make symbol and name to be unique again (usually the
+CMC does not provide unique codes nor unique names, only unique "safenames"
+(slugs). Whenever there is a clash, this catalog modifies the clashing code
+and/or unique name to make code and name to be unique again (usually the
 coin/token with the smaller market cap "loses" the name).
 
-There is no guarantee that the symbol/name/safename of old/unlisted coins or
+There is no guarantee that the code/name/safename of old/unlisted coins or
 tokens will not be reused.
 
 =head1 METHODS
 
 =head2 new
 
-=head2 by_symbol
+=head2 by_code
 
 =head2 by_ticker
 
-Alias for L</"by_symbol">.
+Alias for L</"by_code">.
 
 =head2 by_name
 
@@ -150,7 +150,7 @@ Alias for L</"by_symbol">.
 
 Alias for L</"by_safename">.
 
-=head2 all_symbols
+=head2 all_codes
 
 =head2 all_data
 
