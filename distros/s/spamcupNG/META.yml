@@ -26,7 +26,7 @@ no_index:
 provides:
   SpamcupNG:
     file: lib/SpamcupNG.pm
-    version: '0.9'
+    version: '1.0'
 requires:
   Carp: '0'
   Getopt::Std: '0'
@@ -42,7 +42,7 @@ resources:
   bugtracker: https://github.com/glasswalk3r/spamcupNG/issues
   homepage: https://github.com/glasswalk3r/spamcupNG
   repository: https://github.com/glasswalk3r/spamcupNG.git
-version: '0.9'
+version: '1.0'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

@@ -4,11 +4,14 @@ package App::ElasticSearch::Utilities::QueryString::IP;
 use strict;
 use warnings;
 
+our $VERSION = '5.5'; # VERSION
+
 use Net::CIDR::Lite;
 use namespace::autoclean;
 
 use Moo;
 with 'App::ElasticSearch::Utilities::QueryString::Plugin';
+
 
 sub handle_token {
     my ($self,$token) = @_;
@@ -18,11 +21,11 @@ sub handle_token {
                 my $cidr = Net::CIDR::Lite->new();
                 $cidr->add($match);
                 my @range = split /-/, ($cidr->list_range)[0];
-                return { query_string => sprintf("%s_numeric:[%s TO %s]", $term, @range) };
+                return { query_string => sprintf("%s:[%s TO %s]", $term, @range) };
             }
         }
     }
-    return undef;
+    return;
 }
 
 1;
@@ -39,15 +42,17 @@ App::ElasticSearch::Utilities::QueryString::IP - Expand IP CIDR Notation to ES r
 
 =head1 VERSION
 
-version 5.4
+version 5.5
 
 =head1 SYNOPSIS
 
 =head2 App::ElasticSearch::Utilities::QueryString::IP
 
-If a field is an IP address wild card, it is transformed:
+If a field is an IP address uses CIDR Notation, it's expanded to a range query.
 
-    src_ip:10.* => src_ip:[10.0.0.0 TO 10.255.255.255]
+    src_ip:10.0/8 => src_ip:[10.0.0.0 TO 10.255.255.255]
+
+=for Pod::Coverage handle_token
 
 =head1 AUTHOR
 

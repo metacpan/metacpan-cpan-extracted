@@ -13,7 +13,7 @@ Git::Hooks Tutorials - Gentle introduction on Git::Hooks
 
 =head1 VERSION
 
-version 2.7.0
+version 2.8.1
 
 This document is intended to make it easy to start using the Git::Hooks
 framework as fast as possible, with a minimum of set up. There are major

@@ -20,7 +20,6 @@ my $builder = Module::Build->new(
                         ],
     requires => {
         'perl'       => 'v5.9.4',
-        'Make::Path' => '2.07',
     },
     );
 

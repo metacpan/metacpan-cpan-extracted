@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2018 -- leonerd@leonerd.org.uk
 
 package Test::Device::Chip::Adapter;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::Chip::Adapter );
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Carp;
 
@@ -145,7 +145,7 @@ my %METHODS = (
    read            => [ undef,
                         [qw( I2C )] ],
    write_then_read => [ undef,
-                        [qw( I2C )] ],
+                        [qw( SPI I2C )] ],
    readwrite       => [ undef,
                         [qw( SPI )] ],
    assert_ss       => [ undef,

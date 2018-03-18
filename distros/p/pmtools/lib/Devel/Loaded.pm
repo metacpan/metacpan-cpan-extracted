@@ -8,13 +8,18 @@ use strict;
 use warnings;
 use File::Spec;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.2.0';
 
 # ----- define variable
 my $path  = undef;	# current module path
 our %Seen = ();		# track whether we've seen this module before
 
-BEGIN { %Seen = %INC } 
+BEGIN {
+    %Seen = %INC;
+
+    sub DB::DB { 1 }
+} 
+
 
 END { 
     # get last part of Devel::Loaded path; handle File::Spec->canonpath() removing '.' from '.pm'
@@ -91,7 +96,7 @@ Perl modules for getting dependency information (26 of them at the time of writi
 
 Copyright (C) 1999 Tom Christiansen.
 
-Copyright (C) 2006-2014 Mark Leighton Fisher.
+Copyright (C) 2006-2014, 2018 Mark Leighton Fisher.
 
 =head1 LICENSE
 

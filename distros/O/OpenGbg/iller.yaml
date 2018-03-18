@@ -19,6 +19,7 @@ prereqs:
      - MooseX::AttributeShortcuts
      - Path::Tiny
      - Sub::Exporter
+     - Types::DateTime: 0.002
      - Type::Tiny
      - Types::Path::Tiny
      - Throwable::SugarFactory: 0.152700

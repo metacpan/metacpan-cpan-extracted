@@ -5,6 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Data::Result',
     VERSION_FROM      => 'lib/Data/Result.pm', # finds $VERSION
+    LICENSE=>'perl_5',
     PREREQ_PM         => {
     qw(
       Moo  2.003002
@@ -13,7 +14,7 @@ WriteMakefile(
       MooX::Types::MooseLike::Base 0.29
       Carp 1.42
       namespace::clean 0.27
-      Data::Dumper  2.167
+      Data::Dumper  2.161
       boolean       0.46
       Scalar::Util  0
       Test::More    1.302073

@@ -6,7 +6,7 @@ use YAML::XS ();
 use 5.010;
 
 # ABSTRACT: YAML encoder for AutodataHandler
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.29'; # VERSION
 
 sub coder
 {
@@ -34,7 +34,7 @@ Clustericious::Coder::YAML - YAML encoder for AutodataHandler
 
 =head1 VERSION
 
-version 1.27
+version 1.29
 
 =head1 AUTHOR
 

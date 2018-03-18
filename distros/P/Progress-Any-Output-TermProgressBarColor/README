@@ -1,18 +1,25 @@
-SYNOPSIS
+NAME
+    Progress::Any::Output::TermProgressBarColor - Output progress to
+    terminal as color bar
 
+VERSION
+    This document describes version 0.241 of
+    Progress::Any::Output::TermProgressBarColor (from Perl distribution
+    Progress-Any-Output-TermProgressBarColor), released on 2018-03-17.
+
+SYNOPSIS
      use Progress::Any::Output;
-    
+
      # use default options
      Progress::Any::Output->set('TermProgressBarColor');
-    
+
      # set options
      Progress::Any::Output->set('TermProgressBarColor',
                                 width=>50, fh=>\*STDERR, show_delay=>5);
 
 DESCRIPTION
-
     THIS IS AN EARLY RELEASE, SOME THINGS ARE NOT YET IMPLEMENTED E.G.
-    TEMPLATE, STYLES, COLOR THEMES.
+    STYLES, COLOR THEMES.
 
     Sample screenshots:
 
@@ -21,102 +28,124 @@ DESCRIPTION
     Term::ProgressBar, except that it uses the Progress::Any framework and
     has additional features:
 
-      * colors and color themes
+    *   colors and color themes
 
-      * template and styles
+    *   template and styles
 
-      * displaying message text in addition to bar/percentage number
+    *   displaying message text in addition to bar/percentage number
 
-      * wide character support
+    *   wide character support
 
     XXX option to cleanup when complete or not (like in Term::ProgressBar)
     and should default to 1.
 
 METHODS
-
- new(%args) => OBJ
-
+  new(%args) => OBJ
     Instantiate. Usually called through
-    Progress::Any::Output->set("TermProgressBarColor", %args).
+    "Progress::Any::Output->set("TermProgressBarColor", %args)".
 
     Known arguments:
 
-      * wide => bool
+    *   wide => bool
 
-      If set to 1, enable wide character support (requires
-      Text::ANSI::WideUtil.
+        If set to 1, enable wide character support (requires
+        Text::ANSI::WideUtil.
 
-      * width => INT
+    *   width => INT
 
-      Width of progress bar. The default is to detect terminal width and
-      use the whole width.
+        Width of progress bar. The default is to detect terminal width and
+        use the whole width.
 
-      * color_theme => STR
+    *   color_theme => STR
 
-      Not yet implemented.
+        Not yet implemented.
 
-      Choose color theme. To see what color themes are available, use
-      list_color_themes().
+        Choose color theme. To see what color themes are available, use
+        "list_color_themes()".
 
-      * style => STR
+    *   style => STR
 
-      Not yet implemented.
+        Not yet implemented.
 
-      Choose style. To see what styles are available, use list_styles().
-      Styles determine the characters used for drawing the bar, alignment,
-      etc.
+        Choose style. To see what styles are available, use "list_styles()".
+        Styles determine the characters used for drawing the bar, alignment,
+        etc.
 
-      * template => STR (default: '%p [%B]%e')
+    *   template => str
 
-      Not yet implemented.
+        See fill_template in Progress::Any's documentation. Aside from
+        template strings supported by Progress::Any, this output recognizes
+        these additional strings: %b to display the progress bar (with width
+        using the rest of the available width), %B to display the progress
+        bar as well as the message inside it. You can also enclose parts of
+        text with "<color RGB>" ... "</color>" to give color.
 
-      See fill_template in Progress::Any's documentation. Aside from
-      template strings supported by Progress::Any, this output recognizes
-      these additional strings: %b to display the progress bar (using the
-      rest of the available width), %B to display the progress bar as well
-      as the message inside it.
+        The default template is:
 
-      * fh => handle (default: \*STDOUT)
+         <color ffff00>%p</color> <color 808000>[</color>%B<color 808000>]</color><color ffff00>%e</color>
 
-      Instead of the default STDOUT, you can direct the output to another
-      filehandle.
+    *   fh => handle (default: \*STDOUT)
 
-      * show_delay => int
+        Instead of the default STDOUT, you can direct the output to another
+        filehandle.
 
-      If set, will delay showing the progress bar until the specified
-      number of seconds. This can be used to create, e.g. a CLI application
-      that is relatively not chatty but will display progress after several
-      seconds of seeming inactivity to indicate users that the process is
-      still going on.
+    *   show_delay => int
 
- keep_delay_showing()
+        If set, will delay showing the progress bar until the specified
+        number of seconds. This can be used to create, e.g. a CLI
+        application that is relatively not chatty but will display progress
+        after several seconds of seeming inactivity to indicate users that
+        the process is still going on.
 
+  keep_delay_showing()
     Can be called to reset the timer that counts down to show progress bar
-    when show_delay is defined. For example, if show_delay is 5 seconds and
-    two seconds have passed, it should've been 3 seconds before progress
-    bar is shown in the next update(). However, if you call this method, it
-    will be 5 seconds again before showing.
+    when "show_delay" is defined. For example, if "show_delay" is 5 seconds
+    and two seconds have passed, it should've been 3 seconds before progress
+    bar is shown in the next "update()". However, if you call this method,
+    it will be 5 seconds again before showing.
 
 ENVIRONMENT
-
- COLOR => BOOL
-
+  COLOR => bool
     Can be used to force or disable color. See Color::ANSI::Util.
 
- COLOR_DEPTH => INT
-
+  COLOR_DEPTH => int
     Can be used to override color depth detection. See Color::ANSI::Util.
 
- COLUMNS => INT
-
+  COLUMNS => int
     Can be used to override terminal width detection.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Progress-Any-Output-TermProgressBarColor>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Progress-Any-Output-TermProgressBarCo
+    lor>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Progress-Any-Output-T
+    ermProgressBarColor>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Progress::Any
 
     Term::ProgressBar
 
     Ruby library: ruby-progressbar,
-    https://github.com/jfelchner/ruby-progressbar
+    <https://github.com/jfelchner/ruby-progressbar>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 # PODNAME: es-alias-manager.pl
 # ABSTRACT: Allow easy alias management for daily indexes
 use strict;
@@ -188,7 +188,7 @@ es-alias-manager.pl - Allow easy alias management for daily indexes
 
 =head1 VERSION
 
-version 5.4
+version 5.5
 
 =head1 SYNOPSIS
 

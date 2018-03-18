@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4216",
    "license" : [
       "perl_5"
    ],
@@ -27,7 +27,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Make::Path" : "2.07",
             "perl" : "v5.9.4"
          }
       }
@@ -35,7 +34,7 @@
    "provides" : {
       "Data::RecordStore" : {
          "file" : "lib/Data/RecordStore.pm",
-         "version" : "3.13"
+         "version" : "3.14"
       },
       "Data::RecordStore::Silo" : {
          "file" : "lib/Data/RecordStore.pm"
@@ -50,6 +49,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "3.13",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "3.14",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

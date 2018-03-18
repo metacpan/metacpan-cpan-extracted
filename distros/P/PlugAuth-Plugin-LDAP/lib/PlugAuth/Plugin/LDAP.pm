@@ -1,7 +1,7 @@
 package PlugAuth::Plugin::LDAP;
 
-# ABSTRACT: LDAP back end for PlugAuth
-our $VERSION = '0.08'; # VERSION
+# ABSTRACT: (Deprecated) LDAP back end for PlugAuth
+our $VERSION = '0.09'; # VERSION
 
 
 use strict;
@@ -51,11 +51,11 @@ __END__
 
 =head1 NAME
 
-PlugAuth::Plugin::LDAP - LDAP back end for PlugAuth
+PlugAuth::Plugin::LDAP - (Deprecated) LDAP back end for PlugAuth
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -71,6 +71,9 @@ Note that %s in the dn will be replaced with the username
 when binding to the LDAP server.
 
 =head1 DESCRIPTION
+
+B<NOTE>: This module has been deprecated, and may be removed on or after 31 December 2018.
+Please see L<https://github.com/clustericious/Clustericious/issues/46>.
 
 Handle authentication only from LDAP server.
 Everything else is handled by L<PlugAuth::Plugin::FlatAuth>

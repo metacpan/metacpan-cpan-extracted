@@ -6,7 +6,7 @@ package OpenGbg;
 
 # ABSTRACT: An interface to the Open Data API of Gothenburg
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1402';
+our $VERSION = '0.1403';
 
 use OpenGbg::Elk;
 
@@ -124,16 +124,16 @@ OpenGbg - An interface to the Open Data API of Gothenburg
 <p>
 <img src="https://img.shields.io/badge/perl-5.10+-blue.svg" alt="Requires Perl 5.10+" />
 <a href="https://travis-ci.org/Csson/p5-OpenGbg"><img src="https://api.travis-ci.org/Csson/p5-OpenGbg.svg?branch=master" alt="Travis status" /></a>
-<a href="http://cpants.cpanauthors.org/release/CSSON/OpenGbg-0.1402"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/OpenGbg/0.1402" alt="Distribution kwalitee" /></a>
-<a href="http://matrix.cpantesters.org/?dist=OpenGbg%200.1402"><img src="http://badgedepot.code301.com/badge/cpantesters/OpenGbg/0.1402" alt="CPAN Testers result" /></a>
-<img src="https://img.shields.io/badge/coverage-78.7%-orange.svg" alt="coverage 78.7%" />
+<a href="http://cpants.cpanauthors.org/release/CSSON/OpenGbg-0.1403"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/OpenGbg/0.1403" alt="Distribution kwalitee" /></a>
+<a href="http://matrix.cpantesters.org/?dist=OpenGbg%200.1403"><img src="http://badgedepot.code301.com/badge/cpantesters/OpenGbg/0.1403" alt="CPAN Testers result" /></a>
+<img src="https://img.shields.io/badge/coverage-75.9%-orange.svg" alt="coverage 75.9%" />
 </p>
 
 =end html
 
 =head1 VERSION
 
-Version 0.1402, released 2016-08-12.
+Version 0.1403, released 2018-03-14.
 
 =head1 SYNOPSIS
 
@@ -150,7 +150,7 @@ Version 0.1402, released 2016-08-12.
 OpenGbg is a way to connect to and use the open data published by the city of L<Gothenburg|https://en.wikipedia.org/wiki/Gothenburg>.
 
 The open data homepage is located at L<http://data.goteborg.se/>. All official documentation is in Swedish, but the license agreement is published
-in English L<here|https://gbgdata.wordpress.com/goopen/>.
+in English L<here|http://www25.goteborg.se/psidata/DownloadHandler.ashx?id=7092f661-00c2-4b36-a613-98ca034e2e54&t=h>.
 
 To use the API you need to sign up for a free api key.
 
@@ -162,7 +162,7 @@ Once you have your api key you can use it to authenticate in two different ways:
 
     my $opengbg = OpenGbg->new(key => 'secret-api-key');
 
-2. You can save it in a file named C<.opengbg.ini> in your homedir:
+2. You can save it in a file named C<.opengbg.ini> in your homedir (recommended):
 
     [API]
     key = secret-api-key
@@ -187,7 +187,7 @@ L<$gbg-E<gt>air_quality|OpenGbg::Service::AirQuality> - Data on air quality
 
 L<$gbg-E<gt>bridge|OpenGbg::Service::Bridge> - Data on the openness of Göta Älvbron
 
-L<$gbg-E<gt>styr_och_stall|OpenGbg::Service::StyrOchStall> - Data on rent-a-bike stations
+L<$gbg-E<gt>styr_och_stall|OpenGbg::Service::StyrOchStall> - Data on rent-a-bike stations (deprecated)
 
 L<$gbg-E<gt>traffic_camera|OpenGbg::Service::TrafficCamera> - Data on traffic cameras, and their images
 

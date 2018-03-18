@@ -13,9 +13,10 @@ with qw[Pcore::App::Controller];
 
 requires qw[ext_app ext_app_title];
 
-has ext_default_theme_classic => ( is => 'ro', isa => Str, default => 'triton' );
-has ext_default_theme_modern  => ( is => 'ro', isa => Str, default => 'triton' );
-has ext_default_locale        => ( is => 'ro', isa => Str, default => 'en' );
+has ext_default_theme_classic => ( is => 'ro', isa => Str,      default => 'triton' );
+has ext_default_theme_modern  => ( is => 'ro', isa => Str,      default => 'triton' );
+has ext_default_locale        => ( is => 'ro', isa => Str,      default => 'en' );
+has ext_resources             => ( is => 'ro', isa => ArrayRef, default => sub { [] } );
 
 has cache => ( is => 'ro', isa => ScalarRef, init_arg => undef );
 
@@ -95,7 +96,7 @@ sub _return_html ( $self, $req ) {
     my $locale = $self->_get_locale($req);
 
     if ( !$self->{cache}->{app}->{$locale}->{html} ) {
-        my $resources = [];
+        my $resources = [ $self->ext_resources->@* ];
 
         # FontAwesome
         push $resources->@*, Pcore::Share::WWW->fontawesome;
@@ -161,28 +162,26 @@ sub _return_app ( $self, $req ) {
 
         my $data = {
             locale  => $self->_get_app_locale($locale),
-            api_map => to_json(
-                {   type    => 'websocket',                                                 # remoting
-                    url     => $self->{app}->{router}->get_host_api_path( $req->{host} ),
-                    actions => $ext_app->{api},
+            api_map => to_json( {
+                type    => 'websocket',                                                 # remoting
+                url     => $self->{app}->{router}->get_host_api_path( $req->{host} ),
+                actions => $ext_app->{api},
 
-                    # not mandatory options
-                    id              => 'api',
-                    namespace       => 'API.' . ref( $self->{app} ) =~ s[::][]smgr,
-                    timeout         => 0,                                                   # milliseconds, 0 - no timeout
-                    version         => undef,
-                    maxRetries      => 0,                                                   # number of times to re-attempt delivery on failure of a call
-                    headers         => {},
-                    enableBuffer    => 10,                                                  # \1, \0, milliseconds
-                    enableUrlEncode => undef,
-                }
-            ),
-            loader_paths => to_json(
-                {   $Pcore::Ext::NS => '.',
-                    Ext             => '/static/ext/src/',
-                    'Ext.ux'        => '/static/ext/ux/',
-                }
-            ),
+                # not mandatory options
+                id              => 'api',
+                namespace       => 'API.' . ref( $self->{app} ) =~ s[::][]smgr,
+                timeout         => 0,                                                   # milliseconds, 0 - no timeout
+                version         => undef,
+                maxRetries      => 0,                                                   # number of times to re-attempt delivery on failure of a call
+                headers         => {},
+                enableBuffer    => 10,                                                  # \1, \0, milliseconds
+                enableUrlEncode => undef,
+            } ),
+            loader_paths => to_json( {
+                $Pcore::Ext::NS => '.',
+                Ext             => '/static/ext/src/',
+                'Ext.ux'        => '/static/ext/ux/',
+            } ),
             app_namespace  => $Pcore::Ext::NS,
             viewport_class => $ext_app->{viewport},
         };
@@ -285,8 +284,8 @@ sub _get_app_locale ( $self, $locale ) {
     }
 
     my $data->{locale} = {
-        class_name => $ext_app->{l10n_class_name},
-        messages   => to_json( $locale_messages, canonical => 1 ),
+        class_name      => $ext_app->{l10n_class_name},
+        messages        => to_json( $locale_messages, canonical => 1 ),
         plural_form_exp => $Pcore::Core::L10N::LOCALE_PLURAL_FORM->{$locale}->{exp} // 'null',
     };
 
@@ -450,7 +449,7 @@ sub _prepare_js ( $self, $js ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 362                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 361                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

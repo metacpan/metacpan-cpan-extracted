@@ -6,7 +6,7 @@ use warnings;
 use base qw(Statistics::Data);
 use Carp qw(croak);
 use List::AllUtils qw(any);
-$Statistics::ANOVA::EffectSize::VERSION = '0.01';
+$Statistics::ANOVA::EffectSize::VERSION = '0.02';
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ Statistics::ANOVA::EffectSize - Calculate effect-sizes from ANOVAs incl. eta-squ
 
 =head1 VERSION
 
-This is documentation for B<Version 0.01> of Statistics::ANOVA::EffectSize.
+This is documentation for B<Version 0.02> of Statistics::ANOVA::EffectSize.
 
 =head1 SYNOPSIS
 
@@ -50,8 +50,10 @@ This is also what is commonly designated as I<R>-squared (Maxwell & Delaney, 199
 =cut
 
 sub eta_sq_partial_by_ss {
-    my ($self, %args) = @_;
-    croak 'Undefined values needed to calculate partial eta-squared by sums-of-squares' if any { ! defined $args{$_} } (qw/ss_b ss_w/);
+    my ( $self, %args ) = @_;
+    croak
+'Undefined values needed to calculate partial eta-squared by sums-of-squares'
+      if any { !defined $args{$_} } (qw/ss_b ss_w/);
     return $args{'ss_b'} / ( $args{'ss_b'} + $args{'ss_w'} );
 }
 *r_squared = \&eta_sq_partial_by_ss;
@@ -65,10 +67,13 @@ Returns adjusted I<R>-squared.
 =cut
 
 sub r_squared_adj {
-    my ($self, %args) = @_;
-    my $r_squared = $self->r_squared(%args); # will check for ss_b and ss_w
-    croak 'Could not obtain values to calculate adjusted r-squared' if any { ! defined $args{$_} } (qw/df_b df_w/);
-    return 1 - ( ($args{'df_b'} + $args{'df_w'}) / $args{'df_w'} ) * ( 1 - $r_squared );
+    my ( $self, %args ) = @_;
+    my $r_squared = $self->r_squared(%args);    # will check for ss_b and ss_w
+    croak 'Could not obtain values to calculate adjusted r-squared'
+      if any { !defined $args{$_} } (qw/df_b df_w/);
+    return 1 -
+      ( ( $args{'df_b'} + $args{'df_w'} ) / $args{'df_w'} ) *
+      ( 1 - $r_squared );
 }
 
 =head2 eta_sq_partial_by_f
@@ -82,27 +87,31 @@ Returns partial I<eta>-squared given I<F>-value and its between- and within-grou
 =cut
 
 sub eta_sq_partial_by_f {
-    my ($self, %args) = @_;
-    croak 'Could not obtain values to calculate partial eta-squared by F-value' if any { ! defined $args{$_} } (qw/df_b df_w f_value/);
-    return ( $args{'df_b'} * $args{'f_value'} ) / ( $args{'df_b'} * $args{'f_value'} + $args{'df_w'} );
+    my ( $self, %args ) = @_;
+    croak 'Could not obtain values to calculate partial eta-squared by F-value'
+      if any { !defined $args{$_} } (qw/df_b df_w f_value/);
+    return ( $args{'df_b'} * $args{'f_value'} ) /
+      ( $args{'df_b'} * $args{'f_value'} + $args{'df_w'} );
 }
 
 =head2 omega_sq_partial_by_ss
 
- $es->omega_sq_partial_by_ss(df_b => NUM, df_w => NUM, ss_b => NUM, ss_w => NUM);
+ $es->omega_sq_partial_by_ss(df_b => NUM, df_w => NUM, ss_b => NUM, ss_w => NUM, count => NUM);
 
 Returns partial I<omega>-squared given the between- and within-groups sums-of-squares and degrees-of-freedom.
 
-Essentially as given by Maxwell & Delaney (1990), Eq. 92:
+=for html <p>&nbsp;&nbsp;&omega;<sup>2</sup><sub>P</sub> = ( <i>ss</i><sub>b</sub> &mdash; (<i>df</i><sub>b</sub> . <i>SS</i><sub>w</sub> / <i>df</i><sub>w</sub>) ) / ( <i>SS</i><sub>b</sub> + (<i>N</i> &ndash; <i>df</i><sub>b</sub> ) <i>SS</i><sub>w</sub> / <i>df</i><sub>w</sub> )
 
-=for html <p>&nbsp;&nbsp;&omega;<sup>2</sup><sub>P</sub> = ( <i>ss</i><sub>b</sub> &mdash; (<i>df</i><sub>b</sub> . <i>SS</i><sub>w</sub> / <i>df</i><sub>b</sub>) ) / (( <i>SS</i><sub>b</sub> + <i>SS</i><sub>w</sub> ) + <i>SS</i><sub>w</sub> / <i>df</i><sub>w</sub> )
+(as in, e.g., Olejnik & Algina, 2003, p. 435).
 
 =cut
 
 sub omega_sq_partial_by_ss {
-    my ($self, %args) = @_;
-    croak 'Undefined values for calculating partial omega-squared by sums-of-squares' if any { ! defined $args{$_} } (qw/ss_b ss_w df_b df_w/);
-    return  ( $args{'ss_b'} - ( $args{'df_b'} * $args{'ss_w'} / $args{'df_w'} ) ) / ( ( $args{'ss_b'} + $args{'ss_w'} ) + $args{'ss_w'} / $args{'df_w'} );
+    my ( $self, %args ) = @_;
+    croak
+'Undefined values for calculating partial omega-squared by sums-of-squares'
+      if any { !defined $args{$_} } (qw/ss_b ss_w df_b df_w count/);
+    return _omega_numerator_ss( \%args ) / _omega_denominator_ss( \%args );
 }
 
 =head2 omega_sq_partial_by_ms
@@ -113,12 +122,16 @@ Returns partial I<omega>-squared given between- and within-group mean sums-of-sq
 
 =for html <p>&nbsp;&nbsp;&omega;<sup>2</sup><sub>P</sub> = <i>df</i><sub>b</sub>  ( <i>MS</i><sub>b</sub> &ndash; <i>MS</i><sub>w</sub> ) / ( <i>df</i><sub>b</sub> . <i>MS</i><sub>b</sub> + ( <i>N</i> &ndash; <i>df</i><sub>b</sub> ) <i>MS</i><sub>w</sub> ) </p>
 
+(as in, e.g., Lakens, 2013, Eq. 15).
+
 =cut
 
 sub omega_sq_partial_by_ms {
-    my ($self, %args) = @_;
-    croak 'Could not obtain values to calculate partial omega-squared by mean sums-of-squares' if any { ! defined $_ } values %args;
-    return  $args{'df_b'} * ( $args{'ms_b'} - $args{'ms_w'} )  / ( $args{'df_b'} * $args{'ms_b'} + ( $args{'count'} - $args{'df_b'} ) * $args{'ms_w'} );
+    my ( $self, %args ) = @_;
+    croak
+'Could not obtain values to calculate partial omega-squared by mean sums-of-squares'
+      if any { !defined $_ } values %args;
+    return _omega_numerator_ms( \%args ) / _omega_denominator_ms( \%args );
 }
 
 =head2 omega_sq_partial_by_f
@@ -129,14 +142,17 @@ Returns partial I<omega>-squared given I<F>-value and its between- and within-gr
 
 =for html <p>&nbsp;&nbsp;&omega;<sup>2</sup><sub>P</sub>(est.) = ( <i>F</i> - 1 ) / ( <i>F</i> + ( df</i><sub>w</sub> + 1 ) / <i>df</i><sub>b</sub> )</p>
 
-This is an estimate formulated by L<D. Lakens|http://daniellakens.blogspot.com.au/2015/06/why-you-should-use-omega-squared.html> that will not ordinarily agree with the method by (mean) sum-of-squares.
+This is an estimate provided by L<D. Lakens|http://daniellakens.blogspot.com.au/2015/06/why-you-should-use-omega-squared.html>.
 
 =cut
 
 sub omega_sq_partial_by_f {
-    my ($self, %args) = @_;
-    croak 'Could not obtain values to calculate partial omega-squared by mean sums-of-squares' if any { ! defined $_ } values %args;
-    return ( $args{'f_value'} - 1 ) / ( $args{'f_value'} + ( $args{'df_w'} + 1)/$args{'df_b'} ); 
+    my ( $self, %args ) = @_;
+    croak
+'Could not obtain values to calculate partial omega-squared by mean sums-of-squares'
+      if any { !defined $_ } values %args;
+    return ( $args{'f_value'} - 1 ) /
+      ( $args{'f_value'} + ( $args{'df_w'} + 1 ) / $args{'df_b'} );
 }
 
 =head2 eta_to_omega
@@ -150,10 +166,41 @@ Returns I<omega>-squared based on I<eta>-squared and the between- and within-gro
 =cut
 
 sub eta_to_omega {
-    my ($self, %args) = @_;
-    croak 'Could not obtain values to calculate partial omega-squared by mean sums-of-squares' if any { ! defined $_ } values %args;
-    my $num = $args{'eta_sq'} * ( $args{'df_b'} + $args{'df_w'} ) - $args{'df_b'};
-    return $num / ( $num + ( ( $args{'df_w'} + 1) * ( 1 - $args{'eta_sq'} ) ) );
+    my ( $self, %args ) = @_;
+    croak
+'Could not obtain values to calculate partial omega-squared by mean sums-of-squares'
+      if any { !defined $_ } values %args;
+    my $num =
+      $args{'eta_sq'} * ( $args{'df_b'} + $args{'df_w'} ) - $args{'df_b'};
+    return $num /
+      ( $num + ( ( $args{'df_w'} + 1 ) * ( 1 - $args{'eta_sq'} ) ) );
+}
+
+sub _omega_numerator_ss {
+    my $args = shift;
+    return $args->{'ss_b'} -
+      $args->{'df_b'} * $args->{'ss_w'} / $args->{'df_w'};
+}
+
+sub _omega_numerator_ms {
+    my $args = shift;
+    return $args->{'df_b'} * ( $args->{'ms_b'} - $args->{'ms_w'} );
+}
+
+sub _omega_denominator_ss {
+    my $args = shift;
+
+#return ( $args->{'ss_b'} + $args->{'ss_w'} ) + $args->{'ss_w'} / $args->{'df_w'};
+    return $args->{'ss_b'} +
+      ( $args->{'count'} - $args->{'df_b'} ) *
+      $args->{'ss_w'} /
+      $args->{'df_w'};
+}
+
+sub _omega_denominator_ms {
+    my $args = shift;
+    return $args->{'df_b'} * $args->{'ms_b'} +
+      ( $args->{'count'} - $args->{'df_b'} ) * $args->{'ms_w'};
 }
 
 =head1 DEPENDENCIES
@@ -176,6 +223,8 @@ C<croak>ed if the sufficient statistics have not been provided.
 
 Cohen, J. (1969). I<Statistical power analysis for the behavioral sciences>. New York, US: Academic.
 
+Lakens, D. (2013). Calculating and reporting effect sizes to facilitate cumulative science: A practical primer for t-tests and ANOVAs. Frontiers in Psychology, 4, 863. doi:L<10.3389/fpsyg.2013.00863|http://dx.doi.org/10.3389/fpsyg.2013.00863>
+
 Lakens, D. (2015). Why you should use omega-squared instead of eta-squared, I<The 20% statistician> [L<Weblog|http://daniellakens.blogspot.com.au/2015/06/why-you-should-use-omega-squared.html>].
 
 Maxwell, S. E., & Delaney, H. D. (1990). I<Designing experiments and analyzing data: A model comparison perspective>. Belmont, CA, US: Wadsworth.
@@ -188,16 +237,8 @@ Roderick Garton, C<< <rgarton at cpan.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-statistics-anova-effectsize-0.01 at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Statistics-ANOVA-EffectSize-0.01>.  I will be notified, and then you'll
+Please report any bugs or feature requests to C<bug-statistics-anova-effectsize-0.02 at rt.cpan.org>, or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Statistics-ANOVA-EffectSize-0.02>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-=head1 NOTES
-
-
-For independent variables only, omega-square (raw):
-
-w2 = (SSeffect - (dfeffect)(MSerror)) / MSerror + SStotal
 
 =head1 SUPPORT
 
@@ -212,25 +253,25 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker (report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Statistics-ANOVA-EffectSize-0.01>
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Statistics-ANOVA-EffectSize-0.02>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/Statistics-ANOVA-EffectSize-0.01>
+L<http://annocpan.org/dist/Statistics-ANOVA-EffectSize-0.02>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/Statistics-ANOVA-EffectSize-0.01>
+L<http://cpanratings.perl.org/d/Statistics-ANOVA-EffectSize-0.02>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Statistics-ANOVA-EffectSize-0.01/>
+L<http://search.cpan.org/dist/Statistics-ANOVA-EffectSize-0.02/>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Roderick Garton.
+Copyright 2015-2018 Roderick Garton.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
@@ -240,4 +281,4 @@ See L<http://dev.perl.org/licenses/> for more information.
 
 =cut
 
-1; # End of Statistics::ANOVA::EffectSize
+1;    # End of Statistics::ANOVA::EffectSize

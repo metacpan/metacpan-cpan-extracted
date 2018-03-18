@@ -1,0 +1,174 @@
+%# BEGIN BPS TAGGED BLOCK {{{
+%#
+%# COPYRIGHT:
+%#
+%# This software is Copyright (c) 1996-2017 Best Practical Solutions, LLC
+%#                                          <sales@bestpractical.com>
+%#
+%# (Except where explicitly superseded by other copyright notices)
+%#
+%#
+%# LICENSE:
+%#
+%# This work is made available to you under the terms of Version 2 of
+%# the GNU General Public License. A copy of that license should have
+%# been provided with this software, but in any event can be snarfed
+%# from www.gnu.org.
+%#
+%# This work is distributed in the hope that it will be useful, but
+%# WITHOUT ANY WARRANTY; without even the implied warranty of
+%# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%# General Public License for more details.
+%#
+%# You should have received a copy of the GNU General Public License
+%# along with this program; if not, write to the Free Software
+%# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+%# 02110-1301 or visit their web page on the internet at
+%# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html.
+%#
+%#
+%# CONTRIBUTION SUBMISSION POLICY:
+%#
+%# (The following paragraph is not intended to limit the rights granted
+%# to you to modify and distribute this software under the terms of
+%# the GNU General Public License and is only of importance to you if
+%# you choose to contribute your changes and enhancements to the
+%# community by submitting them to Best Practical Solutions, LLC.)
+%#
+%# By intentionally submitting any modifications, corrections or
+%# derivatives to this work, or any other work intended for use with
+%# Request Tracker, to Best Practical Solutions, LLC, you confirm that
+%# you are the copyright holder for those contributions and you grant
+%# Best Practical Solutions,  LLC a nonexclusive, worldwide, irrevocable,
+%# royalty-free, perpetual, license to use, copy, create derivative
+%# works based on those contributions, and sublicense and distribute
+%# those contributions and any derivatives thereof.
+%#
+%# END BPS TAGGED BLOCK }}}
+%# index.html gets two doctypes unless we can skip it here
+% unless ($SkipDoctype) {
+<!DOCTYPE html>
+% }
+
+<html lang="<% $lang %>">
+  <head>
+    <title><%$Title%></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- The X-UA-Compatible <meta> tag above must be very early in <head> -->
+
+% if ($Refresh && $Refresh =~ /^(\d+)/ && $1 > 0) {
+%   my $URL = $m->notes->{RefreshURL}; $URL = $URL ? ";URL=$URL" : "";
+    <meta http-equiv="refresh" content="<% "$1$URL" %>" />
+% }
+
+<& JavascriptConfig &>
+
+% for my $cssfile ( @css_files ) {
+<link rel="stylesheet" href="<%RT->Config->Get('WebPath')%><% $cssfile %>" type="text/css" media="all" />
+% }
+
+% for (keys %{$LinkRel || {}}) {
+    <link rel="<% $_ %>" href="<% RT->Config->Get('WebPath') . $LinkRel->{$_} %>" />
+% }
+<link rel="shortcut icon" href="<%RT->Config->Get('WebImagesURL')%>favicon.png" type="image/png" />
+
+% if ( $RSSAutoDiscovery ) {
+    <link rel="alternate" href="<%$RSSAutoDiscovery%>" type="application/rss+xml" title="RSS RT Search" />
+% }
+
+% my $stylesheet_plugin = "/NoAuth/css/".$style."/InHeader";
+% if ($m->comp_exists($stylesheet_plugin) ) {
+<& $stylesheet_plugin &>
+% }
+
+<!-- Site CSS from theme editor -->
+<style type="text/css" media="all" id="sitecss">
+%# Header is used when there isn't a database (such as in the Installer) which means there is no
+%# RT::System object, nor are there attributes.
+% if (blessed(RT->System) and my $attr = RT->System->FirstAttribute('UserCSS')) {
+<% $attr->Content |n %>
+% }
+</style>
+% # Leave %ARGS for backward compatibility
+% $m->callback( %ARGS, CallbackName => 'Head', ARGSRef => \%ARGS );
+
+<& HeaderJavascript, focus => $Focus, onload => $onload, RichText => $RichText &>
+
+<& /Elements/Framekiller &>
+
+</head>
+  <body class="<% join( ' ',@{$ARGS{'BodyClass'}}) %>" <% $id && qq[id="comp-$id"] |n %>>
+
+% if ($ShowBar) {
+<& /Elements/Logo, %ARGS &>
+
+<div id="quickbar">
+  <& /Elements/PersonalQuickbar, %ARGS &>
+</div>
+% }
+% if ($ShowTitle) {
+<div id="header"><h1><% $Title %></h1></div>
+% }
+
+% $m->callback(
+%    CallbackName => 'BackToOriginalAccount',
+% );
+
+
+<%INIT>
+my $lang = 'en';
+$lang = $session{'CurrentUser'}->LanguageHandle->language_tag
+     if $session{'CurrentUser'}
+     && $session{'CurrentUser'}->LanguageHandle
+     && $session{'CurrentUser'}->LanguageHandle->language_tag;
+
+$r->headers_out->{'Pragma'} = 'no-cache';
+$r->headers_out->{'Cache-control'} = 'no-cache';
+
+my $id = $m->request_comp->path;
+$id =~ s|^/||g;
+$id =~ s|/|-|g;
+$id =~ s|\.html$||g;
+$id =~ s|index$||g
+    if $id ne 'index';
+$id =~ s|-$||g;
+
+my $style = $session{'CurrentUser'}
+          ? $session{'CurrentUser'}->Stylesheet
+          : RT->Config->Get('WebDefaultStylesheet');
+
+my @css_files;
+if ( RT->Config->Get('DevelMode') ) {
+    @css_files = map { "/static/css/$_" } "$style/main.css", RT->Config->Get('CSSFiles');
+}
+else {
+    my $key =
+      RT::Interface::Web::SquishedCSS( $style )->Key;
+    @css_files = "/NoAuth/css/$style/squished-$key.css";
+}
+
+# We use BodyClass in its $ARGS form so that callbacks have a chance to
+# massage it
+push @{$ARGS{'BodyClass'}}, lc $style;
+
+if (RT->Config->Get("UseSideBySideLayout", $session{'CurrentUser'})) {
+    push @{$ARGS{'BodyClass'}}, 'sidebyside';
+}
+
+</%INIT>
+
+<%ARGS>
+#$Focus => 'focus'
+$Focus => ''
+$Title =>  'RT'
+$Refresh => 0
+$ShowBar => 1
+$ShowTitle => 1
+$URL => undef
+$RSSAutoDiscovery => undef
+$onload => undef
+$LinkRel => undef
+$SkipDoctype => 0
+$RichText => 1
+$BodyClass => undef
+</%ARGS>

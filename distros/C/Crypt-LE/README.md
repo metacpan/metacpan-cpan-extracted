@@ -2,14 +2,23 @@
 
 This module provides the functionality necessary to use Let's Encrypt API and generate free SSL certificates for your domains. It can also be used to generate private RSA (_and from version 0.20 also ECC_) keys or Certificate Signing Requests without resorting to openssl command line. Crypt::LE is shipped with a self-sufficient client for obtaining SSL certificates - `le.pl`.
 
+**Both ACME v1 and ACME v2 protocols and wildcard certificate issuance are supported.**
+
 > The client + library package is codenamed ZeroSSL with the project homepage at https://ZeroSSL.com
 
 **Note:** If you do not need the automation and the flexibility this package offers, and just want to get a free SSL certificate without installing anything, you can do that online with **[Free SSL Certificate Wizard](https://zerossl.com/#certificate)** (works on PC and mobiles, supports different languages:  EN, DE, FR, ES, RU, IT).
 
+#### COMPATIBILITY
+
+- The code has been successfully tested on more than 500 combinations of OS and Perl versions. It should install and run fine on Linux, FreeBSD, NetBSD, etc. It also works on Mac OS X and Windows (tested with ActiveState and Strawberry Perl).
+
+- If you are a Windows user, you can download portable **[Win32/Win64 binaries](https://github.com/do-know/Crypt-LE/releases)** (they work even on Windows XP and require NO installation).
+
+- In addition, you can use the latest **[Docker Image](https://hub.docker.com/r/zerossl/client/)** (lightweight non-root container).
+
 Table of Contents
 -----------------
 
-  * [Compatibility](#compatibility)
   * [Requirements](#requirements)
   * [Installation](#installation)
       * [With CPANminus](#with-cpanminus)
@@ -17,6 +26,7 @@ Table of Contents
       * [Manual installation](#manual-installation)
       * [Windows installation](#windows-installation-with-strawberry-perl)
   * [Client](#client)
+  * [Wildcard certificates support](#wildcard-certificates-support)
   * [PFX/P12 (IIS) support](#pfxp12-iis-support)
   * [IDN (internationalized domain names) support](#idn-internationalized-domain-names-support)
   * [Renewals](#renewals)
@@ -25,14 +35,6 @@ Table of Contents
   * [Custom logging](#custom-logging)
   * [Custom exit codes](#custom-exit-codes)
   * [Support and Documentation](#support-and-documentation)
-
-### COMPATIBILITY
-
-- The code has been successfully tested on more than 500 combinations of OS and Perl versions. It should install and run fine on Linux, FreeBSD, NetBSD, etc. It also works on Mac OS X and Windows (tested with ActiveState and Strawberry Perl).
-
-- If you are a Windows user, you can download portable **[Win32/Win64 binaries](https://github.com/do-know/Crypt-LE/releases)** (they work even on Windows XP and require NO installation).
-
-- In addition, you can use the latest **[Docker Image](https://hub.docker.com/r/zerossl/client/)** (lightweight non-root container).
 
 ### REQUIREMENTS
 
@@ -92,15 +94,17 @@ Please note that with multiple webroots specified, the amount of those should ma
 
      le.pl ... --handle-as dns
 
+For more examples, logging configuration and all available parameters overview use `--help`:
+
+    le.pl --help
+
+### WILDCARD CERTIFICATES SUPPORT
+
 *_To issue a wildcard certificate, use DNS verification and specify the domain in the following format: *.some.domain._*
 
      le.pl ... --domains "*.some.domain" --handle-as dns --api 2
 
-Please note that at the moment wildcards are only supported by the v2.0 of the API, which might not be yet available live, but it is available in the testing environment.
-
-For more examples, logging configuration and all available parameters overview use `--help`:
-
-    le.pl --help
+Please note that at the moment wildcards are only supported by the v2.0 of the API and they can only be issued if DNS verification is used.
 
 ### PFX/P12 (IIS) SUPPORT
 

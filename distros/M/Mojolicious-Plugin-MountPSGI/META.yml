@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,10 +19,10 @@ no_index:
     - inc
     - t
 requires:
-  Mojolicious: '4.82'
+  Mojolicious: '7.70'
   Plack: '0'
 resources:
   bugtracker: https://github.com/marcusramberg/Mojolicious-Plugin-MountPSGI/issues
   repository: https://github.com/marcusramberg/Mojolicious-Plugin-MountPSGI
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

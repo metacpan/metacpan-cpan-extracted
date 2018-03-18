@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Pod::Coverage::TrustPod;
-$Pod::Coverage::TrustPod::VERSION = '0.100004';
+$Pod::Coverage::TrustPod::VERSION = '0.100005';
 use base 'Pod::Coverage::CountParents';
 # ABSTRACT: allow a module's pod to contain Pod::Coverage hints
 
@@ -94,7 +94,7 @@ sub __get_pod_trust {
 
   my @trusted;
   for my $hunk (@hunks) {
-    my $line = $hunk->{start_line} // '?';
+    my $line = defined $hunk->{start_line} ? $hunk->{start_link} : '?';
 
     my @patterns = grep { s/^\s+//; s/\s+$//; /\S/ }
                    split /\s/m, $hunk->{content};
@@ -148,7 +148,7 @@ Pod::Coverage::TrustPod - allow a module's pod to contain Pod::Coverage hints
 
 =head1 VERSION
 
-version 0.100004
+version 0.100005
 
 =head1 DESCRIPTION
 

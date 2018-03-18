@@ -14,7 +14,7 @@ use Moo::Role;
 use Carp qw(croak);
 use namespace::clean;
 
-our $VERSION='1.003';
+our $VERSION='1.005';
 
 # used as a place holder for extended format data
 our $CURRENT_CB;
@@ -189,6 +189,7 @@ has logger=>(
   is=>'rw',
   isa=>sub {
     my ($logger)=@_;
+    croak 'argument: logger must DOES(Log::Log4perl::Logger)' unless defined($logger);
     croak 'argument: logger must DOES(Log::Log4perl::Logger)' unless $logger->DOES('Log::Log4perl::Logger')
   },
   trigger=>1,

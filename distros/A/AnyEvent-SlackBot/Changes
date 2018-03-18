@@ -4,3 +4,6 @@
   -- Http posts now show up correctly in stats
 1.003
   -- set ssl loose for connecting to the internet
+1.004
+  -- Changed min version of Data::Dumper to 2.161
+  -- Added perl 5 licence

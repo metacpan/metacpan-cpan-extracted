@@ -1,20 +1,24 @@
-This should work anyplace File::Spec can split directories,
-which should be anywhere Perl runs these days.
 
-This may not do much good on Windows: the crazy 
-directory structures common to Windows systems 
-do not seem very amenable to using $FindBin::Bin 
-as the starting point for locating libraries.
+This should work anyplace File::Spec can split directories, which 
+should be anywhere Perl runs.
 
-Anyone with access to VMS warn me if this works
-at all -- through judicious use of virtual devices
-should make it useful.
+This may not do much good on Windows: the crazy directory structure 
+common to Windows systems do not seem very amenable to using 
+$FindBin::Bin as the starting point for locating libraries.
 
-The pod describes using the module in a few situations, 
-any suggestions appreciated. In particular, I toyed with
-several ways of passing in switches. The one used here 
-was chosen because it supports qw( ... ) syntax with 
-optional parameters (e.g., qw(export) and qw(export=foo)).
+Anyone with access to VMS warn me if this works at all -- through 
+judicious use of virtual devices should make it useful.
+
+The pod describes using the module in a few situations, any 
+suggestions appreciated. In particular, I toyed with several ways of 
+passing in switches. The one used here was chosen because it supports 
+qw( ... ) syntax with optional parameters (e.g., qw(export) and 
+qw(export=foo)).
+
+Versions are currently availble for Perl before 5.10 one after, 
+with the minimum supported version beingn 5.8. Any later versions
+of Perl supported will be in ./versions (see Module::FromPerlVer
+for description).
 
 Installation:
 

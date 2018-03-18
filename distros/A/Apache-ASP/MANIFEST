@@ -248,3 +248,5 @@ t/xmlsubs.t
 t/xmlsubs_aspargs.t
 t/xmlsubs_perlargs.t
 t/xmlsubsmatch.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

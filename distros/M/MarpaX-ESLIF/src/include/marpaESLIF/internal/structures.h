@@ -356,6 +356,8 @@ struct marpaESLIFRecognizer {
   short                        pristineb;           /* 1: pristine, i.e. can be reused, 0: have at least one thing that happened at the raw grammar level, modulo the eventual initial events */
   genericHash_t                _marpaESLIFRecognizerHash; /* Cache of recognizers ready for re-use - shared with all children (lexeme mode) */
   genericHash_t               *marpaESLIFRecognizerHashp;
+  genericStack_t               _marpaESLIFRecognizerStack; /* Cache of recognizers already malloced - not ready for reuse, just already allocated */
+  genericStack_t              *marpaESLIFRecognizerStackp; /* Cache of recognizers already malloced - not ready for reuse, just already allocated */
   marpaESLIF_stream_t          _marpaESLIF_stream;  /* A stream is always owned by one recognizer */
   marpaESLIF_stream_t         *marpaESLIF_streamp;  /* ... But the stream pointer can be shared with others */
   size_t                       previousMaxMatchedl;       /* Always computed */
@@ -379,6 +381,12 @@ struct marpaESLIF_lexeme_data {
   size_t  byteSizel;    /* Allocated size */
 };
 
+/* Alternative work in two mode: when there is parent recognizer and when this is a top-level recognizer:
+   - when there is a parent recognizer, we are by definition in computing a lexeme. Then we have the full
+     control. And we guarantee that the input will never crunch. At most it can move. Therefore in this
+     mode we can work with offsets.
+   - when this is a top-level recognizer, everything is allocated on the heap.
+*/
 struct marpaESLIF_alternative {
   marpaESLIF_symbol_t *symbolp;         /* Associated symbol */
   void                *valuep;          /* Associated value and length */

@@ -11,7 +11,7 @@ use Scalar::Util qw(looks_like_number);
 use Statistics::Data::Rank;
 use Statistics::Lite qw(count max mean min sum stddev variance);
 
-$Statistics::ANOVA::VERSION = '0.13';
+$Statistics::ANOVA::VERSION = '0.14';
 Readonly my $ALPHA_DEFAULT => .05;
 
 =head1 NAME
@@ -20,11 +20,11 @@ Statistics::ANOVA - Parametric and nonparametric 1-way analyses of variance for 
 
 =head1 VERSION
 
-This is documentation for B<Version 0.13> of Statistics::ANOVA.
+This is documentation for B<Version 0.14> of Statistics::ANOVA.
 
 =head1 SYNOPSIS
 
- use Statistics::ANOVA 0.13;
+ use Statistics::ANOVA 0.14;
  my $aov = Statistics::ANOVA->new();
 
  # Some data:
@@ -813,9 +813,8 @@ sub omega_squared {
     croak
 'Don\'t know how to do ANOVA effect-sizes. Perhaps you need to install Statistics::ANOVA::EffectSize.'
       if $@;
-    my $n = sum0( map { count( @{$_} ) } @{ $self->get_aoa() } );
     my $omg_sq = Statistics::ANOVA::EffectSize->omega_sq_partial_by_ss(
-        $self->anova(%args) );
+        $self->anova(%args), count => $self->grand_n() );
     $self->{'_stat'}->{'omega_sq'} = $omg_sq;
     return $omg_sq;
 }
@@ -1470,8 +1469,8 @@ L<Statistics::Table::F|Statistics::Table::F> Simply returns an I<F> value. Does 
 
 =head1 BUGS AND LIMITATIONS
 
-Please report any bugs or feature requests to C<bug-statistics-anova-0.13 at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Statistics-ANOVA-0.13>.  I will be notified, and then you'll
+Please report any bugs or feature requests to C<bug-statistics-anova-0.14 at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Statistics-ANOVA-0.14>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
@@ -1486,19 +1485,19 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Statistics-ANOVA-0.13>
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Statistics-ANOVA-0.14>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/Statistics-ANOVA-0.13>
+L<http://annocpan.org/dist/Statistics-ANOVA-0.14>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/Statistics-ANOVA-0.13>
+L<http://cpanratings.perl.org/d/Statistics-ANOVA-0.14>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Statistics-ANOVA-0.13/>
+L<http://search.cpan.org/dist/Statistics-ANOVA-0.14/>
 
 =back
 

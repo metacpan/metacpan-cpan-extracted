@@ -105,12 +105,10 @@ SKIP: {
     my $geocoder_us = Geo::Coder::Googlev3->new();
     my $location_us = safe_geocode { $geocoder_us->geocode(location => 'Toledo') };
     within $location_us->{geometry}->{location}->{lat}, $location_us->{geometry}->{location}->{lng},
-	41.663938, 41.663939, -83.55522, -83.55521;
+	41.652805, 41.663939, -83.55522, -83.537867;
 }
 
 { # bounds
-    local $TODO = "Started to fail (RT #122485)"; # XXX check!
-
     my $location_chicago = safe_geocode { $geocoder->geocode(location => 'Winnetka') };
     within $location_chicago->{geometry}->{location}->{lat}, $location_chicago->{geometry}->{location}->{lng},
 	42.1080830, 42.1080840, -87.735900, -87.735890, 'Winnetka without bounds';

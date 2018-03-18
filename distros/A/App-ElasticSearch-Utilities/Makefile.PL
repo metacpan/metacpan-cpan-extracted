@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010001;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "scripts/es-storage-data.pl"
   ],
   "LICENSE" => "bsd",
-  "MIN_PERL_VERSION" => "5.010001",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "App::ElasticSearch::Utilities",
   "PREREQ_PM" => {
     "CLI::Helpers" => 0,
@@ -44,7 +44,6 @@ my %WriteMakefileArgs = (
     "Hash::Merge::Simple" => 0,
     "IO::Socket::INET" => 0,
     "IPC::Run3" => 0,
-    "JSON" => 0,
     "JSON::MaybeXS" => 0,
     "LWP::UserAgent" => 0,
     "Module::Load" => 0,
@@ -57,10 +56,12 @@ my %WriteMakefileArgs = (
     "Pod::Usage" => 0,
     "Ref::Util" => 0,
     "Sub::Exporter" => 0,
-    "Sub::Quote" => 0,
     "Text::CSV_XS" => 0,
     "Time::HiRes" => 0,
     "Time::Local" => 0,
+    "Type::Library" => 0,
+    "Type::Tiny" => 0,
+    "Types::Standard" => 0,
     "URI" => 0,
     "URI::QueryParam" => 0,
     "YAML" => 0,
@@ -81,7 +82,7 @@ my %WriteMakefileArgs = (
     "Test::Perl::Critic" => 0,
     "blib" => "1.01"
   },
-  "VERSION" => "5.4",
+  "VERSION" => "5.5",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -107,7 +108,6 @@ my %FallbackPrereqs = (
   "IO::Socket::INET" => 0,
   "IPC::Open3" => 0,
   "IPC::Run3" => 0,
-  "JSON" => 0,
   "JSON::MaybeXS" => 0,
   "LWP::UserAgent" => 0,
   "Module::Load" => 0,
@@ -121,12 +121,14 @@ my %FallbackPrereqs = (
   "Pod::Usage" => 0,
   "Ref::Util" => 0,
   "Sub::Exporter" => 0,
-  "Sub::Quote" => 0,
   "Test::More" => 0,
   "Test::Perl::Critic" => 0,
   "Text::CSV_XS" => 0,
   "Time::HiRes" => 0,
   "Time::Local" => 0,
+  "Type::Library" => 0,
+  "Type::Tiny" => 0,
+  "Types::Standard" => 0,
   "URI" => 0,
   "URI::QueryParam" => 0,
   "YAML" => 0,

@@ -4,7 +4,7 @@
       "Paul \"LeoNerd\" Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -33,7 +33,9 @@
       "runtime" : {
          "requires" : {
             "Device::Chip::Adapter" : "0.02",
+            "Device::Chip::ProtocolBase::SPI" : "0",
             "Future" : "0",
+            "Test::HexString" : "0",
             "Test::More" : "0"
          }
       }
@@ -48,13 +50,14 @@
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
+         "type" : "git",
          "url" : "git://github.com/leonerd/perl-Device-FTDI"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_contributors" : [
       "Pavel Shaydo <zwon@cpan.org>",
       "Paul \"LeoNerd\" Evans <leonerd@leonerd.org.uk>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,5 +1,6 @@
 
 
+
 <html>
 <head>
 <title>Apache::ASP::Ssi</title>
@@ -18,13 +19,9 @@
 -->
 </style>
 
-
 </head>
 <body bgcolor=black link=#063678 alink=#ff5599 vlink=#993399
 marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
-
-
-
 
 <center>
 <table border=0 cellpadding=0 width=99% cellspacing=8>
@@ -235,7 +232,7 @@ marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
 		<a href=http://perl.apache.org><img src="powered_by_modperl.gif" width="88" height="31" alt="Powered by ModPerl and Apache" border="0"></a>
 		<br>
 		<a href=http://www.perl.com><img src="rectangle_power_perl.gif" width="88" height="31" alt="Powered by Perl" border="0"></a>
-		</center>
+
 
 </center>
 
@@ -295,19 +292,60 @@ header of a www page.
 called with an args parameter.  However, if you
 want all your includes to be compiled as subs and 
 dynamically executed at runtime, turn the DynamicIncludes
-config option on as documented above.
+config option on as documented above.</font>
+
+	<hr size=1>
+	<table width=100% border=0 cellpadding=1 cellspacing=3>
+	<tr>
+	<td valign=top><font face="lucida console" size=-1>
+	
+		<tr>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#Apache%3A%3ASSI%203398279a>Apache::SSI for mod_perl 1.3.x only</a>
+			</font>
+			</td>
+		
+			<td valign=top >
+			<font face="lucida console" size=-1>
+			<a href=#SSI%20with%20modfdac5dd6>SSI with mod_filter in Apache 2</a>
+			</font>
+			</td>
+							
+		</tr>
+			
+	</table>
+	<hr size=1>
+	<p>
+
+	<p>
+	<a name=Apache%3A%3ASSI%203398279a></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>Apache::SSI for mod_perl 1.3.x only</b></font>
 <font face="courier new" size=3><pre>
-</pre></font>That is not all!  SSI is full featured.  One of the 
-things missing above is the 
+</pre></font>One of the things missing above is the 
 <font face="courier new" size=3><pre>
  &lt;!--#include virtual=filename.cgi--&gt;
-</pre></font>tag.  This and many other SSI code extensions are available
+</pre></font>tag.  This and many other <a href=ssi.html><font size=-1 face=verdana><b>SSI</b></font></a> code extensions are available
 by filtering Apache::ASP output through Apache::SSI via
-the Apache::Filter and the Filter config options.  For
-more information on how to wire Apache::ASP and Apache::SSI
+the Apache::Filter and the Filter config options, available in <a href=http://perl.apache.org><font size=-1 face=verdana><b>mod_perl</b></font></a> 1.3.x / Apache 1.3.x.
+Unfortunately this functionality is not available with mod_perl 2 / Apache 2.
+<font face="courier new" size=3><pre>
+</pre></font>For more information on how to wire Apache::ASP and Apache::SSI
 together, please see the Filter config option documented
 above.  Also please see Apache::SSI for further information
 on the capabilities it offers.</font>
+	
+	<p>
+	<a name=SSI%20with%20modfdac5dd6></a>
+	<font face=verdana><font class=title size=+0 color=#555555><b>SSI with mod_filter in Apache 2</b></font>
+<font face="courier new" size=3><pre>
+</pre></font>Apache 2 offers chained filters.  It may be possible to chain filters to
+Apache::ASP output through mod_filter for <a href=ssi.html><font size=-1 face=verdana><b>SSI</b></font></a> processing:
+<font face="courier new" size=3><pre>
+  <a href=http://httpd.apache.org/docs/2.1/mod/mod_filter.html>http://httpd.apache.org/docs/2.1/mod/mod_filter.html</a>
+</pre></font>
+	
 
 </font>
 </td>
@@ -316,14 +354,6 @@ on the capabilities it offers.</font>
 &nbsp;
 </td>
 
-</tr>
-<tr bgcolor=#063678>
-	<td colspan=3 align=center width=80%>
-	<font face=verdana color=white size=-1>
-	Copyright &copy; 1998-2008,
-	<a href=http://www.chamas.com><font color=white>Chamas Enterprises Inc.</font></a>
-	</font>
-	</td>
 </tr>
 </table>
 

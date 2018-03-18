@@ -1,0 +1,18 @@
+=encoding UTF-8
+
+=head2 Let C<[=inc::Foo]> work in Perl v5.26+.
+
+Starting from Perl v26.0, C<.> is not included into C<@INC> anymore. This breaks C<Dist::Zilla>
+syntax for plugins which are located in the distribution source tree, e. g.:
+
+    [=inc::Foo]
+
+Being run with Perl v5.26+, C<dzil> complains:
+
+    Required plugin inc::Foo isn't installed.
+
+C<Dist::Zilla::Plugin::lib> was created specially for workarounding this issue. (I said
+"workarounding" not "solving" because C<Dist::Zilla::Plugin::lib> does not help C<dzil authordeps
+--missing> to work.)
+
+The same effect can be achieved with C<Hook::Init> one-liner.

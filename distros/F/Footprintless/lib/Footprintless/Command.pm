@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Command;
-$Footprintless::Command::VERSION = '1.27';
+$Footprintless::Command::VERSION = '1.28';
 # ABSTRACT: A factory for building common commands
 # PODNAME: Footprintless::Command
 
@@ -374,7 +374,7 @@ sub wrap {
 }
 
 package Footprintless::Command::CommandOptions;
-$Footprintless::Command::CommandOptions::VERSION = '1.27';
+$Footprintless::Command::CommandOptions::VERSION = '1.28';
 sub new {
     return bless( {}, shift )->_init(@_);
 }
@@ -451,7 +451,7 @@ Footprintless::Command - A factory for building common commands
 
 =head1 VERSION
 
-version 1.27
+version 1.28
 
 =head1 SYNOPSIS
 

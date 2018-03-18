@@ -1,5 +1,5 @@
 package Kevin::Command::kevin::worker;
-$Kevin::Command::kevin::worker::VERSION = '0.5.5';
+$Kevin::Command::kevin::worker::VERSION = '0.6.0';
 # ABSTRACT: Alternative Minion worker command
 use Mojo::Base 'Mojolicious::Command';
 
@@ -23,6 +23,7 @@ sub run {
   my $defaults = {};
   getopt \@args,
     'C|command-interval=i'   => \$defaults->{command_interval},
+    'D|dequeue-timeout=i'    => \$defaults->{dequeue_timeout},
     'f|fast-start'           => \$defaults->{fast_start},
     'I|heartbeat-interval=i' => \$defaults->{heartbeat_interval},
     'j|jobs=i'               => \$defaults->{jobs},
@@ -51,6 +52,8 @@ sub run {
 #pod   Options:
 #pod     -C, --command-interval <seconds>     Worker remote control command interval,
 #pod                                          defaults to 10
+#pod     -D, dequeue-timeout <seconds>        Maximum amount of time to wait for
+#pod                                          jobs, defaults 5
 #pod     -f, --fast-start                     Start processing jobs as fast as
 #pod                                          possible and skip repairing on startup
 #pod     -h, --help                           Show this summary of available options
@@ -193,7 +196,7 @@ Kevin::Command::kevin::worker - Alternative Minion worker command
 
 =head1 VERSION
 
-version 0.5.5
+version 0.6.0
 
 =head1 SYNOPSIS
 
@@ -207,6 +210,8 @@ version 0.5.5
   Options:
     -C, --command-interval <seconds>     Worker remote control command interval,
                                          defaults to 10
+    -D, dequeue-timeout <seconds>        Maximum amount of time to wait for
+                                         jobs, defaults 5
     -f, --fast-start                     Start processing jobs as fast as
                                          possible and skip repairing on startup
     -h, --help                           Show this summary of available options

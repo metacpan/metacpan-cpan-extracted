@@ -7,9 +7,11 @@ use utf8;
 use open qw(:std :utf8);
 use LWP::UserAgent;
 use HTTP::Request;
+use JSON::XS;
+use URI::Escape;
 use Carp 'croak';
  
-our $VERSION    = '0.01';
+our $VERSION    = '0.02';
 
 sub new {
     my ($class) = @_;
@@ -24,8 +26,8 @@ sub new {
 
 sub login {
     my ($self, %opt)   = @_;
-    $self->{login}     = $opt{-login}       || croak "You must specify -login opt for 'login' method";
-    $self->{password}  = $opt{-password}    || croak "You must specify -password opt for 'login' method";
+    $self->{login}     = $opt{-login}       || $self->{login}       || croak "You must specify -login opt for 'login' method";
+    $self->{password}  = $opt{-password}    || $self->{password}    || croak "You must specify -password opt for 'login' method";
     my $ua = $self->{ua};
 
     my %param;
@@ -98,7 +100,7 @@ sub __parseInfo {
                 'total_space'       => '',
                 'file_size_limit'   => '',
             );
-    if ($$content =~ /"space":{.+?"used":(.+?),"total":(.+?)}/) {
+    if ($$content =~ /"space":[{].+?"used":(.+?),"total":(.+?)[}]/) {
         $info{used_space} = $1 * 1024 * 1024;   # To bytes from Mbytes
         $info{total_space} = $2 * 1024 * 1024;  # To bytes from Mbytes
     }
@@ -110,10 +112,19 @@ sub __parseInfo {
 
 sub __isLogin {
     my $self = shift;
-    if (not $self->{authToken}) {
-        croak "Not logined";
+    if ($self->{authToken}) {
+        my $ua = $self->{ua};
+        my $res = $ua->get('https://auth.mail.ru/cgi-bin/auth?mac=1&Login=' . uri_escape($self->{login}));
+        my $code = $res->code;
+        if ($code ne '200') {
+            croak "Can't get status about login";
+        }
+        my $json_res = decode_json($res->content);
+        $json_res->{status} eq 'ok' and return 1;
+        $self->login() and return 1;
     }
-    return 1;
+
+    croak "Not logined";
 }
 
 1;
@@ -129,7 +140,7 @@ __END__
 B<Mailru::Cloud::Auth> - authorize on site https://cloud.mail.ru and return csrf token
 
 =head1 VERSION
-    version 0.01
+    version 0.02
 
 =head1 SYNOPSYS
     
@@ -166,7 +177,7 @@ Pavel Andryushin <vrag867@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Pavel Andryushin.
+This software is copyright (c) 2018 by Pavel Andryushin.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

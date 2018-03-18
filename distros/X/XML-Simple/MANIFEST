@@ -22,6 +22,7 @@ t/8_Namespaces.t
 t/9_Strict.t
 t/A_XMLParser.t
 t/B_Hooks.t
+t/C_External_Entities.t
 t/author-pod-syntax.t
 t/desertnet.src
 t/lib/TagsToUpper.pm

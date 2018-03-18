@@ -19,12 +19,13 @@ do { my $x = {
                                       'Dancer::Cookies' => '0',
                                       'Dancer::Session::Abstract' => '0',
                                       'MIME::Base64' => '0',
+                                      'PerlX::Maybe' => '0',
                                       'Session::Storage::Secure' => '0.010',
                                       'Storable' => '0',
                                       'String::CRC32' => '0',
                                       'Time::Duration::Parse' => '0',
-                                      'base' => '0',
-                                      'perl' => '5.008',
+                                      'parent' => '0',
+                                      'perl' => 'v5.10.0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

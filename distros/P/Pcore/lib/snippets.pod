@@ -1,0 +1,77 @@
+=pod
+
+=encoding utf8
+
+=head1 CSV
+
+=head1 read CSV
+
+=head2 write CSV
+
+    use Text::CSV_XS qw[];
+
+    Text::CSV_XS::csv(
+        in          => Array[HashRef],
+        out         => 'filename.csv',
+        headers     => [qw[field1 field2 ...]],
+        binary      => 1,
+        encoding    => 'UTF-8',
+        decode_utf8 => 0,
+        eol         => $LF,
+    );
+
+=head1 PostgreSQL
+
+=head2 uuid
+
+L<https://www.postgresql.org/docs/current/static/uuid-ossp.html>
+
+    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+    # use UUID v1 - based on MAC addr.
+    "id" UUID PRIMARY KEY NOT NULL DEFAULT uuid_generate_v1()
+
+    CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+    # use UUID v5 - random
+    "id" UUID PRIMARY KEY NOT NULL DEFAULT gen_random_uuid()
+
+=head1 MySQL
+
+=head2 connect
+
+    my $dbh = DBI->connect(
+        qq[DBI:mysql:database=$self->{cfg}->{MYSQL}->{db};host=$self->{cfg}->{MYSQL}->{host};port=$self->{cfg}->{MYSQL}->{port}],
+        $self->{cfg}->{MYSQL}->{username},
+        $self->{cfg}->{MYSQL}->{password},
+        {   RaiseError             => 1,
+            PrintWarn              => 0,
+            ShowErrorStatement     => 1,
+            mysql_auto_reconnect   => 1,
+            mysql_enable_utf8mb4   => 1,
+            mysql_multi_statements => 1,
+        }
+    );
+
+=head2 create table
+
+    CREATE TABLE IF NOT EXISTS `table` (
+        `id` VARCHAR(20) NOT NULL,
+        PRIMARY KEY (`player_id`)
+    ) DEFAULT CHARSET=utf8mb4;
+
+=head1 SQLite
+
+=head2 field with the current unix timestamp by default
+
+    "unix_timestamp" INTEGER NOT NULL DEFAULT(CAST(STRFTIME('%s', 'now') AS INT))
+
+=head1 Other
+
+=head2 perl tail recursion
+
+    @_ = ($arg1, $arg2, ...);
+
+    goto &method;
+
+=cut

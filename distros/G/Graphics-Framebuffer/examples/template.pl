@@ -25,11 +25,13 @@ our ($PFB,$DFB); # The framebuffer objects MUST be as global as possible
 unless ($double_buffer) {
     $DFB = Graphics::Framebuffer->new(
         'FB_DEVICE' => $device,
+        'SPLASH' => 0,
     );
 } else { # This is best used in this way for 16 bit mode only
     ($PFB,$DFB) = Graphics::Framebuffer->new(
         'FB_DEVICE'     => $device,
-        'DOUBLE_BUFFER' => TRUE.
+        'DOUBLE_BUFFER' => TRUE,
+        'SPLASH' => 0,
     );
 }
 

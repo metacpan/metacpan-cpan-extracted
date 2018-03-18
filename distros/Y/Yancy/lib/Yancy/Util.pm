@@ -1,10 +1,10 @@
 package Yancy::Util;
-our $VERSION = '0.022';
+our $VERSION = '1.001';
 # ABSTRACT: Utilities for Yancy
 
 #pod =head1 SYNOPSIS
 #pod
-#pod     use Yancy::Util qw( backend );
+#pod     use Yancy::Util qw( load_backend );
 #pod     my $be = load_backend( 'test://localhost', $collections );
 #pod
 #pod =head1 DESCRIPTION
@@ -73,11 +73,11 @@ Yancy::Util - Utilities for Yancy
 
 =head1 VERSION
 
-version 0.022
+version 1.001
 
 =head1 SYNOPSIS
 
-    use Yancy::Util qw( backend );
+    use Yancy::Util qw( load_backend );
     my $be = load_backend( 'test://localhost', $collections );
 
 =head1 DESCRIPTION

@@ -1,13 +1,15 @@
-lib/HTTP/MultiGet/Role.pm
-lib/HTTP/MultiGet.pm
-lib/AnyEvent/HTTP/MultiGet.pm
-t/AnyEvent-HTTP-MultiGet.t
-t/HTTP-MultiGet-Role.t
-t/HTTP-MultiGet.t
-t/HTTP-MultiGet-stream.t
 MANIFEST
 Makefile.PL
 README
+lib/AnyEvent/HTTP/MultiGet.pm
+lib/HTTP/MultiGet/Role.pm
+lib/HTTP/MultiGet.pm
+t/AnyEvent-HTTP-MultiGet.t
+t/HTTP-MultiGet-stream.t
+t/HTTP-MultiGet-fake_jobs.t
+t/HTTP-MultiGet-Role-Parse.t
+t/HTTP-MultiGet.t
+t/HTTP-MultiGet-Role.t
 Changes
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,13 @@
 Changes for Data::Turtle:
 
+0.0106 2018-03-18
+    - Improve documentation.
+    - Follow perlcritic and fix my conditional returns.
+    - Improve eg/lindenmayer-gd a bit.
+
+0.0105 2018-03-18
+    - Add familiar Lindenmayer systems to the example script.
+
 0.0104 2015-12-16
     - (Attempt to) Fix a sometimes failing test.
     - Improve documentation.

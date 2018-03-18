@@ -12,9 +12,9 @@ docs/pics/bb_hardware_test_platform.jpg
 docs/schematic/adc_basic_example_schem.jpg
 docs/schematic/dpot_adc_schem.jpg
 docs/sketch/arduino.ino
-FAQ-Tutorial.pod
 lib/RPi/WiringPi.pm
 lib/RPi/WiringPi/Core.pm
+lib/RPi/WiringPi/FAQ.pod
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -42,6 +42,7 @@ t/75-serial.t
 t/80-mode_state_all_pins.t
 t/85-pwm_hw_mods.t
 t/90-servo.t
+t/95-pod_linkcheck.t
 t/manifest.t
 t/pod-coverage.t
 t/README

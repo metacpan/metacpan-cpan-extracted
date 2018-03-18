@@ -5,7 +5,7 @@ use warnings;
 use Test2::Plugin::FauxHomeDir;
 
 # ABSTRACT: Private package for Test::PlugAUth::Plugin::* modules
-our $VERSION = '0.38'; # VERSION
+our $VERSION = '0.39'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ Test::PlugAuth::Plugin - Private package for Test::PlugAUth::Plugin::* modules
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 SEE ALSO
 

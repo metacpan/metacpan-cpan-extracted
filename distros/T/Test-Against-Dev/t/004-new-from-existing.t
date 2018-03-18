@@ -20,7 +20,6 @@ my $perl_version = 'perl-5.27.4';
 
 my $cwd = cwd();
 my $tdir = tempdir(CLEANUP => 1);
-#my $tdir = '/home/jkeenan/var/tad';
 
 {
     note("Tests of error conditions:  defects in call syntax");
@@ -197,7 +196,6 @@ note("Set PERL_AUTHOR_TESTING_INSTALLED_PERL to run additional tests against ins
     unless $ENV{PERL_AUTHOR_TESTING_INSTALLED_PERL};
 
 SKIP: {
-    #skip 'Test assumes installed perl and cpanm', 8
     skip 'Test assumes installed perl and cpanm', 10
         unless $ENV{PERL_AUTHOR_TESTING_INSTALLED_PERL};
 
@@ -345,9 +343,20 @@ SKIP: {
             "analyze_json_logs(): Got expected error message: absence of hash ref");
     }
 
+    {
+        local $@;
+        eval { $rv = $self->analyze_json_logs( { run => 1, verbose => 1, sep_char => "\t" } ); };
+        like($@, qr/analyze_json_logs: Currently only pipe \('\|'\) and comma \(','\) are supported as delimiter characters/,
+            "analyze_json_logs(): Got expected error message: unsupported delimiter");
+    }
+
     my $fpsvfile = $self->analyze_json_logs( { run => 1, verbose => 1 } );
     ok($fpsvfile, "analyze_json_logs() returned true value");
     ok(-f $fpsvfile, "Located '$fpsvfile'");
+
+    my $fcsvfile = $self->analyze_json_logs( { run => 1, verbose => 1 , sep_char => ',' } );
+    ok($fcsvfile, "analyze_json_logs() returned true value");
+    ok(-f $fcsvfile, "Located '$fcsvfile'");
 }
 
 # Try to ensure that we get back to where we started so that tempdirs can be

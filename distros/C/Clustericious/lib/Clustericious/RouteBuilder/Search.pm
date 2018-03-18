@@ -5,7 +5,7 @@ use warnings;
 use Clustericious::Log;
 
 # ABSTRACT: build routes for searching for objects
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.29'; # VERSION
 
 
 use Sub::Exporter -setup => {
@@ -92,7 +92,7 @@ Clustericious::RouteBuilder::Search - build routes for searching for objects
 
 =head1 VERSION
 
-version 1.27
+version 1.29
 
 =head1 SYNOPSIS
 

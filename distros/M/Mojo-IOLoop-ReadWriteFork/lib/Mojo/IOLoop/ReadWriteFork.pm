@@ -20,7 +20,7 @@ sub ESC {
   $_;
 }
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 our @SAFE_SIG = grep {
   not /^(
@@ -191,6 +191,7 @@ sub _cleanup {
   my $self = shift;
   my $reactor = $self->{ioloop}{reactor} or return;
 
+  delete $self->{stdin_write};
   $reactor->remove(delete $self->{stdout_read}) if $self->{stdout_read};
   $reactor->remove(delete $self->{delay})       if $self->{delay};
 }
@@ -214,8 +215,8 @@ sub _sigchld {
   warn "[$_[0]] Child is dead ($?/$!) $exit_value/$signal\n" if DEBUG;
   $self or return;    # maybe $self has already gone out of scope
   $self->_read;       # flush the rest
-  $self->emit(close => $exit_value, $signal);
   $self->_cleanup;
+  $self->emit(close => $exit_value, $signal);
 }
 
 sub _watch_pid {
@@ -283,7 +284,7 @@ Mojo::IOLoop::ReadWriteFork - Fork a process and read/write from it
 
 =head1 VERSION
 
-0.35
+0.36
 
 =head1 SYNOPSIS
 

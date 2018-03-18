@@ -1,6 +1,6 @@
 package WebService::Wikimapia::GlobalAdmin;
 
-$WebService::Wikimapia::GlobalAdmin::VERSION   = '0.12';
+$WebService::Wikimapia::GlobalAdmin::VERSION   = '0.13';
 $WebService::Wikimapia::GlobalAdmin::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WebService::Wikimapia::GlobalAdmin - Placeholder for 'gadm' of L<WebService::Wik
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 

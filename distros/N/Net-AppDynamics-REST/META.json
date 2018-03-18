@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -38,12 +38,12 @@
             "AnyEvent::Loop" : "0",
             "B" : "1.68",
             "Carp" : "1.42",
-            "Data::Dumper" : "2.167",
+            "Data::Dumper" : "2.161",
             "Data::Queue" : "1.0001",
             "Data::Result" : "1.0001",
             "Exporter" : "5.72",
             "HTTP::Headers" : "6.13",
-            "HTTP::MultiGet" : "1.005",
+            "HTTP::MultiGet" : "1.010",
             "HTTP::Request" : "6.13",
             "HTTP::Response" : "6.13",
             "IO::Scalar" : "2.111",
@@ -65,6 +65,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.001",
+   "version" : "1.004",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

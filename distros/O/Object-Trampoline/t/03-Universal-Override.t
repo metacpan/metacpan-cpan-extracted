@@ -8,26 +8,41 @@ use Scalar::Util    qw( blessed );
 
 my $expect = 'Foo::Bar';
 
-while( my( $name, $val ) = each %{ $::{ 'UNIVERSAL::' } } )
+for my $name ( keys %{ $::{ 'UNIVERSAL::' } } )
 {
     state $sanity   = $Object::Trampoline::Bounce::is_override;
 
-    if( $sanity->( $name, $val ) )
-    {
-        note "Checking method: '$name'";
-
-        my $t1  = Object::Trampoline->bim( $expect => qw( a b ) );
-
-        eval { $t1->$name( $expect ) };
-
-        my $found   = blessed $t1;
-
-        ok $found eq $expect,  "Object is '$found' ($expect)";
-    }
-    else
+    $sanity->( $name )
+    or do
     {
         note "Skipping non-method: '$name'.";
-    }
+        next;
+        
+    };
+
+    note "Checking method: '$name'";
+
+    my $t1  = Object::Trampoline->bim( $expect => qw( a b ) );
+
+    can_ok $t1, $name;
+
+    note "Prior state:\n", explain $t1;
+
+    eval
+    {
+        # no telling what the method takes
+        # as arguments, all we care about 
+        # is that $t1 is replaced with a 
+        # new object after calling it.
+
+        $t1->$name;
+    };
+
+    note "After state:\n", explain $t1;
+
+    my $found   = blessed $t1;
+
+    ok $found eq $expect,  "Object is '$found' ($expect)";
 }
 
 done_testing;

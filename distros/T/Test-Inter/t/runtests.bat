@@ -7,3 +7,4 @@ perl -I../lib tests.t 1
 perl -I../lib use_ok.1.t 1
 perl -I../lib use_ok.2.t 1
 perl -I../lib use_ok.3.t 1
+perl -I../lib version.t 1

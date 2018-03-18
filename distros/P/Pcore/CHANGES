@@ -1,3 +1,40 @@
+v0.57.3 2018-03-18T06:33:57Z
+ - typo
+
+v0.57.2 2018-03-18T06:30:14Z
+ - api created_ts -> created
+
+v0.57.1 2018-03-15T11:49:11Z
+ - POD
+ - app ctoken api removed
+
+v0.57.0 2018-03-14T11:41:34Z
+ - POD updated
+ - new app api architecture
+
+v0.56.9 2018-03-13T19:00:16Z
+ - ca_file.pem updated
+
+v0.56.8 2018-03-13T18:45:26Z
+ - POD updated
+ - $SQL_BLOB removed
+ - SQLite types moved
+ - DBI query builder - support for specify data type added
+
+v0.56.7 2018-03-12T09:19:15Z
+ - pcore docker from command updated
+ - src use json::xs for .json
+ - pcore pause report added
+ - api pgsql backend
+ - pgsql app api
+ - event POD added
+ - syntax
+ - RPC POD added
+ - useless AE::postpone removed
+ - eval verify argon2 hash
+ - snippets added
+ - typo in POD
+
 v0.56.6 2018-02-20T13:05:27Z
  - code formatted
 

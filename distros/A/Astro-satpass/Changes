@@ -1,3 +1,10 @@
+0.091		2018-03-10	T. R. Wyant
+    Kelso marks Iridium 94 as partly operational. Updated canned status
+    to call it spare.
+
+    Use manifest constants for reference types. That is, instead of
+    'ARRAY', use ARRAY_REF, defined using 'use constant', and so on.
+
 0.090		2018-02-22	T. R. Wyant
    Update canned Iridium status table for decay of Iridiums 3, 43 and
    49, and making 3, 23, and 46 spare per Kelso.

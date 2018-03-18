@@ -9,7 +9,7 @@ use File::ReadBackwards;
 use Clustericious;
 
 # ABSTRACT: A Log::Log4perl wrapper for use with Clustericious.
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.29'; # VERSION
 
 
 sub import {
@@ -110,7 +110,7 @@ Clustericious::Log - A Log::Log4perl wrapper for use with Clustericious.
 
 =head1 VERSION
 
-version 1.27
+version 1.29
 
 =head1 SYNOPSIS
 

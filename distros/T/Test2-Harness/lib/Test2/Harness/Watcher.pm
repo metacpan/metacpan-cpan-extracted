@@ -2,11 +2,13 @@ package Test2::Harness::Watcher;
 use strict;
 use warnings;
 
-our $VERSION = '0.001057';
+our $VERSION = '0.001061';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
 use List::Util qw/first max/;
+
+use Test2::Harness::Util::UUID qw/gen_uuid/;
 
 use Test2::Harness::Util qw/hub_truth/;
 
@@ -136,7 +138,6 @@ sub _process {
             my $st = delete $sts->{$n};
             my $se = $st->{event} || $event;
 
-
             my $fd = $se->{facet_data};
             delete $fd->{harness_watcher}->{no_render};
             $fd->{parent}->{hid} ||= $n;
@@ -145,12 +146,18 @@ sub _process {
             $fd->{harness}->{closed_by_eid} = $event->{event_id};
 
             my $pn = $n - 1;
-            if ($pn > $self->{+NESTED}) {
-                push @{$sts->{$pn}->{children}} => $fd;
+
+            if ($st->{event}) {
+                if ($pn > $self->{+NESTED}) {
+                    push @{$sts->{$pn}->{children}} => $fd;
+                }
+                elsif ($pn == $self->{+NESTED}) {
+                    $self->subtest_process($fd, $se);
+                    push @out => $se;
+                }
             }
-            elsif ($pn == $self->{+NESTED}) {
-                $self->subtest_process($fd, $se);
-                push @out => $se;
+            else {
+                push @out => $se if $self->{+NESTED} && $pn == $self->{+NESTED};
             }
         }
     }
@@ -183,7 +190,7 @@ sub subtest_process {
         for my $sf (@{$f->{parent}->{children}}) {
             $sf->{harness}->{job_id} ||= $f->{harness}->{job_id};
             $sf->{harness}->{run_id} ||= $f->{harness}->{run_id};
-            $sf->{harness}->{event_id} ||= $f->{harness}->{event_id} . $id++;
+            $sf->{harness}->{event_id} ||= $sf->{about}->{uuid} ||= gen_uuid();
             $subwatcher->subtest_process($sf);
         }
 

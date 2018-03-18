@@ -1,6 +1,6 @@
 package WebService::Wikimapia::Object;
 
-$WebService::Wikimapia::Object::VERSION   = '0.12';
+$WebService::Wikimapia::Object::VERSION   = '0.13';
 $WebService::Wikimapia::Object::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WebService::Wikimapia::Object - Placeholder for 'object' of search result of L<W
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 

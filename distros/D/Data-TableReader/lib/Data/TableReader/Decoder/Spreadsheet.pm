@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder::Spreadsheet;
-$Data::TableReader::Decoder::Spreadsheet::VERSION = '0.006';
+$Data::TableReader::Decoder::Spreadsheet::VERSION = '0.007';
 use Moo 2;
 use Carp 'croak';
 use IO::Handle;
@@ -138,7 +138,7 @@ Data::TableReader::Decoder::Spreadsheet - Base class for implementing spreadshee
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 DESCRIPTION
 

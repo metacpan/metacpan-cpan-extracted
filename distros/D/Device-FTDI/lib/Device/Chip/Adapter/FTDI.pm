@@ -1,13 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2018 -- leonerd@leonerd.org.uk
 
 package Device::Chip::Adapter::FTDI;
 
 use strict;
 use warnings;
 use base qw( Device::Chip::Adapter );
+
+our $VERSION = '0.14';
 
 use Device::FTDI qw( PID_FT232H );
 
@@ -227,7 +229,7 @@ sub tris_gpios
 
 package
     Device::Chip::Adapter::FTDI::_SPI;
-use base qw( Device::Chip::Adapter::FTDI::_base );
+use base qw( Device::Chip::Adapter::FTDI::_base Device::Chip::ProtocolBase::SPI );
 
 use Carp;
 
@@ -246,6 +248,7 @@ sub configure
 
     my $mode        = delete $args{mode};
     my $max_bitrate = delete $args{max_bitrate};
+    my $wordsize    = delete $args{wordsize};
 
     croak "Unrecognised configuration options: " . join( ", ", keys %args )
         if %args;
@@ -253,6 +256,7 @@ sub configure
     my $spi = $self->{mpsse};
     $spi->set_spi_mode( $mode )          if defined $mode;
     $spi->set_clock_rate( $max_bitrate ) if defined $max_bitrate;
+    $spi->set_wordsize( $wordsize )      if defined $wordsize;
 
     Future->done;
 }
@@ -263,8 +267,8 @@ sub readwrite { my $self = shift; $self->{mpsse}->readwrite( @_ ) }
 sub assert_ss  { my $self = shift; $self->{mpsse}->assert_ss }
 sub release_ss { my $self = shift; $self->{mpsse}->release_ss }
 
-sub write_no_ss     { my $self = shift; $self->{mpsse}->write_bytes( @_ ) }
-sub readwrite_no_ss { my $self = shift; $self->{mpsse}->readwrite_bytes( @_ ) }
+sub write_no_ss     { my $self = shift; $self->{mpsse}->write( $_[0], "no_ss" ) }
+sub readwrite_no_ss { my $self = shift; $self->{mpsse}->readwrite( $_[0], "no_ss" ) }
 
 package
     Device::Chip::Adapter::FTDI::_I2C;

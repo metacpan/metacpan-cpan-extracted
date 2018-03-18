@@ -223,6 +223,74 @@ Pcore::RPC
 
 =head1 SYNOPSIS
 
+    # client
+    my $RPC;
+
+    P->pm->run_rpc(
+        'RPC',
+        workers   => 1,
+        token     => undef,
+        buildargs => {},
+        on_ready  => sub ($rpc) {
+            $RPC = $rpc;
+
+            $RPC->connect_rpc(
+                token          => undef,
+                listen_events  => ['APP.EV1'],
+                forward_events => ['APP.EV2'],
+                on_connect     => sub ($rpc) {
+                    $rpc->rpc_call(
+                        'test', 123,
+                        sub {
+                            say dump \@_;
+
+                            # terminate RPC
+                            P->fire_event('RPC.TERM');
+
+                            return;
+                        }
+                    );
+
+                    return;
+                }
+            );
+
+            return;
+        },
+    );
+
+    # server
+    package RPC;
+
+    use Pcore -rpc, -const, -class;
+
+    const our $RPC_LISTEN_EVENTS  => ['APP.EV2'];
+    const our $RPC_FORWARD_EVENTS => ['APP.EV1'];
+
+    sub BUILD ( $self, $args ) {
+        return;
+    }
+
+    sub RPC_ON_CONNECT ( $self, $ws ) {
+        return;
+    }
+
+    sub RPC_ON_DISCONNECT ( $self, $ws, $status ) {
+        return;
+    }
+
+    sub RPC_ON_TERM ($self) {
+        return;
+    }
+
+    sub API_test ( $self, $req, $args ) {
+        $req->( 200, time );
+
+        return;
+    }
+
+    1;
+
 =head1 DESCRIPTION
 
 =head1 ATTRIBUTES

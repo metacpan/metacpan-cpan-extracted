@@ -14,8 +14,9 @@ use Carp;
 use English qw/ -no_match_vars /;
 use File::chdir;
 use Getopt::Alt;
+use Path::Tiny;
 
-our $VERSION = version->new('0.6.6');
+our $VERSION = version->new('0.6.7');
 
 requires 'repos';
 requires 'verbose';
@@ -23,6 +24,7 @@ requires 'verbose';
 my $opt = Getopt::Alt->new(
     { help => __PACKAGE__, },
     [
+        'file|f=s',
         'quote|q!',
         'interactive|i',
     ]
@@ -30,6 +32,10 @@ my $opt = Getopt::Alt->new(
 
 sub sh_start {
     $opt->process;
+
+    if ( $opt->opt->file && -x $opt->opt->file ) {
+        $opt->opt->file( '' . path($opt->opt->file)->absolute);
+    }
 
     return;
 }
@@ -42,9 +48,9 @@ sub sh {
 
     local $CWD = $name;
     my $cmd
-        = $opt->opt->quote
-        ? join ' ', map { $self->shell_quote } @ARGV
-        : join ' ', @ARGV;
+        = $opt->opt->file  ? $opt->opt->file
+        : $opt->opt->quote ? join ' ', map { $self->shell_quote } @ARGV
+        :                    join ' ', @ARGV;
 
     local $ENV{GROUP_GIT_NAME} = $name;
 
@@ -72,7 +78,7 @@ Group::Git::Cmd::Sh - Runs shell script in each git project
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Cmd::Sh version 0.6.6.
+This documentation refers to Group::Git::Cmd::Sh version 0.6.7.
 
 =head1 SYNOPSIS
 

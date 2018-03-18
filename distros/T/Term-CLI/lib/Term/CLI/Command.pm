@@ -1,4 +1,4 @@
-#===============================================================================
+#=============================================================================
 #
 #       Module:  Term::CLI::Command
 #
@@ -16,16 +16,16 @@
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
-#===============================================================================
+#=============================================================================
 
 use 5.014_001;
 
-package Term::CLI::Command  0.04004 {
+package Term::CLI::Command  0.051002 {
 
-use Modern::Perl;
-use List::Util qw( first min );
-use Getopt::Long qw( GetOptionsFromArray );
-use Types::Standard qw(
+use Modern::Perl 1.20140107;
+use List::Util 1.38 qw( first min );
+use Getopt::Long 2.42 qw( GetOptionsFromArray );
+use Types::Standard 1.000005 qw(
     ArrayRef
     CodeRef
     InstanceOf
@@ -35,8 +35,8 @@ use Types::Standard qw(
 
 use Term::CLI::L10N;
 
-use Moo;
-use namespace::clean;
+use Moo 1.000001;
+use namespace::clean 0.25;
 
 extends 'Term::CLI::Element';
 
@@ -318,7 +318,7 @@ Term::CLI::Command - Class for (sub-)commands in Term::CLI
 
 =head1 VERSION
 
-version 0.04004
+version 0.051002
 
 =head1 SYNOPSIS
 

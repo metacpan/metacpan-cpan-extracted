@@ -15,7 +15,10 @@ WriteMakefile(
 	      PREREQ_PM => {
 			    'Wx' => 0,
 			    'GD::Barcode::QRcode' => 0,
-			    'Math::Prime::Util' => 0
+			    'Math::Prime::Util' => 0,
+			    'LWP' => 6.15,
+			    'LWP::Protocol::https' => 0,
+			    'Mozilla::CA' => 0
 			   },
 	      EXE_FILES => [ 'bin/noodlepay.pl' ],
 	      dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

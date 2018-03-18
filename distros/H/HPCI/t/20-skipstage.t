@@ -62,15 +62,18 @@ sub limit_keys {
 my $test_count;
 
 BEGIN {
-	$dispatch = [ qw(code) ];
-    # $dispatch = [ qw(code command) ];
+    $dispatch = [ qw(code command) ];
 	$sharing  = [ qw(shared) ];
     # $sharing  = [ qw(shared unshared) ];
 	$tests    = [ 1..5 ];
 
 	if ($ENV{LIMIT_TEST}) {
 		my %valid_key = map { $_ => 1 } @$dispatch,@$sharing,@$tests;
-		my @keys = split /[-\w]+/, $ENV{LIMIT_TEST};
+		my @keys = map {
+            $_ =~ m/(\d*)-(\d*)/
+                ? ( ($1 || 1) .. ($2 || 5) )
+                : ($_)
+            } $ENV{LIMIT_TEST} =~ m/([-\w]+)/g;
 		if (my @bad_keys = grep { !$valid_key{$_} } @keys) {
 			die "Invalid key(s) found in LIMIT_TEST: "
 				. join( ' ', @keys )
@@ -96,7 +99,7 @@ chomp($dir_path);
 
 my $workdir = "scratch/TEST.SKIPSTAGE";
 
-my @fs_delay = (file_system_delay => 5);
+my @fs_delay = (file_system_delay => 5, log_level => 'debug');
 # push @fs_delay, stage_defaults => { force_unshared_files => 1 }
 # if $ENV{TEST_UNSHARED_FILES};
 
@@ -251,22 +254,30 @@ sub run_a_test {
         for my $file ( @{ $parms->{build} } ) {
             chain_stage(
                 name => "build_$file",
-                # code => sub {
-                    # open my $fd, '>', "$workdir/f.in";
-                    # print $fd "hi\n";
-                    # close $fd;
-                    # return undef;
-                # },
-                command => "sleep 1;echo hi > $workdir/f.$file",
+                code => sub {
+                    sleep 1;
+                    open my $fd, '>', "$workdir/f.in"
+                        or return "open $workdir/f.in for write failed: $!";
+                    print $fd "hi\n"
+                        or return "write to $workdir/f.in failed: $!";
+                    close $fd
+                        or return "close $workdir/f.in failed: $!";
+                    return undef;
+                },
+                # command => "sleep 1;echo hi > $workdir/f.$file",
                 files => {
                     out => { req => "$workdir/f.$file" }
                 },
             );
         }
 
+        my $cmdS1 = "cp $workdir/f.in $workdir/f.tmp$s1";
         chain_stage(
             name    => 'S1',
-            command => "cp $workdir/f.in $workdir/f.tmp$s1",
+            ( $dispatch eq 'command'
+                ? (command => $cmdS1)
+                : (code    => sub { system( $cmdS1 ) } )
+            ),
             files   => {
                 in        => { req => "$workdir/f.in"  },
                 out       => { req => "$workdir/f.tmp" },
@@ -281,9 +292,13 @@ sub run_a_test {
             },
         );
 
+        my $cmdS2 = "cp $workdir/f.out $workdir/f.tmp$s2";
         chain_stage(
             name    => 'S2',
-            command => "cp $workdir/f.out $workdir/f.tmp$s2",
+            ( $dispatch eq 'command'
+                ? (command => $cmdS2)
+                : (code    => sub { system( $cmdS2 ) } )
+            ),
             files   => {
                 in        => { req => "$workdir/f.out" },
                 out       => { req => "$workdir/f.tmp" },
@@ -309,6 +324,7 @@ sub run_a_test {
 
 for my $d (@$dispatch) {
     for my $s (@$sharing) {
+        unlink "$workdir/$_" for qw(f.in f.out f.out2);
         for my $t (@$tests) {
             run_a_test( $d, $s, $t );
         }

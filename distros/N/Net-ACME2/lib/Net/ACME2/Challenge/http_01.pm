@@ -3,7 +3,7 @@ package Net::ACME2::Challenge::http_01;
 use strict;
 use warnings;
 
-use parent qw( Net::ACME2::Challenge );
+use parent qw( Net::ACME2::ChallengeBase::HasToken );
 
 use constant PATH_DIRECTORY => '/.well-known/acme-challenge';
 
@@ -39,6 +39,9 @@ Creates a file in the given DOCROOT that will, if served up normally,
 satisfy ACME’s requirements for this challenge. The return value is
 an object that, when DESTROYed, will remove that file.
 
+(KEY_AUTHZ is the return of the L<Net::ACME2> instance’s
+C<make_key_authorization()> method.)
+
 This can simplify the authorization process
 if you’re on the same server as all of the authorization object’s
 identifiers’ HTTP document roots.
@@ -65,7 +68,7 @@ sub create_handler {
 
 =head2 I<OBJ>->path()
 
-Returns the relative path of the URL that needs to serve up the
+Returns the URL path that needs to serve up the
 key authorization. This is useful if, for whatever reason, you’re not
 using C<create_handler()> to satisfy this challenge.
 

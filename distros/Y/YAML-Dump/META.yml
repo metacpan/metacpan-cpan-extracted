@@ -1,0 +1,35 @@
+---
+abstract: 'Dump stuff, (simplified) YAML style'
+author:
+  - 'Flavio Poletti <polettix@cpan.org>'
+build_requires:
+  Path::Tiny: '0.096'
+  Test::Exception: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: YAML-Dump
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/polettix/YAML-Dump/issues
+  homepage: https://github.com/polettix/YAML-Dump
+  repository: https://github.com/polettix/YAML-Dump.git
+version: '1.82'
+x_contributors:
+  - 'Flavio Poletti <flavio@polettix.it>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

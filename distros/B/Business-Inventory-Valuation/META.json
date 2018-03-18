@@ -1,5 +1,5 @@
 {
-   "abstract" : "Calculate inventory value/unit price (using LIFO or FIFO)",
+   "abstract" : "Calculate inventory value/unit price (using LIFO/FIFO/weighted average)",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -56,7 +56,7 @@
          "web" : "https://github.com/perlancar/perl-Business-Inventory-Valuation"
       }
    },
-   "version" : "0.001",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

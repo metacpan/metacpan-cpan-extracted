@@ -187,44 +187,30 @@ AUTOLOAD
 our $is_override
 = sub
 {
-    use Scalar::Util    qw( reftype );
+    # sub allows testing w/o reproducing the 
+    # sanity checks in every test.
+    #
+    # basic checks: non-empty name w/o non-word 
+    # chars that has as a coderef in UNIVERSAL.
 
-    # sub allows testing w/o reproducing the code.
+    my $name    = shift
+    or return;
 
-    my ( $name, $stash_val ) = @_;
-
-    $name   =~ /\W/
+    $name       =~ /\W/
     and return;
 
-    eval
-    {
-        # code or globs with a CODE slot
-        # are candidates for mapping.
-        #
-        # eval avoids issues de-referencing
-        # non-glob stash entries.
-        
-        'CODE' eq reftype $stash_val 
-        ? 1
-        : *{ $stash_val }{ CODE }
-        ? 1
-        : ''
-    }
+    defined &{ "UNIVERSAL::$name" }
     or return;
 
     1
 };
 
-while
-(
-    my ( $name, $stash_val ) 
-    = each %{ $::{ 'UNIVERSAL::' } }
-)
+for my $name ( keys %{ $::{ 'UNIVERSAL::' } } )
 {
     # skip stash entries which cannot map to
     # valid method names.
 
-    $is_override->( $name, $stash_val )
+    $is_override->( $name )
     and
     *{ qualify_to_ref $name }
     = sub

@@ -8,8 +8,8 @@
 #
 
 use 5.014_001;
-use strict;
-use Modern::Perl;
+use strict 1.00;
+use Modern::Perl 1.20140107;
 
 sub Main {
     Term_CLI_Command_Help_test->SKIP_CLASS(
@@ -22,12 +22,12 @@ sub Main {
 
 package Term_CLI_Command_Help_test {
 
-use parent qw( Test::Class );
+use parent 0.228 qw( Test::Class );
 
-use Test::More;
-use Test::Output;
-use Test::Exception;
-use FindBin;
+use Test::More 1.001002;
+use Test::Output 1.03;
+use Test::Exception 0.35;
+use FindBin 1.50;
 use Term::CLI;
 use Term::CLI::L10N;
 
@@ -102,10 +102,11 @@ sub check_pager : Test(3) {
         'error on non-existent pager is set correctly');
 
     $pager = "$FindBin::Bin/scripts/pager.pl";
-    $cli->find_command('help')->pager([ 'perl', $pager, '-x' ]);
+    $cli->find_command('help')->pager([ $^X, $pager, '1' ]);
 
     %args = $cli->execute('help');
-    ok($args{status} > 0, 'pager exit status propagates to status');
+    is($args{status}, 1<<8, 'pager exit status propagates to status')
+        or diag("got status=$args{status}; error='$args{error}'");
 }
 
 

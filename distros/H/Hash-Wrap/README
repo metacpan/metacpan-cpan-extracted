@@ -1,125 +1,41 @@
 Hash::Wrap
 
-This module provides constructors which create light-weight objects from
-existing hashes, allowing access to hash elements via methods (and thus
-avoiding typos). By default, attempting to access a non-existent element
-via a method will result in an exception, but this may be modified so
-that the undefined value is returned (see "-undef").
+Hash::Wrap creates objects from hashes, providing accessors for hash
+elements. The objects are hashes, and may be modified using the standard
+Perl hash operations and the object's accessors will behave accordingly.
 
-Hash elements may be added to or deleted from the object after
-instantiation using the standard Perl hash operations, and changes will
-be reflected in the object's methods. For example,
+Why use this class? Sometimes a hash is created on the fly and it's too
+much of a hassle to build a class to encapsulate it.
 
-   $obj = wrap_hash( { a => 1, b => 2 );
-   $obj->c; # throws exception
-   $obj->{c} = 3;
-   $obj->c; # returns 3
-   delete $obj->{c};
-   $obj->c; # throws exception
+  sub foo () { ... ; return { a => 1 }; }
 
-To prevent modification of the hash, consider using the lock routines in
-Hash::Util on the object.
+With "Hash::Wrap":
 
-The methods act as both accessors and setters, e.g.
+  use Hash::Wrap;
 
-  $obj = wrap_hash( { a => 1 } );
-  print $obj->a; # 1
-  $obj->a( 3 );
-  print $obj->a; # 3
+  sub foo () { ... ; return wrap_hash( { a => 1 ); }
 
-Only hash keys which are legal method names will be accessible via
-object methods.
+  my $obj = foo ();
+  print $obj->a;
 
-Accessors may optionally be used as lvalues, e.g.,
+Elements can be added or removed to the object and accessors will track
+them. If the object should be immutable, use the lock routines in
+Hash::Util on it.
 
-  $obj->a = 3;
+There are many similar modules on CPAN (see "SEE ALSO" for comparisons).
 
-in Perl version 5.16 or later. See "-lvalue".
+What sets Hash::Wrap apart is that it's possible to customize object
+construction and accessor behavior:
 
-  Object construction and constructor customization
+*   It's possible to use the passed hash directly, or make shallow or
+    deep copies of it.
 
-By default "Hash::Wrap" exports a "wrap_hash" subroutine which, given a
-hashref, blesses it directly into the Hash::Wrap::Class class.
+*   Accessors can be customized so that accessing a non-existent element
+    can throw an exception or return the undefined value.
 
-The constructor may be customized to change which class the object is
-instantiated from, and how it is constructed from the data. For example,
+*   On recent enough versions of Perl, accessors can be lvalues, e.g.
 
-  use Hash::Wrap
-    { -as => 'return_cloned_object', -clone => 1 };
-
-will create a constructor which clones the passed hash and is imported
-as "return_cloned_object". To import it under the original name,
-"wrap_hash", leave out the "-as" option.
-
-The following options are available to customize the constructor.
-
-"-as" => *subroutine name*
-    This is optional, and imports the constructor with the given name.
-    If not specified, it defaults to "wrap_hash".
-
-"-class" => *class name*
-    The object will be blessed into the specified class. If the class
-    should be created on the fly, specify the "-create" option. See
-    "Object Classes" for what is expected of the object classes. This
-    defaults to "Hash::Wrap::Class".
-
-"-create" => *boolean*
-    If true, and "-class" is specified, a class with the given name will
-    be created.
-
-"-copy" => *boolean*
-    If true, the object will store the data in a *shallow* copy of the
-    hash. By default, the object uses the hash directly.
-
-"-clone" => *boolean* | *coderef*
-    Store the data in a deep copy of the hash. if *true*, "dclone" in
-    Storable is used. If a coderef, it will be called as
-
-       $clone = coderef->( $hash )
-
-    By default, the object uses the hash directly.
-
-"-undef" => *boolean*
-    Normally an attempt to use an accessor for an non-existent key will
-    result in an exception. The "-undef" option causes the accessor to
-    return "undef" instead. It does *not* create an element in the hash
-    for the key.
-
-"-lvalue" => *boolean*
-    If true, the accessors will be lvalue routines, e.g. they can change
-    the underlying hash value by assigning to them:
-
-       $obj->attr = 3;
-
-    The hash entry must already exist before using the accessor in this
-    manner, or it will throw an exception.
-
-    This is only available on Perl version 5.16 and later.
-
-  Object Classes
-
-An object class has the following properties:
-
-*   The class must be a subclass of "Hash::Wrap::Base".
-
-*   The class typically does not provide any methods, as they would mask
-    a hash key of the same name.
-
-*   The class need not have a constructor. If it does, it is passed a
-    hashref which it should bless as the actual object. For example:
-
-      package My::Result;
-      use parent 'Hash::Wrap::Base';
-
-      sub new {
-        my  ( $class, $hash ) = @_;
-        return bless $hash, $class;
-      }
-
-    This excludes having a hash key named "new".
-
-"Hash::Wrap::Base" provides an empty "DESTROY" method, a "can" method,
-and an "AUTOLOAD" method. They will mask hash keys with the same names.
+       $obj->existing_key = $value;
 
 INSTALLATION
 

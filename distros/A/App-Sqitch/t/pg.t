@@ -41,8 +41,11 @@ my $target = App::Sqitch::Target->new(
 );
 isa_ok my $pg = $CLASS->new(sqitch => $sqitch, target => $target), $CLASS;
 
+is $pg->key, 'pg', 'Key should be "pg"';
+is $pg->name, 'PostgreSQL', 'Name should be "PostgreSQL"';
+
 my $client = 'psql' . ($^O eq 'MSWin32' ? '.exe' : '');
-is $pg->client, $client, 'client should default to psql';
+is $pg->client, $client, 'client should default to psqle';
 is $pg->registry, 'sqitch', 'registry default should be "sqitch"';
 is $pg->uri, $uri, 'DB URI should be "db:pg:"';
 my $dest_uri = $uri->clone;
@@ -106,7 +109,7 @@ ENV: {
 # Make sure config settings override defaults.
 my %config = (
     'engine.pg.client'   => '/path/to/psql',
-    'engine.pg.target'   => 'db:pg://localhost/try',
+    'engine.pg.target'   => 'db:pg://localhost/try?sslmode=disable&connect_timeout=5',
     'engine.pg.registry' => 'meta',
 );
 $std_opts[-1] = 'registry=meta';
@@ -116,14 +119,13 @@ $mock_config->mock(get => sub { $config{ $_[2] } });
 $target = App::Sqitch::Target->new( sqitch => $sqitch );
 ok $pg = $CLASS->new(sqitch => $sqitch, target => $target), 'Create another pg';
 is $pg->client, '/path/to/psql', 'client should be as configured';
-is $pg->uri->as_string, 'db:pg://localhost/try',
+is $pg->uri->as_string, 'db:pg://localhost/try?sslmode=disable&connect_timeout=5',
     'uri should be as configured';
 is $pg->registry, 'meta', 'registry should be as configured';
-is_deeply [$pg->psql], [qw(
-    /path/to/psql
-    --dbname   try
-    --host     localhost
-), @std_opts], 'psql command should be configured from URI config';
+is_deeply [$pg->psql], [
+    '/path/to/psql',
+    'dbname=try host=localhost connect_timeout=5 sslmode=disable',
+@std_opts], 'psql command should be configured from URI config';
 
 ##############################################################################
 # Now make sure that (deprecated?) Sqitch options override configurations.
@@ -142,11 +144,10 @@ is $pg->client, '/some/other/psql', 'client should be as optioned';
 is $pg->registry_destination, $pg->destination,
     'registry_destination should be the same as destination';
 is $pg->registry, 'meta', 'registry should still be as configured';
-is_deeply [$pg->psql], [qw(
-    /some/other/psql
-    --dbname   try
-    --host     localhost
-), @std_opts], 'psql command should be as optioned';
+is_deeply [$pg->psql], [
+    '/some/other/psql',
+    'dbname=try host=localhost connect_timeout=5 sslmode=disable',
+@std_opts], 'psql command should be as optioned';
 
 ##############################################################################
 # Test _run(), _capture(), and _spool().
@@ -267,6 +268,7 @@ $sqitch = App::Sqitch->new( options => { engine => 'pg' } );
 $target = App::Sqitch::Target->new( sqitch => $sqitch );
 $pg     = $CLASS->new(sqitch => $sqitch, target => $target);
 my $dbh;
+my $db = '__sqitchtest__' . $$;
 END {
     return unless $dbh;
     $dbh->{Driver}->visit_child_handles(sub {
@@ -274,7 +276,7 @@ END {
         $h->disconnect if $h->{Type} eq 'db' && $h->{Active} && $h ne $dbh;
     });
 
-    $dbh->do('DROP DATABASE __sqitchtest__') if $dbh->{Active};
+    $dbh->do("DROP DATABASE $db") if $dbh->{Active};
 }
 
 my $err = try {
@@ -286,8 +288,8 @@ my $err = try {
         AutoCommit => 1,
     });
     $dbh->do($_) for (
-        'CREATE DATABASE __sqitchtest__',
-        q{ALTER DATABASE __sqitchtest__ SET lc_messages = 'C'},
+        "CREATE DATABASE $db",
+        "ALTER DATABASE $db SET lc_messages = 'C'",
     );
     undef;
 } catch {
@@ -302,11 +304,11 @@ DBIEngineTest->run(
         plan_file   => Path::Class::file(qw(t engine sqitch.plan))->stringify,
     }],
     target_params => [
-        uri => URI::db->new('db:pg://postgres@/__sqitchtest__'),
+        uri => URI::db->new("db:pg://postgres@/$db"),
     ],
     alt_target_params => [
         registry => '__sqitchtest',
-        uri => URI::db->new('db:pg://postgres@/__sqitchtest__'),
+        uri => URI::db->new("db:pg://postgres@/$db"),
     ],
     skip_unless       => sub {
         my $self = shift;

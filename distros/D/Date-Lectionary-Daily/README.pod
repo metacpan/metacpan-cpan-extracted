@@ -4,7 +4,7 @@ Date::Lectionary::Daily - Daily Readings for the Christian Lectionary
 
 =head1 VERSION
 
-Version 1.20180205
+Version 1.20180316
 
 
 =cut
@@ -14,12 +14,57 @@ Version 1.20180205
     use Time::Piece;
     use Date::Lectionary::Daily;
 
-    my $dailyReading = Date::Lectionary::Daily->new('date' => Time::Piece->strptime("2017-12-24", "%Y-%m-%d"));
-    say $dailyReading->readings->{evening}->{1}; #First lesson for evening prayer
+    #Using the old ACNA Liturgical Daily Lectionary
+    my $dailyReading = Date::Lectionary::Daily->new(
+        'date' => Time::Piece->strptime("2017-12-24", "%Y-%m-%d"), 
+        'lectionary' => 'acna-xian'
+    );
+    say $dailyReading->readings->{evening}->{1}; #First lesson for evening prayer, Isaiah 51
+
+    #Using the new ACNA Secular/Civil Daily Lectionary
+    my $dailyNewReading = Date::Lectionary::Daily->new( 
+        'date' => Time::Piece->strptime( "2018-03-12", "%Y-%m-%d" ), 
+        'lectionary' => 'acna-sec' 
+    );
+    say $dailyNewReading->readings->{morning}->{2}; #Second lesson for morning prayer, Matthew 5
 
 =head1 DESCRIPTION
 
-Date::Lectionary::Daily takes a Time::Piece date and returns ACNA readings for morning and evening prayer for that date.
+Date::Lectionary::Daily takes a Time::Piece date and returns readings for morning and evening prayer for that date.
+
+=head2 CONSTRUCTOR ATTRIBUTES
+
+=head3 date
+
+The Time::Piece object date of the day you woudl like the lessons for.
+
+=head3 lectionary
+
+One of two choices `acna-sec` for the new secular calendar based ACNA daily lectionary or `acna-xian` for the previous liturgically-based ACNA daily lectionary.
+
+If lectionary is not given at construction, the ACNA secular daily lectionary — `acna-sec` — will be used.
+
+=head2 ATTRIBUTES
+
+=head3 week
+
+The name of the liturgical week in the lectionary; e.g. `The First Sunday in Lent`.
+
+=head3 day
+
+The name of the day of the week; e.g. `Sunday`.
+
+=head3 tradition
+
+Presently only returns `acna`.  Future version of the module may include daily lectionary from other traditions.
+
+=head3 type
+
+Returns `secular` for daily lectionaries based on the secular/civil calendar and `liturgical` for daily lectionaries based on the liturgical calendar.
+
+=head3 readings
+
+A hasref of the readings for the day.
 
 
 =cut
@@ -32,6 +77,20 @@ Date::Lectionary::Daily takes a Time::Piece date and returns ACNA readings for m
 =head2 BUILD
 
 Constructor for the Date::Lectionary object.  Takes a Time::Piect object, C<date>, to create the object.
+
+
+=cut
+
+=head2 _buildType
+
+Private method to determine if the daily lectionary follows the secular calendar or the liturgical calendar.
+
+
+=cut
+
+=head2 _buildTradition
+
+Private method to determine the Sunday lectionary tradition of the daily lectionary selected. Used to determine the liturgical week the day falls within.
 
 
 =cut
@@ -50,9 +109,16 @@ Private method to determine if the day given is a fixed holiday rather than a st
 
 =cut
 
-=head2 _buildReadings
+=head2 _buildReadingsLiturgical
 
-Private method that returns an ArrayRef of strings for the lectionary readings associated with the date.
+Private method that returns an ArrayRef of strings for the lectionary readings associated with the date according to the liturgical calendar.
+
+
+=cut
+
+=head2 _buildReadingsSecular
+
+Private method that returns an ArrayRef of strings for the lectionary readings associated with the date according to the secular calendar.
 
 
 =cut
@@ -99,11 +165,11 @@ L<http://search.cpan.org/dist/Date-Lectionary-Daily/>
 
 =head1 ACKNOWLEDGEMENTS
 
-Many thanks to my beautiful wife, Jennifer, and my amazing daughter, Rosemary.  But, above all, SOLI DEO GLORIA!
+Many thanks to my beautiful wife, Jennifer, my amazing daughter, Rosemary, and my sweet  son, Oliver.  But, above all, SOLI DEO GLORIA!
 
-=head1 LICENSE AND COPYRIGHT
+=head1 LICENSE
 
-Copyright 2017 MICHAEL WAYNE ARNOLD
+Copyright 2017-2018 MICHAEL WAYNE ARNOLD
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 

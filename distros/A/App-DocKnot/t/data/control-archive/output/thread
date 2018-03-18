@@ -1,0 +1,218 @@
+\==[doc]      [2] [\bullet(packed)[\link[\1][\2]]]
+\==[program]  [3]
+    [\tablerow[\1 \version[\2]] [\release[\2]]
+        [\link[https://archives.eyrie.org/software/\3.tar.gz][tar.gz]
+        (\link[https://archives.eyrie.org/software/\3.tar.gz.asc]
+              [PGP signature])]
+        [\link[https://archives.eyrie.org/software/\3.tar.xz][tar.xz]
+        (\link[https://archives.eyrie.org/software/\3.tar.xz.asc]
+              [PGP signature])]]
+\==[download] [3]
+    [\1 \version[\2]\break
+     \link[https://archives.eyrie.org/software/\3.tar.gz][tar.gz]
+     (\link[https://archives.eyrie.org/software/\3.tar.gz.asc]
+           [signature])\break
+     \link[https://archives.eyrie.org/software/\3.tar.xz][tar.xz]
+     (\link[https://archives.eyrie.org/software/\3.tar.xz.asc]
+           [signature])\break
+    Released \release[\2]]
+
+\heading[control-archive][software]
+
+\h1[control-archive]
+
+\quote[
+
+    Usenet is like a herd of performing elephants with diarrhea —
+    massive, difficult to redirect, awe-inspiring, entertaining, and a
+    source of mind-boggling amounts of excrement when you least expect it.
+
+][Gene Spafford][]
+
+\div(sidebar)[
+    \h2[Download]
+
+    \download[control-archive][control-archive]
+        [usenet/control-archive-\version[control-archive]]
+
+    \link[https://archives.eyrie.org/software/ARCHIVE/control-archive/]
+         [Archive]
+
+    \h2[Documentation]
+
+    \link[readme.html][General overview] \break
+    \link[news.html][Change summary] \break
+    \link[control-summary.html][control-summary manual page] \break
+    \link[export-control.html][export-control manual page] \break
+    \link[generate-files.html][generate-files manual page] \break
+    \link[process-control.html][process-control manual page] \break
+    \link[update-control.html][update-control manual page]
+
+    \h2[Development]
+
+    \link[todo.html][To-do list] \break
+    \link[https://github.com/rra/control-archive]
+         [GitHub] \break
+    \link[https://github.com/rra/control-archive/issues]
+         [Bug tracker] \break
+    \link[https://git.eyrie.org/?p=usenet/control.archive.git]
+         [Git repository]
+]
+
+\h2[Blurb]
+
+This software generates an INN control.ctl configuration file from
+hierarchy configuration fragments, verifies control messages using GnuPG
+where possible, processes new control messages to update a newsgroup list,
+archives new control messages, and exports the list of newsgroups in a
+format suitable for synchronizing the newsgroup list of a Netnews news
+server.  It is the software that maintains the control message and
+newsgroup lists available from ftp.isc.org.
+
+\h2[Description]
+
+This package contains three major components:
+
+\bullet[
+
+  All of the configuration used to generate a \code[control.ctl] file for
+  INN and the \code[PGPKEYS] and \code[README.html] files distributed with
+  pgpcontrol, along with the script to generate those files.
+
+]
+\bullet[
+
+  Software to process control messages, verify them against that
+  authorization information, and maintain a control message archive and
+  list of active newsgroups.  Software is also included to generate
+  reports of recent changes to the list of active newsgroups.
+
+]
+\bullet[
+
+  The documentation files included in the control message archive and
+  newsgroup lists on ftp.isc.org.
+
+]
+Manual changes to the canonical newsgroup list are supported in a way that
+generates the same log messages and uses the same locking structure so
+that they can co-exist with automated changes and be included in the same
+reports.
+
+This is the software that generates the
+\link[ftp://ftp.isc.org/pub/usenet/CONFIG/][active newsgroup lists] and
+\link[ftp://ftp.isc.org/pub/usenet/control/][control message archive]
+hosted on ftp.isc.org, and the source of the \code[control.ctl] file
+provided with INN.
+
+For a web presentation of the information recorded here, as well as other
+useful information about Usenet hierarchies, please see the
+\link[http://usenet.trigofacile.com/hierarchies/][list of Usenet managed
+hierarchies].
+
+\h2[Requirements]
+
+Perl 5.6 or later plus the following additional Perl modules are required:
+
+\bullet(packed)[Compress::Zlib (included in Perl 5.10 and later)]
+\bullet(packed)[Date::Parse (part of TimeDate)]
+\bullet(packed)[Net::NNTP (included in Perl 5.8 and later)]
+\bullet(packed)[Text::Template]
+
+\link[https://www.gnu.org/software/gzip/][gzip] and
+\link[http://www.bzip.org/][bzip2] are required.  Both are generally available
+with current operating systems, possibly as supplemental packages.
+
+process-control expects to be fed file names and message IDs of control
+messages on standard input and therefore needs to be run from a news
+server or some other source of control messages.  A minimalist news server
+like tinyleaf is suitable for this (I wrote tinyleaf, available as part of
+\link[https://www.eyrie.org/~eagle/software/inn/][INN], for this purpose).
+
+\h2[Download]
+
+The distribution:
+
+\table[][
+    \program[control-archive][control-archive]
+        [usenet/control-archive-\version[control-archive]]
+]
+
+An \link[https://archives.eyrie.org/software/ARCHIVE/control-archive/]
+[archive of older releases] is also available.
+
+control-archive is maintained using the Git version control system.  To
+check out the current development tree, see
+\link[https://github.com/rra/control-archive][GitHub] or clone:
+
+\pre[    https://git.eyrie.org/git/usenet/control-archive.git]
+
+Pull requests on GitHub are welcome.  You can also
+\link[https://git.eyrie.org/?p=usenet/control.archive.git][browse the
+current development source].
+
+\h2[Documentation]
+
+User documentation:
+
+\doc[readme.html][README]
+\doc[news.html][Change summary]
+\doc[control-summary.html][control-summary manual page]
+\doc[export-control.html][export-control manual page]
+\doc[generate-files.html][generate-files manual page]
+\doc[process-control.html][process-control manual page]
+\doc[update-control.html][update-control manual page]
+\doc[license.html][License and copyright]
+
+Developer documentation:
+
+\doc[todo.html][To-do list]
+\doc[https://github.com/rra/control-archive]
+    [GitHub]
+\doc[https://github.com/rra/control-archive/issues]
+    [Bug tracker]
+
+\h2[License]
+
+The control-archive package as a whole is covered by the following
+copyright and license:
+
+\block[
+
+    Copyright 2002-2004, 2007-2014, 2016-2018
+        Russ Allbery <eagle@eyrie.org>
+
+    Copyright 2001
+        Marco d'Itri
+
+    Copyright 1996
+        UUNET Technologies, Inc.
+
+    Permission is hereby granted, free of charge, to any person obtaining
+    a copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+    This product includes software developed by UUNET Technologies, Inc.
+
+]
+
+Some individual source files are covered by other, compatible licenses.
+For complete copyright and license information, see the file
+\link[license.html][LICENSE] in the control-archive source distribution.
+
+\signature

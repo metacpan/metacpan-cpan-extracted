@@ -1,5 +1,8 @@
 Revision history for Test-Clustericious-Blocking
 
+0.07      2018-03-12 19:08:32 -0700
+  - Deprecated. See https://github.com/clustericious/Clustericious/issues/46
+
 0.06      2017-09-13 11:47:40 -0400
   - Test2 compatability fix (gh#5 Slaven Rezić++)
 

@@ -1,0 +1,58 @@
+{
+   "abstract" : "Describe routes in configuration",
+   "author" : [
+      "ÐÑÐ°ÑÐ¸Ð¼Ð¸Ñ ÐÐµÑÐ¾Ð² (berov@cpan.org)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-RoutesConfig",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "7.70",
+            "perl" : "5.020000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kberov/Mojolicious-Plugin-RoutesConfig/issues"
+      },
+      "homepage" : "https://github.com/kberov/Mojolicious-Plugin-RoutesConfig",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kberov/Mojolicious-Plugin-RoutesConfig.git",
+         "web" : "https://github.com/kberov/Mojolicious-Plugin-RoutesConfig"
+      }
+   },
+   "version" : 0.03,
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

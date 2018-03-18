@@ -1,6 +1,6 @@
 package WebService::Wikimapia::Params;
 
-$WebService::Wikimapia::Params::VERSION   = '0.12';
+$WebService::Wikimapia::Params::VERSION   = '0.13';
 $WebService::Wikimapia::Params::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,19 +9,16 @@ WebService::Wikimapia::Params - Placeholder for parameters for WebService::Wikim
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
 use 5.006;
 use strict; use warnings;
 use Data::Dumper;
+use parent 'Exporter';
 
-use vars qw(@ISA @EXPORT @EXPORT_OK);
-
-require Exporter;
-@ISA = qw(Exporter);
-@EXPORT_OK = qw(validate $API_KEY $Language $Disable $Format $Pack $Num $FIELDS);
+our @EXPORT_OK = qw(validate $API_KEY $Language $Disable $Format $Pack $Num $FIELDS);
 
 our $API_KEY = sub { die "[$_[0]" unless check_api_key($_[0]); };
 sub check_api_key  { return ($_[0] =~ m/^[A-Z0-9]{8}\-[A-Z0-9]{8}\-[A-Z0-9]{8}\-[A-Z0-9]{8}\-[A-Z0-9]{8}\-[A-Z0-9]{8}\-[A-Z0-9]{8}\-[A-Z0-9]{8}$/i); }

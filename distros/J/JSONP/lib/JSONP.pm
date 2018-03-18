@@ -12,7 +12,7 @@ use Digest::SHA;
 use JSON;
 use Want;
 
-our $VERSION = '1.85';
+our $VERSION = '1.88';
 
 =encoding utf8
 
@@ -307,7 +307,7 @@ sub run
 	my $session = $self->{_aaa_sub}->($sid);
 	$self->{_authenticated} = ! ! $session;
 	if($self->{_authenticated}){
-		$self->graft('session', $session)
+		$self->session = {} unless $self->graft('session', $session);
 	} else {
 		$self->session = {};
 	}
@@ -670,7 +670,7 @@ sub graft
 	my ($self, $name, $json) = @_;
 
 	eval{
-		$self->{$name} = JSON->new->decode($json // '');
+		$self->{$name} = JSON->new->allow_nonref->decode($json // '');
 	};
 
 	return 0 if $@;
@@ -705,7 +705,7 @@ sub stack
 	return 0 unless reftype $self eq 'ARRAY';
 
 	eval{
-		push @$self, JSON->new->decode($json);
+		push @$self, JSON->new->allow_nonref->decode($json // '');
 	};
 	return 0 if $@;
 
@@ -773,7 +773,7 @@ sub serialize
 	my $out;
 	my $pretty = reftype $self eq 'HASH' && $self->{_pretty} ? 1 : 0;
 	eval{
-		$out = JSON->new->pretty($pretty)->allow_blessed->convert_blessed->encode($self);
+		$out = JSON->new->pretty($pretty)->allow_nonref->allow_unknown->allow_blessed->convert_blessed->encode($self);
 	} || $@;
 }
 

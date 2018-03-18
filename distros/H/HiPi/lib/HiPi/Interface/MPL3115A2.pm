@@ -17,7 +17,7 @@ use HiPi qw( :i2c :mpl3115a2 :rpi );
 use HiPi::RaspberryPi;
 use Carp;
 
-our $VERSION ='0.68';
+our $VERSION ='0.69';
 
 __PACKAGE__->create_accessors( qw( osdelay backend ) );
 
@@ -357,7 +357,7 @@ sub sea_level_pressure {
     
     # Po = ((P * 1000) * Math.exp((g*Zg)/(Rd *  (Tv_avg + 273.15))))/1000;
     
-    my $result = (($pressure * 10) * exp(($gravity * $altitude)/($dgc *  ($temperature + 273.15))))/10;
+    my $result = (($pressure * 1000) * exp(($gravity * $altitude)/($dgc *  ($temperature + 273.15))))/1000;
     
     $result = sprintf("%.2f", $result);
     return $result;

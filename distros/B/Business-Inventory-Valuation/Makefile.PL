@@ -7,7 +7,7 @@ use 5.010001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Calculate inventory value/unit price (using LIFO or FIFO)",
+  "ABSTRACT" => "Calculate inventory value/unit price (using LIFO/FIFO/weighted average)",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -10,13 +10,13 @@ use Locale::TextDomain qw(App-Sqitch);
 use App::Sqitch::Plan::Change;
 use Path::Class;
 use Moo;
-use App::Sqitch::Types qw(DBH URIDB ArrayRef Bool Str);
+use App::Sqitch::Types qw(DBH URIDB ArrayRef Bool Str HashRef);
 use namespace::autoclean;
 use List::MoreUtils qw(firstidx);
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = '0.9996';
+our $VERSION = '0.9997';
 
 has registry_uri => (
     is       => 'ro',
@@ -39,6 +39,25 @@ sub registry_destination {
     return $uri->as_string;
 }
 
+has _mycnf => (
+    is => 'rw',
+    isa     => HashRef,
+    default => sub {
+        eval 'require MySQL::Config; 1' or return {};
+        return scalar MySQL::Config::parse_defaults('my', [qw(client mysql)]);
+    },
+);
+
+sub username {
+    my $self = shift;
+    return $self->SUPER::username || $self->_mycnf->{user};
+}
+
+sub password {
+    my $self = shift;
+    return $self->SUPER::password || $self->_mycnf->{password};
+}
+
 has dbh => (
     is      => 'rw',
     isa     => DBH,
@@ -46,17 +65,8 @@ has dbh => (
     default => sub {
         my $self = shift;
         $self->use_driver;
-
         my $uri = $self->registry_uri;
-        my $pass = $self->password || do {
-            # Read the default MySQL configuration.
-            # http://dev.mysql.com/doc/refman/5.0/en/option-file-options.html
-            if (eval 'require MySQL::Config; 1') {
-                my %cfg = MySQL::Config::parse_defaults('my', [qw(client mysql)]);
-                $cfg{password};
-            }
-        };
-        my $dbh = DBI->connect($uri->dbi_dsn, scalar $self->username, $pass, {
+        my $dbh = DBI->connect($uri->dbi_dsn, scalar $self->username, $self->password, {
             PrintError           => 0,
             RaiseError           => 0,
             AutoCommit           => 1,
@@ -486,13 +496,24 @@ to C<mysql> client options will be passed to the client, as follows:
 
 =back
 
+=head3 C<username>
+
+=head3 C<password>
+
+Overrides the methods provided by the target so that, if the target has
+no username or password, Sqitch looks them up in the
+L<F</etc/my.cnf> and F<~/.my.cnf> files|https://dev.mysql.com/doc/refman/5.7/en/password-security-user.html>.
+These files must limit access only to the current user (C<0600>). Sqitch will
+look for a username and password under the C<[client]> and C<[mysql]>
+sections, in that order.
+
 =head1 Author
 
 David E. Wheeler <david@justatheory.com>
 
 =head1 License
 
-Copyright (c) 2012-2015 iovation Inc.
+Copyright (c) 2012-2018 iovation Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

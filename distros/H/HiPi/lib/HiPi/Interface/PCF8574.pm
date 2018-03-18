@@ -21,7 +21,7 @@ __PACKAGE__->create_ro_accessors( qw(
     backend
 ) );
 
-our $VERSION ='0.68';
+our $VERSION ='0.69';
 
 
 sub new {

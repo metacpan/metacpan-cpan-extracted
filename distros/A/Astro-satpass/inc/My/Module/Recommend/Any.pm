@@ -8,9 +8,11 @@ use warnings;
 use Carp;
 use Exporter qw{ import };
 
-our $VERSION = '0.090';
+our $VERSION = '0.091';
 
 our @EXPORT_OK = qw{ __any };
+
+use constant ARRAY_REF	=> ref [];
 
 use constant RECOMMEND_TEMPLATE_SINGLE	=> "    * %s is not available.\n";
 use constant RECOMMEND_TEMPLATE_MULTI	=> "    * None of %s is available.\n";
@@ -46,7 +48,7 @@ sub check {
 
 sub __is_module_available {
     my ( undef, $m ) = @_;
-    my ( $mod, $ver ) = 'ARRAY' eq ref $m ? @{ $m } : ( $m );
+    my ( $mod, $ver ) = ARRAY_REF eq ref $m ? @{ $m } : ( $m );
     my @eval = ( "require $mod;" );
     defined $ver
 	and push @eval, "$mod->VERSION( $ver );";
@@ -58,7 +60,7 @@ sub __is_module_available {
 sub modules {
     my ( $self ) = @_;
     return (
-	map { 'ARRAY' eq ref $_ ? $_->[0] : $_ }
+	map { ARRAY_REF eq ref $_ ? $_->[0] : $_ }
 	@{ $self->{modules} }
     );
 }
@@ -78,7 +80,7 @@ sub _module_stringify {
     my @arg = @_;
     my @rslt;
     foreach my $m ( @arg ) {
-	push @rslt, 'ARRAY' eq ref $m ? "@{ $m }" : $m;
+	push @rslt, ARRAY_REF eq ref $m ? "@{ $m }" : $m;
     }
     return @rslt;
 }

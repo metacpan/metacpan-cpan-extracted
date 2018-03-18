@@ -1,3 +1,12 @@
+-   2.17.3 Fri Mar 16 16:32:47 CDT 2018
+
+    Up required version of Module::FromPerlVer.
+
+-   2.17.2 Thu Mar 15 20:25:13 CDT 2018
+
+    Correct version dir path to v5.14 to match "use" value
+    in libs.pm.
+
 -   2.17.0 Tue Mar  6 12:49:05 CST 2018
 
     POD

@@ -1,3 +1,13 @@
+0.54 - added another out of memory test
+
+0.53 - force explicit use of /bin/bash for running script
+
+0.52 - parse output of qacct correctly by removing trailing whitespace
+     - added env variable (HPCI_NO_DRMAA) to suppress use of DRMAA
+
+0.51 - moved _cpu_multiplier from DRMAARun to Run (where it should have
+       been all along)
+
 0.50 - added another error text to detect memory overrun failure
 
 0.49 - added another error text to detect memory overrun failure

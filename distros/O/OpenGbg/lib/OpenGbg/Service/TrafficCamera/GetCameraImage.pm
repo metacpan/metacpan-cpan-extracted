@@ -6,12 +6,12 @@ package OpenGbg::Service::TrafficCamera::GetCameraImage;
 
 # ABSTRACT: Get the current image from a traffic camera
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1402';
+our $VERSION = '0.1403';
 
 use OpenGbg::Elk;
 use namespace::autoclean;
 use Types::Standard qw/Int/;
-use OpenGbg::DateTimeType qw/DateTime/;
+use Types::DateTime qw/DateTime/;
 
 use DateTime;
 
@@ -55,7 +55,7 @@ OpenGbg::Service::TrafficCamera::GetCameraImage - Get the current image from a t
 
 =head1 VERSION
 
-Version 0.1402, released 2016-08-12.
+Version 0.1403, released 2018-03-14.
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ package pmtools;
 use strict;
 use warnings;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.2.0';
 
 sub new_pod_iterator {
     my ($module) = @_;      # module name
@@ -86,7 +86,7 @@ pmcat(1).
 
 Copyright (C) 1999 Tom Christiansen.
 
-Copyright (C) 2006-2014 Mark Leighton Fisher.
+Copyright (C) 2006-2014, 2018 Mark Leighton Fisher.
 
 =head1 LICENSE
 

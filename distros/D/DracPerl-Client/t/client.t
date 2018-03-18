@@ -1,4 +1,4 @@
-use Test::More;
+use Test::Most;
 use DracPerl::Client;
 
 BEGIN {
@@ -22,10 +22,14 @@ is length $drac_client->token, 32, "Token is present after login";
 ok my $session_saved = $drac_client->saveSession(),
     "Session saved successfully";
 
-ok my $fans_xml = $drac_client->get("fans"),
-    "Fans data is retrieved sucessfully";
+ok my $result = $drac_client->get({
+    commands => ["fans"],
+}),
+    "Data is retrieved sucessfully";
 
-is $fans_xml->{sensortype}->{sensorid}, "4", "Fans data is correct";
+ok my $fans = $result->{fans};
+
+is scalar @{$fans->list}, 5, "Fans data is correct";
 
 is $drac_client->isAlive(), 1, "Session is still alive";
 

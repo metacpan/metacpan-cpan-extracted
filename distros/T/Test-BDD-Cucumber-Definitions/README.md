@@ -1,60 +1,60 @@
-# Test-BDD-Cucumber-Definitions [![Build Status](https://travis-ci.org/ivanych/Test-BDD-Cucumber-Definitions.svg?branch=master)](https://travis-ci.org/ivanych/Test-BDD-Cucumber-Definitions)
+[![Build Status](https://travis-ci.org/ivanych/Test-BDD-Cucumber-Definitions.svg?branch=master)](https://travis-ci.org/ivanych/Test-BDD-Cucumber-Definitions) [![MetaCPAN Release](https://badge.fury.io/pl/Test-BDD-Cucumber-Definitions.svg)](https://metacpan.org/release/Test-BDD-Cucumber-Definitions)
+# NAME
 
-Коллекция шагов для функционального тестирования в стиле Cucumber на языке Perl.
+Test::BDD::Cucumber::Definitions - a collection of step definitions for Test
+Driven Development
 
-# Шаги
+# VERSION
 
-Шаги могут быть написаны на разных языках. В настоящее время есть шаги на двух языках:
+Version 0.26
 
-* In - Internal (внутренний псевдо-язык)
-* Ru - Русский
+# SYNOPSIS
 
-# Определения
+In file **features/step\_definitions/http\_steps.pl**:
 
-Определения всех имеющихся шагов написаны как отдельные функции. Это позволяет легко создавать новые шаги,
-используя для этого готовые определения. Новые шаги просто собираются из готовых определений как конструктор.
+    #!/usr/bin/perl
 
-Допустим, есть шаг:
+    use strict;
+    use warnings;
 
-    When запрошена страница 'http://metacpan.org'
+    use Test::BDD::Cucumber::Definitions::HTTP::In;
 
-и его определение:
+In file **features/http.feature**:
 
-    get_page('http://metacpan.org');
+    Feature: HTTP
+        Site test by HTTP
 
-Есть второй шаг:
+    Scenario: Loading the page
+        When http request "GET" send "http://metacpan.org"
+        Then http response code eq "200"
 
-    Then страница загрузилась успешно
+... and, finally, in the terminal:
 
-и его определение:
+    $ pherkin
 
-    check_code(200);
+      HTTP
+        Site test by HTTP
 
-Теперь можно легко создать новый шаг:
+        Scenario: Loading the page
+          When http request "GET" send "http://metacpan.org"
+          Then http response code eq "200"
 
-    Given загружена страница 'http//metacpan.org'
+# EXPORT
 
-просто объединив два определения:
+The module exports functions `S`, `C`, `Given`, `When` and `Then`.
+These functions are identical to the same functions from the module
+[Test::BDD::Cucumber](https://metacpan.org/pod/Test::BDD::Cucumber).
 
-    get_page('http://metacpan.org');
-    check_code(200);    
+By default, no functions are exported. All functions must be imported
+explicitly.
 
-# Модули
+# AUTHOR
 
-Дистрибутив содержит несколько модулей для работы с различными протоколами и данными.
+Mikhail Ivanov `<m.ivanych@gmail.com>`
 
-## HTTP
+# LICENSE AND COPYRIGHT
 
-Модуль содержит функции для работы с веб-ресурсами по протоколу HTTP.
+Copyright 2018 Mikhail Ivanov.
 
-## Struct
-
-Модуль содержит функции для работы с perl-структурами данных.
-
-## Var
-
-Модуль содержит функции для работы с переменными
-
-## Zip
-
-Модуль содержит функции для работы с архивами Zip
+This is free software; you can redistribute it and/or modify it
+under the same terms as the Perl 5 programming language system itself.

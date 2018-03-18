@@ -2,7 +2,7 @@ package Test2::Harness::Util::TestFile;
 use strict;
 use warnings;
 
-our $VERSION = '0.001057';
+our $VERSION = '0.001061';
 
 use Carp qw/croak/;
 
@@ -11,6 +11,8 @@ use Time::HiRes qw/time/;
 use File::Spec();
 
 use Test2::Harness::Util qw/open_file/;
+
+use Test2::Harness::Util::UUID qw/gen_uuid/;
 
 use Test2::Harness::Util::HashBase qw{
     -file -_scanned -_headers -_shbang -queue_args
@@ -206,7 +208,7 @@ sub _parse_shbang {
 
 sub queue_item {
     my $self = shift;
-    my ($job_id) = @_;
+    my ($job_name) = @_;
 
     my $category = $self->check_category;
     my $stage = $self->check_stage;
@@ -220,7 +222,8 @@ sub queue_item {
         category    => $category,
         file        => $self->file,
         headers     => $self->headers,
-        job_id      => $job_id,
+        job_id      => gen_uuid(),
+        job_name    => $job_name,
         shbang      => $self->shbang,
         stage       => $stage,
         stamp       => time,

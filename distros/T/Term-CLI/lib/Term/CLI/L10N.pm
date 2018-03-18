@@ -1,4 +1,4 @@
-#===============================================================================
+#=============================================================================
 #
 #       Module:  Term::CLI::L10N
 #
@@ -14,15 +14,15 @@
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
-#===============================================================================
+#=============================================================================
 
 use 5.014_001;
 
-package Term::CLI::L10N  0.04004 {
+package Term::CLI::L10N  0.051002 {
 
-use Modern::Perl;
+use Modern::Perl 1.20140107;
 
-use parent qw( Locale::Maketext Exporter );
+use parent 0.228 qw( Locale::Maketext Exporter );
 
 BEGIN {
     our @EXPORT_OK   = qw( __ loc );
@@ -73,7 +73,7 @@ Term::CLI::L10N - localizations for Term::CLI
 
 =head1 VERSION
 
-version 0.04004
+version 0.051002
 
 =head1 SYNOPSIS
 
@@ -89,6 +89,9 @@ version 0.04004
  say $lh->maketext("invalid value");  # "maketext" is not imported by default.
 
 =head1 DESCRIPTION
+
+The C<Term::CLI::L10N> module implements a localization mechanism based
+on L<Locale::Maketext>(3p).
 
 =head1 FUNCTIONS
 
@@ -126,6 +129,12 @@ Dies with an error if no language can be loaded.
 =back
 
 =head1 EXAMPLES
+
+    use Term::CLI::L10N; # Initialise using current locale.
+
+    Term::CLI::L10N->set_language('nl'); # Force "nl" language.
+
+    say loc("ERROR"); # Should print "FOUT".
 
 =head1 SEE ALSO
 

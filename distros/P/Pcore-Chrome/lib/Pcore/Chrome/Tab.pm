@@ -15,9 +15,9 @@ has id => ( is => 'ro', isa => Str, required => 1 );
 
 has listen => ( is => 'ro', isa => HashRef );
 
-has _ws => ( is => 'ro', isa => InstanceOf ['Pcore::WebSocket::Protocol::raw'], init_arg => undef );
-has _cb      => ( is => 'ro', isa => HashRef,  init_arg => undef );
-has _conn_cb => ( is => 'ro', isa => ArrayRef, init_arg => undef );
+has _ws      => ( is => 'ro', isa => InstanceOf ['Pcore::WebSocket::Protocol::raw'], init_arg => undef );
+has _cb      => ( is => 'ro', isa => HashRef,                                        init_arg => undef );
+has _conn_cb => ( is => 'ro', isa => ArrayRef,                                       init_arg => undef );
 
 our $_MSG_ID = 0;
 
@@ -63,13 +63,11 @@ sub _cmd ( $self, $cmd, @args ) {
     $self->{_cb}->{$id} = [ $self, $cb ] if $cb;
 
     my $send = sub {
-        $self->{_ws}->send_text(
-            to_json {
-                id     => $id,
-                method => $cmd,
-                params => \%args,
-            }
-        );
+        $self->{_ws}->send_text( to_json {
+            id     => $id,
+            method => $cmd,
+            params => \%args,
+        } );
 
         return;
     };
@@ -78,13 +76,11 @@ sub _cmd ( $self, $cmd, @args ) {
         $send->();
     }
     else {
-        $self->_connect(
-            sub {
-                $send->();
+        $self->_connect( sub {
+            $send->();
 
-                return;
-            }
-        );
+            return;
+        } );
     }
 
     return;
@@ -108,7 +104,7 @@ sub _connect ( $self, $cb ) {
             # call callbacks
             if ( my $callbacks = delete $self->{_conn_cb} ) {
                 for my $cb ( $callbacks->@* ) {
-                    AE::postpone { $cb->() };
+                    $cb->();
                 }
             }
 
@@ -140,7 +136,7 @@ sub _connect ( $self, $cb ) {
             # call callbacks
             if ( my $callbacks = delete $self->{_conn_cb} ) {
                 for my $cb ( $callbacks->@* ) {
-                    AE::postpone { $cb->() };
+                    $cb->();
                 }
             }
 

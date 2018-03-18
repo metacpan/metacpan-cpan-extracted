@@ -1,5 +1,9 @@
 Revision history for perl distribution Mojo-IOLoop-ReadWriteFork
 
+0.36 2018-03-11T14:50:05+0100
+ - Fix releasing the pty on close #10
+   Contributor: Ole Bjørn Hessen
+
 0.35 2017-08-21T13:07:01+0200
  - Need to skip close-filehandles.t for now
 

@@ -1,4 +1,4 @@
-#===============================================================================
+#=============================================================================
 #
 #       Module:  Term::CLI::ArgumentSet
 #
@@ -16,22 +16,22 @@
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
-#===============================================================================
+#=============================================================================
 
 use 5.014_001;
 
-package Term::CLI::Role::ArgumentSet  0.04004 {
+package Term::CLI::Role::ArgumentSet  0.051002 {
 
-use Modern::Perl;
+use Modern::Perl 1.20140107;
 
-use Types::Standard qw(
+use Types::Standard 1.000005 qw(
     ArrayRef
     InstanceOf
     Maybe
 );
 
 use Moo::Role;
-use namespace::clean;
+use namespace::clean 0.25;
 
 has _arguments => (
     is        => 'rw',
@@ -98,7 +98,7 @@ Term::CLI::Role::ArgumentSet - Role for (sub-)commands in Term::CLI
 
 =head1 VERSION
 
-version 0.04004
+version 0.051002
 
 =head1 SYNOPSIS
 

@@ -21,7 +21,7 @@ use Clustericious::Commands;
 use Path::Class::Dir;
 
 # ABSTRACT: Clustericious app base class
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.29'; # VERSION
 
 
 has commands => sub {
@@ -169,7 +169,7 @@ Clustericious::App - Clustericious app base class
 
 =head1 VERSION
 
-version 1.27
+version 1.29
 
 =head1 SYNOPSIS
 

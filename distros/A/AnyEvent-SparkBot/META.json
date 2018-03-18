@@ -35,7 +35,7 @@
             "AnyEvent::WebSocket::Client" : "0.39",
             "B" : "1.68",
             "Carp" : "1.42",
-            "Data::Dumper" : "2.167",
+            "Data::Dumper" : "2.161",
             "Data::Result" : "1.0",
             "Exporter" : "5.72",
             "HTTP::MultiGet" : "1.008",
@@ -63,6 +63,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : 1.008,
+   "version" : 1.009,
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -25,7 +25,7 @@ use Map::Tube::Exception::FoundUnsupportedObject;
 use Map::Tube::Exception::InvalidColorHexCode;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 sub test_missing_line_id {
     my @caller  = caller(0);

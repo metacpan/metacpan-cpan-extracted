@@ -52,6 +52,12 @@ has 'stats_keys' => (
 	default  => sub { [ values %job_info_mappings, @job_info_fields ] }
 );
 
+has '_cpu_multiplier' => (
+	is       => 'rw',
+	default  => 1,
+	init_arg => undef
+);
+
 after '_collect_job_stats' => sub {
 	my $self   = shift;
 	my $status = shift;
@@ -97,7 +103,7 @@ sub _collect_qacct_info {
 					) if ++$divcnt == 2;
 				next;
 				}
-			if (my ( $key, $val ) = /(\w+)\s+(.*)/) {
+			if (my ( $key, $val ) = /(\w+)\s+(.*?)\s*$/) {
 				$info{$key} = $val;
 			}
 		}
@@ -167,6 +173,7 @@ sub _get_submit_command {
 		"-o",      $self->_stdout,
 		"-e",      $self->_stderr,
 		"-sync y", "-cwd",
+		"-S /bin/bash",
 		"-b y",    "'$shell_script'" );
 
 	return $qsub_command;

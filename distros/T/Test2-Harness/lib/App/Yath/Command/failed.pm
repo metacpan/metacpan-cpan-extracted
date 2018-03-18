@@ -2,7 +2,7 @@ package App::Yath::Command::failed;
 use strict;
 use warnings;
 
-our $VERSION = '0.001057';
+our $VERSION = '0.001061';
 
 use Test2::Util qw/pkg_to_file/;
 
@@ -262,6 +262,14 @@ Use the specified file as standard input to ALL tests
 (Default: on) Include 'lib' in your module path
 
 Do not include 'lib'
+
+=item --no-mem-usage
+
+Disable Test2::Plugin::MemUsage (Loaded by default)
+
+=item --no-uuids
+
+Disable Test2::Plugin::UUID (Loaded by default)
 
 =item --slack "#CHANNEL"
 

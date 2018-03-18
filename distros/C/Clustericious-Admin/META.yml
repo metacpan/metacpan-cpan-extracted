@@ -1,5 +1,5 @@
 ---
-abstract: 'Parallel SSH client'
+abstract: '(Deprecated) Parallel SSH client'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
@@ -36,5 +36,7 @@ resources:
   bugtracker: https://github.com/clustericious/App-clad/issues
   homepage: https://metacpan.org/pod/App::clad
   repository: git://github.com/clustericious/App-clad.git
-version: '1.10'
+version: '1.11'
+x_deprecated: 1
 x_serialization_backend: 'YAML::Tiny version 1.70'
+x_use_unsafe_inc: 0

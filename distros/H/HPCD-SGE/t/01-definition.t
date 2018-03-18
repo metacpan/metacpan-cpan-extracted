@@ -94,6 +94,8 @@ my $end = time;
 
 ok( ($end - $start) > 19, "elapsed time must be at least 19 seconds" );
 
+sleep 30; # allow for slow NFS propagation
+
 ok( -d $workdir, "directory $workdir must have been created" );
 ok( -f $_, "file $_ must have been created" )
 	for (

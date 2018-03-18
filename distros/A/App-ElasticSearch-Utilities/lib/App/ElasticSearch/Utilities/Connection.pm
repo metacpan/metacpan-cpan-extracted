@@ -2,7 +2,10 @@ package App::ElasticSearch::Utilities::Connection;
 # ABSTRACT: Abstract the connection element
 
 
-our $VERSION = '5.4'; # VERSION
+use strict;
+use warnings;
+
+our $VERSION = '5.5'; # VERSION
 
 use App::ElasticSearch::Utilities::HTTPRequest;
 use CLI::Helpers qw(:output);
@@ -10,7 +13,7 @@ use JSON::MaybeXS;
 use LWP::UserAgent;
 use Module::Load;
 use Ref::Util qw(is_ref is_arrayref is_hashref);
-use Sub::Quote;
+use Types::Standard qw( Enum InstanceOf Int Str );
 use URI;
 use URI::QueryParam;
 
@@ -19,34 +22,34 @@ use namespace::autoclean;
 
 has 'host' => (
     is      => 'ro',
-    isa     => quote_sub(q{ die "must specify a hostname or ip for host parameter" unless defined $_[0] and length $_[0] }),
-    default => quote_sub(q{'localhost'}),
+    isa     => Str,
+    default => sub { 'localhost' },
 );
 
 has 'port' => (
     is      => 'ro',
-    isa     => quote_sub(q{ die "must specify a port number" unless defined $_[0] and $_[0] =~ /^\d+$/ }),
-    default => quote_sub(q{9200}),
+    isa     => Int,
+    default => sub { 9200 },
 );
 
 
 has 'proto' => (
     is      => 'ro',
-    isa     => quote_sub(q{ die "must specify a protocol either http or https" unless defined $_[0] and $_[0] =~ /^http(s)?/}),
-    default => quote_sub(q{'http'}),
+    isa     => Enum[qw(http https)],
+    default => sub { 'http' },
 );
 
 
 has 'timeout' => (
     is      => 'ro',
-    isa     => quote_sub(q{ die "must specify a timeout in seconds" unless defined $_[0] and $_[0] =~ /^\d+$/ }),
-    default => quote_sub(q{10}),
+    isa     => Int,
+    default => sub { 10 },
 );
 
 
 has 'ua' => (
     is  => 'lazy',
-    isa => quote_sub(q{die "UA setup failed." unless ref($_[0]) =~ /^LWP::UserAgent/}),
+    isa => InstanceOf["LWP::UserAgent"],
 );
 
 
@@ -57,7 +60,7 @@ has 'ua' => (
     sub LWP::UserAgent::get_basic_credentials {
         my ($self,$realm,$url) = @_;
         my $uri = URI->new( $url );
-        load App::ElasticSearch::Utilities => 'es_basic_auth';
+        load "App::ElasticSearch::Utilities" => 'es_basic_auth';
         return es_basic_auth( $uri->host );
     }
 }
@@ -66,7 +69,9 @@ sub _build_ua {
     my ($self) = @_;
 
     # Construct the UA Object
+    ## no critic
     my $local_version = eval '$VERSION' || '999.9';
+    ## use critic
     my $ua = LWP::UserAgent->new(
         keep_alive        => 3,
         agent             => sprintf("%s/%0.1f (Perl %s)", __PACKAGE__, $local_version, $^V),
@@ -93,8 +98,7 @@ sub _build_ua {
             # Plain text transform for the _cat API
             debug({color=>'yellow',indent=>1},"Plain Text Transform Response Content");
             my $decoded = [
-                map { s/^\s+//; s/\s+$//; $_ }
-                grep { defined && length }
+                grep { defined && length && !/^\s+$/ }
                 split /\r?\n/, $response->content
             ];
             debug_var($decoded);
@@ -215,7 +219,7 @@ App::ElasticSearch::Utilities::Connection - Abstract the connection element
 
 =head1 VERSION
 
-version 5.4
+version 5.5
 
 =head1 SYNOPSIS
 
@@ -293,7 +297,7 @@ Returns a list containing the HTTP Status Code, and the Response Content.
 =head2 bulk( body => ..., index => ... )
 
 Parameter B<body> is required.  The body should be an array containing the command and documents to send to the
-ElasticSearch bulk API, see: L<https://www.elastic.co/guide/en/elasticsearch/reference/2.3/docs-bulk.html|Bulk API>
+ElasticSearch bulk API, see: L<Bulk API|https://www.elastic.co/guide/en/elasticsearch/reference/2.3/docs-bulk.html>
 
 Returns a list containing the HTTP Status Code, and the Response Content.
 

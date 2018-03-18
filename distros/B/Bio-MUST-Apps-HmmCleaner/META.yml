@@ -1,0 +1,46 @@
+---
+abstract: 'Main class for HmmCleaner'
+author:
+  - 'Arnaud Di Franco <arnaud.difranco@gmail.fr>'
+build_requires:
+  Test::Files: '0'
+  Test::Most: '0'
+  autodie: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-MUST-Apps-HmmCleaner
+requires:
+  Bio::FastParsers::Hmmer: '0'
+  Bio::MUST::Core: '0.180230'
+  Bio::MUST::Core::Ali: '0'
+  Bio::MUST::Core::Constants: '0'
+  Bio::MUST::Core::GeneticCode::Factory: '0'
+  Bio::MUST::Core::IdList: '0'
+  Bio::MUST::Core::Seq: '0'
+  Bio::MUST::Core::SeqMask: '0'
+  Bio::MUST::Core::Utils: '0'
+  Bio::MUST::Drivers: '0.180270'
+  Bio::MUST::Drivers::Hmmer::Model::Temporary: '0'
+  Carp: '0'
+  File::Basename: '0'
+  Getopt::Euclid: '0'
+  IPC::System::Simple: '0'
+  List::AllUtils: '0'
+  Modern::Perl: '0'
+  Moose: '0'
+  Path::Class: '0'
+  Smart::Comments: '0'
+  Template: '0'
+  Test::Most: '0'
+  aliased: '0'
+  namespace::autoclean: '0'
+  perl: '5.010'
+version: '0.180750'

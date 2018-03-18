@@ -9,6 +9,6 @@ requires 'Plack';
 requires 'Plack::Middleware::Session';
 requires 'URI';
 requires 'LWP::UserAgent';
-requires 'WWW::ORCID';
+requires 'WWW::ORCID','0.0401';
 requires 'Clone';
 requires 'LWP::Protocol::https';

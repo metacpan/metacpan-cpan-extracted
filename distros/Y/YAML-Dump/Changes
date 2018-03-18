@@ -1,0 +1,7 @@
+1.82  2018-03-10 23:21:31 CET
+   - POD documentation fixes
+   - inclusion of LICENSE file in distribution
+   - release after 70 PASSes in CPAN Testers (Thanks!)
+
+1.81  2018-03-10 20:22:27 CET
+   - first test release

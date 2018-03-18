@@ -1,206 +1,311 @@
 package Yancy::Controller::Yancy::MultiTenant;
-our $VERSION = '0.022';
+our $VERSION = '1.001';
 # ABSTRACT: A controller to show a user only their content
 
-#pod =head1 DESCRIPTION
-#pod
-#pod This module contains routes to manage content owned by users. Each user
-#pod is allowed to see and manage only their own content.
-#pod
-#pod =head1 CONFIGURATION
-#pod
-#pod To use this controller, you must add some additional configuration to
-#pod your collections. This configuration will map collection fields to
-#pod Mojolicious stash values. You must then set these stash values on every
-#pod request so that users are restricted to their own content.
+#pod =head1 SYNOPSIS
 #pod
 #pod     use Mojolicious::Lite;
 #pod     plugin Yancy => {
-#pod         controller_class => 'Yancy::MultiTenant',
 #pod         collections => {
 #pod             blog => {
-#pod                 # Map collection fields to stash values
-#pod                 'x-stash-fields' => {
-#pod                     # collection field => stash field
-#pod                     user_id => 'current_user_id',
-#pod                 },
 #pod                 properties => {
-#pod                     id => { type => 'integer', readOnly => 1 },
-#pod                     user_id => { type => 'integer', readOnly => 1 },
+#pod                     id => { type => 'integer' },
+#pod                     user_id => { type => 'integer' },
 #pod                     title => { type => 'string' },
-#pod                     content => { type => 'string' },
+#pod                     html => { type => 'string' },
 #pod                 },
 #pod             },
 #pod         },
 #pod     };
 #pod
-#pod     under '/' => sub {
+#pod     app->routes->get( '/user/:user_id' )->to(
+#pod         'yancy-multi_tenant#list',
+#pod         collection => 'blog',
+#pod         template => 'index'
+#pod     );
+#pod
+#pod     __DATA__
+#pod     @@ index.html.ep
+#pod     % for my $item ( @{ stash 'items' } ) {
+#pod         <h1><%= $item->{title} %></h1>
+#pod         <%== $item->{html} %>
+#pod     % }
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This module contains routes to manage content owned by users. When paired
+#pod with an authentication plugin like L<Yancy::Plugin::Auth::Basic>, each user
+#pod is allowed to manage their own content.
+#pod
+#pod This controller extends L<Yancy::Controller::Yancy> to add filtering content
+#pod by a user's ID.
+#pod
+#pod =head1 EXAMPLES
+#pod
+#pod To use this controller when the URL displays a username and the content
+#pod uses an internal ID, you can use an C<under> route to map the username
+#pod in the path to the ID:
+#pod
+#pod     my $user_route = app->routes->under( '/:username', sub {
 #pod         my ( $c ) = @_;
-#pod         # Pull out the current user's username from the session.
-#pod         # See Yancy::Plugin::Auth::Basic for a way to set the username
-#pod         $c->stash( current_user_id => $c->session( 'username' ) );
-#pod     };
+#pod         my $username = $c->stash( 'username' );
+#pod         my @users = $c->yancy->list( user => { username => $username } );
+#pod         if ( my $user = $users[0] ) {
+#pod             $c->stash( user_id => $user->{id} );
+#pod             return 1;
+#pod         }
+#pod         return $c->reply->not_found;
+#pod     } );
+#pod
+#pod     # /:username - List blog posts
+#pod     $user_route->get( '' )->to(
+#pod         'yancy-multi_tenant#list',
+#pod         collection => 'blog',
+#pod         template => 'blog_list',
+#pod     );
+#pod     # /:username/:id/:slug - Get a single blog post
+#pod     $user_route->get( '/:id/:slug' )->to(
+#pod         'yancy-multi_tenant#get',
+#pod         collection => 'blog',
+#pod         template => 'blog_view',
+#pod     );
+#pod
+#pod To build a website where content is only for the current logged-in user,
+#pod combine this controller with an auth plugin like
+#pod L<Yancy::Plugin::Auth::Basic>. Use an C<under> route to set the
+#pod C<user_id> from the current user.
+#pod
+#pod     app->yancy->plugin( 'Auth::Basic', {
+#pod         route => any( '' ), # All routes require login
+#pod         collection => 'user',
+#pod         username_field => 'username',
+#pod         password_digest => { type => 'SHA-1' },
+#pod     } );
+#pod
+#pod     my $user_route = app->yancy->auth->route->under( '/', sub {
+#pod         my ( $c ) = @_;
+#pod         my $user = $c->yancy->auth->current_user;
+#pod         $c->stash( user_id => $user->{id} );
+#pod         return 1;
+#pod     } );
+#pod
+#pod     # / - List todo items
+#pod     $user_route->get( '' )->to(
+#pod         'yancy-multi_tenant#list',
+#pod         collection => 'todo_item',
+#pod         template => 'todo_list',
+#pod     );
 #pod
 #pod =head1 SEE ALSO
 #pod
-#pod L<Yancy::Controller::Yancy>, L<Mojolicious::Controller>
+#pod L<Yancy::Controller::Yancy>, L<Mojolicious::Controller>, L<Yancy>
 #pod
 #pod =cut
 
-use Mojo::Base 'Mojolicious::Controller';
+use Mojo::Base 'Yancy::Controller::Yancy';
 
-sub _build_tenant_filter {
-    my ( $c, $coll ) = @_;
-    my $filter = $c->yancy->config->{collections}{$coll}{'x-stash-filter'} || {};
-    #; use Data::Dumper; say "Filter: " . Dumper $filter;
-    my %query = (
-        map {; $_ => $c->stash( $filter->{ $_ } ) }
-        keys %$filter
-    );
-    #; use Data::Dumper; say "Query: " . Dumper \%query;
-    return %query;
-}
-
-sub _fetch_authorized_item {
-    my ( $c, $coll, $id ) = @_;
-    my $item = $c->yancy->backend->get( $coll, $id );
-    my %filter = $c->_build_tenant_filter( $coll );
-    if ( grep { $item->{ $_ } ne $filter{ $_ } } keys %filter ) {
-        return;
-    }
-    return $item;
-}
-
-#pod =method list_items
+#pod =method list
 #pod
-#pod List the items in a collection. A user only can see items owned by
-#pod themselves.
+#pod     $routes->get( '/:user_id' )->to(
+#pod         'yancy-multi_tenant#list',
+#pod         collection => $collection_name,
+#pod         template => $template_name,
+#pod     );
+#pod
+#pod This method is used to list content owned by the given user (specified
+#pod in the C<user_id> stash value).
+#pod
+#pod This method extends L<Yancy::Controller::Yancy/list> and adds the
+#pod following configuration and stash values:
+#pod
+#pod =over
+#pod
+#pod =item user_id
+#pod
+#pod The ID of the user whose content should be listed. Required. Should
+#pod match a value in the C<user_id_field>.
+#pod
+#pod =item user_id_field
+#pod
+#pod The field in the item that holds the user ID. Defaults to C<user_id>.
+#pod
+#pod =back
 #pod
 #pod =cut
 
-sub list_items {
+sub list {
     my ( $c ) = @_;
-    return unless $c->openapi->valid_input;
-    my %query = $c->_build_tenant_filter( $c->stash( 'collection' ) );
-    my $args = $c->validation->output;
-    my %opt = (
-        limit => $args->{limit},
-        offset => $args->{offset},
-    );
-    if ( $args->{order_by} ) {
-        $opt{order_by} = [
-            map +{ "-$_->[0]" => $_->[1] },
-            map +[ split /:/ ],
-            split /,/, $args->{order_by}
-        ];
-    }
-    return $c->render(
-        status => 200,
-        openapi => $c->yancy->backend->list( $c->stash( 'collection' ), \%query, \%opt ),
-    );
+    my $user_id = $c->stash( 'user_id' ) || die "User ID not defined in stash";
+    $c->stash( filter => {
+        %{ $c->stash( 'filter' ) || {} },
+        $c->stash( 'user_id_field' ) // 'user_id' => $user_id,
+    } );
+    return $c->SUPER::list;
 }
 
-#pod =method add_item
+#pod =method get
 #pod
-#pod Add a new item to the collection. This new item will be owned by the
-#pod current user.
+#pod     $routes->get( '/:user_id/:id' )->to(
+#pod         'yancy-multi_tenant#get',
+#pod         collection => $collection_name,
+#pod         template => $template_name,
+#pod     );
+#pod
+#pod This method is used to show a single item owned by a user (given by the
+#pod C<user_id> stash value).
+#pod
+#pod This method extends L<Yancy::Controller::Yancy/get> and adds the
+#pod following configuration and stash values:
+#pod
+#pod =over
+#pod
+#pod =item user_id
+#pod
+#pod The ID of the user whose content should be listed. Required. Should
+#pod match a value in the C<user_id_field>.
+#pod
+#pod =item user_id_field
+#pod
+#pod The field in the item that holds the user ID. Defaults to C<user_id>.
+#pod
+#pod =back
 #pod
 #pod =cut
 
-sub add_item {
+sub get {
     my ( $c ) = @_;
-    return unless $c->openapi->valid_input;
-    my $coll = $c->stash( 'collection' );
-    my $item = {
-        %{ $c->yancy->filter->apply( $coll, $c->validation->param( 'newItem' ) ) },
-        $c->_build_tenant_filter( $coll ),
-    };
-    return $c->render(
-        status => 201,
-        openapi => $c->yancy->backend->create( $coll, $item ),
-    );
+    return if !$c->_is_owned_by;
+    return $c->SUPER::get;
 }
 
-#pod =method get_item
+#pod =method set
 #pod
-#pod Get a single item from a collection. Users can only view items owned
-#pod by them.
+#pod     $routes->any( [ 'GET', 'POST' ] => '/:id/edit' )->to(
+#pod         'yancy#set',
+#pod         collection => $collection_name,
+#pod         template => $template_name,
+#pod     );
+#pod
+#pod     $routes->any( [ 'GET', 'POST' ] => '/create' )->to(
+#pod         'yancy#set',
+#pod         collection => $collection_name,
+#pod         template => $template_name,
+#pod         forward_to => $route_name,
+#pod     );
+#pod
+#pod This route creates a new item or updates an existing item in
+#pod a collection. If the user is making a C<GET> request, they will simply
+#pod be shown the template. If the user is making a C<POST> or C<PUT>
+#pod request, the form parameters will be read, the data will be validated
+#pod against L<the collection configuration|Yancy::Help::Config/Data
+#pod Collections>, and the user will either be shown the form again with the
+#pod result of the form submission (success or failure) or the user will be
+#pod forwarded to another place.
+#pod
+#pod This method does not authenticate users. User authentication and
+#pod authorization should be performed by an auth plugin like
+#pod L<Yancy::Plugin::Auth::Basic>.
+#pod
+#pod This method extends L<Yancy::Controller::Yancy/set> and adds the
+#pod following configuration and stash values:
+#pod
+#pod =over
+#pod
+#pod =item user_id
+#pod
+#pod The ID of the user whose content is being edited. Required. Will be
+#pod set in the C<user_id_field>.
+#pod
+#pod =item user_id_field
+#pod
+#pod The field in the item that holds the user ID. Defaults to C<user_id>.
+#pod This field will be filled in with the C<user_id> stash value.
+#pod
+#pod =back
 #pod
 #pod =cut
 
-sub get_item {
+sub set {
     my ( $c ) = @_;
-    return unless $c->openapi->valid_input;
-    my $args = $c->validation->output;
-    my $id = $args->{ $c->stash( 'id_field' ) };
-    my $item = $c->_fetch_authorized_item( $c->stash( 'collection' ), $id );
-    if ( !$item ) {
-        return $c->render(
-            status => 401,
-            openapi => {
-                message => 'Unauthorized',
-            },
-        );
+
+    # Users are not allowed to edit content from other users
+    my $id = $c->stash( 'id' );
+    return if $id && !$c->_is_owned_by;
+
+    if ( $c->req->method ne 'GET' ) {
+        my $user_id_field = $c->stash( 'user_id_field' ) // 'user_id';
+        $c->req->param( $user_id_field => $c->stash( 'user_id' ) );
     }
-    return $c->render(
-        status => 200,
-        openapi => $item,
-    );
+
+    return $c->SUPER::set;
 }
 
-#pod =method set_item
+#pod =method delete
 #pod
-#pod Update an item in a collection. Users can only update items that they
-#pod own.
+#pod     $routes->any( [ 'GET', 'POST' ], '/delete/:id' )->to(
+#pod         'yancy#delete',
+#pod         collection => $collection_name,
+#pod         template => $template_name,
+#pod         forward_to => $route_name,
+#pod     );
+#pod
+#pod This route deletes an item from a collection. If the user is making
+#pod a C<GET> request, they will simply be shown the template (which can be
+#pod used to confirm the delete). If the user is making a C<POST> or C<DELETE>
+#pod request, the item will be deleted and the user will either be shown the
+#pod form again with the result of the form submission (success or failure)
+#pod or the user will be forwarded to another place.
+#pod
+#pod This method does not authenticate users. User authentication and
+#pod authorization should be performed by an auth plugin like
+#pod L<Yancy::Plugin::Auth::Basic>.
+#pod
+#pod This method extends L<Yancy::Controller::Yancy/delete> and adds the
+#pod following configuration and stash values:
+#pod
+#pod =over
+#pod
+#pod =item user_id
+#pod
+#pod The ID of the user whose content is being edited. Required. Will be
+#pod set in the C<user_id_field>.
+#pod
+#pod =item user_id_field
+#pod
+#pod The field in the item that holds the user ID. Defaults to C<user_id>.
+#pod This field will be filled in with the C<user_id> stash value.
+#pod
+#pod =back
 #pod
 #pod =cut
 
-sub set_item {
+sub delete {
     my ( $c ) = @_;
-    return unless $c->openapi->valid_input;
-    my $args = $c->validation->output;
-    my $id = $args->{ $c->stash( 'id_field' ) };
-    my $coll = $c->stash( 'collection' );
-    if ( $c->_fetch_authorized_item( $coll, $id ) ) {
-        my $new_item = {
-            %{ $c->yancy->filter->apply( $coll, $args->{ newItem } ) },
-            $c->_build_tenant_filter( $coll ),
-        };
-        $c->yancy->backend->set( $coll, $id, $new_item );
-        return $c->render(
-            status => 200,
-            openapi => $c->yancy->backend->get( $coll, $id ),
-        );
-    }
-    return $c->render(
-        status => 401,
-        openapi => {
-            message => 'Unauthorized',
-        },
-    );
+    return if !$c->_is_owned_by;
+    return $c->SUPER::delete;
 }
 
-#pod =method delete_item
-#pod
-#pod Delete an item from a collection. Users can only delete items they own.
-#pod
-#pod =cut
-
-sub delete_item {
+# =sub _is_owned_by
+#
+#   return if !_is_owned_by();
+#
+# Check that the currently-requested item is owned by the user_id in the
+# stash. This uses the collection, id, user_id, and user_id_field stash
+# values. user_id_field defaults to 'user_id'. All other fields are
+# required and will throw an exception if missing.
+sub _is_owned_by {
     my ( $c ) = @_;
-    return unless $c->openapi->valid_input;
-    my $args = $c->validation->output;
-    my $id = $args->{ $c->stash( 'id_field' ) };
-    if ( $c->_fetch_authorized_item( $c->stash( 'collection' ), $id ) ) {
-        $c->yancy->backend->delete( $c->stash( 'collection' ), $id );
-        return $c->rendered( 204 );
+    my $coll_name = $c->stash( 'collection' )
+        || die "Collection name not defined in stash";
+    my $user_id = $c->stash( 'user_id' ) || die "User ID not defined in stash";
+    my $id = $c->stash( 'id' ) // die 'ID not defined in stash';
+    my $user_id_field = $c->stash( 'user_id_field' ) // 'user_id';
+    my $item = $c->yancy->backend->get( $coll_name => $id );
+    if ( !$item || $item->{ $user_id_field } ne $user_id ) {
+        $c->reply->not_found;
+        return 0;
     }
-    return $c->render(
-        status => 401,
-        openapi => {
-            message => 'Unauthorized',
-        },
-    );
+    return 1;
 }
 
 1;
@@ -215,76 +320,243 @@ Yancy::Controller::Yancy::MultiTenant - A controller to show a user only their c
 
 =head1 VERSION
 
-version 0.022
+version 1.001
 
-=head1 DESCRIPTION
-
-This module contains routes to manage content owned by users. Each user
-is allowed to see and manage only their own content.
-
-=head1 METHODS
-
-=head2 list_items
-
-List the items in a collection. A user only can see items owned by
-themselves.
-
-=head2 add_item
-
-Add a new item to the collection. This new item will be owned by the
-current user.
-
-=head2 get_item
-
-Get a single item from a collection. Users can only view items owned
-by them.
-
-=head2 set_item
-
-Update an item in a collection. Users can only update items that they
-own.
-
-=head2 delete_item
-
-Delete an item from a collection. Users can only delete items they own.
-
-=head1 CONFIGURATION
-
-To use this controller, you must add some additional configuration to
-your collections. This configuration will map collection fields to
-Mojolicious stash values. You must then set these stash values on every
-request so that users are restricted to their own content.
+=head1 SYNOPSIS
 
     use Mojolicious::Lite;
     plugin Yancy => {
-        controller_class => 'Yancy::MultiTenant',
         collections => {
             blog => {
-                # Map collection fields to stash values
-                'x-stash-fields' => {
-                    # collection field => stash field
-                    user_id => 'current_user_id',
-                },
                 properties => {
-                    id => { type => 'integer', readOnly => 1 },
-                    user_id => { type => 'integer', readOnly => 1 },
+                    id => { type => 'integer' },
+                    user_id => { type => 'integer' },
                     title => { type => 'string' },
-                    content => { type => 'string' },
+                    html => { type => 'string' },
                 },
             },
         },
     };
 
-    under '/' => sub {
+    app->routes->get( '/user/:user_id' )->to(
+        'yancy-multi_tenant#list',
+        collection => 'blog',
+        template => 'index'
+    );
+
+    __DATA__
+    @@ index.html.ep
+    % for my $item ( @{ stash 'items' } ) {
+        <h1><%= $item->{title} %></h1>
+        <%== $item->{html} %>
+    % }
+
+=head1 DESCRIPTION
+
+This module contains routes to manage content owned by users. When paired
+with an authentication plugin like L<Yancy::Plugin::Auth::Basic>, each user
+is allowed to manage their own content.
+
+This controller extends L<Yancy::Controller::Yancy> to add filtering content
+by a user's ID.
+
+=head1 METHODS
+
+=head2 list
+
+    $routes->get( '/:user_id' )->to(
+        'yancy-multi_tenant#list',
+        collection => $collection_name,
+        template => $template_name,
+    );
+
+This method is used to list content owned by the given user (specified
+in the C<user_id> stash value).
+
+This method extends L<Yancy::Controller::Yancy/list> and adds the
+following configuration and stash values:
+
+=over
+
+=item user_id
+
+The ID of the user whose content should be listed. Required. Should
+match a value in the C<user_id_field>.
+
+=item user_id_field
+
+The field in the item that holds the user ID. Defaults to C<user_id>.
+
+=back
+
+=head2 get
+
+    $routes->get( '/:user_id/:id' )->to(
+        'yancy-multi_tenant#get',
+        collection => $collection_name,
+        template => $template_name,
+    );
+
+This method is used to show a single item owned by a user (given by the
+C<user_id> stash value).
+
+This method extends L<Yancy::Controller::Yancy/get> and adds the
+following configuration and stash values:
+
+=over
+
+=item user_id
+
+The ID of the user whose content should be listed. Required. Should
+match a value in the C<user_id_field>.
+
+=item user_id_field
+
+The field in the item that holds the user ID. Defaults to C<user_id>.
+
+=back
+
+=head2 set
+
+    $routes->any( [ 'GET', 'POST' ] => '/:id/edit' )->to(
+        'yancy#set',
+        collection => $collection_name,
+        template => $template_name,
+    );
+
+    $routes->any( [ 'GET', 'POST' ] => '/create' )->to(
+        'yancy#set',
+        collection => $collection_name,
+        template => $template_name,
+        forward_to => $route_name,
+    );
+
+This route creates a new item or updates an existing item in
+a collection. If the user is making a C<GET> request, they will simply
+be shown the template. If the user is making a C<POST> or C<PUT>
+request, the form parameters will be read, the data will be validated
+against L<the collection configuration|Yancy::Help::Config/Data
+Collections>, and the user will either be shown the form again with the
+result of the form submission (success or failure) or the user will be
+forwarded to another place.
+
+This method does not authenticate users. User authentication and
+authorization should be performed by an auth plugin like
+L<Yancy::Plugin::Auth::Basic>.
+
+This method extends L<Yancy::Controller::Yancy/set> and adds the
+following configuration and stash values:
+
+=over
+
+=item user_id
+
+The ID of the user whose content is being edited. Required. Will be
+set in the C<user_id_field>.
+
+=item user_id_field
+
+The field in the item that holds the user ID. Defaults to C<user_id>.
+This field will be filled in with the C<user_id> stash value.
+
+=back
+
+=head2 delete
+
+    $routes->any( [ 'GET', 'POST' ], '/delete/:id' )->to(
+        'yancy#delete',
+        collection => $collection_name,
+        template => $template_name,
+        forward_to => $route_name,
+    );
+
+This route deletes an item from a collection. If the user is making
+a C<GET> request, they will simply be shown the template (which can be
+used to confirm the delete). If the user is making a C<POST> or C<DELETE>
+request, the item will be deleted and the user will either be shown the
+form again with the result of the form submission (success or failure)
+or the user will be forwarded to another place.
+
+This method does not authenticate users. User authentication and
+authorization should be performed by an auth plugin like
+L<Yancy::Plugin::Auth::Basic>.
+
+This method extends L<Yancy::Controller::Yancy/delete> and adds the
+following configuration and stash values:
+
+=over
+
+=item user_id
+
+The ID of the user whose content is being edited. Required. Will be
+set in the C<user_id_field>.
+
+=item user_id_field
+
+The field in the item that holds the user ID. Defaults to C<user_id>.
+This field will be filled in with the C<user_id> stash value.
+
+=back
+
+=head1 EXAMPLES
+
+To use this controller when the URL displays a username and the content
+uses an internal ID, you can use an C<under> route to map the username
+in the path to the ID:
+
+    my $user_route = app->routes->under( '/:username', sub {
         my ( $c ) = @_;
-        # Pull out the current user's username from the session.
-        # See Yancy::Plugin::Auth::Basic for a way to set the username
-        $c->stash( current_user_id => $c->session( 'username' ) );
-    };
+        my $username = $c->stash( 'username' );
+        my @users = $c->yancy->list( user => { username => $username } );
+        if ( my $user = $users[0] ) {
+            $c->stash( user_id => $user->{id} );
+            return 1;
+        }
+        return $c->reply->not_found;
+    } );
+
+    # /:username - List blog posts
+    $user_route->get( '' )->to(
+        'yancy-multi_tenant#list',
+        collection => 'blog',
+        template => 'blog_list',
+    );
+    # /:username/:id/:slug - Get a single blog post
+    $user_route->get( '/:id/:slug' )->to(
+        'yancy-multi_tenant#get',
+        collection => 'blog',
+        template => 'blog_view',
+    );
+
+To build a website where content is only for the current logged-in user,
+combine this controller with an auth plugin like
+L<Yancy::Plugin::Auth::Basic>. Use an C<under> route to set the
+C<user_id> from the current user.
+
+    app->yancy->plugin( 'Auth::Basic', {
+        route => any( '' ), # All routes require login
+        collection => 'user',
+        username_field => 'username',
+        password_digest => { type => 'SHA-1' },
+    } );
+
+    my $user_route = app->yancy->auth->route->under( '/', sub {
+        my ( $c ) = @_;
+        my $user = $c->yancy->auth->current_user;
+        $c->stash( user_id => $user->{id} );
+        return 1;
+    } );
+
+    # / - List todo items
+    $user_route->get( '' )->to(
+        'yancy-multi_tenant#list',
+        collection => 'todo_item',
+        template => 'todo_list',
+    );
 
 =head1 SEE ALSO
 
-L<Yancy::Controller::Yancy>, L<Mojolicious::Controller>
+L<Yancy::Controller::Yancy>, L<Mojolicious::Controller>, L<Yancy>
 
 =head1 AUTHOR
 

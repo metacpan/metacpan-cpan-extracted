@@ -8,7 +8,6 @@ META.yml
 Makefile.PL
 README
 author.yml
-cpanfile
 dist.ini
 lib/PlugAuth/Plugin/AuthenSimple.pm
 t/00_diag.t

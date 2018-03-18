@@ -1,5 +1,5 @@
 ---
-abstract: 'create lightweight on-the-fly objects from hashes'
+abstract: 'create on-the-fly objects from hashes'
 author:
   - 'Diab Jerius <djerius@cpan.org>'
 build_requires:
@@ -7,7 +7,6 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Number::Tolerant: '0'
   Test2::V0: '0'
   Test::More: '0'
 configure_requires:
@@ -30,16 +29,12 @@ no_index:
 provides:
   Hash::Wrap:
     file: lib/Hash/Wrap.pm
-    version: '0.05'
-  Hash::Wrap::Base:
-    file: lib/Hash/Wrap/Base.pm
-    version: '0.05'
+    version: '0.08'
 requires:
-  MRO::Compat: '0'
   Scalar::Util: '0'
-  perl: '5.008009'
+  perl: '5.010'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Wrap
   repository: git://github.com/djerius/hash-wrap.git
-version: '0.05'
+version: '0.08'
 x_serialization_backend: 'YAML::Tiny version 1.70'

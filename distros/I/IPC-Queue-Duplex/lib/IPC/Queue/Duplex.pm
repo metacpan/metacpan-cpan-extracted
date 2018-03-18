@@ -3,7 +3,7 @@
 # IPC::Queue::Duplex - Filesystem based request / response queue
 # Copyright (c) 2017 Ashish Gulhati <ipc-qd at hash.neo.tc>
 #
-# $Id: lib/IPC/Queue/Duplex.pm v1.007 Sun Jun 25 01:43:14 PDT 2017 $
+# $Id: lib/IPC/Queue/Duplex.pm v1.008 Mon Mar 12 22:18:20 PDT 2018 $
 
 package IPC::Queue::Duplex;
 
@@ -14,7 +14,7 @@ use File::Copy qw(cp);
 use IPC::Queue::Duplex::Job;
 use Fcntl qw(:flock);
 
-our ( $VERSION ) = '$Revision: 1.007 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.008 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my ($class, %args) = @_;
@@ -57,7 +57,7 @@ sub get {
     }
     last unless $filename;
     next unless -e $filename;
-    open(my $jobfh, ">>", $filename);
+    open(my $jobfh, "+<", $filename);
     close $jobfh, next unless flock($jobfh, LOCK_EX | LOCK_NB);
     $filework = $filename; $filework =~ s/\.job/.wrk/;
     close $jobfh, last if rename $filename,$filework;
@@ -84,7 +84,7 @@ sub getresponse {
     }
     last unless $filename;
     next unless -e $filename;
-    open(my $jobfh, ">>", $filename);
+    open(my $jobfh, "+<", $filename);
     close $jobfh, next unless flock($jobfh, LOCK_EX | LOCK_NB);
     $filefin = $filename; $filefin =~ s/\.fin/.rsp/;
     close $jobfh, last if rename $filename,$filefin;
@@ -106,8 +106,8 @@ IPC::Queue::Duplex - Filesystem based request / response queue
 
 =head1 VERSION
 
- $Revision: 1.007 $
- $Date: Sun Jun 25 01:43:14 PDT 2017 $
+ $Revision: 1.008 $
+ $Date: Mon Mar 12 22:18:20 PDT 2018 $
 
 =head1 SYNOPSIS
 

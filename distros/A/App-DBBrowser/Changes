@@ -1,6 +1,21 @@
 Revision history for App-DBBrowser
 
 
+2.006    2018-03-15
+        - Option to enbable/disable write access.
+        - Update documentation.
+
+2.005    2018-03-14
+        - The option 'alias' now also affects aggregate functions, join and union.
+        - Minimum version "Term::Form" is "0.315".
+
+2.004    2018-03-12
+        - Code refactoring.
+        - New experimental features: subqueries, aggregate in select
+        - Removed "Files dir" option.
+        - Update documentation.
+        - Minimum version "Term::Form" is "0.314".
+
 2.003    2018-03-04
         - Update Insert module.
 

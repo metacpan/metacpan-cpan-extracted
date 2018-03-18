@@ -21,7 +21,6 @@
 #include "spvm_descriptor.h"
 #include "spvm_type.h"
 #include "spvm_use.h"
-#include "spvm_constant_pool.h"
 
 SPVM_OP* SPVM_TOKE_newOP(SPVM_COMPILER* compiler, int32_t type) {
   
@@ -172,10 +171,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               cur_src[file_size] = '\0';
               
               // Add package loading information
-              SPVM_CONSTANT_POOL_push_string(compiler, compiler->constant_pool, package_name);
-              SPVM_CONSTANT_POOL_push_string(compiler, compiler->constant_pool, package_name_with_template_args);
               const char* package_path = cur_file;
-              SPVM_CONSTANT_POOL_push_string(compiler, compiler->constant_pool, package_path);
               SPVM_HASH_insert(compiler->package_load_path_symtable, package_name_with_template_args, strlen(package_name_with_template_args), (void*)package_path);
               
               compiler->cur_src = cur_src;
@@ -672,6 +668,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         const char* cur_token_ptr = compiler->bufptr;
         
         char* str;
+        int32_t str_length = 0;
         if (*(compiler->bufptr) == '"') {
           str = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, compiler->allocator, 0);
           str[0] = '\0';
@@ -680,9 +677,11 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         else {
           _Bool finish = 0;
           while(1) {
+            // End of string literal
             if (*compiler->bufptr == '"' && *(compiler->bufptr - 1) != '\\') {
               finish = 1;
             }
+            // End of source file
             else if (*compiler->bufptr == '\0') {
               finish = 1;
             }
@@ -699,51 +698,50 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           }
           
           int32_t str_tmp_len = (int32_t)(compiler->bufptr - cur_token_ptr);
-          
-          char* str_tmp = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, compiler->allocator, str_tmp_len);
-          memcpy(str_tmp, cur_token_ptr, str_tmp_len);
-          str_tmp[str_tmp_len] = '\0';
 
           compiler->bufptr++;
           
           str = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, compiler->allocator, str_tmp_len);
-          int32_t str_index = 0;
           {
-            int32_t i;
-            for (i = 0; i < str_tmp_len; i++) {
-              if (str_tmp[i] == '\\') {
-                i++;
-                if (str_tmp[i] == '"') {
-                  str[str_index] = '"';
-                  str_index++;
+            char* char_ptr = (char*)cur_token_ptr;
+            while (char_ptr != compiler->bufptr - 1) {
+              if (*char_ptr == '\\') {
+                char_ptr++;
+                if (*char_ptr == '"') {
+                  str[str_length] = '"';
+                  str_length++;
                 }
-                else if (str_tmp[i] == '\'') {
-                  str[str_index] = '\'';
-                  str_index++;
+                else if (*char_ptr == '\'') {
+                  str[str_length] = '\'';
+                  str_length++;
                 }
-                else if (str_tmp[i] == '\\') {
-                  str[str_index] = '\\';
-                  str_index++;
+                else if (*char_ptr == '\\') {
+                  str[str_length] = '\\';
+                  str_length++;
                 }
-                else if (str_tmp[i] == 'r') {
-                  str[str_index] = 0x0D;
-                  str_index++;
+                else if (*char_ptr == 'r') {
+                  str[str_length] = 0x0D;
+                  str_length++;
                 }
-                else if (str_tmp[i] == 'n') {
-                  str[str_index] = 0x0A;
-                  str_index++;
+                else if (*char_ptr == 'n') {
+                  str[str_length] = 0x0A;
+                  str_length++;
                 }
-                else if (str_tmp[i] == 't') {
-                  str[str_index] = '\t';
-                  str_index++;
+                else if (*char_ptr == 't') {
+                  str[str_length] = '\t';
+                  str_length++;
                 }
-                else if (str_tmp[i] == 'b') {
-                  str[str_index] = '\b';
-                  str_index++;
+                else if (*char_ptr == 'b') {
+                  str[str_length] = '\b';
+                  str_length++;
                 }
-                else if (str_tmp[i] == 'f') {
-                  str[str_index] = '\f';
-                  str_index++;
+                else if (*char_ptr == 'f') {
+                  str[str_length] = '\f';
+                  str_length++;
+                }
+                else if (*char_ptr == '0') {
+                  str[str_length] = '\0';
+                  str_length++;
                 }
                 else {
                   fprintf(stderr, "Invalid escape character \"%c%c\" at %s line %" PRId32 "\n", *(compiler->bufptr -1),*compiler->bufptr, compiler->cur_file, compiler->cur_line);
@@ -751,15 +749,16 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 }
               }
               else {
-                str[str_index] = str_tmp[i];
-                str_index++;
+                str[str_length] = *char_ptr;
+                str_length++;
               }
+              char_ptr++;
             }
           }
-          str[str_index] = '\0';
+          str[str_length] = '\0';
         }
         
-        SPVM_OP* op_constant = SPVM_OP_new_op_constant_byte_array_string(compiler, str, compiler->cur_file, compiler->cur_line);
+        SPVM_OP* op_constant = SPVM_OP_new_op_constant_string(compiler, str, str_length, compiler->cur_file, compiler->cur_line);
         
         yylvalp->opval = op_constant;
         
@@ -936,80 +935,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               exit(EXIT_FAILURE);
             }
             op_constant = SPVM_OP_new_op_constant_double(compiler, num, compiler->cur_file, compiler->cur_line);
-          }
-          // byte
-          else if (constant_type->id == SPVM_TYPE_C_ID_BYTE) {
-            int64_t num;
-            errno = 0;
-            _Bool out_of_range = 0;
-            _Bool invalid = 0;
-            
-            if (digit == 16 || digit == 8 || digit == 2) {
-              uint64_t unum = (uint64_t)strtoull(num_str, &end, digit);
-              if (*end != '\0') {
-                invalid = 1;
-              }
-              else if (unum > UINT8_MAX || errno == ERANGE) {
-                out_of_range = 1;
-              }
-              num = (int64_t)unum;
-            }
-            else {
-              num = (int64_t)strtoll(num_str, &end, 10);
-              if (*end != '\0') {
-                invalid = 1;
-              }
-              else if (num < INT8_MIN || num > INT8_MAX || errno == ERANGE) {
-                out_of_range = 1;
-              }
-            }
-            
-            if (invalid) {
-              fprintf(stderr, "Invalid byte literal %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
-              exit(EXIT_FAILURE);
-            }
-            else if (out_of_range) {
-              fprintf(stderr, "byte literal out of range %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
-              exit(EXIT_FAILURE);
-            }
-            op_constant = SPVM_OP_new_op_constant_byte(compiler, num, compiler->cur_file, compiler->cur_line);
-          }
-          // short
-          else if (constant_type->id == SPVM_TYPE_C_ID_SHORT) {
-            int64_t num;
-            errno = 0;
-            _Bool out_of_range = 0;
-            _Bool invalid = 0;
-            
-            if (digit == 16 || digit == 8 || digit == 2) {
-              uint64_t unum = (uint64_t)strtoull(num_str, &end, digit);
-              if (*end != '\0') {
-                invalid = 1;
-              }
-              else if (unum > UINT16_MAX || errno == ERANGE) {
-                out_of_range = 1;
-              }
-              num = (int64_t)unum;
-            }
-            else {
-              num = (int64_t)strtoll(num_str, &end, 10);
-              if (*end != '\0') {
-                invalid = 1;
-              }
-              else if (num < INT16_MIN || num > INT16_MAX || errno == ERANGE) {
-                out_of_range = 1;
-              }
-            }
-            
-            if (invalid) {
-              fprintf(stderr, "Invalid short literal %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
-              exit(EXIT_FAILURE);
-            }
-            else if (out_of_range) {
-              fprintf(stderr, "short literal out of range %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
-              exit(EXIT_FAILURE);
-            }
-            op_constant = SPVM_OP_new_op_constant_short(compiler, num, compiler->cur_file, compiler->cur_line);
           }
           // int
           else if (constant_type->id == SPVM_TYPE_C_ID_INT) {

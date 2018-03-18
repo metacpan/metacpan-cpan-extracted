@@ -1,0 +1,16 @@
+Revision history for perl module Test2::Tools::xUnit
+
+0.003 2018-03-15
+
+  - Add Changes file
+  - Fix badly packaged tarball
+
+0.002 2018-03-15
+
+  - Improve test coverage
+  - Documentation enhancements
+  - Skip/Todo will now automatically enable 'Test' for a method
+
+0.001 2018-03-11
+
+  - Initial release

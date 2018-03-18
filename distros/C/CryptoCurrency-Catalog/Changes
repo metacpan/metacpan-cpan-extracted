@@ -1,3 +1,56 @@
+20180312  2018-03-12 (PERLANCAR)
+
+          - New coins:
+            + Ammo Reloaded (AMMO)
+            + Astro (ASTRO)
+            + BABB (BAX)
+            + Bee Token (BEE)
+            + Bitcoin Private (BTCP)
+            + BitWhite (BTW)
+            + Blox (CDT)
+            + CoinPoker (CHP)
+            + Credits (CS)
+            + Cube (AUTO)
+            + DATx (DATX)
+            + Education Ecosystem (LEDU)
+            + Electrify.Asia (ELEC)
+            + EZToken (EZT)
+            + Graft (GRFT)
+            + GXChain (GXS)
+            + HOQU (HQX)
+            + IHT Real Estate Protocol (IHT)
+            + Insights Network (INSTAR)
+            + Interplanetary Broadcast Coin (IPBC)
+            + JET8 (J8T)
+            + Lympo (LYM)
+            + Network Token (NTWK)
+            + Ontology (ONT)
+            + Ravencoin (RVN)
+            + Refereum (RFR)
+            + Sether (SETH)
+            + ShipChain (SHIP)
+            + SpherePay (SAY)
+            + StarterCoin (STAC)
+            + TE-FOOD (TFD)
+            + Tokenomy (TEN)
+            + TomoChain (TOMO)
+            + True USD (TUSD)
+
+          - Removed coins:
+            + Ammo Reloaded (AMMO)
+            + Bitcoin White (BTW)
+            + CoinDash (CDT)
+            + GXShares (GXS)
+            + Rupaya [OLD] (RUPXOLD)
+
+          - Changed coins:
+            + COPYTRACK (CPY) changed name from Copytrack
+            + NavCoin (NAV) changed name from NAV Coin
+            + PACcoin ($PAC) changed code from PAC
+
+          - Total coins now 1556 (from 1527)
+
+
 20180308.1.0  2018-03-08 (PERLANCAR)
 
           - No functional changes.

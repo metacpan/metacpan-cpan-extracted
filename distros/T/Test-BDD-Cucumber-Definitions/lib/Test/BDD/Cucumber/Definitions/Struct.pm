@@ -3,28 +3,33 @@ package Test::BDD::Cucumber::Definitions::Struct;
 use strict;
 use warnings;
 
-use Carp;
 use DDP ( show_unicode => 1 );
 use Exporter qw(import);
-use JSON::Path 'jpath1';
+use JSON::Path qw(jpath jpath1);
 use JSON::XS;
-use Params::ValidationCompiler qw(validation_for);
+use List::Util qw(any);
 use Test::BDD::Cucumber::Definitions qw(S);
-use Test::BDD::Cucumber::Definitions::Struct::Types qw(:all);
+use Test::BDD::Cucumber::Definitions::Validator qw(:all);
 use Test::More;
 use Try::Tiny;
 
-our $VERSION = '0.21';
+our $VERSION = '0.26';
 
 our @EXPORT_OK = qw(
-    read_content
-    jsonpath_eq jsonpath_re
+    http_response_content_read_json
+    zip_archive_members_read_list
+    struct_data_element_eq struct_data_array_any_eq
+    struct_data_element_re struct_data_array_any_re
+    struct_data_array_count
 );
 our %EXPORT_TAGS = (
     util => [
         qw(
-            read_content
-            jsonpath_eq jsonpath_re
+            http_response_content_read_json
+            zip_archive_members_read_list
+            struct_data_element_eq struct_data_array_any_eq
+            struct_data_element_re struct_data_array_any_re
+            struct_data_array_count
             )
     ]
 );
@@ -34,7 +39,7 @@ $JSON::Path::Safe = 0;    ## no critic (Variables::ProhibitPackageVars)
 
 ## no critic [Subroutines::RequireArgUnpacking]
 
-sub read_content {
+sub http_response_content_read_json {
 
     # Clean data
     S->{struct}->{data} = undef;
@@ -65,52 +70,87 @@ sub read_content {
     return;
 }
 
-my $validator_jsonpath_eq = validation_for(
-    params => [
+sub zip_archive_members_read_list {
 
-        # data structure jsonpath
-        { type => StructJsonpath },
+    # Clean data
+    S->{struct}->{data} = undef;
 
-        # data structure value
-        { type => StructString },
-    ]
-);
+    my @members = S->{zip}->{archive}->memberNames();
 
-sub jsonpath_eq {
-    my ( $jsonpath, $value ) = $validator_jsonpath_eq->(@_);
+    S->{struct}->{data} = \@members;
 
-    my $result = jpath1( S->{struct}->{data}, $jsonpath );
-
-    is( $result, $value, qq{Data structure jsonpath "$jsonpath" eq "$value"} );
-
-    diag( 'Data structure = ' . np S->{struct}->{data} );
+    pass('Zip archive members was read as list');
 
     return;
 }
 
-my $validator_jsonpath_re = validation_for(
-    params => [
+sub struct_data_element_eq {
+    my ( $jsonpath, $value ) = validator_ns->(@_);
 
-        # data structure jsonpath
-        { type => StructJsonpath },
+    my $result = jpath1( S->{struct}->{data}, $jsonpath );
 
-        # data structure regexp
-        { type => StructRegexp },
-    ]
-);
+    is( $result, $value, qq{Struct data element "$jsonpath" eq "$value"} );
 
-sub jsonpath_re {
-    my ( $jsonpath, $regexp ) = $validator_jsonpath_re->(@_);
+    diag( 'Data = ' . np S->{struct}->{data} );
+
+    return;
+}
+
+sub struct_data_array_any_eq {
+    my ( $jsonpath, $value ) = validator_ns->(@_);
+
+    my @result = jpath( S->{struct}->{data}, $jsonpath );
+
+    my $ok = any { $_ eq $value } @result;
+
+    ok( $ok, qq{Struct data array "$jsonpath" any eq "$value"} );
+
+    diag( 'Find = ' . np @result );
+    diag( 'Data = ' . np S->{struct}->{data} );
+
+    return;
+}
+
+sub struct_data_element_re {
+    my ( $jsonpath, $regexp ) = validator_nr->(@_);
 
     my $result = jpath1( S->{struct}->{data}, $jsonpath );
 
     like(
         $result,
         qr/$regexp/,    ## no critic [RegularExpressions::RequireExtendedFormatting]
-        qq{Data structure jsonpath "$jsonpath" re "$regexp"}
+        qq{Struct data element "$jsonpath" re "$regexp"}
     );
 
-    diag( 'Data structure = ' . np S->{struct}->{data} );
+    diag( 'Data = ' . np S->{struct}->{data} );
+
+    return;
+}
+
+sub struct_data_array_any_re {
+    my ( $jsonpath, $regexp ) = validator_nr->(@_);
+
+    my @result = jpath( S->{struct}->{data}, $jsonpath );
+
+    my $ok = any {/$regexp/x} @result;
+
+    ok( $ok, qq{Struct data array "$jsonpath" any re "$regexp"} );
+
+    diag( 'Find = ' . np @result );
+    diag( 'Data = ' . np S->{struct}->{data} );
+
+    return;
+}
+
+sub struct_data_array_count {
+    my ( $jsonpath, $count ) = validator_ni->(@_);
+
+    my @result = jpath( S->{struct}->{data}, $jsonpath );
+
+    is( scalar @result, $count, qq{Struct data array "$jsonpath" count "$count"} );
+
+    diag( 'Find = ' . np @result );
+    diag( 'Data = ' . np S->{struct}->{data} );
 
     return;
 }

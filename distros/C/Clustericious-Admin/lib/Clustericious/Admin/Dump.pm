@@ -8,7 +8,7 @@ use base qw( Exporter );
 
 our @EXPORT_OK = qw( perl_dump );
 
-our $VERSION = '1.10'; # VERSION
+our $VERSION = '1.11'; # VERSION
 
 sub perl_dump ($)
 {
@@ -34,7 +34,7 @@ Clustericious::Admin::Dump
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =head1 AUTHOR
 

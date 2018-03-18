@@ -1,3 +1,11 @@
+0.000021    2018-03-11
+            * Stop using defined-or, breals oldeer perls.
+
+0.000020    2018-03-10
+            * Since upgrading Devel::PPPort did not fix the errors,
+              switch from using av_top_index / av_tindex to using
+              av_shift, which seems to be supported waaay back.
+
 0.000019    2018-03-09
             * Upgrade Devel::PPPort to version 3.36 to solve
               compilation errors on older versions of Perl.

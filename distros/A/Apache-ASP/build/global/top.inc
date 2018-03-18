@@ -1,9 +1,10 @@
+
 <%
 
 use File::Basename qw(basename);
 use strict;
 use vars qw( 
-    $NavColor $LinkColor $NavColSpan $Ads $PageCount $DarkRowColor $VLinkColor 
+    $NavColor $LinkColor $NavColSpan $Site $PageCount $DarkRowColor $VLinkColor 
     $BodyWidth $BodyColSpan
     );
 
@@ -72,20 +73,9 @@ if($0 =~ /index.html$/) {
 -->
 </style>
 
-
 </head>
 <body bgcolor=black link=<%=$LinkColor%> alink=#ff5599 vlink=<%=$VLinkColor%>
 marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
-
-<% if($Ads) { %>
-<center>
-<table border=0 cellpadding=3 cellspacing=0 width=100%>
-<tr>
-<td><!--#include file=ad.inc--></td>
-</tr></table>
-</center>
-<% } %>
-
 
 <center>
 <table border=0 cellpadding=0 width=<%=$BodyWidth%> cellspacing=8>
@@ -97,7 +87,7 @@ marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
 	<table border=0 cellpadding=1 cellspacing=0 width=100%>
 	<tr>
 	<td><img border=0 src=asptitlelogo.gif alt="<%=$module%>" width=267 height=44 ></td>	
-	<% if($Ads) { %>
+	<% if($Site) { %>
 		<form action=apps/search/index.asp>
 		<td align=right valign=center>
 		  <input type=text name=search size=20>
@@ -185,7 +175,10 @@ marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
 		<a href=http://perl.apache.org><site:img src="powered_by_modperl.gif" alt="Powered by ModPerl and Apache"/></a>
 		<br>
 		<a href=http://www.perl.com><site:img src="rectangle_power_perl.gif" alt="Powered by Perl" /></a>
-		</center>
+<% if($Site) { %>
+                <br>
+                <a href=http://www.nodeworks.com/partner.htm?partner_id=apacheasp><img src="nodecheck_button.gif" width="88" height="31" alt="NodeWorks Link Checker" border="0"></a>
+<% } %>
 
 </center>
 
@@ -321,14 +314,6 @@ for $data (@order) {
 %>
 </td>
 
-</tr>
-<tr bgcolor=<%=$DarkRowColor%>>
-	<td colspan=<%= $BodyColSpan %> align=center width=80%>
-	<font face=verdana color=white size=-1>
-	Copyright &copy; 1998-<%= (localtime())[5] + 1900 %>,
-	<a href=http://www.chamas.com><font color=white>Chamas Enterprises Inc.</font></a>
-	</font>
-	</td>
 </tr>
 </table>
 

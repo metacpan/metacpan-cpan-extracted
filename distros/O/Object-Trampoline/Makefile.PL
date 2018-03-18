@@ -6,7 +6,7 @@ WriteMakefile
     qw
     (
         NAME            Object::Trampoline
-        VERSION         1.50.3
+        VERSION         1.50.4
         ABSTRACT_FROM   ./lib/Object/Trampoline.pm
         LICENSE         perl
     ),

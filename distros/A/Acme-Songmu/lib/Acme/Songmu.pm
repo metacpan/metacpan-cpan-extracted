@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 use Encode;
 
-use version 0.77; our $VERSION = version->declare("v0.0.3");
+use version 0.77; our $VERSION = version->declare("v0.1.0");
 
 use Time::Piece ();
 use Class::Accessor::Lite::Lazy 0.03 (
@@ -59,6 +59,24 @@ Acme::Songmu - Songmu's sample module
 =head1 DESCRIPTION
 
 Acme::Songmu is Songmu's sample CPAN module for sandboxing.
+
+=head1 CONSTRUCTOR
+
+=head2 C<< my $sonmgu = Acme::Songmu->instance >>
+
+The C<instance> class method returns an instance of Songmu as a singleton.
+
+=head1 METHODS
+
+=over
+
+=item C<< $songmu->name >>
+
+=item C<< $songmu->gmu >>
+
+=back
+
+=head1 METHODS
 
 =head1 LICENSE
 

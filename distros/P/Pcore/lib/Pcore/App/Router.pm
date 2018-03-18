@@ -11,20 +11,22 @@ use overload    #
 has app => ( is => 'ro', isa => ConsumerOf ['Pcore::App'], required => 1 );
 has hosts => ( is => 'ro', isa => HashRef, required => 1 );
 
-has map           => ( is => 'lazy', isa => HashRef, init_arg => undef );    # router path -> class name
-has host_api_path => ( is => 'ro',   isa => HashRef, init_arg => undef );
+has map           => ( is => 'ro', isa => HashRef, init_arg => undef );    # router path -> class name
+has host_api_path => ( is => 'ro', isa => HashRef, init_arg => undef );
 
 has _path_class_cache     => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );    # router path -> sigleton cache
 has _class_instance_cache => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );    # class name -> sigleton cache
 
-sub _build_map ($self) {
+sub init ($self) {
     my $map;
 
     for my $host ( keys $self->{hosts}->%* ) {
         $map->{$host} = $self->_get_host_map( $host, $self->{hosts}->{$host} ) if defined $self->{hosts}->{$host};
     }
 
-    return $map;
+    $self->{map} = $map;
+
+    return;
 }
 
 sub _get_host_map ( $self, $host, $ns ) {

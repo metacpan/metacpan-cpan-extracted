@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2018 -- leonerd@leonerd.org.uk
 
 package Tickit::ContainerWidget;
 
@@ -47,6 +47,20 @@ Set whenever a child widget within the container has the input focus.
 
 =cut
 
+=head1 CONSTRUCTOR
+
+=cut
+
+=head2 new
+
+   $widget = Tickit::ContainerWidget->new( %args )
+
+Constructs a new C<Tickit::ContainerWidget> object. Must be called on a
+subclass that implements the required methods; see the B<SUBCLASS METHODS>
+section below.
+
+=cut
+
 sub new
 {
    my $class = shift;
@@ -63,7 +77,13 @@ sub new
    return $self;
 }
 
-=head2 $widget->add( $child, %opts )
+=head1 METHODS
+
+=cut
+
+=head2 add
+
+   $widget->add( $child, %opts )
 
 Sets the child widget's parent, stores the options for the child, and calls
 the C<children_changed> method. The concrete implementation will have to
@@ -87,7 +107,9 @@ sub add
    return $self;
 }
 
-=head2 $widget->remove( $child_or_index )
+=head2 remove
+
+   $widget->remove( $child_or_index )
 
 Removes the child widget's parent, and calls the C<children_changed> method.
 The concrete implementation will have to remove this child from its storage.
@@ -112,9 +134,11 @@ sub remove
    return $self;
 }
 
-=head2 %opts = $widget->child_opts( $child )
+=head2 child_opts
 
-=head2 $opts = $widget->child_opts( $child )
+   %opts = $widget->child_opts( $child )
+
+   $opts = $widget->child_opts( $child )
 
 Returns the options currently set for the given child as a key/value list in
 list context, or as a HASH reference in scalar context. The HASH reference in
@@ -133,7 +157,9 @@ sub child_opts
    return %$opts;
 }
 
-=head2 $widget->set_child_opts( $child, %newopts )
+=head2 set_child_opts
+
+   $widget->set_child_opts( $child, %newopts )
 
 Sets new options on the given child. Any options whose value is given as
 C<undef> are deleted.
@@ -199,7 +225,9 @@ sub _on_win_focus
    $self->set_style_tag( "focus-child" => $_[1] ) if $_[2];
 }
 
-=head2 $child = $widget->find_child( $how, $other, %args )
+=head2 find_child
+
+   $child = $widget->find_child( $how, $other, %args )
 
 Returns a child widget. The C<$how> argument determines how this is done,
 relative to the child widget given by C<$other>:
@@ -276,7 +304,9 @@ use constant CONTAINER_OR_FOCUSABLE => sub {
       $_->window && $_->window->is_visible && $_->CAN_FOCUS
 };
 
-=head2 $widget->focus_next( $how, $other )
+=head2 focus_next
+
+   $widget->focus_next( $how, $other )
 
 Moves the input focus to the next widget in the widget tree, by searching in
 the direction given by C<$how> relative to the widget given by C<$other>
@@ -382,7 +412,9 @@ sub focus_next
 
 =head1 SUBCLASS METHODS
 
-=head2 @children = $widget->children
+=head2 children
+
+   @children = $widget->children
 
 Required. Should return a list of all the contained child widgets. The order
 is not specified, but should be in some stable order that makes sense given
@@ -392,7 +424,9 @@ This method is used by C<window_lost> to remove the windows from all the child
 widgets automatically, and by C<find_child> to obtain a child relative to
 another given one.
 
-=head2 @children = $widget->children_for_focus
+=head2 children_for_focus
+
+   @children = $widget->children_for_focus
 
 Optional. If implemented, this method is called to obtain a list of child
 widgets to perform a child search on when changing focus using the
@@ -403,7 +437,9 @@ Normally this method shouldn't be used, but it may be useful on container
 widgets that also display "helper" widgets that should not be considered as
 part of the main focus set. This method can then exclude them.
 
-=head2 $widget->children_changed
+=head2 children_changed
+
+   $widget->children_changed
 
 Optional. If implemented, this method will be called after any change of the
 contained child widgets or their options. Typically this will be used to set
@@ -411,7 +447,9 @@ windows on them by sub-dividing the window of the parent.
 
 If not overridden, the base implementation will call C<reshape>.
 
-=head2 $widget->child_resized( $child )
+=head2 child_resized
+
+   $widget->child_resized( $child )
 
 Optional. If implemented, this method will be called after a child widget
 changes or may have changed its size requirements. Typically this will be used

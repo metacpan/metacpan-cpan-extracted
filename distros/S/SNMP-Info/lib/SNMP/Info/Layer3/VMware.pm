@@ -39,7 +39,7 @@ use SNMP::Info::IEEE802dot3ad 'agg_ports_lag';
 
 use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
 
-$VERSION = '3.49';
+$VERSION = '3.51';
 
 %MIBS = (
     %SNMP::Info::IEEE802dot3ad::MIBS,
@@ -60,10 +60,12 @@ $VERSION = '3.49';
 
 %FUNCS = (
     %SNMP::Info::Layer3::FUNCS,
+    %SNMP::Info::IEEE802dot3ad::FUNCS,
 );
 
 %MUNGE = (
     %SNMP::Info::Layer3::MUNGE,
+    %SNMP::Info::IEEE802dot3ad::MUNGE,
 );
 
 sub vendor {
@@ -191,5 +193,8 @@ ifIndex of the corresponding master ports.
 
 See documentation in L<SNMP::Info::Layer3> for details.
 
+=head2 Table Methods imported from SNMP::Info::IEEE802dot3ad
+
+See documentation in L<SNMP::Info::IEEE802dot3ad> for details.
 
 =cut

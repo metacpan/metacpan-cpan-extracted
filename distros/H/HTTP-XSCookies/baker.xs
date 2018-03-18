@@ -36,7 +36,6 @@ static void get_encoded_value(pTHX_ SV* value, Buffer* encoded, int encode)
     SV* ref = 0;
     const char* vstr = 0;
     STRLEN vlen = 0;
-    int j = 0;
 
     Buffer unencoded;
     buffer_reset(encoded);
@@ -57,15 +56,17 @@ static void get_encoded_value(pTHX_ SV* value, Buffer* encoded, int encode)
     ref = SvRV(value);
     if (SvTYPE(ref) == SVt_PVAV) {
         AV* values = (AV*) ref;
-        int top = av_tindex(values);
         int count = 0;
         buffer_init(&unencoded , 0);
-        for (j = 0; j <= top; ++j) {
-            SV** elem = av_fetch(values, j, 0);
-            if (!SvOK(*elem) || !SvPOK(*elem)) {
+        while (1) {
+            SV* elem = av_shift(values);
+            if (!elem || elem == &PL_sv_undef) {
+                break;
+            }
+            if (!SvOK(elem) || !SvPOK(elem)) {
                 continue;
             }
-            vstr = SvPV_const(*elem, vlen);
+            vstr = SvPV_const(elem, vlen);
             if (count) {
                 buffer_append_str(&unencoded, "&", 1);
             }

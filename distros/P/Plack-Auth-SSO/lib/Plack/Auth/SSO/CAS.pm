@@ -9,7 +9,7 @@ use Plack::Request;
 use Plack::Session;
 use Plack::Auth::SSO::ResponseParser::CAS;
 
-our $VERSION = "0.0131";
+our $VERSION = "0.0132";
 
 with "Plack::Auth::SSO";
 

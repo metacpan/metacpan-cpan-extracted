@@ -9,5 +9,6 @@ MANIFEST			This list of files
 t/00-basic.t
 t/basic.t
 t/online.t
+t/tr_status.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

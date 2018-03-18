@@ -2,11 +2,11 @@ package App::ElasticSearch::Utilities::HTTPRequest;
 # ABSTRACT: Allow for strange content elements for Elasticsearch APIs
 
 
-our $VERSION = '5.4'; # VERSION
-
 use strict;
 use warnings;
 no warnings 'uninitialized';
+
+our $VERSION = '5.5'; # VERSION
 
 use JSON::MaybeXS;
 use Ref::Util qw(is_ref is_arrayref is_hashref);
@@ -22,7 +22,7 @@ sub new {
 }
 
 sub content {
-	my ($self,$body) = @_;
+    my ($self,$body) = @_;
 
     if( is_arrayref($body) ) {
         # Bulk does this
@@ -60,7 +60,7 @@ App::ElasticSearch::Utilities::HTTPRequest - Allow for strange content elements 
 
 =head1 VERSION
 
-version 5.4
+version 5.5
 
 =head1 SYNOPSIS
 

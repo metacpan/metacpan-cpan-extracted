@@ -8,7 +8,7 @@ use parent qw/Exporter/;
 our @EXPORT_OK = qw/encode_base91 decode_base91/;
 our @EXPORT = ();
 
-our $VERSION = '0.001002';
+our $VERSION = '1.000';
 
 require XSLoader;
 XSLoader::load('Convert::Base91', $VERSION);
@@ -82,7 +82,8 @@ base91 encoded data.
 =item B<decode_base91> $base91_data
 
 Takes a string containing base91 encoded data and returns the decoded
-string of arbitrary bytes.
+string of arbitrary bytes. Any non-printable character in the input is
+silently ignored.
 
 =item Convert::Base91->B<new>
 
@@ -103,6 +104,7 @@ object so it may be used again (for either encoding or decoding).
 =item $base91->B<decode>($data)
 
 Submit the next chunk of base91 data to be decoded. Returns nothing.
+Any non-printable character in the input is silently ignored.
 
 =item $base91->B<decode_end>
 
@@ -116,13 +118,17 @@ so it may be used again (for either encoding or decoding).
 
 L<http://base91.sourceforge.net/>
 
+L<Convert::Ascii85> provides a constant-length encoding, at the cost
+of a larger overhead (25% for Ascii85, versus 33% for base64 and
+14-23% for base91).
+
 =head1 AUTHOR
 
 Marius Gavrilescu, E<lt>marius@ieval.roE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Marius Gavrilescu
+Copyright (C) 2017-2018 by Marius Gavrilescu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.26.1 or,

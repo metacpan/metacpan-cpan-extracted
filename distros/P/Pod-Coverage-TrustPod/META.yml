@@ -27,7 +27,7 @@ resources:
   bugtracker: https://github.com/rjbs/Pod-Coverage-TrustPod/issues
   homepage: https://github.com/rjbs/Pod-Coverage-TrustPod
   repository: https://github.com/rjbs/Pod-Coverage-TrustPod.git
-version: '0.100004'
+version: '0.100005'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -313,7 +313,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.100004'
+          tag: '0.100005'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

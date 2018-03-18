@@ -4,79 +4,79 @@ package App::ElasticSearch::Utilities::Query;
 use strict;
 use warnings;
 
+our $VERSION = '5.5'; # VERSION
+
 use CLI::Helpers qw(:output);
 use Clone qw(clone);
 use Moo;
+use Ref::Util qw(is_arrayref is_hashref);
+use Types::Standard qw(ArrayRef HashRef Int Maybe Str);
+use Types::ElasticSearch qw(TimeConstant is_TimeConstant);
 use namespace::autoclean;
-use Sub::Quote;
 
-my %VALID = (
-    array_ref     => quote_sub(q{die "must be an array reference" if defined $_[0] and ref $_[0] ne 'ARRAY'}),
-    hash_ref      => quote_sub(q{die "must be a hash reference" if defined $_[0] and ref $_[0] ne 'HASH'}),
-    time_constant => quote_sub(q{die "must be time constant: https://www.elastic.co/guide/en/elasticsearch/reference/master/common-options.html#time-units" if defined $_[0] && $_[0] !~ /^\d+(y|M|w|d|h|m|s|ms)$/ }),
-    integer       => quote_sub(q{die "must be 0+ and integer" if defined $_[0] and $_[0] !~ /^\d+$/ }),
-);
 my %TO = (
-    array_ref => quote_sub(q{defined $_[0] && ref $_[0] eq 'ARRAY' ? $_[0] : defined $_[0] ? [ $_[0] ] : $_[0]}),
+    array_ref => sub { defined $_[0] && ref($_[0]) eq 'ARRAY' ? $_[0] : defined $_[0] ? [ $_[0] ] : $_[0] },
 );
 
 
 has query_stash => (
     is       => 'rw',
+    isa      => HashRef,
     lazy     => 1,
     init_arg => undef,
     default  => sub {{}},
-    isa      => $VALID{hash_ref},
 );
 
 
 my %QUERY = (
-    must     => { default => sub {undef}, isa => $VALID{array_ref}, coerce => $TO{array_ref}, init_arg => 'must'     },
-    must_not => { default => sub {undef}, isa => $VALID{array_ref}, coerce => $TO{array_ref}, init_arg => 'must_not' },
-    should   => { default => sub {undef}, isa => $VALID{array_ref}, coerce => $TO{array_ref}, init_arg => 'should'   },
-    filter   => { default => sub {undef}, isa => $VALID{array_ref}, coerce => $TO{array_ref}, init_arg => 'filter'   },
+    must        => { default => sub {undef}, isa => Maybe[ArrayRef], coerce => $TO{array_ref}, init_arg => 'must'     },
+    must_not    => { default => sub {undef}, isa => Maybe[ArrayRef], coerce => $TO{array_ref}, init_arg => 'must_not' },
+    should      => { default => sub {undef}, isa => Maybe[ArrayRef], coerce => $TO{array_ref}, init_arg => 'should'   },
+    filter      => { default => sub {undef}, isa => Maybe[ArrayRef], coerce => $TO{array_ref}, init_arg => 'filter'   },
+    nested      => { default => sub {undef}, isa => Maybe[HashRef], init_arg => 'nested' },
+    nested_path => { default => sub {undef}, isa => Maybe[Str],     init_arg => 'nested_path' },
 );
 
 
 my %REQUEST_BODY = (
-    from         => { default => sub {undef}, isa => $VALID{integer} },
-    size         => { default => sub {50},    isa => $VALID{integer} },
-    fields       => { default => sub {undef}, isa => $VALID{array_ref}, coerce => $TO{array_ref} },
-    sort         => { default => sub {undef}, isa => $VALID{array_ref}, coerce => $TO{array_ref} },
-    aggregations => { default => sub {undef}, isa => $VALID{hash_ref} },
+    from         => { isa => Maybe[Int] },
+    size         => { default => sub {50},    isa => Int },
+    fields       => { isa => Maybe[ArrayRef], coerce => $TO{array_ref} },
+    sort         => { isa => Maybe[ArrayRef], coerce => $TO{array_ref} },
+    aggregations => { isa => Maybe[HashRef] },
 );
 
 
 my %PARAMS = (
-    scroll          => { default => sub {undef}, isa => $VALID{time_constant} },
-    timeout         => { default => sub {undef}, isa => $VALID{time_constant} },
-    terminate_after => { default => sub {undef}, isa => $VALID{integer} },
+    scroll          => { isa => Maybe[TimeConstant] },
+    timeout         => { isa => TimeConstant },
+    terminate_after => { isa => Int },
 );
 
 # Dynamically build our attributes
 foreach my $attr (keys %QUERY) {
     has $attr => (
-        is => 'rw',
-        lazy => 1,
-        writer => "set_$attr",
+        is       => 'rw',
+        lazy     => 1,
+        writer   => "set_$attr",
         init_arg => undef,
         %{ $QUERY{$attr} },
     );
 }
 foreach my $attr (keys %REQUEST_BODY) {
     has $attr => (
-        is => 'rw',
-        lazy => 1,
-        writer => "set_$attr",
+        is       => 'rw',
+        lazy     => 1,
+        writer   => "set_$attr",
         init_arg => undef,
         %{ $REQUEST_BODY{$attr} },
     );
 }
 foreach my $attr (keys %PARAMS) {
     has $attr => (
-        is => 'rw',
-        lazy => 1,
-        writer => "set_$attr",
+        is       => 'rw',
+        lazy     => 1,
+        writer   => "set_$attr",
         init_arg => undef,
         %{ $PARAMS{$attr} },
     );
@@ -90,8 +90,10 @@ sub uri_params {
     foreach my $field (keys %PARAMS) {
         my $v = eval {
             debug({color=>'magenta'}, "uri_params() - retrieving param '$field'");
+            ## no critic
             no strict 'refs';
             $self->$field();
+            ## user critic
         };
         next unless defined $v;
         $params{$field} = $v;
@@ -105,10 +107,12 @@ sub request_body {
 
     my %body = ();
     foreach my $section (keys %REQUEST_BODY) {
-        no strict 'refs';
         eval {
             debug({color=>'yellow'}, "request_body() - retrieving section '$section'");
+            ## no critic
+            no strict 'refs';
             $body{$section} = $self->$section;
+            ## use critic
             delete $body{$section} unless defined $body{$section};
             debug_var({color=>'cyan'},$body{$section}) if defined $body{$section} and ref $body{$section};
             1;
@@ -124,26 +128,41 @@ sub request_body {
 sub query {
     my $self = shift;
 
-    my %bool = ();
-    foreach my $k (keys %QUERY) {
-        no strict 'refs';
-        $bool{$k} = [];
-        my $v;
-        eval {
-            debug({color=>'yellow'}, "query() - retrieving section '$k'");
-            $v = $self->$k();
-            debug_var({color=>'cyan'},$v) if defined $v and ref $v;
-            1;
-        } or do {
-            debug({color=>'red'}, "query() - Failed to retrieve '$k'");
+    my $qref;
+    if( $self->nested ) {
+        $qref = {
+            nested => {
+                path  => $self->nested_path,
+                query => $self->nested,
+            }
         };
-        $bool{$k} = clone $v if defined $v;
-        if($self->stash($k)) {
-            push @{ $bool{$k} }, $self->stash($k);
-        }
-        delete $bool{$k} if exists $bool{$k} and not @{ $bool{$k} };
     }
-    return { bool => \%bool };
+    else {
+        my %bool = ();
+        foreach my $k (keys %QUERY) {
+            next if $k =~ /^nested/;
+            $bool{$k} = [];
+            my $v;
+            eval {
+                debug({color=>'yellow'}, "query() - retrieving section '$k'");
+                ## no critic
+                no strict 'refs';
+                $v = $self->$k();
+                ## user critic
+                debug_var({color=>'cyan'},$v) if defined $v and ref $v;
+                1;
+            } or do {
+                debug({color=>'red'}, "query() - Failed to retrieve '$k'");
+            };
+            $bool{$k} = clone $v if defined $v;
+            if($self->stash($k)) {
+                push @{ $bool{$k} }, $self->stash($k);
+            }
+            delete $bool{$k} if exists $bool{$k} and not @{ $bool{$k} };
+        }
+        $qref = { bool => \%bool };
+    }
+    return $qref;
 }
 
 
@@ -179,15 +198,15 @@ sub wrap_aggregations {
 *wrap_aggs = \&wrap_aggregations;
 
 
+
+
 sub set_scan_scroll {
     my ($self,$ctxt_life) = @_;
 
     # Validate Context Lifetime
-    eval {
-        $VALID{time_constant}->($ctxt_life);
-    } or do {
+    if( !is_TimeConstant( $ctxt_life) ) {
         undef($ctxt_life);
-    };
+    }
     $ctxt_life ||= '1m';
 
     $self->set_sort( [qw(_doc)] );
@@ -213,11 +232,13 @@ sub add_bool {
     my $condition = shift;
 
     if( exists $QUERY{$section} ) {
+        ## no critic
         no strict 'refs';
         my $set = $self->$section;
         push @{ $set }, $condition;
         my $setter = "set_$section";
         $self->$setter($set);
+        ## use critic
     }
     $self;
 }
@@ -251,7 +272,7 @@ App::ElasticSearch::Utilities::Query - Object representing ES Queries
 
 =head1 VERSION
 
-version 5.4
+version 5.5
 
 =head1 ATTRIBUTES
 
@@ -278,6 +299,15 @@ Can be set using set_should and is a valid init_arg.
 
 The filter section of a bool query as an array reference.  See: L<add_bool>
 Can be set using set_filter and is a valid init_arg.
+
+=head2 nested
+
+The nested query, this shortcircuits the rest of the query due to restrictions
+on the nested queries.
+
+=head2 nested_path
+
+The path by being nested, only used in nested queries.
 
 =head2 from
 
@@ -437,6 +467,11 @@ except one piece that shifts.  Imagine:
     }
 
 This allows re-use of the query object inside of loops like this.
+
+=for Pod::Coverage aggs
+=for Pod::Coverage set_aggs
+=for Pod::Coverage add_aggs
+=for Pod::Coverage wrap_aggs
 
 =head1 AUTHOR
 

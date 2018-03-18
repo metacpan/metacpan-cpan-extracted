@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric once );
 
 package MCE::Shared::Server;
 
-our $VERSION = '1.835';
+our $VERSION = '1.836';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -63,9 +63,10 @@ BEGIN {
 sub _get_freeze { $_freeze; }
 sub _get_thaw   { $_thaw;   }
 
-use Time::HiRes qw( alarm sleep time );
+use IO::Handle ();
 use Scalar::Util qw( blessed looks_like_number reftype weaken );
 use Socket qw( SOL_SOCKET SO_RCVBUF );
+use Time::HiRes qw( alarm sleep time );
 
 use MCE::Util ();
 use MCE::Signal ();
@@ -148,6 +149,7 @@ sub _new {
 
       _start();
    }
+
    if ($_has_fh) {
       _croak("Sharing module '$_class' while the server is running\n".
              "requires the 'IO::FDPass' module, missing in Perl")
@@ -1838,7 +1840,7 @@ MCE::Shared::Server - Server/Object packages for MCE::Shared
 
 =head1 VERSION
 
-This document describes MCE::Shared::Server version 1.835
+This document describes MCE::Shared::Server version 1.836
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,6 @@
+name = "Caller-Easy"
+badges = ["travis"]
+authority="cpan:WORTHMINE"
+
+module_maker="ModuleBuildTiny"
+

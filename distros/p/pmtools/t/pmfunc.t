@@ -3,7 +3,7 @@
 # ------ pragmas
 use strict;
 use warnings;
-use Test::More tests => 1;
+use Test::More tests => 3;
 
 # ------ define variable
 my $output = undef;	# output from pmfunc
@@ -12,11 +12,10 @@ my $output = undef;	# output from pmfunc
 $ENV{"PATH"} = 'blib/script:' . $ENV{"PATH"};
 
 eval {
-    $output = `bin/pmfunc Cwd::getcwd 2>&1`;
+    $output = `bin/pmfunc Cwd::chdir 2>&1`;
 };
 
 isnt($?, 127, "pmfunc runs");
 
-# TODO: add tests after I get pmfunc working again
-# like($output, qr/blessed.*dualvar.*isdual.*isvstring.*isweak/ms,
-# 	"list function body");
+like($output, qr/^sub\schdir\s/msx,     "found 'chdir()'");
+like($output, qr/my\s\$newdir\s=\s/msx, "display function body");

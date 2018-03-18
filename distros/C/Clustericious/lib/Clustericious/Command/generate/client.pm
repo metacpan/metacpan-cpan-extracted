@@ -7,7 +7,7 @@ use File::Find;
 use File::Basename qw( basename );
 
 # ABSTRACT: Clustericious command to generate a new Clustericious client
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.29'; # VERSION
 
 
 has description => <<'EOF';
@@ -72,7 +72,7 @@ Clustericious::Command::generate::client - Clustericious command to generate a n
 
 =head1 VERSION
 
-version 1.27
+version 1.29
 
 =head1 SYNOPSIS
 

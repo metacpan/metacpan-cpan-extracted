@@ -101,7 +101,7 @@ package Astro::Coord::ECI;
 use strict;
 use warnings;
 
-our $VERSION = '0.090';
+our $VERSION = '0.091';
 
 use Astro::Coord::ECI::Utils qw{:all};
 use Carp;
@@ -2582,19 +2582,18 @@ use constant SET_ACTION_RESET => 1;	# Reset the coordinates based on the initial
 sub set {
     my ($self, @args) = @_;
     my $original = $self;
-    ref $self or $self = \%static;
-    @args % 2 and croak <<eod;
-Error - The set() method requires an even number of arguments.
-eod
+    ref $self
+	or $self = \%static;
+    @args % 2
+	and croak 'Error - The set() method requires an even ',
+	    'number of arguments.';
     my $action = 0;
     while (@args) {
 	my $name = shift @args;
-	exists $mutator{$name} or croak <<eod;
-Error - Attribute '$name' does not exist.
-eod
-	ref $mutator{$name} eq 'CODE' or croak <<eod;
-Error - Attribute '$name' is read-only.
-eod
+	exists $mutator{$name}
+	    or croak "Error - Attribute '$name' does not exist.";
+	CODE_REF eq ref $mutator{$name}
+	    or croak "Error - Attribute '$name' is read-only";
 	$action |= $mutator{$name}->($self, $name, shift @args);
     }
 

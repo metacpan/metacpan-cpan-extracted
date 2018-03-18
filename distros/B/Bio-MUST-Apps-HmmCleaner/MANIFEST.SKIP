@@ -1,0 +1,8 @@
+\btest\/.*-my*
+\btest\/.*\.bak
+stuff
+dist\.ini
+weaver\.ini
+tags
+.DS_Store
+docs\/pandoc*

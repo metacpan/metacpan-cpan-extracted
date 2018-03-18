@@ -1,4 +1,4 @@
-#===============================================================================
+#=============================================================================
 #
 #       Module:  Term::CLI::Base
 #
@@ -16,21 +16,21 @@
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
-#===============================================================================
+#=============================================================================
 
 use 5.014_001;
 
-package Term::CLI::Base  0.04004 {
+package Term::CLI::Base  0.051002 {
 
-use Modern::Perl;
+use Modern::Perl 1.20140107;
 use Term::CLI::ReadLine;
 
-use Types::Standard qw(
+use Types::Standard 1.000005 qw(
     Str
 );
 
-use Moo;
-use namespace::clean;
+use Moo 1.000001;
+use namespace::clean 0.25;
 
 has name => ( is => 'ro', isa => Str, required => 1 );
 has error => ( is => 'rwp', isa => Str, default => sub {''} );
@@ -62,7 +62,7 @@ Term::CLI::Base - generic base class for Term::CLI classes
 
 =head1 VERSION
 
-version 0.04004
+version 0.051002
 
 =head1 SYNOPSIS
 

@@ -34,49 +34,49 @@ provides:
     version: '0.53'
   Tickit::Widget::Border:
     file: lib/Tickit/Widget/Border.pm
-    version: '0.28'
+    version: '0.29'
   Tickit::Widget::Box:
     file: lib/Tickit/Widget/Box.pm
     version: '0.52'
   Tickit::Widget::Button:
     file: lib/Tickit/Widget/Button.pm
-    version: '0.28'
+    version: '0.29'
   Tickit::Widget::CheckButton:
     file: lib/Tickit/Widget/CheckButton.pm
-    version: '0.28'
+    version: '0.29'
   Tickit::Widget::Entry:
     file: lib/Tickit/Widget/Entry.pm
-    version: '0.28'
+    version: '0.29'
   Tickit::Widget::Fill:
     file: lib/Tickit/Widget/Fill.pm
-    version: '0.28'
+    version: '0.29'
   Tickit::Widget::Frame:
     file: lib/Tickit/Widget/Frame.pm
     version: '0.31'
   Tickit::Widget::GridBox:
     file: lib/Tickit/Widget/GridBox.pm
-    version: '0.28'
+    version: '0.29'
   Tickit::Widget::HBox:
     file: lib/Tickit/Widget/HBox.pm
     version: '0.47'
   Tickit::Widget::HSplit:
     file: lib/Tickit/Widget/HSplit.pm
-    version: '0.28'
+    version: '0.29'
   Tickit::Widget::LinearBox:
     file: lib/Tickit/Widget/LinearBox.pm
     version: '0.46'
   Tickit::Widget::LinearSplit:
     file: lib/Tickit/Widget/LinearSplit.pm
-    version: '0.28'
+    version: '0.29'
   Tickit::Widget::Placegrid:
     file: lib/Tickit/Widget/Placegrid.pm
-    version: '0.28'
+    version: '0.29'
   Tickit::Widget::RadioButton:
     file: lib/Tickit/Widget/RadioButton.pm
-    version: '0.28'
+    version: '0.29'
   Tickit::Widget::Spinner:
     file: lib/Tickit/Widget/Spinner.pm
-    version: '0.28'
+    version: '0.29'
   Tickit::Widget::Static:
     file: lib/Tickit/Widget/Static.pm
     version: '0.51'
@@ -85,7 +85,7 @@ provides:
     version: '0.47'
   Tickit::Widget::VSplit:
     file: lib/Tickit/Widget/VSplit.pm
-    version: '0.28'
+    version: '0.29'
   Tickit::WidgetRole:
     file: lib/Tickit/WidgetRole.pm
     version: '0.51'
@@ -94,7 +94,7 @@ provides:
     version: '0.51'
   Tickit::Widgets:
     file: lib/Tickit/Widgets.pm
-    version: '0.28'
+    version: '0.29'
 requires:
   List::Util: '1.33'
   Parser::MGC: '0'
@@ -106,5 +106,5 @@ requires:
   perl: '5.010'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.28'
+version: '0.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

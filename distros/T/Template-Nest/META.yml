@@ -20,4 +20,4 @@ no_index:
 requires:
   Carp: '0'
   File::Spec: '0'
-version: '0.01'
+version: '0.02'

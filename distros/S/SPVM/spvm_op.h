@@ -130,20 +130,10 @@ enum {
   SPVM_OP_C_ID_PACKAGE_VAR,
   SPVM_OP_C_ID_ARRAY_INIT,
   SPVM_OP_C_ID_BOOL,
+  SPVM_OP_C_ID_LOOP_INCREMENT,
 };
 
 extern const char* const SPVM_OP_C_ID_NAMES[];
-
-enum {
-  // Block flag
-  SPVM_OP_C_FLAG_BLOCK_IF = 1,
-  SPVM_OP_C_FLAG_BLOCK_ELSE = 2,
-  SPVM_OP_C_FLAG_BLOCK_LOOP = 4,
-  SPVM_OP_C_FLAG_BLOCK_SWITCH = 8,
-  SPVM_OP_C_FLAG_BLOCK_SUB = 32,
-  SPVM_OP_C_FLAG_BLOCK_EVAL = 64,
-  SPVM_OP_C_FLAG_BLOCK_LOOP_INCREMENT = 128,
-};
 
 enum {
   // Condition flag
@@ -205,6 +195,7 @@ struct SPVM_op {
     SPVM_OUR* our;
     SPVM_PACKAGE_VAR* package_var;
     SPVM_UNDEF* undef;
+    SPVM_BLOCK* block;
     int32_t loop_block_index;
   } uv;
   int32_t id;
@@ -215,6 +206,8 @@ struct SPVM_op {
   _Bool is_assign_from;
   _Bool is_var_assign_from;
 };
+
+SPVM_OP* SPVM_OP_new_op_block(SPVM_COMPILER* compiler, const char* file, int32_t line);
 
 const char* SPVM_OP_get_var_name(SPVM_COMPILER* compiler, SPVM_OP* op_var);
 
@@ -319,8 +312,8 @@ SPVM_OP* SPVM_OP_new_op_constant_int(SPVM_COMPILER* compiler, int32_t value, con
 SPVM_OP* SPVM_OP_new_op_constant_long(SPVM_COMPILER* compiler, int64_t value, const char* file, int32_t line);
 SPVM_OP* SPVM_OP_new_op_constant_float(SPVM_COMPILER* compiler, float value, const char* file, int32_t line);
 SPVM_OP* SPVM_OP_new_op_constant_double(SPVM_COMPILER* compiler, double value, const char* file, int32_t line);
-SPVM_OP* SPVM_OP_new_op_constant_string(SPVM_COMPILER* compiler, char* string, const char* file, int32_t line);
-SPVM_OP* SPVM_OP_new_op_constant_byte_array_string(SPVM_COMPILER* compiler, char* string, const char* file, int32_t line);
+SPVM_OP* SPVM_OP_new_op_constant_string(SPVM_COMPILER* compiler, char* string, int32_t length, const char* file, int32_t line);
+SPVM_OP* SPVM_OP_new_op_constant_byte_array_string(SPVM_COMPILER* compiler, char* string, int32_t length, const char* file, int32_t line);
 SPVM_OP* SPVM_OP_new_op_var_from_op_my(SPVM_COMPILER* compiler, SPVM_OP* op_my);
 SPVM_OP* SPVM_OP_new_op_list(SPVM_COMPILER* compiler, const char* file, int32_t line);
 SPVM_OP* SPVM_OP_new_op(SPVM_COMPILER* compiler, int32_t id, const char* file, int32_t line);

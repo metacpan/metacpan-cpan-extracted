@@ -43,27 +43,27 @@
    "provides" : {
       "WWW::Google::PageSpeedOnline" : {
          "file" : "lib/WWW/Google/PageSpeedOnline.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       },
       "WWW::Google::PageSpeedOnline::Advise" : {
          "file" : "lib/WWW/Google/PageSpeedOnline/Advise.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       },
       "WWW::Google::PageSpeedOnline::Params" : {
          "file" : "lib/WWW/Google/PageSpeedOnline/Params.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       },
       "WWW::Google::PageSpeedOnline::Result" : {
          "file" : "lib/WWW/Google/PageSpeedOnline/Result.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       },
       "WWW::Google::PageSpeedOnline::Result::Rule" : {
          "file" : "lib/WWW/Google/PageSpeedOnline/Result/Rule.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       },
       "WWW::Google::PageSpeedOnline::Stats" : {
          "file" : "lib/WWW/Google/PageSpeedOnline/Stats.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       }
    },
    "release_status" : "stable",
@@ -74,6 +74,6 @@
          "web" : "https://github.com/manwar/WWW-Google-PageSpeedOnline"
       }
    },
-   "version" : "0.24",
+   "version" : "0.25",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

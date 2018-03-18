@@ -7,10 +7,34 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Cluster;
-$Net::Proxmox::VE::Cluster::VERSION = '0.32';
+$Net::Proxmox::VE::Cluster::VERSION = '0.33';
 use parent 'Exporter';
 
-our @EXPORT  = qw( cluster );
+our @EXPORT  =
+  qw(
+    cluster
+    cluster_backup
+    create_cluster_backup
+    get_cluster_backup
+    update_cluster_backup
+    delete_cluster_backup
+    cluster_ha
+    get_cluster_ha_config
+    get_cluster_ha_changes
+    commit_cluster_ha_changes
+    revert_cluster_ha_changes
+    cluster_ha_groups
+    create_cluster_ha_groups
+    get_cluster_ha_groups
+    update_cluster_ha_groups
+    delete_cluster_ha_group
+    get_cluster_log
+    get_cluster_options
+    update_cluster_options
+    get_cluster_resources
+    get_cluster_status
+    get_cluster_tasks
+  );
 
 
 my $base = '/cluster';
@@ -358,7 +382,7 @@ Net::Proxmox::VE::Cluster - Functions for the 'cluster' portion of the API
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -828,7 +852,7 @@ Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@bytefoun
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Dean Hamstad.
+This software is copyright (c) 2018 by Dean Hamstad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

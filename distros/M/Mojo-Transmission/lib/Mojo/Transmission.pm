@@ -1,13 +1,15 @@
 package Mojo::Transmission;
 use Mojo::Base -base;
 
+use Exporter 'import';
 use Mojo::JSON;
 use Mojo::UserAgent;
 use Mojo::Util qw(dumper url_escape);
 
 use constant DEBUG => $ENV{MOJO_TRANSMISSION_DEBUG} || 0;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
+our @EXPORT_OK = qw(tr_status);
 
 has default_trackers => sub { [] };
 has ua               => sub { Mojo::UserAgent->new; };
@@ -129,7 +131,7 @@ sub _res {
 }
 
 my @TR_STATUS = qw(stopped check_wait check download_wait download seed_wait seed);
-sub tr_status { defined $_[0] ? $TR_STATUS[$_[0]] || '' : '' }
+sub tr_status { defined $_[0] && $_[0] >= 0 && $_[0] <= @TR_STATUS ? $TR_STATUS[$_[0]] : '' }
 
 1;
 
@@ -272,6 +274,7 @@ L<https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L71>.
 
 =head2 tr_status
 
+  use Mojo::Transmission "tr_status";
   $str = tr_status $int;
 
 Returns a description for the C<$int> status:

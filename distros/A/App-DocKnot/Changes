@@ -1,5 +1,18 @@
                        User-Visible DocKnot Changes
 
+DocKnot 1.03 (2018-03-17)
+
+    Add support for a new metadata file, support/extra, that includes
+    information that should be added into the middle of the normal SUPPORT
+    section of README and README.md files.
+
+    Add a paragraph to the license section of README and README.md saying
+    that SPDX license identifiers are in use and providing a pointer to
+    the SPDX license list.
+
+    Add SPDX-License-Identifier headers to all substantial source files,
+    and add a test to check for them.
+
 DocKnot 1.02 (2017-12-31)
 
     Support quoted paragraphs (each line starting with ">") and turn them

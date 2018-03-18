@@ -30,7 +30,7 @@ ok( $res = request('http://localhost/files/404.txt'), 'request ok' );
 is( $res->content, 'default', 'default handler for non-existent content ok' );
 
 # test unknown extension
-ok( $res = request('http://localhost/files/err.omg'), 'request ok' );
+ok( $res = request('http://localhost/files/err.unknown'), 'request ok' );
 is( $res->content_type, 'text/plain', 'unknown extension as text/plain ok' );
 
 ok( $res = request('http://localhost/files/empty.txt'), 'request ok' );

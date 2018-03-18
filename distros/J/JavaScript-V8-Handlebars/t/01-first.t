@@ -50,7 +50,8 @@ my $c = $hb->c; #Get a JS context with Handlebars preloaded
 ok( $hb->add_template( "precompiletest", "hello this is {{var}}" ) );
 my $code = $hb->bundle;
 ok( $code );
-ok( $c->eval( $code ) );
+eval{ $c->eval( $code ) };
+ok( not $@ );
 
 is( $c->eval( "Handlebars.templates.precompiletest({var:'precompiled'})" ), "hello this is precompiled" );
 ok( not defined $@ );

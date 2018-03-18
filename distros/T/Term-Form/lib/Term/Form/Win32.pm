@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.313';
+our $VERSION = '0.315';
 
 use Encode qw( decode );
 
@@ -23,7 +23,7 @@ sub new {
 
 
 sub __set_mode {
-    my ( $self ) = @_;
+    my ( $self, $hide_cursor ) = @_;
     $self->{input} = Win32::Console->new( STD_INPUT_HANDLE );
     $self->{old_in_mode} = $self->{input}->Mode();
     $self->{input}->Mode( ENABLE_PROCESSED_INPUT );
@@ -31,11 +31,12 @@ sub __set_mode {
     $self->{def_attr}  = $self->{output}->Attr();
     $self->{bg_color}  = $self->{def_attr} & 0x70;
     $self->{fill_attr} = $self->{bg_color} | $self->{bg_color};
+    $self->{output}->Cursor( -1, -1, -1, 0 ) if $hide_cursor;
 }
 
 
 sub __reset_mode {
-    my ( $self ) = @_;
+    my ( $self, $hide_cursor ) = @_;
     if ( defined $self->{input} ) {
         if ( defined $self->{old_in_mode} ) {
             $self->{input}->Mode( $self->{old_in_mode} );
@@ -46,6 +47,7 @@ sub __reset_mode {
         delete $self->{input}{handle};
     }
     if ( defined $self->{output} ) {
+        $self->{output}->Cursor( -1, -1, -1, 1 ) if $hide_cursor;
         delete $self->{output}{handle}; # ?
     }
 }

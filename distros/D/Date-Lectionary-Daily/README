@@ -2,23 +2,75 @@ NAME
     Date::Lectionary::Daily - Daily Readings for the Christian Lectionary
 
 VERSION
-    Version 1.20180205
+    Version 1.20180316
 
 SYNOPSIS
         use Time::Piece;
         use Date::Lectionary::Daily;
 
-        my $dailyReading = Date::Lectionary::Daily->new('date' => Time::Piece->strptime("2017-12-24", "%Y-%m-%d"));
-        say $dailyReading->readings->{evening}->{1}; #First lesson for evening prayer
+        #Using the old ACNA Liturgical Daily Lectionary
+        my $dailyReading = Date::Lectionary::Daily->new(
+            'date' => Time::Piece->strptime("2017-12-24", "%Y-%m-%d"), 
+            'lectionary' => 'acna-xian'
+        );
+        say $dailyReading->readings->{evening}->{1}; #First lesson for evening prayer, Isaiah 51
+
+        #Using the new ACNA Secular/Civil Daily Lectionary
+        my $dailyNewReading = Date::Lectionary::Daily->new( 
+            'date' => Time::Piece->strptime( "2018-03-12", "%Y-%m-%d" ), 
+            'lectionary' => 'acna-sec' 
+        );
+        say $dailyNewReading->readings->{morning}->{2}; #Second lesson for morning prayer, Matthew 5
 
 DESCRIPTION
-    Date::Lectionary::Daily takes a Time::Piece date and returns ACNA
-    readings for morning and evening prayer for that date.
+    Date::Lectionary::Daily takes a Time::Piece date and returns readings
+    for morning and evening prayer for that date.
+
+  CONSTRUCTOR ATTRIBUTES
+   date
+    The Time::Piece object date of the day you woudl like the lessons for.
+
+   lectionary
+    One of two choices `acna-sec` for the new secular calendar based ACNA
+    daily lectionary or `acna-xian` for the previous liturgically-based ACNA
+    daily lectionary.
+
+    If lectionary is not given at construction, the ACNA secular daily
+    lectionary — `acna-sec` — will be used.
+
+  ATTRIBUTES
+   week
+    The name of the liturgical week in the lectionary; e.g. `The First
+    Sunday in Lent`.
+
+   day
+    The name of the day of the week; e.g. `Sunday`.
+
+   tradition
+    Presently only returns `acna`. Future version of the module may include
+    daily lectionary from other traditions.
+
+   type
+    Returns `secular` for daily lectionaries based on the secular/civil
+    calendar and `liturgical` for daily lectionaries based on the liturgical
+    calendar.
+
+   readings
+    A hasref of the readings for the day.
 
 SUBROUTINES/METHODS
   BUILD
     Constructor for the Date::Lectionary object. Takes a Time::Piect object,
     "date", to create the object.
+
+  _buildType
+    Private method to determine if the daily lectionary follows the secular
+    calendar or the liturgical calendar.
+
+  _buildTradition
+    Private method to determine the Sunday lectionary tradition of the daily
+    lectionary selected. Used to determine the liturgical week the day falls
+    within.
 
   _parseLectDB
     Private method to open and parse the lectionary XML to be used by other
@@ -28,9 +80,13 @@ SUBROUTINES/METHODS
     Private method to determine if the day given is a fixed holiday rather
     than a standard day.
 
-  _buildReadings
+  _buildReadingsLiturgical
     Private method that returns an ArrayRef of strings for the lectionary
-    readings associated with the date.
+    readings associated with the date according to the liturgical calendar.
+
+  _buildReadingsSecular
+    Private method that returns an ArrayRef of strings for the lectionary
+    readings associated with the date according to the secular calendar.
 
 AUTHOR
     Michael Wayne Arnold, "<marmanold at cpan.org>"
@@ -66,11 +122,11 @@ SUPPORT
         <http://search.cpan.org/dist/Date-Lectionary-Daily/>
 
 ACKNOWLEDGEMENTS
-    Many thanks to my beautiful wife, Jennifer, and my amazing daughter,
-    Rosemary. But, above all, SOLI DEO GLORIA!
+    Many thanks to my beautiful wife, Jennifer, my amazing daughter,
+    Rosemary, and my sweet son, Oliver. But, above all, SOLI DEO GLORIA!
 
-LICENSE AND COPYRIGHT
-    Copyright 2017 MICHAEL WAYNE ARNOLD
+LICENSE
+    Copyright 2017-2018 MICHAEL WAYNE ARNOLD
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are

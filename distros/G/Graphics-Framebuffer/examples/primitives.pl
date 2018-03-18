@@ -10,6 +10,7 @@ use strict;
 use Graphics::Framebuffer;
 use List::Util qw(min max shuffle);
 use Time::HiRes qw(sleep time alarm);
+use Getopt::Long;
 
 # use Data::Dumper::Simple; $Data::Dumper::Sortkeys=1;
 
@@ -21,21 +22,21 @@ my $new_x;
 my $new_y;
 our $F;
 our $FR;
-my $DIRTY = 1;
-my $dev   = 0;
-my $psize = 1;
+my $DIRTY   = 1;
+my $dev     = 0;
+my $psize   = 1;
+my $noaccel = 0;
 
-if ($arg =~ /X(\d+)/) {
-    $new_x = $1;
-    $arg =~ s/X\d+//;
-}
-if ($arg =~ /Y(\d+)/) {
-    $new_y = $1;
-    $arg =~ s/Y\d+//;
-}
-if ($arg =~ /(\d+)/) {
-    $dev = $1;
-}
+GetOptions(
+    'x=i'     => \$new_x,
+    'y=i'     => \$new_y,
+    'dev=i'   => \$dev,
+    'pixel=i' => \$psize,
+    'noaccel' => \$noaccel,
+);
+
+$noaccel = ($noaccel) ? 1 : 0; # Only 1 or 0 please
+
 my $images_path = (-e 'images/RWBY_White.jpg') ? 'images' : 'examples/images';
 
 print "\n\nGathering images...\n";
@@ -49,9 +50,9 @@ our $DB = 0;
 our $STAMP = sprintf('%.1', time);
 
 if (defined($new_x)) {
-    ($FR,$F) = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'SIMULATED_X' => $new_x, 'SIMULATED_Y' => $new_y, 'DOUBLE_BUFFER' => 1);
+    ($FR,$F) = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'SIMULATED_X' => $new_x, 'SIMULATED_Y' => $new_y, 'DOUBLE_BUFFER' => 1, 'ACCELERATED' => ! $noaccel);
 } else {
-    ($FR,$F) = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0,'DOUBLE_BUFFER'=>1);
+    ($FR,$F) = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0,'DOUBLE_BUFFER'=>1, 'ACCELERATED' => ! $noaccel);
 }
 # warn "PHYSICAL: " . $FR->{'COLOR_ORDER'} . "\nVIRTUAL: " . $F->{'COLOR_ORDER'} . "\n\n";sleep 10;
 $FR->cls('OFF');
@@ -1617,7 +1618,7 @@ This script demonstrates the capabilities of the Graphics::Framebuffer module
 
 =head1 SYNOPSIS
 
- perl primitives.pl [file] [device number] [Xemulated resolution] [Yemulated resolution]
+ perl primitives.pl [--dev=device number] [--x=X emulated resolution] [--y=Y emulated resolution] [--pixel=pixel size] [--noaccel]
 
 =over 2
 
@@ -1627,9 +1628,9 @@ Examples:
 
 =over 4
 
- perl primitives.pl file 1 X640 Y480
+ perl primitives.pl --dev=1 --x=640 --y=480
 
- perl primitives.pl X1280 Y720
+ perl primitives.pl --x=1280 --y=720 --pixel=2
 
 =back
 
@@ -1637,25 +1638,29 @@ Examples:
 
 =over 2
 
-=item C<file>
+=item B<--dev>=C<device number>
 
-Makes the script run in "file handle" mode
+By default, it uses "/dev/fb0", but you can tell it to use any framebuffer device number.  Only the number 0 - 31 is needed here.
 
-=item C<device number> (just the number)
-
-By default, it uses "/dev/fb0", but you can tell it to use any framebuffer device number.  Just the number is needed here.
-
-=item C<X> (followed by the width, no spaces)
+=item B<--x>=C<width>
 
 This tells the script to tell the Graphics::Framebuffer module to simulate a device of a specific width.  It will center it on the screen.
 
- "X800" would set the width to 800 pixels.
+ "--x=800" would set the width to 800 pixels.
 
-=item C<Y> (followed by the height, no spaces)
+=item B<--y>=C<height>
 
 This tells the script to tell the Graphics::Framebuffer module to simulate a device of a specific height.  It will center it on the screen.
 
- "Y480" would set the height to 480 pixels.
+ "--y=480" would set the height to 480 pixels.
+
+=item B<--pixel>=C<pixel size>
+
+This tells the module to draw with larger pixels (larger means slower)
+
+=item B<--noaccel>
+
+Turns off C acceleration.  Uses only the Perl routines.
 
 =back
 
@@ -1671,6 +1676,6 @@ Richard Kelsch <rich@rk-internet.com>
 
 =head1 COPYRIGHT
 
-Copyright 2003-2016 Richard Kelsch
+Copyright 2003-2018 Richard Kelsch
 
 This program must always be included as part of the Graphics::Framebuffer package.

@@ -5,6 +5,13 @@ use Test2::V0;
 
 use Hash::Wrap ();
 
+my $HAS_LVALUE;
+
+BEGIN {
+
+    $HAS_LVALUE = $] ge '5.01600';
+}
+
 
 like(
     dies {
@@ -26,8 +33,16 @@ like(
     dies {
         Hash::Wrap->import( { -copy => 1, -clone => 1 } )
     },
-    qr/cannot mix/,
+    qr/cannot mix -copy and -clone/,
     'copy + clone'
+);
+
+like(
+    dies {
+        Hash::Wrap->import( { -base => 1, -class => 1 } )
+    },
+    qr/cannot mix -base and -class/,
+    'base + class'
 );
 
 {
@@ -57,55 +72,42 @@ ref_ok( *My::Import::CloneNoRename::wrap_hash{CODE},
     'CODE', "clone, no rename" );
 
 
+{
+
+    package My::StandAlone::Class;
+
+    use Hash::Wrap ( { -base => 1, -undef => 1 } );
+
+}
+
+is( My::StandAlone::Class->new( { } )->b, undef, "standalone class" );
+
+{
+
+    package My::Test::No::Sub;
+
+    use Hash::Wrap ( { -class => 'My::Test::No::Sub::Class', -new => 1, -as => undef, -undef => 1 } );
+
+}
+
+is( My::Test::No::Sub::Class->new( { } )->b, undef, "standalone class" );
+{ no warnings 'once';
+  is ( *My::Test::No::Sub::wrap_hash{CODE}, undef, "stopping import of wrap_hash works" );
+}
+
+
+
 SKIP: {
     skip( ":lvalue support requires perl 5.16 or later" )
-      if $] lt '5.016000';
+      unless $HAS_LVALUE;
 
     {
         package My::Import::Default::LValue;
 
-        use if $] ge '5.01600', 'Hash::Wrap',  ( { -lvalue => 1 } );
+        use if $HAS_LVALUE, 'Hash::Wrap', ( { -base => 1, -lvalue => 1 } );
     }
 
-    isa_ok(
-        My::Import::Default::LValue::wrap_hash( {} ),
-        ['Hash::Wrap::Class::lvalue'],
-        "default w/ lvalue"
-    );
-
-    {
-        package My::Import::Bad::LValue;
-
-        use parent 'Hash::Wrap::Base';
-    }
-
-    like(
-        dies {
-            Hash::Wrap->import(
-                { -class => 'My::Import::Bad::LValue', -lvalue => 1 } )
-        },
-        qr/does not add ':lvalue'/,
-        'bad lvalue class'
-    );
-
-
-    {
-        package My::Import::Good::LValue;
-        our @ISA = qw( Hash::Wrap::Base );
-
-        our $generate_signature = sub { ': lvalue' };
-    }
-
-    ok(
-        lives {
-            Hash::Wrap->import( {
-                    -class  => 'My::Import::Good::LValue',
-                } )
-        },
-        'good lvalue class'
-    ) or note $@;
-
-
+    is( $My::Import::Default::LValue::meta->{-lvalue}, 1, "lvalue");
 }
 
 done_testing;

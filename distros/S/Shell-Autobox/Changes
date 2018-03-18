@@ -1,11 +1,13 @@
 Revision history for Perl extension Shell::Autobox
 
+0.40.0 Sun 11 Mar 04:08:57 2018
+    - RT-38687: handle stdin correctly (thanks, Joerg Meltzer)
+
 0.03  Thu May 12 04:05:51 2005
-	- fixed documentation typo
+    - fixed documentation typo
 
 0.02  Thu May 12 03:53:12 2005
-	- added tests for warnings
+    - added tests for warnings
 
 0.01  Thu May 12 03:15:24 2005
-	- original version; created by h2xs 1.23 with options
-		-X -n Shell::Autobox
+    - original version; created by h2xs 1.23 with options -X -n Shell::Autobox

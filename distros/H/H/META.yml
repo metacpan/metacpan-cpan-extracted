@@ -1,0 +1,22 @@
+---
+abstract: 'Method wrappers for hash construction.'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires:
+  Test2::Tools::Tiny: '1.302133'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: H
+requires:
+  perl: '5.008000'
+resources:
+  bugtracker: http://github.com/exodist/H/issues
+  repository: http://github.com/exodist/H/
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.70'

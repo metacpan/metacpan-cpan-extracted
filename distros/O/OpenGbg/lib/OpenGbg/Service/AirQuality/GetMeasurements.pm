@@ -6,7 +6,7 @@ package OpenGbg::Service::AirQuality::GetMeasurements;
 
 # ABSTRACT: Get a collection of measurements
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1402';
+our $VERSION = '0.1403';
 
 use XML::Rabbit::Root;
 use MooseX::AttributeShortcuts;
@@ -38,7 +38,7 @@ OpenGbg::Service::AirQuality::GetMeasurements - Get a collection of measurements
 
 =head1 VERSION
 
-Version 0.1402, released 2016-08-12.
+Version 0.1403, released 2018-03-14.
 
 =head1 NAME
 

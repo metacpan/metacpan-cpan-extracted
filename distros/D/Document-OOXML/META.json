@@ -4,7 +4,7 @@
       "Martijn van de Streek <martijn@vandestreek.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -55,49 +55,49 @@
    "provides" : {
       "Document::OOXML" : {
          "file" : "lib/Document/OOXML.pm",
-         "version" : "0.172650"
+         "version" : "0.180750"
       },
       "Document::OOXML::ContentTypes" : {
          "file" : "lib/Document/OOXML/ContentTypes.pm",
-         "version" : "0.172650"
+         "version" : "0.180750"
       },
       "Document::OOXML::Document" : {
          "file" : "lib/Document/OOXML/Document.pm",
-         "version" : "0.172650"
+         "version" : "0.180750"
       },
       "Document::OOXML::Document::Wordprocessor" : {
          "file" : "lib/Document/OOXML/Document/Wordprocessor.pm",
-         "version" : "0.172650"
+         "version" : "0.180750"
       },
       "Document::OOXML::Part" : {
          "file" : "lib/Document/OOXML/Part.pm",
-         "version" : "0.172650"
+         "version" : "0.180750"
       },
       "Document::OOXML::Part::WordprocessingML" : {
          "file" : "lib/Document/OOXML/Part/WordprocessingML.pm",
-         "version" : "0.172650"
+         "version" : "0.180750"
       },
       "Document::OOXML::PartParser" : {
          "file" : "lib/Document/OOXML/PartParser.pm",
-         "version" : "0.172650"
+         "version" : "0.180750"
       },
       "Document::OOXML::Rels" : {
          "file" : "lib/Document/OOXML/Rels.pm",
-         "version" : "0.172650"
+         "version" : "0.180750"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://gitlab.com/martijnvds/Document-OOML/issues"
+         "web" : "https://gitlab.com/martijnvds/Document-OOXML/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://gitlab.com/martijnvds/Document-OOML.git",
-         "web" : "https://gitlab.com/martijnvds/Document-OOML"
+         "url" : "https://gitlab.com/martijnvds/Document-OOXML.git",
+         "web" : "https://gitlab.com/martijnvds/Document-OOXML"
       }
    },
-   "version" : "0.172650",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "0.180750",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

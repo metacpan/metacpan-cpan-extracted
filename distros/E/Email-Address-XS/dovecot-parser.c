@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2017 Dovecot authors
+ * Copyright (c) 2002-2018 Dovecot authors
  * Copyright (c) 2015-2018 Pali <pali@cpan.org>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -300,7 +300,7 @@ static int rfc822_skip_comment(struct rfc822_parser_context *ctx)
 		str_truncate(ctx->last_comment, 0);
 
 	start = ++ctx->data;
-	for (; ctx->data != ctx->end; ctx->data++) {
+	for (; ctx->data < ctx->end; ctx->data++) {
 		switch (*ctx->data) {
 		case '(':
 			level++;
@@ -312,7 +312,7 @@ static int rfc822_skip_comment(struct rfc822_parser_context *ctx)
 						     ctx->data - start);
 				}
 				ctx->data++;
-				return ctx->data != ctx->end ? 1 : 0;
+				return ctx->data < ctx->end ? 1 : 0;
 			}
 			break;
 		case '\\':
@@ -323,7 +323,7 @@ static int rfc822_skip_comment(struct rfc822_parser_context *ctx)
 			start = ctx->data + 1;
 
 			ctx->data++;
-			if (ctx->data == ctx->end)
+			if (ctx->data >= ctx->end)
 				return -1;
 			break;
 		}
@@ -336,7 +336,7 @@ static int rfc822_skip_comment(struct rfc822_parser_context *ctx)
 /* Skip LWSP if there is any */
 static int rfc822_skip_lwsp(struct rfc822_parser_context *ctx)
 {
-	for (; ctx->data != ctx->end;) {
+	for (; ctx->data < ctx->end;) {
 		if (*ctx->data == ' ' || *ctx->data == '\t' ||
 		    *ctx->data == '\r' || *ctx->data == '\n') {
                         ctx->data++;
@@ -349,7 +349,7 @@ static int rfc822_skip_lwsp(struct rfc822_parser_context *ctx)
 		if (rfc822_skip_comment(ctx) < 0)
 			return -1;
 	}
-	return ctx->data != ctx->end ? 1 : 0;
+	return ctx->data < ctx->end ? 1 : 0;
 }
 
 /* Like parse_atom() but don't stop at '.' */
@@ -367,10 +367,10 @@ static int rfc822_parse_dot_atom(struct rfc822_parser_context *ctx, string_t *st
 
 	   For RFC-822 compatibility allow LWSP around '.'
 	*/
-	if (ctx->data == ctx->end || !IS_ATEXT(*ctx->data))
+	if (ctx->data >= ctx->end || !IS_ATEXT(*ctx->data))
 		return -1;
 
-	for (start = ctx->data++; ctx->data != ctx->end; ) {
+	for (start = ctx->data++; ctx->data < ctx->end; ) {
 		if (IS_ATEXT(*ctx->data)) {
 			ctx->data++;
 			continue;
@@ -402,10 +402,11 @@ static int rfc822_parse_quoted_string(struct rfc822_parser_context *ctx, string_
 	const unsigned char *start;
 	size_t len;
 
+	i_assert(ctx->data < ctx->end);
 	i_assert(*ctx->data == '"');
 	ctx->data++;
 
-	for (start = ctx->data; ctx->data != ctx->end; ctx->data++) {
+	for (start = ctx->data; ctx->data < ctx->end; ctx->data++) {
 		switch (*ctx->data) {
 		case '"':
 			str_append_data(str, start, ctx->data - start);
@@ -421,7 +422,7 @@ static int rfc822_parse_quoted_string(struct rfc822_parser_context *ctx, string_
 			break;
 		case '\\':
 			ctx->data++;
-			if (ctx->data == ctx->end)
+			if (ctx->data >= ctx->end)
 				return -1;
 
 			str_append_data(str, start, ctx->data - start - 1);
@@ -447,7 +448,7 @@ rfc822_parse_atom_or_dot(struct rfc822_parser_context *ctx, string_t *str)
 	   The difference between this function and rfc822_parse_dot_atom()
 	   is that this doesn't just silently skip over all the whitespace.
 	*/
-	for (start = ctx->data; ctx->data != ctx->end; ctx->data++) {
+	for (start = ctx->data; ctx->data < ctx->end; ctx->data++) {
 		if (IS_ATEXT(*ctx->data) || *ctx->data == '.')
 			continue;
 
@@ -470,7 +471,7 @@ static int rfc822_parse_phrase(struct rfc822_parser_context *ctx, string_t *str)
 	   obs-phrase = word *(word / "." / CFWS)
 	*/
 
-	if (ctx->data == ctx->end)
+	if (ctx->data >= ctx->end)
 		return 0;
 	if (*ctx->data == '.')
 		return -1;
@@ -505,12 +506,13 @@ rfc822_parse_domain_literal(struct rfc822_parser_context *ctx, string_t *str)
 			     %d94-126        ;  characters not including "[",
 					     ;  "]", or "\"
 	*/
+	i_assert(ctx->data < ctx->end);
 	i_assert(*ctx->data == '[');
 
-	for (start = ctx->data; ctx->data != ctx->end; ctx->data++) {
+	for (start = ctx->data; ctx->data < ctx->end; ctx->data++) {
 		if (*ctx->data == '\\') {
 			ctx->data++;
-			if (ctx->data == ctx->end)
+			if (ctx->data >= ctx->end)
 				break;
 		} else if (*ctx->data == ']') {
 			ctx->data++;
@@ -531,6 +533,7 @@ static int rfc822_parse_domain(struct rfc822_parser_context *ctx, string_t *str)
 	   domain-literal  = [CFWS] "[" *([FWS] dcontent) [FWS] "]" [CFWS]
 	   obs-domain      = atom *("." atom)
 	*/
+	i_assert(ctx->data < ctx->end);
 	i_assert(*ctx->data == '@');
 	ctx->data++;
 
@@ -569,7 +572,7 @@ static int parse_local_part(struct message_address_parser_context *ctx)
 	   local-part      = dot-atom / quoted-string / obs-local-part
 	   obs-local-part  = word *("." word)
 	*/
-	i_assert(ctx->parser.data != ctx->parser.end);
+	i_assert(ctx->parser.data < ctx->parser.end);
 
 	str_truncate(ctx->str, 0);
 	if (*ctx->parser.data == '"')
@@ -604,7 +607,7 @@ static int parse_domain_list(struct message_address_parser_context *ctx)
 	/* obs-domain-list = "@" domain *(*(CFWS / "," ) [CFWS] "@" domain) */
 	str_truncate(ctx->str, 0);
 	for (;;) {
-		if (ctx->parser.data == ctx->parser.end)
+		if (ctx->parser.data >= ctx->parser.end)
 			return 0;
 
 		if (*ctx->parser.data != '@')
@@ -642,7 +645,7 @@ static int parse_angle_addr(struct message_address_parser_context *ctx)
 			if (ctx->fill_missing)
 				ctx->addr.route = strdup("INVALID_ROUTE");
 			ctx->addr.invalid_syntax = true;
-			if (ctx->parser.data == ctx->parser.end)
+			if (ctx->parser.data >= ctx->parser.end)
 				return -1;
 			/* try to continue anyway */
 		} else {
@@ -709,7 +712,7 @@ static int parse_name_addr(struct message_address_parser_context *ctx)
 		}
 	}
 
-	return ctx->parser.data != ctx->parser.end ? 1 : 0;
+	return ctx->parser.data < ctx->parser.end ? 1 : 0;
 }
 
 static int parse_addr_spec(struct message_address_parser_context *ctx)
@@ -717,7 +720,7 @@ static int parse_addr_spec(struct message_address_parser_context *ctx)
 	/* addr-spec       = local-part "@" domain */
 	int ret, ret2 = -2;
 
-	i_assert(ctx->parser.data != ctx->parser.end);
+	i_assert(ctx->parser.data < ctx->parser.end);
 
 	if (ctx->parser.last_comment != NULL)
 		str_truncate(ctx->parser.last_comment, 0);
@@ -730,7 +733,8 @@ static int parse_addr_spec(struct message_address_parser_context *ctx)
 		/* end of input or parsing local-part failed */
 		ctx->addr.invalid_syntax = true;
 	}
-	if (ret != 0 && *ctx->parser.data == '@') {
+	if (ret != 0 && ctx->parser.data < ctx->parser.end &&
+	    *ctx->parser.data == '@') {
 		ret2 = parse_domain(ctx);
 		if (ret2 <= 0)
 			ret = ret2;
@@ -871,7 +875,7 @@ static int parse_group(struct message_address_parser_context *ctx)
 			if (parse_mailbox(ctx) <= 0) {
 				/* broken mailbox - try to continue anyway. */
 			}
-			if (ctx->parser.data == ctx->parser.end ||
+			if (ctx->parser.data >= ctx->parser.end ||
 			    *ctx->parser.data != ',')
 				break;
 			ctx->parser.data++;
@@ -882,7 +886,7 @@ static int parse_group(struct message_address_parser_context *ctx)
 		}
 	}
 	if (ret >= 0) {
-		if (ctx->parser.data == ctx->parser.end ||
+		if (ctx->parser.data >= ctx->parser.end ||
 		    *ctx->parser.data != ';')
 			ret = -1;
 		else {
@@ -924,7 +928,7 @@ static int parse_address_list(struct message_address_parser_context *ctx,
 		max_addresses--;
 		if ((ret = parse_address(ctx)) == 0)
 			break;
-		if (ctx->parser.data == ctx->parser.end ||
+		if (ctx->parser.data >= ctx->parser.end ||
 		    *ctx->parser.data != ',') {
 			ret = -1;
 			break;

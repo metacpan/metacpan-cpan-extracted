@@ -14,7 +14,7 @@ use Config::IniFiles::Slurp qw( bin_slurp );
 
 use Test::More;
 
-if ($^O !~ m/\AMSWin/)
+if ( $^O !~ m/\AMSWin/ )
 {
     plan skip_all => 'Test is only relevant for Microsoft Windows';
 }
@@ -26,57 +26,59 @@ else
 use Config::IniFiles;
 use File::Spec;
 
-my $config_filename = File::Spec->catdir(File::Spec->curdir(), "t", "testConfig.ini");
+my $config_filename =
+    File::Spec->catdir( File::Spec->curdir(), "t", "testConfig.ini" );
 
-writeNewUserIni ($config_filename);
+writeNewUserIni($config_filename);
 
-for my $s (1 .. 4)
+for my $s ( 1 .. 4 )
 {
     print "s = $s\n";
-    for my $p (1 ..4)
+    for my $p ( 1 .. 4 )
     {
         print "p = $p\n";
-        writeIni($config_filename, "Section$s", "Param$p", "Value$p");
+        writeIni( $config_filename, "Section$s", "Param$p", "Value$p" );
     }
 }
 
-
 # TEST
 unlike(
-    scalar(bin_slurp($config_filename)),
-    qr/[^\x0D]\x0A/, # \x0D is CR ; \x0A is LF. See "man ascii".
+    scalar( bin_slurp($config_filename) ),
+    qr/[^\x0D]\x0A/,    # \x0D is CR ; \x0A is LF. See "man ascii".
     "Checking that all line feeds are preceded by carriage returns",
 );
 
 sub writeNewUserIni
 {
-	my ($config_fn) = @_;
+    my ($config_fn) = @_;
 
-	open my $fh, '>', $config_fn
+    open my $fh, '>', $config_fn
         or die "Cannot open $config_fn for writing. - $!";
-	print {$fh} "[UserConfigFile]\n";
-	close ($fh);
+    print {$fh} "[UserConfigFile]\n";
+    close($fh);
 
     return;
 }
 
 sub writeIni
 {
-    my ($userConfig_fn, $section, $param, $value) = @_;
+    my ( $userConfig_fn, $section, $param, $value ) = @_;
 
-	my $usrCfg = Config::IniFiles->new( -file => $userConfig_fn )
-		or die "Failed! Could not open $userConfig_fn with error @Config::IniFiles::errors\n" ;
+    my $usrCfg = Config::IniFiles->new( -file => $userConfig_fn )
+        or die
+"Failed! Could not open $userConfig_fn with error @Config::IniFiles::errors\n";
 
-	$usrCfg->newval($section, $param, $value)
-		or die "Could not set newval in writeIni for $section, $param -> $value\n";
+    $usrCfg->newval( $section, $param, $value )
+        or die
+        "Could not set newval in writeIni for $section, $param -> $value\n";
 
     my $c = 0;
 
-    while ($c < 6)
+    while ( $c < 6 )
     {
         if ( $usrCfg->RewriteConfig() )
         {
-            $c=6;
+            $c = 6;
             print "Writing [$section] $param -> $value\n";
         }
         else

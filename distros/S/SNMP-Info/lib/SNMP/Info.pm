@@ -24,7 +24,7 @@ use vars
     qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE $AUTOLOAD $INIT $DEBUG %SPEED_MAP
     $NOSUCH $BIGINT $REPEATERS/;
 
-$VERSION = '3.49';
+$VERSION = '3.51';
 
 =head1 NAME
 
@@ -32,7 +32,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.49
+SNMP::Info - Version 3.51
 
 =head1 AUTHOR
 
@@ -983,25 +983,31 @@ See documentation in L<SNMP::Info::Layer7> for details.
 
 =item SNMP::Info::Layer7::APC
 
-SNMP Interface to APC UPS devices
+Subclass for  APC UPS devices
 
 See documentation in L<SNMP::Info::Layer7::APC> for details.
 
 =item SNMP::Info::Layer7::CiscoIPS
 
-SNMP Interface to Cisco IPS devices
+Subclass for Cisco IPS devices
 
 See documentation in L<SNMP::Info::Layer7::Cisco IPS> for details.
 
+=item SNMP::Info::Layer7::Gigamon
+
+Subclass for Gigamon devices
+
+See documentation in L<SNMP::Info::Layer7::Gigamon> for details.
+
 =item SNMP::Info::Layer7::Netscaler
 
-SNMP Interface to Citrix Netscaler appliances
+Subclass for Citrix Netscaler appliances
 
 See documentation in L<SNMP::Info::Layer7::Netscaler> for details.
 
 =item SNMP::Info::Layer7::Neoteris
 
-SNMP Interface to Juniper SSL VPN appliances
+Subclass for Juniper SSL VPN appliances
 
 See documentation in L<SNMP::Info::Layer7::Neoteris> for details.
 
@@ -1632,6 +1638,7 @@ sub device_type {
         5951  => 'SNMP::Info::Layer7::Netscaler',
         14525 => 'SNMP::Info::Layer2::Trapeze',
         12532 => 'SNMP::Info::Layer7::Neoteris',
+        26866 => 'SNMP::Info::Layer7::Gigamon',
     );
 
     # Get just the enterprise number for generic mapping
@@ -3982,16 +3989,6 @@ sub _set {
 
         # Instance is 0 for scalars without a supplied instance
         $var_list->[1] = $list_iid = defined $list_iid ? $list_iid : '0';
-
-        # Check if this method is from a sub or from the tables.
-        if ( $self->can($list_attr) ) {
-            $self->error_throw(
-                "SNMP::Info::_set($list_attr,$list_val) - Failed. $list_attr is generated in a sub(). set_$list_attr sub required."
-            );
-
-            # if sub set_attr() existed, we wouldn't have gotten this far.
-            return;
-        }
 
         # Lookup oid
         my $oid = undef;

@@ -1,3 +1,41 @@
+v2.2.0  2018-03-15 11:07:02 EST  Mark Leighton Fisher
+
+  - RT fixes are for issues 82034, 84443, 121522, 122210, and
+    122212.
+  - Updated Changes file to include v2.1.2 changes.
+  - Fix pmfunc to complain about missing functions.
+  - Fix pmfunc test to use an example that is (still) a function
+    (uses Cwd::chdir instead of the obsolete Cwd::getcwd).
+  - Fix pmfunc POD to use an example that is (still) a function.
+  - Add pmfunc tests for function signature and function body.
+  - Fix podpath to detect POD in the file, in case the .pm file
+    is found before the .pod file.
+  - Fix faqpods for Fedora, which can put new FAQs in the
+    $Config{'vendorlib'} directory instead.
+  - Fix pminst to follow symlinks.
+  - Fix podgrep to once again accept options (broken when pmtools
+    started using 'use strict').
+  - Fix podgrep to eliminate spurious message about Config::Config
+    (which is actually used only once).
+  - Added DB() == 1 to Devel::Loaded so you can invoke it like
+    "perl -dLoaded SCRIPT" instead of "perl -MDevel::Loaded SCRIPT".
+
+    NOTE: These changes mean that pmfunc works after all - the example
+    in the POD was out of date (Cwd::getcwd is no longer a 'sub').
+
+v2.1.2  2018-03-15 14:34:09 EST  Mark Leighton Fisher
+
+  - RT fixes are for issues 90208, 110691, and 119879.
+  - Fix for Windows - need to run external Perl programs as
+    "perl EXTERNALPROGRAM ..." using $^X, otherwise the
+    return status is wrong.
+  - Fix t/pmcat.t and t/pmdesc.t for when PODs are separate from their
+    module files (like Debian and Ubuntu).
+  - Fixed several Copyright notices.
+  - Caught repo up to v2.1.2.
+  - Fixed release tags on GitHub.
+  - Removed obsolete files.
+
 v2.0.0  2014-02-03 17:59:29 EST  Mark Leighton Fisher
 
   - Bumped version to v2.0.0 because of the major architectural

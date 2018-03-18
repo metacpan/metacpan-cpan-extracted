@@ -7,6 +7,7 @@ use HTTP::Request;
 use Data::Dumper;
 use AnyEvent::Loop;
 use Scalar::Util qw(looks_like_number);
+use AnyEvent::Strict;
 use Carp qw(confess);
 BEGIN { $SIG{__DIE__} = sub { confess @_ }; }
 
@@ -28,7 +29,7 @@ $self->logger($log);
 isa_ok($self,$class);
 
 
-SKIP: { skip 'Run HTTP::Tests Not Set',415 unless $ENV{RUN_HTTP_TESTS};
+SKIP: { skip '$ENV{RUN_HTTP_TESTS} Not Set',415 unless $ENV{RUN_HTTP_TESTS};
 if(1) {
   my $request=HTTP::Request->new(GET=>'http://localhost');
   my ($id)=$self->add($request);

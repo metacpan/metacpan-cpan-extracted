@@ -2,7 +2,7 @@
 #
 #   file: lib/Dist/Zilla/Plugin/Hook/Manual.pod
 #
-#   Copyright © 2015, 2016 Van de Bugger.
+#   Copyright © 2015, 2016, 2018 Van de Bugger.
 #
 #   This file is part of perl-Dist-Zilla-Plugin-Hook.
 #
@@ -16,6 +16,8 @@
 #
 #   You should have received a copy of the GNU General Public License along with
 #   perl-Dist-Zilla-Plugin-Hook. If not, see <http://www.gnu.org/licenses/>.
+#
+#   SPDX-License-Identifier: GPL-3.0-or-later
 #
 #   ---------------------------------------------------------------------- copyright and license ---
 
@@ -237,6 +239,8 @@
 #pod and sometimes is the only file of an example. Example module contains single line C<package Assa;
 #pod 1;> and generated on-the-fly with C<GenerateFile> plugin.
 #pod
+#pod =encoding UTF-8
+#pod
 #pod =head2 I<Description> Meta Resource
 #pod
 #pod Distribution meta information contains such items as I<name>, I<version>, I<abstract> and many
@@ -251,7 +255,7 @@
 #pod
 #pod     name     = Description
 #pod     abstract = Hook demo: Set "description" meta info
-#pod     version  = 0.001
+#pod     version  = v0.0.1
 #pod     [Hook::MetaProvider/description]    ; <<<=== Look at this
 #pod         ;   MetaProvider's metadata method must return HashRef (or undef).
 #pod         ;   Multiple MetaProviders are allowed. Metainfo received from
@@ -268,6 +272,8 @@
 #pod         content  = package Assa; 1;
 #pod     [MetaJSON]
 #pod     [FakeRelease]
+#pod
+#pod =encoding UTF-8
 #pod
 #pod =head2 C<Test::Version> adaptive strictness
 #pod
@@ -308,6 +314,8 @@
 #pod     [MetaJSON]
 #pod     [FakeRelease]
 #pod
+#pod =encoding UTF-8
+#pod
 #pod =head2 Template Variables
 #pod
 #pod In a distribution, I have to duplicate the same pieces of information again and again. For example,
@@ -327,7 +335,7 @@
 #pod
 #pod     name     = TemplateVariables
 #pod     abstract = Hook demo: Define variables for later use in templates.
-#pod     version  = 0.001
+#pod     version  = v0.0.1
 #pod     [Hook::Init/my vars]                ; <<<=== Look at this
 #pod         . = package MY;
 #pod         . = our $name    = $dist->name;
@@ -361,46 +369,49 @@
 #pod     Bug tracker can be used via
 #pod     L<web interface|{{$MY::bt_web}}>.
 #pod
-#pod =head2 Version Handling
+#pod =encoding UTF-8
+#pod
+#pod =head2 Version Bumping
 #pod
 #pod I want the version of my distribution is bumped automatically after each release, and automatically
-#pod assigned version should be alpha (trial) one.
+#pod assigned version should be trial.
 #pod
-#pod For example: if I released version "0.001", the version of the next release should be "0.001_01".
-#pod When I release "0.001_01", the next should be "0.001_02", the next one — "0.001_03" and so on.
-#pod When I decide it is time to non-trial release, I will reset the version to "0.002" manually,
-#pod release it, and will have automatically bumped version "0.002_01".
+#pod For example: If I released version C<v0.0.1>, the version of the next release should be C<v0.0.1.1>
+#pod (see C<Version::Dotted::Semantic>). When I release C<v0.0.1.1>, the next should be C<v0.0.1.2>, the
+#pod next one — C<v0.0.1.3> and so on. When I decide it is time to non-trial release, I will set the
+#pod version to C<v0.0.2> manually, release it, and will have automatically bumped version C<v0.0.2.1>
+#pod for the next release.
 #pod
-#pod This is implemented with two plugins: C<Hook:VersionProvider> and C<Hook::AfterRelease>. The first
-#pod one reads version from external file F<VERSION> which contains only version and nothing more (ok,
-#pod trailing newline is allowed) — it simplifies implementation, because there is no need in parsing
-#pod F<dist.ini> file. The second plugin bumps the version after release with help from C<Perl::Version>
-#pod module, and writes bumped version back to the F<VERSION> file.
+#pod This is implemented with three plugins: C<Hook:VersionProvider>, C<Hook::ReleaseStatusProvider>,
+#pod and C<Hook::AfterRelease>. The first one reads version from external file F<VERSION> which contains
+#pod only version and nothing more (ok, trailing whitespace is allowed) — it simplifies implementation,
+#pod because there is no need in parsing F<dist.ini> file. The second plugin lets C<Dist::Zilla> know
+#pod release status (trial or stable). The third plugin bumps the version after release, and writes
+#pod bumped version back to the F<VERSION> file.
 #pod
 #pod F<dist.ini> file:
 #pod
-#pod     name     = VersionHandling
+#pod     name     = VersionBumping
 #pod     abstract = Hook demo: Bump version after release
 #pod     [Hook/prologue]                     ; <<<=== Look at this
-#pod         . = use Path::Tiny;
-#pod         . = use Perl::Version;
+#pod         . = use Version::Dotted::Semantic 'qv';
 #pod     [Hook::VersionProvider]             ; <<<=== Look at this
-#pod         . = path( $zilla->root )->child( 'VERSION' )->slurp =~ s{\s*\z}{}r;
-#pod         . =     #       Strip trailing whitespaces, if any. ^^^^^^^^^^^^^^
+#pod         . = $zilla->root->child( 'VERSION' )->slurp =~ s{\s*\z}{}r;
+#pod     [Hook::ReleaseStatusProvider]       ; <<<=== Look at this
+#pod         . = qv( $zilla->version )->is_trial ? "testing" : "stable";
 #pod     [GenerateFile/Assa.pm]
 #pod         filename = lib/Assa.pm
 #pod         content  = package Assa; 1;
 #pod     [MetaJSON]
 #pod     [FakeRelease]
 #pod     [Hook::AfterRelease/bump version]   ; <<<=== Look at this
-#pod         . = my $ver = Perl::Version->new( $dist->version );
-#pod         . = $ver->inc_alpha;
-#pod         . = path( $zilla->root )->child( 'VERSION' )->spew( $ver );
-#pod         . = $self->log( [ 'Next release will be %s', "$ver" ] );
+#pod         . = my $ver = qv( $dist->version )->bump( 3 );
+#pod         . = $zilla->root->child( 'VERSION' )->spew( $ver );
+#pod         . = $self->log( [ 'The next release will be %s', "$ver" ] );
 #pod
 #pod F<VERSION> file:
 #pod
-#pod     0.001
+#pod     v0.0.1
 #pod
 #pod =head2 Unwanted Dependencies
 #pod
@@ -416,7 +427,7 @@
 #pod
 #pod     name     = UnwantedDependencies
 #pod     abstract = Hook demo: Check the distro does not have unwanted dependencies
-#pod     version  = 0.001
+#pod     version  = v0.0.1
 #pod     [GenerateFile/Assa.pm]
 #pod         filename = lib/Assa.pm
 #pod         content  = package Assa; use DDP; 1;
@@ -435,6 +446,36 @@
 #pod         . = $self->abort_if_error( 'unwanted dependencies found' );
 #pod     [FakeRelease]
 #pod
+#pod =encoding UTF-8
+#pod
+#pod =head2 Let C<[=inc::Foo]> work in Perl v5.26+.
+#pod
+#pod Starting from Perl v26.0, C<.> is not included into C<@INC> anymore. This breaks C<Dist::Zilla>
+#pod syntax for plugins which are located in the distribution source tree, e. g.:
+#pod
+#pod     [=inc::Foo]
+#pod
+#pod Being run with Perl v5.26+, C<dzil> complains:
+#pod
+#pod     Required plugin inc::Foo isn't installed.
+#pod
+#pod C<Dist::Zilla::Plugin::lib> was created specially for workarounding this issue. (I said
+#pod "workarounding" not "solving" because C<Dist::Zilla::Plugin::lib> does not help C<dzil authordeps
+#pod --missing> to work.)
+#pod
+#pod The same effect can be achieved with C<Hook::Init> one-liner.
+#pod
+#pod F<dist.ini> file:
+#pod
+#pod     name     = NoDotInInc
+#pod     abstract = Hook demo: Let [=inc::Foo] work in Perl v5.26+.
+#pod     version  = v0.0.1
+#pod     [Hook::Init]    ; <<<=== Look at this
+#pod         . = use lib $zilla->root->absolute->stringify;
+#pod     [=inc::Foo]
+#pod     [MetaJSON]
+#pod     [FakeRelease]
+#pod
 #pod
 #pod
 #pod =head1 SEE ALSO
@@ -448,7 +489,7 @@
 #pod
 #pod =head1 COPYRIGHT AND LICENSE
 #pod
-#pod Copyright (C) 2015, 2016 Van de Bugger
+#pod Copyright (C) 2015, 2016, 2018 Van de Bugger
 #pod
 #pod License GPLv3+: The GNU General Public License version 3 or later
 #pod <http://www.gnu.org/licenses/gpl-3.0.txt>.
@@ -463,7 +504,11 @@
 #
 #   file: doc/what.pod
 #
+#   Copyright © 2015, 2016, 2018 Van de Bugger.
+#
 #   This file is part of perl-Dist-Zilla-Plugin-Hook.
+#
+#   SPDX-License-Identifier: GPL-3.0-or-later
 #
 #   ------------------------------------------------------------------------------------------------
 
@@ -481,7 +526,11 @@
 #
 #   file: doc/why.pod
 #
+#   Copyright © 2015, 2016, 2018 Van de Bugger.
+#
 #   This file is part of perl-Dist-Zilla-Plugin-Hook.
+#
+#   SPDX-License-Identifier: GPL-3.0-or-later
 #
 #   ------------------------------------------------------------------------------------------------
 
@@ -667,7 +716,7 @@ Dist::Zilla::Plugin::Hook::Manual - C<Hook> plugin user manual
 
 =head1 VERSION
 
-Version v0.8.3, released on 2016-11-25 22:04 UTC.
+Version v0.8.4, released on 2018-03-15 21:44 UTC.
 
 =head1 WHAT?
 
@@ -1080,7 +1129,7 @@ F<dist.ini> file:
 
     name     = Description
     abstract = Hook demo: Set "description" meta info
-    version  = 0.001
+    version  = v0.0.1
     [Hook::MetaProvider/description]    ; <<<=== Look at this
         ;   MetaProvider's metadata method must return HashRef (or undef).
         ;   Multiple MetaProviders are allowed. Metainfo received from
@@ -1156,7 +1205,7 @@ F<dist.ini> file:
 
     name     = TemplateVariables
     abstract = Hook demo: Define variables for later use in templates.
-    version  = 0.001
+    version  = v0.0.1
     [Hook::Init/my vars]                ; <<<=== Look at this
         . = package MY;
         . = our $name    = $dist->name;
@@ -1190,46 +1239,47 @@ F<BUGS.pod> file:
     Bug tracker can be used via
     L<web interface|{{$MY::bt_web}}>.
 
-=head2 Version Handling
+=head2 Version Bumping
 
 I want the version of my distribution is bumped automatically after each release, and automatically
-assigned version should be alpha (trial) one.
+assigned version should be trial.
 
-For example: if I released version "0.001", the version of the next release should be "0.001_01".
-When I release "0.001_01", the next should be "0.001_02", the next one — "0.001_03" and so on.
-When I decide it is time to non-trial release, I will reset the version to "0.002" manually,
-release it, and will have automatically bumped version "0.002_01".
+For example: If I released version C<v0.0.1>, the version of the next release should be C<v0.0.1.1>
+(see C<Version::Dotted::Semantic>). When I release C<v0.0.1.1>, the next should be C<v0.0.1.2>, the
+next one — C<v0.0.1.3> and so on. When I decide it is time to non-trial release, I will set the
+version to C<v0.0.2> manually, release it, and will have automatically bumped version C<v0.0.2.1>
+for the next release.
 
-This is implemented with two plugins: C<Hook:VersionProvider> and C<Hook::AfterRelease>. The first
-one reads version from external file F<VERSION> which contains only version and nothing more (ok,
-trailing newline is allowed) — it simplifies implementation, because there is no need in parsing
-F<dist.ini> file. The second plugin bumps the version after release with help from C<Perl::Version>
-module, and writes bumped version back to the F<VERSION> file.
+This is implemented with three plugins: C<Hook:VersionProvider>, C<Hook::ReleaseStatusProvider>,
+and C<Hook::AfterRelease>. The first one reads version from external file F<VERSION> which contains
+only version and nothing more (ok, trailing whitespace is allowed) — it simplifies implementation,
+because there is no need in parsing F<dist.ini> file. The second plugin lets C<Dist::Zilla> know
+release status (trial or stable). The third plugin bumps the version after release, and writes
+bumped version back to the F<VERSION> file.
 
 F<dist.ini> file:
 
-    name     = VersionHandling
+    name     = VersionBumping
     abstract = Hook demo: Bump version after release
     [Hook/prologue]                     ; <<<=== Look at this
-        . = use Path::Tiny;
-        . = use Perl::Version;
+        . = use Version::Dotted::Semantic 'qv';
     [Hook::VersionProvider]             ; <<<=== Look at this
-        . = path( $zilla->root )->child( 'VERSION' )->slurp =~ s{\s*\z}{}r;
-        . =     #       Strip trailing whitespaces, if any. ^^^^^^^^^^^^^^
+        . = $zilla->root->child( 'VERSION' )->slurp =~ s{\s*\z}{}r;
+    [Hook::ReleaseStatusProvider]       ; <<<=== Look at this
+        . = qv( $zilla->version )->is_trial ? "testing" : "stable";
     [GenerateFile/Assa.pm]
         filename = lib/Assa.pm
         content  = package Assa; 1;
     [MetaJSON]
     [FakeRelease]
     [Hook::AfterRelease/bump version]   ; <<<=== Look at this
-        . = my $ver = Perl::Version->new( $dist->version );
-        . = $ver->inc_alpha;
-        . = path( $zilla->root )->child( 'VERSION' )->spew( $ver );
-        . = $self->log( [ 'Next release will be %s', "$ver" ] );
+        . = my $ver = qv( $dist->version )->bump( 3 );
+        . = $zilla->root->child( 'VERSION' )->spew( $ver );
+        . = $self->log( [ 'The next release will be %s', "$ver" ] );
 
 F<VERSION> file:
 
-    0.001
+    v0.0.1
 
 =head2 Unwanted Dependencies
 
@@ -1245,7 +1295,7 @@ F<dist.ini> file:
 
     name     = UnwantedDependencies
     abstract = Hook demo: Check the distro does not have unwanted dependencies
-    version  = 0.001
+    version  = v0.0.1
     [GenerateFile/Assa.pm]
         filename = lib/Assa.pm
         content  = package Assa; use DDP; 1;
@@ -1262,6 +1312,34 @@ F<dist.ini> file:
         . =     };
         . = };
         . = $self->abort_if_error( 'unwanted dependencies found' );
+    [FakeRelease]
+
+=head2 Let C<[=inc::Foo]> work in Perl v5.26+.
+
+Starting from Perl v26.0, C<.> is not included into C<@INC> anymore. This breaks C<Dist::Zilla>
+syntax for plugins which are located in the distribution source tree, e. g.:
+
+    [=inc::Foo]
+
+Being run with Perl v5.26+, C<dzil> complains:
+
+    Required plugin inc::Foo isn't installed.
+
+C<Dist::Zilla::Plugin::lib> was created specially for workarounding this issue. (I said
+"workarounding" not "solving" because C<Dist::Zilla::Plugin::lib> does not help C<dzil authordeps
+--missing> to work.)
+
+The same effect can be achieved with C<Hook::Init> one-liner.
+
+F<dist.ini> file:
+
+    name     = NoDotInInc
+    abstract = Hook demo: Let [=inc::Foo] work in Perl v5.26+.
+    version  = v0.0.1
+    [Hook::Init]    ; <<<=== Look at this
+        . = use lib $zilla->root->absolute->stringify;
+    [=inc::Foo]
+    [MetaJSON]
     [FakeRelease]
 
 =head1 SEE ALSO
@@ -1286,7 +1364,7 @@ Van de Bugger <van.de.bugger@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015, 2016 Van de Bugger
+Copyright (C) 2015, 2016, 2018 Van de Bugger
 
 License GPLv3+: The GNU General Public License version 3 or later
 <http://www.gnu.org/licenses/gpl-3.0.txt>.

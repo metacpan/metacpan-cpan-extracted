@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 # PODNAME: es-status.pl
 # ABSTRACT: Simple ElaticSearch Status Checks
 use strict;
@@ -215,7 +215,7 @@ es-status.pl - Simple ElaticSearch Status Checks
 
 =head1 VERSION
 
-version 5.4
+version 5.5
 
 =head1 SYNOPSIS
 
@@ -293,6 +293,8 @@ Displays the details on index segmentation, use --verbose to get more informatio
 Displays the details on index settings, use --verbose to get more information
 
     ./es-status.pl --settings --verbose
+
+=back
 
 =head1 AUTHOR
 

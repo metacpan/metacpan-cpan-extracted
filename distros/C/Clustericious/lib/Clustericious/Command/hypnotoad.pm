@@ -9,7 +9,7 @@ use Mojo::Server::Hypnotoad;
 use base 'Clustericious::Command';
 
 # ABSTRACT: Clustericious command to stat Hypnotoad
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.29'; # VERSION
 
 
 __PACKAGE__->attr(description => "Start a hypnotad web server.\n");
@@ -75,7 +75,7 @@ Clustericious::Command::hypnotoad - Clustericious command to stat Hypnotoad
 
 =head1 VERSION
 
-version 1.27
+version 1.29
 
 =head1 DESCRIPTION
 

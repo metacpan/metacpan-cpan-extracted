@@ -1,0 +1,33 @@
+To add a new hierarchy, add a configuration fragment in the `config`
+directory named after the hierarchy, following the format of the existing
+files, and run `scripts/generate-files` to create a new `control.ctl`
+file.  See the documentation in `scripts/generate-files` for details about
+the supported configuration keys.
+
+If the hierarchy uses PGP-signed control messages, also put the PGP key
+into the `keys` directory in a file named after the hierarchy.  Then, run:
+
+```sh
+    gpg --homedir=keyring --import keys/<hierarchy>
+```
+
+to add the new key to the working keyring.
+
+The first user ID on the key must match the signer expected by the
+configuration data for the corresponding hierarchy.  If a hierarchy
+administrator sets that up wrong (usually by putting additional key IDs on
+the key), this can be corrected by importing the key into a keyring with
+GnuPG, using `gpg --edit-key` to remove the offending user ID, and
+exporting the key again with `gpg --export --ascii`.
+
+When adding a new hierarchy, it's often useful to bootstrap the newsgroup
+list by importing the current checkgroups.  To do this, obtain the
+checkgroups as a text file (containing only the groups without any news
+headers) and run:
+
+```sh
+    scripts/update-control checkgroups <hierarchy> < <checkgroups>
+```
+
+where <hierarchy> is the hierarchy the checkgroups is for and
+<checkgroups> is the path to the checkgroups file.

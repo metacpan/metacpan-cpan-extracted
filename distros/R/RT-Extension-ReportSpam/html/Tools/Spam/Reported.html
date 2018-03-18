@@ -36,4 +36,38 @@ $Format ||= qq{
     QueueName,
     ReportSpam
 };
+
+if ( $session{'CurrentUser'}->HasRight( Object=> $RT::System, Right => 'SuperUser') ) {
+    $Format .=
+        ', ' . qq{'<a href="__WebPath__/Tools/Spam/Reported.html?NotSpamForAllUsers=__id__">}
+      . loc( 'Not Spam For All Users' ) . q{</a>/TITLE:Action'};
+
+    if ( $ARGS{NotSpamForAllUsers} ) {
+        my $ticket = RT::Ticket->new($session{CurrentUser});
+        $ticket->Load($ARGS{NotSpamForAllUsers});
+        if ( $ticket->id ) {
+            if ( $ticket->FirstAttribute('SpamReports') ) {
+                my ( $status, $msg ) = $ticket->DeleteAttribute( 'SpamReports' );
+                if ( $status ) {
+                    push @results, loc( "Ticket #[_1] is unmarked as spam for all users", $ARGS{NotSpamForAllUsers} );
+                }
+                else {
+                    push @results, loc( "Failed to unmark ticket #[_1]: [_2]", $ARGS{NotSpamForAllUsers}, $msg );
+                }
+            }
+            else {
+                push @results, loc("Ticket #[_1] is not marked as spam", $ARGS{NotSpamForAllUsers} );
+            }
+        }
+        else {
+            push @results, loc( "Failed to load ticket #[_1]", $ARGS{NotSpamForAllUsers} );
+        }
+
+        MaybeRedirectForResults(
+            Actions   => \@results,
+            Path      => "/Tools/Spam/Reported.html",
+            Anchor    => $ARGS{'Anchor'},
+        );
+    }
+}
 </%INIT>

@@ -9,9 +9,11 @@ lib/Web/MarketReceipt/Order.pm
 lib/Web/MarketReceipt/Verifier.pm
 lib/Web/MarketReceipt/Verifier/AppStore.pm
 lib/Web/MarketReceipt/Verifier/GooglePlay.pm
+lib/Web/MarketReceipt/Verifier/Mock/AppStore.pm
 minil.toml
 t/00_compile.t
 t/01_verify_appstore.t
 t/02_verify_google_play.t
+t/03_verify_mock_appstore.t
 META.yml
 MANIFEST

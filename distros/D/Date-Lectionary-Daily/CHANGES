@@ -1,0 +1,7 @@
+Revision history for Date::Lectionary::Daily
+
+1.20180316 2018-03-16
+
+ - Added support for the new ACNA daily lectionary based on the secular calendar
+ - Migrated the former ACNA daily lectionary to be the non-default lectionary, but kept it around because I like it
+ 

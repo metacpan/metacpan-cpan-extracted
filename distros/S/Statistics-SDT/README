@@ -1,6 +1,6 @@
 Statistics-SDT
 
-Version 0.06
+Version 0.07
 
 Signal detection theory (SDT) measures of sensitivity and response-bias
 
@@ -31,20 +31,20 @@ After installing, you can find documentation for this module with the perldoc co
 You can also look for information at:
 
     Search CPAN
-        http://search.cpan.org/dist/Statistics-SDT-0.06
+        http://search.cpan.org/dist/Statistics-SDT-0.07
 
     CPAN Request Tracker:
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Statistics-SDT-0.06
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Statistics-SDT-0.07
 
     AnnoCPAN, annotated CPAN documentation:
-        http://annocpan.org/dist/Statistics-SDT-0.06
+        http://annocpan.org/dist/Statistics-SDT-0.07
 
     CPAN Ratings:
-        http://cpanratings.perl.org/d/Statistics-SDT-0.06
+        http://cpanratings.perl.org/d/Statistics-SDT-0.07
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2006-2017 Roderick Garton
+Copyright (C) 2006-2018 Roderick Garton
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

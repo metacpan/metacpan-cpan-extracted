@@ -146,11 +146,36 @@ Pcore::Core::Event - Pcore event broker
 
 =head1 SYNOPSIS
 
+    P->listen_events(
+        [ 'TEST1', 'TEST2.*.LOG', 'TEST3.#' ],                       # listen masks
+        sub ( $ev ) {                                                # callback
+            say dump $ev->{key};
+            say dump $ev->{data};
+
+            return;
+        },
+        'stderr:',                                                   # pipe
+        [ 'stderr:',      tmpl => "<: \$key :>$LF<: \$text :>" ],    # pipe with params
+        [ 'file:123.log', tmpl => "<: \$key :>$LF<: \$text :>" ],    # pipe with params
+    );
+
+    P->fire_event( 'TEST.1234.AAA', $data );
+
 =head1 DESCRIPTION
 
 =head1 ATTRIBUTES
 
 =head1 METHODS
+
+=head2 fire_event( $key, $data ) - fire event
+
+$key - event key, special symbols can be used:
+
+* (star) can substitute for exactly one word;
+
+# (hash) can substitute for zero or more words;
+
+where word is /[^.]/
 
 =head1 SEE ALSO
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension Archive::Unzip::Burst.
 
+0.09 Fri Mar 16 20:29:37 GMT 2018
+	- . in @INC test fail fix
+
 0.08 2016-05-08
 	- release with Changes
 

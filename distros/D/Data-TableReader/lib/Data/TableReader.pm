@@ -1,5 +1,5 @@
 package Data::TableReader;
-$Data::TableReader::VERSION = '0.006';
+$Data::TableReader::VERSION = '0.007';
 use Moo 2;
 use Try::Tiny;
 use Carp;
@@ -153,15 +153,17 @@ sub detect_input_format {
 		my $fh= $self->_file_handle;
 		# Need to be able to seek.
 		if (seek($fh, 0, 1)) {
+			$fpos= tell $fh;
 			read($fh, $magic, 4096);
 			seek($fh, $fpos, 0) or croak "seek: $!";
 		}
 		elsif ($fh->can('ungets')) {
+			$fpos= 0; # to indicate that we did try reading the file
 			read($fh, $magic, 4096);
 			$fh->ungets($magic);
 		}
 		else {
-			$self->_log('notice',"Can't fully detect input format because handle is not seekable."
+			$self->_log->('notice',"Can't fully detect input format because handle is not seekable."
 				." Consider fully buffering the file, or using FileHandle::Unget");
 			$magic= '';
 		}
@@ -179,19 +181,20 @@ sub detect_input_format {
 	# Else probe some more...
 	$self->_log->('debug',"Probing file format because no filename suffix");
 	length $magic or croak "Can't probe format. No filename suffix, and "
-		.($fpos >= 0? "unseekable file handle" : "no content");
+		.(!defined $fpos? "unseekable file handle" : "no content");
 
 	my ($probably_csv, $probably_tsv)= (0,0);
-	++$probably_csv if $magic =~ /^["']?[\w ]+["']?,/;
-	++$probably_tsv if $magic =~ /^["']?[\w ]+["']?\t/;
-	my $comma_count= ($magic =~ /,/g);
-	my $tab_count= ($magic =~ /\t/g);
-	my $eol_count= ($magic =~ /\n/g);
+	++$probably_csv if $magic =~ /^(\xEF\xBB\xBF|\xFF\xFE|\xFE\xFF)?["']?[\w ]+["']?,/;
+	++$probably_tsv if $magic =~ /^(\xEF\xBB\xBF|\xFF\xFE|\xFE\xFF)?["']?[\w ]+["']?\t/;
+	my $comma_count= () = ($magic =~ /,/g);
+	my $tab_count= () = ($magic =~ /\t/g);
+	my $eol_count= () = ($magic =~ /\n/g);
 	++$probably_csv if $comma_count > $eol_count and $comma_count > $tab_count;
 	++$probably_tsv if $tab_count > $eol_count and $tab_count > $comma_count;
+	$self->_log->('debug', 'probe results: comma_count=%d tab_count=%d eol_count=%d probably_csv=%d probably_tsv=%d',
+		$comma_count, $tab_count, $eol_count, $probably_csv, $probably_tsv);
 	return 'CSV' if $probably_csv and $probably_csv > $probably_tsv;
 	return 'TSV' if $probably_tsv and $probably_tsv > $probably_csv;
-
 	croak "Can't determine file format";
 }
 
@@ -339,11 +342,13 @@ sub _match_headers_dynamic {
 	];
 	for my $f (@$free_fields) {
 		my $hr= $f->header_regex;
+		$self->_log->('debug', 'looking for %s', $hr);
 		my @found= grep { $header->[$_] =~ $hr } 0 .. $#$header;
 		if (@found == 1) {
 			if ($col_map{$found[0]}) {
-				$self->_log->('info','%sField %s and %s both match',
-					$context, $f->name, $col_map{$found[0]}->name);
+				$self->_log->('debug', 'search status: '._colmap_progress_str(\%col_map, $header));
+				$self->_log->('info','%sField %s and %s both match column %s',
+					$context, $f->name, $col_map{$found[0]}->name, $found[0]);
 				return;
 			}
 			$col_map{$found[0]}= $f;
@@ -353,12 +358,14 @@ sub _match_headers_dynamic {
 				# Array columns may be found more than once
 				$col_map{$_}= $f for @found;
 			} else {
-				$self->_log->('info','%sField %s matches more than one column',
-					$context, $f->name);
+				$self->_log->('debug', 'search status: '._colmap_progress_str(\%col_map, $header));
+				$self->_log->('info','%sField %s matches more than one column: %s',
+					$context, $f->name, join(', ', @found));
 				return;
 			}
 		}
 		elsif ($f->required) {
+			$self->_log->('debug', 'search status: '._colmap_progress_str(\%col_map, $header));
 			$self->_log->('info','%sNo match for required field %s', $context, $f->name);
 			return;
 		}
@@ -366,6 +373,7 @@ sub _match_headers_dynamic {
 	}
 	# Need to have found at least one column (even if none required)
 	unless (keys %col_map) {
+		$self->_log->('debug', 'search status: '._colmap_progress_str(\%col_map, $header));
 		$self->_log->('debug','%sNo field headers found', $context);
 		return;
 	}
@@ -385,6 +393,7 @@ sub _match_headers_dynamic {
 				}
 				if (@match == 1) {
 					if ($found{$match[0]} && !$match[0]->array) {
+						$self->_log->('debug', 'search status: '._colmap_progress_str(\%col_map, $header));
 						$self->_log->('info','%sField %s matches multiple columns',
 							$context, $match[0]->name);
 						return;
@@ -394,6 +403,7 @@ sub _match_headers_dynamic {
 					$following{$match[0]->name}= $match[0];
 				}
 				elsif (@match > 1) {
+					$self->_log->('debug', 'search status: '._colmap_progress_str(\%col_map, $header));
 					$self->_log->('info','%sField %s and %s both match column %d',
 						$context, $match[0]->name, $match[1]->name, $i+1);
 					return;
@@ -405,6 +415,7 @@ sub _match_headers_dynamic {
 		}
 		# Check if any of the 'follows' fields were required
 		if (my @unfound= grep { !$found{$_} && $_->required } @$follows_fields) {
+			$self->_log->('debug', 'search status: '._colmap_progress_str(\%col_map, $header));
 			$self->_log->('info','%sNo match for required %s %s', $context,
 				(@unfound > 1? ('fields', join(', ', map { $_->name } sort @unfound))
 					: ('field', $unfound[0]->name)
@@ -428,6 +439,7 @@ sub _match_headers_dynamic {
 		} else {
 			$stash->{fatal}= "Invalid action '$act' for 'on_unknown_columns'";
 		}
+		$self->_log->('debug', 'search status: '._colmap_progress_str(\%col_map, $header));
 		return if $stash->{fatal};
 	}
 	return [ map $col_map{$_}, 0 .. $#$header ];
@@ -435,10 +447,17 @@ sub _match_headers_dynamic {
 # Make header string readable for log messages
 sub _fmt_header_text {
 	shift if ref $_[0];
-	$_[0] =~ s/[\0-\x1F]+/ /g;
-	$_[0] =~ s/^\s+//;
-	$_[0] =~ s/\s+$//;
-	$_[0];
+	my $x= shift;
+	$x =~ s/ ( [^[:print:]] ) / sprintf("\\x%02X", ord $1 ) /gex;
+	qq{"$x"};
+}
+# format the colmap into a string
+sub _colmap_progress_str {
+	my ($colmap, $headers)= @_;
+	join(' ', map {
+		$colmap->{$_}? $_.'='.$colmap->{$_}->name
+		             : $_.':'._fmt_header_text($headers->[$_])
+		} 0 .. $#$headers)
 }
 
 
@@ -653,7 +672,7 @@ Data::TableReader - Extract records from "dirty" tabular data sources
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

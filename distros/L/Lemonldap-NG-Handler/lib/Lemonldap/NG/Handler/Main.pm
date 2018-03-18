@@ -230,6 +230,10 @@ sub retrieveSession {
         }
 
         # Verify that session is valid
+        Lemonldap::NG::Handler::Main::Logger->lmLog(
+"_utime is not defined. This should not happen. Verify it is transmitted correctly to handler",
+            'error'
+        ) unless $datas->{_utime};
         if (
             $now - $datas->{_utime} > $tsv->{timeout}
             or (    $tsv->{timeoutActivity}

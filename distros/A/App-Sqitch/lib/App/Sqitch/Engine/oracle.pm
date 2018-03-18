@@ -15,7 +15,7 @@ use namespace::autoclean;
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = '0.9996';
+our $VERSION = '0.9997';
 
 BEGIN {
     # We tell the Oracle connector which encoding to use. The last part of the
@@ -741,7 +741,7 @@ sub _capture {
 
     require IPC::Run3;
     IPC::Run3::run3(
-        [$self->sqlplus], \$conn, \@out, @out,
+        [$self->sqlplus], \$conn, \@out, \@out,
         { return_if_system_error => 1 },
     );
     if (my $err = $?) {
@@ -802,7 +802,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 License
 
-Copyright (c) 2012-2015 iovation Inc.
+Copyright (c) 2012-2018 iovation Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

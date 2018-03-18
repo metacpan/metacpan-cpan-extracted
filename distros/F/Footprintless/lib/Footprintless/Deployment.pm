@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Deployment;
-$Footprintless::Deployment::VERSION = '1.27';
+$Footprintless::Deployment::VERSION = '1.28';
 # ABSTRACT: A deployment manager
 # PODNAME: Footprintless::Deployment
 
@@ -15,6 +15,7 @@ use File::Path qw(
 use Footprintless::Mixins qw (
     _clean
     _download
+    _entity
     _extract_resource
     _resource
     _sub_entity
@@ -37,6 +38,7 @@ sub deploy {
     my ( $self, %options ) = @_;
 
     if ( $options{to_dir} ) {
+        $self->_ensure_clean_dirs( $options{to_dir} );
         $self->_deploy_resources( $options{to_dir},
             ( $options{names} ? ( names => $options{names} ) : () ) );
         &{ $options{extra} }( $options{to_dir} ) if ( $options{extra} );
@@ -45,6 +47,7 @@ sub deploy {
         $self->_local_template(
             sub {
                 my ( $to_dir, $resource_dir ) = @_;
+                $self->_ensure_clean_dirs($to_dir);
                 $self->_deploy_resources( $resource_dir,
                     ( $options{names} ? ( names => $options{names} ) : () ) );
                 &{ $options{extra} }($to_dir) if ( $options{extra} );
@@ -80,6 +83,13 @@ sub _deploy_resources {
     }
 }
 
+sub _ensure_clean_dirs {
+    my ( $self, $base_dir ) = @_;
+    foreach my $dir ( $self->_relative_clean_dirs ) {
+        make_path( File::Spec->catdir( $base_dir, $dir ) );
+    }
+}
+
 sub _local_template {
     my ( $self, $local_work, @options ) = @_;
     $self->Footprintless::Mixins::_local_template(
@@ -99,6 +109,14 @@ sub _local_template {
     );
 }
 
+sub _relative_clean_dirs {
+    my ($self) = @_;
+    my $base = $self->_entity("$self->{coordinate}.to_dir");
+    return
+        map { m'/$' ? ( File::Spec->abs2rel( $_, $base ) ) : () }
+        @{ $self->_entity("$self->{coordinate}.clean") };
+}
+
 1;
 
 __END__
@@ -111,7 +129,7 @@ Footprintless::Deployment - A deployment manager
 
 =head1 VERSION
 
-version 1.27
+version 1.28
 
 =head1 SYNOPSIS
 

@@ -4,13 +4,13 @@
       "Steffen Mueller <smueller@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Archive-Unzip-Burst",
    "no_index" : {
@@ -39,5 +39,6 @@
          "web" : "https://github.com/mohawk2/Archive-Unzip-Burst"
       }
    },
-   "version" : "0.08"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 2.97000"
 }

@@ -1,0 +1,7 @@
+This software generates an INN control.ctl configuration file from
+hierarchy configuration fragments, verifies control messages using GnuPG
+where possible, processes new control messages to update a newsgroup list,
+archives new control messages, and exports the list of newsgroups in a
+format suitable for synchronizing the newsgroup list of a Netnews news
+server.  It is the software that maintains the control message and
+newsgroup lists available from ftp.isc.org.

@@ -6,7 +6,7 @@ use Clustericious::Commands;
 
 # PODNAME: plugauth
 # ABSTRACT: PlugAuth server
-our $VERSION = '0.38'; # VERSION
+our $VERSION = '0.39'; # VERSION
 
 
 $ENV{MOJO_APP} ||= 'PlugAuth';
@@ -24,7 +24,7 @@ plugauth - PlugAuth server
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 DESCRIPTION
 

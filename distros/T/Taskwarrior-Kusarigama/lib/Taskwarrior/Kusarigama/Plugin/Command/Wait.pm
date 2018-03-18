@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::Command::Wait;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: hide tasks for a wee while
-$Taskwarrior::Kusarigama::Plugin::Command::Wait::VERSION = '0.8.0';
+$Taskwarrior::Kusarigama::Plugin::Command::Wait::VERSION = '0.9.0';
 
 use strict;
 use warnings;
@@ -35,7 +35,7 @@ Taskwarrior::Kusarigama::Plugin::Command::Wait - hide tasks for a wee while
 
 =head1 VERSION
 
-version 0.8.0
+version 0.9.0
 
 =head1 SYNOPSIS
 

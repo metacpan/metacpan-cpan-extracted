@@ -108,6 +108,19 @@ sub HTMLEncode {
     ref($toencode) ? $data_ref : $$data_ref;
 }
 
+sub HTMLEncodeByValue {
+    my($self, $toencode) = @_;
+    return '' unless defined $toencode;
+
+    $toencode =~ s/&/&amp;/sg;
+    $toencode =~ s/\"/&quot;/sg;
+    $toencode =~ s/\'/&#39;/sg;
+    $toencode =~ s/>/&gt;/sg;
+    $toencode =~ s/</&lt;/sg;
+
+    return $toencode;
+}
+
 sub RegisterCleanup {
     my($self, $code) = @_;
     if(ref($code) =~ /^CODE/) {

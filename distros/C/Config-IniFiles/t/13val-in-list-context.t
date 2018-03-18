@@ -14,12 +14,10 @@ use Config::IniFiles;
 
 {
     my $ini = Config::IniFiles->new(
-        -file => File::Spec->catfile('t', 'array.ini')
-    );
-
+        -file => File::Spec->catfile( 't', 'array.ini' ) );
 
     my $verdict;
-    if (my @v = $ini->val("Sect", "NotExist"))
+    if ( my @v = $ini->val( "Sect", "NotExist" ) )
     {
         $verdict = 1;
     }
@@ -29,6 +27,6 @@ use Config::IniFiles;
     }
 
     # TEST
-    ok(!$verdict, "False should be returned in list context.");
+    ok( !$verdict, "False should be returned in list context." );
 }
 

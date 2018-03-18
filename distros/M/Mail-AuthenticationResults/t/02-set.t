@@ -59,6 +59,11 @@ sub test_key_dies {
     dies_ok( sub{ $class->set_key( "with\nnewline" ) }, ( ref $class ) . ' set invalid newline key' );
     dies_ok( sub{ $class->set_key( "with\rreturn" ) }, ( ref $class ) . ' set invalid return key' );
 
+    delete $class->{ 'value' };
+    lives_ok( sub{ $class->set_key( 'none' ) }, ( ref $class ) . ' set key none' );
+    is( $class->as_string(), 'none', ( ref $class ) . ' stringifies none correctly' );
+    $class->set_value( 'test' );
+
     lives_ok( sub{ $class->set_key( 'test key!' ) }, ( ref $class ) . ' set key spaces' );
     is( $class->as_string(), '"test key!"=test', ( ref $class ) . ' stringifies spaces correctly' );
     lives_ok( sub{ $class->set_key( 'test;' ) }, ( ref $class ) . ' set key semicolon' );
@@ -91,6 +96,15 @@ sub test_value_dies {
     is( $class->as_string(), $expectkey . '"pass;"', ( ref $class ) . ' stringifies semicolon correctly' );
     lives_ok( sub{ $class->set_value( 'with(parens)' ) }, ( ref $class ) . ' set invalid value comment' );
     is( $class->as_string(), $expectkey . '"with(parens)"', ( ref $class ) . ' stringifies parens correctly' );
+
+    if ( ref $class ne 'Mail::AuthenticationResults::Header::AuthServID' ) {
+        lives_ok( sub{ $class->set_value( '' ) }, ( ref $class ) . ' set empty string' );
+        is( $class->as_string(), $expectkey . '""', ( ref $class ) . ' stringifies empty correctly' );
+    }
+
+    lives_ok( sub{ $class->set_value( 0 ) }, ( ref $class ) . ' set zero' );
+    is( $class->as_string(), $expectkey . '0', ( ref $class ) . ' stringifies zero correctly' );
+
 }
 
 sub test_value_dies_version {

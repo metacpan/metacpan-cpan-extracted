@@ -20,7 +20,10 @@ use parent qw( Net::ACME2::AccessorBase );
 use Call::Context ();
 
 use Net::ACME2::Challenge ();
+
+#Pre-load challenge classes.
 use Net::ACME2::Challenge::http_01 ();
+use Net::ACME2::Challenge::dns_01 ();
 
 use constant _ACCESSORS => (
     'id',
@@ -90,9 +93,12 @@ sub challenges {
     for my $c ( @{ $self->{'_challenges'} } ) {
         my $class = 'Net::ACME2::Challenge';
 
-        if ($c->{'type'} eq 'http-01') {
-            $class .= '::http_01';
-        }
+        my $module_leaf = $c->{'type'};
+        $module_leaf =~ tr<-><_>;
+        $class .= "::$module_leaf";
+
+        #Ignore unrecognized challenges.
+        next if !$class->can('new');
 
         push @challenges, $class->new( %$c );
     }

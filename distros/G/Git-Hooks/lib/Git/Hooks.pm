@@ -1,6 +1,6 @@
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '2.7.0';
+$Git::Hooks::VERSION = '2.8.1';
 use 5.010;
 use strict;
 use warnings;
@@ -111,7 +111,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 2.7.0
+version 2.8.1
 
 =head1 SYNOPSIS
 
@@ -1048,6 +1048,22 @@ case-insensitively. The caret is part of the regex, meaning that it's
 anchored at the start of the username.
 
 =back
+
+=head2 githooks.ref REFSPEC
+
+=head2 githooks.noref REFSPEC
+
+These multivalued options are meant to selectively enable/disable hook
+processing for commits in particular references (usually branches). Hook
+developers should use the C<is_reference_enabled> method
+L<Git::Repository::Plugin> method to check it.
+
+Local hooks should pass the current branch to the method and server hooks should
+pass the names of the references affected by the push command.
+
+The REFSPECs can be specified as complete ref names (e.g. "refs/heads/master")
+or by regular expressions starting with a caret (C<^>), which is kept as part of
+the regexp (e.g. "^refs/heads/(master|fix)").
 
 =head2 githooks.abort-commit BOOL
 

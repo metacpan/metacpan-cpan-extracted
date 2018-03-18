@@ -1,7 +1,7 @@
 package Progress::Any::Output;
 
-our $DATE = '2015-01-27'; # DATE
-our $VERSION = '0.20'; # VERSION
+our $DATE = '2018-03-17'; # DATE
+our $VERSION = '0.212'; # VERSION
 
 use 5.010001;
 use strict;
@@ -45,6 +45,11 @@ sub _set_or_add {
         push @{ $Progress::Any::outputs{$task} }, $outputo;
     }
 
+    if ($outputo->can("output_data")) {
+        my $odata = $outputo->output_data;
+        $Progress::Any::output_data{"$outputo"} = $odata;
+    }
+
     $outputo;
 }
 
@@ -73,7 +78,7 @@ Progress::Any::Output - Assign output to progress indicators
 
 =head1 VERSION
 
-This document describes version 0.20 of Progress::Any::Output (from Perl distribution Progress-Any), released on 2015-01-27.
+This document describes version 0.212 of Progress::Any::Output (from Perl distribution Progress-Any), released on 2018-03-17.
 
 =head1 SYNOPSIS
 
@@ -123,10 +128,6 @@ If C<$output> is an object (a reference, really), it will be used as-is.
 
 Like set(), but will add output instead of replace existing one(s).
 
-=head1 SEE ALSO
-
-L<Progress::Any>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Progress-Any>.
@@ -143,13 +144,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Progress::Any>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

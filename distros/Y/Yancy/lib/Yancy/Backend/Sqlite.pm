@@ -1,5 +1,5 @@
 package Yancy::Backend::Sqlite;
-our $VERSION = '0.022';
+our $VERSION = '1.001';
 # ABSTRACT: A backend for SQLite using Mojo::SQLite
 
 #pod =head1 SYNOPSIS
@@ -94,7 +94,7 @@ our $VERSION = '0.022';
 #pod
 #pod =cut
 
-use Mojo::Base 'Mojo';
+use Mojo::Base '-base';
 use Scalar::Util qw( looks_like_number );
 use Text::Balanced qw( extract_bracketed );
 BEGIN {
@@ -191,9 +191,17 @@ ENDQ
         # ; say "Got columns";
         # ; use Data::Dumper;
         # ; say Dumper \@columns;
+        my @unique_columns;
         for my $c ( @columns ) {
             my $column = $c->{name};
+            # We are parsing SQL here, but not well. We may need to
+            # actually parse the SQL here soon so we can divide this all
+            # up into attributes
             my $is_auto = !!( $t->{sql} =~ /${column}[^,\)]+AUTOINCREMENT/ );
+            my $is_unique = !!( $t->{sql} =~ /${column}[^,]+UNIQUE/ );
+            if ( $is_unique ) {
+                push @unique_columns, $column;
+            }
             $schema{ $table }{ properties }{ $column } = {
                 $self->_map_type( $c, $t ),
                 'x-order' => $c->{cid}+1,
@@ -202,8 +210,15 @@ ENDQ
                 push @{ $schema{ $table }{ required } }, $column;
             }
             if ( $c->{pk} == 1 && $column ne 'id' ) {
-                $schema{ $table }{ 'x-id-field' } = $column;
             }
+        }
+
+        my ( $pk ) = grep { $_->{pk} } @columns;
+        if ( $pk && $pk->{name} ne 'id' ) {
+            $schema{ $table }{ 'x-id-field' } = $pk->{name};
+        }
+        elsif ( !$pk && @unique_columns ) {
+            $schema{ $table }{ 'x-id-field' } = $unique_columns[0];
         }
     }
 
@@ -270,7 +285,7 @@ Yancy::Backend::Sqlite - A backend for SQLite using Mojo::SQLite
 
 =head1 VERSION
 
-version 0.022
+version 1.001
 
 =head1 SYNOPSIS
 

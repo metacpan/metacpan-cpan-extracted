@@ -3,19 +3,17 @@ abstract: 'webify your CLI'
 author:
   - 'chocolateboy <chocolate@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
+  ExtUtils::MakeMaker: '6.59'
   Test::Differences: '0.64'
-  Test::Fatal: '0.014'
   Test::TinyMocker: '0.03'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.18'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Module::Install version 1.18, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-Wax
 no_index:
   directory:
@@ -25,21 +23,22 @@ no_index:
 recommends:
   Sereal: '3.015'
 requires:
-  Digest::SHA: 0
+  Digest::SHA: '0'
   File::BaseDir: '0.07'
   File::Slurp: '9999.19'
-  HTTP::Message: '6.11'
+  HTTP::Message: '6.14'
   IPC::System::Simple: '1.25'
-  LWP: '6.26'
-  MIME::Types: '2.13'
+  LWP: '6.31'
+  MIME::Types: '2.17'
   Method::Signatures::Simple: '1.07'
-  Mouse: v2.4.9
+  Mouse: v2.5.2
   Parallel::parallel_map: '0.02'
-  Try::Tiny: '0.28'
-  URI: '1.71'
-  perl: 5.8.8
+  Try::Tiny: '0.30'
+  URI: '1.73'
+  perl: '5.008008'
 resources:
   bugtracker: https://github.com/chocolateboy/App-Wax/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/chocolateboy/App-Wax
-version: 1.1.1
+version: 2.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

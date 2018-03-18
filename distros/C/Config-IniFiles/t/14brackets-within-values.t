@@ -11,13 +11,15 @@ use File::Spec;
 
 use Config::IniFiles;
 
-my $filename = File::Spec->catfile(File::Spec->curdir(), "t", "brackets-in-values.ini");
+my $filename =
+    File::Spec->catfile( File::Spec->curdir(), "t", "brackets-in-values.ini" );
 
 {
-    my $cfg=Config::IniFiles->new(-file => $filename, -allowempty => 1);
+    my $cfg = Config::IniFiles->new( -file => $filename, -allowempty => 1 );
 
     # TEST
-    is ($cfg->val('SiteName', 'file'),
+    is(
+        $cfg->val( 'SiteName', 'file' ),
         "http://www.example.com/files/file[1-22].gz",
         "Reading value containing brackets well"
     );

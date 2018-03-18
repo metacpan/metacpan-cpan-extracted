@@ -1,5 +1,46 @@
 Revision history for Test-BDD-Cucumber-Definitions
 
+0.26 2018-03-11T20:32:12Z
+
+    [ HTTP ]
+    - The body of the HTTP request is encoded in utf8
+
+0.25 2018-03-10T22:07:18Z
+
+    [ All ]
+    - The Validator module with a set of basic functions for parameter validation is added
+    - All step definitions are placed in the import function
+
+    [ TBCD ]
+    - The TBCD module has been added. The module loads all the step definitions at once.
+
+    [ HTTP ]
+    - Functions renamed more accurately
+
+0.24 2018-03-06T20:35:27Z
+
+    [ All ]
+    - The POD of the main module has been edited
+
+0.23 2018-03-05T21:04:21Z
+    [ All ]
+    - Migrate to Minilla
+
+0.22    2018-03-04
+        [ All ]
+        - In all types of Tbcd*, the scenario and environment variables are interpolated
+
+        [ HTTP ]
+        - Types have been removed, HTTP module are redesigned to use the ::Types
+
+        [ Struct ]
+        - Types have been removed, Struct module are redesigned to use the ::Types
+        - In the module Struct were added functions for working with arrays
+        - All functions are renamed more uniformly
+
+        [ Zip ]
+        - Functions in the Zip module have been renamed
+
 0.21    2018-03-01
         [ All ]
         - Types common to all modules have been added (::Types)

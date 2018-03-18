@@ -1,0 +1,28 @@
+---
+abstract: 'IPv6 / IPv4 address encryption to a valid address, for pseudo anonymization.'
+author:
+  - 'Hugo Salgado <hsalgado@vulcano.cl>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Address-IP-Cipher
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Crypt::Cipher::AES: '0'
+  Crypt::PBKDF2: '0'
+  MIME::Base64: '0'
+  Net::IP: '0'
+  perl: '5.006'
+resources:
+  repository: https://github.com/huguei/p5-Net-Address-IP-Cipher.git
+version: '0.2'

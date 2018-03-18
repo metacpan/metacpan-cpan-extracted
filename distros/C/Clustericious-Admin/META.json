@@ -1,5 +1,5 @@
 {
-   "abstract" : "Parallel SSH client",
+   "abstract" : "(Deprecated) Parallel SSH client",
    "author" : [
       "Graham Ollis <plicease@cpan.org>"
    ],
@@ -80,7 +80,9 @@
          "web" : "https://github.com/clustericious/App-clad"
       }
    },
-   "version" : "1.10",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "1.11",
+   "x_deprecated" : 1,
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01",
+   "x_use_unsafe_inc" : 0
 }
 

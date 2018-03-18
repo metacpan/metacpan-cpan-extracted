@@ -36,7 +36,7 @@
             "Date::Utils" : "0.22",
             "Moo" : "2.000000",
             "Time::localtime" : "1.02",
-            "namespace::clean" : "0.24",
+            "namespace::autoclean" : "0.28",
             "perl" : "5.006"
          }
       }
@@ -44,7 +44,7 @@
    "provides" : {
       "Date::Hebrew::Simple" : {
          "file" : "lib/Date/Hebrew/Simple.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "web" : "https://github.com/manwar/Date-Hebrew-Simple"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

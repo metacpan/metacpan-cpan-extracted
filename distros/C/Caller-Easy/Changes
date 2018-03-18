@@ -1,0 +1,9 @@
+Revision history for Perl extension Caller-Easy
+
+0.02 2018-03-17T12:18:57Z
+    - add Moose to cpanfile
+
+0.01 2018-03-16T12:53:59Z
+
+    - original version
+

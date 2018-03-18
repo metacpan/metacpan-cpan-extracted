@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2018 -- leonerd@leonerd.org.uk
 
 package Tickit::WidgetRole::Alignable;
 
@@ -31,7 +31,10 @@ to implement alignment of content within a possibly-larger space.
 The following methods are provided parametrically on the caller package when
 the module is imported by
 
- use Tickit::WidgetRole::Alignable name => NAME, style => STYLE, reshape => RESHAPE
+ use Tickit::WidgetRole::Alignable
+    name    => NAME,
+    style   => STYLE,
+    reshape => RESHAPE;
 
 The parameters are
 
@@ -102,13 +105,17 @@ sub export_subs_for
    };
 }
 
-=head2 $align = $widget->NAME
+=head2 I<NAME>
+
+   $align = $widget->NAME
 
 Return the current alignment value
 
 =cut
 
-=head2 $widget->set_NAME( $value )
+=head2 set_I<NAME>
+
+   $widget->set_NAME( $value )
 
 Set the new alignment value
 
@@ -122,7 +129,9 @@ For horizontal direction alignments, the symbolic values C<left>, C<centre>
 and C<right> can be supplied instead of C<0.0>, C<0.5> and C<1.0>
 respectively.
 
-=head2 ( $before, $alloc, $after ) = $widget->_NAME_allocation( $value, $total )
+=head2 _I<NAME>_allocation
+
+   ( $before, $alloc, $after ) = $widget->_NAME_allocation( $value, $total )
 
 Returns a list of three integers created by aligning the C<$value> to the
 given alignment position within the C<$total>. See also C<align> in

@@ -6,13 +6,13 @@ package OpenGbg::Service::StyrOchStall::GetBikeStation;
 
 # ABSTRACT: Get data about a bike station
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1402';
+our $VERSION = '0.1403';
 
 use XML::Rabbit::Root;
 use DateTime::Format::HTTP;
 use MooseX::AttributeShortcuts;
 use Types::Standard qw/Str/;
-use OpenGbg::DateTimeType qw/DateTime/;
+use Types::DateTime qw/DateTime/;
 
 has xml => (
     is => 'ro',
@@ -54,7 +54,7 @@ OpenGbg::Service::StyrOchStall::GetBikeStation - Get data about a bike station
 
 =head1 VERSION
 
-Version 0.1402, released 2016-08-12.
+Version 0.1403, released 2018-03-14.
 
 =head1 SYNOPSIS
 

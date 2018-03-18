@@ -28,8 +28,8 @@ BEGIN {
     use_ok("Mailru::Cloud");
 }
 
-my $login                   = 'larri.uol@bk.ru';
-my $password                = '0cGAGFQmOiKP';
+my $login                   = 'petr.davydov.80@bk.ru';
+my $password                = '@F3bHlkIS7Ou';
 my $uploadFile              = "$Bin/test_upload.f";
 my $download_file           = "$Bin/test_download";
 my $create_folder           = "/Test/temp" . int(rand(10000));
@@ -79,6 +79,8 @@ sub test_uploadFile {
     my $new_fname2 = $cloud->uploadFile(-file  => $uploadFile, -path => '/', -rename => 1);
     my ($part_fname) = $basename =~ /^(.+)\./;
     like($new_fname2, qr/$part_fname \(\d+\)/, "Test upload file with rename");
+
+    is ($cloud->get_last_uploaded_file_hash(), '8F6984310039D967127C01C8E80BDA36A31B9E19', "Test compare file hash");
     return ($new_fname, $new_fname2);
 }
 

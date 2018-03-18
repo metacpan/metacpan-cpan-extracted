@@ -137,7 +137,7 @@ use warnings;
 
 use base qw{Astro::Coord::ECI::TLE};
 
-our $VERSION = '0.090';
+our $VERSION = '0.091';
 
 use Astro::Coord::ECI::Sun;
 use Astro::Coord::ECI::Utils qw{:all};
@@ -283,10 +283,10 @@ the object is assumed capable of generating flares.
 	} else {
 	    $attrs = {};
 	}
-	ref $attrs eq 'HASH' or croak <<eod;
+	HASH_REF eq ref $attrs or croak <<'EOD';
 Error - The argument of after_reblessing(), if any, must be a hash
 	reference.
-eod
+EOD
 	foreach my $key (keys %static) {
 	    $attrs->{$key} = $static{$key} unless defined $attrs->{$key};
 	}
@@ -1354,10 +1354,10 @@ return wantarray ? %rslt : \%rslt;
 
 sub _invert_matrix_list {
     my @args = @_;
-    confess <<eod unless (grep {ref $_ eq 'ARRAY'} @args) == 3;
+    confess <<'EOD' unless (grep { ARRAY_REF eq ref $_ } @args) == 3;
 Programming error -- _invert_matrix_list takes as its arguments three
        list references.
-eod
+EOD
     my ($a, $b, $c) = @{$args[0]};
     my ($d, $e, $f) = @{$args[1]};
     my ($g, $h, $i) = @{$args[2]};

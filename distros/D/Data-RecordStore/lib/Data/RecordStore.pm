@@ -126,7 +126,7 @@ use Data::Dumper;
 
 use vars qw($VERSION);
 
-$VERSION = '3.13';
+$VERSION = '3.14';
 
 use constant {
     DIRECTORY    => 0,
@@ -1358,14 +1358,16 @@ __END__
 
 
 =head1 AUTHOR
-       Eric Wolf        coyocanid@gmail.com
+
+Eric Wolf
+coyocanid@gmail.com
 
 =head1 COPYRIGHT AND LICENSE
 
-       Copyright (c) 2015-2017 Eric Wolf. All rights reserved.  This program is free software; you can redistribute it and/or modify it
-       under the same terms as Perl itself.
+Copyright (c) 2015-2017 Eric Wolf. All rights reserved.  This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =head1 VERSION
-       Version 3.13  (Dec 5, 2017))
+
+Version 3.14  (3/14/2018 - pi day)
 
 =cut

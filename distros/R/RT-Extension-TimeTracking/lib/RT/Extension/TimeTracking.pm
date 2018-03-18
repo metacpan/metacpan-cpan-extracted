@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::TimeTracking;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 RT->AddStyleSheets("time_tracking.css");
 RT->AddJavaScript("time_tracking.js");
@@ -249,6 +249,29 @@ sub WeekStartDate {
     return (1, $week_start, $first_day);
 }
 
+=head2 SetDateToMidnightForDST
+
+Accepts an RT::Date object expected to be at midnight, but probably is not yet
+because of DST, this method adjusts it accordingly. Note that the adjustment
+is inplace.
+
+=cut
+
+sub SetDateToMidnightForDST {
+    my $self = shift;
+    my $date = shift;
+    return unless $date && $date->isa( 'RT::Date' );
+
+    my $user_hour = ( $date->Localtime( 'user' ) )[ 2 ];
+    if ( $user_hour == 23 ) {
+        $date->AddSeconds( 3600 );
+    }
+    elsif ( $user_hour == 1 ) {
+        $date->AddSeconds( -3600 );
+    }
+}
+
+
 =head1 AUTHOR
 
 Best Practical Solutions, LLC E<lt>modules@bestpractical.comE<gt>
@@ -261,7 +284,7 @@ Or via the web at: L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Nam
 
 =head1 COPYRIGHT
 
-This extension is Copyright (C) 2013-2016 Best Practical Solutions, LLC.
+This extension is Copyright (C) 2013-2018 Best Practical Solutions, LLC.
 
 This is free software, licensed under:
 

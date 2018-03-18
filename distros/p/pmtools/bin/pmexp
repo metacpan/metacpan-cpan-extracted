@@ -40,7 +40,7 @@ use strict 'refs';
     }
     if (%table = %{ $module . "::EXPORT_TAGS" } ) { 
 	for $tag (sort keys %table) {
-	    print "$module export tag `$tag' includes ", commify_series(@{$table{$tag}}), "\n";
+	    print "$module export tag '$tag' includes ", commify_series(@{$table{$tag}}), "\n";
 	} 
     }
 }
@@ -82,8 +82,8 @@ the import groups (in that package's %EXPORT_TAGS hash).
     Fcntl automatically exports FD_CLOEXEC, F_DUPFD, F_EXLCK, F_GETFD, F_GETFL, F_GETLK, F_GETLK64, F_GETOWN, F_POSIX, F_RDLCK, F_SETFD, F_SETFL, F_SETLK, F_SETLK64, F_SETLKW, F_SETLKW64, F_SETOWN, F_SHLCK, F_UNLCK, F_WRLCK, O_ACCMODE, O_APPEND, O_ASYNC, O_BINARY, O_CREAT, O_DEFER, O_DSYNC, O_EXCL, O_EXLOCK, O_LARGEFILE, O_NDELAY, O_NOCTTY, O_NONBLOCK, O_RDONLY, O_RDWR, O_RSYNC, O_SHLOCK, O_SYNC, O_TEXT, O_TRUNC, and O_WRONLY
 
     Fcntl optionally exports FAPPEND, FASYNC, FCREAT, FDEFER, FEXCL, FNDELAY, FNONBLOCK, FSYNC, FTRUNC, LOCK_EX, LOCK_NB, LOCK_SH, and LOCK_UN
-    Fcntl export tag `Fcompat' includes FAPPEND, FASYNC, FCREAT, FDEFER, FEXCL, FNDELAY, FNONBLOCK, FSYNC, and FTRUNC
-    Fcntl export tag `flock' includes LOCK_SH, LOCK_EX, LOCK_NB, and LOCK_UN
+    Fcntl export tag 'Fcompat' includes FAPPEND, FASYNC, FCREAT, FDEFER, FEXCL, FNDELAY, FNONBLOCK, FSYNC, and FTRUNC
+    Fcntl export tag 'flock' includes LOCK_SH, LOCK_EX, LOCK_NB, and LOCK_UN
 
 =head1 BUGS
 
@@ -98,7 +98,7 @@ pmeth(1), perlmod(1), Exporter(3).
 
 Copyright (C) 1999 Tom Christiansen.
 
-Copyright (C) 2006-2014 Mark Leighton Fisher.
+Copyright (C) 2006-2014, 2018 Mark Leighton Fisher.
 
 =head1 LICENSE
 

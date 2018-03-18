@@ -104,7 +104,7 @@ sub http_request ($args) {
 
                     push $args->{_redirects}->@*, $res;
 
-                    AE::postpone { http_request($args) };
+                    http_request($args);
 
                     return;
                 }

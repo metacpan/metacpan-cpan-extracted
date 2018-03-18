@@ -3,6 +3,9 @@ package App::ElasticSearch::Utilities::QueryString::Underscored;
 
 use strict;
 use warnings;
+
+our $VERSION = '5.5'; # VERSION
+
 use CLI::Helpers qw(:output);
 use namespace::autoclean;
 
@@ -20,6 +23,7 @@ my %Underscored = (
         return { condition => { prefix => { $field => $text } } }
     },
 );
+
 
 sub handle_token {
     my ($self,$token) = @_;
@@ -47,7 +51,7 @@ App::ElasticSearch::Utilities::QueryString::Underscored - Extend some _<type>_ q
 
 =head1 VERSION
 
-version 5.4
+version 5.5
 
 =head1 SYNOPSIS
 
@@ -67,6 +71,8 @@ Example query string:
 Translates into:
 
     { prefix => { useragent => 'Go ' } }
+
+=for Pod::Coverage handle_token
 
 =head1 AUTHOR
 

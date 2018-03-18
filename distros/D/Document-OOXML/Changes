@@ -1,5 +1,25 @@
 Revision history for perl distribution Document-OOXML
 
+0.180750  2018-03-16 19:04:46+01:00 Europe/Amsterdam
+
+ - Remove "theme color" attributes when setting an explicit color.
+   Existing theme colors would take precedence, which is not what you want when
+   coloring words.
+
+0.180742  2018-03-15 21:30:56+01:00 Europe/Amsterdam
+
+ - Add ability to underline in all kinds of styles and colors
+
+0.180741  2018-03-15 14:49:58+01:00 Europe/Amsterdam
+
+ - Fix creation of new run properties (w:rPr) elements when none exists
+   for the current run.
+
+0.180740  2018-03-15 06:38:51+01:00 Europe/Amsterdam
+
+ - Add ->style_text() to wordprocessor documents, to set boldness,
+   italicness and color on text in the document.
+
 0.172650  2017-09-22 10:29:31+02:00 Europe/Amsterdam
 
  - Add ->extract_words() method to wordprocessor documents

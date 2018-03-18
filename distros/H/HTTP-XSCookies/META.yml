@@ -25,4 +25,4 @@ requires:
   perl: '5.008009'
 resources:
   repository: https://github.com/gonzus/http-xscookies
-version: '0.000019'
+version: '0.000021'

@@ -89,7 +89,6 @@ Run Time State Settings ( modify at your own risk!! )
   block_for_more: array ref of additoinal ids to block for in a blocking context
   pending: hash ref that outbound request objects
   result_map: hash ref that contains the inbound result objects
-  false_id: int( -1 by default ) used to create job ids for non blocking results
   jobs: anonymous hash, used to keep our results that never hit IO
 
 =cut
@@ -104,12 +103,6 @@ has agent=>(
   lazy=>1,
 );
 
-has false_id=>(
-  is=>'rw',
-  isa=>Int,
-  default=>-1,
-  lazy=>1,
-);
 
 has jobs=>(
   is=>'ro',
@@ -234,23 +227,33 @@ sub queue_request {
 
 =item * my $id=$self->queue_result($cb,$result);
 
-Alows for result objects to be placed in a result set without ever being executed.
+Alows for result objects to look like they were placed in the the job que but wern't. 
+
+Call back example
+
+  sub {
+    my ($self,$id,$result,undef,undef)=@_;
+    # 0 Current object class
+    # 1 fake_id
+    # 2 Data::Result Object ( passed into $self->queue_result )
+    # 3 undef
+    # 4 undef
+  };
 
 =cut
 
 sub queue_result {
   my ($self,$cb,$result)=@_;
-  my $current=$self->false_id;
-  $current -=1;
-  $self->false_id($current);
-  $cb=$self->get_block_cb unless defined($cb);
-  
-  $self->jobs->{$current}=AnyEvent->timer(after=>0,cb=>sub { 
-    $cb->($self,$current,$result,undef,undef); 
-    $self->agent->results->{$current}=$result;
-    delete $self->jobs->{$current};
+  $cb=\&block_cb unless $cb;
+  $result=$self->new_false("unknown error") unless defined($result);
+  my $id;
+  $id=$self->agent->add_result(sub { 
+      $cb->($self,$id,$result,undef,undef);
   });
-  return $current;
+}
+
+sub has_fake_jobs {
+  return $_[0]->agent->has_fake_jobs;
 }
 
 =item * my $results=$self->block_on_ids(@ids);
@@ -286,10 +289,12 @@ sub block_on_ids {
   my @init=@ids;
 
   $self->agent->block_for_results_by_id(@ids);
+  my $ref={};
 
   while($#{$self->block_for_more}!=-1) {
     @ids=@{$self->block_for_more};
     @{$self->block_for_more}=();
+    $self->agent->run_next;
     $self->agent->block_for_results_by_id(@ids);
   }
 
@@ -440,23 +445,18 @@ sub AUTOLOAD {
 
   my $method=$AUTOLOAD;
   $method=~ s/^.*:://s;
+  return if $method eq 'DESTROY';
+
   $self->is_blocking(1);
   my $que_method="que_$method";
-  return if $method eq 'DESTROY';
   unless($self->can($que_method)) {
     croak "Undefined subroutine $method";
   }
-  my $t;
 
   my @ids=$self->$que_method($self->get_block_cb,@args);
-  NO_BLOCK_LOOP: {
-    my $bl=AnyEvent->condvar;
-    $t=AnyEvent->timer(after=>0,cb=>sub { $bl->send});
-    $bl->recv;
-  }
-  undef $t;
-
+  $self->agent->run_next;
   my $result=$self->block_on_ids(@ids)->[0]->[0];
+
   $self->is_blocking(0);
   return $result;
 }

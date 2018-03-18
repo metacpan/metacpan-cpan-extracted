@@ -8,7 +8,7 @@ PerlSetVar StatINC 0
 PerlSetVar StatINCMatch 0
 PerlSetVar Clean 0
 PerlSetVar DynamicIncludes 1
-PerlSetVar FileUploadMax 50000
+PerlSetVar FileUploadMax 200000
 PerlSetVar FileUploadTemp 1
 PerlSetVar SessionQueryParse 0
 PerlSetVar SessionQuery 1

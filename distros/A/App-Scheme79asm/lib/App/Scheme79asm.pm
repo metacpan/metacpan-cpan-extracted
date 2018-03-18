@@ -8,7 +8,7 @@ use Data::Dumper qw/Dumper/;
 use Data::SExpression qw/consp scalarp/;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 our %TYPES = (
 	LIST => 0,
@@ -312,6 +312,13 @@ defined to be 2).
 =item $asm->B<parse>(I<$string>)
 
 Parse a sequence of S-expressions and lay it out in memory.
+Can be called multiple times to lay out multiple sequences of
+S-expressions one after another.
+
+=item $asm->B<process>(I<$sexp>)
+
+Given an already-parsed sexp (meaning a
+L<Data::SExpression> object), lay it out in memory.
 Can be called multiple times to lay out multiple sequences of
 S-expressions one after another.
 

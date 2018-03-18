@@ -181,6 +181,8 @@ t/mojo/delay.t
 t/mojo/dom.t
 t/mojo/eventemitter.t
 t/mojo/exception.t
+t/mojo/exception/non_utf8.txt
+t/mojo/exception/utf8.txt
 t/mojo/file.t
 t/mojo/headers.t
 t/mojo/home.t

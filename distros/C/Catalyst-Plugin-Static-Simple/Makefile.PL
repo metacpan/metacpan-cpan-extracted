@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use lib '.';
+BEGIN { push @INC, '.' unless $INC[-1] eq '.'; }
 
 use inc::Module::Install 0.91;
 use Module::Install::AuthorRequires;

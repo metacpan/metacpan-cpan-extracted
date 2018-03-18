@@ -1,5 +1,6 @@
 
 
+
 <html>
 <head>
 <title>Apache::ASP::Sessions</title>
@@ -18,13 +19,9 @@
 -->
 </style>
 
-
 </head>
 <body bgcolor=black link=#063678 alink=#ff5599 vlink=#993399
 marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
-
-
-
 
 <center>
 <table border=0 cellpadding=0 width=99% cellspacing=8>
@@ -235,7 +232,7 @@ marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
 		<a href=http://perl.apache.org><img src="powered_by_modperl.gif" width="88" height="31" alt="Powered by ModPerl and Apache" border="0"></a>
 		<br>
 		<a href=http://www.perl.com><img src="rectangle_power_perl.gif" width="88" height="31" alt="Powered by Perl" border="0"></a>
-		</center>
+
 
 </center>
 
@@ -253,8 +250,8 @@ In order to track a web user and associate server side data
 with that client, the web server sets, and the web client returns 
 a 32 byte session id identifier cookie.  This implementation 
 is very secure and  may be used in secure HTTPS transactions, 
-and made stronger with SecureSession and ParanoidSession 
-settings (see <a href=config.html><font size=-1 face=verdana><b>CONFIG</b></font></a> ).
+and made stronger with SecureSession, HTTPOnlySession and
+ParanoidSession settings (see <a href=config.html><font size=-1 face=verdana><b>CONFIG</b></font></a> ).
 <font face="courier new" size=3><pre>
 </pre></font>However good cookies are for this kind of persistent
 state management between HTTP requests, they have long 
@@ -334,14 +331,6 @@ original web page if only a normal redirect is used.</font>
 &nbsp;
 </td>
 
-</tr>
-<tr bgcolor=#063678>
-	<td colspan=3 align=center width=80%>
-	<font face=verdana color=white size=-1>
-	Copyright &copy; 1998-2008,
-	<a href=http://www.chamas.com><font color=white>Chamas Enterprises Inc.</font></a>
-	</font>
-	</td>
 </tr>
 </table>
 

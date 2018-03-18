@@ -35,12 +35,23 @@ for my $arg (@ARGV) {
     } 
     chomp $file;
 
-    system $^X, '-ne', 
-       '$ok++,print if /^sub\s+' . $function . '\b/ .. /^}\s*$/;' 
-        . ' END { $? = ($ok == 0) }',
-        $file;
+    my $found = 0;
+    my $ifh;
+    my $in_function = 0;
+    open $ifh, '<', $file or die "cannot open '$file': $!\n";
+    while (my $line = <$ifh>) {
+        $in_function = 1 if ($line =~ m/^sub\s+$function\W/msx);
+        next if !$in_function;
 
-    $errors++ if $?;
+        $found = 1;
+        print $line;
+
+        $in_function = 0 if $line =~ m/^}\s*$/msx;
+    }
+    close $ifh;
+    print STDERR "cannot find '$module::$function'\n" if !$found;
+
+    $errors++ if $? || !$found;
 }
 
 exit ($errors != 0);
@@ -54,13 +65,13 @@ pmfunc - cat out a function from a module
 =head1 DESCRIPTION
 
 Given a fully-qualified function, this program opens
-up the file and attempts to cat out the source for 
+up the file and attempts to display the source for 
 that function.
 
 =head1 EXAMPLES
 
-    $ pmfunc Cwd::getcwd
-    sub getcwd
+    $ pmfunc Cwd::_perl_getcwd
+    sub _perl_getcwd
     {
         abs_path('.');
     }
@@ -86,7 +97,7 @@ or
 
 Copyright (C) 1999 Tom Christiansen.
 
-Copyright (C) 2006-2014 Mark Leighton Fisher.
+Copyright (C) 2006-2014, 2018 Mark Leighton Fisher.
 
 =head1 LICENSE
 

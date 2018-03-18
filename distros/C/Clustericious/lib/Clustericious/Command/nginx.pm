@@ -10,7 +10,7 @@ use Clustericious::Log;
 use File::Which qw( which );
 
 # ABSTRACT: Clustericious command to stat nginx
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.29'; # VERSION
 
 
 __PACKAGE__->attr(description => <<EOT);
@@ -55,7 +55,7 @@ Clustericious::Command::nginx - Clustericious command to stat nginx
 
 =head1 VERSION
 
-version 1.27
+version 1.29
 
 =head1 DESCRIPTION
 

@@ -7,7 +7,8 @@ DirectoryIndex index.asp
 	PerlSetVar StateDir /tmp/asp_apps_bookmarks
 	PerlSetVar Debug 2
 	PerlSetVar SessionTimeout 15
-	PerlSetVar StatScripts 1
-	PerlSetVar AllowApplicationState 1
-	PerlSetVar AllowSessionState 1
+	PerlSetVar StatScripts On
+	PerlSetVar AllowApplicationState On
+	PerlSetVar AllowSessionState On
+	PerlSetVar TimeHiRes On
 </Files>

@@ -1,5 +1,17 @@
 Revision history for Group-Git
 
+0.6.7   2018-03-11
+        Updating for release of version 0.6.7
+        Added perl 5.26 to travis builds (Ivan Wills)
+        Updated date (Ivan Wills)
+        Adding docs for method (Ivan Wills)
+        Only show thread errors if --verbose is on (Ivan Wills)
+        Protecting against threads dieing (Ivan Wills)
+        Removed reprocess command - not sure why it was ever there (Ivan Wills)
+        Added ability to run a shell command in each repository (Ivan Wills)
+        Fixing issue when $dir not set (Ivan Wills)
+        Fixing issue with $self->opt going missing (Ivan Wills)
+
 0.6.6   2017-12-04
         Updating for release of version 0.6.6
         Adding support for github one-time-passwords (Ivan Wills)

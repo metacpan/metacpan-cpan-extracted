@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Voltage;
-$Lab::Moose::Sweep::Step::Voltage::VERSION = '3.622';
+$Lab::Moose::Sweep::Step::Voltage::VERSION = '3.623';
 #ABSTRACT: Voltage sweep.
 
 
@@ -37,7 +37,7 @@ Lab::Moose::Sweep::Step::Voltage - Voltage sweep.
 
 =head1 VERSION
 
-version 3.622
+version 3.623
 
 =head1 DESCRIPTION
 

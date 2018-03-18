@@ -1,5 +1,6 @@
 
 
+
 <html>
 <head>
 <title>Apache::ASP::Faq</title>
@@ -18,13 +19,9 @@
 -->
 </style>
 
-
 </head>
 <body bgcolor=black link=#063678 alink=#ff5599 vlink=#993399
 marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
-
-
-
 
 <center>
 <table border=0 cellpadding=0 width=99% cellspacing=8>
@@ -235,7 +232,7 @@ marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
 		<a href=http://perl.apache.org><img src="powered_by_modperl.gif" width="88" height="31" alt="Powered by ModPerl and Apache" border="0"></a>
 		<br>
 		<a href=http://www.perl.com><img src="rectangle_power_perl.gif" width="88" height="31" alt="Powered by Perl" border="0"></a>
-		</center>
+
 
 </center>
 
@@ -282,7 +279,7 @@ about Apache::ASP.</font>
 		
 			<td valign=top >
 			<font face="lucida console" size=-1>
-			<a href=#VBScript%20or%201d28c52b>VBScript or JScript supported?</a>
+			<a href=#VBScript%20or%20d51ff480>VBScript or JScript supported?</a>
 			</font>
 			</td>
 							
@@ -404,7 +401,7 @@ about Apache::ASP.</font>
 		
 			<td valign=top >
 			<font face="lucida console" size=-1>
-			<a href=#How%20can%20I%20us9eb242f1>How can I use $Session to store complex data structures.</a>
+			<a href=#How%20can%20I%20us65e9eed9>How can I use $Session to store complex data structures.</a>
 			</font>
 			</td>
 		
@@ -577,7 +574,7 @@ state files.</font>
 </font>
 	
 	<p>
-	<a name=How%20can%20I%20us9eb242f1></a>
+	<a name=How%20can%20I%20us65e9eed9></a>
 	<font face=verdana><font class=title size=-1 color=#555555><b>How can I use $Session to store complex data structures.</b></font>
 <font face="courier new" size=3><pre>
 </pre></font>Very carefully.  Please read the $Session documentation in 
@@ -589,7 +586,7 @@ the syntax that must be used to make this happen.
 more than one level of indirection on the left side of
 an assignment like:
 <font face="courier new" size=3><pre>
-  $Session-&gt;{complex}{object} = $data;
+  BAD: $Session-&gt;{complex}{object} = $data;
 </pre></font>
 	
 	<p>
@@ -654,16 +651,10 @@ work for most cases.</font>
 </font>
 	
 	<p>
-	<a name=VBScript%20or%201d28c52b></a>
+	<a name=VBScript%20or%20d51ff480></a>
 	<font face=verdana><font class=title size=-1 color=#555555><b>VBScript or JScript supported?</b></font>
 <font face="courier new" size=3><pre>
-</pre></font>Yes, but not with this Perl module.  For ASP with other scripting
-languages besides Perl, you will need to go with a commercial vendor
-in the UNIX world.  Sun has such a solution.
-Of course on Windows NT and Windows 2000, you get VBScript for free with IIS.
-<font face="courier new" size=3><pre>
-  <a href="http://www.chilisoft.com">Sun ONE Active Server Pages (formerly Sun Chili!Soft ASP)</a>
-</pre></font>
+</pre></font>Only Perl scripting is supported with this module.</font>
 	
 	<p>
 	<a name=How%20is%20datab66fe735a></a>
@@ -694,7 +685,7 @@ configuration directive.</font>
 	<font face=verdana><font class=title size=-1 color=#555555><b>How are file uploads handled?</b></font>
 <font face="courier new" size=3><pre>
 </pre></font>Please see the <a href=cgi.html><font size=-1 face=verdana><b>CGI</b></font></a> section.  File uploads are implemented
-through CGI.pm which is loaded at runtime only for this purpose.
+through <a href=http://stein.cshl.org/WWW/software/CGI/cgi_docs.html><font size=-1 face=verdana><b>CGI.pm</b></font></a> which is loaded at runtime only for this purpose.
 This is the only time that CGI.pm will be loaded by Apache::ASP,
 which implements all other cgi-ish functionality natively.  The
 rationale for not implementing file uploads natively is that 
@@ -765,14 +756,6 @@ goals, your comments are welcome.</font>
 &nbsp;
 </td>
 
-</tr>
-<tr bgcolor=#063678>
-	<td colspan=3 align=center width=80%>
-	<font face=verdana color=white size=-1>
-	Copyright &copy; 1998-2008,
-	<a href=http://www.chamas.com><font color=white>Chamas Enterprises Inc.</font></a>
-	</font>
-	</td>
 </tr>
 </table>
 

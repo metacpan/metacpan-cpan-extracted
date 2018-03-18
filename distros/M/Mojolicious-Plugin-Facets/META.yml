@@ -1,0 +1,41 @@
+---
+abstract: 'Multiple facets for your app.'
+author:
+  - 'Carlos Fernando Avila Gratz <cafe@kreato.com.br>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Facets
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mojolicious::Plugin::Facets:
+    file: lib/Mojolicious/Plugin/Facets.pm
+    version: '0.05'
+requires:
+  Mojolicious: '7.15'
+resources:
+  bugtracker: https://github.com/cafe01/mojolicious-plugin-facets/issues
+  homepage: https://github.com/cafe01/mojolicious-plugin-facets
+  repository: git://github.com/cafe01/mojolicious-plugin-facets.git
+version: '0.05'
+x_authority: cpan:CAFEGRATZ
+x_contributors:
+  - 'Carlos Fernando Avila Gratz <cafe@q1software.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

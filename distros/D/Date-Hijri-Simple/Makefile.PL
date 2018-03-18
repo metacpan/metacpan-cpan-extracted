@@ -19,19 +19,19 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'Moo'              => '2.000000',
-        'namespace::clean' => '0.24',
-        'List::Util'       => '1.41',
-        'Date::Utils'      => '0.22',
-        'Date::Exception'  => '0.03',
-        'Time::localtime'  => '1.02',
+        'Moo'                  => '2.000000',
+        'namespace::autoclean' => '0.28',
+        'List::Util'           => '1.41',
+        'Date::Utils'          => '0.22',
+        'Date::Exception'      => '0.03',
+        'Time::localtime'      => '1.02',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Date-Hijri-Simple-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Date::Hijri::Simple' => { file => 'lib/Date/Hijri/Simple.pm', version => '0.19' },
+            'Date::Hijri::Simple' => { file => 'lib/Date/Hijri/Simple.pm', version => '0.20' },
         },
         resources => {
             repository => {

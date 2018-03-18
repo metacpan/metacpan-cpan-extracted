@@ -223,7 +223,7 @@ sub getConf {
                 # Store modified configuration in cache
                 $self->setLocalConf($r)
                   if ( $self->{refLocalStorage}
-                    and not( $args->{noCache} or $args->{raw} ) );
+                    and not( $args->{noCache} == 1 or $args->{raw} ) );
 
             }
         }

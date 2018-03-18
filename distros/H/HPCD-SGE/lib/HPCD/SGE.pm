@@ -7,11 +7,11 @@ package HPCD::SGE;
 
 =head1 VERSION
 
-Version 0.50
+Version 0.54
 
 =cut
 
-our $VERSION = '0.50';
+our $VERSION = '0.54';
 
 =head1 SYNOPSIS
 
@@ -85,6 +85,18 @@ been a memory overrun if the memory usage exceeds a threshold (default is 99%
 of requested memory allocation, but the attribute B<retry_mem_percent>
 can be specified to provide an alternate range), or if one of a few common
 memory allocation failure requests is seen.
+
+=item -
+
+The SGE driver use the DRMAA binary library to interface with the SGE system
+if it can, otherwise it uses the SGE user interface programs (qsub, qacct,
+qdel).
+
+You can set the environment variable HPCI_NO_DRMAA to a true value if you
+wish to prevent use of the DRMAA library.  (This is mostly provided to be
+able to test that both mechanisms work correctly, but it might also be
+useful on a system that has a broken DRMAA interface that appears to load
+correctly.)
 
 =back
 

@@ -1,5 +1,8 @@
 Revision history for WebService::Wikimapia
 
+0.13  Mon Mar 12 15:55:00 2018
+      - Improved method exporting.
+
 0.12  Mon Apr 10 19:10:00 2017
       - Added test scripts (t/meta-json.t and t/meta-yml.t).
 

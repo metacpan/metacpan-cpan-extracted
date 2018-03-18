@@ -49,6 +49,7 @@ lib/Test2/Event/Plan.pm
 lib/Test2/Event/Skip.pm
 lib/Test2/Event/Subtest.pm
 lib/Test2/Event/TAP/Version.pm
+lib/Test2/Event/V2.pm
 lib/Test2/Event/Waiting.pm
 lib/Test2/EventFacet.pm
 lib/Test2/EventFacet/About.pm
@@ -264,6 +265,7 @@ t/Test2/modules/Event/Plan.t
 t/Test2/modules/Event/Skip.t
 t/Test2/modules/Event/Subtest.t
 t/Test2/modules/Event/TAP/Version.t
+t/Test2/modules/Event/V2.t
 t/Test2/modules/Event/Waiting.t
 t/Test2/modules/EventFacet.t
 t/Test2/modules/EventFacet/About.t

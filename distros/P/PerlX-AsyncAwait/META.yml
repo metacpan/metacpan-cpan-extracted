@@ -19,8 +19,9 @@ no_index:
     - inc
 requires:
   Future: '0'
+  Moo: '2'
   PPR: '0'
   curry: '1'
   perl: '5.006'
   strictures: '2'
-version: '0.001002'
+version: '0.001003'

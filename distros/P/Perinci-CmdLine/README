@@ -2,8 +2,8 @@ NAME
     Perinci::CmdLine - Rinci/Riap-based command-line application framework
 
 VERSION
-    This document describes version 1.77 of Perinci::CmdLine (from Perl
-    distribution Perinci-CmdLine), released on 2017-07-31.
+    This document describes version 1.811.0 of Perinci::CmdLine (from Perl
+    distribution Perinci-CmdLine), released on 2018-03-17.
 
 DESCRIPTION
     This module is currently empty, because the implementation is currently
@@ -43,7 +43,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

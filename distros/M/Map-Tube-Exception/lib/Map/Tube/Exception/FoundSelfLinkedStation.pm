@@ -1,13 +1,13 @@
 package Map::Tube::Exception::FoundSelfLinkedStation;
 $Map::Tube::Exception::FoundSelfLinkedStation::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::FoundSelfLinkedStation::VERSION = '3.14';
+$Map::Tube::Exception::FoundSelfLinkedStation::VERSION = '3.15';
 =head1 NAME
 
 Map::Tube::Exception::FoundSelfLinkedStation - Represent 'self linked station' exception.
 
 =head1 VERSION
 
-version 3.14
+version 3.15
 
 =cut
 
@@ -15,7 +15,7 @@ use 5.006;
 use Data::Dumper;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has status => (is => 'ro', default => sub { 111 });
 

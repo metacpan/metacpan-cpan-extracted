@@ -1,5 +1,13 @@
 Revision history for BankAccount::Validator::UK
 
+0.38  2018-03-16T18:11:00:+01:00
+      - Updated pod with regard to the changes to valacdos.txt v4.80.
+
+0.37  2018-03-16T18:10:00:+01:00
+      - Updated the valacdos.txt (v4.80)
+      - Added sort code range 232290-232290 for Mod11.
+      - Added sort code range 040082-040082 for Mod10.
+
 0.36  2018-02-26T10:30:00:+01:00
       - Improved data loading.
 

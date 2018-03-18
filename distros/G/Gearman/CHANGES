@@ -1,10 +1,14 @@
+2.004.014 2018-03-13 19:28:00 Europe/Berlin
+    - prevent recursion warnings
+      https://github.com/p-alik/perl-Gearman/issues/38
+
 2.004.013 2018-02-05 16:45:00 Europe/Berlin
     - bug fixing: Gearman::Util::read_res_packet
       https://github.com/p-alik/perl-Gearman/issues/37
 
 2.004.012 2018-01-04 11:03:00 Europe/Berlin
     - bug fixing timestamp taskset wait shows unaltered timestamp on fail
-      https://github.com/p-alik/perl-Gearman/issues/35 
+      https://github.com/p-alik/perl-Gearman/issues/35
 
 2.004.011 2017-12-22 16:05:00 Europe/Berlin
     - bug fixing client doesn't on_fail on timeout

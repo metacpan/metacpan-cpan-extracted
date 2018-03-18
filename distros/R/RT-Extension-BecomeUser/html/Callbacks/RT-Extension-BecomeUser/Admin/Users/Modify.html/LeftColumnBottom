@@ -1,0 +1,17 @@
+<%init>
+
+# only display if we're editing a user 
+# (and not when making a new user)
+return unless $UserObj->id;
+
+return unless RT::Extension::BecomeUser::userHasAppropriateRight($session{CurrentUser});
+
+</%init>
+<%args>
+$UserObj => undef
+</%args>
+
+<&| /Widgets/TitleBox, title => loc('Become User'), class => 'user-info-become-user' &>
+<a href="<% RT->Config->Get('WebPath') %>/BecomeUser.html?id=<% $UserObj->id %>">Become this user</a>
+</&>
+

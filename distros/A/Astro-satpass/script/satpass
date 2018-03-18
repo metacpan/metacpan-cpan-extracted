@@ -37,7 +37,7 @@ $clipboard_unavailable = $IO::Clipboard::clipboard_unavailable;
 #	Initialization
 #
 
-our $VERSION = '0.090';
+our $VERSION = '0.091';
 
 use constant LINFMT => <<eod;
 %s %s %8.4f %9.4f %7.1f %-4s %s
@@ -267,7 +267,7 @@ my $interrupted = 'Interrupted by user.';
 
 $opt{clipboard} and select (IO::Clipboard->new ());
 
-ref $Astro::satpass::Test::Hook eq 'CODE' and do {
+CODE_REF eq ref $Astro::satpass::Test::Hook and do {
     $fh = Astro::satpass::Test->new () or die <<eod;
 Error - Failed to instantiate Astro::satpass::Test object.
 eod
@@ -1030,7 +1030,7 @@ foreach my $url (qw{http://geocoder.ca/ http://backup-geocoder.ca/}) {
     my @rslt;
     my $point = {};
     foreach (@xml) {
-	next unless ref $_ eq 'ARRAY';
+	next unless ARRAY_REF eq ref $_;
 	next unless $_->[0] eq 'latt' || $_->[0] eq 'longt';
 	$point->{$_->[0]} = $_->[2];
 	if (exists $point->{latt} && exists $point->{longt}) {
@@ -2570,7 +2570,7 @@ sub _find_first_tag {
     TAG_LOOP:
     foreach my $tag (@_) {
 	foreach my $branch (@$tree) {
-	    next unless ref $branch eq 'ARRAY' && $branch->[0] eq $tag;
+	    next unless ARRAY_REF eq ref $branch && $branch->[0] eq $tag;
 	    $tree = $branch;
 	    next TAG_LOOP;
 	}
@@ -2635,7 +2635,7 @@ sub _flatten {
 		name => $old->get ('name'),
 		id => $old->get ('id'),
 	    );
-	} elsif (ref $hash->{$key} eq 'HASH') {
+	} elsif ( HASH_REF eq ref $hash->{$key} ) {
 	    _flatten ($hash->{$key});
 	}
     }
@@ -2913,7 +2913,7 @@ unless (@_) {
     push @_, @rest;
     }
 
-if (@_ && ref $_[0] eq 'ARRAY') {
+if ( @_ && ARRAY_REF eq ref $_[0] ) {
     Astro::Coord::ECI::TLE->status (clear => 'iridium');
     foreach (@{$_[0]}) {
 	Astro::Coord::ECI::TLE->status (add => $_->[0], iridium =>
@@ -2964,7 +2964,7 @@ BEGIN {	# Begin local symbol block
     );
 
     sub _load_module {
-	my @module = ref $_[0] eq 'ARRAY' ? @{shift ()} : shift ||
+	my @module = ARRAY_REF eq ref $_[0] ? @{shift ()} : shift ||
 	    die "Programming error - No module specified";
 	my @probs;
 	foreach my $module (@module) {
@@ -3481,7 +3481,7 @@ sub _strip_empty_xml {
     while (--$inx >= 0) {
 	my $val = $ref->[$inx];
 	my $typ = ref $val;
-	if ($typ eq 'ARRAY') {
+	if ( ARRAY_REF eq $typ ) {
 	    _strip_empty_xml ($val);
 	} elsif (!$typ) {
 	    splice @$ref, $inx, 1 unless $val =~ m/\S/ms;
@@ -3708,6 +3708,7 @@ $clipout->($$data);
 
 package Astro::satpass::Test;
 
+use Astro::Coord::ECI::Utils qw{ :ref };
 use Carp;
 use Config;
 
@@ -3737,7 +3738,7 @@ Programming error - You are trying to use the test hook under
         a version of Perl prior to v5.8 and you do not have
 	the IO::String package available.
 eod
-confess <<eod unless ref $Hook eq 'CODE';
+confess <<eod unless CODE_REF eq ref $Hook;
 Programming error - Should not instantiate a @{[__PACKAGE__]} object
         unless \$@{[__PACKAGE__]}::Hook has been set to a code
 	reference.

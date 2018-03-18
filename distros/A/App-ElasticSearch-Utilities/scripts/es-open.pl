@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 # PODNAME: es-open.pl
 # ABSTRACT: Open any closed indices matching your paramters.
 use strict;
@@ -46,7 +46,7 @@ es-open.pl - Open any closed indices matching your paramters.
 
 =head1 VERSION
 
-version 5.4
+version 5.5
 
 =head1 SYNOPSIS
 
@@ -115,6 +115,8 @@ Print this message and exit
 =item B<manual>
 
 Print detailed help with examples
+
+=back
 
 =head1 AUTHOR
 

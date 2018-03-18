@@ -18,7 +18,7 @@ use Moo;
 use App::Sqitch::Types qw(Str Int HashRef ChangeList LineList Maybe Sqitch URI File Target);
 use constant SYNTAX_VERSION => '1.0.0';
 
-our $VERSION = '0.9996';
+our $VERSION = '0.9997';
 
 # Like [:punct:], but excluding _. Copied from perlrecharclass.
 my $punct = q{-!"#$%&'()*+,./:;<=>?@[\\]^`{|}~};
@@ -1594,7 +1594,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 License
 
-Copyright (c) 2012-2015 iovation Inc.
+Copyright (c) 2012-2018 iovation Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

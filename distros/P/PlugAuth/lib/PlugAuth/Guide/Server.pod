@@ -14,7 +14,7 @@ PlugAuth::Guide::Server - Guide for setting up a PlugAuth server.
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,8 @@
+1.01 2018-03-06
+
+ - Allow superusers to unmark tickets as spam for all users on Reported.html
+ - Mark it as 4.2 and 4.4 compat and drop 4.0 in documentation
+
 1.00 2014-12-15
  - Packaging and documentation updates
 

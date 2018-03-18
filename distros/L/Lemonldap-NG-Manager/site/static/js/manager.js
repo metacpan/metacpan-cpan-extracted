@@ -383,16 +383,7 @@
       $scope.showModal('prompt.html', name).then(function() {
         var name = $scope.result;
         if (name) {
-          var node = $scope.addTemplateNode(name, 'virtualHost');
-          delete node.nodes[0].cnodes;
-          node.nodes[0].nodes = [{
-            id: "virtualHosts/" + 'new__' + name + '/locationRules/default',
-            type: "rule",
-            title: "default",
-            comment: "",
-            re: "default",
-            data: "deny"
-          }];
+          return $scope.addTemplateNode(name, 'virtualHost');
         }
       });
     };
@@ -449,9 +440,26 @@
         type: type,
         nodes: templates(type, 'new__' + name)
       };
+      setDefault(t.nodes);
       cs.$modelValue.nodes.push(t);
       cs.expand();
       return t;
+    };
+    var setDefault = function(node) {
+      var len, n, o;
+      for (o = 0, len = node.length; o < len; o++) {
+        n = node[o];
+        if (n.cnodes && n["default"]) {
+          delete n.cnodes;
+          n._nodes = n["default"];
+        }
+        if (n._nodes) {
+          setDefault(n._nodes);
+        } else if (n["default"] || n["default"] === 0) {
+          n.data = n["default"];
+        }
+      }
+      return node;
     };
 
     var _getAll = function(node) {

@@ -4,7 +4,7 @@
       "Doug Bell <preaction@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -54,47 +54,47 @@
    "provides" : {
       "Mercury" : {
          "file" : "lib/Mercury.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mercury::Command::mercury" : {
          "file" : "lib/Mercury/Command/mercury.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mercury::Command::mercury::broker" : {
          "file" : "lib/Mercury/Command/mercury/broker.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mercury::Controller::Bus" : {
          "file" : "lib/Mercury/Controller/Bus.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mercury::Controller::PubSub" : {
          "file" : "lib/Mercury/Controller/PubSub.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mercury::Controller::PubSub::Cascade" : {
          "file" : "lib/Mercury/Controller/PubSub/Cascade.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mercury::Controller::PushPull" : {
          "file" : "lib/Mercury/Controller/PushPull.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mercury::Pattern::Bus" : {
          "file" : "lib/Mercury/Pattern/Bus.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mercury::Pattern::PubSub" : {
          "file" : "lib/Mercury/Pattern/PubSub.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mercury::Pattern::PushPull" : {
          "file" : "lib/Mercury/Pattern/PushPull.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Mojolicious::Plugin::Mercury" : {
          "file" : "lib/Mojolicious/Plugin/Mercury.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       }
    },
    "release_status" : "stable",
@@ -110,7 +110,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#statocles"
    },
-   "version" : "0.015",
+   "version" : "0.016",
    "x_authority" : "cpan:PREACTION",
    "x_contributors" : [
       "Joel Berger <joel.a.berger@gmail.com>",
@@ -118,6 +118,6 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "William Lindley <wlindley@wlindley.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0216"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

@@ -4,7 +4,7 @@
 
 package Apache::ASP;
 
-$VERSION = 2.62;
+$VERSION = 2.63;
 
 #require DynaLoader;
 #@ISA = qw(DynaLoader);
@@ -2015,7 +2015,7 @@ sub CompileChecksumKeys() { \@CompileChecksumKeys };
 
 sub get_dir_config {
     my $rv = shift->get(shift);
-    if(lc($rv) eq 'off') {
+    if(!$rv || lc($rv) eq 'off') {
 	$rv = 0; # Off always becomes 0
     }
     $rv;
@@ -2051,6 +2051,8 @@ sub config {
 __END__
 
 =pod
+
+=encoding ISO8859-1
 
 =head1 NAME
 
@@ -2130,9 +2132,9 @@ titled Win32 Install.
 Often, installing the mod_perl part of the Apache server
 can be the hardest part.  If this is the case for you, 
 check out the FAQ and SUPPORT sections for further help,
-as well as the "Build Apache" notes in this section.
+as well as the "Modern Linux Distributions" notes in this section.
 
-Please also see the mod_perl guide at http://perl.apache.org/guide
+Please also see the mod_perl site at http://perl.apache.org/
 which one ought to give a good read before undertaking
 a mod_perl project.
 
@@ -2141,8 +2143,8 @@ a mod_perl project.
 You may download the latest Apache::ASP from your nearest CPAN,
 and also:
 
+  http://search.cpan.org/dist/Apache-ASP/
   http://cpan.org/modules/by-module/Apache/
-  ftp://ftp.duke.edu/pub/perl/modules/by-module/Apache/
 
 As a Perl developer, you should make yourself familiar with 
 the CPAN.pm module, and how it may be used to install
@@ -2188,84 +2190,22 @@ copy ASP.pm to $PERLLIB/site/Apache
 Please note that you must first have the Apache Web Server
 & mod_perl installed before using this module in a web server
 environment.  The offline mode for building static html at
-./cgi/asp may be used with just perl.
+./cgi/asp-perl may be used with just perl.
 
-=head2 Win32 / Windows Install
+=head2 Modern Linux Distributions
 
-If you are on a Win32 platform, like WinNT or Windows 2000, 
-you can download the win32 binaries linked to from:
+If you have a modern Linux distribution like CentOS or Ubuntu,
+you will likely have the easiest path by using the repository tools to
+automatically install mod_perl and Apache before installing Apache::ASP via CPAN.
 
-  http://perl.apache.org/distributions.html  
+For example for CentOS, this will install mod_perl into your apache httpd, the latter
+likely being installed already by default on your server:
 
-From here, I would recommend the mod_perl binary installation at:
+  bash> sudo yum install mod_perl-devel.x86_64
 
-  ftp://theoryx5.uwinnipeg.ca/pub/other/
+For Ubuntu this would be done like this:
 
-and install the latest perl-win32-bin-*.exe file.
-
-Randy Kobes has graciously provided these, which include
-compiled versions perl, mod_perl, apache, mod_ssl,
-as well as all the modules required by Apache::ASP
-and Apache::ASP itself.
-
-You may also try the more recent Perl-5.8-win32-bin.exe
-distribution which is built on Apache 2.  This should be
-treated as BETA release software until mod_perl 2.x is 
-released as stable. Some notes from Randy Kobes about 
-getting this release to work are here:
-
-  After installing this distribution, in Apache2\conf\perl.conf
-  (pulled in via Apache2\conf\httpd.conf) there's directives that
-  have Apache::ASP handle files placed under the Apache2\asp\
-  directory. There should be a sample Apache::ASP script there,
-  printenv.html, accessed as http://127.0.0.1/asp/printenv.html
-  which, if working, will print out your environment variables.
-
-=head2 WinME / 98 / 95 flock() workaround
-
-For those on desktop Windows operation systems, Apache::ASP v2.25 and
-later needs a special work around for the lack of flock() support
-on these systems.  Please add this to your Apache httpd.conf to
-fix this problem after mod_perl is installed:
-
-  <Perl>
-   *CORE::GLOBAL::flock = sub { 1 };
-  </Perl>
-  PerlModule  Apache::ASP
-
-Please be sure to add this configuration before Apache::ASP is loaded
-via PerlModule, or a PerlRequire statement.
-
-=head2 Linux DSO Distributions
-
-If you have a linux distribution, like a RedHat Linux server,
-with an RPM style Apache + mod_perl, seriously consider building 
-a static version of the httpd server yourself, not DSO.  
-DSO is marked as experimental for mod_perl, and often does 
-not work, resulting in "no request object" error messages,
-and other oddities, and are terrible to debug, because of
-the strange kinds of things that can go wrong.
-
-=head2 Build Apache and mod_perl
-
-For a quick build of apache, there is a script in the distribution at
-./make_httpd/build_httpds.sh that can compile a statically linked
-Apache with mod_ssl and mod_perl.  Just drop the sources into the 
-make_httpd directory, configure the environments as appropriate,
-and execute the script like this: 
-
- make_httpd> ./build_httpds.sh
-
-You might also find helpful a couple items:
-
-  Stas's mod_perl guide install section
-  http://perl.apache.org/guide/install.html
-
-  Apache Toolbox
-  http://www.apachetoolbox.com/
-
-People have been using Apache Toolbox to automate their 
-complex builds with great success.
+  bash> sudo apt-get install libapache2-mod-perl2
 
 =head2 Quick Start
 
@@ -2302,6 +2242,63 @@ started with development.
 You will know that Apache::ASP is working normally if you 
 can run the scripts in ./site/eg/ without any errors.  Common
 problems can be found in the FAQ section.
+
+=head2 Build static Apache and mod_perl for Apache 1.3.x
+
+For a quick build of apache, there is a script in the distribution at
+./make_httpd/build_httpds.sh that can compile a statically linked
+Apache with mod_ssl and mod_perl.  Just drop the sources into the 
+make_httpd directory, configure the environments as appropriate,
+and execute the script like this: 
+
+ make_httpd> ./build_httpds.sh
+
+You might also find helpful a couple items:
+
+  Stas's mod_perl guide install section
+  http://perl.apache.org/guide/install.html
+
+  Apache Toolbox
+  http://www.apachetoolbox.com/
+
+People have been using Apache Toolbox to automate their 
+complex builds of Apache 1.3.x with great success.
+
+=head2 Win32 / Windows Install
+
+If you are on a Win32 platform, like WinNT or Windows 2000, 
+you can download the win32 binaries linked to from:
+
+  http://perl.apache.org/download/binaries.html#Win32
+
+and install the latest perl-win32-bin-*.exe file.
+
+Randy Kobes has graciously provided these, which include
+compiled versions perl, mod_perl, apache, mod_ssl,
+as well as all the modules required by Apache::ASP
+and Apache::ASP itself.
+
+After installing this distribution, in Apache2\conf\perl.conf
+(pulled in via Apache2\conf\httpd.conf) there's directives that
+have Apache::ASP handle files placed under the Apache2\asp\
+directory. There should be a sample Apache::ASP script there,
+printenv.html, accessed as http://127.0.0.1/asp/printenv.html
+which, if working, will print out your environment variables.
+
+=head2 WinME / 98 / 95 flock() workaround
+
+For those on desktop Windows operation systems, Apache::ASP v2.25 and
+later needs a special work around for the lack of flock() support
+on these systems.  Please add this to your Apache httpd.conf to
+fix this problem after mod_perl is installed:
+
+  <Perl>
+   *CORE::GLOBAL::flock = sub { 1 };
+  </Perl>
+  PerlModule  Apache::ASP
+
+Please be sure to add this configuration before Apache::ASP is loaded
+via PerlModule, or a PerlRequire statement.
 
 =head1 CONFIG
 
@@ -2590,6 +2587,14 @@ will only be transmitted by the browser under https transmissions.
 
   PerlSetVar SecureSession 1
 
+=item HTTPOnlySession
+
+default 0. Sets HttpOnly flag to session cookie to mitigate XSS attacks.
+Supported by most modern browsers, it only allows access to the
+session cookie by the server (ie NOT Javascript)
+
+  PerlSetVar HTTPOnlySession 1
+
 =item ParanoidSession
 
 default 0.  When true, stores the user-agent header of the browser 
@@ -2777,7 +2782,7 @@ the buffered output are included with the rest of
 the debugging information.  
 
 For a demo of this functionality, try the 
-./site/eg/syntax_error.htm script, and turn buffering on.
+./site/eg/syntax_error.asp script, and turn buffering on.
 
 =item PodComments
 
@@ -3441,8 +3446,6 @@ known to work well for developing Apache::ASP web sites:
  * Emacs, in perl or HTML modes.  For a mmm-mode config
    that mixes HTML & perl modes in a single buffer, check 
    out the editors/mmm-asp-perl.el file in distribution.
-
- * Microsoft Frontpage
 
  * Vim, special syntax support with editors/aasp.vim file in distribution.
 
@@ -4893,18 +4896,28 @@ want all your includes to be compiled as subs and
 dynamically executed at runtime, turn the DynamicIncludes
 config option on as documented above.
 
-That is not all!  SSI is full featured.  One of the 
-things missing above is the 
+=head2 Apache::SSI for mod_perl 1.3.x only
+
+One of the things missing above is the 
 
  <!--#include virtual=filename.cgi-->
 
 tag.  This and many other SSI code extensions are available
 by filtering Apache::ASP output through Apache::SSI via
-the Apache::Filter and the Filter config options.  For
-more information on how to wire Apache::ASP and Apache::SSI
+the Apache::Filter and the Filter config options, available in mod_perl 1.3.x / Apache 1.3.x.
+Unfortunately this functionality is not available with mod_perl 2 / Apache 2.
+
+For more information on how to wire Apache::ASP and Apache::SSI
 together, please see the Filter config option documented
 above.  Also please see Apache::SSI for further information
 on the capabilities it offers.
+
+=head2 SSI with mod_filter in Apache 2
+
+Apache 2 offers chained filters.  It may be possible to chain filters to
+Apache::ASP output through mod_filter for SSI processing:
+
+  http://httpd.apache.org/docs/2.1/mod/mod_filter.html
 
 =head1 EXAMPLES
 
@@ -4927,8 +4940,8 @@ In order to track a web user and associate server side data
 with that client, the web server sets, and the web client returns 
 a 32 byte session id identifier cookie.  This implementation 
 is very secure and  may be used in secure HTTPS transactions, 
-and made stronger with SecureSession and ParanoidSession 
-settings (see CONFIG ).
+and made stronger with SecureSession, HTTPOnlySession and
+ParanoidSession settings (see CONFIG ).
 
 However good cookies are for this kind of persistent
 state management between HTTP requests, they have long 
@@ -5261,7 +5274,7 @@ web applications.
 
 For more information about CGI.pm, please see the web site
 
-  http://stein.cshl.org/WWW/software/CGI/
+  http://search.cpan.org/dist/CGI/
 
 =item Query Object Initialization
 
@@ -5329,7 +5342,7 @@ Please see the docs on CGI.pm (try perldoc CGI) for more information
 on this topic, and ./site/eg/file_upload.asp for an example of its use.
 Also, for more details about CGI.pm itself, please see the web site:
 
-    http://stein.cshl.org/WWW/software/CGI/
+    http://search.cpan.org/dist/CGI/
 
 Occasionally, a newer version of CGI.pm will be released which breaks
 file upload compatibility with Apache::ASP.  If you find this to occur,
@@ -5478,7 +5491,7 @@ Instead of defining subroutines in scripts, you may add them to your sites
 global.asa, or you may create a perl package or module to share
 with your scripts.  For more on perl objects & modules, please see:
 
-  http://www.perldoc.com/perl5.8.0/pod/perlobj.html
+  http://perldoc.perl.org/perlobj.html
 
 =head2 Use global.asa's Script_On* Events
 
@@ -5637,7 +5650,7 @@ In particular, stay away from statements that that have
 more than one level of indirection on the left side of
 an assignment like:
 
-  $Session->{complex}{object} = $data;
+  BAD: $Session->{complex}{object} = $data;
 
 =item How can I keep search engine spiders from killing the session manager?
 
@@ -5696,13 +5709,7 @@ work for most cases.
 
 =item VBScript or JScript supported?
 
-Yes, but not with this Perl module.  For ASP with other scripting
-languages besides Perl, you will need to go with a commercial vendor
-in the UNIX world.  Sun has such a solution.
-Of course on Windows NT and Windows 2000, you get VBScript for free with IIS.
-
-  Sun ONE Active Server Pages (formerly Sun Chili!Soft ASP)
-  http://www.chilisoft.com
+Only Perl scripting is supported with this module.
 
 =item How is database connectivity handled?
 
@@ -5800,7 +5807,7 @@ how to tune your Apache::ASP web site.  It has since been
 updated to remain current with Apache::ASP v2.29+
 
   Apache::ASP Site Tuning
-  http://www.chamas.com/asp/articles/perlmonth3_tune.html
+  http://www.apache-asp.org/articles/perlmonth3_tune.html
 
 =head2 Tuning & Benchmarking
 
@@ -5989,7 +5996,9 @@ would have been possible.
 
 Other honorable mentions include:
 
- !! Doug MacEachern, for moral support and of course mod_perl
+ !! Gregory Youngblood, Thanos Chatziathanassiou, & Tsirkin Evgeny for keeping the flame alive!
+
+ :) Doug MacEachern, for moral support and of course mod_perl
  :) Helmut Zeilinger, Skylos, John Drago, and Warren Young for their help in the community
  :) Randy Kobes, for the win32 binaries, and for always being the epitome of helpfulness
  :) Francesco Pasqualini, for bug fixes with stand alone CGI mode on Win32
@@ -6072,8 +6081,7 @@ The Apache::ASP mailing list archives are located at:
 
 The mod_perl mailing list archives are located at:
 
- http://forum.swarthmore.edu/epigone/modperl
- http://www.egroups.com/group/modperl/
+ http://mail-archives.apache.org/mod_mbox/perl-modperl/
 
 =item Mailing List
 
@@ -6090,7 +6098,7 @@ send your question to modperl[at]apache.org
 
 =item Donations
 
-Apache::ASP is freely distributed under the terms of the GPL license 
+Apache::ASP is freely distributed under the terms of the Perl artistic license 
 ( see the LICENSE section ). If you would like to donate time to 
 the project, please get involved on the Apache::ASP Mailing List,
 and submit ideas, bug fixes and patches for the core system,
@@ -6102,7 +6110,7 @@ the ins and outs of the software.
 If you would like commercial support for Apache::ASP, please
 check out any of the following listed companies.  Note that 
 this is not an endorsement, and if you would like your company
-listed here, please email asp-dev [at] chamas.com with your information.
+listed here, please email asp[at]perl.apache.org with your information.
 
 =item AlterCom
 
@@ -6116,14 +6124,6 @@ anyone with their mod_perl Apache::ASP needs.  Our mod_perl hosting is $24.95 mo
 Our hosting services support Apache:ASP along with Mod_Perl, PHP and MySQL.
 
   http://www.Cyberchute.com
-
-=item GrokThis.net
-
-Web hosting provider.  Specializing in mod_perl and mod_python
-hosting,  we allow users to edit their own Apache configuration files
-and run their own Apache servers.
-
-  http://grokthis.net
 
 =item OmniTI
 
@@ -6147,15 +6147,24 @@ The prices for our service are about 900 EUR per day which is negotiable
 What follows is a list of public sites that are using 
 Apache::ASP.  If you use the software for your site, and 
 would like to show your support of the software by being listed, 
-please send your link to asp-dev [at] chamas.com
+please send your link to asp[at]perl.apache.org
 
 For a list of testimonials of those using Apache::ASP, please see the TESTIMONIALS section.
 
-        Zapisy - Testy
-        http://www.ch.pwr.wroc.pl/~bruno/testy/
+        PERSONiO Match
+        http://www.personio.com/home.asp
+
+        gutscheinwurst.de - a German voucher community
+        http://www.gutscheinwurst.de
 
         SalesJobs.com
         http://www.salesjobs.com
+
+        hanschur.de
+        http://www.hanschur.de
+
+        Webtist
+        http://www.webtist.de
 
         FreeLotto
         http://www.freelotto.com
@@ -6175,12 +6184,6 @@ For a list of testimonials of those using Apache::ASP, please see the TESTIMONIA
         WebTime
         http://webtime-project.net
 
-        Meet-O-Matic
-        http://meetomatic.com/about.asp
-
-        Apache Hello World Benchmarks
-        http://chamas.com/bench/
-
         AlterCom, Advanced Web Hosting
         http://altercom.com/
 
@@ -6190,20 +6193,11 @@ For a list of testimonials of those using Apache::ASP, please see the TESTIMONIA
         ESSTECwebservices
         http://www.esstec.be/
 
-        SQLRef
-        http://comclub.dyndns.org:8081/sqlref/
-
-        Bouygues Telecom Enterprises
-        http://www.b2bouygtel.com
-
         Alumni.NET
 	http://www.alumni.net
 
         Anime Wallpapers dot com
         http://www.animewallpapers.com/
-
-	Chamas Enterprises Inc.		
-	http://www.chamas.com
 
 	Cine.gr
 	http://www.cine.gr
@@ -6222,9 +6216,6 @@ For a list of testimonials of those using Apache::ASP, please see the TESTIMONIA
 
 	Integra
 	http://www.integra.ru/
-
-	Internetowa Gielda Samochodowa		
-	http://www.gielda.szczecin.pl
 
         Money FM
         http://www.moneyfm.gr
@@ -6246,9 +6237,6 @@ For a list of testimonials of those using Apache::ASP, please see the TESTIMONIA
 
 	redhat.com | support
 	http://www.redhat.com/apps/support/
-
-	Samara.RU
-	http://portal.samara.ru/
 
 	Spotlight
 	http://www.spotlight.com.au
@@ -6284,6 +6272,20 @@ community and maintainer have been very helpful whenever we've had
 questions.
 
   -- Tom Lancaster, Red Hat
+
+=item Anime Wallpaper at Anime Cubed
+
+Your suite has got our old CGI implementation beat, hands down. Our site is divided into two main areas, each run by a separate developer, and the Apache::ASP section runs head and shoulders above the other side. Anyone who is still using anything but your product to implement their webpages seriously needs to take a look at how versatile and powerful Apache::ASP is. Thanks again for such great work!
+
+  -- Al from 'Anime Wallpaper at Anime Cubed', http://www.animecubed.com/wallpapers/ 
+
+=item gutscheinwurst.de
+
+I am the web master of http://www.gutscheinwurst.de , a German voucher community. 
+We use Apache::Asp to run our backend & administration servers for the system. We started using Apache::ASP to see whether it is a valid alternative to IIS legacy systems. So far all expectations in regard of performance, ease of development and integration have been fulfilled or exceeded.
+Thank's for such a great product :)
+
+ -- Johnannes Leimbach
 
 =item D. L. Fox
 
@@ -6432,11 +6434,6 @@ at asp[at]perl.apache.org
        Embedded Perl ( part of a series on Perl )
        http://www.wdvl.com/Authoring/Languages/Perl/PerlfortheWeb/index15.html
 
-=head2 Benchmarking
-
-       Apache Hello World Benchmarks
-       http://chamas.com/bench/
-
 =head2 Books
 
        mod_perl "Eagle" Book
@@ -6448,17 +6445,6 @@ at asp[at]perl.apache.org
        Programming the Perl DBI
        http://www.oreilly.com/catalog/perldbi/
 
-=head2 Presentations
-
-       Apache::ASP Tutorial, 2000 Open Source Convention ( PowerPoint )
-       http://www.chamas.com/asp/OSS_convention_2000.pps
-
-       Advanced Apache::ASP Tutorial, 2001 Open Source Convention ( Zipped PDF )
-       http://www.chamas.com/asp/OSS_convention_2001.zip
-
-       Advanced Apache::ASP Tutorial, 2001 Open Source Convention ( PDF )
-       http://www.chamas.com/asp/OSS_convention_2001.pdf
-
 =head2 Reference Cards
 
         Apache & mod_perl Reference Cards
@@ -6469,7 +6455,7 @@ at asp[at]perl.apache.org
 	mod_perl Apache web module
 	http://perl.apache.org
 
-	mod_perl Guide
+	mod_perl 1.x Guide
 	http://perl.apache.org/guide/
 
 	Perl Programming Language
@@ -6489,16 +6475,6 @@ interest to you, and I will give it higher priority.
  + Database storage of $Session & $Application, so web clusters 
    may scale better than the current NFS/CIFS StateDir implementation
    allows, maybe via Apache::Session.
- + Sample Apache::ASP applications beyond ./site/eg
- + More caching options like $Server->Cache for user cache
-   and $Response->Cache for page caching
- + Caching guide
-
-=head2 MAY BE DONE
-
- + VBScript, ECMAScript or JavaScript interpreters
- + Dumping state of Apache::ASP during an error, and being
-   able to go through it with the perl debugger.
 
 =head1 CHANGES
 
@@ -6515,7 +6491,15 @@ equivalent of a 1.0 release for other kinds of software.
 
  + = improvement   - = bug fix    (d) = documentations
 
-=item $VERSION = 2.62; $DATE="2011/08/16"
+=item $VERSION = 2.63; $DATE="03/14/2018"
+
+ + Added section ``raw'' to MailErrors.inc to debug POSTs without
+   form fields
+
+ - MailErrorsHTML now uses monospaced fonts for errors. Easier on
+   the eyes and more informative
+
+=item $VERSION = 2.62; $DATE="08/16/2011"
 
  - Fixed 'application/x-www-form-urlencoded' for AJAX POSTs post
    Firefox 3.x
@@ -6523,9 +6507,6 @@ equivalent of a 1.0 release for other kinds of software.
  + First sourceforge.net hosted version
 
  + Incremented version number to actually match SVN branch tag
-
- + Switched to Big-endian date format in the documentation.
-   Less chance of misunderstandings
 
 =item $VERSION = 2.61; $DATE="05/24/2008"
 
@@ -6818,7 +6799,7 @@ equivalent of a 1.0 release for other kinds of software.
 
  -Fixed runtime HTML error output when Debug is set to -2/2,
   so that script correctly again gets rendered in final perl form.
-  Added compile time error output to ./site/eg/syntax_error.htm
+  Added compile time error output to ./site/eg/syntax_error.asp
   when a special link is clicked for a quick visual test.
 
  -Cleaned up some bad coding practices in ./site/eg/global.asa
@@ -8937,7 +8918,8 @@ equivalent of a 1.0 release for other kinds of software.
 
 =head1 LICENSE
 
-Copyright (c) 1998-2008, Josh Chamas, Chamas Enterprises Inc. 
+Copyright (c) 1998-2018, Josh Chamas
+
 All rights reserved.  This program is free software; you can 
 redistribute it and/or modify it under the same terms as Perl itself.
 

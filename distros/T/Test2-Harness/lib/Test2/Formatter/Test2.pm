@@ -2,7 +2,7 @@ package Test2::Formatter::Test2;
 use strict;
 use warnings;
 
-our $VERSION = '0.001057';
+our $VERSION = '0.001061';
 
 use Scalar::Util qw/blessed/;
 use List::Util qw/shuffle first/;
@@ -39,6 +39,7 @@ use Test2::Util::HashBase qw{
     -job_colors
     -active_files
     -_active_disp
+    -job_names
 };
 
 sub TAG_WIDTH() { 8 }
@@ -68,12 +69,14 @@ sub DEFAULT_TAG_COLOR() {
         'REASON'   => Term::ANSIColor::color('magenta'),
         'TIMEOUT'  => Term::ANSIColor::color('magenta'),
         'TIME'     => Term::ANSIColor::color('blue'),
+        'MEMORY'     => Term::ANSIColor::color('blue'),
     );
 }
 
 sub DEFAULT_FACET_COLOR() {
     return (
         time    => Term::ANSIColor::color('blue'),
+        memory  => Term::ANSIColor::color('blue'),
         about   => Term::ANSIColor::color('magenta'),
         amnesty => Term::ANSIColor::color('cyan'),
         assert  => Term::ANSIColor::color('bold bright_white'),
@@ -279,8 +282,9 @@ sub update_active_disp {
 
     if ($f->{harness_job_launch}) {
         my $job = $f->{harness_job};
-        $self->{+ACTIVE_FILES}->{File::Spec->abs2rel($job->{file})} = $job->{job_id};
+        $self->{+ACTIVE_FILES}->{File::Spec->abs2rel($job->{file})} = $job->{job_name} || $job->{job_id};
         $should_show = 1;
+        $self->{+JOB_NAMES}->{$job->{job_id}} = $job->{job_name} || $job->{job_id};
     }
 
     if ($f->{harness_job_end}) {
@@ -386,6 +390,7 @@ sub render_tree {
     my $job = '';
     if ($f->{harness} && $f->{harness}->{job_id}) {
         my $id = $f->{harness}->{job_id};
+        my $name = $self->{+JOB_NAMES}->{$id};
 
         my ($color, $reset) = (''. '');
         if ($self->{+JOB_COLORS}) {
@@ -393,7 +398,7 @@ sub render_tree {
             $reset = $self->{+COLOR}->{reset};
         }
 
-        my $len = length($id);
+        my $len = length($name);
         if (!$self->{+JOB_LENGTH} || $len > $self->{+JOB_LENGTH}) {
             $self->{+JOB_LENGTH} = $len;
         }
@@ -401,7 +406,7 @@ sub render_tree {
             $len = $self->{+JOB_LENGTH};
         }
 
-        $job = sprintf("%sjob %${len}s%s ", $color, $id, $reset || '');
+        $job = sprintf("%sjob %${len}s%s ", $color, $name, $reset || '');
     }
 
     my $hf = hub_truth($f);

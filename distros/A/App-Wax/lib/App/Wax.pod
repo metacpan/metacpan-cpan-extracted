@@ -19,7 +19,7 @@ See the L<wax> documentation for more details.
 
 =head2 app_name
 
-B<Type>: Str, rw, default: C<wax>
+B<Type>: Str, rw, default: "wax".
 
 The application name used in L<debug|"debug"> and L<error|"log"> messages.
 
@@ -40,18 +40,14 @@ The directory to download remote resources to. If not supplied,
 the system's L<temporary directory|https://en.wikipedia.org/wiki/Temporary_folder>
 is used.
 
+Can be checked with C<has_directory>.
+
 =head2 keep
 
-B<Type>: Bool, rw, default: false.
+B<Type>: Bool, ro, default: false.
 
 True if L<"cache"> or L<"mirror"> are true, false otherwise.
 Used to determine which L<"resolve"> method to use.
-
-=head2 lwp_user_agent
-
-B<Type>: L<LWP::UserAgent>, rw.
-
-The L<LWP::UserAgent> instance used to perform network requests.
 
 =head2 mime_types
 
@@ -71,9 +67,11 @@ If L<"cache"> and L<"mirror"> are both set to true, an exception is thrown.
 
 =head2 separator
 
-B<Type>: Str, rw, optional.
+B<Type>: Str, rw, default: "--".
 
-An optional token used to mark the end of C<wax>'s options.
+A optional token used to mark the end of C<wax>'s options.
+
+Can be cleared with C<clear_separator> and checked with C<has_separator>.
 
 =head2 template
 
@@ -91,7 +89,7 @@ The timeout (in seconds) for HTTP requests.
 
 B<Type>: Str, rw.
 
-The value of the L<user agent|"lwp_user_agent">'s HTTP C<User-Agent> header.
+The value of the HTTP client's C<User-Agent> header.
 
 =head2 verbose
 
@@ -124,13 +122,19 @@ B<Signature>: $url: Str, $path: Str -> Maybe[Str]
 
 Saves the contents of the URL to the path. Returns the error message if an error ocurred.
 
+=head2 dump_command
+
+B<Signature>: $command: ArrayRef[Str] -> Str
+
+Returns a string representation of the supplied command.
+
 =head2 extension
 
 B<Signature>: $url: Str -> $extension: Str
 
 Returns the file extension for the given URL (e.g. C<.html>) if one can be determined from
 the resource's C<Content-Type> header, or the path component of the URL if it's
-C<text/plain>. Otherwise, returns an empty string.
+C<text/plain> or C<application/octet-stream>. Otherwise, returns an empty string.
 
 =head2 is_url
 
@@ -151,12 +155,6 @@ B<Signature>: $level: Str, $template: Str, @args: List[Str] -> None
 Interpolates the arguments into the C<sprintf> template and logs the message,
 with the level prefixed, to STDERR.
 
-=head2 render
-
-B<Signature>: $command: ArrayRef[Str] -> Str
-
-Returns a string representation of the supplied command.
-
 =head2 resolve
 
 B<Signature>: $url: Str -> ($path: Str, $error: Maybe[Str]): List|ArrayRef
@@ -173,7 +171,7 @@ or L<"resolve_temp"> otherwise.
 B<Signature>: $url: Str -> ($filename: Str, $error: Maybe[Str])
 
 Returns the path the L<cached|"cache"> or L<mirrored|"mirror"> URL should be saved to/retrieved
-from and an optional error message if creation of the index file (see below) failed.
+from and an optional error message if creation of the index file failed.
 
 C<resolve_keep> uses an additional file to store the resource's extension. If this file
 can't be created, the error message is returned as the second element of the list.
@@ -181,9 +179,10 @@ Otherwise, it's undef.
 
 =head2 resolve_temp
 
-B<Signature>: $url: Str -> $path: Str
+B<Signature>: $url: Str -> ($path: Str, $error: Maybe[Str])
 
-Returns the path of the temporary file the URL should be saved to.
+Returns the path of the temporary file the URL should be saved to
+and an optional error message if creation of the temporary file failed.
 
 =head2 run
 
@@ -197,7 +196,7 @@ None by default.
 
 =head1 VERSION
 
-1.1.1
+2.1.0
 
 =head1 SEE ALSO
 
@@ -215,7 +214,7 @@ chocolateboy <chocolate@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2017 by chocolateboy
+Copyright (C) 2010-2018 by chocolateboy
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

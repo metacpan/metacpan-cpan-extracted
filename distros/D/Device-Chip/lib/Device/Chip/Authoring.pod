@@ -15,6 +15,16 @@ a I<Maxim> I<MAX7219> LED driver would be called:
 
    package Device::Chip::MAX7219;
 
+If the driver is suitable for a range of different chips, as is often the case
+with closely-related parts, a lowercase letter C<x> can be used in the package
+name to suggest this variation, as for example:
+
+   package Device::Chip::TSL256x;
+
+which can drive both the C<TSL2560> and C<TSL2561> variants. If this is the
+case the documentation should name all the individual variants directly, in
+order to make it show up properly on keyword searches and the like.
+
 The L<Device::Class> package provides a base class that such a specific
 implementation class could use as a superclass, but it is not required to.
 The important detail is that it provides the interface described by the main
@@ -66,3 +76,93 @@ instance implementing the companion interface, L<Device::Chip::Adapter>.
 
 Returns the adapter protocol module that the chip driver code will use to
 actually communicate with the chip.
+
+=head1 SUGGESTED METHODS
+
+The following method ideas are suggestions for what the API of a chip driver
+module should look like. While circumstances and specific details will of
+course differ from chip to chip, by following these general conventions where
+possible a greater level of consistency between drivers can be obtained. This
+makes it easier for users to learn and understand the features offered by a
+new driver, as well as to modify code to switch between them as required for
+different use-cases.
+
+=head2 read_config
+
+  $config = $chip->read_config->get
+
+Most chips this module is applicable to will contain some amount of
+configuration, stored inside the chip, which is accessible over its interface.
+This L<Future>-returning method should return a C<HASH> reference whose keys
+map to values containing this configuration.
+
+Keys should be named to match the names used in the manufacturer's datasheet
+where possible. Simple boolean values can be left as they are, but more
+complex values such as enumerated integer fields ought ideally to be
+converted, perhaps into strings, to make their values more self-explanatory.
+
+This method should only concern itself with those values of the chip that are
+true configuration; that is, values which will not spontaneously change as a
+result of some process internal to the chip. The user program ought to be able
+to rely on these values not changing once set. As a result, this method may
+cache its results, with help from the L</change_config> method.
+
+In order to easily parse and convert the values, a driver module may find
+L<Data::Bitfield> convenient for implementing this.
+
+=head2 change_config
+
+  $chip->change_config( %changes )->get
+
+This L<Future>-returning method should be provided in conjunction with
+L</read_config>, to allow the user to make changes to the chip's
+configuration. It should take as arguments, a list of name-value pairs
+containing the changes to make. Each name-value pair should correspond to an
+element that the C<read_config> method would have yielded.
+
+This method should work by modifying the configuration of the chip taking into
+account the values provided by the caller, along with the existing
+configuration (as would be returned by C<read_config>). It is called
+C<change_...> rather than C<write_...> because it should preserve the existing
+values of any other configuration settings not given as arguments.
+
+If C<read_config> uses a cache then this method should make sure to keep it
+updated.
+
+=head2 read_<register> and write_<register>
+
+  $value = $chip->read_...->get
+  $chip->write_...( $value )->get
+
+If there is other register-like storage accessible on the chip that for some
+reason would not be suitable for or considered as configuration (such as live
+updated values from sensor readings or similar), then access to these should
+instead be provided by individually named L<Future>-returning methods.
+
+A driver module would only need to provide either reading or writing method if
+only one direction of transfer was available on the chip. Typically sensor
+output registers are not writable, and sometimes chips provide register-like
+storage in which drivers can write command instructions, but which cannot be
+read. Or it may be the case that the chip can provide both reading and
+writing, but values can be internally altered by some process; for example
+interrupt flags. User code should not expect to read the same value as was
+written, and the driver should not attempt to cache these.
+
+Documentation for these methods should make it clear what sort of values are
+being returned or passed. Specifically, whether they are raw binary values
+directly mapping to the value on the chip, or whether some amount of
+conversion has taken place.
+
+A driver may consider providing two sets of methods here. The first set
+operating on a fairly low level directly in raw binary values, and a second
+set that converts these values into some more abstracted value, perhaps taking
+into account the current configuration of the chip.
+
+For example, an ADC with a switchable gain or reference voltage might provide
+a raw integer value directly with one method, and a second method to convert
+that value into an actual voltage. The latter should be named to suggest the
+units it returns, for example:
+
+  $intvalue = $adcchip->read_adc->get
+
+  $voltage = $adcchip->read_adc_voltage->get

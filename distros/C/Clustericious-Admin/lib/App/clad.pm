@@ -17,8 +17,8 @@ use Clustericious::Admin::Dump qw( perl_dump );
 use File::chdir;
 use Path::Class ();
 
-# ABSTRACT: Parallel SSH client
-our $VERSION = '1.10'; # VERSION
+# ABSTRACT: (Deprecated) Parallel SSH client
+our $VERSION = '1.11'; # VERSION
 
 
 sub _local_default ($$)
@@ -539,17 +539,20 @@ __END__
 
 =head1 NAME
 
-App::clad - Parallel SSH client
+App::clad - (Deprecated) Parallel SSH client
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =head1 SYNOPSIS
 
  % perldoc clad
 
 =head1 DESCRIPTION
+
+B<NOTE>: This module has been deprecated, and may be removed on or after 31 December 2018.
+Please see L<https://github.com/clustericious/Clustericious/issues/46>.
 
 This module provides the implementation for the L<clad> command.  See 
 the L<clad> command for the public interface.

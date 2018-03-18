@@ -18,7 +18,7 @@ use HiPi::RaspberryPi;
 
 use constant hipi_export_constants();
 
-our $VERSION ='0.68';
+our $VERSION ='0.69';
 
 our @EXPORT_OK = hipi_export_ok();
 our %EXPORT_TAGS = hipi_export_tags();

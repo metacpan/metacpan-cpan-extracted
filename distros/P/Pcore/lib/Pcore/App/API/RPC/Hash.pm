@@ -21,7 +21,7 @@ sub API_create_hash ( $self, $cb, $str ) {
 }
 
 sub API_verify_hash ( $self, $cb, $str, $hash ) {
-    $cb->( 200, match => Crypt::Argon2::argon2i_verify( $hash, $str ) ? 1 : 0 );
+    $cb->( 200, match => eval { Crypt::Argon2::argon2i_verify( $hash, $str ) } ? 1 : 0 );
 
     return;
 }

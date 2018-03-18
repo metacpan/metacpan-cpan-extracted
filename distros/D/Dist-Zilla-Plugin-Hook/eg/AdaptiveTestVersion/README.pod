@@ -1,3 +1,5 @@
+=encoding UTF-8
+
 =head2 C<Test::Version> adaptive strictness
 
 C<Test::Version> is a great plugin. It creates a test which checks modules in distribution: every

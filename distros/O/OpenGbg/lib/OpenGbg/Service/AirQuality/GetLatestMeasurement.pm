@@ -6,7 +6,7 @@ package OpenGbg::Service::AirQuality::GetLatestMeasurement;
 
 # ABSTRACT: Get the latest air quality measurement
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1402';
+our $VERSION = '0.1403';
 
 use XML::Rabbit::Root;
 use Types::Standard qw/Bool Str/;
@@ -112,7 +112,7 @@ OpenGbg::Service::AirQuality::GetLatestMeasurement - Get the latest air quality 
 
 =head1 VERSION
 
-Version 0.1402, released 2016-08-12.
+Version 0.1403, released 2018-03-14.
 
 =head1 SYNOPSIS
 

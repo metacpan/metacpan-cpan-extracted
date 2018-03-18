@@ -13,7 +13,7 @@ sub setup {
 		},
 		db => {
 			master => {
-				dsn      => 'dbi:Pg:dbname=<APP_NAME>; hostname=localhost; port=5432',
+				dsn      => 'dbi:Pg:dbname=<APP_NAME>; host=localhost; port=5432',
 				username => 'www',
 				password => '',
 				opts     => { pg_enable_utf8 => 1 },

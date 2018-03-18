@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 =encoding utf-8
 
@@ -14,7 +14,7 @@ RT::Extension::ReportSpam - mark tickets as spam with one click
 
 =head1 DESCRIPTION
 
-A simple extension that works with RT 4.0 and 4.2 which allows users
+A simple extension that works with RT 4.2 and 4.4 which allows users
 to report a ticket as a spam message.
 
 =head1 INSTALLATION
@@ -31,15 +31,7 @@ May need root permissions
 
 =item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
 
-If you are using RT 4.2 or greater, add this line:
-
     Plugin('RT::Extension::ReportSpam');
-
-For RT 4.0, add this line:
-
-    Set(@Plugins, qw(RT::Extension::ReportSpam));
-
-or add C<RT::Extension::ReportSpam> to your existing C<@Plugins> line.
 
 You may also want to set the C<$SpamAutoDeleteThreshold> config option to the
 number of spam reports required before the system will automatically delete the

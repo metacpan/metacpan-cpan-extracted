@@ -14,7 +14,6 @@ my $width      = shift || 800;
 my $height     = shift || 400;
 
 my $opinion = Lingua::EN::Opinion->new( file => $input_file );
-
 $opinion->analyze();
 
 my $averaged = $cma ? [ central_moving_averages( $param, $opinion->scores ) ]
@@ -22,19 +21,23 @@ my $averaged = $cma ? [ central_moving_averages( $param, $opinion->scores ) ]
 
 my @data = ( 
     [ 1 .. @$averaged ],
+    [ (0) x @$averaged ],
     $averaged,
 );
 
 my $graph = GD::Graph::lines->new( $width, $height );
 
 $graph->set( 
-    x_label     => 'Sentence',
-    y_label     => 'Negative/Positive',
-    title       => 'Emotion Over Time',
-    transparent => 0,
-    dclrs       => [qw( black )],
-    y_max_value => max( @$averaged ),
-    y_min_value => min( @$averaged ),
+    x_label       => 'Sentence',
+    y_label       => 'Negative/Positive',
+    title         => 'Emotion Over Time',
+    transparent   => 0,
+    dclrs         => [qw( green black )],
+    y_max_value   => max( @$averaged ),
+    y_min_value   => min( @$averaged ),
+    x_min_value   => 0,
+    x_max_value   => scalar(@$averaged),
+    x_tick_number => scalar(@$averaged) / 10,
 );
 
 my $gd = $graph->plot(\@data);

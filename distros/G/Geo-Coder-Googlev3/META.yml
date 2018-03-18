@@ -22,6 +22,7 @@ requires:
   JSON::XS: 0
   LWP::UserAgent: 0
   URI: 0
+  URI::QueryParam: 0
 resources:
   repository: git://github.com/eserte/Geo-Coder-Googlev3.git
-version: 0.16
+version: 0.17

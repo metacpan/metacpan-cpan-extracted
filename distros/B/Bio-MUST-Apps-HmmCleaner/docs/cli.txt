@@ -1,0 +1,56 @@
+USAGE
+    HmmCleaner.pl <infiles> [options]
+
+REQUIRED ARGUMENTS
+    <infiles>
+        list of alignment file to check with HmmCleaner
+
+OPTIONS
+    -costs <c1> <c2> <c3> <c4>
+        Cost parameters that defines the low similarity segments detected by
+        HmmCleaner. Default values are -0.15, -0.08, 0.15, 0.45 Users can
+        change each value but they have to be in increasing order. c1 < c2 <
+        0 < c3 < c4 Predefine value are also available with --large and
+        --specificity options but user defined costs will be prioritary if
+        present.
+
+    --changeID
+        Determine if output will have defline with generic suffix
+        (_hmmcleaned)
+
+    --noX
+        Convert X characters to gaps that will not be taken into account by
+        HmmCleaner.
+
+    -profile=<profile>
+        Determine how the profile will be create complete or leave-one-out
+        (default: complete) leave-one-out = without the analyzed sequence
+        (new profile each time) complete = all sequences (same profile for
+        each sequence) First case is more sensitive but need more ressources
+        (hence more time)
+
+    --large
+        Load predifined cost parameters optimized for MSA with at least 50
+        sequences. Can be use with --specificity option. User defined costs
+        will be prioritary if present.
+
+    --specificity
+        Load predifined cost parameters optimized to give more weigth on
+        specificity. Can be use with --large option. User defined costs will
+        be prioritary if present.
+
+    --log_only
+        Only outputs list of segments removed.
+
+    --ali
+        Outputs result file(s) in ali MUST format.
+
+    -v[erbosity]=<level>
+        Verbosity level for logging to STDERR [default: 0]. Available levels
+        range from 0 to 5.
+
+    --version
+    --usage
+    --help
+    --man
+        Print the usual program information

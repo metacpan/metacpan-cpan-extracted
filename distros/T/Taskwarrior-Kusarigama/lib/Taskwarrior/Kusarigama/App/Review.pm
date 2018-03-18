@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::App::Review;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: interactive review of unprioritized tasks
-$Taskwarrior::Kusarigama::App::Review::VERSION = '0.8.0';
+$Taskwarrior::Kusarigama::App::Review::VERSION = '0.9.0';
 
 use 5.20.0;
 
@@ -244,7 +244,7 @@ Taskwarrior::Kusarigama::App::Review - interactive review of unprioritized tasks
 
 =head1 VERSION
 
-version 0.8.0
+version 0.9.0
 
 =head1 SYNOPSIS
 

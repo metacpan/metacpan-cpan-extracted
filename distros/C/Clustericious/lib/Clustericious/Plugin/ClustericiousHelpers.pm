@@ -8,7 +8,7 @@ use base qw( Mojolicious::Plugin );
 use Mojo::ByteStream qw( b );
 
 # ABSTRACT: Helpers for Clustericious
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.29'; # VERSION
 
 
 sub register
@@ -52,7 +52,7 @@ Clustericious::Plugin::ClustericiousHelpers - Helpers for Clustericious
 
 =head1 VERSION
 
-version 1.27
+version 1.29
 
 =head1 DESCRIPTION
 

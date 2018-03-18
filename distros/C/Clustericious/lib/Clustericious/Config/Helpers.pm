@@ -11,7 +11,7 @@ use JSON::MaybeXS qw( encode_json );
 use Clustericious::Config;
 
 # ABSTRACT: Helpers for clustericious config files.
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.29'; # VERSION
 
 
 our @mergeStack;
@@ -177,7 +177,7 @@ Clustericious::Config::Helpers - Helpers for clustericious config files.
 
 =head1 VERSION
 
-version 1.27
+version 1.29
 
 =head1 SYNOPSIS
 

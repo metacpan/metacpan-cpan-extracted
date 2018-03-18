@@ -1,5 +1,24 @@
 Revision history for Perl extension App::Wax.
 
+2.1.0 Thu 15 Mar 23:18:36 2018
+
+    - update metadata to reflect updated dependencies in the build file
+    - minor doc tweaks/fixes
+
+2.0.0 Thu 15 Mar 15:50:25 2018
+
+    - breaking changes:
+        - `resolve_temp` now returns a ($filename, $error) pair rather than
+          just the filename
+        - `render` has been renamed `dump_command`
+        - `lwp_user_agent` has been removed
+        - `keep` is now read-only
+        - some error (exit) codes have changed
+    - improve extension inference: common double-barrel extensions such as
+      tar.gz and tar.bz2 are now detected
+    - fix -u/--user-agent option
+    - misc doc tweaks/fixes
+
 1.1.1 Tue 6 Jun 22:42:39 2017
 
    - perl 5.26 compatibility fix: add '.' to @INC to load inc::Module::Install

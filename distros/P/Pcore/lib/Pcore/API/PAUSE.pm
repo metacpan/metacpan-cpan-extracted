@@ -102,17 +102,18 @@ sub clean ( $self, @args ) {
                     SUBMIT_pause99_delete_files_delete => 'Delete',
                 ];
 
-                my $do_request;
+                my $releases_to_remove;
 
                 for my $release ( keys $releases->%* ) {
                     my $versions = [ map {"$_"} reverse sort map { version->new($_) } keys $releases->{$release}->%* ];
 
+                    # keep last releases
                     splice $versions->@*, 0, $args{keep}, ();
 
                     if ( $versions->@* ) {
-                        $do_request = 1;
-
                         for my $version ( $versions->@* ) {
+                            $releases_to_remove->{"$release-v$version"} = undef;
+
                             push $params->@*, pause99_delete_files_FILE => "$release-v$version.tar.gz";
                             push $params->@*, pause99_delete_files_FILE => "$release-v$version.meta";
                             push $params->@*, pause99_delete_files_FILE => "$release-v$version.readme";
@@ -120,7 +121,7 @@ sub clean ( $self, @args ) {
                     }
                 }
 
-                if ( !$do_request ) {
+                if ( !$releases_to_remove ) {
                     $on_finish->( result [ 200, 'Nothing to do' ] );
                 }
                 else {
@@ -132,7 +133,7 @@ sub clean ( $self, @args ) {
                         },
                         body => P->data->to_uri($params),
                         sub ($res) {
-                            $on_finish->( result [ $res->status, $res->reason ] );
+                            $on_finish->( result [ $res->status, $res->reason ], [ sort keys $releases_to_remove->%* ] );
 
                             return;
                         }
@@ -172,7 +173,7 @@ sub _pack_multipart ( $self, $body, $boundary, $name, $content, $filename = unde
 ## |======+======================+================================================================================================================|
 ## |    3 | 96                   | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 150                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 151                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

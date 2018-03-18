@@ -1,5 +1,11 @@
 Revision history for Perl extension Email::Address::XS.
 
+1.03  Thu Mar 15 21:55:30 2018
+	- update dovecot parser from dovecot version 2.3.0.1
+	- fix reading from uninitialized memory when formatting invalid address without user or host part
+	- fix formatting email address which user part starts with null byte
+	- do not generate invalid email addresses by format functions, rather return empty string
+
 1.02  Sat Feb 03 13:41:38 2018
 	- add support for parsing and generating addresses with nul character
 	- fix function compose_address when both user and host contains non-ASCII 8bit characters

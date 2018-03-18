@@ -6,9 +6,12 @@ use Try::Tiny;
 use Log::Any '$log';
 use Log::Any::Adapter 'TAP';
 use Data::TableReader::Decoder::CSV;
- 
+
+my $csvmod;
 plan skip_all => 'Need a CSV parser for this test'
-	unless try { Data::TableReader::Decoder::CSV->default_csv_module };
+	unless try { $csvmod= Data::TableReader::Decoder::CSV->default_csv_module };
+note "CSV decoder is ".$csvmod." version ".$csvmod->VERSION;
+
 my $log_fn= sub { $log->can($_[0])->($log, $_[1]) };
 
 sub test_basic {

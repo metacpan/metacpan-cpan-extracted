@@ -68,6 +68,7 @@ t/bin/nddiff.d/term_colors.exp
 t/bin/nddiff.d/term_full_headers.exp
 t/bin/nddiff.d/term_grep_1.exp
 t/bin/nddiff.d/term_grep_2.exp
+t/bin/nddiff.d/term_grep_absent_part.exp
 t/bin/nddiff.d/term_grep_utf8_path.exp
 t/bin/nddiff.d/term_hash.exp
 t/bin/nddiff.d/term_nopretty.exp
@@ -76,6 +77,7 @@ t/bin/nddiff.d/term_show.exp
 t/bin/nddiff.d/term_show.json
 t/bin/nddiff.d/term_show_brief.exp
 t/bin/nddiff.d/term_show_brief.json
+t/bin/nddiff.d/term_show_invalid.json
 t/bin/nddiff.d/term_subkey_AR.exp
 t/bin/nddiff.d/term_text.exp
 t/bin/nddiff.d/term_text_AR_0.exp

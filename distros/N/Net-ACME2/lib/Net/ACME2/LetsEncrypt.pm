@@ -19,6 +19,7 @@ See L<Net::ACME2> for usage examples.
 
 use constant {
     _STAGING_SERVER    => 'acme-staging-v02.api.letsencrypt.org',
+    _PRODUCTION_SERVER => 'acme-v02.api.letsencrypt.org',
 };
 
 use constant {
@@ -27,6 +28,6 @@ use constant {
     #JWS_FORMAT => 'compact',   #v1 supported this?
 };
 
-*HOST = *_STAGING_SERVER;
+*HOST = *_PRODUCTION_SERVER;
 
 1;

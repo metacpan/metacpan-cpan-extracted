@@ -1,4 +1,4 @@
-package Pcore::API::Majestic v0.12.0;
+package Pcore::API::Majestic v0.12.1;
 
 use Pcore -dist, -class, -const, -result, -export => { CONST => [qw[$MAJESTIC_INDEX_FRESH $MAJESTIC_INDEX_HISTORIC]] };
 use IO::Uncompress::Unzip qw[];
@@ -171,79 +171,77 @@ sub _request ( $self, $url_params, $cb ) {
 sub bulk_check ( $self, $domains, $cb ) {
 
     # login
-    $self->_login(
-        sub ($res) {
-            if ( !$res ) {
-                $cb->($res);
-
-                return;
-            }
-
-            my $cookies = $res->{data};
-
-            my $job_id = P->uuid->str;
-
-            my $body = qq[-----------------------------3733385012218\r\nContent-Disposition: form-data; name=\"file\"; filename="$job_id"\r\nContent-Type: text/plain\r\n\r\n@{[ join( $LF, $domains->@*) . $LF ]}\r\n-----------------------------3733385012218\r\nContent-Disposition: form-data; name="ajaxLoadUrl"\r\n\r\n/reports/downloads/confirm-file-upload/backlinksAjax\r\n-----------------------------3733385012218\r\nContent-Disposition: form-data; name="fileType"\r\n\r\nSingleColumn\r\n-----------------------------3733385012218\r\nContent-Disposition: form-data; name="IndexDataSource"\r\n\r\nF\r\n-----------------------------3733385012218--\r\n];
-
-            # send domains
-            P->http->post(
-                'https://majestic.com/reports/bulk-backlinks-upload',
-                useragent => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0',
-                cookies   => $cookies,
-                headers   => {
-                    CONTENT_TYPE => 'multipart/form-data; boundary=---------------------------3733385012218',
-                    REFERER      => 'https://majestic.com/reports/bulk-backlink-checker',
-                },
-                body      => $body,
-                on_finish => sub ($res) {
-                    if ( !$res ) {
-                        $cb->( result [ 500, 'Send domains error' ] );
-                    }
-                    elsif ( $res->decoded_body->$* =~ /fileupload_uid=([[:xdigit:]-]+)/sm ) {
-                        my $uid = $1;
-
-                        my $params = {
-                            fileupload_uid       => $uid,
-                            addFileToRecrawlList => 'false',
-                            index_data_source    => 'Fresh',
-                            tool                 => 'BacklinkChecker',
-                        };
-
-                        P->http->get(
-                            'https://majestic.com/reports/downloads/accept-file-upload-charges?' . P->data->to_uri($params),
-                            useragent => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0',
-                            cookies   => $cookies,
-                            headers   => {                                                                                   #
-                                REFERER => "https://majestic.com/reports/downloads/confirm-file-upload?tool=BacklinkChecker&fileupload_uid=$uid",
-                            },
-                            on_finish => sub ($res) {
-                                if ( !$res ) {
-                                    $cb->( result [ $res->status, $res->reason ] );
-                                }
-                                else {
-                                    if ( $res->decoded_body->$* =~ /$uid/sm ) {
-                                        $cb->( result 200, $job_id );
-                                    }
-                                    else {
-                                        $cb->( result [ 500, 'Unknown confirmation error' ] );
-                                    }
-                                }
-
-                                return;
-                            }
-                        );
-                    }
-                    else {
-                        $cb->( result [ 500, 'Send domains error - no job UID returned' ] );
-                    }
-
-                    return;
-                }
-            );
+    $self->_login( sub ($res) {
+        if ( !$res ) {
+            $cb->($res);
 
             return;
         }
-    );
+
+        my $cookies = $res->{data};
+
+        my $job_id = P->uuid->str;
+
+        my $body = qq[-----------------------------3733385012218\r\nContent-Disposition: form-data; name=\"file\"; filename="$job_id"\r\nContent-Type: text/plain\r\n\r\n@{[ join( $LF, $domains->@*) . $LF ]}\r\n-----------------------------3733385012218\r\nContent-Disposition: form-data; name="ajaxLoadUrl"\r\n\r\n/reports/downloads/confirm-file-upload/backlinksAjax\r\n-----------------------------3733385012218\r\nContent-Disposition: form-data; name="fileType"\r\n\r\nSingleColumn\r\n-----------------------------3733385012218\r\nContent-Disposition: form-data; name="IndexDataSource"\r\n\r\nF\r\n-----------------------------3733385012218--\r\n];
+
+        # send domains
+        P->http->post(
+            'https://majestic.com/reports/bulk-backlinks-upload',
+            useragent => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0',
+            cookies   => $cookies,
+            headers   => {
+                CONTENT_TYPE => 'multipart/form-data; boundary=---------------------------3733385012218',
+                REFERER      => 'https://majestic.com/reports/bulk-backlink-checker',
+            },
+            body      => $body,
+            on_finish => sub ($res) {
+                if ( !$res ) {
+                    $cb->( result [ 500, 'Send domains error' ] );
+                }
+                elsif ( $res->decoded_body->$* =~ /fileupload_uid=([[:xdigit:]-]+)/sm ) {
+                    my $uid = $1;
+
+                    my $params = {
+                        fileupload_uid       => $uid,
+                        addFileToRecrawlList => 'false',
+                        index_data_source    => 'Fresh',
+                        tool                 => 'BacklinkChecker',
+                    };
+
+                    P->http->get(
+                        'https://majestic.com/reports/downloads/accept-file-upload-charges?' . P->data->to_uri($params),
+                        useragent => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0',
+                        cookies   => $cookies,
+                        headers   => {                                                                                   #
+                            REFERER => "https://majestic.com/reports/downloads/confirm-file-upload?tool=BacklinkChecker&fileupload_uid=$uid",
+                        },
+                        on_finish => sub ($res) {
+                            if ( !$res ) {
+                                $cb->( result [ $res->status, $res->reason ] );
+                            }
+                            else {
+                                if ( $res->decoded_body->$* =~ /$uid/sm ) {
+                                    $cb->( result 200, $job_id );
+                                }
+                                else {
+                                    $cb->( result [ 500, 'Unknown confirmation error' ] );
+                                }
+                            }
+
+                            return;
+                        }
+                    );
+                }
+                else {
+                    $cb->( result [ 500, 'Send domains error - no job UID returned' ] );
+                }
+
+                return;
+            }
+        );
+
+        return;
+    } );
 
     return;
 }
@@ -251,77 +249,75 @@ sub bulk_check ( $self, $domains, $cb ) {
 sub bulk_check_result ( $self, $id, $mapping, $cb ) {
 
     # login
-    $self->_login(
-        sub ($res) {
-            if ( !$res ) {
-                $cb->($res);
+    $self->_login( sub ($res) {
+        if ( !$res ) {
+            $cb->($res);
 
-                return;
-            }
+            return;
+        }
 
-            my $cookies = $res->{data};
+        my $cookies = $res->{data};
 
-            P->http->get(
-                'https://majestic.com/reports/downloads',
-                useragent => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0',
-                cookies   => $cookies,
-                on_finish => sub ($res) {
-                    if ( !$res ) {
-                        $cb->( result [ 500, 'Get jobs list error' ] );
-
-                        return;
-                    }
-                    else {
-                        if ( $res->decoded_body->$* =~ /\Q$id\E/sm ) {
-                            if ( $res->decoded_body->$* =~ /<a href="\/reports\/downloads\/([[:xdigit:]-]+)">\s+\Q$id\E/sm ) {
-                                my $file_id = $1;
-
-                                P->http->get(
-                                    "https://majestic.com/reports/downloads/$file_id",
-                                    useragent => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0',
-                                    cookies   => $cookies,
-                                    on_finish => sub ($res) {
-                                        if ( !$res ) {
-                                            $cb->( result [ 500, 'Job download error' ] );
-                                        }
-                                        else {
-                                            IO::Uncompress::Unzip::unzip( $res->body, \my $data );
-
-                                            my @lines = split "\n", $data;
-
-                                            my $header = [ map { $mapping->{$_} || '_' } map { s/"//smg; $_ } split /,/sm, shift @lines ];    ## no critic qw[ControlStructures::ProhibitMutatingListFunctions]
-
-                                            my $items;
-
-                                            for my $line (@lines) {
-                                                my $item->@{ $header->@* } = map { s/"//smg; $_ } split /,/sm, $line;                         ## no critic qw[ControlStructures::ProhibitMutatingListFunctions]
-
-                                                delete $item->{_};
-
-                                                push $items->@*, $item;
-                                            }
-
-                                            $cb->( result 200, $items );
-                                        }
-
-                                        return;
-                                    }
-                                );
-                            }
-                            else {
-                                $cb->( result [ 400, 'Job not ready' ] );
-                            }
-                        }
-                        else {
-                            $cb->( result [ 404, 'Job not found' ] );
-                        }
-                    }
+        P->http->get(
+            'https://majestic.com/reports/downloads',
+            useragent => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0',
+            cookies   => $cookies,
+            on_finish => sub ($res) {
+                if ( !$res ) {
+                    $cb->( result [ 500, 'Get jobs list error' ] );
 
                     return;
                 }
-            );
-        }
-    );
+                else {
+                    if ( $res->decoded_body->$* =~ /\Q$id\E/sm ) {
+                        if ( $res->decoded_body->$* =~ /<a href="\/reports\/downloads\/([[:xdigit:]-]+)">\s+\Q$id\E/sm ) {
+                            my $file_id = $1;
+
+                            P->http->get(
+                                "https://majestic.com/reports/downloads/$file_id",
+                                useragent => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0',
+                                cookies   => $cookies,
+                                on_finish => sub ($res) {
+                                    if ( !$res ) {
+                                        $cb->( result [ 500, 'Job download error' ] );
+                                    }
+                                    else {
+                                        IO::Uncompress::Unzip::unzip( $res->body, \my $data );
+
+                                        my @lines = split "\n", $data;
+
+                                        my $header = [ map { $mapping->{$_} || '_' } map { s/"//smg; $_ } split /,/sm, shift @lines ];    ## no critic qw[ControlStructures::ProhibitMutatingListFunctions]
+
+                                        my $items;
+
+                                        for my $line (@lines) {
+                                            my $item->@{ $header->@* } = map { s/"//smg; $_ } split /,/sm, $line;                         ## no critic qw[ControlStructures::ProhibitMutatingListFunctions]
+
+                                            delete $item->{_};
+
+                                            push $items->@*, $item;
+                                        }
+
+                                        $cb->( result 200, $items );
+                                    }
+
+                                    return;
+                                }
+                            );
+                        }
+                        else {
+                            $cb->( result [ 400, 'Job not ready' ] );
+                        }
+                    }
+                    else {
+                        $cb->( result [ 404, 'Job not found' ] );
+                    }
+                }
+
+                return;
+            }
+        );
+    } );
 
     return;
 }
@@ -339,7 +335,7 @@ sub _login ( $self, $cb ) {
 
         state $on_finish = sub ( $self, $res ) {
             while ( my $cb = shift $self->{_login_requests}->@* ) {
-                AE::postpone { $cb->($res) };
+                $cb->($res);
             }
 
             return;
@@ -387,9 +383,9 @@ sub _login ( $self, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 292, 297             | BuiltinFunctions::ProhibitComplexMappings - Map blocks should have a single statement                          |
+## |    3 | 289, 294             | BuiltinFunctions::ProhibitComplexMappings - Map blocks should have a single statement                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 290                  | BuiltinFunctions::ProhibitStringySplit - String delimiter used with "split"                                    |
+## |    2 | 287                  | BuiltinFunctions::ProhibitStringySplit - String delimiter used with "split"                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

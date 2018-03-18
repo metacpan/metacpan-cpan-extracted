@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::ProjectAlias;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: turn @foo into project:foo
-$Taskwarrior::Kusarigama::Plugin::ProjectAlias::VERSION = '0.8.0';
+$Taskwarrior::Kusarigama::Plugin::ProjectAlias::VERSION = '0.9.0';
 
 use strict;
 use warnings;
@@ -18,11 +18,11 @@ sub on_add {
 
     my $desc = $task->{description};
 
-    $desc =~ s/(?:^|\s)\@(\w+)// or return;
+    $desc =~ s/(^|\s)\@(\w+)\s*/$1/ or return;
+
+    $task->{project} = $2;
 
     $task->{description} = $desc;
-
-    $task->{project} = $1;
 }
 
 sub on_modify { 
@@ -44,7 +44,7 @@ Taskwarrior::Kusarigama::Plugin::ProjectAlias - turn @foo into project:foo
 
 =head1 VERSION
 
-version 0.8.0
+version 0.9.0
 
 =head1 SYNOPSIS
 

@@ -18,6 +18,7 @@ WriteMakefile(
     MIN_PERL_VERSION => 5.010001,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
+				'File::ShareDir::Install' => 0,
     },
     BUILD_REQUIRES => {
         'Test::More' => 0,
@@ -26,6 +27,7 @@ WriteMakefile(
         'JavaScript::V8'    => 0,
         'File::Slurp'       => 0,
         'File::ShareDir'    => 0,
+        'JSON'              => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'JavaScript-V8-Handlebars-*' },

@@ -1,9 +1,10 @@
-#!/usr/bin/env perl
+#!perl
 # PODNAME: es-search.pl
 # ABSTRACT: Provides a CLI for quick searches of data in ElasticSearch daily indexes
-$|=1;           # Flush STDOUT
 use strict;
 use warnings;
+
+$|=1;           # Flush STDOUT
 
 use App::ElasticSearch::Utilities qw(:all);
 use App::ElasticSearch::Utilities::Query;
@@ -12,10 +13,11 @@ use Carp;
 use CLI::Helpers qw(:all);
 use Getopt::Long qw(:config no_ignore_case no_ignore_case_always);
 use Hash::Flatten qw(flatten);
-use JSON;
+use JSON::MaybeXS qw(:legacy);
 use Pod::Usage;
 use POSIX qw(strftime);
 use Ref::Util qw(is_ref is_arrayref is_hashref);
+use Time::HiRes qw(sleep time);
 use YAML;
 
 #------------------------------------------------------------------------#
@@ -37,7 +39,7 @@ GetOptions(\%OPT, qw(
     no-header
     prefix:s@
     pretty
-    show:s
+    show:s@
     size|n:i
     sort:s
     tail
@@ -74,8 +76,8 @@ pod2usage({-exitval => 1, -sections => 'SYNOPSIS', -msg =>"Unknown option(s): $u
 #--------------------------------------------------------------------------#
 # App Config
 my %CONFIG = (
-    size      => (exists $OPT{size} && $OPT{size} > 0)              ? int($OPT{size})         : 20,
-    format    => (exists $OPT{format} && length $OPT{format})       ? lc $OPT{format}         : 'yaml',
+    size      => (exists $OPT{size}      && $OPT{size} > 0)         ? int($OPT{size})         : 20,
+    format    => (exists $OPT{format}    && length $OPT{format})    ? lc $OPT{format}         : 'yaml',
     timestamp => (exists $OPT{timestamp} && length $OPT{timestamp}) ? $OPT{timestamp}         :
                  defined es_globals('timestamp')                    ? es_globals('timestamp') : '@timestamp',
     summary   => $OPT{top} && ( !$OPT{by} && !$OPT{with} && !$OPT{interval} ),
@@ -101,8 +103,10 @@ debug_var(\%FIELDS);
 
 # Which fields to show
 my @SHOW = ();
-if ( exists $OPT{show} && length $OPT{show} ) {
-    @SHOW = grep { exists $FIELDS{$_} } split /,/, $OPT{show};
+if ( exists $OPT{show} && scalar @{ $OPT{show} } ) {
+    foreach my $args (@{ $OPT{show} }) {
+        push @SHOW, grep { defined && length } split /,/, $args;
+    }
 }
 # How to sort
 my $SORT = [ { $CONFIG{timestamp} => $ORDER } ];
@@ -125,7 +129,7 @@ if( $OPT{fields} ) {
 }
 # Improper Usage
 pod2usage({-exitval=>1, -verbose=>0, -sections=>'SYNOPSIS', -msg=>'No search string specified'})
-    unless keys %{ $q->query->{bool} };
+    unless keys %{ $q->query };
 pod2usage({-exitval=>1, -verbose=>0, -sections=>'SYNOPSIS', -msg=>'Cannot use --tail and --top together'})
     if exists $OPT{tail} && $OPT{top};
 pod2usage({-exitval=>1, -verbose=>0, -sections=>'SYNOPSIS', -msg=>'Cannot use --tail and --sort together'})
@@ -157,7 +161,7 @@ if( exists $OPT{top} ) {
     my $top_field = pop @top;
     my $top_agg   = @top ? shift @top : 'terms';
 
-    my @agg_fields = grep { exists $FIELDS{$_} } map { s/^\s+//; s/\s+$//; $_; } split ',', $top_field;
+    my @agg_fields = grep { exists $FIELDS{$_} } split /\s*,\s*/, $top_field;
     croak(sprintf("Option --top takes a field, found %d fields: %s\n", scalar(@agg_fields),join(',',@agg_fields)))
         unless @agg_fields == 1;
 
@@ -248,7 +252,7 @@ AGES: while( !$DONE && @AGES ) {
     $age = $OPT{tail} ? $AGES[0] : shift @AGES;
 
     # Pause for 200ms if we're tailing
-    select(undef,undef,undef,0.2) if exists $OPT{tail} && $last_hit_ts;
+    sleep(0.2) if exists $OPT{tail} && $last_hit_ts;
 
     my $start=time();
     $last_hit_ts ||= strftime('%Y-%m-%dT%H:%M:%S%z',localtime($start-30));
@@ -505,7 +509,7 @@ sub document_lookdown {
             return document_lookdown($href->{$k},$field);
         }
     }
-    return undef;
+    return;
 }
 
 sub show_fields {
@@ -577,7 +581,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 5.4
+version 5.5
 
 =head1 SYNOPSIS
 
@@ -660,8 +664,8 @@ Examples might include:
     es-search.pl program:"apache" AND crit:500 --show file,out_bytes
 
     # Search for ip subnet client IP 1.2.3.0 to 1.2.3.255 or 1.2.0.0 to 1.2.255.255
-    es-search.pl --size=100 dst:"admin.example.com" AND src_ip:"1.2.3.*"
-    es-search.pl --size=100 dst:"admin.example.com" AND src_ip:"1.2.*"
+    es-search.pl --size=100 dst:"admin.example.com" AND src_ip:"1.2.3.0/24"
+    es-search.pl --size=100 dst:"admin.example.com" AND src_ip:"1.2.0/16"
 
     # Show the top src_ip for 'www.example.com'
     es-search.pl --base access dst:www.example.com --top src_ip

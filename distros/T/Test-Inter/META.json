@@ -1,27 +1,33 @@
 {
    "abstract" : "framework for more readable interactive test scripts",
    "author" : [
-      "Sullivan Beck <sbeck@cpan.org>"
+      "Sullivan Beck (sbeck@cpan.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-Inter",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Module::Build" : "0.21"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.21"
+            "ExtUtils::MakeMaker" : "6.30"
          }
       },
       "runtime" : {
@@ -33,6 +39,7 @@
       },
       "test" : {
          "requires" : {
+            "Cwd" : "0",
             "Test::More" : "0"
          }
       }
@@ -40,17 +47,17 @@
    "provides" : {
       "Test::Inter" : {
          "file" : "lib/Test/Inter.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
-         "url" : "https://github.com/SBECK-github/Test-Inter"
+         "type" : "git",
+         "url" : "git://github.com/SBECK-github/Test-Inter.git",
+         "web" : "https://github.com/SBECK-github/Test-Inter"
       }
    },
-   "version" : "1.06"
+   "version" : "1.07",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

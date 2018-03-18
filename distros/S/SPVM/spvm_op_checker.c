@@ -29,6 +29,7 @@
 #include "spvm_our.h"
 #include "spvm_package_var.h"
 #include "spvm_undef.h"
+#include "spvm_block.h"
 
 SPVM_OP* SPVM_OP_CHECKEKR_new_op_var_tmp(SPVM_COMPILER* compiler, SPVM_TYPE* type, SPVM_LIST* op_mys, const char* file, int32_t line) {
 
@@ -46,9 +47,6 @@ SPVM_OP* SPVM_OP_CHECKEKR_new_op_var_tmp(SPVM_COMPILER* compiler, SPVM_TYPE* typ
   // Set type to my var
   my->op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, file, line);
   my->op_type->uv.type = type;
-
-  // Index
-  my->index = op_mys->length;
 
   // op my
   SPVM_OP* op_my = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_MY, file, line);
@@ -325,10 +323,10 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
               *block_my_base_ptr = block_my_base;
               SPVM_LIST_push(block_my_base_stack, block_my_base_ptr);
               
-              if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_LOOP) {
+              if (op_cur->uv.block->id == SPVM_BLOCK_C_ID_LOOP_STATEMENTS) {
                 loop_block_stack_length++;
               }
-              else if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_EVAL) {
+              else if (op_cur->uv.block->id == SPVM_BLOCK_C_ID_EVAL) {
                 // Eval block max length
                 eval_block_stack_length++;
                 if (eval_block_stack_length > sub->eval_stack_max_length) {
@@ -1422,17 +1420,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   break;
                 }
                 case SPVM_OP_C_ID_LOOP: {
-                  // Exchange condition and loop block to move condition to end of block
-                  SPVM_OP* op_block_outer = op_cur->first;
-                  
-                  SPVM_OP* op_condition = op_block_outer->first->sibparent;
-                  SPVM_OP* op_block_loop = op_block_outer->last;
-                  
-                  SPVM_OP* op_stab_condition = SPVM_OP_cut_op(compiler, op_condition);
-                  SPVM_OP* op_stab_block_loop = SPVM_OP_cut_op(compiler, op_block_loop);
-                  
-                  SPVM_OP_replace_op(compiler, op_stab_condition, op_block_loop);
-                  SPVM_OP_replace_op(compiler, op_stab_block_loop, op_condition);
                   
                   break;
                 }
@@ -1478,7 +1465,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                     SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_term1);
                     
                     // Empty string
-                    SPVM_OP* op_constant_empty_string = SPVM_OP_new_op_constant_byte_array_string(compiler, "", op_concat_string1->file, op_concat_string1->line);
+                    SPVM_OP* op_constant_empty_string = SPVM_OP_new_op_constant_string(compiler, "", 0, op_concat_string1->file, op_concat_string1->line);
                     SPVM_OP* op_build_constant = SPVM_OP_build_constant(compiler, op_constant_empty_string);
                     
                     SPVM_OP_insert_child(compiler, op_concat_string2, op_concat_string2->last, op_build_constant);
@@ -1520,11 +1507,11 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   }
 
                   // Pop loop block my variable base
-                  if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_LOOP) {
+                  if (op_cur->uv.block->id == SPVM_BLOCK_C_ID_LOOP_STATEMENTS) {
                     loop_block_stack_length--;
                   }
                   // Pop try block my variable base
-                  else if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_EVAL) {
+                  else if (op_cur->uv.block->id == SPVM_BLOCK_C_ID_EVAL) {
                     eval_block_stack_length--;
                   }
                   
@@ -1645,7 +1632,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                     return;
                   }
                   else {
-                    my->index = op_mys->length;
                     SPVM_LIST_push(op_mys, op_cur);
                     SPVM_LIST_push(op_my_stack, op_cur);
                   }
@@ -2016,6 +2002,26 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
 
       assert(sub->file_name);
       
+      // My index
+      {
+        int32_t my_index;
+        for (my_index = 0; my_index < sub->op_mys->length; my_index++) {
+          SPVM_OP* op_my = SPVM_LIST_fetch(sub->op_mys, my_index);
+          SPVM_MY* my = op_my->uv.my;
+          my->index = my_index;
+        }
+      }
+    }
+  }
+  
+
+  // Resolve constant id
+  {
+    int32_t constant_index;
+    for (constant_index = 0; constant_index < compiler->op_constants->length; constant_index++) {
+      SPVM_OP* op_constant = SPVM_LIST_fetch(compiler->op_constants, constant_index);
+      SPVM_CONSTANT* constant = op_constant->uv.constant;
+      constant->id = constant_index;
     }
   }
 }

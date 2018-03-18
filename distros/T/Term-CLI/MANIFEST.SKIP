@@ -4,4 +4,12 @@ dist\.ini
 .bak$
 .old$
 ^Makefile$
+^Build$
 ^MYMETA\.(?:json|yml)$
+^\.git/
+^\.gitignore$
+RELEASING
+^Term-CLI-\d+\.\d/
+^Term-CLI-\d+\.\d+\.tar\.gz$
+pm_to_blib
+^_build/

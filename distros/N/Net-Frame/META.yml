@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: artistic
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,7 +15,7 @@ name: Net-Frame
 provides:
   Net::Frame:
     file: lib/Net/Frame.pm
-    version: '1.17'
+    version: '1.18'
   Net::Frame::Layer:
     file: lib/Net/Frame/Layer.pm
   Net::Frame::Layer::ARP:
@@ -40,9 +40,9 @@ requires:
   Bit::Vector: '0'
   Class::Gomor: '1.00'
   Net::IPv6Addr: '0'
-  Socket: '0'
+  Socket: '2.019'
   perl: v5.6.1
 resources:
   license: http://www.perlfoundation.org/artistic_license_1_0
-version: '1.17'
+version: '1.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

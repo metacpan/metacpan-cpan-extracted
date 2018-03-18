@@ -16,20 +16,20 @@ use Config::IniFiles;
 
 {
     my $conf = Config::IniFiles->new(
-        -file => File::Spec->catfile(File::Spec->curdir(),
-            't', 'case-sensitive.ini'
+        -file => File::Spec->catfile(
+            File::Spec->curdir(), 't', 'case-sensitive.ini'
         ),
         -nocase => 1
     );
 
     # TEST
-    ok (scalar($conf->exists('FOO', 'BAR')),
+    ok(
+        scalar( $conf->exists( 'FOO', 'BAR' ) ),
         "->exists() Handles case well"
     );
 
     # TEST
-    is (scalar($conf->val('FOO', 'BAR')), "goodness",
-        "->val() Handles case well"
-    );
+    is( scalar( $conf->val( 'FOO', 'BAR' ) ),
+        "goodness", "->val() Handles case well" );
 }
 

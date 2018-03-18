@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::App::UsageException;
-$Footprintless::App::UsageException::VERSION = '1.27';
+$Footprintless::App::UsageException::VERSION = '1.28';
 # ABSTRACT: An exception that indicates the invalid usage of a command
 # PODNAME: Footprintless::App::UsageException
 
@@ -62,7 +62,7 @@ Footprintless::App::UsageException - An exception that indicates the invalid usa
 
 =head1 VERSION
 
-version 1.27
+version 1.28
 
 =head1 DESCRIPTION
 

@@ -70,7 +70,7 @@
    "provides" : {
       "SpamcupNG" : {
          "file" : "lib/SpamcupNG.pm",
-         "version" : "0.9"
+         "version" : "1.0"
       }
    },
    "release_status" : "stable",
@@ -85,7 +85,7 @@
          "web" : "https://github.com/glasswalk3r/spamcupNG"
       }
    },
-   "version" : "0.9",
+   "version" : "1.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

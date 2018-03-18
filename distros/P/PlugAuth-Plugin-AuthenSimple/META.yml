@@ -1,5 +1,5 @@
 ---
-abstract: 'AuthenSimple plugin for PlugAuth'
+abstract: '(Deprecated) AuthenSimple plugin for PlugAuth'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
@@ -28,5 +28,7 @@ resources:
   bugtracker: https://github.com/clustericious/PlugAuth-Plugin-AuthenSimple/issues
   homepage: https://metacpan.org/pod/PlugAuth::Plugin::AuthenSimple
   repository: git://github.com/clustericious/PlugAuth-Plugin-AuthenSimple.git
-version: '0.03'
+version: '0.04'
+x_deprecated: 1
 x_serialization_backend: 'YAML::Tiny version 1.70'
+x_use_unsafe_inc: 0

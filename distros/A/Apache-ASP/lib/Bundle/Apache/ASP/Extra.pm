@@ -1,6 +1,6 @@
 package Bundle::Apache::ASP::Extra;
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 1;
 
@@ -36,15 +36,7 @@ Time::HiRes       - Sub second timing of execution with Debug 3 or -3 enabled
 
 HTML::FillInForm  - FormFill functionality which autofills HTML forms from form data
 
-Apache::Filter    - Required for SSI filtering with Apache::SSI
-
 HTML::SimpleParse - Required for SSI filtering with Apache::SSI
-
-Apache::SSI       - Required for full server side includes support ( SSI ) beyond file includes
-
-Tie::TextDir      - Fast file based cache for CacheDB, good for caching large values for things like XSLT and $Response->Include() caching
-
-Bundle::XML       - Required for XML::XSLT support.
 
 XML::XSLT         - Required for XSLT support.  May also use XML::Sablotron and XML::LibXSLT for this, which are not part of this bundle.
 

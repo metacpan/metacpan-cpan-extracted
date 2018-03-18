@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin;
-$Footprintless::Plugin::VERSION = '1.27';
+$Footprintless::Plugin::VERSION = '1.28';
 # ABSTRACT: The base class for footprintless plugins
 # PODNAME: Footprintless::Plugin
 
@@ -37,7 +37,7 @@ Footprintless::Plugin - The base class for footprintless plugins
 
 =head1 VERSION
 
-version 1.27
+version 1.28
 
 =head1 DESCRIPTION
 

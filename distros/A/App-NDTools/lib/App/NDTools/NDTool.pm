@@ -11,7 +11,7 @@ use Getopt::Long qw(GetOptionsFromArray :config bundling);
 use Log::Log4Cli;
 use Struct::Path 0.80 qw(path);
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 sub arg_opts {
     my $self = shift;
@@ -94,6 +94,8 @@ sub new {
     $self->{OPTS} = $self->defaults();
     $self->{ARGV} =
         [ map { decode(locale => "$_", Encode::FB_CROAK) } @_ ? @_ : @ARGV ];
+
+    $self->{TTY} = -t STDOUT;
 
     unless (GetOptionsFromArray ($self->{ARGV}, $self->arg_opts)) {
         $self->usage;

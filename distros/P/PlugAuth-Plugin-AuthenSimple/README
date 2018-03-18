@@ -1,10 +1,11 @@
 NAME
 
-    PlugAuth::Plugin::AuthenSimple - AuthenSimple plugin for PlugAuth
+    PlugAuth::Plugin::AuthenSimple - (Deprecated) AuthenSimple plugin for
+    PlugAuth
 
 VERSION
 
-    version 0.03
+    version 0.04
 
 SYNOPSIS
 
@@ -20,6 +21,10 @@ SYNOPSIS
                pdc: PDC
 
 DESCRIPTION
+
+    NOTE: This module has been deprecated, and may be removed on or after
+    31 December 2018. Please see
+    https://github.com/clustericious/Clustericious/issues/46.
 
     This plugin allows any Authen::Simple implementation to be used as an
     authentication mechanism for PlugAuth. Because Authen::Simple does not

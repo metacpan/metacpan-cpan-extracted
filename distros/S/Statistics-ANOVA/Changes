@@ -1,5 +1,8 @@
 Revision history for Perl extension Statistics::ANOVA.
 
+0.14    2018/03/17
+    - Modified omega_sq_partial_by_ss function so that it does not depend on SS_total; instead, requires count of all observations, ensuring that its returned value agrees with returned value from omega_sq_partial_by_ms.
+
 0.13    2017/02/10
     - add dependency on Readonly.pm in build script
 

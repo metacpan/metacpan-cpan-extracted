@@ -8,7 +8,7 @@
  *
  * Change data removed. See Changes
  *
- * $Id: SSLeay.xs 513 2018-01-03 21:46:53Z mikem-guest $
+ * $Id: SSLeay.xs 518 2018-01-27 20:43:03Z mikem-guest $
  * 
  * The distribution and use of this module are subject to the conditions
  * listed in LICENSE file at the root of the Net-SSLeay
@@ -6608,7 +6608,7 @@ SSL_OCSP_cert2ids(ssl,...)
 		croak("OCSP certid has no length");
 	    XPUSHs(sv_2mortal(newSVpvn((char *)pi, len)));
 
-	    free(pi);
+	    OPENSSL_free(pi);
 	    OCSP_CERTID_free(id);
 	}
 

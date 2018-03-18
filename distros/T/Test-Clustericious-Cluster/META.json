@@ -1,5 +1,5 @@
 {
-   "abstract" : "Test an imaginary beowulf cluster of Clustericious services",
+   "abstract" : "(Deprecated) Test an imaginary beowulf cluster of Clustericious services",
    "author" : [
       "Graham Ollis <plicease@cpan.org>"
    ],
@@ -77,7 +77,9 @@
          "web" : "https://github.com/clustericious/Test-Clustericious-Cluster"
       }
    },
-   "version" : "0.37",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "0.38",
+   "x_deprecated" : 1,
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01",
+   "x_use_unsafe_inc" : 0
 }
 

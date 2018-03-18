@@ -1,5 +1,6 @@
 
 
+
 <html>
 <head>
 <title>Apache::ASP::Cgi</title>
@@ -18,13 +19,9 @@
 -->
 </style>
 
-
 </head>
 <body bgcolor=black link=#063678 alink=#ff5599 vlink=#993399
 marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
-
-
-
 
 <center>
 <table border=0 cellpadding=0 width=99% cellspacing=8>
@@ -235,7 +232,7 @@ marginheight=0 marginwidth=0 leftMargin=0 topMargin=0>
 		<a href=http://perl.apache.org><img src="powered_by_modperl.gif" width="88" height="31" alt="Powered by ModPerl and Apache" border="0"></a>
 		<br>
 		<a href=http://www.perl.com><img src="rectangle_power_perl.gif" width="88" height="31" alt="Powered by Perl" border="0"></a>
-		</center>
+
 
 </center>
 
@@ -377,7 +374,7 @@ to be defined.</font>
 </pre></font>CGI.pm is a very useful module that aids developers in 
 the building of these applications, and Apache::ASP has been made to 
 be compatible with function calls in CGI.pm.  Please see cgi.htm in the 
-./site/eg directory for a sample ASP script written almost entirely in CGI.
+./site/eg directory for a sample ASP script written almost entirely in <a href=cgi.html><font size=-1 face=verdana><b>CGI</b></font></a>.
 <font face="courier new" size=3><pre>
 </pre></font>As of version 0.09, use of CGI.pm for both input and output is seamless
 when working under Apache::ASP.  Thus if you would like to port existing
@@ -388,14 +385,14 @@ web applications.
 <font face="courier new" size=3><pre>
 </pre></font>For more information about CGI.pm, please see the web site
 <font face="courier new" size=3><pre>
-  <a href=http://stein.cshl.org/WWW/software/CGI/>http://stein.cshl.org/WWW/software/CGI/</a>
+  <a href=http://search.cpan.org/dist/CGI/>http://search.cpan.org/dist/CGI/</a>
 </pre></font>
 	
 	<p>
 	<a name=Query%20Object4fef5875></a>
 	<font face=verdana><font class=title size=+0 color=#555555><b>Query Object Initialization</b></font>
 <font face="courier new" size=3><pre>
-</pre></font>You may create a <a href=cgi.html><font size=-1 face=verdana><b>CGI</b></font></a>.pm $query object like so:
+</pre></font>You may create a <a href=http://stein.cshl.org/WWW/software/CGI/cgi_docs.html><font size=-1 face=verdana><b>CGI.pm</b></font></a> $query object like so:
 <font face="courier new" size=3><pre>
 	use CGI;
 	my $query = new CGI;
@@ -409,7 +406,7 @@ routines.</font>
 	<a name=CGI%20headers></a>
 	<font face=verdana><font class=title size=+0 color=#555555><b>CGI headers</b></font>
 <font face="courier new" size=3><pre>
-</pre></font>Not only can you use the <a href=cgi.html><font size=-1 face=verdana><b>CGI</b></font></a>.pm $query-&gt;header() method
+</pre></font>Not only can you use the <a href=http://stein.cshl.org/WWW/software/CGI/cgi_docs.html><font size=-1 face=verdana><b>CGI.pm</b></font></a> $query-&gt;header() method
 to put out headers, but with the CgiHeaders config option
 set to true, you can also print &quot;Header: value\n&quot;, and add 
 similar lines to the top of your script, like:
@@ -462,7 +459,7 @@ name of the file handle.
 on this topic, and <a href=eg/file_upload.asp>./site/eg/file_upload.asp</a> for an example of its use.
 Also, for more details about CGI.pm itself, please see the web site:
 <font face="courier new" size=3><pre>
-    <a href=http://stein.cshl.org/WWW/software/CGI/>http://stein.cshl.org/WWW/software/CGI/</a>
+    <a href=http://search.cpan.org/dist/CGI/>http://search.cpan.org/dist/CGI/</a>
 </pre></font>Occasionally, a newer version of CGI.pm will be released which breaks
 file upload compatibility with Apache::ASP.  If you find this to occur,
 then you might consider downgrading to a version that works.  For example,
@@ -495,14 +492,6 @@ available for querying:
 &nbsp;
 </td>
 
-</tr>
-<tr bgcolor=#063678>
-	<td colspan=3 align=center width=80%>
-	<font face=verdana color=white size=-1>
-	Copyright &copy; 1998-2008,
-	<a href=http://www.chamas.com><font color=white>Chamas Enterprises Inc.</font></a>
-	</font>
-	</td>
 </tr>
 </table>
 

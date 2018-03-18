@@ -1,5 +1,11 @@
 Revision history for App-NDTools
 
+0.5.3   2018-03-11
+        - nddiff: validate diff when --show opt used
+        - nddiff: don't print diff header when --quiet opt used
+        - nddiff: grep failures fixed on unexisted substructures
+        - docs improved
+
 0.5.2   2018-03-04
         - tests fixed
         - dist and docs corrected

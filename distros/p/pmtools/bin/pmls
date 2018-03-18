@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 BEGIN { $^W = 1 }
 
@@ -17,8 +17,14 @@ use FindBin qw($Bin);
 unless (@ARGV) {
     die "usage: $0 module ...\n";
 } 
-for $module (@ARGV) { 
-    system "ls -l " . `$^X -S $Bin/pmpath $module`;
+for $module (@ARGV) {
+    if ( $^O eq "MSWin32" ) {
+        my $path = `$^X -S $Bin/pmpath $module`;
+        $path =~ s/\//\\/g;
+        system "dir " . $path;
+    } else {
+        system "ls -l " . `$^X -S $Bin/pmpath $module`;
+    }    
 }
 
 __END__
@@ -52,7 +58,7 @@ pmpath(1)
 
 Copyright (C) 1999 Tom Christiansen.
 
-Copyright (C) 2006-2014 Mark Leighton Fisher.
+Copyright (C) 2006-2018 Mark Leighton Fisher.
 
 =head1 LICENSE
 

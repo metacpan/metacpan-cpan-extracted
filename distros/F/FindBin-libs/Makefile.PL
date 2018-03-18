@@ -7,7 +7,7 @@ use version;
 use Module::FromPerlVer;
 use ExtUtils::MakeMaker;
 
-my $version = '2.17.0'; 
+my $version = '2.17.3'; 
 
 WriteMakefile
 (
@@ -26,7 +26,7 @@ WriteMakefile
 		qw
         (
             Cwd                 3.73
-            Module::FromPerlVer 0.000007
+            Module::FromPerlVer 0.005005
 
             Carp                0
             File::Spec          0

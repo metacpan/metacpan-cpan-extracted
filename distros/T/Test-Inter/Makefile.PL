@@ -7,6 +7,11 @@ use warnings;
 use 5.006;
 use ExtUtils::MakeMaker 6.30;
 
+my %IsWin32 = map { $_ => 1 } qw( MSWin32 NetWare symbian );
+my $IsWin32 = 1   if ($IsWin32{ $^O });
+my $Pvers   = $];
+my $ConvVers= $ExtUtils::MakeMaker::VERSION;
+
 my %module_prereq = (
    'File::Basename'           => '0',
    'IO::File'                 => '0',
@@ -16,6 +21,7 @@ my %script_prereq = (
 );
 
 my %test_prereq = (
+   'Cwd'                      => '0',
    'Test::More'               => '0',
 );
 
@@ -32,7 +38,7 @@ if ($EU_MM_V < 6.64) {
 
 WriteMakefile(
    NAME             => "Test::Inter",
-   VERSION          => "1.06",
+   VERSION          => "1.07",
    ABSTRACT         => "framework for more readable interactive test scripts",
    LICENSE          => "perl",
    ($EU_MM_V >= 6.48
@@ -48,16 +54,36 @@ WriteMakefile(
    ($EU_MM_V >= 6.64
     ? (TEST_REQUIRES   => \%test_prereq)
     : ()),
-
    ($EU_MM_V > 6.45
-    ? (META_MERGE => {
-        resources => {
-           repository => {
-              type => "git",
-              web  => "https://github.com/SBECK-github/Test-Inter",
-              url  => "git://github.com/SBECK-github/Test-Inter.git",
-           }
-        }
-       })
+    ? (META_ADD => {
+          provides     => {
+             'Test::Inter' => {
+                file    => 'lib/Test/Inter.pm',
+                version => '1.07',
+             },
+
+          },
+       }
+      )
     : ()),
+
+   ($EU_MM_V > 6.46
+    ? (META_MERGE => {
+          'meta-spec'  => {
+             version   => 2,
+          },
+          resources    => {
+             repository => {
+                type => 'git',
+                web  => 'https://github.com/SBECK-github/Test-Inter',
+                url  => 'git://github.com/SBECK-github/Test-Inter.git',
+             },
+          },
+       }
+      )
+    : ()),
+
+
+
+
 );

@@ -6,7 +6,7 @@ package OpenGbg::Service::Bridge;
 
 # ABSTRACT: Entry point to the Bridge service
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1402';
+our $VERSION = '0.1403';
 
 use OpenGbg::Elk;
 use namespace::autoclean;
@@ -66,7 +66,7 @@ OpenGbg::Service::Bridge - Entry point to the Bridge service
 
 =head1 VERSION
 
-Version 0.1402, released 2016-08-12.
+Version 0.1403, released 2018-03-14.
 
 =head1 SYNOPSIS
 

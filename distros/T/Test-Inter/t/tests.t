@@ -46,9 +46,11 @@ $o->tests(func     => \&func,
                        e ef
                       ");
 
-$o->tests(tests    => "1
+$o->tests(tests    => " '' ''
 
-                       '' ''
+                        [] []
+
+                        {} {}
                       ");
 
 $o->done_testing();

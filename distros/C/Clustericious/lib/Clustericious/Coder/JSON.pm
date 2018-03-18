@@ -6,7 +6,7 @@ use JSON::MaybeXS ();
 use 5.010;
 
 # ABSTRACT: JSON encoder for AutodataHandler
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.29'; # VERSION
 
 sub coder
 {
@@ -39,7 +39,7 @@ Clustericious::Coder::JSON - JSON encoder for AutodataHandler
 
 =head1 VERSION
 
-version 1.27
+version 1.29
 
 =head1 AUTHOR
 

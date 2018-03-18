@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.20'; # VERSION
+our $VERSION = '0.212'; # VERSION
 
 sub new {
     my ($class, %args) = @_;
@@ -30,7 +30,7 @@ Progress::Any::Output::Null - Null output
 
 =head1 VERSION
 
-This document describes version 0.20 of Progress::Any::Output::Null (from Perl distribution Progress-Any), released on 2015-01-27.
+This document describes version 0.212 of Progress::Any::Output::Null (from Perl distribution Progress-Any), released on 2018-03-17.
 
 =for Pod::Coverage ^(new|update)$
 
@@ -56,7 +56,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,8 @@
 Revision history for Perl extension Geo::Coder::Googlev3.
 
+0.17  2018-03-10
+	- fixed test for changed results (Toledo, US moved)
+
 0.16  2017-07-14
 	- new parameter key
 	- new parameter use_https

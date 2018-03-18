@@ -8,7 +8,6 @@ use Test::EOL;
 
 my @files = (
     'lib/OpenGbg.pm',
-    'lib/OpenGbg/DateTimeType.pm',
     'lib/OpenGbg/Elk.pm',
     'lib/OpenGbg/Exceptions.pm',
     'lib/OpenGbg/Service/AirQuality.pm',

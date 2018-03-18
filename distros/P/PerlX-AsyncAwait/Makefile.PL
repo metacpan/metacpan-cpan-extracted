@@ -13,5 +13,6 @@ WriteMakefile(
     Future => 0,
     curry => 1,
     strictures => 2,
+    Moo => 2,
   },
 );

@@ -22,7 +22,7 @@ use List::Util qw(first);
 use IPC::System::Simple 1.17 qw(runx capturex $EXITVAL);
 use namespace::autoclean 0.16;
 
-our $VERSION = '0.9996';
+our $VERSION = '0.9997';
 
 BEGIN {
     # Force Locale::TextDomain to encode in UTF-8 and to decode all messages.
@@ -45,7 +45,8 @@ has verbosity => (
     is       => 'ro',
     lazy     => 1,
     default  => sub {
-        shift->config->get( key => 'core.verbosity' ) // 1;
+        my $self = shift;
+        $self->options->{verbosity} // $self->config->get( key => 'core.verbosity' ) // 1;
     }
 );
 
@@ -926,7 +927,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 License
 
-Copyright (c) 2012-2015 iovation Inc.
+Copyright (c) 2012-2018 iovation Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

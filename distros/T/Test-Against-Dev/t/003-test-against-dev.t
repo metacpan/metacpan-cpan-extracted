@@ -118,9 +118,6 @@ SKIP: {
         like($@, qr/run_cpanm: Must supply array ref for 'module_list'/,
             "Got expected error message: value for module_list not an array ref");
     }
-
-    pp({ %{$self} });
-    note("Status");
 }
 
 done_testing();

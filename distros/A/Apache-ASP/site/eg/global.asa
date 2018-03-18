@@ -124,9 +124,9 @@ sub Application_OnEnd {
        'source.asp' => 'Handy source code viewer used to let you easily view the source of '.
 		       'the other asp scripts.',
 
-       'ssi_filter.ssi' => 'Shows full SSI in action via Apache::Filter & Apache::SSI. You must compile '.
-			'your apache with stacked handlers and install these modules to see '.
-       '		this script',
+#       'ssi_filter.ssi' => 'Shows full SSI in action via Apache::Filter & Apache::SSI. You must compile '.
+#			'your apache with stacked handlers and install these modules to see '.
+#       '		this script',
 
        'syntax_error.asp' => 'Demonstrates asp debugging with Debug 2 by creating a perl syntax error ',
 

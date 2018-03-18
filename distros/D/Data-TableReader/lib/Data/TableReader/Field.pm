@@ -1,5 +1,5 @@
 package Data::TableReader::Field;
-$Data::TableReader::Field::VERSION = '0.006';
+$Data::TableReader::Field::VERSION = '0.007';
 use Moo 2;
 
 # ABSTRACT: Field specification for Data::TableReader
@@ -48,7 +48,7 @@ Data::TableReader::Field - Field specification for Data::TableReader
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 DESCRIPTION
 

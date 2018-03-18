@@ -65,7 +65,7 @@ Report bugs to L<https://github.com/mr-mixas/NDTools/issues>
 
 =head1 SEE ALSO
 
-L<App::NDTools::nddiff>, L<App::NDTools::ndproc>, L<App::NDTools::ndquery>
+L<nddiff>, L<ndproc>, L<ndquery>
 
 L<App::NDTools::NDPatch>
 

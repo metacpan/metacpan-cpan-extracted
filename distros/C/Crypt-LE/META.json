@@ -50,15 +50,15 @@
    "provides" : {
       "Crypt::LE" : {
          "file" : "lib/Crypt/LE.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "Crypt::LE::Challenge::Simple" : {
          "file" : "lib/Crypt/LE/Challenge/Simple.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "Crypt::LE::Complete::Simple" : {
          "file" : "lib/Crypt/LE/Complete/Simple.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       }
    },
    "release_status" : "stable",
@@ -71,5 +71,5 @@
          "url" : "https://github.com/do-know"
       }
    },
-   "version" : "0.30"
+   "version" : "0.31"
 }

@@ -3,3 +3,8 @@ Revision history for Perl extension Mailru::Cloud.
 0.01  Tue Nov  28 17:01:40 2017
 	- original version
 		-b 5.8.1 -XAn Mailru::Cloud
+0.02  Sun Mar  11 10:55:00 2018
+    - Version 0.02
+        - Added info() method
+        - Changes __isLogin method. This method autologin if login is expired
+	

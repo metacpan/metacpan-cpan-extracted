@@ -15,6 +15,19 @@ Acme::Songmu - Songmu's sample module
 
 Acme::Songmu is Songmu's sample CPAN module for sandboxing.
 
+# CONSTRUCTOR
+
+## `my $sonmgu = Acme::Songmu->instance`
+
+The `instance` class method returns an instance of Songmu as a singleton.
+
+# METHODS
+
+- `$songmu->name`
+- `$songmu->gmu`
+
+# METHODS
+
 # LICENSE
 
 Copyright (C) Songmu.

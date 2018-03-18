@@ -197,6 +197,18 @@ push @commands, Term::CLI::Command->new(
                 return %args;
             },
         ),
+        Term::CLI::Command->new( name => 'terminal',
+            summary => 'show terminal information',
+            description => 'Show terminal information.',
+            callback => sub {
+                my ($self, %args) = @_;
+                return %args if $args{status} < 0;
+                my ($rows, $cols) = $self->root_node->term->get_screen_size;
+                say "type $ENV{TERM}; rows $rows; columns $cols";
+                $args{status} = 0;
+                return %args;
+            },
+        ),
     ],
 );
 

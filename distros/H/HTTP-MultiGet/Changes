@@ -26,3 +26,19 @@
   -- Role now checks for content length and if content is defined before trying to parse json.
 1.009
   -- got rid of the last calls, now use AnyEvent->condvar
+1.010 
+  -- removed the ODD Ball AnyEvent->timer(after=>0,xxx), Changes now reside in HTTP::MultiGet.pm and HTTP::MultiGet::Role.pm
+  -- Major bug fix -- Solved death by $self->queue_result in a non blocking context
+  -- AUTOLOAD code clean ups
+1.011
+  -- Changed min version of Data::Dumper to 2.161
+1.012
+  -- fixed hang till timeout in muli child blocking context
+1.013
+  -- Fixed blocking non blocking bugs..
+1.014
+  -- Added Pasing unit tests
+1.015
+  -- Fixeed inifiniate loop bug, fake jobs are now working as intended
+1.016
+  -- added missing unit tests to the distro

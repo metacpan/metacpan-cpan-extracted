@@ -2,10 +2,9 @@
 #
 # Tests for license metadata.
 #
-# Written by Russ Allbery <rra@cpan.org>
 # Copyright 2017 Russ Allbery <rra@cpan.org>
 #
-# See LICENSE for licensing terms.
+# SPDX-License-Identifier: MIT
 
 use 5.018;
 use autodie;

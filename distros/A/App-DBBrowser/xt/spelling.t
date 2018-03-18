@@ -35,3 +35,7 @@ sql
 substatement
 IFS
 RaiseError
+Subqueries
+subqueries
+substatement
+MERCHANTIBILITY

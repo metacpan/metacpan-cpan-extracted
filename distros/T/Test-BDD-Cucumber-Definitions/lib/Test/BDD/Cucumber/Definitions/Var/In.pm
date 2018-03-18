@@ -7,24 +7,25 @@ use utf8;
 use Test::BDD::Cucumber::Definitions qw(C Given When Then);
 use Test::BDD::Cucumber::Definitions::Var qw(:util);
 
-our $VERSION = '0.21';
+our $VERSION = '0.26';
 
 ## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
 ## no critic [RegularExpressions::RequireExtendedFormatting]
 ## no critic [RegularExpressions::ProhibitComplexRegexes]
 
-# var scenario var "" set ""
-When qr/var scenario var "(.+?)" set "(.*)"/, sub {
-    my ( $name, $value ) = ( $1, $2 );
+sub import {
 
-    var_scenario_var_set( $name, $value );
-};
+    #       var scenario var "(.+?)" set "(.*)"
+    When qr/var scenario var "(.+?)" set "(.*)"/, sub {
+        var_scenario_var_set( $1, $2 );
+    };
 
-# var scenario var "" random ""
-When qr/var scenario var "(.+?)" random "(.*)"/, sub {
-    my ( $name, $value ) = ( $1, $2 );
+    #       var scenario var "(.+?)" random "(.*)"
+    When qr/var scenario var "(.+?)" random "(.*)"/, sub {
+        var_scenario_var_random( $1, $2 );
+    };
 
-    var_scenario_var_random( $name, $value );
-};
+    return;
+}
 
 1;

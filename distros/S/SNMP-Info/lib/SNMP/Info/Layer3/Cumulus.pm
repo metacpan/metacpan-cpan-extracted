@@ -46,7 +46,7 @@ use SNMP::Info::IEEE802dot3ad 'agg_ports_lag';
 
 use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
 
-$VERSION = '3.49';
+$VERSION = '3.51';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -68,11 +68,13 @@ $VERSION = '3.49';
 %FUNCS = (
     %SNMP::Info::Layer3::FUNCS,
     %SNMP::Info::LLDP::FUNCS,
+    %SNMP::Info::IEEE802dot3ad::FUNCS,
 );
 
 %MUNGE = (
     %SNMP::Info::Layer3::MUNGE,
     %SNMP::Info::LLDP::MUNGE,
+    %SNMP::Info::IEEE802dot3ad::MUNGE,
 );
 
 sub vendor { return 'Cumulus Networks' }
@@ -117,12 +119,12 @@ sub uptime {
 # concatentate ifDesc and ifIndex.
 # (code from SNMP/Info/Layer2/Netgear.pm)
 sub interfaces {
-    my $netgear = shift;
+    my $netsnmp = shift;
     my $partial = shift;
 
-    my $interfaces = $netgear->i_index($partial)       || {};
-    my $i_descr    = $netgear->i_description($partial) || {};
-    my $i_name     = $netgear->i_name($partial);
+    my $interfaces = $netsnmp->i_index($partial)       || {};
+    my $i_descr    = $netsnmp->i_description($partial) || {};
+    my $i_name     = $netsnmp->i_name($partial);
     my $i_isset    = ();
     # Replace the description with the ifName field, if set
     foreach my $iid ( keys %$i_name ) {
@@ -279,15 +281,7 @@ Uses the i_name() field.
 
 =item $cumulus->i_ignore()
 
-Returns reference to hash.  Increments value of IID if port is to be ignored.
-
 Ignores interfaces with an "@" in them.
-
-=item $cumulus->i_ignore()
-
-Returns reference to hash.  Increments value of IID if port is to be ignored.
-
-Ignores loopback
 
 =item C<agg_ports>
 

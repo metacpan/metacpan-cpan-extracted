@@ -18,9 +18,11 @@ lib/App/ElasticSearch/Utilities/QueryString.pm
 lib/App/ElasticSearch/Utilities/QueryString/BareWords.pm
 lib/App/ElasticSearch/Utilities/QueryString/FileExpansion.pm
 lib/App/ElasticSearch/Utilities/QueryString/IP.pm
+lib/App/ElasticSearch/Utilities/QueryString/Nested.pm
 lib/App/ElasticSearch/Utilities/QueryString/Plugin.pm
 lib/App/ElasticSearch/Utilities/QueryString/Underscored.pm
 lib/App/ElasticSearch/Utilities/VersionHacks.pm
+lib/Types/ElasticSearch.pm
 scripts/es-alias-manager.pl
 scripts/es-apply-settings.pl
 scripts/es-copy-index.pl
@@ -39,5 +41,6 @@ t/02-index-data.t
 weaver.ini
 xt/author/critic.t
 xt/author/eol.t
+xt/author/no-tabs.t
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t

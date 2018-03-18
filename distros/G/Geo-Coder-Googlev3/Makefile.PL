@@ -23,6 +23,7 @@ WriteMakefile(
 	'JSON::XS'		=> 0,
 	'LWP::UserAgent'	=> 0,
 	'URI'			=> 0,
+	'URI::QueryParam'       => 0,
     },
     LICENSE	      => 'perl',
     ($] >= 5.005 ?

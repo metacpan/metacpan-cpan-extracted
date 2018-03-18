@@ -13,7 +13,7 @@ use vars qw(%CONF %SDB $title %TEMP_SDB);
 sub Script_OnStart {
     %TEMP_SDB = ();
     for('DB', 'FileRoot', 'SiteRoot', 'RefreshPeriod', 'FileMatch') {
-	$CONF{$_} = Apache->dir_config('Search'.$_) || die("no config for $_");
+	$CONF{$_} = $Server->Config('Search'.$_) || die("no config for $_");
     }
     $CONF{FileRoot} =~ /\W/ or 
       die("The FileRoot config must have a non word character in it ".

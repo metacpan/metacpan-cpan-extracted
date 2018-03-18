@@ -45,7 +45,7 @@ my $major;
 if ($version_string) {
     if ( $version_string =~ /^Mozilla[ ]Firefox[ ](\d+)[.]\d+([.]\d+)?\s*/smx ) {
         ($major) = ($1);
-        if ( $major < 52 ) {
+        if ( $major < 50 ) {
             last_desperate_search();
             die
 "Please install a more recent version of Mozilla Firefox.  Current version is $major\n";

@@ -1,172 +1,228 @@
-NAME
-    Net::Proxmox::VE - Pure perl API for Proxmox virtualisation
+=encoding utf8
 
-SYNOPSIS
-        use Net::Proxmox::VE;
+=head1 SYNOPSIS
 
-        %args = (
-            host     => 'proxmox.local.domain',
-            password => 'barpassword',
-            username => 'root', # optional
-            port     => 8006,   # optional
-            realm    => 'pam',  # optional
-        );
+    use Net::Proxmox::VE;
 
-        $host = Net::Proxmox::VE->new(%args);
+    %args = (
+        host     => 'proxmox.local.domain',
+        password => 'barpassword',
+        username => 'root', # optional
+        port     => 8006,   # optional
+        realm    => 'pam',  # optional
+    );
 
-        $host->login() or die ('Couldn\'t log in to proxmox host');
+    $host = Net::Proxmox::VE->new(%args);
 
-WARNING
-    We are still moving things around and trying to come up with something
-    that makes sense. We havent yet implemented all the API functions, so
-    far we only have a basic internal abstraction of the REST interface and
-    a few modules for each function tree within the API.
+    $host->login() or die ('Couldn\'t log in to proxmox host');
 
-    Any enchancements are greatly appreciated ! (use github, link below)
+=head1 WARNING
 
-    Please dont be offended if we refactor and rework submissions. Perltidy
-    with default settings is prefered style.
+We are still moving things around and trying to come up with something
+that makes sense. We havent yet implemented all the API functions,
+so far we only have a basic internal abstraction of the REST interface
+and a few modules for each function tree within the API.
 
-    Oh, our tests are all against a running server. Care to help make them
-    better?
+Any enchancements are greatly appreciated ! (use github, link below)
 
-DESIGN NOTE
-    This API would be far nicer if it returned nice objects representing
-    different aspects of the system. Such an arrangement would be far better
-    than how this module is currently layed out. It might also be less
-    repetitive code.
+Please dont be offended if we refactor and rework submissions.
+Perltidy with default settings is prefered style.
 
-DESCRIPTION
-    This Class provides the framework for talking to Proxmox VE 2.0 API
-    instances. This just provides a get/delete/put/post abstraction layer as
-    methods on Proxmox VE REST API This also handles the ticket headers
-    required for authentication
+Oh, our tests are all against a running server. Care to help make them better?
 
-    More details on the API can be found here:
-    http://pve.proxmox.com/wiki/Proxmox_VE_API
-    http://pve.proxmox.com/pve2-api-doc/
+=head1 DESIGN NOTE
 
-    This class provides the building blocks for someone wanting to use PHP
-    to talk to Proxmox 2.0. Relatively simple piece of code, just provides a
-    get/put/post/delete abstraction layer as methods on top of Proxmox's
-    REST API, while also handling the Login Ticket headers required for
-    authentication.
+This API would be far nicer if it returned nice objects representing different aspects of the system.
+Such an arrangement would be far better than how this module is currently layed out. It might also be
+less repetitive code.
 
-METHODS
-  api_version
-    Returns the API version of the proxmox server we are talking to
+=head1 DESCRIPTION
 
-  api_version_check
-    Checks that the api we are talking to is at least version 2.0
+This Class provides the framework for talking to Proxmox VE 2.0 API instances.
+This just provides a get/delete/put/post abstraction layer as methods on Proxmox VE REST API
+This also handles the ticket headers required for authentication
 
-    Returns true if the api version is at least 2.0 (perl style true or
-    false)
+More details on the API can be found here:
+http://pve.proxmox.com/wiki/Proxmox_VE_API
+http://pve.proxmox.com/pve2-api-doc/
 
-  debug
-    Has a single optional argument of 1 or 0 representing enable or disable
-    debugging.
+This class provides the building blocks for someone wanting to use PHP to talk to Proxmox 2.0. Relatively simple piece of code, just provides a get/put/post/delete abstraction layer as methods on top of Proxmox's REST API, while also handling the Login Ticket headers required for authentication.
 
-    Undef (ie no argument) leaves the debug status untouched, making this
-    method call simply a query.
+=head1 METHODS
 
-    Returns the resultant debug status (perl style true or false)
+=head2 action
 
-  delete
-    An action helper method that just takes a path as an argument and
-    returns the value of action() with the DELETE method
+This calls raw actions against your proxmox server.
+Ideally you don't use this directly.
 
-  get
-    An action helper method that just takes a path as an argument and
-    returns the value of action with the GET method
 
-  new
-    Creates the Net::Proxmox::VE object and returns it.
+=cut
 
-    Examples...
+=head2 api_version
 
-      my $obj = Net::Proxmox::VE->new(%args);
-      my $obj = Net::Proxmox::VE->new(\%args);
+Returns the API version of the proxmox server we are talking to
 
-    Valid arguments are...
 
-    *host*
-        Proxmox host instance to interact with. Required so no default.
+=cut
 
-    *username*
-        User name used for authentication. Defaults to 'root', optional.
+=head2 api_version_check
 
-    *password*
-        Pass word user for authentication. Required so no default.
+Checks that the api we are talking to is at least version 2.0
 
-    *port*
-        TCP port number used to by the Proxmox host instance. Defaults to
-        8006, optional.
+Returns true if the api version is at least 2.0 (perl style true or false)
 
-    *realm*
-        Authentication realm to request against. Defaults to 'pam' (local
-        auth), optional.
 
-    *ssl_opts*
-        If you're using a self-signed certificate, SSL verification is going
-        to fail, and we need to tell "IO::Socket::SSL" not to attempt
-        certificate verification.
+=cut
 
-        This option is passed on as "ssl_opts" options to
-        "LWP::UserAgent->new()", ultimately for "IO::Socket::SSL".
+=head2 debug
 
-        Using it like this, causes "LWP::UserAgent" and "IO::Socket::SSL"
-        not to attempt SSL verification:
+Has a single optional argument of 1 or 0 representing enable or disable debugging.
 
-            use IO::Socket::SSL qw(SSL_VERIFY_NONE);
-            ..
-            %args = (
-                ...
-                ssl_opts => {
-                    SSL_verify_mode => SSL_VERIFY_NONE,
-                    verify_hostname => 0
-                },
-                ...
-            );
-            my $proxmox = Net::Proxmox::VE->new(%args);
+Undef (ie no argument) leaves the debug status untouched, making this method call simply a query.
 
-        Your connection will work now, but beware: you are now susceptible
-        to a man-in-the-middle attack.
+Returns the resultant debug status (perl style true or false)
 
-    *debug*
-        Enabling debugging of this API (not related to proxmox debugging in
-        any way). Defaults to false, optional.
 
-  post
-    An action helper method that takes two parameters: $path, \%post_data
-    $path to post to, hash ref to %post_data
+=cut
 
-    You are returned what action() with the POST method returns
+=head2 delete
 
-  put
-    An action helper method that takes two parameters: path hash ref to post
-    data your returned what post returns
+An action helper method that just takes a path as an argument and returns the
+value of action() with the DELETE method
 
-  url_prefix
-    returns the url prefix used in the rest api calls
 
-SEE ALSO
-    Proxmox Website
-        http://www.proxmox.com
+=cut
 
-    API reference
-        http://pve.proxmox.com/pve2-api-doc
+=head2 get
 
-SUPPORT
-     Contribute at http://github.com/mrproper/proxmox-ve-api-perl
+An action helper method that just takes a path as an argument and returns the
+value of action with the GET method
 
-LICENSE
-     This program is free software; you can redistribute it and/or modify it under
-     the same terms as Perl itself.
 
-VERSION
-     0.0091
+=cut
 
-AUTHORS
-     Brendan Beveridge <brendan@nodeintegration.com.au>
-     Dean Hamstead <dean@bytefoundry.com.au>
+=head2 new
+
+Creates the Net::Proxmox::VE object and returns it.
+
+Examples...
+
+  my $obj = Net::Proxmox::VE->new(%args);
+  my $obj = Net::Proxmox::VE->new(\%args);
+
+Valid arguments are...
+
+=over 4
+
+=item I<host>
+
+Proxmox host instance to interact with. Required so no default.
+
+=item I<username>
+
+User name used for authentication. Defaults to 'root', optional.
+
+=item I<password>
+
+Pass word user for authentication. Required so no default.
+
+=item I<port>
+
+TCP port number used to by the Proxmox host instance. Defaults to 8006, optional.
+
+=item I<realm>
+
+Authentication realm to request against. Defaults to 'pam' (local auth), optional.
+
+=item I<ssl_opts>
+
+If you're using a self-signed certificate, SSL verification is going to fail, and we need to tell C<IO::Socket::SSL> not to attempt certificate verification.
+
+This option is passed on as C<ssl_opts> options to C<LWP::UserAgent-E<gt>new()>, ultimately for C<IO::Socket::SSL>.
+
+Using it like this, causes C<LWP::UserAgent> and C<IO::Socket::SSL> not to attempt SSL verification:
+
+    use IO::Socket::SSL qw(SSL_VERIFY_NONE);
+    ..
+    %args = (
+        ...
+        ssl_opts => {
+            SSL_verify_mode => SSL_VERIFY_NONE,
+            verify_hostname => 0
+        },
+        ...
+    );
+    my $proxmox = Net::Proxmox::VE->new(%args);
+
+Your connection will work now, but B<beware: you are now susceptible to a man-in-the-middle attack>.
+
+=item I<debug>
+
+Enabling debugging of this API (not related to proxmox debugging in any way). Defaults to false, optional.
+
+=back
+
+
+=cut
+
+=head2 post
+
+An action helper method that takes two parameters: $path, \%post_data
+$path to post to,  hash ref to %post_data
+
+You are returned what action() with the POST method returns
+
+
+=cut
+
+=head2 put
+
+An action helper method that takes two parameters:
+path
+hash ref to post data
+your returned what post returns
+
+
+=cut
+
+=head2 url_prefix
+
+returns the url prefix used in the rest api calls
+
+
+=cut
+
+=head1 SEE ALSO
+
+=over 4
+
+=item Proxmox Website
+
+http://www.proxmox.com
+
+=item API reference
+
+http://pve.proxmox.com/pve2-api-doc
+
+=back
+
+=head1 SUPPORT
+
+ Contribute at http://github.com/mrproper/proxmox-ve-api-perl
+
+=head1 LICENSE
+
+ This program is free software; you can redistribute it and/or modify it under
+ the same terms as Perl itself.
+
+=head1 VERSION
+
+ 0.33
+
+=head1 AUTHORS
+
+ Brendan Beveridge <brendan@nodeintegration.com.au>
+ Dean Hamstead <dean@bytefoundry.com.au>
+
+=cut
 

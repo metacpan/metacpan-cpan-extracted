@@ -6,9 +6,8 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.003';
+our $VERSION = '2.006';
 
-#use Clone           qw( clone );
 use List::MoreUtils qw( first_index );
 
 use Term::Choose       qw( choose );
@@ -25,7 +24,7 @@ sub new {
 
 
 sub col_function {
-    my ( $sf, $dbh, $sql, $backup_sql, $stmt_type ) = @_;
+    my ( $sf, $dbh, $sql, $stmt_type ) = @_;
     my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o} );
     my @functions = ( qw( Epoch_to_Date Bit_Length Truncate Char_Length Epoch_to_DateTime ) );
     my $cols_type = '';
@@ -37,16 +36,16 @@ sub col_function {
         $cols_type = 'chosen_cols';
     }
     if ( $cols_type eq 'chosen_cols' ) {
-        if ( ! $sql->{orig_cols}{chosen_cols} ) {
-            @{$sql->{orig_cols}{chosen_cols}} = @{$sql->{'chosen_cols'}};
+        if ( ! @{$sql->{orig_chosen_cols}} ) {
+            @{$sql->{orig_chosen_cols}} = @{$sql->{'chosen_cols'}};
         }
     }
     else {
-        if ( @{$sql->{aggr_cols}} && ! $sql->{orig_cols}{aggr_cols} ) {
-            @{$sql->{orig_cols}{aggr_cols}} = @{$sql->{'aggr_cols'}};
+        if ( @{$sql->{aggr_cols}} && ! @{$sql->{orig_aggr_cols}} ) {
+            @{$sql->{orig_aggr_cols}} = @{$sql->{'aggr_cols'}};
         }
-        if ( @{$sql->{group_by_cols}} && ! $sql->{orig_cols}{group_by_cols} ) {
-            @{$sql->{orig_cols}{group_by_cols}} = @{$sql->{'group_by_cols'}};
+        if ( @{$sql->{group_by_cols}} && ! @{$sql->{orig_group_by_cols}} ) {
+            @{$sql->{orig_group_by_cols}} = @{$sql->{'group_by_cols'}};
         }
     }
     my $changed = 0;
@@ -69,18 +68,14 @@ sub col_function {
             { %{$sf->{i}{lyt_stmt_v}}, index => 1, default => $default }
         );
         if ( ! defined $idx || ! defined $choices->[$idx] ) {
-            #$sql = clone( $backup_sql );
-            $sql = $backup_sql;
             return;
         }
         if ( $choices->[$idx] eq $sf->{i}{_confirm} ) {
             if ( ! $changed ) {
-                #$sql = clone( $backup_sql );
-                $sql = $backup_sql;
                 return;
             }
             $sql->{select_type} = 'chosen_cols' if $sql->{select_type} eq '*'; # makes the changes visible
-            return 1;
+            return 1; # return $tmp
         }
         ( my $qt_col = $choices->[$idx] ) =~ s/^\-\s//;
         $idx -= @pre;
@@ -94,12 +89,12 @@ sub col_function {
             }
         }
         # reset col to original, if __col_function is called on a already modified col:
-        if ( $sql->{$cols_type}[$idx] ne $sql->{orig_cols}{$cols_type}[$idx] ) {
+        if ( $sql->{$cols_type}[$idx] ne $sql->{'orig_' . $cols_type}[$idx] ) {
             if ( $cols_type ne 'aggr_cols' ) {
                 my $i = first_index { $sql->{$cols_type}[$idx] eq $_ } @{$sql->{modified_cols}};
                 splice( @{$sql->{modified_cols}}, $i, 1 );
             }
-            $sql->{$cols_type}[$idx] = $sql->{orig_cols}{$cols_type}[$idx];
+            $sql->{$cols_type}[$idx] = $sql->{'orig_' . $cols_type}[$idx];
             if ( $cols_type eq 'group_by_cols' ) {
                 $sql->{group_by_stmt} = " GROUP BY " . join( ', ', @{$sql->{$cols_type}} );
             }
@@ -117,20 +112,24 @@ sub col_function {
         }
         $function =~ s/^\s\s//;
         $ax->print_sql( $sql, [ $stmt_type ] );
-        my $qt_scalar_func = $sf->__prepare_col_func( $function, $qt_col );
-        if ( ! defined $qt_scalar_func ) {
+        my $col_with_func = $sf->__prepare_col_func( $function, $qt_col );
+        if ( ! defined $col_with_func ) {
             next COL_SCALAR_FUNC;
         }
         # modify columns:
-        $sql->{$cols_type}[$idx] = $qt_scalar_func;
+        $sql->{$cols_type}[$idx] = $col_with_func;
+        my $alias = $ax->__alias( $dbh, $col_with_func );
+        if ( defined $alias && length $alias ) {
+            $sql->{alias}{$col_with_func} = $ax->quote_col_qualified( $dbh, [ $alias ] );
+        }
         if ( $cols_type eq 'group_by_cols' ) {
-            $sql->{group_by_stmt} = " GROUP BY " . join( ', ', @{$sql->{$cols_type}} );
+            $sql->{group_by_stmt} = " GROUP BY " . join( ', ', @{$sql->{group_by_cols}} );
         }
         if ( $cols_type ne 'aggr_cols' ) {
             # $sql->{modified_cols}: make the modified columns available in WHERE and ORDER BY
             # skip aggregate functions because aggregate are not allowed in WHERE clauses
             # no problem for ORDER BY because it doesn't use the $sql->{modified_cols} in aggregate mode
-            push @{$sql->{modified_cols}}, $qt_scalar_func;
+            push @{$sql->{modified_cols}}, $col_with_func;
         }
         $changed++;
         next COL_SCALAR_FUNC;

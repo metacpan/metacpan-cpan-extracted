@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation for Lab::Measurement
 
 =head1 VERSION
 
-version 3.622
+version 3.623
 
 =head1 OVERVIEW
 
@@ -554,6 +554,8 @@ alias: C<Lab::Moose::Connection::VISA_GPIB>
 =over
 
 =item * L<Lab::Moose::Connection::USB>
+
+=item * L<Lab::Moose::Connection::VISA::USB>
 
 =back
 

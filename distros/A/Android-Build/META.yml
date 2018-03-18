@@ -15,15 +15,15 @@ name: Android-Build
 provides:
   Android::Build:
     file: lib/Android/Build.pm
-    version: '20171227'
+    version: '20180316'
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::Table::Text: '20171223'
+  Data::Table::Text: '20180316'
   File::Copy: '0'
   POSIX: '0'
   Test2::API: '0'
   Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20171227'
+version: '20180316'

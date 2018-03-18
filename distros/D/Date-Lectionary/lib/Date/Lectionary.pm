@@ -4,10 +4,12 @@ use v5.22;
 use strict;
 use warnings;
 
+use Try::Tiny::Tiny;
+
 use Moose;
 use MooseX::StrictConstructor;
 use Carp;
-use Try::Tiny;
+use Try::Catch;
 use XML::LibXML;
 use File::Share ':all';
 use Time::Piece;
@@ -23,11 +25,11 @@ Date::Lectionary - Readings for the Christian Lectionary
 
 =head1 VERSION
 
-Version 1.20180302
+Version 1.20180314
 
 =cut
 
-our $VERSION = '1.20180302';
+our $VERSION = '1.20180314';
 
 =head1 SYNOPSIS
 
@@ -289,9 +291,9 @@ L<http://search.cpan.org/dist/Date-Lectionary/>
 
 Many thanks to my beautiful wife, Jennifer, and my amazing daughter, Rosemary.  But, above all, SOLI DEO GLORIA!
 
-=head1 LICENSE AND COPYRIGHT
+=head1 LICENSE
 
-Copyright 2016-2017 MICHAEL WAYNE ARNOLD
+Copyright 2016-2018 MICHAEL WAYNE ARNOLD
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 

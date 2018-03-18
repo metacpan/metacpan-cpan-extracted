@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008;
+use 5.010000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dancer-Session-Cookie",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.008",
+  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "Dancer::Session::Cookie",
   "PREREQ_PM" => {
     "Crypt::CBC" => 0,
@@ -24,11 +24,12 @@ my %WriteMakefileArgs = (
     "Dancer::Cookies" => 0,
     "Dancer::Session::Abstract" => 0,
     "MIME::Base64" => 0,
+    "PerlX::Maybe" => 0,
     "Session::Storage::Secure" => "0.010",
     "Storable" => 0,
     "String::CRC32" => 0,
     "Time::Duration::Parse" => 0,
-    "base" => 0,
+    "parent" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -51,7 +52,7 @@ my %WriteMakefileArgs = (
     "Test::NoWarnings" => 0,
     "Test::Requires" => 0
   },
-  "VERSION" => "0.29",
+  "VERSION" => "0.30",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -77,6 +78,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "MIME::Base64" => 0,
+  "PerlX::Maybe" => 0,
   "Plack" => "1.0029",
   "Plack::Test" => 0,
   "Session::Storage::Secure" => "0.010",
@@ -87,7 +89,7 @@ my %FallbackPrereqs = (
   "Test::NoWarnings" => 0,
   "Test::Requires" => 0,
   "Time::Duration::Parse" => 0,
-  "base" => 0,
+  "parent" => 0,
   "strict" => 0,
   "warnings" => 0
 );

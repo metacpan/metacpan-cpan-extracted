@@ -1,5 +1,11 @@
 Revision history for Mojolicious-Plugin-Vparam
 
+3.06    14-03-2018
+    - Address lonlat via number parser
+
+3.05    23-02-2018
+    - Add opath extension to validate objects
+
 3.04    23-02-2018
     - Add new type "object"
 

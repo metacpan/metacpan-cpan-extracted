@@ -6,11 +6,11 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Pools;
-$Net::Proxmox::VE::Pools::VERSION = '0.32';
+$Net::Proxmox::VE::Pools::VERSION = '0.33';
 use parent 'Exporter';
 
 
-our @EXPORT  = qw( pools );
+our @EXPORT  = qw( pools get_pool create_pool delete_pool update_pool );
 
 my $base = '/pools';
 
@@ -82,7 +82,7 @@ sub update_pool {
 
     if ( @p == 1 ) {
         die 'Single argument not a hash for update_pool()'
-          unless ref $a eq 'HASH';
+          unless ref $p[0] eq 'HASH';
         %args = %{ $p[0] };
     }
     else {
@@ -108,7 +108,7 @@ Net::Proxmox::VE::Pools - Presents a pool object
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -224,7 +224,7 @@ Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@bytefoun
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Dean Hamstad.
+This software is copyright (c) 2018 by Dean Hamstad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

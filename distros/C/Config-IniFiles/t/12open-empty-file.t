@@ -15,15 +15,15 @@ use Config::IniFiles::TestPaths;
 my $filename = t_file("empty.ini");
 
 {
-    my $cfg=Config::IniFiles->new;
+    my $cfg = Config::IniFiles->new;
     $cfg->WriteConfig($filename);
 }
 
 {
-    my $cfg=Config::IniFiles->new(-file => $filename, -allowempty => 1);
+    my $cfg = Config::IniFiles->new( -file => $filename, -allowempty => 1 );
 
     # TEST
-    isa_ok ($cfg, "Config::IniFiles", '$cfg');
+    isa_ok( $cfg, "Config::IniFiles", '$cfg' );
 }
 
 t_unlink("empty.ini");

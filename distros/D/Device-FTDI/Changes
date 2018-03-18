@@ -1,5 +1,16 @@
 Revision history for Device-FTDI
 
+0.14    2018-03-11 14:28:04
+        [CHANGES]
+         * Support other wordsizes for SPI transfer, from 1 to 32 bits
+         * Implement the SPI Device::Chip adapter using D:C:ProtocolBase::SPI
+           and support the new ->write_then_read and ->read methods
+         * Implement the '_no_ss' variant SPI methods
+
+        [BUGFIXES]
+         * Fix for certain stall conditions on Future logic with mixed
+           reads/writes in the buffer
+
 0.13    2017/01/08 23:41:06
         [CHANGES]
          * Add debugging prints to SPI MPSSE subclass

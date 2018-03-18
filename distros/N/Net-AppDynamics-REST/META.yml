@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -24,12 +24,12 @@ requires:
   AnyEvent::Loop: '0'
   B: '1.68'
   Carp: '1.42'
-  Data::Dumper: '2.167'
+  Data::Dumper: '2.161'
   Data::Queue: '1.0001'
   Data::Result: '1.0001'
   Exporter: '5.72'
   HTTP::Headers: '6.13'
-  HTTP::MultiGet: '1.005'
+  HTTP::MultiGet: '1.010'
   HTTP::Request: '6.13'
   HTTP::Response: '6.13'
   IO::Scalar: '2.111'
@@ -47,5 +47,5 @@ requires:
   URI::Escape: '3.31'
   namespace::clean: '0.27'
   overload: '1.28'
-version: '0.001'
+version: '1.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

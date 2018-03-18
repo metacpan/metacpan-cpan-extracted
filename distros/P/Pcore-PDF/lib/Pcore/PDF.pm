@@ -1,4 +1,4 @@
-package Pcore::PDF v0.4.4;
+package Pcore::PDF v0.4.5;
 
 use Pcore -dist, -class, -const, -result;
 use Config;
@@ -38,9 +38,9 @@ const our $PAGE_SIZE => {
     Tabloid   => '279.4 x 431.8 mm',
 };
 
-has bin => ( is => 'lazy', isa => Str );
-has max_threads => ( is => 'ro', isa => PositiveInt, default => ( $MSWIN ? 1 : 4 ) );
-has page_size => ( is => 'ro', isa => Enum [ keys $PAGE_SIZE->%* ], default => 'A4' );
+has bin         => ( is => 'lazy', isa => Str );
+has max_threads => ( is => 'ro',   isa => PositiveInt, default => ( $MSWIN ? 1 : 4 ) );
+has page_size   => ( is => 'ro',   isa => Enum [ keys $PAGE_SIZE->%* ], default => 'A4' );
 
 has _threads => ( is => 'ro', isa => Int, default => 0, init_arg => undef );
 has _proc  => ( is => 'ro', isa => ArrayRef, default => sub { [] }, init_arg => undef );
@@ -207,7 +207,7 @@ sub _generate_mswin ( $self ) {
 
             $self->{_threads}--;
 
-            AE::postpone { $self->_generate_mswin };
+            $self->_generate_mswin;
 
             return;
         }
@@ -221,22 +221,20 @@ sub _generate_linux ( $self ) {
 
     return if !$self->{_proc}->@* && $self->{_threads} >= $self->{max_threads};
 
-    $self->_get_proc(
-        sub($proc) {
-            return if !$proc;
+    $self->_get_proc( sub($proc) {
+        return if !$proc;
 
-            my $task = shift $self->{_queue}->@*;
+        my $task = shift $self->{_queue}->@*;
 
-            if ( !$task ) {
-                push $self->{_proc}->@*, $proc;
-            }
-            else {
-                $self->_run_task( $proc, $task );
-            }
-
-            return;
+        if ( !$task ) {
+            push $self->{_proc}->@*, $proc;
         }
-    );
+        else {
+            $self->_run_task( $proc, $task );
+        }
+
+        return;
+    } );
 
     return;
 }
@@ -260,37 +258,35 @@ sub _get_proc ( $self, $cb ) {
         stdout   => 1,
         stderr   => 1,
         on_ready => sub ($proc) {
-            $proc->stdout->on_read(
-                sub ($h) {
-                    $h->unshift_read(
-                        line => sub ( $h, $line, $eol ) {
-                            my ( $tag, $len ) = split /\s/sm, $line, 2;
+            $proc->stdout->on_read( sub ($h) {
+                $h->unshift_read(
+                    line => sub ( $h, $line, $eol ) {
+                        my ( $tag, $len ) = split /\s/sm, $line, 2;
 
-                            if ( !$len ) {
-                                die q[princexml protocol error: no version];
-                            }
-                            else {
-                                $h->unshift_read(
-                                    chunk => $len + 1,
-                                    sub ( $h, $data ) {
-                                        chop $data;
-
-                                        $h->on_read(undef);
-
-                                        $cb->($proc);
-
-                                        return;
-                                    }
-                                );
-                            }
-
-                            return;
+                        if ( !$len ) {
+                            die q[princexml protocol error: no version];
                         }
-                    );
+                        else {
+                            $h->unshift_read(
+                                chunk => $len + 1,
+                                sub ( $h, $data ) {
+                                    chop $data;
 
-                    return;
-                }
-            );
+                                    $h->on_read(undef);
+
+                                    $cb->($proc);
+
+                                    return;
+                                }
+                            );
+                        }
+
+                        return;
+                    }
+                );
+
+                return;
+            } );
 
             return;
         },
@@ -340,74 +336,72 @@ sub _run_task ( $self, $proc, $task ) {
 
         push $self->{_proc}->@*, $proc;
 
-        AE::postpone { $self->_generate_linux };
+        $self->_generate_linux;
 
         return;
     };
 
-    $proc->stdout->on_read(
-        sub ($h) {
+    $proc->stdout->on_read( sub ($h) {
 
-            # read pdf
-            $h->unshift_read(
-                line => sub ( $h, $line, $eol ) {
-                    my ( $tag, $len ) = split /\s/sm, $line, 2;
+        # read pdf
+        $h->unshift_read(
+            line => sub ( $h, $line, $eol ) {
+                my ( $tag, $len ) = split /\s/sm, $line, 2;
 
-                    if ( !$len ) {
-                        $on_finish->( 500, q[princexml protocol error: no version] );
-                    }
-                    else {
-                        $h->unshift_read(
-                            chunk => $len + 1,
-                            sub ( $h, $data ) {
-                                chop $data;
-
-                                # protocol error
-                                if ( $tag eq 'err' ) {
-                                    $on_finish->( 500, $data );
-                                }
-
-                                # read log
-                                else {
-                                    my $pdf_ref = \$data;
-
-                                    $h->unshift_read(
-                                        line => sub ( $h, $line, $eol ) {
-                                            my ( $tag1, $len1 ) = split /\s/sm, $line, 2;
-
-                                            if ( !$len1 ) {
-                                                $on_finish->( 500, q[princexml protocol error: no version] );
-                                            }
-                                            else {
-                                                $h->unshift_read(
-                                                    chunk => $len1 + 1,
-                                                    sub ( $h, $data ) {
-                                                        chop $data;
-
-                                                        $on_finish->( 200, 'OK', $pdf_ref, [ split /\n/sm, $data ] );
-
-                                                        return;
-                                                    }
-                                                );
-                                            }
-
-                                            return;
-                                        }
-                                    );
-                                }
-
-                                return;
-                            }
-                        );
-                    }
-
-                    return;
+                if ( !$len ) {
+                    $on_finish->( 500, q[princexml protocol error: no version] );
                 }
-            );
+                else {
+                    $h->unshift_read(
+                        chunk => $len + 1,
+                        sub ( $h, $data ) {
+                            chop $data;
 
-            return;
-        }
-    );
+                            # protocol error
+                            if ( $tag eq 'err' ) {
+                                $on_finish->( 500, $data );
+                            }
+
+                            # read log
+                            else {
+                                my $pdf_ref = \$data;
+
+                                $h->unshift_read(
+                                    line => sub ( $h, $line, $eol ) {
+                                        my ( $tag1, $len1 ) = split /\s/sm, $line, 2;
+
+                                        if ( !$len1 ) {
+                                            $on_finish->( 500, q[princexml protocol error: no version] );
+                                        }
+                                        else {
+                                            $h->unshift_read(
+                                                chunk => $len1 + 1,
+                                                sub ( $h, $data ) {
+                                                    chop $data;
+
+                                                    $on_finish->( 200, 'OK', $pdf_ref, [ split /\n/sm, $data ] );
+
+                                                    return;
+                                                }
+                                            );
+                                        }
+
+                                        return;
+                                    }
+                                );
+                            }
+
+                            return;
+                        }
+                    );
+                }
+
+                return;
+            }
+        );
+
+        return;
+    } );
 
     return;
 }
@@ -422,9 +416,9 @@ sub _run_task ( $self, $proc, $task ) {
 ## |    3 | 100                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | Documentation::RequirePodLinksIncludeText                                                                      |
-## |      | 432                  | * Link L<Pcore::Util::Result> on line 489 does not specify text                                                |
-## |      | 432                  | * Link L<Pcore::Util::Result> on line 499 does not specify text                                                |
-## |      | 432                  | * Link L<Pcore> on line 497 does not specify text                                                              |
+## |      | 426                  | * Link L<Pcore::Util::Result> on line 483 does not specify text                                                |
+## |      | 426                  | * Link L<Pcore::Util::Result> on line 493 does not specify text                                                |
+## |      | 426                  | * Link L<Pcore> on line 491 does not specify text                                                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

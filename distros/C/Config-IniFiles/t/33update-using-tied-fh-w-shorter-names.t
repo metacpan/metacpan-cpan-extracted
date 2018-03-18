@@ -20,8 +20,8 @@ use File::Spec;
 
 use File::Temp qw(tempdir);
 
-my $dirname = tempdir(CLEANUP => 1);
-my $filename = File::Spec->catfile($dirname, 'toto.ini');
+my $dirname = tempdir( CLEANUP => 1 );
+my $filename = File::Spec->catfile( $dirname, 'toto.ini' );
 
 {
     {
@@ -38,24 +38,23 @@ EOF
     {
         my %ini;
 
-        my $fh = IO::File->new( $filename , 'r+' );
+        my $fh = IO::File->new( $filename, 'r+' );
         die "Couldn't open file ${filename}: $!" if not defined $fh;
         tie %ini, 'Config::IniFiles', ( -file => $fh, -allowempty => 1 );
 
-
-        tied( %ini )->delval("toto", "tata");
-        tied( %ini )->RewriteConfig;
+        tied(%ini)->delval( "toto", "tata" );
+        tied(%ini)->RewriteConfig;
 
         $ini{toto}{tata} = 'short';
-        tied( %ini )->RewriteConfig;
+        tied(%ini)->RewriteConfig;
 
         $fh->close;
         untie %ini;
     }
 
     # TEST
-    is (
-        scalar (slurp($filename)),
+    is(
+        scalar( slurp($filename) ),
         <<'EOF',
 [toto]
 tata=short

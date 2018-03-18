@@ -1,3 +1,4 @@
+CHANGES
 INSTALL
 lib/Date/Lectionary/Daily.pm
 LICENSE
@@ -6,11 +7,14 @@ MANIFEST			This list of files
 README
 README.md
 README.pod
-share/acna_lect_daily.xml
+share/acna-sec_lect_daily.xml
+share/acna-xian_lect_daily.xml
 t/00-load.t
 t/01-week.t
 t/02-readings.t
+t/02-xian_readings.t
 t/03-fixed_readings.t
+t/04-secular_readings.t
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t

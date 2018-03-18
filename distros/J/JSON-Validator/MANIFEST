@@ -11,13 +11,13 @@ lib/JSON/Validator/cache/a0f5b4b4e75ea17fc09e88ec0343d148
 lib/JSON/Validator/cache/ea34d47d4e060a1c3b12d2287aff89a7
 lib/JSON/Validator/cache/eaa832720f36cff0abc20c05236a9cd9
 lib/JSON/Validator/Error.pm
+lib/JSON/Validator/Joi.pm
 lib/JSON/Validator/OpenAPI.pm
 lib/JSON/Validator/OpenAPI/Dancer2.pm
 lib/JSON/Validator/OpenAPI/Mojolicious.pm
 lib/JSON/Validator/Ref.pm
 Makefile.PL
 MANIFEST			This list of files
-README
 run-all-tests.sh
 t/00-basic.t
 t/acceptance.t
@@ -60,6 +60,7 @@ t/draft4-tests/refRemote.json
 t/draft4-tests/required.json
 t/draft4-tests/type.json
 t/draft4-tests/uniqueItems.json
+t/get.t
 t/Helper.pm
 t/id-keyword.t
 t/invalid-ref.t
@@ -67,6 +68,7 @@ t/issue-22-duplicate-error-messages.t
 t/issue-42-cache-control.t
 t/issue-59-oneof-blessed-booleans.t
 t/issue-71-additionalproperties.t
+t/joi.t
 t/jv-allof.t
 t/jv-anyof.t
 t/jv-array.t
@@ -98,6 +100,7 @@ t/remotes/folder/folderInteger.json
 t/remotes/integer.json
 t/remotes/subSchemas.json
 t/schema-as-attr.t
+t/spec/bundlecheck.json
 t/spec/invalid-ref.t
 t/spec/person.json
 t/spec/petstore.json

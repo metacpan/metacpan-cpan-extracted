@@ -17,42 +17,57 @@ App::NDTools - command line tools for nested structures
 
 =head1 VERSION
 
-Version 0.5.2
+Version 0.5.3
 
 =cut
 
-our $VERSION = "0.5.2";
+our $VERSION = "0.5.3";
 
 =head1 DESCRIPTION
 
-Nested structures quite often require complex processing, this tools aimed to
-solve some "pain in the neck" cases without writing any code.
+Diff, patch, process and query nested structures with ease.
 
 =head1 TOOLS
 
 =over 4
 
-=item B<L<nddiff|App::NDTools::nddiff>>
+=item B<L<nddiff>>
 
 Human friendly (colored, brief) and machine readable (JSON) diff.
 
-=item B<L<ndpatch|App::NDTools::ndpatch>>
+=item B<L<ndpatch>>
 
-Apply diff to structure.
+Apply diff to the structure.
 
-=item B<L<ndproc|App::NDTools::ndproc>>
+=item B<L<ndproc>>
 
 Process structure using rules and modules.
 
-=item B<L<ndquery|App::NDTools::ndquery>>
+=item B<L<ndquery>>
 
-Examine structure and dump it's parts.
+Examine structure with ease.
 
 =back
 
 =head1 INSTALL
 
- cpan App::NDTools
+From CPAN:
+
+    cpanm App::NDTools
+
+Build and install deb package:
+
+    git clone https://github.com/mr-mixas/NDTools.git
+    cd NDTools
+    vim dist/debian/changelog # change sign for last version
+    make -C dist deb
+    sudo dpkg -i ndtools_*.deb
+
+Play without installation:
+
+    git clone https://github.com/mr-mixas/NDTools.git
+    cd NDTools
+    source ./SOURCEME # install depends to the current directory and set ENV
 
 =head1 AUTHOR
 

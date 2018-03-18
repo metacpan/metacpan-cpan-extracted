@@ -1,0 +1,62 @@
+{
+   "abstract" : "HTML validation in a Perl object",
+   "author" : [
+      "Andy Lester <andy@petdance.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTML-Tidy5",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode" : "0",
+            "Exporter" : "0",
+            "Getopt::Long" : "0",
+            "Test::Builder" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.98",
+            "constant" : "0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/petdance/html-tidy5/issues"
+      },
+      "homepage" : "http://github.com/petdance/html-tidy5",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0.php"
+      ],
+      "repository" : {
+         "url" : "http://github.com/petdance/html-tidy5"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

@@ -1,0 +1,5 @@
+%if ($session{RT_Extension_BecomeUser_OriginalUser}){
+    <div id="header">
+    <h1><a href="/BecomeOriginalUser.html">back to original account</a></h1>
+    </div>
+%}

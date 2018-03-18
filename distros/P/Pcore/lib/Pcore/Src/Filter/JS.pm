@@ -17,15 +17,22 @@ sub decompress ( $self, % ) {
 
     return 0 if $self->has_kolon;
 
-    my $js_beautify_args = $self->dist_cfg->{JS_BEAUTIFY} || $self->src_cfg->{JS_BEAUTIFY};
+    if ( 0 && $self->{file}->{path}->mime_type eq 'application/json' ) {
+        my $json = P->data->from_json( $self->buffer );
 
-    my $temp = P->file->tempfile;
+        $self->buffer->$* = P->data->to_json( $json, readable => 1 )->$*;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    }
+    else {
+        my $js_beautify_args = $self->dist_cfg->{JS_BEAUTIFY} || $self->src_cfg->{JS_BEAUTIFY};
 
-    syswrite $temp, $self->buffer->$* or die;
+        my $temp = P->file->tempfile;
 
-    my $proc = P->pm->run_proc( qq[js-beautify $js_beautify_args --replace "$temp"], win32_create_no_window => 1 );
+        syswrite $temp, $self->buffer->$* or die;
 
-    $self->buffer->$* = P->file->read_bin( $temp->path )->$*;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+        my $proc = P->pm->run_proc( qq[js-beautify $js_beautify_args --replace "$temp"], win32_create_no_window => 1 );
+
+        $self->buffer->$* = P->file->read_bin( $temp->path )->$*;            ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    }
 
     my $log;
 
@@ -56,11 +63,18 @@ sub decompress ( $self, % ) {
 }
 
 sub compress ($self) {
-    state $init = !!require JavaScript::Packer;
+    if ( 0 && $self->{file}->{path}->mime_type eq 'application/json' ) {
+        my $json = P->data->from_json( $self->buffer );
 
-    $JS_PACKER //= JavaScript::Packer->init;
+        $self->buffer->$* = P->data->to_json( $json, readable => 0 )->$*;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    }
+    else {
+        state $init = !!require JavaScript::Packer;
 
-    $JS_PACKER->minify( $self->{buffer}, { compress => 'clean' } );
+        $JS_PACKER //= JavaScript::Packer->init;
+
+        $JS_PACKER->minify( $self->{buffer}, { compress => 'clean' } );
+    }
 
     return 0;
 }
@@ -153,7 +167,7 @@ sub run_js_hint ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 79                   | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
+## |    3 | 93                   | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

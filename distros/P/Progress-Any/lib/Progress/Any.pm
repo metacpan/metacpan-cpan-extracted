@@ -1,7 +1,7 @@
 package Progress::Any;
 
-our $DATE = '2015-01-27'; # DATE
-our $VERSION = '0.20'; # VERSION
+our $DATE = '2018-03-17'; # DATE
+our $VERSION = '0.212'; # VERSION
 
 use 5.010001;
 use strict;
@@ -56,7 +56,7 @@ sub _init_indicator {
     my $progress = bless({
         task        => $task,
         title       => $task,
-        target      => 0,
+        target      => undef,
         pos         => 0,
         state       => 'stopped',
 
@@ -352,7 +352,7 @@ sub _update {
 }
 
 sub _should_update_output {
-    my ($self, $output, $now) = @_;
+    my ($self, $output, $now, $priority) = @_;
 
     my $key = "$output";
     $output_data{$key} //= {};
@@ -367,18 +367,20 @@ sub _should_update_output {
         # force update
         delete $odata->{force_update};
         return 1;
-    # } elsif ($args->{prio} eq 'low') {
-        # perhaps provide something like this? a low-priority or minor update so
-        # we don't have to update the outputs?
+    } elsif ($priority eq 'high') {
+        # high priority, send to output module
+        return 1;
     } else {
-        # normal update, update if not too frequent
+        # normal-/low-priority update, update if not too frequent
         if (!defined($odata->{freq})) {
             # negative number means seconds, positive means pos delta. only
             # update if that number of seconds, or that difference in pos has
             # been passed.
             $odata->{freq} = -0.5;
         }
-        if ($odata->{freq} < 0) {
+        if ($odata->{freq} == 0) {
+            return 1;
+        } if ($odata->{freq} < 0) {
             return 1 if $now >= $odata->{mtime} - $odata->{freq};
         } else {
             return 1 if abs($self->{pos} - $odata->{pos}) >= $odata->{freq};
@@ -395,7 +397,7 @@ sub update {
     $self->_update(pos => $pos, state => $state);
 
     my $message  = delete($args{message});
-    my $level    = delete($args{level});
+    my $priority = delete($args{priority}) // 'normal';
     die "Unknown argument(s) to update(): ".join(", ", keys(%args))
         if keys(%args);
 
@@ -403,18 +405,19 @@ sub update {
 
     # find output(s) and call it
     {
+        last unless $ENV{PROGRESS} // 1;
         my $task = $self->{task};
         while (1) {
             if ($outputs{$task}) {
                 for my $output (@{ $outputs{$task} }) {
-                    next unless $self->_should_update_output($output, $now);
+                    next unless $self->_should_update_output($output, $now, $priority);
                     if (ref($message) eq 'CODE') {
                         $message = $message->();
                     }
                     $output->update(
                         indicator => $indicators{$task},
                         message   => $message,
-                        level     => $level,
+                        priority  => $priority,
                         time      => $now,
                     );
                     my $key = "$output";
@@ -442,25 +445,31 @@ sub finish {
     $self->update(pos=>$self->{target}, state=>'finished', %args);
 }
 
-# - currently used letters: emnPpRrTt%
-# - currently used by Output::TermProgressBarColor: bB
-# - letters that can be used later: s (state)
+our $template_regex = qr{( # all=1
+                             %
+                             ( #width=2
+                                 -?\d+ )?
+                             ( #dot=3
+                                 \.?)
+                             ( #prec=4
+                                 \d+)?
+                             ( #conv=5
+                                 [A-Za-z%])
+                         )}x;
+
 sub fill_template {
-    my ($self, $template, %args) = @_;
+    my ($self, $template0, %args) = @_;
 
     # TODO: some caching so "%e%e" produces two identical numbers
 
-    state $re = qr{( # all=1
-                       %
-                       ( #width=2
-                           -?\d+ )?
-                       ( #dot=3
-                           \.?)
-                       ( #prec=4
-                           \d+)?
-                       ( #conv=5
-                           [emnPpRrTt%])
-                   )}x;
+    my ($template, $opts);
+    if (ref $template0 eq 'HASH') {
+        $opts = $template0;
+        $template = $opts->{template};
+    } else {
+        $template = $template0;
+        $opts = {};
+    }
 
     state $sub = sub {
         my %args = @_;
@@ -529,9 +538,29 @@ sub fill_template {
             }
             $width //= -(8 + 1 + 7);
         } else {
-            # return as-is
-            $fmt = '%s';
-            $data = $all;
+            if ($opts->{handle_unknown_conversion}) {
+                my @res = $opts->{handle_unknown_conversion}->(
+                    indicator => $p,
+                    args  => \%args,
+
+                    all   => $all,
+                    width => $width,
+                    dot   => $dot,
+                    conv  => $conv,
+                    prec  => $prec,
+                );
+                if (@res) {
+                    ($fmt, $data) = @res;
+                } else {
+                # return as-is
+                    $fmt = '%s';
+                    $data = $all;
+                }
+            } else {
+                # return as-is
+                $fmt = '%s';
+                $data = $all;
+            }
         }
 
         # sprintf format
@@ -541,9 +570,8 @@ sub fill_template {
 
         #say "D:fmt=$fmt";
         sprintf $fmt, $data;
-
     };
-    $template =~ s{$re}{$sub->(%args, indicator=>$self)}egox;
+    $template =~ s{$template_regex}{$sub->(%args, indicator=>$self)}egox;
 
     $template;
 }
@@ -563,11 +591,12 @@ Progress::Any - Record progress to any output
 
 =head1 VERSION
 
-This document describes version 0.20 of Progress::Any (from Perl distribution Progress-Any), released on 2015-01-27.
+This document describes version 0.212 of Progress::Any (from Perl distribution Progress-Any), released on 2018-03-17.
 
 =head1 SYNOPSIS
 
-=head2 First example, simple usage in a script
+Example of using in a script with terminal progress bar as output (progress bar
+will be cleared on C<finish()>):
 
  use Progress::Any '$progress';
  use Progress::Any::Output 'TermProgressBarColor';
@@ -577,16 +606,38 @@ This document describes version 0.20 of Progress::Any (from Perl distribution Pr
      $progress->update(message => "Doing item $_");
      sleep 1;
  }
+ $progress->finish();
 
 Sample output:
 
  % ./script.pl
   60% [Doing item 6====           ]3s left
 
-=head2 Second example, usage in module as well as script
+Another example, this time with terminal message as output (see :
 
-In your module:
+ use Progress::Any '$progress';
+ use Progress::Any::Output 'TermMessage', template => '[%n] %P/%T (%6.2p%%) %m';
 
+ $progress->target(10);
+ for (1..10) {
+     $progress->update(message => "Item $_/10");
+     sleep 1;
+ }
+ sleep 1;
+ $progress->finish(message => "Finished!");
+
+Sample output:
+
+ % ./script.pl
+ [] 1/10 ( 10.00%) Item 1/10
+ [] 2/10 ( 20.00%) Item 2/10
+ ...
+ [] 10/10 (100.00%) Item 10/10
+ [] 10/10 (100.00%) Finished!
+
+Example of using in a module as well as script:
+
+ # in lib/MyApp.pm
  package MyApp;
  use Progress::Any;
 
@@ -602,38 +653,32 @@ In your module:
      $progress->finish;
  }
 
-In your application:
-
+ # in script.pl
  use MyApp;
  use Progress::Any::Output;
  Progress::Any::Output->set('TermProgressBarColor');
 
  MyApp::download("url1", "url2", "url3", "url4", "url5");
 
-sample output, in succession:
+Sample output:
 
  % ./script.pl
   20% [====== Downloaded url1           ]0m00s Left
-  40% [=======Downloaded url2           ]0m01s Left
-  60% [=======Downloaded url3           ]0m01s Left
-  80% [=======Downloaded url4==         ]0m00s Left
 
-(At 100%, the output automatically cleans up the progress bar).
-
-=head3 Another example, demonstrating multiple indicators and the LogAny output:
+Example that demonstrates multiple indicator objects:
 
  use Progress::Any;
  use Progress::Any::Output;
- use Log::Any::App;
 
- Progress::Any::Output->set('LogAny', template => '[%-8t] [%P/%2T] %m');
  my $pdl = Progress::Any->get_indicator(task => 'download');
+ Progress::Any::Output->set({task=>'download'}, 'TermMessage', template => '[%-8t] [%P/%2T] %m');
  my $pcp = Progress::Any->get_indicator(task => 'copy');
+ Progress::Any::Output->set({task=>'copy'    }, 'TermMessage', template => '[%-8t] [%P/%2T] %m');
 
- $pdl->pos(10);
  $pdl->target(10);
  $pdl->update(message => "downloading A");
  $pcp->update(message => "copying A");
+ sleep 1;
  $pdl->update(message => "downloading B");
  $pcp->update(message => "copying B");
 
@@ -713,7 +758,7 @@ API might still change, will be stabilized in 1.0.
 
 The list of features:
 
-=over 4
+=over
 
 =item * multiple progress indicators
 
@@ -766,34 +811,44 @@ The root indicator. Equivalent to:
 
 Below are the attributes of an indicator/task:
 
-=head2 task => STR* (default: from caller's package, or C<main>)
+=head2 task
+
+String. Default: from caller's package, or C<main>.
 
 Task name. If not specified will be set to caller's package (C<::> will be
 replaced with C<.>), e.g. if you are calling this method from
 C<Foo::Bar::baz()>, then task will be set to C<Foo.Bar>. If caller is code
 inside eval, C<main> will be used instead.
 
-=head2 title => STR* (default: task name)
+=head2 title
+
+String. Default: task name.
 
 Specify task title. Task title is a longer description for a task and can
 contain spaces and other characters. It is displayed in some outputs, as well as
 using C<%t> in C<fill_template()>. For example, for a task called C<copy>, its
 title might be C<Copying files to remote server>.
 
-=head2 target => POSNUM (default: 0)
+=head2 target
+
+Non-negative number. Default: 0.
 
 The total number of items to finish. Can be set to undef to mean that we don't
 know (yet) how many items there are to finish (in which case, we cannot estimate
 percent of completion and remaining time).
 
-=head2 pos => POSNUM* (default: 0)
+=head2 pos
+
+Non-negative number. Default: 0.
 
 The number of items that are already done. It cannot be larger than C<target>,
 if C<target> is defined. If C<target> is set to a value smaller than C<pos> or
 C<pos> is set to a value larger than C<target>, C<pos> will be changed to be
 C<target>.
 
-=head2 state => STR (default: C<stopped>)
+=head2 state
+
+String. Default: C<stopped>.
 
 State of task/indicator. Either: C<stopped>, C<started>, or C<finished>.
 Initially it will be set to C<stopped>, which means elapsed time won't be
@@ -807,7 +862,11 @@ but 100% when state is C<finished>.
 
 =head1 METHODS
 
-=head2 Progress::Any->get_indicator(%args) => OBJ
+=head2 get_indicator
+
+Usage:
+
+ Progress::Any->get_indicator(%args) => obj
 
 Get a progress indicator for a certain task. C<%args> contain attribute values,
 at least C<task> must be specified.
@@ -816,13 +875,17 @@ Note that this module maintains a list of indicator singleton objects for each
 task (in C<%indicators> package variable), so subsequent C<get_indicator()> for
 the same task will return the same object.
 
-=head2 $progress->update(%args)
+=head2 update
+
+Usage:
+
+ $progress->update(%args)
 
 Update indicator. Will also, usually, update associated output(s) if necessary.
 
 Arguments:
 
-=over 4
+=over
 
 =item * pos => NUM
 
@@ -838,12 +901,10 @@ Aside from a string, you can also pass a coderef here. It can be used to delay
 costly calculation. The message will only be calculated when actually sent to
 output.
 
-=item * level => NUM
+=item * priority => str ("normal"|"low"|"high", default: "normal")
 
-EXPERIMENTAL, NOT YET IMPLEMENTED BY MOST OUTPUTS. Setting the importance level
-of this update. Default is C<normal> (or C<low> for fractional update), but can
-be set to C<high> or C<low>. Output can choose to ignore updates lower than a
-certain level.
+Set importance level of this update. Default is C<normal>. Output can choose to
+ignore updates lower than a certain level.
 
 =item * state => STR
 
@@ -851,7 +912,11 @@ Can be set to C<finished> to finish a task.
 
 =back
 
-=head2 $progress->finish(%args)
+=head2 finish
+
+Usage:
+
+ $progress->finish(%args)
 
 Equivalent to:
 
@@ -861,45 +926,81 @@ Equivalent to:
      %args,
  );
 
-=head2 $progress->start()
+=head2 start
+
+Usage:
+
+ $progress->start()
 
 Set state to C<started>.
 
-=head2 $progress->stop()
+=head2 stop
+
+Usage:
+
+ $progress->stop()
 
 Set state to C<stopped>.
 
-=head2 $progress->elapsed() => FLOAT
+=head2 elapsed
+
+Usage:
+
+ $progress->elapsed() => float
 
 Get elapsed time. Just like a stop-watch, when state is C<started> elapsed time
 will run and when state is C<stopped>, it will freeze.
 
-=head2 $progress->remaining() => undef|FLOAT
+=head2 remaining
+
+Usage:
+
+ $progress->remaining() => undef|float
 
 Give estimated remaining time until task is finished, which will depend on how
 fast the C<update()> is called, i.e. how fast C<pos> is approaching C<target>.
 Will be undef if C<target> is undef.
 
-=head2 $progress->total_remaining() => undef|FLOAT
+=head2 total_remaining
+
+Usage:
+
+ $progress->total_remaining() => undef|FLOAT
 
 Give estimated remaining time added by all its subtasks' remaining. Return undef
 if any one of those time is undef.
 
-=head2 $progress->total_pos() => FLOAT
+=head2 total_pos
+
+Usage:
+
+ $progress->total_pos() => float
 
 Total of indicator's pos and all of its subtasks'.
 
-=head2 $progress->total_target() => undef|FLOAT
+=head2 total_target
+
+Usage:
+
+ $progress->total_target() => undef|float
 
 Total of indicator's target and all of its subtasks'. Return undef if any one of
 those is undef.
 
-=head2 $progress->percent_complete() => undef|FLOAT
+=head2 percent_complete
+
+Usage:
+
+ $progress->percent_complete() => undef|float
 
 Give percentage of completion, calculated using C<< total_pos / total_target *
 100 >>. Undef if total_target is undef.
 
-=head2 $progress->fill_template($template)
+=head2 fill_template
+
+Usage:
+
+ $progress->fill_template($template) => str
 
 Fill template with values, like in C<sprintf()>. Usually used by output modules.
 Available templates:
@@ -974,15 +1075,11 @@ A literal C<%> sign.
 
 =head1 FAQ
 
-=head1 SEE ALSO
+=head1 ENVIRONMENT
 
-Other progress modules on CPAN: L<Term::ProgressBar>,
-L<Term::ProgressBar::Simple>, L<Time::Progress>, among others.
+=head2 PROGRESS
 
-Output modules: C<Progress::Any::Output::*>
-
-See examples on how Progress::Any is used by other modules: L<Perinci::CmdLine>
-(supplying progress object to functions), L<Git::Bunch> (using progress object).
+Boolean. Default 1. Can be set to 0 to display progress output.
 
 =head1 HOMEPAGE
 
@@ -1000,13 +1097,23 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+Other progress modules on CPAN: L<Term::ProgressBar>,
+L<Term::ProgressBar::Simple>, L<Time::Progress>, among others.
+
+Output modules: C<Progress::Any::Output::*>
+
+See examples on how Progress::Any is used by other modules: L<Perinci::CmdLine>
+(supplying progress object to functions), L<Git::Bunch> (using progress object).
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

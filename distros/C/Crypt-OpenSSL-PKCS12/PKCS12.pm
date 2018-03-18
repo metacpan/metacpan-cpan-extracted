@@ -5,7 +5,7 @@ use vars qw($VERSION @EXPORT_OK);
 use Exporter;
 use base qw(Exporter);
 
-$VERSION = '0.8';
+$VERSION = '0.9';
 
 @EXPORT_OK = qw(NOKEYS NOCERTS INFO CLCERTS CACERTS);
 
@@ -124,7 +124,7 @@ Dan Sully, E<lt>daniel@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2004-2014 by Dan Sully
+Copyright 2004-2018 by Dan Sully
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

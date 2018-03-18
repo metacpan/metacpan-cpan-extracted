@@ -43,11 +43,19 @@ if (-f "$testdir/pod.ign") {
    chomp(@ign);
 }
 
+my @dirs = ();
+if (-f "$testdir/pod.dirs") {
+   open(IN,"$testdir/pod.dirs");
+   @dirs = <IN>;
+   close(IN);
+   chomp(@dirs);
+}
+
 chdir("..")  if ($testdir eq '.');
 
 if (@ign) {
 
-   my @file = all_pod_files();
+   my @file = all_pod_files(@dirs);
 
    FILE:
    foreach my $file (@file) {
@@ -59,7 +67,7 @@ if (@ign) {
    done_testing();
 
 } else {
-   all_pod_files_ok();
+   all_pod_files_ok(@dirs);
 }
 
 

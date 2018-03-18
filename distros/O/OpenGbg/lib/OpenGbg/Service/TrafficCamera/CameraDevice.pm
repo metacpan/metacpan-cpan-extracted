@@ -6,7 +6,7 @@ package OpenGbg::Service::TrafficCamera::CameraDevice;
 
 # ABSTRACT: Data about a traffic camera
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1402';
+our $VERSION = '0.1403';
 
 use XML::Rabbit;
 use syntax 'qs';
@@ -21,6 +21,12 @@ has_xpath_value capture_interval_seconds => './x:CaptureIntervalSeconds';
 has_xpath_value description => './x:Description';
 
 has_xpath_value model => './x:Model';
+
+sub get_latest_image {
+    my $self = shift;
+
+    return OpenGbg->new->traffic_camera->get_camera_image($self->id);
+}
 
 sub to_text {
     my $self = shift;
@@ -56,7 +62,7 @@ OpenGbg::Service::TrafficCamera::CameraDevice - Data about a traffic camera
 
 =head1 VERSION
 
-Version 0.1402, released 2016-08-12.
+Version 0.1403, released 2018-03-14.
 
 =head1 SYNOPSIS
 
@@ -90,6 +96,10 @@ Integer. How long between captures.
 String. The brand and/or model of the traffic camera.
 
 =head1 METHODS
+
+=head2 get_latest_image
+
+Returns the latest available image from the camera.
 
 =head2 to_text()
 

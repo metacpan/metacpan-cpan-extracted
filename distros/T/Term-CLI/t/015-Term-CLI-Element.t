@@ -8,7 +8,7 @@
 #
 
 use 5.014_001;
-use Modern::Perl;
+use Modern::Perl 1.20140107;
 
 our $ELT_NAME = 'test_elt';
 
@@ -23,10 +23,10 @@ sub Main() {
 
 package Term_CLI_Element_test {
 
-use parent qw( Test::Class );
+use parent 0.228 qw( Test::Class );
 
-use Test::More;
-use FindBin;
+use Test::More 1.001002;
+use FindBin 1.50;
 use Term::CLI::Element;
 use Term::CLI::ReadLine;
 

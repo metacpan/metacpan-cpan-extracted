@@ -236,7 +236,7 @@ $defaultAttr}
 
     printf STDERR $format, $self->confConstantsFile;
     $ra = Regexp::Assemble->new;
-    foreach ( @simpleHashKeys, sort keys %cnodesRe ) {
+    foreach ( @simpleHashKeys, @doubleHashKeys, sort keys %cnodesRe ) {
         $ra->add($_);
     }
     foreach (

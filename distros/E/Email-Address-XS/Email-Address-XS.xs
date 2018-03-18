@@ -407,10 +407,10 @@ static void message_address_add_from_perl_array(pTHX_ struct message_address **f
 	domain = get_perl_hash_value(aTHX_ hash, "host", &domain_len, utf8, taint);
 	comment = get_perl_hash_value(aTHX_ hash, "comment", &comment_len, utf8, taint);
 
-	if (mailbox && !mailbox[0])
+	if (mailbox && !mailbox[0] && mailbox_len == 0)
 		mailbox = NULL;
 
-	if (domain && !domain[0])
+	if (domain && !domain[0] && domain_len == 0)
 		domain = NULL;
 
 	if (!mailbox && !domain) {
@@ -422,13 +422,13 @@ static void message_address_add_from_perl_array(pTHX_ struct message_address **f
 	if (!mailbox) {
 		fill_element_message(buffer, sizeof(buffer), index1, index2);
 		carp(CARP_WARN, "%s contains empty user portion of address", buffer);
-		mailbox = "";
+		return;
 	}
 
 	if (!domain) {
 		fill_element_message(buffer, sizeof(buffer), index1, index2);
 		carp(CARP_WARN, "%s contains empty host portion of address", buffer);
-		domain = "";
+		return;
 	}
 
 	message_address_add(first_address, last_address, name, name_len, NULL, 0, mailbox, mailbox_len, domain, domain_len, comment, comment_len);

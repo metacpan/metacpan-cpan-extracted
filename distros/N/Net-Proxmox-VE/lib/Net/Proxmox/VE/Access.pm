@@ -6,10 +6,9 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE::Access;
-$Net::Proxmox::VE::Access::VERSION = '0.32';
+$Net::Proxmox::VE::Access::VERSION = '0.33';
 use parent 'Exporter';
 
-use LWP::UserAgent;
 use JSON qw(decode_json);
 
 our @EXPORT =
@@ -375,7 +374,7 @@ sub check_login_ticket {
         && $self->{ticket}->{username} eq $self->{params}->{username} . '@'
         . $self->{params}->{realm}
         && $self->{ticket_timestamp}
-        && $self->{ticket_timestamp} < ( time() + $self->{ticket_life} ) )
+        && ( $self->{ticket_timestamp} + $self->{ticket_life} ) > time() )
     {
         return 1;
     }
@@ -418,20 +417,9 @@ sub login {
     # Prepare login request
     my $url = $self->url_prefix . '/api2/json/access/ticket';
 
-    my %lwpUserAgentOptions;
-    if ($self->{params}->{ssl_opts}) {
-        $lwpUserAgentOptions{ssl_opts} = $self->{params}->{ssl_opts};
-    }
-
-    my $ua = LWP::UserAgent->new( %lwpUserAgentOptions );
-
-    $ua->timeout($self->{params}->{timeout});
-
-    $self->{ua} = $ua;
-
     # Perform login request
     my $request_time = time();
-    my $response     = $ua->post(
+    my $response     = $self->{ua}->post(
         $url,
         {
             'username' => $self->{params}->{username} . '@'
@@ -526,7 +514,7 @@ Net::Proxmox::VE::Access - Functions for the 'access' portion of the API
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -1012,7 +1000,7 @@ Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@bytefoun
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Dean Hamstad.
+This software is copyright (c) 2018 by Dean Hamstad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

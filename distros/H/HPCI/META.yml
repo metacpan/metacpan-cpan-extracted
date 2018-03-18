@@ -31,7 +31,7 @@ provides:
     file: lib/HPCD/uni/Stage.pm
   HPCI:
     file: lib/HPCI.pm
-    version: '0.62'
+    version: '0.63'
   HPCI::CommandScript:
     file: lib/HPCI/CommandScript.pm
   HPCI::Env:
@@ -86,5 +86,5 @@ requires:
   namespace::autoclean: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.62'
+version: '0.63'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,6 +1,6 @@
 
 package Kevin::Commands::Util;
-$Kevin::Commands::Util::VERSION = '0.5.5';
+$Kevin::Commands::Util::VERSION = '0.6.0';
 use Mojo::Base -strict;
 
 # Borrowed from https://github.com/docker/go-units/blob/master/duration.go
@@ -67,7 +67,7 @@ Kevin::Commands::Util
 
 =head1 VERSION
 
-version 0.5.5
+version 0.6.0
 
 =head1 AUTHOR
 

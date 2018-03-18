@@ -1,5 +1,11 @@
 Revision history for Clustericious
 
+1.29      2018-03-11 14:24:27 -0400
+  - Deprecated. See https://github.com/clustericious/Clustericious/issues/46
+
+1.28_01   2018-01-22 10:34:23 -0500
+  - Possible fx for gh#45
+
 1.27      2017-10-26 16:22:49 -0400
   - Add compatability with Test2::Harness / App::Yath
   - Switch from Test::Builder to Test2::API

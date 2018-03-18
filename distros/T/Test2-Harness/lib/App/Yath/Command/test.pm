@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '0.001057';
+our $VERSION = '0.001061';
 
 use Test2::Harness::Util::TestFile;
 use Test2::Harness::Feeder::Run;
@@ -262,6 +262,26 @@ sub options {
                 }
             },
         },
+
+        {
+            spec    => 'uuids!',
+            field   => 'event_uuids',
+            used_by => {jobs => 1},
+            section => 'Job Options',
+            usage   => ['--no-uuids'],
+            summary => ['Disable Test2::Plugin::UUID (Loaded by default)'],
+            default => 1,
+        },
+
+        {
+            spec    => 'mem-usage!',
+            field   => 'mem_usage',
+            used_by => {jobs => 1},
+            section => 'Job Options',
+            usage   => ['--no-mem-usage'],
+            summary => ['Disable Test2::Plugin::MemUsage (Loaded by default)'],
+            default => 1,
+        },
     );
 }
 
@@ -281,12 +301,13 @@ sub feeder {
     my $queue = $runner->queue;
     $queue->start;
 
-    my $job_id = 1;
+    my $job_count = 0;
     for my $tf ($run->find_files) {
-        $queue->enqueue($tf->queue_item($job_id++));
+        $job_count++;
+        $queue->enqueue($tf->queue_item($job_count));
     }
 
-    my $pid = $runner->spawn(jobs_todo => $job_id - 1);
+    my $pid = $runner->spawn(jobs_todo => $job_count);
 
     $queue->end;
 
@@ -297,7 +318,7 @@ sub feeder {
         keep_dir => $settings->{keep_dir},
     );
 
-    return ($feeder, $runner, $pid, $job_id - 1);
+    return ($feeder, $runner, $pid, $job_count);
 }
 
 sub run_command {
@@ -385,7 +406,7 @@ sub run_command {
 
     if (@$bad) {
         $self->paint("\nThe following test jobs failed:\n");
-        $self->paint("  [", $_->{job_id}, '] ', File::Spec->abs2rel($_->file), "\n") for sort {
+        $self->paint("  [", $_->{job_id}, '] ' . $_->{job_name} . ': ', File::Spec->abs2rel($_->file), "\n") for sort {
             my $an = $a->{job_id};
             $an =~ s/\D+//g;
             my $bn = $b->{job_id};
@@ -804,6 +825,14 @@ Use the specified file as standard input to ALL tests
 
 Do not include 'lib'
 
+=item --no-mem-usage
+
+Disable Test2::Plugin::MemUsage (Loaded by default)
+
+=item --no-uuids
+
+Disable Test2::Plugin::UUID (Loaded by default)
+
 =item --slack "#CHANNEL"
 
 =item --slack "@USER"
@@ -1059,6 +1088,12 @@ Show the run configuration when a run starts
 =item --quiet
 
 Be very quiet
+
+=item -T
+
+=item --show-times
+
+Show the timing data for each job
 
 =item -v
 

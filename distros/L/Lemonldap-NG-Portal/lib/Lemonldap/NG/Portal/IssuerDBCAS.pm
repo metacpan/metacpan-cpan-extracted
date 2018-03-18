@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::_CAS;
 use base qw(Lemonldap::NG::Portal::_CAS Lemonldap::NG::Portal::_LibAccess);
 use URI;
 
-our $VERSION = '1.9.12';
+our $VERSION = '1.9.16';
 
 ## @method void issuerDBInit()
 # Nothing to do
@@ -29,13 +29,15 @@ sub issuerForUnAuthUser {
     my $self = shift;
 
     # CAS URLs
-    my $issuerDBCASPath     = $self->{issuerDBCASPath};
-    my $cas_login           = 'login';
-    my $cas_logout          = 'logout';
-    my $cas_validate        = 'validate';
-    my $cas_serviceValidate = 'serviceValidate';
-    my $cas_proxyValidate   = 'proxyValidate';
-    my $cas_proxy           = 'proxy';
+    my $issuerDBCASPath        = $self->{issuerDBCASPath};
+    my $cas_login              = 'login';
+    my $cas_logout             = 'logout';
+    my $cas_validate           = 'validate';
+    my $cas_serviceValidate    = 'serviceValidate';
+    my $cas_p3_serviceValidate = 'p3/serviceValidate';
+    my $cas_proxyValidate      = 'proxyValidate';
+    my $cas_p3_proxyValidate   = 'p3/proxyValidate';
+    my $cas_proxy              = 'proxy';
 
     # Called URL
     my $url = $self->url();
@@ -230,11 +232,14 @@ sub issuerForUnAuthUser {
     # 4. SERVICE VALIDATE [CAS 2.0]
     # 5. PROXY VALIDATE [CAS 2.0]
     if (   ( $url_path =~ m#${issuerDBCASPath}${cas_serviceValidate}# )
-        || ( $url_path =~ m#${issuerDBCASPath}${cas_proxyValidate}# ) )
+        || ( $url_path =~ m#${issuerDBCASPath}${cas_p3_serviceValidate}# )
+        || ( $url_path =~ m#${issuerDBCASPath}${cas_proxyValidate}# )
+        || ( $url_path =~ m#${issuerDBCASPath}${cas_p3_proxyValidate}# ) )
     {
 
         my $urlType = (
             $url_path =~ m#${issuerDBCASPath}${cas_serviceValidate}#
+              || $url_path =~ m#${issuerDBCASPath}${cas_p3_serviceValidate}#
             ? 'SERVICE'
             : 'PROXY'
         );
@@ -550,13 +555,15 @@ sub issuerForAuthUser {
     my $self = shift;
 
     # CAS URLs
-    my $issuerDBCASPath     = $self->{issuerDBCASPath};
-    my $cas_login           = 'login';
-    my $cas_logout          = 'logout';
-    my $cas_validate        = 'validate';
-    my $cas_serviceValidate = 'serviceValidate';
-    my $cas_proxyValidate   = 'proxyValidate';
-    my $cas_proxy           = 'proxy';
+    my $issuerDBCASPath        = $self->{issuerDBCASPath};
+    my $cas_login              = 'login';
+    my $cas_logout             = 'logout';
+    my $cas_validate           = 'validate';
+    my $cas_serviceValidate    = 'serviceValidate';
+    my $cas_p3_serviceValidate = 'p3/serviceValidate';
+    my $cas_proxyValidate      = 'proxyValidate';
+    my $cas_p3_proxyValidate   = 'p3/proxyValidate';
+    my $cas_proxy              = 'proxy';
 
     # Called URL
     my $url = $self->url();
@@ -755,7 +762,9 @@ sub issuerForAuthUser {
     }
 
     # 4. SERVICE VALIDATE [CAS 2.0]
-    if ( $url_path =~ m#${issuerDBCASPath}${cas_serviceValidate}# ) {
+    if (   $url_path =~ m#${issuerDBCASPath}${cas_serviceValidate}#
+        || $url_path =~ m#${issuerDBCASPath}${cas_p3_serviceValidate}# )
+    {
 
         $self->lmLog( "URL $url detected as an CAS SERVICE VALIDATE URL",
             'debug' );
@@ -770,7 +779,9 @@ sub issuerForAuthUser {
     }
 
     # 5. PROXY VALIDATE [CAS 2.0]
-    if ( $url_path =~ m#${issuerDBCASPath}${cas_proxyValidate}# ) {
+    if (   $url_path =~ m#${issuerDBCASPath}${cas_proxyValidate}#
+        || $url_path =~ m#${issuerDBCASPath}${cas_p3_proxyValidate}# )
+    {
 
         $self->lmLog( "URL $url detected as an CAS PROXY VALIDATE URL",
             'debug' );

@@ -2,7 +2,7 @@ package Plack::Middleware::PrettyException;
 
 # ABSTRACT: Capture exceptions and present them as HTML or JSON
 
-our $VERSION = '1.004';
+our $VERSION = '1.006';
 
 use 5.010;
 use strict;
@@ -135,10 +135,10 @@ sub render_html_error {
     if ($exception && $exception->can('does')) {
         my @more;
         if ($exception->does('Throwable::X')) {
-            push(@more, "<li>".$exception->ident."</li>");
+            push(@more, "<li><strong>".$exception->ident."</strong></li>");
             my $payload = $exception->payload;
             while (my ($k, $v) = each %$payload) {
-                push(@more,"<li>$k: $v</li>");
+                push(@more,sprintf("<li>%s: %s</li>", $k, $v // ''));
             }
         }
         if (@more) {
@@ -172,7 +172,7 @@ Plack::Middleware::PrettyException - Capture exceptions and present them as HTML
 
 =head1 VERSION
 
-version 1.004
+version 1.006
 
 =head1 SYNOPSIS
 
@@ -313,7 +313,7 @@ HTML and JSON. There is some semi-dumb checking of the
 C<Accept>-Header, but I only check for literal C<application/json>
 (while I should do the whole q-factor weighting dance).
 
-If you want to force all your errors to JSON, pass C<force_json => 1>
+If you want to force all your errors to JSON, pass C<force_json =E<gt> 1>
 when loading the middleware:
 
   builder {

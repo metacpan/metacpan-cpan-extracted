@@ -17,7 +17,7 @@ use Carp;
 use HiPi qw( :lcd );
 use Time::HiRes;
 
-our $VERSION ='0.68';
+our $VERSION ='0.69';
 
 __PACKAGE__->create_accessors( qw(
     width lines backlightcontrol positionmap devicename serialbuffermode

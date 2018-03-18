@@ -18,7 +18,11 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
 
     print 'clean PAUSE ... ';
 
-    say $pause->clean( keep => 2 );
+    my $res = $pause->clean( keep => 2 );
+
+    say $res;
+
+    say join $LF, $res->{data}->@* if $res->{data};
 
     return;
 }

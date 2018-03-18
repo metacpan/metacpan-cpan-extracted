@@ -26,10 +26,10 @@ no_index:
 provides:
   Cmd::Dwarf:
     file: lib/Cmd/Dwarf.pm
-    version: '1.60'
+    version: '1.70'
   Dwarf:
     file: lib/Dwarf.pm
-    version: '1.60'
+    version: '1.70'
 requires:
   AnyEvent: '0'
   AnyEvent::HTTP: '0'
@@ -44,6 +44,8 @@ requires:
   DateTime::Format::Strptime: '0'
   Email::MIME: '0'
   Email::Sender::Simple: '0'
+  Email::Valid: '0'
+  Email::Valid::Loose: '0'
   Exporter::Lite: '0'
   File::Basename: '0'
   File::Copy: '0'
@@ -62,6 +64,8 @@ requires:
   Log::Dispatch: '0'
   Log::Dispatch::FileRotate: '0'
   Module::Find: '0'
+  Mouse: '0'
+  Mouse::Util::TypeConstraints: '0'
   Net::OAuth: '0'
   Plack: '0'
   Plack::Handler::CLI: '0'
@@ -84,7 +88,7 @@ resources:
   bugtracker: https://github.com/seagirl/dwarf/issues
   homepage: https://github.com/seagirl/dwarf
   repository: git://github.com/seagirl/dwarf.git
-version: '1.60'
+version: '1.70'
 x_authority: cpan:seagirl
 x_contributors:
   - 'tak <yoshizu@sb163.s2factory.co.jp>'

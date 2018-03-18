@@ -17,7 +17,7 @@ use Carp;
 use HiPi qw( :spi :mcp4dac );
 use HiPi::Device::SPI;
 
-our $VERSION ='0.68';
+our $VERSION ='0.69';
 
 __PACKAGE__->create_accessors( qw( bitsperword minvar ic devicename
                                    dualchannel canbuffer buffer gain

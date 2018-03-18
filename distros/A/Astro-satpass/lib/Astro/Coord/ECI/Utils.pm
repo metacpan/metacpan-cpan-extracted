@@ -35,6 +35,10 @@ This imports everything exportable into your name space.
 This imports the parameter validation routines C<__classisa> and
 C<__instance>.
 
+=item :ref
+
+This imports all the C<*_REF> constants.
+
 =item :time
 
 This imports the time routines into your name space. If
@@ -67,6 +71,11 @@ need to specify them first in your import list.
  SECS_PER_SIDERIAL_DAY = seconds in a siderial day
  SPEED_OF_LIGHT = speed of light in kilometers per second
  TWOPI = twice the circle ratio
+
+ ARRAY_REF  = 'ARRAY'
+ CODE_REF   = 'CODE'
+ HASH_REF   = 'HASH'
+ SCALAR_REF = 'SCALAR'
 
 =head2 The following global variables are exportable:
 
@@ -104,7 +113,7 @@ package Astro::Coord::ECI::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.090';
+our $VERSION = '0.091';
 our @ISA = qw{Exporter};
 
 use Carp;
@@ -199,7 +208,9 @@ our @EXPORT;
 our @EXPORT_OK = ( qw{
 	AU $DATETIMEFORMAT $JD_GREGORIAN JD_OF_EPOCH LIGHTYEAR PARSEC
 	PERL2000 PI PIOVER2 SECSPERDAY SECS_PER_SIDERIAL_DAY
-	SPEED_OF_LIGHT TWOPI acos add_magnitudes asin
+	SPEED_OF_LIGHT TWOPI
+	ARRAY_REF CODE_REF HASH_REF SCALAR_REF
+	acos add_magnitudes asin
 	atmospheric_extinction date2epoch date2jd
 	decode_space_track_json_time deg2rad distsq dynamical_delta
 	embodies epoch2datetime equation_of_time find_first_true
@@ -215,6 +226,7 @@ our @EXPORT_OK = ( qw{
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
     params => [ qw{ __classisa __instance } ],
+    ref	=> [ grep { m/ [[:upper:]]+ _REF \z /smx } @EXPORT_OK ],
     time => \@time_routines,
     vector => [ grep { m/ \A vector_ /smx } @EXPORT_OK ],
 );
@@ -234,6 +246,10 @@ use constant SPEED_OF_LIGHT => 299792.458;	# KM/sec, per NIST.
 ### use constant SOLAR_RADIUS => 1392000 / 2;	# Meeus, Appendix I, page 407.
 use constant TWOPI => PI * 2;
 
+use constant ARRAY_REF	=> ref [];
+use constant CODE_REF	=> ref sub {};
+use constant HASH_REF	=> ref {};
+use constant SCALAR_REF	=> ref \0;
 
 =item $angle = acos ($value)
 
@@ -467,17 +483,19 @@ six-dimensional distance.
 =cut
 
 sub distsq {
-    my ($a, $b) = @_;
-    (ref $a eq 'ARRAY' && ref $b eq 'ARRAY' && @$a == @$b) or
-	confess <<eod;
-Programming error - Both arguments to distsq must be  references to
+    my ( $x, $y ) = @_;
+    ARRAY_REF eq ref $x
+	and ARRAY_REF eq ref $y
+	and @{ $x } == @{ $y }
+	or confess <<'EOD';
+Programming error - Both arguments to distsq must be references to
         arrays of the same length.
-eod
+EOD
 
     my $sum = 0;
-    my $size = @$a;
+    my $size = @$x;
     for (my $inx = 0; $inx < $size; $inx++) {
-	my $delta = $a->[$inx] - $b->[$inx];
+	my $delta = $x->[$inx] - $y->[$inx];
 	$sum += $delta * $delta;
     }
     return $sum
@@ -1181,40 +1199,40 @@ sub vector_dot_product {
     return $prod;
 }
 
-=item $a = vector_magnitude( $b );
+=item $m = vector_magnitude( $x );
 
-This subroutine computes and returns the magnitude of vector $b. The
+This subroutine computes and returns the magnitude of vector $x. The
 vector is represented by an array reference.
 
 =cut
 
 sub vector_magnitude {
-    my ( $b ) = @_;
-    'ARRAY' eq ref $b
+    my ( $x ) = @_;
+    ARRAY_REF eq ref $x
 	or confess 'Programming error - vector_magnitude argument ',
     'must be a reference to an array';
     my $mag = 0;
-    my $size = @{ $b } - 1;
+    my $size = @{ $x } - 1;
     foreach my $inx ( 0 .. $size ) {
-	$mag += $b->[$inx] * $b->[$inx];
+	$mag += $x->[$inx] * $x->[$inx];
     }
     return sqrt $mag;
 }
 
-=item $a = vector_unitize( $b );
+=item $u = vector_unitize( $x );
 
 This subroutine computes and returns a unit vector pointing in the same
-direction as $b. The vectors are represented by array references.
+direction as $x. The vectors are represented by array references.
 
 =cut
 
 sub vector_unitize {
-    my ( $b ) = @_;
-    'ARRAY' eq ref $b
+    my ( $x ) = @_;
+    ARRAY_REF eq ref $x
 	or confess 'Programming error - vector_unitize argument ',
     'must be a reference to an array';
-    my $mag = vector_magnitude( $b );
-    return [ map { $_ / $mag } @{ $b } ];
+    my $mag = vector_magnitude( $x );
+    return [ map { $_ / $mag } @{ $x } ];
 }
 
 #	__classisa( 'Foo', 'Bar' );

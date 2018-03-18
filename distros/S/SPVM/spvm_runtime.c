@@ -13,7 +13,6 @@
 #include "spvm_object.h"
 #include "spvm_type.h"
 #include "spvm_runtime.h"
-#include "spvm_constant_pool.h"
 #include "spvm_opcode.h"
 #include "spvm_opcode_array.h"
 #include "spvm_runtime_allocator.h"
@@ -29,6 +28,7 @@
 #include "spvm_op.h"
 #include "spvm_list.h"
 #include "spvm_opcode_array.h"
+#include "spvm_constant.h"
 
 SPVM_API_VALUE SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_id, SPVM_API_VALUE* args) {
   (void)api;
@@ -206,7 +206,6 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
   // Runtime
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime(api);
   SPVM_COMPILER* compiler = runtime->compiler;
-  int32_t* constant_pool = compiler->constant_pool->values;
 
   // Constant pool sub
   SPVM_OP* op_sub = SPVM_LIST_fetch(compiler->op_subs, sub_id);
@@ -230,7 +229,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
   // Opcode base
   int32_t sub_opcode_base = sub->opcode_base;
   
-  SPVM_CALL_STACK_INFO call_stack_info = {};
+  SPVM_CALL_STACK_INFO call_stack_info;
   SPVM_CALL_STACK_init_call_stack_info(&call_stack_info, runtime, sub_id);
 
   // Subroutine stack
@@ -245,8 +244,8 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
   memcpy(call_stack, args, args_length * sizeof(SPVM_API_VALUE));
 
   // Auto decrement reference count variable index stack top
-  SPVM_API_VALUE* auto_dec_ref_count_stack = &call_stack[call_stack_info.auto_dec_ref_count_stack_base];
-  int32_t auto_dec_ref_count_stack_top = -1;
+  SPVM_API_VALUE* object_var_index_stack = &call_stack[call_stack_info.object_var_index_stack_base];
+  int32_t object_var_index_stack_top = -1;
 
   // Call subroutine argument stack top
   int32_t call_sub_arg_stack_top = -1;
@@ -685,41 +684,23 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
       case SPVM_OPCODE_C_ID_LOAD_UNDEF:
         *(SPVM_API_OBJECT**)&vars[opcode->operand0] = NULL;
         break;
-      case SPVM_OPCODE_C_ID_LOAD_CONSTANT_BYTE_0:
-        *(SPVM_API_byte*)&vars[opcode->operand0] = (int8_t)0;
-        break;
-      case SPVM_OPCODE_C_ID_LOAD_CONSTANT_SHORT_0:
-        *(SPVM_API_short*)&vars[opcode->operand0] = (int16_t)0;
-        break;
-      case SPVM_OPCODE_C_ID_LOAD_CONSTANT_INT_0:
-        *(SPVM_API_int*)&vars[opcode->operand0] = (int32_t)0;
-        break;
-      case SPVM_OPCODE_C_ID_LOAD_CONSTANT_LONG_0:
-        *(SPVM_API_long*)&vars[opcode->operand0] = (int64_t)0;
-        break;
-      case SPVM_OPCODE_C_ID_LOAD_CONSTANT_FLOAT_0:
-        *(float*)&vars[opcode->operand0] = (float)0;
-        break;
-      case SPVM_OPCODE_C_ID_LOAD_CONSTANT_DOUBLE_0:
-        *(double*)&vars[opcode->operand0] = (double)0;
-        break;
       case SPVM_OPCODE_C_ID_LOAD_CONSTANT_BYTE:
-        *(SPVM_API_byte*)&vars[opcode->operand0] = *(SPVM_API_byte*)&constant_pool[opcode->operand1];
+        *(SPVM_API_byte*)&vars[opcode->operand0] = *(SPVM_API_byte*)&opcode->operand1;
         break;
       case SPVM_OPCODE_C_ID_LOAD_CONSTANT_SHORT:
-        *(SPVM_API_short*)&vars[opcode->operand0] = *(SPVM_API_short*)&constant_pool[opcode->operand1];
+        *(SPVM_API_short*)&vars[opcode->operand0] = *(SPVM_API_short*)&opcode->operand1;
         break;
       case SPVM_OPCODE_C_ID_LOAD_CONSTANT_INT:
-        *(SPVM_API_int*)&vars[opcode->operand0] = *(SPVM_API_int*)&constant_pool[opcode->operand1];
+        *(SPVM_API_int*)&vars[opcode->operand0] = *(SPVM_API_int*)&opcode->operand1;
         break;
       case SPVM_OPCODE_C_ID_LOAD_CONSTANT_LONG:
-        *(SPVM_API_long*)&vars[opcode->operand0] = *(SPVM_API_long*)&constant_pool[opcode->operand1];
+        *(SPVM_API_long*)&vars[opcode->operand0] = *(SPVM_API_long*)&opcode->operand1;
         break;
       case SPVM_OPCODE_C_ID_LOAD_CONSTANT_FLOAT:
-        *(float*)&vars[opcode->operand0] = *(float*)&constant_pool[opcode->operand1];
+        *(float*)&vars[opcode->operand0] = *(float*)&opcode->operand1;
         break;
       case SPVM_OPCODE_C_ID_LOAD_CONSTANT_DOUBLE:
-        *(double*)&vars[opcode->operand0] = *(double*)&constant_pool[opcode->operand1];
+        *(double*)&vars[opcode->operand0] = *(double*)&opcode->operand1;
         break;
       case SPVM_OPCODE_C_ID_ARRAY_LOAD_BYTE: {
         SPVM_API_OBJECT* array = *(SPVM_API_OBJECT**)&vars[opcode->operand1];
@@ -1061,17 +1042,17 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_PUSH_AUTO_DEC_REF_COUNT: {
-        auto_dec_ref_count_stack_top++;
-        *(int32_t*)&auto_dec_ref_count_stack[auto_dec_ref_count_stack_top] = opcode->operand0;
+      case SPVM_OPCODE_C_ID_PUSH_OBJECT_VAR_INDEX: {
+        object_var_index_stack_top++;
+        *(int32_t*)&object_var_index_stack[object_var_index_stack_top] = opcode->operand0;
         
         break;
       }
       case SPVM_OPCODE_C_ID_LEAVE_SCOPE: {
-        int32_t auto_dec_ref_count_stack_current_base = opcode->operand0;
-        int32_t auto_dec_ref_count_index;
-        for (auto_dec_ref_count_index = auto_dec_ref_count_stack_current_base; auto_dec_ref_count_index <= auto_dec_ref_count_stack_top; auto_dec_ref_count_index++) {
-          int32_t var_index = auto_dec_ref_count_stack[auto_dec_ref_count_index].int_value;
+        int32_t object_var_index_stack_current_base = opcode->operand0;
+        int32_t object_var_index_index;
+        for (object_var_index_index = object_var_index_stack_current_base; object_var_index_index <= object_var_index_stack_top; object_var_index_index++) {
+          int32_t var_index = object_var_index_stack[object_var_index_index].int_value;
           
           if (*(SPVM_API_OBJECT**)&vars[var_index] != NULL) {
             if (SPVM_RUNTIME_C_INLINE_GET_REF_COUNT(*(SPVM_API_OBJECT**)&vars[var_index]) > 1) { SPVM_RUNTIME_C_INLINE_DEC_REF_COUNT_ONLY(*(SPVM_API_OBJECT**)&vars[var_index]); }
@@ -1079,7 +1060,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
           }
         }
         
-        auto_dec_ref_count_stack_top = auto_dec_ref_count_stack_current_base - 1;
+        object_var_index_stack_top = object_var_index_stack_current_base - 1;
         
         break;
       }
@@ -1173,9 +1154,12 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         break;
       }
       case SPVM_OPCODE_C_ID_NEW_STRING: {
-        int32_t name_id = opcode->operand1;
+        int32_t constant_id = opcode->operand1;
         
-        SPVM_API_OBJECT* string = api->new_string(api, (char*)&constant_pool[name_id + 1], constant_pool[name_id]);
+        SPVM_OP* op_constant = SPVM_LIST_fetch(compiler->op_constants, constant_id);
+        SPVM_CONSTANT* constant = op_constant->uv.constant;
+        
+        SPVM_API_OBJECT* string = api->new_string(api, constant->value.string_value, constant->string_length);
 
         // Set string
         *(SPVM_API_OBJECT**)&vars[opcode->operand0] = string;
@@ -1585,7 +1569,13 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_PUSH_ARG:
+      case SPVM_OPCODE_C_ID_PUSH_ARG_BYTE:
+      case SPVM_OPCODE_C_ID_PUSH_ARG_SHORT:
+      case SPVM_OPCODE_C_ID_PUSH_ARG_INT:
+      case SPVM_OPCODE_C_ID_PUSH_ARG_LONG:
+      case SPVM_OPCODE_C_ID_PUSH_ARG_FLOAT:
+      case SPVM_OPCODE_C_ID_PUSH_ARG_DOUBLE:
+      case SPVM_OPCODE_C_ID_PUSH_ARG_OBJECT:
         call_sub_arg_stack_top++;
         call_sub_args[call_sub_arg_stack_top] = vars[opcode->operand0];
         
@@ -1659,7 +1649,8 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
           if (sub_return_type_id != SPVM_TYPE_C_ID_VOID) {
             memset(&return_value, 0, sizeof(SPVM_API_VALUE));
           }
-          goto label_SPVM_OPCODE_C_ID_RETURN;
+          opcode_index = opcode->operand0;
+          continue;
         }
         break;
       }
@@ -1681,7 +1672,8 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
           }
         }
         
-        goto label_SPVM_OPCODE_C_ID_RETURN;
+        opcode_index = opcode->operand1;
+        continue;
       }
       case SPVM_OPCODE_C_ID_TABLE_SWITCH: {
         // default offset
@@ -1754,23 +1746,14 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         
         continue;
       }
+      case SPVM_OPCODE_C_ID_END: {
+        goto label_END;
+      }
     }
     opcode_index++;
   }
 
-  label_SPVM_OPCODE_C_ID_RETURN: {
-    
-    {
-      int32_t auto_dec_ref_count_index;
-      for (auto_dec_ref_count_index = 0; auto_dec_ref_count_index <= auto_dec_ref_count_stack_top; auto_dec_ref_count_index++) {
-        int32_t var_index = auto_dec_ref_count_stack[auto_dec_ref_count_index].int_value;
-        
-        if (*(SPVM_API_OBJECT**)&vars[var_index] != NULL) {
-          if (SPVM_RUNTIME_C_INLINE_GET_REF_COUNT(*(SPVM_API_OBJECT**)&vars[var_index]) > 1) { SPVM_RUNTIME_C_INLINE_DEC_REF_COUNT_ONLY(*(SPVM_API_OBJECT**)&vars[var_index]); }
-          else { api->dec_ref_count(api, *(SPVM_API_OBJECT**)&vars[var_index]); }
-        }
-      }
-    }
+  label_END: {
     
     // Croak
     if (!croak_flag) {

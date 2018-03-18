@@ -1,3 +1,23 @@
+0.000111  2018-03-14 12:37:45-07:00 America/Los_Angeles
+
+    - No Changes since last trial
+
+0.000110  2018-03-13 13:36:37-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Allow events from unattached processes in AsyncSubtest
+
+0.000109  2018-03-12 13:20:18-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Add AsyncSubtest retrieval to hubs
+
+0.000108  2018-03-11 12:51:56-07:00 America/Los_Angeles
+
+    - No changes since last release
+
+0.000107  2018-03-09 15:43:30-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Add rounded() and within() wrappers for approximate comparisons
+
 0.000106  2018-03-06 13:10:55-08:00 America/Los_Angeles
 
     - No changes since trial

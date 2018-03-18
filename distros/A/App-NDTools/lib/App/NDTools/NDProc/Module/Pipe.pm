@@ -10,7 +10,7 @@ use App::NDTools::Slurp qw(s_decode s_encode);
 use Struct::Path 0.80 qw(path);
 use Struct::Path::PerlStyle 0.80 qw(str2path);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub MODINFO { "Modify structure using external process" }
 
@@ -20,7 +20,6 @@ sub arg_opts {
     return (
         $self->SUPER::arg_opts(),
         'command|cmd=s' => \$self->{OPTS}->{command},
-        'preserve=s@' => \$self->{OPTS}->{preserve},
         'strict' => \$self->{OPTS}->{strict},
     )
 }
@@ -71,7 +70,7 @@ __END__
 
 =head1 NAME
 
-Pipe - pipe structure to external program and apply result.
+Pipe - pass structure to external program and apply result.
 
 =head1 OPTIONS
 
@@ -83,25 +82,25 @@ Blame calculation toggle. Enabled by default.
 
 =item B<--command|--cmd> E<lt>commandE<gt>
 
-Command to run. Exit 0 expected for success. JSON emitted to it's STDERR
-will be applied to original structure.
+Command to run. JSON encoded structure passed to it's STDIN and it's STDOUT
+applied to original structure. Exit 0 expected for success.
 
 =item B<--path> E<lt>pathE<gt>
 
-Structure to send to cammand's STDIN.
+Path to substructure to deal with.
 
 =item B<--preserve> E<lt>pathE<gt>
 
-Preserve specified structure parts. May be used several times.
+Preserve specified substructure. May be used several times.
 
 =item B<--strict>
 
-Fail if specified path doesn't exists.
+Fail if specified path doesn't exist.
 
 =back
 
 =head1 SEE ALSO
 
-L<ndproc(1)>, L<ndproc-modules>
+L<ndproc>, L<ndproc-modules>
 
-L<nddiff(1)>, L<ndquery(1)>, L<Struct::Path::PerlStyle>
+L<nddiff>, L<ndquery>, L<Struct::Path::PerlStyle>

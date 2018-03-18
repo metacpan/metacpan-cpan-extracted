@@ -6,6 +6,7 @@ use Carp 'confess';
 use Exporter 'import';
 use JSON::Validator::Error;
 use JSON::Validator::Ref;
+use JSON::Validator::Joi;
 use Mojo::File 'path';
 use Mojo::JSON::Pointer;
 use Mojo::JSON;
@@ -24,8 +25,8 @@ use constant VALIDATE_HOSTNAME => eval 'require Data::Validate::Domain;1';
 use constant VALIDATE_IP       => eval 'require Data::Validate::IP;1';
 
 our $ERR;    # ugly hack to improve validation errors
-our $VERSION = '2.03';
-our @EXPORT_OK = 'validate_json';
+our $VERSION = '2.05';
+our @EXPORT_OK = qw(joi validate_json);
 
 my $BUNDLED_CACHE_DIR = path(path(__FILE__)->dirname, qw(Validator cache));
 my $HTTP_SCHEME_RE = qr{^https?:};
@@ -121,14 +122,28 @@ sub coerce {
 
 sub get {
   my ($self, $pointer) = @_;
-  my $data = $self->schema->data;
+  $pointer = [ref $pointer ? @$pointer : length $pointer ? split('/', $pointer, -1) : $pointer];
+  shift @$pointer if @$pointer and defined $pointer->[0] and !length $pointer->[0];
+  $self->_get($self->schema->data, $pointer, '');
+}
+
+sub _get {
+  my ($self, $data, $path, $pos, $cb) = @_;
   my $tied;
 
-  return $data unless ref $pointer or $pointer =~ s!^/!!;
-  $pointer = [length $pointer ? (split '/', $pointer, -1) : ($pointer)] unless ref $pointer;
-  for my $p (@$pointer) {
+  while (@$path) {
+    my $p = shift @$path;
+
+    unless (defined $p) {
+      my $i = 0;
+      return Mojo::Collection->new(map { $self->_get($_->[0], [@$path], _path($pos, $_->[1]), $cb) }
+          ref $data eq 'ARRAY' ? map { [$_, $i++] }
+          @$data : ref $data eq 'HASH' ? map { [$data->{$_}, $_] } sort keys %$data : [$data, '']);
+    }
+
     $p =~ s!~1!/!g;
     $p =~ s/~0/~/g;
+    $pos = _path($pos, $p) if $cb;
 
     if (ref $data eq 'HASH' and exists $data->{$p}) {
       $data = $data->{$p};
@@ -143,7 +158,14 @@ sub get {
     $data = $tied->schema if ref $data eq 'HASH' and $tied = tied %$data;
   }
 
+  return $cb->($data, $pos) if $cb;
   return $data;
+}
+
+sub joi {
+  return JSON::Validator::Joi->new unless @_;
+  my ($data, $joi) = @_;
+  return $joi->validate($data, $joi);
 }
 
 sub load_and_validate_schema {
@@ -221,7 +243,7 @@ sub _load_schema {
   if (-e $file) {
     $file = $file->realpath;
     warn "[JSON::Validator] Loading schema from file: $file\n" if DEBUG;
-    return $self->_load_schema_from_text(\$file->slurp), $url;
+    return $self->_load_schema_from_text(\$file->slurp), $file;
   }
   elsif ($file =~ m!^/!) {
     warn "[JSON::Validator] Loading schema from URL $url\n" if DEBUG;
@@ -354,6 +376,7 @@ sub _resolve {
         or -e $rid
         or $rid =~ m!^/!;
     }
+    warn sprintf "[JSON::Validator] Using root_schema_url of '$rid'\n" if DEBUG;
     $self->{root_schema_url} = $rid;
   }
 
@@ -987,7 +1010,7 @@ JSON::Validator - Validate data against a JSON schema
 
 =head1 VERSION
 
-2.03
+2.05
 
 =head1 SYNOPSIS
 
@@ -1160,6 +1183,17 @@ welcome!
 
 =head1 FUNCTIONS
 
+=head2 joi
+
+  use JSON::Validator "joi";
+  my $joi = joi;
+  my @errors = joi($data, $joi); # same as $joi->validate($data);
+
+Used to construct a new L<JSON::Validator::Joi> object or perform validation.
+
+Note that this function iS EXPERIMENTAL. See L<JSON::Validator::Joi> for more
+details.
+
 =head2 validate_json
 
   use JSON::Validator "validate_json";
@@ -1299,6 +1333,7 @@ for more details.
 =head2 get
 
   $sub_schema = $self->get("/x/y");
+  $sub_schema = $self->get(["x", "y"]);
 
 Extract value from L</schema> identified by the given JSON Pointer. Will at the
 same time resolve C<$ref> if found. Example:
@@ -1309,6 +1344,9 @@ same time resolve C<$ref> if found. Example:
   $self->get('/x')                   == {type => 'string'}
 
 This method is EXPERIMENTAL.
+
+The argument can also be an array-ref with the different parts of the pointer
+as each elements.
 
 =head2 load_and_validate_schema
 

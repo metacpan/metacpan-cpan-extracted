@@ -1,5 +1,5 @@
 ---
-abstract: 'Run blocking code in a process using an unholy combination of forks and Mojolicious'
+abstract: '(Deprecated) Run blocking code in a process using an unholy combination of forks and Mojolicious'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
@@ -26,5 +26,7 @@ resources:
   bugtracker: https://github.com/clustericious/Test-Clustericious-Blocking/issues
   homepage: https://metacpan.org/pod/Test::Clustericious::Blocking
   repository: git://github.com/clustericious/Test-Clustericious-Blocking.git
-version: '0.06'
+version: '0.07'
+x_deprecated: 1
 x_serialization_backend: 'YAML::Tiny version 1.70'
+x_use_unsafe_inc: 0

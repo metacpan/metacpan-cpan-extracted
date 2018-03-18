@@ -2,22 +2,21 @@
 use strict;
 use warnings;
 
-use 5.008009;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "create lightweight on-the-fly objects from hashes",
+  "ABSTRACT" => "create on-the-fly objects from hashes",
   "AUTHOR" => "Diab Jerius <djerius\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Hash-Wrap",
   "LICENSE" => "gpl",
-  "MIN_PERL_VERSION" => "5.008009",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Hash::Wrap",
   "PREREQ_PM" => {
-    "MRO::Compat" => 0,
     "Scalar::Util" => 0
   },
   "TEST_REQUIRES" => {
@@ -25,11 +24,10 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Number::Tolerant" => 0,
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.08",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,8 +39,6 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "MRO::Compat" => 0,
-  "Number::Tolerant" => 0,
   "Scalar::Util" => 0,
   "Test2::V0" => 0,
   "Test::More" => 0

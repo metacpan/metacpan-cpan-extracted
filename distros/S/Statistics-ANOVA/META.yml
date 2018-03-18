@@ -3,12 +3,12 @@ abstract: 'Parametric and nonparametric 1-way analyses of variance for means-com
 author:
   - 'Roderick Garton <rgarton@cpan.org>'
 build_requires:
-  Array::Compare: '2.11'
+  Array::Compare: '2.012002'
   Test::More: '0.98'
 configure_requires:
   Module::Build: '0.421'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,13 +17,13 @@ name: Statistics-ANOVA
 provides:
   Statistics::ANOVA:
     file: lib/Statistics/ANOVA.pm
-    version: '0.13'
+    version: '0.14'
   Statistics::ANOVA::Compare:
     file: lib/Statistics/ANOVA/Compare.pm
     version: '0.01'
   Statistics::ANOVA::EffectSize:
     file: lib/Statistics/ANOVA/EffectSize.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   List::AllUtils: '0.09'
   Math::Cephes: '0.5304'
@@ -38,7 +38,5 @@ requires:
   Statistics::DependantTTest: '0.03'
   Statistics::Lite: '3.62'
   Statistics::TTest: '1.1'
-resources:
-  license: http://dev.perl.org/licenses/
-version: '0.13'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+version: '0.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

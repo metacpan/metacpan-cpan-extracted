@@ -41,7 +41,7 @@
             "JSON" : "0",
             "Log::Log4Cli" : "0.21",
             "Module::Find" : "0",
-            "Struct::Diff" : "0.94",
+            "Struct::Diff" : "0.95",
             "Struct::Path" : "0.81",
             "Struct::Path::PerlStyle" : "0.8",
             "YAML::XS" : "0",
@@ -55,5 +55,5 @@
          "url" : "https://github.com/mr-mixas/NDTools"
       }
    },
-   "version" : "v0.5.2"
+   "version" : "v0.5.3"
 }

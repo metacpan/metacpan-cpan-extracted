@@ -37,6 +37,7 @@ foreach my $type (qw( app client ))
   
     SKIP: {
       skip 'Test requires prove', 2 unless $have_prove;
+      skip 'Test requires yath executable', 2 unless !! which('prove');
       run_ok('prove', '-l')
         ->exit_is(0)
         ->note;
@@ -44,6 +45,7 @@ foreach my $type (qw( app client ))
     
     SKIP: {
       skip 'Test requires yath', 2 unless $have_yath;
+      skip 'Test requires yath executable', 2 unless !! which('yath');
       run_ok('yath')
         ->exit_is(0)
         ->note;
@@ -80,8 +82,9 @@ $app->process_args(@ARGV);
 $app->run;
 
 @@ bin/yath
-#!/usr/bin/yath
+#!/usr/bin/perl
 use strict;
 use warnings;
 use App::Yath (\@ARGV, \$App::Yath::RUN);
 exit($App::Yath::RUN->());
+

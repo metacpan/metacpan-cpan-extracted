@@ -1,28 +1,57 @@
-SYNOPSIS
+NAME
+    Progress::Any - Record progress to any output
 
- First example, simple usage in a script
+VERSION
+    This document describes version 0.212 of Progress::Any (from Perl
+    distribution Progress-Any), released on 2018-03-17.
+
+SYNOPSIS
+    Example of using in a script with terminal progress bar as output
+    (progress bar will be cleared on "finish()"):
 
      use Progress::Any '$progress';
      use Progress::Any::Output 'TermProgressBarColor';
-    
+
      $progress->target(10);
      for (1..10) {
          $progress->update(message => "Doing item $_");
          sleep 1;
      }
+     $progress->finish();
 
     Sample output:
 
      % ./script.pl
       60% [Doing item 6====           ]3s left
 
- Second example, usage in module as well as script
+    Another example, this time with terminal message as output (see :
 
-    In your module:
+     use Progress::Any '$progress';
+     use Progress::Any::Output 'TermMessage', template => '[%n] %P/%T (%6.2p%%) %m';
 
+     $progress->target(10);
+     for (1..10) {
+         $progress->update(message => "Item $_/10");
+         sleep 1;
+     }
+     sleep 1;
+     $progress->finish(message => "Finished!");
+
+    Sample output:
+
+     % ./script.pl
+     [] 1/10 ( 10.00%) Item 1/10
+     [] 2/10 ( 20.00%) Item 2/10
+     ...
+     [] 10/10 (100.00%) Item 10/10
+     [] 10/10 (100.00%) Finished!
+
+    Example of using in a module as well as script:
+
+     # in lib/MyApp.pm
      package MyApp;
      use Progress::Any;
-    
+
      sub download {
          my @urls = @_;
          return unless @urls;
@@ -35,38 +64,32 @@ SYNOPSIS
          $progress->finish;
      }
 
-    In your application:
-
+     # in script.pl
      use MyApp;
      use Progress::Any::Output;
      Progress::Any::Output->set('TermProgressBarColor');
-    
+
      MyApp::download("url1", "url2", "url3", "url4", "url5");
 
-    sample output, in succession:
+    Sample output:
 
      % ./script.pl
       20% [====== Downloaded url1           ]0m00s Left
-      40% [=======Downloaded url2           ]0m01s Left
-      60% [=======Downloaded url3           ]0m01s Left
-      80% [=======Downloaded url4==         ]0m00s Left
 
-    (At 100%, the output automatically cleans up the progress bar).
-
-  Another example, demonstrating multiple indicators and the LogAny output:
+    Example that demonstrates multiple indicator objects:
 
      use Progress::Any;
      use Progress::Any::Output;
-     use Log::Any::App;
-    
-     Progress::Any::Output->set('LogAny', template => '[%-8t] [%P/%2T] %m');
+
      my $pdl = Progress::Any->get_indicator(task => 'download');
+     Progress::Any::Output->set({task=>'download'}, 'TermMessage', template => '[%-8t] [%P/%2T] %m');
      my $pcp = Progress::Any->get_indicator(task => 'copy');
-    
-     $pdl->pos(10);
+     Progress::Any::Output->set({task=>'copy'    }, 'TermMessage', template => '[%-8t] [%P/%2T] %m');
+
      $pdl->target(10);
      $pdl->update(message => "downloading A");
      $pcp->update(message => "copying A");
+     sleep 1;
      $pdl->update(message => "downloading B");
      $pcp->update(message => "copying B");
 
@@ -77,11 +100,10 @@ SYNOPSIS
      [download] [2/10] downloading B
      [copy    ] [2/ ?] copying B
 
- Example of using with Perinci::CmdLine
-
+  Example of using with Perinci::CmdLine
     If you use Perinci::CmdLine, you can mark your function as expecting a
     Progress::Any object and it will be supplied to you in a special
-    argument -progress:
+    argument "-progress":
 
      use File::chdir;
      use Perinci::CmdLine;
@@ -112,17 +134,12 @@ SYNOPSIS
      }
      Perinci::CmdLine->new(url => '/main/check_dir')->run;
 
-STATUS
-
-    API might still change, will be stabilized in 1.0.
-
 DESCRIPTION
-
-    Progress::Any is an interface for applications that want to display
+    "Progress::Any" is an interface for applications that want to display
     progress to users. It decouples progress updating and output, rather
     similar to how Log::Any decouples log producers and consumers (output).
-    The API is also rather similar to Log::Any, except Adapter is called
-    Output and category is called task.
+    The API is also rather similar to Log::Any, except *Adapter* is called
+    *Output* and *category* is called *task*.
 
     Progress::Any records position/target and calculates elapsed time,
     estimated remaining time, and percentage of completion. One or more
@@ -137,143 +154,155 @@ DESCRIPTION
 
     Screenshots:
 
+STATUS
+    API might still change, will be stabilized in 1.0.
+
     The list of features:
 
-      * multiple progress indicators
+    *   multiple progress indicators
 
-      You can use different indicator for each task/subtask.
+        You can use different indicator for each task/subtask.
 
-      * customizable output
+    *   customizable output
 
-      Output is handled by one of Progress::Any::Output::* modules.
-      Currently available outputs: Null (no output), TermMessage (display
-      as simple message on terminal), TermProgressBarColor (display as
-      color progress bar on terminal), LogAny (log using Log::Any),
-      Callback (call a subroutine). Other possible output ideas:
-      IM/Twitter/SMS, GUI, web/AJAX, remote/RPC (over Riap for example, so
-      that Perinci::CmdLine-based command-line clients can display progress
-      update from remote functions).
+        Output is handled by one of "Progress::Any::Output::*" modules.
+        Currently available outputs: "Null" (no output), "TermMessage"
+        (display as simple message on terminal), "TermProgressBarColor"
+        (display as color progress bar on terminal), "LogAny" (log using
+        Log::Any), "Callback" (call a subroutine). Other possible output
+        ideas: IM/Twitter/SMS, GUI, web/AJAX, remote/RPC (over Riap for
+        example, so that Perinci::CmdLine-based command-line clients can
+        display progress update from remote functions).
 
-      * multiple outputs
+    *   multiple outputs
 
-      One or more outputs can be used to display one or more indicators.
+        One or more outputs can be used to display one or more indicators.
 
-      * hierarchical progress
+    *   hierarchical progress
 
-      A task can be divided into subtasks. If a subtask is updated, its
-      parent task (and its parent, and so on) are also updated
-      proportionally.
+        A task can be divided into subtasks. If a subtask is updated, its
+        parent task (and its parent, and so on) are also updated
+        proportionally.
 
-      * message
+    *   message
 
-      Aside from setting a number/percentage, allow including a message
-      when updating indicator.
+        Aside from setting a number/percentage, allow including a message
+        when updating indicator.
 
-      * undefined target
+    *   undefined target
 
-      Target can be undefined, so a bar output might not show any bar (or
-      show them, but without percentage indicator), but can still show
-      messages.
+        Target can be undefined, so a bar output might not show any bar (or
+        show them, but without percentage indicator), but can still show
+        messages.
 
-      * retargetting
+    *   retargetting
 
-      Target can be changed in the middle of things.
+        Target can be changed in the middle of things.
 
 EXPORTS
-
- $progress => OBJ
-
+  $progress => OBJ
     The root indicator. Equivalent to:
 
      Progress::Any->get_indicator(task => '')
 
 ATTRIBUTES
-
     Below are the attributes of an indicator/task:
 
- task => STR* (default: from caller's package, or main)
+  task
+    String. Default: from caller's package, or "main".
 
-    Task name. If not specified will be set to caller's package (:: will be
-    replaced with .), e.g. if you are calling this method from
-    Foo::Bar::baz(), then task will be set to Foo.Bar. If caller is code
-    inside eval, main will be used instead.
+    Task name. If not specified will be set to caller's package ("::" will
+    be replaced with "."), e.g. if you are calling this method from
+    "Foo::Bar::baz()", then task will be set to "Foo.Bar". If caller is code
+    inside eval, "main" will be used instead.
 
- title => STR* (default: task name)
+  title
+    String. Default: task name.
 
     Specify task title. Task title is a longer description for a task and
     can contain spaces and other characters. It is displayed in some
-    outputs, as well as using %t in fill_template(). For example, for a
-    task called copy, its title might be Copying files to remote server.
+    outputs, as well as using %t in "fill_template()". For example, for a
+    task called "copy", its title might be "Copying files to remote server".
 
- target => POSNUM (default: 0)
+  target
+    Non-negative number. Default: 0.
 
-    The total number of items to finish. Can be set to undef to mean that
-    we don't know (yet) how many items there are to finish (in which case,
-    we cannot estimate percent of completion and remaining time).
+    The total number of items to finish. Can be set to undef to mean that we
+    don't know (yet) how many items there are to finish (in which case, we
+    cannot estimate percent of completion and remaining time).
 
- pos => POSNUM* (default: 0)
+  pos
+    Non-negative number. Default: 0.
 
     The number of items that are already done. It cannot be larger than
-    target, if target is defined. If target is set to a value smaller than
-    pos or pos is set to a value larger than target, pos will be changed to
-    be target.
+    "target", if "target" is defined. If "target" is set to a value smaller
+    than "pos" or "pos" is set to a value larger than "target", "pos" will
+    be changed to be "target".
 
- state => STR (default: stopped)
+  state
+    String. Default: "stopped".
 
-    State of task/indicator. Either: stopped, started, or finished.
-    Initially it will be set to stopped, which means elapsed time won't be
-    running and will stay at 0. update() will set the state to started to
-    get elapsed time to run. At the end of task, you can call finish() (or
-    alternatively set state to finished) to stop the elapsed time again.
+    State of task/indicator. Either: "stopped", "started", or "finished".
+    Initially it will be set to "stopped", which means elapsed time won't be
+    running and will stay at 0. "update()" will set the state to "started"
+    to get elapsed time to run. At the end of task, you can call "finish()"
+    (or alternatively set "state" to "finished") to stop the elapsed time
+    again.
 
-    The difference between stopped and finished is: when target and pos are
-    both at 0, percent completed is assumed to be 0% when state is stopped,
-    but 100% when state is finished.
+    The difference between "stopped" and "finished" is: when "target" and
+    "pos" are both at 0, percent completed is assumed to be 0% when state is
+    "stopped", but 100% when state is "finished".
 
 METHODS
+  get_indicator
+    Usage:
 
- Progress::Any->get_indicator(%args) => OBJ
+     Progress::Any->get_indicator(%args) => obj
 
     Get a progress indicator for a certain task. %args contain attribute
-    values, at least task must be specified.
+    values, at least "task" must be specified.
 
     Note that this module maintains a list of indicator singleton objects
     for each task (in %indicators package variable), so subsequent
-    get_indicator() for the same task will return the same object.
+    "get_indicator()" for the same task will return the same object.
 
- $progress->update(%args)
+  update
+    Usage:
+
+     $progress->update(%args)
 
     Update indicator. Will also, usually, update associated output(s) if
     necessary.
 
     Arguments:
 
-      * pos => NUM
+    *   pos => NUM
 
-      Set the new position. If unspecified, defaults to current position +
-      1. If pos is larger than target, outputs will generally still show
-      100%. Note that fractions are allowed.
+        Set the new position. If unspecified, defaults to current position +
+        1. If pos is larger than target, outputs will generally still show
+        100%. Note that fractions are allowed.
 
-      * message => str|code
+    *   message => str|code
 
-      Set a message to be displayed when updating indicator.
+        Set a message to be displayed when updating indicator.
 
-      Aside from a string, you can also pass a coderef here. It can be used
-      to delay costly calculation. The message will only be calculated when
-      actually sent to output.
+        Aside from a string, you can also pass a coderef here. It can be
+        used to delay costly calculation. The message will only be
+        calculated when actually sent to output.
 
-      * level => NUM
+    *   priority => str ("normal"|"low"|"high", default: "normal")
 
-      EXPERIMENTAL, NOT YET IMPLEMENTED BY MOST OUTPUTS. Setting the
-      importance level of this update. Default is normal (or low for
-      fractional update), but can be set to high or low. Output can choose
-      to ignore updates lower than a certain level.
+        Set importance level of this update. Default is "normal". Output can
+        choose to ignore updates lower than a certain level.
 
-      * state => STR
+    *   state => STR
 
-      Can be set to finished to finish a task.
+        Can be set to "finished" to finish a task.
 
- $progress->finish(%args)
+  finish
+    Usage:
+
+     $progress->finish(%args)
 
     Equivalent to:
 
@@ -283,125 +312,179 @@ METHODS
          %args,
      );
 
- $progress->start()
+  start
+    Usage:
 
-    Set state to started.
+     $progress->start()
 
- $progress->stop()
+    Set state to "started".
 
-    Set state to stopped.
+  stop
+    Usage:
 
- $progress->elapsed() => FLOAT
+     $progress->stop()
 
-    Get elapsed time. Just like a stop-watch, when state is started elapsed
-    time will run and when state is stopped, it will freeze.
+    Set state to "stopped".
 
- $progress->remaining() => undef|FLOAT
+  elapsed
+    Usage:
+
+     $progress->elapsed() => float
+
+    Get elapsed time. Just like a stop-watch, when state is "started"
+    elapsed time will run and when state is "stopped", it will freeze.
+
+  remaining
+    Usage:
+
+     $progress->remaining() => undef|float
 
     Give estimated remaining time until task is finished, which will depend
-    on how fast the update() is called, i.e. how fast pos is approaching
-    target. Will be undef if target is undef.
+    on how fast the "update()" is called, i.e. how fast "pos" is approaching
+    "target". Will be undef if "target" is undef.
 
- $progress->total_remaining() => undef|FLOAT
+  total_remaining
+    Usage:
+
+     $progress->total_remaining() => undef|FLOAT
 
     Give estimated remaining time added by all its subtasks' remaining.
     Return undef if any one of those time is undef.
 
- $progress->total_pos() => FLOAT
+  total_pos
+    Usage:
+
+     $progress->total_pos() => float
 
     Total of indicator's pos and all of its subtasks'.
 
- $progress->total_target() => undef|FLOAT
+  total_target
+    Usage:
+
+     $progress->total_target() => undef|float
 
     Total of indicator's target and all of its subtasks'. Return undef if
     any one of those is undef.
 
- $progress->percent_complete() => undef|FLOAT
+  percent_complete
+    Usage:
 
-    Give percentage of completion, calculated using total_pos /
-    total_target * 100. Undef if total_target is undef.
+     $progress->percent_complete() => undef|float
 
- $progress->fill_template($template)
+    Give percentage of completion, calculated using "total_pos /
+    total_target * 100". Undef if total_target is undef.
 
-    Fill template with values, like in sprintf(). Usually used by output
+  fill_template
+    Usage:
+
+     $progress->fill_template($template) => str
+
+    Fill template with values, like in "sprintf()". Usually used by output
     modules. Available templates:
 
-      * %(width)n
+    *   "%(width)n"
 
-      Task name (the value of the task attribute). width is optional, an
-      integer, like in sprintf(), can be negative to mean left-justify
-      instead of right.
+        Task name (the value of the "task" attribute). "width" is optional,
+        an integer, like in "sprintf()", can be negative to mean
+        left-justify instead of right.
 
-      * %(width)t
+    *   "%(width)t"
 
-      Task title (the value of the title attribute).
+        Task title (the value of the "title" attribute).
 
-      * %(width)e
+    *   "%(width)e"
 
-      Elapsed time (the result from the elapsed() method). Currently using
-      Time::Duration concise format, e.g. 10s, 1m40s, 16m40s, 1d4h, and so
-      on. Format might be configurable and localizable in the future.
-      Default width is -8. Examples:
+        Elapsed time (the result from the "elapsed()" method). Currently
+        using Time::Duration concise format, e.g. 10s, 1m40s, 16m40s, 1d4h,
+        and so on. Format might be configurable and localizable in the
+        future. Default width is -8. Examples:
 
-       2m30s
-       10s
+         2m30s
+         10s
 
-      * %(width)r
+    *   "%(width)r"
 
-      Estimated remaining time (the result of the total_remaining()
-      method). Currently using Time::Duration concise format, e.g. 10s,
-      1m40s, 16m40s, 1d4h, and so on. Will show ? if unknown. Format might
-      be configurable and localizable in the future. Default width is -8.
-      Examples:
+        Estimated remaining time (the result of the "total_remaining()"
+        method). Currently using Time::Duration concise format, e.g. 10s,
+        1m40s, 16m40s, 1d4h, and so on. Will show "?" if unknown. Format
+        might be configurable and localizable in the future. Default width
+        is -8. Examples:
 
-       1m40s
-       5s
+         1m40s
+         5s
 
-      * %(width)R
+    *   "%(width)R"
 
-      Estimated remaining time or elapsed time, if estimated remaining time
-      is not calculatable (e.g. when target is undefined). Format might be
-      configurable and localizable in the future. Default width is
-      -(8+1+7). Examples:
+        Estimated remaining time *or* elapsed time, if estimated remaining
+        time is not calculatable (e.g. when target is undefined). Format
+        might be configurable and localizable in the future. Default width
+        is -(8+1+7). Examples:
 
-       30s left
-       1m40s elapsed
+         30s left
+         1m40s elapsed
 
-      * %(width).(prec)p
+    *   "%(width).(prec)p"
 
-      Percentage of completion (the result of the percent_complete()
-      method). width and precision are optional, like %f in Perl's
-      sprintf(), default is %3.0p. If percentage is unknown (due to target
-      being undef), will show ?.
+        Percentage of completion (the result of the "percent_complete()"
+        method). "width" and "precision" are optional, like %f in Perl's
+        "sprintf()", default is "%3.0p". If percentage is unknown (due to
+        target being undef), will show "?".
 
-      * %(width)P
+    *   "%(width)P"
 
-      Current position (the result of the total_pos() method).
+        Current position (the result of the "total_pos()" method).
 
-      * %(width)T
+    *   "%(width)T"
 
-      Target (the result of the total_target() method). If undefined, will
-      show ?.
+        Target (the result of the "total_target()" method). If undefined,
+        will show "?".
 
-      * %m
+    *   %m
 
-      Message (the update() parameter). If message is unspecified, will
-      show empty string.
+        Message (the "update()" parameter). If message is unspecified, will
+        show empty string.
 
-      * %%
+    *   "%%"
 
-      A literal % sign.
+        A literal "%" sign.
 
 FAQ
+ENVIRONMENT
+  PROGRESS
+    Boolean. Default 1. Can be set to 0 to display progress output.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Progress-Any>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Progress-Any>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Progress-Any>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Other progress modules on CPAN: Term::ProgressBar,
     Term::ProgressBar::Simple, Time::Progress, among others.
 
-    Output modules: Progress::Any::Output::*
+    Output modules: "Progress::Any::Output::*"
 
     See examples on how Progress::Any is used by other modules:
     Perinci::CmdLine (supplying progress object to functions), Git::Bunch
     (using progress object).
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2015, 2014, 2013, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -49,7 +49,6 @@ use Hash::Wrap ( {
     -as     => 'undefined_created_class',
     -undef => 1,
     -class  => 'My::CreatedClass::Lvalue',
-    -create => 1
 } );
 
 subtest 'create class' => sub {

@@ -18,7 +18,7 @@ Perinci::CmdLine::Manual - Perinci::CmdLine manual
 
 =head1 VERSION
 
-This document describes version 1.77 of Perinci::CmdLine::Manual (from Perl distribution Perinci-CmdLine), released on 2017-07-31.
+This document describes version 1.811.0 of Perinci::CmdLine::Manual (from Perl distribution Perinci-CmdLine), released on 2018-03-17.
 
 =head1 DESCRIPTION
 
@@ -311,8 +311,7 @@ scripts activated immediately.
 
 For functions that express that they do progress updating (by setting their
 C<progress> feature to true), Perinci::CmdLine will setup an output, currently
-either L<Progress::Any::Output::TermProgressBar> if program runs interactively,
-or L<Progress::Any::Output::LogAny> if program doesn't run interactively.
+either L<Progress::Any::Output::TermProgressBar> if program runs interactively.
 
 =head1 CONFIGURATION FILE
 
@@ -429,7 +428,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

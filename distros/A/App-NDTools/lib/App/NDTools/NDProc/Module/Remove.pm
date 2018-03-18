@@ -62,16 +62,16 @@ Path in the structure to remove. May be used several times.
 
 =item B<--preserve> E<lt>pathE<gt>
 
-Preserve specified structure parts. May be used several times.
+Preserve specified substructure. May be used several times.
 
 =item B<--strict>
 
-Fail if path specified for remove doesn't exists.
+Fail if path specified for remove doesn't exist.
 
 =back
 
 =head1 SEE ALSO
 
-L<ndproc(1)>, L<ndproc-modules>
+L<ndproc>, L<ndproc-modules>
 
-L<nddiff(1)>, L<ndquery(1)>, L<Struct::Path::PerlStyle>
+L<nddiff>, L<ndquery>, L<Struct::Path::PerlStyle>

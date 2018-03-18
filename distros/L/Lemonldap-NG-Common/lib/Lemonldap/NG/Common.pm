@@ -1,6 +1,6 @@
 package Lemonldap::NG::Common;
 
-our $VERSION = '1.9.15';
+our $VERSION = '1.9.16';
 
 use strict;
 

@@ -1,14 +1,16 @@
 ---
 abstract: "API Client for Dell's management interface (iDRAC)"
 author:
-  - 'Jules Decol (@Apcros)'
+  - 'Jules Decol - @Apcros'
 build_requires:
   LWP::UserAgent::Mockable: '0'
-  Test::More: '0'
+  Path::Tiny: '0'
+  Test::Deep: '0'
+  Test::Most: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.0.16, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,18 +29,80 @@ no_index:
 provides:
   DracPerl::Client:
     file: lib/DracPerl/Client.pm
-    version: '0.10'
+    version: '0.20'
+  DracPerl::CollectionMappings:
+    file: lib/DracPerl/CollectionMappings.pm
+  DracPerl::Factories::CommandCollection:
+    file: lib/DracPerl/Factories/CommandCollection.pm
+  DracPerl::Factories::DellDefaultCommand:
+    file: lib/DracPerl/Factories/DellDefaultCommand.pm
+  DracPerl::Models::Abstract::CPU:
+    file: lib/DracPerl/Models/Abstract/CPU.pm
+  DracPerl::Models::Abstract::Controller:
+    file: lib/DracPerl/Models/Abstract/Controller.pm
+  DracPerl::Models::Abstract::DiscreteSensor:
+    file: lib/DracPerl/Models/Abstract/DiscreteSensor.pm
+  DracPerl::Models::Abstract::EventLogEntry:
+    file: lib/DracPerl/Models/Abstract/EventLogEntry.pm
+  DracPerl::Models::Abstract::Memory:
+    file: lib/DracPerl/Models/Abstract/Memory.pm
+  DracPerl::Models::Abstract::NIC:
+    file: lib/DracPerl/Models/Abstract/NIC.pm
+  DracPerl::Models::Abstract::PhysicalDisk:
+    file: lib/DracPerl/Models/Abstract/PhysicalDisk.pm
+  DracPerl::Models::Abstract::PowerSupplySensor:
+    file: lib/DracPerl/Models/Abstract/PowerSupplySensor.pm
+  DracPerl::Models::Abstract::PowerSupplySlot:
+    file: lib/DracPerl/Models/Abstract/PowerSupplySlot.pm
+  DracPerl::Models::Abstract::RacLogEntry:
+    file: lib/DracPerl/Models/Abstract/RacLogEntry.pm
+  DracPerl::Models::Abstract::ThresholdSensor:
+    file: lib/DracPerl/Models/Abstract/ThresholdSensor.pm
+  DracPerl::Models::Abstract::VFlash:
+    file: lib/DracPerl/Models/Abstract/VFlash.pm
+  DracPerl::Models::Abstract::VideoCard:
+    file: lib/DracPerl/Models/Abstract/VideoCard.pm
+  DracPerl::Models::Abstract::iDracCard:
+    file: lib/DracPerl/Models/Abstract/iDracCard.pm
+  DracPerl::Models::Auth:
+    file: lib/DracPerl/Models/Auth.pm
+  DracPerl::Models::Commands::Collection::LCD:
+    file: lib/DracPerl/Models/Commands/Collection/LCD.pm
+  DracPerl::Models::Commands::Collection::SystemInformations:
+    file: lib/DracPerl/Models/Commands/Collection/SystemInformations.pm
+  DracPerl::Models::Commands::DellDefault::Batteries:
+    file: lib/DracPerl/Models/Commands/DellDefault/Batteries.pm
+  DracPerl::Models::Commands::DellDefault::EventLogEntries:
+    file: lib/DracPerl/Models/Commands/DellDefault/EventLogEntries.pm
+  DracPerl::Models::Commands::DellDefault::Fans:
+    file: lib/DracPerl/Models/Commands/DellDefault/Fans.pm
+  DracPerl::Models::Commands::DellDefault::FansRedundancy:
+    file: lib/DracPerl/Models/Commands/DellDefault/FansRedundancy.pm
+  DracPerl::Models::Commands::DellDefault::GetInv:
+    file: lib/DracPerl/Models/Commands/DellDefault/GetInv.pm
+  DracPerl::Models::Commands::DellDefault::Intrusion:
+    file: lib/DracPerl/Models/Commands/DellDefault/Intrusion.pm
+  DracPerl::Models::Commands::DellDefault::PowerSupplies:
+    file: lib/DracPerl/Models/Commands/DellDefault/PowerSupplies.pm
+  DracPerl::Models::Commands::DellDefault::RacLogEntries:
+    file: lib/DracPerl/Models/Commands/DellDefault/RacLogEntries.pm
+  DracPerl::Models::Commands::DellDefault::Temperatures:
+    file: lib/DracPerl/Models/Commands/DellDefault/Temperatures.pm
+  DracPerl::Models::Commands::DellDefault::Voltages:
+    file: lib/DracPerl/Models/Commands/DellDefault/Voltages.pm
 requires:
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
   Log::Any: '0'
   Moose: '0'
-  XML::Simple: '0'
+  MooseX::AbstractFactory: '0'
+  Readonly: '0'
+  XML::Rabbit: '0'
 resources:
   bugtracker: https://github.com/apcros/Drac-Perl/issues
   homepage: https://github.com/apcros/Drac-Perl
   repository: git://github.com/apcros/Drac-Perl.git
-version: '0.10'
+version: '0.20'
 x_contributors:
-  - 'Apcros <apcros.mail@gmail.com>'
+  - 'Jules Decol <apcros.mail@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

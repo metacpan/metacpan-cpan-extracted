@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use pmtools;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 # ------ define variables
 my $module;     # module name
@@ -39,7 +39,7 @@ for $module (@ARGV) {
     if (!$found) {
         next;
     } 
-    system "pod2text $path | $pager";
+    system "$^X -S pod2text $path | $pager";
 }
 
 exit(0);
@@ -76,7 +76,7 @@ pod2text(1), perlpod(1), pod2man(1), pod2html(1).
 
 Copyright (C) 1999 Tom Christiansen.
 
-Copyright (C) 2006-2014 Mark Leighton Fisher.
+Copyright (C) 2006-2014, 2018 Mark Leighton Fisher.
 
 =head1 LICENSE
 

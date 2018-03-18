@@ -3680,29 +3680,25 @@ static short _marpaESLIF_bootstrap_G1_action_single_symbol_4b(void *userDatavp, 
   if (rci == MARPAESLIF_MATCH_OK) {
     /* Got modifiers. Per def this is an sequence of ASCII characters. */
     /* For a character class it is something like ":xxxxx" */
+    /* We made sure that terminal_matcherb() always returns in marpaESLIFValueResult */
+    /* an area already malloc, ending with a hiden NUL byte. So we can take this */
+    /* memory as-is. */
+#ifndef MARPAESLIF_NTRACE
+    /* Paranoid test */
     if (marpaESLIFValueResult.sizel <= 0) {
       MARPAESLIF_ERROR(marpaESLIFp, "Match of character class modifiers returned empty size");
       goto err;
     }
-    modifiers = (char *) malloc(marpaESLIFValueResult.sizel + 1);
-    if (modifiers == NULL) {
-      MARPAESLIF_ERRORF(marpaESLIFp, "malloc failure, %s", strerror(errno));
-      goto err;
-    }
-    memcpy(modifiers, marpaESLIFValueResult.u.p, marpaESLIFValueResult.sizel);
-    modifiers[marpaESLIFValueResult.sizel] = '\0';
-    free(marpaESLIFValueResult.u.p);
+#endif
+    modifiers = (char *) marpaESLIFValueResult.u.p;
   } else {
     /* Because we use this value just below */
     marpaESLIFValueResult.sizel = 0;
   }
 
-  /* We leave the quotes because terminal_newp(), in case of a STRING, remove itself the surrounding characters */
-  /* In contrary to regexps, because [] in a character class are not to be removed, while // in an explicit regexp */
-  /* are to be removed. Therefore, terminal_newp() to be called with regexp *content* in regexp mode, while it can */
-  /* handle totally the string case. */
+  /* We leave the quotes because terminal_newp(), in case of a STRING, removes the surrounding characters. */
   /* Remember that a quoted string is a regexp with enforced unicode mode. Therefore the match is guaranteed to */
-  /* have been done on a buffer converted to UTF-8, regardless of the original encoding of the input. */
+  /* have been done on a buffer always pre-converted to UTF-8, regardless of the original encoding of the input. */
 
   /* Make that a single symbol structure */
   singleSymbolp = (marpaESLIF_bootstrap_single_symbol_t *) malloc(sizeof(marpaESLIF_bootstrap_single_symbol_t));
@@ -5812,18 +5808,17 @@ static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_regex_to_
   if (rci == MARPAESLIF_MATCH_OK) {
     /* Got modifiers. Per def this is an sequence of ASCII characters. */
     /* For a regular expression it is something like "xxxxx" */
+    /* We made sure that terminal_matcherb() always returns in marpaESLIFValueResult */
+    /* an area already malloc, ending with a hiden NUL byte. So we can take this */
+    /* memory as-is. */
+#ifndef MARPAESLIF_NTRACE
+    /* Paranoid mode */
     if (marpaESLIFValueResult.sizel <= 0) {
       MARPAESLIF_ERROR(marpaESLIFp, "Match of character class modifiers returned empty size");
       goto err;
     }
-    modifiers = (char *) malloc(marpaESLIFValueResult.sizel + 1);
-    if (modifiers == NULL) {
-      MARPAESLIF_ERRORF(marpaESLIFp, "malloc failure, %s", strerror(errno));
-      goto err;
-    }
-    memcpy(modifiers, marpaESLIFValueResult.u.p, marpaESLIFValueResult.sizel);
-    modifiers[marpaESLIFValueResult.sizel] = '\0';
-    free(marpaESLIFValueResult.u.p);
+#endif
+    modifiers = (char *) marpaESLIFValueResult.u.p;
   } else {
     /* Because we use this value just below */
     marpaESLIFValueResult.sizel = 0;
@@ -5926,18 +5921,17 @@ static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_character
   if (rci == MARPAESLIF_MATCH_OK) {
     /* Got modifiers. Per def this is an sequence of ASCII characters. */
     /* For a character class it is something like ":xxxxx" */
+    /* We made sure that terminal_matcherb() always returns in marpaESLIFValueResult */
+    /* an area already malloc, ending with a hiden NUL byte. So we can take this */
+    /* memory as-is. */
+#ifndef MARPAESLIF_NTRACE
+    /* Paranoid mode */
     if (marpaESLIFValueResult.sizel <= 0) {
       MARPAESLIF_ERROR(marpaESLIFp, "Match of character class modifiers returned empty size");
       goto err;
     }
-    modifiers = (char *) malloc(marpaESLIFValueResult.sizel + 1);
-    if (modifiers == NULL) {
-      MARPAESLIF_ERRORF(marpaESLIFp, "malloc failure, %s", strerror(errno));
-      goto err;
-    }
-    memcpy(modifiers, marpaESLIFValueResult.u.p, marpaESLIFValueResult.sizel);
-    modifiers[marpaESLIFValueResult.sizel] = '\0';
-    free(marpaESLIFValueResult.u.p);
+#endif
+    modifiers = (char *) marpaESLIFValueResult.u.p;
   } else {
     /* Because we use this value just below */
     marpaESLIFValueResult.sizel = 0;

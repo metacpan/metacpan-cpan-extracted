@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.52'
   Inline::MakeMaker: '0.45'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,5 +29,4 @@ requires:
   Math::Trig: '1.10'
   Sys::Mmap: '0.16'
   perl: '5.008'
-version: '6.03'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '6.04'

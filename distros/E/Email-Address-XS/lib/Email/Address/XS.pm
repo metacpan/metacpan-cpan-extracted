@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use Carp;
 
@@ -371,7 +371,9 @@ sub parse_bare_address {
 
   my $string = $address->format();
 
-Returns formatted Email::Address::XS object as a string.
+Returns formatted Email::Address::XS object as a string. This method
+throws a warning when L<C<user>|/user> or L<C<host>|/host> part of
+the email address is invalid or empty string.
 
 =cut
 
@@ -427,6 +429,9 @@ sub phrase {
 Accessor and mutator for the unescaped user (local/mailbox) part of
 an address.
 
+Since version 1.03 this method checks if setting a new value is syntactically
+valid (if it is non-empty string). If not undef is set and returned.
+
 =cut
 
 sub user {
@@ -434,7 +439,11 @@ sub user {
 	return $self->{user} unless @args;
 	delete $self->{cached_address} if exists $self->{cached_address};
 	delete $self->{invalid} if exists $self->{invalid};
-	return $self->{user} = $args[0];
+	if (defined $args[0] and length $args[0]) {
+		return $self->{user} = $args[0];
+	} else {
+		return $self->{user} = undef;
+	}
 }
 
 =item host
@@ -444,6 +453,9 @@ sub user {
 
 Accessor and mutator for the unescaped host (domain) part of an address.
 
+Since version 1.03 this method checks if setting a new value is syntactically
+valid. If not undef is set and returned.
+
 =cut
 
 sub host {
@@ -451,7 +463,11 @@ sub host {
 	return $self->{host} unless @args;
 	delete $self->{cached_address} if exists $self->{cached_address};
 	delete $self->{invalid} if exists $self->{invalid};
-	return $self->{host} = $args[0];
+	if (defined $args[0] and $args[0] =~ /^(?:\[.*\]|[^\x00-\x20\x7F()<>\[\]:;@\\,"]+)$/) {
+		return $self->{host} = $args[0];
+	} else {
+		return $self->{host} = undef;
+	}
 }
 
 =item address

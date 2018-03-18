@@ -1,0 +1,31 @@
+Data::BLNS version 20182514.062550
+
+This module exports a single function: get_naughty_strings()
+
+A call to that function returns a list of approximately
+500 strings that may cause problems when used as user input.
+The list originates from minimaxir's GitHub repository
+<https://github.com/minimaxir/big-list-of-naughty-strings>
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2018, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

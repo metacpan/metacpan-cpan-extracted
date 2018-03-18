@@ -12,7 +12,7 @@ use App::Sqitch::Types qw(DBH ArrayRef);
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = '0.9996';
+our $VERSION = '0.9997';
 
 sub key    { 'vertica' }
 sub name   { 'Vertica' }
@@ -579,7 +579,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 License
 
-Copyright (c) 2012-2015 iovation Inc.
+Copyright (c) 2012-2018 iovation Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

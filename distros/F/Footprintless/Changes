@@ -1,5 +1,10 @@
 Revision history for Perl module Footprintless
 
+1.28 2018-03-16
+
+    - added fail fast to _download
+    - added clean dirs creation for deployment
+
 1.27 2018-02-13
 
     - added terse-dump to Util

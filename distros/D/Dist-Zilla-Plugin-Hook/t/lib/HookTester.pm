@@ -2,7 +2,7 @@
 #
 #   file: t/lib/HookTester.pm
 #
-#   Copyright © 2015, 2016 Van de Bugger.
+#   Copyright © 2015, 2016, 2018 Van de Bugger.
 #
 #   This file is part of perl-Dist-Zilla-Plugin-Hook.
 #
@@ -16,6 +16,8 @@
 #
 #   You should have received a copy of the GNU General Public License along with
 #   perl-Dist-Zilla-Plugin-Hook. If not, see <http://www.gnu.org/licenses/>.
+#
+#   SPDX-License-Identifier: GPL-3.0-or-later
 #
 #   ---------------------------------------------------------------------- copyright and license ---
 

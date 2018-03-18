@@ -81,7 +81,7 @@ input#Date {
 <th class="collection-as-table"><% $display_cf %></th>
 % }
 <th class="collection-as-table"><&|/l&>Time Worked</&></th>
-<th class="collection-as-table"><&|/l&>Update</&></th>
+<th class="collection-as-table"><&|/l&>Add Time</&></th>
 </tr>
 % my $i = 1;
 % for my $ticket_id ( sort { $a <=> $b } keys %{$week_worked{$day}{tickets}} ) {
@@ -228,6 +228,7 @@ my ($ret, $week_start, $first_day) = RT::Extension::TimeTracking::WeekStartDate(
 my $week_end = RT::Date->new($user);
 $week_end->Set( Value => $week_start->Unix );
 $week_end->AddDays( 7 );
+RT::Extension::TimeTracking->SetDateToMidnightForDST( $week_end );
 
 my %week_worked;
 
@@ -241,10 +242,7 @@ for my $offset ( 0 .. 6 ) {
     my $date = RT::Date->new($user);
     $date->Set( Value => $week_start->Unix );
     $date->AddDays( $offset ) if $offset;
-    my $user_hour = ($date->Localtime('user'))[2];
-    if ( $user_hour == 23 ) {
-        $date->AddSeconds(3600); # to get around isuses raised by daylight saving
-    }
+    RT::Extension::TimeTracking->SetDateToMidnightForDST( $date );
 
     $week_worked{$date->ISO(Time => 0, Timezone => 'user')} = {
         date => $date,
@@ -323,8 +321,8 @@ my $cf_alias = $txns->Join(
 );
 $txns->Limit( ALIAS => $cf_alias, FIELD => 'CustomField', VALUE => $cf->id );
 $txns->Limit( ALIAS => $cf_alias, FIELD => 'ObjectType', VALUE => 'RT::Transaction' );
-$txns->Limit( ALIAS => $cf_alias, FIELD => 'Content', VALUE => $week_start->ISO(Time => 0), OPERATOR => '>=' );
-$txns->Limit( ALIAS => $cf_alias, FIELD => 'Content', VALUE => $week_end->ISO(Time => 0), OPERATOR => '<', ENTRYAGGREGATOR => 'AND', );
+$txns->Limit( ALIAS => $cf_alias, FIELD => 'Content', VALUE => $week_start->ISO(Time => 0, Timezone => 'user'), OPERATOR => '>=' );
+$txns->Limit( ALIAS => $cf_alias, FIELD => 'Content', VALUE => $week_end->ISO(Time => 0, Timezone => 'user'), OPERATOR => '<', ENTRYAGGREGATOR => 'AND', );
 
 while ( my $txn = $txns->Next ) {
     my $ticket = $txn->Object;
@@ -362,6 +360,7 @@ while ( my $txn = $activity_txns->Next ) {
 my $previous_week = RT::Date->new($user);
 $previous_week->Set( Value => $week_start->Unix );
 $previous_week->AddDays( -7 );
+RT::Extension::TimeTracking->SetDateToMidnightForDST( $previous_week );
 
 </%INIT>
 

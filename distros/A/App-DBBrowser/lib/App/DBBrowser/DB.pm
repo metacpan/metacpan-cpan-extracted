@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.003';
+our $VERSION = '2.006';
 
 use Scalar::Util qw( looks_like_number );
 
@@ -303,7 +303,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.003
+Version 2.006
 
 =head1 DESCRIPTION
 
@@ -610,8 +610,8 @@ A simple plugin which provides only the required methods:
 
     sub get_db_handle {
         my ( $self, $db, $connect_parameter ) = @_;
-        # "$connect_parameter" contains no data because this plugin does not
-        # provide the methods "env_variables", "read_arguments" and "set_attributes"
+        # "$connect_parameter" contains data if the plugin provides the methods "env_variables",
+        # "read_arguments" and "set_attributes"
         my $dbh = DBI->connect( "DBI:mysql:dbname=$db", 'user', 'password', {
             RaiseError => 1,
             PrintError => 0,
@@ -633,6 +633,9 @@ Matthäus Kiem <cuer2s@gmail.com>
 =head1 LICENSE AND COPYRIGHT
 
 Copyright 2012-2018 Matthäus Kiem.
+
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
+IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

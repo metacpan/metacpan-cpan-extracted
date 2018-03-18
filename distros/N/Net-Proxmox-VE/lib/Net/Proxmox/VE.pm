@@ -6,12 +6,13 @@ use strict;
 use warnings;
 
 package Net::Proxmox::VE;
-$Net::Proxmox::VE::VERSION = '0.32';
+$Net::Proxmox::VE::VERSION = '0.33';
 
 use Carp qw( croak );
 use HTTP::Headers;
 use HTTP::Request::Common qw(GET POST DELETE);
 use JSON qw(decode_json);
+use LWP::UserAgent;
 
 # done
 use Net::Proxmox::VE::Pools;
@@ -47,7 +48,9 @@ sub action {
     # Collapse duplicate slashes
     $params{path} =~ s{//+}{/};
 
-    unless ( $self->check_login_ticket ) {
+    unless ( $params{path} eq 'access/domains'
+        or $self->check_login_ticket )
+    {
         print "DEBUG: invalid login ticket\n"
           if $self->{params}->{debug};
         return unless $self->login();
@@ -61,8 +64,8 @@ sub action {
     # Set up the request object
     my $request = HTTP::Request->new();
     $request->uri($url);
-    $request->header(
-        'Cookie' => 'PVEAuthCookie=' . $self->{ticket}->{ticket} );
+    $request->header( 'Cookie' => 'PVEAuthCookie=' . $self->{ticket}->{ticket} )
+      if defined $self->{ticket};
 
     my $response;
 
@@ -86,6 +89,11 @@ sub action {
     }
     elsif ( $params{method} =~ m/^(GET|DELETE)$/ ) {
         $request->method( $params{method} );
+        if ( %{$params{post_data}} ) {
+            my $qstring = join '&', map { $_ . '=' . $params{post_data}->{$_} }
+                sort keys %{ $params{post_data} };
+            $request->uri( "$url?$qstring" );
+        }
         $response = $ua->request($request);
     }
     else {
@@ -104,7 +112,7 @@ sub action {
         if ( ref $data eq 'HASH'
             && exists $data->{data} )
         {
-            if ( ref $data->{data} ) {
+            if ( ref $data->{data} eq 'ARRAY' ) {
 
                 return wantarray
                   ? @{ $data->{data} }
@@ -234,6 +242,15 @@ sub new {
     $self->{'ticket_timestamp'} = undef;
     $self->{'ticket_life'}      = 7200;    # 2 Hours
 
+    my %lwpUserAgentOptions;
+    if ($self->{params}->{ssl_opts}) {
+        $lwpUserAgentOptions{ssl_opts} = $self->{params}->{ssl_opts};
+    }
+
+    my $ua = LWP::UserAgent->new( %lwpUserAgentOptions );
+    $ua->timeout($self->{params}->{timeout});
+    $self->{ua} = $ua;
+
     bless $self, $class;
     return $self
 
@@ -309,7 +326,7 @@ Net::Proxmox::VE - Pure perl API for Proxmox virtualisation
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -493,7 +510,7 @@ Brendan Beveridge <brendan@nodeintegration.com.au>, Dean Hamstead <dean@bytefoun
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Dean Hamstad.
+This software is copyright (c) 2018 by Dean Hamstad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

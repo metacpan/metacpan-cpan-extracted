@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojo-Transmission
 
+0.02 2018-03-11T15:04:36+0100
+ - tr_status() can now be imported
+
 0.01 2018-02-17T21:41:45+0100
  - Add add()
  - Add session()

@@ -2,9 +2,11 @@ package App::Test;
 use Dwarf::Pragma;
 use parent 'Exporter';
 use Data::Dumper;
+use Encode qw/decode_utf8/;
 use JSON;
 use HTTP::Cookies;
 use HTTP::Request::Common qw/GET HEAD PUT POST DELETE/;
+use LWP::UserAgent;
 use Plack::Test;
 use Test::More;
 use WWW::Mechanize;
@@ -55,12 +57,19 @@ sub is_failure {
 	ok !$res->is_success, "$path: $desc";
 }
 
-use Dwarf::Accessor qw/context context_stack cookie_jar mech will_decode_content/;
+use Dwarf::Accessor qw/context context_stack cookie_jar ua mech will_decode_content/;
 
 sub _build_context { App->new }
 sub _build_context_stack { [] }
 
 sub _build_cookie_jar { HTTP::Cookies->new }
+
+sub _build_ua {
+	my ($self) = @_;
+	my $ua = LWP::UserAgent->new;
+	$ua->cookie_jar($self->cookie_jar);
+	return $ua;
+}
 
 sub _build_mech {
 	my ($self) = @_;
@@ -96,6 +105,25 @@ sub req_not_ok {
 sub req {
 	my ($self, $method, $url, @args) = @_;
 
+	my $req = $self->_req($method => $url, @args);
+
+	my $res;
+	test_psgi app => $self->app, client => sub {
+		my ($cb) = @_;
+
+		$self->cookie_jar->add_cookie_header($req);
+		$res = $cb->($req);
+		$self->cookie_jar->extract_cookies($res);
+	};
+
+	$res = decode_response($res) if $self->will_decode_content;
+
+	return wantarray ? ($req, $res) : $res;
+}
+
+sub _req {
+	my ($self, $method, $url, @args) = @_;
+
 	if ($self->c->conf('ssl')) {
 		$url =~ s/^http/https/;
 	}
@@ -103,33 +131,41 @@ sub req {
 	my $uri = URI->new($url);
 	$uri->query_form($args[0]) if $method =~ /^(get|delete)$/i;
 
-	my ($req, $res);
+	my @a = ($uri->as_string);
+	push @a, @args if $method !~ /^(get|delete)$/i;
+	$method = uc $method;
 
-	test_psgi app => $self->app, client => sub {
-		my ($cb) = @_;
+	my $req;
 
-		my @a = ($uri->as_string);
-		push @a, @args if $method !~ /^(get|delete)$/i;
-		$method = uc $method;
+	# HTTP::Request::Common が PATCH をサポートしてないのでワークアラウンド
+	if ($method eq 'PATCH') {
+		$method = 'POST';
+		$method = \&$method;
+		$req = $method->(@a);
+		$req->method('PATCH');
+	} else {
+		$method = \&$method;
+		$req = $method->(@a);
+	}
 
-		# HTTP::Request::Common が PATCH をサポートしてないのでワークアラウンド
-		if ($method eq 'PATCH') {
-			$method = 'POST';
-			$method = \&$method;
-			$req = $method->(@a);
-			$req->method('PATCH');
-		} else {
-			$method = \&$method;
-			$req = $method->(@a);
-		}
+	return $req;
+}
 
-		$self->cookie_jar->add_cookie_header($req);		
-		$res = $cb->($req);
-		$self->cookie_jar->extract_cookies($res);
-	};
-
+sub ua_ok {
+	my ($self, $method, $url, @args) = @_;
+	my $req = $self->_req($method, $url, @args);
+	my $res = $self->ua->request($req);
 	$res = decode_response($res) if $self->will_decode_content;
+	is_success($res, $req->uri);
+	return wantarray ? ($req, $res) : $res;
+}
 
+sub ua_not_ok {
+	my ($self, $method, $url, @args) = @_;
+	my $req = $self->_req($method, $url, @args);
+	my $res = $self->ua->request($req);
+	$res = decode_response($res) if $self->will_decode_content;
+	is_failure($res, $req->uri);
 	return wantarray ? ($req, $res) : $res;
 }
 

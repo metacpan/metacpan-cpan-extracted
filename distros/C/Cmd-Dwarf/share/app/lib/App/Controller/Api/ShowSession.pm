@@ -3,9 +3,18 @@ use Dwarf::Pragma;
 use parent 'App::Controller::ApiBase';
 use Dwarf::DSL;
 use Dwarf::Util qw/decode_utf8_recursively/;
+use App::Type;
 use Class::Method::Modifiers;
 
 after will_dispatch => sub {
+};
+
+after did_dispatch => sub {
+	self->validate_response(
+		id      => 'Str',
+		session => 'HashRef',
+		cookie  => 'HashRef',
+	);
 };
 
 sub get {

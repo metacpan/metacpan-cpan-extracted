@@ -131,7 +131,7 @@ package Astro::Coord::ECI::TLE::Set;
 use strict;
 use warnings;
 
-use Astro::Coord::ECI::Utils qw{ :params max };
+use Astro::Coord::ECI::Utils qw{ :params :ref max };
 use Carp;
 
 our @CARP_NOT = qw{
@@ -140,7 +140,7 @@ our @CARP_NOT = qw{
     Astro::Coord::ECI
 };
 
-our $VERSION = '0.090';
+our $VERSION = '0.091';
 
 use constant ERR_NOCURRENT => <<eod;
 Error - Can not call %s because there is no current member. Be
@@ -258,7 +258,7 @@ our $Singleton = 0;
 sub aggregate {
     my ($class, @args) = @_;
     $class = ref $class if ref $class;
-    my $opt = ref $args[0] eq 'HASH' ? shift @args : {};
+    my $opt = HASH_REF eq ref $args[0] ? shift @args : {};
     my %data;
     my @rslt;
     foreach my $tle ( @args ) {
@@ -533,7 +533,7 @@ ensure that the new set is still valid.
 
 sub validate {
     my ( $self, @args ) = @_;
-    my $opt = ref $args[0] eq 'HASH' ? shift @args : {};
+    my $opt = HASH_REF eq ref $args[0] ? shift @args : {};
 
     my @members = map { [ @{ $_ } ] } @{ $self->{members} };
     $members[0][1]->get('backdate') and $members[0][0] = undef;

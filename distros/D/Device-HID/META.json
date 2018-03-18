@@ -65,6 +65,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Test::HexString" : "0",
             "Test::More" : "0",
             "perl" : "5.006"
          }
@@ -73,7 +74,7 @@
    "provides" : {
       "Device::HID" : {
          "file" : "lib/Device/HID.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -88,7 +89,7 @@
          "web" : "https://github.com/athreef/Device-HID"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -125,6 +126,17 @@
                }
             },
             "name" : "BuildRequires",
+            "version" : "6.010"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "test",
+                  "type" : "requires"
+               }
+            },
+            "name" : "TestRequires",
             "version" : "6.010"
          },
          {
@@ -358,7 +370,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.006",
+                  "tag" : "v0.007",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

@@ -1,5 +1,11 @@
 Revision history for Perl extension Statistics::SDT.
 
+0.07 2018.03.17
+    Added higher-level catch of non-numeric values sent, in the end, for precisioning ahead of returning a value; if not float, returns empty-string.
+    Added is_float check in calculating criterion, not just is defined
+    Changed is defined to is_float check in calculating mr and crr
+    Changed calculation of performance counts (i.e., of hits, false-alarms, misses & correct rejections) and of trial counts (of number of signal or noise trials) to set value of zero for any undefined values (assuming, e.g., that there were no hits or misses, or no noise trials, in the data). This should help to avoid the errors that might be thrown by the methods implicated in the above changes.
+
 0.06 2017.11.12
     Added sensitivity by "general model" (handling unequal variances), d_a method
     Added zrate() method

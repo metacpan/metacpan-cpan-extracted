@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Measure the emotional sentiment of text
 
-our $VERSION = '0.0601';
+our $VERSION = '0.0801';
 
 use Moo;
 use strictures 2;
@@ -53,10 +53,11 @@ has nrc_scores => (
 sub analyze {
     my ($self) = @_;
 
-    my $contents = $self->file ? read_text( $self->file ) : $self->text;
+    unless ( @{ $self->sentences } ) {
+        my $contents = $self->file ? read_text( $self->file ) : $self->text;
 
-    $self->sentences( get_sentences($contents) )
-        unless @{ $self->sentences };
+        $self->sentences( get_sentences($contents) );
+    }
 
     my @sentences = map { $_ } @{ $self->sentences };
 
@@ -66,9 +67,7 @@ sub analyze {
     my $negative = Lingua::EN::Opinion::Negative->new();
 
     for my $sentence ( @sentences ) {
-        $sentence =~ s/[[:punct:]]//g;  # Drop punctuation
-
-        my @words = split /\s+/, $sentence;
+        my @words = _tokenize($sentence);
 
         my $score = 0;
 
@@ -106,10 +105,11 @@ sub nrc_sentiment {
 
     my $null_state = { anger=>0, anticipation=>0, disgust=>0, fear=>0, joy=>0, negative=>0, positive=>0, sadness=>0, surprise=>0, trust=>0 };
 
-    my $contents = $self->file ? read_text( $self->file ) : $self->text;
+    unless ( @{ $self->sentences } ) {
+        my $contents = $self->file ? read_text( $self->file ) : $self->text;
 
-    $self->sentences( get_sentences($contents) )
-        unless @{ $self->sentences };
+        $self->sentences( get_sentences($contents) );
+    }
 
     my @sentences = map { $_ } @{ $self->sentences };
 
@@ -118,9 +118,7 @@ sub nrc_sentiment {
     my $emotion = Lingua::EN::Opinion::Emotion->new();
 
     for my $sentence ( @sentences ) {
-        $sentence =~ s/[[:punct:]]//g;  # Drop punctuation
-
-        my @words = split /\s+/, $sentence;
+        my @words = _tokenize($sentence);
 
         my $score;
 
@@ -141,6 +139,63 @@ sub nrc_sentiment {
     $self->nrc_scores( \@scores );
 }
 
+
+sub get_word {
+    my ( $self, $word ) = @_;
+
+    my $positive = Lingua::EN::Opinion::Positive->new();
+    my $negative = Lingua::EN::Opinion::Negative->new();
+
+    return exists $positive->wordlist->{$word} || exists $negative->wordlist->{$word}
+        ? {
+            positive => exists $positive->wordlist->{$word} ? 1 : 0,
+            negative => exists $negative->wordlist->{$word} ? 1 : 0,
+        }
+        : undef;
+}
+
+
+sub nrc_get_word {
+    my ( $self, $word ) = @_;
+
+    my $emotion = Lingua::EN::Opinion::Emotion->new();
+
+    return exists $emotion->wordlist->{$word}
+        ? $emotion->wordlist->{$word}
+        : undef;
+}
+
+
+sub get_sentence {
+    my ( $self, $sentence ) = @_;
+
+    my @words = _tokenize($sentence);
+
+    my %score;
+    $score{$_} = $self->get_word($_) for @words;
+
+    return \%score;
+}
+
+
+sub nrc_get_sentence {
+    my ( $self, $sentence ) = @_;
+
+    my @words = _tokenize($sentence);
+
+    my %score;
+    $score{$_} = $self->nrc_get_word($_) for @words;
+
+    return \%score;
+}
+
+sub _tokenize {
+    my ($sentence) = @_;
+    $sentence =~ s/[[:punct:]]//g;  # Drop punctuation
+    my @words = split /\s+/, $sentence;
+    return @words;
+}
+
 1;
 
 __END__
@@ -155,7 +210,7 @@ Lingua::EN::Opinion - Measure the emotional sentiment of text
 
 =head1 VERSION
 
-version 0.0601
+version 0.0801
 
 =head1 SYNOPSIS
 
@@ -163,17 +218,20 @@ version 0.0601
   my $opinion = Lingua::EN::Opinion->new( file => '/some/file.txt' );
   $opinion->analyze();
   my $score = $opinion->averaged_score(5);
+  my $sentiment = $opinion->get_word('foo');
+  $sentiment = $opinion->get_sentence('Mary had a little lamb.');
   # OR
   $opinion = Lingua::EN::Opinion->new( text => 'Mary had a little lamb...' );
   $opinion->nrc_sentiment();
   # And now do something cool with $opinion->nrc_scores...
+  $sentiment = $opinion->nrc_get_word('foo');
+  $sentiment = $opinion->nrc_get_sentence('Mary had a little lamb.');
 
 =head1 DESCRIPTION
 
 A C<Lingua::EN::Opinion> measures the emotional sentiment of text.
 
-NOTE: This module is over 3MB uncompressed because of the GIANT sentiment text
-it comes with.
+* This module is large because of the GIANT sentiment text it comes with.
 
 Please see the F<eg/> and F<t/> scripts for example usage.
 
@@ -232,6 +290,8 @@ in the analyzed score.
 
 =head2 nrc_sentiment()
 
+  $opinion->nrc_sentiment();
+
 Compute the NRC sentiment of the given text by sentences.
 
 This is given by a 0/1 list of these 10 emotional elements:
@@ -248,6 +308,32 @@ This is given by a 0/1 list of these 10 emotional elements:
   trust
 
 This method sets the B<nrc_scores> and B<sentences> attributes.
+
+=head2 get_word()
+
+  $sentiment = $opinion->get_word($word);
+
+Get the positive/negative sentiment for a given word.  Return a HashRef of
+positive/negative keys.  If the word does not exist, return C<undef>.
+
+=head2 nrc_get_word()
+
+  $sentiment = $opinion->nrc_get_word($word);
+
+Get the NRC emotional sentiment for a given word.  Return a HashRef of the NRC
+emotions.  If the word does not exist, return C<undef>.
+
+=head2 get_sentence()
+
+  $values = $opinion->get_sentence($sentence);
+
+Return the positive/negative values for the words of the given sentence.
+
+=head2 nrc_get_sentence()
+
+  $values = $opinion->nrc_get_sentence($sentence);
+
+Return the NRC emotion values for each word of the given sentence.
 
 =head1 SEE ALSO
 

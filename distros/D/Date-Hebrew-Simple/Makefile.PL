@@ -19,18 +19,18 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'Moo'              => '2.000000',
-        'namespace::clean' => '0.24',
-        'Date::Utils'      => '0.22',
-        'Date::Calc'       => '6.0',
-        'Time::localtime'  => '1.02',
+        'Moo'                  => '2.000000',
+        'namespace::autoclean' => '0.28',
+        'Date::Utils'          => '0.22',
+        'Date::Calc'           => '6.0',
+        'Time::localtime'      => '1.02',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Date-Hebrew-Simple-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Date::Hebrew::Simple' => { file => 'lib/Date/Hebrew/Simple.pm', version => '0.08' },
+            'Date::Hebrew::Simple' => { file => 'lib/Date/Hebrew/Simple.pm', version => '0.09' },
         },
         resources => {
             repository => {

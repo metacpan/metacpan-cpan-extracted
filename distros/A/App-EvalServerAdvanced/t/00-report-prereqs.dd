@@ -47,6 +47,7 @@ do { my $x = {
                                       'Syntax::Keyword::Try' => '0',
                                       'Sys::Linux::Mount' => '0',
                                       'Sys::Linux::Namespace' => '0',
+                                      'Sys::Linux::Syscall::Execve' => '0',
                                       'TOML' => '0',
                                       'Unix::Mknod' => '0',
                                       'YAML::XS' => '0',

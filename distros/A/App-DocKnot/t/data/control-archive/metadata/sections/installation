@@ -1,0 +1,94 @@
+This software is set up to run from `/srv/control`.  To use a different
+location, edit the paths at the beginning of each of the scripts in the
+`scripts` directory to use different paths.  By default, copying all the
+files from the distribution into a `/srv/control` directory is almost all
+that's needed.  An install rule is provided to do this.  To install the
+software, run:
+
+```sh
+    make install
+```
+
+You will need write access to `/srv/control` or permission to create it.
+
+`process-control` and `generate-files` need a GnuPG keyring containing all
+of the honored hierarchy keys.  To generate this keyring, run `make
+install` or:
+
+```sh
+    mkdir keyring
+    gpg --homedir=keyring --allow-non-selfsigned-uid --import keys/*
+```
+
+from the top level of this distribution.  `process-control` also expects a
+`control.ctl` file in `/srv/control/control.ctl`, which can be generated
+from the files included here (after creating the keyring as described
+above) by running `make install` or:
+
+```sh
+    scripts/generate-files
+```
+
+Both of these are done automatically as part of `make install`.
+process-control expects `/srv/control/archive` to exist and archives
+control messages there.  It expects `/srv/control/tmp` to exist and uses
+it for temporary files for GnuPG control message verification.
+
+To process incoming control messages, you need to run `process-control` on
+each message.  `process-control` expects to receive, on standard input,
+lines consisting of a path to a file, a space, and a message ID.  This
+input format is designed to work with the tinyleaf server that comes with
+INN 2.5 and later, but it should also work as a channel feed from
+pre-storage-API versions of INN (1.x).  It will not work without
+modification via a channel feed from a current version of INN, since it
+doesn't understand the storage API and doesn't know how to retrieve
+articles by tokens.  This could be easily added; I just haven't needed it.
+
+If you're using tinyleaf, here is the setup process:
+
+1. Create a directory that tinyleaf will use to store incoming articles
+   temporarily, the archive directory, and the logs directory and
+   install the software:
+
+   ```sh
+       make install
+   ```
+
+2. Run tinyleaf on some port, configuring it to use that directory and
+   to run process-control.  A typical tinyleaf command line would be:
+
+   ```sh
+       tinyleaf /srv/control/spool /srv/control/scripts/process-control
+   ```
+
+   I run tinyleaf using systemd, but any inetd implementation should work
+   equally well.
+
+3. Set up a news feed to the system running tinyleaf that sends control
+   messages of interest.  You should be careful not to send cancel control
+   messages or you'll get a ton of junk in your logs.  The INN newsfeeds
+   entry I use is:
+
+   ```
+       isc-control:control,control.*,!control.cancel:Tf,Wnm:
+   ```
+
+   combined with nntpsend to send the articles.
+
+That should be all there is to it.  Watch the logs directory to see what
+happens for incoming messages.
+
+`scripts/process-control` just maintains a database file.  To export that
+data in a format that's useful for other software, run
+`scripts/export-control`.  This expects a `/srv/control/export` directory
+into which it stores active and newsgroups files, a copy of the
+`control.ctl` file, and all of the logs in a `LOGS` subdirectory.  This
+export directory can then be made available on the web, copied to another
+system, or whatever else is appropriate.  Generally,
+`scripts/export-control` should be run periodically from cron.
+
+Reports can be generated using `scripts/control-summary`.  This script
+needs configuration before running; see the top of the script and its
+included POD documentation.  There is a sample template in the `templates`
+directory, and `scripts/weekly-report` shows a sample cron job for sending
+out a regular report.

@@ -6,14 +6,14 @@ package OpenGbg::Service::AirQuality::Measurement;
 
 # ABSTRACT: An air quality measurement
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1402';
+our $VERSION = '0.1403';
 
 use utf8;
 use syntax 'qs';
 use XML::Rabbit;
 use DateTime::Format::HTTP;
 use MooseX::AttributeShortcuts;
-use OpenGbg::DateTimeType qw/DateTime/;
+use Types::DateTime qw/DateTime/;
 
 # any attributes/methods added here should also be 'handled' in GetLatestMeasurement.
 
@@ -393,7 +393,7 @@ OpenGbg::Service::AirQuality::Measurement - An air quality measurement
 
 =head1 VERSION
 
-Version 0.1402, released 2016-08-12.
+Version 0.1403, released 2018-03-14.
 
 =head1 SOURCE
 

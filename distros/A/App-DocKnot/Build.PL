@@ -2,7 +2,6 @@
 #
 # Build script for the docknot application.
 #
-# Written by Russ Allbery <rra@cpan.org>
 # Copyright 2013, 2016 Russ Allbery <rra@cpan.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
@@ -22,6 +21,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
+#
+# SPDX-License-Identifier: MIT
 
 use 5.018;
 use autodie;

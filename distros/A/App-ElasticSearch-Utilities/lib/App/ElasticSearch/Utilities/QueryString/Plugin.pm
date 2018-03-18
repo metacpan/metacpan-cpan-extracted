@@ -1,39 +1,50 @@
 package App::ElasticSearch::Utilities::QueryString::Plugin;
 # ABSTRACT: Moo::Role for implementing QueryString Plugins
 
+use strict;
+use warnings;
+
+our $VERSION = '5.5'; # VERSION
+
 use Hash::Merge::Simple qw(clone_merge);
 use Moo::Role;
-use Sub::Quote;
+use Ref::Util qw(is_arrayref is_hashref);
+use Types::Standard qw( Str Int );
 
 
-
-requires qw(handle_token);
 
 # Attributes
 has name => (
-    is => 'ro',
-    isa => quote_sub(q{die "Needs to be a string" if ref $_[0]}),
-    builder => '_build_name',
-    lazy => 1,
+    is  => 'lazy',
+    isa => Str,
 );
+sub _build_name {
+    my $self = shift;
+    my $class = ref $self;
+    return (split /::/, $class)[-1];
+}
+
+
 has priority => (
-    is      => 'ro',
-    isa     => quote_sub(q{die "Not between 1 and 100" unless $_[0] > 0 && $_[0] <= 100 }),
-    builder => '_build_priority',
-    lazy    => 1,
+    is  => 'lazy',
+    isa => Int,
 );
+sub _build_priority { 50; }
+
+
+requires qw(handle_token);
 
 around 'handle_token' => sub {
     my $orig = shift;
     my $self = shift;
     my $refs = $orig->($self,@_);
     if( defined $refs ) {
-        if( ref $refs eq 'ARRAY' ) {
+        if( is_arrayref($refs) ) {
             foreach my $doc (@{ $refs }) {
                 $doc->{_by} = $self->name;
             }
         }
-        elsif( ref $refs eq 'HASH' ) {
+        elsif( is_hashref($refs) ) {
             $refs->{_by} = $self->name;
         }
         return $refs;
@@ -43,15 +54,10 @@ around 'handle_token' => sub {
     }
 };
 
-# Builders
-sub _build_name {
-    my $self = shift;
-    my $class = ref $self;
-    return (split /::/, $class)[-1];
-}
-sub _build_priority { 50; }
 
 # Handle Build Args
+
+
 sub BUILDARGS {
     my($class,%in) = @_;
 
@@ -84,7 +90,18 @@ App::ElasticSearch::Utilities::QueryString::Plugin - Moo::Role for implementing 
 
 =head1 VERSION
 
-version 5.4
+version 5.5
+
+=head1 ATTRIBUTES
+
+=head2 name
+
+Name of the plugin, used in debug reporting.
+
+=head2 priority
+
+Priority is an integer which determmines the order tokens are parsed in
+low->high order.
 
 =head1 INTERFACE
 
@@ -124,6 +141,8 @@ state.  After each token is processed, if it didn't set this flag, the flag is r
 This is used for bare words like "not", "or", and "and" to denote that these terms cannot dangle from the
 beginning or end of the query_string.  This allows the final pass of the query_string builder to strip these
 words to prevent syntax errors.
+
+=for Pod::Coverage BUILDARGS
 
 =head1 AUTHOR
 

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Arnaud Di Franco [arnaud.difranco@sete.cnrs.fr]" />
+  <title>User Guide for HmmCleaner</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+    href="Slidy2/styles/slidy.css" />
+  <script src="Slidy2/scripts/slidy.js"
+    charset="utf-8" type="text/javascript"></script>
+</head>
+<body>
+<div class="slide titlepage">
+  <h1 class="title">User Guide for <code>HmmCleaner</code></h1>
+  <p class="author">
+Arnaud Di Franco [<script type="text/javascript">
+<!--
+h='&#x73;&#x65;&#116;&#x65;&#46;&#x63;&#110;&#114;&#x73;&#46;&#102;&#114;';a='&#64;';n='&#x61;&#114;&#110;&#x61;&#x75;&#100;&#46;&#100;&#x69;&#102;&#114;&#x61;&#110;&#x63;&#x6f;';e=n+a+h;
+document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'">'+e+'<\/'+'a'+'>');
+// -->
+</script><noscript>&#x61;&#114;&#110;&#x61;&#x75;&#100;&#46;&#100;&#x69;&#102;&#114;&#x61;&#110;&#x63;&#x6f;&#32;&#x61;&#116;&#32;&#x73;&#x65;&#116;&#x65;&#32;&#100;&#x6f;&#116;&#32;&#x63;&#110;&#114;&#x73;&#32;&#100;&#x6f;&#116;&#32;&#102;&#114;</noscript>]
+  </p>
+  <p class="date">Version 0.1 / Feb 13, 2018</p>
+</div>
+<div id="aim-and-features" class="titleslide slide section level1"><h1><span class="header-section-number">1</span> Aim and features</h1></div>
+<div id="functional-overview" class="titleslide slide section level1"><h1><span class="header-section-number">2</span> Functional overview</h1></div><div id="profile-creation" class="slide section level2">
+<h1><span class="header-section-number">2.1</span> Profile creation</h1>
+<p><code>HmmCleaner</code> detects low similarity segments (LSS) through four steps. First, a pHMM is built from the MSA using <code>HMMER</code> (Figure 1A). This pHMM can be built upon either (i) all sequences of the MSA (complete strategy) or (ii) all sequences excepted the currently analyzed one (leave-one-out strategy). Users can affect this step with the <code>profile</code> option.</p>
+</div><div id="similarity-search" class="slide section level2">
+<h1><span class="header-section-number">2.2</span> Similarity search</h1>
+<p>Second, each sequence of the MSA is evaluated with the pHMM (Figure 1B), which yields profile-sequence alignments.</p>
+</div><div id="score-analysis" class="slide section level2">
+<h1><span class="header-section-number">2.3</span> Score analysis</h1>
+<p>Third, the analysis of each profile-sequence alignment is based on the four discrete categories of column-wise probabilities provided by <code>HMMER</code>. The two first categories represent residues that fit poorly to the pHMM: blank character (null probability, parameter c1) and '+' character (low probability, parameter c2). In opposition, the two last last categories represent residues that fit to the pHMM: amino acid characters in lower case (good probability, parameter c3) and upper case (high probability, parameter c4). A cumulative similarity score increases when the residue is expected from the profile or decreases it otherwise (Figure 1C). Parameters c1 and c2 are therefore negative and parameters c3 and c4 positive. The cumulative score is computed from left to right starting with a value of 1. Its value is strictly restricted between 0 and 1 included. An LSS start at the last position with a cumulative score of 1 when this one reaches a null value. Its end is defined by the last position with a null value once the cumulative score goes back to 1 or when the end of the sequence is reached (Figure 1D).</p>
+</div>
+<div id="outputs" class="titleslide slide section level1"><h1><span class="header-section-number">3</span> Outputs</h1></div>
+<div id="annexes" class="titleslide slide section level1"><h1><span class="header-section-number">4</span> Annexes</h1></div><div id="command-line-interface" class="slide section level2">
+<h1><span class="header-section-number">4.1</span> Command line interface</h1>
+<pre class="none"><code>USAGE
+    HmmCleaner.pl &lt;infiles&gt; [options]
+
+REQUIRED ARGUMENTS
+    &lt;infiles&gt;
+        list of alignment file to check with HmmCleaner
+
+OPTIONS
+    -costs &lt;c1&gt; &lt;c2&gt; &lt;c3&gt; &lt;c4&gt;
+        Cost parameters that defines the low similarity segments detected by
+        HmmCleaner. Default values are -0.15, -0.08, 0.15, 0.45 Users can
+        change each value but they have to be in increasing order. c1 &lt; c2 &lt;
+        0 &lt; c3 &lt; c4 Predefine value are also available with --large and
+        --specificity options but user defined costs will be prioritary if
+        present.
+
+    --changeID
+        Determine if output will have defline with generic suffix
+        (_hmmcleaned)
+
+    --noX
+        Convert X characters to gaps that will not be taken into account by
+        HmmCleaner.
+
+    -profile=&lt;profile&gt;
+        Determine how the profile will be create complete or leave-one-out
+        (default: complete) leave-one-out = without the analyzed sequence
+        (new profile each time) complete = all sequences (same profile for
+        each sequence) First case is more sensitive but need more ressources
+        (hence more time)
+
+    --large
+        Load predifined cost parameters optimized for MSA with at least 50
+        sequences. Can be use with --specificity option. User defined costs
+        will be prioritary if present.
+
+    --specificity
+        Load predifined cost parameters optimized to give more weigth on
+        specificity. Can be use with --large option. User defined costs will
+        be prioritary if present.
+
+    --log_only
+        Only outputs list of segments removed.
+
+    --ali
+        Outputs result file(s) in ali MUST format.
+
+    -v[erbosity]=&lt;level&gt;
+        Verbosity level for logging to STDERR [default: 0]. Available levels
+        range from 0 to 5.
+
+    --version
+    --usage
+    --help
+    --man
+        Print the usual program information</code></pre>
+<p></p>
+</div>
+</body>
+</html>

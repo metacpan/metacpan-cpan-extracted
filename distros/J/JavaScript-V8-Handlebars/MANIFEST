@@ -1,12 +1,19 @@
 Changes
+inc/File/ShareDir/Install.pm
 lib/JavaScript/V8/Handlebars.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README
-share/handlebars-v4.0.5.js
+share/handlebars-v4.0.11.js
 t/00-load.t
 t/01-first.t
+t/02-dirs.t
+t/data/bar/bar.hbs
+t/data/foo/foo.hbs
+t/data/partials/part1.hbs
+t/data/partialtest.hbs
+t/data/top.hbs
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

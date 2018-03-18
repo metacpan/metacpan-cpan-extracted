@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Email::Stuffer;
 # ABSTRACT: A more casual approach to creating and sending Email:: emails
-$Email::Stuffer::VERSION = '0.016';
+$Email::Stuffer::VERSION = '0.017';
 use Scalar::Util qw(blessed);
 
 #pod =head1 SYNOPSIS
@@ -205,6 +205,7 @@ my %IS_INIT_ARG = map {; $_ => 1 } qw(
 
 my %IS_ARRAY_ARG = map {; $_ => 1 } qw(
   to cc bcc reply_to
+  transport
 );
 
 sub new {
@@ -396,7 +397,7 @@ sub subject {
 #pod to one space (and vice versa).  Version 0.015 (and later) does not set
 #pod flowed format automatically anymore and so text body is really plain
 #pod text.  If you want to use old behavior of "advanced" flowed formatting,
-#pod set flowed format manually by: C<text_body($body, format => 'flowed')>.
+#pod set flowed format manually by: C<< text_body($body, format => 'flowed') >>.
 #pod
 #pod =cut
 
@@ -596,8 +597,7 @@ sub _slurp {
 #pod used to instantiate the transport.  C<$moniker> is used as the transport
 #pod name; if it starts with an equals sign (C<=>) then the text after the
 #pod sign is used as the class.  Otherwise, the text is prepended by
-#pod C<Email::Sender::Transport::>.  In neither case will a module be
-#pod automatically loaded.
+#pod C<Email::Sender::Transport::>.
 #pod
 #pod Alternatively, you can pass a complete transport object (which must be
 #pod an L<Email::Sender::Transport> object) and it will be used as is.
@@ -774,7 +774,7 @@ Email::Stuffer - A more casual approach to creating and sending Email:: emails
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -1004,7 +1004,7 @@ of the line was dropped and every new line character could be changed
 to one space (and vice versa).  Version 0.015 (and later) does not set
 flowed format automatically anymore and so text body is really plain
 text.  If you want to use old behavior of "advanced" flowed formatting,
-set flowed format manually by: C<text_body($body, format => 'flowed')>.
+set flowed format manually by: C<< text_body($body, format => 'flowed') >>.
 
 =head2 html_body $body [, $header => $value, ... ]
 
@@ -1043,8 +1043,7 @@ you want to use to send the email, and any options that need to be
 used to instantiate the transport.  C<$moniker> is used as the transport
 name; if it starts with an equals sign (C<=>) then the text after the
 sign is used as the class.  Otherwise, the text is prepended by
-C<Email::Sender::Transport::>.  In neither case will a module be
-automatically loaded.
+C<Email::Sender::Transport::>.
 
 Alternatively, you can pass a complete transport object (which must be
 an L<Email::Sender::Transport> object) and it will be used as is.

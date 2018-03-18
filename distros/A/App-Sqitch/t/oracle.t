@@ -83,6 +83,9 @@ my $sqitch = App::Sqitch->new(options => { engine => 'oracle' });
 my $target = App::Sqitch::Target->new(sqitch => $sqitch);
 isa_ok my $ora = $CLASS->new(sqitch => $sqitch, target => $target), $CLASS;
 
+is $ora->key, 'oracle', 'Key should be "oracle"';
+is $ora->name, 'Oracle', 'Name should be "Oracle"';
+
 my $client = 'sqlplus' . ($^O eq 'MSWin32' ? '.exe' : '');
 is $ora->client, $client, 'client should default to sqlplus';
 ORACLE_HOME: {
@@ -335,7 +338,7 @@ is join('', <$fh> ), $ora->_script(qw(foo bar baz)),
 
 ok $ora->_capture(qw(foo bar baz)), 'Call _capture';
 is_deeply \@capture, [
-    [$ora->sqlplus], \$ora->_script(qw(foo bar baz)), [],
+    [$ora->sqlplus], \$ora->_script(qw(foo bar baz)), [], [],
     { return_if_system_error => 1 },
 ], 'Command and script should be passed to run3()';
 

@@ -27,7 +27,7 @@ no_index:
 provides:
   Sys::Linux::Syscall::Execve:
     file: lib/Sys/Linux/Syscall/Execve.pm
-    version: '0.10'
+    version: '0.12'
 requires:
   Encode: '0'
   Exporter: '0'
@@ -37,7 +37,7 @@ requires:
 resources:
   bugtracker: https://github.com/perlbot/sys-linux-syscall-execve/issues
   repository: git://github.com/perlbot/sys-linux-syscall-execve.git
-version: '0.10'
+version: '0.12'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -176,7 +176,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.10
+          tag: v0.12
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

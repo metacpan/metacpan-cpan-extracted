@@ -6,7 +6,7 @@ package OpenGbg::Service::Bridge::GetOpenedStatus;
 
 # ABSTRACT: A list of bridge openings
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1402';
+our $VERSION = '0.1403';
 
 use XML::Rabbit::Root;
 use MooseX::AttributeShortcuts;
@@ -38,7 +38,7 @@ OpenGbg::Service::Bridge::GetOpenedStatus - A list of bridge openings
 
 =head1 VERSION
 
-Version 0.1402, released 2016-08-12.
+Version 0.1403, released 2018-03-14.
 
 =head1 SYNOPSIS
 

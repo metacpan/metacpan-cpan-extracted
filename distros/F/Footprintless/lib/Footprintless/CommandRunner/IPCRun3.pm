@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::CommandRunner::IPCRun3;
-$Footprintless::CommandRunner::IPCRun3::VERSION = '1.27';
+$Footprintless::CommandRunner::IPCRun3::VERSION = '1.28';
 # ABSTRACT: An implementation of Footprintless::CommandRunner using IPC::Run3
 # PODNAME: Footprintless::CommandRunner::IPCRun3
 
@@ -42,7 +42,7 @@ Footprintless::CommandRunner::IPCRun3 - An implementation of Footprintless::Comm
 
 =head1 VERSION
 
-version 1.27
+version 1.28
 
 =head1 DESCRIPTION
 

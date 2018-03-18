@@ -1,13 +1,13 @@
 package Map::Tube::Exception::InvalidLineId;
 $Map::Tube::Exception::InvalidLineId::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::InvalidLineId::VERSION = '3.14';
+$Map::Tube::Exception::InvalidLineId::VERSION = '3.15';
 =head1 NAME
 
 Map::Tube::Exception::InvalidLineId - Represent 'invalid line id' exception.
 
 =head1 VERSION
 
-version 3.14
+version 3.15
 
 =cut
 
@@ -15,7 +15,7 @@ use 5.006;
 use Data::Dumper;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has status => (is => 'ro', default => sub { 119 });
 

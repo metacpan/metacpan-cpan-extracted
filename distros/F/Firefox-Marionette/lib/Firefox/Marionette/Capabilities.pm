@@ -3,12 +3,23 @@ package Firefox::Marionette::Capabilities;
 use strict;
 use warnings;
 
-our $VERSION = '0.51';
+our $VERSION = '0.53';
 
 sub new {
     my ( $class, %parameters ) = @_;
     my $element = bless {%parameters}, $class;
     return $element;
+}
+
+sub enumerate {
+    my ($self) = @_;
+    my @enum = sort { $a cmp $b } grep { defined $self->{$_} } keys %{$self};
+    return @enum;
+}
+
+sub moz_use_non_spec_compliant_pointer_origin {
+    my ($self) = @_;
+    return $self->{moz_use_non_spec_compliant_pointer_origin};
 }
 
 sub accept_insecure_certs {
@@ -90,7 +101,7 @@ Firefox::Marionette::Capabilities - Represents Firefox Capabilities retrieved us
 
 =head1 VERSION
 
-Version 0.51
+Version 0.53
 
 =head1 SYNOPSIS
 
@@ -116,29 +127,50 @@ accepts a hash as a parameter.  Allowed keys are below;
 
 =item * accept_insecure_certs - Indicates whether untrusted and self-signed TLS certificates are implicitly trusted on navigation for the duration of the session. Allowed values are 1 or 0.  Default is 0.
 
-=item * page_load_strategy - The page load strategy to use for the current session.  Must be one of 'none', 'eager', or 'normal'.
+=item * page_load_strategy - defines the page load strategy to use for the duration of the session. Setting a page load strategy will cause navigation to be "eager", waiting for the interactive document ready state; "normal" (the default), waiting for the complete ready state; or "none", which will return immediately after starting navigation. 
 
 =item * proxy - describes the L<proxy|Firefox::Marionette::Proxy> setup for the upcoming browser session.
 
 =item * timeouts - describes the L<timeouts|Firefox::Marionette::Timeouts> imposed on certian session operations.
 
-=item * moz_webdriver_click - use a WebDriver conforming L<click|Firefox::Marionette#click>.  Allowed values are 1 or 0.  Default is 0.  This function will return undef for Firefox versions less than 57.
+=item * moz_webdriver_click - a boolean value to indicate which kind of interactability checks to run when performing a L<click|Firefox::Marionette#click> or L<sending keys|Firefox::Marionette#type> to an elements. For Firefoxen prior to version 58.0 some legacy code as imported from an older version of FirefoxDriver was in use.
 
-=item * moz_accessibility_checks - run a11 checks when clicking elements. Allowed values are 1 or 0.  Default is 0.
+With Firefox 58 the interactability checks as required by the WebDriver specification are enabled by default. This means geckodriver will additionally check if an element is obscured by another when clicking, and if an element is focusable for sending keys.
+
+Because of this change in behaviour, we are aware that some extra errors could be returned. In most cases the test in question might have to be updated so it's conform with the new checks. But if the problem is located in geckodriver, then please raise an issue in the issue tracker.
+
+To temporarily disable the WebDriver conformant checks use 0 as value for this capability.
+
+Please note that this capability exists only temporarily, and that it will be removed once the interactability checks have been stabilized.
+
+=item * moz_accessibility_checks - run a11y checks when clicking elements. Allowed values are 1 or 0.  Default is 0.
 
 =item * moz_headless - the browser should be started with the -headless option.  moz_headless is only supported in Firefox 56+
+
+=item * moz_use_non_spec_compliant_pointer_origin - a boolean value to indicate how the pointer origin for an action command will be calculated.
+
+With Firefox 59 the calculation will be based on the requirements by the WebDriver specification. This means that the pointer origin is no longer computed based on the top and left position of the referenced element, but on the in-view center point.
+
+To temporarily disable the WebDriver conformant behavior use 0 as value for this capability.
+
+Please note that this capability exists only temporarily, and that it will be removed once all Selenium bindings can handle the new behavior.
+
 
 =back
 
 This method returns a new L<capabilities|Firefox::Marionette::Capabilities> object.
  
+=head2 enumerate
+
+This method returns a list of strings describing the capabilities that this version of Firefox supports.
+
 =head2 accept_insecure_certs
 
 indicates whether untrusted and self-signed TLS certificates are implicitly trusted on navigation for the duration of the session.
 
 =head2 page_load_strategy 
 
-returns the page load strategy being used for the current session.  It will be one of 'none', 'eager', or 'normal'.
+returns the page load strategy to use for the duration of the session. Setting a page load strategy will cause navigation to be "eager", waiting for the interactive document ready state; "normal" (the default), waiting for the complete ready state; or "none", which will return immediately after starting navigation. 
 
 =head2 timeouts
 
@@ -170,7 +202,15 @@ returns the directory that contains the browsers profile
 
 =head2 moz_webdriver_click
 
-is the browser using a WebDriver conforming L<click|Firefox::Marionette#click>
+returns a boolean value to indicate which kind of interactability checks to run when performing a L<click|Firefox::Marionette#click> or L<sending keys|Firefox::Marionette#type> to an elements. For Firefoxen prior to version 58.0 some legacy code as imported from an older version of FirefoxDriver was in use.
+
+With Firefox 58 the interactability checks as required by the WebDriver specification are enabled by default. This means geckodriver will additionally check if an element is obscured by another when clicking, and if an element is focusable for sending keys.
+
+Because of this change in behaviour, we are aware that some extra errors could be returned. In most cases the test in question might have to be updated so it's conform with the new checks. But if the problem is located in geckodriver, then please raise an issue in the issue tracker.
+
+To temporarily disable the WebDriver conformant checks use 0 as value for this capability.
+
+Please note that this capability exists only temporarily, and that it will be removed once the interactability checks have been stabilized.
 
 =head2 moz_process_id 
 
@@ -187,6 +227,16 @@ returns whether the browser is running in headless mode
 =head2 moz_accessibility_checks 
 
 returns the current accessibility (a11y) value
+
+=head2 moz_use_non_spec_compliant_pointer_origin
+
+returns a boolean value to indicate how the pointer origin for an action command will be calculated.
+
+With Firefox 59 the calculation will be based on the requirements by the WebDriver specification. This means that the pointer origin is no longer computed based on the top and left position of the referenced element, but on the in-view center point.
+
+To temporarily disable the WebDriver conformant behavior use 0 as value for this capability.
+
+Please note that this capability exists only temporarily, and that it will be removed once all Selenium bindings can handle the new behavior.
 
 =head1 DIAGNOSTICS
 

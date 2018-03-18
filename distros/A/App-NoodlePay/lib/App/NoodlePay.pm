@@ -4,7 +4,7 @@
 # App::NoodlePay - Convenient way to securely send Bitcoin from cold storage
 # Copyright (c) 2017 Ashish Gulhati <noodlepay at hash.neo.tc>
 #
-# $Id: lib/App/NoodlePay.pm v1.002 Mon Sep 25 18:56:05 PDT 2017 $
+# $Id: lib/App/NoodlePay.pm v1.003 Sat Mar 17 14:38:49 PDT 2018 $
 
 package App::NoodlePay;
 
@@ -17,7 +17,7 @@ use GD::Barcode::QRcode;
 use Math::Prime::Util qw(fromdigits todigitstring);
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.002 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.003 $' =~ /\s+([\d\.]+)/;
 
 1;
 
@@ -29,8 +29,8 @@ App::NoodlePay - Convenient way to securely send Bitcoin from cold storage
 
 =head1 VERSION
 
- $Revision: 1.002 $
- $Date: Mon Sep 25 18:56:05 PDT 2017 $
+ $Revision: 1.003 $
+ $Date: Sat Mar 17 14:38:49 PDT 2018 $
 
 =head1 SYNOPSIS
 

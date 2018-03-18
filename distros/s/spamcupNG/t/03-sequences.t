@@ -24,6 +24,14 @@ is(
     'get the expected error'
 );
 
+is(
+    SpamcupNG::_check_error(
+        read_html( File::Spec->catfile( $base, 'mailhost_problem.html' ) )
+    ),
+    'Mailhost configuration problem, identified internal IP as source',
+    'get the expected error'
+);
+
 done_testing;
 
 sub read_html {

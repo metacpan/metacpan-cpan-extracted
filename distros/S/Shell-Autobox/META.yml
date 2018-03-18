@@ -1,12 +1,28 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Shell-Autobox
-version:      0.03
-version_from: lib/Shell/Autobox.pm
-installdirs:  perl
+---
+abstract: 'pipe Perl strings through shell commands'
+author:
+  - 'chocolateboy <chocolate@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Shell-Autobox
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    autobox:                       1.03
-    File::Temp:                    0.16
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+  File::Temp: '0.16'
+  autobox: '2.85'
+  perl: '5.008000'
+resources:
+  bugtracker: https://github.com/chocolateboy/Shell-Autobox/issues
+  repository: https://github.com/chocolateboy/Shell-Autobox
+version: v0.40.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

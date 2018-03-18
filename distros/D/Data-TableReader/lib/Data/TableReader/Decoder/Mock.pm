@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder::Mock;
-$Data::TableReader::Decoder::Mock::VERSION = '0.006';
+$Data::TableReader::Decoder::Mock::VERSION = '0.007';
 use Moo 2;
 use Carp 'croak';
 use IO::Handle;
@@ -97,7 +97,7 @@ Data::TableReader::Decoder::Mock - Mock decoder for test cases
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

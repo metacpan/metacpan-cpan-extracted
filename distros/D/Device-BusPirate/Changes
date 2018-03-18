@@ -1,5 +1,11 @@
 Revision history for Device-BusPirate
 
+0.14    2018-03-13 14:14:24
+        [CHANGES]
+         * Simplify the D:C:A SPI protocol implementation by using
+           Device::Chip::ProtocolBase::SPI; thus automatically supporting the
+           new ->read and ->write_then_read methods
+
 0.13    2016/10/02 19:45:24
         [CHANGES]
          * Enable pullups when configuring Device::Chip::Adapter for I²C

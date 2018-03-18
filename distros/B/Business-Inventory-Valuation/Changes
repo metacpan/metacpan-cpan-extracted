@@ -1,3 +1,43 @@
+0.007   2018-03-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Update/fix Synopsis.
+
+
+0.006   2018-03-17 (PERLANCAR)
+
+	- sell() returns actual units sold.
+
+
+0.005   2018-03-16 (PERLANCAR)
+
+        - Add cost accounting method 'weighted average'.
+
+        - Add more examples to Synopsis (FIFO, weighted average, overselling).
+
+
+0.004   2018-03-16 (PERLANCAR)
+
+	- [Bugfix] Fix regression bug introduced by the last optimization.
+
+
+0.003   2018-03-15 (PERLANCAR)
+
+	- [opt] Merge purchases with same price to the last inventory
+	  record.
+
+
+0.002   2018-03-15 (PERLANCAR)
+
+	- [Incompatible change] Remove summary() and replace it with units() and
+          average_purchase_price().
+
+        - Add argument: allow_negative_inventory.
+
+        - sell() now returns realized profits.
+
+
 0.001   2018-03-09 (PERLANCAR)
 
         - First release.

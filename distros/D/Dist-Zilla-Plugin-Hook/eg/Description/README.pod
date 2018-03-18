@@ -1,3 +1,5 @@
+=encoding UTF-8
+
 =head2 I<Description> Meta Resource
 
 Distribution meta information contains such items as I<name>, I<version>, I<abstract> and many

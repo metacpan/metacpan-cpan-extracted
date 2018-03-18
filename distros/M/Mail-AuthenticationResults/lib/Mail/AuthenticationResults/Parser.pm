@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Parser;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180215'; # VERSION
+our $VERSION = '1.20180314'; # VERSION
 use Carp;
 
 use Mail::AuthenticationResults::Header;
@@ -317,7 +317,7 @@ Mail::AuthenticationResults::Parser - Class for parsing Authentication Results H
 
 =head1 VERSION
 
-version 1.20180215
+version 1.20180314
 
 =head1 DESCRIPTION
 

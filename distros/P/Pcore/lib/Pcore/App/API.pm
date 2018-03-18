@@ -1,12 +1,19 @@
 package Pcore::App::API;
 
-use Pcore -role, -const, -result, -export => { CONST => [qw[$TOKEN_TYPE $TOKEN_TYPE_USER_PASSWORD $TOKEN_TYPE_APP_INSTANCE_TOKEN $TOKEN_TYPE_USER_TOKEN $TOKEN_TYPE_USER_SESSION]] };
+use Pcore -role, -result, -const, -export => { CONST => [qw[$TOKEN_TYPE $TOKEN_TYPE_USER_PASSWORD $TOKEN_TYPE_USER_TOKEN $TOKEN_TYPE_USER_SESSION]] };
 use Pcore::App::API::Map;
+use Pcore::App::API::Auth;
 use Pcore::Util::Data qw[from_b64 from_b64_url];
 use Pcore::Util::Digest qw[sha3_512];
 use Pcore::Util::Text qw[encode_utf8];
-use Pcore::Util::UUID qw[looks_like_uuid create_uuid_from_bin uuid_str];
-use Pcore::App::API::Auth::Cache;
+use Pcore::Util::UUID qw[create_uuid_from_bin];
+
+has app => ( is => 'ro', isa => ConsumerOf ['Pcore::App'], required => 1 );
+
+has map => ( is => 'ro', isa => InstanceOf ['Pcore::App::API::Map'], init_arg => undef );
+
+has _auth_cb_queue => ( is => 'ro', isa => HashRef, init_arg => undef );
+has _auth_cache    => ( is => 'ro', isa => HashRef, init_arg => undef );
 
 const our $TOKEN_TYPE_USER_PASSWORD      => 1;
 const our $TOKEN_TYPE_APP_INSTANCE_TOKEN => 2;
@@ -14,210 +21,60 @@ const our $TOKEN_TYPE_USER_TOKEN         => 3;
 const our $TOKEN_TYPE_USER_SESSION       => 4;
 
 const our $TOKEN_TYPE => {
-    $TOKEN_TYPE_USER_PASSWORD      => undef,
-    $TOKEN_TYPE_APP_INSTANCE_TOKEN => undef,
-    $TOKEN_TYPE_USER_TOKEN         => undef,
-    $TOKEN_TYPE_USER_SESSION       => undef,
+    $TOKEN_TYPE_USER_PASSWORD => undef,
+    $TOKEN_TYPE_USER_TOKEN    => undef,
+    $TOKEN_TYPE_USER_SESSION  => undef,
 };
 
-require Pcore::App::API::Auth;
+sub new ( $self, $app ) {
+    my $uri = P->uri( $app->{app_cfg}->{api}->{connect} );
 
-requires qw[_build_roles];
+    state $scheme_class = {
+        sqlite => 'Pcore::App::API::Local::sqlite',
+        pgsql  => 'Pcore::App::API::Local::pgsql',
+        ws     => 'Pcore::App::API::Local::Remote',
+        wss    => 'Pcore::App::API::Local::Remote',
+    };
 
-has app => ( is => 'ro', isa => ConsumerOf ['Pcore::App'], required => 1 );
-
-has map => ( is => 'ro', isa => InstanceOf ['Pcore::App::API::Map'], init_arg => undef );
-has roles => ( is => 'ro', isa => HashRef, init_arg => undef );    # API roles, provided by this app
-has permissions => ( is => 'ro', isa => Maybe [ArrayRef], init_arg => undef );    # foreign app roles, that this app can use
-has backend => ( is => 'ro', isa => ConsumerOf ['Pcore::App::API::Backend'], init_arg => undef );
-
-has auth_cache => ( is => 'ro', isa => InstanceOf ['Pcore::App::API::Auth::Cache'], init_arg => undef );
-has _auth_cb_queue => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
-
-around _build_roles => sub ( $orig, $self ) {
-    my $roles = $self->$orig;
-
-    die q[App must provide roles] if !keys $roles->%*;
-
-    # validate roles
-    for my $role ( keys $roles->%* ) {
-
-        # check, that role has description
-        die qq[API role "$role" requires description] if !$roles->{$role};
+    if ( my $class = $scheme_class->{ $uri->scheme } ) {
+        return P->class->load($class)->new( { app => $app } );
+    }
+    else {
+        die 'Unknown API scheme';
     }
 
-    return $roles;
-};
-
-# NOTE this method can be redefined in app instance
-sub _build_permissions ($self) {
     return;
 }
 
-sub validate_name ( $self, $name ) {
-
-    # name looks like UUID string
-    return if looks_like_uuid $name;
-
-    return if $name =~ /[^[:alnum:]_@.-]/smi;
-
-    return 1;
-}
-
-# INIT API
-sub init_api ($self) {
-    print 'Scanning API ... ';
-
-    # build roles
-    $self->{roles} = $self->_build_roles;
-
-    # build permissions
-    $self->{permissions} = $self->_build_permissions;
-
-    # create auth cache object
-    $self->{auth_cache} = Pcore::App::API::Auth::Cache->new( { app => $self->{app} } );
+# setup events listeners
+around init => sub ( $orig, $self, $cb ) {
 
     # build map
     # using class name as string to avoid conflict with Type::Standard Map subroutine, exported to Pcore::App::API
-    $self->{map} = 'Pcore::App::API::Map'->new( { app => $self->app } );
+    $self->{map} = 'Pcore::App::API::Map'->new( { app => $self->{app} } );
 
     # init map
-    $self->{map}->method;
-
+    print 'Scanning API classes ... ';
+    $self->{map}->init;
     say 'done';
 
-    return;
-}
-
-sub connect_api ( $self, $cb ) {
-
-    # build API auth backend
-    my $auth_uri = P->uri( $self->{app}->{auth} );
-
-    print q[Creating API backend ... ];
-
-    if ( $auth_uri->scheme eq 'sqlite' || $auth_uri->scheme eq 'pgsql' ) {
-        my $dbh = P->handle($auth_uri);
-
-        my $class = P->class->load( $dbh->uri->scheme, ns => 'Pcore::App::API::Backend::Local' );
-
-        $self->{backend} = $class->new( { app => $self->app, dbh => $dbh } );
-    }
-    elsif ( $auth_uri->scheme eq 'http' || $auth_uri->scheme eq 'https' || $auth_uri->scheme eq 'ws' || $auth_uri->scheme eq 'wss' ) {
-        require Pcore::App::API::Backend::Remote;
-
-        $self->{backend} = Pcore::App::API::Backend::Remote->new( { app => $self->app, uri => $auth_uri } );
-    }
-    else {
-        die q[Unknown API auth scheme];
-    }
-
-    say 'done';
-
-    print q[Initialising API backend ... ];
-
-    $self->{backend}->init( sub ($res) {
-        die qq[Error initialising API auth backend: $res] if !$res;
-
-        say 'done';
-
-        my $connect_app_instance = sub {
-            print q[Connecting app instance ... ];
-
-            $self->{backend}->connect_app_instance(
-                $self->app->{instance_id},
-                "@{[$self->app->version]}",
-                $self->roles,
-                $self->permissions,
-                sub ($res) {
-                    say $res;
-
-                    if ( !$res ) {
-                        $cb->($res);
-                    }
-                    else {
-                        if ( $self->{backend}->is_local ) {
-
-                            # create root user
-                            $self->{backend}->create_root_user( sub ($res) {
-
-                                # root user creation error
-                                if ( !$res && $res != 304 ) {
-                                    $cb->($res);
-                                }
-
-                                # root user created
-                                else {
-                                    say qq[Root password: $res->{data}->{root_password}] if $res;
-
-                                    $cb->( result 200 );
-                                }
-
-                                return;
-                            } );
-                        }
-                        else {
-                            $cb->($res);
-                        }
-                    }
-
-                    return;
-                }
-            );
+    # setup events listeners
+    P->listen_events(
+        'APP.API.AUTH',
+        sub ($ev) {
+            $self->{_auth_cache}->%* = ();
 
             return;
-        };
-
-        # get app instance credentials from local config
-        $self->app->{id}             = $self->app->instance_auth->{ $self->{backend}->host }->[0];
-        $self->app->{instance_id}    = $self->app->instance_auth->{ $self->{backend}->host }->[1];
-        $self->app->{instance_token} = $self->app->instance_auth->{ $self->{backend}->host }->[2];
-
-        # sending app instance registration request
-        if ( !$self->app->{instance_token} ) {
-            print q[Sending app instance registration request ... ];
-
-            # register app on backend, get and init message broker
-            $self->{backend}->register_app_instance(
-                $self->app->name,
-                $self->app->desc,
-                $self->permissions,
-                P->sys->hostname,
-                "@{[$self->app->version]}",
-                sub ( $res ) {
-                    die qq[Error registering app: $res] if !$res;
-
-                    say 'done';
-
-                    # store app instance credentials
-                    {
-                        $self->app->{id}             = $self->app->instance_auth->{ $self->{backend}->host }->[0] = $res->{app_id};
-                        $self->app->{instance_id}    = $self->app->instance_auth->{ $self->{backend}->host }->[1] = $res->{app_instance_id};
-                        $self->app->{instance_token} = $self->app->instance_auth->{ $self->{backend}->host }->[2] = $res->{app_instance_token};
-
-                        $self->app->store_instance_auth;
-                    }
-
-                    # connect app instance
-                    $connect_app_instance->();
-
-                    return;
-                }
-            );
         }
+    );
 
-        # connecting app instance
-        else {
-            $connect_app_instance->();
-        }
-
-        return;
-    } );
+    $self->$orig($cb);
 
     return;
-}
+};
 
 # AUTHENTICATE
+# parse token, create private token, forward to authenticate_private
 sub authenticate ( $self, $user_name_utf8, $token, $cb ) {
 
     # no auth token provided
@@ -283,11 +140,12 @@ sub authenticate ( $self, $user_name_utf8, $token, $cb ) {
     return;
 }
 
-sub authenticate_private ( $self, $private_token, $cb ) {
+around authenticate_private => sub ( $orig, $self, $private_token, $cb ) {
 
-    # get auth by private token
-    my $auth = $self->{auth_cache}->{private_token}->{ $private_token->[2] };
+    # try to find token in cache
+    my $auth = $self->{_auth_cache}->{ $private_token->[2] };
 
+    # token was cached
     if ($auth) {
         $cb->($auth);
 
@@ -299,16 +157,15 @@ sub authenticate_private ( $self, $private_token, $cb ) {
     return if $self->{_auth_cb_queue}->{ $private_token->[2] }->@* > 1;
 
     # authenticate on backend
-    $self->{backend}->auth_token(
-        $self->{app}->{instance_id},
+    $self->$orig(
         $private_token,
         sub ( $res ) {
 
             # authentication error
             if ( !$res ) {
 
-                # delete private token
-                $self->{auth_cache}->delete_private_token( $private_token->[2] );
+                # delete private token from cache
+                delete $self->{_auth_cache}->{ $private_token->[2] };
 
                 # return new unauthenticated auth object
                 $auth = bless {
@@ -330,7 +187,7 @@ sub authenticate_private ( $self, $private_token, $cb ) {
                 $auth->{private_token}    = $private_token;
 
                 # store in cache
-                $self->{auth_cache}->store($auth);
+                $self->{_auth_cache}->{ $private_token->[2] } = $auth;
             }
 
             # call callbacks
@@ -345,261 +202,7 @@ sub authenticate_private ( $self, $private_token, $cb ) {
     );
 
     return;
-}
-
-# APP
-sub get_app ( $self, $app_id, $cb = undef ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
-    $self->{backend}->get_app(
-        $app_id,
-        sub ( $res ) {
-            $cb->($res) if $cb;
-
-            $blocking_cv->($res) if $blocking_cv;
-
-            return;
-        }
-    );
-
-    return $blocking_cv ? $blocking_cv->recv : ();
-}
-
-sub remove_app ( $self, $app_id, $cb = undef ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
-    $self->{backend}->remove_app(
-        $app_id,
-        sub ( $res ) {
-            $cb->($res) if $cb;
-
-            $blocking_cv->($res) if $blocking_cv;
-
-            return;
-        }
-    );
-
-    return $blocking_cv ? $blocking_cv->recv : ();
-}
-
-# APP INSTANCE
-sub get_app_instance ( $self, $app_instance_id, $cb = undef ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
-    $self->{backend}->get_app_instance(
-        $app_instance_id,
-        sub ( $res ) {
-            $cb->($res) if $cb;
-
-            $blocking_cv->($res) if $blocking_cv;
-
-            return;
-        }
-    );
-
-    return $blocking_cv ? $blocking_cv->recv : ();
-}
-
-sub remove_app_instance ( $self, $app_instance_id, $cb = undef ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
-    $self->{backend}->remove_app_instance(
-        $app_instance_id,
-        sub ( $res ) {
-            $cb->($res) if $cb;
-
-            $blocking_cv->($res) if $blocking_cv;
-
-            return;
-        }
-    );
-
-    return $blocking_cv ? $blocking_cv->recv : ();
-}
-
-# USER
-# TODO rename -> search users;
-sub get_users ( $self, $cb = undef ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
-    $self->{backend}->get_users( sub ( $res ) {
-        $cb->($res) if $cb;
-
-        $blocking_cv->($res) if $blocking_cv;
-
-        return;
-    } );
-
-    return $blocking_cv ? $blocking_cv->recv : ();
-}
-
-sub get_user ( $self, $user_id, $cb = undef ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
-    $self->{backend}->get_user(
-        $user_id,
-        sub ( $res ) {
-            $cb->($res) if $cb;
-
-            $blocking_cv->($res) if $blocking_cv;
-
-            return;
-        }
-    );
-
-    return $blocking_cv ? $blocking_cv->recv : ();
-}
-
-sub create_user ( $self, $base_user, $user_name, $password, $enabled, $permissions, $cb = undef ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
-    $self->{backend}->create_user(
-        $base_user,
-        $user_name,
-        $password,
-        $enabled,
-        $permissions,
-        sub ( $res ) {
-            $cb->($res) if $cb;
-
-            $blocking_cv->($res) if $blocking_cv;
-
-            return;
-        }
-    );
-
-    return $blocking_cv ? $blocking_cv->recv : ();
-}
-
-sub set_user_password ( $self, $user_id, $user_password_utf8, $cb = undef ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
-    $self->{backend}->set_user_password(
-        $user_id,
-        encode_utf8($user_password_utf8),
-        sub ($res) {
-            $cb->($res) if $cb;
-
-            $blocking_cv->($res) if $blocking_cv;
-
-            return;
-        }
-    );
-
-    return $blocking_cv ? $blocking_cv->recv : ();
-}
-
-sub set_user_enabled ( $self, $user_id, $enabled, $cb = undef ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
-    $self->{backend}->set_user_enabled(
-        $user_id, $enabled,
-        sub ($res) {
-            $cb->($res) if $cb;
-
-            $blocking_cv->($res) if $blocking_cv;
-
-            return;
-        }
-    );
-
-    return $blocking_cv ? $blocking_cv->recv : ();
-}
-
-sub remove_user ( $self, $user_id, $cb = undef ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
-    $self->{backend}->remove_user(
-        $user_id,
-        sub ($res) {
-            $cb->($res) if $cb;
-
-            $blocking_cv->($res) if $blocking_cv;
-
-            return;
-        }
-    );
-
-    return $blocking_cv ? $blocking_cv->recv : ();
-}
-
-# TODO - update user token permissions;
-sub set_user_permissions ($self) {
-    ...;
-
-    return;
-}
-
-# USER TOKEN
-sub create_user_token ( $self, $user_id, $desc, $permissions, $cb = undef ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
-    $self->{backend}->create_user_token(
-        $user_id, $desc,
-        $permissions,
-        sub ( $res ) {
-            $cb->($res) if $cb;
-
-            $blocking_cv->($res) if $blocking_cv;
-
-            return;
-        }
-    );
-
-    return $blocking_cv ? $blocking_cv->recv : ();
-}
-
-sub remove_user_token ( $self, $user_token_id, $cb = undef ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
-    $self->{backend}->remove_user_token(
-        $user_token_id,
-        sub ( $res ) {
-            $cb->($res) if $cb;
-
-            $blocking_cv->($res) if $blocking_cv;
-
-            return;
-        }
-    );
-
-    return $blocking_cv ? $blocking_cv->recv : ();
-}
-
-# USER SESSION
-sub create_user_session ( $self, $user_id, $cb = undef ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
-    $self->{backend}->create_user_session(
-        $user_id,
-        sub ( $res ) {
-            $cb->($res) if $cb;
-
-            $blocking_cv->($res) if $blocking_cv;
-
-            return;
-        }
-    );
-
-    return $blocking_cv ? $blocking_cv->recv : ();
-}
-
-sub remove_user_session ( $self, $user_session_id, $cb = undef ) {
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
-    $self->{backend}->remove_user_session(
-        $user_session_id,
-        sub ( $res ) {
-            $cb->($res) if $cb;
-
-            $blocking_cv->($res) if $blocking_cv;
-
-            return;
-        }
-    );
-
-    return $blocking_cv ? $blocking_cv->recv : ();
-}
+};
 
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
@@ -608,11 +211,9 @@ sub remove_user_session ( $self, $user_session_id, $cb = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 221, 453, 474, 534   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 78                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 254                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 528                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |    3 | 111                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----
@@ -631,7 +232,31 @@ Pcore::App::API
 
 =head1 ATTRIBUTES
 
-=head1 METHODS
+=head1 AUTHENTICATION METHODS
+
+=head2 authentocate( $user_name, $token, $cb )
+
+Performs user authentication and returns instance of Pcore::App::API::Auth.
+
+C<$user_name> can be undefined.
+
+=head2 authentocate_private( $private_token, $cb )
+
+Performs private token authentication and returns instance of Pcore::App::API::Auth.
+
+Private token structure is [ %token_type, $token_id, $token_hash ].
+
+=head1 USER METHODS
+
+=head2 create_user ( $user_name, $password, $enabled, $permissions, $cb )
+
+Creates user and returns user id.
+
+C<$permissions> - ArrayRef[ 'role1', 'role2', ... ]
+
+=head2 get_users ( $cb )
+
+Returns all users.
 
 =head1 SEE ALSO
 

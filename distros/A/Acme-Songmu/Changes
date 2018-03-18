@@ -1,5 +1,8 @@
 Revision history for Perl extension Acme-Songmu
 
+v0.1.0 2018-03-11T11:34:51Z
+    - Enhance document
+
 v0.0.3 2018-02-18T14:14:56Z
     - Adapt x_static_install
     - Enable Travis CI

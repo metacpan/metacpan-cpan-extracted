@@ -1,0 +1,18 @@
+Revision history for RPi-StepperMotor
+
+2.3604  2018-03-14
+        - Pi day!
+        - added Fritzing breadboard layout/docs directory
+        - added cleanup() to clean up pins after use
+
+2.3603  2018-03-13
+        - remove code that unsets the pins. This is the user's or
+          RPi::WiringPi's responsibility
+        - added new "stepper" binary, updated POD
+
+2.3602  2018-03-13
+        - fix unformatted SYNOPSIS
+
+2.3601  2018-03-13
+        First version, released on an unsuspecting world.
+

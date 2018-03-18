@@ -30,31 +30,32 @@ no_index:
 provides:
   Date::Lectionary:
     file: lib/Date/Lectionary.pm
-    version: '1.20180302'
+    version: '1.20180314'
   Date::Lectionary::Day:
     file: lib/Date/Lectionary/Day.pm
-    version: '1.20180302'
+    version: '1.20180314'
   Date::Lectionary::Year:
     file: lib/Date/Lectionary/Year.pm
-    version: '1.20180302'
+    version: '1.20180314'
 requires:
   Carp: '1.38'
-  Date::Advent: '1.20160727'
+  Date::Advent: '1.20171223'
   Date::Easter: '1.22'
-  Date::Lectionary::Time: '1.20160809'
+  Date::Lectionary::Time: '1.20170311'
   File::Share: '0.25'
-  Moose: '2.1804'
-  Moose::Util::TypeConstraints: '2.1804'
+  Moose: '2.2010'
+  Moose::Util::TypeConstraints: '2.2010'
   MooseX::Aliases: '0.11'
   MooseX::StrictConstructor: '0.21'
-  Time::Piece: '1.31'
-  Time::Seconds: '1.31'
-  Try::Tiny: '0.24'
+  Time::Piece: '1.3204'
+  Time::Seconds: '1.3204'
+  Try::Catch: v1.1.0
+  Try::Tiny::Tiny: '0.001'
   XML::LibXML: '2.0128'
   namespace::autoclean: '0.28'
   perl: '5.022'
 resources:
   repository: git://github.com/marmanold/Date-Lectionary.git
-version: '1.20180302'
+version: '1.20180314'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_twitter: https://www.twitter.com/marmanold/

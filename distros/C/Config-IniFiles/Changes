@@ -1,3 +1,9 @@
+2.95        2018-03-16
+    * Make use of perltidy and test for it.
+    * Remove firstload / reload logic
+        - https://rt.cpan.org/Ticket/Display.html?id=104763
+        - thanks to José Joaquín Atria
+
 2.94        2016-11-29
     * Move to GitHub.
         - for better visibility, collaboration, and CI options.

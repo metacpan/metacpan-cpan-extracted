@@ -15,7 +15,7 @@ use namespace::autoclean;
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = '0.9996';
+our $VERSION = '0.9997';
 
 sub destination {
     my $self = shift;
@@ -45,15 +45,26 @@ has _psql => (
         my $self = shift;
         my $uri  = $self->uri;
         my @ret  = ( $self->client );
+
+        my %query_params = $uri->query_params;
+        my @conninfo;
         for my $spec (
-            [ username => $self->username ],
-            [ dbname   => $uri->dbname    ],
-            [ host     => $uri->host      ],
-            [ port     => $uri->_port     ],
+            [ user   => $self->username ],
+            [ dbname => $uri->dbname    ],
+            [ host   => $uri->host      ],
+            [ port   => $uri->_port     ],
+            map { [ $_ => $query_params{$_} ] }
+                sort keys %query_params,
             )
         {
-            push @ret, "--$spec->[0]" => $spec->[1] if $spec->[1];
+            next unless defined $spec->[1] && length $spec->[1];
+            if ($spec->[1] =~ /[ "'\\]/) {
+                $spec->[1] =~ s/([ "'\\])/\\$1/g;
+            }
+            push @conninfo, "$spec->[0]=$spec->[1]";
         }
+
+        push @ret => join ' ', @conninfo if @conninfo;
 
         if (my %vars = $self->variables) {
             push @ret => map {; '--set', "$_=$vars{$_}" } sort keys %vars;
@@ -152,6 +163,8 @@ sub _listagg_format {
 }
 
 sub _regex_op { '~' }
+
+sub _version_query { 'SELECT MAX(version)::TEXT FROM releases' }
 
 sub initialized {
     my $self = shift;
@@ -552,7 +565,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 License
 
-Copyright (c) 2012-2015 iovation Inc.
+Copyright (c) 2012-2018 iovation Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

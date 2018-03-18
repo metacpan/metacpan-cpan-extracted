@@ -19,7 +19,7 @@ my $builder = Module::Build->new(
         'String::Numeric' => '0.9',
         'String::Util' => '1.21',
     },
-    add_to_cleanup => ['Statistics-SDT-0.06-*'],
+    add_to_cleanup => ['Statistics-SDT-0.07-*'],
 );
 
 $builder->create_build_script();

@@ -4,17 +4,20 @@
 # noodlepay.pl - Convenient way to securely send Bitcoin from cold storage
 # Copyright (c) 2017 Ashish Gulhati <noodlepay at hash.neo.tc>
 #
-# $Id: bin/noodlepay.pl v1.002 Mon Sep 25 18:56:05 PDT 2017 $
+# $Id: bin/noodlepay.pl v1.003 Sat Mar 17 14:38:49 PDT 2018 $
 
 use warnings;
 
 use Wx qw (:everything);
 use Wx::Event qw (EVT_BUTTON);
+use LWP::UserAgent;
+use HTTP::Request;
 use GD::Barcode::QRcode;
 use Math::Prime::Util qw(fromdigits todigitstring);
 use vars qw( $VERSION $AUTOLOAD );
 
-my $electrum = 'electrum';
+#my $electrum = 'electrum';
+my $electrum = 'python ~/src/Electrum-2.8.2/electrum';
 
 # Initialize l8n
 my ($lang, %lang) = initl8n();
@@ -33,7 +36,6 @@ $action{SendSign} = sub {   # Send bitcoin / Sign transaction
     system ('killall -9 zbarcam');
     close ZBAR;
     system ('v4l2-ctl --overlay=0');
-    print "$x\n";
     my $tx = "{\n\"complete\": false,\n\"final\": true,\n\"hex\": \"$x\"\n}";
     my $txdetails = `$electrum deserialize '$tx'`;    # Check transaction details
     my $chgaddresses = `$electrum listaddresses --change`;
@@ -64,12 +66,6 @@ $action{SendSign} = sub {   # Send bitcoin / Sign transaction
     system ('killall -9 xvkbd');
     return if $ret == wxID_CANCEL;
     my $amount = $dialog->GetValue(); return unless $amount =~ /^\d+$/; $amount = sprintf("%f",$amount / 100000000);
-    $dialog = Wx::TextEntryDialog->new( $frame, "Enter fee amount (in Satoshi)", "Send Bitcoin");
-    system ('xvkbd -geometry 300x200 -keypad&');
-    $ret = $dialog->ShowModal;
-    system ('killall -9 xvkbd');
-    return if $ret == wxID_CANCEL;
-    my $feeamt = $dialog->GetValue(); return unless $feeamt =~ /^\d+$/; $feeamt = sprintf("%f",$feeamt / 100000000);
     system ('v4l2-ctl --overlay=1');
     open (ZBAR, "zbarcam --nodisplay --prescale=640x480 /dev/video0 |");
     my $sendto = <ZBAR>;
@@ -81,20 +77,41 @@ $action{SendSign} = sub {   # Send bitcoin / Sign transaction
     if (defined $balance and $balance) {
       $balance =~ /"confirmed": "(\S+)"/s; $balance = $1 * 100000000;
       # TODO: Return error if wallet balance lower than send amount
-      print "$electrum payto $sendto $amount -f $feeamt -u";
-      my $tx = `$electrum payto $sendto $amount -f $feeamt -u`;
-      print $tx;
-      $tx =~ /"hex": "(\S+)"/s;
-      my $dialog = qrdialog(fromdigits($1,16), 'Scan the QR code on Noodle Unsnoopable', 'Sign Transaction');
-      $dialog->ShowModal;
-      system ('v4l2-ctl --overlay=1');
-      open (ZBAR, "zbarcam --nodisplay --prescale=640x480 /dev/video0 |");
-      my $signed = <ZBAR>; chomp $signed; $signed =~ s/^QR-Code://; $signed = todigitstring($signed,16);
-      system ('killall -9 zbarcam');
-      close ZBAR;
-      system ('v4l2-ctl --overlay=0');
-      my $signedtx = "{\n\"complete\": true,\n\"final\": true,\n\"hex\": \"$signed\"\n}";
-      print "$signed\n";
+      my $tx = `$electrum payto $sendto $amount -f 0 -u`;
+      $tx =~ /"hex": "(\S+)"/s; my $txsize = length($1)/2 + 65;
+      my $ua = new LWP::UserAgent; $ua->agent('Mozilla/5.0');
+      my $req = HTTP::Request->new(GET => 'https://bitcoinfees.earn.com/api/v1/fees/recommended');
+      my $res = $ua->request($req);
+      my $fees = $res->content; $fees =~ s/\{\s*(.*)\s*\}/$1/; $fees =~ s/\"//g;
+      my %fees = split /[:,]\s*/, $fees;
+      my $fastest_fee = $fees{fastestFee} * $txsize;
+      my $halfhour_fee = $fees{halfHourFee} * $txsize;
+      my $hour_fee = $fees{hourFee} * $txsize;
+      $dialog = Wx::TextEntryDialog->new( $frame, "Enter fee amount (in Satoshi). Recommended fees:\n\n" .
+					  "- Fastest (10-20 mins): $fastest_fee\n- Within half an hour: $halfhour_fee\n" .
+					  "- Within an hour: $hour_fee\n", "Send Bitcoin");
+      system ('xvkbd -geometry 300x200 -keypad&');
+      $ret = $dialog->ShowModal;
+      system ('killall -9 xvkbd');
+      return if $ret == wxID_CANCEL;
+      my $feeamt = $dialog->GetValue(); return unless $feeamt =~ /^\d+$/; $feeamt = sprintf("%f",$feeamt / 100000000);
+      my $signedtx;
+      if ($ARGV[0] and $ARGV[0] eq '--online') {
+	$signedtx = `$electrum payto $sendto $amount -f $feeamt`;
+      }
+      else {
+	$tx = `$electrum payto $sendto $amount -f $feeamt -u`;
+	$tx =~ /"hex": "(\S+)"/s;
+	my $dialog = qrdialog(fromdigits($1,16), 'Scan the QR code on Noodle Air', 'Sign Transaction');
+	$dialog->ShowModal;
+	system ('v4l2-ctl --overlay=1');
+	open (ZBAR, "zbarcam --nodisplay --prescale=640x480 /dev/video0 |");
+	my $signed = <ZBAR>; chomp $signed; $signed =~ s/^QR-Code://; $signed = todigitstring($signed,16);
+	system ('killall -9 zbarcam');
+	close ZBAR;
+	system ('v4l2-ctl --overlay=0');
+	$signedtx = "{\n\"complete\": true,\n\"final\": true,\n\"hex\": \"$signed\"\n}";
+      }
       $dialog = Wx::MessageDialog->new( $frame, "Broadcast transaction?", "Confirm", wxOK|wxCANCEL);
       return if $dialog->ShowModal == wxID_CANCEL;
       my $id = `$electrum broadcast '$signedtx'`;
@@ -228,7 +245,6 @@ sub initl8n {               # Initialize l8n
     for my $l (keys %winlang) {
       $lang = $l, last if grep { sprintf("%04x",$langid) eq $_ } @{$winlang{$l}};
     }
-#    print STDERR "$lang\n";
   }
   else {
     $lang = $ENV{LC_ALL} || $ENV{LANG};
@@ -268,29 +284,39 @@ noodlepay.pl - Convenient way to securely send Bitcoin from cold storage
 
 =head1 VERSION
 
- $Revision: 1.002 $
- $Date: Mon Sep 25 18:56:05 PDT 2017 $
+ $Revision: 1.003 $
+ $Date: Sat Mar 17 14:38:49 PDT 2018 $
 
 =head1 SYNOPSIS
 
-  noodlepay.pl [--offline]
+  noodlepay.pl [--offline] [--online]
 
 =head1 DESCRIPTION
 
 noodlepay.pl (Noodle Pay) emables the use of an air-gapped wallet
-running on a device such as a Noodle Unsnoopable
-(L<http://www.noodlepi.com>) to easily and securely send Bitcoin
-payments.
+running on a device such as a Noodle Air (L<http://www.noodlepi.com>)
+to easily and securely send Bitcoin payments.
 
 Noodle Pay is much easier to use than hardware wallets, and doesn't
-require single-purpose hardware. The Noodle Unsnoopable device is a
-general purpose Linux computer, which can be used for many other
-applications as well.
+require single-purpose hardware. The Noodle Air device is a general
+purpose Linux computer, which can be used for many other applications
+as well.
+
+=head1 OPTION SWITCHES
+
+=head2 --offline
+
+Use this switch when running the app offline on a Noodle Air.
+
+=head2 --online
+
+Use this switch to have the app sign transactions directly on Noodle
+Pi rather than delegating signing to an air-gapped Noodle Air.
 
 =head1 PREREQUISITES
 
 Currently this app is designed to work on Noodle Pi / Noodle
-Unsnoopable devices, and requires the following programs to be
+Air devices, and requires the following programs to be
 available:
 
 * electrum

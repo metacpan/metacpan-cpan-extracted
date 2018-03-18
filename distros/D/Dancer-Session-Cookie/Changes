@@ -1,5 +1,13 @@
 Revision history for Dancer-Session-Cookie
 
+0.30 2018-03-11
+  [ ENHANCEMENTS ]
+    - add a CONTRIBUTING file [GH#18, Paul Cochrane]
+    - minor refactoring, bump minor Perl version to 5.10.0.
+
+  [ STATISTICS ]
+    - code churn: 5 files changed, 127 insertions(+), 26 deletions(-)
+
 0.29 2018-02-19
   [ MISC ]
     - Added appveyor integration for Windows CI. [GH#11, Paul Cochrane]

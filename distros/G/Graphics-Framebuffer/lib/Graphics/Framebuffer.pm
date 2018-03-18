@@ -103,7 +103,7 @@ If you are using CPAN, then installation is simple, but if you are installing ma
 
 =back
 
-Please note, that the install step my require root permissions (run it with sudo).
+Please note, that the install step may require root permissions (run it with sudo, "sudo make install").
 
 If testing fails, it will usually be ok to install it anyway, as it will likely work.  The testing is flakey (thank Perl's test mode for that).
 
@@ -282,7 +282,7 @@ Virtual framebuffer color mode constants
 
 =back
 
-Text renndering centering constants
+Text rendering centering constants
 
 =over 8
 
@@ -401,7 +401,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.03';
+    our $VERSION   = '6.04';
     our @ISA       = qw(Exporter Graphics::Framebuffer::Splash);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -472,6 +472,8 @@ DESTROY {
     _reset() if ($self->{'RESET'});    # Exit by calling 'reset' first
 }
 
+# use Inline 'info', 'noclean', 'noisy'; # Only needed for debugging
+
 use Inline C => <<CC, 'name' => 'Graphics::Framebuffer', 'VERSION' => $VERSION;
 
 #include <stdlib.h>
@@ -507,6 +509,7 @@ use Inline C => <<CC, 'name' => 'Graphics::Framebuffer', 'VERSION' => $VERSION;
 #define fpart_(X) (((double)(X))-(double)ipart_(X))
 #define rfpart_(X) (1.0-fpart_(X))
 #define swap_(a, b) do { __typeof__(a) tmp;  tmp = a; a = b; b = tmp; } while(0)
+
 
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
@@ -1639,12 +1642,16 @@ sub new {
         'CENTER_Y'    => CENTER_Y,                              #   Constants for centering
         'CENTER_XY'   => CENTER_XY,                             #   Constants for centering
 
+        # These are no longer used, but here in case someone uses them #####
         'WAIT_FOR_CONSOLE' => FALSE,
         'NO_FGCONSOLE'     => TRUE,
         'CONSOLE'          => 1,
         'THIS_CONSOLE'     => 1,
+        ####################################################################
 
         ## Set up the Framebuffer driver "constants" defaults
+        # These "fb.h" constants may go away in future versions, as the data needed to get from these
+        # Is available from Inline::C now.
         # Commands
         'FBIOGET_VSCREENINFO' => 0x4600,    # These come from "fb.h" in the kernel source
         'FBIOPUT_VSCREENINFO' => 0x4601,
@@ -2278,7 +2285,7 @@ Would return something like:
 
 =back
 
-When passing a name, it will return a hash reference (if only one match), or an array reference of hashes of fonts matching that name.  Passing in "Arial" would return the font information for "Arial Black, Arial Narrow, and Arial Rounded (if they are installed on your system).
+When passing a name, it will return a hash reference (if only one match), or an array reference of hashes of fonts matching that name.  Passing in "Arial" would return the font information for "Arial Black", "Arial Narrow", and "Arial Rounded" (if they are installed on your system).
 
 =cut
 
@@ -2327,10 +2334,13 @@ Sets or returns the drawing mode, depending on how it is called.
                                    # the new pixel and screen
                                    # pixel.
 
- $fb->draw_mode(ALPHA_MODE);       # Does a bitwise AND with
-                                   # the new pixel and the alpha
-                                   # value, then a bitwise OR
-                                   # with the screen pixel.
+ $fb->draw_mode(ALPHA_MODE);       # Does an alpha blend with
+                                   # the screen pixel and the new
+                                   # pixel using the alpha value
+                                   # as the degree which to apply
+                                   # the blending.  Alpha 1 is most
+                                   # transparent, and alpha 255 is
+                                   # completely opague.
 
  $fb->draw_mode(AND_MODE);         # Does a bitwise AND with
                                    # the new pixel and screen
@@ -2343,7 +2353,7 @@ Sets or returns the drawing mode, depending on how it is called.
 
  $fb->draw_mode(UNMASK_MODE);      # Draws the new pixel on
                                    # screen areas only equal to
-                                   # the background color. (SLOW)
+                                   # the background color.
 
 =back
 =cut
@@ -2484,11 +2494,9 @@ You can add an optional parameter to turn the console cursor on or off too.
 
 =over 4
 
- $fb->clear_screen(); # Leave cursor as is.
-
+ $fb->clear_screen();      # Leave cursor as is.
  $fb->clear_screen('OFF'); # Turn cursor OFF.
-
- $fb->clear_screen('ON'); # Turn cursor ON.
+ $fb->clear_screen('ON');  # Turn cursor ON.
 
 =back
 
@@ -2499,7 +2507,7 @@ sub clear_screen {
     # Fills the entire screen with the background color fast #
     my $self = shift;
     my $cursor = shift || '';
-    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
+#    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
     if ($cursor =~ /off/i) {
         system('clear && tput civis -- invisible');
     } elsif ($cursor =~ /on/i) {
@@ -2563,7 +2571,7 @@ sub attribute_reset {
 
 =head2 plot
 
-Set a single pixel in the globally set color at position x,y with the given pixel size (or default).  Clipping applies.
+Set a single pixel in the set foreground color at position x,y with the given pixel size (or default).  Clipping applies.
 
 With 'pixel_size', if a positive number greater than 1, is drawn with square pixels.  If it's a negative number, then it's drawn with round pixels.  Square pixels are much faster.
 
@@ -2579,15 +2587,12 @@ With 'pixel_size', if a positive number greater than 1, is drawn with square pix
 
 =back
 
-* This is not affected by the Acceleration setting
-
 =cut
 
 sub plot {
     my $self   = shift;
     my $params = shift;
 
-    my $fb   = $self->{'FB'};
     my $x    = int($params->{'x'} || 0);            # Ignore decimals
     my $y    = int($params->{'y'} || 0);
     my $size = int($params->{'pixel_size'} || 1);
@@ -2600,7 +2605,7 @@ sub plot {
             $self->rbox({ 'x' => $x - ($width / 2), 'y' => $y - ($height / 2), 'width' => $size, 'height' => $size, 'filled' => TRUE, 'pixel_size' => 1 });
         }
     } else {
-        $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
+#        $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
         if ($self->{'ACCELERATED'}) {
             c_plot($self->{'SCREEN'}, $x, $y, $self->{'DRAW_MODE'}, $self->{'INT_COLOR'}, $self->{'INT_B_COLOR'}, $self->{'BYTES'}, $self->{'BYTES_PER_LINE'}, $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'}, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $self->{'COLOR_ALPHA'});
         } else {
@@ -2731,7 +2736,7 @@ sub last_plot {
 
 =head2 line
 
-Draws a line, in the global color, from point x,y to point xx,yy.  Clipping applies.
+Draws a line, in the foreground color, from point x,y to point xx,yy.  Clipping applies.
 
 =over 4
 
@@ -2801,7 +2806,7 @@ sub angle_line {
 
 =head2 drawto
 
-Draws a line, in the global color, from the last plotted position to the position x,y.  Clipping applies.
+Draws a line, in the foreground color, from the last plotted position to the position x,y.  Clipping applies.
 
 =over 4
 
@@ -2814,7 +2819,7 @@ Draws a line, in the global color, from the last plotted position to the positio
 
 =back
 
-* This is not affected by the Acceleration setting
+* Antialiased lines are not accelerated
 
 =cut
 
@@ -4103,7 +4108,7 @@ sub _rfpart {
 
 =head2 polygon
 
-Creates a polygon drawn in the global color value.  The parameter 'coordinates' is a reference to an array of x,y values.  The last x,y combination is connected automatically with the first to close the polygon.  All x,y values are absolute, not relative.
+Creates a polygon drawn in the foreground color value.  The parameter 'coordinates' is a reference to an array of x,y values.  The last x,y combination is connected automatically with the first to close the polygon.  All x,y values are absolute, not relative.
 
 It is up to you to make sure the coordinates are "sane".  Weird things can result from twisted or complex filled polygons.
 
@@ -4895,7 +4900,7 @@ sub pixel {
 
     # Values outside of the clipping area return undefined.
     unless (($x > $self->{'XX_CLIP'}) || ($y > $self->{'YY_CLIP'}) || ($x < $self->{'X_CLIP'}) || ($y < $self->{'Y_CLIP'})) {
-        $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
+#        $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
         my ($color, $R, $G, $B, $A);
         $A = $self->{'COLOR_ALPHA'};
         my $index = ($self->{'BYTES_PER_LINE'} * ($y + $self->{'YOFFSET'})) + (($self->{'XOFFSET'} + $x) * $bytes);
@@ -4963,7 +4968,7 @@ sub get_pixel {
 
 =head2 fill
 
-Does a flood fill starting at point x,y.  It samples the color at that point and determines that color to be the "background" color, and proceeds to fill in, with the current global color, until the "background" color is replaced with the new color.
+Does a flood fill starting at point x,y.  It samples the color at that point and determines that color to be the "background" color, and proceeds to fill in, with the current foreground color, until the "background" color is replaced with the new color.
 
 =over 4
 
@@ -5156,7 +5161,7 @@ sub replace_color {
     $self->set_color({ 'red' => $new_r, 'green' => $new_g, 'blue' => $new_b });
     my $old_mode = $self->{'DRAW_MODE'};
     $self->{'DRAW_MODE'} = NORMAL_MODE;
-    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
+#    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
 
     my ($old, $new);
     if ($self->{'BITS'} == 32) {
@@ -5520,7 +5525,7 @@ sub blit_read {
     my $W    = $w * $bytes;
     my $XX   = ($self->{'XOFFSET'} + $x) * $bytes;
     my ($index, $scrn, $line);
-    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
+#    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
     if ($h > 1 && $self->{'ACCELERATED'}) {
         $scrn = chr(0) x ($W * $h);
         c_blit_read($self->{'SCREEN'}, $self->{'XRES'}, $self->{'YRES'}, $bytes_per_line, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $scrn, $x, $y, $w, $h, $bytes, $draw_mode, $self->{'COLOR_ALPHA'}, $self->{'B_COLOR'}, $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},);
@@ -5572,7 +5577,7 @@ sub blit_write {
     my $bytes_per_line = $self->{'BYTES_PER_LINE'};
     my $scrn           = $params->{'image'};
     return unless (defined($scrn) && $scrn ne '' && $h && $w);
-    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
+#    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
 
     if ($self->{'ACCELERATED'}) { # && $h > 1) {
         c_blit_write($self->{'SCREEN'}, $self->{'XRES'}, $self->{'YRES'}, $bytes_per_line, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $scrn, $x, $y, $w, $h, $bytes, $draw_mode, $self->{'COLOR_ALPHA'}, $self->{'B_COLOR'}, $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},);
@@ -6991,7 +6996,7 @@ sub screen_dump {
     my $self   = shift;
     my $params = shift;
 
-    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
+#    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
     my $filename = $params->{'file'} || 'screendump.jpg';
     my $bytes = $self->{'BYTES'};
     my ($width, $height) = ($self->{'XRES'}, $self->{'YRES'});
@@ -7831,7 +7836,7 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 VERSION
 
-Version 6.01 (October 14, 2016)
+Version 6.04 (March 11, 2018)
 
 =head1 THANKS
 

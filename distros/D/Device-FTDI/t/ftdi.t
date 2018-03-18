@@ -1,6 +1,5 @@
 use Test::More 0.94;
 use Device::FTDI qw(:all);
-use Try::Tiny;
 
 subtest Constants => sub {
     is PARITY_NONE,  0, 'NONE';
@@ -13,7 +12,7 @@ subtest Constants => sub {
 subtest Device => sub {
     plan skip_all => "Define ALLOW_ACCESS_TO_FTDI_DEVICE variable"
       unless $ENV{ALLOW_ACCESS_TO_FTDI_DEVICE};
-    my $dev = try { Device::FTDI->new };
+    my $dev = eval { Device::FTDI->new };
     plan skip_all => "Couldn't open FTDI device" unless $dev;
     isa_ok $dev, 'Device::FTDI';
 

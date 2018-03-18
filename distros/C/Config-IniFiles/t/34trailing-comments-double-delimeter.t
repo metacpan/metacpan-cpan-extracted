@@ -19,15 +19,13 @@ key=val ; a comment ; further comment
 EOF
 
     my $cfg = Config::IniFiles->new(
-        -file => \$ini_contents,
+        -file                    => \$ini_contents,
         -handle_trailing_comment => 1,
     );
 
     # TEST
-    is (scalar( $cfg->val("MySect", "key") ),
-        "val",
-        "Value with a double trailing comment."
-    );
+    is( scalar( $cfg->val( "MySect", "key" ) ),
+        "val", "Value with a double trailing comment." );
 }
 
 __END__

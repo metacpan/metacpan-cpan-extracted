@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::App::Command::overlay;
-$Footprintless::App::Command::overlay::VERSION = '1.27';
+$Footprintless::App::Command::overlay::VERSION = '1.28';
 # ABSTRACT: Performs an action on an overlay.
 # PODNAME: Footprintless::App::Command::overlay
 
@@ -36,7 +36,7 @@ Footprintless::App::Command::overlay - Performs an action on an overlay.
 
 =head1 VERSION
 
-version 1.27
+version 1.28
 
 =head1 SYNOPSIS
 

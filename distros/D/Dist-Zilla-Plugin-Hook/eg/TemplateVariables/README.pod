@@ -1,3 +1,5 @@
+=encoding UTF-8
+
 =head2 Template Variables
 
 In a distribution, I have to duplicate the same pieces of information again and again. For example,

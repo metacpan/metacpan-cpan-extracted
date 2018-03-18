@@ -18,7 +18,7 @@ Perinci::CmdLine::Manual::FAQ - FAQs
 
 =head1 VERSION
 
-This document describes version 1.77 of Perinci::CmdLine::Manual::FAQ (from Perl distribution Perinci-CmdLine), released on 2017-07-31.
+This document describes version 1.811.0 of Perinci::CmdLine::Manual::FAQ (from Perl distribution Perinci-CmdLine), released on 2018-03-17.
 
 =head1 NOMENCLATURE
 
@@ -256,6 +256,58 @@ or:
 
  % PERL5OPT='-d:Confess' yourscript.pl
 
+=head1 PROGRESS INDICATOR
+
+=head2 How do I show progress indicator?
+
+Perinci::CmdLine can work together with the L<Progress::Any> framework. Either
+you setup progress output module manually:
+
+ use Perinci::CmdLine::Any;
+ use Progress::Any '$progress';
+ use Progress::Any::Output 'TermProgressBarColor';
+
+ $SPEC{app} = {
+     v => 1.1,
+     ...
+ };
+ sub app {
+     $progress->target(5);
+     for (1..5) {
+         $progress->update(message => "Item $_");
+         sleep 1;
+     }
+     [200];
+ }
+
+ Perinci::CmdLine::Any->new(url => "/main/app")->run;
+
+or you can set C<progress> feature in your function metadata, in which case
+L<Perinci::CmdLine::Lite> will setup
+L<Progress::Any::Output::TermProgressBarColor> for you automatically:
+
+ use Perinci::CmdLine::Any;
+ use Progress::Any '$progress';
+
+ $SPEC{app} = {
+     v => 1.1,
+     ...
+     features => { progress=>1 },
+ };
+ sub app {
+     $progress->target(5);
+     for (1..5) {
+         $progress->update(message => "Item $_");
+         sleep 1;
+     }
+     [200];
+ }
+
+ Perinci::CmdLine::Any->new(url => "/main/app")->run;
+
+The former way gives you flexibility to choose/customize your progress output
+module.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Perinci-CmdLine>.
@@ -285,7 +337,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

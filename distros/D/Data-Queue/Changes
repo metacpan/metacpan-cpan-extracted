@@ -1,2 +1,5 @@
-- 1.0001
-   - Inital Release
+1.001
+ - Inital Release
+1.002
+  - Added perl5 licence
+  - Changed min version of Data::Dumper to 2.161

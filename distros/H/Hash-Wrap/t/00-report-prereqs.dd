@@ -34,7 +34,6 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::Test::CPAN::Changes' => '0',
                                       'Dist::Zilla::Plugin::Test::CPAN::Meta::JSON' => '0',
                                       'Dist::Zilla::Plugin::Test::CheckManifest' => '0',
-                                      'Dist::Zilla::Plugin::Test::CleanNamespaces' => '0',
                                       'Dist::Zilla::Plugin::Test::Compile' => '0',
                                       'Dist::Zilla::Plugin::Test::Fixme' => '0',
                                       'Dist::Zilla::Plugin::Test::NoBreakpoints' => '0',
@@ -52,7 +51,6 @@ do { my $x = {
                                       'Software::License::GPL_3' => '0',
                                       'Test::CPAN::Changes' => '0.19',
                                       'Test::CPAN::Meta::JSON' => '0.16',
-                                      'Test::CleanNamespaces' => '0.15',
                                       'Test::More' => '0.88',
                                       'Test::NoBreakpoints' => '0.15',
                                       'Test::NoTabs' => '0',
@@ -66,9 +64,8 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'MRO::Compat' => '0',
                                       'Scalar::Util' => '0',
-                                      'perl' => '5.008009'
+                                      'perl' => '5.010'
                                     }
                     },
        'test' => {
@@ -80,7 +77,6 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
-                                   'Number::Tolerant' => '0',
                                    'Test2::V0' => '0',
                                    'Test::More' => '0'
                                  }

@@ -15,7 +15,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,10 +37,10 @@ resources:
   bugtracker: https://github.com/rjbs/Email-Stuffer/issues
   homepage: https://github.com/rjbs/Email-Stuffer
   repository: https://github.com/rjbs/Email-Stuffer.git
-version: '0.016'
+version: '0.017'
 x_Dist_Zilla:
   perl:
-    version: '5.024000'
+    version: '5.026001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
@@ -56,7 +56,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@RJBS/Git::GatherDir'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: '@RJBS/CheckPrereqsIndexed'
@@ -93,58 +93,58 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@RJBS/@Filter/PruneCruft'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@RJBS/@Filter/ManifestSkip'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@RJBS/@Filter/MetaYAML'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::License
       name: '@RJBS/@Filter/License'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@RJBS/@Filter/Readme'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@RJBS/@Filter/ExecDir'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@RJBS/@Filter/ShareDir'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@RJBS/@Filter/Manifest'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@RJBS/@Filter/TestRelease'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@RJBS/@Filter/ConfirmRelease'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@RJBS/@Filter/UploadToCPAN'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 9
       name: '@RJBS/MakeMaker'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@RJBS/AutoPrereqs'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -153,34 +153,34 @@ x_Dist_Zilla:
           version_by_branch: 1
           version_regexp: (?^:^([0-9]+\.[0-9]+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.0
+          git_version: 2.15.1
           repo_root: .
       name: '@RJBS/Git::NextVersion'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@RJBS/PkgVersion'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@RJBS/MetaConfig'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@RJBS/MetaJSON'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@RJBS/NextRelease'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
       name: '@RJBS/Test::ChangesHasContent'
-      version: '0.010'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@RJBS/PodSyntaxTests'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@RJBS/Test::ReportPrereqs'
@@ -192,7 +192,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: '@RJBS/TestMoreWithSubtests'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -297,10 +297,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.0
+          git_version: 2.15.1
           repo_root: .
       name: '@RJBS/@Git/Check'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -314,12 +314,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.0
+          git_version: 2.15.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@RJBS/@Git/Commit'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -327,16 +327,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.016'
+          tag: '0.017'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.0
+          git_version: 2.15.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@RJBS/@Git/Tag'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -346,70 +346,70 @@ x_Dist_Zilla:
             - 'github :'
           remotes_must_exist: 0
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.0
+          git_version: 2.15.1
           repo_root: .
       name: '@RJBS/@Git/Push'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.13.0
+          git_version: 2.15.1
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: '@RJBS/Git::Contributors'
-      version: '0.030'
+      version: '0.032'
     -
       class: Dist::Zilla::Plugin::Encoding
       name: Encoding
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.010'
+      version: '6.011'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.010'
+    version: '6.011'
 x_contributors:
   - 'Aaron W. Swenson <aaron.w.swenson@gmail.com>'
   - 'adam <adam@88f4d9cd-8a04-0410-9d60-8f63309c3137>'

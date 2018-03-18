@@ -31,7 +31,7 @@ is( $res->content_type, 'text/html', '404 is text/html' );
 
 # qr regex test
 ok( $res = request('http://localhost/images/catalyst.png'), 'request ok' );
-is( $res->content_type, 'image/png', 'qr regex path ok' );
+like( $res->content_type, qr{\Aimage/.*png\z}, 'qr regex path ok' );
 
 # eval regex test
 ok( $res = request('http://localhost/css/static.css'), 'request ok' );

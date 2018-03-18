@@ -5,7 +5,7 @@ use Mojolicious::Plugin::Vparam::Common qw(:all);
 use version;
 use List::MoreUtils qw(firstval natatime mesh);
 
-our $VERSION    = '3.04';
+our $VERSION    = '3.06';
 
 # Regext for shortcut parser
 our $SHORTCUT_REGEXP = qr{
@@ -270,9 +270,9 @@ sub register {
 
             # Get value
             my @input;
-            if ($attr{'jpath?'}) {
+            if( $attr{'jpath?'} ) {
                 # JSON Pointer
-                unless (exists $vars->{json}) {
+                unless(exists $vars->{json}) {
                     $vars->{json} =
                         Mojolicious::Plugin::Vparam::JSON::parse_json(
                             $self->req->body // ''
@@ -289,7 +289,7 @@ sub register {
                     # POST parameters
                     @input = params($self, $name);
                 }
-            } elsif ($attr{jpath}) {
+            } elsif( $attr{jpath} ) {
                 # JSON Pointer
                 unless (exists $vars->{json}) {
                     $vars->{json} =
@@ -305,7 +305,7 @@ sub register {
                         @input = 'ARRAY' eq ref $value ? @$value : $value;
                     }
                 }
-            } elsif ($attr{cpath}) {
+            } elsif( $attr{cpath} ) {
                 # CSS
                 unless (exists $vars->{dom}) {
                     $vars->{dom} =
@@ -317,7 +317,7 @@ sub register {
                     @input =
                         $vars->{dom}->find($attr{cpath})->map('text')->each;
                 }
-            } elsif ($attr{xpath}) {
+            } elsif( $attr{xpath} ) {
                 # XML
                 unless (exists $vars->{xml}) {
                     $vars->{xml} = Mojolicious::Plugin::Vparam::XML::parse_xml(
@@ -328,7 +328,26 @@ sub register {
                     @input = map {$_->textContent}
                         $vars->{xml}->findnodes($attr{xpath});
                 }
-            } elsif ($type && $type eq 'object') {
+            } elsif( $attr{opath} ) {
+                # PHP, jQuery, Ruby, etc.
+                unless (
+                        exists( $vars->{objects} )
+                    &&  exists( $vars->{objects}{$name} )
+                ) {
+                    my @names = grep m{^$name\[}, @{$self->req->params->names};
+                    my $object = Mojolicious::Plugin::Vparam::Object::parse_object({
+                        map { $_ => params($self, $_) } @names
+                    });
+
+                    $vars->{objects} //= {};
+                    $vars->{objects}{$name} =
+                        Mojo::JSON::Pointer->new( $object );
+                }
+                if( $vars->{objects}{$name}->contains( $attr{opath} ) ) {
+                    my $value = $vars->{objects}{$name}->get( $attr{opath} );
+                    @input = 'ARRAY' eq ref $value ? @$value : $value;
+                }
+            } elsif( $type && $type eq 'object' ) {
                 # PHP, jQuery, Ruby, etc.
                 my @names = grep m{^$name\[}, @{$self->req->params->names};
                 @input = ( { map { $_ => params($self, $_) } @names });
@@ -1494,6 +1513,11 @@ Same as cpath but parse XML/HTML using XPath selectors from L<XML::LibXML>.
         lat     => { type => 'lat',         xpath => '/Point/Lat' },
         time    => { type => 'datetime',    xpath => '/Point/@time' },
     );
+
+=head2 opath
+
+Same as jpath but apply for other types of object istead of JSON. See I<object>
+type.
 
 =head1 RESERVED ATTRIBUTES
 

@@ -34,14 +34,17 @@ my $optional_modules =
    'HTML::Clean' => 'Compress text/html with Clean config or $Response->{Clean} set to 1-9',
    'HTML::FillInForm' => 
    'Enables FormFill feature which will auto fill forms from $Request->Form data',
-   'Apache::Filter' => 'Full SSI support via Apache::Filter & Apache::SSI',
-   'Apache::SSI' => 'Full SSI support via Apache::Filter & Apache::SSI',
+## not relevant on apache2 context
+##   'Apache::Filter' => 'Full SSI support via Apache::Filter & Apache::SSI',
+##   'Apache::SSI' => 'Full SSI support via Apache::Filter & Apache::SSI',
    'Net::SMTP' => 'Runtime errors can be mailed to the webmaster with MailErrorTo config',
    'Net::Config' => 'Config options for use with Net::SMTP',
    'Time::HiRes' => 'Sub second Apache::ASP response timing with Debug 3/-3 turned on.',
-#   'Tie::TextDir .04' => 'Fast cache for CacheDB setting for things like large XSLT transformations.',
+## no longer seems supported
+##   'Tie::TextDir .04' => 'Fast cache for CacheDB setting for things like large XSLT transformations.',
    'XML::XSLT 0.32' => 'XSLT, written in perl so makes for an easy install after installing Bundle::XML from CPAN.',
-   'XML::Sablotron' => 'XSLT that is 10 times faster than XML::XSLT',
+## no longer seems supported
+##   'XML::Sablotron' => 'XSLT that is 10 times faster than XML::XSLT', 
    'XML::LibXSLT' => 'XSLT that is 2 times faster than XML::Sablotron',
 };
 	    

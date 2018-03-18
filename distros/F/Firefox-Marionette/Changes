@@ -1,5 +1,12 @@
 Revision history for Firefox-Marionette
 
+0.53  Fri Mar 15 19:49:00 2018
+       Fixed test suite.
+
+0.52  Thu Mar 15 21:28:00 2018
+       Reduced the minimum acceptable firefox version to 50.
+       Adding enumerate, moz_use_non_spec_compliant_pointer_origin methods to Capabilities.
+
 0.51  Sat Mar 10 15:44:00 2018
        Adding loaded and interactive methods.
 

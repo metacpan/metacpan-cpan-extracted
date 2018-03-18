@@ -6,7 +6,7 @@ use Clustericious::Commands;
 
 # PODNAME: clustericious
 # ABSTRACT: Clustericious command runner
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.29'; # VERSION
 
 
 Clustericious::Commands->start;
@@ -23,7 +23,7 @@ clustericious - Clustericious command runner
 
 =head1 VERSION
 
-version 1.27
+version 1.29
 
 =head1 SYNOPSIS
 

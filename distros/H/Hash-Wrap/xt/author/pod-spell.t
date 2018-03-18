@@ -11,7 +11,6 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Astrophysical
-Base
 DCONWAY
 Diab
 Hash
@@ -20,6 +19,4 @@ Observatory
 Smithsonian
 Wrap
 djerius
-instantiation
 lib
-mistyped

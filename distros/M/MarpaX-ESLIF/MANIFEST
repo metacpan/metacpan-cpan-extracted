@@ -281,7 +281,9 @@ src/3rdparty/github/tconv/3rdparty/github/optparse/README.md
 src/3rdparty/github/tconv/3rdparty/github/optparse/UNLICENSE
 src/3rdparty/github/tconv/3rdparty/github/optparse/optparse.h
 src/3rdparty/github/tconv/3rdparty/github/optparse/test.c
+src/3rdparty/github/tconv/3rdparty/tar/cchardet-1.0.0.README.txt
 src/3rdparty/github/tconv/3rdparty/tar/cchardet-1.0.0.tar.gz
+src/3rdparty/github/tconv/3rdparty/tar/cchardet-1.0.0.tar.orig.gz
 src/3rdparty/github/tconv/3rdparty/tar/libiconv-1.15.tar.gz
 src/3rdparty/github/tconv/CMakeLists.txt
 src/3rdparty/github/tconv/CMakeObjects.PL

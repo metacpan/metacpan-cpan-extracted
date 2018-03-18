@@ -94,8 +94,7 @@ sub auth {
         ]
     );
     croak "authorization failed: " . $res->status_line unless $res->is_success;
-    my $body_params = from_json( $res->content );
-    my $url         = $body_params->{storage}->{ $self->tenant_name };
+    my $url = $res->header('X-Storage-Url');
     $self->auth_token( $res->header('X-Auth-Token') );
     $self->service_catalog(
         [

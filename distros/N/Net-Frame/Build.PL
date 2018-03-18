@@ -1,5 +1,5 @@
 #
-# $Id: Build.PL,v 50c674721baf 2015/01/28 19:04:14 gomor $
+# $Id: Build.PL,v 7609c9d085d3 2018/03/15 15:17:19 gomor $
 #
 use strict;
 use warnings;
@@ -27,7 +27,7 @@ my $builder = Module::Build->new(
       'Class::Gomor' => '1.00',
       'Net::IPv6Addr' => '0',
       'Bit::Vector' => '0',
-      'Socket' => '0',
+      'Socket' => '2.019',
       @conditions_modules,
    },
    configure_requires => {

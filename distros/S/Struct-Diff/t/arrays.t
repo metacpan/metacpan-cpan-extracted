@@ -130,26 +130,26 @@ my @TESTS = (
     {
         a       => [0, 2],
         b       => [0, 1, 2],
-        name    => 'one_item_inserted_in_the_moddle_of_list',
+        name    => 'one_item_inserted_in_the_middle_of_list',
         diff    => {D => [{U => 0},{A => 1},{U => 2}]},
     },
     {
         a       => [0, 2],
         b       => [0, 1, 2],
-        name    => 'one_item_inserted_in_the_moddle_of_list_noU',
+        name    => 'one_item_inserted_in_the_middle_of_list_noU',
         diff    => {D => [{A => 1,I => 1}]},
         opts    => {noU => 1},
     },
     {
         a       => [0, 1, 2],
         b       => [0, 2],
-        name    => 'one_item_removed_from_the_moddle_of_list',
+        name    => 'one_item_removed_from_the_middle_of_list',
         diff    => {D => [{U => 0},{R => 1},{U => 2}]},
     },
     {
         a       => [0, 1, 2],
         b       => [0, 2],
-        name    => 'one_item_removed_from_the_moddle_of_list_noU',
+        name    => 'one_item_removed_from_the_middle_of_list_noU',
         diff    => {D => [{I => 1,R => 1}]},
         opts    => {noU => 1},
     },
@@ -389,7 +389,7 @@ my @TESTS = (
     {
         a       => [ 0, [[ 100 ]], [ 20, '30' ], 4 ],
         b       => [ 0, [[ 100 ]], [ 20, '31' ], 5 ],
-        name    => 'complex_arrays',
+        name    => 'complex_lists',
         diff    => {
             D => [
                 {U => 0},
@@ -407,7 +407,7 @@ my @TESTS = (
     {
         a       => [ 0, [[ 100 ]], [ 20, '30' ], 4 ],
         b       => [ 0, [[ 100 ]], [ 20, '31' ], 5 ],
-        name    => 'complex_arrays_noU',
+        name    => 'complex_lists_noU',
         diff    => {
             D => [
                 {

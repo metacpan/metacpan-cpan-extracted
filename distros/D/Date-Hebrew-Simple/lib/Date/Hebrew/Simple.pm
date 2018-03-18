@@ -1,6 +1,6 @@
 package Date::Hebrew::Simple;
 
-$Date::Hebrew::Simple::VERSION   = '0.08';
+$Date::Hebrew::Simple::VERSION   = '0.09';
 $Date::Hebrew::Simple::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Date::Hebrew::Simple - Represents Hebrew date.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
@@ -21,7 +21,7 @@ use Date::Calc qw/Delta_Days/;
 use Date::Exception::InvalidMonth;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 use overload q{""} => 'as_string', fallback => 1;
 

@@ -7,11 +7,12 @@ use warnings;
 
 use Carp;
 
-use Astro::Coord::ECI::Utils qw{ __default_station PIOVER2 SECSPERDAY };
+use Astro::Coord::ECI::Utils qw{ __default_station
+    ARRAY_REF PIOVER2 SECSPERDAY };
 use Exporter ();
 use POSIX qw{ floor };
 
-our $VERSION = '0.090';
+our $VERSION = '0.091';
 
 our @EXPORT_OK = qw{
     almanac almanac_hash
@@ -46,7 +47,7 @@ sub almanac {
 	    my ( $time, $which ) = $obj->$method ( @$args );
 	    $time >= $end
 		and last;
-	    defined ( my $text = 'ARRAY' eq ref $descr ?
+	    defined ( my $text = ARRAY_REF eq ref $descr ?
 		$descr->[ $which ] : $self->$descr( $which ) )
 		or next;
 	    push @almanac, [ $time, $event, $which, $text ];

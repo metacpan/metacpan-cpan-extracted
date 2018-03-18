@@ -2,10 +2,6 @@
 
 # This shows a slide show on ALL available framebuffers
 
-# The last item on the command line should be the path to the pictures
-# other options are "file" for file handle mode, "error" for show
-# errors, and 'auto' for autolevel.
-
 use strict;
 use threads;
 use threads::shared;
@@ -13,24 +9,21 @@ use threads::shared;
 use Graphics::Framebuffer;
 use Time::HiRes qw(sleep time);
 use List::Util qw(shuffle);
+use Getopts::Long;
 
 # use Data::Dumper::Simple;
-my (@a,$path,$args);
-if (scalar(@ARGV)) {
-    @a    = @ARGV;
-    $path = pop(@a);
-    $args = join('', @a);
-} else {
-    $path = (-d "images/") ? 'images/' : 'examples/images/';
-    $args = 'full';
-}
 
-my $errors = 0;
-$errors = 1 if ($args =~ /errors/i);
-my $auto = 0;
-$auto = 1 if ($args =~ /auto/i);
+my $path;
+my $errors     = 0;
+my $auto       = 0;
 my $fullscreen = 0;
-$fullscreen = 1 if ($args =~ /full/i);
+
+GetOptions(
+    'auto'   => \$auto,
+    'errors' => \$errors,
+    'full'   => \$fullscreen,
+    'path=s' => \$path,
+);
 
 my @fbs;
 

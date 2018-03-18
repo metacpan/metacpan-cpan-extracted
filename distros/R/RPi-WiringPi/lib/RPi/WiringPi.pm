@@ -17,9 +17,10 @@ use RPi::LCD;
 use RPi::Pin;
 use RPi::Serial;
 use RPi::SPI;
+use RPi::StepperMotor;
 use RPi::Const qw(:all);
 
-our $VERSION = '2.3622';
+our $VERSION = '2.3623';
 
 my $fatal_exit = 1;
 
@@ -208,6 +209,19 @@ sub spi {
     my ($self, $chan, $speed) = @_;
     my $spi = RPi::SPI->new($chan, $speed);
     return $spi;
+}
+sub stepper_motor {
+    my ($self, %args) = @_;
+
+    if (! exists $args{pins}){
+        die "steppermotor() requires an arrayref of pins sent in\n";
+    }
+
+    for (@{ $args{pins} }){
+        $self->pin($_);
+    }
+
+    return RPi::StepperMotor->new(%args);
 }
 
 # private
@@ -457,6 +471,17 @@ various items
     $servo->pwm(50);  # left position
     $servo->pwm(250); # right position
 
+    #
+    # stepper motor
+    #
+
+    my $sm = $pi->stepper_motor(
+        pins => [12, 16, 20, 21]
+    );
+
+    $sm->cw(180);   # turn clockwise 180 degrees
+    $sm->ccw(240);  # turn counter-clockwise 240 degrees
+
 =head1 DESCRIPTION
 
 This is the root module for the C<RPi::WiringPi> system. It interfaces to a
@@ -522,7 +547,7 @@ Parameters:
 The default (no parameters) is almost always enough, but please do review
 the documentation in the link above for further information, and have a
 look at the
-L<ADC tutorial section|RPi::WiringPi::FAQ/ANALOG TO DIGITAL CONVERTERS> in
+L<ADC tutorial section|RPi::WiringPi::FAQ/ANALOG TO DIGITAL CONVERTERS (ADC)> in
 this distribution.
 
 =head3 MCP3008
@@ -577,7 +602,7 @@ Returns a L<RPi::DigiPot::MCP4XXXX> object, which allows you to manage a
 digital potentiometer (only the MCP4XXXX versions are currently supported).
 
 See the linked documentation for full documentation on usage, or the
-L<RPi::WiringPi::FAQ-Tutorial> for usage examples.
+L<RPi::WiringPi::FAQ> for usage examples.
 
 =head2 gps
 
@@ -613,7 +638,7 @@ Creates a new L<RPi::I2C> device object which allows you to communicate with
 the devices on an I2C bus.
 
 See the linked documentation for full documentation on usage, or the
-L<RPi::WiringPi::FAQ-Tutorial> for usage examples.
+L<RPi::WiringPi::FAQ> for usage examples.
 
 Aruino note: If using I2C with an Arduino, the Pi may speak faster than the
 Arduino can. If this is the case, try lowering the I2C bus speed on the Pi:
@@ -646,7 +671,7 @@ Creates a new L<RPi::Serial> object which allows basic read/write access to a
 serial bus.
 
 See the linked documentation for full documentation on usage, or the
-L<RPi::WiringPi::FAQ-Tutorial> for usage examples.
+L<RPi::WiringPi::FAQ> for usage examples.
 
 NOTE: Bluetooth on the Pi overlays the serial pins (14, 15) on the Pi. To use
 serial, you must disable bluetooth in the C</boot/config.txt> file:
@@ -716,11 +741,39 @@ Creates a new L<RPi::SPI> object which allows you to communicate on the Serial
 Peripheral Interface (SPI) bus with attached devices.
 
 See the linked documentation for full documentation on usage, or the
-L<RPi::WiringPi::FAQ-Tutorial> for usage examples.
+L<RPi::WiringPi::FAQ> for usage examples.
+
+=head2 stepper_motor($pins)
+
+Creates a new L<RPi::StepperMotor> object which allows you to drive a
+28BYJ-48 stepper motor with a ULN2003 driver chip.
+
+See the linked documentation for full usage instructions and the optional
+parameters.
+
+Parameters:
+
+    pins => $aref
+
+Mandatory, Array Reference: The ULN2003 has four data pins, IN1, IN2, IN3 and
+IN4. Send in the GPIO pin numbers in the array reference which correlate to the
+driver pins in the listed order.
+
+    speed => 'half'|'full'
+
+Optional, String: By default we run in "half speed" mode. Essentially, in this
+mode we run through all eight steps. Send in 'full' to double the speed of the
+motor. We do this by skipping every other step.
+
+    delay => Float|Int
+
+Optional, Float or Int: By default, between each step, we delay by C<0.01>
+seconds. Send in a float or integer for the number of seconds to delay each step
+by. The smaller this number, the faster the motor will turn.
 
 =head1 RUNNING TESTS
 
-Please see L<RUNNING TESTS|RPi::WiringPi::FAQ/RUNNING-TESTS> in the
+Please see L<RUNNING TESTS|RPi::WiringPi::FAQ/RUNNING TESTS> in the
 L<FAQ|RPi::WiringPi::FAQ>.
 
 =head1 AUTHOR

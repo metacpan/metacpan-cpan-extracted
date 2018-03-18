@@ -2,7 +2,7 @@ package Test2::Harness::Job::Runner::Dummy;
 use strict;
 use warnings;
 
-our $VERSION = '0.001057';
+our $VERSION = '0.001061';
 
 use Test2::Harness::Util qw/open_file write_file local_env/;
 use Test2::Harness::Util::IPC qw/run_cmd/;
@@ -32,6 +32,8 @@ sub command {
         (map { "-I$_" } @{$job->libs}, $class->find_inc),
         $ENV{HARNESS_PERL_SWITCHES} ? $ENV{HARNESS_PERL_SWITCHES} : (),
         @{$job->switches},
+        $job->event_uuids ? ('-MTest2::Plugin::UUID') : (),
+        $job->mem_usage ? ('-MTest2::Plugin::MemUsage') : (),
         (map {"-m$_"} @{$job->load || []}),
         (map {"-M$_"} @{$job->load_import || []}),
         $job->use_stream ? ("-MTest2::Formatter::Stream=file,$event_file") : (),

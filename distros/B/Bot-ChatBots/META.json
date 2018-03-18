@@ -4,7 +4,7 @@
       "Flavio Poletti <polettix@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.15",
+            "Dist::Milla" : "v1.0.18",
             "Path::Tiny" : "0.096",
             "Template::Perlish" : "1.52",
             "Test::Pod" : "1.41"
@@ -44,8 +44,9 @@
             "Module::Runtime" : "0.014",
             "Mojolicious" : "7.10",
             "Moo" : "2.002005",
-            "Ouch" : "0.0410",
+            "Ouch" : "0.0500",
             "Try::Tiny" : "0.27",
+            "namespace::clean" : "0.27",
             "perl" : "5.010"
          }
       },
@@ -71,9 +72,10 @@
          "web" : "https://github.com/polettix/Bot-ChatBots"
       }
    },
-   "version" : "0.012",
+   "version" : "0.014",
    "x_contributors" : [
       "Flavio Poletti <flavio@polettix.it>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.00"
 }
 

@@ -5,8 +5,6 @@ use warnings;
 
 our $AUTOLOAD;
 
-#sub _ACCESSORS { ... }
-
 sub new {
     my ($class, %opts) = @_;
 

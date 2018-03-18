@@ -11,8 +11,8 @@ use Crypt::PasswdMD5 qw( unix_md5_crypt apache_md5_crypt );
 with 'PlugAuth::Role::Plugin';
 with 'PlugAuth::Role::Auth';
 
-# ABSTRACT: DBI Authentication back end for PlugAuth
-our $VERSION = '0.06'; # VERSION
+# ABSTRACT: (Deprecated) DBI Authentication back end for PlugAuth
+our $VERSION = '0.07'; # VERSION
 
 
 sub init
@@ -163,11 +163,11 @@ __END__
 
 =head1 NAME
 
-PlugAuth::Plugin::DBIAuth - DBI Authentication back end for PlugAuth
+PlugAuth::Plugin::DBIAuth - (Deprecated) DBI Authentication back end for PlugAuth
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -186,6 +186,9 @@ In your PlugAuth.conf file:
          all_users: 'SELECT username FROM users'
 
 =head1 DESCRIPTION
+
+B<NOTE>: This module has been deprecated, and may be removed on or after 31 December 2018.
+Please see L<https://github.com/clustericious/Clustericious/issues/46>.
 
 This plugin provides an authentication mechanism for PlugAuth using any
 database supported by DBI as a backend.  It is configured as above, with

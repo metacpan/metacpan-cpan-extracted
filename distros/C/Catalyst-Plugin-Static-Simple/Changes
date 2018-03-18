@@ -1,5 +1,11 @@
 Revision history for Perl extension Catalyst::Plugin::Static::Simple
 
+0.36   2018-03-15 11:37 GMT
+       - Relax PNG content type check in t/05dirs.t
+
+0.35   2018-03-14 12:07 GMT
+       - Use less-likely extension for unknown file type (RT#124211)
+
 0.34   2017-08-02 09:56 Los Angeles
        - Remove MYMETA.* (RT#108814)
        - Fix installing on 5.26.0+ (RT#121861)

@@ -1,7 +1,14 @@
 
 Release history for Kevin-Command-kevin
 
-0.5.5     2017-12-20 14:14:14-08:00 America/Los_Angeles
+0.6.0     2018-03-12 15:21:58-07:00 America/Los_Angeles
+
+    [Minion 8.08]
+    - Added busy and wait events to Minion::Worker
+    - Added dequeue_timeout option to run method in Minion::Worker
+    - Added -D option to worker command
+
+v0.5.5     2017-12-20 14:14:14-08:00 America/Los_Angeles
 
     [internal]
     - $worker->_ping(): allows override for extended health-check updates

@@ -86,6 +86,7 @@ t/721_jpath_array.t
 t/722_jpath_maybe.t
 t/730_cpath.t
 t/740_xpath.t
+t/750_opath.t
 t/800_inn.t
 t/805_kpp.t
 t/840_isin.t

@@ -1,5 +1,8 @@
 Revision history for Perl extension Web-MarketReceipt
 
+0.05 2018-03-14T09:06:42Z
+    - add receipt verification mock module for AppStore
+
 0.04 2018-01-04T06:46:50Z
     - fix cpants
 

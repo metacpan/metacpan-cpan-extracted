@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckReference;
 # ABSTRACT: Git::Hooks plugin for checking references
-$Git::Hooks::CheckReference::VERSION = '2.7.0';
+$Git::Hooks::CheckReference::VERSION = '2.8.1';
 use 5.010;
 use utf8;
 use strict;
@@ -56,6 +56,7 @@ sub check_affected_refs {
     my $errors = 0;
 
     foreach my $ref ($git->get_affected_refs()) {
+        next unless $git->is_reference_enabled($ref);
         check_ref($git, $ref)
             or ++$errors;
     }
@@ -84,7 +85,7 @@ Git::Hooks::CheckReference - Git::Hooks plugin for checking references
 
 =head1 VERSION
 
-version 2.7.0
+version 2.8.1
 
 =head1 SYNOPSIS
 
@@ -142,6 +143,10 @@ CheckReference - Git::Hooks plugin for checking references
 =head1 CONFIGURATION
 
 The plugin is configured by the following git options.
+
+It can be disabled for specific references via the C<githooks.ref> and
+C<githooks.noref> options about which you can read in the L<Git::Hooks>
+documentation.
 
 =head2 githooks.checkreference.deny REGEXP
 

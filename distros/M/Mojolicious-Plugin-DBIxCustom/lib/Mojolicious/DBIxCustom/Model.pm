@@ -239,12 +239,8 @@ sub remove_by_id{
     $where->{$sdel} = 0;
   }
   
-  ## 查询需要出将要删除的内容
-  my $object = $self->select(where => $where)->one;
-  
-  ## 执行删除
-  my $rows = $self->delete(where => $where);
-  return {rows => $rows, object => $object, where => $where};
+  ## 调用 remove 方法 执行删除操作
+  return $self->remove($where);
 }
 
 
@@ -319,6 +315,7 @@ sub sremove{
 ## 根据参数 构造 where 条件
 ## 支持 id 的列表
 ## 支持 id 的数组引用
+## 支持 flag 等 sremove 所支持的参数
 ## 返回值为 hashref
 ## rows 影响了多少行
 ## object ,update语句删除的数据对象，删除前的值
@@ -344,9 +341,6 @@ sub sremove_by_id{
     $where->{$pk} = shift(@ids);
   }
   
-  my $flag = $t ? shift : shift(@ids);
-  $flag ||= 1;
-  
   ## 添加软删除标记
   my $sdel = $self->sdel;
   if($sdel && !exists($where->{$sdel})){
@@ -354,12 +348,8 @@ sub sremove_by_id{
   }
   
   if($sdel){
-    ## 查询需要出将要删除的内容
-    my $object = $self->select(where => $where)->one;
-    
-    ## 执行软件删除
-    my $rows = $self->update({$sdel => $flag}, where => $where);
-    return {rows => $rows, object => $object, where => $where};
+    ## 调用 sremove 方法 执行软删除
+    return $self->sremove($where, $t ? @_ : @ids);
   }else{
     cluck "dont support sremove";
   }
@@ -499,10 +489,11 @@ sub AUTOLOAD{
   ## list , update语句删除的数据对象，删除前的值
   ## object ,update语句删除的数据对象中的第一个，删除前的值
   ## where ,执行update时的where条件
+  ## 支持 flag 等更多 sremove 所支持的参数
   if($method =~ /^sremove_by_(.+)$/){
     my $wk = $1;
     my $where = {$wk => shift};
-    return $self->sremove($where);
+    return $self->sremove($where, @_);
   }
   
   confess qq{Can't locate obj method "$method" via package "$package"}

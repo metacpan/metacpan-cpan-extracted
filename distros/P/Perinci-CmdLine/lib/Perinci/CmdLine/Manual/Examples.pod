@@ -18,7 +18,7 @@ Perinci::CmdLine::Manual::Examples - Collection of examples
 
 =head1 VERSION
 
-This document describes version 1.77 of Perinci::CmdLine::Manual::Examples (from Perl distribution Perinci-CmdLine), released on 2017-07-31.
+This document describes version 1.811.0 of Perinci::CmdLine::Manual::Examples (from Perl distribution Perinci-CmdLine), released on 2018-03-17.
 
 =head1 DESCRIPTION
 
@@ -563,6 +563,22 @@ caller to read data from.
 If result type is not simple (e.g. an array or hash), then each record will be
 encoded into JSON, to produce JSON stream.
 
+If you want to return a file content as a stream (instead of slurping the whole
+content into memory):
+
+ $SPEC{catfile} = {
+     v => 1.1,
+     summary => "Display file contents",
+     args => { file => { schema => 'filename*', req=>1, pos=>0 } },
+     result => { stream => 1, schema => 'str*' },
+ };
+ sub catfile {
+     my %args = @_;
+     my $file = $args{file};
+     open my $fh, "<", $file or return [500, "Can't open file '$file': $!"];
+     [200, "OK", sub { scalar(<$fh>) }];
+ }
+
 =head2 Adding support for new format
 
 TODO
@@ -895,7 +911,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

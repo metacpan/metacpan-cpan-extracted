@@ -9,6 +9,8 @@ use strict;
 use warnings;
 use base qw( Device::Chip::Adapter );
 
+our $VERSION = '0.14';
+
 use Device::BusPirate;
 
 =head1 NAME
@@ -237,7 +239,7 @@ sub read_gpios
 
 package
    Device::Chip::Adapter::BusPirate::_SPI;
-use base qw( Device::Chip::Adapter::BusPirate::_base );
+use base qw( Device::Chip::Adapter::BusPirate::_base Device::Chip::ProtocolBase::SPI );
 
 use Carp;
 
@@ -250,6 +252,9 @@ sub configure
 
     my $mode        = delete $args{mode};
     my $max_bitrate = delete $args{max_bitrate};
+
+    croak "Cannot support SPI wordsize other than 8"
+        if ( $args{wordsize} // 8 ) != 8;
 
     croak "Unrecognised configuration options: " . join( ", ", keys %args )
         if %args;
@@ -270,14 +275,24 @@ sub readwrite
    $self->{mode}->writeread_cs( $data );
 }
 
-sub write
+sub readwrite_no_ss
 {
    my $self = shift;
    my ( $data ) = @_;
 
-   # BP has no write-without-read method
-   $self->{mode}->writeread_cs( $data )
-      ->then_done();
+   $self->{mode}->writeread( $data );
+}
+
+sub assert_ss
+{
+   my $self = shift;
+   $self->{mode}->chip_select( 0 );
+}
+
+sub release_ss
+{
+   my $self = shift;
+   $self->{mode}->chip_select( 1 );
 }
 
 package

@@ -3,3 +3,6 @@
 1.002
   - now makes use of the boolean module
   - fix bug 122740
+1.003
+  - Added perl5 licence
+  - Changed min version of Data::Dumper to 2.161 ( min version on cpan )

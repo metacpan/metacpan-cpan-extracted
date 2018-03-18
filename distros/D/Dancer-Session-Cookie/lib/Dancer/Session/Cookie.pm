@@ -1,13 +1,12 @@
 package Dancer::Session::Cookie;
 our $AUTHORITY = 'cpan:YANICK';
-$Dancer::Session::Cookie::VERSION = '0.29';
+# ABSTRACT: Encrypted cookie-based session backend for Dancer
+$Dancer::Session::Cookie::VERSION = '0.30';
 use strict;
 use warnings;
-# ABSTRACT: Encrypted cookie-based session backend for Dancer
-# VERSION
 
-use 5.008;
-use base 'Dancer::Session::Abstract';
+use 5.10.0;
+use parent 'Dancer::Session::Abstract';
 
 use Session::Storage::Secure 0.010;
 use Crypt::CBC;
@@ -20,6 +19,7 @@ use Dancer::Cookie  ();
 use Dancer::Cookies ();
 use Storable        ();
 use MIME::Base64    ();
+use PerlX::Maybe;
 
 # crydec
 my $CIPHER = undef;
@@ -47,18 +47,18 @@ sub init {
 
     $STORE = Session::Storage::Secure->new(
         secret_key => $key,
-        ( $duration ? ( default_duration => $duration ) : () ),
         sereal_encoder_options => { snappy => 1, stringify_unknown => 1 },
         sereal_decoder_options => { validate_utf8 => 1 },
+        maybe default_duration => $duration,
     );
 }
 
 # return our cached ID if we have it instead of looking in a cookie
 sub read_session_id {
     my ($self) = @_;
-    return $SESSION->id
-      if defined $SESSION;
-    return $self->SUPER::read_session_id;
+    return defined $SESSION 
+                ? $SESSION->id
+                : $self->SUPER::read_session_id;
 }
 
 sub retrieve {
@@ -115,14 +115,14 @@ sub destroy {
 hook 'after' => sub {
     my $response = shift;
 
-    if ($SESSION) {
-        # UGH! Awful hack because Dancer instantiates responses
-        # and headers too many times and locks out new cookies
-        $response->{_built_cookies} = 0;
+    return unless $SESSION;
 
-        my $c = Dancer::Cookie->new( $SESSION->_cookie_params );
-        Dancer::Cookies->set_cookie_object( $c->name => $c );
-    }
+    # UGH! Awful hack because Dancer instantiates responses
+    # and headers too many times and locks out new cookies
+    $response->{_built_cookies} = 0;
+
+    my $c = Dancer::Cookie->new( $SESSION->_cookie_params );
+    Dancer::Cookies->set_cookie_object( $c->name => $c );
 };
 
 # Make sure that the session is initially undefined for every request
@@ -143,9 +143,7 @@ sub _cookie_params {
         path      => setting('session_cookie_path') || '/',
         domain    => setting('session_domain'),
         secure    => setting('session_secure'),
-        http_only => defined( setting("session_is_http_only") )
-        ? setting("session_is_http_only")
-        : 1,
+        http_only => setting("session_is_http_only") // 1.
     );
     if ( defined $duration ) {
         $cookie{expires} = time + $duration;
@@ -196,7 +194,7 @@ Dancer::Session::Cookie - Encrypted cookie-based session backend for Dancer
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 SYNOPSIS
 

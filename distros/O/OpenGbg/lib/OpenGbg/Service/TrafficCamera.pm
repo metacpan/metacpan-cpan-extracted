@@ -6,7 +6,7 @@ package OpenGbg::Service::TrafficCamera;
 
 # ABSTRACT: Entry point to the Traffic Camera service
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1402';
+our $VERSION = '0.1403';
 
 use OpenGbg::Elk;
 
@@ -46,6 +46,13 @@ sub get_traffic_cameras {
     return OpenGbg::Service::TrafficCamera::GetTrafficCameras->new(xml => $response);
 }
 
+sub get_traffic_camera {
+    my $self = shift;
+    my $id = shift;
+
+    return $self->get_traffic_cameras->camera_devices->find(sub { $_->id == $id });
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -62,7 +69,7 @@ OpenGbg::Service::TrafficCamera - Entry point to the Traffic Camera service
 
 =head1 VERSION
 
-Version 0.1402, released 2016-08-12.
+Version 0.1403, released 2018-03-14.
 
 =head1 SYNOPSIS
 
@@ -87,6 +94,10 @@ See L<OpenGbg> for general information.
 Get information on the traffic cameras.
 
 Returns a L<GetTrafficCameras|OpenGbg::Service::TrafficCamera::GetTrafficCameras> object.
+
+=head2 get_traffic_camera($camera_id)
+
+Returns the L<CameraDevice|OpenGbg::Service::TrafficCamera::CameraDevice> object for the camera with id C<$id>. Undef if no camera has that id.
 
 =head2 get_camera_image($camera_id)
 

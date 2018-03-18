@@ -443,6 +443,111 @@ db->search(‘posts’, {}, { offset => param(‘offset’), limit => param(‘l
         $value;
     };
 
+## メソッドの引数バリデーション
+
+Dwarf::Module では Data::Validator を使った引数のバリデーションを簡単に記述することができます。
+Data::Validator の書式に加え、文字列で型を書くスタイルもサポートされます。
+
+文字列      | バリデーションルール
+---------- | --------------------------------------------------
+'Str'      | { isa => 'Str' }
+'Int? = 0' | { isa => 'Int', optional => 1, default => '0' }
+
+```
+sub create_member {
+    my $args = args {
+        name   => 'Str',
+        age    => 'Int',
+        gender => 'Int? = 0'
+    }, @_;
+
+    ...
+}
+
+self->create_member({ name => 'Taro Yamada', age => 35 });
+```
+
+## JSON バリデーション
+
+validate_json_body を使って POST された JSON データのバリデーションが行えます。
+バリデーションルールの定義の仕方はメソッドの引数バリデーションと同じです。
+
+```
+after will_dispatch => sub {
+    self->validate(
+        id => [qw/NOT_BLANK UINT/],
+    );
+
+    self->validate_json_body(
+        name => 'Str',
+        tel  => 'JTel',
+    );
+};
+```
+
+#### 複雑なオブジェクトをバリデーションする例
+
+rules というキーにルールを渡すことで、HashRef や ArrayRef[HashRef] に関するバリデーションルールを記述することができます。
+これによって、複雑なオブジェクトをバリデーションすることが出来ます。
+
+```
+sub ITEM_TYPE {
+    return {
+        id        => 'Int',
+        code      => 'Int',
+        name      => 'Str',
+        name_kana => 'Str',
+    };
+}
+
+sub ITEM_TYPE_TYPE {
+    return {
+        id     => 'Int',
+        name   => 'Str',
+        gender => 'Int',
+    };
+}
+
+sub TEXTURE_TYPE {
+    return {
+        id              => 'Int',
+        code            => 'Str',
+        maker           => 'Int',
+        price1          => 'Int?',
+        price2          => 'Int?',
+        price3          => 'Int?',
+    };
+}
+
+sub ORDER_ITEM_TYPE {
+    return {
+        id        => 'Int',
+        quantity  => 'Int',
+        item      => { isa => 'HashRef', rules => ITEM_TYPE() },
+        item_type => { isa => 'HashRef', rules => ITEM_TYPE_TYPE() },
+        texture   => { isa => 'HashRef', rules => TEXTURE_TYPE() },
+    };
+}
+
+after will_dispatch => sub {
+    self->validate_json_body(
+        order_items => { isa => 'ArrayRef[HashRef]', rules => ORDER_ITEM_TYPE() }
+    );
+};
+```
+
+#### 独自型の実装例は Dwarf::Plugin::MouseX::Types::Common
+
+```
+subtype URL
+    => as 'Str'
+    => where { $_ =~ /($RE{URI}{HTTP}{-scheme =>'(https|http)'})/o };
+
+subtype Email
+    => as 'Str'
+    => where { Email::Valid::Loose->address(encode_utf8 $_) };
+```
+
 ## モジュール
 
 Dwarf::Module はコントローラやモデルの根底クラス。<br />

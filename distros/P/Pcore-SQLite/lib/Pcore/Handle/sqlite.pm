@@ -1,7 +1,6 @@
 package Pcore::Handle::sqlite;
 
-use Pcore -class, -const, -result;
-use Pcore::Handle::DBI::Const qw[:ODBC_TYPES];
+use Pcore -class, -const, -result, -sql;
 use DBI qw[];
 use DBD::SQLite qw[];
 use DBD::SQLite::Constants qw[:file_open];
@@ -33,9 +32,34 @@ has synchronous  => ( is => 'ro', isa => Enum [qw[FULL NORMAL OFF]],            
 has cache_size   => ( is => 'ro', isa => Int,  default => -1_048_576 );                                              # 0+ - pages,  -kilobytes, default 1G
 has foreign_keys => ( is => 'ro', isa => Bool, default => 1 );
 
-has is_sqlite => ( is => 'ro', isa => Bool, default => 1, init_arg => undef );
+has is_sqlite    => ( is => 'ro', isa => Bool,    default  => 1, init_arg => undef );
 has h            => ( is => 'ro', isa => Object,  init_arg => undef );
 has prepared_sth => ( is => 'ro', isa => HashRef, init_arg => undef );
+
+# SQLite types
+const our $SQLITE_UNKNOWN => 0;
+const our $SQLITE_INTEGER => 4;
+const our $SQLITE_REAL    => 6;
+const our $SQLITE_TEXT    => 12;
+const our $SQLITE_BLOB    => 30;
+
+# postgreSQL types to SQLite
+const our $TYPE_TO_SQLITE => {
+    $SQL_BYTEA   => $SQLITE_BLOB,
+    $SQL_BOOL    => $SQLITE_INTEGER,
+    $SQL_FLOAT4  => $SQLITE_REAL,
+    $SQL_FLOAT8  => $SQLITE_REAL,
+    $SQL_INT2    => $SQLITE_INTEGER,
+    $SQL_INT4    => $SQLITE_INTEGER,
+    $SQL_INT8    => $SQLITE_INTEGER,
+    $SQL_MONEY   => $SQLITE_REAL,
+    $SQL_NUMERIC => $SQLITE_REAL,
+    $SQL_TEXT    => $SQLITE_TEXT,
+    $SQL_VARCHAR => $SQLITE_TEXT,
+    $SQL_CHAR    => $SQLITE_TEXT,
+    $SQL_UNKNOWN => $SQLITE_UNKNOWN,
+    $SQL_UUID    => $SQLITE_BLOB,
+};
 
 sub BUILD ( $self, $args ) {
     my $attr = {
@@ -98,6 +122,9 @@ sub BUILD ( $self, $args ) {
 
     $dbh->sqlite_busy_timeout( $self->{busy_timeout} );
 
+    # create custom functions
+    $dbh->sqlite_create_function( 'uuid', 0, sub { return uuid_str } );
+
     $self->{on_connect}->($self) if $self->{on_connect};
 
     $self->{h} = $dbh;
@@ -133,12 +160,14 @@ SQL
 }
 
 # QUOTE
-sub _get_odbc_type ($type = undef) : prototype(;$) {
-    if ( !defined $type || !exists $TYPE_TO_ODBC->{$type} ) {
-        $type = $ODBC_VARCHAR;
+sub _get_sqlite_type ($type = undef) : prototype(;$) {
+
+    # use TEXT as default type
+    if ( !defined $type || !exists $TYPE_TO_SQLITE->{$type} ) {
+        $type = $SQLITE_TEXT;
     }
     else {
-        $type = $TYPE_TO_ODBC->{$type};
+        $type = $TYPE_TO_SQLITE->{$type};
     }
 
     return $type;
@@ -147,15 +176,15 @@ sub _get_odbc_type ($type = undef) : prototype(;$) {
 sub quote ( $self, $var, $type = undef ) {
     return 'NULL' if !defined $var;
 
-    $type = _get_odbc_type $type;
+    $type = _get_sqlite_type $type;
 
     # NUMBER
-    if ( ( $type == $ODBC_INTEGER || $type == $ODBC_FLOAT ) && looks_like_number $var) {
+    if ( ( $type == $SQLITE_INTEGER || $type == $SQLITE_REAL ) && looks_like_number $var) {
         return $var;
     }
 
     # BLOB
-    elsif ( $type == $ODBC_BLOB ) {
+    elsif ( $type == $SQLITE_BLOB ) {
         utf8::encode $var if utf8::is_utf8 $var;
 
         $var = q[x'] . unpack( 'H*', $var ) . q['];
@@ -255,7 +284,7 @@ sub _exec_sth ( $self, $query, @args ) {
         # bind types
         for ( my $i = 0; $i <= $#bind; $i++ ) {
             if ( is_plain_arrayref $bind[$i] ) {
-                $sth->bind_param( $i + 1, undef, _get_odbc_type $bind[$i]->[1] );
+                $sth->bind_param( $i + 1, undef, _get_sqlite_type $bind[$i]->[1] );
 
                 $bind[$i] = $bind[$i]->[0];
             }
@@ -327,7 +356,7 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
             # bind types
             for ( my $i = 0; $i <= $#bind; $i++ ) {
                 if ( is_plain_arrayref $bind[$i] ) {
-                    $sth->bind_param( $i + 1, undef, _get_odbc_type $bind[$i]->[1] );
+                    $sth->bind_param( $i + 1, undef, _get_sqlite_type $bind[$i]->[1] );
 
                     $bind[$i] = $bind[$i]->[0];
                 }
@@ -400,7 +429,7 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
             # bind types
             for ( my $i = 0; $i <= $#bind; $i++ ) {
                 if ( is_plain_arrayref $bind[$i] ) {
-                    $sth->bind_param( $i + 1, undef, _get_odbc_type $bind[$i]->[1] );
+                    $sth->bind_param( $i + 1, undef, _get_sqlite_type $bind[$i]->[1] );
 
                     $bind[$i] = $bind[$i]->[0];
                 }
@@ -410,7 +439,7 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
 
             # execute error
             if ( defined $DBI::err ) {
-                if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( result( $self, [ 500, $DBI::errstr ], rows => $rows ), undef ); return $rows }
+                if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return $rows }
                 else               { die $DBI::errstr }
             }
 
@@ -632,18 +661,18 @@ sub attach ( $self, $name, $path = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 126                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
+## |    3 | 153                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
 ## |      |                      | declared but not used                                                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 281                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (40)                        |
+## |    3 | 310                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (40)                        |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 364                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 393                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 172                  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 201                  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 256, 328, 401        | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 285, 357, 430        | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 557                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 586                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

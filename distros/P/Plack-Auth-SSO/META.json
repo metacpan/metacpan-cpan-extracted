@@ -52,7 +52,7 @@
             "Plack" : "0",
             "Plack::Middleware::Session" : "0",
             "URI" : "0",
-            "WWW::ORCID" : "0",
+            "WWW::ORCID" : "0.0401",
             "perl" : "v5.10.1"
          }
       }
@@ -69,8 +69,9 @@
          "web" : "https://github.com/LibreCat/Plack-Auth-SSO"
       }
    },
-   "version" : "0.0131",
+   "version" : "0.0132",
    "x_contributors" : [
+      "Nicolas Franck <nicolas.franck@ugent.be>",
       "Nicolas Franck <njfranck@ca20c526.ugent.be>",
       "Nicolas Franck <njfranck@ca20c533.ugent.be>",
       "Nicolas Franck <njfranck@nicolasfranck.local>"

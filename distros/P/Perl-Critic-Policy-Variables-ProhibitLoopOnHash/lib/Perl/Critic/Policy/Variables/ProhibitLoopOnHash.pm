@@ -1,7 +1,7 @@
 package Perl::Critic::Policy::Variables::ProhibitLoopOnHash;
 our $AUTHORITY = 'cpan:XSAWYERX';
 # ABSTRACT: Don't write loops on hashes, only on keys and values of hashes
-
+$Perl::Critic::Policy::Variables::ProhibitLoopOnHash::VERSION = '0.003';
 use strict;
 use warnings;
 use parent 'Perl::Critic::Policy';
@@ -9,8 +9,6 @@ use parent 'Perl::Critic::Policy';
 use Carp qw< croak >;
 use Perl::Critic::Utils qw< :severities :classification :ppi >;
 use List::Util 'first';
-
-our $VERSION = '0.001';
 
 use constant 'DESC' => 'Looping over hash instead of hash keys or values';
 use constant 'EXPL' => 'You are accidentally looping over the hash itself '
@@ -27,7 +25,7 @@ sub violates {
     my ($self, $elem) = @_;
 
     $elem->isa('PPI::Token::Word')
-        and first { $elem eq $_ } qw< for foreach map grep >
+        and first { $elem eq $_ } qw< for foreach >
         or  return ();
 
     # This is how we do it:
@@ -117,20 +115,25 @@ Perl::Critic::Policy::Variables::ProhibitLoopOnHash - Don't write loops on hashe
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 DESCRIPTION
 
 When "looping over hashes," we mean looping over hash keys or hash values. If
 you forgot to call C<keys> or C<values> you will accidentally loop over both.
 
-    foreach my $foo (%hash) {...} # not ok
-    action() for %hash;           # not ok
+    foreach my $foo (%hash) {...}        # not ok
+    action() for %hash;                  # not ok
+    foreach my $foo ( keys %hash ) {...} # ok
+    action() for values %hash;           # ok
 
 An effort is made to detect expressions:
 
-    action() for %hash ? keys %hash : ();                        # ok
-    action() for %{ keys $hash{'stuff'} ? $hash{'stuff'} : {} }; # ok
+    action() for %hash ? keys %hash : ();                             # ok
+    action() for %{ $hash{'stuff'} } ? keys %{ $hash{'stuff'} } : (); # ok
+
+(Granted, the second example there doesn't make much sense, but I have found
+a variationo of it in real code.)
 
 =head1 CONFIGURATION
 
@@ -142,7 +145,7 @@ Sawyer X, C<xsaawyerx@cpan.org>
 
 =head1 THANKS
 
-Thank you to Rudd H.G. Van Tol.
+Thank you to Ruud H.G. Van Tol.
 
 =head1 SEE ALSO
 

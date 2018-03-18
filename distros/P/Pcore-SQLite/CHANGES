@@ -1,3 +1,12 @@
+v0.10.3 2018-03-13T08:04:29Z
+ - SQLite types moved
+
+v0.10.2 2018-03-12T13:07:12Z
+ - custom function UUID() added
+
+v0.10.1 2018-03-11T18:58:55Z
+ - typo
+
 v0.10.0 2017-08-25T09:25:06Z
  - SQL functions returns $dbh as first arg
 

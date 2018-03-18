@@ -1,3 +1,18 @@
+$MODULE=Apache::ASP; $VERSION = 2.63; $DATE="2014/05/20"
+
+ + fixed $r->connection()->remote_ip() to use useragent_ip(), then client_ip() access for Apache 2.4
+
+ + Added section ``raw'' to MailErrors.inc to debug POSTs without
+   form fields
+
+ - MailErrorsHTML now uses monospaced fonts for errors. Easier on
+   the eyes and more informative
+
+ - Added a clumsy regex to avoid header longer than 70 chars
+
+ - removed deprecated "Extra" module references from Makefile.PL and Bundle::Apache::ASP::Extra, 
+   including Apache::Filter, Apache::SSI, Bundle::XML, XML::Sablotron, and Tie::TextDir
+
 $MODULE=Apache::ASP; $VERSION = 2.62; $DATE="2011/08/16"
 
  - Fixed 'application/x-www-form-urlencoded' for AJAX POSTs post

@@ -5,7 +5,7 @@ use warnings;
 package OpenGbg::Elk;
 
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1402';
+our $VERSION = '0.1403';
 
 use Moose();
 use MooseX::AttributeShortcuts();
@@ -36,7 +36,7 @@ OpenGbg::Elk
 
 =head1 VERSION
 
-Version 0.1402, released 2016-08-12.
+Version 0.1403, released 2018-03-14.
 
 =head1 SOURCE
 

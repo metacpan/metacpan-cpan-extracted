@@ -1,5 +1,8 @@
 Revision history for Catmandu-ArXiv
 
+0.200  2018-03-15 10:07:04 CET
+    - don't die on empty result list
+
 0.101  2017-03-10 16:51:05 CET
     - cpanfile
 

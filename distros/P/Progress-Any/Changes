@@ -1,4 +1,32 @@
-Revision history for Progress-Any
+0.212   2018-03-16 (PERLANCAR)
+
+        - Make regex to parse template available as package variable
+          '$template_regex'.
+
+        - fill_template(): Accept handle_unknown_conversion option to handle
+          unknown conversion.
+
+
+0.211   2018-03-17 (PERLANCAR)
+
+        - [Incompatible change] update(): Rename 'level' argument to 'priority'.
+          High-priority updates are now not frequency-throttled.
+
+        - [Bugfix] Indicator object's target was not initially set to undef but
+          to 0.
+
+        - Don't frequency-throttle update to output that has freq = 0.
+
+        - Read output module data via output_data().
+
+        - [doc] Fix/update/add examples.
+
+
+0.210   2018-03-16 (PERLANCAR)
+
+	- Observe PROGRESS environment variable to let user turn off
+	  progress updating.
+
 
 0.20    2015-01-27 (PERLANCAR)
 

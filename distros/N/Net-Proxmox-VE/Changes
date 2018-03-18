@@ -1,5 +1,13 @@
 Revision history for perl Net::Proxmox::VE
 
+0.33 2018-03-15
+- Fix ticket expiration calculation (thanks p5i via GH)
+- Checking that $data->{data} is an array ref (thanks p5i via GH)
+- URI access/domains should be accessible w/o login (thanks p5i via GH)
+- Actually export functions from Net::Proxmox::VE::Cluster (thanks p5i via GH)
+- Export more functions from Net::Proxmox::VE::Pools (thanks p5i via GH)
+- Moved LWP from Access.pm to VE.pm (thanks p5i via GH)
+
 0.32 2016-02-18
 - Update things for Dist::Zilla
 - Big version jump to satiate CPAN

@@ -1,18 +1,28 @@
 package Pcore::App::API::Map;
 
 use Pcore -class;
+use Pcore::Util::Scalar qw[is_plain_arrayref];
 
 has app => ( is => 'ro', isa => ConsumerOf ['Pcore::App'], required => 1 );
 
-has method => ( is => 'lazy', isa => HashRef, init_arg => undef );
+has method => ( is => 'ro', isa => HashRef, init_arg => undef );
 has obj => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
 
 # TODO https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
 
-sub _build_method ($self) {
+sub init ($self) {
     my $method = {};
 
-    my $ns_path = ( ref( $self->app ) =~ s[::][/]smgr ) . '/API';
+    # read api roles
+    my $roles = {
+        do {
+            no strict qw[refs];
+
+            map { $_ => 1 } ${ ref( $self->{app} ) . '::APP_API_ROLES' }->@*;
+          }
+    };
+
+    my $ns_path = ( ref( $self->{app} ) =~ s[::][/]smgr ) . '/API';
 
     my $class;
 
@@ -45,7 +55,7 @@ sub _build_method ($self) {
                     if ( $path->suffix eq 'pm' ) {
 
                         # API class must be located in V\d+ directory
-                        return if $path !~ m[\AV\d+/]sm;
+                        return if $path !~ m[\Av\d+/]sm;
 
                         my $route = $path->dirname . $path->filename_base;
 
@@ -69,7 +79,7 @@ sub _build_method ($self) {
         $class_path =~ s/\AV/v/sm;
 
         # create API object and store in cache
-        my $obj = $self->{obj}->{$class_name} = $class_name->new( { app => $self->app } );
+        my $obj = $self->{obj}->{$class_name} = $class_name->new( { app => $self->{app} } );
 
         my $obj_map = $obj->api_map;
 
@@ -102,7 +112,7 @@ sub _build_method ($self) {
             if ( $method->{$method_id}->{permissions} ) {
 
                 # convert method permissions to ArrayRef
-                $method->{$method_id}->{permissions} = [ $method->{$method_id}->{permissions} ] if !ref $method->{$method_id}->{permissions};
+                $method->{$method_id}->{permissions} = [ $method->{$method_id}->{permissions} ] if !is_plain_arrayref $method->{$method_id}->{permissions};
 
                 # methods permissions are empty
                 if ( !$method->{$method_id}->{permissions}->@* ) {
@@ -115,12 +125,12 @@ sub _build_method ($self) {
 
                         # expand "*"
                         if ( $role eq q[*] ) {
-                            $method->{$method_id}->{permissions} = [ keys $self->app->api->roles->%* ];
+                            $method->{$method_id}->{permissions} = [ keys $roles->%* ];
 
                             last;
                         }
 
-                        if ( !exists $self->app->api->roles->{$role} ) {
+                        if ( !exists $roles->{$role} ) {
                             die qq[Invalid API method permission "$role" for method "$method_id"];
                         }
                     }
@@ -129,7 +139,9 @@ sub _build_method ($self) {
         }
     }
 
-    return $method;
+    $self->{method} = $method;
+
+    return;
 }
 
 sub get_method ( $self, $method_id ) {
@@ -143,9 +155,7 @@ sub get_method ( $self, $method_id ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 117, 123             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 118, 123             | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
+## |    3 | 127, 133             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

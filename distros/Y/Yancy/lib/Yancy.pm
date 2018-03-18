@@ -1,14 +1,13 @@
 package Yancy;
-our $VERSION = '0.022';
+our $VERSION = '1.001';
 # ABSTRACT: A simple CMS for administrating data
 
 #pod =head1 SYNOPSIS
 #pod
 #pod     use Mojolicious::Lite;
 #pod     use Mojo::Pg; # Supported backends: Pg, MySQL, SQLite, DBIx::Class
-#pod     has pg => sub { Mojo::Pg->new( 'postgres:///myapp' ) };
 #pod     plugin Yancy => {
-#pod         backend => [ Pg => app->pg ],
+#pod         backend => { Pg => Mojo::Pg->new( 'postgres:///myapp' ) },
 #pod         read_schema => 1,
 #pod     };
 #pod
@@ -169,15 +168,14 @@ Yancy - A simple CMS for administrating data
 
 =head1 VERSION
 
-version 0.022
+version 1.001
 
 =head1 SYNOPSIS
 
     use Mojolicious::Lite;
     use Mojo::Pg; # Supported backends: Pg, MySQL, SQLite, DBIx::Class
-    has pg => sub { Mojo::Pg->new( 'postgres:///myapp' ) };
     plugin Yancy => {
-        backend => [ Pg => app->pg ],
+        backend => { Pg => Mojo::Pg->new( 'postgres:///myapp' ) },
         read_schema => 1,
     };
 

@@ -1,5 +1,8 @@
 Revision history for Pod-Coverage-TrustPod
 
+0.100005  2018-03-12 08:34:52-04:00 America/New_York
+        - remove an accidentally introduced // operator!
+
 0.100004  2018-03-04 22:46:25-05:00 America/New_York
         - report more usefully when a regex can't be compiled
 

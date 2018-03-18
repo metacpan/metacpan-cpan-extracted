@@ -6,7 +6,7 @@ package OpenGbg::Service::Bridge::GetIsCurrentlyOpen;
 
 # ABSTRACT: Is the bridge currently open?
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1402';
+our $VERSION = '0.1403';
 
 use XML::Rabbit::Root;
 use DateTime::Format::HTTP;
@@ -50,7 +50,7 @@ OpenGbg::Service::Bridge::GetIsCurrentlyOpen - Is the bridge currently open?
 
 =head1 VERSION
 
-Version 0.1402, released 2016-08-12.
+Version 0.1403, released 2018-03-14.
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,6 @@
+0.001003 - 2018-03-11
+  - Add Moo to dependencies (mst is an idiot, thanks srezic for the report)
+
 0.001002 - 2017-08-10
   - Fix copyright to have right module name (doh, thanks Grinnz)
   - Use die instead of croak since future already adds location

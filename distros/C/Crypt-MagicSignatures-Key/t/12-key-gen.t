@@ -29,12 +29,13 @@ sub _b {
 my $key;
 stderr_like(
   sub {
-    ok($key = Crypt::MagicSignatures::Key->new, 'Key Generation');
+    ok(!($key = Crypt::MagicSignatures::Key->new), 'Deprecated Key Generation');
   },
-  qr/DEPRECATED/,
+  qr/generate()/,
   'Key generation in new'
 );
 
+ok($key = Crypt::MagicSignatures::Key->generate, 'Key Generation');
 ok($key->n, 'Modulus');
 ok($key->e, 'Public Exponet');
 ok($key->d, 'Private Exponet');
@@ -52,12 +53,13 @@ ok($key->verify('This is a message', $sig), 'Verification');
 
 stderr_like(
   sub {
-    ok($key = Crypt::MagicSignatures::Key->new(size => 1024, e => 3), 'Key Generation');
+    ok(!($key = Crypt::MagicSignatures::Key->new(size => 1024, e => 3)), 'Deprecated Key Generation');
   },
-  qr/DEPRECATED/,
+  qr/generate()/,
   'Generation in new with size'
 );
 
+ok($key = Crypt::MagicSignatures::Key->generate(size => 1024, e => 3), 'Key Generation');
 ok($key->n, 'Modulus');
 ok($key->e, 'Public Exponet');
 ok($key->d, 'Private Exponet');

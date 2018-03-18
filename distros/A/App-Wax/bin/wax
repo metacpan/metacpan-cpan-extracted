@@ -17,6 +17,14 @@ wax - webify your CLI
 
     wax [OPTIONS] program [OPTIONS] ...
 
+e.g.:
+
+    $ wax vim -R https://registry.npmjs.org/left-pad/-/left-pad-1.2.0.tgz
+
+runs:
+
+    $ vim -R /tmp/wax_abcd1234.tgz
+
 =head1 DESCRIPTION
 
 C<wax> is a command-line program which runs other command-line programs and converts their URL
@@ -44,14 +52,17 @@ add a caching layer to network requests (remote resources are only fetched once)
 =head1 OPTIONS
 
 The following C<wax> options can be supplied before the command name. Subsequent options are passed to
-the command verbatim, apart from URLs, which are converted to paths to the corresponding
-files. URL arguments can be excluded from the conversion process by supplying a separator token.
+the command verbatim, apart from URLs, which are converted to paths to the corresponding files.
+URL arguments can be excluded from the conversion process by supplying a separator token (default C<-->).
 Arguments after this are no longer processed by C<wax> and are passed through verbatim e.g.:
 
-    wax --cache --separator --no-wax cmd http://example.com/foo --no-wax --referrer http://example.com
+    $ wax --cache cmd http://example.com/foo -- --referrer http://example.com
 
 Note that the C<--cache> and C<--mirror> options are mutually exclusive i.e. only one (or neither)
 should be supplied. Supplying both will cause C<wax> to terminate with an error.
+
+Note that option bundling is not currently supported e.g. C<reach --cache --verbose ...> can't be condensed
+to C<reach -cv ...>, and would need to be written as C<reach -c -v ...>.
 
 =head2 -c, --cache
 
@@ -79,7 +90,7 @@ temp directory. Can be overriden by C<-d>.
 If the directory doesn't exist, it is created if its parent directory exists.
 Otherwise, an error is raised.
 
-=head2 -?, -h, --help
+=head2 -h, -?, --help
 
 Display this documentation.
 
@@ -94,11 +105,15 @@ If a local file no longer exists, the resource is re-downloaded.
 
 =head2 -s, --separator STRING
 
-Set the token used to mark the end of waxable options e.g.:
+Override the default separator-token (C<-->) used to mark the end of waxable options e.g.:
 
-    wax --cache --separator :: cmd http://example.com/foo :: --referrer http://example.com
+    $ wax --cache --separator :: cmd http://example.com/foo :: --referrer http://example.com
 
 Note: the separator token is removed from the list of options passed to the command.
+
+=head2 -S, --no-separator
+
+Disable separator-token handling i.e. leave the default separator (C<-->) to be handled by the command.
 
 =head2 -t, --timeout INTEGER
 
@@ -118,14 +133,23 @@ Print the version of wax.
 
 =head1 EXAMPLES
 
-=head2 grep
-
-    $ wax grep -B1 demons http://www.mplayerhq.hu/DOCS/man/en/mplayer.1.txt
-
 =head2 espeak
 
     $ alias espeak="wax espeak"
     $ espeak -f http://www.setec.org/mel.txt
+
+=head2 grep
+
+    $ wax grep -B1 demons http://www.mplayerhq.hu/DOCS/man/en/mplayer.1.txt
+
+=head2 jsview
+
+Browse files in Node module tarballs
+
+    #!/bin/sh
+
+    # usage: jsview <module> e.g. jsview left-pad
+    wax --cache view $(npm info --json "$@" | jq -r .dist.tarball)
 
 =head2 nman
 
@@ -147,17 +171,17 @@ embedded escapes in Windows C<cmd>/C<command.exe>-like shells.
 It's worth checking that a program actually needs waxing. Many command-line programs already support
 URLs e.g:
 
-    eog http://upload.wikimedia.org/wikipedia/commons/4/4c/Eye_of_GNOME.png
-    gedit http://projects.gnome.org/gedit/
-    gimp http://upload.wikimedia.org/wikipedia/commons/6/6c/Gimpscreen.png
-    perldoc -F "http://www.pair.com/~comdog/brian's_guide.pod"
-    vim http://www.vim.org/
+    $ eog http://upload.wikimedia.org/wikipedia/commons/4/4c/Eye_of_GNOME.png
+    $ gedit http://projects.gnome.org/gedit/
+    $ gimp http://upload.wikimedia.org/wikipedia/commons/6/6c/Gimpscreen.png
+    $ perldoc -F "http://www.pair.com/~comdog/brian's_guide.pod"
+    $ vim http://www.vim.org/
 
 &c.
 
 =head1 VERSION
 
-1.1.1
+2.1.0
 
 =head1 SEE ALSO
 
@@ -177,7 +201,7 @@ chocolateboy <chocolate@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2017 by chocolateboy
+Copyright (C) 2010-2018 by chocolateboy
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

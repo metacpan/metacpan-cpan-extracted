@@ -1,6 +1,6 @@
 package App::EvalServerAdvanced::Config;
 
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 use v5.20.0;
 

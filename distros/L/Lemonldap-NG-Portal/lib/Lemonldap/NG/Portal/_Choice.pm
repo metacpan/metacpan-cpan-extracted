@@ -9,7 +9,7 @@ package Lemonldap::NG::Portal::_Choice;
 use Lemonldap::NG::Portal::Simple;
 use Scalar::Util 'weaken';
 
-our $VERSION = '1.9.11';
+our $VERSION = '1.9.16';
 
 ## @cmethod Lemonldap::NG::Portal::_Choice new(Lemonldap::NG::Portal::Simple portal)
 # Constructor
@@ -203,7 +203,14 @@ sub _buildAuthLoop {
         if ( $auth and $userDB and $passwordDB ) {
 
             # Default URL
-            $url = ( defined $url ? $url .= $ENV{'REQUEST_URI'} : '#' );
+            if ( defined $url
+                and not $self->checkXSSAttack( 'URI', $ENV{'REQUEST_URI'} ) )
+            {
+                $url .= $ENV{'REQUEST_URI'};
+            }
+            else {
+                $url .= '#';
+            }
             $self->lmLog( "Use URL $url", 'debug' );
 
             # Options to store in the loop

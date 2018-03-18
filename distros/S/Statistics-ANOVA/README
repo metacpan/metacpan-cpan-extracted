@@ -1,4 +1,4 @@
-Statistics-ANOVA-0.13
+Statistics-ANOVA-0.14
 
 The README is used to introduce the module and provide instructions on
 how to install the module, any machine dependencies it may have (for
@@ -38,21 +38,21 @@ perldoc command.
 You can also look for information at:
 
     RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Statistics-ANOVA-0.13
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Statistics-ANOVA-0.14
 
     AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Statistics-ANOVA-0.13
+        http://annocpan.org/dist/Statistics-ANOVA-0.14
 
     CPAN Ratings
-        http://cpanratings.perl.org/d/Statistics-ANOVA-0.13
+        http://cpanratings.perl.org/d/Statistics-ANOVA-0.14
 
     Search CPAN
-        http://search.cpan.org/dist/Statistics-ANOVA-0.13/
+        http://search.cpan.org/dist/Statistics-ANOVA-0.14/
 
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 Roderick Garton
+Copyright (C) 2015-2018 Roderick Garton
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

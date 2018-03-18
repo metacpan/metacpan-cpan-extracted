@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::Frame.
 
+1.18 Thu 15 Mar 16:16:39 CET 2018
+   - bugfix: https://rt.cpan.org/Ticket/Display.html?id=104689
+   - update: copyright notice
+
 1.17 Sun  7 May 14:21:26 CEST 2017
    - update: IP in IP encapsulation should use IPv4 layer type
    - update: copyright notice

@@ -2,35 +2,49 @@
 use strict;
 use warnings;
 
+# https://en.wikipedia.org/wiki/Lindenmayer_System
+
 use Data::Turtle;
 use GD;
 
-my $repetitions = shift || 1;
-my $string      = shift || 'A';
-my $distance    = shift || 20;
-my $theta       = shift || 20;
-my $width       = shift || 500;
-my $height      = shift || 500;
-
-my $motion = {
-    distance => $distance,
-    theta    => $theta,
-};
+my $repeat   = shift || 6;
+my $start    = shift || 'X';
+my $distance = shift || 3;
+my $theta    = shift || 25;
+my $center   = shift || 0;
+my $width    = shift || 500;
+my $height   = shift || 500;
 
 my %rule = (
-#    A => 'BA',
-#    B => 'AB',
-    A => 'GS[-A][+A]',
-    G => 'S',
-#    B => 'C',
-#    C => 'A',
+    # Branches: start=X, distance=20, theta=20
+#    X => 'YF[-X][+X]',
+#    Y => 'F',
+
+    # Koch curve: start=F, distance=10, theta=90
+#    F => 'F+F-F-F+F',
+
+    # Fractal plant: start=X, distance=3, theta=25
+    X => 'F[-X][X]F[-X]+FX',
+    F => 'FF',
+
+    # Dragon curve: start=FX, distance=10, theta=90
+#    X => 'X+YF+',
+#    Y => '-FX-Y',
+
+    # Sierpiński arrowhead curve: start=F, distance=1, theta=60
+#    F => 'G-F-G',
+#    G => 'F+G+F',
+
+    # Sierpiński triangle: start=F-G-G, distance=4, theta=120
+#    F => 'F-G+F+G-F',
+#    G => 'GG',
 );
 
 my $turtle = Data::Turtle->new(
     width  => $width,
     height => $height,
     x      => $width / 2,
-    y      => $height,
+    y      => $center ? $height / 2 : $height,
 );
 
 my $img = GD::Image->new( $width, $height );
@@ -46,27 +60,34 @@ $img->interlaced('true');
 my @statestack;
 
 my %translate = (
-    'S' => sub {
-        my @line = $turtle->forward( $motion->{distance} );
+    'F' => sub {
+        my @line = $turtle->forward($distance);
         if ( $turtle->pen_status == 1 && @line ) {
             $img->setThickness( $line[5] );
             $img->line( @line[ 0 .. 3 ], $color{ $line[4] } );
         }
     },
-    '-' => sub { $turtle->turn( - $motion->{theta} ) },
-    '+' => sub { $turtle->turn( $motion->{theta} ) },
+    'G' => sub {
+        my @line = $turtle->forward($distance);
+        if ( $turtle->pen_status == 1 && @line ) {
+            $img->setThickness( $line[5] );
+            $img->line( @line[ 0 .. 3 ], $color{ $line[4] } );
+        }
+    },
+    '-' => sub { $turtle->turn( - $theta ) },
+    '+' => sub { $turtle->turn($theta) },
     'M' => sub { $turtle->mirror },
     '[' => sub { push @statestack, [ $turtle->get_state ] },
     ']' => sub { $turtle->set_state( @{ pop @statestack } ) },
 );
 
-for ( 1 .. $repetitions ) {
-    $string =~ s/./defined($rule{$&}) ? $rule{$&} : $&/eg;
+for ( 1 .. $repeat ) {
+    $start =~ s/(.)/defined($rule{$1}) ? $rule{$1} : $1/eg;
 }
-#warn __LINE__,". String: ","$string\n";
+warn "$start\n";
 
-for my $command ( split //, $string ) {
-    $translate{$command}->() if $translate{$command};
+for my $command ( split //, $start ) {
+    $translate{$command}->() if exists $translate{$command};
 }
 
 print $img->png;

@@ -1,131 +1,137 @@
 Revision history for Struct-Diff
 
+0.95    2017-03-10
+        - path format fixed in valid_diff()
+        - refactoring (ref() calls reduced)
+        - docs improved a bit
+        - dist corrected
+
 0.94    2017-12-25
-        'freezer' opt to diff() added
-        path format in list_diff() corrected according Struct::Path v0.80
+        - 'freezer' opt to diff() added
+        - path format in list_diff() corrected according Struct::Path v0.80
 
 0.93    2017-12-09
-        diff(): get rid of redundant I tokens in array's diffs
-        diff(): get rid of empty subdiffs in array's diffs (noU)
-        patch(): references patching fixed
-        patch(): arrays patching fixed for LCS noU diffs
-        diff() and patch() code refactored
-        tests refactored and significantly improved
-        docs improved
+        - diff(): get rid of redundant I tokens in array's diffs
+        - diff(): get rid of empty subdiffs in array's diffs (noU)
+        - patch(): references patching fixed
+        - patch(): arrays patching fixed for LCS noU diffs
+        - diff() and patch() code refactored
+        - tests refactored and significantly improved
+        - docs improved
 
 0.92    2017-11-27
-        diff fixed for emptied/filled subhashes
-        patch fixed for cases when entire data type changed
-        subdiff squash fixed for A/R
+        - diff fixed for emptied/filled subhashes
+        - patch fixed for cases when entire data type changed
+        - subdiff squash fixed for A/R
 
 0.91    2017-11-04
-        regexps comparison support added to diff()
+        - regexps comparison support added to diff()
 
 0.90    2017-08-09
-        valid_diff() appeared
-        coderefs and blessed are now distinguishable for diff() by content
-        deprecated code removed
-        tests improved
+        - valid_diff() appeared
+        - coderefs and blessed are now distinguishable for diff() by content
+        - deprecated code removed
+        - tests improved
 
 0.89    2017-07-12
-        diff fixed for A/R hash subkeys with U subkeys present and noU opt
-        get rid of recursion in patch()
-        docs corrected, some cosmetic refactoring
+        - diff fixed for A/R hash subkeys with U subkeys present and noU opt
+        - get rid of recursion in patch()
+        - docs corrected, some cosmetic refactoring
 
 0.88    2017-06-17
-        paths in list_diff() fixed for arrays in noU diffs
-        rename dsplit => split_diff(), old name is deprecated (alias)
+        - paths in list_diff() fixed for arrays in noU diffs
+        - rename dsplit => split_diff(), old name is deprecated (alias)
 
 0.87    2017-06-16
-        list_diff() added
-        get rid of global $Storable::canonical
-        dtraverse() deprecated (list_diff should be used instead)
-        code and docs refactorings
+        - list_diff() added
+        - get rid of global $Storable::canonical
+        - dtraverse() deprecated (list_diff should be used instead)
+        - code and docs refactorings
 
 0.86    2017-01-22
-        number and same number as string are now distinguishable for diff()
-        diff() now much faster in hashes comparsion
+        - number and same number as string are now distinguishable for diff()
+        - diff() now much faster in hashes comparsion
 
 0.85    2016-12-25
-        numbers stringification fixed in resulting diff
+        - numbers stringification fixed in resulting diff
 
 0.84    2016-12-23
-        arrays path indexes fixed in dtraverse() for noU diffs
+        - arrays path indexes fixed in dtraverse() for noU diffs
 
 0.83    2016-12-04
-        patch() fixed (A/R in the middle of arrays)
+        - patch() fixed (A/R in the middle of arrays)
 
 0.82    2016-10-21
-        docs corrected
+        - docs corrected
 
 0.81    2016-10-16
-        code and tests refactoring
+        - code and tests refactoring
 
 0.80    2016-09-18
-        LCS for arrays diff implemented
+        - LCS for arrays diff implemented
 
 0.71    2016-09-15
-        'depth' opt to dtraverse() added
+        - 'depth' opt to dtraverse() added
 
 0.70    2016-09-13
-        dselect() removed, dtraverse() should be used instead
-        cosmetic refactoring
-        docs corrected
+        - dselect() removed, dtraverse() should be used instead
+        - cosmetic refactoring
+        - docs corrected
 
 0.66    2016-09-06
-        ref to subdiff passed as fourth arg to callback functions in dtraverse()
-        dtraverse() expects true value as callback's out value
+        - ref to subdiff passed as fourth arg to callback functions in dtraverse()
+        - dtraverse() expects true value as callback's out value
 
 0.65    2016-08-16
-        Tests fixed, min perl ver 5.008
+        - tests fixed, min perl ver 5.008
 
 0.64    2016-08-08
-        'statuses' opt for dtraverse() appeared
+        - 'statuses' opt for dtraverse() appeared
 
 0.63    2016-08-02
-        dtraverse() opts format changed, 'sortkeys' opt added
+        - dtraverse() opts format changed, 'sortkeys' opt added
 
 0.62    2016-07-15
-        Docs corrected
+        - docs corrected
 
 0.61    2016-07-13
-        Refactoring
-        diff()'s speed improved (~20%) on arrays
+        - refactoring
+        - diff()'s speed improved (~20%) on arrays
 
 0.60    2016-07-11
-        dtraverse() appeared
+        - dtraverse() appeared
 
 0.58    2016-07-06
-        Diff fixed for array's nested single items,
-        example: [[ 0 ]] vs [[ 1 ]], tests for this case added.
+        - diff fixed for array's nested single items,
+        - example: [[ 0 ]] vs [[ 1 ]], tests for this case added.
 
 0.57    2016-07-03
-        Unused code removed
-        More tests added, tests refactored
+        - unused code removed
+        - more tests added, tests refactored
 
 0.56    2016-06-22
-        Pod and dist corrected, unused code removed.
+        - pod and dist corrected, unused code removed.
 
 0.55    2016-05-16
-        get rid of experimental feature (keys on scalars
+        - get rid of experimental feature (keys on scalars
         (not supported in Perl < 5.14 and forbidden since >= 5.20))
 
 0.54    2016-05-16
-        dist corrected (tests and metadata).
+        - dist corrected (tests and metadata).
 
 0.53    2016-05-15
-        Pod corrected.
+        - pod corrected.
 
 0.52    2016-05-10
-        Pod corrected, cosmetics.
+        - pod corrected, cosmetics.
 
 0.50    2016-04-18
-        Diff metadata format changed (and I hope stabilized)
-        diff()'s opts changed
-        strip() removed
-        dselect(), dsplit(), patch() appeared
-        tests and pod almost for everything
+        - diff metadata format changed (and I hope stabilized)
+        - diff()'s opts changed
+        - strip() removed
+        - dselect(), dsplit(), patch() appeared
+        - tests and pod almost for everything
 
 0.01    2015-07-21
-        Original version.
+        - initial release.
 

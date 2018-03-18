@@ -12,19 +12,21 @@ use Scalar::Util qw(tainted);
 
 use Config::IniFiles;
 
-my $filename = File::Spec->catfile(
-    File::Spec->curdir(), "t", "array.ini",
-);
+my $filename = File::Spec->catfile( File::Spec->curdir(), "t", "array.ini", );
 
 {
-    my $cfg=Config::IniFiles->new(-file => $filename, -default => "Common", -nocase => 1,);
+    my $cfg = Config::IniFiles->new(
+        -file    => $filename,
+        -default => "Common",
+        -nocase  => 1,
+    );
 
-    my @val = $cfg->val("Sect", "Par");
+    my @val = $cfg->val( "Sect", "Par" );
 
     # TEST
-    ok (!tainted($val[0]), "val[0] is not tainted");
+    ok( !tainted( $val[0] ), "val[0] is not tainted" );
 
     # TEST
-    ok (!tainted($val[1]), "val[1] is not tainted");
+    ok( !tainted( $val[1] ), "val[1] is not tainted" );
 }
 

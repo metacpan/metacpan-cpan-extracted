@@ -5,7 +5,9 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  Minion: '8.08'
   Module::Build: '0.28'
+  Mojo::Pg: '0'
   Test::More: '0.96'
   strict: '0'
   warnings: '0'
@@ -21,32 +23,32 @@ name: Kevin-Command-kevin
 provides:
   Kevin::Command::kevin:
     file: lib/Kevin/Command/kevin.pm
-    version: v0.5.5
+    version: v0.6.0
   Kevin::Command::kevin::jobs:
     file: lib/Kevin/Command/kevin/jobs.pm
-    version: v0.5.5
+    version: v0.6.0
   Kevin::Command::kevin::worker:
     file: lib/Kevin/Command/kevin/worker.pm
-    version: v0.5.5
+    version: v0.6.0
   Kevin::Command::kevin::workers:
     file: lib/Kevin/Command/kevin/workers.pm
-    version: v0.5.5
+    version: v0.6.0
   Kevin::Commands::Util:
     file: lib/Kevin/Commands/Util.pm
-    version: v0.5.5
+    version: v0.6.0
   Minion::Worker::Role::Kevin:
     file: lib/Minion/Worker/Role/Kevin.pm
-    version: v0.5.5
+    version: v0.6.0
   Mojolicious::Plugin::Kevin::Commands:
     file: lib/Mojolicious/Plugin/Kevin/Commands.pm
-    version: v0.5.5
+    version: v0.6.0
 requires:
-  Minion: '8.0'
+  Minion: '8.08'
   Minion::Worker: '0'
   Mojo::Base: '0'
   Mojo::Log: '0'
   Mojo::Util: '0'
-  Mojolicious: '7.40'
+  Mojolicious: '7.55'
   Mojolicious::Command: '0'
   Mojolicious::Commands: '0'
   Mojolicious::Plugin: '0'
@@ -59,7 +61,7 @@ resources:
   bugtracker: https://github.com/aferreira/cpan-Kevin-Command-kevin/issues
   homepage: https://github.com/aferreira/cpan-Kevin-Command-kevin
   repository: https://github.com/aferreira/cpan-Kevin-Command-kevin.git
-version: 0.5.5
+version: 0.6.0
 x_contributors:
   - 'Adriano Ferreira <a.r.ferreira@gmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

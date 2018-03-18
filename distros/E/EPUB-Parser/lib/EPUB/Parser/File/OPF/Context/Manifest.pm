@@ -8,11 +8,11 @@ use EPUB::Parser::Util::AttributePacker;
 
 sub nav_path {
     my $self = shift;
-    my $nav_path = $self->parser->single('pkg:item[@properties="nav"]/@href')->string_value;
+    my $nav_path = $self->parser->single('pkg:item[@properties="nav"]/@href');
 
     croak '<item properties="nav" /> is required for epub3' unless $nav_path;
 
-    return $nav_path;
+    return $nav_path->string_value;
 }
 
 sub cover_image_path {

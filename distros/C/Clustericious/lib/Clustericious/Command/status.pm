@@ -11,7 +11,7 @@ use File::Basename qw( dirname );
 use base 'Clustericious::Command';
 
 # ABSTRACT: Clustericious command to report status of Clustericious application
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.29'; # VERSION
 
 
 __PACKAGE__->attr(description => <<'');
@@ -129,7 +129,7 @@ Clustericious::Command::status - Clustericious command to report status of Clust
 
 =head1 VERSION
 
-version 1.27
+version 1.29
 
 =head1 SYNOPSIS
 

@@ -16,30 +16,32 @@ use Pod::Usage qw(pod2usage);
 use Try::Tiny qw(try catch);
 use URI::Split qw(uri_split);
 
-our $VERSION = '1.1.1';
+our $VERSION = '2.1.0';
 
 # defaults
 use constant {
     CACHE      => 0,
     ENV_PROXY  => 1,
+    EXTENSION  => qr/.(\.(?:(tar\.(?:bz|bz2|gz|lzo|Z))|(?:[ch]\+\+)|(?:\w+)))$/i,
     INDEX      => '%s.index.txt',
     MIRROR     => 0,
     NAME       => 'wax',
+    SEPARATOR  => '--',
     TEMPLATE   => 'XXXXXXXX',
     TIMEOUT    => 60,
-    USER_AGENT => 'Mozilla/5.0 (X11; Linux x86_64; rv:50.0) Gecko/20100101 Firefox/50.0',
+    USER_AGENT => 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:50.0) Gecko/20100101 Firefox/50.0',
     VERBOSE    => 0,
 };
 
 # errors
 use constant {
     OK                  =>  0,
-    E_DOWNLOAD          => -2,
-    E_INVALID_ARGUMENTS => -3,
-    E_NO_ARGUMENTS      => -4,
-    E_NO_COMMAND        => -5,
-    E_INVALID_OPTION    => -6,
-    E_INVALID_DIRECTORY => -7,
+    E_DOWNLOAD          => -1,
+    E_INVALID_OPTION    => -2,
+    E_INVALID_OPTIONS   => -3,
+    E_INVALID_DIRECTORY => -4,
+    E_NO_ARGUMENTS      => -5,
+    E_NO_COMMAND        => -6,
 };
 
 has app_name => (
@@ -64,20 +66,20 @@ has directory => (
 );
 
 has keep => (
-    is       => 'rw',
+    is       => 'ro',
     isa      => 'Bool',
     default  => 0,
+    writer   => '_set_keep',
 );
 
-has lwp_user_agent => (
+has _lwp_user_agent => (
     is      => 'rw',
     isa     => 'LWP::UserAgent',
     lazy    => 1,
     builder => '_build_lwp_user_agent',
 );
 
-# this should really be a class attribute,
-# but there's no MouseX::ClassAttribute
+# this should really be a class attribute, but there's no MouseX::ClassAttribute
 # (on CPAN)
 has mime_types => (
     is      => 'ro',
@@ -95,15 +97,18 @@ has mirror => (
 
 has separator => (
     is        => 'rw',
-    isa       => 'Maybe[Str]',
+    isa       => 'Str',
+    default   => SEPARATOR,
+    clearer   => 'clear_separator',
     predicate => 'has_separator',
-    required  => 0,
 );
 
+# TODO make this private and read only, and rename it to something more
+# descriptive e.g. tempfile_template
 has template => (
     is      => 'rw',
     isa     => 'Str',
-    default => method() { sprintf('%s_%s', $self->app_name, TEMPLATE) },
+    default => method () { sprintf('%s_%s', $self->app_name, TEMPLATE) },
     lazy    => 1,
 );
 
@@ -111,14 +116,14 @@ has timeout => (
     is      => 'rw',
     isa     => 'Int',
     default => TIMEOUT,
-    trigger => method ($timeout) { $self->lwp_user_agent->timeout($timeout) },
+    trigger => method ($timeout) { $self->_lwp_user_agent->timeout($timeout) },
 );
 
 has user_agent => (
     is      => 'rw',
     isa     => 'Str',
     default => USER_AGENT,
-    trigger => method ($user_agent) { $self->lwp_user_agent->agent($user_agent) },
+    trigger => method ($user_agent) { $self->_lwp_user_agent->agent($user_agent) },
 );
 
 has verbose => (
@@ -155,9 +160,9 @@ method _build_lwp_user_agent {
 method _check_keep {
     if ($self->cache && $self->mirror) {
         $self->log(ERROR => "--cache and --mirror can't be used together");
-        exit E_INVALID_ARGUMENTS;
+        exit E_INVALID_OPTIONS;
     } else {
-        $self->keep(1);
+        $self->_set_keep(1);
     }
 }
 
@@ -170,8 +175,9 @@ method _unlink ($unlink) {
     }
 }
 
+# return the URL's content type or an empty string if the request fails
 method content_type ($url) {
-    my $response = $self->lwp_user_agent->head($url);
+    my $response = $self->_lwp_user_agent->head($url);
     my $content_type = '';
 
     if ($response->is_success) {
@@ -182,8 +188,9 @@ method content_type ($url) {
     return $content_type;
 }
 
+# save the URL to a local filename
 method download ($url, $filename) {
-    my $ua = $self->lwp_user_agent;
+    my $ua = $self->_lwp_user_agent;
     my ($downloaded, $error, $response);
 
     if ($self->cache && (-e $filename)) {
@@ -214,7 +221,7 @@ method download ($url, $filename) {
     return $error;
 }
 
-# helper for `render`: escape/quote a shell argument on POSIX shells
+# helper for `dump_command`: escape/quote a shell argument on POSIX shells
 func _escape ($arg) {
     # https://stackoverflow.com/a/1250279
     # https://github.com/boazy/any-shell-escape/issues/1#issuecomment-36226734
@@ -224,12 +231,15 @@ func _escape ($arg) {
     return $arg;
 }
 
+# log a message to stderr with the app's name and message's log level
 method log ($level, $template, @args) {
     my $name = $self->app_name;
     my $message = @args ? sprintf($template, @args) : $template;
     warn "$name: $level: $message", $/;
 }
 
+# return a best-effort guess at the URL's extension, e.g. ".md" or ".tar.gz",
+# or an empty string if one can't be determined
 method extension ($url) {
     my $extension = '';
     my $split = $self->is_url($url);
@@ -241,10 +251,10 @@ method extension ($url) {
 
     return $extension unless ($content_type); # won't be defined if the URL is invalid
 
-    if ($content_type eq 'text/plain') {
+    if (($content_type eq 'text/plain') || ($content_type eq 'application/octet-stream')) {
         # try to get a more specific extension from the path
-        if (not(defined $query) && not(defined($fragment)) && $path && ($path =~ /\w+(\.\w+)$/)) {
-            $extension = $1;
+        if (not(defined $query) && $path && ($path =~ EXTENSION)) {
+            $extension = $+;
         }
     }
 
@@ -262,6 +272,8 @@ method extension ($url) {
     return $extension;
 }
 
+# return a truthy value (an arrayref containing the URL's components)
+# if the supplied value can be parsed as a URL, or a falsey value otherwise
 method is_url ($url) {
     if ($url =~ m{^[a-zA-Z][\w+]*://}) { # basic sanity check
         my ($scheme, $domain, $path, $query, $fragment) = uri_split($url);
@@ -271,6 +283,7 @@ method is_url ($url) {
     }
 }
 
+# log a message to stderr if logging is enabled
 method debug ($template, @args) {
     if ($self->verbose) {
         my $name = $self->app_name;
@@ -304,20 +317,21 @@ method _handle ($resolved, $command, $unlink) {
 # (but still imperfect/incomplete) implementation would require at
 # least two extra modules: Win32::ShellQuote and String::ShellQuote:
 # https://rt.cpan.org/Public/Bug/Display.html?id=37348
-#
-# XXX looks like Shell::Escape is... unavailable:
-# http://search.cpan.org/search?query=shell+escape&mode=all
-method render ($args) {
+method dump_command ($args) {
     return join(' ', map { /[^0-9A-Za-z+,.\/:=\@_-]/ ? _escape($_) : $_ } @$args);
 }
 
+# takes a URL and returns a $filename => $error pair where
+# the filename is the path to the saved file and the error
+# is the first error message encountered while trying to download
+# and save it
 method resolve ($url) {
     my ($error, $filename, @resolved);
 
     if ($self->keep) {
         ($filename, $error) = $self->resolve_keep($url);
     } else {
-        $filename = $self->resolve_temp($url);
+        ($filename, $error) = $self->resolve_temp($url);
     }
 
     $error ||= $self->download($url, $filename);
@@ -326,6 +340,8 @@ method resolve ($url) {
     return wantarray ? @resolved : \@resolved;
 }
 
+# takes a URL and returns a $filename => $error pair for
+# cacheable files
 method resolve_keep ($url) {
     my $directory = $self->has_directory ? $self->directory : File::Spec->tmpdir;
     my $id        = sprintf('%s_%s', $self->app_name, sha1_hex($url));
@@ -349,6 +365,8 @@ method resolve_keep ($url) {
     return ($filename, $error);
 }
 
+# takes a URL and returns a $filename => $error pair for
+# temporary files (i.e. files which will be automatically unlinked)
 method resolve_temp ($url) {
     my $extension = $self->extension($url);
     my $template  = $self->template;
@@ -365,10 +383,19 @@ method resolve_temp ($url) {
         $options{SUFFIX} = $extension;
     }
 
-    srand($$); # see the File::Temp docs
-    return File::Temp->new(%options)->filename;
+    my ($filename, $error);
+
+    try {
+        srand($$); # see the File::Temp docs
+        $filename = File::Temp->new(%options)->filename;
+    } catch {
+        $error = $_;
+    };
+
+    return ($filename, $error);
 }
 
+# process the options and execute the command with substituted filenames
 method run ($argv) {
     my @argv = @$argv;
 
@@ -384,20 +411,33 @@ method run ($argv) {
     my $wax_options = 1;
     my $seen_url = 0;
     my $test = 0;
-    my (@command, @resolve, $msg);
+    my (@command, @resolve);
 
     while (@argv) {
         my $arg = shift @argv;
+
+        my $val = sub {
+            if (@argv) {
+                return shift(@argv);
+            } else {
+                pod2usage(
+                    -exitval => E_INVALID_OPTION,
+                    -input   => $0,
+                    -msg     => "missing value for $arg option",
+                    -verbose => 1,
+                );
+            }
+        };
 
         if ($wax_options) {
             if ($arg =~ /^(?:-c|--cache)$/) {
                 $self->cache(1);
             } elsif ($arg =~ /^(?:-d|--dir|--directory)$/) {
-                $self->directory(shift @argv);
+                $self->directory($val->());
             } elsif ($arg eq '-D') {
                 # "${XDG_CACHE_HOME:-$HOME/.cache}/wax"
                 require File::BaseDir;
-                $self->directory(File::BaseDir::cache_home(NAME));
+                $self->directory(File::BaseDir::cache_home($self->app_name));
             } elsif ($arg =~ /^(?:-v|--verbose)$/) {
                 $self->verbose(1);
             } elsif ($arg =~ /^(?:-[?h]|--help)$/) {
@@ -405,19 +445,25 @@ method run ($argv) {
             } elsif ($arg =~ /^(?:-m|--mirror)$/) {
                 $self->mirror(1);
             } elsif ($arg =~ /^(?:-s|--separator)$/) {
-                $self->separator(shift @argv);
+                $self->separator($val->());
+            } elsif ($arg =~ /^(?:-S|--no-separator)$/) {
+                $self->clear_separator();
             } elsif ($arg eq '--test') {
                 $test = 1;
             } elsif ($arg =~ /^(?:-t|--timeout)$/) {
-                $self->timeout(shift @argv);
+                $self->timeout($val->());
             } elsif ($arg =~ /^(?:-u|--user-agent)$/) {
-                $self->agent(shift @argv);
+                $self->user_agent($val->());
             } elsif ($arg =~ /^(?:-V|--version)$/) {
                 print $VERSION, $/;
                 exit 0;
             } elsif ($arg =~ /^-/) { # unknown option
-                $msg = sprintf('invalid option: %s', $arg);
-                pod2usage(-input => $0, -verbose => 1, -msg => $msg, -exitval => E_INVALID_OPTION);
+                pod2usage(
+                    -exitval => E_INVALID_OPTION,
+                    -input   => $0,
+                    -msg     => "invalid option: $arg",
+                    -verbose => 1,
+                );
             } else { # non-option: exit the wax-options processing stage
                 push @command, $arg;
                 $wax_options = 0;
@@ -465,7 +511,7 @@ method run ($argv) {
         }
     }
 
-    $self->debug('command: %s', $self->render(\@command));
+    $self->debug('command: %s', $self->dump_command(\@command));
 
     if ($error) {
         $self->debug('exit code: %d', $error);

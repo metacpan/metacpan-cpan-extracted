@@ -1,3 +1,18 @@
+0.241   2018-03-17 (PERLANCAR)
+
+	- No functional changes.
+
+        - [dist] Forgot to add entry to Changes.
+
+
+0.240   2018-03-17 (PERLANCAR)
+
+	- Implement template.
+
+        - [Incompatible change] [ux] Don't clear progress bar on 100%, clear on
+          finish().
+
+
 0.23    2017-06-21 (PERLANCAR)
 
         - Support patching Log::ger::Output::Screen in addition to

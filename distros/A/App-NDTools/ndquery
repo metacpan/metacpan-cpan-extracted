@@ -125,7 +125,7 @@ Report bugs to L<https://github.com/mr-mixas/NDTools/issues>
 
 =head1 SEE ALSO
 
-L<App::NDTools::nddiff>, L<App::NDTools::ndpatch>, L<App::NDTools::ndproc>
+L<nddiff>, L<ndpatch>, L<ndproc>
 
 L<App::NDTools::NDQuery>
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::CommandRunner;
-$Footprintless::CommandRunner::VERSION = '1.27';
+$Footprintless::CommandRunner::VERSION = '1.28';
 # ABSTRACT: A contract for an command runner
 # PODNAME: Footprintless::CommandRunner
 
@@ -89,7 +89,7 @@ Footprintless::CommandRunner - A contract for an command runner
 
 =head1 VERSION
 
-version 1.27
+version 1.28
 
 =head1 DESCRIPTION
 

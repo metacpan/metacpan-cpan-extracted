@@ -654,7 +654,7 @@ sub Write {
 	$dataref = defined($_[0]) ? \$_[0] : \'';
     }
 
-    &WriteRef($self, $dataref);
+	&WriteRef($self, $dataref);
 
     1;
 }
@@ -680,6 +680,10 @@ sub WriteRef {
     # add dataref to buffer
     ${$self->{out}} .= $$dataref;
     
+    #Encode::_utf8_on(${$self->{out}});
+    
+	#Encode::from_to(${$self->{out}}, "utf8", "iso-8859-1");
+	
     # do we flush now?  not if we are buffering
     if(! $self->{'Buffer'} && ! $self->{'FormFill'}) {
 	# we test for whether anything is in the buffer since

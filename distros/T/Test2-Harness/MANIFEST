@@ -72,6 +72,8 @@ lib/Test2/Harness/Util/Term.pm
 lib/Test2/Harness/Util/TestFile.pm
 lib/Test2/Harness/Util/UUID.pm
 lib/Test2/Harness/Watcher.pm
+lib/Test2/Plugin/MemUsage.pm
+lib/Test2/Plugin/UUID.pm
 lib/Test2/Tools/HarnessTester.pm
 scripts/yath
 t/App/Yath.t
@@ -176,6 +178,8 @@ t2/require_file.pm
 t2/require_file.t
 t2/simple.t
 t2/subtests.t
+t2/subtests_buffered.t
+t2/subtests_streamed.t
 test.pl
 xt/acceptance/help.t
 xt/acceptance/init.t

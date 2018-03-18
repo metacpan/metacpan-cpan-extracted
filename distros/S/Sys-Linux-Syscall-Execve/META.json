@@ -65,7 +65,7 @@
    "provides" : {
       "Sys::Linux::Syscall::Execve" : {
          "file" : "lib/Sys/Linux/Syscall/Execve.pm",
-         "version" : "0.10"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/perlbot/sys-linux-syscall-execve"
       }
    },
-   "version" : "0.10",
+   "version" : "0.12",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -256,7 +256,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.10",
+                  "tag" : "v0.12",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

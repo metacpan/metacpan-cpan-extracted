@@ -305,7 +305,7 @@ that is returned from a separately executed program (except for being
 able to provide a more easily understood failure code than a simple
 integer) - however, it does mean that some common purposes for this
 attribute will need some wrapping code.  For example, any B<code> that
-is just providig a system call (e.g. unlink, link, rename) will need to
+is just providing a system call (e.g. unlink, link, rename) will need to
 invert the boolean result, and expand the failure result to provide the
 errno value, such as:
 
@@ -1372,8 +1372,8 @@ sub _file_list_acceptable_for_skip {
             return undef;
         }
         if ($newest_pre) {
-            unless ($ts < $newest_pre) {
-                $self->debug( "target too old: $ts should be less than $newest_pre" );
+            unless ($ts > $newest_pre) {
+                $self->debug( "target too old: timestamp of $file($ts) should be newer than ($newest_pre)" );
                 return undef;
             }
         }

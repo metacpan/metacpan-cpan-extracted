@@ -34,7 +34,7 @@ is_deeply(\@got, \@exp) || diag scmp(\@got, \@exp);
 @got = valid_diff(
     {D => {one => undef}}
 );
-@exp = ([{keys => ['one']}],'BAD_DIFF_TYPE');
+@exp = ([{K => ['one']}],'BAD_DIFF_TYPE');
 is_deeply(\@got, \@exp) || diag scmp(\@got, \@exp);
 
 @got = valid_diff(
@@ -62,8 +62,8 @@ is_deeply(\@got, \@exp) || diag scmp(\@got, \@exp);
     {D => {a => {D => 1},b => {D => 1}}}
 );
 @exp = (
-    [{keys => ['a']}],'BAD_D_TYPE',
-    [{keys => ['b']}],'BAD_D_TYPE'
+    [{K => ['a']}],'BAD_D_TYPE',
+    [{K => ['b']}],'BAD_D_TYPE'
 );
 is_deeply(\@got, \@exp) || diag scmp(\@got, \@exp);
 

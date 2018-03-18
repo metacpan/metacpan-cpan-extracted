@@ -1,0 +1,41 @@
+This package is intended to provide all of the tools, configuration, and
+information required to duplicate the ftp.isc.org control message archive
+and newsgroup list service if you so desire.  To set up a similar service
+based on that service, however, you will also want to bootstrap from the
+existing data.  Here is the procedure for that:
+
+1. Be sure that you're starting from the latest software and set of
+   configuration files.  I will generally try to make a new release after
+   committing a batch of changes, but I may not make a new release after
+   every change.  See the sections below for information about the Git
+   repository in which this package is maintained.  You can always clone
+   that repository to get the latest configuration (and then merge or
+   cherry-pick changes from my repository into your repository as you
+   desire).
+
+2. Download the current newsgroup list from:
+
+       ftp://ftp.isc.org/pub/usenet/CONFIG/newsgroups.bz2
+
+   and then bootstrap the database from it:
+
+   ```sh
+       bzip2 -dc newsgroups.bz2 | scripts/update-control bulkload
+   ```
+
+3. If you want the log information so that your reports will include
+   changes made in the ftp.isc.org archive before you created your own,
+   copy the contents of ftp://ftp.isc.org/pub/usenet/CONFIG/LOGS/ into
+   `/srv/control/logs`.
+
+4. If you want to start with the existing control message repository,
+   download the contents of ftp://ftp.isc.org/pub/usenet/control/ into
+   `/srv/control/archive`.  You can do this using a recursive download
+   tool that understands FTP, such as wget, but please use the options
+   that add delays and don't hammer the server to death.
+
+After finishing those steps, you will have a copy of the ftp.isc.org
+archive and can start processing control messages, possibly with different
+configuration choices.  You can generate the files that are found in
+ftp://ftp.isc.org/pub/usenet/CONFIG/ by running `scripts/export-control`
+as described above.

@@ -7,7 +7,7 @@ use Log::Log4perl qw(:easy);
 use Clustericious::Client;
 
 # ABSTRACT: PlugAuth Client
-our $VERSION = '0.38'; # VERSION
+our $VERSION = '0.39'; # VERSION
 
 
 route welcome      => 'GET', '/';
@@ -199,7 +199,7 @@ PlugAuth::Client - PlugAuth Client
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 SYNOPSIS
 

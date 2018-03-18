@@ -57,6 +57,7 @@ my %WriteMakefileArgs = (
     "Syntax::Keyword::Try" => 0,
     "Sys::Linux::Mount" => 0,
     "Sys::Linux::Namespace" => 0,
+    "Sys::Linux::Syscall::Execve" => 0,
     "TOML" => 0,
     "Unix::Mknod" => 0,
     "YAML::XS" => 0,
@@ -71,7 +72,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.021",
+  "VERSION" => "0.022",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -110,6 +111,7 @@ my %FallbackPrereqs = (
   "Syntax::Keyword::Try" => 0,
   "Sys::Linux::Mount" => 0,
   "Sys::Linux::Namespace" => 0,
+  "Sys::Linux::Syscall::Execve" => 0,
   "TOML" => 0,
   "Test::More" => 0,
   "Unix::Mknod" => 0,

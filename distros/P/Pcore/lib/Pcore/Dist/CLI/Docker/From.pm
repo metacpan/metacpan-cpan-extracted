@@ -11,6 +11,7 @@ sub CLI ($self) {
             tag => {
                 desc => 'tag',
                 isa  => 'Str',
+                min  => 0,
             },
         ],
     };

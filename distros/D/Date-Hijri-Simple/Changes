@@ -1,5 +1,8 @@
 Revision history for Date::Hijri::Simple
 
+0.20  Sat Mar 17 23:25:00 2018
+      - Used namespace::autoclean instead.
+
 0.19  Wed Aug 30 12:00:00 2017
       - Updated copyright year information.
       - Updated SEE ALSO section in the pod.

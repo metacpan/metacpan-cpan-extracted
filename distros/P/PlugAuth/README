@@ -1,10 +1,11 @@
 NAME
 
-    PlugAuth - Pluggable authentication and authorization server.
+    PlugAuth - (Deprecated) Pluggable authentication and authorization
+    server.
 
 VERSION
 
-    version 0.38
+    version 0.39
 
 SYNOPSIS
 
@@ -27,6 +28,10 @@ SYNOPSIS
      };
 
 DESCRIPTION
+
+    NOTE: This module has been deprecated, and may be removed on or after
+    31 December 2018. Please see
+    https://github.com/clustericious/Clustericious/issues/46.
 
     (For a quick start guide on how to setup a PlugAuth server, please see
     PlugAuth::Guide::Server)

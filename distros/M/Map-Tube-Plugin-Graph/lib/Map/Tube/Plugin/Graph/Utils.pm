@@ -1,6 +1,6 @@
 package Map::Tube::Plugin::Graph::Utils;
 
-$Map::Tube::Plugin::Graph::Utils::VERSION   = '0.30';
+$Map::Tube::Plugin::Graph::Utils::VERSION   = '0.31';
 $Map::Tube::Plugin::Graph::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Plugin::Graph::Utils - Helper package for Map::Tube::Plugin::Graph.
 
 =head1 VERSION
 
-Version 0.30
+Version 0.31
 
 =cut
 
@@ -21,6 +21,7 @@ use MIME::Base64;
 use Graphics::ColorNames;
 use Map::Tube::Exception::MissingLineName;
 use Map::Tube::Exception::InvalidLineName;
+use Map::Tube::Exception::InvalidColorHexCode;
 use File::Temp qw(tempfile tempdir);
 use parent 'Exporter';
 
@@ -201,7 +202,14 @@ sub _graph_bgcolor {
 sub _graph_contrast_color {
     my ($color) = @_;
 
-    die "ERROR: Invalid color hex code [$color].\n"
+    my @caller = caller(0);
+    @caller = caller(2) if $caller[3] eq '(eval)';
+
+    Map::Tube::Exception::InvalidColorHexCode->throw({
+        method      => __PACKAGE__."::graph_line_image",
+        message     => "ERROR: Invalid color hex code.",
+        filename    => $caller[1],
+        line_number => $caller[2] })
         unless ($color =~ /^#(..)(..)(..)$/);
 
     my ($r, $g, $b) = (hex($1), hex($2), hex($3));

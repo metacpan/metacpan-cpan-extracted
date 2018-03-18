@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::RS_ZVM;
-$Lab::Moose::Instrument::RS_ZVM::VERSION = '3.622';
+$Lab::Moose::Instrument::RS_ZVM::VERSION = '3.623';
 #ABSTRACT: Rohde & Schwarz ZVM Vector Network Analyzer
 
 use 5.010;
@@ -96,7 +96,7 @@ Lab::Moose::Instrument::RS_ZVM - Rohde & Schwarz ZVM Vector Network Analyzer
 
 =head1 VERSION
 
-version 3.622
+version 3.623
 
 =head1 SYNOPSIS
 

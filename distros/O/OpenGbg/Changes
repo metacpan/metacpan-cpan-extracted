@@ -1,6 +1,42 @@
 Revision history for OpenGbg
 
-0.1402 2016-08-12 22:07:56 UTC
+0.1403 2018-03-14 18:26:16 UTC
+ [New Features]
+ - Added a couple of shortcut methods in the traffic camera service.
+
+ [Other Changes]
+ - The OpenGbg::StyrOchStall namespace is deprecated, due to the
+   removal/renaming of the underlying web service.
+ - Types::DateTime 0.002 fixed the previously mentioned issue, so the
+   custom DateTime type class has been removed.
+
+ [Documentation]
+ - Updated link to the official license agreement.
+
+ [Stats & Dependency Changes]
+ - 26 files changed, 61 insertions(+), 46 deletions(-)
+ - (run req) + Types::DateTime 0.002
+ - (run req) ~ Type::Tiny 1.000005 --> 1.000006
+ - (dev req) ~ Dist::Zilla 5.000 --> 6.010
+ - (dev req) ~ Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.007 --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0100
+   --> 0.0200
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild 0.151680 -->
+   0.170880
+ - (dev req) ~ Dist::Zilla::Plugin::Git 2.036 --> 2.041
+ - (dev req) ~ Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013 -->
+   0.014
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors 0.017 --> 0.030
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package 2.003001 -->
+   2.004003
+ - (dev req) ~ Dist::Zilla::Plugin::PromptIfStale (any) --> 0.054
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod 0.150250 --> 0.163250
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Compile 2.054 --> 2.057
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs 0.021 --> 0.027
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0312 --> 0.0320
+
+0.1402 2016-08-12T22:07:56Z UTC
  [Bug Fixes]
  - Types::DateTime is (currently) broken with recent releases of
    DateTime::Locale, so add a custom DateTime type for now.

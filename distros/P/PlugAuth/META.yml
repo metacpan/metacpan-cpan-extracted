@@ -1,5 +1,5 @@
 ---
-abstract: 'Pluggable authentication and authorization server.'
+abstract: '(Deprecated) Pluggable authentication and authorization server.'
 author:
   - 'Graham Ollis <gollis@sesda3.com>'
 build_requires:
@@ -42,5 +42,7 @@ resources:
   bugtracker: https://github.com/clustericious/PlugAuth/issues
   homepage: https://metacpan.org/pod/PlugAuth
   repository: git://github.com/clustericious/PlugAuth.git
-version: '0.38'
+version: '0.39'
+x_deprecated: 1
 x_serialization_backend: 'YAML::Tiny version 1.70'
+x_use_unsafe_inc: 0

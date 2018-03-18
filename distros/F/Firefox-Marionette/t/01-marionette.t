@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Digest::SHA();
 use MIME::Base64();
-use Test::More tests => 335;
+use Test::More tests => 338;
 use Cwd();
 use Firefox::Marionette qw(:all);
 use Config;
@@ -15,7 +15,7 @@ use HTTP::Response();
 my $segv_detected;
 my $at_least_one_success;
 
-my $test_time_limit = 80;
+my $test_time_limit = 90;
 
 sub out_of_time {
 	diag("Testing has been running for " . (time - $^T) . " seconds");
@@ -26,11 +26,21 @@ sub out_of_time {
 	}
 }
 
+my ($major_version, $minor_version, $patch_version); 
 sub start_firefox {
 	my ($require_visible, %parameters) = @_;
 	if ($ENV{FIREFOX_BINARY}) {
 		$parameters{firefox_binary} = $ENV{FIREFOX_BINARY};
 		diag("Overriding firefox binary to $parameters{firefox_binary}");
+	}
+	if (defined $parameters{capabilities}) {
+		if ($major_version < 52) {
+			delete $parameters{capabilities}->{page_load_strategy};
+			delete $parameters{capabilities}->{moz_webdriver_click};
+			delete $parameters{capabilities}->{moz_accessibility_checks};
+			delete $parameters{capabilities}->{accept_insecure_certs};
+			delete $parameters{capabilities}->{moz_use_non_spec_compliant_pointer_origin};
+		}
 	}
 	if ($ENV{FIREFOX_VISIBLE}) {
 		$require_visible = 1;
@@ -39,7 +49,26 @@ sub start_firefox {
 		}
 		if ((defined $parameters{capabilities}) && ($parameters{capabilities}->moz_headless())) {
 			my $old = $parameters{capabilities};
-			$parameters{capabilities} = Firefox::Marionette::Capabilities->new(proxy => $old->proxy(), moz_headless => 0, accept_insecure_certs => $old->accept_insecure_certs(), page_load_strategy => $old->page_load_strategy(), moz_webdriver_click => $old->moz_webdriver_click(), moz_accessibility_checks => $old->moz_accessibility_checks());
+			my $new = { moz_headless => 0 };
+			if (defined $old->proxy()) {
+				$new->{proxy} = $old->proxy();
+			}
+			if (defined $old->moz_use_non_spec_compliant_pointer_origin()) {
+				$new->{moz_use_non_spec_compliant_pointer_origin} = $old->moz_use_non_spec_compliant_pointer_origin();
+			}
+			if (defined $old->accept_insecure_certs()) {
+				$new->{accept_insecure_certs} = $old->accept_insecure_certs();
+			}
+			if (defined $old->page_load_strategy()) {
+				$new->{page_load_strategy} = $old->page_load_strategy();
+			}
+			if (defined $old->moz_webdriver_click()) {
+				$new->{moz_webdriver_click} = $old->moz_webdriver_click();
+			}
+			if (defined $old->moz_accessibility_checks()) {
+				$new->{moz_accessibility_checks} = $old->moz_accessibility_checks();
+			}
+			$parameters{capabilities} = Firefox::Marionette::Capabilities->new($new);
 		}
 		diag("Overriding firefox visibility");
 	}
@@ -256,7 +285,6 @@ eval {
 chomp $@;
 ok((($@) and (not($firefox))), "Firefox::Marionette->new() threw an exception when launched with a path to a non firefox binary:$@");
 my $skip_message;
-my ($major_version, $minor_version, $patch_version); 
 ok($profile = Firefox::Marionette::Profile->new(), "Firefox::Marionette::Profile->new() correctly returns a new profile");
 ok(((defined $profile->get_value('marionette.port')) && ($profile->get_value('marionette.port') == 0)), "\$profile->get_value('marionette.port') correctly returns 0");
 ok($profile->set_value('browser.link.open_newwindow', 2), "\$profile->set_value('browser.link.open_newwindow', 2) to force new windows to appear");
@@ -336,9 +364,9 @@ SKIP: {
 	$new = Firefox::Marionette::Timeouts->new(page_load => $page_timeout, script => $script_timeout, implicit => $implicit_timeout);
 	my $timeouts = $firefox->timeouts($new);
 	ok((ref $timeouts) eq 'Firefox::Marionette::Timeouts', "\$firefox->timeouts() returns a Firefox::Marionette::Timeouts object");
-	ok($timeouts->page_load() =~ /^\d+$/, "\$timeouts->page_load() is an integer");
-	ok($timeouts->script() =~ /^\d+$/, "\$timeouts->script() is an integer");
-	ok($timeouts->implicit() =~ /^\d+$/, "\$timeouts->implicit() is an integer");
+	ok($timeouts->page_load() == 300_000, "\$timeouts->page_load() is 5 minutes");
+	ok($timeouts->script() == 30_000, "\$timeouts->script() is 30 seconds");
+	ok(defined $timeouts->implicit() && $timeouts->implicit() == 0, "\$timeouts->implicit() is 0 milliseconds");
 	$timeouts = $firefox->timeouts($new);
 	ok($timeouts->page_load() == $page_timeout, "\$timeouts->page_load() is $page_timeout");
 	ok($timeouts->script() == $script_timeout, "\$timeouts->script() is $script_timeout");
@@ -366,24 +394,52 @@ SKIP: {
 	my $daemon = HTTP::Daemon->new() || die "Failed to create HTTP::Daemon";
 	my $localPort = URI->new($daemon->url())->port();
 	my $proxy = Firefox::Marionette::Proxy->new( http => 'localhost:' . $localPort, https => 'proxy.example.org:4343', ftp => 'ftp.example.org:2121', none => [ 'local.example.org' ], socks => 'socks.example.org:1081' );
-	($skip_message, $firefox) = start_firefox(0, debug => 1, sleep_time_in_ms => 5, profile => $profile, capabilities => Firefox::Marionette::Capabilities->new(proxy => $proxy, moz_headless => 1, accept_insecure_certs => 1, page_load_strategy => 'eager', moz_webdriver_click => 1, moz_accessibility_checks => 1));
+	($skip_message, $firefox) = start_firefox(0, debug => 1, sleep_time_in_ms => 5, profile => $profile, capabilities => Firefox::Marionette::Capabilities->new(proxy => $proxy, moz_headless => 1, accept_insecure_certs => 1, page_load_strategy => 'eager', moz_webdriver_click => 1, moz_accessibility_checks => 1, moz_use_non_spec_compliant_pointer_origin => 1));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 18);
+		skip($skip_message, 19);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to known values");
 	ok($firefox->sleep_time_in_ms() == 5, "\$firefox->sleep_time_in_ms() is 5 milliseconds");
 	my $capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
-	ok($capabilities->page_load_strategy() eq 'eager', "\$capabilities->page_load_strategy() is 'eager'");
-	ok($capabilities->accept_insecure_certs() == 1, "\$capabilities->accept_insecure_certs() is set to true");
-	TODO: {
-		local $TODO = $major_version < 57 ? $capabilities->browser_version() . " probably does not have support for \$capabilities->moz_webdriver_click()" : q[];
+	SKIP: {
+		if (!grep /^page_load_strategy$/, $capabilities->enumerate()) {
+			diag("\$capabilities->page_load_strategy is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->page_load_strategy is not supported for " . $capabilities->browser_version(), 1);
+		}
+		ok($capabilities->page_load_strategy() eq 'eager', "\$capabilities->page_load_strategy() is 'eager'");
+	}
+	SKIP: {
+		if (!grep /^accept_insecure_certs$/, $capabilities->enumerate()) {
+			diag("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version(), 1);
+		}
+		ok($capabilities->accept_insecure_certs() == 1, "\$capabilities->accept_insecure_certs() is set to true");
+	}
+	SKIP: {
+		if (!grep /^moz_webdriver_click$/, $capabilities->enumerate()) {
+			diag("\$capabilities->moz_webdriver_click is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->moz_webdriver_click is not supported for " . $capabilities->browser_version(), 1);
+		}
 		ok($capabilities->moz_webdriver_click() == 1, "\$capabilities->moz_webdriver_click() is set to true");
 	}
-	ok($capabilities->moz_accessibility_checks() == 1, "\$capabilities->moz_accessibility_checks() is set to true");
+	SKIP: {
+		if (!grep /^moz_use_non_spec_compliant_pointer_origin$/, $capabilities->enumerate()) {
+			diag("\$capabilities->moz_use_non_spec_compliant_pointer_origin is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->moz_use_non_spec_compliant_pointer_origin is not supported for " . $capabilities->browser_version(), 1);
+		}
+		ok($capabilities->moz_use_non_spec_compliant_pointer_origin() == 1, "\$capabilities->moz_use_non_spec_compliant_pointer_origin() is set to true");
+	}
+	SKIP: {
+		if (!grep /^moz_accessibility_checks$/, $capabilities->enumerate()) {
+			diag("\$capabilities->moz_accessibility_checks is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->moz_accessibility_checks is not supported for " . $capabilities->browser_version(), 1);
+		}
+		ok($capabilities->moz_accessibility_checks() == 1, "\$capabilities->moz_accessibility_checks() is set to true");
+	}
 	TODO: {
 		local $TODO = $major_version < 56 ? $capabilities->browser_version() . " does not have support for -headless argument" : q[];
 		ok($capabilities->moz_headless() == 1 || $ENV{FIREFOX_VISIBLE} || 0, "\$capabilities->moz_headless() is set to " . ($ENV{FIREFOX_VISIBLE} ? 'true' : 'false'));
@@ -485,7 +541,7 @@ SKIP: {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 239);
+		skip($skip_message, 240);
 	}
 	ok($firefox, "Firefox has started in Marionette mode without defined capabilities, but with a defined profile and debug turned off");
 	ok($firefox->go(URI->new("https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html")), "https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html has been loaded");
@@ -531,6 +587,12 @@ SKIP: {
 			if (($@->isa('Firefox::Marionette::Exception')) && ($@ =~ /Only supported in Fennec.* in .* at line \d+/)) {
 				local $TODO = "Only supported in Fennec";
 				ok($screen_orientation, "\$firefox->screen_orientation() is " . $screen_orientation);
+			} elsif ($major_version < 52) {
+				my $exception = "$@";
+				chomp $exception;
+				diag("\$firefox->screen_orientation() is unavailable in " . $firefox->browser_version() . ":$exception");
+				local $TODO = "\$firefox->screen_orientation() is unavailable in " . $firefox->browser_version() . ":$exception";
+				ok($screen_orientation, "\$firefox->screen_orientation() is " . $screen_orientation);
 			} else {
 				ok($screen_orientation, "\$firefox->screen_orientation() is " . $screen_orientation);
 			}
@@ -552,7 +614,8 @@ SKIP: {
 	ok($firefox->active_frame()->isa('Firefox::Marionette::Element'), "\$firefox->active_frame() returns a Firefox::Marionette::Element object");
 	ok($firefox->switch_to_parent_frame(), "Switched to parent frame");
 	foreach my $handle ($firefox->close_current_chrome_window_handle()) {
-		ok($handle == $new_chrome_window_handle, "Closed original window, which means the remaining chrome window handle should be $new_chrome_window_handle:" . $handle);
+		local $TODO = $major_version < 52 ? "\$firefox->close_current_chrome_window_handle() can return a undef value for versions less than 52" : "";
+		ok(defined $handle && $handle == $new_chrome_window_handle, "Closed original window, which means the remaining chrome window handle should be $new_chrome_window_handle:" . ($handle || ''));
 	}
 	ok($firefox->switch_to_window($new_window_handle), "\$firefox->switch_to_window() used to move back to the original window");
 	ok($firefox->go("https://metacpan.org/"), "metacpan.org has been loaded in the new window");
@@ -874,6 +937,10 @@ SKIP: {
 	}
 	ok($clicked, "Clicked the API link");
 	ok($firefox->await(sub { $firefox->uri()->host() eq 'github.com' }), "\$firefox->uri()->host() is equal to github.com:" . $firefox->uri());
+	while(!$firefox->loaded()) {
+		diag("Waiting for firefox to load after clicking on API link");
+		sleep 1;
+	}
 	my @cookies = $firefox->cookies();
 	ok($cookies[0]->name() =~ /\w/, "The first cookie name is '" . $cookies[0]->name() . "'");
 	ok($cookies[0]->value() =~ /\w/, "The first cookie value is '" . $cookies[0]->value() . "'");
@@ -890,20 +957,32 @@ SKIP: {
 	ok($firefox->delete_cookie($cookies[0]->name()), "\$firefox->delete_cookie('" . $cookies[0]->name() . "') deletes the specified cookie name");
 	ok(not(grep { $_->name() eq $cookies[0]->name() } $firefox->cookies()), "List of cookies no longer includes " . $cookies[0]->name());
 	ok($firefox->back(), "\$firefox->back() goes back one page");
+	while(!$firefox->loaded()) {
+		diag("Waiting for firefox to load after clicking back button");
+		sleep 1;
+	}
 	while($firefox->uri()->host() ne 'metacpan.org') {
-		diag("Waiting to load previous page");
+		diag("Waiting to load previous page:" . $firefox->uri()->host());
 		sleep 1;
 	}
 	ok($firefox->uri()->host() eq 'metacpan.org', "\$firefox->uri()->host() is equal to metacpan.org:" . $firefox->uri());
 	ok($firefox->forward(), "\$firefox->forward() goes forward one page");
+	while(!$firefox->loaded()) {
+		diag("Waiting for firefox to load after clicking forward button");
+		sleep 1;
+	}
 	while($firefox->uri()->host() ne 'github.com') {
-		diag("Waiting to load next page");
+		diag("Waiting to load next page:" . $firefox->uri()->host());
 		sleep 1;
 	}
 	ok($firefox->uri()->host() eq 'github.com', "\$firefox->uri()->host() is equal to github.com:" . $firefox->uri());
 	ok($firefox->back(), "\$firefox->back() goes back one page");
+	while(!$firefox->loaded()) {
+		diag("Waiting for firefox to load after clicking back button (2)");
+		sleep 1;
+	}
 	while($firefox->uri()->host() ne 'metacpan.org') {
-		diag("Waiting to load previous page (2)");
+		diag("Waiting to load previous page (2):" . $firefox->uri()->host());
 		sleep 1;
 	}
 	ok($firefox->uri()->host() eq 'metacpan.org', "\$firefox->uri()->host() is equal to metacpan.org:" . $firefox->uri());
@@ -914,24 +993,22 @@ SKIP: {
 	if (out_of_time()) {
 		skip("Running out of time.  Trying to shutdown tests as fast as possible", 31);
 	}
-	SKIP: {
-		ok($firefox->find_name('lucky')->click($element), "Clicked the \"I'm Feeling Lucky\" button");
-		diag("Going to Test::More page with a page load strategy of " . $capabilities->page_load_strategy());
-		ok($firefox->bye(sub { $firefox->find_id('search-input') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click(), "Clicked on the download link");
-		diag("Clicked download link");
-		while(!$firefox->downloads()) {
-			sleep 1;
-		}
-		while($firefox->downloading()) {
-			sleep 1;
-		}
-		$count = 0;
-		foreach my $path ($firefox->downloads()) {
-			diag("Downloaded $path");
-			$count += 1;
-		}
-		ok($count == 1, "Downloaded 1 files:$count");
+	ok($firefox->find_name('lucky')->click($element), "Clicked the \"I'm Feeling Lucky\" button");
+	diag("Going to Test::More page with a page load strategy of " . ($capabilities->page_load_strategy() || ''));
+	ok($firefox->bye(sub { $firefox->find_id('search-input') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click(), "Clicked on the download link");
+	diag("Clicked download link");
+	while(!$firefox->downloads()) {
+		sleep 1;
 	}
+	while($firefox->downloading()) {
+		sleep 1;
+	}
+	$count = 0;
+	foreach my $path ($firefox->downloads()) {
+		diag("Downloaded $path");
+		$count += 1;
+	}
+	ok($count == 1, "Downloaded 1 files:$count");
 
 	my $alert_text = 'testing alert';
 	$firefox->script(qq[alert('$alert_text')]);
@@ -946,13 +1023,38 @@ SKIP: {
 	ok($firefox->current_chrome_window_handle() =~ /^\d+$/, "Returned the current chrome window handle as an integer");
 	$capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
-	ok($capabilities->page_load_strategy() =~ /^\w+$/, "\$capabilities->page_load_strategy() is a string:" . $capabilities->page_load_strategy());
+	SKIP: {
+		if (!grep /^page_load_strategy$/, $capabilities->enumerate()) {
+			diag("\$capabilities->page_load_strategy is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->page_load_strategy is not supported for " . $capabilities->browser_version(), 1);
+		}
+		ok($capabilities->page_load_strategy() =~ /^\w+$/, "\$capabilities->page_load_strategy() is a string:" . $capabilities->page_load_strategy());
+	}
 	ok($capabilities->moz_headless() =~ /^(1|0)$/, "\$capabilities->moz_headless() is a boolean:" . $capabilities->moz_headless());
-	ok($capabilities->accept_insecure_certs() =~ /^(1|0)$/, "\$capabilities->accept_insecure_certs() is a boolean:" . $capabilities->accept_insecure_certs());
+	SKIP: {
+		if (!grep /^accept_insecure_certs$/, $capabilities->enumerate()) {
+			diag("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version(), 1);
+		}
+		ok($capabilities->accept_insecure_certs() =~ /^(1|0)$/, "\$capabilities->accept_insecure_certs() is a boolean:" . $capabilities->accept_insecure_certs());
+	}
 	ok($capabilities->moz_process_id() =~ /^\d+$/, "\$capabilities->moz_process_id() is an integer:" . $capabilities->moz_process_id());
 	ok($capabilities->browser_name() =~ /^\w+$/, "\$capabilities->browser_name() is a string:" . $capabilities->browser_name());
 	ok($capabilities->rotatable() =~ /^(1|0)$/, "\$capabilities->rotatable() is a boolean:" . $capabilities->rotatable());
-	ok($capabilities->moz_accessibility_checks() =~ /^(1|0)$/, "\$capabilities->moz_accessibility_checks() is a boolean:" . $capabilities->moz_accessibility_checks());
+	SKIP: {
+		if (!grep /^moz_use_non_spec_compliant_pointer_origin$/, $capabilities->enumerate()) {
+			diag("\$capabilities->moz_use_non_spec_compliant_pointer_origin is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->moz_use_non_spec_compliant_pointer_origin is not supported for " . $capabilities->browser_version(), 1);
+		}
+		ok($capabilities->moz_use_non_spec_compliant_pointer_origin() =~ /^(1|0)$/, "\$capabilities->moz_use_non_spec_compliant_pointer_origin() is a boolean:" . $capabilities->moz_use_non_spec_compliant_pointer_origin());
+	}
+	SKIP: {
+		if (!grep /^moz_accessibility_checks$/, $capabilities->enumerate()) {
+			diag("\$capabilities->moz_accessibility_checks is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->moz_accessibility_checks is not supported for " . $capabilities->browser_version(), 1);
+		}
+		ok($capabilities->moz_accessibility_checks() =~ /^(1|0)$/, "\$capabilities->moz_accessibility_checks() is a boolean:" . $capabilities->moz_accessibility_checks());
+	}
 	ok((ref $capabilities->timeouts()) eq 'Firefox::Marionette::Timeouts', "\$capabilities->timeouts() returns a Firefox::Marionette::Timeouts object");
 	ok($capabilities->timeouts()->page_load() =~ /^\d+$/, "\$capabilities->timeouts->page_load() is an integer:" . $capabilities->timeouts()->page_load());
 	ok($capabilities->timeouts()->script() =~ /^\d+$/, "\$capabilities->timeouts->script() is an integer:" . $capabilities->timeouts()->script());
@@ -960,8 +1062,11 @@ SKIP: {
 	ok($capabilities->browser_version() =~ /^\d+[.]\d+([.]\d+)?$/, "\$capabilities->browser_version() is a major.minor.patch version number:" . $capabilities->browser_version());
 	ok($capabilities->platform_version() =~ /\d+/, "\$capabilities->platform_version() contains a number:" . $capabilities->platform_version());
 	ok($capabilities->moz_profile() =~ /firefox_marionette/, "\$capabilities->moz_profile() contains 'firefox_marionette':" . $capabilities->moz_profile());
-	TODO: {
-		local $TODO = $major_version < 57 ? $capabilities->browser_version() . " probably does not have support for \$capabilities->moz_webdriver_click()" : q[];
+	SKIP: {
+		if (!grep /^moz_webdriver_click$/, $capabilities->enumerate()) {
+			diag("\$capabilities->moz_webdriver_click is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->moz_webdriver_click is not supported for " . $capabilities->browser_version(), 1);
+		}
 		ok($capabilities->moz_webdriver_click() =~ /^(1|0)$/, "\$capabilities->moz_webdriver_click() is a boolean:" . $capabilities->moz_webdriver_click());
 	}
 	ok($capabilities->platform_name() =~ /\w+/, "\$capabilities->platform_version() contains alpha characters:" . $capabilities->platform_name());
@@ -981,9 +1086,30 @@ SKIP: {
 		$install_path =~ s/\//\\/smxg;
 	}
 	diag("Installing extension from $install_path");
-	ok($install_id = $firefox->install($install_path, 1), "Successfully installed an extension:$install_id");
-	ok($firefox->uninstall($install_id), "Successfully uninstalled an extension");
-	ok($firefox->accept_connections(0), "Refusing future connections");
+	eval {
+		$install_id = $firefox->install($install_path, 1);
+	};
+	SKIP: {	
+		my $exception = "$@";
+		chomp $exception;
+		if ((!$install_id) && ($major_version < 52)) {
+			skip("addon:install may not be supported in firefox versions less than 52:$exception", 2);
+		}
+		ok($install_id, "Successfully installed an extension:$install_id");
+		ok($firefox->uninstall($install_id), "Successfully uninstalled an extension");
+	}
+	$result = undef;
+	eval {
+		$result = $firefox->accept_connections(0);
+	};
+	SKIP: {
+		my $exception = "$@";
+		chomp $exception;
+		if ((!$result) && ($major_version < 52)) {
+			skip("Refusing future connections may not be supported in firefox versions less than 52:$exception", 1);
+		}
+		ok($result, "Refusing future connections");
+	}
 	ok($firefox->quit() == 0, "Firefox has closed with an exit status of 0:" . $firefox->child_error());
 }
 
@@ -1008,18 +1134,46 @@ SKIP: {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 8);
+		skip($skip_message, 9);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to different values");
 	my $capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
-	ok($capabilities->page_load_strategy() eq 'none', "\$capabilities->page_load_strategy() is 'none'");
-	ok($capabilities->accept_insecure_certs() == 0, "\$capabilities->accept_insecure_certs() is set to false");
-	TODO: {
-		local $TODO = $major_version < 57 ? $capabilities->browser_version() . " probably does not have support for \$capabilities->moz_webdriver_click()" : q[];
+	SKIP: {
+		if (!grep /^page_load_strategy$/, $capabilities->enumerate()) {
+			diag("\$capabilities->page_load_strategy is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->page_load_strategy is not supported for " . $capabilities->browser_version(), 1);
+		}
+		ok($capabilities->page_load_strategy() eq 'none', "\$capabilities->page_load_strategy() is 'none'");
+	}
+	SKIP: {
+		if (!grep /^accept_insecure_certs$/, $capabilities->enumerate()) {
+			diag("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version(), 1);
+		}
+		ok($capabilities->accept_insecure_certs() == 0, "\$capabilities->accept_insecure_certs() is set to false");
+	}
+	SKIP: {
+		if (!grep /^moz_use_non_spec_compliant_pointer_origin$/, $capabilities->enumerate()) {
+			diag("\$capabilities->moz_use_non_spec_compliant_pointer_origin is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->moz_use_non_spec_compliant_pointer_origin is not supported for " . $capabilities->browser_version(), 1);
+		}
+		ok($capabilities->moz_use_non_spec_compliant_pointer_origin() == 0, "\$capabilities->moz_use_non_spec_compliant_pointer_origin() is set to false");
+	}
+	SKIP: {
+		if (!grep /^moz_webdriver_click$/, $capabilities->enumerate()) {
+			diag("\$capabilities->moz_webdriver_click is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->moz_webdriver_click is not supported for " . $capabilities->browser_version(), 1);
+		}
 		ok($capabilities->moz_webdriver_click() == 0, "\$capabilities->moz_webdriver_click() is set to false");
 	}
-	ok($capabilities->moz_accessibility_checks() == 0, "\$capabilities->moz_accessibility_checks() is set to false");
+	SKIP: {
+		if (!grep /^moz_accessibility_checks$/, $capabilities->enumerate()) {
+			diag("\$capabilities->moz_accessibility_checks is not supported for " . $capabilities->browser_version());
+			skip("\$capabilities->moz_accessibility_checks is not supported for " . $capabilities->browser_version(), 1);
+		}
+		ok($capabilities->moz_accessibility_checks() == 0, "\$capabilities->moz_accessibility_checks() is set to false");
+	}
 	ok(not($capabilities->moz_headless()), "\$capabilities->moz_headless() is set to false");
 	ok($firefox->quit() == 0, "Firefox has closed with an exit status of 0:" . $firefox->child_error());
 }

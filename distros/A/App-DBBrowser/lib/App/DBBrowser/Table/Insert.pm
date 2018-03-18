@@ -6,14 +6,13 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.003';
+our $VERSION = '2.006';
 
-use Cwd            qw( realpath );
-use Encode         qw( encode decode );
-use File::Basename qw( dirname );
-use File::Spec::Functions qw( catfile ); #
-#use File::Temp     qw( tempfile ); ###
-use List::Util     qw( all );
+use Cwd                   qw( realpath );
+use Encode                qw( encode decode );
+use File::Basename        qw( dirname );
+use File::Spec::Functions qw( catfile );
+use List::Util            qw( all );
 
 use List::MoreUtils   qw( first_index any );
 use Encode::Locale    qw();
@@ -28,11 +27,13 @@ use App::DBBrowser::Auxil;
 use App::DBBrowser::Opt;
 use App::DBBrowser::Table;
 
+use open ':encoding(locale)';
+
 
 sub new {
     my ( $class, $info, $opt ) = @_;
     my $sf = { i => $info, o => $opt };
-    $sf->{i}{tmp_copy_paste} = catfile $info->{app_dir}, 'copy_and_paste_tmp_file.csv';
+    $sf->{i}{tmp_copy_paste} = catfile $info->{app_dir}, 'c0py_and_pasTe_tmp_file.csv';
     bless $sf, $class;
 }
 
@@ -205,12 +206,12 @@ sub __from_col_by_col {
 
 
 sub __file_name {
-    my ( $sf, $sql, $file ) = @_;
+    my ( $sf, $sql ) = @_;
 
     FILE: while ( 1 ) {
         my @files;
         if ( $sf->{o}{insert}{max_files} && -e $sf->{i}{input_files} ) {
-            open my $fh_in, '<:encoding(locale)', $sf->{i}{input_files} or die $!;
+            open my $fh_in, '<', $sf->{i}{input_files} or die $!;
             while ( my $fl = <$fh_in> ) {
                 chomp $fl;
                 next if ! -e $fl;
@@ -222,7 +223,7 @@ sub __file_name {
         my $del_file = '  Remove file';
         my $prompt = sprintf "Choose a file  %s:", $sf->__parse_setting( 'file' );
         # Choose
-        $file = choose(
+        my $file = choose(
             [ undef, $add_file, map( '  ' . decode( 'locale_fs', $_ ), @files ), $del_file ],
             { %{$sf->{i}{lyt_stmt_v}}, clear_screen => 1, prompt => $prompt, undef => $sf->{i}{back_config} }
         );
@@ -231,7 +232,7 @@ sub __file_name {
         }
         if ( $file eq $add_file ) {
             my $prompt = sprintf "%s", $sf->__parse_setting( 'file' );
-            my $dir = $sf->{i}{tmp_files_dir} || $sf->{o}{insert}{files_dir};
+            my $dir = $sf->{i}{tmp_files_dir} || $sf->{i}{home_dir};
             # Choose_a_file
             $file = choose_a_file( { dir => $dir, mouse => $sf->{o}{table}{mouse} } );
             if ( ! defined $file || ! length $file ) {
@@ -244,7 +245,7 @@ sub __file_name {
                 while ( @files > $sf->{o}{insert}{max_files} ) {
                     shift @files;
                 }
-                open my $fh_out, '>:encoding(locale)', $sf->{i}{input_files} or die $!;
+                open my $fh_out, '>', $sf->{i}{input_files} or die $!;
                 for my $fl ( @files ) {
                     print $fh_out $fl . "\n";
                 }
@@ -264,7 +265,7 @@ sub __file_name {
             if ( ! defined $idx || ! @$idx ) {
                 next FILE;
             }
-            open my $fh_out, '>:encoding(locale)', $sf->{i}{input_files} or die $!;
+            open my $fh_out, '>', $sf->{i}{input_files} or die $!; # file_name
             for my $i ( 0 .. $#files ) {
                 if ( any { $i == $_ } @$idx ) {
                     next;
@@ -306,14 +307,14 @@ sub from_copy_and_paste {
     my $file = $sf->{i}{tmp_copy_paste};
     #local $SIG{INT} = sub { unlink $file; exit };
     if ( ! eval {
-        open my $fh_in, '>:encoding(' . $sf->{o}{insert}{file_encoding} . ')', $file or die $!;
+        open my $fh_in, '>', $file or die $!;
         # STDIN
         while ( my $row = <STDIN> ) {
             print $fh_in $row;
         }
         close $fh_in;
         die "No input!" if ! -s $file;
-        open my $fh, '<:encoding(' . $sf->{o}{insert}{file_encoding} . ')', $file or die $!;
+        open my $fh, '<', $file or die $!;
         $sql->{insert_into_args} = [];
         my $ok = $sf->__parse_file( $sql, $stmt_typeS, $file, $fh, $sf->{o}{insert}{copy_parse_mode} );
         close $fh;
@@ -335,10 +336,13 @@ sub from_copy_and_paste {
 
 sub from_file {
     my ( $sf, $sql, $stmt_typeS ) = @_;
-    my ( $file, $fh, $parse_mode );
+
     FILE: while ( 1 ) {
-        $file = $sf->__file_name( $sql, $file );
-        return if ! defined $file;
+        my $file = $sf->__file_name( $sql );
+        my $fh;
+        if ( ! defined $file ) {
+            return;
+        }
         if ( $sf->{o}{insert}{file_parse_mode} < 2 && -T $file ) {
             open $fh, '<:encoding(' . $sf->{o}{insert}{file_encoding} . ')', $file or die $!;
             if ( -z $file ) {
@@ -346,16 +350,20 @@ sub from_file {
                 close $fh;
                 next FILE;
             }
-            $parse_mode = $sf->{o}{insert}{file_parse_mode};
+            my $parse_mode = $sf->{o}{insert}{file_parse_mode};
             my $ok = $sf->__parse_file( $sql, $stmt_typeS, $file, $fh, $parse_mode );
             if ( ! $ok ) {
                 next FILE;
             }
             #next if ! @{$sql->{insert_into_args}};
-            return 1;
+            $ok = $sf->__input_filter( $sql, $stmt_typeS );
+            if ( ! $ok ) {
+                next FILE;
+            }
+            return $file;
         }
         else {
-            $parse_mode = 2;
+            my $parse_mode = 2;
             my ( $sheet_count, $sheet_idx );
             SHEET: while ( 1 ) {
                 $sql->{insert_into_args} = [];
@@ -372,7 +380,7 @@ sub from_file {
                     next SHEET if $sheet_count >= 2;
                     next FILE;
                 }
-                return 1;
+                return $file;
             }
         }
     }
@@ -413,7 +421,16 @@ sub __parse_file {
         my $tmp = [];
         local $/;
         seek $fh, 0, 0;
-        push @$tmp, map { [ split /$sf->{o}{split}{i_f_s}/ ] } split /$sf->{o}{split}{i_r_s}/, <$fh>;
+        #push @$tmp, map { [ split /$sf->{o}{split}{i_f_s}/ ] } split /$sf->{o}{split}{i_r_s}/, <$fh>;
+        my $lead  = $sf->{o}{split}{trim_leading};
+        my $trail = $sf->{o}{split}{trim_trailing};
+        for my $row ( split /$sf->{o}{split}{i_r_s}/, <$fh> ) {
+            push @$tmp, [ map {
+                s/^$lead//   if length $lead;
+                s/$trail\z// if length $trail;
+                $_
+            } split /$sf->{o}{split}{i_f_s}/, $row ]; ## docu
+        }
         $ax->print_sql( $sql, $stmt_typeS );
         $sql->{insert_into_args} = $tmp;
         return 1;
@@ -595,7 +612,7 @@ sub __input_filter {
                 no warnings 'uninitialized';
                 for my $i ( @idx ) {
                     $i -= @pre;
-                    push @$tmp_aoa, [ map { s/^\s+|\s+\z//g; $_ } @{$aoa->[$i]} ];
+                    push @$tmp_aoa, [ @{$aoa->[$i]} ];
                 }
             }
             $sql->{insert_into_args} = $tmp_aoa;

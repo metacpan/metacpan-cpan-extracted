@@ -3,10 +3,12 @@ package Pcore::Core::Event::Listener::Pipe::stderr;
 use Pcore -class, -ansi, -const;
 use Pcore::Util::Text qw[remove_ansi];
 use Pcore::Util::Data qw[to_json];
+use Pcore::Util::Scalar qw[is_ref];
+use Time::HiRes qw[];
 
 with qw[Pcore::Core::Event::Listener::Pipe];
 
-has tmpl => ( is => 'ro', isa => Str, default => $BOLD . $GREEN . '[<: $date.strftime("%Y-%m-%d %H:%M:%S.%4N") :>]' . $BOLD . $YELLOW . '[<: $channel :>]' . $BOLD . $RED . '[<: $level :>]' . $RESET . ' <: $title | raw :><: $text | raw :>' );
+has tmpl => ( is => 'ro', isa => Str, default => $BOLD . $GREEN . '[<: $date.strftime("%Y-%m-%d %H:%M:%S.%4N") :>]' . $BOLD . $YELLOW . '[<: $channel :>]' . $BOLD . $RED . '[<: $level :>]' . $RESET . ' <: $title | raw :>' . $LF . '<: $text | raw :>' );
 
 has _tmpl => ( is => 'ro', isa => InstanceOf ['Pcore::Util::Template'], init_arg => undef );
 has _is_ansi => ( is => 'ro', isa => Bool, init_arg => undef );
@@ -34,7 +36,7 @@ sub sendlog ( $self, $ev ) {
     # sendlog
     {
         # prepare date object
-        local $ev->{date} = P->date->from_epoch( $ev->{timestamp} );
+        local $ev->{date} = P->date->from_epoch( $ev->{timestamp} // Time::HiRes::time() );
 
         # prepare text
         local $ev->{text};
@@ -42,13 +44,13 @@ sub sendlog ( $self, $ev ) {
         if ( defined $ev->{data} ) {
 
             # serialize reference
-            $ev->{text} = $LF . ( ref $ev->{data} ? to_json( $ev->{data}, readable => 1 )->$* : $ev->{data} );
+            $ev->{text} = is_ref $ev->{data} ? to_json( $ev->{data}, readable => 1 )->$* : $ev->{data};
 
             # indent
             $ev->{text} =~ s/^/$INDENT/smg;
 
             # remove all trailing "\n"
-            local $/ = '';
+            local $/ = q[];
 
             chomp $ev->{text};
         }
@@ -70,13 +72,11 @@ sub sendlog ( $self, $ev ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 40                   | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |    3 | 42                   | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 37, 40               | Variables::ProhibitLocalVars - Variable declared as "local"                                                    |
+## |    2 | 39, 42               | Variables::ProhibitLocalVars - Variable declared as "local"                                                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 51                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 9                    | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 11                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

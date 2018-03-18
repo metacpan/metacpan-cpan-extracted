@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.51
+    Version 0.53
 
 SYNOPSIS
 
@@ -83,12 +83,13 @@ SUBROUTINES/METHODS
 
     Navigates the current browsing context to the given URI and waits for
     the document to load or the session's page timeout duration to elapse
-    before returning. This method returns itself to aid in chaining methods
+    before returning, which, by default is 5 minutes. This method returns
+    itself to aid in chaining methods
 
  uri
 
     returns the current URI of current top level browsing context for
-    Desktop. It is equivalent to the javascript 'document.location.href'
+    Desktop. It is equivalent to the javascript document.location.href
 
  title
 
@@ -100,7 +101,8 @@ SUBROUTINES/METHODS
     the first parameter and returns the first element that matches this
     expression.
 
-    This method is subject to the implicit timeout.
+    This method is subject to the implicit timeout, which, by default is 0
+    seconds.
 
         use Firefox::Marionette();
     
@@ -123,7 +125,8 @@ SUBROUTINES/METHODS
     as the first parameter and returns the first element with a matching
     'id' property.
 
-    This method is subject to the implicit timeout.
+    This method is subject to the implicit timeout, which, by default is 0
+    seconds.
 
         use Firefox::Marionette();
     
@@ -143,7 +146,8 @@ SUBROUTINES/METHODS
 
     This method returns the first element with a matching 'name' property.
 
-    This method is subject to the implicit timeout.
+    This method is subject to the implicit timeout, which, by default is 0
+    seconds.
 
         use Firefox::Marionette();
     
@@ -165,7 +169,8 @@ SUBROUTINES/METHODS
     as the first parameter and returns the first element with a matching
     'class' property.
 
-    This method is subject to the implicit timeout.
+    This method is subject to the implicit timeout, which, by default is 0
+    seconds.
 
         use Firefox::Marionette();
     
@@ -187,7 +192,8 @@ SUBROUTINES/METHODS
     first parameter and returns the first element that matches that
     selector.
 
-    This method is subject to the implicit timeout.
+    This method is subject to the implicit timeout, which, by default is 0
+    seconds.
 
         use Firefox::Marionette();
     
@@ -208,7 +214,8 @@ SUBROUTINES/METHODS
     <https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName> as
     the first parameter and returns the first element with this tag name.
 
-    This method is subject to the implicit timeout.
+    This method is subject to the implicit timeout, which, by default is 0
+    seconds.
 
         use Firefox::Marionette();
     
@@ -228,7 +235,8 @@ SUBROUTINES/METHODS
     accepts a text string as the first parameter and returns the first link
     element that has a matching link text.
 
-    This method is subject to the implicit timeout.
+    This method is subject to the implicit timeout, which, by default is 0
+    seconds.
 
         use Firefox::Marionette();
     
@@ -248,7 +256,8 @@ SUBROUTINES/METHODS
     accepts a text string as the first parameter and returns the first link
     element that has a partially matching link text.
 
-    This method is subject to the implicit timeout.
+    This method is subject to the implicit timeout, which, by default is 0
+    seconds.
 
         use Firefox::Marionette();
     
@@ -431,14 +440,16 @@ SUBROUTINES/METHODS
             # luckily!
         }
 
-    The executing javascript is subject to the scripts timeout.
+    The executing javascript is subject to the scripts timeout, which, by
+    default is 30 seconds.
 
  async_script
 
     accepts a scalar containing a javascript function that is executed in
     the browser. This method returns itself to aid in chaining methods.
 
-    The executing javascript is subject to the scripts timeout.
+    The executing javascript is subject to the scripts timeout, which, by
+    default is 30 seconds.
 
  html
 
@@ -498,7 +509,7 @@ SUBROUTINES/METHODS
     
         $firefox->find_name('lucky')->click();
     
-        $firefox->await(sub { $firefox->find_partial('Download') })->click();
+        $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click()
 
  bye
 
@@ -516,7 +527,7 @@ SUBROUTINES/METHODS
     
         $firefox->find_name('lucky')->click();
     
-        $firefox->bye(sub { $firefox->find_name('lucky') })->await(sub { $firefox->find_partial('Download') })->click();
+        $firefox->bye(sub { $firefox->find_name('lucky') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click()
 
  sleep_time_in_ms
 
@@ -554,16 +565,16 @@ SUBROUTINES/METHODS
     causes the browser to traverse one step backward in the joint history
     of the current browsing context. The browser will wait for the one step
     backward to complete or the session's page timeout duration to elapse
-    before returning. This method returns itself to aid in chaining
-    methods.
+    before returning, which, by default is 5 minutes. This method returns
+    itself to aid in chaining methods.
 
  forward
 
     causes the browser to traverse one step forward in the joint history of
     the current browsing context. The browser will wait for the one step
     forward to complete or the session's page timeout duration to elapse
-    before returning. This method returns itself to aid in chaining
-    methods.
+    before returning, which, by default is 5 minutes. This method returns
+    itself to aid in chaining methods.
 
  active_frame
 
@@ -620,8 +631,8 @@ SUBROUTINES/METHODS
 
     refreshes the current page. The browser will wait for the page to
     completely refresh or the session's page timeout duration to elapse
-    before returning. This method returns itself to aid in chaining
-    methods.
+    before returning, which, by default is 5 minutes. This method returns
+    itself to aid in chaining methods.
 
  alert_text
 
@@ -710,7 +721,8 @@ SUBROUTINES/METHODS
 
     accepts a element as the first parameter and sends a 'click' to it. The
     browser will wait for any page load to complete or the session's page
-    timeout duration to elapse before returning.
+    timeout duration to elapse before returning, which, by default is 5
+    minutes.
 
  timeouts
 

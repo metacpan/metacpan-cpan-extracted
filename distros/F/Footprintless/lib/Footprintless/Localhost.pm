@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Localhost;
-$Footprintless::Localhost::VERSION = '1.27';
+$Footprintless::Localhost::VERSION = '1.28';
 # ABSTRACT: A localhost alias resolver
 # PODNAME: Footprintless::Localhost
 
@@ -138,7 +138,7 @@ Footprintless::Localhost - A localhost alias resolver
 
 =head1 VERSION
 
-version 1.27
+version 1.28
 
 =head1 DESCRIPTION
 

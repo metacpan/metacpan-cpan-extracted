@@ -35,5 +35,5 @@ requires:
   Perl::Download::FTP: '0.03'
   Text::CSV_XS: '0'
   perl: '5.014000'
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

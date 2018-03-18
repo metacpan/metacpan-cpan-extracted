@@ -1,85 +1,88 @@
 Revision history for WWW::Google::PageSpeedOnline
 
-0.24   Sun Jul 02 09:45:00 2017
-       - Added test scripts (t/meta-json.t and t/meta-yml.t).
+0.25  Tue Mar 13 18:05:00 2018
+      - Improved method exporting.
 
-0.23    Tue Jun 27 11:30:00 2017
-        - Added key 'provides' to the Makefile.PL script.
+0.24  Sun Jul 02 09:45:00 2017
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
 
-0.22    Sat Jun 17 09:45:00 2017
-        - Added $AUTHORITY
-        - Tidied up attribute definitions.
+0.23  Tue Jun 27 11:30:00 2017
+      - Added key 'provides' to the Makefile.PL script.
 
-0.21    Tue Nov 17 10:50:00 2015
-        - Added LICENSE file.
+0.22  Sat Jun 17 09:45:00 2017
+      - Added $AUTHORITY
+      - Tidied up attribute definitions.
 
-0.20    Sun Oct 11 11:25:00 2015
-        - Upgraded to use WWW::Google::UserAgent v0.20.
+0.21  Tue Nov 17 10:50:00 2015
+      - Added LICENSE file.
 
-0.19    Sun Sep 13 06:25:00 2015
-        - Added link to the official Google API document.
+0.20  Sun Oct 11 11:25:00 2015
+      - Upgraded to use WWW::Google::UserAgent v0.20.
 
-0.18    Fri Sep 04 10:05:00 2015
-        - Added support for Google PageSpeedOnline API v2.0.
+0.19  Sun Sep 13 06:25:00 2015
+      - Added link to the official Google API document.
 
-0.17    Thu Aug 20 11:00:00 2015
-        - Upgraded to use WWW::Google::UserAgent v0.18.
+0.18  Fri Sep 04 10:05:00 2015
+      - Added support for Google PageSpeedOnline API v2.0.
 
-0.16    Sat Aug 08 12:00:00 2015
-        - Upgraded to use WWW::Google::UserAgent v0.17.
+0.17  Thu Aug 20 11:00:00 2015
+      - Upgraded to use WWW::Google::UserAgent v0.18.
 
-0.15    Sat Jan 17 10:30:00 2015
-        - Removed SIGNATURE file.
-        - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
-        - Updated Copyright year information.
+0.16  Sat Aug 08 12:00:00 2015
+      - Upgraded to use WWW::Google::UserAgent v0.17.
 
-0.14    Sat Aug 30 01:25:18 2014
-        - Added section "REPOSITORY" to the pod document.
-        - Added key "META_MERGE" to Makefile.PL file.
+0.15  Sat Jan 17 10:30:00 2015
+      - Removed SIGNATURE file.
+      - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+      - Updated Copyright year information.
 
-0.13    Tue Jul 29 15:34:10 2014
-        - Updated Makefile.PL to make pre-requisite WWW::Google::UserAgent v0.07
+0.14  Sat Aug 30 01:25:18 2014
+      - Added section "REPOSITORY" to the pod document.
+      - Added key "META_MERGE" to Makefile.PL file.
 
-0.12    Tue Jul 29 00:32:00 2014
-        - Updated Makefile.PL to make pre-requisite WWW::Google::UserAgent v0.06
+0.13  Tue Jul 29 15:34:10 2014
+      - Updated Makefile.PL to make pre-requisite WWW::Google::UserAgent v0.07
 
-0.11    Mon Jul 28 14:20:00 2014
-        - Updated Makefile.PL to make pre-requisite WWW::Google::UserAgent v0.03
+0.12  Tue Jul 29 00:32:00 2014
+      - Updated Makefile.PL to make pre-requisite WWW::Google::UserAgent v0.06
 
-0.10    Sun Jul 27 11:30:20 2014
-        - Made use of WWW::Google::UserAgent v0.02
-        - Deleted Build.PL
+0.11  Mon Jul 28 14:20:00 2014
+      - Updated Makefile.PL to make pre-requisite WWW::Google::UserAgent v0.03
 
-0.09    Sun Jul 27 05:10:29 2014
-        - Complete re-structured the code using Moo.
-        - Present the result in object format.
+0.10  Sun Jul 27 11:30:20 2014
+      - Made use of WWW::Google::UserAgent v0.02
+      - Deleted Build.PL
 
-0.08    Wed Aug 17 09:53:11 2011
-        - Fixed method _get_url() to add URL.
-        - Fixed the typo in the default locale and others in the list of all
-          supported locales.
+0.09  Sun Jul 27 05:10:29 2014
+      - Complete re-structured the code using Moo.
+      - Present the result in object format.
 
-0.07    Mon Aug 08 12:56:11 2011
-        - Made Readonly v1.03 as minimum requirement.
-        - Prepared the distribution using the Module::Signature v0.68.
+0.08  Wed Aug 17 09:53:11 2011
+      - Fixed method _get_url() to add URL.
+      - Fixed the typo in the default locale and others in the list of all
+        supported locales.
 
-0.06    Thu May 19 11:00:00 2011
-        - Updated text for "LICENSE AND COPYRIGHT".
+0.07  Mon Aug 08 12:56:11 2011
+      - Made Readonly v1.03 as minimum requirement.
+      - Prepared the distribution using the Module::Signature v0.68.
 
-0.05    Fri May 13 17:58:21 2011
-        - Added DISCLAIMER section to the pod.
+0.06  Thu May 19 11:00:00 2011
+      - Updated text for "LICENSE AND COPYRIGHT".
 
-0.04    Thu May 12 16:51:02 2011
-        - Importing Moose and its family first.
+0.05  Fri May 13 17:58:21 2011
+      - Added DISCLAIMER section to the pod.
 
-0.03    Thu May 12 13:12:11 2011
-        - Made the package immutable.
+0.04  Thu May 12 16:51:02 2011
+      - Importing Moose and its family first.
 
-0.02    Thu May 12 09:32:19 2011
-        - Added namespace::clean to the pre-requisite list of modules in Build.PL and Makefile.PL.
-        - Removed 'use strict; use warnings;' as 'use Moose;' gets that by default.
-        - Up the version of Moose and Moose::Util::TypeConstraints to 2.006.
-        - Added no Moose; to remove keywords it export.
+0.03  Thu May 12 13:12:11 2011
+      - Made the package immutable.
 
-0.01    Wed May 11 10:43:01 2011
-        - First version, released.
+0.02  Thu May 12 09:32:19 2011
+      - Added namespace::clean to the pre-requisite list of modules in Build.PL and Makefile.PL.
+      - Removed 'use strict; use warnings;' as 'use Moose;' gets that by default.
+      - Up the version of Moose and Moose::Util::TypeConstraints to 2.006.
+      - Added no Moose; to remove keywords it export.
+
+0.01  Wed May 11 10:43:01 2011
+      - First version, released.

@@ -16,8 +16,11 @@ inc/Module/Install/Metadata.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 Makefile.PL
-MANIFEST
-META.yml			Module meta-data (added by MakeMaker)
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+MYMETA.json
+MYMETA.yml
 PKCS12.pm
 PKCS12.xs
 README

@@ -1,0 +1,16 @@
+Perl 5.6 or later plus the following additional Perl modules are required:
+
+* Compress::Zlib (included in Perl 5.10 and later)
+* Date::Parse (part of TimeDate)
+* Net::NNTP (included in Perl 5.8 and later)
+* Text::Template
+
+[gzip](https://www.gnu.org/software/gzip/) and
+[bzip2](http://www.bzip.org/) are required.  Both are generally available
+with current operating systems, possibly as supplemental packages.
+
+process-control expects to be fed file names and message IDs of control
+messages on standard input and therefore needs to be run from a news
+server or some other source of control messages.  A minimalist news server
+like tinyleaf is suitable for this (I wrote tinyleaf, available as part of
+[INN](https://www.eyrie.org/~eagle/software/inn/), for this purpose).

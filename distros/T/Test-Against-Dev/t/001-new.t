@@ -1,5 +1,5 @@
 # -*- perl -*-
-# t/001-load.t - check module loading and create testing directory
+# t/001-new.t - check module loading and create testing directory
 use strict;
 use warnings;
 

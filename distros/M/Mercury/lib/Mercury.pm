@@ -1,5 +1,5 @@
 package Mercury;
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 # ABSTRACT: Main broker application class
 
 #pod =head1 SYNOPSIS
@@ -119,7 +119,7 @@ Mercury - Main broker application class
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -148,7 +148,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Doug Bell.
+This software is copyright (c) 2018 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

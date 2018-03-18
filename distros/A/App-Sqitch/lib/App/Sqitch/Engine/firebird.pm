@@ -18,7 +18,7 @@ use namespace::autoclean;
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = '0.9996';
+our $VERSION = '0.9997';
 
 has registry_uri => (
     is       => 'ro',
@@ -676,7 +676,7 @@ sub change_id_for {
 
         # Find earliest by change name.
         my $ids = $dbh->selectcol_arrayref(qq{
-            SELECT FIRST 1 change_id
+            SELECT change_id
               FROM changes
              WHERE project = ?
                AND changes.change  = ?
@@ -972,7 +972,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 License
 
-Copyright (c) 2012-2015 iovation Inc.
+Copyright (c) 2012-2018 iovation Inc.
 
 Copyright (c) 2013 Ștefan Suciu
 

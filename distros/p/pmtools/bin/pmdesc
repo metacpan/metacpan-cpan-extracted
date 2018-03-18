@@ -7,38 +7,38 @@ use warnings;
 use FindBin qw($Bin);
 use Getopt::Long;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 # ------ define variables
-my $errors;	# error count
-my $fullpath;	# full module path
-my $module;	# module name
-my $use_pod;	# use .pod instead of .pm file for systems with split POD/pm
-my $vers;	# module version
+my $errors;     # error count
+my $fullpath;   # full module path
+my $module;     # module name
+my $use_pod;    # use .pod instead of .pm file for systems with split POD/pm
+my $vers;       # module version
 
 BEGIN { $^W = 1 }
 
 GetOptions ("splitpod"  => \$use_pod); 
-print "use_pod = $use_pod\n";
 
 $errors = 0;
 
 MODULE: for $module (@ARGV) {
     if ($use_pod) {
-        $fullpath = `$Bin/podpath $module`;
+        $fullpath = `$^X $Bin/podpath $module`;
     } else {
-        $fullpath = `$Bin/pmpath $module`;
+        $fullpath = `$^X $Bin/pmpath $module`;
     }
     if ($?) {
-	$errors++;
-	next;
+        $errors++;
+        next;
     } 
     chomp $fullpath;
     unless (open(POD, "< $fullpath")) {
-	warn "$0: cannot open $fullpath: $!";
-	$errors++;
-	next;
+        warn "$0: cannot open $fullpath: $!";
+        $errors++;
+        next;
     } 
+
     local $/ = '';
     local $_;
     while (<POD>) {
@@ -54,7 +54,8 @@ MODULE: for $module (@ARGV) {
                 print "$module ";
             }
             print "- $_\n";
-	    next MODULE;
+
+            next MODULE;
         } 
     } 
     print "no description found\n";
@@ -64,7 +65,12 @@ MODULE: for $module (@ARGV) {
 sub getversion {
     my $module = shift;
 
-    my $vers = `$^X -S $Bin/pmvers $module 2>/dev/null`;
+    my $vers;
+    if ( $^O eq "MSWin32" ) {
+        $vers = `$^X -S $Bin/pmvers $module 2>NUL`;
+    } else {
+        $vers = `$^X -S $Bin/pmvers $module 2>/dev/null`;
+    }
     return if $?;
     chomp $vers;
     return $vers;
@@ -81,8 +87,8 @@ pmdesc - print out version and whatis description of perl modules
 =head1 DESCRIPTION
 
 Given one or more module names, show the version number (if known)
-and the `whatis' line, that is, the NAME section's description,
-typically used for generation whatis databases.
+and the 'whatis' line, that is, the NAME section's description,
+typically used for generation of whatis databases.
 
 =head1 EXAMPLES
 
@@ -112,7 +118,7 @@ pmvers(1)
 
 Copyright (C) 1999 Tom Christiansen.
 
-Copyright (C) 2006-2014 Mark Leighton Fisher.
+Copyright (C) 2006-2014, 2018 Mark Leighton Fisher.
 
 =head1 LICENSE
 

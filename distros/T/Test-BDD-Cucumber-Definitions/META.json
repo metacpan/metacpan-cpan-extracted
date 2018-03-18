@@ -1,12 +1,12 @@
 {
-   "abstract" : "The great new Test::BDD::Cucumber::Definitions!",
+   "abstract" : "a collection of step definitions for Test Driven Development",
    "author" : [
-      "Mikhail Ivanov <m.ivanych@gmail.com>"
+      "Mikhail Ivanov C<< <m.ivanych@gmail.com> >>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.16",
    "license" : [
-      "artistic_2"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -16,7 +16,13 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
       ]
    },
    "prereqs" : {
@@ -27,14 +33,23 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
          }
       },
       "runtime" : {
          "requires" : {
             "Archive::Zip" : "0",
             "Const::Fast" : "0",
-            "DDP" : "0",
+            "Data::Printer" : "0",
             "HTTP::Response" : "0",
             "HTTP::Tiny" : "0",
             "Hash::MultiValue" : "0",
@@ -50,20 +65,90 @@
          }
       }
    },
+   "provides" : {
+      "Test::BDD::Cucumber::Definitions" : {
+         "file" : "lib/Test/BDD/Cucumber/Definitions.pm",
+         "version" : "0.26"
+      },
+      "Test::BDD::Cucumber::Definitions::HTTP" : {
+         "file" : "lib/Test/BDD/Cucumber/Definitions/HTTP.pm",
+         "version" : "0.26"
+      },
+      "Test::BDD::Cucumber::Definitions::HTTP::In" : {
+         "file" : "lib/Test/BDD/Cucumber/Definitions/HTTP/In.pm",
+         "version" : "0.26"
+      },
+      "Test::BDD::Cucumber::Definitions::HTTP::Ru" : {
+         "file" : "lib/Test/BDD/Cucumber/Definitions/HTTP/Ru.pm",
+         "version" : "0.26"
+      },
+      "Test::BDD::Cucumber::Definitions::Struct" : {
+         "file" : "lib/Test/BDD/Cucumber/Definitions/Struct.pm",
+         "version" : "0.26"
+      },
+      "Test::BDD::Cucumber::Definitions::Struct::In" : {
+         "file" : "lib/Test/BDD/Cucumber/Definitions/Struct/In.pm",
+         "version" : "0.26"
+      },
+      "Test::BDD::Cucumber::Definitions::Struct::Ru" : {
+         "file" : "lib/Test/BDD/Cucumber/Definitions/Struct/Ru.pm",
+         "version" : "0.26"
+      },
+      "Test::BDD::Cucumber::Definitions::TBCD::In" : {
+         "file" : "lib/Test/BDD/Cucumber/Definitions/TBCD/In.pm",
+         "version" : "0.26"
+      },
+      "Test::BDD::Cucumber::Definitions::TBCD::Ru" : {
+         "file" : "lib/Test/BDD/Cucumber/Definitions/TBCD/Ru.pm",
+         "version" : "0.26"
+      },
+      "Test::BDD::Cucumber::Definitions::Types" : {
+         "file" : "lib/Test/BDD/Cucumber/Definitions/Types.pm",
+         "version" : "0.26"
+      },
+      "Test::BDD::Cucumber::Definitions::Validator" : {
+         "file" : "lib/Test/BDD/Cucumber/Definitions/Validator.pm",
+         "version" : "0.26"
+      },
+      "Test::BDD::Cucumber::Definitions::Var" : {
+         "file" : "lib/Test/BDD/Cucumber/Definitions/Var.pm",
+         "version" : "0.26"
+      },
+      "Test::BDD::Cucumber::Definitions::Var::In" : {
+         "file" : "lib/Test/BDD/Cucumber/Definitions/Var/In.pm",
+         "version" : "0.26"
+      },
+      "Test::BDD::Cucumber::Definitions::Var::Ru" : {
+         "file" : "lib/Test/BDD/Cucumber/Definitions/Var/Ru.pm",
+         "version" : "0.26"
+      },
+      "Test::BDD::Cucumber::Definitions::Zip" : {
+         "file" : "lib/Test/BDD/Cucumber/Definitions/Zip.pm",
+         "version" : "0.26"
+      },
+      "Test::BDD::Cucumber::Definitions::Zip::In" : {
+         "file" : "lib/Test/BDD/Cucumber/Definitions/Zip/In.pm",
+         "version" : "0.26"
+      },
+      "Test::BDD::Cucumber::Definitions::Zip::Ru" : {
+         "file" : "lib/Test/BDD/Cucumber/Definitions/Zip/Ru.pm",
+         "version" : "0.26"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "web" : "https://github.com/ivanych/Test-BDD-Cucumber-Definitions/issues"
       },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
+      "homepage" : "https://github.com/ivanych/Test-BDD-Cucumber-Definitions",
       "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/ivanych/Test-BDD-Cucumber-Definitions.git",
+         "url" : "git://github.com/ivanych/Test-BDD-Cucumber-Definitions.git",
          "web" : "https://github.com/ivanych/Test-BDD-Cucumber-Definitions"
       }
    },
-   "version" : "0.21",
+   "version" : "0.26",
+   "x_contributors" : [
+      "Mikhail Ivanov <m.ivanych@gmail.com>"
+   ],
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

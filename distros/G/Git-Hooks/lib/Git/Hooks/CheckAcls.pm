@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckAcls;
 # ABSTRACT: Git::Hooks plugin for branch/tag access control
-$Git::Hooks::CheckAcls::VERSION = '2.7.0';
+$Git::Hooks::CheckAcls::VERSION = '2.8.1';
 use 5.010;
 use utf8;
 use strict;
@@ -114,6 +114,7 @@ sub check_affected_refs {
     return 1 if $git->im_admin();
 
     foreach my $ref ($git->get_affected_refs()) {
+        next unless $git->is_reference_enabled($ref);
         check_ref($git, $ref)
             or return 0;
     }
@@ -141,7 +142,7 @@ Git::Hooks::CheckAcls - Git::Hooks plugin for branch/tag access control
 
 =head1 VERSION
 
-version 2.7.0
+version 2.8.1
 
 =head1 SYNOPSIS
 
@@ -201,6 +202,10 @@ Git::Hooks::CheckAcls - Git::Hooks plugin for branch/tag access control
 =head1 CONFIGURATION
 
 The plugin is configured by the following git options.
+
+It can be disabled for specific references via the C<githooks.ref> and
+C<githooks.noref> options about which you can read in the L<Git::Hooks>
+documentation.
 
 =head2 githooks.checkacls.acl ACL
 

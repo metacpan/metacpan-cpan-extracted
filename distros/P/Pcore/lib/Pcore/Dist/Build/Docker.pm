@@ -86,7 +86,12 @@ sub init ( $self, $args ) {
 sub set_from_tag ( $self, $tag ) {
     my $dockerfile = P->file->read_bin( $self->dist->root . 'Dockerfile' );
 
-    if ( $dockerfile->$* =~ s/^FROM\s+([^:]+)(.*?)$/FROM $1:$tag/sm ) {
+    if ( !defined $tag ) {
+        $dockerfile->$* =~ /^FROM\s+([^:]+)(.*?)$/sm;
+
+        say qq[Docker base image is "$1$2"];
+    }
+    elsif ( $dockerfile->$* =~ s/^FROM\s+([^:]+)(.*?)$/FROM $1:$tag/sm ) {
         if ( "$1$2" eq "$1:$tag" ) {
             say q[Docker base image wasn't changed];
         }
@@ -534,12 +539,12 @@ sub trigger_build ( $self, $tag ) {
 ## |    3 | 23                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 117                  | * Subroutine "status" with high complexity score (26)                                                          |
-## |      | 291                  | * Subroutine "build_status" with high complexity score (31)                                                    |
+## |      | 122                  | * Subroutine "status" with high complexity score (26)                                                          |
+## |      | 296                  | * Subroutine "build_status" with high complexity score (31)                                                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 476                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 481                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 260, 339, 469        | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 265, 344, 474        | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

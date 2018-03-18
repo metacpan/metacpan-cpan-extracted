@@ -18,7 +18,7 @@ use File::Temp qw( tempdir );
 use Test2::API qw( context );
 
 # ABSTRACT: Test Clustericious commands
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.29'; # VERSION
 
 
 our @EXPORT      = qw( extract_data mirror requires run_ok generate_port note_file clean_file create_symlink );
@@ -360,7 +360,7 @@ Test::Clustericious::Command - Test Clustericious commands
 
 =head1 VERSION
 
-version 1.27
+version 1.29
 
 =head1 SYNOPSIS
 

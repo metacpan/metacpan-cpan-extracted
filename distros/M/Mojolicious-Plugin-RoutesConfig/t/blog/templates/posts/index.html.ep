@@ -1,0 +1,17 @@
+% layout 'default';
+% title 'Welcome';
+<h2><%= $title %></h2>
+
+% for my $p (@$posts) {
+<h3><%= $p->{title} %></h3>
+<p><%= $p->{body} %></p>
+% }
+<p>
+  %=  'Controller: ' . stash->{controller} . '; Action: ' . stash->{action};
+  <%= link_to 'Click here' => url_for %> to reload the page or
+  <%= link_to 'here' => '/index.html' %> to move forward to a static page.
+  % if (config 'perldoc') {
+    To learn more, you can also browse through the documentation
+    <%= link_to 'here' => '/perldoc' %>.
+  % }
+</p>

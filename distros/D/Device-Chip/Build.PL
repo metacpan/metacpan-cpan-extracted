@@ -16,9 +16,10 @@ my $build = Module::Build->new(
       'Test::More' => '0.88', # done_testing
       'Test::Builder::Tester' => 0,
    },
-   auto_configure_requires => 0, # Don't add M::B to configure_requires
+   configure_requires => {
+      'Module::Build' => '0.4004', # test_requires
+   },
    license => 'perl',
-   create_makefile_pl => 'small',
    create_license => 1,
    create_readme  => 1,
 );

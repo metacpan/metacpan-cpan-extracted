@@ -1,9 +1,12 @@
 package Gearman::Util;
 use version ();
-$Gearman::Util::VERSION = version->declare("2.004.0013");
+$Gearman::Util::VERSION = version->declare("2.004.014");
 
 use strict;
 use warnings;
+
+# for sake of _read_sock
+no warnings "recursion";
 
 # man errno
 # Resource temporarily unavailable

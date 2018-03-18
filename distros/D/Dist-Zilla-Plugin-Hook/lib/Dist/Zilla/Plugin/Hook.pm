@@ -2,7 +2,7 @@
 #
 #   file: lib/Dist/Zilla/Plugin/Hook.pm
 #
-#   Copyright © 2015, 2016 Van de Bugger.
+#   Copyright © 2015, 2016, 2018 Van de Bugger.
 #
 #   This file is part of perl-Dist-Zilla-Plugin-Hook.
 #
@@ -16,6 +16,8 @@
 #
 #   You should have received a copy of the GNU General Public License along with
 #   perl-Dist-Zilla-Plugin-Hook. If not, see <http://www.gnu.org/licenses/>.
+#
+#   SPDX-License-Identifier: GPL-3.0-or-later
 #
 #   ---------------------------------------------------------------------- copyright and license ---
 
@@ -57,7 +59,7 @@ use namespace::autoclean;
 use version 0.77;
 
 # ABSTRACT: Write C<Dist::Zilla> plugin directly in F<dist.ini>
-our $VERSION = 'v0.8.3'; # VERSION
+our $VERSION = 'v0.8.4'; # VERSION
 
 with 'Dist::Zilla::Role::Plugin';
 with 'Dist::Zilla::Role::ErrorLogger' => { -version => 0.005 };
@@ -69,7 +71,7 @@ __PACKAGE__->meta->make_immutable();
 
 #pod =head1 COPYRIGHT AND LICENSE
 #pod
-#pod Copyright (C) 2015, 2016 Van de Bugger
+#pod Copyright (C) 2015, 2016, 2018 Van de Bugger
 #pod
 #pod License GPLv3+: The GNU General Public License version 3 or later
 #pod <http://www.gnu.org/licenses/gpl-3.0.txt>.
@@ -84,7 +86,11 @@ __PACKAGE__->meta->make_immutable();
 #
 #   file: doc/what.pod
 #
+#   Copyright © 2015, 2016, 2018 Van de Bugger.
+#
 #   This file is part of perl-Dist-Zilla-Plugin-Hook.
+#
+#   SPDX-License-Identifier: GPL-3.0-or-later
 #
 #   ------------------------------------------------------------------------------------------------
 
@@ -114,7 +120,7 @@ Dist::Zilla::Plugin::Hook - Write C<Dist::Zilla> plugin directly in F<dist.ini>
 
 =head1 VERSION
 
-Version v0.8.3, released on 2016-11-25 22:04 UTC.
+Version v0.8.4, released on 2018-03-15 21:44 UTC.
 
 =head1 WHAT?
 
@@ -161,7 +167,7 @@ Van de Bugger <van.de.bugger@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015, 2016 Van de Bugger
+Copyright (C) 2015, 2016, 2018 Van de Bugger
 
 License GPLv3+: The GNU General Public License version 3 or later
 <http://www.gnu.org/licenses/gpl-3.0.txt>.

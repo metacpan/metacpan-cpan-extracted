@@ -1,5 +1,5 @@
 {
-   "abstract" : "Run blocking code in a process using an unholy combination of forks and Mojolicious",
+   "abstract" : "(Deprecated) Run blocking code in a process using an unholy combination of forks and Mojolicious",
    "author" : [
       "Graham Ollis <plicease@cpan.org>"
    ],
@@ -66,7 +66,9 @@
          "web" : "https://github.com/clustericious/Test-Clustericious-Blocking"
       }
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "0.07",
+   "x_deprecated" : 1,
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01",
+   "x_use_unsafe_inc" : 0
 }
 

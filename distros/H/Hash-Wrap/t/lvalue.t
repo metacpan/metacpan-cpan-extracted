@@ -5,8 +5,13 @@ use Test2::API qw/ context /;
 
 use Scalar::Util 'blessed';
 
-skip_all( "lvalue support requires perl 5.16 or later" )
-  if $] lt '5.016000';
+use Hash::Wrap ();
+
+my $HAS_LVALUE;
+
+BEGIN {
+    $HAS_LVALUE = $] ge '5.01600';
+}
 
 sub test_generator {
 
@@ -44,43 +49,62 @@ sub test_generator {
     $ctx->release;
 }
 
-use if $] ge '5.016000',
-  'Hash::Wrap' => ( { -as => 'lvalued', -lvalue => 1 } );
+if ( $HAS_LVALUE ) {
 
-subtest 'default' => sub {
+    {
+        package My::Test::LValue::1;
 
-    test_generator( \&lvalued );
+        Hash::Wrap->import( { -as => 'lvalued', -lvalue => 1 } );
 
-};
+    }
+    subtest 'default' => sub {
+        test_generator( \&My::Test::LValue::1::lvalued );
+    };
 
-use if $] ge '5.016000',
-  'Hash::Wrap' => ( {
-    -as     => 'lvalued_created_class',
-    -lvalue => 1,
-    -class  => 'My::CreatedClass::Lvalue',
-    -create => 1
-} );
 
-subtest 'create class' => sub {
+    {
+        package My::Test::LValue::2;
 
-    test_generator( \&lvalued_created_class );
-};
+        Hash::Wrap->import( {
+            -as     => 'lvalued_created_class',
+            -lvalue => 1,
+            -class  => 'My::CreatedClass::Lvalue',
+        } );
+    }
 
-{
-    package My::Bogus::LValue::Class;
-    use parent 'Hash::Wrap::Base';
+    subtest 'create class' => sub {
+        test_generator( \&My::Test::LValue::2::lvalued_created_class );
+    };
+
+
 }
 
-like(
-    dies {
-        Hash::Wrap->import( {
-                -as     => 'bogus_lvalue_class',
-                -lvalue => 1,
-                -class  => 'My::Bogus::LValue::Class'
-            } )
-    },
-    qr/does not add ':lvalue'/,
-    'bad lvalue class'
-);
+else {
+
+    ok(
+        lives {
+            package My::Test::LValue::3;
+
+            Hash::Wrap->import( { -as => 'lvalued', -lvalue => 1 } );
+
+            1;
+        },
+        "Perl < 5.16, lvalue => 1"
+    ) or note $@;
+
+    like(
+        dies {
+            package My::Test::LValue::4;
+
+            Hash::Wrap->import( { -as => 'lvalued', -lvalue => -1 } );
+
+            1;
+        },
+        qr/lvalue accessors require Perl 5.16 or later/,
+        "Perl < 5.16, lvalue => -1"
+    );
+
+}
+
 
 done_testing;

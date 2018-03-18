@@ -17,7 +17,6 @@
 #include "spvm_hash.h"
 #include "spvm_list.h"
 #include "spvm_util_allocator.h"
-#include "spvm_constant_pool.h"
 #include "spvm_runtime.h"
 #include "spvm_op.h"
 #include "spvm_sub.h"
@@ -26,13 +25,11 @@
 #include "spvm_my.h"
 #include "spvm_type.h"
 #include "spvm_field.h"
-#include "spvm_constant_pool.h"
 #include "spvm_object.h"
 #include "spvm_api.h"
 #include "spvm_opcode_builder.h"
 #include "spvm_jitcode_builder.h"
 #include "spvm_list.h"
-#include "spvm_constant_pool_builder.h"
 #include "spvm_jitcode_builder.h"
 #include "spvm_string_buffer.h"
 
@@ -2867,9 +2864,6 @@ new_len(...)
   // API
   SPVM_API* api = SPVM_XS_UTIL_get_api();
   
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
-  SPVM_COMPILER* compiler = runtime->compiler;
-  
   int32_t length = (int32_t)SvIV(sv_length);
   
   // Element type id
@@ -2887,7 +2881,6 @@ new_len(...)
   const char* type_name = SvPV_nolen(sv_type_name);
   
   int32_t type_id = api->get_type_id(api, type_name);
-  SPVM_TYPE* type = SPVM_LIST_fetch(compiler->types, type_id);
   
   if (type_id < 0) {
     croak("Unknown type %s. Type must be used in SPVM module at least one(SPVM::Core::Object::Array::Object::new())", type_name);
@@ -3181,21 +3174,6 @@ compile(...)
   XPUSHs(sv_compile_success);
   
   XSRETURN(1);
-}
-
-SV*
-build_constant_pool(...)
-  PPCODE:
-{
-  (void)RETVAL;
-
-  // Get compiler
-  SPVM_COMPILER* compiler = (SPVM_COMPILER*)SvIV(SvRV(get_sv("SPVM::COMPILER", 0)));
-  
-  // Build constant pool
-  SPVM_CONSTANT_POOL_BUILDER_build_constant_pool(compiler);
-  
-  XSRETURN(0);
 }
 
 SV*

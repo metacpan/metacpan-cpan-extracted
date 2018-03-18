@@ -20,6 +20,7 @@ t/00-report-prereqs.t
 t/01-load.t
 t/commands.t
 t/human.t
+t/pg_worker.t
 t/pod.t
 t/pod_coverage.t
 xt/author/pod-syntax.t

@@ -8,13 +8,18 @@
 # ------ pragmas
 use strict;
 use warnings;
+use FindBin qw($Bin);
 
 our $VERSION = '2.0.0';
 
-system("$^X -S basepods");
-open(PROG, "$^X -S modpods |") || die "can't fork: $!";
+system("$^X -S $Bin/basepods");
+open(PROG, "$^X -S $Bin/modpods |") || die "can't fork: $!";
 while (<PROG>) {
-    print unless /site_perl/;
+    if ( $^O eq "MSWin32" ) {
+        print unless /\/site\//;
+    } else {
+        print unless /site_perl/;
+    }
 } 
 close PROG;
 

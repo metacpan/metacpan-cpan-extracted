@@ -1,9 +1,85 @@
 ==================================================
-Changes from 2015-10-14 00:00:00 +0000 to present.
+Changes from 2016-03-17 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 5.4 at 2017-10-13 19:36:25 +0000
+version 5.5 at 2018-03-17 06:01:47 +0000
+----------------------------------------
+
+  Change: 757dec9e648d077759da9a19ebdf3ed343df82f1
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-03-16 23:01:25 +0000
+
+    Remove no longer necessary test 
+
+  Change: d63a1b823fcd72116e731cbfc45387290b60e769
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-03-16 22:49:15 +0000
+
+    Documentation updated for 5.5 release 
+
+  Change: b1709e428bf9031e99b196ed6c865b02535ddb66
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-03-16 22:43:04 +0000
+
+    Bugfix and better replica management
+
+    * BUGFIX: es_index_strip_date() now removes everything after the date
+
+    string.
+
+    es-daily-index-maintenance.pl
+
+    * --replicas-* options aliased to --replica-* * Smarter handling of math
+    around replica calculation * Disable --bloom option entirely as it's
+    deprecated by Elastic 
+
+  Change: aabba5ad9a1c26ee5aa631f4ea81d887bf98463a
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-02-21 23:04:18 +0000
+
+    Pod and Perl::Critic fixes 
+
+  Change: 1dcaaa7ea8b7b8b89387692dd969a18fd385bd23
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-02-21 20:58:15 +0000
+
+    Conversion to Ref::Util and Types::Tiny
+
+    Fix paths for the shebang line so the installer will be able to install the
+    scripts with the correct Perl binary path. Add a first pass at nested query
+    syntax 
+
+  Change: 722e812a7365f9a81aa0d1df5d61a3a1dcb695ed
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-02-21 20:52:06 +0000
+
+    Update the QS::IP expander to make it more intelligent.
+
+    If a field ends in *_ip, allow CIDR queries against the field. This skips
+    renaming the field from "src_ip" to "src_ip_numeric" and is now an inline
+    replacement. This enhances simplifies the CLI queries.
+
+    The docs were not accurate, so now the example and documentation are valid. 
+
+  Change: 8e7e34fe1690349a0485ec271c85e966c699b0d9
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-12-03 23:42:00 +0000
+
+    Disallow tabs in my files. 
+
+  Change: 938d5f9e9bf387d304388bf524348dd4b0d51fac
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-10-25 17:07:47 +0000
+
+    Allow --show to be more flexible
+
+    * Unbind from the index fields since this operates on the source
+
+    document * Change to an array so you can add multiple --show's 
+
+----------------------------------------
+version 5.4 at 2017-10-13 19:36:20 +0000
 ----------------------------------------
 
   Change: c31b5f39953589c497f4374be9c22f36a2514dc2
@@ -362,362 +438,6 @@ version 4.6 at 2016-04-04 18:06:24 +0000
 
     Version 4.5 docs. 
 
-----------------------------------------
-version 4.5 at 2016-03-06 05:32:34 +0000
-----------------------------------------
-
-  Change: 52d2a4e79167971c83048b7ceb479f1e29836f0d
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-03-05 21:32:34 +0000
-
-    Better field resolution for es_index_fields()
-
-    Fields lookup should now be accurate Minor UI Improvements to es-search.pl
-    and es-copy-index.pl 
-
-  Change: b40ab9ae068fe1cadbe1bf0e96e7422ede0ed941
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-02-26 23:15:57 +0000
-
-    Documentation updates for 4.4 
-
-----------------------------------------
-version 4.4 at 2016-02-27 07:12:47 +0000
-----------------------------------------
-
-  Change: 4a832f92659ebc575d2de0948dbb01b8e349138b
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-02-26 23:12:47 +0000
-
-    Bug fixes in es-copy-index.pl
-
-    Found some bugs around error handling as I convinced it throw errors. These
-    have been fixed and it should be ready fo general use. 
-
-  Change: eb446d391c937da9c29917db8b1cf39e2c2eada9
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-02-26 23:00:28 +0000
-
-    Use fake_home for compiles to catch problems not apparent with my RC files. 
-
-  Change: 764878a671d8ae548c2bbb0cdb83b0c7d28ae6b4
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-02-26 23:00:28 +0000
-
-    Testing for index name methods.
-
-    Added tests for expected results when parsing certain index names. This
-    flushed out a bug in the handling of index names already. 
-
-  Change: c6db63a4555205e1649f11c9226124117420626b
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-02-26 22:43:19 +0000
-
-    Corrected es_index_bases() to match expected behavior
-
-    Subtle bug in calculating the bases for each index was flushed out during
-    creation of tests. Bases are free words, combined with '-'s maintaining
-    order in the index name, but without regard for offset.
-
-    For example: type-dcid-2016.02.26-tags has the following bases:
-
-    type
-
-    type-dcid
-
-    type-dcid-tags
-
-    dcid
-
-    dcid-tags
-
-    tags
-
-    This behaviour is now correct. 
-
-  Change: a798f5c3aa8f29dcba51964174e79ae99770802e
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-02-26 21:58:53 +0000
-
-    es-search.pl updated to use more flexible methods
-
-    Several underlying functions were dramatically enhanced, so es-search.pl is
-    now making full use of them.
-
-    Important changes:
-
-    es-search.pl --bases
-
-    This command now uses a call to es_indices(_all => 1), so all
-
-    available index bases will be displayed. Additionally, using
-
-    --verbose it's possible to see the age-ranges of the indexes in the
-
-    output so calls to the --base <base> --days <days> will do what you
-
-    expect.
-
-    es-search.pl --base <base> --fields
-
-    This command now uses the enhanced es_index_fields() function which
-
-    has support for full path key names.
-
-    General
-
-    Because of the enhancements to es_index_fields(), every search,
-
-    aggregate, and display check for key names is more accurate. If you
-
-    have been annoyed with '--top requires a valid key' errors in the
-
-    pat, this patch fixes most of those issues. 
-
-  Change: 198070c98534a5ef868d63fdb9b57cc4120d7577
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-02-26 21:56:04 +0000
-
-    es_index_fields(index-name) dramatically improved.
-
-    Previous versions of the module broken down with nested fields. This change
-    adds support for full path key lookups and magic around handling weirdness
-    is the document structure. All keys are now accessible via their full path
-    names and any unique leaf key is still available by it's unique name. 
-
-  Change: 618afcf75d5d36002846c765bb6eecfb2e0f36c0
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-02-26 21:52:34 +0000
-
-    es_index_bases(index-name) returns bases
-
-    Converted es_indices() to use _cat API. Added es_index_bases(index-name) to
-    return a list of base tags that the index passed matches. The logic is much
-    more consistent and less prone to error.
-
-    es_index_days_old() can now returns undef if it can't figure out an index
-    age instead of -1. This is due to timezones. There are cases where an index
-    can have a negative age. 
-
-  Change: 1cf798a0033ce7d62e3e60d79bf4805762d19ffe
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-02-26 21:49:46 +0000
-
-    Add support for _cat API with es_request()
-
-    Elastijk does not support responses from ElasticSearch that do not pass a
-    JSON decode. To allow _cat API calls through the es_request(), I am using
-    Hijk directly from this module and encapsulating the _cat API responses in
-    an ARRAY reference. 
-
-  Change: 239b115a53c97fd43bbf743c5ebc8ed835f2b12c
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-02-26 21:46:56 +0000
-
-    Fix uninitialized errors in es-copy-index.pl
-
-    Replaced several places in the es-copy-index.pl where $OPT{to} was
-    referenced with $HOST{to}, which is always defined. 
-
-  Change: 7d36f5af7fa1a27b2fb7663c5400eac133b1d9aa
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-02-26 21:45:44 +0000
-
-    Long overdue, disable bloom filters.
-
-    es-daily-index-maintenance.pl now manages the the: index.codec.bloom.load
-    setting and will set it to false for indexes older than 1 day. 
-
-----------------------------------------
-version 4.3 at 2016-02-27 00:50:57 +0000
-----------------------------------------
-
-  Change: fdd6b0f48cbb0fe376b99ff1b6331f63cc5970b7
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-02-26 16:50:57 +0000
-
-    Fix typos in es-copy-index.pl 
-
-  Change: 6b475f713ab9dab705d50f915bd11bf5ce86f5df
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-02-23 11:36:39 +0000
-
-    Ignore generated Changes file. 
-
-----------------------------------------
-version 4.2 at 2016-02-23 03:50:22 +0000
-----------------------------------------
-
-  Change: 6026b686c0dd3f49e51fdaf59df2c0d425fc15f0
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-02-22 19:50:22 +0000
-
-    Fix bug not handling undefined values from clone_merge. 
-
-  Change: 5aa28edbdbcf378a342624b7b5aff691d25cdad2
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-02-22 19:44:09 +0000
-
-    Fix es-nodes.pl when viewing tribed nodes. 
-
-  Change: b7157d2a40dbddc6eaab4def1d7e577e8a783afb
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-02-20 22:59:26 +0000
-
-    Customized the Support POD Section. 
-
-  Change: 5dc11f625b534fd42c102cc0e76ba5e128509611
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-02-20 21:52:47 +0000
-
-    Changes generation is now using Git. 
-
-  Change: 3b83ad99bd1409a64897f66cc033de2d7c5d96ba
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-02-20 21:32:43 +0000
-
-    GitHub allows downloading of releases, no reason to stash these in the
-    repository. 
-
-----------------------------------------
-version 4.1 at 2016-02-21 05:28:15 +0000
-----------------------------------------
-
-  Change: 8001843554a4818fb4235078e01ef6d3c3bd854e
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-02-20 21:28:15 +0000
-
-    Version Hack for _optimize/_forcemerge 
-
-  Change: 24a765fc0bb945ccb82af408a77acdd39ab82c60
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-02-20 21:19:34 +0000
-
-    Allow changes to the CopyIndexes.mkdn file 
-
-  Change: 68ab17e0b2cbcf29308385f5c2ae4b51e7eabf86
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-02-20 21:17:00 +0000
-
-    Testing for ::QueryString parsing. 
-
-  Change: f892f3286ce9ba37703d4c36d20f3e4c2bb35489
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-02-20 14:04:09 +0000
-
-    Generated contributors file. 
-
-  Change: 02b35e658796399844e00f321c170354ee6fe18e
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-02-20 14:01:48 +0000
-
-    Contributors is now generated with Pod::Weaver 
-
-  Change: 9c56685c71715dde217107bf1247d35d887bf244
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-02-20 14:01:37 +0000
-
-    Mail map for contributors. 
-
-  Change: e08ec62703e4811fefda2722842de6196e21cd4b
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-02-20 14:01:19 +0000
-
-    Pull contributors from git. 
-
-  Change: ae9b3f892d5a8e8074289c184e72406a3ffcb6d3
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-02-20 00:31:39 +0000
-
-    Major overhaul of the CLI query string parsing
-
-    + App::ElasticSearch::Utilities::QueryString adds dynamic parsing to the
-
-    query string and makes it pluggable + App::ElasticSearch::Utilities::Query
-    represents a query object and
-
-    provides short cuts and safety nets for some common queries +
-    es-copy-index.pl on steroids. Can now slice, dice, and make french
-
-    fries in 30 different cuts. Now uses the ::QueryString framework. +
-    es-search.pl uses the ::QueryString framework. +
-    examples/parse-query-string.pl show how the framework would parse
-
-    a given query string. + Massive documentation overhaul and update. 
-
-  Change: c90bf5fb8d1bf4edfcc18e0b3107cc42fbd3cd32
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-02-19 20:51:42 +0000
-
-    Migrate globals to config merging. 
-
-  Change: 0152d7b9d0f379bd80b5362782ba4ca909100526
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-02-11 11:37:04 +0000
-
-    Provide a :config export 
-
-  Change: c644518c1d8bef2f752f1784a0eca9dd983b6310
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-02-11 11:37:04 +0000
-
-    If we can't determine the ES version, exit immediately. 
-
-  Change: a4f64b5cf12dca767d3ec4741b712ec0767b98d3
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2016-02-11 19:33:22 +0000
-
-    Fix markdown generation errors. 
-
-  Change: 490ca9eaf40787209a9d659f634de2da3ab398db
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-02-01 18:33:57 +0000
-
-    Add a block-size option fot es-copy-index.pl Handle stray AND|OR|NOT in
-    query string. 
-
-----------------------------------------
-version 4.0 at 2016-01-27 23:37:44 +0000
-----------------------------------------
-
-  Change: 30f4436209b9bdbd2e7f5f18f5bcbff416341a06
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-01-27 15:37:44 +0000
-
-    es-search.pl: Remove relying on @fields hierarchy. 
-
-  Change: 2bab7219bf5638e1e4f238d1b6db4e177c291b03
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-01-27 15:12:05 +0000
-
-    Drop support for pre-1.0 ElasticSearch Migrate es-search.pl to using only
-    aggregations 
-
-  Change: cd8e263d6d8a2be637477e3da4c81961e20da960
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-01-27 14:07:24 +0000
-
-    Add version hacks to map for newer versions of ES. Remove all deprecated
-    _cluster API. 
-
-  Change: ab6847b22840e51f576469c01bfdf7d90b155a4f
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2015-10-29 23:10:13 +0000
-
-    Adding authordeps in the dist.ini 
-
-  Change: 831c1cd779a01f503026eaaba750e419765b1480
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2015-10-29 23:01:39 +0000
-
-    Adding TravisCI to the project. 
-
-  Change: c9856b116258d8e989d8d7354808f1871e205115
-  Author: Brad Lhotsky <brad.lhotsky@booking.com>
-  Date : 2015-05-21 15:58:25 +0000
-
-    Fix typo in documentation 
-
 =================================================
-Plus 48 releases after 2015-10-14 00:00:00 +0000.
+Plus 51 releases after 2016-03-17 00:00:00 +0000.
 =================================================

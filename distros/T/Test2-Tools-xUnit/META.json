@@ -1,0 +1,62 @@
+{
+   "abstract" : "Perl xUnit framework built on Test2::Workflow",
+   "author" : [
+      "Tim Retout <t.retout@cv-library.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test2-Tools-xUnit",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B" : "0",
+            "Test2::Workflow" : "0",
+            "Test2::Workflow::Runner" : "0",
+            "Test2::Workflow::Task::Action" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "Test2::API" : "0",
+            "Test2::Plugin::SRand" : "0",
+            "Test2::Tools::Basic" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test2::Tools::xUnit" : {
+         "file" : "lib/Test2/Tools/xUnit.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cv-library/Test2-Tools-xUnit/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/cv-library/Test2-Tools-xUnit.git",
+         "web" : "https://github.com/cv-library/Test2-Tools-xUnit"
+      }
+   },
+   "version" : "0.003",
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

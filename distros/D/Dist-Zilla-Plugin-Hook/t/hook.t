@@ -3,7 +3,7 @@
 #
 #   file: t/hook.t
 #
-#   Copyright © 2015, 2016 Van de Bugger.
+#   Copyright © 2015, 2016, 2018 Van de Bugger.
 #
 #   This file is part of perl-Dist-Zilla-Plugin-Hook.
 #
@@ -18,12 +18,13 @@
 #   You should have received a copy of the GNU General Public License along with
 #   perl-Dist-Zilla-Plugin-Hook. If not, see <http://www.gnu.org/licenses/>.
 #
+#   SPDX-License-Identifier: GPL-3.0-or-later
+#
 #   ---------------------------------------------------------------------- copyright and license ---
 
 use strict;
 use warnings;
-use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC';
-use lib 't/lib';
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use lib 't/lib';
 
 use Test::Deep qw{ re isa };
 use Test::More;
@@ -52,7 +53,7 @@ sub skip_if_missed($) {
 };
 
 my $abort = isa( 'Dist::Zilla::Role::ErrorLogger::Exception::Abort' );
-    # REQUIRE: Dist::Zilla::Role::ErrorLogger v0.9.0
+    ## REQUIRE: Dist::Zilla::Role::ErrorLogger v0.9.0
 
 #   `$self` and `$zilla` variables are defined.
 run_me '$self and $zilla' => {

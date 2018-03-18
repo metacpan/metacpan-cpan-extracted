@@ -1,5 +1,14 @@
 Revision history for Tickit-Widgets
 
+0.29    2018-03-13 13:49:27
+        [CHANGES]
+         * Have Tickit::Widget::Entry also delete back a word on
+           Ctrl-Backspace
+
+        [BUGFIXES]
+         * Fix off-by-one error calculating the size of a
+           Tickit::Widget::GridBox
+
 0.28    2017-11-30 13:32:58
         [CHANGES]
          * Add SingleChildWidget->remove (RT122231)

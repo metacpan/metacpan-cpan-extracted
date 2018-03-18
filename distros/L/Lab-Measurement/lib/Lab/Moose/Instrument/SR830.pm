@@ -1,6 +1,7 @@
 package Lab::Moose::Instrument::SR830;
+$Lab::Moose::Instrument::SR830::VERSION = '3.623';
 #ABSTRACT: Stanford Research SR830 Lock-In Amplifier
-$Lab::Moose::Instrument::SR830::VERSION = '3.622';
+
 use 5.010;
 use Moose;
 use Moose::Util::TypeConstraints qw/enum/;
@@ -11,7 +12,6 @@ use Lab::Moose::Instrument::Cache;
 use Carp;
 use namespace::autoclean;
 use POSIX qw/log10 ceil floor/;
-
 
 extends 'Lab::Moose::Instrument';
 
@@ -83,34 +83,28 @@ sub set_phase {
 }
 
 
-cache xy => ( getter => 'get_xy' );
-
 sub get_xy {
     my ( $self, %args ) = validated_getter( \@_ );
     my $retval = $self->query( command => "SNAP?1,2", %args );
     my ( $x, $y ) = split( ',', $retval );
     chomp $y;
-    return $self->cached_xy( { x => $x, y => $y } );
+    return { x => $x, y => $y };
 }
-
-cache rphi => ( getter => 'get_rphi' );
 
 sub get_rphi {
     my ( $self, %args ) = validated_getter( \@_ );
     my $retval = $self->query( command => "SNAP?3,4", %args );
     my ( $r, $phi ) = split( ',', $retval );
     chomp $phi;
-    return $self->cached_rphi( { r => $r, phi => $phi } );
+    return { r => $r, phi => $phi };
 }
-
-cache xyrphi => ( getter => 'get_xyrphi' );
 
 sub get_xyrphi {
     my ( $self, %args ) = validated_getter( \@_ );
     my $retval = $self->query( command => "SNAP?1,2,3,4", %args );
     my ( $x, $y, $r, $phi ) = split( ',', $retval );
     chomp( $x, $y, $r, $phi );
-    return $self->cached_xyrphi( { x => $x, y => $y, r => $r, phi => $phi } );
+    return { x => $x, y => $y, r => $r, phi => $phi };
 }
 
 cache tc => ( getter => 'get_tc' );
@@ -402,7 +396,7 @@ Lab::Moose::Instrument::SR830 - Stanford Research SR830 Lock-In Amplifier
 
 =head1 VERSION
 
-version 3.622
+version 3.623
 
 =head1 SYNOPSIS
 
@@ -720,6 +714,7 @@ This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2018       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

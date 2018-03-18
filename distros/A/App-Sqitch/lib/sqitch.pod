@@ -104,6 +104,8 @@ of a database with Sqitch.
 
 =item * L<Vertica Tutorial|sqitchtutorial-vertica>
 
+=item * L<Exasol Tutorial|sqitchtutorial-exasol>
+
 =back
 
 =item L<PDX.pm Presentation|https://speakerdeck.com/theory/sane-database-change-management-with-sqitch>
@@ -252,6 +254,8 @@ The database engine to use. Supported engines include:
 
 =item * C<vertica> - L<Vertica|https://my.vertica.com/>
 
+=item * C<exasol> - L<Exasol|https://www.exasol.com/>
+
 =back
 
 =item C<--registry>
@@ -334,6 +338,8 @@ directory where the system-wide configuration file lives, as well as change
 script templates.
 
 =item C<--quiet>
+
+  sqitch --quiet
 
 Suppress normal output messages. Error messages will still be emitted to
 C<STDERR>. Overrides any value specified by C<--verbose>.
@@ -544,7 +550,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 License
 
-Copyright (c) 2012-2015 iovation Inc.
+Copyright (c) 2012-2018 iovation Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

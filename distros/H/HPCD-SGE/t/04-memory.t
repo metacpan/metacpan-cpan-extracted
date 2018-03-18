@@ -18,8 +18,6 @@ use Test::More
         ? (tests => 6)
         : (skip_all => "SGE not available on this system");
 
-my $cluster = 'SGE';
-
 use FindBin;
 $ENV{PATH} = "$FindBin::Bin/../bin:$ENV{PATH}";
 

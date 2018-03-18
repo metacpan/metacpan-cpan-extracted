@@ -4,7 +4,7 @@
       "Olivier Duclos <odc@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -52,5 +52,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#mojo"
    },
-   "version" : "1.29"
+   "version" : "1.30",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,5 +1,5 @@
 package Yancy::Backend::Dbic;
-our $VERSION = '0.022';
+our $VERSION = '1.001';
 # ABSTRACT: A backend for DBIx::Class schemas
 
 #pod =head1 SYNOPSIS
@@ -87,7 +87,7 @@ our $VERSION = '0.022';
 #pod
 #pod =cut
 
-use Mojo::Base 'Mojo';
+use Mojo::Base '-base';
 use Scalar::Util qw( looks_like_number );
 use Mojo::Loader qw( load_class );
 
@@ -118,6 +118,12 @@ sub _rs {
     return $rs;
 }
 
+sub _find {
+    my ( $self, $coll, $id ) = @_;
+    my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
+    return $self->dbic->resultset( $coll )->find( { $id_field => $id } );
+}
+
 sub create {
     my ( $self, $coll, $params ) = @_;
     my $created = $self->dbic->resultset( $coll )->create( $params );
@@ -127,7 +133,8 @@ sub create {
 
 sub get {
     my ( $self, $coll, $id ) = @_;
-    return $self->_rs( $coll )->find( $id );
+    my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
+    return $self->_rs( $coll )->find( { $id_field => $id } );
 }
 
 sub list {
@@ -150,7 +157,7 @@ sub list {
 
 sub set {
     my ( $self, $coll, $id, $params ) = @_;
-    if ( my $row = $self->dbic->resultset( $coll )->find( $id ) ) {
+    if ( my $row = $self->_find( $coll, $id ) ) {
         $row->set_columns( $params );
         if ( $row->is_changed ) {
             $row->update;
@@ -164,7 +171,7 @@ sub delete {
     my ( $self, $coll, $id ) = @_;
     # We assume that if we can find the row by ID, that the delete will
     # succeed
-    if ( my $row = $self->dbic->resultset( $coll )->find( $id ) ) {
+    if ( my $row = $self->_find( $coll, $id ) ) {
         $row->delete;
         return 1;
     }
@@ -194,8 +201,16 @@ sub read_schema {
                 push @{ $schema{ $table }{ required } }, $column;
             }
         }
-        my @keys = $source->primary_columns;
-        if ( $keys[0] ne 'id' ) {
+
+        my @keys = (
+            $source->primary_columns,
+            (
+                map { @$_ } grep { scalar( @$_ ) == 1 }
+                map { [ $source->unique_constraint_columns( $_ ) ] }
+                $source->unique_constraint_names
+            ),
+        );
+        if ( @keys && $keys[0] ne 'id' ) {
             $schema{ $table }{ 'x-id-field' } = $keys[0];
         }
     }
@@ -248,7 +263,7 @@ Yancy::Backend::Dbic - A backend for DBIx::Class schemas
 
 =head1 VERSION
 
-version 0.022
+version 1.001
 
 =head1 SYNOPSIS
 

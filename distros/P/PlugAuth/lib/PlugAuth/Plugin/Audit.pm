@@ -13,7 +13,7 @@ use DateTime;
 with 'PlugAuth::Role::Plugin';
 
 # ABSTRACT: Audit log for authentication/authorization
-our $VERSION = '0.38'; # VERSION
+our $VERSION = '0.39'; # VERSION
 
 
 with 'PlugAuth::Role::Plugin';
@@ -150,7 +150,7 @@ PlugAuth::Plugin::Audit - Audit log for authentication/authorization
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 SYNOPSIS
 

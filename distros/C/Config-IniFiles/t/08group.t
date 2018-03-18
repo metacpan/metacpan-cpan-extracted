@@ -19,8 +19,8 @@ my $members;
 
 # TEST
 is_deeply(
-    [$ini->GroupMembers("group")],
-    ["group member one", "group member two", "group member three"],
+    [ $ini->GroupMembers("group") ],
+    [ "group member one", "group member two", "group member three" ],
     "Group members with spaces",
 );
 

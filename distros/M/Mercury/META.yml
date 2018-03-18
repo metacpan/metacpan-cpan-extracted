@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,37 +28,37 @@ no_index:
 provides:
   Mercury:
     file: lib/Mercury.pm
-    version: '0.015'
+    version: '0.016'
   Mercury::Command::mercury:
     file: lib/Mercury/Command/mercury.pm
-    version: '0.015'
+    version: '0.016'
   Mercury::Command::mercury::broker:
     file: lib/Mercury/Command/mercury/broker.pm
-    version: '0.015'
+    version: '0.016'
   Mercury::Controller::Bus:
     file: lib/Mercury/Controller/Bus.pm
-    version: '0.015'
+    version: '0.016'
   Mercury::Controller::PubSub:
     file: lib/Mercury/Controller/PubSub.pm
-    version: '0.015'
+    version: '0.016'
   Mercury::Controller::PubSub::Cascade:
     file: lib/Mercury/Controller/PubSub/Cascade.pm
-    version: '0.015'
+    version: '0.016'
   Mercury::Controller::PushPull:
     file: lib/Mercury/Controller/PushPull.pm
-    version: '0.015'
+    version: '0.016'
   Mercury::Pattern::Bus:
     file: lib/Mercury/Pattern/Bus.pm
-    version: '0.015'
+    version: '0.016'
   Mercury::Pattern::PubSub:
     file: lib/Mercury/Pattern/PubSub.pm
-    version: '0.015'
+    version: '0.016'
   Mercury::Pattern::PushPull:
     file: lib/Mercury/Pattern/PushPull.pm
-    version: '0.015'
+    version: '0.016'
   Mojolicious::Plugin::Mercury:
     file: lib/Mojolicious/Plugin/Mercury.pm
-    version: '0.015'
+    version: '0.016'
 requires:
   File::Basename: '0'
   File::Spec::Functions: '0'
@@ -70,11 +70,11 @@ resources:
   bugtracker: https://github.com/preaction/Mercury/issues
   homepage: https://github.com/preaction/Mercury
   repository: https://github.com/preaction/Mercury.git
-version: '0.015'
+version: '0.016'
 x_authority: cpan:PREACTION
 x_contributors:
   - 'Joel Berger <joel.a.berger@gmail.com>'
   - 'Justin Hunter <justin.d.hunter@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'William Lindley <wlindley@wlindley.com>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -4,12 +4,15 @@ package App::ElasticSearch::Utilities::QueryString;
 use strict;
 use warnings;
 
+our $VERSION = '5.5'; # VERSION
+
 use App::ElasticSearch::Utilities qw(:config);
 use App::ElasticSearch::Utilities::Query;
 use CLI::Helpers qw(:output);
 use Module::Pluggable::Object;
 use Moo;
-use Sub::Quote;
+use Ref::Util qw(is_arrayref);
+use Types::Standard qw(ArrayRef);
 
 use namespace::autoclean;
 
@@ -19,17 +22,17 @@ my %TRAILING = map { $_ => 1 } qw( AND OR NOT );
 
 
 has search_path => (
-    is => 'rw',
-    isa => quote_sub(q{die "Not an ARRAY" unless ref $_[0] eq 'ARRAY'}),
+    is      => 'rw',
+    isa     => ArrayRef,
     default => sub {[]},
 );
 
 
 has plugins => (
-    is => 'ro',
-    isa => quote_sub(q{die "Not an ARRAY" unless ref $_[0] eq 'ARRAY' }),
+    is      => 'ro',
+    isa     => ArrayRef,
     builder => '_build_plugins',
-    lazy => 1,
+    lazy    => 1,
 );
 
 
@@ -42,7 +45,7 @@ sub expand_query_string {
         foreach my $p (@{ $self->plugins }) {
             my $res = $p->handle_token($token);
             if( defined $res ) {
-                push @processed, ref $res eq 'ARRAY' ? @{$res} : $res;
+                push @processed, is_arrayref($res) ? @{$res} : $res;
                 next TOKEN;
             }
         }
@@ -66,6 +69,11 @@ sub expand_query_string {
         elsif( exists $part->{condition} ) {
             my $target = $invert ? 'must_not' : 'must';
             $query->add_bool( $target => $part->{condition} );
+            @dangling=();
+        }
+        elsif( exists $part->{nested} ) {
+            $query->nested($part->{nested}{query});
+            $query->nested_path($part->{nested}{path});
             @dangling=();
         }
         # Carry over the Inversion for instance where we jump out of the QS
@@ -115,7 +123,7 @@ App::ElasticSearch::Utilities::QueryString - CLI query string fixer
 
 =head1 VERSION
 
-version 5.4
+version 5.5
 
 =head1 SYNOPSIS
 
@@ -157,6 +165,8 @@ The token expansion plugins can return undefined, which is basically a noop on t
 The plugin can return a hash reference, which marks that token as handled and no other plugins
 receive that token.  The hash reference may contain:
 
+=over 2
+
 =item query_string
 
 This is the rewritten bits that will be reassembled in to the final query string.
@@ -185,6 +195,8 @@ This is used for bare words like "not", "or", and "and" to denote that these ter
 beginning or end of the query_string.  This allows the final pass of the query_string builder to strip these
 words to prevent syntax errors.
 
+=back
+
 =head1 Extended Syntax
 
 The search string is pre-analyzed before being sent to ElasticSearch.  The following plugins
@@ -200,9 +212,9 @@ The following barewords are transformed:
 
 =head2 App::ElasticSearch::Utilities::QueryString::IP
 
-If a field is an IP address wild card, it is transformed:
+If a field is an IP address uses CIDR Notation, it's expanded to a range query.
 
-    src_ip:10.* => src_ip:[10.0.0.0 TO 10.255.255.255]
+    src_ip:10.0/8 => src_ip:[10.0.0.0 TO 10.255.255.255]
 
 =head2 App::ElasticSearch::Utilities::Underscored
 

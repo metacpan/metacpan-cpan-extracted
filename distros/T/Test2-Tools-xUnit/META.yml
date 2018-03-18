@@ -1,0 +1,35 @@
+---
+abstract: 'Perl xUnit framework built on Test2::Workflow'
+author:
+  - 'Tim Retout <t.retout@cv-library.co.uk>'
+build_requires:
+  Scalar::Util: '0'
+  Test2::API: '0'
+  Test2::Plugin::SRand: '0'
+  Test2::Tools::Basic: '0'
+  Test2::V0: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test2-Tools-xUnit
+provides:
+  Test2::Tools::xUnit:
+    file: lib/Test2/Tools/xUnit.pm
+    version: '0.003'
+requires:
+  B: '0'
+  Test2::Workflow: '0'
+  Test2::Workflow::Runner: '0'
+  Test2::Workflow::Task::Action: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/cv-library/Test2-Tools-xUnit/issues
+  repository: git://github.com/cv-library/Test2-Tools-xUnit.git
+version: '0.003'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,5 +1,4 @@
 .travis.yml
-Build.PL
 Changes
 examples/is
 examples/ok
@@ -16,7 +15,6 @@ lib/Test/Inter.pod
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-META.json
 README
 t/file.1.exp
 t/file.2.exp
@@ -34,4 +32,6 @@ t/tests.t
 t/use_ok.1.t
 t/use_ok.2.t
 t/use_ok.3.t
-META.yml
+t/version.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2018 -- leonerd@leonerd.org.uk
 
 package Device::FTDI::SPI;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::FTDI::MPSSE );
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 NAME
 
@@ -59,6 +59,10 @@ constructor also accepts:
 
 The required SPI mode. Should be 0, 1, 2, or 3.
 
+=item wordsize => INT
+
+The required wordsize. Values up to 32 are supported.
+
 =item clock_rate => INT
 
 Sets the initial value of the bit clock rate; as per L</set_clock_rate>.
@@ -77,6 +81,8 @@ sub new
     $self->set_spi_mode( $args{mode} ) if defined $args{mode};
 
     $self->set_clock_rate( $args{clock_rate} ) if defined $args{clock_rate};
+
+    $self->set_wordsize( $args{wordsize} // 8 );
 
     $self->set_open_collector( 0, 0 );
 
@@ -160,6 +166,128 @@ sub set_spi_mode
     $self->write_gpio( DBUS, $idle, SPI_SCK );
 }
 
+=head2 set_wordsize
+
+    $spi->set_wordsize( $bits )->get
+
+Sets the number of bits per word, used by the L</write>, L</read> and
+L</readwrite> methods. Normally, this value is 8 but it may be set anywhere
+between 1 and 32.
+
+When set to a value smaller than 8, only the least significant bits of each
+word are used.
+
+When set to a value greater than 8, the string values operated on will consist
+of wide characters, having codepoints greater than 255. Care should be taken
+not to treat these strings as Unicode text strings, as in general the values
+they contain may not be compatible with Unicode.
+
+=cut
+
+sub set_wordsize
+{
+    my $self = shift;
+    my ( $size ) = @_;
+
+    croak "Invalid wordsize" unless $size > 0 and $size <= 32 and $size == int $size;
+
+    $self->{wordsize} = $size;
+
+    return Future->done;
+}
+
+sub _reshape_words_out
+{
+    my $self = shift;
+    my ( $words ) = @_;
+
+    my $wordsize = $self->{wordsize};
+    return $words if $wordsize == 8;
+
+    my $lsbfirst = $self->{mpsse_setup} & Device::FTDI::MPSSE::CMD_LSBFIRST;
+
+    # Build bytes to emit by tracking bits specifically
+    my $bytes = "";
+    my $bits = 0;
+    my $nbits = 0;
+
+    while( length $words || $nbits >= 8 ) {
+        while( $nbits >= 8 ) {
+            if( $lsbfirst ) {
+                $bytes .= chr( $bits & 0xFF );
+                $bits >>= 8;
+            }
+            else {
+                $bytes .= chr( ( $bits >> 24 ) & 0xFF );
+                $bits &= 0xFFFFFF; $bits <<= 8;
+            }
+            $nbits -= 8;
+        }
+        last unless length $words;
+
+        if( $lsbfirst ) {
+            $bits |= ord( substr( $words, 0, 1, "" ) ) << $nbits;
+        }
+        else {
+            $bits |= ord( substr( $words, 0, 1, "" ) ) << ( 32 - $wordsize - $nbits );
+        }
+        $nbits += $wordsize;
+    }
+
+    return $bytes, $nbits, chr( $lsbfirst ? $bits : $bits >> 24 );
+}
+
+sub _reshape_bytes_in
+{
+    my $self = shift;
+    my ( $bytes, $lastlen, $lastbits ) = @_;
+
+    my $wordsize = $self->{wordsize};
+
+    my $lsbfirst = $self->{mpsse_setup} & Device::FTDI::MPSSE::CMD_LSBFIRST;
+
+    my $wordmask = ( 1 << $wordsize ) - 1;
+
+    # Build words to emit by tracking bits specifically
+    my $words = "";
+    my $bits = 0;
+    my $nbits = 0;
+
+    while( length $bytes || $nbits ) {
+        while( $nbits >= $wordsize ) {
+            if( $lsbfirst ) {
+                $words .= chr( $bits & $wordmask );
+                $bits >>= $wordsize;
+            }
+            else {
+                $words .= chr( ( $bits >> ( 32 - $wordsize ) ) & $wordmask );
+                $bits &= ( 0xFFFFFFFF >> $wordsize ); $bits <<= $wordsize;
+            }
+            $nbits -= $wordsize;
+        }
+        last unless length $bytes;
+
+        if( $lsbfirst ) {
+            $bits |= ord( substr( $bytes, 0, 1, "" ) ) << $nbits;
+        }
+        else {
+            $bits |= ord( substr( $bytes, 0, 1, "" ) ) << ( 32 - 8 - $nbits );
+        }
+        $nbits += 8;
+    }
+
+    if( $lsbfirst ) {
+        $words .= chr( $bits | ( ord $lastbits ) << $nbits )
+            if $lastlen;
+    }
+    else {
+        $words .= chr( $bits >> ( 32 - $wordsize ) | ( ord $lastbits ) >> ( 8 - $lastlen ) )
+            if $lastlen;
+    }
+
+    return $words;
+}
+
 =head2 assert_ss
 
 =head2 release_ss
@@ -171,8 +299,8 @@ sub set_spi_mode
 Set the C<SS> GPIO pin to LOW or HIGH state respectively. Normally these
 methods would not be required, as L</read>, L</write> and L</readwrite>
 perform these steps automatically. However, they may be useful when combined
-with the lower-level L<Device::FTDI::MPSSE/readwrite_bytes> method to split
-an SPI transaction over multiple method calls.
+with the C<$no_ss> argument to split an SPI transaction over multiple method
+calls.
 
 =cut
 
@@ -196,37 +324,55 @@ sub release_ss
 
 =head2 write
 
-    $spi->write( $bytes )->get
+    $spi->write( $words, $no_ss )->get
 
 =cut
 
 sub write
 {
     my $self = shift;
-    my ( $bytes ) = @_;
+    my ( $words, $no_ss ) = @_;
 
-    $self->assert_ss;
+    $self->assert_ss unless $no_ss;
 
-    printf STDERR "FTDI MPSSE SPI WRITE> %v.02X\n", $bytes;
-    $self->write_bytes( $bytes );
+    printf STDERR "FTDI MPSSE SPI WRITE> %v.02X\n", $words if DEBUG;
 
-    $self->release_ss;
+    my ( $bytes, $bitlen, $bits ) = $self->_reshape_words_out( $words );
+    my $f = $self->write_bytes( $bytes );
+    $f = $self->write_bits( $bitlen, $bits ) if $bitlen;
+
+    $f = $self->release_ss unless $no_ss;
+
+    return $f;
 }
 
 =head2 read
 
-    $bytes = $spi->read( $len )->get;
+    $words = $spi->read( $len, $no_ss )->get;
 
 =cut
 
 sub read
 {
     my $self = shift;
-    my ( $len ) = @_;
+    my ( $len, $no_ss ) = @_;
 
-    $self->assert_ss;
-    my $f = $self->read_bytes( $len );
-    $self->release_ss;
+    $self->assert_ss unless $no_ss;
+
+    my $wordsize = $self->{wordsize};
+    my $nbits = $len * $wordsize;
+    my $lastlen = $nbits % 8;
+
+    my $fbytes = $self->read_bytes( int( $nbits / 8 ) );
+    my $fbits = $lastlen ? $self->read_bits( $lastlen ) : undef;
+
+    $self->release_ss unless $no_ss;
+
+    my $f = $wordsize == 8 ? $fbytes :
+        ( Future->needs_all( $fbytes, $fbits ? ( $fbits ) : () )->then( sub {
+            my ( $bytes, $bits ) = @_;
+            return Future->done( $self->_reshape_bytes_in( $bytes, $lastlen, $bits ) );
+        }) );
 
     $f->on_done( sub { printf STDERR "FTDI MPSSE SPI READ <%v.02X\n", $_[0] } ) if DEBUG;
 
@@ -235,24 +381,43 @@ sub read
 
 =head2 readwrite
 
-    $bytes_in = $spi->readwrite( $bytes_out )->get;
+    $words_in = $spi->readwrite( $words_out, $no_ss )->get;
 
 Performs a full SPI write, or read-and-write operation, consisting of
 asserting the C<SS> pin, transferring bytes, and deasserting it again.
+
+If the optional C<$no_ss> argument is true, then the C<SS> pin will not be
+adjusted. This is useful for combining multiple write or read operations into
+one SPI transaction.
+
+If the wordsize is set to a value other than 8, the actual serial transfer is
+achieved by first reshaping the outbound data into 8-bit bytes with optionally
+a final bitmode transfer of between 1 and 7 bits, and reshaping inbound 8-bit
+bytes with this final bitmode transfer back into the required shape to be
+returned to the caller.
 
 =cut
 
 sub readwrite
 {
     my $self = shift;
-    my ( $bytes ) = @_;
+    my ( $words, $no_ss ) = @_;
 
-    $self->assert_ss;
+    $self->assert_ss unless $no_ss;
 
-    printf STDERR "FTDI MPSSE SPI READWRITE> %v.02X\n", $bytes if DEBUG;
-    my $f = $self->readwrite_bytes( $bytes );
+    printf STDERR "FTDI MPSSE SPI READWRITE> %v.02X\n", $words if DEBUG;
 
-    $self->release_ss;
+    my ( $bytes, $bitlen, $bits ) = $self->_reshape_words_out( $words );
+    my $fbytes = $self->readwrite_bytes( $bytes );
+    my $fbits = $bitlen ? $self->readwrite_bits( $bitlen, $bits ) : undef;
+
+    $self->release_ss unless $no_ss;
+
+    my $f = $self->{wordsize} == 8 ? $fbytes :
+        ( Future->needs_all( $fbytes, $fbits ? ( $fbits ) : () )->then( sub {
+            my ( $bytes, $bits ) = @_;
+            return Future->done( $self->_reshape_bytes_in( $bytes, $bitlen, $bits ) );
+        }) );
 
     $f->on_done( sub { printf STDERR "FTDI MPSSE SPI READWRITE <%v.02X\n", $_[0] } ) if DEBUG;
 

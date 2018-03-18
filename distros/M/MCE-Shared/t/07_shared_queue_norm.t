@@ -19,15 +19,16 @@ MCE::Flow::init {
 
 ## Queues must be shared first before anything else or it will not work.
 ## The reason is for the socket handles to be in place before starting the
-## server. Sharing a hash or array will cause the server to start.
+## server. Sharing a hash or array will start the server automatically.
 
 my $q1 = MCE::Shared->queue( type => $MCE::Shared::Queue::FIFO );
 my $q2 = MCE::Shared->queue( type => $MCE::Shared::Queue::LIFO );
 my $q;
 
-## One must explicitly start the server for queues. Not necessary otherwise.
+## One must explicitly start the shared-server for condvars and queues.
+## Not necessary otherwise when IO::FDPass is available.
 
-MCE::Shared->start();
+MCE::Shared->start() unless $INC{'IO/FDPass.pm'};
 
 ###############################################################################
 

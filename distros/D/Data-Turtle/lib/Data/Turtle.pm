@@ -4,7 +4,7 @@ our $AUTHORITY = 'cpan:GENE';
 use Moo;
 use POSIX qw( ceil );
 
-our $VERSION = '0.0104';
+our $VERSION = '0.0106';
 
 use constant K => 3.14159265358979323846 / 180;
 
@@ -29,6 +29,7 @@ has width => (
     is => 'rw',
     default => sub { 500 },
 );
+
 has height => (
     is => 'rw',
     default => sub { 500 },
@@ -40,11 +41,13 @@ has x => (
     lazy => 1,
     builder => \&_init_x,
 );
+
 has y => (
     is => 'rw',
     lazy => 1,
     builder => \&_init_y,
 );
+
 has heading => (
     is => 'rw',
     builder => \&_init_heading,
@@ -55,10 +58,12 @@ has pen_status => (
     is => 'rw',
     default => sub { 1 }, # Pen down
 );
+
 has pen_color => (
     is => 'rw',
     default => sub { 'black' },
 );
+
 has pen_size => (
     is => 'rw',
     default => sub { 1 },
@@ -148,12 +153,9 @@ sub forward {
     $self->x( $x + $xo );
     $self->y( $y + $yo );
 
-    if ( $self->pen_status == 1 ) {
-        return
-            ceil($xo), ceil($yo),
-            ceil($self->x), ceil($self->y),
-            $self->pen_color, $self->pen_size;
-    }
+    return $self->pen_status == 1
+        ? ( ceil($xo), ceil($yo), ceil($self->x), ceil($self->y), $self->pen_color, $self->pen_size )
+        : undef;
 }
 
 
@@ -180,12 +182,9 @@ sub goto {
     $self->x($x);
     $self->y($y);
 
-    if ( $self->pen_status == 1 ) {
-        return
-            ceil($xo), ceil($yo),
-            ceil($self->x), ceil($self->y),
-            $self->pen_color, $self->pen_size;
-    }
+    return $self->pen_status == 1
+        ? ( ceil($xo), ceil($yo), ceil($self->x), ceil($self->y), $self->pen_color, $self->pen_size )
+        : undef;
 }
 
 1;
@@ -202,7 +201,7 @@ Data::Turtle
 
 =head1 VERSION
 
-version 0.0104
+version 0.0106
 
 =head1 SYNOPSIS
 
@@ -228,15 +227,15 @@ version 0.0104
 This module enables basic turtle movement and state operations without requiring
 any particular graphics package.
 
-The methods don't draw anything per se.  They set or output coordinates and
-values for line drawing by your favorite graphics package.
+The methods don't draw anything.  They just set or output coordinates and
+values for drawing by your favorite graphics package.
 
 Please see the F<eg/> distribution directory for example code, with L<GD> and
 L<Imager>.
 
 =head1 NAME
 
-Turtle - Turtle Movement and State Operations
+Data::Turtle - Turtle Movement and State Operations
 
 =head1 METHODS
 
@@ -277,7 +276,7 @@ Coordinate parameters.  Defaults:
 
   x       = width / 2
   y       = height / 2
-  heading = 0 (degrees)
+  heading = 270 (degrees)
 
 =back
 
@@ -374,6 +373,8 @@ Move the pen to the given coordinate.
 =head1 SEE ALSO
 
 L<https://metacpan.org/source/YVESP/llg-1.07/Turtle.pm>
+
+L<https://en.wikipedia.org/wiki/Turtle_graphics>
 
 =head1 AUTHOR
 

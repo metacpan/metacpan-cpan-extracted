@@ -7,20 +7,18 @@ use utf8;
 use Test::BDD::Cucumber::Definitions qw(C Given When Then);
 use Test::BDD::Cucumber::Definitions::Var qw(:util);
 
+our $VERSION = '0.26';
+
+## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
+## no critic [RegularExpressions::RequireExtendedFormatting]
+## no critic [RegularExpressions::ProhibitComplexRegexes]
+
 =encoding utf8
 
 =head1 NAME
 
 Test::BDD::Cucumber::Definitions::Var::Ru - Шаги на русском языке для работы
 с переменными
-
-=cut
-
-our $VERSION = '0.21';
-
-## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
-## no critic [RegularExpressions::RequireExtendedFormatting]
-## no critic [RegularExpressions::ProhibitComplexRegexes]
 
 =head1 SYNOPSIS
 
@@ -48,6 +46,10 @@ our $VERSION = '0.21';
 
 =head1 ШАГИ
 
+=cut
+
+sub import {
+
 =head2 Создание переменной
 
 =pod
@@ -58,12 +60,10 @@ our $VERSION = '0.21';
 
 =cut
 
-# var scenario var "" set ""
-When qr/переменной сценария "(.+?)" присвоено значение "(.*)"/, sub {
-    my ( $name, $value ) = ( $1, $2 );
-
-    var_scenario_var_set( $name, $value );
-};
+    #       var scenario var "(.+?)" set "(.*)"
+    When qr/переменной сценария "(.+?)" присвоено значение "(.*)"/, sub {
+        var_scenario_var_set( $1, $2 );
+    };
 
 =pod
 
@@ -73,14 +73,15 @@ When qr/переменной сценария "(.+?)" присвоено зна�
 
 =cut
 
-# var scenario var "" random ""
-When
-    qr/переменной сценария "(.+?)" присвоено случайное значение длиной "(.*)" символов/,
-    sub {
-    my ( $name, $value ) = ( $1, $2 );
+    #       var scenario var "(.+?)" random "(.*)"
+    When
+        qr/переменной сценария "(.+?)" присвоено случайное значение длиной "(.*)" символов/,
+        sub {
+        var_scenario_var_random( $1, $2 );
+        };
 
-    var_scenario_var_random( $name, $value );
-    };
+    return;
+}
 
 1;
 

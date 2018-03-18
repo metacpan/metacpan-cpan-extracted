@@ -1,3 +1,6 @@
+version 0.69  - 17 March 2018
+                updates for Raspberry Pi 3 Plus
+
 Version 0.68  - 29 November 2017
                 Added HiPi::Interface::PCF8574
                 Added HiPi::Interface::LCDBackpackPCF9574

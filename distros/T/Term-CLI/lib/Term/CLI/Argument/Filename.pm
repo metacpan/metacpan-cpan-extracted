@@ -1,4 +1,4 @@
-#===============================================================================
+#=============================================================================
 #
 #       Module:  Term::CLI::Argument::Filename
 #
@@ -16,15 +16,15 @@
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
-#===============================================================================
+#=============================================================================
 
 use 5.014_001;
 
-package Term::CLI::Argument::Filename  0.04004 {
+package Term::CLI::Argument::Filename  0.051002 {
 
-use Modern::Perl;
-use Moo;
-use namespace::clean;
+use Modern::Perl 1.20140107;
+use Moo 1.000001;
+use namespace::clean 0.25;
 
 extends 'Term::CLI::Argument';
 
@@ -58,7 +58,7 @@ Term::CLI::Argument::Filename - class for file name arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.04004
+version 0.051002
 
 =head1 SYNOPSIS
 

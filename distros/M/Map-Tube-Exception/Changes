@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Exception
 
+3.15  Sun Mar 11 09:25:00 2018
+      - Used namespace::autoclean instead.
+
 3.14  Fri Mar 09 17:15:00 2018
       - Added exception for Invalid color hex code.
 

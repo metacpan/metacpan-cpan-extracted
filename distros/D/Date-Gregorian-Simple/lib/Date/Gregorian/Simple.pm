@@ -1,6 +1,6 @@
 package Date::Gregorian::Simple;
 
-$Date::Gregorian::Simple::VERSION   = '0.11';
+$Date::Gregorian::Simple::VERSION   = '0.12';
 $Date::Gregorian::Simple::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Date::Gregorian::Simple - Represents Gregorian date.
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
@@ -19,7 +19,7 @@ use Time::localtime;
 use Date::Exception::InvalidDay;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 use overload q{""} => 'as_string', fallback => 1;
 

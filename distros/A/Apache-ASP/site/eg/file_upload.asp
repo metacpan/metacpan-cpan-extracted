@@ -36,9 +36,9 @@ print $q->submit('Upload File');
     $q->checkbox_group(-name=>'extensions',
 		   -values=>['GIF','HTML','OTHER'],
 		   -defaults=>['HTML']
-		   ).
-    $q->endform()
+		   )
   %>
+</form>   
 
 <% 
 my $filehandle;

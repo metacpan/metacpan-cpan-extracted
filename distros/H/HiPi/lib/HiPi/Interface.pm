@@ -16,7 +16,7 @@ use parent qw( HiPi::Class );
 
 __PACKAGE__->create_accessors( qw( device ) );
 
-our $VERSION ='0.68';
+our $VERSION ='0.69';
 
 sub new {
     my ($class, %params) = @_;

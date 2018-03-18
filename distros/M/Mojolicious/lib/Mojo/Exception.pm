@@ -2,6 +2,8 @@ package Mojo::Exception;
 use Mojo::Base -base;
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
+use Mojo::Util 'decode';
+
 has [qw(frames line lines_after lines_before)] => sub { [] };
 has message => 'Exception!';
 has 'verbose';
@@ -19,7 +21,7 @@ sub inspect {
 
   # Search for context in files
   for my $file (@files) {
-    next unless -r $file->[0] && open my $handle, '<:utf8', $file->[0];
+    next unless -r $file->[0] && open my $handle, '<', $file->[0];
     $self->_context($file->[1], [[<$handle>]]);
     return $self;
   }
@@ -57,6 +59,7 @@ sub trace {
 
 sub _append {
   my ($stack, $line) = @_;
+  $line = decode('UTF-8', $line) // $line;
   chomp $line;
   push @$stack, $line;
 }

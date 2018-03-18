@@ -7,7 +7,7 @@ use Mojo::Base 'Clustericious::Command';
 use File::Find;
 
 # ABSTRACT: Clustericious command to generate a new Clustericious application
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.29'; # VERSION
 
 
 has description => <<'EOF';
@@ -67,7 +67,7 @@ Clustericious::Command::generate::app - Clustericious command to generate a new 
 
 =head1 VERSION
 
-version 1.27
+version 1.29
 
 =head1 SYNOPSIS
 

@@ -16,20 +16,17 @@ bugtracker     'https://github.com/chocolateboy/App-Wax/issues';
 requires 'Digest::SHA';
 requires 'File::BaseDir'              => '0.07';
 requires 'File::Slurp'                => '9999.19';
-requires 'HTTP::Message'              => '6.11';
+requires 'HTTP::Message'              => '6.14';
 requires 'IPC::System::Simple'        => '1.25';
-requires 'LWP'                        => '6.26';
+requires 'LWP'                        => '6.31';
 requires 'Method::Signatures::Simple' => '1.07';
-requires 'MIME::Types'                => '2.13';
-requires 'Mouse'                      => 'v2.4.9';
+requires 'MIME::Types'                => '2.17';
+requires 'Mouse'                      => 'v2.5.2';
 requires 'Parallel::parallel_map'     => '0.02';
-requires 'Try::Tiny'                  => '0.28';
-requires 'URI'                        => '1.71';
-
-recommends 'Sereal' => '3.015';
+requires 'Try::Tiny'                  => '0.30';
+requires 'URI'                        => '1.73';
 
 test_requires 'Test::Differences' => '0.64';
-test_requires 'Test::Fatal'       => '0.014';
 
 # the latest version (0.05) is not available:
 # https://github.com/sukria/Test-TinyMocker/issues/8

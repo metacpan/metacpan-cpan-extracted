@@ -27,12 +27,12 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'WWW::Google::PageSpeedOnline'               => { file => 'lib/WWW/Google/PageSpeedOnline.pm'            , version => '0.24' },
-            'WWW::Google::PageSpeedOnline::Params'       => { file => 'lib/WWW/Google/PageSpeedOnline/Params.pm'     , version => '0.24' },
-            'WWW::Google::PageSpeedOnline::Advise'       => { file => 'lib/WWW/Google/PageSpeedOnline/Advise.pm'     , version => '0.24' },
-            'WWW::Google::PageSpeedOnline::Stats'        => { file => 'lib/WWW/Google/PageSpeedOnline/Stats.pm'      , version => '0.24' },
-            'WWW::Google::PageSpeedOnline::Result'       => { file => 'lib/WWW/Google/PageSpeedOnline/Result.pm'     , version => '0.24' },
-            'WWW::Google::PageSpeedOnline::Result::Rule' => { file => 'lib/WWW/Google/PageSpeedOnline/Result/Rule.pm', version => '0.24' },
+            'WWW::Google::PageSpeedOnline'               => { file => 'lib/WWW/Google/PageSpeedOnline.pm'            , version => '0.25' },
+            'WWW::Google::PageSpeedOnline::Params'       => { file => 'lib/WWW/Google/PageSpeedOnline/Params.pm'     , version => '0.25' },
+            'WWW::Google::PageSpeedOnline::Advise'       => { file => 'lib/WWW/Google/PageSpeedOnline/Advise.pm'     , version => '0.25' },
+            'WWW::Google::PageSpeedOnline::Stats'        => { file => 'lib/WWW/Google/PageSpeedOnline/Stats.pm'      , version => '0.25' },
+            'WWW::Google::PageSpeedOnline::Result'       => { file => 'lib/WWW/Google/PageSpeedOnline/Result.pm'     , version => '0.25' },
+            'WWW::Google::PageSpeedOnline::Result::Rule' => { file => 'lib/WWW/Google/PageSpeedOnline/Result/Rule.pm', version => '0.25' },
         },
         resources => {
             repository => {

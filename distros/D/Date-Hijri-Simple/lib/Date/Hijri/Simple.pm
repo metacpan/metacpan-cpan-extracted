@@ -1,6 +1,6 @@
 package Date::Hijri::Simple;
 
-$Date::Hijri::Simple::VERSION   = '0.19';
+$Date::Hijri::Simple::VERSION   = '0.20';
 $Date::Hijri::Simple::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Date::Hijri::Simple - Represents Hijri date.
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =cut
 
@@ -21,7 +21,7 @@ use POSIX qw/floor ceil/;
 use Date::Exception::InvalidDay;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 use overload q{""} => 'as_string', fallback => 1;
 
@@ -122,22 +122,22 @@ sub to_julian {
             + $self->hijri_epoch) - 1;
 }
 
-=head2 from_julian($julian_date)
+=head2 from_julian($julian_day)
 
 Returns Hijri  date as an object of type L<Date::Hijri::Simple> equivalent of the
-given Julian date C<$julian_date>.
+given Julian day C<$julian_day>.
 
 =cut
 
 sub from_julian {
-    my ($self, $julian_date) = @_;
+    my ($self, $julian_day) = @_;
 
-    $julian_date = floor($julian_date) + 0.5;
-    my $year     = floor(((30 * ($julian_date - $self->hijri_epoch)) + 10646) / 10631);
+    $julian_day = floor($julian_day) + 0.5;
+    my $year     = floor(((30 * ($julian_day - $self->hijri_epoch)) + 10646) / 10631);
     my $a_hijri  = Date::Hijri::Simple->new({ year => $year, month => 1, day => 1 });
-    my $month    = min(12, ceil(($julian_date - (29 + $a_hijri->to_julian)) / 29.5) + 1);
+    my $month    = min(12, ceil(($julian_day - (29 + $a_hijri->to_julian)) / 29.5) + 1);
     my $b_hijri  = Date::Hijri::Simple->new({ year => $year, month => $month, day => 1 });
-    my $day      = ($julian_date - $b_hijri->to_julian) + 1;
+    my $day      = ($julian_day - $b_hijri->to_julian) + 1;
 
     return Date::Hijri::Simple->new({
         year  => $year,

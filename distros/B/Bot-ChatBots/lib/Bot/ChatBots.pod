@@ -8,7 +8,7 @@ Bot::ChatBots - Basic system for ChatBots
 
 =head1 VERSION
 
-This document describes Bot::ChatBots version 0.012.
+This document describes Bot::ChatBots version 0.014.
 
 =begin html
 

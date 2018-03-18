@@ -1,5 +1,5 @@
 package Yancy::Backend::Pg;
-our $VERSION = '0.022';
+our $VERSION = '1.001';
 # ABSTRACT: A backend for Postgres using Mojo::Pg
 
 #pod =head1 SYNOPSIS
@@ -98,7 +98,7 @@ our $VERSION = '0.022';
 #pod
 #pod =cut
 
-use Mojo::Base 'Mojo';
+use Mojo::Base '-base';
 use Scalar::Util qw( looks_like_number );
 BEGIN {
     eval { require Mojo::Pg; Mojo::Pg->VERSION( 3 ); 1 }
@@ -178,9 +178,18 @@ WHERE table_schema=?
 ENDQ
 
     my $key_q = <<ENDQ;
-SELECT * FROM information_schema.table_constraints as tc
-JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_name)
-WHERE tc.table_schema=? AND tc.table_name=? AND constraint_type = 'PRIMARY KEY'
+SELECT c.column_name FROM information_schema.table_constraints as tc
+JOIN information_schema.constraint_column_usage AS ccu
+    USING (constraint_schema, constraint_name)
+JOIN information_schema.columns AS c
+    ON tc.table_schema=c.table_schema
+        AND tc.table_name=c.table_name
+        AND ccu.column_name=c.column_name
+WHERE tc.table_schema=?
+    AND tc.table_name=? 
+    AND ( constraint_type = 'PRIMARY KEY' 
+        OR constraint_type = 'UNIQUE' )
+ORDER BY ordinal_position ASC
 ENDQ
 
     my @tables = @{ $self->pg->db->query( $tables_q, $database )->hashes };
@@ -189,8 +198,8 @@ ENDQ
         my $table = $t->{table_name};
         my @keys = @{ $self->pg->db->query( $key_q, $database, $table )->hashes };
         $keys{ $table } = \@keys;
-        # ; use Data::Dumper;
-        # ; say Dumper \@keys;
+        #; use Data::Dumper;
+        #; say Dumper \@keys;
         if ( @keys && $keys[0]{column_name} ne 'id' ) {
             $schema{ $table }{ 'x-id-field' } = $keys[0]{column_name};
         }
@@ -277,7 +286,7 @@ Yancy::Backend::Pg - A backend for Postgres using Mojo::Pg
 
 =head1 VERSION
 
-version 0.022
+version 1.001
 
 =head1 SYNOPSIS
 

@@ -176,6 +176,8 @@ TESTING
   mailing list.  To subscribe or see the list archives, go to:
 
       [% support.listurl %]
+[% END %][% IF support.extra %]
+[% indent(to_text(support.extra), 2) %]
 [% END %]
 [% IF support.cpan %]
   For bug tracking, use the CPAN bug tracker at:
@@ -235,6 +237,11 @@ LICENSE
   package license but which may require preservation of additional
   notices.  All required notices, and detailed information about the
   licensing of each file, are recorded in the LICENSE file.
+
+  Files covered by a license with an assigned SPDX License Identifier
+  include SPDX-License-Identifier tags to enable automated processing of
+  license information.  See https://spdx.org/licenses/ for more
+  information.
 
   For any copyright range specified by files in this package as YYYY-ZZZZ,
   the range specifies every single year in that closed interval.

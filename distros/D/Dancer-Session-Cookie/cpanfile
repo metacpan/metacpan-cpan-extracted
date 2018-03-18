@@ -5,12 +5,13 @@ requires "Dancer::Cookie" => "0";
 requires "Dancer::Cookies" => "0";
 requires "Dancer::Session::Abstract" => "0";
 requires "MIME::Base64" => "0";
+requires "PerlX::Maybe" => "0";
 requires "Session::Storage::Secure" => "0.010";
 requires "Storable" => "0";
 requires "String::CRC32" => "0";
 requires "Time::Duration::Parse" => "0";
-requires "base" => "0";
-requires "perl" => "5.008";
+requires "parent" => "0";
+requires "perl" => "v5.10.0";
 requires "strict" => "0";
 requires "warnings" => "0";
 

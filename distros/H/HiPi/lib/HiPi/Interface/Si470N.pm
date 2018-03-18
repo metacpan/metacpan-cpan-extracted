@@ -22,7 +22,7 @@ use Time::HiRes qw( usleep );
 use HiPi::GPIO;
 use HiPi::Device::I2C;
 
-our $VERSION ='0.68';
+our $VERSION ='0.69';
 
 __PACKAGE__->create_accessors( qw(
     devicename address

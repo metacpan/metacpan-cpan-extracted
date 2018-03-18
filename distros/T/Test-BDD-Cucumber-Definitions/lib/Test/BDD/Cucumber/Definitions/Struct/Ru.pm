@@ -7,20 +7,18 @@ use utf8;
 use Test::BDD::Cucumber::Definitions qw(Given When Then);
 use Test::BDD::Cucumber::Definitions::Struct qw(:util);
 
+our $VERSION = '0.26';
+
+## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
+## no critic [RegularExpressions::RequireExtendedFormatting]
+## no critic [RegularExpressions::ProhibitComplexRegexes]
+
 =encoding utf8
 
 =head1 NAME
 
 Test::BDD::Cucumber::Definitions::Struct::Ru - Шаги на русском языке
 для работы с perl-структурами данных
-
-=cut
-
-our $VERSION = '0.21';
-
-## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
-## no critic [RegularExpressions::RequireExtendedFormatting]
-## no critic [RegularExpressions::ProhibitComplexRegexes]
 
 =head1 SYNOPSIS
 
@@ -39,7 +37,7 @@ our $VERSION = '0.21';
 В файле B<features/struct.feature>:
 
     Feature: Struct (Ru)
-        Работа perl-структурами данных
+        Работа с perl-структурами данных
 
     Scenario: HTTP->JSON->Struct
         When HTTP-запрос "GET" отправлен на "https://fastapi.metacpan.org/v1/distribution/Test-BDD-Cucumber-Definitions"
@@ -55,21 +53,39 @@ our $VERSION = '0.21';
 
 =head1 ШАГИ
 
+=cut
+
+sub import {
+
 =head2 Чтение данных
 
 =pod
 
-Прочитать данные из L<HTTP-ответа|Test::BDD::Cucumber::Definitions::HTTP::Ru>
-в L<perl-структуру|Test::BDD::Cucumber::Definitions::Struct::Ru>:
+Прочитать JSON из L<HTTP-ответа|Test::BDD::Cucumber::Definitions::HTTP::Ru>
+в perl-структуру:
 
     When содержимое HTTP-ответа прочитано как JSON
 
 =cut
 
-# http response content read JSON
-When qr/содержимое HTTP-ответа прочитано как JSON/, sub {
-    read_content();
-};
+    #       http response content read JSON
+    When qr/содержимое HTTP-ответа прочитано как JSON/, sub {
+        http_response_content_read_json();
+    };
+
+=pod
+
+Прочитать список файлов L<Zip-архива|Test::BDD::Cucumber::Definitions::HTTP::Ru>
+в perl-структуру
+
+    When перечень файлов Zip-архива прочитан как список
+
+=cut
+
+    #       zip archive members read list
+    When qr/перечень файлов Zip-архива прочитан как список/, sub {
+        zip_archive_members_read_list();
+    };
 
 =head2 Проверка данных
 
@@ -84,12 +100,24 @@ L<JSON::Path>.
 
 =cut
 
-# struct data element "" eq ""
-Then qr/элемент структуры данных "(.+?)" равен "(.*)"/, sub {
-    my ( $jsonpath, $value ) = ( $1, $2 );
+    #       struct data element "(.+?)" eq "(.*)"
+    Then qr/элемент структуры данных "(.+?)" равен "(.*)"/, sub {
+        struct_data_element_eq( $1, $2 );
+    };
 
-    jsonpath_eq( $jsonpath, $value );
-};
+=pod
+
+Проверить массив структур на наличие элемента, точно соответствующего значению:
+
+    Then массив структур данных "$[*]" содержит элемент, равный "user_42"
+
+=cut
+
+    #       struct data array "(.+?)" any eq "(.*)"
+    Then qr/массив структур данных "(.+?)" содержит элемент, равный "(.*)"/,
+        sub {
+        struct_data_array_any_eq( $1, $2 );
+        };
 
 =pod
 
@@ -99,12 +127,44 @@ Then qr/элемент структуры данных "(.+?)" равен "(.*)"
 
 =cut
 
-# struct data element "" re ""
-Then qr/элемент структуры данных "(.+?)" совпадает с "(.+)"/, sub {
-    my ( $jsonpath, $value ) = ( $1, $2 );
+    #       struct data element "(.+?)" re "(.*)"
+    Then qr/элемент структуры данных "(.+?)" совпадает с "(.*)"/, sub {
+        struct_data_element_re( $1, $2 );
+    };
 
-    jsonpath_re( $jsonpath, $value );
-};
+=pod
+
+Проверить массив структур на наличие элемента, совпадающего с регулярным выражением:
+
+    Then массив структур данных  "$[*]" содержит элемент, совпадающий с ".+42"
+
+=cut
+
+    #       struct data array "(.+?)" any re "(.*)"
+    Then
+        qr/массив структур данных "(.+?)" содержит элемент, совпадающий с "(.*)"/,
+        sub {
+        struct_data_array_any_re( $1, $2 );
+        };
+
+=pod
+
+Проверить количество элементов в массиве структур данных:
+
+    Then массив структур данных "$[*]" содержит "1" элемент
+    Then массив структур данных "$[*]" содержит "4" элемента
+    Then массив структур данных "$[*]" содержит "6" элементов
+
+=cut
+
+    #       struct data array "(.+?)" count "(.*)"
+    Then qr/массив структур данных "(.+?)" содержит "(.*)" элемент(?:а|ов)?/,
+        sub {
+        struct_data_array_count( $1, $2 );
+        };
+
+    return;
+}
 
 1;
 

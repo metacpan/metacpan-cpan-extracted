@@ -14,7 +14,7 @@ use AnyEvent::WebSocket::Client;
 use JSON;
 use namespace::clean;
 use IO::Socket::SSL;
-our $VERSION='1.0003';
+our $VERSION='1.0004';
 
 BEGIN { 
   no namespace::clean;

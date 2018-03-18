@@ -2,7 +2,7 @@ package Test2::Harness::Run::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '0.001057';
+our $VERSION = '0.001061';
 
 use Carp qw/croak confess/;
 use POSIX ":sys_wait_h";
@@ -501,6 +501,7 @@ sub run_job {
     my $job = Test2::Harness::Job->new(
         # These can be overriden by the task
         times => $run->times,
+        show_times => $run->show_times,
 
         %$task,
 
@@ -517,6 +518,9 @@ sub run_job {
         libs        => \@libs,
         switches    => [@{$run->switches}, @{$task->{switches} || []}],
         args        => [@{$run->args}, @{$task->{args} || []}],
+
+        event_uuids => $run->event_uuids,
+        mem_usage   => $run->mem_usage,
 
         input => $task->{input} || $run->input,
 

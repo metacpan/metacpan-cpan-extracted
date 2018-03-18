@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 # PODNAME: es-nodes.pl
 # ABSTRACT: Listing the nodes in a cluster with some details
 use strict;
@@ -63,7 +63,7 @@ es-nodes.pl - Listing the nodes in a cluster with some details
 
 =head1 VERSION
 
-version 5.4
+version 5.5
 
 =head1 SYNOPSIS
 
@@ -134,6 +134,8 @@ Print detailed help with examples
 Comma separated list of node attributes to display, aliased as --attr
 
     --attributes dc,id
+
+=back
 
 =head1 AUTHOR
 

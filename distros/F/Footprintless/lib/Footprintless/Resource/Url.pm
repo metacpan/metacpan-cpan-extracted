@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Resource::Url;
-$Footprintless::Resource::Url::VERSION = '1.27';
+$Footprintless::Resource::Url::VERSION = '1.28';
 # ABSTRACT: A resource described by URL
 # PODNAME: Footprintless::Resource::Url
 
@@ -36,7 +36,7 @@ Footprintless::Resource::Url - A resource described by URL
 
 =head1 VERSION
 
-version 1.27
+version 1.28
 
 =head1 CONSTRUCTORS
 

@@ -14,7 +14,7 @@ use overload
   bool=>sub { $_[0]->is_true },
 ;
 
-our $VERSION='1.0002';
+our $VERSION='1.0003';
 
 =head1 NAME
 

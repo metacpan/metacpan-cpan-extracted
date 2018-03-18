@@ -16,7 +16,7 @@ has jail => ( is => 'rw' );
 
 has error => ( is => 'rw' );
 
-our $VERSION = '1.9.9';
+our $VERSION = '1.9.16';
 
 use Lemonldap::NG::Handler::Main '$datas', '$tsv';
 use Lemonldap::NG::Handler::API ':functions';
@@ -30,7 +30,7 @@ sub build_jail {
     return $self->jail
       if ( $self->jail
         && $self->jail->useSafeJail == $self->useSafeJail
-        && $self->jail->customFunctions == $self->customFunctions );
+        && $self->jail->customFunctions eq $self->customFunctions );
 
     $self->useSafeJail(1) unless defined $self->useSafeJail;
 

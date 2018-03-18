@@ -14,7 +14,7 @@ Lab::Measurement::Tutorial - Tutorial on using the Lab::Measurement package stac
 
 =head1 VERSION
 
-version 3.622
+version 3.623
 
 =head1 Introduction
 

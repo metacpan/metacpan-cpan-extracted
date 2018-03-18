@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder::XLSX;
-$Data::TableReader::Decoder::XLSX::VERSION = '0.006';
+$Data::TableReader::Decoder::XLSX::VERSION = '0.007';
 use Moo 2;
 use Carp;
 use Try::Tiny;
@@ -51,7 +51,7 @@ Data::TableReader::Decoder::XLSX - Access sheets/rows of a modern Microsoft Exce
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 DESCRIPTION
 

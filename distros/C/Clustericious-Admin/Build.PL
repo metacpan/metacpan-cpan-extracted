@@ -26,12 +26,12 @@ my %module_build_args = (
     "Module::Build" => "0.28",
     "perl" => "5.006"
   },
-  "dist_abstract" => "Parallel SSH client",
+  "dist_abstract" => "(Deprecated) Parallel SSH client",
   "dist_author" => [
     "Graham Ollis <plicease\@cpan.org>"
   ],
   "dist_name" => "Clustericious-Admin",
-  "dist_version" => "1.10",
+  "dist_version" => "1.11",
   "license" => "perl",
   "module_name" => "Clustericious::Admin",
   "recommends" => {

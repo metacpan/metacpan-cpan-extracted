@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::MountPSGI::Proxy;
-use Mojo::Base 'Mojo';
+use Mojo::Base 'Mojolicious';
 use Plack::Util;
 
 has app => sub { Plack::Util::load_psgi shift->script };

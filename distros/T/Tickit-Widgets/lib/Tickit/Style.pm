@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2018 -- leonerd@leonerd.org.uk
 
 package Tickit::Style;
 
@@ -254,7 +254,9 @@ sub _ref_tagset
 
 =cut
 
-=head2 style_definition( $tags, %definition )
+=head2 style_definition
+
+   style_definition( $tags, %definition )
 
 In addition to any loaded stylesheets, the widget class itself can provide
 style information, via the C<style_definition> function. It provides a definition
@@ -286,7 +288,9 @@ sub style_definition
    _ref_tagset( $type, undef )->merge_with_tags( \%tags, \%definition );
 }
 
-=head2 style_reshape_keys( @keys )
+=head2 style_reshape_keys
+
+   style_reshape_keys( @keys )
 
 Declares that the given list of keys are somehow responsible for determining
 the shape of the widget. If their values are changed, the C<reshape> method is
@@ -308,7 +312,9 @@ sub _reshape_keys
    return keys %{ $RESHAPE_KEYS{$type} };
 }
 
-=head2 style_reshape_textwidth_keys( @keys )
+=head2 style_reshape_textwidth_keys
+
+   style_reshape_textwidth_keys( @keys )
 
 Declares that the given list of keys contain text, the C<textwidth()> of which
 is used to determine the shape of the widget. If their values are changed such
@@ -330,7 +336,9 @@ sub _reshape_textwidth_keys
    return keys %{ $RESHAPE_TEXTWIDTH_KEYS{$type} };
 }
 
-=head2 style_redraw_keys( @keys )
+=head2 style_redraw_keys
+
+   style_redraw_keys( @keys )
 
 Declares that the given list of keys are somehow responsible for determining
 the look of the widget, but in a way that does not determine the size. If
@@ -380,7 +388,9 @@ These functions are not exported, but may be called directly.
 
 =cut
 
-=head2 Tickit::Style->load_style( $string )
+=head2 load_style
+
+   Tickit::Style->load_style( $string )
 
 Loads definitions from a stylesheet given in a string.
 
@@ -396,7 +406,9 @@ sub load_style
    _load_style( Tickit::Style::Parser->new->from_string( $str ) );
 }
 
-=head2 Tickit::Style->load_style_file( $path )
+=head2 load_style_file
+
+   Tickit::Style->load_style_file( $path )
 
 Loads definitions from a stylesheet file given by the path.
 
@@ -417,7 +429,9 @@ sub load_style_file
    _load_style( Tickit::Style::Parser->new->from_string( $str ) );
 }
 
-=head2 Tickit::Style->load_style_from_DATA
+=head2 load_style_from_DATA
+
+   Tickit::Style->load_style_from_DATA
 
 A convenient shortcut for loading style definitions from the caller's C<DATA>
 filehandle.
@@ -433,7 +447,9 @@ sub load_style_from_DATA
    _load_style( Tickit::Style::Parser->new->from_string( $str ) );
 }
 
-=head2 Tickit::Style::on_style_load( \&code )
+=head2 on_style_load
+
+   Tickit::Style::on_style_load( \&code )
 
 Adds a CODE reference to be invoked after either C<load_style> or
 C<load_style_file> are called. This may be useful to flush any caches or

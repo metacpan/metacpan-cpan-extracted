@@ -1,5 +1,8 @@
 Revision history for Perl extension Convert::Base91.
 
+1.000 2018-03-10T22:15+02:00
+ - Module is stable
+
 0.001002 2017-12-30T19:31+03:00
  - Attempt to fix compilation on case-insensitive filesystems
  - Write a few extra tests

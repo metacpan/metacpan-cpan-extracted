@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::App;
-$Footprintless::App::VERSION = '1.27';
+$Footprintless::App::VERSION = '1.28';
 # ABSTRACT: The base application class for fpl
 # PODNAME: Footprintless::App
 
@@ -113,7 +113,7 @@ Footprintless::App - The base application class for fpl
 
 =head1 VERSION
 
-version 1.27
+version 1.28
 
 =head1 METHODS
 

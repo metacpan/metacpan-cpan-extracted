@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.003';
+our $VERSION = '2.006';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -34,7 +34,6 @@ BEGIN {
     1;
 }
 
-
 sub new {
     my ( $class ) = @_;
     my $info = {
@@ -57,15 +56,6 @@ sub new {
     };
     return bless { i => $info }, $class;
 }
-# <, >, ... work numeric:
-
-# MySQL     mysql_bind_type_guessing    enabled     always
-# MySQL     mysql_bind_type_guessing    disabled    with INT
-
-# postgreSQL                                        with INT
-
-# SQLite                                            with INT
-# SQLite    sqlite_see_if_its_a_number  enabled     with no data tpyes
 
 
 sub __init {
@@ -285,15 +275,16 @@ sub run {
                         $dbh->do( $stmt );
                     }
                     $sf->{i}{db_attached} = 1;
-                    if ( ! exists $sf->{i}{backup_qualy} ) {
-                        $sf->{i}{backup_qualy} = $sf->{o}{G}{qualified_table_name};
+                    if ( ! exists $sf->{i}{backup_qtn} ) {
+                        $sf->{i}{backup_qtn} = $sf->{o}{G}{qualified_table_name};
                     }
                     $sf->{o}{G}{qualified_table_name} = 1;
                 }
             }
-            if ( exists $sf->{i}{backup_qualy} && ! $sf->{i}{db_attached} ) {
-                $sf->{o}{G}{qualified_table_name} = delete $sf->{i}{backup_qualy};
+            if ( exists $sf->{i}{backup_qtn} && ! $sf->{i}{db_attached} ) {
+                $sf->{o}{G}{qualified_table_name} = delete $sf->{i}{backup_qtn};
             }
+            $sf->{i}{stmt_history} = [];
 
             # SCHEMAS
 
@@ -435,10 +426,15 @@ sub run {
                             my ( $create_table, $drop_table, $attach_databases, $detach_databases ) = (
                                 '- CREATE table', '- DROP   table', '- Attach DB', '- Detach DB'
                             );
-                            my $choices_hidden = [ undef, $create_table, $drop_table ];
+                            my $choices_hidden = [ undef ];
+                            push @$choices_hidden, $create_table if $sf->{o}{G}{create_table_ok};
+                            push @$choices_hidden, $drop_table   if $sf->{o}{G}{drop_table_ok};
                             if ( $driver eq 'SQLite' ) {
                                 push @$choices_hidden, $attach_databases;
                                 push @$choices_hidden, $detach_databases if $sf->{i}{db_attached};
+                            }
+                            if ( @$choices_hidden == 0 ) {
+                                next TABLE;
                             }
                             # Choose
                             $ENV{TC_RESET_AUTO_UP} = 0;
@@ -666,7 +662,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.003
+Version 2.006
 
 =head1 DESCRIPTION
 
@@ -681,6 +677,9 @@ Matthäus Kiem <cuer2s@gmail.com>
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2012-2018 Matthäus Kiem.
+
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
+IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

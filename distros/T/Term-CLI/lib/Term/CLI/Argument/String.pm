@@ -1,4 +1,4 @@
-#===============================================================================
+#=============================================================================
 #
 #       Module:  Term::CLI::Argument::String
 #
@@ -16,20 +16,20 @@
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
-#===============================================================================
+#=============================================================================
 
 use 5.014_001;
 
-package Term::CLI::Argument::String  0.04004 {
+package Term::CLI::Argument::String  0.051002 {
 
-use Modern::Perl;
+use Modern::Perl 1.20140107;
 
 use Term::CLI::L10N;
 
-use Types::Standard qw( Int );
+use Types::Standard 1.000005 qw( Int );
 
-use Moo;
-use namespace::clean;
+use Moo 1.000001;
+use namespace::clean 0.25;
 
 extends 'Term::CLI::Argument';
 
@@ -72,7 +72,7 @@ Term::CLI::Argument::String - class for basic string arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.04004
+version 0.051002
 
 =head1 SYNOPSIS
 

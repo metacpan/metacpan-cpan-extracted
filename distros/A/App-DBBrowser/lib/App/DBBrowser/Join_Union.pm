@@ -6,9 +6,8 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.003';
+our $VERSION = '2.006';
 
-use Clone           qw( clone );
 use List::MoreUtils qw( any );
 
 use Term::Choose           qw( choose );
@@ -73,10 +72,10 @@ sub union_tables {
                 used_cols     => {},
                 saved_cols    => [],
             };
-            $sf->{union_all} = 1;
+            $sf->{union_all} = 1; #
             next UNION_TABLE;
         }
-        my $backup_union = clone( $union );
+        my $backup_union = $ax->backup_href( $union );
         $union_table =~ s/^[-+]\s//;
         my $check_idx = $idx_tbl - ( @pre_tbl + @{$union->{used_tables}} );
         if ( $check_idx < 0 ) {
@@ -108,7 +107,6 @@ sub union_tables {
                 }
                 else {
                     delete $sf->{union_all} if $sf->{union_all};
-                    #$union = clone( $backup_union );
                     $union = $backup_union;
                     last UNION_COLUMN;
                 }
@@ -170,12 +168,10 @@ sub union_tables {
         $qt_table .= " FROM " . $ax->quote_table( $dbh, $u->{tables}{$table} );
         $qt_table .= $c < @{$union->{used_tables}} ? " UNION ALL " : " )";
     }
-    if ( $sf->{union_all} ) {  # alias: required if mysql, Pg, ...
-        $qt_table .= " AS UNION_ALL_TABLES";
-    }
-    else {
-        $qt_table .= " AS UNION_SELECTED_TABLES";
-    }
+    my $default = $sf->{union_all} ? "UNION_ALL_TABLES" : "UNION_SELECTED_TABLES";
+    # alias: required if mysql, Pg, ...
+    my $alias = $ax->__alias( $dbh, 'Union', $default );
+    $qt_table .= " AS " . $ax->quote_col_qualified( $dbh, [ $alias ] );
     return $qt_table, $qt_columns;
 }
 
@@ -272,16 +268,19 @@ sub join_tables {
         ( my $master = splice( @tables, $idx, 1 ) ) =~ s/^-\s//;
         $join->{used_tables}  = [ $master ];
         $join->{avail_tables} = [ @tables ];
-        $join->{table_alias} = $sf->{i}{driver} eq 'Pg' ? 'a' : 'A';
-        $join->{stmt}  = "SELECT * FROM " . $ax->quote_table( $dbh, $j->{tables}{$master} ) . " AS " . $join->{table_alias}; ###
-        $join->{alias}{$master} = $join->{table_alias};
-        my $backup_master = clone( $join );
+        my $default_alias = $sf->{i}{driver} eq 'Pg' ? 'a' : 'A';
+        my $qt_master = $ax->quote_table( $dbh, $j->{tables}{$master} );
+        $join->{stmt} = "SELECT * FROM " . $qt_master;
+        $sf->__print_join_statement( $join->{stmt} );
+        $join->{alias}{$master} = $ax->__alias( $dbh, $qt_master, $default_alias );
+        $join->{stmt} .= " AS " . $ax->quote_col_qualified( $dbh, [ $join->{alias}{$master} ] );
+        my $backup_master = $ax->backup_href( $join );
 
         JOIN: while ( 1 ) {
             my $idx;
             my $enough_slaves = '  Enough TABLES';
             my @pre = ( undef, $enough_slaves );
-            my $backup_join = clone( $join );
+            my $backup_join = $ax->backup_href( $join );
 
             SLAVE: while ( 1 ) {
                 my $choices = [ @pre, @{$join->{avail_tables}}, $info ];
@@ -296,7 +295,6 @@ sub join_tables {
                         next MASTER;
                     }
                     else {
-                        #$join = clone( $backup_master );
                         $join = $backup_master;
                         next JOIN;
                     }
@@ -315,9 +313,11 @@ sub join_tables {
             }
             $idx -= @pre;
             ( my $slave = splice( @{$join->{avail_tables}}, $idx, 1 ) ) =~ s/^-\s//;
-            $join->{table_alias}++;
-            $join->{stmt} .= " LEFT OUTER JOIN " . $ax->quote_table( $dbh, $j->{tables}{$slave} ) . " AS " . $join->{table_alias} . " ON";
-            $join->{alias}{$slave} = $join->{table_alias};
+            my $qt_slave = $ax->quote_table( $dbh, $j->{tables}{$slave} );
+            $join->{stmt} .= " LEFT OUTER JOIN " . $qt_slave;
+            $sf->__print_join_statement( $join->{stmt} );
+            $join->{alias}{$slave} = $ax->__alias( $dbh, $qt_slave, ++$default_alias );
+            $join->{stmt} .= " AS " . $ax->quote_col_qualified( $dbh, [ $join->{alias}{$slave} ] ). " ON";
             my %avail_pk_cols;
             for my $used_table ( @{$join->{used_tables}} ) {
                 for my $col ( @{$j->{col_names}{$used_table}} ) {
@@ -341,13 +341,11 @@ sub join_tables {
                     { prompt => 'Choose PRIMARY KEY column:', undef => $sf->{i}{_reset} }
                 );
                 if ( ! defined $pk_col ) {
-                    #$join = clone( $backup_join );
                     $join = $backup_join;
                     next JOIN;
                 }
                 if ( $pk_col eq $sf->{i}{_continue} ) {
                     if ( @{$join->{primary_keys}} == @{$backup_join->{primary_keys}} ) {
-                        #$join = clone( $backup_join );
                         $join = $backup_join;
                         next JOIN;
                     }
@@ -364,7 +362,6 @@ sub join_tables {
                     { prompt => 'Choose FOREIGN KEY column:', undef => $sf->{i}{_reset} }
                 );
                 if ( ! defined $fk_col ) {
-                    #$join = clone( $backup_join );
                     $join = $backup_join;
                     next JOIN;
                 }

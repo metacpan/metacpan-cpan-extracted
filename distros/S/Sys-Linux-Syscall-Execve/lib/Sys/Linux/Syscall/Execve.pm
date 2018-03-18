@@ -7,7 +7,7 @@ use Encode qw/encode/;
 use Exporter qw/import/;
 use Config;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 our @EXPORT_OK = qw/execve execve_env execve_byref/;
 
@@ -57,7 +57,7 @@ sub _get_str_ptr {
 sub _build_args {
   my $arg_ref = shift;
 
-  my $buffer = join '', map {_get_str_ptr($_)} @$arg_ref;
+  my $buffer = join('', (map {_get_str_ptr(\$_)} @$arg_ref));
 
   return $buffer . $NULL_PTR; # terminate the char *argv[] with a NULL ptr
 }
@@ -126,13 +126,16 @@ sub execve_byref {
 sub execve_env {
   my ($cmd, $args_ref, $env_ref) = @_;
 
-  execve_byref(\$cmd, $args_ref, $env_ref);
+  # Copy the arguments, and put $cmd at the start
+  my @args = ($cmd, @$args_ref);
+
+  execve_byref(\$cmd, \@args, $env_ref);
 }
 
 sub execve {
   my ($cmd, @args) = @_;
 
-  execve_byref(\$cmd, \@args, \%ENV);
+  execve_byref(\$cmd, \@_, \%ENV);
 }
 
 1;
@@ -175,12 +178,13 @@ Lets you setup a custom environment to be passed to the new program.  Useful for
 =item execve_byref
 
     my $cmd = "/path/to/cmd";
-    my $args = [arg1, arg2, arg3, ...];
+    my $args = [$cmd, arg1, arg2, arg3, ...];
     my $env = {env_var => value, ...};
 
     execve_byref(\$cmd, $args, $env);
 
 This is a special interface, passing the command in as a scalar ref helps ensure that the correct string gets passed by pointer to execve() at the final stage.  This is necessary to be perfectly sure that the correct value is passed to the syscall.
+It's important to note that this method requires you to set the command as the first argument.  This gets used to set the running name of the program and may allow you to unlock other behavior in it based on this value (e.g. busybox).
 
 =back
 

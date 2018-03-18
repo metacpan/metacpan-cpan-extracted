@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.835';
+our $VERSION = '1.836';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -95,6 +95,7 @@ sub init {
       $_DATA->{"$pkg:seed"} = int(rand() * 1e9);
       $_DATA->{"$pkg:id"  } = 0;
    }
+
    if ( !exists $mngd->{posix_exit} ) {
       $mngd->{posix_exit} = 1 if (
          ( $_has_threads && $_tid ) || $INC{'Mojo/IOLoop.pm'} ||
@@ -105,11 +106,16 @@ sub init {
          $INC{'Win32/GUI.pm'} || $INC{'stfl.pm'}
       );
    }
+
    if ( $mngd->{max_workers} ) {
       my $cpus = $mngd->{max_workers};
       $cpus = MCE::Util::get_ncpu() if $cpus eq 'auto';
       $cpus = 1 if $cpus !~ /^[\d\.]+$/ || $cpus < 1;
       $mngd->{max_workers} = int($cpus);
+   }
+
+   if ( $INC{'LWP/UserAgent.pm'} && !$INC{'Net/HTTP.pm'} ) {
+      local $@; eval 'require Net::HTTP; require Net::HTTPS';
    }
 
    require POSIX
@@ -799,7 +805,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.835
+This document describes MCE::Hobo version 1.836
 
 =head1 SYNOPSIS
 

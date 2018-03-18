@@ -14,7 +14,7 @@ use App::Sqitch::Types qw(Str Int Sqitch Plan Bool HashRef URI Maybe Target);
 use namespace::autoclean;
 use constant registry_release => '1.1';
 
-our $VERSION = '0.9996';
+our $VERSION = '0.9997';
 
 has sqitch => (
     is       => 'ro',
@@ -260,13 +260,12 @@ sub revert {
 
         @changes = $self->deployed_changes_since(
             $self->_load_changes($change)
-        ) or hurl {
-            ident => 'revert',
-            message => __x(
+        ) or do {
+            $sqitch->info(__x(
                 'No changes deployed since: "{change}"',
                 change => $to,
-            ),
-            exitval => 1,
+            ));
+            return $self;
         };
 
         if ($self->no_prompt) {
@@ -288,10 +287,9 @@ sub revert {
         }
 
     } else {
-        @changes = $self->deployed_changes or hurl {
-            ident   => 'revert',
-            message => __ 'Nothing to revert (nothing deployed)',
-            exitval => 1,
+        @changes = $self->deployed_changes or do {
+            $sqitch->info(__ 'Nothing to revert (nothing deployed)');
+            return $self;
         };
 
         if ($self->no_prompt) {
@@ -335,21 +333,17 @@ sub verify {
     my $plan     = $self->plan;
     my @changes  = $self->_load_changes( $self->deployed_changes );
 
-    $self->sqitch->info(__x(
+    $sqitch->info(__x(
         'Verifying {destination}',
         destination => $self->destination,
     ));
 
     if (!@changes) {
-        # Probably expected, but exit 1 anyway.
         my $msg = $plan->count
             ? __ 'No changes deployed'
             : __ 'Nothing to verify (no planned or deployed changes)';
-        hurl {
-            ident   => 'verify',
-            message => $msg,
-            exitval => 1,
-        };
+        $sqitch->info($msg);
+        return $self;
     }
 
     if ($plan->count == 0) {
@@ -2372,7 +2366,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 License
 
-Copyright (c) 2012-2015 iovation Inc.
+Copyright (c) 2012-2018 iovation Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

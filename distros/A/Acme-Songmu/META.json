@@ -4,7 +4,7 @@
       "Songmu <y.songmu@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.14",
+   "generated_by" : "Minilla/v3.0.16",
    "license" : [
       "perl_5"
    ],
@@ -59,7 +59,7 @@
    "provides" : {
       "Acme::Songmu" : {
          "file" : "lib/Acme/Songmu.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.1.0"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/Songmu/Acme-Songmu"
       }
    },
-   "version" : "v0.0.3",
+   "version" : "v0.1.0",
    "x_authority" : "cpan:SONGMU",
    "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1

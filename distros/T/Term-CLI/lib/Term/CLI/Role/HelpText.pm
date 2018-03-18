@@ -1,4 +1,4 @@
-#===============================================================================
+#=============================================================================
 #
 #       Module:  Term::CLI::HelpText
 #
@@ -16,21 +16,21 @@
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
-#===============================================================================
+#=============================================================================
 
 use 5.014_001;
 
-package Term::CLI::Role::HelpText  0.04004 {
+package Term::CLI::Role::HelpText  0.051002 {
 
-use Modern::Perl;
+use Modern::Perl 1.20140107;
 
-use Types::Standard qw(
+use Types::Standard 1.000005 qw(
     Maybe
     Str
 );
 
 use Moo::Role;
-use namespace::clean;
+use namespace::clean 0.25;
 
 requires 'options';
 requires 'has_commands';
@@ -204,7 +204,7 @@ Term::CLI::Role::HelpText - Role for generating help text in Term::CLI
 
 =head1 VERSION
 
-version 0.04004
+version 0.051002
 
 =head1 SYNOPSIS
 

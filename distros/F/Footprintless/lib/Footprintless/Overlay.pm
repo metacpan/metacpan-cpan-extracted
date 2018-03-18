@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Overlay;
-$Footprintless::Overlay::VERSION = '1.27';
+$Footprintless::Overlay::VERSION = '1.28';
 # ABSTRACT: An overlay manager
 # PODNAME: Footprintless::Overlay
 
@@ -218,7 +218,7 @@ Footprintless::Overlay - An overlay manager
 
 =head1 VERSION
 
-version 1.27
+version 1.28
 
 =head1 SYNOPSIS
 

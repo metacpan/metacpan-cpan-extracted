@@ -1,4 +1,4 @@
-#===============================================================================
+#=============================================================================
 #
 #       Module:  Term::CLI::L10N::nl
 #       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
@@ -13,26 +13,26 @@
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
-#===============================================================================
+#=============================================================================
 
 use 5.014_001;
 
 package Term::CLI::L10N::nl;
 
-our $VERSION = 0.04004;
+our $VERSION = 0.051002;
 
-use Modern::Perl;
+use Modern::Perl 1.20140107;
 
-use parent qw( Term::CLI::L10N );
+use parent 0.228 qw( Term::CLI::L10N );
 
-use Locale::Maketext::Lexicon::Gettext;
+use Locale::Maketext::Lexicon::Gettext 1.00;
 
 our %Lexicon = %{ Locale::Maketext::Lexicon::Gettext->parse(<DATA>) };
 close DATA;
 
 # $str = $lh->singularize($num, $plural);
 # $str = $lh->singularise($num, $plural);
-use subs qw( singularise );
+use subs 1.00 qw( singularise );
 *singularise = \&singularize;
 
 sub singularize {
@@ -289,7 +289,7 @@ Term::CLI::L10N::nl - Dutch localizations for Term::CLI
 
 =head1 VERSION
 
-version 0.04004
+version 0.051002
 
 =head1 SYNOPSIS
 
@@ -309,7 +309,7 @@ L<Term::CLI::L10N>(3p) class to provide Dutch translations for
 the messages of the L<Term::CLI>(3p) library.
 
 It implements its own C<numerate> method that reverses the
-meaning of its "form" arguments (because its easier to derive
+meaning of its "form" arguments (because it's easier to derive
 the singular noun from the plural in Dutch).
 
 It defines its lexicon using L<Locale::Maketext::Lexicon::Gettext>(3p)

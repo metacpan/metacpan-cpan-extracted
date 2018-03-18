@@ -71,9 +71,9 @@ extern "C" {
 #define IV_1E7 10000000
 #define IV_1E9 1000000000
 
-#define NV_1E6 1000000.0
-#define NV_1E7 10000000.0
-#define NV_1E9 1000000000.0
+#define NV_1E6 (NV)1000000.0
+#define NV_1E7 (NV)10000000.0
+#define NV_1E9 (NV)1000000000.0
 
 #ifndef PerlProc_pause
 #   define PerlProc_pause() Pause()
@@ -1013,17 +1013,35 @@ nsec_without_unslept(struct timespec *sleepfor,
 
 /* Mac OS (Classic) (MacOS 9) */
 #ifdef MACOS_TRADITIONAL
-/* has tz.tz_minuteswest which needs to be added to tv_sec */
+/* has tz values that matter */
 #define GETTIMEOFDAY_TZ
+/* has tz.tz_minuteswest which needs to be added to tv_sec */
+#define ADJUST_BY_TZ_MINUTES
 /* has unsigned time_t */
 #define UNSIGNED_TIME_T
 #endif
 
-#ifdef GETTIMEOFDAY_TZ
-#define mygettimeofday(tv, tz) gettimeofday(tv, tz)
+#if defined(WIN32) || defined(CYGWIN_WITH_W32API)
+#  define mygettimeofday(tp, not_used) gettimeofday(tp, not_used)
 #else
-#define mygettimeofday(tv, tz) gettimeofday(tv, NULL)
-#endif
+static int mygettimeofday(struct timeval *tv, struct timezone *tz)
+{                                 
+  int status;
+#  ifdef GETTIMEOFDAY_TZ
+  status = gettimeofday(tv, tz);
+#  else
+  (void) tz;
+  status = gettimeofday(tv, NULL);
+#  endif /* ifdef GETTIMEOFDAY_TZ */
+#  ifdef ADJUST_BY_TZ_MINUTES
+#    ifndef GETTIMEOFDAY_TZ
+#      error "ADJUST_BY_TZ_MINUTES requires GETTIMEOFDAY_TZ"
+#    endif /* ifndef GETTIMEOFDAY_TZ */
+  tv->tv_sec += tz->tz_minuteswest * 60;	/* adjust for TZ */
+#  endif /* ADJUST_BY_TZ_MINUTES */
+  return status;
+}
+#endif /* if defined(WIN32) || defined(CYGWIN_WITH_W32API) else */
 
 #ifdef UNSIGNED_TIME_T
 #define SvTIME(sv) SvUV(sv)
@@ -1304,16 +1322,11 @@ void
 gettimeofday()
         PREINIT:
         struct timeval Tp;
-#ifdef GETTIMEOFDAY_TZ
         struct timezone Tz;
-#endif
         PPCODE:
         int status;
 	status = mygettimeofday (&Tp, &Tz);
 	if (status == 0) {
-#ifdef MACOS_TRADITIONAL
-	     Tp.tv_sec += Tz.tz_minuteswest * 60;	/* adjust for TZ */
-#endif
              if (GIMME == G_ARRAY) {
                  EXTEND(sp, 2);
                  PUSHs(sv_2mortal(newSVtime(Tp.tv_sec)));
@@ -1328,16 +1341,11 @@ NV
 time()
         PREINIT:
         struct timeval Tp;
-#ifdef GETTIMEOFDAY_TZ
         struct timezone Tz;
-#endif
         CODE:
         int status;
         status = mygettimeofday (&Tp, &Tz);
 	if (status == 0) {
-#ifdef MACOS_TRADITIONAL
-            Tp.tv_sec += Tz.tz_minuteswest * 60;	/* adjust for TZ */
-#endif
 	    RETVAL = Tp.tv_sec + (Tp.tv_usec / NV_1E6);
         } else {
 	    RETVAL = -1.0;
@@ -1349,9 +1357,7 @@ NV
 tv_interval(SV* start, ...)
     PREINIT:
     struct timeval Tp;
-#ifdef GETTIMEOFDAY_TZ
     struct timezone Tz;
-#endif
     SV* end;
     time_t end_sec;
     IV end_usec;
@@ -1359,18 +1365,35 @@ tv_interval(SV* start, ...)
 
     CODE:
 
+    end = NULL;
     if (items >= 2) {
         end = ST(1);
+    }
+    /* It would be tempting croak on items > 2
+     * but that would probably break some code. */
+
+    if (SvROK(start) && SvTYPE(SvRV(start)) == SVt_PVAV) {
+        start = SvRV(start);
     } else {
-        end = NULL;
+        croak("tv_interval() 1st argument should be an array reference");
     }
 
-    if (!end || !SvROK(end)) {
+    if (end != NULL) {
+        if (SvROK(end) && SvTYPE(SvRV(end)) == SVt_PVAV) {
+            end = SvRV(end);
+            /* Resist the temptation to expect exactly
+             * an array of length two: that would
+             * no doubt break some code. */
+            avalue = av_fetch((AV*)end, 0, FALSE);
+            end_sec = avalue ? SvTIME(*avalue) : 0;
+            avalue = av_fetch((AV*)end, 1, FALSE);
+            end_usec = avalue ? SvIV(*avalue) : 0;
+        } else {
+            croak("tv_interval() 2nd argument should be an array reference");
+        }
+    } else {
         int status;
         status = mygettimeofday (&Tp, &Tz);
-#ifdef MACOS_TRADITIONAL
-        Tp.tv_sec += Tz.tz_minuteswest * 60;	/* adjust for TZ */
-#endif
         if (status == 0) {
             end_sec = Tp.tv_sec;
             end_usec = Tp.tv_usec;
@@ -1378,23 +1401,12 @@ tv_interval(SV* start, ...)
             end_sec = 0;
             end_usec = 0;
         }
-    } else {
-        end = SvRV(end);
-        if (SvTYPE(end) != SVt_PVAV) croak("Not an array reference in tv_interal()");
-
-        avalue = av_fetch((AV*)end, 0, FALSE);
-        end_sec = avalue ? SvTIME(*avalue) : 0;
-        avalue = av_fetch((AV*)end, 1, FALSE);
-        end_usec = avalue ? SvIV(*avalue) : 0;
     }
 
-    if (!SvROK(start)) croak("Not an array reference in tv_interval()");
-    start = SvRV(start);
-    if (SvTYPE(start) != SVt_PVAV) croak("Not an array reference in tv_interva()");
-
+    /* Resist temptation to expect exactly an array
+     * of length two: that would no doubt break some code. */
     avalue = av_fetch((AV*)start, 0, FALSE);
     RETVAL = end_sec - (avalue ? SvTIME(*avalue) : 0);
-
     avalue = av_fetch((AV*)start, 1, FALSE);
     RETVAL += ((end_usec - (avalue ? SvIV(*avalue) : 0)) / NV_1E6);
 

@@ -1,16 +1,22 @@
 package URI::Fast;
-$URI::Fast::VERSION = '0.09';
+$URI::Fast::VERSION = '0.15';
 # ABSTRACT: A fast(er) URI parser
 
 use utf8;
 use strict;
 use warnings;
 no strict 'refs';
-
 use Carp;
-use Inline C => 'lib/uri_fast.c';
-
+require Inline;
 require Exporter;
+require File::Spec;
+
+# Build
+my $path = File::Spec->rel2abs(__FILE__);
+$path =~ s/\.pm$//;
+$path .= '/uri_fast.c';
+Inline->bind(C => $path => optimize => '-O2');
+
 use parent 'Exporter';
 our @EXPORT_OK = qw(uri uri_split);
 
@@ -18,7 +24,7 @@ use overload '""' => sub{ $_[0]->to_string };
 
 sub uri ($) {
   my $self = URI::Fast->new($_[0] // '');
-  $self->set_scheme('file', 0) unless $self->get_scheme;
+  $self->set_scheme('file') unless $self->get_scheme;
   $self;
 }
 
@@ -29,7 +35,7 @@ foreach my $attr (qw(scheme usr pwd host port frag)) {
 
   *{__PACKAGE__ . "::$attr"} = sub {
     if (@_ == 2) {
-      $_[0]->$s($_[1], 0);
+      $_[0]->$s( $_[1] );
     }
 
     if (defined wantarray) {
@@ -46,14 +52,13 @@ sub auth {
 
   if (@_ == 2) {
     if (ref $val) {
-      $self->set_auth('', 1);
-      $self->set_usr($val->{usr}   // '', 1);
-      $self->set_pwd($val->{pwd}   // '', 1);
-      $self->set_host($val->{host} // '', 1);
-      $self->set_port($val->{port} // '', 0);
+      $self->set_usr($val->{usr}   // '');
+      $self->set_pwd($val->{pwd}   // '');
+      $self->set_host($val->{host} // '');
+      $self->set_port($val->{port} // '');
     }
     else {
-      $self->set_auth($val, 0);
+      $self->set_auth($val);
     }
   }
 
@@ -67,7 +72,7 @@ sub path {
 
   if (@_ == 2) {
     $val = '/' . join '/', @$val if ref $val;
-    $self->set_path($val, 0);
+    $self->set_path($val);
   }
 
   if (wantarray) {
@@ -80,16 +85,16 @@ sub path {
 
 # Queries may be set with either a string or a hash ref
 sub query {
-  my ($self, $val) = @_;
+  my ($self, $val, $sep) = @_;
 
-  if (@_ == 2) {
+  if (@_ > 1) {
     if (ref $val) {
-      $self->set_query('', 1);
-      $self->param($_, $val->{$_})
+      $self->clear_query;
+      $self->param($_, $val->{$_}, $sep)
         foreach keys %$val;
     }
     else {
-      $self->set_query($val, 0);
+      $self->set_query($val);
     }
   }
 
@@ -103,14 +108,15 @@ sub query_keys {
 }
 
 sub param {
-  my ($self, $key, $val) = @_;
+  my ($self, $key, $val, $sep) = @_;
+  $sep ||= '&';
 
-  if (@_ == 3) {
+  if (@_ > 2) {
     $val = ref     $val ? $val
          : defined $val ? [$val]
          : [];
 
-    $self->set_param($key, $val);
+    $self->set_param($key, $val, $sep);
   }
 
   # No return value in void context
@@ -139,7 +145,7 @@ URI::Fast - A fast(er) URI parser
 
 =head1 VERSION
 
-version 0.09
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -229,7 +235,12 @@ The path may also be updated using either a string or an array ref of segments:
 
 =head2 query
 
-The complete query string. Does not include the leading C<?>.
+Returns the complete query string. Does not include the leading C<?>. The query
+string may be set in several ways.
+
+  $uri->query("foo=bar&baz=bat"); # note: no percent-encoding performed
+  $uri->query({foo => 'bar', baz => 'bat'}); # foo=bar&baz=bat
+  $uri->query({foo => 'bar', baz => 'bat'}, ';'); # foo=bar;baz=bat
 
 =head3 query_keys
 
@@ -256,6 +267,12 @@ parameter to C<undef> deletes the parameter from the URI.
 
   # Delete 'foo'
   $uri->param('foo', undef);
+
+An optional third parameter may be specified to control the character used to
+separate key/value pairs.
+
+  $uri->param('foo', 'bar', ';'); # foo=bar
+  $uri->param('baz', 'bat', ';'); # foo=bar;baz=bat
 
 =head2 frag
 

@@ -4,7 +4,7 @@ Date::Lectionary - Readings for the Christian Lectionary
 
 # VERSION
 
-Version 1.20180302
+Version 1.20180314
 
 # SYNOPSIS
 
@@ -125,9 +125,9 @@ You can also look for information at:
 
 Many thanks to my beautiful wife, Jennifer, and my amazing daughter, Rosemary.  But, above all, SOLI DEO GLORIA!
 
-# LICENSE AND COPYRIGHT
+# LICENSE
 
-Copyright 2016-2017 MICHAEL WAYNE ARNOLD
+Copyright 2016-2018 MICHAEL WAYNE ARNOLD
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 

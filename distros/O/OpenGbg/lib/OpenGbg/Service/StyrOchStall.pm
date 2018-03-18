@@ -6,7 +6,7 @@ package OpenGbg::Service::StyrOchStall;
 
 # ABSTRACT: Entry point to the StyrOchStall bike rental service
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1402';
+our $VERSION = '0.1403';
 
 use OpenGbg::Elk;
 with 'OpenGbg::Service::Getter';
@@ -69,7 +69,7 @@ OpenGbg::Service::StyrOchStall - Entry point to the StyrOchStall bike rental ser
 
 =head1 VERSION
 
-Version 0.1402, released 2016-08-12.
+Version 0.1403, released 2018-03-14.
 
 =head1 SYNOPSIS
 
@@ -77,6 +77,10 @@ Version 0.1402, released 2016-08-12.
     my $stations = $service->get_bike_stations;
 
     print $stations->get_by_index(0)->to_text;
+
+=head1 STATUS
+
+Deprecated. The underlying web service has changed. Nothing under the C<OpenGbg::StyrOchStall> namespace works, and will be replaced.
 
 =head1 DESCRIPTION
 

@@ -3,7 +3,7 @@ package HTTP::Request;
 use strict;
 use warnings;
 
-our $VERSION = '6.14';
+our $VERSION = '6.15';
 
 use base 'HTTP::Message';
 
@@ -145,7 +145,7 @@ HTTP::Request - HTTP style request message
 
 =head1 VERSION
 
-version 6.14
+version 6.15
 
 =head1 SYNOPSIS
 

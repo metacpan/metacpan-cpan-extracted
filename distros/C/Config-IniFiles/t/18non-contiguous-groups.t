@@ -11,19 +11,15 @@ use File::Spec;
 
 use Config::IniFiles;
 
-my $filename = File::Spec->catfile(
-    File::Spec->curdir(), "t", "non-contiguous-groups.ini",
-);
+my $filename = File::Spec->catfile( File::Spec->curdir(), "t",
+    "non-contiguous-groups.ini", );
 
 {
-    my $cfg=Config::IniFiles->new(-file => $filename);
+    my $cfg = Config::IniFiles->new( -file => $filename );
 
     my @members = $cfg->GroupMembers("A");
 
     # TEST
-    is_deeply(
-        \@members,
-        ["A 1", "A 2", "A 3"],
-    );
+    is_deeply( \@members, [ "A 1", "A 2", "A 3" ], );
 }
 

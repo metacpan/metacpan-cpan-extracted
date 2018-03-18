@@ -1,5 +1,8 @@
 Revision history for Perl extension DracPerl-Client
 
+0.20 2018-03-17T23:35:29Z
+        - Refactored to use XML::Rabbits and models
+
 0.10 2016-11-01T22:06:34Z
 
 	- Added openSession/saveSession/closeSession

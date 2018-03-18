@@ -6,7 +6,7 @@ use Carp qw/confess/;
 
 use base 'Test2::Compare::Base';
 
-our $VERSION = '0.000106';
+our $VERSION = '0.000111';
 
 our $DEFAULT_TOLERANCE = 1e-08;
 
@@ -56,6 +56,12 @@ sub operator {
 
     return '' unless defined($got);
     return '' unless length($got) && $got =~ m/\S/;
+
+    if ( $self->{+PRECISION} )
+    {
+      return 'ne' if $self->{+NEGATE};
+      return 'eq';
+    }
 
     return '!=' if $self->{+NEGATE};
     return '==';

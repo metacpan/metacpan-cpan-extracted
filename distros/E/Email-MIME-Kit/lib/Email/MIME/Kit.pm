@@ -1,6 +1,6 @@
 package Email::MIME::Kit;
 # ABSTRACT: build messages from templates
-$Email::MIME::Kit::VERSION = '3.000005';
+$Email::MIME::Kit::VERSION = '3.000006';
 require 5.008;
 use Moose 0.65; # maybe_type
 use Moose::Util::TypeConstraints;
@@ -62,6 +62,10 @@ use String::RewritePrefix;
 #pod       }
 #pod     ]
 #pod   }
+#pod
+#pod B<Inline images> may be accessed with the function C<cid_for>, for example to include the above logo.jpg:
+#pod
+#pod     <img style="margin: 0 auto" src="cid:[% cid_for("logo.jpg") %]">
 #pod
 #pod B<Please note:> the assembly of HTML documents as multipart/related bodies may
 #pod be simplified with an alternate assembler in the future.
@@ -293,7 +297,7 @@ Email::MIME::Kit - build messages from templates
 
 =head1 VERSION
 
-version 3.000005
+version 3.000006
 
 =head1 SYNOPSIS
 
@@ -347,6 +351,10 @@ look something like this:
       }
     ]
   }
+
+B<Inline images> may be accessed with the function C<cid_for>, for example to include the above logo.jpg:
+
+    <img style="margin: 0 auto" src="cid:[% cid_for("logo.jpg") %]">
 
 B<Please note:> the assembly of HTML documents as multipart/related bodies may
 be simplified with an alternate assembler in the future.
@@ -407,7 +415,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Charlie Garrison fREW Schmidt hdp
+=for stopwords Charlie Garrison fREW Schmidt hdp Kaitlyn Parkhurst
 
 =over 4
 
@@ -423,11 +431,15 @@ fREW Schmidt <frioux@gmail.com>
 
 hdp <hdp@1bcdbe44-fcfd-0310-b51b-975661d93aa0>
 
+=item *
+
+Kaitlyn Parkhurst <symkat@symkat.com>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo Signes.
+This software is copyright (c) 2018 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

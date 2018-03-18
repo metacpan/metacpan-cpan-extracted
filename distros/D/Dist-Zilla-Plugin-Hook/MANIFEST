@@ -1,8 +1,8 @@
-# This file was generated with Dist::Zilla::Plugin::Manifest::Write v0.9.5
+# This file was generated with Dist::Zilla::Plugin::Manifest::Write v0.9.7.
 Build.PL                                            #              3rd party file built by ModuleBuildTiny
 COPYING                                             # Dist-Zilla-Plugin-Hook file built by GenerateFile
 Changes                                             # Dist-Zilla-Plugin-Hook file added by Manifest::Read
-GPLv3                                               # Dist-Zilla-Plugin-Hook file added by Manifest::Read
+GPL-3.0                                             # Dist-Zilla-Plugin-Hook file added by Manifest::Read
 MANIFEST                                            #               metainfo file built by Manifest::Write
 META.json                                           #               metainfo file built by MetaJSON
 META.yml                                            #               metainfo file built by MetaYAML
@@ -12,14 +12,17 @@ eg/AdaptiveTestVersion/README.pod                   # Dist-Zilla-Plugin-Hook fil
 eg/AdaptiveTestVersion/dist.ini                     # Dist-Zilla-Plugin-Hook file added by Manifest::Read
 eg/Description/README.pod                           # Dist-Zilla-Plugin-Hook file added by Manifest::Read
 eg/Description/dist.ini                             # Dist-Zilla-Plugin-Hook file added by Manifest::Read
+eg/NoDotInInc/README.pod                            # Dist-Zilla-Plugin-Hook file added by Manifest::Read
+eg/NoDotInInc/dist.ini                              # Dist-Zilla-Plugin-Hook file added by Manifest::Read
+eg/NoDotInInc/inc/Foo.pm                            # Dist-Zilla-Plugin-Hook file added by Manifest::Read
 eg/TemplateVariables/BUGS.pod                       # Dist-Zilla-Plugin-Hook file added by Manifest::Read
 eg/TemplateVariables/README.pod                     # Dist-Zilla-Plugin-Hook file added by Manifest::Read
 eg/TemplateVariables/dist.ini                       # Dist-Zilla-Plugin-Hook file added by Manifest::Read
 eg/UnwantedDependencies/README.pod                  # Dist-Zilla-Plugin-Hook file added by Manifest::Read
 eg/UnwantedDependencies/dist.ini                    # Dist-Zilla-Plugin-Hook file added by Manifest::Read
-eg/VersionHandling/README.pod                       # Dist-Zilla-Plugin-Hook file added by Manifest::Read
-eg/VersionHandling/VERSION                          # Dist-Zilla-Plugin-Hook file added by Manifest::Read
-eg/VersionHandling/dist.ini                         # Dist-Zilla-Plugin-Hook file added by Manifest::Read
+eg/VersionBumping/README.pod                        # Dist-Zilla-Plugin-Hook file added by Manifest::Read
+eg/VersionBumping/VERSION                           # Dist-Zilla-Plugin-Hook file added by Manifest::Read
+eg/VersionBumping/dist.ini                          # Dist-Zilla-Plugin-Hook file added by Manifest::Read
 lib/Dist/Zilla/Plugin/Hook.pm                       # Dist-Zilla-Plugin-Hook file added by Manifest::Read
 lib/Dist/Zilla/Plugin/Hook/AfterBuild.pm            #              3rd party file built by =tools::GenerateHooks
 lib/Dist/Zilla/Plugin/Hook/AfterMint.pm             #              3rd party file built by =tools::GenerateHooks
@@ -46,26 +49,3 @@ lib/Dist/Zilla/Role/Hooker.pm                       # Dist-Zilla-Plugin-Hook fil
 t/00-compile.t                                      #              3rd party file built by Test::Compile
 t/hook.t                                            # Dist-Zilla-Plugin-Hook file added by Manifest::Read
 t/lib/HookTester.pm                                 # Dist-Zilla-Plugin-Hook file added by Manifest::Read
-xt/aspell-en.pws                                    # Dist-Zilla-Plugin-Hook file added by Manifest::Read
-xt/author/critic.t                                  #              3rd party file built by Test::Perl::Critic
-xt/author/eol.t                                     #              3rd party file built by Test::EOL
-xt/author/mojibake.t                                #              3rd party file built by MojibakeTests
-xt/author/no-tabs.t                                 #              3rd party file built by Test::NoTabs
-xt/author/pod-coverage.t                            #              3rd party file built by PodCoverageTests
-xt/author/pod-no404s.t                              #              3rd party file built by Test::Pod::No404s
-xt/author/pod-spell.t                               #              3rd party file built by Test::PodSpelling
-xt/author/pod-syntax.t                              #              3rd party file built by PodSyntaxTests
-xt/author/test-version.t                            #              3rd party file built by Test::Version
-xt/examples.t                                       # Dist-Zilla-Plugin-Hook file added by Manifest::Read
-xt/perlcritic.ini                                   # Dist-Zilla-Plugin-Hook file added by Manifest::Read
-xt/release/cpan-changes.t                           #              3rd party file built by Test::CPAN::Changes
-xt/release/dist-manifest.t                          #              3rd party file built by Test::DistManifest
-xt/release/distmeta.t                               #              3rd party file built by MetaTests
-xt/release/fixme.t                                  #              3rd party file built by Test::Fixme
-xt/release/kwalitee.t                               #              3rd party file built by Test::Kwalitee
-xt/release/meta-json.t                              #              3rd party file built by Test::CPAN::Meta::JSON
-xt/release/minimum-version.t                        #              3rd party file built by Test::MinimumVersion
-xt/release/new-version.t                            #              3rd party file built by Test::NewVersion
-xt/release/pod-linkcheck.t                          #              3rd party file built by Test::Pod::LinkCheck
-xt/release/portability.t                            #              3rd party file built by Test::Portability
-xt/release/synopsis.t                               #              3rd party file built by Test::Synopsis

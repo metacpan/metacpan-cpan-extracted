@@ -1,5 +1,7 @@
 package Catmandu::Importer::ArXiv;
 
+our $VERSION = '0.200';
+
 use Catmandu::Sane;
 use Catmandu::Importer::XML;
 use Catmandu::Fix::Condition::is_valid_orcid as => 'is_valid_orcid';
@@ -35,8 +37,6 @@ sub _request {
     );
 
     my $res = $furl->get($url);
-    die $res->status_line unless $res->is_success;
-
     return $res;
 }
 

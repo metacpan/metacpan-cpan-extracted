@@ -1,10 +1,10 @@
 # ABSTRACT: Utilities for Monitoring ElasticSearch
 package App::ElasticSearch::Utilities;
 
-our $VERSION = '5.4'; # VERSION
-
 use strict;
 use warnings;
+
+our $VERSION = '5.5'; # VERSION
 
 our $_OPTIONS_PARSED;
 our %_GLOBALS = ();
@@ -287,7 +287,7 @@ sub es_connect {
 
     # If we're overriding, return a unique handle
     if(defined $override_servers) {
-        my @overrides = ref $override_servers eq 'ARRAY' ? @$override_servers : $override_servers;
+        my @overrides =  is_arrayref($override_servers) ? @$override_servers : $override_servers;
         my @servers;
         foreach my $entry ( @overrides ) {
             my ($s,$p) = split /\:/, $entry;
@@ -355,7 +355,7 @@ sub es_request {
         else {
             # Validate each included index
             my @valid;
-            my @test = ref $index_in eq 'ARRAY' ? @{ $index_in } : split /\,/, $index_in;
+            my @test = is_arrayref($index_in) ? @{ $index_in } : split /\,/, $index_in;
             foreach my $i (@test) {
                 push @valid, $i if es_index_valid($i);
             }
@@ -536,10 +536,10 @@ sub es_index_strip_date {
 
     return -1 unless defined $index;
 
-    if( $index =~ s/[-_]$PATTERN_REGEX{DATE}// ) {
+    if( $index =~ s/[-_]$PATTERN_REGEX{DATE}.*// ) {
         return $index;
     }
-    return undef;
+    return;
 }
 
 
@@ -677,7 +677,7 @@ sub _find_fields {
     elsif( exists $ref->{type} ) {
         _add_fields($f,@path);
         # Handle multifields
-        if( exists $ref->{fields} && ref $ref->{fields} eq 'HASH') {
+        if( exists $ref->{fields} && is_hashref($ref->{fields}) ) {
             foreach my $k (sort keys %{ $ref->{fields} } ) {
                 _add_fields($f,@path,$k);
             }
@@ -688,8 +688,8 @@ sub _find_fields {
         debug({stderr=>1,color=>'red'},
             sprintf "_find_fields(): Invalid property at: %s ref info: %s",
                 join('.', @path),
-                join(',', ref $ref eq 'HASH' ? sort keys %{$ref} :
-                          ref $ref           ? ref $ref : 'unknown ref'
+                join(',', is_hashref($ref) ? sort keys %{$ref} :
+                          ref $ref         ? ref $ref : 'unknown ref'
                 ),
         );
     }
@@ -729,10 +729,11 @@ sub es_optimize_index {
     });
 }
 
+
 sub es_apply_index_settings {
     my($index,$settings) = @_;
 
-    if(ref $settings ne 'HASH') {
+    if(!is_hashref($settings)) {
         output({stderr=>1,color=>'red'}, 'usage is es_apply_index_settings($index,$settings_hashref)');
         return;
     }
@@ -746,7 +747,7 @@ sub es_index_segments {
 
     if( !defined $index || !length $index || !es_index_valid($index) ) {
         output({stderr=>1,color=>'red'}, "es_index_segments('$index'): invalid index");
-        return undef;
+        return;
     }
 
     return es_request('_segments', {
@@ -824,7 +825,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 5.4
+version 5.5
 
 =head1 SYNOPSIS
 
@@ -897,7 +898,7 @@ Returns a hashref of the pattern filter used to get the indexes
 Without options, this connects to the server defined in the args.  If passed
 an array ref, it will use that as the connection definition.
 
-=head2 es_request([$handle])
+=head2 es_master([$handle])
 
 Returns true (1) if the handle is to the the cluster master, or false (0) otherwise.
 
@@ -963,7 +964,7 @@ Returns an array of the possible index base names for this index
 
 Return the number of days old this index is.
 
-=head2 es_index_shard_replicas( 'index-name' )
+=head2 es_index_shards( 'index-name' )
 
 Returns the number of replicas for a given index.
 
@@ -990,6 +991,10 @@ Deletes an index
 =head2 es_optimize_index('index-name')
 
 Optimize an index to a single segment per shard
+
+=head2 es_apply_index_settings('index-name', { settings })
+
+Apply a HASH of settings to an index.
 
 =head2 es_index_segments( 'index-name' )
 

@@ -3,7 +3,7 @@ package JavaScript::V8::Handlebars;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.10';
 
 use File::Slurp qw/slurp/;
 use File::Spec;
@@ -12,6 +12,8 @@ use File::ShareDir ();
 
 use JSON ();
 use JavaScript::V8;
+
+our $LOG = 0;
 
 my $module_dir = File::ShareDir::module_dir( __PACKAGE__ );
 my ( $LIBRARY_PATH ) = glob "$module_dir/handlebars*.js"; # list context avoids global state
@@ -162,17 +164,17 @@ sub register_partial_file {
 }
 
 sub register_partial {
-	my( $self, $name, $tpl ) = @_;
+	my( $self, $name, $template ) = @_;
 
-	if( ref $tpl eq '' ) {
-		$tpl = $self->compile( $tpl );
+	if( ref $template eq 'CODE') {
+		$self->{registerPartial}->( $name, $template );
 	}
-
-	if( ref $tpl eq 'CODE') {
-		$self->{registerPartial}->( $name, $tpl );
+	elsif( ref $template eq '' ) {
+		$self->{registerPartial}->( $name, $self->compile( $template ) );
+		$self->{partials}{$name} = $self->precompile( $template );
 	}
 	else {
-		die "Bad partial template: should be CODEREF or template source [$tpl]";
+		die "Bad partial template: should be CODEREF or template source [$template]";
 	}
 
 	return 1;
@@ -215,6 +217,8 @@ sub add_template_file {
 		$name = (File::Spec->splitpath($file))[2]; #Filename
 		$name =~ s/\..*//; #Remove extension
 	}
+
+	warn "Storing template $name" if $LOG;
 	
 	$self->add_template( $name, scalar slurp $file );
 }
@@ -235,7 +239,7 @@ sub add_template_dir {
 			my $name = File::Spec->abs2rel( $_, $start_dir );
 				$name =~ s/\..*$//; #Remove extension
 
-			if( $File::Find::dir =~ /(^|\W)partial(\W|$)/ ) {
+			if( $File::Find::dir =~ /(^|\W)partials?(\W|$)/ ) {
 				$self->register_partial_file( $name, $_ );
 			}
 			else {
@@ -250,6 +254,8 @@ sub add_template_dir {
 sub execute_template {
 	my( $self, $name, $args ) = @_;
 
+	warn "Attempting to execute $name $args" if $LOG;
+
 	return $self->{templates}{$name}->( $args );
 }
 
@@ -258,9 +264,17 @@ sub bundle {
 
 	my $out = "var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};\n";
 
+	#Templates!
 	while( my( $name, $template ) = each %{ $self->{template_code} } ) {
 		$out .= "templates['$name'] = template( $template );\n";
 	}
+
+	#Partials!
+	while( my( $name, $partial ) = each %{ $self->{partials} } ) {
+		$out .= "Handlebars.registerPartial('$name', template( $partial ));\n";
+	}
+
+
 
 	return $out;
 }
@@ -348,7 +362,7 @@ Wrapper function for C<$hbjs->c->eval> that checks for errors and throws an exce
 
 =item $hbjs->precompile($template_string)
 
-Takes a template and translates it into the javascript code suitable for passing to the C<template> method.
+Takes a template and translates it into the javascript code suitable for passing to the C<template> method. See handlebar.js for specifics.
 
 =item $hbjs->compile_file($template_filename)
 
@@ -400,6 +414,10 @@ Returns a string of javascript consisting of all the templates in the cache read
 Whatever the original Handlebar function does.
 
 =item $hbjs->escapeString ($string)
+
+Whatever the original Handlebar function does.
+
+=item $hbjs->escape_expression ($string)
 
 Whatever the original Handlebar function does.
 

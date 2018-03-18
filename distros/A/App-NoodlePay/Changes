@@ -1,4 +1,7 @@
 Revision history for App-NoodlePay
 
+1.003   Sat Mar 17 14:38:49 2018 -0700
+    	Add fee estimation, online mode
+
 1.002   Mon Sep 25 18:56:05 2017 -0700
 	First release

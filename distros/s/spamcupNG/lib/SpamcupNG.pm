@@ -24,16 +24,20 @@ our %MAP       = (
     'verbosity'  => 'V',
 );
 
+my %fatal_errors = (
+    mailhost_problem => qr/Mailhost\sconfiguration\sproblem/i,
+    too_old          => qr/^Sorry,\sthis\semail\sis\stoo\sold/
+);
+
 my %regexes = (
-    no_user_id    => qr/\>No userid found\</i,
-    next_id       => qr/sc\?id\=(.*?)\"\>/i,
-    http_500      => qr/500/,
-    too_old_email => qr/Sorry, this email is too old/i,
+    no_user_id => qr/\>No userid found\</i,
+    next_id    => qr/sc\?id\=(.*?)\"\>/i,
+    http_500   => qr/500/,
 );
 
 lock_hash(%MAP);
 
-our $VERSION = '0.9'; # VERSION
+our $VERSION = '1.0'; # VERSION
 
 =head1 NAME
 
@@ -316,7 +320,7 @@ sub _self_auth {
 
     # Parse id for link
     if ( $content =~ $regexes{no_user_id} ) {
-        $logger->fatal(
+        $logger->logdie(
 'No userid found. Please check that you have entered correct code. Also consider obtaining a password to Spamcop.net instead of using the old-style authorization token.'
         );
     }
@@ -347,11 +351,26 @@ sub _check_next_id {
     return $next_id;
 }
 
+sub _check_warning {
+    my $content_ref = shift;
+    my $tree        = HTML::TreeBuilder::XPath->new;
+    $tree->parse_content($$content_ref);
+    my @errors = $tree->findnodes('//div[@id="content"]/div[@class="warn"]');
+
+    if ( scalar(@errors) > 0 ) {
+        return $errors[0]->as_trimmed_text;
+    }
+    else {
+        return;
+    }
+}
+
 sub _check_error {
     my $content_ref = shift;
     my $tree        = HTML::TreeBuilder::XPath->new;
     $tree->parse_content($$content_ref);
     my @errors = $tree->findnodes('//div[@id="content"]/div[@class="error"]');
+
     if ( scalar(@errors) > 0 ) {
         return $errors[0]->as_trimmed_text;
     }
@@ -420,8 +439,32 @@ sub main_loop {
         return 0;
     }
 
+    if ( my $warn_msg = _check_warning( \( $res->content ) ) ) {
+        $logger->warn($warn_msg);
+    }
+
     if ( my $error_msg = _check_error( \( $res->content ) ) ) {
-        $logger->error($error_msg);
+
+        my $is_fatal = 0;
+
+        for my $fatal_error ( keys(%fatal_errors) ) {
+
+            if ( $error_msg =~ $fatal_errors{$fatal_error} ) {
+                $is_fatal = 1;
+                last;
+            }
+
+        }
+
+        if ($is_fatal) {
+            $logger->fatal($error_msg);
+
+            # must stop processing the HTML for this report and move to next
+            return 0;
+        }
+        else {
+            $logger->error($error_msg);
+        }
     }
 
     # parse the spam
@@ -584,11 +627,6 @@ sub main_loop {
         }
 
     }
-
-    elsif ( $res->content =~ $regexes{too_old_email} ) {
-        $logger->warn('This SPAM is too old and thus was deleted.');
-        return 0;
-    }
     elsif ( $res->content =~
 /click reload if this page does not refresh automatically in \n(\d+) seconds/gs
       )
@@ -613,18 +651,6 @@ sub main_loop {
         );
         return 0;
     }
-
-    # :TODO:07/02/2018 10:15:44:ARFREITAS: Need to add a checking for this
-
-#<div class="fixedmsg">0: Received: by 2002:a17:902:526d:: with SMTP id z100-v6mr2179638plh.396.1517918532644; Tue, 06 Feb 2018 04:02:12 -0800 (PST)</div>
-#No unique hostname found for source: 2002:a17:902:526d:0:0:0:0<br>
-#<div class="warning">Possible forgery. Supposed receiving system not associated with any of your mailhosts</div>
-#Will not trust this Received line.<br>
-#<div class="error">Mailhost configuration problem, identified internal IP as source</div>
-#Mailhost:<br>
-#Please correct this situation - register every email address where you receive spam<br>
-#<div class="error">No source IP address found, cannot proceed.</div>
-
     else {
         # Shit happens. If you know it should be parseable, please report a bug!
         $logger->warn(
@@ -640,7 +666,6 @@ sub main_loop {
         exit;
     }
 
-    $logger->debug('Starting the parse phase...');
     undef $req;
     undef $res;
 
@@ -701,9 +726,13 @@ sub main_loop {
 
     # print the report
     if ( $logger->is_info ) {
-        $logger->info('Spamcop.net sent following SPAM reports:');
-        $logger->info("$report") if $report;
+
+        if ($report) {
+            $logger->info("Spamcop.net sent following SPAM reports:\n$report");
+        }
+
         $logger->info('Finished processing.');
+
     }
 
     return 1;

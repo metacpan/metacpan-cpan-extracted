@@ -1,6 +1,6 @@
 package Map::Tube::Line;
 
-$Map::Tube::Line::VERSION   = '3.44';
+$Map::Tube::Line::VERSION   = '3.45';
 $Map::Tube::Line::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Line - Class to represent the line in the map.
 
 =head1 VERSION
 
-Version 3.44
+Version 3.45
 
 =cut
 
@@ -101,13 +101,11 @@ sub add_station {
     push @{$self->{stations}}, $station;
 }
 
-# TODO: Fix station name with different ids. Refer method Map::Tube::get_stations()
-#
-#=head2 get_stations()
-#
-#Returns ref to a list of stations i.e. object of type L<Map::Tube::Node>.
-#
-#=cut
+=head2 get_stations()
+
+Returns ref to a list of stations i.e. object of type L<Map::Tube::Node>.
+
+=cut
 
 sub get_stations {
     my ($self) = @_;

@@ -15,7 +15,8 @@ our @JobGroupWith;
 our @RunWith;
 
 BEGIN {
-    if ($using_DRMAA = can_load( modules => { 'Schedule::DRMAAc' => undef })) {
+    if (!$ENV{HPCI_NO_DRMAA}
+		    and $using_DRMAA = can_load( modules => { 'Schedule::DRMAAc' => undef })) {
         push @RunWith, "HPCD::SGE::DRMAARun";
         push @JobGroupWith, "HPCD::SGE::DRMAAJobGroup";
     }

@@ -82,7 +82,11 @@ sub InitState {
 	$self->{cookie_path}       = &config($self, 'CookiePath', undef, '/');
 	$self->{cookie_domain}     = &config($self, 'CookieDomain');
 	$self->{paranoid_session}  = &config($self, 'ParanoidSession');
-	$self->{remote_ip}         = $r->connection()->remote_ip();
+
+	$self->{remote_ip}         = eval { $r->connection()->remote_ip() };   # may not exist in Apache 2.4
+	$self->{remote_ip}         ||= eval { $r->useragent_ip() };            # should exist in Apache 2.4, best for end user agent IP address
+	$self->{remote_ip}         ||= eval { $r->connection()->client_ip() }; # if useragent_ip not defined for Apache 2.4, try this one
+
 	$self->{session_count}     = &config($self, 'SessionCount');
 	
 	# cookieless session support, cascading values
@@ -94,6 +98,7 @@ sub InitState {
 	
 	$self->{session_serialize} = &config($self, 'SessionSerialize');
 	$self->{secure_session}    = &config($self, 'SecureSession');
+	$self->{http_only_session} = &config($self, 'HTTPOnlySession');
 	# session timeout in seconds since that is what we work with internally
 	$self->{session_timeout}   = &config($self, 'SessionTimeout', undef, $SessionTimeout) * 60;
 	$self->{'ua'}              = $self->{headers_in}->get('User-Agent') || 'UNKNOWN UA';
@@ -440,8 +445,9 @@ sub SessionId {
 	unless($self->{session_url_force}) {
 	    # don't set the cookie when we are just using SessionQuery* configs
 	    my $secure = $self->{secure_session} ? '; secure' : '';
+	    my $httponly = $self->{http_only_session} ? '; HttpOnly' : '';
 	    my $domain = $self->{cookie_domain}  ? '; domain='.$self->{cookie_domain} : '';
-	    $self->{r}->err_headers_out->add('Set-Cookie', "$SessionCookieName=$id; path=$self->{cookie_path}".$domain.$secure);
+	    $self->{r}->err_headers_out->add('Set-Cookie', "$SessionCookieName=$id; path=$self->{cookie_path}".$domain.$secure.$httponly);
 	}
 	$self->{session_id} = $id;
     } else {

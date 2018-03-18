@@ -29,7 +29,7 @@ no_index:
 provides:
   Net::OpenStack::Swift:
     file: lib/Net/OpenStack/Swift.pm
-    version: '0.13'
+    version: '0.14'
   Net::OpenStack::Swift::InnerKeystone::Base:
     file: lib/Net/OpenStack/Swift/InnerKeystone.pm
   Net::OpenStack::Swift::InnerKeystone::V1_0:
@@ -59,10 +59,11 @@ resources:
   bugtracker: https://github.com/masakyst/Net-OpenStack-Swift/issues
   homepage: https://github.com/masakyst/Net-OpenStack-Swift
   repository: git://github.com/masakyst/Net-OpenStack-Swift.git
-version: '0.13'
+version: '0.14'
 x_contributors:
   - 'RenatoCRON <renato.cron@gmail.com>'
   - 'yasu47b <yasu47b@gmail.com>'
   - 'Marios Titas <redneb@gmx.com>'
+  - 'bork1n <24889495+bork1n@users.noreply.github.com>'
   - 'Masaaki Saito <masakyst.mobile@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

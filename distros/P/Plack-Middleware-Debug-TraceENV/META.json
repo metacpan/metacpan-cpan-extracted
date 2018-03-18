@@ -4,7 +4,7 @@
       "Dai Okabayashi <bayashi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -39,7 +39,7 @@
    "provides" : {
       "Plack::Middleware::Debug::TraceENV" : {
          "file" : "lib/Plack/Middleware/Debug/TraceENV.pm",
-         "version" : "0.042"
+         "version" : "0.043"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
          "url" : "http://github.com/bayashi/Plack-Middleware-Debug-TraceENV"
       }
    },
-   "version" : "0.042",
+   "version" : "0.043",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -4,7 +4,7 @@
       "Robert Grimes <rmzgrimes@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -27,13 +27,15 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "File::ShareDir" : "0",
             "File::Slurp" : "0",
+            "JSON" : "0",
             "JavaScript::V8" : "0",
             "perl" : "5.010001"
          }
@@ -47,5 +49,6 @@
          "web" : "https://github.com/rmzg/JavaScript-V8-Handlebars"
       }
    },
-   "version" : "0.06"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,0 +1,8 @@
+\B\.git\b
+\B\.gitignore
+\.tar\.gz
+.github/ISSUE_TEMPLATE.md
+.github/PULL_REQUEST_TEMPLATE.md
+.travis.yml
+^Makefile$
+MANIFEST.bak

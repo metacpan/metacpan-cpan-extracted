@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.18
+# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.19
 
 use Test::More 0.88;
 use Test::EOL;
@@ -15,9 +15,11 @@ my @files = (
     'lib/App/ElasticSearch/Utilities/QueryString/BareWords.pm',
     'lib/App/ElasticSearch/Utilities/QueryString/FileExpansion.pm',
     'lib/App/ElasticSearch/Utilities/QueryString/IP.pm',
+    'lib/App/ElasticSearch/Utilities/QueryString/Nested.pm',
     'lib/App/ElasticSearch/Utilities/QueryString/Plugin.pm',
     'lib/App/ElasticSearch/Utilities/QueryString/Underscored.pm',
     'lib/App/ElasticSearch/Utilities/VersionHacks.pm',
+    'lib/Types/ElasticSearch.pm',
     'scripts/es-alias-manager.pl',
     'scripts/es-apply-settings.pl',
     'scripts/es-copy-index.pl',

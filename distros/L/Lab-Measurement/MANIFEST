@@ -162,6 +162,7 @@ lib/Lab/Moose/Connection/Socket.pm
 lib/Lab/Moose/Connection/USB.pm
 lib/Lab/Moose/Connection/VISA.pm
 lib/Lab/Moose/Connection/VISA/GPIB.pm
+lib/Lab/Moose/Connection/VISA/USB.pm
 lib/Lab/Moose/Connection/VISA/VXI11.pm
 lib/Lab/Moose/Connection/VISA_GPIB.pm
 lib/Lab/Moose/Connection/VXI11.pm
@@ -248,8 +249,6 @@ lib/Lab/XPRESS/Sweep/Time.pm
 lib/Lab/XPRESS/Sweep/Voltage.pm
 lib/Lab/XPRESS/Utilities/Utilities.pm
 lib/Lab/XPRESS/hub.pm
-paper.bib
-paper.md
 perltidyrc
 scripts/lab-update.pl
 t/00-load.t

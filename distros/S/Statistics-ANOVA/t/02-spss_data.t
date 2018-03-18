@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 8;
 use constant EPS     => 1e-4;
 
 BEGIN { use_ok('Statistics::ANOVA::EffectSize') }
@@ -47,6 +47,44 @@ $es = $aov_es->eta_sq_partial_by_f(f_value => $ref_vals{'f_value'} , df_b => $re
 ok( about_equal( $es, $ref_vals{'eta_sq_p'} ),
     "eta_sq_partial_by_ss: $es != $ref_vals{'eta_sq_p'}" );
 
+# check that the two omega-sq methods yield the same results:
+my $numerator_ss = Statistics::ANOVA::EffectSize::_omega_numerator_ss({df_b => $ref_vals{'df_b'},
+df_w => $ref_vals{'df_w'},
+ss_b => $ref_vals{'ss_b'},
+ss_w => $ref_vals{'ss_w'}});
+#diag($numerator_ss);
+
+my $numerator_ms = Statistics::ANOVA::EffectSize::_omega_numerator_ms({ms_b => $ref_vals{'ms_b'}, ms_w => $ref_vals{'ms_w'}, df_b => $ref_vals{'df_b'}, count => $ref_vals{'count'}});
+#diag($numerator_ms);
+
+ok( about_equal( $numerator_ss, $numerator_ms ),
+    "omega_sq_partial_xx methods: numerators do not agree: $numerator_ss != $numerator_ms" );
+
+my $denominator_ss = Statistics::ANOVA::EffectSize::_omega_denominator_ss({df_b => $ref_vals{'df_b'},
+df_w => $ref_vals{'df_w'},
+ss_b => $ref_vals{'ss_b'},
+ss_w => $ref_vals{'ss_w'},
+count => $ref_vals{'count'}});
+#diag($numerator_ss);
+
+my $denominator_ms = Statistics::ANOVA::EffectSize::_omega_denominator_ms({ms_b => $ref_vals{'ms_b'}, ms_w => $ref_vals{'ms_w'}, df_b => $ref_vals{'df_b'}, count => $ref_vals{'count'}});
+#diag($numerator_ms);
+
+ok( about_equal( $denominator_ss, $denominator_ms ),
+    "omega_sq_partial_xx methods: denominators do not agree: $denominator_ss != $denominator_ms" );
+
+# $es->omega_sq_partial_by_ss(df_b => NUM, df_w => NUM, ss_b => NUM, ss_w => NUM);
+$es = $aov_es->omega_sq_partial_by_ss(
+df_b => $ref_vals{'df_b'},
+df_w => $ref_vals{'df_w'},
+ss_b => $ref_vals{'ss_b'},
+ss_w => $ref_vals{'ss_w'},
+count => $ref_vals{'count'},
+ );
+#diag("omega = $es");
+ok( about_equal( $es, $ref_vals{'omega_sq_p'} ),
+    "omega_sq_partial_by_ss: $es != $ref_vals{'omega_sq_p'}" );
+ 
 $es = $aov_es->omega_sq_partial_by_ms(ms_b => $ref_vals{'ms_b'}, ms_w => $ref_vals{'ms_w'}, df_b => $ref_vals{'df_b'}, count => $ref_vals{'count'});
 #diag("omega = $es");
 ok( about_equal( $es, $ref_vals{'omega_sq_p'} ),

@@ -1,0 +1,52 @@
+{
+   "abstract" : "pipe Perl strings through shell commands",
+   "author" : [
+      "chocolateboy <chocolate@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Shell-Autobox",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Temp" : "0.16",
+            "autobox" : "2.85",
+            "perl" : "5.008000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/chocolateboy/Shell-Autobox/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/chocolateboy/Shell-Autobox"
+      }
+   },
+   "version" : "v0.40.0",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

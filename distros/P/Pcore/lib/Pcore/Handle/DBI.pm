@@ -89,7 +89,7 @@ sub prepare_query ( $self, $query ) {
 
             $last_not_ref = 0;
 
-            if ( is_plain_scalarref $arg) {
+            if ( is_plain_scalarref($arg) || is_plain_refref($arg) ) {
                 push @sql, '$' . ++$i;
 
                 push $bind->@*, $arg->$*;
@@ -378,7 +378,7 @@ sub quote_id ( $self, $id ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 49                   | Subroutines::ProhibitExcessComplexity - Subroutine "prepare_query" with high complexity score (44)             |
+## |    3 | 49                   | Subroutines::ProhibitExcessComplexity - Subroutine "prepare_query" with high complexity score (45)             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 117, 120, 124, 163,  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |      | 187, 191, 201        |                                                                                                                |

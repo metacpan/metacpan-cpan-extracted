@@ -129,6 +129,13 @@ subtest 'set' => sub {
 
         is_deeply $backend->get( people => $set_id ), $new_person,
             'person is not saved';
+
+        my $message = $@->[0]{message};
+        my $path = $@->[0]{path};
+        is $t->app->log->history->[-1][1], 'error',
+            'error message is logged at error level';
+        like $t->app->log->history->[-1][2], qr{Error validating item with ID "$set_id" in collection "people": $message \($path\)},
+            'error message is logged with JSON validation error';
     };
 };
 

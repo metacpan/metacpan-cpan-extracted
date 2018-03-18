@@ -78,4 +78,74 @@ $scores = {
 $obj->nrc_sentiment();
 is_deeply $obj->nrc_scores->[6], $scores, 'nrc_scores';
 
+$x = $obj->get_word('foo');
+is_deeply $x, undef, 'get_word';
+
+$x = $obj->nrc_get_word('foo');
+is_deeply $x, undef, 'nrc_get_word';
+
+$x = $obj->get_word('happy');
+my $expected = { negative => 0, positive => 1 };
+is_deeply $x, $expected, 'get_word';
+
+$x = $obj->nrc_get_word('happy');
+$expected = {
+    anger        => 0,
+    anticipation => 1,
+    disgust      => 0,
+    fear         => 0,
+    joy          => 1,
+    negative     => 0,
+    positive     => 1,
+    sadness      => 0,
+    surprise     => 0,
+    trust        => 1,
+};
+is_deeply $x, $expected, 'nrc_get_word';
+
+$text = 'I am actually very happy today.';
+$x = $obj->get_sentence($text);
+$expected = {
+    I        => undef,
+    am       => undef,
+    actually => undef,
+    very     => undef,
+    happy    => { 'negative' => 0, 'positive' => 1 },
+    today    => undef,
+};
+is_deeply $x, $expected, 'get_sentence';
+
+$x = $obj->nrc_get_sentence($text);
+$expected = {
+    I        => undef,
+    am       => undef,
+    actually => undef,
+    very     => undef,
+    happy    => {
+        anger        => 0,
+        anticipation => 1,
+        disgust      => 0,
+        fear         => 0,
+        joy          => 1,
+        negative     => 0,
+        positive     => 1,
+        sadness      => 0,
+        surprise     => 0,
+        trust        => 1,
+    },
+    today => {
+        anger        => 0,
+        anticipation => 0,
+        disgust      => 0,
+        fear         => 0,
+        joy          => 0,
+        negative     => 0,
+        positive     => 0,
+        sadness      => 0,
+        surprise     => 0,
+        trust        => 0,
+    },
+};
+is_deeply $x, $expected, 'nrc_get_sentence';
+
 done_testing();

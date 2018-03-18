@@ -6,7 +6,7 @@ use List::AllUtils qw(all any);
 use Math::Cephes qw(:dists :explog);
 use String::Numeric qw(is_int is_float);
 use String::Util qw(hascontent nocontent);
-$Statistics::SDT::VERSION = '0.06';
+$Statistics::SDT::VERSION = '0.07';
 
 my %counts_dep = (
     hits               => [qw/signal_trials misses/],
@@ -29,11 +29,11 @@ Statistics::SDT - Signal detection theory (SDT) measures of sensitivity and bias
 
 =head1 VERSION
 
-This is documentation for B<Version 0.06> of Statistics::SDT.
+This is documentation for B<Version 0.07> of Statistics::SDT.
 
 =head1 SYNOPSIS
 
- use Statistics::SDT 0.06;
+ use Statistics::SDT 0.07;
  use feature qw{say};
 
  my $sdt = Statistics::SDT->new(
@@ -194,12 +194,17 @@ sub init {
 sub _init_performance_counts {
     my $self = shift;
     foreach ( keys %counts_dep ) {
-        if (   !defined $self->{$_}
-            && $self->{ $counts_dep{$_}->[0] }
-            && defined $self->{ $counts_dep{$_}->[1] } )
-        {
-            $self->{$_} =
-              $self->{ $counts_dep{$_}->[0] } - $self->{ $counts_dep{$_}->[1] };
+        if ( !defined $self->{$_} ) {
+            if (   is_float( $self->{ $counts_dep{$_}->[0] } )
+                && is_float( $self->{ $counts_dep{$_}->[1] } ) )
+            {
+                $self->{$_} =
+                  $self->{ $counts_dep{$_}->[0] } -
+                  $self->{ $counts_dep{$_}->[1] };
+            }
+            else {
+                $self->{$_} = 0;
+            }
         }
     }
     return;
@@ -210,12 +215,17 @@ sub _init_performance_counts {
 sub _init_trial_counts {
     my $self = shift;
     foreach ( keys %trials_dep ) {
-        if (  !defined $self->{$_}
-            && defined $self->{ $trials_dep{$_}->[0] }
-            && defined $self->{ $trials_dep{$_}->[1] } )
-        {
-            $self->{$_} =
-              $self->{ $trials_dep{$_}->[0] } + $self->{ $trials_dep{$_}->[1] };
+        if ( !defined $self->{$_} ) {
+            if (   is_float( $self->{ $trials_dep{$_}->[0] } )
+                && is_float( $self->{ $trials_dep{$_}->[1] } ) )
+            {
+                $self->{$_} =
+                  $self->{ $trials_dep{$_}->[0] } +
+                  $self->{ $trials_dep{$_}->[1] };
+            }
+            else {
+                $self->{$_} = 0;
+            }
         }
     }
     return;
@@ -306,7 +316,10 @@ sub rate {
     elsif ( scalar @args > 1 ) {    # Set the rate:
         my %params = @args;
         foreach ( keys %params ) {
-            my @args2 = ref $params{$_} ? %{ $params{$_} } : $params{$_}; # hash(ref) to ari
+            my @args2 =
+              ref $params{$_}
+              ? %{ $params{$_} }
+              : $params{$_};        # hash(ref) to ari
           CASE: {
                 /^h/ixsm && do { $rate = $self->_hr(@args2);  last CASE; };
                 /^f/ixsm && do { $rate = $self->_far(@args2); last CASE; };
@@ -360,7 +373,10 @@ sub _mr {
     foreach ( keys %params ) {
         $self->{$_} = $params{$_};
     }
-    if ( !$self->{'signal_trials'} || !defined $self->{'misses'} ) {
+    if (   !is_float( $self->{'signal_trials'} )
+        || !is_float( $self->{'misses'} ) )
+    {
+        #if ( !$self->{'signal_trials'} || !defined $self->{'misses'} ) {
         carp 'Uninitialised counts for calculating MR';
         return q{};
     }
@@ -372,7 +388,10 @@ sub _crr {
     foreach ( keys %params ) {
         $self->{$_} = $params{$_};
     }
-    if ( !$self->{'signal_trials'} || !defined $self->{'correct_rejections'} ) {
+    if (   !is_float( $self->{'signal_trials'} )
+        || !is_float( $self->{'correct_rejections'} ) )
+    {
+   #if ( !$self->{'signal_trials'} || !defined $self->{'correct_rejections'} ) {
         carp 'Uninitialised counts for calculating CRR';
         return q{};
     }
@@ -432,7 +451,9 @@ Returns the hit-rate estimated from given values of sensitivity I<d'> and bias I
 sub dc2hr {
     my ( $self, %args ) = @_;
     my ( $d, $c ) = _get_dc( $self, %args );
-    return (all { hascontent($_) } ($d, $c)) ? _precisioned( $self->{'precision_s'}, ndtr( $d / 2 - $c ) ) : q{};
+    return ( all { hascontent($_) } ( $d, $c ) )
+      ? _precisioned( $self->{'precision_s'}, ndtr( $d / 2 - $c ) )
+      : q{};
 }
 
 =head2 dc2far
@@ -449,7 +470,9 @@ Returns the false-alarm-rate estimated from given values of sensitivity I<d'> an
 sub dc2far {
     my ( $self, %args ) = @_;
     my ( $d, $c ) = _get_dc( $self, %args );
-    return (all { hascontent($_) } ($d, $c)) ? _precisioned( $self->{'precision_s'}, ndtr( -1 * $d / 2 - $c ) ) : q{};
+    return ( all { hascontent($_) } ( $d, $c ) )
+      ? _precisioned( $self->{'precision_s'}, ndtr( -1 * $d / 2 - $c ) )
+      : q{};
 }
 
 # --------------------
@@ -552,6 +575,7 @@ sub sens {
         /^d|f/ixsm    && do { $d = $self->_d_sensitivity( %{$args} ); };
         /^a[p\b]/ixsm && do { $d = $self->_a_sensitivity( %{$args} ) };
         /^ad/ixsm     && do { $d = $self->_ad_sensitivity( %{$args} ); };
+
         #/^h/ixsm      && do { $d = $self->_hthresh_sensitivity( %{$args} ); };
         #/^p/ixsm      && do { $d = $self->_pcorrect( %{$args} ); };
         #/^lp/ixsm     && do { $d = $self->_lpcorrect( %{$args} ); };
@@ -564,6 +588,7 @@ sub sens {
 sub _d_sensitivity {
     my ( $self, %args ) = @_;
     my ( $h, $f, $m ) = $self->init(%args);
+
     #croak 'No hit-rate for calculating d-sensitivity' if ! defined $h;
     my $d;
 
@@ -577,10 +602,13 @@ sub _d_sensitivity {
           : _fc_alexander( $h, $m );
     }
     elsif ( all { defined $args{$_} } qw/stdev_n stdev_s/ ) {
-        $d = (all { hascontent($_) } ($h, $f))? _d_a( $h, $f, $args{'stdev_s'}, $args{'stdev_n'} ) : q{};
+        $d =
+          ( all { hascontent($_) } ( $h, $f ) )
+          ? _d_a( $h, $f, $args{'stdev_s'}, $args{'stdev_n'} )
+          : q{};
     }
     else {
-        $d = (all { hascontent($_) } ($h, $f)) ? _dprime( $h, $f ) : q{};
+        $d = ( all { hascontent($_) } ( $h, $f ) ) ? _dprime( $h, $f ) : q{};
     }
     return $d;
 }
@@ -643,7 +671,7 @@ sub _fc_alexander {
 sub _a_sensitivity {
     my ( $self, @args ) = @_;
     my ( $h,    $f )    = $self->init(@args);
-    return q{} if any { nocontent($_) } ($h, $f);
+    return q{} if any { nocontent($_) } ( $h, $f );
     my $d;
     if ( $h >= $f ) {
         $d =
@@ -659,7 +687,7 @@ sub _a_sensitivity {
 sub _ad_sensitivity {
     my ( $self, @args ) = @_;
     my ( $h,    $f )    = $self->init(@args);
-    return q{} if any { nocontent($_) } ($h, $f);
+    return q{} if any { nocontent($_) } ( $h, $f );
     my $d;
 
     # Assume A(d') = 0.5 if both rates = 0 or both = 1:
@@ -741,7 +769,7 @@ sub bias {
 sub _likelihood_bias {    # beta
     my ( $self, @args ) = @_;
     my ( $h,    $f )    = $self->init(@args);
-    return q{} if any { nocontent($_) } ($h, $f);
+    return q{} if any { nocontent($_) } ( $h, $f );
     my $diff = ( ndtri($f)**2 - ndtri($h)**2 ) / 2;
     return exp $diff;
 }
@@ -749,21 +777,21 @@ sub _likelihood_bias {    # beta
 sub _log_likelihood_bias {    # ln(beta)
     my ( $self, @args ) = @_;
     my ( $h,    $f )    = $self->init(@args);
-    return q{} if any { nocontent($_) } ($h, $f);
+    return q{} if any { nocontent($_) } ( $h, $f );
     return ( ndtri($f)**2 - ndtri($h)**2 ) / 2;
 }
 
 sub _distance_bias {          # c
     my ( $self, @args ) = @_;
     my ( $h,    $f )    = $self->init(@args);
-    return q{} if any { nocontent($_) } ($h, $f);
+    return q{} if any { nocontent($_) } ( $h, $f );
     return -1 * ( ( ndtri($h) + ndtri($f) ) / 2 );
 }
 
 sub _griers_bias {            # B''
     my ( $self, @args ) = @_;
     my ( $h,    $f )    = $self->init(@args);
-    return q{} if any { nocontent($_) } ($h, $f);
+    return q{} if any { nocontent($_) } ( $h, $f );
     my $v1 = $h * ( 1 - $h );
     my $v2 = $f * ( 1 - $f );
     return _sign( $h - $f ) * ( ( $v1 - $v2 ) / ( $v1 + $v2 ) );
@@ -783,7 +811,7 @@ Returns the log-likelihood (beta) bias estimated from given values of sensitivit
 sub dc2logbeta {
     my ( $self, %args ) = @_;
     my ( $d, $c ) = _get_dc( $self, %args );
-    return q{} if any { nocontent($_) } ($d, $c);
+    return q{} if any { nocontent($_) } ( $d, $c );
     return _precisioned( $self->{'precision_s'}, $d * $c );
 }
 
@@ -812,12 +840,12 @@ The method firstly checks if FAR can be calculated from given data or specific a
 sub criterion {
     my ( $self, %args ) = @_;
     my $xc;
-    if ( defined $self->rate('far') ) {
+    if ( is_float( $self->rate('far') ) ) {
         $xc = -1 * ndtri( $self->rate('far') );
     }
     else {
         my ( $d, $c ) = _get_dc( $self, %args );
-        if (all { hascontent($_) } ($d, $c) ) {
+        if ( all { hascontent($_) } ( $d, $c ) ) {
             $xc = $d / 2 + $c;
         }
     }
@@ -856,6 +884,7 @@ sub _n_correct {
 
 sub _precisioned {
     my ( $lim, $val ) = @_;
+    return q{} if !is_float($val);
     return $lim ? sprintf( q{%.} . $lim . q{f}, $val ) : $val;
 }
 
@@ -899,7 +928,7 @@ Croaked when using L<init|Statistics::SDT/init> or L<rate|Statistics::SDT/rate> 
 
 =item Uninitialised counts for calculating MR [or CRR]
 
-Croaked if a method depends on calculating the miss-rate (MR) or correct-rejection-rate (CRR) and the necessary counts of signal or noise trials (respectively), or number of misses or correct-rejections (respectively) have not been provided or cannot be inferred.
+Croaked if a method depends on calculating the miss-rate (MR) or correct-rejection-rate (CRR) and the necessary counts of signal or noise trials (respectively), or number of misses or correct-rejections (respectively) have not been provided, cannot be inferred, or are not numeric (is_float check). To avoid this error, try to ensure that if there are no trials of these kinds, that their given values are zero and not just empty.
 
 =back
 
@@ -939,19 +968,19 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker (report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Statistics-SDT-0.06>
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Statistics-SDT-0.07>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/Statistics-SDT-0.06>
+L<http://annocpan.org/dist/Statistics-SDT-0.07>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/Statistics-SDT-0.06>
+L<http://cpanratings.perl.org/d/Statistics-SDT-0.07>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Statistics-SDT-0.06/>
+L<http://search.cpan.org/dist/Statistics-SDT-0.07/>
 
 =back
 
@@ -963,7 +992,7 @@ Roderick Garton, C<< <rgarton at cpan.org> >>
 
 =over 4
 
-=item Copyright (c) 2006-2017 Roderick Garton
+=item Copyright (c) 2006-2018 Roderick Garton
 
 This program is free software. It may be used, redistributed and/or modified under the same terms as Perl-5.6.1 (or later) (see L<http://www.perl.com/perl/misc/Artistic.html>).
 

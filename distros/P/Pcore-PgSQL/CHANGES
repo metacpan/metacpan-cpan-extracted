@@ -1,3 +1,12 @@
+v0.14.7 2018-03-13T19:01:58Z
+ - Docker base image changed from "softvisio/pcore:v0.56.6" to
+   "softvisio/pcore:v0.56.8"
+ - Docker base image changed from "softvisio/pcore:v0.56.8" to
+   "softvisio/pcore:v0.56.9"
+
+v0.14.6 2018-03-13T08:35:11Z
+ - quote $SQL_UUID as text
+
 v0.14.5 2018-02-20T13:07:08Z
  - code formatted
  - Docker base image changed from "softvisio/pcore:v0.56.5" to

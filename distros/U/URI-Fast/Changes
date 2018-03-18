@@ -1,3 +1,31 @@
+0.15 2018-03-16
+-bugfix: split_path generates incorrect segments on //paths
+
+0.14 2018-03-16
+-bugfix: dynamically find path to uri_fast.c
+-bugfix: move uri_fast.c out of lib root
+
+0.13 2018-03-16
+-support for specifying delimiter when modifying query parameters
+-bugfix: inlined function visibility lost in generated xs scope
+
+0.12 2018-03-14
+-bugfix: fix compiler error on MSWin32 (thanks appveyor!)
+
+0.11 2018-03-13
+-bugfix: length was being ignored in uri_scan_auth
+
+0.10 2018-03-13
+-exposed clear_* methods
+-get_auth replaced by function joining sub-members
+-more thorough testing of parsing edge cases
+-more thorough testing of memory leaks
+-bugfix: missing bounds checks in parser and setters
+-bugfix: segfault when query key not followed by '='
+-bugfix: non-digits no longer accepted when setting/parsing port number
+-bugfix: increased member size for uri_t
+-added MetaProvides::Package Dist::Zilla plugin for experimental Kwalitee
+
 0.09 2018-03-08
 -constructor is more efficient
 -set_param does less copying, uses less memory

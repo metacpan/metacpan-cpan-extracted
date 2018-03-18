@@ -1,3 +1,178 @@
+0.051002 -- 2018-03-16
+
+    - Fix version number.
+        0.05002 might look like "0.05.2", but is in fact "0.50.20".
+        Insert a digit to make fix this: "0.051002" translates to
+        "0.51.2".
+
+        Files modified:
+            lib/**/*.pm
+
+0.05002 -- 2018-03-16
+
+    [Bug Fixes]
+
+    - Don't "reset_after_signal" after re-throwing.
+
+        Files modified:
+            lib/Term/CLI.pm
+
+0.05001 -- 2018-03-16
+
+    [Bug Fixes]
+
+    - Fix signal handling
+        - WINCH is now handled correctly.
+        - TTIN, TTOU, HUP, and TERM are now handled as well.
+
+        Files modified:
+            lib/Term/CLI.pm
+
+    - Fix heuristic =over determination.
+
+        Files modified:
+            lib/Term/CLI/Command/Help.pm
+
+    [Features]
+
+    - Expand tutorial(s).
+
+        Files modified:
+            tutorial/*.t
+            lib/Term/CLI/Tutorial.pod
+
+    [POD fixes]
+
+    - Term::CLI::L10N: Add EXAMPLES and DESCRIPTION.
+    - Term::CLI::Intro: Include L10N modules and Bool argument class.
+    - Term::CLI: Bring POD in line with code.
+    - Term::CLI::L10N::nl: its => it's
+
+    [Miscellaneous Changes]
+
+    - pkg/fedora/perl-Term-CLI.spec: Fix packager.
+
+    - lib/**/*.pm: Reduce length of "#==...==" lines.
+
+    - Update POD on signal handling.
+
+        Files modified:
+            lib/Term/CLI.pm
+
+    - Fix tutorial file names.
+
+        Files modified:
+            lib/Term/CLI/Tutorial.pod
+
+    - Update with dzil build.
+
+        Files modified:
+            MANIFEST
+
+0.04009 -- 2018-03-14
+
+    - Use $^X to find current Perl interpreter.
+      Also, remove "#!" line from "fake pager".
+
+        Files modified:
+            t/065-Term-CLI-Command-Help.t
+            t/scripts/pager.pl
+
+    - Lower versions for FindBin, strict, subs, warnings.
+
+        Files modified:
+            t/*
+            lib/*
+
+0.04008 -- 2018-03-13
+
+  [Bug Fixes]
+
+    - Fake pager should drain STDIN before exiting.
+      This should finally fix the failing test in 
+      t/065-Term-CLI-Command-Help.t
+
+        Files modified:
+            t/scripts/pager.pl
+
+  [Other Changes]
+
+    - Better check and diagnostics for pager error.
+
+        Files modified:
+            t/065-Term-CLI-Command-Help.t
+
+0.04007 -- 2018-03-13
+
+  [Bug Fixes]
+
+    - Try to add a "diag" to failing test.
+
+        Files modified:
+            t/065-Term-CLI-Command-Help.t
+
+  [Other Changes]
+
+    - $SIG instead of $::SIG.
+
+        Files modified:
+            lib/Term/CLI/Command/Help.pm
+
+0.04006 -- 2018-03-12
+
+  [Other Changes]
+
+    - Lower min. version for Moo, drop Moo::Role version.
+
+        Files modified:
+            lib/**/*.pm
+
+    - Remove use of POSIX.
+
+        Files modified:
+            lib/Term/CLI/Argument/Number/Float.pm
+            Makefile.PL
+            cpanfile
+
+0.04005 -- 2018-03-12
+
+  [Bug Fixes]
+    - Separate STDOUT/pager output for help a bit more.
+        Also, set "status" to $? regardless of close() result.
+        Some tests for status still fail, and I'm suspecting a
+        race condition, making close() return "true". If this
+        fails as well, then I'll just skip the test. :-(
+
+        Files modified:
+            lib/Term/CLI/Command/Help.pm
+
+  [Other Changes]
+    - Require specific versions of modules.
+        Minimal versions come from Debian jessie (8) install. Wheezy has
+        a version of "Moo" that is too old.
+
+        Files modified: (almost all)
+
+    - Use MetaProvides::Package in dist.ini
+
+        Files modified:
+            dist.ini
+
+    - Clean up MANIFEST and gitignore
+
+        Files modified:
+            MANIFEST.SKIP, MANIFEST, .gitignore
+
+    - Add script to extract RPM provides from PM files.
+
+        Files added:
+            scratch/get_rpm_provides.pl
+
+    - Fix dependencies and provides.
+
+        Files modified:
+            pkg/fedora/perl-Term-CLI.spec
+
 0.04004 -- 2018-03-10
 
   [Bug Fixes]

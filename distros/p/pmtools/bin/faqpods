@@ -8,11 +8,25 @@
 use strict;
 use warnings;
 
-our $VERSION = '2.0.0';
+use Config;
 
+our $VERSION = '2.2.0';
+
+my $foundcore = 0;
 open(PROG, "$^X -S basepods |") || die "can't fork: $!";
 while (<PROG>) {
-    print if /perlfaq/;
+    if (/perlfaq/) {
+        print $_;
+        $foundcore = 1;
+    }
+}
+
+unless ($foundcore) {
+    my $lib = $Config{'vendorlib'};
+    opendir(LIB, $lib) || die "$0: can't opendir $lib: $!\n";
+    while ($_ = readdir(LIB)) {
+        print "$lib/$_\n" if /perlfaq.*\.pod$/;
+    }
 } 
 
 __END__
@@ -47,7 +61,7 @@ basepods(1), modpods(1), pods(1), sitepod(1), podpath(1), and stdpod(1).
 
 Copyright (C) 1999 Tom Christiansen.
 
-Copyright (C) 2006-2014 Mark Leighton Fisher.
+Copyright (C) 2006-2014, 2018 Mark Leighton Fisher.
 
 =head1 LICENSE
 

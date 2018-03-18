@@ -1,6 +1,6 @@
 package Web::MarketReceipt;
 use 5.010000;
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 use Mouse;
 use Mouse::Util::TypeConstraints;

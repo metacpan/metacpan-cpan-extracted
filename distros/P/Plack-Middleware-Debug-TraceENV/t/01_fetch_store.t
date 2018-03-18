@@ -44,7 +44,7 @@ use Test::More;
         like $res->content, qr{<td>\d+: STORE</td>}, "label of STORE";
 
         like $res->content,
-          qr{<td>TEST_TRACE_ENV \[[^\]]+\]</td>},
+          qr{<td>(<pre>)?TEST_TRACE_ENV \[[^\]]+\](</pre>)?</td>},
           "Trace";
     };
 }

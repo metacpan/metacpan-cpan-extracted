@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy::API;
-our $VERSION = '0.022';
+our $VERSION = '1.001';
 # ABSTRACT: An OpenAPI REST controller for the Yancy editor
 
 #pod =head1 DESCRIPTION
@@ -46,7 +46,7 @@ use Mojo::Base 'Mojolicious::Controller';
 #pod =method list_items
 #pod
 #pod List the items in a collection. The collection name should be in the
-#pod stash key C<collection>. C<limit>, C<offset>, and C<order_by> may be
+#pod stash key C<collection>. C<$limit>, C<$offset>, and C<$order_by> may be
 #pod provided as query parameters.
 #pod
 #pod =cut
@@ -55,20 +55,31 @@ sub list_items {
     my ( $c ) = @_;
     return unless $c->openapi->valid_input;
     my $args = $c->validation->output;
+
     my %opt = (
-        limit => $args->{limit},
-        offset => $args->{offset},
+        limit => delete $args->{'$limit'},
+        offset => delete $args->{'$offset'},
     );
-    if ( $args->{order_by} ) {
+    if ( my $order_by = delete $args->{'$order_by'} ) {
         $opt{order_by} = [
             map +{ "-$_->[0]" => $_->[1] },
             map +[ split /:/ ],
-            split /,/, $args->{order_by}
+            split /,/, $order_by
         ];
     }
+
+    my %filter;
+    for my $key ( keys %$args ) {
+        my $value = $args->{ $key };
+        if ( ( $value =~ tr/*/%/ ) <= 0 ) {
+            $value = "\%$value\%";
+        }
+        $filter{ $key } = { -like => $value };
+    }
+
     return $c->render(
         status => 200,
-        openapi => $c->yancy->backend->list( $c->stash( 'collection' ), {}, \%opt ),
+        openapi => $c->yancy->backend->list( $c->stash( 'collection' ), \%filter, \%opt ),
     );
 }
 
@@ -159,7 +170,7 @@ Yancy::Controller::Yancy::API - An OpenAPI REST controller for the Yancy editor
 
 =head1 VERSION
 
-version 0.022
+version 1.001
 
 =head1 DESCRIPTION
 
@@ -171,7 +182,7 @@ backend data. This API is used by the Yancy editor.
 =head2 list_items
 
 List the items in a collection. The collection name should be in the
-stash key C<collection>. C<limit>, C<offset>, and C<order_by> may be
+stash key C<collection>. C<$limit>, C<$offset>, and C<$order_by> may be
 provided as query parameters.
 
 =head2 add_item

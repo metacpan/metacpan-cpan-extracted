@@ -5,7 +5,7 @@ use GSSAPI;
 use MIME::Base64;
 use Lemonldap::NG::Portal::Simple;
 
-our $VERSION = '1.9.14';
+our $VERSION = '1.9.16';
 
 # INITIALIZATION
 
@@ -22,6 +22,12 @@ sub authInit {
 
 sub extractFormInfo {
     my ($self) = @_;
+
+    # Return if Kerberos ticket already validated
+    if ($self->{_krbUser}) {
+        $self->lmLog("Kerberos ticket already validated, found user ".$self->{_krbUser}, 'debug');
+	return PE_OK;
+    }
 
     if ( $self->{krbUseModKrb} and $self->{_krbUser} = $ENV{REMOTE_USER} ) {
         $self->userNotice(
@@ -62,6 +68,7 @@ sub extractFormInfo {
         # Case 3: Display kerberos auth page (with javascript)
         else {
             $self->lmLog( 'Send Kerberos javascript', 'debug' );
+            $self->setHiddenFormValue( 'kerberos', 0, '', 0 );
             return PE_FIRSTACCESS;
         }
     }
@@ -126,6 +133,7 @@ sub setAuthSessionInfo {
     my ($self) = @_;
     $self->{sessionInfo}->{authenticationLevel} = $self->{krbAuthnLevel};
     $self->{sessionInfo}->{_krbUser}            = $self->{_krbUser};
+    $self->{sessionInfo}->{_user}               = $self->{user};
     PE_OK;
 }
 

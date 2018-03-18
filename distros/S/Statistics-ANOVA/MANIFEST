@@ -23,7 +23,6 @@ t/01-rmdep_param_cat_cmp.t
 t/02-statistics.t
 t/02-lakens_data.t
 t/02-spss_data.t
-t/03-es.t
 t/99-synopsis.t
 t/pod-coverage.t
 t/pod.t

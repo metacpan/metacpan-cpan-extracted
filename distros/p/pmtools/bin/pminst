@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.2.0';
 
 # ------ define variables
 my $pattern = undef;	# module name pattern
@@ -35,7 +35,7 @@ use vars qw($opt_l $opt_s %seen);
 for $startdir (@INC) { 
     next if (!-d $startdir);
 
-    find(\&wanted, $startdir);
+    find({ wanted => \&wanted, follow => 1 }, $startdir);
 }
 
 sub wanted {
@@ -165,7 +165,7 @@ the full pathname.  The B<-s> flag will separate the base directory from
 
 Copyright (C) 1999 Tom Christiansen.
 
-Copyright (C) 2006-2014 Mark Leighton Fisher.
+Copyright (C) 2006-2014, 2018 Mark Leighton Fisher.
 
 =head1 LICENSE
 

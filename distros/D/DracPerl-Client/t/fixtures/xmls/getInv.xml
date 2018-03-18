@@ -1,0 +1,190 @@
+<root>
+	<HWINVs>
+		<DCIM_ControllerViews>
+			<DCIM_ControllerView>
+				<InstanceID>RAID.Slot.4-1</InstanceID>
+				<ProductName>PERC H700 Integrated</ProductName>
+				<ControllerFirmwareVersion>12.3.0-0032</ControllerFirmwareVersion>
+			</DCIM_ControllerView>
+		</DCIM_ControllerViews>
+		<DCIM_MemoryViews>
+			<DCIM_MemoryView>
+				<InstanceID>DIMM.Socket.B4</InstanceID>
+				<PartNumber>M393B5273CH0-YH9</PartNumber>
+				<Model>DDR3 DIMM</Model>
+				<Size>4096 MB</Size>
+				<Speed>1333 MHz</Speed>
+			</DCIM_MemoryView>
+			<DCIM_MemoryView>
+				<InstanceID>DIMM.Socket.B3</InstanceID>
+				<PartNumber>M393B5273CH0-YH9</PartNumber>
+				<Model>DDR3 DIMM</Model>
+				<Size>4096 MB</Size>
+				<Speed>1333 MHz</Speed>
+			</DCIM_MemoryView>
+			<DCIM_MemoryView>
+				<InstanceID>DIMM.Socket.B2</InstanceID>
+				<PartNumber>M393B5273CH0-YH9</PartNumber>
+				<Model>DDR3 DIMM</Model>
+				<Size>4096 MB</Size>
+				<Speed>1333 MHz</Speed>
+			</DCIM_MemoryView>
+			<DCIM_MemoryView>
+				<InstanceID>DIMM.Socket.B1</InstanceID>
+				<PartNumber>M393B5273CH0-YH9</PartNumber>
+				<Model>DDR3 DIMM</Model>
+				<Size>4096 MB</Size>
+				<Speed>1333 MHz</Speed>
+			</DCIM_MemoryView>
+			<DCIM_MemoryView>
+				<InstanceID>DIMM.Socket.A4</InstanceID>
+				<PartNumber>HMT31GR7BFR4A-H9</PartNumber>
+				<Model>DDR3 DIMM</Model>
+				<Size>8192 MB</Size>
+				<Speed>1333 MHz</Speed>
+			</DCIM_MemoryView>
+			<DCIM_MemoryView>
+				<InstanceID>DIMM.Socket.A3</InstanceID>
+				<PartNumber>M393B5273CH0-YH9</PartNumber>
+				<Model>DDR3 DIMM</Model>
+				<Size>4096 MB</Size>
+				<Speed>1333 MHz</Speed>
+			</DCIM_MemoryView>
+			<DCIM_MemoryView>
+				<InstanceID>DIMM.Socket.A2</InstanceID>
+				<PartNumber>M393B5273CH0-YH9</PartNumber>
+				<Model>DDR3 DIMM</Model>
+				<Size>4096 MB</Size>
+				<Speed>1333 MHz</Speed>
+			</DCIM_MemoryView>
+			<DCIM_MemoryView>
+				<InstanceID>DIMM.Socket.A1</InstanceID>
+				<PartNumber>M393B5273CH0-YH9</PartNumber>
+				<Model>DDR3 DIMM</Model>
+				<Size>4096 MB</Size>
+				<Speed>1333 MHz</Speed>
+			</DCIM_MemoryView>
+		</DCIM_MemoryViews>
+		<DCIM_NICViews>
+			<DCIM_NICView>
+				<InstanceID>NIC.Embedded.2-1</InstanceID>
+				<ProductName>Broadcom NetXtreme II Gigabit Ethernet - 84:2B:2B:FF:FF:FF</ProductName>
+				<PermanentiSCSIMACAddress>00:00:00:00:00:00</PermanentiSCSIMACAddress>
+				<PermanentMACAddress>84:2B:2B:FF:FF:FF</PermanentMACAddress>
+				<CurrentMACAddress>84:2B:2B:FF:FF:FF</CurrentMACAddress>
+			</DCIM_NICView>
+			<DCIM_NICView>
+				<InstanceID>NIC.Embedded.1-1</InstanceID>
+				<ProductName>Broadcom NetXtreme II Gigabit Ethernet - 84:2B:2B:FF:FF:B0</ProductName>
+				<PermanentiSCSIMACAddress>00:00:00:00:00:00</PermanentiSCSIMACAddress>
+				<PermanentMACAddress>84:2B:2B:FF:FF:B0</PermanentMACAddress>
+				<CurrentMACAddress>84:2B:2B:FF:FF:B0</CurrentMACAddress>
+			</DCIM_NICView>
+		</DCIM_NICViews>
+		<DCIM_VideoViews>
+			<DCIM_VideoView>
+				<InstanceID>Video.Embedded.1-1</InstanceID>
+				<Description>PowerEdge R510 BCM5716 Gigabit Ethernet</Description>
+				<Manufacturer>Matrox Electronics Systems Ltd.</Manufacturer>
+			</DCIM_VideoView>
+		</DCIM_VideoViews>
+		<DCIM_PowerSupplyViews>
+			<DCIM_PowerSupplyView>
+				<InstanceID>PSU.Slot.1</InstanceID>
+				<FirmwareVersion>Z1.0A.03</FirmwareVersion>
+				<Manufacturer>Dell</Manufacturer>
+				<PartNumber>0F613NA01</PartNumber>
+				<SerialNumber>XXXXX</SerialNumber>
+				<Model>PWR SPLY,750W,RDNT,EMERSON    </Model>
+			</DCIM_PowerSupplyView>
+			<DCIM_PowerSupplyView>
+				<InstanceID>PSU.Slot.2</InstanceID>
+				<FirmwareVersion>N/A</FirmwareVersion>
+				<Manufacturer>N/A</Manufacturer>
+				<PartNumber>N/A</PartNumber>
+				<SerialNumber>N/A</SerialNumber>
+				<Model>N/A</Model>
+			</DCIM_PowerSupplyView>
+		</DCIM_PowerSupplyViews>
+		<DCIM_PhysicalDiskViews>
+			<DCIM_PhysicalDiskView>
+				<InstanceID>Disk.Bay.0:Enclosure.Internal.0-0:RAID.Slot.4-1</InstanceID>
+				<Model>SAMSUNG         </Model>
+				<Manufacturer>ATA     </Manufacturer>
+				<SerialNumber>N/A</SerialNumber>
+				<SizeInBytes>749606010880 Bytes</SizeInBytes>
+			</DCIM_PhysicalDiskView>
+			<DCIM_PhysicalDiskView>
+				<InstanceID>Disk.Bay.1:Enclosure.Internal.0-0:RAID.Slot.4-1</InstanceID>
+				<Model>WDC             </Model>
+				<Manufacturer>ATA     </Manufacturer>
+				<SerialNumber>N/A</SerialNumber>
+				<SizeInBytes>749606010880 Bytes</SizeInBytes>
+			</DCIM_PhysicalDiskView>
+			<DCIM_PhysicalDiskView>
+				<InstanceID>Disk.Bay.2:Enclosure.Internal.0-0:RAID.Slot.4-1</InstanceID>
+				<Model>ST600MP0005     </Model>
+				<Manufacturer>SEAGATE </Manufacturer>
+				<SerialNumber>XXXX            </SerialNumber>
+				<SizeInBytes>599550590976 Bytes</SizeInBytes>
+			</DCIM_PhysicalDiskView>
+			<DCIM_PhysicalDiskView>
+				<InstanceID>Disk.Bay.3:Enclosure.Internal.0-0:RAID.Slot.4-1</InstanceID>
+				<Model>ST600MP0005     </Model>
+				<Manufacturer>SEAGATE </Manufacturer>
+				<SerialNumber>XXXXX            </SerialNumber>
+				<SizeInBytes>599550590976 Bytes</SizeInBytes>
+			</DCIM_PhysicalDiskView>
+			<DCIM_PhysicalDiskView>
+				<InstanceID>Disk.Bay.4:Enclosure.Internal.0-0:RAID.Slot.4-1</InstanceID>
+				<Model>ST3600057SS     </Model>
+				<Manufacturer>SEAGATE </Manufacturer>
+				<SerialNumber>XXXX            </SerialNumber>
+				<SizeInBytes>599550590976 Bytes</SizeInBytes>
+			</DCIM_PhysicalDiskView>
+			<DCIM_PhysicalDiskView>
+				<InstanceID>Disk.Bay.5:Enclosure.Internal.0-0:RAID.Slot.4-1</InstanceID>
+				<Model>ST3600057SS     </Model>
+				<Manufacturer>SEAGATE </Manufacturer>
+				<SerialNumber>XXXX            </SerialNumber>
+				<SizeInBytes>599550590976 Bytes</SizeInBytes>
+			</DCIM_PhysicalDiskView>
+		</DCIM_PhysicalDiskViews>
+		<DCIM_iDRACCardViews>
+			<DCIM_iDRACCardView>
+				<InstanceID>iDRAC.Embedded.1</InstanceID>
+				<Model>Express</Model>
+				<FirmwareVersion>2.85</FirmwareVersion>
+			</DCIM_iDRACCardView>
+		</DCIM_iDRACCardViews>
+		<DCIM_VFlashViews>
+			<DCIM_VFlashView>
+				<InstanceID>Disk.vFlashCard.1</InstanceID>
+				<Capacity>N/A</Capacity>
+				<ComponentName>No SD Card</ComponentName>
+			</DCIM_VFlashView>
+		</DCIM_VFlashViews>
+		<DCIM_CPUViews>
+			<DCIM_CPUView>
+				<InstanceID>CPU.Socket.2</InstanceID>
+				<Model>Intel(R) Xeon(R) CPU E5530 @ 2.40GHz</Model>
+				<Manufacturer>Intel</Manufacturer>
+			</DCIM_CPUView>
+			<DCIM_CPUView>
+				<InstanceID>CPU.Socket.1</InstanceID>
+				<Model>Intel(R) Xeon(R) CPU E5530 @ 2.40GHz</Model>
+				<Manufacturer>Intel</Manufacturer>
+			</DCIM_CPUView>
+		</DCIM_CPUViews>
+	</HWINVs>
+	<SWINVs>
+		<BIOS>1.4.0</BIOS>
+		<Lifecycle_Controller>1.4.0.445</Lifecycle_Controller>
+		<DIAG>XXXX</DIAG>
+		<Diagnostic>XXXX</Diagnostic>
+		<OS_Drivers>6.3.0.23</OS_Drivers>
+		<Embedded_1-1>5.2.7</Embedded_1-1>
+		<Embedded_2-1>5.2.7</Embedded_2-1>
+	</SWINVs>
+	<status>ok</status>
+</root>

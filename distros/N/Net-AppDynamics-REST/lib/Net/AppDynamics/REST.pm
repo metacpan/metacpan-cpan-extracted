@@ -26,20 +26,22 @@ Net::AppDynamics::REST - AppDynamics AnyEvent Friendly REST Client
 =head1 SYNOPSIS
 
   use Net::AppDynamics::REST;
+  use AnyEvent;
 
+  my $cv=AnyEvent->condvar;
   my $obj=Net::AppDynamics::REST->new(PASS=>'password',USER=>'Username',SERVER=>'SERVERNAME');
 
   # to get a list of applications in a non blocking context
   my $resut=$obj->list_applications;
 
   # get a list of applications in a non blocking context
-  use AnyEvent;
-
+  $cv->begin;
   $obj->que_list_applications(sub {
     my ($self,$id,$result,$request,$response)=@_;
+    $cv->end;
   });
-  $ojb->agent->run_next;
-  AnyEvent::Loop::run;
+  $obj->agent->run_next;
+  $cv->recv;
 
 =head1 DESCRIPTION
 
@@ -66,6 +68,7 @@ Optional
 For Internal use
 
   data_cache: Data structure used to cache object resolion
+  cache_check: boolean value, if true a cache check is in progress
 
 =head2 Moo::Roles
 
@@ -73,12 +76,18 @@ This module makes use of the following roles:  L<HTTP::MultiGet::Role>, L<Log::L
 
 =cut
 
-our $VERSION="0.001";
+our $VERSION="1.004";
 
 has USER=>(
   is=>'ro',
   isa=>Str,
   required=>1,
+);
+
+has cache_check=>(
+  is=>'rw',
+  isa=>Bool
+  default=>0,
 );
 
 has CUSTOMER=>(
@@ -145,58 +154,6 @@ around BUILDARGS => sub {
   return $class->$org(@args);
 };
 
-=head1 OO Methods
-
-=over 4
-
-=item * my $url=$self->base_url
-
-Creates the base url for a request.
-
-=cut
-
-sub base_url {
-  my ($self)=@_;
-  my $url=$self->PROTO.'://'.$self->SERVER.':'.$self->PORT;
-  return $url;
-}
-
-=item * my $request=$self->create_get($path,%args);
-
-Create a request object for $path with the required arguments
-
-=cut
-
-sub create_get {
-  my ($self,$path,%args)=@_;
-
-  my $str =$self->base_url.$path.'?';
-  $args{output}='JSON';
-
-  my $count=0;
-  while(my ($key,$value)=each %args) {
-    if($count++ ==0) {
-      $str .="$key=".uri_escape($value);
-    } else {
-      $str .="\&$key=".uri_escape($value);
-    }
-  }
-
-  my $headers=HTTP::Headers->new(@{$self->{header}});
-  my $request=HTTP::Request->new(GET=>$str,$headers);
-
-  return $request;
-}
-
-=item * my $result=$self->new_true({qw( some data )});
-
-Returns a new true Data::Result object.
-
-=item * my $result=$self->new_false("why this failed")
-
-Returns a new false Data::Result object
-
-=back
 
 =head1 NonBlocking interfaces
 
@@ -213,7 +170,7 @@ Default Callback arguments:
     my ($self,$id,$result,$request,$response)=@_;
   };
 
-=head2 Blocking Interfaces
+=head1 Blocking Interfaces
 
 All interfaces that are prefixed with que_xxx have a corisponding blocking method that is simply the xxx portion of the method name.
 
@@ -223,13 +180,33 @@ Example Non Blocking version of que_list_applicatinos:
 
 When called without the que context the methods provides the more traditional blocking style inteface.  When called in a blocking context only the Data::Result Object is returned.
 
-=head2 Application Model API
+=head1 Application Model API
+
+
+=head2 Listing Applications 
 
 =over 4
 
-=item * my $id=$self->que_list_applicatinos 
+=item * Blocking context my $result=$self->list_applications
 
-Queues a requst to fetch the list of all applications
+Returns a Data::Result object, when true it contains the Listing of Applications, when false it contains why it failed.
+
+=cut
+
+=item * Non Blocking context my $id=$self->que_list_applicatinos($cb)
+
+Queues a requst to fetch the list of all applications.
+
+Example Callback: 
+
+  my $cb=sub {
+    my ($self,$id,$result,$request,$result)=@_;
+    # 0 Net::AppDynamics::REST Object
+    # 1 Id of the request
+    # 2 Data::Result Object
+    # 3 HTTP::Request Object
+    # 4 HTTP::Result Object
+  };
 
 =cut
 
@@ -240,9 +217,32 @@ sub que_list_applications {
   return $self->queue_request($req,$cb);
 }
 
-=item * my $id=$self->que_list_tiers($cb,$application);
+=back
 
-Queues a request to fetch the list of tiers within a given application
+=head3 Listing Tiers
+
+Each Application can contain many Tiers
+
+=over 4
+
+=item * Blocking context my $result=$self->list_tiers($application);
+
+Returns a Data::Result Object, when true it contains the Listing of Tiers
+
+=item * Non Blocking context my $id=$self->que_list_tiers($cb,$application);
+
+Queues a request to fetch the list of tiers within a given application.
+
+Example Callback: 
+
+  my $cb=sub {
+    my ($self,$id,$result,$request,$result)=@_;
+    # 0 Net::AppDynamics::REST Object
+    # 1 Id of the request
+    # 2 Data::Result Object
+    # 3 HTTP::Request Object
+    # 4 HTTP::Result Object
+  };
 
 =cut
 
@@ -254,9 +254,30 @@ sub que_list_tiers {
   return $self->queue_request($req,$cb);
 }
 
-=item * my $id=$self->que_list_tiers($cb,$application,$tier);
+=back
 
-Ques a request for the details of the application tier
+=head4 Listing Tier Details
+
+=over 4
+
+=item * Blocking context my $result=$self->list_tier($application,$tier);
+
+Returns a Data::Result object, when true it contains the list of tiers.
+
+=item * Non BLocking Context my $id=$self->que_list_tier($cb,$application,$tier);
+
+Ques a request for the details of the application tier.
+
+Example Callback: 
+
+  my $cb=sub {
+    my ($self,$id,$result,$request,$result)=@_;
+    # 0 Net::AppDynamics::REST Object
+    # 1 Id of the request
+    # 2 Data::Result Object
+    # 3 HTTP::Request Object
+    # 4 HTTP::Result Object
+  };
 
 =cut
 
@@ -268,9 +289,30 @@ sub que_list_tier {
   return $self->queue_request($req,$cb);
 }
 
-=item * my $id=$self->que_list_business_transactions($cb,$application)
+=back
+
+=head3 Listing Busuness Transactions
+
+Each Application can contain many business transactions.
+
+=over 4
+
+=item * Blocking context my $result=$self->list_business_transactions($application)
+
+=item * Non Blocking context my $id=$self->que_list_business_transactions($cb,$application)
 
 Queues a request to fetch the list of business transactions for a given application
+
+Example Callback: 
+
+  my $cb=sub {
+    my ($self,$id,$result,$request,$result)=@_;
+    # 0 Net::AppDynamics::REST Object
+    # 1 Id of the request
+    # 2 Data::Result Object
+    # 3 HTTP::Request Object
+    # 4 HTTP::Result Object
+  };
 
 =cut
 
@@ -282,9 +324,32 @@ sub que_list_business_transactions {
   return $self->queue_request($req,$cb);
 }
 
-=item * my $id=$self->que_list_nodes($cb,$application)
+=back
+
+=head3 List Nodes
+
+Each Application will contain many nodes
+
+=over 4
+
+=item * Blocking context my $result=$self->list_nodes($application)
+
+Returns a Data::Result object, when true it contains the list of nodes.
+
+=item * Non Blocking context my $id=$self->que_list_nodes($cb,$application)
 
 Ques a request to all the nodes in a given application
+
+Example Callback: 
+
+  my $cb=sub {
+    my ($self,$id,$result,$request,$result)=@_;
+    # 0 Net::AppDynamics::REST Object
+    # 1 Id of the request
+    # 2 Data::Result Object
+    # 3 HTTP::Request Object
+    # 4 HTTP::Result Object
+  };
 
 =cut
 
@@ -296,9 +361,30 @@ sub que_list_nodes {
   return $self->queue_request($req,$cb);
 }
 
-=item * my $id=$self->que_list_nodes($cb,$application,$node)
+=back
+
+=head4 Listing Node Details
+
+=over 4
+
+=item * Blocking context my $id=$self->list_node($application,$node)
+
+Returns a Data::Result object
+
+=item * Non BLocking context my $id=$self->que_list_node($cb,$application,$node)
 
 Queues a request to list the details of a node in a given tier
+
+Example Callback: 
+
+  my $cb=sub {
+    my ($self,$id,$result,$request,$result)=@_;
+    # 0 Net::AppDynamics::REST Object
+    # 1 Id of the request
+    # 2 Data::Result Object
+    # 3 HTTP::Request Object
+    # 4 HTTP::Result Object
+  };
 
 =cut
 
@@ -310,9 +396,32 @@ sub que_list_node {
   return $self->queue_request($req,$cb);
 }
 
-=item * my $id=$self->que_list_backends($cb,$application)
+=back
+
+=head3 Listing BackEnds
+
+Each application can contain many backends
+
+=over 4
+
+=item * Non Blocking context my $id=$self->que_list_backends($cb,$application)
+
+Returns a Data::Result Object when true, it contains the list of backends.
+
+=item * Non Blocking context my $id=$self->que_list_backends($cb,$application)
 
 Queues a request to list the backends for a given application
+
+Example Callback: 
+
+  my $cb=sub {
+    my ($self,$id,$result,$request,$result)=@_;
+    # 0 Net::AppDynamics::REST Object
+    # 1 Id of the request
+    # 2 Data::Result Object
+    # 3 HTTP::Request Object
+    # 4 HTTP::Result Object
+  };
 
 =cut
 
@@ -324,11 +433,35 @@ sub que_list_backends {
   return $self->queue_request($req,$cb);
 }
 
-=item * my $id=$self->que_walk_all($cb)
+=back
+
+=head1 Walking The entire api
+
+THis method walks all aspects of the appdynamics api and returns a data structure.
+
+The structure of $result->get_data when true contains the following anonymous hash.
+
+Objects are listed by ids
+
+  ids: Anonymous hash of ids to object refrerences
+
+  # keys used to map names to object ids
+  applications, business_transactions, tiers, nodes
+    Each element contains an anonymous hash of of an array refres
+      Each element in the array ref refres back to an ids object.
+
+=over 4
+
+=item * Blocking context my $result=$self->walk_all()
+
+Reutruns a Data::Result Object
+
+=item * Non Blocking context my $id=$self->que_walk_all($cb)
 
 Queues a request to walk everything.. $cb arguments are different in this caes, $cb is called with the following arguments.  Keep in mind this walks every single object in mass and up to 20 requests are run at a time ( by default ), so this can put a strain on your controler if run too often.
 
   my $cb=sub {
+    my ($self,$id,$result,$request,$response,$method,$application)=@_;
     # 0: this Net::AppDynamics::REST Object
     # 1: id, for internal use
     # 2: Data::Result Final object ( if failed, it will say why it failed )
@@ -336,19 +469,7 @@ Queues a request to walk everything.. $cb arguments are different in this caes, 
     # 4: HTTP::Response Last Object|undef
     # 5: method ( wich method this result set is for ) 
     # 6: application ( undef the method is list_applications )
-    my ($self,$id,$result,$request,$response,$method,$application)=@_;
   };
-
-
-The structure of $result->get_data when true contains the following anonymous hash.
-
-Objects are listed by ids
-  ids: Anonymous hash of ids to object refrerences
-
-  # keys used to map names to object ids
-  applications, business_transactions, tiers, nodes
-    Each element contains an anonymous hash of of an array refres
-      Each element in the array ref refres back to an ids object.
 
 =cut
 
@@ -403,8 +524,6 @@ sub que_walk_all {
 	        $data->{id_map}->{$sub_obj->{tierId}}->{$sub_obj->{id}}++;
 	        $data->{id_map}->{$sub_obj->{tierId}}->{$sub_obj->{machineId}}++ if exists $sub_obj->{machineId};
 	      }
-	      
-
 	    }
 
 	    if($total==0) {
@@ -426,20 +545,36 @@ sub que_walk_all {
 
 =back
 
-=head2 Alert and Respond API
+=head1 Alert and Response API
+
+Queues a health rule violation lookup
+
+For more details, please see: L<https://docs.appdynamics.com/display/PRO43/Alert+and+Respond+API#AlertandRespondAPI-RetrieveAllHealthRuleViolationsinaBusinessApplication>
 
 =over 4
 
-=item * my $id=$self->que_health_rule_violations($cb,$app,%args);
+=item * Blocking context my $result=$self->health_rule_violations($app,%args);
 
-Queues a health rule violation lookup
+Example ( defaults if no arguments are passed ):
+
+  my $result=$self->health_rule_violations($cb,"PRODUCTION",'time-range-type'=>'BEFORE_NOW','duration-in-mins'=>15);
+
+=item * Non Blocking context my $id=$self->que_health_rule_violations($cb,$app,%args);
 
 Example ( defaults if no arguments are passed ):
 
   my $id=$self->que_health_rule_violations($cb,"PRODUCTION",'time-range-type'=>'BEFORE_NOW','duration-in-mins'=>15);
 
+Example Callback: 
 
-For more details, please see: L<https://docs.appdynamics.com/display/PRO43/Alert+and+Respond+API#AlertandRespondAPI-RetrieveAllHealthRuleViolationsinaBusinessApplication>
+  my $cb=sub {
+    my ($self,$id,$result,$request,$result)=@_;
+    # 0 Net::AppDynamics::REST Object
+    # 1 Id of the request
+    # 2 Data::Result Object
+    # 3 HTTP::Request Object
+    # 4 HTTP::Result Object
+  };
 
 =cut
 
@@ -455,89 +590,59 @@ sub que_health_rule_violations {
   return $self->queue_request($req,$cb);
 }
 
-=item * my $id=$self->que_resolve($cb,$type,$name);
+=back
 
-Used to resolve tiers, nodes, business_transactions, and applications to thier application's id.
+=head1 Configuration Import and Export API
 
- cb:  standard callback
- type: String representing the typpe of object to resolve (tiers|nodes|business_transactions|applications);
- name: name to be resolved
+This section documents the Configuration Import and Export API.
 
-Uses the internal cache to resolve the object, if the internal cache is out of date or empty the cache will be refreshed.
+=over 4
 
-=cut
+=item * Blocking context my $result=$self->export_policies($app) 
 
-sub que_resolve {
-  my ($self,$cb,$type,$name)=@_;
+=item * Non Blocking context my $id=$self->que_export_policies($cb,$app) 
 
-  my $code=sub {
-    my ($self,$id,$result,$request,$response)=@_;
-    return $cb->(@_) unless $result;
+Queues the exporting of a policy
 
+Example Callback: 
 
-    foreach my $key ($type,$name) {
-      $key=lc($key);
-      $key=~ s/(?:^\s+|\s+$)//sg;
-    }
-
-    my $cache=$result->get_data;
-    if(exists $cache->{$type}) {
-      if(exists($cache->{$type}->{$name})) {
-	my $data=[];
-	foreach my $target (@{$cache->{$type}->{$name}}) {
-	  push @{$data},$cache->{ids}->{$target};
-	}
-	return $cb->($self,$id,$self->new_false("Type: [$type] Name: [$name] Not Found"),undef,undef) if $#{$data}==-1;
-        $cb->($self,$id,$self->new_true($data),$request,$response);
-      } else {
-        $cb->($self,$id,$self->new_false("Type: [$type] Name: [$name] Not Found"),undef,undef);
-      }
-    } else {
-      $cb->($self,$id,$self->new_false("Type: [$type] Name: [$name] Not Found"),undef,undef);
-    }
+  my $cb=sub {
+    my ($self,$id,$result,$request,$result)=@_;
+    # 0 Net::AppDynamics::REST Object
+    # 1 Id of the request
+    # 2 Data::Result Object
+    # 3 HTTP::Request Object
+    # 4 HTTP::Result Object
   };
-  my $id=$self->que_check_cache($code);
-  return $id;
-}
-
-=item * my $id=$self->que_check_cache($cb);
-
-Queues a cache check.  The resolve cache is refreshed if it is too old.
 
 =cut
 
-sub que_check_cache {
-  my ($self,$cb)=@_;
-
-  my $max=time - $self->cache_max_age;
-  my $cache=$self->data_cache;
-  if($cache->{created_on} > $max) {
-    my $id=$self->agent->next_que_id;
-    $cb->($self,$id,$self->new_true($cache),undef,undef);
-    return $id;
-  } else {
-    return $self->que_walk_all(sub {
-      my ($self,$id,$result,@list)=@_;
-      return $cb->(@_) unless $result;
-      %{$cache}=%{$result->get_data};
-      $cache->{created_on}=time;
-      return $cb->($self,$id,$self->new_true($cache),@list);
-    });
-  }
+sub que_export_policies {
+  my ($self,$cb,$app)=@_;
+  my $path=sprintf '/controller/policies/%s',uri_escape($app);
+  
+  my $req=$self->create_get($path);
+  return $self->queue_request($req,$cb);
 }
 
-=item * my $id=$self->que_find_health_rule_violations($cb,$type,$name,%args)
+=back
 
-Queues a a $sellf->que_health_rule_violations($internal_cb,%args)
+=head1 Finding Health rule violations
 
-The result when true will cointain health rules on anything that resolved.
+See: que_health_rule_violations and que_resolve for more information.
 
-See: que_health_rule_violations and que_resolve for more information
+=over 4
+
+=item * Blocking Context my $result=$self->find_health_rule_violations($type,$name)
+
+Returns a Data::Result Object, when true the result will cointain health rules on anything that resolved.
+
+=item * Non Blocking Context my $id=$self->que_find_health_rule_violations($cb,$type,$name)
 
 =cut
 
 sub que_find_health_rule_violations {
-  my ($self,$cb,$type,$name,%args)=@_;
+  my ($self,$cb,$type,$name)=@_;
 
   my $id;
   my $code=sub {
@@ -625,24 +730,161 @@ sub que_find_health_rule_violations {
 
 =back
 
-=head2 Configuration Import and Export API
+=head1 Resolving Objects
 
-This section documents the Configuration Import and Export API.
+Used to resolve tiers, nodes, business_transactions, and applications to thier application's id.
+
+ cb:  standard callback
+ type: String representing the typpe of object to resolve (tiers|nodes|business_transactions|applications);
+ name: name to be resolved
+
+Uses the internal cache to resolve the object, if the internal cache is out of date or empty the cache will be refreshed.
 
 =over 4
 
-=item * my $id=$self->que_export_policies($cb,$app) 
+=item * Blocking context my $result=$self->resolve($type,$name);
 
-Queues the exporting of a policy
+Returns a Data::Result object, when true it contains the resolved object.
+
+=item * Non Blocking context my $id=$self->que_resolve($cb,$type,$name);
+
+Example Callback: 
+
+  my $cb=sub {
+    my ($self,$id,$result,$request,$result)=@_;
+    # 0 Net::AppDynamics::REST Object
+    # 1 Id of the request
+    # 2 Data::Result Object
+    # 3 HTTP::Request Object
+    # 4 HTTP::Result Object
+  };
 
 =cut
 
-sub que_export_policies {
-  my ($self,$cb,$app)=@_;
-  my $path=sprintf '/controller/policies/%s',uri_escape($app);
-  
-  my $req=$self->create_get($path);
-  return $self->queue_request($req,$cb);
+sub que_resolve {
+  my ($self,$cb,$type,$name)=@_;
+
+  my $code=sub {
+    my ($self,$id,$result,$request,$response)=@_;
+    return $cb->(@_) unless $result;
+
+
+    foreach my $key ($type,$name) {
+      $key=lc($key);
+      $key=~ s/(?:^\s+|\s+$)//sg;
+    }
+
+    my $cache=$result->get_data;
+    if(exists $cache->{$type}) {
+      if(exists($cache->{$type}->{$name})) {
+	my $data=[];
+	foreach my $target (@{$cache->{$type}->{$name}}) {
+	  push @{$data},$cache->{ids}->{$target};
+	}
+	return $cb->($self,$id,$self->new_false("Type: [$type] Name: [$name] Not Found"),undef,undef) if $#{$data}==-1;
+        $cb->($self,$id,$self->new_true($data),$request,$response);
+      } else {
+        $cb->($self,$id,$self->new_false("Type: [$type] Name: [$name] Not Found"),undef,undef);
+      }
+    } else {
+      $cb->($self,$id,$self->new_false("Type: [$type] Name: [$name] Not Found"),undef,undef);
+    }
+  };
+  my $id=$self->que_check_cache($code);
+  return $id;
+}
+
+=back
+
+=head1 Internal Caching
+
+The Net::AppDynamics::REST object uses an internal cache for resolving objects.  The $forceCacheRefresh is a boolean value, when set to true it forces the cache to refresh reguardless of the age of the cache.
+
+=over 4
+
+=item * Non BLocking context my $result=$self->que_check_cache($cb,$forceCacheRefresh);
+
+Returns a Data::Result object, when true it contains the cache.
+
+=item * BLocking context my $id=$self->que_check_cache($cb,$forceCacheRefresh);
+
+Queues a cache check.  The resolve cache is refreshed if it is too old. 
+
+Example Callback: 
+
+  my $cb=sub {
+    my ($self,$id,$result,$request,$result)=@_;
+    # 0 Net::AppDynamics::REST Object
+    # 1 Id of the request
+    # 2 Data::Result Object
+    # 3 HTTP::Request Object
+    # 4 HTTP::Result Object
+  };
+
+=cut
+
+sub que_check_cache {
+  my ($self,$cb,$force)=@_;
+
+  my $max=time - $self->cache_max_age;
+  if(!$force and  $self->data_cache->{created_on} > $max) {
+    return $self->queue_result($cb,$self->new_true($self->data_cache));
+  } else {
+    $self->cache_check(1);
+    return $self->que_walk_all(sub {
+      my ($self,$id,$result,@list)=@_;
+      $self->cache_check(0);
+      return $cb->(@_) unless $result;
+      $self->data_cache($result->get_data);
+      $self->data_cache->{created_on}=time;
+      return $cb->($self,$id,$result,@list);
+    });
+  }
+}
+
+=back
+
+=head1 OO Inernal OO Methods
+
+=over 4
+
+=item * my $url=$self->base_url
+
+Creates the base url for a request.
+
+=cut
+
+sub base_url {
+  my ($self)=@_;
+  my $url=$self->PROTO.'://'.$self->SERVER.':'.$self->PORT;
+  return $url;
+}
+
+=item * my $request=$self->create_get($path,%args);
+
+Create a request object for $path with the required arguments
+
+=cut
+
+sub create_get {
+  my ($self,$path,%args)=@_;
+
+  my $str =$self->base_url.$path.'?';
+  $args{output}='JSON';
+
+  my $count=0;
+  while(my ($key,$value)=each %args) {
+    if($count++ ==0) {
+      $str .="$key=".uri_escape($value);
+    } else {
+      $str .="\&$key=".uri_escape($value);
+    }
+  }
+
+  my $headers=HTTP::Headers->new(@{$self->{header}});
+  my $request=HTTP::Request->new(GET=>$str,$headers);
+
+  return $request;
 }
 
 =back
@@ -653,7 +895,7 @@ Please report bugs and submit patches via L<https://rt.cpan.org>
 
 =head2 Todo
 
-This module is pretty sparse in what it can do, this is the pre 1.0 release.. mostly becase the api is only partially implemented at best.
+Implement more of the api.. it is pretty extensive, patches welcome!
 
 =head1 See Also
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::App::Command::overlay::update;
-$Footprintless::App::Command::overlay::update::VERSION = '1.27';
+$Footprintless::App::Command::overlay::update::VERSION = '1.28';
 # ABSTRACT: processes the overlay template files only
 # PODNAME: Footprintless::App::Command::overlay::clean
 
@@ -46,7 +46,7 @@ Footprintless::App::Command::overlay::clean - processes the overlay template fil
 
 =head1 VERSION
 
-version 1.27
+version 1.28
 
 =head1 AUTHOR
 

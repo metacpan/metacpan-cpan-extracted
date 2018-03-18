@@ -18,9 +18,10 @@ use English qw(-no_match_vars);
 
 use Config::IniFiles;
 
-if ( ! eval { require 5.008; } )
+if ( !eval { require 5.008; } )
 {
-    plan skip_all => "We need filehandles made from scalar which is a feature of Perl above 5.8.x";
+    plan skip_all =>
+"We need filehandles made from scalar which is a feature of Perl above 5.8.x";
 }
 else
 {
@@ -38,17 +39,15 @@ EOF
     my $conf = eval {
         $WARNING = 1;
         $SIG{__WARN__} = \&Carp::croak;
-        Config::IniFiles->new( -file => $scalar_fh);
+        Config::IniFiles->new( -file => $scalar_fh );
     } or warn $EVAL_ERROR;
 
     # TEST
-    ok(!$EVAL_ERROR, "Object was initialised from filehandle made out of a scalar.");
+    ok( !$EVAL_ERROR,
+        "Object was initialised from filehandle made out of a scalar." );
 
     # TEST
-    is ($conf->val("section1", "key"),
-        "val",
-        "Object works."
-    );
+    is( $conf->val( "section1", "key" ), "val", "Object works." );
 
     undef $conf;
     close $scalar_fh;

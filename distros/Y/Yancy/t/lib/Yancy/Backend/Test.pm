@@ -4,7 +4,7 @@ our $VERSION = '0.018';
 
 use Mojo::Base 'Mojo';
 use List::Util qw( max );
-use Mojo::JSON qw( from_json );
+use Mojo::JSON qw( from_json to_json );
 use Mojo::File qw( path );
 use Storable qw( dclone );
 
@@ -23,9 +23,13 @@ sub new {
 sub create {
     my ( $self, $coll, $params ) = @_;
     my $id_field = $self->{collections}{ $coll }{ 'x-id-field' } || 'id';
-    if ( !$params->{ $id_field } ) {
-        my $id = ( max( keys %{ $COLLECTIONS{ $coll } } ) // 0 ) + 1;
-        $params->{ $id_field } = $id;
+    if ( !$params->{ $id_field } || $id_field ne 'id' ) {
+        my @existing_ids = $id_field eq 'id'
+            ? keys %{ $COLLECTIONS{ $coll } }
+            : map { $_->{ id } } values %{ $COLLECTIONS{ $coll } }
+            ;
+        my $id = ( max( @existing_ids ) // 0 ) + 1;
+        $params->{ $id_field ne 'id' ? 'id' : $id_field } = $id;
     }
     $COLLECTIONS{ $coll }{ $params->{ $id_field } } = $params;
     return $params->{ $id_field };
@@ -38,7 +42,25 @@ sub get {
 
 sub _match_all {
     my ( $match, $item ) = @_;
-    return ( grep { $match->{ $_ } eq $item->{ $_ } } keys %$match ) == keys %$match;
+    my %regex;
+    for my $key ( keys %$match ) {
+        if ( !ref $match->{ $key } ) {
+            $regex{ $key } = qr{^$match->{$key}$};
+        }
+        elsif ( ref $match->{ $key } eq 'HASH' ) {
+            if ( my $value = $match->{ $key }{ -like } ) {
+                $value =~ s/%/.*/g;
+                $regex{ $key } = qr{^$value$};
+            }
+            else {
+                die "Unknown query type: " . to_json( $match->{ $key } );
+            }
+        }
+        else {
+            die "Unknown match ref type: " . to_json( $match->{ $key } );
+        }
+    }
+    return ( grep { $item->{ $_ } =~ $regex{ $_ } } keys %regex ) == keys %regex;
 }
 
 sub list {

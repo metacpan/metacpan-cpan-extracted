@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
     "Moo" => "2.000000",
     "Moo::Role" => 0,
     "Throwable" => "0.200011",
-    "namespace::clean" => "0.24",
+    "namespace::autoclean" => "0.28",
     "overload" => 0
   },
   "TEST_REQUIRES" => {
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "3.14",
+  "VERSION" => "3.15",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,7 +42,7 @@ my %FallbackPrereqs = (
   "Moo::Role" => 0,
   "Test::More" => 0,
   "Throwable" => "0.200011",
-  "namespace::clean" => "0.24",
+  "namespace::autoclean" => "0.28",
   "overload" => 0,
   "strict" => 0,
   "warnings" => 0

@@ -19,7 +19,7 @@ use Config::Any;
 use Term::ANSIColor qw/colored/;
 use File::chdir;
 
-our $VERSION = version->new('0.6.6');
+our $VERSION = version->new('0.6.7');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 main();
@@ -139,7 +139,8 @@ sub main {
                         warn "Abandoning $threads[$check]{project} as it's taking too long!\n";
 
                         # abandon thread
-                        threads->detach( $threads[$check]{thread} );
+                        eval { threads->detach( $threads[$check]{thread} ) };
+                        warn $@ if $@ && $opt->verbose;
                         @threads = (
                             @threads[ 0 .. $check - 1 ],
                             @threads[ $check + 1 .. @threads - 1 ]
@@ -317,7 +318,7 @@ group-git - Perform operations over many git repositories at once
 
 =head1 VERSION
 
-This documentation refers to group-git version 0.6.6.
+This documentation refers to group-git version 0.6.7.
 
 =head1 SYNOPSIS
 

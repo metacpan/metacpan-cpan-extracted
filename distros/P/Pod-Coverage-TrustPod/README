@@ -1,5 +1,5 @@
 This archive contains the distribution Pod-Coverage-TrustPod,
-version 0.100004:
+version 0.100005:
 
   allow a module's pod to contain Pod::Coverage hints
 

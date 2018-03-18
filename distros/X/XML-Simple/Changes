@@ -1,5 +1,10 @@
 Revision history for XML-Simple
 
+2.25      2018-03-18 16:18:24+13:00 Pacific/Auckland
+  - disable entity expansion when using XML::Parser, for more secure default
+    behaviour (patch from Ray Morris)
+  - call to XML::Parser constructor is now in its own method to ease overriding
+
 2.24      2017-04-17 16:12:00+12:00 Pacific/Auckland
   - fix typo in last commit with mistakenly removed some underscores
   - don't initialise $XML::Simple::PREFERRED_PARSER to undef as a caller may

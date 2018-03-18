@@ -1,6 +1,6 @@
 
 package Kevin::Command::kevin::jobs;
-$Kevin::Command::kevin::jobs::VERSION = '0.5.5';
+$Kevin::Command::kevin::jobs::VERSION = '0.6.0';
 # ABSTRACT: Command to list Minion jobs
 use Mojo::Base 'Mojolicious::Command';
 
@@ -132,7 +132,7 @@ Kevin::Command::kevin::jobs - Command to list Minion jobs
 
 =head1 VERSION
 
-version 0.5.5
+version 0.6.0
 
 =head1 SYNOPSIS
 

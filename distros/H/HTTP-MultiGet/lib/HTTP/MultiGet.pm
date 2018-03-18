@@ -77,14 +77,14 @@ use MooX::Types::MooseLike::Base qw(:all);
 use AnyEvent::HTTP::Response;
 use AnyEvent;
 use Carp qw(croak);
-use Ref::Util qw(is_plain_arrayref);
+use Ref::Util qw(is_plain_arrayref is_plain_hashref);
 require AnyEvent::HTTP;
 use namespace::clean;
 BEGIN {
 with 'Log::LogMethods';
 with 'Data::Result::Moo';
 }
-our $VERSION='1.009';
+our $VERSION='1.016';
 
 sub BUILD {
   my ($self)=@_;
@@ -134,8 +134,23 @@ Arguments  for the call back
 Interal blocking control variables
 
   loop_control: AnyEvent->condvar object
+  false_id: internal false id tracker
+  fake_jobs: Internal object for handling fake results
 
 =cut 
+
+has false_id=>(
+  is=>'rw',
+  isa=>Int,
+  default=>-1,
+  lazy=>1,
+);
+
+has fake_jobs=>(
+  isa=>HashRef,
+  is=>'rw',
+  default=>sub { {}}
+);
 
 has loop_control=>(
   is=>'rw',
@@ -315,6 +330,24 @@ sub add_by_id {
   return $id;
 }
 
+=item * $self->run_fake_jobs
+
+Runs all current fake jobs
+
+=cut
+
+sub run_fake_jobs {
+  my ($self)=@_;
+  
+  while($self->has_fake_jobs) {
+    my $fj=$self->fake_jobs;
+    $self->fake_jobs({});
+    while(my (undef,$job)=each (%{$fj})) {
+      $job->();
+    }
+  }
+}
+
 =item * $self->run_next
 
 Internal functoin, used to run the next request from the stack.
@@ -324,6 +357,7 @@ Internal functoin, used to run the next request from the stack.
 sub run_next {
   my ($self)=@_;
 
+  $self->run_fake_jobs;
   return if $self->{que_count} >= $self->max_que_count;
 
   while($self->{que_count} < $self->max_que_count and $self->stack->has_next) {
@@ -335,6 +369,31 @@ sub run_next {
   }
 
   return 1;
+}
+
+=item * my $id=$self->add_result($cb)
+
+Internal function, added for L<HTTP::MultiGet::Role>
+
+=cut
+
+sub add_result {
+  my ($self,$cb)=@_;
+  my $current=$self->false_id;
+  $current -=1;
+  $self->false_id($current);
+  $self->fake_jobs->{$current}=$cb;
+  return $current;
+}
+
+=item * if($self->has_fake_jobs) { ... }
+
+Checks if any fake jobs exist 
+
+=cut
+
+sub has_fake_jobs {
+  return 0 < keys %{$_[0]->fake_jobs}
 }
 
 =item * my $result=$self->has_request($id)
@@ -425,7 +484,8 @@ when true: some results were found
 
 sub block_for_ids {
   my ($self,@ids)=@_;
-  
+
+  $self->run_fake_jobs;
   my $results={};
 
   my @check;
@@ -557,7 +617,12 @@ sub que_function {
     $self->results->{$id}=$self->new_true($response);
     
     $self->run_next;
-    return unless $self->in_control_loop;
+    if($self->in_control_loop) {
+      if($self->que_count==0) {
+        $self->loop_control->send if $self->loop_control;
+      }
+      return;
+    }
 
     if($self->{que_count}==0) {
       $self->log_debug('Que Count has reached 0');
@@ -565,7 +630,7 @@ sub que_function {
         $self->log_info("A result outside of it's lifecycle has arived loop_id: $loop_id que_id: $id, but we are in loop_id: ".$self->loop_id);
         return;
       }
-      $self->loop_control->send;
+      $self->loop_control->send if $self->loop_control;
     } else {
       $self->log_debug("Que Count is at $self->{que_count}");
     }
@@ -584,7 +649,6 @@ sub block_loop : BENCHMARK_DEBUG {
   my ($self)=@_;
   my $timeout=$self->timeout;
   my $stack=$self->stack;
-  my $results=$self->results;
   my $count=$self->que_count;
 
   return $self->new_true("No http requests in que") if($stack->total==0 and $count==0);
@@ -597,17 +661,17 @@ sub block_loop : BENCHMARK_DEBUG {
     $self->in_control_loop(1);
     # make sure we don't run forever!
     $self->loop_control(AnyEvent->condvar);
-    $t=AnyEvent->timer(after=>$self->timeout,sub { 
+    $t=AnyEvent->timer(after=>$self->timeout,cb=>sub { 
       $result=$self->new_false("Timed out before we got a response");
       $self->log_error("Request Que timed out, Que Count is: ".$self->que_count);
       $self->loop_control->send;
-
     });
     $self->run_next;
     $self->loop_control->send if $self->{que_count}<=0;
 
     $self->loop_control->recv;
   }
+  $self->loop_control(undef);
   undef $t;
   $self->in_control_loop(0);
   $self->loop_id($self->loop_id + 1);

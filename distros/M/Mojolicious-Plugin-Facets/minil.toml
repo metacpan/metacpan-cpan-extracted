@@ -1,0 +1,6 @@
+name = "Mojolicious-Plugin-Facets"
+# badges = ["travis"]
+authority="cpan:CAFEGRATZ"
+
+module_maker="ModuleBuildTiny"
+

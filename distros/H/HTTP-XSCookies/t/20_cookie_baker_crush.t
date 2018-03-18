@@ -57,7 +57,7 @@ sub test_crush_cookie {
     );
 
     for my $test (@tests) {
-        my $got = crush_cookie($test->[1], @{ $test->[3] // [] });
+        my $got = crush_cookie($test->[1], @{ $test->[3] || [] });
         is_deeply( $got, $test->[2], $test->[0] );
     }
 }

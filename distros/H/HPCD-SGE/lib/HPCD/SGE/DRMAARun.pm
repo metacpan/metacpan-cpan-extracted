@@ -92,12 +92,6 @@ has '_extra_queue_arg' => (
 	init_arg => undef
 );
 
-has '_cpu_multiplier' => (
-	is       => 'rw',
-	default  => 1,
-	init_arg => undef
-);
-
 for my $l (@_qa) {
 	my ( $k, $p, $s, $sa, $d, $a ) = @$l;
 	$_qaparse{$k}   = $p;

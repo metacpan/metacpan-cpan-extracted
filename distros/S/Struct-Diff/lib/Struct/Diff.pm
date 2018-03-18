@@ -31,11 +31,11 @@ Struct::Diff - Recursive diff for nested perl structures
 
 =head1 VERSION
 
-Version 0.94
+Version 0.95
 
 =cut
 
-our $VERSION = '0.94';
+our $VERSION = '0.95';
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ our $VERSION = '0.94';
     # $diff == {D => {one => {D => [{D => {two => {N => 9}},I => 1}]},three => {A => 3}}}
 
     @list_diff = list_diff($diff); # list (path and ref pairs) all diff entries
-    # @list_diff == ({keys => ['one']},[1],{keys => ['two']}],\{N => 9},[{keys => ['three']}],\{A => 3})
+    # @list_diff == ({K => ['one']},[1],{K => ['two']}],\{N => 9},[{K => ['three']}],\{A => 3})
 
     $splitted = split_diff($diff);
     # $splitted->{a} # does not exist
@@ -147,16 +147,16 @@ changing diff: it's parts are links to original structures.
 
 =over 4
 
-=item freezer E<lt>subE<gt>
+=item freezer C<< <sub> >>
 
-Serializer callback (redefines default serializer). See
-L</CONFIGURATION VARIABLES> for details.
+Serializer callback (redefines default serializer). L<Storable/freeze> is used
+by default, see L</CONFIGURATION VARIABLES> for details.
 
-=item noX
+=item noX C<< <true|false> >>
 
 Where X is a status (C<A>, C<N>, C<O>, C<R>, C<U>); such status will be omitted.
 
-=item trimR
+=item trimR C<< <true|false> >>
 
 Drop removed item's data.
 
@@ -184,10 +184,12 @@ sub _diff($$;@) {
     my ($x, $y, %opts) = @_;
 
     my $d = {};
-    if (ref $x ne ref $y) {
+    my $type = ref $x;
+
+    if ($type ne ref $y) {
         $d->{O} = $x unless ($opts{noO});
         $d->{N} = $y unless ($opts{noN});
-    } elsif (ref $x eq 'ARRAY' and $x != $y) {
+    } elsif ($type eq 'ARRAY' and $x != $y) {
         return $opts{noU} ? {} : { U => [] } unless (@{$x} or @{$y});
 
         my ($i, $I) = (-1, -1);
@@ -220,7 +222,7 @@ sub _diff($$;@) {
             $d->{D}->[-1]->{I} = $I = $i
                 if (exists $d->{D} and $#{$d->{D}} != $i and ++$I != $i);
         }
-    } elsif (ref $x eq 'HASH' and $x != $y) {
+    } elsif ($type eq 'HASH' and $x != $y) {
         my @keys = keys %{{ %{$x}, %{$y} }}; # uniq keys for both hashes
         return $opts{noU} ? {} : { U => {} } unless (@keys);
 
@@ -247,7 +249,7 @@ sub _diff($$;@) {
             map { $d->{D}->{$_}->{U} = $d->{U}->{$_} } keys %{$d->{U}};
             delete $d->{U};
         }
-    } elsif (ref $x && $x == $y || $opts{freezer}($x) eq $opts{freezer}($y)) {
+    } elsif ($type && $x == $y || $opts{freezer}($x) eq $opts{freezer}($y)) {
         $d->{U} = $x unless ($opts{noU});
     } else {
         $d->{O} = $x unless ($opts{noO});
@@ -268,12 +270,12 @@ L<Struct::Path/ADDRESSING SCHEME> for path format specification.
 
 =over 4
 
-=item depth E<lt>intE<gt>
+=item depth C<< <int> >>
 
 Don't dive deeper than defined number of levels. C<undef> used by default
 (unlimited).
 
-=item sort E<lt>sub|true|falseE<gt>
+=item sort C<< <sub|true|false> >>
 
 Defines how to handle hash subdiffs. Keys will be picked randomely (default
 C<keys> behavior), sorted by provided subroutine (if value is a coderef) or
@@ -446,7 +448,7 @@ sub valid_diff($) {
                 } 0 .. $#{$diff->{D}};
             } elsif (ref $diff->{D} eq 'HASH') {
                 map {
-                    unshift @stack, [@{$path}, {keys => [$_]}], $diff->{D}->{$_}
+                    unshift @stack, [@{$path}, {K => [$_]}], $diff->{D}->{$_}
                 } sort keys %{$diff->{D}};
             } else {
                 return undef unless wantarray;
@@ -500,12 +502,13 @@ to distinguish numbers from their string representations.
 Only arrays and hashes traversed. All other data types compared by reference
 addresses and content.
 
-L<Storable/freeze> (serializer used by default) failes on compiled regexp
-serialization, so, consider to use other serializer if data contains regular
+L<Storable/freeze> (serializer used by default) will fail serializing compiled
+regexps, so, consider to use other serializer if data contains regular
 expressions. See L<CONFIGURATION VARIABLES> for details.
 
-Struct::Diff fails on structures with loops in references. C<has_circular_ref>
-from L<Data::Structure::Util> can help to detect such structures.
+Struct::Diff will fail on structures with loops in references;
+C<has_circular_ref> from L<Data::Structure::Util> can help to detect such
+structures.
 
 =head1 AUTHOR
 
@@ -556,7 +559,7 @@ L<Data::Structure::Util>, L<Struct::Path>, L<Struct::Path::PerlStyle>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015-2017 Michael Samoglyadov.
+Copyright 2015-2018 Michael Samoglyadov.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

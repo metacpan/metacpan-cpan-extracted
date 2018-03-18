@@ -76,7 +76,7 @@ subtest "the basic basics" => sub {
       jcmp_deeply(
         $call->("as_stripped_${triple_method}"),
         [ 'atePies', { howMany => 100, tastiestPieId => 123 }, 'a' ],
-        "as_stripped_struct",
+        "as_stripped_${triple_method}",
       );
 
       jcmp_deeply(

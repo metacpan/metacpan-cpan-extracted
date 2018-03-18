@@ -11,12 +11,10 @@ use File::Spec;
 
 use Config::IniFiles;
 
-my $filename = File::Spec->catfile(
-    File::Spec->curdir(), "t", "store-and-retrieve-here-doc-terminator.ini"
-);
+my $filename = File::Spec->catfile( File::Spec->curdir(), "t",
+    "store-and-retrieve-here-doc-terminator.ini" );
 
-my @file_write_subs =
-(
+my @file_write_subs = (
     sub {
         my ($cfg) = @_;
 
@@ -41,23 +39,24 @@ foreach my $write_sub (@file_write_subs)
     {
         # Delete the stray file - we want to over-write it.
         unlink($filename);
-        my $cfg=Config::IniFiles->new();
+        my $cfg = Config::IniFiles->new();
 
-        $cfg->newval ("MySection", "MyParam", "Hello\nEOT\n");
+        $cfg->newval( "MySection", "MyParam", "Hello\nEOT\n" );
 
         $write_sub->($cfg);
     }
 
     {
-        my $cfg=Config::IniFiles->new(-file => $filename);
+        my $cfg = Config::IniFiles->new( -file => $filename );
 
         # TEST*2
-        is (scalar($cfg->val ("MySection", "MyParam")),
+        is(
+            scalar( $cfg->val( "MySection", "MyParam" ) ),
             "Hello\nEOT\n",
             "Default here-doc terminator was stored and retrieved correctly",
         );
     }
 
-# Delete it again to keep the working-copy clean.
+    # Delete it again to keep the working-copy clean.
     unlink($filename);
 }

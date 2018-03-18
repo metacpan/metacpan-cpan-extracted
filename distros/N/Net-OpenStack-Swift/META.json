@@ -70,7 +70,7 @@
    "provides" : {
       "Net::OpenStack::Swift" : {
          "file" : "lib/Net/OpenStack/Swift.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Net::OpenStack::Swift::InnerKeystone::Base" : {
          "file" : "lib/Net/OpenStack/Swift/InnerKeystone.pm"
@@ -99,11 +99,12 @@
          "web" : "https://github.com/masakyst/Net-OpenStack-Swift"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_contributors" : [
       "RenatoCRON <renato.cron@gmail.com>",
       "yasu47b <yasu47b@gmail.com>",
       "Marios Titas <redneb@gmx.com>",
+      "bork1n <24889495+bork1n@users.noreply.github.com>",
       "Masaaki Saito <masakyst.mobile@gmail.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27400"

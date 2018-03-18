@@ -1,3 +1,7 @@
+Version 0.007 - 2018-03-15
+ - Fix various bugs in detect_input_format relevant to CSV files
+ - Enhanced debug-level logging during the table search algorighm
+
 Version 0.006 - 2018-03-08
  - Auto-detect CSV Unicode format by looking for BOM, unless handle
    already has an IO layer to specify encoding.

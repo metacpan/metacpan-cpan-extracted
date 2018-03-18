@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,11 +14,11 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 30b84993d8bf6c9b9a27d39857f909d4ab515789 Changes
-SHA1 30d3ed82fab5d233cae78e51f2591b22061e233e MANIFEST
-SHA1 f06c080334da068c5cce0112e000b47e98193fdd META.yml
+SHA1 91b1f8ac31f2512a79df9f3e7bd95fe66f031637 Changes
+SHA1 4f3cbea3dd0cc24b54df537216d45225accf0699 MANIFEST
+SHA1 7836cf12405e4620df1f2a56b83f9a1e6d036c19 META.yml
 SHA1 585f3ce9b6218edf6f8ff7730a71cc97aaf4e5f0 Makefile.PL
-SHA1 aa599d002ed9f81745c7f301eccb0970eda76379 README
+SHA1 402478af9b20929e11cce1b60d449bf1d5b39435 README
 SHA1 7d0938d44cfd4b3d4773f7c8b2f7229333d54a85 doc/images/timetracking_basics.png
 SHA1 feacf0d9eac91c303e29ff25db2baf9aacf8a66a doc/images/timetracking_my_week.png
 SHA1 f184537cd250a5c5a6bfdb96de4472f159b5f3fb doc/images/timetracking_my_week_admin.png
@@ -30,37 +30,38 @@ SHA1 77462753371197275d55a1a3b9886775637bcaa9 html/Callbacks/RT-Extension-TimeTr
 SHA1 bebded891553f06e3ca0aec81ecf106115872e22 html/Callbacks/RT-Extension-TimeTracking/Ticket/Elements/EditTransactionCustomFields/MassageTransactionCustomFields
 SHA1 853623e7c252e2a40d3dc57563e3a6f5b09782fc html/Callbacks/RT-Extension-TimeTracking/Ticket/Elements/ShowBasics/EndOfList
 SHA1 38421b8bf19ef1878f245324562b7e905e6d8a14 html/Elements/ShowCustomFieldActor
-SHA1 4e15f4786622a1708244d451b4b6bc4106ecef5f html/Tools/MyWeek.html
-SHA1 707278f4ee3fa8eb21b9a2d40fe26447113244a3 inc/Module/AutoInstall.pm
-SHA1 fb87e7e7964647af0e7f6422bc7943754935dca7 inc/Module/Install.pm
-SHA1 da26ed869803dd04c51b15609437d00ffebed3f9 inc/Module/Install/AutoInstall.pm
-SHA1 06ca84c52f555dfd7cf8bb7c941c975e25adfc9d inc/Module/Install/Base.pm
-SHA1 3eeb29878c8a435182b492e22315166a0229a373 inc/Module/Install/Can.pm
-SHA1 3bb596078a0413cc568ff3a834d9fc54dbddd54b inc/Module/Install/Fetch.pm
-SHA1 51f01eba57f9f58f7a3480115d2660126f48b35c inc/Module/Install/Include.pm
-SHA1 5885b5a7af6c3d54cbeb1274a896a565e5cbdb9a inc/Module/Install/Makefile.pm
-SHA1 9247628a32ad889e815a356fb39b2bc94ff3cc3a inc/Module/Install/Metadata.pm
-SHA1 20c3e601f307847362142395e404613b8266ef2b inc/Module/Install/RTx.pm
-SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
-SHA1 9e886864978e9f9b9988e412a75a908070b54fbf inc/Module/Install/ReadmeFromPod.pm
+SHA1 212f7fbfec18728547a6af3df700b82ccdc23285 html/Tools/MyWeek.html
+SHA1 fe85f4bb1c9da8c8fe3c58cf37ed126771dd81af inc/Module/AutoInstall.pm
+SHA1 c3f8f9f2a209f80b7ca3c8af3a6b1b7b408ad620 inc/Module/Install.pm
+SHA1 6d0f3583ae3a240ed0d75aa436ac6b44163de8bb inc/Module/Install/AutoInstall.pm
+SHA1 de30b539a326675c42e6ad360fddb05902d621be inc/Module/Install/Base.pm
+SHA1 81fffeca82bcd7100d8435b139f0780fcc5cdf9c inc/Module/Install/Can.pm
+SHA1 b4dd9cb3cf0cb60390c575bd3405e2297d4a0b1a inc/Module/Install/Fetch.pm
+SHA1 85254e101a40b265981d7165d2b8cf0277ebfed2 inc/Module/Install/Include.pm
+SHA1 b84cf97b12f8e5ef37bea54e33ddce32dff804d1 inc/Module/Install/Makefile.pm
+SHA1 0d9fd69718198fcd1560214c4f23fcaa44f8395e inc/Module/Install/Metadata.pm
+SHA1 0771221f89b940bd9523987126a5ad8938f2eade inc/Module/Install/RTx.pm
+SHA1 a17d6d01c9da7a5bed6fcef0038727e63d9b932a inc/Module/Install/RTx/Runtime.pm
+SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
 SHA1 13c903897bad7f0fdd7871a4a0182ff62dfbefd5 inc/Module/Install/Substitute.pm
-SHA1 b0b3ad3cfea40b508eb61e0e5c8ea477f81f3eb1 inc/Module/Install/Win32.pm
-SHA1 b162866505fb2a1141efa422cfdc864394cb4444 inc/Module/Install/WriteAll.pm
-SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
-SHA1 57fefcd4a0017e9b0458a58dd020b7fea67ce421 lib/RT/Extension/TimeTracking.pm
-SHA1 ab0c51eabdd37cc479bf1f42dc7ffc6fa83b7764 lib/RT/Extension/TimeTracking/Test.pm
+SHA1 99b8179fbd9e05422b161cf91abe198744188064 inc/Module/Install/Win32.pm
+SHA1 6a91e14bbecc64e9c8e2261dfa4b360641d152e4 inc/Module/Install/WriteAll.pm
+SHA1 61eb6159a86c81ec77f4a7ae9a177e187cad4634 inc/YAML/Tiny.pm
+SHA1 3b39cfb54fdbc374793e4c8581a8cdf3062fb2c8 inc/unicore/Name.pm
+SHA1 63fd831c1fda1f8fd4d030ecd2d5769955e913f9 lib/RT/Extension/TimeTracking.pm
+SHA1 910cb8116978ad0eb4a23a68ff8035c34e365db6 lib/RT/Extension/TimeTracking/Test.pm
 SHA1 95e9032f9c0250923b72ad293c7f7d07e2bf1685 lib/RT/Extension/TimeTracking/Test.pm.in
 SHA1 8938c161009684c51fe98a45b97544cb3161a8b9 static/css/time_tracking.css
 SHA1 4576930ae3f8966d32869a14bf474c0b11c31676 static/js/time_tracking.js
 SHA1 b8d9e72a18d2afdfb3068d6c0d483d9239d3f22c xt/work_week.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
+Version: GnuPG v1.4.15 (Darwin)
 
-iQEcBAEBAgAGBQJZldxfAAoJEBXncVGnZqUUXJgH/0QPd/7NPJH9OsBP/PcRgD53
-mdJLHSP+8GaLJYSaGocOx6qq6MbTDg4jvUVNWyzcPcNPZZTxrREmqpuV2oaRxaoq
-iCPMxFys9yJ6y4lOcedz28bQ12KuEfU3Bpw15rHPbAXTaP67jHCCuIIchiJHndjj
-5lAH6G3yORR0rPxJ+cW1ZuBzQupWZbNgTIVL2knK7C0BsFU83mZM9d2Xd00XHd8G
-ovKCOFiMrOqPAuug7GDrzdNFH/D0uHBYOzioKeP2tfTGpf2bnx7BT6hzH3Zzov2F
-hjx4wiaOqCxfcngh89jYgI6B7UjpPD6r0eLy0JqxuAgMaJJYPew5qEypYk26Eg4=
-=85yO
+iQEcBAEBAgAGBQJaqWomAAoJEI1a+/f/jPtr6yoH/0qKhsFqJBCjn38eygQDhebj
+buQtINmGdLcxBWdyMUzWQRbxyzY5MofFLXNc0ndL9ZGt2fG/X8Ppis8Hh4jACGuy
+Xg1Yp+6f+LeBKJr9KkFuGCXLQgkwt/P1zdwrVAUbxV7UNf8PXCYDjVOiNN+EOQuC
+V5ZydMGHZlLCgdCj/TZGF7m3l3cqNrhXHXs7BcONVdarKFvVuGwbe9rlaw4zTQZ1
+h0L7mY/gjrjDPyU1KEsYp6NkiMf23OUbgcEtDjT6PJb3gy6gbe+fnz78CpgkG4Yg
+XtcK2uu+njkFyrIgtGBbUUK4caioCOjyBa9+i8LI9fRk9xIF8tFD9yjXM31cy3w=
+=LDJX
 -----END PGP SIGNATURE-----

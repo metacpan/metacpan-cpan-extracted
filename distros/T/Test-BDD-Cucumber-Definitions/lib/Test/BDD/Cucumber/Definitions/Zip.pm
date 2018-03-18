@@ -4,40 +4,39 @@ use strict;
 use warnings;
 
 use Archive::Zip;
-use Carp;
 use DDP ( show_unicode => 1 );
 use Exporter qw(import);
 use IO::String;
-use Params::ValidationCompiler qw(validation_for);
 use Test::BDD::Cucumber::Definitions qw(S);
+use Test::BDD::Cucumber::Definitions::Validator qw(:all);
 use Test::More;
 use Try::Tiny;
 
-our $VERSION = '0.21';
+our $VERSION = '0.26';
 
 our @EXPORT_OK = qw(
-    read_content
+    http_response_content_read_zip
 );
 our %EXPORT_TAGS = (
     util => [
         qw(
-            read_content
+            http_response_content_read_zip
             )
     ]
 );
 
 ## no critic [Subroutines::RequireArgUnpacking]
 
-sub read_content {
+sub http_response_content_read_zip {
 
-    # Clean object
-    S->{zip}->{object} = undef;
+    # Clean archive
+    S->{zip}->{archive} = undef;
 
     my $error;
 
     my $decoded_content = S->{http}->{response_object}->decoded_content();
 
-    S->{zip}->{object} = try {
+    S->{zip}->{archive} = try {
         my $fh = IO::String->new( \$decoded_content );
 
         # The default error handler is the Carp::carp function (warning, not an exception)

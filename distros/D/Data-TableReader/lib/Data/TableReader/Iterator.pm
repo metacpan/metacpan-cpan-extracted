@@ -1,5 +1,5 @@
 package Data::TableReader::Iterator;
-$Data::TableReader::Iterator::VERSION = '0.006';
+$Data::TableReader::Iterator::VERSION = '0.007';
 use strict;
 use warnings;
 use Try::Tiny;
@@ -56,7 +56,7 @@ Data::TableReader::Iterator - Base class for iterators (blessed coderefs)
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

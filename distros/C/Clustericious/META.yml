@@ -1,5 +1,5 @@
 ---
-abstract: 'A framework for RESTful processing systems.'
+abstract: '(Deprecated) A framework for RESTful processing systems.'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
@@ -62,10 +62,12 @@ resources:
   bugtracker: https://github.com/clustericious/Clustericious/issues
   homepage: https://metacpan.org/pod/Clustericious
   repository: git://github.com/clustericious/Clustericious.git
-version: '1.27'
+version: '1.29'
 x_contributors:
   - 'Brian Duggan'
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Curt Tilmes'
   - 'Yanick Champoux'
+x_deprecated: 1
 x_serialization_backend: 'YAML::Tiny version 1.70'
+x_use_unsafe_inc: 0

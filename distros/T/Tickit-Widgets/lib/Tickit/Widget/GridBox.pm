@@ -10,7 +10,7 @@ use warnings;
 use base qw( Tickit::ContainerWidget );
 use Tickit::Style;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use Carp;
 
@@ -133,7 +133,7 @@ sub lines
             $child ? $child->requested_lines : 0;
          } 0 .. $max_col
       } 0 .. $max_row ) ) +
-      $row_spacing * ( $max_row - 1 );
+      $row_spacing * $max_row;
 }
 
 sub cols
@@ -150,7 +150,7 @@ sub cols
             $child ? $child->requested_cols : 0;
          } 0 .. $max_row
       } 0 .. $max_col ) ) +
-      $col_spacing * ( $max_col - 1 );
+      $col_spacing * $max_col;
 }
 
 sub children

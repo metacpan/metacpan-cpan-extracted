@@ -75,7 +75,7 @@ Don't show diff, only exit code shows exists diff or not.
 
 =item B<--rules>
 
-Dump diff as rules for L<ndproc|App::NDTools::ndproc>.
+Dump diff as rules for L<ndproc>.
 
 =item B<--show>
 
@@ -115,7 +115,7 @@ Report bugs to L<https://github.com/mr-mixas/NDTools/issues>
 
 =head1 SEE ALSO
 
-L<App::NDTools::ndpatch>, L<App::NDTools::ndproc>, L<App::NDTools::ndquery>
+L<ndpatch>, L<ndproc>, L<ndquery>
 
 L<App::NDTools::NDDiff>
 

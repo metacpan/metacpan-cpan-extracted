@@ -1,0 +1,33 @@
+<%INIT>
+
+if ( $session{CurrentUser}->HasRight(
+        Right => 'SuperUser', Object => $RT::System)
+            or 
+      $session{CurrentUser}->HasRight(
+          Right => 'BecomeUser', Object => $RT::System
+      )
+){
+    # refuse to become super users 
+    my $u = RT::CurrentUser->new(RT->SystemUser);
+    $u->Load($id);
+    if ($u->HasRight(Right => 'SuperUser', Object => $RT::System)){
+        $m->out("<h1>Error</h1>Cannot become a super user");
+    }
+    else {
+        $session{RT_Extension_BecomeUser_OriginalUser} = $session{CurrentUser};
+        $session{CurrentUser} = $u;
+        $session{CurrentUser}->_BuildTableAttributes;
+
+        $m->out("<h1>you are now user ".$session{CurrentUser}->Name." (id: $id )</h1>");
+    }
+}
+else{
+    $m->out("<h1>Error</h1><p>you don't have the right to become other users</p>");
+}
+</%INIT>
+
+<a href="/">home</a>
+
+<%ARGS>
+$id => undef
+</%ARGS>

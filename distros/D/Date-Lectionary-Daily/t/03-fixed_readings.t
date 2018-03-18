@@ -10,7 +10,7 @@ use Time::Piece;
 use Date::Lectionary::Daily;
 
 my $testReading = Date::Lectionary::Daily->new(
-    'date' => Time::Piece->strptime( "2017-12-24", "%Y-%m-%d" ) );
+    'date' => Time::Piece->strptime( "2017-12-24", "%Y-%m-%d" ), 'lectionary' => 'acna-xian' );
 is(
     $testReading->readings->{morning}->{1},
     '-',
@@ -18,7 +18,7 @@ is(
 );
 
 $testReading = Date::Lectionary::Daily->new(
-    'date' => Time::Piece->strptime( "2017-12-24", "%Y-%m-%d" ) );
+    'date' => Time::Piece->strptime( "2017-12-24", "%Y-%m-%d" ), 'lectionary' => 'acna-xian' );
 is(
     $testReading->readings->{morning}->{2},
     '-',
@@ -26,7 +26,7 @@ is(
 );
 
 $testReading = Date::Lectionary::Daily->new(
-    'date' => Time::Piece->strptime( "2017-12-24", "%Y-%m-%d" ) );
+    'date' => Time::Piece->strptime( "2017-12-24", "%Y-%m-%d" ), 'lectionary' => 'acna-xian' );
 is(
     $testReading->readings->{evening}->{1},
     'Zechariah 2:10-end',
@@ -34,7 +34,7 @@ is(
 );
 
 $testReading = Date::Lectionary::Daily->new(
-    'date' => Time::Piece->strptime( "2017-12-24", "%Y-%m-%d" ) );
+    'date' => Time::Piece->strptime( "2017-12-24", "%Y-%m-%d" ), 'lectionary' => 'acna-xian' );
 is(
     $testReading->readings->{evening}->{2},
     'Hebrews 2:10-18',

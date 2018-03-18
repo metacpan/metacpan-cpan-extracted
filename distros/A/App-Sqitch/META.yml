@@ -1,7 +1,7 @@
 ---
 abstract: 'Sane database change management'
 author:
-  - 'David E. Wheeler <david@justatheory.com>'
+  - '"iovation Inc."'
 build_requires:
   Capture::Tiny: '0.12'
   Carp: '0'
@@ -24,7 +24,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.35'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.143240'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -101,4 +101,4 @@ resources:
   bugtracker: http://github.com/theory/sqitch/issues/
   homepage: http://sqitch.org/
   repository: http://github.com/theory/sqitch/
-version: '0.9996'
+version: '0.9997'

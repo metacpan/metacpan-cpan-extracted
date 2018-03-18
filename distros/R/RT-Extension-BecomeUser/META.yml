@@ -1,0 +1,29 @@
+---
+abstract: 'RT-Extension-BecomeUser Extension'
+author:
+  - 'Matthias Bloch <matthias.bloch@puffin.ch>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: gplv2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: RT-Extension-BecomeUser
+no_index:
+  directory:
+    - html
+    - inc
+requires:
+  perl: 5.8.3
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: https://github.com/maettu/RT-Extension-BecomeUser
+version: '0.04'
+x_module_install_rtx_version: '0.38'
+x_requires_rt: 4.0.0
+x_rt_too_new: 4.6.0

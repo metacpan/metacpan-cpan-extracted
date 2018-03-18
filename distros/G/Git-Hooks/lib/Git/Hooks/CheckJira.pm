@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckJira;
 # ABSTRACT: Git::Hooks plugin which requires citation of JIRA issues in commit messages
-$Git::Hooks::CheckJira::VERSION = '2.7.0';
+$Git::Hooks::CheckJira::VERSION = '2.8.1';
 use 5.010;
 use utf8;
 use strict;
@@ -405,6 +405,8 @@ sub check_patchset {
     $branch = "refs/heads/$branch"
         unless $branch =~ m:^refs/:;
 
+    return 1 unless $git->is_reference_enabled($branch);
+
     if (my @ref = $git->get_config($CFG => 'ref')) {
         return 1 unless $git->is_ref_enabled($branch, @ref);
     }
@@ -421,6 +423,9 @@ sub check_message_file {
     _setup_config($git);
 
     my $current_branch = $git->get_current_branch();
+
+    return 1 unless $git->is_reference_enabled($current_branch);
+
     if (my @ref = $git->get_config($CFG => 'ref')) {
         return 1 unless $git->is_ref_enabled($current_branch, @ref);
     }
@@ -480,6 +485,7 @@ sub check_affected_refs {
     my $errors = 0;
 
     foreach my $ref ($git->get_affected_refs()) {
+        next unless $git->is_reference_enabled($ref);
         check_ref($git, $ref)
             or ++$errors;
     }
@@ -572,6 +578,7 @@ EOS
     my $errors = 0;
 
     foreach my $ref ($git->get_affected_refs()) {
+        next unless $git->is_reference_enabled($ref);
         $errors += notify_ref($git, $ref, $visibility);
     }
 
@@ -605,7 +612,7 @@ Git::Hooks::CheckJira - Git::Hooks plugin which requires citation of JIRA issues
 
 =head1 VERSION
 
-version 2.7.0
+version 2.8.1
 
 =head1 SYNOPSIS
 
@@ -720,7 +727,13 @@ CheckJira - Git::Hooks plugin to implement JIRA checks
 
 The plugin is configured by the following git options.
 
+It can be disabled for specific references via the C<githooks.ref> and
+C<githooks.noref> options about which you can read in the L<Git::Hooks>
+documentation.
+
 =head2 githooks.checkjira.ref REFSPEC
+
+This option is DEPRECATED. Please, use the C<githooks.ref> option instead.
 
 By default, the message of every commit is checked. If you want to
 have them checked only for some refs (usually some branch under
@@ -733,6 +746,8 @@ caret (C<^>), which is kept as part of the regexp
 (e.g. "^refs/heads/(master|fix)").
 
 =head2 githooks.checkjira.noref REFSPEC
+
+This option is DEPRECATED. Please, use the C<githooks.noref> option instead.
 
 By default, the message of every commit is checked. If you want to exclude
 some refs (usually some branch under refs/heads/), you may specify them with

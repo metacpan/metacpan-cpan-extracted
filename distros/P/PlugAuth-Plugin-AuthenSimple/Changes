@@ -1,5 +1,8 @@
 Revision history for PlugAuth-Plugin-AuthenSimple
 
+0.04      2018-03-12 19:11:37 -0700
+  - Deprecated. See https://github.com/clustericious/Clustericious/issues/46
+
 0.03      2017-07-22 22:11:36 -0400
   - Remove dependency on File::HomeDir
 

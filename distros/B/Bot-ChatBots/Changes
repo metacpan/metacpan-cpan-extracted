@@ -1,3 +1,6 @@
+0.014  2018-03-11 07:41:56 CET
+   - add missing dependecy for namespace::clean
+
 0.012  2018-03-10 07:15:40 CET
    - make example RSS reader more general
    - add missing dependency for IO::Socket::SSL

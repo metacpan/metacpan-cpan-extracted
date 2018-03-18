@@ -62,14 +62,20 @@ SQL
 
 # get all the bookmarks
 ERROR:
-my $sth = $Db->prepare_cached(
-			"select * from bookmarks where username=? ".
-			"order by bookmark_id"
+my $rows = $Db->selectall_arrayref(
+			"select bookmark_id, username, title, url from bookmarks where username=? ".
+			"order by bookmark_id",
+			undef,
+			$Session->{'user'}
 			);
-$sth->execute($Session->{'user'});
 my @bookmarks;
-while(my $bookmark = $sth->fetchrow_hashref()) {
-	push(@bookmarks, $bookmark);
+for my $row ( @$rows ) {
+	push(@bookmarks, {
+		bookmark_id => $row->[0],
+		username => $row->[1],
+		title => $row->[2],
+		url => $row->[3],
+		});
 }
 %>
 

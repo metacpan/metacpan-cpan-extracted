@@ -13,7 +13,7 @@ use warnings;
 
 use Config::IniFiles;
 
-if ( ! eval { require IO::Scalar; } )
+if ( !eval { require IO::Scalar; } )
 {
     plan skip_all => "IO::Scalar is not available";
 }
@@ -28,15 +28,12 @@ else
 key = val
 EOF
 
-    my $conf = Config::IniFiles->new( -file => \$contents);
+    my $conf = Config::IniFiles->new( -file => \$contents );
 
     # TEST
-    ok ($conf, "Object was initialised from reference to scalar.");
+    ok( $conf, "Object was initialised from reference to scalar." );
 
     # TEST
-    is ($conf->val("section1", "key"),
-        "val",
-        "Object works."
-    );
+    is( $conf->val( "section1", "key" ), "val", "Object works." );
 }
 

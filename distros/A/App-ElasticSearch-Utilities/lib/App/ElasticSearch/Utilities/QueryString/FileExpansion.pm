@@ -4,8 +4,11 @@ package App::ElasticSearch::Utilities::QueryString::FileExpansion;
 use strict;
 use warnings;
 
+our $VERSION = '5.5'; # VERSION
+
 use CLI::Helpers qw(:output);
 use File::Slurp::Tiny qw(read_lines);
+use Ref::Util qw(is_hashref);
 use Text::CSV_XS;
 use namespace::autoclean;
 
@@ -20,6 +23,7 @@ my %parsers = (
     csv => \&_parse_csv,
 );
 
+
 sub handle_token {
     my($self,$token) = @_;
 
@@ -33,7 +37,7 @@ sub handle_token {
             );
             if( exists $parsers{$type} && -f $file ) {
                 my $uniq = $parsers{$type}->($file,$col);
-                if (defined $uniq && ref $uniq eq 'HASH' && scalar(keys %$uniq)) {
+                if (defined $uniq && is_hashref($uniq) && scalar(keys %$uniq)) {
                     verbose({color=>'cyan'},
                         sprintf "# FILE:%s[%d] contained %d unique elements.",
                         $file,
@@ -45,7 +49,7 @@ sub handle_token {
             }
         }
     }
-    return undef;
+    return;
 }
 
 sub _parse_csv {
@@ -67,10 +71,11 @@ sub _parse_csv {
 sub _parse_txt {
     my ($file,$col) = @_;
     my %uniq=();
-    my @rows = grep { defined && length && !/^#/ && chomp } read_lines($file);
+    my @rows = grep { defined && length && !/^#/ } read_lines($file);
     debug({color=>'magenta'}, @rows);
     if(@rows) {
         for(@rows) {
+            chomp;
             my @cols = split /[\s,]+/;
             my $value = $cols[$col];
             if(defined $value) {
@@ -95,7 +100,7 @@ App::ElasticSearch::Utilities::QueryString::FileExpansion - Build a terms query 
 
 =head1 VERSION
 
-version 5.4
+version 5.5
 
 =head1 SYNOPSIS
 
@@ -145,6 +150,8 @@ or:
 
 This option will iterate through the whole file and unique the elements of the list.  They will then be transformed into
 an appropriate L<terms query|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html>.
+
+=for Pod::Coverage handle_token
 
 =head1 AUTHOR
 

@@ -7,7 +7,7 @@
 
 package GitHub::Crud;
 use v5.16;
-our $VERSION = '20180113';
+our $VERSION = '20180316';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess);
@@ -124,6 +124,7 @@ qw(ETag),
 qw(Expires),
 qw(Last_Modified),
 qw(Location),
+qw(Referrer_Policy),
 qw(Server),
 qw(Source_Age),
 qw(Status),
@@ -593,7 +594,7 @@ sub listWebHooks($)                                                             
   my $s    = "curl -si $pat $u";
   my $r    = GitHub::Crud::Response::new($gitHub, $s);
   my ($status) = split / /, $r->Status;                                         # Check response code
-  my $success = $status == 200;
+  my $success = $status =~ m(200|404);                                          # Present or not present
   $gitHub->failed = $success ? undef : 1;
   lll($gitHub, q(listWebHooks));
   $success ? $gitHub->response->data : undef                                    # Return reference to array of web hooks on success. If there are no web hooks set then the referenced array will be empty.
@@ -629,6 +630,7 @@ END
   my $u = filePath($url, $user, $repo, qw(hooks));
   my $s = "curl -si -X POST $pat $u $d";                                        # Create url
   my $r = GitHub::Crud::Response::new($gitHub, $s);
+
   my ($status) = split / /, $r->Status;                                         # Check response code
   my $success = $status == 201;
   unlink $tmpFile;                                                              # Cleanup
@@ -637,7 +639,7 @@ END
   $success ? 1 : undef                                                          # Return true on success
  }
 
-if (0 and !caller)
+if (1 and !caller)
  {my $g = gitHub;
   my $d = $g->createPushWebHook;
   say STDERR "Create web hook:\n", dump($d);
@@ -902,8 +904,8 @@ If the list operation fails then L<failed|/failed> is set to true and L<fileList
 
 Returns the list of file names found or empty list if no files were found.
 
-     Parameter  Description    
-  1  $gitHub    GitHub object  
+     Parameter  Description
+  1  $gitHub    GitHub object
 
 =head2 read($$)
 
@@ -919,9 +921,9 @@ If the read operation fails then L<failed|/failed> is set to true and L<readData
 
 Returns the data read or B<undef> if no file was found.
 
-     Parameter  Description                   
-  1  $gitHub    GitHub object                 
-  2  $noLog     Whether to log errors or not  
+     Parameter  Description
+  1  $gitHub    GitHub object
+  2  $noLog     Whether to log errors or not
 
 =head2 write($$)
 
@@ -935,9 +937,9 @@ If the write operation is successful, L<failed|/failed> is set to false otherwis
 
 Returns B<updated> if the write updated the file, B<created> if the write created the file else B<undef> if the write failed.
 
-     Parameter  Description         
-  1  $gitHub    GitHub object       
-  2  $data      Data to be written  
+     Parameter  Description
+  1  $gitHub    GitHub object
+  2  $data      Data to be written
 
 =head2 copy($$)
 
@@ -951,9 +953,9 @@ If the write operation is successful, L<failed|/failed> is set to false otherwis
 
 Returns B<updated> if the write updated the file, B<created> if the write created the file else B<undef> if the write failed.
 
-     Parameter  Description                         
-  1  $gitHub    GitHub object                       
-  2  $target    The name of the file to be created  
+     Parameter  Description
+  1  $gitHub    GitHub object
+  2  $target    The name of the file to be created
 
 =head2 exists($)
 
@@ -963,8 +965,8 @@ Required parameters: L<userid|/userid>, L<repository|/repository>, L<gitFile|/gi
 
 Optional parameters: L<refOrBranch|/refOrBranch>, L<patKey|/patKey>.
 
-     Parameter  Description    
-  1  $gitHub    GitHub object  
+     Parameter  Description
+  1  $gitHub    GitHub object
 
 =head2 rename($$)
 
@@ -976,9 +978,9 @@ Optional parameters: L<refOrBranch|/refOrBranch>.
 
 Returns the new name of the file B<renamed> if the rename was successful else B<undef> if the rename failed.
 
-     Parameter  Description               
-  1  $gitHub    GitHub object             
-  2  $target    The new name of the file  
+     Parameter  Description
+  1  $gitHub    GitHub object
+  2  $target    The new name of the file
 
 =head2 delete($)
 
@@ -992,21 +994,21 @@ If the delete operation is successful, L<failed|/failed> is set to false otherwi
 
 Returns true if the delete was successful else false.
 
-     Parameter  Description    
-  1  $gitHub    GitHub object  
+     Parameter  Description
+  1  $gitHub    GitHub object
 
 =head2 listWebHooks($)
 
 List web hooks.
 
-Required: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>. 
+Required: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>.
 
 If the list operation is successful, L<failed|/failed> is set to false otherwise it is set to true.
 
 Returns true if the list  operation was successful else false.
 
-     Parameter  Description    
-  1  $gitHub    GitHub object  
+     Parameter  Description
+  1  $gitHub    GitHub object
 
 =head2 createPushWebHook($)
 
@@ -1020,8 +1022,8 @@ If the create operation is successful, L<failed|/failed> is set to false otherwi
 
 Returns true if the web hook was created successfully else false.
 
-     Parameter  Description    
-  1  $gitHub    GitHub object  
+     Parameter  Description
+  1  $gitHub    GitHub object
 
 =head2 createIssue($)
 
@@ -1033,22 +1035,22 @@ If the operation is successful, L<failed|/failed> is set to false otherwise it i
 
 Returns true if the issue was created successfully else false.
 
-     Parameter  Description    
-  1  $gitHub    GitHub object  
+     Parameter  Description
+  1  $gitHub    GitHub object
 
 =head2 savePersonalAccessToken($)
 
 Save the personal access token by userid in folder L<personalAccessTokenFolder()|/personalAccessTokenFolder>.
 
-     Parameter  Description    
-  1  $gitHub    GitHub object  
+     Parameter  Description
+  1  $gitHub    GitHub object
 
 =head2 loadPersonalAccessToken($)
 
 Load the personal access token by userid from folder L<personalAccessTokenFolder()|/personalAccessTokenFolder>.
 
-     Parameter  Description    
-  1  $gitHub    GitHub object  
+     Parameter  Description
+  1  $gitHub    GitHub object
 
 
 =head1 Index

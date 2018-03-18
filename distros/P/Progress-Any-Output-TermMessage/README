@@ -3,7 +3,9 @@ NAME
     simple message
 
 VERSION
-    version 0.02
+    This document describes version 0.03 of
+    Progress::Any::Output::TermMessage (from Perl distribution
+    Progress-Any-Output-TermMessage), released on 2018-03-17.
 
 SYNOPSIS
      use Progress::Any::Output;
@@ -52,14 +54,30 @@ METHODS
 
         all in one line.
 
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Progress-Any-Output-TermMessage>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Progress-Any-Output-TermMessage>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Progress-Any-Output-T
+    ermMessage>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
 SEE ALSO
     Progress::Any
 
 AUTHOR
-    Steven Haryanto <stevenharyanto@gmail.com>
+    perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2013 by Steven Haryanto.
+    This software is copyright (c) 2018, 2013 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

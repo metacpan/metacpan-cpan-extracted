@@ -11,10 +11,10 @@ lib/Net/ACME2.pm
 lib/Net/ACME2/AccessorBase.pm
 lib/Net/ACME2/Authorization.pm
 lib/Net/ACME2/Challenge.pm
-lib/Net/ACME2/Challenge/.Pending.pm.swp
 lib/Net/ACME2/Challenge/dns_01.pm
 lib/Net/ACME2/Challenge/http_01.pm
 lib/Net/ACME2/Challenge/http_01/Handler.pm
+lib/Net/ACME2/ChallengeBase/HasToken.pm
 lib/Net/ACME2/Constants.pm
 lib/Net/ACME2/Error.pm
 lib/Net/ACME2/HTTP.pm

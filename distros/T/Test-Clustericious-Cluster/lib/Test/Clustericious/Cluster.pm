@@ -14,8 +14,8 @@ use File::Basename ();
 use File::Path ();
 use Test::Mojo;
 
-# ABSTRACT: Test an imaginary beowulf cluster of Clustericious services
-our $VERSION = '0.37'; # VERSION
+# ABSTRACT: (Deprecated) Test an imaginary beowulf cluster of Clustericious services
+our $VERSION = '0.38'; # VERSION
 
 
 BEGIN { $ENV{MOJO_LOG_LEVEL} = 'fatal' }
@@ -693,11 +693,11 @@ __END__
 
 =head1 NAME
 
-Test::Clustericious::Cluster - Test an imaginary beowulf cluster of Clustericious services
+Test::Clustericious::Cluster - (Deprecated) Test an imaginary beowulf cluster of Clustericious services
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 SYNOPSIS
 
@@ -726,6 +726,9 @@ version 0.37
  url_for_my_app2: <%= cluster->urls->[1] %>
 
 =head1 DESCRIPTION
+
+B<NOTE>: This module has been deprecated, and may be removed on or after 31 December 2018.
+Please see L<https://github.com/clustericious/Clustericious/issues/46>.
 
 This module allows you to test an entire cluster of Clustericious services
 (or just one or two).  The only prerequisites are L<Mojolicious>, and

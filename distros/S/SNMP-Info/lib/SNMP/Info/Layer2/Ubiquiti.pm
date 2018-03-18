@@ -18,7 +18,7 @@ use SNMP::Info::Layer3;  # only used in sub mac()
 
 use vars qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE/;
 
-$VERSION = '3.49';
+$VERSION = '3.51';
 
 %MIBS = (
     %SNMP::Info::Layer2::MIBS,
@@ -207,6 +207,50 @@ sub mac {
 
 }
 
+sub interfaces {
+    my $netgear = shift;
+    my $partial = shift;
+
+    my $interfaces = $netgear->i_index($partial)       || {};
+    my $i_descr    = $netgear->i_description($partial) || {};
+    my $return = {};
+
+    foreach my $iid ( keys %$i_descr ) {
+        # Slot: 0 Port: 4 Gigabit - Level
+        if ($i_descr->{$iid} =~ m/([0-9]+)[^0-9]+([0-9]+)/) {
+            $return->{$iid} = $1 .'/'. $2;
+            next;
+        }
+        # Link Aggregate 4
+        if ($i_descr->{$iid} =~ m/Link Aggregate (\d+)/) {
+            $return->{$iid} = '3/'. $1;
+            next;
+        }
+        # else
+        $return->{$iid} = $i_descr->{$iid};
+    }
+
+    return $return;
+}
+
+sub i_ignore {
+    my $l2      = shift;
+    my $partial = shift;
+
+    my $interfaces = $l2->interfaces($partial) || {};
+    my $i_descr    = $l2->i_description($partial) || {};
+
+    my %i_ignore;
+    foreach my $if ( keys %$interfaces ) {
+
+        # CPU Interface
+        if ( $i_descr->{$if} =~ /CPU Interface/i ) {
+            $i_ignore{$if}++;
+        }
+    }
+    return \%i_ignore;
+}
+
 1;
 __END__
 
@@ -307,6 +351,20 @@ See L<SNMP::Info::IEEE802dot11/"GLOBALS"> for details.
 
 These are methods that return tables of information in the form of a reference
 to a hash.
+
+=head2 Overrides
+
+=over
+
+=item $ubiquiti->interfaces()
+
+Uses the i_name() field.
+
+=item $ubiquiti->i_ignore()
+
+Ignores interfaces with "CPU Interface" in them.
+
+=back
 
 =head2 Table Methods imported from SNMP::Info::Layer2
 

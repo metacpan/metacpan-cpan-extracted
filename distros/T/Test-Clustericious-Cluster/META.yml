@@ -1,5 +1,5 @@
 ---
-abstract: 'Test an imaginary beowulf cluster of Clustericious services'
+abstract: '(Deprecated) Test an imaginary beowulf cluster of Clustericious services'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
@@ -29,5 +29,7 @@ resources:
   bugtracker: https://github.com/clustericious/Test-Clustericious-Cluster/issues
   homepage: https://metacpan.org/pod/Test::Clustericious::Cluster
   repository: git://github.com/clustericious/Test-Clustericious-Cluster.git
-version: '0.37'
+version: '0.38'
+x_deprecated: 1
 x_serialization_backend: 'YAML::Tiny version 1.70'
+x_use_unsafe_inc: 0

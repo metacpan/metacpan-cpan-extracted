@@ -12,7 +12,7 @@ use Struct::Path 0.80 qw(list_paths path path_delta);
 use Struct::Path::PerlStyle 0.80 qw(str2path path2str);
 use Term::ANSIColor qw(colored);
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 sub arg_opts {
     my $self = shift;
@@ -54,7 +54,7 @@ sub configure {
 
     $self->SUPER::configure();
 
-    $self->{OPTS}->{colors} = -t STDOUT ? 1 : 0
+    $self->{OPTS}->{colors} = $self->{TTY}
         unless (defined $self->{OPTS}->{colors});
 
     for (

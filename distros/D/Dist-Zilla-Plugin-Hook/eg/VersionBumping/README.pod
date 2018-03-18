@@ -1,0 +1,19 @@
+=encoding UTF-8
+
+=head2 Version Bumping
+
+I want the version of my distribution is bumped automatically after each release, and automatically
+assigned version should be trial.
+
+For example: If I released version C<v0.0.1>, the version of the next release should be C<v0.0.1.1>
+(see C<Version::Dotted::Semantic>). When I release C<v0.0.1.1>, the next should be C<v0.0.1.2>, the
+next one — C<v0.0.1.3> and so on. When I decide it is time to non-trial release, I will set the
+version to C<v0.0.2> manually, release it, and will have automatically bumped version C<v0.0.2.1>
+for the next release.
+
+This is implemented with three plugins: C<Hook:VersionProvider>, C<Hook::ReleaseStatusProvider>,
+and C<Hook::AfterRelease>. The first one reads version from external file F<VERSION> which contains
+only version and nothing more (ok, trailing whitespace is allowed) — it simplifies implementation,
+because there is no need in parsing F<dist.ini> file. The second plugin lets C<Dist::Zilla> know
+release status (trial or stable). The third plugin bumps the version after release, and writes
+bumped version back to the F<VERSION> file.

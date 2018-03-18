@@ -11,7 +11,7 @@ use base qw( Tickit::Widget );
 use Tickit::Style;
 Tickit::Window->VERSION( '0.39' ); # expose_after_scroll default on
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use Tickit::Utils qw( textwidth chars2cols cols2chars substrwidth );
 
@@ -96,7 +96,7 @@ Delete the entire line
 
 Delete to the start of the line
 
-=item * Ctrl-W
+=item * Ctrl-W or Ctrl-Backspace
 
 Delete one word backwards
 
@@ -202,17 +202,18 @@ sub new
       'M-b' => "key_backward_word",
       'M-f' => "key_forward_word",
 
-      'Backspace' => "key_backward_delete_char",
-      'Delete'    => "key_forward_delete_char",
-      'C-Delete'  => "key_forward_delete_word",
-      'End'       => "key_end_of_line",
-      'Enter'     => "key_enter_line",
-      'Home'      => "key_beginning_of_line",
-      'Insert'    => "key_overwrite_mode",
-      'Left'      => "key_backward_char",
-      'C-Left'    => "key_backward_word",
-      'Right'     => "key_forward_char",
-      'C-Right'   => "key_forward_word",
+      'Backspace'   => "key_backward_delete_char",
+      'C-Backspace' => "key_backward_delete_word",
+      'Delete'      => "key_forward_delete_char",
+      'C-Delete'    => "key_forward_delete_word",
+      'End'         => "key_end_of_line",
+      'Enter'       => "key_enter_line",
+      'Home'        => "key_beginning_of_line",
+      'Insert'      => "key_overwrite_mode",
+      'Left'        => "key_backward_char",
+      'C-Left'      => "key_backward_word",
+      'Right'       => "key_forward_char",
+      'C-Right'     => "key_forward_word",
    };
 
    $self->set_on_enter( $params{on_enter} ) if defined $params{on_enter};

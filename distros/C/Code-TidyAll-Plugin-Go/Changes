@@ -1,3 +1,14 @@
+0.04     2018-03-14
+
+- As of Go 1.10, `go vet` no longer works on individual files. This plugin
+  now uses `go tool vet` instead.
+
+
+0.03     2018-03-14
+
+- First release with MAXMIND dzil bundle.
+
+
 0.02     2015-01-05
 
 - Fixed an issue where both "go vet" and "gofmt" errors would not be displayed

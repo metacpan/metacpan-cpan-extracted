@@ -31,6 +31,8 @@ If you'd like to manage an Firebird database, see L<sqitchtutorial-firebird>.
 
 If you'd like to manage an Vertica database, see L<sqitchtutorial-vertica>.
 
+If you'd like to manage an Exasol database, see L<sqitchtutorial-exasol>.
+
 =head2 VM Configuration
 
 Some instructions for setting up a VM for following along in this tutorial.
@@ -1833,7 +1835,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 License
 
-Copyright (c) 2012-2015 iovation Inc.
+Copyright (c) 2012-2018 iovation Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

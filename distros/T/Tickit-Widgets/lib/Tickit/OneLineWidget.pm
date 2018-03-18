@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2018 -- leonerd@leonerd.org.uk
 
 package Tickit::OneLineWidget;
 
@@ -54,9 +54,13 @@ sub lines
    return 1;
 }
 
-=head2 $valign = $widget->valign
+=head2 valign
 
-=head2 $widget->set_valign( $valign )
+   $valign = $widget->valign
+
+=head2 set_valign
+
+   $widget->set_valign( $valign )
 
 Accessor for vertical alignment value.
 
@@ -95,7 +99,9 @@ sub render
 Because this is an abstract class, the constructor must be called on a
 subclass which implements the following methods.
 
-=head2 $widget->render_line
+=head2 render_line
+
+   $widget->render_line
 
 Called to redraw the widget's content to its window. When invoked, the window
 cursor will already be in column C<0> of the required line of the window, as

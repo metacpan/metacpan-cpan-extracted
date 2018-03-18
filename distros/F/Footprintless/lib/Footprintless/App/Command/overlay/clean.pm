@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::App::Command::overlay::clean;
-$Footprintless::App::Command::overlay::clean::VERSION = '1.27';
+$Footprintless::App::Command::overlay::clean::VERSION = '1.28';
 # ABSTRACT: removes all files managed by the overlay
 # PODNAME: Footprintless::App::Command::overlay::clean
 
@@ -46,7 +46,7 @@ Footprintless::App::Command::overlay::clean - removes all files managed by the o
 
 =head1 VERSION
 
-version 1.27
+version 1.28
 
 =head1 AUTHOR
 

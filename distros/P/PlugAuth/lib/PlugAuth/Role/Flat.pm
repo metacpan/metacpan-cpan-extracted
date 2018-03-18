@@ -12,7 +12,7 @@ use File::Spec;
 use File::Touch qw( touch );
 
 # ABSTRACT: private role used by L<FlatAuth|PlugAuth::Plugin::FlatAuth> and L<FlatAuthz|PlugAuth::Plugin::FlatAuthz>.
-our $VERSION = '0.38'; # VERSION
+our $VERSION = '0.39'; # VERSION
 
 my %MTimes;
 
@@ -192,7 +192,7 @@ PlugAuth::Role::Flat - private role used by L<FlatAuth|PlugAuth::Plugin::FlatAut
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 SEE ALSO
 

@@ -18,8 +18,10 @@
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
 #define PKCS12_SAFEBAG_get0_p8inf(o) ((o)->value.keybag)
 #define PKCS12_SAFEBAG_get0_attr PKCS12_get_attr
+#define CONST_PKCS8_PRIV_KEY_INFO PKCS8_PRIV_KEY_INFO
+#else
+#define CONST_PKCS8_PRIV_KEY_INFO const PKCS8_PRIV_KEY_INFO
 #endif
-
 
 const EVP_CIPHER *enc;
 
@@ -157,6 +159,7 @@ int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen
   EVP_PKEY *pkey;
   X509 *x509;
   PKCS8_PRIV_KEY_INFO *p8;
+  CONST_PKCS8_PRIV_KEY_INFO *p8c;
 
   switch (M_PKCS12_bag_type(bag)) {
 
@@ -164,9 +167,9 @@ int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen
 
       if (options & NOKEYS) return 1;
 
-      p8 = PKCS12_SAFEBAG_get0_p8inf(bag);
+      p8c = PKCS12_SAFEBAG_get0_p8inf(bag);
 
-      if (!(pkey = EVP_PKCS82PKEY (p8))) return 0;
+      if (!(pkey = EVP_PKCS82PKEY (p8c))) return 0;
 
       PEM_write_bio_PrivateKey (bio, pkey, enc, NULL, 0, NULL, pempass);
 
@@ -455,13 +458,13 @@ create(pkcs12, cert = "", pk = "", pass = 0, file = 0, name = "PKCS12 Certificat
   p12  = PKCS12_create(pass, name, pkey, x509, NULL, 0,0,0,0,0);
 
   if (!p12) {
-    croak("Error creating PKCS#12 structure\n");
     ERR_print_errors_fp(stderr);
+    croak("Error creating PKCS#12 structure\n");
   }
 
   if (!(fp = fopen(file, "wb"))) {
-    croak("Error opening file %s\n", file);
     ERR_print_errors_fp(stderr);
+    croak("Error opening file %s\n", file);
   }
 
   i2d_PKCS12_fp(fp, p12);

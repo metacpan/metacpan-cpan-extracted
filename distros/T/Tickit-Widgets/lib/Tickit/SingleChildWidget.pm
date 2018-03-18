@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2018 -- leonerd@leonerd.org.uk
 
 package Tickit::SingleChildWidget;
 
@@ -35,7 +35,9 @@ obtain it.
 
 =cut
 
-=head2 $widget = Tickit::SingleChildWidget->new( %args )
+=head2 new
+
+   $widget = Tickit::SingleChildWidget->new( %args )
 
 Constructs a new C<Tickit::SingleChildWidget> object. If passed an argument
 called C<child> this will be added as the contained child widget.
@@ -58,7 +60,9 @@ sub new
 
 =cut
 
-=head2 $child = $widget->child
+=head2 child
+
+   $child = $widget->child
 
 Returns the contained child widget.
 
@@ -78,7 +82,9 @@ sub children
    return $child ? 1 : 0;
 }
 
-=head2 $widget->set_child( $child )
+=head2 set_child
+
+   $widget->set_child( $child )
 
 Sets the child widget, or C<undef> to remove.
 

@@ -11,7 +11,7 @@ use base 'Clustericious::Command';
 use Clustericious;
 
 # ABSTRACT: Clustericious command to stop a Clustericious application
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.29'; # VERSION
 
 
 __PACKAGE__->attr(description => <<EOT);
@@ -133,7 +133,7 @@ Clustericious::Command::stop - Clustericious command to stop a Clustericious app
 
 =head1 VERSION
 
-version 1.27
+version 1.29
 
 =head1 SYNOPSIS
 

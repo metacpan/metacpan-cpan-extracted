@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2018 -- leonerd@leonerd.org.uk
 
 package Device::Chip::Adapter;
 
@@ -10,7 +10,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Carp;
 
@@ -276,27 +276,64 @@ must pick a rate that is no higher than this. Note specifically that not all
 adapters are able to choose a rate arbitrarily, and so the actually
 communication may happen at some rate slower than this.
 
+=item wordsize => INT
+
+The number of bits per word transferred. Many drivers will not be able to
+accept a number other than 8.
+
+For values less than 8, the value should be taken from the least-significant
+bits of each byte given to the C<readwrite> or C<write> methods.
+
+For values greater than 8, use character strings with wide codepoints inside;
+such as created by the C<chr()> function.
+
 =back
 
 =head2 readwrite
 
-   $bytes_in = $spi->readwrite( $bytes_out )->get
+   $words_in = $spi->readwrite( $words_out )->get
 
-Performs a complete SPI transaction; assert the SS pin, synchronously clock the
-data given by the plain byte string I<$bytes_out> out of the MOSI pin of the
-adapter while simultaneously capturing the data coming in to the MISO pin, then
-release the SS pin again. The bytes clocked in are eventually returned as the
-result of the returned future.
+Performs a complete SPI transaction; assert the SS pin, synchronously clock
+the data given by the I<$words_out> out of the MOSI pin of the adapter while
+simultaneously capturing the data coming in to the MISO pin, then release the
+SS pin again. The values clocked in are eventually returned as the result of
+the returned future.
 
 =head2 write
 
-   $spi->write( $bytes )->get
+   $spi->write( $words )->get
 
 A variant of C<readwrite> where the caller does not intend to make use of the
 data returned by the device, and so the adapter does not need to return it.
 This may or may not make a material difference to the actual communication
 with the adapter or device; it could be implemented simply by calling the
 C<readwrite> method and ignoring the return value.
+
+=head2 read
+
+   $words = $spi->read( $len )->get
+
+A variant of C<readwrite> where the chip will not care what data is written
+to it, so the caller does not need to supply it. This may or may not make a
+material difference to the actual communication with the adapter or device;
+it could be implemented simply by calling the C<readwrite> method and passing
+in some constant string of appropriate length.
+
+=head2 write_then_read
+
+    $words_in = $spi->write_then_read( $words_out, $len_in )->get
+
+Performs a complete SPI transaction; assert the SS pin, synchronously clock
+the data given by I<$words_out> out of the MOSI pin of the adapter, then clock
+in more data from the MISO pin, finally releasing the SS pin again. These two
+operations must be performed within a single assert-and-release SS cycle. It
+is unspecified what values will be sent out during the read phase; adapters
+should typically send all-bits-low or all-bits-high, but in general may not
+allow configuration of what that will be.
+
+This differs from the C</readwrite> method in that it works sequentially;
+sending out words while ignoring the result, then reading in words while
+sending unspecified data.
 
 =head2 assert_ss
 
@@ -314,37 +351,46 @@ or L</write_no_ss>.
 
 =head2 write_no_ss
 
-   $bytes_in = $spi->readwrite_no_ss( $bytes_out )->get
+=head2 read_no_ss
 
-   $spi->write_no_ss( $bytes )->get
+   $words_in = $spi->readwrite_no_ss( $words_out )->get
 
-Lower-level access methods to directly perform a byte transfer across the
+   $spi->write_no_ss( $words )->get
+
+   $words = $spi->read_no_ss( $len )->get
+
+Lower-level access methods to directly perform a data transfer across the
 MOSI/MISO pins of the adapter, without touching the SS pin. A complete SPI
 transaction can be performed in conjunction with the L</assert_ss> and
 L</release_ss> methods.
 
    $spi->assert_ss
       ->then( sub {
-         $spi->readwrite_no_ss( $bytes_out );
+         $spi->readwrite_no_ss( $words_out );
       })
       ->then( sub {
-         ( $bytes_in ) = @_;
-         $spi->release_ss
+         ( $words_in ) = @_;
+         $spi->release_ss->then_done( $words_in );
       });
 
 These methods are provided for situations where it is not possible to know in
-advance all the bytes to be sent out in an SPI transaction; where the chip
-driver code must inspect some of the bytes incoming before it can determine
+advance all the data to be sent out in an SPI transaction; where the chip
+driver code must inspect some of the incoming data before it can determine
 what else needs to be sent, but when these must all be sent in one SS-asserted
 transaction.
 
 Because they perform multiple independent operations on the underlying
 adapter, these lower-level methods may be less efficient than using the single
 higher-level methods of L</readwrite> and L</write>. As such, they should only
-be used when the combined higher-level method cannot be used. However, as an
-implementation detail, a device adapter module could implement the higher-
-level methods by using the lower ones as described above, if that would be an
-efficient implementation.
+be used when the combined higher-level method cannot be used.
+
+Note that many of these methods can be synthesized from other simpler ones. A
+convenient abstract base class, L<Device::Chip::ProtocolBase::SPI>, can be
+used to do this, providing wrappers for some methods implemented using others.
+This reduces the number of distinct methods that need to be provided.
+Implementations may still, and are encouraged to, provide "better" versions of
+those methods if they can be provided more efficiently than simply wrapping
+others.
 
 =cut
 

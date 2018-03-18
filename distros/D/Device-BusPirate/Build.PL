@@ -7,6 +7,7 @@ my $build = Module::Build->new(
    module_name => 'Device::BusPirate',
    requires => {
       'Device::Chip::Adapter' => '0.02',
+      'Device::Chip::ProtocolBase::SPI' => 0,
       'Future' => 0,
       'Future::Mutex' => 0,
       'Future::Utils' => 0,
@@ -19,9 +20,10 @@ my $build = Module::Build->new(
    test_requires => {
       'Test::More' => '0.88', # done_testing
    },
-   auto_configure_requires => 0, # Don't add M::B to configure_requires
+   configure_requires => {
+      'Module::Build' => '0.4004',
+   },
    license => 'perl',
-   create_makefile_pl => 'small',
    create_license => 1,
    create_readme  => 1,
 );

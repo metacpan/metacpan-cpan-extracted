@@ -16,5 +16,5 @@ WriteMakefile(
         'String::Util' => '1.21',
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'Statistics-SDT-0.06-*' },
+    clean               => { FILES => 'Statistics-SDT-0.07-*' },
 );

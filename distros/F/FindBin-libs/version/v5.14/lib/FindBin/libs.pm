@@ -438,9 +438,6 @@ directories based on $FindBin::Bin.
 
 =head1 SYNOPSIS
 
-This version of FindBin::libs is suitable for 
-Perl v5.10+.
-
     # search up $FindBin::Bin looking for ./lib directories
     # and "use lib" them.
 

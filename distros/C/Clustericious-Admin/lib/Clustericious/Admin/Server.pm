@@ -8,7 +8,7 @@ use File::Spec;
 use File::Path qw( mkpath );
 
 # ABSTRACT: Parallel SSH client server side code
-our $VERSION = '1.10'; # VERSION
+our $VERSION = '1.11'; # VERSION
 
 
 # This is the implementation of the clad server.
@@ -228,7 +228,7 @@ Clustericious::Admin::Server - Parallel SSH client server side code
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =head1 SYNOPSIS
 

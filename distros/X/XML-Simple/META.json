@@ -34,6 +34,7 @@
       },
       "test" : {
          "requires" : {
+            "File::Temp" : "0",
             "Test::More" : "0.88"
          }
       }
@@ -46,6 +47,6 @@
          "web" : "https://github.com/grantm/xml-simple"
       }
    },
-   "version" : "2.24"
+   "version" : "2.25"
 }
 

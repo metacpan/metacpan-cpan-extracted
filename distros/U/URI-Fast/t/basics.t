@@ -12,26 +12,11 @@ my @uris = (
   'https://user:pwd@192.168.0.1:8000/foo/bar?baz=bat&slack=fnord&asdf=the+quick%20brown+fox+%26+hound#foofrag',
 );
 
-subtest 'implicit file path' => sub{
-  ok my $uri = uri($uris[0]), 'ctor';
-  is $uri->scheme, 'file', 'scheme';
-  ok !$uri->auth, 'auth';
-  is $uri->path, '/foo/bar/baz', 'path';
-  is [$uri->path], ['foo', 'bar', 'baz'], 'path';
-  ok !$uri->query, 'query';
-  ok !$uri->frag, 'frag';
-
-  ok !$uri->usr, 'usr';
-  ok !$uri->pwd, 'pwd';
-  ok !$uri->host, 'host';
-  ok !$uri->port, 'port';
-};
-
 subtest 'simple' => sub{
   ok my $uri = uri($uris[1]), 'ctor';
   is $uri->scheme, 'http', 'scheme';
   is $uri->auth, 'www.test.com', 'auth';
-  ok !$uri->path, 'path';
+  is $uri->path, '', 'path';
   is [$uri->path], [], 'path';
   ok !$uri->query, 'query';
   ok !$uri->frag, 'frag';
@@ -148,7 +133,7 @@ subtest 'query' => sub{
 
   is $uri->query('foo=bar'), 'foo=bar', 'set (scalar)';
   is $uri->query, 'foo=bar', 'get (scalar)';
-  is { $uri->query }, {foo => ['bar']}, 'get (list)';
+  is { $uri->query }, {foo => ['bar']}, 'get (list)', do{ use Data::Dumper; { Dumper($uri->query) } };
 
   is $uri->query({baz => 'bat'}), 'baz=bat', 'set (hash ref)';
   is $uri->query, 'baz=bat', 'get (scalar)';
@@ -159,60 +144,64 @@ subtest 'query' => sub{
   is { $uri->query }, {fnord => [qw(foo bar)]}, 'get (list)';
 
   subtest 'param' => sub{
-    my $uri = uri 'http://www.test.com?foo=bar&foo=baz&fnord=slack';
-    is $uri->param('foo'), [qw(bar baz)], 'get (scalar): multiple values as array ref';
-    is $uri->param('fnord'), 'slack', 'get (scalar): single value as scalar';
-    is [$uri->param('foo')], [qw(bar baz)], 'get (list)';
+    foreach my $sep (qw(& ;)) {
+      subtest "separator '$sep'" => sub {
+        my $uri = uri "http://www.test.com?foo=bar${sep}foo=baz${sep}fnord=slack";
+        is $uri->param('foo'), array{ item 'bar'; item 'baz'; end; }, 'get (scalar): multiple values as array ref';
+        is $uri->param('fnord'), 'slack', 'get (scalar): single value as scalar';
+        is [$uri->param('foo')], array{ item 'bar'; item 'baz'; end; }, 'get (list)';
 
-    subtest 'unset' => sub {
-      is $uri->param('foo', undef), U, 'set';
-      is $uri->param('foo'), U, 'get';
-      is $uri->query, 'fnord=slack', 'updated: query';
-    };
+        subtest 'unset' => sub {
+          is $uri->param('foo', undef, $sep), U, 'set';
+          is $uri->param('foo'), U, 'get';
+          is $uri->query, 'fnord=slack', 'updated: query';
+        };
 
-    subtest 'set: string' => sub {
-      is $uri->param('foo', 'bar'), 'bar', 'set (scalar, single value)';
-      is $uri->param('foo'), 'bar', 'get';
-      is $uri->query, 'fnord=slack&foo=bar', 'updated: query';
-    };
+        subtest 'set: string' => sub {
+          is $uri->param('foo', 'bar', $sep), 'bar', 'set (scalar, single value)';
+          is $uri->param('foo'), 'bar', 'get';
+          is $uri->query, "fnord=slack${sep}foo=bar", 'updated: query';
+        };
 
-    subtest 'set: array ref' => sub {
-      is $uri->param('foo', [qw(bar baz)]), [qw(bar baz)], 'set (scalar, array ref)';
-      is $uri->param('foo'), [qw(bar baz)], 'get';
-      is $uri->query, 'fnord=slack&foo=bar&foo=baz', 'updated: query';
-    };
+        subtest 'set: array ref' => sub {
+          is $uri->param('foo', [qw(bar baz)], $sep), [qw(bar baz)], 'set (scalar, array ref)';
+          is $uri->param('foo'), [qw(bar baz)], 'get';
+          is $uri->query, "fnord=slack${sep}foo=bar${sep}foo=baz", 'updated: query';
+        };
 
-    subtest 'edge cases' => sub {
-      subtest 'unset only parameter' => sub {
-        my $uri = uri 'http://www.test.com?foo=bar';
-        $uri->param('foo', undef);
-        is $uri->query, '', 'expected query valuee';
+        subtest 'edge cases' => sub {
+          subtest 'unset only parameter' => sub {
+            my $uri = uri 'http://www.test.com?foo=bar';
+            $uri->param('foo', undef, $sep);
+            is $uri->query, '', 'expected query valuee';
+          };
+
+          subtest 'unset final parameter' => sub {
+            my $uri = uri "http://www.test.com?bar=bat${sep}foo=bar";
+            $uri->param('foo', undef, $sep);
+            is $uri->query, 'bar=bat', 'expected query valuee';
+          };
+
+          subtest 'unset initial parameter' => sub {
+            my $uri = uri "http://www.test.com?bar=bat${sep}foo=bar";
+            $uri->param('bar', undef, $sep);
+            is $uri->query, 'foo=bar', 'expected query value';
+          };
+
+          subtest 'update initial parameter' => sub {
+            my $uri = uri "http://www.test.com?bar=bat${sep}foo=bar";
+            $uri->param('bar', 'blah', $sep);
+            is $uri->query, "foo=bar${sep}bar=blah", 'expected query value';
+          };
+
+          subtest 'update final parameter' => sub {
+            my $uri = uri "http://www.test.com?bar=bat${sep}foo=bar";
+            $uri->param('foo', 'blah', $sep);
+            is $uri->query, "bar=bat${sep}foo=blah", 'expected query value';
+          };
+        };
       };
-
-      subtest 'unset final parameter' => sub {
-        my $uri = uri 'http://www.test.com?bar=bat&foo=bar';
-        $uri->param('foo', undef);
-        is $uri->query, 'bar=bat', 'expected query valuee';
-      };
-
-      subtest 'unset initial parameter' => sub {
-        my $uri = uri 'http://www.test.com?bar=bat&foo=bar';
-        $uri->param('bar', undef);
-        is $uri->query, 'foo=bar', 'expected query value';
-      };
-
-      subtest 'update initial parameter' => sub {
-        my $uri = uri 'http://www.test.com?bar=bat&foo=bar';
-        $uri->param('bar', 'blah');
-        is $uri->query, 'foo=bar&bar=blah', 'expected query value';
-      };
-
-      subtest 'update final parameter' => sub {
-        my $uri = uri 'http://www.test.com?bar=bat&foo=bar';
-        $uri->param('foo', 'blah');
-        is $uri->query, 'bar=bat&foo=blah', 'expected query value';
-      };
-    };
+    }
   };
 };
 
@@ -277,6 +266,50 @@ subtest 'memory leaks' => sub{
   no_leaks_ok { $uri->query_keys } 'query_keys';
   no_leaks_ok { $uri->query_hash } 'query_hash';
   no_leaks_ok { $uri->to_string } 'to_string';
+
+  no_leaks_ok {
+    my $uri   = uri $uris[3];
+    my @parts = ($uri->scheme, $uri->auth, $uri->path, $uri->query, $uri->frag);
+    my @auth  = ($uri->usr, $uri->pwd, $uri->host, $uri->port);
+    my @path  = $uri->path;
+    my @keys  = $uri->query_keys;
+    my $query = $uri->query_hash;
+
+    $uri->scheme('http');
+    $uri->auth('foo:bar@test.com:101010');
+    $uri->path('/asdf');
+    $uri->path('/Ῥόδος¢€');
+    $uri->path(['asdf', 'qwerty']);
+    $uri->query('foo=Ῥόδος¢€');
+    $uri->param('foo', 'bar');
+    $uri->param({foo => ['bar', 'baz']});
+    $uri->frag('foo');
+
+    my $str = "$uri";
+
+  }, 'combined';
+};
+
+subtest 'overruns' => sub{
+   # scheme: 16
+   # auth:   267
+   # path:   256
+   # query:  1024
+   # frag:   32
+   # usr:    64
+   # pwd:    64
+   # host:   128
+   # port:   8
+   my $uri = uri 'http://www.test.com';
+   ok $uri->scheme('x' x 17), 'scheme';
+   ok $uri->auth('x' x 268), 'auth';
+   ok $uri->path('x' x 257), 'path';
+   ok $uri->query('x' x 1025), 'query';
+   ok $uri->frag('x' x 33), 'frag';
+   ok $uri->usr('x' x 65), 'usr';
+   ok $uri->pwd('x' x 65), 'pwd';
+   ok $uri->host('x' x 129), 'host';
+   ok $uri->port('1234567890'), 'port';
 };
 
 done_testing;

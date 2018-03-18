@@ -2,7 +2,7 @@ package Test2::Harness::Job::Runner::Fork;
 use strict;
 use warnings;
 
-our $VERSION = '0.001057';
+our $VERSION = '0.001061';
 
 use POSIX;
 use Scalar::Util qw/openhandle/;
@@ -132,6 +132,16 @@ sub { shift->import(@_) }
 
     my %seen;
     @INC = grep { !$seen{$_}++ } (@{$job->libs}, @INC);
+
+    if ($job->event_uuids) {
+        require Test2::Plugin::UUID;
+        Test2::Plugin::UUID->import();
+    }
+
+    if ($job->mem_usage) {
+        require Test2::Plugin::MemUsage;
+        Test2::Plugin::MemUsage->import();
+    }
 
     if ($job->use_stream) {
         $ENV{T2_FORMATTER} = 'Stream';

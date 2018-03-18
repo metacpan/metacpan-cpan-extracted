@@ -10,7 +10,7 @@ my $builder = Module::Build->new(
     dist_author         => ['John Macdonald  <jmacdonald@oicr.on.ca>'],
 
     dist_version_from   => 'lib/HPCD/SGE.pm',
-    dist_abstract       => 'Please add a short description of the module here.',
+    dist_abstract       => 'HPCI driver for SGE cluster interface.',
 
     # Modules required to use this module
     test_requires => {

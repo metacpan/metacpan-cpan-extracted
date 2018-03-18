@@ -5,6 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Log::LogMethods',
     VERSION_FROM      => 'lib/Log/LogMethods.pm', # finds $VERSION
+    LICENSE=>'perl_5',
     PREREQ_PM         => {
     qw(
       Moo  2.003002
@@ -13,7 +14,7 @@ WriteMakefile(
       MooX::Types::MooseLike::Base 0.29
       Carp 1.42
       namespace::clean 0.27
-      Data::Dumper  2.167
+      Data::Dumper  2.161
       Test::More    1.302073
       Data::Result  1.0
       Log::Log4perl 1.49

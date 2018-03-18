@@ -1,2 +1,13 @@
-1.00001
+0.0001
   -- Inital Release
+1.0002
+  -- Pod clean ups... loads of pod clean ups.. loads and loads
+  -- Added force cache refresh
+  -- Bumped up to 1.x
+  -- Added a lot more unit tests.. 
+  -- Added licence to the Makefile.PL
+1.003
+  -- Bumped Min version of HTTP::MultiGet to 1.010
+  -- Added blocking unit tests that found the problem with HTTP::MultiGet
+1.004
+  -- Changed min version of Data::Dumper to 2.161

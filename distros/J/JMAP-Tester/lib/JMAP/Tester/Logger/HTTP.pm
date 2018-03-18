@@ -1,6 +1,6 @@
 use 5.14.0;
 package JMAP::Tester::Logger::HTTP;
-$JMAP::Tester::Logger::HTTP::VERSION = '0.017';
+$JMAP::Tester::Logger::HTTP::VERSION = '0.018';
 use Moo;
 
 use namespace::clean;
@@ -44,7 +44,7 @@ JMAP::Tester::Logger::HTTP
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 AUTHOR
 

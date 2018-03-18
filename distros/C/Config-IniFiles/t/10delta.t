@@ -13,7 +13,7 @@ use Config::IniFiles::TestPaths;
 use Config::IniFiles::Slurp qw( slurp );
 
 my $ors = $\ || "\n";
-my ($ini,$value);
+my ( $ini, $value );
 
 #
 # Delta tests added by D/DO/DOMQ
@@ -24,7 +24,7 @@ my ($ini,$value);
 my $en = Config::IniFiles->new( -file => t_file('en.ini') );
 
 # TEST
-ok ( $en, "En was instantiated." );
+ok( $en, "En was instantiated." );
 
 # test 2
 my $es = Config::IniFiles->new( -file => t_file('es.ini'), -import => $en );
@@ -32,37 +32,37 @@ my $es = Config::IniFiles->new( -file => t_file('es.ini'), -import => $en );
 # TEST
 ok( $es, "Es was instantiated." );
 
-my $estext=slurp(t_file("es.ini"));
+my $estext = slurp( t_file("es.ini") );
 $estext =~ s/\s*//g;
 
 # test 3
 ## Delta without any update should result in exact same file (ignoring
 ## distinctions about leading whitespace)
 t_unlink('delta.ini');
-$es->WriteConfig(t_file('delta.ini'), -delta=>1);
+$es->WriteConfig( t_file('delta.ini'), -delta => 1 );
 
-my $deltatext=slurp(t_file('delta.ini'));
+my $deltatext = slurp( t_file('delta.ini') );
 $deltatext =~ s/\s*//g;
 
 # TEST
-is ($deltatext, $estext,
-    "Delta without any update should result in exact same file "
-);
+is( $deltatext, $estext,
+    "Delta without any update should result in exact same file " );
 
 t_unlink('delta.ini');
 
 # test 4
 ## Delta with updates
-$es->newval("something", "completely", "different");
-$es->WriteConfig(t_file('delta.ini'), -delta=>1);
-$deltatext=slurp(t_file('delta.ini'));
+$es->newval( "something", "completely", "different" );
+$es->WriteConfig( t_file('delta.ini'), -delta => 1 );
+$deltatext = slurp( t_file('delta.ini') );
 
 # TEST
-if (!ok(
-    scalar($deltatext =~ m/^[something].*completely=different/sm),
-    "Delta with updates",
+if (
+    !ok(
+        scalar( $deltatext =~ m/^[something].*completely=different/sm ),
+        "Delta with updates",
     )
-)
+    )
 {
     diag($deltatext);
 }
@@ -71,17 +71,19 @@ t_unlink('delta.ini');
 
 # test 5
 ## Delta with deletion marks
-$es->delval("x", "LongName");
+$es->delval( "x", "LongName" );
 $es->DeleteSection("m");
-$es->WriteConfig(t_file('delta.ini'), -delta=>1);
-$deltatext=slurp(t_file('delta.ini'));
+$es->WriteConfig( t_file('delta.ini'), -delta => 1 );
+$deltatext = slurp( t_file('delta.ini') );
 
 # TEST
-if (!ok(($deltatext =~ m/^. \[m\] is deleted/m) &&
-   ($deltatext =~ m/^. LongName is deleted/m),
-   "Delta with deletion marks",
-   ),
-   )
+if (
+    !ok(
+        ( $deltatext =~ m/^. \[m\] is deleted/m )
+            && ( $deltatext =~ m/^. LongName is deleted/m ),
+        "Delta with deletion marks",
+    ),
+    )
 {
     diag($deltatext);
 }
@@ -89,9 +91,9 @@ if (!ok(($deltatext =~ m/^. \[m\] is deleted/m) &&
 # test 6
 ## Parsing back deletion marks
 
-$es=Config::IniFiles->new( -file => t_file('delta.ini'), -import => $en );
+$es = Config::IniFiles->new( -file => t_file('delta.ini'), -import => $en );
+
 # TEST
-ok((!defined $es->val("x", "LongName")) &&
-   (! $es->SectionExists("m")),
-   "Parsing back deletion marks");
+ok( ( !defined $es->val( "x", "LongName" ) ) && ( !$es->SectionExists("m") ),
+    "Parsing back deletion marks" );
 t_unlink("delta.ini");

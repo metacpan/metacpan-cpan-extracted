@@ -56,6 +56,9 @@ my $target = App::Sqitch::Target->new(
 );
 isa_ok my $fb = $CLASS->new(sqitch  => $sqitch, target => $target), $CLASS;
 
+is $fb->key, 'firebird', 'Key should be "firebird"';
+is $fb->name, 'Firebird', 'Name should be "Firebird"';
+
 my $have_fb_client;
 if ($have_fb_driver && (my $client = try { $fb->client })) {
     $have_fb_client = 1;
@@ -319,11 +322,11 @@ END {
         );
         if (@{$res} > 1) {
             # Do we have more than 1 active connections?
-            warn "    Another active connection detected, can't DROP DATABASE!\n";
+            diag "    Another active connection detected, can't DROP DATABASE!\n";
         }
         else {
             $dbh->func('ib_drop_database')
-                or warn
+                or diag
                 "Error dropping test database '$dbname': $DBI::errstr";
         }
     }

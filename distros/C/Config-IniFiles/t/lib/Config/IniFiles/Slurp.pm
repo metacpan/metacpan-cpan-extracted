@@ -5,7 +5,7 @@ use warnings;
 
 use File::Spec;
 
-use base 'Exporter';
+use parent 'Exporter';
 
 use vars (qw(@EXPORT_OK));
 
@@ -16,7 +16,6 @@ use vars (qw(@EXPORT_OK));
 Reads the entire file.
 
 =cut
-
 
 sub slurp
 {
@@ -38,6 +37,7 @@ sub slurp
 Reads the entire file with binmode
 
 =cut
+
 sub bin_slurp
 {
     my $filename = shift;

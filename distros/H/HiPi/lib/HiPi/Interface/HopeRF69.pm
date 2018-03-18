@@ -20,7 +20,7 @@ use Time::HiRes qw( usleep );
 __PACKAGE__->create_accessors( qw( devicename reset_gpio update_default_on_reset
                                    fsk_config ook_config ook_repeat) );
 
-our $VERSION ='0.68';
+our $VERSION ='0.69';
 
 # Hope recommended updated reset defaults
 my $reset_defaults = [

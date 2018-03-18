@@ -1,10 +1,10 @@
 NAME
 
-    PlugAuth::Plugin::LDAP - LDAP back end for PlugAuth
+    PlugAuth::Plugin::LDAP - (Deprecated) LDAP back end for PlugAuth
 
 VERSION
 
-    version 0.08
+    version 0.09
 
 SYNOPSIS
 
@@ -20,6 +20,10 @@ SYNOPSIS
     to the LDAP server.
 
 DESCRIPTION
+
+    NOTE: This module has been deprecated, and may be removed on or after
+    31 December 2018. Please see
+    https://github.com/clustericious/Clustericious/issues/46.
 
     Handle authentication only from LDAP server. Everything else is handled
     by PlugAuth::Plugin::FlatAuth (e.g. authorization, groups, etc).

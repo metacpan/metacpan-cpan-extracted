@@ -1,5 +1,5 @@
 use Test2::Plugin::FauxHomeDir;
-use Test2::V0;
+use Test2::V0 -no_srand => 1;
 use File::Spec;
 use YAML::XS ();
 use File::Glob qw( bsd_glob );

@@ -217,7 +217,11 @@ var app = new Vue({
             fetching: false,
             error: {},
             formError: {},
-            info: {}
+            info: {},
+            sortColumn: null,
+            sortDirection: 1,
+            newFilter: null,
+            filters: []
         }
     },
     methods: {
@@ -231,6 +235,43 @@ var app = new Vue({
                 this.addingItem = false;
                 this.openedRow = i;
             }
+        },
+
+        sortClass: function ( col ) {
+            return this.sortColumn != col.field ? 'fa-sort'
+                : this.sortDirection > 0 ? 'fa-sort-asc'
+                : 'fa-sort-desc';
+        },
+
+        toggleSort: function ( col ) {
+            if ( this.sortColumn == col.field ) {
+                this.sortDirection = this.sortDirection > 0 ? -1 : 1;
+            }
+            else {
+                this.sortColumn = col.field;
+                this.sortDirection = 1;
+            }
+            this.currentPage = 1;
+            this.fetchPage();
+        },
+
+        createFilter: function () {
+            this.newFilter = {};
+        },
+
+        addFilter: function () {
+            this.filters.push( this.newFilter );
+            this.cancelFilter();
+            this.fetchPage();
+        },
+
+        cancelFilter: function () {
+            this.newFilter = null;
+        },
+
+        removeFilter: function ( i ) {
+            this.filters.splice( i, 1 );
+            this.fetchPage();
         },
 
         setCollection: function ( name ) {
@@ -351,16 +392,24 @@ var app = new Vue({
             if ( this.fetching ) return;
             var coll = this.collections[ this.currentCollection ],
                 self = this,
-                paging = {
-                    limit: this.perPage,
-                    offset: this.perPage * ( this.currentPage - 1 )
+                query = {
+                    $limit: this.perPage,
+                    $offset: this.perPage * ( this.currentPage - 1 )
                 };
+
+            if ( this.sortColumn != null ) {
+                var dir = this.sortDirection > 0 ? 'asc' : 'desc';
+                query.$order_by = [ dir, this.sortColumn ].join( ':' );
+            }
+            for ( var i = 0; i < this.filters.length; i++ ) {
+                query[ this.filters[i].field ] = this.filters[i].value;
+            }
 
             this.fetching = true;
             delete this.error.fetchPage;
-            $.get( coll.operations["list"].url, paging ).done(
+            $.get( coll.operations["list"].url, query ).done(
                 function ( data, status, jqXHR ) {
-                    if ( paging.offset > data.total ) {
+                    if ( query.offset > data.total ) {
                         // We somehow got to a page that doesn't exist,
                         // so go to the first page instead
                         self.fetching = false;
@@ -628,6 +677,8 @@ var app = new Vue({
             this.openedRow = null;
             this.addingItem = false;
             this.fetching = false;
+            this.sortColumn = null;
+            this.sortDirection = 1;
             this.fetchPage();
         },
         currentPage: function () {

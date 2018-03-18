@@ -1,0 +1,24 @@
+<%init>
+return unless RT::Extension::BecomeUser::userHasAppropriateRight($session{CurrentUser});
+if (ref $Collection eq 'RT::Users' ){
+    push @$Format, {
+        attribute => 'become user', 
+        title     => 'become user',
+        output    => [
+            '<a href="',
+            '__WebPath__',
+            '/BecomeUser.html?id=',
+            '__id__',
+            '">',
+            'become',
+            '</a>',
+        ],
+    last_attribute => 'Status',
+    };
+}
+
+</%init>
+<%args>
+$Collection => undef
+$Format => undef
+</%args>

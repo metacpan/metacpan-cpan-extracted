@@ -11,11 +11,11 @@ use Catalyst::Test 'TestApp';
 
 # test custom MIME types
 TestApp->config->{'Plugin::Static::Simple'}->{mime_types} = {
-    omg => 'holy/crap',
+    unknown => 'holy/crap',
     gif => 'patents/are-evil',
 };
 
-ok( my $res = request('http://localhost/files/err.omg'), 'request ok' );
+ok( my $res = request('http://localhost/files/err.unknown'), 'request ok' );
 is( $res->content_type, 'holy/crap', 'custom MIME type ok' );
 
 ok( $res = request('http://localhost/files/bad.gif'), 'request ok' );

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Getopt::Std  qw(getopts);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.2.0';
 
 # ------ define variables
 my $chunk        = undef;	# chunk count
@@ -14,10 +14,10 @@ my $file         = undef;	# file name
 my $inmatch      = undef;	# TRUE if inside match
 my $inpod        = undef;	# TRUE if inside POD
 my $only_header  = undef;	# copy of $opt_h
-my $opt_f        = undef;	# output plain text, paged if -p
-my $opt_h        = undef;	# output only POD headers
-my $opt_i        = undef;	# case-insensitive pattern
-my $opt_p        = undef;	# use $ENV{PAGER} to page output
+our $opt_f       = undef;	# output plain text, paged if -p
+our $opt_h       = undef;	# output only POD headers
+our $opt_i       = undef;	# case-insensitive pattern
+our $opt_p       = undef;	# use $ENV{PAGER} to page output
 my $orig_pattern = undef;	# original pattern to search for
 my $pager        = undef;	# contents of $ENV{PAGER}
 my $pattern      = undef;	# pattern to search for
@@ -34,8 +34,11 @@ $pattern .= '(?i)' if $opt_i;
 
 if ($opt_p) {
     unless ($pager = $ENV{PAGER}) {
-	require Config;
-	$pager = $Config::Config{"pager"} || "more";
+    	require Config;
+        {
+            no warnings qw(once);
+    	    $pager = $Config::Config{"pager"} || "more";
+        }
     } 
 } 
 
@@ -181,7 +184,7 @@ startup, of course):
 
 Copyright (C) 1999 Tom Christiansen.
 
-Copyright (C) 2006-2014 Mark Leighton Fisher.
+Copyright (C) 2006-2014, 2018 Mark Leighton Fisher.
 
 =head1 LICENSE
 

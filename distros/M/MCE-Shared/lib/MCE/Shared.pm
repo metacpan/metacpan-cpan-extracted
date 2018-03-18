@@ -13,13 +13,13 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.835';
+our $VERSION = '1.836';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
-use Carp;
+use Carp ();
 
 $Carp::Internal{ (__PACKAGE__) }++;
 
@@ -416,7 +416,7 @@ MCE::Shared - MCE extension for sharing data supporting threads and processes
 
 =head1 VERSION
 
-This document describes MCE::Shared version 1.835
+This document describes MCE::Shared version 1.836
 
 =head1 SYNOPSIS
 

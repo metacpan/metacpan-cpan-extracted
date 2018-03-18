@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2018 -- leonerd@leonerd.org.uk
 
 package Tickit::Widget;
 
@@ -79,7 +79,9 @@ order.
 
 =cut
 
-=head2 $widget = Tickit::Widget->new( %args )
+=head2 new
+
+   $widget = Tickit::Widget->new( %args )
 
 Constructs a new C<Tickit::Widget> object. Must be called on a subclass that
 implements the required methods; see the B<SUBCLASS METHODS> section below.
@@ -147,7 +149,9 @@ sub new
 
 =cut
 
-=head2 @classes = $widget->style_classes
+=head2 style_classes
+
+   @classes = $widget->style_classes
 
 Returns a list of the style class names this Widget has.
 
@@ -159,7 +163,9 @@ sub style_classes
    return @{ $self->{classes} };
 }
 
-=head2 $widget->set_style_tag( $tag, $value )
+=head2 set_style_tag
+
+   $widget->set_style_tag( $tag, $value )
 
 Sets the (boolean) state of the named style tag. After calling this method,
 the C<get_style_*> methods may return different results. No resizing or
@@ -229,9 +235,11 @@ sub _style_tags
    return join "|", sort grep { $tags->{$_} } keys %$tags;
 }
 
-=head2 @values = $widget->get_style_values( @keys )
+=head2 get_style_values
 
-=head2 $value = $widget->get_style_values( $key )
+   @values = $widget->get_style_values( @keys )
+
+   $value = $widget->get_style_values( $key )
 
 Returns a list of values for the given keys of the currently-applied style.
 For more detail see the L<Tickit::Style> documentation. Returns just one value
@@ -294,7 +302,9 @@ sub get_style_values
    return $values[0];
 }
 
-=head2 $pen = $widget->get_style_pen( $prefix )
+=head2 get_style_pen
+
+   $pen = $widget->get_style_pen( $prefix )
 
 A shortcut to calling C<get_style_values> to collect up the pen attributes,
 and form a L<Tickit::Pen::Immutable> object from them. If C<$prefix> is
@@ -320,7 +330,9 @@ sub get_style_pen
    };
 }
 
-=head2 $text = $widget->get_style_text
+=head2 get_style_text
+
+   $text = $widget->get_style_text
 
 A shortcut to calling C<get_style_values> for a single key called C<"text">.
 
@@ -334,7 +346,9 @@ sub get_style_text
    return $self->get_style_values( "text" ) // croak "$class style does not define text";
 }
 
-=head2 $widget->set_style( %defs )
+=head2 set_style
+
+   $widget->set_style( %defs )
 
 Changes the widget's direct-applied style.
 
@@ -463,7 +477,9 @@ sub _style_changed_values
    }
 }
 
-=head2 $widget->set_window( $window )
+=head2 set_window
+
+   $widget->set_window( $window )
 
 Sets the L<Tickit::Window> for the widget to draw on. Setting C<undef> removes
 the window.
@@ -597,7 +613,9 @@ sub window_lost
    $window->unbind_event_id( $_ ) for values %{ $self->{event_ids} };
 }
 
-=head2 $window = $widget->window
+=head2 window
+
+   $window = $widget->window
 
 Returns the current window of the widget, if one has been set using
 C<set_window>.
@@ -610,7 +628,9 @@ sub window
    return $self->{window};
 }
 
-=head2 $widget->set_parent( $parent )
+=head2 set_parent
+
+   $widget->set_parent( $parent )
 
 Sets the parent widget; pass C<undef> to remove the parent.
 
@@ -628,7 +648,9 @@ sub set_parent
    weaken( $self->{parent} = $parent );
 }
 
-=head2 $parent = $widget->parent
+=head2 parent
+
+   $parent = $widget->parent
 
 Returns the current container widget
 
@@ -640,7 +662,9 @@ sub parent
    return $self->{parent};
 }
 
-=head2 $widget->resized
+=head2 resized
+
+   $widget->resized
 
 Provided for subclasses to call when their size requirements have or may have
 changed. Re-calculates the size requirements by calling C<lines> and C<cols>
@@ -655,7 +679,9 @@ sub resized
    $self->set_requested_size( scalar $self->lines, scalar $self->cols );
 }
 
-=head2 $widget->set_requested_size( $lines, $cols )
+=head2 set_requested_size
+
+   $widget->set_requested_size( $lines, $cols )
 
 Provided for subclasses to call when their size requirements have or may have
 changed. Informs the parent that the widget requires a differently-sized
@@ -683,16 +709,22 @@ sub set_requested_size
    }
 }
 
-=head2 ( $lines, $cols ) = $widget->requested_size
+=head2 requested_size
+
+   ( $lines, $cols ) = $widget->requested_size
 
 Returns the requested size of the widget; its preferred dimensions. This
 method calls C<lines> and C<cols> and caches the result until the next call to
 C<resized>. Container widgets should use this method in preference to calling
 C<lines> and C<cols> directly.
 
-=head2 $lines = $widget->requested_lines
+=head2 requested_lines
 
-=head2 $cols  = $widget->requested_cols
+   $lines = $widget->requested_lines
+
+=head2 requested_cols
+
+   $cols  = $widget->requested_cols
 
 Returns one or other of the requested dimensions. Shortcuts for calling
 C<requested_size>. These are I<temporary> convenience methods to assist
@@ -711,7 +743,9 @@ sub requested_size
 sub requested_lines { ( shift->requested_size )[0] }
 sub requested_cols  { ( shift->requested_size )[1] }
 
-=head2 $widget->redraw
+=head2 redraw
+
+   $widget->redraw
 
 Clears the widget's window then invokes the C<render> method. This should
 completely redraw the widget.
@@ -732,7 +766,9 @@ sub redraw
    $self->window->expose;
 }
 
-=head2 $pen = $widget->pen
+=head2 pen
+
+   $pen = $widget->pen
 
 Returns the widget's L<Tickit::Pen>.
 
@@ -763,7 +799,9 @@ sub _update_pen
 # Default empty implementation
 sub reshape { }
 
-=head2 $widget->take_focus
+=head2 take_focus
+
+   $widget->take_focus
 
 Calls C<take_focus> on the Widget's underlying Window, if present, or stores
 that the window should take focus when one is eventually set by C<set_window>.
@@ -792,7 +830,9 @@ sub take_focus
 Because this is an abstract class, the constructor must be called on a
 subclass which implements the following methods.
 
-=head2 $widget->render_to_rb( $renderbuffer, $rect )
+=head2 render_to_rb
+
+   $widget->render_to_rb( $renderbuffer, $rect )
 
 Called to redraw the widget's content to the given L<Tickit::RenderBuffer>.
 
@@ -800,42 +840,58 @@ Will be passed the clipping rectangle region to be rendered as a
 L<Tickit::Rect>. the method does not have to render any content outside of
 this region.
 
-=head2 $widget->reshape
+=head2 reshape
+
+   $widget->reshape
 
 Optional. Called after the window geometry is changed. Useful to distribute
 window change sizes to contained child widgets.
 
-=head2 $lines = $widget->lines
+=head2 lines
 
-=head2 $cols = $widget->cols
+   $lines = $widget->lines
+
+=head2 cols
+
+   $cols = $widget->cols
 
 Called to enquire on the requested window for this widget. It is possible that
 the actual allocated window may be larger, or smaller than this amount.
 
-=head2 $widget->window_gained( $window )
+=head2 window_gained
+
+   $widget->window_gained( $window )
 
 Optional. Called by C<set_window> when a window has been set for this widget.
 
-=head2 $widget->window_lost( $window )
+=head2 window_lost
+
+   $widget->window_lost( $window )
 
 Optional. Called by C<set_window> when C<undef> has been set as the window for
 this widget. The old window object is passed in.
 
-=head2 $handled = $widget->on_key( $ev )
+=head2 on_key
+
+   $handled = $widget->on_key( $ev )
 
 Optional. If provided, this method will be set as the C<on_key> callback for
 any window set on the widget. By providing this method a subclass can
 implement widgets that respond to user input. It receives the same event
 arguments structure as the underlying window C<on_key> event.
 
-=head2 $handled = $widget->on_mouse( $ev )
+=head2 on_mouse
+
+   $handled = $widget->on_mouse( $ev )
 
 Optional. If provided, this method will be set as the C<on_mouse> callback for
 any window set on the widget. By providing this method a subclass can
 implement widgets that respond to user input. If receives the same event
 arguments structure as the underlying window C<on_mouse> event.
 
-=head2 $widget->on_style_changed_values( %values )
+=head2 on_style_changed_values
+
+   $widget->on_style_changed_values( %values )
 
 Optional. If provided, this method will be called by C<set_style_tag> to
 inform the widget which style keys may have changed values, as a result of the
@@ -850,13 +906,17 @@ Most of the time this method may not be necessary as the C<style_reshape_keys>
 C<style_reshape_textwidth_keys>, and C<style_redraw_keys> declarations should
 suffice for most purposes.
 
-=head2 $widget->CAN_FOCUS
+=head2 CAN_FOCUS
+
+   $widget->CAN_FOCUS
 
 Optional, normally false. If this constant method returns a true value, the
 widget is allowed to take focus using the C<take_focus> method. It will also
 take focus automatically if it receives a mouse button 1 press event.
 
-=head2 $widget->KEYPRESSES_FROM_STYLE
+=head2 KEYPRESSES_FROM_STYLE
+
+   $widget->KEYPRESSES_FROM_STYLE
 
 Optional, normally false. If this constant method returns a true value, the
 widget will use style information to invoke named methods on keypresses. When

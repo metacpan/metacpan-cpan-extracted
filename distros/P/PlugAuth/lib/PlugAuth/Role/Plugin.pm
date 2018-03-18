@@ -6,7 +6,7 @@ use 5.010001;
 use Role::Tiny;
 
 # ABSTRACT: Role for PlugAuth plugins
-our $VERSION = '0.38'; # VERSION
+our $VERSION = '0.39'; # VERSION
 
 
 sub init { }
@@ -71,7 +71,7 @@ PlugAuth::Role::Plugin - Role for PlugAuth plugins
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 SYNOPSIS
 

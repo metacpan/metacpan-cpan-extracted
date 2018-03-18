@@ -37,8 +37,8 @@ activity it will get reopened just as quickly.
 =head2 Reporting security issues
 
 Please report security issues directly to the pumpkin-holder via email, which is
-currently Sebastian Riedel (C<sri@cpan.org>), and give us a few days to develop
-and release a proper fix.
+currently Sebastian Riedel (C<kraih@mojolicious.org>), and give us a few days to
+develop and release a proper fix.
 
 =head1 RESOLVING ISSUES
 
@@ -188,8 +188,8 @@ that the project your product relies on stays healthy and actively maintained.
 It can also help your exposure within the community and will make it easier to
 attract L<Mojolicious> developers.
 
-Please email Sebastian Riedel (C<sri@cpan.org>) if you have any questions about
-becoming a sponsor.
+Please email Sebastian Riedel (C<kraih@mojolicious.org>) if you have any
+questions about becoming a sponsor.
 
 =head1 CODE OF CONDUCT
 
@@ -214,7 +214,7 @@ In addition, violations of this code outside these spaces may affect a person's
 ability to participate within them.
 
 If you believe someone is violating the code of conduct, we ask that you report
-it by emailing Joel Berger (C<jberger@cpan.org>) or other members of
+it by emailing Joel Berger (C<jberger@mojolicious.org>) or other members of
 L<the team|Mojolicious/"CORE DEVELOPERS">.
 
 =over 2

@@ -27,9 +27,9 @@ use Net::ACME2::X ();
 use constant _ACCESSORS => (
     'url',
     'type',
-    'token',
     'status',
     'validated',
+    'error',
     #'keyAuthorization',
 );
 

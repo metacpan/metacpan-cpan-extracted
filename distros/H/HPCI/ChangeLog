@@ -1,3 +1,6 @@
+0.63 - added code stage checking to skipstage.t
+     - fixed timestamp checking in skipstage test
+
 0.62 - finished group->add_file_params support: added test, fixed uncovered bugs
      - removed some debug code from checksum test
 

@@ -15,15 +15,12 @@ use Config::IniFiles;
 use File::Spec;
 
 my $ini_filename =
-    File::Spec->catfile(
-        File::Spec->curdir(), "t", 'test25.ini'
-    );
+    File::Spec->catfile( File::Spec->curdir(), "t", 'test25.ini' );
 
 {
 
-    # being pedantic, we don't take line breaks from this or an external file for granted
-    my $sample_ini =
-    "<eol>
+# being pedantic, we don't take line breaks from this or an external file for granted
+    my $sample_ini = "<eol>
     <sol># this is a sample file for testing the proper detection of line endings in Config::IniFiles<eol>
     <sol><eol>
     <sol>[single values]<eol>
@@ -39,42 +36,40 @@ my $ini_filename =
     <sol><eol>
     <sol>";
 
-    foreach my $lf (("\x0d\x0a", "\x0d", "\x0a", "\x15", "\n")) {
+    foreach my $lf ( ( "\x0d\x0a", "\x0d", "\x0a", "\x15", "\n" ) )
+    {
         my $ini = $sample_ini;
         $ini =~ s/<eol>[^<]*<sol>/$lf/g;
 
         open my $INI, '>', $ini_filename or die $!;
         binmode $INI;
-        print $INI $ini;
+        print {$INI} $ini;
         close $INI;
 
-        my $lf_print = join('', map {sprintf '\x%0.2x', ord $_} split(//, $lf));
+        my $lf_print =
+            join( '', map { sprintf '\x%0.2x', ord $_ } split( //, $lf ) );
 
-        my $cfg = Config::IniFiles->new(-file => $ini_filename);
-
-        # TEST
-        ok($cfg, "Loading from a '$lf_print'-separated file");
+        my $cfg = Config::IniFiles->new( -file => $ini_filename );
 
         # TEST
-        my $value = $cfg->val('single values', 'firstval');
-        is (
-            $value, 'first value',
-            "Reading a single value from a '$lf_print'-separated file"
-        );
+        ok( $cfg, "Loading from a '$lf_print'-separated file" );
 
         # TEST
-        $value = $cfg->val('single values', 'secondval');
-        is (
-            $value, '2nd',
-            "Reading a single value from a '$lf_print'-separated file"
-        );
+        my $value = $cfg->val( 'single values', 'firstval' );
+        is( $value, 'first value',
+            "Reading a single value from a '$lf_print'-separated file" );
 
-        my @vals = $cfg->val("multi value", "Paths");
+        # TEST
+        $value = $cfg->val( 'single values', 'secondval' );
+        is( $value, '2nd',
+            "Reading a single value from a '$lf_print'-separated file" );
+
+        my @vals = $cfg->val( "multi value", "Paths" );
 
         # TEST
         is_deeply(
             \@vals,
-            ['path1', 'path2'],
+            [ 'path1', 'path2' ],
             "Reading a multiple value from a '$lf_print'-separated file",
         );
 
@@ -82,4 +77,4 @@ my $ini_filename =
 
 }
 
-unlink ($ini_filename);
+unlink($ini_filename);

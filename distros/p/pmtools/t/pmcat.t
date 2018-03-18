@@ -16,4 +16,4 @@ eval {
 };
 
 is($?,        0,                                        "pmcat runs");
-like($output, qr/.*package Carp\;.*\=head1 SYNOPSIS/ms, "catted Carp");
+like($output, qr/package\sCarp\;/msx, "catted Carp");

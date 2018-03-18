@@ -1,0 +1,75 @@
+{
+   "abstract" : "less stress to remind returned list from CORE::caller()",
+   "author" : [
+      "Yuki Yoshida <worthmine@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.13",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Caller-Easy",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "perl" : "5.014004"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Caller::Easy" : {
+         "file" : "lib/Caller/Easy.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/worthmine/Caller-Easy/issues"
+      },
+      "homepage" : "https://github.com/worthmine/Caller-Easy",
+      "repository" : {
+         "url" : "git://github.com/worthmine/Caller-Easy.git",
+         "web" : "https://github.com/worthmine/Caller-Easy"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:WORTHMINE",
+   "x_serialization_backend" : "JSON::PP version 2.93"
+}

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::App::Command::log::grep;
-$Footprintless::App::Command::log::grep::VERSION = '1.27';
+$Footprintless::App::Command::log::grep::VERSION = '1.28';
 # ABSTRACT: output lines matching a pattern
 # PODNAME: Footprintless::App::Command::log::grep
 
@@ -51,7 +51,7 @@ Footprintless::App::Command::log::grep - output lines matching a pattern
 
 =head1 VERSION
 
-version 1.27
+version 1.28
 
 =head1 AUTHOR
 

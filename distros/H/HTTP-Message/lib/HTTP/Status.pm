@@ -3,13 +3,13 @@ package HTTP::Status;
 use strict;
 use warnings;
 
-our $VERSION = '6.14';
+our $VERSION = '6.15';
 
 require 5.002;   # because we use prototypes
 
 use base 'Exporter';
 our @EXPORT = qw(is_info is_success is_redirect is_error status_message);
-our @EXPORT_OK = qw(is_client_error is_server_error);
+our @EXPORT_OK = qw(is_client_error is_server_error is_cacheable_by_default);
 
 # Note also addition of mnemonics to @EXPORT below
 
@@ -105,12 +105,25 @@ our %EXPORT_TAGS = (
 
 sub status_message  ($) { $StatusCode{$_[0]}; }
 
-sub is_info         ($) { $_[0] && $_[0] >= 100 && $_[0] < 200; }
-sub is_success      ($) { $_[0] && $_[0] >= 200 && $_[0] < 300; }
-sub is_redirect     ($) { $_[0] && $_[0] >= 300 && $_[0] < 400; }
-sub is_error        ($) { $_[0] && $_[0] >= 400 && $_[0] < 600; }
-sub is_client_error ($) { $_[0] && $_[0] >= 400 && $_[0] < 500; }
-sub is_server_error ($) { $_[0] && $_[0] >= 500 && $_[0] < 600; }
+sub is_info                 ($) { $_[0] && $_[0] >= 100 && $_[0] < 200; }
+sub is_success              ($) { $_[0] && $_[0] >= 200 && $_[0] < 300; }
+sub is_redirect             ($) { $_[0] && $_[0] >= 300 && $_[0] < 400; }
+sub is_error                ($) { $_[0] && $_[0] >= 400 && $_[0] < 600; }
+sub is_client_error         ($) { $_[0] && $_[0] >= 400 && $_[0] < 500; }
+sub is_server_error         ($) { $_[0] && $_[0] >= 500 && $_[0] < 600; }
+sub is_cacheable_by_default ($) { $_[0] &&
+    (  $_[0] == 200 # OK
+    || $_[0] == 203 # Non-Authoritative Information
+    || $_[0] == 204 # No Content
+    || $_[0] == 206 # Not Acceptable
+    || $_[0] == 300 # Multiple Choices
+    || $_[0] == 301 # Moved Permanently
+    || $_[0] == 404 # Not Found
+    || $_[0] == 405 # Method Not Allowed
+    || $_[0] == 410 # Gone
+    || $_[0] == 414 # Request-URI Too Large
+    || $_[0] == 501 # Not Implemented
+    ); }
 
 1;
 
@@ -124,7 +137,7 @@ HTTP::Status - HTTP Status code processing
 
 =head1 VERSION
 
-version 6.14
+version 6.15
 
 =head1 SYNOPSIS
 
@@ -264,6 +277,15 @@ This function is B<not> exported by default.
 Return TRUE if C<$code> is a I<Server Error> status code (5xx). This class
 of status codes is intended for cases in which the server is aware
 that it has erred or is incapable of performing the request.
+
+This function is B<not> exported by default.
+
+=item is_cacheable_by_default( $code )
+
+Return TRUE if C<$code> indicates that a response is cacheable by default, and
+it can be reused by a cache with heuristic expiration. All other status codes
+are not cacheable by default. See L<RFC 7231 - HTTP/1.1 Semantics and Content, 
+Section 6.1. Overview of Status Codes|https://tools.ietf.org/html/rfc7231#section-6.1>.
 
 This function is B<not> exported by default.
 

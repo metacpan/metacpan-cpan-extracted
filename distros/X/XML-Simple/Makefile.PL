@@ -22,9 +22,10 @@ my %WriteMakefileArgs = (
     "XML::SAX::Expat" => 0
   },
   "TEST_REQUIRES" => {
+    "File::Temp" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "2.24",
+  "VERSION" => "2.25",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,6 +33,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "File::Temp" => 0,
   "Test::More" => "0.88",
   "XML::NamespaceSupport" => "1.04",
   "XML::SAX" => "0.15",

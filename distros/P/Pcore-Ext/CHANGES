@@ -1,3 +1,6 @@
+v0.13.2 2018-03-18T06:26:36Z
+ - app can define additional resources
+
 v0.13.1 2017-09-12T10:23:40Z
  - utf8 json encode improved
 

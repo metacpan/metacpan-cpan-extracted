@@ -69,6 +69,7 @@ tutorial/example_09_ls_command.pl
 tutorial/example_10_cp_command.pl
 tutorial/example_11_sleep_command.pl
 tutorial/example_12_show_command.pl
-tutorial/example_13_sub_cmd_and_args.pl
-tutorial/example_14_debug_command.pl
-tutorial/example_15_options.pl
+tutorial/example_13_set_command.pl
+tutorial/example_14_sub_cmd_and_args.pl
+tutorial/example_15_debug_command.pl
+tutorial/example_16_options.pl

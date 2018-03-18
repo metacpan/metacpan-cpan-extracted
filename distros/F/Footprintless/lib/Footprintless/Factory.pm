@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Factory;
-$Footprintless::Factory::VERSION = '1.27';
+$Footprintless::Factory::VERSION = '1.28';
 # ABSTRACT: The default factory for footprintless modules
 # PODNAME: Footprintless::Factory
 
@@ -178,7 +178,7 @@ Footprintless::Factory - The default factory for footprintless modules
 
 =head1 VERSION
 
-version 1.27
+version 1.28
 
 =head1 DESCRIPTION
 

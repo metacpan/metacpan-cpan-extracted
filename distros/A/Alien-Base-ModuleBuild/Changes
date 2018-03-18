@@ -1,5 +1,11 @@
 Revision history for Perl module Alien::Base.
 
+1.02 2018-03-11 14:33:44 -0400
+  - Production release identical to 1.01_01
+
+1.01_01 2018-03-09 17:40:12 -0500
+  - Allow changing protocol with environment variables.
+
 1.00 2017-10-01 06:21:53 -0400
   - Remove Alien::Base::PkgConfig
   - Require Alien::Build::PkgConfig 1.20

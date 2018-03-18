@@ -1,9 +1,9 @@
 package Lab::Moose::Instrument::Cache;
-$Lab::Moose::Instrument::Cache::VERSION = '3.622';
-#ABSTRACT: Role for device cache functionality in Moose::Instrument drivers
+$Lab::Moose::Instrument::Cache::VERSION = '3.623';
+#ABSTRACT: Device caching functionality in Moose::Instrument drivers
 
 
-use Moose::Role;
+use Moose;
 use MooseX::Params::Validate;
 
 Moose::Exporter->setup_import_methods( with_meta => ['cache'] );
@@ -150,11 +150,11 @@ __END__
 
 =head1 NAME
 
-Lab::Moose::Instrument::Cache - Role for device cache functionality in Moose::Instrument drivers
+Lab::Moose::Instrument::Cache - Device caching functionality in Moose::Instrument drivers
 
 =head1 VERSION
 
-version 3.622
+version 3.623
 
 =head1 SYNOPSIS
 
@@ -239,6 +239,7 @@ This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2018       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

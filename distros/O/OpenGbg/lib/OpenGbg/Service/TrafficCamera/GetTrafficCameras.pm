@@ -6,7 +6,7 @@ package OpenGbg::Service::TrafficCamera::GetTrafficCameras;
 
 # ABSTRACT: Get a list of traffic cameras
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1402';
+our $VERSION = '0.1403';
 
 use XML::Rabbit::Root;
 use Types::Standard qw/Str/;
@@ -38,7 +38,7 @@ OpenGbg::Service::TrafficCamera::GetTrafficCameras - Get a list of traffic camer
 
 =head1 VERSION
 
-Version 0.1402, released 2016-08-12.
+Version 0.1403, released 2018-03-14.
 
 =head1 SYNOPSIS
 

@@ -15,7 +15,6 @@ corpus/dir/sub1/sub2/3.txt
 corpus/dir/sub1/sub2/sub3/4.txt
 corpus/fake-server.pl
 corpus/fake-ssh.pl
-cpanfile
 dist.ini
 inc/My/ModuleBuild.pm
 inc/dist.spec.tt

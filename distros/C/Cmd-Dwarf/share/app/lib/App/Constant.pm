@@ -5,16 +5,18 @@ our(@ISA, @EXPORT);
 require Exporter;
 @ISA = qw(Exporter);
 
-@EXPORT = qw|
-	TRUE FALSE HTTPS_PORT SUCCESS FAILURE|;
+my %constant;
+BEGIN {
+	%constant = (
+		TRUE    => 1,
+		FALSE   => 0,
+		SUCCESS => 0,
+		FAILURE => 1,
+	);
+}
 
-use constant {
-	TRUE                  => 1,
-	FALSE                 => 0,
-	SUCCESS               => 0,
-	FAILURE               => 1,
-	HTTPS_PORT            => 443,
-};
+@EXPORT = keys %constant;
+use constant { %constant };
 
 1;
 

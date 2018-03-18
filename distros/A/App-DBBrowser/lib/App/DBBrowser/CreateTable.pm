@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.003';
+our $VERSION = '2.006';
 
 use File::Basename qw( basename );
 use List::Util     qw( none any );
@@ -76,10 +76,12 @@ sub __table_name {
 
     TABLENAME: while ( 1 ) {
         my $trs = Term::Form->new( 'tn' );
-        my $info = 'DB: ' . basename( $data->{db} );
-        # filename
+        my $info;
+        if ( defined $data->{file_name} ) {
+            $info = sprintf "File: '%s'\n", basename( delete $data->{file_name} );
+        }
         # Readline
-        $table = $trs->readline( 'Table name: ' );
+        $table = $trs->readline( 'Table name: ', { info => $info } );
         if ( ! length $table ) {
             return;
         }
@@ -101,11 +103,18 @@ sub __table_name {
 }
 
 
+sub __reset_create_table_sql {
+    my ( $sf, $sql ) = @_;
+    $sql->{table} = undef;
+    $sql->{insert_into_args} = [];
+    $sql->{insert_into_cols} = [];
+}
+
 sub create_new_table {
     my ( $sf, $dbh, $data ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o} );
     my $sql = {};
-    $ax->reset_sql( $sql ); #
+    $sf->__reset_create_table_sql( $sql );
     my @cu_keys = ( qw/create_table_plain create_table_form_copy create_table_form_file settings/ );
     my %cu = ( create_table_plain      => '- plain',
                create_table_form_copy  => '- Copy & Paste',
@@ -117,7 +126,7 @@ sub create_new_table {
     MENU: while ( 1 ) {
         my $stmt_typeS = [ 'Create_table' ];
         my $choices = [ undef, @cu{@cu_keys} ];
-        my $prompt = 'DB: "' . basename( $data->{db} ) . '"' . "\n" . 'Create table';
+        my $prompt = 'Create table';
         # Choose
         $ENV{TC_RESET_AUTO_UP} = 0;
         my $idx = choose(
@@ -144,7 +153,10 @@ sub create_new_table {
         $ax->reset_sql( $sql ); #
         if ( $custom eq $cu{create_table_plain} ) {
             my $ok = $sf->__data_from_plain( $sql, $dbh, $stmt_typeS, $data );
-            next MENU if ! $ok;
+            if ( ! $ok ) {
+                $sf->__reset_create_table_sql( $sql );
+                next MENU;
+            }
         }
         else {
             if ( $custom eq $cu{create_table_form_copy} ) {
@@ -152,31 +164,35 @@ sub create_new_table {
                 my $tbl_in = App::DBBrowser::Table::Insert->new( $sf->{i}, $sf->{o} );
                 my $ok = $tbl_in->from_copy_and_paste( $sql, $stmt_typeS );
                 if ( ! $ok ) {
+                    $sf->__reset_create_table_sql( $sql );
                     next MENU;
                 }
             }
             elsif ( $custom eq $cu{create_table_form_file} ) {
                 push @$stmt_typeS, 'Insert';
                 my $tbl_in = App::DBBrowser::Table::Insert->new( $sf->{i}, $sf->{o} );
-                my $ok = $tbl_in->from_file( $sql, $stmt_typeS );
-                if ( ! $ok ) {
+                my $file_name = $tbl_in->from_file( $sql, $stmt_typeS );
+                if ( ! $file_name ) {
+                    $sf->__reset_create_table_sql( $sql );
                     next MENU;
                 }
+                $data->{file_name} = $file_name;
             }
             my $ok = $sf->__table_name( $sql, $dbh, $stmt_typeS, $data );
             if ( ! $ok ) {
+                $sf->__reset_create_table_sql( $sql );
                 next MENU;
             }
             # Columns
-            my ( $first_row, $user_input ) = ( '- Use first row', '- User input' );
+            my ( $first_row, $user_input ) = ( '- First row', '- Add row' );
             $ax->print_sql( $sql, $stmt_typeS );
             # Choose
             my $choice = choose(
                 [ undef, $first_row, $user_input ],
-                { %{$sf->{i}{lyt_stmt_v}}, prompt => 'Column names:' }
+                { %{$sf->{i}{lyt_stmt_v}}, prompt => 'Header:' }
             );
             if ( ! defined $choice ) {
-                $sql->{insert_into_args} = [];
+                $sf->__reset_create_table_sql( $sql );
                 next MENU;
             }
             if ( $choice eq $first_row ) {
@@ -195,7 +211,7 @@ sub create_new_table {
                 { prompt => 'Col names:', auto_up => 2, confirm => '  CONFIRM', back => '  BACK   ' }
             );
             if ( ! $form ) {
-                $sql->{insert_into_cols} = [];
+                $sf->__reset_create_table_sql( $sql );
                 next MENU;
             }
             $sql->{insert_into_cols} = [ map { $_->[1] } @$form ]; # not quoted
@@ -212,6 +228,7 @@ sub create_new_table {
             { prompt => 'Data types:', auto_up => 2, confirm => 'CONFIRM', back => 'BACK        ' }
         );
         if ( ! $col_name_and_type ) {
+            $sf->__reset_create_table_sql( $sql );
             next MENU;
         }
         my $qt_table = $sql->{table};
@@ -226,9 +243,10 @@ sub create_new_table {
             { %{$sf->{i}{lyt_m}}, prompt => "Create table $qt_table?", undef => 'NO', index => 1 }
         );
         if ( ! defined $create_table_ok || ! $create_table_ok ) {
+            $sf->__reset_create_table_sql( $sql );
             next MENU;
         }
-        my $ct = sprintf "CREATE TABLE $qt_table ( %s )", join( ', ', @{$sql->{create_table_cols}} );
+        my $ct = sprintf "CREATE TABLE $qt_table (%s)", join( ', ', @{$sql->{create_table_cols}} );
         $dbh->do( $ct ) or die "$ct failed!";
         delete $sql->{create_table_cols};
         my $sth = $dbh->prepare( "SELECT * FROM $qt_table LIMIT 0" );

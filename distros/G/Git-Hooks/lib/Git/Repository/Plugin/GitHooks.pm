@@ -1,6 +1,6 @@
 package Git::Repository::Plugin::GitHooks;
 # ABSTRACT: A Git::Repository plugin with some goodies for hook developers
-$Git::Repository::Plugin::GitHooks::VERSION = '2.7.0';
+$Git::Repository::Plugin::GitHooks::VERSION = '2.8.1';
 use parent qw/Git::Repository::Plugin/;
 
 use 5.010;
@@ -37,7 +37,7 @@ sub _keywords {                 ## no critic (ProhibitUnusedPrivateSubroutines)
 
           blob file_size file_mode
 
-          is_ref_enabled match_user im_admin
+          is_reference_enabled is_ref_enabled match_user im_admin
       /;
 }
 
@@ -680,44 +680,38 @@ sub get_errors {
 sub _githooks_colors {
     my ($git) = @_;
 
-    state $colors;
+    my $cache = $git->cache('colors');
 
-    unless (defined $colors) {
+    unless (exists $cache->{reset}) {
         # Check if we want to colorize the output, and if so, return a hash
         # containing the default colors. Otherwise, return a hash containing no
         # color codes at all.
 
-        # BUG: https://rt.cpan.org/Ticket/Display.html?id=124711. We can't
-        # invoke 'git config --get-colorbool' via Git::Repository because it
-        # deletes the TERM environment variable before invoking Git, which makes
-        # it think it shouldn't apply any colors. So, we have to shell out Git
-        # explicitly.
+        # NOTE: We have to pass the TERM environment variable explicitly because
+        # Git::Repository's constructor deletes it by default. (Se discussion in
+        # https://rt.cpan.org/Ticket/Display.html?id=124711.)
 
         my $stdout_is_tty = -t STDOUT ? 'true' : 'false';
-        my $githooks_color = qx{git config --get-colorbool githooks.color $stdout_is_tty};
-        chomp $githooks_color;
+        my $githooks_color = $git->run(qw/config --get-colorbool githooks.color/, $stdout_is_tty,
+                                       {env => {TERM => $ENV{TERM}}});
         if ($githooks_color eq 'true') {
-            $colors = {
-                header  => $git->run(qw/config --get-color githooks.color.header/,  'green'),
-                footer  => $git->run(qw/config --get-color githooks.color.footer/,  'green'),
-                context => $git->run(qw/config --get-color githooks.color.context/, 'red bold'),
-                message => $git->run(qw/config --get-color githooks.color.message/, 'yellow'),
-                details => '',
-                reset   => $git->run(qw/config --get-color/, '', 'reset'),
-            };
+            $cache->{header}  = $git->run(qw/config --get-color githooks.color.header/,  'green');
+            $cache->{footer}  = $git->run(qw/config --get-color githooks.color.footer/,  'green');
+            $cache->{context} = $git->run(qw/config --get-color githooks.color.context/, 'red bold');
+            $cache->{message} = $git->run(qw/config --get-color githooks.color.message/, 'yellow');
+            $cache->{details} = '';
+            $cache->{reset}   = $git->run(qw/config --get-color/, '', 'reset');
         } else {
-            $colors = {
-                header  => '',
-                footer  => '',
-                context => '',
-                message => '',
-                details => '',
-                reset   => '',
-            };
+            $cache->{header}  = '';
+            $cache->{footer}  = '';
+            $cache->{context} = '';
+            $cache->{message} = '';
+            $cache->{details} = '';
+            $cache->{reset}   = '';
         }
     }
 
-    return $colors;
+    return $cache;
 }
 
 sub fault {
@@ -1235,6 +1229,7 @@ sub file_mode {
     die "Can't happen!";
 }
 
+## DEPRECATED
 sub is_ref_enabled {
     my ($git, $ref, @specs) = @_;
 
@@ -1249,6 +1244,40 @@ sub is_ref_enabled {
     }
 
     return 0;
+}
+
+sub is_reference_enabled {
+    my ($git, $reference) = @_;
+
+    return 1 unless defined $reference;
+
+    my $cache = $git->cache('is_reference_enabled');
+
+    unless (exists $cache->{$reference}) {
+        my $check_reference = sub {
+            foreach ($git->get_config(githooks => 'ref')) {
+                if (/^\^/) {
+                    return 1 if $reference =~ qr/$_/;
+                } else {
+                    return 1 if $reference eq $_;
+                }
+            }
+
+            foreach ($git->get_config(githooks => 'noref')) {
+                if (/^\^/) {
+                    return 0 if $reference =~ qr/$_/;
+                } else {
+                    return 0 if $reference eq $_;
+                }
+            }
+
+            return 1;
+        };
+
+        $cache->{$reference} = $check_reference->();
+    }
+
+    return $cache->{$reference};
 }
 
 sub _grok_groups_spec {
@@ -1358,7 +1387,7 @@ Git::Repository::Plugin::GitHooks - A Git::Repository plugin with some goodies f
 
 =head1 VERSION
 
-version 2.7.0
+version 2.8.1
 
 =head1 SYNOPSIS
 
@@ -1925,7 +1954,32 @@ in revision REV.
 Returns the mode (as a number) of FILE (a path relative to the repository root)
 in revision REV.
 
+=head2 is_reference_enabled REF
+
+This method should be invoked by hooks to see if REF is enabled according to
+the C<githooks.ref> and C<githooks.noref> options. Please, read about these
+options in L<Git::Hooks> documetation.
+
+REF must be a complete reference name or undef. Local hooks should pass the
+current branch, and server hooks should pass the references affected by the push
+command. If REF is undef, the method returns true.
+
+The method decides if a reference is enabled using the following algorithn:
+
+=over
+
+=item * If REF matches any REFSPEC in C<githooks.ref> then it is B<enabled>.
+
+=item * Else, if REF matches any REFSPEC in C<githooks.noref> then it is B<disabled>.
+
+=item * Else, it is B<enabled>.
+
+=back
+
 =head2 is_ref_enabled REF, SPECs...
+
+This method is DEPRECATED. Please, use the C<is_reference_enabled> method
+instead.
 
 Returns a boolean indicating if REF matches one of the ref-specs in
 SPECS. REF is the complete name of a Git ref and SPECS is a list of strings,

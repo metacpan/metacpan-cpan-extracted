@@ -1,6 +1,6 @@
 package WWW::Google::PageSpeedOnline::Params;
 
-$WWW::Google::PageSpeedOnline::Params::VERSION   = '0.24';
+$WWW::Google::PageSpeedOnline::Params::VERSION   = '0.25';
 $WWW::Google::PageSpeedOnline::Params::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,19 +9,16 @@ WWW::Google::PageSpeedOnline::Params - Placeholder for parameters for L<WWW::Goo
 
 =head1 VERSION
 
-Version 0.24
+Version 0.25
 
 =cut
 
 use 5.006;
 use strict; use warnings;
 use Data::Dumper;
+use parent 'Exporter';
 
-use vars qw(@ISA @EXPORT @EXPORT_OK);
-
-require Exporter;
-@ISA = qw(Exporter);
-@EXPORT_OK = qw(validate $FIELDS);
+our @EXPORT_OK = qw(validate $FIELDS);
 
 my $STRATEGIES = { desktop => 1, mobile => 1 };
 

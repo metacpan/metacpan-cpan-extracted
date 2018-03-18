@@ -1,10 +1,21 @@
 ==================================================
-Changes from 2017-02-18 00:00:00 +0000 to present.
+Changes from 2017-03-11 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 0.9 at 2018-02-18 17:48:25 +0000
+version 1.0 at 2018-03-11 01:16:28 +0000
 ----------------------------------------
+
+  Change: 6750147d9244003ddf741f961512191855531dd8
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-02-22 23:43:07 +0000
+
+    Added error checking for mailhost problem
+
+    Now checking for mailhost problems detected by Spamcop and stop
+    processing for the given SPAM report effectively removing a pending
+    TODO. Added unit testing for this error identification. Small
+    refactorings. Increase version number. 
 
   Change: 7d95b725b581e265c74687ea18617463a33f064f
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>

@@ -7,7 +7,7 @@ use Carp 'carp';
 use v5.10.1;
 
 our @CARP_NOT;
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 our $DEFAULT_KEY_SIZE = 512;
 our $MAX_GEN_ROUNDS = 100;
@@ -19,9 +19,13 @@ our $MAX_GEN_ROUNDS = 100;
 # This implementation uses a blessed array for speed.
 # The array order is [n, e, d, size, emLen].
 
+# TODO: Implement a common tech based alternative,
+#       e.g. openssl. LibSodium unfortunately will not work.
 # TODO: Check extreme values for d, e, n, sign, verify
 # TODO: Improve tests for _bitsize, b64url_encode, b64url_decode,
 #       hex2b64url, b64url2hex
+# TODO: Add some notes regarding
+#       http://www.daemonology.net/blog/2009-06-11-cryptographic-right-answers.html
 
 use overload '""' => sub { $_[0]->to_string }, fallback => 1;
 use Digest::SHA qw/sha256 sha256_hex/;
@@ -132,9 +136,8 @@ sub new {
     # Generate new key
     else {
 
-      carp 'Key generation in new() is DEPRECATED '
-        . 'in favor of generate()';
-      return $class->generate(@_);
+      carp $INVALID_MSG . ' - did you mean generate()?';
+      return;
     };
   }
 
@@ -746,7 +749,7 @@ or by attributes.
 
 =head2 generate
 
-  my $mkey = Crypt::MagicSignatures::Key->new(size => 1024);
+  my $mkey = Crypt::MagicSignatures::Key->generate(size => 1024);
 
 Generate a new key. Requires L<Math::Prime::Util> to be installed.
 
@@ -861,7 +864,7 @@ L<https://github.com/sivy/Salmon>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2017, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2012-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

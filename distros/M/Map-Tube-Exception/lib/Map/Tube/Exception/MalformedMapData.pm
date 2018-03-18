@@ -1,13 +1,13 @@
 package Map::Tube::Exception::MalformedMapData;
 $Map::Tube::Exception::MalformedMapData::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::MalformedMapData::VERSION = '3.14';
+$Map::Tube::Exception::MalformedMapData::VERSION = '3.15';
 =head1 NAME
 
 Map::Tube::Exception::MalformedMapData - Represent 'malformed map data' exception.
 
 =head1 VERSION
 
-version 3.14
+version 3.15
 
 =cut
 
@@ -15,7 +15,7 @@ use 5.006;
 use Data::Dumper;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has status => (is => 'ro', default => sub { 126 });
 

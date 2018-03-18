@@ -1,10 +1,11 @@
 NAME
 
-    Clustericious - A framework for RESTful processing systems.
+    Clustericious - (Deprecated) A framework for RESTful processing
+    systems.
 
 VERSION
 
-    version 1.27
+    version 1.29
 
 SYNOPSIS
 
@@ -56,6 +57,10 @@ SYNOPSIS
      url: <%= cluster->url %>
 
 DESCRIPTION
+
+    NOTE: This module has been deprecated, and may be removed on or after
+    31 December 2018. Please see
+    https://github.com/clustericious/Clustericious/issues/46.
 
     Clustericious is a web application framework designed to create
     HTTP/RESTful web services that operate on a cluster, where each service

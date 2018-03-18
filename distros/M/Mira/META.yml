@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,6 +32,7 @@ requires:
   LWP::MediaTypes: '0'
   Markup::Unified: '0'
   Template: '0'
+  Test::Harness: '0'
   Text::Markdown: v1.0.31
   Text::MultiMarkdown: v1.0.34
   Text::Textile: '2.12'
@@ -40,5 +41,5 @@ requires:
   perl: '5.012'
 resources:
   repository: https://github.com/kiamazi/mira.git
-version: v00.07.49
+version: v00.07.51
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -7,10 +7,10 @@ use Pcore::Util::Scalar qw[is_blessed_ref];
 use Pcore::HTTP::Server::Request;
 
 # listen:
-# unix:/socket/path
-# unix:abstract-socket-name
-# *:80
-# 127.0.0.1:80
+# - unix:/socket/path
+# - unix:abstract-socket-name
+# - *:80
+# - 127.0.0.1:80
 
 has listen => ( is => 'ro', isa => Str, required => 1 );
 has app => ( is => 'ro', isa => CodeRef | InstanceOf ['Pcore::App::Router'], required => 1 );

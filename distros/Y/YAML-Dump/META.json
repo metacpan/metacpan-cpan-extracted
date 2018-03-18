@@ -1,0 +1,71 @@
+{
+   "abstract" : "Dump stuff, (simplified) YAML style",
+   "author" : [
+      "Flavio Poletti <polettix@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "YAML-Dump",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.18",
+            "Path::Tiny" : "0.096",
+            "Template::Perlish" : "1.52",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Path::Tiny" : "0.096",
+            "Test::Exception" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/polettix/YAML-Dump/issues"
+      },
+      "homepage" : "https://github.com/polettix/YAML-Dump",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/polettix/YAML-Dump.git",
+         "web" : "https://github.com/polettix/YAML-Dump"
+      }
+   },
+   "version" : "1.82",
+   "x_contributors" : [
+      "Flavio Poletti <flavio@polettix.it>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.00"
+}
+

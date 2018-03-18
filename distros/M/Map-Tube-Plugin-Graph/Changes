@@ -1,5 +1,9 @@
 Revision history for Map::Tube::Plugin::Graph
 
+0.31  2018-03-10T23:20:00+01:00
+      - Upgraded dependency on Map::Tube::Exception v3.14.
+      - Handled invalid color hex code with exception.
+
 0.30  2017-12-25T10:20:00+01:00
       - Improved sample code in the pod section "SYNOPSIS".
 

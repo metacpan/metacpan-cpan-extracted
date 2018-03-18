@@ -1,5 +1,13 @@
 Revision history for Device-Chip
 
+0.11    2018-03-13 14:00:25
+        [CHANGES]
+         * Define a 'wordsize' parameter for SPI protocol
+         * Define ->write_then_read and ->read methods for SPI protocol
+         * Created a Device::Chip::ProtocolBase::SPI base class
+         * Further expand the Tickit-based GPIO demo app into supporting SPI
+           as well
+
 0.10    2017/07/27 17:31:30
         [CHANGES]
          * Allow Device::Chip::Base::RegisteredI2C to work on data sizes

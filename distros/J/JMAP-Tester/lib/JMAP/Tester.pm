@@ -3,7 +3,7 @@ use warnings;
 
 package JMAP::Tester;
 # ABSTRACT: a JMAP client made for testing JMAP servers
-$JMAP::Tester::VERSION = '0.017';
+$JMAP::Tester::VERSION = '0.018';
 use Moo;
 
 use Crypt::Misc qw(decode_b64u encode_b64u);
@@ -86,7 +86,7 @@ has json_codec => (
   },
   default => sub {
     require JSON;
-    return JSON->new->utf8->allow_blessed->convert_blessed;
+    return JSON->new->utf8->convert_blessed;
   },
 );
 
@@ -772,7 +772,7 @@ JMAP::Tester - a JMAP client made for testing JMAP servers
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 OVERVIEW
 

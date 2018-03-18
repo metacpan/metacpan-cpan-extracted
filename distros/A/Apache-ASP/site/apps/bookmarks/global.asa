@@ -1,6 +1,6 @@
 use File::Basename;
 use DBI;
-use DBD::CSV;
+use DBD::SQLite;
 
 use vars qw( $DarkColor $Name %Titles $FontBase $Db $Title $Basename $Form $Query );
 
@@ -12,34 +12,16 @@ $Name = "MyBookmarks";
 	  );
 $FontBase = 'face=verdana,arial';
 
-$Db = DBI->connect("DBI:CSV:f_dir=".Apache->dir_config('StateDir'), '', '', 
-		   { RaiseError => 1 })
-  or die "Cannot connect: " . $DBI::errstr;
-
-# setup bookmark database if first time
-unless(eval { $Db->do("select bookmark_id,username,title,url from bookmarks") }) {
-    eval { $Db->do("drop table bookmarks"); };
-    $Db->do(<<CREATE) || die("can't create table $DBI::errstr");
-    create table bookmarks (
-			    bookmark_id varchar(15),
-			    username varchar(30),
-			    title varchar(60),
-			    url varchar(120)
-			   )
-CREATE
-  ;
-}
-
-$Db->do("select * from bookmarks")
-  || die("can't do select against bookmarks: $DBI::errstr");
-
 sub Script_OnStart {
+
+    &init_db();
+
     $Basename = basename($0);
     $Title = $Name.' / '.$Titles{$Basename};
     $Response->Include('header.inc');
     $Form = $Request->Form();
     $Query = $Request->QueryString();
-    $Response->Expires(0);
+    $Response->{Expires} = 0;
 
     # a user may logout from any script, destroy session, and go
     # to login / intro page
@@ -55,11 +37,42 @@ sub Script_OnEnd {
 }
 
 sub Application_OnStart {
+
+    &init_db();
+
     # use max_bookmark_id as a pseudo sequence
     $Application->Lock();
-    my $sth = $Db->prepare_cached
-      ("select bookmark_id from bookmarks order by bookmark_id desc");
-    $sth->execute();
-    $Application->{max_bookmark_id} = $sth->fetchrow_array();
+    my $max_id = $Db->selectrow_array("select bookmark_id from bookmarks order by bookmark_id desc");
+    $Application->{max_bookmark_id} = $max_id;
     $Application->UnLock();
+}
+
+sub init_db {
+    my $db_file = $Server->Config('StateDir').'/'."bookmarks.sqlite";
+    $Db = DBI->connect("dbi:SQLite:dbname=$db_file","","", { RaiseError => 1 })
+    	or die "Cannot connect: " . $DBI::errstr;
+
+#    $Db = DBI->connect("DBI:CSV:f_dir=".$Server->Config('StateDir'), '', '', 
+#		       { RaiseError => 1 })
+#	or die "Cannot connect: " . $DBI::errstr;
+    
+    # setup bookmark database if first time
+#    die $Server->Config('StateDir');
+
+    unless(eval { $Db->do("select bookmark_id,username,title,url from bookmarks") }) {
+	eval { $Db->do("drop table bookmarks"); };
+	$Db->do(<<CREATE) || die("can't create table $DBI::errstr");
+	create table bookmarks (
+				bookmark_id varchar(15),
+				username varchar(30),
+				title varchar(60),
+				url varchar(120)
+				)
+CREATE
+	    ;
+    }
+
+    $Db->do("select * from bookmarks")
+	|| die("can't do select against bookmarks: $DBI::errstr");
+    
 }

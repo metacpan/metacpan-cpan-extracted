@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.313';
+our $VERSION = '0.315';
 
 use Term::ReadKey  qw( GetTerminalSize ReadKey ReadMode );
 
@@ -17,14 +17,18 @@ sub new {
 }
 
 
+
 sub __set_mode {
-    #my ( $self ) = @_;
+    my ( $self, $hide_cursor ) = @_;
     ReadMode( 'cbreak' );
+    print "\e[?25l" if $hide_cursor;
 };
 
 
+
 sub __reset_mode {
-    #my ( $self ) = @_;
+    my ( $self, $hide_cursor ) = @_;
+    print "\e[?25h" if $hide_cursor;
     ReadMode( 'restore' );
 }
 

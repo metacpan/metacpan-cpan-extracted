@@ -1,5 +1,8 @@
 Revision history for Date::Hebrew::Simple
 
+0.09  Thu Mar 15 18:20:00 2018
+      - Used namespace::autoclean instead.
+
 0.08  Wed Feb 14 17:50:00 2018
       - Added more codes to the SYNOPSIS section.
 

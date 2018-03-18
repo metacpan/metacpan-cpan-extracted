@@ -1,3 +1,6 @@
+0.022 - Mar 10th 2018
+  * Fix evalserver on perls newer than 5.27.6 by using new execve module
+
 0.021 - Nov 27th 2017
   * Complete redesign of seccomp handling, now uses a config file
   * These changes are under-documented but are better documented than before

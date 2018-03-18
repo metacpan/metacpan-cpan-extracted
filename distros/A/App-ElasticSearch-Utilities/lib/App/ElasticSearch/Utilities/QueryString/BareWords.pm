@@ -3,6 +3,9 @@ package App::ElasticSearch::Utilities::QueryString::BareWords;
 
 use strict;
 use warnings;
+
+our $VERSION = '5.5'; # VERSION
+
 use CLI::Helpers qw(:output);
 use namespace::autoclean;
 
@@ -16,6 +19,7 @@ my %BareWords = (
     or  => { query_string => 'OR',  invert => 0, dangles => 1 },
     not => { query_string => 'NOT', invert => 1, dangles => 1 },
 );
+
 
 sub handle_token {
     my ($self,$token) = @_;
@@ -39,7 +43,7 @@ App::ElasticSearch::Utilities::QueryString::BareWords - Mostly fixing case and t
 
 =head1 VERSION
 
-version 5.4
+version 5.5
 
 =head1 SYNOPSIS
 
@@ -50,6 +54,8 @@ The following barewords are transformed:
     or => OR
     and => AND
     not => NOT
+
+=for Pod::Coverage handle_token
 
 =head1 AUTHOR
 

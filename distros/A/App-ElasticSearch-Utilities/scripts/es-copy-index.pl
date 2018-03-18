@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 # PODNAME: es-copy-index.pl
 # ABSTRACT: Copy an index from one cluster to another
 
@@ -228,7 +228,7 @@ es-copy-index.pl - Copy an index from one cluster to another
 
 =head1 VERSION
 
-version 5.4
+version 5.5
 
 =head1 SYNOPSIS
 

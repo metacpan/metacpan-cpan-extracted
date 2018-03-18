@@ -5,6 +5,8 @@
 # This is the driver program for the DocKnot documentation generation system.
 # As much logic as possible should live in App::DocKnot rather than in this
 # script.  It should be a thin wrapper.
+#
+# SPDX-License-Identifier: MIT
 
 use 5.018;
 use autodie;
@@ -134,3 +136,7 @@ CPAN as App::DocKnot, or directly from its web site at
 L<https://www.eyrie.org/~eagle/software/docknot/>.
 
 =cut
+
+# Local Variables:
+# copyright-at-end-flag: t
+# End:

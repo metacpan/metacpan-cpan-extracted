@@ -16,6 +16,12 @@
   </developer>
   <helper>
     <foaf:Person>
+      <foaf:name>Alan Young</foaf:name>
+      <foaf:mbox rdf:resource="mailto:harleypig@harleypig.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Paul Fenwick</foaf:name>
       <foaf:mbox rdf:resource="mailto:pjf@perltraining.com.au" />
     </foaf:Person>
@@ -87,6 +93,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.7.0</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-02-24</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.8.0</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-03-04</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

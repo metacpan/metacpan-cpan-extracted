@@ -1,4 +1,4 @@
-#===============================================================================
+#=============================================================================
 #
 #       Module:  Term::CLI::Argument::Number::Float
 #
@@ -16,18 +16,17 @@
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
-#===============================================================================
+#=============================================================================
 
 use 5.014_001;
 
-package Term::CLI::Argument::Number::Float  0.04004 {
+package Term::CLI::Argument::Number::Float  0.051002 {
 
-use Modern::Perl;
-use POSIX qw( );
-use Scalar::Util qw( looks_like_number );
+use Modern::Perl 1.20140107;
+use Scalar::Util 1.38 qw( looks_like_number );
 
-use Moo;
-use namespace::clean;
+use Moo 1.000001;
+use namespace::clean 0.25;
 
 extends 'Term::CLI::Argument::Number';
 
@@ -52,7 +51,7 @@ Term::CLI::Argument::Number::Float - class for floating point arguments in Term:
 
 =head1 VERSION
 
-version 0.04004
+version 0.051002
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,6 @@
 
 use Data::Dumper;
-use vars qw(%FILES %ALIASES %LINKS $ASP $DOCINIT $DUMP $Ads $LINKS_MATCH $VAR1);
-use MD5;
+use vars qw(%FILES %ALIASES %LINKS $ASP $DOCINIT $DUMP $Site $LINKS_MATCH $VAR1);
 use Time::HiRes;
 use Data::Dumper;
 use Digest::MD5 qw( md5_hex );
@@ -64,8 +63,8 @@ sub Script_OnStart {
     unless ($DOCINIT++) {
 	doc_init();
     }
-    if($Request->QueryString('ads')) {
-	$Ads = 1;
+    if($Request->QueryString('site')) {
+	$Site = 1;
     }
 }
 
@@ -104,7 +103,7 @@ sub doc_init {
     close ASP;
 
     $data =~ s/^.*\n__END__//s;
-    my $new_checksum = MD5->hexhash($data.$self_data.(join('', %ALIASES)));
+    my $new_checksum = md5_hex($data.$self_data.(join('', %ALIASES)));
     if ($new_checksum eq $dump_data->{checksum}) {
 	$Response->Debug("matched old compiled ASP doc $dump_data->{checksum}");
 	$ASP = $dump_data->{ASP};

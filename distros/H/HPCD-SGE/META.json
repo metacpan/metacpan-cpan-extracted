@@ -1,5 +1,5 @@
 {
-   "abstract" : "Please add a short description of the module here.",
+   "abstract" : "HPCI driver for SGE cluster interface.",
    "author" : [
       "John Macdonald  <jmacdonald@oicr.on.ca>"
    ],
@@ -52,7 +52,7 @@
    "provides" : {
       "HPCD::SGE" : {
          "file" : "lib/HPCD/SGE.pm",
-         "version" : "0.50"
+         "version" : "0.54"
       },
       "HPCD::SGE::DRMAACheck" : {
          "file" : "lib/HPCD/SGE/DRMAACheck.pm"
@@ -85,6 +85,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.50",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.54",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 # PODNAME: es-nagios-check.pl
 # ABSTRACT: ElasticSearch Nagios Checks
 use strict;
@@ -219,7 +219,7 @@ es-nagios-check.pl - ElasticSearch Nagios Checks
 
 =head1 VERSION
 
-version 5.4
+version 5.5
 
 =head1 SYNOPSIS
 

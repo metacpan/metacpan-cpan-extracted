@@ -55,6 +55,6 @@
          "url" : "https://github.com/dr-co/libmojolicious-plugin-vparam-perl"
       }
    },
-   "version" : "3.04",
+   "version" : "3.06",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

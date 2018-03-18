@@ -1,5 +1,5 @@
 {
-   "abstract" : "AuthenSimple plugin for PlugAuth",
+   "abstract" : "(Deprecated) AuthenSimple plugin for PlugAuth",
    "author" : [
       "Graham Ollis <plicease@cpan.org>"
    ],
@@ -67,7 +67,9 @@
          "web" : "https://github.com/clustericious/PlugAuth-Plugin-AuthenSimple"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "0.04",
+   "x_deprecated" : 1,
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01",
+   "x_use_unsafe_inc" : 0
 }
 

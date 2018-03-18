@@ -1,4 +1,4 @@
-#===============================================================================
+#=============================================================================
 #
 #       Module:  Term::CLI::CommandSet
 #
@@ -16,16 +16,16 @@
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
-#===============================================================================
+#=============================================================================
 
 use 5.014_001;
 
-package Term::CLI::Role::CommandSet  0.04004 {
+package Term::CLI::Role::CommandSet  0.051002 {
 
-use Modern::Perl;
+use Modern::Perl 1.20140107;
 use Term::CLI::L10N;
 
-use Types::Standard qw(
+use Types::Standard 1.000005 qw(
     ArrayRef
     CodeRef
     InstanceOf
@@ -34,7 +34,7 @@ use Types::Standard qw(
 );
 
 use Moo::Role;
-use namespace::clean;
+use namespace::clean 0.25;
 
 has parent => (
     is       => 'rwp',
@@ -174,7 +174,7 @@ Term::CLI::Role::CommandSet - Role for (sub-)commands in Term::CLI
 
 =head1 VERSION
 
-version 0.04004
+version 0.051002
 
 =head1 SYNOPSIS
 

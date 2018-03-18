@@ -4,7 +4,9 @@ MANIFEST
 README
 scheme79asm
 t/App-Scheme79asm.t
+t/Compiler.t
 lib/App/Scheme79asm.pm
+lib/App/Scheme79asm/Compiler.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -1,3 +1,21 @@
+1.302133  2018-03-11 12:48:37-07:00 America/Los_Angeles
+
+    - No changes since last trial
+
+1.302132  2018-03-09 15:43:51-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Add method to validate facet data
+    - Add Test2::Event::V2 event class, and context helpers
+    - Improve how events handle facets
+    - Break out meta_facet_data
+    - Document and fix Facets2Legacy
+    - Fix nested and in_subtest to look at hub facets
+    - Fix event->related and trace with uuid
+
+1.302131  2018-03-07 09:36:16-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Make sure event puts the uuid into the about facet
+
 1.302130  2018-03-07 08:07:54-08:00 America/Los_Angeles
 
     - No changes since last trial

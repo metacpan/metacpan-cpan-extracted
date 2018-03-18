@@ -32,26 +32,74 @@ my $collections = {
             html => { type => 'string', 'x-hidden' => 1 },
         },
     },
+    user => {
+        'x-list-columns' => [qw( username email )],
+        required => [qw( username email password )],
+        properties => {
+            id => {
+                type => 'integer',
+            },
+            username => {
+                type => 'string',
+                'x-order' => 1,
+            },
+            email => {
+                type => 'string',
+                'x-order' => 2,
+            },
+            password => {
+                type => 'string',
+                format => 'password',
+                'x-order' => 3,
+            },
+            access => {
+                type => 'string',
+                enum => [qw( user moderator admin )],
+                'x-order' => 4,
+            },
+        },
+    },
 };
+
 my ( $backend_url, $backend, %items ) = init_backend(
     $collections,
-    blog => [
+    user => [
         {
-            title => 'First Post',
-            slug => 'first-post',
-            markdown => '# First Post',
-            html => '<h1>First Post</h1>',
-            user_id => 1,
+            username => 'doug',
+            email => 'doug@example.com',
+            password => 'ignore',
+            access => 'user',
         },
         {
-            title => 'Second Post',
-            slug => 'second-post',
-            markdown => '# Second Post',
-            html => '<h1>Second Post</h1>',
-            user_id => 1,
+            username => 'joel',
+            email => 'joel@example.com',
+            password => 'ignore',
+            access => 'user',
         },
     ],
 );
+
+$items{blog} = [
+    {
+        title => 'First Post',
+        slug => 'first-post',
+        markdown => '# First Post',
+        html => '<h1>First Post</h1>',
+        user_id => $items{user}[0]{id},
+    },
+    {
+        title => 'Second Post',
+        slug => 'second-post',
+        markdown => '# Second Post',
+        html => '<h1>Second Post</h1>',
+        user_id => $items{user}[1]{id},
+    },
+];
+for my $i ( 0..$#{ $items{blog} } ) {
+    my $id = $backend->create( blog => $items{blog}[$i] );
+    $items{blog}[$i] = $backend->get( blog => $id );
+}
+
 
 local $ENV{MOJO_HOME} = path( $Bin, '..', 'share' );
 my $t = Test::Mojo->new( 'Mojolicious' );
@@ -83,9 +131,11 @@ $r->any( [ 'GET', 'POST' ] => '/edit' )
 $r->get( '/:id/:slug' )
     ->to( 'yancy#get' => collection => 'blog', template => 'blog_view' )
     ->name( 'blog.view' );
-$r->get( '/' )
+$r->get( '/:page', { page => 1 } )
     ->to( 'yancy#list' => collection => 'blog', template => 'blog_list' )
     ->name( 'blog.list' );
+$r->get( '/list/user/1/:page', { filter => { user_id => $items{user}[0]{id} }, page => 1 } )
+    ->to( 'yancy#list' => collection => 'blog', template => 'blog_list' );
 
 subtest 'list' => sub {
     $t->get_ok( '/' )
@@ -97,11 +147,27 @@ subtest 'list' => sub {
       ->or( sub { diag shift->tx->res->dom( 'article:nth-child(1)' )->[0] } )
       ->element_exists( "article:nth-child(2) h1 a[href=/$items{blog}[1]{id}/second-post]" )
       ->or( sub { diag shift->tx->res->dom( 'article:nth-child(2)' )->[0] } )
+      ->element_exists( ".pager a[href=/]", 'pager link exists' )
+      ->or( sub { diag shift->tx->res->dom->at( '.pager' ) } )
       ;
 
     $t->get_ok( '/', { Accept => 'application/json' } )
       ->json_is( { items => $items{blog}, total => 2, offset => 0 } )
       ;
+
+    subtest 'list with filter' => sub {
+        $t->get_ok( '/list/user/1' )
+          ->status_is( 200 )
+          ->text_is( 'article:nth-child(1) h1 a', 'First Post' )
+          ->or( sub { diag shift->tx->res->dom( 'article:nth-child(1)' )->[0] } )
+          ->element_exists( "article:nth-child(1) h1 a[href=/$items{blog}[0]{id}/first-post]" )
+          ->or( sub { diag shift->tx->res->dom( 'article:nth-child(1)' )->[0] } )
+          ->element_exists_not( "article:nth-child(2) h1 a[href=/$items{blog}[1]{id}/second-post]" )
+          ->or( sub { diag shift->tx->res->dom( 'article:nth-child(2)' )->[0] } )
+          ->element_exists( ".pager a[href=/list/user/1]", 'pager link exists' )
+          ->or( sub { diag shift->tx->res->dom->at( '.pager' ) } )
+          ;
+    };
 
     subtest 'errors' => sub {
         $t->get_ok( '/error/list/nocollection' )
@@ -173,7 +239,7 @@ subtest 'set' => sub {
         is $saved_item->{slug}, 'frist-psot', 'item slug saved correctly';
         is $saved_item->{markdown}, '# Frist Psot', 'item markdown saved correctly';
         is $saved_item->{html}, '<h1>Frist Psot</h1>', 'item html saved correctly';
-        is $saved_item->{user_id}, 1, 'item user_id not modified';
+        is $saved_item->{user_id}, $items{user}[0]{id}, 'item user_id not modified';
     };
 
     subtest 'create new' => sub {
@@ -221,7 +287,7 @@ subtest 'set' => sub {
           ->status_is( 200 )
           ->json_is( {
             id => $items{blog}[0]{id},
-            user_id => 1,
+            user_id => $items{user}[0]{id},
             %json_data,
           } );
 
@@ -230,7 +296,7 @@ subtest 'set' => sub {
         is $saved_item->{slug}, 'first-post', 'item slug saved correctly';
         is $saved_item->{markdown}, '# First Post', 'item markdown saved correctly';
         is $saved_item->{html}, '<h1>First Post</h1>', 'item html saved correctly';
-        is $saved_item->{user_id}, 1, 'item user_id not modified';
+        is $saved_item->{user_id}, $items{user}[0]{id}, 'item user_id not modified';
     };
 
     subtest 'json create' => sub {

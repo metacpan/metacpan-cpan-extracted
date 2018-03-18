@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Iller version 0.1408, Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Iller version 0.1408, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,76 +28,73 @@ no_index:
 provides:
   OpenGbg:
     file: lib/OpenGbg.pm
-    version: '0.1402'
-  OpenGbg::DateTimeType:
-    file: lib/OpenGbg/DateTimeType.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Elk:
     file: lib/OpenGbg/Elk.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Exceptions:
     file: lib/OpenGbg/Exceptions.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Service::AirQuality:
     file: lib/OpenGbg/Service/AirQuality.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Service::AirQuality::GetLatestMeasurement:
     file: lib/OpenGbg/Service/AirQuality/GetLatestMeasurement.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Service::AirQuality::GetMeasurements:
     file: lib/OpenGbg/Service/AirQuality/GetMeasurements.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Service::AirQuality::Measurement:
     file: lib/OpenGbg/Service/AirQuality/Measurement.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Service::AirQuality::Measurements:
     file: lib/OpenGbg/Service/AirQuality/Measurements.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Service::Bridge:
     file: lib/OpenGbg/Service/Bridge.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Service::Bridge::BridgeOpening:
     file: lib/OpenGbg/Service/Bridge/BridgeOpening.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Service::Bridge::BridgeOpenings:
     file: lib/OpenGbg/Service/Bridge/BridgeOpenings.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Service::Bridge::GetIsCurrentlyOpen:
     file: lib/OpenGbg/Service/Bridge/GetIsCurrentlyOpen.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Service::Bridge::GetOpenedStatus:
     file: lib/OpenGbg/Service/Bridge/GetOpenedStatus.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Service::Getter:
     file: lib/OpenGbg/Service/Getter.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Service::StyrOchStall:
     file: lib/OpenGbg/Service/StyrOchStall.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Service::StyrOchStall::GetBikeStation:
     file: lib/OpenGbg/Service/StyrOchStall/GetBikeStation.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Service::StyrOchStall::GetBikeStations:
     file: lib/OpenGbg/Service/StyrOchStall/GetBikeStations.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Service::StyrOchStall::Station:
     file: lib/OpenGbg/Service/StyrOchStall/Station.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Service::TrafficCamera:
     file: lib/OpenGbg/Service/TrafficCamera.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Service::TrafficCamera::CameraDevice:
     file: lib/OpenGbg/Service/TrafficCamera/CameraDevice.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Service::TrafficCamera::CameraDevices:
     file: lib/OpenGbg/Service/TrafficCamera/CameraDevices.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Service::TrafficCamera::GetCameraImage:
     file: lib/OpenGbg/Service/TrafficCamera/GetCameraImage.pm
-    version: '0.1402'
+    version: '0.1403'
   OpenGbg::Service::TrafficCamera::GetTrafficCameras:
     file: lib/OpenGbg/Service/TrafficCamera/GetTrafficCameras.pm
-    version: '0.1402'
+    version: '0.1403'
 requires:
   Config::Any: '0'
   DateTime: '1.36'
@@ -110,7 +107,8 @@ requires:
   Sub::Exporter: '0'
   Syntax::Feature::Qs: '0.2004'
   Throwable::SugarFactory: '0.152700'
-  Type::Tiny: '1.000005'
+  Type::Tiny: '1.000006'
+  Types::DateTime: '0.002'
   Types::Path::Tiny: '0.005'
   XML::Rabbit: v0.4.1
   namespace::autoclean: '0.22'
@@ -120,7 +118,7 @@ resources:
   bugtracker: https://github.com/Csson/p5-OpenGbg/issues
   homepage: https://metacpan.org/release/OpenGbg
   repository: https://github.com/Csson/p5-OpenGbg.git
-version: '0.1402'
+version: '0.1403'
 x_Dist_Zilla:
   perl:
     version: '5.020001'
@@ -143,7 +141,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: Git::GatherDir
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -155,11 +153,11 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: PromptIfStale
-      version: '0.051'
+      version: '0.054'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: CopyFilesFromBuild
-      version: '0.161350'
+      version: '0.170880'
     -
       class: Dist::Zilla::Plugin::Authority
       name: Authority
@@ -167,7 +165,6 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::RewriteVersion::Transitional
       config:
-        Dist::Zilla::Plugin::PkgVersion: {}
         Dist::Zilla::Plugin::RewriteVersion:
           add_tarball_name: 0
           finders:
@@ -177,11 +174,11 @@ x_Dist_Zilla:
           skip_version_provider: 0
         Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
       name: RewriteVersion::Transitional
-      version: '0.007'
+      version: '0.008'
     -
       class: Dist::Zilla::Plugin::ChangeStats::Dependencies::Git
       name: ChangeStats::Dependencies::Git
-      version: '0.0101'
+      version: '0.0200'
     -
       class: Dist::Zilla::Plugin::NextRelease::Grouped
       name: NextRelease::Grouped
@@ -292,9 +289,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.16.1
           repo_root: .
       name: Git::Check
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: GithubMeta
@@ -302,30 +300,30 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Readme
       name: Readme
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       name: ReadmeAnyFromPod
-      version: '0.161170'
+      version: '0.163250'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: MetaNoIndex
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: MakeMaker
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: MetaConfig
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -334,7 +332,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
-              version: '6.007'
+              version: '6.010'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           inherit_missing: '1'
@@ -344,7 +342,7 @@ x_Dist_Zilla:
           Module::Metadata: '1.000026'
           version: '0.003'
       name: MetaProvides::Package
-      version: '2.004002'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::DistIller::MetaGeneratedBy
       name: DistIller::MetaGeneratedBy
@@ -353,14 +351,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          'git --version': 1.9.1
+          git_version: 2.16.1
           include_authors: 0
           include_releaser: 1
           order_by: name
-          paths:
-            - .
+          paths: []
       name: Git::Contributors
-      version: '0.024'
+      version: '0.030'
     -
       class: Dist::Zilla::Plugin::Test::Kwalitee::Extra
       name: Test::Kwalitee::Extra
@@ -414,24 +411,25 @@ x_Dist_Zilla:
           script_finder:
             - ':PerlExecFiles'
           skips: []
+          switch: []
       name: Test::Compile
-      version: '2.054'
+      version: '2.057'
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: Test::ReportPrereqs
-      version: '0.025'
+      version: '0.027'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: PodSyntaxTests
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: MetaYAML
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::License
       name: License
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -442,19 +440,19 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: ShareDir
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: ExecDir
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: Manifest
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: ManifestSkip
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: CheckChangesHasContent
@@ -463,21 +461,22 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.16.1
           repo_root: .
       name: Git::CheckFor::CorrectBranch
-      version: '0.013'
+      version: '0.014'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: TestRelease
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: ConfirmRelease
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: UploadToCPAN
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::TravisYML
       name: TravisYML
@@ -496,11 +495,12 @@ x_Dist_Zilla:
             - (?^u:.)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.16.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: CommitBeforeTag
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -508,15 +508,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.1402'
+          tag: '0.1403'
           tag_format: '%v'
           tag_message: 'Release %v%n%n%c'
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.16.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: Git::Tag
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::InstallRelease
       name: InstallRelease
@@ -532,7 +533,7 @@ x_Dist_Zilla:
           munge_makefile_pl: 1
         Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional: {}
       name: BumpVersionAfterRelease::Transitional
-      version: '0.007'
+      version: '0.008'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -547,11 +548,12 @@ x_Dist_Zilla:
             - (?^u:.)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.16.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: CommitAfterRelease
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -560,9 +562,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.16.1
           repo_root: .
       name: Git::Push
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Clean
       name: Clean
@@ -574,7 +577,7 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: DevelopRequires
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -582,7 +585,7 @@ x_Dist_Zilla:
           phase: develop
           type: suggests
       name: DevelopSuggests
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -590,7 +593,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: RuntimeRequires
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -598,55 +601,55 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.007'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
-      version: '6.007'
+      version: '6.010'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.007'
+    version: '6.010'
 x_authority: cpan:CSSON
 x_serialization_backend: 'YAML::Tiny version 1.69'

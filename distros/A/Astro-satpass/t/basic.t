@@ -12,6 +12,8 @@ use Time::Local;
 ##use constant PERL2000 => timegm (0, 0, 12, 1, 0, 100);
 use constant TIMFMT => '%d-%b-%Y %H:%M:%S';
 
+use constant ARRAY_REF	=> ref [];
+
 sub instantiate ($);
 sub u_cmp_eql (@);
 sub u_ok (@);
@@ -306,14 +308,14 @@ sub instantiate ($) {
 
 sub u_cmp_eql (@) {
     my ( $sub, $arg, $want, $tplt, $title ) = @_;
-    'ARRAY' eq ref $arg
+    ARRAY_REF eq ref $arg
 	or $arg = [ $arg ];
     if ( my $code = Astro::Coord::ECI::Utils->can( $sub ) ) {
 	my $got;
-	if ( 'ARRAY' eq ref $want ) {
+	if ( ARRAY_REF eq ref $want ) {
 	    ( my $inx, $want ) = @{ $want };
 	    my @rslt = $code->( @{ $arg } );
-	    if ( 1 == @rslt && 'ARRAY' eq ref $rslt[0] ) {
+	    if ( 1 == @rslt && ARRAY_REF eq ref $rslt[0] ) {
 		$got = $rslt[0][$inx];
 	    } else {
 		$got = $rslt[$inx];
@@ -344,7 +346,7 @@ sub u_cmp_eql (@) {
 sub u_ok (@) {
     my ( $sub, $arg, $title ) = @_;
     if ( my $code = Astro::Coord::ECI::Utils->can( $sub ) ) {
-	'ARRAY' eq ref $arg
+	ARRAY_REF eq ref $arg
 	    or $arg = [ $arg ];
 	my $got = $code->( @{ $arg } );
 	@_ = ( $got, $title );

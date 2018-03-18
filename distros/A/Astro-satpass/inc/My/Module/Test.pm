@@ -5,13 +5,15 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '0.090';
+our $VERSION = '0.091';
 
 use Exporter qw{ import };
 
 use Astro::Coord::ECI::TLE qw{ :constants };
 use Astro::Coord::ECI::Utils qw{ rad2deg };
 use Test::More 0.88;
+
+use constant CODE_REF	=> ref sub {};
 
 our @EXPORT_OK = qw{
     format_pass format_time
@@ -102,7 +104,7 @@ sub _format_optional {
     my ( $tplt, $hash, $key, $xfrm ) = @_;
     defined( my $val = $hash->{$key} )
 	or return '';
-    'CODE' eq ref $xfrm
+    CODE_REF eq ref $xfrm
 	and $val = $xfrm->( $val );
     return sprintf $tplt, $val;
 }

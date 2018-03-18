@@ -40,7 +40,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.51';
+our $VERSION = '0.53';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -58,6 +58,9 @@ sub _MIN_VERSION_FOR_AUTO_LISTEN    { return 55 }
 sub _MIN_VERSION_FOR_HOSTPORT_PROXY { return 57 }
 sub _DEFAULT_SOCKS_VERSION          { return 5 }
 sub _MILLISECONDS_IN_ONE_SECOND     { return 1000 }
+sub _DEFAULT_PAGE_LOAD_TIMEOUT      { return 300_000 }
+sub _DEFAULT_SCRIPT_TIMEOUT         { return 30_000 }
+sub _DEFAULT_IMPLICIT_TIMEOUT       { return 0 }
 
 sub BY_XPATH {
     Carp::carp(
@@ -233,7 +236,7 @@ sub new {
     }
     elsif ( $self->_pid() != $capabilities->moz_process_id() ) {
         Firefox::Marionette::Exception->throw(
-'Failed to correctly determined the Firefox process id through the initial connection capabilities'
+'Failed to correctly determine the Firefox process id through the initial connection capabilities'
         );
     }
     return $self;
@@ -1169,6 +1172,8 @@ sub _proxy_from_env {
 sub _new_session_parameters {
     my ( $self, $capabilities ) = @_;
     my $parameters = {};
+    $parameters->{capabilities}->{requiredCapabilities} =
+      {};    # for Mozilla 50 (and below???)
     if (   ( defined $capabilities )
         && ( ref $capabilities )
         && ( ref $capabilities eq 'Firefox::Marionette::Capabilities' ) )
@@ -1186,7 +1191,17 @@ sub _new_session_parameters {
         }
         if ( defined $capabilities->moz_webdriver_click() ) {
             $actual->{'moz:webdriverClick'} =
-              $capabilities->moz_webdriver_click() ? JSON::true : JSON::false();
+              $capabilities->moz_webdriver_click()
+              ? JSON::true()
+              : JSON::false();
+        }
+        if (
+            defined $capabilities->moz_use_non_spec_compliant_pointer_origin() )
+        {
+            $actual->{'moz:useNonSpecCompliantPointerOrigin'} =
+              $capabilities->moz_use_non_spec_compliant_pointer_origin()
+              ? JSON::true()
+              : JSON::false();
         }
         if ( defined $capabilities->moz_accessibility_checks() ) {
             $actual->{'moz:accessibilityChecks'} =
@@ -1205,6 +1220,8 @@ sub _new_session_parameters {
             $parameters->{capabilities}->{requiredCapabilities}->{$key} =
               $actual->{$key};    # for Mozilla 56 (and below???)
         }
+        $parameters->{capabilities}->{requiredCapabilities} ||=
+          {};                     # for Mozilla 50 (and below???)
     }
     elsif ( my $env_proxy = $self->_proxy_from_env() ) {
         $parameters->{proxy} = $env_proxy;    # for Mozilla 57 and after
@@ -1224,26 +1241,7 @@ sub new_session {
             $self->_command('WebDriver:NewSession'), $parameters
         ]
     );
-    my $response;
-    eval { $response = $self->_get_response($message_id); } or do {
-        if (
-            ( ref $EVAL_ERROR )
-            && ( ( ref $EVAL_ERROR ) eq
-                'Firefox::Marionette::Exception::Response' )
-            && (   ( $EVAL_ERROR->error() eq 'invalid session id' )
-                || ( $EVAL_ERROR->error() eq 'unknown command' ) )
-          )
-        {
-            my $fallback_message_id = $self->_new_message_id();
-            $self->_send_request(
-                [ _COMMAND(), $fallback_message_id, 'newSession', $parameters ]
-            );
-            $response = $self->_get_response($fallback_message_id);
-        }
-        else {
-            Firefox::Marionette::Exception->throw($EVAL_ERROR);
-        }
-    };
+    my $response = $self->_get_response($message_id);
     $self->{session_id} = $response->result()->{sessionId};
     my $new =
       $self->_create_capabilities( $response->result()->{capabilities} );
@@ -1253,12 +1251,19 @@ sub new_session {
 
 sub browser_version {
     my ($self) = @_;
-    return $self->{_browser_version};
+    if ( defined $self->{_browser_version} ) {
+        return $self->{_browser_version};
+    }
+    else {
+        return join q[.], $self->{_initial_version}->{major},
+          $self->{_initial_version}->{minor},
+          $self->{_initial_version}->{patch};
+    }
 }
 
 sub _create_capabilities {
     my ( $self, $parameters ) = @_;
-    my $pid = $parameters->{'moz:processID'};
+    my $pid = $parameters->{'moz:processID'} || $parameters->{processId};
     if ( ($pid) && ( $OSNAME eq 'cygwin' ) ) {
         $pid = $self->_pid();
     }
@@ -1273,23 +1278,38 @@ sub _create_capabilities {
         $parameters->{'moz:headless'} = $headless;
     }
     if ( !defined $self->{_page_load_timeouts_key} ) {
-        if ( defined $parameters->{timeouts}->{'page load'} ) {
-            $self->{_page_load_timeouts_key} = 'page load';
+        if ( $parameters->{timeouts} ) {
+            if ( defined $parameters->{timeouts}->{'page load'} ) {
+                $self->{_page_load_timeouts_key} = 'page load';
+            }
+            else {
+                $self->{_page_load_timeouts_key} = 'pageLoad';
+            }
         }
         else {
+            $self->{_no_timeouts_command}    = {};
             $self->{_page_load_timeouts_key} = 'pageLoad';
+            $self->timeouts(
+                Firefox::Marionette::Timeouts->new(
+                    page_load => _DEFAULT_PAGE_LOAD_TIMEOUT(),
+                    script    => _DEFAULT_SCRIPT_TIMEOUT(),
+                    implicit  => _DEFAULT_IMPLICIT_TIMEOUT(),
+                )
+            );
         }
     }
-    my %optional;
-    if ( defined $parameters->{proxy} ) {
-        $optional{proxy} = Firefox::Marionette::Proxy->new(
-            $self->_response_proxy( $parameters->{proxy} ) );
+    elsif ( $self->{_no_timeouts_command} ) {
+        $parameters->{timeouts} = {
+            $self->{_page_load_timeouts_key} =>
+              $self->{_no_timeouts_command}->page_load(),
+            script   => $self->{_no_timeouts_command}->script(),
+            implicit => $self->{_no_timeouts_command}->implicit(),
+        };
     }
+    my %optional = $self->_get_optional_capabilities($parameters);
 
     return Firefox::Marionette::Capabilities->new(
-        accept_insecure_certs => $parameters->{acceptInsecureCerts} ? 1 : 0,
-        page_load_strategy    => $parameters->{pageLoadStrategy},
-        timeouts              => Firefox::Marionette::Timeouts->new(
+        timeouts => Firefox::Marionette::Timeouts->new(
             page_load =>
               $parameters->{timeouts}->{ $self->{_page_load_timeouts_key} },
             script   => $parameters->{timeouts}->{script},
@@ -1298,17 +1318,45 @@ sub _create_capabilities {
         browser_version => $parameters->{browserVersion},
         platform_name   => $parameters->{platformName},
         rotatable => $parameters->{rotatable} ? 1 : 0,
-        platform_version         => $parameters->{platformVersion},
-        moz_profile              => $parameters->{'moz:profile'},
-        moz_webdriver_click      => $parameters->{'moz:webdriverClick'} ? 1 : 0,
-        moz_process_id           => $pid,
-        browser_name             => $parameters->{browserName},
-        moz_headless             => $headless,
-        moz_accessibility_checks => $parameters->{'moz:accessibilityChecks'}
-        ? 1
-        : 0,
+        platform_version => $parameters->{platformVersion},
+        moz_profile      => $parameters->{'moz:profile'}
+          || $self->{profile_directory},
+        moz_process_id => $pid,
+        browser_name   => $parameters->{browserName},
+        moz_headless   => $headless,
         %optional,
     );
+}
+
+sub _get_optional_capabilities {
+    my ( $self, $parameters ) = @_;
+    my %optional;
+    if (   ( defined $parameters->{proxy} )
+        && ( keys %{ $parameters->{proxy} } ) )
+    {
+        $optional{proxy} = Firefox::Marionette::Proxy->new(
+            $self->_response_proxy( $parameters->{proxy} ) );
+    }
+    if ( defined $parameters->{'moz:accessibilityChecks'} ) {
+        $optional{moz_accessibility_checks} =
+          $parameters->{'moz:accessibilityChecks'} ? 1 : 0;
+    }
+    if ( defined $parameters->{'moz:webdriverClick'} ) {
+        $optional{moz_webdriver_click} =
+          $parameters->{'moz:webdriverClick'} ? 1 : 0;
+    }
+    if ( defined $parameters->{acceptInsecureCerts} ) {
+        $optional{accept_insecure_certs} =
+          $parameters->{acceptInsecureCerts} ? 1 : 0;
+    }
+    if ( defined $parameters->{pageLoadStrategy} ) {
+        $optional{page_load_strategy} = $parameters->{pageLoadStrategy};
+    }
+    if ( defined $parameters->{'moz:useNonSpecCompliantPointerOrigin'} ) {
+        $optional{moz_use_non_spec_compliant_pointer_origin} =
+          $parameters->{'moz:useNonSpecCompliantPointerOrigin'} ? 1 : 0;
+    }
+    return %optional;
 }
 
 sub _response_proxy {
@@ -1916,30 +1964,88 @@ sub click {
 
 sub timeouts {
     my ( $self, $new ) = @_;
-    my $message_id = $self->_new_message_id();
-    $self->_send_request(
-        [ _COMMAND(), $message_id, $self->_command('WebDriver:GetTimeouts') ] );
-    my $response = $self->_get_response($message_id);
-    my $old      = Firefox::Marionette::Timeouts->new(
-        page_load => $response->result()->{ $self->{_page_load_timeouts_key} },
-        script    => $response->result()->{script},
-        implicit  => $response->result()->{implicit}
-    );
-    if ( defined $new ) {
-        $message_id = $self->_new_message_id();
+    my $old;
+    if ( $self->{_no_timeouts_command} ) {
+        if ( !defined $self->{_no_timeouts_command}->{page_load} ) {
+            $self->{_no_timeouts_command} = $new;
+        }
+        $old = $self->{_no_timeouts_command};
+    }
+    else {
+        my $message_id = $self->_new_message_id();
         $self->_send_request(
             [
-                _COMMAND(),
-                $message_id,
-                $self->_command('WebDriver:SetTimeouts'),
-                {
-                    $self->{_page_load_timeouts_key} => $new->page_load(),
-                    script                           => $new->script(),
-                    implicit                         => $new->implicit()
-                }
+                _COMMAND(), $message_id,
+                $self->_command('WebDriver:GetTimeouts')
             ]
         );
-        $self->_get_response($message_id);
+        my $response = $self->_get_response($message_id);
+        $old = Firefox::Marionette::Timeouts->new(
+            page_load =>
+              $response->result()->{ $self->{_page_load_timeouts_key} },
+            script   => $response->result()->{script},
+            implicit => $response->result()->{implicit}
+        );
+    }
+    if ( defined $new ) {
+        if ( $self->{_no_timeouts_command} ) {
+            my $message_id = $self->_new_message_id();
+            $self->_send_request(
+                [
+                    _COMMAND(),
+                    $message_id,
+                    'timeouts',
+                    {
+                        type => 'implicit',
+                        ms   => $new->implicit(),
+                    }
+                ]
+            );
+            $self->_get_response($message_id);
+            $message_id = $self->_new_message_id();
+            $self->_send_request(
+                [
+                    _COMMAND(),
+                    $message_id,
+                    'timeouts',
+                    {
+                        type => 'script',
+                        ms   => $new->script(),
+                    }
+                ]
+            );
+            $self->_get_response($message_id);
+            $message_id = $self->_new_message_id();
+            $self->_send_request(
+                [
+                    _COMMAND(),
+                    $message_id,
+                    'timeouts',
+                    {
+                        type => 'default',
+                        ms   => $new->page_load(),
+                    }
+                ]
+            );
+            $self->_get_response($message_id);
+            $self->{_no_timeouts_command} = $new;
+        }
+        else {
+            my $message_id = $self->_new_message_id();
+            $self->_send_request(
+                [
+                    _COMMAND(),
+                    $message_id,
+                    $self->_command('WebDriver:SetTimeouts'),
+                    {
+                        $self->{_page_load_timeouts_key} => $new->page_load(),
+                        script                           => $new->script(),
+                        implicit                         => $new->implicit()
+                    }
+                ]
+            );
+            $self->_get_response($message_id);
+        }
     }
     return $old;
 }
@@ -2161,7 +2267,12 @@ sub close_current_chrome_window_handle {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return @{ $response->result() };
+    if ( ref $response->result() eq 'HASH' ) {
+        return ( $response->result()->{value} );
+    }
+    else {
+        return @{ $response->result() };
+    }
 }
 
 sub close_current_window_handle {
@@ -2170,7 +2281,12 @@ sub close_current_window_handle {
     $self->_send_request(
         [ _COMMAND(), $message_id, $self->_command('WebDriver:CloseWindow') ] );
     my $response = $self->_get_response($message_id);
-    return @{ $response->result() };
+    if ( ref $response->result() eq 'HASH' ) {
+        return ( $response->result() );
+    }
+    else {
+        return @{ $response->result() };
+    }
 }
 
 sub css {
@@ -2737,6 +2853,9 @@ sub await {
                     || (
                         ref $EVAL_ERROR eq
                         'Firefox::Marionette::Exception::StaleElement' )
+                    || (
+                        ref $EVAL_ERROR eq
+                        'Firefox::Marionette::Exception::NoSuchAlert' )
                 )
               )
             {
@@ -2957,7 +3076,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.51
+Version 0.53
 
 =head1 SYNOPSIS
 
@@ -3012,11 +3131,11 @@ This method returns a new C<Firefox::Marionette> object, connected to an instanc
  
 =head2 go
 
-Navigates the current browsing context to the given L<URI|URI> and waits for the document to load or the session's L<page timeout|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods
+Navigates the current browsing context to the given L<URI|URI> and waits for the document to load or the session's L<page timeout|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods
 
 =head2 uri
 
-returns the current L<URI|URI> of current top level browsing context for Desktop.  It is equivalent to the javascript 'document.location.href'
+returns the current L<URI|URI> of current top level browsing context for Desktop.  It is equivalent to the javascript C<document.location.href>
 
 =head2 title
 
@@ -3026,7 +3145,7 @@ returns the current title of the window.
 
 accepts an L<xpath expression|https://en.wikipedia.org/wiki/XPath> as the first parameter and returns the first L<element|Firefox::Marionette::Element> that matches this expression.
 
-This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout, which, by default is 0 seconds.
 
     use Firefox::Marionette();
 
@@ -3046,7 +3165,7 @@ If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound
 
 accepts an L<id|https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id> as the first parameter and returns the first L<element|Firefox::Marionette::Element> with a matching 'id' property.
 
-This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout, which, by default is 0 seconds.
 
     use Firefox::Marionette();
 
@@ -3066,7 +3185,7 @@ If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound
 
 This method returns the first L<element|Firefox::Marionette::Element> with a matching 'name' property.
 
-This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout, which, by default is 0 seconds.
 
     use Firefox::Marionette();
 
@@ -3085,7 +3204,7 @@ If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound
 
 accepts a L<class name|https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/class> as the first parameter and returns the first L<element|Firefox::Marionette::Element> with a matching 'class' property.
 
-This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout, which, by default is 0 seconds.
 
     use Firefox::Marionette();
 
@@ -3104,7 +3223,7 @@ If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound
 
 accepts a L<CSS Selector|https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors> as the first parameter and returns the first L<element|Firefox::Marionette::Element> that matches that selector.
 
-This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout, which, by default is 0 seconds.
 
     use Firefox::Marionette();
 
@@ -3123,7 +3242,7 @@ If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound
 
 accepts a L<tag name|https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName> as the first parameter and returns the first L<element|Firefox::Marionette::Element> with this tag name.
 
-This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout, which, by default is 0 seconds.
 
     use Firefox::Marionette();
 
@@ -3142,7 +3261,7 @@ If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound
 
 accepts a text string as the first parameter and returns the first link L<element|Firefox::Marionette::Element> that has a matching link text.
 
-This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout, which, by default is 0 seconds.
 
     use Firefox::Marionette();
 
@@ -3161,7 +3280,7 @@ If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound
 
 accepts a text string as the first parameter and returns the first link L<element|Firefox::Marionette::Element> that has a partially matching link text.
 
-This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout, which, by default is 0 seconds.
 
     use Firefox::Marionette();
 
@@ -3320,13 +3439,13 @@ Returns the result of the javascript function.
         # luckily!
     }
 
-The executing javascript is subject to the L<scripts|Firefox::Marionette::Timeouts#scripts> timeout.
+The executing javascript is subject to the L<scripts|Firefox::Marionette::Timeouts#scripts> timeout, which, by default is 30 seconds.
 
 =head2 async_script 
 
 accepts a scalar containing a javascript function that is executed in the browser.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
-The executing javascript is subject to the L<scripts|Firefox::Marionette::Timeouts#scripts> timeout.
+The executing javascript is subject to the L<scripts|Firefox::Marionette::Timeouts#scripts> timeout, which, by default is 30 seconds.
 
 =head2 html
 
@@ -3373,7 +3492,7 @@ accepts a subroutine reference as a parameter and then executes the subroutine. 
 
     $firefox->find_name('lucky')->click();
 
-    $firefox->await(sub { $firefox->find_partial('Download') })->click();
+    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click()
 
 =head2 bye
 
@@ -3387,7 +3506,7 @@ accepts a subroutine reference as a parameter and then executes the subroutine. 
 
     $firefox->find_name('lucky')->click();
 
-    $firefox->bye(sub { $firefox->find_name('lucky') })->await(sub { $firefox->find_partial('Download') })->click();
+    $firefox->bye(sub { $firefox->find_name('lucky') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click()
 
 =head2 sleep_time_in_ms
 
@@ -3417,11 +3536,11 @@ returns the active element of the current browsing context's document element, i
 
 =head2 back
 
-causes the browser to traverse one step backward in the joint history of the current browsing context.  The browser will wait for the one step backward to complete or the session's L<page timeout|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+causes the browser to traverse one step backward in the joint history of the current browsing context.  The browser will wait for the one step backward to complete or the session's L<page timeout|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 forward
 
-causes the browser to traverse one step forward in the joint history of the current browsing context. The browser will wait for the one step forward to complete or the session's L<page timeout|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+causes the browser to traverse one step forward in the joint history of the current browsing context. The browser will wait for the one step forward to complete or the session's L<page timeout|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 active_frame
 
@@ -3465,7 +3584,7 @@ maximises the firefox window. This method returns L<itself|Firefox::Marionette> 
 
 =head2 refresh
 
-refreshes the current page.  The browser will wait for the page to completely refresh or the session's L<page timeout|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+refreshes the current page.  The browser will wait for the page to completely refresh or the session's L<page timeout|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 alert_text
 
@@ -3535,7 +3654,7 @@ accepts a L<element|Firefox::Marionette::Element> as the first parameter and cle
 
 =head2 click
 
-accepts a L<element|Firefox::Marionette::Element> as the first parameter and sends a 'click' to it.  The browser will wait for any page load to complete or the session's L<page timeout|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning.
+accepts a L<element|Firefox::Marionette::Element> as the first parameter and sends a 'click' to it.  The browser will wait for any page load to complete or the session's L<page timeout|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.
 
 =head2 timeouts
 

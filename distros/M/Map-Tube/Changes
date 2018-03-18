@@ -1,5 +1,9 @@
 Revision history for Map::Tube
 
+3.45  2018-03-18T05:05:00+00:00
+      - Documented method get_stations() for Map::Tube::Line.
+      - Added test script line-stations.t.
+
 3.44  2018-01-12T19:45:00+00:00
       - Improved method exporting.
       - Tidied up map-data-converter script.

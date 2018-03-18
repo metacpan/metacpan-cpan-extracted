@@ -1,6 +1,7 @@
 package Mojolicious::Plugin::Vparam::Address;
 use Mojo::Base -strict;
 use Mojolicious::Plugin::Vparam::Common qw(load_class decode_json);
+use Mojolicious::Plugin::Vparam::Numbers;
 
 use Mojo::JSON;
 use Digest::MD5                     qw(md5_hex);
@@ -31,8 +32,10 @@ sub parse {
             $full       = sprintf '%s : %s , %s',
                             $json->[2]//'', $json->[3]//'', $json->[4]//'';
             $address    = $json->[2];
-            $lon        = $json->[3];
-            $lat        = $json->[4];
+            $lon        =
+                Mojolicious::Plugin::Vparam::Numbers::parse_number $json->[3];
+            $lat        =
+                Mojolicious::Plugin::Vparam::Numbers::parse_number $json->[4];
             $id         = $json->[0];
             $type       = $json->[1];
             $lang       = $json->[5];

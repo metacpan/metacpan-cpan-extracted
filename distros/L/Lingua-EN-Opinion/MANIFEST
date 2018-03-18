@@ -14,6 +14,7 @@ eg/nrc-bars
 eg/nrc-lines
 eg/nrc-opinion
 eg/opinion
+eg/score-sentence.psgi
 lib/Lingua/EN/Opinion.pm
 lib/Lingua/EN/Opinion/Emotion.pm
 lib/Lingua/EN/Opinion/Negative.pm

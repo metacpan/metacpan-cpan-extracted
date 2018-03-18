@@ -1,6 +1,6 @@
 
 package Minion::Worker::Role::Kevin;
-$Minion::Worker::Role::Kevin::VERSION = '0.5.5';
+$Minion::Worker::Role::Kevin::VERSION = '0.6.0';
 # ABSTRACT: Alternative Minion worker
 use Mojo::Base -role;
 
@@ -16,6 +16,7 @@ has 'log' => sub { Mojo::Log->new };
 sub _defaults {
   return {
     command_interval   => 10,
+    dequeue_timeout    => 5,
     heartbeat_interval => 300,
     jobs               => 4,
     queues             => ['default'],
@@ -127,11 +128,13 @@ sub _work {
   # Return if worker is finished
   ++$self->{finished} and return if $self->{stopping} && !keys %{$self->{jobs}};
 
-  # Wait if job limit has been reached or worker is stopping
-  if (($status->{jobs} <= keys %$jobs) || $self->{stopping}) { sleep 1 }
+  # Job limit has been reached or worker is stopping
+  return $self->emit('busy')
+    if ($status->{jobs} <= keys %$jobs) || $self->{stopping};
 
   # Try to get more jobs
-  elsif (my $job = $self->dequeue(5 => {queues => $status->{queues}})) {
+  my ($max, $queues) = @{$status}{qw(dequeue_timeout queues)};
+  if (my $job = $self->emit('wait')->dequeue($max => {queues => $queues})) {
     $jobs->{my $id = $job->id} = $job->start;
     my ($pid, $task) = ($job->pid, $job->task);
     $log->debug(qq{Process $pid is performing job "$id" with task "$task"});
@@ -152,7 +155,7 @@ Minion::Worker::Role::Kevin - Alternative Minion worker
 
 =head1 VERSION
 
-version 0.5.5
+version 0.6.0
 
 =head1 AUTHOR
 

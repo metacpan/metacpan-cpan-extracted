@@ -1,3 +1,10 @@
+0.002   2018-03-12 (PERLANCAR)
+
+	- Add eval_level(), inside_block_eval(), inside_string_eval().
+
+	- Mention $^S [RT#124747].
+
+
 0.001   2018-03-05 (PERLANCAR)
 
         - First release.

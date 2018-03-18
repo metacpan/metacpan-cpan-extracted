@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use pmtools;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.2.0';
 
 for my $module (@ARGV) {
     if ( $module =~ /^perl/ ) {
@@ -16,7 +16,11 @@ for my $module (@ARGV) {
         my $found = 0;
         my $pod_iter = pmtools::new_pod_iterator($module);
         while (my $pod_file = $pod_iter->()) {
-            if (-s $pod_file) {
+            next if !-s $pod_file;
+
+            # in case we find the .pm before the .pod
+            my $output = `grep '=head1' $pod_file`;
+            if ($? == 0) {
                 print "$pod_file\n";
                 $found++;
                 last;
@@ -70,7 +74,7 @@ perlmodlib(1).
 
 Copyright (C) 1999 Tom Christiansen.
 
-Copyright (C) 2006-2014 Mark Leighton Fisher.
+Copyright (C) 2006-2014, 2018 Mark Leighton Fisher.
 
 =head1 LICENSE
 

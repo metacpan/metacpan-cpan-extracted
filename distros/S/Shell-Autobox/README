@@ -1,10 +1,10 @@
-Shell-Autobox version 0.03
+Shell-Autobox version 0.40.0
 ==========================
 
 Shell::Autobox - pipe Perl strings through shell commands
 
 Shell::Autobox provides an easy way to pipe Perl strings through shell commands. Commands passed as arguments to the
-C<use Shell::Autobox> statement are installed as subroutines in the calling package, and that package is then
+use Shell::Autobox statement are installed as subroutines in the calling package, and that package is then
 registered as the handler for methods called on ordinary (i.e. non-reference) scalars.
 
 INSTALLATION
@@ -25,7 +25,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (c) 2005 by chocolateboy <chocolate.boy@email.com>
+Copyright (c) 2005-2018 by chocolateboy <chocolate@cpan.org>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or,

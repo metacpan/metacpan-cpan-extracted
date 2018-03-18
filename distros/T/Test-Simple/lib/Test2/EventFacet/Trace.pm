@@ -2,7 +2,7 @@ package Test2::EventFacet::Trace;
 use strict;
 use warnings;
 
-our $VERSION = '1.302130';
+our $VERSION = '1.302133';
 
 BEGIN { require Test2::EventFacet; our @ISA = qw(Test2::EventFacet) }
 
@@ -35,8 +35,6 @@ sub snapshot {
 
 sub signature {
     my $self = shift;
-
-    return $self->{+UUID} if $self->{+UUID};
 
     # Signature is only valid if all of these fields are defined, there is no
     # signature if any is missing. '0' is ok, but '' is not.

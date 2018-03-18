@@ -197,7 +197,12 @@ sub _save {
     unless ( $parser->testNewConf() ) {
         printf STDERR "Modifications rejected: %s:\n", $parser->{message};
     }
-    my $s = $self->mgr->confAcc->saveConf( $new, { force => $self->force } );
+    my $saveParams = { force => $self->force };
+    if ( $self->force and $self->cfgNum ) {
+        $saveParams->{cfgNum}      = $self->cfgNum;
+        $saveParams->{cfgNumFixed} = 1;
+    }
+    my $s = $self->mgr->confAcc->saveConf( $new, %$saveParams );
     if ( $s > 0 ) {
         print STDERR "Saved under number $s\n";
         $parser->{status} = [ $self->mgr->applyConf($new) ];

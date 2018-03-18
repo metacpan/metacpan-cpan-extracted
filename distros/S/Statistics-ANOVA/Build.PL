@@ -8,7 +8,7 @@ my $builder = Module::Build->new(
     dist_author       => 'Roderick Garton <rgarton@cpan.org>',
     dist_version_from => 'lib/Statistics/ANOVA.pm',
     build_requires    => {
-        'Array::Compare' => '2.11',
+        'Array::Compare' => '2.12.2',
         'Test::More'     => '0.98',
     },
     configure_requires => {
@@ -29,7 +29,7 @@ my $builder = Module::Build->new(
         'Statistics::DependantTTest'  => '0.03',
         'Statistics::TTest'           => '1.1',
     },
-    add_to_cleanup     => ['Statistics-ANOVA-0.13-*'],
+    add_to_cleanup     => ['Statistics-ANOVA-0.14-*'],
     create_makefile_pl => 'traditional',
 );
 $builder->add_build_element('csv');

@@ -4,7 +4,7 @@
       "Michael Wayne Arnold <marmanold@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "lectionary",
       "rcl",
@@ -31,34 +31,35 @@
       "build" : {
          "requires" : {
             "Pod::Markdown" : "3.005",
-            "Test::CheckManifest" : "0.9",
+            "Test::CheckManifest" : "1.33",
             "Test::Exception" : "0.43",
-            "Test::More" : "1.302040"
+            "Test::More" : "1.302130"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::MakeMaker" : "7.32",
             "File::ShareDir::Install" : "0.11"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "1.38",
-            "Date::Advent" : "1.20160727",
+            "Date::Advent" : "1.20171223",
             "Date::Easter" : "1.22",
-            "Date::Lectionary" : "1.20180109",
-            "Date::Lectionary::Day" : "1.20180109",
+            "Date::Lectionary" : "1.20180302",
+            "Date::Lectionary::Day" : "1.20180302",
             "Date::Lectionary::Time" : "1.20170311",
             "File::Share" : "0.25",
-            "Moose" : "2.1804",
-            "Moose::Util::TypeConstraints" : "2.1804",
+            "Moose" : "2.2010",
+            "Moose::Util::TypeConstraints" : "2.2010",
             "MooseX::Aliases" : "0.11",
             "MooseX::StrictConstructor" : "0.21",
-            "Time::Piece" : "1.31",
-            "Time::Seconds" : "1.31",
-            "Try::Tiny" : "0.24",
-            "XML::LibXML" : "2.0128",
+            "Time::Piece" : "1.3204",
+            "Time::Seconds" : "1.3204",
+            "Try::Catch" : "v1.1.0",
+            "Try::Tiny::Tiny" : "0.001",
+            "XML::LibXML" : "2.0132",
             "namespace::autoclean" : "0.28",
             "perl" : "5.022"
          }
@@ -67,7 +68,7 @@
    "provides" : {
       "Date::Lectionary::Daily" : {
          "file" : "lib/Date/Lectionary/Daily.pm",
-         "version" : "1.20180205"
+         "version" : "1.20180316"
       }
    },
    "release_status" : "stable",
@@ -78,7 +79,7 @@
          "web" : "https://github.com/marmanold/Date-Lectionary-Daily"
       }
    },
-   "version" : "1.20180205",
+   "version" : "1.20180316",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_twitter" : "https://www.twitter.com/marmanold/"
 }

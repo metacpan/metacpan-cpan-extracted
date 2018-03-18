@@ -8,6 +8,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test::HexString: '0'
   Test::More: '0'
   perl: '5.006'
 configure_requires:
@@ -33,7 +34,7 @@ no_index:
 provides:
   Device::HID:
     file: lib/Device/HID.pm
-    version: '0.006'
+    version: '0.007'
 requires:
   Alien::HIDAPI: '0.004'
   perl: '5.006'
@@ -41,7 +42,7 @@ resources:
   bugtracker: https://github.com/athreef/Device-HID/issues
   homepage: https://github.com/athreef/Device-HID
   repository: https://github.com/athreef/Device-HID.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -69,6 +70,14 @@ x_Dist_Zilla:
           phase: build
           type: requires
       name: BuildRequires
+      version: '6.010'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::MakeMaker::Awesome
@@ -248,7 +257,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.006
+          tag: v0.007
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

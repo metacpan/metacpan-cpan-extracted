@@ -5,16 +5,16 @@ PATH=/usr/local/bin:/bin:/usr/bin
 # Put local $PATH setting in this file.
 # "run.cgi.env" file should not be committed in repository.
 if [ -r run.cgi.env ]; then
-    . ./run.cgi.env
+	. ./run.cgi.env
 fi
 
 if [ "$USE_SPEEDY" != "" ]; then
-	export SPEEDY_TIMEOUT=60
-	export SPEEDY_MAXRUNS=200
-	export SPEEDY_MAXBACKENDS=20
-    exec speedy -x "$0" "${1+$@}"
+	export SPEEDY_TIMEOUT=${SPEEDY_TIMEOUT:-60}
+	export SPEEDY_MAXRUNS=${SPEEDY_MAXRUNS:-200}
+	export SPEEDY_MAXBACKENDS=${SPEEDY_MAXBACKENDS:-20}
+	exec speedy -x "$0" "${1+$@}"
 else
-    exec perl -x "$0" "${1+$@}"
+	exec perl -x "$0" "${1+$@}"
 fi
 
 #!perl

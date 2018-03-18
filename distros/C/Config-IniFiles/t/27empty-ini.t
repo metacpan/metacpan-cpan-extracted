@@ -13,20 +13,17 @@ use warnings;
 use Config::IniFiles;
 use File::Spec;
 
-my $empty_fn = File::Spec->catfile(File::Spec->curdir(), "t", "for-27-empty.ini");
+my $empty_fn =
+    File::Spec->catfile( File::Spec->curdir(), "t", "for-27-empty.ini" );
 
 {
-    my $cfg = Config::IniFiles->new( -file => $empty_fn, -allowempty => 1);
+    my $cfg = Config::IniFiles->new( -file => $empty_fn, -allowempty => 1 );
 
     # TEST
-    ok ($cfg, "object was initialized.");
+    ok( $cfg, "object was initialized." );
 
     my @Groups = $cfg->GroupMembers("test");
 
     # TEST
-    is_deeply (
-        \@Groups,
-        [],
-        "Groups is empty."
-    );
+    is_deeply( \@Groups, [], "Groups is empty." );
 }

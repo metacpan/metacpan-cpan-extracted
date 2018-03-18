@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use 5.010; # //
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 # Testing on my FT232H board suggests that the MPSSE gets upset and stalls if
 #   you write more than 1024 bytes at once.
@@ -760,6 +760,8 @@ sub await
     }
 
     while( $mpsse->{mpsse_recv_len} ) {
+        last if @$buffers; # Stop early to let another write round happen
+
         die "TODO: read with sleep/alarm" if @$alarms;
 
         $mpsse->{ftdi}->read_data( my $more, $mpsse->{mpsse_recv_len} );
@@ -774,8 +776,6 @@ sub await
             my ( $len, $f ) = @{ shift @$recv_f };
             $f->done( substr $recvbuff, 0, $len, "" );
         }
-
-        last if @$buffers; # Stop early to let another write round happen
     }
 }
 

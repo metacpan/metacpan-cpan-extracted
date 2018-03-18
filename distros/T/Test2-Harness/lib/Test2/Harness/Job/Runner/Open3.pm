@@ -2,7 +2,7 @@ package Test2::Harness::Job::Runner::Open3;
 use strict;
 use warnings;
 
-our $VERSION = '0.001057';
+our $VERSION = '0.001061';
 
 use IPC::Open3 qw/open3/;
 use Test2::Harness::Util qw/open_file write_file local_env/;
@@ -33,13 +33,14 @@ sub command {
     my ($test, $event_file) = @_;
 
     my $job = $test->job;
-
     my %seen;
     return (
         $^X,
         (map { "-I$_" } grep {!$seen{$_}++} @{$job->libs}, $class->find_inc, @INC),
         $ENV{HARNESS_PERL_SWITCHES} ? $ENV{HARNESS_PERL_SWITCHES} : (),
         @{$job->switches},
+        $job->event_uuids ? ('-MTest2::Plugin::UUID') : (),
+        $job->mem_usage ? ('-MTest2::Plugin::MemUsage') : (),
         (map {"-M$_"} @{$job->load_import || []}),
         (map {"-m$_"} @{$job->load || []}),
         $job->use_stream ? ("-MTest2::Formatter::Stream=file,$event_file") : (),

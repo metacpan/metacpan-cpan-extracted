@@ -173,6 +173,13 @@ sub quote ( $self, $var, $type = undef ) {
 
             return $var;
         }
+        elsif ( $type == $SQL_UUID ) {
+            utf8::encode $var if utf8::is_utf8 $var;
+
+            $var =~ s/'/''/smg;
+
+            return qq['$var'];
+        }
         else {
             die 'Unsupported SQL type';
         }
@@ -181,6 +188,8 @@ sub quote ( $self, $var, $type = undef ) {
     # elsif ( looks_like_number $var) {
     #     return $var;
     # }
+
+    # ARRAY
     elsif ( is_plain_arrayref $var) {
         my @els;
 
@@ -190,6 +199,8 @@ sub quote ( $self, $var, $type = undef ) {
 
         return 'ARRAY[' . join( ', ', @els ) . ']';
     }
+
+    # TEXT
     else {
         utf8::encode $var if utf8::is_utf8 $var;
 
@@ -254,7 +265,7 @@ PERL
 ## |      | 81                   | * Private subroutine/method '_get_dbh' declared but not used                                                   |
 ## |      | 152                  | * Private subroutine/method '_get_schema_patch_table_query' declared but not used                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 204, 226             | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 215, 237             | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,2 +1,9 @@
+0.12 - 2018-03-10
+ * Really fix them this time, I promise.
+ * Set $cmd to the first argument in most setups
+
+0.11 - 2018-03-10
+ * Fix arguments
+
 0.10 - 2018-03-09
  * First version

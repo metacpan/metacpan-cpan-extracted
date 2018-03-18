@@ -1,5 +1,5 @@
 {
-   "abstract" : "A framework for RESTful processing systems.",
+   "abstract" : "(Deprecated) A framework for RESTful processing systems.",
    "author" : [
       "Graham Ollis <plicease@cpan.org>"
    ],
@@ -104,13 +104,15 @@
          "web" : "https://github.com/clustericious/Clustericious"
       }
    },
-   "version" : "1.27",
+   "version" : "1.29",
    "x_contributors" : [
       "Brian Duggan",
       "Graham Ollis <plicease@cpan.org>",
       "Curt Tilmes",
       "Yanick Champoux"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_deprecated" : 1,
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01",
+   "x_use_unsafe_inc" : 0
 }
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 my $debug;
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 BEGIN {
     use App::EvalServerAdvanced::Config;

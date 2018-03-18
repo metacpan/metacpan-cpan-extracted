@@ -4,7 +4,7 @@ Code::TidyAll::Plugin::Go - Provides gofmt and go vet plugins for Code::TidyAll
 
 # VERSION
 
-version 0.02
+version 0.04
 
 # SYNOPSIS
 
@@ -30,11 +30,17 @@ Please report all issues with this code using the GitHub issue tracker at
 
 # AUTHOR
 
-Gregory Oschwald <goschwald@maxmind.com>
+Gregory Oschwald <oschwald@maxmind.com>
+
+# CONTRIBUTORS
+
+- Andy Jack <andyjack@users.noreply.github.com>
+- Dave Rolsky <drolsky@maxmind.com>
+- Greg Oschwald <goschwald@maxmind.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by MaxMind, Inc..
+This software is copyright (c) 2018 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

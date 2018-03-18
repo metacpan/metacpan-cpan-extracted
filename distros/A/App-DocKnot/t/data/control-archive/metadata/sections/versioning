@@ -1,0 +1,7 @@
+This package uses a three-part version number.  The first number will be
+incremented for major changes, major new functionality, incompatible
+changes to the configuration format (more than just adding new keys), or
+similar disruptive changes.  For lesser changes, the second number will be
+incremented for any change to the code or functioning of the software.  A
+change to the third part of the version number indicates a release with
+changes only to the configuration, PGP keys, and documentation files.

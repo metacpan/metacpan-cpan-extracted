@@ -34,7 +34,7 @@
          "requires" : {
             "Date::Utils" : "0.22",
             "Moo" : "2.000000",
-            "namespace::clean" : "0.24",
+            "namespace::autoclean" : "0.28",
             "perl" : "5.006"
          }
       }
@@ -42,7 +42,7 @@
    "provides" : {
       "Date::Gregorian::Simple" : {
          "file" : "lib/Date/Gregorian/Simple.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "web" : "https://github.com/manwar/Date-Gregorian-Simple"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

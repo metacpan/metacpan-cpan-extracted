@@ -1,5 +1,18 @@
 Release history for perl-Dist-Zilla-Plugin-Hook:
 
+v0.8.4 @ 2018-03-15 21:44 UTC
+
+    -   `VersionHandling` example is renamed to `VersionBumping` and reworked: (1)
+        `Version::Dotted::Semantic` is used instead of `Perl::Version` (due to problem with
+        underscore). (2) `use Path::Tiny` is not required with current `Dist::Zilla`. (3) The
+        example shows `ReleaseStatusProvider`.
+
+    -   `NoDotInInc` example added.
+
+    -   `=encoding UTF-8` added to examples to avoid POD errors on Metacpan.
+
+    -   SPDX license identifiers added.
+
 v0.8.3 @ 2016-11-25 22:04 UTC
 
     -   Example directory renamed from `ex/` to `eg/`. Metacpan now shows example files correctly

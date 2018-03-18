@@ -1,0 +1,29 @@
+The configuration data is in one file per hierarchy in the `config`
+directory.  Each file has the format specified in FORMAT and is designed
+to be readable by INN's new configuration parser in case this can be
+further automated down the road.  The `config/special` directory contains
+overrides, raw `control.ctl` fragments that should be used for particular
+hierarchies instead of automatically-generated entries (usually for
+special comments).  Eventually, the format should be extended to handle as
+many of these cases as possible.
+
+The `keys` directory contains the PGP public keys for every hierarchy that
+has one.  The user IDs on these keys must match the signer expected by the
+configuration data for the corresponding hierarchy.
+
+The `forms` directory contains the basic file structure for the three
+generated files.
+
+The `scripts` directory contains all the software that generates the
+configuration and documentation files, processes control messages, updates
+the database, creates the newsgroup lists, and generates reports.  Most
+scripts in that directory have POD documentation included at the end of
+the script, viewable by running perldoc on the script.
+
+The `templates` directory contains templates for the `control-summary`
+script.  These are the templates I use myself.  Other installations should
+customize them.
+
+The `docs` directory contains the extra documentation files that are
+distributed from ftp.isc.org in the control message archive and newsgroup
+list directories, plus the DocKnot metadata for this package.

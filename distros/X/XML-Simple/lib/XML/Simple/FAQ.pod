@@ -6,21 +6,34 @@ XML::Simple::FAQ - Frequently Asked Questions about XML::Simple
 =head1 Basics
 
 
-=head2 What is XML::Simple designed to be used for?
+=head2 What should I use XML::Simple for?
+
+Nothing!
+
+It's as simple as that.
+
+Choose a better module. See
+L<Perl XML::LibXML by Example|http://grantm.github.io/perl-libxml-by-example/>
+for a gentle introduction to L<XML::LibXML> with lots of examples.
+
+
+=head2 What was XML::Simple designed to be used for?
 
 XML::Simple is a Perl module that was originally developed as a tool for
-reading and writing configuration data in XML format.  You can use it for
-many other purposes that involve storing and retrieving structured data in
-XML.
-
-You might also find XML::Simple a good starting point for playing with XML
-from Perl.  It doesn't have a steep learning curve and if you outgrow its
-capabilities there are plenty of other Perl/XML modules to 'step up' to.
+reading and writing configuration data in XML format.  You could use it for
+other purposes that involve storing and retrieving structured data in
+XML but it's likely to be a frustrating experience.
 
 
 =head2 Why store configuration data in XML anyway?
 
-The many advantages of using XML format for configuration data include:
+It seemed like a good idea at the time.  Now, I use and recommend
+L<Config::General> which uses a format similar to that used by the Apache web
+server.  This is easier to read than XML while still allowing advanced concepts
+such as nested sections.
+
+At the time XML::Simple was written, the advantages of using XML format for
+configuration data were thought to include:
 
 =over 4
 
@@ -74,6 +87,13 @@ The main limitation of XML::Simple is that it does not work with 'mixed
 content' (see the next question).  If you consider your XML files contain
 marked up text rather than structured data, you should probably use another
 module.
+
+If your source XML documents change regularly, it's likely that you will
+experience intermittent failures.  In particular, failure to properly use the
+ForceArray and KeyAttr options will produce code that works when you get a list
+of elements with the same name, but fails when there's only one item in the
+list.  These types of problems can be avoided by not using XML::Simple in the
+first place.
 
 If you are working with very large XML files, XML::Simple's approach of
 representing the whole file in memory as a 'tree' data structure may not be
@@ -131,8 +151,10 @@ FAQ at:
 
 =head2 How do I install XML::Simple?
 
-If you're running ActiveState Perl, you've probably already got XML::Simple
-(although you may want to upgrade to version 1.09 or better for SAX support).
+If you're running ActiveState Perl, or
+L<Strawberry Perl|http://strawberryperl.com/> you've probably already got
+XML::Simple and therefore do not need to install it at all.  But you probably
+also have L<XML::LibXML>, which is a much better module, so just use that.
 
 If you do need to install XML::Simple, you'll need to install an XML parser
 module first.  Install either XML::Parser (which you may have already) or
@@ -216,14 +238,12 @@ XML::SAX::Expat or XML::LibXML.
 
 =head2 How do I use XML::Simple?
 
-If you had an XML document called /etc/appconfig/foo.xml you could 'slurp' it
-into a simple data structure (typically a hashref) with these lines of code:
+If you don't know how to use XML::Simple then the best approach is to
+L<learn to use XML::LibXML|http://grantm.github.io/perl-libxml-by-example/>
+instead.  Stop reading this document and use that one instead.
 
-  use XML::Simple;
-
-  my $config = XMLin('/etc/appconfig/foo.xml');
-
-The XMLin() function accepts options after the filename.
+If you are determined to use XML::Simple, it come with copious documentation,
+so L<read that|XML::Simple>.
 
 
 =head2 There are so many options, which ones do I really need to know about?

@@ -1,11 +1,11 @@
 NAME
 
-    Test::Clustericious::Blocking - Run blocking code in a process using an
-    unholy combination of forks and Mojolicious
+    Test::Clustericious::Blocking - (Deprecated) Run blocking code in a
+    process using an unholy combination of forks and Mojolicious
 
 VERSION
 
-    version 0.06
+    version 0.07
 
 SYNOPSIS
 
@@ -28,6 +28,10 @@ SYNOPSIS
      url: <%= clusters->url %>
 
 DESCRIPTION
+
+    NOTE: This module has been deprecated, and may be removed on or after
+    31 December 2018. Please see
+    https://github.com/clustericious/Clustericious/issues/46.
 
     Warning: This module should be considered experimental.
 

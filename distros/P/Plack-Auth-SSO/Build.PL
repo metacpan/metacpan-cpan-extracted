@@ -18,7 +18,7 @@ my %module_build_args = (
     "Nicolas Franck, C<< <nicolas.franck at ugent.be> >>"
   ],
   "dist_name" => "Plack-Auth-SSO",
-  "dist_version" => "0.0131",
+  "dist_version" => "0.0132",
   "license" => "perl",
   "module_name" => "Plack::Auth::SSO",
   "recursive_test_files" => 1,
@@ -33,7 +33,7 @@ my %module_build_args = (
     "Plack" => 0,
     "Plack::Middleware::Session" => 0,
     "URI" => 0,
-    "WWW::ORCID" => 0,
+    "WWW::ORCID" => "0.0401",
     "perl" => "v5.10.1"
   }
 );

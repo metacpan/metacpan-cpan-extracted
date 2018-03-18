@@ -1,0 +1,76 @@
+{
+    "name": "control-archive",
+    "version": "1.8.0",
+    "synopsis": "processing and archiving of Netnews control messages",
+    "maintainer": "Russ Allbery <eagle@eyrie.org>",
+    "copyrights": [
+        {
+            "holder": "Russ Allbery <eagle@eyrie.org>",
+            "years": "2002-2004, 2007-2014, 2016-2018",
+        },
+        {
+            "holder": "Marco d'Itri",
+            "years": "2001",
+        },
+        {
+            "holder": "UUNET Technologies, Inc.",
+            "years": "1996",
+        }
+    ],
+    "license": "Expat",
+    "build": {
+        "install": false,
+    },
+    "support": {
+        "email": "eagle@eyrie.org",
+        "github": "rra/control-archive",
+        "web": "https://www.eyrie.org/~eagle/software/control-archive/",
+    },
+    "vcs": {
+        "type": "Git",
+        "url": "https://git.eyrie.org/git/usenet/control-archive.git",
+        "browse": "https://git.eyrie.org/?p=usenet/control.archive.git",
+        "github": "rra/control-archive",
+    },
+    "readme": {
+        "sections": [
+            { "title": "Versioning" },
+            { "title": "Layout" },
+            { "title": "Installation" },
+            { "title": "Bootstrapping" },
+            { "title": "Maintenance" },
+        ],
+    },
+    "quote": {
+        "author": "Gene Spafford",
+    },
+    "distribution": {
+        "section": "usenet",
+        "tarname": "control-archive",
+        "version": "control-archive",
+    },
+    "docs": {
+        "user": [
+            {
+                "name": "control-summary",
+                "title": "control-summary manual page",
+            },
+            {
+                "name": "export-control",
+                "title": "export-control manual page",
+            },
+            {
+                "name": "generate-files",
+                "title": "generate-files manual page",
+            },
+            {
+                "name": "process-control",
+                "title": "process-control manual page",
+            },
+            {
+                "name": "update-control",
+                "title": "update-control manual page",
+            },
+        ],
+    },
+}

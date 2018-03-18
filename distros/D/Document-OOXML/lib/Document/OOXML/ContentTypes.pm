@@ -76,7 +76,7 @@ Document::OOXML::ContentTypes - Part to content-type mapping for OOXML
 
 =head1 VERSION
 
-version 0.172650
+version 0.180750
 
 =head1 SYNOPSIS
 
@@ -116,7 +116,7 @@ Martijn van de Streek <martijn@vandestreek.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Martijn van de Streek.
+This software is copyright (c) 2018 by Martijn van de Streek.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

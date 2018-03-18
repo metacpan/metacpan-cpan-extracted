@@ -1,4 +1,4 @@
-#===============================================================================
+#=============================================================================
 #
 #       Module:  Term::CLI::L10N::en
 #       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
@@ -13,15 +13,15 @@
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
-#===============================================================================
+#=============================================================================
 
 use 5.014_001;
 
-package Term::CLI::L10N::en  0.04004 {
+package Term::CLI::L10N::en  0.051002 {
 
-use Modern::Perl;
+use Modern::Perl 1.20140107;
 
-use parent qw( Term::CLI::L10N );
+use parent 0.228 qw( Term::CLI::L10N );
 
 our %Lexicon = (
     _AUTO => 1,
@@ -41,7 +41,7 @@ Term::CLI::L10N::en - English localizations for Term::CLI
 
 =head1 VERSION
 
-version 0.04004
+version 0.051002
 
 =head1 SYNOPSIS
 

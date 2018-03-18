@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '0.022';
+our $VERSION = '1.001';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -36,7 +36,7 @@ our $VERSION = '0.022';
 #pod =head1 CONFIGURATION
 #pod
 #pod For getting started with a configuration for Yancy, see
-#pod L<Yancy/CONFIGURATION>.
+#pod L<Yancy::Help::Config>.
 #pod
 #pod Additional configuration keys accepted by the plugin are:
 #pod
@@ -45,8 +45,9 @@ our $VERSION = '0.022';
 #pod =item backend
 #pod
 #pod In addition to specifying the backend as a single URL (see L<"Database
-#pod Backend"|Yancy/Database Backend>), you can specify it as a hashref of
-#pod C<< class => $db >>. This allows you to share database connections.
+#pod Backend"|Yancy::Help::Config/Database Backend>), you can specify it as
+#pod a hashref of C<< class => $db >>. This allows you to share database
+#pod connections.
 #pod
 #pod     use Mojolicious::Lite;
 #pod     use Mojo::Pg;
@@ -86,7 +87,8 @@ our $VERSION = '0.022';
 #pod
 #pod     my $be = $c->yancy->backend;
 #pod
-#pod Get the currently-configured Yancy backend object.
+#pod Get the currently-configured Yancy backend object. See L<Yancy::Backend>
+#pod for the methods you can call on a backend object and their purpose.
 #pod
 #pod =head2 yancy.route
 #pod
@@ -155,16 +157,16 @@ our $VERSION = '0.022';
 #pod
 #pod =back
 #pod
-#pod See your backend documentation for more information about the C<list>
-#pod method arguments. This helper only returns the list of items, not the
-#pod total count of items or any other value.
+#pod See L<the backend documentation for more information about the list
+#pod method's arguments|Yancy::Backend/list>. This helper only returns the list
+#pod of items, not the total count of items or any other value.
 #pod
 #pod =head2 yancy.get
 #pod
 #pod     my $item = $c->yancy->get( $collection, $id );
 #pod
 #pod Get an item from the backend. C<$collection> is the collection name.
-#pod C<$id> is the ID of the item to get.
+#pod C<$id> is the ID of the item to get. See L<Yancy::Backend/get>.
 #pod
 #pod =head2 yancy.set
 #pod
@@ -172,7 +174,7 @@ our $VERSION = '0.022';
 #pod
 #pod Update an item in the backend. C<$collection> is the collection name.
 #pod C<$id> is the ID of the item to update. C<$item_data> is a hash of data
-#pod to update.
+#pod to update. See L<Yancy::Backend/set>.
 #pod
 #pod This helper will validate the data against the configuration and run any
 #pod filters as needed. If validation fails, this helper will throw an
@@ -195,7 +197,7 @@ our $VERSION = '0.022';
 #pod     my $item = $c->yancy->create( $collection, $item_data );
 #pod
 #pod Create a new item. C<$collection> is the collection name. C<$item_data>
-#pod is a hash of data for the new item.
+#pod is a hash of data for the new item. See L<Yancy::Backend/create>.
 #pod
 #pod This helper will validate the data against the configuration and run any
 #pod filters as needed. If validation fails, this helper will throw an
@@ -218,7 +220,7 @@ our $VERSION = '0.022';
 #pod     $c->yancy->delete( $collection, $id );
 #pod
 #pod Delete an item from the backend. C<$collection> is the collection name.
-#pod C<$id> is the ID of the item to delete.
+#pod C<$id> is the ID of the item to delete. See L<Yancy::Backend/delete>.
 #pod
 #pod =head2 yancy.validate
 #pod
@@ -279,9 +281,6 @@ our $VERSION = '0.022';
 #pod         },
 #pod     }
 #pod
-#pod See L<Yancy/CONFIGURATION> for more information on how to add filters to
-#pod fields.
-#pod
 #pod =head2 yancy.filter.apply
 #pod
 #pod     my $filtered_data = $c->yancy->filter->apply( $collection, $item_data );
@@ -334,12 +333,6 @@ use Mojo::File qw( path );
 use Mojo::Loader qw( load_class );
 use Sys::Hostname qw( hostname );
 use Yancy::Util qw( load_backend );
-
-#pod =method register
-#pod
-#pod Set up the plugin. Called automatically by Mojolicious.
-#pod
-#pod =cut
 
 sub register {
     my ( $self, $app, $config ) = @_;
@@ -482,8 +475,10 @@ sub _build_openapi_spec {
     for my $name ( keys %{ $config->{collections} } ) {
         # Set some defaults so users don't have to type as much
         my $collection = $config->{collections}{ $name };
+        next if $collection->{ 'x-ignore' };
         $collection->{ type } //= 'object';
         my $id_field = $collection->{ 'x-id-field' } // 'id';
+        my %props = %{ $collection->{ properties } };
 
         $definitions{ $name . 'Item' } = $collection;
         $definitions{ $name . 'Array' } = {
@@ -500,23 +495,31 @@ sub _build_openapi_spec {
                 },
                 parameters => [
                     {
-                        name => 'limit',
+                        name => '$limit',
                         type => 'integer',
                         in => 'query',
                         description => 'The number of items to return',
                     },
                     {
-                        name => 'offset',
+                        name => '$offset',
                         type => 'integer',
                         in => 'query',
                         description => 'The index (0-based) to start returning items',
                     },
                     {
-                        name => 'order_by',
+                        name => '$order_by',
                         type => 'string',
                         in => 'query',
                         pattern => '^(?:asc|desc):[^:,]+$',
+                        description => 'How to sort the list. A string containing one of "asc" (to sort in ascending order) or "desc" (to sort in descending order), followed by a ":", followed by the field name to sort by.',
                     },
+                    map {; {
+                        name => $_,
+                        in => 'query',
+                        type => ref $props{ $_ }{type} eq 'ARRAY'
+                            ? $props{ $_ }{type}[0] : $props{ $_ }{type},
+                        description => "Filter the list by the $_ field. By default, looks for rows containing the value anywhere in the column. Use '*' anywhere in the value to anchor the match.",
+                    } } keys %props,
                 ],
                 responses => {
                     200 => {
@@ -715,7 +718,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 0.022
+version 1.001
 
 =head1 SYNOPSIS
 
@@ -748,16 +751,10 @@ to administrate content on your L<Mojolicious> site. This includes
 a JavaScript web application to edit the content and a REST API to help
 quickly build your own application.
 
-=head1 METHODS
-
-=head2 register
-
-Set up the plugin. Called automatically by Mojolicious.
-
 =head1 CONFIGURATION
 
 For getting started with a configuration for Yancy, see
-L<Yancy/CONFIGURATION>.
+L<Yancy::Help::Config>.
 
 Additional configuration keys accepted by the plugin are:
 
@@ -766,8 +763,9 @@ Additional configuration keys accepted by the plugin are:
 =item backend
 
 In addition to specifying the backend as a single URL (see L<"Database
-Backend"|Yancy/Database Backend>), you can specify it as a hashref of
-C<< class => $db >>. This allows you to share database connections.
+Backend"|Yancy::Help::Config/Database Backend>), you can specify it as
+a hashref of C<< class => $db >>. This allows you to share database
+connections.
 
     use Mojolicious::Lite;
     use Mojo::Pg;
@@ -807,7 +805,8 @@ C<collections> configuration as needed.
 
     my $be = $c->yancy->backend;
 
-Get the currently-configured Yancy backend object.
+Get the currently-configured Yancy backend object. See L<Yancy::Backend>
+for the methods you can call on a backend object and their purpose.
 
 =head2 yancy.route
 
@@ -876,16 +875,16 @@ C<\%opt> is a hash of options with the following keys:
 
 =back
 
-See your backend documentation for more information about the C<list>
-method arguments. This helper only returns the list of items, not the
-total count of items or any other value.
+See L<the backend documentation for more information about the list
+method's arguments|Yancy::Backend/list>. This helper only returns the list
+of items, not the total count of items or any other value.
 
 =head2 yancy.get
 
     my $item = $c->yancy->get( $collection, $id );
 
 Get an item from the backend. C<$collection> is the collection name.
-C<$id> is the ID of the item to get.
+C<$id> is the ID of the item to get. See L<Yancy::Backend/get>.
 
 =head2 yancy.set
 
@@ -893,7 +892,7 @@ C<$id> is the ID of the item to get.
 
 Update an item in the backend. C<$collection> is the collection name.
 C<$id> is the ID of the item to update. C<$item_data> is a hash of data
-to update.
+to update. See L<Yancy::Backend/set>.
 
 This helper will validate the data against the configuration and run any
 filters as needed. If validation fails, this helper will throw an
@@ -916,7 +915,7 @@ backend object directly via L<the backend helper|/yancy.backend>.
     my $item = $c->yancy->create( $collection, $item_data );
 
 Create a new item. C<$collection> is the collection name. C<$item_data>
-is a hash of data for the new item.
+is a hash of data for the new item. See L<Yancy::Backend/create>.
 
 This helper will validate the data against the configuration and run any
 filters as needed. If validation fails, this helper will throw an
@@ -939,7 +938,7 @@ backend object directly via L<the backend helper|/yancy.backend>.
     $c->yancy->delete( $collection, $id );
 
 Delete an item from the backend. C<$collection> is the collection name.
-C<$id> is the ID of the item to delete.
+C<$id> is the ID of the item to delete. See L<Yancy::Backend/delete>.
 
 =head2 yancy.validate
 
@@ -999,9 +998,6 @@ And you configure this on a field using C<< x-filter >> and C<< x-digest >>:
             },
         },
     }
-
-See L<Yancy/CONFIGURATION> for more information on how to add filters to
-fields.
 
 =head2 yancy.filter.apply
 

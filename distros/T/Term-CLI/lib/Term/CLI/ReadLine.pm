@@ -1,4 +1,4 @@
-#===============================================================================
+#=============================================================================
 #
 #       Module:  Term::CLI::ReadLine
 #
@@ -16,19 +16,19 @@
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
-#===============================================================================
+#=============================================================================
 
 use 5.014_001;
 
-package Term::CLI::ReadLine  0.04004 {
+package Term::CLI::ReadLine  0.051002 {
 
-use Modern::Perl;
+use Modern::Perl 1.20140107;
 
-use parent qw( Term::ReadLine );
+use parent 0.228 qw( Term::ReadLine );
 
 use Term::ReadLine::Gnu;
 
-use namespace::clean;
+use namespace::clean 0.25;
 
 my $Term = undef;
 
@@ -66,7 +66,7 @@ Term::CLI::ReadLine - maintain a single Term::ReadLine object
 
 =head1 VERSION
 
-version 0.04004
+version 0.051002
 
 =head1 SYNOPSIS
 

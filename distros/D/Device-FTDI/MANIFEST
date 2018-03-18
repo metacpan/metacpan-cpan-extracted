@@ -1,5 +1,6 @@
 Changes
 examples/bitbang-tickit-ui.pl
+examples/enttec-opendmx.pl
 examples/max7221-clock.pl
 examples/mpl3115a2.pl
 examples/synopsis.pl
@@ -17,7 +18,10 @@ ppport.h
 README
 t/00-load.t
 t/ftdi.t
+t/lib/MockFTDI.pm
 t/manifest.t
+t/mpsse.t
 t/pod.t
+t/spi.t
 typemap
 util/generate_const.pl

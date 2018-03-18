@@ -13,7 +13,9 @@ on test => sub {
     requires 'Test::Exception', '0.32';
 };
 
-requires 'Catmandu', '1.03';
+requires 'Catmandu', '1.09';
 requires 'Furl', '3.07';
 requires 'Catmandu::XML', '0.16';
+requires 'XML::LibXML';
+requires 'XML::LibXSLT';
 requires 'Catmandu::Identifier', '0.06';

@@ -15,7 +15,7 @@ our @EXPORT = qw( log_events log_context log_like log_unlike );
 our %EXPORT_TAGS = ( all => \@EXPORT );
 
 # ABSTRACT: Clustericious logging in tests.
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.29'; # VERSION
 
 
 sub log_events
@@ -340,7 +340,7 @@ Test::Clustericious::Log - Clustericious logging in tests.
 
 =head1 VERSION
 
-version 1.27
+version 1.29
 
 =head1 SYNOPSIS
 

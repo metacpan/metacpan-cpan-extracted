@@ -4,6 +4,7 @@ use warnings;
 
 use GD::Graph::bars;
 use Lingua::EN::Opinion;
+use List::Util qw( max );
 
 my $input_file = shift || die "Usage: perl $0 /some/file.txt\n";
 my $width      = shift || 800;
@@ -30,9 +31,10 @@ my @data = (
 my $graph = GD::Graph::bars->new( $width, $height );
 
 $graph->set(
-    title   => 'NRC Sentiment',
-    x_label => 'Emotions',
-    y_label => 'Sentences',
+    title       => 'NRC Sentiment',
+    x_label     => 'Emotions',
+    y_label     => 'Sentences',
+    y_max_value => max( values %index ),
 ) or die "Can't set graph: ", $graph->error;
 
 my $gd = $graph->plot(\@data) or die $graph->error;

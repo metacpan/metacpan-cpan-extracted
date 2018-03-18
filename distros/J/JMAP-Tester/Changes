@@ -1,5 +1,8 @@
 Revision history for JMAP-Tester
 
+0.018     2018-03-10 18:08:29-05:00 America/New_York
+        - no longer use allow_blessed on the JSON codec
+
 0.017     2018-01-16 10:54:11-05:00 America/New_York
         - updated for JMAP wrapper Objects, will make new-style Object requests
           unless instructed otherwise

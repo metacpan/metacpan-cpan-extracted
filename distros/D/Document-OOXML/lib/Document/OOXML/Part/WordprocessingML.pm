@@ -7,6 +7,7 @@ with 'Document::OOXML::Part';
 
 # ABSTRACT: WordprocessingML document part handling
 
+use Carp;
 use List::Util qw(first);
 use XML::LibXML;
 
@@ -101,6 +102,8 @@ sub find_text_nodes {
     $runs->foreach(sub {
         my $run = shift;
 
+        my $run_was_split = 0;
+
         my $text_nodes = $self->xpc->findnodes('./w:t', $run);
         $text_nodes->foreach(sub {
             my $t = shift;
@@ -110,6 +113,8 @@ sub find_text_nodes {
 
             # No match, no need to do all the DOM processing below
             return if @parts == 1;
+
+            $run_was_split = 1;
 
             for (my $i = $#parts; $i >= 0; $i--) {
                 my $part = $parts[$i];
@@ -133,7 +138,7 @@ sub find_text_nodes {
             }
         });
 
-        $run->parentNode->removeChild($run);
+        $run->parentNode->removeChild($run) if $run_was_split;
     });
 
     for my $part ($self->referenced_parts) {
@@ -146,6 +151,160 @@ sub find_text_nodes {
     }
 
     return \@matching_nodes;
+}
+
+
+sub style_text {
+    my $self = shift;
+    my $regex = shift;
+    my %options = @_;
+
+    my $text_nodes = $self->find_text_nodes($regex, delete $options{exclude_tables});
+
+    for my $text_node (@$text_nodes) {
+        my ($run_props) = $self->xpc->findnodes('ancestor::w:r[1]/w:rPr', $text_node);
+        if (!$run_props) {
+            my ($run) = $self->xpc->findnodes('ancestor::w:r[1]', $text_node);
+
+            my $run_ns = $run->namespaceURI;
+            $run_props = $self->xml->createElement('rPr');
+            $run_props->setNamespace($run_ns => $run->lookupNamespacePrefix($run_ns));
+            $run->insertBefore($run_props, $run->firstChild);
+        }
+
+        if (exists $options{bold}) {
+            my ($bold) = $self->xpc->findnodes('./w:b', $run_props);
+
+            if (!$bold && $options{bold}) {
+                $run_props->addNewChild($run_props->namespaceURI => 'b');
+            }
+            if ($bold && !$options{bold}) {
+                $run_props->removeChild($bold);
+            }
+        }
+
+       if (exists $options{italic}) {
+            my ($italic) = $self->xpc->findnodes('./w:i', $run_props);
+
+            if (!$italic && $options{italic}) {
+                $run_props->addNewChild($run_props->namespaceURI => 'i');
+            }
+            if ($italic && !$options{italic}) {
+                $run_props->removeChild($italic);
+            }
+        }
+
+        if (exists $options{color}) {
+            my $color_to_set = _check_color_syntax($options{color});
+
+            my ($color_element) = $self->xpc->findnodes('./w:color', $run_props);
+
+            if (!$color_element && $options{color}) {
+                $color_element = $run_props->addNewChild($run_props->namespaceURI => 'color');
+            }
+
+            if ($color_element && $options{color}) {
+                my $ns = $color_element->namespaceURI;
+
+                $color_element->setAttributeNS(
+                    $ns,
+                    'val' => $color_to_set
+                );
+
+                # We're explicitly setting the color, so we need to remove
+                # the "document theme"-based color attributes or they'll
+                # take precedence.
+                $color_element->removeAttributeNS($ns => 'themeColor');
+                $color_element->removeAttributeNS($ns => 'themeShade');
+                $color_element->removeAttributeNS($ns => 'themeTint');
+            }
+
+            if ($color_element && not defined $options{color}) {
+                $run_props->removeChild($color_element);
+            }
+        }
+
+        if (exists $options{underline_style}) {
+            my $underline_style = _check_underline_style($options{underline_style});
+
+            my ($underline_element) = $self->xpc->findnodes('./w:u', $run_props);
+
+            if (!$underline_element && $options{underline_style}) {
+                $underline_element = $run_props->addNewChild($run_props->namespaceURI => 'u');
+            }
+
+            if ($underline_element && $options{underline_style}) {
+                $underline_element->setAttributeNS(
+                    $underline_element->namespaceURI,
+                    'val' => $options{underline_style}
+                );
+
+                if (exists $options{underline_color}) {
+                    if (defined $options{underline_color}) {
+                        my $color_to_set = _check_color_syntax($options{underline_color});
+
+                        $underline_element->setAttributeNS(
+                            $underline_element->namespaceURI,
+                            'color' => $color_to_set,
+                        );
+                    } else {
+                        $underline_element->removeAttributeNS(
+                            $underline_element->namespaceURI => 'color'
+                        );
+                    }
+                }
+            }
+
+            if ($underline_element && not defined $options{underline_style}) {
+                $run_props->removeChild($underline_element);
+            }
+        }
+    }
+
+    return;
+}
+
+sub _check_color_syntax {
+    my $color = shift;
+
+    return        if not defined $color;
+    return $color if $color eq 'auto';
+    return uc($color) if $color =~ /^[0-9a-fA-F]{6}$/;
+
+    croak("Invalid color value: '$color'");
+}
+
+my %underline_styles = (
+    map { $_ => 1 } qw(
+        dash
+        dashDotDotHeavy
+        dashDotHeavy
+        dashedHeavy
+        dashLong
+        dashLongHeavy
+        dotDash
+        dotDotDash
+        dotted
+        dottedHeavy
+        double
+        none
+        single
+        thick
+        wave
+        wavyDouble
+        wavyHeavy
+        words
+    )
+);
+
+sub _check_underline_style {
+    my $underline_style = shift;
+
+
+    return if not defined $underline_style;
+    return $underline_style if exists $underline_styles{$underline_style};
+
+    croak("Invalid underline style: '$underline_style'");
 }
 
 
@@ -374,7 +533,7 @@ Document::OOXML::Part::WordprocessingML - WordprocessingML document part handlin
 
 =head1 VERSION
 
-version 0.172650
+version 0.180750
 
 =head1 ATTRIBUTES
 
@@ -409,6 +568,80 @@ confuse the splitting code.
 
 If C<$exclude_tables> is true, the regular expression will not match
 text in tables. This option may change in the future.
+
+=head2 style_text($regex, %style)
+
+Sets the style options described by C<%style> to all text parts of the document
+that match regular expression C<$regex>.
+
+Internally, this method uses L</find_text_nodes> to do the heavy lifting of
+combining and splitting runs.
+
+The regular expression should not contain matching groups, as this will confuse
+the splitting code.
+
+The following style options are recognised (all are optional, but why would you
+call this method if you don't want to set/unset styling?):
+
+=over
+
+=item * bold
+
+Boolean value. If true, matching text will be made B<bold>. If specified and
+false, matching text will be un-bolded.
+
+=item * italic
+
+Boolean value. If true, matching text will be made I<italic>. If specified and
+false, matching text will be un-italiced.
+
+=item * underline_style
+
+String value. Matching text will get an underline of the specified style. If
+the key exists specified and the value is c<undef>, underline will be removed
+from the matching text.
+
+Allowed underline styles are:
+
+    dash
+    dashDotDotHeavy
+    dashDotHeavy
+    dashedHeavy
+    dashLong
+    dashLongHeavy
+    dotDash
+    dotDotDash
+    dotted
+    dottedHeavy
+    double
+    none
+    single
+    thick
+    wave
+    wavyDouble
+    wavyHeavy
+    words
+
+=item * underline_color
+
+Color value that will be used for the underline only.
+
+=item * color
+
+Color value, matching text will be given this color.
+
+Colors should be in the format: C<RRGGBB> (red, green, blue components in
+hexadecimal, like used in HTML). The special value C<auto> can be used to
+let the word processor decide the color.
+
+Note: unlike HTML, the color value should NOT be prefixed with "#". It
+should just be the six hexadecimal digits.
+
+=item * exclude_tables
+
+Boolean value. If true, text in tables will not be touched.
+
+=back
 
 =head2 remove_spellcheck_markers
 
@@ -453,7 +686,7 @@ Martijn van de Streek <martijn@vandestreek.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Martijn van de Streek.
+This software is copyright (c) 2018 by Martijn van de Streek.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

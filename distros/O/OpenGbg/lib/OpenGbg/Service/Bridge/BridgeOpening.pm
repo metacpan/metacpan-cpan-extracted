@@ -6,12 +6,12 @@ package OpenGbg::Service::Bridge::BridgeOpening;
 
 # ABSTRACT: A change in status for Göta Älvbron
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1402';
+our $VERSION = '0.1403';
 
 use XML::Rabbit;
 use DateTime::Format::HTTP;
 use MooseX::AttributeShortcuts;
-use OpenGbg::DateTimeType qw/DateTime/;
+use Types::DateTime qw/DateTime/;
 use Types::Standard qw/Bool/;
 
 has_xpath_value _timestamp => './x:TimeStamp';
@@ -55,7 +55,7 @@ OpenGbg::Service::Bridge::BridgeOpening - A change in status for Göta Älvbron
 
 =head1 VERSION
 
-Version 0.1402, released 2016-08-12.
+Version 0.1403, released 2018-03-14.
 
 =head1 SYNOPSIS
 

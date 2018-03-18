@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '0.022';
+our $VERSION = '1.001';
 # ABSTRACT: Basic controller for displaying content
 
 #pod =head1 SYNOPSIS
@@ -20,7 +20,7 @@ our $VERSION = '0.022';
 #pod     app->routes->get( '/' )->to(
 #pod         'yancy#list',
 #pod         collection => 'blog',
-#pod         template => 'index'
+#pod         template => 'index',
 #pod     );
 #pod
 #pod     __DATA__
@@ -43,6 +43,28 @@ our $VERSION = '0.022';
 #pod website. Any user agent that requests JSON will get JSON instead of
 #pod HTML. For full details on how JSON clients are detected, see
 #pod L<Mojolicious::Guides::Rendering/Content negotiation>.
+#pod
+#pod =head1 EXTENDING
+#pod
+#pod Here are some tips for inheriting from this controller to add
+#pod functionality.
+#pod
+#pod =over
+#pod
+#pod =item set
+#pod
+#pod =over
+#pod
+#pod =item *
+#pod
+#pod When setting field values to add to the updated/created item, use C<<
+#pod $c->req->param >> not C<< $c->param >>. The underlying code uses C<<
+#pod $c->req->param >> to get all of the params, which will not be updated if
+#pod you use C<< $c->param >>.
+#pod
+#pod =back
+#pod
+#pod =back
 #pod
 #pod =head1 DIAGNOSTICS
 #pod
@@ -114,6 +136,11 @@ use Mojo::Base 'Mojolicious::Controller';
 #pod The page number to show. Defaults to C<1>. The page number will
 #pod be used to calculate the C<offset> parameter to L<Yancy::Backend/list>.
 #pod
+#pod =item filter
+#pod
+#pod A hash reference of field/value pairs to filter the contents of the
+#pod list.
+#pod
 #pod =back
 #pod
 #pod The following stash values are set by this method:
@@ -124,6 +151,10 @@ use Mojo::Base 'Mojolicious::Controller';
 #pod
 #pod An array reference of items to display.
 #pod
+#pod =item total_pages
+#pod
+#pod The number of pages of items. Can be used for pagination.
+#pod
 #pod =back
 #pod
 #pod =cut
@@ -132,17 +163,20 @@ sub list {
     my ( $c ) = @_;
     my $coll_name = $c->stash( 'collection' )
         || die "Collection name not defined in stash";
-    my $limit = $c->stash( 'limit' ) // 10;
-    my $page = $c->stash( 'page' ) // 1;
+    my $limit = $c->stash->{ limit } //= 10;
+    my $page = $c->stash->{ page } //= 1;
     my $offset = ( $page - 1 ) * $limit;
     my $opt = {
         limit => $limit,
         offset => $offset,
     };
-    my $items = $c->yancy->backend->list( $coll_name, {}, $opt );
+    my $filter = {
+        %{ $c->stash( 'filter' ) || {} },
+    };
+    my $items = $c->yancy->backend->list( $coll_name, $filter, $opt );
     return $c->respond_to(
         json => { json => { %$items, offset => $offset } },
-        html => { %$items },
+        html => { %$items, total_pages => int( $items->{total} / $limit ) + 1 },
     );
 }
 
@@ -546,7 +580,7 @@ Yancy::Controller::Yancy - Basic controller for displaying content
 
 =head1 VERSION
 
-version 0.022
+version 1.001
 
 =head1 SYNOPSIS
 
@@ -566,7 +600,7 @@ version 0.022
     app->routes->get( '/' )->to(
         'yancy#list',
         collection => 'blog',
-        template => 'index'
+        template => 'index',
     );
 
     __DATA__
@@ -624,6 +658,11 @@ The number of items to show on the page. Defaults to C<10>.
 The page number to show. Defaults to C<1>. The page number will
 be used to calculate the C<offset> parameter to L<Yancy::Backend/list>.
 
+=item filter
+
+A hash reference of field/value pairs to filter the contents of the
+list.
+
 =back
 
 The following stash values are set by this method:
@@ -633,6 +672,10 @@ The following stash values are set by this method:
 =item items
 
 An array reference of items to display.
+
+=item total_pages
+
+The number of pages of items. Can be used for pagination.
 
 =back
 
@@ -867,6 +910,28 @@ into doing something on your site that they didn't intend, such as
 editing or deleting content.  You must add a C<< <%= csrf_field %> >> to
 your form in order to delete an item successfully. See
 L<Mojolicious::Guides::Rendering/Cross-site request forgery>.
+
+=head1 EXTENDING
+
+Here are some tips for inheriting from this controller to add
+functionality.
+
+=over
+
+=item set
+
+=over
+
+=item *
+
+When setting field values to add to the updated/created item, use C<<
+$c->req->param >> not C<< $c->param >>. The underlying code uses C<<
+$c->req->param >> to get all of the params, which will not be updated if
+you use C<< $c->param >>.
+
+=back
+
+=back
 
 =head1 DIAGNOSTICS
 

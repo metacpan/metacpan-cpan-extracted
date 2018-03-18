@@ -1,5 +1,5 @@
 package Yancy::Backend::Mysql;
-our $VERSION = '0.022';
+our $VERSION = '1.001';
 # ABSTRACT: A backend for MySQL using Mojo::mysql
 
 #pod =head1 SYNOPSIS
@@ -97,7 +97,7 @@ our $VERSION = '0.022';
 #pod
 #pod =cut
 
-use Mojo::Base 'Mojo';
+use Mojo::Base '-base';
 use Scalar::Util qw( looks_like_number );
 BEGIN {
     eval { require Mojo::mysql; Mojo::mysql->VERSION( 1 ); 1 }
@@ -124,9 +124,9 @@ sub create {
     my ( $self, $coll, $params ) = @_;
     my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
     my $id = $self->mysql->db->insert( $coll, $params )->last_insert_id;
-    # If we don't get an auto-incremented id or an exception, trust the
-    # ID was inserted correctly
-    return $id || $params->{ $id_field };
+    # Assume the id field is correct in case we're using a different
+    # unique ID (not the auto-increment column).
+    return $params->{ $id_field } || $id;
 }
 
 sub get {
@@ -181,7 +181,7 @@ ENDQ
     my $key_q = <<ENDQ;
 SELECT * FROM information_schema.table_constraints as tc
 JOIN information_schema.key_column_usage AS ccu USING ( table_name, table_schema )
-WHERE tc.table_schema=? AND tc.table_name=? AND constraint_type = 'PRIMARY KEY'
+WHERE tc.table_schema=? AND tc.table_name=? AND ( constraint_type = 'PRIMARY KEY' OR constraint_type = 'UNIQUE' )
     AND tc.table_schema NOT IN ('information_schema','performance_schema','mysql','sys')
 ENDQ
 
@@ -266,7 +266,7 @@ Yancy::Backend::Mysql - A backend for MySQL using Mojo::mysql
 
 =head1 VERSION
 
-version 0.022
+version 1.001
 
 =head1 SYNOPSIS
 

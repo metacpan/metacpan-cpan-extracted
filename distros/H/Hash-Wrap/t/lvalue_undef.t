@@ -5,8 +5,14 @@ use Test2::API qw/ context /;
 
 use Scalar::Util 'blessed';
 
+my $HAS_LVALUE;
+
+BEGIN {
+    $HAS_LVALUE = $] ge '5.01600';
+}
+
 skip_all( "lvalue support requires perl 5.16 or later" )
-  if $] lt '5.016000';
+  unless $HAS_LVALUE;
 
 sub test_generator {
 
@@ -42,7 +48,7 @@ sub test_generator {
     $ctx->release;
 }
 
-use if $] ge '5.016000',
+use if $HAS_LVALUE,
   'Hash::Wrap' => ( { -as => 'lvalued_undef', -lvalue => 1, -undef => 1 } );
 
 subtest 'default' => sub {
@@ -51,38 +57,17 @@ subtest 'default' => sub {
 
 };
 
-use if $] ge '5.016000',
+use if $HAS_LVALUE,
   'Hash::Wrap' => ( {
     -as     => 'created_class',
     -lvalue => 1,
     -undef => 1,
     -class  => 'My::CreatedClass::LvalueUndef',
-    -create => 1
 } );
 
 subtest 'create class' => sub {
 
     test_generator( \&created_class );
 };
-
-{
-    package My::Bogus::LValueUndef::Class;
-    use parent 'Hash::Wrap::Base';
-
-    our $generate_signature = sub {};
-
-}
-
-like(
-    dies {
-        Hash::Wrap->import( {
-                -as     => 'bogus_lvalue_undef_class',
-                -lvalue => 1,
-                -class  => 'My::Bogus::LValueUndef::Class'
-            } )
-    },
-    qr/does not add ':lvalue'/,
-    'bad lvalue class'
-);
 
 done_testing;

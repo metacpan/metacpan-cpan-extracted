@@ -1,5 +1,14 @@
 Revision history for Perl module Net::ACME2
 
+0.09 14 Mar 2018
+- Fix MANIFEST (sorry!)
+- Update documentation a bit for the production endpoint.
+
+0.08 13 Mar 2018
+- Make the Let’s Encrypt module default to the production server.
+- DNS challenges are now instantiated as dns_01.pm instances.
+- Tweaks to documentation.
+
 0.07 11 Feb 2018
 - Fix to request new nonce when there is none set.
 

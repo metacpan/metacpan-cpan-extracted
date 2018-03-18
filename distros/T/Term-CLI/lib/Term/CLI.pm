@@ -1,4 +1,4 @@
-#===============================================================================
+#=============================================================================
 #
 #       Module:  Term::CLI
 #
@@ -16,16 +16,16 @@
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
-#===============================================================================
+#=============================================================================
 
 use 5.014_001;
 
-package Term::CLI  0.04004 {
+package Term::CLI  0.051002 {
 
-use Modern::Perl;
-use Text::ParseWords qw( parse_line );
+use Modern::Perl 1.20140107;
+use Text::ParseWords 3.29 qw( parse_line );
 use Term::CLI::ReadLine;
-use FindBin;
+use FindBin 1.50;
 
 use Term::CLI::L10N;
 
@@ -42,7 +42,7 @@ use Term::CLI::Argument::String;
 use Term::CLI::Command;
 use Term::CLI::Command::Help;
 
-use Types::Standard qw(
+use Types::Standard 1.000005 qw(
     ArrayRef
     CodeRef
     InstanceOf
@@ -52,8 +52,8 @@ use Types::Standard qw(
     Int
 );
 
-use Moo;
-use namespace::clean;
+use Moo 1.000001;
+use namespace::clean 0.25;
 
 extends 'Term::CLI::Base';
 
@@ -108,14 +108,6 @@ sub BUILD {
     if (! exists $args->{callback} ) {
         $self->callback(\&_default_callback);
     }
-
-    # Set the signal hook to abort the current input line.
-    $term->Attribs->{signal_event_hook} = sub {
-        $term->crlf();
-        $term->Attribs->{line_buffer} = '';
-        $term->forced_update_display();
-        return 1;
-    };
 
     if (!exists $args->{history_file}) {
         my $hist_file = $self->name;
@@ -271,33 +263,109 @@ sub complete_line {
 # %old_sig = CLI->_set_signal_handlers();
 #
 # Set signal handlers to ensure proper terminal/CLI handling in the
-# face of certain keyboard signals (^C ^\ ^Z).
+# face of various signals (^C ^\ ^Z).
 #
 sub _set_signal_handlers {
     my $self = shift;
 
     my %old_sig = %SIG;
 
-    # Install sig handler(s), if they haven't been installed yet.
-    for my $sig (qw( INT QUIT )) {
-        next if defined $SIG{$sig} && $SIG{$sig} !~ /^(?:DEFAULT|IGNORE)$/;
-        # Just set the signal handler to do nothing. Note that this
-        # is not the same as 'IGNORE'!
-        $SIG{$sig} = sub { return 1 };
-    }
+    # $last_signal is set by the signal handlers and is used
+    # in the term's "Attrib{signal_event_hook}" to determine
+    # what action to take.
+    my $last_signal = 'NONE';
 
-    # Handle TSTP, by resending the signal if necessary. If we don't
-    # do this, a keyboard suspend looks weird.
-    # In case we get suspended, make sure we redraw the CLI on wake up.
-    $SIG{CONT} = sub {
-        if (ref $old_sig{CONT}) {
-            $old_sig{CONT}->(@_);
+    # The generic signal handler will attempt to re-throw the signal, after
+    # putting the terminal in the correct state. Any previously set signal
+    # handlers should then be triggered.
+    my $generic_handler = sub {
+        my $signal = shift;
+
+        $last_signal = $signal;
+
+        if (defined $old_sig{$signal} && $old_sig{$signal} ne 'DEFAULT') {
+            $SIG{$signal} = $old_sig{$signal};
         }
+        else {
+            $SIG{$signal} = 'DEFAULT';
+        }
+
+        $self->term->Attribs->{catch_signals} = 0;
+
+        $self->term->free_line_state();
+        $self->term->cleanup_after_signal();
+        kill $signal, $$;
+        $self->term->Attribs->{catch_signals} = 1;
+        return 1;
+    };
+
+    # The WINCH signal handler.
+    # Tell ReadLine to resize the terminal.
+    my $winch_handler = sub {
+        $self->term->resize_terminal;
+        $last_signal = $_[0];
+        $old_sig{$_[0]}->(@_) if ref $old_sig{$_[0]};
+        return 1;
+    };
+
+    # The CONT signal handler.
+    # In case we get suspended, make sure we redraw the CLI on wake-up.
+    my $cont_handler = sub {
+        $last_signal = $_[0];
+
+        $self->term->free_line_state();
+        $self->term->cleanup_after_signal();
+
+        $old_sig{$_[0]}->(@_) if ref $old_sig{$_[0]};
+
+        $self->term->Attribs->{line_buffer} = '';
+        $self->term->reset_after_signal();
         $self->term->forced_update_display();
+        return 1;
+    };
+
+    # Install signal handler(s).
+    my $install_handlers = sub {
+        $self->term->Attribs->{catch_signals} = 1;
+
+        $SIG{WINCH} = $winch_handler;
+        $SIG{CONT} = $cont_handler;
+        $SIG{HUP}
+            = $SIG{INT}
+            = $SIG{QUIT}
+            = $SIG{ALRM}
+            #= $SIG{STOP}
+            = $SIG{TERM}
+            = $SIG{TTIN}
+            = $SIG{TTOU}
+            = $SIG{TSTP}
+                = $generic_handler;
+
+    };
+
+    $install_handlers->();
+
+    # Post-signal hook, called by ReadLine.
+    #
+    # Abort the current input line, except when the
+    # WINCH signal was received.
+    #
+    $self->term->Attribs->{signal_event_hook} = sub {
+        return 1 if $last_signal eq 'WINCH'; # Nothing on WINCH.
+
+        # Move to a new line and clear input buffer.
+        $self->term->crlf();
+        $self->term->Attribs->{line_buffer} = '';
+        $self->term->forced_update_display();
+
+        $install_handlers->(); # Re-install handlers, if necessary.
+        $self->term->reset_after_signal();
+        return 1;
     };
 
     return %old_sig;
 }
+
 
 # See POD X<readline>
 sub readline {
@@ -401,7 +469,7 @@ Term::CLI - CLI interpreter based on Term::ReadLine
 
 =head1 VERSION
 
-version 0.04004
+version 0.051002
 
 =head1 SYNOPSIS
 
@@ -445,7 +513,7 @@ version 0.04004
  # $cli will now recognise things like: 'copy --verbose a b'
 
  while ( my $input = $cli->readline(skip => qr/^\s*(?:#.*)?$/) ) {
-    $cli->execute(@input);
+    $cli->execute($input);
  }
 
 =head1 DESCRIPTION
@@ -745,19 +813,19 @@ Examples:
     $line = $cli->readline( skip => qr{^\s*(?:#.*)?$} );
     exit if !defined $line;
 
-=item B<execute> ( I<Str>, [ I<ArrayRef[Str]> ] )
+=item B<execute> ( I<Str> )
 X<execute>
 
-Parse and execute the command line consisting of I<Str>s
+Parse and execute the command line consisting of I<Str>
 (see the return value of L<readline|/readline> above).
 
-The first I<Str> should be the original command line string.
-
-By default, C<execute> will split the command line into words using
-L<Text::ParseWords::parse_line|Text::ParseWords/parse_line>, and then
-parse and execute the result accordingly.
-If L<parse_line|Text::ParseWords/parse_line> fails, then a parse error
-is generated.
+The command line is split into words using
+the L<split_function|/split_function>.
+If that succeeds, then the resulting list of words is
+parsed and executed, otherwise a parse error is generated
+(i.e. the object's L<callback|Term::CLI::Role::CommandSet/callback>
+function is called with a C<status> of C<-1> and a suitable C<error>
+field).
 
 For specifying a custom word splitting method, see
 L<split_function|/split_function>.
@@ -832,12 +900,19 @@ be fed back up the parse tree (and eventually to the caller).
 
 =head1 SIGNAL HANDLING
 
-In case of C<INT>, C<HUP>, C<TERM>, or C<TSTP> signals, the current input
-line is always discarded.
+The C<Term::CLI> object sets its own signal handlers in the L<readline|/readline>
+function.
 
-If the application has not set its own handlers, the L<readline|/readline>
-method will set signal handlers for the C<INT> and C<QUIT> signals in such
-a way that they do not cause the application to terminate.
+The signal handlers will ensure the terminal is in a sane state.
+
+
+The following signal handlers discard the the current input line, restore
+any previous signal handler, and re-throw the signal:
+C<HUP>, C<INT>, C<QUIT>, C<ALRM>, C<TERM>, C<TTIN>, C<TTOU>, C<TSTP>.
+
+The C<CONT> and C<WINCH> signals are treated slightly different: they don't
+re-throw the signal, but rather just call any previous signal handler. The
+C<WINCH> signal handler will not discard the input line.
 
 It also makes sure that after a keyboard suspend (C<TSTP>) and
 subsequent continue (C<CONT>), the command prompt is redrawn:

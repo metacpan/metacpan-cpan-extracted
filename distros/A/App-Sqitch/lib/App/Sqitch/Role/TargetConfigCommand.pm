@@ -9,6 +9,7 @@ use App::Sqitch::Types qw(HashRef);
 use App::Sqitch::X qw(hurl);
 use Path::Class;
 use Try::Tiny;
+use URI::db;
 use Locale::TextDomain qw(App-Sqitch);
 use List::Util qw(first);
 use File::Path qw(make_path);
@@ -508,7 +509,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 License
 
-Copyright (c) 2012-2015 iovation Inc.
+Copyright (c) 2012-2018 iovation Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

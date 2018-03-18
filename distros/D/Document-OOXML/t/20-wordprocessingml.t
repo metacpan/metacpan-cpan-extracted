@@ -1,4 +1,6 @@
 use utf8;
+use warnings;
+use strict;
 use Test::More;
 
 use Document::OOXML;
@@ -185,6 +187,142 @@ EOX
             "This word contains several wordial words we're word looking for.",
             'Manually replaced text works',
         );
+    }
+}
+
+# Style text nodes
+{
+    my $xml = <<'EOX';
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://purl.oclc.org/ooxml/wordprocessingml/main" w:conformance="strict">
+    <w:body>
+        <w:p>
+            <w:pPr>
+                <w:rPr>
+                    <w:lang w:val="en-US"/>
+                </w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:t xml:space="preserve">This part contains several partial words we're part looking for.</w:t>
+            </w:r>
+        </w:p>
+    </w:body>
+</w:document>
+EOX
+
+    my $part = Document::OOXML::Part::WordprocessingML->new_from_xml(
+        '/word/document.xml',
+        $xml,
+        1,
+    );
+
+    $part->style_text(qr/part(?:ial)?/, bold => 1);
+    $part->style_text(qr/This/, italic => 1);
+    $part->style_text(qr/looking/, color => 'ABCDEF');
+    $part->style_text(
+        qr/contains/,
+        underline_style => 'dotDash',
+        underline_color => 'ABCDEF',
+    );
+    $part->style_text(
+        qr/several/,
+        underline_style => 'wave'
+    );
+
+    my @txt = $part->xpc->findnodes('//w:t', $part->xml);
+    is(@txt, 14, "Text nodes were split correctly for styling");
+
+    my @runs = $part->xpc->findnodes('//w:r', $part->xml);
+    {
+        my ($b) = $part->xpc->findnodes('./w:rPr/w:b', $runs[2]);
+        ok($b, "w:b element found in the run properties");
+
+        ($b) = $part->xpc->findnodes('./w:rPr/w:b', $runs[8]);
+        ok($b, "w:b element found in the run properties");
+
+        ($b) = $part->xpc->findnodes('./w:rPr/w:b', $runs[10]);
+        ok($b, "w:b element found in the run properties");
+    }
+    {
+        my ($i) = $part->xpc->findnodes('./w:rPr/w:i', $runs[0]);
+        ok($i, "w:i element found in the run properties");
+    }
+    {
+        my ($col) = $part->xpc->findnodes('./w:rPr/w:color', $runs[12]);
+        ok($col, "w:color element found in the run properties");
+
+        my $color_value = $col->getAttributeNS($col->namespaceURI, 'val');
+        is($color_value, 'ABCDEF', 'Correct w:val attribute found in w:color element');
+    }
+    {
+        #        my ($u) = $part->xpc->findnodes('./w:rPr/w:u', $runs[4]);
+        my ($u) = $part->xpc->findnodes('./w:rPr/w:u', $runs[4]);
+        ok($u, "w:u element found in the run properties");
+        is($u->getAttributeNS($u->namespaceURI => 'val'), 'dotDash', 'Second underline type is dotDash');
+        is($u->getAttributeNS($u->namespaceURI => 'color'), 'ABCDEF', 'Second underline has color ABCDEF');
+
+        ($u) = $part->xpc->findnodes('./w:rPr/w:u', $runs[6]);
+        ok($u, "w:u element found in the run properties");
+        is($u->getAttributeNS($u->namespaceURI => 'val'), 'wave', 'Second underline type is wave');
+        is($u->getAttributeNS($u->namespaceURI => 'color'), undef, 'Second underline has no color');
+    }
+}
+
+{
+    my $xml = <<'EOX';
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://purl.oclc.org/ooxml/wordprocessingml/main" w:conformance="strict">
+    <w:body>
+        <w:p>
+            <w:pPr>
+                <w:rPr>
+                    <w:lang w:val="en-US"/>
+                </w:rPr>
+            </w:pPr>
+            <w:r>
+                <w:rPr>
+                    <w:color w:themeColor="text1"/>
+                </w:rPr>
+                <w:t>Already styled with a theme color.</w:t>
+            </w:r>
+        </w:p>
+    </w:body>
+</w:document>
+EOX
+
+    my $part = Document::OOXML::Part::WordprocessingML->new_from_xml(
+        '/word/document.xml',
+        $xml,
+        1,
+    );
+
+    $part->style_text(
+        qr/Already styled/,
+        color => 'FF0000'
+    );
+
+    my @txt = $part->xpc->findnodes('//w:t', $part->xml);
+    is(@txt, 2, "Text nodes were split correctly for styling");
+
+    my @runs = $part->xpc->findnodes('//w:r', $part->xml);
+    {
+        my ($col) = $part->xpc->findnodes('./w:rPr/w:color', $runs[0]);
+        ok($col, "w:color element found in the run properties");
+
+        my $color_value = $col->getAttributeNS($col->namespaceURI, 'val');
+        my $theme_value = $col->getAttributeNS($col->namespaceURI, 'themeColor');
+
+        is($color_value, 'FF0000', 'New run has "val" attribute set correctly');
+        is($theme_value, undef, 'New run has no "themeColor" attribute');
+
+        ($col) = $part->xpc->findnodes('./w:rPr/w:color', $runs[1]);
+        ok($col, "w:color element found in the run properties");
+
+        $color_value = $col->getAttributeNS($col->namespaceURI, 'val');
+        $theme_value = $col->getAttributeNS($col->namespaceURI, 'themeColor');
+
+        is($color_value, undef, 'Original run has no "val" attribute for color');
+        is($theme_value, 'text1', 'Original run has "themeColor" attribute set correctly');
     }
 }
 

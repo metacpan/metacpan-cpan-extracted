@@ -1,10 +1,10 @@
 {
-   "abstract" : "Add a finger protocol interface to your PlugAuth server",
+   "abstract" : "(Deprecated) Add a finger protocol interface to your PlugAuth server",
    "author" : [
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,9 +21,6 @@
          }
       },
       "develop" : {
-         "recommends" : {
-            "YAML::XS" : "0"
-         },
          "requires" : {
             "File::Spec" : "0",
             "FindBin" : "0",
@@ -62,7 +59,7 @@
          "requires" : {
             "AE" : "0",
             "EV" : "0",
-            "Test::Clustericious::Cluster" : "0",
+            "Test::Clustericious::Cluster" : "0.31",
             "Test::More" : "0.94",
             "perl" : "5.010001"
          }
@@ -73,13 +70,16 @@
       "bugtracker" : {
          "web" : "https://github.com/clustericious/PlugAuth-Plugin-Finger/issues"
       },
-      "homepage" : "http://perl.wdlabs.com/PlugAuth-Plugin-Finger",
+      "homepage" : "https://metacpan.org/pod/PlugAuth::Plugin::Finger",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/clustericious/PlugAuth-Plugin-Finger.git",
          "web" : "https://github.com/clustericious/PlugAuth-Plugin-Finger"
       }
    },
-   "version" : "0.02"
+   "version" : "0.03",
+   "x_deprecated" : 1,
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01",
+   "x_use_unsafe_inc" : 0
 }
 

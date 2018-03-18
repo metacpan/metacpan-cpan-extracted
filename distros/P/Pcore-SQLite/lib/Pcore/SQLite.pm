@@ -1,4 +1,4 @@
-package Pcore::SQLite v0.10.0;
+package Pcore::SQLite v0.10.3;
 
 use Pcore -dist;
 

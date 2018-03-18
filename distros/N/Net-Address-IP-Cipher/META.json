@@ -1,0 +1,52 @@
+{
+   "abstract" : "IPv6 / IPv4 address encryption to a valid address, for pseudo anonymization.",
+   "author" : [
+      "Hugo Salgado <hsalgado@vulcano.cl>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Address-IP-Cipher",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::Cipher::AES" : "0",
+            "Crypt::PBKDF2" : "0",
+            "MIME::Base64" : "0",
+            "Net::IP" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/huguei/p5-Net-Address-IP-Cipher.git",
+         "web" : "https://github.com/huguei/p5-Net-Address-IP-Cipher"
+      }
+   },
+   "version" : "0.2"
+}

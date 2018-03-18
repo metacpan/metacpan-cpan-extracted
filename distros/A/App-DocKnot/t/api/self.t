@@ -2,10 +2,9 @@
 #
 # Test generated files against the files included in the package.
 #
-# Written by Russ Allbery <rra@cpan.org>
 # Copyright 2016 Russ Allbery <rra@cpan.org>
 #
-# See LICENSE for licensing terms.
+# SPDX-License-Identifier: MIT
 
 use 5.018;
 use autodie;

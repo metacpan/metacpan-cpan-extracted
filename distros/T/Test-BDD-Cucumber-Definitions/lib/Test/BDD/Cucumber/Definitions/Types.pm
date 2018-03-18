@@ -3,9 +3,11 @@ package Test::BDD::Cucumber::Definitions::Types;
 use strict;
 use warnings;
 
+use DDP ( show_unicode => 1 );
 use MooseX::Types::Common::String qw(NonEmptyStr);
 use MooseX::Types::Moose qw(Int Str RegexpRef);
 use Test::BDD::Cucumber::Definitions qw(S);
+use Test::More;
 use Try::Tiny;
 
 use MooseX::Types (
@@ -19,7 +21,30 @@ use MooseX::Types (
     ]
 );
 
-our $VERSION = '0.21';
+our $VERSION = '0.26';
+
+# Interpolation of variables (scenario and environment)
+sub _interpolate {
+    my ($value) = @_;
+
+    my $orig = $value;
+
+    # Scenario variables
+    my $is = $value =~ s/ S\{ (.+?) \} /
+        S->{var}->{scenario}->{vars}->{$1} || '';
+     /gxe;
+
+    # Environment variables
+    my $ie = $value =~ s/ \$\{ (.+?) \} /
+        $ENV{$1} || '';
+    /gxe;
+
+    if ( $is || $ie ) {
+        diag( sprintf( q{Inteprolated value "%s" = %s}, $orig, np $value) );
+    }
+
+    return $value;
+}
 
 # TbcdInt
 subtype(
@@ -28,6 +53,12 @@ subtype(
     message {
         qq{"$_" is not a valid TBCD Int}
     }
+);
+
+coerce(
+    TbcdInt,
+    from Str,
+    via { _interpolate $_}
 );
 
 # TbcdStr
@@ -42,13 +73,7 @@ subtype(
 coerce(
     TbcdStr,
     from Str,
-    via {
-        my $value = $_;
-
-        $value =~ s/S\{ (.+?) \}/S->{var}->{scenario}->{vars}->{$1} || ''/gxe;
-
-        return $value;
-    }
+    via { _interpolate $_}
 );
 
 # TbcdNonEmptyStr
@@ -63,13 +88,7 @@ subtype(
 coerce(
     TbcdNonEmptyStr,
     from NonEmptyStr,
-    via {
-        my $value = $_;
-
-        $value =~ s/S\{ (.+?) \}/S->{var}->{scenario}->{vars}->{$1} || ''/gxe;
-
-        return $value;
-    }
+    via { _interpolate $_}
 );
 
 # TbcdRegexpRef
@@ -85,7 +104,7 @@ coerce(
     TbcdRegexpRef,
     from Str,
     via {
-        my $value = $_;
+        my $value = _interpolate $_;
 
         try {
             qr/$value/;    ## no critic [RegularExpressions::RequireExtendedFormatting]

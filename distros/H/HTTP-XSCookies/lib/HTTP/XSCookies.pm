@@ -6,7 +6,7 @@ use warnings;
 use XSLoader;
 use parent 'Exporter';
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000021';
 XSLoader::load( 'HTTP::XSCookies', $VERSION );
 
 our @EXPORT_OK = qw[bake_cookie crush_cookie];
@@ -25,7 +25,7 @@ HTTP::XSCookies - Fast XS cookie mangling for Perl
 
 =head1 VERSION
 
-Version 0.000019
+Version 0.000021
 
 =head1 SYNOPSIS
 

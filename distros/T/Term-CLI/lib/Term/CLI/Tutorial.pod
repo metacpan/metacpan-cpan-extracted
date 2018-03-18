@@ -1,4 +1,4 @@
-#===============================================================================
+#============================================================================
 #
 #       Module:  Term::CLI::Tutorial
 #
@@ -14,7 +14,7 @@
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
-#===============================================================================
+#============================================================================
 
 =head1 NAME
 
@@ -22,7 +22,7 @@ Term::CLI::Tutorial - tips, tricks, and examples for Term::CLI
 
 =head1 VERSION
 
-version 0.04004
+version 0.051002
 
 =head1 SYNOPSIS
 
@@ -109,6 +109,18 @@ A silly command for illustration purposes.
 =item B<sleep> I<seconds>
 
 Sleep for I<seconds> seconds.
+
+=item B<show> {B<clock>|B<load>|B<terminal>}
+
+Show some system information.
+
+=item B<set> B<verbose> I<bool>
+
+Set program verbosity.
+
+=item B<set> B<delimiter> I<bool>
+
+Set word delimiter(s).
 
 =item B<do> {B<something>|B<nothing>} B<while> {B<working>|B<sleeping>}
 
@@ -362,6 +374,7 @@ we default to C<0>.
 The C<arguments> attribute is an ArrayRef made up of L<Term::CLI::Argument>
 instances, or more precisely, object classes derived from that. At this
 moment, we have a number of pre-defined sub-classes:
+L<Term::CLI::Argument::Bool>,
 L<Term::CLI::Argument::Enum>,
 L<Term::CLI::Argument::Number::Float>.
 L<Term::CLI::Argument::Number::Int>,
@@ -580,7 +593,7 @@ same prefix (C<e>), so let's see what happens with the abbreviations:
 
     [Welcome to BSSH]
     bssh> e hello, world
-    ERROR: ambiguous command 'e' (matches: echo exit)
+    ERROR: ambiguous command 'e' (matches: echo, exit)
     bssh> ec hello, world
     hello, world
     bssh> ex
@@ -630,7 +643,7 @@ fail because C<n> is ambiguous:
     bssh> m m l
     making money later
     bssh> m l n
-    ERROR: arg#2, 'n': ambiguous value (matches: now never) for when
+    ERROR: arg#2, 'n': ambiguous value (matches: never, now) for 'when'
 
 =head3 Command and parameter completion
 
@@ -670,7 +683,7 @@ The code for this:
 
 Output should look like:
 
-    bash$ perl tutorial/example_07.pl
+    bash$ perl tutorial/example_09_ls_command.pl
 
     [Welcome to BSSH]
     bssh> ls
@@ -862,7 +875,7 @@ See it in action:
 You may have noticed that so far, we've only added commands with arguments.
 But what if we want to implement something like:
 
-S<    >B<show> { B<load>|B<clock> }
+S<    >B<show> { B<load>|B<clock>|B<terminal> }
 
 Well, as it turns out, L<Term::CLI::Command|Term::CLI::Command>(3p) can handle
 that as well: instead of specifying C<arguments> in the constructor, you can
@@ -900,6 +913,19 @@ The code for the C<show> command looks almost trivial:
                     return %args;
                 },
             ),
+            Term::CLI::Command->new( name => 'terminal',
+                summary => 'show terminal information',
+                description => 'Show terminal information.',
+                callback => sub {
+                    my ($self, %args) = @_;
+                    return %args if $args{status} < 0;
+                    my ($rows, $cols)
+                        = $self->root_node->term->get_screen_size;
+                    say "type $ENV{TERM}; rows $rows; columns $cols";
+                    $args{status} = 0;
+                    return %args;
+                },
+            ),
         ],
     );
 
@@ -910,21 +936,120 @@ Adding this to our ever-growing C<bssh> code, we get:
     [Welcome to BSSH]
     bssh> help show
       Usage:
-        show {clock|load}
+        show {clock|load|terminal}
 
       Description:
         Show some system-related information, such as the system clock or load
         average.
 
       Sub-Commands:
-        show clock                                   show system time
-        show load                                    show system load
+        show clock               show system time
+        show load                show system load
+        show terminal            show terminal information
     bssh> show clock
     Wed Feb 21 14:21:56 2018
     bssh> show load
      14:21:59 up 1 day, 15:30,  1 user,  load average: 0.19, 0.33, 0.40
+    bssh> show terminal
+    type gnome-256color; rows 25; columns 80
     bssh> ^D
     -- exit: 0
+
+=head2 The C<set> command
+
+The specification says:
+
+S<    >B<set> B<verbose> I<bool>
+
+S<    >B<set> B<delimiters> I<string>
+
+Code:
+
+    push @commands, Term::CLI::Command->new(
+        name => 'set',
+        summary => 'set CLI parameters',
+        description => 'Set various CLI parameters.',
+        commands => [
+            Term::CLI::Command->new(
+                name => 'delimiters',
+                summary => 'set word delimiter(s)',
+                description =>
+                    'Set the word delimiter(s) to I<string>.',
+                arguments => [
+                    Term::CLI::Argument::String->new(name => 'string')
+                ],
+                callback => sub {
+                    my ($self, %args) = @_;
+                    return %args if $args{status} < 0;
+                    my $delimiters = $args{arguments}->[0];
+                    $self->root_node->word_delimiters($delimiters);
+                    say "Delimiters set to [$delimiters]";
+                    return %args;
+                }
+            ),
+            Term::CLI::Command->new(
+                name => 'verbose',
+                summary => 'set verbose flag',
+                description =>
+                    'Set the verbose flag for the program.',
+                arguments => [
+                    Term::CLI::Argument::Bool->new(name => 'bool',
+                        true_values  => [qw( 1 true on yes ok )],
+                        false_values => [qw( 1 false off no never )],
+                    )
+
+                ],
+                callback => sub {
+                    my ($self, %args) = @_;
+                    return %args if $args{status} < 0;
+                    my $bool = $args{arguments}->[0];
+                    say "Setting verbose to $bool";
+                    return %args;
+                }
+            ),
+        ],
+    );
+
+This shows the use of L<Term::CLI::Argument::Bool> (C<set verbose>), and
+the use of alternative delimiters (C<set delimiters>).
+
+Results for C<set verbose>:
+
+    bash$ perl tutorial/example_13_set_command.pl
+
+    [Welcome to BSSH]
+    bssh> help set
+      Usage:
+        set {delimiters|verbose}
+    
+      Description:
+        Set various CLI parameters.
+    
+      Sub-Commands:
+        set delimiters string    set word delimiter(s)
+        set verbose bool         set verbose flag
+    bssh> set verbose o
+    ERROR: arg#1, 'o': ambiguous boolean value (matches [on, ok]
+    and [off]) for 'bool'
+    bssh> set verbose t
+    Setting verbose to 1
+
+Results for C<set delimiters>:
+
+    bash$ perl tutorial/example_13_set_command.pl
+
+    [Welcome to BSSH]
+    bssh> set delim ';,'
+    Delimiters set to [;,]
+    bssh> show clock
+    ERROR: unknown command 'show clock'
+    bssh> show;clock
+    Wed Mar 14 23:44:49 2018
+    bssh> make;love,now
+    making love now
+    bssh> exit;0
+    -- exit: 0
+
 
 =head2 Combining arguments and sub-commands
 
@@ -1023,7 +1148,7 @@ Code:
 
 With the above two additions, we have:
 
-    bash$ perl tutorial/example_13_sub_cmd_and_args.pl
+    bash$ perl tutorial/example_14_sub_cmd_and_args.pl
 
     [Welcome to BSSH]
     bssh> help
@@ -1036,6 +1161,7 @@ With the above two additions, we have:
         interface iface {up|down}                    turn iface up or down
         ls arg ...                                   list file(s)
         make target when                             make target at time when
+        set {delimiters|verbose}                     set CLI parameters
         show {clock|load}                            show system properties
         sleep time                                   sleep for time seconds
     bssh> do something wh s
@@ -1075,11 +1201,11 @@ Here, we basically added a C<debug> command that takes any other command
 structure as a sub-command and, after the sub-command has executed,
 will print some status information.
 
-    bash$ perl tutorial/example_10.pl
+    bash$ perl tutorial/example_15_debug_command.pl
 
     [Welcome to BSSH]
     bssh> debug <TAB><TAB>
-    cp     echo   exit   ls     make   show   sleep
+    cp     echo   exit   ls     make   set    show   sleep
     bssh> debug echo hi
     hi
     # --- DEBUG ---
@@ -1103,7 +1229,7 @@ will print some status information.
 Note the addition of the static C<usage> line, because the autogenerated
 usage line is too long (it lists every possible sub-command):
 
-    bash$ perl tutorial/example_14_debug_command.pl
+    bash$ perl tutorial/example_15_debug_command.pl
 
     [Welcome to BSSH]
     bssh> help
@@ -1127,6 +1253,7 @@ usage line is too long (it lists every possible sub-command):
         debug interface iface {down|up}              Turn iface up or down
         debug ls arg ...                             list file(s)
         debug make target when                       make target at time when
+        debug set {delimiters|verbose}               set CLI parameters
         debug show {clock|load}                      show system properties
         debug sleep time                             sleep for time seconds
 
@@ -1214,7 +1341,7 @@ specific C<--timezone> option to the C<clock> sub-command.
 
 The following commands should be allowed now:
 
-    bash$ perl tutorial/example_15_options.pl
+    bash$ perl tutorial/example_16_options.pl
     
     [Welcome to BSSH]
     bssh> help show clock
@@ -1422,6 +1549,7 @@ L<Term::CLI::Intro>(3p).
 L<Getopt::Long>(3p),
 L<Term::CLI>(3p),
 L<Term::CLI::Argument>(3p),
+L<Term::CLI::Argument::Bool>(3p),
 L<Term::CLI::Argument::Enum>(3p),
 L<Term::CLI::Argument::FileName>(3p),
 L<Term::CLI::Argument::Number>(3p),
@@ -1454,7 +1582,7 @@ and command history.
 The full-blown L<Term::CLI> implementation with all of the
 features of F<tutorial/readline_cli.pl>, adding all the goodness.
 
-=item F<tutorial/example_01.pl> ... F<tutorial/example_12.pl>
+=item F<tutorial/example_01.pl> ... F<tutorial/example_16.pl>
 
 The tutorial code.
 

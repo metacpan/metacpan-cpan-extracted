@@ -14,15 +14,16 @@ use Encode;
 use IO::Socket::SSL;
 use base qw/Mailru::Cloud::Auth/;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $BUFF_SIZE = 512;
 
 sub uploadFile {
-    my ($self, %opt) = @_;
-    my $upload_file = $opt{'-file'} || croak "You must specify -file param for method uploadFile";
-    my $path        = $opt{'-path'} || '/';
-    my $rename      = $opt{'-rename'};
+    my ($self, %opt)    = @_;
+    my $upload_file     = $opt{'-file'} || croak "You must specify -file param for method uploadFile";
+    my $path            = $opt{'-path'} || '/';
+    my $rename          = $opt{'-rename'};
+    $self->{file_hash}  = undef;
 
     $self->__isLogin();
 
@@ -39,6 +40,7 @@ sub uploadFile {
     my $request = 'https://cloclo18-upload.cloud.mail.ru/upload/?' .'cloud_domain=2&x-email=' . uri_escape($self->{email});
 
     my ($file_hash, $size) = $self->__upload_file($request, $upload_file) or return;
+    $self->{file_hash} = $file_hash;
     
     #Опубликуем файл
     my %param = (
@@ -172,47 +174,33 @@ sub emptyTrash {
 sub listFiles {
     my ($self, %opt)    = @_;
     my $path            = $opt{-path} || '/';
-    my $orig_path = $path;
+    my $orig_path       = $path;
 
     $self->__isLogin();
-
-    if ($path eq '/') {
-        $path  = 'home';
-    }
-    else {
-        $path =~ s/^\///g;
-        $path = 'home/' . uri_escape($path);
-    }
-
-    my $res = $self->{ua}->get('https://cloud.mail.ru/' . $path);
+    $path = uri_escape($path);
+    my $res = $self->{ua}->get('https://cloud.mail.ru/api/v2/folder' . '?token=' . $self->{authToken} . '&home=' . $path);
     my $code = $res->code;
     if ($res->is_success) {
-        if ($res->content =~ /cloudBuilder.+?(\{\s+?"tree":.+\}).+pageContentLoader\.showContent\(\);/s) {
-            my $json_parsed = decode_json($1);
-            my @list_files;
-            # Если папка не существует
-            if (eval {$json_parsed->{folder}->{home}->{error} eq 'not_exists'}) {
-                croak "Folder $orig_path not exists";
+        my $json_parsed = decode_json($res->content);
+        my @list_files;
+        
+        for my $item (@{$json_parsed->{body}->{list}}) {
+            my $h = {
+                                'type'      => $item->{type},
+                                'name'      => $item->{name},
+                                'size'      => $item->{size},
+                            };
+            if ($item->{weblink}) {
+                $h->{weblink} = 'https://cloud.mail.ru/public/' . $item->{weblink};
             }
-
-            for my $item (@{$json_parsed->{folder}->{list}}) {
-                my $h = {
-                                    'type'      => $item->{type},
-                                    'name'      => $item->{name},
-                                    'size'      => $item->{size},
-                                };
-                if ($item->{weblink}) {
-                    $h->{weblink} = 'https://cloud.mail.ru/public/' . $item->{weblink};
-                }
-                push @list_files, $h;
-            }
-            return \@list_files;
+            push @list_files, $h;
         }
-        else {
-            croak "Cant get info about -path $path. Can't execute regexp";
-        }
+        return \@list_files;
     }
-    croak "Cant get file list for path: $path. Code: $code"; 
+    if ($code eq '404') {
+        croak "Folder $orig_path not exists";
+    }
+    croak "Cant get file list for path: $orig_path. Code: $code"; 
 }
 
 sub shareResource {
@@ -318,6 +306,12 @@ sub __upload_file {
     return;
 }
 
+################################## ACCESSORS ##########################3
+#
+sub get_last_uploaded_file_hash {
+    return $_[0]->{file_hash};
+}
+
 1;
 
 __END__
@@ -330,7 +324,7 @@ __END__
 B<Mailru::Cloud> - Simple REST API cloud mail.ru client
 
 =head1 VERSION
-    version 0.01
+    version 0.02
 
 =head1 SYNOPSYS
     
@@ -364,18 +358,30 @@ Login on cloud.mail.ru server.Return csrf token if success. Die on error
         -login          => login form cloud.mail.ru
         -password       => password from cloud.mail.ru
 
+=head2 info()
+
+Return hashref to info with keys: used_space, total_space, file_size_limit
+    
+    my $info = $cloud->info() || die "Can't get info";
+    print "Used_space: $info->{used_space}\nTotal space: $info->{total_space}\nFile size limit: $info->{file_size_limit}\n";
+
+
 =head2 uploadFile(%opt)
 
-Upload local file to cloud. Return full file name on cloud if success. Die on error 
+Upload local file to cloud. Return full file name on cloud if success. Die on error
+
     my $uploaded_name = $cloud->uploadFile(-file => 'Temp.png');
     Options:
         -file           => Path to local file
         -path           => Folder on cloud
         -rename         => Rename file if exists (default: overwrite exists file)
+    Get Mailru cloud hash of uploaded file
+    my $hash = $cloud->get_last_uploaded_file_hash() || die "Can't get file hash";
 
 =head2 downloadFile(%opt)
 
 Download file from cloud.mail.ru to local file. Method overwrites local file if exists. Return full file name on local disk if success. Die if error
+
     my $local_file = $cloud->downloadFile(-cloud_file => '/Temp/test', -file => 'test');
     Options:
         -cloud_file     => Path to file on cloud.mail.ru
@@ -384,6 +390,7 @@ Download file from cloud.mail.ru to local file. Method overwrites local file if 
 =head2 createFolder(%opt)
 
 Create recursive folder on cloud.mail.ru. Return 1 if success, undef if folder exists. Die on error
+
     $cloud->creteFolder(-folder => '/Temp/test');
     Options:
         -folder     => Path to folder on cloud
@@ -391,6 +398,7 @@ Create recursive folder on cloud.mail.ru. Return 1 if success, undef if folder e
 =head2 deleteResource(%opt)
 
 Delete file/folder from cloud.mail.ru. Resource moved to trash. To delete run emptyTrash() method. Return 1 if success. Die on error
+
     $cloud->deleteResource(-path => '/Temp/test.txt');      #Delete file '/Temp/test.txt' from cloud
     Options:
         -path       => Path to delete resource
@@ -398,11 +406,13 @@ Delete file/folder from cloud.mail.ru. Resource moved to trash. To delete run em
 =head2 emptyTrash()
 
 Empty trash on cloud.mail.ru. Return 1 if success. Die on error
+
     $cloud->emptyTrash();
 
 =head2 listFiles(%opt)
 
 Return struct (arrayref) of files and folders. Die on error
+
     my $list = $cloud->listFiles(-path => '/');              #Get list files and folder in path '/'
     Options:
         -path       => Path to get file list (default: '/')
@@ -419,6 +429,7 @@ Return struct (arrayref) of files and folders. Die on error
 =head2 shareResource(%opt)
 
 Share resource for all. Return weblink if success. Die if error
+
     my $link = $cloud->shareResource(-path  => '/Temp/');           Share folder /Temp
     Options:
         -path       => Path to shared resource
@@ -440,7 +451,7 @@ Pavel Andryushin <vrag867@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Pavel Andryushin.
+This software is copyright (c) 2018 by Pavel Andryushin.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

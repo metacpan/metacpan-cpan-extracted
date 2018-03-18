@@ -1,4 +1,4 @@
-#===============================================================================
+#=============================================================================
 #
 #       Module:  Term::CLI::Intro
 #
@@ -14,25 +14,42 @@
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
-#===============================================================================
+#=============================================================================
 
 =head1 NAME
 
-Term::CLI::Intro - introduction to Term::CLI class structure
+Term::CLI::Intro - introduction to Term::CLI class/module structure
 
 =head1 VERSION
 
-version 0.04004
+version 0.051002
 
 =head1 DESCRIPTION
 
-This manual entry provides information on the class structure of
-the L<Term::CLI> classes.
+This manual entry provides information on the class and module
+structure of the L<Term::CLI> library.
 
 For an introduction in the usage of this library, including code
 examples, see L<Term::CLI::Tutorial>(3p).
 
-=head1 CLASS SUMMARY
+=head1 MODULE SUMMARY
+
+=head2 Language Modules
+
+=over 36
+
+=item L<Term::CLI::L10N>
+
+Localizations for L<Term::CLI> diagnostics. Defines and exports a
+L<loc|Term::CLI::L10N/loc> function. Based on L<Locale::Maketext>(3p).
+
+=item L<Term::CLI::L10N::en>
+
+=item L<Term::CLI::L10N::nl>
+
+English and Dutch language localizations, resp.
+
+=back
 
 =head2 Classes
 
@@ -139,17 +156,19 @@ I<Y> inherits from I<X>
                 |
                 +--> Term::CLI::Argument
                         |
-                        +--> Term::CLI::Argument::String
-                        |
-                        +--> Term::CLI::Argument::Filename
+                        +--> Term::CLI::Argument::Bool
                         |
                         +--> Term::CLI::Argument::Enum
                         |
+                        +--> Term::CLI::Argument::Filename
+                        |
                         +--> Term::CLI::Argument::Number
-                                |
-                                +--> Term::CLI::Argument::Number::Int
-                                |
-                                +--> Term::CLI::Argument::Number::Float
+                        |       |
+                        |       +--> Term::CLI::Argument::Number::Int
+                        |       |
+                        |       +--> Term::CLI::Argument::Number::Float
+                        |
+                        +--> Term::CLI::Argument::String
 
 =head2 Roles
 
@@ -204,6 +223,7 @@ L<Term::CLI::Tutorial>(3p).
 
 L<Term::CLI>(3p),
 L<Term::CLI::Argument>(3p),
+L<Term::CLI::Argument::Bool>(3p),
 L<Term::CLI::Argument::Enum>(3p),
 L<Term::CLI::Argument::FileName>(3p),
 L<Term::CLI::Argument::Number>(3p),
@@ -211,6 +231,9 @@ L<Term::CLI::Argument::Number::Float>(3p),
 L<Term::CLI::Argument::Number::Int>(3p),
 L<Term::CLI::Argument::String>(3p),
 L<Term::CLI::Command>(3p),
+L<Term::CLI::L10N>(3p),
+L<Term::CLI::L10N::en>(3p),
+L<Term::CLI::L10N::nl>(3p),
 L<Term::CLI::Role::CommandSet>(3p),
 L<Term::CLI::Role::ArgumentSet>(3p),
 L<Term::ReadLine>(3p).

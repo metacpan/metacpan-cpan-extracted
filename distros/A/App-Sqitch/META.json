@@ -1,10 +1,10 @@
 {
    "abstract" : "Sane database change management",
    "author" : [
-      "David E. Wheeler <david@justatheory.com>"
+      "\"iovation Inc.\""
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "mit"
    ],
@@ -144,6 +144,6 @@
          "url" : "http://github.com/theory/sqitch/"
       }
    },
-   "version" : "0.9996"
+   "version" : "0.9997"
 }
 
