@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy::API;
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 # ABSTRACT: An OpenAPI REST controller for the Yancy editor
 
 #pod =head1 DESCRIPTION
@@ -77,9 +77,12 @@ sub list_items {
         $filter{ $key } = { -like => $value };
     }
 
+    my $res = $c->yancy->backend->list( $c->stash( 'collection' ), \%filter, \%opt );
+    _delete_null_values( @{ $res->{items} } );
+
     return $c->render(
         status => 200,
-        openapi => $c->yancy->backend->list( $c->stash( 'collection' ), \%filter, \%opt ),
+        openapi => $res,
     );
 }
 
@@ -115,7 +118,7 @@ sub get_item {
     my $id = $args->{ $c->stash( 'id_field' ) };
     return $c->render(
         status => 200,
-        openapi => $c->yancy->backend->get( $c->stash( 'collection' ), $id ),
+        openapi => _delete_null_values( $c->yancy->backend->get( $c->stash( 'collection' ), $id ) ),
     );
 }
 
@@ -137,7 +140,7 @@ sub set_item {
     $c->yancy->backend->set( $coll, $id, $item );
     return $c->render(
         status => 200,
-        openapi => $c->yancy->backend->get( $coll, $id ),
+        openapi => _delete_null_values( $c->yancy->backend->get( $coll, $id ) ),
     );
 }
 
@@ -158,6 +161,24 @@ sub delete_item {
     return $c->rendered( 204 );
 }
 
+#=sub _delete_null_values
+#
+#   _delete_null_values( @items );
+#
+# Remove all the keys with a value of C<undef> from the given items.
+# This prevents the user from having to explicitly declare fields that
+# can be C<null> as C<< [ 'string', 'null' ] >>. Since this validation
+# really only happens when a response is generated, it can be very
+# confusing to understand what the problem is
+sub _delete_null_values {
+    for my $item ( @_ ) {
+        for my $key ( grep { !defined $item->{ $_ } } keys %$item ) {
+            delete $item->{ $key };
+        }
+    }
+    return @_;
+}
+
 1;
 
 __END__
@@ -170,7 +191,7 @@ Yancy::Controller::Yancy::API - An OpenAPI REST controller for the Yancy editor
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 DESCRIPTION
 

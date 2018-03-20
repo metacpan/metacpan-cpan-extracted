@@ -33,7 +33,7 @@ close $fh;
 &$unlink( $temp, 'chown fail' ) if @pw && ! chown @pw[2,3], $temp;
 
 &$unlink( $temp, 'md5 nomatch' ) if $md5 ne $conf->{md5};
-&$unlink( $temp, 'rename fail' ) unless rename $temp, $path;
+&$unlink( $temp, 'rename fail' ) if system "mv '$temp' '$path'";
 
 print "ok\n";
 exit 0;

@@ -1,0 +1,38 @@
+Mojolicious::Plugin::AutoReload
+
+This plugin automatically reloades the page when the Mojolicious webapp
+restarts. This is especially useful when using the Morbo development
+server
+<http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial#Reloading>,
+which automatically restarts the webapp when it detects changes.
+Combined, "morbo" and "Mojolicious::Plugin::AutoReload" will
+automatically display your new content whenever you change your webapp
+in your editor!
+
+This works by opening a WebSocket connection to a specific Mojolicious
+route. When the server restarts, the WebSocket is disconnected, which
+triggers a reload of the page.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

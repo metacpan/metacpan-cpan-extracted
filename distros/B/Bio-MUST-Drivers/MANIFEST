@@ -13,6 +13,7 @@ lib/Bio/MUST/Drivers/Blast/Database.pm
 lib/Bio/MUST/Drivers/Blast/Database/Temporary.pm
 lib/Bio/MUST/Drivers/Cap3.pm
 lib/Bio/MUST/Drivers/CdHit.pm
+lib/Bio/MUST/Drivers/ClustalO.pm
 lib/Bio/MUST/Drivers/Exonerate.pm
 lib/Bio/MUST/Drivers/Exonerate/Aligned.pm
 lib/Bio/MUST/Drivers/Exonerate/Sugar.pm
@@ -20,6 +21,7 @@ lib/Bio/MUST/Drivers/Hmmer.pm
 lib/Bio/MUST/Drivers/Hmmer/Model.pm
 lib/Bio/MUST/Drivers/Hmmer/Model/Database.pm
 lib/Bio/MUST/Drivers/Hmmer/Model/Temporary.pm
+lib/Bio/MUST/Drivers/Mafft.pm
 lib/Bio/MUST/Drivers/Roles/Blastable.pm
 lib/Bio/MUST/Drivers/Roles/Hmmerable.pm
 lib/Bio/MUST/Drivers/Utils.pm
@@ -29,9 +31,11 @@ t/author-portability.t
 t/blast.t
 t/cap3.t
 t/cd_hit.t
+t/clustalo.t
 t/exo_aligned.t
 t/exonerate.t
 t/hmmer.t
+t/mafft.t
 test/aligned-nuc.ali
 test/aligned-nuc.fasta
 test/aligned-nuc.hmm
@@ -127,6 +131,19 @@ test/ready_unaligned.fasta
 test/report.blastn.m7
 test/report.blastp.m6
 test/report.blastp.xml
+test/seq_in1.fasta
+test/seq_in2.fasta
+test/seq_out1_clustal.fasta
+test/seq_out1_gap_mafft.fasta
+test/seq_out1_mafft.fasta
+test/seq_out1_short_clustal.fasta
+test/seq_out2_clustal.fasta
+test/seq_out2_mafft.fasta
+test/seq_profile_out.fasta
+test/seq_profiles2_clustal.fasta
+test/seq_profiles_mafft.fasta
 test/seqs4cap3.fasta
+test/seqs_2profile_out_clustal.fasta
+test/seqs_profile_out_clustal.fasta
 test/taxdump/gc.prt
 test/test.faa

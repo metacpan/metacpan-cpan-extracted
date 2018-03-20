@@ -1,5 +1,8 @@
 Revision history for App-intrunningsum
 
+0.0.2      2018-03-18
+    - Fix a documentation typo.
+
 0.0.1      2017-12-18
     - First version, released on an unsuspecting world
     - Happy 30th birthday, perl!

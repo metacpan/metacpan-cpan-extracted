@@ -32,7 +32,8 @@ sub new {
     $obj;
 }
 
-my @OPTIONS = qw(
+our @OPTIONS = qw(
+    RCFILE
     BASECLASS
     MODULE_OPT
     DEFAULT
@@ -45,8 +46,9 @@ sub configure {
     my %opt = @_;
 
     for my $opt (@OPTIONS) {
-	if (defined (my $value = delete $opt{$opt})) {
-	    $obj->{$opt} = $value;
+	next if $opt eq 'RCFILE';
+	if (exists $opt{$opt}) {
+	    $obj->{$opt} = delete $opt{$opt};
 	}
     }
 
@@ -279,10 +281,7 @@ sub expand {
 	    if ($debug) {
 		printf STDERR
 		    "\@ARGV = %s\n",
-		    join(' ',
-			 @$argv,
-			 join(' ', '<', @s, '>'),
-			 @follow);
+		    join(' ', @$argv, '<', @s, '>', @follow);
 	    }
 
 	    my @module = $obj->modopt(\@s);
@@ -371,14 +370,18 @@ just like a startup RC file.
 
 =over 4
 
+=item RCFILE
+
+Define the name of startup file.
+
 =item BASECLASS
 
-Define base class for user defined module.  Use array reference to
+Define the base class for user defined module.  Use array reference to
 specify multiple base classes; they are tried to be loaded in order.
 
 =item MODULE_OPT
 
-Define module option string.  String B<-M> is set by default.
+Define the module option string.  String B<-M> is set by default.
 
 =item DEFAULT
 

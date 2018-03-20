@@ -128,6 +128,25 @@ Returns I<undef> if the glyph is not available in the font and
 I<fallback> isn't defined; otherwise, i.e. if I<fallback = true>
 returns fonts I<missing glyph>.
 
+=item get_name_index(I<name>)
+
+Looks up a glyph by name and returns the index for that glyph in the
+font. Returns 0 if the name is not found.
+
+=item glyph_from_index(I<index>)
+
+Returns a L<Font::FreeType::Glyph|Font::FreeType::Glyph> object for the
+glyph at the given index.
+
+=item glyph_from_name(I<name>, I<fallback = 0>)
+
+Looks up a glyph by name and returns a
+L<Font::FreeType::Glyph|Font::FreeType::Glyph> object.
+
+Returns I<undef> if the glyph is not available in the font and
+I<fallback> isn't defined; otherwise, i.e. if I<fallback = true>
+returns fonts I<missing glyph>.
+
 =item has_glyph_names()
 
 True if individual glyphs have names.  If so, the names can be

@@ -33,9 +33,12 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "Perl::Tidy::Sweetened" => "1.12",
+    "Pod::Tidy" => "0.10",
+    "Test::Code::TidyAll" => "0.69",
     "Test::More" => 0
   },
-  "VERSION" => "1.0",
+  "VERSION" => "1.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,6 +56,9 @@ my %FallbackPrereqs = (
   "HTTP::Cookies" => "6.01",
   "LWP::UserAgent" => "6.05",
   "Log::Log4perl" => "1.48",
+  "Perl::Tidy::Sweetened" => "1.12",
+  "Pod::Tidy" => "0.10",
+  "Test::Code::TidyAll" => "0.69",
   "Test::More" => 0,
   "YAML::XS" => "0.62"
 );

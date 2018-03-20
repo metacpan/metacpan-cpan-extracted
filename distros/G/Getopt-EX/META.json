@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.13",
+   "generated_by" : "Minilla/v3.0.14",
    "license" : [
       "perl_5"
    ],
@@ -55,7 +55,7 @@
    "provides" : {
       "Getopt::EX" : {
          "file" : "lib/Getopt/EX.pm",
-         "version" : "v1.7.1"
+         "version" : "v1.7.2"
       },
       "Getopt::EX::Colormap" : {
          "file" : "lib/Getopt/EX/Colormap.pm"
@@ -90,7 +90,7 @@
          "web" : "https://github.com/kaz-utashiro/Getopt-EX"
       }
    },
-   "version" : "v1.7.1",
+   "version" : "v1.7.2",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kaz Utashiro <utashiro@cpan.org>"

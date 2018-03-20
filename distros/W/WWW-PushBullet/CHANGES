@@ -1,5 +1,11 @@
 Revision history for WWW-PushBullet Distribution
 
+v1.6.0	2018-03-18 00:30
+
+  * Add 'send SMS' feature
+  * Fixing version for 'RewriteVersion'
+
+
 1.4.0   2014-10-28 22:30
 
   * Many changes to handle new PushBullet API

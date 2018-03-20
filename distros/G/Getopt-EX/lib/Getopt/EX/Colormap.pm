@@ -76,10 +76,27 @@ my %numbers = (
     W => 37, w => 97,	# W : White
     );
 
+sub rgb24 {
+    my $rgb = shift;
+    if ($COLOR_RGB24) {
+	return (2,
+		map { hex $_ }
+		$rgb =~ /^([\da-f]{2})([\da-f]{2})([\da-f]{2})/i);
+    } else {
+	return (5, ansi256_number $rgb);
+    }
+}
+
 sub ansi_numbers {
     local $_ = shift // '';
     my @numbers;
-    my $BG = 0;
+    my %xg = do {
+	my $FG = 1;
+	toggle    => sub { $FG ^= 1      },
+	indicator => sub { $FG ? 38 : 48 },
+	shift16   => sub { $FG ?  0 : 10 };
+    };
+
     while (m{\G
 	     (?:
 	       (?<slash> /)				# /
@@ -98,23 +115,16 @@ sub ansi_numbers {
 	     )
 	    }xig) {
 	if ($+{slash}) {
-	    $BG++ and die "Color spec error: $_\n";
+	    $xg{toggle}->();
 	}
-	elsif (my $h24 = $+{h24}) {
-	    if ($COLOR_RGB24) {
-		push @numbers, ($BG ? 48 : 38), 2, do {
-		    map { hex $_ }
-		    $h24 =~ /^([\da-f]{2})([\da-f]{2})([\da-f]{2})/i
-		};
-	    } else {
-		push @numbers, ($BG ? 48 : 38), 5, ansi256_number $h24;
-	    }
+	elsif ($+{h24}) {
+	    push @numbers, $xg{indicator}->(), rgb24($+{h24});
 	}
 	elsif ($+{c256}) {
-	    push @numbers, ($BG ? 48 : 38), 5, ansi256_number $+{c256};
+	    push @numbers, $xg{indicator}->(), 5, ansi256_number $+{c256};
 	}
 	elsif ($+{c16}) {
-	    push @numbers, $numbers{$+{c16}} + ($BG ? 10 : 0);
+	    push @numbers, $numbers{$+{c16}} + $xg{shift16}->();
 	}
 	elsif ($+{efct}) {
 	    my $efct = uc $+{efct};
@@ -425,7 +435,7 @@ C<$COLOR_RGB24> module variable to enable it.
 Character "E" is abbreviation for "{EL}", and it clears the line from
 cursor to the end of the line.  At this time, background color is set
 to the area.  When this code is found at the end of start sequence, it
-is copied to just before ending reset sequence, to kepp the effect
+is copied to just before ending reset sequence, to keep the effect
 even when the text is wrapped to multiple lines.
 
 Other ANSI CSI sequences are also available in the form of "{NAME}",

@@ -33,7 +33,7 @@ for my $conf ( ref $param{argv}[0] ? @{ $param{argv} } : $param{argv} )
         && ! chmod oct $conf->{chmod}, $temp;
     &$unlink( $temp, 'chown fail' ) if @pw && ! chown @pw[2,3], $temp;
 
-    &$unlink( $temp, 'rename fail' ) unless rename $temp, $path;
+    &$unlink( $temp, 'rename fail' ) if system "mv '$temp' '$path'";
 }
 
 print "ok\n";

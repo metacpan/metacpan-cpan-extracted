@@ -17,7 +17,7 @@ use File::ShareDir qw/dist_dir/;
 use Path::Tiny;
 use DateTime;
 
-our $VERSION = "0.012";
+our $VERSION = "0.013";
 
 has [qw/base_url api_key api_pass test/] => (
     is => 'rw',
@@ -408,7 +408,7 @@ sub _ls_job {
                     $extra_post .= " ($duration / $details->{lastBuild}{displayName} / $details->{lastBuild}{builtOn})";
                 }
                 else {
-                    $extra_post .= "Never run";
+                    $extra_post .= " Never run";
                 }
                 1;
             } or do {
@@ -460,7 +460,7 @@ App::JenkinsCli - Command line tool for interacting with Jenkins
 
 =head1 VERSION
 
-This documentation refers to App::JenkinsCli version 0.012
+This documentation refers to App::JenkinsCli version 0.013
 
 =head1 SYNOPSIS
 

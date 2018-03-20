@@ -17,13 +17,13 @@ $MYDan::Util::OptConf::THIS = 'node';
 
 Delete node databases entries
 
- $0 --cluster clusters --table table [--key nodes] [--value values]
+ $0 --cluster clusters [--table table] [--key nodes] [--value values]
 
 =cut
 my $option = MYDan::Util::OptConf->load( base => $Bin );
 my %o = $option->get( qw( cluster=s table=s key=s value=s ) )->dump();
 
-$option->assert(qw( cluster table key value ));
+$option->assert( 'cluster' );
 
 my %range = $option->dump( 'range' );
 my $range = MYDan::Node->new( %range );

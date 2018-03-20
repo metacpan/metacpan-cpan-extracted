@@ -8,7 +8,7 @@ use HTTP::Request;
 use LWP::UserAgent;
 use Encode;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 my %def = (
               server     => 'https://s.pface.ru/',
@@ -19,7 +19,8 @@ my %def = (
 );
 
 sub new {
-    my ( $class, $self ) = @_;
+    my $class = shift;
+    my $self  = {@_};
     
     bless $self, $class;
 
@@ -179,13 +180,10 @@ Net::Pface - Perl extension for pface.ru simple API
 
     use Modern::Perl;
     use Net::Pface;
-    my $obj_pface = Net::Pface->new( { 
-                                        id  => $site_id,
-                                        key => $site_key
-    } );
+    my $obj_pface = Net::Pface->new( id  => $site_id, key => $site_key );
       
     # user authentication
-    $hash = $obj_pface->auth( $sess1, $sess2, $user_ip );
+    my $hash = $obj_pface->auth( $sess1, $sess2, $user_ip );
     if ( exists $$hash{'result'} ) {
         my $lnk = $$hash{'result'};
         say $$lnk{'id'}; # if id > 0 then user else guest
@@ -211,9 +209,11 @@ Net::Pface - Perl extension for pface.ru simple API
 
 =head1 DESCRIPTION
 
+This module is simple API for pface.ru.
+
 Connect to server use your pface site_id and site_key:
 
-  my $obj_pface = Net::Pface->new( { id => $site_id, key => $site_key } );
+  my $obj_pface = Net::Pface->new( id => $site_id, key => $site_key );
   
   keys:
   id         - your site id in pface.ru

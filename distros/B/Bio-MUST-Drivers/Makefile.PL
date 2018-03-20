@@ -53,9 +53,10 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Test::Files" => 0,
-    "Test::Most" => 0
+    "Test::Most" => 0,
+    "version" => 0
   },
-  "VERSION" => "0.180270",
+  "VERSION" => "0.180770",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -96,6 +97,7 @@ my %FallbackPrereqs = (
   "feature" => 0,
   "namespace::autoclean" => 0,
   "strict" => 0,
+  "version" => 0,
   "warnings" => 0
 );
 

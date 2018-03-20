@@ -13,3 +13,9 @@ use_ok 'MIME::Types';
 use_ok 'Pod::Usage';
 
 done_testing(8);
+
+=head1 AUTHOR
+
+Sebastien Thebert <www-pushbullet@onetool.pm>
+
+=cut

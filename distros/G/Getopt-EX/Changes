@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-EX
 
+v1.7.2 2018-03-19T01:12:08Z
+
+    - Improve color spec handling (now accept multiple shashes).
+
 v1.7.1 2018-01-04T00:25:06Z
 
     - Bug fix.

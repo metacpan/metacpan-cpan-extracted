@@ -35,6 +35,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Test::Code::TidyAll" : "0.50",
             "Test::Kwalitee" : "1.21",
             "Test::More" : "0.88",
             "Test::Pod" : "1.41",
@@ -63,6 +64,9 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
+            "Perl::Tidy::Sweetened" : "1.12",
+            "Pod::Tidy" : "0.10",
+            "Test::Code::TidyAll" : "0.69",
             "Test::More" : "0"
          }
       }
@@ -70,7 +74,7 @@
    "provides" : {
       "SpamcupNG" : {
          "file" : "lib/SpamcupNG.pm",
-         "version" : "1.0"
+         "version" : "1.1"
       }
    },
    "release_status" : "stable",
@@ -85,7 +89,7 @@
          "web" : "https://github.com/glasswalk3r/spamcupNG"
       }
    },
-   "version" : "1.0",
+   "version" : "1.1",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -296,6 +300,17 @@
             "version" : "6.010"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "test",
+                  "type" : "requires"
+               }
+            },
+            "name" : "TestRequires",
+            "version" : "6.010"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "AutoPrereqs",
             "version" : "6.010"
@@ -304,6 +319,11 @@
             "class" : "Dist::Zilla::Plugin::MetaResources",
             "name" : "MetaResources",
             "version" : "6.010"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::TidyAll",
+            "name" : "Test::TidyAll",
+            "version" : "0.04"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Kwalitee",

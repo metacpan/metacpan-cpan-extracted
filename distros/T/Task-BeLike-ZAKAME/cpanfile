@@ -5,7 +5,6 @@ requires 'App::Ack';
 requires 'App::cpanoutdated';
 requires 'App::cpm';
 requires 'App::HTTPThis';
-requires 'App::Nopaste';
 requires 'Carton';
 requires 'Class::Refresh';
 requires 'CPAN::Mini';
@@ -29,13 +28,16 @@ requires 'Net::Async::HTTP';
 
 recommends 'App::rainbarf';
 recommends 'App::scan_prereqs_cpanfile';
+recommends 'App::Nopaste';
 recommends 'CPAN::Mini::Webserver';
 recommends 'DB::Pluggable';
 recommends 'DB::Skip';
 recommends 'Devel::Cover';
+recommends 'Devel::Trace';
 recommends 'LWP::Protocol::rsync';
 recommends 'Paws';
 recommends 'Perl::Critic';
+recommends 'Perl::Critic::Freenode';
 recommends 'Web::Query';
 
 on 'test' => sub {

@@ -1,0 +1,73 @@
+{
+   "abstract" : "Automatically reload open browser windows when your application changes",
+   "author" : [
+      "Doug Bell <preaction@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-AutoReload",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "7",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::AutoReload" : {
+         "file" : "lib/Mojolicious/Plugin/AutoReload.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/preaction/Mojolicious-Plugin-AutoReload/issues"
+      },
+      "homepage" : "https://github.com/preaction/Mojolicious-Plugin-AutoReload",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/preaction/Mojolicious-Plugin-AutoReload.git",
+         "web" : "https://github.com/preaction/Mojolicious-Plugin-AutoReload"
+      }
+   },
+   "version" : "0.001",
+   "x_authority" : "cpan:PREACTION",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

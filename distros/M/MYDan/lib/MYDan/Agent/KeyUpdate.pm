@@ -82,7 +82,7 @@ sub update
         my $tmd5 = Digest::MD5->new()->addfile( $TEMP )->hexdigest();
 
         next unless lc( $md5 ) eq lc( $tmd5 );
-        rename $TEMP->filename, "$auth/$name";
+        system "mv '$TEMP->filename' '$auth/$name'";
     }
 
     return if $ddd;

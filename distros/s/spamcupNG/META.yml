@@ -5,6 +5,9 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  Perl::Tidy::Sweetened: '1.12'
+  Pod::Tidy: '0.10'
+  Test::Code::TidyAll: '0.69'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -26,7 +29,7 @@ no_index:
 provides:
   SpamcupNG:
     file: lib/SpamcupNG.pm
-    version: '1.0'
+    version: '1.1'
 requires:
   Carp: '0'
   Getopt::Std: '0'
@@ -42,7 +45,7 @@ resources:
   bugtracker: https://github.com/glasswalk3r/spamcupNG/issues
   homepage: https://github.com/glasswalk3r/spamcupNG
   repository: https://github.com/glasswalk3r/spamcupNG.git
-version: '1.0'
+version: '1.1'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -205,6 +208,14 @@ x_Dist_Zilla:
       name: Prereqs
       version: '6.010'
     -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
+      version: '6.010'
+    -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
       version: '6.010'
@@ -212,6 +223,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::MetaResources
       name: MetaResources
       version: '6.010'
+    -
+      class: Dist::Zilla::Plugin::Test::TidyAll
+      name: Test::TidyAll
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::Test::Kwalitee
       config:

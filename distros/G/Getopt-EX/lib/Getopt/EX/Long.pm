@@ -20,9 +20,8 @@ use Getopt::Long();
 use Getopt::EX::Loader;
 use Getopt::EX::Func qw(parse_func);
 
-our $BASECLASS;
-our $RCFILE;
-our $AUTO_DEFAULT = 1;
+my %ConfigOption = ( AUTO_DEFAULT => 1 );
+my @ValidOptions = ('AUTO_DEFAULT' , @Getopt::EX::Loader::OPTIONS);
 
 my $loader;
 
@@ -34,11 +33,13 @@ sub GetOptions {
 sub GetOptionsFromArray {
     my $argv = $_[0];
 
-    set_default() if $AUTO_DEFAULT;
+    set_default() if $ConfigOption{AUTO_DEFAULT};
 
-    $loader //= new Getopt::EX::Loader
-	RCFILE => $RCFILE,
-	BASECLASS => $BASECLASS;
+    $loader //= new Getopt::EX::Loader do {
+	map {
+	    exists $ConfigOption{$_} ? ( $_ => $ConfigOption{$_} ) : ()
+	} @Getopt::EX::Loader::OPTIONS
+    };
 
     $loader->deal_with($argv);
 
@@ -53,10 +54,9 @@ sub GetOptionsFromString {
 
 sub ExConfigure {
     my %opt = @_;
-    for my $name (qw(BASECLASS RCFILE AUTO_DEFAULT)) {
-	if (my $val = delete $opt{$name}) {
-	    no strict 'refs';
-	    ${$name} = $val;
+    for my $name (@ValidOptions) {
+	if (exists $opt{$name}) {
+	    $ConfigOption{$name} = delete $opt{$name};
 	}
     }
     warn "Unknown option: ", Dumper \%opt if %opt;
@@ -75,11 +75,8 @@ sub VersionMessage {
 }
 
 sub set_default {
-    my @default = get_default();
-    while (my($label, $value) = splice(@default, 0, 2)) {
-	no strict 'refs';
-	${$label} //= $value;
-    }
+    use List::Util qw(pairmap);
+    pairmap { $ConfigOption{$a} //= $b } get_default();
 }
 
 sub get_default {
@@ -153,6 +150,7 @@ Getopt::EX::Long - Getopt::Long compatible glue module
 =head1 SYNOPSIS
 
   use Getopt::EX::Long;
+  ExConfigure(...)
 
   or
 
@@ -199,6 +197,24 @@ If the module includes C<__DATA__> section, it is interpreted just
 same as rc file.  So you can define arbitrary option there.  Combined
 with startup function call described above, it is possible to control
 module behavior by user defined option.
+
+=head1 CONFIG OPTIONS
+
+Config options are set by B<Getopt::ExConfigure> or B<exconfig>
+parameter for B<Getopt::EX::Long::Parser::new> method.
+
+=over 4
+
+=item AUTO_DEFAULT
+
+Config option B<RCFILE> and B<BASECLASS> are automatically set based
+on the name of command executable.  If you don't want this behavior,
+set B<AUTO_DEFAULT> to 0.
+
+=back
+
+Other options including B<RCFILE> and B<BASECLASS> are passed to
+B<Getopt::EX::Loader>.  Read its document for detail.
 
 =head1 INCOMPATIBILITY
 

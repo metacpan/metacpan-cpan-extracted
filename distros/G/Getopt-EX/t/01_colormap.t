@@ -16,6 +16,7 @@ is(ansi_code("ABCDEF"), "\e[38;5;152m", "hex");
 }
 
 is(ansi_code("DK/544"), "\e[1;30;48;5;224m", "256 color");
+is(ansi_code("//DK///544"), "\e[1;30;48;5;224m", "multiple /");
 is(ansi_code("L00/L23"), "\e[38;5;232;48;5;255m", "grey scale");
 is(ansi_code("CCCCCC"), "\e[38;5;251m", "hex to grey scale map");
 is(ansi_code("FFFFFF/000000"), "\e[38;5;231;48;5;16m", "hex, all 0/1");

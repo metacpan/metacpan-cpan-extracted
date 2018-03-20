@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Font-FreeType",
    "no_index" : {
@@ -49,6 +49,6 @@
          "url" : "https://github.com/zmughal/p5-Font-FreeType"
       }
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

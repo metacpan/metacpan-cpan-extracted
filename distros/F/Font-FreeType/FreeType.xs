@@ -89,7 +89,8 @@ QefFT2_Errstr qefft2_errstr[] = /* rest filled in by the header */
 struct QefFT2_Glyph_
 {
     SV *face_sv;
-    FT_ULong char_code;     /* -1 if not yet known */
+    FT_ULong char_code;     /* 0 if not yet known */
+    bool has_char_code;
     FT_UInt index;
     char *name;
 };
@@ -198,7 +199,7 @@ errchk (FT_Error err, const char *desc)
 }
 
 static SV *
-make_glyph (SV *face_sv, FT_ULong char_code, FT_UInt index)
+make_glyph (SV *face_sv, FT_ULong char_code, bool has_cc, FT_UInt index)
 {
     Font_FreeType_Glyph glyph;
     SV *sv;
@@ -208,6 +209,7 @@ make_glyph (SV *face_sv, FT_ULong char_code, FT_UInt index)
     SvREFCNT_inc(face_sv);
 
     glyph->char_code = char_code;
+    glyph->has_char_code = has_cc;
     glyph->index = index;
     glyph->name = 0;
 
@@ -803,7 +805,7 @@ qefft2_face_glyph_from_char_code (Font_FreeType_Face face, FT_ULong char_code, i
     CODE:
         glyph_idx = FT_Get_Char_Index(face, char_code);
         if (glyph_idx || fallback)
-            RETVAL = make_glyph(SvRV(ST(0)), char_code, glyph_idx);
+            RETVAL = make_glyph(SvRV(ST(0)), char_code, 1, glyph_idx);
         else
             RETVAL = &PL_sv_undef;
     OUTPUT:
@@ -835,12 +837,43 @@ qefft2_face_glyph_from_char (Font_FreeType_Face face, SV *sv, int fallback = 0)
         glyph_idx = FT_Get_Char_Index(face, char_code);
         fallback = SvOK(ST(2)) ? SvIV(ST(2)) : 0;
         if (glyph_idx || fallback)
-            RETVAL = make_glyph(SvRV(ST(0)), char_code, glyph_idx);
+            RETVAL = make_glyph(SvRV(ST(0)), char_code, 1, glyph_idx);
         else
             RETVAL = &PL_sv_undef;
     OUTPUT:
         RETVAL
 
+FT_UInt
+qefft2_face_get_name_index (Font_FreeType_Face face, SV *sv)
+    PREINIT:
+        char *name;
+    CODE:
+        name = SvPV_nolen(sv);
+        RETVAL = FT_Get_Name_Index(face, name);
+    OUTPUT:
+        RETVAL
+
+SV *
+qefft2_face_glyph_from_index (Font_FreeType_Face face, FT_UInt ix)
+    CODE:
+        RETVAL = make_glyph(SvRV(ST(0)), 0, 0, ix);
+    OUTPUT:
+        RETVAL
+
+SV *
+qefft2_face_glyph_from_name (Font_FreeType_Face face, SV *sv, int fallback = 0)
+    PREINIT:
+        char *name;
+        FT_UInt ix;
+    CODE:
+        name = SvPV_nolen(sv);
+        ix = FT_Get_Name_Index(face, name);
+        if (ix || fallback)
+            RETVAL = make_glyph(SvRV(ST(0)), 0, 0, ix);
+        else
+            RETVAL = &PL_sv_undef;
+    OUTPUT:
+        RETVAL
 
 void
 qefft2_face_foreach_char (Font_FreeType_Face face, SV *code)
@@ -856,7 +889,7 @@ qefft2_face_foreach_char (Font_FreeType_Face face, SV *code)
 
             PUSHMARK(SP);
             SAVESPTR(DEFSV);
-            DEFSV = sv_2mortal(make_glyph(SvRV(ST(0)), char_code, glyph_idx));
+            DEFSV = sv_2mortal(make_glyph(SvRV(ST(0)), char_code, 1, glyph_idx));
             PUTBACK;
 
             call_sv(code, G_VOID | G_DISCARD);
@@ -896,7 +929,7 @@ qefft2_glyph_char_code (Font_FreeType_Glyph glyph)
         FT_ULong char_code;
         FT_UInt glyph_idx;
     CODE:
-        if (glyph->char_code >= 0) {
+        if (glyph->has_char_code) {
             RETVAL = newSVuv((UV) glyph->char_code);
         }
         else {

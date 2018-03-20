@@ -20,7 +20,7 @@ subtest 'config file cannot be read' => sub {
     my $file = $SHARE_DIR->child( config => 'bad_char.yml' );
     throws_ok { Beam::Wire->new( file => $file ) }
         'Beam::Wire::Exception::Config';
-    like $@, qr{Could not load container file "$file": Error from config parser: .+};
+    like $@, qr{Could not load container file "\Q$file\E": Error from config parser: .+};
 };
 
 subtest "get a service that doesn't exist" => sub {

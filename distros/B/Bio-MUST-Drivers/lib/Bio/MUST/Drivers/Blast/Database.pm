@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Blast::Database;
-# ABSTRACT: internal class for BLAST driver
-$Bio::MUST::Drivers::Blast::Database::VERSION = '0.180270';
+# ABSTRACT: Internal class for BLAST driver
+$Bio::MUST::Drivers::Blast::Database::VERSION = '0.180770';
 use Moose;
 use namespace::autoclean;
 
@@ -67,11 +67,11 @@ __END__
 
 =head1 NAME
 
-Bio::MUST::Drivers::Blast::Database - internal class for BLAST driver
+Bio::MUST::Drivers::Blast::Database - Internal class for BLAST driver
 
 =head1 VERSION
 
-version 0.180270
+version 0.180770
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,13 @@
 Revision history for App-jenkins-cli
 
+0.013   2018-03-19
+        Updating for release of version 0.013
+        Added new files (Ivan Wills)
+        New example XSLT to change build time out time (Ivan Wills)
+        Adding missing space (Ivan Wills)
+        Added not for Docker based tests (Ivan Wills)
+        Some notes on what I should do in the future (Ivan Wills)
+
 0.012   2018-01-28
         Updating for release of version 0.012
         Adding perl 5.26 to travis config (Ivan Wills)

@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::Pface.
 
+1.02  Mon Mar 19 12:10:09 2018
+  - changed the data transfer for object
+
 1.01  Mon Mar 12 14:10:09 2018
 	- original version; created by h2xs 1.23 with options
 		-AX -n Net::Pface -v 1.01

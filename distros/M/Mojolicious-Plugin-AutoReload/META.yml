@@ -1,0 +1,41 @@
+---
+abstract: 'Automatically reload open browser windows when your application changes'
+author:
+  - 'Doug Bell <preaction@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-AutoReload
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Mojolicious::Plugin::AutoReload:
+    file: lib/Mojolicious/Plugin/AutoReload.pm
+    version: '0.001'
+requires:
+  Mojolicious: '7'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/preaction/Mojolicious-Plugin-AutoReload/issues
+  homepage: https://github.com/preaction/Mojolicious-Plugin-AutoReload
+  repository: https://github.com/preaction/Mojolicious-Plugin-AutoReload.git
+version: '0.001'
+x_authority: cpan:PREACTION
+x_serialization_backend: 'YAML::Tiny version 1.70'

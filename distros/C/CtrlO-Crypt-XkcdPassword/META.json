@@ -24,6 +24,13 @@
             "Module::Build" : "0.28"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Bad::Words" : "0",
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
@@ -64,7 +71,7 @@
          "web" : "https://github.com/domm/CtrlO-Crypt-XkcdPassword"
       }
    },
-   "version" : "1.003",
+   "version" : "1.004",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

@@ -4,6 +4,7 @@ Changes
 example/change.xsl
 example/jenkins.xml
 example/rebuild-to-success
+example/timeout.xsl
 lib/App/JenkinsCli.pm
 LICENSE
 MANIFEST
@@ -19,5 +20,6 @@ t/perlcriticrc
 t/pod-coverage.t
 t/pod.t
 t/spelling.t
+TODO.md
 xslt/disable.xsl
 xslt/enable.xsl

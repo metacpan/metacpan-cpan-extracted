@@ -1,5 +1,12 @@
 Changelog for Beam-Wire
 
+1.021     2018-03-18 12:26:40-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed a test failing when file paths have regex metacharacters.
+      Thanks @mohawk2!
+
 1.020     2017-05-05 00:21:19-05:00 America/Chicago
 
     [Added]

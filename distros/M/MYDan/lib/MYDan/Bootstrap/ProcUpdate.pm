@@ -83,7 +83,7 @@ sub update
 
         next unless lc( $md5 ) eq lc( $tmd5 );
         chmod 0700, $TEMP->filename;
-        rename $TEMP->filename, "$exec/$name";
+        system "mv '$TEMP->filename' '$exec/$name'";
     }
 
     return if $ddd;

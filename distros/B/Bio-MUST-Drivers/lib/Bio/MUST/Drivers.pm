@@ -3,7 +3,7 @@ package Bio::MUST::Drivers;
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
-$Bio::MUST::Drivers::VERSION = '0.180270';
+$Bio::MUST::Drivers::VERSION = '0.180770';
 use strict;
 use warnings;
 
@@ -13,6 +13,8 @@ use Bio::MUST::Drivers::Cap3;
 use Bio::MUST::Drivers::CdHit;
 use Bio::MUST::Drivers::Exonerate;
 use Bio::MUST::Drivers::Exonerate::Aligned;
+use Bio::MUST::Drivers::ClustalO;
+use Bio::MUST::Drivers::Mafft;
 
 1;
 
@@ -26,7 +28,7 @@ Bio::MUST::Drivers - Bio::MUST classes for driving external programs
 
 =head1 VERSION
 
-version 0.180270
+version 0.180770
 
 =head1 SYNOPSIS
 

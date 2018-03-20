@@ -43,7 +43,7 @@
    "provides" : {
       "App::JenkinsCli" : {
          "file" : "lib/App/JenkinsCli.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       }
    },
    "release_status" : "stable",
@@ -58,6 +58,6 @@
          "url" : "git://github.com/ivanwills/App-jenkins-cli.git"
       }
    },
-   "version" : "0.012",
+   "version" : "0.013",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -18,7 +18,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Metadata: '0'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,25 +35,25 @@ no_index:
 provides:
   Beam::Wire:
     file: lib/Beam/Wire.pm
-    version: '1.020'
+    version: '1.021'
   Beam::Wire::Exception:
     file: lib/Beam/Wire.pm
-    version: '1.020'
+    version: '1.021'
   Beam::Wire::Exception::Config:
     file: lib/Beam/Wire.pm
-    version: '1.020'
+    version: '1.021'
   Beam::Wire::Exception::Constructor:
     file: lib/Beam/Wire.pm
-    version: '1.020'
+    version: '1.021'
   Beam::Wire::Exception::InvalidConfig:
     file: lib/Beam/Wire.pm
-    version: '1.020'
+    version: '1.021'
   Beam::Wire::Exception::NotFound:
     file: lib/Beam/Wire.pm
-    version: '1.020'
+    version: '1.021'
   Beam::Wire::Exception::Service:
     file: lib/Beam/Wire.pm
-    version: '1.020'
+    version: '1.021'
 recommends:
   JSON: '0'
 requires:
@@ -72,13 +72,11 @@ resources:
   bugtracker: https://github.com/preaction/Beam-Wire/issues
   homepage: https://github.com/preaction/Beam-Wire
   repository: https://github.com/preaction/Beam-Wire.git
-version: '1.020'
+version: '1.021'
 x_authority: cpan:PREACTION
 x_contributors:
   - 'Ben Moon <guiltydolphin@gmail.com>'
   - 'Bruce Armstrong <bruce@armstronganchor.net>'
-  - 'Bruce Armstrong <bruce@fortressofgeekdom.org>'
-  - 'Doug Bell <doug@preaction.me>'
-  - 'Doug Bell <preaction@users.noreply.github.com>'
   - 'Kent Fredric <kentnl@cpan.org>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+  - 'mohawk2 <mohawk2@users.noreply.github.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,3 +1,11 @@
+2018-03-19T18:56:59+08:00 : 发布0.1.34到cpan.org
+2018-03-19T18:56:19+08:00 : lib/MYDan/Agent/Proxy.pm 添加使用Cache
+2018-03-19T18:33:28+08:00 : agent 添加 secret exec
+2018-03-15T16:15:23+08:00 : 发布0.1.33到cpan.org
+2018-03-15T16:14:35+08:00 : lib/MYDan/Agent/Proxy.pm 代理模块添加 MYDan_Agent_Proxy_Addr,MYDan_Agent_Proxy_Config 环境变量
+2018-03-15T15:39:11+08:00 : fix dan/node/purge
+2018-02-27T18:11:56+08:00 : 发布0.1.32到cpan.org
+2018-02-27T18:07:28+08:00 : fix 把所有rename换成system mv, rename 不能跨文件系统
 2018-01-18T23:35:49+08:00 : 发布0.1.31版本到cpan.org
 2018-01-18T23:34:44+08:00 : 调用agent时把key为“__”开头的信息在日志中隐藏掉,方便用于传递敏感信息
 2018-01-11T18:51:55+08:00 : 发布0.1.30到cpan.org

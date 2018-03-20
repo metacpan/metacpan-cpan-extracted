@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Roles::Blastable;
 # ABSTRACT: BLAST database-related methods
-$Bio::MUST::Drivers::Roles::Blastable::VERSION = '0.180270';
+$Bio::MUST::Drivers::Roles::Blastable::VERSION = '0.180770';
 use Moose::Role;
 
 use autodie;
@@ -11,6 +11,7 @@ use feature qw(say);
 use Carp;
 use File::Temp;
 use IPC::System::Simple qw(system);
+use Path::Class;
 
 use aliased 'Bio::MUST::Core::Ali::Stash';
 use aliased 'Bio::FastParsers::Blast::Table';
@@ -99,6 +100,7 @@ sub _blast {
     my $args_str = stringify_args($args);
 
     # create BLAST command
+    $pgm = file($ENV{BMD_BLAST_BINDIR}, $pgm);
     my $cmd = join q{ }, $pgm, $args_str, '> /dev/null 2> /dev/null';
     ### $cmd
 
@@ -169,7 +171,7 @@ Bio::MUST::Drivers::Roles::Blastable - BLAST database-related methods
 
 =head1 VERSION
 
-version 0.180270
+version 0.180770
 
 =head1 SYNOPSIS
 

@@ -8,7 +8,7 @@ use Net::Pface;
 BEGIN { use_ok('Net::Pface') };
 
 # create object
-my $obj_pface = Net::Pface->new( { id => '0', key => '0', cache_time => 300 } );
+my $obj_pface = Net::Pface->new( id => '0', key => '0', cache_time => 300 );
 ok( $obj_pface, "create Net::Pface object" );
 
 

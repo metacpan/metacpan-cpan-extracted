@@ -37,7 +37,7 @@ my %regexes = (
 
 lock_hash(%MAP);
 
-our $VERSION = '1.0'; # VERSION
+our $VERSION = '1.1'; # VERSION
 
 =head1 NAME
 
@@ -49,7 +49,9 @@ SpamcupNG - module to export functions for spamcup program
 
 =head1 DESCRIPTION
 
-SpamcupNG is a Perl web crawler for finishing Spamcop.net reports automatically. This module implements the functions used by the spamcup program.
+SpamcupNG is a Perl web crawler for finishing Spamcop.net reports
+automatically. This module implements the functions used by the spamcup
+program.
 
 See the README.md file on this project for more details.
 
@@ -59,16 +61,19 @@ See the INSTALL for setup instructions.
 
 =head2 read_config
 
-Reads a YAML file, sets the command line options and return the associated accounts.
+Reads a YAML file, sets the command line options and return the associated
+accounts.
 
-Expects as parameter a string with the full path to the YAML file and a hash reference of the
-command line options read (as returned by L<Getopts::Std> C<getopts> function).
+Expects as parameter a string with the full path to the YAML file and a hash
+reference of the command line options read (as returned by L<Getopts::Std>
+C<getopts> function).
 
-The hash reference options will set as defined in the YAML file.
-Options defined in the YAML have preference of those read on the command line then.
+The hash reference options will set as defined in the YAML file. Options
+defined in the YAML have preference of those read on the command line then.
 
-It will also return all data configured in the C<Accounts> section of the YAML file as a hash refence. Check the README.md file for more details about
-the configuration file.
+It will also return all data configured in the C<Accounts> section of the YAML
+file as a hash refence. Check the README.md file for more details about the
+configuration file.
 
 =cut
 
@@ -130,7 +135,8 @@ sub get_browser {
 
 =head2 config_logger
 
-Configures a L<Log::Log4perl> object, as defined by the verbosity parameter (-V in the command line).
+Configures a L<Log::Log4perl> object, as defined by the verbosity parameter (-V
+in the command line).
 
 Expected parameters:
 
@@ -146,7 +152,8 @@ path to a log file
 
 =back
 
-If the verbosity is set to DEBUG, all messages will be sent to a log file opened as C<spamcup.log> in append mode.
+If the verbosity is set to DEBUG, all messages will be sent to a log file
+opened as C<spamcup.log> in append mode.
 
 Otherwise, all messages will be sent to C<STDOUT>.
 
@@ -176,7 +183,8 @@ FATAL
 
 =back
 
-Depending on the verbosity level, more or less information you be provided. See L<Log::Log4perl> for more details about the levels.
+Depending on the verbosity level, more or less information you be provided. See
+L<Log::Log4perl> for more details about the levels.
 
 =cut
 
@@ -255,14 +263,16 @@ delay => time in seconds to wait for next iteration with Spamcop website
 
 =item *
 
-verbosity => defines what level of information should be provided. Uses the same values as defined by L<Log::Log4perl>.
+verbosity => defines what level of information should be provided. Uses the
+same values as defined by L<Log::Log4perl>.
 
 As confusing as it seems, current implementation may accept debug messages
 B<and> disable other messages.
 
 =item *
 
-check_only => true (1) or false (0) to only check for unreported SPAM, but not reporting them
+check_only => true (1) or false (0) to only check for unreported SPAM, but not
+reporting them
 
 =back
 
@@ -630,6 +640,7 @@ sub main_loop {
     elsif ( $res->content =~
 /click reload if this page does not refresh automatically in \n(\d+) seconds/gs
       )
+
     {
         my $delay = $1;
         $logger->warn(
@@ -756,22 +767,22 @@ Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 of Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+This software is copyright (c) 2015 of Alceu Rodrigues de Freitas Junior,
+E<lt>arfreitas@cpan.orgE<gt>
 
 This file is part of spamcupNG distribution.
 
-spamcupNG is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+spamcupNG is free software: you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
 
-spamcupNG is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+spamcupNG is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with spamcupNG. If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License along with
+spamcupNG. If not, see <http://www.gnu.org/licenses/>.
 
 =cut
 

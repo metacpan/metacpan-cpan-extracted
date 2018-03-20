@@ -1,5 +1,5 @@
 package App::intrunningsum;
-$App::intrunningsum::VERSION = '0.0.1';
+$App::intrunningsum::VERSION = '0.0.2';
 use strict;
 use warnings;
 
@@ -48,18 +48,18 @@ App::intrunningsum - running sum of decimal big integers from stdin or files
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 SYNOPSIS
 
-    $ (echo 2 ; echo 3) | intsum
+    $ (echo 2 ; echo 3) | intrunningsum
     2
     5
 
 =head1 DESCRIPTION
 
 Performs an arithmetic sum of decimal integers in the files given as command
-line arguments and STDIN.
+line arguments and STDIN, and displays the intermediate results at each line.
 
 =head1 VERSION
 

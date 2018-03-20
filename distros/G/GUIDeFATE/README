@@ -1,5 +1,15 @@
 GUI Design From A Text Editor
 
+Installation:
+
+This may install even if its dependencies fail to install.  This is 
+because different backends will have different needs. GUIDeFATE will 
+work currently with Gtk, Wx and Tk. 
+
+Perl5.8.8, Exporter, Wx, Wx::Perl::Imagick (for Wx interface)
+Perl5.8.8, Exporter, Tk, Image::Imagick, Tk::JPEG, MIME::Base64 (for Tk interface)
+Perl5.8.8, Exporter, Glib, Gtk (for Gtk interface)
+
 Designing a graphical User interface requires knowledge of things like
 toolkit libraries, platform context etc.  At least I think it does.  I
 am a relatively new programmer in that I have near zero experience in

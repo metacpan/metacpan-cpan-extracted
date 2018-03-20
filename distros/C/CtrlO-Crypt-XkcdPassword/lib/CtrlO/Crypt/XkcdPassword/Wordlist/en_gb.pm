@@ -20,7 +20,7 @@ CtrlO::Crypt::XkcdPassword::Wordlist::en_gb - default word list for CtrlO::Crypt
 
 =head1 VERSION
 
-version 1.003
+version 1.004
 
 =head1 DESCRIPTION
 
@@ -981,7 +981,6 @@ below
 bemoan
 bemuse
 bench
-bender
 beneath
 benefit
 benign
@@ -997,7 +996,6 @@ beset
 beside
 besiege
 besought
-bestial
 bestow
 betcha
 betray
@@ -1112,7 +1110,6 @@ blonder
 blood
 bloodier
 bloodshot
-bloody
 bloom
 blossom
 blotch
@@ -1724,7 +1721,6 @@ chime
 chimney
 chimp
 china
-chink
 chintz
 chipmunk
 chipper
@@ -2219,7 +2215,6 @@ coyote
 crabbier
 crabby
 crack
-cracker
 crackle
 crackpot
 cradle
@@ -3020,7 +3015,6 @@ drowsy
 drudge
 drudgery
 druggist
-drugstore
 drummer
 drumstick
 drunk
@@ -3263,7 +3257,6 @@ endow
 endowment
 endurance
 endure
-enema
 enemy
 energetic
 energy
@@ -4091,7 +4084,6 @@ fruitier
 fruition
 fruity
 frustrate
-fudge
 fugitive
 fulcrum
 fulfil
@@ -4823,7 +4815,6 @@ horizon
 hormone
 hornet
 hornier
-horny
 horoscope
 horrible
 horribly
@@ -5987,7 +5978,6 @@ marvel
 mascara
 mascot
 masculine
-masochist
 mason
 masonry
 massage
@@ -6081,8 +6071,6 @@ memory
 menace
 menagerie
 menial
-menopause
-menstrual
 mental
 mentality
 mentally
@@ -6780,7 +6768,6 @@ organist
 orient
 oriental
 orientate
-orifice
 origin
 original
 originate
@@ -6944,7 +6931,6 @@ pacifism
 pacifist
 pacify
 package
-packer
 packet
 paddle
 paddock
@@ -7259,7 +7245,6 @@ piccolo
 pickax
 picket
 pickier
-pickle
 pickup
 picky
 picnic
@@ -7576,7 +7561,6 @@ prevent
 preview
 previewer
 price
-prick
 prickle
 pricklier
 prickly
@@ -7781,7 +7765,6 @@ pushier
 pushover
 pushy
 pussier
-pussy
 putative
 putrid
 putter
@@ -7821,8 +7804,6 @@ queasy
 queen
 queenlier
 queenly
-queer
-queerer
 quell
 quench
 query
@@ -8260,7 +8241,6 @@ retailer
 retain
 retainer
 retaliate
-retard
 retch
 retention
 rethink
@@ -8643,7 +8623,6 @@ scrawny
 scream
 screech
 screen
-screw
 screwier
 screwy
 scribble
@@ -9150,7 +9129,6 @@ snappy
 snapshot
 snare
 snarl
-snatch
 sneak
 sneaker
 sneakier
@@ -9922,7 +9900,6 @@ tailgate
 taillight
 tailor
 tailspin
-taint
 taken
 takeoff
 takeover
@@ -10064,7 +10041,6 @@ terser
 testable
 testament
 tester
-testicle
 testify
 testimony
 tether
@@ -11049,7 +11025,6 @@ wholesome
 wholly
 whoop
 whopper
-whore
 whose
 wickeder
 wickedly

@@ -32,3 +32,9 @@ on 'test' => sub {
 on 'configure' => sub {
   requires "Module::Build" => "0.28";
 };
+
+on 'develop' => sub {
+  requires "Bad::Words" => "0";
+  requires "Test::More" => "0";
+  requires "lib" => "0";
+};

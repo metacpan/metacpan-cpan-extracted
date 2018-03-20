@@ -23,3 +23,4 @@ t/fixtures/NotAList.pm
 t/fixtures/XkcdList.pm
 t/fixtures/aa_wordlist.txt
 t/fixtures/nentropy.txt
+xt/no-bad-words_en-GB.t

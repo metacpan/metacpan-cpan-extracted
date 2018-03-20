@@ -1,3 +1,11 @@
+-   2.17.5 Sun Mar 18 17:19:43 CDT 2018
+
+    Bump dependency version.
+
+-   2.17.4 Sun Mar 18 13:05:04 CDT 2018
+
+    Update Makefile.PL, thanks to Slaven_Rezic.
+
 -   2.17.3 Fri Mar 16 16:32:47 CDT 2018
 
     Up required version of Module::FromPerlVer.

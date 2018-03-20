@@ -1,5 +1,10 @@
 Revision history for CtrlO-Crypt-XkcdPassword
 
+1.004   2018-03-19T10:28:04
+    - add author test in xt to check for bad words
+    - remove a few more bad-ish words
+
+
 1.003   2018-02-28T11:17:15
     - Remove words with potential to generate offensive phrases (Andy Beverley)
 

@@ -56,7 +56,7 @@ sub update
 
     my $TEMP = File::Temp->new();
     print $TEMP $c;
-    rename $TEMP->filename, $output;
+    system "mv '$TEMP->filename' '$output'";
 }
 
 sub uaget

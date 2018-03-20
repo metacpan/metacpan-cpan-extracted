@@ -15,6 +15,15 @@ use Bio::MUST::Drivers::CdHit;
 my $class = 'Bio::MUST::Drivers::CdHit';
 
 
+# skip all CD-HIT tests unless cd-hit is available in the $PATH
+unless ( qx{which cd-hit} ) {
+    plan skip_all => <<"EOT";
+skipped all CD-HIT tests!
+If you want to use this module you need to install the CD-HIT executable:
+https://github.com/weizhongli/cdhit
+EOT
+}
+
 # expected members for
 my $exp_clstr_file = file('test', 'cdHit.out.groups');
 open my $in, '<', $exp_clstr_file;

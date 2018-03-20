@@ -3,7 +3,7 @@ package App::ModuleBuildTiny;
 use 5.010;
 use strict;
 use warnings;
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
@@ -171,7 +171,7 @@ my %actions = (
 		my $dist = App::ModuleBuildTiny::Dist->new;
 
 		require CPAN::Meta::Prereqs::Filter;
-		my $prereqs = CPAN::Meta::Prereqs::Filter::filter_prereqs($dist->meta->effective_prereqs, %opts, sanitize => 1);
+		my $prereqs = CPAN::Meta::Prereqs::Filter::filter_prereqs($dist->meta->effective_prereqs, %opts);
 
 		if (!$opts{json}) {
 			my @phases = qw/build test configure runtime/;
@@ -282,7 +282,7 @@ App::ModuleBuildTiny - A standalone authoring tool for Module::Build::Tiny
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 DESCRIPTION
 

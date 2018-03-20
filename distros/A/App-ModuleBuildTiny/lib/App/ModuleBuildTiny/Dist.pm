@@ -3,8 +3,9 @@ package App::ModuleBuildTiny::Dist;
 use 5.010;
 use strict;
 use warnings;
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
+use CPAN::Meta;
 use Carp qw/croak/;
 use Config;
 use Encode qw/encode_utf8 decode_utf8/;
@@ -127,7 +128,7 @@ sub new {
 
 	require Module::Metadata; Module::Metadata->VERSION('1.000009');
 	my $data = Module::Metadata->new_from_file($filename, collect_pod => 1) or die "Couldn't analyse $filename: $!";
-	my @authors = map { / \A \s* (.+?) \s* \z /x } grep { /\S/ } split /\n/, $data->pod('AUTHOR') // '' or warn "Could not parse any authors from `=head1 AUTHOR` in $filename";
+	my @authors = map { / \A \s* (.+?) \s* \z /x } grep { /\S/ } split /\n/, $data->pod('AUTHOR') // $data->pod('AUTHORS') // '' or warn "Could not parse any authors from `=head1 AUTHOR` in $filename";
 	my $license = detect_license($data, $filename, \@authors);
 
 	my $load_meta = !%{ $opts{regenerate} || {} } && uptodate('META.json', 'cpanfile', $mergefile);
@@ -158,6 +159,25 @@ sub new {
 			require CPAN::Meta::Merge;
 			$metahash = CPAN::Meta::Merge->new(default_version => '2')->merge($metahash, $mergedata);
 		}
+
+		# this avoids a long-standing CPAN.pm bug that incorrectly merges runtime and
+		# "build" (build+test) requirements by ensuring requirements stay unified
+		# across all three phases
+		require CPAN::Meta::Prereqs::Filter;
+		my $filtered = CPAN::Meta::Prereqs::Filter::filter_prereqs(CPAN::Meta::Prereqs->new($metahash->{prereqs}), sanitize => 1);
+		my $merged_prereqs = $filtered->merged_requirements([qw/runtime build test/], ['requires']);
+		my %seen;
+		for my $phase (qw/runtime build test/) {
+			my $requirements = $filtered->requirements_for($phase, 'requires');
+			for my $module ($requirements->required_modules) {
+				$requirements->clear_requirement($module);
+				next if $seen{$module}++;
+				my $module_requirement = $merged_prereqs->requirements_for_module($module);
+				$requirements->add_string_requirement($module => $module_requirement);
+			}
+		}
+		$metahash->{prereqs} = $filtered->as_string_hash;
+
 		$metahash->{provides} ||= Module::Metadata->provides(version => 2, dir => 'lib') if not $metahash->{no_index};
 		CPAN::Meta->create($metahash, { lazy_validation => 0 });
 	};

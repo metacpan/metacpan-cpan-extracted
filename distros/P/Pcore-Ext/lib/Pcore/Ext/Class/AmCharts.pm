@@ -29,14 +29,16 @@ JS
 
         onBindStore => $ext->js_func(
             [ 'store', 'initial' ], <<'JS'
-                if (this.rendered) this.onStorerefresh();
+                if (!this.getStore()) return;
+
+                if (this.rendered) this.onStoreRefresh();
 JS
         ),
 
         getStoreListeners => $ext->js_func(
             ['store'], <<'JS'
                 return {
-                    load: this.onStorerefresh,
+                    load: this.onStoreRefresh,
                     // prefetch: this.updateInfo,
                     // exception: this.onTotalCountChange
                 };
@@ -53,7 +55,7 @@ JS
 JS
         ),
 
-        onStorerefresh => $ext->js_func(
+        onStoreRefresh => $ext->js_func(
             <<'JS'
                 if (this.chart) {
                     var store = this.getStore();

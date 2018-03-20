@@ -1,5 +1,7 @@
 package WWW::PushBullet;
 
+=encoding utf8
+
 =head1 NAME
 
 WWW::PushBullet - Module giving easy access to PushBullet API
@@ -38,7 +40,7 @@ use JSON;
 use LWP::UserAgent;
 use MIME::Types;
 
-our $VERSION = '1.4.0';
+our $VERSION = 'v1.6.0';
 
 my %PUSHBULLET = (
     REALM     => 'Pushbullet',
@@ -63,7 +65,7 @@ sub new
     my ($class, $params) = @_;
 
     return (undef) if (!defined $params->{apikey});
-    my $ua = LWP::UserAgent->new;
+    my $ua = $params->{ua} || LWP::UserAgent->new;
     $ua->agent("WWW::PushBullet/$VERSION");
     $ua->proxy('https', $params->{proxy}) if (defined $params->{proxy});
     $ua->credentials($PUSHBULLET{SERVER}, $PUSHBULLET{REALM},
@@ -73,6 +75,7 @@ sub new
         _ua     => $ua,
         _apikey => $params->{apikey},
         _debug  => $params->{debug} || 0,
+        _limits => undef
     };
 
     bless $self, $class;
@@ -133,6 +136,28 @@ sub debug_mode
     return ($self->{_debug});
 }
 
+sub _update_limits
+{
+    my ($self, $response) = @_;
+
+    my $limits = {
+        'limit'     => $response->header('X-Ratelimit-Limit'),
+        'remaining' => $response->header('X-Ratelimit-Remaining'),
+        'reset'     => $response->header('X-Ratelimit-Reset')
+    };
+
+    $self->{_limits} = $limits;
+}
+
+sub print_limits
+{
+    my $self = shift;
+
+    my $l = $self->{_limits};
+    printf "Limits limit: %s - remaining: %s - reset %s\n",
+        $l->{limit}, $l->{remaining}, $l->{reset};
+}
+
 =head2 contacts()
 
 Returns list of contacts
@@ -154,6 +179,7 @@ sub contacts
 
     if ($res->is_success)
     {
+        $self->_update_limits($res);
         my $data = JSON->new->decode($res->content);
         return ($data->{contacts});
     }
@@ -186,8 +212,38 @@ sub devices
 
     if ($res->is_success)
     {
+        $self->_update_limits($res);
         my $data = JSON->new->decode($res->content);
         return ($data->{devices});
+    }
+    else
+    {
+        print $res->status_line, "\n";
+        return (undef);
+    }
+}
+
+=head2 _ephemerals
+
+Generic ephemerals function (not supposed to be used directly)
+
+=cut
+
+sub _ephemerals
+{
+    my ($self, $content) = @_;
+
+    my $res = $self->{_ua}->post(
+        "$PUSHBULLET{URL_APIV2}/ephemerals",
+        Content_Type => 'application/json',
+        Content      => JSON->new->encode($content)
+    );
+
+    if ($res->is_success)
+    {
+        $self->_update_limits($res);
+        my $data = JSON->new->decode($res->content);
+        return ($data);
     }
     else
     {
@@ -214,6 +270,7 @@ sub _pushes
 
     if ($res->is_success)
     {
+        $self->_update_limits($res);
         my $data = JSON->new->decode($res->content);
         return ($data);
     }
@@ -242,6 +299,7 @@ sub _upload_request
 
     if ($res->is_success)
     {
+        $self->_update_limits($res);
         my $data       = JSON->new->decode($res->content);
         my @array_data = %{$data->{data}};
         push @array_data, 'file', [$file_name];
@@ -252,6 +310,7 @@ sub _upload_request
         );
         if ($res->is_success)
         {
+            $self->_update_limits($res);
             return ($data->{file_url});
         }
         else
@@ -404,6 +463,64 @@ sub push_note
     return ($result);
 }
 
+=head2 push_sms($params)
+
+Push SMS
+
+    $pb->push_sms(
+        {
+            conversation_iden => $mobile,
+            message => $sms,
+            target_device_iden => $conf->{default_sms_device}
+        }
+        );
+
+=cut
+
+sub push_sms
+{
+    my ($self, $params) = @_;
+
+    my $user_info = $self->user_info();
+
+    my $ephemeral = {type => 'push', push => $params};
+    $ephemeral->{push}->{package_name}     = 'com.pushbullet.android';
+    $ephemeral->{push}->{source_user_iden} = $user_info->{iden};
+    $ephemeral->{push}->{type}             = 'messaging_extension_reply';
+
+    $self->DEBUG(sprintf('push_sms: %s', dump($ephemeral)));
+    my $result = $self->_ephemerals($ephemeral);
+
+    return ($result);
+}
+
+=head2 user_info()
+
+Returns PushBullet's user information (name, email, iden...)
+
+    my $user_info = $pb->user_info();
+
+=cut
+
+sub user_info
+{
+    my $self = shift;
+
+    my $res = $self->{_ua}->get("$PUSHBULLET{URL_APIV2}/users/me");
+
+    if ($res->is_success)
+    {
+        $self->_update_limits($res);
+        my $data = JSON->new->decode($res->content);
+        return ($data);
+    }
+    else
+    {
+        print $res->status_line, "\n";
+        return (undef);
+    }
+}
+
 =head2 version()
 
 Returns WWW::PushBullet module version
@@ -428,6 +545,6 @@ L<https://github.com/sebthebert/WWW-PushBullet>
 
 =head1 AUTHOR
 
-Sebastien Thebert <www-pushbullet@onetool.pm>
+Sébastien Thébert <www-pushbullet@onetool.pm>
 
 =cut

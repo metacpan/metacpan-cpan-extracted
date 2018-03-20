@@ -38,7 +38,7 @@
             "File::Temp" : "0",
             "FindBin" : "0",
             "List::Util" : "0",
-            "Module::FromPerlVer" : "0.005005",
+            "Module::FromPerlVer" : "0.002",
             "Symbol" : "0",
             "Test::More" : "0",
             "strict" : "0"
@@ -46,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.017003",
+   "version" : "2.017006",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

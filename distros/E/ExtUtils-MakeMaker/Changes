@@ -1,3 +1,25 @@
+7.34  Mon Mar 19 10:21:12 GMT 2018
+
+    No changes since v7.33_03
+
+7.33_03 Sat Feb 24 20:17:04 GMT 2018
+
+    Core fixes:
+    - Properly silence warnings under core
+
+    Darwin/NeXT fixes:
+    - Recognise -F as framework flag too
+
+7.33_02 Sat Feb 24 13:17:01 GMT 2018
+
+    Core fixes:
+    - Skip xsstatic test on Darwin
+
+7.33_01 Tue Feb 20 10:39:43 GMT 2018
+
+    Core fixes:
+    - Silence errant README.pod warning when in perl core
+
 7.32  Fri Feb 16 20:10:58 GMT 2018
 
     No changes since v7.31_08

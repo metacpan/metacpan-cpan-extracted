@@ -5,11 +5,12 @@ use utf8;
 use Moose;
 use App::BatParser;
 use Carp;
+use Data::Dumper;
 use Bat::Interpreter::Delegate::FileStore::LocalFileSystem;
 use Bat::Interpreter::Delegate::Executor::PartialDryRunner;
 use namespace::autoclean;
 
-our $VERSION = '0.001';    # VERSION
+our $VERSION = '0.002';    # VERSION
 
 =encoding utf-8
 
@@ -70,7 +71,13 @@ sub run {
 
     my $parser = App::BatParser->new;
 
-    my $parse_tree = $parser->parse( $self->batfilestore->get_contents($filename) . "\r\n" );
+    my $ensure_last_line_has_carriage_return = "\r\n";
+    if ( $^O eq 'MSWin32' ) {
+        $ensure_last_line_has_carriage_return = "\n";
+    }
+
+    my $parse_tree =
+      $parser->parse( $self->batfilestore->get_contents($filename) . $ensure_last_line_has_carriage_return );
     if ($parse_tree) {
         my $lines = $parse_tree->{'File'}{'Lines'};
 
@@ -267,7 +274,11 @@ sub _handle_condition {
 
             #print "$left_operand == $right_operand\n";
             return $left_operand eq $right_operand;
-        } else {
+        } elsif ( $operator eq 'GTR' ) {
+            return $left_operand > $right_operand;
+        }
+
+        else {
             die "Operator: $operator not implemented";
         }
 

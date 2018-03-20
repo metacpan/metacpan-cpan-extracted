@@ -1,5 +1,10 @@
 Revision history for Perl extension Task-BeLike-ZAKAME
 
+0.15 2018-03-19T02:05:34Z
+
+    - Add Devel::Trace and Perl::Critic::Freenode to recommends
+    - Move App::Nopaste to recommends
+
 0.14 2018-01-17T03:10:26Z
 
     - Add Net::Async::HTTP (which pulls in Future and IO::Async)

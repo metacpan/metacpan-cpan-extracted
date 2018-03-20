@@ -1,3 +1,9 @@
+0.10_1 2018-03-18 dmol@cpan.org
+ - No changes since 0.10_1
+
+0.10_1 2018-03-17 dmol@cpan.org
+ - Allow to lookup glyphs by name (mauzo)
+
 0.09 2017-10-18 dmol@cpan.org
  - Fallback to default charmap for 2.8.1 for backward-compatibility
    for FNT-fonts

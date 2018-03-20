@@ -7,7 +7,37 @@ use version;
 use Module::FromPerlVer;
 use ExtUtils::MakeMaker;
 
-my $version = '2.17.3'; 
+my $version = '2.17.6'; 
+my $mm_v    = ExtUtils::MakeMaker->VERSION;
+
+my @merge_spec
+= do
+{
+    if( $mm_v < 6.46 )
+    {
+        ()
+    }
+    else
+    {
+        META_MERGE => 
+        {
+            'meta-spec' =>
+            {
+                version => 2
+            },
+
+            dynamic_config => 1,
+
+            configure_requires =>
+            {
+                qw
+                (
+                    Module::FromPerlVer 0.002,
+                )
+            },
+        }
+    }
+};
 
 WriteMakefile
 (
@@ -26,7 +56,7 @@ WriteMakefile
 		qw
         (
             Cwd                 3.73
-            Module::FromPerlVer 0.005005
+            Module::FromPerlVer 0.002
 
             Carp                0
             File::Spec          0
@@ -38,6 +68,8 @@ WriteMakefile
             strict              0
         )
     },
+
+    @merge_spec,
 );
 
 __END__

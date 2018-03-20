@@ -5,7 +5,7 @@ use utf8;
 use Moose::Role;
 use namespace::autoclean;
 
-our $VERSION = '0.001';    # VERSION
+our $VERSION = '0.002';    # VERSION
 
 =encoding utf-8
 

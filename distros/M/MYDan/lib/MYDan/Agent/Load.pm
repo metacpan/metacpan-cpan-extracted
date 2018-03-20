@@ -224,7 +224,7 @@ sub run
 	die "chown fail\n" unless chown @pw[2,3], $temp;
     }
 
-    die "rename temp file\n" unless rename $temp, $dp;
+    die "rename temp file\n" if system "mv '$temp' '$dp'";
 }
 
 1;

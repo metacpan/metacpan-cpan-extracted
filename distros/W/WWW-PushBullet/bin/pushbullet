@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+=encoding utf8
+
 =head1 NAME
 
 pushbullet - Program giving easy access to PushBullet API
@@ -28,6 +30,9 @@ Program giving easy access to PushBullet features
     
     pushbullet note [ -k <pushbullet_apikey> ] [ -d <device_iden> ]
         --title 'your title' --body 'your body message'
+    
+    pushbullet sms [ -k <pushbullet_apikey> ] [ -d <device_iden> ]
+        --mobile '+33 6 xx xx xx xx' --sms 'your sms'
     
 =head1 OPTIONS
 
@@ -65,9 +70,17 @@ Prints this Help
 
 Sets PushBullet API key
 
+=item B<-m>, B<--mobile>
+
+Sets mobile phone number for 'pushbullet sms'
+
 =item B<-n>, B<--name>
 
 Sets name for 'pushbullet address'
+
+=item B<-s>, B<--sms>
+
+Sets SMS message for 'pushbullet sms'
 
 =item B<-t>, B<--title>
 
@@ -99,14 +112,10 @@ use JSON;
 use Pod::Usage;
 
 use lib "$FindBin::Bin/../lib/";
-
 use WWW::PushBullet;
 
 my $FILE_CONFIG = "$FindBin::Bin/../conf/pushbullet.json";
-
 my %opt         = ();
-my @opt_devices = ();
-my @opt_items   = ();
 
 =head1 SUBROUTINES/METHODS
 
@@ -158,8 +167,10 @@ my $status = GetOptions(
     'device|d=s@',    # to specify device
     'file|f=s',       # for 'pushbullet file'
     'item|i=s@',      # for 'pushbullet list'
-    'apikey|k=s',     # to specify apikey
+    'apikey|k=s',     # to specify user apikey
+    'mobile|m=s',     # for 'pushbullet sms'
     'name|n=s',       # for 'pushbullet address'
+	'sms|s=s',		  # for 'pushbullet sms'
     'title|t=s',      # for 'pushbullet note'
     'url|u=s',        # for 'pushbullet link, list & note'
     'proxy|x=s',      # to set proxy
@@ -170,15 +181,16 @@ my $status = GetOptions(
 pod2usage(0) if ((!$status) || ($opt{help}));
 if ($opt{version})
 {
-    printf "WWW::PushBullet v%s\n", WWW::PushBullet::version();
+    printf "WWW::PushBullet %s\n", WWW::PushBullet::version();
     exit 0;
 }
 
 $opt{action} = $ARGV[0];
 
+my $qr_action_list = qr/^(?:address|contacts|devices|file|link|list|note|sms)$/;
 pod2usage(0)
-    if ((!defined $opt{action})
-    || ($opt{action} !~ /^(?:address|contacts|devices|file|link|list|note)$/));
+    if ((!defined $opt{action}) || ($opt{action} !~ $qr_action_list));
+
 my $conf = Read_Config_File($opt{config});
 
 my $apikey  = $opt{apikey}  || $conf->{apikey};
@@ -199,6 +211,9 @@ my $name  = $opt{name}  || $conf->{default_name};
 my $title = $opt{title} || $conf->{default_title};
 my $proxy = $opt{proxy} || $conf->{proxy};
 my $url   = $opt{url}   || $conf->{default_url};
+
+my $mobile = $opt{mobile} || $conf->{default_sms_mobile};
+my $sms = $opt{sms};
 
 my $pb = WWW::PushBullet->new({
     apikey => $apikey, 
@@ -248,8 +263,11 @@ elsif ($opt{action} eq 'devices')
     my $devices = $pb->devices();
     foreach my $d (@{$devices})
     {
-        printf "Device '%s' (%s) => id %s\n", 
-            $d->{nickname}, $d->{model}, $d->{iden};
+	if ($d->{active})
+	{
+        	printf "Device '%s' (%s) => id %s\n", 
+            		$d->{nickname}, $d->{model}, $d->{iden};
+	}
     }
 }
 elsif ($opt{action} eq 'file')
@@ -327,9 +345,37 @@ elsif ($opt{action} eq 'note')
         printf "pushbullet note --title title --body 'body message'\n";
     }
 }
+elsif ($opt{action} eq 'sms')
+{
+    if ((defined $mobile) && (defined $sms))
+    {
+        $pb->push_sms(
+            {
+                conversation_iden => $mobile,
+                message => $sms,
+                target_device_iden => ($devices[0] || $conf->{default_sms_device})
+           	}
+            );
+    }
+    else
+    {
+        printf "pushbullet sms --phone 'dest mobile number' --sms 'your sms'\n";
+    }
+}
+
+$pb->print_limits();
+
+=head1 LICENSE
+ 
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 REPOSITORY
+
+L<https://github.com/sebthebert/WWW-PushBullet>
 
 =head1 AUTHOR
 
-Sebastien Thebert <www-pushbullet@onetool.pm>
+Sébastien Thébert <www-pushbullet@onetool.pm>
 
 =cut

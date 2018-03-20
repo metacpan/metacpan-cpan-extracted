@@ -3,12 +3,12 @@ package GUIDeFATE;
    use strict;
    use warnings;
    
-   our $VERSION = '0.065';
+   our $VERSION = '0.081';
    
    use Exporter 'import';
    
    our @EXPORT_OK      = qw<$frame>;  # allows manipulation of frame from main.
-   our $target="wx";
+   our $target;
    our $AppObject;
    our $winX=30;
    our $winY=30;
@@ -21,26 +21,43 @@ package GUIDeFATE;
 
 sub new{
 	my ($class,$textGUI,$target,$assist)=@_;
-	if ((!$target)||($target=~/wx/i)){
+	if ((!$target)||($target=~/^wx/i)){
 		$target="wx";
-		eval " use GFwx qw<addButton addStatText addTextCtrl addMenuBits addPanel setScale
+		eval " use GFwx qw<addWidget addVar setScale
 		           \$frame \$winScale \$winWidth \$winHeight \$winTitle>;";
 		convert($textGUI,$assist);
 		return GFwx->new(); ;
 	}
-	elsif ($target =~m/tk/i){
-		eval " use GFtk qw<addButton addStatText addTextCtrl addMenuBits addPanel setScale 
+	elsif ($target =~m/^gtk/i){
+		$target="gtk";
+		eval " use GFgtk qw<addWidget addVar setScale MainLoop
 		           \$frame \$winScale \$winWidth \$winHeight \$winTitle>;";
-		convert($textGUI, $target);
+		convert($textGUI, $assist);
+		return GFgtk->new(); 
+		
+	}	
+	elsif ($target =~m/^tk/i){
+		$target="tk";
+		eval " use GFtk qw<addWidget addVar setScale 
+		           \$frame \$winScale \$winWidth \$winHeight \$winTitle>;";
+		convert($textGUI, $assist);
 		return GFtk->new(); 
 	}
-	elsif ($target =~m/win32/i){
-		eval " use GFwin32 qw<addButton addStatText addTextCtrl addMenuBits addPanel setScale 
+	elsif ($target =~m/^qt/i){
+		$target="qt";
+		eval " use GFqt qw<addWidget addVar setScale
 		           \$frame \$winScale \$winWidth \$winHeight \$winTitle>;";
-		convert($textGUI, $target);
+		convert($textGUI, $assist);
+		my $qtWin=GFqt->new(); 
+		return $qtWin;
+	}
+	elsif ($target =~m/^win32/i){
+		$target="win32";
+		eval " use GFwin32 qw<addWidget addVar setScale 
+		           \$frame \$winScale \$winWidth \$winHeight \$winTitle>;";
+		convert($textGUI, $assist);
 		return GFwin32->new(); 
 	}
-	
 }
 
 
@@ -49,9 +66,9 @@ sub convert{
 	my @lines=(split /\n/ ,$textGUI) ;
 	if (!$assist){$assist="q"};
 		           
-	my $verbose= $assist=~/v/;
-	my $debug= $assist=~/d/;
-	my $auto= $assist=~/a/;
+	my $verbose= $assist=~/^v/i;
+	my $debug= $assist=~/^d/i;
+	my $auto= $assist=~/^a/i;
 	
 	if (!exists &{"setScale"}){print "Error exists in GF$target\n"; return;}
 	setScale($winScale);  # makes scaling in the two modules match
@@ -91,18 +108,27 @@ sub convert{
 				$log="SubPanel '$panelType' Id $bid found position  $ps height $fh width $fl at row $l with content $content \n";##
 				if ($verbose){ print $log; }
 				if ($auto){ $autoGen.="#".$log; }
-				addPanel([$bid,$panelType,$content,[$winScale*($ps*2-1),$winScale*$l*4],[$winScale*($fl*2+3),$winScale*$fh*4]]);
+				addWidget(["sp",$bid,$panelType,$content,[$winScale*($ps*2-1),$winScale*$l*4],[$winScale*($fl*2+3),$winScale*$fh*4]]);
 				$bid+=2; # id goes up by 2, one for the panel and one for the content;
 			};    
 		}
 		
-		
+		while ($line =~m/(\^([A-z]+)\s*\^)/g){ #ComboBoxes
+			my $ps=length($`);my $label=$2; my $len=length ($label);$label=~s/^(\s+)|(\s+)$//g;
+			$line=~s/(\^([A-z]+)\s*\^)/" " x length($1)/e;
+			$log= "combobox calls function &combo$bid\n"; ##
+			if ($verbose){ print $log; }
+			if ($auto){ $autoGen.=makeSub("combo$bid", "combobox with data from \@$label"); }
+			addWidget(["combo",$bid,$label,[$winScale*($ps*2-1),$winScale*$l*4],[$winScale*($len*2+3),$winScale*4], \&{"main::combo".$bid}]);
+			$bid++;
+		}
 		while ($line =~m/(\{([^}]*)\})/g){   # buttons are made from { <label> } 
 			my $ps=length($`);my $label=$2; my $len=length ($label);$label=~s/^(\s+)|(\s+)$//g;
 			$log= "Button with label '$label' calls function &btn$bid\n"; ##
 			if ($verbose){ print $log; }
 			if ($auto){ $autoGen.=makeSub("btn$bid", "button with label $label "); }			
-			addButton([$bid, $label,[$winScale*($ps*2-1),$winScale*$l*4],[$winScale*($len*2+3),$winScale*4], \&{"main::btn".$bid++}]);
+			addWidget(["btn",$bid, $label,[$winScale*($ps*2-1),$winScale*$l*4],[$winScale*($len*2+3),$winScale*4], \&{"main::btn".$bid}]);
+			$bid++;
 			$line=~s/(\{([^}]*)\})/" " x length($1)/e;     #remove buttons replacing with spaces
 		}
 		while ($line=~m/(\[([^\]]+)\])/g){   # text ctrls are made from [ default text ] 
@@ -111,11 +137,11 @@ sub convert{
 			if ($verbose){ print $log; }
 			if ($auto){ $autoGen.=makeSub("textctrl$bid","Text Control with default text ' $content '" ); }	
 			my $trimmed=$content; $trimmed=~s/(\s+)|(\s+)$//g; 
-			addTextCtrl([$bid, $trimmed,[$winScale*($ps*2-1),$winScale*$l*4],[$winScale*(length($content)*2+3),$winScale*4], \&{"main::textctrl".$bid}]);
+			addWidget(["textctrl",$bid, $trimmed,[$winScale*($ps*2-1),$winScale*$l*4],[$winScale*(length($all)*2-1),$winScale*4], \&{"main::textctrl".$bid}]);
 			$bid++;
 			$line=~s/(\[([^\]]+)\])/" " x length($1)/e;     #remove text controls replacing with spaces
 		}
-		if ($line !~ m/\+/){
+		if ($line !~ m/^\+/){
 		  my $tmp=$line;
 		  $tmp=~s/(\[([^\]]+)\])|(\{([^}]*)\})/" " x length $1/ge;    
 		  $tmp=~s/^(\|)|(\|)$//g;                                     #remove starting and ending border
@@ -124,8 +150,8 @@ sub convert{
 			  $log= "Static text '".$tmp."'  with id stattext$bid\n"; ##
 			  if ($verbose){ print $log; }
 			  if ($auto){ $autoGen.="#".$log; }
-		      $line=~m/$tmp/;my $ps=length($`);
-		      addStatText([$bid++, $tmp,[$winScale*($ps*2-1),$winScale*$l*4]]);
+		      $line=~m/\Q$tmp\E/;my $ps=length($`);
+		      addWidget(["stattext",$bid++, $tmp,[$winScale*($ps*2-1),$winScale*$l*4]]);
 		  }
 	     }
 		$l++;		
@@ -134,47 +160,56 @@ sub convert{
 	
 	my $mode="";
 	while ($l++<=scalar(@lines)){
-		next if ((!$lines[$l]) || ($lines[$l] eq "")||($lines[$l]=~m/^#/));
-		if ($lines[$l]=~/menu/i){
+		my $line=$lines[$l];
+		if ((!$line) || ($line eq "")||($line=~/^#/)){
+			$mode="";next;
+			}
+		elsif ($line=~/menu/i){
 			$log="Menu found\n"; ##
 			if ($verbose){ print $log; }
 			if ($auto){ $autoGen.="#".$log; }
 			$mode="menu";
-			next;};
+			next;}
+		elsif($line=~/^([A-z]+=)/){
+			chomp $line;
+			my ($varName,$value)=split(/=/,$line,2);
+			$log="var ' $varName ' has value ' $value '\n"; ##
+			addVar($varName,$value);
+		}
 		
 		if($mode eq "menu"){
-			if ($lines[$l]=~/^\-([A-z0-9].*)/i){
+			if ($line=~/^\-([A-z0-9].*)/i){
 				$log= "Menuhead $1 found\n"; ##
 				if ($verbose){ print $log; }
 				if ($auto){ $autoGen.="#".$log; }
-				addMenuBits([$bid++, $1, "menuhead", undef]);
+				addWidget(["mb",$bid++, $1, "menuhead", undef]);
 				}
-			elsif($lines[$l]=~/^\-{2}([A-z0-9].*)\;radio/i){
+			elsif($line=~/^\-{2}([A-z0-9].*)\;radio/i){
 				$log= "Menu $1  as radio found, calls function &menu$bid \n";##
 				if ($verbose){ print $log; }
-				if ($auto){ $autoGen.="#".$log.makeSub("menu$bid"); }
-				addMenuBits([$bid, $1, "radio", \&{"main::menu".$bid++}]);
+				if ($auto){ $autoGen.="#".$log.makeSub("menu$bid","Menu with label $1"); }
+				addWidget(["mb",$bid, $1, "radio", \&{"main::menu".$bid++}]);
 				}
-			elsif($lines[$l]=~/^\-{2}([A-z0-9].*)\;check/i){
+			elsif($line=~/^\-{2}([A-z0-9].*)\;check/i){
 				$log= "Menu $1 as check found, calls function &menu$bid \n";##
 				if ($verbose){ print $log; }
-				if ($auto){ $autoGen.="#".$log.makeSub("menu$bid"); }
-				addMenuBits([$bid, $1, "check", \&{"main::menu".$bid++}]);
+				if ($auto){ $autoGen.="#".$log.makeSub("menu$bid","Menu with label $1"); }
+				addWidget(["mb",$bid, $1, "check", \&{"main::menu".$bid++}]);
 				}
 			elsif($lines[$l]=~/^\-{6}/){
 				$log= "Separator found,\n"; ##
 				if ($verbose){ print $log; }
-				if ($auto){ $autoGen.="#".$log.makeSub("menu$bid"); }
-				addMenuBits([$bid++, "", "separator",""]);
+				if ($auto){ $autoGen.="#".$log.makeSub("menu$bid","Menu with label $1"); }
+				addWidget(["mb",$bid++, "", "separator",""]);
 				}
-		    elsif($lines[$l]=~/^\-{2}([A-z0-9].*)/i){
+		    elsif($line=~/^\-{2}([A-z0-9].*)/i){
 				$log= "Menu $1 found, calls function &menu$bid \n";##
 				if ($verbose){ print $log; }
-				if ($auto){ $autoGen.="#".$log.makeSub("menu$bid"); }
+				if ($auto){ $autoGen.="#".$log.makeSub("menu$bid","Menu with label $1"); }
 				}
-				addMenuBits([$bid, $1, "normal", \&{"main::menu".$bid++}]);
+				addWidget(["mb",$bid, $1, "normal", \&{"main::menu".$bid++}]);
 				}
-		    elsif($lines[$l]=~/^\-{3}([A-z0-9].*)/i){
+		    elsif($line=~/^\-{3}([A-z0-9].*)/i){
 				$log= "SubMenu $1 found\n";##
 				}
 		}
@@ -187,7 +222,7 @@ sub convert{
 	
 	sub makeSub{
 	  my ($subName,$trigger)=@_;
-	  return "sub $subName #called using $trigger {\n  # subroutione code goes here\n   };\n\n";
+	  return "sub $subName {#called using $trigger\n  # subroutione code goes here\n   };\n\n";
     }
 
 
@@ -226,14 +261,20 @@ GUIDeFATE  -  Graphical User Interface Design From A Text Editor
 
     END
 
-    my $gui=GUIDeFATE->new($window);
-    $frame=$gui->getFrame;
+    my $gui=GUIDeFATE->new($window,[$backend],[$assist]); # API changed at version 0.06
+    # $backend is one of Wx(Default), Tk or Gtk
+    # $assist is one or  "q" (quiet, default), "v" (verbose) or "a" for Autogenerate
+    
+    $frame=$gui->getFrame||$gui;
     $gui->MainLoop;
 
 =head1 REQUIRES
 
 Perl5.8.8, Exporter, Wx, Wx::Perl::Imagick (for Wx interface)
 Perl5.8.8, Exporter, Tk, Image::Imagick, Tk::JPEG, MIME::Base64 (for Tk interface)
+Perl5.8.8, Exporter, Glib, Gtk (for Gtk interface)
+Perl5.8.8, Exporter, QtCore4, QtGui4 (for Qt interface)
+
 
 =head1 EXPORTS
 
@@ -256,12 +297,13 @@ GUIDeFATE and this is transformed into an Interactive Interface.
 
 Extracts dimensions and wdigets in a window from the textual
 representation.
-If $options not pprovided, defaults to "Wx"; options are Wx and Tk.
+If $backend not provided, defaults to "Wx"; options are Wx and Tk,
+Gtk and Qt.
 If $options contains "v", then a verbose output is sent to console,
 if it contains "a", and autogenerated file is produced with all the
 called functions
 
-=item my $frame=$gui->getFrame;
+=item my $frame=$gui->getFrame || $gui;
 
 Returns reference to the frame for both abstracted and backend
 specific functions.
@@ -274,6 +316,6 @@ Saif Ahmed, SAIFTYNET { at } gmail.com
 
 =head1 SEE ALSO
 
-L<Wx>, L<Tk>, L<Image::Magick>, L<Wx::Perl::Imagick>,
+L<Wx>, L<Tk>, L<Image::Magick>, L<Wx::Perl::Imagick>, L<GLib>, L<Gtk3>
 
 =cut

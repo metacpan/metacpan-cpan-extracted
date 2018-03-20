@@ -1,10 +1,47 @@
 ==================================================
-Changes from 2017-03-11 00:00:00 +0000 to present.
+Changes from 2017-03-18 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 1.0 at 2018-03-11 01:16:28 +0000
+version 1.1 at 2018-03-18 20:55:24 +0000
 ----------------------------------------
+
+  Change: eee6d23f61ceae7b58edfd5500e601c590cfcd8f
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-14 23:05:36 +0000
+
+    Fixed with tidyall 
+
+  Change: 4cd31de32336b17715f6821757ef561781c01abd
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-14 22:46:13 +0000
+
+    Merge branch 'master' of github.com:glasswalk3r/spamcupNG 
+
+  Change: d1a03b455fe7f46f18cd9f6e99c5bf630cbf7a4f
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-14 22:43:01 +0000
+
+    Fixing how the module deals with too old report
+
+    Those changes should prevent the parser wrongly stating that there
+    was no form to process: this is expected when the SPAM report is too
+    old to be reported. 
+
+  Change: 191cf7c5a1978df7658105409cf5290bef2fb5f9
+  Author: Alceu Rodrigues de Freitas Junior <cin_afreitas@uolinc.com>
+  Date : 2018-03-12 11:14:41 +0000
+
+    Added .gitignore for tidyall cache 
+
+  Change: 3b4e3188b167948990196a89a42f5866684ff452
+  Author: Alceu Rodrigues de Freitas Junior <cin_afreitas@uolinc.com>
+  Date : 2018-03-12 11:12:22 +0000
+
+    Added tidyall
+
+    Added tidyall to include more validations. Tried to fix Kwalitee
+    "main_module_version_matches_dist_version" 
 
   Change: 6750147d9244003ddf741f961512191855531dd8
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>

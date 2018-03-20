@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Exonerate::Sugar;
-# ABSTRACT: internal class for exonerate driver
-$Bio::MUST::Drivers::Exonerate::Sugar::VERSION = '0.180270';
+# ABSTRACT: Internal class for exonerate driver
+$Bio::MUST::Drivers::Exonerate::Sugar::VERSION = '0.180770';
 use Moose;
 use namespace::autoclean;
 
@@ -32,11 +32,11 @@ __END__
 
 =head1 NAME
 
-Bio::MUST::Drivers::Exonerate::Sugar - internal class for exonerate driver
+Bio::MUST::Drivers::Exonerate::Sugar - Internal class for exonerate driver
 
 =head1 VERSION
 
-version 0.180270
+version 0.180770
 
 =head1 SYNOPSIS
 

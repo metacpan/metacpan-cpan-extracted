@@ -3,28 +3,26 @@ package GFwxFrame;
    use strict;
    use warnings;
 
-   our $VERSION = '0.065';
+   our $VERSION = '0.081';
    
    use Exporter 'import';
-   our @EXPORT_OK      = qw<addButton addStatText addTextCtrl addMenuBits addPanel setScale>;
+   our @EXPORT_OK      = qw<addWidget addVar setScale>;
    
    use Wx qw(wxMODERN wxTE_PASSWORD wxTE_PROCESS_ENTER wxDEFAULT wxNORMAL
           wxFONTENCODING_DEFAULT wxTE_MULTILINE wxHSCROLL wxDefaultPosition wxFD_SAVE
           wxYES wxFD_OPEN wxFD_FILE_MUST_EXIST wxFD_CHANGE_DIR wxID_CANCEL
           wxYES_NO wxCANCEL wxOK  wxCENTRE  wxICON_EXCLAMATION  wxICON_HAND 
-          wxICON_ERROR  wxICON_QUESTION  wxICON_INFORMATION);
+          wxICON_ERROR  wxICON_QUESTION  wxICON_INFORMATION wxCB_DROPDOWN);
           
-   use Wx::Event qw( EVT_BUTTON EVT_TEXT_ENTER EVT_UPDATE_UI EVT_MENU);
+   use Wx::Event qw( EVT_BUTTON EVT_TEXT_ENTER EVT_UPDATE_UI EVT_MENU EVT_COMBOBOX);
    use Wx::Perl::Imagick;                 #for image panels
    
    use base qw(Wx::Frame); # Inherit from Wx::Frame
    
    # these arrays will contain the widgets each as an arrayref of the parameters
-   my @buttons=();
-   my @textctrls=();
-   my @stattexts=();
-   my @menu=();
-   my @subpanels=();
+   my @widgets=();
+   my %iVars=();     #vars for interface operation (e.g. 
+   my %oVars=();                #vars for interface
    my %styles;
    
    my $lastMenuLabel;  #bug workaround in menu generator
@@ -52,31 +50,38 @@ package GFwxFrame;
 # setupContent  sets up the initial content before Mainloop can be run.
    
    sub setupContent{
-	   my ($self,$panel)=@_;
-	   
-       foreach my $button  (@buttons){
-		   aBt($self, $panel, @$button)
-	   }
-	   foreach my $textctrl (@textctrls){
-		   aTC($self,$panel,@$textctrl)
-	   }
-	   foreach my $stattxt (@stattexts){
-		   aST($self,$panel,@$stattxt)
-	   }
-	   if (scalar @menu){   #menu exists
-		   $self ->{"menubar"} = Wx::MenuBar->new();
-		   $self->SetMenuBar($self ->{"menubar"});
-		   my $currentMenu;
-		   foreach my $menuBits (@menu){ 
-			  $currentMenu=aMB($self,$panel,$currentMenu,@$menuBits)
+	   my ($self,$canvas)=@_;
+	   $self ->{"menubar"}=undef;
+	   my $currentMenu;
+	   foreach my $widget (@widgets){
+		   my @params=@$widget;
+		   my $wtype=shift @params;
+		   if ($wtype eq "btn")             {aBt($self, $canvas, @params);}
+		   elsif ($wtype eq "textctrl")     {aTC($self, $canvas, @params);}
+		   elsif ($wtype eq "stattext")     {aST($self, $canvas, @params);}
+		   elsif ($wtype eq "sp")           {aSP($self, $canvas, @params);}
+		   elsif ($wtype eq "combo")        {aCB($self, $canvas, @params);}
+		   elsif ($wtype eq "sp")           {aSP($self, $canvas, @params);}
+		   elsif ($wtype eq "mb")
+		                   {
+							   if (! $self->{"menubar"}){
+							       $self ->{"menubar"} = Wx::MenuBar->new();
+		                           $self->SetMenuBar($self ->{"menubar"});
+		                          }
+	                          $currentMenu=aMB($self,$canvas,$currentMenu,@params)
 	       }
-	       # a bug seems to make a menuhead to be also ia menuitem---
-
-	   }
-	   foreach my $sp (@subpanels){
-		   aSP($self,$panel,@$sp);
 	   }
 	   
+	   sub aCB{
+		   my ($self,$panel, $id, $label, $location, $size, $action)=@_;
+		   if (defined $oVars{$label}){
+	         my @strings2 = split(",",$oVars{$label});
+	         $self->{"combo".$id}= Wx::ComboBox->new($panel, $id, $strings2[0],$location, Wx::Size->new($$size[0], $$size[1]),\@strings2,wxCB_DROPDOWN);
+	         EVT_COMBOBOX( $self, $id, $action);
+		 }
+		 else {print "Combo options not defined for 'combo$id' with label $label\n"}
+	   }
+	   	   
 	   sub aMB{
 	     my ($self,$panel,$currentMenu, $id, $label, $type, $action)=@_;
 	     if (($lastMenuLabel) &&($label eq $lastMenuLabel)){return $currentMenu} # bug workaround 
@@ -181,44 +186,36 @@ package GFwxFrame;
    }
    
 #functions for GUIDeFATE to load the widgets into the backend
-   sub addButton{
-	   push (@buttons,shift );
-   }
-   sub addTextCtrl{
-	   push (@textctrls,shift );
-   }
-   sub addStatText{
-	   push (@stattexts,shift );
-   }
-   sub addMenuBits{
-	   push (@menu, shift);
-   }
-    sub addPanel{
-	   push (@subpanels, shift);
+   sub addWidget{
+	   push (@widgets,shift );
    }
    sub addStyle{
 	   my ($name,$style)=@_;
 	   $styles{$name}=$style;
+   }
+   sub addVar{
+	   my ($varName,$value)=@_;
+	   $oVars{$varName}=$value;
    }
 
 # Functions for internal use 
    sub getSize{
 	   my ($self,$id,$arrayRef)=@_;
 	   my $found=getItem($self,$id,$arrayRef);
-	   return ( $found!=-1) ? $$arrayRef[$found][4]:0;
+	   return ( $found!=-1) ? $$arrayRef[$found][5]:0;
 	   
    }
    sub getLocation{
 	   my ($self,$id,$arrayRef)=@_;
 	   my $found=getItem($self,$id,$arrayRef);
-	   return ( $found!=-1) ? $$arrayRef[$found][3]:0;
+	   return ( $found!=-1) ? $$arrayRef[$found][4]:0;
 	   
    }   
    sub getItem{
 	   my ($self,$id,$arrayRef)=@_;
 	   my $i=0; my $found=-1;
 	   while ($i<@$arrayRef){
-		   if ($$arrayRef[$i][0]==$id) {
+		   if ($$arrayRef[$i][1]==$id) {
 			   $found=$i;
 			   }
 		   $i++;
@@ -250,7 +247,7 @@ package GFwxFrame;
    sub setImage{
 	   my ($self,$id,$file)=@_;
 	   $id=~s/[^\d]//g;
-	   my $size=getSize($self,$id,\@subpanels);
+	   my $size=getSize($self,$id,\@widgets);
 	   if ($size){
 	       my $image = Wx::Perl::Imagick->new($file);
 		   if ($image){

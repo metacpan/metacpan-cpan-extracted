@@ -1,5 +1,5 @@
 package Beam::Wire;
-our $VERSION = '1.020';
+our $VERSION = '1.021';
 # ABSTRACT: Lightweight Dependency Injection Container
 
 #pod =head1 SYNOPSIS
@@ -1211,7 +1211,7 @@ Beam::Wire - Lightweight Dependency Injection Container
 
 =head1 VERSION
 
-version 1.020
+version 1.021
 
 =head1 SYNOPSIS
 
@@ -1688,7 +1688,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ben Moon Bruce Armstrong Doug Bell Kent Fredric
+=for stopwords Ben Moon Bruce Armstrong Kent Fredric mohawk2
 
 =over 4
 
@@ -1702,25 +1702,17 @@ Bruce Armstrong <bruce@armstronganchor.net>
 
 =item *
 
-Bruce Armstrong <bruce@fortressofgeekdom.org>
-
-=item *
-
-Doug Bell <doug@preaction.me>
-
-=item *
-
-Doug Bell <preaction@users.noreply.github.com>
-
-=item *
-
 Kent Fredric <kentnl@cpan.org>
+
+=item *
+
+mohawk2 <mohawk2@users.noreply.github.com>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Doug Bell.
+This software is copyright (c) 2018 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

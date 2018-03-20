@@ -10,6 +10,7 @@ do { my $x = {
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
+                                      'Test::Code::TidyAll' => '0.50',
                                       'Test::Kwalitee' => '1.21',
                                       'Test::More' => '0.88',
                                       'Test::Pod' => '1.41',
@@ -38,6 +39,9 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'Perl::Tidy::Sweetened' => '1.12',
+                                   'Pod::Tidy' => '0.10',
+                                   'Test::Code::TidyAll' => '0.69',
                                    'Test::More' => '0'
                                  }
                  }

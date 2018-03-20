@@ -1,6 +1,6 @@
 package Getopt::EX;
 use 5.016;
-use version; our $VERSION = version->declare("v1.7.1");
+use version; our $VERSION = version->declare("v1.7.2");
 
 
 1;

@@ -50,7 +50,7 @@ ok(!$debug_mode && !defined $debug_str, 'debug_mode off');
 
 my $version = $pb2->version();
 ok(
-    defined $version && $version =~ /^\d+.*/,
+    defined $version && $version =~ /^v\d+.*/,
     'WWW::PushBullet->version() => version'
   );
 
