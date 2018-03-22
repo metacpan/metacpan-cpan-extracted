@@ -53,7 +53,19 @@ SKIP: {
         "Got expected verbose output: tarball path");
 
     my $alt = "sh ./Configure -des -Dusedevel -Dprefix=$release_dir -Uversiononly -Dman1dir=none -Dman3dir=none";
-    my $this_perl = $self->configure_build_install_perl({
+    my $this_perl;
+    {
+        local $@;
+        eval {
+            $this_perl = $self->configure_build_install_perl([
+                configure_command => $alt,
+            ]);
+        };
+        like($@, qr/configure_build_install_perl: Must supply hash ref as argument/,
+            "configure_build_install_perl:  Got expected error message for non-hashref argument");
+    }
+
+    $this_perl = $self->configure_build_install_perl({
         configure_command => $alt,
         verbose => 1,
     });

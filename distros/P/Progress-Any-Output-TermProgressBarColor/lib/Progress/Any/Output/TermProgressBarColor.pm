@@ -1,7 +1,7 @@
 package Progress::Any::Output::TermProgressBarColor;
 
-our $DATE = '2018-03-17'; # DATE
-our $VERSION = '0.241'; # VERSION
+our $DATE = '2018-03-21'; # DATE
+our $VERSION = '0.243'; # VERSION
 
 use 5.010001;
 use strict;
@@ -128,7 +128,7 @@ sub new {
     }
 
     $args{fh} = delete($args0{fh});
-    $args{fh} //= \*STDOUT;
+    $args{fh} //= \*STDERR;
 
     $args{show_delay} = delete($args0{show_delay});
 
@@ -218,6 +218,8 @@ sub _handle_unknown_conversion {
 sub update {
     my ($self, %args) = @_;
 
+    return unless $ENV{PROGRESS_TERM_BAR} // $ENV{PROGRESS} // (-t $self->{fh});
+
     my $now = time();
 
     # if there is show_delay, don't display until we've surpassed it
@@ -256,7 +258,6 @@ sub update {
         %args,
     );
 
-    $bar = "$bar\e[0m";
     $bar =~ s!<color (\w+)>|<(/)color>!$1 ? ansifg($1) : "\e[0m"!eg;
 
     print { $self->{fh} } $bar;
@@ -303,7 +304,7 @@ Progress::Any::Output::TermProgressBarColor - Output progress to terminal as col
 
 =head1 VERSION
 
-This document describes version 0.241 of Progress::Any::Output::TermProgressBarColor (from Perl distribution Progress-Any-Output-TermProgressBarColor), released on 2018-03-17.
+This document describes version 0.243 of Progress::Any::Output::TermProgressBarColor (from Perl distribution Progress-Any-Output-TermProgressBarColor), released on 2018-03-21.
 
 =head1 SYNOPSIS
 
@@ -393,9 +394,10 @@ The default template is:
 
  <color ffff00>%p</color> <color 808000>[</color>%B<color 808000>]</color><color ffff00>%e</color>
 
-=item * fh => handle (default: \*STDOUT)
+=item * fh => handle (default: \*STDERR)
 
-Instead of the default STDOUT, you can direct the output to another filehandle.
+Instead of the default STDERR, you can direct the output to another filehandle
+e.g. STDOUT.
 
 =item * show_delay => int
 
@@ -416,17 +418,29 @@ again before showing.
 
 =head1 ENVIRONMENT
 
-=head2 COLOR => bool
+=head2 COLOR
 
-Can be used to force or disable color. See L<Color::ANSI::Util>.
+Bool. Can be used to force or disable color. See L<Color::ANSI::Util>.
 
-=head2 COLOR_DEPTH => int
+=head2 COLOR_DEPTH
 
-Can be used to override color depth detection. See L<Color::ANSI::Util>.
+Integer. Can be used to override color depth detection. See
+L<Color::ANSI::Util>.
 
-=head2 COLUMNS => int
+=head2 COLUMNS
 
-Can be used to override terminal width detection.
+Integer. Can be used to override terminal width detection.
+
+=head2 PROGRESS_TERM_BAR
+
+Bool. Forces disabling or enabling progress output (just for this output).
+
+In the absence of PROGRESS_TERM_MESSAGE and PROGRESS, will default to 1 if
+filehandle is detected as interactive (using C<-t>).
+
+=head2 PROGRESS
+
+Bool. Forces disabling or enabling progress output (for all outputs).
 
 =head1 HOMEPAGE
 

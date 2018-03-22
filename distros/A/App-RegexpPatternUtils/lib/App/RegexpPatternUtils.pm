@@ -1,7 +1,7 @@
 package App::RegexpPatternUtils;
 
-our $DATE = '2016-12-31'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-03-21'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -22,7 +22,7 @@ App::RegexpPatternUtils - CLI utilities related to Regexp::Pattern
 
 =head1 VERSION
 
-This document describes version 0.002 of App::RegexpPatternUtils (from Perl distribution App-RegexpPatternUtils), released on 2016-12-31.
+This document describes version 0.003 of App::RegexpPatternUtils (from Perl distribution App-RegexpPatternUtils), released on 2018-03-21.
 
 =head1 SYNOPSIS
 
@@ -64,7 +64,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

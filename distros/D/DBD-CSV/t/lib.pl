@@ -12,7 +12,8 @@ use File::Spec;
 my $testname  = "output$$";
 my $base_dir  = File::Spec->rel2abs (File::Spec->curdir ());
 my $test_dir  = File::Spec->rel2abs ($testname);
-my $test_dsn  = $ENV{DBI_DSN}  || "DBI:CSV:f_dir=$testname";
+my $test_dsn  = $ENV{DBI_DSN}  || "";
+   $test_dsn  =~ m/csv/i or $test_dsn = "dbi:CSV:f_dir=$testname";
 my $test_user = $ENV{DBI_USER} || "";
 my $test_pass = $ENV{DBI_PASS} || "";
 

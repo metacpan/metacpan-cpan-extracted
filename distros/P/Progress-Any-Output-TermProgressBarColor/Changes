@@ -1,3 +1,20 @@
+0.243   2018-03-21 (PERLANCAR)
+
+	- [Bugfix] Check -t against the actual handle used, not hardcoded
+	  STDOUT or STDERR.
+
+
+0.242   2018-03-21 (PERLANCAR)
+
+	- [Incompatible change] [ux] Default output to STDERR instead of
+	  STDOUT, like logging.
+
+	- Observe PROGRESS_TERM_BAR and PROGRESS environment variables to
+	  allow disabling or force-enabling progress output.
+
+	- [opt] No need to add extra color reset.
+
+
 0.241   2018-03-17 (PERLANCAR)
 
 	- No functional changes.

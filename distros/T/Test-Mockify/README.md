@@ -25,7 +25,9 @@ Test::Mockify - minimal mocking framework for perl
 # DESCRIPTION
 
 Use [Test::Mockify](https://metacpan.org/pod/Test::Mockify) to create and configure mock objects. Use [Test::Mockify::Verify](https://metacpan.org/pod/Test::Mockify::Verify) to
-verify the interactions with your mocks.
+verify the interactions with your mocks. Use [Test::Mockify::Sut](https://metacpan.org/pod/Test::Mockify::Sut) to inject dependencies into your Sut.
+
+You can find a Example Project in [ExampleProject](https://github.com/ChristianBreitkreutz/Mockify/tree/master/t/ExampleProject)
 
 # METHODS
 
@@ -66,39 +68,6 @@ It is not possible to mix `whenAny` and `when` for the same method.
 
 For possible return types please look in [Test::Mockify::ReturnValue](https://metacpan.org/pod/Test::Mockify::ReturnValue)
 
-## mockStatic
-
-Sometimes it is not possible to inject the dependencies from the outside. This is especially the case when the package uses imports of static functions.
-`mockStatic` provides the possibility to mock static functions inside the mock/sut.
-
-    package SUT;
-    use Magic::Tools qw ( Rabbit ); # Rabbit could use a webservice
-    sub pullCylinder {
-        shift;
-        if(Rabbit('white') && not Magic::Tools::Rabbit('black')){ # imported && full path
-            return 1;
-        }else{
-            return 0;
-        }
-    }
-    1;
-
-In the Test it can be mocked
-
-    package Test_SUT;
-    my $MockObjectBuilder = Test::Mockify->new( 'SUT', [] );
-    $MockObjectBuilder->mockStatic('Magic::Tools::Rabbit')->when(String('white'))->thenReturn(1);
-    $MockObjectBuilder->mockStatic('Magic::Tools::Rabbit')->when(String('black'))->thenReturn(0);
-
-    my $SUT = $MockObjectBuilder->getMockObject();
-    is($SUT->pullCylinder(), 1);
-    1;
-
-It can be mixed with normal `spy` and `mock`
-
-#### Thx
-to @dbucky for this amazing idea
-
 ## spy
 
 Use spy if you want to observe a method. You can use the [Test::Mockify::Verify](https://metacpan.org/pod/Test::Mockify::Verify) to ensure that the method was called with the expected parameters.
@@ -129,81 +98,6 @@ To define the signature in the needed structure you must use the [Test::Mockify:
 If you don't want to specify the method signature at all, you can use whenAny.
 It is not possible to mix `whenAny` and `when` for the same method.
 
-## spyStatic
-
-Provides the possibility to spy static functions inside the mock/sut.
-
-    package SUT;
-    use Magic::Tools qw ( Rabbit ); # Rabbit could use a webservice
-    sub pullCylinder {
-        shift;
-        if(Rabbit('white') && not Magic::Tools::Rabbit('black')){ # imported && full path
-            return 1;
-        }else{
-            return 0;
-        }
-    }
-    1;
-
-In the Test it can be mocked
-
-    package Test_SUT;
-    my $MockObjectBuilder = Test::Mockify->new( 'SUT', [] );
-    $MockObjectBuilder->spyStatic('Magic::Tools::Rabbit')->whenAny();
-    my $SUT = $MockObjectBuilder->getMockObject();
-
-    $SUT->pullCylinder();
-    is(GetCallCount($SUT, 'pullCylinder), 1);
-
-    1;
-
-It can be mixed with normal `spy` and `mock`. For more options see, `mockStatic`
-
-## addMethodSpy _(deprecated)_
-
-With this method it is possible to observe a method. That means, you keep the original functionality but you can get meta data from the mockify-framework.
-
-    $MockObjectBuilder->addMethodSpy('myMethodName');
-
-## addMethodSpyWithParameterCheck _(deprecated)_
-
-With this method it is possible to observe a method and check the parameters. That means, you keep the original functionality, but you can get meta data from the mockify- framework and use the parameter check, like **addMockWithReturnValueAndParameterCheck**.
-
-    my $aParameterTypes = [String(),String(abcd)];
-    $MockObjectBuilder->addMethodSpyWithParameterCheck('myMethodName', $aParameterTypes);
-
-To define it in a nice way the signature you must use the [Test::Mockify::Matcher;](https://metacpan.org/pod/Test::Mockify::Matcher;).
-
-## addMock _(deprecated)_
-
-This is the simplest case. It works like the mock-method from [Test::MockObject](https://metacpan.org/pod/Test::MockObject).
-
-Only handover the **name** and a **method pointer**. Mockify will automatically check if the method exists in the original object.
-
-    $MockObjectBuilder->addMock('myMethodName', sub {
-                                      # Your implementation
-                                   }
-    );
-
-## addMockWithReturnValue _(deprecated)_
-
-Does the same as `addMock`, but here you can handover a **value** which will be returned if you call the mocked method.
-
-    $MockObjectBuilder->addMockWithReturnValue('myMethodName','the return value');
-
-## addMockWithReturnValueAndParameterCheck _(deprecated)_
-
-This method is an extension of **addMockWithReturnValue**. Here you can also check the parameters which will be passed.
-
-You can check if they have a specific **data type** or even check if they have a given **value**.
-
-In the following example two strings will be expected, and the second one has to have the value "abcd".
-
-    my $aParameterTypes = [String(),String('abcd')];
-    $MockObjectBuilder->addMockWithReturnValueAndParameterCheck('myMethodName','the return value',$aParameterTypes);
-
-To define it in a nice way the signature you must use the [Test::Mockify::Matcher;](https://metacpan.org/pod/Test::Mockify::Matcher;).
-
 # LICENSE
 
 Copyright (C) 2017 ePages GmbH
@@ -214,3 +108,7 @@ it under the same terms as Perl itself.
 # AUTHOR
 
 Christian Breitkreutz <christianbreitkreutz@gmx.de>
+
+# ACKNOWLEDGEMENTS
+
+Thanks to Dustin Buckenmeyer <dustin.buckenmeyer@gmail.com> and [ECS Tuning](https://www.ecstuning.com/) for giving Dustin the opportunity to pursue this idea and ultimately give it back to the community!

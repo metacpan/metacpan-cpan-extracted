@@ -16,7 +16,7 @@ use namespace::clean;
 # Always remember to do all digits for the version even if they're 0
 # i.e. first release of 0.XX *must* be 0.XX000. This avoids fBSD ports
 # brain damage and presumably various other packaging systems too
-our $VERSION = '0.07048';
+our $VERSION = '0.07049';
 
 __PACKAGE__->mk_group_accessors('inherited', qw/
                                 _loader_args
@@ -187,13 +187,13 @@ sub _invoke_loader {
     $args->{naming} = $self->naming if $self->naming;
     $args->{use_namespaces} = $self->use_namespaces if defined $self->use_namespaces;
 
-    # XXX this only works for relative storage_type, like ::DBI ...
     my $loader_class = $self->loader_class;
     if ($loader_class) {
         $loader_class = "DBIx::Class::Schema::Loader${loader_class}" if $loader_class =~ /^::/;
         $args->{loader_class} = $loader_class;
     };
 
+    # XXX this only works for relative storage_type, like ::DBI ...
     my $impl = $loader_class || "DBIx::Class::Schema::Loader" . $self->storage_type;
     try {
         $self->ensure_class_loaded($impl)

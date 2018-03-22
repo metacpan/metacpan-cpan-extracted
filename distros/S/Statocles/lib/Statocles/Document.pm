@@ -1,8 +1,9 @@
 package Statocles::Document;
-our $VERSION = '0.087';
+our $VERSION = '0.088';
 # ABSTRACT: Base class for all Statocles documents
 
 use Statocles::Base 'Class';
+with 'Statocles::Role::PageAttrs';
 use Statocles::Image;
 use Statocles::Util qw( derp );
 
@@ -43,11 +44,6 @@ has store => (
 #pod
 #pod =cut
 
-has title => (
-    is => 'rw',
-    isa => Str,
-);
-
 #pod =attr author
 #pod
 #pod     ---
@@ -67,11 +63,7 @@ has title => (
 #pod
 #pod =cut
 
-has author => (
-    is => 'rw',
-    isa => Person,
-    coerce => Person->coercion,
-);
+sub _build_author { }
 
 #pod =attr status
 #pod
@@ -179,13 +171,6 @@ has tags => (
 #pod
 #pod =cut
 
-has links => (
-    is => 'rw',
-    isa => LinkHash,
-    default => sub { +{} },
-    coerce => LinkHash->coercion,
-);
-
 #pod =attr images
 #pod
 #pod     ---
@@ -217,26 +202,6 @@ has links => (
 #pod =back
 #pod
 #pod =cut
-
-has images => (
-    is => 'ro',
-    isa => HashRef[InstanceOf['Statocles::Image']],
-    default => sub { +{} },
-    coerce => sub {
-        my ( $ref ) = @_;
-        my %img;
-        for my $name ( keys %$ref ) {
-            my $attrs = $ref->{ $name };
-            if ( !ref $attrs ) {
-                $attrs = { src => $attrs };
-            }
-            $img{ $name } = Statocles::Image->new(
-                %{ $attrs },
-            );
-        }
-        return \%img;
-    },
-);
 
 #pod =attr date
 #pod
@@ -382,7 +347,7 @@ Statocles::Document - Base class for all Statocles documents
 
 =head1 VERSION
 
-version 0.087
+version 0.088
 
 =head1 DESCRIPTION
 

@@ -176,6 +176,27 @@ has '_sum_status' => (
     init_arg => undef,
 );
 
+=head2 _shared
+
+This is an internal attribute that specifies that the file is located
+on a file system that is shared by all of the nodes in the cluster.
+This value is over-ridden by subclasses of HPCI::File which provide
+for files which are not on a shared file system.
+Such subclasses must provide for get and put methods to copy files
+between the local filer system and a repository that B<is> accessible
+from all nodes (although not necessarily on the file system).
+They will also define their own addition attributes
+as needed to provide the details of accessing the 
+
+=cut
+
+has '_shared' => (
+    is       => 'ro',
+    isa      => 'Bool',
+    init_arg => undef,
+    default  => 1,
+);
+
 has 'stage'  => (
     is       => 'ro',
     isa      => 'Object',

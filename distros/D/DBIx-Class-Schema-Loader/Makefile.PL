@@ -2,67 +2,98 @@ use warnings;
 use strict;
 
 use 5.008001;
-BEGIN { unshift @INC, '.' unless $INC[-1] eq '.'; }
-use inc::Module::Install 1.00;
+use ExtUtils::MakeMaker;
+my ($dev_requires) = (do './maint/Makefile.PL.include' or die $@)
+    unless -f 'META.yml';
 
-use Getopt::Long();
-
-my $getopt = Getopt::Long::Parser->new(
-    config => [qw/gnu_getopt bundling_override no_ignore_case pass_through/]
+my $eumm_version = eval $ExtUtils::MakeMaker::VERSION;
+my %eumm_args = (
+    NAME => 'DBIx::Class::Schema::Loader',
+    VERSION_FROM => 'lib/DBIx/Class/Schema/Loader.pm',
+    LICENSE => 'perl',
+    MIN_PERL_VERSION => '5.008001',
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => '0',
+    },
+    TEST_REQUIRES => {
+        'DBD::SQLite'     => '1.29',
+        'Test::Exception' => '0.31',
+        'Test::More'      => '0.94',
+        'Test::Warn'      => '0.21',
+        'Test::Deep'      => '0.107',
+        'Test::Differences' => '0.60',
+        # core, but specific versions not available on older perls
+        'File::Temp'      => '0.16',
+        'File::Path'      => '2.07',
+    },
+    test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'},
+    PREREQ_PM => {
+        'Carp::Clan'                  => 0,
+        'Class::Accessor::Grouped'    => '0.10008',
+        'Class::C3::Componentised'    => '1.0008',
+        'Class::Inspector'            => '1.27',
+        'Class::Unload'               => '0.07',
+        'curry'                       => '1.000000',
+        'Data::Dump'                  => '1.06',
+        'DBIx::Class'                 => '0.08127',
+        'Hash::Merge'                 => '0.12',
+        'Lingua::EN::Inflect::Number' => '1.1',
+        'Lingua::EN::Tagger'          => '0.23',
+        'Lingua::EN::Inflect::Phrase' => '0.15',
+        'List::Util'                  => '1.33',
+        'MRO::Compat'                 => '0.09',
+        'namespace::clean'            => '0.23',
+        'Scope::Guard'                => '0.20',
+        'String::ToIdentifier::EN'    => '0.05',
+        'Sub::Util'                   => '1.40',
+        'Try::Tiny'                   => 0,
+        # core, but specific versions not available on older perls
+        'Digest::MD5'                 => '2.36',
+        'Exporter'                    => '5.63',
+    },
+    realclean => {
+        FILES => 'lib/DBIx/Class/Schema/Loader/Optional/Dependencies.pod'
+    },
+    EXE_FILES => [ qw(script/dbicdump) ],
+    META_MERGE => {
+        "meta-spec" => { version => 2 },
+        dynamic_config => 0,
+        resources => {
+            repository => {
+                type => 'git',
+                url => 'git@github.com/dbsrgits/dbix-class-schema-loader.git',
+                web => 'https://github.com/dbsrgits/dbix-class-schema-loader',
+            },
+            x_IRC => 'irc://irc.perl.org/#dbix-class',
+            license => [ 'http://dev.perl.org/licenses/' ],
+            x_MailingList => 'http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/dbix-class',
+        },
+        no_index => {
+            directory => [qw(maint xt)],
+        },
+        prereqs => {
+            develop => { requires => $dev_requires || +{} },
+        },
+    },
 );
-my $args = {
-    skip_author_deps => undef,
-};
-$getopt->getoptions($args, 'skip_author_deps');
-if (@ARGV) {
-    warn "\nIgnoring unrecognized option(s): @ARGV\n\n";
+
+sub _move_to {
+  my ($hash, $fromkey, $tokey) = @_;
+  $hash->{$tokey} = {
+    %{ $hash->{$tokey} || {} },
+    %{ delete($hash->{$fromkey}) || {} },
+  };
 }
-
-use FindBin;
-use lib "$FindBin::Bin/lib";
-
-perl_version '5.008001';
-name           'DBIx-Class-Schema-Loader';
-all_from       'lib/DBIx/Class/Schema/Loader.pm';
-
-# temporary, needs to be thrown out
-test_requires 'DBIx::Class::IntrospectableM2M' => 0;
-
-# core, but specific versions not available on older perls
-test_requires 'File::Temp'      => '0.16';
-test_requires 'File::Path'      => '2.07';
-
-test_requires 'DBD::SQLite'     => '1.29';
-test_requires 'Test::Exception' => '0.31';
-test_requires 'Test::More'      => '0.94';
-test_requires 'Test::Warn'      => '0.21';
-test_requires 'Test::Deep'      => '0.107';
-test_requires 'Test::Differences' => '0.60';
-
-requires 'Carp::Clan'                  => 0;
-requires 'Class::Accessor::Grouped'    => '0.10008';
-requires 'Class::C3::Componentised'    => '1.0008';
-requires 'Class::Inspector'            => '1.27';
-requires 'Class::Unload'               => '0.07';
-requires 'curry'                       => '1.000000',
-requires 'Data::Dump'                  => '1.06';
-requires 'DBIx::Class'                 => '0.08127';
-requires 'Hash::Merge'                 => '0.12';
-requires 'Lingua::EN::Inflect::Number' => '1.1';
-requires 'Lingua::EN::Tagger'          => '0.23';
-requires 'Lingua::EN::Inflect::Phrase' => '0.15';
-requires 'List::Util'                  => '1.33';
-requires 'MRO::Compat'                 => '0.09';
-requires 'namespace::clean'            => '0.23';
-requires 'Scope::Guard'                => '0.20';
-requires 'String::ToIdentifier::EN'    => '0.05';
-requires 'String::CamelCase'           => '0.02';
-requires 'Sub::Util'                   => '1.40';
-requires 'Try::Tiny'                   => 0;
-
-# core, but specific versions not available on older perls
-requires 'Digest::MD5'                 => '2.36';
-requires 'Exporter'                    => '5.63';
+delete $eumm_args{META_MERGE} if $eumm_version < 6.45_01;
+delete $eumm_args{CONFIGURE_REQUIRES}
+  if $eumm_version < 6.51_03; # too late to use so just delete
+_move_to(\%eumm_args, 'TEST_REQUIRES', 'BUILD_REQUIRES')
+  if $eumm_version < 6.63_03;
+_move_to(\%eumm_args, 'BUILD_REQUIRES', 'PREREQ_PM')
+  if $eumm_version < 6.55_01;
+$eumm_args{NO_MYMETA} = 1
+  if $eumm_version >= 6.57_02 and $eumm_version < 6.57_07;
+WriteMakefile(%eumm_args);
 
 print <<"EOF";
 ******************* DBIx::Class::Schema::Loader WARNING ***********************
@@ -84,56 +115,5 @@ https://metacpan.org/module/DBIx::Class::Schema::Loader::Base#relationship_attrs
 See also the "Changes" file for the last few revisions.
 *******************************************************************************
 EOF
-
-if ($Module::Install::AUTHOR && ! $args->{skip_author_deps}) {
-    my @missing_plugins;
-    for my $plugin (qw(ReadmeFromPod AuthorTests)) {
-        eval "require Module::Install::$plugin" and next;
-        push @missing_plugins, "Module::Install::$plugin";
-        chomp(my $err = $@);
-        $missing_plugins[-1] .= " ($err)"
-            unless $err =~ m{^Can't locate Module/Install/$plugin.pm in \@INC};
-    }
-    die "\nYou need to install the following modules to run this Makefile.PL in author mode:\n\n", join("\n", @missing_plugins), "\n\n"
-        if @missing_plugins;
-
-    warn "\n*** AUTHOR MODE: some optional dependencies converted to hard requires.\n\n";
-
-    require DBIx::Class::Schema::Loader::Optional::Dependencies;
-
-    test_requires %{DBIx::Class::Schema::Loader::Optional::Dependencies
-        ->modreq_list_for([
-            grep { !/rdbms/ }
-            keys %{ DBIx::Class::Schema::Loader::Optional::Dependencies
-                ->req_group_list
-            }
-        ])};
-
-    DBIx::Class::Schema::Loader::Optional::Dependencies->_gen_pod(undef, 'lib');
-
-    author_tests( 'xt' );
-    readme_from( 'lib/DBIx/Class/Schema/Loader.pm' );
-    realclean_files( qw[README MANIFEST lib/DBIx/Class/Schema/Loader/Optional/Dependencies.pod] );
-    postamble <<EOP;
-create_distdir: author_stop_distdir_creation
-author_stop_distdir_creation:
-\t\$(NOECHO) \$(ECHO) Creation of dist with author mode deps not allowed
-\t\$(NOECHO) \$(ECHO) Please re-run Makefile.PL with --skip_author_deps
-\t\$(NOECHO) \$(FALSE)
-EOP
-
-}
-
-tests_recursive;
-
-install_script 'script/dbicdump';
-
-resources 'IRC'         => 'irc://irc.perl.org/#dbix-class';
-resources 'license'     => 'http://dev.perl.org/licenses/';
-resources 'repository'  => 'https://github.com/dbsrgits/dbix-class-schema-loader';
-resources 'MailingList' => 'http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/dbix-class';
-
-auto_install;
-WriteAll;
 
 # vim:et sts=4 sw=4 tw=0:

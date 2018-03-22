@@ -15,14 +15,14 @@
   #include "spvm_block.h"
 %}
 
-%token <opval> MY HAS SUB PACKAGE IF ELSIF ELSE RETURN FOR WHILE USE NEW SET GET OUR
+%token <opval> MY HAS SUB PACKAGE IF ELSIF ELSE RETURN FOR WHILE USE NEW OUR SELF CLASS
 %token <opval> LAST NEXT NAME CONSTANT ENUM DESCRIPTOR CORETYPE UNDEF CROAK VAR_NAME
 %token <opval> SWITCH CASE DEFAULT VOID EVAL BYTE SHORT INT LONG FLOAT DOUBLE STRING WEAKEN
 
 %type <opval> grammar opt_statements statements statement my_var field if_statement else_statement
 %type <opval> block enumeration_block package_block sub opt_declarations_in_package call_sub unop binop
 %type <opval> opt_assignable_terms assignable_terms assignable_term args arg opt_args use declaration_in_package declarations_in_package term logical_term relative_term
-%type <opval> enumeration_values enumeration_value weaken_field names opt_names setters getters our_var
+%type <opval> enumeration_values enumeration_value weaken_field our_var invocant
 %type <opval> type package_name field_name sub_name package declarations_in_grammar opt_enumeration_values type_array
 %type <opval> for_statement while_statement expression opt_declarations_in_grammar var
 %type <opval> call_field array_elem convert_type enumeration new_object type_name array_length declaration_in_grammar
@@ -149,8 +149,6 @@ declaration_in_package
   : field
   | sub
   | enumeration
-  | setters ';'
-  | getters ';'
   | our_var ';'
 
 package_block
@@ -343,26 +341,14 @@ field
     }
 
 sub
- : opt_descriptors SUB sub_name ':' type_or_void '(' opt_args ')' block
+  : opt_descriptors SUB sub_name ':' type_or_void '(' opt_args ')' block
      {
-       $$ = SPVM_OP_build_sub(compiler, $2, $3, $7, $1, $5, $9);
+       $$ = SPVM_OP_build_sub(compiler, $2, $3, $5, $7, $1, $9);
      }
- | opt_descriptors SUB sub_name ':' type_or_void '(' opt_args ')' ';'
+  | opt_descriptors SUB sub_name ':' type_or_void '(' opt_args ')' ';'
      {
-       $$ = SPVM_OP_build_sub(compiler, $2, $3, $7, $1, $5, NULL);
+       $$ = SPVM_OP_build_sub(compiler, $2, $3, $5, $7, $1, NULL);
      }
-
-setters
-  : SET opt_names
-    {
-      $$ = SPVM_OP_build_setters(compiler, $1, $2);
-    }
-
-getters
-  : GET opt_names
-    {
-      $$ = SPVM_OP_build_getters(compiler, $1, $2);
-    }
 
 enumeration
   : ENUM enumeration_block
@@ -424,44 +410,6 @@ assignable_terms
     }
   | assignable_term
 
-opt_names
-  :	/* Empty */
-    {
-      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
-    }
-  |	names
-    {
-      if ($1->id == SPVM_OP_C_ID_LIST) {
-        $$ = $1;
-      }
-      else {
-        SPVM_OP* op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
-        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
-        $$ = op_list;
-      }
-    }
-    
-names
-  : names ',' NAME
-    {
-      SPVM_OP* op_list;
-      if ($1->id == SPVM_OP_C_ID_LIST) {
-        op_list = $1;
-      }
-      else {
-        op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
-        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
-      }
-      SPVM_OP_insert_child(compiler, op_list, op_list->last, $3);
-      
-      $$ = op_list;
-    }
-  | names ','
-    {
-      $$ = $1
-    }
-  | NAME
-  
 array_length
   : ARRAY_LENGTH assignable_term
     {
@@ -698,6 +646,15 @@ call_sub
     {
       $$ = SPVM_OP_build_call_sub(compiler, SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NULL, $1->file, $1->line), $1, $3);
     }
+  | package_name ARROW sub_name '(' opt_assignable_terms  ')'
+    {
+      $$ = SPVM_OP_build_call_sub(compiler, $1, $3, $5);
+    }
+  | package_name ARROW sub_name
+    {
+      SPVM_OP* op_assignable_terms = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
+      $$ = SPVM_OP_build_call_sub(compiler, $1, $3, op_assignable_terms);
+    }
   | assignable_term ARROW sub_name '(' opt_assignable_terms ')'
     {
       $$ = SPVM_OP_build_call_sub(compiler, $1, $3, $5);
@@ -707,6 +664,7 @@ call_sub
       SPVM_OP* op_assignable_terms = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
       $$ = SPVM_OP_build_call_sub(compiler, $1, $3, op_assignable_terms);
     }
+
 opt_args
   :	/* Empty */
     {
@@ -722,6 +680,31 @@ opt_args
         SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
         $$ = op_list;
       }
+    }
+  | invocant
+    {
+       // Add invocant to arguments
+       SPVM_OP* op_args = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
+       SPVM_OP_insert_child(compiler, op_args, op_args->last, $1);
+       
+       $$ = op_args;
+    }
+  | invocant ',' args
+    {
+      // Add invocant to arguments
+      SPVM_OP* op_args;
+      if ($3->id == SPVM_OP_C_ID_LIST) {
+        op_args = $3;
+      }
+      else {
+        SPVM_OP* op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
+        SPVM_OP_insert_child(compiler, op_list, op_list->last, $3);
+        op_args = op_list;
+      }
+      
+      SPVM_OP_insert_child(compiler, op_args, op_args->first, $1);
+       
+      $$ = op_args;
     }
 
 args
@@ -751,6 +734,16 @@ arg
       $$ = SPVM_OP_build_arg(compiler, $1, $3);
     }
 
+invocant
+  : var ':' SELF
+    {
+      $$ = SPVM_OP_build_arg(compiler, $1, $3);
+    }
+  | var ':' CLASS
+    {
+      $$ = SPVM_OP_build_arg(compiler, $1, $3);
+    }
+
 opt_descriptors
   :	/* Empty */
     {
@@ -769,7 +762,7 @@ opt_descriptors
     }
     
 descriptors
-  : descriptors ',' DESCRIPTOR
+  : descriptors DESCRIPTOR
     {
       SPVM_OP* op_list;
       if ($1->id == SPVM_OP_C_ID_LIST) {
@@ -779,13 +772,9 @@ descriptors
         op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
         SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
       }
-      SPVM_OP_insert_child(compiler, op_list, op_list->last, $3);
+      SPVM_OP_insert_child(compiler, op_list, op_list->last, $2);
       
       $$ = op_list;
-    }
-  | descriptors ','
-    {
-      $$ = $1;
     }
   | DESCRIPTOR
 

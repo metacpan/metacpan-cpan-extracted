@@ -3,25 +3,13 @@ use strict;
 use warnings;
 
 package Dist::Zilla::Plugin::Test::MinimumVersion;
-# ABSTRACT: Release tests for minimum required versions
-our $VERSION = '2.000007'; # VERSION
+# ABSTRACT: Author tests for minimum required versions
+our $VERSION = '2.000008'; # VERSION
 
 use Moose;
 extends 'Dist::Zilla::Plugin::InlineFiles';
 with 'Dist::Zilla::Role::TextTemplate',
-    'Dist::Zilla::Role::PrereqSource',
-    ;
-
-sub register_prereqs {
-    my $self = shift @_;
-
-    $self->zilla->register_prereqs(
-        { phase => 'develop' },
-        'Test::MinimumVersion' => 0,
-    );
-
-    return;
-}
+    'Dist::Zilla::Role::PrereqSource';
 
 has max_target_perl => (
     is => 'ro',
@@ -42,6 +30,18 @@ around add_file => sub {
     );
 };
 
+
+sub register_prereqs {
+    my $self = shift;
+    $self->zilla->register_prereqs(
+        {
+            type  => 'requires',
+            phase => 'develop',
+        },
+        'Test::MinimumVersion' => 0,
+    );
+}
+
 __PACKAGE__->meta->make_immutable;
 no Moose;
 1;
@@ -52,15 +52,16 @@ no Moose;
 
 =head1 NAME
 
-Dist::Zilla::Plugin::Test::MinimumVersion - Release tests for minimum required versions
+Dist::Zilla::Plugin::Test::MinimumVersion - Author tests for minimum required versions
 
 =head1 VERSION
 
-version 2.000007
-
-=for test_synopsis BEGIN { die "SKIP: Synopsis isn't Perl code" }
+version 2.000008
 
 =for Pod::Coverage register_prereqs
+
+=for test_synopsis 1;
+__END__
 
 =head1 SYNOPSIS
 
@@ -74,7 +75,7 @@ In C<dist.ini>:
 This is an extension of L<Dist::Zilla::Plugin::InlineFiles>, providing a
 L<Test::MinimumVersion> test:
 
-  xt/release/minimum-version.t - a standard Test::MinimumVersion test
+  xt/author/minimum-version.t - a standard Test::MinimumVersion test
 
 You should provide the highest perl version you want to require as
 C<target_max_version>. If you accidentally use perl features that are newer
@@ -91,7 +92,7 @@ site near you, or see L<https://metacpan.org/module/Dist::Zilla::Plugin::Test::M
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/doherty/Dist-Zilla-Plugin-Test-MinimumVersion>
+The development version is on github at L<https://github.com/doherty/Dist-Zilla-Plugin-Test-MinimumVersion>
 and may be cloned from L<git://github.com/doherty/Dist-Zilla-Plugin-Test-MinimumVersion.git>
 
 =head1 BUGS AND LIMITATIONS
@@ -123,14 +124,12 @@ the same terms as the Perl 5 programming language system itself.
 =cut
 
 __DATA__
-___[ xt/release/minimum-version.t ]___
+___[ xt/author/minimum-version.t ]___
 #!perl
 
 use Test::More;
 
-eval "use Test::MinimumVersion";
-plan skip_all => "Test::MinimumVersion required for testing minimum versions"
-  if $@;
+use Test::MinimumVersion;
 {{ $version
     ? "all_minimum_version_ok( qq{$version} );"
     : "all_minimum_version_from_metayml_ok();"

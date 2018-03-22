@@ -190,7 +190,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	LOC_MAP_IRRADIANCE
 	LOC_MAP_METALNESS
 	LOC_MAP_NORMAL
-	LOC_MAP_OCCUSION
+	LOC_MAP_OCCLUSION
 	LOC_MAP_PREFILTER
 	LOC_MAP_ROUGHNESS
 	LOC_MAP_SPECULAR
@@ -252,7 +252,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	BeginShaderMode
 	BeginTextureMode
 	BeginVrDrawing
-	CalculateBoundingBox
+	MeshBoundingBox
 	ChangeDirectory
 	CheckCollisionBoxSphere
 	CheckCollisionBoxes
@@ -490,8 +490,6 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	LoadTextureFromImage
 	LoadWave
 	LoadWaveEx
-	MatrixIdentity
-	MatrixToFloat
 	MeasureText
 	MeasureTextEx
 	PauseAudioStream
@@ -566,9 +564,6 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	UpdateTexture
 	UpdateTextureFromImage
 	UpdateVrTracking
-	Vector3One
-	Vector3ToFloat
-	Vector3Zero
 	WaveCopy
 	WaveCrop
 	WaveFormat
@@ -750,7 +745,7 @@ our @EXPORT = qw(
 	LOC_MAP_IRRADIANCE
 	LOC_MAP_METALNESS
 	LOC_MAP_NORMAL
-	LOC_MAP_OCCUSION
+	LOC_MAP_OCCLUSION
 	LOC_MAP_PREFILTER
 	LOC_MAP_ROUGHNESS
 	LOC_MAP_SPECULAR
@@ -1034,7 +1029,7 @@ None by default.
   LOC_MAP_IRRADIANCE
   LOC_MAP_METALNESS
   LOC_MAP_NORMAL
-  LOC_MAP_OCCUSION
+  LOC_MAP_OCCLUSION
   LOC_MAP_PREFILTER
   LOC_MAP_ROUGHNESS
   LOC_MAP_SPECULAR
@@ -1099,7 +1094,7 @@ None by default.
   void BeginShaderMode(Shader shader)
   void BeginTextureMode(RenderTexture2D target)
   void BeginVrDrawing(void)
-  BoundingBox CalculateBoundingBox(Mesh mesh)
+  BoundingBox MeshBoundingBox(Mesh mesh)
   bool ChangeDirectory(const char *dir)
   bool CheckCollisionBoxSphere(BoundingBox box, Vector3 centerSphere, float radiusSphere)
   bool CheckCollisionBoxes(BoundingBox box1, BoundingBox box2)
@@ -1345,8 +1340,6 @@ None by default.
   Texture2D LoadTextureFromImage(Image image)
   Wave LoadWave(const char *fileName)
   Wave LoadWaveEx(void *data, int sampleCount, int sampleRate, int sampleSize, int channels)
-  Matrix MatrixIdentity(void)
-  float *MatrixToFloat(Matrix mat)
   int MeasureText(const char *text, int fontSize)
   Vector2 MeasureTextEx(SpriteFont spriteFont, const char *text, float fontSize, int spacing)
   void PauseAudioStream(AudioStream stream)
@@ -1423,9 +1416,6 @@ None by default.
   void UpdateTexture(Texture2D texture, const void *pixels)
   void UpdateTextureFromImage(Texture2D texture, Image image)
   void UpdateVrTracking(Camera *camera)
-  Vector3 Vector3One(void)
-  float *Vector3ToFloat(Vector3 vec)
-  Vector3 Vector3Zero(void)
   Wave WaveCopy(Wave wave)
   void WaveCrop(Wave *wave, int initSample, int finalSample)
   void WaveFormat(Wave *wave, int sampleRate, int sampleSize, int channels)

@@ -2,7 +2,7 @@ package Dist::Zilla::PluginBundle::Author::DOHERTY;
 use strict;
 use warnings;
 # ABSTRACT: configure Dist::Zilla like DOHERTY
-our $VERSION = '0.40'; # VERSION
+our $VERSION = '0.42'; # VERSION
 
 
 use feature qw(say);
@@ -119,14 +119,6 @@ has critic_config => (
 );
 
 
-has googlecode_project => (
-    is  => 'ro',
-    isa => 'Str',
-    lazy => 1,
-    default => sub { $_[0]->payload->{googlecode_project} },
-);
-
-
 has fork_is_authoritative => (
     is  => 'ro',
     isa => 'Bool',
@@ -166,7 +158,7 @@ has sharedir => (
 );
 
 
-enum 'ReleaseTarget', [qw( CPAN PAUSE Google GoogleCode local )];
+enum 'ReleaseTarget', [qw( CPAN PAUSE local )];
 
 has release_to => (
     is  => 'rw',
@@ -189,8 +181,8 @@ has dzil_files_for_scm => (
     default => sub {
         my $self = shift;
         return [
-            (qw/ Build.PL Makefile.PL /)x!$self->custom_build,
-            qw/ README README.mkdn /,
+            (qw/ Makefile.PL /)x!$self->custom_build,
+            qw/ README.mkdn /,
         ];
     },
 );
@@ -313,10 +305,6 @@ sub configure {
             $self->add_plugins('UploadToCPAN', 'SchwartzRatio');
             say STDERR '[@Author::DOHERTY] Releasing to CPAN';
         }
-        if ( any { $_ =~ m/^Google(?:Code)?$/i } @{ $self->release_to } ) {
-            $self->add_plugins(['UploadToGoogleCode' => { project => $self->googlecode_project }]);
-            say STDERR '[@Author::DOHERTY] Releasing to Google Code';
-        }
     }
 
     $self->add_plugins(
@@ -381,17 +369,7 @@ Dist::Zilla::PluginBundle::Author::DOHERTY - configure Dist::Zilla like DOHERTY
 
 =head1 VERSION
 
-version 0.40
-
-=head1 SYNOPSIS
-
-    # in dist.ini
-    [@Author::DOHERTY]
-
-=head1 DESCRIPTION
-
-C<Dist::Zilla::PluginBundle::Author::DOHERTY> provides shorthand for
-a L<Dist::Zilla> configuration that does what Mike wants.
+version 0.42
 
 =head1 USAGE
 
@@ -485,12 +463,6 @@ C<critic_config> is a filename to pass through to L<Dist::Zilla::Plugin::Test::P
 
 =item *
 
-C<googlecode_project> tells L<UploadToGoogleCode|Dist::Zilla::Plugin::UploadToGoogleCode>
-which project to upload to. This is required if you want to upload your release
-to Google Code.
-
-=item *
-
 C<fork_is_authoritative> tells L<GitHub::Meta|Dist::Zilla::Plugin::GitHub::Meta>
 that your fork is authoritative. That means that the repository, issues, etc
 will point to your stuff on github, instead of wherever you forked from. This
@@ -517,11 +489,6 @@ targets are:
 
 We'll use L<UploadToPAUSE|Dist::Zilla::Plugin::UploadToCPAN> to do the release,
 and clean up afterwards. This is the default
-
-=item * GoogleCode
-
-Well use L<UploadToGoogleCode|Dist::Zilla::Plugin::UploadToGoogleCode> to do the
-release, and clean up afterwards. Make sure you set C<googlecode_project>
 
 =item * local
 
@@ -589,6 +556,16 @@ mvp_multivalue_args
 
 =end Pod::Coverage
 
+=head1 SYNOPSIS
+
+    # in dist.ini
+    [@Author::DOHERTY]
+
+=head1 DESCRIPTION
+
+C<Dist::Zilla::PluginBundle::Author::DOHERTY> provides shorthand for
+a L<Dist::Zilla> configuration that does what Mike wants.
+
 =head1 AVAILABILITY
 
 The project homepage is L<http://metacpan.org/release/Dist-Zilla-PluginBundle-Author-DOHERTY/>.
@@ -599,7 +576,7 @@ site near you, or see L<https://metacpan.org/module/Dist::Zilla::PluginBundle::A
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/doherty/Dist-Zilla-PluginBundle-Author-DOHERTY>
+The development version is on github at L<https://github.com/doherty/Dist-Zilla-PluginBundle-Author-DOHERTY>
 and may be cloned from L<git://github.com/doherty/Dist-Zilla-PluginBundle-Author-DOHERTY.git>
 
 =head1 BUGS AND LIMITATIONS

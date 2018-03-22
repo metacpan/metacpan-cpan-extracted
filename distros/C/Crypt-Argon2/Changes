@@ -1,5 +1,8 @@
 Revision history for Crypt-Argon2
 
+0.003     2018-03-19 19:31:21+01:00 Europe/Amsterdam
+          - Added argon2id support
+
 0.002     2016-09-21 23:24:25+02:00 Europe/Amsterdam
           - Include an upstream fix to encoded_length
           - Add attribution to original authors

@@ -11,7 +11,7 @@
 
 #include "const-c.inc"
 
-static bool ColorEqual(Color a, Color b) {
+static int ColorEqual(Color a, Color b) {
     return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
 }
 typedef Rectangle ImageSet_t(Color*, Rectangle, Color, unsigned, unsigned);
@@ -24,8 +24,9 @@ TransposedImageSet(Color *dst, Rectangle dst_rect, Color color, unsigned width, 
         return dst_rect;
 
     if (!ColorEqual(color, BLANK)) {
-        for(unsigned y = 0; y < height; y++) {
-            for(unsigned x = 0; x < width; x++) {
+        unsigned y, x;
+        for(y = 0; y < height; y++) {
+            for(x = 0; x < width; x++) {
                 Color *pixel = &dst[(x+dst_rect.x)*dst_rect.width + (dst_rect.y+y)];
                 *pixel = color;
             }
@@ -52,8 +53,9 @@ ImageSet(Color *dst, Rectangle dst_rect, Color color, unsigned width, unsigned h
         return dst_rect;
 
     if (!ColorEqual(color, BLANK)) {
-        for(unsigned y = 0; y < height; y++) {
-            for(unsigned x = 0; x < width; x++) {
+        unsigned y, x;
+        for(y = 0; y < height; y++) {
+            for(x = 0; x < width; x++) {
                 Color *pixel = &dst[(y+dst_rect.y)*dst_rect.width + (dst_rect.x+x)];
                 *pixel = color;
             }
@@ -105,7 +107,7 @@ void
 BeginVrDrawing()
 
 BoundingBox
-CalculateBoundingBox(mesh)
+MeshBoundingBox(mesh)
     Mesh    mesh
 
 bool
@@ -1250,6 +1252,7 @@ LoadImageFromAV(array_ref, color_cb, width, height)
     LoadImageFromAV_transposed = 2
     LoadImageFromAV_transposed_uninitialized_mem = 3
   INIT:
+    int i;
     AV *av;
     Color *pixels;
     Image img;
@@ -1264,7 +1267,7 @@ LoadImageFromAV(array_ref, color_cb, width, height)
 
     av = (AV*)SvRV(array_ref);
     where.height = av_len(av) + 1;
-    for (int i = 0; i < where.height; i++) {
+    for (i = 0; i < where.height; i++) {
         SV** row_sv = av_fetch(av, i, 0);
         if (!row_sv || !SvROK(*row_sv) || SvTYPE(SvRV(*row_sv)) != SVt_PVAV)
             croak("expected ARRAY ref as rows");
@@ -1281,10 +1284,11 @@ LoadImageFromAV(array_ref, color_cb, width, height)
         my_ImageSet = TransposedImageSet;
 
     EXTEND(SP, 3);
-    for (int i = 0; i < where.height; i++) {
+    for (i = 0; i < where.height; i++) {
         AV* row = (AV*)SvRV(*av_fetch(av, i, 0));
 
         for (int j = 0; j < where.width; j++) {
+            SV *ret;
             SV** pixel = av_fetch(row, j, 0);
             if (!pixel) {
                 /* do something ? */
@@ -1299,7 +1303,7 @@ LoadImageFromAV(array_ref, color_cb, width, height)
             Color color = BLANK;
             call_sv(color_cb, G_SCALAR);
             SPAGAIN;
-            SV *ret = POPs;
+            ret = POPs;
             if (sv_isa(ret, "Graphics::Raylib::XS::Color"))
                 color = *(Color *)SvPV_nolen(SvRV(ret));
 
@@ -1394,13 +1398,6 @@ LoadWaveEx(data, sampleCount, sampleRate, sampleSize, channels)
     int    sampleRate
     int    sampleSize
     int    channels
-
-Matrix
-MatrixIdentity()
-
-float *
-MatrixToFloat(mat)
-    Matrix    mat
 
 int
 MeasureText(text, fontSize)
@@ -1736,16 +1733,6 @@ UpdateTextureFromImage(texture, image)
 void
 UpdateVrTracking(camera)
     Camera *    camera
-
-Vector3
-Vector3One()
-
-float *
-Vector3ToFloat(vec)
-    Vector3    vec
-
-Vector3
-Vector3Zero()
 
 Wave
 WaveCopy(wave)

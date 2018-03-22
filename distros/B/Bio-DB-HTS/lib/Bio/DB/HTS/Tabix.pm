@@ -1,7 +1,7 @@
 
 =head1 LICENSE
 
-Copyright [2015-2017] EMBL-European Bioinformatics Institute
+Copyright [2015-2018] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ package Bio::DB::HTS::Tabix;
 
 use Bio::DB::HTS;
 use Bio::DB::HTS::Tabix::Iterator;
-$Bio::DB::HTS::Tabix::VERSION = '2.9';
+$Bio::DB::HTS::Tabix::VERSION = '2.10';
 use strict;
 use warnings;
 
@@ -49,19 +49,22 @@ sub new {
 
   my $htsfile = Bio::DB::HTSfile->open($filename);
   my $tabix_index = tbx_open($filename);
+  # use Data::Dumper; print $tabix_index; die;
   die "Couldn't find index for file " . $filename unless $tabix_index;
   my $header = tbx_header($htsfile, $tabix_index);
-  if( $header )
-  {
+  if( $header ) {
     $header = join "\n", @{ $header } ;
+  } else {
+    $header = '';
   }
+  
   chdir($pdir);
 
   my $self = bless {
                     _htsfile => $htsfile,
                     _filename => $filename,
                     _tabix_index => $tabix_index,
-                    _header=> $header,
+                    _header => $header,
                    }, ref $class || $class;
 
   return $self;
@@ -75,16 +78,18 @@ sub query_full {
     $region .= $start;
     $region .= '-'.$end if(defined $end);
   }
+  
   my $iter = tbx_query( $self->{_tabix_index}, $region );
   unless ( $iter ) {
-    #this likely means the chromosome wasn't found in the tabix index, or it couldn't parse the provided region.
+    # this likely means the chromosome wasn't found in the tabix index, or it couldn't parse the provided region.
     my $seqnames_hash = { map { $_ => 1 } @{ $self->seqnames } };
+    
     if ( not exists $seqnames_hash->{ $chr } ) {
-      #$self->log->warn("Specified chromosome '$chr' does not exist in file " . $self->_filename);
-    }
-    else {
+      # warn("Specified chromosome '$chr' does not exist in file " . $self->{_filename});
+      return undef;
+    } else {
       die "Unable to get iterator for region '$region' in file ". $self->{_filename} . " -- htslib couldn't parse your region string";
-      }
+    }
   }
 
   return Bio::DB::HTS::Tabix::Iterator->new( _tabix_iter => $iter, _htsfile => $self->{_htsfile}, _tabix_index => $self->{_tabix_index} );
@@ -98,7 +103,7 @@ sub query {
     unless ( defined $chr ) {
         die "You must specify a region in the format chr, chr:start or chr:start-end";
     }
-
+    
     if ( defined $end ) {
         die "End in $region is less than the start" if $end < $start;
     }

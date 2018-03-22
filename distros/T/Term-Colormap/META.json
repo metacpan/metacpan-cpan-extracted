@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Term-Colormap",
    "prereqs" : {
@@ -37,21 +37,21 @@
    "provides" : {
       "Term::Colormap" : {
          "file" : "lib/Term/Colormap.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       },
       "Term::Colormap::Brewer" : {
          "file" : "lib/Term/Colormap/Brewer.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://www.perlfoundation.org/artistic_license_2_0"
+         "http://opensource.org/licenses/artistic-license-2.0.php"
       ],
       "repository" : {
          "url" : "https://github.com/xxfelixxx/perl-term-colormap"
       }
    },
-   "version" : "0.18"
+   "version" : "0.19"
 }

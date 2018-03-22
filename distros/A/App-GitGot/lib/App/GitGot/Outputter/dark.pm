@@ -1,6 +1,6 @@
 package App::GitGot::Outputter::dark;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Outputter::dark::VERSION = '1.334';
+$App::GitGot::Outputter::dark::VERSION = '1.335';
 # ABSTRACT: Color scheme appropriate for dark terminal backgrounds
 use 5.014;
 
@@ -51,7 +51,7 @@ App::GitGot::Outputter::dark - Color scheme appropriate for dark terminal backgr
 
 =head1 VERSION
 
-version 1.334
+version 1.335
 
 =for Pod::Coverage color_error color_major_change color_minor_change color_warning
 

@@ -14,3 +14,5 @@ IP-China-[0-9\.]+\/
 ^makeitfile$
 ^xt/.*$
 ^\.perlcriticrc$
+^examples/.*-out\.txt$
+^make-pod\.pl$

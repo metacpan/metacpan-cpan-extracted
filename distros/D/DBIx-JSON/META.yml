@@ -1,14 +1,26 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         DBIx-JSON
-version:      0.02
-version_from: lib/DBIx/JSON.pm
-installdirs:  site
+---
+abstract: 'Perl extension for creating JSON from existing DBI datasources'
+author:
+  - 'Koji Komatsu <yosty@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-JSON
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    Carp:                          0
-    DBI:                           1.15
-    JSON::Syck:                    0
-    Test::More:                    0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+  Carp: '0'
+  DBI: '1.15'
+  JSON::Syck: '0'
+  Test::More: '0'
+  perl: '5.006002'
+version: '0.04'

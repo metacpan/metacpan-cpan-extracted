@@ -1,5 +1,5 @@
 
-#define XS_Id "$Id: SEC.xs 1641 2018-02-14 21:34:17Z willem $"
+#define XS_Id "$Id: SEC.xs 1654 2018-03-19 15:53:37Z willem $"
 
 #define PERL_NO_GET_CONTEXT
 
@@ -12,6 +12,11 @@ extern "C" {
 #include "XSUB.h"
 
 #include <openssl/opensslv.h>
+
+#if (OPENSSL_VERSION_NUMBER < 0x00908000L)
+#error	Incompatible OpenSSL version
+#endif
+
 #include <openssl/bn.h>
 #include <openssl/dsa.h>
 #include <openssl/ec.h>
@@ -25,12 +30,24 @@ extern "C" {
 
 
 #ifdef LIBRESSL_VERSION_NUMBER
+#undef  OPENSSL_VERSION_NUMBER
+#define OPENSSL_VERSION_NUMBER 0x10001080L
 #define LIB_VERSION LIBRESSL_VERSION_NUMBER
 #endif
 
 #ifndef LIB_VERSION
 #define LIB_VERSION OPENSSL_VERSION_NUMBER
 #endif
+
+
+#ifndef INC_ED25519
+#define NO_ED25519
+#endif
+
+#ifndef INC_ED448
+#define NO_ED448
+#endif
+
 
 int checkerr(const int ret)
 {
@@ -48,7 +65,14 @@ int get_NID(const char *id)
 }
 
 
-#if defined(LIBRESSL_VERSION_NUMBER) || (OPENSSL_VERSION_NUMBER < 0x10100000L)
+#if (OPENSSL_VERSION_NUMBER < 0x10101002L)
+#define NO_ED448
+#endif
+
+
+#if (OPENSSL_VERSION_NUMBER < 0x10100000L)
+
+#define NO_ED25519
 
 int DSA_set0_pqg(DSA *d, BIGNUM *p, BIGNUM *q, BIGNUM *g)
 {
@@ -145,7 +169,7 @@ int RSA_set0_factors(RSA *r, BIGNUM *p, BIGNUM *q)
 #endif
 
 
-#if defined(OPENSSL_VERSION_NUMBER) && (OPENSSL_VERSION_NUMBER < 0x10001000L)
+#if (OPENSSL_VERSION_NUMBER < 0x10001000L)
 
 int EC_KEY_set_public_key_affine_coordinates(EC_KEY *eckey, BIGNUM *x, BIGNUM *y)
 {
@@ -172,6 +196,15 @@ int EC_KEY_set_public_key_affine_coordinates(EC_KEY *eckey, BIGNUM *x, BIGNUM *y
 	return retval;
 }
 
+#endif
+
+
+#ifndef NO_ED25519
+#include "include/Ed25519.h"
+#endif
+
+#ifndef NO_ED448
+#include "include/Ed448.h"
 #endif
 
 
@@ -315,7 +348,10 @@ EC_KEY*
 EC_KEY_new_by_curve_name(int nid)
 
 EC_KEY*
-EC_KEY_dup(EC_KEY *src);
+EC_KEY_new()
+
+EC_KEY*
+EC_KEY_dup(EC_KEY *src)
 
 void
 EC_KEY_free(EC_KEY *key)
@@ -415,6 +451,126 @@ ECDSA_do_verify(SV *dgst, ECDSA_SIG *sig, EC_KEY *key)
 	RETVAL = ECDSA_do_verify( bin, (int)len, sig, key );
     OUTPUT:
 	RETVAL
+
+
+####	Ed25519	####
+
+#ifndef NO_ED25519
+
+SV*
+ED25519_sign(SV *message, SV *public_key, SV *private_key)
+    PREINIT:
+	const unsigned char *m;
+	STRLEN	mlen;
+	const unsigned char *p;
+	STRLEN	plen;
+	const unsigned char *k;
+	STRLEN	klen;
+	char *sig = malloc( sizeof(char) * 128 );
+	int r;
+    CODE:
+	m = (unsigned char*) SvPV( message, mlen );
+	p = (unsigned char*) SvPV( public_key, plen );
+	k = (unsigned char*) SvPV( private_key, klen );
+	r =  ED25519_sign( (uint8_t*)sig, m, mlen, p, k );
+	RETVAL = newSVpvn( sig, 64 );
+	free(sig);
+	checkerr(r);
+    OUTPUT:
+	RETVAL
+
+int
+ED25519_verify(SV *msg, SV *sig, SV *key)
+    PREINIT:
+	unsigned char *m;
+	STRLEN	mlen;
+	unsigned char *s;
+	STRLEN	slen;
+	unsigned char *k;
+	STRLEN	klen;
+    CODE:
+	m = (unsigned char*) SvPV( msg, mlen );
+	s = (unsigned char*) SvPV( sig, slen );
+	k = (unsigned char*) SvPV( key, klen );
+	RETVAL = ED25519_verify( m, mlen, s, k );
+    OUTPUT:
+	RETVAL
+
+SV*
+ED25519_public_from_private(SV *private_key)
+    PREINIT:
+	const unsigned char *p;
+	STRLEN	plen;
+	char *k = malloc( sizeof(char) * 60 );
+    CODE:
+	p = (unsigned char*) SvPV( private_key, plen );
+	ED25519_public_from_private( (uint8_t*)k, p );
+	RETVAL = newSVpvn( k, plen );
+	free(k);
+    OUTPUT:
+	RETVAL
+
+#endif
+
+
+####	Ed448	####
+
+#ifndef NO_ED448
+
+SV*
+ED448_sign(SV *message, SV *public_key, SV *private_key)
+    PREINIT:
+	const unsigned char *m;
+	STRLEN	mlen;
+	const unsigned char *p;
+	STRLEN	plen;
+	const unsigned char *k;
+	STRLEN	klen;
+	char *sig = malloc( sizeof(char) * 128 );
+	int r;
+    CODE:
+	m = (unsigned char*) SvPV( message, mlen );
+	p = (unsigned char*) SvPV( public_key, plen );
+	k = (unsigned char*) SvPV( private_key, klen );
+	r =  ED448_sign( (uint8_t*)sig, m, mlen, p, k, NULL, 0 );
+	RETVAL = newSVpvn( sig, 114 );
+	free(sig);
+	checkerr(r);
+    OUTPUT:
+	RETVAL
+
+int
+ED448_verify(SV *msg, SV *sig, SV *key)
+    PREINIT:
+	unsigned char *m;
+	STRLEN	mlen;
+	unsigned char *s;
+	STRLEN	slen;
+	unsigned char *k;
+	STRLEN	klen;
+    CODE:
+	m = (unsigned char*) SvPV( msg, mlen );
+	s = (unsigned char*) SvPV( sig, slen );
+	k = (unsigned char*) SvPV( key, klen );
+	RETVAL = ED448_verify( m, mlen, s, k, NULL, 0 );
+    OUTPUT:
+	RETVAL
+
+SV*
+ED448_public_from_private(SV *private_key)
+    PREINIT:
+	const unsigned char *p;
+	STRLEN	plen;
+	char *k = malloc( sizeof(char) * 60 );
+    CODE:
+	p = (unsigned char*) SvPV( private_key, plen );
+	ED448_public_from_private( (uint8_t*)k, p );
+	RETVAL = newSVpvn( k, plen );
+	free(k);
+    OUTPUT:
+	RETVAL
+
+#endif
 
 
 ####	RSA	####

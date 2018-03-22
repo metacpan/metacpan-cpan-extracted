@@ -149,14 +149,14 @@ require 5.004;
 	    # to figure it out, since I'm not a SQL server expert.  Anyone out there?
 	    # (mine returns "dbo" for the owner on ALL my tables.  This is obviously something
 	    # significant for SQL Server...one of these days I'll dig...
-	 if (($table_name eq uc($row->{TABLE_NAME}))) {
-		# and (uc($user) eq uc($row[1])))
-		# qeDBF driver returns null for TABLE_OWNER
-	    my $owner = $row->{TABLE_OWNER} || '(unknown owner)';
-	    # diag("$owner.$row->{TABLE_NAME}\n");
-	    $rc = 1;
-	    last;
-	 }
+          if ((lc($table_name) eq lc($row->{TABLE_NAME}))) {
+              # and (uc($user) eq uc($row[1])))
+              # qeDBF driver returns null for TABLE_OWNER
+              my $owner = $row->{TABLE_OWNER} || '(unknown owner)';
+              # diag("$owner.$row->{TABLE_NAME}\n");
+              $rc = 1;
+              last;
+          }
       }
       $sth->finish();
       $rc;

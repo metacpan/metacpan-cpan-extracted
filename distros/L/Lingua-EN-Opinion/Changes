@@ -1,5 +1,29 @@
 Revision history for Lingua-EN-Opinion
 
+0.1201 2018-03-21 23:29:45
+    - Don't allow digits in tokenization.
+    - Only return defined words from the tokenization function.
+
+0.12 2018-03-21 22:33:39
+    - Make the sentiment modules object attributes instead of re-instantiating them constantly.
+    - Improve documentation.
+
+0.1102 2018-03-21 16:42:44
+    - Improve documentation.
+    - Break out POD from the Emotion module.
+
+0.1101 2018-03-21 14:07:23
+    - Remove the duplicate stemming code from the *get_sentence() methods.
+
+0.11 2018-03-21 13:26:58
+    - Re-add stemming support.
+
+0.10 2018-03-20 23:23:10
+    - Sadly, we get to rollback stemming support. :(
+
+0.09 2018-03-20 23:03:39
+    - Add optional word stemming support.
+
 0.0801 2018-03-17 15:59:18
     - Improve documentation slightly again.
     - Add score-sentence.psgi to the example scripts.

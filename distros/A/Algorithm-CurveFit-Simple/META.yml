@@ -24,4 +24,4 @@ requires:
   perl: '5.010'
   strict: '0'
   warnings: '0'
-version: '1.02'
+version: '1.03'

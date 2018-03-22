@@ -2,7 +2,7 @@ package Test2::Formatter::Stream;
 use strict;
 use warnings;
 
-our $VERSION = '0.001061';
+our $VERSION = '0.001062';
 
 use Carp qw/croak confess/;
 use Time::HiRes qw/time/;
@@ -118,6 +118,9 @@ sub record {
             }
         );
     }
+
+    # Local is expensive! Only do it if we really need to.
+    local($\, $,) = (undef, '') if $\ || $,;
 
     my ($out, @sync) = @{$self->{+IO}};
     print $out $self->{+LEADER} ? ("T2-HARNESS-EVENT: ", $id, ' ', $json, "\n") : ($json, "\n");

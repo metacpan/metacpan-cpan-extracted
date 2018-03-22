@@ -60,7 +60,7 @@ my ($schema_file_count, $result_file_count);
     __PACKAGE__->loader_options(
         dump_directory => $dump_path,
         quiet => 1,
-        filter_generated_code => "$^X t/bin/simple_filter",
+        filter_generated_code => qq{"$^X" t/bin/simple_filter},
     );
 }
 

@@ -1,7 +1,7 @@
 
 =head1 LICENSE
 
-Copyright [2015-2017] EMBL-European Bioinformatics Institute
+Copyright [2015-2018] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -99,8 +99,8 @@ Bio::DB::HTS -- Read files using HTSlib including BAM/CRAM, Tabix and BCF databa
 =head1 DESCRIPTION
 
 This module provides a Perl interface to the HTSlib library for
-indexed and unindexed SAM/BAM sequence alignment databases. It
-provides support for retrieving information on individual alignments,
+indexed and unindexed SAM/BAM/CRAM sequence alignment databases. 
+It provides support for retrieving information on individual alignments,
 read pairs, and alignment coverage information across large
 regions. It also provides callback functionality for calling SNPs and
 performing other base-by-base functions.
@@ -1003,7 +1003,7 @@ write the alignment to the BAM file and return the number of bytes successfully 
 
 =head2 Index methods
 
-The Bio::DB::HTS::Index object provides access to index (.bai,.crai) files.
+The Bio::DB::HTS::Index object provides access to index (.bai|.csi, .crai) files.
 
 =over 4
 
@@ -1031,7 +1031,7 @@ exist or if attempting to rebuild the index was unsuccessful.
 
 Attempt to open the index file for an alignment file, returning a
 Bio::DB::HTS::Index object. The filename path to use is the alignment file,
-not the index file (i.e. .bam or .cram, not .bai or .crai)
+not the index file (i.e. .bam or .cram, not .bai|.csi or .crai)
 
 =item $index = Bio::DB::HTS->index_open_in_safewd('/path/to/file.?am' [,$mode])
 
@@ -1276,14 +1276,77 @@ exported to the Perl API just in case.
 Please see L<Bio::DB::HTS::Alignment> for documentation of the
 Bio::DB::HTS::Alignment and Bio::DB::HTS::AlignWrapper objects.
 
-=head1 AUTHOR
+=head1 DEPENDENCIES
 
-Rishi Nag E<lt>rishi@ebi.ac.ukE<gt>
+Module::Build, Carp, Bio::Perl (>=1.006001), Test::More
+
+=head1 EXPORT
+
+None
+
+=head1 AUTHORS
+
+Rishi Nag E<lt>rishi@ebi.ac.ukE<gt>, original author.
+
+Alessandro Vullo C<< <avullo at cpan.org> >>, the current developer and maintainer.
+
+=head1 CONTRIBUTORS
+
+Andy Yates, Keiran Raine, John Marshall, Zhicheng Liu, Can Wood, Dietmar Rieder, Chris Fields, David Jones, James Gilbert, Alex Hodgkins (Congenica Ltd.)
+
+=head1 KNOWN BUGS
+
+=over 4
+
+=item * SAM file reading and iterating over alignments does not work with older htslib versions (<1.5)
+
+=item * The padded_alignment() function with CRAM files may produce invalid output: unequal lenght of the strings that specify the pairwise alignment
+
+=back
+
+
+Please report any bugs or feature requests to C<bug-bio-db-hts at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Bio-DB-HTS>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 TESTING AND CONTRIBUTING
+
+You can obtain the most recent development version of this module via the GitHub
+repository at https://github.com/Ensembl/Bio-DB-HTS. Please feel free to submit bug
+reports, patches etc.
+
+=head1 SUPPORT 
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Bio::DB::HTS
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-DB-HTS>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Bio-DB-HTS>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Bio-DB-HTS>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Bio-DB-HTS/>
+
+=back
 
 =cut
 
 package Bio::DB::HTS;
-$Bio::DB::HTS::VERSION = '2.9';
+$Bio::DB::HTS::VERSION = '2.10';
 
 use strict;
 use warnings;
@@ -1936,9 +1999,6 @@ sub _coverage {
     my $self = shift;
     my ( $seqid, $start, $end, $bins, $filter ) = @_;
 
-    # Currently filter is ignored. In reality, we should
-    # turn filter into a callback and invoke it on each
-    # position in the pileup.
     croak "cannot calculate coverage unless a -seq_id is provided"
       unless defined $seqid;
 
@@ -1958,7 +2018,8 @@ sub _coverage {
     $bins ||= $end - $start + 1;
 
     my $index = $self->hts_index;
-    my $coverage = $index->coverage( $self->{hts_file}, $id, $s, $end, $bins );
+    my $coverage = $index->coverage( $self->{hts_file}, $id, $s, $end,
+                                     $bins, 8000, $filter );
 
     return
       Bio::SeqFeature::HTSCoverage->new( -display_name => "$seqid coverage",
@@ -2078,7 +2139,7 @@ sub _glob_match {
 
 package Bio::DB::HTS::Fai;
 
-$Bio::DB::HTS::Fai::VERSION = '2.9';
+$Bio::DB::HTS::Fai::VERSION = '2.10';
 
 sub open { shift->load(@_) }
 
@@ -2095,7 +2156,7 @@ package Bio::SeqFeature::HTSCoverage;
 
 use base 'Bio::SeqFeature::Lite';
 
-$Bio::SeqFeature::HTSCoverage::VERSION = '2.9';
+$Bio::SeqFeature::HTSCoverage::VERSION = '2.10';
 
 sub coverage {
     my $self = shift;
@@ -2127,7 +2188,7 @@ sub gff3_string {
 
 package Bio::DB::HTSfile;
 
-$Bio::DB::HTS::HTSfile::VERSION = '2.9';
+$Bio::DB::HTS::HTSfile::VERSION = '2.10';
 
 use File::Spec;
 use Cwd;
@@ -2143,11 +2204,14 @@ sub index {
     return $self->index_open_in_safewd($fh) if Bio::DB::HTSfile->is_remote($path);
 
     if ($autoindex) {
-        if ( !( -e "${path}.bai" or -e "${path}.crai" ) ) {
+        if ( !( -e "${path}.bai" or -e "${path}.csi" or -e "${path}.crai" ) ) {
             $self->reindex($path);
         }
         elsif ( -e "${path}.bai" && mtime($path) > mtime("${path}.bai") ) {
             $self->reindex($path);
+        }
+        elsif ( -e "${path}.csi" && mtime($path) > mtime("${path}.csi") ) {
+            croak "csi index is older than bam file, Bio::DB::HTS cannot index csi format."
         }
         elsif ( -e "${path}.crai" && mtime($path) > mtime("${path}.crai") ) {
             $self->reindex($path);
@@ -2156,7 +2220,8 @@ sub index {
 
     croak "No index file for $path; try opening file with -autoindex"
       unless -e "${path}.bai" or
-      -e "${path}.crai";
+        -e "${path}.csi" or
+        -e "${path}.crai";
     return $self->index_load($fh);
 } ## end sub index
 
@@ -2164,7 +2229,7 @@ sub reindex {
     my $self = shift;
     my $path = shift;
 
-    # if bam file is not sorted, then index_build will exit.
+    # if bam|cram file is not sorted, then index_build will exit.
     # we spawn a shell to intercept this eventuality
     print STDERR "[hts_index_build] creating index for $path\n" if -t STDOUT;
 
@@ -2185,8 +2250,11 @@ sub reindex {
         print STDERR "[hts_index_build] sorting by coordinate...\n"
           if -t STDOUT;
         $self->sort_core( 0, $path, "$path.sorted" );
-        rename "$path.sorted.bam", $path;
-        $self->index_build($path);
+
+	$path =~ /\.(.+?)$/;
+        rename "$path.sorted.$1", $path;
+
+	$self->index_build($path);
     }
     elsif ($mesg) {
         die $mesg;

@@ -1,13 +1,14 @@
 package App::wordlist;
 
-our $DATE = '2018-02-20'; # DATE
-our $VERSION = '0.264'; # VERSION
+our $DATE = '2018-03-22'; # DATE
+our $VERSION = '0.266'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
 use List::Util qw(shuffle);
+use WordList::Namespace qw(is_actual_wordlist_module);
 
 our %SPEC;
 
@@ -37,30 +38,22 @@ sub _length_in_graphemes {
 
 sub _list_installed {
     require Module::List;
-    my $mods1 = Module::List::list_modules(
+    my $mods = Module::List::list_modules(
         "WordList::",
         {
             list_modules  => 1,
             list_pod      => 0,
             recurse       => 1,
         });
-    my $mods2 = Module::List::list_modules(
-        "WordListC::",
-        {
-            list_modules  => 1,
-            list_pod      => 0,
-            recurse       => 1,
-        });
     my @res;
-    for my $wl0 ((sort keys %$mods1), (sort keys %$mods2)) {
-        (my $wl = $wl0) =~ s/\AWordListC?:://;
+    for my $wl0 (sort keys %$mods) {
+        next unless is_actual_wordlist_module($wl0);
+        (my $wl = $wl0) =~ s/\AWordList:://;
 
         my $type;
         if ($wl =~ /^(Base|MetaSyntactic)\z/) {
             # just a base class
             next;
-        } elsif ($wl =~ s/^Base:://) {
-            $type = 'Base';
         } elsif ($wl =~ s/^MetaSyntactic:://) {
             $type = 'MetaSyntactic';
         } elsif ($wl =~ s/^Char:://) {
@@ -356,9 +349,6 @@ sub wordlist {
                 $mod = "WordList::$wl";
                 ($modpm = $mod . ".pm") =~ s!::!/!g;
                 last if eval { require $modpm; 1 };
-                $mod = "WordListC::$wl";
-                ($modpm = $mod . ".pm") =~ s!::!/!g;
-                last if eval { require $modpm; 1 };
                 die;
             }
             my $obj = $mod->new;
@@ -484,7 +474,7 @@ App::wordlist - Grep words from WordList::*
 
 =head1 VERSION
 
-This document describes version 0.264 of App::wordlist (from Perl distribution App-wordlist), released on 2018-02-20.
+This document describes version 0.266 of App::wordlist (from Perl distribution App-wordlist), released on 2018-03-22.
 
 =head1 SYNOPSIS
 
@@ -653,8 +643,6 @@ L<App::GamesWordlist> (L<games-wordlist>) which greps from
 C<Games::Word::Wordlist::*> instead.
 
 L<WordList> and C<WordList::*> modules.
-
-L<WordListC> and C<WordListC::*> modules.
 
 =head1 AUTHOR
 

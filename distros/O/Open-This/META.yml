@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/oalders/open-this/issues
   homepage: https://github.com/oalders/open-this
   repository: https://github.com/oalders/open-this.git
-version: '0.000006'
+version: '0.000007'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -122,7 +122,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InstallGuide
       name: '@Author::OALDERS/InstallGuide'
-      version: '1.200007'
+      version: '1.200009'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -322,7 +322,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.1
+          git_version: 2.16.2
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
       version: '2.043'
@@ -330,7 +330,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.16.1
+          git_version: 2.16.2
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -413,7 +413,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.1
+          git_version: 2.16.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -426,11 +426,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000006
+          tag: v0.000007
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.1
+          git_version: 2.16.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -467,7 +467,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.1
+          git_version: 2.16.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -481,7 +481,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.1
+          git_version: 2.16.2
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
       version: '2.043'

@@ -58,6 +58,12 @@ sub waitlist_count {
     return @$waitlist_count;
 }
 
+sub owners {
+    my $self = shift;
+    my $owners = $self->{owners} ||= [ $self->{session}->fetch_event_owners($self) ];
+    return @$owners;
+}
+
 sub update_waitlist_count {
     my $self = shift;
     $self->{session}->update_waitlist_count($self, @_);

@@ -3,6 +3,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
+    MIN_PERL_VERSION    => '5.6.2',
     NAME                => 'DBIx::JSON',
     AUTHOR              => 'Koji Komatsu <yosty@cpan.org>',
     VERSION_FROM        => 'lib/DBIx/JSON.pm',
@@ -10,7 +11,7 @@ WriteMakefile(
     PL_FILES            => {},
     PREREQ_PM => {
         'Test::More' => 0,
-        'DBI' => 1.15,
+        'DBI' => '1.15',
         'JSON::Syck' => 0,
         'Carp' => 0,
     },

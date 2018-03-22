@@ -1,5 +1,5 @@
 package Statocles::Base;
-our $VERSION = '0.087';
+our $VERSION = '0.088';
 # ABSTRACT: Base module for Statocles modules
 
 use strict;
@@ -76,7 +76,7 @@ Statocles::Base - Base module for Statocles modules
 
 =head1 VERSION
 
-version 0.087
+version 0.088
 
 =head1 SYNOPSIS
 

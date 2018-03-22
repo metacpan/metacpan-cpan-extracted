@@ -1,3 +1,11 @@
+0.040   2018-03-21 (PERLANCAR)
+
+        - [Incompatible change] By default send output to STDERR instead of
+	  STDOUT, like logging.
+
+	- Add option: fh to allow customizing where to print progress message.
+
+
 0.03    2018-03-17 (PERLANCAR)
 
 	- Prevent frequency throttling by Progress::Any.

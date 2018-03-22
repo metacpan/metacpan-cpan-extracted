@@ -2,8 +2,8 @@ NAME
     Nodejs::Util - Utilities related to Node.js
 
 VERSION
-    This document describes version 0.011 of Nodejs::Util (from Perl
-    distribution Nodejs-Util), released on 2018-03-09.
+    This document describes version 0.012 of Nodejs::Util (from Perl
+    distribution Nodejs-Util), released on 2018-03-21.
 
 FUNCTIONS
   nodejs_available

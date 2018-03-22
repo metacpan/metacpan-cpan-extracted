@@ -1,6 +1,15 @@
 Revision history for Perl extension Net::DNS::SEC.
 
 
+**** 1.05 March 20, Tuesday
+
+Feature
+	Support added for Ed25519 and Ed448 algorithms
+
+Fix: rt.cpan.org #124650
+	Net::DNS::SEC::Private must not die if attribute is not present
+
+
 **** 1.04 February 15, 2018
 
 Feature
@@ -554,4 +563,4 @@ Net::DNS. The history of those is documented below.
 
 
 ---------------------------------------------------------------------------
-$Id: Changes 1643 2018-02-15 15:40:34Z willem $
+$Id: Changes 1655 2018-03-20 08:41:36Z willem $

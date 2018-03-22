@@ -18,7 +18,7 @@ subtest 'explicit version' => sub {
     );
     $tzil->build;
 
-    my ($test) = map { $_->name eq 'xt/release/minimum-version.t' ? $_ : () } @{ $tzil->files };
+    my ($test) = map { $_->name eq 'xt/author/minimum-version.t' ? $_ : () } @{ $tzil->files };
     ok $test, 'minimum-version.t exists'
         or diag explain [ map { $_->name } @{ $tzil->files } ];
 
@@ -40,7 +40,7 @@ subtest 'version from metayml' => sub {
     );
     $tzil->build;
 
-    my ($test) = map { $_->name eq 'xt/release/minimum-version.t' ? $_ : () } @{ $tzil->files };
+    my ($test) = map { $_->name eq 'xt/author/minimum-version.t' ? $_ : () } @{ $tzil->files };
     ok $test, 'minimum-version.t exists'
         or diag explain [ map { $_->name } @{ $tzil->files } ];
 

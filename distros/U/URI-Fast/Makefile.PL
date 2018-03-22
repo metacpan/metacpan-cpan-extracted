@@ -19,7 +19,6 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Exporter" => 0,
-    "File::Spec" => 0,
     "Inline" => "0.80",
     "Inline::C" => "0.78",
     "parent" => 0
@@ -36,7 +35,7 @@ my %WriteMakefileArgs = (
     "URI::Encode::XS" => "0.11",
     "URI::Split" => 0
   },
-  "VERSION" => "0.15",
+  "VERSION" => "0.18",
   "test" => {
     "TESTS" => "t/*.t"
   }

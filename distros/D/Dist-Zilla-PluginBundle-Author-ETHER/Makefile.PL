@@ -167,7 +167,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::Test::Compile" => "2.039",
     "Dist::Zilla::Plugin::Test::EOL" => "0.17",
     "Dist::Zilla::Plugin::Test::Kwalitee" => "2.10",
-    "Dist::Zilla::Plugin::Test::MinimumVersion" => "2.000003",
+    "Dist::Zilla::Plugin::Test::MinimumVersion" => "2.000008",
     "Dist::Zilla::Plugin::Test::NoTabs" => "0.08",
     "Dist::Zilla::Plugin::Test::Pod::No404s" => "1.003",
     "Dist::Zilla::Plugin::Test::PodSpelling" => "2.006003",
@@ -236,7 +236,7 @@ my %WriteMakefileArgs = (
     "namespace::clean" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.135",
+  "VERSION" => "0.136",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -316,7 +316,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::Test::Compile" => "2.039",
   "Dist::Zilla::Plugin::Test::EOL" => "0.17",
   "Dist::Zilla::Plugin::Test::Kwalitee" => "2.10",
-  "Dist::Zilla::Plugin::Test::MinimumVersion" => "2.000003",
+  "Dist::Zilla::Plugin::Test::MinimumVersion" => "2.000008",
   "Dist::Zilla::Plugin::Test::NoTabs" => "0.08",
   "Dist::Zilla::Plugin::Test::Pod::No404s" => "1.003",
   "Dist::Zilla::Plugin::Test::PodSpelling" => "2.006003",

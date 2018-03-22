@@ -122,12 +122,13 @@ my @expected_files = qw(
     xt/author/00-compile.t
     xt/author/eol.t
     xt/author/kwalitee.t
+    xt/author/minimum-version.t
     xt/author/pod-spell.t
+    xt/author/changes_has_content.t
     xt/author/clean-namespaces.t
     xt/release/changes_has_content.t
     xt/release/cpan-changes.t
     xt/release/distmeta.t
-    xt/release/minimum-version.t
     xt/author/mojibake.t
     xt/author/pod-coverage.t
     xt/author/pod-syntax.t

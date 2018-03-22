@@ -19,11 +19,11 @@ This module was inspired by DBIx::XML_RDB.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ sub _init {
     eval {
         $self->{dbh} =
           DBI->connect( "dbi:$driver:$dsn", $userid, $passwd,
-            { PrintWarm => 0, PrintError => 1 } );
+            { PrintWarn => 0, PrintError => 1 } );
       }
       or $@ && Carp::croak $@;
     if ( !$self->{dbh} ) {
@@ -260,6 +260,11 @@ This returns $DBI::errstr.
 JSON::Syck by Tatsuhiko Miyagawa, C<< <miyagawa@bulknews.net> >>
 Tweaked by Koji Komatsu, C<< <yosty@cpan.org> >>
 
+=head1 TODO
+
+support encoding
+test
+
 =head1 BUGS
 
 Please report any bugs or feature requests to
@@ -306,8 +311,7 @@ None.
 
 Copyright 2006 Koji Komatsu, all rights reserved.
 
-This program is free software; you can redistribute it and/or modify it
+This program is a free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =cut
-

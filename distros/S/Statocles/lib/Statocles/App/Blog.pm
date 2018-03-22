@@ -1,5 +1,5 @@
 package Statocles::App::Blog;
-our $VERSION = '0.087';
+our $VERSION = '0.088';
 # ABSTRACT: A blog application
 
 use Text::Unidecode;
@@ -393,6 +393,7 @@ sub tag_pages {
             template => $self->template( 'index.html' ),
             layout => $self->template( 'layout.html' ),
             data => {
+                tag => $tag,
                 tag_text => $self->tag_text->{ $tag },
             },
         );
@@ -510,8 +511,8 @@ around pages => sub {
         my $page = $post_pages[$i];
         my $prev_page = $i ? $post_pages[$i-1] : undef;
         my $next_page = $post_pages[$i+1];
-        $page->prev( $prev_page->path ) if $prev_page;
-        $page->next( $next_page->path ) if $next_page;
+        $page->prev_page( $prev_page ) if $prev_page;
+        $page->next_page( $next_page ) if $next_page;
     }
 
     # Cache the post pages for this build
@@ -648,7 +649,7 @@ Statocles::App::Blog - A blog application
 
 =head1 VERSION
 
-version 0.087
+version 0.088
 
 =head1 DESCRIPTION
 

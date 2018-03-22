@@ -1,11 +1,11 @@
 Changes
-Header.pm
+lib/Ogg/Vorbis/Header.pm
 Makefile.PL
 MANIFEST
 README
-test.pl
-test.ogg
-test.ogg.bak
+t/test.t
+t/test.ogg
+t/test.ogg.bak
 LICENSE.GPL
 inc/i18n.h
 inc/vcedit.c

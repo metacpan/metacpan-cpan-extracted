@@ -1,3 +1,16 @@
+2018-03-19 Monday  DoccY <alban@mancheron.infos.st>
+
+	* Makefile (1.7):
+
+	BugFix: module file was encoded with ISO-8859-1. Switching to UTF-8.
+
+2018-03-19 Monday  DoccY <alban@mancheron.infos.st>
+
+	* lib/Config/FileManager.pm (1.7), Makefile.PL (1.5), Makefile
+	  (1.6):
+
+	BugFix: module file was encoded with ISO-8859-1. Switching to UT-8.
+
 2014-04-09 Wednesday  DoccY <alban@mancheron.infos.st>
 
 	* Makefile (1.5), Makefile.PL (1.4):

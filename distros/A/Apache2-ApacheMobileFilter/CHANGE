@@ -1,3 +1,9 @@
+ApacheMobileFilter 4.22
+Add TypeGraphicLibrary directive to chose which graphic library to use ('gd' or 'magick')
+Add TypeGraphicLibrary directive to chose which graphic library to use ('gd' or 'magick')
+AMFImageRendering save the filename in base64
+
+
 ApacheMobileFilter 4.21
 Fixed bug (thanks to Scott Pakin) https://groups.google.com/forum/#!topic/amf-device-detection/1uvTlnZ-xcs
 

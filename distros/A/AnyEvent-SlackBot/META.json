@@ -51,6 +51,7 @@
             "Modern::Perl" : "1.20170117",
             "Moo" : "2.003002",
             "MooX::Types::MooseLike::Base" : "0.29",
+            "Net::SSLeay" : "1.84",
             "Ref::Util" : "0.203",
             "Scalar::Util" : "1.48",
             "Test::More" : "1.302073",
@@ -62,6 +63,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.0004",
+   "version" : "1.0005",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

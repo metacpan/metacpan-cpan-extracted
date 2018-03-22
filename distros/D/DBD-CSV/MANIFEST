@@ -1,6 +1,5 @@
 ChangeLog
 MANIFEST
-MANIFEST.SKIP
 Makefile.PL
 CONTRIBUTING.md
 README
@@ -8,9 +7,6 @@ lib/Bundle/DBD/CSV.pm
 lib/DBD/CSV.pm
 lib/DBD/CSV/TypeInfo.pm
 lib/DBD/CSV/GetInfo.pm
-t/00_meta.t
-t/00_pod_cov.t
-t/00_pod.t
 t/10_base.t
 t/11_dsnlist.t
 t/20_createdrop.t

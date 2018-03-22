@@ -1,0 +1,270 @@
+#!perl
+
+our $DATE = '2018-03-21'; # DATE
+our $VERSION = '0.003'; # VERSION
+
+use 5.010001;
+use strict 'subs', 'vars';
+use warnings;
+use Perinci::CmdLine::Any;
+
+use Regexp::Pattern;
+
+our %SPEC;
+
+$SPEC{app} = {
+    v => 1.1,
+    summary => 'Get a Regexp::Pattern::* pattern',
+    args => {
+        name => {
+            summary => "Name of pattern, with module prefix but without the 'Regexp::Pattern'",
+            schema => ['str*', match=>'\A\w+((::|/|\.)\w+)+\z'],
+            req => 1,
+            pos => 0,
+            completion => sub {
+                my %args = @_;
+                require Complete::Regexp::Pattern;
+                Complete::Regexp::Pattern::complete_regexp_pattern_pattern(
+                    word => $args{word},
+                );
+            },
+        },
+        gen_args => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'gen_arg',
+            summary => 'Supply generator arguments',
+            description => <<'_',
+
+If pattern is a dynamic pattern (generated on-demand) and the generator requires
+some arguments, you can supply them here.
+
+_
+            schema => ['hash*', of=>'str*'],
+        },
+    },
+    examples => [
+        {
+            args => {name=>'YouTube/video_id'},
+        },
+        {
+            summary=>"Generate variant A of Example::re3",
+            argv => ['Example::re3', '--gen-arg', 'variant=A'],
+        },
+        {
+            summary=>"Generate variant B of Example::re3",
+            argv => ['Example::re3', '--gen-arg', 'variant=B'],
+        },
+    ],
+};
+sub app {
+    my %args = @_;
+
+    my $name = $args{name};
+    $name =~ s!(/|\.)!::!g;
+
+    my $re = re($name, $args{gen_args} // {});
+
+    if (-t STDOUT && $args{-cmdline} &&
+            ($args{-cmdline_r}{format} // 'text') =~ /text/) {
+        require Data::Dump::Color;
+        return [200, "OK", Data::Dump::Color::dump($re) . "\n",
+                {'cmdline.skip_format'=>1}];
+    } else {
+        return [200, "OK", "$re"];
+    }
+}
+
+Perinci::CmdLine::Any->new(
+    url => '/main/app',
+    pass_cmdline_object => 1,
+    read_config => 0,
+    read_env => 0,
+)->run;
+
+# ABSTRACT: Get a Regexp::Pattern::* pattern
+# PODNAME: get-regexp-pattern-pattern
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+get-regexp-pattern-pattern - Get a Regexp::Pattern::* pattern
+
+=head1 VERSION
+
+This document describes version 0.003 of get-regexp-pattern-pattern (from Perl distribution App-RegexpPatternUtils), released on 2018-03-21.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % get-regexp-pattern-pattern [options] <name>
+
+Examples:
+
+ % get-regexp-pattern-pattern YouTube/video_id
+ (?^:[A-Za-z0-9_-]{11})
+
+Generate variant A of Example::re3:
+
+ % get-regexp-pattern-pattern Example::re3 --gen-arg 'variant=A'
+ (?^:\d{3}-\d{3})
+
+Generate variant B of Example::re3:
+
+ % get-regexp-pattern-pattern Example::re3 --gen-arg 'variant=B'
+ (?^:\d{3}-\d{2}-\d{5})
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--gen-arg>=I<s>%
+
+Supply generator arguments.
+
+If pattern is a dynamic pattern (generated on-demand) and the generator requires
+some arguments, you can supply them here.
+
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+
+=item B<--gen-args-json>=I<s>
+
+Supply generator arguments (JSON-encoded).
+
+See C<--gen-arg>.
+
+=item B<--name>=I<s>*
+
+Name of pattern, with module prefix but without the 'Regexp::Pattern'.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C get-regexp-pattern-pattern get-regexp-pattern-pattern
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete get-regexp-pattern-pattern 'p/*/`get-regexp-pattern-pattern`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-RegexpPatternUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-RegexpPatternUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-RegexpPatternUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<list-regexp-pattern-modules>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -3,9 +3,9 @@ NAME
     distribution
 
 VERSION
-    This document describes version 0.052 of Dist::Zilla::Plugin::WordList
+    This document describes version 0.053 of Dist::Zilla::Plugin::WordList
     (from Perl distribution Dist-Zilla-Plugin-WordList), released on
-    2018-02-20.
+    2018-03-19.
 
 SYNOPSIS
     In dist.ini:
@@ -43,8 +43,6 @@ SEE ALSO
     WordList
 
     Pod::Weaver::Plugin::WordList
-
-    Dist::Zilla::Plugin::WordListC
 
 AUTHOR
     perlancar <perlancar@cpan.org>

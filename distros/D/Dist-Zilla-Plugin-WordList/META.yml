@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-WordList
   homepage: https://metacpan.org/release/Dist-Zilla-Plugin-WordList
   repository: git://github.com/perlancar/perl-Dist-Zilla-Plugin-WordList.git
-version: '0.052'
+version: '0.053'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

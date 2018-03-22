@@ -1,12 +1,12 @@
 package WordList::IT::BIP39;
 
 our $DATE = '2017-12-24'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use WordList;
 our @ISA = qw(WordList);
 
-our %STATS = ("longest_word_len",9,"avg_word_len",6.82861328125,"shortest_word_len",4,"num_words_contains_whitespace",0,"num_words_contains_nonword_chars",0,"num_words_contains_unicode",0,"num_words",2048); # STATS
+our %STATS = ("shortest_word_len",4,"avg_word_len",6.82861328125,"num_words_contains_nonword_chars",0,"num_words",2048,"longest_word_len",9,"num_words_contains_unicode",0,"num_words_contains_whitespace",0); # STATS
 
 1;
 # ABSTRACT: Italian word list for BIP 39
@@ -21,7 +21,7 @@ WordList::IT::BIP39 - Italian word list for BIP 39
 
 =head1 VERSION
 
-This document describes version 0.001 of WordList::IT::BIP39 (from Perl distribution WordList-IT-BIP39), released on 2017-12-24.
+This document describes version 0.002 of WordList::IT::BIP39 (from Perl distribution WordList-IT-BIP39), released on 2017-12-24.
 
 =head1 SYNOPSIS
 

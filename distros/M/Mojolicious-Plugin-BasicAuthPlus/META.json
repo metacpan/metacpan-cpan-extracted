@@ -4,7 +4,7 @@
       "Brad Robertson <blr@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -36,10 +36,10 @@
       },
       "runtime" : {
          "requires" : {
-            "Authen::Simple::LDAP" : "0",
             "Authen::Simple::Passwd" : "0",
             "Authen::Simple::Password" : "0",
             "Mojolicious" : "1.4",
+            "Net::LDAP" : "0",
             "Test::More" : "0",
             "perl" : "5.006001"
          }
@@ -54,5 +54,6 @@
          "url" : "http://github.com/stregone/mojolicious-plugin-basicauthplus"
       }
    },
-   "version" : "v0.10.2"
+   "version" : "v0.11.0",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

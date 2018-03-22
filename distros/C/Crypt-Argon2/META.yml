@@ -10,7 +10,7 @@ configure_requires:
   Module::Build: '0.28'
   perl: '5.006'
 dynamic_config: '1'
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +19,7 @@ name: Crypt-Argon2
 provides:
   Crypt::Argon2:
     file: lib/Crypt/Argon2.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Exporter: '5.57'
   XSLoader: '0'
@@ -29,7 +29,7 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-Argon2
   repository: git://github.com/Leont/crypt-argon2.git
-version: '0.002'
+version: '0.003'
 x_contributors:
   - 'Leon Timmermans <fawaka@gmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

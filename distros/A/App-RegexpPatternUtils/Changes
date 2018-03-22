@@ -1,4 +1,10 @@
-Revision history for App-RegexpPatternUtils
+0.003   2018-03-21 (PERLANCAR)
+
+	- [doc] get-regexp-pattern-pattern: Add/fix command-line examples
+	  to be clearer (RT#124833).
+
+	- [ux] Simplify CLI's: no need to read configuration or ENV vars.
+
 
 0.002   2016-12-31 (PERLANCAR)
 

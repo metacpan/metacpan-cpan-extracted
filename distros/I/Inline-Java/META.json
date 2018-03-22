@@ -52,6 +52,6 @@
          "web" : "https://github.com/ingydotnet/Inline-Java"
       }
    },
-   "version" : "0.63",
+   "version" : "0.64",
    "x_serialization_backend" : "JSON::PP version 2.97000"
 }

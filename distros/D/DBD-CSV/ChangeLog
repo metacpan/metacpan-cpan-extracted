@@ -1,3 +1,13 @@
+0.50	- 2018-03-21, H.Merijn Brand
+    * Explain more about header folding
+    * It's 2017
+    * BOM handling
+    * Some documentation enhancements
+    * Ignore DBI_DSN if it is not CSV
+    * It's 2018
+    * Test with perl-5.26, DBI-1.641, SQL::Statement-1.412, and
+      Text::CSV_XS-1.35
+
 0.49	- 2016-05-12, H.Merijn Brand
     * Simplified test-table-name generation
     * Prefer quote_empty over quote_always for size (Text::CSV_XS => 1.18)

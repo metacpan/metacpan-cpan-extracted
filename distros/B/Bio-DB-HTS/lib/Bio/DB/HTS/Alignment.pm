@@ -1,7 +1,7 @@
 
 =head1 LICENSE
 
-Copyright [2015-2017] EMBL-European Bioinformatics Institute
+Copyright [2015-2018] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -450,7 +450,7 @@ Rishi Nag E<lt>rishi@ebi.ac.uk<gt>
 =cut
 
 package Bio::DB::HTS::Alignment;
-$Bio::DB::HTS::Alignment::VERSION = '2.9';
+$Bio::DB::HTS::Alignment::VERSION = '2.10';
 
 use strict;
 use warnings;

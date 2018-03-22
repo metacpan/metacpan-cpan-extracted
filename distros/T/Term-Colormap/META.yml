@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150001'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,15 +18,15 @@ name: Term-Colormap
 provides:
   Term::Colormap:
     file: lib/Term/Colormap.pm
-    version: '0.18'
+    version: '0.19'
   Term::Colormap::Brewer:
     file: lib/Term/Colormap/Brewer.pm
-    version: '0.18'
+    version: '0.19'
 requires:
   Scalar::Util: '0'
   Term::ReadKey: '0'
   perl: '5.006'
 resources:
-  license: http://www.perlfoundation.org/artistic_license_2_0
+  license: http://opensource.org/licenses/artistic-license-2.0.php
   repository: https://github.com/xxfelixxx/perl-term-colormap
-version: '0.18'
+version: '0.19'

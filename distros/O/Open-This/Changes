@@ -1,7 +1,10 @@
 Revision history for Open-This
 
+0.000007  2018-03-20 20:14:09Z
+    - Extract line numbers from contextual git-grep matches
+
 0.000006  2018-02-21 03:42:36Z
-    - allow for sub names with args
+    - Allow for sub names with args
 
 0.000005  2018-02-13 03:52:00Z
     - to_editor_args() now accepts an array

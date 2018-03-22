@@ -1,7 +1,7 @@
 package Test::Against::Dev;
 use strict;
 use 5.10.1;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 use Carp;
 use Cwd;
 use File::Basename;
@@ -130,7 +130,7 @@ So the output for particular CPAN libraries will look like this:
     Algorithm-C3|HAARG|Algorithm-C3-0.10|0.10|PASS|HAARG|Algorithm-C3-0.10|0.10|PASS|...
 
 If a particular CPAN library receives a grade of C<PASS> one month and a grade
-of <FAIL> month, it ought to be inspected for the cause of that breakage.
+of C<FAIL> month, it ought to be inspected for the cause of that breakage.
 Sometimes the change in Perl 5 is wrong and needs to be reverted.  Sometimes
 the change in Perl 5 is correct (or, at least, plausible) but exposes
 sub-optimal code in the CPAN module.  Sometimes the failure is due to external
@@ -145,7 +145,7 @@ we are in.  The human user must intervene at this point.
 =item * Platform
 
 The user should select a machine/platform which is likely to be reasonably
-stable over one Perl 5 annual development cycle.  We understand that the
+stable over one Perl 5 annual development cycle.  We presume that the
 platform's system administrator will be updating system libraries for security
 and other reasons over time.  But it would be a hassle to run this software on
 a machine scheduled for a complete major version update of its operating
@@ -154,13 +154,13 @@ system.
 =item * Perl 5 Configuration
 
 The user must decide on a Perl 5 configuration before using
-F<Test-Against-Dev> on a regular basis and not change that over the course of
-the testing period.  Otherwise, the results may reflect changes in that
-configuration rather than changes in Perl 5 core distribution code or changes
-in the targeted CPAN libraries.
+F<Test-Against-Dev> on a regular basis and then must refrain from changing
+that configuration over the course of the testing period.  Otherwise, the
+results may reflect changes in that configuration rather than changes in Perl
+5 core distribution code or changes in the targeted CPAN libraries.
 
-"Perl 5 configuration" means the way one calls F<Configure> when building Perl
-5 from source, <e.g.>:
+By "Perl 5 configuration" we mean the way one calls F<Configure> when building
+Perl 5 from source, <e.g.>:
 
     sh ./Configure -des -Dusedevel \
         -Duseithreads \
@@ -211,7 +211,7 @@ to see what happens with the 1000 "farthest upstream" modules -- the so-called
 =item * Organizational dependencies
 
 Many organizations use technologies such as F<Carton> and F<cpanfile> to keep
-track of their dependencies on CPAN libraries.  The lists compile by such
+track of their dependencies on CPAN libraries.  The lists compiled by such
 applications could very easily be translated into a list of modules tested
 once a month against a Perl development release.
 
@@ -227,6 +227,54 @@ supported features of Perl.
 
 =back
 
+=head2 Notice of Breaking Change in Version 0.06 (March 20 2018)
+
+If you are first using F<Test-Against-Dev> in version 0.06 released on the
+date above, you may skip this section.
+
+If you used F<Test-Against-Dev> in an ongoing way prior to that version,
+please be advised that the library now creates a slightly different directory
+structure beneath the directory specified by the value of F<application_dir>
+passed to the constructor.  Up through version 0.05, that structure looked
+like this:
+
+    $> find . -maxdepth 4 -type d
+    ./results
+    ./results/perl-5.27.6
+    ./results/perl-5.27.6/storage
+    ./results/perl-5.27.6/analysis
+    ./results/perl-5.27.6/analysis/01
+    ./results/perl-5.27.6/buildlogs
+    ./testing
+    ./testing/perl-5.27.6
+    ./testing/perl-5.27.6/.cpanreporter
+    ./testing/perl-5.27.6/.cpanm
+    ./testing/perl-5.27.6/.cpanm/work
+    ./testing/perl-5.27.6/lib
+    ./testing/perl-5.27.6/lib/site_perl
+    ./testing/perl-5.27.6/lib/5.27.6
+    ./testing/perl-5.27.6/bin
+
+The F<results/E<lt>perl-versionE<gt>/analysis/01> directory would hold F<.log.json>
+files like these:
+
+    $> ls -l ./results/perl-5.27.6/analysis/01 | head -5
+    total 5824
+    -rw-r--r-- 1 jkeenan jkeenan    757 Dec 16 13:58 ABH.Mozilla-CA-20160104.log.json
+    -rw-r--r-- 1 jkeenan jkeenan   6504 Dec 16 13:58 ABIGAIL.Regexp-Common-2017060201.log.json
+    -rw-r--r-- 1 jkeenan jkeenan  11639 Dec 16 13:58 ABW.Template-Toolkit-2.27.log.json
+    -rw-r--r-- 1 jkeenan jkeenan    645 Dec 16 13:58 ABW.XML-Namespace-0.02.log.json
+
+In versions 0.06 and later, the F<.log.json> files are placed one directory
+higher, I<i.e.,> in F<results/E<lt>perl-versionE<gt>/analysis>.  An F<analysis/01>
+directory is no longer created, as it was deemed unnecessary.  Please upgrade
+to a newer version at the completion of your tracking of the Perl 5.27
+development cycle, I<i.e.,> once Perl 5.28.0 has been released.
+
+As a consequence of this change, the C<analyze_json_logs()> method no longer
+needs a key-value pair like C<run =E<gt> 1> in the hash reference passed to the
+method as argument.
+
 =head1 METHODS
 
 =head2 C<new()>
@@ -236,8 +284,8 @@ supported features of Perl.
 =item * Purpose
 
 Test::Against::Dev constructor.  Guarantees that the top-level directory for
-the application exists, then creates two directories thereunder:  C<testing/>
-and C<results/>.
+the application (C<application_dir>) already exists, then creates two
+directories thereunder:  F<testing/> and F<results/>.
 
 =item * Arguments
 
@@ -262,10 +310,10 @@ Test::Against::Dev object.
 =item * Comment
 
 This class has two possible constructors:  this method and
-C<new_from_existing_perl_cpanm()>.  Use this one when you need to do a fresh
-install of a F<perl> by compiling it from a downloaded tarball.  Use the other
-one when you have already installed such a F<perl> on disk and have installed
-a F<cpanm> against that F<perl>.
+C<new_from_existing_perl_cpanm()> (see below).  Use C<new()> when you need to
+do a fresh install of a F<perl> by compiling it from a downloaded tarball.
+Use C<new_from_existing_perl_cpanm()> when you have already installed such a
+F<perl> on disk and have installed a F<cpanm> against that F<perl>.
 
 The method will guarantee that underneath the application directory there are
 two directories:  F<testing> and F<results>.
@@ -342,11 +390,13 @@ Hash reference with the following elements:
 
 =item * C<host>
 
-String.  The FTP mirror from which you wish to download a tarball of a Perl release.  Required.
+String.  The FTP mirror from which you wish to download a tarball of a Perl
+release.  Required.
 
 =item * C<hostdir>
 
-String.  The directory on the FTP mirror specified by C<host> in which the tarball is located.  Required.
+String.  The directory on the FTP mirror specified by C<host> in which the
+tarball is located.  Required.
 
 =item * C<perl_version>
 
@@ -552,7 +602,8 @@ command-line options.  Optional; will default to:
     sh ./Configure -des -Dusedevel -Uversiononly -Dprefix=$release_dir \
         -Dman1dir=none -Dman3dir=none
 
-The spelling of the command is subsequently accessible by calling C<$self->access_configure_command()>.
+The spelling of the command is subsequently accessible by calling
+C<$self->access_configure_command()>.
 
 =item * C<make_install_command>
 
@@ -561,7 +612,8 @@ release directory.  Optional; will default to:
 
     make install
 
-The spelling of the command is subsequently accessible by calling C<$self->access_make_install_command()>.
+The spelling of the command is subsequently accessible by calling
+C<$self->access_make_install_command()>.
 
 =item * C<verbose>
 
@@ -593,7 +645,7 @@ sub configure_build_install_perl {
     my ($self, $args) = @_;
     my $cwd = cwd();
     $args //= {};
-    croak "perform_tarball_download: Must supply hash ref as argument"
+    croak "configure_build_install_perl: Must supply hash ref as argument"
         unless ref($args) eq 'HASH';
     my $verbose = delete $args->{verbose} || '';
 
@@ -697,7 +749,8 @@ Hash reference with these elements:
 
 =item * C<uri>
 
-String holding URI from which F<cpanm> will be downloaded.  Optional; defaults to L<http://cpansearch.perl.org/src/MIYAGAWA/App-cpanminus-1.7043/bin/cpanm>.
+String holding URI from which F<cpanm> will be downloaded.  Optional; defaults
+to L<http://cpansearch.perl.org/src/MIYAGAWA/App-cpanminus-1.7043/bin/cpanm>.
 
 =item * C<verbose>
 
@@ -741,20 +794,27 @@ sub fetch_cpanm {
     my ($scalar, $where);
     $where = $ff->fetch( to => \$scalar );
     croak "Did not download 'cpanm'" unless (-f $where);
-    open my $IN, '<', \$scalar or croak "Unable to open scalar for reading";
     my $this_cpanm = File::Spec->catfile($self->{bin_dir}, 'cpanm');
-    open my $OUT, '>', $this_cpanm or croak "Unable to open $this_cpanm for writing";
-    while (<$IN>) {
-        chomp $_;
-        say $OUT $_;
-    }
-    close $OUT or croak "Unable to close $this_cpanm after writing";
-    close $IN or croak "Unable to close scalar after reading";
+    # If cpanm is already installed in bin_dir, we don't need to try to
+    # reinstall it.
     unless (-f $this_cpanm) {
-        croak "Unable to locate '$this_cpanm'";
+        open my $IN, '<', \$scalar or croak "Unable to open scalar for reading";
+        open my $OUT, '>', $this_cpanm or croak "Unable to open $this_cpanm for writing";
+        while (<$IN>) {
+            chomp $_;
+            say $OUT $_;
+        }
+        close $OUT or croak "Unable to close $this_cpanm after writing";
+        close $IN or croak "Unable to close scalar after reading";
+        unless (-f $this_cpanm) {
+            croak "Unable to locate '$this_cpanm'";
+        }
+        else {
+            say "Installed '$this_cpanm'" if $verbose;
+        }
     }
     else {
-        say "Installed '$this_cpanm'" if $verbose;
+        say "'$this_cpanm' already installed" if $verbose;
     }
     my $cnt = chmod 0755, $this_cpanm;
     croak "Unable to make '$this_cpanm' executable" unless $cnt;
@@ -964,20 +1024,20 @@ sub gzip_cpanm_build_log {
         unless (-l $build_log_link);
     my $real_log = readlink($build_log_link);
 
-    # Read the directory holding gzipped build.logs.  If there are no files
-    # whose names match the pattern, then set $run to 01.  If there are,
-    # determine the next appropriate run number.
-
-    my $pattern = qr/^$self->{title}\.$self->{perl_version}\.(\d{2})\.build\.log\.gz$/;
+    my $pattern = qr/^$self->{title}\.$self->{perl_version}\.build\.log\.gz$/;
     $self->{gzlog_pattern} = $pattern;
     opendir my $DIRH, $self->{buildlogs_dir} or croak "Unable to open buildlogs_dir for reading";
     my @files_found = grep { -f $_ and $_ =~ m/$pattern/ } readdir $DIRH;
     closedir $DIRH or croak "Unable to close buildlogs_dir after reading";
-    my $srun = (! @files_found) ? sprintf("%02d" => 1) : sprintf("%02d" => (scalar(@files_found) + 1));
+
+    # In this new approach, we'll assume that we never do anything except
+    # exactly 1 run per monthly release.  Hence, there shouldn't be any files
+    # in this directory whatsoever.  We'll croak if there are such file.
+    croak "There are already log files in '$self->{buildlogs_dir}'"if scalar(@files_found);
+
     my $gzipped_build_log = join('.' => (
         $self->{title},
         $self->{perl_version},
-        $srun,
         'build',
         'log',
         'gz'
@@ -1024,10 +1084,7 @@ sub analyze_cpanm_build_logs {
     my $verbose = delete $args->{verbose} || '';
 
     my $gzlog = $self->{gzlog};
-    my ($srun) = basename($gzlog) =~ m/$self->{gzlog_pattern}/;
-    croak "Unable to identify run number within $gzlog filename"
-        unless $srun;
-    my $ranalysis_dir = File::Spec->catdir($self->{analysis_dir}, $srun);
+    my $ranalysis_dir = $self->{analysis_dir};
     unless (-d $ranalysis_dir) { make_path($ranalysis_dir, { mode => 0755 }); }
         croak "Could not locate $ranalysis_dir" unless (-d $ranalysis_dir);
 
@@ -1065,15 +1122,11 @@ generating a comma-separated-values file (C<.csv>) as well.
 
 =item * Arguments
 
-    my $fcdvfile = $self->analyze_json_logs( { run => 1, verbose => 1, sep_char => '|' } );
+    my $fcdvfile = $self->analyze_json_logs( { verbose => 1, sep_char => '|' } );
 
 Hash reference with these elements:
 
 =over 4
-
-=item * C<run>
-
-A positive integer.
 
 =item * C<verbose>
 
@@ -1109,16 +1162,12 @@ sub analyze_json_logs {
     my $sep_char = delete $args->{sep_char} || '|';
     croak "analyze_json_logs: Currently only pipe ('|') and comma (',') are supported as delimiter characters"
         unless ($sep_char eq '|' or $sep_char eq ',');
-    croak "analyze_json_logs: Must supply a 'run' number"
-        unless (defined $args->{run} and length($args->{run}));
-    my $srun = sprintf("%02d" => $args->{run});
 
     # As a precaution, we archive the log.json files.
 
     my $output = join('.' => (
         $self->{title},
         $self->{perl_version},
-        $srun,
         'log',
         'json',
         'gz'
@@ -1126,9 +1175,9 @@ sub analyze_json_logs {
     my $foutput = File::Spec->catfile($self->{storage_dir}, $output);
     say "Output will be: $foutput" if $verbose;
 
-    my $vranalysis_dir = File::Spec->catdir($self->{analysis_dir}, $srun);
+    my $vranalysis_dir = $self->{analysis_dir};
     opendir my $DIRH, $vranalysis_dir or croak "Unable to open $vranalysis_dir for reading";
-    my @json_log_files = sort map { File::Spec->catfile('analysis', $srun, $_) }
+    my @json_log_files = sort map { File::Spec->catfile('analysis', $_) }
         grep { m/\.log\.json$/ } readdir $DIRH;
     closedir $DIRH or croak "Unable to close $vranalysis_dir after reading";
     dd(\@json_log_files) if $verbose;
@@ -1152,7 +1201,15 @@ sub analyze_json_logs {
         my $flog = File::Spec->catfile($cwd, $log);
         my %this = ();
         my $f = Path::Tiny::path($flog);
-        my $decoded = decode_json($f->slurp_utf8);
+        my $decoded;
+        {
+            local $@;
+            eval { $decoded = decode_json($f->slurp_utf8); };
+            if ($@) {
+                say STDERR "JSON decoding problem in $flog: <$@>";
+                eval { $decoded = JSON->new->decode($f->slurp_utf8); };
+            }
+        }
         map { $this{$_} = $decoded->{$_} } ( qw| author dist distname distversion grade | );
         $data{$decoded->{dist}} = \%this;
     }
@@ -1161,7 +1218,6 @@ sub analyze_json_logs {
     my $cdvfile = join('.' => (
         $self->{title},
         $self->{perl_version},
-        $srun,
         (($sep_char eq ',') ? 'csv' : 'psv'),
     ) );
 
@@ -1198,8 +1254,8 @@ sub analyze_json_logs {
 =item * Purpose
 
 Alternate constructor to be used when you have already built a C<perl>
-executable to be used in tracking Perl development and installed a C<cpanm>
-against that C<perl>.
+executable to be used in tracking Perl development and have installed a
+C<cpanm> against that C<perl>.
 
 =item * Arguments
 
@@ -1337,6 +1393,9 @@ dependent upon F<App::cpanminus::reporter>, which in turn is dependent upon
 F<cpanm>.  (Nonetheless, this software could never have been written without
 those two libraries by Breno G. de Oliveira and Tatsuhiko Miyagawa,
 respectively.)
+
+This library has been developed in a Unix programming environment and is
+unlikely to work in its current form on Windows, Cygwin or VMS.
 
 =head1 AUTHOR
 

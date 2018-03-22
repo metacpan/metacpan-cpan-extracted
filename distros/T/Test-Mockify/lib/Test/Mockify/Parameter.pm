@@ -3,7 +3,7 @@ use Test::Mockify::ReturnValue;
 use Data::Compare;
 use Test::Mockify::TypeTests qw ( IsString );
 use Scalar::Util qw(blessed );
-
+use Test::Mockify::Tools qw (Error);
 use strict;
 use warnings;
 #---------------------------------------------------------------------
@@ -19,7 +19,7 @@ sub new {
 #---------------------------------------------------------------------
 sub call {
     my $self = shift;
-    die ('NoReturnValueDefined') unless ($self->{'ReturnValue'});
+    Error ('NoReturnValueDefined') unless ($self->{'ReturnValue'});
     return $self->{'ReturnValue'}->call(@_);
 }
 #---------------------------------------------------------------------
@@ -42,12 +42,13 @@ sub matchWithExpectedParameters {
     my @Params = @_;
     return 0 unless (scalar @Params == scalar @{$self->{'ExpectedParams'}});
 
-    for(my $i=0; $i < scalar @Params; $i++){
-        if(not $self->{'ExpectedParams'}->[$i]->{'Value'}){ #No Value no Match
+    for(my $i=0; $i < scalar @Params; $i++){## no critic (ProhibitCStyleForLoops) i need the counter
+        my $StoredValue = $self->{'ExpectedParams'}->[$i]->{'Value'};
+        if(not $StoredValue || (defined $StoredValue && "$StoredValue" eq '0')){ ## no critic (ProhibitMixedBooleanOperators )
             next;
-        }elsif(blessed($Params[$i]) && $Params[$i]->isa($self->{'ExpectedParams'}->[$i]->{'Value'})){# map package name
+        }elsif(blessed($Params[$i]) && $Params[$i]->isa($StoredValue)){# map package name
             next;
-        }elsif(Data::Compare->new()->Cmp($Params[$i], $self->{'ExpectedParams'}->[$i]->{'Value'})){
+        }elsif(Data::Compare->new()->Cmp($Params[$i], $StoredValue)){
             next;
         } else{
             return 0;

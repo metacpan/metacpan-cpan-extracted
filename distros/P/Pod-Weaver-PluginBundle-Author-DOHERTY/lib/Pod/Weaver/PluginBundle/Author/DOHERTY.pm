@@ -2,7 +2,7 @@ package Pod::Weaver::PluginBundle::Author::DOHERTY;
 # ABSTRACT: Pod::Weaver configuration the way DOHERTY does it
 use strict;
 use warnings;
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use Pod::Weaver::Config::Assembler;
 
@@ -17,6 +17,8 @@ sub mvp_bundle_config {
 
         [ '@Author::DOHERTY/Prelude',               _exp('Region'),             {region_name => 'prelude'} ],
 
+        [ '@Author::DOHERTY/Leftovers',             _exp('Leftovers'),          {} ],
+
         [ 'SYNOPSIS',                               _exp('Generic'),            {} ],
         [ 'DESCRIPTION',                            _exp('Generic'),            {} ],
         [ 'OVERVIEW',                               _exp('Generic'),            {} ],
@@ -24,8 +26,6 @@ sub mvp_bundle_config {
 
         [ 'METHODS',                                _exp('Generic'),            {} ],
         [ 'FUNCTIONS',                              _exp('Generic'),            {} ],
-
-        [ '@Author::DOHERTY/Leftovers',             _exp('Leftovers'),          {} ],
 
         [ '@Author::DOHERTY/Availability',          _exp('Availability'),       {} ],
         [ '@Author::DOHERTY/SourceGitHub',          _exp('SourceGitHub'),       {} ],
@@ -52,7 +52,7 @@ Pod::Weaver::PluginBundle::Author::DOHERTY - Pod::Weaver configuration the way D
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =for Pod::Coverage mvp_bundle_config
 
@@ -66,7 +66,7 @@ site near you, or see L<https://metacpan.org/module/Pod::Weaver::PluginBundle::A
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/doherty/Pod-Weaver-PluginBundle-Author-DOHERTY>
+The development version is on github at L<https://github.com/doherty/Pod-Weaver-PluginBundle-Author-DOHERTY>
 and may be cloned from L<git://github.com/doherty/Pod-Weaver-PluginBundle-Author-DOHERTY.git>
 
 =head1 BUGS AND LIMITATIONS

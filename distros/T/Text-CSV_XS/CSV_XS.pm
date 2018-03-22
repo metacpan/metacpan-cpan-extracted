@@ -1,6 +1,6 @@
 package Text::CSV_XS;
 
-# Copyright (c) 2007-2017 H.Merijn Brand.  All rights reserved.
+# Copyright (c) 2007-2018 H.Merijn Brand.  All rights reserved.
 # Copyright (c) 1998-2001 Jochen Wiedmann. All rights reserved.
 # Copyright (c) 1997 Alan Citterman.       All rights reserved.
 #
@@ -26,7 +26,7 @@ use DynaLoader ();
 use Carp;
 
 use vars   qw( $VERSION @ISA @EXPORT_OK );
-$VERSION   = "1.34";
+$VERSION   = "1.35";
 @ISA       = qw( DynaLoader Exporter );
 @EXPORT_OK = qw( csv );
 bootstrap Text::CSV_XS $VERSION;
@@ -91,6 +91,8 @@ my %def_attr = (
     _COLUMN_NAMES		=> undef,
     _BOUND_COLUMNS		=> undef,
     _AHEAD			=> undef,
+
+    ENCODING			=> undef,
     );
 my %attr_alias = (
     quote_always		=> "always_quote",
@@ -609,8 +611,10 @@ sub error_diag {
     my $self = shift;
     my @diag = (0 + $last_new_err, $last_new_err, 0, 0, 0);
 
+    # Docs state to NEVER use UNIVERSAL::isa, because it will *never* call an
+    # overridden isa method in any class. Well, that is exacly what I want here
     if ($self && ref $self && # Not a class method or direct call
-	 $self->isa (__PACKAGE__) && exists $self->{_ERROR_DIAG}) {
+	 UNIVERSAL::isa ($self, __PACKAGE__) && exists $self->{_ERROR_DIAG}) {
 	$diag[0] = 0 + $self->{_ERROR_DIAG};
 	$diag[1] =     $self->{_ERROR_DIAG};
 	$diag[2] = 1 + $self->{_ERROR_POS} if exists $self->{_ERROR_POS};
@@ -857,6 +861,8 @@ sub header {
 	elsif ($hdr =~ s/^\x84\x31\x95\x33//) { $enc = "gb-18030"   }
 	elsif ($hdr =~ s/^\x{feff}//)         { $enc = ""           }
 
+	$self->{ENCODING} = uc $enc;
+
 	$hdr eq "" and croak ($self->SetDiag (1010));
 
 	if ($enc) {
@@ -1079,9 +1085,11 @@ sub _csv_attr {
     $enc =~ m/^[-\w.]+$/ and $enc = ":encoding($enc)";
 
     my $fh;
-    my $cls = 0;	# If I open a file, I have to close it
-    my $in  = delete $attr{in}  || delete $attr{file} or croak $csv_usage;
-    my $out = delete $attr{out} || delete $attr{file};
+    my $sink = 0;
+    my $cls  = 0;	# If I open a file, I have to close it
+    my $in   = delete $attr{in}  || delete $attr{file} or croak $csv_usage;
+    my $out  = exists $attr{out} && !$attr{out} ? \"skip"
+	     : delete $attr{out} || delete $attr{file};
 
     ref $in eq "CODE" || ref $in eq "ARRAY" and $out ||= \*STDOUT;
 
@@ -1090,17 +1098,23 @@ sub _csv_attr {
 	qq{ csv (in => csv (in => "$in"), out => "$out");\n};
 
     if ($out) {
-	if ((ref $out and ref $out ne "SCALAR") or "GLOB" eq ref \$out) {
+	if ((ref $out and "SCALAR" ne ref $out) or "GLOB" eq ref \$out) {
 	    $fh = $out;
+	    }
+	elsif (ref $out and "SCALAR" eq ref $out and defined $$out and $$out eq "skip") {
+	    delete $attr{out};
+	    $sink = 1;
 	    }
 	else {
 	    open $fh, ">", $out or croak "$out: $!";
 	    $cls = 1;
 	    }
-	$enc and binmode $fh, $enc;
-	unless (defined $attr{eol}) {
-	    my @layers = eval { PerlIO::get_layers ($fh) };
-	    $attr{eol} = (grep m/crlf/ => @layers) ? "\n" : "\r\n";
+	if ($fh) {
+	    $enc and binmode $fh, $enc;
+	    unless (defined $attr{eol}) {
+		my @layers = eval { PerlIO::get_layers ($fh) };
+		$attr{eol} = (grep m/crlf/ => @layers) ? "\n" : "\r\n";
+		}
 	    }
 	}
 
@@ -1125,7 +1139,7 @@ sub _csv_attr {
 	open $fh, "<$enc", $in or croak "$in: $!";
 	$cls = 1;
 	}
-    $fh or croak qq{No valid source passed. "in" is required};
+    $fh || $sink or croak qq{No valid source passed. "in" is required};
 
     my $hdrs = delete $attr{headers};
     my $frag = delete $attr{fragment};
@@ -1167,7 +1181,8 @@ sub _csv_attr {
 	);
     defined $fltr && !ref $fltr && exists $fltr{$fltr} and
 	$fltr = { 0 => $fltr{$fltr} };
-    ref $fltr eq "HASH" or $fltr = undef;
+    ref $fltr eq "CODE" and $fltr = { 0 => $fltr };
+    ref $fltr eq "HASH" or  $fltr = undef;
 
     exists $attr{formula} and
 	$attr{formula} = _supported_formula (undef, $attr{formula});
@@ -1183,6 +1198,7 @@ sub _csv_attr {
 	fh   => $fh,
 	cls  => $cls,
 	in   => $in,
+	sink => $sink,
 	out  => $out,
 	enc  => $enc,
 	hdrs => $hdrs,
@@ -1213,7 +1229,7 @@ sub csv {
 	$hdrs = "auto";
 	}
 
-    if ($c->{out}) {
+    if ($c->{out} && !$c->{sink}) {
 	if (ref $in eq "CODE") {
 	    my $hdr = 1;
 	    while (my $row = $in->($csv)) {
@@ -1357,6 +1373,8 @@ sub csv {
 	    $c->{cboi} and $c->{cboi}->($csv, $r);
 	    }
 	}
+
+    $c->{sink} and return;
 
     defined wantarray or
 	return csv (%{$c->{attr}}, in => $ref, headers => $hdrs, %{$c->{attr}});
@@ -2633,10 +2651,17 @@ Supported encodings from BOM are: UTF-8, UTF-16BE, UTF-16LE, UTF-32BE,  and
 UTF-32LE. BOM's also support UTF-1, UTF-EBCDIC, SCSU, BOCU-1,  and GB-18030
 but L<Encode> does not (yet). UTF-7 is not supported.
 
-The encoding is set using C<binmode> on C<$fh>.
+If a supported BOM was detected as start of the stream, it is stored in the
+abject attribute C<ENCODING>.
+
+ my $enc = $csv->{ENCODING};
+
+The encoding is used with C<binmode> on C<$fh>.
 
 If the handle was opened in a (correct) encoding,  this method will  B<not>
-alter the encoding, as it checks the leading B<bytes> of the first line.
+alter the encoding, as it checks the leading B<bytes> of the first line. In
+case the stream starts with a decode BOM (C<U+FEFF>), C<{ENCODING}> will be
+C<""> (empty) instead of the default C<undef>.
 
 =item munge_column_names
 X<munge_column_names>
@@ -3072,6 +3097,8 @@ X<out>
  csv (in => $aoa, out =>  *STDOUT);
  csv (in => $aoa, out => \*STDOUT);
  csv (in => $aoa, out => \my $data);
+ csv (in => $aoa, out =>  undef);
+ csv (in => $aoa, out => \"skip");
 
 In output mode, the default CSV options when producing CSV are
 
@@ -3092,6 +3119,18 @@ When a code-ref is used for C<in>, the output is generated  per invocation,
 so no buffering is involved. This implies that there is no size restriction
 on the number of records. The C<csv> function ends when the coderef returns
 a false value.
+
+If C<out> is set to a reference of the literal string C<"skip">, the output
+will be suppressed completely,  which might be useful in combination with a
+filter for side effects only.
+
+ my %cache;
+ csv (in    => "dump.csv",
+      out   => \"skip",
+      on_in => sub { $cache{$_[1][1]}++ });
+
+Currently,  setting C<out> to any false value  (C<undef>, C<"">, 0) will be
+equivalent to C<\"skip">.
 
 =head3 encoding
 X<encoding>
@@ -3495,25 +3534,26 @@ but only feature the L</csv> function.
 X<filter>
 
 This callback can be used to filter records.  It is called just after a new
-record has been scanned.  The callback accepts a hashref where the keys are
-the index to the row (the field number, 1-based) and the values are subs to
-return a true or false value.
+record has been scanned.  The callback accepts a:
+
+=over 2
+
+=item hashref
+
+The keys are the index to the row (the field name or field number, 1-based)
+and the values are subs to return a true or false value.
 
  csv (in => "file.csv", filter => {
             3 => sub { m/a/ },       # third field should contain an "a"
             5 => sub { length > 4 }, # length of the 5th field minimal 5
             });
 
- csv (in => "file.csv", filter => "not_blank");
- csv (in => "file.csv", filter => "not_empty");
- csv (in => "file.csv", filter => "filled");
+ csv (in => "file.csv", filter => { foo => sub { $_ > 4 }});
 
 If the keys to the filter hash contain any character that is not a digit it
 will also implicitly set L</headers> to C<"auto">  unless  L</headers>  was
 already passed as argument.  When headers are active, returning an array of
 hashes, the filter is not applicable to the header itself.
-
- csv (in => "file.csv", filter => { foo => sub { $_ > 4 }});
 
 All sub results should match, as in AND.
 
@@ -3538,7 +3578,26 @@ evaluates to false. To always accept, end with truth:
 
  filter => { 2 => sub { $_ = uc; 1 }}
 
-B<Predefined filters>
+=item coderef
+
+ csv (in => "file.csv", filter => sub { $n++; 0; });
+
+If the argument to C<filter> is a coderef,  it is an alias or shortcut to a
+filter on column 0:
+
+ csv (filter => sub { $n++; 0 });
+
+is equal to
+
+ csv (filter => { 0 => sub { $n++; 0 });
+
+=item filter-name
+
+ csv (in => "file.csv", filter => "not_blank");
+ csv (in => "file.csv", filter => "not_empty");
+ csv (in => "file.csv", filter => "filled");
+
+These are predefined filters
 
 Given a file like (line numbers prefixed for doc purpose only):
 
@@ -3592,6 +3651,8 @@ This filter rejects all lines that I<not> have at least one field that does
 not evaluate to the empty string.
 
 With the given example data, this filter would skip lines 2 through 8.
+
+=back
 
 =back
 
@@ -4423,7 +4484,7 @@ L</csv> function. See ChangeLog releases 0.25 and on.
 
 =head1 COPYRIGHT AND LICENSE
 
- Copyright (C) 2007-2017 H.Merijn Brand.  All rights reserved.
+ Copyright (C) 2007-2018 H.Merijn Brand.  All rights reserved.
  Copyright (C) 1998-2001 Jochen Wiedmann. All rights reserved.
  Copyright (C) 1997      Alan Citterman.  All rights reserved.
 

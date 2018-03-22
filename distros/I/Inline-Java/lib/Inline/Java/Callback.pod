@@ -338,7 +338,7 @@ example:
          $b->ProcessNextCallback() ;
       }
       else {
-         # A timeout has occured after, in this case, 5 secs.
+         # A timeout has occurred after, in this case, 5 secs.
          print "5 seconds have passed, still waiting for callback...\n" ;
          # Maybe do some other stuff
       }
@@ -361,7 +361,7 @@ then be called with a float timeout value (-1 means wait forever, 0 means return
 immediately). The WaitForCallback method can return:
 
    rc  >  0, indicating that rc callbacks are waiting to be processed
-   rc ==  0, indicating that a timeout has occured and no callbacks are waiting
+   rc ==  0, indicating that a timeout has occurred and no callbacks are waiting
    rc == -1, indicating that the callback stream has been closed
 
 The callback stream can be closed by calling CloseCallbackStream, which works 

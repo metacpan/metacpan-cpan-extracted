@@ -51,6 +51,8 @@ unlike($content, qr/[^\S\n]\n/m, 'no trailing whitespace in generated file');
 like($content, qr/Makefile.PL/m, 'INSTALL mentions Makefile.PL');
 unlike($content, qr/Build.PL/m, 'INSTALL does not mention Build.PL');
 
+like($content, qr{https://www.cpan.org/modules/INSTALL.html}m, 'INSTALL mentions CPAN reference');
+
 ok(
     scalar(grep { $_->name eq 'INSTALL' } @$gathered_files),
     'file was created at FileGathering time',

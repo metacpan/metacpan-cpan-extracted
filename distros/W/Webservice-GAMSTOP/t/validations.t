@@ -85,7 +85,7 @@ subtest 'Webservice::GAMSTOP get_exclusion_for validations' => sub {
             postcode      => 'hp11aa'
         );
     }
-    qr/Connection error: Can't connect: Name or service not known/, 'Dummy api key and url fail with connection error';
+    qr/Error - Connection error: /, 'Dummy api key and url fail with connection error';
 };
 
 subtest 'Webservice::GAMSTOP::Response validations' => sub {

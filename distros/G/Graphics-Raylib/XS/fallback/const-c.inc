@@ -1250,7 +1250,7 @@ constant_16 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
      BLEND_MULTIPLIED FILTER_TRILINEAR GESTURE_PINCH_IN GESTURE_SWIPE_UP
-     KEY_LEFT_CONTROL LOC_MAP_EMISSION LOC_MAP_OCCUSION LOC_MAP_SPECULAR
+     KEY_LEFT_CONTROL LOC_MAP_EMISSION LOC_MAP_OCCLUSION LOC_MAP_SPECULAR
      LOC_MATRIX_MODEL LOC_VERTEX_COLOR MAX_TOUCH_POINTS UNCOMPRESSED_R32 */
   /* Offset 12 gives the best switch position.  */
   switch (name[12]) {
@@ -1311,9 +1311,9 @@ constant_16 (pTHX_ const char *name, IV *iv_return) {
       *iv_return = LOC_MAP_EMISSION;
       return PERL_constant_ISIV;
     }
-    if (memEQ(name, "LOC_MAP_OCCUSION", 16)) {
+    if (memEQ(name, "LOC_MAP_OCCLUSION", 16)) {
     /*                           ^          */
-      *iv_return = LOC_MAP_OCCUSION;
+      *iv_return = LOC_MAP_OCCLUSION;
       return PERL_constant_ISIV;
     }
     break;
@@ -2402,7 +2402,7 @@ my @names = (qw(DEG2RAD FLAG_FULLSCREEN_MODE FLAG_MSAA_4X_HINT FLAG_SHOW_LOGO
             {name=>"LOC_MAP_IRRADIANCE", type=>"IV", macro=>"1"},
             {name=>"LOC_MAP_METALNESS", type=>"IV", macro=>"1"},
             {name=>"LOC_MAP_NORMAL", type=>"IV", macro=>"1"},
-            {name=>"LOC_MAP_OCCUSION", type=>"IV", macro=>"1"},
+            {name=>"LOC_MAP_OCCLUSION", type=>"IV", macro=>"1"},
             {name=>"LOC_MAP_PREFILTER", type=>"IV", macro=>"1"},
             {name=>"LOC_MAP_ROUGHNESS", type=>"IV", macro=>"1"},
             {name=>"LOC_MATRIX_MODEL", type=>"IV", macro=>"1"},

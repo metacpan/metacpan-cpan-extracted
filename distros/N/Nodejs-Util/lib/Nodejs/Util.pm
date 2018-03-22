@@ -1,7 +1,7 @@
 package Nodejs::Util;
 
-our $DATE = '2018-03-09'; # DATE
-our $VERSION = '0.011'; # VERSION
+our $DATE = '2018-03-21'; # DATE
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -283,7 +283,7 @@ Nodejs::Util - Utilities related to Node.js
 
 =head1 VERSION
 
-This document describes version 0.011 of Nodejs::Util (from Perl distribution Nodejs-Util), released on 2018-03-09.
+This document describes version 0.012 of Nodejs::Util (from Perl distribution Nodejs-Util), released on 2018-03-21.
 
 =for Pod::Coverage ^(get_nodejs_path)$
 

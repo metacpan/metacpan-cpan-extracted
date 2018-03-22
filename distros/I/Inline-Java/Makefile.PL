@@ -200,7 +200,7 @@ WriteMakefile(
   PM => {
     'lib/Inline/Java.pm' => File::Spec->catfile('$(INST_LIBDIR)', 'Java.pm'),
     'lib/Inline/Java.pod'=> File::Spec->catfile('$(INST_LIBDIR)', 'Java.pod'),
-    map { my $f = $_; $f =~ s#$subprefix#\$(INST_LIBDIR)#; ($_ => $f) } @subfiles, $server_arch, $user_arch,
+    map { my $f = $_; $f =~ s#\Q$subprefix\E#\$(INST_LIBDIR)#; ($_ => $f) } @subfiles, $server_arch, $user_arch,
   },
   clean => {FILES => "$def_jdk _Inline $obj_dir $server_arch $user_arch java.ts"},
   ABSTRACT_FROM  => 'lib/Inline/Java.pod', # retrieve abstract from module

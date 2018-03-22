@@ -34,10 +34,12 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "File::Slurper" : "0",
             "Lingua::EN::Sentence" : "0",
             "Moo" : "2",
             "Statistics::Lite" : "0",
+            "Try::Tiny" : "0",
             "namespace::clean" : "0",
             "perl" : "5.006",
             "strictures" : "2"
@@ -67,7 +69,7 @@
          "web" : "https://github.com/ology/Lingua-EN-Opinion"
       }
    },
-   "version" : "0.0801",
+   "version" : "0.1201",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -309,6 +311,7 @@
                      "Minqing",
                      "SIGKDD",
                      "Saif",
+                     "stemmer",
                      "th"
                   ],
                   "wordlist" : "Pod::Wordlist"

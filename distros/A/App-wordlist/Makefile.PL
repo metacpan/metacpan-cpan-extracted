@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
     "Module::List" => 0,
     "Perinci::Sub::Property::cmdline" => 0,
     "Scalar::Util::Numeric" => 0,
+    "WordList::Namespace" => 0,
     "experimental" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -37,7 +38,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.264",
+  "VERSION" => "0.266",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,6 +56,7 @@ my %FallbackPrereqs = (
   "Perinci::Sub::Property::cmdline" => 0,
   "Scalar::Util::Numeric" => 0,
   "Test::More" => 0,
+  "WordList::Namespace" => 0,
   "experimental" => 0,
   "strict" => 0,
   "warnings" => 0

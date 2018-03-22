@@ -1,3 +1,11 @@
+0.053   2018-03-19 (PERLANCAR)
+
+	- Allow WordList to be custom sorted when $SORT is true (WordList
+	  0.2.0).
+
+	- [doc] Remove mention of DZP:WordListC.
+
+
 0.052   2018-02-20 (PERLANCAR)
 
 	- No functional changes.

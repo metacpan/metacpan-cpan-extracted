@@ -1,7 +1,7 @@
 
 =head1 LICENSE
 
-Copyright [2015-2017] EMBL-European Bioinformatics Institute
+Copyright [2015-2018] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ package Bio::DB::HTS::Kseq;
 use Bio::DB::HTS; #load the XS
 use Bio::DB::HTS::Kseq::Record;
 
-$Bio::DB::HTS::Kseq::VERSION = '2.9';
+$Bio::DB::HTS::Kseq::VERSION = '2.10';
 
 use strict;
 use warnings;

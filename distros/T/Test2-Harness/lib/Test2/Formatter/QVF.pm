@@ -2,7 +2,7 @@ package Test2::Formatter::QVF;
 use strict;
 use warnings;
 
-our $VERSION = '0.001061';
+our $VERSION = '0.001062';
 
 BEGIN { require Test2::Formatter::Test2; our @ISA = qw(Test2::Formatter::Test2) }
 
@@ -47,6 +47,9 @@ sub write {
     $show ||= 1 unless $self->{+ECOUNT} % 10;
 
     if ($show) {
+        # Local is expensive! Only do it if we really need to.
+        local($\, $,) = (undef, '') if $\ || $,;
+
         my $io = $self->{+IO};
         if ($self->{+_BUFFERED}) {
             print $io "\r\e[K";

@@ -1,11 +1,10 @@
 package Lingua::EN::Opinion::Emotion;
-$Lingua::EN::Opinion::Emotion::VERSION = '0.0801';
+$Lingua::EN::Opinion::Emotion::VERSION = '0.1201';
 our $AUTHORITY = 'cpan:GENE';
 
 use Moo;
 use strictures 2;
 use namespace::clean;
-
 
 has wordlist => (
     is      => 'ro',
@@ -14214,44 +14213,7 @@ Lingua::EN::Opinion::Emotion
 
 =head1 VERSION
 
-version 0.0801
-
-=head1 DESCRIPTION
-
-NRC Word-Emotion Association Lexicon
-(NRC Emotion Lexicon)
-Version 0.92
-10 July 2011
-Copyright (C) 2011 National Research Council Canada (NRC)
-Contact: Saif Mohammad (saif.mohammad@nrc-cnrc.gc.ca)
-
-1. This copy of the NRC Emotion Lexicon is to be used for research
-purposes only.  Please contact NRC if interested in a commercial
-license.
-
-2. If you use this lexicon in your research, then please cite
-at least one of the papers listed in the PUBLICATIONS section of the
-README (preferably the journal paper in Computational Intelligence).
-
-.......................................................................
-
-NRC EMOTION LEXICON
--------------------
-The NRC emotion lexicon is a list of words and their associations with
-eight emotions (anger, fear, anticipation, trust, surprise, sadness,
-joy, and disgust) and two sentiments (negative and positive). The
-annotations were manually done through Amazon's Mechanical Turk. Refer
-to publications below for more details.
-
-.......................................................................
-
-=head1 ATTRIBUTES
-
-=head2 wordlist
-
-HashRef entries of the form:
-
-  word => { anger=>0, anticipation=>0, disgust=>0, fear=>0, joy=>0, negative=>0, positive=>0, sadness=>0, surprise=>0, trust=>0 },
+version 0.1201
 
 =head1 AUTHOR
 

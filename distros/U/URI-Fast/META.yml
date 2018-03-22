@@ -25,11 +25,10 @@ name: URI-Fast
 provides:
   URI::Fast:
     file: lib/URI/Fast.pm
-    version: '0.15'
+    version: '0.18'
 requires:
   Carp: '0'
   Exporter: '0'
-  File::Spec: '0'
   Inline: '0.80'
   Inline::C: '0.78'
   parent: '0'
@@ -38,5 +37,5 @@ resources:
   bugtracker: https://github.com/sysread/URI-Fast/issues
   homepage: https://github.com/sysread/URI-Fast
   repository: https://github.com/sysread/URI-Fast.git
-version: '0.15'
+version: '0.18'
 x_serialization_backend: 'YAML::Tiny version 1.70'

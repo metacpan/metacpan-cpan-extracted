@@ -17,8 +17,8 @@ our @EXPORT_OK = qw (
 sub LoadPackage {
     my ($Package) = @_;
 
-    my $PackageFileName = join( '/', split /::/, $Package ) . '.pm';
-    load($PackageFileName);
+    my $PackageFileName = join( '/', split /::/sm, $Package ); ## no critic (ProhibitNoisyQuotes)
+    load("$PackageFileName.pm");
     return;
 }
 #------------------------------------------------------------------------
@@ -33,15 +33,16 @@ sub IsValid {
 }
 #------------------------------------------------------------------------
 sub ExistsMethod {
-    my ( $PathOrObject, $MethodName ) = @_;
+    my ( $PathOrObject, $MethodName, $hAdditionalInfo ) = @_;
 
+    $hAdditionalInfo //= {};
     Error('Path or Object is needed') unless defined $PathOrObject;
     Error('Method name is needed') unless defined $MethodName;
     if( not $PathOrObject->can( $MethodName ) ){
         if( IsValid( ref( $PathOrObject ) ) ){
             $PathOrObject = ref( $PathOrObject );
         }
-        Error( $PathOrObject." donsn't have a method like: $MethodName", {'Method' => $MethodName});
+        Error( $PathOrObject." doesn't have a method like: $MethodName", {'Method' => $MethodName, %{$hAdditionalInfo}});
     }
 
     return 1;
@@ -65,7 +66,7 @@ sub Error {
     # print hData
     local $Data::Dumper::Terse = 1;
     local $Data::Dumper::Indent = 0;
-    local $Data::Dumper::Pair = '=';
+    local $Data::Dumper::Pair = '='; ## no critic (ProhibitNoisyQuotes)
     local $Data::Dumper::Quotekeys = 0;
     my $MockedMethod = delete $hData->{'Method'} if defined $hData->{'Method'}; ## no critic (ProhibitConditionalDeclarations)
     $MockedMethod //= '-no method set-';
@@ -83,7 +84,7 @@ sub Error {
             $FileName,
             $LineNumber,
         );
-       
+
     }
     # If the last element is a newline, the "at Xxxx.pm line XX" will not be printed
     my $ErrorOutput = sprintf(
@@ -93,9 +94,8 @@ sub Error {
         $DumpedData,
         $CallerStack,
     );
-    
-    die($ErrorOutput);
-}   
 
+    die($ErrorOutput);
+}
 
 1;

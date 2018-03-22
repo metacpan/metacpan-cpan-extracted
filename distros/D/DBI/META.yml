@@ -27,7 +27,6 @@ no_index:
     - t
     - inc
 requires:
-  Storable: '2.16'
   perl: '5.008'
 resources:
   IRC: irc://irc.perl.org/#dbi
@@ -35,7 +34,7 @@ resources:
   homepage: http://dbi.perl.org/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl5-dbi/dbi
-version: '1.640'
+version: '1.641'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_suggests:
   Clone: 0.34

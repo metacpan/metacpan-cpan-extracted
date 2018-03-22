@@ -39,10 +39,12 @@ disable parts of your application without editing its source code.
 The routes are described the same way as you would generate them imperatively,
 just instead of methods you use method names as keys and suitable references as
 values which will be dereferenced and passed as arguments to the respective
-method. For allowed keys look at ["METHODS" in Mojolicious::Routes::Route](https://metacpan.org/pod/Mojolicious::Routes::Route#METHODS). Of
-course only relatively simple cases are handled. Complex logic is left to the
-programmer. Still you can have all your routes defined in the configuration
-file as it is Perl and you have the `app` object available.
+method. If `$parameters` is a reference to CODE it will be executed and
+whatever it returns will be the parameters for the respective method.For
+allowed keys look at ["METHODS" in Mojolicious::Routes::Route](https://metacpan.org/pod/Mojolicious::Routes::Route#METHODS). Look at
+`t/blog/etc/complex_routes.conf` for inspiration. You can have all your routes
+defined in the configuration file as it is Perl and you have the `app` object
+available.
 
 # METHODS
 

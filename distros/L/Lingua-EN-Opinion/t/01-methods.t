@@ -148,4 +148,34 @@ $expected = {
 };
 is_deeply $x, $expected, 'nrc_get_sentence';
 
+=pod
+
+$text = <<'END';
+And a mighty angel took up a stone like a great millstone, and
+cast it into the sea, saying, Thus with violence shall that
+great city Babylon be thrown down, and shall be found no more
+at all.
+
+And to her was granted that she should be arrayed in fine
+linen, clean and white: for the fine linen is the
+righteousness of saints.
+
+Having the glory of God: and her light was like unto a stone
+most precious, even like a jasper stone, clear as crystal;
+
+But the fearful, and unbelieving, and the abominable, and
+murderers, and whoremongers, and sorcerers, and idolaters, and
+all liars, shall have their part in the lake which burneth
+with fire and brimstone: which is the second death.
+END
+
+$obj = Lingua::EN::Opinion->new( text => $text, stem => 1 );
+isa_ok $obj, 'Lingua::EN::Opinion';
+$obj->analyze;
+$x = $obj->scores;
+$scores = [ 5, 5, 5, -6 ];
+is_deeply $x, $scores, 'scores';
+
+=cut
+
 done_testing();

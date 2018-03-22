@@ -19,6 +19,10 @@ ajax '/ajax/content/device/netmap' => require_login sub {
 };
 
 ajax '/ajax/data/device/netmappositions' => require_login sub {
+    my $q = param('q');
+    my $qdev = schema('netdisco')->resultset('Device')
+      ->search_for_device($q) or send_error('Bad device', 400);
+
     my $p = param('positions') or send_error('Missing positions', 400);
     my $positions = from_json($p) or send_error('Bad positions', 400);
     send_error('Bad positions', 400) unless ref [] eq ref $positions;
@@ -27,17 +31,19 @@ ajax '/ajax/data/device/netmappositions' => require_login sub {
     undef $vlan if (defined $vlan and $vlan !~ m/^\d+$/);
 
     my $mapshow = param('mapshow');
-    return if !defined $mapshow or $mapshow !~ m/^(?:all|only)$/;
+    return if !defined $mapshow or $mapshow !~ m/^(?:all|neighbors)$/;
 
     # list of groups selected by user and passed in param
-    my $devgrp = (ref [] eq ref param('devgrp') ? param('devgrp') : [param('devgrp')]);
+    my $hgroup = (ref [] eq ref param('hgroup') ? param('hgroup') : [param('hgroup')]);
     # list of groups validated as real host groups and named host groups
     my @hgrplist = List::MoreUtils::uniq
                    grep { exists setting('host_group_displaynames')->{$_} }
                    grep { exists setting('host_groups')->{$_} }
-                   grep { defined } @{ $devgrp };
-    return if $mapshow eq 'only' and 0 == scalar @hgrplist;
-    push(@hgrplist, '__ANY__') if 0 == scalar @hgrplist;
+                   grep { defined } @{ $hgroup };
+
+    # list of locations selected by user and passed in param
+    my $lgroup = (ref [] eq ref param('lgroup') ? param('lgroup') : [param('lgroup')]);
+    my @lgrplist = List::MoreUtils::uniq grep { defined } @{ $lgroup };
 
     my %clean = ();
     POSITION: foreach my $pos (@$positions) {
@@ -51,14 +57,20 @@ ajax '/ajax/data/device/netmappositions' => require_login sub {
     return unless scalar keys %clean;
 
     my $posrow = schema('netdisco')->resultset('NetmapPositions')->find({
-      device_groups => \[ '= ?', [device_groups => [sort @hgrplist]] ],
-      vlan => ($vlan || 0)});
+      device => (($mapshow eq 'neighbors') ? $qdev->ip : undef),
+      host_groups => \[ '= ?', [host_groups => [sort @hgrplist]] ],
+      locations   => \[ '= ?', [locations   => [sort @lgrplist]] ],
+      vlan => ($vlan || 0),
+    });
+
     if ($posrow) {
       $posrow->update({ positions => to_json(\%clean) });
     }
     else {
       schema('netdisco')->resultset('NetmapPositions')->create({
-        device_groups => [sort @hgrplist],
+        device => (($mapshow eq 'neighbors') ? $qdev->ip : undef),
+        host_groups => [sort @hgrplist],
+        locations   => [sort @lgrplist],
         vlan => ($vlan || 0),
         positions => to_json(\%clean),
       });
@@ -109,17 +121,22 @@ ajax '/ajax/data/device/netmap' => require_login sub {
     my $vlan = param('vlan');
     undef $vlan if (defined $vlan and $vlan !~ m/^\d+$/);
 
+    my $colorby = (param('colorby') || 'speed');
     my $mapshow = (param('mapshow') || 'neighbors');
-    $mapshow = 'neighbors' if $mapshow !~ m/^(?:all|neighbors|only)$/;
+    $mapshow = 'neighbors' if $mapshow !~ m/^(?:all|neighbors)$/;
     $mapshow = 'all' unless $qdev->in_storage;
 
     # list of groups selected by user and passed in param
-    my $devgrp = (ref [] eq ref param('devgrp') ? param('devgrp') : [param('devgrp')]);
+    my $hgroup = (ref [] eq ref param('hgroup') ? param('hgroup') : [param('hgroup')]);
     # list of groups validated as real host groups and named host groups
     my @hgrplist = List::MoreUtils::uniq
                    grep { exists setting('host_group_displaynames')->{$_} }
                    grep { exists setting('host_groups')->{$_} }
-                   grep { defined } @{ $devgrp };
+                   grep { defined } @{ $hgroup };
+
+    # list of locations selected by user and passed in param
+    my $lgroup = (ref [] eq ref param('lgroup') ? param('lgroup') : [param('lgroup')]);
+    my @lgrplist = List::MoreUtils::uniq grep { defined } @{ $lgroup };
 
     my %ok_dev = ();
     my %logvals = ();
@@ -162,9 +179,11 @@ ajax '/ajax/data/device/netmap' => require_login sub {
     # DEVICES (NODES)
 
     my $posrow = schema('netdisco')->resultset('NetmapPositions')->find({
-      device_groups => \[ '= ?',
-        [device_groups => [$mapshow eq 'all' ? '__ANY__' : (sort @hgrplist)]] ],
-      vlan => ($vlan || 0)});
+      device => (($mapshow eq 'neighbors') ? $qdev->ip : undef),
+      host_groups => \[ '= ?', [host_groups => [sort @hgrplist]] ],
+      locations   => \[ '= ?', [locations   => [sort @lgrplist]] ],
+      vlan => ($vlan || 0),
+    });
     my $pos_for = from_json( $posrow ? $posrow->positions : '{}' );
 
     my $devices = schema('netdisco')->resultset('Device')->search({}, {
@@ -177,23 +196,30 @@ ajax '/ajax/data/device/netmap' => require_login sub {
       next DEVICE if (($mapshow eq 'neighbors') or $vlan)
         and (not $ok_dev{$device->ip});
 
-      # if in only mode then use ACLs to filter
+      # if location picked then filter
+      next DEVICE if ((scalar @lgrplist) and ((!defined $device->location)
+        or (0 == scalar grep {$_ eq $device->location} @lgrplist)));
+
+      # if host groups piked then use ACLs to filter
       my $first_hgrp =
         first { check_acl_only($device, setting('host_groups')->{$_}) } @hgrplist;
-      next DEVICE if $mapshow eq 'only' and not $first_hgrp;
+      next DEVICE if ((scalar @hgrplist) and (not $first_hgrp));
 
       ++$logvals{ $device->get_column('log') || 1 };
       (my $name = lc($device->dns || $device->name || $device->ip)) =~ s/$domain$//;
 
+      my %color_lkp = (
+        speed => (($device->get_column('log') || 1) * 1000),
+        hgroup => ($first_hgrp ?
+          setting('host_group_displaynames')->{$first_hgrp} : 'Other'),
+        lgroup => ($device->location || 'Other'),
+      );
+
       my $node = {
         ID => $device->ip,
-        SIZEVALUE => (param('dynamicsize') ?
-          (($device->get_column('log') || 1) * 1000) : 3000),
-        (param('colorgroups') ?
-          (COLORVALUE => ($first_hgrp ? setting('host_group_displaynames')->{$first_hgrp}
-                                      : 'Other')) : ()),
-        LABEL => (param('showips')
-          ? (($name eq $device->ip) ? $name : ($name .' '. $device->ip)) : $name),
+        SIZEVALUE => (param('dynamicsize') ? $color_lkp{speed} : 3000),
+        ((exists $color_lkp{$colorby}) ? (COLORVALUE => $color_lkp{$colorby}) : ()),
+        LABEL => $name,
         ORIG_LABEL => $name,
         INFOSTRING => make_node_infostring($device),
         LINK => uri_for('/device', {
@@ -203,7 +229,7 @@ ajax '/ajax/data/device/netmap' => require_login sub {
         })->path_query,
       };
 
-      if ($mapshow ne 'neighbors' and exists $pos_for->{$device->ip}) {
+      if (exists $pos_for->{$device->ip}) {
         $node->{'fixed'} = 1;
         $node->{'x'} = $pos_for->{$device->ip}->{'x'};
         $node->{'y'} = $pos_for->{$device->ip}->{'y'};

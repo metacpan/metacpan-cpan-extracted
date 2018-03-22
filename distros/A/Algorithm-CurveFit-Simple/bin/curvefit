@@ -3,7 +3,7 @@
 # Available for unlimited distribution and use.
 # The copyright is just so someone else cannot claim ownership and sue me for use of my own code.
 
-our $VERSION = '1.02'; # VERSION 1.02
+our $VERSION = '1.03'; # VERSION 1.02
 
 use strict;
 use warnings;

@@ -4,6 +4,8 @@ use Statocles::Util qw( trim dircopy run_editor uniq_by derp );
 use Statocles::Link;
 my $SHARE_DIR = path( __DIR__, 'share' );
 
+use constant Win32 => $^O =~ /Win32/;
+
 subtest 'trim' => sub {
     my $foo;
     my @warnings;
@@ -55,6 +57,7 @@ subtest 'dircopy' => sub {
 };
 
 subtest 'run_editor' => sub {
+    my $editor = join ' ', map qq{"$_"}, $^X, $SHARE_DIR->child( 'bin', 'editor.pl' );
     subtest 'no editor found' => sub {
         local $ENV{EDITOR};
         my $tmp = tempdir;
@@ -62,7 +65,7 @@ subtest 'run_editor' => sub {
     };
 
     subtest 'editor found' => sub {
-        local $ENV{EDITOR} = "$^X " . $SHARE_DIR->child( 'bin', 'editor.pl' );
+        local $ENV{EDITOR} = $editor;
         local $ENV{STATOCLES_TEST_EDITOR_CONTENT} = "".$SHARE_DIR->child(qw( app blog draft a-draft-post.markdown ));
         my $tmp = tempdir;
         ok run_editor( $tmp->child( 'index.markdown' ) ), 'editor invoked, so return true';
@@ -73,23 +76,25 @@ subtest 'run_editor' => sub {
         my $tmp = tempdir;
         throws_ok {
             run_editor( $tmp->child( 'index.markdown' ) );
-        } qr{Failed to invoke editor "HOPEFULLY_DOES_NOT_EXIST": .*\n};
+        } qr{Editor "HOPEFULLY_DOES_NOT_EXIST" exited with error \(non-zero\) status: \d+\n};
     };
 
-    subtest 'editor dies by signal' => sub {
-        local $ENV{EDITOR} = "$^X " . $SHARE_DIR->child( 'bin', 'editor.pl' ) . " --signal TERM";
-        my $tmp = tempdir;
-        throws_ok {
-            run_editor( $tmp->child( 'index.markdown' ) );
-        } qr[Editor "$ENV{EDITOR}" died from signal \d+\n];
-    };
+    if (!Win32) {
+        subtest 'editor dies by signal' => sub {
+            local $ENV{EDITOR} = $editor . " --signal TERM";
+            my $tmp = tempdir;
+            throws_ok {
+                run_editor( $tmp->child( 'index.markdown' ) );
+            } qr[Editor "\Q$ENV{EDITOR}\E" exited with error \(non-zero\) status: \d+\n];
+        };
+    }
 
     subtest 'editor nonzero exit' => sub {
-        local $ENV{EDITOR} = "$^X " . $SHARE_DIR->child( 'bin', 'editor.pl' ) . " --exit 1";
+        local $ENV{EDITOR} = $editor . " --exit 1";
         my $tmp = tempdir;
         throws_ok {
             run_editor( $tmp->child( 'index.markdown' ) );
-        } qr[Editor "$ENV{EDITOR}" exited with error \(non-zero\) status: 1\n];
+        } qr[Editor "\Q$ENV{EDITOR}\E" exited with error \(non-zero\) status: \d+\n];
     };
 };
 

@@ -6,7 +6,7 @@ Test::Mockify::Matcher - To define parameter matchers
 
 =head1 DESCRIPTION
 
-Use L<Test::Mockify::Matcher> to define different types of expected parameters. See method description for more details.
+Use L<Test::Mockify::Matcher|Test::Mockify::Matcher> to define different types of expected parameters. See method description for more details.
 
 =head1 METHODS
 
@@ -21,6 +21,7 @@ use Test::Mockify::TypeTests qw (
         IsHashReference
         IsCodeReference
     );
+use Test::Mockify::Tools qw (Error);
 use base qw( Exporter );
 our @EXPORT_OK = qw (
         SupportedTypes
@@ -43,7 +44,7 @@ The C<SupportedTypes> will return all supported matcher types as an array ref.
 
 =cut
 sub SupportedTypes{
-    return [ 
+    return [
         'string',
         'number',
         'hashref',
@@ -68,8 +69,8 @@ Use the Matcher Number() to Check for the string '0' (perl cannot differ that)
 =cut
 sub String(;$) {
     my ($Value) = @_;
-    die('NotAString') if $Value && !IsString($Value);
-    die('Use the Matcher Number() to Check for the string \'0\' (perl cannot differ that)') if defined $Value && $Value eq '0';
+    Error('NotAString') if $Value && !IsString($Value);
+    Error("Please use the Matcher Number($Value) to check for the string '$Value' (perl can not distinguish between numbers and strings)") if defined $Value && IsFloat($Value);
     return _Type('string',$Value);
 }
 =pod
@@ -86,7 +87,7 @@ If called with parameter, it will be proved that this value is actually a number
 =cut
 sub Number(;$) {
     my ($Value) = @_;
-    die('NotANumber') if $Value && !IsFloat($Value);
+    Error('NotANumber') if defined $Value && !IsFloat($Value);
     return _Type('number',$Value);
 }
 =pod
@@ -102,7 +103,7 @@ If called with parameter, it will be proved that this value is actually a hash r
 =cut
 sub HashRef(;$) {
     my ($Value) = @_;
-    die('NotAHashReference') if $Value && !IsHashReference($Value);
+    Error('NotAHashReference') if $Value && !IsHashReference($Value);
     return _Type('hashref',$Value);
 }
 =pod
@@ -118,7 +119,7 @@ If called with parameter, it will be proved that this value is actually an array
 =cut
 sub ArrayRef(;$) {
     my ($Value) = @_;
-    die('NotAnArrayReference') if $Value && !IsArrayReference($Value);
+    Error('NotAnArrayReference') if $Value && !IsArrayReference($Value);
     return _Type('arrayref',$Value);
 }
 =pod
@@ -134,7 +135,7 @@ If called with parameter, it will be proved that this value is actually an strin
 =cut
 sub Object(;$) {
     my ($Value) = @_;
-    die('NotAnModulPath') if $Value && !($Value =~ /^\w+(::\w+)*$/);
+    Error('NotAnModulPath') if $Value && !($Value =~ /^\w+(::\w+)*$/sm);
     return _Type('object',$Value);
 }
 =pod

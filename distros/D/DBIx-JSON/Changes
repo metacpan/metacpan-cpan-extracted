@@ -1,9 +1,14 @@
 Revision history for DBIx::JSON
 
+0.04  Wed Mar  21 17:00:00JST 2018
+        - Fixed a package issue (RT Bug 124841)
+
+0.03  Wed Mar  21 14:00:00JST 2018
+        - Fixed a typo of PrintWarn (RT Bug 30809, 43062, 60413, 124788)
+
 0.02  Sat Jun  02 10:20:32 2006
         - Added hash_array option
         - Updated error handling
 
 0.01  Sat Apr  15 23:01:11 2006
         - original version
-

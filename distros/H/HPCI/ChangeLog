@@ -1,3 +1,8 @@
+0.64 - initial code for unshared file support (not yet working but causes no bugs)
+     - skipstage testing was losing the per-test pre list, only using the
+	   global list
+	 - cleaned up some grammar and text in diagnostics
+
 0.63 - added code stage checking to skipstage.t
      - fixed timestamp checking in skipstage test
 

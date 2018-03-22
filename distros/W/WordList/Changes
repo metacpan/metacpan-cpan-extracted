@@ -1,3 +1,24 @@
+0.2.1   2018-03-19 (PERLANCAR)
+
+	- [doc] Mention that there must not be duplicate entries.
+
+
+0.2.0   2018-03-19 (PERLANCAR)
+
+        - Allow wordlist to be sorted other than ascibetically, and in that
+          case, require $SORT package variable to be set to some true value.
+
+        - Move back implementation from WordListC (WordListC was an experiment
+          and its feature is now incorporated into WordList).
+
+
+0.1.5   2018-02-20 (PERLANCAR)
+
+	- No spec changes.
+
+	- [optimize] Avoid using base.pm.
+
+
 0.1.4   2018-02-20 (PERLANCAR)
 
 	- No spec changes.

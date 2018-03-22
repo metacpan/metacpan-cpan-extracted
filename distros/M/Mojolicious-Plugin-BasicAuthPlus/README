@@ -2,7 +2,7 @@ NAME
     Mojolicious::Plugin::BasicAuthPlus - Basic HTTP Auth Helper Plus
 
 VERSION
-    Version 0.10.2
+    Version 0.11.0
 
 SYNOPSIS
       # Mojolicious::Lite
@@ -54,10 +54,13 @@ METHODS
     two-element list, where the first element is a hash reference and the
     second is an integer (1 for success, 0 for failure).
 
-    In the future, the hash reference may contain additional values, but for
-    now it contains just one key/value pair for the username used to
-    authenticate. You can ignore this; thus, for example, both of the
-    following are valid:
+    The hash reference contains one key/value pair for the username used to
+    authenticate, and when LDAP is used it may also contain the 'ldap' key
+    whose value is the active LDAP connection handle if requested by setting
+    the return_ldap_handle option (see options below).
+
+    Generally, you can ignore this; thus, for example, both of the following
+    are valid:
 
       my ($hash_ref, $auth_ok)
           = $self->basic_auth(
@@ -72,20 +75,12 @@ METHODS
       }
 
       $self->render(text => 'ok')
-          if ($self->basic_auth(
+          if $self->basic_auth(
               "My Realm" => {
                   username => 'zapp',
                   password => 'brannigan'
               }
           );
-
-  "check_auth"
-
-    Check authentication does the same thing as C<basic_auth> without asking
-    for a password if authentication failed.
-
-      my ($hash_ref, $status) = $plugin->check_auth($c, $auth, $params);
-
 
 CONFIGURATION
     The basic_auth method takes an HTTP Basic Auth realm name that is either
@@ -132,8 +127,66 @@ CONFIGURATION
     The password to use when doing an authenticated bind to LDAP or Active
     Directory.
 
+  scope
+    The search scope for LDAP or Active Directory. Choices are 'base' |
+    'one' | 'sub' | 'subtree' | 'children', but the default is 'sub'. See
+    Net::LDAP for further discussion.
+
   filter
     The LDAP/ActiveDirectory filter to use when searching a directory.
+
+  port
+    The TCP port to use for an LDAP/ActiveDirectory connection. The default
+    is 389.
+
+  debug
+    Set the LDAP debug level. See the debug method in Net::LDAP for details.
+    The default value is 0, debugging off.
+
+  timeout
+    Timeout in seconds passed to IO::Socket when connecting to a remote LDAP
+    server. The default is 120.
+
+  version
+    Set the LDAP protocol version being used (default is LDAPv3). To talk to
+    an older server, for example one using LDAPv2, set this to 2. With
+    modern LDAP implementations, you shouldn't need to bother setting this.
+
+  start_tls
+    Enable TLS support for LDAP. This is the default. If you do not want
+    TLS, set this to zero, but it's recommended to take the default.
+
+  tls_verify
+    For SSL certificate validation, set tls_verify to 'none' | 'optional' |
+    'require'. The default is 'optional'. See Net::LDAP for more
+    information.
+
+  cafile
+    The path to your CA or CA chain certificate file. Required in TLS mode
+    for LDAP if tls_verify is true.
+
+  return_ldap_handle
+    When authenticating against LDAP, the plugin will do an unbind operation
+    to close the connection with the LDAP server after an authentication
+    success or failure. In some cases, it may be useful to return the active
+    LDAP connection handle to your calling code so that further LDAP
+    operations can be performed after authentication succeeds. To enable
+    this, set return_ldap_handle.
+
+    Note that the last bind operation on the connection will be that of the
+    end user you're trying to authenticate, so once you get the handle back
+    any LDAP operation you attempt to execute will have only the LDAP
+    privileges granted to the end user who just authenticated. If you need
+    the LDAP privileges of your administrative bind DN or other user, you'll
+    need to do a fresh bind using the same handle. Rebinding will probably
+    work with many modern LDAP implementations, but it is not guaranteed.
+
+    The default behavior for the plugin is to close the LDAP connection and
+    not return a connection handle.
+
+  logging
+    If set, this enables some logging of successes and failures for
+    authentication, LDAP binding, etc. The default is no logging.
 
 EXAMPLES
       # With callback
@@ -208,6 +261,71 @@ EXAMPLES
           );
       };
   
+      # LDAP authentication over TLS/SSL (with authenticated bind)
+      get '/' => sub {
+          my $self = shift;
+          my ($hash_ref, $auth_ok)
+              = $self->basic_auth(
+                  "Realm Name" => {
+                      host       => 'ldap.company.com',
+                      basedn     => 'ou=People,dc=domain,dc=com',
+                      binddn     => 'cn=bender,ou=People,dc=domain,dc=com',
+                      bindpw     => 'secret',
+                      filter     => '(&(objectClass=person)(cn=%s))',
+                      cafile     => '/some/path/to/ca.cert',
+                      tls_verify => 'require'
+                  }
+              );
+          $self->render(text => 'ok') if $auth_ok;
+      };
+
+      # LDAP authentication over TLS/SSL (with authentciated bind),
+      # returning the active LDAP handle and using it to do an additional
+      # search.  Logging is also enabled.
+      get '/' => sub {
+          my $self = shift;
+          my ($hash_ref, $auth_ok)
+              = $self->basic_auth(
+                  "Realm Name" => {
+                      host       => 'ldap.company.com',
+                      basedn     => 'ou=People,dc=domain,dc=com',
+                      binddn     => 'cn=bender,ou=People,dc=domain,dc=com',
+                      bindpw     => 'secret',
+                      filter     => '(&(objectClass=person)(cn=%s))',
+                      cafile     => '/some/path/to/ca.cert',
+                      tls_verify => 'require',
+                      logging    => 1,
+                      return_ldap_handle => 1
+                  }
+              );
+
+          if ($hash_ref->{ldap}) {
+              my $ldap     = $hash_ref->{ldap};
+              my $username = $hash_ref->{username};
+              my @fields   = qw(cn sn mail);
+              my $filter   = join '', map { "($_=*$username*)" } @fields;
+              $filter      = '(|' . $filter . ')';
+
+              my $mesg = $ldap->search(
+                  base   => 'dc=domain,dc=com',
+                  scope  => 'sub',
+                  filter => $filter,
+                  attrs  => [ 'cn', 'sn', 'mail' ]
+              );
+              croak $mesg->error if $mesg->code;
+
+              my @entries = $mesg->entries;
+
+              for my $entry (@entries) {
+                  my $email = $entry->get_value('mail');
+                  $self->app->log->info("Email address for $username is $email.");
+              }
+              $ldap->unbind;
+          }
+
+          $self->render(text => 'ok') if $auth_ok;
+      };
+
       # Active Directory authentication (with authenticated bind)
       get '/' => sub {
           my $self = shift;
@@ -278,10 +396,10 @@ CONTRIBUTORS
 
 SEE ALSO
     Mojolicious, Mojolicious::Guides, <http://mojolicio.us>,
-    Authen::Simple::Password, Authen::Simple::LDAP, Authen::Simple::Passwd
+    Authen::Simple::Password, Authen::Simple::Passwd, Net::LDAP
 
 COPYRIGHT
-    Copyright (c) 2013-2015 by Brad Robertson.
+    Copyright (c) 2013-2018 by Brad Robertson.
 
 LICENSE
     This program is free software; you can redistribute it and/or modify it

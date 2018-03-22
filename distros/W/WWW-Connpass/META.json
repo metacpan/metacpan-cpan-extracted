@@ -4,7 +4,7 @@
       "karupanerura <karupa@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.1",
+   "generated_by" : "Minilla/v3.0.16",
    "license" : [
       "perl_5"
    ],
@@ -63,7 +63,7 @@
    "provides" : {
       "WWW::Connpass" : {
          "file" : "lib/WWW/Connpass.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "WWW::Connpass::Agent" : {
          "file" : "lib/WWW/Connpass/Agent.pm"
@@ -128,7 +128,7 @@
          "web" : "https://github.com/karupanerura/WWW-Connpass"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_authority" : "cpan:KARUPA",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

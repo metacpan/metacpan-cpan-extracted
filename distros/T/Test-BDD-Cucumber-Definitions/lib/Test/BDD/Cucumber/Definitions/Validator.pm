@@ -7,10 +7,11 @@ use Exporter qw(import);
 use Params::ValidationCompiler qw(validation_for);
 use Test::BDD::Cucumber::Definitions::Types qw(:all);
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 our @EXPORT_OK = qw(
     validator_i
+    validator_n
     validator_s
     validator_r
     validator_ni
@@ -23,6 +24,7 @@ our %EXPORT_TAGS = (
     all => [
         qw(
             validator_i
+            validator_n
             validator_s
             validator_r
             validator_ni
@@ -43,6 +45,18 @@ my $validator_i = validation_for(
 
 sub validator_i {
     return $validator_i;
+}
+
+my $validator_n = validation_for(
+    params => [
+
+        # name
+        { type => TbcdNonEmptyStr },
+    ]
+);
+
+sub validator_n {
+    return $validator_n;
 }
 
 my $validator_s = validation_for(

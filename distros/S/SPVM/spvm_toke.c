@@ -1146,6 +1146,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_CASE);
                   return CASE;
                 }
+                else if (strcmp(keyword, "class") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_CLASS);
+                  return CLASS;
+                }
                 else if (strcmp(keyword, "croak") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_CROAK);
                   return CROAK;
@@ -1187,12 +1191,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 else if (strcmp(keyword, "float") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_FLOAT);
                   return FLOAT;
-                }
-                break;
-              case 'g' :
-                if (strcmp(keyword, "get") == 0) {
-                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_GET);
-                  return GET;
                 }
                 break;
               case 'h' :
@@ -1291,7 +1289,11 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 }
                 break;
               case 's' :
-                if (strcmp(keyword, "switch") == 0) {
+                if (strcmp(keyword, "self") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_SELF);
+                  return SELF;
+                }
+                else if (strcmp(keyword, "switch") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_SWITCH);
                   return SWITCH;
                 }
@@ -1308,10 +1310,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 else if (strcmp(keyword, "string") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_STRING);
                   return STRING;
-                }
-                else if (strcmp(keyword, "set") == 0) {
-                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_SET);
-                  return SET;
                 }
                 break;
               case 'u' :

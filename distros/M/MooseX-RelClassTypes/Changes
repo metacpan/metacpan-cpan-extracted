@@ -1,0 +1,6 @@
+Revision history for Perl extension MooseX::RelClassType.
+
+0.01  Mon Mar 19 05:16:14 2018
+	- original version; created by h2xs 1.23 with options
+		-AX MooseX::RelClassType
+

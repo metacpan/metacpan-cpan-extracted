@@ -143,7 +143,6 @@ typedef struct MarpaX_ESLIF_Recognizer {
   SV                     *previous_Perl_encodingp;
   genericStack_t         *lexemeStackp;
   marpaESLIFRecognizer_t *marpaESLIFRecognizerp;
-  short                   exhaustedb;
   short                   canContinueb;
 } MarpaX_ESLIF_Recognizer_t;
 
@@ -1163,7 +1162,6 @@ static void marpaESLIF_recognizerContextInitv(pTHX_ SV *Perl_MarpaX_ESLIF_Gramma
   Perl_MarpaX_ESLIF_Recognizerp->previous_Perl_encodingp            = NULL;
   Perl_MarpaX_ESLIF_Recognizerp->lexemeStackp                       = NULL;
   Perl_MarpaX_ESLIF_Recognizerp->marpaESLIFRecognizerp              = NULL;
-  Perl_MarpaX_ESLIF_Recognizerp->exhaustedb                         = 0;
   Perl_MarpaX_ESLIF_Recognizerp->canContinueb                       = 0;
 }
 
@@ -2312,7 +2310,6 @@ CODE:
   marpaESLIFValueResult_t       marpaESLIFValueResult;
   MarpaX_ESLIF_Recognizer_t     marpaESLIFRecognizerContext;
   MarpaX_ESLIF_Value_t          marpaESLIFValueContext;
-  short                         exhaustedb;
   SV                           *svp;
   bool                          rcb;
 
@@ -2342,7 +2339,7 @@ CODE:
   marpaESLIFValueOption.nullb                          = marpaESLIF_call_methodb(aTHX_ Perl_valueInterfacep, "isWithNull");
   marpaESLIFValueOption.maxParsesi                     = (int) marpaESLIF_call_methodi(aTHX_ Perl_valueInterfacep, "maxParses");
 
-  if (! marpaESLIFGrammar_parseb(Perl_MarpaX_ESLIF_Grammarp->marpaESLIFGrammarp, &marpaESLIFRecognizerOption, &marpaESLIFValueOption, &exhaustedb, &marpaESLIFValueResult)) {
+  if (! marpaESLIFGrammar_parseb(Perl_MarpaX_ESLIF_Grammarp->marpaESLIFGrammarp, &marpaESLIFRecognizerOption, &marpaESLIFValueOption, NULL, &marpaESLIFValueResult)) {
     goto err;
   }
   /* It is our responsbility to free the final value */
@@ -2554,7 +2551,11 @@ isCanContinue(Perl_MarpaX_ESLIF_Recognizer)
 PREINIT:
   static const char *funcs = "MarpaX::ESLIF::Recognizer::isCanContinue";
 CODE:
-  RETVAL = (bool) Perl_MarpaX_ESLIF_Recognizer->canContinueb;
+  short isCanContinueb;
+  if (! marpaESLIFRecognizer_isCanContinueb(Perl_MarpaX_ESLIF_Recognizer->marpaESLIFRecognizerp, &(isCanContinueb))) {
+    MARPAESLIF_CROAKF("marpaESLIFRecognizer_isCanContinueb failure, %s", strerror(errno));
+  }
+  RETVAL = (bool) isCanContinueb;
 OUTPUT:
   RETVAL
 
@@ -2570,7 +2571,11 @@ isExhausted(Perl_MarpaX_ESLIF_Recognizer)
 PREINIT:
   static const char *funcs = "MarpaX::ESLIF::Recognizer::isExhausted";
 CODE:
-  RETVAL = (bool) Perl_MarpaX_ESLIF_Recognizer->exhaustedb;
+  short exhaustedb;
+  if (! marpaESLIFRecognizer_isExhaustedb(Perl_MarpaX_ESLIF_Recognizer->marpaESLIFRecognizerp, &(exhaustedb))) {
+    MARPAESLIF_CROAKF("marpaESLIFRecognizer_isExhaustedb failure, %s", strerror(errno));
+  }
+  RETVAL = (bool) exhaustedb;
 OUTPUT:
   RETVAL
 
@@ -2598,7 +2603,7 @@ CODE:
     initialEventsb = 0;
   }
 
-  RETVAL = (bool) marpaESLIFRecognizer_scanb(Perl_MarpaX_ESLIF_Recognizer->marpaESLIFRecognizerp, initialEventsb, &(Perl_MarpaX_ESLIF_Recognizer->canContinueb), &(Perl_MarpaX_ESLIF_Recognizer->exhaustedb));
+  RETVAL = (bool) marpaESLIFRecognizer_scanb(Perl_MarpaX_ESLIF_Recognizer->marpaESLIFRecognizerp, initialEventsb, &(Perl_MarpaX_ESLIF_Recognizer->canContinueb), NULL);
 OUTPUT:
   RETVAL
 
@@ -2629,7 +2634,7 @@ CODE:
   if (deltaLength < 0) {
     MARPAESLIF_CROAK("Resume delta length cannot be negative");
   }
-  RETVAL = (bool) marpaESLIFRecognizer_resumeb(Perl_MarpaX_ESLIF_Recognizer->marpaESLIFRecognizerp, (size_t) deltaLength, &(Perl_MarpaX_ESLIF_Recognizer->canContinueb), &(Perl_MarpaX_ESLIF_Recognizer->exhaustedb));
+  RETVAL = (bool) marpaESLIFRecognizer_resumeb(Perl_MarpaX_ESLIF_Recognizer->marpaESLIFRecognizerp, (size_t) deltaLength, &(Perl_MarpaX_ESLIF_Recognizer->canContinueb), NULL);
 OUTPUT:
   RETVAL
 

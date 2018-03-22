@@ -1,4 +1,4 @@
-# $Id: 22-RSA-SHA1.t 1619 2018-01-24 08:24:17Z willem $	-*-perl-*-
+# $Id: 22-RSA-SHA1.t 1654 2018-03-19 15:53:37Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -75,8 +75,17 @@ my $signature = Net::DNS::SEC::RSA->sign( $sigdata, $private );
 ok( $signature, 'signature created using private key' );
 
 
-my $verified = Net::DNS::SEC::RSA->verify( $sigdata, $key, $signature );
-ok( $verified, 'signature verified using public key' );
+{
+	my $verified = Net::DNS::SEC::RSA->verify( $sigdata, $key, $signature );
+	ok( $verified, 'signature verified using public key' );
+}
+
+
+{
+	my $corrupt = 'corrupted data';
+	my $verified = Net::DNS::SEC::RSA->verify( $corrupt, $key, $signature );
+	ok( !$verified, 'signature over corrupt data not verified' );
+}
 
 
 # The following tests are not replicated for other RSA/SHA flavours
@@ -136,11 +145,11 @@ is( $invalid2, undef, "missing keyfile:	[$@]" );
 
 my $invalid3 = eval { Net::DNS::SEC::Private->new( signame => 'private' ) };
 chomp $@;
-is( $invalid3, undef, "undef algorithm:	[$@]" );
+is( $invalid3, undef, "unspecified algorithm:	[$@]" );
 
 my $invalid4 = eval { Net::DNS::SEC::Private->new( algorithm => 1 ) };
 chomp $@;
-is( $invalid4, undef, "undef signame:	[$@]" );
+is( $invalid4, undef, "unspecified signame:	[$@]" );
 
 
 # exercise code for key with long exponent (not required for DNSSEC)
@@ -149,29 +158,6 @@ eval {
 	$key->keybin($longformat);
 	Net::DNS::SEC::RSA->verify( $sigdata, $key, $signature );
 };
-
-
-# test coverage only for RSA key generation
-eval {
-	local $SIG{__WARN__} = sub { };
-	my $private = Net::DNS::SEC::Private->generate_rsa(qw(domain 256 1024));
-};
-
-eval {
-	local $SIG{__WARN__} = sub { };
-	my $keyblob = '';
-	my $private = Net::DNS::SEC::Private->new_rsa_priv( $keyblob, qw(domain 256 1024) );
-};
-
-
-# test coverage only for deprecated dump_rsa_??? warning
-eval {
-	local $SIG{__WARN__} = sub { };
-	$private->dump_rsa_keytag;
-};
-
-
-is( $private->DESTROY, undef, 'DESTROY() required to defeat pre-5.18 AUTOLOAD' );
 
 
 exit;

@@ -18,6 +18,7 @@ lib/Dist/Zilla/MintingProfile/Author/ETHER.pm
 lib/Dist/Zilla/PluginBundle/Author/ETHER.pm
 lib/Pod/Weaver/PluginBundle/Author/ETHER.pm
 share/CONTRIBUTING
+share/changes_has_content.t
 share/profiles/default/Module.pm
 share/profiles/default/profile.ini
 share/profiles/default/skel/dist.ini
@@ -56,9 +57,11 @@ t/lib/NoNetworkHits.pm
 t/lib/NoPrereqChecks.pm
 t/zzz-check-breaks.t
 xt/author/00-compile.t
+xt/author/changes_has_content.t
 xt/author/clean-namespaces.t
 xt/author/eol.t
 xt/author/kwalitee.t
+xt/author/minimum-version.t
 xt/author/mojibake.t
 xt/author/no-tabs.t
 xt/author/pod-spell.t
@@ -67,4 +70,3 @@ xt/author/portability.t
 xt/release/changes_has_content.t
 xt/release/cpan-changes.t
 xt/release/distmeta.t
-xt/release/minimum-version.t

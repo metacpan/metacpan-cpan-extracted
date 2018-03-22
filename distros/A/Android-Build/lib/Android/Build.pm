@@ -13,7 +13,7 @@ use Data::Table::Text qw(:all);
 use File::Copy;
 use POSIX qw(strftime);                                                         # http://www.cplusplus.com/reference/ctime/strftime/
 
-our $VERSION = '20180316';
+our $VERSION = '20180318';
 
 #-------------------------------------------------------------------------------
 # Constants
@@ -535,7 +535,7 @@ sub cloneApk2($$)                                                               
 
   my $tempFolder = temporaryFolder;                                             # Temporary folder to unzip into
   zzz(<<"END", 0, 0,  "Unable to unzip");                                       # Unzip old apk
-rm $tempFolder*; unzip -o $oldApk -d $tempFolder -x "assets/*" "META-INF/*"
+unzip -o $oldApk -d $tempFolder -x "assets/*" "META-INF/*"
 END
 
   if (my $assetsFiles = $android->assets)                                       # Create asset files if necessary
@@ -586,7 +586,7 @@ sub lint2($)                                                                    
 
 #1 Methods and attributes
 
-sub new()                                                                       #S Create a new builder.
+sub new()                                                                       #S Create a new build.
  {bless{action     =>qq(run),
         activity   =>qw(Activity),
         device     =>qq(emulator-5554),
@@ -600,7 +600,7 @@ sub new()                                                                       
 
 if (1) {                                                                        # Parameters that can be set by the caller - see the pod at the end of this file for a complete description of what each parameter does
   genLValueScalarMethods(qw(activity));                                         # Activity name: default is B<Activity>. The name of the activity to start on your android device: L<device|/device> is L<package|/package>/L<Activity|/Activity>
-  genLValueHashMethods  (qw(assets));                                           # A hash containing your assets folder (if any).  Each key is the file name in the assets folder, each corresponding value is the data for that file. The keys of this hash may contain B</> to create sub folders.
+  genLValueScalarMethods(qw(assets));                                           # A hash containing your assets folder (if any).  Each key is the file name in the assets folder, each corresponding value is the data for that file. The keys of this hash may contain B</> to create sub folders.
   genLValueScalarMethods(qw(buildTools));                                       # Name of the folder containing the build tools to be used to build the app, see L<prerequisites|/prerequisites>
   genLValueScalarMethods(qw(buildFolder));                                      # Name of a folder in which to build the app, The default is B</tmp/app/>
   genLValueScalarMethods(qw(classes));                                          # A folder containing precompiled java classes and jar files that you wish to L<lint|/lint> against.
@@ -614,7 +614,7 @@ if (1) {                                                                        
   genLValueArrayMethods (qw(libs));                                             # A reference to an array of jar files to be copied into the app build to be used as libraries.
   genLValueScalarMethods(qw(lintFile));                                         # A file to be linted with the L<lint|/lint> action using the android L<platform|/platform> and the L<classes|/classes> specified.
   genLValueArrayMethods (qw(log));                                              # Output: a reference to an array of messages showing all the non fatal errors produced by this running this build. To catch fatal error enclose L<build|/build> with L<eval{}|perlfunc/eval>
-  genLValueScalarMethods(qw(package));                                          # The package name used in the manifest file to identify the app. The java file containing the L<activity|/activity> for this app should use this package name on its package statement.
+  genLValueScalarMethods(qw(package));                                          # The package name used in the manifest file to identify the app. The java file containing the L<activity|/activity> for this app should use this package name on its B<package> statement.
   genLValueScalarMethods(qw(parameters));                                       # Optional parameter string to be placed in folder: B<res> as a string accessible via: B<R.string.parameters> from within the app. Alternatively, if this is a reference to a hash, strings are created for each hash key=value
   genLValueArrayMethods (qw(permissions));                                      # A reference to an array of permissions, a standard useful set is applied by default if none are specified.
   genLValueScalarMethods(qw(platform));                                         # Folder containing B<android.jar>. For example B<~/Android/sdk/platforms/25.0.2>
@@ -638,7 +638,7 @@ sub compile($)                                                                  
  }
 
 sub cloneApk($$)                                                                # Clone an apk file: copy the existing apk, replace the L<assets|/assets>, re-sign, zipalign, return the name of the newly created apk file.
- {my ($android, $oldApk) = @_;                                                  # Android, the file name of the apk to be cloned
+ {my ($android, $oldApk) = @_;                                                  # Android build, the file name of the apk to be cloned
   &cloneApk2(@_);
  }
 
@@ -652,7 +652,7 @@ sub lint($)                                                                     
   undef                                                                         # No errors encountered
  }
 
-sub install($)                                                                  # Install an already L<compiled|/compile> app on the selected L<device|/device>
+sub install($)                                                                  # Install an already L<compiled|/compile> app on to the selected L<device|/device>
  {my ($android)  = @_;                                                          # Android build
   eval {&install2(@_)};
   if ($@)
@@ -759,7 +759,7 @@ module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
 =head2 new()
 
-Create a new builder.
+Create a new build.
 
 
 This is a static method and so should be invoked as:
@@ -844,7 +844,7 @@ Output: a reference to an array of messages showing all the non fatal errors pro
 
 =head2 package :lvalue
 
-The package name used in the manifest file to identify the app. The java file containing the L<activity|/activity> for this app should use this package name on its package statement.
+The package name used in the manifest file to identify the app. The java file containing the L<activity|/activity> for this app should use this package name on its B<package> statement.
 
 
 =head2 parameters :lvalue
@@ -901,37 +901,37 @@ The version number of the app. Default is today's date, formatted as B<YYYYMMDD>
 
 Compile the app.
 
-     Parameter  Description    
-  1  $android   Android build  
+     Parameter  Description
+  1  $android   Android build
 
 =head2 cloneApk($$)
 
 Clone an apk file: copy the existing apk, replace the L<assets|/assets>, re-sign, zipalign, return the name of the newly created apk file.
 
-     Parameter  Description                            
-  1  $android   Android                                
-  2  $oldApk    The file name of the apk to be cloned  
+     Parameter  Description
+  1  $android   Android build
+  2  $oldApk    The file name of the apk to be cloned
 
 =head2 lint($)
 
 Lint all the Java source code files for the app.
 
-     Parameter  Description    
-  1  $android   Android build  
+     Parameter  Description
+  1  $android   Android build
 
 =head2 install($)
 
-Install an already L<compiled|/compile> app on the selected L<device|/device>
+Install an already L<compiled|/compile> app on to the selected L<device|/device>
 
-     Parameter  Description    
-  1  $android   Android build  
+     Parameter  Description
+  1  $android   Android build
 
 =head2 run($)
 
 L<Compile|/compile> the app, L<install|/install> and then run it on the selected L<device|/device>
 
-     Parameter  Description    
-  1  $android   Android build  
+     Parameter  Description
+  1  $android   Android build
 
 
 =head1 Index
@@ -1021,7 +1021,7 @@ L<http://www.appaapps.com|http://www.appaapps.com>
 
 =head1 Copyright
 
-Copyright (c) 2016-2017 Philip R Brenan.
+Copyright (c) 2016-2018 Philip R Brenan.
 
 This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.

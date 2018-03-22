@@ -1,5 +1,11 @@
 Revision history for Perl module Dist-Zilla-PluginBundle-Author-DOHERTY
 
+0.42      2018-03-19
+ - Excise long-deprecated GoogleCode release options
+
+0.41      2018-03-19
+ - Remove files from the repo which are no longer produced in the build
+
 0.40      2016-06-11
   - switch installer default from [DualBuilders] to [MakeMaker] (GH#8, ether)
 

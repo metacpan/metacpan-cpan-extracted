@@ -1,5 +1,5 @@
 package Statocles::Event;
-our $VERSION = '0.087';
+our $VERSION = '0.088';
 # ABSTRACT: Events objects for Statocles
 
 #pod =head1 EVENTS
@@ -41,7 +41,7 @@ Statocles::Event - Events objects for Statocles
 
 =head1 VERSION
 
-version 0.087
+version 0.088
 
 =head1 ATTRIBUTES
 

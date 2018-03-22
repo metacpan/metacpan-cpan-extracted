@@ -5,6 +5,22 @@ use strict;
 
 DBD::ODBC::Changes - Log of significant changes to the DBD::ODBC
 
+1.58 2018-03-01
+
+  [MISCELLANEOUS]
+
+  Various changes to the test suite to get better results with Postgres
+
+1.57 2018-03-01
+
+  [MISCELLANEOUS]
+
+  Merged pull request 6 from genio which allows Makefile.PL argument -u
+  to be set via the environment variable DBD_ODBC_UNICODE
+
+  This version was removed from CPAN because it was uploaded with a nasty
+  bug in the diagnostics code.
+
 1.56 2016-10-06
 
   Full release of the 1.53 development series

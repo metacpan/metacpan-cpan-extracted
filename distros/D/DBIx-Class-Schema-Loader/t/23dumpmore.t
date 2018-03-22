@@ -620,7 +620,7 @@ $t->dump_test(
     },
     regexes => {
         Foo => [
-            qr/^\# Created by DBIx::Class::Schema::Loader v[\d.]+$/m,
+            qr/^\# Created by DBIx::Class::Schema::Loader v[\d._]+$/m,
         ],
     },
 );

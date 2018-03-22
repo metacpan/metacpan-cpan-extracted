@@ -1,5 +1,13 @@
 Revision history for Mojolicious-Plugin-BasicAuthPlus
 
+0.11.0 2018-03-21
+  - Now use Net::LDAP directly instead of Authen::Simple::LDAP.
+  - Fixed support for TLS using Net::LDAP's start_tls method.
+  - Added option to return LDAP handle on request after successful
+    authentication/bind.
+  - Renamed check_auth() to _check_auth(), because it's intended to be
+    used only internally.
+
 0.10.2 2015-08-05
   - Uncouple validation and response/action of authentication (Nicolas
     Georges)

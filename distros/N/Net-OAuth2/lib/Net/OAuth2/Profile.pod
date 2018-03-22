@@ -68,6 +68,7 @@ Additional parameters for the command.
   client_id          <required>
   client_secret      <required>
   grant_type         <required>
+  hd                 undef
   scope              undef
   secrets_in_params  <true>
   site               undef
@@ -82,6 +83,16 @@ Additional parameters for the command.
 =item client_secret => STRING
 
 =item grant_type => STRING
+
+=item hd => STRING
+
+Passthrough parameter that allows you to restrict one's login to a particular
+Google Apps domain. The application making the call should check that the
+returned value for hd matches the expected domain, as the user can change the
+hd parameter in the original request.
+
+See F<https://developers.google.com/identity/protocols/OpenIDConnect#hd-param>
+for more details.
 
 =item scope => STRING
 
@@ -132,6 +143,8 @@ Merge the access token inside a form body via 'form-body:oauth_token'
 =item $obj-E<gt>B<bearer_token_scheme>()
 
 =item $obj-E<gt>B<grant_type>()
+
+=item $obj-E<gt>B<hd>()
 
 =item $obj-E<gt>B<id>()
 
@@ -227,17 +240,17 @@ to L<new(site)|Net::OAuth2::Profile/"Constructors">.
 
 =head1 SEE ALSO
 
-This module is part of Net-OAuth2 distribution version 0.63,
-built on January 18, 2016. Website: F<http://perl.overmeer.net>.
+This module is part of Net-OAuth2 distribution version 0.64,
+built on March 21, 2018. Website: F<http://perl.overmeer.net/CPAN/>.
 
 =head1 COPYRIGHTS
 
-Copyrights 2013-2016 on the perl code and the related documentation
- by [Mark Overmeer] for SURFnet bv, The Netherlands.  For other contributors see Changes.
+Copyrights 2013-2018-2018 on the perl code and the related documentation
+ by [Mark Overmeer <markov@cpan.org>] for SURFnet bv, The Netherlands.  For other contributors see ChangeLog.
 
 Copyrights 2011-12 by Keith Grennan.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

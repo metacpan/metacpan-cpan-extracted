@@ -13,14 +13,13 @@ sub new {
     return $self;
 }
 #---------------------------------------------------------------------
-sub _addToTypeStore {
+sub _addToTypeStore { ## no critic (Private subroutine/method) used in chaining
     my $self = shift;
     my ($Signature, $NewExpectedParameters) = @_;
-    my $SignatureKey = join('',@$Signature);
+    my $SignatureKey = join('',@{$Signature});
     my $Parameter = Test::Mockify::Parameter->new($NewExpectedParameters);
     $Parameter->buildReturn()->thenCall($self->{'OriginalMethodPointer'});
     push(@{$self->{'TypeStore'}{$SignatureKey}}, $Parameter );
     return;
 }
-
 1;

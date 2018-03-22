@@ -1,5 +1,14 @@
 Revision history for Test-BDD-Cucumber-Definitions
 
+0.27 2018-03-20T20:29:03Z
+
+    [ All ]
+    - The "validator_n" validation function has been added
+    - Requirement IPC::Run3 was added
+
+    [ File ]
+    - Module File was added
+
 0.26 2018-03-11T20:32:12Z
 
     [ HTTP ]

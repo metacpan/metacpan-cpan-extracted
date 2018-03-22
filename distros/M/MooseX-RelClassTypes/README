@@ -1,0 +1,35 @@
+MooseX-RelClassTypes version 0.01
+=================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries
+
+    Moose
+    MooseX::Role::Parameterized
+    Module::Runtime
+    Carp
+    Clone
+
+The following additional modules are required for testing:
+
+    Test::More
+
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2018 by Tom Gracey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

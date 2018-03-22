@@ -1,5 +1,8 @@
 Revision history for JavaScript-Beautifier
 
+0.21    2018-03-21
+        - Double backslashes fixes by eleonora45 (RT 124828)
+
 0.20    2015-12-05
         - fix POD by gregor herrmann
 

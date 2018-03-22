@@ -1,9 +1,9 @@
 package Net::DNS::SEC::Private;
 
 #
-# $Id: Private.pm 1616 2018-01-22 08:54:52Z willem $
+# $Id: Private.pm 1644 2018-03-05 20:58:58Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1616 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1644 $)[1];
 
 
 =head1 NAME
@@ -85,103 +85,9 @@ sub _new_params {
 	}
 
 	my $self = bless sub { $param->{shift()} }, $class;
-	$self->algorithm;					# force exception if undefined
-	$self->signame;						# ditto
+	croak 'no algorithm specified' unless $self->algorithm;
+	croak 'no signame specified'   unless $self->signame;
 	return $self;
-}
-
-
-sub generate_rsa {
-	eval <<'SUBEND'						# compile on demand
-	my ( $class, $domain, $flags, $keysize, $entropy, $algcode ) = @_;
-
-	$keysize ||= 1024;
-
-	require Crypt::OpenSSL::RSA;
-
-	if ( defined($entropy) ) {
-		require Crypt::OpenSSL::Random;
-		Crypt::OpenSSL::Random::random_seed($entropy);
-		Crypt::OpenSSL::RSA->import_random_seed();
-	}
-
-	my $rsa = Crypt::OpenSSL::RSA->generate_key($keysize);
-
-	my $keyblob = $rsa->get_private_key_string;
-
-	return $class->new_rsa_priv( $keyblob, $domain, $flags, $algcode );
-SUBEND
-}
-
-
-sub new_rsa_priv {
-	eval <<'SUBEND'						# compile on demand
-	my ( $class, $keyblob, $domain, $flags, $keysize, $entropy, $algcode ) = @_;
-
-	carp 'future release will not support deprecated method';
-
-	$flags	 ||= 256;
-	$keysize ||= 1024;
-	$algcode ||= 5;
-
-	require Crypt::OpenSSL::RSA;
-
-	my $rsa = Crypt::OpenSSL::RSA->new_private_key($keyblob);
-
-	my @params = map $_->to_bin, $rsa->get_key_parameters;
-	my @base64 = map encode_base64( $_, '' ), @params;	# private key
-
-	my ( $modulus, $exponent ) = @params;			# public key
-	my $explen = length $exponent;
-	# my $format = $explen < 256 ? 'C a* a*' : 'xn a* a*';	# RFC3110, section 2
-	my $format = 'C a* a*';					# real world
-	my $keybin = pack $format, $explen, $exponent, $modulus;
-
-	my $dnskey = new Net::DNS::RR(
-		name	  => $domain,
-		type	  => 'DNSKEY',
-		algorithm => $algcode,
-		flags	  => $flags,
-		keybin	  => $keybin,
-		);
-
-	my $algorithm = $dnskey->algorithm;
-	my $mnemonic  = $dnskey->algorithm('MNEMONIC');
-	my $keytag    = $dnskey->keytag;
-
-	my $private_key = <<"END";
-Private-key-format: v1.2
-Algorithm: $algorithm ($mnemonic)
-Modulus: $base64[0]
-PublicExponent: $base64[1]
-PrivateExponent: $base64[2]
-Prime1: $base64[3]
-Prime2: $base64[4]
-Exponent1: $base64[5]
-Exponent2: $base64[6]
-Coefficient: $base64[7]
-END
-	return $class->_new_params(
-		algorithm	     => $algorithm,
-		keytag		     => $keytag,
-		signame		     => $dnskey->signame,
-		privatekeyname	     => $dnskey->privatekeyname,
-		flags		     => $dnskey->flags,
-		Modulus		     => $base64[0],
-		PublicExponent	     => $base64[1],
-		PrivateExponent	     => $base64[2],
-		Prime1		     => $base64[3],
-		Prime2		     => $base64[4],
-		Exponent1	     => $base64[5],
-		Exponent2	     => $base64[6],
-		Coefficient	     => $base64[7],
-		dump_rsa_priv	     => $private_key,
-		dump_rsa_pub	     => $dnskey->key,
-		dump_rsa_keytag	     => $keytag,
-		dump_rsa_private_pem => $rsa->get_private_key_string,
-		dump_rsa_private_der => $rsa->get_private_key_string,	# historical
-		);
-SUBEND
 }
 
 
@@ -195,16 +101,8 @@ sub AUTOLOAD {				## Default method
 	$attribute =~ tr/A-Za-z0-9\000-\377/a-za-z0-9/d;
 
 	# Build a method in the class
-	*{$AUTOLOAD} = sub {
-		my $self = shift;
-		return if $attribute eq 'destroy';		# fail silently (in cleanup)
-		&$self($attribute) || croak "'$attribute' not defined";
-	};
+	*{$AUTOLOAD} = sub { &{shift()}($attribute) };
 
-carp <<"END" if $attribute =~ /^dumprsa/;
-Warning: $AUTOLOAD is deprecated
-and may be removed in a future release
-END
 	# and jump to it
 	goto &{$AUTOLOAD};
 }
@@ -275,88 +173,9 @@ Returns a string which represents a date in the form 20141212123456.
 Returns undefined value for key formats older than v1.3.
 
 
-=head1 RSA SPECIFIC HELPER FUNCTIONS
-
-These functions may be useful to generate RSA private keys and
-import PEM format RSA private keys.
-
-=head2 new_rsa_priv
-
-    $private = Net::DNS::SEC::Private->new_rsa_priv( $keyblob,
-						     $domain,
-						     $flag,
-						     $algorithm
-						);
-
-Constructor method which creates a Net::DNS::SEC::Private object from
-the supplied PEM keyblob.
-
-The second argument specifies the domain name for which this key will
-be used.
-
-The flag argument should be either 257 or 256 for SEP and non-SEP key
-respectively.
-
-The keyblob should include the -----BEGIN...----- and -----END...----- lines.
-The padding is set to PKCS1_OAEP.
-
-
-=head2 dump_rsa_priv
-
-    $BIND_private_key = $private->dump_rsa_priv();
-  
-Returns the content of a BIND private keyfile (Private-key-format: v1.2).
-
-
-=head2 dump_rsa_pub
-
-    $public_key = $private->dump_rsa_pub();
-
-Returns the public key field of the DNSKEY resource record.
-
-
-=head2 dump_rsa_keytag
-    
-    $keytag = $private->dump_rsa_keytag();
-
-Returns the keytag field of the DNSKEY resource record.
-
-
-=head2 dump_rsa_private_pem
-
-    $keyblob = $private->dump_rsa_private_pem();
-
-Return the PEM-encoded representation of the private key.
-(Same format that can be read with the new_rsa_priv method.)
-
-
-=head2 generate_rsa
-
-    $newkey = Net::DNS::SEC::Private->generate_rsa( "example.com",
-					256, 1024, $random, $algorithm );
-    print $newkey->dump_rsa_priv();
-    print $newkey->dump_rsa_pub();
-
-
-Uses Crypt::OpenSSL::RSA generate_key to create a keypair.
-
-The first argument is the name of the key.
-
-The flag field takes the value of 257 for key-signing keys and ther
-value of 256 for zone signing keys.
-
-The 3rd argument is the keysize (default 1024).
-
-The 4th argument, if defined, is passed to the Crypt::OpenSSL::Random
-random_seed method (see Crypt::OpenSSL::RSA for details), not needed
-with a proper /dev/random.
-
-The 5th argument specifies the algorithm if not RSASHA1 (the default).
-
-
 =head1 COPYRIGHT
 
-Copyright (c)2014 Dick Franks
+Copyright (c)2014,2018 Dick Franks
 
 All Rights Reserved
 

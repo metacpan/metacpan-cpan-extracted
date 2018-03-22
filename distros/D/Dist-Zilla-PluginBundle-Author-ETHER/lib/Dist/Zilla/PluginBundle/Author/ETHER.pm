@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.134-5-gf11b9e2
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.135-3-gbdbe2b3
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.135';
+our $VERSION = '0.136';
 
 use Moose;
 with
@@ -313,8 +313,9 @@ sub configure
         [ 'Test::EOL'           => { ':version' => '0.17', finder => [qw(:InstallModules :ExecFiles @Author::ETHER/Examples :TestFiles :ExtraTestFiles)] } ],
         'MetaTests',
         [ 'Test::CPAN::Changes' => { ':version' => '0.012' } ],
+        [ 'GenerateFile::FromShareDir' => 'generate xt/author/changes_has_content.t' => { -dist => 'Dist-Zilla-PluginBundle-Author-ETHER', -source_filename => 'changes_has_content.t', -destination_filename => 'xt/author/changes_has_content.t' } ],
         'Test::ChangesHasContent',
-        [ 'Test::MinimumVersion' => { ':version' => '2.000003', max_target_perl => '5.006' } ],
+        [ 'Test::MinimumVersion' => { ':version' => '2.000008', max_target_perl => '5.006' } ],
         [ 'PodSyntaxTests'      => { ':version' => '5.040' } ],
         [ 'PodCoverageTests'    => { ':version' => '5.040' } ],
         [ 'Test::PodSpelling'   => { ':version' => '2.006003', stopwords => ['irc'], directories => [qw(examples lib script t xt)] } ],
@@ -608,7 +609,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.135
+version 0.136
 
 =head1 SYNOPSIS
 
@@ -701,9 +702,13 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     [MetaTests]
     [Test::CPAN::Changes]
     :version = 0.012
+    [GenerateFile::FromShareDir / generate xt/author/changes_has_content.t]
+    -dist = Dist-Zilla-PluginBundle-Author-ETHER
+    -source_filename = changes_has_content.t
+    -destinotion_filename = xt/author/changes_has_content.t
     [Test::ChangesHasContent]
     [Test::MinimumVersion]
-    :version = 2.000003
+    :version = 2.000008
     max_target_perl = 5.006
     [PodSyntaxTests]
     :version = 5.040

@@ -34,7 +34,7 @@
    "provides" : {
       "Android::Build" : {
          "file" : "lib/Android/Build.pm",
-         "version" : "20180316"
+         "version" : "20180318"
       }
    },
    "release_status" : "stable",
@@ -43,5 +43,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20180316"
+   "version" : "20180318"
 }

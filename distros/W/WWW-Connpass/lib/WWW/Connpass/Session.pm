@@ -24,6 +24,7 @@ sub new {
     my ($class, $user, $pass, $opt) = @_;
 
     my $mech = WWW::Connpass::Agent->new(%$opt, cookie_jar => {});
+    $mech->get('https://connpass.com/');
     $mech->get('https://connpass.com/login/');
     $mech->form_id('login_form');
     $mech->set_fields(username => $user, password => $pass);
@@ -56,11 +57,20 @@ sub _check_response_error_or_throw {
 }
 
 sub new_event {
-    my ($self, $title) = @_;
+    my ($self, $title, $opts) = @_;
+    $opts ||= {};
 
-    my $res = $self->{mech}->request_like_xhr(POST => 'http://connpass.com/api/event/', {
-        title => $title,
-        place => undef,
+    # pre-request (for referer check)
+    $self->{mech}->get($opts->{group} ? $opts->{group}->url : 'https://connpass.com/dashboard/');
+
+    my $url = $opts->{group} ? URI->new($opts->{group}->url) : URI->new('https://connpass.com/');
+    $url->scheme('https');
+    $url->path('/api/event/');
+
+    my $res = $self->{mech}->request_like_xhr(POST => $url->as_string, {
+        title  => $title,
+        place  => undef,
+        $opts->{group} ? (series => $opts->{group}->id) : (),
     });
     _check_response_error_or_throw($res);
 
@@ -70,7 +80,7 @@ sub new_event {
 
 sub fetch_event_by_id {
     my ($self, $event_id) = @_;
-    my $uri = sprintf 'http://connpass.com/api/event/%d', $event_id;
+    my $uri = sprintf 'https://connpass.com/api/event/%d', $event_id;
 
     my $res = $self->{mech}->get($uri);
     return if $res->code == 404;
@@ -80,15 +90,43 @@ sub fetch_event_by_id {
     return WWW::Connpass::Event->new(session => $self, event => $data);
 }
 
+sub fetch_event_owners {
+    my ($self, $event) = @_;
+    $self->_update_event_pre_flight_request($event);
+
+    my $uri = sprintf 'https://connpass.com/api/event/%d/owner/', $event->id;
+    my $res = $self->{mech}->get($uri);
+    return if $res->code == 404;
+    _check_response_error_or_throw($res);
+
+    my $data = $_JSON->decode($res->decoded_content);
+    return map { WWW::Connpass::User->new(user => $_) } @$data;
+}
+
 sub refetch_event {
     my ($self, $event) = @_;
     return $self->fetch_event_by_id($event->id);
 }
 
+sub _update_event_pre_flight_request {
+    my ($self, $event) = @_;
+
+    # pre-request (for referer check)
+    $self->{mech}->get(sprintf 'https://connpass.com/event/%d/edit/', $event->id);
+}
+
+sub _update_questionnaire_pre_flight_request {
+    my ($self, $questionnaire) = @_;
+
+    # pre-request (for referer check)
+    $self->{mech}->get(sprintf 'https://connpass.com/event/%d/edit/form/', $questionnaire->event);
+}
+
 sub update_event {
     my ($self, $event, $diff) = @_;
-    my $uri = sprintf 'http://connpass.com/api/event/%d', $event->id;
+    my $uri = sprintf 'https://connpass.com/api/event/%d', $event->id;
 
+    $self->_update_event_pre_flight_request($event);
     my $res = $self->{mech}->request_like_xhr(PUT => $uri, {
         %{ $event->raw_data },
         $event->place ? (
@@ -108,7 +146,9 @@ sub update_waitlist_count {
     my @update = map { $_->raw_data } map { delete $update{$_->id} || $_ } $event->waitlist_count();
     push @update => map { $_->raw_data } grep { $_->is_new } @waitlist_count;
 
-    my $uri = sprintf 'http://connpass.com/api/event/%d/participation_type/', $event->id;
+    my $uri = sprintf 'https://connpass.com/api/event/%d/participation_type/', $event->id;
+
+    $self->_update_event_pre_flight_request($event);
     my $res = $self->{mech}->request_like_xhr(PUT => $uri, \@update);
     _check_response_error_or_throw($res);
 
@@ -117,7 +157,7 @@ sub update_waitlist_count {
 
 sub fetch_questionnaire_by_event {
     my ($self, $event) = @_;
-    my $uri = sprintf 'http://connpass.com/api/question/%d', $event->id;
+    my $uri = sprintf 'https://connpass.com/api/question/%d', $event->id;
     my $res = $self->{mech}->get($uri);
     # HTTP::Response
     if ($res->code == 404) {
@@ -140,7 +180,9 @@ sub update_questionnaire {
     my ($self, $questionnaire, @question) = @_;
 
     my $method = $questionnaire->is_new ? 'POST' : 'PUT';
-    my $uri = sprintf 'http://connpass.com/api/question/%d', $questionnaire->event;
+    my $uri = sprintf 'https://connpass.com/api/question/%d', $questionnaire->event;
+
+    $self->_update_questionnaire_pre_flight_request($questionnaire);
     my $res = $self->{mech}->request_like_xhr($method => $uri, {
         %{ $questionnaire->raw_data },
         questions => [map { $_->raw_data } @question],
@@ -154,7 +196,7 @@ sub update_questionnaire {
 sub register_place {
     my ($self, %data) = @_;
 
-    my $res = $self->{mech}->request_like_xhr(POST => 'http://connpass.com/api/place/', \%data);
+    my $res = $self->{mech}->request_like_xhr(POST => 'https://connpass.com/api/place/', \%data);
     _check_response_error_or_throw($res);
 
     my $data = $_JSON->decode($res->decoded_content);
@@ -163,7 +205,9 @@ sub register_place {
 
 sub add_owner_to_event {
     my ($self, $event, $user) = @_;
-    my $uri = sprintf 'http://connpass.com/api/event/%d/owner/%d', $event->id, $user->id;
+    $self->_update_event_pre_flight_request($event);
+
+    my $uri = sprintf 'https://connpass.com/api/event/%d/owner/%d', $event->id, $user->id;
     my $res = $self->{mech}->request_like_xhr(POST => $uri, { id => $user->id });
     _check_response_error_or_throw($res);
 
@@ -173,7 +217,8 @@ sub add_owner_to_event {
 
 sub update_place {
     my ($self, $place, %data) = @_;
-    my $uri = sprintf 'http://connpass.com/api/place/%d', $place->id;
+
+    my $uri = sprintf 'https://connpass.com/api/place/%d', $place->id;
     my $res = $self->{mech}->request_like_xhr(PUT => $uri, {
         %{ $place->raw_data },
         %data,
@@ -187,7 +232,7 @@ sub update_place {
 sub fetch_all_places {
     my $self = shift;
 
-    my $res = $self->{mech}->get('http://connpass.com/api/place/');
+    my $res = $self->{mech}->get('https://connpass.com/api/place/');
     _check_response_error_or_throw($res);
 
     my $data = $_JSON->decode($res->decoded_content);
@@ -196,7 +241,7 @@ sub fetch_all_places {
 
 sub fetch_place_by_id {
     my ($self, $place_id) = @_;
-    my $uri = sprintf 'http://connpass.com/api/place/%d', $place_id;
+    my $uri = sprintf 'https://connpass.com/api/place/%d', $place_id;
 
     my $res = $self->{mech}->get($uri);
     return if $res->code == 404;
@@ -213,7 +258,7 @@ sub refetch_place {
 
 sub search_users_by_name {
     my ($self, $name) = @_;
-    my $uri = URI->new('http://connpass.com/api/user/');
+    my $uri = URI->new('https://connpass.com/api/user/');
     $uri->query_form(q => $name);
 
     my $res = $self->{mech}->get($uri);
@@ -225,7 +270,7 @@ sub search_users_by_name {
 
 sub fetch_managed_events {
     my $self = shift;
-    my $res = $self->{mech}->get('http://connpass.com/editmanage/');
+    my $res = $self->{mech}->get('https://connpass.com/editmanage/');
     _check_response_error_or_throw($res);
     return map { WWW::Connpass::Event->new(session => $self, event => $_) }
         map { $_JSON->decode($_) } @{
@@ -235,7 +280,7 @@ sub fetch_managed_events {
 
 sub fetch_organized_groups {
     my $self = shift;
-    my $res = $self->{mech}->get('http://connpass.com/group/');
+    my $res = $self->{mech}->get('https://connpass.com/group/');
     _check_response_error_or_throw($res);
 
     my $groups = wq($res->decoded_content)->find('.series_lists_area .series_list .title a')->map(sub {
@@ -257,7 +302,7 @@ sub fetch_organized_groups {
 
 sub fetch_participants_info {
     my ($self, $event) = @_;
-    my $uri = sprintf 'http://connpass.com/event/%d/participants_csv/', $event->id;
+    my $uri = sprintf 'https://connpass.com/event/%d/participants_csv/', $event->id;
 
     my $res = $self->{mech}->get($uri);
     _check_response_error_or_throw($res);

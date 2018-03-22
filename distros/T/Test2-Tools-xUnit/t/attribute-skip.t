@@ -2,7 +2,7 @@ use Test2::V0;
 use Test2::API 'intercept';
 
 my $events = intercept {
-    do "./t/fixtures/attribute-skip.t";
+    do "./t/fixtures/attribute-skip.it";
 };
 
 is $events, array {

@@ -5,7 +5,7 @@ use warnings;
 use base 'DBIx::Class::Schema::Loader::DBI';
 use mro 'c3';
 
-our $VERSION = '0.07048';
+our $VERSION = '0.07049';
 
 =head1 NAME
 
@@ -24,7 +24,7 @@ sub _columns_info_for {
     my $self    = shift;
     my ($table) = @_;
 
-    my $result = $self->next::method(@_);
+    my ($result,$raw) = $self->next::method(@_);
 
     while (my ($col, $info) = each %$result) {
         if (my $def = $info->{default_value}) {
@@ -52,7 +52,7 @@ sub _columns_info_for {
         }
     }
 
-    return $result;
+    return wantarray ? ($result, $raw) : $result;
 }
 
 1;

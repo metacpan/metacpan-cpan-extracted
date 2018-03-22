@@ -34,7 +34,7 @@ my @tests = (
     },
     {
         test_name => 'remove things referenced by short form, full name, moniker',
-        remove_plugins => [ '=Dist::Zilla::Plugin::Keywords', 'generate CONTRIBUTING' ],
+        remove_plugins => [ '=Dist::Zilla::Plugin::Keywords', 'generate CONTRIBUTING', 'generate xt/author/changes_has_content.t' ],
         unwanted_plugins => [
             @network_plugins,
             qw(Keywords GenerateFile::FromShareDir),
@@ -60,7 +60,7 @@ subtest $_->{test_name} => sub
                             'Test::MinimumVersion.max_target_perl' => '5.008',
                             # necessary, as there are no files added to the build to read a version from
                             'RewriteVersion::Transitional.skip_version_provider' => 1,
-                            airplane => 1,
+                            airplane => 1,  # removes network plugins
                             @$remove ? ('-remove' => $remove) : (),
                             # since we don't do a build, not removing the git- and network-based plugins is okay.
                         } ],

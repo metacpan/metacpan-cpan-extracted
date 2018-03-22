@@ -17,13 +17,12 @@ meta-spec:
   version: '1.4'
 name: WordList
 requires:
-  WordListC: '0'
-  base: '0'
+  strict: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WordList
   homepage: https://metacpan.org/release/WordList
   repository: git://github.com/perlancar/perl-WordList.git
-version: 0.1.4
+version: 0.2.1
 x_Dist_Zilla:
   perl:
     version: '5.026001'

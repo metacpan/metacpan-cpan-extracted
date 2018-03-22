@@ -17,6 +17,7 @@ use Test::NoTabs;
 my @files = (
     'lib/Lingua/EN/Opinion.pm',
     'lib/Lingua/EN/Opinion/Emotion.pm',
+    'lib/Lingua/EN/Opinion/Emotion.pod',
     'lib/Lingua/EN/Opinion/Negative.pm',
     'lib/Lingua/EN/Opinion/Positive.pm',
     't/00-compile.t',

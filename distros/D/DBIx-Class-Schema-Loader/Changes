@@ -1,5 +1,14 @@
 Revision history for Perl extension DBIx::Class::Schema::Loader
 
+0.07049 - 2018-03-21
+        - Fix tests when the path to perl has spaces in it (GH#19)
+        - Inline String::CamelCase::wordsplit() due to RT#123030
+        - Get enum values from DBD::Pg if it's new enough
+        - Remove dependency on DBIx::Class::IntrospectableM2M
+
+0.07048_01 - 2018-02-23
+        - Convert from Module::Install to ExtUtils::MakeMaker + Distar (GH#17)
+
 0.07048  2018-01-20
         - Fix for PostgreSQL enums not in the schema search path (RT#123234)
         - Fix 'default now()' test for PostgreSQL v10

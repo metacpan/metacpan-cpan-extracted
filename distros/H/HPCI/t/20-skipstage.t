@@ -252,26 +252,28 @@ sub run_a_test {
         }
 
         for my $file ( @{ $parms->{build} } ) {
+            my $fname = "$workdir/f.$file";
             chain_stage(
                 name => "build_$file",
                 code => sub {
                     sleep 1;
-                    open my $fd, '>', "$workdir/f.in"
-                        or return "open $workdir/f.in for write failed: $!";
+                    open my $fd, '>', $fname
+                        or return "open $fname for write failed: $!";
                     print $fd "hi\n"
-                        or return "write to $workdir/f.in failed: $!";
+                        or return "write to $fname failed: $!";
                     close $fd
-                        or return "close $workdir/f.in failed: $!";
+                        or return "close $fname failed: $!";
+                    sleep 1;
                     return undef;
                 },
                 # command => "sleep 1;echo hi > $workdir/f.$file",
                 files => {
-                    out => { req => "$workdir/f.$file" }
+                    out => { req => "$fname" }
                 },
             );
         }
 
-        my $cmdS1 = "cp $workdir/f.in $workdir/f.tmp$s1";
+        my $cmdS1 = "sleep 1; cp $workdir/f.in $workdir/f.tmp$s1";
         chain_stage(
             name    => 'S1',
             ( $dispatch eq 'command'
@@ -292,7 +294,7 @@ sub run_a_test {
             },
         );
 
-        my $cmdS2 = "cp $workdir/f.out $workdir/f.tmp$s2";
+        my $cmdS2 = "sleep 1; cp $workdir/f.out $workdir/f.tmp$s2";
         chain_stage(
             name    => 'S2',
             ( $dispatch eq 'command'
@@ -315,7 +317,7 @@ sub run_a_test {
         #use Data::Dump qw(dump);
         #print STDERR "\n---===---\nAfter executing test: $test_name\n",
             #"stat:\n", dump($stat), "workdir:\n",
-            #qx(ls -l $workdir)
+            #map { "$_:\t" . (-M $_) . "\n" } <$workdir/*>,
             #;
         pairwise { check_stat( $stat, $a, $b ) } @check_stages, @{ $parms->{stage_stat} };
         pairwise { check_file( $a, $b ) }        @check_files, @{ $parms->{file_stat} };

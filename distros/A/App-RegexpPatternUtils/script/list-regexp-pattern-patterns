@@ -1,0 +1,677 @@
+#!perl
+
+our $DATE = '2018-03-21'; # DATE
+our $VERSION = '0.003'; # VERSION
+
+use 5.010001;
+use strict 'subs', 'vars';
+use warnings;
+
+use Perinci::CmdLine::Any;
+use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
+
+our %SPEC;
+
+my $res = gen_read_table_func(
+    name => 'list_regexp_pattern_patterns',
+    summary => 'List Regexp::Pattern::* patterns',
+    table_spec => {
+        fields => {
+            module => {
+                schema => 'str*',
+                pos => 0,
+                sortable => 1,
+            },
+            name => {
+                schema => 'str*',
+                pos => 1,
+                sortable => 1,
+            },
+            summary => {
+                schema => 'str*',
+                pos => 2,
+            },
+            pattern => {
+                schema => 'str',
+                pos => 3,
+            },
+            is_dynamic => {
+                schema => 'bool*',
+                pos => 4,
+            },
+            dynamic_args => {
+                schema => 'str',
+                pos => 5,
+            },
+        },
+        pk => 'name',
+    },
+    table_data => sub {
+        require PERLANCAR::Module::List;
+
+        my ($query) = @_;
+
+        my $res = PERLANCAR::Module::List::list_modules(
+            'Regexp::Pattern::', {list_modules=>1, recurse=>1});
+
+        #use DD; dd $query;
+
+        my @res;
+        for my $mod (sort keys %$res) {
+            next if defined $query->{args}{"module.is"} &&
+                $query->{args}{"module.is"} ne $mod;
+            (my $mod_pm = "$mod.pm") =~ s!::!/!g;
+            require $mod_pm;
+
+            my $var = \%{"$mod\::RE"};
+
+            for my $patname (sort keys %$var) {
+                my $patspec = $var->{$patname};
+                my $rec = {
+                    module => $mod,
+                    name => $patname,
+                    summary => $patspec->{summary},
+                };
+                if ($patspec->{gen}) {
+                    $rec->{is_dynamic} = 1;
+                    $rec->{dynamic_args} =
+                        join(",", sort keys %{$patspec->{gen_args} // {}});
+                } else {
+                    $rec->{is_dynamic} = 0;
+                    $rec->{pattern} = "$patspec->{pat}";
+                }
+                push @res, $rec;
+            }
+        }
+        return {data=>\@res};
+    },
+);
+die "Can't generate function: $res->[0] - $res->[1]" unless $res->[0] == 200;
+
+Perinci::CmdLine::Any->new(
+    url => '/main/list_regexp_pattern_patterns',
+    read_config => 0,
+    read_env => 0,
+)->run;
+
+# ABSTRACT: List Regexp::Pattern::* patterns
+# PODNAME: list-regexp-pattern-patterns
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+list-regexp-pattern-patterns - List Regexp::Pattern::* patterns
+
+=head1 VERSION
+
+This document describes version 0.003 of list-regexp-pattern-patterns (from Perl distribution App-RegexpPatternUtils), released on 2018-03-21.
+
+=head1 SYNOPSIS
+
+ % list-regexp-pattern-patterns
+ % list-regexp-pattern-patterns -l
+
+=head1 DESCRIPTION
+
+REPLACE ME
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Field selection options
+
+=over
+
+=item B<--detail>, B<-l>
+
+Return array of full records instead of just ID fields.
+
+By default, only the key (ID) field is returned per result entry.
+
+
+=item B<--field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--field>.
+
+=item B<--with-field-names>
+
+Return field names in each record (as hash/associative array).
+
+When enabled, function will return each record as hash/associative array
+(field name => value pairs). Otherwise, function will return each record
+as list/array (field value, field value, ...).
+
+
+=back
+
+=head2 Filtering for dynamic_args options
+
+=over
+
+=item B<--dynamic-args-contains>=I<s>
+
+Only return records where the 'dynamic_args' field contains specified text.
+
+=item B<--dynamic-args-in-json>=I<s>
+
+Only return records where the 'dynamic_args' field is in the specified values (JSON-encoded).
+
+See C<--dynamic-args-in>.
+
+=item B<--dynamic-args-in>=I<s@>
+
+Only return records where the 'dynamic_args' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--dynamic-args-is>=I<s>
+
+Only return records where the 'dynamic_args' field equals specified value.
+
+=item B<--dynamic-args-isnt>=I<s>
+
+Only return records where the 'dynamic_args' field does not equal specified value.
+
+=item B<--dynamic-args-max>=I<s>
+
+Only return records where the 'dynamic_args' field is less than or equal to specified value.
+
+=item B<--dynamic-args-min>=I<s>
+
+Only return records where the 'dynamic_args' field is greater than or equal to specified value.
+
+=item B<--dynamic-args-not-contains>=I<s>
+
+Only return records where the 'dynamic_args' field does not contain specified text.
+
+=item B<--dynamic-args-not-in-json>=I<s>
+
+Only return records where the 'dynamic_args' field is not in the specified values (JSON-encoded).
+
+See C<--dynamic-args-not-in>.
+
+=item B<--dynamic-args-not-in>=I<s@>
+
+Only return records where the 'dynamic_args' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--dynamic-args-xmax>=I<s>
+
+Only return records where the 'dynamic_args' field is less than specified value.
+
+=item B<--dynamic-args-xmin>=I<s>
+
+Only return records where the 'dynamic_args' field is greater than specified value.
+
+=item B<--dynamic-args>=I<s>
+
+Only return records where the 'dynamic_args' field equals specified value.
+
+=back
+
+=head2 Filtering for is_dynamic options
+
+=over
+
+=item B<--is-dynamic>
+
+Only return records where the 'is_dynamic' field equals specified value.
+
+=item B<--is-dynamic-is>
+
+Only return records where the 'is_dynamic' field equals specified value.
+
+=item B<--is-dynamic-isnt>
+
+Only return records where the 'is_dynamic' field does not equal specified value.
+
+=back
+
+=head2 Filtering for module options
+
+=over
+
+=item B<--module-contains>=I<s>
+
+Only return records where the 'module' field contains specified text.
+
+=item B<--module-in-json>=I<s>
+
+Only return records where the 'module' field is in the specified values (JSON-encoded).
+
+See C<--module-in>.
+
+=item B<--module-in>=I<s@>
+
+Only return records where the 'module' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--module-is>=I<s>
+
+Only return records where the 'module' field equals specified value.
+
+=item B<--module-isnt>=I<s>
+
+Only return records where the 'module' field does not equal specified value.
+
+=item B<--module-max>=I<s>
+
+Only return records where the 'module' field is less than or equal to specified value.
+
+=item B<--module-min>=I<s>
+
+Only return records where the 'module' field is greater than or equal to specified value.
+
+=item B<--module-not-contains>=I<s>
+
+Only return records where the 'module' field does not contain specified text.
+
+=item B<--module-not-in-json>=I<s>
+
+Only return records where the 'module' field is not in the specified values (JSON-encoded).
+
+See C<--module-not-in>.
+
+=item B<--module-not-in>=I<s@>
+
+Only return records where the 'module' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--module-xmax>=I<s>
+
+Only return records where the 'module' field is less than specified value.
+
+=item B<--module-xmin>=I<s>
+
+Only return records where the 'module' field is greater than specified value.
+
+=item B<--module>=I<s>
+
+Only return records where the 'module' field equals specified value.
+
+=back
+
+=head2 Filtering for name options
+
+=over
+
+=item B<--name-contains>=I<s>
+
+Only return records where the 'name' field contains specified text.
+
+=item B<--name-in-json>=I<s>
+
+Only return records where the 'name' field is in the specified values (JSON-encoded).
+
+See C<--name-in>.
+
+=item B<--name-in>=I<s@>
+
+Only return records where the 'name' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--name-is>=I<s>
+
+Only return records where the 'name' field equals specified value.
+
+=item B<--name-isnt>=I<s>
+
+Only return records where the 'name' field does not equal specified value.
+
+=item B<--name-max>=I<s>
+
+Only return records where the 'name' field is less than or equal to specified value.
+
+=item B<--name-min>=I<s>
+
+Only return records where the 'name' field is greater than or equal to specified value.
+
+=item B<--name-not-contains>=I<s>
+
+Only return records where the 'name' field does not contain specified text.
+
+=item B<--name-not-in-json>=I<s>
+
+Only return records where the 'name' field is not in the specified values (JSON-encoded).
+
+See C<--name-not-in>.
+
+=item B<--name-not-in>=I<s@>
+
+Only return records where the 'name' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--name-xmax>=I<s>
+
+Only return records where the 'name' field is less than specified value.
+
+=item B<--name-xmin>=I<s>
+
+Only return records where the 'name' field is greater than specified value.
+
+=item B<--name>=I<s>
+
+Only return records where the 'name' field equals specified value.
+
+=back
+
+=head2 Filtering for pattern options
+
+=over
+
+=item B<--pattern-contains>=I<s>
+
+Only return records where the 'pattern' field contains specified text.
+
+=item B<--pattern-in-json>=I<s>
+
+Only return records where the 'pattern' field is in the specified values (JSON-encoded).
+
+See C<--pattern-in>.
+
+=item B<--pattern-in>=I<s@>
+
+Only return records where the 'pattern' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--pattern-is>=I<s>
+
+Only return records where the 'pattern' field equals specified value.
+
+=item B<--pattern-isnt>=I<s>
+
+Only return records where the 'pattern' field does not equal specified value.
+
+=item B<--pattern-max>=I<s>
+
+Only return records where the 'pattern' field is less than or equal to specified value.
+
+=item B<--pattern-min>=I<s>
+
+Only return records where the 'pattern' field is greater than or equal to specified value.
+
+=item B<--pattern-not-contains>=I<s>
+
+Only return records where the 'pattern' field does not contain specified text.
+
+=item B<--pattern-not-in-json>=I<s>
+
+Only return records where the 'pattern' field is not in the specified values (JSON-encoded).
+
+See C<--pattern-not-in>.
+
+=item B<--pattern-not-in>=I<s@>
+
+Only return records where the 'pattern' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--pattern-xmax>=I<s>
+
+Only return records where the 'pattern' field is less than specified value.
+
+=item B<--pattern-xmin>=I<s>
+
+Only return records where the 'pattern' field is greater than specified value.
+
+=item B<--pattern>=I<s>
+
+Only return records where the 'pattern' field equals specified value.
+
+=back
+
+=head2 Filtering for summary options
+
+=over
+
+=item B<--summary-contains>=I<s>
+
+Only return records where the 'summary' field contains specified text.
+
+=item B<--summary-in-json>=I<s>
+
+Only return records where the 'summary' field is in the specified values (JSON-encoded).
+
+See C<--summary-in>.
+
+=item B<--summary-in>=I<s@>
+
+Only return records where the 'summary' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--summary-is>=I<s>
+
+Only return records where the 'summary' field equals specified value.
+
+=item B<--summary-isnt>=I<s>
+
+Only return records where the 'summary' field does not equal specified value.
+
+=item B<--summary-max>=I<s>
+
+Only return records where the 'summary' field is less than or equal to specified value.
+
+=item B<--summary-min>=I<s>
+
+Only return records where the 'summary' field is greater than or equal to specified value.
+
+=item B<--summary-not-contains>=I<s>
+
+Only return records where the 'summary' field does not contain specified text.
+
+=item B<--summary-not-in-json>=I<s>
+
+Only return records where the 'summary' field is not in the specified values (JSON-encoded).
+
+See C<--summary-not-in>.
+
+=item B<--summary-not-in>=I<s@>
+
+Only return records where the 'summary' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--summary-xmax>=I<s>
+
+Only return records where the 'summary' field is less than specified value.
+
+=item B<--summary-xmin>=I<s>
+
+Only return records where the 'summary' field is greater than specified value.
+
+=item B<--summary>=I<s>
+
+Only return records where the 'summary' field equals specified value.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--query>=I<s>, B<-q>
+
+Search.
+
+=back
+
+=head2 Ordering options
+
+=over
+
+=item B<--random>
+
+Return records in random order.
+
+=item B<--sort-json>=I<s>
+
+Order records according to certain field(s) (JSON-encoded).
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Order records according to certain field(s).
+
+A list of field names separated by comma. Each field can be prefixed with '-' to
+specify descending order instead of the default ascending.
+
+
+Can be specified multiple times.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Paging options
+
+=over
+
+=item B<--result-limit>=I<s>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<s>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C list-regexp-pattern-patterns list-regexp-pattern-patterns
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete list-regexp-pattern-patterns 'p/*/`list-regexp-pattern-patterns`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-RegexpPatternUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-RegexpPatternUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-RegexpPatternUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

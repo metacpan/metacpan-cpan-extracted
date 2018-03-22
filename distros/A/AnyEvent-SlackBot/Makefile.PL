@@ -34,6 +34,7 @@ WriteMakefile(
       LWP::UserAgent  6.26
       HTTP::Request  6.13
       AnyEvent::WebSocket::Client 0.39
+      Net::SSLeay 1.84
     )
     
     }, # e.g., Module::Name => 1.1

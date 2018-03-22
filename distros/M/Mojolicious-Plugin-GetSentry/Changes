@@ -1,0 +1,14 @@
+Revision history for Mojolicious-Plugin-GetSentry
+
+1.0.0   2018-03-21
+        Initial version
+
+1.1.0   2018-03-22
+        Add Changes file
+        Handlers and custom handlers for better customization
+
+1.1.1   2018-03-22
+        Fix readme
+
+1.1.2   2018-03-22
+        Make cpan happy

@@ -23,7 +23,7 @@ use vars qw( @ISA $VERSION $ATTRIBUTION $drh $err $errstr $sqlstate );
 
 @ISA =   qw( DBD::File );
 
-$VERSION     = "0.49";
+$VERSION     = "0.50";
 $ATTRIBUTION = "DBD::CSV $DBD::CSV::VERSION by H.Merijn Brand";
 
 $err      = 0;		# holds error code   for DBI::err
@@ -31,8 +31,7 @@ $errstr   = "";		# holds error string for DBI::errstr
 $sqlstate = "";         # holds error state  for DBI::state
 $drh      = undef;	# holds driver handle once initialized
 
-sub CLONE		# empty method: prevent warnings when threads are cloned
-{
+sub CLONE {		# empty method: prevent warnings when threads are cloned
     } # CLONE
 
 # --- DRIVER -------------------------------------------------------------------
@@ -67,8 +66,7 @@ our @ISA = qw( DBD::File::dr );
 our $imp_data_size     = 0;
 our $data_sources_attr = undef;
 
-sub connect
-{
+sub connect {
     my ($drh, $dbname, $user, $auth, $attr) = @_;
     my $dbh = $drh->DBD::File::dr::connect ($dbname, $user, $auth, $attr);
     $dbh and $dbh->{Active} = 1;
@@ -84,8 +82,7 @@ use strict;
 our $imp_data_size = 0;
 our @ISA = qw( DBD::File::db );
 
-sub set_versions
-{
+sub set_versions {
     my $this = shift;
     $this->{csv_version} = $DBD::CSV::VERSION;
     return $this->SUPER::set_versions ();
@@ -93,8 +90,7 @@ sub set_versions
 
 my %csv_xs_attr;
 
-sub init_valid_attributes
-{
+sub init_valid_attributes {
     my $dbh = shift;
 
     # Straight from Text::CSV_XS.pm
@@ -131,7 +127,7 @@ sub init_valid_attributes
 
 	class tables in csv_in out csv_out skip_first_row
 
-	null sep quote escape
+	null sep quote escape bom
 	)};
 
     $dbh->{csv_readonly_attrs} = { };
@@ -141,8 +137,7 @@ sub init_valid_attributes
     return $dbh->SUPER::init_valid_attributes ();
     } # init_valid_attributes
 
-sub get_csv_versions
-{
+sub get_csv_versions {
     my ($dbh, $table) = @_;
     $table ||= "";
     my $class = $dbh->{ImplementorClass};
@@ -159,8 +154,7 @@ sub get_csv_versions
     return sprintf "%s using %s", $dbh->{csv_version}, $dtype;
     } # get_csv_versions
 
-sub get_info
-{
+sub get_info {
     my ($dbh, $info_type) = @_;
     require  DBD::CSV::GetInfo;
     my $v = $DBD::CSV::GetInfo::info{int ($info_type)};
@@ -168,9 +162,8 @@ sub get_info
     return $v;
     } # get_info
 
-sub type_info_all
-{
-    my $dbh = shift;
+sub type_info_all {
+#   my $dbh = shift;
     require   DBD::CSV::TypeInfo;
     return [@$DBD::CSV::TypeInfo::type_info_all];
     } # type_info_all
@@ -182,34 +175,40 @@ package DBD::CSV::st;
 use strict;
 
 our $imp_data_size = 0;
-our @ISA = qw(DBD::File::st);
+our @ISA = qw( DBD::File::st );
 
 package DBD::CSV::Statement;
 
 use strict;
 use Carp;
 
-our @ISA = qw(DBD::File::Statement);
+our @ISA = qw( DBD::File::Statement );
 
 package DBD::CSV::Table;
 
 use strict;
 use Carp;
 
-our @ISA = qw(DBD::File::Table);
+our @ISA = qw( DBD::File::Table );
 
-sub bootstrap_table_meta
-{
+#sub DESTROY {
+#    my $self = shift or return;
+#
+#    $self->{meta} and delete $self->{meta}{csv_in};
+#    } # DESTROY
+
+sub bootstrap_table_meta {
     my ($self, $dbh, $meta, $table) = @_;
     $meta->{csv_class} ||= $dbh->{csv_class} || "Text::CSV_XS";
     $meta->{csv_eol}   ||= $dbh->{csv_eol}   || "\r\n";
     exists $meta->{csv_skip_first_row} or
 	$meta->{csv_skip_first_row} = $dbh->{csv_skip_first_row};
+    exists $meta->{csv_bom} or
+	$meta->{csv_bom} = exists $dbh->{bom} ? $dbh->{bom} : $dbh->{csv_bom};
     $self->SUPER::bootstrap_table_meta ($dbh, $meta, $table);
     } # bootstrap_table_meta
 
-sub init_table_meta
-{
+sub init_table_meta {
     my ($self, $dbh, $meta, $table) = @_;
 
     $self->SUPER::init_table_meta ($dbh, $table, $meta);
@@ -252,8 +251,7 @@ my %compat_map = map { $_ => "csv_$_" }
 
 __PACKAGE__->register_compat_map (\%compat_map);
 
-sub table_meta_attr_changed
-{
+sub table_meta_attr_changed {
     my ($class, $meta, $attr, $value) = @_;
 
     (my $csv_attr = $attr) =~ s/^csv_//;
@@ -296,6 +294,12 @@ sub open_data {
 		    : exists $meta->{col_names} ? 0 : 1;
 	    defined $meta->{skip_rows} or
 		$meta->{skip_rows} = $skipRows;
+	    if ($meta->{csv_bom}) {
+		my @hdr = $attrs->{csv_csv_in}->header ($meta->{fh}) or
+		    croak "Failed using the header row: ".$attrs->{csv_csv_in}->error_diag;
+		$meta->{col_names} ||= \@hdr;
+		$skipRows and $skipRows = 0;
+		}
 	    if ($skipRows--) {
 		$array = $attrs->{csv_csv_in}->getline ($meta->{fh}) or
 		    croak "Missing first row due to ".$attrs->{csv_csv_in}->error_diag;
@@ -331,8 +335,7 @@ $DBI::VERSION < 1.623 and
     *open_file = \&open_data;
 use warnings;
 
-sub _csv_diag
-{
+sub _csv_diag {
     my @diag = $_[0]->error_diag;
     for (2, 3) {
 	defined $diag[$_] or $diag[$_] = "?";
@@ -340,8 +343,7 @@ sub _csv_diag
     return @diag;
     } # _csv_diag
 
-sub fetch_row
-{
+sub fetch_row {
     my ($self, $data) = @_;
 
     exists $self->{cached_row} and
@@ -352,8 +354,7 @@ sub fetch_row
     my $csv = $self->{csv_csv_in} or
 	return do { $data->set_err ($DBI::stderr, "Fetch from undefined handle"); undef };
 
-    my $fields;
-    eval { $fields = $csv->getline ($tbl->{fh}) };
+    my $fields = eval { $csv->getline ($tbl->{fh}) };
     unless ($fields) {
 	$csv->eof and return;
 
@@ -368,8 +369,7 @@ sub fetch_row
     $self->{row} = (@$fields ? $fields : undef);
     } # fetch_row
 
-sub push_row
-{
+sub push_row {
     my ($self, $data, $fields) = @_;
     my $tbl = $self->{meta};
     my $csv = $self->{csv_csv_out};
@@ -378,7 +378,8 @@ sub push_row
     unless ($csv->print ($fh, $fields)) {
 	my @diag = _csv_diag ($csv);
 	my $file = $tbl->{f_fqfn};
-	return do { $data->set_err ($DBI::stderr, "Error $diag[0] while writing file $file: $diag[1] \@ line $diag[3] pos $diag[2]"); undef };
+	return do { $data->set_err ($DBI::stderr,
+	    "Error $diag[0] while writing file $file: $diag[1] \@ line $diag[3] pos $diag[2]"); undef };
 	}
     1;
     } # push_row
@@ -559,27 +560,36 @@ The preferred way of passing the arguments is by driver attributes:
 
     # specify most possible flags via driver flags
     $dbh = DBI->connect ("dbi:CSV:", undef, undef, {
-	f_schema         => undef,
-	f_dir            => "data",
-	f_dir_search     => [],
-	f_ext            => ".csv/r",
-	f_lock           => 2,
-	f_encoding       => "utf8",
+        f_schema         => undef,
+        f_dir            => "data",
+        f_dir_search     => [],
+        f_ext            => ".csv/r",
+        f_lock           => 2,
+        f_encoding       => "utf8",
 
-	csv_eol          => "\r\n",
-	csv_sep_char     => ",",
-	csv_quote_char   => '"',
-	csv_escape_char  => '"',
-	csv_class        => "Text::CSV_XS",
-	csv_null         => 1,
-	csv_tables       => {
-	    info => { f_file => "info.csv" }
-	    },
+        csv_eol          => "\r\n",
+        csv_sep_char     => ",",
+        csv_quote_char   => '"',
+        csv_escape_char  => '"',
+        csv_class        => "Text::CSV_XS",
+        csv_null         => 1,
+        csv_bom          => 0,
+        csv_tables       => {
+            syspwd => {
+                sep_char    => ":",
+                quote_char  => undef,
+                escape_char => undef,
+                file        => "/etc/passwd",
+                col_names   => [qw( login password
+                                    uid gid realname
+                                    directory shell )],
+		},
+            },
 
-	RaiseError       => 1,
-	PrintError       => 1,
-	FetchHashKeyName => "NAME_lc",
-	}) or die $DBI::errstr;
+        RaiseError       => 1,
+        PrintError       => 1,
+        FetchHashKeyName => "NAME_lc",
+        }) or die $DBI::errstr;
 
 but you may set these attributes in the DSN as well, separated by semicolons.
 Pay attention to the semi-colon for C<csv_sep_char> (as seen in many CSV
@@ -596,6 +606,13 @@ Using attributes in the DSN is easier to use when the DSN is derived from an
 outside source (environment variable, database entry, or configure file),
 whereas specifying entries in the attribute hash is easier to read and to
 maintain.
+
+The default value for C<csv_binary> is C<1> (True).
+
+The default value for C<csv_auto_diag> is <1>. Note that this might cause
+trouble on perl versions older than 5.8.9, so up to and including perl
+version 5.8.8 it might be required to use C<;csv_auto_diag=0> inside the
+C<DSN> or C<csv_auto_diag => 0> inside the attributes.
 
 =head2 Creating and dropping tables
 
@@ -969,12 +986,38 @@ reset it with a false value. You can pass it to connect, or set it later:
 
   $dbh->{csv_null} = 1;
 
+=item csv_bom
+X<csv_bom>
+
+With this option set, the CSV parser will try to detect BOM (Byte Order Mark)
+in the header line. This requires L<Text::CSV_XS> version 1.22 or higher.
+
+  $dbh = DBI->connect ("dbi:CSV:", "", "", { csv_bom => 1 });
+
+  $dbh->{csv_bom} = 1;
+
 =item csv_tables
 X<csv_tables>
 
 This hash ref is used for storing table dependent metadata. For any
 table it contains an element with the table name as key and another
 hash ref with the following attributes:
+
+=over 4
+
+=item o
+
+All valid attributes to the CSV parsing module. Any of the can optionally
+be prefixed with C<csv_>.
+
+=item o
+
+All attributes valid to DBD::File
+
+=back
+
+If you pass it C<f_file> or its alias C<file>, C<f_ext> has no effect, but
+C<f_dir> and C<f_encoding> still have.
 
 =item csv_*
 X<csv_*>
@@ -1066,12 +1109,32 @@ used verbatim for column headers and field names.  DBD::CSV cannot guarantee
 that any part in the toolchain will work if field names have those characters,
 and the chances are high that the SQL statements will fail.
 
+Currently, the sanitizing of headers is as simple as
+
+  s/\W/_/g;
+
+Note that headers (column names) might be folded in other parts of the code
+stack, specifically SQL::Statement, whose docs mention:
+
+ Wildcards are expanded to lower cased identifiers. This might
+ confuse some people, but it was easier to implement.
+
+That means that in
+
+ my $sth = $dbh->prepare ("select * from foo");
+ $sth->execute;
+ while (my $row = $sth->fetchrow_hashref) {
+     say for keys %$row;
+     }
+
+all keys will show as all lower case, regardless of the original header.
+
 =back
 
 It's strongly recommended to check the attributes supported by
 L<DBD::File/Metadata>.
 
-Example: Suppose you want to use /etc/passwd as a CSV file. :-)
+Example: Suppose you want to use F</etc/passwd> as a CSV file. :-)
 There simplest way is:
 
     use DBI;
@@ -1230,7 +1293,7 @@ Previous maintainer was Jeff Zucker
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2016 by H.Merijn Brand
+Copyright (C) 2009-2018 by H.Merijn Brand
 Copyright (C) 2004-2009 by Jeff Zucker
 Copyright (C) 1998-2004 by Jochen Wiedmann
 

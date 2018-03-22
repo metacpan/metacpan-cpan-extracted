@@ -6,7 +6,7 @@ Test::Mockify::ReturnValue - To define return values
 
 =head1 DESCRIPTION
 
-Use L<Test::Modify::ReturnValue> to define different types of return values. See method description for more details.
+Use L<Test::Modify::ReturnValue|Test::Modify::ReturnValue> to define different types of return values. See method description for more details.
 
 =head1 METHODS
 
@@ -14,7 +14,7 @@ Use L<Test::Modify::ReturnValue> to define different types of return values. See
 package Test::Mockify::ReturnValue;
 use strict;
 use warnings;
-
+use Test::Mockify::Tools qw (Error);
 sub new {
     my $class = shift;
     my $self  = bless {
@@ -36,7 +36,7 @@ The C<thenReturn> method set the return value of C<call>.
 sub thenReturn {
     my $self = shift;
     my ($Value) = @_;
-    die('Return value undefined. Use "thenReturnUndef" if you need to return undef.') unless(defined $Value);
+    Error('Return value undefined. Use "thenReturnUndef" if you need to return undef.') unless(defined $Value);
     $self->{'Value'} = $Value;
 }
 =pod
@@ -54,7 +54,7 @@ The C<thenReturnArray> method sets the return value of C<call> in the way that i
 sub thenReturnArray {
     my $self = shift;
     my ($Value) = @_;
-    die('NoAnArrayRef') unless(ref($Value) eq 'ARRAY');
+    Error('NoAnArrayRef') unless(ref($Value) eq 'ARRAY');
     $self->{'ArrayValue'} = $Value;
 }
 =pod
@@ -72,7 +72,7 @@ The C<thenReturnArray> method sets the return value of C<call> in the way that i
 sub thenReturnHash {
     my $self = shift;
     my ($Value) = @_;
-    die('NoAHashRef') unless(ref($Value) eq 'HASH');
+    Error('NoAHashRef') unless(ref($Value) eq 'HASH');
     $self->{'HashValue'} = $Value;
 }
 =pod
@@ -105,7 +105,7 @@ The C<thenReturnArray> method sets the return value of C<call> in the way that i
 sub thenThrowError {
     my $self = shift;
     my ($ErrorCode) = @_;
-    die('NoErrorCode') unless($ErrorCode);
+    Error('NoErrorCode') unless($ErrorCode);
     $self->{'ErrorType'} = $ErrorCode;
     return;
 }
@@ -124,7 +124,7 @@ The C<thenCall> method change the C<call> Function in a way that it will trigger
 sub thenCall{
     my $self = shift;
     my ($FunctionPointer) = @_;
-    die('NoAnCodeRef') unless(ref($FunctionPointer) eq 'CODE');
+    Error('NoAnCodeRef') unless(ref($FunctionPointer) eq 'CODE');
     $self->{'FunctionPointer'} = $FunctionPointer;
     return;
 }
@@ -146,7 +146,7 @@ sub call {
     my $self = shift;
     my @Params = @_;
     if($self->{'ErrorType'}){
-        die($self->{'ErrorType'});
+        Error($self->{'ErrorType'});
 
     }elsif($self->{'ArrayValue'}){
         return @{$self->{'ArrayValue'}};
@@ -164,7 +164,7 @@ sub call {
         return $self->{'Value'};
 
     }else{
-        die('NoReturnValue');
+        Error('NoReturnValue');
     }
 }
 1;

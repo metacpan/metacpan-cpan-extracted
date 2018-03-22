@@ -10,7 +10,7 @@
 #
 
 package Text::Template;
-$Text::Template::VERSION = '1.51';
+$Text::Template::VERSION = '1.52';
 # ABSTRACT: Expand template text with embedded Perl
 
 use strict;
@@ -558,6 +558,7 @@ sub _install_hash {
             my $val = $hash->{$name};
 
             no strict 'refs';
+            no warnings 'redefine';
 
             local *SYM = *{"$ {dest}::$name"};
 
@@ -599,7 +600,7 @@ Text::Template - Expand template text with embedded Perl
 
 =head1 VERSION
 
-version 1.51
+version 1.52
 
 =head1 SYNOPSIS
 

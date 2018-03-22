@@ -54,11 +54,11 @@
    "provides" : {
       "Text::Template" : {
          "file" : "lib/Text/Template.pm",
-         "version" : "1.51"
+         "version" : "1.52"
       },
       "Text::Template::Preprocess" : {
          "file" : "lib/Text/Template/Preprocess.pm",
-         "version" : "1.51"
+         "version" : "1.52"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/mschout/perl-text-template"
       }
    },
-   "version" : "1.51",
+   "version" : "1.52",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

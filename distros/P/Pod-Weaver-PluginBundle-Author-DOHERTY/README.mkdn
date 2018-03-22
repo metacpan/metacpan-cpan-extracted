@@ -4,7 +4,7 @@ Pod::Weaver::PluginBundle::Author::DOHERTY - Pod::Weaver configuration the way D
 
 # VERSION
 
-version 0.009
+version 0.010
 
 # AVAILABILITY
 
@@ -16,7 +16,7 @@ site near you, or see [https://metacpan.org/module/Pod::Weaver::PluginBundle::Au
 
 # SOURCE
 
-The development version is on github at [http://github.com/doherty/Pod-Weaver-PluginBundle-Author-DOHERTY](http://github.com/doherty/Pod-Weaver-PluginBundle-Author-DOHERTY)
+The development version is on github at [https://github.com/doherty/Pod-Weaver-PluginBundle-Author-DOHERTY](https://github.com/doherty/Pod-Weaver-PluginBundle-Author-DOHERTY)
 and may be cloned from [git://github.com/doherty/Pod-Weaver-PluginBundle-Author-DOHERTY.git](git://github.com/doherty/Pod-Weaver-PluginBundle-Author-DOHERTY.git)
 
 # BUGS AND LIMITATIONS

@@ -1,3 +1,12 @@
+0.18 2018-03-21
+-support for tied scalar inputs in XS code
+
+0.17 2018-03-19
+-bugfix: in which sysread gives up and puts the code in __DATA__ after all
+
+0.16 2018-03-19
+-bugfix: mixed separators in generated source file path on some mswin32 systems
+
 0.15 2018-03-16
 -bugfix: split_path generates incorrect segments on //paths
 

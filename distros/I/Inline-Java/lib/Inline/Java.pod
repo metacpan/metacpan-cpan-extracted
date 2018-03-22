@@ -1038,7 +1038,7 @@ Here is an example of how to use C<Inline::Java> under mod_perl:
 See USING Inline::Java IN A CGI for more details.
 
 If you are using L<ModPerl::Registry>, make sure to use the C<PACKAGE>
-configuration option to specifiy the package in which C<Inline::Java>
+configuration option to specify the package in which C<Inline::Java>
 should bind the Java code, since L<ModPerl::Registry> will place your
 code in a package with a unpredictable name.
 

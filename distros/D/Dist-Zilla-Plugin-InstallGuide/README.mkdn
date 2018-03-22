@@ -4,7 +4,7 @@ Dist::Zilla::Plugin::InstallGuide - Build an INSTALL file
 
 # VERSION
 
-version 1.200007
+version 1.200009
 
 # SYNOPSIS
 
@@ -40,7 +40,7 @@ site near you, or see [https://metacpan.org/module/Dist::Zilla::Plugin::InstallG
 
 # SOURCE
 
-The development version is on github at [http://github.com/doherty/Dist-Zilla-Plugin-InstallGuide](http://github.com/doherty/Dist-Zilla-Plugin-InstallGuide)
+The development version is on github at [https://github.com/doherty/Dist-Zilla-Plugin-InstallGuide](https://github.com/doherty/Dist-Zilla-Plugin-InstallGuide)
 and may be cloned from [git://github.com/doherty/Dist-Zilla-Plugin-InstallGuide.git](git://github.com/doherty/Dist-Zilla-Plugin-InstallGuide.git)
 
 # BUGS AND LIMITATIONS

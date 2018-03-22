@@ -24,5 +24,5 @@ requires:
   perl: '5.008'
 resources:
   repository: https://github.com/ingydotnet/Inline-Java
-version: '0.63'
+version: '0.64'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

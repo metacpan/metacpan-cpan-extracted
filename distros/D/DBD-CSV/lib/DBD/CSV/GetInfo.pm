@@ -16,14 +16,12 @@ my $sql_driver  = "CSV";		# DBD::CSV uses tw-partr version string
 my $sql_ver_fmt = "%02d.%02d.0000";	# ODBC version string: ##.##.#####
 my $sql_driver_ver = sprintf $sql_ver_fmt, split /\./ => $DBD::CSV::VERSION;
 
-sub sql_data_source_name
-{
+sub sql_data_source_name {
     my $dbh = shift;
     return "dbi:$sql_driver:" . $dbh->{Name};
     } # sql_data_source_name
 
-sub sql_user_name
-{
+sub sql_user_name {
     my $dbh = shift;
     # CURRENT_USER is a non-standard attribute, probably undef
     # Username is a standard DBI attribute

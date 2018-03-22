@@ -11,7 +11,7 @@ package Apache2::AMFCommonLib;
   use strict; 
   use warnings;
   use vars qw($VERSION);
-  $VERSION= "4.21";;;
+  $VERSION= "4.30";;;
 
 
 sub new {

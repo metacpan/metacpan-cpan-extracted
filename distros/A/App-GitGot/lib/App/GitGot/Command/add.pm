@@ -1,6 +1,6 @@
 package App::GitGot::Command::add;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::add::VERSION = '1.334';
+$App::GitGot::Command::add::VERSION = '1.335';
 # ABSTRACT: add a new repo to your config
 use 5.014;
 
@@ -133,7 +133,7 @@ App::GitGot::Command::add - add a new repo to your config
 
 =head1 VERSION
 
-version 1.334
+version 1.335
 
 =head1 SYNOPSIS
 

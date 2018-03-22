@@ -2,7 +2,7 @@ use Test2::V0;
 use Test2::API 'intercept';
 
 my $events = intercept {
-    do './t/fixtures/instance-lifecycle.t';
+    do './t/fixtures/instance-lifecycle.it';
 };
 
 is $events, array {

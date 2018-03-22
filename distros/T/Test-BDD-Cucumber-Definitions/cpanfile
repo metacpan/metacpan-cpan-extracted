@@ -5,6 +5,7 @@ requires 'HTTP::Response';
 requires 'HTTP::Tiny';
 requires 'Hash::MultiValue';
 requires 'IO::String';
+requires 'IPC::Run3';
 requires 'JSON::Path';
 requires 'JSON::XS';
 requires 'MooseX::Types';

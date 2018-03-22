@@ -1,4 +1,4 @@
-# $Id: 31-DSA-SHA1.t 1616 2018-01-22 08:54:52Z willem $	-*-perl-*-
+# $Id: 31-DSA-SHA1.t 1654 2018-03-19 15:53:37Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -17,7 +17,7 @@ foreach my $package ( sort keys %prerequisite ) {
 	exit;
 }
 
-plan tests => 12;
+plan tests => 13;
 
 
 my %filename;
@@ -105,8 +105,18 @@ my $sigdata = 'arbitrary data';
 my $signature = Net::DNS::SEC::DSA->sign( $sigdata, $private );
 ok( $signature, 'signature created using private key' );
 
-my $verified = Net::DNS::SEC::DSA->verify( $sigdata, $key, $signature );
-ok( $verified, 'signature verified using public key' );
+
+{
+	my $verified = Net::DNS::SEC::DSA->verify( $sigdata, $key, $signature );
+	ok( $verified, 'signature verified using public key' );
+}
+
+
+{
+	my $corrupt = 'corrupted data';
+	my $verified = Net::DNS::SEC::DSA->verify( $corrupt, $key, $signature );
+	ok( !$verified, 'signature over corrupt data not verified' );
+}
 
 
 ok( !eval { Net::DNS::SEC::DSA->sign( $sigdata, $wrongprivate ) },

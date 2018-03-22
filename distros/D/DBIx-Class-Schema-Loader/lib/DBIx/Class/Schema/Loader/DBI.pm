@@ -10,7 +10,7 @@ use Carp::Clan qw/^DBIx::Class/;
 use namespace::clean;
 use DBIx::Class::Schema::Loader::Table ();
 
-our $VERSION = '0.07048';
+our $VERSION = '0.07049';
 
 __PACKAGE__->mk_group_accessors('simple', qw/
     _disable_pk_detection
@@ -506,6 +506,7 @@ sub _columns_info_for {
     my $dbh = $self->schema->storage->dbh;
 
     my %result;
+    my %raw_result;
 
     if (my $sth = try { $self->_dbh_column_info($dbh, undef, $table->schema, $table->name, '%' ) }) {
         COL_INFO: while (my $info = try { $sth->fetchrow_hashref } catch { +{} }) {
@@ -533,6 +534,7 @@ sub _columns_info_for {
             ) || {};
             $column_info = { %$column_info, %$extra_info };
 
+            $raw_result{$col_name} = $info;
             $result{$col_name} = $column_info;
         }
         $sth->finish;
@@ -608,7 +610,7 @@ sub _columns_info_for {
         %result = %lc_result;
     }
 
-    return \%result;
+    return wantarray ? (\%result, \%raw_result) : \%result;
 }
 
 # Need to override this for the buggy Firebird ODBC driver.

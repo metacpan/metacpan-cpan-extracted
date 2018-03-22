@@ -338,23 +338,23 @@ SKIP: {
     my $rv;
     {
         local $@;
-        eval { $rv = $self->analyze_json_logs( run => 1, verbose => 1 ); };
+        eval { $rv = $self->analyze_json_logs( verbose => 1 ); };
         like($@, qr/analyze_json_logs: Must supply hash ref as argument/,
             "analyze_json_logs(): Got expected error message: absence of hash ref");
     }
 
     {
         local $@;
-        eval { $rv = $self->analyze_json_logs( { run => 1, verbose => 1, sep_char => "\t" } ); };
+        eval { $rv = $self->analyze_json_logs( { verbose => 1, sep_char => "\t" } ); };
         like($@, qr/analyze_json_logs: Currently only pipe \('\|'\) and comma \(','\) are supported as delimiter characters/,
             "analyze_json_logs(): Got expected error message: unsupported delimiter");
     }
 
-    my $fpsvfile = $self->analyze_json_logs( { run => 1, verbose => 1 } );
+    my $fpsvfile = $self->analyze_json_logs( { verbose => 1 } );
     ok($fpsvfile, "analyze_json_logs() returned true value");
     ok(-f $fpsvfile, "Located '$fpsvfile'");
 
-    my $fcsvfile = $self->analyze_json_logs( { run => 1, verbose => 1 , sep_char => ',' } );
+    my $fcsvfile = $self->analyze_json_logs( { verbose => 1 , sep_char => ',' } );
     ok($fcsvfile, "analyze_json_logs() returned true value");
     ok(-f $fcsvfile, "Located '$fcsvfile'");
 }

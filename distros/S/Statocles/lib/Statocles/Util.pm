@@ -1,5 +1,5 @@
 package Statocles::Util;
-our $VERSION = '0.087';
+our $VERSION = '0.088';
 # ABSTRACT: Various utility functions to reduce dependencies
 
 use Statocles::Base;
@@ -54,10 +54,10 @@ sub dircopy($$) {
 #pod
 #pod     my $was_run = run_editor( $path );
 #pod
-#pod Invoke the user's text editor (from the C<EDITOR> environment variable) to edit
-#pod the given path. Returns true if an editor was invoked, false otherwise. If the
-#pod editor was not able to be invoked (C<EDITOR> was set but could not be run), an
-#pod exception is thrown.
+#pod Invoke the user's text editor (from the C<EDITOR> environment variable)
+#pod to edit the given path. Returns true if an editor was invoked, false if
+#pod C<EDITOR> was not set. If the editor was not able to be invoked
+#pod (C<EDITOR> was set but could not be run), an exception is thrown.
 #pod
 #pod =cut
 
@@ -65,15 +65,11 @@ sub run_editor {
     my ( $path ) = @_;
     return 0 unless $ENV{EDITOR};
     no warnings 'exec'; # We're checking everything ourselves
-    system split( /\s+/, $ENV{EDITOR} ), $path;
-    if ($? == -1) {
-        die sprintf qq{Failed to invoke editor "%s": %s\n}, $ENV{EDITOR}, $!;
-    }
-    elsif ($? & 127) {
-        die sprintf qq{Editor "%s" died from signal %d\n}, $ENV{EDITOR}, ( $? & 127 );
-    }
-    elsif ( my $exit = $? >> 8 ) {
-        die sprintf qq{Editor "%s" exited with error (non-zero) status: %d\n}, $ENV{EDITOR}, $exit;
+    # use string "system" as env-vars need to quote to protect from spaces
+    # therefore, we quote path, then append it
+    system $ENV{EDITOR} . qq{ "$path"};
+    if ($? != 0) {
+        die sprintf qq{Editor "%s" exited with error (non-zero) status: %d\n}, $ENV{EDITOR}, $?;
     }
     return 1;
 }
@@ -132,7 +128,7 @@ Statocles::Util - Various utility functions to reduce dependencies
 
 =head1 VERSION
 
-version 0.087
+version 0.088
 
 =head1 SYNOPSIS
 
@@ -162,10 +158,10 @@ Copy everything in $source to $destination, recursively.
 
     my $was_run = run_editor( $path );
 
-Invoke the user's text editor (from the C<EDITOR> environment variable) to edit
-the given path. Returns true if an editor was invoked, false otherwise. If the
-editor was not able to be invoked (C<EDITOR> was set but could not be run), an
-exception is thrown.
+Invoke the user's text editor (from the C<EDITOR> environment variable)
+to edit the given path. Returns true if an editor was invoked, false if
+C<EDITOR> was not set. If the editor was not able to be invoked
+(C<EDITOR> was set but could not be run), an exception is thrown.
 
 =head2 uniq_by
 

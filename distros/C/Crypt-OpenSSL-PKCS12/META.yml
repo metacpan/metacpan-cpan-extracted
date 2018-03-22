@@ -28,4 +28,4 @@ resources:
   homepage: https://github.com/dsully/perl-crypt-openssl-pkcs12
   license: http://dev.perl.org/licenses/
   repository: https://github.com/dsully/perl-crypt-openssl-pkcs12
-version: '0.9'
+version: '1.0'

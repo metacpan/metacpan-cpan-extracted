@@ -876,10 +876,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         compiler->fatal_error = 1;
                         return;
                       }
-                      else if (strcmp(type->name, op_package->uv.package->op_name->uv.name) != 0) {
-                        SPVM_yyerror_format(compiler,
-                          "new operator is private at %s line %d\n", op_cur->file, op_cur->line);
-                      }
                     }
                   }
                   else if (op_cur->first->id == SPVM_OP_C_ID_CONSTANT) {
@@ -1675,6 +1671,13 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                     return;
                   }
                   
+                  if (call_sub->call_type_id != call_sub->sub->call_type_id) {
+                    SPVM_yyerror_format(compiler, "Invalid subroutine call \"%s\" at %s line %d\n",
+                      op_cur->first->uv.name, op_cur->file, op_cur->line);
+                    compiler->fatal_error = 1;
+                    return;
+                  }
+                  
                   const char* sub_abs_name = call_sub->sub->abs_name;
                   
                   int32_t sub_args_count = call_sub->sub->op_args->length;
@@ -1713,7 +1716,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                       }
                     }
                     if (is_invalid) {
-                      SPVM_yyerror_format(compiler, "%d argument must be %s (%s()) at %s line %d\n", (int)call_sub_args_count, sub_arg_type->name, sub_abs_name, op_cur->file, op_cur->line);
+                      SPVM_yyerror_format(compiler, "%dth argument type must be %s (%s()) at %s line %d\n", (int)call_sub_args_count, sub_arg_type->name, sub_abs_name, op_cur->file, op_cur->line);
                       compiler->fatal_error = 1;
                       return;
                     }
@@ -1754,13 +1757,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                     return;
                   }
                   
-                  SPVM_OUR* our = op_cur->uv.package_var->op_our->uv.our;
-                  
-                  if (package != our->op_package->uv.package) {
-                    SPVM_yyerror_format(compiler, "Package variable is private \"%s\" \"%s\" at %s line %d\n",
-                      our->op_package->uv.package->op_name->uv.name, our->op_package_var->uv.package_var->op_name->uv.name, op_cur->file, op_cur->line);
-                  }
-                  
                   break;
                 }
                 case SPVM_OP_C_ID_CALL_FIELD: {
@@ -1790,11 +1786,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                       type->name, op_name->uv.name, op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
-                  }
-                  
-                  if ( package != field->op_package->uv.package) {
-                    SPVM_yyerror_format(compiler, "Field is private \"%s\" \"%s\" at %s line %d\n",
-                      field->op_package->uv.package->op_name->uv.name, field->op_name->uv.name, op_cur->file, op_cur->line);
                   }
                   
                   break;

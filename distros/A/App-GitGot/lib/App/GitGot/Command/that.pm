@@ -1,6 +1,6 @@
 package App::GitGot::Command::that;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::that::VERSION = '1.334';
+$App::GitGot::Command::that::VERSION = '1.335';
 # ABSTRACT: check if a given repository is managed
 use 5.014;
 
@@ -34,7 +34,7 @@ App::GitGot::Command::that - check if a given repository is managed
 
 =head1 VERSION
 
-version 1.334
+version 1.335
 
 =head1 AUTHOR
 

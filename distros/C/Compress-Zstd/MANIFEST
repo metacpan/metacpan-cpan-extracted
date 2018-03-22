@@ -197,6 +197,11 @@ ext/zstd/doc/images/dict-cs.png
 ext/zstd/doc/images/dict-ds.png
 ext/zstd/doc/images/ldmCspeed.png
 ext/zstd/doc/images/ldmDspeed.png
+ext/zstd/doc/images/linux-4.7-12-compress.png
+ext/zstd/doc/images/linux-4.7-12-decompress.png
+ext/zstd/doc/images/linux-git-compress.png
+ext/zstd/doc/images/linux-git-decompress.png
+ext/zstd/doc/images/zstd_logo86.png
 ext/zstd/doc/zstd_compression_format.md
 ext/zstd/doc/zstd_manual.html
 ext/zstd/examples/Makefile
@@ -233,7 +238,7 @@ ext/zstd/lib/common/zstd_internal.h
 ext/zstd/lib/compress/fse_compress.c
 ext/zstd/lib/compress/huf_compress.c
 ext/zstd/lib/compress/zstd_compress.c
-ext/zstd/lib/compress/zstd_compress.h
+ext/zstd/lib/compress/zstd_compress_internal.h
 ext/zstd/lib/compress/zstd_double_fast.c
 ext/zstd/lib/compress/zstd_double_fast.h
 ext/zstd/lib/compress/zstd_fast.c
@@ -356,6 +361,8 @@ ext/zstd/tests/paramgrill.c
 ext/zstd/tests/playTests.sh
 ext/zstd/tests/poolTests.c
 ext/zstd/tests/roundTripCrash.c
+ext/zstd/tests/seqgen.c
+ext/zstd/tests/seqgen.h
 ext/zstd/tests/symbols.c
 ext/zstd/tests/test-zstd-speed.py
 ext/zstd/tests/test-zstd-versions.py

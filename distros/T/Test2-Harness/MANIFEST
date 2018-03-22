@@ -171,6 +171,7 @@ t2/data.t
 t2/ending.t
 t2/exception.t
 t2/findbin.t
+t2/magic_vars.t
 t2/no_stdout_eol.t
 t2/output.t
 t2/relative_paths.t

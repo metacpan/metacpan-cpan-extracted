@@ -31,7 +31,7 @@ use File::Temp 'tempfile';
 use curry;
 use namespace::clean;
 
-our $VERSION = '0.07048';
+our $VERSION = '0.07049';
 
 __PACKAGE__->mk_group_ro_accessors('simple', qw/
                                 schema
@@ -2277,7 +2277,7 @@ sub _parse_generated_file {
             my $mark_md5 = $2;
 
             # Pull out the version and timestamp from the line above
-            ($ver, $ts) = $gen =~ m/^# Created by DBIx::Class::Schema::Loader( v[\d.]+)?( @ [\d-]+ [\d:]+)?\r?\Z/m;
+            ($ver, $ts) = $gen =~ m/^# Created by DBIx::Class::Schema::Loader( v[\d._]+)?( @ [\d-]+ [\d:]+)?\r?\Z/m;
             $ver =~ s/^ v// if $ver;
             $ts =~ s/^ @ // if $ts;
 

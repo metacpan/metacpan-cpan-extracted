@@ -1,5 +1,5 @@
 package Statocles::Types;
-our $VERSION = '0.087';
+our $VERSION = '0.088';
 # ABSTRACT: Type constraints and coercions for Statocles
 
 use strict;
@@ -37,7 +37,7 @@ coerce Person, from Str, via { Statocles::Person->new( $_ ) };
 declare LinkArray, as ArrayRef[Link], coerce => 1;
 coerce LinkArray, from ArrayRef[HashRef|Str],
     via {
-        [ map { Link->coerce( $_ ) } @$_ ];
+        [ map { ref $_ eq 'HASH' && exists $_->{children} ? LinkTree->coerce($_) : Link->coerce( $_ ) } @$_ ];
     };
 
 declare LinkHash, as HashRef[LinkArray], coerce => 1;
@@ -93,6 +93,7 @@ require Statocles::Store;
 require Statocles::Link;
 require Statocles::Link::Tree;
 require Statocles::Person;
+require Statocles::Image;
 
 1;
 
@@ -108,7 +109,7 @@ Statocles::Types - Type constraints and coercions for Statocles
 
 =head1 VERSION
 
-version 0.087
+version 0.088
 
 =head1 SYNOPSIS
 

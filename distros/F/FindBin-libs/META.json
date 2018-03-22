@@ -33,12 +33,13 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Cwd" : "3.73",
-            "File::Spec" : "0",
+            "Cwd" : "3.073",
+            "File::Basename" : "0",
+            "File::Spec::Functions" : "0",
             "File::Temp" : "0",
             "FindBin" : "0",
             "List::Util" : "0",
-            "Module::FromPerlVer" : "0.002",
+            "Module::FromPerlVer" : "0",
             "Symbol" : "0",
             "Test::More" : "0",
             "strict" : "0"
@@ -46,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.017006",
+   "version" : "2.017008",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

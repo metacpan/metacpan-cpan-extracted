@@ -1,6 +1,9 @@
 Revision history for Perl extension Inline::Java
 ------------------------------------------------
 
+0.64 Tue Mar 20 15:00:39 GMT 2018
+ - apply Debian spelling patch
+
 0.63 Tue Feb 13 05:52:42 GMT 2018
  - fix JDK 7 problem with "<>" type on HashMap
 

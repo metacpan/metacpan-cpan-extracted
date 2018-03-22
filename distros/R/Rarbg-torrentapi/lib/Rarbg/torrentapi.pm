@@ -2,7 +2,7 @@ package Rarbg::torrentapi;
 
 use strict;
 use 5.008_005;
-our $VERSION = 'v0.1.5';
+our $VERSION = 'v0.1.6';
 use LWP::UserAgent;
 use JSON;
 use Carp;
@@ -46,6 +46,12 @@ has mode => (
     default => 'list'
 );
 
+has app_id => (
+    is      => 'rw',
+    isa     => 'Str',
+    default => 'p5-Rarbg-torrentapi'
+);
+
 has _format => (
     is      => 'ro',
     isa     => 'Str',
@@ -78,7 +84,8 @@ has _token_time => (
 
 sub _renew_token {
     my $self     = shift;
-    my $res_json = $self->_ua->get( $BASEURL . "get_token=get_token" );
+    my $url      = $BASEURL . "get_token=get_token&app_id=" . $self->app_id;
+    my $res_json = $self->_ua->get($url);
     if ( $res_json->is_success ) {
         $self->_token_time(time);
         my $res = decode_json( $res_json->decoded_content );

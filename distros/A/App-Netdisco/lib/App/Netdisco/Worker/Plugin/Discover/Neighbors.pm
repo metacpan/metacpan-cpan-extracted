@@ -172,13 +172,12 @@ sub store_neighbors {
       my $remote_id   = Encode::decode('UTF-8', $c_id->{$entry});
 
       next unless $remote_ip;
-      my $r_ip = NetAddr::IP::Lite->new($remote_ip) or next;
-      $remote_ip = $r_ip->addr;
+      my $r_netaddr = NetAddr::IP::Lite->new($remote_ip);
 
       # a bunch of heuristics to search known devices if we don't have a
       # useable remote IP...
 
-      if ($remote_ip eq '0.0.0.0' or
+      if ((! $r_netaddr) or ($remote_ip eq '0.0.0.0') or
         check_acl_no($remote_ip, 'group:__LOCAL_ADDRESSES__')) {
 
           if ($remote_id) {
@@ -232,6 +231,14 @@ sub store_neighbors {
           }
       }
 
+      if ($r_netaddr->addr ne $remote_ip) {
+        info sprintf ' [%s] neigh - discrepancy in IP on %s: using %s instead of %s',
+          $device->ip, $port, $r_netaddr->addr, $remote_ip;
+      }
+
+      # OK, remote IP seems sane
+      $remote_ip = $r_netaddr->addr;
+
       # what we came here to do.... discover the neighbor
       debug sprintf ' [%s] neigh - %s with ID [%s] on %s',
         $device->ip, $remote_ip, ($remote_id || ''), $port;
@@ -240,7 +247,7 @@ sub store_neighbors {
       $remote_port = $c_port->{$entry};
       if (defined $remote_port) {
           # clean weird characters
-          $remote_port =~ s/[^\d\/\.,()\w:-]+//gi;
+          $remote_port =~ s/[^\d\s\/\.,()\w:-]+//gi;
       }
       else {
           info sprintf ' [%s] neigh - no remote port found for port %s at %s',

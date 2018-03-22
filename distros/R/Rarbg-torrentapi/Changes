@@ -1,5 +1,8 @@
 Revision history for Rarbg-torrentapi
 
+v0.1.6  2018-03-21 16:16:44 CET
+        - Torrentapi now needs app_id.
+
 v0.1.5  2017-09-10 18:16:16 CEST
         - PR #1 --> Fix ranked attribute. by baptistecdr
 

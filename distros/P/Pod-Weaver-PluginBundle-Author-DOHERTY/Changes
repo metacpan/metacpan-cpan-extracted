@@ -1,5 +1,8 @@
 Revision history for Perl module Pod-Weaver-PluginBundle-Author-DOHERTY
 
+0.010     2018-03-19
+ - Move leftovers up so "=for test_synopsis" is before synopsis
+
 0.009     2016-06-11
   - Add a Prelude region just before Synopsis
 

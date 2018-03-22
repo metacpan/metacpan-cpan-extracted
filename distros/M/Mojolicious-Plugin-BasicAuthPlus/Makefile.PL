@@ -33,7 +33,7 @@ WriteMakefile(
         'Mojolicious' => '1.4',
         'Authen::Simple::Password' => 0,
         'Authen::Simple::Passwd' => 0,
-        'Authen::Simple::LDAP' => 0,
+        'Net::LDAP' => 0,
     },
     EXE_FILES => ['examples/sample.pl'],
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

@@ -1,5 +1,5 @@
 package Statocles::Plugin;
-our $VERSION = '0.087';
+our $VERSION = '0.088';
 # ABSTRACT: Base role for Statocles plugins
 
 #pod =head1 SYNOPSIS
@@ -60,7 +60,7 @@ Statocles::Plugin - Base role for Statocles plugins
 
 =head1 VERSION
 
-version 0.087
+version 0.088
 
 =head1 SYNOPSIS
 
@@ -154,6 +154,7 @@ A helper function like C<plugger> above receives first the template
 variables and then all the helper arguments supplied in the template
 itself.  In the example above (section "Event Handlers"), C<$args>
 would be a hash with these keys:
+
 =over
 
 =item *

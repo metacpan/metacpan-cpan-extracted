@@ -116,6 +116,14 @@ To build a libcrypto.so library, run the following:
 	make	# copy libcrypto.so.1.1 into /usr/lib
 		# required *h files to /usr/local/include/openssl
 
+Implementation of Ed25519 and Ed448 algorithms requires additional
+steps which are described in the corresponding include files.
+
+You may need to compile openssl with no-asm option to make it work
+on a 64-bit system.  The assembly object that is by default compiled
+for 64 bit systems is not position independent and can not be linked
+into a relocatable shared object.
+
 
 5. MAINTENANCE
    -----------
@@ -185,4 +193,4 @@ DEALINGS IN THE SOFTWARE.
 
 
 ------------------------------------------------------------------------------
-$Id: README 1621 2018-01-26 14:18:58Z willem $
+$Id: README 1647 2018-03-12 15:34:40Z willem $

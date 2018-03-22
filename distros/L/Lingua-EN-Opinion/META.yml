@@ -22,17 +22,19 @@ meta-spec:
   version: '1.4'
 name: Lingua-EN-Opinion
 requires:
+  Carp: '0'
   File::Slurper: '0'
   Lingua::EN::Sentence: '0'
   Moo: '2'
   Statistics::Lite: '0'
+  Try::Tiny: '0'
   namespace::clean: '0'
   perl: '5.006'
   strictures: '2'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Lingua-EN-Opinion
   repository: https://github.com/ology/Lingua-EN-Opinion
-version: '0.0801'
+version: '0.1201'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -225,6 +227,7 @@ x_Dist_Zilla:
             - Minqing
             - SIGKDD
             - Saif
+            - stemmer
             - th
           wordlist: Pod::Wordlist
       name: Test::PodSpelling

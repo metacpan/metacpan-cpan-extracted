@@ -2,7 +2,7 @@ package Test2::Formatter::Test2;
 use strict;
 use warnings;
 
-our $VERSION = '0.001061';
+our $VERSION = '0.001062';
 
 use Scalar::Util qw/blessed/;
 use List::Util qw/shuffle first/;
@@ -251,6 +251,9 @@ sub write {
     my $job_id = $f->{harness}->{job_id};
     push @{$self->{+JOB_COLORS}->{free}} => delete $self->{+JOB_COLORS}->{used}->{$job_id}
         if $job_id && $f->{harness_job_end};
+
+    # Local is expensive! Only do it if we really need to.
+    local($\, $,) = (undef, '') if $\ || $,;
 
     my $io = $self->{+IO};
     if ($self->{+_BUFFERED}) {
@@ -528,6 +531,9 @@ sub DESTROY {
     my $self = shift;
 
     my $io = $self->{+IO} or return;
+
+    # Local is expensive! Only do it if we really need to.
+    local($\, $,) = (undef, '') if $\ || $,;
 
     print $io Term::ANSIColor::color('reset')
         if USE_ANSI_COLOR;

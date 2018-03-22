@@ -1,4 +1,5 @@
 package MethodSpy;
+## no critic (ProhibitMagicNumbers)
 use strict;
 use FindBin;
 use lib ($FindBin::Bin);

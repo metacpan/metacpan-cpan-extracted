@@ -3,9 +3,9 @@ NAME
     simple message
 
 VERSION
-    This document describes version 0.03 of
+    This document describes version 0.040 of
     Progress::Any::Output::TermMessage (from Perl distribution
-    Progress-Any-Output-TermMessage), released on 2018-03-17.
+    Progress-Any-Output-TermMessage), released on 2018-03-21.
 
 SYNOPSIS
      use Progress::Any::Output;
@@ -20,6 +20,10 @@ METHODS
     "Progress::Any::Output->set("TermMessage", %args)".
 
     Known arguments:
+
+    *   fh => GLOB (default: \*STDERR)
+
+        Wheere to send progress message.
 
     *   template => STR (default: '(%P/%T) %m')
 
@@ -53,6 +57,17 @@ METHODS
          _
 
         all in one line.
+
+ENVIRONMENT
+  PROGRESS_TERM_MESSAGE
+    Bool. Forces disabling or enabling progress output (just for this
+    output).
+
+    In the absence of PROGRESS_TERM_MESSAGE and PROGRESS, will default to 1
+    if filehandle is tested to be in interactive mode (using "-t").
+
+  PROGRESS
+    Bool. Forces disabling or enabling progress output (for all outputs).
 
 HOMEPAGE
     Please visit the project's homepage at

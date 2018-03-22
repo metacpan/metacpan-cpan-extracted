@@ -1,0 +1,7 @@
+0.02 2018-03-20
+-new: put() accepts multiple values
+-bugfix: remove unused struct member
+-bugfix: support anonymous sub in constructor
+
+0.01 2018-03-20
+-Initial release

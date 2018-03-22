@@ -1,10 +1,15 @@
-# Copyrights 2013-2016 by [Mark Overmeer].
-#  For other contributors see Changes.
+# Copyrights 2013-2018 by [Mark Overmeer <markov@cpan.org>].
+#  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution Net-OAuth2.  Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+
 package Net::OAuth2::Profile;
 use vars '$VERSION';
-$VERSION = '0.63';
+$VERSION = '0.64';
+
 
 use warnings;
 use strict;
@@ -51,6 +56,7 @@ sub init($)
         || $args->{bearer_token_scheme} || 'auth-header:Bearer';
     $self->{NOP_scope}       = $args->{scope};
     $self->{NOP_state}       = $args->{state};
+    $self->{NOP_hd}          = $args->{hd};
     $self->{NOP_method}      = $args->{access_token_method} || 'POST';
     $self->{NOP_acc_param}   = $args->{access_token_param} || [];
     $self->{NOP_init_params} = $args->{init_params};
@@ -79,6 +85,7 @@ sub user_agent() {shift->{NOP_agent}}
 sub site()       {shift->{NOP_site}}
 sub scope()      {shift->{NOP_scope}}
 sub state()      {shift->{NOP_state}}
+sub hd()         {shift->{NOP_hd}}
 sub grant_type() {shift->{NOP_grant_type}}
 
 sub bearer_token_scheme() {shift->{NOP_scheme}}
@@ -252,6 +259,7 @@ sub authorize_params(%)
     my %params = (@{$self->{NOP_authorize_param}}, @_);
     $params{scope}         ||= $self->scope;
     $params{state}         ||= $self->state;
+    $params{hd}            ||= $self->hd;
     $params{client_id}     ||= $self->id;
     \%params;
 }

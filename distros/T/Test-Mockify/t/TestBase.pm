@@ -43,7 +43,6 @@ __PACKAGE__->RunTest();
 package TestBase;
 use strict;
 use Test::More;
-
 #------------------------------------------------------------------------
 sub new {
     my $class = shift;
@@ -56,7 +55,7 @@ sub RunTest {
     my $Package = shift;
     note("Unit test for: $Package ######");
     my $UnitTest = $Package->new();
-    
+
     $UnitTest->testPlan();
     done_testing();
 }

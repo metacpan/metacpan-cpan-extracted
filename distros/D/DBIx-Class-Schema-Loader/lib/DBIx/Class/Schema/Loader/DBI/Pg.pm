@@ -5,7 +5,7 @@ use warnings;
 use base 'DBIx::Class::Schema::Loader::DBI::Component::QuotedDefault';
 use mro 'c3';
 
-our $VERSION = '0.07048';
+our $VERSION = '0.07049';
 
 =head1 NAME
 
@@ -197,7 +197,7 @@ sub _columns_info_for {
     my $self = shift;
     my ($table) = @_;
 
-    my $result = $self->next::method(@_);
+    my ($result, $raw) = $self->next::method(@_);
 
     while (my ($col, $info) = each %$result) {
         my $data_type = $info->{data_type};
@@ -281,7 +281,22 @@ EOF
         elsif (lc($data_type) eq 'character') {
             $info->{data_type} = 'char';
         }
-        else {
+        # DBD::Pg < 3.5.2 can get the order wrong on Pg >= 9.1.0
+        elsif (
+            ($DBD::Pg::VERSION >= 3.005002 or $self->dbh->{pg_server_version} < 90100)
+                and
+            my $values = $raw->{$col}->{pg_enum_values}
+        ) {
+            $info->{extra}{list} = $values;
+
+            # Store its original name in extra for SQLT to pick up.
+            $info->{extra}{custom_type_name} = $info->{data_type};
+
+            $info->{data_type} = 'enum';
+
+            delete $info->{size};
+        }
+        else  {
             my ($typetype) = $self->schema->storage->dbh
                 ->selectrow_array(<<EOF, {}, $data_type);
 SELECT typtype

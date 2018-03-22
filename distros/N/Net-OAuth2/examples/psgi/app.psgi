@@ -32,6 +32,8 @@ get '/got/:site_id' => sub {
                 . '<p>'.encode_entities($access_token->to_string)."</p>\n";
     $content   .= "<h2>State passthru</h2>" . encode_entities(params->{state})
         if params->{state};
+    $content   .= "<h2>HD passthru</h2>" . encode_entities(params->{hd})
+        if params->{hd};
 
     my $this_site = config->{sites}{$site_id};
     my $response  = $access_token->get($this_site->{protected_resource_url}

@@ -2,7 +2,7 @@ NAME
     WordList::IT::BIP39 - Italian word list for BIP 39
 
 VERSION
-    This document describes version 0.001 of WordList::IT::BIP39 (from Perl
+    This document describes version 0.002 of WordList::IT::BIP39 (from Perl
     distribution WordList-IT-BIP39), released on 2017-12-24.
 
 SYNOPSIS

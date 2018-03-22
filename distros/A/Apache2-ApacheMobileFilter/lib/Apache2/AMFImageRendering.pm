@@ -23,6 +23,7 @@ package Apache2::AMFImageRendering;
   use Apache2::Log;
   use Apache2::Filter (); 
   use APR::Table (); 
+  use APR::Base64 (); 
   use LWP::Simple;
   use Image::Resize;
   use Image::Scale;
@@ -37,7 +38,7 @@ package Apache2::AMFImageRendering;
   # 
 
   use vars qw($VERSION);
-  $VERSION= "4.21";;;
+  $VERSION= "4.30";;;
   my $CommonLib = new Apache2::AMFCommonLib ();
   my %Capability;
   my %Array_fb;
@@ -51,6 +52,9 @@ package Apache2::AMFImageRendering;
   my %ImageType;
   my %cacheArray;
   my %cacheArray_toview;
+  my @arrayFilterMagick=("Point","Box","Triangle","Hermite","Hanning","Hamming","Blackman","Gaussian","Quadratic","Cubic","Catrom","Mitchell","Lanczos","Bessel","Sinc");
+
+
   
 
   my $intelliswitch="false";
@@ -79,7 +83,10 @@ package Apache2::AMFImageRendering;
   my $par_height='height';
   my $par_width='width';
   my $par_perc='dim';
-  
+  my $typeGraphicLibrary='gd';
+  my $filterMagick='Lanczos';
+  my $qualityJpeg=90;
+
   $ImageType{'image/png'}="png";
   $ImageType{'image/gif'}="gif";
   $ImageType{'image/jpg'}="jpg";
@@ -118,6 +125,42 @@ sub loadConfigFile {
 			$resizeimagesmall=$ENV{ResizeSmallImage};
 			$CommonLib->printLog("ResizeSmallImage is: $resizeimagesmall. The image smallest of device screensize is also resized (low quality)");
 		}
+		if ($ENV{TypeGraphicLibrary}) {
+      if ($ENV{TypeGraphicLibrary} eq 'gd' || $ENV{TypeGraphicLibrary} eq 'magick') {
+        $typeGraphicLibrary=$ENV{TypeGraphicLibrary};
+        $CommonLib->printLog("TypeGraphicLibrary is: $typeGraphicLibrary");
+      } else {
+			    $CommonLib->printLog("ERROR: TypeGraphicLibrary parameter must be 'gd' or 'magick'");
+			    ModPerl::Util::exit();        
+      }
+		}
+		if ($ENV{QualityJpeg}) {
+      if (($ENV{QualityJpeg} =~ /^\d+?$/) && $ENV{QualityJpeg} > -1 && $ENV{QualityJpeg} < 101) {
+        $qualityJpeg=$ENV{QualityJpeg};
+      } else {
+			    $CommonLib->printLog("ERROR: QualityJpeg must be a number from 0 (lower) to 100 (higher), default is: ".$qualityJpeg);
+      }
+		}
+    $CommonLib->printLog("QualityJpeg is: ".$qualityJpeg);
+		if ($ENV{TypeMagickFilter}) {
+      my %params = map { $_ => 1 } @arrayFilterMagick;
+      if(exists($params{$ENV{TypeMagickFilter}})) {
+        $filterMagick=$ENV{TypeMagickFilter};
+        $CommonLib->printLog("TypeMagickFilter is: $filterMagick");
+      } else {
+			    $CommonLib->printLog("ERROR: TypeMagickFilter filter ".$ENV{TypeMagickFilter}." not available, the default is ".$filterMagick);
+          my $stringFilters='';
+          foreach my $filter (@arrayFilterMagick){
+            $stringFilters=$stringFilters."'".$filter."' ";
+          }
+			    $CommonLib->printLog("The available filters are: ".$stringFilters."for more info http://www.imagemagick.org/Usage/filter/");          
+      }
+		} else {
+      if ($ENV{TypeGraphicLibrary} eq 'magick') {
+			    $CommonLib->printLog("TypeMagickFilter is not set, the default is ".$filterMagick);        
+      }
+      
+    }
 	      	if ($ENV{ImageParamWidth}) {
 				$par_width=$ENV{ImageParamWidth};
 				$CommonLib->printLog("ImageParamWidth is: $par_width. To force the width of image the url must be <url image>?$par_width=<width>");
@@ -139,12 +182,12 @@ sub handler    {
       my $s = $f->r->server;
       my $query_string=$f->r->args;
       my $uri = $f->r->uri();
-      $uri =~ s/\//_/g;
+      #$uri =~ s/\//_/g;
       my $content_type=$f->r->content_type();
       my @fileArray = split(/\//, $uri);
       my $file=$fileArray[-1];
       my $docroot = $f->r->document_root();
-      $docroot =~ s/\//_/g;
+      #$docroot =~ s/\//_/g;
       my $servername=$f->r->get_server_name();
       my $id="";
       my $method="";     
@@ -220,8 +263,7 @@ sub handler    {
 								  $width=$ArrayQuery{$par_perc} * $width / 100;
 							 }
 						}
-						$imagefile="$resizeimagedirectory/$docroot-$uri.$width";
-	  
+            $imagefile=$resizeimagedirectory."/".APR::Base64::encode($docroot."-".$uri.".".$width);
 						#
 						# control if image exist
 						#
@@ -271,13 +313,21 @@ sub handler    {
 								  } 
 								  if ($content_type eq "image/png") {
 										 my $img = Image::Scale->new("$imageToConvert") ;
-										 $img->resize_gd( { width => $width } );
+                    if ($typeGraphicLibrary eq 'gd') {
+                        $img->resize_gd( { width => $width } );
+                    } else {
+                        $img->resize_gm( { width => $width, filter => $filterMagick } );                      
+                    }
 										 $img->save_png("$imagefile");
 								  }
 								  if ($content_type eq "image/jpeg") {
-										 my $img = Image::Scale->new("$imageToConvert") ;
-										 $img->resize_gd( { width => $width } );
-										 $img->save_jpeg("$imagefile");
+                    my $img = Image::Scale->new("$imageToConvert");
+                    if ($typeGraphicLibrary eq 'gd') {
+                        $img->resize_gd( { width => $width } );
+                    } else {
+                        $img->resize_gm( { width => $width, filter => $filterMagick } );                      
+                    }
+										 $img->save_jpeg("$imagefile",$qualityJpeg);
 								  }
 							   }
 	  

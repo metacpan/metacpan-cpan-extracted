@@ -1,5 +1,6 @@
 package Parameter;
 use strict;
+## no critic (ProhibitMagicNumbers)
 use FindBin;
 use lib ($FindBin::Bin);
 use parent 'TestBase';
@@ -31,12 +32,12 @@ sub test_call_and_buildReturn {
     my $SubTestName = (caller(0))[3];
 
     my $Parameter = Test::Mockify::Parameter->new();
-    $Parameter->buildReturn()->thenCall(sub{return join('-', @_);});
+    $Parameter->buildReturn()->thenCall(sub{return join('-', @_);}); ## no critic (ProhibitNoisyQuotes) # wrong critic match
     is($Parameter->call('a','b'),'a-b', 'proves that the parameter has passed');
 
     $Parameter = Test::Mockify::Parameter->new();
     throws_ok( sub { $Parameter->call() },
-       qr/NoReturnValueDefined/,
+       qr/NoReturnValueDefined/sm,
        'proves that mockify throws an error if the return is nott defined.'
     );
 
@@ -78,12 +79,12 @@ sub matchWithExpectedParameters {
     my $self = shift;
     # no expected parameter
     my $Parameter = Test::Mockify::Parameter->new([String('expectedValue'),String(),String()]);
-    is($Parameter->matchWithExpectedParameters('expectedValue','somevalue',123456),1, 'proves that expected and not checked values are checked. matches.');
-    is($Parameter->matchWithExpectedParameters('unexpectedValue','somevalue',123456),0, 'proves that expected and not checked values are checked. matches not.');
+    is($Parameter->matchWithExpectedParameters('expectedValue','somevalue',123_456),1, 'proves that expected and not checked values are checked. matches.');
+    is($Parameter->matchWithExpectedParameters('unexpectedValue','somevalue',123_456),0, 'proves that expected and not checked values are checked. matches not.');
     # check parameter amount
     $Parameter = Test::Mockify::Parameter->new([String('somevalue'),String('othervalue')]);
     is($Parameter->matchWithExpectedParameters('somevalue','othervalue' ), 1, 'proves that the correct amount is matches.');
-    is($Parameter->matchWithExpectedParameters('somevalue','othervalue',123456), 0, 'proves that too many values are not matching');
+    is($Parameter->matchWithExpectedParameters('somevalue','othervalue',123_456), 0, 'proves that too many values are not matching');
     is($Parameter->matchWithExpectedParameters('somevalue'), 0, 'proves that too less values are not matching');
     is($Parameter->matchWithExpectedParameters(), 0, , 'proves that no values are not matching');
     # check package name

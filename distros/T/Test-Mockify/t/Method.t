@@ -1,4 +1,5 @@
 package Method;
+## no critic (ProhibitComplexRegexes ProhibitMagicNumbers)
 use Test::Mockify::Matcher qw (
         String
         Number
@@ -26,6 +27,7 @@ sub testPlan{
     $self->_SignaturWithAnyMatcherAndExpectedMatcher();
     $self->_MultipleAnyMatcher();
     $self->_SingleExepctedMatcher();
+    $self->_SingleAnyParameter();
     $self->_NullProblems();
     $self->_MockifiedObjectCheck();
     $self->_AnyMatcher();
@@ -48,7 +50,7 @@ sub _SignaturWithAnyMatcherAndExpectedMatcher {
     is($Method->call('hello','world'), 'World', 'first expected, second any');
 
     $Method = Test::Mockify::Method->new();
-    $Method->when(String(), String('World'))->thenReturn('Hello');    
+    $Method->when(String(), String('World'))->thenReturn('Hello');
     is($Method->call('jaja','World'), 'Hello', 'first any, second expected');
     is($Method->call('something','World'), 'Hello', 'first expected, second any');
 }
@@ -76,17 +78,17 @@ sub _AnyMatcher {
     is($Method->call(sub{}), 'Result for one any.', 'single any parameter type sub');
     is($Method->call(undef), 'Result for one any.', 'single any parameter type undef');
     throws_ok( sub { $Method->when( Any() )->thenReturn('Hello World'); },
-               qr/It is not possible two add two times the same method Signature./,
+               qr/You can use a method signature only once./sm,
                'proves that it is not possbible to create two expectations for any'
      );
     throws_ok( sub { $Method->when( String() )->thenReturn('Hello World'); },
-               qr/It is not possibel to mix "specific type" with previously set "any type"./,
+               qr/It is not possibel to mix "specific type" with previously set "any type"./sm,
                'proves that it is not possible to use a specific type after an any type was set.'
      );
     my $StringMethod = Test::Mockify::Method->new();
     $StringMethod->when(String())->thenReturn('Result for one string.');
     throws_ok( sub { $StringMethod->when( Any() )->thenReturn('Hello World'); },
-               qr/It is not possibel to mix "any type" with previously set "specific type"./,
+               qr/It is not possibel to mix "any type" with previously set "specific type"./sm,
                'proves that it is not possible to use an any type after a specific type was set.'
      );
 }
@@ -99,22 +101,22 @@ sub _AnyParameter {
     is($Method->call(123),'helloWorld' , 'proves that "whenAny" works one parameter.');;
     is($Method->call('abc',['abc']),'helloWorld' , 'proves that the same"whenAny" works with two parameter.');
     throws_ok( sub { $Method->whenAny()->thenReturn('WaterWorld') },
-               qr/"whenAny" can only used once. Also it is not possible to use a mixture between "when" and "whenAny"/,
+               qr/You can use "whenAny" only once. Additionaly, it is not possible to mix "when" and "whenAny" for the same method./sm,
                'proves that it is not possible to use "whenAny" two times.'
      );
     throws_ok( sub { $Method->when(String('abc'))->thenReturn('WaterWorld') },
-               qr/It is not possible to use a mixture between "when" and "whenAny"/,
+               qr/It is not possible to mix "when" and "whenAny" for the same method./sm,
                'proves that it is not possible to use "when" when "whenAny" was used before.'
      );
      $Method = Test::Mockify::Method->new();
     throws_ok( sub { $Method->whenAny('param')->thenReturn('WaterWorld') },
-               qr/"whenAny" don`t allow any parameters/,
+               qr/"whenAny" doesn't allow any parameters/sm,
                'proves that it is not possible to use "whenAny" two times.'
      );
      $Method = Test::Mockify::Method->new();
      $Method->when(String())->thenReturn('helloWorld');
     throws_ok( sub { $Method->whenAny()->thenReturn('WaterWorld') },
-               qr/"whenAny" can only used once. Also it is not possible to use a mixture between "when" and "whenAny"/,
+               qr/You can use "whenAny" only once. Additionaly, it is not possible to mix "when" and "whenAny" for the same method./sm,
                'proves that it is not possible to use "whenAny" when "when" was used before.'
      );
 }
@@ -147,25 +149,31 @@ sub _NullProblems {
     # there are some special cases
     my $Method = Test::Mockify::Method->new();
     $Method->when(Number(0))->thenReturn('Result for zero number.');
+    $Method->when(String(''))->thenReturn('Result for empty string.');
+    $Method->when(Undef())->thenReturn('Result for undef.');
 
     throws_ok( sub { $Method->when(String('0')) },
-       qr/Use the Matcher Number\(\) to Check for the string '0' \(perl cannot differ that\)/,
-       "proves that an Error is thrown if mockify is used wrongly"
+       qr/Please use the Matcher Number\(0\) to check for the string '0' \(perl can not distinguish between numbers and strings\)/sm, ## no critic (ProhibitEscapedMetacharacters)
+       'proves that an Error is thrown if mockify is used wrongly'
     );
 
-    $Method->when(String(''))->thenReturn('Result for empty string.');
 
     is($Method->call(0), 'Result for zero number.', 'single expected parameter type number (0)');
+    throws_ok( sub { $Method->call(30) },
+       qr/No matching found for signatur type 'number'.*30/sm,
+       'proves that to fix the bug that any number could be selected if 0 was defined'
+    );
     is($Method->call('0'), 'Result for zero number.', 'single expected parameter type number, even though it is a String');
     is($Method->call(''), 'Result for empty string.', 'expected return value for empty string signatur');
+    is($Method->call(undef), 'Result for undef.', 'prove that empty string and undef dont interfere');
 }
 #---------------------------------------------------------------------------------
 sub _MockifiedObjectCheck {
     my $self = shift;
     my $Method = Test::Mockify::Method->new();
-    $Method->when(Object('FakeModuleForMockifyTest'))->thenReturn('Result for mockified Object.');
+    $Method->when(Object('TestDummies::FakeModuleForMockifyTest'))->thenReturn('Result for mockified Object.');
 
-    my $Mockify = Test::Mockify->new('FakeModuleForMockifyTest');
+    my $Mockify = Test::Mockify->new('TestDummies::FakeModuleForMockifyTest');
     my $MockedFakeModuleForMockifyTest = $Mockify->getMockObject();
 
     is($Method->call($MockedFakeModuleForMockifyTest), 'Result for mockified Object.', 'Match mocked Objects');
@@ -186,53 +194,53 @@ sub _SingleAnyParameter {
     $Method->when(String())->thenReturn('Result for one string.');
     $Method->when(Number())->thenReturn('Result for one number.');
 
-    is($Method->call('OneString'), 'Result for one string.', 'single any parameter type string');	
-    is($Method->call(123), 'Result for one number.', 'single any parameter type number');	
+    is($Method->call('OneString'), 'Result for one string.', 'single any parameter type string');
+    is($Method->call(123), 'Result for one number.', 'single any parameter type number');
 }
 #---------------------------------------------------------------------------------
 sub _MixedExepctedMatcherAndAnyMatcher_Error {
-    my $self = shift;    
-    
+    my $self = shift;
+
     my $Method = Test::Mockify::Method->new();
     $Method->when(String('OneString'))->thenReturn('Result for one string.');
     throws_ok( sub { $Method->when( String() )->thenReturn('Hello World'); },
-               qr/It is not possibel to mix "any parameter" with previously set "expected parameter"./,
+               qr/It is not possibel to mix "any parameter" with previously set "expected parameter"./sm,
                'error if use of any and expected matcher in first parameter'
      );
 
     $Method = Test::Mockify::Method->new();
     $Method->when(String())->thenReturn('Result for two strings.');
     throws_ok( sub { $Method->when( String('OneString') )->thenReturn('Hello World'); },
-               qr/It is not possibel to mix "expected parameter" with previously set "any parameter"./,
+               qr/It is not possibel to mix "expected parameter" with previously set "any parameter"./sm,
                'error if use of any and expected matcher - single parameter'
      );
-} 
+}
 #---------------------------------------------------------------------------------
 sub _MixedAnyMatcherWithDifferntTypes {
-    my $self = shift;    
-    
+    my $self = shift;
+
     my $Method = Test::Mockify::Method->new();
     $Method->when( String() )->thenReturn('ResultString');
     $Method->when( Number(123) )->thenReturn('ResultNumber');
-    
-    is($Method->call(123), 'ResultNumber', 'correct result for expected matcher number -> 123');
-    is($Method->call("lalal"), 'ResultString', 'correct result for any matcher sting');
 
-} 
+    is($Method->call(123), 'ResultNumber', 'correct result for expected matcher number -> 123');
+    is($Method->call('lala'), 'ResultString', 'correct result for any matcher sting');
+
+}
 #---------------------------------------------------------------------------------
 sub _DefineSignatureTwice_Error{
     my $self = shift;
-    
+
     my $Method = Test::Mockify::Method->new();
     $Method->when(String('FirstString'))->thenReturn('Result for two strings.');
     throws_ok( sub { $Method->when( String('FirstString') )->thenReturn('Hello World'); },
-               qr/It is not possible two add two times the same method Signature./,
+               qr/You can use a method signature only once./sm,
                'define signatur twice - expected matcher'
      );
     $Method = Test::Mockify::Method->new();
     $Method->when(String())->thenReturn('Result for two strings.');
     throws_ok( sub { $Method->when( String() )->thenReturn('Hello World'); },
-               qr/It is not possible two add two times the same method Signature./,
+               qr/You can use a method signature only once./sm,
                'define signatur twice - any matcher'
      );
 }
@@ -242,7 +250,7 @@ sub _UndefinedSignatur_Error {
     my $Method = Test::Mockify::Method->new();
     $Method->when(String())->thenReturn('Hello World');
     throws_ok( sub { $Method->call('not','mocked Signatur') },
-    	qr/No matching found for stringstring/,
+    qr/No matching found for signatur type 'stringstring'.*'not'.*'mocked Signatur'/sm,
                'unsupported amount of parameters'
      );
 }
@@ -251,7 +259,7 @@ sub _UndefinedType_Error {
     my $self = shift;
     my $Method = Test::Mockify::Method->new();
     throws_ok( sub { $Method->when('NotSuportedType')->thenReturn('Result for two strings.'); },
-               qr/Use Test::Mockify::Matcher to define proper matchers./,
+               qr/Use Test::Mockify::Matcher to define proper matchers./sm,
                'unsuported type, not like string or number'
      );
 }

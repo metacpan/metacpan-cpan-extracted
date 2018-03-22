@@ -1,4 +1,4 @@
-# $Id: 51-ECDSA-P256.t 1616 2018-01-22 08:54:52Z willem $	-*-perl-*-
+# $Id: 51-ECDSA-P256.t 1654 2018-03-19 15:53:37Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -17,7 +17,7 @@ foreach my $package ( sort keys %prerequisite ) {
 	exit;
 }
 
-plan tests => 12;
+plan tests => 13;
 
 
 my %filename;
@@ -37,8 +37,7 @@ use_ok('Net::DNS::SEC::ECDSA');
 my $key = new Net::DNS::RR <<'END';
 ECDSAP256SHA256.example.	IN	DNSKEY	256 3 13 (
 	7Y4BZY1g9uzBwt3OZexWk7iWfkiOt0PZ5o7EMip0KBNxlBD+Z58uWutYZIMolsW8v/3rfgac45lO
-	IikBZK4KZg== ; Key ID = 44222
-	)
+	IikBZK4KZg== ) ; Key ID = 44222
 END
 
 ok( $key, 'set up ECDSA public key' );
@@ -62,10 +61,8 @@ ok( $private, 'set up ECDSA private key' );
 
 
 my $wrongkey = new Net::DNS::RR <<'END';
-ecc-gost.example.	IN	DNSKEY	256 3 12 (
-	6VwgNT1BXxXNVpTQXcJQ82PcsCYmI60oN88Plbl028ruvl6DqJby/uBGULHT5FXmZiXBJozE6kP0
-	+BirN9YPBQ== ; Key ID = 46387
-	)
+ED25519.example.	IN	DNSKEY	( 257 3 15
+	l02Woi0iS8Aa25FQkUd9RMzZHJpBoRQwAQEX1SxZJA4= ) ; Key ID = 3613
 END
 
 ok( $wrongkey, 'set up non-ECDSA public key' );
@@ -75,12 +72,9 @@ my $wrongfile = $filename{wrongfile} = $wrongkey->privatekeyname;
 
 open( KEY, ">$wrongfile" ) or die "$wrongfile $!";
 print KEY <<'END';
-Private-key-format: v1.3
-Algorithm: 12 (ECC-GOST)
-PrivateKey: nBnGCP/hYTdJX0znDstyFTVYSA6b0nFeHy0FJUj7LhU=
-Created: 20150102211707
-Publish: 20150102211707
-Activate: 20150102211707
+Private-key-format: v1.2
+Algorithm: 15 (ED25519)
+PrivateKey: ODIyNjAzODQ2MjgwODAxMjI2NDUxOTAyMDQxNDIyNjI=
 END
 close(KEY);
 
@@ -93,8 +87,18 @@ my $sigdata = 'arbitrary data';
 my $signature = Net::DNS::SEC::ECDSA->sign( $sigdata, $private );
 ok( $signature, 'signature created using private key' );
 
-my $verified = Net::DNS::SEC::ECDSA->verify( $sigdata, $key, $signature );
-ok( $verified, 'signature verified using public key' );
+
+{
+	my $verified = Net::DNS::SEC::ECDSA->verify( $sigdata, $key, $signature );
+	ok( $verified, 'signature verified using public key' );
+}
+
+
+{
+	my $corrupt = 'corrupted data';
+	my $verified = Net::DNS::SEC::ECDSA->verify( $corrupt, $key, $signature );
+	ok( !$verified, 'signature over corrupt data not verified' );
+}
 
 
 ok( !eval { Net::DNS::SEC::ECDSA->sign( $sigdata, $wrongprivate ) },
@@ -105,7 +109,6 @@ ok( !eval { Net::DNS::SEC::ECDSA->verify( $sigdata, $wrongkey, $signature ) },
 
 ok( !eval { Net::DNS::SEC::ECDSA->verify( $sigdata, $key, undef ) },
 	'signature not verified if empty or undefined' );
-
 
 exit;
 

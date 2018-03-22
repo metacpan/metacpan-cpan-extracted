@@ -14,7 +14,7 @@ MarpaX::ESLIF::Recognizer - MarpaX::ESLIF's recognizer
 
 =head1 VERSION
 
-version 2.0.41
+version 2.0.42
 
 =head1 SYNOPSIS
 
@@ -197,6 +197,12 @@ Returns the associated bytes, or C<undef>.
 =head2 $eslifRecognizer->isEof()
 
 This method is similar to the isEof()'s recognizer interface. Except that this is asking the question directly to the recognizer's internal state, that maintains a copy of this flag.
+
+Returns a boolean indicating of end-of-user-data is reached.
+
+=head2 $eslifRecognizer->isExhausted()
+
+This method returns a true value if the underlying grammar is exhausted, a false value otherwise, and croaks on failure.
 
 Returns a boolean indicating of end-of-user-data is reached.
 

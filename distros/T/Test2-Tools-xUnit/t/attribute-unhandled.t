@@ -1,6 +1,6 @@
 use Test2::V0;
 
-my $result = do './t/fixtures/unhandled-attribute.t';
+my $result = do './t/fixtures/unhandled-attribute.it';
 
 ok !defined $result, "unhandled-attribute.t should not compile";
 like $@, qr/Invalid CODE attribute: Foo/,

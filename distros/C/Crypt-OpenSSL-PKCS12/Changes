@@ -1,5 +1,14 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+1.0  Mon Mar 19 21:20:49 CET 2018
+
+- Re-release of 0.10, due to indexing issue with PAUSE/CPAN ref: #28
+
+0.10  Wed Mar 14 08:11:54 CET 2018
+
+- Patch from kelson (@kelson42) improving the code, going from two pass to one
+  pass, speeding up the chain management PR #27
+
 0.9   Sun Mar 11 19:45:18 CET 2018
 
     - Patch from kelson (@kelson42) addressing compilation issues against OpenSSL 1.1.0
@@ -16,13 +25,13 @@ Revision history for Perl extension Crypt::OpenSSL::PKCS12.
     - Patch from jonasbn adding inc/Module/Install/External.pm from Module::Install
       missing from MANIFEST
 
-    - Patch from jonasbn for compability with required C libraries installed
+    - Patch from jonasbn for compatibility with required C libraries installed
       via Homebrew on OSX
 
     - Patch from jonasbn to address clang changes
 
-    - Patch from Christopher Hoskin enabling compability with OpenSSL 1.1.0 and
-      backwards compability with OpenSSL 1.0.2
+    - Patch from Christopher Hoskin enabling compatibility with OpenSSL 1.1.0 and
+      backwards compatibility with OpenSSL 1.0.2
 
 0.7   Fri Oct 24 06:16:43 PDT 2014
 	- Patch from Mikołaj Zalewski to fix C90 issue on CentOS.

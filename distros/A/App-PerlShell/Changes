@@ -1,5 +1,8 @@
 Revision history for Perl Shell.
 
+1.02  Wed Mar 21 14:05:00 2018
+    - Added App::PerlShell::AddOn::Macros from PPC::Macro
+
 1.01  Thu Dec  7 14:05:00 2017
     - Fixed failing tests for missing L::P and M::R.
 

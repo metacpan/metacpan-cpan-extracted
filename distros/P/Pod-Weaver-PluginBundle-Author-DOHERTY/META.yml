@@ -7,13 +7,12 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
-  blib: '1.01'
   perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,4 +35,5 @@ resources:
   bugtracker: https://github.com/doherty/Pod-Weaver-PluginBundle-Author-DOHERTY/issues
   homepage: http://metacpan.org/release/Pod-Weaver-PluginBundle-Author-DOHERTY/
   repository: git://github.com/doherty/Pod-Weaver-PluginBundle-Author-DOHERTY.git
-version: '0.009'
+version: '0.010'
+x_serialization_backend: 'YAML::Tiny version 1.73'

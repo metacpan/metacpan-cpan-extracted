@@ -1,5 +1,11 @@
 Revision history for Perl extension Dist-Zilla-Plugin-InstallGuide
 
+1.200009  2018-03-19
+ - Grammar fix
+
+1.200008  2018-03-19
+ - Better instructions for Windows [jonasbn]
+
 1.200007  2016-06-11
   - Updated text to suggest local::lib, and not recommend sudo [gh-9]
 

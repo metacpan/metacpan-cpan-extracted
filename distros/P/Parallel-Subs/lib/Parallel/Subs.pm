@@ -1,5 +1,5 @@
 package Parallel::Subs;
-$Parallel::Subs::VERSION = '0.001';
+$Parallel::Subs::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -32,7 +32,7 @@ sub _init {
             $self->{result}->{$id} = $data->{result};
         }
     );
-    $self->{jobs}  = [];
+    $self->{jobs}      = [];
     $self->{callbacks} = [];
 
     return $self;
@@ -55,10 +55,11 @@ sub _pfork {
             require Sys::Statistics::Linux::MemStats;
             $free_mem = Sys::Statistics::Linux::MemStats->new->get->{realfree};
         };
-        my $max_mem = $opts{max_memory} * 1024;    # 1024 **2 = 1 GO => expr in Kb
+        my $max_mem = $opts{max_memory} * 1024;  # 1024 **2 = 1 GO => expr in Kb
         my $cpu_for_mem;
         if ($@) {
-            #warn "Cannot guess amount of available free memory need Sys::Statistics::Linux::MemStats\n";
+
+#warn "Cannot guess amount of available free memory need Sys::Statistics::Linux::MemStats\n";
             $cpu_for_mem = 2;
         }
         else {
@@ -70,8 +71,12 @@ sub _pfork {
     }
     $cpu ||= 1;
 
+    $self->{cpu} = $cpu;
+
     # we could also set a minimum amount of required memory
     $self->{pfork} = Parallel::ForkManager->new( int($cpu) );
+    $self->{pfork}->set_waitpid_blocking_sleep(0)
+      unless $opts{waitpid_blocking_sleep};
 
     return $self;
 }
@@ -88,6 +93,65 @@ sub add {
     push( @{ $self->{callbacks} }, $test );
 
     return $self;
+}
+
+
+sub total_jobs {
+    my ($self) = @_;
+
+    return scalar @{ $self->{jobs} };
+}
+
+
+sub wait_for_all_optimized {
+    my ($self) = @_;
+
+    return $self unless $self->total_jobs;
+    my @original_jobs = @{ $self->{jobs} };
+
+    # callback not supported for now
+    if ( scalar @{ $self->{callbacks} } ) {
+        warn "Callback not supported in this mode for now.\n"
+          if grep { defined $_ } @{ $self->{callbacks} };
+        $self->{callbacks} = [];
+    }
+
+    my $cpu = $self->{cpu} or die;
+    my $jobs_per_cpu = int( scalar @original_jobs / $cpu );
+    ++$jobs_per_cpu if scalar @original_jobs % $cpu || !$jobs_per_cpu;
+
+    my @new_jobs;
+
+    my $generate_sub = sub {
+        my ( $from, $to ) = @_;
+
+        return sub {
+
+            #print "subprocess from $from to $to\n";
+            for ( my $i = $from ; $i <= $to ; ++$i ) {
+
+                #print "running job $i\n";
+                $original_jobs[$i]->{code}->();
+            }
+            return;
+        };
+    };
+
+    my ( $from, $to ) = ( 0, 0 );
+    foreach my $id ( 1 .. $cpu ) {
+        $to = $from + $jobs_per_cpu - 1;
+        $to = scalar(@original_jobs) - 1 if $to >= scalar(@original_jobs);
+
+        #print "FROM $from - TO $to\n";
+        my $sub = $generate_sub->( $from, $to );
+
+        push @new_jobs, { name => $id, code => $sub };
+        $from = $to + 1;
+    }
+
+    $self->{jobs} = \@new_jobs;
+
+    return $self->wait_for_all();
 }
 
 
@@ -118,10 +182,11 @@ sub wait_for_all {
     # run callbacks
     die "Cannot run callbacks" unless $self->run();
 
+    return $self unless $self->total_jobs;
     my $c = 0;
 
     my $results = $self->results();
-    
+
     foreach my $callback ( @{ $self->{callbacks} } ) {
         next unless $callback;
         die "cannot find result for #${c}" unless exists $results->[$c];
@@ -130,7 +195,8 @@ sub wait_for_all {
         if ( ref $callback eq 'HASH' ) {
 
             # internal mechanism
-            return unless defined $callback->{test} && defined $callback->{args};
+            return
+              unless defined $callback->{test} && defined $callback->{args};
 
             my @args = ( $res, @{ $callback->{args} } );
             my $t    = $callback->{test};
@@ -138,6 +204,7 @@ sub wait_for_all {
             eval "$t(" . $str . ")";
         }
         elsif ( ref $callback eq 'CODE' ) {
+
             # execute user function
             $callback->($res);
         }
@@ -171,7 +238,7 @@ Parallel::Subs - Simple way to run subs in parallel and process their return val
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 
@@ -229,6 +296,7 @@ which can make your code easier to read.
      ->add( sub{ print "Hello from kid $$\n"; sleep 1; } )
      ->add( sub{ print "Hello from kid $$\n" } )
      ->wait_for_all();
+     # or ->wait_for_all_optimized(); # beta - group jobs and run one single fork per/cpu
     
     print qq[This is done.\n];
 
@@ -306,6 +374,17 @@ You can add some sub to be run in parallel.
 
     $p->add( sub { 1 } );
     $p->add( sub { return { 1..6 } }, sub { my $result = shift; ... } );
+
+=head2 $p->total_jobs
+
+    return the total number of jobs
+
+=head2 $p->wait_for_all_optimized
+
+    similar to wait_for_all but the goal is to reduce the number of fork
+    by grouping tasks together to be run by the same process
+
+    For now this does not support callback. This is still in beta testing.
 
 =head2 $p->run
 

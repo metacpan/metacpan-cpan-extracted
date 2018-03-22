@@ -1,11 +1,11 @@
 package Net::DNS::SEC;
 
 #
-# $Id: SEC.pm 1643 2018-02-15 15:40:34Z willem $
+# $Id: SEC.pm 1655 2018-03-20 08:41:36Z willem $
 #
 our $VERSION;
-$VERSION = '1.04';
-our $SVNVERSION = (qw$LastChangedRevision: 1643 $)[1];
+$VERSION = '1.05';
+our $SVNVERSION = (qw$LastChangedRevision: 1655 $)[1];
 our $XS_VERSION = $VERSION;
 $VERSION = eval($VERSION);
 
@@ -45,7 +45,7 @@ use integer;
 use warnings;
 use Carp;
 
-Net::DNS::SEC->bootstrap($XS_VERSION);
+eval{ Net::DNS::SEC->bootstrap($XS_VERSION) } || warn;
 
 
 require Net::DNS::RR::CDS;

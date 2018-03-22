@@ -1083,7 +1083,7 @@ after '_analyse_completion_state' => sub {
                     }
                     # a req file was not found
                     $self->_set_state('fail');
-                    $run->stats->{failure_detected} = "required output file $file not updated";
+                    $run->stats->{failure_detected} = "required output file ($file) not updated";
                     $self->error(
                         "Stage (",
                         $self->name,
@@ -1095,13 +1095,23 @@ after '_analyse_completion_state' => sub {
                         $self->error(
                             "mod time: (",
                             $timestamp,
-                            ") should be more recent (smaller) than script time (",
+                            ") for file($file) should be more recent (less) than script time (",
                             $script_time,
                             ")"
                         );
+                        # my $script_file = $self->script_file;
+                        # $self->error(
+                            # "ls:\n",
+                            # `ls --full-time $script_file $file`
+                        # );
+                        # $self->error(
+                            # "-M:\n\t\t",
+                            # -M "$script_file", "\t$script_file", "\n\t\t",
+                            # -M "$file","\t$file", 
+                        # );
                     }
                     else {
-                        $self->error( "file does not exist" );
+                        $self->error( "file ($file) does not exist" );
                     }
                 }
             }
@@ -1122,6 +1132,14 @@ after '_analyse_completion_state' => sub {
     }
 };
 
+sub lof {
+    my $lof = shift;
+    my $res = '[';
+    $res .= " $_" for @$lof;
+    $res .= ' ]';
+    return $res;
+}
+
 # check whether criteria are satisfied to skip executing the stage
 sub _can_be_skipped {
     my $self = shift;
@@ -1133,13 +1151,13 @@ sub _can_be_skipped {
     for my $l (@$lol) {
         my $thispre = [@$pre, @{$l->{pre}}];
         $l = $l->{post};
-        $self->debug( "Considering skipstage, pre: ", Dumper($pre), ", list: ", Dumper( $l ) );
+        $self->debug( "Considering skipstage, pre: ", lof($thispre), ", list: ", lof( $l ) );
         unless (@$l) { # an empty list does not qualify for skipping
             $self->debug( "no skip: empty list element" );
             next LIST;
         }
         my $newest_pre;
-        for my $f (@$pre) {
+        for my $f (@$thispre) {
             # if there is a pre list
             #     check that they all exist and
             #     get latest pre timestamp
@@ -1368,12 +1386,12 @@ sub _file_list_acceptable_for_skip {
     for my $file (@$list) {
         my $ts = $file->timestamp;
         if (not defined $ts) {
-            $self->debug( "target file does not exists: $file" );
+            $self->debug( "target file does not exist: $file" );
             return undef;
         }
         if ($newest_pre) {
-            unless ($ts > $newest_pre) {
-                $self->debug( "target too old: timestamp of $file($ts) should be newer than ($newest_pre)" );
+            unless ($ts <= $newest_pre) {
+                $self->debug( "target too old: timestamp of $file($ts) should be newer (less) than newest prerequisite ($newest_pre)" );
                 return undef;
             }
         }

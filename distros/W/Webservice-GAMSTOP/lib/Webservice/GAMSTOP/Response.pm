@@ -3,7 +3,7 @@ package Webservice::GAMSTOP::Response;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';    # VERSION
+our $VERSION = '0.002';    # VERSION
 
 =head1 NAME
 
@@ -11,7 +11,7 @@ Webservice::GAMSTOP::Response - Response object for get_exclusion_for sub
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

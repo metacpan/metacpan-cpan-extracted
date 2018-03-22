@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib::Color;
 
 # ABSTRACT: Colors for use with Graphics::Raylib
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use Graphics::Raylib::XS qw(:all);
 use Convert::Color;
@@ -37,7 +37,7 @@ Graphics::Raylib::Color - Use predefined Raylib colors or define your own
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 
 =head1 LICENSE
 
-Copyright [2015-2017] EMBL-European Bioinformatics Institute
+Copyright [2015-2018] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -95,7 +95,10 @@ L<Bio::Perl>, L<Bio::DB::HTS>, L<Bio::DB::HTS::Alignment>, L<Bio::DB::HTS::Const
 # documentation only
 
 package Bio::DB::HTS::Pileup;
+
 use strict;
 use warnings;
-$Bio::DB::HTS::Pileup::VERSION = '2.9';
+
+$Bio::DB::HTS::Pileup::VERSION = '2.10';
+
 1;

@@ -1,6 +1,6 @@
 package App::GitGot::Command::checkout;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::checkout::VERSION = '1.334';
+$App::GitGot::Command::checkout::VERSION = '1.335';
 # ABSTRACT: checkout specific branch for managed repositories
 use 5.014;
 
@@ -124,7 +124,7 @@ App::GitGot::Command::checkout - checkout specific branch for managed repositori
 
 =head1 VERSION
 
-version 1.334
+version 1.335
 
 =head1 AUTHOR
 

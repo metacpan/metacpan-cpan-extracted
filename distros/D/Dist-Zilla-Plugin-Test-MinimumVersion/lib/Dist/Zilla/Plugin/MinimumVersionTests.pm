@@ -4,7 +4,7 @@ use warnings;
 
 package Dist::Zilla::Plugin::MinimumVersionTests;
 # ABSTRACT: Release tests for minimum required versions
-our $VERSION = '2.000007'; # VERSION
+our $VERSION = '2.000008'; # VERSION
 use Moose;
 extends 'Dist::Zilla::Plugin::Test::MinimumVersion';
 
@@ -29,7 +29,7 @@ Dist::Zilla::Plugin::MinimumVersionTests - Release tests for minimum required ve
 
 =head1 VERSION
 
-version 2.000007
+version 2.000008
 
 =for test_synopsis BEGIN { die "SKIP: Synopsis isn't Perl code" }
 
@@ -49,7 +49,7 @@ site near you, or see L<https://metacpan.org/module/Dist::Zilla::Plugin::Test::M
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/doherty/Dist-Zilla-Plugin-Test-MinimumVersion>
+The development version is on github at L<https://github.com/doherty/Dist-Zilla-Plugin-Test-MinimumVersion>
 and may be cloned from L<git://github.com/doherty/Dist-Zilla-Plugin-Test-MinimumVersion.git>
 
 =head1 BUGS AND LIMITATIONS

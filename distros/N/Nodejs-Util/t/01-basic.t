@@ -134,7 +134,7 @@ sub path_eq {
 sub paths_eq {
     my ($paths1, $paths2) = @_;
 
-    if (length $paths1 ne length $paths2) {
+    if (@$paths1 != @$paths2) {
         diag("paths1 = ", explain $paths1);
         diag("paths2 = ", explain $paths2);
         ok(0, "paths1 ne paths2 (different length)");

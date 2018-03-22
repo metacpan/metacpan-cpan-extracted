@@ -4,8 +4,7 @@ author:
   - 'Caelum: Rafael Kitover <rkitover@cpan.org>'
 build_requires:
   DBD::SQLite: '1.29'
-  DBIx::Class::IntrospectableM2M: 0
-  ExtUtils::MakeMaker: 6.59
+  ExtUtils::MakeMaker: '0'
   File::Path: '2.07'
   File::Temp: '0.16'
   Test::Deep: '0.107'
@@ -14,22 +13,22 @@ build_requires:
   Test::More: '0.94'
   Test::Warn: '0.21'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.18'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: DBIx-Class-Schema-Loader
 no_index:
   directory:
-    - inc
     - t
+    - inc
+    - maint
     - xt
 requires:
-  Carp::Clan: 0
+  Carp::Clan: '0'
   Class::Accessor::Grouped: '0.10008'
   Class::C3::Componentised: '1.0008'
   Class::Inspector: '1.27'
@@ -45,16 +44,16 @@ requires:
   List::Util: '1.33'
   MRO::Compat: '0.09'
   Scope::Guard: '0.20'
-  String::CamelCase: '0.02'
   String::ToIdentifier::EN: '0.05'
   Sub::Util: '1.40'
-  Try::Tiny: 0
+  Try::Tiny: '0'
   curry: '1.000000'
   namespace::clean: '0.23'
-  perl: 5.8.1
+  perl: '5.008001'
 resources:
   IRC: irc://irc.perl.org/#dbix-class
   MailingList: http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/dbix-class
   license: http://dev.perl.org/licenses/
   repository: https://github.com/dbsrgits/dbix-class-schema-loader
-version: '0.07048'
+version: '0.07049'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

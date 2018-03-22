@@ -1,0 +1,52 @@
+{
+   "abstract" : "Configuration File Management with versionning",
+   "author" : [
+      "Alban MANCHERON <alban.mancheron@lirmm.fr>, Nicolas PHILIPPE <nicolas.philippe@inserm.fr>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-FileManager",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.17",
+            "Data::Dumper" : "2.125",
+            "Exporter" : "5.62",
+            "File::Basename" : "2.76",
+            "File::HomeDir" : "0.97",
+            "POSIX" : "1.13",
+            "Pod::Usage" : "1.35",
+            "Text::Diff" : "1.41",
+            "Text::Patch" : "1.8",
+            "strict" : "1.04",
+            "utf8" : "1.07",
+            "warnings" : "1.06"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.7"
+}

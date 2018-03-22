@@ -1,5 +1,9 @@
 Revision history for perl module Test2::Tools::xUnit
 
+0.004     2018-03-22 08:44:25+00:00 Europe/London
+
+  - Prevent test fails because fixture tests are picked up.
+
 0.003 2018-03-15
 
   - Add Changes file

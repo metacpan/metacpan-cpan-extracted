@@ -1,9 +1,29 @@
 ==================================================
-Changes from 2017-02-20 00:00:00 +0000 to present.
+Changes from 2017-03-21 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.016 at 2018-02-20 21:43:26 +0000
+version 0.017 at 2018-03-21 22:10:48 +0000
+------------------------------------------
+
+  Change: e82253d61ef56ea2c9b9d0d250131404dcf8d57d
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-03-21 23:07:22 +0000
+
+    Bump to newest raylib version 
+
+  Change: 17af0f84069b7cbf24f7e6fbb78fdd3371ca4d6b
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-25 13:16:28 +0000
+
+    Make XS C89-compatible
+
+    raylib itself requires C99, but not for use. Fixes
+    http://www.cpantesters.org/cpan/report/a1e73230-168c-11e8-b84c-9eb724
+    d5b79b among others 
+
+------------------------------------------
+version 0.016 at 2018-02-20 21:40:48 +0000
 ------------------------------------------
 
   Change: 59a06dbc6c29496cb49646761ec404400c7ce620
@@ -338,18 +358,6 @@ version 0.003 at 2017-10-04 14:27:50 +0000
 
     Bigger bitmaps ran into size limits before. 
 
-------------------------------------------
-version 0.002 at 2017-02-21 23:25:10 +0000
-------------------------------------------
-
-  Change: 5a583f3cf0b7898ff480b2f3190d2da06c8ba7bb
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-02-22 00:25:10 +0000
-
-    Remove generated files and directories
-
-    from both git and perl distribution. This resolves issue #1. 
-
-===============================================
-Plus 1 release after 2017-02-20 00:00:00 +0000.
-===============================================
+================================================
+Plus 2 releases after 2017-03-21 00:00:00 +0000.
+================================================

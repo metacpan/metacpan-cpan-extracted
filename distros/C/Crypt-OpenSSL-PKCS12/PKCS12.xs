@@ -65,27 +65,36 @@ EVP_PKEY* _load_pkey(char* keyString, EVP_PKEY*(*p_loader)(BIO*, EVP_PKEY**, pem
   return pkey;
 }
 
-X509* _load_x509(char* keyString, X509*(*p_loader)(BIO*, X509**, pem_password_cb*, void*)) {
-
-  X509* x509;
+STACK_OF(X509)* _load_cert_chain(char* keyString, STACK_OF(X509_INFO)*(*p_loader)(BIO*, STACK_OF(X509_INFO)*, pem_password_cb*, void*)) {
+  int i;
+  STACK_OF(X509_INFO) *xis = NULL;
+  X509_INFO *xi = NULL;
   BIO* stringBIO;
+  STACK_OF(X509) *stack = sk_X509_new_null();
 
   if (!strncmp(keyString, "----", 4)) {
-
     CHECK_OPEN_SSL(stringBIO = BIO_new_mem_buf(keyString, strlen(keyString)));
-
   } else {
-
     CHECK_OPEN_SSL(stringBIO = BIO_new_file(keyString, "r"));
   }
 
-  x509 = p_loader(stringBIO, NULL, NULL, NULL);
+  xis = p_loader(stringBIO, NULL, NULL, NULL);
+  for (i = 0; i < sk_X509_INFO_num(xis); i++) {
+    xi = sk_X509_INFO_value(xis, i);
+    if (xi->x509 != NULL && stack != NULL) {
+      CHECK_OPEN_SSL(xi->x509);
+      if (!sk_X509_push(stack, xi->x509))
+        goto end;
+      xi->x509 = NULL;
+    }
+  }
 
+ end:
+  sk_X509_INFO_pop_free(xis, X509_INFO_free);
   (void)BIO_set_close(stringBIO, BIO_CLOSE);
   BIO_free_all(stringBIO);
 
-  CHECK_OPEN_SSL(x509);
-  return x509;
+  return stack;
 }
 
 /* stolen from OpenSSL.xs */
@@ -438,8 +447,8 @@ changepass(pkcs12, oldpwd = "", newpwd = "")
   RETVAL
 
 SV*
-create(pkcs12, cert = "", pk = "", pass = 0, file = 0, name = "PKCS12 Certificate")
-  char *cert
+create(pkcs12, cert_chain_pem = "", pk = "", pass = 0, file = 0, name = "PKCS12 Certificate")
+  char *cert_chain_pem
   char *pk
   char *pass
   char *file
@@ -448,14 +457,14 @@ create(pkcs12, cert = "", pk = "", pass = 0, file = 0, name = "PKCS12 Certificat
   PREINIT:
   FILE *fp;
   EVP_PKEY* pkey;
-  X509* x509;
   PKCS12 *p12;
+  STACK_OF(X509) *cert_chain = NULL;
 
   CODE:
 
-  pkey = _load_pkey(pk, PEM_read_bio_PrivateKey);
-  x509 = _load_x509(cert, PEM_read_bio_X509);
-  p12  = PKCS12_create(pass, name, pkey, x509, NULL, 0,0,0,0,0);
+  pkey       = _load_pkey(pk, PEM_read_bio_PrivateKey);
+  cert_chain = _load_cert_chain(cert_chain_pem, PEM_X509_INFO_read_bio);
+  p12        = PKCS12_create(pass, name, pkey, sk_X509_shift(cert_chain), cert_chain, 0, 0, 0, 0, 0);
 
   if (!p12) {
     ERR_print_errors_fp(stderr);

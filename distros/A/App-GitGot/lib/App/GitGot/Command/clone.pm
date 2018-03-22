@@ -1,6 +1,6 @@
 package App::GitGot::Command::clone;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::clone::VERSION = '1.334';
+$App::GitGot::Command::clone::VERSION = '1.335';
 # ABSTRACT: clone a remote repo and add it to your config
 use 5.014;
 
@@ -45,7 +45,11 @@ sub _execute {
 
   unless ( $self->opt->defaults ) {
     $name = prompt( 'Name: ' , $name );
-    $path = prompt( 'Path: ' , $path );
+    while() {
+        $path = prompt( 'Path: ' , $path );
+        last if not path($path)->exists;
+        say "can't clone into '$path': directory already exists";
+    }
     $tags = prompt( 'Tags: ' , $tags );
   }
 
@@ -78,7 +82,7 @@ App::GitGot::Command::clone - clone a remote repo and add it to your config
 
 =head1 VERSION
 
-version 1.334
+version 1.335
 
 =head1 SYNOPSIS
 

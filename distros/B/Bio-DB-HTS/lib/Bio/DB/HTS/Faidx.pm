@@ -1,6 +1,6 @@
 =head1 LICENSE
 
-Copyright [2015-2017] EMBL-European Bioinformatics Institute
+Copyright [2015-2018] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -56,7 +56,6 @@ Rishi Nag
 
 package Bio::DB::HTS::Faidx;
 
-use 5.014002;
 use strict;
 use warnings;
 
@@ -81,7 +80,7 @@ our @EXPORT = qw(
 
 );
 
-our $VERSION = '2.9';
+our $VERSION = '2.10';
 
 require XSLoader;
 XSLoader::load('Bio::DB::HTS::Faidx', $VERSION);

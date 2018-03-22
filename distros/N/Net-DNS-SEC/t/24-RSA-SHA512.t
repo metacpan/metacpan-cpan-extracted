@@ -1,4 +1,4 @@
-# $Id: 24-RSA-SHA512.t 1613 2018-01-15 13:47:13Z willem $	-*-perl-*-
+# $Id: 24-RSA-SHA512.t 1654 2018-03-19 15:53:37Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -17,7 +17,7 @@ foreach my $package ( sort keys %prerequisite ) {
 	exit;
 }
 
-plan tests => 7;
+plan tests => 8;
 
 
 my %filename;
@@ -75,9 +75,17 @@ my $signature = Net::DNS::SEC::RSA->sign( $sigdata, $private );
 ok( $signature, 'signature created using private key' );
 
 
-my $validated = Net::DNS::SEC::RSA->verify( $sigdata, $key, $signature );
-ok( $validated, 'signature validated using public key' );
+{
+	my $verified = Net::DNS::SEC::RSA->verify( $sigdata, $key, $signature );
+	ok( $verified, 'signature verified using public key' );
+}
 
+
+{
+	my $corrupt = 'corrupted data';
+	my $verified = Net::DNS::SEC::RSA->verify( $corrupt, $key, $signature );
+	ok( !$verified, 'signature over corrupt data not verified' );
+}
 
 exit;
 

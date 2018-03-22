@@ -1,9 +1,44 @@
+NAME
+    App::RegexpPatternUtils - CLI utilities related to Regexp::Pattern
+
+VERSION
+    This document describes version 0.003 of App::RegexpPatternUtils (from
+    Perl distribution App-RegexpPatternUtils), released on 2018-03-21.
+
 SYNOPSIS
-
 DESCRIPTION
+    This distribution includes several utilities related to Regexp::Pattern:
 
-    This distribution includes several utilities related to
-    Regexp::Pattern:
+    *   get-regexp-pattern-pattern
 
-    #INSERT_EXECS_LIST
+    *   list-regexp-pattern-modules
+
+    *   list-regexp-pattern-patterns
+
+    *   show-regexp-pattern-module
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-RegexpPatternUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-RegexpPatternUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-RegexpPatternUtil
+    s>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

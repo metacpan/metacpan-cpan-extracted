@@ -1,7 +1,7 @@
 package Progress::Any::Output::TermMessage;
 
-our $DATE = '2018-03-17'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2018-03-21'; # DATE
+our $VERSION = '0.040'; # VERSION
 
 use 5.010001;
 use strict;
@@ -19,6 +19,9 @@ sub new {
 
     my %args;
 
+    $args{fh} = delete($args0{fh});
+    $args{fh} //= \*STDERR;
+
     $args{template}          = delete($args0{template}) // "(%P/%T) %m";
     $args{single_line_task}  = delete($args0{single_line_task}) // 0;
 
@@ -31,6 +34,8 @@ sub new {
 sub update {
     my ($self, %args) = @_;
 
+    return unless $ENV{PROGRESS_TERM_MESSAGE} // $ENV{PROGRESS} // (-t $self->{fh});
+
     my $p = $args{indicator};
 
     my $s = $p->fill_template($self->{template}, %args);
@@ -39,13 +44,13 @@ sub update {
     if ($self->{single_line_task}) {
         if (defined($self->{prev_task}) && $self->{prev_task} ne $p->{task} ||
             $p->{finished}) {
-            print "\n";
+            print { $self->{fh} } "\n";
         } elsif (defined $self->{prev_task}) {
-            print "\b" x length($self->{prev_str});
+            print { $self->{fh} } "\b" x length($self->{prev_str});
         }
     }
-    print $s;
-    print "\n" if !$self->{single_line_task} || $p->{finished};
+    print { $self->{fh} } $s;
+    print { $self->{fh} } "\n" if !$self->{single_line_task} || $p->{finished};
 
     if ($p->{finished}) {
         undef $self->{prev_task};
@@ -71,7 +76,7 @@ Progress::Any::Output::TermMessage - Output progress to terminal as simple messa
 
 =head1 VERSION
 
-This document describes version 0.03 of Progress::Any::Output::TermMessage (from Perl distribution Progress-Any-Output-TermMessage), released on 2018-03-17.
+This document describes version 0.040 of Progress::Any::Output::TermMessage (from Perl distribution Progress-Any-Output-TermMessage), released on 2018-03-21.
 
 =head1 SYNOPSIS
 
@@ -94,6 +99,10 @@ Progress::Any::Output->set("TermMessage", %args) >>.
 Known arguments:
 
 =over
+
+=item * fh => GLOB (default: \*STDERR)
+
+Wheere to send progress message.
 
 =item * template => STR (default: '(%P/%T) %m')
 
@@ -129,6 +138,19 @@ will result in:
 all in one line.
 
 =back
+
+=head1 ENVIRONMENT
+
+=head2 PROGRESS_TERM_MESSAGE
+
+Bool. Forces disabling or enabling progress output (just for this output).
+
+In the absence of PROGRESS_TERM_MESSAGE and PROGRESS, will default to 1 if
+filehandle is tested to be in interactive mode (using C<-t>).
+
+=head2 PROGRESS
+
+Bool. Forces disabling or enabling progress output (for all outputs).
 
 =head1 HOMEPAGE
 

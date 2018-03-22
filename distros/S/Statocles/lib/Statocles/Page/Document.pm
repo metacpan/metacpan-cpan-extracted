@@ -1,5 +1,5 @@
 package Statocles::Page::Document;
-our $VERSION = '0.087';
+our $VERSION = '0.088';
 # ABSTRACT: Render document objects into HTML
 
 use Statocles::Base 'Class';
@@ -73,13 +73,13 @@ has _tags => (
     init_arg => 'tags',
 );
 
-has '+_links' => (
-    default => sub { $_[0]->document->links },
-);
+sub links {
+    shift->document->links( @_ );
+}
 
-has '+_images' => (
-    default => sub { $_[0]->document->images },
-);
+sub images {
+    shift->document->images( @_ );
+}
 
 #pod =attr data
 #pod
@@ -274,17 +274,54 @@ around layout => sub {
 #pod =attr next
 #pod
 #pod The path to the next document if it is part of a list.
-#pod
-#pod =attr prev
-#pod
-#pod The path to the previous document if it is part of a list.
+#pod Defaults to the L<Statocles::Document/path> from L</next_page> if it exists.
 #pod
 #pod =cut
 
-has [qw( next prev )] => (
+has next => (
     is => 'rw',
-    isa => Path,
+    lazy => 1,
+    isa => Path|Undef,
     coerce => Path->coercion,
+    default => sub { $_[0]->_page_path('next_page') },
+);
+
+#pod =attr prev
+#pod
+#pod The path to the previous document if it is part of a list.
+#pod Defaults to the L<Statocles::Document/path> from L</prev_page> if it exists.
+#pod
+#pod =cut
+
+has prev => (
+    is => 'rw',
+    lazy => 1,
+    isa => Path|Undef,
+    coerce => Path->coercion,
+    default => sub { $_[0]->_page_path('prev_page') },
+);
+
+sub _page_path {
+  my ( $self, $method ) = @_;
+  if ( my $page = $self->$method() ) {
+    return $page->path;
+  }
+  return undef;
+}
+
+#pod =attr next_page
+#pod
+#pod The L<Statocles::Page::Document> instance of the next document if it is part of a list.
+#pod
+#pod =attr prev_page
+#pod
+#pod The L<Statocles::Page::Document> instance of the previous document if it is part of a list.
+#pod
+#pod =cut
+
+has [qw( next_page prev_page )] => (
+    is => 'rw',
+    isa => InstanceOf['Statocles::Page::Document'],
 );
 
 1;
@@ -301,7 +338,7 @@ Statocles::Page::Document - Render document objects into HTML
 
 =head1 VERSION
 
-version 0.087
+version 0.088
 
 =head1 DESCRIPTION
 
@@ -349,10 +386,20 @@ the application (L<Statocles::App/disable_content_template>), or the site
 =head2 next
 
 The path to the next document if it is part of a list.
+Defaults to the L<Statocles::Document/path> from L</next_page> if it exists.
 
 =head2 prev
 
 The path to the previous document if it is part of a list.
+Defaults to the L<Statocles::Document/path> from L</prev_page> if it exists.
+
+=head2 next_page
+
+The L<Statocles::Page::Document> instance of the next document if it is part of a list.
+
+=head2 prev_page
+
+The L<Statocles::Page::Document> instance of the previous document if it is part of a list.
 
 =head1 METHODS
 

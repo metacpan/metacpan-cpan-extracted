@@ -1,7 +1,5 @@
 #! perl
 
-package App::find2perl;
-$App::find2perl::VERSION = '1.003';
 use strict;
 use vars qw/$statdone/;
 use File::Spec::Functions 'curdir';

@@ -3,9 +3,9 @@ NAME
     terminal as color bar
 
 VERSION
-    This document describes version 0.241 of
+    This document describes version 0.243 of
     Progress::Any::Output::TermProgressBarColor (from Perl distribution
-    Progress-Any-Output-TermProgressBarColor), released on 2018-03-17.
+    Progress-Any-Output-TermProgressBarColor), released on 2018-03-21.
 
 SYNOPSIS
      use Progress::Any::Output;
@@ -84,10 +84,10 @@ METHODS
 
          <color ffff00>%p</color> <color 808000>[</color>%B<color 808000>]</color><color ffff00>%e</color>
 
-    *   fh => handle (default: \*STDOUT)
+    *   fh => handle (default: \*STDERR)
 
-        Instead of the default STDOUT, you can direct the output to another
-        filehandle.
+        Instead of the default STDERR, you can direct the output to another
+        filehandle e.g. STDOUT.
 
     *   show_delay => int
 
@@ -105,14 +105,25 @@ METHODS
     it will be 5 seconds again before showing.
 
 ENVIRONMENT
-  COLOR => bool
-    Can be used to force or disable color. See Color::ANSI::Util.
+  COLOR
+    Bool. Can be used to force or disable color. See Color::ANSI::Util.
 
-  COLOR_DEPTH => int
-    Can be used to override color depth detection. See Color::ANSI::Util.
+  COLOR_DEPTH
+    Integer. Can be used to override color depth detection. See
+    Color::ANSI::Util.
 
-  COLUMNS => int
-    Can be used to override terminal width detection.
+  COLUMNS
+    Integer. Can be used to override terminal width detection.
+
+  PROGRESS_TERM_BAR
+    Bool. Forces disabling or enabling progress output (just for this
+    output).
+
+    In the absence of PROGRESS_TERM_MESSAGE and PROGRESS, will default to 1
+    if filehandle is detected as interactive (using "-t").
+
+  PROGRESS
+    Bool. Forces disabling or enabling progress output (for all outputs).
 
 HOMEPAGE
     Please visit the project's homepage at

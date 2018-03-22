@@ -1,9 +1,9 @@
 ###############################################################################
 #                                                                             #
-#    Copyright © 2012-2013 -- LIRMM/UM2                                       #
+#    Copyright © 2012-2018 -- LIRMM/UM                                        #
 #                            (Laboratoire d'Informatique, de Robotique et de  #
 #                             Microélectronique de Montpellier /              #
-#                             Université de Montpellier 2)                    #
+#                             Université de Montpellier)                      #
 #                             IRB/INSERM                                      #
 #                            (Institut de Recherche en Biothérapie /          #
 #                             Institut National de la Santé et de la          #
@@ -77,11 +77,14 @@
 #                                                                             #
 ###############################################################################
 #
-# $Id: Makefile.PL,v 1.4 2014/04/09 07:33:38 doccy Exp $
+# $Id: Makefile.PL,v 1.5 2018/03/19 13:16:38 doccy Exp $
 #
 ###############################################################################
 #
 # $Log: Makefile.PL,v $
+# Revision 1.5  2018/03/19 13:16:38  doccy
+# BugFix: module file was encoded with ISO-8859-1. Switching to UT-8.
+#
 # Revision 1.4  2014/04/09 07:33:38  doccy
 # Removing PREREQ_FATAL in makefile (thanks to both Jérôme Audoux and Slaven
 # Rezic).

@@ -2,7 +2,7 @@ use Test2::V0;
 use Test2::API 'intercept';
 
 my $events = intercept {
-    do "./t/fixtures/attribute-todo.t";
+    do "./t/fixtures/attribute-todo.it";
 };
 
 is $events, array {

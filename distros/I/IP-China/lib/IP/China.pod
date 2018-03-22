@@ -18,10 +18,10 @@ IP::China - decide whether an internet address is from China
 
 =head1 VERSION
 
-This documents IP::China version 20170704
-corresponding to git commit L<72e6c5fac49cb99a8f4052ecff15d513047c4453|https://github.com/benkasminbullock/chinese-ip/commit/72e6c5fac49cb99a8f4052ecff15d513047c4453> released on Sun Jul 30 15:30:33 2017 +0900. 
+This documents IP::China version 20180308
+corresponding to git commit L<cd48a8ebb3c02d6c2db20d41578a7bca6947082f|https://github.com/benkasminbullock/chinese-ip/commit/cd48a8ebb3c02d6c2db20d41578a7bca6947082f> released on Wed Mar 21 20:22:58 2018 +0900. 
 
-This module incorporates the MaxMind GeoLite data of date 20170704 (YYYYMMDD).
+This module incorporates the MaxMind GeoLite data of date 20180308 (YYYYMMDD).
 
 =head1 DESCRIPTION
 
@@ -63,6 +63,7 @@ L<http://www.lemoda.net/networking/block-china/> contains an article
 and some links to further information.
 
 
+
 =head1 AUTHOR
 
 Ben Bullock, <bkb@cpan.org>
@@ -70,7 +71,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2013-2017
+2013-2018
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

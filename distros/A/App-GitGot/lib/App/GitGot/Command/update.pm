@@ -1,6 +1,6 @@
 package App::GitGot::Command::update;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::update::VERSION = '1.334';
+$App::GitGot::Command::update::VERSION = '1.335';
 # ABSTRACT: update managed repositories
 use 5.014;
 
@@ -32,7 +32,7 @@ App::GitGot::Command::update - update managed repositories
 
 =head1 VERSION
 
-version 1.334
+version 1.335
 
 =head1 AUTHOR
 

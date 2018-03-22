@@ -1,4 +1,4 @@
-
+BEGIN { binmode STDOUT, ':utf8'; }
 use Mojo::Base -strict;
 use Test::More;
 use Test::Mojo;
@@ -35,5 +35,13 @@ $t->get_ok('/')->status_is(200)->content_like(qr/Mojolicious/i);
 $t->get_ok('/posts')->status_is(200)->content_like(qr/post5/);
 $t->get_ok('/posts/index')->status_is(200)->content_like(qr/post5/);
 $t->post_ok('/posts')->status_is(201)->content_is('');
+
+#find some defined routes
+my $routes       = $t->app->routes;
+my $routes_class = 'Mojolicious::Routes::Route';
+isa_ok($routes->find('управление'), $routes_class, 'found /управление');
+isa_ok($routes->find('вход'),       $routes_class, 'found +/вход');
+isa_ok($routes->find('blahid'),     $routes_class, 'found +/blah/id');
+
 
 done_testing();

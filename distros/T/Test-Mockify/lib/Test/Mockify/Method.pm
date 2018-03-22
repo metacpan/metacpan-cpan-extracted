@@ -6,7 +6,7 @@ Test::Mockify::Method - chained setup
 
 =head1 DESCRIPTION
 
-L<Test::Mockify::Method> is used to provide the chained mock setup
+L<Test::Mockify::Method|Test::Mockify::Method> is used to provide the chained mock setup
 
 =head1 METHODS
 
@@ -26,6 +26,7 @@ use Test::Mockify::TypeTests qw (
 use Test::Mockify::Matcher qw (SupportedTypes);
 use Scalar::Util qw( blessed );
 use strict;
+use Test::Mockify::Tools qw (Error);
 use warnings;
 
 #---------------------------------------------------------------------
@@ -45,8 +46,8 @@ sub new {
 
 =head2 when
 
-C<when> have to be called with a L<Test::Mockify::Matcher> to specify the expected parameter list (signature).
-This will create for every signature a Parameter Object which will stored and also returned. So it is possible to create multiple signatures for one Method.
+C<when> have to be called with a L<Test::Mockify::Matcher|Test::Mockify::Matcher> to specify the expected parameter list (signature).
+This will create for every signature a L<Test::Mockify::Parameter|Test::Mockify::Parameter> Object which will stored and also returned. So it is possible to create multiple signatures for one Method.
 It is not possible to mix C<when> with C<whenAny>.
 
   when(String())
@@ -59,11 +60,11 @@ sub when {
     my @Signature;
     foreach my $Signature (keys %{$self->{'TypeStore'}}){
         if($Signature eq 'UsedWithWhenAny'){
-            die('It is not possible to use a mixture between "when" and "whenAny"');
+            Error('It is not possible to mix "when" and "whenAny" for the same method.');
         }
     }
     foreach my $hParameter ( @Parameters ){
-        die('Use Test::Mockify::Matcher to define proper matchers.') unless (ref($hParameter) eq 'HASH');
+        Error('Use Test::Mockify::Matcher to define proper matchers.') unless (ref($hParameter) eq 'HASH');
         push(@Signature, $hParameter->{'Type'});
     }
     $self->_checkExpectedParameters(\@Parameters);
@@ -73,7 +74,7 @@ sub when {
 
 =head2 whenAny
 
-C<whenAny> have to be called without parameter, when called it will accept any type and amount of parameter. It will return a Parameter Object.
+C<whenAny> have to be called without parameter, when called it will accept any type and amount of parameter. It will return a L<Test::Mockify::Parameter|Test::Mockify::Parameter> Object.
 It is not possible to mix C<whenAny> with C<when>.
 
   whenAny()
@@ -81,18 +82,19 @@ It is not possible to mix C<whenAny> with C<when>.
 =cut
 sub whenAny {
     my $self = shift;
-    die ('"whenAny" don`t allow any parameters' ) if (@_);
+    Error ('"whenAny" doesn\'t allow any parameters' ) if (@_);
     if((scalar keys %{$self->{'TypeStore'}})){
-        die('"whenAny" can only used once. Also it is not possible to use a mixture between "when" and "whenAny"');
+        Error('You can use "whenAny" only once. Additionaly, it is not possible to mix "when" and "whenAny" for the same method.');
     }
     return $self->_addToTypeStore(['UsedWithWhenAny']);
 }
+
 #---------------------------------------------------------------------
 sub _checkExpectedParameters{
     my $self = shift;
     my ( $NewExpectedParameters) = @_;
     my $SignatureKey = '';
-    for(my $i = 0; $i < scalar @$NewExpectedParameters; $i++){
+    for(my $i = 0; $i < scalar @{$NewExpectedParameters}; $i++){ ## no critic (ProhibitCStyleForLoops) i need the counter
         my $Type = $NewExpectedParameters->[$i]->{'Type'};
         $SignatureKey .= $Type;
         my $NewExpectedParameter = $NewExpectedParameters->[$i];
@@ -104,7 +106,7 @@ sub _checkExpectedParameters{
 
     foreach my $ExistingParameter (@{$self->{'TypeStore'}{$SignatureKey}}){
         if($ExistingParameter->compareExpectedParameters($NewExpectedParameters)){
-            die('It is not possible two add two times the same method Signature.');
+            Error('You can use a method signature only once.');
         }
     }
 }
@@ -115,11 +117,11 @@ sub _testMatcherStore {
     my ($MatcherStore, $NewExpectedParameterValue) = @_;
     if( defined $NewExpectedParameterValue->{'Value'} ){
         if($MatcherStore and not $MatcherStore->{'Value'}){
-            die('It is not possibel to mix "expected parameter" with previously set "any parameter".');
+            Error('It is not possibel to mix "expected parameter" with previously set "any parameter".');
         }
     } else {
         if($MatcherStore && $MatcherStore->{'Value'}){
-            die('It is not possibel to mix "any parameter" with previously set "expected parameter".');
+            Error('It is not possibel to mix "any parameter" with previously set "expected parameter".');
         }
     }
     return;
@@ -130,10 +132,10 @@ sub _testAnyStore {
     my ($AnyStore, $Type) = @_;
     if($AnyStore){
         if($AnyStore eq 'any' and $Type ne 'any'){
-            die('It is not possibel to mix "specific type" with previously set "any type".');
+            Error('It is not possibel to mix "specific type" with previously set "any type".');
         }
         if($AnyStore ne 'any' and $Type eq 'any'){
-            die('It is not possibel to mix "any type" with previously set "specific type".');
+            Error('It is not possibel to mix "any type" with previously set "specific type".');
         }
     }
     return;
@@ -142,7 +144,7 @@ sub _testAnyStore {
 sub _addToTypeStore {
     my $self = shift;
     my ($Signature, $NewExpectedParameters) = @_;
-    my $SignatureKey = join('',@$Signature);
+    my $SignatureKey = join('',@{$Signature});
     my $Parameter = Test::Mockify::Parameter->new($NewExpectedParameters);
     push(@{$self->{'TypeStore'}{$SignatureKey}}, $Parameter );
     return $Parameter->buildReturn();
@@ -160,7 +162,7 @@ sub call {
     my $self = shift;
     my @Parameters = @_;
     my $SignatureKey = '';
-    for(my $i = 0; $i < scalar @Parameters; $i++){
+    for(my $i = 0; $i < scalar @Parameters; $i++){ ## no critic (ProhibitCStyleForLoops) i need the counter
         if($self->{'AnyStore'}->[$i] && $self->{'AnyStore'}->[$i] eq 'any'){
             $SignatureKey .= 'any';
         }else{
@@ -176,7 +178,7 @@ sub call {
             }
         }
     }
-    die ("No matching found for $SignatureKey -> ".Dumper(\@Parameters));
+    Error ("No matching found for signatur type '$SignatureKey' \nvalues:".Dumper(\@Parameters));
 }
 #---------------------------------------------------------------------
 sub _getType{
@@ -189,7 +191,7 @@ sub _getType{
     return 'number' if(IsFloat($Parameter));
     return 'string' if(IsString($Parameter));
     return 'undef' if( not $Parameter);
-    die("UnexpectedParameterType for: '$Parameter'");
+    Error("UnexpectedParameterType for: '$Parameter'");
 }
 
 1;

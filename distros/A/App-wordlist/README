@@ -2,8 +2,8 @@ NAME
     App::wordlist - Grep words from WordList::*
 
 VERSION
-    This document describes version 0.264 of App::wordlist (from Perl
-    distribution App-wordlist), released on 2018-02-20.
+    This document describes version 0.266 of App::wordlist (from Perl
+    distribution App-wordlist), released on 2018-03-22.
 
 SYNOPSIS
     See the included script wordlist.
@@ -155,8 +155,6 @@ SEE ALSO
     "Games::Word::Wordlist::*" instead.
 
     WordList and "WordList::*" modules.
-
-    WordListC and "WordListC::*" modules.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

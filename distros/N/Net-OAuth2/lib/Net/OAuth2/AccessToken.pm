@@ -1,10 +1,14 @@
-# Copyrights 2013-2016 by [Mark Overmeer].
-#  For other contributors see Changes.
+# Copyrights 2013-2018 by [Mark Overmeer <markov@cpan.org>].
+#  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution Net-OAuth2.  Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+
 package Net::OAuth2::AccessToken;
 use vars '$VERSION';
-$VERSION = '0.63';
+$VERSION = '0.64';
 
 use warnings;
 use strict;
@@ -45,6 +49,7 @@ sub init($)
     $self->{NOA_refresh_always}= $args->{refresh_always};
     $self->{NOA_scope}         = $args->{scope};
     $self->{NOA_state}         = $args->{state};
+    $self->{NOA_hd}            = $args->{hd};
     $self->{NOA_token_type}    = $args->{token_type};
     $self->{NOA_auto_refresh}  = $args->{auto_refresh};
     $self->{NOA_changed}       = $args->{changed};
@@ -69,6 +74,7 @@ sub session_thaw($%)
 sub token_type() {shift->{NOA_token_type}}
 sub scope()      {shift->{NOA_scope}}
 sub state()      {shift->{NOA_state}}
+sub hd()         {shift->{NOA_hd}}
 sub profile()    {shift->{NOA_profile}}
 
 

@@ -243,7 +243,7 @@ sub setup_schema {
         additional_classes      => 'TestAdditional',
         additional_base_classes => 'TestAdditionalBase',
         left_base_classes       => [ qw/TestLeftBase/ ],
-        components              => [ qw/TestComponent +TestComponentFQN IntrospectableM2M/ ],
+        components              => [ qw/TestComponent +TestComponentFQN +IntrospectM2M/ ],
         inflect_plural          => { loader_test4_fkid => 'loader_test4zes' },
         inflect_singular        => { fkid => 'fkid_singular' },
         moniker_map             => \&_monikerize,

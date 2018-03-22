@@ -6,3 +6,8 @@
 .travis.yml
 ^Makefile$
 MANIFEST.bak
+blib/
+PKCS12.bs
+PKCS12.c
+PKCS12.o
+pm_to_blib

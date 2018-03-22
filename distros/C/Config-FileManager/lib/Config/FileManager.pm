@@ -1,47 +1,47 @@
 ###############################################################################
 #                                                                             #
-#    Copyright © 2012-2013 -- LIRMM/UM2                                       #
+#    Copyright Â© 2012-2018 -- LIRMM/UM                                        #
 #                            (Laboratoire d'Informatique, de Robotique et de  #
-#                             Microélectronique de Montpellier /              #
-#                             Université de Montpellier 2)                    #
+#                             MicroÃ©lectronique de Montpellier /              #
+#                             UniversitÃ© de Montpellier)                      #
 #                             IRB/INSERM                                      #
-#                            (Institut de Recherche en Biothérapie /          #
-#                             Institut National de la Santé et de la          #
-#                             Recherche Médicale)                             #
+#                            (Institut de Recherche en BiothÃ©rapie /          #
+#                             Institut National de la SantÃ© et de la          #
+#                             Recherche MÃ©dicale)                             #
 #                                                                             #
 #  Auteurs/Authors: Alban MANCHERON  <alban.mancheron@lirmm.fr>               #
 #                   Nicolas PHILIPPE <nicolas.philippe@inserm.fr>             #
 #                                                                             #
 #  -------------------------------------------------------------------------  #
 #                                                                             #
-#  Ce fichier  fait partie  du Pipeline  de traitement  de données NGS de la  #
-#  plateforme ATGC labélisée par le GiS IBiSA.                                #
+#  Ce fichier  fait partie  du Pipeline  de traitement  de donnÃ©es NGS de la  #
+#  plateforme ATGC labÃ©lisÃ©e par le GiS IBiSA.                                #
 #                                                                             #
-#  Ce logiciel est régi  par la licence CeCILL  soumise au droit français et  #
+#  Ce logiciel est rÃ©gi  par la licence CeCILL  soumise au droit franÃ§ais et  #
 #  respectant les principes  de diffusion des logiciels libres.  Vous pouvez  #
 #  utiliser, modifier et/ou redistribuer ce programme sous les conditions de  #
-#  la licence CeCILL  telle que diffusée par le CEA,  le CNRS et l'INRIA sur  #
+#  la licence CeCILL  telle que diffusÃ©e par le CEA,  le CNRS et l'INRIA sur  #
 #  le site "http://www.cecill.info".                                          #
 #                                                                             #
-#  En contrepartie de l'accessibilité au code source et des droits de copie,  #
-#  de modification et de redistribution accordés par cette licence, il n'est  #
-#  offert aux utilisateurs qu'une garantie limitée.  Pour les mêmes raisons,  #
-#  seule une responsabilité  restreinte pèse  sur l'auteur du programme,  le  #
-#  titulaire des droits patrimoniaux et les concédants successifs.            #
+#  En contrepartie de l'accessibilitÃ© au code source et des droits de copie,  #
+#  de modification et de redistribution accordÃ©s par cette licence, il n'est  #
+#  offert aux utilisateurs qu'une garantie limitÃ©e.  Pour les mÃªmes raisons,  #
+#  seule une responsabilitÃ©  restreinte pÃ¨se  sur l'auteur du programme,  le  #
+#  titulaire des droits patrimoniaux et les concÃ©dants successifs.            #
 #                                                                             #
-#  À  cet égard  l'attention de  l'utilisateur est  attirée sur  les risques  #
-#  associés  au chargement,  à  l'utilisation,  à  la modification  et/ou au  #
-#  développement  et à la reproduction du  logiciel par  l'utilisateur étant  #
-#  donné  sa spécificité  de logiciel libre,  qui peut le rendre  complexe à  #
-#  manipuler et qui le réserve donc à des développeurs et des professionnels  #
-#  avertis  possédant  des  connaissances  informatiques  approfondies.  Les  #
-#  utilisateurs  sont donc  invités  à  charger  et  tester  l'adéquation du  #
-#  logiciel  à leurs besoins  dans des conditions  permettant  d'assurer  la  #
-#  sécurité de leurs systêmes et ou de leurs données et,  plus généralement,  #
-#  à l'utiliser et l'exploiter dans les mêmes conditions de sécurité.         #
+#  Ã€  cet Ã©gard  l'attention de  l'utilisateur est  attirÃ©e sur  les risques  #
+#  associÃ©s  au chargement,  Ã Â  l'utilisation,  Ã Â  la modification  et/ou au  #
+#  dÃ©veloppement  et Ã Â la reproduction du  logiciel par  l'utilisateur Ã©tant  #
+#  donnÃ©  sa spÃ©cificitÃ©  de logiciel libre,  qui peut le rendre  complexe Ã   #
+#  manipuler et qui le rÃ©serve donc Ã Â des dÃ©veloppeurs et des professionnels  #
+#  avertis  possÃ©dant  des  connaissances  informatiques  approfondies.  Les  #
+#  utilisateurs  sont donc  invitÃ©s  Ã Â  charger  et  tester  l'adÃ©quation du  #
+#  logiciel  Ã Â leurs besoins  dans des conditions  permettant  d'assurer  la  #
+#  sÃ©curitÃ© de leurs systÃªmes et ou de leurs donnÃ©es et,  plus gÃ©nÃ©ralement,  #
+#  Ã Â l'utiliser et l'exploiter dans les mÃªmes conditions de sÃ©curitÃ©.         #
 #                                                                             #
-#  Le fait  que vous puissiez accéder  à cet en-tête signifie  que vous avez  #
-#  pris connaissance  de la licence CeCILL,  et que vous en avez accepté les  #
+#  Le fait  que vous puissiez accÃ©der  Ã Â cet en-tÃªte signifie  que vous avez  #
+#  pris connaissance  de la licence CeCILL,  et que vous en avez acceptÃ© les  #
 #  termes.                                                                    #
 #                                                                             #
 #  -------------------------------------------------------------------------  #
@@ -77,11 +77,14 @@
 #                                                                             #
 ###############################################################################
 #
-# $Id: FileManager.pm,v 1.6 2013/11/07 10:19:25 doccy Exp $
+# $Id: FileManager.pm,v 1.7 2018/03/19 13:16:31 doccy Exp $
 #
 ###############################################################################
 #
 # $Log: FileManager.pm,v $
+# Revision 1.7  2018/03/19 13:16:31  doccy
+# BugFix: module file was encoded with ISO-8859-1. Switching to UT-8.
+#
 # Revision 1.6  2013/11/07 10:19:25  doccy
 # Renaming the module.
 #
@@ -89,7 +92,7 @@
 # Update Copyright informations
 #
 # Revision 1.4  2013/05/22 10:42:43  doccy
-# Add CÃ©CILL Copyright Notice
+# Add CÃƒÂ©CILL Copyright Notice
 #
 # Revision 1.3  2013/05/22 08:11:25  doccy
 # Fix POD examples.
@@ -124,7 +127,7 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = (qw$Revision: 1.6 $)[-1];
+our $VERSION = (qw$Revision: 1.7 $)[-1];
 
 ###########################
 # Plain Old Documentation #
@@ -698,22 +701,22 @@ Nicolas PHILIPPE E<lt>L<nicolas.philippe@inserm.fr|mailto:nicolas.philippe@inser
 
 Copyright (C) 2012-2013 -- LIRMM/UM2
                            (Laboratoire d'Informatique, de Robotique et de
-                            Microélectronique de Montpellier /
-                            Université de Montpellier 2)
+                            MicroÃ©lectronique de Montpellier /
+                            UniversitÃ© de Montpellier 2)
                            IRB/INSERM
-                           (Institut de Recherche en Biothérapie /
-                            Institut National de la Santé et de la
-                            Recherche Médicale)
+                           (Institut de Recherche en BiothÃ©rapie /
+                            Institut National de la SantÃ© et de la
+                            Recherche MÃ©dicale)
 
 =head2 FRENCH
 
-Ce fichier  fait partie  du Pipeline  de traitement  de données NGS de la
-plateforme ATGC labélisée par le GiS IBiSA.
+Ce fichier  fait partie  du Pipeline  de traitement  de donnÃ©es NGS de la
+plateforme ATGC labÃ©lisÃ©e par le GiS IBiSA.
 
-Ce logiciel est régi  par la licence CeCILL  soumise au droit français et
+Ce logiciel est rÃ©gi  par la licence CeCILL  soumise au droit franÃ§ais et
 respectant les principes  de diffusion des logiciels libres.  Vous pouvez
 utiliser, modifier et/ou redistribuer ce programme sous les conditions de
-la licence CeCILL  telle que diffusée par le CEA,  le CNRS et l'INRIA sur
+la licence CeCILL  telle que diffusÃ©e par le CEA,  le CNRS et l'INRIA sur
 le site "http://www.cecill.info".
 
 =head2 ENGLISH

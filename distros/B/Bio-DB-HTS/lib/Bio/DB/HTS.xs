@@ -1,5 +1,5 @@
 /*
-Copyright [2015-2017] EMBL-European Bioinformatics Institute
+Copyright [2015-2018] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -30,6 +30,11 @@ limitations under the License.
  #endif
  #include <perlio.h>
 #endif
+
+#define TRACEME(x) do {						\
+    if (SvTRUE(perl_get_sv("Bio::DB::HTS::ENABLE_DEBUG", TRUE)))	\
+      { PerlIO_stdoutf (x); PerlIO_stdoutf ("\n"); }		\
+  } while (0)
 
 #ifndef Newx
 #  define Newx(v,n,t) New(0,v,n,t)
@@ -105,6 +110,31 @@ void XS_pack_charPtrPtr( SV * arg, char ** array, int count) {
   SvSetSV( arg, newRV((SV*)avref));
 }
 
+static int invoke_sv_to_int_fun(SV *func, SV *arg)
+{
+  dSP;
+  int count, ret;
+
+  ENTER;
+  SAVETMPS;
+
+  PUSHMARK(SP);
+  XPUSHs(arg);
+  PUTBACK;
+
+  count = call_sv(func, G_SCALAR);
+  SPAGAIN;
+
+  if (count != 1) return -1;
+
+  ret = POPi;
+  PUTBACK;
+  FREETMPS;
+  LEAVE;
+
+  return ret;
+}
+
 int hts_fetch_fun (void *data, bam1_t *b)
 {
   dSP;
@@ -120,8 +150,12 @@ int hts_fetch_fun (void *data, bam1_t *b)
   callback     = fcp->callback;
   callbackdata = fcp->data;
 
-  /* turn the bam1_t into an appropriate object */
-  /* need to dup it here so that the C layer doesn't reuse the address under Perl */
+  /* The underlying bam1_t will be bam_destroy1()ed by alignment_obj's
+   * destructor, so we need to duplicate it here. We could create the Perl SV
+   * alongside the C bam1_t (cf bami_coverage), but note that a new b & b_sv
+   * would be needed for each iteration, as some callback functions will
+   * expect distinct references to distinct alignment objects each time.
+   */
   b2 = bam_dup1(b);
 
   alignment_obj = sv_setref_pv(newSV(sizeof(bam1_t)),"Bio::DB::HTS::Alignment",(void*) b2);
@@ -189,6 +223,8 @@ int invoke_pileup_callback_fun(uint32_t tid,
 
   FREETMPS;
   LEAVE;
+
+  return 0;
 }
 
 /*
@@ -360,6 +396,17 @@ int hts_fetch(htsFile *fp, const hts_idx_t *idx, int tid, int beg, int end, void
 }
 
 
+MODULE = Bio::DB::HTS PACKAGE = Bio::DB::HTS
+
+SV*
+htslib_version(packname="Bio::DB::HTS")
+    char * packname
+  PROTOTYPE: $
+  CODE:
+    RETVAL = newSVpv(hts_version(), 0);
+  OUTPUT:
+    RETVAL
+
 MODULE = Bio::DB::HTS PACKAGE = Bio::DB::HTS::Fai PREFIX=fai_
 
 Bio::DB::HTS::Fai
@@ -398,7 +445,7 @@ fai_fetch(fai,reg)
 
 
 MODULE = Bio::DB::HTS PACKAGE = Bio::DB::HTSfile PREFIX=hts_
-
+      
 int
 max_pileup_cnt(packname,...)
 CODE:
@@ -471,10 +518,23 @@ hts_header_read(htsfile)
       const htsFormat *format ;
     CODE:
       format = hts_get_format( htsfile ) ;
-      if( format->format == bam ) //enum value from htsExactFormat from hts.h
-      {
+      if( format->format == bam  ) //enum value from htsExactFormat from hts.h
         result = bgzf_seek(htsfile->fp.bgzf,0,0) ;
+      /*
+       * https://github.com/Ensembl/Bio-DB-HTS/issues/54
+       * must seek at beginning of file for sam as well
+       */
+      else if ( format->format == sam ) {
+	/*
+	 * Using hseek with htslib < 1.5 triggers segfault
+	 * and couldn't find a valid alternative.
+	 *
+	 * WARNING: we're tied to buggy behaviour for htslib <= 1.3.1
+	 */
+	if ( strcmp(hts_version(), "1.5") >= 0 )
+	  result = hseek(htsfile->fp.hfile, 0, SEEK_SET);
       }
+
       bh = sam_hdr_read(htsfile);
       RETVAL = bh ;
     OUTPUT:
@@ -521,8 +581,10 @@ hts_read1(htsfile,header)
        if (sam_read1(htsfile,header,alignment) >= 0) {
          RETVAL = alignment ;
        }
-       else
+       else {
+         bam_destroy1(alignment);
          XSRETURN_EMPTY;
+       }
     OUTPUT:
        RETVAL
 
@@ -647,7 +709,7 @@ PREINIT:
     char* seq;
     int   i;
 CODE:
-    seq = Newxz(seq,b->core.l_qseq+1,char);
+    Newxz(seq,b->core.l_qseq+1,char);
     for (i=0;i<b->core.l_qseq;i++) {
       seq[i]=seq_nt16_str[bam_seqi(bam_get_seq(b),i)];
     }
@@ -1101,7 +1163,7 @@ CODE:
   hts_plbuf_destroy(pileup);
 
 AV*
-bami_coverage(bai,hfp,ref,start,end,bins=0,maxcnt=8000)
+bami_coverage(bai,hfp,ref,start,end,bins=0,maxcnt=8000,filter=NULL)
     Bio::DB::HTS::Index bai
     Bio::DB::HTSfile    hfp
     int             ref
@@ -1109,13 +1171,14 @@ bami_coverage(bai,hfp,ref,start,end,bins=0,maxcnt=8000)
     int             end
     int             bins
     int             maxcnt
+    SV*             filter
 PREINIT:
     coverage_graph  cg;
     hts_plbuf_t    *pileup;
     AV*             array;
-    SV*             cov;
-    int             i;
+    int             i, ret;
     bam_hdr_t      *bh;
+    hts_itr_t      *iter;
     const htsFormat *format ;
 CODE:
   {
@@ -1148,7 +1211,30 @@ CODE:
             bam_plp_set_maxcnt(pileup->iter,maxcnt);
       else
             bam_plp_set_maxcnt(pileup->iter,MaxPileupCnt);
-      hts_fetch(hfp,bai,ref,start,end,(void*)pileup,add_pileup_line);
+
+      iter = sam_itr_queryi(bai, ref, start, end);
+
+      if (items >= 8 && SvROK(filter) && SvTYPE(SvRV(filter)) == SVt_PVCV)
+      {
+        bam1_t *b = bam_init1();
+        SV *b_sv = sv_setref_pv(newSV(sizeof b), "Bio::DB::HTS::Alignment", b);
+
+        while ((ret = sam_itr_next(hfp, iter, b)) >= 0)
+          if (invoke_sv_to_int_fun(filter, b_sv) != 0)
+            hts_plbuf_push(b, pileup);
+
+        SvREFCNT_dec(b_sv); /* b_sv's destructor will call bam_destroy1(b) */
+      }
+      else
+      {
+        bam1_t *b = bam_init1();
+        while ((ret = sam_itr_next(hfp, iter, b)) >= 0)
+          hts_plbuf_push(b, pileup);
+        bam_destroy1(b);
+      }
+
+      hts_itr_destroy(iter);
+
       hts_plbuf_push(NULL,pileup);
       hts_plbuf_destroy(pileup);
 

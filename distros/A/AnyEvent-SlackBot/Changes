@@ -7,3 +7,5 @@
 1.004
   -- Changed min version of Data::Dumper to 2.161
   -- Added perl 5 licence
+1.005
+  -- added Net::SSLeay as a required module

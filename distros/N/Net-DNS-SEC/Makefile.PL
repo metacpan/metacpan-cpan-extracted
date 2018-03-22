@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1616 2018-01-22 08:54:52Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1647 2018-03-12 15:34:40Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -61,11 +61,26 @@ if ( my $dir = $ENV{OPENSSL_PREFIX} ) {
 }
 
 
+my @DEFINE;
+my @OBJECT;
+if ( -d './curve25519' ) {
+	push @DEFINE, qw(-DINC_ED25519);
+	push @OBJECT, qw(curve25519/*.o);
+}
+
+if ( -d './curve448' ) {
+	push @DEFINE, qw(-DINC_ED448);
+	push @OBJECT, qw(curve448/*.o);
+}
+
+
 WriteMakefile(
 	%metadata,
 	PREREQ_PM  => {%prerequisite},
+	DEFINE	   => "@DEFINE",
+	INC	   => "$inc",
 	LIBS	   => [$lib],
-	INC	   => $inc,
+	OBJECT	   => "SEC.o @OBJECT",
 	META_MERGE => {recommends => {%optional}},
 	);
 

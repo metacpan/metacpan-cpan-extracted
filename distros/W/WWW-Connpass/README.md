@@ -31,4 +31,4 @@ it under the same terms as Perl itself.
 
 # AUTHOR
 
-karupanerura &lt;karupa@cpan.org>
+karupanerura <karupa@cpan.org>

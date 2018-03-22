@@ -1,0 +1,587 @@
+#########################################################################
+#####################  A U T O G E N E R A T E D ########################
+#########################################################################
+#
+# The contents of this POD file are auto-generated.  Any changes you make
+# will be lost. If you need to change the generated text edit _gen_pod()
+# at the end of DBIx/Class/Schema/Loader/Optional/Dependencies.pm
+#
+
+=head1 NAME
+
+DBIx::Class::Schema::Loader::Optional::Dependencies - Optional module dependency specifications (for module authors)
+
+
+=head1 SYNOPSIS
+
+Somewhere in your build-file (e.g. L<ExtUtils::MakeMaker>'s F<Makefile.PL>):
+
+  ...
+
+  $EUMM_ARGS{CONFIGURE_REQUIRES} = {
+    %{ $EUMM_ARGS{CONFIGURE_REQUIRES} || {} },
+    'DBIx::Class::Schema::Loader' => '0.07049',
+  };
+
+  ...
+
+  my %DBIC_CONFIG_AND_ORACLE_DEPS = %{ eval {
+    require DBIx::Class::Schema::Loader::Optional::Dependencies;
+    DBIx::Class::Schema::Loader::Optional::Dependencies->req_list_for([qw( dbicdump_config rdbms_oracle )]);
+  } || {} };
+
+  $EUMM_ARGS{PREREQ_PM} = {
+    %DBIC_CONFIG_AND_ORACLE_DEPS,
+    %{ $EUMM_ARGS{PREREQ_PM} || {} },
+  };
+
+  ...
+
+  ExtUtils::MakeMaker::WriteMakefile(%EUMM_ARGS);
+
+B<Note>: The C<eval> protection within the example is due to support for
+requirements during L<the C<configure> build phase|CPAN::Meta::Spec/Phases>
+not being available on a sufficient portion of production installations of
+Perl. Robust support for such dependency requirements is available in the
+L<CPAN> installer only since version C<1.94_56> first made available for
+production with perl version C<5.12>. It is the belief of the current
+maintainer that support for requirements during the C<configure> build phase
+will not be sufficiently ubiquitous until the B<year 2020> at the earliest,
+hence the extra care demonstrated above. It should also be noted that some
+3rd party installers (e.g. L<cpanminus|App::cpanminus>) do the right thing
+with configure requirements independent from the versions of perl and CPAN
+available.
+
+
+=head1 DESCRIPTION
+
+Some of the less-frequently used features of L<DBIx::Class::Schema::Loader> have external
+module dependencies on their own. In order not to burden the average user
+with modules they will never use, these optional dependencies are not included
+in the base Makefile.PL. Instead an exception with a descriptive message is
+thrown when a specific feature can't find one or several modules required for
+its operation. This module is the central holding place for the current list
+of such dependencies, for DBIx::Class::Schema::Loader core authors, and DBIx::Class::Schema::Loader extension
+authors alike.
+
+Dependencies are organized in L<groups|/CURRENT REQUIREMENT GROUPS> where each
+group can list one or more required modules, with an optional minimum version
+(or 0 for any version). In addition groups prefixed with C<test_> can specify
+a set of environment variables, some (or all) of which are marked as required
+for the group to be considered by L</req_list_for>
+
+Each group name (or a combination thereof) can be used in the
+L<public methods|/METHODS> as described below.
+
+
+=head1 CURRENT REQUIREMENT GROUPS
+
+=head2 dbicdump config file
+
+=head3 dbicdump_config
+
+Modules required for using a config file with dbicdump
+
+=over
+
+=item * Config::Any
+
+=back
+
+=head2 Sybase ASE support
+
+=head3 rdbms_ase
+
+Modules required to connect to Sybase ASE
+
+=over
+
+=item * DBD::Sybase
+
+=back
+
+=head2 DB2 support
+
+=head3 rdbms_db2
+
+Modules required to connect to DB2
+
+=over
+
+=item * DBD::DB2
+
+=back
+
+=head2 Firebird support
+
+=head3 rdbms_firebird
+
+Modules required to connect to Firebird
+
+=over
+
+=item * DBD::Firebird
+
+=back
+
+=head2 Firebird support via DBD::InterBase
+
+=head3 rdbms_firebird_interbase
+
+Modules required to connect to Firebird via DBD::InterBase
+
+=over
+
+=item * DBD::InterBase
+
+=back
+
+=head2 Firebird support via DBD::ODBC
+
+=head3 rdbms_firebird_odbc
+
+Modules required to connect to Firebird via DBD::ODBC
+
+=over
+
+=item * DBD::ODBC
+
+=back
+
+=head2 Informix support
+
+=head3 rdbms_informix
+
+Modules required to connect to Informix
+
+=over
+
+=item * DBD::Informix
+
+=back
+
+=head2 MS Access support via DBD::ADO (Windows only)
+
+=head3 rdbms_msaccess_ado
+
+Modules required to connect to MS Access via DBD::ADO. This particular DBD is available on Windows only
+
+=over
+
+=item * DBD::ADO
+
+=back
+
+=head2 MS Access support via DBD::ODBC
+
+=head3 rdbms_msaccess_odbc
+
+Modules required to connect to MS Access via DBD::ODBC
+
+=over
+
+=item * DBD::ODBC
+
+=back
+
+=head2 MSSQL support via DBD::ADO (Windows only)
+
+=head3 rdbms_mssql_ado
+
+Modules required to connect to MSSQL via DBD::ADO. This particular DBD is available on Windows only
+
+=over
+
+=item * DBD::ADO
+
+=back
+
+=head2 MSSQL support via DBD::ODBC
+
+=head3 rdbms_mssql_odbc
+
+Modules required to connect to MSSQL via DBD::ODBC
+
+=over
+
+=item * DBD::ODBC
+
+=back
+
+=head2 MSSQL support via DBD::Sybase
+
+=head3 rdbms_mssql_sybase
+
+Modules required to connect to MSSQL via DBD::Sybase
+
+=over
+
+=item * DBD::Sybase
+
+=back
+
+=head2 MySQL support
+
+=head3 rdbms_mysql
+
+Modules required to connect to MySQL
+
+=over
+
+=item * DBD::mysql
+
+=back
+
+=head2 Oracle support
+
+=head3 rdbms_oracle
+
+Modules required to connect to Oracle
+
+=over
+
+=item * DBD::Oracle
+
+=item * Math::Base36 >= 0.07
+
+=item * Math::BigInt >= 1.80
+
+=back
+
+=head2 PostgreSQL support
+
+=head3 rdbms_pg
+
+Modules required to connect to PostgreSQL
+
+=over
+
+=item * DBD::Pg
+
+=back
+
+=head2 SQLAnywhere support
+
+=head3 rdbms_sqlanywhere
+
+Modules required to connect to SQLAnywhere
+
+=over
+
+=item * DBD::SQLAnywhere
+
+=back
+
+=head2 SQLAnywhere support via DBD::ODBC
+
+=head3 rdbms_sqlanywhere_odbc
+
+Modules required to connect to SQLAnywhere via DBD::ODBC
+
+=over
+
+=item * DBD::ODBC
+
+=back
+
+=head2 SQLite support
+
+=head3 rdbms_sqlite
+
+Modules required to connect to SQLite
+
+=over
+
+=item * DBD::SQLite
+
+=back
+
+=head2 dbicdump config file testing
+
+=head3 test_dbicdump_config
+
+Modules required for using testing using a config file with dbicdump
+
+=over
+
+=item * Config::Any
+
+=item * Config::General
+
+=back
+
+=head2 POD testing
+
+=head3 test_pod
+
+Modules required for testing POD in this distribution
+
+=over
+
+=item * Pod::Simple >= 3.22
+
+=item * Test::Pod >= 1.14
+
+=back
+
+=head2 use_moose
+
+=head3 use_moose
+
+Modules required for the use_moose option
+
+=over
+
+=item * Moose >= 1.12
+
+=item * MooseX::MarkAsMethods >= 0.13
+
+=item * MooseX::NonMoose >= 0.25
+
+=item * namespace::autoclean >= 0.09
+
+=back
+
+
+=head1 IMPORT-LIKE ACTIONS
+
+Even though this module is not an L<Exporter>, it recognizes several C<actions>
+supplied to its C<import> method.
+
+=head2 -skip_all_without
+
+=over
+
+=item Arguments: @group_names
+
+=back
+
+A convenience wrapper for use during testing:
+
+
+ use DBIx::Class::Schema::Loader::Optional::Dependencies -skip_all_without => qw(admin test_rdbms_mysql);
+
+Roughly equivalent to the following code:
+
+
+ BEGIN {
+   require DBIx::Class::Schema::Loader::Optional::Dependencies;
+   if ( my $missing = DBIx::Class::Schema::Loader::Optional::Dependencies->req_missing_for(\@group_names_) ) {
+     print "1..0 # SKIP requirements not satisfied: $missing\n";
+     exit 0;
+   }
+ }
+
+
+
+It also takes into account the C<RELEASE_TESTING> environment variable and
+behaves like L</-die_without> for any requirement groups marked as
+C<release_testing_mandatory>.
+
+=head2 -die_without
+
+=over
+
+=item Arguments: @group_names
+
+=back
+
+A convenience wrapper around L</die_unless_req_ok_for>:
+
+
+ use DBIx::Class::Schema::Loader::Optional::Dependencies -die_without => qw(deploy admin);
+
+
+=head2 -list_missing
+
+=over
+
+=item Arguments: @group_names
+
+=back
+
+A convenience wrapper around L</modreq_missing_for>:
+
+ perl -Ilib -MDBIx::Class::Schema::Loader::Optional::Dependencies=-list_missing,dbicdump_config,rdbms_oracle | cpanm
+
+=head1 METHODS
+
+=head2 req_group_list
+
+=over
+
+=item Arguments: none
+
+=item Return Value: \%list_of_requirement_groups
+
+=back
+
+This method should be used by DBIx::Class::Schema::Loader packagers, to get a hashref of all
+dependencies B<keyed> by dependency group. Each key (group name), or a combination
+thereof (as an arrayref) can be supplied to the methods below.
+The B<values> of the returned hash are currently a set of options B<without a
+well defined structure>. If you have use for any of the contents - contact the
+maintainers, instead of treating this as public (left alone stable) API.
+
+=head2 req_list_for
+
+=over
+
+=item Arguments: $group_name | \@group_names
+
+=item Return Value: \%set_of_module_version_pairs
+
+=back
+
+This method should be used by DBIx::Class::Schema::Loader extension authors, to determine the
+version of modules a specific set of features requires for this version of
+DBIx::Class::Schema::Loader (regardless of their availability on the system).
+See the L</SYNOPSIS> for a real-world example.
+
+When handling C<test_*> groups this method behaves B<differently> from
+L</modreq_list_for> below (and is the only such inconsistency among the
+C<req_*> methods). If a particular group declares as requirements some
+C<environment variables> and these requirements are not satisfied (the envvars
+are unset) - then the C<module requirements> of this group are not included in
+the returned list.
+
+=head2 modreq_list_for
+
+=over
+
+=item Arguments: $group_name | \@group_names
+
+=item Return Value: \%set_of_module_version_pairs
+
+=back
+
+Same as L</req_list_for> but does not take into consideration any
+C<environment variable requirements> - returns just the list of required
+modules.
+
+=head2 req_ok_for
+
+=over
+
+=item Arguments: $group_name | \@group_names
+
+=item Return Value: 1|0
+
+=back
+
+Returns true or false depending on whether all modules/envvars required by
+the group(s) are loadable/set on the system.
+
+=head2 req_missing_for
+
+=over
+
+=item Arguments: $group_name | \@group_names
+
+=item Return Value: $error_message_string
+
+=back
+
+Returns a single-line string suitable for inclusion in larger error messages.
+This method would normally be used by DBIx::Class::Schema::Loader core features, to indicate to
+the user that they need to install specific modules and/or set specific
+environment variables before being able to use a specific feature set.
+
+For example if some of the requirements for C<deploy> are not available,
+the returned string could look like:
+
+
+ "Moose~1.12" (see DBIx::Class::Schema::Loader::Optional::Dependencies documentation for details)
+
+The author is expected to prepend the necessary text to this message before
+returning the actual error seen by the user. See also L</modreq_missing_for>
+
+=head2 modreq_missing_for
+
+=over
+
+=item Arguments: $group_name | \@group_names
+
+=item Return Value: $error_message_string
+
+=back
+
+Same as L</req_missing_for> except that the error string is guaranteed to be
+either empty, or contain a set of module requirement specifications suitable
+for piping to e.g. L<cpanminus|App::cpanminus>. The method explicitly does not
+attempt to validate the state of required environment variables (if any).
+
+For instance if some of the requirements for C<deploy> are not available,
+the returned string could look like:
+
+
+ "Moose~1.12"
+
+
+See also L</-list_missing>.
+
+=head2 skip_without
+
+=over
+
+=item Arguments: $group_name | \@group_names
+
+=back
+
+A convenience wrapper around L<skip|Test::More/SKIP>. It does not take neither
+a reason (it is generated by L</req_missing_for>) nor an amount of skipped tests
+(it is always C<1>, thus mandating unconditional use of
+L<done_testing|Test::More/done_testing>). Most useful in combination with ad hoc
+requirement specifications:
+
+
+  SKIP: {
+    DBIx::Class::Schema::Loader::Optional::Dependencies->skip_without([ deploy YAML>=0.90 ]);
+
+    ...
+  }
+
+
+
+=head2 die_unless_req_ok_for
+
+=over
+
+=item Arguments: $group_name | \@group_names
+
+=back
+
+Checks if L</req_ok_for> passes for the supplied group(s), and
+in case of failure throws an exception including the information
+from L</req_missing_for>. See also L</-die_without>.
+
+=head2 modreq_errorlist_for
+
+=over
+
+=item Arguments: $group_name | \@group_names
+
+=item Return Value: \%set_of_loaderrors_per_module
+
+=back
+
+Returns a hashref containing the actual errors that occurred while attempting
+to load each module in the requirement group(s).
+
+=head2 req_errorlist_for
+
+Deprecated method name, equivalent (via proxy) to L</modreq_errorlist_for>.
+
+
+
+=head1 FURTHER QUESTIONS?
+
+Check the list of L<additional DBIC resources|DBIx::Class/GETTING HELP/SUPPORT>.
+
+=head1 COPYRIGHT AND LICENSE
+
+This module is free software L<copyright|DBIx::Class::Schema::Loader/COPYRIGHT AND LICENSE>
+by the L<DBIx::Class::Schema::Loader (DBICSL) authors|DBIx::Class::Schema::Loader/AUTHORS>.
+You can redistribute it and/or modify it under the same terms as the
+L<DBIx::Class::Schema::Loader library|DBIx::Class::Schema::Loader/COPYRIGHT AND LICENSE>.
+

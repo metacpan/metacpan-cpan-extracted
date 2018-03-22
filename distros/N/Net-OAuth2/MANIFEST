@@ -1,7 +1,8 @@
-Changes
+ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 examples/.htaccess
 examples/psgi/app.psgi
 examples/psgi/config.yml

@@ -1,4 +1,4 @@
-/*  Copyright (c) 2007-2017 H.Merijn Brand.  All rights reserved.
+/*  Copyright (c) 2007-2018 H.Merijn Brand.  All rights reserved.
  *  Copyright (c) 1998-2001 Jochen Wiedmann. All rights reserved.
  *  This program is free software; you can redistribute it and/or
  *  modify it under the same terms as Perl itself.
@@ -367,6 +367,7 @@ static void cx_xs_cache_set (pTHX_ HV *hv, int idx, SV *val) {
     csv_t  *csv = &csvs;
 
     IV      iv;
+    byte    bv;
     char   *cp  = "\0";
     STRLEN  len = 0;
 
@@ -384,6 +385,7 @@ static void cx_xs_cache_set (pTHX_ HV *hv, int idx, SV *val) {
 	iv = (IV)SvNV (val);	/* uncoverable statement ancient perl required */
     else
 	iv = *cp;
+    bv = (unsigned)iv & 0xff;
 
     switch (idx) {
 
@@ -401,28 +403,28 @@ static void cx_xs_cache_set (pTHX_ HV *hv, int idx, SV *val) {
 	case CACHE_ID_escape_char:           csv->escape_char           = *cp; break;
 
 	/* boolean/numeric */
-	case CACHE_ID_binary:                csv->binary                = iv; break;
-	case CACHE_ID_keep_meta_info:        csv->keep_meta_info        = iv; break;
-	case CACHE_ID_always_quote:          csv->always_quote          = iv; break;
-	case CACHE_ID_quote_empty:           csv->quote_empty           = iv; break;
-	case CACHE_ID_quote_space:           csv->quote_space           = iv; break;
-	case CACHE_ID_escape_null:           csv->escape_null           = iv; break;
-	case CACHE_ID_quote_binary:          csv->quote_binary          = iv; break;
-	case CACHE_ID_decode_utf8:           csv->decode_utf8           = iv; break;
-	case CACHE_ID_allow_loose_escapes:   csv->allow_loose_escapes   = iv; break;
-	case CACHE_ID_allow_loose_quotes:    csv->allow_loose_quotes    = iv; break;
-	case CACHE_ID_allow_unquoted_escape: csv->allow_unquoted_escape = iv; break;
-	case CACHE_ID_allow_whitespace:      csv->allow_whitespace      = iv; break;
-	case CACHE_ID_blank_is_undef:        csv->blank_is_undef        = iv; break;
-	case CACHE_ID_empty_is_undef:        csv->empty_is_undef        = iv; break;
-	case CACHE_ID_formula:               csv->formula               = iv; break;
-	case CACHE_ID_strict:                csv->strict                = iv; break;
-	case CACHE_ID_verbatim:              csv->verbatim              = iv; break;
-	case CACHE_ID_auto_diag:             csv->auto_diag             = iv; break;
-	case CACHE_ID_diag_verbose:          csv->diag_verbose          = iv; break;
-	case CACHE_ID__has_ahead:            csv->has_ahead             = iv; break;
-	case CACHE_ID__has_hooks:            csv->has_hooks             = iv; break;
-	case CACHE_ID_has_error_input:       csv->has_error_input       = iv; break;
+	case CACHE_ID_binary:                csv->binary                = bv; break;
+	case CACHE_ID_keep_meta_info:        csv->keep_meta_info        = bv; break;
+	case CACHE_ID_always_quote:          csv->always_quote          = bv; break;
+	case CACHE_ID_quote_empty:           csv->quote_empty           = bv; break;
+	case CACHE_ID_quote_space:           csv->quote_space           = bv; break;
+	case CACHE_ID_escape_null:           csv->escape_null           = bv; break;
+	case CACHE_ID_quote_binary:          csv->quote_binary          = bv; break;
+	case CACHE_ID_decode_utf8:           csv->decode_utf8           = bv; break;
+	case CACHE_ID_allow_loose_escapes:   csv->allow_loose_escapes   = bv; break;
+	case CACHE_ID_allow_loose_quotes:    csv->allow_loose_quotes    = bv; break;
+	case CACHE_ID_allow_unquoted_escape: csv->allow_unquoted_escape = bv; break;
+	case CACHE_ID_allow_whitespace:      csv->allow_whitespace      = bv; break;
+	case CACHE_ID_blank_is_undef:        csv->blank_is_undef        = bv; break;
+	case CACHE_ID_empty_is_undef:        csv->empty_is_undef        = bv; break;
+	case CACHE_ID_formula:               csv->formula               = bv; break;
+	case CACHE_ID_strict:                csv->strict                = bv; break;
+	case CACHE_ID_verbatim:              csv->verbatim              = bv; break;
+	case CACHE_ID_auto_diag:             csv->auto_diag             = bv; break;
+	case CACHE_ID_diag_verbose:          csv->diag_verbose          = bv; break;
+	case CACHE_ID__has_ahead:            csv->has_ahead             = bv; break;
+	case CACHE_ID__has_hooks:            csv->has_hooks             = bv; break;
+	case CACHE_ID_has_error_input:       csv->has_error_input       = bv; break;
 
 	/* a 4-byte IV */
 	case CACHE_ID__is_bound:             csv->is_bound              = iv; break;
@@ -724,7 +726,7 @@ static int cx_Print (pTHX_ csv_t *csv, SV *dst) {
     }
 
 #define bound_field(csv,i,keep)	cx_bound_field (aTHX_ csv, i, keep)
-static SV *cx_bound_field (pTHX_ csv_t *csv, int i, int keep) {
+static SV *cx_bound_field (pTHX_ csv_t *csv, SSize_t i, int keep) {
     SV *sv = csv->bound;
     AV *av;
 
@@ -776,7 +778,7 @@ static char *cx_formula (pTHX_ csv_t *csv, SV *sv, STRLEN *len, int f) {
 	char  field[128];
 	SV  **svp;
 
-	if (csv->recno) sprintf (rec, " in record %d", csv->recno + 1);
+	if (csv->recno) sprintf (rec, " in record %lu", csv->recno + 1);
 	else           *rec = (char)0;
 
 	*field = (char)0;
@@ -961,7 +963,7 @@ static int cx_Combine (pTHX_ csv_t *csv, SV *dst, AV *fields) {
     } /* Combine */
 
 #define ParseError(csv,xse,pos)	cx_ParseError (aTHX_ csv, xse, pos)
-static void cx_ParseError (pTHX_ csv_t *csv, int xse, int pos) {
+static void cx_ParseError (pTHX_ csv_t *csv, int xse, STRLEN pos) {
     (void)hv_store (csv->self, "_ERROR_POS", 10, newSViv (pos), 0);
     (void)hv_store (csv->self, "_ERROR_FLD", 10, newSViv (csv->fld_idx), 0);
     if (csv->tmp) {

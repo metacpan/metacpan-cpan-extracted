@@ -21,6 +21,13 @@ use Test::Differences;
 }
 
 {
+    my $text        = 'lib/Open/This.pm-17-';
+    my $line_number = Open::This::_maybe_extract_line_number( \$text );
+    is( $line_number, 17, 'git-grep context line_number' );
+    is( $text, 'lib/Open/This.pm', 'git-grep context line number stripped' );
+}
+
+{
     my $text = 'Open::This::do_something()';
     my $name = Open::This::_maybe_extract_subroutine_name( \$text );
     is( $name, 'do_something', 'subroutine name' );
@@ -32,6 +39,13 @@ use Test::Differences;
     my $name = Open::This::_maybe_extract_subroutine_name( \$text );
     is( $name, 'do_something', 'subroutine name with args' );
     is( $text, 'Open::This',   'sub name stripped' );
+}
+
+{
+    my $text = q{Foo::Bar::_render('This::Module=HASH(0x257631c0)')};
+    my $name = Open::This::_maybe_extract_subroutine_name( \$text );
+    is( $name, '_render',  'subroutine name with args' );
+    is( $text, 'Foo::Bar', 'stringified object' );
 }
 
 {

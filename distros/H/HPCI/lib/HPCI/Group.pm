@@ -582,7 +582,7 @@ reference to the object.)
         $self->_croak("Cannot define new stages after execution has started!")
             if $self->_execution_started;
         my $use_args = { };
-        $self->debug( "Calling stage.  Provided args: " . Dumper( \@_ ));
+        # $self->debug( "Calling stage.  Provided args: " . Dumper( \@_ ));
         HPCI::_merge_hash( $use_args, $self->stage_defaults );
         my $args     = { @_ };
         my $cluster  = $self->cluster;
@@ -915,7 +915,7 @@ other stage or the attempt is aborted).
             # is elegible to be skipped.  That could cause the for loop to
             # terminate while there are still keys in the hash, and might
             # give the appearance of a dependency loop where there is not
-            # ready one present.
+            # really one present.
             (my $name) = keys %{ $self->_ready };
             return 1 if $self->max_concurrent
                      && $self->max_concurrent <= $self->_running_cnt;

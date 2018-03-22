@@ -4,9 +4,9 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::ByteStream;
 use Authen::Simple::Password;
 use Authen::Simple::Passwd;
-use Authen::Simple::LDAP;
+use Net::LDAP;
 
-our $VERSION = '0.10.2';
+our $VERSION = '0.11.0';
 
 sub register {
     my ($plugin, $app) = @_;
@@ -18,7 +18,7 @@ sub register {
             # Sent credentials
             my $auth = $self->req->url->to_abs->userinfo || '';
 
-            my ($hash_ref, $status) = $plugin->check_auth($self, $auth, @_);
+            my ($hash_ref, $status) = $plugin->_check_auth($self, $auth, @_);
             if ($status) {
                 return ($hash_ref, $status);
             }
@@ -31,7 +31,7 @@ sub register {
     );
 }
 
-sub check_auth {
+sub _check_auth {
     my ($plugin, $c, $auth, @params) = @_;
 
     # Required credentials
@@ -65,7 +65,11 @@ sub check_auth {
             return (\%data, 1) if $plugin->_check_passwd($c, $auth, $params);
         }
         elsif ($params->{'host'}) {
-            return (\%data, 1) if $plugin->_check_ldap($c, $auth, $params);
+            my ($ok, $ldap) = $plugin->_check_ldap($c, $auth, $params);
+            if ($ldap) {
+                $data{ldap} = $ldap;
+            }
+            return (\%data, 1) if $ok;
         }
     }
 
@@ -114,11 +118,113 @@ sub _check_simple {
 sub _check_ldap {
     my ($self, $c, $auth, $params) = @_;
     my ($username, $password) = _split_auth($auth);
+    my $logging = $params->{logging} // 0;
 
     return 0 unless defined $password;
-    my $ldap = Authen::Simple::LDAP->new(%$params);
 
-    return 1 if $ldap->authenticate($username, $password);
+    my $ldap = Net::LDAP->new(
+        $params->{host},
+        port    => $params->{port}    // 389,
+        scheme  => $params->{scheme}  // 'ldap',
+        debug   => $params->{debug}   // 0,
+        timeout => $params->{timeout} // 120,
+        version => $params->{version} // 3,
+    );
+    unless ($ldap) {
+        $c->app->log->warn("Connection to $params->{host} failed: $@")
+            if $logging;
+        return 0;
+    }
+
+    unless (defined($params->{start_tls}) && $params->{start_tls} == 0) {
+        my $dse = $ldap->root_dse();
+        my $has_tls = $dse->supported_extension('1.3.6.1.4.1.1466.20037');
+        if ($has_tls) {
+            my $mesg = $ldap->start_tls(
+                verify  => $params->{tls_verify} // 'optional',
+                cafile  => $params->{cafile} // '',
+            );
+            if ($mesg->is_error) {
+                $c->app->log->warn("$@") if $logging;
+                $ldap->unbind;
+                return 0;
+            }
+        }
+    }
+
+    my @credentials
+        = $params->{binddn}
+        ? ($params->{binddn}, password => $params->{bindpw})
+        : ();
+
+    my $mesg = $ldap->bind(@credentials);
+    if ($mesg->is_error) {
+        $c->app->log->warn("LDAP bind failed" . ($params->{binddn}
+            ? " for $params->{binddn}: "
+            : ": ") . $mesg->error)
+            if $logging;
+        $ldap->unbind;
+        return 0;
+    }
+
+    my $count = () = $params->{filter} =~ /%s/g;
+    my $filter = sprintf($params->{filter}, ($username) x $count);
+    my $scope  = $params->{scope} // 'sub';
+    my $search = $ldap->search(
+        base   => $params->{basedn},
+        scope  => $scope,
+        filter => $filter,
+        attrs  => ['1.1']
+    );
+
+    if ($search->is_error) {
+        $c->app->log->warn("LDAP search failed: " . $search->error)
+            if $logging;
+        $ldap->unbind;
+        return 0;
+    }
+
+    if ($search->count == 0) {
+        $c->app->log->warn(
+            qq{User '$username' not found with filter '$filter' and scope '$scope'})
+            if $logging;
+        $ldap->unbind;
+        return 0;
+    }
+
+    if ($search->count > 1) {
+        $c->app->log->warn("Found "
+                . $search->count
+                . qq{ matching entries for $username with filter '$filter'})
+            if $logging;
+    }
+
+    my $entry = $search->entry(0);
+    my $dn    = $entry->dn;
+    $mesg = $ldap->bind($dn, password => $password);
+
+    if ($mesg->is_error) {
+        $c->app->log->warn(
+            qq{LDAP failed to authenticate user '$username' with dn '$dn': }
+                . $mesg->error)
+            if $logging;
+        $ldap->unbind;
+        return 0;
+    }
+    else {
+        $c->app->log->info(
+            qq{LDAP successfully authenticated user '$username' with dn '$dn'}
+        ) if $logging;
+        if ($params->{return_ldap_handle}) {
+            return (1, $ldap);
+        }
+        else {
+            $ldap->unbind;
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 sub _check_passwd {
@@ -140,7 +246,7 @@ Mojolicious::Plugin::BasicAuthPlus - Basic HTTP Auth Helper Plus
 
 =head1 VERSION
 
-Version 0.10.2
+Version 0.11.0
 
 =head1 SYNOPSIS
 
@@ -197,9 +303,13 @@ Configure specific auth method (see CONFIGURATION).  Returns a two-element
 list, where the first element is a hash reference and the second is an
 integer (1 for success, 0 for failure).
 
-In the future, the hash reference may contain additional values, but for now
-it contains just one key/value pair for the username used to authenticate.
-You can ignore this; thus, for example, both of the following are valid:
+The hash reference contains one key/value pair for the username used to
+authenticate, and when LDAP is used it may also contain the 'ldap' key
+whose value is the active LDAP connection handle if requested by setting
+the return_ldap_handle option (see options below).
+
+Generally, you can ignore this; thus, for example, both of the following
+are valid:
 
   my ($hash_ref, $auth_ok)
       = $self->basic_auth(
@@ -214,19 +324,12 @@ You can ignore this; thus, for example, both of the following are valid:
   }
 
   $self->render(text => 'ok')
-      if ($self->basic_auth(
+      if $self->basic_auth(
           "My Realm" => {
               username => 'zapp',
               password => 'brannigan'
           }
       );
-
-=head2 C<check_auth>
-
-    my ($hash_ref, $status) = $plugin->check_auth($c, $auth, $params);
-
-Check authentication does the same thing than C<basic_auth> without asking
-for password if authentication failed.
 
 =head1 CONFIGURATION
 
@@ -279,9 +382,74 @@ Directory.
 The password to use when doing an authenticated bind to LDAP or Active
 Directory.
 
+=head2 scope
+
+The search scope for LDAP or Active Directory.  Choices are
+'base' | 'one' | 'sub' | 'subtree' | 'children', but the default is 'sub'.
+See Net::LDAP for further discussion.
+
 =head2 filter
 
 The LDAP/ActiveDirectory filter to use when searching a directory.
+
+=head2 port
+
+The TCP port to use for an LDAP/ActiveDirectory connection.  The default is 389.
+
+=head2 debug
+
+Set the LDAP debug level. See the debug method in Net::LDAP for details.
+The default value is 0, debugging off.
+
+=head2 timeout
+
+Timeout in seconds passed to IO::Socket when connecting to a remote
+LDAP server.  The default is 120.
+
+=head2 version
+
+Set the LDAP protocol version being used (default is LDAPv3). To talk
+to an older server, for example one using LDAPv2, set this to 2.  With
+modern LDAP implementations, you shouldn't need to bother setting this.
+
+=head2 start_tls
+
+Enable TLS support for LDAP.  This is the default.  If you do not want TLS,
+set this to zero, but it's recommended to take the default.
+
+=head2 tls_verify
+
+For SSL certificate validation, set tls_verify to 'none' | 'optional' | 'require'.
+The default is 'optional'.  See Net::LDAP for more information.
+
+=head2 cafile
+
+The path to your CA or CA chain certificate file.  Required in TLS mode for
+LDAP if tls_verify is true.
+
+=head2 return_ldap_handle
+
+When authenticating against LDAP, the plugin will do an unbind operation to
+close the connection with the LDAP server after an authentication success or
+failure.  In some cases, it may be useful to return the active LDAP connection
+handle to your calling code so that further LDAP operations can be performed
+after authentication succeeds.  To enable this, set return_ldap_handle.
+
+Note that the last bind operation on the connection will be that of the end
+user you're trying to authenticate, so once you get the handle back any LDAP
+operation you attempt to execute will have only the LDAP privileges granted to
+the end user who just authenticated.  If you need the LDAP privileges of your
+administrative bind DN or other user, you'll need to do a fresh bind using the
+same handle.  Rebinding will probably work with many modern LDAP
+implementations, but it is not guaranteed.
+
+The default behavior for the plugin is to close the LDAP connection and not
+return a connection handle.
+
+=head2 logging
+
+If set, this enables some logging of successes and failures for
+authentication, LDAP binding, etc.  The default is no logging.
 
 =head1 EXAMPLES
 
@@ -357,6 +525,71 @@ The LDAP/ActiveDirectory filter to use when searching a directory.
       );
   };
   
+  # LDAP authentication over TLS/SSL (with authenticated bind)
+  get '/' => sub {
+      my $self = shift;
+      my ($hash_ref, $auth_ok)
+          = $self->basic_auth(
+              "Realm Name" => {
+                  host       => 'ldap.company.com',
+                  basedn     => 'ou=People,dc=domain,dc=com',
+                  binddn     => 'cn=bender,ou=People,dc=domain,dc=com',
+                  bindpw     => 'secret',
+                  filter     => '(&(objectClass=person)(cn=%s))',
+                  cafile     => '/some/path/to/ca.cert',
+                  tls_verify => 'require'
+              }
+          );
+      $self->render(text => 'ok') if $auth_ok;
+  };
+
+  # LDAP authentication over TLS/SSL (with authentciated bind),
+  # returning the active LDAP handle and using it to do an additional
+  # search.  Logging is also enabled.
+  get '/' => sub {
+      my $self = shift;
+      my ($hash_ref, $auth_ok)
+          = $self->basic_auth(
+              "Realm Name" => {
+                  host       => 'ldap.company.com',
+                  basedn     => 'ou=People,dc=domain,dc=com',
+                  binddn     => 'cn=bender,ou=People,dc=domain,dc=com',
+                  bindpw     => 'secret',
+                  filter     => '(&(objectClass=person)(cn=%s))',
+                  cafile     => '/some/path/to/ca.cert',
+                  tls_verify => 'require',
+                  logging    => 1,
+                  return_ldap_handle => 1
+              }
+          );
+
+      if ($hash_ref->{ldap}) {
+          my $ldap     = $hash_ref->{ldap};
+          my $username = $hash_ref->{username};
+          my @fields   = qw(cn sn mail);
+          my $filter   = join '', map { "($_=*$username*)" } @fields;
+          $filter      = '(|' . $filter . ')';
+
+          my $mesg = $ldap->search(
+              base   => 'dc=domain,dc=com',
+              scope  => 'sub',
+              filter => $filter,
+              attrs  => [ 'cn', 'sn', 'mail' ]
+          );
+          croak $mesg->error if $mesg->code;
+
+          my @entries = $mesg->entries;
+
+          for my $entry (@entries) {
+              my $email = $entry->get_value('mail');
+              $self->app->log->info("Email address for $username is $email.");
+          }
+          $ldap->unbind;
+      }
+
+      $self->render(text => 'ok') if $auth_ok;
+  };
+
   # Active Directory authentication (with authenticated bind)
   get '/' => sub {
       my $self = shift;
@@ -438,11 +671,11 @@ Nicolas Georges
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>,
-L<Authen::Simple::Password>, L<Authen::Simple::LDAP>, L<Authen::Simple::Passwd>
+L<Authen::Simple::Password>, L<Authen::Simple::Passwd>, L<Net::LDAP>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2013-2015 by Brad Robertson.
+Copyright (c) 2013-2018 by Brad Robertson.
 
 =head1 LICENSE
 

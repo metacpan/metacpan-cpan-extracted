@@ -1,0 +1,46 @@
+{
+   "abstract" : "specify a class name in an attribute C<isa> relative to the current class",
+   "author" : [
+      "Tom Gracey <tomgracey@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-RelClassTypes",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Clone" : "0",
+            "Module::Runtime" : "0",
+            "Moose" : "0",
+            "MooseX::Role::Parameterized" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : 0.01
+}

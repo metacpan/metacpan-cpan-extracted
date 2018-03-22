@@ -4,17 +4,7 @@ Dist::Zilla::PluginBundle::Author::DOHERTY - configure Dist::Zilla like DOHERTY
 
 # VERSION
 
-version 0.40
-
-# SYNOPSIS
-
-    # in dist.ini
-    [@Author::DOHERTY]
-
-# DESCRIPTION
-
-`Dist::Zilla::PluginBundle::Author::DOHERTY` provides shorthand for
-a [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) configuration that does what Mike wants.
+version 0.42
 
 # USAGE
 
@@ -74,9 +64,6 @@ of perl is okay.)
 - `github` is a boolean specifying whether to use the plugins
 [Dist::Zilla::Plugin::GitHub::Meta](https://metacpan.org/pod/Dist::Zilla::Plugin::GitHub::Meta) and [Dist::Zilla::Plugin::GitHub::Update](https://metacpan.org/pod/Dist::Zilla::Plugin::GitHub::Update).
 - `critic_config` is a filename to pass through to [Dist::Zilla::Plugin::Test::Perl::Critic](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Perl::Critic).
-- `googlecode_project` tells [UploadToGoogleCode](https://metacpan.org/pod/Dist::Zilla::Plugin::UploadToGoogleCode)
-which project to upload to. This is required if you want to upload your release
-to Google Code.
 - `fork_is_authoritative` tells [GitHub::Meta](https://metacpan.org/pod/Dist::Zilla::Plugin::GitHub::Meta)
 that your fork is authoritative. That means that the repository, issues, etc
 will point to your stuff on github, instead of wherever you forked from. This
@@ -95,11 +82,6 @@ targets are:
 
         We'll use [UploadToPAUSE](https://metacpan.org/pod/Dist::Zilla::Plugin::UploadToCPAN) to do the release,
         and clean up afterwards. This is the default
-
-    - GoogleCode
-
-        Well use [UploadToGoogleCode](https://metacpan.org/pod/Dist::Zilla::Plugin::UploadToGoogleCode) to do the
-        release, and clean up afterwards. Make sure you set `googlecode_project`
 
     - local
 
@@ -142,6 +124,16 @@ default is `share`.
 
 `[Dist::Zilla](https://metacpan.org/pod/Dist::Zilla)`
 
+# SYNOPSIS
+
+    # in dist.ini
+    [@Author::DOHERTY]
+
+# DESCRIPTION
+
+`Dist::Zilla::PluginBundle::Author::DOHERTY` provides shorthand for
+a [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) configuration that does what Mike wants.
+
 # AVAILABILITY
 
 The project homepage is [http://metacpan.org/release/Dist-Zilla-PluginBundle-Author-DOHERTY/](http://metacpan.org/release/Dist-Zilla-PluginBundle-Author-DOHERTY/).
@@ -152,7 +144,7 @@ site near you, or see [https://metacpan.org/module/Dist::Zilla::PluginBundle::Au
 
 # SOURCE
 
-The development version is on github at [http://github.com/doherty/Dist-Zilla-PluginBundle-Author-DOHERTY](http://github.com/doherty/Dist-Zilla-PluginBundle-Author-DOHERTY)
+The development version is on github at [https://github.com/doherty/Dist-Zilla-PluginBundle-Author-DOHERTY](https://github.com/doherty/Dist-Zilla-PluginBundle-Author-DOHERTY)
 and may be cloned from [git://github.com/doherty/Dist-Zilla-PluginBundle-Author-DOHERTY.git](git://github.com/doherty/Dist-Zilla-PluginBundle-Author-DOHERTY.git)
 
 # BUGS AND LIMITATIONS

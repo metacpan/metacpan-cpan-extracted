@@ -60,7 +60,7 @@
          "web" : "https://github.com/perlancar/perl-Dist-Zilla-Plugin-WordList"
       }
    },
-   "version" : "0.052",
+   "version" : "0.053",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

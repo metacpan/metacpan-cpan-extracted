@@ -1,8 +1,8 @@
 package Mojolicious::Plugin::RoutesConfig;
-use Mojo::Base 'Mojolicious::Plugin::Config';
+use Mojo::Base 'Mojolicious::Plugin::Config', -signatures;
 use List::Util qw(first);
 
-our $VERSION   = 0.03;
+our $VERSION   = 0.04;
 our $AUTHORITY = 'cpan:BEROV';
 
 sub register {
@@ -19,15 +19,14 @@ sub register {
     && return $conf
     unless ref $conf->{routes} eq 'ARRAY';
 
-  $self->_generate_routes($app, $conf->{routes}, $file_msg);
+  $self->_generate_routes($app, $app->routes, $conf->{routes}, $file_msg);
   return $conf;
 }
 
 #generates routes (TODO:recursively?)
 sub _generate_routes {
-  my ($self, $app, $routes_conf, $file_msg) = @_;
-  my $routes  = $app->routes;
-  my $init_rx = '^any|route|get|post|patch|put|delete|options$';
+  my ($self, $app, $routes, $routes_conf, $file_msg) = @_;
+  my $init_rx = '^(?:any|route|get|post|patch|put|delete|options|under)$';
   for my $rconf (@$routes_conf) {
     my $init_method = first(sub { $_ =~ /$init_rx/; }, keys %$rconf);
     unless ($init_method) {
@@ -40,14 +39,13 @@ sub _generate_routes {
       next;
     }
     my $init_params = $rconf->{$init_method};
-    my $route
-      = $routes->$init_method(
-                 ref $init_params eq 'ARRAY'
-                 ? @$init_params
-                 : (ref $init_params eq 'HASH' ? %$init_params : $init_params));
-
+    my $route = _call_method($routes, $init_method, $init_params);
+    if ($init_method eq 'under') {    # recourse
+      $self->_generate_routes($app, $route, $rconf->{routes}, $file_msg);
+      next;
+    }
     for my $method (keys %$rconf) {
-      next if $method eq $init_method;
+      next if $method =~ /^(?:$init_method|routes)$/;
       my $params = $rconf->{$method};
       $route->can($method) || do {
         $app->log->warn("Malformed route description$file_msg!!!$/"
@@ -59,14 +57,28 @@ sub _generate_routes {
         $route->remove();
         last;
       };
-
-      $route->$method(
-                      ref $params eq 'ARRAY'
-                      ? @$params
-                      : (ref $params eq 'HASH' ? %$params : $params));
+      _call_method($route, $method, $params);
     }
   }
   return;
+}
+
+# Returns a new or existing route
+sub _call_method ($caller, $method, $params) {
+  if (ref $params eq 'ARRAY') {
+    return $caller->$method(@$params);
+  }
+  elsif (ref $params eq 'HASH') {
+    return $caller->$method(%$params);
+  }
+  elsif (ref $params eq 'CODE') {
+    return $caller->$method($params->());
+  }
+  else {
+    return $caller->$method($params);
+  }
+
+  Carp::croak('This should never happen');
 }
 
 =encoding utf8
@@ -112,10 +124,12 @@ disable parts of your application without editing its source code.
 The routes are described the same way as you would generate them imperatively,
 just instead of methods you use method names as keys and suitable references as
 values which will be dereferenced and passed as arguments to the respective
-method. For allowed keys look at L<Mojolicious::Routes::Route/METHODS>. Of
-course only relatively simple cases are handled. Complex logic is left to the
-programmer. Still you can have all your routes defined in the configuration
-file as it is Perl and you have the C<app> object available.
+method. If C<$parameters> is a reference to CODE it will be executed and
+whatever it returns will be the parameters for the respective method.For
+allowed keys look at L<Mojolicious::Routes::Route/METHODS>. Look at
+C<t/blog/etc/complex_routes.conf> for inspiration. You can have all your routes
+defined in the configuration file as it is Perl and you have the C<app> object
+available.
 
 =head1 METHODS
 

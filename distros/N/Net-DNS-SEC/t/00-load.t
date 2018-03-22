@@ -1,4 +1,4 @@
-# $Id: 00-load.t 1619 2018-01-24 08:24:17Z willem $
+# $Id: 00-load.t 1646 2018-03-12 12:52:45Z willem $
 #
 
 use strict;
@@ -8,6 +8,7 @@ my @module = qw(
 	Net::DNS::SEC
 	Net::DNS::SEC::DSA
 	Net::DNS::SEC::ECDSA
+	Net::DNS::SEC::EdDSA
 	Net::DNS::SEC::RSA
 	Net::DNS::SEC::Keyset
 	Net::DNS::SEC::Private

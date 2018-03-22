@@ -2,7 +2,7 @@ use Test2::V0;
 use Test2::API 'intercept';
 
 my $events = intercept {
-    do './t/fixtures/no-new-method.t';
+    do './t/fixtures/no-new-method.it';
 };
 
 is $events, array {

@@ -1,3 +1,7 @@
+-   2.17.6 
+
+    Missing dependencies in Makefile.PL.
+
 -   2.17.5 Sun Mar 18 17:19:43 CDT 2018
 
     Bump dependency version.

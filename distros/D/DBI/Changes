@@ -6,6 +6,13 @@ DBI::Changes - List of significant changes to the DBI
 
 =cut
 
+=head2 Changes in DBI 1.641 - 19th March 2018
+
+    Remove dependency on Storable 2.16 introduced in DBI 1.639
+        thanks to Ribasushi #60
+    Avoid compiler warnings in Driver.xst #59
+        thanks to pali #59
+
 =head2 Changes in DBI 1.640 - 28th January 2018
 
     Fix test t/91_store_warning.t for perl 5.10.0

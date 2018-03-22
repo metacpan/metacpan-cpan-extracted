@@ -128,7 +128,7 @@ if  (eval {require ExtUtils::Constant; 1}) {
               {name=>"LOC_MAP_IRRADIANCE", macro=>"1"},
               {name=>"LOC_MAP_METALNESS", macro=>"1"},
               {name=>"LOC_MAP_NORMAL", macro=>"1"},
-              {name=>"LOC_MAP_OCCUSION", macro=>"1"},
+              {name=>"LOC_MAP_OCCLUSION", macro=>"1"},
               {name=>"LOC_MAP_PREFILTER", macro=>"1"},
               {name=>"LOC_MAP_ROUGHNESS", macro=>"1"},
               {name=>"LOC_MATRIX_MODEL", macro=>"1"},

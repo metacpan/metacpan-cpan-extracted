@@ -1,0 +1,107 @@
+{
+   "abstract" : "Create a DBIx::Class::Schema based on a database",
+   "author" : [
+      "Caelum: Rafael Kitover <rkitover@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-Schema-Loader",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "maint",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Config::Any" : "0",
+            "Config::General" : "0",
+            "Math::Base36" : "0.07",
+            "Math::BigInt" : "1.80",
+            "Moose" : "1.12",
+            "MooseX::MarkAsMethods" : "0.13",
+            "MooseX::NonMoose" : "0.25",
+            "Pod::Coverage" : "0.20",
+            "Pod::Simple" : "3.22",
+            "Test::EOL" : "1.0",
+            "Test::NoTabs" : "0.9",
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Strict" : "0.20",
+            "namespace::autoclean" : "0.09"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp::Clan" : "0",
+            "Class::Accessor::Grouped" : "0.10008",
+            "Class::C3::Componentised" : "1.0008",
+            "Class::Inspector" : "1.27",
+            "Class::Unload" : "0.07",
+            "DBIx::Class" : "0.08127",
+            "Data::Dump" : "1.06",
+            "Digest::MD5" : "2.36",
+            "Exporter" : "5.63",
+            "Hash::Merge" : "0.12",
+            "Lingua::EN::Inflect::Number" : "1.1",
+            "Lingua::EN::Inflect::Phrase" : "0.15",
+            "Lingua::EN::Tagger" : "0.23",
+            "List::Util" : "1.33",
+            "MRO::Compat" : "0.09",
+            "Scope::Guard" : "0.20",
+            "String::ToIdentifier::EN" : "0.05",
+            "Sub::Util" : "1.40",
+            "Try::Tiny" : "0",
+            "curry" : "1.000000",
+            "namespace::clean" : "0.23",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "1.29",
+            "File::Path" : "2.07",
+            "File::Temp" : "0.16",
+            "Test::Deep" : "0.107",
+            "Test::Differences" : "0.60",
+            "Test::Exception" : "0.31",
+            "Test::More" : "0.94",
+            "Test::Warn" : "0.21"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/dbsrgits/dbix-class-schema-loader"
+      },
+      "x_IRC" : "irc://irc.perl.org/#dbix-class",
+      "x_MailingList" : "http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/dbix-class"
+   },
+   "version" : "0.07049",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

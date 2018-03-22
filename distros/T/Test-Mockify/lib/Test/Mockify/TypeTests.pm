@@ -20,7 +20,7 @@ sub IsInteger {
     my $IsInteger = 0;
     my $Sign = '[-+]?'; # + or - or nothing
     if( defined $Value ){
-        if($Value =~ /^$Sign\d+$/ ) {
+        if($Value =~ /^$Sign\d+$/sm ) {
             $IsInteger = 1;
         }
     }
@@ -38,7 +38,7 @@ sub IsFloat {
     my $OptionalExponent = '([eE][-+]?\d+)?';
     my $FloatRegex = sprintf('%s%s%s', $OptionalSign, $NumberOptions, $OptionalExponent);
 
-    if ( defined $Value && $Value =~ /^$FloatRegex$/ ){
+    if ( defined $Value && $Value =~ /^$FloatRegex$/sm ){
         $IsFloat = 1;
     }
 
@@ -50,8 +50,8 @@ sub IsString {
 
     my $IsString = 0;
 
-    if ( defined $Value ){ 
-        if( $Value =~ /[\w\s]/ || $Value eq ''){
+    if ( defined $Value ){
+        if( $Value =~ /[\w\s]/sm || $Value eq ''){
             $IsString = 1;
         }
         # exclude all "types"

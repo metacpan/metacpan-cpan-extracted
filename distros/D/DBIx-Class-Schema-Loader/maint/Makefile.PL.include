@@ -1,0 +1,28 @@
+BEGIN { -e 'Distar' or system("git clone git://git.shadowcat.co.uk/p5sagit/Distar.git") }
+use lib 'Distar/lib';
+use Distar 0.001;
+
+author 'Caelum: Rafael Kitover <rkitover@cpan.org>';
+
+manifest_include 't/backcompat/0.04006/lib' => qr/.*\.pm$/;
+manifest_include 't/bin' => qr/\w+/;
+manifest_include 'script' => qr/\w+/;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+require DBIx::Class::Schema::Loader::Optional::Dependencies;
+my $optdeps = 'DBIx::Class::Schema::Loader::Optional::Dependencies';
+my @req_groups = keys %{ $optdeps->req_group_list };
+my @other_groups = grep { !/rdbms/ } @req_groups;
+my %dev_requires = %{ $optdeps->modreq_list_for(\@other_groups) };
+
+eval {
+    # eval as blows up if not all deps installed
+    # should probably be part of "build" stage instead
+    $optdeps->_gen_pod(undef, 'lib');
+};
+
+# vim: ft=perl et sts=4 sw=4 tw=0:
+
+# list in case more added - returned to caller
+(\%dev_requires);

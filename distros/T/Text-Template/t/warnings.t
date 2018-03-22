@@ -22,4 +22,11 @@ my $result = $template->fill_in(HASH => { good => 'good' });
 $result =~ s/(?:^\s+)|(?:\s+$)//gs;
 is $result, 'This template should not produce warnings.';
 
+# see https://github.com/mschout/perl-text-template/issues/10
+$template = Text::Template->new(type => 'STRING', package => 'MY', source => '');
+$template->fill_in(package => 'MY', hash => { include => sub { 'XX' } });
+
+$template = Text::Template->new(type => 'STRING', package => 'MY', source => '');
+$template->fill_in(package => 'MY', hash => { include => sub { 'XX' } });
+
 done_testing;

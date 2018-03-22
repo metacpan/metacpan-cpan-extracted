@@ -12,9 +12,6 @@ package TestCase::Simple {
   
   has title : int;
   
-  get x, y, values1;
-  set x, y, values1;
-  
   sub new : TestCase::Simple () {
     return new TestCase::Simple;
   }
@@ -31,7 +28,7 @@ package TestCase::Simple {
   sub get4 : int ($foo : int) { return 0; }
   sub get7 : int ($foo : int, $bar : int) { return 0; }
 
-  sub sum4 : int ($self : TestCase::Simple) {
+  sub sum4 : int ($self : self) {
     
     my $title : int;
    
@@ -42,8 +39,6 @@ package TestCase::Simple {
     $self->{x};
     $self->sum5();
 
-    TestCase::Simple::sum5($self);
-
     $self->{x} = 3;
 
     my $char : byte = 'a';
@@ -51,7 +46,7 @@ package TestCase::Simple {
     return 0;
   }
   
-  sub sum5 : int ($self : TestCase::Simple) {
+  sub sum5 : int ($self : self) {
     $self->{x};
     
     return 0;

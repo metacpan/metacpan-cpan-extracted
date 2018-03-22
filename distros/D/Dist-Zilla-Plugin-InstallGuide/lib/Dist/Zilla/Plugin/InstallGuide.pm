@@ -5,7 +5,7 @@ use warnings;
 package Dist::Zilla::Plugin::InstallGuide;
 
 # ABSTRACT: Build an INSTALL file
-our $VERSION = '1.200007'; # VERSION
+our $VERSION = '1.200009'; # VERSION
 use Moose;
 with 'Dist::Zilla::Role::FileGatherer';
 with 'Dist::Zilla::Role::TextTemplate';
@@ -38,10 +38,15 @@ Alternatively, if your CPAN shell is set up, you should just be able to do:
 ## Manual installation
 
 {{ $manual_installation }}
+
+The prerequisites of this distribution will also have to be installed manually. The
+prerequisites are listed in one of the files: `MYMETA.yml` or `MYMETA.json` generated
+by running the manual build process described above.
+
 ## Documentation
 
 {{ $dist->name }} documentation is available as POD.
-You can run perldoc from a shell to read the documentation:
+You can run `perldoc` from a shell to read the documentation:
 
     % perldoc {{ $package }}
 END_TEXT
@@ -56,6 +61,8 @@ then build it:
 Then install it:
 
     % make install
+
+On Windows platforms, you should use `dmake` or `nmake`, instead of `make`.
 
 If your perl is system-managed, you can create a local::lib in your home
 directory to install modules to. For details, see the local::lib documentation:
@@ -73,19 +80,34 @@ Then install it:
 
     % ./Build install
 
+Or the more portable variation:
+
+    % perl Build.PL
+    % perl Build
+    % perl Build test
+    % perl Build install
+
 If your perl is system-managed, you can create a local::lib in your home
 directory to install modules to. For details, see the local::lib documentation:
 https://metacpan.org/pod/local::lib
+END_TEXT
+
+has cpan_reference => (is => 'ro', isa => 'Str', default => <<END_TEXT);
+For more information on installing Perl modules via CPAN, please see:
+https://www.cpan.org/modules/INSTALL.html
 END_TEXT
 
 
 sub gather_files {
     my $self = shift;
 
+    my $content = $self->template;
+    $content .= $self->cpan_reference;
+
     require Dist::Zilla::File::InMemory;
     $self->add_file(Dist::Zilla::File::InMemory->new({
         name => 'INSTALL',
-        content => $self->template,
+        content => $content,
     }));
 
     return;
@@ -124,7 +146,7 @@ sub munge_files {
         $file->content,
         {   dist                => \$zilla,
             package             => $main_package,
-            manual_installation => $manual_installation
+            manual_installation => $manual_installation,
         }
     );
 
@@ -148,7 +170,7 @@ Dist::Zilla::Plugin::InstallGuide - Build an INSTALL file
 
 =head1 VERSION
 
-version 1.200007
+version 1.200009
 
 =for test_synopsis BEGIN { die "SKIP: synopsis isn't perl code" }
 
@@ -186,7 +208,7 @@ site near you, or see L<https://metacpan.org/module/Dist::Zilla::Plugin::Install
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/doherty/Dist-Zilla-Plugin-InstallGuide>
+The development version is on github at L<https://github.com/doherty/Dist-Zilla-Plugin-InstallGuide>
 and may be cloned from L<git://github.com/doherty/Dist-Zilla-Plugin-InstallGuide.git>
 
 =head1 BUGS AND LIMITATIONS

@@ -75,7 +75,7 @@
          "web" : "https://github.com/binary-com/perl-Webservice-GAMSTOP"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0222"
 }
 

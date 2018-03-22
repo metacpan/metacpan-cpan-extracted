@@ -51,9 +51,9 @@
      WHILE = 267,
      USE = 268,
      NEW = 269,
-     SET = 270,
-     GET = 271,
-     OUR = 272,
+     OUR = 270,
+     SELF = 271,
+     CLASS = 272,
      LAST = 273,
      NEXT = 274,
      NAME = 275,
@@ -110,9 +110,9 @@
 #define WHILE 267
 #define USE 268
 #define NEW 269
-#define SET 270
-#define GET 271
-#define OUR 272
+#define OUR 270
+#define SELF 271
+#define CLASS 272
 #define LAST 273
 #define NEXT 274
 #define NAME 275

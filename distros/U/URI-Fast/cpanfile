@@ -3,8 +3,7 @@ requires 'perl', '5.010';
 requires 'parent';
 requires 'Carp';
 requires 'Exporter';
-requires 'File::Spec';
-requires 'Inline'    => '0.80';
+requires 'Inline' => '0.80';
 requires 'Inline::C' => '0.78';
 
 on test => sub {

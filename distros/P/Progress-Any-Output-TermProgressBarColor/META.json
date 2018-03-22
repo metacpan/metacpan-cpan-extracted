@@ -68,7 +68,7 @@
          "web" : "https://github.com/perlancar/perl-Progress-Any-Output-TermProgressBarColor"
       }
    },
-   "version" : "0.241",
+   "version" : "0.243",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

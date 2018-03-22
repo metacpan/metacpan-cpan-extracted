@@ -24,7 +24,7 @@ my $size = @{ $opinion->scores };
 my @data = ( 
     [ 1 .. $size ],     # The x axis labels
     $opinion->scores,   # The sentiment data
-    $locations,         # Line showing instance of term
+    $locations,         # Line showing instances of term
 );
 
 my $graph = GD::Graph::lines->new( $width, $height );
@@ -43,8 +43,5 @@ $graph->set(
 );
 
 my $gd = $graph->plot(\@data);
-
-#my $black = $gd->colorAllocate(0,0,0);
-#GD::Image::line( $gd, 0,0, 100,5, $black );
 
 print $gd->png;

@@ -17,10 +17,12 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Lingua::EN::Opinion",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "File::Slurper" => 0,
     "Lingua::EN::Sentence" => 0,
     "Moo" => 2,
     "Statistics::Lite" => 0,
+    "Try::Tiny" => 0,
     "namespace::clean" => 0,
     "strictures" => 2
   },
@@ -33,7 +35,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0801",
+  "VERSION" => "0.1201",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +43,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "File::Slurper" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
@@ -50,6 +53,7 @@ my %FallbackPrereqs = (
   "Statistics::Lite" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
+  "Try::Tiny" => 0,
   "namespace::clean" => 0,
   "strict" => 0,
   "strictures" => 2,

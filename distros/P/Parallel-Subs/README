@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution Parallel-Subs,
-version 0.001:
+version 0.002:
 
   Simple way to run subs in parallel and process their return value in perl
 

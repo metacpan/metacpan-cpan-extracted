@@ -2,7 +2,7 @@ package Algorithm::CurveFit::Simple;
 
 # ABSTRACT: Convenience wrapper around Algorithm::CurveFit.
 
-our $VERSION = '1.02'; # VERSION 1.02
+our $VERSION = '1.03'; # VERSION 1.03
 
 use strict;
 use warnings;
@@ -14,7 +14,7 @@ our %STATS_H;  # side-products of fit() stored here for profiling purposes
 
 BEGIN {
     require Exporter;
-    our $VERSION = '1.02';
+    our $VERSION = '1.03';
     our @ISA = qw(Exporter);
     our @EXPORT_OK = qw(fit %STATS_H);
 }
@@ -355,35 +355,35 @@ It returns three values: A maximum deviation, the average deviation and the form
 
 =over 4
 
-=item C<try(xdata =E<gt> \@xdata, ydata =E<gt> \@ydata)>
+=item C<fit(xdata =E<gt> \@xdata, ydata =E<gt> \@ydata)>
 
 The data points the formula will fit.  Same as L<Algorithm::CurveFit> parameters of the same name.
 
-=item C<try(xydata =E<gt> [[1, 2, 3, 4], [10, 17, 26, 37]])>
+=item C<fit(xydata =E<gt> [[1, 2, 3, 4], [10, 17, 26, 37]])>
 
-=item C<try(xydata =E<gt> [[1, 10], [2, 17], [3, 26], [4, 37]])>
+=item C<fit(xydata =E<gt> [[1, 10], [2, 17], [3, 26], [4, 37]])>
 
 A more convenient way to provide data points.  C<fit()> will try to detect how the data points are organized -- list of x and list of y, or list of [x,y].
 
-=item C<try(terms =E<gt> 3)>
+=item C<fit(terms =E<gt> 3)>
 
 Sets the order of the polynomial, which will be of the form C<k + a*x + b*x**2 + c*x**3 ...>.  The default is 3 and the limit is 10.
 
 There is no need to specify initial C<k>.  It will be calculated from C<xydata>.
 
-=item C<try(time_limit =E<gt> 3)>
+=item C<fit(time_limit =E<gt> 3)>
 
 If a time limit is given (in seconds), C<fit()> will spend no more than that long trying to fit the data.  It may return in much less time.  The default is 3.
 
-=item C<try(iterations =E<gt> 10000)>
+=item C<fit(iterations =E<gt> 10000)>
 
 If an iteration count is given, C<fit()> will ignore any time limit and iterate up to C<iterations> times trying to fit the curve.  Same as L<Algorithm::CurveFit> parameter of the same name.
 
-=item C<try(inv =E<gt> 1)>
+=item C<fit(inv =E<gt> 1)>
 
 Setting C<inv> inverts the sense of the fit.  Instead of C<f(x) = y> the formula will fit C<f(y) = x>.
 
-=item C<try(impl_lang =E<gt> "perl")>
+=item C<fit(impl_lang =E<gt> "perl")>
 
 Sets the programming language in which the formula will be implemented.  Currently supported languages are C<"C">, C<"coderef"> and the default, C<"perl">.
 
@@ -395,7 +395,7 @@ When C<impl_lang =E<gt> "coderef"> is specified, a code reference is returned in
 
 More implementation languages will be supported in the future.
 
-=item C<try(impl_name =E<gt> "x2y")>
+=item C<fit(impl_name =E<gt> "x2y")>
 
 Sets the name of the function implementing the formula.  The default is C<"x2y">.  Has no effect when used with C<impl_lang =E<gt> "coderef")>.
 
@@ -409,7 +409,7 @@ Sets the name of the function implementing the formula.  The default is C<"x2y">
         return $y;
     }
 
-=item C<try(bounds_check =E<gt> 1)>
+=item C<fit(bounds_check =E<gt> 1)>
 
 When set, the implementation will include logic for checking whether the input is out-of-bounds, per the highest and lowest x points in the data used to fit the formula.  For implementation languages which support exceptions, an exception will be thrown.  For others (like C), C<-1.0> will be returned to indicate the error.
 
@@ -427,7 +427,7 @@ For instance, if the highest x in C<$xydata> is 83.0 and the lowest x is 60.0:
         return $y;
     }
 
-=item C<try(round_result =E<gt> 1)>
+=item C<fit(round_result =E<gt> 1)>
 
 When set, the implementation will round the output to the nearest whole number.  When the implementation language is C<"C"> this adds an C<#include E<lt>math.hE<gt>> directive to the source code, which will have to be compiled against libm -- see C<man 3 round>.
 
@@ -442,7 +442,7 @@ When set, the implementation will round the output to the nearest whole number. 
         return $y;
     }
 
-=item C<try(suppress_includes =E<gt> 1)>
+=item C<fit(suppress_includes =E<gt> 1)>
 
 When set and C<lang_impl =E<gt> "C">, any C<#include> directives which the implementation might need will be suppressed.
 

@@ -6,6 +6,10 @@ SYNOPSIS
 
 DESCRIPTION
 
+    Version 0.30 (Algorithm::Bertsekas-0.30 Released on 21th Mar 2018)
+		1. improvements with the use of @objects_with_greater_benefits 
+		working sets that are updated dynamically by %most_wanted_object hash.
+		
     Version 0.25 (Algorithm::Bertsekas-0.25 Released on 03th Mar 2018)
 		1. little changes and improvements.
 		

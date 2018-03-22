@@ -1,5 +1,5 @@
 package Statocles::Template;
-our $VERSION = '0.087';
+our $VERSION = '0.088';
 # ABSTRACT: A template object to pass around
 
 use Statocles::Base 'Class';
@@ -174,7 +174,7 @@ sub render {
             return $args{content};
         };
 
-        $content = $t->process( \%args );
+        $content = eval { $t->process( \%args ) };
     }
 
     if ( blessed $content && $content->isa( 'Mojo::Exception' ) ) {
@@ -299,7 +299,7 @@ Statocles::Template - A template object to pass around
 
 =head1 VERSION
 
-version 0.087
+version 0.088
 
 =head1 DESCRIPTION
 

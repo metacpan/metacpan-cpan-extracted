@@ -1,5 +1,5 @@
 ---
-abstract: 'Release tests for minimum required versions'
+abstract: 'Author tests for minimum required versions'
 author:
   - 'Mike Doherty <doherty@cpan.org>'
   - 'Marcel Grünauer <marcel@cpan.org>'
@@ -10,13 +10,12 @@ build_requires:
   Test::DZil: '0'
   Test::More: '0.96'
   Test::Output: '0'
-  blib: '1.01'
   perl: '5.008'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -41,5 +40,5 @@ resources:
   bugtracker: https://github.com/doherty/Dist-Zilla-Plugin-Test-MinimumVersion/issues
   homepage: http://metacpan.org/release/Dist-Zilla-Plugin-Test-MinimumVersion/
   repository: git://github.com/doherty/Dist-Zilla-Plugin-Test-MinimumVersion.git
-version: '2.000007'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '2.000008'
+x_serialization_backend: 'YAML::Tiny version 1.73'

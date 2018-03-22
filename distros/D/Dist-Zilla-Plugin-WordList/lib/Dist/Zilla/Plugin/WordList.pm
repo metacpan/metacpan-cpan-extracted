@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::WordList;
 
-our $DATE = '2018-02-20'; # DATE
-our $VERSION = '0.052'; # VERSION
+our $DATE = '2018-03-19'; # DATE
+our $VERSION = '0.053'; # VERSION
 
 use 5.014;
 use strict;
@@ -59,7 +59,7 @@ sub munge_files {
                     my $word = shift;
 
                     # check that word is sorted
-                    if (defined $last_word) {
+                    if (!${"$package\::SORT"} && defined $last_word) {
                         if ($last_word eq $word) {
                             die "Duplicate entry '$word'";
                         } elsif ($last_word gt $word) {
@@ -109,7 +109,7 @@ Dist::Zilla::Plugin::WordList - Plugin to use when building WordList::* distribu
 
 =head1 VERSION
 
-This document describes version 0.052 of Dist::Zilla::Plugin::WordList (from Perl distribution Dist-Zilla-Plugin-WordList), released on 2018-02-20.
+This document describes version 0.053 of Dist::Zilla::Plugin::WordList (from Perl distribution Dist-Zilla-Plugin-WordList), released on 2018-03-19.
 
 =head1 SYNOPSIS
 
@@ -155,8 +155,6 @@ feature.
 L<WordList>
 
 L<Pod::Weaver::Plugin::WordList>
-
-L<Dist::Zilla::Plugin::WordListC>
 
 =head1 AUTHOR
 

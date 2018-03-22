@@ -1,0 +1,60 @@
+
+use strict;
+use warnings;
+
+use Module::Build 0.3601;
+
+
+my %module_build_args = (
+  "build_requires" => {
+    "Module::Build" => "0.3601"
+  },
+  "configure_requires" => {
+    "Module::Build" => "0.3601"
+  },
+  "dist_abstract" => "Pod::Weaver configuration the way DOHERTY does it",
+  "dist_author" => [
+    "Mike Doherty <doherty\@cpan.org>"
+  ],
+  "dist_name" => "Pod-Weaver-PluginBundle-Author-DOHERTY",
+  "dist_version" => "0.008",
+  "license" => "perl",
+  "module_name" => "Pod::Weaver::PluginBundle::Author::DOHERTY",
+  "recommends" => {},
+  "recursive_test_files" => 1,
+  "requires" => {
+    "Pod::Weaver::Config::Assembler" => 0,
+    "Pod::Weaver::Section::Availability" => "1.20",
+    "Pod::Weaver::Section::BugsAndLimitations" => "1.20",
+    "Pod::Weaver::Section::SourceGitHub" => "0.53",
+    "perl" => "5.006",
+    "strict" => 0,
+    "warnings" => 0
+  },
+  "script_files" => [],
+  "test_requires" => {
+    "File::Spec" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
+    "Test::More" => 0
+  }
+);
+
+
+my %fallback_build_requires = (
+  "File::Spec" => 0,
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
+  "Module::Build" => "0.3601",
+  "Test::More" => 0
+);
+
+
+unless ( eval { Module::Build->VERSION(0.4004) } ) {
+  delete $module_build_args{test_requires};
+  $module_build_args{build_requires} = \%fallback_build_requires;
+}
+
+my $build = Module::Build->new(%module_build_args);
+
+$build->create_build_script;
