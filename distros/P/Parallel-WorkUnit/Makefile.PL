@@ -9,6 +9,9 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Provide multi-paradigm forking with ability to pass back data",
   "AUTHOR" => "Joelle Maslak <jmaslak\@antelope.net>",
+  "BUILD_REQUIRES" => {
+    "Test::UseAllModules" => "0.17"
+  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -25,18 +28,23 @@ my %WriteMakefileArgs = (
     "Moose" => 0,
     "Moose::Util::TypeConstraints" => 0,
     "POSIX" => 0,
+    "Scalar::Util" => 0,
     "Storable" => 0,
     "Try::Tiny" => 0,
     "autodie" => 0,
     "namespace::autoclean" => 0,
+    "overload" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Test2::Tools::Warnings" => 0,
+    "Test2::V0" => 0,
     "Test::Exception" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "Test::UseAllModules" => "0.17"
   },
-  "VERSION" => "1.112",
+  "VERSION" => "1.116",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,12 +60,17 @@ my %FallbackPrereqs = (
   "Moose" => 0,
   "Moose::Util::TypeConstraints" => 0,
   "POSIX" => 0,
+  "Scalar::Util" => 0,
   "Storable" => 0,
+  "Test2::Tools::Warnings" => 0,
+  "Test2::V0" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
+  "Test::UseAllModules" => "0.17",
   "Try::Tiny" => 0,
   "autodie" => 0,
   "namespace::autoclean" => 0,
+  "overload" => 0,
   "strict" => 0,
   "warnings" => 0
 );
@@ -73,7 +86,7 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 if ( $^O eq 'MSWin32' ) {
-	$WriteMakefileArgs{PREREQ_PM}{'Thread::Queue'} = '0';
+	$WriteMakefileArgs{PREREQ_PM}{'Thread::Queue'} = '3.12';
 	$WriteMakefileArgs{PREREQ_PM}{'threads'} = '0';
 }
 

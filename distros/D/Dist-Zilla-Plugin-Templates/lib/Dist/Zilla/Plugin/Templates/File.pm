@@ -2,7 +2,7 @@
 #
 #   file: lib/Dist/Zilla/Plugin/Templates/File.pm
 #
-#   Copyright © 2015, 2016 Van de Bugger.
+#   Copyright © 2015, 2016, 2018 Van de Bugger.
 #
 #   This file is part of perl-Dist-Zilla-Plugin-Templates.
 #
@@ -16,6 +16,8 @@
 #
 #   You should have received a copy of the GNU General Public License along with
 #   perl-Dist-Zilla-Plugin-Templates. If not, see <http://www.gnu.org/licenses/>.
+#
+#   SPDX-License-Identifier: GPL-3.0-or-later
 #
 #   ---------------------------------------------------------------------- copyright and license ---
 
@@ -71,7 +73,7 @@ use namespace::autoclean 0.16;
 use version 0.77;
 
 # ABSTRACT: Frequently used operations on include files
-our $VERSION = 'v0.6.4'; # VERSION
+our $VERSION = 'v0.6.5'; # VERSION
 
 extends 'Dist::Zilla::File::InMemory';
 
@@ -292,7 +294,7 @@ __PACKAGE__->meta->make_immutable();
 
 #pod =head1 COPYRIGHT AND LICENSE
 #pod
-#pod Copyright (C) 2015, 2016 Van de Bugger
+#pod Copyright (C) 2015, 2016, 2018 Van de Bugger
 #pod
 #pod License GPLv3+: The GNU General Public License version 3 or later
 #pod <http://www.gnu.org/licenses/gpl-3.0.txt>.
@@ -317,7 +319,7 @@ Dist::Zilla::Plugin::Templates::File - Frequently used operations on include fil
 
 =head1 VERSION
 
-Version v0.6.4, released on 2016-12-28 20:24 UTC.
+Version v0.6.5, released on 2018-03-22 20:35 UTC.
 
 =for test_synopsis BEGIN { die "SKIP: Not Perl code.\n" };
 
@@ -458,7 +460,7 @@ Van de Bugger <van.de.bugger@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015, 2016 Van de Bugger
+Copyright (C) 2015, 2016, 2018 Van de Bugger
 
 License GPLv3+: The GNU General Public License version 3 or later
 <http://www.gnu.org/licenses/gpl-3.0.txt>.

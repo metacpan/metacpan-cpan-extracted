@@ -1,0 +1,291 @@
+=head1 NAME
+
+  Google::ContentAPI - Interact with Google's Content API for Shopping
+
+=head1 DESCRIPTION
+
+  Add, modify and delete items from the Google Merchant Center platform via
+  the Content API for Shopping.
+
+  Authentication is done via Service Account credentials. See the following for details:
+  https://developers.google.com/shopping-content/v2/how-tos/service-accounts
+
+  You will also need to create a Merchant Center Account:
+  https://developers.google.com/shopping-content/v2/quickstart
+
+  For convenince, add your Merchant account ID to the *.json file provided by Google.
+  Your complete *.json file, after adding your merchant ID, will look something like this:
+
+  {
+    "merchant_id": "120960455",
+    "type": "service_account",
+    "project_id": "content-api-test-197421",
+    "private_key_id": "11b8e20c2540c788e98b49e623ae8167dc3e4a6f",
+    "private_key": "-----BEGIN PRIVATE KEY-----
+    ...
+    -----END PRIVATE KEY-----\n",
+    "client_email": "google@content-api.iam.gserviceaccount.com",
+    "client_id": "999999999",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://accounts.google.com/o/oauth2/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/google%40content-api.iam.gserviceaccount.com"
+  }
+
+=head1 SYNOPSIS
+
+  use Google::ContentAPI;
+  use Data::Dumper;
+
+  # get account auth info (merchantId)
+  my $google = Google::ContentAPI->new({
+      debug => 0,
+      config_file => 'content-api-key.json'
+  });
+
+  my ($result, $products, $batch_id);
+
+  # get account auth info (merchantId)
+  $result = $google->get(
+    resource => 'accounts',
+    method   => 'authinfo'
+  );
+  print "authinfo: \n". Dumper $result;
+  print "$result->{code} ". ($result->{code} eq '200' ? 'success' : 'failure') ."\n";
+
+  # list products
+
+  $result = $google->get(
+      resource => 'products',
+      method   => 'list',
+      params   => ['includeInvalidInsertedItems' => 'true']
+  );
+  print "Products list: \n". Dumper $result;
+  print "$result->{code} ". ($result->{code} eq '200' ? 'success' : 'failure') ."\n";
+
+  # insert a product
+
+  $result = $google->post(
+      resource => 'products',
+      method   => 'insert',
+      params   => ['dryRun' => 'true'],
+      body => {
+        contentLanguage => 'en',
+        targetCountry => 'US',
+        channel => 'online',
+        offerId => '333333',
+        title => 'Item title',
+        description => 'The item description',
+        link => 'http://www.google.com',
+        imageLink => 'https://www.google.com/images/logo.png',
+        availability => 'in stock',
+        condition => 'new',
+        price => {
+            value => '99.95',
+            currency => 'USD',
+        },
+        shipping => [
+          {
+            country => 'US',
+            service => 'Standard Shipping',
+            price => {
+                value => '7.95',
+                currency => 'USD',
+            },
+          },
+        ],
+        brand => 'Apple',
+        gtin => '333333-67890',
+        mpn => '333333',
+        googleProductCategory => 'Home & Garden > Household Supplies > Apples',
+        productType => 'Home & Garden > Household Supplies > Apples',
+        customLabel1 => 'apples'
+      }
+  );
+  print "$result->{code} ". ($result->{code} eq '200' ? 'success' : 'failure') ."\n";
+
+  # get single product info
+
+  my $product_id = '333333';
+  $result = $google->get(
+      resource => 'products',
+      method   => 'get',
+      id => 'online:en:US:'. $product_id
+  );
+  print "Products info: \n". Dumper $result;
+  print "$result->{code} ". ($result->{code} eq '200' ? 'success' : 'failure') ."\n";
+
+  # delete a product
+
+  my $del_product_id = '333333';
+  $result = $google->delete(
+      resource => 'products',
+      method   => 'delete',
+      id => 'online:en:US:'. $del_product_id,
+      #params   => ['dryRun' => 'true']
+  );
+  print "$result->{code} ". ($result->{code} eq '204' ? 'success' : 'failure') ."\n"; # 204 = delete success
+
+  # batch insert
+
+  $products = [];
+  $batch_id = 0;
+
+  foreach my $i ('211203'..'211205') {
+      push @$products, {
+          batchId => ++$batch_id,
+          merchantId => $google->{merchant_id},
+          method => 'insert', # insert / get / delete
+          #productId => '', # for get / delete
+          product => { # for insert
+              contentLanguage => 'en',
+              targetCountry => 'US',
+              channel => 'online',
+              offerId => "$i",
+              title => "item title $i",
+              description => "The item description for $i",
+              link => 'http://www.google.com',
+              imageLink => 'https://www.google.com/images/logo.png',
+              availability => 'in stock',
+              condition => 'new',
+              price => {
+                  value => '10.95',
+                  currency => 'USD',
+              },
+              shipping => [
+                {
+                  country => 'US',
+                  service => 'Standard Shipping',
+                  price => {
+                      value => '7.95',
+                      currency => 'USD',
+                  },
+                },
+              ],
+              brand => 'Apple',
+              gtin => "${i}-67890",
+              mpn => "$i",
+              googleProductCategory => 'Home & Garden > Household Supplies > Apples',
+              productType => 'Home & Garden > Household Supplies > Apples',
+              customLabel1 => 'apples'
+          }
+      };
+  }
+
+  $result = $google->post(
+      resource => 'products',
+      method   => 'batch',
+      #params   => ['dryRun' => 'true'],
+      body => { entries => $products }
+  );
+  print "$result->{code} ". ($result->{code} eq '200' ? 'success' : 'failure') ."\n";
+
+  # batch get:
+
+  $products = [];
+  $batch_id = 0;
+  foreach my $product_id ('211203'..'211205') {
+      push @$products, {
+          batchId => ++$batch_id,
+          merchantId => $google->{merchant_id},
+          method => 'get', # insert / get / delete
+          productId => 'online:en:US:'. $product_id, # for get / delete
+      };
+  }
+
+  $result = $google->post(
+      resource => 'products',
+      method   => 'batch',
+      #params   => ['dryRun' => 'true'],
+      body => { entries => $products }
+  );
+  print Dumper $result;
+  print "$result->{code} ". ($result->{code} eq '200' ? 'success' : 'failure') ."\n";
+
+  # batch delete:
+
+  $products = [];
+  $batch_id = 0;
+  foreach my $product_id ('211203'..'211205') {
+      push @$products, {
+          batchId => ++$batch_id,
+          merchantId => $google->{merchant_id},
+          method => 'delete', # insert / get / delete
+          productId => 'online:en:US:'. $product_id, # for get / delete
+      };
+  }
+
+  $result = $google->post(
+      resource => 'products',
+      method   => 'batch',
+      #params   => ['dryRun' => 'true'],
+      body => { entries => $products }
+  );
+  print "$result->{code} ". ($result->{code} eq '200' ? 'success' : 'failure') ."\n";
+
+=head1 METHODS AND FUNCTIONS
+
+=head2 ACCOUNTS
+
+=head3 authinfo
+
+  Returns information about the authenticated user.
+
+=head2 PRODUCTS
+
+=head3 custombatch
+
+  Retrieves, inserts, and deletes multiple products in a single request.
+
+=head3 insert
+
+  Uploads a product to your Merchant Center account. If an item with the
+  same channel, contentLanguage, offerId, and targetCountry already exists,
+  this method updates that entry.
+
+=head3 list
+
+  Lists the products in your Merchant Center account.
+
+=head3 get
+
+  Retrieves a product from your Merchant Center account.
+
+=head3 delete
+
+  Deletes a product from your Merchant Center account.
+
+=head1 UNIMPLEMENTED FEATURES
+
+Certain API methods are not yet implemented (no current personal business need).
+
+=head1 PREREQUISITES
+
+  JSON
+  JSON::WebToken
+  Crypt::OpenSSL::RSA
+  REST::Client
+  HTML::Entities
+
+=head1 AUTHOR
+
+  Original Author
+  Bill Gerrard <bill@gerrard.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+  Copyright (C) 2018 Bill Gerrard
+
+  This library is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself, either Perl version 5.20.2 or,
+  at your option, any later version of Perl 5 you may have available.
+  Disclaimer of warranty: This program is provided by the copyright holder
+  and contributors "As is" and without any express or implied warranties.
+  The implied warranties of merchantability, fitness for a particular purpose,
+  or non-infringement are disclaimed to the extent permitted by your local
+  law. Unless required by law, no copyright holder or contributor will be
+  liable for any direct, indirect, incidental, or consequential damages
+  arising in any way out of the use of the package, even if advised of the
+  possibility of such damage.
+
+=cut

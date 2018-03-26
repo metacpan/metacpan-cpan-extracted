@@ -15,11 +15,12 @@ sub startup {
   $self->plugin('TagHelpers');
 
   # Model
-  $self->helper(
-    sqlite => sub {
-      state $sql = Mojo::SQLite->new->from_filename(shift->config('sqlite'));
-    }
-  );
+  my $db_helper = sub {
+    state $sql = Mojo::SQLite->new->from_filename(shift->config('sqlite'));
+  };
+  $self->helper(sqlite => $db_helper);
+  $self->helper(dbx    => $db_helper);
+
   $self->helper(
     posts => sub {
       state $posts = Blog::Model::Posts->new(sqlite => shift->sqlite);

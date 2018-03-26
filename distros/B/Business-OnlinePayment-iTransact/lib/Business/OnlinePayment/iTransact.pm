@@ -16,11 +16,12 @@
 #
 # VERSION HISTORY
 #
+# + v1.01       03/24/2018 Added option to pass line item detail
 # + v1.00	07/17/2017 Business::OnlinePayment implementation
 #
 # COPYRIGHT AND LICENSE
 #
-# Copyright (C) 2017 Bill Gerrard
+# Copyright (C) 2017-2018 Bill Gerrard
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself, either Perl version 5.20.2 or,
@@ -45,12 +46,13 @@ use Carp;
 use Business::OnlinePayment 3;
 use Business::OnlinePayment::HTTPS;
 
-# iTransact specificprerequisites:
-use XML::Hash::LX;
+# iTransact specific prerequisites:
+use XML::Writer;
+use XML::Hash::XS qw();
 use Digest::HMAC_SHA1;
 
 our @ISA = qw(Business::OnlinePayment::HTTPS);
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 sub set_defaults {
     my $self = shift;
@@ -91,11 +93,16 @@ sub submit {
 
     $self->map_fields();
 
-    my @required_fields = qw(type action amount description 
-        first_name last_name card_number expiration);
-    $self->required_fields( @required_fields );
-
     my %c = $self->content();
+
+    # check required fields: if no items array, amount/description required
+    my @required_fields = qw(type action 
+        first_name last_name card_number expiration);
+    unless ( defined $c{'items'} ) {
+      push @required_fields, 'description';
+      push @required_fields, 'amount';
+    }
+    $self->required_fields( @required_fields );
 
     if ( lc( $c{'type'} ) =~ /^e?check$/i ) {
       $self->is_success(0);
@@ -105,25 +112,32 @@ sub submit {
 
     my $action = $c{action_type};
 
-    ### start XML Generation
-    my $customer_info = {
-        CustomerData => {
-            CustId          => $c{customer_id},
-            Email           => $c{email},
-            BillingAddress  => {
-                    Address1        => $c{address},
-                    FirstName       => $c{first_name},
-                    LastName        => $c{last_name},
-                    City            => $c{city},
-                    State           => $c{state},
-                    Zip             => $c{zip},
-                    Country         => $c{country},
-                    Phone           => $c{phone},
-            },
-        },
-    };
+    ### start XML generation
 
-    my $account_info;
+    my $writer = XML::Writer->new( OUTPUT => 'self' );
+
+    $writer->startTag($action);
+
+    $writer->startTag('TransactionControl');
+      $writer->dataElement('SendCustomerEmail', $self->email_customer);
+      $writer->dataElement('SendMerchantEmail', $self->email_merchant);
+      $writer->dataElement('TestMode', $self->{test_mode} ? 'TRUE' : 'FALSE');
+    $writer->endTag('TransactionControl');
+
+    $writer->startTag('CustomerData');
+      $writer->dataElement('CustId', $c{customer_id});
+      $writer->dataElement('Email', $c{email});
+      $writer->startTag('BillingAddress');
+        $writer->dataElement('Address1', $c{address});
+        $writer->dataElement('FirstName', $c{first_name});
+        $writer->dataElement('LastName', $c{last_name});
+        $writer->dataElement('City', $c{city});
+        $writer->dataElement('State', $c{state});
+        $writer->dataElement('Zip', $c{zip});
+        $writer->dataElement('Country', $c{country});
+        $writer->dataElement('Phone', $c{phone});
+      $writer->endTag('BillingAddress');
+    $writer->endTag('CustomerData');
 
     if (lc $c{type} eq 'cc') {
 
@@ -134,62 +148,64 @@ sub submit {
       $month = '0'. $month if $month =~ /^\d$/;
       $year = '20' . $year if length($year) == 2;
 
-       $account_info = {
-            AccountInfo => {
-                CardAccount => {
-                    AccountNumber   => $c{card_number},
-                    ExpirationMonth => $month,
-                    ExpirationYear  => $year,
-                    CVVNumber       => $c{cvv2},
-                },
-            },
-       };
+      $writer->startTag('AccountInfo');
+        $writer->startTag('CardAccount');
+          $writer->dataElement('AccountNumber', $c{card_number});
+          $writer->dataElement('ExpirationMonth', $month);
+          $writer->dataElement('ExpirationYear', $year);
+          $writer->dataElement('CVVNumber', $c{cvv2});
+        $writer->endTag('CardAccount');
+      $writer->endTag('AccountInfo');
+
     } 
 
-    my $http = $self->{port} eq '443' ? 'https://' : 'http://';
-    my $gateway_url = $http . $self->{server} . $self->{path};
+    if ( defined($c{'items'}) ) {
+      $writer->startTag('OrderItems');
+      foreach my $itm ( @{$c{'items'}} ) {
+        $writer->startTag('Item');
+          foreach my $key ( qw( description qty cost ) ) {
+            $writer->dataElement(ucfirst($key), $itm->{$key});
+          }
+        $writer->endTag('Item');
+      }
+      $writer->endTag('OrderItems');
+    } else {
+      $writer->dataElement('Description', $c{description});
+      $writer->dataElement('Total', $c{amount});
+    }
 
-    my $payload = {
-        $action => {
-             TransactionControl => {
-                 SendCustomerEmail => $self->email_customer,
-                 SendMerchantEmail => $self->email_merchant,
-                 TestMode          => $self->{test_mode} ? 'TRUE' : 'FALSE',
-             },
-             %{$customer_info},
-             %{$account_info},
-             Description => $c{description},
-             Total => $c{amount},
-         },
+    $writer->endTag($action); # root
+
+    my $xml_payload = $writer->to_string;
+
+    ### payload built, now generate payload signature
+    
+    my $hmac = Digest::HMAC_SHA1->new($self->password);
+    $hmac->add($xml_payload);
+    my $payload_signature = $hmac->b64digest . '='; # add closing '=' to signature
+    my $username = $self->login;
+
+    my $xml_request = qq{<?xml version="1.0" encoding="UTF-8"?>
+      <GatewayInterface>
+        <APICredentials>
+          <Username>$username</Username>
+          <PayloadSignature>$payload_signature</PayloadSignature>
+        </APICredentials>
+        $xml_payload
+      </GatewayInterface>
     };
 
-    my $xml = hash2xml $payload;
-    $xml = (split(/\n/, $xml))[1]; # remove <xml> declaration
-    my $hmac = Digest::HMAC_SHA1->new($self->password);
-    $hmac->add($xml);
-    my $payload_signature = $hmac->b64digest . '='; # add closing '=' to signature
-
-    # build request with calculated payload signature
-    my %request = (
-        GatewayInterface    => {
-            APICredentials  => {
-                Username            => $self->login,
-                PayloadSignature    => $payload_signature,
-            },
-            %{$payload},
-        },
-    );
-    $xml = hash2xml \%request;
-    ### end XML Generation
+    ### end XML generation
 
     my ( $page, $status_code, %headers ) =
-        $self->https_post( { 'Content-Type' => 'text/xml; charset=utf-8' } , $xml);
+        $self->https_post( { 'Content-Type' => 'text/xml; charset=utf-8' } , $xml_request);
 
     my $response = {};
     if ( $status_code =~ /^200/ ) {
         if ( ! eval {
-            my $decoded_xml = xml2hash $page;
-            $response = $decoded_xml->{GatewayInterface}{TransactionResponse}{TransactionResult};
+            my $conv = XML::Hash::XS->new(utf8 => 0, encoding => 'utf-8');
+            my $hash = $conv->xml2hash($page);
+            $response = $hash->{TransactionResponse}->{TransactionResult};
         } ) {
             die "XML PARSING FAILURE: $@";
         }
@@ -260,8 +276,6 @@ Business::OnlinePayment::iTransact - iTransact backend module for Business::Onli
   $tx->content(
       action         => 'Normal Authorization',
       type           => 'cc',
-      description    => 'Business::OnlinePayment::iTransact XML Test',
-      amount         => '20.17',
       customer_id    => '123-CUST',
       first_name     => 'John',
       last_name      => 'Doe',
@@ -276,6 +290,20 @@ Business::OnlinePayment::iTransact - iTransact backend module for Business::Onli
       zip            => '84001',
       country        => 'US',
       phone          => '801-555-1212',
+      # order total and description
+      description    => 'Business::OnlinePayment::iTransact XML Test',
+      amount         => '20.17',
+      # itemized list
+      items => [
+          {   description => 'item one',
+              qty => 1,
+              cost => '11.11'
+          },
+          {   description => 'item two',
+              qty => 2,
+              cost => '22.22'
+          },
+      ],
   );
 
   $tx->submit();
@@ -317,6 +345,10 @@ first_name, last_name, card_number, expiration.
 An action of 'Normal Authorization' will send a 'AuthTransaction' sale request to iTransact. 
 
 A sale request is the default authorization type performed which is an authorization that will automatically be captured during the settlement process. An AVSOnly credit card transaction request is a sale request run with a zero amount and can be used to validate the AVS and CVV information on a card without actually running an authorization.
+
+When processing a sale request, you have the option of providing an itemized list of item, qty, cost. iTransact will calculate the item cost (qty * cost) and calculate an order total. Otherwise you only need to pass an order total and description. iTransact will attempt a charge of either the calculated order total (when itemized) or the amount you provide.
+
+Note that the example in the synopsis shows "amount", "description" and "items" fields. Define either amount/description or items, not all three. 
 
 =head1 METHODS AND FUNCTIONS
 
@@ -371,7 +403,8 @@ and other transaction action types supported by iTransact.
 
   Business::OnlinePayment
   Business::OnlinePayment::HTTPS
-  XML::Hash::LX
+  XML::Writer
+  XML::Hash::XS
   Digest::HMAC_SHA1
 
 =head1 SEE ALSO
@@ -394,7 +427,7 @@ Bill Gerrard <bill@gerrard.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 Bill Gerrard
+Copyright (C) 2017-2018 Bill Gerrard
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.20.2 or,

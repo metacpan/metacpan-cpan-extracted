@@ -1,0 +1,261 @@
+{
+   "abstract" : "build Dezi search applications",
+   "author" : [
+      "Peter Karman <karpet@dezi.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dezi-App",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "DBI" : "0",
+            "File::Find" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTML::Tagset" : "0",
+            "HTTP::Cookies" : "0",
+            "HTTP::Message" : "0",
+            "HTTP::Server::Simple" : "0",
+            "HTTP::Server::Simple::Authen" : "0",
+            "JSON" : "2.0",
+            "LWP::RobotUA" : "0",
+            "Mail::Box" : "0",
+            "Rose::DBx::TestDB" : "0",
+            "Term::ProgressBar" : "0",
+            "Test::HTTP::Server::Simple" : "0",
+            "URI" : "0",
+            "WWW::Sitemap::XML" : "0",
+            "XML::Feed" : "0",
+            "YAML::Syck" : "0.72"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Class::Load" : "0",
+            "Config::General" : "2.31",
+            "Data::Dump" : "0",
+            "DateTime::Format::DateParse" : "0",
+            "Digest::MD5" : "0",
+            "File::Basename" : "0",
+            "File::Rules" : "0.02",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "HTTP::Date" : "0",
+            "Lucy" : "0.006002",
+            "Moose" : "0",
+            "MooseX::Getopt" : "0",
+            "MooseX::StrictConstructor" : "0",
+            "MooseX::Types::DateTime" : "0",
+            "MooseX::Types::Path::Class" : "0",
+            "MooseX::XSAccessor" : "0",
+            "Path::Class" : "0.32",
+            "Path::Class::File::Lockable" : "0",
+            "Path::Class::File::Stat" : "0.05",
+            "SWISH::3" : "1.000015",
+            "SWISH::Filter" : "0.191",
+            "Scalar::Util" : "0",
+            "Search::Query" : "0.307",
+            "Search::Query::Dialect::Lucy" : "0.202",
+            "Search::Tools" : "1.000",
+            "Sort::SQL" : "0",
+            "Sys::Hostname" : "0",
+            "Text::ParseWords" : "0",
+            "Time::HiRes" : "0",
+            "Try::Tiny" : "0",
+            "Type::Tiny" : "0",
+            "Types::Standard" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "v5.8.3"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "CAM::PDF" : "0",
+            "Compress::Zlib" : "0",
+            "Test::LeakTrace" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dezi::Aggregator" : {
+         "file" : "lib/Dezi/Aggregator.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Aggregator::DBI" : {
+         "file" : "lib/Dezi/Aggregator/DBI.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Aggregator::FS" : {
+         "file" : "lib/Dezi/Aggregator/FS.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Aggregator::Mail" : {
+         "file" : "lib/Dezi/Aggregator/Mail.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Aggregator::MailFS" : {
+         "file" : "lib/Dezi/Aggregator/MailFS.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Aggregator::Spider" : {
+         "file" : "lib/Dezi/Aggregator/Spider.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Aggregator::Spider::Response" : {
+         "file" : "lib/Dezi/Aggregator/Spider/Response.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Aggregator::Spider::UA" : {
+         "file" : "lib/Dezi/Aggregator/Spider/UA.pm",
+         "version" : "0.015"
+      },
+      "Dezi::App" : {
+         "file" : "lib/Dezi/App.pm",
+         "version" : "0.015"
+      },
+      "Dezi::CLI" : {
+         "file" : "lib/Dezi/CLI.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Cache" : {
+         "file" : "lib/Dezi/Cache.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Indexer" : {
+         "file" : "lib/Dezi/Indexer.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Indexer::Config" : {
+         "file" : "lib/Dezi/Indexer/Config.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Indexer::Doc" : {
+         "file" : "lib/Dezi/Indexer/Doc.pm",
+         "version" : "0.015"
+      },
+      "Dezi::InvIndex" : {
+         "file" : "lib/Dezi/InvIndex.pm",
+         "version" : "0.015"
+      },
+      "Dezi::InvIndex::Header" : {
+         "file" : "lib/Dezi/InvIndex/Header.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Lucy" : {
+         "file" : "lib/Dezi/Lucy.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Lucy::Indexer" : {
+         "file" : "lib/Dezi/Lucy/Indexer.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Lucy::InvIndex" : {
+         "file" : "lib/Dezi/Lucy/InvIndex.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Lucy::Result" : {
+         "file" : "lib/Dezi/Lucy/Result.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Lucy::Results" : {
+         "file" : "lib/Dezi/Lucy/Results.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Lucy::Searcher" : {
+         "file" : "lib/Dezi/Lucy/Searcher.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Queue" : {
+         "file" : "lib/Dezi/Queue.pm",
+         "version" : "0.015"
+      },
+      "Dezi::ReplaceRules" : {
+         "file" : "lib/Dezi/ReplaceRules.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Result" : {
+         "file" : "lib/Dezi/Result.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Results" : {
+         "file" : "lib/Dezi/Results.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Role" : {
+         "file" : "lib/Dezi/Role.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Searcher" : {
+         "file" : "lib/Dezi/Searcher.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Searcher::SearchOpts" : {
+         "file" : "lib/Dezi/Searcher/SearchOpts.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Test::Doc" : {
+         "file" : "lib/Dezi/Test/Doc.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Test::Indexer" : {
+         "file" : "lib/Dezi/Test/Indexer.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Test::InvIndex" : {
+         "file" : "lib/Dezi/Test/InvIndex.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Test::Result" : {
+         "file" : "lib/Dezi/Test/Result.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Test::Results" : {
+         "file" : "lib/Dezi/Test/Results.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Test::ResultsPayload" : {
+         "file" : "lib/Dezi/Test/ResultsPayload.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Test::Searcher" : {
+         "file" : "lib/Dezi/Test/Searcher.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Types" : {
+         "file" : "lib/Dezi/Types.pm",
+         "version" : "0.015"
+      },
+      "Dezi::Utils" : {
+         "file" : "lib/Dezi/Utils.pm",
+         "version" : "0.015"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dezi-app at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dezi-App"
+      },
+      "homepage" : "http://search.cpan.org/dist/Dezi-App/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/karpet/dezi-app",
+         "web" : "https://github.com/karpet/dezi-app"
+      }
+   },
+   "version" : "0.015",
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

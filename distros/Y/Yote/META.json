@@ -27,8 +27,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Data::RecordStore" : "2",
-            "JSON" : "0",
+            "Data::RecordStore" : "3.15",
             "perl" : "v5.10.0"
          }
       }
@@ -36,15 +35,9 @@
    "provides" : {
       "Yote" : {
          "file" : "lib/Yote.pm",
-         "version" : "2.02"
+         "version" : "3.0"
       },
       "Yote::Array" : {
-         "file" : "lib/Yote.pm"
-      },
-      "Yote::ArrayGatekeeper" : {
-         "file" : "lib/Yote.pm"
-      },
-      "Yote::BigHash" : {
          "file" : "lib/Yote.pm"
       },
       "Yote::Hash" : {
@@ -55,9 +48,6 @@
       },
       "Yote::ObjStore" : {
          "file" : "lib/Yote.pm"
-      },
-      "Yote::YoteDB" : {
-         "file" : "lib/Yote.pm"
       }
    },
    "release_status" : "stable",
@@ -66,6 +56,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2.02",
+   "version" : "3.0",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

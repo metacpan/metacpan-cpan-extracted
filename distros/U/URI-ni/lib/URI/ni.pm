@@ -6,7 +6,7 @@ require URI::_punycode;
 require URI::QueryParam;
 @ISA=qw(URI::_server URI);
 
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 # not sure why the module is laid out like this, oh well.
 
@@ -42,9 +42,6 @@ use URI::Escape  ();
 use Digest       ();
 use Carp         ();
 use Scalar::Util ();
-
-# XXX please don't go away from Digest
-my %ALGOS = map { lc $_ => 1 } keys %Digest::MMAP;
 
 =head2 compute $DATA [, $ALGO, \%QUERY]
 
@@ -103,23 +100,37 @@ sub compute {
     my $is_blessed = Scalar::Util::blessed($data);
     my $is_digest  = $is_blessed and $data->isa('Digest::base');
 
-    $algo = $algo ? lc $algo : 'sha-256';
-    $self = ref $self ? $self->clone : URI->new("ni:///$algo");
-    # one last time
-    $algo = lc $self->algorithm;
+    my $ctx = $is_digest ? $data : undef;
 
-    # easy out for exotic Digest subclasses
-    Carp::croak("Algorithm $algo isn't on the menu.")
-          unless $ALGOS{$algo} or $is_digest;
+    if ($algo) {
+        $algo = lc $algo;
+        # it is considerably more robust to just test the
+        # explicitly-specified algorithm by trying to load it
+        $ctx ||= eval { Digest->new(uc $algo) };
+        Carp::croak("Algorithm $algo isn't on the menu: $@") if $@;
+    }
+    else {
+        Carp::croak('We currently need to be told what the digest algorithm is')
+              if $is_digest;
+        # sane default which we know works
+        $algo = 'sha-256';
+        $ctx ||= Digest->new(uc $algo);
+    }
 
-    # of course the chief wants it in upper case
-    my $ctx = Digest->new(uc $algo);
+    if (ref $self) {
+        # instance method; clone it
+        $self = $self->clone;
+        $algo ||= my $a = lc $self->algorithm;
+        $self->algorithm($algo) if $algo ne $a;
+    }
+    else {
+        # class method, defaults to sha256
+        $algo ||= 'sha-256';
+        $self = URI->new("ni:///$algo");
+    }
 
     if (ref $data) {
-        if ($is_digest) {
-            $ctx = $data;
-        }
-        else {
+        unless ($is_digest) {
             # oh man this is too damn clever. it is bound to screw up.
             my %handler = (
                 GLOB   => sub { binmode $_[0]; $ctx->addfile($_[0]) },
@@ -127,17 +138,13 @@ sub compute {
                 CODE   => sub { shift->($ctx) },
             );
 
-            my $ok;
-            for my $type (keys %handler) {
-                # XXX is there a less dumb way to do this?
-                $ok = $is_blessed ? $data->isa($type) : ref $data eq $type;
-                if ($ok) {
-                    $handler{$type}->($data);
-                    last;
-                }
+            if (my $func = $handler{Scalar::Util::reftype($data)}) {
+                $func->($data);
             }
-            Carp::croak('If the data is a reference, it has to be' .
-                            ' some kind of GLOB or SCALAR.') unless $ok;
+            else {
+                Carp::croak('If the data is a reference, it has to be' .
+                                ' some kind of GLOB or SCALAR.');
+            }
         }
     }
     else {
@@ -294,7 +301,16 @@ L<Digest>.
 =cut
 
 sub digest {
-    MIME::Base64::decode_base64(shift->b64digest);
+    my $b64 = shift->b64digest;
+    # lol do none of this
+
+    # my $len = length $b64;
+    # return '' unless $len;
+    # # add 0 (A)
+    # $b64 .= 'A' if $len == 1;
+    # $b64 .= '=' while length($b64) % 4;
+    # #warn $b64;
+    MIME::Base64::decode_base64($b64);
 }
 
 =head2 locators

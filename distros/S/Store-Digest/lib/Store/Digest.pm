@@ -22,11 +22,11 @@ Store::Digest - Store opaque data objects keyed on their cryptographic digests
 
 =head1 VERSION
 
-Version 0.03
+Version 0.06
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 has _driver => (
     is      => 'rw',
@@ -38,11 +38,15 @@ has _driver => (
 
     use Store::Digest;
 
+    # initialize the store
+
     my $store = Store::Digest->new(
         driver  => 'FileSystem',
         # all other options pass through to the driver
         dir     => '/var/db/store-digest',
     );
+
+    # add an object
 
     my $obj = $store->add(
         content  => $fh,
@@ -50,9 +54,29 @@ has _driver => (
         mtime    => DateTime->now,
     );
 
+    # if you want to get the object back
+
+    my $str = 'ni:///sha-256;IcnxQtEMlihv1wFHTMjkMprLO-9-ZXZD2lcsQLmQ1xA';
+    my $uri = URI->new($str);
+    my $obj = $store->get($uri);
+
 =head1 METHODS
 
-=head2 function1
+This module will eventually act as a unifying interface for multiple
+storage drivers, but there is currently only one implemented:
+L<Store::Digest::Driver::FileSystem>. Go see that.
+
+=over 4
+
+B<Note to users prior to this version> (all two of you): The
+C<control> database that contains the store-wide metadata was for some
+stupid reason a L<BerkeleyDB::Hash>, and I have changed it to be a
+L<BerkeleyDB::Btree>. I have included a conversion routine in the
+driver which I<should> do the job transparently, but since it deletes
+the old control database, you may run into trouble if you don't shut
+down all processes attached to this database before upgrading.
+
+=back
 
 =cut
 
@@ -67,17 +91,38 @@ sub BUILD {
     $self->_driver($driver->new(%$p));
 }
 
+=head1 SEE ALSO
+
+=over 4
+
+=item
+
+L<Store::Digest::Driver::FileSystem>
+
+=item
+
+L<Store::Digest::Object>
+
+=item
+
+L<URI::ni>
+
+=item
+
+L<https://tools.ietf.org/html/rfc6920>
+
+=back
+
+=cut
+
 =head1 AUTHOR
 
-Dorian Taylor, C<< <dorian at cpan.org> >>
+Dorian Taylor, C<E<lt>dorian at cpan.orgE<gt>>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-store-digest at
-rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Store-Digest>.  I
-will be notified, and then you'll automatically be notified of
-progress on your bug as I make changes.
+Please report any issues to
+L<https://github.com/doriantaylor/p5-store-digest/issues>.
 
 =head1 SUPPORT
 
@@ -85,14 +130,9 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Store::Digest
 
-
 You can also look for information at:
 
 =over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Store-Digest>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -110,7 +150,7 @@ L<http://search.cpan.org/dist/Store-Digest/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 Dorian Taylor.
+Copyright 2012-2018 Dorian Taylor.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you
 may not use this file except in compliance with the License. You may

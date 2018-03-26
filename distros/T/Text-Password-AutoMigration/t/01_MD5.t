@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 4;
 
 use lib 'lib';
 
@@ -24,10 +24,5 @@ subtest "generate with unix_md5_crypt" => sub {                         # 4
      is $pwd->verify( '', $hash ), '',                                  # 4.4
     "fail to verify with empty string";
 };
-
-eval{ $pwd->verify( $raw, '$1$l1PMyqG!$mNPUHQnly7oLJjt/jb/m/.#' ) };
- like $@,                                                               # 5
- qr/^Crypt::PasswdMD5 makes 34bytes hash strings. Your data must be wrong./i,
-"catch the error with invalid strings";
 
 done_testing();

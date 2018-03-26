@@ -20,6 +20,8 @@ t/01-basic.cmd
 t/01-basic.t
 t/02-comparison.cmd
 t/02-comparison.t
+t/03-negated_condition.cmd
+t/03-negated_condition.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/author-synopsis.t

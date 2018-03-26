@@ -1,5 +1,7 @@
+# vim: sw=4 ts=4 ft=perl
+
 package WebService::Braintree::Transaction;
-$WebService::Braintree::Transaction::VERSION = '1.1';
+$WebService::Braintree::Transaction::VERSION = '1.2';
 use 5.010_001;
 use strictures 1;
 
@@ -20,7 +22,8 @@ use WebService::Braintree::Transaction::Status;
 use WebService::Braintree::Transaction::Type;
 
 use Moose;
-extends "WebService::Braintree::ResultObject";
+
+with 'WebService::Braintree::Role::Interface';
 
 =head1 CLASS METHODS
 
@@ -210,95 +213,7 @@ sub all {
     $class->gateway->transaction->all;
 }
 
-sub gateway {
-    WebService::Braintree->configuration->gateway;
-}
-
-=head1 OBJECT METHODS
-
-In addition to the methods provided by the keys returned from Braintree, this
-class provides the following methods:
-
-=head2 disbursement_details()
-
-This returns the disbursement details of this transaction (if they exist). It
-will be a L<WebService::Braintree::DisbursementDetails> object.
-
-=cut
-
-has disbursement_details => (is => 'rw');
-
-=head2 paypal_details()
-
-This returns the PayPal details of this transaction (if they exist). It
-will be a L<WebService::Braintree::PayPalDetails> object.
-
-=cut
-
-has paypal_details => (is => 'rw');
-
-=head2 subscription()
-
-This returns the related subscription of this transaction (if they exist). It
-will be a L<WebService::Braintree::Subscription> object.
-
-=cut
-
-has subscription => (is => 'rw');
-
-sub BUILD {
-    my ($self, $attrs) = @_;
-
-    $self->build_sub_object($attrs,
-        method => 'subscription',
-        class  => 'Subscription',
-        key    => 'subscription',
-    );
-    $self->build_sub_object($attrs,
-        method => 'disbursement_details',
-        class  => 'DisbursementDetails',
-        key    => 'disbursement_details',
-    );
-    $self->build_sub_object($attrs,
-        method => 'paypal_details',
-        class  => 'PayPalDetails',
-        key    => 'paypal',
-    );
-
-    $self->setup_sub_objects($self, $attrs, {
-        disputes => 'WebService::Braintree::Dispute',
-    });
-
-    $self->set_attributes_from_hash($self, $attrs);
-}
-
-=head2 is_disbursed()
-
-This returns whether or not the disbursement details of this transaction are
-valid.
-
-=cut
-
-sub is_disbursed {
-    my $self = shift;
-    $self->disbursement_details && $self->disbursement_details->is_valid();
-};
-
 __PACKAGE__->meta->make_immutable;
 
 1;
 __END__
-
-=head1 TODO
-
-=over 4
-
-=item Need to document the keys and values that are returned
-
-=item Need to document the required and optional input parameters
-
-=item Need to document the possible errors/exceptions
-
-=back
-
-=cut

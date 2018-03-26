@@ -1,6 +1,13 @@
 Revision history for Term::Choose::Util
 
 
+0.061   2018-03-23
+        - Output-format changes.
+
+0.060   2018-03-22
+        - Reset "choose_a_subset" and "choose_dirs" step by step.
+        - "settings_menu": removed deprecated option 'in_place'.
+
 0.059   2018-03-03
         - Bugfix: operator '//' not available in Perl 5.8.
 

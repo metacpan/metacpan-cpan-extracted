@@ -1,22 +1,16 @@
-package WebService::Braintree::PaginatedResult;
-$WebService::Braintree::PaginatedResult::VERSION = '1.1';
+# vim: sw=4 ts=4 ft=perl
+
+package # hide from pause
+    WebService::Braintree::PaginatedResult;
+
 use 5.010_001;
 use strictures 1;
 
 use Moose;
-extends "WebService::Braintree::ResultObject";
 
-has 'total_items' => (is => 'rw');
-has 'page_size' => (is => 'rw');
-has 'current_page' => (is => 'rw');
-
-sub init {
-    my ($self, $total_items, $page_size, $current_page) = @_;
-    $self->total_items($total_items);
-    $self->page_size($page_size);
-    $self->current_page($current_page);
-    return $self;
-}
+has total_items => (is => 'ro');
+has page_size => (is => 'ro');
+has current_page => (is => 'ro');
 
 __PACKAGE__->meta->make_immutable;
 

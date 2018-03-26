@@ -1,6 +1,16 @@
 Release history of Mojolicious::Plugin::WebAPI
 ==============================================
 
+0.04 2018-03-25 10:39:00
+
+  [BUGFIXES]
+  * We need to inherit from Mojolicious, not from Mojo in the ::Proxy class
+  * The JSON that is returned by WebAPI::DBIC changed, fixed that in the test
+
+  [IMPROVEMENTS]
+  * add tests for the ::Proxy class
+  * you can pass debug => 1 in the plugin('WebAPI') configuration to get some WebAPI::DBIC messages
+
 0.03 2015-07-24
 
   [BUGFIXES]

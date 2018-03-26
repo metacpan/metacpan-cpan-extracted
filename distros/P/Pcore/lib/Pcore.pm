@@ -1,4 +1,4 @@
-package Pcore v0.57.3;
+package Pcore v0.58.3;
 
 use v5.26.1;
 use common::header;
@@ -177,7 +177,7 @@ sub import {
         if ( $import->{pragma}->{sql} ) {
             state $SQL_INIT = !!require Pcore::Handle::DBI::Const;
 
-            Pcore::Handle::DBI::Const->import( -caller => $caller, qw[:TYPES] );
+            Pcore::Handle::DBI::Const->import( -caller => $caller, qw[:TYPES :QUERY] );
         }
 
         # re-export Moo

@@ -18,4 +18,4 @@ plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
 
 all_pod_coverage_ok({
     also_private => [
-        qr/BUILD|DEMOLISH|BUFSIZE|INDEX|STORE|TE?MP|_CHECKED|_VALID/] });
+        qr/BUILD|DEMOLISH|BUFSIZE|INDEX|STORE|CONTROL|TE?MP|_CHECKED|_VALID/] });

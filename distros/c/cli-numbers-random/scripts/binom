@@ -1,0 +1,60 @@
+#!/usr/bin/perl  
+
+use 5.014 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts "n:p:qg:s:" , \my %o ; 
+use Term::ANSIColor qw[ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+use FindBin qw [ $Script ] ;
+
+sub binomGen ( ) ; 
+
+my ( $s1 , $s2 ) = map { eval qq[$_] } split /,/, $o{g} // '6,1' , 2 ; # 行列のように並べるサイズ
+$s2 //= 1 ; 
+my $n = $o{n} // 10 ; # 二項分布のパラメータで試行の回数
+my $p = $o{p} // 0.5 ; # 二項分布のパラメータで、成功確率
+
+my $seed = defined $o{s} ? srand $o{s} : srand ; # 乱数シード
+print STDERR CYAN "Used random seed : $seed ($Script)\n" unless $o{q} ;  
+
+for ( 1 .. $s1 ) { 
+    print join "\t" , map { binomGen } 1 .. $s2 ; 
+    print "\n" ; 
+}
+
+sub binomGen (  ) { 
+    my $s = 0  ;
+    $s +=  rand () < $p for 1 .. $n ;
+    return $s ; 
+}
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8 
+
+=head1
+
+  $0 -p rate -n size -g rows,cols
+
+  二項分布(binomial distribution)に従う乱数の生成。
+
+ オプション: 
+   -p num : 0以上1以下の数。二項分布のパラメータ。成功確率。	
+   -n num : 整数。二項分布のパラメータ。試行の回数。
+   -g n1,n2 : n1 行 で、タブ区切りで各行に n2 個 並べる。
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+ 
+ =cut

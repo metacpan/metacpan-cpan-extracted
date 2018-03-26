@@ -1,18 +1,24 @@
-Code  Game
-----  ----
-   0  Chess
-   1  Shogi
-  20  International Checkers
-  21  Checkers
-  22  Italy Checkers
-  24  Spanish Checkers
-  25  Russian Shahki
-  27  Canadian checkers
-  30  Pool
-  31  Russian Give-Away
-  52  Ataxx
+Code  Game                    Full Spec of GameType in PDN  Result  Capture Sep
+----  ----                    ----------------------------  ------  -----------
+   0  Chess                   [GameType "0,W,8,8,S0"]
+   1  Chinese chess
+  20  International checkers  [GameType "20,W,10,10,N2,0"]  Intl       x
+  21  English draughts        [GameType "21,B,8,8,N1,0"]    Default    x
+  22  Italian checkers        [GameType "22,W,8,8,N2,1"]    Default    x
+  23  American pool checkers  [GameType "23,B,8,8,N1,0"]    Default    x
+  24  Spanish checkers        [GameType "24,W,8,8,N1,1"]    Default    x
+  25  Russian checkers        [GameType "25,W,8,8,A1,0"]    Default    :
+  26  Brazilian checkers      [GameType "26,W,8,8,A1,0"]    Default    x
+  27  Canadian checkers       [GameType "27,W,12,12,N2,0"]  Intl       x
+  28  Portuguese checkers     [GameType "28,W,8,8,N1,1"]    Default    x
+  29  Czech checkers          [GameType "29,W,8,8,A1,0"]    Default    x
+  30  Turkish checkers        [GameType "30,W,8,8,A1,0"]    Default    x
+  31  Thai checkers           [GameType "31,W,8,8,N1,0"]    Default    -
+  40  Frisian checkers        [GameType "40,W,10,10,N2,0"]  Intl       x
+  41  Spantsiretti checkers   [GameType "41,W,10,8,N2,0"]   Default    :
   50  Othello
   51  Reverse-Othello
+  52  Ataxx
   80  Go
   81  Tanbo
  105  Tic-tac-Toe

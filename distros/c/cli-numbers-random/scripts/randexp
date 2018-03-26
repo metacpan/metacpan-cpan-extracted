@@ -1,0 +1,67 @@
+#!/usr/bin/perl -T
+
+use 5.001 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts "l:n:qs:2#", \my %o ; 
+use Term::ANSIColor qw[ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+use FindBin qw [ $Script ] ; 
+my $count = 1 ; # 生成した個数 
+my $untilNum = $o{n} //= 10 ; # 生成予定個数
+my $lambda = $o{l} //= 1 ; # ラプラス分布のパラメータを指定
+#$o{s} =  do { defined $o{s} ? srand $o{s} : srand } ;
+srand  do{ $o{s}//='';my $s=($o{s}=~s/(.*)!$//)?$1:1<<32; my $seed = $o{s}||int rand($s) } ; # <-- 要デバグ。! を使った時に
+print STDERR CYAN "Using random seeds: ", BRIGHT_CYAN $o{s} , " ($Script)\n" unless $o{q} ;  
+sub randvalue ; 
+* randvalue = * randexpGen ; 
+* randvalue = * randLaplaceGen if $o{2} ;
+
+while ( $count  <= $untilNum ) { 
+    print $count, "\t"  if $o{'#'} ; 
+    print randvalue ; 
+    print "\n" ; 
+    $count ++ ;
+}
+
+sub randexpGen { 
+    my $rand = 1 - rand ; 
+    return - log ( $rand ) / $lambda ; 
+}
+
+sub randLaplaceGen { 
+    my $rand = 1 - rand ; 
+    return  rand > 0.5 ? -log($rand)/$lambda : log($rand)/$lambda ;
+}
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8 
+
+=head1
+
+ $0 
+
+ オプション: 
+
+  -2 : 指数分布ではなくて、ラブラス分布を生成することを指定している。
+  -l : 指数分布もしくはラプラス分布のパラーメータλを設定する。
+  -n : 生成個数の設定。"inf" も使える。
+  -q : 二次情報の出力の抑制
+  -s num : ランダムシードの設定
+  -# : 連番も行頭に出力する。
+ 
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+ 
+=cut

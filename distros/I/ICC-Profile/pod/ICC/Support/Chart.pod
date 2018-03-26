@@ -1,0 +1,4017 @@
+# documentation for Chart.pm module / 2018-02-09
+
+=encoding utf8
+
+=head1 NAME
+
+ICC::Support::Chart - An object oriented module for reading, writing and manipulating color measurement data.
+
+=head1 SYNOPSIS
+
+    use ICC::Support::Chart;
+
+    # create a new object
+    $chart = ICC::Support::Chart->new(); # empty object
+    $chart = ICC::Support::Chart->new($hash); # from a hash
+    $chart = ICC::Support::Chart->new($array); # from an array
+    $chart = ICC::Support::Chart->new($file_path); # from a file
+    $chart = ICC::Support::Chart->new($folder_path); # from a folder
+
+    # get/set header hash
+    $hash = $chart->header();
+    $hash = $chart->header($replace);
+
+    # get/set data array
+    $array = $chart->array();
+    $array = $chart->array($replace);
+
+    # get number of rows in data array
+    $m = $chart->size();
+
+    # get number of rows and columns in data array
+    ($m, $n) = $chart->size();
+
+    # get row slice from list of SAMPLE_ID keys
+    $rows = $chart->rows(qw(30 25 40 12));
+
+    # get column slice from list of DATA_FORMAT keys
+    $cols = $chart->cols(qw(CMYK_C CMYK_M CMYK_Y CMYK_K));
+
+    # get format keys from column slice
+    $keys = fmt_keys($cols);
+
+    # get/set column slice context
+    $context = $chart->context($cols);
+    $chart->context($cols, $context);
+
+    # test for a data class
+    @cols = $chart->test('CLASS'); # get array of indices
+    @cols = $chart->test('CLASS', $context);
+    $n = $chart->test('CLASS'); # get count of indices
+    $n = $chart->test('CLASS', $context);
+
+    # get/set keyword value(s)
+    $array = $chart->keyword(); # get keyword/value array
+    $value = $chart->keyword($key); # get first value
+    @values = $chart->keyword($key); # get array of values
+    @old = $chart->keyword($key, @values); # set array of values
+
+    # get/set 'CREATED' value
+    $time = $chart->created(); # get 'CREATED' value
+    $time = $chart->created($string); # set 'CREATED' value
+    $time = $chart->created($time); # set 'CREATED' value
+    $time = $chart->created($value); # set 'CREATED' value
+
+    # get/set data slice
+    $mat = $chart->slice(); # get all row and columns
+    $mat = $chart->slice($rows); # get specified rows, all columns
+    $mat = $chart->slice($rows, $cols); # get specified rows and columns
+    $cols = $chart->slice($rows, $cols, $replace); # set specified rows and columns
+
+    # get/set colorimetry slice
+    $mat = $chart->colorimetry(); # get all row and columns
+    $mat = $chart->colorimetry($rows); # get specified rows, all columns
+    $mat = $chart->colorimetry($rows, $cols); # get specified rows and columns
+    $cols = $chart->colorimetry($rows, $cols, $replace); # set specified rows and columns
+
+    # get/set SAMPLE_ID data slice
+    $cols = $chart->id(); # get column slice
+    $mat = $chart->id($rows); # get specified rows
+    $cols = $chart->id($rows, $replace); # set specified rows
+
+    # get/set SAMPLE_NAME data slice
+    $cols = $chart->name(); # get column slice
+    $mat = $chart->name($rows); # get specified rows
+    $cols = $chart->name($rows, $replace); # set specified rows
+
+    # get/set RGB data slice
+    $cols = $chart->rgb(); # get column slice
+    $mat = $chart->rgb($rows); # get specified rows
+    $cols = $chart->rgb($rows, $replace); # set specified rows
+
+    # get/set CMYK data slice
+    $cols = $chart->cmyk(); # get column slice
+    $mat = $chart->cmyk($rows); # get specified rows
+    $cols = $chart->cmyk($rows, $replace); # set specified rows
+
+    # get/set 6/C data slice
+    $cols = $chart->hex(); # get column slice
+    $mat = $chart->hex($rows); # get specified rows
+    $cols = $chart->hex($rows, $replace); # set specified rows
+
+    # get/set nCLR data slice
+    $cols = $chart->nCLR(); # get column slice
+    $mat = $chart->nCLR($rows); # get specified rows
+    $cols = $chart->nCLR($rows, $replace); # set specified rows
+
+    # get/set device data slice
+    $cols = $chart->device(); # get column slice
+    $mat = $chart->device($rows); # get specified rows
+    $cols = $chart->device($rows, $replace); # set specified rows
+
+    # get/set CTV data slice
+    $cols = $chart->ctv(); # get column slice
+    $mat = $chart->ctv($rows); # get specified rows
+    $cols = $chart->ctv($rows, $replace); # set specified rows
+
+    # get/set L*a*b* data slice
+    $cols = $chart->lab(); # get column slice
+    $mat = $chart->lab($rows); # get specified rows
+    $cols = $chart->lab($rows, $replace); # set specified rows
+
+    # get/set XYZ data slice
+    $cols = $chart->xyz(); # get column slice
+    $mat = $chart->xyz($rows); # get specified rows
+    $cols = $chart->xyz($rows, $replace); # set specified rows
+
+    # get/set density data slice
+    $cols = $chart->density(); # get column slice
+    $mat = $chart->density($rows); # get specified rows
+    $cols = $chart->density($rows, $replace); # set specified rows
+
+    # get/set spectral data slice
+    $cols = $chart->spectral(); # get column slice
+    $mat = $chart->spectral($rows); # get specified rows
+    $cols = $chart->spectral($rows, $replace); # set specified rows
+
+    # get spectral wavelength slice
+    $nms = $chart->wavelength();
+
+    # get spectral wavelength range
+    $range = $chart->nm();
+
+    # get illuminant white point
+    $xyz = $chart->iwtpt();
+    $xyz = $chart->iwtpt($hash);
+
+    # get media white point
+    $xyz = $chart->wtpt();
+    $xyz = $chart->wtpt($hash);
+
+    # get media black point
+    $xyz = $chart->bkpt();
+    $xyz = $chart->bkpt($hash);
+
+    # get the OBA index
+    $oba_index = $chart->oba_index();
+    $oba_index = $chart->oba_index($hash);
+
+    # get the M1/M2 XYZ vectors
+    ($m1, $m2) = $chart->oba_index();
+    ($m1, $m2) = $chart->oba_index($hash);
+
+    # get chromatic adaptation transform object (CAT)
+    $cat = $chart->cat();
+    $cat = $chart->cat($hash);
+
+    # get Color object
+    $color = $chart->color();
+    $color = $chart->color($hash);
+
+    # add average sample
+    $rows = $chart->add_avg($rows);
+
+    # add format keys
+    $cols = $chart->add_fmt(@keys);
+
+    # add CTV data
+    $cols = $chart->add_ctv();
+    $cols = $chart->add_ctv($hash);
+
+    # add L*a*b* data
+    $cols = $chart->add_lab();
+    $cols = $chart->add_lab($hash);
+
+    # add XYZ data
+    $cols = $chart->add_xyz();
+    $cols = $chart->add_xyz($hash);
+
+    # add density data
+    $cols = $chart->add_density();
+    $cols = $chart->add_density($hash);
+
+    # add udf computed data
+    $cols = $chart->add_udf($cols1, $cols2, ... $hash);
+
+    # add date
+    $cols = $chart->add_date();
+    $cols = $chart->add_date($hash);
+
+    # add data rows
+    $rows = $chart->add_rows($mat);
+    $rows = $chart->add_rows($mat, $cols);
+
+    # add data columns
+    $cols = $chart->add_cols($mat);
+    $cols = $chart->add_cols($mat, $header);
+
+    # add/remove data rows
+    $removed_mat = $chart->splice_rows();
+    $removed_mat = $chart->splice_rows($offset);
+    $removed_mat = $chart->splice_rows($offset, $length);
+    $removed_mat = $chart->splice_rows($offset, $length, $mat);
+    $removed_mat = $chart->splice_rows($offset, $length, $mat, $cols);
+
+    # add/remove data columns
+    $removed_mat = $chart->splice_cols();
+    $removed_mat = $chart->splice_cols($offset);
+    $removed_mat = $chart->splice_cols($offset, $length);
+    $removed_mat = $chart->splice_cols($offset, $length, $mat);
+    $removed_mat = $chart->splice_cols($offset, $length, $mat, $rows);
+
+    # remove data rows
+    $removed_mat = $chart->remove_rows($rows);
+
+    # remove data columns
+    $removed_mat = $chart->remove_cols($cols);
+
+    # get sample selection based on 2-D location
+    $mat = $chart->select_matrix();
+    $mat = $chart->select_matrix($row_length);
+    $mat = $chart->select_matrix($upper_row_index, $lower_row_index, $left_column_index, $right_column_index);
+    $mat = $chart->select_matrix($upper_row_index, $lower_row_index, $left_column_index, $right_column_index, $row_length);
+
+    # get sample selection using template
+    $mat = $chart->select_template($template);
+    $mat = $chart->select_template($template, $hash);
+    ($mat, $sid) = $chart->select_template($template);
+    ($mat, $sid) = $chart->select_template($template, $hash);
+
+    # get sample selection based on data values
+    $rows = $chart->find($code_ref, $rows, $cols);
+
+    # get sample selection based on device values
+    $rows = $chart->ramp($code_ref);
+    $rows = $chart->ramp($code_ref, $source_rows);
+    $rows = $chart->ramp($code_ref, $source_rows, $hash);
+
+    # get sample selection based on L*a*b* values
+    $rows = $chart->range($code_ref);
+    $rows = $chart->range($code_ref, $source_rows);
+    $rows = $chart->range($code_ref, $source_rows, $hash);
+
+    # get randomized sample selection
+    $rows = $chart->randomize();
+    $rows = $chart->randomize($rows);
+
+    # analyze chart device values
+    $struct = $chart->anaylze();
+    $struct = $chart->anaylze($rows);
+    $struct = $chart->anaylze($rows, $hash);
+
+    # write chart to CGATS ASCII file
+    $chart->write($file_path);
+    $chart->write($file_path, $rows);
+    $chart->write($file_path, $rows, $cols);
+
+    # write chart to CxF3 file
+    $chart->writeCxF3($file_path);
+    $chart->writeCxF3($file_path, $rows);
+    $chart->writeCxF3($file_path, $rows, $cols);
+
+    # write chart to delimited ASCII file
+    $chart->writeASCII($file_path);
+    $chart->writeASCII($file_path, $rows);
+    $chart->writeASCII($file_path, $rows, $cols);
+
+    # write chart to TIFF file
+    $chart->writeTIFF($file_path);
+    $chart->writeTIFF($file_path, $rows);
+    $chart->writeTIFF($file_path, $rows, $cols);
+
+    # write chart to Adobe Swatch Exchange (.ase) file
+    $chart->writeASE($file_path, $rows, $cols);
+    $chart->writeASE($file_path, $rows, $cols, $color_type);
+
+    # Math::Matrix methods for row_matrix manipulation
+
+    # rotate matrix
+    $mat = $mat->rotate($n);
+
+    # flip matrix
+    $mat = $mat->flip($n);
+
+    # randomize matrix
+    $mat = $mat->randomize();
+
+=head1 DESCRIPTION
+
+Color measurements are made with a spectrophotometer and saved as a file.
+An ICC::Support::Chart object is made from this measurement file.
+Other ICC modules and objects utilize Chart objects for data input and output.
+Many methods are provided for converting, combining, arranging, selecting and writing the Chart object data.
+
+=head2 Object structure
+
+An ICC::Support::Chart object is a blessed array reference.
+The array contains four elements, the object header, the chart data, the colorimetry data, and the SAMPLE_ID hash.
+
+    # create empty Chart object
+    my $self = [
+        {},     # header hash
+        [[]],   # data array
+        [[]],   # colorimetry array
+        [],     # header line array
+        {},     # SAMPLE_ID hash
+    ];
+
+The header hash contains metadata describing the object.
+The origin of the object determines the content of the hash.
+Here are some common hash keys.
+
+    $self->[0]{'file_path'} is the 'new' method file path
+    $self->[0]{'file_type'} is the 'new' method file type
+    $self->[0]{'files_read'} is the number of files read (and averaged) when the file path is a folder
+    $self->[0]{'read_rs'} is the record separator (LF, CR or CRLF) detected by the 'new' method
+    $self->[0]{'write_rs'} is the record separator (LF, CR or CRLF) output by the 'write' method
+
+    $self->[0]{'CxF3_dom'} is the root node of the CxF3 XML object (CxF3 files)
+    $self->[0]{'xrp:CustomAttributes'} is a hash of the 'xrp:CustomAttributes' Names/Values (CxF3 files)
+
+    $self->[0]{'TIFF_tag'} is a hash containing the TIFF directory (TIFF files)
+    $self->[0]{'TIFF_tag'}{'700'} is the XMP metadata packet (Photoshop TIFF files)
+
+    $self->[0]{'illuminant'} is an array containing illuminant spectral data
+    $self->[0]{'CIS_shift'} is the CIE color mixture shift
+
+The data array is a 2-D array or matrix whose rows are the samples, and whose columns are the data fields.
+The first row contains the field names, and is equivalent to a header row in a spreadsheet.
+Permissible field names are enumerated in the ANSI standard CGATS.17 and ISO standard 28178.
+The remaining rows are the chart data, with the array index corresponding to the sample number.
+
+    $self->[1][0][$j] is the DATA_FORMAT field name for column $j
+    $self->[1][$i][$j] is data for sample $i, column $j, first sample $i = 1
+
+The colorimetry array is a 2-D array or matrix whose columns correspond to the chart data.
+The array contains the colorimetric origin of XYZ and L*a*b* data, and the media white and black points.
+There are five rows, whose contents depend on the field type.
+
+    for spectral columns:
+    spectral data has no colorimetric properties.
+    the measuring illuminant may be indicated by the ISO identifiers M0, M1, M2 or M3.
+
+    for XYZ or LAB columns:
+    $self->[2][0][$j] is origin (column slice)
+    $self->[2][1][$j] is 'Color.pm' object for column $j (if origin is spectral data)
+    $self->[2][2][$j] is illuminant XYZ for column $j -OR- CAT object for column $j
+    $self->[2][3][$j] is media white point XYZ for column $j
+    $self->[2][4][$j] is media black point XYZ for column $j
+    $self->[2][5][$j] is ColorSpecification XML for column $j (CxF3)
+    $self->[2][6][$j] is hash containing colorimetry parameters
+
+    for density columns:
+    $self->[2][0][$j] is origin (column slice)
+    $self->[2][1][$j] is 'Color.pm' object for column $j (if origin is spectral data)
+
+    for CTV columns:
+    $self->[2][0][$j] is origin (column slice)
+    $self->[2][3][$j] is media white CTV (0) for column $j
+
+In a CGATS ASCII file, the header lines are those preceding the 'BEGIN_DATA_FORMAT' line.
+Lines begin with a keyword.
+Lines after the first contain a value, separated from the keyword by whitespace.
+Values are generally enclosed in double quotes.
+
+    $self->[3][$i][0] is the keyword of header line $i
+    $self->[3][$i][1] is the value of header line $i
+    $self->[3][$i][2] is the CxF3 source of header line $i
+
+In a CxF3 file, the header lines are mapped to/from the 'FileInformation' element or a 'ColorSpecification' element.
+The mapping depends on the content of the keyword/value.
+When a CxF3 file is read, the source of the keyword/value line is saved.
+When a CxF3 file is written, the keyword/value lines are written to the source location.
+If the source is undefined (as when reading from a CGATS ASCII file), most keyword/values are not written to the CxF3 file.
+An optional hash may be used to force keyword/values to be written as 'Tag' elements in the 'FileInformation' element.
+
+The SAMPLE_ID hash is a lookup table with the SAMPLE_ID as keys and the chart data index as values.
+The hash is created by the 'new' method, and other methods that add or remove data rows.
+The hash is used by the 'rows' method to make a row slice from a list of SAMPLE_IDs.
+If there are two or more rows with the same SAMPLE_ID, the hash will contain the largest index.
+If there is no SAMPLE_ID data, the hash is empty.
+
+    $self->[4]{'key'} is data row index of SAMPLE_ID 'key'
+
+=head2 Test charts
+
+A color device is characterized by scanning, printing or displaying a test chart.
+The test chart should contain the full range of colors possible with that device.
+The number of possible colors is usually very large, so we choose a practical subset — large enough to obtain an accurate characterization, but small enough to be measured easily.
+
+The IT8.7/4 data set, defined by the ANSI/CGATS standards group, is a common set of test chart colors for a CMYK printer.
+This data set contains 1617 samples, specified by their CMYK values and an ID value.
+The test samples are normally printed as a chart containing small, square patches arranged in a rectangular grid.
+A graphic arts spectrophotometer has the ability to measure these patches automatically via X-Y movement of the chart and/or the measuring head.
+The number of samples in the IT8.7/4 data set (1617) comes from the maximum chart size of a common spectrophotometer — 33 rows by 49 columns.
+
+When a test chart is measured, the instrument will read it like we read a page, line-by-line.
+Depending on the design of the instrument and its software, the lines may be chart rows or columns.
+The measurements are stored as a list, in the order they are read.
+So, although the chart is two-dimensional, the data list is one-dimensional.
+The location of a chart sample may be saved as metadata, or it may be inferred from an ID value or from the chart dimensions.
+
+=head2 File formats
+
+A test chart measurement file will usually contain device data and associated measurements for each patch or sample. For
+instance, the file might contain CMYK values and spectral reflectance measurements. But sometimes the file only contains
+measurements, and no device data. For instance, paint chips have no device values, just color names. Obviously, we need a
+flexible file format to handle these various needs.
+
+The file format most often used to store measurement data is whitespace-delimited ASCII, as saved from spreadsheet software.
+The data samples are rows, and the fields are columns in the spreadsheet. The spreadsheet also contains information about
+the test, and lines to group the field names and data. The structure of these text files, and the allowed field names are
+defined by parallel ANSI and ISO standards (see CGATS.17 and ISO 28178).
+
+In 2004, the CGATS group began work on an equivalent XML file format. In those days, it was believed that XML would simplify
+software development, and ease the integration of systems. A version of CGATS.17 was released in 2005 containing the ASCII
+format, and its XML equivalent. Unfortunately, this XML design was technically flawed and never used commercially. In the
+same time period, the Gretag-Macbeth company introduced a proprietary XML format called CxF, which was implemented in some
+of their color management software. Gretag-Macbeth was purchased by X-Rite, which released improved versions of CxF, known
+as CxF2 and CxF3. CxF3 was recently adopted by the ISO standards group as CxF/X, and is the default file format for X-Rite's
+i1Profiler software.
+
+The ICC::Support::Chart module was originally developed to support CGATS ASCII files. Support for CxF3 files was added
+later, and required substantial modifications, the most prominent being the addition of L</"Contexts"> to the format fields.
+ICC::Support::Chart objects can be created from either format, and saved in either format, with some limitations. The CxF3
+files written by this software are intended to be compatible with X-Rite's i1Profiler software.
+
+=head2 Colorimetry
+
+The colorimetry array is used to store colorimetric metadata.
+For example, when we add XYZ data to a chart containing spectral data, the illuminant and the CIE observer are specified.
+A 'Color.pm' object is created from these parameters, and used to convert the spectral data to XYZ.
+A reference to this object is stored in the colorimetry array.
+If additional samples of spectral data are supplied, their XYZ values may be computed using this object.
+We also store the illuminant white point, and the chromatic adaptation transform, if used.
+
+If the chart contains XYZ and device data, we may be able to compute the media white point and black point.
+These values are computed on demand, and stored in the colorimetry array.
+
+When L*a*b* and CTV values are computed from XYZ values, the column slice of the XYZ data is stored in the colorimetry array.
+We refer to this as the origin of the added data.
+
+The columns of the colorimetry array correspond to those of the data array.
+In effect, the colorimetry array is an extension of the data array for storage of the metadata.
+This structure allows the possibility of XYZ/L*a*b* data of different illuminants within the same Chart object.
+
+See the object structure section above for details of what is stored for each field type.
+There are instances when we do not know the colorimetry metadata.
+In the colorimetry is unknown, we assume D50 illumination, CIE 2° observer, which is the ICC standard.
+Some field types (e.g. device data) do not use the colorimetry array and will contain 'undef' values.
+
+=head2 Slices
+
+In this document, a slice refers to an array of row or column indices. For example,
+
+    $rows = [1, 2, 3]; # rows 1, 2 and 3
+    $rows = [1 .. 100]; # rows 1 to 100
+    $rows = [50, 22, 34, 3]; # rows in no particular order
+
+The term slice comes from Perl, where a slice accesses several elements of a list, an array, or a hash simultaneously using a list of subscripts.
+The Perl concept of slices is one-dimensional, but we have extended it to two-dimensions.
+(See the 'perldata' language reference for a more detailed explanation of slices).
+
+Note that while we say a slice is an array of indices, it is technically a reference to an array of indices.
+For the sake of clarity, we omit the phrase 'reference to an' in most of this document.
+(See the 'perldata' language reference for a more detailed explanation of arrays and references).
+
+Many methods use row and column slices as parameters to select a subset of the data.
+
+    $mat = $chart->slice([1 .. 10], [0 .. 4]);
+
+will return a matrix containing rows 1 - 10, columns 0 - 4, a subset of the larger data array.
+
+Most methods interpret the empty slice to mean all rows or columns in that object.
+
+    $mat = $chart->slice([], [0 .. 4]);
+
+will return a matrix containing all rows, columns 0 - 4.
+
+Furthermore, most methods flatten the slice, which means reducing an array structure to a simple array.
+
+    $mat = $chart->slice([[1, 2, 3], 4, [5, 6], 7, 8], [0 .. 4]);
+
+will return a matrix containing rows 1 - 8, columns 0 - 4.
+
+Because slices are flattened, it is possible to use a matrix as a slice parameter.
+
+    $row_matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+    $mat = $chart->slice($row_matrix, [0 - 4]);
+
+will return a matrix containing rows 1 - 9, columns 0 - 4.
+
+We can define the layout of a 2-D chart by arranging the patch row indices in a matrix.
+Commonly used row matrices may be created using the L</"select_matrix"> and L</"select_template"> methods.
+A row matrix may be modified using the additional Math::Matrix methods provided by this module, L</"rotate">, L</"flip"> and L</"randomize">.
+
+=head2 Contexts
+
+The structure of a chart as a two-dimensional table originated at Kodak, where measurements of Q-60 test targets were
+entered into a spreadsheet, then saved in tab-delimited text format for distribution to users. The ICC::Support::Chart
+module was originally developed around this data structure. Now, there is a corresponding XML format called CxF3 (see
+L</"File formats">), and we have adapted the module to support this format, in addition to the text format.
+
+The CxF3 format does not use the simple two-dimensional table structure. It does support the concept of sample collections,
+but even with that, the representation of spectral data ends up just a list of numbers. There are many difficulties reading
+and writing CxF3 files. A big problem is keeping track of the 'ObjectType' attribute, which may be different for each object
+in a collection. This led to modification of the format fields to include an optional prefix which we call the context. If a
+chart object was created from a CxF3 file, the contexts of the format fields are the 'ObjectType' attributes.
+
+Format fields for RGB data without context,
+
+    RGB_R, RGB_G, RGB_B
+
+Format fields for RGB data with 'Target' context ('ObjectType' from CxF3 file),
+
+    Target|RGB_R, Target|RGB_G, Target|RGB_B
+
+The character '|' was chosen because it cannot be used in an XML attribute, and is not used in the standard CGATS field
+names.
+
+Many methods allow the context to be specified through an optional hash. For example,
+
+    $rgb = $chart->rgb([], {'context' => 'Target'});
+    $M0_spectral = $chart->spectral([], {'context' => 'M0_Measurement'});
+    $M2_spectral = $chart->spectral([], {'context' => 'M2_Measurement'});
+
+To simplify and improve compatibility of scripts with CxF3 data, it is not strictly necessary to specify contexts. Here are
+examples to illustrate the behavior of methods that allow contexts,
+
+    $chart1 = ICC::Support::Chart->new('~/Desktop/GRACoL2006_Coated1_CGATS.txt'); # no contexts in this chart
+
+    $cmyk = $chart1->cmyk(); # returns slice for CMYK data – context is undefined
+    $cmyk = $chart1->cmyk({'context' => undef}); # context is explicitly undefined – same as above
+    $cmyk = $chart1->cmyk({'context' => 'Target'}) # returns 'undef' because there is no data with that context
+
+    $chart2 = ICC::Support::Chart->new('~/Desktop/GRACoL_2006_Coated_1.mxf'); # i1Profiler CxF3 format has contexts
+
+    $cmyk = $chart2->cmyk(); # returns slice for CMYK data – context is undefined, so it is ignored
+    $cmyk = $chart2->cmyk({'context' => 'Target'}) # returns slice for CMYK data, which has this ObjectType in .mxf files
+    $cmyk = $chart2->cmyk({'context' => 'Source'}) # returns 'undef' because there is no data with that context
+
+This behavior is implemented by the following algorithm. A hash is built from the format field names including their
+contexts. The fields we are seeking (with context, if supplied) are looked up in the hash. If successful, that slice is
+used. If not, the hash is rebuilt from the format field names without contexts. The fields we are seeking are looked up in
+the new hash. If successful, that slice is used. If not, the method returns 'undef'. A consequence of the hash lookup
+technique is that duplicate field names are resolved to the last occurrence when building the hash. So, if we have duplicate
+field names, the slice will contain the largest column index for that field name.
+
+Although the addition of contexts was motivated by the CxF3 format, there are some other benefits. For instance, we may wish
+to have XYZ data with different illuminants in the same chart. To accommodate this need, some methods allow both the source
+and destination context to be specified,
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_spectral_data.txt');
+
+    $D50 = $chart->add_xyz({'illuminant' => 'D50', 'added' => 'D50_illum'}); # add XYZ data with D50 illuminant
+    $F11 = $chart->add_xyz({'illuminant' => 'F11', 'added' => 'F11_illum'}); # add XYZ data with F11 illuminant
+
+This chart now contains spectral data and two sets of XYZ data. The 'added' key sets the context of the new XYZ fields,
+which may be used to distinguish them in subsequent operations. The 'context' key may be used to select the source data,
+
+    $D50_from_M0 = $chart->add_xyz({'illuminant' => 'D50', 'context' => 'M0_Measurement', 'added' => 'D50_from_M0'});
+
+The context of format fields may be set directly using the 'context' method,
+
+    $chart->context($D50, 'CIE_D50');
+
+When writing to a text file, contexts are removed from the field names. This may result in a file with duplicate field
+names. So, if contexts are used, it is best to be explicit,
+
+    $chart->write('~/Desktop/my_ambiguous_data.txt); # writes everything, including all sets of XYZ data
+    $chart->write('~/Desktop/my_D50_data.txt, [], $D50); # writes only the D50 XYZ data
+
+=head1 METHODS
+
+=head2 Creating ICC::Support::Chart objects
+
+=head3 new
+
+This method creates an C<ICC::Support::Chart> object.
+
+With no parameters, the object contains the empty basic structure (see L<"Object structure">).
+
+An object may be created from a hash, with parameters describing a patch set. Hash keys are 'colorspace', 'template' and 'sort'.
+
+An object may be created from a 2-D array, with the first row containing the format keys, followed by the sample data in the remaining rows.
+
+Most often, an object is created from a data file.
+Supported files types are CGATS ASCII, CxF3, TIFF, SpectraShop SS3, and Adobe Swatch Exchange.
+The file type is determined from the internal structure of the file, not from the suffix.
+For more information on files types, read the SEE ALSO section of this document.
+
+An object may be created from a single file, or from a folder (directory) of files.
+If the files within a folder have an identical structure, they may be averaged.
+If the files within a folder have the same format fields, they may by appended.
+
+An optional hash may added to provide supplementary parameters.
+Supported hash keys for folders are 'folder', 'method'
+
+B<Usage>
+
+    $chart = ICC::Support::Chart->new(); # empty object
+    $chart = ICC::Support::Chart->new($hash); # from a hash
+    $chart = ICC::Support::Chart->new($array); # from an array
+    $chart = ICC::Support::Chart->new($file_path); # from a single file
+    $chart = ICC::Support::Chart->new($folder_path); # from a folder of files
+    ($chart, $result) = ICC::Support::Chart->new( ... ); # get object and result
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new(); # make empty object
+
+    $chart = ICC::Support::Chart->new({'colorspace' => 'RGB', 'template' => [[([0, 127, 255]) x 3]], 'sort' => [3, 1, 2]}); # make object from hash (see note 11)
+
+    $array = [[qw(SAMPLE_ID RGB_R RGB_G RGB_B)], [1, 255, 255, 255], [2, 255, 255, 128], [3, 255, 255, 0]]; # data array (with format header)
+    $chart = ICC::Support::Chart->new($array); # make object from data array (see note 4)
+    $array = [[1, 255, 255, 255], [2, 255, 255, 128], [3, 255, 255, 0]]; # data array (no format header)
+    $chart = ICC::Support::Chart->new($array, {'format' => [qw(SAMPLE_ID RGB_R RGB_G RGB_B)]}); # make object from data array (see note 4)
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt'); # CGATS ASCII file (see note 13)
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.mxf'); # CxF3 file
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.mxf', {'cc:Tag' => [qw(Target/SampleID)]}); # import SampleID Tags
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.mxf', {'cc:Object' => [qw(Target/Id)]}); # import Target Id
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.mxf', {'validate' => 1});  # validate to CxF3 schema
+    $chart = ICC::Support::Chart->new('~/Desktop/my_profile.icc'); # ICC profile (see note 9)
+    $chart = ICC::Support::Chart->new('~/Desktop/my_scan.tif'); # TIFF file (see note 5)
+    $chart = ICC::Support::Chart->new('~/Desktop/my_scan.tif', {'rows' => 12, 'columns' => 22}); # divide image into 12 rows and 22 columns (see note 6)
+    $chart = ICC::Support::Chart->new('~/Desktop/my_scan.tif', {'rows' => 12, 'columns' => 22, 'crop' => [10, 10, 10, 10]}); # crop 10 pixels on all sides
+    $chart = ICC::Support::Chart->new('~/Desktop/my_scan.tif', {'rows' => 12, 'columns' => 22, 'ratio' => 0.7}); # sample is 0.7 x division size
+    $chart = ICC::Support::Chart->new('~/Desktop/my_scan.tif', {'rows' => 12, 'columns' => 22, 'aperture' => 4.5}); # sample is 4.5 mm aperture
+    $chart = ICC::Support::Chart->new('~/Desktop/my_scan.tif', {'rows' => 12, 'columns' => 22, 'context' => 'scanner'}); # set format context
+    $chart = ICC::Support::Chart->new('~/Desktop/my_scan.tif', {'rows' => 12, 'columns' => 22, 'udf' => $udf, 'format' => $fmt}); # user defined function
+    $chart = ICC::Support::Chart->new('~/Desktop/my_scan.tif', {'aperture' => 4.5}); # special sampling mode (see note 7)
+    $chart = ICC::Support::Chart->new('~/Desktop/my_swatches.ase'); # Adobe Swatch Exchange file (see note 8)
+    $chart = ICC::Support::Chart->new('~/Desktop/my_swatches.ase', {'colorspace' => 'CMYK'}); # Adobe Swatch Exchange file
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_folder'); # files are averaged (see note 2)
+    $chart = ICC::Support::Chart->new('~/Desktop/my_folder', {'folder' => 'AVG'}); # same as above
+    $chart = ICC::Support::Chart->new('~/Desktop/my_folder', {'method' => 'SIMPLE'}); # use simple averaging for L*a*b* and density
+    $chart = ICC::Support::Chart->new('~/Desktop/my_folder', {'folder' => 'APPEND'}); # files are appended (see note 3)
+    $chart = ICC::Support::Chart->new('~/Desktop/my_folder', {'STDEV_LAB' => undef}); # files are averaged, with standard deviation (see note 12)
+    $chart = ICC::Support::Chart->new('~/Desktop/my_folder', {'STDEV_LAB' => [qw(M0 M2)]}); # same as above, 'M0' and 'M2' prefixes (see note 12)
+    $chart = ICC::Support::Chart->new('~/Desktop/my_folder', {'STDEV_LAB' => [qw(M0 M2)], 'illuminant' => 'F2'}); # same as above, with 'F2' illuminant (see note 12)
+
+    ($chart, $result) = ICC::Support::Chart->new({}); # get result of 'new' method (see note 10)
+
+=over
+
+=item 1
+
+File paths are processed with the File::Glob::bsd_glob function on Unix systems.
+
+=item 2
+
+Files must have the same row and column structure to be averaged.
+
+=item 3
+
+Files must have the same column structure to be appended.
+
+=item 4
+
+The supplied array is copied to the object, making them independent entities.
+
+=item 5
+
+Supported file types are RGB, CMYK, or L*a*b*, 8, 16 or 32 bit, Intel or Motorola byte order, uncompressed.
+Alpha and spot channels are supported in RGB and CMYK files. With no parameters, each pixel becomes a data sample.
+
+=item 6
+
+Supported hash keys are 'rows', 'columns', 'crop', 'ratio', 'aperture', 'udf' and 'format'. The 'rows'
+and 'columns' parameters specify the size of the chart, with the image size in pixels as default
+values. The 'crop' parameter is an array containing the crop dimension in pixels for the left, right,
+upper and lower edges. The 'ratio' and 'aperture' parameters control the size of the sample rectangle.
+The 'ratio' value must be between 0 and 1, with a default value of 0.5. If the 'ratio' is set to 0,
+the sample size is one pixel, located in the middle of the image division for that sample. The
+'aperture' parameter is the diameter of a circle in millimeters, and the sample rectangle is set to a
+square of the same area. The 'aperture' parameter overrides the 'ratio' parameter. The 'udf' parameter
+is a code reference of a user defined function which processes each sample pixel individually. The
+'format' parameter sets the format of the fields, and overrides the TIFF format.
+
+=item 7
+
+When the 'aperture' key is specified, and the 'rows' and 'columns' keys are not, the sample matrix
+is a uniformly spaced grid of single-pixel samples equal in total area to the circular aperture.
+
+=item 8
+
+An Adobe Swatch Exchange file may contain LAB, RGB, CMYK or Gray swatches, which are filtered using the 'colorspace' parameter.
+
+=item 9
+
+Supported profile types are i1Profiler, ProfileMaker, MonacoPROFILER, EFI, Heidelberg and Argyll.
+
+=item 10
+
+The result is undefined on success, and contains an error message on failure.
+The object may still be usable on failure, depending on the circumstances.
+
+=item 11
+
+A patch set is created from a hash parameter.
+Supported hash keys are: 'colorspace', 'template', 'sort' and 'limit'.
+Supported colorspaces are 'RGB', 'CMYK', 'nCLR' and 'Lab'.
+The template value is a 3-D array describing the chart structure.
+The sort value is a 1-D array containing the sort columns (one-based), each preceeded by an optional '-' to indicate descending order.
+The limit is the total ink limit, using the Monaco algorithm to select patches.
+
+=item 12
+
+When a folder of files is averaged, ISO 28178 statistics may be enabled with a hash parameter.
+Supported hash keys are: 'STDEV_XYZ', 'STDEV_LAB', 'MEAN_DE', and 'CHI_SQD_PAR'.
+The hash key values are the context prefix(es) of the source data.
+A context prefix of undef indicates no prefix. Multiple context prefixes are placed in an array.
+XYZ and L*a*b* data are added as needed, and hash keys for 'add_xyz' and 'add_lab' may be used.
+
+=item 13
+
+If a CGATS ASCII file contains the 'DPLGROTATE' and/or 'DPLGFLIP' keywords, the chart will be
+rotated and/or flipped (in that order) when read. The values for these keywords are the same as
+for the L<"rotate"> and L<"flip"> methods. The 'LGOROWLENGTH' keyword is also required, and may
+be updated to reflect the new orientation of the chart.
+
+=back
+
+=head2 General accessors
+
+=head3 header
+
+This method returns a reference to the header hash (see L<"Object structure">).
+
+B<Usage>
+
+    $hash = $chart->header(); # get header hash
+    $hash = $chart->header($replacement_hash); # set header hash
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt'); # create a chart object
+    $hash = $chart->header(); # get header hash
+    $rs = $chart->header->{'read_rs'}; # get file record separator
+    $chart->header->{'write_rs'} = "\n"; # set file record separator
+    $hash = $chart->header({'key' => 'value'}); # set header hash (see note 1)
+
+=over
+
+=item 1
+
+The parameter is copied to the object.
+
+=back
+
+=head3 array
+
+This method returns a reference to the data array (see L<"Object structure">).
+
+B<Usage>
+
+    $array = $chart->array(); # get data array
+    $array = $chart->array($replacement_array); # set data array
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt'); # create a chart object
+    $array = $chart->array(); # get data array
+    $row = $chart->array->[0]; # get row 0 (format keys)
+    $row = $chart->array->[1]; # get row 1 (first data sample)
+    $row = $chart->array->[1][3]; # get data element, row 1, column 3
+    $chart->array->[1] = [1, 2, 3, 4]; # set row 1
+    $chart->array->[1][3] = 1.234; # set data element, row 1, column 3
+    $rep = [[qw(SAMPLE_ID RGB_R RGB_G RGB_B)], [1, 255, 255, 255], [2, 255, 255, 128], [3, 255, 255, 0]];
+    $chart->array($rep); # set data array (see note 1)
+
+=over
+
+=item 1
+
+Object data array is a copy of the supplied array parameter
+
+=back
+
+=head3 size
+
+This method returns the size of the chart.
+In the scalar context, this is the number of rows.
+In the array context, this is the number of rows and columns.
+The first row of the data array contains the format keys, and is not counted in the number of rows.
+
+B<Usage>
+
+    $m = $chart->size(); # get number of rows ($m) in data array (see note 1)
+    ($m, $n) = $chart->size(); # get number of rows ($m) and columns ($n) in data array (see notes 1 and 2)
+
+=over
+
+=item 1
+
+Doesn't include row 0, which contains the format keys
+
+=item 2
+
+The size of an empty object is 0 rows and 0 columns
+
+=back
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $m = $chart->size();
+    print "chart has $m rows\n";
+    ($m, $n) = $chart->size();
+    print "chart has $m rows and $n columns\n";
+    print "IT874\n" if ($chart->size() == 1617);
+
+=head3 matrix_size
+
+This method returns the size of the full row matrix, as returned by the 'select_matrix' method.
+
+B<Usage>
+
+    $m = $chart->matrix_size(); # get number of rows ($m) in data matrix
+    ($m, $n) = $chart->matrix_size(); # get number of rows ($m) and columns ($n) in data matrix
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $m = $chart->matrix_size();
+    print "chart has $m rows\n";
+    ($m, $n) = $chart->matrix_size();
+    print "chart has $m rows and $n columns\n";
+
+=head3 rows
+
+This method returns a row slice from a list of SAMPLE_ID keys.
+The SAMPLE_ID is usually an integer, however any text string may be used.
+
+B<Usage>
+
+    $rows = $chart->rows(@list); # make row slice from list of SAMPLE_ID keys
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $rows = $chart->rows(100, 102, 77, 55); # get row slice (see note 1)
+
+=over
+
+=item 1
+
+If any SAMPLE_ID in list is missing, or chart has no SAMPLE_ID field, returns 'undef'
+
+=back
+
+=head3 cols
+
+This method returns a column slice from a list of DATA_FORMAT keys.
+The keys are usually as specified in B<CGATS.17> or B<ISO 28178>, however any text string may be used.
+The '|' character is used to separate the context prefix from base key.
+
+B<Usage>
+
+    $cols = $chart->cols(@list); make column slice from list of DATA_FORMAT keys
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $cols = $chart->cols(qw(CMYK_C CMYK_M CMYK_Y CMYK_K)); # get CMYK slice (see notes 1, 2 and 3)
+    $cols = $chart->cols(qw(Target|CMYK_C Target|CMYK_M Target|CMYK_Y Target|CMYK_K)); # with context prefix
+
+=over
+
+=item 1
+
+If any FORMAT_KEY in list is missing, returns 'undef'
+
+=item 2
+
+An exact match to the format keys is attempted, and if that fails, a match to the format keys without their context is attempted
+
+=item 3
+
+Normally, objects made from CxF3 files will have context prefixes.
+If you call this method without using context prefixes, the first instances of the format keys (ignoring prefixes) will be returned.
+
+=back
+
+=head3 fmt_keys
+
+This method returns an array of format keys from a column slice.
+The returned keys will include the context prefix and separator, if any.
+
+B<Usage>
+
+    $keys = $chart->fmt_keys($column_slice); # make array of DATA_FORMAT keys from column slice
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $keys = $chart->fmt_keys(1, 2, 3); # get format keys
+    $cols = $chart->cols($keys); # returns [1, 2, 3]
+    $cols = $chart->cols(qw(CMYK_C CMYK_M CMYK_Y CMYK_K)); # get CMYK slice
+    $keys = $chart->fmt_keys($cols); # returned keys might have context prefix (see 'cols' note 2, above)
+    $keys = $chart->fmt_keys([]); # get all format keys
+
+=head3 context
+
+This method gets the prefix of a column slice (not including the '|' separator).
+In a scalar context, the prefix of the first key is returned.
+In an array context, the prefixes of each key are returned.
+
+This method sets the prefix of a column slice to a supplied value.
+An array containing the modified DATA_FORMAT keys is returned.
+If the supplied value is 'undef', all prefixes (including the '|' separator) are removed.
+
+B<Usage>
+
+    $context = $chart->context($column_slice); # get context of column slice (scalar)
+    @context = $chart->context($column_slice); # get context of column slice (array)
+    $keys = $chart->context($column_slice, 'my_prefix'); # set context of column slice
+    $keys = $chart->context($column_slice, undef); # remove context of column slice
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $cols = $chart->cmyk(); # get CMYK column slice
+    $context = $chart->context($cols); # get scalar context of slice (see note 1 and 2)
+    @context = $chart->context($cols); # get array of context values (see note 1 and 3)
+    $keys = $chart->context($cols, 'Target'); # set context of column slice (see note 4)
+    $keys = $chart->context($cols, undef); # remove context from column slice (see notes 4 and 5)
+
+=over
+
+=item 1
+
+Returns undef if the column has no context prefix
+
+=item 2
+
+Returns context of first column, and warns if other columns have a different context
+
+=item 3
+
+Returns an array containing the context of each column
+
+=item 4
+
+Returns an array reference containing the modified keys
+
+=item 5
+
+A context value of undef will remove the context prefix of all columns
+
+=back
+
+=head3 test
+
+This method returns a list of fields (columns) of a specified class.
+In a scalar context, returns the number of fields, which will be zero if no fields are found.
+
+Without the optional context parameter, all fields of a specified class are counted.
+When the context is specified, only fields with that context are counted.
+When the context is specified as '|', only fields with no context are counted.
+
+B<Usage>
+
+    @cols = $chart->test('CLASS'); # test for data of class (see notes 1 and 3)
+    @cols = $chart->test('CLASS', $context); # with context
+    $n = $chart->test('CLASS'); # test for data of class (see notes 2 and 3)
+    $n = $chart->test('CLASS', $context); # with context
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    @cols = $chart->test('RGB'); # test for RGB data
+    @cols = $chart->test('CMYK'); # test for CMYK data
+    @cols = $chart->test('XYZ'); # test for XYZ data
+    @cols = $chart->test('XYY'); # test for xyY data
+    @cols = $chart->test('LAB'); # test for L*a*b* data
+    @cols = $chart->test('LCH'); # test for L*C*h data
+    @cols = $chart->test('NCLR'); # test for nCLR data (see note 4)
+    @cols = $chart->test('SPECTRAL'); # test for spectral data (see note 5)
+    @cols = $chart->test('SPOT'); # test for spot color data
+    @cols = $chart->test('DENSITY'); # test for density data
+    @cols = $chart->test('STDEVXYZ'); # test for XYZ standard deviation data
+    @cols = $chart->test('STDEVLAB'); # test for L*a*b* standard deviation data
+    @cols = $chart->test('ID'); # test for SAMPLE_ID data
+    @cols = $chart->test('NAME'); # test for SAMPLE_NAME data
+    @cols = $chart->test('DEVICE'); # test for RGB, CMYK or nCLR data
+    @cols = $chart->test('RGB', 'Target'); # test for RGB data with 'Target' context prefix
+    @cols = $chart->test('RGB', '|'); # test for RGB data with no context prefix
+    print "contains RGB data\n" if ($chart->test('RGB') == 3);
+
+=over
+
+=item 1
+
+Returns array containing the matching columns
+
+=item 2
+
+Returns the number of matching columns (0 if none)
+
+=item 3
+
+Format keys for most data classes are defined in ANSI CGATS.17, ISO 28178, and ISO 17972-1 standards
+
+=item 4
+
+Format keys for nCLR devices were introduced in Gretag-Macbeth ProfileMaker software
+
+=item 5
+
+Format keys for spectral data were not clearly defined in standards, so there are several notations in use
+
+=back
+
+=head3 keyword
+
+This method gets/sets the keyword/value lines of a CGATS ASCII chart.
+The keywords, and their usage is described in CGATS.17/ISO 28178.
+A keyword may appear more than once with different values, so the value parameter is an array.
+Values may be strings or integers.
+String values must begin and end with the double quote character.
+When setting values, double quotes are added, if necessary.
+
+The keyword/value lines are stored in a 2-D array.
+When a chart is saved in CGATS/ASCII format, this array is output as the file header.
+Lines with the keywords 'NUMBER_OF_FIELDS' and 'NUMBER_OF_SETS' are skipped.
+
+The keyword method may be called in either a scalar or array context.
+In a scalar context, the first value is returned, and in an array context, all values are returned.
+If no lines with the keyword are found, no values are returned.
+
+When setting values, the new values provided will replace the current values, starting at the beginning of the array.
+The lines will remain in their current position.
+If there are more values than current lines, new lines are added to the end of the array.
+When setting values, the current (old) values are returned.
+
+If the keyword is enclosed in angle brackets, all lines with that keyword will be removed from the array.
+When setting values, the current lines are all removed, then lines with the new values are added to the end of the array.
+
+B<Usage>
+
+    $array = $chart->keyword(); # get keyword/value array
+    $value = $chart->keyword($key); # get first value
+    @values = $chart->keyword($key); # get array of values
+    @old = $chart->keyword($key, @values); # set array of values
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $array = $chart->keyword(); # get keyword/value array reference
+    for (@{$array}) {print "@{$_}\n"}; print "\n";
+    $std = $chart->keyword->[0][0]; # get first array element (see note 1)
+    print "standard: $std\n\n";
+    $date = $chart->keyword('CREATED'); # get a single value
+    print "created: $date\n\n";
+    @values = $chart->keyword('KEYWORD'); # get multiple values
+    print "values: @values\n\n";
+    $chart->keyword('MYROWLENGTH', 33); # add new array element
+    for (@{$array}) {print "@{$_}\n"}; print "\n";
+    $old = $chart->keyword('MYROWLENGTH', 22); # change value of existing array element
+    for (@{$array}) {print "@{$_}\n"}; print "\n";
+    $old = $chart->keyword('<MYROWLENGTH>'); # delete an array element
+    for (@{$array}) {print "@{$_}\n"}; print "\n";
+    @old = $chart->keyword('<KEYWORD>', qw(word1 word2 word3)); # delete, then add multiple keyword/values
+    for (@{$array}) {print "@{$_}\n"}; print "\n";
+    print "removed values: @old\n"; # print removed values
+
+=over
+
+=item 1
+
+This line should contain the standard.
+Some common values are 'ISO28178', 'CGATS.17', 'ISO12642', 'IT8.7/4'.
+There is no value - just the keyword.
+
+=back
+
+=head3 created
+
+This method gets/sets the value of the keyword 'CREATED', which is the date/time that the chart was created.
+ISO 28178 specifies the format CCYY-MM-DDThh:mm:ss[Z | +/-hh:mm] for this value.
+Most CGATS ASCII files do not conform to this standard, and use a different date/time format.
+The FreeBSD strptime() function of the Time::Piece module is used to parse these varied date/time formats.
+When getting the date/time, this method will return a Time::Piece object.
+When setting the date/time, the parameter may be a string, or a Time::Piece object.
+If the date/time string cannot be interpreted, localtime is used instead.
+
+B<Usage>
+
+    $time = $chart->created(); # get 'CREATED' value as Time::Piece object
+    $time = $chart->created($string); # set 'CREATED' value from text string
+    $time = $chart->created($time); # set 'CREATED' value from Time::Piece object
+    $time = $chart->created($value); # set 'CREATED' value from Unix date/time value
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $time = $chart->created(); # get the creation date/time as a Time::Piece object
+    print $chart->keyword('CREATED'), " $time\n";
+    $time = $chart->created('January 1, 2000 5:03 PM'); # set creation date/time using a text string
+    print $chart->keyword('CREATED'), " $time\n";
+    $time = $chart->created(scalar(localtime())); # set creation date/time using a Time::Piece object
+    print $chart->keyword('CREATED'), " $time\n";
+    $time = $chart->created(1400000000); # set creation date/time using a Unix date/time value
+    print $chart->keyword('CREATED'), " $time\n";
+
+    print "@{$time}\n"; # print Time::Piece object contents
+    $string = $time->strftime('%Y-%m-%dT%T%z'); # format using 'C' strftime function
+    substr($string, -2, 0, ':'); # add colon
+    print "$string\n"; # print in ISO 8601 format, as specified by ISO 28178
+
+=head3 slice
+
+This method gets a data array slice, which is returned as a Math::Matrix object.
+The data array slice is specified by row and column slices, which are arrays of indices.
+For a more detailed explanation, see the B<Slices> section, above.
+
+When no parameters are provided, the entire data array is returned.
+
+When only a row slice is provided, all fields (columns) are returned.
+
+This method sets a region of the data array when replacement data is provided.
+The data array region is specified by row and column slices.
+When setting, the column slice is returned.
+
+Data may be undefined when getting or setting, and there is no encoding of values.
+
+B<Usage>
+
+    $mat = $chart->slice(); # get data array slice (see note 1)
+    $mat = $chart->slice($row_slice); # get data array slice (see note 2)
+    $mat = $chart->slice($row_slice, $column_slice); # get data array slice (see note 2)
+    $cols = $chart->slice($row_slice, $column_slice, $replacement_array); # set data array slice (see note 3)
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $mat = $chart->slice(); # get all data (see note 4)
+    $mat = $chart->slice([]); # same as above (see note 5)
+    $mat = $chart->slice([], []); # same as above (see note 5)
+    $mat = $chart->slice([1 .. 3]); # get rows 1 - 3, all columns
+    $mat = $chart->slice([1 .. 3], []); # same as above
+    $mat = $chart->slice([1 .. 3], [5 ..7]); # get rows 1 - 3, columns 5 - 7
+    $mat = $chart->slice([1, 3, 5], [7, 5, 6]); # get rows 1, 3, 5, columns 7, 5, 6
+    $rep = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+    $cols = $chart->slice([1 .. 3], [5 ..7], $rep); # set rows 1 - 3, columns 5 - 7
+
+=over
+
+=item 1
+
+A data array slice is a Math::Matrix object, which has the structure of a 2-D array
+
+=item 2
+
+Row and column slices are 1-D arrays of indices
+
+=item 3
+
+Replacement array slice must be the size indicated by the row and column slices
+
+=item 4
+
+Doesn't include row 0, which contains the format keys
+
+=item 5
+
+An empty array [] indicates all rows or columns
+
+=back
+
+=head3 colorimetry
+
+This method gets a colorimetry array slice, which is returned as a Math::Matrix object.
+The colorimetry array slice is specified by row and column slices, which are arrays of indices.
+For a more detailed explanation, see the B<Slices> section, above.
+
+When no parameters are provided, the entire colorimetry array is returned.
+
+When only a row slice is provided, all fields (columns) are returned.
+
+This method sets a region of the colorimetry array when replacement data is provided.
+The colorimetry array region is specified by row and column slices.
+When setting, the column slice is returned.
+
+B<Usage>
+
+    $mat = $chart->colorimetry(); # get colorimetry array slice (see note 1)
+    $mat = $chart->colorimetry($row_slice); # get colorimetry array slice (see note 2)
+    $mat = $chart->colorimetry($row_slice, $column_slice); # get colorimetry array slice (see note 2)
+    $cols = $chart->colorimetry($row_slice, $column_slice, $replacement_array); # set colorimetry array slice (see note 3)
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $mat = $chart->colorimetry(); # get all data
+    $mat = $chart->colorimetry([]); # same as above (see note 4)
+    $mat = $chart->colorimetry([], []); # same as above (see note 4)
+    $mat = $chart->colorimetry([1 .. 3]); # get rows 1 - 3, all columns
+    $mat = $chart->colorimetry([1 .. 3], []); # same as above
+    $mat = $chart->colorimetry([1 .. 3], [5 ..7]); # get rows 1 - 3, columns 5 - 7
+    $mat = $chart->colorimetry([1, 3, 5], [7, 5, 6]); # get rows 1, 3, 5, columns 7, 5, 6
+    $rep = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+    $cols = $chart->colorimetry([1 .. 3], [5 ..7], $rep); # set rows 1 - 3, columns 5 - 7
+
+=over
+
+=item 1
+
+A colorimetry array slice is a Math::Matrix object, which has the structure of a 2-D array
+
+=item 2
+
+Row and column slices are 1-D arrays of indices
+
+=item 3
+
+Replacement array slice must be the size indicated by the row and column slices
+
+=item 4
+
+An empty array [] indicates all rows or columns
+
+=back
+
+=head2 Shortcut accessors
+
+These methods are used to get/set the most commonly used data classes. The evaluation of the column slice is built into the method, which is the shortcut. For instance, the following lines are equivalent:
+
+    $mat = $chart->slice($row_slice, $chart->cols(qw(RGB_R RGB_G RGB_B)));
+
+    $mat = $chart->rgb($row_slice);
+
+If you already have the column slice, or make multiple calls, it is more efficient to use the B<slice> method:
+
+    $cols = $chart->cols(qw(RGB_R RGB_G RGB_B));
+    $mat1 = $chart->slice($rows1, $cols);
+    $mat2 = $chart->slice($rows2, $cols);
+    $mat3 = $chart->slice($rows3, $cols);
+
+The shortcut methods also add the context prefix to the list of format keys, if supplied in a hash parameter.
+
+=head3 id
+
+This method returns the column slice of the SAMPLE_ID field, when no parameters are provided.
+
+This method gets a group of SAMPLE_ID values from the data array, when a row slice is provided.
+The group is returned as a Math::Matrix object.
+
+This method sets a group of SAMPLE_ID values in the data array, when a row slice and replacement data are provided.
+The column slice of the SAMPLE_ID field is returned.
+
+The context of the SAMPLE_ID field may be specified with an optional hash parameter.
+This hash must be the last parameter.
+
+B<Usage>
+
+    $cols = $chart->id(); # get SAMPLE_ID column slice
+    $mat = $chart->id($row_slice); # get SAMPLE_ID of specified rows
+    $cols = $chart->id($row_slice, $replacement_array); # set SAMPLE_ID of specified rows
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $cols = $chart->id(); # get SAMPLE_ID columns slice (see note 1)
+    $mat = $chart->id([]); # get SAMPLE_ID of all rows (see notes 1, 2 and 3)
+    $mat = $chart->id([1 .. 10]); # get SAMPLE_ID of rows 1 - 10
+    $cols = $chart->id([5], [[1000]]); # set SAMPLE_ID of row 5 to 1000 (see note 4)
+    $cols = $chart->id([1 .. 3], [[1000], [2000], [3000]]); # set SAMPLE_ID of rows 1 to 3 (see note 4)
+    $cols = $chart->id({'context' => 'My'}); # with context prefix (see note 5)
+    $mat = $chart->id([], {'context' => 'My'}); # with context prefix (see note 5)
+    $cols = $chart->id([5], [[1000]], {'context' => 'My'}); # with context prefix (see note 5)
+
+=over
+
+=item 1
+
+If SAMPLE_ID field is missing, returns 'undef'
+
+=item 2
+
+Returns a Math::Matrix object, which has the structure of a 2-D array
+
+=item 3
+
+An empty array [] indicates all rows
+
+=item 4
+
+Replacement array must have same number of rows as row slice, and one column.
+
+=item 5
+
+Context prefix is specified with optional parameter hash, which must be the last parameter
+
+=back
+
+=head3 name
+
+This method returns the column slice of the SAMPLE_NAME field, when no parameters are provided.
+
+This method gets a group of SAMPLE_NAME values from the data array, when a row slice is provided.
+The group is returned as a Math::Matrix object.
+
+This method sets a group of SAMPLE_NAME values in the data array, when a row slice and replacement data are provided.
+The column slice of the SAMPLE_NAME field is returned.
+
+The context of the SAMPLE_NAME field may be specified with an optional hash parameter.
+This hash must be the last parameter.
+
+B<Usage>
+
+    $cols = $chart->name(); # get SAMPLE_NAME column slice
+    $mat = $chart->name($row_slice); # get SAMPLE_NAME of specified rows
+    $cols = $chart->name($row_slice, $replacement_array); # set SAMPLE_NAME of specified rows
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $cols = $chart->name(); # get SAMPLE_NAME columns slice (see note 1)
+    $mat = $chart->name([]); # get SAMPLE_NAME of all rows (see notes 1, 2 and 3)
+    $mat = $chart->name([1 .. 10]); # get SAMPLE_NAME of rows 1 - 10
+    $cols = $chart->name([5], [['Sky_Blue']]); # set SAMPLE_NAME of row 5 to 'Sky_Blue' (see note 4)
+    $cols = $chart->name([1 .. 3], [['Sky_Blue'], ['Eggshell'], ['Mauve']]); # set SAMPLE_NAME of rows 1 to 3 (see note 4)
+    $cols = $chart->name({'context' => 'My'}); # with context prefix (see note 5)
+    $mat = $chart->name([], {'context' => 'My'}); # with context prefix (see note 5)
+    $cols = $chart->name([5], [[1000]], {'context' => 'My'}); # with context prefix (see note 5)
+
+=over
+
+=item 1
+
+If SAMPLE_NAME field is missing, returns 'undef'
+
+=item 2
+
+Returns a Math::Matrix object, which has the structure of a 2-D array
+
+=item 3
+
+An empty array [] indicates all rows
+
+=item 4
+
+Replacement array must have same number of rows as row slice, and one column.
+
+=item 5
+
+Context prefix is specified with optional parameter hash, which must be the last parameter
+
+=item 6
+
+The SAMPLE_NAME key is used by ProfileMaker software, and usually indicates the sample's row and column location.
+
+=item 7
+
+For CxF3 files, the 'Name' attribute of cc:Object elements is mapped to the SAMPLE_NAME field.
+
+=back
+
+=head3 rgb
+
+This method returns the column slice of the RGB fields, when no parameters are provided.
+
+This method gets a group of RGB values from the data array, when a row slice is provided.
+The group is returned as a Math::Matrix object.
+
+This method sets a group of RGB values in the data array, when a row slice and replacement data are provided.
+The column slice of the RGB fields is returned.
+
+The context of the RGB fields may be specified with an optional hash parameter.
+This hash must be the last parameter.
+
+B<Usage>
+
+    $cols = $chart->rgb(); # get RGB column slice
+    $mat = $chart->rgb($row_slice); # get RGB values of specified rows
+    $cols = $chart->rgb($row_slice, $replacement_array); # set RGB values of specified rows
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $cols = $chart->rgb(); # get RGB columns slice (see note 1)
+    $mat = $chart->rgb([]); # get RGB values of all rows (see notes 1, 2 and 3)
+    $mat = $chart->rgb([1 .. 10]); # get RGB values of rows 1 - 10
+    $cols = $chart->rgb([5], [[255, 0, 0]]); # set RGB values of row 5 to 255, 0, 0 (see note 4)
+    $cols = $chart->rgb([1 .. 3], [[255, 0, 0], [0, 255, 0], [0, 0, 255]]); # set RGB of rows 1 to 3 (see note 4)
+    $cols = $chart->rgb({'context' => 'Target'}); # with context prefix (see note 5)
+    $mat = $chart->rgb([], {'context' => 'Target'}); # with context prefix (see note 5)
+    $cols = $chart->rgb([5], [[255, 0, 0]], {'context' => 'Target'}); # with context prefix (see note 5)
+
+=over
+
+=item 1
+
+If RGB_R, RGB_G or RGB_B field is missing, returns 'undef'
+
+=item 2
+
+Returns a Math::Matrix object, which has the structure of a 2-D array
+
+=item 3
+
+An empty array [] indicates all rows
+
+=item 4
+
+Replacement array must have same number of rows as row slice, and three columns.
+
+=item 5
+
+Context prefix is specified with optional parameter hash, which must be the last parameter
+
+=back
+
+=head3 cmyk
+
+This method returns the column slice of the CMYK fields, when no parameters are provided.
+
+This method gets a group of CMYK values from the data array, when a row slice is provided.
+The group is returned as a Math::Matrix object.
+
+This method sets a group of CMYK values in the data array, when a row slice and replacement data are provided.
+The column slice of the CMYK fields is returned.
+
+The context of the CMYK fields may be specified with an optional hash parameter.
+This hash must be the last parameter.
+
+B<Usage>
+
+    $cols = $chart->cmyk(); # get CMYK column slice
+    $mat = $chart->cmyk($row_slice); # get CMYK values of specified rows
+    $cols = $chart->cmyk($row_slice, $replacement_array); # set CMYK values of specified rows
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $cols = $chart->cmyk(); # get CMYK columns slice (see note 1)
+    $mat = $chart->cmyk([]); # get CMYK values of all rows (see notes 1, 2 and 3)
+    $mat = $chart->cmyk([1 .. 10]); # get CMYK values of rows 1 - 10
+    $cols = $chart->cmyk([5], [[100, 0, 0, 0]]); # set CMYK values of row 5 to 100, 0, 0, 0 (see note 4)
+    $cols = $chart->cmyk([1 .. 3], [[100, 0, 0, 0], [0, 100, 0, 0], [0, 0, 100, 0]]); # set CMYK of rows 1 to 3 (see note 4)
+    $cols = $chart->cmyk({'context' => 'Target'}); # with context prefix (see note 5)
+    $mat = $chart->cmyk([], {'context' => 'Target'}); # with context prefix (see note 5)
+    $cols = $chart->cmyk([5], [[100, 0, 0, 0]], {'context' => 'Target'}); # with context prefix (see note 5)
+
+=over
+
+=item 1
+
+If CMYK_C, CMYK_M, CMYK_Y or CMYK_K field is missing, returns 'undef'
+
+=item 2
+
+Returns a Math::Matrix object, which has the structure of a 2-D array
+
+=item 3
+
+An empty array [] indicates all rows
+
+=item 4
+
+Replacement array must have same number of rows as row slice, and four columns.
+
+=item 5
+
+Context prefix is specified with optional parameter hash, which must be the last parameter
+
+=back
+
+=head3 hex
+
+This method returns the column slice of the 6CLR fields, when no parameters are provided.
+
+This method gets a group of 6CLR values from the data array, when a row slice is provided.
+The group is returned as a Math::Matrix object.
+
+This method sets a group of 6CLR values in the data array, when a row slice and replacement data are provided.
+The column slice of the 6CLR fields is returned.
+
+The context of the 6CLR fields may be specified with an optional hash parameter.
+This hash must be the last parameter.
+
+B<Usage>
+
+    $cols = $chart->hex(); # get 6/C column slice
+    $mat = $chart->hex($row_slice); # get 6/C values of specified rows
+    $cols = $chart->hex($row_slice, $replacement_array); # set 6/C values of specified rows
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $cols = $chart->hex(); # get 6/C columns slice (see note 1)
+    $mat = $chart->hex([]); # get 6/C values of all rows (see notes 1, 2 and 3)
+    $mat = $chart->hex([1 .. 10]); # get 6/C values of rows 1 - 10
+    $cols = $chart->hex([5], [[100, 0, 0, 0, 0, 0]]); # set 6/C values of row 5 to 100, 0, 0, 0 (see note 4)
+    $cols = $chart->hex([1 .. 3], [[100, 0, 0, 0, 0, 0], [0, 100, 0, 0, 0, 0], [0, 0, 100, 0, 0, 0]]); # set 6/C of rows 1 to 3 (see note 4)
+    $cols = $chart->hex({'context' => 'Target'}); # with context prefix (see note 5)
+    $mat = $chart->hex([], {'context' => 'Target'}); # with context prefix (see note 5)
+    $cols = $chart->hex([5], [[100, 0, 0, 0, 0, 0]], {'context' => 'Target'}); # with context prefix (see note 5)
+
+=over
+
+=item 1
+
+If 6CLR_1, 6CLR_2, 6CLR_3, 6CLR_4, 6CLR_5 or 6CLR_6 field is missing, returns 'undef'
+
+=item 2
+
+Returns a Math::Matrix object, which has the structure of a 2-D array
+
+=item 3
+
+An empty array [] indicates all rows
+
+=item 4
+
+Replacement array must have same number of rows as row slice, and six columns.
+
+=item 5
+
+Context prefix is specified with optional parameter hash, which must be the last parameter
+
+=item 6
+
+The 6CLR keys are used by ProfileMaker software and follow the ICC convention for color space signatures.
+
+=back
+
+=head3 nCLR
+
+This method returns the column slice of the nCLR fields, when no parameters are provided.
+
+This method gets a group of nCLR values from the data array, when a row slice is provided.
+The group is returned as a Math::Matrix object.
+
+This method sets a group of nCLR values in the data array, when a row slice and replacement data are provided.
+The column slice of the nCLR fields is returned.
+
+The context of the nCLR fields may be specified with an optional hash parameter.
+This hash must be the last parameter.
+
+B<Usage>
+
+    $cols = $chart->nCLR(); # get n-color column slice
+    $mat = $chart->nCLR($row_slice); # get n-color values of specified rows
+    $cols = $chart->nCLR($row_slice, $replacement_array); # set n-color values of specified rows
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $cols = $chart->nCLR(); # get n-color columns slice (see notes 1 and 6)
+    $mat = $chart->nCLR([]); # get n-color values of all rows (see notes 1, 2, 3 and 6)
+    $mat = $chart->nCLR([1 .. 10]); # get n-color values of rows 1 - 10
+    $cols = $chart->nCLR([5], [[100, 0, 0, ... 0]]); # set n-color values of row 5 to 100, 0, 0, .. 0 (see note 4)
+    $cols = $chart->nCLR([1 .. 3], [[100, 0, 0, ... 0], [0, 100, 0, ... 0], [0, 0, 100, ... 0]]); # set n-color of rows 1 to 3 (see note 4)
+    $cols = $chart->nCLR({'context' => 'Target'}); # with context prefix (see note 5)
+    $mat = $chart->nCLR([], {'context' => 'Target'}); # with context prefix (see note 5)
+    $cols = $chart->nCLR([5], [[100, 0, 0, ... 0]], {'context' => 'Target'}); # with context prefix (see note 5)
+    $n = @{$cols}; # get the number of channels from column slice (see note 6)
+    $n = @{$mat->[0]}; # get the number of channels from data matrix (see note 6)
+
+=over
+
+=item 1
+
+If any nCLR field is missing, returns 'undef'
+
+=item 2
+
+Returns a Math::Matrix object, which has the structure of a 2-D array
+
+=item 3
+
+An empty array [] indicates all rows
+
+=item 4
+
+Replacement array must have same number of rows as row slice, and columns as columns slice (n)
+
+=item 5
+
+Context prefix is specified with optional parameter hash, which must be the last parameter
+
+=item 6
+
+The number of channels is between 2 and 15
+
+=item 7
+
+The nCLR keys are used by ProfileMaker software and follow the ICC convention for color space signatures.
+
+=back
+
+=head3 device
+
+This method returns the column slice of the device fields, when no parameters are provided.
+
+This method gets a group of device values from the data array, when a row slice is provided.
+The group is returned as a Math::Matrix object.
+
+This method sets a group of device values in the data array, when a row slice and replacement data are provided.
+The column slice of the device fields is returned.
+
+The context of the device fields may be specified with an optional hash parameter.
+This hash must be the last parameter.
+
+B<Usage>
+
+    $cols = $chart->device(); # get device column slice
+    $mat = $chart->device($row_slice); # get device values of specified rows
+    $cols = $chart->device($row_slice, $replacement_array); # set device values of specified rows
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $cols = $chart->device(); # get device columns slice (see note 1, 6, and 7)
+    $mat = $chart->device([]); # get device values of all rows (see notes 1, 2, 3, 6, 7 and 8)
+    $mat = $chart->device([1 .. 10]); # get device values of rows 1 - 10
+    $cols = $chart->device([5], [[1.0, 0, 0, ... 0]]); # set device values of row 5 to 1.0, 0, 0, .. 0 (see note 4)
+    $cols = $chart->device([1 .. 3], [[1.0, 0, 0, ... 0], [0, 1.0, 0, ... 0], [0, 0, 1.0, ... 0]]); # set device of rows 1 to 3 (see note 4)
+    $cols = $chart->device({'context' => 'Target'}); # with context prefix (see note 5)
+    $mat = $chart->device([], {'context' => 'Target'}); # with context prefix (see note 5)
+    $cols = $chart->device([5], [[1.0, 0, 0, ... 0]], {'context' => 'Target'}); # with context prefix (see note 5)
+    $n = @{$cols}; # get the number of channels from column slice (see note 7)
+    $n = @{$mat->[0]}; # get the number of channels from data matrix (see note 7)
+
+=over
+
+=item 1
+
+If any device field is missing, returns 'undef'
+
+=item 2
+
+Returns a Math::Matrix object, which has the structure of a 2-D array
+
+=item 3
+
+An empty array [] indicates all rows
+
+=item 4
+
+Replacement array must have same number of rows as row slice, and columns as column slice.
+
+=item 5
+
+Context prefix is specified with optional parameter hash, which must be the last parameter
+
+=item 6
+
+Device fields are RGB, CMYK or nCLR, searched in that order
+
+=item 7
+
+The number of channels is between 2 and 15
+
+=item 8
+
+The range of device values is 0 - 1 for all color spaces, RGB, CMYK or nCLR
+
+=back
+
+=head3 ctv
+
+This method returns the column slice of the CTV field, when no parameters are provided.
+
+This method gets a group of CTV values from the data array, when a row slice is provided.
+The group is returned as a Math::Matrix object.
+
+This method sets a group of CTV values in the data array, when a row slice and replacement data are provided.
+The column slice of the CTV field is returned.
+
+The context of the CTV field may be specified with an optional hash parameter.
+This hash must be the last parameter.
+
+B<Usage>
+
+    $cols = $chart->ctv(); # get CTV column slice
+    $mat = $chart->ctv($row_slice); # get CTV value of specified rows
+    $cols = $chart->ctv($row_slice, $replacement_array); # set CTV value of specified rows
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $cols = $chart->ctv(); # get CTV column slice (see note 1)
+    $mat = $chart->ctv([]); # get CTV value of all rows (see notes 1, 2 and 3)
+    $mat = $chart->ctv([1 .. 10]); # get CTV value of rows 1 - 10
+    $cols = $chart->ctv([5], [[0]]); # set CTV value of row 5 to 0 (see note 4)
+    $cols = $chart->ctv([1 .. 3], [[0], [50], [100]]); # set CTV of rows 1 to 3 (see note 4)
+    $cols = $chart->ctv({'context' => 'My'}); # with context prefix (see note 5)
+    $mat = $chart->ctv([], {'context' => 'My'}); # with context prefix (see note 5)
+    $cols = $chart->ctv([5], [[0]], {'context' => 'My'}); # with context prefix (see note 5)
+
+=over
+
+=item 1
+
+If CTV field is missing, returns 'undef'
+
+=item 2
+
+Returns a Math::Matrix object, which has the structure of a 2-D array
+
+=item 3
+
+An empty array [] indicates all rows
+
+=item 4
+
+Replacement array must have same number of rows as row slice, and one column.
+
+=item 5
+
+Context prefix is specified with optional parameter hash, which must be the last parameter
+
+=back
+
+=head3 lab
+
+This method returns the column slice of the L*a*b* fields, when no parameters are provided.
+
+This method gets a group of L*a*b* values from the data array, when a row slice is provided.
+The group is returned as a Math::Matrix object.
+
+This method sets a group of L*a*b* values in the data array, when a row slice and replacement data are provided.
+The column slice of the L*a*b* fields is returned.
+
+The context of the L*a*b* fields may be specified with an optional hash parameter.
+This hash must be the last parameter.
+
+B<Usage>
+
+    $cols = $chart->lab(); # get L*a*b* column slice
+    $mat = $chart->lab($row_slice); # get L*a*b* value of specified rows
+    $cols = $chart->lab($row_slice, $replacement_array); # set L*a*b* value of specified rows
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $cols = $chart->lab(); # get L*a*b* column slice (see note 1)
+    $mat = $chart->lab([]); # get L*a*b* values of all rows (see notes 1, 2 and 3)
+    $mat = $chart->lab([1 .. 10]); # get L*a*b* values of rows 1 - 10
+    $cols = $chart->lab([5], [[0, 0, 0]]); # set L*a*b* values of row 5 to 0 (see note 4)
+    $cols = $chart->lab([1 .. 3], [[0, 0, 0], [50, 0, 0], [100, 0, 0]]); # set L*a*b* of rows 1 to 3 (see note 4)
+    $cols = $chart->lab({'context' => 'My'}); # with context prefix (see note 5)
+    $mat = $chart->lab([], {'context' => 'My'}); # with context prefix (see note 5)
+    $cols = $chart->lab([5], [[0, 0, 0]], {'context' => 'My'}); # with context prefix (see note 5)
+    $mat = $chart->lab([], {'encoding' => 0}); # with encoding (see note 6)
+    $cols = $chart->lab([5], [[0, 0, 0]], {'encoding' => 0}); # with encoding (see note 6)
+
+=over
+
+=item 1
+
+If LAB_L, LAB_A or LAB_B fields are missing, returns 'undef'
+
+=item 2
+
+Returns a Math::Matrix object, which has the structure of a 2-D array
+
+=item 3
+
+An empty array [] indicates all rows
+
+=item 4
+
+Replacement array must have same number of rows as row slice, and three columns.
+
+=item 5
+
+Context prefix is specified with optional parameter hash, which must be the last parameter
+
+=item 6
+
+Encoding is specified with optional parameter hash, which must be the last parameter
+Supported values are:
+
+    0 - 8-bit ICC CIELAB (100, 0, 0 => 255/255, 128/255, 128/255 = 1, 0.50196, 0.50196)
+    0 - 16-bit ICC CIELAB (100, 0, 0 => 65535/65535, 32896/65535, 32896/65535 = 1, 0.50196, 0.50196)
+    1 - 16-bit ICC legacy L*a*b* (100, 0, 0 => 65280/65535, 32768/65535, 32768/65535 = 0.99611, 0.50001, 0.50001)
+    2 - 16-bit EFI/Monaco L*a*b* (100, 0, 0 => 65535/65535, 32768/65535, 32768/65535 = 1, 0.50001, 0.50001)
+    3 - L*a*b* (100, 0, 0 => 100, 0, 0)
+    4 - LxLyLz (100, 0, 0 => 100, 100, 100)
+    5 - unit LxLyLz (100, 0, 0 => 1, 1, 1)
+
+    0 is both 8-bit and 16-bit CIELAB encoding from the ICC v4 specification.
+    1 is the 16-bit L*a*b* encoding from the ICC v2 specification, and also applies to mft2 and ncl2 tags within v4 profiles.
+    2 is a non-standard L*a*b* encoding used by EFI and Monaco in their v2 profiles.
+    3 is standard L*a*b* encoding, used in measurement files.
+    4 is L* encoding of xyz values.
+    5 is unit L* encoding of xyz values.
+
+=back
+
+=head3 xyz
+
+This method returns the column slice of the XYZ fields, when no parameters are provided.
+
+This method gets a group of XYZ values from the data array, when a row slice is provided.
+The group is returned as a Math::Matrix object.
+
+This method sets a group of XYZ values in the data array, when a row slice and replacement data are provided.
+The column slice of the XYZ fields is returned.
+
+The context of the XYZ fields may be specified with an optional hash parameter.
+This hash must be the last parameter.
+
+B<Usage>
+
+    $cols = $chart->xyz(); # get XYZ column slice
+    $mat = $chart->xyz($row_slice); # get XYZ value of specified rows
+    $cols = $chart->xyz($row_slice, $replacement_array); # set XYZ value of specified rows
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $cols = $chart->xyz(); # get XYZ column slice (see note 1)
+    $mat = $chart->xyz([]); # get XYZ values of all rows (see notes 1, 2 and 3)
+    $mat = $chart->xyz([1 .. 10]); # get XYZ values of rows 1 - 10
+    $cols = $chart->xyz([5], [[0, 0, 0]]); # set XYZ values of row 5 to 0 (see note 4)
+    $cols = $chart->xyz([1 .. 3], [[0, 0, 0], [50, 50, 50], [100, 100, 100]]); # set XYZ of rows 1 to 3 (see note 4)
+    $cols = $chart->xyz({'context' => 'My'}); # with context prefix (see note 5)
+    $mat = $chart->xyz([], {'context' => 'My'}); # with context prefix (see note 5)
+    $cols = $chart->xyz([5], [[0, 0, 0]], {'context' => 'My'}); # with context prefix (see note 5)
+    $mat = $chart->xyz([], {'encoding' => 9}); # with encoding (see note 6)
+    $cols = $chart->xyz([5], [[0, 0, 0]], {'encoding' => 9}); # with encoding (see note 6)
+
+=over
+
+=item 1
+
+If XYZ_X, XYZ_Y or XYZ_Z fields are missing, returns 'undef'
+
+=item 2
+
+Returns a Math::Matrix object, which has the structure of a 2-D array
+
+=item 3
+
+An empty array [] indicates all rows
+
+=item 4
+
+Replacement array must have same number of rows as row slice, and three columns.
+
+=item 5
+
+Context prefix is specified with optional parameter hash, which must be the last parameter
+
+=item 6
+
+Encoding is specified with optional parameter hash, which must be the last parameter
+Supported values are:
+
+    4 - LxLyLz (100, 0, 0 => 100, 100, 100)
+    7 - 16-bit ICC XYZ (100, 0, 0 => 0.48210, 0.50000, 0.41245)
+    8 - 32-bit ICC XYZNumber (100, 0, 0 => 0.9642, 1.0, 0.8249)
+    9 - xyz (100, 0, 0 => 1, 1, 1)
+    10 - XYZ (100, 0, 0 => 96.42, 100, 82.49)
+    11 - media relative xyz (media white => 1, 1, 1)
+
+    4 is L* encoding of xyz values
+    7 is the 16-bit XYZ encoding from ICC v2 and v4 specifications. 8-bit XYZ encoding is undefined by the ICC specification.
+    8 is the 32-bit format used by XYZ tags, and the format used to set absolute colorimetry when creating PCS objects.
+    9 is X/Xn, Y/Yn, Z/Zn, as defined in ISO 13655, and requires an illuminant value (in the colorimetry array).
+    10 is standard XYZ encoding, used in measurement files.
+    11 is X/Xmw, Y/Ymw, Z/Zmw, and requires a media white value (in the colorimetry array).
+
+=back
+
+=head3 density
+
+This method accesses density values, per ISO 5-3.
+These fields are created from spectral data using the 'add_density' method.
+
+This method returns the column slice of the density fields, when no parameters are provided.
+
+This method gets a group of density values from the data array, when a row slice is provided.
+The group is returned as a Math::Matrix object.
+
+This method sets a group of density values in the data array, when a row slice and replacement data are provided.
+The column slice of the density fields is returned.
+
+The context of the density fields may be specified with an optional hash parameter.
+This hash must be the last parameter.
+
+B<Usage>
+
+    $cols = $chart->density(); # get density column slice
+    $mat = $chart->density($row_slice); # get density value of specified rows
+    $cols = $chart->density($row_slice, $replacement_array); # set density value of specified rows
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt'); # spectral data
+    $chart->add_density({'status' => 'T'}); # add density values
+
+    $cols = $chart->density(); # get density column slice (see note 1)
+    $mat = $chart->density([]); # get density values of all rows (see notes 1, 2 and 3)
+    $mat = $chart->density([1 .. 10]); # get density values of rows 1 - 10
+    $cols = $chart->density([5], [[0, 0, 0, 0]]); # set density values of row 5 to 0 (see note 4)
+    $cols = $chart->density([1 .. 3], [[0, 0, 0, 0], [1.0, 0, 0, 0], [2.0, 0, 0, 0]]); # set density of rows 1 to 3 (see note 4)
+    $cols = $chart->density({'context' => 'My'}); # with context prefix (see note 5)
+    $mat = $chart->density([], {'context' => 'My'}); # with context prefix (see note 5)
+    $cols = $chart->density([5], [[0, 0, 0, 0]], {'context' => 'My'}); # with context prefix (see note 5)
+    $mat = $chart->density([], {'encoding' => 'linear'}); # with encoding (see note 6)
+    $cols = $chart->density([5], [[0, 0, 0, 0]], {'encoding' => 'linear'}); # with encoding (see note 6)
+
+=over
+
+=item 1
+
+If D_RED, D_GREEN, D_BLUE, or D_VIS fields are missing, returns 'undef'
+
+=item 2
+
+Returns a Math::Matrix object, which has the structure of a 2-D array
+
+=item 3
+
+An empty array [] indicates all rows
+
+=item 4
+
+Replacement array must have same number of rows as row slice, and four columns.
+
+=item 5
+
+Context prefix is specified with optional parameter hash, which must be the last parameter
+
+=item 6
+
+Encoding is specified with optional parameter hash, which must be the last parameter.
+Supported values are:
+
+    'density' - normal density values as specified in ISO 5-3 (default)
+    'linear' - reflectance/transmittance values as specified in ISO 5-3 (100 * 10^-D)
+    'unit' - reflectance/transmittance values with range (0 - 1)
+    'L*' - L* encoded values with range (0 - 100)
+
+=back
+
+=head3 rgbv
+
+This method accesses reflectance/transmittance values, per ISO 5-3.
+These fields are created from spectral data using the 'add_density' method, with the encoding set to 'linear'.
+Reflectance/transmittance values are commonly used to compute TVI.
+
+This method returns the column slice of the reflectance/transmittance fields, when no parameters are provided.
+
+This method gets a group of reflectance/transmittance values from the data array, when a row slice is provided.
+The group is returned as a Math::Matrix object.
+
+This method sets a group of reflectance/transmittance values in the data array, when a row slice and replacement data are provided.
+The column slice of the reflectance/transmittance fields is returned.
+
+The context of the reflectance/transmittance fields may be specified with an optional hash parameter.
+This hash must be the last parameter.
+
+B<Usage>
+
+    $cols = $chart->rgbv(); # get reflectance/transmittance column slice
+    $mat = $chart->rgbv($row_slice); # get reflectance/transmittance value of specified rows
+    $cols = $chart->rgbv($row_slice, $replacement_array); # set reflectance/transmittance value of specified rows
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt'); # spectral data
+    $chart->add_density({'status' => 'T', 'encoding' => 'linear'}); # add reflectance/transmittance values
+
+    $cols = $chart->rgbv(); # get reflectance/transmittance column slice (see note 1)
+    $mat = $chart->rgbv([]); # get reflectance/transmittance values of all rows (see notes 1, 2 and 3)
+    $mat = $chart->rgbv([1 .. 10]); # get reflectance/transmittance values of rows 1 - 10
+    $cols = $chart->rgbv([5], [[0, 0, 0, 0]]); # set reflectance/transmittance values of row 5 to 0 (see note 4)
+    $cols = $chart->rgbv([1 .. 3], [[0, 0, 0, 0], [1.0, 0, 0, 0], [2.0, 0, 0, 0]]); # set reflectance/transmittance of rows 1 to 3 (see note 4)
+    $cols = $chart->rgbv({'context' => 'My'}); # with context prefix (see note 5)
+    $mat = $chart->rgbv([], {'context' => 'My'}); # with context prefix (see note 5)
+    $cols = $chart->rgbv([5], [[0, 0, 0, 0]], {'context' => 'My'}); # with context prefix (see note 5)
+    $mat = $chart->rgbv([], {'encoding' => 'unit'}); # with encoding (see note 6)
+    $cols = $chart->rgbv([5], [[0, 0, 0, 0]], {'encoding' => 'unit'}); # with encoding (see note 6)
+
+=over
+
+=item 1
+
+If R_RED, R_GREEN, R_BLUE, or R_VIS fields are missing, returns 'undef'
+
+=item 2
+
+Returns a Math::Matrix object, which has the structure of a 2-D array
+
+=item 3
+
+An empty array [] indicates all rows
+
+=item 4
+
+Replacement array must have same number of rows as row slice, and four columns
+
+=item 5
+
+Context prefix is specified with optional parameter hash, which must be the last parameter
+
+=item 6
+
+Encoding is specified with optional parameter hash, which must be the last parameter.
+Supported values are:
+
+    'linear' - reflectance/transmittance values as specified in ISO 5-3 (default)
+    'unit' - reflectance/transmittance values with range (0 - 1)
+    'density' - normal density values as specified in ISO 5-3 (-log10(R/100))
+    'L*' - L* encoded values with range (0 - 100)
+
+Note that reflectance/transmittance values must be positive (> 0) to be correctly encoded as 'density'.
+
+=back
+
+=head3 spectral
+
+This method returns the column slice of the spectral fields, when no parameters are provided.
+
+This method gets a group of spectral values from the data array, when a row slice is provided.
+The group is returned as a Math::Matrix object.
+
+This method sets a group of spectral values in the data array, when a row slice and replacement data are provided.
+The column slice of the spectral fields is returned.
+
+The context of the spectral fields may be specified with an optional hash parameter.
+This hash must be the last parameter.
+
+Values are ordered from low to high wavelength.
+
+B<Usage>
+
+    $cols = $chart->spectral(); # get spectral reflectance column slice
+    $mat = $chart->spectral($row_slice); # get spectral reflectance value of specified rows
+    $cols = $chart->spectral($row_slice, $replacement_array); # set spectral reflectance value of specified rows
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $cols = $chart->spectral(); # get spectral reflectance column slice (see note 1)
+    $mat = $chart->spectral([]); # get spectral reflectance values of all rows (see notes 1, 2 and 3)
+    $mat = $chart->spectral([1 .. 10]); # get spectral reflectance values of rows 1 - 10
+    $cols = $chart->spectral([5], [[(0) x 36]]); # set spectral reflectance values of row 5 (see note 4)
+    $cols = $chart->spectral([1 .. 3], [[(0) x 36], [(0.5) x 36], [(1.0) x 36]]); # set spectral reflectance of rows 1 to 3 (see note 4)
+    $cols = $chart->spectral({'context' => 'My'}); # with context prefix (see note 5)
+    $mat = $chart->spectral([], {'context' => 'My'}); # with context prefix (see note 5)
+    $cols = $chart->spectral([5], [[(0) x 36]], {'context' => 'My'}); # with context prefix (see note 5)
+
+=over
+
+=item 1
+
+If spectral fields are missing, returns 'undef'
+
+=item 2
+
+Returns a Math::Matrix object, which has the structure of a 2-D array
+
+=item 3
+
+An empty array [] indicates all rows
+
+=item 4
+
+Replacement array must have same number of rows as row slice, and columns as column slice
+
+=item 5
+
+Context prefix is specified with optional parameter hash, which must be the last parameter
+
+=back
+
+=head3 wavelength
+
+This method returns an array of the spectral wavelengths.
+
+Values are ordered from low to high wavelength.
+
+The context of the spectral fields may be specified with an optional hash parameter.
+
+B<Usage>
+
+    $nms = $chart->wavelength(); # get spectral wavelengths
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $nms = $chart->wavelength(); # get spectral wavelengths (see notes 1 and 2)
+    $nms = $chart->wavelength({'context' => 'M0_Measurement'}); # with context prefix
+
+=over
+
+=item 1
+
+If spectral fields are missing, returns 'undef'
+
+=item 2
+
+Wavelengths are sorted from low to high
+
+=back
+
+=head3 nm
+
+This method returns the wavelength range of a spectral slice.
+
+The structure of a wavlength range is: [start_nm, end_nm, increment]
+
+The context of the spectral fields may be specified with an optional hash parameter.
+
+B<Usage>
+
+    $cols = $chart->nm(); # get wavelength range of spectral slice
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $cols = $chart->nm(); # get wavelength range (see note 1)
+    $cols = $chart->nm({'context' => 'M0_Measurement'}; # with context prefix
+
+=over
+
+=item 1
+
+Returns 'undef' if the chart has no spectral data.
+
+=back
+
+=head3 iwtpt
+
+This method returns the illuminant white point as an XYZ vector.
+
+XYZ or L*a*b* data is required.
+
+If the white point cannot be determined, D50 is returned.
+
+The context of the XYZ or L*a*b* fields may be specified with an optional hash parameter.
+The XYZ encoding may also be specified with the hash parameter.
+This hash must be the last parameter.
+
+B<Usage>
+
+    $xyz = $chart->iwtpt(); # get illuminant white point
+    $xyz = $chart->iwtpt($hash); # with optional parameters
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $xyz = $chart->iwtpt(); # get illuminant white point (see notes 1 and 2)
+    $xyz = $chart->iwtpt({'context' => 'M0_Measurement'}); # with context prefix (see note 3)
+    $xyz = $chart->iwtpt({'encoding' => 9}); # with xyz encoding (see note 4)
+
+=over
+
+=item 1
+
+Returns an XYZ vector (1-D array)
+
+=item 2
+
+Default white point value is ICC D50
+
+=item 3
+
+Context prefix is specified with optional parameter hash
+
+=item 4
+
+XYZ encoding is specified with optional parameter hash
+
+=back
+
+=head3 wtpt
+
+This method returns the media white point as an XYZ vector.
+
+XYZ or L*a*b* data is required.
+
+If the white point cannot be determined, warns and returns 'undef'.
+
+The context of the XYZ or L*a*b* fields may be specified with an optional hash parameter.
+The XYZ encoding may also be specified with the hash parameter.
+This hash must be the last parameter.
+
+B<Usage>
+
+    $xyz = $chart->wtpt(); # get media white point
+    $xyz = $chart->wtpt($hash); # with optional parameters
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $xyz = $chart->wtpt(); # get media white point (see notes 1 and 2)
+    $xyz = $chart->wtpt({'context' => 'M0_Measurement'}); # with context prefix (see note 3)
+    $xyz = $chart->wtpt({'encoding' => 9}); # with xyz encoding (see note 4)
+
+=over
+
+=item 1
+
+Returns an XYZ vector (1-D array)
+
+=item 2
+
+Requires device and colorimetric data, otherwise returns 'undef'
+
+=item 3
+
+Context prefix is specified with optional parameter hash
+
+=item 4
+
+XYZ encoding is specified with optional parameter hash
+
+=back
+
+=head3 bkpt
+
+This method returns the media black point as an XYZ vector.
+
+XYZ or L*a*b* data is required.
+
+If the white point cannot be determined, warns and returns 'undef'.
+
+The context of the XYZ or L*a*b* fields may be specified with an optional hash parameter.
+The XYZ encoding may also be specified with the hash parameter.
+This hash must be the last parameter.
+
+B<Usage>
+
+    $xyz = $chart->bkpt(); # get media black point
+    $xyz = $chart->bkpt($hash); # with optional parameters
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $xyz = $chart->bkpt(); # get media black point (see notes 1 and 2)
+    $xyz = $chart->bkpt({'context' => 'M0_Measurement'}); # with context prefix (see note 3)
+    $xyz = $chart->bkpt({'encoding' => 9}); # with xyz encoding (see note 4)
+
+=over
+
+=item 1
+
+Returns an XYZ vector (1-D array)
+
+=item 2
+
+Requires device and colorimetric data, otherwise returns 'undef'
+
+=item 3
+
+Context prefix is specified with optional parameter hash
+
+=item 4
+
+XYZ encoding is specified with optional parameter hash
+
+=back
+
+=head3 oba_index
+
+This method returns the media OBA index.
+
+M1 and M2 data is required – spectral, XYZ or L*a*b*.
+
+If the OBA index cannot be determined, warns and returns 'undef'.
+
+The context of the M1 and M2 data and the sample number may be specified with an optional hash parameter.
+
+B<Usage>
+
+    $oba_index = $chart->oba_index(); # get OBA index
+    $oba_index = $chart->oba_index($hash); # with optional parameter
+
+    ($m1, $m2) = $chart->oba_index(); # get the M1/M2 XYZ vectors
+    ($m1, $m2) = $chart->oba_index($hash); # with optional parameter
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.mxf'); # chart contains M1 and M2 data
+    $oba_index = $chart->oba_index(); # get OBA index (see note 1)
+    $oba_index = $chart->oba_index({'context' => ['M1_Measurement', 'M2_Measurement']}); # with contexts (see note 2)
+    $oba_index = $chart->oba_index({'sample' => 1000}); # with specified sample (see note 3)
+    ($m1, $m2) = $chart->oba_index(); # get M1/M2 XYZ vectors (see note 4)
+
+=over
+
+=item 1
+
+Default contexts ('M1_Measurement' and 'M2_Measurement') are used.
+
+Paper white sample(s) are located using device values and averaged, by default.
+
+=item 2
+
+Contexts may be specfied using an optional hash. The hash value is an array reference containing M1 and M2 contexts.
+
+=item 3
+
+The sample number may be specified using an optional hash, which is required when the chart has no device values.
+
+=item 4
+
+The media white point M1/M2 XYZ vectors are returned when the function is called in the array context.
+Colorimetry is D50, 2 degree observer.
+
+=back
+
+=head3 cat
+
+This method returns the chromatic adaptation transform object (CAT) associated with XYZ data.
+A CAT object is optionally created when adding XYZ data.
+
+XYZ data is required.
+
+Returns 'undef' if there is no CAT.
+
+The context of the XYZ fields may be specified with an optional hash parameter.
+
+B<Usage>
+
+    $cat = $chart->cat(); # get CAT object
+    $cat = $chart->cat($hash); # with optional hash parameter
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_spectral_data.txt');
+    $chart->add_xyz({'illuminant' => 'F11', 'cat' => 'bradford'});
+    $cat = $chart->cat(); # get CAT object (see notes 1 and 2)
+    $cat = $chart->cat({'context' => 'M0_Measurement'}); # with context prefix (see note 3)
+
+=over
+
+=item 1
+
+Returns an 'ICC::Profile::matf' object
+
+=item 2
+
+Requires XYZ data added using a CAT, otherwise returns 'undef'
+
+=item 3
+
+Context prefix is specified with optional hash parameter
+
+=back
+
+=head3 color
+
+This method returns the Color object associated with XYZ data.
+A Color object is created when adding XYZ data from spectral data.
+
+XYZ data is required.
+
+Returns 'undef' if there is no Color object.
+
+The context of the XYZ fields may be specified with an optional hash parameter.
+
+B<Usage>
+
+    $color = $chart->color(); # get Color object
+    $color = $chart->color($hash); # with optional hash parameter
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_spectral_data.txt');
+    $chart->add_xyz({'illuminant' => 'F11', 'cat' => 'bradford'});
+    $color = $chart->color(); # get Color object (see notes 1 and 2)
+    $color = $chart->color({'context' => 'M0_Measurement'}); # with context prefix (see note 3)
+
+=over
+
+=item 1
+
+Returns an 'ICC::Support::Color' object
+
+=item 2
+
+Requires XYZ data added using a Color object, otherwise returns 'undef'
+
+=item 3
+
+Context prefix is specified with optional hash parameter
+
+=back
+
+=head2 Adding data
+
+=head3 add_avg
+
+This method is for averaging samples in a single, existing chart. If you have multiple measurement
+files to average (e.g. sheets pulled from a press run), put them in a folder, and make a chart from
+the folder (see B<new> method).
+
+B<Usage>
+
+    $rows = $chart->add_avg($row_slice); # add average row
+    $rows = $chart->add_avg($row_slice, $hash); # with optional parameters
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $rows = $chart->add_avg([1, 3, 5]); # add average sample (see notes 1 and 2)
+    $rows = $chart->add_avg([1, 3, 5], {'method' => 'SIMPLE'}); (see note 3)
+    $rows = $chart->add_avg([], {'name' => 'average_all_samples'}); (see note 3)
+
+=over
+
+=item 1
+
+New sample is appended to end of data array
+
+=item 2
+
+Only measurements (i.e. spectral, XYZ, L*a*b* and density columns) are averaged
+
+=item 3
+
+Hash keys are 'method', 'id', and 'name'
+
+Hash values for 'method' are 'LINEAR' and 'SIMPLE', default is 'LINEAR'.
+L*a*b* and density values are converted to/from linear values for 'LINEAR' averaging.
+
+Hash value for 'id' overrides default value of the added row index.
+
+Hash value for 'name' overrides default value of first sample name with '_AVG' appended.
+
+=back
+
+=head3 add_fmt
+
+B<Usage>
+
+    $cols = $chart->add_fmt(@list); # add format fields
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $cols = $chart->add_fmt(qw(RGB_R RGB_G RGB_B)); # add RGB columns (see note 1 and 2)
+    $cols = $chart->add_fmt(qw(Target|RGB_R Target|RGB_G Target|RGB_B)); # with context
+
+=over
+
+=item 1
+
+New fields are appended to end of format array
+
+=item 2
+
+No data is added, just the format fields
+
+=back
+
+=head3 add_ctv
+
+B<Usage>
+
+    $cols = $chart->add_ctv(); # add CTV data
+    $cols = $chart->add_ctv($hash); # with optional parameters
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $cols = $chart->add_ctv(); # add CTV data (see notes 1 and 2)
+    $cols = $chart->add_ctv({'coef' => [1, 2, 1, 2, 0, 5]}); # Mahalanobis coefficients (see note 3)
+    $cols = $chart->add_ctv({'context' => 'M0_measurement', 'added' => 'My'}); # with contexts
+    $cols = $chart->add_ctv({'illuminant' => 'F2'}); # ASTM illuminant (see note 4)
+    $cols = $chart->add_ctv({'illuminant' => 'F2', 'cat' => 'cat02'}); # transformed to D50 using a CAT02 matrix (see note 6)
+    $cols = $chart->add_ctv({'illuminant' => ['CIE', 'FL10']}); # CIE standard illuminant (see note 5)
+    $cols = $chart->add_ctv({'illuminant' => []}); # no illuminant, for emissive measurements (see note 5)
+    $cols = $chart->add_ctv({'illuminant' => ['DATA']}); # data file illuminant (see note 5)
+    $cols = $chart->add_ctv({'illuminant' => [$nm, $spd]}); # illuminant as range and spd vector (see note 5)
+    $cols = $chart->add_ctv({'illuminant' => [daylight(5000)], 'added' => 'CCT_5000K'}); # CIE daylight, specified by CCT
+    $cols = $chart->add_ctv({'illuminant' => ['~/Desktop/my_illum.txt', 1]}); # measured illuminant (see note 5)
+    $cols = $chart->add_ctv({'illuminant' => ['~/Desktop/my_illum.txt', 1], 'imethod' => 'linear', 'ibandpass' => 'trapezoid'}); # (see note 9)
+    $cols = $chart->add_ctv({'iwtpt' => $chart->wtpt()}); # supplied illuminant white point (see note 7)
+    $cols = $chart->add_ctv({'oba' => 0.5}); # add OBA effect (see note 8)
+    $cols = $chart->add_ctv({'oba' => 0.5, 'context' => ['M1_Measurement', 'M2_Measurement']}); # with context (see note 8)
+
+=over
+
+=item 1
+
+Requires L*a*b* data and media white point
+
+=item 2
+
+L*a*b* data will be added from XYZ or spectral data, if missing
+
+Default colorimetry is ASTM E 308 table 5.9 - D50, 2 degree observer, 10 nm increment, no bandpass correction.
+
+=item 3
+
+CTV is the Mahalanobis distance to media white in Lx, Ly, Lz space, coefficients are [Lx, Ly, Lz, (Ly - Lz), (Lx - Lz), (Lx - Ly)], default is [1, 1, 1, 0, 0, 0]
+
+=item 4
+
+Hash keys are 'coef', 'illuminant', 'observer', 'bandpass', 'oba', 'cat', 'context' and 'added'
+
+Hash values for 'illuminant' are 'A', 'C', 'D50', 'D55', 'D65', 'D75', 'F2', 'F7', or 'F11', default is 'D50'
+
+Hash values for 'observer' are '2', '10', default is '2'
+
+Hash values for 'bandpass' are 'astm', 'triangle', 'trapezoid' or 'six', default is no bandpass correction
+
+A bandpass value of 'astm' selects the ASTM E 2729 method (the current standard).
+
+A bandpass value of 'six' selects table 6 from ASTM E 308, which is deprecated by ASTM E 2729.
+
+Hash value for 'oba' is a real value, typically between 0 and 1, default is no OBA effect.
+
+Default value for 'context' is 'undef' (no prefix)
+
+Default value for 'added' is the 'context' value
+
+=item 5
+
+Hash keys are 'coef', 'illuminant', 'observer', 'increment', 'method', 'bandpass', 'oba', 'cat', 'context' and 'added'
+
+Hash values for 'illuminant' are [], [source, id], or [nm, spd]
+
+An empty array indicates no illuminant, for emissive measurements
+
+Values for 'source' are 'CIE', 'Philips', 'DATA' or a measurement file path
+
+Values for 'id' depend on the source
+
+CIE illuminants are 'A', 'C', 'D50', 'D55', 'D65', 'D75', 'FL1' to 'FL12', 'FL3.1' to 'FL3.15', 'HP1' to 'HP5', and 'E'
+
+Philips illuminants are '60_A/W', 'C100S54', 'C100S54C', 'F32T8/TL830', 'F32T8/TL835', 'F32T8/TL841', 'F32T8/TL850',
+'F32T8/TL865/PLUS', 'F34/CW/RS/EW', 'F34T12WW/RS/EW', 'F40/C50', 'F40/C75', 'F40/CWX', 'F40/DX', 'F40/DXTP',
+'F40/N', 'F34T12/LW/RS/EW', 'H38HT-100', 'H38JA-100/DX', 'MHC100/U/MP/3K', 'MHC100/U/MP/4K', and 'SDW-T_100W/LV'
+
+DATA selects an illuminant measurement appended to the data set (ProfileMaker)
+
+With a measurement file path, the 'id' is the sample number
+
+The illuminant may also be specified by wavelength range and spd vector
+
+Hash values for 'observer' are '2', '10', '2P' or '10P' ('2P' and '10P' are the CIE (2012) "physiologically-relevant" CMFs), default is '2'
+
+Hash values for 'increment' are '1' or '5', default is '1'
+
+Hash values for 'method' are 'linear', 'cspline' or 'lagrange', default is 'cspline' (interpolation method)
+
+Hash values for 'bandpass' are 'astm', 'triangle' or 'trapezoid', default is no bandpass correction
+
+Default value for 'context' is 'undef' (no prefix)
+
+Default value for 'added' is the 'context' value
+
+=item 6
+
+XYZ values are computed with an optional chromatic adaptation transform (CAT)
+
+The CAT transforms XYZ values from the actual illuminant white point to D50, as in ProfileMaker
+
+The CAT transform is enabled by adding a 'cat' parameter to the hash
+
+Hash values for 'cat' are 'bradford', 'cat02' or 'quasi'
+
+=item 7
+
+Illuminant is an XYZ vector, and is used only to calculate L*a*b* values from XYZ values.
+Media-relative L*a*b* values may be computed by setting this parameter to the media white point.
+
+=item 8
+
+The OBA effect requires M1 and M2 spectral data. The hash value is a factor indicating the OBA excitation relative to D50.
+
+Hash value for 'oba' is a real value, typically between 0 and 1, default is no OBA effect
+
+When the OBA effect is specified, the context is an array reference containing the context of M1 and M2 spectral data.
+
+Default contexts are 'M1_Measurement' and 'M2_Measurement'.
+
+=item 9
+
+The illuminant interpolation method and bandpass correction are set by 'imethod' and 'ibandpass' keys.
+
+Hash values for 'imethod' are 'linear', 'cspline' or 'lagrange', default is 'linear' or 'cspline', based on smoothness of the SPD
+
+Hash values for 'ibandpass' are 'astm', 'triangle' or 'trapezoid', default is no bandpass correction
+
+=back
+
+=head3 add_lab
+
+B<Usage>
+
+    $cols = $chart->add_lab(); # add L*a*b* data
+    $cols = $chart->add_lab($hash); # with optional parameters
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $cols = $chart->add_lab(); # add L*a*b* data (see notes 1 and 2)
+    $cols = $chart->add_lab({'context' => 'M0_measurement', 'added' => 'My'}); # with contexts
+    $cols = $chart->add_lab({'illuminant' => 'F2'}); # ASTM illuminant (see note 3)
+    $cols = $chart->add_lab({'illuminant' => 'F2', 'cat' => 'cat02'}); # transformed to D50 using a CAT02 matrix (see note 5)
+    $cols = $chart->add_lab({'illuminant' => ['CIE', 'FL10']}); # CIE standard illuminant (see note 4)
+    $cols = $chart->add_lab({'illuminant' => []}); # no illuminant, for emissive measurements (see note 4)
+    $cols = $chart->add_lab({'illuminant' => ['DATA']}); # data file illuminant (see note 4)
+    $cols = $chart->add_lab({'illuminant' => [$nm, $spd]}); # illuminant as range and spd vector (see note 4)
+    $cols = $chart->add_lab({'illuminant' => [daylight(5000)], 'added' => 'CCT_5000K'}); # CIE daylight, specified by CCT
+    $cols = $chart->add_lab({'illuminant' => ['~/Desktop/my_illum.txt', 1]}); # measured illuminant (see note 4)
+    $cols = $chart->add_lab({'illuminant' => ['~/Desktop/my_illum.txt', 1], 'imethod' => 'linear', 'ibandpass' => 'trapezoid'}); # (see note 8)
+    $cols = $chart->add_lab({'iwtpt' => $chart->wtpt()}); # supplied illuminant white point (see note 6)
+    $cols = $chart->add_lab({'oba' => 0.5}); # add OBA effect (see note 7)
+    $cols = $chart->add_lab({'oba' => 0.5, 'context' => ['M1_Measurement', 'M2_Measurement']}); # with context (see note 7)
+
+=over
+
+=item 1
+
+Requires XYZ data and illuminant white point
+
+=item 2
+
+XYZ data will be added from spectral data, if missing
+
+Default colorimetry is ASTM E 308 table 5.9 - D50, 2 degree observer, 10 nm increment, no bandpass correction.
+
+=item 3
+
+Hash keys are 'illuminant', 'observer', 'bandpass', 'oba', 'cat', 'context' and 'added'
+
+Hash values for 'illuminant' are 'A', 'C', 'D50', 'D55', 'D65', 'D75', 'F2', 'F7', or 'F11', default is 'D50'
+
+Hash values for 'observer' are '2', '10', default is '2'
+
+Hash values for 'bandpass' are 'astm', 'triangle', 'trapezoid' or 'six', default is no bandpass correction
+
+A bandpass value of 'astm' selects the ASTM E 2729 method (the current standard).
+
+A bandpass value of 'six' selects table 6 from ASTM E 308, which is deprecated by ASTM E 2729.
+
+Hash value for 'oba' is a real value, typically between 0 and 1, default is no OBA effect.
+
+Default value for 'context' is 'undef' (no prefix)
+
+Default value for 'added' is the 'context' value
+
+=item 4
+
+Hash keys are 'illuminant', 'observer', 'increment', 'method', 'bandpass', 'oba', 'cat', 'context' and 'added'
+
+Hash values for 'illuminant' are [], [source, id], or [nm, spd]
+
+An empty array indicates no illuminant, for emissive measurements
+
+Values for 'source' are 'CIE', 'Philips', 'DATA' or a measurement file path
+
+Values for 'id' depend on the source
+
+CIE illuminants are 'A', 'C', 'D50', 'D55', 'D65', 'D75', 'FL1' to 'FL12', 'FL3.1' to 'FL3.15', 'HP1' to 'HP5', and 'E'
+
+Philips illuminants are '60_A/W', 'C100S54', 'C100S54C', 'F32T8/TL830', 'F32T8/TL835', 'F32T8/TL841', 'F32T8/TL850',
+'F32T8/TL865/PLUS', 'F34/CW/RS/EW', 'F34T12WW/RS/EW', 'F40/C50', 'F40/C75', 'F40/CWX', 'F40/DX', 'F40/DXTP',
+'F40/N', 'F34T12/LW/RS/EW', 'H38HT-100', 'H38JA-100/DX', 'MHC100/U/MP/3K', 'MHC100/U/MP/4K', and 'SDW-T_100W/LV'
+
+DATA selects an illuminant measurement appended to the data set (ProfileMaker)
+
+With a measurement file path, the 'id' is the sample number
+
+The illuminant may also be specified by wavelength range and spd vector
+
+The illuminant interpolation method and bandpass correction are set by 'imethod' and 'ibandpass' keys.
+
+Hash values for 'observer' are '2', '10', '2P' or '10P' ('2P' and '10P' are the CIE (2012) "physiologically-relevant" CMFs), default is '2'
+
+Hash values for 'increment' are '1' or '5', default is '1'
+
+Hash values for 'method' are 'linear', 'cspline' or 'lagrange', default is 'cspline' (interpolation method)
+
+Hash values for 'bandpass' are 'astm', 'triangle' or 'trapezoid', default is no bandpass correction
+
+Default value for 'context' is 'undef' (no prefix)
+
+Default value for 'added' is the 'context' value
+
+=item 5
+
+XYZ values are computed with an optional chromatic adaptation transform (CAT)
+
+The CAT transforms XYZ values from the actual illuminant white point to D50, as in ProfileMaker
+
+The CAT transform is enabled by adding a 'cat' parameter to the hash
+
+Hash values for 'cat' are 'bradford', 'cat02' or 'quasi'
+
+=item 6
+
+Illuminant is an XYZ vector, and is used only to calculate L*a*b* values from XYZ values.
+Media-relative L*a*b* values may be computed by setting this parameter to the media white point.
+
+=item 7
+
+The OBA effect requires M1 and M2 spectral data. The hash value is a factor indicating the OBA excitation relative to D50.
+
+Hash value for 'oba' is a real value, typically between 0 and 1, default is no OBA effect
+
+When the OBA effect is specified, the context is an array reference containing the context of M1 and M2 spectral data.
+
+Default contexts are 'M1_Measurement' and 'M2_Measurement'.
+
+=item 8
+
+The illuminant interpolation method and bandpass correction are set by 'imethod' and 'ibandpass' keys.
+
+Hash values for 'imethod' are 'linear', 'cspline' or 'lagrange', default is 'linear' or 'cspline', based on smoothness of the SPD
+
+Hash values for 'ibandpass' are 'astm', 'triangle' or 'trapezoid', default is no bandpass correction
+
+=back
+
+=head3 add_xyz
+
+B<Usage>
+
+    $cols = $chart->add_xyz(); # add XYZ data
+    $cols = $chart->add_xyz($hash); # with optional parameters
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $cols = $chart->add_xyz(); # add XYZ data (see note 1)
+    $cols = $chart->add_xyz({'context' => 'M0_measurement', 'added' => 'My'}); # with contexts
+    $cols = $chart->add_xyz({'illuminant' => 'F2'}); # ASTM illuminant (see note 2)
+    $cols = $chart->add_xyz({'illuminant' => 'F2', 'cat' => 'cat02'}); # transformed to D50 using a CAT02 matrix (see note 4)
+    $cols = $chart->add_xyz({'illuminant' => ['CIE', 'FL10']}); # CIE standard illuminant (see note 3)
+    $cols = $chart->add_xyz({'illuminant' => []}); # no illuminant, for emissive measurements (see note 3)
+    $cols = $chart->add_xyz({'illuminant' => ['DATA']}); # data file illuminant (see note 3)
+    $cols = $chart->add_xyz({'illuminant' => [$nm, $spd]}); # illuminant as range and spd vector (see note 3)
+    $cols = $chart->add_xyz({'illuminant' => [daylight(5000)], 'added' => 'CCT_5000K'}); # CIE daylight, specified by CCT
+    $cols = $chart->add_xyz({'illuminant' => ['~/Desktop/my_illum.txt', 1]}); # measured illuminant (see note 3)
+    $cols = $chart->add_xyz({'illuminant' => ['~/Desktop/my_illum.txt', 1], 'imethod' => 'linear', 'ibandpass' => 'trapezoid'}); # (see note 6)
+    $cols = $chart->add_xyz({'oba' => 0.5}); # add OBA effect (see note 5)
+    $cols = $chart->add_xyz({'oba' => 0.5, 'context' => ['M1_Measurement', 'M2_Measurement']}); # with context (see note 5)
+
+=over
+
+=item 1
+
+Requires spectral or L*a*b* data, and illuminant
+
+Default colorimetry is ASTM E 308 table 5.9 - D50, 2 degree observer, 10 nm increment, no bandpass correction.
+
+=item 2
+
+Hash keys are 'illuminant', 'observer', 'bandpass', 'oba', 'cat', 'context' and 'added'
+
+Hash values for 'illuminant' are 'A', 'C', 'D50', 'D55', 'D65', 'D75', 'F2', 'F7', or 'F11', default is 'D50'
+
+Hash values for 'observer' are '2', '10', default is '2'
+
+Hash values for 'bandpass' are 'astm', 'triangle', 'trapezoid' or 'six', default is no bandpass correction
+
+A bandpass value of 'astm' selects the ASTM E 2729 method (the current standard).
+
+A bandpass value of 'six' selects table 6 from ASTM E 308, which is deprecated by ASTM E 2729.
+
+Hash value for 'oba' is a real value, typically between 0 and 1, default is no OBA effect.
+
+Default value for 'context' is 'undef' (no prefix)
+
+Default value for 'added' is the 'context' value
+
+=item 3
+
+Hash keys are 'illuminant', 'observer', 'increment', 'method', 'bandpass', 'oba', 'cat', 'context' and 'added'
+
+Hash values for 'illuminant' are [], [source, id], or [nm, spd]
+
+An empty array indicates no illuminant, for emissive measurements
+
+Values for 'source' are 'CIE', 'Philips', 'DATA' or a measurement file path
+
+Values for 'id' depend on the source
+
+CIE illuminants are 'A', 'C', 'D50', 'D55', 'D65', 'D75', 'FL1' to 'FL12', 'FL3.1' to 'FL3.15', 'HP1' to 'HP5', and 'E'
+
+Philips illuminants are '60_A/W', 'C100S54', 'C100S54C', 'F32T8/TL830', 'F32T8/TL835', 'F32T8/TL841', 'F32T8/TL850',
+'F32T8/TL865/PLUS', 'F34/CW/RS/EW', 'F34T12WW/RS/EW', 'F40/C50', 'F40/C75', 'F40/CWX', 'F40/DX', 'F40/DXTP',
+'F40/N', 'F34T12/LW/RS/EW', 'H38HT-100', 'H38JA-100/DX', 'MHC100/U/MP/3K', 'MHC100/U/MP/4K', and 'SDW-T_100W/LV'
+
+DATA selects an illuminant measurement appended to the data set (ProfileMaker)
+
+With a measurement file path, the 'id' is the sample number
+
+The illuminant may also be specified by wavelength range and spd vector
+
+The illuminant interpolation method and bandpass correction are set by 'imethod' and 'ibandpass' keys.
+
+Hash values for 'observer' are '2', '10', '2P' or '10P' ('2P' and '10P' are the CIE (2012) "physiologically-relevant" CMFs), default is '2'
+
+Hash values for 'increment' are '1' or '5', default is '1' (this is increment of the color-matching functions)
+
+Hash values for 'method' are 'linear', 'cspline' or 'lagrange', default is 'cspline' (interpolation method)
+
+Hash values for 'bandpass' are 'astm', 'triangle' or 'trapezoid', default is no bandpass correction
+
+Default value for 'context' is 'undef' (no prefix)
+
+Default value for 'added' is the 'context' value
+
+=item 4
+
+XYZ values are computed with an optional chromatic adaptation transform (CAT)
+
+The CAT transforms XYZ values from the actual illuminant white point to D50, as in ProfileMaker
+
+The CAT transform is enabled by adding a 'cat' parameter to the hash
+
+Hash values for 'cat' are 'bradford', 'cat02' or 'quasi'
+
+The 'cat' value may also be an existing 'cat' object (more specifically, an 'ICC::Profile::matf' object)
+
+=item 5
+
+The OBA effect requires M1 and M2 spectral data. The hash value is a factor indicating the OBA excitation relative to D50.
+
+Hash value for 'oba' is a real value, typically between 0 and 1, default is no OBA effect
+
+When the OBA effect is specified, the context is an array reference containing the context of M1 and M2 spectral data.
+
+Default contexts are 'M1_Measurement' and 'M2_Measurement'.
+
+=item 6
+
+The illuminant interpolation method and bandpass correction are set by 'imethod' and 'ibandpass' keys.
+
+Hash values for 'imethod' are 'linear', 'cspline' or 'lagrange', default is 'linear' or 'cspline', based on smoothness of the SPD
+
+Hash values for 'ibandpass' are 'astm', 'triangle' or 'trapezoid', default is no bandpass correction
+
+=back
+
+=head3 add_density
+
+This method adds density or reflectance/transmittance data, per ISO 5-3.
+
+B<Usage>
+
+    $cols = $chart->add_density(); # add density data
+    $cols = $chart->add_density($hash); # with optional parameters
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $cols = $chart->add_density(); # add density data (see notes 1)
+    $cols = $chart->add_density({'context' => 'M0_measurement', 'added' => 'My'}); # with contexts (see note 2)
+    $cols = $chart->add_density({'status' => 'T'}); # ISO 5-3 status (see note 2)
+    $cols = $chart->add_density({'encoding' => 'linear'}); # add reflectance/transmittance data (see notes 2, 3 and 4)
+
+=over
+
+=item 1
+
+Requires spectral data
+
+=item 2
+
+Hash keys are 'status', 'context', 'added' and 'encoding'
+
+Hash values for 'status' are 'A', 'M', 'T', 'E', 'I', default is 'T'
+
+Default value for 'context' is 'undef' (no prefix)
+
+Default value for 'added' is the 'context' value
+
+Hash values for 'encoding' are 'density' and 'linear', default is 'density'
+
+=item 3
+
+The range of 'linear' values is 0 - 100, per ISO 5-3
+
+=item 4
+
+Data format keys for 'density' encoding are 'D_RED', 'D_GREEN', 'D_BLUE' and 'D_VIS', per ISO 28178
+
+Data format keys for 'linear' encoding are 'R_RED', 'R_GREEN', 'R_BLUE' and 'R_VIS'
+
+=back
+
+=head3 add_udf
+
+This method adds data computed by a user-defined function (udf).
+Two types of udfs are possible, selected by the 'element' or 'sample' keys in the parameter hash.
+An 'element' udf is used to compute a sample one element at a time, with each element processed identically.
+A 'sample' udf is used to compute an entire sample at once, with flexibility of inputs and outputs.
+
+The input parameters for 'add_udf' are a list of column slices and a hash.
+The column slices define the inputs to the udf. For an 'element' udf, a scalar column index may also be used.
+A column slice for the added data is returned.
+
+An 'element' udf is called once for each element of a column slice. The column slices must all be the same size.
+The input parameters to the 'element' udf are a single value from each of the slices, followed by the slice index.
+If a column slice is a scalar, the data value of that column is used as the udf input parameter, regardless of the index.
+A single computed value is returned.
+
+A 'sample' udf is called just once for each sample. The column slices may be various sizes.
+The input parameters to the 'sample' udf are data slices corresponding to the column slices.
+Computed value(s) are returned as a list.
+
+B<Usage>
+
+    $cols = $chart->add_udf($cols1, $cols2, ... $hash);
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.mxf'); # chart contains spectral data with multiple measurement conditions
+    $m1 = $chart->spectral({'context' => 'M1_Measurement'}); # M1 column slice
+    $m2 = $chart->spectral({'context' => 'M2_Measurement'}); # M2 column slice
+    $dev = $chart->device({'context' => 'Target'});
+
+    $cols = $chart->add_udf($m1, $m2, {'element' => sub {return(($_[0] + $_[1])/2)}}); # averages M1 and M2 data, element-by-element, see notes 1 and 2
+    $cols = $chart->add_udf($m1, $m2, {'sample' => sub {return(map {($_[0][$_] + $_[1][$_])/2} (0 .. $#{$_[0]}))}}); # averages entire sample
+    $cols = $chart->add_udf($m1, $m2, {'element' => sub {return(($_[0] + $_[1])/2)}, 'rows' => [1, 2, 3]}); # set row slice, see note 2
+    $cols = $chart->add_udf($m1, $m2, {'element' => sub {return(($_[0] + $_[1])/2)}, 'start' => 100}); # set starting column index, see note 2
+    $cols = $chart->add_udf($m1, $m2, {'element' => sub {return(($_[0] + $_[1])/2)}, 'added' => 'avg'}); # set data format context, see note 2
+    $cols = $chart->add_udf($m1, $m2, {'element' => sub {return(($_[0] + $_[1])/2)}, 'added' => [map {"avg_$_"} (0 .. 35)]}); # set data format, see note 2
+    $cols = $chart->add_udf($dev, {'sample' => sub {return(@{$_[0]})}, 'device' => 1, 'added' => 'dev'}); # add device values, see note 2
+
+=over
+
+=item 1
+
+Each column slice must be the same size for an 'element' udf
+
+Scalar column indices are also allowed for an 'element' udf
+
+=item 2
+
+Hash keys are 'element', 'sample', 'device', 'rows', 'start', and 'added'
+
+Hash value for 'element' is a user-defined function (CODE reference) that processes element-by-element
+
+UDF input parameters are a single value for each column slice, followed by the column index, output is a single calculated value
+
+Hash value for 'sample' is a user-defined function (CODE reference) that processes an entire sample at once
+
+UDF input parameters are arrays of values for each column slice, output is an array of calculated values
+
+Either an 'element' udf or a 'sample' udf is required, but not both
+
+Hash value for 'device' is a flag. If true, RGB/CMYK/nCLR values are converted to device values for input to the udf. Default is false.
+
+Hash value for 'rows' is a row slice of the rows to be computed. Default is all rows
+
+Hash value for 'start' is the column index of the first added column. Default is to append
+
+Hash value for 'added' is either a scalar, an array of scalars, or undef. Default is 'udf'
+
+=back
+
+=head3 add_date
+
+This method appends a column containing the creation date, which is useful when exporting data to other applications.
+The creation date is normally stored in the header array, and is accessed with the L</"created"> method.
+
+B<Usage>
+
+    $cols = $chart->add_date(); # add creation date
+    $cols = $chart->add_date($hash); # with optional parameters
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $cols = $chart->add_date(); # add creation date (see note 1)
+    $cols = $chart->add_date({'context' => 'M0_measurement', 'added' => 'My'}); # with contexts (see note 2)
+    $cols = $chart->add_date({'status' => 'T'}); # ISO 5-3 status (see note 2)
+
+=over
+
+=item 1
+
+The same date is added for each sample
+
+=item 2
+
+Hash keys are 'date', 'format' and 'added'
+
+Default value for 'date' is the 'CREATED' value, or the local time if none
+
+Default value for 'format' is Unix time
+
+=back
+
+=head3 add_rows
+
+This convenience method is used to append data rows to a chart object.
+It computes the the offset, then calls the 'splice_rows' method.
+The added row slice is returned.
+
+B<Usage>
+
+    $rows = $chart->add_rows($mat);
+    $rows = $chart->add_rows($mat, $cols);
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+
+    # adding rows
+    $mat = $chart->slice([1 .. 5]); # get rows 1 - 5
+    $rows = $chart->add_rows($mat);
+    $rows = $chart->add_rows($mat, [3 .. 5]);
+
+=head3 add_cols
+
+This convenience method is used to append data columns to a chart object.
+It computes the the offset, prepends the optional header, then calls the 'splice_cols' method.
+The added column slice is returned.
+
+B<Usage>
+
+    $cols = $chart->add_cols($mat);
+    $cols = $chart->add_cols($mat, $header);
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+
+    # adding columns
+    $mat = $chart->slice([0 .. $chart->size], [2 .. 4]); # get columns 2 - 4, including format row
+    $cols = $chart->add_cols($mat);
+    $cols = $chart->add_cols($mat, [qw(XYZ_X XYZ_Y XYZ_Z)]);
+
+=head2 Splicing Data
+
+=head3 splice_rows
+
+This method is used to add or remove data rows to/from a chart object.
+Perl's B<splice> function is used to modify the data array.
+The offset and length parameters are passed directly to the B<splice> function.
+With the proper choice of parameters, this method can insert, replace, append or remove data rows.
+Removed data is returned as a Math::Matrix object (2-D array structure).
+The optional column slice maps the columns of the added data to the object's data array.
+Rebuilds the SAMPLE_ID hash.
+
+B<Usage>
+
+    $removed_mat = $chart->splice_rows();
+    $removed_mat = $chart->splice_rows($offset);
+    $removed_mat = $chart->splice_rows($offset, $length);
+    $removed_mat = $chart->splice_rows($offset, $length, $mat);
+    $removed_mat = $chart->splice_rows($offset, $length, $mat, $cols);
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+
+    # adding rows
+    $mat = $chart->slice([1 .. 5]); # get rows 1 - 5
+    $rem = $chart->splice_rows(1, 0, $mat); # insert at row 1
+    $rem = $chart->splice_rows(6, 5, $mat); # replace rows 6 - 10
+    $rem = $chart->add_rows($mat); # append
+
+    # adding rows with column mapping
+    $mat = $chart->lab([1 .. 5]); # get L*a*b* rows 1 - 5
+    $cols = $chart->lab(); # get L*a*b* column slice
+    $rem = $chart->splice_rows(11, 0, $mat, $cols); # insert at row 11
+
+    # removing rows
+    $rem = $chart->splice_rows(1, 5); # remove rows 1 - 5
+    $rem = $chart->splice_rows(10); # remove rows 10 onward
+    $rem = $chart->splice_rows(-1); # remove last row
+    $rem = $chart->splice_rows(); # remove all rows
+
+=head3 splice_cols
+
+This method is used to add or remove data columns to/from a chart object.
+Perl's B<splice> function is used to modify the data array.
+The offset and length parameters are passed directly to the B<splice> function.
+With the proper choice of parameters, this method can insert, replace, append or remove data columns.
+Removed data is returned as a Math::Matrix object (2-D array structure).
+The optional row slice maps the rows of the added data to the object's data array.
+The colorimetry array is also modified to maintain correspondence with the data array.
+
+B<Usage>
+
+    $removed_mat = $chart->splice_cols();
+    $removed_mat = $chart->splice_cols($offset);
+    $removed_mat = $chart->splice_cols($offset, $length);
+    $removed_mat = $chart->splice_cols($offset, $length, $mat); (see note 1)
+    $removed_mat = $chart->splice_cols($offset, $length, $mat, $rows); (see note 1)
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+
+    # adding columns
+    $mat = $chart->slice([0 .. $chart->size], [2 .. 4]); # get columns 2 - 4, including format row
+    $rem = $chart->splice_cols(1, 0, $mat); # insert at column 1
+    $rem = $chart->splice_cols(6, 3, $mat); # replace columns 6 - 8
+    $rem = $chart->add_cols($mat); # append
+
+    # adding columns with row mapping
+    $mat = $chart->slice([0 .. 5], [2 .. 4]); # get rows 0 - 5, columns 2 - 4
+    $rows = [0, 3, 7, 9, 18, 5]; # map to random rows
+    $rem = $chart->splice_cols(11, 0, $mat, $rows); # insert at row 11
+
+    # removing columns
+    $rem = $chart->splice_cols(1, 5); # remove columns 1 - 5
+    $rem = $chart->splice_cols(5); # remove columns 5 onward
+    $rem = $chart->splice_cols(-1); # remove last column
+    $rem = $chart->splice_cols(); # remove all columns
+
+=over
+
+=item 1
+
+If C<$mat> does not contain a row corresponding to the data array, C<undef> elements are inserted to maintain the array's integrity.
+
+=back
+
+=head2 Removing data
+
+=head3 remove_rows
+
+This method is used to remove data rows from a chart object.
+Row 0, the DATA_FORMAT row is preserved.
+Rebuilds the SAMPLE_ID hash.
+
+B<Usage>
+
+    $removed_mat = $chart->remove_rows($rows);
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+
+    # removing rows
+    $rem = $chart->remove_rows([1 .. 10]); # remove rows 1 - 10
+    $rem = $chart->remove_rows([7, 33, 100, 3]); # remove rows - any order is okay
+    $rem = $chart->remove_rows([[1 .. 10], 55, 27]); # remove rows - structure is flattened
+    $rem = $chart->remove_rows([]); # remove all rows (except row 0, the DATA_FORMAT row)
+
+=head3 remove_cols
+
+This method is used to remove data columns from a chart object.
+The colorimetry array is also modified.
+Clears the SAMPLE_ID hash if the SAMPLE_ID column is removed.
+
+B<Usage>
+
+    $removed_mat = $chart->remove_cols($rows);
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+
+    # removing rows
+    $rem = $chart->remove_cols([2 .. 4]); # remove columns 2 - 4
+    $rem = $chart->remove_cols([4, 3, 2, 7]); # remove columns - any order is okay
+    $rem = $chart->remove_cols([$chart->name, $chart->lab]); # remove columns - structure is flattened
+    $rem = $chart->remove_cols([]); # remove all columns
+
+=head2 Selecting data
+
+=head3 select_matrix
+
+This method returns a row-matrix from row and column coordinate parameters.
+The row-matrix selects (crops) a rectangular area of the chart.
+
+A data set, which is a one dimensional list of samples, is mapped to a two-dimensional chart.
+The first sample is placed in the upper-left corner of the chart.
+The following samples are placed in this column from top to bottom.
+The height of the chart is called the row length (although it is really the length of the columns).
+When a column is filled, the next sample is placed at the top of a new column to the right.
+
+The row-matrix is a Math::Matrix object (a 2-D array structure) containing sample indices of a chart.
+The matrix is transposed, with the rows of the matrix representing the physical columns described above.
+This allows the row-matrix to be used as a row slice parameter in most methods.
+Row slices are flattened by a function which joins the rows together into a one-dimensional list.
+
+The object may contain the row length as a keyword. Otherwise, a default value will be used.
+The row length may be specified as a parameter, which takes precedence over the object value.
+When the method is called without parameters, a row-matrix of the entire chart is returned.
+If row and column indices are specified, the chart will be cropped to include these rows and columns.
+The row and column indices are one-based, i.e. the upper left sample is row 1, column 1.
+
+The row-matrix can be rotated (L</rotate>), flipped (L</flip>), or randomized (L</randomize>).
+
+B<Usage>
+
+    $mat = $chart->select_matrix();
+    $mat = $chart->select_matrix($row_length);
+    $mat = $chart->select_matrix($upper_row_index, $lower_row_index, $left_column_index, $right_column_index); (see note 1)
+    $mat = $chart->select_matrix($upper_row_index, $lower_row_index, $left_column_index, $right_column_index, $row_length); (see note 1)
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/GRACoL2006_Coated1.txt'); # chart contains 33 rows and 49 columns
+
+    $mat = $chart->select_matrix(); # select the entire chart, row length = 33 (33 x 49 chart)
+    $chart->write('~/Desktop/full_chart.txt', $mat);
+
+    $mat = $chart->select_matrix(21); # select the entire chart, row length = 21, (21 x 77 chart)
+    $chart->write('~/Desktop/full_chart_21.txt', $mat);
+
+    $mat = $chart->select_matrix(1, 5, 1, 5); # select 5 x 5 matrix (from 33 x 49 chart)
+    $chart->write('~/Desktop/full_chart_5x5.txt', $mat);
+
+    $mat = $chart->select_matrix(1, 5, 1, 5, 21); # select 5 x 5 matrix (from 21 x 77 chart)
+    $chart->write('~/Desktop/full_chart_5x5A.txt', $mat);
+
+=over
+
+=item 1
+
+Indices are one-based, with origin at the upper left
+
+=back
+
+=head3 select_template
+
+This method returns a row-matrix containing samples with the same device values as a template chart.
+
+See 'select_matrix' for an explanation of the row-matrix structure.
+
+Samples are selected using device values.
+Chart and template objects must have device data with the same number of channels.
+If the exact device values of the template are not found in the object, the sample with the smallest device value error is used.
+The device value error is computed as a root-mean-square value.
+
+The chart may contain duplicate samples having the same device values.
+The B<dups> parameter determines how these duplicates will be handled.
+The B<rows> parameter sets the number of elements in each matrix row.
+The B<context> parameter sets the device context of the chart object.
+The B<template_context> parameter sets the device context of the template object.
+
+The default B<dups> behavior is to average duplicate samples.
+The default B<rows> is taken from various possible sources within the data.
+
+This method will also copy selected values (after averaging, etc.) to the template chart.
+The behavior is enabled by the B<copy> parameter, whose value is the column slice to be copied.
+
+B<Usage>
+
+    $mat = $chart->select_template($template);
+    $mat = $chart->select_template($template, $hash);
+    ($mat, $sid) = $chart->select_template($template);
+    ($mat, $sid) = $chart->select_template($template, $hash);
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/random_data.txt');
+    $template = ICC::Support::Chart->new('~/Desktop/IT8.7-4V.txt');
+
+    $mat = $chart->select_template($template); # use default parameters
+    $chart->write('~/Desktop/IT874_data.txt', $mat);
+
+    $mat = $chart->select_template($template, {'dups' => 1}); # set duplicate handling (see note 1)
+    $chart->write('~/Desktop/IT874_FIFO_data.txt', $mat);
+
+    $mat = $chart->select_template($template, {'dups' => 1, 'method' => 'SIMPLE'}); # use simple averaging of L*a*b* and density
+    $chart->write('~/Desktop/IT874_FIFO_data.txt', $mat);
+
+    $mat = $chart->select_template($template, {'rows' => 33}); # set row length
+    $chart->write('~/Desktop/IT874_33_data.txt', $mat);
+
+    $mat = $chart->select_template($template, {'context' => 'Target'}); # set object context
+    $chart->write('~/Desktop/IT874_OC_data.txt', $mat);
+
+    $mat = $chart->select_template($template, {'template_context' => 'Target'}); # set template context
+    $chart->write('~/Desktop/IT874_TC_data.txt', $mat);
+
+    $mat = $chart->select_template($template, {'copy' => $chart->spectral()}); # set copy column slice (see note 2)
+    $template->write('~/Desktop/IT874_data.txt');
+
+    ($mat, $sid) = $chart->select_template($template); # get optional sid row-matrix (see note 3)
+    $chart->write('~/Desktop/IT874_data.txt', $mat, {'sid' => $sid}); # write file using template sid values
+
+=over
+
+=item 1
+
+Supported values: 0 - sample average (default), 1 - FIFO, 2 - LIFO, 3 - first sample, 4 - last sample
+
+=item 2
+
+The B<copy> parameter specifies a column slice which is copied to the template.
+Columns with the same field names and contexts are added to the template.
+If the device values differ, the object device values are also copied to the template.
+
+=item 3
+
+The optional sid row-matrix contains the SAMPLE_ID values of the template.
+If the template has no SAMPLE_ID field, the sid row-matrix is undefined.
+
+=back
+
+=head3 find
+
+This method returns a row slice of samples selected by a subroutine.
+For each sample, data values are passed to this subroutine, which returns 'true' to select that sample.
+The subroutine is supplied as a code reference.
+
+B<Usage>
+
+    $rows = $chart->find($code_ref);
+    $rows = $chart->find($code_ref, $source_rows);
+    $rows = $chart->find($code_ref, $source_rows, $source_columns);
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/GRACoL2006_Coated1.txt');
+
+    $rows = $chart->find(sub {$_[0] eq 'B7'}, [], $chart->name()); # find sample named 'A27'
+    $rows = $chart->find(sub {@_ == grep {$_ == 0} @_}, [], $chart->cmyk()); # find paper white samples (CMYK == 0)
+    $rows = $chart->find(sub {$_[0] == 100 && $_[1] == 0 && $_[2] == 100}, [], $chart->cmyk()); # find sample with specific CMY values
+    $rows = $chart->find(sub {$_[0] > 90}, [], $chart->lab()); # find samples with L* > 90
+    $rows = $chart->find(sub {$_[0] > 90}, [1000 .. $chart->size()], $chart->lab()); # find samples with L* > 90 in sample subset
+
+=head3 ramp
+
+This method returns a row slice of samples selected by a subroutine.
+For each sample, device values are passed to this subroutine, which returns 'true' to select that sample.
+The subroutine is supplied as a code reference.
+The chart must have device values.
+
+B<Usage>
+
+    $rows = $chart->ramp($code_ref);
+    $rows = $chart->ramp($code_ref, $source_rows);
+    $rows = $chart->ramp($code_ref, $source_rows, $hash);
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/GRACoL2006_Coated1.txt');
+
+    $code_ref = sub {@_ == grep {$_ == 0} @_}; # code block to select paper white samples
+    $rows = $chart->ramp($code_ref); # select paper white samples
+    $rows = $chart->ramp(sub {@_ == grep {$_ == 0} @_}); # same as above
+    $rows = $chart->ramp(sub {3 == grep {$_ == 0}  @_[1 .. 3]}); # select cyan ramp samples (MYK device values == 0)
+    $rows = $chart->ramp(sub {$_[3] == 0}); # select samples with no black (K device value == 0)
+    $rows = $chart->ramp(sub {$_[3] == 1}); # select samples with 100% black (K device value == 1)
+    $rows = $chart->ramp(sub {$_[0] == $_[1] && $_[1] == $_[2] && $_[3] == 0}); # select samples where C == M == Y and K == 0
+    $rows = $chart->ramp($code_ref, [1 ..100]); # select paper white samples from sample subset
+    $rows = $chart->ramp($code_ref, {'context' => 'Target'}); # specify device context
+
+=head3 range
+
+This method returns a row slice of samples selected by a subroutine.
+For each sample, L*a*b* values are passed to this subroutine, which returns 'true' to select that sample.
+The subroutine is supplied as a code reference.
+The chart must have L*a*b* values.
+
+B<Usage>
+
+    $rows = $chart->range($code_ref);
+    $rows = $chart->range($code_ref, $source_rows);
+    $rows = $chart->range($code_ref, $source_rows, $hash);
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/GRACoL2006_Coated1.txt');
+
+    $code_ref = sub {abs($_[1]) < 0.5 && abs($_[2]) < 0.5}; # code block to select near-neutral samples
+    $rows = $chart->range($code_ref); # select near-neutral samples
+    $rows = $chart->range(sub {abs($_[1]) < 0.5 && abs($_[2]) < 0.5}); # same as above
+    $rows = $chart->range($code_ref, [800 .. 1000]); # select neutral samples from sample subset
+    $rows = $chart->range($code_ref, {'context' => 'Target'}); # specify L*a*b* context
+
+=head3 randomize
+
+This method returns a randomly shuffled row slice.
+
+B<Usage>
+
+    $rows = $chart->randomize();
+    $rows = $chart->randomize($rows);
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/GRACoL2006_Coated1.txt');
+
+    $rows = $chart->randomize(); # returns random slice containing all rows (1 - 1617)
+    $rows = $chart->randomize([1 .. 100]); # returns random slice of first hundred rows
+
+=head3 analyze
+
+This method returns a structure describing the occurrence of device values within a chart.
+The structure is a reference to a 2-D array (matrix) with each row corresponding to a device channel.
+The first column is a hash whose keys are device values (in that channel), and whose values are row slices of the samples with that device value.
+The second column is an array of the device values, sorted by the number of samples, largest to smallest.
+The third column is a row slice of a ramp for that device channel, sorted by device value, smallest to largest.
+
+B<Usage>
+
+    $struct = $chart->anaylze();
+    $struct = $chart->anaylze($rows);
+    $struct = $chart->anaylze($rows, $hash);
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/GRACoL2006_Coated1.txt'); # CMYK chart
+    $chart2 = ICC::Support::Chart->new('~/Desktop/RGB_printer.txt'); # RGB chart
+
+    $struct = $chart->analyze(); # average any duplicate samples (see note 1)
+    $rows = $struct->[3][0]{0}; # get row slice of samples with K == 0
+    $rows = $struct->[3][0]{0.0}; # same as above
+    $rows = $struct->[3][0]{'0'}; # same as above
+    $rows = $struct->[3][0]{'0.0'}; # returns undef (see note 2)
+    $dev = $struct->[3][1]; # get list of black channel device values
+    $rows = $struct->[3][2]; # get row slice for black channel ramp
+    $struct = $chart->analyze([1 .. 100]); # analyze the first hundred samples
+    $struct = $chart->analyze({'dups' => 1}); # don't average duplicate samples (see note 3)
+    $struct = $chart->analyze({'context' => 'Target'}); # set device context
+    $struct = $chart2->analyze({'ramp' => 1}); #  (see note 4)
+    $struct = $chart2->analyze({'method' => 'SIMPLE'}); # use simple averaging for L*a*b* and density
+
+=over
+
+=item 1
+
+If there are duplicate samples (samples with the same device values), a corresponding average sample is appended to the chart.
+That sample index replaces the measured sample indices in the structure (see note 3).
+
+=item 2
+
+The key is the string equivalent of the numeric device value, in this case '0'.
+
+=item 3
+
+In this mode, duplicate sample indices are grouped within anonymous arrays, and saved in the structure (see note 1).
+
+=item 4
+
+An RGB ramp will normally run from black to red, green or blue, which is the proper result for an additive device.
+For a subtractive device, such as an RGB printer, you may want the ramp to run from paper white to cyan, magenta or yellow.
+This is accomplished by setting the 'ramp' value to 1.
+The sort order is not changed by this setting, so the subtractive RGB ramp will run from cyan, magenta or yellow to white.
+
+=back
+
+=head2 Reading and writing
+
+The B<new> method reads various file types (CGATS ASCII, CxF3, ASE, TIFF) to create an object.
+
+The following methods write a chart to various file types.
+
+=head3 write
+
+This method writes a chart to CGATS ASCII format (see CGATS.17 and ISO 28178).
+
+B<Usage>
+
+    $chart->write($file_path, [$hash]);
+    $chart->write($file_path, $rows, [$hash]);
+    $chart->write($file_path, $rows, $cols, [$hash]);
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/GRACoL2006_Coated1.txt'); # CGATS ASCII format
+    $chart2 = ICC::Support::Chart->new('~/Desktop/GRACoL2006_Coated1.mxf'); # CxF3 format
+
+    $chart->write('~/Desktop/entire_chart.txt'); # writes the entire chart - all rows and columns (see note 1)
+    $chart->write('~/Desktop/first_rows.txt', [1 .. 10]); # writes first ten rows, all columns
+    $chart->write('~/Desktop/first_columns.txt', [], [0 .. 5]); # writes all rows, first six columns
+    $chart->write('~/Desktop/first_rows_columns.txt', [1 .. 10], [0 .. 5]); # writes first ten rows, first six columns
+    $chart->write('~/Desktop/Lab_columns.txt', [], $chart->lab()); # writes L*a*b* columns
+    $chart->write('~/Desktop/id_cmyk_columns.txt', [], [$chart->id(), $chart->cmyk()]); # writes SAMPLE_ID and CMYK columns
+    $chart->write('~/Desktop/XYZ_columns.txt', [], $chart->cols(qw(XYZ_X XYZ_Y XYZ_Z))); # writes XYZ columns
+    $chart->write('~/Desktop/matrix.txt', $chart->select_matrix(5, 10, 5, 10)); # writes a 6 x 6 matrix
+    $chart2->write('~/Desktop/entire_chart2.txt'); # writes the entire chart (see note 2)
+
+    $cols = $chart2->xyz({'context' => 'M0_Measurement'}); # get column slice with specific context
+    $chart2->write('~/Desktop/context.txt', [], $cols); # write XYZ columns with specific context (see note 2)
+
+    $chart->write('~/Desktop/chart.txt', [], {'undef' => 0}); # undefined data values are replaced by 0 (see note 3)
+    $chart->write('~/Desktop/chart.txt', [], {'null' => 'unknown'}); # null string data values are replaced by 'unknown' (see note 3)
+
+    $chart->write('~/Desktop/external_sid1.txt', [], $chart->cmyk(), {'sid' => 'row'}); # add SAMPLE_ID field using row number (see note 4)
+    $chart->write('~/Desktop/external_sid2.txt', [], $chart->cmyk(), {'sid' => $sid}); # add SAMPLE_ID field using sid slice (see note 5)
+    $chart->write('~/Desktop/external_sid3.txt', [], {'sid' => $sid}); # add SAMPLE_ID field using slice (see note 6)
+
+    $mat = $chart->select_matrix->rotate(1); # get rotation matrix
+    $chart->write('~/Desktop/external_sid4.txt', $mat, $chart->cmyk(), {'sid' => $mat}); # add SAMPLE_ID field when rotating (see note 7)
+
+=over
+
+=item 1
+
+The first sample row is row 1 (row 0 contains the DATA_FORMAT field names).
+
+=item 2
+
+The context prefix is stripped from the DATA_FORMAT field names.
+
+=item 3
+
+Hash keys are 'undef', 'null', and 'sid'.
+
+Default value for 'undef' is 'undef'.
+
+Default value for 'null' is 'null.
+
+=item 4
+
+A SAMPLE_ID field is inserted at the start of the DATA_FORMAT header and each DATA record.
+The SAMPLE_ID value is the row number, starting with one.
+
+=item 5
+
+A SAMPLE_ID field is inserted at the start of the DATA_FORMAT header and each DATA record.
+The SAMPLE_ID value is the value contained in the flattened sid slice. The slice may be an array or a row-matrix.
+This is useful when the row slice is a 'select_template' row-matrix, and we want to use the SAMPLE_ID values of the template.
+
+=item 6
+
+If the column slice contains a SAMPLE_ID field, the sid slice values are used, rather than the data array values,
+and no SAMPLE_ID field is inserted.
+
+=item 7
+
+A SAMPLE_ID field is inserted at the start of the DATA_FORMAT header and each DATA record.
+The SAMPLE_ID value is the value contained in the flattened rotation matrix, which is the row in the data array.
+
+=back
+
+=head3 writeCxF3
+
+This method writes a chart to CxF3 format (see Color Exchange Format 3.0 and ISO 17972-1).
+
+B<Usage>
+
+    $chart->writeCxF3($file_path, [$hash]);
+    $chart->writeCxF3($file_path, $rows, [$hash]);
+    $chart->writeCxF3($file_path, $rows, $cols, [$hash]);
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/GRACoL2006_Coated1.txt'); # CGATS ASCII format
+    $chart2 = ICC::Support::Chart->new('~/Desktop/GRACoL2006_Coated1.mxf'); # CxF3 format
+
+    $chart->writeCxF3('~/Desktop/entire_chart.mxf'); # writes the entire chart - all rows and columns (see notes 1 and 2)
+    $chart->writeCxF3('~/Desktop/first_rows.mxf', [1 .. 10]); # writes first ten rows, all columns
+    $chart->writeCxF3('~/Desktop/first_columns.mxf', [], [0 .. 5]); # writes all rows, first six columns (see note 3)
+    $chart->writeCxF3('~/Desktop/first_rows_columns.mxf', [1 .. 10], [0 .. 5]); # writes first ten rows, first six columns
+    $chart->writeCxF3('~/Desktop/Lab_columns.mxf', [], $chart->lab()); # writes L*a*b* columns
+    $chart->writeCxF3('~/Desktop/id_cmyk_columns.mxf', [], [$chart->id(), $chart->cmyk()]); # writes SAMPLE_ID and CMYK columns
+    $chart->writeCxF3('~/Desktop/XYZ_columns.mxf', [], $chart->cols(qw(XYZ_X XYZ_Y XYZ_Z))); # writes XYZ columns (see note 4)
+    $chart->writeCxF3('~/Desktop/matrix.mxf', $chart->select_matrix(5, 10, 5, 10)); # writes a 6 x 6 matrix
+    $cols = $chart2->xyz({'context' => 'M0_Measurement'}); # get column slice with specific context
+    $chart2->writeCxF3('~/Desktop/context.mxf', [], $cols); # write XYZ columns with specific context
+    $chart2->writeCxF3('~/Desktop/context.mxf', {'cc:FileInformation' => [qw(MATERIAL)]}); # copy MATERIAL keyword/value to 'FileInformation' structure.
+    $chart2->writeCxF3('~/Desktop/context.mxf', {'validate' => 1}); # validate to CxF3 schema
+
+=over
+
+=item 1
+
+The first sample row is row 1 (row 0 contains the DATA_FORMAT field names).
+
+=item 2
+
+The ObjectType attribute is set to the context prefix (if present), or is inferred from the from the format fields.
+
+=item 3
+
+The CxF3 format requires complete groups of data. For example, you can save L*a*b* data, but not L* by itself.
+
+=item 4
+
+X-Rite i1Profiler does not support XYZ measurement data.
+
+=back
+
+=head3 writeASCII
+
+This method writes the data array in ASCII delimited format for Excel, R, MATLAB, etc. The optional hash controls the inclusion of a
+header line, the field separator, the record separator and the undefined string. The header line contains the DATA_FORMAT
+field names, with any contexts removed, and is the first line in the file, if included.
+
+B<Usage>
+
+    $chart->writeASCII($file_path, [$hash]);
+    $chart->writeASCII($file_path, $rows, [$hash]);
+    $chart->writeASCII($file_path, $rows, $cols, [$hash]);
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/GRACoL2006_Coated1.txt'); # CGATS ASCII format
+
+    $chart->writeASCII('~/Desktop/entire_chart.txt'); # writes the entire chart - all rows and columns (see note 1)
+    $chart->writeASCII('~/Desktop/first_rows.txt', [1 .. 10]); # writes first ten rows, all columns
+    $chart->writeASCII('~/Desktop/first_columns.txt', [], [0 .. 5]); # writes all rows, first six columns
+    $chart->writeASCII('~/Desktop/first_rows_columns.txt', [1 .. 10], [0 .. 5]); # writes first ten rows, first six columns
+    $chart->writeASCII('~/Desktop/no_header.txt', {'header' => 0}); # omit the header (see notes 2 and 3)
+    $chart->writeASCII('~/Desktop/comma_delimited.txt', {'sep' => ','}); # use comma for field separator
+    $chart->writeASCII('~/Desktop/line_feed.txt', {'eol' => "\r\n"}); # use carriage return/line feed for record separator
+    $chart->writeASCII('~/Desktop/undef_NA.txt', {'undef' => 'NA'}); # use 'NA' string for undefined data
+
+=over
+
+=item 1
+
+The first sample row is row 1 (row 0 contains the DATA_FORMAT field names).
+
+=item 2
+
+The optional hash must be the last parameter.
+
+=item 3
+
+Hash keys are 'header', 'sep', 'eol', and 'undef'.
+
+Allowed values for 'header' are 0 (no header), 1 (header with contexts), and 2 (header without contexts).
+
+Default value for 'header' is 1.
+
+Default value for 'sep' is the tab character.
+
+Default value for 'eol' is the line feed character.
+
+Default value for 'undef' is the null string.
+
+=back
+
+=head3 writeTIFF
+
+This method writes a TIFF image file.
+The samples are selected by the row slice, and the corresponding TIFF patches are arranged as rows and columns.
+The first sample is in the upper-left corner, and the samples are arranged in column-major order (top to bottom, left to right).
+The TIFF color space is determined by the first supported field in the column slice. Supported color spaces are RGB, CMYK, nCLR and L*a*b*.
+RGB files may have alpha channels, identified by the keywords 'RGB_A', 'RGB_A1', RGB_A2', etc.
+nCLR files are written as CMYK + spot TIFF files, therefore n must be 4 or greater to write as a TIFF.
+
+B<Usage>
+
+    $chart->writeTIFF($file_path, [$hash]);
+    $chart->writeTIFF($file_path, $rows, [$hash]);
+    $chart->writeTIFF($file_path, $rows, $cols, [$hash]);
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/GRACoL2006_Coated1.txt'); # CGATS TR006 standard data set
+
+    $chart->writeTIFF('~/Desktop/cmyk.tif'); # all samples, CMYK color space, default parameters (see note 1)
+    $chart->writeTIFF('~/Desktop/cmyk_1-10.tif', [1 .. 10]); # samples 1 - 10
+    $chart->writeTIFF('~/Desktop/cmyk_rotate.tif', $chart->select_matrix->rotate(1)); # all samples, rotated 90 degrees CW
+    $chart->writeTIFF('~/Desktop/lab.tif', [], $chart->lab()); # all samples, color space is L*a*b*
+    $chart->writeTIFF('~/Desktop/cmyk_2020.tif', {'width' => 20, 'height' => 20}); # patch size is 20 px by 20 px (see note 2)
+    $chart->writeTIFF('~/Desktop/cmyk_20203.tif', {'width' => 20, 'height' => 20, 'gap' => 3}); # same as above, with 3 px gap (see note 3)
+    $chart->writeTIFF('~/Desktop/cmyk_2020363.tif', {'width' => 20, 'height' => 20, 'gap' => 3, 'left' => 6, 'right' => 3}); # same as above, with edges (see note 3)
+    $chart->writeTIFF('~/Desktop/cmyk_20203633.tif', {'width' => 20, 'height' => 20, 'gap' => 3, 'left' => 6.3, 'right' => 3}); # same as above, with edge overlap (see note 3)
+    $chart->writeTIFF('~/Desktop/cmyk_8-bit.tif', {'width' => 20, 'height' => 20, 'bits' => 8}); # 8-bit data (see note 4)
+    $chart->writeTIFF('~/Desktop/cmyk_dither.tif', {'width' => 20, 'height' => 20, 'bits' => 8, 'dither' => 1}); # dithered (see note 5)
+    $chart->writeTIFF('~/Desktop/cmyk_300dpi.tif', {'width' => 20, 'height' => 20, 'xres' => 300, 'yres' => 300}); # resolution 300 dpi (see note 6)
+    $chart->writeTIFF('~/Desktop/cmyk_120dpcm.tif', {'width' => 20, 'height' => 20, 'xres' => 120, 'yres' => 120, 'unit' => 3}); # resolution 120 dpcm (see note 7)
+    $chart->writeTIFF('~/Desktop/cmyk_32rows.tif', {'width' => 20, 'height' => 20, 'rows' => 32}); # row length is 32 (see note 8)
+    $chart->writeTIFF('~/Desktop/cmyk_bigendian.tif', {'endian' => 'big'}); # file is big-endian (see note 9)
+
+=over
+
+=item 1
+
+Omitting the row and column slices selects all samples and all fields. The first supported field in this file is 'CMYK_C', so the TIFF color space is CMYK.
+
+=item 2
+
+Patch size is specified by the 'width' and 'height' hash values (in pixels). Default values are 1 pixel.
+
+=item 3
+
+Gap width is specified by the 'gap' hash value (in pixels).
+Left and right edge width is specified by the 'left' and 'right' hash values (in pixels).
+Left and right edge width may also be specified as m.n where m is the width and n is the overlap.
+Gaps and edges are used by scanning instruments, such as X-Rite's i1Pro2, to locate patch boundaries.
+Default values are 0 pixels (no gap or edges).
+
+=item 4
+
+Bits per pixel is specified by the 'bits' hash value. Allowed values are 8, 16 and 32. Default value is 16.
+
+=item 5
+
+Dithering is enabled by a 'dither' hash value. Dithering is used on 8-bit files to simulate tone values between 8-bit integer values. The value is boolean with a default of 0.
+
+=item 6
+
+Resolution is specified by the 'xres' and 'yres' hash values. Default values are 72.
+
+=item 7
+
+Resolution units are specified by the 'units' hash value. Allowed values are 1 (no absolute unit), 2 (dpi) and 3 (dpcm). Default value is 2 (dpi).
+
+=item 8
+
+Row length is specified by the 'rows' hash value. Default is taken from the 'LGOROWLENGTH' keyword, or computed to make a square file.
+
+=item 9
+
+Byte order is specified by the 'endian' hash value. Allowed values are 'big' and 'little'. Default value is the system byte order.
+
+=back
+
+=head3 writeASE
+
+This method writes a chart to Adobe Swatch Exchange format, which is used by the Adobe Creative Suite applications.
+
+B<Usage>
+
+    $chart->writeASE($file_path, $rows, $cols);
+    $chart->writeASE($file_path, $rows, $cols, $color_type);
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/GRACoL2006_Coated1.txt'); # CGATS ASCII format
+
+    $chart->writeASE('~/Desktop/cmyk_all.ase', [], $chart->cmyk()); # write all samples as CMYK values (see notes 1 and 2)
+    $chart->writeASE('~/Desktop/cmyk_10.ase', [1 .. 10], $chart->cmyk()); # write first ten samples
+    $chart->writeASE('~/Desktop/Lab_all.ase', [], $chart->lab()); # write all samples as L*a*b* values
+    $chart->writeASE('~/Desktop/Lab_all_global.ase', [], $chart->lab(), 0); # swatches are global (see note 3)
+
+=over
+
+=item 1
+
+Supported color types are CMYK, RGB and L*a*b*. The column slice must be one of these types.
+
+=item 2
+
+If the chart contains a SAMPLE_NAME field, it will be used as the swatch name.
+Otherwise, a name is created from the color values, e.g. C=100 M=50 Y=0 K=0.
+The SAMPLE_NAME field should not be included in the column slice.
+
+=item 3
+
+The color type may be: 0 - global, 1 - spot, 2 - normal (default)
+
+=back
+
+=head2 Math::Matrix additions
+
+These methods are used to manipulate the geometry of a chart in two dimensions.
+A chart is actually a one-dimensional list of samples, but is commonly treated as a two-dimensional object, having rows and columns of patches.
+For example, the IT8.7/4 target contains 1617 samples, and is often rendered as a matrix of 33 rows and 49 columns (which perfectly fills the bed of a SpectroScan table).
+
+When a chart is written as a CGATS ASCII file it is a one-dimensional list of samples.
+When displayed by other software, the samples are arranged sequentially in rows or columns, as a two-dimensional matrix.
+For instance, the Gretag-Macbeth MeasureTool software starts in the upper LH corner, and displays in columns, from top to bottom, left to right.
+Other software may use a different convention, for instance, from left to right, top to bottom.
+
+We use a row matrix to represent a set of samples in a two-dimensional arrangement.
+The row matrix is a C<Math::Matrix> object, and contains row numbers in an array-of-arrays structure.
+The row matrix may be used as a row slice parameter in most methods, in which case it is flattened to a one-dimensional list.
+The B<select_matrix> and B<select_template> methods are typically used to create the row matrix.
+
+The methods below will modify the geometry of the row matrix, rotating, flipping and transposing in all possible combinations.
+In addition, there is a randomize method, which is used to scramble the chart data.
+These methods return a new row matrix, with the samples rearranged.
+The methods may be combined, as shown in the examples below.
+
+=head3 rotate
+
+B<Usage>
+
+    $mat = $mat->rotate($n); # rotate Math::Matrix object
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $mat = $chart->select_matrix(); # make row matrix of the full chart
+    $chart->write('~/Desktop/my_rotated_file.txt', $mat->rotate(1)); # write rotated chart (see note 1)
+
+=over
+
+=item 1
+
+Parameter values are: 0 = None, 1 = 90° CW, 2 = 180°, 3 = 90° CCW
+
+=back
+
+=head3 flip
+
+B<Usage>
+
+    $mat = $mat->flip($n); # flip Math::Matrix object
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $mat = $chart->select_matrix(); # make row matrix of the full chart
+    $chart->write('~/Desktop/my_flipped_file.txt', $mat->flip(1)); # write flipped chart (see note 1)
+    $chart->write('~/Desktop/my_rot_flip_file.txt', $mat->rotate(1)->flip(1)); # rotate, then flip
+
+=over
+
+=item 1
+
+Parameter values are: 0 = transpose, 1 = horizontal, 2 = cross transpose, 3 = vertical
+
+=back
+
+=head3 randomize
+
+B<Usage>
+
+    $mat = $mat->randomize($n); # randomize Math::Matrix object
+
+B<Examples>
+
+    use ICC::Support::Chart;
+
+    $chart = ICC::Support::Chart->new('~/Desktop/my_file.txt');
+    $mat = $chart->select_matrix(); # make row matrix of the full chart
+    $chart->write('~/Desktop/my_random_file.txt', $mat->randomize()); # write randomized chart
+    $chart->write('~/Desktop/my_rot_random_file.txt', $mat->rotate(1)->randomize()); # rotate, then randomize
+
+This B<randomize> method is for C<Math::Matrix> objects. There is another B<randomize> method for C<ICC::Support::Chart> objects in the B<Selecting data> section.
+
+=head1 SEE ALSO
+
+=head2 ANSI Standards
+
+B<CGATS.4> I<Graphic technology - Graphic arts reflection densitometry measurements - Terminology, equations, image elements and procedures>
+
+B<CGATS.5> I<Graphic technology - Spectral measurement and colorimetric computation for graphic arts images>
+
+B<CGATS.17> I<Graphic technology - Exchange format for color and process control data using XML or ASCII text>
+
+B<IT8.7/4> I<Graphic technology - Input data for characterization of 4-color process printing - Expanded data set>
+
+=head2 ASTM Standards
+
+B<ASTM D 2244> I<Standard Practice for Calculation of Color Tolerances and Color Differences from Instrumentally Measured Color Coordinates>
+
+B<ASTM E 308> I<Standard Practice for Computing the Colors of Objects by Using the CIE System>
+
+B<ASTM E 1708> I<Standard Practice for Electronic Interchange of Color and Appearance Data>
+
+B<ASTM E 2022> I<Standard Practice for Calculation of Weighting Factors for Tristimulus Integration>
+
+B<ASTM E 2729> I<Standard Practice for Rectification of Spectrophotometric Bandpass Differences>
+
+=head2 CIE Standards
+
+B<CIE 15> I<Colorimetry>
+
+=head2 ISO Standards
+
+B<ISO 5-3> I<Photography and graphic technology — Spectral density measurements — Part 3: Spectral conditions>
+
+B<ISO 13655> I<Graphic technology — Spectral measurement and colorimetric computation for graphic arts images>
+
+B<ISO 15076-1> I<Image technology colour management — Architecture, profile format and data structure — Part 1: Based on ICC.1:2010>
+
+B<ISO 17972-1> I<Graphic technology — Colour data exchange format (CxF/X) — Part 1: Relationship to CxF3 (CxF/X-1)>
+
+B<ISO 28178> I<Graphic technology — Exchange format for colour and process control data using XML or ASCII text>
+
+=head2 Proprietary Standards
+
+B<Color Exchange Format 3.0> I<A standard for exchange of color information (X-Rite)>
+
+B<ICC.1> I<Image technology colour management — Architecture, profile format, and data structure (ICC)>
+
+=head1 LICENSE
+
+Programs in this distribution, authored by William B. Birkett, are licensed under the GNU General Public License, v3.
+
+See L<http://www.gnu.org/licenses/gpl.html> for license details.
+
+=head1 AUTHOR
+
+William B. Birkett, E<lt>wbirkett@doplganger.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright © 2004-2018 by William B. Birkett
+
+=cut

@@ -1,6 +1,12 @@
 Revision history for Perl extension Search::HiLiter.
 
-1.004 11 Marh 2016
+1.006 24 March 2018
+ - Apparently toLOWER_utf8_safe is not present before Perl 5.26
+
+1.005 24 March 2018
+ - Fix Perl warning about deprecated toLOWER_utf8 and some compiler warnings.
+
+1.004 11 March 2016
  - Carp::cluck() in to_utf8() is the string argument is undefined
 
 1.003 08 June 2015

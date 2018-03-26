@@ -12,7 +12,7 @@ use Search::Query;
 use Search::Query::Parser;
 use namespace::autoclean;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 has 'max_hits' => ( is => 'rw', isa => Int, default => 1000 );
 has 'invindex' => (
@@ -41,7 +41,7 @@ Dezi::Searcher - base searcher class
                     invindex        => 'path/to/index',
                     max_hits        => 1000,
                 );
-                
+
  my $results = $searcher->search( 'foo bar' );
  while (my $result = $results->next) {
      printf("%4d %s\n", $result->score, $result->uri);
@@ -189,7 +189,7 @@ Peter Karman, E<lt>karpet@dezi.orgE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-dezi-app at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
@@ -234,10 +234,10 @@ L<https://metacpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2014 by Peter Karman
+Copyright 2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the terms of the GPL v2 or later.
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

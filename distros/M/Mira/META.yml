@@ -41,5 +41,5 @@ requires:
   perl: '5.012'
 resources:
   repository: https://github.com/kiamazi/mira.git
-version: v00.07.51
+version: v00.07.55
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

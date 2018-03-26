@@ -1,5 +1,8 @@
-package WebService::Braintree::DocumentUploadGateway;
-$WebService::Braintree::DocumentUploadGateway::VERSION = '1.1';
+# vim: sw=4 ts=4 ft=perl
+
+package # hide from pause
+    WebService::Braintree::DocumentUploadGateway;
+
 use 5.010_001;
 use strictures 1;
 
@@ -7,6 +10,8 @@ use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 
 has 'gateway' => (is => 'ro');
+
+use WebService::Braintree::_::DocumentUpload;
 
 sub create {
     my ($self, $params) = @_;

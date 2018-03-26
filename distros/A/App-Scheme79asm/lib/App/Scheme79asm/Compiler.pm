@@ -6,7 +6,7 @@ use warnings;
 use parent qw/Exporter/;
 
 our @EXPORT_OK = qw/pretty_print/;
-our $VERSION = 0.004;
+our $VERSION = '0.005';
 
 use Carp qw/croak/;
 use Data::Dumper qw/Dumper/;
@@ -106,7 +106,7 @@ sub new {
 	my %self = (
 		symbols => ['', '', 'T'],
 		nsymbols => 3,
-		symbol_map => {}
+		symbol_map => {},
 	);
 	bless \%self, $class;
 }
@@ -114,7 +114,7 @@ sub new {
 sub process_quoted {
 	my ($self, $expr) = @_;
 	if (!defined $expr) { # nil
-		[list => 0]
+		[LIST => 0]
 	} elsif (scalarp $expr) {
 		$expr = uc $expr;
 		if (!exists $self->{symbol_map}{$expr}) {
@@ -122,9 +122,9 @@ sub process_quoted {
 			$self->{nsymbols}++;
 			push @{$self->{symbols}}, $expr;
 		}
-		[symbol => $self->{symbol_map}{$expr}]
+		[SYMBOL => $self->{symbol_map}{$expr}]
 	} elsif (consp $expr) {
-		[list => $self->process_quoted($expr->cdr), $self->process_quoted($expr->car)]
+		[LIST => $self->process_quoted($expr->cdr), $self->process_quoted($expr->car)]
 	} else {
 		croak 'argument to process_quoted is not a scalar, cons, or nil: ', Dumper($expr);
 	}
@@ -132,7 +132,7 @@ sub process_quoted {
 
 sub process_proc {
 	my ($self, $func_name, $func_args, $func_body, $env) = @_;
-	my $new_env = append $env, (cons $func_name, rev $func_args);
+	my $new_env = append cons($func_name, rev $func_args), $env;
 	$self->process_toplevel($func_body, $new_env)
 }
 
@@ -141,7 +141,7 @@ sub rest_of_funcall {
 	if (!defined $args) {
 		$func
 	} else {
-		[more => $self->rest_of_funcall($func, $args->cdr), $args->car]
+		[MORE => $self->rest_of_funcall($func, $args->cdr), $args->car]
 	}
 }
 
@@ -154,28 +154,28 @@ sub process_funcall {
 		if (!defined $processed_args) {
 			croak "Cannot call primitive $func_name with no arguments";
 		}
-		[call => $self->rest_of_funcall([lc $func_name, 0], $processed_args->cdr), $processed_args->car]
+		[CALL => $self->rest_of_funcall([uc $func_name, 0], $processed_args->cdr), $processed_args->car]
 	} else {
 		my $final_args = append $processed_args, cons ($self->process_toplevel($func_name, $env), undef);
-		[call => $self->rest_of_funcall([funcall => 0], $final_args->cdr), $final_args->car]
+		[CALL => $self->rest_of_funcall([FUNCALL => 0], $final_args->cdr), $final_args->car]
 	}
 }
 
 sub process_toplevel {
 	my ($self, $expr, $env) = @_;
 	if (!defined $expr) {
-		[list => 0]
+		[LIST => 0]
 	} elsif (scalarp $expr) {
 		if (looks_like_number $expr) {
 			$self->process_quoted($expr);
 		} elsif (uc $expr eq 'T') {
-			[symbol => 2]
+			[SYMBOL => 2]
 		} elsif (uc $expr eq 'NIL') {
-			[list => 0]
+			[LIST => 0]
 		} else {
 			my $position = position $expr, $env;
 			if (defined $position) {
-				[var => -1 - $position]
+				[VAR => -1 - $position]
 			} else {
 				croak "Variable $expr not in environment";
 			}
@@ -187,13 +187,13 @@ sub process_toplevel {
 		} elsif ($func eq 'LAMBDA') {
 			my $func_name = $expr->cdr->car;
 			my $func_args = $expr->cdr->cdr->car;
-			my $func_body = $expr->cdr->cdr->cdr->car;
-			[proc => $self->process_proc($func_name, $func_args, $func_body, $env)]
+			my $func_body = $expr->cdr->cdr->cdr->car; ## no critic (ProhibitLongChainsOfMethodCalls)
+			[PROC => $self->process_proc($func_name, $func_args, $func_body, $env)]
 		} elsif ($func eq 'IF') {
 			my ($if_cond, $if_then, $if_else) =
 			  map { $self->process_toplevel($_, $env) }
-			  ($expr->cdr->car, $expr->cdr->cdr->car, $expr->cdr->cdr->cdr->car);
-			[if => [list => $if_else, $if_then], $if_cond]
+			  ($expr->cdr->car, $expr->cdr->cdr->car, $expr->cdr->cdr->cdr->car); ## no critic (ProhibitLongChainsOfMethodCalls)
+			[IF => [LIST => $if_else, $if_then], $if_cond]
 		} else {
 			$self->process_funcall($expr->car, $expr->cdr, $env)
 		}
@@ -234,6 +234,7 @@ App::Scheme79asm::Compiler - compile Lisp code to SIMPLE assembly
   my $string = '(reverse-list 2 1)';
   my $assembly_sexp = $compiler->compile_string($string);
   $asm->process($assembly_sexp);
+  $asm->finish;
   $asm->print_verilog
 
 =head1 DESCRIPTION

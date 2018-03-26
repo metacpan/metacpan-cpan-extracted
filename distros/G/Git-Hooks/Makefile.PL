@@ -52,6 +52,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Cwd" => 0,
+    "Data::Dump" => 0,
     "Email::Simple" => 0,
     "Email::Valid" => 0,
     "Encode" => 0,
@@ -83,7 +84,7 @@ my %WriteMakefileArgs = (
     "Test::Requires::Git" => 0,
     "lib" => 0
   },
-  "VERSION" => "2.8.1",
+  "VERSION" => "2.9.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -93,6 +94,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Config" => 0,
   "Cwd" => 0,
+  "Data::Dump" => 0,
   "Data::Dumper" => 0,
   "Email::Sender::Transport::Mbox" => 0,
   "Email::Simple" => 0,

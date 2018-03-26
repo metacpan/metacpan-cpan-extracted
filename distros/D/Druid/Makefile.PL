@@ -18,7 +18,10 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'Moo'	=> '0'
+        'Moo' => '0',
+        'LWP::UserAgent' => 0,
+        'HTTP::Request' => 0,
+        'JSON::MaybeXS' => 0,
         #'ABC'              => 1.6,
         #'Foo::Bar::Module' => 5.0401,
     },

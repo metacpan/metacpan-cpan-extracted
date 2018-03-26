@@ -1,7 +1,7 @@
 package Test::Against::Dev;
 use strict;
 use 5.10.1;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use Carp;
 use Cwd;
 use File::Basename;
@@ -1370,12 +1370,16 @@ sub new_from_existing_perl_cpanm {
     croak "Could not locate cpanm executable at '$this_cpanm'"
         unless (-x $this_cpanm);
 
+    my $cpanm_dir = File::Spec->catdir($release_dir, '.cpanm');
+    croak "Could not locate $cpanm_dir" unless (-d $cpanm_dir);
+
     my %load = (
         release_dir     => $release_dir,
         bin_dir         => $bin_dir,
         lib_dir         => $lib_dir,
         this_perl       => $this_perl,
         this_cpanm      => $this_cpanm,
+        cpanm_dir       => $cpanm_dir,
     );
     $data->{$_} = $load{$_} for keys %load;
 

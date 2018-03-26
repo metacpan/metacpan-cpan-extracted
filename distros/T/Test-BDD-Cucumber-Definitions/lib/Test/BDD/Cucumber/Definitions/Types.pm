@@ -21,7 +21,7 @@ use MooseX::Types (
     ]
 );
 
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 
 # Interpolation of variables (scenario and environment)
 sub _interpolate {
@@ -51,7 +51,7 @@ subtype(
     TbcdInt,
     as Int,
     message {
-        qq{"$_" is not a valid TBCD Int}
+        sprintf('%s is not a valid TBCD Int', np $_);
     }
 );
 
@@ -66,7 +66,7 @@ subtype(
     TbcdStr,
     as Str,
     message {
-        qq{"$_" is not a valid TBCD Str}
+        sprintf('%s is not a valid TBCD Str', np $_);
     }
 );
 
@@ -81,7 +81,7 @@ subtype(
     TbcdNonEmptyStr,
     as NonEmptyStr,
     message {
-        qq{"$_" is not a valid TBCD NonEmptyStr}
+        sprintf('%s is not a valid TBCD NonEmptyStr', np $_);
     }
 );
 
@@ -96,7 +96,7 @@ subtype(
     TbcdRegexpRef,
     as RegexpRef,
     message {
-        qq{"$_" is not a valid TBCD TbcdRegexpRef}
+        sprintf('%s is not a valid TBCD RegexpRef', np $_);
     }
 );
 

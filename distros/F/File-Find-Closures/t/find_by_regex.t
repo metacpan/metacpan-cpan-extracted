@@ -1,4 +1,3 @@
-# $Id$
 use strict;
 
 use File::Basename        qw(basename);

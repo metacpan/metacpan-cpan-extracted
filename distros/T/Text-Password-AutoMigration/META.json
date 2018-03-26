@@ -58,19 +58,19 @@
    "provides" : {
       "Text::Password::AutoMigration" : {
          "file" : "lib/Text/Password/AutoMigration.pm",
-         "version" : "0.13"
+         "version" : "0.15"
       },
       "Text::Password::CoreCrypt" : {
          "file" : "lib/Text/Password/CoreCrypt.pm",
-         "version" : "0.13"
+         "version" : "0.15"
       },
       "Text::Password::MD5" : {
          "file" : "lib/Text/Password/MD5.pm",
-         "version" : "0.13"
+         "version" : "0.15"
       },
       "Text::Password::SHA" : {
          "file" : "lib/Text/Password/SHA.pm",
-         "version" : "0.13"
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
@@ -84,7 +84,7 @@
          "web" : "https://github.com/worthmine/Text-Password-AutoMigration"
       }
    },
-   "version" : "0.13",
+   "version" : "0.15",
    "x_authority" : "cpan:WORTHMINE",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",

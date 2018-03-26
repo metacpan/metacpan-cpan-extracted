@@ -5,7 +5,7 @@ use App::SimulateReads::Base 'role';
 
 requires '_build_weights';
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.13'; # VERSION
 
 has 'weights'     => (
 	is         => 'ro',
@@ -23,7 +23,7 @@ has 'num_weights' => (
 
 has 'max_weight'  => (
 	is         => 'ro',
-	isa        => 'My:IntGt0',
+	isa        => 'My:IntGe0',
 	builder    => '_build_max_weight',
 	lazy_build => 1
 );
@@ -66,7 +66,7 @@ sub weighted_raffle {
 	my $range = int(rand($self->max_weight + 1));
 	return $self->_search(0, $self->num_weights - 1, $range);
 }
- 
+
 sub _search {
 	my ($self, $min_index, $max_index, $range) = @_;
 
@@ -101,7 +101,7 @@ App::SimulateReads::Role::WeightedRaffle - Extends class with weighted raffle.
 
 =head1 VERSION
 
-version 0.10
+version 0.13
 
 =head1 AUTHOR
 
@@ -109,7 +109,7 @@ Thiago L. A. Miller <tmiller@mochsl.org.br>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Teaching and Research Institute from Sírio-Libanês Hospital.
+This software is Copyright (c) 2018 by Teaching and Research Institute from Sírio-Libanês Hospital.
 
 This is free software, licensed under:
 

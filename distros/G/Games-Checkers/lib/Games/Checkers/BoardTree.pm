@@ -18,14 +18,9 @@ use warnings;
 
 package Games::Checkers::BoardTreeNode;
 
-use base 'Games::Checkers::Board';
-
 use Games::Checkers::Constants;
 use Games::Checkers::MoveConstants;
 use Games::Checkers::CreateMoveList;
-
-use constant NO_COST => 1e9;
-use constant EqualCostDeterminism => $ENV{EQUAL_COST_DETERMINISM};
 
 my $stopped = No;
 sub check_user_interaction () {
@@ -38,11 +33,14 @@ sub new ($$$) {
 	my $board = shift;
 	my $move = shift;
 
-	my $self = $class->SUPER::new($board);
-	$self->{move} = $move;
-	$self->{sons} = [];
-	$self->{expanded} = 0;
-	return $self;
+	my $self = {
+		board => $board,
+		move => $move,
+		sons => [],
+		expanded => 0,
+	};
+
+	return bless $self, $class;
 }
 
 #       o                                                    3  0
@@ -57,70 +55,75 @@ sub expand ($$) {
 	my $self = shift;
 	my $color = shift;
 
-	my $creating_moves = Games::Checkers::CreateMoveList->new($self, $color);
+	my $board = $self->{board};
+	my $builder = Games::Checkers::CreateMoveList->new($board, $color);
+
+	@{$self->{sons}} = map {
+		Games::Checkers::BoardTreeNode->new($_->[1], $_->[0])
+	} @{$builder->get_move_boards};
 	$self->{expanded} = 1;
-	return $creating_moves->{status};
+
+	return $builder->{status};
 }
 
 sub unexpand ($) {
 	my $self = shift;
+
 	$_->unexpand foreach @{$self->{sons}};
 	@{$self->{sons}} = ();
 	$self->{expanded} = 0;
 }
 
-sub is_better_cost ($$$$) {
-	my $self = shift;
-	my $color = shift;
-	my $cost1 = shift;
-	my $cost2 = shift;
-
-	return int(rand(2)) unless $cost1 != $cost2 || EqualCostDeterminism;
-
-	my $max = ($cost1 > $cost2) ? $cost1 : $cost2;
-	my $min = ($cost1 < $cost2) ? $cost1 : $cost2;
-	my $best = ($color == ($Games::Checkers::give_away ? Black : White)) ? $max : $min;
-	return $best == $cost1;
-}
-
-sub choose_best_son ($$$$$) {
+sub choose_best_son ($$$;$$) {
 	my $self = shift;
 	my $color = shift;
 	my $level = shift;
-	my $max_level = shift;
+	my $min = shift; $min = MIN_SCORE unless defined $min;
+	my $max = shift; $max = MAX_SCORE unless defined $max;
 
-#	return undef if $stopped || check_user_interaction() != Ok;
+#	return if $stopped || check_user_interaction() != Ok;
 
-	my $best_node = undef;
-	my $best_cost = NO_COST;
+	my $is_maximizing = $color == ($::RULES{GIVE_AWAY} ? Black : White);
+	my $best_node;
 
-	if ($level != 0) {
-		# should use return value to determine actual thinking level
+	if ($level <= 0) {
+		$min = $max = $self->{board}->get_score($color);
+	} else {
 		$self->expand($color) unless $self->{expanded};
 
 		foreach my $son (@{$self->{sons}}) {
-			my ($deep_node, $deep_cost) = $son->choose_best_son(!$color, $level-1, $max_level);
-			($best_node, $best_cost) = ($deep_node, $deep_cost)
-				if $best_cost == NO_COST || $self->is_better_cost($color, $deep_cost, $best_cost);
+			my ($score) = $son->choose_best_son(!$color, $level - 1,	$min, $max);
+
+			if ($is_maximizing) {
+				if ($score > $min) {
+					$min = $score;
+					$best_node = $son;
+				}
+			}
+			else {
+				if ($score < $max) {
+					$max = $score;
+					$best_node = $son;
+				}
+			}
+			# alpha-beta pruning
+			$is_maximizing ^= 1, last if $min >= $max;
 		}
+
+		# all moves if any lead to losage, choose a random one
+		$best_node ||= $self->{sons}[rand(@{$self->{sons}})];
 
 		$self->unexpand;
 	}
 
-	if (!defined $best_node) {
-		$best_node = $self;
-		$best_cost = $self->get_cost($color);
-	} elsif ($level == $max_level - 1) {
-		$best_node = $self;
-	}
-
-	return wantarray ? ($best_node, $best_cost) : $best_node;
+	return wantarray ? ($is_maximizing ? $min : $max) : $best_node;
 }
 
 package Games::Checkers::BoardTree;
 
 use Games::Checkers::MoveConstants;
-use Games::Checkers::BoardConstants;
+
+use constant DEFAULT_LEVEL => 5;
 
 sub new ($$$;$) {
 	my $class = shift;
@@ -142,7 +145,7 @@ sub choose_best_move ($) {
 	my $self = shift;
 
 	my $max_level = $self->{max_level};
-	my $son = $self->{head}->choose_best_son($self->{color}, $max_level, $max_level);
+	my $son = $self->{head}->choose_best_son($self->{color}, $max_level);
 #	foreach my $son0 (@{$self->{sons}}) {
 #		next if defined $son && $son == $son0;
 #		$son0->unexpand;

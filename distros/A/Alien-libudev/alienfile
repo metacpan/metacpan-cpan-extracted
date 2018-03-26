@@ -29,7 +29,7 @@ share {
 
     build [
         'autoreconf -i',
-        './configure --prefix=%{.install.prefix} --disable-shared',
+        './configure --prefix=%{.install.prefix} --disable-shared --with-pic',
         'cd src/shared  && %{make}',
         'cd src/libudev && %{make}',
         'cd src/libudev && %{make} install',

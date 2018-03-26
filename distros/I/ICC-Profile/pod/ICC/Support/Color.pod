@@ -1,0 +1,787 @@
+# documentation for Color.pm module / 2017-02-24
+
+=encoding utf8
+
+=head1 NAME
+
+ICC::Support::Color - An object oriented module for computing colorimetry from spectral measurement data.
+
+=head1 SYNOPSIS
+
+    use ICC::Support::Color;
+
+    # create a new object
+    $color = ICC::Support::Color->new(); # empty object
+    $color = ICC::Support::Color->new($hash); # from a hash
+
+    # get/set header hash
+    $hash = $color->header();
+    $hash = $color->header($replace);
+
+    # get/set illuminant structure
+    $structure = $color->illuminant();
+    $structure = $color->illuminant($replace);
+
+    # get/set observer structure
+    $structure = $color->observer();
+    $structure = $color->observer($replace);
+
+    # get/set color-weight function structure
+    $structure = $color->cwf();
+    $structure = $color->cwf($replace);
+
+    # get illuminant white point
+    $xyz = $color->iwtpt();
+    $xyz = $color->iwtpt($hash);
+
+    # transform spectral data to XYZ data
+    $xyz = $color->transform($spectral);
+    $xyz = $color->transform($spectral, $hash);
+
+    # compute Jacobian matrix
+    $matrix = $color->jacobian($spectral_vector);
+    $matrix = $color->jacobian($spectral_vector, $hash);
+    ($matrix, $xyz_vector) = $color->jacobian($spectral_vector);
+    ($matrix, $xyz_vector) = $color->jacobian($spectral_vector, $hash);
+
+    # dump object
+    $string = $color->sdump([$format]);
+    $color->dump([$format]);
+
+=head1 DESCRIPTION
+
+Color is measured using instruments that split light into wavelength bands, which are measured individually and returned as
+so-called spectral measurements. These objective spectral measurements are transformed to psychophysical values using
+colorimetry, as defined by various international standards (L<"SEE ALSO">). The ICC::Support::Color module implements these
+complex standards, providing a simple way to convert spectral measurements to XYZ (colorimetric) values.
+
+=head2 Object structure
+
+An ICC::Support::Color object is a blessed array reference. The array contains six elements, the object header, illuminant,
+color-matching functions, color-weight functions, adjusted color-weight functions, and white-point.
+
+    # create empty Color object
+    my $self = [
+        {},     # header hash
+        [],     # illuminant SPD (CIE)
+        [],     # color-matching functions (CIE)
+        [],     # color-weight functions (ASTM and ISO 5-3)
+        [],     # color-weight functions (adjusted to input range and cached)
+        []      # white-point
+    ];
+
+There are three types of Color objects, 'ASTM', 'CIE' and 'ISO', which implement the corresponding standards in L<"SEE ALSO">.
+The object type is determined by the parameter hash. If the hash contains the 'status' key, the object type is 'ISO'. If there
+is no 'status' key and the 'illuminant' value is an array reference ([]), the object type is 'CIE'. If there is no 'status' key
+and the 'illuminant' value is a scalar or undefined, the object type is 'ASTM'.
+
+The ASTM E 308 standard provides pre-computed color-weight functions for various standard illuminants and observers. There are
+nine illuminants, two observers, and two data increments. Each combination has two tables, one with and one without bandpass
+correction. The color-weight functions are selected by the hash values and loaded into the object. For an 'ASTM' object, the
+illuminant and color-matching function structures are empty.
+
+The CIE 15 standard provides separate color-matching functions and standard illuminant spectral power distributions (SPD).
+Other illuminant SPDs are provided by Philips. Measured illuminants may also be used. The selected observer and illuminant are
+loaded into the object. The 'CIE' color-weight functions are computed using interpolation and bandpass correction specified in
+the hash.
+
+The ISO 5-3 standard provides color-weight functions for various types of densitometry, specified by the 'status' value. The
+selected color-weight function is loaded into the object. For an 'ISO' object, the illuminant and color-matching function
+structures are empty.
+
+The header hash contains metadata describing the object. If the object was created from a hash parameter, the header is a copy
+of that hash. The hash may contain some of the following keys. The allowable values for each key are described in L<"new">. If
+a key is missing, its default value was used to create the object.
+
+    'illuminant'
+    'observer'
+    'increment'
+    'method'
+    'bandpass'
+    'imethod'
+    'ibandpass'
+    'status'
+    'type'
+
+Header hash values are accessed per the following example,
+
+    $illuminant = $color->header->{'illuminant'}; # get the illuminant value
+    $color->header->{'illuminant'} = $illuminant; # set the illuminant value
+
+Note that changing a header value does not change the behaviour of the object. If different properties are desired, a new
+object should be created. The header hash is meant to be informative.
+
+The 'illuminant SPD' is stored as a structure containing the wavelength range and spectral power distribution. For example,
+
+    $illum = [[low_nm, high_nm, increment_nm], [spd]];
+
+A typical illuminant has the following numerical values,
+
+    $illum = [[380, 780, 5], [0.91, 0.63, 0.46, 0.37, 1.29, 12.68, 1.59, 1.79, 2.46, ... 0.16, 0.12, 0.09]];
+
+For this example, the starting wavelength is 380 nm, the ending wavelength is 780 nm, and the increment is 5 nm.
+The SPD value at 380 nm is 0.91, at 385 nm is 0.63, at 390 nm is 0.46, and so on.
+
+The 'color-matching functions' have a similar structure, but with an array of X, Y and Z functions in place of the SPD,
+
+    $cmf = [[low_nm, high_nm, increment_nm], [[X-cmf], [Y-cmf], [Z-cmf]]];
+
+The 'color-weight functions', both loaded and cached, have this structure,
+
+    $cwf = [[low_nm, high_nm, increment_nm], [[X-cwf], [Y-cwf], [Z-cwf]]];
+
+This is the same structure as the 'color-matching functions' except for the names.
+
+Note the wavelength range may be different for each structure within a single Color object. If there are range differences,
+they are resolved by interpolation. The interpolation functions use the same notation for wavelength range.
+
+The 'white-point' is stored as an XYZ vector. For example, the D50 white point,
+
+    $wtpt = [96.42, 100, 82.51];
+
+Note that each of the object elements has accessor methods (see L<"General accessors">), except for the cached
+'color-weight functions'. Normally, there is no need to access these internal object elements, except for the 'white-point'.
+The Color object is created from the parameter hash, and does its work through the 'transform' and 'jacobian' methods.
+
+=head2 Spectral measurements
+
+Spectral measurements are made with a spectrophotometer for prints, or with a spectroradiometer for illumination. For each
+sample, light is split into wavelength bands by a diffraction grating. The instrument returns a list of measurements at each
+wavelength. For colorimetry, the range of wavelengths is usually confined to visible light, typically between 380 and 780 nm.
+
+An instrument commonly used in the graphic arts, the X-Rite i1Pro 2, measures from 380 to 730 nm with an increment of 10 nm.
+Each sample consists of 36 measurements, for 380 nm, 390 nm, 400 nm, etc. In the reflective mode, the values returned range
+from 0 to 1.0, with 1.0 representing a perfect diffuse white. In the emissive mode, the values represent spectral irradiance,
+and taken together, form the spectral power distribution (SPD).
+
+The optics of a graphic arts spectrophotometer normally illuminate the sample with a 45 degree cone, and capture the light
+reflected perpendicular from the surface. This is called 45/0 geometry. Industrial spectrophotometers commonly use an
+integrating sphere to minimize the effect of gloss variation. Measurements from these instruments are incompatible with 45/0
+measurements, but are handled identically when computing colorimetry.
+
+When measuring reflective samples, the UV content of the instrument's light source may affect the readings, especially if the
+samples are printed on paper or media with OBAs (optical brightening agents). The ISO 13655 standard specifies "measurement
+conditions" for the light source. These measurement conditions are known as 'M0', 'M1', 'M2' and 'M3'. The Chart module has
+functions to handle the OBA effect using 'M1' and 'M2' measurements. However, the measurement condition is not a factor in
+colorimetry calculations.
+
+=head2 Colorimetry
+
+Spectral measurements are objective. They describe the physical properties of materials and light sources. The perception
+of color is subjective, and depends on the function of the eyes and brain. Colorimetry is the science and technology that
+relates the spectral properties of light to its perceived color. CIE 15 is the international standard defining colorimetry.
+
+Colorimetry is based on color matching experiments using human observers. The observers match color samples using a mixture
+of three monochromatic light sources. Color-matching functions are derived from these experiments. The first standard set
+of color-matching functions was published by the CIE in 1931. These functions were based on a 2 degree field of view.
+The experiments were repeated with a 10 degree field of view, with corresponding color-matching functions published in 1964.
+More recently, so-called "physiologically-relevant" color-matching functions were developed and published.
+
+These color-matching functions are used to convert spectral measurements into XYZ values that represent the perceived color.
+The spectral measurements are multiplied by the color matching functions, then integrated to get the XYZ values. The color
+matching functions are supplied with a range of 360 to 830 nm and an increment of 1 nm. The CIE recommends that calculations
+are done with a 1 nm increment for greatest accuracy.
+
+=head2 Interpolation
+
+Most graphic arts spectrophotometers measure color with a 10 nm increment. In order to calculate XYZ values with 1 nm
+colorimetry, it is necessary to interpolate. Interpolation estimates the intermediate values by fitting a mathematical
+function to the measured data. There are many ways to do this, as explained in the CIE 15 document.
+
+The Color object provides three different interpolation methods, linear, cubic spline, and Lagrange. Linear interpolation
+uses a straight line function between points. Cubic spline interpolation uses a cubic function between points. Lagrange
+interpolation uses a polynomial function that passes through some number of points surrounding the interval. The ASTM E 308
+and E 2022 standards employ Lagrange interpolation.
+
+In most cases, cubic spline interpolation will provide the best results. A so-called "natural" cubic spline is used, which
+has continuous first and second derivatives. Linear interpolation is preferred for fluorescent and gas discharge
+illuminants. For illuminants, the appropriate interpolation method is selected based on the "smoothness" of the SPD.
+Lagrange interpolation is included for ASTM compatibility.
+
+Wavelengths outside the range of the measuring device are copied from the endpoints. This is the preferred way to extend the
+data. Fortunately, the values of the color-matching functions become extremely small as they approach the UV and IR regions.
+This minimizes any errors from an abbreviated measurement range.
+
+=head2 Color weight functions
+
+To compute the colorimetry of a single sample using a 1 nm increment requires interpolating 470 values, multiplying them by
+the color-matching functions and illuminant, then adding these products together to get X, Y, and Z values. This consumes a
+lot of computing power.
+
+This work can be greatly simplified with color-weight functions. Color-weight functions combine the interpolation and
+integration steps. The colorimetry calculation is reduced to the dot product of each color-weight function and the raw
+spectral data. The ASTM E 308 standard provides pre-computed color-weight functions for commonly used illuminants. (The ISO
+13655 standard contains tables 5.9 and 5.10 from ASTM E 308). Another standard, ASTM E 2022, shows how to create
+color-weight functions using other illuminants and observers.
+
+When the illuminant is set to a scalar value (e.g. 'D50'), the ASTM E 308 standard tables are used. When the illuminant is set
+to an array reference (e.g. ['CIE', 'D50']), color-weight functions are computed using the supplied hash parameters. This
+provides great flexibility, including the use of measured illuminants.
+
+When density is selected by the 'status' key, the appropriate color-weight functions from ISO 5-3 are loaded.
+
+=head2 Standard illuminants
+
+The CIE 15 standard provides a large selection of standard illuminants which include daylight and various artificial light
+sources. These illuminants are used to compute standard colorimetry, e.g. "D65, 2 degree observer". Of course, it is
+possible to measure an actual illuminant, but in most instances the illuminant is chosen simply to represent the likely or
+agreed upon viewing conditions. That is the function of standard illuminants.
+
+The standard illuminants representing daylight are provided at specific color temperatures. For instance, D50 is 5000K, D65
+is 6500K, and so on. The standard also provides a method for calculating the SPD at an arbitrary color temperature. The
+'daylight' function implements this method,
+
+    $color = ICC::Support::Color->new{'illuminant' => [daylight(5700)]}; # daylight at 5700k
+
+The Color module contains SPD data for of all CIE 15 standard illuminants, selected by the names used in the standard. It
+also contains a set of typical commercial lamp SPDs provided by the Philips Corporation.
+
+=head2 Bandpass correction
+
+Bandpass correction is the adjustment of spectral values to represent the actual zero-bandwidth value at each wavelength.
+Raw spectral measurements include a band of wavelengths, and represent the convolution of the spectral distribution with the
+bandpass function of the instrument. Bandpass correction extracts the true distribution from this convoluted raw data. Some
+instruments do this internally, while others do not, which is why bandpass correction is turned off by default. Bandpass
+correction is enabled by the 'bandpass' key.
+
+The ASTM E 2729 standard defines a generic bandpass correction method, for instruments having a triangular bandpass function.
+ASTM calls their method "bandpass rectification", apparently to avoid suggesting that raw spectral data is somehow incorrect.
+This correction method is selected by setting the 'bandpass' value to 'astm'.
+
+The ASTM E 308 standard contains a complete set of color-weight functions (table 6) with bandpass correction applied. This
+table is deprecated by ASTM E 2729. One reason for this change is to ensure that bandpass correction is applied to the raw
+spectral data, which may have a different wavelength range than the color-weight tables.
+
+A more sophisticated bandpass correction method is available that takes into account the bandpass function of the instrument
+and the interpolation method. This correction method is selected by setting the 'bandpass' value to the shape of the
+instrument bandpass function. Possible values are 'triangle', 'trapezoid', or a vector representing the actual bandpass
+function. The 'trapezoid' shape simulates the bandpass function of X-Rite i1 instruments.
+
+=head2 Data structure and transforms
+
+The 'transform' method converts spectral data to XYZ data. The spectral data must have a supported structure for this to work
+correctly. Four basic data types are supported – list, vector, matrix, and structure of vectors,
+
+    @list = (0.91, 0.63, 0.46, 0.37, 1.29, 12.68, 1.59, 1.79, 2.46, ... 0.16, 0.12, 0.09); # single sample, a list
+
+    $vector = [0.91, 0.63, 0.46, 0.37, 1.29, 12.68, 1.59, 1.79, 2.46, ... 0.16, 0.12, 0.09]; # single sample, a vector
+
+    $matrix = [
+        [0.91, 0.63, 0.46, 0.37, 1.29, 12.68, 1.59, 1.79, 2.46, ... 0.16, 0.12, 0.09],
+        [0.91, 0.63, 0.46, 0.37, 1.29, 12.68, 1.59, 1.79, 2.46, ... 0.16, 0.12, 0.09],
+        [0.91, 0.63, 0.46, 0.37, 1.29, 12.68, 1.59, 1.79, 2.46, ... 0.16, 0.12, 0.09],
+    ]; # multiple samples, a matrix, also known as a 2-D array
+
+    $struct = [
+        [0.91, 0.63, 0.46, 0.37, 1.29, 12.68, 1.59, 1.79, 2.46, ... 0.16, 0.12, 0.09],
+        [
+            [0.91, 0.63, 0.46, 0.37, 1.29, 12.68, 1.59, 1.79, 2.46, ... 0.16, 0.12, 0.09],
+            [0.91, 0.63, 0.46, 0.37, 1.29, 12.68, 1.59, 1.79, 2.46, ... 0.16, 0.12, 0.09],
+        ]
+    ]; # multiple samples, a structure of vectors
+
+If we call the 'transform' method on any of these supported data structures, an identical structure containing XYZ values is
+returned.
+
+The 'jacobian' method requires a single vector as input.
+
+The wavelength range of the input data is determined by the number spectral values. Some commonly used ranges, such as 380 to
+730 nm, 10 nm increment, are recognized. These ranges are stored in the $srh hash of the Color module, which may be edited by
+the user. A non-standard range may be specified for each transform call by adding a hash with the 'range' key.
+
+The encoding of the output values may be specified with the 'encoding' key.
+
+=head2 Camera/scanner simulation
+
+A color object may be used to simulate a camera or scanner. This is done by replacing the observer function with the
+spectral sensitivity of the device's sensor. This is illustrated by the snippet 'scanner_spectral_model_14.plx'.
+
+If the spectral sensitivity of the sensor is known in advance, the Color object may be created directly using the
+'observer' hash key,
+
+    $camera = ICC::Support::Color->new({'observer' => [[400, 700, 30], $spec_camera], ... });
+
+Alternately, the 'observer' method may be used with an existing Color object,
+
+    $camera->observer([[400, 700, 30], $spec_camera]);
+
+Additional hash parameters, 'cwf_range', 'cwf_ks', and 'observer_exp', have been added to support camera/scanner simulation.
+
+The parameter 'cwf_range' sets the range of the color weight functions, which is normally the same as the observer.
+The spectral sensitivity function may be coarse, and require interpolation. This parameter enables that within the Color object.
+
+The parameter 'cwf_ks' sets the scale factor used to compute the color weight functions.
+
+The parameter 'observer_exp' is a flag which enables exponentiation of logarithmic 'observer' values.
+
+These parameters may be included in the 'new' hash, or set using the 'header' method,
+
+    $camera->header->{'cwf_range'} = [380, 730, 1];
+
+    $camera->header->{'cwf_ks'} = 1;
+
+    $camera->header->{'observer_exp'} = 1;
+
+If the parameters are set this way, the color weight functions should be updated using the '_make_cwf' method.
+
+    $camera->_make_cwf;
+
+=head1 METHODS
+
+=head2 Creating ICC::Support::Color objects
+
+=head3 new
+
+This method creates an C<ICC::Support::Color> object.
+
+With no parameters, the object contains the empty basic structure (see L<"Object structure">).
+
+An object is normally created from a hash, as illustrated below.
+
+B<Usage>
+
+    $color = ICC::Support::Color->new(); # empty object
+    $color = ICC::Support::Color->new($hash); # from a hash
+
+B<Examples>
+
+    use ICC::Support::Color;
+
+    $color = ICC::Support::Color->new(); # empty object
+
+    $color = ICC::Support::Color->new({}); # default object (ASTM E 308 table 5.9 - D50, 2 degree observer, 10 nm increment, no bandpass correction)
+    $color = ICC::Support::Color->new({'illuminant' => 'F2'}); # ASTM illuminant (see note 1)
+    $color = ICC::Support::Color->new({'illuminant' => ['CIE', 'FL10']}); # CIE standard illuminant (see note 2)
+    $color = ICC::Support::Color->new({'illuminant' => ['~/Desktop/my_illum.txt', 1]}); # measured illuminant
+    $color = ICC::Support::Color->new({'illuminant' => [$nm, $spd]}); # illuminant as range and spd vector
+    $color = ICC::Support::Color->new({'illuminant' => [daylight(5000)], 'added' => 'CCT_5000K'}); # CIE daylight, specified by CCT
+    $color = ICC::Support::Color->new({'illuminant' => []}); # no illuminant, for emissive measurements
+    $color = ICC::Support::Color->new({'illuminant' => ['~/Desktop/my_illum.txt', 1], 'imethod' => 'linear', 'ibandpass' => 'trapezoid'}); # (see note 3)
+    $color = ICC::Support::Color->new({'status' => 'T'}); # ISO 5-3 status (see note 4)
+
+=over
+
+=item 1
+
+Hash keys are 'illuminant', 'observer', 'increment' and 'bandpass'
+
+Hash values for 'illuminant' are 'A', 'C', 'D50', 'D55', 'D65', 'D75', 'F2', 'F7', or 'F11', default is 'D50'
+
+Hash values for 'observer' are '2', '10', default is '2'
+
+Hash values for 'increment' are '10' or '20', default is '10'
+
+Hash values for 'bandpass' are 'astm', 'triangle', 'trapezoid' or 'six', default is no bandpass correction
+
+A bandpass value of 'astm' selects the ASTM E 2729 method (the current standard).
+
+A bandpass value of 'six' selects table 6 from ASTM E 308, which is deprecated by ASTM E 2729.
+
+=item 2
+
+Hash keys are 'illuminant', 'observer', 'increment', 'method', 'bandpass', 'imethod' and 'ibandpass'
+
+Hash values for 'illuminant' are [], [source, id], or [nm, spd]
+
+An empty array ([]) indicates no illuminant, for emissive measurements
+
+Values for 'source' are 'CIE', 'Philips', 'DATA' or a measurement file path
+
+Values for 'id' depend on the source
+
+CIE illuminants are 'A', 'C', 'D50', 'D55', 'D65', 'D75', 'FL1' to 'FL12', 'FL3.1' to 'FL3.15', 'HP1' to 'HP5', and 'E'
+
+Philips illuminants are '60_A/W', 'C100S54', 'C100S54C', 'F32T8/TL830', 'F32T8/TL835', 'F32T8/TL841', 'F32T8/TL850',
+'F32T8/TL865/PLUS', 'F34/CW/RS/EW', 'F34T12WW/RS/EW', 'F40/C50', 'F40/C75', 'F40/CWX', 'F40/DX', 'F40/DXTP',
+'F40/N', 'F34T12/LW/RS/EW', 'H38HT-100', 'H38JA-100/DX', 'MHC100/U/MP/3K', 'MHC100/U/MP/4K', and 'SDW-T_100W/LV'
+
+DATA selects an illuminant measurement appended to the data set (ProfileMaker)
+
+With a measurement file path, the 'id' is the sample number
+
+The illuminant may also be specified by wavelength range and SPD vector
+
+Hash values for 'observer' are '2', '10', '2P' or '10P' ('2P' and '10P' are the CIE (2012) "physiologically-relevant" CMFs), default is '2'
+
+Hash values for 'increment' are '1' or '5', default is '1' (this is increment of the color-matching functions)
+
+Hash values for 'method' are 'linear', 'cspline' or 'lagrange', default is 'cspline' (interpolation method)
+
+Hash values for 'bandpass' are 'astm', 'triangle' or 'trapezoid', default is no bandpass correction
+
+=item 3
+
+The illuminant interpolation method and bandpass correction are set by the 'imethod' and 'ibandpass' keys.
+
+Hash values for 'imethod' are 'linear', 'cspline' or 'lagrange', default is 'linear' or 'cspline', based on smoothness of the SPD
+
+Hash values for 'ibandpass' are 'astm', 'triangle' or 'trapezoid', default is no bandpass correction
+
+=item 4
+
+When the 'illuminant' hash key is replaced by the 'status' hash key, ISO 5-3 density is computed,
+
+Hash key is 'status'
+
+Hash values for 'status' are 'A', 'M', 'T', 'E', 'I', default is 'T'
+
+=back
+
+=head2 General accessors
+
+=head3 header
+
+This method returns a reference to the header hash (see L<"Object structure"> section).
+
+B<Usage>
+
+    $hash = $color->header(); # get header hash
+    $hash = $color->header($replacement_hash); # set header hash
+
+B<Examples>
+
+    use ICC::Support::Color;
+
+    $color = ICC::Support::Color->new({'illuminant' => ['CIE', 'FL2']}); # create a Color object
+    $hash = $color->header(); # get header hash reference
+    $illuminant = $color->header->{'illuminant'}; # get illuminant
+    $hash->{'key'} = 'value'; # add key to existing header hash
+    $color->header({'new' => 'hash'}); # replace header (see note 1)
+
+=over
+
+=item 1
+
+The parameter is copied to the object.
+
+=back
+
+=head3 illuminant
+
+This method returns a reference to the illuminant structure (see L<"Object structure"> section).
+
+B<Usage>
+
+    $illuminant = $color->illuminant(); # get illuminant structure
+    $illuminant = $color->illuminant($replacement_structure); # set illuminant structure
+
+B<Examples>
+
+    use ICC::Support::Color;
+
+    $color = ICC::Support::Color->new({'illuminant' => ['CIE', 'FL11']}); # create a Color object
+    $illuminant = $color->illuminant(); # get illuminant structure
+    $range = $color->illuminant->[0]; # get illuminant range ([lower_nm, upper_nm, increment_nm])
+    $spd = $color->illuminant->[1]; # get illuminant spectral power distribution (SPD)
+    $rep = [[400, 700, 20], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]]; # replacement structure
+    $color->illuminant($rep); # set illuminant structure (see note 1)
+
+=over
+
+=item 1
+
+The parameter is copied to the object.
+
+=back
+
+=head3 observer
+
+This method returns a reference to the observer structure (see L<"Object structure"> section).
+The observer is usually set by the 'new' method, as specified by the 'observer' hash value.
+The color matching functions are normally CIE 15 values, or CIE 2012 "physiologically-relevant" values.
+It is possible to set other color matching functions, for instance, to model a camera or scanner.
+
+B<Usage>
+
+    $observer = $color->observer(); # get observer structure
+    $observer = $color->observer($replacement_structure); # set observer structure
+
+B<Examples>
+
+    use ICC::Support::Color;
+
+    $color = ICC::Support::Color->new({'illuminant' => ['CIE', 'FL11'], 'observer' => '2P'}); # create a Color object
+    $observer = $color->observer(); # get observer structure
+    $range = $color->observer->[0]; # get observer range ([lower_nm, upper_nm, increment_nm])
+    $cmf = $color->observer->[1]; # get observer color matching functions
+    $rep = [$range, [$cmf->[2], $cmf->[1], $cmf->[0]]]; # replacement structure (swapping the X and Z functions)
+    $color->observer($rep); # set observer structure (see notes 1 and 2)
+
+=over
+
+=item 1
+
+The parameter is copied to the object.
+
+=item 2
+
+Color is calculated over the range of the observer, using the increment specified by the 'increment' hash key (default is 1 nm).
+
+=back
+
+=head3 cwf
+
+This method returns a reference to the color-weight function structure (see L<"Object structure"> section).
+
+B<Usage>
+
+    $cwf = $color->cwf(); # get cwf structure
+    $cwf = $color->cwf($replacement_structure); # set cwf structure
+
+B<Examples>
+
+    use ICC::Support::Color;
+
+    $color = ICC::Support::Color->new({'illuminant' => ['CIE', 'FL11'], 'observer' => '2P'}); # create a Color object
+    $cwf = $color->cwf(); # get cwf structure
+    $range = $color->cwf->[0]; # get cwf range ([lower_nm, upper_nm, increment_nm])
+    $functions = $color->cwf->[1]; # get color-weight functions
+    $rep = [$range, [$functions->[2], $functions->[1], $functions->[0]]]; # replacement structure (swapping the X and Z functions)
+    $color->cwf($rep); # set cwf structure (see note 1)
+
+=over
+
+=item 1
+
+The parameter is copied to the object.
+
+=back
+
+=head3 iwtpt
+
+This method returns the illuminant white point as an XYZ vector.
+
+The XYZ encoding may be specified with an optional hash parameter.
+
+B<Usage>
+
+    $xyz = $color->iwtpt(); # get illuminant white point
+    $xyz = $color->iwtpt($hash); # with optional hash parameter
+
+B<Examples>
+
+    use ICC::Support::Color;
+
+    $color = ICC::Support::Color->new({'illuminant' => ['CIE' => 'D50']});
+    $xyz = $color->iwtpt(); # get illuminant white point (see notes 1)
+    $xyz = $color->iwtpt({'encoding' => 'ICC_XYZNumber'}); # with xyz encoding (see note 2)
+
+=over
+
+=item 1
+
+Returns an XYZ vector (1-D array)
+
+=item 2
+
+XYZ encoding is specified with optional parameter hash
+
+Hash values for 'encoding' are 'XYZ', 'xyz', 'ICC_XYZ', or 'ICC_XYZNumber', default is 'XYZ'
+
+=back
+
+=head2 Transformations
+
+=head3 transform
+
+This method transforms spectral data to XYZ colorimetric values.
+The colorimetric parameters (illuminant, observer, interpolation, bandpass, etc.) are specified when creating the Color object.
+
+B<Usage>
+
+    $xyz = $color->transform($spectral);
+    $xyz = $color->transform($spectral, $hash);
+
+B<Examples>
+
+    use ICC::Support::Chart;
+    use ICC::Support::Color;
+
+    $chart = ICC::Support::Chart->new('~/my_spectral_measurements.txt'); # open chart containing spectral data
+    $color = ICC::Support::Color->new({'illuminant' => ['CIE' => 'D50']}); # make Color object (see note 1)
+    $density = ICC::Support::Color->new({'status' => 'T'}); # make Color object for status T density
+
+    $spectral = $chart->spectral([]); # get matrix of spectral samples
+    $xyz = $color->transform($spectral); # transform spectral matrix to XYZ matrix
+    $xyz = $color->transform($spectral->[1]); # transform spectral vector to XYZ vector
+    @xyz = $color->transform(@{$spectral->[1]}); # transform spectral array to XYZ array
+    $xyz = $color->transform($spectral, {'encoding' => 'ICC_XYZNumber'}); # 'ICC_XYZNumber' encoding (see note 2)
+    $rgbv = $density->transform($spectral, {'encoding' => 'density'}); # 'density' encoding (see note 3)
+    $xyz = $color->transform($spectral, {'range' => [330, 780, 5]}); # special wavelength range (see note 4)
+
+=over
+
+=item 1
+
+Colorimetric parameters (illuminant, observer, interpolation, bandpass, etc.) are specified when creating the Color object.
+These keys are ignored by the 'transform' method.
+The 'illumination', 'observer' and 'cwf' methods override the original colorimetric parameters.
+
+=item 2
+
+XYZ encoding is specified with optional parameter hash.
+
+Hash values for 'encoding' are:
+
+    'XYZ' - XYZ values as defined by CIE 15 (0 - 100) (default)
+    'xyz' - XYZ values divided by white point XYZ values (0 - 1)
+    'ICC_XYZ' - XYZ values defined by ICC (L*a*b* 100, 0, 0 => 0.9642 * 32768/65535, 32768/65535, 0.8249 * 32768/65535 = 0.48211, 0.50001, 0.41246)
+    'ICC_XYZNumber' - XYZ values defined by ICC (L*a*b* 100, 0, 0 => 0.9642, 1.0, 0.8249)
+
+=item 3
+
+RGBV encoding is specified with optional parameter hash.
+
+Hash values for 'encoding' are:
+
+    'RGBV' or 'linear' - reflectance/transmittance values as specified in ISO 5-3 (0 - 100) (default)
+    'unit' - reflectance/transmittance values with range (0 - 1)
+    'density' - normal density values as specified in ISO 5-3 (-log10(R/100))
+
+=item 4
+
+Wavelength range may be specified with optional parameter hash.
+
+This overrides the normal behavior, where the range is determined by the number of spectral values.
+
+The user may edit the $srh hash at the start of the Color module to recognize other data ranges.
+
+=back
+
+=head3 jacobian
+
+This method caclulates the Jacobian matrix for a spectral vector.
+The colorimetric parameters (illuminant, observer, interpolation, bandpass, etc.) are specified when creating the Color object.
+
+B<Usage>
+
+    $matrix = $color->jacobian($spectral_vector);
+    $matrix = $color->jacobian($spectral_vector, $hash);
+    ($matrix, $xyz_vector) = $color->jacobian($spectral_vector);
+    ($matrix, $xyz_vector) = $color->jacobian($spectral_vector, $hash);
+
+B<Examples>
+
+    use ICC::Support::Chart;
+    use ICC::Support::Color;
+
+    $chart = ICC::Support::Chart->new('~/my_spectral_measurements.txt'); # open chart containing spectral data
+    $color = ICC::Support::Color->new({'illuminant' => ['CIE' => 'D50']}); # make Color object (see note 1)
+    $density = ICC::Support::Color->new({'status' => 'T'}); # make Color object for status T density
+
+    $spectral = $chart->spectral([]); # get matrix of spectral samples
+    $jac = $color->jacobian($spectral->[1]); # compute Jacobian matrix for spectral vector
+    ($jac, $xyz) = $color->jacobian($spectral->[1]); # compute Jacobian matrix and XYZ vector
+    ($jac, $xyz) = $color->jacobian($spectral->[1], {'encoding' => 'ICC_XYZNumber'}); # 'ICC_XYZNumber' encoding (see note 2)
+    ($jac, $rgbv) = $density->jacobian($spectral->[1], {'encoding' => 'density'}); # 'density' encoding (see note 3)
+    ($jac, $xyz) = $color->jacobian($spectral->[1], {'range' => [330, 780, 5]}); # special wavelength range (see note 4)
+
+=over
+
+=item 1
+
+Colorimetric parameters (illuminant, observer, interpolation, bandpass, etc.) are specified when creating the Color object.
+These keys are ignored by the 'transform' method.
+The 'illumination', 'observer' and 'cwf' methods override the original colorimetric parameters.
+
+=item 2
+
+XYZ encoding is specified with optional parameter hash.
+
+Hash values for 'encoding' are:
+
+    'XYZ' - XYZ values as defined by CIE 15 (0 - 100) (default)
+    'xyz' - XYZ values divided by white point XYZ values (0 - 1)
+    'ICC_XYZ' - XYZ values defined by ICC (L*a*b* 100, 0, 0 => 0.9642 * 32768/65535, 32768/65535, 0.8249 * 32768/65535 = 0.48211, 0.50001, 0.41246)
+    'ICC_XYZNumber' - XYZ values defined by ICC (L*a*b* 100, 0, 0 => 0.9642, 1.0, 0.8249)
+
+=item 3
+
+RGBV encoding is specified with optional parameter hash.
+
+Hash values for 'encoding' are:
+
+    'RGBV' or 'linear' - reflectance/transmittance values as specified in ISO 5-3 (0 - 100) (default)
+    'unit' - reflectance/transmittance values with range (0 - 1)
+    'density' - normal density values as specified in ISO 5-3 (-log10(R/100))
+
+=item 4
+
+Wavelength range may be specified with optional parameter hash.
+
+This overrides the normal behavior, where the range is determined by the number of spectral values.
+
+The user may edit the $srh hash at the start of the Color module to recognize other data ranges.
+
+=back
+
+=head2 General
+
+=head3 sdump
+
+This method returns a string showing the structure of the Color object.
+
+B<Usage>
+
+    $string = $color->sdump([$format]);
+    $color->dump([$format]);
+
+B<Examples>
+
+    use ICC::Support::Color;
+
+    $color = ICC::Support::Color->new({'illuminant' => ['CIE' => 'D50']});
+    $string = $color->sdump(); # dump to string
+    $color->dump(); # dump to STD output
+
+=head1 SEE ALSO
+
+=head2 ANSI Standards
+
+B<CGATS.4> I<Graphic technology - Graphic arts reflection densitometry measurements - Terminology, equations, image elements and procedures>
+
+B<CGATS.5> I<Graphic technology - Spectral measurement and colorimetric computation for graphic arts images>
+
+=head2 ASTM Standards
+
+B<ASTM E 308> I<Standard Practice for Computing the Colors of Objects by Using the CIE System>
+
+B<ASTM E 2022> I<Standard Practice for Calculation of Weighting Factors for Tristimulus Integration>
+
+B<ASTM E 2729> I<Standard Practice for Rectification of Spectrophotometric Bandpass Differences>
+
+=head2 CIE Standards
+
+B<CIE 15> I<Colorimetry>
+
+B<CIE 167> I<Recommended Practice for Tabulating Spectral Data for Use In Colour Computations>
+
+B<CIE 214> I<Effect of Instrumental Bandpass Function and Measurement Interval on Spectral Quantities>
+
+=head2 ISO Standards
+
+B<ISO 5-3> I<Photography and graphic technology — Spectral density measurements — Part 3: Spectral conditions>
+
+B<ISO 13655> I<Graphic technology — Spectral measurement and colorimetric computation for graphic arts images>
+
+=head2 Color Research Organizations
+
+B<Colour & Vision Research Laboratory> L<http://www.cvrl.org/>
+
+B<Munsell Color Science Laboratory> L<http://www.rit.edu/cos/colorscience/>
+
+=head1 LICENSE
+
+Programs in this distribution, authored by William B. Birkett, are licensed under the GNU General Public License, v3.
+
+See L<http://www.gnu.org/licenses/gpl.html> for license details.
+
+=head1 AUTHOR
+
+William B. Birkett, E<lt>wbirkett@doplganger.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright © 2004-2018 by William B. Birkett
+
+=cut

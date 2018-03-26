@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CurveSet Averaging="None" Compensation="one_for_ink" CurveForUnknownColors="0" Measurements="one_for_ink">
+	<Curve Name="Cyan" Side="Front">
+		<CurveProperties AlwaysKeep100="true" CallibratedModeOn="true" ClipToZeroBelow="0" DMax="2.5" DMin="0" EnableClipToZeroBelow="true" EnableMaxDotPercentage="true" EnableMinDotPercentage="true" IgnoreDiscrepancies="true" MaxDotPercentage="100" MinDotPercentage="0" ShowAsDensity="false" SmoothCurve="true" UseMeasuredPoints="false" Yule_Nielsen_Factor="1"/>
+	</Curve>
+	<Curve Name="Magenta" Side="Front">
+		<CurveProperties AlwaysKeep100="true" CallibratedModeOn="true" ClipToZeroBelow="0" DMax="2.5" DMin="0" EnableClipToZeroBelow="true" EnableMaxDotPercentage="true" EnableMinDotPercentage="true" IgnoreDiscrepancies="true" MaxDotPercentage="100" MinDotPercentage="0" ShowAsDensity="false" SmoothCurve="true" UseMeasuredPoints="false" Yule_Nielsen_Factor="1"/>
+	</Curve>
+	<Curve Name="Yellow" Side="Front">
+		<CurveProperties AlwaysKeep100="true" CallibratedModeOn="true" ClipToZeroBelow="0" DMax="2.5" DMin="0" EnableClipToZeroBelow="true" EnableMaxDotPercentage="true" EnableMinDotPercentage="true" IgnoreDiscrepancies="true" MaxDotPercentage="100" MinDotPercentage="0" ShowAsDensity="false" SmoothCurve="true" UseMeasuredPoints="false" Yule_Nielsen_Factor="1"/>
+	</Curve>
+	<Curve Name="Black" Side="Front">
+		<CurveProperties AlwaysKeep100="true" CallibratedModeOn="true" ClipToZeroBelow="0" DMax="2.5" DMin="0" EnableClipToZeroBelow="true" EnableMaxDotPercentage="true" EnableMinDotPercentage="true" IgnoreDiscrepancies="true" MaxDotPercentage="100" MinDotPercentage="0" ShowAsDensity="false" SmoothCurve="true" UseMeasuredPoints="false" Yule_Nielsen_Factor="1"/>
+	</Curve>
+</CurveSet>

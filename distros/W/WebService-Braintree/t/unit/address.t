@@ -16,7 +16,7 @@ subtest "validation" => sub {
 };
 
 subtest "instance methods" => sub {
-    my $address = WebService::Braintree::Address->new(first_name => "Walter", last_name => "Weatherman");
+    my $address = WebService::Braintree::_::Address->new(first_name => "Walter", last_name => "Weatherman");
     is $address->full_name, "Walter Weatherman";
 };
 

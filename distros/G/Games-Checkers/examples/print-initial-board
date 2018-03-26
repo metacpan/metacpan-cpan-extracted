@@ -8,6 +8,6 @@ use lib "$FindBin::Bin/../lib";
 
 use Games::Checkers::Board;
 
-my $board = Games::Checkers::Board->new;
+my $board = Games::Checkers::Board->new($ENV{BOARD}, $ENV{BOARD_SIZE});
 
 print $board->dump;

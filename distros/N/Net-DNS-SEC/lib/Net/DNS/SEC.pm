@@ -1,11 +1,11 @@
 package Net::DNS::SEC;
 
 #
-# $Id: SEC.pm 1655 2018-03-20 08:41:36Z willem $
+# $Id: SEC.pm 1657 2018-03-22 14:37:04Z willem $
 #
 our $VERSION;
-$VERSION = '1.05';
-our $SVNVERSION = (qw$LastChangedRevision: 1655 $)[1];
+$VERSION = '1.06';
+our $SVNVERSION = (qw$LastChangedRevision: 1657 $)[1];
 our $XS_VERSION = $VERSION;
 $VERSION = eval($VERSION);
 

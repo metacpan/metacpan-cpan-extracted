@@ -1,0 +1,18 @@
+Revision history for Mojolicious application Slovo
+
+
+2018.03.24
+    - Made the application installable as any perl module.
+        * added EXE_FILES to the installation
+        * Fixed unwanted installation of README.pod
+        * Added new target "readme" for "make" which is also part of the
+        "dist" target.
+        * Added new target perltidy which is also part of the "test" target.
+    - Made the application installable as a perl application.
+
+2018.03.23
+    - Original version; created by ExtUtils::ModuleMaker 0.56
+    - Generated application using `mojo generate app Slovo`
+    - Modified Makefile.PL and whatever needed so most basic tests pass.
+    - Used $CODENAME from Ado to indicate that this project is continuation of
+      Ado (in a way).

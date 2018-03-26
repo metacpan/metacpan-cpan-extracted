@@ -1,7 +1,7 @@
 package WordList;
 
-our $DATE = '2018-03-19'; # DATE
-our $VERSION = '0.2.1'; # VERSION
+our $DATE = '2018-03-23'; # DATE
+our $VERSION = '0.3.1'; # VERSION
 
 use strict 'subs', 'vars';
 
@@ -25,85 +25,74 @@ sub each_word {
     seek $fh, ${"$class\::DATA_POS"}, 0;
     while (defined(my $word = <$fh>)) {
         chomp $word;
-        $code->($word);
+        my $res = $code->($word);
+        last if defined $res && $res == -2;
     }
 }
 
 sub pick {
     my ($self, $n) = @_;
 
-    $n ||= 1;
+    $n = 1 if !defined $n;
+    die "Please specify a positive number of words to pick" if $n < 1;
 
-    my $class = ref($self);
-
-    my $fh = \*{"$class\::DATA"};
-
-    seek $fh, ${"$class\::DATA_POS"}, 0;
-    if ($n < 1) {
-        die "Please specify a positive number of words to pick";
-    } elsif ($n == 1) {
-        # use algorithm from Learning Perl
+    if ($n == 1) {
+        my $i = 0;
         my $word;
-        my $i = 0;
-        while (defined(my $line = <$fh>)) {
-            $i++;
-            $word = $line if rand($i) < 1;
-        }
-        chomp($word);
+        # algorithm from Learning Perl
+        $self->each_word(
+            sub {
+                $i++;
+                $word = $_[0] if rand($i) < 1;
+            }
+        );
         return $word;
-    } else {
-        my @words;
-        my $i = 0;
-        while (defined(my $line = <$fh>)) {
+    }
+
+    my $i = 0;
+    my @words;
+    $self->each_word(
+        sub {
             $i++;
             if (@words < $n) {
                 # we haven't reached $n, put word to result in a random position
-                splice @words, rand(@words+1), 0, $line;
+                splice @words, rand(@words+1), 0, $_[0];
             } else {
                 # we have reached $n, just replace a word randomly, using
                 # algorithm from Learning Perl, slightly modified
-                rand($i) < @words and splice @words, rand(@words), 1, $line;
+                rand($i) < @words and splice @words, rand(@words), 1, $_[0];
             }
         }
-        chomp(@words);
-        return @words;
-    }
+    );
+    @words;
 }
 
 sub word_exists {
     my ($self, $word) = @_;
 
-    my $class = ref($self);
-
-    my $fh = \*{"$class\::DATA"};
-
-    seek $fh, ${"$class\::DATA_POS"}, 0;
-    while (defined(my $line = <$fh>)) {
-        chomp $line;
-        if ($word eq $line) {
-            return 1;
+    my $found = 0;
+    $self->each_word(
+        sub {
+            if ($word eq $_[0]) {
+                $found = 1;
+                return -2;
+            }
         }
-    }
-    0;
+    );
+    $found;
 }
 
 sub all_words {
     my ($self) = @_;
 
-    my $class = ref($self);
-
-    my $fh = \*{"$class\::DATA"};
-
-    seek $fh, ${"$class\::DATA_POS"}, 0;
-    my @res;
-    while (defined(my $word = <$fh>)) {
-        chomp $word;
-        push @res, $word;
-    }
-    @res;
+    my @words;
+    $self->each_word(
+        sub {
+            push @words, $_[0];
+        }
+    );
+    @words;
 }
-
-# TODO: binary search method, etc
 
 1;
 # ABSTRACT: Word lists
@@ -120,7 +109,7 @@ WordList - Word lists
 
 =head1 VERSION
 
-This document describes version 0.2.1 of WordList (from Perl distribution WordList), released on 2018-03-19.
+This document describes version 0.3.1 of WordList (from Perl distribution WordList), released on 2018-03-23.
 
 =head1 SYNOPSIS
 
@@ -195,33 +184,59 @@ Pick $n words matching regex $re.
 
 =head1 METHODS
 
-=head2 new()
+=head2 new
+
+Usage:
+
+ $wl = WordList::Module->new => obj
 
 Constructor.
 
-=head2 $wl->each_word($code)
+=head2 each_word
+
+Usage:
+
+ $wl->each_word($code)
 
 Call C<$code> for each word in the list. The code will receive the word as its
 first argument.
 
-=head2 $wl->pick($n = 1) => list
+If code return -2 will exit early.
 
-Pick C<$n> (default: 1) random words from the list. If there are less then C<$n>
-words in the list, only that many will be returned.
+=head2 pick
+
+Usage:
+
+ $wl->pick($n = 1) => list
+
+Pick C<$n> (default: 1) random word(s) from the list. If there are less then
+C<$n> words in the list, only that many will be returned.
 
 The algorithm used is from perlfaq ("perldoc -q "random line""), which scans the
-whole list once. The algorithm is for returning a single entry and is modified
-to support returning multiple entries.
+whole list once (a.k.a. each_word() once). The algorithm is for returning a
+single entry and is modified to support returning multiple entries.
 
-=head2 $wl->word_exists($word) => bool
+=head2 word_exists
+
+Usage:
+
+ $wl->word_exists($word) => bool
 
 Check whether C<$word> is in the list.
 
-Algorithm is binary search (NOTE: not yet implemented, currently linear search).
+Algorithm in this implementation is linear scan (O(n)). Check out
+L<WordList::Role::BinarySearch> for an O(log n) implementation, or
+L<WordList::Role::Bloom> for O(1) implementation.
 
-=head2 $wl->all_words() => list
+=head2 all_words
 
-Return all the words in a list.
+Usage:
+
+ $wl->all_words() => list
+
+Return all the words in a list, in order. Note that if wordlist is very large
+you might want to use L</"each_word"> instead to avoid slurping all words into
+memory.
 
 =head1 HOMEPAGE
 
@@ -241,9 +256,9 @@ feature.
 
 =head1 SEE ALSO
 
-L<Bencher::Scenario::GamesWordlistModules>
+C<WordList::Role::*> modules.
 
-L<Bencher::Scenario::WordListModules>
+Other C<WordList::*> modules.
 
 =head1 AUTHOR
 

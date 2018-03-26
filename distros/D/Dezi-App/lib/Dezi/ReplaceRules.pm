@@ -8,7 +8,7 @@ use Text::ParseWords;
 use Try::Tiny;
 use namespace::autoclean;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 has 'rules' => ( is => 'rw', isa => 'ArrayRef' );
 
@@ -47,7 +47,7 @@ in a Dezi::Indexer::Config object or config file.
 Constructor for new ReplaceRules object. I<rules> should be an array
 of strings as defined in
 L<http://swish-e.org/docs/swish-config.html#replacerules>.
- 
+
 =head2 BUILDARGS
 
 Internal method. Allows for single argument to new().
@@ -170,6 +170,7 @@ sub apply {
 
             #warn "code='$code'\n";
             try {
+                ## no critic (ProhibitStringyEval)
                 eval "$code";
             }
             catch {
@@ -195,7 +196,7 @@ Peter Karman, E<lt>perl@peknet.comE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-swish-prog at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
@@ -234,10 +235,10 @@ L<http://search.cpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2011 by Peter Karman
+Copyright 2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

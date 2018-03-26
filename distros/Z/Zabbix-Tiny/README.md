@@ -29,7 +29,7 @@ Zabbix::Tiny - A small module to eliminate boilerplate overhead when using the Z
     };
 
     $zabbix->prepare('host.get', $params);  # Prepare the query.
-    print $zabbix->prepared . "\n";         # Get the JSON query without actually executing it.
+    print $zabbix->json_prepared . "\n";    # Get the JSON query without actually executing it.
     my $host = $zabbix->do;                 # Execute the prepared query.
 
     # Alternately, the query can be prepared and executed in one step.
@@ -49,6 +49,7 @@ Zabbix::Tiny - A small module to eliminate boilerplate overhead when using the Z
     # Debugging methods:
     print "JSON request:\n" . $zabbix->json_request . "\n\n";   # Print the json data sent in the last request.
     print "JSON response:\n" . $zabbix->json_response . "\n\n"; # Print the json data received in the last response.
+    print "Prepared JSON:\n" . $zabbix->json_prepared . "\n\n"; # Print the JSON that will be sent if $zabbix->do is called.
     print "Auth is: ". $zabbix->auth . "\n";
 
     print "\$zabbix->last_response:\n";
@@ -112,6 +113,10 @@ The Zabbix::Tiny `do` method contains a very succinct arrayref that should conta
 
     Used to retrieve the last raw json message from the zabbix server,  including the "jsonrpc", "id", and "auth".
 
+- my $json\_prepared = $zabbix->json\_prepared;
+
+    Used to retrieve the raw json message ready to be sent to Zabbix server, including the "jsonrpc", "id" and "auth".
+
 - my $verbose = $zabbix->last\_response;
 
     Similar to json\_response, but the last response message as a perl data structure (hashref).
@@ -128,7 +133,7 @@ Probably bugs.
 
 ## Untrusted Certificates
 
-In many cases it is expected that zabbix servers may be using self-signed or otherwise 'untrusted' certiifcates.  The ssl\_opts argument in the constructor can be set to any valid values for LWP::UserAgent to disallow certificate checks.  For example:
+In many cases it is expected that zabbix servers may be using self-signed or otherwise 'untrusted' certificates.  The ssl\_opts argument in the constructor can be set to any valid values for LWP::UserAgent to disallow certificate checks.  For example:
 
     use strict;
     use warnings;
@@ -147,7 +152,7 @@ In many cases it is expected that zabbix servers may be using self-signed or oth
 
 # See Also
 
-Zabbix API Documentation: [https://www.zabbix.com/documentation/3.0/manual/api](https://www.zabbix.com/documentation/3.0/manual/api)
+Zabbix API Documentation: [https://www.zabbix.com/documentation/3.2/manual/api](https://www.zabbix.com/documentation/3.2/manual/api)
 
 # COPYRIGHT
 
@@ -155,7 +160,7 @@ Zabbix::Tiny is Copyright (C) 2016, Ben Kaufman.
 
 # License Information
 
-This module is free software; you can redistribute it and/or modify it under the same terms as Perl 5.20.3.
+This module is free software; you can redistribute it and/or modify it under the same terms as Perl 5.
 
 This program is distributed in the hope that it will be useful, but it is provided 'as is' and without any express or implied warranties.
 

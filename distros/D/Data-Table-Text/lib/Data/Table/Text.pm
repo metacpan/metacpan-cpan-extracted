@@ -1,14 +1,14 @@
 #!/usr/bin/perl
 #-------------------------------------------------------------------------------
 # Write data in tabular text format
-# Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2017
+# Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2018
 #-------------------------------------------------------------------------------
 # podDocumentation
 # line 1025 - handle: sub a::b
 
 package Data::Table::Text;
 use v5.8.0;
-our $VERSION = '20180316';
+our $VERSION = '20180327';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -21,6 +21,7 @@ use Data::Dump qw(dump);
 use JSON;
 use MIME::Base64;
 use String::Numeric qw(is_float);
+use Time::HiRes qw(gettimeofday);
 use utf8;
 
 #1 Time stamps                                                                  # Date and timestamps as used in logs of long running commands
@@ -39,6 +40,11 @@ sub versionCode                                                                 
 
 sub timeStamp                                                                   # hours:minute:seconds
  {strftime('%H:%M:%S', localtime)
+ }
+
+sub microSecondsSinceEpoch                                                      # Micro seconds since unix epoch
+ {my ($s, $u) = gettimeofday();
+  $s*1e6 + $u
  }
 
 #1 Command execution                                                            # Various ways of processing commands
@@ -342,6 +348,7 @@ sub searchDirectoryTreesForMatchingFiles(@)                                     
   my @extensions = grep {!-d $_ } @_;                                           # Extensions
   my $e = join '|', @extensions;                                                # Files
   my @f;                                                                        # Files
+confess;
   for my $dir(@folder)                                                          # Directory
    {for(split /\0/, qx(find $dir -print0))
      {next if -d $_;                                                            # Do not include folder names
@@ -1154,7 +1161,7 @@ END
        ($example, $produces) = split /:/, $2, 2;
        }
 
-      my $signature = $sub =~ s/\A\s*\w+//gsr =~                                # Signature
+      my $signature = $sub =~ s/\A\s*(\w|:)+//gsr =~                            # Signature
                               s/\A\(//gsr     =~
                               s/\)\s*(:lvalue\s*)?\Z//gsr =~
                               s/;//gsr;                                         # Remove optional parameters marker from signature
@@ -1327,7 +1334,7 @@ L<http://www.appaapps.com|http://www.appaapps.com>
 
 `head1 Copyright
 
-Copyright (c) 2016-2017 Philip R Brenan.
+Copyright (c) 2016-2018 Philip R Brenan.
 
 This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.
@@ -1460,7 +1467,7 @@ javaPackage javaPackageAsFileName
 keyCount
 loadArrayArrayFromLines loadArrayFromLines
 loadHashArrayFromLines loadHashFromLines
-makePath matchPath max min
+makePath matchPath max microSecondsSinceEpoch min
 nws
 pad parseFileName parseCommandLineArguments powerOfTwo printFullFileName printQw
 quoteFile
@@ -1593,6 +1600,11 @@ YYYmmdd-HHMMSS
 hours:minute:seconds
 
 
+=head2 microSecondsSinceEpoch()
+
+Micro seconds since unix epoch
+
+
 =head1 Command execution
 
 Various ways of processing commands
@@ -1611,7 +1623,7 @@ Execute a block of shell commands line by line after removing comments - stop if
      Parameter  Description
   1  $cmd       Commands to execute separated by new lines
 
-=head2 zzz($$$)
+=head2 zzz($$$$)
 
 Execute lines of commands as one long command string separated by added &&'s and then check that the pipeline results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
 
@@ -1619,6 +1631,7 @@ Execute lines of commands as one long command string separated by added &&'s and
   1  $cmd         Commands to execute - one per line with no trailing &&
   2  $success     Optional regular expression to check for acceptable results
   3  $returnCode  Optional regular expression to check the acceptable return codes
+  4  $message     Message of explanation if any of the checks fail
 
 =head2 parseCommandLineArguments(&$$)
 
@@ -1886,6 +1899,14 @@ Write a unicode string to a file after creating a path to the file if necessary 
      Parameter  Description
   1  $file      File to write to
   2  $string    Unicode string to write
+
+=head3 writeFiles($$)
+
+Write the values of a hash as a file identified by the key of the value
+
+     Parameter  Description
+  1  $hash      Hash of key value pairs representing files and data
+  2  $folder    Optional folder to contain files else the current folder
 
 =head3 appendFile($$)
 
@@ -2541,69 +2562,73 @@ Extract a line of a test.
 
 65 L<max|/max>
 
-66 L<min|/min>
+66 L<microSecondsSinceEpoch|/microSecondsSinceEpoch>
 
-67 L<nws|/nws>
+67 L<min|/min>
 
-68 L<pad|/pad>
+68 L<nws|/nws>
 
-69 L<parseCommandLineArguments|/parseCommandLineArguments>
+69 L<pad|/pad>
 
-70 L<parseFileName|/parseFileName>
+70 L<parseCommandLineArguments|/parseCommandLineArguments>
 
-71 L<perlPackage|/perlPackage>
+71 L<parseFileName|/parseFileName>
 
-72 L<powerOfTwo|/powerOfTwo>
+72 L<perlPackage|/perlPackage>
 
-73 L<powerOfTwoX|/powerOfTwo>
+73 L<powerOfTwo|/powerOfTwo>
 
-74 L<printFullFileName|/printFullFileName>
+74 L<powerOfTwoX|/powerOfTwo>
 
-75 L<printQw|/printQw>
+75 L<printFullFileName|/printFullFileName>
 
-76 L<quoteFile|/quoteFile>
+76 L<printQw|/printQw>
 
-77 L<readBinaryFile|/readBinaryFile>
+77 L<quoteFile|/quoteFile>
 
-78 L<readFile|/readFile>
+78 L<readBinaryFile|/readBinaryFile>
 
-79 L<removeFilePrefix|/removeFilePrefix>
+79 L<readFile|/readFile>
 
-80 L<renormalizeFolderName|/renormalizeFolderName>
+80 L<removeFilePrefix|/removeFilePrefix>
 
-81 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
+81 L<renormalizeFolderName|/renormalizeFolderName>
 
-82 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords>
+82 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
 
-83 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords>
+83 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords>
 
-84 L<temporaryDirectory|/temporaryDirectory>
+84 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords>
 
-85 L<temporaryFile|/temporaryFile>
+85 L<temporaryDirectory|/temporaryDirectory>
 
-86 L<temporaryFolder|/temporaryFolder>
+86 L<temporaryFile|/temporaryFile>
 
-87 L<timeStamp|/timeStamp>
+87 L<temporaryFolder|/temporaryFolder>
 
-88 L<trackFiles|/trackFiles>
+88 L<timeStamp|/timeStamp>
 
-89 L<trim|/trim>
+89 L<trackFiles|/trackFiles>
 
-90 L<updateDocumentation|/updateDocumentation>
+90 L<trim|/trim>
 
-91 L<userId|/userId>
+91 L<updateDocumentation|/updateDocumentation>
 
-92 L<versionCode|/versionCode>
+92 L<userId|/userId>
 
-93 L<writeBinaryFile|/writeBinaryFile>
+93 L<versionCode|/versionCode>
 
-94 L<writeFile|/writeFile>
+94 L<writeBinaryFile|/writeBinaryFile>
 
-95 L<xxx|/xxx>
+95 L<writeFile|/writeFile>
 
-96 L<yyy|/yyy>
+96 L<writeFiles|/writeFiles>
 
-97 L<zzz|/zzz>
+97 L<xxx|/xxx>
+
+98 L<yyy|/yyy>
+
+99 L<zzz|/zzz>
 
 =head1 Installation
 
@@ -2625,7 +2650,7 @@ L<http://www.appaapps.com|http://www.appaapps.com>
 
 =head1 Copyright
 
-Copyright (c) 2016-2017 Philip R Brenan.
+Copyright (c) 2016-2018 Philip R Brenan.
 
 This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.
@@ -2673,6 +2698,7 @@ __DATA__
 use Test::More tests => 140;
 
 #Test::More->builder->output("/dev/null");
+my $windows = $^O =~ m(MSWin32)is;
 
 if (1)                                                                          # Unicode to local file
  {use utf8;
@@ -2746,8 +2772,11 @@ if (1)                                                                          
   ok $s eq $z;
   ok length($s) == length($z);
 
-  my @f = findFiles($T);
-  ok $f[0] eq $f, "Find unicode file name";
+  if ($windows) {ok 1}
+  else
+   {my @f = findFiles($T);
+    ok $f[0] eq $f, "Find unicode file name";
+   }
 
   unlink $f;
   ok !-e $f, $f;
@@ -2808,11 +2837,14 @@ if (1)                                                                          
     writeFile($f, '1');
     pop @D;
    }
-  ok findFiles($d) == 4;
-  eval {clearFolder($d, 3)};
-  ok $@ =~ m(\ALimit is 3, but 4 files under folder:)s;
-  clearFolder($d, 4);
-  ok !-e $d;
+  if ($windows) {ok 1}
+  else
+   {ok findFiles($d) == 4;
+    eval {clearFolder($d, 3)};
+    ok $@ =~ m(\ALimit is 3, but 4 files under folder:)s;
+    clearFolder($d, 4);
+    ok !-e $d;
+   }
  }
 
 if (1)                                                                          # Format table and AA

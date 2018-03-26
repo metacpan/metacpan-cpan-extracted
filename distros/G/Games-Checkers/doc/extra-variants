@@ -1,0 +1,37 @@
+These variants introduce a new piece type besides pawn and king, or new
+cell/move types. There are no plans to support them, but who knows...
+
+Big Shot Checkers
+-----------------
+
+Played on 8x8 board. There is one Big Shot piece replacing one pawn at
+the start. The game is played by normal checkers rules (usually English
+rules), so it ends when no moves or no pieces are left for one side.
+
+Additionally, Big Shot piece can move like a king. It can be swapped with
+any own piece next to it as a new kind of move. The game is also won when
+a Big Shot piece becomes a king.
+
+Tower Checkers
+--------------
+
+Played on 7x7, 8x8 or other boards. The pieces are captured by stacking
+below the attacking piece rather than annihilating. The attacking piece
+becomes a tower. Towers can be up to the total number of pieces tall,
+and can be of a single color or of 2 stacks, each of one color.
+
+The captured opponent pieces, if any, are always strictly at the tower's
+bottom. The top tower piece determines the tower ownership. Only the top
+tower piece is captured and is placed under the attacking tower, so a
+tower can change ownership after being captured.
+
+Armenian/Turkish Checkers
+-------------------------
+
+All 64 cells of the board are used (both dark and light). The 16 pieces
+for each opponent are initially placed on the second and third rows.
+
+The pieces can move forward/left/right (and forward-left/forward-right in
+Armenian), and can capture forward/left/right (and backward in Armenian).
+The kings add backward directions and can fly.
+

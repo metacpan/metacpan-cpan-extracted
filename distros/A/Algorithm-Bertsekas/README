@@ -17,7 +17,7 @@ DESCRIPTION
  assigned to. The numbers in the table are the costs associated with each particular assignment."
  
  In Auction Algorithm (AA) the N persons iteratively submit the bids to M objects.
- The AA take cost Matrix_N×M = [aij] as an input and produce assignment as an output.
+ The AA take cost Matrix N×M = [aij] as an input and produce assignment as an output.
  In the AA persons iteratively submit the bids to the objects which are then reassigned 
  to the bidders which offer them the best bid.
  
@@ -30,7 +30,8 @@ DESCRIPTION
 SYNOPSIS
 
  use Algorithm::Bertsekas qw(auction);
-
+ 
+ Example 1: Minimize the total benefit.
  my @array1 = ( 22, 15, 98,  1 );
  my @array2 = ( 72, 99, 29, 88, 12, 26, 41 );
 
@@ -51,18 +52,9 @@ SYNOPSIS
  15 [ 57 84 14 73  3 11 26 ]
  98 [ 26  1 69 10 86 72 57 ]
   1 [ 71 98 28 87 11 25 40 ]
- 
- Alternatively, we can define the matrix with its elements:
-
- my @input_matrix = (
- [ 50, 77,  7, 66, 10,  4, 19 ],
- [ 57, 84, 14, 73,  3, 11, 26 ],
- [ 26,  1, 69, 10, 86, 72, 57 ],
- [ 71, 98, 28, 87, 11, 25, 40 ]
- );
-
- my ( $optimal, $assignement_ref, $output_index_ref ) = auction( matrix_ref => \@input_matrix, maximize_total_benefit => 0, verbose => 3 );
-
+  
+ my ( $optimal, $assignement_ref, $output_index_ref ) = auction( matrix_ref => \@input_matrix, maximize_total_benefit => 0, verbose => 5 );
+  
  Objective: to Minimize the total benefit
  Number of left nodes: 4
  Number of right nodes: 7
@@ -71,26 +63,102 @@ SYNOPSIS
  Solution:
  Optimal assignment: sum of values = 30
  Feasible assignment condition: stepsize = 0.2 < 1/4 = 0.25
- Number of iterations: 17
+ Number of iterations: 15
 
- Maximum index size    = [ 0  1  2  3  4  5  6 ]
- @output_index indexes = [ 5  2  1  4  6  0  3 ]
- @output_index values  = [ 4 14  1 11          ]
+ row index    = [ 0  1  2  3  4  5  6 ]
+ column index = [ 2  5  1  4  0  6  3 ]
+ matrix value = [ 7 11  1 11          ]
+
+ modified matrix 4 x 7:
+ [ 48   21   91** 32   88   94   79  ]
+ [ 41   14   84   25   95   87** 72  ]
+ [ 72   97** 29   88   12   26   41  ]
+ [ 27    0   70   11   87** 73   58  ]
 
  original matrix 4 x 7 with solution:
- [ 50   77    7   66   10    4** 19  ]
- [ 57   84   14** 73    3   11   26  ]
+ [ 50   77    7** 66   10    4   19  ]
+ [ 57   84   14   73    3   11** 26  ]
  [ 26    1** 69   10   86   72   57  ]
  [ 71   98   28   87   11** 25   40  ]
 
- Pairs (in ascending order of weight function values):
-   indexes ( 2, 1 ), weight value =  1 ; sum of values =  1
-   indexes ( 0, 5 ), weight value =  4 ; sum of values =  5
-   indexes ( 3, 4 ), weight value = 11 ; sum of values = 16
-   indexes ( 1, 2 ), weight value = 14 ; sum of values = 30
-   indexes ( 4, 6 ), weight value =    ; sum of values = 30
-   indexes ( 5, 0 ), weight value =    ; sum of values = 30
-   indexes ( 6, 3 ), weight value =    ; sum of values = 30
+ Pairs (in ascending order of matrix values):
+   indices ( 2, 1 ), matrix value =  1 ; sum of values =  1
+   indices ( 0, 2 ), matrix value =  7 ; sum of values =  8
+   indices ( 1, 5 ), matrix value = 11 ; sum of values = 19
+   indices ( 3, 4 ), matrix value = 11 ; sum of values = 30
+   indices ( 4, 0 ), matrix value =    ; sum of values = 30
+   indices ( 5, 6 ), matrix value =    ; sum of values = 30
+   indices ( 6, 3 ), matrix value =    ; sum of values = 30  
+  
+ Example 2: Maximize the total benefit.
+ Alternatively, we can define the matrix with its elements:
+ 
+ my $N = 10;
+ my $M = 10;
+ my $r = 100;
+ 
+ my @input_matrix;
+ for my $i ( 0 .. $N - 1 ){
+   my @weight_function;		   
+   for my $j ( 0 .. $M - 1 ){
+	  my $weight = sprintf( "%.0f", rand($r) );
+      push @weight_function, $weight;
+   }
+   push @input_matrix, \@weight_function;
+ }
+
+ my @input_matrix = ( 
+ [  84,  94,  75,  56,  66,  95,  39,  53,  73,   4 ],
+ [  76,  71,  56,  49,  29,   1,  40,  40,  72,  72 ],
+ [  85, 100,  71,  23,  47,  18,  82,  70,  30,  71 ],
+ [   2,  95,  71,  89,  73,  73,  48,  52,  90,  51 ],
+ [  65,  28,  77,  73,  24,  28,  75,  48,   8,  81 ],
+ [  25,  27,  35,  89,  98,  10,  99,   3,  27,   4 ],
+ [  58,  15,  99,  37,  92,  55,  52,  82,  73,  96 ],
+ [  11,  75,   2,   1,  88,  43,   8,  28,  98,  20 ],
+ [  52,  95,  10,  38,  41,  64,  20,  75,   1,  47 ],
+ [  50,  80,  31,  90,  10,  83,  51,  55,  57,  40 ]
+ );
+
+ my ( $optimal, $assignement_ref, $output_index_ref ) = auction( matrix_ref => \@input_matrix, maximize_total_benefit => 1, verbose => 3 );
+
+ Objective: to Maximize the total benefit
+ Number of left nodes: 10
+ Number of right nodes: 10
+ Number of edges: 100
+
+ Solution:
+ Optimal assignment: sum of values = 893
+ Feasible assignment condition: stepsize = 0.09091 < 1/10 = 0.1
+ Number of iterations: 27
+
+ row index    = [  0   1   2   3   4   5   6   7   8   9 ]
+ column index = [  5   0   1   8   9   6   2   4   7   3 ]
+ matrix value = [ 95  76 100  90  81  99  99  88  75  90 ]
+
+ original matrix 10 x 10 with solution:
+ [  84    94    75    56    66    95**  39    53    73     4  ]
+ [  76**  71    56    49    29     1    40    40    72    72  ]
+ [  85   100**  71    23    47    18    82    70    30    71  ]
+ [   2    95    71    89    73    73    48    52    90**  51  ]
+ [  65    28    77    73    24    28    75    48     8    81**]
+ [  25    27    35    89    98    10    99**   3    27     4  ]
+ [  58    15    99**  37    92    55    52    82    73    96  ]
+ [  11    75     2     1    88**  43     8    28    98    20  ]
+ [  52    95    10    38    41    64    20    75**   1    47  ]
+ [  50    80    31    90**  10    83    51    55    57    40  ]
+
+ Pairs (in ascending order of matrix values):
+   indices (  8,  7 ), matrix value =  75 ; sum of values =  75
+   indices (  1,  0 ), matrix value =  76 ; sum of values = 151
+   indices (  4,  9 ), matrix value =  81 ; sum of values = 232
+   indices (  7,  4 ), matrix value =  88 ; sum of values = 320
+   indices (  3,  8 ), matrix value =  90 ; sum of values = 410
+   indices (  9,  3 ), matrix value =  90 ; sum of values = 500
+   indices (  0,  5 ), matrix value =  95 ; sum of values = 595
+   indices (  5,  6 ), matrix value =  99 ; sum of values = 694
+   indices (  6,  2 ), matrix value =  99 ; sum of values = 793
+   indices (  2,  1 ), matrix value = 100 ; sum of values = 893
 
  Common use of the solution:
    
@@ -99,9 +167,12 @@ SYNOPSIS
    ...
  }
  
+ my $sum = 0;
  for my $i ( 0 .. $#{$output_index_ref} ){
-   my $j = $output_index_ref->[$i];
-   ...
+	my $j = $output_index_ref->[$i];   
+	my $value = $input_matrix[$i]->[$j];  
+	$sum += $value;
+	printf " Auction Algorithm, output index --> \$i = %3d ; \$j = %3d ; \$value = %5s ; \$sum = %5s \n", $i, $j, $value, $sum;
  }
  
 OPTIONS
@@ -109,7 +180,7 @@ OPTIONS
  matrix_ref => \@input_matrix,   reference to array: matrix N x M.
  maximize_total_benefit => 0,    0: minimize the total benefit ; 1: maximize the total benefit.
  inicial_stepsize       => 1,    auction algorithm terminates with a feasible assignment if the problem data are integer and stepsize < 1/min(N,M).
- inicial_price          => 1,			
+ inicial_price          => 0,			
  verbose                => 3,    print messages on the screen, level of verbosity, 0: quiet; 1, 2, 3, 4, 9, 10: debug information.
 
 EXPORT
@@ -149,7 +220,7 @@ SEE ALSO
 AUTHOR
 
     Claudio Fernandes de Souza Rodrigues
-	March 21, 2018
+	March 25, 2018
 	Sao Paulo, Brasil
 	claudiofsr@yahoo.com
 	

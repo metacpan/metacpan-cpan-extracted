@@ -1,0 +1,167 @@
+#!/usr/bin/perl
+
+# 2016年10月12日と25日に集中して作り、2018年3月25日に気になる箇所をリファクタなど行った。
+
+use 5.001 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts 'q~0=/%*!.:~' , \my %o  ; 
+use Term::ANSIColor qw[ color :constants ]  ; $Term::ANSIColor::AUTORESET = 1 ;
+use List::Util qw[ sum sum0 reduce ]  ; 
+use Scalar::Util qw[ looks_like_number ] ;
+
+$| = 1 if $o{'!'} ;
+$o{'/'} = 1 if $o{'%'} ; # -%が指定されたら、-/ も有効だったとみなす処理
+$o{'.'} //= 3 ; # 割合を出力する場合に、小数点以下何桁を表示するかを指定する。
+
+my $sep = "\t" ; # 入力区切り文字
+my $cumsum = 0 ; # 
+my @nums ; # 先頭列
+my @strs ; # それより後の列
+my @revsum ; # 逆方向の累積和。単純に 総和から引き算したものとは違う。
+my $header = <> if $o{'='} ;
+
+& init  ; 
+& input  ; 
+& mid_proc  ; 
+& output  ; 
+exit 0 ;
+
+
+sub init ( ) { 
+  if ( $o{'!'} ) { print STDERR GREEN "sum\tnum\n" ; return }
+  $header = "number" . $sep . "rest_str" ."\n" unless defined $header ; 
+  #$header = "prod"   . $sep . $header if $o{'*'} ;
+  $header = "ratio"  . $sep . $header if $o{'/'} ; 
+  $header = "cumsum" . $sep . $header unless $o{0} ;
+  $header = "cumRat"   . $sep . $header if $o{'/'} && ! $o{0}  ; 
+  #$header = $o{'/'} ? join $sep , qw[cumRat cumsum ratio],$header  : "cumsum" . $sep . $header ;
+  $header = "revsum" . $sep . $header if $o{'~'} ;
+  $o{'='} ? print $header : $o{q} ? 0 : print STDERR GREEN $header ; 
+}
+
+sub input ( ) { 
+
+  my $sum = 0 ;
+
+  while ( <> ) { 
+  	chomp ;
+  	my @F = split /\t/ , $_ , -1 ; 
+    my $num = ! $o{'*'} ? $F[0] :  reduce { $a * $b } grep {looks_like_number $_} @F ; 
+    my $str = join "\t" , ! $o{'*'} ? splice @F , 1 : grep { ! looks_like_number $_} @F ; 
+
+    if ( $o{'!'} ) { 
+      $sum += $num ; 
+      print "$sum\t$num\n" ; 
+      next ;
+    } else { 
+    	push @nums , $num ; 
+    	push @strs , $str ; 
+    }
+  }
+
+  #exit if $o{'!'} ;
+}
+
+sub mid_proc ( ) { 
+  if ( $o{'~'} ) { 
+  	my $tmp = 0 ; # 逆方向の累積和
+  	for ( 0 .. $#nums ) { 
+  		$tmp += $nums [ $#nums - $_ ] ;
+  		unshift @revsum , $tmp ;
+  	}
+  }
+}
+
+sub output ( ) { 
+  my $totalSum = sum0 ( @nums ) ; 
+  my $outLines = 0 ; # データとして出力対象とした行数
+  for ( 0 .. $#nums )  {
+
+      $cumsum += $nums[ $_ ] ;
+      my $cumratio = $cumsum / $totalSum ; 
+      my $ratio = $nums [ $_ ] / $totalSum ; 
+
+      if ( $o{'%'} ) { 
+  	    grep { $_ = sprintf "%0.$o{'.'}f%%" , $_ * 100 } ( $cumratio , $ratio ) ;
+  	  }
+  	  else { 
+  	    grep { $_ = sprintf "%0.$o{'.'}f" , $_ } ( $cumratio , $ratio ) ;
+  	  }
+
+      my @out = grep defined, $nums[$_] , $strs[$_]   ;
+      unshift @out , $ratio  if $o{'/'} ;
+      unshift @out , $cumsum unless $o{0} ; 
+      unshift @out , $cumratio if $o{'/'} && ! $o{0} ; 
+      unshift @out , $revsum [ $_ ] if $o{'~'} ;
+      print join ( "\t" , @out ) , "\n" ; 
+
+      #print sprintf "%0.$o{'.'}f$sep", $cumsum / $totalSum if $o{'/'} ;   
+      #print $cumsum, $sep ;
+
+      #printf "%5.3f%%$sep", 100.0 * $nums [ $_ ] / $totalSum if $o{'/'} ;  
+      #print $nums[ $_ ] . $sep . $strs [ $_ ];
+      
+      #print "\n" ;
+      $outLines ++ ; 
+  } 
+
+  use FindBin qw[ $Script ] ; 
+  unless ( $o{q} ) {
+    print STDERR CYAN "$. lines are processed. ($Script)\n" if $o{'!'} ;
+    print STDERR CYAN "$. lines processed. $outLines are calculation target. The total sum is $totalSum. ($Script)\n" if ! $o{'!'} ;
+  }
+}
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+=head1 NAME
+
+  cumsum - Calculates the accumulative sum line by line. Various options entail.
+=head1
+
+コマンド
+  $0 
+
+  入力行の先頭列の数値を取りだし、その累積和について出力をする。
+  その数値の全体に対する割合について調べるために用いる。
+
+  Calculates accumulative sum from STDIN. 
+  Various relevant information can be entailed by options.
+
+ オプション(Option): 
+
+   -=   : 先頭行をヘッダとして扱う。データは2行目からと見なす。 (Skip the first line for the processing.)
+   -. N : 割合を出力する場合に、小数点以下何桁を表示するかを指定する。 (How many digits after the decimal point.)
+   -q   : 2次情報を出力しない。(No secondary information. (Quiet) )
+   -*   ; (-\* と書く方が良いかも知れない。) 各行について数値の列を全て乗じた数を入力と見なす。(Employ the multiplied number on all numbers on each line)
+
+   -!   : 入力を最後まで読み終わらなくても1行毎に累積和を計算する。下記に書かれた残りのオプションは使われない。
+
+   -~   : 逆方向の累積和も出力する。(Reverse accumulative summation. (Calculated from the end line.))
+   -/   : 割合も出力する。(Also output the rate.)
+   -%   : 割合を出力する場合に % 表記を用いる。 -/ もあったと見なされる。 (Use % notation for the rate output.)
+   -0   : 累積和に相当する部分を出力しない。(-/ や -~ は無効化されない。)  (Omit the cumsum column in the output.)
+
+ 動作上の注意/開発上のメモ: 
+
+    * このコマンド$0は入力を全て読み終わってから、出力を開始する。全体に対する割合を計算するため。-! を指定されない限り。
+    * 緑色の最初の行の表示は、標準出力ではなくて、標準エラー出力である。
+    *  逆方向の累積に対する割合の表示も、次回の機能改善の時に機能として加えたい。時に有用であるため。
+    * 列ごとに別々に加算するオプションがあっても良いかも。
+
+=cut
+
+

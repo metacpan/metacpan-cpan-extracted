@@ -1,0 +1,10 @@
+function
+x = p0 * exp( -t*t * p1);
+jacobian
+double ex, arg;
+loop
+arg = -t*t * p1;
+ex = exp(arg);
+d0 = ex;
+d1 = -p0 * t*t * ex ;
+

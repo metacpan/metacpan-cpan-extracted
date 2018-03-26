@@ -1,0 +1,43 @@
+Supported Game Variants
+-----------------------
+
+                                                   6 CROWNING_DURING_CAPTURE
+                                                5 CAPTURING_POSTPONED
+                                             4 CAPTURING_LARGEST
+                                          3 PAWNS_CAPTURING_BACKWARDS
+                                       2 KINGS_LONG_RANGED
+                                    1 WHITE_STARTS    BOARD BLC NT SEP R CODE
+English Draughts/Americal Checkers  -  -  -  -  -  S   8x8   +  TL  x  3  21
+Italian Checkers                    +  -  -  +* -  S   8x8   -  TR  x  3  22  7
+Spanish Checkers                    +  +  -  +K +  S   8x8   -  BR  x  3  24
+Argentinian Checkers                +  +  -  +K +  S   8x8   -  BR  x  3  --  8
+Portuguese Checkers                 +  +  -  +K +  S   8x8   +  BR  x  3  28
+Czech Checkers                      +  +  -  -K +  S   8x8   +  h8  x  3  29
+German Checkers                     +  +  -  -  +  S   8x8   +  h8  x  3  --
+Thai Checkers                       -  +  -  -  -  S   8x8   +  BR  -  2  31  8
+American Pool Checkers              -  +  +  -  -  -   8x8   +  BR  x  3  23
+Russian Checkers                    +  +  +  -  +  +   8x8   +  h8  :  3  25
+Russian Give-Away Checkers          +  +  +  -  +  +   8x8   +  h8  :  3  --  9
+Russian 10x8/Spantsiretti Checkers  +  +  +  -  +  +  10x8   +  k8  :  3  41
+Brazilian Checkers                  +  +  +  +  +  -   8x8   +  h8  x  3  26
+International/Polish Checkers       +  +  +  +  +  -  10x10  +  TL  x  4  20
+Frisian Checkers                    +  +  +  +  +  -  10x10  +  TL  x  4  40  F
+Canadian Checkers                   +  +  +  +  +  -  12x12  +  TL  x  5  27
+Sri Lankian Checkers                +  +  +  +  +  -  12x12  -  TL  x  5  --
+
+
+0 BOARD SIZE, BOTTOM LEFT CELL, NOTATION, CAPTURE SEP, NUM PAWN ROWS, CODE
+1 WHITE_STARTS
+2 KINGS_LONG_RANGED
+3 PAWNS_CAPTURING_BACKWARDS
+4 CAPTURING_LARGEST
+5 CAPTURING_POSTPONED
+6 CROWNING_DURING_CAPTURE
+7 PAWNS_CANT_CAPTURE_KINGS
+8 CAPTURING_LEAVES_NO_GAP
+9 GIVE_AWAY
+F CAPTURING_IN_8_DIRECTIONS
+
+
+http://en.wikipedia.org/wiki/Draughts
+http://www.checkersland.com/ru/rules.jsp

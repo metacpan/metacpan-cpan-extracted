@@ -1,0 +1,24 @@
+---
+abstract: 'Zcash Payment API Client'
+author:
+  - 'Nils Knieling'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Zcash-RPC-Client
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON::RPC::Legacy::Client: '1.06'
+  Moo: '1.001'
+  perl: '5.006'
+version: '1.01'

@@ -1,5 +1,8 @@
-package WebService::Braintree::SubscriptionGateway;
-$WebService::Braintree::SubscriptionGateway::VERSION = '1.1';
+# vim: sw=4 ts=4 ft=perl
+
+package # hide from pause
+    WebService::Braintree::SubscriptionGateway;
+
 use 5.010_001;
 use strictures 1;
 
@@ -11,6 +14,9 @@ with 'WebService::Braintree::Role::MakeRequest';
 with 'WebService::Braintree::Role::CollectionBuilder';
 
 has 'gateway' => (is => 'ro');
+
+use WebService::Braintree::_::Subscription;
+use WebService::Braintree::SubscriptionSearch;
 
 sub create {
     my ($self, $params) = @_;
@@ -40,7 +46,7 @@ sub search {
     return $self->resource_collection({
         ids_url => "/subscriptions/advanced_search_ids",
         obj_url => "/subscriptions/advanced_search",
-        inflate => [qw/subscriptions subscription Subscription/],
+        inflate => [qw/subscriptions subscription _::Subscription/],
         search => $block->(WebService::Braintree::SubscriptionSearch->new),
     });
 }
@@ -51,7 +57,7 @@ sub all {
     return $self->resource_collection({
         ids_url => "/subscriptions/advanced_search_ids",
         obj_url => "/subscriptions/advanced_search",
-        inflate => [qw/subscriptions subscription Subscription/],
+        inflate => [qw/subscriptions subscription _::Subscription/],
     });
 }
 

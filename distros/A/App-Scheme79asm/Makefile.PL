@@ -9,7 +9,8 @@ WriteMakefile(
 	LICENSE           => 'perl',
 	SIGN              => 1,
 	PREREQ_PM         => {
-		qw/Data::SExpression 0.41/,
+		qw/Data::SExpression 0.41
+		   List::MoreUtils   0.33/,
 	},
 	META_ADD          => {
 		dynamic_config => 0,

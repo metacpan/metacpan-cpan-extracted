@@ -4,7 +4,7 @@
       "Bill Gerrard <bill@gerrard.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
    "license" : [
       "perl_5"
    ],
@@ -19,28 +19,6 @@
          "inc"
       ]
    },
-   "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "runtime" : {
-         "requires" : {
-            "Business::OnlinePayment" : "3",
-            "Business::OnlinePayment::HTTPS" : "0",
-            "Digest::HMAC_SHA1" : "0",
-            "XML::Hash::LX" : "0",
-            "perl" : "5.008004",
-            "strict" : "0"
-         }
-      }
-   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
@@ -49,5 +27,5 @@
          "web" : "https://github.com/billgerrard/Business-OnlinePayment-iTransact"
       }
    },
-   "version" : "1.00"
+   "version" : "1.01"
 }

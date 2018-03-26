@@ -14,7 +14,6 @@ use lib qw(lib t/lib);
 
 use WebService::Braintree;
 use WebService::Braintree::ErrorCodes;
-use WebService::Braintree::Nonce;
 use WebService::Braintree::SandboxValues::Nonce;
 use WebService::Braintree::TestHelper qw(sandbox);
 use WebService::Braintree::Test;
@@ -37,7 +36,7 @@ subtest "Create" => sub {
 
         isnt($payment_method_result->paypal_account->token, undef);
         isnt($payment_method_result->paypal_account->image_url, undef);
-        is($payment_method_result->paypal_account->meta->name, "WebService::Braintree::PayPalAccount");
+        is($payment_method_result->paypal_account->meta->name, "WebService::Braintree::_::PayPalAccount");
     };
 
     subtest "it creates a credit card payment method with a nonce" => sub {
@@ -52,7 +51,7 @@ subtest "Create" => sub {
         validate_result($payment_method_result) or return;
 
         isnt($payment_method_result->credit_card->token, undef);
-        is($payment_method_result->credit_card->meta->name, "WebService::Braintree::CreditCard");
+        is($payment_method_result->credit_card->meta->name, "WebService::Braintree::_::CreditCard");
     };
 
     subtest "it creates a payment method with a fake apple pay nonce" => sub {
@@ -67,7 +66,7 @@ subtest "Create" => sub {
 
         my $apple_pay_card = $payment_method_result->apple_pay_card;
         isnt($apple_pay_card->token, undef);
-        is($apple_pay_card->meta->name, "WebService::Braintree::ApplePayCard");
+        is($apple_pay_card->meta->name, "WebService::Braintree::_::ApplePayCard");
         is($apple_pay_card->card_type, WebService::Braintree::ApplePayCard::CardType::MasterCard);
         ok $apple_pay_card->default;
         ok $apple_pay_card->image_url =~ /apple_pay/;
@@ -213,7 +212,7 @@ subtest "Create" => sub {
         validate_result($result) or return;
 
         isnt($result->payment_method, undef);
-        ok $result->payment_method->isa('WebService::Braintree::CreditCard');
+        ok $result->payment_method->isa('WebService::Braintree::_::CreditCard');
 
         my $token = $result->payment_method->token;
         my $found_credit_card = WebService::Braintree::CreditCard->find($token);
@@ -244,7 +243,7 @@ subtest "Create" => sub {
         });
         validate_result($result) or return;
 
-        ok $result->payment_method->isa('WebService::Braintree::CreditCard');
+        ok $result->payment_method->isa('WebService::Braintree::_::CreditCard');
 
         my $token = $result->payment_method->token;
         my $found_credit_card = WebService::Braintree::CreditCard->find($token);
@@ -284,7 +283,7 @@ subtest "Create" => sub {
         });
         validate_result($result) or return;
 
-        ok $result->payment_method->isa('WebService::Braintree::CreditCard');
+        ok $result->payment_method->isa('WebService::Braintree::_::CreditCard');
         my $token = $result->payment_method->token;
         my $found_credit_card = WebService::Braintree::CreditCard->find($token);
         isnt($found_credit_card, undef);
@@ -307,7 +306,7 @@ subtest "Create" => sub {
         });
         validate_result($result) or return;
 
-        ok $result->payment_method->isa('WebService::Braintree::PayPalAccount');
+        ok $result->payment_method->isa('WebService::Braintree::_::PayPalAccount');
         isnt($result->payment_method->image_url, undef);
 
         my $token = $result->payment_method->token;
@@ -351,7 +350,7 @@ subtest "Create" => sub {
         });
         validate_result($result) or return;
 
-        ok $result->payment_method->isa('WebService::Braintree::CreditCard');
+        ok $result->payment_method->isa('WebService::Braintree::_::CreditCard');
 
         my $token = $result->payment_method->token;
         my $found_credit_card = WebService::Braintree::CreditCard->find($token);
@@ -374,7 +373,7 @@ subtest "Create" => sub {
         });
         validate_result($result) or return;
 
-        ok $result->payment_method->isa('WebService::Braintree::PayPalAccount');
+        ok $result->payment_method->isa('WebService::Braintree::_::PayPalAccount');
         isnt($result->payment_method->image_url, undef);
 
         my $token = $result->payment_method->token;

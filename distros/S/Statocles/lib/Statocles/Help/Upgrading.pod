@@ -13,7 +13,7 @@ Statocles::Help::Upgrading - A guide to pitfalls when upgrading Statocles
 
 =head1 VERSION
 
-version 0.088
+version 0.089
 
 =head1 DESCRIPTION
 
@@ -70,7 +70,7 @@ misguided at best.
 With Statocles::Store::File removed, there's no need for a write method to
 return anything. Now, C<write_document> and C<write_file> work the same.
 
-The return value will be removed in v1.000.
+This method was removed in C<0.100>.
 
 =item Statocles::App::Plain has been renamed to Statocles::App::Basic
 

@@ -19,6 +19,12 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Module::Load" : "0",
+            "Test::More" : "0"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
@@ -33,7 +39,6 @@
       },
       "test" : {
          "requires" : {
-            "Module::Load" : "0",
             "Test::More" : "0"
          }
       }
@@ -52,7 +57,7 @@
       "x_IRC" : "'irc://chat.freenode.net/#labmeasurement'",
       "x_MailingList" : "'https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users'"
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

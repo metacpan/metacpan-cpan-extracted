@@ -585,7 +585,7 @@ sub set_user_password ( $self, $user_id, $password, $cb ) {
                         else {
                             $self->{dbh}->do(
                                 q[UPDATE "api_user" SET "hash" = ? WHERE "id" = ?],
-                                [ [ $password_hash->{data}->{hash}, $SQL_BYTEA ], [ $user->{data}->{id}, $SQL_UUID ] ],
+                                [ SQL_BYTEA $password_hash->{data}->{hash}, SQL_UUID $user->{data}->{id} ],
                                 sub ( $dbh, $res, $data ) {
                                     if ( !$res ) {
                                         $cb->( result 500 );
@@ -638,7 +638,7 @@ sub set_user_enabled ( $self, $user_id, $enabled, $cb ) {
                 if ( $enabled ^ $user->{data}->{enabled} ) {
                     $self->{dbh}->do(
                         q[UPDATE "api_user" SET "enabled" = ? WHERE "id" = ?],
-                        [ [ $enabled, $SQL_BOOL ], [ $user->{data}->{id}, $SQL_UUID ] ],
+                        [ SQL_BOOL $enabled, SQL_UUID $user->{data}->{id} ],
                         sub ( $dbh, $res, $data ) {
                             if ( !$res ) {
                                 $cb->( result 500 );
@@ -690,7 +690,7 @@ sub _auth_user_token ( $self, $private_token, $cb ) {
                 "api_user"."id" = "api_user_token"."user_id"
                 AND "api_user_token"."id" = ?
 SQL
-        [ [ $private_token->[1], $SQL_UUID ] ],
+        [ SQL_UUID $private_token->[1] ],
         sub ( $dbh, $res, $user_token ) {
 
             # user is disabled
@@ -735,7 +735,7 @@ sub create_user_token ( $self, $user_id, $desc, $permissions, $cb ) {
 sub remove_user_token ( $self, $user_token_id, $cb ) {
     $self->{dbh}->do(
         'DELETE FROM "api_user_token" WHERE "id" = ?',
-        [ [ $user_token_id, $SQL_UUID ] ],
+        [ SQL_UUID $user_token_id ],
         sub ( $dbh, $res, $data ) {
             if ( !$res ) {
                 $cb->( result 500 );
@@ -774,7 +774,7 @@ sub _auth_user_session ( $self, $private_token, $cb ) {
                 "api_user"."id" = "api_user_session"."user_id"
                 AND "api_user_session"."id" = ?
 SQL
-        [ [ $private_token->[1], $SQL_UUID ] ],
+        [ SQL_UUID $private_token->[1] ],
         sub ( $dbh, $res, $user_session ) {
 
             # user is disabled
@@ -839,7 +839,7 @@ sub create_user_session ( $self, $user_id, $ip, $agent, $cb ) {
                         else {
                             $self->{dbh}->do(
                                 'INSERT INTO "api_user_session" ("id", "user_id", "hash", "ip", "agent") VALUES (?, ?, ?, ?, ?)',
-                                [ [ $token->{data}->{id}, $SQL_UUID ], [ $user->{data}->{id}, $SQL_UUID ], [ $token->{data}->{hash}, $SQL_BYTEA ], [ $ip, $SQL_BYTEA ], $agent ],
+                                [ SQL_UUID $token->{data}->{id}, SQL_UUID $user->{data}->{id}, SQL_BYTEA $token->{data}->{hash}, SQL_BYTEA $ip, $agent ],
                                 sub ( $dbh, $res, $data ) {
                                     if ( !$res->{rows} ) {
                                         $cb->( result 500 );
@@ -874,7 +874,7 @@ sub create_user_session ( $self, $user_id, $ip, $agent, $cb ) {
 sub remove_user_session ( $self, $user_sid, $cb ) {
     $self->{dbh}->do(
         'DELETE FROM "api_user_session" WHERE "id" = ?',
-        [ [ $user_sid, $SQL_UUID ] ],
+        [ SQL_UUID $user_sid ],
         sub ( $dbh, $res, $data ) {
             if ( !$res ) {
                 $cb->( result 500 );
@@ -898,7 +898,7 @@ sub remove_user_session ( $self, $user_sid, $cb ) {
 sub update_user_session ( $self, $user_sid, $ip, $agent, $cb ) {
     $self->{dbh}->do(
         'UPDATE "api_user_session" SET "updated" = ?, "ip" = ?, "agent" = ? WHERE "id" = ?',
-        [ time, $ip, $agent, [ $user_sid, $SQL_UUID ] ],
+        [ time, $ip, $agent, SQL_UUID $user_sid ],
         sub ( $dbh, $res, $data ) {
             if ( !$res ) {
                 $cb->( result 500 );
@@ -941,7 +941,7 @@ sub _db_get_user ( $self, $dbh, $user_id, $cb ) {
 
     $dbh->selectrow(
         qq[SELECT "id", "name", "enabled", "created" FROM "api_user" WHERE "@{[$is_uuid ? 'id' : 'name']}" = ?],
-        $is_uuid ? [ [ $user_id, $SQL_UUID ] ] : [$user_id],
+        $is_uuid ? [ SQL_UUID $user_id ] : [$user_id],
         sub ( $dbh, $res, $user ) {
 
             # query error
@@ -997,7 +997,7 @@ sub _db_get_user_permissions ( $self, $dbh, $user_id, $cb ) {
                 "api_user_permission"."role_id" = "api_role"."id"
                 AND "api_user_permission"."user_id" = ?
 SQL
-        [ [ $user_id, $SQL_UUID ] ],
+        [ SQL_UUID $user_id ],
         sub ( $dbh, $res, $data ) {
             if ( !$res ) {
                 $cb->($res);
@@ -1029,7 +1029,7 @@ sub _db_get_user_token_permissions ( $self, $dbh, $user_token_id, $cb ) {
                 AND "api_user_permission"."role_id" = "api_role"."id"
                 AND "api_user_token_permission"."user_token_id" = ?
 SQL
-        [ [ $user_token_id, $SQL_UUID ] ],
+        [ SQL_UUID $user_token_id ],
         sub ( $dbh, $res, $data ) {
             if ( !$res ) {
                 $cb->($res);

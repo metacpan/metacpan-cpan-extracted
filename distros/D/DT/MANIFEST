@@ -6,6 +6,7 @@ t/01-constructor.t
 t/02-formatters.t
 t/03-pg.t
 t/04-mutators.t
+t/05-overload.t
 t/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

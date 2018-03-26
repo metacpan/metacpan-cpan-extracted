@@ -1,5 +1,7 @@
+# vim: sw=4 ts=4 ft=perl
+
 package WebService::Braintree::PayPalAccount;
-$WebService::Braintree::PayPalAccount::VERSION = '1.1';
+$WebService::Braintree::PayPalAccount::VERSION = '1.2';
 use 5.010_001;
 use strictures 1;
 
@@ -14,7 +16,8 @@ This class finds, creates, updates, and deletes PayPal accounts.
 =cut
 
 use Moose;
-extends 'WebService::Braintree::PaymentMethod';
+
+with 'WebService::Braintree::Role::Interface';
 
 =head1 CLASS METHODS
 
@@ -78,37 +81,10 @@ sub sale {
     });
 }
 
-sub gateway {
-    WebService::Braintree->configuration->gateway;
-}
-
-=head1 OBJECT METHODS
-
-In addition to the methods provided by the keys returned from Braintree, this
-class provides the following methods:
-
-=head2 email()
-
-=cut
-
-has email => ( is => 'rw' );
-
-sub BUILD {
-    my ($self, $attributes) = @_;
-    $self->set_attributes_from_hash($self, $attributes);
-}
-
 __PACKAGE__->meta->make_immutable;
 
 1;
 __END__
-
-=head1 NOTES
-
-Most of the classes normally used in WebService::Braintree inherit from
-L<WebService::Braintree::ResultObject/>. This class, however, inherits from
-L<WebService::Braintree::PaymentMethod/>. The primary benefit of this is that
-these objects have a C<< token() >> attribute.
 
 =head1 TODO
 

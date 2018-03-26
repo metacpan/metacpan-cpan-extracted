@@ -1,5 +1,5 @@
 package Selenium::Remote::Driver;
-$Selenium::Remote::Driver::VERSION = '1.26';
+$Selenium::Remote::Driver::VERSION = '1.27';
 use strict;
 use warnings;
 
@@ -476,6 +476,12 @@ sub _request_new_session {
     delete $args->{desiredCapabilities} if $FORCE_WD3; #XXX fork working-around busted fallback in firefox
     delete $args->{capabilities} if $FORCE_WD2; #XXX 'secret' feature to help the legacy unit tests to work
 
+    #Delete compatibility layer when using drivers directly
+    if ($self->isa('Selenium::Firefox')) {
+        delete $args->{capabilities};
+        delete $args->{extra_capabilities};
+    }
+
     # geckodriver has not yet implemented the GET /status endpoint
     # https://developer.mozilla.org/en-US/docs/Mozilla/QA/Marionette/WebDriver/status
     if (! $self->isa('Selenium::Firefox')) {
@@ -512,6 +518,7 @@ sub _request_new_session {
     #Webdriver 3 - best guess that this is 'whats goin on'
     if ( ref $resp->{cmd_return} eq 'HASH' && $resp->{cmd_return}->{capabilities}) {
         $self->{is_wd3} = 1;
+        $self->{emulate_jsonwire} = 1;
         $self->{capabilities} = $resp->{cmd_return}->{capabilities};
     }
 
@@ -519,6 +526,7 @@ sub _request_new_session {
     if ( ref $resp->{cmd_return} eq 'HASH' && $resp->{cmd_return}->{chrome}) {
         if (defined $resp->{cmd_return}->{setWindowRect}) { #XXX i'm inferring we are wd3 based on the presence of this
             $self->{is_wd3} = 1;
+            $self->{emulate_jsonwire} = 1;
             $self->{capabilities} = $resp->{cmd_return};
         }
     }
@@ -526,6 +534,7 @@ sub _request_new_session {
     #XXX unsurprisingly, neither does microsoft
     if ( ref $resp->{cmd_return} eq 'HASH' && $resp->{cmd_return}->{pageLoadStrategy} && $self->browser_name eq 'MicrosoftEdge') {
         $self->{is_wd3} = 1;
+        $self->{emulate_jsonwire} = 1;
         $self->{capabilities} = $resp->{cmd_return};
     }
 
@@ -1731,7 +1740,7 @@ Selenium::Remote::Driver - Perl Client for Selenium Remote Driver
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 
@@ -1872,15 +1881,24 @@ One way of dealing with this is setting:
 
 Of course, this will prevent access of any new WC3 methods, but will probably make your tests pass until your browser's driver gets it's act together.
 
+There are also some JSONWire behaviors that we emulate in methods, such as Selenium::Remote::WebElement::get_attribute.
+You can get around that by passing an extra flag to the sub, or setting:
+
+    $driver->{emulate_jsonwire} = 0;
+
+When in WC3 Webdriver mode.
+
+=head2 WC3 WEBDRIVER CURRENT STATUS
+
 That said, the following 'sanity tests' in the at/ (acceptance test) directory of the module passed on the following versions:
 
 =over 4
 
 =item Selenium Server: 3.8.1 - all tests
 
-=item geckodriver: 0.19.1 - at/sanity.test
+=item geckodriver: 0.19.1 - at/sanity.test, at/firefox.test (Selenium::Firefox)
 
-=item chromedriver: 2.35 - at/sanity-chrome.test
+=item chromedriver: 2.35 - at/sanity-chrome.test, at/chrome.test (Selenium::Chrome)
 
 =item edgedriver: 5.16299 - at/sanity-edge.test
 
@@ -3483,7 +3501,7 @@ L<Wight|Wight>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/teodesian/Selenium-Remote-Driver/issues
+L<https://github.com/teodesian/Selenium-Remote-Driver/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

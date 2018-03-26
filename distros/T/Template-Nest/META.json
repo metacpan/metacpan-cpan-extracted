@@ -33,10 +33,11 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Data::Dumper" : "0",
             "File::Spec" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02"
+   "version" : "0.03"
 }

@@ -1,5 +1,8 @@
-package WebService::Braintree::CustomerGateway;
-$WebService::Braintree::CustomerGateway::VERSION = '1.1';
+# vim: sw=4 ts=4 ft=perl
+
+package # hide from pause
+    WebService::Braintree::CustomerGateway;
+
 use 5.010_001;
 use strictures 1;
 
@@ -11,6 +14,9 @@ use Carp qw(confess);
 use WebService::Braintree::Validations qw(verify_params customer_signature);
 use WebService::Braintree::Util qw(validate_id);
 use WebService::Braintree::Result;
+
+use WebService::Braintree::_::Customer;
+use WebService::Braintree::CustomerSearch;
 
 has 'gateway' => (is => 'ro');
 
@@ -43,7 +49,7 @@ sub search {
     return $self->resource_collection({
         ids_url => "/customers/advanced_search_ids",
         obj_url => "/customers/advanced_search",
-        inflate => [qw/customers customer Customer/],
+        inflate => [qw/customers customer _::Customer/],
         search => $block->(WebService::Braintree::CustomerSearch->new),
     });
 }
@@ -54,7 +60,7 @@ sub all {
     return $self->resource_collection({
         ids_url => "/customers/advanced_search_ids",
         obj_url => "/customers/advanced_search",
-        inflate => [qw/customers customer Customer/],
+        inflate => [qw/customers customer _::Customer/],
     });
 }
 
@@ -64,7 +70,7 @@ sub transactions {
     return $self->resource_collection({
         ids_url => "/customers/${customer_id}/transaction_ids",
         obj_url => "/customers/${customer_id}/transactions",
-        inflate => [qw/credit_card_transactions transaction Transaction/],
+        inflate => [qw/credit_card_transactions transaction _::Transaction/],
     });
 }
 

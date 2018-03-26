@@ -37,6 +37,7 @@ my %WriteMakefileArgs = (
     "MIME::Base64" => 0,
     "Module::Install::TestTarget" => 0,
     "Moose" => 0,
+    "MooseX::Aliases" => 0,
     "Mozilla::CA" => 0,
     "Scalar::Util" => 0,
     "Try::Tiny" => 0,
@@ -57,7 +58,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "Try::Tiny" => 0
   },
-  "VERSION" => "1.1",
+  "VERSION" => "1.2",
   "test" => {
     "TESTS" => "t/sandbox/*.t t/unit/*.t"
   }
@@ -86,6 +87,7 @@ my %FallbackPrereqs = (
   "MIME::Base64" => 0,
   "Module::Install::TestTarget" => 0,
   "Moose" => 0,
+  "MooseX::Aliases" => 0,
   "Mozilla::CA" => 0,
   "Scalar::Util" => 0,
   "String::CamelCase" => 0,

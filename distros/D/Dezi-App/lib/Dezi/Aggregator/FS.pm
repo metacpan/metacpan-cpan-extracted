@@ -9,7 +9,7 @@ use Data::Dump qw( dump );
 use SWISH::3;
 use Try::Tiny;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 # we rely on file extensions to determine content type
 # and thus parser type. If a file has no extension,
@@ -26,13 +26,13 @@ Dezi::Aggregator::FS - crawl a filesystem
 
  use Dezi::Aggregator::FS;
  my $fs = Dezi::Aggregator::FS->new(
-        indexer => Dezi::Indexer->new
-    );
-    
+   indexer => Dezi::Indexer->new
+ );
+
  $fs->indexer->start;
  $fs->crawl( $path );
  $fs->indexer->finish;
- 
+
 =head1 DESCRIPTION
 
 Dezi::Aggregator::FS is a filesystem aggregator implementation
@@ -120,7 +120,7 @@ sub file_ok {
 
 Called by find() for all directories. You can control
 the recursion into I<directory> via the config() params
- 
+
 =cut
 
 sub dir_ok {
@@ -298,7 +298,7 @@ Peter Karman, E<lt>perl@peknet.comE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-swish-prog at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
@@ -337,10 +337,10 @@ L<http://search.cpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008-2009 by Peter Karman
+Copyright 2008-2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

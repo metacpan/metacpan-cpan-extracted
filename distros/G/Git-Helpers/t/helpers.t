@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+use Capture::Tiny qw( capture_stderr );
 use File::Temp qw( tempdir );
 use File::Touch qw( touch );
 use Git::Helpers
@@ -53,7 +54,11 @@ SKIP: {
     touch($file);
     git::add($file);
     git::commit( '-m', $file );
-    git::checkout( '-b', $file );
+
+    my $stderr = capture_stderr {
+        git::checkout( '-b', $file );
+    };
+    diag $stderr;
 
     is( current_branch_name(), $file, 'current branch is ' . $file );
 }

@@ -11,7 +11,7 @@ sub _ssh {
     Net::OpenSSH->new($host,
         async => 1,
         strict_mode => 0,
-        timeout => 5,
+        timeout => 6,
         kill_ssh_on_timeout => 1,
         master_setpgrp => 1,
         master_opts => [
@@ -63,6 +63,9 @@ sub cancel {
     } elsif ($self->{state} == STATE_CONNECTING) {
         @{$self->{cmd}} = ();
         undef $self->{at_exit};
+        my $master_pid = $self->{ssh}->get_master_pid;
+        DEBUG and logger " SEND SIG$signal %s, process group for master pid %d", $self->host, $master_pid;
+        kill $signal => -$master_pid;
     } elsif ($self->{state} == STATE_CONNECTED) {
         @{$self->{cmd}} = ();
         if ($signal

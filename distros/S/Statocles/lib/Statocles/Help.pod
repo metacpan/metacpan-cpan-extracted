@@ -13,7 +13,7 @@ Statocles::Help - Get help for Statocles
 
 =head1 VERSION
 
-version 0.088
+version 0.089
 
 =head1 GUIDES
 

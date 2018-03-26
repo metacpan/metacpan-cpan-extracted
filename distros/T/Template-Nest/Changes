@@ -5,4 +5,7 @@ Revision history for Perl extension Template::Nest.
 		-AX Template::Nest
 
 0.02  Sat Mar 10 15:00:06 2018
-	- add missing test data  
+	- add missing test data
+
+0.03  Mon Mar 26 11:10:16 2018
+    - Correct bug when reporting a missing template param

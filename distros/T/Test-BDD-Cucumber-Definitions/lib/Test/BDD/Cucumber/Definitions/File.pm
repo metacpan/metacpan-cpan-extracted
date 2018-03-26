@@ -6,17 +6,22 @@ use warnings;
 use Const::Fast;
 use DDP ( show_unicode => 1 );
 use Exporter qw(import);
+use File::Slurper qw(read_text read_binary);
 use File::Spec::Functions qw(catdir splitdir);
 use File::Basename qw(dirname);
+use IO::Capture::Stderr;
 use IPC::Run3;
 use Test::BDD::Cucumber::Definitions qw(S);
 use Test::BDD::Cucumber::Definitions::Validator qw(:all);
 use Test::More;
+use Try::Tiny;
 
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 
 our @EXPORT_OK = qw(
     file_path_set
+    file_read_text
+    file_read_binary
     file_exists
     file_noexists
     file_type_is
@@ -25,6 +30,8 @@ our %EXPORT_TAGS = (
     util => [
         qw(
             file_path_set
+            file_read_text
+            file_read_binary
             file_exists
             file_noexists
             file_type_is
@@ -140,6 +147,54 @@ sub file_type_is {
         diag( sprintf( q{ Error: %s}, $! ) );
 
         _stat( S->{file}->{path} );
+
+        return;
+    }
+
+    return 1;
+}
+
+sub file_read_text {
+    my ($encoding) = validator_n->(@_);
+
+    return _file_read($encoding);
+}
+
+sub file_read_binary {
+    return _file_read();
+}
+
+sub _file_read {
+    my ($encoding) = @_;
+
+    my $error;
+
+    my $capture = IO::Capture::Stderr->new();
+
+    $capture->start();
+
+    S->{file}->{content} = try {
+        if ( defined $encoding ) {
+            return read_text( S->{file}->{path}, $encoding );
+        }
+        else {
+            return read_binary( S->{file}->{path} );
+        }
+    }
+    catch {
+        $error = $_[0];
+
+        return;
+    };
+
+    $capture->stop();
+
+    if ( !ok( !$error, qq{File read} ) ) {
+        diag($error);
+
+        for ( $capture->read ) {
+            diag("Warning: $_");
+        }
 
         return;
     }

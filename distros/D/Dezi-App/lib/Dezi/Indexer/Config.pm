@@ -21,7 +21,7 @@ use overload(
 
 use namespace::autoclean;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 # only a few explicitly named attributes.
 # everything else is through AUTOLOAD.
@@ -158,13 +158,13 @@ Dezi::Indexer::Config - read/write Indexer config files
 =head1 SYNOPSIS
 
  use Dezi::Indexer::Config;
- 
+
  my $config = Dezi::Indexer::Config->new;
  $config->write2();
  $config->read2('path/to/file.conf');
  $config->write3();
- 
- 
+
+
 =head1 DESCRIPTION
 
 The Dezi::Indexer::Config class reads and writes Swish-e 2.x configuration files,
@@ -188,22 +188,22 @@ Example:
  # one two
  # red yellow
  # green blue
- 
+
 
 =head1 METHODS
 
 =head2 new( I<params> )
 
-Instantiate a new Config object. 
+Instantiate a new Config object.
 Takes a hash of key/value pairs, where each key
 may be a configuration parameter.
 
 Example:
 
  my $config = Dezi::Indexer::Config->new( DefaultContents => 'HTML*' );
- 
+
  print "DefaultContents is ", $config->DefaultContents, "\n";
- 
+
 =cut
 
 around BUILDARGS => sub {
@@ -366,12 +366,12 @@ Example:
  use Dezi::Indexer::Config;
  my $config = Dezi::Indexer::Config->new();
  my $parsed = $config->read2( 'my/file.cfg' );
- 
+
  # should print same thing
  print $config->WordCharacters->[0], "\n";
  print $parsed->{WordCharacters}, "\n";
- 
- 
+
+
 =cut
 
 sub read2 {
@@ -429,7 +429,7 @@ Writes Swish-e version 2 compatible config file.
 If I<path/file> is omitted, a temp file will be
 written using File::Temp.
 
-If I<prog_mode> is true all config directives 
+If I<prog_mode> is true all config directives
 inappropriate for the -S prog mode in the Native::Indexer
 are skipped. The default is false.
 
@@ -572,7 +572,7 @@ sub stringify {
 
 sub _write_utf8 {
     my ( $self, $file, $buf ) = @_;
-    binmode $file, ':utf8';
+    binmode $file, ':encoding(UTF-8)';
     print {$file} $buf;
 }
 
@@ -678,7 +678,7 @@ equivalents.
  UndefinedMetaNames
  UndefinedXMLAttributes
  XMLClassAttributes
-        
+
 =cut
 
 sub ver2_to_ver3 {
@@ -1130,7 +1130,7 @@ __END__
 
 =head1 CAVEATS
 
-IgnoreTotalWordCountWhenRanking defaults to 0 
+IgnoreTotalWordCountWhenRanking defaults to 0
 which is B<not> the default in Swish-e 2.x.
 
 =head1 AUTHOR
@@ -1140,7 +1140,7 @@ Peter Karman, E<lt>perl@peknet.comE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-swish-prog at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
@@ -1179,10 +1179,10 @@ L<http://search.cpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2006-2009 by Peter Karman
+Copyright 2006-2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

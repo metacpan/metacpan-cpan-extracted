@@ -1,4 +1,4 @@
 Revision history for Business::OnlinePayment::iTransact.
 
-1.00  07-17-17 Business::OnlinePayment original implementation
-
+1.01  2018-03-24 Add option for line item detail 
+1.00  2017-07-17 Business::OnlinePayment original implementation

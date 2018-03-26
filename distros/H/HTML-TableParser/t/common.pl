@@ -1,13 +1,13 @@
 sub read_table_data
 {
   my ( $html, $data_t ) = @_;
-  
+
   ( my $hdrfile = $html ) =~ s/.html/.hdr/;
-  
+
   open FILE, $hdrfile or die( "unable to open $hdrfile\n" );
   @columns = <FILE>;
   chomp(@columns);
-  
+
   my %data;
   foreach my $type ( @$data_t )
   {

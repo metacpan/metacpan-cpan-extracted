@@ -24,6 +24,7 @@ requires:
   App::MusicTools: '0'
   Csound: '0'
   File::Format::RIFF: '0'
+  Guitar::Scale: '0'
   MIDI: '0'
   MIDI::Drummer::Tiny: '0'
   MIDI::Morph: '0'
@@ -65,7 +66,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Task-MusicBundle
   repository: https://github.com/ology/Task-MusicBundle
-version: '0.12'
+version: '0.13'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

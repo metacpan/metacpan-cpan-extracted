@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/cli/rows/venn.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+scripts/venn2
+scripts/venn3
+scripts/venn4

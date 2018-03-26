@@ -1,5 +1,7 @@
+# vim: sw=4 ts=4 ft=perl
+
 package WebService::Braintree::PaymentMethod;
-$WebService::Braintree::PaymentMethod::VERSION = '1.1';
+$WebService::Braintree::PaymentMethod::VERSION = '1.2';
 use 5.010_001;
 use strictures 1;
 
@@ -14,7 +16,8 @@ This class creates and finds payment methods.
 =cut
 
 use Moose;
-extends 'WebService::Braintree::ResultObject';
+
+with 'WebService::Braintree::Role::Interface';
 
 =head1 CLASS METHODS
 
@@ -84,21 +87,6 @@ sub find {
     my ($class, $token) = @_;
     $class->gateway->payment_method->find($token);
 }
-
-sub gateway {
-    return WebService::Braintree->configuration->gateway;
-}
-
-=head1 OBJECT METHODS
-
-In addition to the methods provided by the keys returned from Braintree, this
-class provides the following methods:
-
-=head2 token()
-
-=cut
-
-has token => ( is => 'rw' );
 
 __PACKAGE__->meta->make_immutable;
 

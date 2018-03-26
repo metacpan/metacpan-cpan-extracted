@@ -3,9 +3,9 @@ NAME
     requests
 
 VERSION
-    This document describes version 0.06 of
+    This document describes version 0.070 of
     LWP::UserAgent::Patch::HTTPSHardTimeout (from Perl distribution
-    LWP-UserAgent-Patch-HTTPSHardTimeout), released on 2017-07-10.
+    LWP-UserAgent-Patch-HTTPSHardTimeout), released on 2018-03-23.
 
 SYNOPSIS
      use LWP::UserAgent::Patch::HTTPSHardTimeout -timeout => 300;
@@ -48,7 +48,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2015, 2012 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2015, 2012 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

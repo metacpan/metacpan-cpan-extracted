@@ -1,5 +1,7 @@
+# vim: sw=4 ts=4 ft=perl
+
 package WebService::Braintree::EuropeBankAccount;
-$WebService::Braintree::EuropeBankAccount::VERSION = '1.1';
+$WebService::Braintree::EuropeBankAccount::VERSION = '1.2';
 use 5.010_001;
 use strictures 1;
 
@@ -14,13 +16,14 @@ This class finds Europe Bank Account payment methods.
 =cut
 
 use Moose;
-extends 'WebService::Braintree::PaymentMethod';
+
+with 'WebService::Braintree::Role::Interface';
 
 =head1 CLASS METHODS
 
 =head2 find()
 
-This takes a token and returns the Europe Bank account (if it exists).
+This takes a token and returns a L<response|WebService::Braintee::PaymentMethodResult> with the C<< europe_bank_account() >> set.
 
 =cut
 
@@ -31,8 +34,10 @@ sub find {
 
 =head2 sale()
 
-This takes a token and an optional hashref of parameters and creates a sale
-transaction on the provided token.
+This takes a token and an optional hashref of parameters. This delegates to
+L<WebService::Braintree::Transaction/sale>, setting the
+C<< payment_method_token >> appropriately and submitting the transaction for
+settlement.
 
 =cut
 
@@ -45,38 +50,7 @@ sub sale {
     });
 }
 
-sub gateway {
-    WebService::Braintree->configuration->gateway;
-}
-
-sub BUILD {
-    my ($self, $attrs) = @_;
-
-    $self->set_attributes_from_hash($self, $attrs);
-}
-
 __PACKAGE__->meta->make_immutable;
 
 1;
 __END__
-
-=head1 NOTES
-
-Most of the classes normally used in WebService::Braintree inherit from
-L<WebService::Braintree::ResultObject/>. This class, however, inherits from
-L<WebService::Braintree::PaymentMethod/>. The primary benefit of this is that
-these objects have a C<< token() >> attribute.
-
-=head1 TODO
-
-=over 4
-
-=item Need to document the keys and values that are returned
-
-=item Need to document the required and optional input parameters
-
-=item Need to document the possible errors/exceptions
-
-=back
-
-=cut

@@ -246,9 +246,11 @@ SKIP: {
     my $release_dir = $self->get_release_dir();
     my $bin_dir = $self->get_bin_dir();
     my $lib_dir = $self->get_lib_dir();
+    my $cpanm_dir = $self->get_cpanm_dir();
     is($release_dir, $expected_release_dir, "Got expected release_dir '$release_dir'");
     is($bin_dir, catdir($release_dir, 'bin'), "Got expected bin_dir '$bin_dir'");
     is($lib_dir, catdir($release_dir, 'lib'), "Got expected lib_dir '$lib_dir'");
+    is($cpanm_dir, catdir($release_dir, '.cpanm'), "Got expected cpanm_dir '$cpanm_dir'");
     is($self->{this_perl}, catfile($bin_dir, 'perl'), "Got expected 'perl'");
     my $this_perl = $self->get_this_perl();
     is($this_perl, $good_path, "Got expected 'perl': $this_perl");

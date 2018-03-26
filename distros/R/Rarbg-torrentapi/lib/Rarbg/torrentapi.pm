@@ -2,7 +2,7 @@ package Rarbg::torrentapi;
 
 use strict;
 use 5.008_005;
-our $VERSION = 'v0.1.6';
+our $VERSION = 'v0.1.7';
 use LWP::UserAgent;
 use JSON;
 use Carp;
@@ -86,6 +86,7 @@ sub _renew_token {
     my $self     = shift;
     my $url      = $BASEURL . "get_token=get_token&app_id=" . $self->app_id;
     my $res_json = $self->_ua->get($url);
+    sleep 1;
     if ( $res_json->is_success ) {
         $self->_token_time(time);
         my $res = decode_json( $res_json->decoded_content );
@@ -103,7 +104,9 @@ sub _token_valid {
 
 sub _make_request {
     my $self = shift;
-    $self->_renew_token unless $self->_token_valid;
+    unless ($self->_token_valid) {
+        $self->_token($self->_renew_token);
+    }
     my $url = $BASEURL;
     foreach my $attribute ( $self->meta->get_attribute_list ) {
         next if $attribute =~ /^_/;

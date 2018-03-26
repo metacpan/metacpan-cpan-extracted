@@ -1,4 +1,27 @@
-Revision history for Regexp-Pattern
+0.2.2   2018-03-24 (PERLANCAR)
+
+	- No spec changes.
+
+	- [doc] Re-add pattern style guide which was accidentally removed
+	  in 0.2.0.
+
+
+0.2.1   2018-03-24 (PERLANCAR)
+
+	- No spec changes.
+
+	- [doc] Some wording/grammar fixes.
+
+
+0.2.0   2018-03-24 (PERLANCAR)
+
+        - Add hash interface.
+
+        - [doc] Some revision with added examples to be clearer, some
+          grammar/wording fixes.
+
+        - [doc] Mention related Dist::Zilla plugins.
+
 
 0.1.4   2016-12-31 (PERLANCAR)
 

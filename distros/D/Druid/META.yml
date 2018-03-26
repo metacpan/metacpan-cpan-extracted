@@ -18,7 +18,10 @@ no_index:
     - t
     - inc
 requires:
+  HTTP::Request: '0'
+  JSON::MaybeXS: '0'
+  LWP::UserAgent: '0'
   Moo: '0'
   perl: '5.006'
-version: '0.002'
+version: '0.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

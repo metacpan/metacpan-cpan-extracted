@@ -1,5 +1,10 @@
 Revision history for Perl extension Unicode::BiDiRule.
 
+0.04  Sun Mar 25 2018
+! t/02IdnaTest.t
+  - Fix: CPAN RT #122862: Tests break with perl 5.27.2.
+    Eliminated unuseful cases.
+
 0.03  Mon Nov 09 2015
 ! Makefile.PL
   - Bug fix: Windows: "make" fails due to incompatible directory/file

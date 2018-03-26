@@ -1,0 +1,1852 @@
+
+#
+# GENERATED WITH PDL::PP! Don't modify!
+#
+package PDL::Fit::Levmar;
+
+@EXPORT_OK  = qw(  levmar levmar_report levmar_chkjac PDL::PP levmar_der_ub PDL::PP levmar_der_lb PDL::PP levmar_der_ PDL::PP levmar_der_lb_ub PDL::PP levmar_diff_ub PDL::PP levmar_diff_lb PDL::PP levmar_diff_ PDL::PP levmar_diff_lb_ub PDL::PP _levmar_chkjac PDL::PP _levmar_chkjac_no_t );
+%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+
+use PDL::Core;
+use PDL::Exporter;
+use DynaLoader;
+
+
+
+   $PDL::Fit::Levmar::VERSION = '0.0100';
+   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   push @PDL::Core::PP, __PACKAGE__;
+   bootstrap PDL::Fit::Levmar $VERSION;
+
+
+
+
+#use Data::Dumper;
+
+=head1 NAME
+
+PDL::Fit::Levmar - Levenberg-Marquardt fit/optimization routines
+
+=head1 DESCRIPTION
+
+Levenberg-Marquardt routines for least-squares fit to
+functions non-linear in fit parameters.
+
+This module provides a L<PDL> ( L<PDL::PDL> ) interface to the non-linear fitting
+library levmar 2.5 (written in C). Levmar is
+L<thread|/example--6> aware (in the L<PDL> sense), provides support for analytic
+or finite difference derivatives (in case no analytic
+derivatives are supplied), L<linear|/A> and/or L<box|/UB>
+and/or L<inequality|/C>
+constraints (with L<parameter fixing|/FIX> as a special
+case) and pure single or double precision computation. The
+routines are re-entrant, so they can be used in
+multi-threaded applications (not tested!). Levmar is suited
+both for data fitting and for optimization problems.
+
+The source code for the C levmar library is included in this
+distribution. However, linearly-constrained fitting requires
+that C<PDL::Fit::Levmar> be built with support for B<lapack>
+and B<blas> libraries. See the files F<INSTALL> and
+F<Makefile.PL>, for more information. If
+C<PDL::Fit::Levmar> is built without support for C<lapack>,
+the fitting options C<A>, C<B>, C<C>, C<D>, and C<FIX> may
+not be used. All other options, including C<FIXB>, do not
+require C<lapack>.
+
+User supplied fit functions can be written in perl code that
+takes pdls as arguments, or, for efficiency, in in a simple
+function description language (C<lpp>), which is rapidly and
+transparently translated to C, compiled, and dynamically
+linked.  Fit functions may also be written in pure C.  If C
+or C<lpp> fit functions are used, the entire fitting
+procedure is done in pure compiled C. The compilation and
+linking is done only the first time the function is defined.
+
+There is a document distributed with this module
+F<./doc/levmar.pdf> by the author of liblevmar describing
+the fit algorithms. Additional information on liblevmar is available at
+L<http://www.ics.forth.gr/~lourakis/levmar/>
+
+Don't confuse this module with, but see also,  L<PDL::Fit::LM>.
+
+=head1 SYNOPSIS
+
+    use PDL::Fit::Levmar;
+    $result_hash = levmar($params,$x,$t, FUNC => '
+                      function somename
+                      x = p0 * exp(-t*t * p1);');
+    print levmar_report($result_hash);
+
+
+=head1 EXAMPLES
+
+
+A number of examples of invocations of C<levmar> follow. The test
+directory C<./t> in the module distribution contains many more examples.
+The following seven examples are included as stand-alone scripts in the
+./examples/ directory. Some of the necessary lines are not repeated in
+each example below.
+
+=over 3
+
+=item example--1
+
+In this example we fill co-ordinate $t and ordinate $x arrays
+with 100 pairs of sample data. Then we call the fit routine
+with initial guesses of the parameters.
+
+ use PDL::LiteF;
+ use PDL::Fit::Levmar;
+ use PDL::NiceSlice;
+ 
+ $n = 100;
+ $t = 10 * (sequence($n)/$n -1/2);
+ $x = 3 * exp(-$t*$t * .3  );
+ $p = pdl [ 1, 1 ]; # initial  parameter guesses
+
+ $h = levmar($p,$x,$t, FUNC =>
+          '   function
+              x = p0 * exp( -t*t * p1);
+           ');
+ print levmar_report($h);
+
+This example gives the output:
+
+ Estimated parameters: [         3        0.3]    
+ Covariance: 
+ [
+  [5.3772081e-25 7.1703376e-26]
+  [7.1703376e-26 2.8682471e-26]
+ ]
+
+ ||e||_2 at initial parameters = 125.201
+ Errors at estimated parameters:
+ ||e||_2	 = 8.03854e-22
+ ||J^T e||_inf	= 2.69892e-05
+ ||Dp||_2	= 3.9274e-15
+ \mu/max[J^T J]_ii ]	= 1.37223e-05
+ number of iterations	= 15
+ reason for termination: = stopped by small ||e||_2
+ number of function evaluations	= 20
+ number of jacobian evaluations	= 2
+
+In the example above and all following examples, it is necessary
+to include the three C<use> statements at the top of the file.
+The fit function in this example is in C<lpp> code.
+The parameter pdl $p is the input parameters (guesses)
+levmar returns a hash with several elements including a
+plain text report of the fit, which we chose to print.
+
+The interface is flexible-- we could have also called levmar like this
+
+ $h = levmar($p,$x,$t, '   function
+                      x = p0 * exp( -t*t * p1);
+                      ');
+
+or like this
+
+ $h = levmar(P =>$p, X => $x, T=> $t, FUNC => '   function
+                      x = p0 * exp( -t*t * p1);
+                      ');
+
+After the fit, the input parameters $p are left
+unchanged. The output hash $h contains, among other things,
+the optimized parameters in $h->{P}.
+
+=item example--2
+
+Next, we do the same fit, but with a perl/PDL fit function.
+
+ $h = levmar($p,$x,$t, FUNC => sub {
+    my ($p,$x,$t) = @_;
+    my ($p0,$p1)  = list $p;
+    $x .= $p0 * exp(-$t*$t * $p1);
+ });
+
+Using perl code (second example) results in slower execution
+than using pure C (first example). How much slower depends
+on the problem (see L</IMPLEMENTATION> below). See also the
+section on L<perl subroutines|/Perl_Subroutines>.
+
+=item example--3
+
+Next, we solve the same problem using a C fit routine.
+
+ levmar($p,$x,$t, FUNC => '
+ #include <math.h>
+ void gaussian(FLOAT *p, FLOAT *x, int m, int n, FLOAT *t)
+ {
+  int i;
+  for(i=0; i<n; ++i)
+           x[i] = p[0] * exp( -t[i]*t[i] * p[1]);
+ }
+ ');
+
+The macro C<FLOAT> is used rather than float or double because
+the C code will be used for both single and double precision
+routines. ( The code is automatically compiled twice; once
+with C<FLOAT> expanded to double and once expanded to float)
+The correct version is used automatically depending on the
+type of pdls you give levmar.
+
+
+=item example--4
+
+We supply an analytic derivative ( analytic jacobian).
+
+ $st = '
+   function
+   x = p0 * exp( -t*t * p1);
+
+   jacobian
+   FLOAT ex, arg;
+   loop
+   arg = -t*t * p1;
+   ex = exp(arg);
+   d0 = ex;
+   d1 = -p0 * t*t * ex ;
+
+ ';
+
+ $h = levmar($p,$x,$t, FUNC => $st);
+
+If no jacobian function is supplied, levmar automatically
+uses numeric difference derivatives. You can also explicitly
+use numeric derivatives with the option C<DERIVATIVE>
+C<< => 'numeric' >>.
+
+Note that the directives C<function> and C<jacobian> begin
+the function definitions. You can also supply a name if
+you like, eg.  C<function john> and C<jacobian mary>.
+
+In C<lpp>, the co-ordinate data is always identified by 't', the
+ordinate data by 'x' in the fit function and by 'dn', with n a
+number, in the jacobian. The parameters are identified by
+'p'. All other identifiers are pure C identifiers and
+must be defined, as are C<ex> and C<arg> in the example.
+
+Referring to the example above, if the directive C<loop> appears
+on a line by itself, code after it is wrapped in a loop over
+the data; code before it is not. If  C<loop> does not appear,
+then all the code is wrapped in a loop. 'loop' must occur zero
+or one times in each of the fit and jacobian definitions.
+For some problems, you will not want a loop at all. In this
+case the directive C<noloop> is placed after the declarations.
+
+To see what C<lpp> does, pass the option C<NOCLEAN> C<<  => 1 >> to levmar
+and look at the C source file that is written.
+
+When defining the derivatives above (d0, d1) etc., you must
+put the lines in the proper order  ( eg, not d1,d0 ). (This
+is for efficiency, see the generated C code.)
+
+One final note on this example-- we declared C<ex> and C<arg> to 
+be type C<FLOAT>. Because they are temporary variables, we could
+have hard coded them to double, in which case both the float
+and double code versions would have used type double for them.
+This is ok, because it doesn't cost any storage or cause
+a memory fault because of incorrect pointer arithmetic.
+
+
+=item example--5
+
+Here is an example from the liblevmar demo program that shows
+one more bit of C<lpp> syntax.
+
+ $defst = "
+    function modros
+    noloop
+    x0 = 10 * (p1 -p0*p0);
+    x1 = 1.0 - p0;
+    x2 = 100;
+    jacobian jacmodros
+    noloop
+    d0[0] = -20 * p0;
+    d1[0] = 10;
+    d0[1] = -1;
+    d1[1] = 0;
+    d0[2] = 0;
+    d1[2] = 0;
+  ";
+  $p = pdl [-1.2, 1];
+  $x = pdl [0,0,0];   
+  $h = levmar( $p,$x, FUNC => $defst );
+
+The directive C<noloop> mentioned above has been used,
+indicating that there are no implied loops in the
+function. Note that this model function is designed only for
+$x->nelem == 3. The additional syntax is in the
+derivatives. Keeping in mind that there is no loop variable,
+dq[r] means derivative w.r.t q evaluated at x[r].  (This is
+translated by C<lpp> to d[q+r*m], which is the index into a
+1-d array.)
+
+=item example--6
+
+Here is an example that uses implicit threading. We create data
+from a gaussian function with four different sets of parameters
+and fit it all in one function call.
+
+ $st = '
+    function
+    x = p0 * exp( -t*t * p1);
+   ';
+
+ $n = 10;
+ $t = 10 * (sequence($n)/$n -1/2);
+ $x = zeroes($n,4);
+ map {  $x(:,$_->[0])  .= $_->[1] * exp(-$t*$t * $_->[2]  ) } 
+         ( [0,3,.2], [1, 28, .1] , [2,2,.01], [3,3,.3] );
+ $p = [ 5, 1];  # initial guess
+ $h = levmar($p,$x,$t, FUNC => $st );
+ print $h->{P} . "\n";
+
+ [
+  [         3        0.2]
+  [        28        0.1]
+  [         2       0.01]
+  [         3        0.3]
+ ]
+
+
+=item example--7
+
+This example shows how to fit a bivariate Gaussian. Here
+is the fit function.
+
+ sub gauss2d {
+    my ($p,$xin,$t) = @_;
+    my ($p0,$p1,$p2) = list $p;
+    my $n = $t->nelem;
+    my $t1 = $t(:,*$n); # first coordinate
+    my $t2 = $t(*$n,:); # second coordinate
+    my $x = $xin->splitdim(0,$n);
+    $x .= $p0 * exp( -$p1*$t1*$t1 - $p2*$t2*$t2);
+ }
+
+
+We would prefer a function that maps t(n,n) --> x(n,n) (with
+p viewed as parameters.) But the levmar library expects one
+dimensional x and t. So we design C<gauss2d> to take
+piddles with these dimensions: C<p(3)>, C<xin(n*n)>,
+C<t(n)>. For this example, we assume that both the co-ordinate
+axes run over the same range, so we only need to pass n
+values for t. The piddles t1 and t2 are (virtual) copies of
+t with dummy dimensions inserted. Each represents
+co-ordinate values along each of the two axes at each point
+in the 2-d space, but independent of the position along the
+other axis.  For instance C<t1(i,j) == t(i)> and C<t1(i,j)
+== t(j)>. We assume that the piddle xin is a flattened
+version of the ordinate data, so we split the dimensions in
+x. Then the entire bi-variate gaussian is calculated with
+one line that operates on 2-d matrices. Now we create some
+data,
+
+   my $n = 101;  # number of data points along each axis
+   my $scale = 3; # range of co-ordiate data
+   my $t = sequence($n); # co-ordinate data (used for both axes)
+   $t *= $scale/($n-1);
+   $t  -= $scale/2;     # rescale and shift.
+   my $x = zeroes($n,$n);
+   my $p = pdl  [ .5,2,3]; # actual parameters
+   my $xlin = $x->clump(-1); # flatten the x data
+   gauss2d( $p, $xlin, $t->copy); # compute the bivariate gaussian data.
+
+Now x contains the ordinate data (so does xlin, but in a flattened shape.)
+Finally, we fit the data with an incorrect set of initial parameters,
+
+   my $p1 = pdl  [ 1,1,1];  # not the parameters we used to make the data
+   my $h = levmar($p1,$xlin,$t,\&gauss2d);
+
+At this point C<$h->{P}> refers to the output parameter piddle C<[0.5, 2, 3]>.
+
+=back
+
+=head1 CONSTRAINTS
+
+Several of the options below are related to constraints. There are
+three types: box, linear equation, and linear inequality. They may
+be used in any combination. (But there is no testing if
+there is a possible solution.) None or one or two  of C<UB> and C<LB> may be
+specified. None or both of C<A> and C<B> may be specified.
+None or both of C<C> and C<D> may be specified.
+
+=head1 OPTIONS
+
+It is best to learn how to call levmar by looking at the
+examples first, and looking at this section later.
+
+levmar() is called like this
+
+ levmar($arg1, $arg2, ..., OPT1=>$val1, OPT2=>$val2, ...);
+ or this:
+ levmar($arg1, $arg2, ..., {OPT1=>$val1, OPT2=>$val2, ...});
+
+When calling levmar, the first 3 piddle arguments (or refs
+to arrays), if present, are taken to be C<$p>,C<$x>, and C<$t>
+(parameters, ordinate data, and co-ordinate data) in that
+order. The first scalar value that can be interpreted as a
+function will be. Everything else must be passed as an
+option in a key-value pair. If you prefer, you can pass some
+or all of  C<$p,$x,$t> and the function as key-values in the
+hash. Note that after the first key-value pair, you cannot
+pass any more non-hash arguments. The following calls are equivalent
+(where $func specifies the function as described in L</FUNC> ).
+
+ levmar($p, $x, $t, $func);
+ levmar($func,$p, $x, $t);
+ levmar($p, $x, $t, FUNC=> $func);
+ levmar($p, $x, T=>$t, FUNC => $func);
+ levmar($p, X=>$x, T=>$t, FUNC => $func);
+ levmar(P=>$p, X=>$x, T=>$t, FUNC => $func);
+
+In the following, if the default value is not mentioned, it is undef.
+C<$outh> refers to the output hash.
+
+Some of these options are actually options to Levmar::Func.
+All options to Levmar::Func may by given in calls to levmar().
+
+=over 4
+
+=item FUNC
+
+This option is required (but it can be passed before the
+options hash without the key C<FUNC> ) It can be
+any of the following, which are auto-detected.
+
+ a string containing lpp code
+ a string containing pure C code
+ the filename of a file containing lpp code (which must end in '.lpp' )
+ the filename of a file containing pure C code ( which must end in '.c' )
+ a reference to perl code
+ a reference to a previously created Levmar::Func object (which was
+ previously created via one of the preceeding methods.)
+
+If you are fitting a lot of data by doing many iterations over
+a loop of perl code, it is by far most efficient to create a Func
+object from C or lpp code and pass it to levmar. (Implicit threading
+does not recompile code in any case.)
+
+You can also pass pure C code via the option CSRC.
+
+=item JFUNC
+
+This parameter is the jacobian as a ref to perl CODE. For
+C and C<lpp> code, the jacobian, if present, is always in the
+same source file as the fit function; in this case, you
+should leave C<JFUNC> undefined. See L</Perl_Subroutines>
+
+=item DERIVATIVE
+
+This takes the value 'numeric' or 'analytic'. If it is
+set to 'analytic', but no analytic jacobian of the model
+function is supplied, then the numeric algorithms will be used
+anyway.
+
+=item NOCLEAN
+
+If defined (NOCLEAN => 1), files containing generated C
+object and dynamic library code are not deleted. If not
+defined, these files are deleted after they are no longer
+needed. For the source and object (.c and .o) files, this
+means immediately after the dynamic library (.so) is built.
+The dynamic library file is deleted when the corresponding
+Levmar::Func object is destroyed. (It could be deleted after
+it is loaded, I suppose, and then be rebuilt if needed
+again)
+
+=item FIX
+
+Example: Fix => [1,0,0,1,0].
+This option takes a pdl (or array ref) of the same shape as
+the parameters $p. Each element must have the value zero or
+one. A zero corresponds to a free parameter and a one to a
+fixed parameter. The best fit is found keeping the fixed
+parameters at their input values and letting the free
+parameters vary. This is implemented by using the linear
+constraint option described below. Each element must be
+either one or zero. This option currently cannot be
+threaded. That is, if the array FIX has more than one
+dimension you will not get correct results. Also, PDL will
+not add dimension correctly if you pass additional
+dimensions in other quantities.  Threading will work if you
+use linear contstraints directly via C<A> and C<b>.
+
+=item FIXB
+
+This option is almost the same as FIX. It takes the same
+values with the same meanings. It fixes parameters at the value
+of the input parameters, but uses
+box constraints, i.e., UB and LB rather than linear
+constraints A and B. You can specify all three of UB,LB, and FIXB.
+In this case, first box constraints determined by UB and LB are applied
+Then, for those elements of FIXB with value one, the corresponding
+values of UB and LB are overridden.
+
+=item A
+
+Example: A =>pdl [ [1,0], [0,1] ] , B => pdl [ 1,2 ] 
+
+Minimize with linear constraints $A x $p = $b. That is,
+parameters $p are optimized over the subset of parameters
+that solve the equation.  The dimensions of the quantities
+are A(k,m), b(m), p(m), where k is the number of
+constraints. ( k <= m ). Note that $b is a vector (it has one
+fewer dimensions than A), but the option key is a capital 'B'.
+
+=item B
+
+See C<A>.
+
+=item UB
+
+Example: UB => [10,10,10], LB => [-10,0,-5].
+Box constraints. These have the same shape as the parameter
+pdl $p. The fit is done with ub forming upper bounds and lb
+lower bounds on the parameter values. Use, for instance
+PDL::Fit::Levmar::get_dbl_max() for parameters that you
+don't want bounded. You can use either linear constraints or
+box constraints, or both. That is, you may specify A, B, UB, and LB.
+
+=item LB
+
+See C<UB>.
+
+
+=item WGHTS
+
+Penalty weights can be given optionally when box and linear equality
+constraints are both passed to levmar. See the levmar documenation for
+how to use this. Note that if C and D are used then the WGHTS must
+not passed.
+
+=item C
+
+Example: C => [ [ -1, -2, -1, -1], [ -3, -1, -2,  1] ], D => [ -5, -0.4]
+Linear inequality constraints. Minimize with constraints $C x $p >= $d.
+The dimensions are C(k2,m), D(m), p(m).
+
+=item D
+
+See C<C>
+
+=item  P
+
+Keys P, X, and T can be used to send to the parameters, ordinates and coordinates.
+Alternatively, you can send them as non-option arguments to levmar before
+the option arguments.
+
+=item X
+
+See C<P>
+
+=item T
+
+See C<P>
+
+=item DIR
+
+The directory containing files created when compiling C<lpp>
+and C fit functions.  This defaults to './tempcode'; The .c,
+.o, and .so files will be written to this directory. This
+option actually falls through to levmar_func.  Such options
+should be in separate section, or otherwise noted.
+
+=item GETOPTS
+
+If defined, return a ref to a hash containing the default
+values of the parameters.
+
+=item WORK
+
+levmar() needs some storage for scratch space. Normally, you
+are not concerned with this-- the storage is allocated and
+deallocated automatically without you being aware. However
+if you have very large data sets, and are doing several
+fits, this allocation and deallocation may be time consuming
+(the time required to allocate storage grows faster than
+linearly with the amount of storage). If you are using
+implicit threading, the storage is only allocated once
+outside the threadloop even if you don't use this
+option. However, you may want to do several fits on the perl
+level and want to allocate the work space only once.
+
+If you set WORK to a null piddle (say $work) and keep the
+reference and call levmar(), storage will be created before
+the fit. If you continue to call levmar() with WORK =>
+$work, no new storage will be created. In this example,
+
+ sub somefitting {
+  my $work = PDL->null;
+  ...
+  while (1) {
+    my $h = levmar($p, ... ,WORK => $work);
+    ... change inputs based on results in $h  
+    last if somecondition is true;
+  }
+  ...
+ }
+
+storage is created in the first call to C<levmar> and is
+destroyed upon leaving the subroutine C<somefitting>
+(provided a reference to $work was not stored in some data
+structure delclared in an block enclosing the subroutine.)
+
+The numeric-derivative algorithms require more storage than
+the analytic-derivative algorithms. So if you create the
+storage for $work on a call with DERIVATIVE=>'numeric' and
+subsequently make a call with DERIVATIVE=>'analytic' you are
+ok. But if you try it in the other order, you will get a
+runtime error. You can also pass a pdl created elsewhere
+with the correct type and enough or more than enough storage.
+
+There are several pdls used by levmar() that have a similar option.
+
+(see also in PDL::Indexing )
+
+=item COVAR
+
+Send a pdl reference for the output hash element COVAR. You may
+want to test if this option is more efficient for
+some problem. But unless the covariance matrix is very large,
+it probably won't help much. On the other hand it almost certainly
+won't make levmar() less efficient.  See the section on WORK above.
+
+Note that levmar returns a piddle representing the covariance in
+the output hash. This will be the the same piddle that you give
+as input via this option. So, if you do the following,
+
+  my $covar = PDL->null
+  my $h =levmar(...., COVAR => $covar);
+
+then $covar and $h->{COVAR} are references to the same
+pdl. The storage for the pdl will not be destroyed until
+both $covar and $h->{COVAR} become undefined. The option
+C<WORK> differs in this regard. That is, the piddle containing
+the workspace is not returned in the hash.
+
+=item NOCOVAR
+
+If defined, no covariance matrix is computed.
+
+=item POUT
+
+Send a pdl reference for the output hash element P. Don't
+confuse this with the option P which can be used to send the
+initial guess for the parameters
+(see C<COVAR> and C<WORK>).
+
+=item INFO
+
+Send a pdl reference for the output hash element C<INFO>.
+(see C<COVAR> and C<WORK>)
+
+=item RET
+
+Send a pdl reference for the output hash element C<RET>.
+(see C<COVAR> and C<WORK>)
+
+
+=item MAXITS
+
+Maximum number of iterations to try before giving up. The default
+is 100.
+
+=item MU
+
+The starting value of the parameter mu in the L-M algorithm.
+
+=item EPS1, EPS2, EPS3
+
+Stopping thresholds for C<||J^T e||_inf>, C<||Dp||_2> and
+C<||e||_2>. (see the document levmar.pdf by the author of
+liblevmar and distributed with this module) The algorithm
+stops when the first threshold is reached (or C<MAXITS> is reached).  See
+C<REASON> for determining which threshold was reached.
+
+Here, C<e> is a the vector of errors between the data and
+the model function and C<p> is the vector of parameters.
+ S<||J^T e||_inf> is the gradient of C<e> w.r.t C<p>
+at the current estimate of C<p>;  C<||Dp||_2>  is the amount
+by which C<p> is currently being shifted at each iteration;
+C<||e||_2> is a measure of the error between the model function
+at the current estimate for C<p> and the data.
+
+=item DELTA
+
+This is a step size used in computing numeric derivatives. It is
+not used if the analytic jacobian is used.
+
+
+=item MKOBJ
+
+command to compile source into object code. This option is actually set in
+the Levmar::Func object, but can be given in calls to levmar().
+The default value is determined by the perl installation and can
+be determined by examining the Levmar::Func object returned by 
+new or the output hash of a call to levmar. A typical value is
+ cc -c -O2 -fPIC -o %o %c
+
+=item MKSO
+
+command to convert object code to dynamic library code.
+This option is actually set in the Levmar::Func object.  A
+typical default value is
+ cc -shared -L/usr/local/lib -fstack-protector %o -o %s
+
+=item CTOP
+
+The value of this string will be written at the top of the c code
+written by Levmar::Func. This can be used to include headers and so forth.
+This option is actually set in the Levmar::Func object. This code is also written
+at the top of c code translated from lpp code.
+
+
+=item FVERBOSE
+
+If true (eg 1) Print the compiling and linking commands to STDERR when compiling fit functions.
+This option is actually passed to Levmar::Func. Default is 0.
+
+=item Default values
+
+Here are the default values
+of some options
+
+
+ $Levmar_defaults = {
+   FUNC => undef,  # Levmar::Func object, or function def, or ...
+   JFUNC => undef,  # must be ref to perl sub
+   MAXITS => 100,   # maximum iterations
+   MU => LM_INIT_MU,      # These are described in levmar docs
+   EPS1 => LM_STOP_THRESH,
+   EPS2 => LM_STOP_THRESH,
+   EPS3 => LM_STOP_THRESH,
+   DELTA => LM_DIFF_DELTA,
+   DERIVATIVE => 'analytic',
+   FIX => undef,
+   A => undef,
+   B => undef,
+   C => undef,
+   D => undef,
+   UB = undef,
+   LB => undef,
+   X => undef,
+   P => undef,
+   T => undef,
+   WGHTS => undef,
+   # meant to be private
+   LFUNC => undef,  # only Levmar::Func object, made from FUNC
+   };
+
+=back
+
+
+=head1 OUTPUT
+
+This section describes the contents of the hash that
+levmar takes as output. Do not confuse these hash keys with
+the hash keys of the input options. It may be a good idea
+to change the interface by prepending O to all of the output
+keys that could be confused with options to levmar().
+
+=over 3
+
+=item  P (output)
+
+pdl containing the optimized parameters. It has the same shape
+as the input parameters.
+
+=item  FUNC (output)
+
+ref to the Levmar::Func object. This object may have been created
+during the call to levmar(). For instance, if you pass a string
+contiaining an C<lpp> definition, the compiled object (and associated
+information) is contained in $outh->{FUNC}. Don't confuse this with
+the input parameter of the same name.
+
+=item COVAR (output)
+
+a pdl representing covariance matrix.
+
+=item REASON
+
+an integer code representing the reason for terminating the
+fit. (call levmar_report($outh) for an interpretation. The interpretations
+are listed here as well (see the liblevmar documentation if you don't
+find an explanation somewhere here.)
+
+ 1  stopped by small gradient J^T e
+ 2  stopped by small Dp
+ 3  stopped by itmax
+ 4  singular matrix. Restart from current p with increased \mu
+ 5  no further error reduction is possible. Restart with increased \mu
+ 6  stopped by small ||e||_2
+
+
+=item ERRI, ERR1, ERR2, ERR3, ERR4
+
+ERRI is C<||e||_2> at the initial paramters.  ERR1 through
+ERR3 are the actual values on termination of the quantities
+corresponding to the thresholds EPS1 through EPS3 described
+in the options section. ERR4 is C<mu/max[J^T J]_ii>
+
+=item ITS
+
+Number of iterations performed
+
+=item NFUNC, NJAC, NLS
+
+Number of function evaluations, number of jacobian evaluations
+and number of linear systems solved.
+
+=item INFO
+
+Array containing  ERRI,ERR1, ..., ERR4, ITS, REASON, NFUNC, NJAC, NLS.
+
+=back
+
+=head1 FIT FUNCTIONS
+
+Fit functions, or model functions can be specified in the following
+ways.
+
+=over 3
+
+=item lpp
+
+It is easier to learn to use C<lpp> by reading the C<EXAMPLES> section.
+
+C<lpp> processes a function definition into C code.  It writes
+the opening and closing parts of the function, alters a
+small number of identifiers if they appear, and wraps some
+of the code in a loop. C<lpp> recognizes four directives. They
+must occur on a line with nothing else, not even comments.
+
+First, the directives are explained, then the substitutions.
+The directive lines have a strict format. All other lines
+can contain any C code including comments and B<cpp>
+macros. They will be written to a function in C after the
+substitutions described below.
+
+=over 3
+
+=item C<function, jacobian>
+
+The first line of the fit function definition must be
+C<function funcname>. The first line of the jacobian
+definition, if the jacobian is to be defined, is C<jacobian
+funcname>. The function names can be any valid C function
+name. The names may also be omitted as they are never needed
+by the user. The names can be identical. (Note that a
+numeric suffix will be automatically added to the function
+name if the .so file already exists. This is because, if
+another Func object has already loaded the shared library
+from an .so file, dlopen will use this loaded library for
+all C<Func> objects asking for that .so file, even if the
+file has been overwritten, causing unexpected behavior)
+
+=item C<loop>
+
+The directive C<loop> says that all code before C<loop> is not
+in the implicit loop, while all code following C<loop> is in
+the implicit loop. If you omit the directive, then all the code
+is wrapped in a loop.
+
+=item C<noloop>
+
+The directive C<noloop> says that there is no implicit loop anywhere
+in the function.
+
+=item Out-of-loop substitutions
+
+These substitutions translate C<lpp> to C in lines that occur
+before the implied loop (or everywhere if there is no loop.)
+In every case you can write the translated C code into your
+function definition yourself and C<lpp> will leave it
+untouched.
+
+=over 3
+
+=item pq -> p[q]  
+
+where q is a sequence of digits.
+
+
+=item xq -> x[q]  
+
+where q is a sequence of digits. This is applied only in the fit function,
+not in the jacobian.
+
+
+=item dq[r] -> d[q+m*r]
+
+(where m == $p->nelem), q and r are sequences of
+digits. This applies only in the jacobian. You usually will
+only use the fit functions with one value of m. It would
+make faster code if you were to explicitly write, say C<d[u]>,
+for each derivative at each point. Presumably there is a
+small number of data points since this is outside a
+loop. Some provisions should be added to C<lpp>, say C<m=3> to
+hard code the value of C<m>. But m is only explicitly used in
+constructions involving this substitution.
+
+
+=back
+
+=item In-loop substitutions
+
+These substitutions apply inside the implied loop. The loop variables are
+i in the fit function and i and j in the jacobian.
+
+=over 3
+
+=item t -> t[i]   
+
+(literal "i")  You can also write t[i] or t[expression involving i] by hand.
+Example: t*t -> t[i]*t[i].
+
+
+=item pq -> p[q]  
+
+where q is a sequence of digits. Example p3 -> p[3].
+
+
+=item x -> x[i]   
+
+only in fit function, not in jacobian.
+
+
+=item (dr or dr[i]) -> d[j++] 
+
+where r is a sequence of digits. Note that r and i are
+ignored. So you are required to list the derivatives in
+order. An example is
+
+    d0 = t*t;  // derivative w.r.t p[0] loop over all points
+    d1 = t;    
+
+If you write C<d1> first and then C<d0>, lpp will incorrectly
+assign the derivative functions.
+
+=back
+
+
+=back
+
+
+
+=item C Code
+
+The jacobian name must start with 'jac' when a pure C function definition
+is used. To see example of fit functions writen in C, call levmar
+with lpp code and the option C<NOCLEAN>. This will leave the C source
+in the directory given by C<DIR>. The C code you supply is mangled
+slightly before passing it to the compiler: It is copied twice, with
+FLOAT defined in one case as C<double> and in the other as C<float>.
+The letter C<s> is also appended to the function names in the latter
+copy. The C code is parsed to find the fit function name and the
+jacobian function name.
+
+We should make it possible to pass the function names as a separate option
+rather than parsing the C code. This will allow auxiallary functions to
+be defined in the C code; something that is currently not possible.
+
+
+=item Perl_Subroutines
+
+This is how to use perl subroutines as fit functions... (see
+the examples for now, e.g. L<example 2|/example--2>.)  The
+fit function takes piddles $p,$x, and $t, with dimensions
+m,n, and tn. (often tn ==n ).  These are references with
+storage already allocated (by the user and liblevmar). So
+you must use C<.=> when setting values. The jacobian takes
+piddles $p,$d, and $t, where $d, the piddle of derivatives
+has dimensions (m,n). For example
+
+ $f = sub myexp {
+    my ($p,$x,$t) = @_;
+    my ($p0,$p1,$p2) = list($p);
+    $x .= exp($t/$p0);
+    $x *= $p1;
+    $x += $p2 
+ }
+
+ $jf = sub my expjac {
+    my ($p,$d,$t) = @_;
+    my ($p0,$p1,$p2) = list($p);
+    my $arg = $t/$p0;
+    my $ex = exp($arg);
+    $d((0)) .= -$p1*$ex*$arg/$p0;
+    $d((1)) .= $ex;
+    $d((2)) .= 1.0;
+ }
+
+
+
+=back
+
+
+=head1 PDL::Fit::Levmar::Func Objects
+
+These objects are created every time you call levmar(). The hash
+returned by levmar contains a ref to the Func object. For instance
+if you do
+
+ $outh = levmar( FUNC => ..., @opts);
+
+then $outh->{LFUNC} will contain a ref to the function object. The .so
+file, if it exists, will not be deleted until the object is destroyed.
+This will happen, for instance if you do C<$outh = undef>.
+
+
+=head1 IMPLEMENTATION
+
+This section currently only refers to the interface and not the fit algorithms.
+
+=over 3
+
+=item C fit functions
+
+The module does not use perl interfaces to dlopen or the C
+compiler.  The C compiler options are taken from
+%Config. This is mostly because I had already written those
+parts before I found the modules. I imagine the
+implementation here has less overhead, but is less portable.
+
+
+=item perl subroutine fit functions
+
+Null pdls are created in C code before the fit starts. They
+are passed in a struct to the C fit function and derivative
+routines that wrap the user's perl code. At each call the
+data pointers to the pdls are set to what liblevmar has sent
+to the fit functions.  The pdls are deleted after the fit.
+Originally, all the information on the fit functions was
+supposed to be handled by Levmar::Func. But when I added
+perl subroutine support, it was less clumsy to move most of
+the code for perl subs to the Levmar module. So the current
+solution is not very clean.
+
+=item Efficiency
+
+Using C<lpp> or C is faster than using perl subs, which is
+faster than using L<PDL::Fit::LM>, at least in all the tests I have
+done. For very large data sets, pure C was twice as fast as
+perl subs and three times as fast as Fit::LM.  Some
+optimization problems have very small data sets and converge
+very slowly.  As the data sets become smaller and the number
+of iterations increases the advantage of using pure C
+increases as expected. Also, if I fit a small data set
+(n=10) a large number of times (just looping over the same
+problem), Pure C is ten times faster than Fit::LM, while
+Levmar with perl subs is only about 1.15 times faster than
+Fit::LM.  All of this was observed on only two different
+problems.
+
+=back
+
+=head1 FUNCTIONS
+
+=head2 levmar()
+
+=for ref
+
+Perform Levenberg-Marquardt non-linear least squares fit
+to data given a model function.
+
+=for usage
+
+use PDL::Fit::Levmar;
+
+ $result_hash = levmar($p,$x,$t, FUNC => $func, %OPTIONS  ); 
+
+ $p is a pdl of input parameters
+ $x is a pdl of ordinate data
+ $t is an optional pdl of co-ordinate data
+ 
+levmar() is the main function in the Levmar package. See the
+PDL::Fit::Levmar for a complete description.
+
+=for signature
+
+ p(m);  x(n);  t(nt); int itmax();
+ [o] covar(m,m) ; int [o] returnval();
+ [o] pout(m);  [o] info(q=10);
+
+See the module documentation for information on passing
+these arguments to levmar.  Threading is known to
+work with p(m) and x(n), but I have not tested the rest.  In
+this case all of they output pdls get the correct number of
+dimensions (and correct values !).  Notice that t(nt) has a
+different dimension than x(n). This is correct because in
+some problems there is no t at all, and in some it is
+pressed into the service of delivering other parameters to
+the fit routine. (Formally, even if you use t(n), they are
+parameters.) 
+
+
+=head2 levmar_chkjac()
+
+=for ref
+
+Check the analytic jacobian of a function by computing
+the derivatives numerically.
+
+=for signature
+ 
+    p(m); t(n); [o] err(n);
+    This is the relevant part of the signature of the
+    routine that does the work.
+
+
+=for usage
+
+ use PDL::Fit::Levmar;
+
+ $Gh = levmar_func(FUNC=>$Gf);
+
+ $err = levmar_chkjac($Gh,$p,$t);
+
+ $f is an object of type PDL::Fit::Levmar::Func
+ $p is a pdl of input parameters
+ $t is an pdl of co-ordinate data
+ $err is a pdl of errors computed at the values $t.
+
+ Note: No data $x is supplied to this function
+
+The Func object $Gh contains a function f, and a jacobian
+jf.  The i_th element of $err measures the agreement between
+the numeric and analytic gradients of f with respect to $p
+at the i_th evaluation point f (normally determined by the
+i_th element of t). A value of 1 means that the analytic and
+numeric gradients agree well. A value of 0 mean they do not
+agree.
+
+Sometimes the number of evaluation points n is hardcoded
+into the function (as in almost all the examples taken from
+liblevmar and appearing in t/liblevmar.t. In this case the
+values that f returns depend only on $p and not on any other
+external data (nameley t). In this case, you must pass the
+number n as a perl scalar in place of t. For example
+
+   $err = levmar_chkjac($Gh,$p,5);
+
+
+in the case that f is hardcoded to return five values.
+
+Need to put the description from the C code in here.
+
+=head2 levmar_report()
+
+=for ref
+
+Make a human readable report from the hash ref returned
+by lemvar().
+
+=for usage
+
+ use PDL::Fit::Levmar;
+
+ $h = levmar($p,$x,$t, $func);
+
+ print levmar_report($h);
+
+
+=head1 BUGS
+
+With the levmar-2.5 code: Passing workspace currently does not work with
+linear inequality constraint. Some of the PDL threading no long works
+correctly. These are noted in the tests in t/thread.t. It is not clear
+if it is a threading issue or the fitting has changed.
+
+ 
+=cut
+
+#--------------------------------------------------------------------
+#  Begining of module code
+
+use strict;
+use PDL::Fit::Levmar::Func;
+use Carp;
+use PDL::NiceSlice;
+use PDL::Core ':Internal'; # For topdl()
+use vars ( '$Levmar_defaults', '$Levmar_defaults_order',
+   '$Perl_func_wrapper', '$Perl_jac_wrapper', '$LPPEXT', '$DBLMAX' );
+
+# 'jac' refers to jacobian
+$Perl_func_wrapper = get_perl_func_wrapper();
+$Perl_jac_wrapper = get_perl_jac_wrapper();
+$DBLMAX = get_dbl_max();
+
+$LPPEXT = ".lpp";
+
+
+sub deb { print STDERR $_[0],"\n"}
+
+
+
+$PDL::Fit::Levmar::HAVE_LAPACK=0;
+
+
+
+
+
+
+
+
+# check if dims are equal in two pdls
+sub chk_eq_dims {
+    my ($x,$y) = @_;
+    my (@xd) = $x->dims();
+    my (@yd) = $y->dims();
+    return -2 if (scalar(@xd) != scalar(@yd) );
+    my $ret = 1;
+    foreach (@xd) {
+	return -1 if ($_ != shift(@yd) );
+    }
+    return $ret;
+}
+
+@PDL::Fit::Levmar::reason_for_terminating = (
+	'',		   
+      'stopped by small gradient J^T e',
+      'stopped by small Dp',
+      'stopped by itmax',
+      'singular matrix. Restart from current p with increased \mu',
+      'no further error reduction is possible. Restart with increased \mu',
+      'stopped by small ||e||_2'
+			   );
+    
+sub levmar_report {
+    my $h = shift;
+    make_report($h->{P},$h->{COVAR}, $h->{INFO});
+}
+
+# make a small report out of the results of the optimization
+sub make_report {
+    my ($p,$covar,$info) = @_;
+    my @ninf = list($info);
+#    for(my $i=0;$i<9; $i++) { # Tried to get threading to work, but no!
+#	$ninf[$i] = $info(($i));
+#    } 
+    $ninf[6] = 
+	$PDL::Fit::Levmar::reason_for_terminating[$ninf[6]]; # replace int with string
+    my $form = <<"EOFORM";
+Estimated parameters: %s    
+Covariance: %s
+||e||_2 at initial parameters = %g
+Errors at estimated parameters:
+||e||_2\t = %g
+||J^T e||_inf\t= %g
+||Dp||_2\t= %g
+\\mu/max[J^T J]_ii ]\t= %g
+number of iterations\t= %d
+reason for termination: = %s
+number of function evaluations\t= %d
+number of jacobian evaluations\t= %d
+number of linear systems solved\t= %d
+EOFORM
+my $st = sprintf($form, $p,$covar,@ninf);
+    
+}
+
+$Levmar_defaults_order =  qw [
+    FUNC
+    
+
+    ];
+
+
+$Levmar_defaults = {
+    MAXITS => 100,   # maximum iterations
+    MU =>    LM_INIT_MU(),
+    EPS1 =>  LM_STOP_THRESH(),
+    EPS2 =>  LM_STOP_THRESH(),
+    EPS3 =>  LM_STOP_THRESH(),
+    DELTA => LM_DIFF_DELTA(),
+    DERIVATIVE => 'analytic',
+    NOCOVAR => undef,
+    FIX => undef,
+    FIXB => undef,
+    A => undef,
+    B => undef,
+    C => undef,
+    D => undef,
+    UB => undef,
+    LB => undef,
+    FUNC => undef,  # Levmar::Func object, or function def, or ...
+    JFUNC => undef,  # must be ref to perl sub
+    X => undef,
+    P => undef,
+    T => undef,
+    WGHTS => undef,
+    COVAR => undef, # The next 5 params can be set to PDL->null
+    WORK => undef,  # work space
+    POUT => undef,  # ref for preallocated output parameters
+    INFO => undef,
+    RET => undef,
+# meant to be private
+    LFUNC => undef,  # only Levmar::Func object, made from FUNC
+};
+
+# This isn't meant to replace help. But for now its doing nothing.
+sub get_help_str {
+    return '
+This is the help string for levmar.
+
+';
+}
+
+#################################################################
+sub levmar {
+    my($p,$x,$t,$infunc);
+    my $args;
+    # get all args before the hash. p,x,t must come in that order
+    # but (t), or (t and x), or (t,x,and p) can be in the hash
+    # the function can be anywhere before the hash
+    while (1) { 
+	$args = 0;
+	if ( (not defined $p ) and (ref($_[0]) eq 'PDL' or ref($_[0]) eq 'ARRAY')) {
+	    $p = shift ; $args++;
+	}
+        last if ( @_ == 0 );
+	if ( (not defined $x ) and (ref($_[0]) eq 'PDL' or ref($_[0]) eq 'ARRAY')) {
+	    $x = shift ; $args++;
+	}
+        last if ( @_ == 0 );
+	if ( (not defined $t) and (ref($_[0]) eq 'PDL' or ref($_[0]) eq 'ARRAY')) {
+	    $t = shift ; $args++;
+	}
+        last if ( @_ == 0 );
+	if ( not defined $infunc and ref($_[0]) =~ /Func|CODE/  ) {
+	    $infunc = shift; $args++;
+	}
+        last if ( @_ == 0 );
+	if ( (not defined $infunc) and 
+	     (  not ref($_[0]) ) and (  $_[0] =~ /(\.c|$LPPEXT)$/o or $_[0] =~ /\n/ ) ) {
+	    $infunc = shift; $args++;
+	}
+	last if ( @_ == 0 or  $args == 0);
+    }
+    my $inh;
+    $inh = shift if @_; # input parameter hash
+    $inh = {} unless defined $inh;
+    if(ref $inh ne 'HASH') { # turn list into anonymous hash
+	$inh = defined $inh ? {$inh,@_} : {} ;
+    }
+    if( exists $inh->{HELP} ) {
+	my $s = get_help_str();
+	return $s;
+    }
+    if( exists $inh->{GETOPTS} ) {
+	my %h = %$Levmar_defaults;
+	return \%h;
+    }
+    # should already use a ref to string here
+    $inh->{FUNC} = $infunc if defined $infunc;
+    die "levmar: neither FUNC nor CSRC defined"
+        unless defined $inh->{FUNC} or defined $inh->{CSRC};
+
+
+
+ 
+    foreach (qw( A B C D FIX WGHT )) {
+        barf "PDL::Fit::Levmar not built with lapack. Found parameter $_"
+            if exists $inh->{$_};
+    }
+   
+
+
+        
+########  Handle parameters
+    my $h = {}; # parameter hash to be built from $inh and defaults
+    my $funch = {}; # unrecognized parameter hash. This will be passed to Func.
+    foreach ( keys %$Levmar_defaults ){ # copy defaults to final hash
+	$h->{$_} = $Levmar_defaults->{$_};
+    }
+    foreach my $k (keys %$inh ) { # replace defaults with input params
+	if ( exists $Levmar_defaults->{$k} ) {
+	    $h->{$k} = $inh->{$k};
+	}		
+	else { # don't recognize, so pass to Func
+	    $funch->{$k} = $inh->{$k}; 
+	}
+    }
+########## Set up input and output variables
+
+    # These must come from parameters if not from the arg list
+    $p = $h->{P} unless not defined $h->{P} and defined $p;
+    $x = $h->{X} unless not defined $h->{X} and defined $p;
+    $t = $h->{T} unless not defined $h->{T} and defined $p;
+
+    $t = PDL->null unless defined $t; # sometimes $t not needed
+
+    if ( not defined $p ) { # This looks like some kind of error thing that was
+                            # not implemented consistently
+	my $st = "No parameter (P) pdl";
+	warn $st;
+	return {RET => -1, ERRS => [$st] };
+    }
+    if ( not defined $x ) {
+	my $st = "No data (X) pdl";
+	warn $st;
+	return {RET => -1, ERRS => [$st] };
+    }
+
+#-------------------------------------------------
+# Treat input and output piddles for pp_defs
+    $x = topdl($x); # in case they are refs to arrays
+    $p = topdl($p);
+    $t = topdl($t);
+###  output variables
+    my $pout;
+    my $info;
+    my $covar;
+    my $ret;
+    my $work;
+    my $wghts;
+
+# should put this stuff in a loop
+    $covar = $h->{COVAR} if defined $h->{COVAR};
+    $pout = $h->{POUT} if defined $h->{POUT};
+    $info = $h->{INFO} if defined $h->{INFO};
+    $ret = $h->{RET} if defined $h->{RET};
+    $work = $h->{WORK} if defined $h->{WORK};
+    $wghts = $h->{WGHTS} if defined $h->{WGHTS};
+
+# If they are set here, then there will be no external ref.
+    $covar = PDL->null unless defined $covar;
+    $pout = PDL->null unless defined $pout;
+    $info = PDL->null unless defined $info;
+    $ret = PDL->null unless defined $ret;
+    $work = PDL->null unless defined $work;
+    $wghts = PDL->null unless defined $wghts;
+
+# Input pdl contstructed in levmar
+# Currently, the elements are set from a hash; no convenient way to thread.
+# As an alternative, we could send them as a pdl, then we could thread them
+    my $opts;
+# Careful about $m, it is used in construcing $A below (with fix). But this is
+# not correct when using implicit threading. Except threading may still be working.
+# Need to look into that.
+    my $m = $p->nelem;
+
+#--------------------------------------------------------
+# Set up Func object
+#--------------------------------------------------------
+    croak "No FUNC in options to levmar." unless exists $h->{FUNC};
+    if ( ref($h->{FUNC}) =~ /CODE/ or 
+     not ref($h->{FUNC}) ) { # probably a string, convert to func object
+	$funch->{FUNC} = $h->{FUNC};
+	my @ret = PDL::Fit::Levmar::Func::levmar_func($funch);
+	if ($ret[0] == -1 ) { # error in creating function
+	    shift(@ret);
+#	    deb "Error: " . join("\n",@ret); # can turn this off  and on
+	    return {RET => -1, ERRS =>  [@ret] } ; # just return all the other messages.
+	}	
+	$h->{LFUNC} = $ret[0];
+    }
+    else { # already a Func object
+	 $h->{LFUNC} = $h->{FUNC} ; #  copy ref
+	 my @k = keys %$funch;
+# It would be good to check for valid options. But if a user switches from a
+# string to a Func oject in  the call to levmar(), he may not delete the
+# other keys. Halting on an error would bit frustrating or puzzling.
+# Even a warning is perhaps too much
+	 if ( @k ) {
+             my $s = ''; $s = 's' if @k>1;
+	     my $str = "Unrecognized or useless option$s to levmar: \n";
+	     foreach ( @k ) {
+		 $str .= " '$_' => '" . $funch->{$_} . "'\n" ;
+	     }
+	     warn $str ."";
+	 }
+     }
+      # C pointers to fit functions
+    my ($funcn,$sfuncn,$jacn,$sjacn) =   # single and double
+	$h->{LFUNC}->get_fit_pointers();
+    my $deriv = $h->{DERIVATIVE};
+
+    # The DFP stuff is to wrap perl functions in C routines to pass to liblevmar.
+    # It's probably cleaner to move most of this stuff into Levmar::Func
+    my $DFP = 0; # routines check for $DFP == 0 to bypass perl wrapper
+
+    if ( ref($h->{FUNC}) =~ /CODE/) { # setup perl wrapper stuff
+	my $jfunc = 0;
+	$DFP = DFP_create();
+	if (defined $h->{JFUNC} and  ref($h->{JFUNC}) =~ /CODE/) {
+	    $jfunc = $h->{JFUNC};
+	}
+	if ( $deriv eq 'analytic' and $jfunc == 0 ) {
+	  #  warn "No jacobian function supplied, using numeric derivatives";
+	    $deriv = 'numeric';
+            $h->{DERIVATIVE} = 'numeric';
+	}
+	DFP_set_perl_funcs($DFP, $h->{FUNC}, $h->{JFUNC});
+	$funcn = $Perl_func_wrapper;
+	$jacn = $Perl_jac_wrapper; 
+	$sfuncn = $Perl_func_wrapper; # Single and double can use same wrapper
+	$sjacn = $Perl_jac_wrapper;
+    }
+
+############ Do a few sanity checks
+
+    if ( $deriv eq 'analytic' ) {
+	if  (not defined $jacn or $jacn == 0 ) {
+	    #   warn "No jacobian function supplied, using numeric derivatives";
+	    $deriv = 'numeric';
+            $h->{DERIVATIVE} = 'numeric';
+	}
+    }
+    elsif ( $deriv ne 'numeric' ) {
+	croak "DERIVATIVE must be 'analytic' or 'numeric'";
+    }
+
+# liblevmar uses 5 option for analytic and 6 for numeric. 
+# We make an integer option array as well, for passing stuff , like maxits.
+    if ($h->{DERIVATIVE} eq 'analytic') {
+	$opts = pdl ($p->type, $h->{MU},$h->{EPS1},$h->{EPS2},$h->{EPS3});
+    }
+    else {
+	$opts = pdl ($p->type,$h->{MU},$h->{EPS1},$h->{EPS2},$h->{EPS3},$h->{DELTA});
+    }
+    my $iopts = pdl(long, $h->{MAXITS});
+
+  
+########### FIX holds some parameters constant using linear constraints.
+# It is a special case of more general constraints using A and b.
+# Notice that this fails if FIX has more than one dimension (ie, you are
+# threading. FIXB does the same but using box constraints.
+
+    if (defined $h->{FIX} ) { 
+	my $ip =  topdl( $h->{FIX}); # take array ref or pdl
+	if ( chk_eq_dims($ip,$p) < 0 ) {
+	    croak "p and FIX must have the same dimensions";
+	}
+	my $nc = $ip->sum; # number of fixed  vars
+	if ($nc > 0) {
+	    my $A = zeroes($p->type, $m,$nc);
+	    my $b = zeroes($p->type, $nc);
+	    my $j=0;
+	    for(my $i=0; $i<$m; $i++) {
+		if ($ip->at($i) == 1) {
+		    $A($i,$j) .= 1;
+		    $b($j) .= $p->at($i);
+		    $j++;
+		}
+	    }
+	    $h->{A} = $A;
+	    $h->{B} = $b;
+	}
+    }
+    elsif ( defined $h->{FIXB} ) {
+	my $f =  topdl( $h->{FIXB}); # take array ref or pdl
+	if ( chk_eq_dims($f,$p) < 0 ) {
+	    croak "p and FIX must have the same dimensions";
+	}
+	if ( not defined  $h->{UB} ) {
+	    $h->{UB} = ones($p);
+	    $h->{UB} *= $DBLMAX;
+	}
+	if (not defined  $h->{LB} ) {
+	    $h->{LB} = ones($p);
+	    $h->{LB} *= -$DBLMAX;
+	}
+	my $fi = PDL::Primitive::which($f == 1); # indices in p that we want to fix.
+	$h->{UB}->flat->index($fi) .= $p->flat->index($fi);
+	$h->{LB}->flat->index($fi) .= $p->flat->index($fi);
+	# so ub and lb are now at maximum bounds where not fixed and at value of
+        # p where fixed
+    }
+    my $want_covar = 1;
+    if ( defined $h->{NOCOVAR} ) {
+	$want_covar = 0;
+    }
+
+    my $errs = check_levmar_args($h);
+    if ( @$errs > 0 ) {
+#        print @$errs;
+        return {RET => -1, ERRS => $errs };
+    }
+    my ($func_key, $arg_list) = build_constraint_arg_combination($h);    
+#    print "func key '$func_key'\n";
+    if ( not defined $func_key ) {
+        croak "Could not find function key";
+    }
+    if ( not exists $PDL::Fit::Levmar::PDL_Levmar_funcs{$func_key} ) {
+        croak "Could not find function for key";
+    }
+    my $pdl_levmar_func = $PDL::Fit::Levmar::PDL_Levmar_funcs{$func_key};
+#    print "func $pdl_levmar_func\n";
+#    my $nargs = @$arg_list;
+#    print "Got $nargs args\n";
+    my @jacobians = ();
+    if ( $h->{DERIVATIVE} eq 'analytic' ) {
+      @jacobians = ( $jacn, $sjacn );
+    }
+    &$pdl_levmar_func($p,$x,$t,@$arg_list,$iopts,$opts,$work,
+       $covar, $ret, $pout, $info, $funcn, $sfuncn, @jacobians, $DFP, $want_covar);
+
+    DFP_free($DFP) if $DFP;
+
+    my  $hout = {
+	    RET => $ret,
+	    COVAR => $covar,
+	    P => $pout,
+	    ERRI => $info((0)),
+	    ERR1 => $info((1)),
+	    ERR2 => $info((2)),
+	    ERR3 => $info((3)),
+	    ERR4 => $info((4)),
+	    ITS =>  $info((5)),
+	    REASON =>  $info((6)),
+	    NFUNC =>  $info((7)),
+	    NJAC =>  $info((8)),
+	    NLS =>  $info((9)),            
+	    INFO => $info,
+	    FUNC => $h->{LFUNC},
+	};
+    return $hout;
+ 
+} # end levmar()
+
+
+sub PDL::Fit::Levmar::check_levmar_args {
+    my ($h) = @_;
+    my @refargs = qw( LB UB A B C D );
+    my @errs = ();
+    foreach my $argname ( @refargs ) {
+        if ( exists $h->{$argname} and defined $h->{$argname} ) {
+            my $arg = $h->{$argname};
+            if ( not ref($arg) ) {
+                push @errs, "$argname must be a pdl or ref to array.";
+            }
+        }
+    }
+    my @combs = ( [ 'A', 'B' ], [ 'C', 'D' ] );
+    foreach my $comb  (@combs ) {
+        my $n = @$comb;
+        my $nf = 0;
+        foreach my $arg ( @$comb ) {
+            $nf++ if exists $h->{$arg} and defined $h->{$arg};
+        }
+        if ( $nf != 0  and  $n != $nf ) {
+            push @errs, 'none or all of ' . join(' and ',@$comb) . ' must be defined.';
+        }
+    }
+    return \@errs;
+}
+
+    
+# make a list of strings of names of constraint args that
+# have been passed.
+# hash is arg hash to top level call
+sub PDL::Fit::Levmar::build_constraint_arg_combination {
+    my ($h) = @_;
+    my @arg_comb = ();
+    my @arg_list = ();
+    # order is important in following
+    my @possible_args = qw( LB UB A B C D );
+    foreach ( @possible_args ) {
+        my $ucarg = $_;
+#        $ucarg =~ tr/a-z/A-Z/;  # should rewrite so that tr not needed
+        if ( exists $h->{$ucarg} and defined $h->{$ucarg} ) {
+            push @arg_comb, $_;
+            push @arg_list, topdl($h->{$ucarg});
+        }
+    }
+    my $deriv_type;
+    if ($h->{DERIVATIVE} eq 'analytic' ) {
+        $deriv_type = 'DER';
+    }
+    else {
+        $deriv_type = 'DIFF';
+    }
+    push @arg_list, topdl($h->{WGHTS}) if exists $h->{WGHTS} and defined $h->{WGHTS};
+    my $fk = make_pdl_levmar_func_key(make_hash_key_from_arg_comb(\@arg_comb), $deriv_type);
+    return ($fk,\@arg_list);
+}
+
+sub PDL::Fit::Levmar::make_hash_key_from_arg_comb {
+    my ( $arg_comb ) = @_;
+    return join( '_', @$arg_comb);
+}
+
+
+sub PDL::Fit::Levmar::make_pdl_levmar_func_key {
+    my ($arg_str, $deriv_type) = @_;
+    return  $deriv_type . '_' . $arg_str;
+}
+
+
+%PDL::Fit::Levmar::PDL_Levmar_funcs = (
+  DER_ => \&PDL::levmar_der_,
+  DIFF_ => \&PDL::levmar_diff_,
+  DER_LB_C_D => \&PDL::levmar_der_lb_C_d,
+  DIFF_LB_C_D => \&PDL::levmar_diff_lb_C_d,
+  DER_A_B => \&PDL::levmar_der_A_b,
+  DIFF_A_B => \&PDL::levmar_diff_A_b,
+  DER_UB_A_B => \&PDL::levmar_der_ub_A_b,
+  DIFF_UB_A_B => \&PDL::levmar_diff_ub_A_b,
+  DER_UB => \&PDL::levmar_der_ub,
+  DIFF_UB => \&PDL::levmar_diff_ub,
+  DER_A_B_C_D => \&PDL::levmar_der_A_b_C_d,
+  DIFF_A_B_C_D => \&PDL::levmar_diff_A_b_C_d,
+  DER_LB_UB_A_B_C_D => \&PDL::levmar_der_lb_ub_A_b_C_d,
+  DIFF_LB_UB_A_B_C_D => \&PDL::levmar_diff_lb_ub_A_b_C_d,
+  DER_LB => \&PDL::levmar_der_lb,
+  DIFF_LB => \&PDL::levmar_diff_lb,
+  DER_LB_A_B_C_D => \&PDL::levmar_der_lb_A_b_C_d,
+  DIFF_LB_A_B_C_D => \&PDL::levmar_diff_lb_A_b_C_d,
+  DER_UB_A_B_C_D => \&PDL::levmar_der_ub_A_b_C_d,
+  DIFF_UB_A_B_C_D => \&PDL::levmar_diff_ub_A_b_C_d,
+  DER_LB_UB => \&PDL::levmar_der_lb_ub,
+  DIFF_LB_UB => \&PDL::levmar_diff_lb_ub,
+  DER_LB_A_B => \&PDL::levmar_der_lb_A_b,
+  DIFF_LB_A_B => \&PDL::levmar_diff_lb_A_b,
+  DER_UB_C_D => \&PDL::levmar_der_ub_C_d,
+  DIFF_UB_C_D => \&PDL::levmar_diff_ub_C_d,
+  DER_LB_UB_A_B => \&PDL::levmar_der_lb_ub_A_b,
+  DIFF_LB_UB_A_B => \&PDL::levmar_diff_lb_ub_A_b,
+  DER_LB_UB_C_D => \&PDL::levmar_der_lb_ub_C_d,
+  DIFF_LB_UB_C_D => \&PDL::levmar_diff_lb_ub_C_d,
+  DER_C_D => \&PDL::levmar_der_C_d,
+  DIFF_C_D => \&PDL::levmar_diff_C_d,
+);
+
+
+
+
+sub levmar_chkjac {
+    my ($f,$p,$t)  = @_;
+    my $r = ref $f;
+    if ( not $r =~ /Levmar::Func/ ) {
+	warn "levmar_chkjac: not a Levmar::Func object ";
+	return;
+    }
+    my $N;
+    if ( not ref($t) =~ /PDL/ ) {
+	$N = $t; # in case there is no t for this func
+	$t = zeroes( $p->type, 1); just some pdl
+    }
+    my $DFP = 0;
+    my ($funcn,$sfuncn,$jacn,$sjacn);
+    if ( ref($f->{FUNC}) =~ /CODE/) { # setup perl wrapper stuff
+	my $jfunc = 0;
+	$DFP = DFP_create();
+	if (not (defined $f->{JFUNC} and  ref($f->{FUNC}) =~ /CODE/ ) ) {
+	    warn "levmar_chkjac: no perl code jacobian supplied in JFUNC.";
+	    return undef;
+	}
+	DFP_set_perl_funcs($DFP, $f->{FUNC}, $f->{JFUNC});
+	$funcn = $Perl_func_wrapper;
+	$jacn = $Perl_jac_wrapper;
+	$sfuncn = $Perl_func_wrapper;
+	$sjacn = $Perl_jac_wrapper;
+    }
+    else { # pointers to native c functions.
+	($funcn,$sfuncn,$jacn,$sjacn) = 
+	    $f->get_fit_pointers();
+    }
+    my $err;
+    if ( defined $N ) {
+	$err =  _levmar_chkjac_no_t($p,$funcn,$sfuncn,$jacn,$sjacn,$N,$DFP);
+    }
+    else  {
+	$err =  _levmar_chkjac($p,$t,$funcn,$sfuncn,$jacn,$sjacn,$DFP);
+    }
+    DFP_free($DFP);
+    return $err;
+}
+
+
+
+
+
+*levmar_der_ub = \&PDL::levmar_der_ub;
+
+
+
+
+
+*levmar_der_lb = \&PDL::levmar_der_lb;
+
+
+
+
+
+*levmar_der_ = \&PDL::levmar_der_;
+
+
+
+
+
+*levmar_der_lb_ub = \&PDL::levmar_der_lb_ub;
+
+
+
+
+
+*levmar_diff_ub = \&PDL::levmar_diff_ub;
+
+
+
+
+
+*levmar_diff_lb = \&PDL::levmar_diff_lb;
+
+
+
+
+
+*levmar_diff_ = \&PDL::levmar_diff_;
+
+
+
+
+
+*levmar_diff_lb_ub = \&PDL::levmar_diff_lb_ub;
+
+
+
+
+
+*_levmar_chkjac = \&PDL::_levmar_chkjac;
+
+
+
+
+
+*_levmar_chkjac_no_t = \&PDL::_levmar_chkjac_no_t;
+
+
+
+;
+
+
+
+=head1 AUTHORS
+
+PDL code for Levmar Copyright (C) 2006 John Lapeyre. C
+library code Copyright (C) 2006 Manolis Lourakis, licensed
+here under the Gnu Public License.
+
+All rights reserved. There is no warranty. You are allowed
+to redistribute this software / documentation under certain
+conditions. For details, see the file COPYING in the PDL
+distribution. If this file is separated from the PDL
+distribution, the copyright notice should be included in the
+file.
+
+=cut
+
+
+
+
+
+# Exit with OK status
+
+1;
+
+		   

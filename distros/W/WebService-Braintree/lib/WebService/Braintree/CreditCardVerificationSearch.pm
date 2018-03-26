@@ -1,26 +1,94 @@
+# vim: sw=4 ts=4 ft=perl
+
 package WebService::Braintree::CreditCardVerificationSearch;
-$WebService::Braintree::CreditCardVerificationSearch::VERSION = '1.1';
+$WebService::Braintree::CreditCardVerificationSearch::VERSION = '1.2';
 use 5.010_001;
 use strictures 1;
 
 use Moose;
+
+=head1 NAME
+
+WebService::Braintree::CreditCardVerificationSearch
+
+=head1 PURPOSE
+
+This class represents a search for credit card verifications.
+
+=cut
+
+extends 'WebService::Braintree::AdvancedSearch';
+
 use WebService::Braintree::CreditCard::CardType;
-use WebService::Braintree::AdvancedSearch;
+
+=head1 FIELDS
+
+=cut
 
 my $field = WebService::Braintree::AdvancedSearchFields->new(metaclass => __PACKAGE__->meta);
+
+=head2 id
+
+This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">. It will restrict the search to a specific id.
+
+=cut
+
 $field->text("id");
-$field->text("credit_card_cardholder_name");
-$field->equality("credit_card_expiration_date");
-$field->partial_match("credit_card_number");
+
+=head2 ids
+
+This is a L<multiple-values field|WebService::Braintree::AdvancedSearchNodes/"Multiple Values Field">. It will restrict the search to a list of
+specific ids.
+
+=cut
+
 $field->multiple_values("ids");
+
+=head2 credit_card_cardholder_name
+
+This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">. It will restrict the search to verifications for credit
+cards with a specific cardholder name.
+
+=cut
+
+$field->text("credit_card_cardholder_name");
+
+=head2 credit_card_expiration_date
+
+This is an L<equality field|WebService::Braintree::AdvancedSearchNodes/"Equality Field">. It will restrict the search to verifications for
+credit cards with a specific expiration date.
+
+=cut
+
+$field->equality("credit_card_expiration_date");
+
+=head2 credit_card_number
+
+This is a L<partial-match field|WebService::Braintree::AdvancedSearchNodes/"Partial Match Field">. It will restrict the search to verifications for
+credit cards with a specific card number.
+
+=cut
+
+$field->partial_match("credit_card_number");
+
+=head2 credit_card_card_type
+
+This is a L<multiple-values field|WebService::Braintree::AdvancedSearchNodes/"Multiple Values Field">. It will restrict the search to verifications
+for credit cards within the list of provided card types. The card types must be
+within L<this list|WebService::Braintree::CreditCard::CardType/All>.
+
+=cut
 
 $field->multiple_values("credit_card_card_type", @{WebService::Braintree::CreditCard::CardType::All()});
 
-$field->range("created_at");
+=head2 created_at
 
-sub to_hash {
-    WebService::Braintree::AdvancedSearch->search_to_hash(shift);
-}
+This is a L<range field|WebService::Braintree::AdvancedSearchNodes/"Range Field">. It will restrict the search to verifications created
+between the two dates.
+
+=cut
+
+$field->range("created_at");
 
 __PACKAGE__->meta->make_immutable;
 

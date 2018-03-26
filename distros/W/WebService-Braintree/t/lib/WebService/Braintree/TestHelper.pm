@@ -78,7 +78,7 @@ sub verify_sandbox {
                 id => 'increase_30',
                 amount => '30.00',
                 never_expires => 1,
-            }, 'WebService::Braintree::AddOn'),
+            }, 'WebService::Braintree::_::AddOn'),
         );
         my %addons = map {
             $_->id => $_
@@ -90,7 +90,7 @@ sub verify_sandbox {
                 id => 'discount_15',
                 amount => '15.00',
                 never_expires => 1,
-            }, 'WebService::Braintree::Discount'),
+            }, 'WebService::Braintree::_::Discount'),
         );
         my %discounts = map {
             $_->id => $_
@@ -105,7 +105,7 @@ sub verify_sandbox {
                 trial_period => 0,
                 add_ons => [],
                 discounts => [],
-            }, 'WebService::Braintree::Plan'),
+            }, 'WebService::Braintree::_::Plan'),
             integration_plan_with_add_ons_and_discounts => superhashof(bless {
                 price => '1.00',
                 number_of_billing_cycles => undef,
@@ -116,16 +116,16 @@ sub verify_sandbox {
                         id => 'increase_30',
                         amount => '30.00',
                         never_expires => 1,
-                    }, 'Hash::Inflator'),
+                    }, 'WebService::Braintree::_::AddOn'),
                 ],
                 discounts => [
                     superhashof(bless {
                         id => 'discount_15',
                         amount => '15.00',
                         never_expires => 1,
-                    }, 'Hash::Inflator'),
+                    }, 'WebService::Braintree::_::Discount'),
                 ],
-            }, 'WebService::Braintree::Plan'),
+            }, 'WebService::Braintree::_::Plan'),
         );
         my %plans = map {
             $_->id => $_
@@ -137,21 +137,21 @@ sub verify_sandbox {
             sandbox_master_merchant_account => superhashof(bless {
                 id => 'sandbox_master_merchant_account',
                 status => 'active',
-                default => 1,
-                sub_merchant_account => 0,
-            }, 'WebService::Braintree::MerchantAccount'),
+                #default => 1,
+                #sub_merchant_account => 0,
+            }, 'WebService::Braintree::_::MerchantAccount'),
             sandbox_credit_card => superhashof(bless {
                 id => 'sandbox_credit_card',
                 status => 'active',
-                default => 0,
-                sub_merchant_account => 0,
-            }, 'WebService::Braintree::MerchantAccount'),
+                #default => 0,
+                #sub_merchant_account => 0,
+            }, 'WebService::Braintree::_::MerchantAccount'),
             three_d_secure_merchant_account => superhashof(bless {
                 id => 'three_d_secure_merchant_account',
                 status => 'active',
-                default => 0,
-                sub_merchant_account => 0,
-            }, 'WebService::Braintree::MerchantAccount'),
+                #default => 0,
+                #sub_merchant_account => 0,
+            }, 'WebService::Braintree::_::MerchantAccount'),
         );
         my %merchants;
         WebService::Braintree::MerchantAccount->all->each(sub {
@@ -167,9 +167,9 @@ sub verify_sandbox {
                 superhashof(bless {
                     id => 'sandbox_sub_merchant_account',
                     status => 'active',
-                    default => 0,
-                    sub_merchant_account => 1,
-                }, 'WebService::Braintree::MerchantAccount'),
+                    #default => 0,
+                    #sub_merchant_account => 1,
+                }, 'WebService::Braintree::_::MerchantAccount'),
                 {
                     id => 'sandbox_sub_merchant_account',
                     master_merchant_account_id => 'sandbox_master_merchant_account',
@@ -564,7 +564,7 @@ sub credit_card {
     $params //= {};
     return {
         number => cc_number('mastercard'),
-        expiration_date => "05/12",
+        expiration_date => '05/12',
         %$params,
     };
 }
@@ -610,7 +610,7 @@ my %cc_numbers = (
         # processor_declined
         '4000111111111115', # visa
         '5105105105105100', # mastercard
-        '378734493671000',  # amex
+        #'378734493671000',  # amex < Do not use this because the CVV error trumps all
         '6011000990139424', # discover
         '38520000009814',   # diners_club
         # failed (3000)

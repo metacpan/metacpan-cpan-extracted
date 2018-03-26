@@ -1,4 +1,4 @@
-/* $Id: Ed25519.h 1649 2018-03-12 15:39:47Z willem $
+/* $Id: Ed25519.h 1656 2018-03-22 14:36:14Z willem $
  *
  *	How To Include Support for Ed25519
  *	==================================
@@ -32,7 +32,8 @@
  *		make
  *		make test
  *
- *	Note: The entire process is VERY architecture-sensitive.
+ *	Notes:	1) The entire process is VERY architecture-sensitive.
+ *		2) On some platforms:	./config no-asm shared
  */
 
 int ED25519_sign(uint8_t *out_sig, const uint8_t *message, size_t message_len,

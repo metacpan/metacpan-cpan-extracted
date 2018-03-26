@@ -1,5 +1,8 @@
 Revision history for Druid
 
+0.003   2018-03-25
+        Merged review commits and fixed the test failing because of missing test dependencies.
+
 0.002   2017-09-17
         Initial release with implementation for Timeseries, topN & groupBy queries
 

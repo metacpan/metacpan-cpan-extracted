@@ -1,3 +1,10 @@
+0.101   2018-03-25 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention Regexp::Pattern::JSON, Regexp::Common::json.
+
+
 0.100   2018-02-14 (PERLANCAR)
 
 	- Replace \d with [0-9] [RT#124392].

@@ -5,7 +5,7 @@ use SWISH::3 ':constants';
 use Carp;
 use namespace::autoclean;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 has 'relevant_fields' => ( is => 'rw', isa => 'ArrayRef' );
 
@@ -29,7 +29,7 @@ the L<Dezi::Result> documentation.
 
 =head2 relevant_fields
 
-Returns an ARRAY ref of the field names in the result 
+Returns an ARRAY ref of the field names in the result
 that matched the query. Will only be populated if
 the Results object had find_relevant_fields() set to true.
 
@@ -101,7 +101,7 @@ Peter Karman, E<lt>karpet@dezi.orgE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-dezi-app at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
@@ -146,10 +146,10 @@ L<https://metacpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2014 by Peter Karman
+Copyright 2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the terms of the GPL v2 or later.
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

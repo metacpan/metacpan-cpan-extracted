@@ -1,11 +1,12 @@
 Changes
 examples/README
+INSTALL.SKIP
 lib/File/Find/Closures.pm
 LICENSE
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
-README
+README.pod
 t/compile.t
 t/find_by_directory_contains.t
 t/find_by_group.t
@@ -21,5 +22,6 @@ t/pod.t
 t/pod_coverage.t
 t/test_manifest
 t/unimplemented.t
+xt/changes.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,8 @@
-package WebService::Braintree::PaymentMethodNonceGateway;
-$WebService::Braintree::PaymentMethodNonceGateway::VERSION = '1.1';
+# vim: sw=4 ts=4 ft=perl
+
+package # hide from pause
+    WebService::Braintree::PaymentMethodNonceGateway;
+
 use 5.010_001;
 use strictures 1;
 
@@ -10,13 +13,14 @@ use WebService::Braintree::Util qw(validate_id);
 
 has 'gateway' => (is => 'ro');
 
+use WebService::Braintree::_::PaymentMethodNonce;
+
 sub create {
     my ($self, $token) = @_;
     if (!validate_id($token)) {
         confess "NotFoundError";
     }
-    my $response = $self->_make_request("/payment_methods/${token}/nonces", 'post');
-    return $response;
+    $self->_make_request("/payment_methods/${token}/nonces", 'post');
 }
 
 sub find {
@@ -25,8 +29,7 @@ sub find {
         confess "NotFoundError";
     }
 
-    my $response = $self->_make_request("/payment_method_nonces/" . $token, 'get');
-    return $response;
+    $self->_make_request("/payment_method_nonces/" . $token, 'get');
 }
 
 __PACKAGE__->meta->make_immutable;

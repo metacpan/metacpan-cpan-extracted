@@ -2,7 +2,7 @@ package App::optex;
 use strict;
 use warnings;
 
-our $VERSION = "v0.0.14";
+our $VERSION = "v0.0.15";
 
 1;
 
@@ -27,13 +27,13 @@ these modules are loaded from top of package name space.
 
 =head1 LICENSE
 
-Copyright (C) Kaz Utashiro.
+Copyright (C) Kazumasa Utashiro.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+You can redistribute it and/or modify it under the same terms
+as Perl itself.
 
 =head1 AUTHOR
 
-Kaz Utashiro E<lt>kaz@utashiro.comE<gt>
+Kazumasa Utashiro E<lt>kaz@utashiro.comE<gt>
 
 =cut

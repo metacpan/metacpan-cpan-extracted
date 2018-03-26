@@ -1,11 +1,13 @@
 package Pcore::Handle::sqlite;
 
-use Pcore -class, -const, -result, -sql;
+use Pcore -class, -const, -result;
 use DBI qw[];
+use Pcore::Handle::DBI::Const qw[:CONST];
 use DBD::SQLite qw[];
 use DBD::SQLite::Constants qw[:file_open];
-use Pcore::Util::Scalar qw[weaken is_blessed_ref looks_like_number is_plain_arrayref is_plain_coderef];
+use Pcore::Util::Scalar qw[weaken is_blessed_ref looks_like_number is_plain_arrayref is_plain_coderef is_blessed_arrayref];
 use Pcore::Util::UUID qw[uuid_str];
+use Pcore::Util::Data qw[to_json];
 
 # NOTE http://habrahabr.ru/post/149635/
 # для вставки данных в цикле надо использовать h->begin_work ... h->commit
@@ -32,9 +34,10 @@ has synchronous  => ( is => 'ro', isa => Enum [qw[FULL NORMAL OFF]],            
 has cache_size   => ( is => 'ro', isa => Int,  default => -1_048_576 );                                              # 0+ - pages,  -kilobytes, default 1G
 has foreign_keys => ( is => 'ro', isa => Bool, default => 1 );
 
-has is_sqlite    => ( is => 'ro', isa => Bool,    default  => 1, init_arg => undef );
-has h            => ( is => 'ro', isa => Object,  init_arg => undef );
-has prepared_sth => ( is => 'ro', isa => HashRef, init_arg => undef );
+has is_sqlite    => ( is => 'ro', isa => Bool,      default  => 1, init_arg => undef );
+has h            => ( is => 'ro', isa => Object,    init_arg => undef );
+has prepared_sth => ( is => 'ro', isa => HashRef,   init_arg => undef );
+has query        => ( is => 'ro', isa => ScalarRef, init_arg => undef );                                             # ref to the last query
 
 # SQLite types
 const our $SQLITE_UNKNOWN => 0;
@@ -45,20 +48,21 @@ const our $SQLITE_BLOB    => 30;
 
 # postgreSQL types to SQLite
 const our $TYPE_TO_SQLITE => {
-    $SQL_BYTEA   => $SQLITE_BLOB,
     $SQL_BOOL    => $SQLITE_INTEGER,
+    $SQL_BYTEA   => $SQLITE_BLOB,
+    $SQL_CHAR    => $SQLITE_TEXT,
     $SQL_FLOAT4  => $SQLITE_REAL,
     $SQL_FLOAT8  => $SQLITE_REAL,
+    $SQL_JSON    => $SQLITE_BLOB,
     $SQL_INT2    => $SQLITE_INTEGER,
     $SQL_INT4    => $SQLITE_INTEGER,
     $SQL_INT8    => $SQLITE_INTEGER,
     $SQL_MONEY   => $SQLITE_REAL,
     $SQL_NUMERIC => $SQLITE_REAL,
     $SQL_TEXT    => $SQLITE_TEXT,
-    $SQL_VARCHAR => $SQLITE_TEXT,
-    $SQL_CHAR    => $SQLITE_TEXT,
     $SQL_UNKNOWN => $SQLITE_UNKNOWN,
     $SQL_UUID    => $SQLITE_BLOB,
+    $SQL_VARCHAR => $SQLITE_TEXT,
 };
 
 sub BUILD ( $self, $args ) {
@@ -160,7 +164,7 @@ SQL
 }
 
 # QUOTE
-sub _get_sqlite_type ($type = undef) : prototype(;$) {
+sub _get_sqlite_type ($type) : prototype($) {
 
     # use TEXT as default type
     if ( !defined $type || !exists $TYPE_TO_SQLITE->{$type} ) {
@@ -173,10 +177,38 @@ sub _get_sqlite_type ($type = undef) : prototype(;$) {
     return $type;
 }
 
-sub quote ( $self, $var, $type = undef ) {
+sub quote ( $self, $var ) {
     return 'NULL' if !defined $var;
 
-    $type = _get_sqlite_type $type;
+    my $type;
+
+    if ( is_blessed_arrayref $var) {
+        return 'NULL' if !defined $var->[1];
+
+        $type = _get_sqlite_type( $var->[0] );
+
+        if ( $var->[0] == $SQL_BOOL ) {
+            $var = $var->[1] ? 1 : 0;
+        }
+        elsif ( $var->[0] == $SQL_JSON ) {
+            $var = to_json( $var->[1] )->$*;
+        }
+        else {
+            $var = $var->[1];
+        }
+    }
+    else {
+
+        # transparently encode arrays to JSON
+        if ( is_plain_arrayref $var) {
+            $type = $SQLITE_BLOB;
+
+            $var = to_json($var)->$*;
+        }
+        else {
+            $type = $SQLITE_TEXT;
+        }
+    }
 
     # NUMBER
     if ( ( $type == $SQLITE_INTEGER || $type == $SQLITE_REAL ) && looks_like_number $var) {
@@ -252,6 +284,8 @@ sub _exec_sth ( $self, $query, @args ) {
         $sth = $self->{prepared_sth}->{ $query->{id} };
 
         if ( !defined $sth ) {
+            $self->{query} = \$query->{query};
+
             $sth = $dbh->prepare( $query->{query} );
 
             return $rows, $sth, \%args, $cb if defined $DBI::err;
@@ -271,6 +305,8 @@ sub _exec_sth ( $self, $query, @args ) {
 
     # prepare sth
     if ( !defined $sth ) {
+        $self->{query} = \$query;
+
         $sth = $dbh->prepare($query);
 
         return $rows, $sth, \%args, $cb if defined $DBI::err;
@@ -278,19 +314,8 @@ sub _exec_sth ( $self, $query, @args ) {
 
     if ( defined $bind ) {
 
-        # make a copy
-        my @bind = $bind->@*;
-
-        # bind types
-        for ( my $i = 0; $i <= $#bind; $i++ ) {
-            if ( is_plain_arrayref $bind[$i] ) {
-                $sth->bind_param( $i + 1, undef, _get_sqlite_type $bind[$i]->[1] );
-
-                $bind[$i] = $bind[$i]->[0];
-            }
-        }
-
-        $rows = $sth->execute(@bind);
+        # bind and exec
+        $rows = $self->_execute( $sth, $bind, 0 );
     }
     else {
         $rows = $sth->execute;
@@ -304,6 +329,48 @@ sub _exec_sth ( $self, $query, @args ) {
 
         return $rows, $sth, \%args, $cb;
     }
+}
+
+sub _warn ($self) {
+    warn qq[DBI: "$DBI::errstr"] . ( defined $self->{query} ? qq[, current query: "$self->{query}->$*"] : q[] );
+
+    return;
+}
+
+sub _die ($self) {
+    die qq[DBI: "$DBI::errstr"] . ( defined $self->{query} ? qq[, current query: "$self->{query}->$*"] : q[] );
+}
+
+sub _execute ( $self, $sth, $bind, $bind_pos ) {
+
+    # make a copy
+    my @bind = $bind->@[ $bind_pos .. $bind_pos + $sth->{NUM_OF_PARAMS} - 1 ];
+
+    $bind_pos += $sth->{NUM_OF_PARAMS};
+
+    # bind types
+    for ( my $i = 0; $i <= $#bind; $i++ ) {
+        if ( is_blessed_arrayref $bind[$i] ) {
+            $sth->bind_param( $i + 1, undef, _get_sqlite_type $bind[$i]->[0] );
+
+            if ( $bind[$i]->[0] == $SQL_BOOL ) {
+                $bind[$i] = $bind[$i]->[1] ? 1 : 0;
+            }
+            elsif ( $bind[$i]->[0] == $SQL_JSON ) {
+                $bind[$i] = to_json( $bind[$i]->[1] )->$*;
+            }
+            else {
+                $bind[$i] = $bind[$i]->[1];
+            }
+        }
+        elsif ( is_plain_arrayref $bind[$i] ) {
+            $sth->bind_param( $i + 1, undef, $SQLITE_BLOB );
+
+            $bind[$i] = to_json( $bind[$i] )->$*;
+        }
+    }
+
+    return $sth->execute(@bind);
 }
 
 # PUBLIC DBI METHODS
@@ -324,12 +391,14 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
             $sth = $self->{prepared_sth}->{ $query->{id} };
 
             if ( !defined $sth ) {
+                $self->{query} = \$query->{query};
+
                 $sth = $dbh->prepare( $query->{query} );
 
                 # check error
                 if ( defined $DBI::err ) {
-                    if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return $rows }
-                    else               { die $DBI::errstr }
+                    if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return $rows }
+                    else               { $self->_die }
                 }
 
                 $self->{prepared_sth}->{ $query->{id} } = $sth;
@@ -343,26 +412,13 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
             $sth = $query;
         }
         else {
-            if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( $self, result( [ 500, 'Invalid STH class' ], rows => $rows ), undef ); return $rows }
+            if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, 'Invalid STH class' ], rows => $rows ), undef ); return $rows }
             else               { die 'Invalid STH class' }
         }
 
-        # bind params
+        # bind and exec
         if ( defined $bind ) {
-
-            # make a copy
-            my @bind = $bind->@*;
-
-            # bind types
-            for ( my $i = 0; $i <= $#bind; $i++ ) {
-                if ( is_plain_arrayref $bind[$i] ) {
-                    $sth->bind_param( $i + 1, undef, _get_sqlite_type $bind[$i]->[1] );
-
-                    $bind[$i] = $bind[$i]->[0];
-                }
-            }
-
-            $rows = $sth->execute(@bind);
+            $rows = $self->_execute( $sth, $bind, 0 );
         }
         else {
             $rows = $sth->execute;
@@ -370,8 +426,8 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
 
         # check error
         if ( defined $DBI::err ) {
-            if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return $rows }
-            else               { die $DBI::errstr }
+            if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return $rows }
+            else               { $self->_die }
         }
 
         $rows = 0 if $rows == 0;    # convert "0E0" to "0"
@@ -390,12 +446,14 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
     # execute query directly without prepare and bind params
     # multiple queries in single statement are allowed
     if ( !defined $bind ) {
+        $self->{query} = \$query;
+
         $rows = DBD::SQLite::db::_do( $dbh, $query );
 
         # check error
         if ( defined $DBI::err ) {
-            if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return $rows }
-            else               { die $DBI::errstr }
+            if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return $rows }
+            else               { $self->_die }
         }
 
         $rows = 0 if $rows == 0;    # convert "0E0" to "0"
@@ -411,36 +469,24 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
         my $bind_pos = 0;
 
         while ($query) {
+            $self->{query} = \$query;
 
             # prepare sth
             my $sth = $dbh->prepare($query);
 
             # prepare sth error
             if ( defined $DBI::err ) {
-                if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return $rows }
-                else               { die $DBI::errstr }
+                if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return $rows }
+                else               { $self->_die }
             }
 
-            # make a copy
-            my @bind = $bind->@[ $bind_pos .. $bind_pos + $sth->{NUM_OF_PARAMS} - 1 ];
-
-            $bind_pos += $sth->{NUM_OF_PARAMS};
-
-            # bind types
-            for ( my $i = 0; $i <= $#bind; $i++ ) {
-                if ( is_plain_arrayref $bind[$i] ) {
-                    $sth->bind_param( $i + 1, undef, _get_sqlite_type $bind[$i]->[1] );
-
-                    $bind[$i] = $bind[$i]->[0];
-                }
-            }
-
-            $sth->execute(@bind);
+            # bind and exec
+            $self->_execute( $sth, $bind, $bind_pos );
 
             # execute error
             if ( defined $DBI::err ) {
-                if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return $rows }
-                else               { die $DBI::errstr }
+                if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return $rows }
+                else               { $self->_die }
             }
 
             $rows += $sth->rows;
@@ -460,8 +506,8 @@ sub selectall ( $self, @ ) {
 
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return }
-        else               { die $DBI::errstr }
+        if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return }
+        else               { $self->_die }
     }
 
     my $data;
@@ -475,8 +521,8 @@ sub selectall ( $self, @ ) {
 
         # check error
         if ( defined $DBI::err ) {
-            if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return }
-            else               { die $DBI::errstr }
+            if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return }
+            else               { $self->_die }
         }
 
         undef $data if !$data->%*;
@@ -497,8 +543,8 @@ sub selectall_arrayref ( $self, @ ) {
 
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return }
-        else               { die $DBI::errstr }
+        if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return }
+        else               { $self->_die }
     }
 
     my $data = $sth->fetchall_arrayref( undef, undef );
@@ -515,8 +561,8 @@ sub selectrow ( $self, @ ) {
 
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return }
-        else               { die $DBI::errstr }
+        if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return }
+        else               { $self->_die }
     }
 
     my $data = $sth->fetchrow_hashref;
@@ -533,8 +579,8 @@ sub selectrow_arrayref ( $self, @ ) {
 
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return }
-        else               { die $DBI::errstr }
+        if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return }
+        else               { $self->_die }
     }
 
     my $data = $sth->fetchrow_arrayref;
@@ -552,8 +598,8 @@ sub selectcol ( $self, @ ) {
 
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return }
-        else               { die $DBI::errstr }
+        if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, $DBI::errstr ], rows => $rows ), undef ); return }
+        else               { $self->_die }
     }
 
     my ( $data, $name2idx, $idx, @vals );
@@ -565,7 +611,7 @@ sub selectcol ( $self, @ ) {
     for my $col ( is_plain_arrayref $args->{col} ? $args->{col}->@* : $args->{col} ) {
         if ( looks_like_number $col) {
             if ( $col > $num_of_fields ) {
-                if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( $self, result( [ 500, qq[Invalid column index: "$col"] ], rows => $rows ), undef ); return }
+                if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, qq[Invalid column index: "$col"] ], rows => $rows ), undef ); return }
                 else               { die qq[Invalid column index: "$col"] }
             }
 
@@ -575,7 +621,7 @@ sub selectcol ( $self, @ ) {
             $name2idx //= $sth->{NAME_hash};
 
             if ( !exists $name2idx->{$col} ) {
-                if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( $self, result( [ 500, qq[Invalid column name: "$col"] ], rows => $rows ), undef ); return }
+                if ( defined $cb ) { $self->_warn; $cb->( $self, result( [ 500, qq[Invalid column name: "$col"] ], rows => $rows ), undef ); return }
                 else               { die qq[Invalid column name: "$col"] }
             }
 
@@ -596,8 +642,8 @@ sub begin_work ( $self, $cb = undef ) {
 
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( $self, result [ 500, $DBI::errstr ] ); return }
-        else               { die $DBI::errstr }
+        if ( defined $cb ) { $self->_warn; $cb->( $self, result [ 500, $DBI::errstr ] ); return }
+        else               { $self->_die }
     }
 
     $cb->( $self, result 200 ) if defined $cb;
@@ -610,8 +656,8 @@ sub commit ( $self, $cb = undef ) {
 
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( $self, result [ 500, $DBI::errstr ] ); return }
-        else               { die $DBI::errstr }
+        if ( defined $cb ) { $self->_warn; $cb->( $self, result [ 500, $DBI::errstr ] ); return }
+        else               { $self->_die }
     }
 
     $cb->( $self, result 200 ) if defined $cb;
@@ -624,8 +670,8 @@ sub rollback ( $self, $cb = undef ) {
 
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( $self, result [ 500, $DBI::errstr ] ); return }
-        else               { die $DBI::errstr }
+        if ( defined $cb ) { $self->_warn; $cb->( $self, result [ 500, $DBI::errstr ] ); return }
+        else               { $self->_die }
     }
 
     $cb->( $self, result 200 ) if defined $cb;
@@ -661,18 +707,18 @@ sub attach ( $self, $name, $path = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 153                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
+## |    3 | 157                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
 ## |      |                      | declared but not used                                                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 310                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (40)                        |
+## |    3 | 377                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (36)                        |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 393                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 451                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 201                  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 233                  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 285, 357, 430        | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 352                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 586                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 632                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

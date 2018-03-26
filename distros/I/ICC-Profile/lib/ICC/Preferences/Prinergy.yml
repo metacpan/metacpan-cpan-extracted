@@ -1,0 +1,22 @@
+--- 
+FirstName: G7_200LPI_coated_r1
+ID: 1271
+Enabled: FALSE
+CurveSet: CmykCurves
+MediumUsed: TRUE
+Medium: 001 (Paper)
+ScreeningTypeUsed: FALSE
+ScreeningType:
+ResolutionUsed: TRUE
+Resolution: 2400
+FrequencyUsed: TRUE
+FreqFrom: 200
+FreqTo: 200
+SpotFunctionUsed: FALSE
+SpotFunction:
+SpotFunctionMode: UserDefined
+DefaultMedium: 001 (Paper)
+DefaultResolution: 2400
+DefaultFrequency: 200
+DefaultSpotFunction:
+Comments: G7_200LPI_coated_r1

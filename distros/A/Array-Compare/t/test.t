@@ -1,4 +1,5 @@
-
+use warnings;
+use strict;
 use Test::More 'no_plan';
 use Test::NoWarnings;
 
@@ -25,7 +26,7 @@ ok($comp->compare(\@A, \@B));
 $comp->Skip(\%skip2);
 ok(not $comp->compare(\@A, \@B));
 
-# Compare two different arrays but ignore differing column (badly) 
+# Compare two different arrays but ignore differing column (badly)
 # - should fail as skip value is 0
 $comp->Skip(\%skip3);
 ok(not $comp->compare(\@A, \@B));
@@ -109,7 +110,7 @@ ok($comp->perm(\@F, \@H));
 ok(not $comp->perm(\@F, \@I));
 
 my @J = ('array with', 'white space');
-my @K = ('array  with', 'white	space');
+my @K = ('array  with', "white\tspace");
 ok($comp->compare(\@J, \@K));
 
 # Turn off whitespace

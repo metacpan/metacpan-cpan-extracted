@@ -19,8 +19,9 @@ no_index:
     - inc
 requires:
   Data::SExpression: '0.41'
+  List::MoreUtils: '0.33'
   perl: '5.014000'
 resources:
   repository: https://git.ieval.ro/?p=app-scheme79asm.git
-version: '0.004'
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,7 +1,7 @@
 package JSON::Decode::Regexp;
 
-our $DATE = '2018-02-14'; # DATE
-our $VERSION = '0.100'; # VERSION
+our $DATE = '2018-03-25'; # DATE
+our $VERSION = '0.101'; # VERSION
 
 use 5.010001;
 use strict;
@@ -190,7 +190,7 @@ JSON::Decode::Regexp - JSON parser as a single Perl Regex
 
 =head1 VERSION
 
-This document describes version 0.100 of JSON::Decode::Regexp (from Perl distribution JSON-Decode-Regexp), released on 2018-02-14.
+This document describes version 0.101 of JSON::Decode::Regexp (from Perl distribution JSON-Decode-Regexp), released on 2018-03-25.
 
 =head1 SYNOPSIS
 
@@ -247,10 +247,18 @@ feature.
 
 =head1 SEE ALSO
 
+=head2 Other modules to decode JSON
+
 Pure-perl modules: L<JSON::Tiny>, L<JSON::PP>, L<Pegex::JSON>,
 L<JSON::Decode::Marpa>.
 
 XS modules: L<JSON::XS>, L<Cpanel::JSON::XS>.
+
+=head2 Other modules related to regexps for parsing JSON
+
+L<Regexp::Pattern::JSON>
+
+L<Regexp::Common::json>
 
 =head1 AUTHOR
 

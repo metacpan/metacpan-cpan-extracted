@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/"><zs:version>1.1</zs:version><zs:numberOfRecords>1</zs:numberOfRecords><zs:records><zs:record><zs:recordSchema>picaxml</zs:recordSchema><zs:recordPacking>xml</zs:recordPacking><zs:recordData><record xmlns="info:srw/schema/5/picaXML-v1.0">
+  <datafield tag="001A">
+    <subfield code="0">9006:18-11-99</subfield>
+  </datafield>
+  <datafield tag="001B">
+    <subfield code="0">9006:26-11-13</subfield>
+    <subfield code="t">15:22:33.000</subfield>
+  </datafield>
+  <datafield tag="001D">
+    <subfield code="0">9999:27-05-05</subfield>
+  </datafield>
+  <datafield tag="001U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield tag="001X">
+    <subfield code="0">0</subfield>
+  </datafield>
+  <datafield tag="002@">
+    <subfield code="0">Tw</subfield>
+  </datafield>
+  <datafield tag="003@">
+    <subfield code="0">00903482X</subfield>
+  </datafield>
+  <datafield tag="008H">
+    <subfield code="a">910107-x</subfield>
+    <subfield code="b">AG000</subfield>
+    <subfield code="d">1</subfield>
+    <subfield code="e">DE-1</subfield>
+  </datafield>
+  <datafield tag="009Q">
+    <subfield code="u">http://staatsbibliothek-berlin.de</subfield>
+    <subfield code="z">A</subfield>
+  </datafield>
+  <datafield tag="009Q">
+    <subfield code="u">http://stabikat.de</subfield>
+    <subfield code="z">B</subfield>
+  </datafield>
+  <datafield tag="029@">
+    <subfield code="a">SBB-PK, Haus Unter d. Linden</subfield>
+    <subfield code="4">a</subfield>
+  </datafield>
+  <datafield tag="029@">
+    <subfield code="a">Berlin SBB Haus Unter d.Linden</subfield>
+    <subfield code="4">c</subfield>
+  </datafield>
+  <datafield tag="029A">
+    <subfield code="a">Staatsbibliothek zu Berlin - Preußischer Kulturbesitz, Haus Unter den Linden</subfield>
+  </datafield>
+  <datafield tag="032P">
+    <subfield code="a">Unter den Linden 8</subfield>
+    <subfield code="b">Berlin</subfield>
+    <subfield code="d">DE</subfield>
+    <subfield code="e">10117</subfield>
+    <subfield code="f">Berlin</subfield>
+    <subfield code="i">Mo-Fr 9.00-21.00, Sa 10.00-19.00</subfield>
+    <subfield code="j">Öffnungszeiten besonderer Bereiche s. Homepage</subfield>
+    <subfield code="k">13.39162</subfield>
+    <subfield code="l">52.51755</subfield>
+    <subfield code="n">11000000</subfield>
+    <subfield code="p">j</subfield>
+    <subfield code="2">S</subfield>
+  </datafield>
+  <datafield tag="032P">
+    <subfield code="b">Berlin</subfield>
+    <subfield code="d">DE</subfield>
+    <subfield code="e">10102</subfield>
+    <subfield code="f">Berlin</subfield>
+    <subfield code="p">j</subfield>
+    <subfield code="2">P</subfield>
+  </datafield>
+  <datafield tag="035B">
+    <subfield code="a">S</subfield>
+    <subfield code="c">j</subfield>
+    <subfield code="d">49</subfield>
+    <subfield code="e">30</subfield>
+    <subfield code="f">2 66-433666 (Auskunft)</subfield>
+    <subfield code="g">49</subfield>
+    <subfield code="h">30</subfield>
+    <subfield code="i">2 66-333701</subfield>
+    <subfield code="k">info@sbb.spk-berlin.de</subfield>
+    <subfield code="l">Weitere E-Mail-Adresse: benutzung.h1@sbb.spk-berlin.de</subfield>
+  </datafield>
+  <datafield tag="035D">
+    <subfield code="a">103</subfield>
+  </datafield>
+  <datafield tag="035E">
+    <subfield code="a">H</subfield>
+    <subfield code="b">s</subfield>
+    <subfield code="c">0011</subfield>
+    <subfield code="e">GBV</subfield>
+    <subfield code="f">11</subfield>
+    <subfield code="g">07</subfield>
+    <subfield code="h">10</subfield>
+  </datafield>
+  <datafield tag="035I">
+    <subfield code="a">BER</subfield>
+    <subfield code="b">ÜLV</subfield>
+    <subfield code="c">GBV</subfield>
+    <subfield code="d">Kalliope</subfield>
+    <subfield code="e">l</subfield>
+  </datafield>
+  <datafield tag="047A">
+    <subfield code="a">Sammelschwerpunkte: Ergänzung der historischen Bestände (Druckschriften bis 1945, insbesondere auch für die Sondersammelgebiete: s. Nennung bei 1a); Karten, Musikalien, Musikwissenschaft, Kinder- und Jugendliteratur. Übernommene Bestände: Altbestände vor 1945 von B 66 (Bibliothek der Gesellschaft für Erdkunde); Online-Auskunft "Fragen Sie uns": http://staatsbibliothek-berlin.de/service-und-benutzung/auskunft.html</subfield>
+  </datafield>
+  <datafield tag="050D">
+    <subfield code="a">ANF2013; KOBV 04-05-06 K Telefon, E-Mail, URL; DE-1a 30-05-07 K Tel.; Umfrage2009 01-07-09; 29-03-11 K online-auskunft; ZRB 08-05-13 K Öff</subfield>
+  </datafield>
+</record></zs:recordData><zs:recordPosition>1</zs:recordPosition></zs:record></zs:records></zs:searchRetrieveResponse>

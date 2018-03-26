@@ -1,5 +1,9 @@
                        User-Visible DocKnot Changes
 
+DocKnot 1.04 (2018-03-24)
+
+    Fix SPDX test failure on Windows.
+
 DocKnot 1.03 (2018-03-17)
 
     Add support for a new metadata file, support/extra, that includes

@@ -1,5 +1,8 @@
-package WebService::Braintree::Role::CollectionBuilder;
-$WebService::Braintree::Role::CollectionBuilder::VERSION = '1.1';
+# vim: sw=4 ts=4 ft=perl
+
+package # hide from pause
+    WebService::Braintree::Role::CollectionBuilder;
+
 use 5.010_001;
 use strictures 1;
 
@@ -32,17 +35,20 @@ sub resource_collection {
     }
 
     my $obj_class = $opts->{inflate}[2];
-    return WebService::Braintree::ResourceCollection->new->init($ids_resp, sub {
-        my $ids = shift;
-        return [] if scalar @{$ids} == 0;
-        $search->ids->in($ids);
+    return WebService::Braintree::ResourceCollection->new({
+        response => $ids_resp,
+        callback => sub {
+            my $ids = shift;
+            return [] if scalar @{$ids} == 0;
+            $search->ids->in($ids);
 
-        my $response = $self->gateway->http->post($opts->{obj_url}, {
-            search => $search->to_hash,
-        });
-        my $body = $response->{$opts->{inflate}[0]} // {};
-        my $attrs = $body->{$opts->{inflate}[1]} // [];
-        return to_instance_array($attrs, "WebService::Braintree::${obj_class}");
+            my $response = $self->gateway->http->post($opts->{obj_url}, {
+                search => $search->to_hash,
+            });
+            my $body = $response->{$opts->{inflate}[0]} // {};
+            my $attrs = $body->{$opts->{inflate}[1]} // [];
+            return to_instance_array($attrs, "WebService::Braintree::${obj_class}");
+        },
     });
 }
 
@@ -53,7 +59,7 @@ sub paginated_collection {
 
     my $method = $opts->{method} // 'get';
 
-    return WebService::Braintree::PaginatedCollection->new->init(sub {
+    return WebService::Braintree::PaginatedCollection->new({ callback => sub {
         my $page_number = shift;
 
         my $response;
@@ -73,11 +79,14 @@ sub paginated_collection {
 
         my $body = $response->{$opts->{inflate}[0]} // {};
         my $attrs = $body->{$opts->{inflate}[1]} // [];
-        return WebService::Braintree::PaginatedResult->new->init(
-            $body->{total_items}, $body->{page_size},
-            to_instance_array($attrs, "WebService::Braintree::${obj_class}"),
-        );
-    });
+        return WebService::Braintree::PaginatedResult->new({
+            total_items => $body->{total_items},
+            page_size => $body->{page_size},
+            current_page => to_instance_array(
+                $attrs, "WebService::Braintree::${obj_class}"
+            ),
+        });
+    }});
 }
 
 1;

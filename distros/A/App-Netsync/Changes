@@ -1,0 +1,44 @@
+2013-09-03 : Blackberry Abalone
+    netsync v1.0.0
+
+2013-09-06 : patch
+    netsync v1.0.1
+    - minor dependency removals & major bug fixes
+
+2013-09-06 : patch
+    netsync v1.0.2
+    - code restructure for v1.0.1 which was unusable
+
+2013-09-20 : patch
+    netsync v1.0.3
+    - update bug fixes
+
+2013-09-20 : Pea Abalone
+    netsync v1.1.0
+    - POD support
+
+2013-11-15 : Kiwi Oyster
+    netsync v2.0.0
+    Netsync v1.0.0
+    Netsync::Network v1.0.0
+    Helpers::Configurator v1.0.0
+    Helpers::Messenger v1.0.0
+    Helpers::Scribe v1.0.0
+    - Update and Match options
+    - DNS option modified
+    - Netsync is now an API.
+    - DB credential requirement removed.
+    - Library module APIs are properly documented and defined.
+    - EUMM support
+    - CPAN release
+
+2017-03-24 : v3.0.0 Banana Slug
+    - Refactor the project and rename to App::Netsync.
+    - Publish to CPAN for the first time.
+    - Unify versions.
+
+2017-03-24 : v3.0.1 patch
+    - Fix Kwalitee issues.
+
+2017-03-25 : v4.0.0 (big) patch
+    - Use a string for the (incorrectly numified) version.

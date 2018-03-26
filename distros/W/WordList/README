@@ -2,8 +2,8 @@ NAME
     WordList - Word lists
 
 VERSION
-    This document describes version 0.2.1 of WordList (from Perl
-    distribution WordList), released on 2018-03-19.
+    This document describes version 0.3.1 of WordList (from Perl
+    distribution WordList), released on 2018-03-23.
 
 SYNOPSIS
     Use one of the "WordList::*" modules.
@@ -70,29 +70,55 @@ DESCRIPTION
     *   Interface to enable faster lookup/caching
 
 METHODS
-  new()
+  new
+    Usage:
+
+     $wl = WordList::Module->new => obj
+
     Constructor.
 
-  $wl->each_word($code)
+  each_word
+    Usage:
+
+     $wl->each_word($code)
+
     Call $code for each word in the list. The code will receive the word as
     its first argument.
 
-  $wl->pick($n = 1) => list
-    Pick $n (default: 1) random words from the list. If there are less then
-    $n words in the list, only that many will be returned.
+    If code return -2 will exit early.
+
+  pick
+    Usage:
+
+     $wl->pick($n = 1) => list
+
+    Pick $n (default: 1) random word(s) from the list. If there are less
+    then $n words in the list, only that many will be returned.
 
     The algorithm used is from perlfaq ("perldoc -q "random line""), which
-    scans the whole list once. The algorithm is for returning a single entry
-    and is modified to support returning multiple entries.
+    scans the whole list once (a.k.a. each_word() once). The algorithm is
+    for returning a single entry and is modified to support returning
+    multiple entries.
 
-  $wl->word_exists($word) => bool
+  word_exists
+    Usage:
+
+     $wl->word_exists($word) => bool
+
     Check whether $word is in the list.
 
-    Algorithm is binary search (NOTE: not yet implemented, currently linear
-    search).
+    Algorithm in this implementation is linear scan (O(n)). Check out
+    WordList::Role::BinarySearch for an O(log n) implementation, or
+    WordList::Role::Bloom for O(1) implementation.
 
-  $wl->all_words() => list
-    Return all the words in a list.
+  all_words
+    Usage:
+
+     $wl->all_words() => list
+
+    Return all the words in a list, in order. Note that if wordlist is very
+    large you might want to use "each_word" instead to avoid slurping all
+    words into memory.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -109,9 +135,9 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Bencher::Scenario::GamesWordlistModules
+    "WordList::Role::*" modules.
 
-    Bencher::Scenario::WordListModules
+    Other "WordList::*" modules.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

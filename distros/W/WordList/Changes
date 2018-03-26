@@ -1,3 +1,23 @@
+0.3.1   2018-03-23 (PERLANCAR)
+
+	- Add WordList::Bloom::* to non-wordlist namespace.
+
+	- [dist] Activate DZP:WordList and PWP:WordList.
+
+
+0.3.0   2018-03-22 (PERLANCAR)
+
+	- Add WordList::Namespace.
+
+        - [spec] each_word() will exit early if code returns -2.
+
+	- [test] Add some tests.
+
+	- [internal] Implement word_exists, pick, and all_words in terms of
+          each_word(). Which is a tiny bit slower but more orthogonal and makes
+          it easier to change functionality.
+
+
 0.2.1   2018-03-19 (PERLANCAR)
 
 	- [doc] Mention that there must not be duplicate entries.

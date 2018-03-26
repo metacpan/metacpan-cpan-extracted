@@ -1,0 +1,30 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <link rel="stylesheet" href="demos.css" type="text/css" media="screen" />
+    
+    <script src="[% jsFolder %]/rgraph/RGraph.common.core.js" ></script>
+    <script src="[% jsFolder %]/rgraph/RGraph.line.js" ></script>
+    
+    <title>[% title %]</title>
+    
+    <meta name="description" content="canvas line graph" />
+     
+</head>
+<body>
+
+    <h1>[% title %]</h1>
+
+    <canvas id="cvs" width="[% width %]" height="[% height %]">[No canvas support]</canvas>
+    
+    <script>
+        window.onload = function ()
+        {
+            var line = new RGraph.Line('cvs', [% data %])
+                 [% options %]
+                 .Draw();
+        }
+    </script>
+
+</body>
+</html>

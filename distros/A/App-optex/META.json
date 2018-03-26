@@ -1,7 +1,7 @@
 {
    "abstract" : "optex command module direcrtory",
    "author" : [
-      "Kaz Utashiro <kaz@utashiro.com>"
+      "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.0.14",
@@ -60,7 +60,7 @@
    "provides" : {
       "App::optex" : {
          "file" : "lib/App/optex.pm",
-         "version" : "v0.0.14"
+         "version" : "v0.0.15"
       },
       "App::optex::debug" : {
          "file" : "lib/App/optex/debug.pm"
@@ -92,7 +92,7 @@
          "web" : "https://github.com/kaz-utashiro/optex"
       }
    },
-   "version" : "v0.0.14",
+   "version" : "v0.0.15",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"

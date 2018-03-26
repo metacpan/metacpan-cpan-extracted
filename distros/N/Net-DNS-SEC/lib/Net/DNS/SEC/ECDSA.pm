@@ -1,9 +1,9 @@
 package Net::DNS::SEC::ECDSA;
 
 #
-# $Id: ECDSA.pm 1626 2018-01-31 09:48:15Z willem $
+# $Id: ECDSA.pm 1656 2018-03-22 14:36:14Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1626 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1656 $)[1];
 
 
 =head1 NAME
@@ -70,7 +70,7 @@ sub sign {
 	my $eckey = Net::DNS::SEC::libcrypto::EC_KEY_dup( _curve($NID) );
 	Net::DNS::SEC::libcrypto::EC_KEY_set_private_key( $eckey, $key );
 
-	my $sig = Net::DNS::SEC::libcrypto::ECDSA_do_sign( $digest, $eckey );
+	my $sig = Net::DNS::SEC::libcrypto::ECDSA_sign( $digest, $eckey );
 
 	Net::DNS::SEC::libcrypto::EC_KEY_free($eckey);		# destroy private key
 
@@ -110,7 +110,7 @@ sub verify {
 	my $sig = Net::DNS::SEC::libcrypto::ECDSA_SIG_new();
 	Net::DNS::SEC::libcrypto::ECDSA_SIG_set0( $sig, $r, $s );
 
-	my $vrfy = Net::DNS::SEC::libcrypto::ECDSA_do_verify( $digest, $sig, $eckey );
+	my $vrfy = Net::DNS::SEC::libcrypto::ECDSA_verify( $digest, $sig, $eckey );
 
 	Net::DNS::SEC::libcrypto::EC_KEY_free($eckey);
 	Net::DNS::SEC::libcrypto::ECDSA_SIG_free($sig);

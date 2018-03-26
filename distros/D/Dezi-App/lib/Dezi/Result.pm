@@ -5,7 +5,7 @@ with 'Dezi::Role';
 use Carp;
 use namespace::autoclean;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 has 'doc'          => ( is => 'ro', isa => 'Object',  required => 1, );
 has 'score'        => ( is => 'ro', isa => 'Num',     required => 1 );
@@ -16,7 +16,7 @@ has 'property_map' => ( is => 'ro', isa => 'HashRef', required => 1 );
 Dezi::Result - abstract result class
 
 =head1 SYNOPSIS
-                
+
  my $results = $searcher->search( 'foo bar' );
  while (my $result = $results->next) {
      printf("%4d %s\n", $result->score, $result->uri);
@@ -42,11 +42,19 @@ Returns the ranking score for the Result.
 
 =head2 uri
 
+URL or filepath to document.
+
 =head2 mtime
+
+Last modified date of document.
 
 =head2 title
 
+Document title.
+
 =head2 summary
+
+Description of document.
 
 =head2 swishdocpath
 
@@ -149,7 +157,7 @@ Peter Karman, E<lt>karpet@dezi.orgE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-dezi-app at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
@@ -194,10 +202,10 @@ L<https://metacpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2014 by Peter Karman
+Copyright 2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the terms of the GPL v2 or later.
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

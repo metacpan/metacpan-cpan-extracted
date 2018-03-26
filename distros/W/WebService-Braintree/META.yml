@@ -41,6 +41,7 @@ requires:
   MIME::Base64: '0'
   Module::Install::TestTarget: '0'
   Moose: '0'
+  MooseX::Aliases: '0'
   Mozilla::CA: '0'
   Scalar::Util: '0'
   Try::Tiny: '0'
@@ -55,5 +56,5 @@ resources:
   bugtracker: https://github.com/singingfish/braintree_perl/issues
   homepage: https://www.braintreepayments.com
   repository: git://github.com/singingfish/braintree_perl.git
-version: '1.1'
+version: '1.2'
 x_serialization_backend: 'YAML::Tiny version 1.69'

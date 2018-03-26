@@ -1,0 +1,19 @@
+Build.PL
+Changes
+lib/cli/rows/util.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+scripts/timeput
+scripts/expskip
+scripts/freq
+scripts/eofcheck
+scripts/alluniq
+scripts/idmaker
+scripts/sampler
+scripts/shuffler
+META.yml
+META.json

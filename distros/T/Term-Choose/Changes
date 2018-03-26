@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.514   2018-03-22
+        - New option 'info'.
+
 1.513   2018-03-06
         - Ctrl-Spacebar affects all elements independently of the cursor position.
 

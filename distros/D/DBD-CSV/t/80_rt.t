@@ -12,7 +12,7 @@ if ($ENV{DBI_SQL_NANO}) {
     exit 0;
     }
 
-do "t/lib.pl";
+do "./t/lib.pl";
 
 my ($rt, %input, %desc);
 while (<DATA>) {

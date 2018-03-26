@@ -2,13 +2,12 @@ use strict; use warnings;
 
 use Plack::Test;
 use Plack::Builder;
-use Test::More tests => 21;
+use Test::More tests => 19;
 use HTTP::Request::Common;
 use Plack::Middleware::RedirectSSL ();
 
-my $mw = Plack::Middleware::RedirectSSL->new( app => sub {
-	return [ 204, [qw( Content-Type text/plain )], [ '' ] ];
-} );
+my $app = sub { [ 204, [], [] ] };
+my $mw = Plack::Middleware::RedirectSSL->new( app => $app );
 
 test_psgi app => $mw->to_app, client => sub {
 	my $cb = shift;
@@ -19,6 +18,8 @@ test_psgi app => $mw->to_app, client => sub {
 
 	$res = $cb->( GET 'https://localhost/' );
 	is $res->code, 204, '... and not vice versa';
+
+	is +Plack::Middleware::RedirectSSL->new( app => $app, ssl => 0 )->ssl, 0, '... unless overridden during construction';
 
 	for my $do_ssl ( 1, 0 ) {
 		$mw->ssl( $do_ssl );
@@ -55,19 +56,4 @@ test_psgi app => $mw->to_app, client => sub {
 			? '... but not in plaintext responses'
 			: '... nor in plaintext responses';
 	}
-
-	$mw->ssl( undef );
-	$mw->prepare_app;
-	my $hsts_age = Plack::Middleware::RedirectSSL::DEFAULT_STS_MAXAGE;
-
-	$res = $cb->( GET 'https://localhost/' );
-	is $res->header( 'Strict-Transport-Security' ), 'max-age='.$hsts_age, 'HSTS is enabled by default';
-
-	$mw->hsts( $hsts_age = 60 * 60 );
-	$res = $cb->( GET 'https://localhost/' );
-	is $res->header( 'Strict-Transport-Security' ), 'max-age='.$hsts_age, '... but can be changed';
-
-	$mw->hsts( 0 );
-	$res = $cb->( GET 'https://localhost/' );
-	is $res->header( 'Strict-Transport-Security' ), undef, '... or completely disabled';
 };

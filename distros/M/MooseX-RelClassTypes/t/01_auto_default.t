@@ -110,6 +110,21 @@ use Test::More;
     has param => (is => 'rw', isa => 'Str');
 }
 
+use TestAD::NoAuto_NoDefault_NoBuilder;
+use TestAD::NoAuto_NoDefault_WithBuilder;
+use TestAD::NoAuto_WithDefault_NoBuilder;
+use TestAD::WithAuto_NoDefault_NoBuilder;
+use TestAD::WithAuto_NoDefault_WithBuilder;
+use TestAD::WithAuto_WithDefault_NoBuilder;
+
+use TestAD::NoAuto_NoDefault_NoBuilder::RelPack;
+use TestAD::NoAuto_NoDefault_WithBuilder::RelPack;
+use TestAD::NoAuto_WithDefault_NoBuilder::RelPack;
+use TestAD::WithAuto_NoDefault_NoBuilder::RelPack;
+use TestAD::WithAuto_NoDefault_WithBuilder::RelPack;
+use TestAD::WithAuto_WithDefault_NoBuilder::RelPack;
+
+
 my $expected = {
 
     NoAuto_NoDefault_NoBuilder => [ 0, undef ],

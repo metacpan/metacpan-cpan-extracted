@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+
+use 5.001 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts "cdk:sr23456" , \my %o ; 
+use Time::HiRes qw[ gettimeofday tv_interval ] ; 
+#die "Time::HiRes can not be used.\n" if $@ ; 
+use Term::ANSIColor qw[color] ; 
+sub timenow () ; 
+
+my $d = 0 ; # 桁数
+$d = $o{2} ? 2 : $o{3} ? 3 : $o{4} ? 4 : $o{5} ? 5 : $o{6} ? 6 : $d ; 
+$d = $o{k} if defined $o{k} ; 
+my $d6 = 1e6 / 10 ** $d ; 
+* timenow = * hhmmss0 ; 
+* timenow = * hhmmssD if $d ; 
+* timenow = * ymdhms if $o{d} ; 
+* timenow = * secondsSince0 if $o{s} ; 
+* timenow = * secondsSinceD if $o{s} && $d ; 
+
+
+my $t0s = time ; # エポック秒の取得 
+my $t0 = [gettimeofday] if $o{s} ; 
+
+if ( ! $o{c} ) { 
+    print timenow() , "\t" , $_ while <> ; 
+}
+else {
+    print color('cyan').timenow.color('reset')."\t".$_ while ( <> ) ; 
+}
+
+exit ; 
+
+
+sub hhmmss0 ( ) { 
+    return sprintf "%02d:%02d:%02d" , @{[localtime]}  [2,1,0] ; 
+}
+
+sub hhmmssD ( ) { 
+    my ($sec, $msec) = gettimeofday ; 
+    return sprintf '%02d:%02d:%02d.%0'. $d. 'd' , @{[localtime($sec)]} [2,1,0] , int $msec /$d6 ; #$msec/(1e6/10**$d) ; 
+}
+sub hhmmss3 ( ) { 
+    my ($sec, $msec) = gettimeofday ; 
+    return sprintf "%02d:%02d:%02d.%03d" , @{[localtime($sec)]} [2,1,0] , int $msec/1e3 ; 
+}
+
+sub hhmmss6 ( ) { 
+    my ($sec, $msec) = gettimeofday ; 
+    return sprintf "%02d:%02d:%02d.%06d" , @{[localtime($sec)]} [2,1,0] , $msec ; 
+}
+
+sub ymdhms ( ) { 
+    my @f = localtime ; 
+    $f[4] += 1 ; 
+    $f[5] += 1900 ; 
+    return sprintf '%02d-%02d-%02d %02d:%02d:%02d' , @f[5,4,3,2,1,0] ;
+}
+
+sub secondsSince0 ( ) { return sprintf "%0.0f" , time - $t0s } 
+sub secondsSinceD ( ) { return sprintf '%0.'.$d.'f' , tv_interval ( $t0 ) }
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE{
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if $ARGV[1] eq 'opt' ? m/^\ +\-/ : s/^=head1// .. s/^=cut// ;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8 
+
+=head1
+
+ $0 
+
+  $0 は入力を可能な限り読取り、その各行の先頭に読み取った時刻の情報を
+  タブ区切りで出力する。
+
+ オプション : 
+    -c : 日時情報に色を付ける。
+    -d : 日付(年:月:日) を出力する。
+    -s : $0 を起動してからの秒数を出力する。
+
+    -k num : 秒数を小数点以下 num 桁出力する。
+    -2 : 秒数を小数点以下2桁出力する。
+    -3 : 秒数を小数点以下3桁出力する。
+    -4 : 秒数を小数点以下4桁出力する。
+    -5 : 秒数を小数点以下5桁出力する。
+    -6 : 秒数を小数点以下6桁出力する。
+
+=cut 

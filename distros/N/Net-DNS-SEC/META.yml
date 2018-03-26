@@ -18,7 +18,6 @@ no_index:
   directory:
     - t
     - inc
-recommends: {}
 requires:
   Digest::SHA: '5.23'
   DynaLoader: '1.04'
@@ -29,5 +28,7 @@ requires:
   Net::DNS: '1.01'
   Test::More: '0.47'
   perl: '5.006'
-version: '1.05'
+resources:
+  X_type: cpan
+version: '1.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

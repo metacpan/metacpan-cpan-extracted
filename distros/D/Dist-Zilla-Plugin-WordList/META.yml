@@ -21,6 +21,7 @@ requires:
   Dist::Zilla::Role::FileFinderUser: '0'
   Dist::Zilla::Role::FileMunger: '0'
   Moose: '0'
+  WordList::Namespace: v0.3.1
   namespace::autoclean: '0'
   perl: '5.014000'
   strict: '0'
@@ -29,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-WordList
   homepage: https://metacpan.org/release/Dist-Zilla-Plugin-WordList
   repository: git://github.com/perlancar/perl-Dist-Zilla-Plugin-WordList.git
-version: '0.053'
+version: '0.054'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

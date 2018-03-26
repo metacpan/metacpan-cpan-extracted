@@ -1,50 +1,138 @@
-NAME
-    HTML::TableParser - Extract data from an HTML table
+HTML::TableParser
 
-DESCRIPTION
-    HTML::TableParser uses HTML::Parser to extract data from an HTML
-    table.  The data is returned via a series of user defined callback
-    functions or methods.  Specific tables may be selected either by a
-    unique table id or by matching against the column names.  Multiple
-    tables may be parsed simultaneously in the document.
+HTML::TableParser uses HTML::Parser to extract data from an HTML table.
+The data is returned via a series of user defined callback functions or
+methods. Specific tables may be selected either by a matching a unique
+table id or by matching against the column names. Multiple (even nested)
+tables may be parsed in a document in one pass.
 
-    The data are presented to the caller as the table is scanned,
-    on a row-by-row basis.
+  Table Identification
+
+Each table is given a unique id, relative to its parent, based upon its
+order and nesting. The first top level table has id 1, the second 2,
+etc. The first table nested in table 1 has id 1.1, the second 1.2, etc.
+The first table nested in table 1.1 has id 1.1.1, etc. These, as well as
+the tables' column names, may be used to identify which tables to parse.
+
+  Data Extraction
+
+As the parser traverses a selected table, it will pass data to user
+provided callback functions or methods after it has digested particular
+structures in the table. All functions are passed the table id (as
+described above), the line number in the HTML source where the table was
+found, and a reference to any table specific user provided data.
+
+Table Start
+        The start callback is invoked when a matched table has been
+        found.
+
+Table End
+        The end callback is invoked after a matched table has been
+        parsed.
+
+Header  The hdr callback is invoked after the table header has been read
+        in. Some tables do not use the <th> tag to indicate a header, so
+        this function may not be called. It is passed the column names.
+
+Row     The row callback is invoked after a row in the table has been
+        read. It is passed the column data.
+
+Warn    The warn callback is invoked when a non-fatal error occurs
+        during parsing. Fatal errors croak.
+
+New     This is the class method to call to create a new object when
+        HTML::TableParser is supposed to create new objects upon table
+        start.
+
+  Callback API
+
+Callbacks may be functions or methods or a mixture of both. In the
+latter case, an object must be passed to the constructor. (More on that
+later.)
+
+The callbacks are invoked as follows:
+
+  start( $tbl_id, $line_no, $udata );
+
+  end( $tbl_id, $line_no, $udata );
+
+  hdr( $tbl_id, $line_no, \@col_names, $udata );
+
+  row( $tbl_id, $line_no, \@data, $udata );
+
+  warn( $tbl_id, $line_no, $message, $udata );
+
+  new( $tbl_id, $udata );
+
+  Data Cleanup
+
+There are several cleanup operations that may be performed
+automatically:
+
+Chomp   chomp() the data
+
+Decode  Run the data through HTML::Entities::decode.
+
+DecodeNBSP
+        Normally HTML::Entitites::decode changes a non-breaking space
+        into a character which doesn't seem to be matched by Perl's
+        whitespace regexp. Setting this attribute changes the HTML
+        "nbsp" character to a plain 'ol blank.
+
+Trim    remove leading and trailing white space.
+
+  Data Organization
+
+Column names are derived from cells delimited by the <th> and </th>
+tags. Some tables have header cells which span one or more columns or
+rows to make things look nice. HTML::TableParser determines the actual
+number of columns used and provides column names for each column,
+repeating names for spanned columns and concatenating spanned rows and
+columns. For example, if the table header looks like this:
+
+ +----+--------+----------+-------------+-------------------+
+ |    |        | Eq J2000 |             | Velocity/Redshift |
+ | No | Object |----------| Object Type |-------------------|
+ |    |        | RA | Dec |             | km/s |  z  | Qual |
+ +----+--------+----------+-------------+-------------------+
+
+The columns will be:
+
+  No
+  Object
+  Eq J2000 RA
+  Eq J2000 Dec
+  Object Type
+  Velocity/Redshift km/s
+  Velocity/Redshift z
+  Velocity/Redshift Qual
+
+Row data are derived from cells delimited by the <td> and </td> tags.
+Cells which span more than one column or row are handled correctly, i.e.
+the values are duplicated in the appropriate places.
 
 INSTALLATION
 
-    To install this module type the following:
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-       perl Makefile.PL
-       make
-       make test
-       make install
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-DEPENDENCIES
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-    This module requires these other modules and libraries:
+  perl Makefile.PL
+  make
+  make test
+  make install
 
-       HTML::Entities
-       HTML::Parser
-       Test::More
+COPYRIGHT AND LICENSE
 
+This software is Copyright (c) 2018 by Smithsonian Astrophysical
+Observatory.
 
-COPYRIGHT AND LICENCE
+This is free software, licensed under:
 
-Copyright (C) 2001-2007 Smithsonian Astrophysical Observatory
-
-This file is part of HTML::TableParser
-
-HTML::TableParser is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or (at
-your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+  The GNU General Public License, Version 3, June 2007

@@ -1,0 +1,13 @@
+=pod
+
+=encoding utf8
+
+=head1 PERL CODE SNIPPETS
+
+=head2 tail recursion
+
+    @_ = ($arg1, $arg2, ...);
+
+    goto &method;
+
+=cut

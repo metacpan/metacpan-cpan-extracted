@@ -23,6 +23,7 @@ BEGIN {
             next unless /\S/;
 
             my ($type, $source, $toUnicode) = split /[ \t]*;[ \t]*/, $_;
+            next if $source =~ /\Axn--/;         # Punycode case
             next if $source =~ /\\uD[89A-F]/;    # Surrogate cases
             $source    =~ s/\\u([0-9A-F]{4})/pack 'U', hex "0x$1"/egi;
             $toUnicode =~ s/\\u([0-9A-F]{4})/pack 'U', hex "0x$1"/egi;

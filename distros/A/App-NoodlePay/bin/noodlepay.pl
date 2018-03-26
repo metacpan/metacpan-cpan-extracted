@@ -2,9 +2,9 @@
 # -*-cperl-*-
 #
 # noodlepay.pl - Convenient way to securely send Bitcoin from cold storage
-# Copyright (c) 2017 Ashish Gulhati <noodlepay at hash.neo.tc>
+# Copyright (c) Ashish Gulhati <noodlepay at hash.neo.tc>
 #
-# $Id: bin/noodlepay.pl v1.003 Sat Mar 17 14:38:49 PDT 2018 $
+# $Id: bin/noodlepay.pl v1.005 Fri Mar 23 18:47:36 PDT 2018 $
 
 use warnings;
 
@@ -16,8 +16,8 @@ use GD::Barcode::QRcode;
 use Math::Prime::Util qw(fromdigits todigitstring);
 use vars qw( $VERSION $AUTOLOAD );
 
-#my $electrum = 'electrum';
-my $electrum = 'python ~/src/Electrum-2.8.2/electrum';
+my $electrum = 'electrum';
+#my $electrum = 'python ~/src/Electrum-2.8.2/electrum';
 
 # Initialize l8n
 my ($lang, %lang) = initl8n();
@@ -284,8 +284,8 @@ noodlepay.pl - Convenient way to securely send Bitcoin from cold storage
 
 =head1 VERSION
 
- $Revision: 1.003 $
- $Date: Sat Mar 17 14:38:49 PDT 2018 $
+ $Revision: 1.005 $
+ $Date: Fri Mar 23 18:47:36 PDT 2018 $
 
 =head1 SYNOPSIS
 
@@ -293,14 +293,55 @@ noodlepay.pl - Convenient way to securely send Bitcoin from cold storage
 
 =head1 DESCRIPTION
 
-noodlepay.pl (Noodle Pay) emables the use of an air-gapped wallet
+noodlepay.pl (Noodle Pay) enables the use of an air-gapped wallet
 running on a device such as a Noodle Air (L<http://www.noodlepi.com>)
 to easily and securely send Bitcoin payments.
 
-Noodle Pay is much easier to use than hardware wallets, and doesn't
-require single-purpose hardware. The Noodle Air device is a general
-purpose Linux computer, which can be used for many other applications
-as well.
+Noodle Pay is much more convenient to use than hardware wallets, and
+doesn't require single-purpose hardware. The Noodle Air device is a
+general purpose Linux computer, which can be used for many other
+applications as well.
+
+Noodle Pay uses the Electrum wallet's command line mode to create,
+sign and publish Bitcoin transactions.
+
+To use Noodle Pay to send Bitcoin from cold storage, you would first
+create a cold storage wallet using Electrum on a Noodle Air. Then you
+copy the master public key from the Noodle Air to a Noodle Pi, and
+create a "watching-only wallet" on the Noodle Pi.
+
+Now you can receive funds to your cold storage wallet and keep track
+of them using your watching-only wallet on the Noodle Pi (or any other
+computer).
+
+To spend funds from your cold storage wallet, you run noodlepay.pl on
+the Noodle Pi, and "noodlepay.pl --offline" on the Noodle Air. Click
+"Send" on the Noodle Pi, and enter the amount, scan the destination
+address QR code, and enter the transaction fee amount.
+
+A QR code then pops up on the screen, which you scan on the Noodle Air
+by clicking "Sign". You're then asked to confirm the transaction, and
+if you do a QR code pops up, which you now scan on the Noodle
+Pi. You're then asked for confirmation to broadcast the transaction,
+and when you click OK it is broadcast.
+
+Your private keys always stay secure on the offline Noodle Air.
+
+Noodle Air provides a truly mobile, wire-free and convenient cold
+storage payment solution. Most hardware wallets require the use of a
+desktop or laptop computer, and a USB cable to connect it to the
+hardware wallet device.
+
+Compared to other hardware wallet solutions, Noodle Pay also greatly
+simplifies physically securing your private keys, and keeping
+backups. You can simply pop the MicroSD card out of the Noodle Air,
+and keep it physically secure. For backups, you can just duplicate the
+MicroSD card, and keep multiple copies in safe locations.
+
+=head1 CONFIGURATION
+
+The $electrum variable at the top of noodlepay.pl should be set to the
+path or command required to run electrum on your system.
 
 =head1 OPTION SWITCHES
 
@@ -373,7 +414,7 @@ L<http://search.cpan.org/dist/App-NoodlePay/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2017 Ashish Gulhati.
+Copyright (c) Ashish Gulhati.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the Artistic License 2.0.

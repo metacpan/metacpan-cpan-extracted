@@ -1,0 +1,64 @@
+NAME
+    Regexp::Pattern::JSON - Regexp patterns to match JSON
+
+VERSION
+    This document describes version 0.002 of Regexp::Pattern::JSON (from
+    Perl distribution Regexp-Pattern-JSON), released on 2018-03-25.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("JSON::array");
+
+DESCRIPTION
+    Regexp::Pattern is a convention for organizing reusable regex patterns.
+
+PATTERNS
+    *   array
+
+        Match a JSON array.
+
+    *   number
+
+        Match a JSON number literal.
+
+    *   object
+
+        Match a JSON object (a.k.a. hash/dictionary).
+
+    *   string
+
+        Match a JSON string literal.
+
+    *   value
+
+        Match a JSON value.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-JSON>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-JSON>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-JSON>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    JSON::Decode::Regexp
+
+    Regexp::Common::json
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

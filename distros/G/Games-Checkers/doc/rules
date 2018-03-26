@@ -32,7 +32,7 @@ Chess notation:
    |---+---+---+---+---+---+---+---|
  1 |:O:|   |:O:|   |:O:|   |:O:|   |
    +-------------------------------+
-     a   b   c   d   e   f   g   h  
+     a   b   c   d   e   f   g   h
 
 Numerical notation:
 
@@ -91,7 +91,7 @@ is captured and removed from the board.
 In some variants, if in the course of single or multiple jumps the man
 reaches the last rank, becoming a king, the turn shifts to the opponent;
 no further 'continuation' jump is possible.
- 
+
 The kings
 ---------
 

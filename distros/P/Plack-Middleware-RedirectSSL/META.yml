@@ -29,4 +29,4 @@ requires:
 resources:
   bugtracker: https://github.com/ap/Plack-Middleware-RedirectSSL/issues
   repository: git://github.com/ap/Plack-Middleware-RedirectSSL.git
-version: 1.200
+version: 1.300

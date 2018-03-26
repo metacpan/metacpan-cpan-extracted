@@ -19,7 +19,7 @@ use BerkeleyDB qw(DB_CREATE DB_GET_BOTH DB_INIT_CDB DB_INIT_LOCK
                   DB_INIT_LOG DB_INIT_TXN DB_INIT_MPOOL DB_NEXT
                   DB_SET_RANGE DB_GET_BOTH DB_GET_BOTH_RANGE
                   DB_RECOVER DB_RECOVER_FATAL DB_DONOTINDEX
-                  DB_DUP DB_DUPSORT DB_DIRTY_READ DB_AUTO_COMMIT);
+                  DB_DUP DB_DUPSORT DB_DIRTY_READ DB_AUTO_COMMIT DB_HASH);
 
 use Path::Class  ();
 use File::Copy   ();
@@ -32,6 +32,7 @@ use List::Util   ();
 # directories
 use constant STORE   => 'store';
 use constant TEMP    => 'tmp';
+use constant CONTROL => 'control';
 use constant INDEX   => 'index';
 use constant BUFSIZE => 2**13;
 
@@ -113,11 +114,11 @@ Store::Digest::Driver::FileSystem - File system driver for Store::Digest
 
 =head1 VERSION
 
-Version 0.03
+Version 0.06
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 # target directory
 has dir => (
@@ -144,7 +145,7 @@ has _env => (
 # metadata for the actual database
 has _control => (
     is  => 'rw',
-    isa => 'BerkeleyDB::Hash',
+    isa => 'BerkeleyDB::Btree',
 );
 
 # the payload data itself
@@ -200,6 +201,86 @@ sub _create_dirs {
     }
 }
 
+# attempt to create a btree control file; rescue from the stupid
+# stupid stupid stupid idea that this should be a hash
+sub _init_control {
+    my $self = shift;
+
+    my $env  = $self->_env;
+    my $mode = 0666 & ~$self->umask;
+    my $file = $self->dir->absolute->file(CONTROL);
+
+    my $control;
+
+    if (-e $file) {
+        $control = BerkeleyDB::Unknown->new(
+            -Env      => $env,
+            -Flags    => DB_AUTO_COMMIT,
+            -Mode     => $mode,
+            -Filename => CONTROL,
+        ) or Carp::croak
+            ("Could not initialize control database: $BerkeleyDB::Error");
+
+        if ($control->type == DB_HASH) {
+            my $c2 = BerkeleyDB::Btree->new(
+                -Env      => $env,
+                -Flags    => DB_CREATE|DB_AUTO_COMMIT,
+                -Mode     => $mode,
+                -Filename => CONTROL . 2,
+            ) or Carp::croak
+                ("Could not create replacement control: $BerkeleyDB::Error");
+
+            my $txn = $env->txn_begin;
+            $txn->Txn($control, $c2);
+
+            my $cur = $control->db_cursor;
+            my ($k, $v, $ret) = ('', '', 0);
+            while ($cur->c_get($k, $v, DB_NEXT) == 0) {
+                #warn "wat $k $v";
+                $ret += $c2->db_put($k, $v);
+            }
+            Carp::croak("Could not copy database: $BerkeleyDB::Error") if $ret;
+
+            $cur->c_close;
+            undef $cur;
+
+            unless ($txn->txn_commit == 0) {
+                die 'Could not copy contents from old control database to new!';
+            }
+
+            $env->txn_checkpoint(0, 0);
+
+            # require Data::Dumper;
+            # warn Data::Dumper::Dumper($env->txn_stat);
+
+            undef $txn;
+
+            $control->db_close;
+            $c2->db_close;
+            undef $control;
+            undef $c2;
+
+            # note OK is zero hence `and`
+            BerkeleyDB::db_remove(-Env => $env, -Filename => CONTROL)
+                  and die 'Could not delete old hash-based control database!: '
+                      . $BerkeleyDB::Error;
+            BerkeleyDB::db_rename
+                  (-Env => $env, -Filename => CONTROL . 2, -Newname => CONTROL)
+                      and die 'Could not rename new B+Tree control database!: '
+                          . $BerkeleyDB::Error;
+        }
+    }
+
+    $control ||= BerkeleyDB::Btree->new(
+        -Env      => $env,
+        -Flags    => DB_CREATE|DB_AUTO_COMMIT,
+        -Mode     => $mode,
+        -Filename => CONTROL,
+    ) or Carp::croak
+        ("Could not initialize (B+Tree) control database: $BerkeleyDB::Error");
+
+    $control;
+}
 
 sub BUILD {
     my $self = shift;
@@ -221,19 +302,22 @@ sub BUILD {
 
     $self->_env($env);
 
-    my $txn = $env->txn_begin;
-
     # create control
-    my $control = BerkeleyDB::Hash->new(
-        -Env      => $env,
-        -Flags    => DB_CREATE|DB_AUTO_COMMIT,
-        -Mode     => $mode,
-        #-Txn      => $txn,
-        -Filename => 'control',
-    ) or Carp::croak
-        ("Can't create/bind control database: $BerkeleyDB::Error");
-
+    # my $control = BerkeleyDB::Hash->new(
+    #     -Env      => $env,
+    #     -Flags    => DB_CREATE|DB_AUTO_COMMIT,
+    #     -Mode     => $mode,
+    #     #-Txn      => $txn,
+    #     -Filename => 'control',
+    # ) or Carp::croak
+    #     ("Can't create/bind control database: $BerkeleyDB::Error");
+    my $control = $self->_init_control;
     $self->_control($control);
+
+    my $txn = $env->txn_begin;
+    # add to transaction
+    $control->Txn($txn);
+
     # control stores:
 
     # algorithms used
@@ -269,7 +353,10 @@ sub BUILD {
         my $v = join ',', @$w;
 
         $self->_algorithms($w);
-        $control->db_put(algorithms => $v);
+        unless ($control->db_put(algorithms => $v) == 0) {
+            die 'INTERNAL ERROR: could not store control data (algorithms): ' .
+                $BerkeleyDB::Error;
+        }
     }
 
     # primary algorithm
@@ -293,36 +380,60 @@ sub BUILD {
                   unless grep { $_ eq $v } @{$self->_algorithms};
 
         $self->_primary($v);
-        $control->db_put(primary => $v);
+        unless ($control->db_put(primary => $v) == 0) {
+            die 'INTERNAL ERROR: could not store control data (primary): ' .
+                $BerkeleyDB::Error;
+        }
     }
 
     # total number of known hash entries
     unless ($control->db_get(objects => my $v) == 0) {
-        $control->db_put(objects => 0);
+        unless ($control->db_put(objects => 0) == 0) {
+            die 'INTERNAL ERROR: could not store control data (objects): ' .
+                $BerkeleyDB::Error;
+        }
     }
 
     # total number of hash entries where the payloads were removed
     unless ($control->db_get(deleted => my $v) == 0) {
-        $control->db_put(deleted => 0);
+        unless ($control->db_put(deleted => 0) == 0) {
+            die 'INTERNAL ERROR: could not store control data (deleted): ' .
+                $BerkeleyDB::Error;
+        }
     }
 
     # total number of bytes stored
     unless ($control->db_get(bytes => my $v) == 0) {
-        $control->db_put(bytes => 0);
+        unless ($control->db_put(bytes => 0) == 0) {
+            die 'INTERNAL ERROR: could not store control data (bytes): ' .
+                $BerkeleyDB::Error;
+        }
     }
 
 
     # store-wide creation and modification times
     my $now = time;
     unless ($control->db_get(ctime => my $v) == 0) {
-        $control->db_put(ctime => $now);
+        unless ($control->db_put(ctime => $now) == 0) {
+            die 'INTERNAL ERROR: could not store control data (ctime): ' .
+                $BerkeleyDB::Error;
+        }
     }
 
     unless ($control->db_get(mtime => my $v) == 0) {
-        $control->db_put(mtime => $now);
+        unless ($control->db_put(mtime => $now) == 0) {
+            die 'INTERNAL ERROR: could not store control data (mtime): ' .
+                $BerkeleyDB::Error;
+        }
     }
 
+    unless ($txn->txn_commit == 0) {
+        die 'INTERNAL ERROR: Could not commit transaction on control data: ' .
+            $BerkeleyDB::Error;
+    }
 
+    # renew transaction
+    $txn = $env->txn_begin;
 
     # create algo btrees, these enable partial matches
     my $pri  = $self->_primary;
@@ -334,6 +445,9 @@ sub BUILD {
         -Filename => $pri,
     ) or Carp::croak
         ("Can't create/bind primary database $pri: $BerkeleyDB::Error");
+
+    # add primary database to transaction
+    $primary->Txn($txn);
 
     my @rest = grep { $_ ne $pri } @{$self->_algorithms};
     for my $i (0..$#rest) {
@@ -372,6 +486,9 @@ sub BUILD {
         ) or Carp::croak
             ("Can't create/bind $k index database: $BerkeleyDB::Error");
 
+        # add index db to transaction
+        $index->Txn($txn);
+
         # add this to initialization queue
         my $st = $index->db_stat;
         if ($st->{bt_nkeys} == 0) {
@@ -401,12 +518,17 @@ sub BUILD {
             }
         }
 
+        $cursor->c_close;
+        undef $cursor;
+
         for my $ix (keys %init) {
             $primary->associate($meta->{$ix}, $self->_meta_keyfunc($ix));
         }
     }
 
-    $txn->txn_commit;
+    unless ($txn->txn_commit == 0) {
+        die "Could not commit initialization transaction: $BerkeleyDB::Error";
+    }
 
     # hashes ctime atime dtime type language encoding charset
     #$self->_entries($entries);
@@ -432,6 +554,8 @@ sub DEMOLISH {
 }
 
 =head2 add
+
+Add an object to the store.
 
 =cut
 
@@ -583,11 +707,11 @@ sub add {
     my ($self, %p) = @_;
     my $pri = $self->_primary;
     my $ctl = $self->_control;
+    my $env = $self->_env;
 
     # open transactions on all databases
-    my $txn = $self->_env->txn_begin or Carp::croak
-        ("Could not open transaction: $BerkeleyDB::Error "
-             . $self->_env->status);
+    my $txn = $env->txn_begin or Carp::croak
+        ("Could not open transaction: $BerkeleyDB::Error " . $env->status);
     $txn->Txn($ctl, values %{$self->_entries});
 
     # Step 1: record digests as we read the content handle into a
@@ -648,7 +772,7 @@ sub add {
         File::Copy::move($tempname, $target);
     }
 
-    # Step 2: alter database entries
+    # Step 3: alter database entries
 
     my $db  = $self->_entries->{$pri};
     my $now = time;
@@ -658,6 +782,7 @@ sub add {
     my $rec = '';
     utf8::downgrade($rec);
     $db->db_get($bin, $rec);
+
     if ($rec) {
         # create an object because it's easier to deal with
         $obj = $self->_inflate($bin, $rec);
@@ -668,35 +793,36 @@ sub add {
         if ($obj->dtime and $obj->dtime->epoch > 0) {
             $obj->dtime(undef);
 
+            my $nok = 0;
+
             # don't forget to decrement the deleted count by 1
             $ctl->db_get(deleted => my $deleted);
-            $ctl->db_put(deleted =>  --$deleted) if $deleted > 0;
+            $nok += $ctl->db_put
+                (deleted => ($deleted && $deleted > 0 ? $deleted - 1 : 0));
             # and no matter what, we don't want this number to be negative
 
             # set the modification time as well
-            $ctl->db_put(mtime   => $now);
+            $nok += $ctl->db_put(mtime => $now);
+
+            if ($nok) {
+                $txn->txn_abort;
+                die 'INTERNAL ERROR: Could not modify control database: ' .
+                    $BerkeleyDB::Error;
+            }
 
             # overwrite the record
             $rec = $self->_deflate($obj);
+
             # XXX ???? WTF how many times do i have to re-downgrade
             utf8::downgrade($rec);
-            #warn utf8::is_utf8($rec);
 
-            $db->db_put($bin, $rec);
-            #$db->db_sync;
+            unless ($db->db_put($bin, $rec) == 0) {
+                die 'INTERNAL ERROR: Could not modify digest database: ' .
+                    $BerkeleyDB::Error;
+            }
         }
     }
     else {
-        # set the mappings for the other digest algorithms
-        # my $e = $self->_entries;
-        # for my $algo (grep { $_ ne $pri } @{$self->_algorithms}) {
-        #     my $k = $p{digests}{$algo}->digest;
-        #     utf8::downgrade($k); # dat utf8
-
-        #     $e->{$algo}->db_put($k, $bin);
-        #     #$e->{$algo}->db_sync;
-        # }
-
         # tie up loose ends re the file
         my $stat    = $target->stat;
         $p{size}    = $stat->size;
@@ -711,32 +837,43 @@ sub add {
         $p{ctime} = $now;
 
         # now for the control db
+        my $nok = 0;
 
         # increment byte count by file size
         $ctl->db_get(bytes   => my $bytes);
-        $ctl->db_put(bytes   => $bytes += $p{size});
+        $nok += $ctl->db_put(bytes   => ($bytes || 0) + $p{size});
         # increment object count by 1
         $ctl->db_get(objects => my $objects);
-        $ctl->db_put(objects =>  ++$objects);
+        $nok += $ctl->db_put(objects => ($objects || 0) + 1);
         # set the modification time
-        $ctl->db_put(mtime   => $now);
+        $nok += $ctl->db_put(mtime   => $now);
+
+        if ($nok) {
+            $txn->txn_abort;
+            die 'INTERNAL ERROR: Could not modify control database: ' .
+                $BerkeleyDB::Error;
+        }
 
         # create the new object
         $obj = Store::Digest::Object->new(%p);
 
         # overwrite the record
         $rec = $self->_deflate($obj);
+
         # XXX ???? WTF
         utf8::downgrade($rec);
-        #warn utf8::is_utf8($rec);
-        $db->db_put($bin, $rec);
-        #$db->db_sync;
+
+        unless ($db->db_put($bin, $rec) == 0) {
+            die 'INTERNAL ERROR: Could not modify digest database: ' .
+                $BerkeleyDB::Error;
+        }
     }
 
     # Step 4: commit the changes
 
     unless ($txn->txn_commit == 0) {
-        Carp::croak($BerkeleyDB::Error);
+        die 'INTERNAL ERROR: Could not commit transaction: ' .
+            $BerkeleyDB::Error;
     }
 
     # Step 5: return the object
@@ -784,9 +921,9 @@ sub get {
     my $bin  = $digest->digest;
     utf8::downgrade($bin); # JIC
 
-    my @out = $self->_get($bin, $algo);
+    my @out = $self->_get($bin, $algo) or return;
 
-    wantarray ? @out : \@out;
+    wantarray ? @out : $out[0];
 }
 
 sub _get {
@@ -815,9 +952,9 @@ sub _get {
     # pad the key too
     $bin .= ("\0" x ($DIGESTS{$algo} - length $bin));
 
-    #warn $algo;
-    #warn unpack('H*', $bin);
-    #warn unpack('H*', $last);
+    # warn $algo;
+    # warn unpack('H*', $bin);
+    # warn unpack('H*', $last);
 
     my @obj;
     my $rec;
@@ -838,7 +975,6 @@ sub _get {
         #warn "$algo ne $pri";
         my $pk;
         while ($cursor->c_pget($d, $pk, $rec, $flag) == 0) {
-            last if $d gt $last;
 
             #warn unpack 'H*', $d;
             #warn unpack 'H*', $pk;
@@ -850,12 +986,16 @@ sub _get {
             # to set the key manually, and this is the easiest way to
             # do it.
             $d = $obj->digest($algo)->digest;
+            last if $d gt $last;
 
             push @obj, $obj;
 
             $d = _bin_inc($d, $algo);
         }
     }
+
+    $cursor->c_close;
+    undef $cursor;
 
     $txn->txn_commit;
 
@@ -1060,26 +1200,25 @@ sub stats {
 
     my %x;
     for my $k (qw(objects deleted bytes ctime mtime)) {
-        $ctl->db_get($k, my $val);
+        die "INTERNAL ERROR: Control database has failed to store $k"
+            unless $ctl->db_get($k, my $val) == 0;
         $x{$k} = $val;
     }
 
-    # fix these
+    # fix these into datetime objects
     $x{created}  = DateTime->from_epoch(epoch => delete $x{ctime});
     $x{modified} = DateTime->from_epoch(epoch => delete $x{mtime});
 
     Store::Digest::Stats->new(%x);
 }
 
-# beginning to think i should index by ctime/mtime/dtime/type/encoding
-
 =head1 AUTHOR
 
-Dorian Taylor, C<< <dorian at cpan.org> >>
+Dorian Taylor, C<E<lt>dorian at cpan.orgE<gt>>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 Dorian Taylor.
+Copyright 2012-2018 Dorian Taylor.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you
 may not use this file except in compliance with the License. You may

@@ -1,5 +1,5 @@
 package Text::Password::MD5;
-our $VERSION = "0.13";
+our $VERSION = "0.15";
 
 use Moose;
 extends 'Text::Password::CoreCrypt';
@@ -64,13 +64,8 @@ returns true if the verification succeeds.
 override 'verify' => sub {
     my $self = shift;
     my ( $input, $data ) = @_;
+    carp ref($self). " doesn't allow any Wide Characters or white spaces\n" if $input =~ /[^ -~]/;
     return super() if $data =~ /^[!-~]{13}$/; # with crypt in Perl
-
-     die __PACKAGE__. " doesn't allow any Wide Characters or white spaces\n"
-    if length $input and $input !~ /[!-~]/ or $input =~ /\s/;
-     croak "Crypt::PasswdMD5 makes 34bytes hash strings. Your data must be wrong"
-    if $data !~ /^\$1\$[!-~]{1,8}\$[!-~]{22}$/;
-
     return $data eq unix_md5_crypt( $input, $data );
 };
 
@@ -95,9 +90,8 @@ sub encrypt {
     my $self = shift;
     my $input = shift;
     my $min = $self->minimum();
-    croak __PACKAGE__ ." requires at least $min length" if length $input < $min;
-     die __PACKAGE__. " doesn't allow any Wide Characters or white spaces\n"
-    if $input =~ /[^!-~]/ or $input =~ /\s/;
+    croak ref($self) ." requires at least $min length" if length $input < $min;
+    carp ref($self). " doesn't allow any Wide Characters or white spaces\n" if $input =~ /[^ -~]/;
 
     return unix_md5_crypt( $input, $self->_salt() );
 }

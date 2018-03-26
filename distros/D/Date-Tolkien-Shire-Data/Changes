@@ -1,3 +1,10 @@
+0.004		2018-03-24	T. R. Wyant
+    Correct POD in eg/display.
+
+    Track change in accenting mechanism in eg/on-date. Belately.
+
+    Put circumflex over second 'u' in 'Udun', in accented output.
+
 0.003		2017-04-02	T. R. Wyant
     Correct __on_date() text for 8 Astron from 'fields of Cormallen' to
     'Field of Cormallen.'

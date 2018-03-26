@@ -12,4 +12,4 @@ lib/USB/TMC.pm
 scripts/load.pl
 scripts/test.pl
 t/USB-TMC.t
-t/pod.t
+xt/author/pod.t

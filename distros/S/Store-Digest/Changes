@@ -1,12 +1,25 @@
 Revision history for Store-Digest
 
+0.06    Sat Mar 24 22:31:17 PDT 2018
+        OKAY finally tests pass in DB 4.x; turns out cursors need to be
+        explicitly closed and killed.
+
+0.05_01 Sat Mar 24 20:34:38 PDT 2018
+        cargo-culting some more; hopefully these changes yield more info.
+
+0.05    Sat Mar 24 12:24:49 PDT 2018
+        Attempting to cargo-cult a solution to test failures for DB 4.X
+
+0.04    Fri Mar 23 18:11:39 PDT 2018
+        - (maybe?) fixed issues with control database not storing mtime
+        - definitely fixed issue with partial retrieval of non-primary hash
+
+0.03_01 Tue Dec 05 23:23:29 PST 2017
+        ah crap bunged up the manifest
+
 0.03    Sun Sep 17 22:31:11 PDT 2017
         Made it suck less; added recover flag, stubbed in indices for
         type/lang/etc
 
 0.02    Sun Nov 29 12:01:29 PST 2015
         Berkeley DB was storing keys in UTF8 rather than binary. Bad. 
-
-0.01    Date/time
-        First version, released on an unsuspecting world.
-

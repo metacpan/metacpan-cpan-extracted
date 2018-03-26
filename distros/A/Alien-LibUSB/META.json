@@ -35,7 +35,8 @@
          "requires" : {
             "Alien::Build" : "0.32",
             "Alien::Build::MM" : "0.32",
-            "ExtUtils::MakeMaker" : "6.52"
+            "ExtUtils::MakeMaker" : "6.52",
+            "perl" : "5.006"
          }
       },
       "develop" : {
@@ -43,6 +44,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Test::MinimumVersion" : "0",
             "Test::More" : "0",
             "Test::Pod" : "1.41",
             "blib" : "1.01",
@@ -65,15 +67,19 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "6.52",
             "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Test::Alien" : "0.05",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "perl" : "5.008"
          }
       }
    },
    "provides" : {
       "Alien::LibUSB" : {
          "file" : "lib/Alien/LibUSB.pm",
-         "version" : "0.2"
+         "version" : "0.3"
       }
    },
    "release_status" : "stable",
@@ -88,16 +94,26 @@
          "web" : "https://github.com/athreef/Alien-LibUSB"
       }
    },
-   "version" : "0.2",
+   "version" : "0.3",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026000"
+         "version" : "5.026001"
       },
       "plugins" : [
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "AutoPrereqs",
             "version" : "6.010"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::OSPrereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::OSPrereqs" : {
+                  "os" : "linux"
+               }
+            },
+            "name" : "linux",
+            "version" : "0.008"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
@@ -273,7 +289,7 @@
          {
             "class" : "Dist::Zilla::Plugin::AlienBuild",
             "name" : "AlienBuild",
-            "version" : "0.20"
+            "version" : "0.24"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
@@ -342,7 +358,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.13.3",
+                  "git_version" : "2.16.1",
                   "repo_root" : "."
                }
             },
@@ -365,7 +381,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.13.3",
+                  "git_version" : "2.16.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -382,12 +398,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.2",
+                  "tag" : "v0.3",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.13.3",
+                  "git_version" : "2.16.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -407,7 +423,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.13.3",
+                  "git_version" : "2.16.1",
                   "repo_root" : "."
                }
             },
@@ -428,7 +444,7 @@
                   "version_regexp" : "(?^:^v(.+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.13.3",
+                  "git_version" : "2.16.1",
                   "repo_root" : "."
                }
             },
@@ -439,6 +455,39 @@
             "class" : "Dist::Zilla::Plugin::ChangelogFromGit",
             "name" : "ChangelogFromGit",
             "version" : "0.016"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MinimumPerl",
+            "name" : "MinimumPerl",
+            "version" : "1.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::MinimumVersion",
+            "name" : "Test::MinimumVersion",
+            "version" : "2.000007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Compile",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Compile" : {
+                  "bail_out_on_fail" : 0,
+                  "fail_on_warning" : "author",
+                  "fake_home" : 0,
+                  "filename" : "t/00-compile.t",
+                  "module_finder" : [
+                     ":InstallModules"
+                  ],
+                  "needs_display" : 0,
+                  "phase" : "test",
+                  "script_finder" : [
+                     ":PerlExecFiles"
+                  ],
+                  "skips" : [],
+                  "switch" : []
+               }
+            },
+            "name" : "Test::Compile",
+            "version" : "2.056"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
@@ -507,6 +556,28 @@
             "is_trial" : 0
          },
          "version" : "6.010"
+      }
+   },
+   "x_alienfile" : {
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.24",
+      "requires" : {
+         "share" : {
+            "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
+            "Alien::autoconf" : "0.03",
+            "Alien::automake" : "0.05",
+            "Alien::libtool" : "0.02",
+            "Alien::m4" : "0.11",
+            "Archive::Zip" : "0",
+            "Config" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "Net::SSLeay" : "1.49",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
       }
    },
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"

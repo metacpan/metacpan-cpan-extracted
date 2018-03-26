@@ -1,3 +1,6 @@
+0.51	- 2018-03-24, H.Merijn Brand
+    * Dot-in-inc (cpantesters)
+
 0.50	- 2018-03-21, H.Merijn Brand
     * Explain more about header folding
     * It's 2017

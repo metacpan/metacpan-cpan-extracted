@@ -16,7 +16,7 @@ use overload(
 
 use namespace::autoclean;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 our $DEFAULT_NAME = 'dezi.index';
 
@@ -120,7 +120,7 @@ Dezi::InvIndex - base class for Dezi inverted indexes
  my $index = Dezi::InvIndex->new(path => 'path/to/index');
  print $index;  # prints $index->path
  my $header = $index->get_header();  # $meta isa Dezi::InvIndex::Header object
- 
+
 =head1 DESCRIPTION
 
 A Dezi::InvIndex is a base class for defining different inverted index formats.
@@ -143,13 +143,13 @@ Example:
 
 =head2 path
 
-Returns a Path::Class::Dir object representing the directory path to the index. 
-The path is a directory which contains the various files that comprise the 
+Returns a Path::Class::Dir object representing the directory path to the index.
+The path is a directory which contains the various files that comprise the
 index.
 
 =head2 get_header
 
-Returns a Dezi::InvIndex::Header object with which you can query 
+Returns a Dezi::InvIndex::Header object with which you can query
 information about the index.
 
 =head2 header_file
@@ -179,7 +179,7 @@ their IR library specifics.
 
 =head2 clobber
 
-Get/set the boolean indicating whether the index should overwrite
+Get/set the Boolean indicating whether the index should overwrite
 any existing index with the same name. The default is true.
 
 =head2 new_from_meta
@@ -194,7 +194,7 @@ Peter Karman, E<lt>karpet@dezi.orgE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-dezi-app at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
@@ -239,10 +239,10 @@ L<https://metacpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2014 by Peter Karman
+Copyright 2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the terms of the GPL v2 or later.
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

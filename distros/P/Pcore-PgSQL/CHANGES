@@ -1,3 +1,26 @@
+v0.14.11 2018-03-25T08:15:27Z
+ - useless index removed
+ - array support improved
+ - json support improved
+ - decode JSON
+ - Docker base image changed from "softvisio/pcore:v0.58.2" to
+   "softvisio/pcore:v0.58.3"
+
+v0.14.10 2018-03-24T00:03:05Z
+ - update-pgsql script improved
+ - SQL_TYPE subs intead of const
+ - Docker base image changed from "softvisio/pcore:v0.58.0" to
+   "softvisio/pcore:v0.58.2"
+
+v0.14.9 2018-03-22T19:30:48Z
+ - ru_UA locale fixed
+
+v0.14.8 2018-03-22T19:07:22Z
+ - show last statement on error
+ - ru_UA locale added
+ - Docker base image changed from "softvisio/pcore:v0.56.9" to
+   "softvisio/pcore:v0.58.0"
+
 v0.14.7 2018-03-13T19:01:58Z
  - Docker base image changed from "softvisio/pcore:v0.56.6" to
    "softvisio/pcore:v0.56.8"

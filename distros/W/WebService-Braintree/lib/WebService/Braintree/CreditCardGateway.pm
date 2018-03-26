@@ -1,10 +1,13 @@
-package WebService::Braintree::CreditCardGateway;
-$WebService::Braintree::CreditCardGateway::VERSION = '1.1';
+# vim: sw=4 ts=4 ft=perl
+
+package # hide from pause
+    WebService::Braintree::CreditCardGateway;
+
 use 5.010_001;
 use strictures 1;
 
 use Moose;
-with 'WebService::Braintree::Role::MakeRequest';
+extends 'WebService::Braintree::PaymentMethodGatewayBase';
 with 'WebService::Braintree::Role::CollectionBuilder';
 
 use Carp qw(confess);
@@ -13,12 +16,14 @@ use WebService::Braintree::Util qw(validate_id);
 use WebService::Braintree::Result;
 use Try::Tiny;
 
-has 'gateway' => (is => 'ro');
+use WebService::Braintree::_::CreditCard;
 
 sub create {
     my ($self, $params) = @_;
     confess "ArgumentError" unless verify_params($params, credit_card_signature);
-    $self->_make_request("/payment_methods/", "post", {credit_card => $params});
+    return $self->_create(
+        "/payment_methods", 'post', {credit_card => $params},
+    );
 }
 
 sub delete {
@@ -29,13 +34,17 @@ sub delete {
 sub update {
     my ($self, $token, $params) = @_;
     confess "ArgumentError" unless verify_params($params, credit_card_signature);
-    $self->_make_request("/payment_methods/credit_card/$token", "put", {credit_card => $params});
+    return $self->_update(
+        "/payment_methods/credit_card/$token", "put", {credit_card => $params},
+    );
 }
 
 sub find {
     my ($self, $token) = @_;
     confess "NotFoundError" unless validate_id($token);
-    $self->_make_request("/payment_methods/credit_card/$token", "get", undef)->credit_card;
+    return $self->_find(credit_card => (
+        "/payment_methods/credit_card/${token}", 'get', undef,
+    ));
 }
 
 sub from_nonce {
@@ -55,7 +64,7 @@ sub expired {
     return $self->resource_collection({
         ids_url => "/payment_methods/all/expired_ids",
         obj_url => "/payment_methods/all/expired",
-        inflate => [qw/payment_methods credit_card CreditCard/],
+        inflate => [qw/payment_methods credit_card _::CreditCard/],
     });
 }
 
@@ -69,7 +78,7 @@ sub expiring_between {
     return $self->resource_collection({
         ids_url => "/payment_methods/all/expiring_ids?${params}",
         obj_url => "/payment_methods/all/expiring?${params}",
-        inflate => [qw/payment_methods credit_card CreditCard/],
+        inflate => [qw/payment_methods credit_card _::CreditCard/],
     });
 }
 

@@ -26,10 +26,11 @@ subtest 'raises error if find is passed a blank string' => sub {
 };
 
 subtest 'details' => sub {
-    my $result = WebService::Braintree::Transaction->new({
+    my $result = WebService::Braintree::_::Transaction->new({
         amount => amount(40, 60),
         credit_card => credit_card({
-            expiration_date  => '05/12',
+            expiration_month => '05',
+            expiration_year => '12',
         }),
         customer => {first_name => 'Dan', last_name => 'Smith'},
         billing => { street_address => '123 45 6' },

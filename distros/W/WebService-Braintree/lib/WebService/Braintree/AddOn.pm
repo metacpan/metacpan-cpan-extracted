@@ -1,5 +1,7 @@
+# vim: sw=4 ts=4 ft=perl
+
 package WebService::Braintree::AddOn;
-$WebService::Braintree::AddOn::VERSION = '1.1';
+$WebService::Braintree::AddOn::VERSION = '1.2';
 use 5.010_001;
 use strictures 1;
 
@@ -14,11 +16,14 @@ This class lists all add-ons
 =cut
 
 use Moose;
-extends "WebService::Braintree::ResultObject";
+
+with 'WebService::Braintree::Role::Interface';
 
 =head2 all()
 
-This returns all the add-ons.
+This returns all the add-ons. This will be an arrayref of L<AddOn|WebService::Braintree::_::AddOn>s. If none are found, then an empty arrayref.
+
+This does B<NOT> return a result or error-result object.
 
 =cut
 
@@ -27,31 +32,7 @@ sub all {
     $class->gateway->add_on->all;
 }
 
-sub gateway {
-    return WebService::Braintree->configuration->gateway;
-}
-
-sub BUILD {
-    my ($self, $attributes) = @_;
-
-    $self->set_attributes_from_hash($self, $attributes);
-}
-
 __PACKAGE__->meta->make_immutable;
 
 1;
 __END__
-
-=head1 TODO
-
-=over 4
-
-=item Need to document the keys and values that are returned
-
-=item Need to document the required and optional input parameters
-
-=item Need to document the possible errors/exceptions
-
-=back
-
-=cut

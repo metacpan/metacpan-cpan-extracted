@@ -1,0 +1,38 @@
+---
+abstract: 'tcp_connect with transparent proxy handling'
+author:
+  - 'Toshio Ito <toshioito@cpan.org>'
+build_requires:
+  AnyEvent::Handle: '0'
+  AnyEvent::Socket: '0'
+  Net::EmptyPort: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+  Module::Build::Prereqs::FromCPANfile: '0.02'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-Connector
+no_index:
+  directory:
+    - t
+    - xt
+    - eg
+    - inc
+    - share
+  file:
+    - README.pod
+    - README.md
+requires:
+  AnyEvent::Handle: '0'
+  AnyEvent::Socket: '0'
+  URI: '0'
+resources:
+  bugtracker: https://github.com/debug-ito/AnyEvent-Connector/issues
+  repository: git://github.com/debug-ito/AnyEvent-Connector.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

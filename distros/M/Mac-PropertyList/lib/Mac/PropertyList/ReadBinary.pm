@@ -13,7 +13,7 @@ use MIME::Base64      qw(decode_base64);
 use POSIX             qw(SEEK_END SEEK_SET);
 use XML::Entities     ();
 
-$VERSION = '1.411';
+$VERSION = '1.413';
 
 __PACKAGE__->_run( @ARGV ) unless caller;
 
@@ -392,10 +392,10 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2015, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2004-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the terms of the Artistic License 2.0.
 
 =cut
 

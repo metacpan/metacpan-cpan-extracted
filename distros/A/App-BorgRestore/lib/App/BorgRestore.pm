@@ -3,7 +3,7 @@ use v5.14;
 use strict;
 use warnings;
 
-our $VERSION = "2.3.0";
+our $VERSION = "3.0.0";
 
 use App::BorgRestore::Borg;
 use App::BorgRestore::DB;

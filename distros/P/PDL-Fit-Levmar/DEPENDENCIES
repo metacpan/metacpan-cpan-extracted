@@ -1,0 +1,26 @@
+Dependencies:
+
+Linearly-constrained fitting requires the lapack and blas libraries.
+But, unconstrained and box constraints do not require lapack.
+See INSTALL for more information.
+
+There are many ways to provide lapack, even on the same platform.
+
+The following shared libraries or equivalents are required (version numbers are
+those used for testing this module.)
+liblapack.so.3
+libblas.so.3
+libg2c.so.0
+
+Linking against these shared libaries requires, for instance under debian, that
+the following development packages be installed.
+
+lapack3-dev library of linear algebra routines 3 - static library
+refblas3-dev   Basic Linear Algebra Subroutines 3, static library
+
+# The following is a dependency of lapack3-dev, and refblas3-dev
+(libg2c0-dev GNU Fortran 77 library development)
+
+These libraries are used in building the upstream levmar library. There
+are other options for providing the lapack and blas routines. If you
+use these other libraries, you have to edit Makefile.PL

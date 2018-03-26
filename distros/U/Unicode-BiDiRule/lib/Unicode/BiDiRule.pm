@@ -15,7 +15,7 @@ our %EXPORT_TAGS = (
 
 our @EXPORT_OK = @{$EXPORT_TAGS{'all'}};
 
-our $VERSION    = '0.03';
+our $VERSION    = '0.04';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;    # see L<perlmodstyle>
 
@@ -212,7 +212,7 @@ Hatuka*nezumi - IKEDA Soji, E<lt>hatuka@nezumi.nuE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015 by Hatuka*nezumi - IKEDA Soji
+Copyright (C) 2015, 2018 by Hatuka*nezumi - IKEDA Soji
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. For more details, see the full text of

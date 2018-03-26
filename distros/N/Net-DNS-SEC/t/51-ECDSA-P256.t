@@ -1,13 +1,13 @@
-# $Id: 51-ECDSA-P256.t 1654 2018-03-19 15:53:37Z willem $	-*-perl-*-
+# $Id: 51-ECDSA-P256.t 1656 2018-03-22 14:36:14Z willem $	-*-perl-*-
 #
 
 use strict;
 use Test::More;
 
 my %prerequisite = (
-	'Digest::SHA'  => 5.23,
-	'Net::DNS'     => 1.01,
-	'MIME::Base64' => 2.13,
+	'Digest::SHA'	=> 5.23,
+	'Net::DNS::SEC'	=> 1.01,
+	'MIME::Base64'	=> 2.13,
 	);
 
 foreach my $package ( sort keys %prerequisite ) {
@@ -16,6 +16,9 @@ foreach my $package ( sort keys %prerequisite ) {
 	plan skip_all => "missing prerequisite $package @revision";
 	exit;
 }
+
+plan skip_all => 'disabled ECDSA'
+		unless eval { Net::DNS::SEC::libcrypto->can('ECDSA_sign') };
 
 plan tests => 13;
 
@@ -61,8 +64,10 @@ ok( $private, 'set up ECDSA private key' );
 
 
 my $wrongkey = new Net::DNS::RR <<'END';
-ED25519.example.	IN	DNSKEY	( 257 3 15
-	l02Woi0iS8Aa25FQkUd9RMzZHJpBoRQwAQEX1SxZJA4= ) ; Key ID = 3613
+RSASHA1.example.	IN	DNSKEY	256 3 5 (
+	AwEAAZHbngk6sMoFHN8fsYY6bmGR4B9UYJIqDp+mORLEH53Xg0f6RMDtfx+H3/x7bHTUikTr26bV
+	AqsxOs2KxyJ2Xx9RGG0DB9O4gpANljtTq2tLjvaQknhJpSq9vj4CqUtr6Wu152J2aQYITBoQLHDV
+	i8mIIunparIKDmhy8TclVXg9 ; Key ID = 1623
 END
 
 ok( $wrongkey, 'set up non-ECDSA public key' );
@@ -73,8 +78,17 @@ my $wrongfile = $filename{wrongfile} = $wrongkey->privatekeyname;
 open( KEY, ">$wrongfile" ) or die "$wrongfile $!";
 print KEY <<'END';
 Private-key-format: v1.2
-Algorithm: 15 (ED25519)
-PrivateKey: ODIyNjAzODQ2MjgwODAxMjI2NDUxOTAyMDQxNDIyNjI=
+Algorithm: 5 (RSASHA1)
+Modulus: kdueCTqwygUc3x+xhjpuYZHgH1RgkioOn6Y5EsQfndeDR/pEwO1/H4ff/HtsdNSKROvbptUCqzE6zYrHInZfH1EYbQMH07iCkA2WO1Ora0uO9pCSeEmlKr2+PgK
+pS2vpa7XnYnZpBghMGhAscNWLyYgi6elqsgoOaHLxNyVVeD0=
+PublicExponent: AQAB
+PrivateExponent: Vd6cuMRDxnuiFr367pJB39FYyDkNrZ9zAoyCt0idcHirglmV1ps7px2AQY2MOW/Tg2Xz59EqBA00mEOmnuRfdRXraqo1mxA9C2qGR2xHltNH2RVR5oT
+lahZLRUYZTDuLI7G/3IiPKrf5z/HFm2DkkzuxGqC8hWf9FOni49CqhYE=
+Prime1: waSsFnVlQrG/3SGh5GNV5o50PS8gE5L0/+GP2MIjkR3px1zR+LjfkVii1EaTda+Sq7B0ROI+M+R0JLh98Rr6XQ==
+Prime2: wNOsL3isJAE89C2XaESsJnm46vPZrqZ4XATub1dwOWNqVOji6KI9yTBc3MfmXkZVmy0I8Rm4ILLh5m/+0LNXYQ==
+Exponent1: muRjmptQ4iZYOEOcwZkLrx4nsIEvgTi9rKf6bgHsfTmWNBf1BKSsgBCMPowti6djBN5iQm9OHigRFwZUBzXzKQ==
+Exponent2: KE8Xe4T6Vzx7BYBSWlWgtxpS8aqwIrZiCrptLZFVwGlr3PwiEwd3awtVHkIbgjGpy5qKd/wsZYl/d7CJ0A7tgQ==
+Coefficient: p9WMT9cDpT7BXcKBXnrMLV8O31ujZ17nwlmlFe3+0n2VCx2T/CSz72xssffn0n2q0DaHHfu9SxR1RLgmDUzVEA==
 END
 close(KEY);
 

@@ -1,12 +1,14 @@
 package Pcore::Handle::pgsql;
 
-use Pcore -class, -const, -result, -sql,
+use Pcore -class, -const, -result,
   -export => {
     STATE     => [qw[$STATE_CONNECT $STATE_READY $STATE_BUSY $STATE_DISCONNECTED]],
     TX_STATUS => [qw[$TX_STATUS_IDLE $TX_STATUS_TRANS $TX_STATUS_ERROR]],
   };
-use Pcore::Util::Scalar qw[looks_like_number is_plain_arrayref];
+use Pcore::Handle::DBI::Const qw[:CONST];
+use Pcore::Util::Scalar qw[looks_like_number is_plain_arrayref is_blessed_arrayref];
 use Pcore::Util::UUID qw[uuid_str];
+use Pcore::Util::Data qw[to_json];
 
 with qw[Pcore::Handle::DBI];
 
@@ -160,54 +162,105 @@ SQL
 }
 
 # QUOTE
-sub quote ( $self, $var, $type = undef ) {
+sub quote ( $self, $var ) {
     return 'NULL' if !defined $var;
 
-    if ( defined $type ) {
+    if ( is_blessed_arrayref $var) {
+        return 'NULL' if !defined $var->[1];
 
         # https://www.postgresql.org/docs/current/static/datatype-binary.html
-        if ( $type == $SQL_BYTEA ) {
+        if ( $var->[0] == $SQL_BYTEA ) {
+            $var = $var->[1];
+
+            # encode
             utf8::encode $var if utf8::is_utf8 $var;
 
+            # quote
             $var = q[E'\\\\x] . unpack( 'H*', $var ) . q['];
 
             return $var;
         }
-        elsif ( $type == $SQL_UUID ) {
+        elsif ( $var->[0] == $SQL_BOOL ) {
+            return $var->[1] ? q['1'] : q['0'];
+        }
+        elsif ( $var->[0] == $SQL_UUID ) {
+            $var = $var->[1];
+
+            # encode
             utf8::encode $var if utf8::is_utf8 $var;
 
+            # escape
             $var =~ s/'/''/smg;
 
+            # quote
             return qq['$var'];
+        }
+        elsif ( $var->[0] == $SQL_JSON ) {
+
+            # encode and quote
+            $var = $self->encode_json( $var->[1] );
+
+            $var->$* =~ s/'/''/smg;
+
+            return q['] . $var->$* . q['];
         }
         else {
             die 'Unsupported SQL type';
         }
     }
+    elsif ( is_plain_arrayref $var) {
 
+        # encode and quote
+        $var = $self->encode_array($var);
+
+        $var->$* =~ s/'/''/smg;
+
+        return q['] . $var->$* . q['];
+    }
+
+    # NUMBER
     # elsif ( looks_like_number $var) {
     #     return $var;
     # }
 
-    # ARRAY
-    elsif ( is_plain_arrayref $var) {
-        my @els;
-
-        for my $el ( $var->@* ) {
-            push @els, $self->quote( $el, $type );
-        }
-
-        return 'ARRAY[' . join( ', ', @els ) . ']';
-    }
-
     # TEXT
     else {
+
+        # encode
         utf8::encode $var if utf8::is_utf8 $var;
 
+        # escape
         $var =~ s/'/''/smg;
 
+        # quote
         return qq['$var'];
     }
+}
+
+sub encode_json ( $self, $var ) {
+
+    # encode
+    return to_json $var;
+}
+
+sub encode_array ( $self, $var ) {
+    my @buf;
+
+    for my $el ( $var->@* ) {
+        if ( is_plain_arrayref $el) {
+            push @buf, $self->encode_array($el)->$*;
+        }
+        else {
+
+            # copy and escape
+            my $var = $el =~ s/"/\\"/smgr;
+
+            # quote
+            push @buf, qq["$var"];
+        }
+    }
+
+    return \( '{' . join( q[,], @buf ) . '}' );
 }
 
 # DBI METHODS
@@ -262,10 +315,10 @@ PERL
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 81                   | * Private subroutine/method '_get_dbh' declared but not used                                                   |
-## |      | 152                  | * Private subroutine/method '_get_schema_patch_table_query' declared but not used                              |
+## |      | 83                   | * Private subroutine/method '_get_dbh' declared but not used                                                   |
+## |      | 154                  | * Private subroutine/method '_get_schema_patch_table_query' declared but not used                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 215, 237             | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 268, 290             | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

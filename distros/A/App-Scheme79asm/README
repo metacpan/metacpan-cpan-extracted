@@ -1,4 +1,4 @@
-App-Scheme79asm version 0.004
+App-Scheme79asm version 0.005
 =============================
 
 SIMPLE is a LISP processor defined in the 1979
@@ -8,9 +8,9 @@ The SIMPLE processor expects input in a particular tagged-pointer
 format. This module takes a string containing a sequence of
 S-expressions. Each S-expression is a list of one of three types:
 
-(tag value), for example (symbol nil), represents a value to be
+(tag value), for example (symbol 2), represents a value to be
 put in memory (for example a number, or a symbol, or a variable
-reference).
+reference). The value must be a number.
 
 (tag list), where list is of one of these three types,
 represents a tagged pointer. In this case, list is (recursively)
@@ -44,6 +44,7 @@ DEPENDENCIES
 This module requires these other modules and libraries:
 
 * Data::SExpression
+* List::MoreUtils
 
 COPYRIGHT AND LICENCE
 

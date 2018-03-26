@@ -1,5 +1,6 @@
-#!perl -w
+#!perl
 use strict;
+use warnings;
 use constant HAS_LEAKTRACE => eval { require Test::LeakTrace };
 use Test::More HAS_LEAKTRACE
     ? ( tests => 7 )

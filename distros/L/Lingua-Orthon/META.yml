@@ -1,28 +1,29 @@
 ---
-abstract: 'Various measures of orthographic relatedness between two letter strings'
+abstract: "Orthographic similarity of strings - Coltheart's N and related measures"
 author:
   - 'Roderick Garton <rgarton@cpan.org>'
 build_requires:
-  List::AllUtils: 0.03
-  Math::MatrixReal: 2.09
-  String::LCSS_XS: 1.2
-  String::Similarity: 1.04
-  Test::More: 0.98
-  Text::Abbrev: 1.01
+  Test::More: '1.302073'
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3624'
+  Module::Build: '0.4220'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Lingua-Orthon
 provides:
   Lingua::Orthon:
     file: lib/Lingua/Orthon.pm
-    version: 0.02
+    version: '0.03'
 requires:
-  perl: 5.006
-resources:
-  license: http://dev.perl.org/licenses/
-version: 0.02
+  List::AllUtils: '0.14'
+  Number::Misc: '1.2'
+  Statistics::Lite: '3.62'
+  String::Util: '1.26'
+  Text::Levenshtein: '0.13'
+  Text::Levenshtein::XS: '0.503'
+  Unicode::Collate: '1.19'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

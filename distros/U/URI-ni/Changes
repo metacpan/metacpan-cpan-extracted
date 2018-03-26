@@ -1,4 +1,7 @@
-Revision history for URI-di
+Revision history for URI-ni
+
+0.05    Fri, 23 Mar 2018 14:53:42 -0700
+        redid algorithm selection which was broken and stupid
 
 0.01    Date/time
         First version, released on an unsuspecting world.

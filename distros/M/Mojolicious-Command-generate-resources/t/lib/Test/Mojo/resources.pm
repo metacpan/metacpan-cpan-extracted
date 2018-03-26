@@ -8,7 +8,7 @@ require Mojolicious::Commands;
 
 sub tempdir {
 
-  #my $tempdir = '/tmp/mres';
+  # my $tempdir = '/tmp/mres';
   my $tempdir = File::Temp::tempdir(CLEANUP => 1, TEMPLATE => 'resourcesXXXX');
   unshift @INC, $tempdir . "/blog/lib";
   return $tempdir;

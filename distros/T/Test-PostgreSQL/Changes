@@ -1,5 +1,12 @@
 Revision history for Perl extension Test::PostgreSQL.
 
+1.25
+    - Don't continue to wait if Postgres PID has gone
+    - Database seeding after startup
+    - Allow writing custom postgresql.conf instead of always emptying it
+    - Suppress "pg_ctl: could not start server" messages on stderr
+    - More config options
+
 1.24
     - Adds support for UNIX socket connections to PostgreSQL
     - Adds psql method to retrieve appropriate CLI parameters

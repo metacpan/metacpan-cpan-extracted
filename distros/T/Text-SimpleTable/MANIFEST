@@ -10,5 +10,5 @@ t/01use.t
 t/02pod.t
 t/03podcoverage.t
 t/04tables.t
-Text-SimpleTable-2.03/META.yml
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -7,7 +7,7 @@ use diagnostics;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw( auction );
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 #Variables global to the package	
 my $maximize_total_benefit;
@@ -16,17 +16,17 @@ my $decimals;          # the number of digits after the decimal point
 my $max_matrix_value;
 my $need_transpose = 0;
 my $inicial_price;
-my $iter_count_global;
-my $iter_count_local;
+my $iter_count_global = 0;
+my $iter_count_local  = 0;
 my ( $array1_size, $array2_size, $min_size, $max_size, $original_max_size );
-my ( %assignned_object, %assignned_person, %most_wanted_object, %price_object );
+my ( %assignned_object, %assignned_person, %objects_desired_by_this, %price_object );
 my %index_correlation;
 
 sub auction { #                        => default values
 	my %args = ( matrix_ref            => undef,     # reference to array: matrix N x M			                                     
 				maximize_total_benefit => 0,         # 0: minimize_total_benefit ; 1: maximize_total_benefit
 				inicial_stepsize       => undef,     # auction algorithm terminates with a feasible assignment if the problem data are integer and stepsize < 1/min(N,M)				
-				inicial_price          => 1,
+				inicial_price          => 0,
 				verbose                => 3,         # level of verbosity, 0: quiet; 1, 2, 3, 4, 9, 10: debug information.				
 				@_,                                  # argument pair list goes here
 				);
@@ -271,19 +271,19 @@ sub print_screen_messages {
 	  printf(" Feasible assignment condition: stepsize = %.4g < 1/$min_size = %.4g \n", $epsilon, 1/$min_size ) if ( $verbose >= 1 and $max_size >= 2 );
 	  printf(" Number of iterations: %u \n", $iter_count_global ) if ( $verbose >= 1 );
    
-      print "\nMaximum index size    = [";
+      print "\n row index    = [";
       for my $i ( 0 .. $#output_index ) {
          printf("%${matrix_spaces}d ", $i);
       }
       print "]\n";
 
-      print "\@output_index indexes = [";
+      print " column index = [";
       for my $index (@output_index) {
          printf("%${matrix_spaces}d ", $index);
       }
       print "]\n";
 	  
-      print "\@output_index values  = [";
+      print " matrix value = [";
 	  
       for my $i ( 0 .. $#output_index ){
          my $j = $output_index[$i];
@@ -334,7 +334,7 @@ sub print_screen_messages {
          $orderly_solution{ $weight } { $i } { 'index_array2' } = $j;		 
       }
 
-      print "\n Pairs (in ascending order of weight function values):\n"; 
+      print "\n Pairs (in ascending order of matrix values):\n"; 
 
       my $sum_matrix_value = 0;
       foreach my $matrix_value ( sort { $a <=> $b }  keys %orderly_solution ){
@@ -347,7 +347,7 @@ sub print_screen_messages {
 	  
 	     my $weight = ( defined $matrix_input[$index_array1] and defined $matrix_input[$index_array1]->[$index_array2] ) ? sprintf( "%${matrix_spaces}.${decimals}f", $matrix_value ) : ' ' x $matrix_spaces ;
 	  
-         printf( "   indexes ( %${index_length}d, %${index_length}d ), weight value = $weight ; sum of values = %${matrix_spaces}.${decimals}f \n", $index_array1, $index_array2, $sum_matrix_value );
+         printf( "   indices ( %${index_length}d, %${index_length}d ), matrix value = $weight ; sum of values = %${matrix_spaces}.${decimals}f \n", $index_array1, $index_array2, $sum_matrix_value );
       }}	  
    }
 
@@ -433,60 +433,79 @@ sub auctionRound {
 			##  |  ...
 			##  i  person (N - 1)    price_i_0	
 			
-			my ( $optValForPersonI, $secOptValForPersonI, $optObjForPersonI, $secOptObjForPersonI );
+			my ( $optObjForPersonI, $SecOptObjForPersonI, $ThdOptObjForPersonI, $FthOptObjForPersonI );			
+			my ( $optValForPersonI, $SecOptValForPersonI, $ThdOptValForPersonI, $FthOptValForPersonI ) = ( -1 * $max_matrix_value, -1 * $max_matrix_value, -1 * $max_matrix_value, -1 * $max_matrix_value );
             
 			# "The set of objects to which each person i has been assigned in the last few assignments does not change much as the algorithm proceeds."
 			# Each person is assigned to just a relatively small number of objects during the execution of the auctionRound.
 			# My implementation is different from Libor Bus and Pavel Tvrdik: 'Towards auction algorithms for large dense assignment problems' (see reference 2).
-			# My working sets @objects_with_greater_benefits are updated dynamically by %most_wanted_object hash.
+			# My working sets @objects_with_greater_benefits are updated dynamically by %objects_desired_by_this hash.
 			
-			my @objects_with_greater_benefits = keys %{$most_wanted_object{$person}};
+			my @objects_with_greater_benefits = keys %{$objects_desired_by_this{$person}};
 			my @not_assignned_objects = grep { not defined $assignned_object{$_} } @objects_with_greater_benefits;
 			
-			for my $object ( (@not_assignned_objects >= 4) ? @objects_with_greater_benefits : ( 0 .. $max_size - 1 ) )			
+			for my $object ( @not_assignned_objects > 1 ? @objects_with_greater_benefits : ( 0 .. $max_size - 1 ) )		
 			#for my $object ( 0 .. $max_size - 1 )			
 			{				
 				$seen_ghost++ if ( not defined $matrix[$person] and $min_size < $max_size );
 				
 				my $matrix_value = $seen_ghost ? 0 : $matrix[$person]->[$object] ;
-
+				
 				my $curVal = $matrix_value - $price_object{$object};
 				
-				# Find the best and second best value among all objects for that person
-				
-				if ( (not defined $optValForPersonI) || ($curVal > $optValForPersonI)  # highest current benefit
-				                                     || ($curVal == $optValForPersonI and not defined $assignned_object{$object} ) )
-				{
-					$secOptValForPersonI = $optValForPersonI;
-					$secOptObjForPersonI = $optObjForPersonI;
+				if ( $curVal > $optValForPersonI )
+				{					
+					$FthOptValForPersonI = $ThdOptValForPersonI;
+					$FthOptObjForPersonI = $ThdOptObjForPersonI;
+					$ThdOptValForPersonI = $SecOptValForPersonI;
+					$ThdOptObjForPersonI = $SecOptObjForPersonI;
+					$SecOptValForPersonI = $optValForPersonI;
+					$SecOptObjForPersonI = $optObjForPersonI;
 					$optValForPersonI = $curVal;
 					$optObjForPersonI = $object;
 				}
-				elsif ( (not defined $secOptValForPersonI) || ($curVal > $secOptValForPersonI) ) # second highest current benefit
+				elsif ( $curVal > $SecOptValForPersonI )
 				{
-					$secOptValForPersonI = $curVal;
-					$secOptObjForPersonI = $object;
+					$FthOptValForPersonI = $ThdOptValForPersonI;
+					$FthOptObjForPersonI = $ThdOptObjForPersonI;
+					$ThdOptValForPersonI = $SecOptValForPersonI;
+					$ThdOptObjForPersonI = $SecOptObjForPersonI;
+					$SecOptValForPersonI = $curVal;
+					$SecOptObjForPersonI = $object;
+				}
+				elsif ( $curVal > $ThdOptValForPersonI )
+				{
+					$FthOptValForPersonI = $ThdOptValForPersonI;
+					$FthOptObjForPersonI = $ThdOptObjForPersonI;
+					$ThdOptValForPersonI = $curVal;
+					$ThdOptObjForPersonI = $object;
+				}
+				elsif ( $curVal > $FthOptValForPersonI )
+				{
+					$FthOptValForPersonI = $curVal;
+					$FthOptObjForPersonI = $object;
 				}
 				
 				if ( $verbose >= 10 ){
-					printf " personI = %2s ; objectJ = %2s ; \$curVal %6.2f = \$matrix[%2s][%2s] %2.0f - \$price_object{%2s} %6.2f ;", $person, $object, $curVal, $person, $object, $matrix_value, $object, $price_object{$object};				
-					if ( defined $optValForPersonI    ){ printf " obj %2s \$optValForPersonI = %6.2f ", $optObjForPersonI, $optValForPersonI; }
-					if ( defined $secOptValForPersonI ){ printf " obj %2s \$secOptValForPersonI = %6.2f \n", $secOptObjForPersonI, $secOptValForPersonI; } else { print "\n"; }
-				}
+					printf " personI = %2s ; objectJ = %2s ; \$curVal %10.5f = \$matrix[%2s][%2s] %2.0f - \$price_object{%2s} %10.5f \n", $person, $object, $curVal, $person, $object, $matrix_value, $object, $price_object{$object};
+				}				
 			}
-
-			## Computes the highest reasonable bid for the best object for this person
-			my $bidForPersonI = $optValForPersonI - $secOptValForPersonI + $epsilon;		
-
+			
+			my $bidForPersonI = $optValForPersonI - $SecOptValForPersonI + $epsilon;
+			
 			# Stores the bidding info for future use
 			$info{$optObjForPersonI}{$bidForPersonI} = $person if ( not defined $info{$optObjForPersonI}{$bidForPersonI} ); # get only one person with this bid
 			
-			$most_wanted_object{$person}{$optObjForPersonI}    = 1;  # get the optimal object
-			$most_wanted_object{$person}{$secOptObjForPersonI} = 1;  # get the second optimal object
+			$objects_desired_by_this{$person}{$optObjForPersonI}    = 1; # information about the most desired objects
+			$objects_desired_by_this{$person}{$SecOptObjForPersonI} = 1 if (defined $SecOptObjForPersonI);
+			$objects_desired_by_this{$person}{$ThdOptObjForPersonI} = 1 if (defined $ThdOptObjForPersonI);
+			$objects_desired_by_this{$person}{$FthOptObjForPersonI} = 1 if (defined $FthOptObjForPersonI);			
 			
 			if ( $verbose >= 10 ){
-				printf "<> PersonI = %2s chose ObjectJ = %2s ; \$bidForPersonI %3s = \$optValForPersonI %3s - \$secOptValForPersonI %3s + \$epsilon %.4f \n", $person, $optObjForPersonI, $bidForPersonI, $optValForPersonI, $secOptValForPersonI, $epsilon;
-				printf "<> PersonI = %2s ; \@objects_with_greater_benefits = (@objects_with_greater_benefits) ; object eligible to bid --> \@not_assignned_objects = (@not_assignned_objects)\n", $person;
+				my @array = sort { $a <=> $b } keys %{$objects_desired_by_this{$person}};				
+				printf "<> PersonI = %2s ; \@objects_with_greater_benefits = (@objects_with_greater_benefits) ; object eligible to bid --> \@not_assignned_objects = (@not_assignned_objects) : %2s > 1 ? \n", $person, scalar @not_assignned_objects;
+				printf "<> PersonI = %2s ; objects desired by this person = (@array) \n", $person;
+				printf "<> PersonI = %2s chose ObjectJ = %2s ; \$bidForPersonI %.5f = \$optValForPersonI %.5f - \$SecOptValForPersonI %.5f + \$epsilon %.5f \n", $person, $optObjForPersonI, $bidForPersonI, $optValForPersonI, $SecOptValForPersonI, $epsilon;							    								
 			}
 		}
 	}	
@@ -518,7 +537,7 @@ sub auctionRound {
 		$price_object{$object} += $bid;	
 	   
 		if ( $verbose >= 10 ){
-			printf " --> Assigning to personI = %2s the objectJ = %2s with highestBidForJ = %6.2f and update the price vector ; \$assignned_person{%2s} = %2s ; \$price_object{%2s} = $price_object{$object} \n", $person, $object, $bid, $person, $assignned_person{$person}, $object, ;	
+			printf " --> Assigning to personI = %2s the objectJ = %2s with highestBidForJ = %10.5f and update the price vector ; \$assignned_person{%2s} = %2s ; \$price_object{%2s} = %.5f \n", $person, $object, $bid, $person, $assignned_person{$person}, $object, $price_object{$object};	
 		}
 	   
 		last;  # next object, choose only the highest bid for each object
@@ -561,7 +580,7 @@ __END__
  assigned to. The numbers in the table are the costs associated with each particular assignment."
  
  In Auction Algorithm (AA) the N persons iteratively submit the bids to M objects.
- The AA take cost Matrix_N×M = [aij] as an input and produce assignment as an output.
+ The AA take cost Matrix N×M = [aij] as an input and produce assignment as an output.
  In the AA persons iteratively submit the bids to the objects which are then reassigned 
  to the bidders which offer them the best bid.
  
@@ -574,7 +593,8 @@ __END__
 =head1 SYNOPSIS
 
  use Algorithm::Bertsekas qw(auction);
-
+ 
+ Example 1: Minimize the total benefit.
  my @array1 = ( 22, 15, 98,  1 );
  my @array2 = ( 72, 99, 29, 88, 12, 26, 41 );
 
@@ -595,18 +615,9 @@ __END__
  15 [ 57 84 14 73  3 11 26 ]
  98 [ 26  1 69 10 86 72 57 ]
   1 [ 71 98 28 87 11 25 40 ]
- 
- Alternatively, we can define the matrix with its elements:
-
- my @input_matrix = (
- [ 50, 77,  7, 66, 10,  4, 19 ],
- [ 57, 84, 14, 73,  3, 11, 26 ],
- [ 26,  1, 69, 10, 86, 72, 57 ],
- [ 71, 98, 28, 87, 11, 25, 40 ]
- );
-
- my ( $optimal, $assignement_ref, $output_index_ref ) = auction( matrix_ref => \@input_matrix, maximize_total_benefit => 0, verbose => 3 );
-
+  
+ my ( $optimal, $assignement_ref, $output_index_ref ) = auction( matrix_ref => \@input_matrix, maximize_total_benefit => 0, verbose => 5 );
+  
  Objective: to Minimize the total benefit
  Number of left nodes: 4
  Number of right nodes: 7
@@ -615,26 +626,102 @@ __END__
  Solution:
  Optimal assignment: sum of values = 30
  Feasible assignment condition: stepsize = 0.2 < 1/4 = 0.25
- Number of iterations: 17
+ Number of iterations: 15
 
- Maximum index size    = [ 0  1  2  3  4  5  6 ]
- @output_index indexes = [ 5  2  1  4  6  0  3 ]
- @output_index values  = [ 4 14  1 11          ]
+ row index    = [ 0  1  2  3  4  5  6 ]
+ column index = [ 2  5  1  4  0  6  3 ]
+ matrix value = [ 7 11  1 11          ]
+
+ modified matrix 4 x 7:
+ [ 48   21   91** 32   88   94   79  ]
+ [ 41   14   84   25   95   87** 72  ]
+ [ 72   97** 29   88   12   26   41  ]
+ [ 27    0   70   11   87** 73   58  ]
 
  original matrix 4 x 7 with solution:
- [ 50   77    7   66   10    4** 19  ]
- [ 57   84   14** 73    3   11   26  ]
+ [ 50   77    7** 66   10    4   19  ]
+ [ 57   84   14   73    3   11** 26  ]
  [ 26    1** 69   10   86   72   57  ]
  [ 71   98   28   87   11** 25   40  ]
 
- Pairs (in ascending order of weight function values):
-   indexes ( 2, 1 ), weight value =  1 ; sum of values =  1
-   indexes ( 0, 5 ), weight value =  4 ; sum of values =  5
-   indexes ( 3, 4 ), weight value = 11 ; sum of values = 16
-   indexes ( 1, 2 ), weight value = 14 ; sum of values = 30
-   indexes ( 4, 6 ), weight value =    ; sum of values = 30
-   indexes ( 5, 0 ), weight value =    ; sum of values = 30
-   indexes ( 6, 3 ), weight value =    ; sum of values = 30
+ Pairs (in ascending order of matrix values):
+   indices ( 2, 1 ), matrix value =  1 ; sum of values =  1
+   indices ( 0, 2 ), matrix value =  7 ; sum of values =  8
+   indices ( 1, 5 ), matrix value = 11 ; sum of values = 19
+   indices ( 3, 4 ), matrix value = 11 ; sum of values = 30
+   indices ( 4, 0 ), matrix value =    ; sum of values = 30
+   indices ( 5, 6 ), matrix value =    ; sum of values = 30
+   indices ( 6, 3 ), matrix value =    ; sum of values = 30  
+  
+ Example 2: Maximize the total benefit.
+ Alternatively, we can define the matrix with its elements:
+ 
+ my $N = 10;
+ my $M = 10;
+ my $r = 100;
+ 
+ my @input_matrix;
+ for my $i ( 0 .. $N - 1 ){
+   my @weight_function;		   
+   for my $j ( 0 .. $M - 1 ){
+	  my $weight = sprintf( "%.0f", rand($r) );
+      push @weight_function, $weight;
+   }
+   push @input_matrix, \@weight_function;
+ }
+
+ my @input_matrix = ( 
+ [  84,  94,  75,  56,  66,  95,  39,  53,  73,   4 ],
+ [  76,  71,  56,  49,  29,   1,  40,  40,  72,  72 ],
+ [  85, 100,  71,  23,  47,  18,  82,  70,  30,  71 ],
+ [   2,  95,  71,  89,  73,  73,  48,  52,  90,  51 ],
+ [  65,  28,  77,  73,  24,  28,  75,  48,   8,  81 ],
+ [  25,  27,  35,  89,  98,  10,  99,   3,  27,   4 ],
+ [  58,  15,  99,  37,  92,  55,  52,  82,  73,  96 ],
+ [  11,  75,   2,   1,  88,  43,   8,  28,  98,  20 ],
+ [  52,  95,  10,  38,  41,  64,  20,  75,   1,  47 ],
+ [  50,  80,  31,  90,  10,  83,  51,  55,  57,  40 ]
+ );
+
+ my ( $optimal, $assignement_ref, $output_index_ref ) = auction( matrix_ref => \@input_matrix, maximize_total_benefit => 1, verbose => 3 );
+
+ Objective: to Maximize the total benefit
+ Number of left nodes: 10
+ Number of right nodes: 10
+ Number of edges: 100
+
+ Solution:
+ Optimal assignment: sum of values = 893
+ Feasible assignment condition: stepsize = 0.09091 < 1/10 = 0.1
+ Number of iterations: 27
+
+ row index    = [  0   1   2   3   4   5   6   7   8   9 ]
+ column index = [  5   0   1   8   9   6   2   4   7   3 ]
+ matrix value = [ 95  76 100  90  81  99  99  88  75  90 ]
+
+ original matrix 10 x 10 with solution:
+ [  84    94    75    56    66    95**  39    53    73     4  ]
+ [  76**  71    56    49    29     1    40    40    72    72  ]
+ [  85   100**  71    23    47    18    82    70    30    71  ]
+ [   2    95    71    89    73    73    48    52    90**  51  ]
+ [  65    28    77    73    24    28    75    48     8    81**]
+ [  25    27    35    89    98    10    99**   3    27     4  ]
+ [  58    15    99**  37    92    55    52    82    73    96  ]
+ [  11    75     2     1    88**  43     8    28    98    20  ]
+ [  52    95    10    38    41    64    20    75**   1    47  ]
+ [  50    80    31    90**  10    83    51    55    57    40  ]
+
+ Pairs (in ascending order of matrix values):
+   indices (  8,  7 ), matrix value =  75 ; sum of values =  75
+   indices (  1,  0 ), matrix value =  76 ; sum of values = 151
+   indices (  4,  9 ), matrix value =  81 ; sum of values = 232
+   indices (  7,  4 ), matrix value =  88 ; sum of values = 320
+   indices (  3,  8 ), matrix value =  90 ; sum of values = 410
+   indices (  9,  3 ), matrix value =  90 ; sum of values = 500
+   indices (  0,  5 ), matrix value =  95 ; sum of values = 595
+   indices (  5,  6 ), matrix value =  99 ; sum of values = 694
+   indices (  6,  2 ), matrix value =  99 ; sum of values = 793
+   indices (  2,  1 ), matrix value = 100 ; sum of values = 893
 
  Common use of the solution:
    
@@ -643,9 +730,12 @@ __END__
    ...
  }
  
+ my $sum = 0;
  for my $i ( 0 .. $#{$output_index_ref} ){
-   my $j = $output_index_ref->[$i];
-   ...
+	my $j = $output_index_ref->[$i];   
+	my $value = $input_matrix[$i]->[$j];  
+	$sum += $value;
+	printf " Auction Algorithm, output index --> \$i = %3d ; \$j = %3d ; \$value = %5s ; \$sum = %5s \n", $i, $j, $value, $sum;
  }
  
 =head1 OPTIONS
@@ -653,7 +743,7 @@ __END__
  matrix_ref => \@input_matrix,   reference to array: matrix N x M.
  maximize_total_benefit => 0,    0: minimize the total benefit ; 1: maximize the total benefit.
  inicial_stepsize       => 1,    auction algorithm terminates with a feasible assignment if the problem data are integer and stepsize < 1/min(N,M).
- inicial_price          => 1,			
+ inicial_price          => 0,			
  verbose                => 3,    print messages on the screen, level of verbosity, 0: quiet; 1, 2, 3, 4, 9, 10: debug information.
 
 =head1 EXPORT
@@ -693,7 +783,7 @@ __END__
 =head1 AUTHOR
 
     Claudio Fernandes de Souza Rodrigues
-	March 21, 2018
+	March 25, 2018
 	Sao Paulo, Brasil
 	claudiofsr@yahoo.com
 	

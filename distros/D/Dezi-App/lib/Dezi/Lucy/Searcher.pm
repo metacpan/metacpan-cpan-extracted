@@ -24,7 +24,7 @@ use Search::Query::Dialect::Lucy;
 
 use namespace::autoclean;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 has 'find_relevant_fields' => ( is => 'rw', isa => Bool, default => sub {0} );
 has 'nfs_mode'             => ( is => 'rw', isa => Bool, default => sub {0} );
@@ -34,14 +34,14 @@ has 'nfs_mode'             => ( is => 'rw', isa => Bool, default => sub {0} );
 Dezi::Lucy::Searcher - Dezi Apache Lucy Searcher
 
 =head1 SYNOPSIS
- 
+
  my $searcher = Dezi::Lucy::Searcher->new(
      invindex             => 'path/to/index',
      max_hits             => 1000,
      find_relevant_fields => 1,   # default: 0
      nfs_mode             => 1,   # default: 0
  );
-                
+
  my $results = $searcher->search( 'foo bar' );
  while (my $result = $results->next) {
      printf("%4d %s\n", $result->score, $result->uri);
@@ -65,14 +65,18 @@ recommends the switch to using Lucy::Search::Searcher directly.
 All the L<SWISH::3> constants are imported into this namespace,
 including:
 
-=head2 SWISH_DOC_PROP_MAP
+=over 4
+
+=item * SWISH_DOC_PROP_MAP
+
+=back
 
 =head1 METHODS
 
 Only new and overridden methods are documented here. See
 the L<Dezi::Searcher> documentation.
 
-=head2 BUILD 
+=head2 BUILD
 
 Called internally by new(). Additional parameters include:
 
@@ -184,7 +188,7 @@ sub _build_lucy {
     return $self;
 }
 
-=head2 get_propnames 
+=head2 get_propnames
 
 Returns array ref of PropertyNames defined for the invindex.
 The array will not contain any alias names or reserved PropertyNames.
@@ -225,7 +229,7 @@ The B<order> param in I<opts> may be a Lucy::Search::SortSpec object.
 
 =item default_boolop
 
-The default boolean connector for parsing I<query>. Valid values
+The default Boolean connector for parsing I<query>. Valid values
 are B<AND> and B<OR>. The default is
 B<AND> (which is different than Lucy::QueryParser, but the
 same as Swish-e).
@@ -528,7 +532,7 @@ Peter Karman, E<lt>karpet@dezi.orgE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-dezi-app at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
@@ -573,10 +577,10 @@ L<https://metacpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2014 by Peter Karman
+Copyright 2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the terms of the GPL v2 or later.
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

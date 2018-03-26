@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Regexp::Pattern;
 
-our $DATE = '2016-12-31'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-03-24'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,10 +12,10 @@ use namespace::autoclean;
 #use Module::Load;
 
 with (
-    'Dist::Zilla::Role::InstallTool',
+    'Dist::Zilla::Role::AfterBuild',
 );
 
-sub setup_installer {
+sub after_build {
     my $self = shift;
 
     my $prereqs_hash = $self->zilla->prereqs->as_string_hash;
@@ -44,7 +44,7 @@ Dist::Zilla::Plugin::Regexp::Pattern - Plugin to use when building Regexp::Patte
 
 =head1 VERSION
 
-This document describes version 0.002 of Dist::Zilla::Plugin::Regexp::Pattern (from Perl distribution Dist-Zilla-Plugin-Regexp-Pattern), released on 2016-12-31.
+This document describes version 0.003 of Dist::Zilla::Plugin::Regexp::Pattern (from Perl distribution Dist-Zilla-Plugin-Regexp-Pattern), released on 2018-03-24.
 
 =head1 SYNOPSIS
 
@@ -59,10 +59,10 @@ currently does the following:
 
 =over
 
-=item * Make sure that L<Regexp::Pattern> is added as a DevelopRecommends prerequisite
+=item * Make sure that L<Regexp::Pattern> is added as a (phase=develop, rel=x_spec) prerequisite
 
-This is an informal way to express that the module I<follows the specification>
-specified in L<Regexp::Pattern>.
+This is a way to express that the module I<follows the specification> specified
+in L<Regexp::Pattern>.
 
 =back
 
@@ -96,7 +96,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

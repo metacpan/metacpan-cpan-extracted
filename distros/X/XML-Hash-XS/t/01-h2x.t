@@ -2,7 +2,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More tests => 23;
+use Test::More tests => 24;
 use File::Temp qw(tempfile);
 
 use XML::Hash::XS 'hash2xml';
@@ -231,6 +231,15 @@ EOT
 }
 
 {
+    my $o = TestObjectWithOverloadedStringification->new('test');
+    is
+        hash2xml({ object => $o }),
+        qq{$xml_decl\n<root><object>test</object></root>},
+        'object with overloaded stringification',
+    ;
+}
+
+{
     $XML::Hash::XS::indent    = 2;
     $XML::Hash::XS::use_attr  = 1;
     $XML::Hash::XS::canonical = 1;
@@ -347,6 +356,19 @@ sub new {
 
 sub toString {
     return '<root attr="1">value1</root>';
+}
+
+package TestObjectWithOverloadedStringification;
+
+use overload '""' => sub { shift->stringify }, fallback => 1;
+
+sub new {
+    my ($class, $value) = @_;
+    return bless { value => $value }, $class;
+}
+
+sub stringify {
+    return shift->{value};
 }
 
 package Trapper;

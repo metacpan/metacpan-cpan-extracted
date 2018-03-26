@@ -1,7 +1,7 @@
 ---
 abstract: 'optex command module direcrtory'
 author:
-  - 'Kaz Utashiro <kaz@utashiro.com>'
+  - 'Kazumasa Utashiro <kaz@utashiro.com>'
 build_requires:
   File::Path: '0'
   File::Spec: '0'
@@ -29,7 +29,7 @@ no_index:
 provides:
   App::optex:
     file: lib/App/optex.pm
-    version: v0.0.14
+    version: v0.0.15
   App::optex::debug:
     file: lib/App/optex/debug.pm
   App::optex::help:
@@ -51,7 +51,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/optex/issues
   homepage: https://github.com/kaz-utashiro/optex
   repository: git://github.com/kaz-utashiro/optex.git
-version: v0.0.14
+version: v0.0.15
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

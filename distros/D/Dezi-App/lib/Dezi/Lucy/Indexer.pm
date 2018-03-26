@@ -19,7 +19,7 @@ use Path::Class::File::Lockable;
 use Sys::Hostname qw( hostname );
 use Digest::MD5 ();
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 has 'highlightable_fields' =>
     ( is => 'rw', isa => 'Bool', default => sub {0} );
@@ -637,7 +637,7 @@ The libswish3 XML and HTML parsers will automatically treat a <title> tag as swi
 
 =item
 
-Things get complicated quickly when defining fields. Experiment with small test cases to arrive a the configuration that works best with your application.
+Things get complicated quickly when defining fields. Experiment with small test cases to arrive at the configuration that works best with your application.
 
 =back
 
@@ -648,7 +648,7 @@ Peter Karman, E<lt>karpet@dezi.orgE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-dezi-app at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
@@ -693,10 +693,10 @@ L<https://metacpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2014 by Peter Karman
+Copyright 2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the terms of the GPL v2 or later.
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 use DBI qw(:sql_types);
-do "t/lib.pl";
+do "./t/lib.pl";
 
 my $cnt = join "" => <DATA>;
 my $tbl;

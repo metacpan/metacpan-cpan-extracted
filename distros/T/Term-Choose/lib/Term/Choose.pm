@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.513';
+our $VERSION = '1.514';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -54,6 +54,7 @@ sub __defaults {        #hae
     my $prompt = defined $self->{wantarray} ? 'Your choice:' : 'Close with ENTER';
     return {
         prompt       => $prompt,
+        info         => '',         # documentation
         beep         => 0,
         clear_screen => 0,
         #default     => undef,
@@ -109,6 +110,7 @@ sub __valid_options {       #hae
         mark            => 'ARRAY',
         no_spacebar     => 'ARRAY',
         empty           => 'Str',
+        info            => 'Str',       # documentation
         prompt          => 'Str',
         undef           => 'Str',
     };
@@ -747,13 +749,17 @@ sub __write_first_screen {
 
 sub __prepare_promptline {
     my ( $self ) = @_;
-    if ( $self->{prompt} eq '' ) {
+    my $prompt = $self->{prompt};
+    if ( length $self->{info} ) {
+        $prompt = $self->{info} . "\n" . $prompt;
+    }
+    if ( $prompt eq '' ) {
         $self->{nr_prompt_lines} = 0;
         return;
     }
     my $init   = $self->{lf}[0] ? $self->{lf}[0] : 0;
     my $subseq = $self->{lf}[1] ? $self->{lf}[1] : 0;
-    $self->{prompt_copy} = line_fold( $self->{prompt}, $self->{avail_width}, ' ' x $init, ' ' x $subseq );
+    $self->{prompt_copy} = line_fold( $prompt, $self->{avail_width}, ' ' x $init, ' ' x $subseq );
     $self->{prompt_copy} .= "\n\r";
     $self->{nr_prompt_lines} = $self->{prompt_copy} =~ s/\n/\n\r/g;
 }
@@ -1078,7 +1084,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.513
+Version 1.514
 
 =cut
 

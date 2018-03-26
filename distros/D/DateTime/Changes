@@ -1,3 +1,19 @@
+1.47   2018-03-25
+
+1.47   2018-02-18
+
+- DateTime::Duration->multiply now only allows integer
+  multipliers. Implemented by Dan Stewart. PR #73.
+
+- Added is_last_day_of_quarter() and is_last_day_of_year()
+  methods. Implemented by Dan Stewart. PR #72.
+
+- When an exception was thrown while adding a duration the object could be
+  left in a broken state, with the duration partially applied. Subsequent
+  addition or subtraction would produce the wrong results. Reported by Pawel
+  Pabian. GH #74.
+
+
 1.46   2018-02-11
 
 - Fixed the formatting for the CLDR "S" symbol. It could in some cases round

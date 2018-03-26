@@ -2,7 +2,7 @@ package Dezi::Lucy;
 use Moose;
 extends 'Dezi::App';
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 __PACKAGE__->meta->make_immutable;
 
@@ -24,9 +24,9 @@ Dezi::Lucy - Dezi Apache Lucy backend
     indexer    => 'lucy',
     config     => 'path/to/dezi.conf',
  );
- 
+
  $app->run('path/to/files');
- 
+
  # then search the index
  my $searcher = Dezi::Lucy::Searcher->new(
     invindex => 'path/to/dezi.index',
@@ -62,13 +62,13 @@ offers a few advantages:
 =item Aggregators and Filters
 
 You get to use all of Dezi's Aggregators and SWISH::Filter support.
-So you can easily index all kinds of file formats 
-(email, .txt, .html, .xml, .pdf, .doc, .xls, etc) 
+So you can easily index all kinds of file formats
+(email, .txt, .html, .xml, .pdf, .doc, .xls, etc)
 without writing your own parser.
 
 =item SWISH::3
 
-SWISH::3 offers fast and robust XML and HTML parsers 
+SWISH::3 offers fast and robust XML and HTML parsers
 with an extensible configuration system, build on top of libxml2.
 
 =item Simple now, complex later
@@ -86,7 +86,7 @@ Peter Karman, E<lt>karpet@dezi.orgE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-dezi-app at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
@@ -131,10 +131,10 @@ L<https://metacpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2014 by Peter Karman
+Copyright 2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the terms of the GPL v2 or later.
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

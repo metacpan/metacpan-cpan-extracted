@@ -4,6 +4,7 @@ use My::Test;
 use Capture::Tiny qw( capture );
 use Statocles::App::Blog;
 my $SHARE_DIR = path( __DIR__ )->parent->parent->child( 'share' );
+use constant WIN32 => $^O =~ /Win32/;
 
 my $site = build_test_site(
     theme => $SHARE_DIR->child( 'theme' ),
@@ -83,8 +84,12 @@ subtest 'post' => sub {
             };
 
             subtest 'check the generated document' => sub {
-                my $path = $doc_path->relative( $tmpdir->child('blog') );
-                my $doc = $app->store->read_document( $path );
+                my $path = $doc_path->relative( $tmpdir->child('blog') )->stringify;
+                my $doc = Statocles::Document->parse_content(
+                    path => $path,
+                    content => $doc_path->slurp_utf8,
+                    store => $app->store,
+                );
                 cmp_deeply $doc, Statocles::Document->new(
                     path => $path,
                     title => 'This is a Title',
@@ -96,7 +101,7 @@ ENDMARKDOWN
                 );
                 eq_or_diff $doc_path->slurp, <<ENDCONTENT;
 ---
-tags: ~
+status: published
 title: This is a Title
 ---
 Markdown content goes here.
@@ -126,8 +131,12 @@ ENDCONTENT
             };
 
             subtest 'check the generated document' => sub {
-                my $path = $doc_path->relative( $tmpdir->child('blog') );
-                my $doc = $app->store->read_document( $path );
+                my $path = $doc_path->relative( $tmpdir->child('blog') )->stringify;
+                my $doc = Statocles::Document->parse_content(
+                    path => $path,
+                    content => $doc_path->slurp_utf8,
+                    store => $app->store,
+                );
                 cmp_deeply $doc, Statocles::Document->new(
                     path => $path,
                     title => 'Special Characters: A Retrospective (2) - The Return',
@@ -139,7 +148,7 @@ ENDMARKDOWN
                 );
                 eq_or_diff $doc_path->slurp, <<ENDCONTENT;
 ---
-tags: ~
+status: published
 title: 'Special Characters: A Retrospective (2) - The Return'
 ---
 Markdown content goes here.
@@ -164,8 +173,12 @@ ENDCONTENT
             };
 
             subtest 'check the generated document' => sub {
-                my $path = $doc_path->relative( $tmpdir->child( 'blog' ) );
-                my $doc = $app->store->read_document( $path );
+                my $path = $doc_path->relative( $tmpdir->child( 'blog' ) )->stringify;
+                my $doc = Statocles::Document->parse_content(
+                    path => $path,
+                    content => $doc_path->slurp_utf8,
+                    store => $app->store,
+                );
                 cmp_deeply $doc, Statocles::Document->new(
                     path => $path,
                     title => 'This is a Title',
@@ -177,7 +190,7 @@ ENDMARKDOWN
                 );
                 eq_or_diff $doc_path->slurp, <<ENDCONTENT;
 ---
-tags: ~
+status: published
 title: This is a Title
 ---
 Markdown content goes here.
@@ -222,8 +235,12 @@ ENDCONTENT
                 };
 
                 subtest 'check the generated document' => sub {
-                    my $path = $doc_path->relative( $tmpdir->child('blog') );
-                    my $doc = $app->store->read_document( $path );
+                    my $path = $doc_path->relative( $tmpdir->child('blog') )->stringify;
+                    my $doc = Statocles::Document->parse_content(
+                        path => $path,
+                        content => $doc_path->slurp_utf8,
+                        store => $app->store,
+                    );
                     cmp_deeply $doc, Statocles::Document->new(
                         path => $path,
                         title => 'This is a Title for stdin',
@@ -272,8 +289,12 @@ ENDMARKDOWN
                 };
 
                 subtest 'check the generated document' => sub {
-                    my $path = $doc_path->relative( $tmpdir->child('blog') );
-                    my $doc = $app->store->read_document( $path );
+                    my $path = $doc_path->relative( $tmpdir->child('blog') )->stringify;
+                    my $doc = Statocles::Document->parse_content(
+                        path => $path,
+                        content => $doc_path->slurp_utf8,
+                        store => $app->store,
+                    );
                     cmp_deeply $doc, Statocles::Document->new(
                         path => $path,
                         title => 'This is a Title for stdin',
@@ -329,8 +350,12 @@ ENDSTDIN
                 };
 
                 subtest 'check the generated document' => sub {
-                    my $path = $doc_path->relative( $tmpdir->child('blog') );
-                    my $doc = $app->store->read_document( $path );
+                    my $path = $doc_path->relative( $tmpdir->child('blog') )->stringify;
+                    my $doc = Statocles::Document->parse_content(
+                        path => $path,
+                        content => $doc_path->slurp_utf8,
+                        store => $app->store,
+                    );
                     cmp_deeply $doc, Statocles::Document->new(
                         path => $path,
                         title => 'This is Frontmatter',
@@ -370,16 +395,19 @@ ENDMARKDOWN
             };
 
             subtest 'check the generated document' => sub {
-                my $path = $doc_path->relative( $tmpdir->child('blog') );
-                my $doc = $app->store->read_document( $path );
+                my $path = $doc_path->relative( $tmpdir->child('blog') )->stringify;
+                my $doc = Statocles::Document->parse_content(
+                    path => $path.'',
+                    content => $doc_path->slurp_utf8,
+                    store => $app->store,
+                );
+                my $content = 'Draft body content' . (WIN32 ? "\r\n" : "\n");
                 cmp_deeply $doc, Statocles::Document->new(
-                    path => $path,
+                    path => $path.'',
                     title => 'A Draft',
                     author => 'preaction',
                     date => DateTimeObj->coerce( '2014-06-21 00:06:00' ),
-                    content => <<'ENDMARKDOWN',
-Draft body content
-ENDMARKDOWN
+                    content => $content,
                     store => $app->store,
                 );
 

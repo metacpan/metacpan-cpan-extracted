@@ -3,15 +3,15 @@ use ExtUtils::MakeMaker;
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
-my $preop = qq'pod2text lib/Mojolicious/Command/generate/resources.pm > README;'
-  . qq'pod2markdown lib/Mojolicious/Command/generate/resources.pm > README.md';
+my $module_file = 'lib/Mojolicious/Command/generate/resources.pm';
+my $preop       = qq'pod2text $module_file > README;'
+  . qq'pod2markdown $module_file > README.md';
 WriteMakefile(
-  NAME => 'Mojolicious::Command::generate::resources',
-  VERSION_FROM =>
-    'lib/Mojolicious/Command/generate/resources.pm',    # finds \$VERSION
+  NAME          => 'Mojolicious::Command::generate::resources',
+  VERSION_FROM  => $module_file,                               # finds \$VERSION
   AUTHOR        => 'Красимир Беров (berov@cpan.org)',
-  ABSTRACT_FROM => 'lib/Mojolicious/Command/generate/resources.pm',
-  PREREQ_PM     => {'Mojolicious' => '7.60', perl => '5.020001'},
+  ABSTRACT_FROM => $module_file,
+  PREREQ_PM => {'Mojolicious' => '7.60', perl => '5.020001'},
   TEST_REQUIRES =>
     {'Mojo::SQLite' => '3.000', 'Mojolicious::Plugin::OpenAPI' => '1.25'},
   test       => {TESTS => 't/*.t'},

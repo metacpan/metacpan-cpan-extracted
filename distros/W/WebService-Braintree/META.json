@@ -41,6 +41,7 @@
             "MIME::Base64" : "0",
             "Module::Install::TestTarget" : "0",
             "Moose" : "0",
+            "MooseX::Aliases" : "0",
             "Mozilla::CA" : "0",
             "Scalar::Util" : "0",
             "Try::Tiny" : "0",
@@ -78,7 +79,7 @@
          "web" : "https://github.com/singingfish/braintree_perl"
       }
    },
-   "version" : "1.1",
+   "version" : "1.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

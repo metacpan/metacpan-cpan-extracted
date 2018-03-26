@@ -85,22 +85,18 @@ subtest 'edit' => sub {
             };
 
             subtest 'check the generated document' => sub {
-                my $path = $doc_path->relative( $tmpdir->child('basic') );
-                my $doc = $app->store->read_document( $path );
+                my $path = $doc_path->relative( $tmpdir->child('basic') )->stringify;
+                my $doc = Statocles::Document->parse_content(
+                    path => $path,
+                    content => $doc_path->slurp_utf8,
+                    store => $app->store,
+                );
                 cmp_deeply $doc, Statocles::Document->new(
                     path => $path,
                     title => '',
-                    content => <<'ENDMARKDOWN',
-Markdown content goes here.
-ENDMARKDOWN
+                    content => "Markdown content goes here.\n",
                     store => $app->store,
                 );
-                eq_or_diff $doc_path->slurp, <<ENDCONTENT;
----
-title: ''
----
-Markdown content goes here.
-ENDCONTENT
             };
         };
 
@@ -132,8 +128,12 @@ ENDCONTENT
                 };
 
                 subtest 'check the generated document' => sub {
-                    my $path = $doc_path->relative( $tmpdir->child('basic') );
-                    my $doc = $app->store->read_document( $path );
+                    my $path = $doc_path->relative( $tmpdir->child('basic') )->stringify;
+                    my $doc = Statocles::Document->parse_content(
+                        path => $path,
+                        content => $doc_path->slurp_utf8,
+                        store => $app->store,
+                    );
                     cmp_deeply $doc, Statocles::Document->new(
                         path => $path,
                         title => '',
@@ -178,8 +178,12 @@ ENDSTDIN
                 };
 
                 subtest 'check the generated document' => sub {
-                    my $path = $doc_path->relative( $tmpdir->child('basic') );
-                    my $doc = $app->store->read_document( $path );
+                    my $path = $doc_path->relative( $tmpdir->child('basic') )->stringify;
+                    my $doc = Statocles::Document->parse_content(
+                        path => $path,
+                        content => $doc_path->slurp_utf8,
+                        store => $app->store,
+                    );
                     cmp_deeply $doc, Statocles::Document->new(
                         path => $path,
                         title => 'This is Frontmatter',

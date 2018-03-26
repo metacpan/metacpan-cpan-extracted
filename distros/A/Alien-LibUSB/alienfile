@@ -40,8 +40,8 @@ share {
     if ($^O eq 'linux') {
         requires 'Alien::libudev' => '0.1';
         eval "use Alien::libudev"; die $@ if $@;
-        $cppflags  = Alien::libudev->cflags;
-        $ldflags   = Alien::libudev->libs;
+        $cppflags  = Alien::libudev->cflags // '';
+        $ldflags   = Alien::libudev->libs // '';
 
         meta->after_hook(gather_share => sub {
             my($build) = @_;

@@ -1,5 +1,5 @@
 package Statocles::Site;
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 # ABSTRACT: An entire, configured website
 
 use Statocles::Base 'Class', 'Emitter';
@@ -650,7 +650,9 @@ sub build {
 
                 # Fix relative non-anchor links on the index page
                 if ( $is_index && $index_orig_path && $url !~ m{^([A-Za-z]+:|/|#)} ) {
-                    $url = join "/", $index_orig_path->parent, $url;
+                    my $clone = $index_orig_path->clone;
+                    pop @$clone;
+                    $url = join "/", $clone, $url;
                 }
 
                 next unless $url =~ m{^/(?:[^/]|$)};
@@ -668,6 +670,7 @@ sub build {
             }
         }
 
+        #; say "Writing file: " . $page->path;
         $store->write_file( $page->path, $dom->to_string );
     }
 
@@ -848,7 +851,7 @@ Statocles::Site - An entire, configured website
 
 =head1 VERSION
 
-version 0.088
+version 0.089
 
 =head1 SYNOPSIS
 

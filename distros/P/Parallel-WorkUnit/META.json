@@ -14,6 +14,11 @@
    },
    "name" : "Parallel-WorkUnit",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::UseAllModules" : "0.17"
+         }
+      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
@@ -21,14 +26,16 @@
       },
       "develop" : {
          "requires" : {
-            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0",
             "Test::Perl::Critic" : "0",
-            "Test::Pod" : "1.41"
+            "Test::Pod" : "1.41",
+            "Test::TrailingSpace" : "0.0203",
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
          "recommends" : {
-            "AnyEvent" : "0"
+            "AnyEvent" : "7.14"
          },
          "requires" : {
             "AnyEvent" : "0",
@@ -39,10 +46,12 @@
             "Moose" : "0",
             "Moose::Util::TypeConstraints" : "0",
             "POSIX" : "0",
+            "Scalar::Util" : "0",
             "Storable" : "0",
             "Try::Tiny" : "0",
             "autodie" : "0",
             "namespace::autoclean" : "0",
+            "overload" : "0",
             "perl" : "v5.8.0",
             "strict" : "0",
             "warnings" : "0"
@@ -50,15 +59,18 @@
       },
       "test" : {
          "requires" : {
+            "Test2::Tools::Warnings" : "0",
+            "Test2::V0" : "0",
             "Test::Exception" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Test::UseAllModules" : "0.17"
          }
       }
    },
    "provides" : {
       "Parallel::WorkUnit" : {
          "file" : "lib/Parallel/WorkUnit.pm",
-         "version" : "1.112"
+         "version" : "1.116"
       }
    },
    "release_status" : "stable",
@@ -72,7 +84,7 @@
          "web" : "https://github.com/jmaslak/Parallel-WorkUnit"
       }
    },
-   "version" : "1.112",
+   "version" : "1.116",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

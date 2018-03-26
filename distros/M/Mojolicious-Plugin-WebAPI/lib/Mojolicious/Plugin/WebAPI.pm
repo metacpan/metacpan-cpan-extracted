@@ -8,13 +8,19 @@ use WebAPI::DBIC::WebApp;
 use WebAPI::DBIC::RouteMaker;
 use Mojolicious::Plugin::WebAPI::Proxy;
  
-our $VERSION = '0.03';
+our $VERSION = '0.04';
  
 sub register {
     my ($self, $app, $conf) = @_;
 
     my $schema = delete $conf->{schema};
     my $route  = delete $conf->{route};
+    my $debug  = delete $conf->{debug};
+
+    if ( $debug ) {
+        $ENV{WEBAPI_DBIC_DEBUG} = 1;
+        $app->log->debug( "Base route: " . $route->to_string );
+    }
 
     my %opts;
     if ( $conf->{resource_opts} ) {
@@ -50,7 +56,7 @@ Mojolicious::Plugin::WebAPI - Mojolicious::Plugin::WebAPI - mount WebAPI::DBIC i
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -121,7 +127,7 @@ Renee Baecker <reneeb@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 by Renee Baecker.
+This software is Copyright (c) 2018 by Renee Baecker.
 
 This is free software, licensed under:
 

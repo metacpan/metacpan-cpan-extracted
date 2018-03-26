@@ -1,0 +1,107 @@
+2018-03-24 - version 0.3.1
+--------------------------
+
+* Fixed unintentionally broken 0.3.0 package.
+
+2018-03-24 - version 0.3.0
+--------------------------
+
+* Support for game variants (AI and game replay):
+	* russian
+        * russian_give_away
+        * russian_10x8
+        * international
+        * english
+        * english_give_away
+        * italian
+        * spanish
+        * argentinian
+        * portuguese
+        * czech
+        * german
+        * thai
+        * pool
+        * brazilian
+        * frisian
+        * canadian
+        * sri_lankian
+* Support for variant aliases:
+	* default   -> russian
+	* british   -> english
+	* internt   -> international
+	* int       -> international
+	* polish    -> international
+	* 8x8       -> brazilian
+	* 10x10     -> international
+	* 12x12     -> canadian
+	* shashki   -> russian
+	* poddavki  -> russian_give_away
+	* american  -> english
+	* give_away -> english_give_away
+	* spantsiretti  -> russian_10x8
+	* american_pool -> pool
+	* spanish_pool  -> spanish
+	* 20 -> international
+	* 21 -> english
+	* 22 -> italian
+	* 23 -> pool
+	* 24 -> spanish
+	* 25 -> russian
+	* 26 -> brazilian
+	* 27 -> canadian
+	* 28 -> portuguese
+	* 29 -> czech
+	* 31 -> thai
+	* 40 -> frisian
+	* 41 -> russian_10x8
+* Support for individual rule items:
+	* BOARD_SIZE
+	* BOARD_NOTATION
+	* CAPTURE_SEPARATOR
+	* STARTING_ROWS
+	* BOTTOM_LEFT_CELL
+	* PDN_GAME_TYPE
+	* WHITE_STARTS
+	* KINGS_LONG_RANGED
+	* PAWNS_CAPTURING_BACKWARDS
+	* CAPTURING_LARGEST
+	* CAPTURING_POSTPONED
+	* CROWNING_DURING_CAPTURE
+	* PAWNS_CANT_CAPTURE_KINGS
+	* CAPTURING_LEAVES_NO_GAP
+	* GIVE_AWAY
+	* CAPTURING_IN_8_DIRECTIONS
+* Increased default AI depth to 5 from 3.
+* Initial GUI menu in auto-play, to select game & board parameters.
+* Support for editing initial board in GUI auto-play.
+* New buttons in GUI in addition to "pause": "restart", "fullscreen".
+* Better support for unusual cases in PDN format.
+* Now all supplied pdn files are replayable.
+* Refactored and improved code.
+* Fixed build caused by bug in ExtUtils-MakeMaker & File-Find.
+
+
+2012-05-13 - version 0.2.0
+--------------------------
+
+* Reworked code with lots of improvements.
+* Support for GUI using SDL. Fallback to terminal output.
+* Support for game file formats: .pdn, .pdn.gz, .pdn.bz2, .pdn.xz.
+* Pausing game in GUI using Spacebar or icon.
+* Moved to github repository mig0/Games-Checkers.
+
+
+2004-03-01 - version 0.1.0
+--------------------------
+
+* Initial Checkers version with terminal output.
+* Automatic AI game play, via script pcheckers-auto-play.
+* Recorded game replay, via script pcheckers-replay-games.
+* Support for boards:
+	8x8
+* Support for game variants (AI for "russian" only, game replay):
+	* russian
+	* british
+	* italian
+* Support for game file formats: .pdn, .pdn.gz.
+

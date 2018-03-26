@@ -13,7 +13,7 @@ use Encode qw( encode );
 use Test::More;
 
 BEGIN { use_ok ("DBI") }
-do "t/lib.pl";
+do "./t/lib.pl";
 
 ok (my $dbh = Connect ({ f_ext => ".csv/r", f_schema => undef }), "connect");
 

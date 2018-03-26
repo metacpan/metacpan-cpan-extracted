@@ -1,0 +1,25 @@
+=pod
+
+=encoding utf8
+
+=head1 PostgreSQL
+
+=head2 create database
+
+    CREATE DATABASE "name" ENCODING 'UTF8' LC_COLLATE 'ru_UA.UTF-8' LC_CTYPE 'ru_UA.UTF-8' TEMPLATE template0;
+
+=head2 uuid
+
+L<https://www.postgresql.org/docs/current/static/uuid-ossp.html>
+
+    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+    # use UUID v1 - based on MAC addr.
+    "id" UUID PRIMARY KEY NOT NULL DEFAULT uuid_generate_v1()
+
+    CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+    # use UUID v5 - random
+    "id" UUID PRIMARY KEY NOT NULL DEFAULT gen_random_uuid()
+
+=cut

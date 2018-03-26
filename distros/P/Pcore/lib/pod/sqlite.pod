@@ -1,0 +1,11 @@
+=pod
+
+=encoding utf8
+
+=head1 SQLite
+
+=head2 field with the current unix timestamp by default
+
+    "unix_timestamp" INTEGER NOT NULL DEFAULT(CAST(STRFTIME('%s', 'now') AS INT))
+
+=cut

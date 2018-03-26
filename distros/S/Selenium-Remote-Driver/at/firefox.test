@@ -1,0 +1,16 @@
+use strict;
+use warnings;
+
+use Selenium::Firefox;
+use Test::More tests => 2;
+use Test::Fatal;
+
+my $driver;
+is( exception { $driver = Selenium::Firefox->new(
+	extra_capabilities => {
+        'moz:firefoxOptions' => {
+            args    => [ '-headless' ],
+        },
+    },
+); }, undef, "can spawn new Selenium::Firefox");
+is( exception { $driver->shutdown_binary; }, undef, "can shutdown binary correctly");

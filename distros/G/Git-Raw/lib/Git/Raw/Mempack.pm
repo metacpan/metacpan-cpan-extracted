@@ -1,5 +1,5 @@
 package Git::Raw::Mempack;
-$Git::Raw::Mempack::VERSION = '0.78';
+$Git::Raw::Mempack::VERSION = '0.79';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Mempack - Git in-memory object database class
 
 =head1 VERSION
 
-version 0.78
+version 0.79
 
 =head1 SYNOPSIS
 

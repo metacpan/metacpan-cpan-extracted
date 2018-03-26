@@ -2,7 +2,7 @@
 
 package Git::Hooks::GerritChangeId;
 # ABSTRACT: Git::Hooks plugin to insert a Change-Id in a commit message
-$Git::Hooks::GerritChangeId::VERSION = '2.8.1';
+$Git::Hooks::GerritChangeId::VERSION = '2.9.0';
 use 5.010;
 use utf8;
 use strict;
@@ -104,7 +104,7 @@ Git::Hooks::GerritChangeId - Git::Hooks plugin to insert a Change-Id in a commit
 
 =head1 VERSION
 
-version 2.8.1
+version 2.9.0
 
 =head1 SYNOPSIS
 
@@ -112,7 +112,11 @@ As a C<Git::Hooks> plugin you don't use this Perl module directly. Instead, you
 may configure it in a Git configuration file like this:
 
   [githooks]
+
+    # Enable the plugin
     plugin = CheckGerritChangeId
+
+    # These users are exempt from all checks
     admin = joe molly
 
 The first section enables the plugin and defines the users C<joe> and C<molly>

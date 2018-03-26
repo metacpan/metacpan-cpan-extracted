@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 37 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 38 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Statocles.pm',
@@ -24,6 +24,7 @@ my @module_files = (
     'Statocles/Deploy/Git.pm',
     'Statocles/Document.pm',
     'Statocles/Event.pm',
+    'Statocles/File.pm',
     'Statocles/Image.pm',
     'Statocles/Link.pm',
     'Statocles/Link/Tree.pm',

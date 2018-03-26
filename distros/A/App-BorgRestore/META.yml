@@ -3,6 +3,7 @@ abstract: 'Restore paths from borg backups'
 author:
   - '-2017  Florian Pritz <bluewind@xinu.at>'
 build_requires:
+  Software::License::GPL_3: '0'
   Test::Differences: '0'
   Test::Exception: '0'
   Test::MockObject: '0'
@@ -32,7 +33,7 @@ no_index:
 provides:
   App::BorgRestore:
     file: lib/App/BorgRestore.pm
-    version: v2.3.0
+    version: v3.0.0
   App::BorgRestore::Borg:
     file: lib/App/BorgRestore/Borg.pm
   App::BorgRestore::DB:
@@ -68,5 +69,5 @@ resources:
   bugtracker: https://github.com/Bluewind/App-BorgRestore/issues
   homepage: https://github.com/Bluewind/App-BorgRestore
   repository: git://github.com/Bluewind/App-BorgRestore.git
-version: 2.3.0
+version: 3.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

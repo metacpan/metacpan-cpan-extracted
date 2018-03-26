@@ -12,7 +12,7 @@ use File::Basename qw(dirname);
 use File::Spec::Functions qw(canonpath no_upwards);
 use UNIVERSAL;
 
-$VERSION = '1.11';
+$VERSION = '1.112';
 
 @EXPORT_OK   = qw(
 	find_regular_files
@@ -32,12 +32,14 @@ $VERSION = '1.11';
 	find_by_created_before
 	find_by_created_after
 	);
-	
+
 %EXPORT_TAGS = (
 	all => \@EXPORT_OK
 	);
 
 sub _unimplemented { croak "Unimplemented function!" }
+
+=encoding utf8
 
 =head1 NAME
 
@@ -60,7 +62,7 @@ File::Find::Closures - functions you can use with File::Find
 I wrote this module as an example of both using closures and using
 File::Find. Students are always asking me what closures are good
 for, and here's some examples. The functions mostly stand alone (i.e.
-they don't need the rest of the module), so rather than creating a 
+they don't need the rest of the module), so rather than creating a
 dependency in your code, just lift the parts you want).
 
 When I use File::Find, I have two headaches---coming up with the
@@ -94,9 +96,9 @@ Find all regular files.
 
 =cut
 
-sub find_regular_files {	
+sub find_regular_files {
 	my @files = ();
-	
+
 	sub { push @files, canonpath( $File::Find::name ) if -f $_ },
 	sub { @files = no_upwards( @files ); wantarray ? @files : [ @files ] }
 	}
@@ -109,9 +111,9 @@ Find files whose size is equal to or greater than SIZE bytes.
 
 sub find_by_min_size {
 	my $min   = shift;
-	
+
 	my @files = ();
-	
+
 	sub { push @files, canonpath( $File::Find::name ) if -s $_ >= $min },
 	sub { @files = no_upwards( @files ); wantarray ? @files : [ @files ] }
 	}
@@ -124,9 +126,9 @@ Find files whose size is equal to or less than SIZE bytes.
 
 sub find_by_max_size {
 	my $min   = shift;
-	
+
 	my @files = ();
-	
+
 	sub { push @files, canonpath( $File::Find::name ) if -s $_ <= $min },
 	sub { @files = no_upwards( @files ); wantarray ? @files : [ @files ] }
 	}
@@ -139,9 +141,9 @@ Find files whose size is equal to 0 bytes.
 
 sub find_by_zero_size {
 	my $min   = shift;
-	
+
 	my @files = ();
-	
+
 	sub { push @files, canonpath( $File::Find::name ) if -s $_ == 0 },
 	sub { @files = no_upwards( @files ); wantarray ? @files : [ @files ] }
 	}
@@ -156,13 +158,13 @@ as any of the values in @names.
 sub find_by_directory_contains {
 	my @contains = @_;
 	my %contains = map { $_, 1 } @contains;
-	
+
 	my %files = ();
 
-	sub { 
+	sub {
 		return unless exists $contains{$_};
 		my $dir = dirname( canonpath( $File::Find::name ) );
-			
+
 		$files{ $dir }++;
 		},
 
@@ -186,7 +188,7 @@ that's what you get.
 sub find_by_name {
 	my %hash  = map { $_, 1 } @_;
 	my @files = ();
-	
+
 	sub { push @files, canonpath( $File::Find::name ) if exists $hash{$_} },
 	sub { wantarray ? @files : [ @files ] }
 	}
@@ -204,16 +206,16 @@ sub find_by_regex {
 	require File::Spec::Functions;
 	require Carp;
 	require UNIVERSAL;
-	
+
 	my $regex = shift;
-	
+
 	unless( UNIVERSAL::isa( $regex, ref qr// ) ) {
 		croak "Argument must be a regular expression";
 		}
-		
+
 	my @files = ();
-	
-	sub { push @files, 
+
+	sub { push @files,
 		File::Spec::Functions::canonpath( $File::Find::name ) if m/$regex/ },
 	sub { wantarray ? @files : [ @files ] }
 	}
@@ -442,9 +444,10 @@ Some functions implemented by Nathan Wagner, C<< <nw@hydaspes.if.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2004-2014, brian d foy, All Rights Reserved.
+Copyright © 2004-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the same terms as the Artistic License
+2.0.
 
 =cut
 

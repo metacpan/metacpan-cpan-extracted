@@ -1,4 +1,3 @@
-# $Id$
 use strict;
 
 use File::Find            qw(find);

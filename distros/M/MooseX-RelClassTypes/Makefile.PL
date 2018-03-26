@@ -13,7 +13,7 @@ WriteMakefile(
     TEST_REQUIRES => {
         "Test::More" => 0
     },
-    ABSTRACT_FROM     => 'lib/MooseX/RelClassTypes.pm', # retrieve abstract from module
+    ABSTRACT_FROM     => 'lib/MooseX/RelClassTypes.pm',
     AUTHOR            => 'Tom Gracey <tomgracey@gmail.com>',
     LICENSE           => 'perl'
 );

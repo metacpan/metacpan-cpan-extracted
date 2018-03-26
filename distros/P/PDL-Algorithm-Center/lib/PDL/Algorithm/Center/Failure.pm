@@ -1,9 +1,11 @@
 package PDL::Algorithm::Center::Failure;
 
+# ABSTRACT: Exception classes for PDL::Algorithm::Center
+
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 use custom::failures();
 
@@ -47,11 +49,11 @@ __END__
 
 =head1 NAME
 
-PDL::Algorithm::Center::Failure
+PDL::Algorithm::Center::Failure - Exception classes for PDL::Algorithm::Center
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 BUGS
 

@@ -16,6 +16,14 @@ bugs:
 wishlist:
 	- let xgettext-perl produce mo files as well.
 
+version 1.11: Thu Mar 22 23:32:11 CET 2018
+
+	Release 1.10 seems to got lost on CPAN.  Upload a new one.
+
+	Fixes:
+	- fix metadata [Mohammad S Anwar]
+	- $fh->binmode not supported before 5.12 [cpantesters]
+
 version 1.10: Tue Jan 23 23:03:57 CET 2018
 
 	Improvements:

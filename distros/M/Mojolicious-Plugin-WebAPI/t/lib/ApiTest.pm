@@ -23,18 +23,21 @@ sub startup {
   my $schema = ApiTest::Schema->connect('DBI:SQLite:' . $db_new);
 
   # Normal route to controller
-  $r->get('/')->to('example#welcome');
+  $r->get('/')->to( cb => sub {
+      shift->render( text => 'Mojolicious::Plugin::WebAPI test app' );
+  });
 
-  my $auth  = $self->routes->under('/')->to( 'auth#test' );
+  my $auth  = $self->routes->under('/'); #->to( 'auth#test' );
   my $route = $auth->route('/api/v0/');
 
   $self->plugin('WebAPI' => {
     schema => $schema,
     route  => $route,
+    #debug  => 1,
 
     resource_opts => {
       resource_default_args => {
-        http_auth_type => 'none',
+        http_auth_type => 'disabled',
         writable       => 1,
         #base_uri       => $route->to_string,
       },

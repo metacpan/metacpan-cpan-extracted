@@ -1,4 +1,4 @@
-# Copyrights 2007-2018 by [Mark Overmeer].
+# Copyrights 2007-2018 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Log::Report::Lexicon::POT;
 use vars '$VERSION';
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 use base 'Log::Report::Lexicon::Table';
 
@@ -91,7 +91,7 @@ sub read($@)
         {   $charset = $block =~ m/\"content-type:.*?charset=["']?([\w-]+)/mi
               ? $1 : error __x"cannot detect charset in {fn}", fn => $fn;
             trace "auto-detected charset $charset for $fn";
-            $fh->binmode(":encoding($charset):crlf");
+            binmode $fh, ":encoding($charset):crlf";
 
             $block = decode $charset, $block
                or error __x"unsupported charset {charset} in {fn}"

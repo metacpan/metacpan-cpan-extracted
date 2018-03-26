@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.006';
+our $VERSION = '2.008';
 
 use Scalar::Util qw( looks_like_number );
 
@@ -17,6 +17,7 @@ sub new {
     eval "require $db_module" or die $@;
 
     my $plugin = $db_module->new( {
+        home_dir      => $info->{home_dir},
         app_dir       => $info->{app_dir},
         add_metadata  => $opt->{G}{meta},
         reset_search_cache => $info->{sqlite_search},
@@ -32,7 +33,7 @@ sub message_method_undef_return {
 }
 
 
-sub driver {
+sub get_db_driver {
     my ( $sf ) = @_;
     ###
     if ( ! $sf->{Plugin}->can( 'get_db_driver' ) && $sf->{Plugin}->can( 'db_driver' ) ) {
@@ -42,7 +43,7 @@ sub driver {
     }
     ###
     my $driver = $sf->{Plugin}->get_db_driver();
-    die $sf->message_method_undef_return( 'driver' ) if ! defined $driver;
+    die $sf->message_method_undef_return( 'get_db_driver' ) if ! defined $driver;
     return $driver;
 }
 
@@ -72,7 +73,7 @@ sub set_attributes {
 }
 
 
-sub databases {
+sub get_databases {
     my ( $sf, $connect_parameter ) = @_;
     my ( $user_db, $sys_db ) = $sf->{Plugin}->get_databases( $connect_parameter );
     $user_db = [] if ! defined $user_db;
@@ -81,10 +82,10 @@ sub databases {
 }
 
 
-sub db_handle {
+sub get_db_handle {
     my ( $sf, $db, $connect_parameter ) = @_;
     my $dbh = $sf->{Plugin}->get_db_handle( $db, $connect_parameter );
-    die $sf->message_method_undef_return( 'db_handle' ) if ! defined $dbh;
+    die $sf->message_method_undef_return( 'get_db_handle' ) if ! defined $dbh;
     if ( $dbh->{Driver}{Name} eq 'SQLite' ) {
         if ( ! $sf->{Plugin}->can( 'regexp' ) ) {
             $dbh->sqlite_create_function( 'regexp', 3, sub {
@@ -122,7 +123,7 @@ sub db_handle {
 }
 
 
-sub schemas {
+sub get_schemas {
     my ( $sf, $dbh, $db ) = @_;
     my ( $user_schema, $sys_schema );
     if ( $sf->{Plugin}->can( 'schemas' ) ) {
@@ -182,7 +183,7 @@ sub regexp {
         $sql_regexp = ' ' . $sql_regexp if $sql_regexp !~ /^\ /;
         return $sql_regexp;
     }
-    elsif ( $sf->driver eq 'SQLite' ) {
+    elsif ( $sf->get_db_driver eq 'SQLite' ) {
         if ( $do_not_match ) {
             return sprintf ' NOT REGEXP(?,%s,%d)', $col, $case_sensitive;
         }
@@ -190,7 +191,7 @@ sub regexp {
             return sprintf ' REGEXP(?,%s,%d)', $col, $case_sensitive;
         }
     }
-    elsif ( $sf->driver eq 'mysql' ) {
+    elsif ( $sf->get_db_driver eq 'mysql' ) {
         if ( $do_not_match ) {
             return ' '. $col . ' NOT REGEXP ?'        if ! $case_sensitive;
             return ' '. $col . ' NOT REGEXP BINARY ?' if   $case_sensitive;
@@ -200,7 +201,7 @@ sub regexp {
             return ' '. $col . ' REGEXP BINARY ?'     if   $case_sensitive;
         }
     }
-    elsif ( $sf->driver eq 'Pg' ) {
+    elsif ( $sf->get_db_driver eq 'Pg' ) {
         if ( $do_not_match ) {
             return ' '. $col . '::text' . ' !~* ?' if ! $case_sensitive;
             return ' '. $col . '::text' . ' !~ ?'  if   $case_sensitive;
@@ -220,7 +221,7 @@ sub concatenate {
         die $sf->message_method_undef_return( 'concatenate' ) if ! defined $concatenated;
         return $concatenated;
     }
-    return 'concat(' . join( ',', @$arg ) . ')'  if $sf->driver eq 'mysql';
+    return 'concat(' . join( ',', @$arg ) . ')'  if $sf->get_db_driver eq 'mysql';
 
     return join( ' || ', @$arg );
 }
@@ -231,12 +232,12 @@ sub epoch_to_datetime {
 
     return $sf->{Plugin}->epoch_to_datetime( $col, $interval )    if $sf->{Plugin}->can( 'epoch_to_datetime' );
 
-    return "DATETIME($col/$interval,'unixepoch','localtime')"     if $sf->driver eq 'SQLite';
+    return "DATETIME($col/$interval,'unixepoch','localtime')"     if $sf->get_db_driver eq 'SQLite';
 
     # mysql: FROM_UNIXTIME doesn't work with negative timestamps
-    return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d %H:%i:%s')"    if $sf->driver eq 'mysql';
+    return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d %H:%i:%s')"    if $sf->get_db_driver eq 'mysql';
 
-    return "TO_TIMESTAMP(${col}::bigint/$interval)::timestamp"    if $sf->driver eq 'Pg';
+    return "TO_TIMESTAMP(${col}::bigint/$interval)::timestamp"    if $sf->get_db_driver eq 'Pg';
 }
 
 
@@ -245,11 +246,11 @@ sub epoch_to_date {
 
     return $sf->{Plugin}->epoch_to_date( $col, $interval )   if $sf->{Plugin}->can( 'epoch_to_date' );
 
-    return "DATE($col/$interval,'unixepoch','localtime')"    if $sf->driver eq 'SQLite';
+    return "DATE($col/$interval,'unixepoch','localtime')"    if $sf->get_db_driver eq 'SQLite';
 
-    return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d')"        if $sf->driver eq 'mysql';
+    return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d')"        if $sf->get_db_driver eq 'mysql';
 
-    return "TO_TIMESTAMP(${col}::bigint/$interval)::date"    if $sf->driver eq 'Pg';
+    return "TO_TIMESTAMP(${col}::bigint/$interval)::date"    if $sf->get_db_driver eq 'Pg';
 }
 
 
@@ -262,7 +263,7 @@ sub truncate {
 
     return $sf->{Plugin}->truncate( $col, $precision )  if $sf->{Plugin}->can( 'truncate' );
 
-    return "TRUNC($col,$precision)"                     if $sf->driver eq 'Pg';
+    return "TRUNC($col,$precision)"                     if $sf->get_db_driver eq 'Pg';
 
     return "TRUNCATE($col,$precision)";
 }
@@ -303,7 +304,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.006
+Version 2.008
 
 =head1 DESCRIPTION
 

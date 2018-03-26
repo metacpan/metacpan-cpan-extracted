@@ -1,5 +1,7 @@
+# vim: sw=4 ts=4 ft=perl
+
 package WebService::Braintree::Configuration;
-$WebService::Braintree::Configuration::VERSION = '1.1';
+$WebService::Braintree::Configuration::VERSION = '1.2';
 use 5.010_001;
 use strictures 1;
 
@@ -30,7 +32,7 @@ has partner_id => (is => 'rw');
 Get these values from L<Braintree's API credentials documentation|https://articles.braintreepayments.com/control-panel/important-gateway-credentials#api-credentials>.
 
 These attributes are standard mutators. If you invoke them with a value, they
-will set the attribute to that value. If you invoke them without a value, they 
+will set the attribute to that value. If you invoke them without a value, they
 will return the current value.
 
 =head2 merchant_id(?$value)

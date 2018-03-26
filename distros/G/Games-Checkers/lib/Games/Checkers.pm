@@ -19,7 +19,7 @@ use warnings;
 package Games::Checkers;
 
 use vars qw($VERSION);
-$VERSION = '0.2.0';
+$VERSION = '0.3.1';
 
 1;
 
@@ -46,7 +46,7 @@ Games::Checkers - Play the Checkers games
     }
 
     $game->show_result;
-    
+
 # Or the same on a lower level:
 
     # automatic computer-vus-computer play script
@@ -68,7 +68,7 @@ Games::Checkers - Play the Checkers games
         my $move = $board_tree->choose_best_move;  # or: choose_random_move
 
         $board->transform($move);
-        print $move->dump, "\n", $board->dump;
+        print $move->dump($board), "\n", $board->dump;
         $color = ($color == White) ? Black : White;
     }
 
@@ -77,26 +77,51 @@ Games::Checkers - Play the Checkers games
 =head1 ABSTRACT
 
 Games::Checkers is a set of Perl classes implementing the Checkers game
-play. Several national rule variants are supported. A basic AI heuristics is
-implemented using the Minimax algorithm. Replay of previously recorded games
-is supported too.
+play. 17 different national rule variants (and any custom mix of rules)
+are supported on any arbitrary board sizes. A basic AI heuristics is
+implemented using the Minimax algorithm. Replay of previously recorded
+games is supported too.
 
 =head1 DESCRIPTION
 
 This package is intended to provide complete infrastructure for interactive
-and automatic playing and manipulating of Checkers games. Some features are
-not implemented yet.
+and automatic playing and manipulating of Checkers games.
+
+Currently supported checkers/draughts variants (AI and game replay):
+
+	* russian
+	* russian_give_away
+	* russian_10x8 (spantsiretti)
+	* international (polish)
+	* english
+	* english_give_away
+	* italian
+	* spanish
+	* argentinian
+	* portuguese
+	* czech
+	* german
+	* thai
+	* pool (american_pool)
+	* brazilian
+	* frisian
+	* canadian
+	* sri_lankian
 
 Currently supported board sizes:
 
+	* 4x4, 6x6, 8x10 (just for fun)
 	* 8x8
-	* 10x10 (not yet, but will be soon hopefully)
+	* 10x8
+	* 10x10
+	* 12x12
+	* 14x14, 16x16 (not too practical)
 
-Currently supported variants:
-
-	* Russian Checkers (AI and game replay)
-	* British Checkers (game replay)
-	* Italian Checkers (game replay, set $ENV{ITALIAN_BOARD_NOTATION})
+Note that every variant configures its own board size, but it is made
+possible to play using any variant rules on different board sizes too,
+for example Russian Checkers on 12x12 board. Or even construct own
+rule variants, like: Give-Away International Checkers on the 8x10 board
+without the requirement to capture maximal amount of pieces.
 
 Currently supported game file formats:
 
@@ -149,7 +174,7 @@ Chess notation:
    |---+---+---+---+---+---+---+---|
  1 | O |###| O |###| O |###| O |###|
    +-------------------------------+
-     a   b   c   d   e   f   g   h  
+     a   b   c   d   e   f   g   h
 
 Numerical notation:
 
@@ -205,7 +230,7 @@ is captured and removed from the board.
 In some variants, if in the course of single or multiple jumps the man
 reaches the last rank, becoming a king, the turn shifts to the opponent;
 no further 'continuation' jump is possible.
- 
+
 =head2 The kings
 
 When a single piece reaches the last rank of the board by reason of a move,
@@ -224,38 +249,34 @@ forward directions.
 
     Games::Checkers
     Games::Checkers::Board
-    Games::Checkers::BoardConstants
+    Games::Checkers::Board::_4x4
+    Games::Checkers::Board::_6x6
+    Games::Checkers::Board::_8x8
+    Games::Checkers::Board::_8x10
+    Games::Checkers::Board::_10x8
+    Games::Checkers::Board::_10x10
+    Games::Checkers::Board::_12x12
+    Games::Checkers::Board::_14x14
+    Games::Checkers::Board::_16x16
     Games::Checkers::BoardTree
-    Games::Checkers::BoardTreeNode
-    Games::Checkers::CompPlayer
     Games::Checkers::Constants
-    Games::Checkers::CountMoveList
     Games::Checkers::CreateMoveList
-    Games::Checkers::CreateUniqueMove
-    Games::Checkers::CreateVergeMove
     Games::Checkers::DeclareConstant
     Games::Checkers::ExpandMoveList
-    Games::Checkers::FigureIterator
     Games::Checkers::Game
-    Games::Checkers::IteratorConstants
     Games::Checkers::Iterators
-    Games::Checkers::KingBeatIterator
-    Games::Checkers::KingStepIterator
-    Games::Checkers::LocationConversions
-    Games::Checkers::LocationIterator
     Games::Checkers::Move
     Games::Checkers::MoveConstants
-    Games::Checkers::MoveListNode
     Games::Checkers::MoveLocationConstructor
     Games::Checkers::PDNParser
-    Games::Checkers::PawnBeatIterator
-    Games::Checkers::PawnStepIterator
-    Games::Checkers::PieceRuleIterator
-    Games::Checkers::Player
-    Games::Checkers::PlayerConstants
+    Games::Checkers::Rules
     Games::Checkers::SDL
-    Games::Checkers::UserPlayer
-    Games::Checkers::ValidKingBeatIterator
+    Games::Checkers::BoardTreeNode
+    Games::Checkers::CountMoveList
+    Games::Checkers::CreateUniqueMove
+    Games::Checkers::CreateVergeMove
+    Games::Checkers::FigureIterator
+    Games::Checkers::LocationIterator
 
 =head1 SEE ALSO
 

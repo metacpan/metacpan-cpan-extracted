@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/cli/numbers/random.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+scripts/randexp
+scripts/binom
+scripts/cauchydist
+scripts/saikoro
+scripts/poisson
+scripts/boxmuller
+META.yml
+META.json

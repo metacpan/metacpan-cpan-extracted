@@ -1,13 +1,12 @@
 {
    "abstract" : "Log::Report translation table management",
    "author" : [
-      "Mark Overmeer"
+      "Mark Overmeer <markov@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5",
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -52,13 +51,16 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "homepage" : "http://perl.overmeer.net/CPAN/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/markov2/perl5-Log-Report-Lexicon.git",
          "web" : "https://github.com/markov2/perl5-Log-Report-Lexicon"
       }
    },
-   "version" : "1.10",
-   "x_homepage" : "http://perl.overmeer.net/CPAN/",
+   "version" : "1.11",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

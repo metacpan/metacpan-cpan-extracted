@@ -35,5 +35,10 @@ diag($di2);
 
 is($di2, $hglaguaghlag);
 
+my $di3 = URI->new('ni:///sha-256;__');
+#diag($di3->hexdigest);
+diag(unpack 'H*', $di3->digest);
+ok(length($di3->digest) > 0, 'di3 has a length');
+
 __DATA__
 hglaguaghlag

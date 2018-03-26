@@ -1,5 +1,8 @@
-package WebService::Braintree::ClientTokenGateway;
-$WebService::Braintree::ClientTokenGateway::VERSION = '1.1';
+# vim: sw=4 ts=4 ft=perl
+
+package # hide from pause
+    WebService::Braintree::ClientTokenGateway;
+
 use 5.010_001;
 use strictures 1;
 
@@ -7,9 +10,11 @@ use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 
 use Carp qw(confess);
-use WebService::Braintree::Validations qw(verify_params client_token_signature_with_customer_id client_token_signature_without_customer_id);
-use WebService::Braintree::Result;
-use URI;
+use WebService::Braintree::Validations qw(
+    verify_params
+    client_token_signature_with_customer_id
+    client_token_signature_without_customer_id
+);
 
 has 'gateway' => (is => 'ro');
 
@@ -20,7 +25,7 @@ sub generate {
         $params = {client_token => $params};
     }
     my $result = $self->_make_request("/client_token", 'post', $params);
-    $result->{"response"}->{"client_token"}->{"value"};
+    return $result->{"response"}->{"client_token"}->{"value"};
 }
 
 

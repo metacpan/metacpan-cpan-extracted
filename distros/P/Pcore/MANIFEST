@@ -199,7 +199,13 @@ lib/Pcore/WebSocket/Protocol/pcore.pm
 lib/Pcore/WebSocket/Protocol/pcore/Request.pm
 lib/Pcore/WebSocket/Protocol/raw.pm
 lib/common/header.pm
-lib/snippets.pod
+lib/pod/csv.pod
+lib/pod/ext/model.pod
+lib/pod/mysql.pod
+lib/pod/perl-code.pod
+lib/pod/pgsql.pod
+lib/pod/sqlite.pod
+lib/pod/ssh.pod
 script/pcore
 script/pcore-vim-rpc.pl
 script/src

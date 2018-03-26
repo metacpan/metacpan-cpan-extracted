@@ -1,5 +1,5 @@
 package Git::Raw::Index::Entry;
-$Git::Raw::Index::Entry::VERSION = '0.78';
+$Git::Raw::Index::Entry::VERSION = '0.79';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Index::Entry - Git index entry class
 
 =head1 VERSION
 
-version 0.78
+version 0.79
 
 =head1 DESCRIPTION
 
@@ -29,6 +29,11 @@ Retrieve the id of the index entry as a string.
 =head2 is_conflict( )
 
 Check if the entry has a non-zero stage entry.
+
+=head2 mode( )
+
+Retrieve the mode of the index entry.  Note that this is returned as a
+number, not a string.
 
 =head2 path( )
 

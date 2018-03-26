@@ -32,5 +32,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/Term-Choose.git
-version: '1.513'
+version: '1.514'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

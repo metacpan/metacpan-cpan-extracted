@@ -1,5 +1,11 @@
 Revision history for Perl extension Text-Password-AutoMigration
 
+0.15 2018-03-26T03:31:16Z
+  - Fixed the bug: white spaces like ' ' was forbidden for input in sub verify
+
+0.14 2018-03-25T12:53:25Z
+  - DEPRECATED
+
 0.13 2017-12-27T08:41:56Z
   - be more strict at the tests
   - forbade '$' charactor in salt

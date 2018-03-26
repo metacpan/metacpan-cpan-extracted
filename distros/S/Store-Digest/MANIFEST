@@ -17,7 +17,6 @@ lib/Store/Digest/Driver.pm
 lib/Store/Digest/Driver/FileSystem.pm
 lib/Store/Digest/HTTP.pm
 lib/Store/Digest/Object.pm
-lib/Store/Digest/Role/Driver.pm
 lib/Store/Digest/Stats.pm
 lib/Store/Digest/Types.pm
 Makefile.PL

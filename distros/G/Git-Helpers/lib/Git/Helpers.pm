@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Git::Helpers;
-$Git::Helpers::VERSION = '0.000013';
+our $VERSION = '0.000014';
 use Carp qw( croak );
 use Capture::Tiny 'capture_stderr';
 use File::pushd qw( pushd );
@@ -70,7 +70,20 @@ sub https_remote_url {
 
 sub remote_url {
     my $remote = shift || 'origin';
-    return git::remote( 'get-url', $remote );
+    my $url;
+    my $stderr = capture_stderr {
+        try {
+            $url = git::remote( 'get-url', $remote );
+        }
+
+        catch {
+            try {
+                $url = git::config( '--get', "remote.$remote.url" );
+            };
+        }
+    };
+
+    return $url;
 }
 
 sub travis_url {
@@ -99,7 +112,7 @@ Git::Helpers - Shortcuts for common Git commands
 
 =head1 VERSION
 
-version 0.000013
+version 0.000014
 
 =head1 SYNOPSIS
 
@@ -170,7 +183,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2017 by Olaf Alders.
+This software is copyright (c) 2015-2018 by Olaf Alders.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

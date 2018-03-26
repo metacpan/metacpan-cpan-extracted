@@ -4,8 +4,12 @@
 
 use strict;
 use warnings;
+use utf8;
 
-use Test::More tests => 6;
+use Test::More tests => 9;
+
+binmode STDERR, ":utf8";
+binmode STDOUT, ":utf8";
 
 use_ok('Text::SimpleTable');
 
@@ -93,3 +97,48 @@ is($t5->draw, <<EOF, 'right table');
 | s! |
 '----'
 EOF
+
+# UTF-8 Titles and multiple cols
+my $t6 = Text::SimpleTable->new([5, "\x{A9}ROCKZ!"], [10, "Suckz!"], [7, "r\x{1A0}ckz!"]);
+$t6->row('Catalyst', 'DBIx::Class', 'Template::Toolkit', 'HTML::Mason');
+is($t6->draw, <<EOF, 'right table');
+.-------+------------+---------.
+| \x{A9}ROC- | Suckz!     | r\x{1A0}ckz!  |
+| KZ!   |            |         |
++-------+------------+---------+
+| Cata- | DBIx::Cla- | Templa- |
+| lyst  | ss         | te::To- |
+|       |            | olkit   |
+'-------+------------+---------'
+EOF
+
+# UTF-8 Titles and multiple cols with boxes
+is($t6->boxes->draw, <<EOF, 'right table');
+┌───────┬────────────┬─────────┐
+│ ©ROC- │ Suckz!     │ rƠckz!  │
+│ KZ!   │            │         │
+├───────┼────────────┼─────────┤
+│ Cata- │ DBIx::Cla- │ Templa- │
+│ lyst  │ ss         │ te::To- │
+│       │            │ olkit   │
+└───────┴────────────┴─────────┘
+EOF
+
+my $t7 = Text::SimpleTable->new([5, 'Foo'], [10, 'Bar']);
+$t7->row('foobarbaz', 'yadayadayada');
+$t7->hr;
+$t7->row('barbarbarbarbar', 'yada');
+is($t7->boxes->draw, <<EOF, 'right table');
+┌───────┬────────────┐
+│ Foo   │ Bar        │
+├───────┼────────────┤
+│ foob- │ yadayaday- │
+│ arbaz │ ada        │
+├───────┼────────────┤
+│ barb- │ yada       │
+│ arba- │            │
+│ rbar- │            │
+│ bar   │            │
+└───────┴────────────┘
+EOF
+

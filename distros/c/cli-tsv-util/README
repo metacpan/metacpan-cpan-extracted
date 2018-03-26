@@ -1,0 +1,65 @@
+cli-tsv-util
+
+   CLI::TSV::UTIL 0.51
+
+The following 5 files (each with function explanation after ":" )
+will be installed by folloinwg INSTALLATION instruction.
+
+   1. csv2tsv  : Converting CSV format into TSV (Tab-Seprated Variable).
+   2. colgrep  : Extension of "grep" command searching on specified columns.
+   3. colsplit  : Splitting a TSV file into files of the each column.
+   4. colwidth   : Extracting `column width' informations.
+   5. latextable  : Useful when you need latex tables from Excel/SQL results.
+
+  The function detail can be shown by --help after each command but 
+  as of 2018.03.25, most of them is written in Japanese. Sorry. 
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc cli::tsv::util
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=cli-tsv-util
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/cli-tsv-util
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/cli-tsv-util
+
+    Search CPAN
+        http://search.cpan.org/dist/cli-tsv-util/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2018 "Toshiyuki Shimono"
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+

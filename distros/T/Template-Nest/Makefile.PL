@@ -4,6 +4,7 @@ WriteMakefile(
     VERSION_FROM      => 'lib/Template/Nest.pm',
     PREREQ_PM         => { 
 		'Carp' => 0,
+        'Data::Dumper' => 0,
 		'File::Spec' => 0	
 	},
     ABSTRACT_FROM     => 'lib/Template/Nest.pm',

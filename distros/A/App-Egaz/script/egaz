@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use App::Egaz;
+
+App::Egaz->run;
+
+=head1 OVERVIEW
+
+For help with App::Egaz, run "egaz help"
+
+=cut
+
+__END__
+
+perl -I lib/ script/egaz help
+
+lastz t/pseudocat.fa t/pseudopig.fa > t/default.lav
+lavToPsl t/default.lav t/default.psl
+
+perl -I lib/ script/egaz lav2axt t/default.lav
+perl -I lib/ t/04-lav2axt.t
+
+perl -I lib/ script/egaz lav2psl t/default.lav
+perl -I lib/ t/05-lav2psl.t
+
+perl -I lib/ script/egaz formats
+perl -I lib/ t/06-formats.t
+
+perl -I lib/ t/07-maskfasta.t
+
+perl -I lib/ script/egaz masked <(echo -e ">1\nNNNN\n")
+perl -I lib/ t/08-masked.t
+
+perl -I lib/ script/egaz partition
+perl -I lib/ t/09-partition.t
+
+touch 't/pseudocat.fa[5001,10100]'
+lastz 't/pseudocat.fa[5001,10100]' t/pseudopig.fa > t/partition.t.lav
+cat t/partition.t.lav | perl ~/Downloads/blastz-normalizeLav 18803 0 > t/partition.t.norm.lav
+
+touch 't/pig2.fa[10001,18000]'
+lastz t/pseudocat.fa 't/pig2.fa[10001,18000]' > t/partition.q.lav
+cat t/partition.q.lav | perl ~/Downloads/blastz-normalizeLav 18803 22929 > t/partition.q.norm.lav
+
+perl -I lib/ script/egaz normalize t/partition.t.lav --tlen 18803
+perl -I lib/ t/10-normalize.t
+
+sortaxt

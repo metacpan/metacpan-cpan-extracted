@@ -1,5 +1,7 @@
+# vim: sw=4 ts=4 ft=perl
+
 package WebService::Braintree::MerchantAccount;
-$WebService::Braintree::MerchantAccount::VERSION = '1.1';
+$WebService::Braintree::MerchantAccount::VERSION = '1.2';
 use 5.010_001;
 use strictures 1;
 
@@ -13,17 +15,13 @@ This class creates, updates, deletes, and finds merchant accounts.
 
 =cut
 
-use WebService::Braintree::MerchantAccount::IndividualDetails;
-use WebService::Braintree::MerchantAccount::AddressDetails;
-use WebService::Braintree::MerchantAccount::BusinessDetails;
-use WebService::Braintree::MerchantAccount::FundingDetails;
-
 use Moose;
-extends "WebService::Braintree::ResultObject";
+
+with 'WebService::Braintree::Role::Interface';
 
 =head2 create()
 
-This takes a hashref of parameters and returns the merchant account created.
+This takes a hashref of parameters and returns a L<response|WebService::Braintee::Result> with the C<< merchant_account() >> set.
 
 =cut
 
@@ -34,7 +32,8 @@ sub create {
 
 =head2 find()
 
-This takes a merchant_account_id returns the merchant account (if it exists).
+This takes a merchant_account_id and returns a L<response|WebService::Braintee::Result> with
+the C<< merchant_account() >> set (if found).
 
 =cut
 
@@ -45,7 +44,8 @@ sub find {
 
 =head2 all()
 
-This returns all the merchant accounts.
+This returns a L<collection|WebService::Braintree::PaginatedCollection> of all
+L<merchant accounts|WebService::Braintree::_::MerchantAccount>.
 
 =cut
 
@@ -56,9 +56,9 @@ sub all {
 
 =head2 update()
 
-This takes a merchant_account_id and a hashref of parameters. It will update the
-corresponding merchant account (if found) and returns the updated merchant
-account.
+This takes a merchant_account_id and a hashref of parameters. It will update the corresponding
+merchant account (if found) and return a L<response|WebService::Braintee::Result>
+with the C<< merchant_account() >> set.
 
 =cut
 
@@ -67,13 +67,9 @@ sub update {
     $class->gateway->merchant_account->update($merchant_account_id, $params);
 }
 
-sub gateway {
-    return WebService::Braintree->configuration->gateway;
-}
-
 {
     package WebService::Braintree::MerchantAccount::Status;
-$WebService::Braintree::MerchantAccount::Status::VERSION = '1.1';
+$WebService::Braintree::MerchantAccount::Status::VERSION = '1.2';
 use 5.010_001;
     use strictures 1;
 
@@ -84,84 +80,13 @@ use 5.010_001;
 
 {
     package WebService::Braintree::MerchantAccount::FundingDestination;
-$WebService::Braintree::MerchantAccount::FundingDestination::VERSION = '1.1';
+$WebService::Braintree::MerchantAccount::FundingDestination::VERSION = '1.2';
 use 5.010_001;
     use strictures 1;
 
     use constant Bank => "bank";
     use constant Email => "email";
     use constant MobilePhone => "mobile_phone";
-}
-
-=head1 OBJECT METHODS
-
-In addition to the methods provided by the keys returned from Braintree, this
-class provides the following methods:
-
-=head2 master_merchant_account()
-
-This returns the master merchant account (if it exists). It will be a
-L<WebService::Braintree::MerchantAccount> object.
-
-=cut
-
-has master_merchant_account => (is => 'rw');
-
-=head2 individual_details()
-
-This returns the individual details of this merchant account (if they exist). It
-will be a L<WebService::Braintree::MerchantAccount::IndividualDetails> object.
-
-=cut
-
-has individual_details => (is => 'rw');
-
-=head2 business_details()
-
-This returns the business details of this merchant account (if they exist). It
-will be a L<WebService::Braintree::MerchantAccount::BusinessDetails> object.
-
-=cut
-
-has business_details => (is => 'rw');
-
-=head2 funding_details()
-
-This returns the funding details of this merchant account (if they exist). It
-will be a L<WebService::Braintree::MerchantAccount::FundingDetails> object.
-
-=cut
-
-has funding_details => (is => 'rw');
-
-sub BUILD {
-    my ($self, $attrs) = @_;
-
-    $self->build_sub_object($attrs,
-        method => 'master_merchant_account',
-        class  => 'MerchantAccount',
-        key    => 'master_merchant_account',
-    );
-
-    $self->build_sub_object($attrs,
-        method => 'individual_details',
-        class  => 'MerchantAccount::IndividualDetails',
-        key    => 'individual',
-    );
-
-    $self->build_sub_object($attrs,
-        method => 'business_details',
-        class  => 'MerchantAccount::BusinessDetails',
-        key    => 'business',
-    );
-
-    $self->build_sub_object($attrs,
-        method => 'funding_details',
-        class  => 'MerchantAccount::FundingDetails',
-        key    => 'funding',
-    );
-
-    $self->set_attributes_from_hash($self, $attrs);
 }
 
 __PACKAGE__->meta->make_immutable;

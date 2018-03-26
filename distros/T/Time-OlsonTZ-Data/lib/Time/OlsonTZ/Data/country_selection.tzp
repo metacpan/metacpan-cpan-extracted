@@ -3429,7 +3429,7 @@ use strict;
 		olson_name => "Uruguay",
 		regions => {
 			"" => {
-				location_coords => "-3453-05611",
+				location_coords => "-345433-0561245",
 				olson_description => "",
 				timezone_name => "America/Montevideo",
 			},

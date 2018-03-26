@@ -1,5 +1,9 @@
 Revision history for Rarbg-torrentapi
 
+v0.1.7  2018-03-22 13:31:57 CET
+        - torrentapi time request limit was making the module crash ...
+          Also, the token validity is better tested now.
+
 v0.1.6  2018-03-21 16:16:44 CET
         - Torrentapi now needs app_id.
 

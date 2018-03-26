@@ -894,25 +894,16 @@ sub _get_file_list {
 sub _get_file_obj {
     my $self = shift;
     my $file = shift;
-    if (my $ref = ref($file)) {
-        if ($ref eq 'ARRAY') {
-            return $self->_generate_file( @$file );
-        }
-        elsif (blessed $file && $file->isa("HPCI::File")) {
-            return $file;
-        }
-        else {
-            $self->_croak( "Element in files attribute is not a pathname, a pathname plus args array, or a HPCI::File (sub)class. Type is $ref, value is $file" )
-        }
-    }
-    else {
-        return $self->_generate_file( $file );
-    }
+    return $self->_generate_file( ref($file) eq 'ARRAY' ? @$file : $file );
 }
 
 sub _generate_file {
     my $self = shift;
-    my $path = File::Spec->rel2abs(shift);
+    my $file = shift;
+    if (blessed $file && $file->isa("HPCI::File")) {
+        return $file;
+    }
+    my $path = File::Spec->rel2abs("$file");
     # TODO: add search through storage_classes list here
     my $known = $self->_file_info->{$path} //= {};
     return $known->{file} //= $self->storage_class->(

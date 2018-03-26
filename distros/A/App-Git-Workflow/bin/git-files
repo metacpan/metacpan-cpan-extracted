@@ -20,7 +20,7 @@ git-files - Get information on files changed across branches.
 
 =head1 VERSION
 
-This documentation refers to git-files version 1.0.4
+This documentation refers to git-files version 1.0.5
 
 =head1 SYNOPSIS
 

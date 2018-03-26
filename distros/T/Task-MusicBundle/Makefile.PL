@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
     "App::MusicTools" => 0,
     "Csound" => 0,
     "File::Format::RIFF" => 0,
+    "Guitar::Scale" => 0,
     "MIDI" => 0,
     "MIDI::Drummer::Tiny" => 0,
     "MIDI::Morph" => 0,
@@ -66,7 +67,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.12",
+  "VERSION" => "0.13",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -80,6 +81,7 @@ my %FallbackPrereqs = (
   "Csound" => 0,
   "File::Format::RIFF" => 0,
   "File::Spec" => 0,
+  "Guitar::Scale" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "MIDI" => 0,

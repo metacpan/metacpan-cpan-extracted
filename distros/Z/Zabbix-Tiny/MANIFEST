@@ -17,5 +17,7 @@ t/000_compile.t
 t/010_test_lwp_useragent.t
 t/020_apiinfo.version.t
 t/030_empty_response.t
+t/040_wrong_url.t
+t/050_demolish.t
 META.yml
 MANIFEST

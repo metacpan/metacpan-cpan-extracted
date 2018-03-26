@@ -11,7 +11,7 @@ use Carp;
 
 use namespace::autoclean;
 
-our $VERSION = '1.004';
+our $VERSION = '1.006';
 
 1;
 

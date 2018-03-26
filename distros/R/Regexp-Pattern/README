@@ -1,84 +1,277 @@
+NAME
+    Regexp::Pattern - Collection of regexp patterns
+
+SPECIFICATION VERSION
+    0.2.0
+
+VERSION
+    This document describes version 0.2.2 of Regexp::Pattern (from Perl
+    distribution Regexp-Pattern), released on 2018-03-24.
+
 SYNOPSIS
+    Subroutine interface:
 
      use Regexp::Pattern; # exports re()
-    
+
      my $re = re('YouTube::video_id');
      say "ID does not look like a YouTube video ID" unless $id =~ /\A$re\z/;
-    
+
      # a dynamic pattern (generated on-demand) with generator arguments
      my $re2 = re('Example::re3', {variant=>"B"});
 
-SPECIFICATION VERSION
+    Hash interface (a la Regexp::Common but simpler with regular/non-magical
+    hash that is only 1-level deep):
 
-    0.1.0
+     use Regexp::Pattern 'YouTube::video_id';
+     say "ID does not look like a YouTube video ID"
+         unless $id =~ /\A$RE{video_id}\z/;
+
+     # more complex example
+
+     use Regexp::Pattern (
+         're',                                # we still want the re() function
+         'Foo::bar' => (-as => 'qux'),        # the pattern will be in your $RE{qux}
+         'YouTube::*',                        # wildcard import
+         'Example::re3' => (variant => 'B'),  # supply generator arguments
+         'JSON::*' => (-prefix => 'json_'),   # add prefix
+         'License::*' => (
+           -has_tag    => 'family:cc',        # select by tag
+           -lacks_tag  => 'type:unversioned', #   also select by lack of tag
+           -suffix     => '_license',         #   also add suffix
+         ),
+     );
 
 DESCRIPTION
-
     Regexp::Pattern is a convention for organizing reusable regexp patterns
-    in modules.
+    in modules, as well as framework for some convenience in using those
+    patterns in your program.
 
- Structure of an example Regexp::Pattern::* module
-
+  Structure of an example Regexp::Pattern::* module
      package Regexp::Pattern::Example;
 
-    # INSERT_BLOCK: lib/Regexp/Pattern/Example.pm def pod_verbatim
+ 
+     our %RE = (
+         # the minimum spec
+         re1 => { pat => qr/\d{3}-\d{4}/ },
+ 
+         # more complete spec
+         re2 => {
+             summary => 'This is regexp for blah',
+             description => <<'_',
+ 
+     A longer description.
+ 
+     _
+             pat => qr/.../,
+             tags => ['A','B'],
+         },
+ 
+         # dynamic (regexp generator)
+         re3 => {
+             summary => 'This is a regexp for blah blah',
+             description => <<'_',
+ 
+     ...
+ 
+     _
+             gen => sub {
+                 my %args = @_;
+                 my $variant = $args{variant} || 'A';
+                 if ($variant eq 'A') {
+                     return qr/\d{3}-\d{3}/;
+                 } else { # B
+                     return qr/\d{3}-\d{2}-\d{5}/;
+                 }
+             },
+             gen_args => {
+                 variant => {
+                     summary => 'Choose variant',
+                     schema => ['str*', in=>['A','B']],
+                     default => 'A',
+                     req => 1,
+                 },
+             },
+             tags => ['B','C'],
+         },
+     );
 
     A Regexp::Pattern::* module must declare a package global hash variable
-    named %RE. Hash keys are pattern names, hash values are defhashes (see
-    DefHash). At the minimum, it should be:
+    named %RE. Hash keys are pattern names, hash values are pattern
+    definitions in the form of defhashes (see DefHash).
 
-     { pat => qr/.../ },
+    Pattern name should be a simple identifier that matches this regexp:
+    "/\A[A-Za-z_][A-Za-z_0-9]*\z/". The definition for the qualified pattern
+    name "Foo::Bar::baz" can then be located in
+    %Regexp::Pattern::Foo::Bar::RE under the hash key "baz".
 
-    Regexp pattern should be written as qr// literal, or (less desirable)
-    as a string literal. Regexp should not be anchored (qr/^...$/) unless
-    necessary. Regexp should not contain capture groups unless necessary.
+    Pattern definition hash should at the minimum be:
 
- Using a Regexp::Pattern::* module
+     { pat => qr/.../ }
 
-    A Regexp::Pattern::* module can be used manually by itself, as it
-    contains simply data that can be grabbed using a normal means, e.g.:
+    You can add more stuffs from the defhash specification, e.g. summary,
+    description, tags, and so on, for example (taken from
+    Regexp::Pattern::CPAN):
+
+     {
+         summary     => 'PAUSE author ID, or PAUSE ID for short',
+         pat         => qr/[A-Z][A-Z0-9]{1,8}/,
+         description => <<_,
+
+    I'm not sure whether PAUSE allows digit for the first letter. For safety
+    I'm assuming no.
+
+    _ }
+
+  Using a Regexp::Pattern::* module
+   Standalone
+    A Regexp::Pattern::* module can be used in a standalone way (i.e. no
+    need to use via the Regexp::Pattern framework), as it simply contains
+    data that can be grabbed using a normal means, e.g.:
 
      use Regexp::Pattern::Example;
-    
+
      say "Input does not match blah"
          unless $input =~ /\A$Regexp::Pattern::Example::RE{re1}{pat}\z/;
 
-    Regexp::Pattern (this module) also provides re() function to help
-    retrieve the regexp pattern.
+   Via Regexp::Pattern, sub interface
+    Regexp::Pattern (this module) also provides "re()" function to help
+    retrieve the regexp pattern. See "re" for more details.
+
+   Via Regexp::Pattern, hash interface
+    Additionally, Regexp::Pattern (since v0.2.0) lets you import regexp
+    patterns into your %RE package hash variable, a la Regexp::Common (but
+    simpler because the hash is just a regular hash, only 1-level deep, and
+    not magical).
+
+    To import, you specify qualified pattern names as the import arguments:
+
+     use Regexp::Pattern 'Q::pat1', 'Q::pat2', ...;
+
+    Each qualified pattern name can optionally be followed by a list of
+    name-value pairs. A pair name can be an option name (which is dash
+    followed by a word, e.g. "-as", "-prefix") or a generator argument name
+    for dynamic pattern.
+
+    Wildcard import. Instead of a qualified pattern name, you can use
+    'Module::SubModule::*' wildcard syntax to import all patterns from a
+    pattern module.
+
+    Importing into a different name. You can add the import option "-as" to
+    import into a different name, for example:
+
+     use Regexp::Pattern 'YouTube::video_id' => (-as => 'yt_id');
+
+    Prefix and suffix. You can also add a prefix and/or suffix to the
+    imported name:
+
+     use Regexp::Pattern 'Example::*' => (-prefix => 'example_');
+     use Regexp::Pattern 'Example::*' => (-suffix => '_sample');
+
+    Filtering. When wildcard-importing, you can select the patterns you want
+    using a combination of these options: "-has_tag" (only select patterns
+    that have a specified tag), "-lacks_tag" (only select patterns that do
+    not have a specified tag).
+
+  Recommendations for writing the regex patterns
+    *   Regexp pattern should be written as a "qr//" literal
+
+        Using a string literal is less desirable. That is:
+
+         pat => qr/foo[abc]+/,
+
+        is preferable over:
+
+         pat => 'foo[abc]+',
+
+    *   Regexp pattern should not be anchored (unless really necessary)
+
+        That is:
+
+         pat => qr/foo/,
+
+        is preferable over:
+
+         pat => qr/^foo/, # or qr/foo$/, or qr/\Afoo\z/
+
+        Adding anchors limits the reusability of the pattern. When composing
+        pattern, user can add anchors herself if needed.
+
+        When you define an anchored pattern, adding tag "anchored" is
+        recommended:
+
+         tags => ['anchored'],
+
+    *   Regexp pattern should not contain capture groups (unless really
+        necessary)
+
+        Adding capture groups limits the reusability of the pattern because
+        it can affect the groups of the composed pattern. When composing
+        pattern, user can add captures herself if needed.
+
+    *   Regexp pattern should not contain modifiers unless necessary
+
+        An exception to this rule is the /x modifier which is usually
+        recommended for longer patterns.
 
 FUNCTIONS
-
- re
-
+  re
     Exported by default. Get a regexp pattern by name from a
-    Regexp::Pattern::* module.
+    "Regexp::Pattern::*" module.
 
-    Syntax:
+    Usage:
 
      re($name[, \%args ]) => $re
 
-    $name is MODULE_NAME::PATTERN_NAME where MODULE_NAME is name of a
-    Regexp::Pattern::* module without the Regexp::Pattern:: prefix and
-    PATTERN_NAME is a key to the %RE package global hash in the module. A
-    dynamic pattern can accept arguments for its generator, and you can
-    pass it as hashref in the second argument of re().
+    $name is *MODULE_NAME::PATTERN_NAME* where *MODULE_NAME* is name of a
+    "Regexp::Pattern::*" module without the "Regexp::Pattern::" prefix and
+    *PATTERN_NAME* is a key to the %RE package global hash in the module. A
+    dynamic pattern can accept arguments for its generator, and you can pass
+    it as hashref in the second argument of "re()".
 
-    Die when pattern by name $name cannot be found (either the module
-    cannot be loaded or the pattern with that name is not found in the
-    module).
+    Die when pattern by name $name cannot be found (either the module cannot
+    be loaded or the pattern with that name is not found in the module).
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Regexp::Common. Regexp::Pattern is an alternative to Regexp::Common.
-    Regexp::Pattern offers simplicity and lower startup overhead. Instead
-    of a magic hash, you retrieve available regexes from normal data
-    structure or via the provided re() function.
+    Regexp::Pattern offers simplicity and lower startup overhead. Instead of
+    a magic hash, you retrieve available regexes from normal data structure
+    or via the provided "re()" function. Regexp::Pattern also provides a
+    hash interface, albeit the hash is not magic.
 
     Regexp::Common::RegexpPattern, a bridge module to use patterns in
-    Regexp::Pattern::* modules via Regexp::Common.
+    "Regexp::Pattern::*" modules via Regexp::Common.
 
     Regexp::Pattern::RegexpCommon, a bridge module to use patterns in
-    Regexp::Common::* modules via Regexp::Pattern.
+    "Regexp::Common::*" modules via Regexp::Pattern.
 
     App::RegexpPatternUtils
+
+    If you use Dist::Zilla: Dist::Zilla::Plugin::Regexp::Pattern,
+    Pod::Weaver::Plugin::Regexp::Pattern,
+    Dist::Zilla::Plugin::AddModule::RegexpCommon::FromRegexpPattern,
+    Dist::Zilla::Plugin::AddModule::RegexpPattern::FromRegexpCommon.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

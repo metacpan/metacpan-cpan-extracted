@@ -1,4 +1,8 @@
-Revision history for Dist-Zilla-Plugin-Regexp-Pattern
+0.003   2018-03-24 (PERLANCAR)
+
+	- Switch from (ab)using InstallTool phase to using AfterBuild phase
+	  to do our stuffs, to be compatible with DZP:StaticInstall.
+
 
 0.002   2016-12-31 (PERLANCAR)
 

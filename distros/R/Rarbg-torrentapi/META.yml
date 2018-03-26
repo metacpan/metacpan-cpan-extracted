@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/pacoesteban/Rarbg-torrentapi/issues
   homepage: https://github.com/pacoesteban/Rarbg-torrentapi
   repository: https://github.com/pacoesteban/Rarbg-torrentapi.git
-version: v0.1.6
+version: v0.1.7
 x_contributors:
   - 'Baptiste C <baptistecdr@users.noreply.github.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

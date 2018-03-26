@@ -1,0 +1,91 @@
+<xs:schema attributeFormDefault="unqualified"
+           elementFormDefault="qualified"
+           targetNamespace="http://www.npes.org/schema/ISO18620/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="TransferCurveSet">
+    <xs:complexType>
+      <xs:attribute type="xs:string" name="Creator" use="optional"/>
+      <xs:attribute type="xs:dateTime" name="CreationDate" use="optional"/>
+      <xs:attribute type="xs:string" name="OperatorName" use="optional"/>
+      <xs:attribute type="xs:string" name="PressName" use="optional"/>
+      <xs:attribute type="xs:string" name="MediaName" use="optional"/>
+      <xs:attribute type="xs:string" name="TransferCurveSetID" 
+                    use="optional"/>
+      <xs:attribute name="Side" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="Front" />
+            <xs:enumeration value="Back" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute type="xs:anyURI" name="MeasurementFile" use="optional"/>
+      <xs:sequence>
+        <xs:element name="FormPreparationDetails"
+                    maxOccurs="1"
+                    minOccurs="0">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute type="xs:string"
+                              name="Description"
+                              use="required"/>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:sequence>
+        <xs:element name="PrintingCondition"
+                    maxOccurs="1"
+                    minOccurs="0">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute type="xs:string"
+                              name="PrintingConditionID"
+                              use="optional"/>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:sequence>
+        <xs:element name="TransferCurve"
+                    maxOccurs="unbounded"
+                    minOccurs="1">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute type="xs:string"
+                              name="Separation"
+                              use="required"/>
+                <xs:attribute type="xs:NMTOKEN"
+                              name="TransferCurveID"
+                              use="optional"/>
+                <xs:attribute type="xs:integer"
+                              name="PrintingUnitNumber"
+                              use="optional"/>
+                <xs:attribute type="xs:string"
+                              name="Curve"
+                              use="required"/>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:sequence>
+        <xs:element name="NativePressResponse"
+                    maxOccurs="unbounded"
+                    minOccurs="0">
+          <Comment>This element when present may contain proprietary elements and attributes</Comment>
+      </xs:sequence>
+      <xs:sequence>
+        <xs:element name="CalibratedPressResponse"
+                    maxOccurs="unbounded"
+                    minOccurs="0">
+          <Comment>This element when present may contain proprietary elements and attributes</Comment>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

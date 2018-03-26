@@ -1,31 +1,42 @@
 ---
-abstract: 'Extract data from an HTML table'
+abstract: 'HTML::TableParser - Extract data from an HTML table'
 author:
-  - 'Diab Jerius (djerius@cpan.org)'
+  - 'Diab Jerius <djerius@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '6.59'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Test::More: '0.32'
 configure_requires:
-  CPAN::Meta: '0'
-  ExtUtils::MakeMaker: '6.59'
-dynamic_config: '0'
-generated_by: 'Module::Install version 1.16, CPAN::Meta::Converter version 2.150005'
-license: unknown
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: HTML-TableParser
 no_index:
   directory:
+    - eg
+    - examples
     - inc
+    - share
     - t
     - xt
+provides:
+  HTML::TableParser:
+    file: lib/HTML/TableParser.pm
+    version: '0.43'
+  HTML::TableParser::Table:
+    file: lib/HTML/TableParser/Table.pm
+    version: '0.43'
 requires:
   HTML::Entities: '0'
   HTML::Parser: '3.26'
-  perl: v5.8.1
 resources:
-  license: http://opensource.org/licenses/gpl-3.0.html
-  repository: http://bitbucket.org/djerius/html-tableparser
-version: '0.41'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-TableParser
+  repository: git://github.com/djerius/html-tableparser.git
+version: '0.43'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -57,7 +57,7 @@
          "web" : "https://github.com/perlancar/perl-JSON-Decode-Regexp"
       }
    },
-   "version" : "0.100",
+   "version" : "0.101",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

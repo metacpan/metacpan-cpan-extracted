@@ -1,5 +1,14 @@
 Revision history for Dezi-App
 
+0.015  25 March 2018
+  - Lots of packaging and test improvements, thanks to Paul Cochrane.
+
+0.014_02 21 March 2018
+  - test pull request challenge improvements, notably POD and tests.
+
+0.014_01 20 March 2018
+  - test pull request challenge improvements, notably move to Dist::Zilla
+
 0.014  01 Dec 2015
   - replace namespace::sweep with namespace::autoclean
 

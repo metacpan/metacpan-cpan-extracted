@@ -26,71 +26,73 @@ no_index:
 provides:
   Test::BDD::Cucumber::Definitions:
     file: lib/Test/BDD/Cucumber/Definitions.pm
-    version: '0.27'
+    version: '0.29'
   Test::BDD::Cucumber::Definitions::File:
     file: lib/Test/BDD/Cucumber/Definitions/File.pm
-    version: '0.27'
+    version: '0.29'
   Test::BDD::Cucumber::Definitions::File::In:
     file: lib/Test/BDD/Cucumber/Definitions/File/In.pm
-    version: '0.27'
+    version: '0.29'
   Test::BDD::Cucumber::Definitions::File::Ru:
     file: lib/Test/BDD/Cucumber/Definitions/File/Ru.pm
-    version: '0.27'
+    version: '0.29'
   Test::BDD::Cucumber::Definitions::HTTP:
     file: lib/Test/BDD/Cucumber/Definitions/HTTP.pm
-    version: '0.27'
+    version: '0.29'
   Test::BDD::Cucumber::Definitions::HTTP::In:
     file: lib/Test/BDD/Cucumber/Definitions/HTTP/In.pm
-    version: '0.27'
+    version: '0.29'
   Test::BDD::Cucumber::Definitions::HTTP::Ru:
     file: lib/Test/BDD/Cucumber/Definitions/HTTP/Ru.pm
-    version: '0.27'
+    version: '0.29'
   Test::BDD::Cucumber::Definitions::Struct:
     file: lib/Test/BDD/Cucumber/Definitions/Struct.pm
-    version: '0.27'
+    version: '0.29'
   Test::BDD::Cucumber::Definitions::Struct::In:
     file: lib/Test/BDD/Cucumber/Definitions/Struct/In.pm
-    version: '0.27'
+    version: '0.29'
   Test::BDD::Cucumber::Definitions::Struct::Ru:
     file: lib/Test/BDD/Cucumber/Definitions/Struct/Ru.pm
-    version: '0.27'
+    version: '0.29'
   Test::BDD::Cucumber::Definitions::TBCD::In:
     file: lib/Test/BDD/Cucumber/Definitions/TBCD/In.pm
-    version: '0.27'
+    version: '0.29'
   Test::BDD::Cucumber::Definitions::TBCD::Ru:
     file: lib/Test/BDD/Cucumber/Definitions/TBCD/Ru.pm
-    version: '0.27'
+    version: '0.29'
   Test::BDD::Cucumber::Definitions::Types:
     file: lib/Test/BDD/Cucumber/Definitions/Types.pm
-    version: '0.27'
+    version: '0.29'
   Test::BDD::Cucumber::Definitions::Validator:
     file: lib/Test/BDD/Cucumber/Definitions/Validator.pm
-    version: '0.27'
+    version: '0.29'
   Test::BDD::Cucumber::Definitions::Var:
     file: lib/Test/BDD/Cucumber/Definitions/Var.pm
-    version: '0.27'
+    version: '0.29'
   Test::BDD::Cucumber::Definitions::Var::In:
     file: lib/Test/BDD/Cucumber/Definitions/Var/In.pm
-    version: '0.27'
+    version: '0.29'
   Test::BDD::Cucumber::Definitions::Var::Ru:
     file: lib/Test/BDD/Cucumber/Definitions/Var/Ru.pm
-    version: '0.27'
+    version: '0.29'
   Test::BDD::Cucumber::Definitions::Zip:
     file: lib/Test/BDD/Cucumber/Definitions/Zip.pm
-    version: '0.27'
+    version: '0.29'
   Test::BDD::Cucumber::Definitions::Zip::In:
     file: lib/Test/BDD/Cucumber/Definitions/Zip/In.pm
-    version: '0.27'
+    version: '0.29'
   Test::BDD::Cucumber::Definitions::Zip::Ru:
     file: lib/Test/BDD/Cucumber/Definitions/Zip/Ru.pm
-    version: '0.27'
+    version: '0.29'
 requires:
   Archive::Zip: '0'
   Const::Fast: '0'
   Data::Printer: '0'
+  File::Slurper: '0'
   HTTP::Response: '0'
   HTTP::Tiny: '0'
   Hash::MultiValue: '0'
+  IO::Capture: '0'
   IO::String: '0'
   IPC::Run3: '0'
   JSON::Path: '0'
@@ -105,7 +107,7 @@ resources:
   bugtracker: https://github.com/ivanych/Test-BDD-Cucumber-Definitions/issues
   homepage: https://github.com/ivanych/Test-BDD-Cucumber-Definitions
   repository: git://github.com/ivanych/Test-BDD-Cucumber-Definitions.git
-version: '0.27'
+version: '0.29'
 x_contributors:
   - 'Mikhail Ivanov <m.ivanych@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

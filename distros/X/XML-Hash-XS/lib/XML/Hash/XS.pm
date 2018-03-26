@@ -7,7 +7,7 @@ use vars qw($VERSION @EXPORT @EXPORT_OK);
 use base 'Exporter';
 @EXPORT_OK = @EXPORT = qw( hash2xml xml2hash );
 
-$VERSION = '0.51';
+$VERSION = '0.52';
 
 require XSLoader;
 XSLoader::load('XML::Hash::XS', $VERSION);
@@ -311,7 +311,7 @@ Note: for 'LX' method following additional options are available:
 
 =back
 
-=head1 OBJECT_SERIALISATION(hash2xml)
+=head1 OBJECT SERIALISATION(hash2xml)
 
 =over 2
 
@@ -331,7 +331,30 @@ Example:
       <doc><foo bar="1"/></doc>
     </root>
 
-=item 2. When object has a "iternext" method ("NATIVE" method only)
+=item 2. When object has overloaded stringification
+
+In this case, the stringification method of object is invoked and result is directly encoded into XML.
+
+Example:
+
+    package Test {
+        use overload '""' => sub { shift->stringify }, fallback => 1;
+        sub new {
+            my ($class, $str) = @_;
+            bless { str => $str }, $class;
+        }
+        sub stringify {
+            shift->{str}
+        }
+    }
+    my $obj = Test->new('test string');
+    print hash2xml({ obj => $obj }, indent => 2, xml_decl => 0);
+    =>
+    <root>
+      <obj>test string</obj>
+    </root>
+
+=item 3. When object has a "iternext" method ("NATIVE" method only)
 
 In this case, the <iternext> method method will invoke a few times until the return value is not undefined.
 

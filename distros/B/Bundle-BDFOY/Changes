@@ -1,6 +1,15 @@
 Revision history for Perl module Bundle::BDFOY
 
-. 2017-03-31T20:23:39Z
+20180323 2018-03-22T18:17:19Z
+	* Update to Artistic License 2.0
+
+20170402 2018-03-22T18:13:12Z
+	* Distro fixups
+
+20180322 - 2018-03-22T18:08:29Z
+	* Switch to Artistic License 2.0
+
+20170402 - 2017-03-31T20:23:39Z
 	* So, this is embarrassing. Let's try that change again.
 
 20170401 - 2017-03-31T19:06:05Z

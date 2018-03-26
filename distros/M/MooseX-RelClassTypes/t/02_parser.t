@@ -72,6 +72,13 @@ use Test::More;
     has param => (is => 'rw', isa => 'Str');
 }
 
+use TestParser::AngleBK;
+use TestParser::RoundBK;
+use TestParser::AngleBK::RelPack;
+use RelPack::TestParser::AngleBK;
+use TestParser::RoundBK::RelPack;
+use RelPack::TestParser::RoundBK;
+
 
 foreach my $type ( qw(AngleBK RoundBK) ){
 

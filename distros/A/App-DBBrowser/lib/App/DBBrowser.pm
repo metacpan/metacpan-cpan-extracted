@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.006';
+our $VERSION = '2.008';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -19,6 +19,8 @@ use File::Which    qw( which );
 use Term::Choose     qw( choose );
 use Term::TablePrint qw( print_table );
 
+use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
+
 #use App::DBBrowser::AttachDB;    # 'require'-d
 use App::DBBrowser::Auxil;
 #use App::DBBrowser::CreateTable; # 'require'-d
@@ -28,6 +30,8 @@ use App::DBBrowser::Opt;
 use App::DBBrowser::OptDB;
 use App::DBBrowser::Table;
 
+
+use App::DBBrowser::Subqueries; ###
 
 BEGIN {
     decode_argv(); # not at the end of the BEGIN block if less than perl 5.16
@@ -84,13 +88,10 @@ sub __init {
     $sf->{i}{home_dir}         = $home;
     $sf->{i}{app_dir}          = $app_dir;
     $sf->{i}{file_settings}    = catfile $app_dir, 'general_settings.json';
-    $sf->{i}{conf_file_fmt}    = catfile $app_dir, 'config_%s.json';
-    $sf->{i}{input_files}      = catfile $app_dir, 'file_history.txt';
-    $sf->{i}{file_attached_db} = catfile $app_dir, 'SQLite_attached_DB.json';
     # check all info
 
     if ( ! eval {
-        my $obj_opt = App::DBBrowser::Opt->new( $sf->{i}, {} ); #
+        my $opt = App::DBBrowser::Opt->new( $sf->{i}, {} ); #
         my $help;
         GetOptions (
             'h|?|help' => \$help,
@@ -103,7 +104,7 @@ sub __init {
                     $sf->{i}{$key}{mouse} = $sf->{o}{table}{mouse};
                 }
             }
-            $sf->{o} = $obj_opt->set_options(); #
+            $sf->{o} = $opt->set_options(); #
             if ( defined $sf->{o}{table}{mouse} ) {
                 for my $key ( keys %{$sf->{i}} ) {
                     next if $key !~ /^lyt_/;
@@ -112,14 +113,14 @@ sub __init {
             }
         }
         else {
-            $sf->{o} = $obj_opt->read_config_files(); #
+            $sf->{o} = $opt->read_config_files(); #
         }
         1 }
     ) {
-        my $ax = App::DBBrowser::Auxil->new( $sf->{i}, {} );
+        my $ax = App::DBBrowser::Auxil->new( $sf->{i}, {}, {} );
         $ax->print_error_message( $@, 'Configfile/Options' );
-        my $obj_opt = App::DBBrowser::Opt->new( $sf->{i}, {} ); #
-        $sf->{o} = $obj_opt->defaults();
+        my $opt = App::DBBrowser::Opt->new( $sf->{i}, {} ); #
+        $sf->{o} = $opt->defaults();
         while ( $ARGV[0] && $ARGV[0] =~ /^-/ ) {
             my $arg = shift @ARGV;
             last if $arg eq '--';
@@ -138,7 +139,7 @@ sub run {
     my ( $sf ) = @_;
     $sf->__init();
     my $lyt_3 = Term::Choose->new( $sf->{i}{lyt_3} );
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o} );
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, {} );
     my $auto_one = 0;
 
     DB_PLUGIN: while ( 1 ) {
@@ -159,27 +160,28 @@ sub run {
         }
         $plugin = 'App::DBBrowser::DB::' . $plugin;
         $sf->{i}{plugin} = $plugin;
-        my $obj_db;
+        my $odb = App::DBBrowser::OptDB->new( $sf->{i}, $sf->{o} );
+        my $db_opt = $odb->read_db_config_files();
+        my $plui;
+        my $driver;
         if ( ! eval {
-            $obj_db = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
-            $sf->{i}{driver} = $obj_db->driver();
-            die "No database driver!" if ! $sf->{i}{driver};
+            $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
+            $driver = $plui->get_db_driver();
+            die "No database driver!" if ! $driver;
             1 }
         ) {
             $ax->print_error_message( $@, 'load plugin' );
             next DB_PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
             last DB_PLUGIN;
         }
-        my $driver = $sf->{i}{driver};
-        my $obj_o_db = App::DBBrowser::OptDB->new( $sf->{i}, $sf->{o} );
-        my $db_o = $obj_o_db->__read_db_config_files();
+
 
         # DATABASES
 
         my @databases;
         my ( $user_dbs, $sys_dbs ) = ( [], [] ); #
         if ( ! eval {
-            ( $user_dbs, $sys_dbs ) = $obj_db->databases( $obj_o_db->connect_parameter( $db_o ) );
+            ( $user_dbs, $sys_dbs ) = $plui->get_databases( $odb->connect_parameter( $db_opt ) );
             if ( $driver eq 'SQLite' ) {
                 @databases = ( @$user_dbs, $sf->{o}{G}{meta} ? @$sys_dbs : () );
             }
@@ -204,8 +206,8 @@ sub run {
 
         DATABASE: while ( 1 ) {
 
-            if ( $sf->{i}{redo_db} ) {
-                $db = delete $sf->{i}{redo_db};
+            if ( $sf->{redo_db} ) {
+                $db = delete $sf->{redo_db};
                 $db = '- ' . $db if $driver ne 'SQLite';
             }
             elsif ( @databases == 1 ) {
@@ -246,14 +248,14 @@ sub run {
                 delete $ENV{TC_RESET_AUTO_UP};
             }
             $db =~ s/^[-\ ]\s// if $driver ne 'SQLite';
-
+            my $db_string = 'DB: '. basename( $db ) . '';
             # DB-HANDLE
 
             my $dbh;
             if ( ! eval {
                 print $sf->{i}{clear_screen};
-                print 'DB: "'. basename( $db ) . '"' . "\n";
-                $dbh = $obj_db->db_handle( $db, $obj_o_db->connect_parameter( $db_o, $db) );
+                print $db_string . "\n";
+                $dbh = $plui->get_db_handle( $db, $odb->connect_parameter( $db_opt, $db) );
                 $sf->{i}{sep_char} = $dbh->get_info(41)  || '.'; # SQL_CATALOG_NAME_SEPARATOR
                 1 }
             ) {
@@ -265,7 +267,18 @@ sub run {
                 next DB_PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
                 last DB_PLUGIN;
             }
-            $sf->{i}{db_attached} = 0;
+            $sf->{d} = {
+                db       => $db,
+                dbh      => $dbh,
+                driver   => $dbh->{Driver}{Name},
+                user_dbs => $user_dbs,
+                sys_dbs  => $sys_dbs,
+            };
+            #if ( $sf->{o}{G}{subqueries} ) {
+            #    $sf->{i}{sq_file} = catfile $sf->{i}{app_dir}, 'subqueries.json';
+            #}
+            $sf->{i}{file_attached_db} = catfile $sf->{i}{app_dir}, 'attached_DB.json';
+            $sf->{db_attached} = 0;
             if ( $driver eq 'SQLite' && -s $sf->{i}{file_attached_db} ) {
                 my $h_ref = $ax->read_json( $sf->{i}{file_attached_db} );
                 my $attached_db = $h_ref->{$db} || [];
@@ -274,15 +287,15 @@ sub run {
                         my $stmt = sprintf "ATTACH DATABASE %s AS %s", $dbh->quote_identifier( $ref->[0] ), $dbh->quote( $ref->[1] );
                         $dbh->do( $stmt );
                     }
-                    $sf->{i}{db_attached} = 1;
-                    if ( ! exists $sf->{i}{backup_qtn} ) {
-                        $sf->{i}{backup_qtn} = $sf->{o}{G}{qualified_table_name};
+                    $sf->{db_attached} = 1;
+                    if ( ! exists $sf->{backup_qtn} ) {
+                        $sf->{backup_qtn} = $sf->{o}{G}{qualified_table_name};
                     }
                     $sf->{o}{G}{qualified_table_name} = 1;
                 }
             }
-            if ( exists $sf->{i}{backup_qtn} && ! $sf->{i}{db_attached} ) {
-                $sf->{o}{G}{qualified_table_name} = delete $sf->{i}{backup_qtn};
+            if ( exists $sf->{backup_qtn} && ! $sf->{db_attached} ) {
+                $sf->{o}{G}{qualified_table_name} = delete $sf->{backup_qtn};
             }
             $sf->{i}{stmt_history} = [];
 
@@ -291,7 +304,7 @@ sub run {
             my @schemas;
             my ( $user_schemas, $sys_schemas ) = ( [], [] );
             if ( ! eval {
-                ( $user_schemas, $sys_schemas ) = $obj_db->schemas( $dbh, $db );
+                ( $user_schemas, $sys_schemas ) = $plui->get_schemas( $dbh, $db );
                 @schemas = ( map( "- $_", @$user_schemas ), $sf->{o}{G}{meta} ? map( "  $_", @$sys_schemas ) : () );
                 1 }
             ) {
@@ -306,8 +319,8 @@ sub run {
             SCHEMA: while ( 1 ) {
 
                 my $schema;
-                if ( $sf->{i}{redo_schema} ) {
-                    $schema = delete $sf->{i}{redo_schema};
+                if ( $sf->{redo_schema} ) {
+                    $schema = delete $sf->{redo_schema};
                 }
                 elsif ( @schemas <= 1 ) {
                     $schema = $schemas[0];
@@ -343,22 +356,20 @@ sub run {
                     delete $ENV{TC_RESET_AUTO_UP};
                     $schema =~ s/^[-\ ]\s//;
                 }
+                $db_string = 'DB: '. basename( $db ) . ( @schemas > 1 ? '.' . $schema : '' ) . '';
+                $sf->{d}{schema}       = $schema;
+                $sf->{d}{user_schemas} = $user_schemas;
+                $sf->{d}{sys_schemas}  = $sys_schemas;
+                $sf->{d}{db_string}    = $db_string;
 
                 # TABLES
 
-                my $data = {
-                    db => $db,
-                    schema => $schema,
-                    user_dbs => $user_dbs,
-                    sys_dbs  => $sys_dbs,
-                    user_schemas => $user_schemas,
-                    sys_schemas  => $sys_schemas,
-                };
                 my @tables;
+                my ( $tables_info, $user_tables, $sys_tables );
                 if ( ! eval {
-                    ( $data->{tables}, $data->{user_tbls}, $data->{sys_tbls} ) = $sf->__tables_data( $dbh, $schema, $data );
-                    @tables = (                     map( "- $_", sort @{$data->{user_tbls}} ),
-                                $sf->{o}{G}{meta} ? map( "  $_", sort @{$data->{sys_tbls}} ) : () );
+                    ( $tables_info, $user_tables, $sys_tables ) = $sf->__tables_data( $schema );
+                    @tables = (                     map( "- $_", sort @$user_tables ),
+                                $sf->{o}{G}{meta} ? map( "  $_", sort @$sys_tables ) : () );
                     1 }
                 ) {
                     $ax->print_error_message( $@, 'Get table names' );
@@ -368,71 +379,80 @@ sub run {
                     next DB_PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
                     last DB_PLUGIN;
                 }
+                $sf->{d}{tables_info} = $tables_info;
+                $sf->{d}{user_tables} = $user_tables;
+                $sf->{d}{sys_tables}  = $sys_tables;
                 my $old_idx_tbl = 1;
 
                 TABLE: while ( 1 ) {
 
-                    my $db_string = 'DB: "'. basename( $db ) . ( @schemas > 1 ? '.' . $schema : '' ) . '"';
                     my ( $join, $union, $new, $db_setting ) = ( '  Join', '  Union', '  New', '  Database settings' );
                     my $hidden = $db_string;
-                    my $choices_table = [ $hidden, undef, @tables, $join, $union, $db_setting ]; # db_setting only if any
-                    my $back = $auto_one == 3 ? $sf->{i}{_quit} : $sf->{i}{_back};
-                    # Choose
-                    $ENV{TC_RESET_AUTO_UP} = 0;
-                    my $idx_tbl = $lyt_3->choose(
-                        $choices_table,
-                        { prompt => '', index => 1, default => $old_idx_tbl, undef => $back }
-                    );
-                    my $table = $choices_table->[$idx_tbl] if defined $idx_tbl;
-                    if ( ! defined $table ) {
-                        next SCHEMA         if @schemas                > 1;
-                        $dbh->disconnect();
-                        next DATABASE       if @databases              > 1;
-                        next DB_PLUGIN      if @{$sf->{o}{G}{plugins}} > 1;
-                        last DB_PLUGIN;
+                    my $table;
+                    if ( $sf->{redo_table} ) {
+                        $table = delete $sf->{redo_table};
                     }
-                    if ( $sf->{o}{G}{menu_memory} ) {
-                        if ( $old_idx_tbl == $idx_tbl && ! $ENV{TC_RESET_AUTO_UP} ) {
-                            $old_idx_tbl = 1;
-                            next TABLE;
+                    else {
+                        my $choices_table = [ $hidden, undef, @tables, $join, $union, $db_setting ]; # db_setting only if any
+                        my $back = $auto_one == 3 ? $sf->{i}{_quit} : $sf->{i}{_back};
+                        # Choose
+                        $ENV{TC_RESET_AUTO_UP} = 0;
+                        my $idx_tbl = $lyt_3->choose(
+                            $choices_table,
+                            { prompt => '', index => 1, default => $old_idx_tbl, undef => $back }
+                        );
+                        $table = $choices_table->[$idx_tbl] if defined $idx_tbl;
+                        if ( ! defined $table ) {
+                            next SCHEMA         if @schemas                > 1;
+                            $dbh->disconnect();
+                            next DATABASE       if @databases              > 1;
+                            next DB_PLUGIN      if @{$sf->{o}{G}{plugins}} > 1;
+                            last DB_PLUGIN;
                         }
-                        else {
-                            $old_idx_tbl = $idx_tbl;
+                        if ( $sf->{o}{G}{menu_memory} ) {
+                            if ( $old_idx_tbl == $idx_tbl && ! $ENV{TC_RESET_AUTO_UP} ) {
+                                $old_idx_tbl = 1;
+                                next TABLE;
+                            }
+                            else {
+                                $old_idx_tbl = $idx_tbl;
+                            }
                         }
+                        delete $ENV{TC_RESET_AUTO_UP};
                     }
-                    delete $ENV{TC_RESET_AUTO_UP};
                     if ( $table eq $db_setting ) {
                         my $changed;
                         if ( ! eval {
-                            my $obj_o_db = App::DBBrowser::OptDB->new( $sf->{i}, $sf->{o} );
-                            $changed = $obj_o_db->database_setting( $db );
+                            my $odb = App::DBBrowser::OptDB->new( $sf->{i}, $sf->{o} );
+                            $changed = $odb->database_setting( $db );
                             1 }
                         ) {
                             $ax->print_error_message( $@, 'Database settings' );
                             next TABLE;
                         }
                         if ( $changed ) {
-                            $sf->{i}{redo_db} = $db;
-                            $sf->{i}{redo_schema} = $schema;
+                            $sf->{redo_db} = $db;
+                            $sf->{redo_schema} = $schema;
                             $dbh->disconnect(); # reconnects
                             next DATABASE;
                         }
                         next TABLE;
                     }
                     if ( $table eq $hidden ) {
-                        my $old_idx_hdn = 0;
+                        my $old_idx_hdn = exists $sf->{old_idx_hdn} ? delete $sf->{old_idx_hdn} : 0;
 
                         HIDDEN: while ( 1 ) {
-                            my ( $create_table, $drop_table, $attach_databases, $detach_databases ) = (
-                                '- CREATE table', '- DROP   table', '- Attach DB', '- Detach DB'
+                            my ( $create_table, $drop_table, $attach_databases, $detach_databases, $edit_sq_file ) = (
+                                '- CREATE table', '- DROP   table', '- Attach DB', '- Detach DB', '  SQ-file'
                             );
                             my $choices_hidden = [ undef ];
                             push @$choices_hidden, $create_table if $sf->{o}{G}{create_table_ok};
                             push @$choices_hidden, $drop_table   if $sf->{o}{G}{drop_table_ok};
                             if ( $driver eq 'SQLite' ) {
                                 push @$choices_hidden, $attach_databases;
-                                push @$choices_hidden, $detach_databases if $sf->{i}{db_attached};
+                                push @$choices_hidden, $detach_databases if $sf->{db_attached};
                             }
+                            push @$choices_hidden, $edit_sq_file if $sf->{o}{G}{subqueries};
                             if ( @$choices_hidden == 0 ) {
                                 next TABLE;
                             }
@@ -456,116 +476,96 @@ sub run {
                                 }
                             }
                             delete $ENV{TC_RESET_AUTO_UP};
-                            if ( $choice eq $create_table || $choice eq $drop_table  ){
+                            if ( $choice eq $create_table || $choice eq $drop_table ) {
+                                require App::DBBrowser::CreateTable;
+                                my $ct = App::DBBrowser::CreateTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
                                 if ( $driver eq 'SQLite' ) {
                                     $dbh->disconnect();
-                                    $dbh = $obj_db->db_handle( $db, $obj_o_db->connect_parameter( $db_o, $db ) );
+                                    $dbh = $plui->get_db_handle( $db, $odb->connect_parameter( $db_opt, $db ) );
+                                    $sf->{d}{dbh} = $dbh; # new $dbh
                                 }
+                                my $changed;
                                 if ( $choice eq $create_table ) {
-                                    my $created;
-                                    if ( ! eval {
-                                        require App::DBBrowser::CreateTable;
-                                        my $obj_ct = App::DBBrowser::CreateTable->new( $sf->{i}, $sf->{o} );
-                                        $created = $obj_ct->create_new_table( $dbh, $data );
-                                        1 }
-                                    ) {
+                                    if ( ! eval { $changed = $ct->create_new_table(); 1 } ) {
                                         $ax->print_error_message( $@, 'Create table' );
                                         next HIDDEN;
                                     }
-                                    next HIDDEN if ! $created;
-                                    $sf->{i}{redo_schema} = $schema;
-                                    next SCHEMA;
                                 }
                                 elsif ( $choice eq $drop_table ) {
-                                    my $deleted;
-                                    if ( ! eval {
-                                        require App::DBBrowser::CreateTable;
-                                        my $obj_ct = App::DBBrowser::CreateTable->new( $sf->{i}, $sf->{o} );
-                                        $deleted = $obj_ct->delete_table( $dbh, $data );
-                                        1 }
-                                    ) {
+                                    if ( ! eval { $changed = $ct->delete_table(); 1 } ) {
                                         $ax->print_error_message( $@, 'Drop table' );
                                         next HIDDEN;
                                     }
-                                    next HIDDEN if ! $deleted;
-                                    $sf->{i}{redo_schema} = $schema;
-                                    next SCHEMA;
                                 }
+                                next HIDDEN if ! $changed;
+                                $sf->{old_idx_hdn} = $old_idx_hdn;
+                                $sf->{redo_table}  = $table;
+                                $sf->{redo_schema} = $schema;
+                                next SCHEMA;
+
                             }
-                            else {
+                            elsif ( $choice eq $attach_databases || $choice eq $detach_databases ) {
+                                require App::DBBrowser::AttachDB;
+                                my $att = App::DBBrowser::AttachDB->new( $sf->{i}, $sf->{o}, $sf->{d} );
+                                my $changed;
                                 if ( $choice eq $attach_databases ) {
-                                    my $changed;
-                                    if ( ! eval {
-                                        require App::DBBrowser::AttachDB;
-                                        my $att = App::DBBrowser::AttachDB->new( $sf->{i}, $sf->{o} );
-                                        $changed = $att->attach_db( $dbh, $data );
-                                        1 }
-                                    ) {
+                                    if ( ! eval { $changed = $att->attach_db(); 1 } ) {
                                         $ax->print_error_message( $@, 'Attach DB' );
                                         next HIDDEN;
                                     }
-                                    $sf->{i}{redo_schema} = $schema;
-                                    $sf->{i}{redo_db}     = $db;
-                                    $dbh->disconnect();
-                                    next DATABASE;
                                 }
                                 elsif ( $choice eq $detach_databases ) {
-                                    if ( ! eval {
-                                        require App::DBBrowser::AttachDB;
-                                        my $att = App::DBBrowser::AttachDB->new( $sf->{i}, $sf->{o} );
-                                        $att->detach_db( $dbh, $data );
-                                        1 }
-                                    ) {
+                                    if ( ! eval { $changed = $att->detach_db(); 1 } ) {
                                         $ax->print_error_message( $@, 'Detach DB' );
                                         next HIDDEN;
                                     }
-                                    $sf->{i}{redo_schema} = $schema;
-                                    $sf->{i}{redo_db}     = $db;
-                                    $dbh->disconnect();
-                                    next DATABASE;
                                 }
+                                next HIDDEN if ! $changed;
+                                $sf->{old_idx_hdn} = $old_idx_hdn;
+                                $sf->{redo_table}  = $table;
+                                $sf->{redo_schema} = $schema;
+                                $sf->{redo_db}     = $db;
+                                $dbh->disconnect();
+                                next DATABASE;
+                            }
+                            elsif ( $choice eq $edit_sq_file ) {
+                                my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
+                                $sq->edit_sq_file( $db );
                             }
                         }
                     }
                     my ( $qt_table, $qt_columns );
-                    if ( $table eq $join ) {
-                        $sf->{i}{multi_tbl} = 'join';
-                        if ( ! eval {
-                            require App::DBBrowser::Join_Union;
-                            my $obj_ju = App::DBBrowser::Join_Union->new( $sf->{i}, $sf->{o} );
-                            ( $qt_table, $qt_columns ) = $obj_ju->join_tables( $dbh, $data );
-                            1 }
-                        ) {
-                            $ax->print_error_message( $@, 'Join tables' );
-                            next TABLE;
+                    if ( $table eq $join || $table eq $union ) {
+                        require App::DBBrowser::Join_Union;
+                        my $ju = App::DBBrowser::Join_Union->new( $sf->{i}, $sf->{o}, $sf->{d} );
+                        if ( $table eq $join ) {
+                            $sf->{i}{multi_tbl} = 'join';
+                            if ( ! eval { ( $qt_table, $qt_columns ) = $ju->join_tables(); 1 } ) {
+                                $ax->print_error_message( $@, 'Join tables' );
+                                next TABLE;
+                            }
                         }
-                        next TABLE if ! defined $qt_table;
-                    }
-                    elsif ( $table eq $union ) {
-                        $sf->{i}{multi_tbl} = 'union';
-                        my $ok;
-                        if ( ! eval {
-                            require App::DBBrowser::Join_Union;
-                            my $obj_ju = App::DBBrowser::Join_Union->new( $sf->{i}, $sf->{o} );
-                            ( $qt_table, $qt_columns ) = $obj_ju->union_tables( $dbh, $data );
-                            1 }
-                        ) {
-                            $ax->print_error_message( $@, 'Union tables' );
-                            next TABLE;
+                        elsif ( $table eq $union ) {
+                            $sf->{i}{multi_tbl} = 'union';
+                            if ( ! eval { ( $qt_table, $qt_columns ) = $ju->union_tables(); 1 } ) {
+                                $ax->print_error_message( $@, 'Union tables' );
+                                next TABLE;
+                            }
                         }
                         next TABLE if ! defined $qt_table;
                     }
                     else {
                         $sf->{i}{multi_tbl} = '';
                         $table =~ s/^[-\ ]\s//;
-                        $qt_table = $ax->quote_table( $dbh, $data->{tables}{$table} );
+                        my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+                        $qt_table = $ax->quote_table( $sf->{d}{tables_info}{$table} );
                         my $sth = $dbh->prepare( "SELECT * FROM " . $qt_table . " LIMIT 0" );
                         $sth->execute() if $driver ne 'SQLite';
-                        $qt_columns = $ax->quote_simple_many( $dbh, $sth->{NAME} );
+                        $qt_columns = $ax->quote_simple_many( $sth->{NAME} );
                         $sth->finish();
                     }
                     #if ( ! eval {
-                    $sf->__browse_the_table( $dbh, $qt_table, $qt_columns );
+                    $sf->__browse_the_table( $qt_table, $qt_columns );
                     #    1 }
                     #) {
                     #    $ax->print_error_message( $@, 'Browse table' );
@@ -579,8 +579,8 @@ sub run {
 
 
 sub __browse_the_table {
-    my ( $sf, $dbh, $qt_table, $qt_columns ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o} );
+    my ( $sf, $qt_table, $qt_columns ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $sf->{i}{lock} = $sf->{o}{G}{lock_stmt};
     my $sql = {};
     $ax->reset_sql( $sql );
@@ -590,8 +590,8 @@ sub __browse_the_table {
     PRINT_TABLE: while ( 1 ) {
         my $all_arrayref;
         if ( ! eval {
-            my $obj_table = App::DBBrowser::Table->new( $sf->{i}, $sf->{o} );
-            ( $all_arrayref, $sql ) = $obj_table->on_table( $sql, $dbh );
+            my $tbl = App::DBBrowser::Table->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            ( $all_arrayref, $sql ) = $tbl->on_table( $sql );
             1 }
         ) {
             $ax->print_error_message( $@, 'Print table' );
@@ -609,9 +609,9 @@ sub __browse_the_table {
 
 
 sub __tables_data {
-    my ( $sf, $dbh, $schema ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o} );
-    my $driver = $sf->{i}{driver};
+    my ( $sf, $schema ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $driver = $sf->{d}{driver};
     my ( $user_tbls, $sys_tbls ) = ( [], [] );
     my $table_data = {};
     my ( $table_schem, $table_name );
@@ -624,14 +624,14 @@ sub __tables_data {
         $table_name  = 'TABLE_NAME';
     }
     my @keys = ( 'TABLE_CAT', $table_schem, $table_name, 'TABLE_TYPE' );
-    if ( $sf->{i}{db_attached} ) {
+    if ( $sf->{db_attached} ) {
         $schema = undef;
         # More than one schema if a SQLite database has databases attached
     }
-    my $sth = $dbh->table_info( undef, $schema, undef, undef );
+    my $sth = $sf->{d}{dbh}->table_info( undef, $schema, undef, undef );
     my $info = $sth->fetchall_arrayref( { map { $_ => 1 } @keys } );
     for my $href ( @$info ) {
-        my $table = defined $schema ? $href->{$table_name} : $ax->quote_table( $dbh, [ @{$href}{@keys} ] );
+        my $table = defined $schema ? $href->{$table_name} : $ax->quote_table( [ @{$href}{@keys} ] );
         if ( $href->{TABLE_TYPE} =~ /SYSTEM/ ) {
             #next if ! $sf->{add_metadata};
             next if $href->{$table_name} eq 'sqlite_temp_master';
@@ -662,7 +662,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.006
+Version 2.008
 
 =head1 DESCRIPTION
 

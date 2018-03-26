@@ -1,19 +1,18 @@
-package WebService::Braintree::GenericSearch;
-$WebService::Braintree::GenericSearch::VERSION = '1.1';
+# vim: sw=4 ts=4 ft=perl
+
+package # hide from pause
+    WebService::Braintree::GenericSearch;
+
 use 5.010_001;
 use strictures 1;
 
 use Moose;
-use WebService::Braintree::AdvancedSearch;
+extends 'WebService::Braintree::AdvancedSearch';
 
 my $field = WebService::Braintree::AdvancedSearchFields->new(metaclass => __PACKAGE__->meta);
 
 $field->text("id");
 $field->multiple_values("ids");
-
-sub to_hash {
-    WebService::Braintree::AdvancedSearch->search_to_hash(shift);
-}
 
 __PACKAGE__->meta->make_immutable;
 

@@ -1,5 +1,8 @@
-package WebService::Braintree::CreditCardVerificationGateway;
-$WebService::Braintree::CreditCardVerificationGateway::VERSION = '1.1';
+# vim: sw=4 ts=4 ft=perl
+
+package # hide from pause
+    WebService::Braintree::CreditCardVerificationGateway;
+
 use 5.010_001;
 use strictures 1;
 
@@ -17,11 +20,14 @@ use Carp qw(confess);
 
 has 'gateway' => (is => 'ro');
 
+use WebService::Braintree::_::CreditCardVerification;
+use WebService::Braintree::CreditCardVerificationSearch;
+
 sub find {
     my ($self, $id) = @_;
     confess "NotFoundError" unless validate_id($id);
     my $response = $self->gateway->http->get("/verifications/$id");
-    return WebService::Braintree::CreditCardVerification->new($response->{'verification'});
+    $self->_make_request("/verifications/$id", "get", undef)->verification;
 }
 
 sub search {
@@ -30,7 +36,7 @@ sub search {
     return $self->resource_collection({
         ids_url => "/verifications/advanced_search_ids",
         obj_url => "/verifications/advanced_search/",
-        inflate => [qw/credit_card_verifications verification CreditCardVerification/],
+        inflate => [qw/credit_card_verifications verification _::CreditCardVerification/],
         search => $block->(WebService::Braintree::CreditCardVerificationSearch->new),
     });
 }
@@ -41,7 +47,7 @@ sub all {
     return $self->resource_collection({
         ids_url => "/verifications/advanced_search_ids",
         obj_url => "/verifications/advanced_search/",
-        inflate => [qw/credit_card_verifications verification CreditCardVerification/],
+        inflate => [qw/credit_card_verifications verification _::CreditCardVerification/],
     });
 }
 

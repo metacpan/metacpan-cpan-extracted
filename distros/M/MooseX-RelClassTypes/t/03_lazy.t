@@ -220,6 +220,27 @@ use Test::More;
 }
 
 
+use LazyParent::Parent;
+use LazyParent::Child;
+use LazyParent::Parent::RelPack;
+use LazyParent::Child::RelPack;
+
+use LazyChild::Parent;
+use LazyChild::Child;
+use LazyChild::Parent::RelPack;
+use LazyChild::Child::RelPack;
+
+use LazyParam::Parent;
+use LazyParam::Child;
+use LazyParam::Parent::RelPack;
+use LazyParam::Child::RelPack;
+
+use LazyAll::Parent;
+use LazyAll::Child;
+use LazyAll::Parent::RelPack;
+use LazyAll::Child::RelPack;
+
+
 foreach my $project ( qw(Parent Child Param All) ){
 
     my $child_pack = "Lazy$project\::Child";

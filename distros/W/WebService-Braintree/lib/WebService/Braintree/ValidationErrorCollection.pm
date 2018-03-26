@@ -1,28 +1,26 @@
+# vim: sw=4 ts=4 ft=perl
+
 package WebService::Braintree::ValidationErrorCollection;
-$WebService::Braintree::ValidationErrorCollection::VERSION = '1.1';
+$WebService::Braintree::ValidationErrorCollection::VERSION = '1.2';
 use 5.010_001;
 use strictures 1;
 
 =head1 NAME
 
-WebService::Braintree::ValidationError
+WebService::Braintree::ValidationErrorCollection
 
 =head1 PURPOSE
 
-This class represents a collection of validation errors.
+This class represents a collection of L<validation errors|WebService::Braintree::ValidationError>.
+
+This class will only be created as part of a L<error response|WebService::Braintree::ErrorResult>.
 
 =cut
 
 use Moose;
 use WebService::Braintree::ValidationError;
 
-=head1 CLASS METHODS
-
-This class is B<NOT> an interface, so it does B<NOT> have any class methods.
-
-=cut
-
-=head1 OBJECT METHODS
+=head1 METHODS
 
 =cut
 

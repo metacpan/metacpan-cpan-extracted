@@ -1,3 +1,8 @@
+0.070   2018-03-23 (PERLANCAR)
+
+	- Relax version requirement (6.0.x -> 6.x).
+
+
 0.06    2017-07-10 (PERLANCAR)
 
 	- No functional changes.

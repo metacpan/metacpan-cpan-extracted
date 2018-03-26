@@ -1,5 +1,5 @@
 package Statocles::Template;
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 # ABSTRACT: A template object to pass around
 
 use Statocles::Base 'Class';
@@ -222,9 +222,11 @@ sub include {
     for my $store ( @{ $self->include_stores } ) {
         if ( $store->has_file( $path ) ) {
             if ( $render ) {
-                return $self->theme->build_template( $path, $store->read_file( $path ) );
+                return $self->theme->build_template(
+                    $path, $store->path->child( $path )->slurp_utf8,
+                );
             }
-            return $store->read_file( $path );
+            return $store->path->child( $path )->slurp_utf8;
         }
     }
 
@@ -299,7 +301,7 @@ Statocles::Template - A template object to pass around
 
 =head1 VERSION
 
-version 0.088
+version 0.089
 
 =head1 DESCRIPTION
 

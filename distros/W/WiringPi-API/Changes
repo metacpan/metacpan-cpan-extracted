@@ -1,5 +1,10 @@
 Revision history for Perl extension WiringPi::API.
 
+2.3615  2018-03-23
+        - added graceful exit from Makefile.PL if wiringPi header file is not
+          found (closes #33)(Thanks James Keenan for the report)
+        - EXPORT_TAGS POD did not include all tags (fixes #32)
+
 2.3614  2017-07-08
         - added t/15-wpi_to_gpio.t to test #12
         - exposed pwm_set_range(), had missed that one previously

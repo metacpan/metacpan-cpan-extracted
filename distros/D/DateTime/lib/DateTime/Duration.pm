@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.46';
+our $VERSION = '1.47';
 
 use Carp ();
 use DateTime;
@@ -272,17 +272,27 @@ sub _duration_object_from_args {
 
 sub subtract_duration { return $_[0]->add_duration( $_[1]->inverse ) }
 
-sub multiply {
-    my $self       = shift;
-    my $multiplier = shift;
+{
+    my $check = validation_for(
+        name   => '_check_multiply_params',
+        slurpy => 1,
+        params => [
+            { type => t('Int') },
+        ],
+    );
 
-    foreach my $u (@all_units) {
-        $self->{$u} *= $multiplier;
+    sub multiply {
+        my $self = shift;
+        my ($multiplier) = $check->(@_);
+
+        foreach my $u (@all_units) {
+            $self->{$u} *= $multiplier;
+        }
+
+        $self->_normalize_nanoseconds if $self->{nanoseconds};
+
+        return $self;
     }
-
-    $self->_normalize_nanoseconds if $self->{nanoseconds};
-
-    return $self;
 }
 
 sub compare {
@@ -352,7 +362,7 @@ DateTime::Duration - Duration objects for date math
 
 =head1 VERSION
 
-version 1.46
+version 1.47
 
 =head1 SYNOPSIS
 
@@ -552,7 +562,7 @@ object or an already-constructed duration object.
 
 =head2 $dur->multiply( $number )
 
-Multiplies each unit in the by the specified number.
+Multiplies each unit in the by the specified integer number.
 
 =head2 DateTime::Duration->compare( $duration1, $duration2, $base_datetime )
 

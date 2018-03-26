@@ -1,5 +1,8 @@
 Revision history for Perl extension App-BorgRestore
 
+3.0.0 2018-03-23T14:57:52Z
+	- No longer automatically enable --adhoc when cache is empty
+
 2.3.0 2018-02-06T15:58:36Z
 	- Add --list option to search for paths occuring in backups
 	- Warn if sqlite's memory cache is is filled during cache updates

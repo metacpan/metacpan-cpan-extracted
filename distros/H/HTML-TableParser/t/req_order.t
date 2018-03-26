@@ -30,15 +30,15 @@ sub header
 
 @reqs = (
           {
-	   colre => [ qr/NO MATCH POSSIBLE/ ],
-	  },
+           colre => [ qr/NO MATCH POSSIBLE/ ],
+          },
           {
-	   id => 'DEFAULT',
-	   start => \&start,
-	   hdr => \&header,
-	   row => \&row 
-	  },
-	) ;
+           id => 'DEFAULT',
+           start => \&start,
+           hdr => \&header,
+           row => \&row
+          },
+        ) ;
 
 
 my $html = 'data/ned.html';
@@ -50,7 +50,3 @@ $p->parse_file( 'data/ned.html' ) || die;
 
 ok( eq_array( $header, $columns ), "$html header" );
 ok( eq_array( $data->{Default}, \@parse_data ), "$html data" );
-
-
-
-

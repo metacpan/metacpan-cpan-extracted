@@ -1,11 +1,13 @@
 package Statocles::Document;
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 # ABSTRACT: Base class for all Statocles documents
 
 use Statocles::Base 'Class';
 with 'Statocles::Role::PageAttrs';
 use Statocles::Image;
 use Statocles::Util qw( derp );
+use YAML ();
+use JSON::PP qw( decode_json );
 
 #pod =attr path
 #pod
@@ -15,8 +17,8 @@ use Statocles::Util qw( derp );
 
 has path => (
     is => 'rw',
-    isa => Path,
-    coerce => Path->coercion,
+    isa => PagePath,
+    coerce => PagePath->coercion,
 );
 
 #pod =attr store
@@ -333,6 +335,126 @@ around BUILDARGS => sub {
     return $args;
 };
 
+#pod =method parse_content
+#pod
+#pod     my $doc = $class->parse_content(
+#pod         path => $path,
+#pod         store => $store,
+#pod         content => $content,
+#pod     );
+#pod
+#pod Construct a document the given content, with the given additional
+#pod attributes. Returns a new C<Statocles::Document> object.
+#pod
+#pod This parses the YAML or JSON frontmatter into the document's attributes,
+#pod putting the rest of the file after the YAML or JSON frontmatter in the
+#pod C<content> attribute.
+#pod
+#pod Custom document classes can override this method to change how file content is
+#pod parsed.
+#pod
+#pod =cut
+
+sub parse_content {
+    my ( $class, %args ) = @_;
+
+    my %doc;
+    my $content = delete $args{content} or die "Content is required";
+
+    my @lines = split /\n/, $content;
+    # YAML frontmatter
+    if ( @lines && $lines[0] =~ /^---/ ) {
+        shift @lines;
+
+        # The next --- is the end of the YAML frontmatter
+        my ( $i ) = grep { $lines[ $_ ] =~ /^---/ } 0..$#lines;
+
+        # If we did not find the marker between YAML and Markdown
+        if ( !defined $i ) {
+            die qq{Could not find end of YAML front matter (---)\n};
+        }
+
+        # Before the marker is YAML
+        eval {
+            %doc = %{ YAML::Load( join "\n", splice( @lines, 0, $i ), "" ) };
+        };
+        if ( $@ ) {
+            die qq{Error parsing YAML in "$args{path}"\n$@};
+        }
+
+        # Remove the last '---' mark
+        shift @lines;
+    }
+    # JSON frontmatter
+    elsif ( @lines && $lines[0] =~ /^{/ ) {
+        my $json;
+        if ( $lines[0] =~ /\}$/ ) {
+            # The JSON is all on a single line
+            $json = shift @lines;
+        }
+        else {
+            # The } on a line by itself is the last line of JSON
+            my ( $i ) = grep { $lines[ $_ ] =~ /^}$/ } 0..$#lines;
+            # If we did not find the marker between YAML and Markdown
+            if ( !defined $i ) {
+                die qq{Could not find end of JSON front matter (\})\n};
+            }
+            $json = join "\n", splice( @lines, 0, $i+1 );
+        }
+        eval {
+            %doc = %{ decode_json( $json ) };
+        };
+        if ( $@ ) {
+            die qq{Error parsing JSON: $@\n};
+        }
+    }
+
+    # The remaining lines are content
+    $doc{content} = join "\n", @lines, "";
+
+    delete $doc{path};
+    delete $doc{store};
+
+    return $class->new( %doc, %args );
+}
+
+#pod =method deparse_content
+#pod
+#pod     my $content = $doc->deparse_content;
+#pod
+#pod Deparse the document into a string ready to be stored in a file. This will
+#pod serialize the document attributes into YAML frontmatter, and place the content
+#pod after.
+#pod
+#pod =cut
+
+sub deparse_content {
+    my ( $self ) = @_;
+    my %data = %$self;
+    delete $data{ store };
+    delete $data{ path };
+    my $content = delete $data{content};
+
+    # Serialize date correctly
+    if ( exists $data{date} ) {
+        $data{date} = $data{date}->strftime('%Y-%m-%d %H:%M:%S');
+    }
+
+    # Don't save empty references
+    for my $hash_type ( qw( links images ) ) {
+        if ( exists $data{ $hash_type } && !keys %{ $data{ $hash_type } } ) {
+            delete $data{ $hash_type };
+        }
+    }
+    for my $array_type ( qw( tags ) ) {
+        if ( exists $data{ $array_type } && !@{ $data{ $array_type } } ) {
+            delete $data{ $array_type };
+        }
+    }
+
+    return YAML::Dump( \%data ) . "---\n". $content;
+}
+
 1;
 
 __END__
@@ -347,7 +469,7 @@ Statocles::Document - Base class for all Statocles documents
 
 =head1 VERSION
 
-version 0.088
+version 0.089
 
 =head1 DESCRIPTION
 
@@ -581,6 +703,34 @@ when the content is not using template directives.
 This can be also set in the application
 (L<Statocles::App/disable_content_template>), or for the entire site
 (L<Statocles::Site/disable_content_template>).
+
+=head1 METHODS
+
+=head2 parse_content
+
+    my $doc = $class->parse_content(
+        path => $path,
+        store => $store,
+        content => $content,
+    );
+
+Construct a document the given content, with the given additional
+attributes. Returns a new C<Statocles::Document> object.
+
+This parses the YAML or JSON frontmatter into the document's attributes,
+putting the rest of the file after the YAML or JSON frontmatter in the
+C<content> attribute.
+
+Custom document classes can override this method to change how file content is
+parsed.
+
+=head2 deparse_content
+
+    my $content = $doc->deparse_content;
+
+Deparse the document into a string ready to be stored in a file. This will
+serialize the document attributes into YAML frontmatter, and place the content
+after.
 
 =head1 SEE ALSO
 

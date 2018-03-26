@@ -3,7 +3,7 @@ package WiringPi::API;
 use strict;
 use warnings;
 
-our $VERSION = '2.3614';
+our $VERSION = '2.3615';
 
 require XSLoader;
 XSLoader::load('WiringPi::API', $VERSION);
@@ -583,6 +583,14 @@ See L<EXPORT_OK>
 =head2 :all
 
 Exports all available exportable functions.
+
+=head2 :perl
+
+Export only Perlish snake_case named version of the functions.
+
+=head2 :wiringPi
+
+Export only the C based camelCase version of the function names.
 
 =head1 FUNCTION TABLE OF CONTENTS
 

@@ -1,0 +1,8 @@
+Changes
+lib/Google/ContentAPI.pm
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/google-content-api.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -6,9 +6,7 @@ use Carp;
 use LWP;
 use JSON;
 
-use Data::Dumper;
-
-our $VERSION = "1.09";
+our $VERSION = "1.11";
 
 has 'server' => (
     is       => 'rw',
@@ -85,7 +83,10 @@ sub login {
     my $response = $ua->post( $url, @content_type, Content => $json );
 
     if ( $response->{_rc} !~ /2\d\d/ ) {
-        croak("$response->{_msg}");
+        my $error_message = "HTTP error ";
+        $error_message   .= "(code $response->{_rc}) ";
+        $error_message   .= $response->{_msg} // q{};
+        croak($error_message);
     }
 
     my $content = decode_json( $response->{_content} ) or die($!);
@@ -104,7 +105,6 @@ sub login {
 sub prepare {
     my $self   = shift;
     my $method = shift;
-    #my $id     = new String::Random;
     $self->{ id }++;
     if ($method) {
         $self->{zabbix_method} = $method;
@@ -187,6 +187,9 @@ sub DEMOLISH {
     my $ua        = $self->ua;
     my $auth      = $self->auth;
     my $url       = $self->server;
+	
+	return unless ($ua);
+	
     my $json_data = {
         jsonrpc => '2.0',
         id      => ++$self->{ id },
@@ -235,7 +238,7 @@ Zabbix::Tiny - A small module to eliminate boilerplate overhead when using the Z
   };
 
   $zabbix->prepare('host.get', $params);  # Prepare the query.
-  print $zabbix->prepared . "\n";         # Get the JSON query without actually executing it.
+  print $zabbix->json_prepared . "\n";    # Get the JSON query without actually executing it.
   my $host = $zabbix->do;                 # Execute the prepared query.
 
   # Alternately, the query can be prepared and executed in one step.
@@ -255,6 +258,7 @@ Zabbix::Tiny - A small module to eliminate boilerplate overhead when using the Z
   # Debugging methods:
   print "JSON request:\n" . $zabbix->json_request . "\n\n";   # Print the json data sent in the last request.
   print "JSON response:\n" . $zabbix->json_response . "\n\n"; # Print the json data received in the last response.
+  print "Prepared JSON:\n" . $zabbix->json_prepared . "\n\n"; # Print the JSON that will be sent if $zabbix->do is called.
   print "Auth is: ". $zabbix->auth . "\n";
 
   print "\$zabbix->last_response:\n";
@@ -326,6 +330,10 @@ Used to retrieve the last raw json message sent to the Zabbix server, including 
 
 Used to retrieve the last raw json message from the zabbix server,  including the "jsonrpc", "id", and "auth".
 
+=item my $json_prepared = $zabbix->json_prepared;
+
+Used to retrieve the raw json message ready to be sent to Zabbix server, including the "jsonrpc", "id" and "auth".
+
 =item my $verbose = $zabbix->last_response;
 
 Similar to json_response, but the last response message as a perl data structure (hashref).
@@ -344,7 +352,7 @@ Probably bugs.
 
 =head2 Untrusted Certificates
 
-In many cases it is expected that zabbix servers may be using self-signed or otherwise 'untrusted' certiifcates.  The ssl_opts argument in the constructor can be set to any valid values for LWP::UserAgent to disallow certificate checks.  For example:
+In many cases it is expected that zabbix servers may be using self-signed or otherwise 'untrusted' certificates.  The ssl_opts argument in the constructor can be set to any valid values for LWP::UserAgent to disallow certificate checks.  For example:
 
   use strict;
   use warnings;
@@ -364,7 +372,7 @@ In many cases it is expected that zabbix servers may be using self-signed or oth
 
 =head1 See Also
 
-Zabbix API Documentation: L<https://www.zabbix.com/documentation/3.0/manual/api>
+Zabbix API Documentation: L<https://www.zabbix.com/documentation/3.2/manual/api>
 
 =head1 COPYRIGHT
 
@@ -372,7 +380,7 @@ Zabbix::Tiny is Copyright (C) 2016, Ben Kaufman.
 
 =head1 License Information
 
-This module is free software; you can redistribute it and/or modify it under the same terms as Perl 5.20.3.
+This module is free software; you can redistribute it and/or modify it under the same terms as Perl 5.
 
 This program is distributed in the hope that it will be useful, but it is provided 'as is' and without any express or implied warranties.
 

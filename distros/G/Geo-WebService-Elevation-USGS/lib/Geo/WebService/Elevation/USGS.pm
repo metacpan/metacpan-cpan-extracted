@@ -123,7 +123,7 @@ use JSON;
 use LWP::UserAgent;
 use Scalar::Util 1.10 qw{ blessed looks_like_number };
 
-our $VERSION = '0.107';
+our $VERSION = '0.108';
 
 use constant BEST_DATA_SET => -1;
 use constant USGS_URL => 'http://nationalmap.gov/epqs/pqs.php';
@@ -378,7 +378,7 @@ sub is_valid {
     } elsif ($ref) {
 	croak "$ref reference not understood";
     }
-    return looks_like_number($ele) && $ele > -1e+300;
+    return defined( $ele ) && looks_like_number($ele) && $ele > -1e+300;
 }
 
 =head3 $eq = $eq->set($attribute => $value ...);

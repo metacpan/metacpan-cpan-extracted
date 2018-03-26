@@ -1,5 +1,8 @@
 Revision history for Map::Tube::NYC
 
+0.50  Fri Mar 23 18:05:00 2018
+      - Updated dependency on Map::Tube v3.45.
+
 0.49  Sat Feb 03 22:10:00 2018
       - Updated dependency on Map::Tube v3.44.
 

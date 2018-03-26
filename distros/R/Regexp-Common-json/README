@@ -1,0 +1,45 @@
+NAME
+    Regexp::Common::json - Regexp patterns to match JSON
+
+VERSION
+    This document describes version 0.001 of Regexp::Common::json (from Perl
+    distribution Regexp-Common-json), released on 2018-03-25.
+
+SYNOPSIS
+     use Regexp::Common qw/json/;
+
+     say "match" if $str =~ /\A$RE{json}{number}\z/;
+
+PATTERNS
+  number
+  string
+  array
+  object
+  value
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Common-json>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Common-json>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Common-json>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Regexp::Pattern::JSON
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

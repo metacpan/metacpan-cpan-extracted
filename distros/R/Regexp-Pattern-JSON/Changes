@@ -1,0 +1,10 @@
+0.002   2018-03-25 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention JSON::Decode::Regexp & Regexp::Common::json.
+
+
+0.001   2018-03-24 (PERLANCAR)
+
+        - First release, motivated by [RT#124874].

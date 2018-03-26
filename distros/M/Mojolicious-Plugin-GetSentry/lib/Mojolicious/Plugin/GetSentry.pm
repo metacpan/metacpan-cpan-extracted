@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::GetSentry;
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '1.1.2';
+our $VERSION = '1.1.4';
 
 use Data::Dump 'dump';
 use Devel::StackTrace::Extract;
@@ -36,6 +36,7 @@ has 'handlers' => sub {
         user_context        => sub { $self->user_context(@_) },
         request_context     => sub { $self->request_context(@_) },
         tags_context        => sub { $self->tags_context(@_) },
+        ignore              => sub { $self->ignore(@_) },
         on_error            => sub { $self->on_error(@_) },
     };
 };
@@ -83,7 +84,10 @@ sub hook_after_dispatch {
             # 2-second period, we want the logger to ignore it.
             $self->pending->{ $exception } = 0 if defined $self->pending->{ $exception };
             
-            $self->handle('capture_request', $exception, $controller);
+            # Check if the exception should be ignored
+            if (!$self->handle('ignore', $exception)) {
+                $self->handle('capture_request', $exception, $controller);
+            }
         }
     });
 }
@@ -107,11 +111,14 @@ sub hook_on_message {
        
             $self->pending->{ $exception } = 1;
 
-            # Wait 2 seconds before we handle it; if the exception happened in
-            # a request we want the after_dispatch-hook to handle it instead.
-            Mojo::IOLoop->timer(2 => sub {
-                $self->handle('capture_message', $exception);
-            });
+            # Check if the exception should be ignored
+            if (!$self->handle('ignore', $exception)) {
+                # Wait 2 seconds before we handle it; if the exception happened in
+                # a request we want the after_dispatch-hook to handle it instead.
+                Mojo::IOLoop->timer(2 => sub {
+                    $self->handle('capture_message', $exception);
+                });
+            }
         }
     });
 }
@@ -171,10 +178,12 @@ sub capture_message {
 }
 
 =head2 stacktrace_context
-    $app->sentry->stacktrace_context($exception)
-    
-    Build the stacktrace context from current exception.
-    See also L<Sentry::Raven->stacktrace_context|https://metacpan.org/pod/Sentry::Raven#Sentry::Raven-%3Estacktrace_context(-$frames-)>
+
+$app->sentry->stacktrace_context($exception)
+
+Build the stacktrace context from current exception.
+See also L<Sentry::Raven->stacktrace_context|https://metacpan.org/pod/Sentry::Raven#Sentry::Raven-%3Estacktrace_context(-$frames-)>
+
 =cut
 
 sub stacktrace_context {
@@ -189,10 +198,10 @@ sub stacktrace_context {
 
 =head2 exception_context
 
-    $app->sentry->exception_context($exception)
-    
-    Build the exception context from current exception.
-    See also L<Sentry::Raven->exception_context|https://metacpan.org/pod/Sentry::Raven#Sentry::Raven-%3Eexception_context(-$value,-%25exception_context-)>
+$app->sentry->exception_context($exception)
+
+Build the exception context from current exception.
+See also L<Sentry::Raven->exception_context|https://metacpan.org/pod/Sentry::Raven#Sentry::Raven-%3Eexception_context(-$value,-%25exception_context-)>
 
 =cut
 
@@ -206,10 +215,10 @@ sub exception_context {
 
 =head2 user_context
 
-    $app->sentry->user_context($controller)
-    
-    Build the user context from current controller.
-    See also L<Sentry::Raven->user_context|https://metacpan.org/pod/Sentry::Raven#Sentry::Raven-%3Euser_context(-%25user_context-)>
+$app->sentry->user_context($controller)
+
+Build the user context from current controller.
+See also L<Sentry::Raven->user_context|https://metacpan.org/pod/Sentry::Raven#Sentry::Raven-%3Euser_context(-%25user_context-)>
 
 =cut
 
@@ -228,10 +237,10 @@ sub user_context {
 
 =head2 request_context
 
-    $app->sentry->request_context($controller)
+$app->sentry->request_context($controller)
 
-    Build the request context from current controller.
-    See also L<Sentry::Raven->request_context|https://metacpan.org/pod/Sentry::Raven#Sentry::Raven-%3Erequest_context(-$url,-%25request_context-)>
+Build the request context from current controller.
+See also L<Sentry::Raven->request_context|https://metacpan.org/pod/Sentry::Raven#Sentry::Raven-%3Erequest_context(-$url,-%25request_context-)>
 
 =cut
 
@@ -256,10 +265,10 @@ sub request_context {
 
 =head2 tags_context
     
-    $app->sentry->tags_context($controller)
+$app->sentry->tags_context($controller)
 
-    Add some tags to the context.
-    See also L<Sentry::Raven->3Emerge_tags|https://metacpan.org/pod/Sentry::Raven#$raven-%3Emerge_tags(-%25tags-)>
+Add some tags to the context.
+See also L<Sentry::Raven->3Emerge_tags|https://metacpan.org/pod/Sentry::Raven#$raven-%3Emerge_tags(-%25tags-)>
 
 =cut
 
@@ -271,11 +280,25 @@ sub tags_context {
     );
 }
 
+=head2 ignore
+    
+$app->sentry->ignore($exception)
+
+Check if the exception should be ignored.
+
+=cut
+
+sub ignore {
+    my ($self, $exception) = @_;
+
+    return 0;
+}
+
 =head2 on_error
     
-    $app->sentry->on_error($message, %context)
+$app->sentry->on_error($message, %context)
 
-    Handle reporting to Sentry error.
+Handle reporting to Sentry error.
 
 =cut
 
@@ -304,19 +327,167 @@ version 1.0
     # Mojolicious with config
     #
     $self->plugin('sentry' => {
+        # Required field
         sentry_dsn  => 'DSN',
+
+        # Not required
+        log_levels => ['error', 'fatal'],
         timeout     => 3,
         logger      => 'root',
         platform    => 'perl',
+
+        # And if you want to use custom handles
+        # this is how you do it
+        stacktrace_context => sub {
+            my ($sentry, $exception) = @_;
+
+            my $stacktrace = Devel::StackTrace::Extract::extract_stack_trace($exception);
+
+            $sentry->raven->add_context(
+                $sentry->raven->stacktrace_context($sentry->raven->_get_frames_from_devel_stacktrace($stacktrace))
+            );
+        },
+
+        exception_context => sub {
+            my ($sentry, $exception) = @_;
+
+            $sentry->raven->add_context(
+                $sentry->raven->exception_context($exception->message, type => ref($exception))
+            );
+        },
+
+        user_context => {
+            my ($sentry, $controller) = @_;
+
+            $sentry->raven->add_context(
+                $sentry->raven->user_context(
+                    id          => 1,
+                    ip_address  => '10.10.10.1',
+                )
+            );
+        },
+
+        request_context => sub {
+            my ($sentry, $controller) = @_;
+
+            if (defined($controller->req)) {
+                my $request_context = {
+                    method  => $controller->req->method,
+                    headers => $controller->req->headers->to_hash,
+                };
+
+                $sentry->raven->add_context(
+                    $sentry->raven->request_context($controller->url_for->to_abs, %$request_context)
+                );
+
+                return $request_context;
+            }
+
+            return {};
+        },
+
+        tags_context => sub {
+            my ($sentry, $controller) = @_;
+
+            $sentry->raven->merge_tags(
+                account => $controller->current_user->account_id,
+            );
+        },
+
+        ignore => sub {
+            my ($sentry, $exception) = @_;
+
+            return 1 if ($expection->message =~ /Do not log this error/);
+        },
+
+        on_error => sub {
+            my ($self, $message) = (shift, shift);
+
+            die "failed to submit event to sentry service:\n" . dump($sentry->raven->_construct_message_event($message, @_));
+        }
     });
 
     # Mojolicious::Lite
     #
     plugin 'sentry' => {
+        # Required field
         sentry_dsn  => 'DSN',
+
+        # Not required
+        log_levels => ['error', 'fatal'],
         timeout     => 3,
         logger      => 'root',
         platform    => 'perl',
+
+        # And if you want to use custom handles
+        # this is how you do it
+        stacktrace_context => sub {
+            my ($sentry, $exception) = @_;
+
+            my $stacktrace = Devel::StackTrace::Extract::extract_stack_trace($exception);
+
+            $sentry->raven->add_context(
+                $sentry->raven->stacktrace_context($sentry->raven->_get_frames_from_devel_stacktrace($stacktrace))
+            );
+        },
+
+        exception_context => sub {
+            my ($sentry, $exception) = @_;
+
+            $sentry->raven->add_context(
+                $sentry->raven->exception_context($exception->message, type => ref($exception))
+            );
+        },
+
+        user_context => {
+            my ($sentry, $controller) = @_;
+
+            $sentry->raven->add_context(
+                $sentry->raven->user_context(
+                    id          => 1,
+                    ip_address  => '10.10.10.1',
+                )
+            );
+        },
+
+        request_context => sub {
+            my ($sentry, $controller) = @_;
+
+            if (defined($controller->req)) {
+                my $request_context = {
+                    method  => $controller->req->method,
+                    headers => $controller->req->headers->to_hash,
+                };
+
+                $sentry->raven->add_context(
+                    $sentry->raven->request_context($controller->url_for->to_abs, %$request_context)
+                );
+
+                return $request_context;
+            }
+
+            return {};
+        },
+
+        tags_context => sub {
+            my ($sentry, $controller) = @_;
+
+            $sentry->raven->merge_tags(
+                account => $controller->current_user->account_id,
+            );
+        },
+
+        ignore => sub {
+            my ($sentry, $exception) = @_;
+
+            return 1 if ($expection->message =~ /Do not log this error/);
+        },
+
+        on_error {
+            my ($sentry, $method) = (shift, shift);
+
+            die "failed to submit event to sentry service:\n" . dump($sentry->raven->_construct_message_event($message, @_));
+        }
     };
 
 =head1 DESCRIPTION

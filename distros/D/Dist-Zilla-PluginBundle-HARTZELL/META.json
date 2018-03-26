@@ -5,43 +5,45 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dist-Zilla-PluginBundle-HARTZELL",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
+         "corpus",
          "examples",
-         "corpus"
+         "t",
+         "xt"
       ],
       "package" : [
          "DB"
       ]
    },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.3601"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.3601"
+            "ExtUtils::MakeMaker" : "6.17",
+            "perl" : "5.006"
          }
       },
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
             "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -111,20 +113,23 @@
             "Test::Pod::Coverage" : "0"
          },
          "requires" : {
-            "File::Find" : "0",
+            "File::Spec" : "0",
             "File::Temp" : "0",
-            "Test::More" : "0"
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
          }
       }
    },
    "provides" : {
       "Dist::Zilla::PluginBundle::HARTZELL" : {
          "file" : "lib/Dist/Zilla/PluginBundle/HARTZELL.pm",
-         "version" : "0.008"
+         "version" : "0.011"
       },
       "Pod::Weaver::PluginBundle::HARTZELL" : {
          "file" : "lib/Pod/Weaver/PluginBundle/HARTZELL.pm",
-         "version" : "0.008"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
@@ -139,6 +144,7 @@
          "web" : "https://github.com/hartzell/dist-zilla-pluginbundle-hartzell"
       }
    },
-   "version" : "0.008"
+   "version" : "0.011",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

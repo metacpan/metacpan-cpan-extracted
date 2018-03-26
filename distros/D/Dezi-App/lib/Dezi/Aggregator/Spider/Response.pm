@@ -11,7 +11,7 @@ use HTML::HeadParser;
 
 use namespace::autoclean;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 has 'http_response' => ( is => 'rw', isa => 'HTTP::Response' );
 has 'link_tags'     => ( is => 'rw', isa => 'HashRef' );
@@ -28,7 +28,7 @@ Dezi::Aggregator::Spider::Response - spider response
  my $ua = Dezi::Aggregator::Spider::UA->new;
  my $response = $ua->get('http://swish-e.org/');
  my $http_response = $response->http_response;
- 
+
  # $ua isa LWP::RobotUA subclass
  # $response isa Dezi::Aggregator::Spider::Response
  # $http_response isa HTTP::Response
@@ -233,7 +233,7 @@ sub title {
     return $p->header('Title');
 }
 
-# delegate all other method calls the the http_response object.
+# delegate all other method calls to the http_response object.
 # cribbed from HTTP::Message
 our $AUTOLOAD;
 
@@ -263,7 +263,7 @@ Peter Karman, E<lt>perl@peknet.comE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-swish-prog at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
@@ -298,10 +298,10 @@ L<http://search.cpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008-2009 by Peter Karman
+Copyright 2008-2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

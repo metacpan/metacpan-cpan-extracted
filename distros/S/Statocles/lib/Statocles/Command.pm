@@ -1,5 +1,5 @@
 package Statocles::Command;
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 # ABSTRACT: The statocles command-line interface
 
 use Statocles::Base 'Class';
@@ -573,7 +573,7 @@ sub bundle_theme {
                         }
 
                         $self->log->info( "Path '" . $event->path . "' changed... Rebuilding" );
-                        $_->clear for @{ $watches{ $path } };
+                        $_->can('clear') && $_->clear for @{ $watches{ $path } };
                         $rebuild = 1;
                     }
 
@@ -645,7 +645,7 @@ Statocles::Command - The statocles command-line interface
 
 =head1 VERSION
 
-version 0.088
+version 0.089
 
 =head1 SYNOPSIS
 

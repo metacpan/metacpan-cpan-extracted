@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/cli/tsv/util.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+scripts/colwidth
+scripts/colsplit
+scripts/colgrep
+scripts/latextable
+scripts/csv2tsv
+META.yml
+META.json

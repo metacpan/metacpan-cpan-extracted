@@ -2,7 +2,7 @@ package Mojolicious::Plugin::WebAPI::Proxy;
 
 # ABSTRACT: Proxy for WebAPI integration
 
-use Mojo::Base 'Mojo';
+use Mojo::Base 'Mojolicious';
 use Plack::Util;
 
 has 'script';
@@ -131,7 +131,7 @@ Mojolicious::Plugin::WebAPI::Proxy - Proxy for WebAPI integration
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 
@@ -139,7 +139,7 @@ Renee Baecker <reneeb@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 by Renee Baecker.
+This software is Copyright (c) 2018 by Renee Baecker.
 
 This is free software, licensed under:
 

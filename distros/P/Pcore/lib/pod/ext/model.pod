@@ -1,0 +1,59 @@
+=pod
+
+=encoding utf8
+
+=head1 ExtJS model
+
+=head1 read CSV
+
+=head2 define model class
+
+	sub EXT_model ( $ext ) {
+		return {
+			proxy => {
+				type         => 'direct',
+				batchActions => \0,
+
+				api => {    #
+					create => $ext->{api}->{'Customer/Contract/create'},
+					read => $ext->{api}->{'Customer/Contract/read'},
+					update => $ext->{api}->{'Customer/Contract/update'},
+					destroy => $ext->{api}->{'Customer/Contract/destroy'},
+				},
+			},
+
+			fields => [
+				{   name      => 'customer_id',
+					reference => {
+						type        => $ext->{class}->{'::Billing::Billing::Customer::model'},
+						association => 'customer_contracts',
+						role        => 'customer',
+						inverse     => 'contracts',
+					},
+					type => 'string',
+				},
+				{   name => 'enabled',
+					type => 'boolean',
+				},
+				{   name    => 'created',
+					type    => 'date',
+					persist => \0,
+				},
+				{   name    => 'full_address',
+					type    => 'string',
+					persist => \0,
+					calculate => $ext->js_func(
+						['data'], <<"JS"
+							return data.city + ', ' + data.street + ' ' + data.house + ', ' + data.apartment;
+	JS
+					),
+				},
+				{   name    => 'balance',
+					type    => 'number',
+					persist => \0,
+				},
+			],
+		};
+	}
+
+=cut

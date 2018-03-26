@@ -18,7 +18,6 @@ use WebService::Braintree::CreditCardNumbers::CardTypeIndicators;
 use WebService::Braintree::ErrorCodes::Transaction;
 use WebService::Braintree::ErrorCodes::Descriptor;
 use WebService::Braintree::CreditCardDefaults;
-use WebService::Braintree::Nonce;
 use WebService::Braintree::SandboxValues::Nonce;
 use WebService::Braintree::SandboxValues::TransactionAmount;
 use WebService::Braintree::Test;
@@ -35,6 +34,7 @@ my $params = {
     },
 };
 
+=pod
 my @examples = qw(credit sale);
 foreach my $method (@examples) {
     subtest "Successful Transaction for $method" => sub {
@@ -98,7 +98,7 @@ subtest "Custom Fields" => sub {
     });
     validate_result($result) or return;
 
-    is $result->transaction->custom_fields->store_me, "please!", "stores custom field value";
+    is $result->transaction->custom_fields->{store_me}, "please!", "stores custom field value";
 };
 
 subtest "Processor declined rejection" => sub {
@@ -1073,6 +1073,52 @@ subtest submit_for_partial_settlement => sub {
         invalidate_result($result) or return;
         is($result->errors->for('transaction')->on('order_id')->[0]->code, WebService::Braintree::ErrorCodes::Transaction::OrderIdIsTooLong);
     };
+};
+=cut
+
+subtest line_items => sub {
+    my $result = WebService::Braintree::Transaction->sale({
+        amount => amount(40, 60),
+        credit_card => credit_card(),
+        customer => { first_name => "Dan", last_name => "Smith" },
+        line_items => [
+            {
+                quantity => 1.0232,
+                name => 'Name #1',
+                description => 'Description #1',
+                kind => 'debit',
+                unit_amount => 45.1232,
+                unit_tax_amount => 1.23,
+                unit_of_measure => 'gallon',
+                discount_amount => 1.02,
+                total_amount => 45.15,
+                product_code => '23434',
+                commodity_code => '9SAASSD8724',
+                url => 'https://example.com/products/23434/',
+            },
+            {
+                quantity => 2.0232,
+                name => 'Name #2',
+                description => 'Description #2',
+                kind => 'debit',
+                unit_amount => 65.1232,
+                unit_tax_amount => 2.23,
+                unit_of_measure => 'quart',
+                discount_amount => 1.03,
+                total_amount => 45.16,
+                product_code => '23435',
+                commodity_code => '9SAASSD8725',
+                url => 'https://example.com/products/23435/',
+            },
+        ],
+    });
+    validate_result($result) or return;
+
+    my @items = $result->transaction->line_items;
+    cmp_ok(scalar(@items), '==', 2);
+
+    is($items[0]->description, 'Description #1');
+    is($items[1]->description, 'Description #2');
 };
 
 done_testing();

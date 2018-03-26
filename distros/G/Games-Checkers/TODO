@@ -1,7 +1,5 @@
-Things to possibly add in the future versions:
+Things to add in the future versions:
 
-* Support rules for all national Checkers variants on the 8x8 board.
-
-* Support gameplay on boards 10x10, 12x12, 14x14.
-
-* Add interactive play.
+* Add interactive play for 1 and 2 players.
+* Add auto draw condition rather than endless games.
+* Improve GUI.

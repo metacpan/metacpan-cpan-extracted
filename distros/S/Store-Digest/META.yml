@@ -1,7 +1,7 @@
 ---
 abstract: 'Store opaque data objects keyed on their cryptographic digests'
 author:
-  - 'Dorian Taylor, C<< <dorian at cpan.org> >>'
+  - 'Dorian Taylor, C<<dorian at cpan.org>>'
   - 'Dorian Taylor <dorian@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: 6.59
@@ -22,7 +22,7 @@ no_index:
     - inc
     - t
 requires:
-  BerkeleyDB: '0.51'
+  BerkeleyDB: '0.55'
   Class::Load: '0.23'
   DateTime: '0.70'
   DateTime::Format::HTTP: '0.40'
@@ -45,4 +45,4 @@ resources:
   homepage: https://github.com/doriantaylor/p5-store-digest
   license: http://www.apache.org/licenses/LICENSE-2.0
   repository: git://github.com/doriantaylor/p5-store-digest.git
-version: '0.03'
+version: '0.06'

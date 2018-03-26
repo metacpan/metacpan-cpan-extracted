@@ -1,0 +1,65 @@
+{
+   "abstract" : "tcp_connect with transparent proxy handling",
+   "author" : [
+      "Toshio Ito <toshioito@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-Connector",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg",
+         "inc",
+         "share"
+      ],
+      "file" : [
+         "README.pod",
+         "README.md"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42",
+            "Module::Build::Prereqs::FromCPANfile" : "0.02"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent::Handle" : "0",
+            "AnyEvent::Socket" : "0",
+            "URI" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent::Handle" : "0",
+            "AnyEvent::Socket" : "0",
+            "Net::EmptyPort" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/debug-ito/AnyEvent-Connector/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/debug-ito/AnyEvent-Connector.git",
+         "web" : "https://github.com/debug-ito/AnyEvent-Connector"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

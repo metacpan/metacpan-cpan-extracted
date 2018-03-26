@@ -1,5 +1,8 @@
-package WebService::Braintree::DigestSHA256;
-$WebService::Braintree::DigestSHA256::VERSION = '1.1';
+# vim: sw=4 ts=4 ft=perl
+
+package # hide from pause
+    WebService::Braintree::DigestSHA256;
+
 use 5.010_001;
 use strictures 1;
 

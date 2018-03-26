@@ -22,4 +22,11 @@ repository 'https://github.com/TJC/Test-postgresql';
 
 license 'artistic_2';
 
+add_metadata x_contributors => [
+    'Toby Corkindale',
+    'Kazuho Oku',
+    'Peter Mottram',
+    'Alex Tokarev <tokarev@cpan.org>',
+];
+
 WriteAll;

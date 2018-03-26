@@ -1,0 +1,46 @@
+.travis.yml
+Changes
+doc/algorithm.svg
+doc/algorithm.xml
+etc/netsync.ini
+lib/App/Netsync.pm
+lib/App/Netsync/Configurator.pm
+lib/App/Netsync/Network.pm
+lib/App/Netsync/Scribe.pm
+lib/App/Netsync/SNMP.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+script/netsync
+share/mib/ADSL-LINE-MIB.txt
+share/mib/ADSL-TC-MIB.txt
+share/mib/BGP4-MIB.txt
+share/mib/CISCO-IETF-IP-MIB.my
+share/mib/CISCO-SMI.my
+share/mib/CISCO-STACK-MIB.my
+share/mib/CISCO-TC.my
+share/mib/CISCO-VTP-MIB.my
+share/mib/ENTITY-MIB.txt
+share/mib/FDDI-SMT73-MIB.txt
+share/mib/FOUNDRY-SN-AGENT-MIB.mib
+share/mib/FOUNDRY-SN-ROOT-MIB.mib
+share/mib/FOUNDRY-SN-SWITCH-GROUP-MIB.mib
+share/mib/hphttpmg.mib
+share/mib/IF-MIB.txt
+share/mib/lldp.mib
+share/mib/lldp_dot1.mib
+share/mib/lldp_dot3.mib
+share/mib/OSPF-MIB.txt
+share/mib/P-BRIDGE-MIB.txt
+share/mib/PerfHist-TC-MIB.txt
+share/mib/POWER-ETHERNET-MIB.txt
+share/mib/Q-BRIDGE-MIB.txt
+share/mib/RMON2-MIB.txt
+share/mib/TOKEN-RING-RMON-MIB.txt
+t/00-load.t
+t/kwalitee.t
+t/manifest.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

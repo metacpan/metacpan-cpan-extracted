@@ -6,26 +6,6 @@ use Carp;
 use Dezi::Cache;
 use Data::Dump qw( dump );
 
-=head1 NAME
-
-Dezi::Test::InvIndex - test in-memory invindex
-
-=head1 METHODS
-
-=head2 term_cache
-
-=head2 doc_cache
-
-=head2 open
-
-=head2 search
-
-=head2 put_doc
-
-=head2 get_doc
-
-=cut
-
 # in memory invindex
 has 'term_cache' => (
     is      => 'rw',
@@ -100,6 +80,36 @@ __PACKAGE__->meta->make_immutable;
 
 1;
 
+=head1 NAME
+
+Dezi::Test::InvIndex - test in-memory invindex
+
+=head1 METHODS
+
+=head2 term_cache
+
+Accessor for the term cache.
+
+=head2 doc_cache
+
+Accessor for the document cache.
+
+=head2 open
+
+Currently a no-op.
+
+=head2 search($query)
+
+Search the document cache with the given query and return a hash of the hits found.
+
+=head2 put_doc($doc)
+
+Add the given document to the document cache.
+
+=head2 get_doc($uri)
+
+Return the document from the given URI.
+
 =head1 AUTHOR
 
 Peter Karman, E<lt>karpet@dezi.orgE<gt>
@@ -107,7 +117,7 @@ Peter Karman, E<lt>karpet@dezi.orgE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-dezi-app at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
@@ -152,10 +162,10 @@ L<https://metacpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2014 by Peter Karman
+Copyright 2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the terms of the GPL v2 or later.
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

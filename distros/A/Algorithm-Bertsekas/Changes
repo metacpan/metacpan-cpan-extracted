@@ -6,6 +6,10 @@ SYNOPSIS
 
 DESCRIPTION
 
+    Version 0.31 (Algorithm::Bertsekas-0.31 Released on 25th Mar 2018)
+		1. Added $ThdOptValForPersonI and $FthOptValForPersonI.
+		2. Updated README.
+		
     Version 0.30 (Algorithm::Bertsekas-0.30 Released on 21th Mar 2018)
 		1. improvements with the use of @objects_with_greater_benefits 
 		working sets that are updated dynamically by %most_wanted_object hash.

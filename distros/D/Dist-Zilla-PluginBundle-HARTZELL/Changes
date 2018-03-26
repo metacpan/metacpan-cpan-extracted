@@ -1,5 +1,19 @@
 Revision history for Dist-Zilla-PluginBundle-HARTZELL
 
+0.011     2018-03-24 11:49:00-07:00 America/Los_Angeles
+
+  * Don't exclude the cpanfile from [Git::GatherDir],
+    so that it gets included in the distribution.
+
+0.010     2018-03-23 16:39:45-07:00 America/Los_Angeles
+
+  * Include the CPANFile plugin.
+
+0.009     2018-03-23 14:38:19-07:00 America/Los_Angeles
+
+  * Switch from the Module::Build plugin to
+    MakeMaker.
+
 0.008     2013-01-30 15:01:13 America/Los_Angeles
 
   * add a POD section for Roles Consumed to the @HARTZELL weaver

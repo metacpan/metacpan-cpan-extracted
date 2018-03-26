@@ -310,7 +310,7 @@ sub exists_base_file {
 }
 
 sub exists_valid_sum {
-    my $self = shift;  # the file for $self must exists
+    my $self = shift;  # any needed sum file must exist or be creatable
     $self->sum or return 1;  # if sum is turned off, it is valid by default
     my $file  = $self->file;
     my $fts   = file_timestamp( $file );

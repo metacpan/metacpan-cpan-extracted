@@ -6,7 +6,7 @@ use Dezi::Aggregator::Mail;    # delegate doc creation
 use Carp;
 use Data::Dump qw( dump );
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 =pod
 
@@ -20,11 +20,11 @@ Dezi::Aggregator::MailFS - crawl a filesystem of email messages
  my $fs = Dezi::Aggregator::MailFS->new(
         indexer => Dezi::Indexer->new
     );
-    
+
  $fs->indexer->start;
  $fs->crawl( $path_to_mail );
  $fs->indexer->finish;
- 
+
 =head1 DESCRIPTION
 
 Dezi::Aggregator::MailFS is a subclass of Dezi::Aggregator::FS
@@ -106,7 +106,7 @@ sub file_ok {
 
 =head2 get_doc( I<url> )
 
-Overrides parent class to delegate the creation of the 
+Overrides parent class to delegate the creation of the
 Dezi::Indexer::Doc object to Dezi::Aggregator::Mail->get_doc().
 
 Returns a Dezi::Indexer::Doc object.
@@ -156,7 +156,7 @@ Peter Karman, E<lt>perl@peknet.comE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-swish-prog at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
@@ -195,10 +195,10 @@ L<http://search.cpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008-2009 by Peter Karman
+Copyright 2008-2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

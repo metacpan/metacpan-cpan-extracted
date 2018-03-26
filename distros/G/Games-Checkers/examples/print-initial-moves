@@ -1,31 +1,48 @@
 #!/usr/bin/perl
 
+# Just run the script.
+# Also try: COMPACT_BOARD=1 BOARD=random examples/print-initial-moves
+# Or: VARIANT=russian BOARD_SIZE=6 BOARD=5//4/8,18 EXPAND=1 examples/print-initial-moves
+
 use strict;
 use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
+use Games::Checkers::Board;
+use Games::Checkers::Rules;
 use Games::Checkers::Constants;
 use Games::Checkers::MoveConstants;
 use Games::Checkers::BoardTree;
 
-my $board = Games::Checkers::Board->new;
-my $color = White;
+my $board = Games::Checkers::Board->new($ENV{BOARD}, $ENV{BOARD_SIZE});
+my $color = $ENV{BLACK} ? Black : White;
+
+Games::Checkers::Rules::set_variant($ENV{VARIANT});
+
+my $move_counter = Games::Checkers::CountMoveList->new($board, $color);
+die "Internal problem" unless $move_counter->{status} == Ok;
+print "There are ", $move_counter->get_count, " possible initial moves.\n";
 
 my $board_node = Games::Checkers::BoardTreeNode->new($board, NO_MOVE);
+die "Internal problem" unless $board_node->expand($color) == Ok;
 
-my $counting_moves = Games::Checkers::CountMoveList->new($board, $color);
-die "Internal problem" unless $counting_moves->{status} == Ok;
-print "There are ", $counting_moves->get_count, " possible initial moves.\n";
+my $board_dump = $board->dump;
+my $expanded_nodes = $board_node->{sons};
+print $board_dump unless @$expanded_nodes;
 
-my $creating_moves = Games::Checkers::CreateMoveList->new($board_node, $color);
-die "Internal problem" unless $creating_moves->{status} == Ok;
+foreach (@$expanded_nodes) {
+	my $board = $_->{board};
+	my $score = $board->get_score($color = $color == White ? Black : White);
+	print $board->dump($board_dump, "$score " . $_->{move}->dump($board));
 
-print $board->dump;
+	if ($ENV{EXPAND}) {
+		my $board_tree = Games::Checkers::BoardTree->new($board, $color, $ENV{LEVEL});
+		my $move = $board_tree->choose_best_move;
 
-foreach (@{$board_node->{sons}}) {
-	print "-" x 78, "\n\n";
-	print "Move: ", $_->{move}->dump, "\n";
-	print $_->dump, "\n";
+		$board->apply_move($move);
+		$score = $board->get_score($color = $color == White ? Black : White);
+		print $board->dump(3, "$score " . $move->dump($board));
+	}
 }

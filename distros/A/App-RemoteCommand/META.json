@@ -4,7 +4,7 @@
       "Shoichi Kaji <skaji@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -47,6 +47,27 @@
          }
       }
    },
+   "provides" : {
+      "App::RemoteCommand" : {
+         "file" : "lib/App/RemoteCommand.pm",
+         "version" : "0.981"
+      },
+      "App::RemoteCommand::LineBuffer" : {
+         "file" : "lib/App/RemoteCommand/LineBuffer.pm"
+      },
+      "App::RemoteCommand::Pool" : {
+         "file" : "lib/App/RemoteCommand/Pool.pm"
+      },
+      "App::RemoteCommand::SSH" : {
+         "file" : "lib/App/RemoteCommand/SSH.pm"
+      },
+      "App::RemoteCommand::Select" : {
+         "file" : "lib/App/RemoteCommand/Select.pm"
+      },
+      "App::RemoteCommand::Util" : {
+         "file" : "lib/App/RemoteCommand/Util.pm"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -59,11 +80,11 @@
          "web" : "https://github.com/skaji/App-RemoteCommand"
       }
    },
-   "version" : "0.97",
+   "version" : "0.981",
    "x_contributors" : [
       "Shoichi Kaji <skaji@outlook.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
    "x_static_install" : 1
 }
 

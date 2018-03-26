@@ -1,12 +1,14 @@
 Changes
+lib/App/Scheme79asm.pm
+lib/App/Scheme79asm/Compiler.pm
 Makefile.PL
 MANIFEST
 README
 scheme79asm
 t/App-Scheme79asm.t
 t/Compiler.t
-lib/App/Scheme79asm.pm
-lib/App/Scheme79asm/Compiler.pm
+t/perlcritic.t
+t/perlcriticrc
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 SIGNATURE                                Public-key signature (added by MakeMaker)

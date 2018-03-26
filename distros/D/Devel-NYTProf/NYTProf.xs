@@ -24,11 +24,12 @@
 #include "NYTProf.h"
 
 #ifndef NO_PPPORT_H
+#define NEED_my_snprintf_GLOBAL
+#define NEED_newRV_noinc_GLOBAL
 #define NEED_eval_pv
 #define NEED_grok_number
 #define NEED_grok_numeric_radix
 #define NEED_newCONSTSUB
-#define NEED_newRV_noinc
 #define NEED_sv_2pv_flags
 #define NEED_newSVpvn_flags
 #define NEED_my_strlcat
@@ -2153,7 +2154,7 @@ incr_sub_inclusive_time(pTHX_ subr_entry_t *subr_entry)
     /* exclusive = inclusive - time spent in subroutines called by this subroutine */
     excl_subr_ticks = incl_subr_ticks - called_sub_ticks;
 
-    subr_call_key_len = sprintf(subr_call_key, "%s::%s[%u:%d]",
+    subr_call_key_len = my_snprintf(subr_call_key, sizeof(subr_call_key), "%s::%s[%u:%d]",
         subr_entry->caller_subpkg_pv,
         (subr_entry->caller_subnam_sv) ? SvPV_nolen(subr_entry->caller_subnam_sv) : "(null)",
         subr_entry->caller_fid, subr_entry->caller_line);

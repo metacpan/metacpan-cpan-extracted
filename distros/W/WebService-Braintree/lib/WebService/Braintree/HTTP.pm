@@ -1,7 +1,8 @@
 # vim: sw=4 ts=4 ft=perl
 
-package WebService::Braintree::HTTP;
-$WebService::Braintree::HTTP::VERSION = '1.1';
+package # hide from pause
+    WebService::Braintree::HTTP;
+
 use 5.010_001;
 use strictures 1;
 
@@ -141,7 +142,6 @@ sub mime_type_for_file_name {
         return 'application/octet-stream';
     }
 }
-
 
 __PACKAGE__->meta->make_immutable;
 

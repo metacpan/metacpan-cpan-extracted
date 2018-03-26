@@ -456,6 +456,7 @@ tzsrc/zdump.8
 tzsrc/zdump.c
 tzsrc/zic.8
 tzsrc/zic.c
+tzsrc/ziguard.awk
 tzsrc/zishrink.awk
 tzsrc/zone.tab
 tzsrc/zone1970.tab

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 31;
 BEGIN { use_ok('App::Scheme79asm::Compiler', qw/pretty_print/) };
 
 sub is_sexp {
@@ -22,16 +22,47 @@ sub new {
 sub is_toplevel {
 	my ($string, $expected) = @_;
 	is_sexp new->process_toplevel(to_sexp $string), $expected, "process_toplevel $string";
+	is_sexp new->compile_string($string), $expected, "compile_string $string";
 }
 
-is_sexp new->process_quoted(to_sexp '5'), '(symbol 3)', 'process_quoted 5';
-is_sexp new->process_quoted(to_sexp '()'), '(list 0)', 'process_quoted ()';
-is_sexp new->process_quoted(to_sexp '(5 foo)'), '(list (list (list 0) (symbol 3)) (symbol 4))', 'process_quoted (5 foo)';
-is_sexp new->process_quoted(to_sexp '(((5)))'), '(list (list 0) (list (list 0) (list (list 0) (symbol 3))))', 'process_quoted (((5)))';
+is_sexp new->process_quoted(to_sexp '5'), '(SYMBOL 3)', 'process_quoted 5';
+is_sexp new->process_quoted(to_sexp '()'), '(LIST 0)', 'process_quoted ()';
+is_sexp new->process_quoted(to_sexp '(5 foo)'), '(LIST (LIST (LIST 0) (SYMBOL 3)) (SYMBOL 4))', 'process_quoted (5 foo)';
+is_sexp new->process_quoted(to_sexp '(((5)))'), '(LIST (LIST 0) (LIST (LIST 0) (LIST (LIST 0) (SYMBOL 3))))', 'process_quoted (((5)))';
 
-is_toplevel '(quote 5)', '(symbol 3)';
-is_toplevel '(if t \'(2 3) \'x)', '(if (list (symbol 5) (list (list (list 0) (symbol 3)) (symbol 4))) (symbol 2))';
-is_toplevel '(car \'(1 2))', '(call (car 0) (list (list (list 0) (symbol 3)) (symbol 4)))';
-is_toplevel '(lambda id (x) x)', '(proc (var -2))';
-is_toplevel '((lambda id (x) x) 5)', '(call (more (funcall 0) (proc (var -2))) (symbol 3))';
-is_toplevel '(lambda append (x y) (if (atom x) y (cons (car x) (append (cdr x) y))))', '(proc (if (list (call (more (cons 0) (call (more (more (funcall 0) (var -1)) (var -2)) (call (cdr 0) (var -3)))) (call (car 0) (var -3))) (var -2)) (call (atom 0) (var -3))))';
+is_toplevel '()', '(LIST 0)';
+is_toplevel 'NIL', '(LIST 0)';
+is_toplevel 'T', '(SYMBOL 2)';
+is_toplevel '(quote 5)', '(SYMBOL 3)';
+is_toplevel '(reverse-list \'a \'a \'b)', '(CALL (MORE (MORE (REVERSE-LIST 0) (SYMBOL 4)) (SYMBOL 3)) (SYMBOL 3))';
+is_toplevel '(if t \'(2 3) \'x)', '(IF (LIST (SYMBOL 5) (LIST (LIST (LIST 0) (SYMBOL 3)) (SYMBOL 4))) (SYMBOL 2))';
+is_toplevel '(car \'(1 2))', '(CALL (CAR 0) (LIST (LIST (LIST 0) (SYMBOL 3)) (SYMBOL 4)))';
+is_toplevel '(lambda id (x) x)', '(PROC (VAR -2))';
+is_toplevel '((lambda id (x) x) 5)', '(CALL (MORE (FUNCALL 0) (PROC (VAR -2))) (SYMBOL 3))';
+is_toplevel '(lambda append (x y) (if (atom x) y (cons (car x) (append (cdr x) y))))', '(PROC (IF (LIST (CALL (MORE (CONS 0) (CALL (MORE (MORE (FUNCALL 0) (VAR -1)) (VAR -2)) (CALL (CDR 0) (VAR -3)))) (CALL (CAR 0) (VAR -3))) (VAR -2)) (CALL (ATOM 0) (VAR -3))))';
+
+sub pp_roundtrip {
+	my ($string) = @_;
+	my $pp = uc App::Scheme79asm::Compiler::pretty_print(to_sexp $string);
+	is $pp, uc($string), "pretty_print roundtrip $string";
+}
+
+pp_roundtrip '()';
+pp_roundtrip 't';
+pp_roundtrip '(lambda append (x y) (if (atom x) y (cons (car x) (append (cdr x) y))))';
+
+sub expect_error_like (&$) {
+	my ($block, $error_re) = @_;
+	my $name = "test error like /$error_re/";
+	my $result = eval { $block->(); 1 };
+	if ($result) {
+		note 'Block did not throw an exception, failing test';
+		fail $name;
+	} else {
+		like $@, qr/$error_re/, $name;
+	}
+}
+
+expect_error_like { new->process_quoted([]) } 'argument to process_quoted is not a scalar, cons, or nil';
+expect_error_like { is_toplevel 'x' } 'Variable x not in environment';
+expect_error_like { is_toplevel '(car)' } 'Cannot call primitive car with no arguments';

@@ -2,10 +2,7 @@ use strict;
 use warnings;
 
 package Pod::Weaver::PluginBundle::HARTZELL;
-{
-  $Pod::Weaver::PluginBundle::HARTZELL::VERSION = '0.008';
-}
-
+$Pod::Weaver::PluginBundle::HARTZELL::VERSION = '0.011';
 # ABSTRACT: HARTZELL's default Pod::Weaver config
 
 
@@ -92,7 +89,7 @@ Pod::Weaver::PluginBundle::HARTZELL - HARTZELL's default Pod::Weaver config
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 DESCRIPTION
 
@@ -157,7 +154,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by George Hartzell.
+This software is copyright (c) 2018 by George Hartzell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

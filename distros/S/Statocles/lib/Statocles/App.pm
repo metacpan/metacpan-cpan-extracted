@@ -1,5 +1,5 @@
 package Statocles::App;
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 # ABSTRACT: Base role for Statocles applications
 
 use Statocles::Base 'Role', 'Emitter';
@@ -114,9 +114,9 @@ around pages => sub {
         }
 
         for my $attr ( @url_attrs ) {
-            if ( $page->$attr && $page->$attr !~ /^$url_root/ ) {
-                $page->$attr( join "/", $url_root, $page->$attr );
-            }
+            next unless my $value = $page->$attr;
+            next if index( $value, $url_root ) == 0;
+            $page->$attr( $self->url( $value, 1 ) );
         }
     }
 
@@ -127,17 +127,18 @@ around pages => sub {
 
 #pod =method url
 #pod
-#pod     my $app_url = $app->url( $path );
+#pod     my $app_url = $app->url( $path[, $keep_index] );
 #pod
 #pod Get a URL to a page in this application. Prepends the app's L<url_root
-#pod attribute|/url_root> if necessary. Strips "index.html" if possible.
+#pod attribute|/url_root>. Strips "index.html" if C<$keep_index> is not given,
+#pod or false. Avoids double-C</> in the result.
 #pod
 #pod =cut
 
 sub url {
-    my ( $self, $url ) = @_;
+    my ( $self, $url, $keep_index ) = @_;
     my $base = $self->url_root;
-    $url =~ s{/index[.]html$}{/};
+    $url =~ s{/index[.]html$}{/} unless $keep_index;
 
     # Remove the / from both sides of the join so we don't double up
     $base =~ s{/$}{};
@@ -159,7 +160,7 @@ sub url {
 sub link {
     my ( $self, %args ) = @_;
     my $url_root = $self->url_root;
-    if ( $args{href} !~ /^$url_root/ ) {
+    if ( index( $args{href}, $url_root ) != 0 ) {
         $args{href} = $self->url( $args{href} );
     }
     return Statocles::Link->new( %args );
@@ -207,7 +208,7 @@ Statocles::App - Base role for Statocles applications
 
 =head1 VERSION
 
-version 0.088
+version 0.089
 
 =head1 SYNOPSIS
 
@@ -282,10 +283,11 @@ Get the pages for this app. Must return a list of L<Statocles::Page> objects.
 
 =head2 url
 
-    my $app_url = $app->url( $path );
+    my $app_url = $app->url( $path[, $keep_index] );
 
 Get a URL to a page in this application. Prepends the app's L<url_root
-attribute|/url_root> if necessary. Strips "index.html" if possible.
+attribute|/url_root>. Strips "index.html" if C<$keep_index> is not given,
+or false. Avoids double-C</> in the result.
 
 =head2 link
 

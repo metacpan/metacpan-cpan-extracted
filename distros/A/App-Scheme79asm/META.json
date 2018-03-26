@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Data::SExpression" : "0.41",
+            "List::MoreUtils" : "0.33",
             "perl" : "5.014000"
          }
       }
@@ -43,6 +44,6 @@
          "url" : "https://git.ieval.ro/?p=app-scheme79asm.git"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

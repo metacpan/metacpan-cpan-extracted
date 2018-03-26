@@ -1,0 +1,179 @@
+---
+abstract: 'A set of object-oriented modules implementing ICC profiles and related color functions'
+author:
+  - 'William B. Birkett <wbirkett@doplganger.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ICC-Profile
+provides:
+  ICC::Profile:
+    file: lib/ICC/Profile.pm
+    version: '0.6'
+  ICC::Profile::Generic:
+    file: lib/ICC/Profile/Generic.pm
+    version: '0.21'
+  ICC::Profile::XYZ_:
+    file: lib/ICC/Profile/XYZ_.pm
+    version: '0.12'
+  ICC::Profile::ZXML:
+    file: lib/ICC/Profile/ZXML.pm
+    version: '0.22'
+  ICC::Profile::clro:
+    file: lib/ICC/Profile/clro.pm
+    version: '0.12'
+  ICC::Profile::clrt:
+    file: lib/ICC/Profile/clrt.pm
+    version: '0.12'
+  ICC::Profile::clut:
+    file: lib/ICC/Profile/clut.pm
+    version: '0.21'
+  ICC::Profile::curf:
+    file: lib/ICC/Profile/curf.pm
+    version: '0.12'
+  ICC::Profile::curv:
+    file: lib/ICC/Profile/curv.pm
+    version: '2.11'
+  ICC::Profile::cvst:
+    file: lib/ICC/Profile/cvst.pm
+    version: '0.3'
+  ICC::Profile::data:
+    file: lib/ICC/Profile/data.pm
+    version: '0.12'
+  ICC::Profile::desc:
+    file: lib/ICC/Profile/desc.pm
+    version: '0.22'
+  ICC::Profile::gbd_:
+    file: lib/ICC/Profile/gbd_.pm
+    version: '0.12'
+  ICC::Profile::mAB_:
+    file: lib/ICC/Profile/mAB_.pm
+    version: '2.51'
+  ICC::Profile::mBA_:
+    file: lib/ICC/Profile/mBA_.pm
+    version: '2.51'
+  ICC::Profile::matf:
+    file: lib/ICC/Profile/matf.pm
+    version: '0.33'
+  ICC::Profile::mft1:
+    file: lib/ICC/Profile/mft1.pm
+    version: '2.51'
+  ICC::Profile::mft2:
+    file: lib/ICC/Profile/mft2.pm
+    version: '2.51'
+  ICC::Profile::mluc:
+    file: lib/ICC/Profile/mluc.pm
+    version: '0.12'
+  ICC::Profile::mpet:
+    file: lib/ICC/Profile/mpet.pm
+    version: '0.51'
+  ICC::Profile::ncl2:
+    file: lib/ICC/Profile/ncl2.pm
+    version: '0.22'
+  ICC::Profile::para:
+    file: lib/ICC/Profile/para.pm
+    version: '0.41'
+  ICC::Profile::parf:
+    file: lib/ICC/Profile/parf.pm
+    version: '0.2'
+  ICC::Profile::pseq:
+    file: lib/ICC/Profile/pseq.pm
+    version: '0.22'
+  ICC::Profile::samf:
+    file: lib/ICC/Profile/samf.pm
+    version: '0.11'
+  ICC::Profile::sf32:
+    file: lib/ICC/Profile/sf32.pm
+    version: '0.22'
+  ICC::Profile::sig_:
+    file: lib/ICC/Profile/sig_.pm
+    version: '0.12'
+  ICC::Profile::text:
+    file: lib/ICC/Profile/text.pm
+    version: '0.12'
+  ICC::Profile::vcgt:
+    file: lib/ICC/Profile/vcgt.pm
+    version: '0.12'
+  ICC::Profile::view:
+    file: lib/ICC/Profile/view.pm
+    version: '0.12'
+  ICC::Shared:
+    file: lib/ICC/Shared.pm
+    version: '0.53'
+  ICC::Support::Chart:
+    file: lib/ICC/Support/Chart.pm
+    version: '1.69'
+  ICC::Support::Color:
+    file: lib/ICC/Support/Color.pm
+    version: '0.22'
+  ICC::Support::PCS:
+    file: lib/ICC/Support/PCS.pm
+    version: '0.73'
+  ICC::Support::akima:
+    file: lib/ICC/Support/akima.pm
+    version: '0.15'
+  ICC::Support::bern:
+    file: lib/ICC/Support/bern.pm
+    version: '0.32'
+  ICC::Support::geo1:
+    file: lib/ICC/Support/geo1.pm
+    version: '0.11'
+  ICC::Support::geo2:
+    file: lib/ICC/Support/geo2.pm
+    version: '0.11'
+  ICC::Support::nMIX:
+    file: lib/ICC/Support/nMIX.pm
+    version: '0.31'
+  ICC::Support::nNET:
+    file: lib/ICC/Support/nNET.pm
+    version: '0.31'
+  ICC::Support::nNET2:
+    file: lib/ICC/Support/nNET2.pm
+    version: '0.21'
+  ICC::Support::nPINT:
+    file: lib/ICC/Support/nPINT.pm
+    version: '0.71'
+  ICC::Support::ratfunc:
+    file: lib/ICC/Support/ratfunc.pm
+    version: '0.1'
+  ICC::Support::rbf:
+    file: lib/ICC/Support/rbf.pm
+    version: '0.21'
+  ICC::Support::spline:
+    file: lib/ICC/Support/spline.pm
+    version: '0.02'
+  ICC::Support::spline2:
+    file: lib/ICC/Support/spline2.pm
+    version: '0.01'
+  Math::Matrix:
+    file: lib/ICC/Shared.pm
+requires:
+  Carp: '0'
+  Compress::Raw::Zlib: '0'
+  Config: '0'
+  Data::Dumper: '0'
+  Digest::MD5: '0'
+  Encode: '0'
+  Exporter: '0'
+  File::Glob: '0'
+  File::Spec: '0'
+  List::Util: '0'
+  Math::Complex: '0'
+  Math::Matrix: '0.8'
+  Scalar::Util: '0'
+  Storable: '0'
+  Template: '0'
+  Time::Piece: '1.17'
+  XML::LibXML: '0'
+  XSLoader: '0'
+  YAML::Tiny: '0'
+  perl: v5.10.0
+version: '0.603'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

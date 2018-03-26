@@ -1,5 +1,7 @@
+# vim: sw=4 ts=4 ft=perl
+
 package WebService::Braintree::Address;
-$WebService::Braintree::Address::VERSION = '1.1';
+$WebService::Braintree::Address::VERSION = '1.2';
 use 5.010_001;
 use strictures 1;
 
@@ -14,13 +16,14 @@ This class creates, updates, deletes, and finds addresses.
 =cut
 
 use Moose;
-extends 'WebService::Braintree::ResultObject';
+
+with 'WebService::Braintree::Role::Interface';
 
 =head1 CLASS METHODS
 
 =head2 create()
 
-This takes a hashref of parameters and returns the address created.
+This takes a hashref of parameters and returns a L<response|WebService::Braintee::Result> with the C<< address() >> set.
 
 =cut
 
@@ -31,8 +34,7 @@ sub create {
 
 =head2 find()
 
-This takes a customer_id and an address_id and returns the address (if it
-exists).
+This takes a customer_id and an address_id and returns a L<response|WebService::Braintee::Result> with the C<< address() >> set (if found).
 
 =cut
 
@@ -44,7 +46,7 @@ sub find {
 =head2 update()
 
 This takes a customer_id, an address_id, and a hashref of parameters. It will
-update the corresponding address (if found) and returns the updated address.
+update the corresponding address (if found) and return a L<response|WebService::Braintee::Result> with the updated C<< address() >> (if found).
 
 =cut
 
@@ -56,7 +58,7 @@ sub update {
 =head2 delete()
 
 This takes a customer_id and an address_id and deletes the corresponding
-address (if found).
+address (if found). It returns a L<response|WebService::Braintee::Result>.
 
 =cut
 
@@ -65,47 +67,7 @@ sub delete {
     $class->gateway->address->delete($customer_id, $address_id);
 }
 
-sub gateway {
-    return WebService::Braintree->configuration->gateway;
-}
-
-sub BUILD {
-    my ($self, $attributes) = @_;
-    $self->set_attributes_from_hash($self, $attributes);
-}
-
-=head1 OBJECT METHODS
-
-In addition to the methods provided by the keys returned from Braintree, this
-class provides the following methods:
-
-=head2 full_name()
-
-This returns the full name of this address. This is the first_name and the
-last_name concatenated with a space.
-
-=cut
-
-sub full_name {
-    my $self = shift;
-    return $self->first_name . " " . $self->last_name
-}
-
 __PACKAGE__->meta->make_immutable;
 
 1;
 __END__
-
-=head1 TODO
-
-=over 4
-
-=item Need to document the keys and values that are returned
-
-=item Need to document the required and optional input parameters
-
-=item Need to document the possible errors/exceptions
-
-=back
-
-=cut

@@ -2,51 +2,54 @@ package Druid;
 
 
 use Moo;
-use JSON;
+use JSON::MaybeXS qw(encode_json decode_json);
 use LWP::UserAgent;
 use HTTP::Request;
 use Druid::Util qw(iso8601_yyyy_mm_dd_hh_mm_ss);
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
-has api_url => (is	=> 'ro');
+has 'api_url' => (
+    'is' => 'ro',
+);
 
-has _ua     => (is => 'rwp', lazy => 1);
-has _req    => (is => 'rwp', lazy => 1);
+has 'ua' => (
+    'is'      => 'ro',
+    'default' => sub {
+        my $self = shift;
+        my $ua   = LWP::UserAgent->new();
+        $ua->ssl_opts( 'verify_hostname' => 0 );
+        return $ua;
+    },
+);
 
-sub _set_ua     { $_[0]->{_ua}    = $_[1] }
-sub _set_req    { $_[0]->{_req } = $_[1] }
-
-sub BUILD {
-    my $self = shift;
-    
-    my $ua	= LWP::UserAgent->new();
-    my $req	= HTTP::Request->new( 'POST' => $self->api_url );
-
-    $ua->ssl_opts( verify_hostname => 0 );
-    $req->header( 'Content-Type' => 'application/json' );
-    
-    $self->_set_ua( $ua );
-    $self->_set_req( $req );
-}
+has 'req' => (
+    'is'      => 'ro',
+    'lazy'    => 1,
+    'default' => sub {
+        my $self = shift;
+        my $req  = HTTP::Request->new( 'POST' => $self->api_url );
+        $req->header( 'Content-Type' => 'application/json' );
+        return $req;
+    },
+);
 
 sub send {
     my $self = shift;
     my $query = shift;
-	
+
     $self->{error} = undef;
 
     my $response;
     my $request_hash = $query->gen_query;
-    $self->_req->content( encode_json( $request_hash ) );
+    $self->req->content( encode_json( $request_hash ) );
 
-    my $res = $self->_ua->request( $self->_req );	
+    my $res = $self->ua->request( $self->req );
     if ($res->is_success) {
         eval {
             $response = decode_json($res->content) if $res->content ne "";
-            map { 
-                $_->{'timestamp'} =  iso8601_yyyy_mm_dd_hh_mm_ss($_->{'timestamp'})
-            } @{$response};
+            $_->{'timestamp'} = iso8601_yyyy_mm_dd_hh_mm_ss( $_->{'timestamp'} )
+                for @{$response};
             1;
         } or do {
             $self->handle_error("500", "Parsing of the reponse failed");
@@ -80,11 +83,12 @@ Druid - The great new perl client for Druid!
 
 =head1 VERSION
 
-Version 0.002
+Version 0.003
 
 =cut
 
-our $VERSION = '0.002';
+
+our $VERSION = '0.003';
 	
 =head1 AUTHOR
 

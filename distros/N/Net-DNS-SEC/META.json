@@ -32,7 +32,6 @@
          }
       },
       "runtime" : {
-         "recommends" : {},
          "requires" : {
             "Digest::SHA" : "5.23",
             "DynaLoader" : "1.04",
@@ -47,6 +46,9 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.05",
+   "resources" : {
+      "X_type" : "cpan"
+   },
+   "version" : "1.06",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

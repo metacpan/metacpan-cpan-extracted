@@ -1,23 +1,54 @@
-SYNOPSIS
+NAME
+    Dist::Zilla::Plugin::Regexp::Pattern - Plugin to use when building
+    Regexp::Pattern::* distribution
 
+VERSION
+    This document describes version 0.003 of
+    Dist::Zilla::Plugin::Regexp::Pattern (from Perl distribution
+    Dist-Zilla-Plugin-Regexp-Pattern), released on 2018-03-24.
+
+SYNOPSIS
     In dist.ini:
 
      [Regexp::Pattern]
 
 DESCRIPTION
-
-    This plugin is to be used when building Regexp::Pattern::*
+    This plugin is to be used when building "Regexp::Pattern::*"
     distribution. It currently does the following:
 
-      * Make sure that Regexp::Pattern is added as a DevelopRecommends
-      prerequisite
+    *   Make sure that Regexp::Pattern is added as a (phase=develop,
+        rel=x_spec) prerequisite
 
-      This is an informal way to express that the module follows the
-      specification specified in Regexp::Pattern.
+        This is a way to express that the module *follows the specification*
+        specified in Regexp::Pattern.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-Regexp-Pattern>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-Regexp-Pattern>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Reg
+    exp-Pattern>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Regexp::Pattern
 
     Pod::Weaver::Plugin::Regexp::Pattern
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

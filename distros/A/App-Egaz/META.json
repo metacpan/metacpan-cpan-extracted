@@ -1,0 +1,106 @@
+{
+   "abstract" : "It's new $module",
+   "author" : [
+      "wang-q <wang-q@outlook.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.16",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Egaz",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Cmd" : "0.330",
+            "App::Fasops" : "v0.5.11",
+            "File::ShareDir" : "1.102",
+            "IO::Zlib" : "0",
+            "IPC::Cmd" : "0",
+            "List::Util" : "0",
+            "Path::Tiny" : "0.076",
+            "Template" : "2.26",
+            "YAML::Syck" : "1.29",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::Egaz" : {
+         "file" : "lib/App/Egaz.pm",
+         "version" : "v0.0.8"
+      },
+      "App::Egaz::Command::formats" : {
+         "file" : "lib/App/Egaz/Command/formats.pm"
+      },
+      "App::Egaz::Command::lav2axt" : {
+         "file" : "lib/App/Egaz/Command/lav2axt.pm"
+      },
+      "App::Egaz::Command::lav2psl" : {
+         "file" : "lib/App/Egaz/Command/lav2psl.pm"
+      },
+      "App::Egaz::Command::masked" : {
+         "file" : "lib/App/Egaz/Command/masked.pm"
+      },
+      "App::Egaz::Command::maskfasta" : {
+         "file" : "lib/App/Egaz/Command/maskfasta.pm"
+      },
+      "App::Egaz::Command::normalize" : {
+         "file" : "lib/App/Egaz/Command/normalize.pm"
+      },
+      "App::Egaz::Command::partition" : {
+         "file" : "lib/App/Egaz/Command/partition.pm"
+      },
+      "App::Egaz::Common" : {
+         "file" : "lib/App/Egaz/Common.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/wang-q/App-Egaz/issues"
+      },
+      "homepage" : "https://github.com/wang-q/App-Egaz",
+      "repository" : {
+         "url" : "git://github.com/wang-q/App-Egaz.git",
+         "web" : "https://github.com/wang-q/App-Egaz"
+      }
+   },
+   "version" : "0.0.8",
+   "x_authority" : "cpan:WANGQ"
+}

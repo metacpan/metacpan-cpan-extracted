@@ -4,7 +4,7 @@ use MooseX::Role::Parameterized;
 use Module::Runtime 'require_module';
 use Carp;
 use Clone 'clone';
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 parameter parser => (isa => 'CodeRef', default => sub{ sub{
     my @args = @_;
@@ -13,8 +13,6 @@ parameter parser => (isa => 'CodeRef', default => sub{ sub{
 }});
 
 parameter auto_default => ( isa => 'Bool', default => 1 );
-
-sub BUILDARGS{}
 
 role {
     my ($p) = @_;

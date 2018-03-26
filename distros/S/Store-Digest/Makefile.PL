@@ -29,7 +29,7 @@ build_requires (
 );
 
 requires (
-    'BerkeleyDB'               => '0.51',
+    'BerkeleyDB'               => '0.55',
     'Class::Load'              => '0.23',
     'DateTime'                 => '0.70',
     'File::Copy'               => '2.21',
@@ -48,6 +48,8 @@ requires (
     'Plack'                    => '1.0005', # http
     'XML::LibXML::LazyBuilder' => '0.05',   # http
 );
+
+clean_files 't/content';
 
 install_as_cpan;
 auto_install;

@@ -16,7 +16,8 @@ sub setup : Tests(setup) {
 	my %default_attr = (
 		sequencing_error => 0.1,
 		fragment_mean    => 50,
-		fragment_stdd    => 10
+		fragment_stdd    => 10,
+		template_id      => 'sr0001 simulation_read length=%r position=%c:%t-%n'
 	);
 
 	$test->SUPER::setup(%default_attr);
@@ -27,7 +28,7 @@ sub cleanup : Tests(shutdown) {
 	$test->SUPER::shutdown;
 }
 
-sub constructor : Tests(10) {
+sub constructor : Tests(12) {
 	my $test = shift;
 
 	my $class = $test->class_to_test;
@@ -50,10 +51,10 @@ sub sprint_fastq : Tests(6) {
 
 	my $id = "SR0001";
 	my $seq_name = "Chr1";
-	my ($read1_ref, $read2_ref) = $fastq->sprint_fastq($id, $seq_name, \$seq, length $seq, 1);
+	my ($read1_ref, $read2_ref) = $fastq->sprint_fastq($id, 1, $seq_name, \$seq, length $seq, 1);
 	my $read_size = $fastq->read_size;
-	my $header = qr/$id simulation_read length=$read_size position=${seq_name}:\d+-\d+/;
-	my $rg = qr/\@${header}\n.+\n\+\n.+/;
+	my $header = qr/simulation_read length=$read_size position=${seq_name}:\d+-\d+/;
+	my $rg = qr/\@.+${header}\n.+\n\+\n.+/;
 
 	for ($read1_ref, $read2_ref) {
 		ok $$_ =~ $rg,
@@ -81,7 +82,7 @@ sub sprint_fastq : Tests(6) {
 		"The seq_name:end-start inside read 2 fastq header should be the correct relative position";
 	
 	# Testing retarded strand paired-end fastq
-	my ($read2_1_ref, $read2_2_ref) = $fastq->sprint_fastq($id, $seq_name, \$seq, length $seq, 0);
+	my ($read2_1_ref, $read2_2_ref) = $fastq->sprint_fastq($id, 1, $seq_name, \$seq, length $seq, 0);
 
 	my @lines3 = split /\n/ => $$read2_1_ref;
 	$fastq->_read->reverse_complement(\$lines3[1]);

@@ -26,10 +26,9 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Module::Load" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,7 +38,6 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Data::Dumper" => 0,
-  "Module::Load" => 0,
   "Moose" => 0,
   "MooseX::Params::Validate" => 0,
   "Test::More" => 0,

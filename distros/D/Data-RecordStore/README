@@ -1,330 +1,175 @@
-[1mNAME[0m
-     Data::RecordStore - Simple and fast record based data store
+NAME
+    Data::RecordStore - Simple and fast record based data store
 
-[1mSYNPOSIS[0m
-     use Data::RecordStore;
+SYNPOSIS
+    use Data::RecordStore;
 
-     $store = Data::RecordStore->open_store( $directory );
-     $data = "TEXT OR BINARY DATA";
+    my $store = Data::RecordStore->open_store( $directory );
 
-     ### Without transactions ###
+    my $data = "TEXT DATA OR BYTES";
 
-     my $id = $store->stow( $data );
+    my $id = $store->stow( $data, $optionalID );
 
-     my $new_or_recycled_id = $store->next_id;
-     $store->stow( $new_data, $new_or_recycled_id );
+    my $val = $store->fetch( $id );
 
-     my $val = $store->fetch( $some_id );
+    my $new_or_recycled_id = $store->next_id;
 
-     my $count = $store->entry_count;
+    $store->stow( "MORE DATA", $new_or_recycled_id );
 
-     $store->delete_record( $del_id );
+    my $has_object_at_id = $store->has_id( $someid );
 
-     $store->recycle_id( $del_id );
+    $store->delete( $someid );
 
-     my $has_id = $store->has_id( $someother_id );
+    $store->empty_recycler; $store->recycle( $dead_id );
 
-     $store->empty_recycler; #all recycled ids are gone
+DESCRIPTION
+    A simple and fast way to store arbitrary text or byte data. It is
+    written entirely in perl with no non-core dependencies. It is designed
+    to be both easy to set up and easy to use.
 
-     $store->empty; # clears out store completely
+LIMITATIONS
+    Data::RecordStore is not meant to store huge amounts of data. It will
+    fail if it tries to create a file size greater than the max allowed by
+    the filesystem. This limitation may be removed in subsequent versions.
+    This limitation is most important when working with sets of data that
+    approach the max file size of the system in question.
 
+    This is not written with thread safety in mind, so unexpected behavior
+    can occur when multiple Data::RecordStore objects open the same
+    directory. Locking coordination is currently the responsibility of the
+    implementation.
 
-
-     ### Using Transactions ###
-
-     my $transaction = $store->create_transaction;
-
-     print join(",", $transaction->get_update_time,
-                     $transaction->get_process_id,
-                     $transaction->get_state,
-                     $transaction->get_id );
-
-     my $new_id = $transaction->stow( $data );
-
-     my $new_or_recycled_id = $store->next_id;
-
-     $transaction->stow( "MORE DATA", $new_or_recycled_id );
-
-     $transaction->delete_record( $someid );
-
-     $transaction->recycle_id( $dead_id );
-
-     if( $is_good ) {
-        $transaction->commit;
-     } else {
-        $transaction->rollback;
-     }
-
-
-     ### Transaction maintenance ###
-
-     # Get a list of transactions that are old and probably stale.
-     for my $trans ($store->list_transactions) {
-
-       next if $trans->get_udpate_time > $too_old;
-
-       if( $trans->get_state == Data::RecordStore::Transaction::TRA_IN_COMMIT
-         || $trans->get_state == Data::RecordStore::Transaction::TRA_CLEANUP_COMMIT )
-       {
-          $trans->commit;
-       }
-       elsif( $trans->get_state == Data::RecordStore::Transaction::TRA_IN_ROLLBACK
-         || $trans->get_state == Data::RecordStore::Transaction::TRA_CLEANUP_ROLLBACK )
-       {
-          $trans->rollback;
-       }
-       elsif( $trans->get_state == Data::RecordStore::Transaction::TRA_ACTIVE )
-       {
-          # commit or rollback, depending on preference
-       }
-     }
-
-[1mDESCRIPTION[0m
-    A simple and fast way to store arbitrary text or byte data. It is written
-    entirely in perl with no non-core dependencies. It is designed to be both
-    easy to set up and easy to use.
-
-    Transactions allow the RecordStore to protect data. Transactions can
-    collect stow, delete_record and recycle_id actions. Data stowed this way
-    is stored in the record store, but indexed to only by the transaction.
-    Upon a transaction commit, the indexes are updated and discarded data
-    removed. Destructive actions are only performed once the transaction
-    updates the indexes.
-
-    Data is stored in fixed record file silos. This applies to index data,
-    recycling data, payload data and transaction data. These silos are self
-    vaccuuming. Entries that are removed either by deletion or recycling have
-    their space in the file replaced by a live entry.
-
-    This is not a server or daemon, this is a direct operation on the file
-    system. Only meta data such as directories, file location and fixed
-    calculated values are stored as state. That means this is not thread safe.
-    It can be used in a thread safe manner if a program using it provides
-    locking mechanisms.
-
-[1mLIMITATIONS[0m
-    Data::RecordStore is not thread safe. Thread coordination and locking can
-    be done on a level above Data::RecordStore.
-
-[1mMETHODS[0m
-  [1mopen_store( directory )[0m
+METHODS
+  open_store( directory )
     Takes a single argument - a directory, and constructs the data store in
-    it. The directory must be writeable or creatible. If a RecordStore already
-    exists there, it opens it, otherwise it creates a new one.
+    it. The directory must be writeable or creatible. If a RecordStore
+    already exists there, it opens it, otherwise it creates a new one.
 
-  [1mcreate_transaction()[0m
-    Creates and returns a transaction object
-
-  [1mlist_transactions[0m
-    Returns a list of currently existing transaction objects that are not
-    marked TRA_DONE.
-
-  [1mstow( data, optionalID )[0m
+  stow( data, optionalID )
     This saves the text or byte data to the record store. If an id is passed
     in, this saves the data to the record for that id, overwriting what was
     there. If an id is not passed in, it creates a new record store.
 
     Returns the id of the record written to.
 
-  [1mfetch( id )[0m
+  fetch( id )
     Returns the record associated with the ID. If the ID has no record
     associated with it, undef is returned.
 
-  [1mentry_count[0m
-    Returns how many active ids have been assigned in this store. If an ID was
-    assigned but not used, it still counts towards the number of entries.
+  entry_count
+    Returns how many active ids have been assigned in this store. If an ID
+    was assigned but not used, it still counts towards the number of
+    entries.
 
-  [1mdelete_record( id )[0m
-    Removes the entry with the given id from the store, freeing up its space.
-    It does not reuse the id.
+  delete( id )
+    Removes the entry with the given id from the store, freeing up its
+    space. It does not reuse the id.
 
-  [1mhas_id( id )[0m
-      Returns true if an record with this id exists in the record store.
+  has_id( id )
+      Returns true if an object with this id exists in the record store.
 
-  [1mnext_id[0m
+  next_id
     This sets up a new empty record and returns the id for it.
 
-  [1mempty()[0m
-    This empties out the entire record store completely. Use only if you mean
-    it.
+  empty()
+    This empties out the entire record store completely. Use only if you
+    mean it.
 
-  [1mempty_recycler()[0m
+  empty_recycler()
       Clears out all data from the recycler
 
-  [1mrecycle( id, keep_data_flag )[0m
+  recycle( id, keep_data_flag )
       Ads the id to the recycler, so it will be returned when next_id is called.
       This removes the data occupied by the id, freeing up space unles keep_data_flag
       is set to true.
 
-  [1mopen( direcdtory )[0m
-    Alias to open_store
-
-  [1mdelete( id )[0m
-    Alias to delete_record
-
-[1mHELPER PACKAGES[0m
+HELPER PACKAGES
     Data::RecordStore relies on two helper packages that are useful in their
     own right and are documented here.
 
-[1mHELPER PACKAGE[0m
-    Data::RecordStore::Silo
+HELPER PACKAGE
+    Data::RecordStore::FixedStore
 
-[1mDESCRIPTION[0m
+DESCRIPTION
     A fixed record store that uses perl pack and unpack templates to store
-    identically sized sets of data and uses a set of files to do so.
+    identically sized sets of data and uses a single file to do so.
 
-[1mSYNOPSIS[0m
-     my $template = "LII"; # perl pack template. See perl pack/unpack.
+SYNOPSIS
+    my $template = "LII"; # perl pack template. See perl pack/unpack.
 
-     my $size; #required if the template does not have a definite size, like A*
+    my $size; #required if the template does not have a definite size, like
+    A*
 
-     my $store = Data::RecordStore::Silo->open_silo( $template, $filename, $size );
+    my $store = Data::RecordStore::FixedStore->open_fixed_store( $template,
+    $filename, $size );
 
-     my $new_id = $store->next_id;
+    my $new_id = $store->next_id;
 
-     $store->put_record( $new_id, [ 321421424243, 12, 345 ] );
+    $store->put_record( $id, [ 321421424243, 12, 345 ] );
 
-     my $more_data = $store->get_record( $other_id );
+    my $more_data = $store->get_record( $other_id );
 
-     my $removed_last = $store->pop;
+    my $removed_last = $store->pop;
 
-     my $last_id = $store->push( $data_for_the_end );
+    my $last_id = $store->push( $data_at_the_end );
 
-     my $entries = $store->entry_count;
+    my $entries = $store->entry_count;
 
-     $store->emtpy;
+    if( $entries < $min ) {
 
-     $store->unlink_store;
+        $store->_ensure_entry_count( $min );
 
-[1mMETHODS[0m
-  [1mopen_silo( template, filename, record_size )[0m
-    Opens or creates the directory for a group of files that represent one
-    silo storing records of the given template and size. If a size is not
-    given, it calculates the size from the template, if it can. This will die
-    if a zero byte record size is given or calculated.
+    }
 
-  [1mempty[0m
+    $store->emtpy;
+
+    $store->unlink_store;
+
+METHODS
+  open_fixed_store( template, filename, size )
+    Opens or creates the file given as a fixed record length data store. If
+    a size is not given, it calculates the size from the template, if it
+    can. This will die if a zero byte record size is determined.
+
+  empty
     This empties out the database, setting it to zero records.
 
-  [1m[0m
-    Returns the number of entries in this store. This is the same as the size
-    of the file divided by the record size.
+  
+    Returns the number of entries in this store. This is the same as the
+    size of the file divided by the record size.
 
-  [1mget_record( idx )[0m
+  get_record( idx )
     Returns an arrayref representing the record with the given id. The array
     in question is the unpacked template.
 
-  [1mnext_id[0m
+  next_id
     adds an empty record and returns its id, starting with 1
 
-  [1mpop[0m
+  pop
     Remove the last record and return it.
 
-  [1mlast_entry[0m
+  last_entry
     Return the last record.
 
-  [1mpush( data )[0m
+  push( data )
     Add a record to the end of this store. Returns the id assigned to that
-    record. The data must be a scalar or list reference. If a list reference,
-    it should conform to the pack template assigned to this store.
+    record. The data must be a scalar or list reference. If a list
+    reference, it should conform to the pack template assigned to this
+    store.
 
-  [1mpush( idx, data )[0m
+  push( idx, data )
     Saves the data to the record and the record to the filesystem. The data
-    must be a scalar or list reference. If a list reference, it should conform
-    to the pack template assigned to this store.
+    must be a scalar or list reference. If a list reference, it should
+    conform to the pack template assigned to this store.
 
-  [1munlink_store[0m
+  unlink_store
     Removes the file for this record store entirely from the file system.
 
-  [1mopen( direcdtory )[0m
-    Alias to open_silo
-
-[1mHELPER PACKAGE[0m
-    Data::RecordStore::Transaction
-
-[1mDESCRIPTION[0m
-    A transaction that can collect actions on the record store and then writes
-    them as a block.
-
-[1mSYNOPSIS[0m
-    my $trans = $store->create_transaction;
-
-    print join(",", $transaction->get_update_time,
-    $transaction->get_process_id, $transaction->get_state,
-    $transaction->get_id );
-
-    my $new_id = $transaction->stow( $data );
-
-    my $new_or_recycled_id = $store->next_id;
-
-    $transaction->stow( "MORE DATA", $new_or_recycled_id );
-
-    $transaction->delete_record( $someid ); $transaction->recycle_id( $dead_id
-    );
-
-    if( $is_good ) { $transaction->commit; } else { $transaction->rollback; }
-    # # Get a list of transactions that are old and probably stale. # for my
-    $trans ($store->list_transactions) {
-
-      next if $trans->get_udpate_time > $too_old;
-
-      if( $trans->get_state == Data::RecordStore::Transaction::TRA_IN_COMMIT
-        || $trans->get_state == Data::RecordStore::Transaction::TRA_CLEANUP_COMMIT )
-      {
-         $trans->commit;
-      }
-      elsif( $trans->get_state == Data::RecordStore::Transaction::TRA_IN_ROLLBACK
-        || $trans->get_state == Data::RecordStore::Transaction::TRA_CLEANUP_ROLLBACK )
-      {
-         $trans->rollback;
-      }
-      elsif( $trans->get_state == Data::RecordStore::Transaction::TRA_ACTIVE )
-      {
-         # commit or rollback, depending on preference
-      }
-    }
-
-[1mMETHODS[0m
-  [1mget_update_time[0m
-    Returns the epoch time when the last time this was updated.
-
-  [1mget_process_id[0m
-    Returns the process id that last wrote to this transaction.
-
-  [1mget_state[0m
-    Returns the state of this process. Values are TRA_ACTIVE TRA_IN_COMMIT
-    TRA_IN_ROLLBACK TRA_COMMIT_CLEANUP TRA_ROLLBACK_CLEANUP TRA_DONE
-
-  [1mget_id[0m
-    Returns the ID for this transaction, which is the same as its position in
-    the transaction index plus one.
-
-  [1mstow( $data, $optional_id )[0m
-    Stores the data given. Returns the id that the data was stowed under. If
-    the id is not given, this generates one from the record store. The data
-    stored this way is really stored in the record store, but the index is not
-    updated until a commit happens. That means it is not reachable from the
-    store until the commit.
-
-  [1mdelete_record( $id )[0m
-    Marks that the record associated with the id is to be deleted when the
-    transaction commits.
-
-  [1mrecycle_id( $id )[0m
-    Marks that the record associated with the id is to be deleted and its id
-    recycled when the transaction commits.
-
-  [1mcommit()[0m
-    Commit applies
-
-  [1munlink_store[0m
-    Removes the file for this record store entirely from the file system.
-
-[1mAUTHOR
-       Eric Wolf        coyocanid@gmail.com[0m
-[1mCOPYRIGHT AND LICENSE[0m
+AUTHOR
+       Eric Wolf        coyocanid@gmail.com
+COPYRIGHT AND LICENSE
            Copyright (c) 2015-2017 Eric Wolf. All rights reserved.  This program is free software; you can redistribute it and/or modify it
            under the same terms as Perl itself.
 
-[1mVERSION
-       Version 3.13  (Dec 5, 2017))[0m
+VERSION
+       Version 2.03  (Nov 21, 2017))

@@ -1,0 +1,452 @@
+# documentation for Profile.pm module / 2016-05-23
+
+=encoding utf8
+
+=head1 NAME
+
+ICC::Profile - A set of Perl modules to read, write, create and edit ICC profiles.
+
+=head1 SYNOPSIS
+
+    use ICC::Profile;
+
+    # create a new object
+    $profile = ICC::Profile->new(); # empty object
+    $profile = ICC::Profile->new($hash); # from a hash
+    $profile = ICC::Profile->new($file_path); # from a file
+
+    # get/set header hash
+    $hash = $profile->header();
+    $hash = $profile->header($replace);
+
+    # get/set profile header
+    $array = $profile->profile_header();
+    $array = $profile->profile_header($replace);
+
+    # get/set profile tag table
+    $array = $profile->tag_table();
+    $array = $profile->tag_table($replace);
+
+    # get/set tag
+    $A2B0 = $profile->tag('A2B0'); # get tag
+    $A2B0 = $profile->tag({'A2B0' => $new_tag}); # set tag
+
+    # write profile
+    $profile->write($file_path);
+
+    # print profile contents
+    $profile->dump();
+
+=head1 DESCRIPTION
+
+ICC::Profile is the main module from a set of object-oriented modules for creating and using ICC profiles.
+This set includes modules for each of the required tags, and some others that are commonly used. The
+distribution also includes various support modules. These modules support the creation and use of ICC
+profiles, but do not correspond to actual profile tags.
+
+This document refers to version 4.3 of the ICC specification. Other versions may use different section numbers.
+
+You can (and should) download the specification from the ICC web site, L<http://www.color.org/specification/ICC1v43_2010-12.pdf>.
+This document is also available as ISO 15076-1:2010.
+
+ICC::Profile supports all types of profiles, including those with the MPE tags introduced in version 4.3.
+All required tag types have a corresponding Perl module and class.
+Other tag types are handled by the 'Generic.pm' module, which treats the tag contents as binary data.
+It is straightforward to add custom tag modules, if needed.
+
+=head2 Object structure
+
+An ICC::Profile object is a blessed array reference.
+The array contains three elements, the object header, the profile header, and the tag table.
+
+    # create empty profile object
+    my $self = [
+        {},    # object header
+        [],    # profile header
+        []     # tag table
+    ];
+
+The profile header contains metadata and general information that applies to all tags.
+The tag table contains the signature, offset and size of each tag, plus a reference to the associated tag object.
+For example,
+
+    use ICC::Profile;
+
+    $profile = ICC::Profile->new('/Library/Application Support/Adobe/Color/Profiles/Recommended/CoatedGRACoL2006.icc');
+    $profile->dump();
+
+produced the following output:
+
+                    Size: 654456 bytes
+           Preferred CMM: ADBE
+   Specification Version: 2.1.0
+                   Class: prtr
+                    Data: CMYK
+                     PCS: Lab 
+                 Created: 2009-06-26 00:22:19
+                Platform: APPL
+                   Flags: <0x00000000>
+     Device Manufacturer: ADBE
+            Device Model: 
+       Device Attributes: <0x00000000> <0x00000000>
+        Rendering Intent: 0
+          PCS Illuminant: 0.96420, 1.00000, 0.82491
+                 Creator: ADBE
+           MD5 Signature:
+
+   #   Tag           Object Type         Offset     Size
+   1  'desc'  ICC::Profile::desc            300      128
+   2  'cprt'  ICC::Profile::text            428      133
+   3  'wtpt'  ICC::Profile::XYZ_            564       20
+   4  'targ'  ICC::Profile::text            584       29
+   5  'tech'  ICC::Profile::sig_            616       12
+   6  'vued'  ICC::Profile::desc            628       94
+   7  'view'  ICC::Profile::view            724       36
+   8  'A2B0'  ICC::Profile::mft2            760    89958
+   9  'A2B2'  ICC::Profile::mft2            760    89958
+  10  'A2B1'  ICC::Profile::mft2          90720    89958
+  11  'B2A0'  ICC::Profile::mft1         180680   145588
+  12  'B2A1'  ICC::Profile::mft1         326268   145588
+  13  'B2A2'  ICC::Profile::mft1         471856   145588
+  14  'gamt'  ICC::Profile::mft1         617444    37009
+
+This shows the profile header followed by the tag table. Each tag is a Perl object with its own properties and methods.
+
+=head1 METHODS
+
+=head2 Creating ICC::Profile objects
+
+=head3 new
+
+This method creates an C<ICC::Profile> object.
+
+With no parameters, the object contains the empty basic structure (see L<"Object structure">).
+
+An object may be created from a hash, whose values are set in the ICC profile header.
+
+An object may also be created from an existing ICC profile.
+
+B<Usage>
+
+    $profile = ICC::Profile->new(); # empty object
+    $profile = ICC::Profile->new($hash); # from a hash
+    $profile = ICC::Profile->new($file_path); # from a file
+
+B<Examples>
+
+    use ICC::Profile;
+
+    $profile = ICC::Profile->new(); # make empty object
+
+    $profile = ICC::Profile->new({'class' => 'prtr', 'data' => 'CMYK', 'PCS' => 'Lab '}); # make object from hash (see notes 1 and 2)
+
+    $profile = ICC::Profile->new('~/Desktop/my_profile.icc'); # open an existing ICC profile
+    $profile = ICC::Profile->new('~/Desktop/my_image.tif'); # open an ICC profile embedded in a TIFF file
+    $profile = ICC::Profile->new('~/Desktop/my_image.psd'); # open an ICC profile embedded in a Photoshop file
+
+=over
+
+=item 1
+
+Hash values contain the profile class and other header data.
+Required hash keys are 'class', 'data', and 'PCS'.
+Optional hash keys are 'version', 'subclass', and 'render'.
+
+The 'class' value is a 4-character string, as described in section 7.2.5 of the ICC specification.
+
+    'scnr' – Input device (scanner)
+    'mntr' – Display device (monitor)
+    'prtr' – Output device (printer)
+    'link' – Device link
+    'spac' – Color space
+    'abst' – Abstract
+    'nmcl' – Named
+
+The 'data' value is a 4-character string, as described in section 7.2.6 of the ICC specification.
+
+    'XYZ ' – nCIEXYZ or PCSXYZ (depends on context)
+    'Lab ' – CIELAB or PCSLAB (depends on context)
+    'Luv ' – CIELUV
+    ‘YCbr’ – YCbCr
+    'Yxy ' – CIEYxy
+    'RGB ' – RGB
+    'GRAY' – Gray
+    'HSV ' – HSV
+    'HLS ' – HLS
+    'CMYK' – CMYK
+    'CMY ' – CMY
+    '2CLR' – 2 color
+    '3CLR' – 3 color (other than those listed above)
+    '4CLR' – 4 color (other than CMYK)
+    '5CLR' – 5 color
+    '6CLR' – 6 color
+    '7CLR' – 7 color
+    'nCLR' – n color, where n is a hexadecimal value, 2 - F
+
+The 'PCS' value is a 4-character string, as described in section 7.2.7 of the ICC specification.
+
+    'XYZ ' – PCSXYZ
+    'Lab ' – PCSLAB
+
+The 'version' value is an 8-character hex string as described in section 7.2.4 of the ICC specification, default is '02400000'.
+
+Some commonly used 'version' values are,
+
+    '02400000' – version 2.4.0.0 (v2.4)
+    '04300000' – version 4.3.0.0 (v4.3)
+
+The 'subclass' value is an integer that specifies the profile structure when multiple structures are possible, default is 0.
+
+For Input profiles, the 'subclass' values are,
+
+    0 - N-component LUT-based input profile (section 8.3.2)
+    1 - Three-component matrix-based input profile (section 8.3.3)
+    2 - Monochrome input profile (section 8.3.4)
+
+For Display profiles, the 'subclass' values are,
+
+    0 - N-Component LUT-based display profile (section 8.4.2)
+    1 - Three-component matrix-based display profile (section 8.4.3)
+    2 - Monochrome display profile (section 8.4.4)
+
+For Output profiles, the 'subclass' values are,
+
+    0 - N-component LUT-based output profile (section 8.5.2)
+    2 - Monochrome output profile (section 8.5.3)
+
+The 'render' value is an integer as described in section 7.2.15 of the ICC specification, default is 0.
+
+    0 – Perceptual
+    1 – Media–relative colorimetric
+    2 – Saturation
+    3 – ICC–absolute colorimetric
+
+=item 2
+
+Required tag signatures for the profile class and subclass are added to the tag table.
+The corresponding tag objects are then added using the 'tag' method.
+
+=back
+
+=head2 Accessors
+
+=head3 header
+
+This method returns a reference to the header hash (see L<"Object structure">).
+
+B<Usage>
+
+    $hash = $profile->header(); # get header hash
+    $hash = $profile->header($replacement_hash); # set header hash
+
+B<Examples>
+
+    use ICC::Profile;
+
+    $profile = ICC::Profile->new('~/Desktop/my_profile.icc'); # create a profile object
+    $hash = $profile->header(); # get header hash
+    $rs = $profile->header->{'key'}; # get 'key' value
+    $profile->header->{'key'} = $value; # set 'key' value
+    $hash = $profile->header({'key' => 'value'}); # set header hash (see note 1)
+
+=over
+
+=item 1
+
+The parameter is copied to the object.
+
+=back
+
+=head3 profile_header
+
+This method returns a reference to the profile header array (see L<"Object structure">).
+
+B<Usage>
+
+    $array = $profile->profile_header(); # get profile header array reference
+    $array = $profile->profile_header($replace); set profile header array reference
+
+B<Examples>
+
+    use ICC::Profile;
+
+    $profile = ICC::Profile->new('~/Desktop/my_profile.icc'); # create a profile object
+    $array = $profile->profile_header(); # get profile header array ref
+    $cmm = $profile->profile_header->[1]; # get preferred CMM signature (see note 1)
+    $profile->profile_header->[1] = 'appl'; # set preferred CMM signature
+
+=over
+
+=item 1
+
+The structure of the header array follows table 17 in section 7.2.1 of the ICC specification.
+
+=back
+
+=head3 tag_table
+
+This method returns a reference to the tag table array (see L<"Object structure">).
+
+B<Usage>
+
+    $array = $profile->tag_table(); # get tag table array reference
+    $array = $profile->tag_table($replace); # set tag table array reference
+
+B<Examples>
+
+    use ICC::Profile;
+
+    $profile = ICC::Profile->new('~/Desktop/my_profile.icc'); # create a profile object
+    $table = $profile->tag_table(); # get tag table array reference (see notes 1 and 2)
+    $entry = profile->tag_table->[0]; # get first tag table entry (an array reference)
+    $sig = profile->tag_table->[0][0]; # get signature of first table entry
+    $tag = profile->tag_table->[0][3]; # get tag of first table entry (see note 3)
+
+=over
+
+=item 1
+
+The structure of the tag table array follows table 24 in section 7.3.1 of the ICC specification.
+Each entry contains the signature, offset, size, and object reference for a tag.
+
+=item 2
+
+The offset and size of a newly added tag are initially set to 0.
+All offsets and sizes in the tag table are re-calculated when writing the profile.
+
+=item 3
+
+Use the 'tag' method to get/set tag objects, unless you have a good reason to access the tag table directly.
+
+=back
+
+=head3 tag
+
+This method gets/sets tag object(s) from/to the tag table.
+
+B<Usage>
+
+    $tag -or- @tags = $profile->tag(@sigs); # get list of tag objects
+    $tag -or- @tags = $profile->tag($hash_ref); # set list of tag objects
+
+B<Examples>
+
+    use ICC::Profile;
+
+    $profile = ICC::Profile->new('~/Desktop/my_profile.icc'); # create a profile object
+
+    @tags = $profile->tag(qw(A2B1 B2A1)); # get the 'A2B1' and 'B2A1' tags (see note 1)
+    ($A2B1, $B2A1) = $profile->tag(qw(A2B1 B2A1)); # same as above, but tags assigned to individual variables
+    $desc = $profile->tag('desc'); # get the 'desc' tag
+
+    @tags = $profile->tag({'A2B1' => $A2B1, 'B2A1' => $B2A1}); # set the 'A2B1' and 'B2A1' tags (see note 2)
+    $desc = $profile->tag({'desc' => ICC::Profile::desc->new({'ascii' => 'printer profile'})}); # set 'desc' tag
+    $profile->tag({'desc' => ICC::Profile::text->new('printer profile')}); # ignore returned tag object
+    $profile->tag({'what' => undef}); # set 'what' tag to undefined value (see note 3)
+    $profile->tag({'chad' => 'delete'}); # delete 'chad' tag (see note 4)
+    $rem = $profile->tag({'chad' => 'delete'}); # delete 'chad' tag and return the deleted object
+
+=over
+
+=item 1
+
+If the tag signature is not found, B<undef> will be returned for that tag.
+
+=item 2
+
+If the tag table already contains the tag signature, that entry will be modified to contain the new tag object.
+Otherwise, a new entry will be added at the end of the tag table containing the tag signature and object.
+
+=item 3
+
+The tag value may be set to B<undef> as a temporary measure. When writing a profile, an B<undef> tag will cause an error.
+
+=item 4
+
+A tag is deleted by setting its value to 'delete'.
+
+=back
+
+=head2 Reading and writing
+
+The B<new> method reads various file types (ICC, TIFF, PSD) to create an object.
+
+The following method will write a profile.
+
+=head3 write
+
+This method writes an ICC profile.
+
+B<Usage>
+
+    $profile->write($file_path);
+
+B<Examples>
+
+    use ICC::Profile;
+
+    $profile = ICC::Profile->new('/Library/Application Support/Adobe/Color/Profiles/Recommended/CoatedGRACoL2006.icc');
+    $profile->tag({'desc' => ICC::Profile::desc->new({'ascii' => 'modified'})}); # modify the 'desc' tag
+    $profile->write('~/Desktop/modified.icc'); # write the modified profile (see note 1)
+
+=over
+
+=item 1
+
+When writing a profile, the size and offset of each tag are determined and saved in the tag table.
+
+=back
+
+=head2 Utility
+
+=head3 dump, sdump
+
+The 'dump' method prints the profile contents to the STDOUT device.
+The 'sdump' method is identical, but returns a string.
+
+B<Usage>
+
+    $profile->dump($flags);
+
+B<Examples>
+
+    use ICC::Profile;
+
+    $profile = ICC::Profile->new('/Library/Application Support/Adobe/Color/Profiles/Recommended/CoatedGRACoL2006.icc');
+
+    $profile->dump(); # prints header and tag table
+    $profile->dump('h'); # prints header only
+    $profile->dump('t'); # prints tag table only
+    $profile->dump('1'); # prints tags to level 1 only
+    $profile->dump('ht1'); # prints header, tag table and tags to level 1
+
+    $string = $profile->sdump(); # returns a string
+
+=head1 SEE ALSO
+
+=head2 ICC Specification
+
+The ICC (International Color Consortium) maintains a web site at L<http://www.color.org>
+The ICC specification and related materials may be downloaded from this web site.
+
+The ICC specification is also published as ISO 15076-1.
+
+=head2 ISO Standards
+
+B<ISO 15076-1> I<Image technology colour management — Architecture, profile format and data structure — Part 1: Based on ICC.1:2010>
+
+=head1 LICENSE
+
+Programs in this distribution, authored by William B. Birkett, are licensed under the GNU General Public License, v3.
+
+See L<http://www.gnu.org/licenses/gpl.html> for license details.
+
+=head1 AUTHOR
+
+William B. Birkett, E<lt>wbirkett@doplganger.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright E<0x00A9> 2004-2018 by William B. Birkett
+
+=cut

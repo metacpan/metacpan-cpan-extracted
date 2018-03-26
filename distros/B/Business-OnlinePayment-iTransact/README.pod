@@ -16,8 +16,6 @@ Business::OnlinePayment::iTransact - iTransact backend module for Business::Onli
   $tx->content(
       action         => 'Normal Authorization',
       type           => 'cc',
-      description    => 'Business::OnlinePayment::iTransact XML Test',
-      amount         => '20.17',
       customer_id    => '123-CUST',
       first_name     => 'John',
       last_name      => 'Doe',
@@ -32,6 +30,20 @@ Business::OnlinePayment::iTransact - iTransact backend module for Business::Onli
       zip            => '84001',
       country        => 'US',
       phone          => '801-555-1212',
+      # order total and description
+      description    => 'Business::OnlinePayment::iTransact XML Test',
+      amount         => '20.17',
+      # itemized list
+      items => [
+          {   description => 'item one',
+              qty => 1,
+              cost => '11.11'
+          },
+          {   description => 'item two',
+              qty => 2,
+              cost => '22.22'
+          },
+      ],
   );
 
   $tx->submit();
@@ -73,6 +85,10 @@ first_name, last_name, card_number, expiration.
 An action of 'Normal Authorization' will send a 'AuthTransaction' sale request to iTransact. 
 
 A sale request is the default authorization type performed which is an authorization that will automatically be captured during the settlement process. An AVSOnly credit card transaction request is a sale request run with a zero amount and can be used to validate the AVS and CVV information on a card without actually running an authorization.
+
+When processing a sale request, you have the option of providing an itemized list of item, qty, cost. iTransact will calculate the item cost (qty * cost) and calculate an order total. Otherwise you only need to pass an order total and description. iTransact will attempt a charge of either the calculated order total (when itemized) or the amount you provide.
+
+Note that the example in the synopsis shows "amount", "description" and "items" fields. Define either amount/description or items, not all three. 
 
 =head1 METHODS AND FUNCTIONS
 
@@ -127,7 +143,8 @@ and other transaction action types supported by iTransact.
 
   Business::OnlinePayment
   Business::OnlinePayment::HTTPS
-  XML::Hash::LX
+  XML::Writer
+  XML::Hash::XS
   Digest::HMAC_SHA1
 
 =head1 SEE ALSO
@@ -150,7 +167,7 @@ Bill Gerrard <bill@gerrard.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 Bill Gerrard
+Copyright (C) 2017-2018 Bill Gerrard
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.20.2 or,
@@ -168,4 +185,7 @@ possibility of such damage.
 =head1 SEE ALSO
 
 perl(1). L<Business::OnlinePayment>.
+
+
+=cut
 

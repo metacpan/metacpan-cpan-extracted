@@ -8,7 +8,7 @@ use warnings;
 use warnings::register;
 use namespace::autoclean 0.19;
 
-our $VERSION = '1.46';
+our $VERSION = '1.47';
 
 use Carp;
 use DateTime::Duration;
@@ -983,6 +983,14 @@ sub is_last_day_of_month {
     $_[0]->day == $_[0]->_month_length( $_[0]->year, $_[0]->month );
 }
 
+sub is_last_day_of_quarter {
+    $_[0]->day_of_quarter == $_[0]->quarter_length;
+}
+
+sub is_last_day_of_year {
+    $_[0]->day_of_year == $_[0]->year_length;
+}
+
 sub week {
     my $self = shift;
 
@@ -1809,93 +1817,108 @@ sub subtract_duration { return $_[0]->add_duration( $_[1]->inverse ) }
 
         return $self if $self->is_infinite;
 
-        if ( $deltas{days} ) {
-            $self->{local_rd_days} += $deltas{days};
-
-            $self->{utc_year} += int( $deltas{days} / 365 ) + 1;
+        my %orig = %{$self};
+        try {
+            $self->_add_duration($dur);
         }
+        catch {
+            %{$self} = %orig;
+            die $_;
+        };
+    }
+}
 
-        if ( $deltas{months} ) {
+sub _add_duration {
+    my $self = shift;
+    my $dur  = shift;
 
-            # For preserve mode, if it is the last day of the month, make
-            # it the 0th day of the following month (which then will
-            # normalize back to the last day of the new month).
-            my ( $y, $m, $d ) = (
-                  $dur->is_preserve_mode
-                ? $self->_rd2ymd( $self->{local_rd_days} + 1 )
-                : $self->_rd2ymd( $self->{local_rd_days} )
-            );
+    my %deltas = $dur->deltas;
 
-            $d -= 1 if $dur->is_preserve_mode;
+    if ( $deltas{days} ) {
+        $self->{local_rd_days} += $deltas{days};
 
-            if ( !$dur->is_wrap_mode && $d > 28 ) {
+        $self->{utc_year} += int( $deltas{days} / 365 ) + 1;
+    }
 
-                # find the rd for the last day of our target month
-                $self->{local_rd_days}
-                    = $self->_ymd2rd( $y, $m + $deltas{months} + 1, 0 );
+    if ( $deltas{months} ) {
 
-                # what day of the month is it? (discard year and month)
-                my $last_day
-                    = ( $self->_rd2ymd( $self->{local_rd_days} ) )[2];
-
-                # if our original day was less than the last day,
-                # use that instead
-                $self->{local_rd_days} -= $last_day - $d if $last_day > $d;
-            }
-            else {
-                $self->{local_rd_days}
-                    = $self->_ymd2rd( $y, $m + $deltas{months}, $d );
-            }
-
-            $self->{utc_year} += int( $deltas{months} / 12 ) + 1;
-        }
-
-        if ( $deltas{days} || $deltas{months} ) {
-            $self->_calc_utc_rd;
-
-            $self->_handle_offset_modifier( $self->second );
-        }
-
-        if ( $deltas{minutes} ) {
-            $self->{utc_rd_secs} += $deltas{minutes} * 60;
-
-            # This intentionally ignores leap seconds
-            $self->_normalize_tai_seconds(
-                $self->{utc_rd_days},
-                $self->{utc_rd_secs}
-            );
-        }
-
-        if ( $deltas{seconds} || $deltas{nanoseconds} ) {
-            $self->{utc_rd_secs} += $deltas{seconds};
-
-            if ( $deltas{nanoseconds} ) {
-                $self->{rd_nanosecs} += $deltas{nanoseconds};
-                $self->_normalize_nanoseconds(
-                    $self->{utc_rd_secs},
-                    $self->{rd_nanosecs}
-                );
-            }
-
-            $self->_normalize_seconds;
-
-            # This might be some big number much bigger than 60, but
-            # that's ok (there are tests in 19leap_second.t to confirm
-            # that)
-            $self->_handle_offset_modifier(
-                $self->second + $deltas{seconds} );
-        }
-
-        my $new = ( ref $self )->from_object(
-            object => $self,
-            locale => $self->{locale},
-            ( $self->{formatter} ? ( formatter => $self->{formatter} ) : () ),
+        # For preserve mode, if it is the last day of the month, make
+        # it the 0th day of the following month (which then will
+        # normalize back to the last day of the new month).
+        my ( $y, $m, $d ) = (
+              $dur->is_preserve_mode
+            ? $self->_rd2ymd( $self->{local_rd_days} + 1 )
+            : $self->_rd2ymd( $self->{local_rd_days} )
         );
 
-        %$self = %$new;
+        $d -= 1 if $dur->is_preserve_mode;
 
-        return $self;
+        if ( !$dur->is_wrap_mode && $d > 28 ) {
+
+            # find the rd for the last day of our target month
+            $self->{local_rd_days}
+                = $self->_ymd2rd( $y, $m + $deltas{months} + 1, 0 );
+
+            # what day of the month is it? (discard year and month)
+            my $last_day
+                = ( $self->_rd2ymd( $self->{local_rd_days} ) )[2];
+
+            # if our original day was less than the last day,
+            # use that instead
+            $self->{local_rd_days} -= $last_day - $d if $last_day > $d;
+        }
+        else {
+            $self->{local_rd_days}
+                = $self->_ymd2rd( $y, $m + $deltas{months}, $d );
+        }
+
+        $self->{utc_year} += int( $deltas{months} / 12 ) + 1;
     }
+
+    if ( $deltas{days} || $deltas{months} ) {
+        $self->_calc_utc_rd;
+
+        $self->_handle_offset_modifier( $self->second );
+    }
+
+    if ( $deltas{minutes} ) {
+        $self->{utc_rd_secs} += $deltas{minutes} * 60;
+
+        # This intentionally ignores leap seconds
+        $self->_normalize_tai_seconds(
+            $self->{utc_rd_days},
+            $self->{utc_rd_secs}
+        );
+    }
+
+    if ( $deltas{seconds} || $deltas{nanoseconds} ) {
+        $self->{utc_rd_secs} += $deltas{seconds};
+
+        if ( $deltas{nanoseconds} ) {
+            $self->{rd_nanosecs} += $deltas{nanoseconds};
+            $self->_normalize_nanoseconds(
+                $self->{utc_rd_secs},
+                $self->{rd_nanosecs}
+            );
+        }
+
+        $self->_normalize_seconds;
+
+        # This might be some big number much bigger than 60, but
+        # that's ok (there are tests in 19leap_second.t to confirm
+        # that)
+        $self->_handle_offset_modifier( $self->second + $deltas{seconds} );
+    }
+
+    my $new = ( ref $self )->from_object(
+        object => $self,
+        locale => $self->{locale},
+        ( $self->{formatter} ? ( formatter => $self->{formatter} ) : () ),
+    );
+
+    %$self = %$new;
+
+    return $self;
 }
 
 sub _compare_overload {
@@ -2325,7 +2348,7 @@ DateTime - A date and time object for Perl
 
 =head1 VERSION
 
-version 1.46
+version 1.47
 
 =head1 SYNOPSIS
 
@@ -2992,6 +3015,16 @@ datetime object is in a leap year.
 This method returns a true or false value indicating whether or not the
 datetime object is the last day of the month.
 
+=head3 $dt->is_last_day_of_quarter()
+
+This method returns a true or false value indicating whether or not the
+datetime object is the last day of the quarter.
+
+=head3 $dt->is_last_day_of_year()
+
+This method returns a true or false value indicating whether or not the
+datetime object is the last day of the year.
+
 =head3 $dt->month_length()
 
 This method returns the number of days in the current month.
@@ -3500,7 +3533,7 @@ corner cases involving subtraction of two datetimes across a DST
 change.
 
 If you can always use the floating or UTC time zones, you can skip
-ahead to L<Leap Seconds and Date Math|Leap Seconds and Date Math>
+ahead to L<Leap Seconds and Date Math>
 
 =item * date vs datetime math
 

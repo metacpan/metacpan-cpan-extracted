@@ -15,6 +15,7 @@ README
 t/00-load.t
 t/05-phys_to_wpi.t
 t/10-phys-to-gpio.t
+t/15-wpi_to_gpio.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

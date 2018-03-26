@@ -12,6 +12,7 @@ lib/App/DBBrowser/DB/SQLite.pm
 lib/App/DBBrowser/Join_Union.pm
 lib/App/DBBrowser/Opt.pm
 lib/App/DBBrowser/OptDB.pm
+lib/App/DBBrowser/Subqueries.pm
 lib/App/DBBrowser/Table.pm
 lib/App/DBBrowser/Table/Functions.pm
 lib/App/DBBrowser/Table/Insert.pm

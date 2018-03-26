@@ -57,17 +57,17 @@ sub set_attributes {
 
 sub get_db_handle {
     my ( $self, $db, $parameter ) = @_;
-    my $obj_db_cred = App::DBBrowser::Credentials->new( { parameter => $parameter } );
+    my $cred = App::DBBrowser::Credentials->new( { parameter => $parameter } );
     my $dsn;
     if ( ! $parameter->{use_env_var}{DBI_DSN} || ! exists $ENV{DBI_DSN} ) {
-        my $host = $obj_db_cred->get_login( 'host' );
-        my $port = $obj_db_cred->get_login( 'port' );
+        my $host = $cred->get_login( 'host' );
+        my $port = $cred->get_login( 'port' );
         $dsn = "dbi:$self->{driver}:dbname=$db";
         $dsn .= ";host=$host" if length $host;
         $dsn .= ";port=$port" if length $port;
     }
-    my $user   = $obj_db_cred->get_login( 'user' );
-    my $passwd = $obj_db_cred->get_login( 'pass' );
+    my $user   = $cred->get_login( 'user' );
+    my $passwd = $cred->get_login( 'pass' );
     my $dbh = DBI->connect( $dsn, $user, $passwd, {
         PrintError => 0,
         RaiseError => 1,

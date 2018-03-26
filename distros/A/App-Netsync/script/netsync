@@ -1,0 +1,249 @@
+#!perl
+
+=head1 NAME
+
+netsync - network/database synchronization utility
+
+=head1 DESCRIPTION
+
+This tool can discover a network and synchronize it with a database.
+
+=head1 SYNOPSIS
+
+ -h --help   Help. Print usage and options.
+ -V          Version. Print build information.
+ -v          Verbose. Print everything.
+ -q          Quiet. Print nothing.
+ -c .ini     Config. Specify a configuration file.
+ -p #        Probe. There are 2 Probe levels:
+               1: Probe the network for active nodes.
+               2: Probe the database for those nodes.
+ -D          DNS. Use your the Domain Name System to retrieve relevant nodes.
+ -m pattern  Match. Only process nodes with hostnames matching the pattern.
+ -d .csv     Database. Specify an RFC4180-compliant database file.
+ -a          Automatch. Enable interface auto-matching.
+ -u          Update. Send interface-specific information to network nodes.
+ nodes       Nodes. Nodes. Specify an RFC1035-compliant list of relevant nodes.
+
+=head1 EXAMPLES
+
+ $ netsync -Dm "host[0-9]+" -au
+
+Z<>
+
+ $ netsync -Dm "host[0-9]+" -p1
+ > configuring (using /etc/netsync/netsync.ini)... done
+ > discovering (using DNS)...  778 nodes (47 skipped), 796 devices (12 stacks)
+
+ $ netsync -ap2 /var/cache/netsync/active.txt
+ > configuring (using /etc/netsync/netsync.ini)... done
+ > discovering (using /var/cache/netsync/active.txt)...  778 nodes, 796 devices (12 stacks)
+ > identifying (using DBMS)...  664 synchronized (2389 conflicts)
+
+ $ netsync -d /var/cache/netsync/synced.csv -a /var/cache/netsync/active.txt
+ configuring (using /etc/netsync/netsync.ini)... done
+ discovering (using /var/cache/netsync/active.txt)...  778 nodes, 796 devices (12 stacks)
+ identifying (using /var/cache/netsync/synced.csv)...  796 synchronized
+
+=cut
+
+
+use autodie; #XXX Is autodie adequate?
+#use diagnostics;
+use strict;
+use warnings;
+use feature 'say';
+
+use File::Basename;
+use Getopt::Std;
+use Pod::Usage;
+use version;
+
+use App::Netsync;
+use App::Netsync::Configurator;
+use App::Netsync::Scribe ('note');
+
+our ($SCRIPT,$VERSION);
+our %config;
+
+
+BEGIN {
+    ($SCRIPT)  = ($0);
+    ($VERSION) = version->declare('v4.0.0');
+
+    $Getopt::Std::STANDARD_HELP_VERSION = 1;
+    $| = 1;
+
+    $config{'Options'}   = 'c:p:Dm:d:au';
+    $config{'Arguments'} = '[nodes]';
+}
+
+
+sub VERSION_MESSAGE {
+    say 'Perl v'.$];
+    say $SCRIPT.' '.$VERSION;
+
+    say 'App::Netsync               '.$App::Netsync::VERSION;
+    say 'App::Netsync::Configurator '.$App::Netsync::Configurator::VERSION;
+    say 'App::Netsync::Network      '.$App::Netsync::Network::VERSION;
+    say 'App::Netsync::Scribe       '.$App::Netsync::Scribe::VERSION;
+    say 'App::Netsync::SNMP         '.$App::Netsync::SNMP::VERSION;
+    say '[Core Modules]';
+    say '   File::Basename v'.$File::Basename::VERSION;
+    say ' Getopt::Std      v'.$Getopt::Std::VERSION;
+    say '    Pod::Usage    v'.$Pod::Usage::VERSION;
+    say '  POSIX           v'.$POSIX::VERSION;
+    say ' Scalar::Util     v'.$Scalar::Util::VERSION;
+    say '[CPAN Modules]';
+    say ' Config::Simple v'.$Config::Simple::VERSION;
+    say '    DBI         v'.$DBI::VERSION;
+    say '    Net::DNS    v'.$Net::DNS::VERSION;
+    say '   SNMP         v'.$SNMP::VERSION;
+    say '   SNMP::Info   v'.$SNMP::Info::VERSION;
+    say '   Text::CSV    v'.$Text::CSV::VERSION;
+}
+
+
+sub HELP_MESSAGE {
+    my $opts = $config{'Options'};
+    $opts =~ s/://g;
+    pod2usage({
+        '-message' => $SCRIPT.' [-'.$opts.'] '.$config{'Arguments'},
+        '-exitval' => 0,
+        '-verbose' => 0,
+    });
+}
+
+
+INIT {
+    my %opts;
+    $config{'Options'} = 'hVvq'.$config{'Options'};
+       HELP_MESSAGE and exit 1 unless getopts ($config{'Options'},\%opts);
+       HELP_MESSAGE and exit if $opts{'h'};
+    VERSION_MESSAGE and exit if $opts{'V'};
+    $config{'Verbose'} = (defined $opts{'q'}) ? 0 : $opts{'v'} // 0;
+    $config{'Quiet'}   = $opts{'q'} // 0;
+
+    { # Read the configuration file.
+        $config{'File'} = $opts{'c'} // '/etc/'.$SCRIPT.'/'.$SCRIPT.'.ini';
+        print 'configuring (using '.$config{'File'}.')...' unless $config{'Quiet'};
+        my %conf = App::Netsync::Configurator::configurate ($config{'File'});
+        $config{$_} = $conf{$_} foreach keys %conf;
+        say ' done' unless $config{'Quiet'};
+    }
+
+    $config{'ProbeLevel'} = $opts{'p'} // 0;
+    unless ($config{'ProbeLevel'} =~ /^[0-2]$/) {
+        warn 'Invalid ProbeLevel';
+        HELP_MESSAGE and exit 1;
+    }
+    $config{'Probe1Cache'} //= '/var/cache/'.$SCRIPT.'/active.txt';
+    $config{'Probe2Cache'} //= '/var/cache/'.$SCRIPT.'/synced.csv';
+
+    chomp ($config{'NodeFile'} = (defined $opts{'D'}) ? 'DNS' : <>);
+
+    $config{'Match'}     = $opts{'m'} // '[^.]+';
+    $config{'DataFile'}  = $opts{'d'} // 'DB';
+    $config{'Automatch'} = $opts{'a'} // 0;
+    $config{'Update'}    = $opts{'u'} // 0;
+
+    App::Netsync::configure({
+            %{App::Netsync::Configurator::config('Netsync')},
+            'Quiet'   => $config{'Quiet'},
+            'Verbose' => $config{'Verbose'},
+        },
+        App::Netsync::Configurator::config('DNS'),
+        App::Netsync::Configurator::config('SNMP'),
+        App::Netsync::Configurator::config('DB'),
+    );
+}
+
+
+{
+    my $nodes = App::Netsync::discover($config{'NodeFile'},$config{'Match'});
+    if ($config{'ProbeLevel'} == 1) {
+        foreach my $ip (sort keys %$nodes) {
+            note ($config{'Probe1Cache'},$nodes->{$ip}{'RFC1035'},0,'>');
+        }
+        exit;
+    }
+    App::Netsync::identify($nodes,$config{'DataFile'},$config{'Automatch'});
+    if ($config{'ProbeLevel'} == 2) {
+        my $Netsync = App::Netsync::Configurator::config('Netsync');
+        my $fields = $Netsync->{'DeviceField'}.','.$Netsync->{'InterfaceField'};
+        $fields .= ','.join (',',sort @{$Netsync->{'InfoFields'}});
+        note ($config{'Probe2Cache'},$fields,0,'>');
+        foreach my $ip (sort keys %$nodes) {
+            my $node = $nodes->{$ip};
+            foreach my $serial (sort keys %{$node->{'devices'}}) {
+                my $device = $node->{'devices'}{$serial};
+                foreach my $ifName (sort keys %{$device->{'interfaces'}}) {
+                    my $interface = $device->{'interfaces'}{$ifName};
+
+                    my $note = $serial.','.$ifName;
+                    foreach my $field (sort @{$Netsync->{'InfoFields'}}) {
+                        $note .= ','.($interface->{'info'}{$field} // '');
+                    }
+                    note ($config{'Probe2Cache'},$note,0);
+                }
+            }
+        }
+        exit;
+    }
+    App::Netsync::update $nodes if $config{'Update'};
+    exit;
+}
+
+
+=head1 AUTHOR
+
+David Tucker, C<< <dmtucker at ucsc.edu> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-netsync at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-Netsync>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+ perldoc App::Netsync
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Netsync>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/App-Netsync>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/App-Netsync>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/App-Netsync/>
+
+=back
+
+=head1 LICENSE
+
+Copyright 2013 David Tucker.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut
+
+
+1;

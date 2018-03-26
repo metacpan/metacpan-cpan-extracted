@@ -8,7 +8,7 @@ use Test::More;
 
 # Include lib.pl
 BEGIN { use_ok ("DBI") }
-do "t/lib.pl";
+do "./t/lib.pl";
 
 ok (1,						"Driver is CSV\n");
 

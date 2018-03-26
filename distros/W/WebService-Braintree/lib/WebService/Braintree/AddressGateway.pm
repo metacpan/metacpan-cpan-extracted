@@ -1,5 +1,8 @@
-package WebService::Braintree::AddressGateway;
-$WebService::Braintree::AddressGateway::VERSION = '1.1';
+# vim: sw=4 ts=4 ft=perl
+
+package # hide from pause
+    WebService::Braintree::AddressGateway;
+
 use 5.010_001;
 use strictures 1;
 
@@ -10,6 +13,8 @@ use Carp qw(confess);
 use WebService::Braintree::Validations qw(verify_params address_signature);
 use WebService::Braintree::Util qw(validate_id);
 use WebService::Braintree::Result;
+
+use WebService::Braintree::_::Address;
 
 has 'gateway' => (is => 'ro');
 

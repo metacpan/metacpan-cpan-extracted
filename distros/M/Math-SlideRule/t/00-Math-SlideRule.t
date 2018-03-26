@@ -7,18 +7,12 @@ use Test::Most;    # plan is down at bottom
 my $deeply = \&eq_or_diff;
 
 BEGIN {
-  use_ok('Math::SlideRule') || print "Bail out!\n";
+    use_ok('Math::SlideRule') || print "Bail out!\n";
 }
 diag("Testing Math::SlideRule $Math::SlideRule::VERSION, Perl $], $^X");
 
 my $sr = Math::SlideRule->new;
 isa_ok( $sr, 'Math::SlideRule' );
-
-########################################################################
-#
-# Public attributes
-
-# Back! Though are lookup tables now, so uh yeah.
 
 ########################################################################
 #
@@ -67,7 +61,7 @@ is( sprintf( "%.2f", $sr->divide( 14, 92, 3 ) ), 0.05, 'chain divide' );
 
 is( sprintf( "%.2f", $sr->multiply( 1.1, 2.2 ) ), 2.42, 'simple multiply' );
 is( sprintf( "%.2f", $sr->multiply( 4.1, 3.7 ) ),
-  15.17, 'multiply across bounds' );
+    15.17, 'multiply across bounds' );
 
 is( sprintf( "%.1f", $sr->sqrt(.04) ), 0.2,  'sqrt(.04)' );
 is( sprintf( "%.2f", $sr->sqrt(.4) ),  0.63, 'sqrt(.4)' );
@@ -76,8 +70,8 @@ is( sprintf( "%.2f", $sr->sqrt(40) ),  6.32, 'sqrt(40)' );
 # and also outside the 1..100 bounds of the A/B scale, which must be
 # adjusted to fit, then the exponent properly handled
 is( sprintf( "%.0f", $sr->sqrt(400) ), 20, 'sqrt(400)' );
-# NOTE should be 63.25, really do need to investigate magnitude of the errors
-# of these calculations.
+# NOTE should be 63.25, really do need to investigate magnitude of the
+# errors of these calculations.
 is( sprintf( "%.2f", $sr->sqrt(4000) ), 63.24, 'sqrt(4000)' );
 
 # actual answer precisely 4.00e-4; similar calculations without so nice
@@ -93,11 +87,11 @@ is( sprintf( "%.2f", $sr->multiply( 99, 99 ) ), 9799.41, 'big multiply' );
 is( sprintf( "%.2f", $sr->multiply( 1.1,  -2.2 ) ), -2.42, 'negative' );
 is( sprintf( "%.2f", $sr->multiply( -1.1, -2.2 ) ), 2.42,  'not negative' );
 
-# These really do accumulate error without rounding! (TODO investigate
+# these really do accumulate error without rounding! (TODO investigate
 # the error...)
 is( sprintf( "%.2f", $sr->multiply( 42, 31, 28, 215 ) ),
-  7837905.09, 'chain multiply' );
+    7837905.09, 'chain multiply' );
 is( sprintf( "%.2f", $sr->multiply( 42, -31, -28, -215 ) ),
-  -7837905.09, 'chain multiply neg' );
+    -7837905.09, 'chain multiply neg' );
 
 plan tests => 35;

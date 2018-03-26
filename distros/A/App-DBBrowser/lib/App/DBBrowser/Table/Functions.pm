@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.006';
+our $VERSION = '2.008';
 
 use List::MoreUtils qw( first_index );
 
@@ -18,34 +18,26 @@ use App::DBBrowser::DB;
 
 
 sub new {
-    my ( $class, $info, $opt ) = @_;
-    bless { i => $info, o => $opt }, $class;
+    my ( $class, $info, $options, $data ) = @_;
+    bless {
+        i => $info,
+        o => $options,
+        d => $data
+    }, $class;
 }
 
 
 sub col_function {
-    my ( $sf, $dbh, $sql, $stmt_type ) = @_;
-    my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o} );
+    my ( $sf, $sql, $stmt_type ) = @_;
+    my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my @functions = ( qw( Epoch_to_Date Bit_Length Truncate Char_Length Epoch_to_DateTime ) );
-    my $cols_type = '';
-    if ( $sql->{select_type} eq '*' ) {
+    if ( @{$sql->{group_by_cols}} + @{$sql->{aggr_cols}} + @{$sql->{chosen_cols}} == 0 ) {
         @{$sql->{chosen_cols}} = @{$sql->{cols}};
-        $cols_type = 'chosen_cols';
     }
-    elsif ( $sql->{select_type} eq 'chosen_cols' ) {
-        $cols_type = 'chosen_cols';
-    }
-    if ( $cols_type eq 'chosen_cols' ) {
-        if ( ! @{$sql->{orig_chosen_cols}} ) {
-            @{$sql->{orig_chosen_cols}} = @{$sql->{'chosen_cols'}};
-        }
-    }
-    else {
-        if ( @{$sql->{aggr_cols}} && ! @{$sql->{orig_aggr_cols}} ) {
-            @{$sql->{orig_aggr_cols}} = @{$sql->{'aggr_cols'}};
-        }
-        if ( @{$sql->{group_by_cols}} && ! @{$sql->{orig_group_by_cols}} ) {
-            @{$sql->{orig_group_by_cols}} = @{$sql->{'group_by_cols'}};
+    for my $col_type ( qw( chosen_cols aggr_cols group_by_cols ) ) {
+        my $col_type_orig = 'orig_' . $col_type;
+        if ( @{$sql->{$col_type}} && ! @{$sql->{$col_type_orig}} ) {
+            @{$sql->{$col_type_orig}} = @{$sql->{$col_type}};
         }
     }
     my $changed = 0;
@@ -53,13 +45,7 @@ sub col_function {
     COL_SCALAR_FUNC: while ( 1 ) {
         my $default = 0;
         my @pre = ( undef, $sf->{i}{_confirm} );
-        my @cols;
-        if ( $cols_type eq 'chosen_cols' ) {
-            @cols = @{$sql->{chosen_cols}};
-        }
-        else {
-            @cols = ( @{$sql->{aggr_cols}}, @{$sql->{group_by_cols}} );
-        }
+        my @cols = ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}}, @{$sql->{chosen_cols}} );
         my $choices = [ @pre, map( "- $_", @cols ) ];
         $ax->print_sql( $sql, [ $stmt_type ] );
         # Choose
@@ -74,19 +60,21 @@ sub col_function {
             if ( ! $changed ) {
                 return;
             }
-            $sql->{select_type} = 'chosen_cols' if $sql->{select_type} eq '*'; # makes the changes visible
             return 1; # return $tmp
         }
         ( my $qt_col = $choices->[$idx] ) =~ s/^\-\s//;
         $idx -= @pre;
-        if ( $cols_type ne 'chosen_cols' ) {
-            if ( $idx - @{$sql->{aggr_cols}} >= 0 ) { # chosen a "group by" col
-                $idx -= @{$sql->{aggr_cols}};
-                $cols_type = 'group_by_cols';
-            }
-            else {
-                $cols_type = 'aggr_cols';
-            }
+        my $cols_type;
+        if ( $idx <= $#{$sql->{group_by_cols}} ) {
+            $cols_type = 'group_by_cols';
+        }
+        elsif ( $idx <= $#{$sql->{aggr_cols}} ) {
+            $idx -= @{$sql->{group_by_cols}};
+            $cols_type = 'aggr_cols';
+        }
+        else {
+            $idx -= @{$sql->{group_by_cols}} + @{$sql->{aggr_cols}};
+            $cols_type = 'chosen_cols';
         }
         # reset col to original, if __col_function is called on a already modified col:
         if ( $sql->{$cols_type}[$idx] ne $sql->{'orig_' . $cols_type}[$idx] ) {
@@ -118,9 +106,9 @@ sub col_function {
         }
         # modify columns:
         $sql->{$cols_type}[$idx] = $col_with_func;
-        my $alias = $ax->__alias( $dbh, $col_with_func );
+        my $alias = $ax->alias( $col_with_func );
         if ( defined $alias && length $alias ) {
-            $sql->{alias}{$col_with_func} = $ax->quote_col_qualified( $dbh, [ $alias ] );
+            $sql->{alias}{$col_with_func} = $ax->quote_col_qualified( [ $alias ] );
         }
         if ( $cols_type eq 'group_by_cols' ) {
             $sql->{group_by_stmt} = " GROUP BY " . join( ', ', @{$sql->{group_by_cols}} );
@@ -139,7 +127,7 @@ sub col_function {
 
 sub __prepare_col_func {
     my ( $sf, $func, $qt_col ) = @_;
-    my $obj_db = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
+    my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
     my $quote_f;
     if ( $func =~ /^Epoch_to_Date(?:Time)?\z/ ) {
         my $prompt = $func eq 'Epoch_to_Date' ? 'DATE' : 'DATETIME';
@@ -158,10 +146,10 @@ sub __prepare_col_func {
         my $div = $interval eq $microseconds ? 1000000 :
                   $interval eq $milliseconds ? 1000 : 1;
         if ( $func eq 'Epoch_to_DateTime' ) {
-            $quote_f = $obj_db->epoch_to_datetime( $qt_col, $div );
+            $quote_f = $plui->epoch_to_datetime( $qt_col, $div );
         }
         else {
-            $quote_f = $obj_db->epoch_to_date( $qt_col, $div );
+            $quote_f = $plui->epoch_to_date( $qt_col, $div );
         }
     }
     elsif ( $func eq 'Truncate' ) {
@@ -171,13 +159,13 @@ sub __prepare_col_func {
             { info => $info, name => $name, small => 1, mouse => $sf->{o}{table}{mouse}, clear_screen => 0 }
         );
         return if ! defined $precision;
-        $quote_f = $obj_db->truncate( $qt_col, $precision );
+        $quote_f = $plui->truncate( $qt_col, $precision );
     }
     elsif ( $func eq 'Bit_Length' ) {
-        $quote_f = $obj_db->bit_length( $qt_col );
+        $quote_f = $plui->bit_length( $qt_col );
     }
     elsif ( $func eq 'Char_Length' ) {
-        $quote_f = $obj_db->char_length( $qt_col );
+        $quote_f = $plui->char_length( $qt_col );
     }
     return $quote_f;
 }

@@ -4,3 +4,8 @@ Revision history for Perl extension MooseX::RelClassType.
 	- original version; created by h2xs 1.23 with options
 		-AX MooseX::RelClassType
 
+0.02  Mon Mar 26 07:14:24 2018
+    - remove erroneous BUILDARGS sub. Explicitly "use"
+      included modules in tests
+
+

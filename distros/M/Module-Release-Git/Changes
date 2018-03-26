@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Release::Git
 
+1.014 2018-03-22T18:55:19Z
+	* Change to Artistic License 2.0
+
 1.012 2018-02-26T11:46:00Z
 	* Adjust git output matching for new output strings. This should 
 	still work on older gits.

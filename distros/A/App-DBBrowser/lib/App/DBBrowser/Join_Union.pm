@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.006';
+our $VERSION = '2.008';
 
 use List::MoreUtils qw( any );
 
@@ -22,17 +22,21 @@ use App::DBBrowser::Auxil;
 
 
 sub new {
-    my ( $class, $info, $opt ) = @_;
-    bless { i => $info, o => $opt }, $class; # no opt
+    my ( $class, $info, $options, $data ) = @_;
+    bless {
+        i => $info,
+        o => $options,
+        d => $data
+    }, $class;
 }
 
 
 sub union_tables {
-    my ( $sf, $dbh, $data ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o} );
-    my $u = $data;
-    my $tbls = [ sort keys %{$u->{tables}} ];
-    ( $u->{col_names}, $u->{col_types} ) = $sf->__column_names_and_types( $dbh, $data, $tbls );
+    my ( $sf ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $u = $sf->{d}; # ###
+    my $tbls = [ sort keys %{$u->{tables_info}} ];
+    ( $u->{col_names}, $u->{col_types} ) = $sf->__column_names_and_types( $tbls );
     my $union = {
         unused_tables => [ map { "- $_" } @$tbls ],
         used_tables   => [],
@@ -72,7 +76,7 @@ sub union_tables {
                 used_cols     => {},
                 saved_cols    => [],
             };
-            $sf->{union_all} = 1; #
+            $sf->{union_all} = 1;
             next UNION_TABLE;
         }
         my $backup_union = $ax->backup_href( $union );
@@ -159,19 +163,19 @@ sub union_tables {
     my $first_table = $union->{used_tables}[0];
     my $c;
     my $qt_table = "(";
-    my $qt_columns = $ax->quote_simple_many( $dbh, $union->{used_cols}{$first_table} );
+    my $qt_columns = $ax->quote_simple_many( $union->{used_cols}{$first_table} );
     for my $table ( @{$union->{used_tables}} ) {
         $c++;
         $qt_table .= " SELECT ";
-        my $qt_cols = $ax->quote_simple_many( $dbh, $union->{used_cols}{$table} );
+        my $qt_cols = $ax->quote_simple_many( $union->{used_cols}{$table} );
         $qt_table .= join( ', ', @$qt_cols );
-        $qt_table .= " FROM " . $ax->quote_table( $dbh, $u->{tables}{$table} );
+        $qt_table .= " FROM " . $ax->quote_table( $u->{tables_info}{$table} );
         $qt_table .= $c < @{$union->{used_tables}} ? " UNION ALL " : " )";
     }
     my $default = $sf->{union_all} ? "UNION_ALL_TABLES" : "UNION_SELECTED_TABLES";
     # alias: required if mysql, Pg, ...
-    my $alias = $ax->__alias( $dbh, 'Union', $default );
-    $qt_table .= " AS " . $ax->quote_col_qualified( $dbh, [ $alias ] );
+    my $alias = $ax->alias( 'Union', $default );
+    $qt_table .= " AS " . $ax->quote_col_qualified( [ $alias ] );
     return $qt_table, $qt_columns;
 }
 
@@ -219,12 +223,12 @@ sub __print_union_statement {
 
 
 sub __column_names_and_types {
-    my ( $sf, $dbh, $data, $tables ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o} );
+    my ( $sf, $tables ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my ( $col_names, $col_types );
     for my $table ( @$tables ) {
-        my $sth = $dbh->prepare( "SELECT * FROM " . $ax->quote_table( $dbh, $data->{tables}{$table} ) . " LIMIT 0" );
-        $sth->execute() if $sf->{i}{driver} ne 'SQLite';
+        my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $ax->quote_table( $sf->{d}{tables_info}{$table} ) . " LIMIT 0" );
+        $sth->execute() if $sf->{d}{driver} ne 'SQLite';
         $col_names->{$table} ||= $sth->{NAME};
         $col_types->{$table} ||= $sth->{TYPE};
     }
@@ -233,12 +237,12 @@ sub __column_names_and_types {
 
 
 sub join_tables {
-    my ( $sf, $dbh, $data ) = @_;
+    my ( $sf ) = @_;
     my $stmt_v = Term::Choose->new( $sf->{i}{lyt_stmt_v} );
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o} );
-    my $j = $data;
-    my $tbls = [ sort keys %{$j->{tables}} ]; # name
-    ( $j->{col_names}, $j->{col_types} ) = $sf->__column_names_and_types( $dbh, $data, $tbls );
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $j = $sf->{d}; # ###
+    my $tbls = [ sort keys %{$j->{tables_info}} ]; # name
+    ( $j->{col_names}, $j->{col_types} ) = $sf->__column_names_and_types( $tbls );
     my $join = {};
 
     MASTER: while ( 1 ) {
@@ -260,20 +264,20 @@ sub join_tables {
             return;
         }
         if ( $choices->[$idx] eq $info ) {
-            $sf->__get_join_info( $dbh, $data );
-            $sf->__print_join_info( $data );
+            $sf->__get_join_info();
+            $sf->__print_join_info();
             next MASTER;
         }
         $idx -= @pre;
         ( my $master = splice( @tables, $idx, 1 ) ) =~ s/^-\s//;
         $join->{used_tables}  = [ $master ];
         $join->{avail_tables} = [ @tables ];
-        my $default_alias = $sf->{i}{driver} eq 'Pg' ? 'a' : 'A';
-        my $qt_master = $ax->quote_table( $dbh, $j->{tables}{$master} );
+        my $default_alias = $sf->{d}{driver} eq 'Pg' ? 'a' : 'A';
+        my $qt_master = $ax->quote_table( $j->{tables_info}{$master} );
         $join->{stmt} = "SELECT * FROM " . $qt_master;
         $sf->__print_join_statement( $join->{stmt} );
-        $join->{alias}{$master} = $ax->__alias( $dbh, $qt_master, $default_alias );
-        $join->{stmt} .= " AS " . $ax->quote_col_qualified( $dbh, [ $join->{alias}{$master} ] );
+        $join->{alias}{$master} = $ax->alias( $qt_master, $default_alias );
+        $join->{stmt} .= " AS " . $ax->quote_col_qualified( [ $join->{alias}{$master} ] );
         my $backup_master = $ax->backup_href( $join );
 
         JOIN: while ( 1 ) {
@@ -303,8 +307,8 @@ sub join_tables {
                     last JOIN;
                 }
                 elsif ( $choices->[$idx] eq $info ) {
-                    $sf->__get_join_info( $dbh, $data );
-                    $sf->__print_join_info( $data );
+                    $sf->__get_join_info();
+                    $sf->__print_join_info();
                     next SLAVE;
                 }
                 else {
@@ -313,20 +317,20 @@ sub join_tables {
             }
             $idx -= @pre;
             ( my $slave = splice( @{$join->{avail_tables}}, $idx, 1 ) ) =~ s/^-\s//;
-            my $qt_slave = $ax->quote_table( $dbh, $j->{tables}{$slave} );
+            my $qt_slave = $ax->quote_table( $j->{tables_info}{$slave} );
             $join->{stmt} .= " LEFT OUTER JOIN " . $qt_slave;
             $sf->__print_join_statement( $join->{stmt} );
-            $join->{alias}{$slave} = $ax->__alias( $dbh, $qt_slave, ++$default_alias );
-            $join->{stmt} .= " AS " . $ax->quote_col_qualified( $dbh, [ $join->{alias}{$slave} ] ). " ON";
+            $join->{alias}{$slave} = $ax->alias( $qt_slave, ++$default_alias );
+            $join->{stmt} .= " AS " . $ax->quote_col_qualified( [ $join->{alias}{$slave} ] ). " ON";
             my %avail_pk_cols;
             for my $used_table ( @{$join->{used_tables}} ) {
                 for my $col ( @{$j->{col_names}{$used_table}} ) {
-                    $avail_pk_cols{ $join->{alias}{$used_table} . '.' . $col } = $ax->quote_col_qualified( $dbh, [undef, $join->{alias}{$used_table}, $col ] ); #
+                    $avail_pk_cols{ $join->{alias}{$used_table} . '.' . $col } = $ax->quote_col_qualified( [undef, $join->{alias}{$used_table}, $col ] ); #
                 }
             }
             my %avail_fk_cols;
             for my $col ( @{$j->{col_names}{$slave}} ) {
-                $avail_fk_cols{ $join->{alias}{$slave} . '.' . $col } = $ax->quote_col_qualified( $dbh, [ undef, $join->{alias}{$slave}, $col ] );
+                $avail_fk_cols{ $join->{alias}{$slave} . '.' . $col } = $ax->quote_col_qualified( [ $join->{alias}{$slave}, $col ] );
             }
 
             my $AND = '';
@@ -378,7 +382,7 @@ sub join_tables {
     my $qt_columns = [];
     for my $table ( @{$join->{used_tables}} ) {
         for my $col ( @{$j->{col_names}{$table}} ) {
-            my $col_qt = $ax->quote_col_qualified( $dbh, [ undef, $join->{alias}{$table}, $col ] );
+            my $col_qt = $ax->quote_col_qualified( [ undef, $join->{alias}{$table}, $col ] );
             if ( any { $_ eq $col_qt } @{$join->{foreign_keys}} ) { ##
                 next;
             }
@@ -400,9 +404,9 @@ sub __print_join_statement {
 
 
 sub __print_join_info {
-    my ( $sf, $data ) = @_;
-    my $pk = $data->{pk_info};
-    my $fk = $data->{fk_info};
+    my ( $sf ) = @_;
+    my $pk = $sf->{d}{pk_info};
+    my $fk = $sf->{d}{fk_info};
     my $aref = [ [ qw(PK_TABLE PK_COLUMN), ' ', qw(FK_TABLE FK_COLUMN) ] ];
     my $r = 1;
     for my $t ( sort keys %$pk ) {
@@ -424,13 +428,13 @@ sub __print_join_info {
 }
 
 sub __get_join_info {
-    my ( $sf, $dbh, $data ) = @_;
-    return if $data->{pk_info};
-    my $td = $data->{tables};
-    my $tables = $data->{user_tbls}; ###
+    my ( $sf ) = @_;
+    return if $sf->{d}{pk_info};
+    my $td = $sf->{d}{tables_info};
+    my $tables = $sf->{d}{user_tables}; ###
     my $pk = {};
     for my $table ( @$tables ) {
-        my $sth = $dbh->primary_key_info( @{$td->{$table}} );
+        my $sth = $sf->{d}{dbh}->primary_key_info( @{$td->{$table}} );
         next if ! defined $sth;
         while ( my $ref = $sth->fetchrow_hashref() ) {
             next if ! defined $ref;
@@ -442,7 +446,7 @@ sub __get_join_info {
     }
     my $fk = {};
     for my $table ( @$tables ) {
-        my $sth = $dbh->foreign_key_info( @{$td->{$table}}, undef, undef, undef );
+        my $sth = $sf->{d}{dbh}->foreign_key_info( @{$td->{$table}}, undef, undef, undef );
         next if ! defined $sth;
         while ( my $ref = $sth->fetchrow_hashref() ) {
             next if ! defined $ref;
@@ -452,8 +456,8 @@ sub __get_join_info {
             #push @{$fk->{$table}{KEY_SEQ}},       defined $ref->{KEY_SEQ}       ? $ref->{KEY_SEQ}       : $ref->{ORDINAL_POSITION};
         }
     }
-    $data->{pk_info} = $pk;
-    $data->{fk_info} = $fk;
+    $sf->{d}{pk_info} = $pk;
+    $sf->{d}{fk_info} = $fk;
 }
 
 1;

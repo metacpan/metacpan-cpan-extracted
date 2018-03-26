@@ -29,8 +29,9 @@ subtest "card verification is returned by result objects" => sub {
     };
 
     my $result = WebService::Braintree::CreditCard->create($credit_card_params);
-    my $verification = $result->credit_card_verification;
+    invalidate_result($result) or return;
 
+    my $verification = $result->credit_card_verification;
     is $verification->credit_card->{'last_4'}, "1115";
     is $verification->status, "processor_declined";
 };
@@ -46,8 +47,9 @@ subtest "finds credit card verification" => sub {
     };
 
     my $result = WebService::Braintree::CreditCard->create($credit_card_params);
-    my $verification = $result->credit_card_verification;
+    invalidate_result($result) or return;
 
+    my $verification = $result->credit_card_verification;
     my $find_result = WebService::Braintree::CreditCardVerification->find($verification->id);
 
     is $find_result->id, $verification->id;

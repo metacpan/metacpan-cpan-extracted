@@ -3,9 +3,9 @@ NAME
     distribution
 
 VERSION
-    This document describes version 0.053 of Dist::Zilla::Plugin::WordList
+    This document describes version 0.054 of Dist::Zilla::Plugin::WordList
     (from Perl distribution Dist-Zilla-Plugin-WordList), released on
-    2018-03-19.
+    2018-03-23.
 
 SYNOPSIS
     In dist.ini:

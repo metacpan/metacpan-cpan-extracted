@@ -1,3 +1,8 @@
+0.66 - bug in 0.65 fix, fully tested now
+
+0.65 - allow files arguments to be Path::Class::File or similar objects that
+       stringify to the pathname
+
 0.64 - initial code for unshared file support (not yet working but causes no bugs)
      - skipstage testing was losing the per-test pre list, only using the
 	   global list

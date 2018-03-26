@@ -1,5 +1,8 @@
 Revision history for Perl module Mac::PropertyList
 
+1.413 2018-03-22T18:51:07Z
+	* Update to Artistic License 2.0
+
 1.412 2017-07-30T18:27:33Z
 	* Fix for plist files with comments (bram.stappers@tiobe.com) RT #122466
 	and GitHub #5 (as a pull request)

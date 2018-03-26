@@ -59,6 +59,24 @@ Perl_get_re_arg(pTHX_ SV *sv) {
 }
 #endif
 
+#if PERL_VERSION > 17
+# define XH_AMAGIC(sv) HvAMAGIC(SvSTASH(sv))
+#else
+# if PERL_VERSION > 8
+#  define XH_AMAGIC(sv) (SvFLAGS(sv) & SVf_AMAGIC)
+# else
+#  define XH_AMAGIC(sv) ((SvFLAGS(sv) & SVf_AMAGIC)                     \
+     || ((mg = mg_find((SV*) SvSTASH(sv), PERL_MAGIC_overload_table))   \
+         && mg->mg_ptr && AMT_AMAGIC((AMT*)mg->mg_ptr)))
+# endif
+#endif
+
+#if PERL_VERSION > 13
+# define XH_AMG_CALL_STRING(sv) AMG_CALLunary(sv, string_amg)
+#else
+# define XH_AMG_CALL_STRING(sv) AMG_CALLun(sv ,string)
+#endif
+
 #if __GNUC__ >= 3
 # define expect(expr,value)         __builtin_expect ((expr), (value))
 # define XH_INLINE                  static inline
@@ -67,6 +85,16 @@ Perl_get_re_arg(pTHX_ SV *sv) {
 # define expect(expr,value)         (expr)
 # define XH_INLINE                  static
 # define XH_UNUSED(v)               v
+#endif
+
+#if __STDC_VERSION__ < 199901L
+# if __GNUC__ >= 2
+#  define XH_FUNCTION __FUNCTION__
+# else
+#  define XH_FUNCTION "<unknown>"
+# endif
+#else
+# define XH_FUNCTION __func__
 #endif
 
 #ifdef _MSC_VER

@@ -1,6 +1,7 @@
 #!perl
 
 use strict;
+use Test::Builder::Tester;
 use Test::More tests => 19;
 
 use Data::Dumper;
@@ -18,7 +19,7 @@ no_title($filename,'test site','no english title');
 tag_matches($filename,
        'p',
        { class => 'formError',
-	 _content => qr/Omlouváme se, byly nalezeny chyby a Váš inzerát nemohl být odeslán/ },
+     _content => qr/Omlouváme se, byly nalezeny chyby a Váš inzerát nemohl být odeslán/ },
        'main error message appears as expected' );
 
 tag_matches($filename, [qw/weak strong/], { _content => qr/Titulek/ }, 'tag_matches will match one of several tags ok' );
@@ -26,7 +27,7 @@ tag_matches($filename, [qw/weak strong/], { _content => qr/Titulek/ }, 'tag_matc
 no_tag($filename,
        'p',
        { class => 'formError',
-	 _content => 'Error' },
+     _content => 'Error' },
        'no unexpected english errors' );
 
 
@@ -35,13 +36,12 @@ no_text($filename,'Concert','no text matching : Concert'); # check text found in
 
 script_matches($filename, qr/function someWidget/, 'found widget in JS');
 
-# script_matches($filename, qr/function foobar/, 'found widget in JS');
-
 image_matches($filename,'/images/error.gif','matching image found image in HTML');
 no_image($filename,'/images/hello_kitty.jpg','no matching image found in HTML');
 
 link_matches($filename,'/foo/select_foo.html?id=12345678','Found link in HTML');
 no_link($filename,'/foo/select_foo.html?id=87654321','Not found wrong link in HTML');
+
 link_matches($filename,'/css/layout.css','Found css link in HTML');
 
 form_field_value_matches($filename,'tit1e','test event', undef, 'have title');

@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckRewrite;
 # ABSTRACT: Git::Hooks plugin for checking against unsafe rewrites
-$Git::Hooks::CheckRewrite::VERSION = '2.8.1';
+$Git::Hooks::CheckRewrite::VERSION = '2.9.0';
 use 5.010;
 use utf8;
 use strict;
@@ -184,7 +184,7 @@ Git::Hooks::CheckRewrite - Git::Hooks plugin for checking against unsafe rewrite
 
 =head1 VERSION
 
-version 2.8.1
+version 2.9.0
 
 =head1 SYNOPSIS
 
@@ -192,7 +192,11 @@ As a C<Git::Hooks> plugin you don't use this Perl module directly. Instead, you
 may configure it in a Git configuration file like this:
 
   [githooks]
+
+    # Enable the plugin
     plugin = CheckRewrite
+
+    # These users are exempt from all checks
     admin = joe molly
 
 This section enables the plugin and defines the users C<joe> and C<molly> as

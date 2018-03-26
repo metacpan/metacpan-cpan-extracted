@@ -1,0 +1,4852 @@
+ICC Modules Revisions
+
+2010-02-08
+
+- started ICC::Profile project
+
+2010-03-26
+
+- added basic usage example.
+
+2010-03-29
+
+-added profile quality example.
+
+2010-04-10
+
+- added device link example.
+
+2010-04-10
+
+- added modules for most commonly used ICC profile tags.
+
+2010-04-23
+
+- added many tests.
+
+2010-08-02
+
+- modified mAB_->_readICCmAB_, mBA_->_readICCmBA_, mft1->_readICCmft1, mft2->_readICCmft2, to eliminate circular reference.
+
+2010-08-03
+
+- modified curv->transform, curv->inverse, curv->derivative to copy array reference, rather than entire array.
+
+- modified para->transform, para->inverse, para->derivative to copy array reference, rather than entire array.
+
+2010-08-04
+
+- modified Profile_test to check for circular references using Devel::Cycle module.
+
+2010-08-06
+
+- added 't' directory and created initial test programs for each object type.
+
+- added program 'run_cpan_tests.plx' to simulate CPAN 'make test' command.
+
+2010-08-07
+
+- added object round-trip test to 'clro.t'.
+
+2010-08-08
+
+- modified Chart subroutines _getDataFolder, _makeCWF, _readCWF to use File::Spec for building paths (for OS portability).
+
+- modified Curve subroutines _getPrefsFolder, prinergy to use File::Spec for building paths (for OS portability).
+
+- added some tests to clrt.t and realized this module needs an A2B1 tag for testing.
+
+- added test profiles to 'data' folder.
+
+- added module 't::lib::Test' to create bootstrap profile objects.
+
+- renumbered tests to allow bootstrapping of modules as needed to open test profiles.
+
+- modified profile subroutine _readICCprofile by removing @sigs from parameter list, and cleaning up local variable lists.
+
+- added program 'snippets/write_profile_structure.plx' to create YAML file of profile structure.
+
+2010-08-09
+
+- moved program 'run_cpan_tests.plx' into 'ICC_modules' folder, so current directory is the same as with 'make test'.
+
+- modified 'File::Spec' calls to reflect new location of 'run_cpan_tests.plx'.
+
+- added test program 'bootstrap.t' to test 't::lib::Test' module.
+
+- added some basic tests to 'curv.t'
+
+2010-08-10
+
+- copied basic tests to 'para.t', 'XYZ_.t', 'desc.t', 'text.t', 'mft1.t', 'mft2.t', 'mAB_.t', 'mBA_.t' and modified as needed.
+
+2010-08-11
+
+- copied basic tests to 'Generic.t', 'mluc.t', 'sf32.t', 'sig_.t' and modified as needed.
+
+2010-08-12
+
+- added snippet 'read_TIFF_data.plx'.
+
+2010-08-14
+
+- added 'Chart->readTIFF' method (v0.50).
+
+- added example program 'scanner_profile_1_example.plx'.
+
+2010-08-20
+
+- completed example program 'scanner_profile_1_example.plx'.
+
+2010-08-29
+
+- added new module 'mCLUT.pm' to implement CLUT functions within 'mft1', 'mft2', 'mAB_', 'mBA_'.
+
+- added test program 'mCLUT_test.plx' to test the 'mCLUT.pm' module.
+
+- modified module 'mAB_' to incorporate 'mCLUT' object. (v0.70)
+
+2010-08-30
+
+- added 'build' method to 'mCLUT.pm'.
+
+2010-09-05
+
+- added clipping to 'mCLUT->_writeICCmCLUT' method.
+
+2010-09-09
+
+- completed example program 'scanner_profile_2_example.plx', which uses CLUT to improve accuracy.
+
+2010-09-10
+
+- modified module 'mBA_' to incorporate 'mCLUT' object. (v0.70)
+
+- modified test program 'mAB_test.plx' to use mCLUT object when creating new profile.
+
+- added test program '05_mCLUT.t'.
+
+2010-09-11
+
+- modified modules 'mft1' and 'mft2' to incorporate 'mCLUT' object. (v0.70 and v1.00)
+
+- updated some of the example programs to work with mCLUT.
+
+2010-09-12
+
+- added new module 'nCLUT' to implement CLUTs with any number of inputs, not just 3, 4, and 6.
+
+- added snippet 'clut_index_test.plx' to test binary indexing idea.
+
+- added test program 'nCLUT_test.plx' to test the 'nCLUT.pm' module.
+
+2010-09-13
+
+- added subroutine '_clut_in' to 'nCLUT.pm' module.
+
+- modified 'build' method of 'nCLUT.pm' to use '_clut_in', to work with CLUTs having any number of inputs.
+
+- modified modules 'mAB_', 'mBA_', 'mft1', 'mft2' to use 'nCLUT.pm' module.
+
+- updated cpan tests to use nCLUT instead of mCLUT.
+
+2010-09-14
+
+- updated 'device_link_1_example.plx', 'device_link_2_example.plx', 'device_link_3_example.plx' to work with 'nCLUT.pm'.
+
+- removed 'device_link_4_example.plx', which was incomplete.
+
+- updated 'overlam_compensation_example.plx' to work with 'nCLUT.pm'.
+
+- updated 'rebuild_reverse_table_example.plx' to work with 'nCLUT.pm'.
+
+2010-09-16
+
+- updated 'rebuild_reverse_table_example.plx' to use 'inverse' method.
+
+2010-09-19
+
+- fixed a serious bug in nCLUT, where @xr was scaled by the grid size, and caused extrapolated values to be wrong.
+
+- modified nCLUT to compute Jacobian from CLUT corner points when extrapolating. (v0.30)
+
+2010-09-21
+
+- added Jacobian test to 'nCLUT_test.plx'.
+
+2010-09-22
+
+- modified 'clut' method of 'nCLUT.pm' to be a 'get/set' method, and take optional reference to new array.
+
+- modified 'nCLUT.pm' to use 2 as the default value of 'clut_bytes'.
+
+- modified 'nCLUT.pm' to add validation of 'build' parameters.
+
+2010-09-25
+
+- modified 'nCLUT->build' to return object reference.
+
+2010-09-26
+
+- modified various examples to use returned 'build' object reference.
+
+- added 'scanner_profile_3_example.plx' example.
+
+2010-09-28
+
+- added 'randomize' method to 'Chart.pm' module.
+
+- modified 'Chart_test.plx' to test 'randomize' method.
+
+2010-10-03
+
+- modified 'scanner_profile_1_example.plx' to use 'rms' subroutine.
+
+- modified 'scanner_profile_2_example.plx' to compute optimize linear and non-linear components simultaneously.
+
+- modified 'scanner_profile_3_example.plx' to incorporate changes example 2 changes.
+ 
+- modified 'jacobian' method of 'nCLUT.pm' to verify user-defined functions for both 'transform' and 'Jacobian', or not.
+
+2010-10-15
+
+- added example program 'profile_to_dataset_example.plx'.
+
+2010-10-21
+
+- added 'bern' module.
+
+2010-10-23
+
+- updated 'Curve' module to use 'bern' objects. (v0.40)
+
+- updated 'Curve_module_notes.txt'
+
+- added 'bern_module_notes.txt'
+
+- added test program '50_bern.t'.
+
+- updated examples that use the 'Curve' module.
+
+2010-10-31
+
+- modified 'scanner_profile_3_example.plx' to display gamma curve parameters.
+
+2010-11-04
+
+- modified subroutines size and _writeICCtext of 'text' module to remove non-ASCII characters from text string.
+
+2010-11-07
+
+- modified scanner profile examples by adding gamma curve optimization slice.
+
+- modified 'scanner_profile_1_example.plx' and 'scanner_profile_2_example.plx' to display gamma curve parameters.
+
+2010-11-13
+
+- added 'rampage' method to 'Curves.pm'.
+
+2010-11-14
+
+- modified 'edit_media_whitepoint_example.plx' to support measurement and manual entry of new white point.
+
+2010-11-16
+
+- added example 'chart_duplicate_patches.plx'.
+
+2010-12-05
+
+- added 'press_curve_3_example.plx' with shadow contrast limiting.
+
+2010-12-17
+
+- added example 'overlam_compensation_2_example.plx'.
+
+2010-12-30
+
+- added 'TriCubic.pm' module and 'TriCubic_test.plx'.
+
+2010-12-31
+
+- fixed a bug in Chart->slice method. the replacement row index did not use slice indirection.
+
+- added 'TriCubic_fit_test.plx'.
+
+2011-01-01
+
+- added 'TriCubic_fit_test2.plx' and a MATLAB program, 'tricubic.m'.
+
+2011-01-15
+
+- modified 'new' method in 'curv' object to copy the input array, rather than just save the array reference.
+
+- modified '_newICCclro' method in 'clro' object to copy the input array, rather than just save the array reference.
+
+- modified 'new' method in 'para' object to copy the input array, rather than just save the array reference.
+
+- modified 'new' method in 'sf32' object to copy the input array, rather than just save the array reference.
+
+- modified 'gsa' and 'udf' methods in 'nCLUT' object to copy the input array, rather than just save the array reference.
+
+2011-01-19
+
+- added 'nPINT.pm' module.
+
+- added 'nPINT_test.plx' program.
+
+- added 'press_curve_4_example.plx'.
+
+2011-01-20
+
+- modified 'nPINT.pm' by adding subroutine _input2cv, an optimized algorithm for computing the coefficient vector.
+
+2011-01-21
+
+- modified 'rampage' method of 'Curves' module to put 'C', 'M', 'Y', or 'K' at end of file names.
+
+2011-01-22
+
+- created XS module 'ICC::Support::Lapack' to interface with the LAPACK library.
+
+- added program 'build_CPAN_distribution.plx' to organize modules for distribution on CPAN.
+
+- added some rudimentary documentation to 'Profile.pm' module.
+
+2011-01-23
+
+- fixed minor bug in 'Profile.pm' and 'pseq.pm' where the major revision only used the second nibble of byte 8, instead of both nibbles.
+
+- fixed minor bug in 'Profile.pm' by changing default value of MD5 string from "\x00" x 16 to '00' x 16.
+
+- added 'dump' and 'sdump' methods to 'Profile.pm'.
+
+- added test program 'Profile_dump_test.plx'.
+
+2011-01-26
+
+- modified 'sdump' method of 'Profile.pm' so that flag may contain a number indicating the depth to dump linked objects.
+
+- added 'dump' and 'sdump' method stubs to all modules - 'sdump' method returns 'sdump method not yet implemented'.
+
+2011-02-04
+
+- added 'device' method and '_getset' subroutine to 'Chart.pm' module. (v0.60)
+
+- added 'Chart_device_test.plx' to test 'device' method.
+
+- modified 'Chart.pm' methods 'slice', 'rgb', 'cmyk', 'hex', 'lab', 'xyz', and 'spectral' to call '_getset'.
+
+- removed 'getSoS' method from 'Chart.pm' module.
+
+- added 'nCLR' method to 'Chart.pm' module.
+
+2011-02-05
+
+- modified 'fmt', 'id', 'add_fmt', and 'add_set' methods of 'Chart.pm' to always return an array reference. reasoning: be tolerant on input, strict on output.
+
+- updated 'Chart_test.plx' to reflect changes in 'Chart.pm' module.
+
+- modified example programs to reflect changes in 'Chart.pm' module.
+
+- modified 'nPINT.pm' so that 'transform' method calls BLAS routines in ICC::Support::Lapack;
+
+2011-02-06
+
+- added document 'nPINT_module_notes.txt' to describe function of 'nPINT' module.
+
+- added 'jacobian' method and 'input2xd' subroutine to 'nPINT.pm' module.
+
+2011-02-07
+
+- added subroutine vec_derv to ICC::Support::Lapack, to compute partial derivatives.
+
+- incorporated vec_derv into 'jacobian' method of 'nPINT.pm' module.
+
+2011-02-08
+
+- added subroutine jacobian to ICC::Support::Lapack, removed vec_derv.
+
+- incorporated jacobian into 'jacobian' method of 'nPINT.pm' module.
+
+2011-02-09
+
+- fixed bug in subroutine _readSPD of 'Chart.pm' where last sample was equal to array upper index.
+
+- added subroutine solve to ICC::Support::Lapack.
+
+- incorporated solve into 'inverse' method of 'nPINT.pm' module (v0.40)
+
+2011-02-10
+
+- modified subroutine _getset in 'Chart.pm' to bless data slice as a Math::Matrix object.
+
+- added 'fit' method to 'bern.pm' module.
+
+- added 'bern_fit_test.plx'.
+
+- added 'add_ctv' method to 'Chart.pm' module.
+
+- added 'Chart_ctv_test.plx'
+
+2011-02-11
+
+- added functions XYZ2Lxyz and Lxyz2XYZ to 'Shared.pm'.
+
+- cleaned up 'add_xyz', 'add_lab' and 'wtpt' methods in 'Chart.pm'.
+
+- added 'NONE' option for illuminant to 'add_xyz' method in 'Chart.pm'.
+
+- added 'normalize' method to 'bern.pm'.
+
+- added 'view_ctv_curves_example.plx'.
+
+- modified 'add_ctv' method of 'Chart.pm' to add optional coefficients.
+
+2011-02-12
+
+- modified 'mAB_.pm', 'mBA_.pm', 'mft1.pm', 'mft2.pm', 'Chart.pm', 'Curve.pm', 'nCLUT.pm', 'nPINT.pm' and 'PCS.pm' to accept Math::Matrix inputs.
+
+- added 'press_curve_5_example.plx'.
+
+2011-02-13
+
+- added 'press_curve_6_example.plx'.
+
+2011-02-15
+
+- added 'overlam_compensation_3_example.plx'.
+
+2011-02-16
+
+- modified 'new' method of 'Chart.pm' to add empty format row to chart data, i.e. [] => [[]].
+
+- modified 'add_set' method of 'Chart.pm' to require a 2-D data slice, as in 'slice' method (v0.70).
+
+2011-02-20
+
+- added '_intersect' subroutine to 'nPINT.pm' to compute intersection with unit box for extrapolation.
+
+- modified '_transform' and 'jacobian' methods of 'nPINT.pm' to handle extrapolated values.
+
+- added 'nPINT_extrapolation_test.plx'.
+
+- removed 'parajac' method from 'nPINT.pm' (little use for this, since we have 'fit' method).
+
+- removed subroutines '_jacext' and '_parajac' from 'nPINT.pm'.
+
+- added '_intersect' subroutine to 'nCLUT.pm'.
+
+- modified '_transform' method of 'nCLUT.pm' to use '_intersect' (still need to do 'jacobian').
+
+- modified 'clut' method of 'mAB_.pm', 'mBA_.pm', 'mft1.pm', and 'mft2.pm' to get/set an nCLUT object, instead of an array.
+
+- added 'nCLUT_extrapolation_test.plx'.
+
+- modified methods 'array' and 'clut' of 'nCLUT.pm' to make array copies when setting.
+
+2011-02-21
+
+- modified 'jacobian' and '_transform' methods in 'nCLUT.pm' to compute interpolation index and ratios more efficiently.
+
+- modified 'jacobian', '_transform' and '_jacext' methods in 'nCLUT.pm' to clean up program flow and remove unused variables.
+
+2011-02-24
+
+- added 'analyze' and '_add_avg' methods to 'Chart.pm'.
+
+- added snippet 'analyze_chart_structure.plx'.
+
+- modified 'press_curve_6_example.plx' to incorporate new 'analyze' method.
+
+- added snippet 'flatten_slice_test.plx'.
+
+2011-02-25
+
+- added function 'flatten' to 'Chart.pm', using Exporter to export.
+
+- modified 'add_set' '_getset', 'analyze' and 'write_chart' methods of 'Chart.pm' to flatten row and column slices.
+
+- modified 'Shared.pm' by using Exporter to export all functions.
+
+- modified 'Shared.pm' by removing underscore from several public functions.
+
+- modified other modules that used 'Shared.pm' functions.
+
+- added 'add_avg' method to 'Chart.pm'.
+
+2011-02-26
+
+- modified 'array' method of 'Curve.pm' to allow 'bern' or 'para' elements.
+
+- added '_transform', '-derivative' and '_parametric' methods to 'para.pm'.
+
+2011-02-27
+
+- modified 'parajac' method of 'Curve.pm' to accept 'Math::Matrix' objects as input.
+
+- modified 'roots' method of 'Curve.pm' to test if object has 'roots' method before calling it.
+
+- modified '_transform', '_fwd', '_rev' and '_new_pcs' methods of 'PCS.pm' by adding the LxLyLz encoding option (4).
+
+- modified 'PCS_test.plx' by adding the LxLyLz encoding option (4).
+
+2011-02-28
+
+- added 'scanner_profile_4_example.plx'.
+
+2011-03-01
+
+- added 'array' method to 'nPINT.pm'.
+
+2011-03-02
+
+- added snippet 'XML_test.plx'.
+
+2011-03-07
+
+- modified 'analyze' method of 'Chart.pm' to accept undefined row slice.
+
+2011-03-08
+
+- modified 'analyze' method of 'Chart.pm' to return an array of arrays, containing a hash, an sorted array of keys, and a ramp.
+
+- modified 'press_curve_6_example.plx' and 'analyze_chart_structure.plx' to accommodate changes to 'analyze' method.
+
+- added 'printer_profile_1_example.plx'.
+
+2011-03-17
+
+- fixed memory leak in ICC::Support::Lapack::mat_zeros in 'xs-arrays.c', made array references mortal with sv_2mortal macro.
+
+- fixed memory leak in ICC::Support::Lapack::nPINT_jacobian in 'xs-arrays.c', made array references mortal with sv_2mortal macro.
+
+2011-03-24
+
+- added 'cache_2D', 'cache_array', 'cache_rows' and 'cache_cols' functions to 'xs_arrays.c'.
+
+- added 'cache_2D' function to 'Lapack.xs'
+
+- modified 'nPINT_mat_trans', 'nPINT_vec_trans' and 'jacobian' functions in 'Lapack.xs' to use cached coefficient array.
+
+- modified 'transform', 'inverse', 'jacobian', 'fit' and '_transform' methods of 'nPINT.pm' to use cached coefficient array. (v0.50)
+
+2011-04-24
+
+- added 'instrument_crossover_1_example.plx'.
+
+- added 'instrument_crossover_2_example.plx'.
+
+2011-04-30
+
+- added 'nMAT.pm', 'nMAT_test.plx', '06_nMAT.t' and 'nMAT_module_notes.txt'.
+
+2011-05-05
+
+- added functions 'vec_offset' and 'mat_offset' to 'xs-arrays.c'.
+
+- added functions 'nMAT_mat_trans' and 'nMAT_vec_trans' to 'Lapack.xs'.
+
+- modified 'nMAT.pm' to incorporate 'nMAT_mat_trans' and 'nMAT_vec_trans' (v0.20).
+
+- modified 'instrument_crossover_2_example.plx' to use the nMAT.pm object.
+
+
+2011-05-06
+
+- added 'fit' method to 'nMAT.pm', updated '06_nMAT.t'.
+
+2011-05-07
+
+- added 'inverse' method to 'nMAT.pm'.
+
+- renamed '_newICCnMAT' method to 'new_from_hash' in 'nMAT.pm'.
+
+- renamed '_newICCnCLUT' method to 'new_from_hash' in 'nCLUT.pm'.
+
+2011-05-11
+
+- modified '_new_from_hash' method of 'nCLUT.pm' to copy input parameters (like nMAT).
+
+- changed 'clut' attribute in '_new_from_hash' of 'nCLUT.pm' to 'array', to match get/set method.
+
+2011-05-15
+
+- modified '_writeICCprofile' method of 'Profile.pm' to fix final padding bug (file was short when last tag seek was beyond EOF).
+
+2011-05-18
+
+- changed '_new_from_hash' method of 'nCLUT.pm' to dclone 'array' reference.
+
+2011-05-21
+
+- modified functions 'vec_offset' and 'mat_offset' in 'xs_arrays.c' to check for empty tempav1 array.
+
+2011-05-22
+
+- added 'working_space_example.plx'.
+
+- added 'XYZ2xyY' and 'xyY2XYZ' methods to ICC::Shared.pm.
+
+- modified 'new' method of 'sf32.pm' to accept 2-D array and Math::Matrix objects as input. (v0.20)
+
+- added 'matrix' method to 'sf32.pm'.
+
+- added tests to 'sf32_test.plx'.
+
+2011-05-23
+
+- added 'cat' function to 'Shared.pm'.
+
+- added 'Shared_test.plx'.
+
+- removed 'cat' method from 'Chart.pm'.
+
+- modified 'add_lab' method in 'Chart.pm' to use 'cat' function from ICC::Shared.
+
+- modified 'Chart_test.plx' to use 'cat' function from ICC::Shared.
+
+2011-05-27
+
+- modified '_readChartAvg', '_readChart', '_writeChart' and 'readTIFF' of 'Chart.pm' to filter Terminal escape sequences from path.
+
+- modified '_readICCprofile', and '_writeICCprofile' of 'Profile.pm' to filter Terminal escape sequences from path.
+
+2011-05-28
+
+- modified 'cat' method of 'Shared.pm' to improve accuracy.
+
+- modified 'vec_offset' and 'mat_offset' functions of 'xs_arrays.c' to copy offset values, instead of references.
+
+- modified 'nMAT_test.plx' by adding test of 'fit' method accuracy.
+
+2011-05-30
+
+- added 'ICC::Support::Levmar' project, and got Makefile to compile successfully.
+
+- modified 'Lapack.xs' to eliminate Leopard warnings variable declarations after code.
+
+2011-06-05
+
+- made 'ICC::Support::Levmar' fully functional.
+
+2011-06-06
+
+- added functions '_XYZN2Lab_jac' and '_Lab2XYZN_jac' to 'PCS.pm' (v0.40).
+
+2011-06-08
+
+- added functions '_fwd_jac' and '_rev_jac' to 'PCS.pm'.
+
+- added 'jacobian' method to 'PCS.pm'.
+
+- added 'PCS_jacobian_test.plx'.
+
+- added 'use blib' entry for the ICC::Support::Levmar module to 'Profile.pm'.
+
+- added roundtrip matrix test to 'PCS_test.plx'.
+
+2011-06-09
+
+- added functions 'xyz2Lab_jac' and 'Lab2xyz_jac' to 'Shared.pm'.
+
+- added 'test4.pl' to 'ICC::Support::Levmar' module.
+
+- added curve class parameter to 'new' method of 'Curve.pm'.
+
+- added tests to 'Curve_test.plx'.
+
+2011-06-10
+
+- added functions '_transform' and '_derivative' to 'curv.pm' module for compatibility with 'Curve.pm'. (v0.30)
+
+2011-06-12
+
+- added function 'chkjac' and 'test6.pl' to 'ICC::Support::Levmar' module.
+
+- added 'chkjac' test to 'PCS_jacobian_test.plx'.
+
+- modified 'jacobian' method of 'nMAT.pm' to return transposed object matrix (see Jacobian_notes.txt).
+
+2011-06-13
+
+- added 'nMAT_jacobian_test.plx'.
+
+2011-06-15
+
+- updated 'nPINT_jacobian_test.plx'.
+
+- modified 'ramp' method of 'Chart.pm' to work correctly with RGB data.
+
+- updated 'profile_quality_example.plx' to work with all color spaces (RGB, CMYK, nCLR).
+
+2011-06-16
+
+- replaced function 'dxdev_1D' with 'dxdev_2D' and modified 'dxrow' in 'xs_device.c'.
+
+- modified function 'jacobian' in 'Lapack.xs' to use 'cblas_dgemm' and return standard Jacobian (not transposed).
+
+- modified 'inverse', 'jacobian', '_transform' and '_intersect' methods of 'nPINT.pm' to use standard Jacobian (not transposed). (v0.60)
+
+2011-06-17
+
+- modified 'ramp' method of 'Chart.pm' to use CODE reference for selection. (v0.80)
+
+2011-06-18
+
+- added 'printer_profile_2_example.plx' to make RGB printer profiles.
+
+- swapped names 'printer_profile_1_example.plx' and 'printer_profile_2_example.plx'.
+
+2011-06-19
+
+- added 'select' method to 'Chart.pm'.
+
+2011-06-20
+
+- modified 'b_curves', 'matrix', 'm_curves', 'clut' and 'a_curves' methods of 'mAB_.pm' and 'mBA_.pm' to set mask bits.
+
+- modified 'matrix', 'input', 'clut' and 'output' methods of 'mft1.pm' and 'mft2.pm' to set mask bits.
+
+2011-06-24
+
+- modified '_readICCprofile' of 'Profile.pm' to use optional default profile (used when opening images which may or may not be tagged).
+
+2011-07-03
+
+- added 'mAB_jacobian_test.plx'.
+
+- added 'mft_jacobian_test.plx'.
+
+2011-07-04
+
+- added 'nCLUT_jacobian_test.plx'.
+
+- modified 'jacobian' method of 'nCLUT.pm' to return transposed matrix. (v0.60)
+
+- modified '_intersect' function of 'nCLUT.pm' to return transposed extension vector.
+
+- modified '_jext' function of 'nCLUT.pm' to return transposed matrix.
+
+- modified 'jacobian' and '_transform' methods of 'nCLUT.pm' to compute extrapolated data using transposed values.
+
+- renamed 'nCLUT_test.plx' to 'nCLUT_speed_test.plx'.
+
+- added new 'nCLUT_test.plx' to check 'transform' and 'inverse' methods.
+
+- modified 'inverse' method of 'nCLUT.pm' to use transposed Jacobian.
+
+- modified 'jacobian' method of 'mAB_.pm' to return transposed matrix. (v0.80)
+
+- modified 'inverse' method of 'mAB_.pm' to use transposed Jacobian.
+
+- modified 'jacobian' method of 'mBA_.pm' to return transposed matrix. (v0.80)
+
+- modified 'inverse' method of 'mBA_.pm' to use transposed Jacobian.
+
+- modified 'jacobian' method of 'mft2.pm' to return transposed matrix. (v1.10)
+
+- modified 'inverse' method of 'mft2.pm' to use transposed Jacobian.
+
+- modified 'jacobian' method of 'mft1.pm' to return transposed matrix. (v0.80)
+
+- modified 'inverse' method of 'mft1.pm' to use transposed Jacobian.
+
+- modified 'device_link_2_example', 'device_link_3_example' to use transposed jacobian.
+
+- modified 'press_curve_1_example', 'press_curve_2_example', 'press_curve_3_example', 'press_curve_4_example', 'press_curve_5_example', 'press_curve_6_example' to use transposed jacobian.
+
+2011-07-27
+
+- added function 'dgesvd' to 'Lapack.xs', to compute singular value decomposition (SVD).
+
+- added 'test15.pl' to test singular value decomposition function.
+
+- added functions 'unpack_1D_m' and 'unpack_2D_mxn' to 'xs_arrays.c'.
+
+2011-07-30
+
+- added 'xs_stat.c' and 'xs_stat.h' to 'ICC::Support::Lapack'.
+
+- added functions 'mat_mean' and 'mat_diff' to 'xs_stat.c'.
+
+- added 'mean' function to 'Lapack.xs'.
+
+- added 'test16.pl' to test 'mean' function.
+
+- added 'pca' function to 'Lapack.xs'.
+
+- added 'test17.pl' to test 'pca' function.
+
+2011-08-04
+
+- renamed function '_specSlice' to 'nm' in 'Chart.pm'.
+
+2011-08-05
+
+- added 'spec2XYZ' method to 'Chart.pm'.
+
+2011-08-06
+
+- added 'spec2xyz' method to 'Chart.pm'.
+
+- modified 'chart_test.plx' to test 'spec2XYZ', 'spec2xyz' and 'nm' methods.
+
+- modified 'add_xyz' and 'add_lab' to save illuminant white point and CWF in object arrays.
+
+2011-08-07
+
+- added 'iwtpt' method to 'Chart.pm'.
+
+2011-08-11
+
+- modified subroutine '_readICCmft2' of 'mft2.pm' to verify number of input/output channels < 16.
+
+- modified subroutine '_readICCmft1' of 'mft1.pm' to verify number of input/output channels < 16.
+
+- modified subroutine '_readICCmAB_' of 'mAB_.pm' to verify number of input/output channels < 16.
+
+- modified subroutine '_readICCmBA_' of 'mBA_.pm' to verify number of input/output channels < 16.
+
+2011-08-13
+
+- modified subroutine '_readICCmft2' of 'mft2.pm' to not check number of input/output channels.
+
+- modified subroutine '_readICCmft1' of 'mft1.pm' to not check number of input/output channels.
+
+- modified subroutine '_readICCmAB_' of 'mAB_.pm' to not check number of input/output channels.
+
+- modified subroutine '_readICCmBA_' of 'mBA_.pm' to not check number of input/output channels.
+
+2011-08-15
+
+- modified '_getset' method of 'Chart.pm' to support multiplier arrays (for xyz data). (v0.90)
+
+- added 'xyz_slice' method to 'Chart.pm'.
+
+- added 'xyz_slice' tests to 'Chart_test.plx'.
+
+- added '_makeXYZ' subroutine to 'Chart_test.plx', to set illuminant XYZ and CWF arrays when reading data.
+
+- modified '_readChart' subroutine of 'Chart_test.plx' to call '_makeXYZ'.
+
+2011-08-23
+
+- added 'dgeqrf' and 'qr' functions to 'ICC::Support::Lapack'.
+
+2011-08-24
+
+- added 'normal' function to 'ICC::Support::Lapack'.
+
+2011-08-25
+
+- modified 'normal' function of 'ICC::Support::Lapack' to accept optional weight array parameter.
+
+- modified 'opt_curves' subroutine of 'press_curve_5_example.plx' to use 'normal' function.
+
+- removed the 'apply' subroutine from 'press_curve_5_example.plx'.
+
+2011-08-26
+
+- organized functions in 'ICC::Support::Lapack' and added many comments.
+
+- renamed function 'ICC::Support::Lapack::fit_nPINT' to 'ICC::Support::Lapack::nPINT_fit' in all project files.
+
+- renamed function 'ICC::Support::Lapack::mat_trans' to 'ICC::Support::Lapack::nPINT_mat_trans' in all project files.
+
+- renamed function 'ICC::Support::Lapack::vec_trans' to 'ICC::Support::Lapack::nPINT_vec_trans' in all project files.
+
+- renamed function 'ICC::Support::Lapack::dgemm_trans' to 'ICC::Support::Lapack::nMAT_mat_trans' in all project files.
+
+- renamed function 'ICC::Support::Lapack::dgemv_trans' to 'ICC::Support::Lapack::nMAT_vec_trans' in all project files.
+
+- renamed function 'ICC::Support::Lapack::jacobian' to 'ICC::Support::Lapack::nPINT_jacobian' in all project files.
+
+- added document 'Lapack_XS_function_names.txt'.
+
+2011-08-28
+
+- added 'ctv' method to 'ICC::Support::Chart'.
+
+- modified 'add_ctv' method of 'ICC::Support::Chart' to use illuminant XYZ values stored in object array.
+
+- modified 'normalize' method of 'bern.pm' to skip empty coefficient array;
+
+2011-09-01
+
+- added 'add_density' and 'density' methods to 'ICC::Support::Chart' (v1.00).
+
+- added tests for 'add_density' and 'density' methods to 'Chart_test.plx'.
+
+2011-09-17
+
+- updated 'opt_curves' subroutine of 'press_curve_6_example.plx'
+
+- removed the 'apply' subroutine from 'press_curve_6_example.plx'.
+
+2011-09-18
+
+- modified subroutines 'segx' and 'delta' of 'printer_profile_2_example.plx' to use transposed Jacobian. (see 2011-07-04 mods)
+
+2011-09-21
+
+- added 'extend' subroutine to 'printer_profile_2_example.plx'.
+
+- added 'extend', 'devx' and 'ix' subroutines to 'press_curve_6_example.plx' and modified to use them.
+
+2011-09-29
+
+- added snippet 'tone_compression.plx' and 'tone_compression_notes.txt', describing new tone compression function.
+
+2011-10-01
+
+- updated 'PCS.pm' to use new tone compression function, as detailed below (v0.50).
+
+- modified '_fwd', '_rev', '_transform' and 'jacobian' to use xyz encoding instead of XYZNumber.
+
+- added '_fwd_tc', 'rev_tc' and '_derv_tc' subroutines.
+
+- modified '_transform' and 'jacobian' to use tone compression functions.
+
+- removed subroutines '_XYZN2Lab', '_Lab2XYZN, '_XYZN2Lab_jac', and '_Lab2XYZN_jac'.
+
+- modified 'PCS_jacobian_test.plx' by commenting out tests of '_Lab2XYZN', '_XYZN2Lab_jac', and '_Lab2XYZN_jac'.
+
+2011-10-02
+
+- modified 'PCS_test.plx' by adding tone compression tests.
+
+- modified 'press_curve_5_example.plx' and 'press_curve_6_example.plx' by adding PCS gamma setting.
+
+2011-10-06
+
+- added functions 'sinh' and 'cosh' to 'Shared.pm'.
+
+- added 'abstract_profile_example.plx'.
+
+2011-10-12
+
+- added functions 'Lxyz2Lab' and 'Lab2Lxyz' to 'Shared.pm'.
+
+- modified 'shared.t' by adding new functions to list.
+
+- modified 'print_profile_1_example.plx' to use LxLyLz to compute curves, rather than CTV.
+
+2011-10-19
+
+- modified 'fit' method of 'nMAT.pm' to fix input verification bug.
+
+- added snippet 'spectral_scanner_model.plx'.
+
+2011-11-03
+
+- modified 'ICC::Support::Lapack::solve' to return solution matrix, leaving a and b unchanged.
+
+- modified 'inverse' method of 'nMAT.pm' to use modified 'ICC::Support::Lapack::solve'.
+
+- modified 'inverse' method of 'nPINT.pm' to use modified 'ICC::Support::Lapack::solve'.
+
+- modified 'tc_pars' method of 'PCS.pm' to use modified 'ICC::Support::Lapack::solve'.
+
+- modified 'printer_profile_1_example.plx' to use modified 'ICC::Support::Lapack::solve'.
+
+- modified 'printer_profile_2_example.plx' to use modified 'ICC::Support::Lapack::solve'.
+
+- modified 'gamut_by_path.plx' to use modified 'ICC::Support::Lapack::solve'.
+
+- modified 'tone_compression.plx' to use modified 'ICC::Support::Lapack::solve'.
+
+2011-12-31
+
+- modified functions ICC::Support::Lapack::nMAT_vec_trans and ICC::Support::Lapack::nMAT_mat_trans to use normal (not transposed) 'A' matrix.
+
+- modified functions 'mat_offset' and 'vec_offset' of 'xs_arrays.c' to return C arrays, rather than Perl arrays.
+
+- modified 'new' method of 'nMAT.pm' to set array and offset as empty array references.
+
+- modified '_new_from_hash' function of 'nMAT.pm' to save matrix as 2-D array, and offset as 1-D array.
+
+- modified 'jacobian' method of 'nMAT.pm' to return dclone of matrix.
+
+- modified 'matrix' method of 'nMAT.pm' to set matrix as 2-D array.
+
+- modified 'offset' method of 'nMAT.pm' to set offset as 1-D array.
+
+- modified 'fit' method of 'nMAT.pm' to transpose matrix, and save offset as 1-D array.
+
+- modified 'inverse' method of 'nMAT.pm' to transpose jacobian indices.
+
+- modified 'nMAT_test.plx' for changes to 'nMAT.pm'.
+
+- modified 'nMAT_jacobian_test.plx' for changes to 'nMAT.pm'.
+
+2012-01-01
+
+- modified 'sdump' method of 'nMAT.pm' to print matrix and offset.
+
+- modified 'instrument_crossover_2_example.plx' for changes to 'nMAT.pm'.
+
+- modified 'working_space_example.plx' for changes to 'nMAT.pm'.
+
+- modified 'overlam_compensation_4_example.plx' for changes to 'nMAT.pm'.
+
+- modified 'scanner_spectral_model.plx' for changes to 'nMAT.pm'.
+
+- updated 'nMAT_module_notes.txt'.
+
+- added function 'zeros' to 'xs_arrays.c' and 'xs_arrays.h'.
+
+- modified functions ICC::Support::Lapack::nPINT_vec_trans, ICC::Support::Lapack::nPINT_mat_trans and ICC::Support::Lapack::jacobian to use 'zeros' function.
+
+- modified ICC::Support::Lapack::normal to use standard CODE structure, rather than PPCODE.
+
+- modified function 'pack_2D' in 'xs_arrays.c' to verify outer array is not empty (caused SEG fault).
+
+2012-01-02
+
+- added function 'add_ones' to 'xs_arrays.c' and 'xs_arrays.h'.
+
+- added function ICC::Support::Lapack::nMAT_fit.
+
+- modified 'fit' method of 'nMAT.pm' to use ICC::Support::Lapack::nMAT_fit.
+
+2012-01-03
+
+- modified function 'add_ones' to 'xs_arrays.c' and 'xs_arrays.h' to work on C array, rather than Perl array.
+
+- modified function ICC::Support::Lapack::nMAT_fit for change to 'add_ones'.
+
+- modified 'fit' method of 'nMAT.pm' by removing dclone of input array.
+
+2012-01-04
+
+- modified function ICC::Support::Lapack::nPINT_fit to return coefficient matrix, leaving input b intact.
+
+- modified function ICC::Support::Lapack::nPINT_fit to set lda and ldb to array rows and verify they match.
+
+- modified 'test3.pl' for change to ICC::Support::Lapack::nPINT_fit.
+
+- modified 'fit' method of 'nPINT.pm' for change to ICC::Support::Lapack::nPINT_fit.
+
+- modified subroutine 'fit' of 'instrument_crossover_1_example.plx' for change to ICC::Support::Lapack::nPINT_fit.
+
+2012-01-14
+
+- modified function ICC::Support::Lapack::solve to return the 'info' value and the solution matrix 'x'.
+
+- modified subroutine 'segx' of 'printer_profile_1_example' to check 'info' value when calling 'solve' function.
+
+- modified subroutines 'segx' and 'delta' of 'printer_profile_2_example' to check 'info' value when calling 'solve' function.
+
+- modified subroutine 'segx' of 'gamut_by_path.plx' to check 'info' value when calling 'solve' function.
+
+- modified 'inverse' method of 'nMAT.pm' to check 'info' value when calling 'solve' function.
+
+- modified 'inverse' method of 'nPINT.pm' to check 'info' value when calling 'solve' function.
+
+- modified 'tc_pars' method of 'PCS.pm' to check 'info' value when calling 'solve' function.
+
+- modified 'tone_compression.plx' to check 'info' value when calling 'solve' function.
+
+- modified function ICC::Support::Lapack::normal to return the 'info' value and the solution matrix 'delta'.
+
+- modified subroutine 'opt_curves' in 'press_curve_5_example.plx' and 'press_curve_6_example.plx' to check 'info' value when calling 'normal' function.
+
+- modified subroutine 'fit_gamma' in 'scanner_spectral_model.plx' to check 'info' value when calling 'normal' function.
+
+- modified function ICC::Support::Lapack::qr to return the 'info' value.
+
+- modified function ICC::Support::Lapack::pca to return the 'info' value.
+
+2012-01-29
+
+- added 'rebuild_reverse_table_2_example.plx'.
+
+2012-02-04
+
+- modified '_readICCmft1' subroutine of 'mft1.pm' to set input and output colorspace of preview tags.
+
+- modified '_readICCmft2' subroutine of 'mft2.pm' to set input and output colorspace of preview tags.
+
+2012-02-11
+
+- added module 'nNET.pm' and 'test_nNET.plx' (incomplete).
+
+2012-02-14
+
+- added module 'rbf.pm' (incomplete).
+
+2012-02-19
+
+- modified 'transform' method of 'nMAT.pm' by removing wantarray test for simple array input.
+
+- modified '_crawl' method of 'nMAT.pm' to test fully for vectors.
+
+2012-02-20
+
+- modified '_crawl' methods of 'Curve.pm', 'nPINT.pm' and 'PCS.pm' to test fully for vectors.
+
+- modified '_crawl' methods of 'mAB.pm', 'mBA.pm', 'mft1.pm' and 'mft2.pm' to test fully for vectors.
+
+2012-02-25
+
+- added 'jacobian' method and _jacobian subroutine to 'rbf.pm'.
+
+- added 'rbf_test.plx'.
+
+2012-02-26
+
+- added function ICC::Support::Lapack::mat_xplus to perform normal matrix multiplication.
+
+- added 'test_25.pl' to test the 'mat_xplus' function.
+
+- modified functions ICC::Support::Lapack::nMAT_mat_trans, ICC::Support::Lapack::nMAT_vec_trans, to check for the optional offset parameter before calling 'mat_offset' and 'vec_offset'.
+
+- modified functions 'mat_offset' and 'vec_offset' to just compute the offset array.
+
+- added '_hidden3' subroutine to 'nNET.pm'.
+
+- modified 'jacobian' method to 'nNET.pm' to work correctly.
+
+2012-02-28
+
+- added '_numjac' subroutine to 'nNET.pm'.
+
+- modified '_hidden3' subroutine to use '_numjac'.
+
+2012-02-29
+
+- modified 'fit' method of 'nNET.pm' to work correctly.
+
+2012-03-02
+
+- modified 'inverse' method of 'nNET.pm' to work correctly.
+
+2012-03-03
+
+- modified test11.pl to test more functions for memory leaks.
+
+- fixed memory leaks in ICC::Support::Lapack::nMAT_mat_trans, ICC::Support::Lapack::nMAT_vec_trans, ICC::Support::Lapack::mat_xplus, ICC::Support::Lapack::dgemm, and ICC::Support::Lapack::dgemv.
+
+- modified 'fit' method of 'nNET.pm' to use number of kernel nodes as matrix column dimension.
+
+2012-03-05
+
+- modified '_hidden2' subroutine of 'nNET.pm' by swapping inner and outer loops.
+
+2012-03-06
+
+- modified 'test1.pl' of 'ICC::Support::Lapack' to test underdetermined case.
+
+2012-03-07
+
+- added 'pack_2D_pad' function to 'xs_arrays.c', which adds rows to rhs array when system is underdetermined, as needed by dgels.
+
+- modified ICC::Support::Lapack::nMAT_fit and ICC::Support::Lapack::nPINT_fit to use 'pack_2D_pad', to fix bug fitting underdetermined systems.
+
+- modified 'fit' method of 'nPINT.pm' to verify input arrays.
+
+- modified 'fit' method of 'nMAT.pm' and 'nNET.pm' to test 'info' value before updating object.
+
+2012-03-10
+
+- modified 'trueflow' method of 'Curve.pm' to use regex for big-endian flag, to accommodate 64-bit systems.
+
+- added snippet 'read_ASE_file.plx'.
+
+- added 'readASE' and 'writeASE' methods to 'Chart.pm' (v1.10).
+
+- modified 'Chart_test.plx' by adding tests for 'readASE' and 'writeASE' methods.
+
+- added example 'check_swatches_example.plx'.
+
+2012-03-11
+
+- added subroutine '_readChartAppend' to 'Chart.pm'.
+
+- modified 'new' method of 'Chart.pm' for modifier parameter ('AVERAGE' or 'APPEND') when reading a folder of measurements.
+
+- replaced 'die' with 'croak' in 'sf32.pm', 'Profile.pm', 'Shared.pm', 'Chart.pm', 'Chart.pm'.
+
+2012-03-12
+
+- added 'name' method to 'Chart.pm'.
+
+- modified 'writeASE' method of 'Chart.pm' to use column_slice instead of color_space.
+
+2012-03-13
+
+- modified 'writeASE' by adding optional color type parameter.
+
+2012-03-14
+
+- added ICC::Support::Lapack::nNET_fit, which uses LAPACK function dgelsd to handle rank deficient matrices.
+
+2012-03-15
+
+- modified ICC::Support::Lapack::nNET_fit, to use LAPACK function dgelss, which is more reliable than dgelsd.
+
+2012-03-18
+
+- added ICC::Support::Lapack::erf, the statistics error function, used as a sigmoid function.
+
+2012-03-20
+
+- added example 'match_swatches_example.plx'.
+
+- added 'init' method to 'nNET.pm' and modified '_new_from_hash' to store 'init' CODE reference.
+
+2012-03-21
+
+- modified 'iwtpt' method of 'Chart.pm' to use current illuminant as default.
+
+2012-03-25
+
+- added 'XYZ_encoding' method to 'Chart.pm' (v1.11).
+
+- reworked 'iwtpt' and 'wtpt' methods of 'Chart.pm' to use XYZ encoding parameter.
+
+- updated many example programs to incorporate XYZ encoding changes.
+
+2012-03-26
+
+- modified 'printer_profile_relinearization_example.plx' for changes in Jacobian (no longer transposed).
+
+- modified 'Shared.pm' to export functions properly using Exporter.
+
+- modified 'Chart.pm' to import selected 'Shared.pm' functions.
+
+- removed 'vars' statements from tag and support modules, replaced with 'our' statements.
+
+2012-03-30
+
+- added snippet 'read_ZXML.plx'.
+
+2012-04-01
+
+- added snippet 'Import2.pm' to develop module loading routine borrowed from Mac::Carbon.
+
+- modified 'Profile.pm' to use module loading routine.
+
+- moved 'flatten' subroutine from 'Chart.pm' to 'Shared.pm'.
+
+- removed 'Export' module from 'Chart.pm'.
+
+- removed 'use Data::Dumper' from many examples and tests.
+
+- added '80_nNET.t' and '81_rbf.t' test programs.
+
+- added module 'ZXML.pm'.
+
+- added 'ZXML_test.plx'.
+
+2012-04-02
+
+- added '23_ZXML.t' test program
+
+2012-04-03
+
+- modified 'Chart.pm' object structure to put illuminant CWF data in $self->[4][0], and illuminant XYZ data in $self->[4][1]. (v1.12)
+
+- updated 'Chart_module_notes.txt' to reflect changes in object structure.
+
+2012-04-04
+
+- added subroutines 'mediaWP' and 'mediaBP' to 'Chart.pm'.
+
+- added media relative encoding to 'xyz_encoding' method of 'Chart.pm'.
+
+- modified 'wtpt', 'iwtpt' and 'xyz' methods of 'Chart.pm' to support media relative encoding.
+
+- modified 'wtpt' method of 'Chart.pm' to use 'mediaWP'.
+
+- added 'bkpt' method to 'Chart.pm'.
+
+- updated 'Chart_test.plx' to test methods added today.
+
+- added subroutine '_xyzDivisor' to 'Chart.pm', to factor code used in XYZ methods.
+
+- modified 'xyz' method of 'Chart.pm' to use '_xyzDivisor'.
+
+2012-04-05
+
+- modified 'spec2XYZ' method of 'Chart.pm' to return encoded values using '_xyzDivisor'.
+
+- removed 'spec2xyz' method of 'Chart.pm'.
+
+- renamed 'spec2XYZ' to 'spec2xyz'.
+
+- modified 'iwtpt', 'wtpt' and 'bkpt' methods of 'Chart.pm' to use '_xyzDivisor'.
+
+- added 'current' method to 'Chart.pm'.
+
+- removed 'xyz_slice' method of 'Chart.pm'.
+
+- updated 'Chart_module_notes.txt', 'Chart_test.plx' and '40_Chart.t' for recent changes to 'Chart.pm'.
+
+- updated all press curve examples to use media relative encoding, and 'device' method.
+
+2012-04-06
+
+- modified 'cat' method of 'Shared.pm' to use nMAT object.
+
+- renamed 'cat' to 'bradford'.
+
+- added 'cat02' method to 'Shared.pm'.
+
+- modified 'add_lab' method of 'Chart.pm' to use nMAT objects.
+
+- added 'cat_test.plx' snippet.
+
+2012-04-07
+
+- added 'press_curve_7_example.plx'.
+
+2012-04-11
+
+- added 'akima.pm' module.
+
+- added 'akima_test.plx'.
+
+- added 'akima_module_notes.txt'.
+
+- modified 'Curve_test.plx' to test 'akima' based curves.
+
+2012-04-13
+
+- added snippet 'linear_least_squares.txt'.
+
+- modified subroutine '_endslope' of 'akima.pm' to fit a quadratic equation using least squares, instead of linear equation.
+
+2012-04-14
+
+- modified '_endslope' to use weighted cubic function, and renamed '_endpoint'.
+
+- modified '_objderv' to compute endpoint slopes and derivatives using standard Akima method, then call '_endpoint' to overwrite the endpoint derivatives.
+
+- added several tests to 'akima_test.plx'.
+
+- added '_parametric' method to 'akima.pm', prints error message if called.
+
+- modified 'array' method of 'akima.pm' to get/save an array containing x-values, y-values and derivatives.
+
+2012-04-15
+
+- modified 'new' method of 'akima.pm' by adding optional endpoint flag parameter.
+
+- modified '_objderv' to use endpoint flag.
+
+- modified the '_makeCWF' subroutine of 'Chart.pm' to use 'akima.pm' objects, instead of 'Math::Akima' objects.
+
+- added 'normalize' method to 'akima.pm'.
+
+- modified 'add_set' method of 'Chart.pm' to handle '[]' as a column slice.
+
+- added 'press_curve_8_example.plx' to generate TVI curves.
+
+2012-04-16
+
+- modified 'analyze' method of 'Chart.pm' to treat '-0' as '0' when building hash.
+
+2012-04-18
+
+- modified '_readChart' method of 'Chart.pm'. changed record separator key from {'rec_sep'} to {'read_rs'};
+
+- modified '_readChart' method of 'Chart.pm' to localize setting of $/ variable.
+
+- modified '_writeChart' method of 'Chart.pm'. added optional header key {'write_rs'} to set record separator.
+
+2012-04-19
+
+- modified 'opt_pcs' subroutine in press curve examples 2-7 to pass $xyz2Lab_p parameter, and use 'ramp' method to make sample list.
+
+2012-04-20
+
+- added 'press_curve_9_example.plx' to generate press curves per CGATS TR 015.
+
+- removed '_crawl2' subroutine from 'nPINT.pm' (wasn't used).
+
+- added 'recursive_sub_call.plx' snippet.
+
+2012-04-21
+
+- added subroutines 'x2L', 'L2x', 'dLdx', and 'dxdL' to 'Shared.pm'.
+
+- modified subroutines 'xyz2Lab', 'Lab2xyz', 'xyz2Lxyz', 'Lxyz2xyz', 'Lab2Lxyz', 'Lxyz2Lab', 'Lab2XYZ', 'XYZ2Lab', 'Lxyz2XYZ' and 'XYZ2Lxyz' of 'Shared.pm' to use 'x2L' and 'L2x'. 
+
+- modified subroutines 'xyz2Lab_jac' and 'Lab2xyz_jac' of 'Shared.pm' to use 'dLdx' and  'dxdL'.
+
+- renamed subroutines 'xyz2Lab', 'Lab2xyz', 'xyz2Lxyz', 'Lxyz2xyz', 'Lab2Lxyz' and 'Lxyz2Lab' of 'Shared.pm' to start with underscore.
+
+- added subroutine '_crawl' to Shared.pm.
+
+- added new subroutines 'xyz2Lab', 'Lab2xyz', 'xyz2Lxyz', 'Lxyz2xyz', 'Lab2Lxyz' and 'Lxyz2Lab' to 'Shared.pm', which call the underscored versions.
+
+- added tests for color transform functions to 'Shared_test.plx'.
+
+- modified many examples to use 'xyz2Lab', 'Lab2xyz', 'xyz2Lxyz', 'Lxyz2xyz', 'Lab2Lxyz' and 'Lxyz2Lab' subroutines instead of PCS objects.
+
+2012-04-25
+
+- added snippets 'linear_3D_transform.plx' and 'perspective_transform_2.plx' to test ideas on fine-tuning data sets.
+
+2012-04-26
+
+- modified 'select' and 'ramp' methods of 'Chart.pm' to use optional sample list parameter.
+
+- added constants 'D50', 'd50' and 'PI' to 'Shared.pm'.
+
+- modified various modules that used D50 variables to use constants instead.
+
+- added 'modify_data_set_example.plx'.
+
+2012-04-27
+
+- modified 'fit' method of 'nNET.pm' to allow optional difference mode (v0.20).
+
+- modified '_hidden' and '_hidden2' methods of 'nNET.pm' for difference mode.
+
+2012-04-28
+
+- modified '_hidden3' method of 'nNET.pm' for difference mode.
+
+- modified 'nNET_test.plx' by adding tests for difference mode.
+
+- updated 'PCS_module_notes.txt'.
+
+2012-04-29
+
+- added 'PCS_tone_compression_test.plx'. uncovered problems with existing algorithm.
+
+- developed new tone compression algorithm, see 'tone_compression_notes.txt' and 'tone_compression_function.xls'.
+
+2012-05-04
+
+- updated 'PCS.pm' extensively to use new tone compression algorithm (v0.60)
+
+- updated 'PCS_tone_compression_test.plx'.
+
+2012-05-14
+
+- added snippet 'perspective_transform_1.plx'.
+
+2012-05-17
+
+- modified 'match_swatches_example.plx' to print RGB device values correctly.
+
+2012-05-20
+
+- reverted changes to 'scanner_profile_example_4.plx' made on 2012-04-21 (replacing $xyz2Lxyz object with xyz2Lxyz() function).
+
+- modified 'scanner_profile_example_4.plx' by replacing jacobian functions with 'jacobian' method and 'xyz2Lab_jac' function.
+
+- modified 'scanner_profile_example_4.plx' by creating the $xyz2Lxyz PCS object early, and passing the object reference to 'fit_gamma' and 'pj_gamma' functions.
+
+- modified 'fit_gamma' function of 'scanner_profile_example_4.plx' to use the 'ICC::Support::Lapack::normal' function to solve the normal equations.
+
+2012-05-24
+
+- added 'device_link_example_4.plx'.
+
+- minor changes to other device link examples.
+
+2012-05-28
+
+- added snippet 'scanner_spectral_model2.plx.'
+
+2012-06-09
+
+- modified 'scanner_profile_3_example.plx' to allow disabling auxiliary gray scale, and to specify illuminant.
+
+2012-06-17
+
+- added example 'scanner_profile_5_example.plx.'
+
+- modified scanner profile examples 1-3 by replacing '$RGB2dev' transform with 'device' method.
+
+2012-07-13
+
+- modified 'scanner_profile_5_example.plx' by adding support for chromatic adaptation transform (CAT).
+
+2012-08-29
+
+- modified 'flatten' subroutine of 'Shared.pm' to accept Math::Matrix objects.
+
+- modified 'Shared_test.plx' by adding tests of 'flatten' subroutine.
+
+- added snippet 'row_matrix_test.plx'.
+
+2012-08-30
+
+- added 'row_matrix' method to 'Chart.pm'.
+
+- modified subroutine '_write_chart' in 'Chart.pm' to set LGOROWLENGTH value when row slice is a matrix.
+
+- modified 'Chart_test.plx' by adding test of 'row_matrix' method.
+
+2012-09-04
+
+- renamed the 'row_matrix' method as 'select_matrix'.
+
+- added snippet 'template_test.plx'.
+
+2012-09-05
+
+- added snippet 'template_test_2.plx'.
+
+- added subroutines '_binary_search' and '_linear_search' to 'Chart.pm'.
+
+- added method 'select_template' to 'Chart.pm'.
+
+- added test program 'Chart_select_test.plx'.
+
+2012-09-06
+
+- modified 'select_matrix' method of 'Chart.pm' to do additional verification of parameters.
+
+2012-09-07
+
+- modified 'select_matrix' method of 'Chart.pm' to return matrix of entire chart when row and column parameters are omitted.
+
+- added snippet 'chart_merge_test.plx'.
+
+2012-09-08
+
+- added 'merge' method to 'Chart.pm'.
+
+- modified 'Chart_test.plx' to add tests for 'merge' method.
+
+2012-09-09
+
+- renamed snippet 'row_matrix_test.plx' to 'chart_matrix_test.plx'.
+
+- renamed snippet 'template_test_1.plx' and 'template_test_2.plx' to 'chart_template_test_1.plx' and 'chart_template_test_2.plx'.
+
+- renamed method 'merge' to 'merge_cols' in 'Chart.pm'.
+
+2012-09-10
+
+- renamed snippet 'chart_merge_test.plx' to 'chart_merge_cols_test.plx'.
+
+- added snippet 'chart_merge_rows_test.plx.
+
+- added method 'merge_rows' to 'Chart.pm'.
+
+- modified 'Chart_test.plx' to add tests for 'merge_rows' method.
+
+2012-09-15
+
+- modified test '40_chart.t' by adding new methods.
+
+- modified 'desc.pm' by fixing ScriptCode comments.
+
+- added example 'limit_matrix_profile_example.plx'.
+
+2012-09-16
+
+- added example 'matrix_profile_example.plx'.
+
+- modified 'bradford' subroutine in 'Shared.pm' by correcting typo in matrix (0.8591 to 0.8951).
+
+2012-09-22
+
+- modified 'readTIFF' method of 'Chart.pm' to return column slice of TIFF data.
+
+- added snippet 'clusters.plx'.
+
+- replaced references to $WPicc with D50 in 'Chart.pm' (v1.14)
+
+- added snippet 'clusters_2.plx'.
+
+2012-09-30
+
+- added snippets 'clusters_3.plx' and 'Latan.plx'.
+
+2012-10-03
+
+- added 'ICC::Support::Lapack::cov' function, similar to the MATLAB function of the same name.
+
+- added 'test28.pl' to test 'cov' function.
+
+2012-10-06
+
+- changed 'vec_zeros' and 'mat_zeros' functions of 'xs_arrays.c' to 'vec_fill' and 'mat_fill'.
+
+- added 'mat_eye' function to 'xs_arrays.c'.
+
+- removed 'ICC::Support::Lapack::mat_zeros' and 'ICC::Support::Lapack::vec_zeros'.
+
+- added 'ICC::Support::Lapack::zeros', 'ICC::Support::Lapack::ones' and 'ICC::Support::Lapack::eye' functions, similar to MATLAB functions of the same name.
+
+- added 'test29.pl' to test the 'zeros', 'ones' and 'eye' functions.
+
+2012-10-07
+
+- added 'ICC::Support::Lapack::inv' function, similar to the MATLAB function of the same name.
+
+- added 'test30.pl' to test the 'inv' function.
+
+2012-10-09
+
+- added 'ICC::Support::Lapack::chol' function, similar to the MATLAB function of the same name.
+
+- added 'ICC::Support::Lapack::mahal' function, to compute Mahalanobis distance between two vectors.
+
+- added 'test31.pl' to test 'chol' and 'mahal' functions.
+
+- added 'ICC::Support::Lapack::euclid' function, to compute Euclidean distance between two vectors.
+
+- added 'test32.pl' to test 'euclid' function.
+
+- updated 'Lapack.pm' to document recent changes.
+
+2012-10-10
+
+- modified 'ICC::Support::Lapack::mahal', 'Lapack.pm' and 'test31.pl' to use inverse covariance matrix, rather than the Cholesky factorization.
+
+- added snippet 'ctv_mahalanobis.plx' and document 'dEab_mahalanobis.txt'.
+
+2012-10-13
+
+- resolved differences between example 'matrix_profile_example.plx' and 'working_space_example.plx' to use best features of each program.
+
+- renamed 'working_space_example.plx' to 'working_space_profile_gamut_check_example.plx'.
+
+- renamed 'matrix_profile_example.plx' to 'working_space_profile_example.plx'
+
+- modified 'sdump' method of 'nMAT.pm' to check for empty arrays.
+
+- modified 'rbf.pm' by swapping the center and parameter arrays. (v0.20)
+
+- modified 'rbf_test.plx', 'nNET_test.plx', '81_rbf.t', 'scanner_profile_5_example.plx', and 'modify_data_set_example.plx' for swapping of 'rbf.pm' parameters.
+
+- added 'array' method to 'rbf.pm', and fixed 'center' method.
+
+- modified 'radius' and '_jacobian' methods of 'rbf.pm' to use 'ICC::Support::Lapack::euclid'.
+
+- modified 'new' method of 'rbf.pm' to accept covariance matrix, and save its inverse in object.
+
+- modified 'radius' and '_jacobian' methods of 'rbf.pm' to handle covariance matrix using 'ICC::Support::Lapack::mahal'.
+
+- modified 'rbf_test.plx' to include testing of objects with covariance matrix.
+
+2012-10-14
+
+- added 'ICC::Support::Lapack::vec_xplus' function, which multiplies a vector by a matrix.
+
+- added 'test33.pl' to test the 'vec_xplus' function.
+
+- modified '_jacobian' subroutine of 'rbf.pm' to incorporate 'ICC::Support::Lapack::vec_xplus'.
+
+- added 'matrix' method to 'rbf.pm'.
+
+2012-10-17
+
+- renamed snippet 'view_ctv_curves.plx' to 'ctv_view.plx'.
+
+- modified 'ctv_view.plx' to write a v4 device link profile.
+
+- modified 'ctv_view.plx' to write a chart containing CTV values as L*a*b* gray values.
+
+2012-10-18
+
+- modified 'new' method of 'akima.pm' to accept a 'Math::Matrix' object for first parameter.
+
+- added snippet 'ctv_tvi_tone_curves.plx'.
+
+2012-10-20
+
+- modified 'add_ctv' method of 'Chart.pm' to use Mahalanobis distance for computing CTV. (v1.15)
+
+- modified '_xyzDivisor' subroutine of 'chart.pm' to accept optional encoding parameter.
+
+- modified 'iwtpt', 'wtpt', and 'bkpt' methods of 'chart.pm' to accept optional encoding parameter.
+
+- modified 'edit_media_white_point_example.plx' to set XYZ encoding with 'wtpt' method, instead of 'xyz_encoding'.
+
+2012-10-21
+
+- modified '_xyzDivisor' subroutine of 'chart.pm' by removing encoding lookup in header hash.
+
+- modified 'xyz' and 'spec2xyz' methods of 'chart.pm' to lookup encoding in header hash.
+
+- modified 'Chart_test.plx' and 'Chart_module_notes.txt' to reflect changes in XYZ encoding.
+
+- modified 'Chart_module_notes.txt' by adding examples of 'spec2xyz' method.
+
+- modified 'Chart_module_notes.txt' by adding examples of 'device' method.
+
+- modified 'Chart_module_notes.txt' by adding examples of 'merge_rows' and 'merge_cols' methods.
+
+- modified 'Chart_module_notes.txt' by adding examples of 'select', 'select_matrix' and 'select_template' methods.
+
+- added 'rotate' and 'flip' methods for 'Math::Matrix' objects to 'Chart.pm'.
+
+- modified 'Chart_select_test.plx' by adding tests for 'rotate', 'flip' and 'transpose' methods.
+
+2012-10-22
+
+- modified 'Chart_module_notes.txt' by adding examples of 'ctv' and 'analyze' methods.
+
+2012-10-23
+
+- added 'check_cmyk_data_set_example.plx'.
+
+2012-10-24
+
+- modified 'flatten' subroutine of 'Shared.pm' to warn if the slice contains an undefined value.
+
+2012-10-25
+
+- added snippet 'chart_template_test_3.plx' to develop 'FIFO' and 'LIFO' duplicate handling.
+
+- modified 'select_template' method of 'Chart.pm' to incorporate 'FIFO' and 'LIFO' duplicate handling.
+
+2012-10-26
+
+- modified 'rotate' and 'flip' methods of 'Chart.pm', and 'Chart_select_test.plx'.
+
+- modified 'select_template' method of 'Chart.pm' to replace FIFO and LIFO warnings with plain messages.
+
+- modified '_readChart' subroutine of 'Chart.pm' to skip blank data and format lines. (v1.16)
+
+2012-10-27
+
+- added snippet 'glob.plx' to test 'glob' function for file paths.
+
+- added subroutine '_files' to 'Chart.pm', which resolves a list of files from a path using the 'bsd_glob' function.
+
+- modified 'new' method of 'Chart.pm' to incorporate '_files'.
+
+- modified '_readChartAvg' and '_readChartAppend' subroutines to use file list instead of directory path.
+
+- modified 'Chart_test.plx' by adding tests of new file path capabilities.
+
+- modified 'readASE', 'readTIFF', 'writeASE', '_readSPD', and '_writeChart' of 'Chart.pm' subroutines to use 'bsd_glob' for resolving file path.
+
+- modified '_readICCprofile' and '_writeICCprofile' subroutines of 'Profile.pm' to use 'bsd_glob' for resolving file path. (v0.51)
+
+- modified 'prinergy', 'trueflow' and 'rampage' methods of 'Curve.pm' to use 'bsd_glob' for resolving file path.
+
+- modified '_new_from_storable' subroutine of 'nPINT.pm' to use 'bsd_glob' for resolving file path.
+
+2012-10-28
+
+- added 'perl_critic_test.plx'.
+
+- modified many modules based on Perl::Critic analysis. mostly fixed 'Loop iterator is not lexical' issue.
+
+2012-10-29
+
+- modified development directory by putting modules in 'lib' folder, to accommodate Module::Build and/or ExtUtils::MakeMaker
+
+- added Build.PL script, and associated files such as MANIFEST, META, etc.
+
+- changed the name of this file to 'Changes'.
+
+2012-10-31
+
+- modified ICC::Profile, ICC::Support::Lapack and ICC::Support::Levmar to use the Module::Build system.
+
+2012-11-02
+
+- made many changes to file paths after reorganizing folder structure, eliminating user dependence as much as possible.
+
+2012-11-03
+
+- added snippets 'cxf_read.plx' and 'cxf_write.plx'.
+
+2012-11-08
+
+- added '_readChartCxF3' subroutine to 'Chart.pm', renamed '_readChart' to '_readChartASCII' and added new '_readChart' subroutine to test file type and call the proper '_readChart...' subroutine. (v1.17)
+
+- modified 'Chart_test.plx' to open a CxF3 chart file.
+
+- added 'device_link_5_example.plx'.
+
+2012-11-09
+
+- added 'photoshop' method to 'Curve.pm'. (v0.51)
+
+- modified all 'press_curve' examples to write Photoshop curves.
+
+2012-11-11
+
+- added '_makeCxF3hash' subroutine to 'Chart.pm'.
+
+- added 'writeCxF3' method to 'Chart.pm'. (v1.18)
+
+2012-11-15
+
+- modified '_readChartCxF3' of 'Chart.pm' to handle multiple device values.
+
+- added snippet 'cxf_make_template.plx'.
+
+- modified 'writeCxF3' method of 'Chart.pm' to check column slice against suffix, and use appropriate XML template.
+
+2012-11-18
+
+- added 'context' method to 'Chart.pm' (v1.19).
+
+- modified 'fmt' and 'add_fmt' methods of 'Chart.pm' to use context.
+
+- modified '_spectral' subroutine of 'Chart.pm' to use context.
+
+- modified '_readChartCxF3' subroutine to save format fields with context.
+
+- added 'Chart_context_test.plx'.
+
+- modified 'Chart_test.plx' by changing examples using 'current' to use 'context'.
+
+- modified '_makeDataFormat' of 'Chart.pm' to warn about duplicate keys.
+
+2012-11-19
+
+- updated all regular expressions in 'Chart.pm' to allow context prefix.
+
+2012-11-23
+
+- added snippets 'chart_regex_test.plx' and 'cxf_object_array.plx'.
+
+- added '_makeCxF3array' subroutine to 'Chart.pm'.
+
+2012-11-24
+
+- modified 'writeCxF3' method of 'Chart.pm' to use '_makeCxF3array'.
+
+2012-11-25
+
+- added '_makeCxF3_colorspec' subroutine to 'Chart.pm'.
+
+- modified 'writeCxF3' method of 'Chart.pm' to use '_makeCxF3_colorspec'.
+
+2012-12-01
+
+- modified '_writeChart' subroutine of 'Chart.pm' to replace spaces with underscores.
+
+- renamed '_writeChart' to '_writeChartASCII';
+
+2012-12-02
+
+- reworked '_readChartCxF3' subroutine of 'Chart.pm' to be table-based. (v1.20)
+
+- added snippet 'chart_test_fmt.plx'.
+
+- modified 'fmt' and 'add_fmt' methods of 'Chart.pm' to use optional context.
+
+- added 'test' method to 'Chart.pm'.
+
+- modified '_spectral' subroutine of 'Chart.pm' to use optional context.
+
+- modified 'Chart.pm' by removing all reference to $self->[5] (context).
+
+- modified 'spectral', 'name', 'rgb', 'cmyk', 'hex', 'ctv', 'lab', 'xyz' methods of 'Chart.pm' to use optional context parameter.
+
+- modified 'add_xyz' method of 'Chart.pm' to use optional context parameters.
+
+2012-12-04
+
+- modified 'nm' method of 'Chart.pm' to use '_spectral' subroutine, and optional context parameter.
+
+- modified 'add_density' method of 'Chart.pm' to use optional context parameters.
+
+2012-12-05
+
+- modified 'wavelength' method of 'Chart.pm' to call '_spectral' and use context.
+
+- modified 'add_lab' method of 'Chart.pm' to use context.
+
+- added 'fmt_keys' method to 'Chart.pm'
+
+- modified 'ramp' and 'select' methods to use grep for selection.
+
+2012-12-06
+
+- modified 'nCLR' and 'device' methods of 'Chart.pm' to use context.
+
+- added 'context' method to 'Chart.pm'.
+
+2012-12-07
+
+- modified 'add_ctv' method of 'Chart.pm' to use context.
+
+2012-12-09
+
+- modified 'ramp' and 'select' methods of 'Chart.pm' to use context.
+
+- renamed 'select' to 'range' and changed code which used 'select'.
+
+- modified '_getset' subroutine of 'Chart.pm' to check row and column indices are positive integers.
+
+- modified 'select_template' method of 'Chart.pm' to use contexts.
+
+- modified 'iwtpt', 'wtpt', 'bkpt' methods of 'Chart.pm' to use context.
+
+- modified '_mediaWP', '_media_BP' and '_xyzDivisor' subroutines of 'Chart.pm' to use context.
+
+- modified '_makeXYZ' subroutine of 'Chart.pm' to match format keys with context.
+
+- modified 'analyze' method of 'Chart.pm' to use context.
+
+- modified 'readASE' method of 'Chart.pm' to use context.
+
+- modified 'readTIFF' method of 'Chart.pm' to use context.
+
+2012-12-10
+
+- modified 'analyze' method of 'Chart.pm' to create empty structure first, simplifying code.
+
+- modified 'analyze' method of 'Chart.pm', fixing a serious bug when row slice was specified.
+
+- modified 'test' method of 'Chart.pm' by simplifying to one grep statement, testing if $1 is defined.
+
+2012-12-12
+
+- removed 'spec2xzy' method from 'Chart.pm', and also from tests.
+
+- added tests for 'test' method to 'Chart_test.pl'.
+
+2012-12-14
+
+- modified 'add_set' method of 'Chart.pm' to use Perl's slice function.
+
+- modified '_makeSampleID' subroutine of 'Chart.pm' to determine ID column directly, not using DATA_FORMAT hash.
+
+2012-12-15
+
+- modified 'Chart_test.plx' to include new tests of 'add_set' method.
+
+- modified 'id' method to use 'flatten'.
+
+- modified 'merge_rows' method of 'Chart.pm' to match column keys with context.
+
+- modified 'merge_rows' and 'merge_cols' methods of 'Chart.pm' to append if offset parameter not supplied.
+
+2012-12-16
+
+- modified 'fmt' method of 'Chart.pm' to do literal match first, then match without context prefix.
+
+- renamed 'id' method of 'Chart.pm' to 'select_id', and updated other files using 'id'.
+
+- added 'id' method of 'Chart.pm' as a get/set shortcut.
+
+- modified 'add_avg', 'analyze' and '_add_avg' of 'Chart.pm' to find SAMPLE_ID and SAMPLE_NAME without using DATA_FORMAT hash.
+
+- modified '_readChartAvg' to handle L*a*b* values, and work without data format hash.
+
+- modified '_readChartAppend' to work without data format hash.
+
+- modified '_makeCxF3writeops' to work without data format hash.
+
+- modified '_readSPD' to work without data format hash.
+
+- removed '_makeDataFormat' of 'Chart.pm'.
+
+2012-12-17
+
+- changed 't::lib::Test' to 't::lib::Boot' in all modules.
+
+- modified 'new' method of 'Chart.pm' by removing data format hash from object structure.
+
+2012-12-18
+
+- modified 'Chart.pm' by changing SAMPLE_ID hash from $self->[2] to $self->[3] and context array from $self->[4] to $self->[2].
+
+- modified '_makeCWF' and '_readCWF' functions of 'Chart.pm' to return Wx, Wy, Wz and WPxyz, rather than save to header hash.
+
+- modified '_makeXYZ' and 'add_xyz' functions of 'Chart.pm' to use modified '_makeCWF' and '_readCWF' function.
+
+- modified 'add_density' method of 'Chart.pm' to not save weight functions in object header.
+
+- modified 'new' method of 'Chart.pm' by removing 'AVERAGE' modifier.
+
+2012-12-19
+
+- changed 'rows' to 'n_rows' and 'cols' to 'n_cols' in 'Chart.pm', tests and examples.
+
+- changed 'fmt' to 'cols' in 'Chart.pm', tests and examples.
+
+- changed 'select_id' to 'rows' in 'Chart.pm', tests and examples.
+
+- changed 'add_set' to 'splice_matrix' in 'Chart.pm', tests and examples.
+
+2012-12-22
+
+- modified '_getset' function of 'Chart.pm' to take object index parameter.
+
+- modified 'Chart.pm' methods that call '_getset' by adding object index parameter of '1'.
+
+- added 'colorimetry' method to 'Chart.pm', same as 'slice', except object index is '2' (colorimetry array).
+
+2012-12-25
+
+- modified 'Chart.pm' extensively to use optional hash parameter for context, encoding, etc. (v1.21)
+
+2012-12-26
+
+- modified '_readCWF' function of 'Chart.pm' to use parameter hash.
+
+- modified 'add_xyz' and 'nm' methods of 'Chart.pm' to use parameter hash.
+
+2012-12-27
+
+- modified 'add_lab', 'add_density' and 'add_ctv' methods of 'Chart.pm' to use parameter hash.
+
+- updated 'Chart_test.plx' to use parameter hash.
+
+2012-12-28
+
+- modified '_mediaWP' and '_mediaBP' of 'Chart.pm' to use 'device' context.
+
+- modified '_mediaWP' and '_mediaBP' of 'Chart.pm' to return stored values, if any.
+
+- added snippet 'ISO_5-3_to_YAML.pl' to generate density data, 10 nm and 20 nm.
+
+- modified 'add_density' method to detect and use both 10 nm and 20 nm spectral data.
+
+- modified 'density' method of 'Chart.pm' to use 'encoding' parameter.
+
+2012-12-29
+
+- modified '_readChartASCII' subroutine of 'Chart.pm' to read illuminant data (ProfileMaker files).
+
+- modified 'add_xyz' method of 'Chart.pm' to use read illuminant data ('DATA').
+
+- modified 'printer_profile_relinearization_example.plx' to fix incorrect L*a*b* values.
+
+2012-12-30
+
+- checked all example programs, and corrected any problems.
+
+2012-12-31
+
+- modified '_readChartASCII' subroutine of 'Chart.pm'. factored some common steps, and removed close file handle step.
+
+- modified '_readChart' subroutine of 'Chart.pm' by adding step to close file handle.
+
+2013-01-02
+
+- modified '40_Chart.t' to include tests of ASCII files with various line endings.
+
+2013-01-03
+
+- added 'harlequin' method to 'Curve.pm'.
+
+2013-01-06
+
+- modified '_readChartAvg' subroutine of 'chart.pm' to fix bug in averaging L*a*b* data.
+
+- modified '_readChartASCII' and '_readChartCxF3' subroutines of 'Chart.pm' by moving calls to '_makeSampleID' and '_makeXYZ' to the 'new' method.
+
+- modified '_readChartAvg' and '_readChartAppend' subroutines of 'Chart.pm' by saving file path in new method, instead of extracting it with regex.
+
+- modified 'slice' method of 'chart.pm' to fix case with no parameters.
+
+
+2013-01-12
+
+- modified '_getset' subroutine of 'Chart.pm' to test for array multiplier of 1's, and return unaltered data.
+
+- modified '_readChartASCII' subroutine of 'Chart.pm' by changing regex '\s+' to '\s*', so that an 'END_DATA' line without a line ending is interpreted correctly.
+
+2013-01-13
+
+- added 'Chart.pod' to document 'Chart.pm' module.
+
+2013-01-21
+
+- added 'size' method to 'Chart.pm', removed 'n_rows' and 'n_cols' methods.
+
+- updated examples and documentation to use 'size' method instead of 'n_rows' and 'n_cols'.
+
+2013-01-22
+
+- modified 'header' method of 'Chart.pm' to copy the supplied hash when setting.
+
+2013-01-24
+
+- modified 'new' method of 'Chart.pm' by incorporating the '_newChart' function and removed '_newChart'.
+
+2013-01-26
+
+- modified 'add_ctv' method of 'Chart.pm' to just add CTV data, not Lx, Ly and Lz. Lx, Lz, Lz can be derived from L*a*b*, if needed.
+
+- added snippet 'CIE_cmf_to_YAML.pl' to create 'CIE_cmfs_360-780_x_1.yml', containing CIE1931 and CIE1964 color matching functions.
+
+- modified '_makeCWF' subroutine of 'Chart.pm' to use 2º or 10º CIE color matching functions from 'CIE_cmfs_360-780_x_1.yml'.
+
+- modified '_makeSPD' subroutine of 'Chart.pm' to use context prefix when looking up spectral fields.
+
+- modified 'ramp' and 'range' methods of 'Chart.pm' to use optional parameter hash.
+
+- modified 'randomize' method to take optional row_slice parameter.
+
+2013-01-27
+
+- added 'randomize' method to 'Math::Matrix' additions of 'Chart.pm'.
+
+2013-01-28
+
+- reworked 'context' method of 'Chart.pm' to return either a scalar or an array when getting, and a list of keys when setting.
+
+2013-01-29
+
+- modified 'test' method of 'Chart.pm' by splitting complex grep into two simpler tests, with and without context.
+
+2013-02-05
+
+- modified '_readChartASCII' to read comma delimited (.csv) files.
+
+2013-02-06
+
+- modified '_readChartASCII' by removing 'chomp()' and adding regular expression to detect an empty line.
+
+- modified '_readChartASCII' by adding regular expression to remove comments, which may begin after valid data.
+
+2013-02-09
+
+- modified '_writeChartASCII' function of 'Chart.pm' to map undefined data to '', as when Excel write tab-delimited text.
+
+- added snippet 'chart_splice_test.plx'.
+
+2013-02-10
+
+- removed 'splice_matrix', 'merge_rows' and 'merge_cols' methods from 'Chart.pm'. (v1.22)
+
+- added 'splice_rows' and 'splice_cols' methods to 'Chart.pm'.
+
+- update 'Chart.pod' for changes above.
+
+2013-02-12
+
+- modified many functions in 'Chart.pm' by replacing 'exists' with 'defined'.
+
+- added snippet 'chart_template_test_4.plx'.
+
+- modified 'select_template' methods of 'Chart.pm' to use hash parameter.
+
+2013-02-16
+
+- modified 'analyze' method of 'Chart.pm' to use hash parameter.
+
+- modified 'analyze' method by adding hash key 'ramp' to set the device value use to select ramps.
+
+2013-02-17
+
+- added 'read_file_formats_test.plx'.
+
+- modified '_readChart' subroutine of 'Chart.pm' to detect and read Adobe Swatch Exchange and TIFF files. (v1.23)
+
+- added subroutines '_readChartASE' and _readChartTIFF' to 'Chart.pm'.
+
+- removed 'readASE' and 'readTIFF' methods from 'Chart.pm'.
+
+- modified '_readChart', '_readChartAvg', '_readChartAppend' and 'new' to use optional hash parameter.
+
+- modified 'Chart_test.plx' for above changes.
+
+- updated snippets 'scanner_spectral_model_1.plx' and 'scanner_spectral_model_2.plx' for above changes.
+
+- updated snippets 'clusters', 'clusters_2' and 'clusters_3' for above changes.
+
+- updated examples 'scanner_profile_1_example.plx' to 'scanner_profile_5_example.plx' for above changes.
+
+2013-02-18
+
+- modified 'array' method of 'Chart.pm' to update the SAMPLE_ID hash and colorimetry array.
+
+2013-02-26
+
+- modified 'rows' and 'cols' methods of 'Chart.pm' to use hash slice in place of map function.
+
+2013-02-28
+
+- modified 'wtpt' and 'bkpt' methods of 'Chart.pm' by removing unnecessary 'else' branch.
+
+- completed 'Chart.pod' documentation.
+
+2013-03-02
+
+- modified '_makeCxF3writeops' of 'Chart.pm' to use hash slice in place of map function.
+
+- changed '_writeChartASCII' to 'write' in 'Chart.pm'.
+
+2013-03-03
+
+- modified 'test', 'add_avg', 'select_template', 'analyze', '_spectral', '_readChartAvg', and '_makeCxF3writeops' of 'Chart.pm' by adding 'SPECTRAL_NM' to regex (used by i1Profiler).
+
+- modified 'test' method of 'Chart.pm' by removing 'PCm_n' test from nCLR regex (can't find any application that uses this notation).
+
+- modified '_readChartASCII' of 'Chart.pm' by changing regex used by 'split' to /[\s,]+/, allowing multiple whitespace characters between fields.
+
+2013-03-04
+
+- added snippet 'chart_keyword.plx' to develop storing CGATS file header lines in an array.
+
+- modified 'write' method and '_readChartASCII' function of 'Chart.pm' to save file header in an array. (v1.24)
+
+- added 'keyword' method to 'Chart.pm' for getting/setting keyword values.
+
+- modified '_makeXYZ' method of 'Chart.pm' to use 'keyword' method to get illuminant and obeserver data.
+
+- modified '_makeXYZ' method of 'Chart.pm' to make copies of CWF functions saved in colorimetry array.
+
+- modified '40_Chart.t' for above changes in 'Chart.pm' module.
+
+2013-03-05
+
+- modified '_readChartASCII' method of 'Chart.pm' by changing file header regex to use non-greedy match (.*?).
+
+- modified 'write' method of 'Chart.pm' by replacing regex that trim leading and trailing whitespace.
+
+- modified 'select_template' method of 'Chart.pm' to use 'keyword' to get 'LGOROWLENGTH' value.
+
+2013-03-06
+
+- modified 'keyword' method of 'Chart.pm' to delete array elements when keyword is enclosed by <>.
+
+- updated snippets, tests, and examples to use 'keyword' method.
+
+2013-03-07
+
+- modified 'Chart.pod' by adding 'keyword' documentation.
+
+2013-03-09
+
+- modified '_readChartCxF3' function of 'Chart.pm' to extract index ($ix) from Name attribute only for Target and Measurement types.
+
+2013-03-16
+
+- modified 'write' method of 'Chart.pm' to skip KEYWORD entries in keyword array, and add KEYWORD lines for non-standard keys.
+
+- modified 'test' method of 'Chart.pm' by changing regex 'YCAP' to 'CAPY', per ISO 28178.
+
+2013-03-19
+
+- modified 'write' method of 'Chart.pm' to filter valid rows and columns.
+
+- modified 'writeCxF3' method of 'Chart.pm' to filter valid rows.
+
+- modified 'select_matrix' method of 'Chart.pm' to warn instead of croak on out of bound indices.
+
+2013-03-27
+
+- modified 'Chart.pm' by replacing instances of 'carp' with 'warn'.
+
+2013-03-28
+
+- modified 'write' method of 'Chart.pm' by copying chart data to @field array before using map function.
+
+2013-03-31
+
+- modified 'write', 'writeCxF3', and 'randomize' methods of 'Chart.pm' to test row and columns slices directly if empty array references.
+
+- modified '_getset' function of 'Chart.pm' to test row and columns slices directly if empty array references.
+
+- modified 'randomize' method of 'Chart.pm' to shuffle row slice directly (eliminating map function).
+
+2013-04-07
+
+- modified 'CxF3_template.xml' by removing the xrp:Prism resource.
+
+2013-05-07
+
+- modified 'new', 'rows', 'keyword', 'splice_cols', 'write', '_makeSampleID', and '_readChartASCII' of 'Chart.pm' by adding file header array to object structure. (v1.25).
+
+- modified 'Chart_module_notes.txt' to show changed object structure.
+
+2013-05-09
+
+- added snippet 'CGATS_keyword_regex.plx' to develop a well-tested regex for splitting header lines.
+
+- modified '_readChartASCII' subroutine of 'Chart.pm' to split header lines into keyword and value, and save as array elements.
+
+- modified 'write' method of 'Chart.pm' to print the header lines, as now saved by '_readChartASCII'.
+
+- modified 'keyword' method of 'Chart.pm' to edit header lines, as now saved by '_readChartASCII'.
+
+2013-05-11
+
+- modified 'Chart.pm' (v1.25) with routines from 'cxf_write_2.plx'.
+
+- modified 'chart_to_YAML.pl' and '40_chart.t' for above changes to 'Chart.pm'.
+
+- modified 'nCLR' method of 'Chart.pm' to fix sorting bug.
+
+2013-05-12
+
+- modified example 'chart_duplicate_patches.plx' to use device values instead of CMYK values.
+
+- added snippet 'CGATS_prefix_regex.plx' to develop regex for splitting format strings into prefix/keyword.
+
+- modified 'Chart.pm' (v1.25) to use '|' character instead of '/' for delimiting prefix/keyword.
+
+- modified '40_chart.t' for above changes.
+
+- modified 'Chart.pod' and 'Chart_module_notes.txt' to reflect changes in v1.25.
+
+- modified folders containing test profiles, ../test_data/profiles/ became ../test_data/profiles/originals/.
+
+2013-05-13
+
+- modified '_readChartASCII' by adding 'local $_' to prevent 'while (<$fh>)' loop from interfering with external $_ usage.
+
+- added test 'copy_charts_test.plx'.
+
+2013-05-15
+
+- modified '_readCxF3colorspec' function of 'Chart.pm' to use %keys hash, and not add header lines for non-existent XPaths.
+
+2013-05-17
+
+- modified '_readCxF3colorspec' and '_makeCxF3colorspec' functions of 'Chart.pm' to use the 'nonBlankChildNodes' method to determine child node type.
+
+2013-05-18
+
+- modified '_makeCxF3fileinfo', '_makeCxF3readops' and '_makeCxF3writeops' functions of 'Chart.pm' by replacing 'firstChild' methods with 'nonBlankChildNodes' and related logic.
+
+- added '_validateCxF3' function to 'Chart.pm' to validate against the CxF3 XML schema.
+
+- modified 'writeCxF3' and '_readChartCxF3' functions to call '_validateCxF3' when enabled by hash entry.
+
+- modified 'writeCxF3' to round off RGB data to integer values (required by CxF3 schema).
+
+- updated 'Chart.pod' for numerous changes.
+
+- updated 'Build.PL' to include data files with 'xsd' suffix (CxF3 XML schema).
+
+2013-05-19
+
+- updated test 'copy_charts_test.plx' to write only a single device and a single colorimetric data type to CxF3 files.
+
+- modified '_makeISOdatetime' of 'Chart.pm' to return Time::Piece object and renamed to '_makeTimePiece'.
+
+- modified '_makeCxF3fileinfo' of 'Chart.pm' to use '_makeTimePiece'.
+
+- added 'created' method to 'Chart.pm'.
+
+- added snippet 'Chart_created_test.plx'.
+
+- modified '_makeTimePiece' of 'Chart.pm' to parse month and year strings, e.g. December, 2006.
+
+- modified many example programs for new location of test profiles (../test_data/profiles/originals/).
+
+2013-05-21
+
+- modified '_readChartASCII' of 'Chart.pm' to ignore leading spaces/tabs, per ISO 28178.
+
+- modified '_readChartASCII' of 'Chart.pm' by cleaning up use of '$iflag' variable.
+
+2013-05-22
+
+- modified '_readChartASCII' of 'Chart.pm' for better handling of comments and blank lines.
+
+- verified that Excel CSV charts are read correctly.
+
+2013-05-23
+
+- modified '_readChartASCII' of 'Chart.pm' by removing check of keyword characters.
+
+2013-05-24
+
+- modified 'Chart.pm' fixing several small issues identified by Perl Critic.
+
+2013-05-25
+
+- modified 'Chart.pod' by adding documentation for 'created' method.
+
+- modified 'ZXML.pm' to trim four null bytes when inflated XML, and restore them when deflating.
+
+2013-05-26
+
+- added '_readChartICC' function to 'Chart.pm'.
+
+- modified '_readChart' of 'Chart.pm' to call '_readChartICC' for ICC profiles.
+
+2013-05-30
+
+- modified 'ZXML.pm' to store only zipped data, using the 'text' method to inflate and deflate CxF string. (v0.20)
+
+- added 'data' method to 'ZXML.pm' to get/set zipped data string.
+
+- modified data method of 'Generic.pm' to get and set data. (v0.20)
+
+2013-05-31
+
+- modified 'text' method of 'ZXML.pm' to use pack and unpack to add/strip null bytes.
+
+2013-06-01
+
+- added snippets 'monaco_read_DEVD_tag.plx' and 'monaco_TAC_analysis.plx'.
+
+- added '_readMonacoDEVD' function to 'Chart.pm', to read charts from Monaco profiles.
+
+2013-06-02
+
+- modified '_readChart' function by adding 'save file type' lines, and removing same from other functions.
+
+- modified '_readChartICC' to support Heidelberg and Argyll profiles by reading 'targ' tag.
+
+- modified '_readMonacoDEVD' to use the profile header colorspace to determine number of channels.
+
+2013-06-08
+
+- modified 'press_curve_4_example.plx' to support adjusting nCLR data sets.
+
+2013-06-09
+
+- modified '_readChartICC' by adding tag id hash, simplifying logic, and reading 'targ' tag from any profile.
+
+- modified '_readMonacoDEVD' to add 'CREATED' keyword from header date/time.
+
+- updated snippet 'blend_charts.plx' to compute and save L*a*b* values.
+
+- modified 'Profile.pm' by moving the documentation to 'Profile.pod'.
+
+2013-06-12
+
+- modified 'add_lab' method of 'Chart.pm' by adding supplied white point option.
+
+2013-06-17
+
+- added snippet 'chart_getset_functions.plx' to develop improved '_getset' subroutine.
+
+- modified '_getset' subroutine of 'Chart.pm', and the methods that call it. (v1.26).
+
+- modified '_xyzDivisor' in 'Chart.pm', and renamed to '_xyz_encoding'.
+
+- modified 'iwtpt', 'wtpt', and 'bkpt' methods of 'Chart.pm' to use '_xyz_encoding'.
+
+- added '_density_encoding' to 'Chart.pm'.
+
+- added '_lab_encoding' to 'Chart.pm'.
+
+- modified 'lab' method of 'Chart.pm' to use '_lab_encoding'.
+
+2013-06-22
+
+- added 'encoding' options to 'Chart.pod'.
+
+- added snippet 'PCS_transform_sequence.plx'.
+
+- added Devel::NYTProf to analyze performance.
+
+2013-06-24
+
+- modified '_readICCprofile' and '_pcs' subroutines of 'Profile.pm' to correctly determine the PCS encoding of v2 RGB profiles.
+
+2013-06-29
+
+- modified '_readICCmft1' of 'mft1.pm' to correctly set the input colorspace for 'gamt' tags.
+
+- modified '_readICCmft2' of 'mft2.pm' to correctly set the input colorspace for 'gamt' tags.
+
+2013-07-02
+
+- modified '_readChartAvg' function of 'Chart.pm' to sort L*a*b* fields in correct order, and verify consistency.
+
+2013-07-03
+
+- modified 'add_avg', 'select_template' and 'analyze' methods of 'Chart.pm' to sort L*a*b* fields in correct order, and verify consistency.
+
+- modified '_readChartAvg' function of 'Chart.pm' to act on 'avg_method' parameter. allows simple averaging of L*a*b* data.
+
+2013-07-04
+
+- modified 'Shared.pm' by adding constant 'ln10'
+
+- modified 'add_density' and '_density_encoding' of 'Chart.pm' to use 'ln10' in place of $ln10.
+
+- modified '_readChartAvg' function of 'Chart.pm' to handle density values.
+
+- modified '_readChartAvg' function of 'Chart.pm' by factoring common code into '_avg_groups'.
+
+- modified 'add_avg', 'select_template' and 'analyze' methods of 'Chart.pm' to use '_avg_groups'.
+
+- rewrote '_add_avg' of 'Chart.pm' to use '_avg_groups', and to function more efficiently.
+
+- updated 'Chart.pod' to show examples of 'method' parameter.
+
+2013-07-05
+
+- modified 'write' method of 'Chart.pm' to remove useless return statements, improve error messages.
+
+- modified 'new' method of 'Chart.pm' by adding optional error string to return, and changing 'warn' statements to 'carp'.
+
+- modified '_readChart', '_readChartAvg', and '_readChartAppend' methods of 'Chart.pm' to improve error handling.
+
+- modified '_readChartASE', '_readChartICC', '_readMonacoDEVD', and '_readChartCxF3' methods of 'Chart.pm' to improve error handling.
+
+- modified '_readChartAvg' of 'Chart.pm' to skip final steps when number of files = 0.
+
+2013-07-08
+
+- added snippet 'TIFF_read_2.plx' to develop improved TIFF functions.
+
+- modified 'Chart.pm' with new version of '_readChartTIFF', and new functions '_readTIFFband' and '_readTIFFdir'. (v1.27)
+
+2013-07-13
+
+- added snippet 'TIFF_write.plx' to develop 'writeTIFF' method.
+
+- added 'writeTIFF', '_writeTIFFstrip' and '_writeTIFFdir' to 'Chart.pm'.
+
+2013-07-14
+
+- modified 'Chart.pod' to include documentation for new 'writeTIFF' method.
+
+- modified '_readChartTIFF' method in 'Chart.pm' to support 'context' hash key.
+
+2013-07-16
+
+- added snippet 'patch_set.plx'.
+
+- modified 'new' method of 'Chart.pm' to call '_makePatchSet' if only hash parameter is provided.
+
+- added '_makePatchSet' function to 'Chart.pm'.
+
+- added 'Chart_patch_set_test.plx'.
+
+- updated 'Chart.pod' for changes to 'new' method (making an patch set object from a hash).
+
+- modified '_writeTIFFstrip' function of 'Chart.pm' to check value when adding rand() value, and subtract if negative.
+
+2013-07-18
+
+- modified '_makePatchSet' function of 'Chart.pm' to use 'limit' parameter, simulating Monaco ink limit function.
+
+2013-07-20
+
+- modified '_readChartICC' function of 'Chart.pm', adding 'require ICC::Profile' to load that module, if not already included.
+
+- added '_mahal' function to 'Chart.pm', modified 'add_ctv' function to call it instead of 'ICC::Support::Lapack' version.
+
+- modified '_density_encoding' function of 'Chart.pm' by fixing comparison bugs ('==' changed to 'eq').
+
+- installed Math::Matrix v0.70, could break something.
+
+- modified '_density_encoding' function of 'Chart.pm' to check for log of zero or negative value and warn.
+
+2013-07-21
+
+- modified '_makeCWF' function of 'Chart.pm', adding 'require ICC::Support::akima' to load that module, if not already included.
+
+- added snippet 'row_length.plx'.
+
+- added '_getRowLength' function to 'Chart.pm'.
+
+- modified 'select_matrix', 'select_template', 'writeTIFF' methods of 'Chart.p to use '_getRowLength' function.
+
+- verified all example code in 'Chart.pod'.
+
+2013-07-22
+
+- fixed incorrect use of text string as regex parameter for 'split' function in 'Chart.pm', 'curve.pm', 'analyze_chart_structure.plx', 'cxf_read.plx', 'cxf_read2.plx', 'cxf_write_2.plx', 'ISO_5-3_to_YAML.pl'.
+
+- modified '_readChartICC' function of 'Chart.pm' to make $key loop iterator lexical (Perl::Critic).
+
+2013-07-24
+
+- modified 'Shared.pm' to include POSIX math functions and floating point constants and delete redundant functions.
+
+- modified 'Chart.pm' to use 'log10' and 'pow' functions for density/reflectance conversions.
+
+2013-07-25
+
+- modified several instances where 'map' was used as a 'for' loop.
+
+2013-07-27
+
+- modified 'new', 'readChartAvg' and 'readChartAppend' of 'Chart.pm' by moving location of call to '_makeXYZ'.
+
+- changed all 'sumProduct' references to 'dotProduct'.
+
+- modified 'test' method of 'Chart.pm' by changing 'STDDEV' to 'STDEV' (and all other instances of 'STDDEV').
+
+- modified 'test' method of 'Chart.pm' by adding 'MEAN_DE' to regex hash.
+
+- added snippet 'chart_std_dev.plx'.
+
+- modified '_readChartAvg' of 'Chart.pm' to optionally compute ISO statistics. (v1.28)
+
+- added '_addStats', '_addStdDevCol' and '_addMeanDECol' functions to 'Chart.pm' to support '_readChartAvg'.
+
+2013-07-28
+
+- added snippet 'chart_set_colorimetry.plx'.
+
+- renamed '_makeXYZ' function of 'Chart.pm' to '_addColorMeta'.
+
+- modified '_readChartASCII' function of 'Chart.pm' to save ProfileMaker illuminant data in header hash.
+
+- modified '_addColorMeta', '_makeSPD', and '_readSPD' functions of 'Chart.pm' to operate correctly (see 'chart_set_colorimetry.plx').
+
+- modified 'Chart.pm' by adding documentation to 'new' method for ISO 28178 statistics.
+
+2013-08-03
+
+- added snippet 'chart_template_test_5.plx' to develop 'copy' function.
+
+- modified 'select_template' method of 'Chart.pm' to include 'copy' function.
+
+- updated 'Chart.pod' by adding the 'copy' key to the 'select_template' section.
+
+2013-08-06
+
+- modified 'select_template' method of 'chart.pm' to maintain context of copied fields.
+
+2013-08-09
+
+- added example 'combine_charts.plx'.
+
+- modified 'device' method of 'Chart.pm' so get and set code blocks pass undefined values.
+
+- modified 'select_template' method of 'Chart.pm' to bypass samples with undefined device values.
+
+2013-08-10
+
+- modified '_lab_encoding', '_xyz_encoding' and '_density_encoding' functions of 'Chart.pm' so get and set code blocks pass undefined values.
+
+2013-08-11
+
+- modified several example programs by cleaning up subroutines to pass 'strict' mode, and verifying they still work.
+
+- added 'crossProduct' function to 'Shared.pm'.
+
+2013-08-17
+
+- modified 'test' method of 'Chart.pm' to return list of indices in array context.
+
+2013-08-18
+
+- renamed 'color' method of 'ncl2.pm' to 'array'.
+
+- modified 'array' method of 'ncl2.pm' to get/set color array.
+
+- modified 'new' method of 'ncl2.pm' to accept color table array parameter.
+
+- modified '_newICCprofile' function of 'Profile.pm' by changing profile class hash from 'nmci' to 'nmcl' (bug).
+
+2013-08-19
+
+- modified '_readICCprofile' function of 'Profile.pm' to add 'pcs' and 'wtpt' to 'gamt' tags.
+
+2013-08-21
+
+- modified 'add_xyz' entry in 'Chart.pod' to contain information about the optional 'cat' parameter.
+
+2013-09-07
+
+- modified 'PCS.pm' to fix 16-bit XYZ encoding. 1.0 => 32768/65535, not 0.5. (v0.61)
+
+- modified '_xyz_encoding' function of 'Chart.pm' to use correct multiplier (199.9969482421875) for 16-bit XYZ encoding.
+
+- modified example 'convert_printer_profile_example.plx' to use correct multipliers for 16-bit XYZ encoding.
+
+- added snippet 'mAB_from_matrix_profile.plx'.
+
+- modified 'mAB_.pm' by adding '_newICCmatrix' function, and changing 'new'. (v0.81)
+
+2013-09-08
+
+- added snippet 'mBA_from_matrix_profile.plx'.
+
+- modified 'mBA_.pm' by adding '_newICCmatrix' and '_makeInvCurve' functions, and changing 'new'. (v0.81)
+
+2013-09-11
+
+- added snippet 'vcgt_devel.plx'
+
+- added module 'vcgt.pm'.
+
+- added test program '24_vcgt.t'.
+
+2013-09-12
+
+- modified modules 'mft1.pm', 'mft2.pm', 'akima.pm', 'bern.pm' by combining 'map' functions that limit and round values.
+
+- modified modules 'clro.pm', 'clrt.pm', 'data.pm', 'desc.pm', 'mAB_.pm', 'mBA_.pm', 'mft1.pm', 'mft2.pm', 'mluc.pm', 'ncl2.pm', 'para.pm', 'pseq.pm', 'sf32.pm', 'sig_.pm', 'text.pm', 'view.pm', 'XYZ_.pm', 'ZXML.pm', 'Profile.pm', 'akima.pm', 'bern.pm', 'Chart.pm', 'nCLUT.pm' by combining 'pack' and 'print $fh $buf' lines.
+
+- modified '_pcs' function of 'Profile.pm' to return 'undef' when PCS is neither 'XYZ ' of 'Lab '.
+
+2013-09-14
+
+- modified 'tag' method of 'Profile.pm' to check for multiple instances of a tag signature.
+
+- updated 'Profile.pod' documentation file.
+
+2013-09-16
+
+- compiled on ICC::Support::Lapack on Mountain Lion, 10.8.5, and got the following error message:
+
+/System/Library/Frameworks/vecLib.framework/Headers/vecLib.h:22:4: error:
+      "<vecLib/vecLib.h> is deprecated. Please #include
+      <Accelerate/Accelerate.h> and link to Accelerate.framework."
+
+updated 'Lapack.xs', 'xs_arrays.c', and 'xs_stat.c' to use <Accelerate/Accelerate.h>
+updated 'Build.PL' to include Accelerate framework
+
+after updates, the Lapack module built successfully on 10.6.8 and 10.8.5.
+
+- updated Build.PL to require perl 5.9.2, so we can use the pack/unpack modifiers '<' and '>'.
+
+2013-09-22
+
+- modified 'sdump' method of 'Profile.pm' to print the offset in the tag table.
+
+- modified '_readICCprofile' function of 'Profile.pm' to support 'D2Bx' and 'B2Dx' tags.
+
+2013-09-24
+
+- modified '_readICCxxxx' function of 'mAB_.pm', 'mBA_.pm', 'mft1.pm', 'mft2.pm' to verify number of input and output channels.
+
+2013-10-12
+
+- modified module loading code of 'Profile.pm' to treat 'ICC::Support::Lapack' and 'ICC::Support::Levmar' as optional modules.
+
+2013-10-13
+
+- modified 'derivative' and 'transform' methods of 'curv.pm' by replacing int() function with floor() when compute interpolation interval.
+
+2013-10-14
+
+- modified 'pcs' method in 'mft1.pm', 'mft2.pm', 'mAB_.pm' and 'mBA_.pm' to use hash key 'pcs_encoding' in place of 'pcs'. also narrowed that acceptable encoding types.
+
+- modified '_readICCprofile' function of 'Profile.pm' to test for 'D2Bx' and 'B2Dx' tags.
+
+2013-10-16
+
+- completed initial work on the MPE tag set, 'mpet.pm', 'cvst.pm', 'clut.pm', 'matf.pm', 'curf.pm', 'samf.pm', and 'parf.pm'.
+
+2013-10-17
+
+- modified '_readICCprofile' function of 'Profile.pm' to save the file path and type in object header hash.
+
+2013-10-19
+
+- added 'inverse' method to 'parf.pm'.
+
+- modified '_readICCpara' and '_writeICCpara' functions of 'para.pm' to validate parameters.
+
+- added test 'parf_test.plx'.
+
+- updated test 'para_test.plx'.
+
+2013-10-20
+
+- modified example 'check_swatches_example.plx' to work with correctly with RGB data.
+
+- modified 'Levmar.xs' to free the 'x' and 'opts' memory, if not 'NULL' (a bug that was causing SEGV crash).
+
+2013-10-22
+
+- modified '_new_from_hash' function of 'cvst.pm' to allow 'curv' and 'para' objects.
+
+2013-10-28
+
+- added 'device_link_6_example.plx'.
+
+- added 'find' method to 'Chart.pm'.
+
+- updated 'Chart.pod' and '40_Chart.t' by adding 'find' method.
+
+2013-10-31
+
+- modified 'Chart.pm' by cleaning up 'find', 'ramp' and 'range' methods.
+
+- modified examples 'scanner_profile_x_example.plx' by replacing 'near_neutrals' function with 'range' method.
+
+2013-11-02
+
+- added snippet 'color_difference.plx'.
+
+- modified 'Shared.pm' by adding color difference functions, 'dEab', 'dE94', 'dE00', 'dEcmc', 'dE99', and '_Lab2DIN99'. (v0.30)
+
+- removed function 'dEab' from many examples (now uses the exported function from 'Shared.pm').
+
+2013-11-03
+
+- modified '_read_matf' and '_write_matf' methods of 'matf.pm' by removing the 8-bit option, and using s15Fixed16Numbers for 16-bit values.
+
+2013-11-10
+
+- updated 'mft1.pm', 'mft2.pm', 'mAB_.pm' and 'mBA_.pm' modules to new design based on 'mpet.pm', 'cvst.pm', 'matf.pm' and 'clut.pm'. each tag component is now a processing element object. mask/clipping bits now correspond consistently to the position of data in tag (was reversed, confusing). (v2.00)
+
+- updated 'curv.pm' to use floating point values (0 - 1) as curve data, instead of integer values (0 - 65535). (v2.00)
+
+2013-11-11
+
+- modified the 'curv' method of 'akima.pm' and 'bern.pm' to have range (0 - 1) instead of (0 - 65535).
+
+2013-11-12
+
+- modified 'cvst.pm' by adding '_inverse', '_crawl2', and 'inverse' methods.
+
+2013-11-14
+
+- modified 'matf.pm' so that the matrix is saved as a Math::Matrix object.
+
+2013-11-15
+
+- modified 'scanner_profile_x_example.plx' examples for changes to 'mAB_.pm'.
+
+- modified 'matf.pm' to write zeros when offset array is undefined.
+
+- modified '_check' function of 'mAB_.pm' and 'mBA_.pm' to allow matrix offset to be undefined.
+
+- modified '_newICCmatrix' function of 'mAB_' to fix bug cloning TRC curves.
+
+2013-11-16
+
+- added 'parajac', 'roots', 'curv', 'harlequin', 'photoshop', 'prinergy', 'rampage', 'trueflow' and '_getPrefsFolder' methods to 'cvst.pm', largely copied from 'Curve.pm'.
+
+- modified 'copy' method of 'Shared.pm' by adding optional parameter for multiple copies.
+
+2013-11-17
+
+- updated 'StatMatch' to use new 'mAB_' and 'mBA_' modules. (v3b15)
+
+2013-11-18
+
+- modified 'matf.pm' to fix bug in '_read_matf' function, bless entire array as 'Math::Matrix' at end.
+
+2013-11-22
+
+- modified 'press_curve_x_example.plx' to use 'cvst' object in place of 'Curve' object.
+
+- modified 'press_curve_8_example.plx' and 'press_curve_9_example.plx' to fix bug (curves were inverted, switched ramp indices).
+
+- modified 'akima.pm' module, so that 'inverse' returns the first value in input range as a scalar result.
+
+- modified 'working_space_profile_example.plx' to generate LUT based profile, in addition to matrix profile.
+
+2013-11-23
+
+- modified 'vcgt.pm' for changes in 'curv.pm' (values range from 0 - 1, instead of 0 - 65535).
+
+2013-11-24
+
+- modified many example scripts to use 'cvst' objects instead of 'Curve' objects, 'matf' objects instead of 'nMAT' objects.
+
+2013-12-03
+
+- modified 'Chart.pm' by adding 'matrix_size' method.
+
+2013-12-05
+
+- modified 'press_curve_8_example.plx' by adding TV functions for ISO 12647-2:2004.
+
+2013-12-07
+
+- modified 'scanner_profile_5_example.plx' and 'scanner_profile_6_example.plx' by adding 'q_factor' function.
+
+2013-12-08
+
+- added snippet 'canvas_plot_curve.plx' to develop curve plotting function.
+
+- modified 'scanner_profile_5_example.plx' and 'scanner_profile_6_example.plx' by adding 'plot_srgb' function.
+
+2013-12-14
+
+- added snippet 'spectral_reduction.plx'.
+
+- modified entire project 'ICC::Support::Lapack by replacing all occurrences of 'nMAT' with 'matf'.
+
+- modified many ICC::Profile module and examples by replacing occurrences of 'nMAT' with 'matf'.
+
+- removed loading of 'nMAT.pm', 'nCLUT.pm' and 'Curve.pm' modules from 'Profile.pm' (will force conversion to new floating point objects).
+
+- removed 'nMAT.pm', 'nCLUT.pm' and 'Curve.pm' modules from lib folder.
+
+- modified and added several test programs to use new floating point tags.
+
+2013-12-15
+
+- modified 'setFile' function of 'Shared.pm' to check for existence of the 'SetFile' utility before calling it (only useful on older versions of Mac OSX).
+
+2013-12-17
+
+- added snippet 'fit_matrix_gb_constrained.plx' to improve fitting of spectral model.
+
+- modified 'scanner_profile_example_5.plx' to optionally incorporate clustering of artwork samples, and removed 'scanner_profile_6_example.plx'.
+
+- modified 'scanner_profile_example_5.plx' by incorporating the improvements in 'spectral_reduction.plx' and 'fit_matrix_gb_constrained.plx'.
+
+- fixed a bug in several example programs where 3x3 matrix was multiplied by 32768/65535, indices were swapped.
+
+2013-12-18
+
+- modified 'scanner_profile_example_5.plx' by adding 'show_clusters' function.
+
+2013-12-25
+
+- modified 'matrix' method of 'matf.pm' to return a 'Math::Matrix' object.
+
+- modified 'scanner_profile_example_5.plx' to correctly compute scanner spectral response.
+
+2014-01-01
+
+- added snippet 'LED_scanner.plx'.
+
+2014-01-03
+
+- modified '_transform' method of 'matf.pm' to check for undefined offset, and simplified.
+
+- modified 'fit' method of 'matf.pm' to set $self->[2] to an empty array reference when there is no offset.
+
+2014-01-04
+
+- modified the '_readChartTIFF' function of 'Chart.pm' to support a mask ratio of 0.
+
+2014-01-05
+
+- added 'scanner_profile_6_example.plx'.
+
+2014-01-06
+
+- modified 'scanner_profile_6_example.plx' to scale offsets, if enabled, before writing profile.
+
+- modified 'show_3x3_matrix' function of 'scanner_profile_6_example.plx' to show the offset values, if any.
+
+2014-01-08
+
+- modified the '_readChartTIFF' function of 'Chart.pm' to support 'aperture', 'udf', and 'format' options, see 'TIFF_read_5.plx'.
+
+2014-01-09
+
+- modified the '_readChartTIFF' function of 'Chart.pm' by adding special sampling mode, see 'TIFF_read_6.plx'.
+
+2014-01-11
+
+- added 'grayscale_printer_profile_example.plx' and 'greyscale_working_space_profile_example.plx'.
+
+2014-01-14
+
+- modified '_newICCmatrix' function of 'mAB_.pm' and 'mBA_.pm' to add 'wtpt' and 'pcs_encoding' to header hash.
+
+2014-02-01
+
+- added snippet 'CCT_function.plx'.
+
+- modified 'Shared.pm' by adding functions 'XYZ2ucs', 'xy2ucs', 'CCT', 'CCT2', 'bbrad', 'bbxy', 'bbuv' and 'getDataFolder'.
+
+- modified 'Chart.pm' by removing function '_getDataFolder', and modifying all subroutines that called it to call shared function 'getDataFolder'.
+
+- modified 'Chart.pm' by changing variables used to read from data files from lexical (my) to 
+'state' variables.
+
+- modified various programs that called '_getDataFolder' to use the version in 'Shared.pm', and to use 'state' variables.
+
+2014-02-02
+
+- modified 'scanner_profile_1_example.plx' to fix a bug where matrix was not adjusted properly for XYZ encoding.
+
+2014-02-03
+
+- modified 'CIE_cmf_to_YAML.pl' to use 360-830 nm data, and include the 100/sum constants. new YAML file 'CIE_cmfs_360-830_x_1.yml' saved in Data folder.
+
+- modified 'bbxy' and 'bbuv' functions of 'Shared.pm' to use 'CIE_cmfs_360-830_x_1.yml'.
+
+2014-02-04
+
+- modified snippet 'qfactor.plx' to use 'state' variables and 'CIE_cmfs_360-830_x_1.yml'.
+
+- modified 'qfactor' function of 'scanner_profile_5_example.plx' and 'scanner_profile_6_example.plx' to use 'state' variables and 'CIE_cmfs_360-830_x_1.yml'.
+
+- modified 'LED_scanner.plx' to use 'CIE_cmfs_360-830_x_1.yml'.
+
+2014-02-05
+
+- modified '_makeCWF' function of 'Chart.pm' to use 'CIE_cmfs_360-830_x_1.yml', and modified the normalizing of data to agree with ASTM E2022, section 6.7.
+
+2014-02-07
+
+- added 'scan_curve_example.plx'.
+
+- modified 'photoshop' method of 'cvst.pm' to clip x-values, and complement non-RGB curves.
+
+2014-02-11
+
+- modified 'table' and 'curv' methods of 'akima.pm' and 'bern.pm'. range of 'table' values now (0 - 1). 'curv' now calls 'table'.
+
+2014-02-13
+
+- modified 'bern.pm' by changing 'our $pascal' to 'my $pascal', to make the variable lexical within the package.
+
+2014-02-17
+
+- modified '_check' function of 'mft2.pm' to check that input and output 'curv' objects have same number of entries.
+
+2014-02-19
+
+- added 'convert_printer_profile_2_example.plx'.
+
+2014-02-20
+
+- added 'convert_chart_example.plx' and 'device_link_7_example.plx'.
+
+2014-03-02
+
+- added function 'norm_gamma' to 'scanner_profile_6_example.plx', which normalizes the gamma curves so that y(1) = 1.
+
+2014-03-03
+
+- added function 'norm_3x3_matrix' to 'scanner_profile_6_example.plx', which normalizes and scales the matrix.
+
+2014-03-05
+
+- added 'cat' method to 'Chart.pm'.
+
+- updated 'Chart.pod' to include documentation for 'cat' method.
+
+- updated 'scanner_profile_5_example.plx' and 'scanner_profile_6_example.plx' to add 'chad' tag.
+
+- updated 'bradford' and 'cat02' functions of 'Shared.pm' to include 'type' key in header of CAT object.
+
+2014-03-12
+
+- added CIE 2012 "physiologically-relevant" color matching functions to 'CIE_cmfs_360-830_x_1.yml'.
+
+- modified '_makeCWF' function of 'Chart.pm' to support new CIE 2012 observers.
+
+- modified 'Chart.pod' by adding new CIE 2012 observers as hash options.
+
+2014-03-23
+
+- added snippets 'interpolate_linear.plx' and 'interpolate_cspline.plx'.
+
+- added functions 'linear' and 'cspline' to 'Shared.pm'.
+
+2014-03-26
+
+- added snippet 'CIE_colorimetry.plx' to develop improved colorimetry functions.
+
+- added '_makeKIO' function to 'Chart.pm' (v1.40).
+
+- modified 'add_xyz' method of 'Chart.pm' to use '_makeKIO'.
+
+- modified '_addColorMeta' function of 'Chart.pm' to use '_makeKIO'.
+
+- removed '_readSPD', '_makeSPD' and '_makeCWF' functions from 'Chart.pm' (replaced by '_makeKIO' and interpolation functions in 'Shared.pm').
+
+- modified 'Chart.pod' to reflect changes in hash for 'add_ctv', 'add_lab' and 'add_xyz'.
+
+- fixed various functions in 'Chart.pm' to use '|' character instead of '/' for delimiting prefix/keyword.
+
+- updated various example programs for 'illuminant' usage changes.
+
+- updated 'Chart_module_notes.txt' for 'illuminant' usage changes.
+
+- modified 'test' method of 'Chart.pm' to return array -or- count per 'wantarray' function.
+
+- modified 'Chart_test.plx' to run all tests successfully.
+
+- added 'trisolve' function to 'ICC::Support::Lapack', to solve tridiagonal systems.
+
+- updated 'Lapack.pm' by adding pod entries for 'trisolve'.
+
+2014-03-27
+
+- modified 'cspline' function of 'Shared.pm' to use 'ICC::Support::Lapack::trisolve', if available.
+
+- added 'dot' function to 'ICC::Support::Lapack', to compute dot products.
+
+- updated 'Lapack.pm' by adding pod entries for 'dot'.
+
+- modified 'dotProduct' function of 'Shared.pm' to use 'ICC::Support::Lapack::dot', if available.
+
+- modified '_readCWF' function of 'Chart.pm' to get wavelength increment from data.
+
+- fixed '_readCWF' function of 'Chart.pm' where the bandpass correction adjustment to table number was incorrect.
+
+- updated 'Chart.pod' to more accurately describe the hash for 'add_xyz', etc.
+
+2014-03-28
+
+- updated '_makeKIO' function of 'Chart.pm' to build SPD for emissive measurements (empty illuminant array).
+
+- updated 'add_xyz' method of 'Chart.pm' to use linear interpolation for emissive measurements (empty illuminant array).
+
+- updated 'Chart.pod' for emissive measurements (empty illuminant array).
+
+- added 'show_color' function to 'scanner_profile_6_example.plx'.
+
+- modified 'cspline' and 'dotProduct' functions of 'Shared.pm' to correctly detect if 'ICC::Support::Lapack' module is loaded (using %INC).
+
+2014-03-29
+
+- added 'hermite' function to 'ICC::Support::Lapack', to compute cubic spline values.
+
+- updated 'Lapack.pm' by adding pod entries for 'hermite'.
+
+- modified 'cspline' function of 'Shared.pm' to use 'ICC::Support::Lapack::hermite', if available.
+
+2014-03-30
+
+- modified '_fwd' function of 'Akima.pm' to use 'ICC::Support::Lapack::hermite', if available.
+
+2014-04-01
+
+- modified 'bbuv' and 'bbxy' functions of 'Shared.pm' by removing the 'k' value from colorimetry calculation (functions return ratios).
+
+- removed the 'k' values from 'CIE_cmfs_380-780_x_5.yml' and 'CIE_cmfs_360-830_x_1.yml'.
+
+- added Luminous efficiency functions Vm and V' to 'CIE_cmfs_380-780_x_5.yml'.
+
+- modified '_makeKIO' function of 'Chart.pm' to add option for 'illuminant' as two vectors.
+
+2014-04-05
+
+- modified 'device_link_1_example.plx' by adding options for rendering intent, media-relative/absolute, and black point compensation.
+
+2014-04-06
+
+- added 'check_metamerism_example.plx'.
+
+2014-04-10
+
+- added 'cin' and 'cout' methods to 'mft1.pm', 'mft2.pm', 'mAB_.pm', 'mBA_.pm', and 'mpet.pm' modules.
+
+2014-04-19
+
+- modified 'add_xyz' method of 'Chart.pm' to warn if illuminant specified when object contains L*a*b* data, and no spectral data.
+
+- added 'chart_spectral_to_Lab_example.plx', to explain use of colorimetry parameters.
+
+2014-04-20
+
+- updated 'Chart.pod' to include lists of the CIE and Philips illuminants.
+
+2014-04-21
+
+- modified 'device_link_1_example.plx' to adjust black point values for media-relative colorimetry.
+
+2014-04-26
+
+- modified '_spectral' function of 'Chart.pm' to behave like 'cols' method when handling contexts. see 'chart_spectral_test.plx'.
+
+- modified calls to '_spectral' function by eliminating context defined test.
+
+- modified 'id' method of 'Chart.pm' to behave like 'cols' method when handling contexts.
+
+2014-04-27
+
+- modified 'Chart.pod' by adding section on contexts.
+
+- modified 'nCLR' method of 'Chart.pm' to behave like 'cols' method when handling contexts. see 'chart_nCLR_test.plx'.
+
+2014-04-28
+
+- modified 'Chart.pod' to use =over and =back around =item lists, per the 'perlpod' language reference.
+
+- modified 'test' method of 'Chart.pm' to match only fields with no context, when the context parameter is '|'.
+
+- modified 'Chart.pod' to include changes to 'test' method.
+
+2014-05-03
+
+- added '_cols' function to 'Chart.pm'. (v1.50)
+
+- modified 'xyz', 'add_ctv', 'add_lab', 'add_xyz', 'iwtpt', 'wtpt', 'bkpt', '_illumWP', '_mediaWP', '_mediaBP', and '_xyz_encoding' methods and functions of 'Chart.pm' to improve handling of 'context' and 'added'. see 'chart_add_xyz.plx'. 
+
+- modified 'Chart.pod' by adding rows 5 and 6 to the colorimetry structure for ColorSpecification XML, and colorimetry hash.
+
+2014-05-11
+
+- added 'abstract_profile_2_example.plx'.
+
+2014-05-14
+
+- modified '_getRowLength' function of 'Chart.pm' to correctly handle one or two samples, simplified code.
+
+2014-05-15
+
+- modified '_readChartTIFF' function of 'Chart.pm' to support 'crop' parameter.
+
+- updated 'Chart.pod' by documenting 'crop' parameter.
+
+2014-05-22
+
+- modified 'scanner_profile_3_example.plx' and 'scanner_profile_4_example.plx' to use the rows and columns of second chart when adding RGB values.
+
+- added 'use strict' to scanner profile examples and fixed many minor errors.
+
+2014-05-23
+
+- added 'use strict' to all example programs with subroutines and fixed many minor errors.
+
+2014-05-24
+
+- updated 'scanner_profile_5_example.plx' and 'scanner_profile_6_example.plx' by modifying 'get_illum' function to use new illuminant hash notation.
+
+2014-05-26
+
+- modified 'sdump' method of 'matf.pm' to print the object contents.
+
+- added 'dump' method to 'Shared.pm'.
+
+- removed 'dump' method from all other classes.
+
+- modified test programs (.t) to remove test for 'dump' method.
+
+2014-05-31
+
+- modified 'linear' and 'cspline' functions of 'Share.pm' to improve parameter checking, and calculate input wavelength increment from first and last wavelengths, rather than difference of first two wavelengths.
+
+2014-06-19
+
+- modified 'abstract_profile_1_example.plx' by adding udf6, which applies a tone curve to neutral colors.
+
+- modified 'abstract_profile_1_example.plx' by changing input and output curves so that neutral axis falls exactly on grid points.
+
+2014-06-21
+
+- modified 'abstract_profile_2_example.plx' to allow selecting the mean of all samples as target color.
+
+2014-06-22
+
+- modified 'abstract_profile_2_example.plx' by adding the 'cc_curve' function, and removing the other curve types.
+
+- fixed small bug in '_getRowLength' function of 'Chart.pm'.
+
+2014-06-25
+
+- added 'tgamma' and 'beta' functions to 'ICC::Support::Lapack', to support probability distributions of color samples.
+
+2014-07-06
+
+- modified 'abstract_profile_2_example.plx' by removing B-curve adjustment option.
+
+- added 'abstract_profile_3_example.plx', which uses B-curve adjustments for colorizing images.
+
+2014-07-09
+
+- modified '_makeInvCurve' function of 'mBA_.pm' to make inverse of LUT type 'curv' object.
+
+2014-07-11
+
+- modified 'working_space_profile_example.plx' and 'working_space_profile_check_example.plx' by adding Rec. 709 encoding TRC option.
+
+- modified 'Shared.pm' by adding 'Math::Matrix' methods 'xyz2XYZ' and 'XYZ2xyz'.
+
+2014-07-12
+
+- modified 'Shared.pm' by adding the 'd50P' constant.
+
+- modified various example programs by replacing the idiom 'd50->[] * 32768/65535' with 'd50P->[]'.
+
+2014-07-13
+
+- modified 'abstract_profile_3_example.plx' by adding 'opt_B_curves' function.
+
+2014-08-11
+
+- modified 'scanner_profile_1_example.plx' by adding illumination and gamma parameters.
+
+2014-08-16
+
+- modified 'Shared.pm' by renaming function 'xyz2w' to 'xyz2dwv'.
+
+- modified 'Shared.pm' by adding 'XYZ2W' function to compute CIE Whiteness.
+
+2014-08-28
+
+- added 'check_printer_example.plx'.
+
+2014-09-04
+
+- modified 'fmt_keys' method of 'Chart.pm' to accept '[]' as the column slice.
+
+- added 'blend_charts_example.plx'.
+
+2014-09-18
+
+- added snippet 'point_line_distance.plx'.
+
+- added module 'ICC::Support::rbf2.pm'.
+
+2014-09-27
+
+- added 'rbf2_test.plx'.
+
+2014-10-26
+
+- renamed 'ICC::Support::rbf2.pm' to 'ICC::Support::geo2.pm'.
+
+- renamed 'rbf2_test.plx' to 'geo2_test.plx'.
+
+- added module 'ICC::Support::nNET2.pm'.
+
+- added 'nNET2_test.plx'.
+
+2014-10-28
+
+- added module 'ICC::Support::geo1.pm'.
+
+- added 'geo1_test.plx'.
+
+2014-11-01
+
+- modified '_jacobian' function of 'ICC::Support::rbf.pm' to correctly compute Jacobian with weight matrix (Mahalnobis).
+
+2014-11-02
+
+- modified 'convert_printer_profile_2_example.plx' to make profiling chart.
+
+- modified 'convert_printer_profile_2_example.plx' by adding UDF for orange and green channels.
+
+2014-11-06
+
+- modified 'convert_printer_profile_2_example.plx' to work with profiles having Z-shaped curves.
+
+2014-11-14
+
+- modified 'convert_printer_profile_2_example.plx' by adding starting point for 'geo2' objects.
+
+2014-11-15
+
+- added tests '80_nNET2.t', '81_geo1.t' and '82_geo2.t' for new modules.
+
+2014-11-16
+
+- modified 'nNET2.pm' by adding 'add_kernel' and 'add_hidden' methods.
+
+2014-12-01
+
+- modified 'Chart.pm' by adding 'writeASCII' method.
+
+- modified 'Chart.pod' by adding description of the 'writeASCII' method.
+
+- modified 'Chart_test.plx' by adding tests for 'writeASCII' method.
+
+2014-12-06
+
+- modified '_makeTimePiece' function of 'Chart.pm' to parse varied formats more robustly. Note there is a bug in early Perl versions (5.12.5 and earlier) where time strings with UTC offsets are parsed incorrectly by the Time::Piece::_strptime() function. This bug was fixed in Time::Piece version 1.17.
+
+- modified 'Chart.pm' by adding 'add_date' method.
+
+- modified 'Chart.pod' by adding description of the 'add_date' method.
+
+- modified 'Chart_test.plx' by adding tests for 'add_date' method.
+
+2014-12-09
+
+- modified 'Build.PL' to set the required version for Time::Piece to 1.17 (so %z works correctly).
+
+2014-12-11
+
+- added snippets 'TIFF_read_8.plx' and 'TIFF_write_2.plx' to develop 32-bit capability.
+
+- modified 'Chart.pm' by adding support reading and writing for 32-bit RGB TIFF images.
+
+- modified 'Chart.pod' by updating 'new' and 'writeTIFF' for 32-bit RGB TIFF images.
+
+2014-12-12
+
+- modified 'working_space_profile_example.plx' and 'working_space_profile_gamut_check_example.plx' by adding Rec. 2020 (UHDTV) working space data.
+
+2014-12-20
+
+- modified 'Profile.pm' by reworking the 'tag' method to allow setting an 'undef' value, and deleting unwanted tags. (v0.54)
+
+- modified 'Profile.pod' to document new behavior of the 'tag' method.
+
+2014-12-23
+
+- added snippet 'median.plx' to develop the statistical functions 'median' and 'quantiles'.
+
+2014-12-25
+
+- modified 'ICC::Support::Lapack' by adding 'round' function from C math library.
+
+2014-12-30
+
+- modified 'select_template' method of 'Chart.pm' to use the template row length for the output matrix.
+
+- added example 'compare_charts.plx'.
+
+2015-01-01
+
+- modified 'matf.pm' by adding 'primary' method, and modifying 'fit' method to add 'Math::Matrix' object, instead of simple 2-D array.
+
+- added private example 'scanner_profile_linear.plx'.
+
+2015-01-03
+
+- modified 'ICC::Support::Lapack' by adding 'skew_normal' function.
+
+2015-01-04
+
+- modified 'ICC::Support::Lapack' by adding 'bandpass' function.
+
+2015-01-12
+
+- modified 'ICC::Support::Levmar' by fixing various bugs in 'Levmar.xs' and 'xs_arrays.c'. updated levmar code to v2.6, and added support for optional 'dscl' array. added 'Build_obj.PL' script to compile levmar code. updated tests, 'Build.PL' script and 'levmar_XS_programming_notes.txt'. module now has some degree of portability.
+
+2015-01-13
+
+- modified 'ICC::Support::Levmar' by adding 'test7.pl', which tests the feasibility of using the 'Data::Alias' module to simplify the updating of model parameters.
+
+2015-01-16
+
+- added 'scanner_profile_linear_3.plx' snippet to compute linear scanner profiles using ICC::Support::Levmar.
+
+2015-01-17
+
+- modified 'ICC::Support::Levmar' by adding parameter binding capability to the callback functions, and cleaning up some small bugs in 'xs_arrays.c'.
+
+2015-01-19
+
+- modified 'ICC::Support::Levmar' by having 'levmar' function obtain parameters k1 and k2 from the size of Perl arrays. added requirement for various parameters (lb, ub, A, b, C, d) when corresponding constraint keys are present. allowed lb or ub to be 'undef', which corresponds to 'NULL'.
+
+2015-01-23
+
+- modified 'ICC::Support::Lapack' by updating 'bandpass' function.
+
+2015-01-28
+
+- modified 'ICC::Support::Levmar' by adding 'zeros' function (used to create arrays for linear equality/inequality constraints).
+
+2015-02-01
+
+- modified '_new_from_hash' function of 'matf' to support numeric hash values for 'matrix' and 'offset' keys. a numeric value for 'matrix' creates an identity matrix of that size.
+
+2015-02-02
+
+- added 'scanner_profile_measured_art_1.plx'.
+
+2015-02-03
+
+- modified 'build' method and '_new_from_hash' function of 'clut.pm' to make hash handling more consistent.
+
+2015-02-04
+
+- modified '_transform' and 'Jacobian' function of 'clut.pm' to do CLUT access logging.
+
+- modified 'build' method of 'clut.pm' to accept the 'slice' attribute, which is the list of clut elements to update. used when optimizing certain areas of the CLUT.
+
+- added 'scanner_profile_measured_art_2.plx'.
+
+2015-02-14
+
+- modified 'Profile.pm' by renaming 'header' to 'profile_header' and 'tagtable' to 'tag_table'. changed these methods from 'get' to 'get/set'.
+
+- modified entire project for renaming of methods, above.
+
+- modified 'Profile.pm' by adding 'header' method to access the object header (for consistency with other objects).
+
+2014-02-15
+
+- modified '_newICCprofile' function of 'Profile.pm' by replacing hash tests with regular expressions, where used to verify parameter values (v 0.55).
+
+2015-02-16
+
+- modified 'matf.pm' by adding 'inv' method, to create an inverse 'matf' object (v 0.13)
+
+- added 'scanner_profile_measured_art_3.plx'.
+
+2015-02-22
+
+- added snippet 'fit_exp'.
+
+- added private examples 'abstract_profile_luminance_1.plx', 'abstract_profile_luminance_2.plx', and 'abstract_profile_luminance_3.plx'.
+
+2015-02-23
+
+- modified 'new' method of 'matf' to accept 'fit' parameters, then call 'fit' method on new object.
+
+2015-03-14
+
+- modified 'ICC::Support::Lapack' by adding 'matf_inv' and 'minus_offset' functions, and 'test42.pl'.
+
+- added snippet 'matf_invsqr.plx'.
+
+- modified 'matf.pm' module by adding 'invsqr' method, and various support functions from 'matf_invsqr.plx'.
+
+- modified 'matf.pm' module by updating 'transform' method and various support functions.
+
+2015-03-21
+
+- modified 'XYZ2xyY' and 'xyY2XYZ' functions of 'Shared.pm' to handle array structures.
+
+- modified all current files by replacing "ref(...) eq ''" with "! ref(...)".
+
+- modified all current files by replacing "ref(...) eq 'object::class'" with "UNIVERSAL::isa(..., 'object::class')".
+
+- modified all current files by replacing "ref($_)" with "ref()".
+
+2015-03-23
+
+- modified 'Shared.pm' by factoring common code from 'xyz2Lab', 'Lab2xyz, etc. into '_convert'.
+
+2015-03-28
+
+- modified 'modify_data_set_example.plx' to include device values in output file.
+
+- modified 'edit_media_white_point_example.plx' to accept paper measurements without device values.
+
+2015-03-29
+
+- added private script 'abstract_profile_clusters.plx'.
+
+- modified 'para' module by adding 'inv' method to create an inverse curve (v 0.40).
+
+- modified 'curv' module by adding 'inv' method to create an inverse curve (v 2.10).
+
+- modified 'cvst' module by adding 'inv' method to create an inverse curve set (v 0.20).
+
+- modified 'mBA_' module by replacing '_makeInvCurve' function with 'inv' method (v 2.10).
+
+- modified example 'scanner_profile_1_example.plx' to include an 'B2A0' tag in profile.
+
+2015-03-30
+
+- modified example 'scanner_profile_6_example.plx' to include an 'B2A0' tag in profile.
+
+- modified example 'scanner_profile_7_example.plx' to include an 'B2A0' tag in profile.
+
+2015-04-04
+
+- added snippet 'sdump_parameter.plx' to experiment with hierarchal dump idea.
+
+- updated 'sdump' method of all modules, to support hierarchal dump.
+
+- added module 'ICC::Profile::gbd_.pm', from iccMAX, implemented by X-Rite.
+
+2015-04-09
+
+- added snippet 'gamut_intersection.plx'. too slow.
+
+2015-04-10
+
+- added snippet 'gamut_intersection2.plx'. cache some calculations, still too slow.
+
+2015-04-11
+
+- added snippet 'gamut_intersection3.plx'. spherical index. fast, but not entirely reliable.
+
+2015-04-12
+
+- added snippet 'gamut_intersection4.plx'. fast, reliable and elegant.
+
+2015-04-13
+
+- modified 'gbd_.pm' module by adding '_make_index' function, and 'intersect' and 'test' methods.
+
+- added test program 'gbd_test.plx'.
+
+2015-04-14
+
+- modified '_readICCprofile' function of 'Profile.pm' to add 'wtpt', 'bkpt' and 'pcs_encoding' attributes to 'gbdx' tags.
+
+- modified '_readICCprofile' function of 'Profile.pm' to use the 'A2B1' tag when determining the PCS type, and fall back on 'A2B0' tag if the profile has no 'A2B1' tag.
+
+2015-05-09
+
+- added snippet 'chart_add_mix.plx'.
+
+- modified 'Chart.pm' by adding 'add_mix' method.
+
+- updated 'Chart.pod' by adding documentation for 'add_mix' method.
+
+- updated 'Chart.pod' and 'Profile.pod' to work with version 5.16 of pod2html. '=itemx' lines become '=item x', =over and =back lines are required when around '=item' lines. non-ASCII characters replaced with E<0xXXXX>.
+
+2015-05-17
+
+- modified 'add_avg' method of 'Chart.pm' by adding 'name' and 'id' hash keys.
+
+- modified 'Chart.pod' with changes to 'add_avg' method. added note explaining 'LINEAR' vs. 'SIMPLE' averaging.
+
+2015-05-25
+
+- modified private programs 'scanner_profile_linear_x.plx' to compute XYZ values from L*a*b* values, for non-D50 colorimetry without CAT (a bad practice).
+
+- added private program 'scanner_profile_linear_4.plx' which makes linear profiles for a scanner with known gamma.
+
+2015-05-31
+
+- modified 'sdump' method of 'para.pm' to display curve parameters.
+
+- modified 'press_curve_9_example.plx' to make curve-adjusted data set.
+
+- added private program 'scanner_profile_linear_5.plx' which optimizes both gamma and matrix values.
+
+2015-06-11
+
+- added private program 'scanner_profile_linear_6.plx' which adds adjustment of the XYZ output curves to fine-tune the color match.
+
+2015-06-21
+
+- added snippet 'make_profile_folder.plx'.
+
+- modified 'Shared.pm' by adding the function 'makeProfileFolder'.
+
+- modified private programs 'scanner_profile_linear_3.plx', 'scanner_profile_linear_4.plx', 'scanner_profile_linear_5.plx' and 'scanner_profile_linear_6.plx' to use the 'makeProfileFolder' function.
+
+2015-06-21
+
+- modified 'select_matrix' section of 'Chart.pod' to improve clarity.
+
+2015-06-26
+
+- added private program 'substrate_adjust_1.plx'.
+
+2015-06-28
+
+- added private program 'substrate_adjust_2.plx'.
+
+- modified snippet 'chart_splice_test.plx' by adding 'add_rows' and 'add_cols', which are convenience methods that call 'splice_rows' and 'splice_cols'.
+
+- modified 'Chart.pm' by adding the 'add_rows' and 'add_cols' methods.
+
+- modified 'Chart.pod' by adding entries for 'add_rows' and 'add_cols' methods.
+
+- added snippet 'chart_remove_test.plx'.
+
+- modified 'Chart.pm' by adding the 'remove_rows' and 'remove_cols' methods.
+
+- modified 'Chart.pod' by adding entries for 'remove_rows' and 'remove_cols' methods.
+
+2015-06-29
+
+- replaced all instances of 'splice_rows('APPEND', 0, ' with 'add_rows('.
+
+- replaced all instances of 'splice_cols('APPEND', 0, ' with 'add_cols('.
+
+- modified 'chart_splice_test.plx', 'Chart.pm', and 'Chart.pod' by removing 'APPEND' functionality from 'splice_rows' and 'splice_cols'.
+
+2015-06-30
+
+- modified 'iwtpt', 'wtpt, and 'bkpt' methods of './' to croak when the XYZ/L*a*b* slice is undefined.
+
+2015-07-04
+
+- modified 'add_cols' method of 'Chart.pm' and 'chart_slice_test.plx' to take optional header array.
+
+- modified 'Chart.pod' to reflect changes in 'add_cols' method.
+
+2015-07-06
+
+- added snippet 'oba_effect.plx'.
+
+2015-07-09
+
+- modified 'write' method of 'Chart.pm' to accept optional hash parameter, and add 'SAMPLE_ID' field from 'sid' slice.
+
+- modified 'Chart.pod' to reflect above changes to the 'write' method.
+
+2015-07-10
+
+- modified 'select_template' method of 'Chart.pm' to optionally return sid row-matrix.
+
+- modified 'Chart.pod' to reflect above changes to the 'select_template' method.
+
+2015-07-11
+
+- modified 'write' method of 'Chart.pm' to output the correct NUMBER_OF_FIELDS value when inserting an sid column.
+
+- modified a few instances where 'select_template' was used as a parameter by adding scalar() to force just the row-matrix.
+
+- added snippet 'make_CMY_working_space_profile.plx'.
+
+2015-07-18
+
+- modified 'writeTIFF' and '_writeTIFFstrip' in snippet 'TIFF_write_2.plx', to support 'left' and 'right' hash keys.
+
+- modified 'writeTIFF' and '_writeTIFFstrip' in module 'Chart.pm' (v1.52).
+
+- updated 'writeTIFF' documentation in 'Chart.pod'.
+
+- modified 'test' method of 'Chart.pm' by adding 'DEVICE' class.
+
+2015-07-20
+
+- added snippet 'read_ss3_file.plx'.
+
+- modified 'write' method of 'Chart.pm' to substitute 'undef' for undefined data, and 'null' for null string data.
+
+2015-07-22
+
+- modified 'Chart.pm' by adding '_readChartSS3' function, and modifying '_readChart' to handle .ss3 files. (v1.53)
+
+- modified 'Chart.pod' by adding SpectraShop SS3 files to list of support formats for 'new'.
+
+2015-08-01
+
+- modified '_readChartAvg', '_addStdDevCol', and '_addMeanDECol' functions of 'Chart.pm' to store just the data arrays in $charts variable. Storable::dclone crashes with XML::LibXML objects.
+
+- modified '_addStats' function of 'Chart.pm' to correctly make the L*a*b* and XYZ column slices with contexts.
+
+- modified snippet 'chart_std_dev.plx' with the above changes to 'Chart.pm'.
+
+2015-08-19
+
+- modified example 'convert_printer_profile_2_example.plx' to create TIFF files for i1iO 2 Dual scan mode.
+
+2015-08-22
+
+- modified '_mediaWP', '_mediaBP', 'add_ctv' to identify RGB device values using a regular expression instead of 'eq'.
+
+- added snippet 'chart_add_udf.plx'.
+
+2015-08-23
+
+- modified '_getset' and 'randomize' functions of 'Chart.pm' to validate row and column slices only when not '[]';
+
+- modified 'Chart.pm' by replacing 'add_mix' method with 'add_udf' (v1.55)
+
+- modified 'Chart.pod' by replacing 'add_mix' method with 'add_udf'.
+
+- modified 'substrate_adjust_1.plx' to use the 'add_udf' method to calculate blending and scaling. write spectral data for modes 0 & 1.
+
+2015-08-24
+
+- modified 'add_ctv', 'add_xyz', 'add_lab' and 'add_density' methods of Chart.pm to add the context of source, when the 'context' and 'added' keys are undefined.
+
+2015-08-27
+
+- modified 'add_udf' method of 'Chart.pm' to allow scalar indices -or- column slices for 'element' udfs.
+
+- modified 'writeASCII' method of 'Chart.pm' so 'header' parameter has three possible values: 0, 1, 2 (no header, header with context, header without context)
+
+2015-08-29
+
+- modified 'add_udf' method of 'Chart.pm' by adding 'device' flag, and code to convert RGB/CMYK/nCLR values to device values.
+
+- modified 'akima.pm', 'mpet.pm', 'mluc.pm', 'para.pm', 'parf.pm', 'rbf.pm' by changing ']->[' to '][' (arrow unnecessary between subscript brackets).
+
+- modified snippet 'oba_effect.plx' by replacing slice calculations with 'add_udf' method.
+
+2015-09-02
+
+- added 'power' method for 'Math::Matrix' objects to 'Shared.pm'
+
+2015-09-04
+
+- modified 'nPINT.pm' to accept and use Math::Matrix objects for the coefficient array (v0.61).
+
+2015-09-06
+
+- modified 'sdump' method of 'bern.pm' to display input and output parameter arrays.
+
+- added snippets 'tone_reproduction_1.plx' through 'tone_reproduction_4.plx'.
+
+2015-09-07
+
+- modified 'power' method of 'Shared.pm' to accept vector exponents.
+
+2015-09-17
+
+- updated example 'working_space_profile_example.plx' at allow optional offset for A2B0 tags.
+
+2015-09-26
+
+- added snippet 'transform_dispatch.plx'.
+
+- added 'Color.pm' module (v0.10).
+
+- added test program 'Color_test.plx'.
+
+2015-09-27
+
+- modified 'Shared.pm' by updating 'cspline' and 'linear' functions to use wavelength range parameters ([start, end, increment]).
+
+- modified 'Chart.pm' by renaming the 'nm' method as '_extSS', and adding new 'nm' method to get the spectral wavelength range.
+
+- modified 'add_xyz' method of 'Chart.pm' to use new 'cspline', 'linear' and 'nm' functions.
+
+- updated instances of the 'nm' method in various programs.
+
+- updated instances of the 'cspline' and 'linear' functions in various programs.
+
+2015-09-28
+
+- updated 'tone_reproduction5.plx' and 'tone_reproduction6.plx' to use the 'Color.pm' module.
+
+2015-09-29
+
+- fixed a bug in '_transf2' function of 'matf.pm' module (wrong column index for matrix in dotProduct).
+
+- added tests 'matf_test.plx' and 'matf_jacobian_test.plx'.
+
+2015-09-30
+
+- modified '_new_from_hash' function of 'matf.pm' to recognize 'header' key in hash.
+
+- added snippet 'chart_add_xyz_2.plx'.
+
+2015-10-01
+
+- updated 'add_xyz' and 'add_density' methods of 'Chart.pm', which use the 'Color.pm' object.
+
+- updated '_addColorMeta' function of 'Chart.pm' to use 'Color.pm' object.
+
+- removed unused colorimetry functions from 'Chart.pm'.
+
+- updated 'Chart.pod' to reflect changes to the object structure and functions.
+
+2015-10-03
+
+- modified 'power' method of 'Shared.pm' so that matrix elements with zero value return zero.
+
+- added snippet 'tone_reproduction7.plx'.
+
+2015-10-04
+
+- added snippet 'tone_reproduction8.plx', for n-color data sets.
+
+2015-10-09
+
+- modified '_transform' and 'jacobian' methods of 'clut.pm' to use modf() function.
+
+2015-10-10
+
+- removed common 'use' lines from various modules, and added them to 'Shared.pm'.
+
+2015-10-15
+
+- added 'xs_bdevice.c' to Lapack module - helper functions for 'nMIX' and 'clut' functions.
+
+- added 'nMIX_power' and 'nMIX_mat_trans' functions to Lapack module.
+
+- updated 'nMIX.pm' to incorporate Lapack functions.
+
+2015-10-16
+
+- added 'nMIX_vec_trans' function to Lapack module.
+
+- updated 'nMIX.pm' to incorporate Lapack function.
+
+2015-10-18
+
+- added 'power' function to Lapack module.
+
+- updated 'Shared.pm' to incorporate Lapack 'power' functions.
+
+2015-10-19
+
+- renamed 'tone_reproduction10.plx' to 'spectral_modeling.plx', and updated formatting of printout.
+
+2015-10-22
+
+- modified '_bernstein' function of 'bern.pm' to contain 'state' variable $pascal, and to use degree as a parameter (v0.20).
+
+2015-10-25
+
+- added 'jacobian' method to 'nMIX.pm'.
+
+- added 'nMIX_test.plx';
+
+2015-10-29
+
+- added 'nMIX_jacobian' function to 'Lapack.pm' module.
+
+- updated 'jacobian' method of 'nMIX.pm' to use new Lapack function.
+
+2015-10-30
+
+- modified 'delta' method and '_new_from_hash' function of 'nMIX.pm' to accept a scalar as input for delta array.
+
+- updated 'nMIX_test.plx' to include a delta ramp in each test group.
+
+2015-10-31
+
+- modified exponentiation in 'nMIX.pm' and 'Lapack.pm' to test sign of base value.
+
+- update 'Lapack.pm' with documentation of the new 'nMIX' functions (v0.60).
+
+2015-11-16
+
+- added snippet 'interpolate_cubic_spline_jacobian.plx'.
+
+- added function 'csplineJacobian' to 'Shared.pm' module (v0.41).
+
+2015-11-17
+
+- modified 'Color.pm' module by adding '_reduce_cwf' function, completing 'jacobian' method.
+
+2015-11-18
+
+- modified 'mat_xplus' and 'vec_xplus' functions of 'Lapack.pm' to accept optional parameter hash. updated 'test25.pl', 'test32.pl' and pod.
+
+- updated 'geo1.pm', 'geo2.pm', and 'rbf.pm' for change in 'vec_xplus' function, added {'trans' => 'T'} hash.
+
+- updated various examples for change in 'mat_xplus' function, added {'transb' => 'T'} hash.
+
+2015-11-19
+
+- updated 'Color.pm' to use '_reduce_cwf' function in '_trans1' and '_trans2', to replace cubic spline interpolation. gives the same result, but much faster, because the cwf matrix is cached.
+
+- modified '_adjust_cwf' of 'Color.pm' to check that offset is an integer, and round off counts ($j).
+
+2015-11-20
+
+- added 'round' function to 'Shared.pm', updated interpolation functions to correctly compute vector sizes.
+
+2015-11-23
+
+- added snippet 'interpolate_lagrange.plx'.
+
+- modified 'Color.pm' by rearranging the object structure.
+
+2015-11-25
+
+- updated 'interpolate_cubic_spline.plx' to include 'cspline_matrix' function, formerly called 'cspline_jac'. removed snippet 'interpolate_cubic_spline_jacobian.plx'.
+
+2015-11-28
+
+- updated 'interpolate_linear.plx', 'interpolate_cubic_spline.plx' and 'interpolate_lagrange.plx' to include interchangeable functions 'linear', 'cspline', 'lagrange', 'linear_matrix', 'cspline_matrix' and 'lagrange_matrix'.
+
+- updated 'Shared.pm' by adding 'linear', 'cspline', 'lagrange', 'linear_matrix', 'cspline_matrix' and 'lagrange_matrix' functions (v0.43).
+
+2015-11-29
+
+- updated 'Color.pm' to use new interpolation methods, selected by new hash key 'method' (v0.12).
+
+- updated 'Color_test.plx' by adding tests for new interpolation methods.
+
+- updated 'Color_module_notes.txt'.
+
+- updated many examples and snippets for changes in 'cspline' and 'linear' (added 'linear' extrapolation method).
+
+2015-12-08
+
+- added snippet 'nMIX_parametric_jacobian.plx'.
+
+- added 'parajac' method and '_parametric' function to 'nMIX.pm' module.
+
+- updated 'nMIX_module_notes.txt' with section on parametric Jacobian.
+
+2015-12-11
+
+- added the 'expm1' and 'log1p' functions to the 'Lapack.xs'.
+
+2015-12-12
+
+- added snippet 'nMIX_special_math.plx', which cleans up the calculation of nMIX values, using the 'expm1' and 'log1p' functions.
+
+2015-12-13
+
+- modified 'xs_arrays.c' in ICC::Support::Levmar project to fix precedence bug.
+
+2015-12-14
+
+- added the '_powm1' and '_pow1p' functions to 'nMIX3.pm'.
+
+- modified the '_update_clut_exp', '_trans1', '_trans2', and 'jacobian' functions of 'nMIX3.pm' to use the '_powm1' and '_pow1p' functions. 
+
+- added the 'powm1' and 'pow1p' functions to 'xs_bdevice.c' of Lapack.pm module.
+
+- modified the 'mat_exp', 'vec_exp_zero_test', 'mat_exp_zero_test' and 'jac_exp_zero_test' functions of 'xs_bdevice.c' to use the 'powm1' and 'pow1p' functions.
+
+2015-12-15
+
+- updated 'nMIX.pm' module to v0.30 by renaming 'nMIX3.pm', described above.
+
+- added '61_nMIX.t' test program, renumbered some of the other test programs.
+
+- updated 'nMIX_module_notes.txt'.
+
+2015-12-16
+
+- added PERL5LIB= line to the '~/.bash_login' file, to enable running 'Devel::NYTProf' profiling tool.
+
+- created a 'Devel::NYTProf' profile for 'spectral_modeling.plx'. the 'bern' module accounts for 83% of the run time.
+
+- modified '_bernstein' function of 'bern.pm' by replacing 'Storable::dclone' of Pascal array with Perl equivalent.
+
+2015-12-17
+
+- added snippet 'bern_dispatch.plx'.
+
+- modified 'bern.pm' module (v0.30) by adding '_fwds' and '_revs' functions, called by 'transform' and 'inverse'.
+
+2015-12-18
+
+- added 'bernstein' function to 'ICC::Support::Lapack' module.
+
+- updated 'bern' module to use 'bernstein' function where applicable.
+
+2015-12-19
+
+- moved 'spectral_modeling.plx' into 'private' folder as 'spectral_modeling_1.plx'.
+
+- added private example 'spectral_modeling_2.plx'.
+
+2015-12-22
+
+- updated 'spectral_modeling_2.plx' with improved device curves. put first attempt in the 'old' folder.
+
+2015-12-23
+
+- updated 'spectral_modeling_1.plx' and 'spectral_modeling_2.plx' to display optimized parameters better.
+
+- updated 'bern.pm' module to support 'constant' functions (single Bernstein coefficient).
+
+2015-12-24
+
+- fixed 'transform' method bug in 'transform_dispatch.plx', 'Color.pm' and 'nMIX.pm', when testing for 2-D array.
+
+2015-12-25
+
+- modified the 'matf.pm' module to use the 'transform_dispatch.plx' framework, applied to both the 'transform' and 'invsqr' methods (v0.30).
+
+- modified 'matf_test.plx' by adding tests for the 'invsqr' method.
+
+- added snippet 'clip_structure'.
+
+- added 'clip_struct' function to 'Shared.pm'.
+
+2015-12-26
+
+- updated 'nPINT.pm' 'transform' method to use 'transform_dispatch.plx' framework. changed 'jacobian' method so input and output values are vectors, rather than arrays. added optional hash key 'ubox' for unit-box extrapolation. (v0.70).
+
+- updated 'nPINT' test programs.
+
+- updated 'nPINT_module_notes.txt'.
+
+2015-12-27
+
+- created 'clut2.pm' module. got all pure Perl methods and functions working.
+
+- added snippet 'clut2_develop_test.plx' to compare 'clut2.pm' functions with 'clut.pm'.
+
+- updated 'jacobian' method of 'clut2.pm'. changed input/output parameters from lists to vectors.
+
+2015-12-28
+
+- added 'clut_vec_trans' function, and supporting functions, 'locate', 'cp_values', 'ix2lin', 'baryc' to 'Lapack.pm' module.
+
+- updated 'clut2.pm' to use 'clut_vec_trans' function.
+
+- added documentation for 'clut_vec_trans' to 'Lapack.pm'.
+
+2015-12-29
+
+- added 'clut_jacobian' function, and supporting functions, 'locate_jac', 'dbaryc', gsa_adjust' to 'Lapack.pm' module.
+
+- added 'clut_jacobian_ext' function, and supporting function 'locate_ext' to 'Lapack.pm' module.
+
+- updated 'clut2.pm' to use 'clut_jacobian'  and 'clut_jacobian_ext' functions.
+
+- added documentation for 'clut_jacobian'  and 'clut_jacobian_ext' to 'Lapack.pm'.
+
+- replaced 'clut' with 'clut2' (v0.20).
+
+2015-12-30
+
+- updated 'transform' and 'inverse' methods of 'cvst.pm' to use 'transform_dispatch.plx' framework. (v0.20)
+
+- updated 'jacobian' method of 'cvst.pm'. changed input/output parameters from lists to vectors.
+
+- updated 'para.pm' by adding 'table' and 'curv' methods (Adobe 'para' bug).
+
+- updated 'transform' method of 'mft2.pm' to use 'transform_dispatch.plx' framework. (v2.50)
+
+- updated 'jacobian' and 'inverse' methods of 'mft2.pm'. changed input/output parameters from lists to vectors.
+
+- updated 'transform' method of 'mft1.pm' to use 'transform_dispatch.plx' framework. (v2.50)
+
+- updated 'jacobian' and 'inverse' methods of 'mft1.pm'. changed input/output parameters from lists to vectors.
+
+- updated 'transform' method of 'mAB_.pm' to use 'transform_dispatch.plx' framework. (v2.50)
+
+- updated 'jacobian' and 'inverse' methods of 'mAB_.pm'. changed input/output parameters from lists to vectors.
+
+- updated 'transform' method of 'mBA_.pm' to use 'transform_dispatch.plx' framework. (v2.50)
+
+- updated 'jacobian' and 'inverse' methods of 'mBA_.pm'. changed input/output parameters from lists to vectors.
+
+- updated 'jacobian' method of 'matf.pm'. changed input/output parameters from lists to vectors.
+
+2015-12-31
+
+- updated 'transform' method of 'nNET.pm' to use 'transform_dispatch.plx' framework. (v0.30)
+
+- updated 'jacobian' method of 'nNET.pm'. changed input/output parameters from lists to vectors.
+
+- updated 'transform' method of 'nNET2.pm' to use 'transform_dispatch.plx' framework. (v0.20)
+
+- updated 'jacobian' method of 'nNET2.pm'. changed input/output parameters from lists to vectors.
+
+- updated 'transform' and 'inverse' methods of 'PCS.pm' to use 'transform_dispatch.plx' framework. (v0.70)
+
+- updated 'jacobian' method of 'PCS.pm'. changed input/output parameters from lists to vectors.
+
+- updated 'clut.pm' by adding code for udf transforms, which was accidentally omitted when reworking module to v0.20.
+
+- updated 'parajac' method of 'cvst.pm'. changed input parameter from list to vector.
+
+- updated numerous examples, tests, and snippets for the parameter changes in 'jacobian' and 'parajac' methods, detailed above.
+
+2016-01-01
+
+- added 'cvst_test.plx' with complete transform suite to test transform dispatch and jacobian changes, above.
+
+- updated 'clut_test.plx', 'matf_test.plx', 'mAB_test.plx', 'mft_test.plx', 'mpet_test.plx', 'nNET_test.plx', 'nNET2_test.plx', 'nPINT_test.plx', 'PCS_test.plx' by adding complete transform suite.
+
+2016-01-02
+
+- updated 'inverse' method for change in 'jacobian' parameters in 'clut.pm', 'mAB_.pm', 'matf.pm', 'mBA_.pm', 'mft1.pm', 'mft2.pm', 'mpet.pm', 'nNET.pm', 'nNET2.pm', 'nPINT.pm'.
+
+- checked and modified all example programs, after above changes.
+
+- fixed elusive bug in 'qr' function of 'Lapack.pm' (was filling the q with garbage when copying a to q).
+
+2016-01-03
+
+- modified 'qr' function of 'Lapack.pm'to accept 'economy' parameter, similar to Matlab implementation of 'qr' function. updated Lapack.pm documentation.
+
+- modified 'jacobian' method of 'cvst' module to return diagonal vector with 'diag' hash flag. (to be used by 'mAB_', 'mBA_', 'mft1', 'mft2', and 'mpet' modules).
+
+- checked all private example programs.
+
+2016-01-05
+
+- updated '_powm1' and '_pow1p' functions of 'nMIX.pm' to correctly handle base values <= 0.
+
+- updated 'powm1' and 'pow1p' functions of 'Lapack.pm' to correctly handle base values <= 0.
+
+- updated 'nMIX_special_math.plx'.
+
+- updated 'check_metamerism_example.plx' to use 'Color.pm' object to convert spectral to XYZ data.
+
+- added 'color' method to 'Chart.pm', to return the 'Color.pm' object used to add XYZ data.
+
+- updated 'Chart.pod' for new 'color' method.
+
+2016-01-23
+
+- modified 'new' method of 'Chart.pm' by adding 'format' hash key when making object from array.
+
+2016-02-07
+
+- added 'daylight' function to 'Shared.pm' (v0.44).
+
+2016-02-08
+
+- updated 'Chart.pod' to show use of 'daylight' function with 'add_ctv', 'add_lab', and 'add_xyz'.
+
+2016-03-03
+
+- modified 'add_xyz' method of 'Chart.pm' to accept an existing 'matf' object as the 'cat'.
+
+- added private example 'substrate_adjust_3.plx'.
+
+2016-03-31
+
+- added snippet 'bandpass_rectification.plx', which implements ASTM E 2729 bandpass correction.
+
+- verified correctness of bandpass matrix with Mike Rodriquez.
+
+- modified 'Color.pm' module by adding '_bandpass' function, and updating '_reduce_cwf' function to do bandpass correction.
+
+- updated 'Color_test.plx' to include test of bandpass correction.
+
+- updated 'Chart.pod' by adding hash key info for 'bandpass' and 'method' to 'add_ctv', 'add_lab' and 'add_xyz' methods.
+
+- updated 'color_module_notes.txt' to include info on bandpass correction.
+
+- updated 'Build.PL' by setting the minimum Perl version to 5.10.0 (OSX 10.6).
+
+2016-04-01
+
+- modified '_readCxF3colorspec' function of 'Chart.pm' by changing the mapping hash to an array, so the order of entries in the header line array is always the same (was causing '60_Chart.t' to fail).
+
+2016-04-03
+
+- added snippet 'chart_add_xyx_3.plx' which develops OBA effect option for 'add_xyz'.
+
+- modified 'add_xyz' method of 'Chart.pm' to support OBA effect ('oba' hash key), and added function '_add_oba' (v1.6.3).
+
+- updated 'Chart.pod' by adding hash key info for 'oba' to 'add_ctv', 'add_lab' and 'add_xyz' methods.
+
+- added snippet 'chart_oba_index.plx' which develops 'oba_index' method.
+
+- added 'oba_index' method to 'Chart.pm'.
+
+- updated 'Chart.pod' by adding entries for 'oba_index'.
+
+2016-04-04
+
+- modified 'oba_index' method of 'Chart.pm' to return the M1/M2 XYZ vectors, when called in array context.
+
+2016-04-10
+
+- added snippet 'color_deconvolution.plx'.
+
+2016-04-24
+
+- added snippet 'color_deconvolution_2.plx'.
+
+2016-04-25
+
+- added snippet 'black_only_CMYK_profile.plx' to make special profile for Brad Zylman of MRM Worldwide.
+
+2016-04-29
+
+- added private script 'metamerism_model.plx' to estimate viewing booth metamerism for Merillat.
+
+2016-05-01
+
+- added snippet 'color_deconvolution_3.plx' to develop bandpass correction by deconvolution.
+
+- modified 'Color.pm' module by adding '_bandpass', '_bandpass_astm', '_bandpass_fn' and '_conv_matrix' functions from 'color_deconvolution_3.plx' (v0.14).
+
+- modified 'Color_test.plx' by adding tests for new 'bandpass' methods.
+
+- updated 'Chart.pod' hash values for 'bandpass'.
+
+2016-05-03
+
+- updated 'scanner_profile_linear_3.plx' adding the capability to apply matching colorimetry to printer measurements.
+
+2016-05-04
+
+- updated 'Color_module_notes.txt' by adding information about bandpass correction methods, and new hash keys for the illuminant – 'imethod' and 'ibandpass'.
+
+2016-05-05
+
+- updated '_make_cwf' function of 'Color.pm' module to process the 'imethod' and 'ibandpass' keys. (v0.15).
+
+- updated '_bandpass' function of 'Color.pm' module to always makes a bandpass function with an upper index of 20, regardless of the illuminant increment.
+
+- updated 'Color.pm' by replacing many instances of adding to the header hash with setting to a clone of the entire colorimetry hash.
+
+- updated 'Chart.pod' by adding 'imethod' and 'ibandpass' keys to 'add_ctv', 'add_lab', and 'add_xyz' notes.
+
+2016-05-06
+
+- added 'Color.t' test program.
+
+2016-05-07
+
+- modified 'Color.pm' so that ICC::Support::Color->new() makes an empty object, and ICC::Support::Color->new({}) makes a default ASTM object (D50, 2 degree, 10 nm).
+
+- modified various modules and programs to change instances of 'ICC::Support::Color->new()' to 'ICC::Support::Color->new({})' and vice versa.
+
+- added documentation 'Color.pod'.
+
+2016-05-08
+
+- modified '_reduce_cwf' function of 'Color.pm' by removing the $hash parameter, to prevent changes to the 'method' and 'bandpass' properties when calling the 'transform' method.
+
+- modified '_astm', '_cie' and '_iso' functions of 'Color.pm' to add 'type' key-value to header hash.
+
+2016-05-13
+
+- modified '_astm' function of 'Color.pm' to load table 6 when the 'bandpass' value is 'six'.
+
+- modified '_adjust_cwf' function of 'Color.pm' to apply bandpass correction, if enabled. (v0.16).
+
+- modified 'jacobian' method of 'Color.pm' to make clone of the $self->[4], so subsequent manipulations won't corrupt the object.
+
+- modified 'jacobian' method of 'Color.pm' to adjust the matrix for the output encoding.
+
+2016-05-14
+
+- added support for 'RGBV' and 'rgbv' encoding to 'Color.pm'.
+
+- modified 'jacobian' method of 'Color.pm' to check for divide by zero (derivative of density).
+
+- modified '_encoding' function of 'Color.pm' to check output data size, similar to 'jacobian' method.
+
+- updated 'Color_module_notes.txt' to reflect recent changes.
+
+- updated 'Color.pod' to reflect changes in 'encoding' and 'bandpass' values.
+
+- updated 'Chart.pod' to be consistent with 'Color.pod'.
+
+2016-05-16
+
+- added snippet 'recursive_sub_call2.plx' to develop the encoding conversion functions with white points.
+
+- modified 'Shared.pm' by updating '_crawl', replacing '_convert' with '_convert3' and '_convert4'.
+
+- modified 'Shared.pm' by adding 'xyz2XYZ' and 'XYZ2xyz' functions.
+
+- modified 'Shared.pm' by updating all encoding conversion functions to use either '_convert3' and '_convert4' (v0.50).
+
+- updated 'Shared_test.plx' to test all variations of encoding functions.
+
+- modified 'Chart.pm' to use ICC::Shared::_XYZ2Lab and ICC::Shared::_Lab2XYZ instead of XYZ2Lab and Lab2XYZ, in various locations (for speed).
+
+2015-05-16
+
+- modified 'PCS.pm' to use ICC::Shared::_XYZ2Lab and ICC::Shared::_Lab2XYZ instead of XYZ2Lab and Lab2XYZ, in various locations (for speed) (v0.71).
+
+2015-05-17
+
+- replaced all instances of 'our @ISA =' with 'use parent', within the 'lib' folder.
+
+- removed all instances of 'use ICC::Shared;' within the 'lib' folder.
+
+2016-05-18
+
+- moved 'bradford' and 'cat02' constructors from 'Shared.pm' to 'matf.pm'.
+
+- updated all instances of 'bradford' and 'cat02' function by adding 'ICC::Profile::matf->'.
+
+- moved 'bradford' and 'cat02' tests from 'Shared_test.plx' to 'matf_test.plx'.
+
+2016-05-21
+
+- updated 'Profile.pod' by enumerating the various options for 'new' method hash.
+
+2016-05-29
+
+- added snippets 'read_NEF_raw.plx', 'read_NEF_raw2.plx', and 'read_NEF_raw3.plx'.
+
+- added document 'Image_module_notes.txt', exploring various ways to handle statistical analysis of RAW image data.
+
+2016-06-26
+
+- modified 'write' method of 'Profile.pm' to accept a scalar reference as input parameter. the profile is then written to the scalar (rather than a file), which can then be embedded into an image file.
+
+2016-07-12
+
+- added function 'filter_path' to 'Shared.pm'
+
+- incorporated 'ICC::Support::Image' into 'ICC::Profile', as with 'Lapack' and 'Levmar'.
+
+2016-07-18
+
+- added 'serialize' method to 'Profile.pm' (v0.60)
+
+- updated '_readICCprofile' and '_writeICCprofile' of 'Profile.pm' to use 'filter_path'.
+
+- updated '_readICCprofile' to accept a scalar reference as file path.
+
+2016-07-21
+
+- added function 'getPackageFolder' to 'ICC::Shared'.
+
+2016-08-27
+
+- added 'POSIX::' prefix to all current instances of 'modf', 'floor', 'ceil' and 'tanh' functions.
+
+2016-09-08
+
+- added 'xitron' method to 'cvst.pm', to write curves for Xitron Sierra RIP.
+
+2016-10-22
+
+- added 'POSIX::' prefix to all current instances of 'log10' function.
+
+- modified 'transform', 'inverse' and 'derivative' methods of 'parf.pm' by adding function types 3 - 5 (v0.2).
+
+- modified 'sdump' method of 'parf.pm' to include parameter data, as in 'para.pm'.
+
+- modified 'parf_test.plx' by adding tests of new function types.
+
+- added 'pars' method to 'cvst.pm'. gets the parameters of 'para' and 'parf' curves.
+
+- added 'rattfunc.pm' module.
+
+2016-10-24
+
+- added module 'ratfunc.pm', derived from 'matf.pm'.
+
+- added test program 'ratfunc_test.plx' derived from 'matf_test.plx'.
+
+2016-10-26
+
+- added XS functions 'ratfunc_mat_trans' and 'ratfunc_vec_trans' to Lapack.xs.
+
+- added C function 'unpack_2D_ratfunc' to 'xs_arrays.c'.
+
+2016-11-13
+
+- updated snippets 'scanner_spectral_model_1.plx' and 'scanner_spectral_model_2.plx' to use 'cvst' and 'matf' objects.
+
+- added snippet 'scanner_spectral_model_10.plx'.
+
+2016-11-14
+
+- added 'cwf_ks' hash key, used by '_make_cwf' function of 'Color.pm' to set $ks manually (v0.18)
+
+2016-11-18
+
+- modified 'illuminant' and 'observer' methods of 'Color.pm' by removing the save to the header hash. the hash should contain the values passed to 'new'.
+
+- modified '_make_cwf' function of 'Color.pm' by adding $range and $obs variables, and observer interpolation (v0.20)
+
+- modified '_cie' function of 'Color.pm' so that observer can be an array reference.
+
+- modified 'scanner_spectral_model_10.plx' to utilize changes to 'Color.pm' listed above.
+
+2016-12-03
+
+- modified 'matf.pm' by adding the 'quasi' method (v0.33).
+
+- modified 'Chart.pm' to accept a CAT value of 'quasi' (v1.66).
+
+- modified 'Chart.pod' to include 'quasi' as a CAT value.
+
+- modified 'Chart_test.plx' to include test of 'quasi' object.
+
+2016-12-04
+
+- modified 'writeCxF3' method of 'Chart.pm' to use a sequential index for the sample name, instead of the slice index.
+
+2016-12-21
+
+- added snippet 'scanner_spectral_model_11.plx'.
+
+- modified '_make_cwf' function of 'Color.pm' to use 'observer_exp' flag in header. setting this flag causes the observer values to be exponentiated after interpolation.
+
+2016-12-23
+
+- added snippet 'scanner_spectral_model_12.plx'.
+
+- modified '_make_cwf' function of 'Color.pm' to use 'cwf_range' key in header (v0.21).
+
+2017-02-08
+
+- added 'fuji_xmf' method to 'cvst.pm', to write curves for Fuji XMF RIP.
+
+- updated 'press_curve_3_example.plx' and 'press_curve_4_example.plx' by adding output of Fuji XMF curves.
+
+2017-02-11
+
+- added snippet 'rotate_chart_data.plx'.
+
+- modified 'rotation' and 'flip' methods of 'Chart.pm' to return unaltered matrix object, if parameter is undefined.
+
+- modified 'Chart.pm' by adding '_rotateChartASCII' function, so ASCII charts with 'DPLGROTATE' and/or 'DPLGFLIP' keywords will be rotated/flipped when making a 'new' object.
+
+- updated the 'new' section of 'Chart.pod' for the 'DPLGROTATE' and/or 'DPLGFLIP' keywords.
+
+2017-02-12
+
+- added 'pod_files => {...}' to 'Build.PL.
+
+2017-02-13
+
+- updated 'Color.pod' by adding section 'Camera/scanner simulation'.
+
+- added private 'press_curve_new_plates.plx' to build curves when changing plates.
+
+2017-02-14
+
+- modified 'Chart.pm' by adding 'POSIX::' prefix to 'pow()' functions.
+
+2017-02-16
+
+- added 'density.txt' to explain new handling of density/reflectance in Chart.pm'.
+
+- modified '_encoding' function of 'Color.pm' to recognize 'linear' encoding.
+
+- updated 'add_density' method of 'Chart.pm' to add density or reflectance, based on the 'encoding' value.
+
+- added 'rgbv' method and '_rgbv_encoding' function to 'Chart.pm', to access reflectance/transmittance data.
+
+- updated 'press_curve_8_example.plx' and 'press_curve_new_plates.plx' for above changes.
+
+- updated 'Color.pod' for above changes.
+
+2017-02-17
+
+- updated 'Chart.pod' by adding section for 'rgbv' method, and revised 'density' method.
+
+2017-02-24
+
+- updated 'Chart.pm' and 'Color.pm' so that RGBV encodings are consistent. added 'L*' encoding.
+
+- updated 'Chart.pod' and 'Color.pod'.
+
+- updated 'Color_test.plx' to include new encoding values.
+
+2017-02-25
+
+- updated '_xyz_encoding' function of 'Chart.pm' by adding 'L*' encoding option.
+
+- updated 'press_curve_new_plates.plx' and 'press_curve_8_example.plx' to use L* encoding when computing TVI values.
+
+2017-02-26
+
+- fixed a bug in 'inverse' method of 'akima.pm' which occurred when input values were extremely close to x-max (v0.15).
+
+2017-03-06
+
+- added 'spline.pm' module, derived from 'akima.pm', but using uniform natural splines.
+
+- added 'spline_module_notes.txt'.
+
+- added 'spline_test.plx'.
+
+- added 'press_curve_3X_example.plx', to test 'spline' objects. results look good, so continue work on 'spline.pm' module.
+
+2017-03-08
+
+- updated '_rev' method of 'spline' to work with input range.
+
+2017-03-09
+
+- added snippet 'spline_inverse.plx' to develop new 'inverse' method for 'spline.pm'
+
+- modified '_fwd', '_derv', and '_derv2' methods of 'spline.pm' to take t-value and segment as inputs, rather than x-value.
+
+- modified 'transform' and 'derivative' methods of 'spline.pm' for above changes.
+
+2017-03-11
+
+- added 'spline_inverse.plx' to develop 'inverse' and '_rev' methods using complex math to solve cubic equations.
+
+- updated 'spline.pm' module with new methods '_minmax', '_local', '_rev', and 'inverse'.
+
+- updated 'press_curve_3X_example.plx' for above changes to 'spline.pm'.
+
+2017-03-12
+
+- updated '_rev' method of 'spline.pm' to handle linear and quadratic splines.
+
+- reworked 'monotonic' method of 'spline.pm' to return min/max values. added option for s-values, x-values, or y-values.
+
+- reworked 'normalize' method of 'spline.pm'. recomputes the derivatives and min/max values.
+
+- reworked 'array' method of 'spline.pm' to get/save output value array.
+
+- added 'range' method to 'spline.pm'.
+
+2017-03-13
+
+- updated 'spline_test.plx' to test all 'spline' methods.
+
+2017-03-14
+
+- modified '_local' method of 'spline' by eliminating the solution where discriminant is 0 (inflection point).
+
+2017-03-17
+
+- added 'spline2_feasibility.plx' to verify assumptions about non-uniform natural splines.
+
+2017-03-19
+
+- added test program '46_spline.t'.
+
+- added 'spline2.pm' module, for non-uniform splines.
+
+- added 'spline2_test.plx'.
+
+2017-03-28
+
+- completed 'spline2.pm' module changes, all tests working.
+
+2017-03-29
+
+- resolved differences between 'spline.pm' and 'spline2.pm'.
+
+2017-03-30
+
+- cleaned up 'substrate_adjust_1.plx', added 'opt_blending' function.
+
+2017-04-02
+
+- modified '_readChartASCII' function of 'Chart.pm' to extract and save appended data in hash, and restricted header info to states 0 and 2.
+
+- modified 'write' method of 'Chart.pm' to write 'append' data string provided in hash (v1.68).
+
+2017-04-05
+
+- added private 'substrate_adjust_4.plx', using 'parf' curves to map the XYZ values.
+
+2017-05-01
+
+- modified 'setFile' function of 'Shared.pm' to use qx() instead of system() and filter the path.
+
+2017-05-05
+
+- modified '_writeTIFFdir' function of 'Chart.pm' by changing the format for short strings to 'a4' and 'Z4', so the directory entries will be padded to exactly 12 bytes (v1.69).
+
+- modified '_writeTIFFdir' and '_readTIFFdir' functions of 'Chart.pm' by adding length (4) of type 13 data to @ts.
+
+2017-05-06
+
+- modified 'select_matrix' method of 'Chart.pm' to add an additional column if chart is not rectangular, possibly containing undefined samples.
+
+- modified 'write' method of 'Chart.pm' to warn about, but not filter invalid samples.
+
+- modified 'write' method of 'Chart.pm' by adding hash keys for 'null' and 'undef' replacement values.
+
+- updated 'Chart.pod' to include new hash keys for 'write' method.
+
+2017-05-21
+
+- modified 'cvst.pm' by adding the 'text' method to make tab delimited text files (v0.24).
+
+- updated all 'press_curve_X_example.plx' scripts to save new curve formats, 'xitron', 'fuji_xmf', and 'text'.
+
+2017-05-24
+
+- modified '_rev' function of 'bern.pm' to use a small random value for the derivative, if '_drv' function returns 0.
+
+2017-05-27
+
+- modified 'setFile' function to escape spaces and special characters in path name before system call.
+
+2017-06-04
+
+- added 'abstract_profile_5_example.plx' and 'abstract_profile_6_example.plx'.
+
+2017-06-11
+
+- added '45_ratfunc.t' test script.
+
+- added '47_spline2.t' test script.
+
+2017-06-17
+
+- modified 'press_curve_3_example.plx' by adding 'select_samples' function, and some typical selections.
+
+- modified '_revs' and '_rev' functions of 'bern.pm', to set x-value to a random number when the slope is zero, or the x-value is out of range. added counter to quit loop after 100 iterations (v0.32).
+
+- fixed problem in 'device_link_1_example.plx', where the output curves were incorrect for v4 dest profiles.
+
+2017-06-18
+
+- modified 'press_curve_1_example.plx', 'press_curve_2_example.plx', 'press_curve_3X_example.plx' and 'press_curve_4_example.plx' to use the 'select_samples' function of 'press_curve_3_example.plx'.
+
+- added 'press_tvi_analysis.plx'.
+
+2017-06-21
+
+- modified 'press_tvi_analysis.plx' by adding spectral oveprint calculations.
+
+2017-06-25
+
+- added 'press_ink_balance.plx'.
+
+2017-07-04
+
+- modified 'iwtpt', 'wtpt', and 'bkpt' methods of 'Chart.pm', by extracting the 'encoding' key/value from $hash before checking for L*a*b* data (which caused an error when encoding was specified with an L*a*b* only data set).
+
+2017-07-08
+
+- modified 'PCS.pm' by adding xyY encoding option 6 (v0.73).
+
+2017-07-09
+
+- modified 'cvst.pm' by adding 'apogee' method to write Agfa Apogee curve format (v0.25).
+
+2017-07-11
+
+- modified 'apogee' method of 'cvst.pm' to use the standard 31-step 'Stimuli' values, and allow user defined steps array.
+
+2017-07-15
+
+- added 'make_PressCalZ_charts.plx' to make PressCal charts with samples for building ICC profiles.
+
+- modified 'Chart.pod' by adding example for 'write' method adding SAMPLE_ID with rotation matrix.
+
+2017-07-16
+
+- modified 'press_ink_balance.plx' by adding selection of measurement condition for CxF3 files.
+
+- modified 'press_tvi_analysis.plx' by adding selection of measurement condition for CxF3 files.
+
+- modified 'press_curve_3_example.plx' by adding selection of measurement condition for CxF3 files.
+
+2017-07-17
+
+- modified press curve examples by adding selection of measurement condition for CxF3 files.
+
+2017-07-30
+
+- added function 'getICCPath' to 'Shared.pm' module.
+
+- removed functions 'getPackageFolder' and 'getDataFolder' from 'Shared.pm' (v0.53).
+
+- changed all instances of 'getDataFolder()' to 'getICCPath('Data)'.
+
+- renamed 'filter_path' function of 'Shared.pm' to 'filterPath' for consistency.
+
+- removed '_getPrefsFolder' function from 'cvst.pm', and replaced in 'prinergy' method with 'getICCPath'.
+
+- added 'iso_18620' method to 'cvst.pm', to write curves in ISO 18620 format.
+
+- modified 'press_curve_X_example.plx' scripts to write ISO 18620 format.
+
+2017-07-31
+
+- tested the 'getICCPath' function on Windows, using Strawberry Perl.
+
+2017-08-01
+
+- modified 'Shared.pm' to use the 'Internals::SvREADONLY' function to make vector elements read-only.
+
+- modified 'bbxy', 'bbuv' and 'daylight' functions of 'Shared.pm' by replacing 'File::Spec->catfile(...)' function with 'getICCPath(...)' function.
+
+- modified 'apogee', 'iso_18620' and 'prinergy' methods of 'cvst.pm' by replacing 'File::Spec->catfile(...)' function with 'getICCPath(...)' function.
+
+2017-08-02
+
+- modified 'writeCxF3' method and '_validateCxF3' function of 'Chart.pm' by replacing 'File::Spec->catfile(...)' function with 'getICCPath(...)' function.
+
+2017-08-04
+
+- modified '_cie', '_astm' and '_iso' methods of 'Color.pm' by replacing 'File::Spec->catfile(...)' function with 'getICCPath(...)' function (v0.22).
+
+- modified 'Profile.pm' by adding 'BEGIN' block to add development directories to @INC. this replaces the 'lib' and 'blib' pragmas, and allows us to run in Windows.
+
+2017-08-05
+
+- replaced 'File::Spec->catfile(...)' function with 'getICCPath(...)' function in various modules and scripts.
+
+- replaced all instances of 'exists($INC{'ICC/Support/Lapack.pm'})' with 'defined($INC{'ICC/Support/Lapack.pm'})'. when the 'Lapack.pm' module fails loading, the 'ICC/Support/Lapack.pm' key is added to %INC with a value of 'undef'.
+
+2017-08-06
+
+- installed Intel MKL library in OSX and Windows, for testing.
+
+2017-10-21
+
+- updated 'press_ink_balance.plx' and 'press_tvi_analysis.plx' to work with legacy data lacking an isometric solid sample.
+
+- modified 'harlequin' method of 'cvst.pm' by reversing the order of the patch values.
+
+- modified 'press_tvi_analysis.plx' by adding optional ISO TVI calculation.
+
+2017-10-22
+
+- modified 'press_tvi_analysis.plx' by adding support for all recent PressCal charts (8, 8R, X, XR, Z, ZR).
+
+2017-10-23
+
+- modified 'press_ink_balance.plx' and 'press_tvi_analysis.plx' by adding 'preferred' subroutine to create preferred sample slice for various PressCal targets.
+
+2017-10-27
+
+- modified 'press_curve_X_examples.plx' scripts to write average press measurements as a CxF3 file, if that is the input format.
+
+2017-10-28
+
+- added 'PressCalY_charts.plx' to create 'PressCalY' charts with "well-chosen" samples for press calibration.
+
+2017-10-29
+
+- modified subroutine 'opt_pcs' of 'press_curve_3_example.plx' to allow manual setting of gamut scale factor, and to use the solid black ink sample.
+
+2017-11-27
+
+- added snippet 'ctv_press_curves.plx' to make press curves based on CTV data, similar to TVI curves.
+
+2017-11-29
+
+- added 'process_ramps' function to 'ctv_press_curves.plx', which locates linear press process ramps in any test target.
+
+2017-11-30
+
+- added 'indigo' method to 'cvst.pm', to write HP Indigo curve sets.
+
+2017-12-02
+
+- renamed 'ctv_press_curves.plx' script as 'press_curve_10_example.plx'.
+
+2017-12-03
+
+- modified 'press_curve_x_example.plx' scripts by cleaning up context selection for CxF3 files ($ctx = undef same as no context for CGATS format files).
+
+- modified 'press_curve_x_example.plx' scripts by commenting out lines which output the various curve formats. users may un-comment the curve format(s) desired.
+
+2018-01-06
+
+- modified 'press_curve_10_example.plx' to optionally use a reference data set.
+
+2018-01-09
+
+- added 'press_curve_11_example.plx' script, to build hybrid press curves.
+
+2018-01-10
+
+- modified 'process_ramps' function of 'press_curve_10_example.plx' and 'press_curve_11_example.plx' to work with random chart layouts.
+
+2018-01-14
+
+- modified 'process_ramps' function of 'press_curve_10_example.plx' and 'press_curve_11_example.plx' to handle charts with the number of rows undefined.
+
+2018-01-22
+
+- modified 'press_curve_9_example.plx' by changing instances of '$curves' to '$akima'.
+
+2018-02-04
+
+- added snippet 'graph_tone_curves.plx'.
+
+- added 'graph' method to 'cvst.pm'.
+
+- modified 'press_curve_x_example.plx' to optionally make curve graphs.
+
+2018-02-05
+
+- added snippet 'graph_tone_curves_svg.plx' and template 'rgraph_cvst_svg.tt2', to use the SVG capabilities of Rgraph.
+
+- updated 'graph' method of 'cvst.pm'.
+
+2018-02-07
+
+- added 'device_link' method to 'cvst.pm' (v0.26).
+
+- modified 'press_curve_x_example.plx' to replace device link code with 'device_link' method call.
+
+2018-02-08
+
+- modified 'press_curve_8_example.plx' by adding the 'process_ramps' function.
+
+- modified 'graph' method of 'cvst.pm' to format graph values as "%f.3".
+
+2018-02-09
+
+- verified all 'press_curve_x_example.plx' programs run without errors.
+
+- modified 'Chart.pm' to add 'files_read' hash key/value when averaging a folder of measurements.
+
+- modified all 'press_curve_x_example.plx' to only save average measurements when opening a folder of measurements.
+
+2018-02-10
+
+- added 'press_curve_3N_example.plx' to handle N-color processes. modified the functions that assumed CMYK color space.
+
+2018-02-15
+
+- modified 'select_samples' function of 'press_curve_3N_example.plx' by adding the 'c+m+y' and 'rt' selection tokens.
+
+2018-02-20
+
+- updated the 'select_samples' function of various 'press_curve_x_example.plx' scripts to the latest version (from example 3N).
+
+2018-02-21
+
+- added '_options' function to 'cvst.pm' module, to process options for curve writing functions. the 'dir' hash key is supported.
+
+2018-02-28
+
+- modified 'graph' method of 'cvst.pm' to use '_options' function, added 'composite' key.
+
+2018-03-01
+
+- updated the '_options' function of 'cvst.pm' to handle the 'steps' key.
+
+- modified remaining curve output methods of 'cvst.pm' to use '_options' function, and appropriate hash keys (v0.30).
+
+2018-03-24
+
+- updated 'Build.PL' script to include the 'dist_abstract' string.
+
+- updated 'Build.PL' script to include 'Template' module in 'requires' hash, and to remove 'ICC::Support::Lapack' and 'ICC::Support::Levmar' modules (they are optional).
+
+- uploaded the v0.601 distribution to CPAN.
+
+2018-03-25
+
+- added 'cmp_matrix' function to '60_Chart.t', to compare averaged numeric data with a tolerance based on epsilon values.
+
+- updated 'Shared.pod' with descriptions of the methods appended to 'Math::Matrix'.
+
+- uploaded the v0.602 distribution to CPAN.
+
+2018-03-26
+
+- updated 'cmp_matrix' function of '60_Chart.t' to compare numeric values more carefully.
+
+
+

@@ -1,0 +1,100 @@
+#!/usr/bin/perl 
+use 5.014 ; use strict ; use warnings ; 
+use Term::ANSIColor qw/:constants color/ ; $Term::ANSIColor::AUTORESET = 1 ; 
+use Getopt::Std ; use POSIX qw/floor/ ; my %o ; getopts "=,:", \%o ; 
+
+# ファイルオープン
+my ( $f1, $f2 ) ; # 2個のファイルのファイルハンドラー 
+my $isep ; # 入力ファイルの区切り文字の指定 
+&procCmdArgs ; 
+&main ; 
+grep {close $_ } grep {$_ } ($f1,$f2) ;
+exit 0 ;
+
+sub procCmdArgs { 
+    $o{','} //= "\t" ; 
+    $isep = eval qq[qq[$o{','}]] ;  
+    die YELLOW "You need to specify 2 file names " if ( $#ARGV < 1 ) ;
+    warn CYAN "File $ARGV[0] seems not a regular File. "  if ( ! -f $ARGV[0] ) ; 
+    warn CYAN "File $ARGV[1] seems not a regular File. "  if ( ! -f $ARGV[1] ) ; 
+    open $f1 , "<" , $ARGV[0] or die YELLOW "$ARGV[0]" , RESET " ? : " , $! ; 
+    open $f2 , "<" , $ARGV[1] or die YELLOW "$ARGV[1]" , RESET " ? : " , $! ; 
+}
+# ファイル読み取り
+
+sub main { 
+    # 読む
+    my ($pkw1,$n1) = & readkv ( $f1 , $ARGV[0] ) ; 
+    my ($pkw2,$n2) = & readkv ( $f2 , $ARGV[1]) ; 
+
+    # 集計する
+    my $c1 = 0 ; # 1 番目のファイルだけに出現 
+    my $c2 = 0 ; # 2番目のファイルだけに出現
+    my $cm = 0 ; # 両方で値がおなじキーの個数 
+    my $cd = 0 ; # 値は存在するが値が異なるキーの個数。
+    for ( keys %$pkw1 ) {
+        if ( ! exists $pkw2->{$_} ) { $c1++ ; next } ;
+        if ( $pkw1->{$_} eq $pkw2->{$_} ) { $cm++ } else { $cd++ } ; 
+    }
+    for ( keys %$pkw2 ) {
+        if ( ! exists $pkw1->{$_} ) { $c2++ ; next } ;
+    }
+
+    # 出力する
+    print $cm , " " , BRIGHT_GREEN sprintf( "%5.2f %%",floor ($cm/($cm+$cd)*10000)/100), RESET " : Same key-value pairs \n" ; 
+    print $cd , " " , BRIGHT_GREEN sprintf( "%5.2f %%",floor ($cd/($cm+$cd)*10000)/100), RESET " : Different key-value pairs \n" ; 
+    print $c1 , " " , GREEN sprintf( "%5.2f %%",floor ($c1/$n1*10000)/100),  RESET  " : Keys only appeared in ", BRIGHT_WHITE "$ARGV[0]\n" ; 
+    print $c2 , " " , GREEN sprintf( "%5.2f %%",floor ($c2/$n2*10000)/100),  RESET  " : Keys only appeared in ", BRIGHT_WHITE "$ARGV[1]\n" ; 
+}
+
+# ファイルハンドラとファイル名を受け取り、キーからバリューを参照するハッシュと、行数を返す。
+sub readkv ($$) { 
+    my %kw ; 
+    my $fh = $_[0] ;
+    my $tmp = <> if $o{'='} ;
+    my $undefn = 0 ;
+    while ( <$fh> ) {
+        chomp ; 
+        my ($k,$v) = split  /$isep/ , $_ , 2   ; 
+        $kw{$k} = defined $v ? "#$v" : ($undefn++, '' ) ;
+        #print $kw{$k} , "\n" ;
+    }
+    my $knum = keys %kw ; # 格納したキーの数 
+    print CYAN "$_[1] : total lines = $. , different lines = $knum , undef values = $undefn " ;
+    print CYAN " Only the last value is employed for each key"  if keys %kw != $. ;
+    print "\n" ;
+	
+    return (\%kw , $. ); 
+}
+
+
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+
+=encoding utf8
+
+=head1
+
+
+$0 file1 file2 
+
+  2個のそれぞれのファイルは、キーと値の2列のデータが含まれているとする。
+  キーと値の関係が、それらの2個の異なるファイルの間で、どれだけ一致し、どれだけ
+  異なるか、その様子を表示する。
+
+=cut 
+

@@ -1,0 +1,61 @@
+PDL::Fit::Levmar installation notes.
+
+You **must** have the perl module **PDL** **installed**
+ **before** building this module. The linux package is often
+called 'pdl'.
+
+This module has been installed on *nix, Mac OSX, and Win32
+platforms.
+
+To build with support for linearly-constrained fitting, you must
+
+  1) have lapack and blas development libraries installed. 
+  2) In  `./Makefile.PL` set
+    our $HAVE_LAPACK = 1;
+
+To build *without* support for linearly-constrained fitting, you must
+
+  1) In  `./Makefile.PL` set
+    our $HAVE_LAPACK = 0;
+
+You may need to edit the lines specifying $hash{LIBS} in Makefile.PL
+to give the proper flags to the linker regarding your lapack
+and blas libraries.
+
+For Win32, the default Makefile.PL assumes that liblapack.a and
+librefblas.a are in the parent directory of the distribution. The
+libraries used in testing were built with gfortran under mingw.
+
+For the most part, under a fairly standard linux installation,
+and  only if you have the dependencies (see below) installed...
+
+Build:
+perl Makefile.PL && make
+
+Test:
+'make test 2> err.out' or, if that fails, ' make test '.
+
+You can see a bit more detail if you do
+ ./levtest
+
+Install:
+To install, as root, do
+make install
+
+------------------------------------
+Dependencies for linearly-constrained fitting:
+
+The following shared libraries or equivalents are required (version numbers are
+those used for testing this module.)
+liblapack.so.3
+libblas.so.3
+libg2c.so.0
+
+Linking against these shared libaries requires, for instance under debian, that
+the following development packages be installed.
+
+libg2c0-dev GNU Fortran 77 library development
+lapack3-dev library of linear algebra routines 3 - static library
+refblas3-dev   Basic Linear Algebra Subroutines 3, static library
+
+These libraries are used in building upstream levmar library.

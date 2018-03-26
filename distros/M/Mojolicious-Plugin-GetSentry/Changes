@@ -12,3 +12,6 @@ Revision history for Mojolicious-Plugin-GetSentry
 
 1.1.2   2018-03-22
         Make cpan happy
+
+1.1.3   2018-03-22
+        Allow the user to define if the expection should be ignored

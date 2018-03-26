@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 
 # ABSTRACT: Open a browser window with the URL of a CPAN module's repository
 # PODNAME: cpan-repo
@@ -26,18 +26,7 @@ unless ($url) {
 open_browser($url);
 
 __END__
-
 =pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-cpan-repo - Open a browser window with the URL of a CPAN module's repository
-
-=head1 VERSION
-
-version 0.000013
 
 =head1 SYNOPSIS
 
@@ -46,16 +35,5 @@ version 0.000013
 
     # search by release name
     cpan-repo Git-Helpers
-
-=head1 AUTHOR
-
-Olaf Alders <olaf@wundercounter.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015-2017 by Olaf Alders.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

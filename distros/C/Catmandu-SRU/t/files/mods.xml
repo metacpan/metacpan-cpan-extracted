@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<srw:searchRetrieveResponse xmlns:srw="http://www.loc.gov/zing/srw/"
+                            xmlns:srw_dc="info:srw/schema/1/dc-v1.1"
+                            xmlns:dc="http://purl.org/dc/elements/1.1/"
+                            xmlns:diag="http://www.loc.gov/zing/srw/diagnostic/"
+                            xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                            xmlns:mods="http://www.loc.gov/mods/v3"
+                            xmlns:cld="http://www.ukoln.ac.uk/metadata/rslp/schema/"
+                            xmlns:dcterms="http://purl.org/dc/terms/"
+                            xmlns:my="http://www.infolytics.com/kopac"
+                            xmlns:eacNS="urn:isbn:1-931666-33-4">
+   <srw:version>1.2</srw:version>
+   <srw:numberOfRecords>1251693</srw:numberOfRecords>
+   <srw:records>
+      <srw:record>
+         <srw:recordSchema>mods</srw:recordSchema>
+         <srw:recordPacking>xml</srw:recordPacking>
+         <srw:recordData>
+            <mods xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns="http://www.loc.gov/mods/v3"
+                  version="3.4"
+                  xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-4.xsd">
+               <identifier type="uri">http://kalliope-verbund.info/DE-611-BF-18449</identifier>
+               <recordInfo>
+                  <recordIdentifier source="DE-611">DE-611-BF-18449</recordIdentifier>
+                  <recordCreationDate encoding="marc">20070207</recordCreationDate>
+                  <recordChangeDate encoding="iso8601">20100805</recordChangeDate>
+                  <recordContentSource authority="marcorg">Deutsche Nationalbibliothek</recordContentSource>
+               </recordInfo>
+               <typeOfResource collection="yes">text</typeOfResource>
+               <name type="personal"
+                     authority="GND"
+                     valueURI="http://d-nb.info/gnd/118574000">
+                  <namePart>Löwenstein, Hubertus zu (1906-1984)</namePart>
+                  <role>
+                     <roleTerm type="code" authority="marcrelator">org</roleTerm>
+                     <roleTerm>originatator</roleTerm>
+                  </role>
+               </name>
+               <titleInfo>
+                  <title>Teilnachlass Hubertus Prinz zu Löwenstein (Titel)</title>
+               </titleInfo>
+               <abstract type="content">Autobiographisches; Briefe von und an Löwenstein; Werkmanuskripte; Drucke; Sekundärliteratur; Lebensdokumente; Porträt- und Familienfotos; 1 Konvolut Material und Korrespondenz über John Strick (1941-1981); Memorabilia; Manuskripte von anderer Hand</abstract>
+               <location>
+                  <shelfLocator>EB 86/2</shelfLocator>
+               </location>
+            </mods>
+         </srw:recordData>
+      </srw:record>
+      <srw:record>
+         <srw:recordSchema>mods</srw:recordSchema>
+         <srw:recordPacking>xml</srw:recordPacking>
+         <srw:recordData>
+            <mods xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns="http://www.loc.gov/mods/v3"
+                  version="3.4"
+                  xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-4.xsd">
+               <identifier type="uri">http://kalliope-verbund.info/DE-611-BF-18493</identifier>
+               <recordInfo>
+                  <recordIdentifier source="DE-611">DE-611-BF-18493</recordIdentifier>
+                  <recordCreationDate encoding="marc">20070208</recordCreationDate>
+                  <recordChangeDate encoding="iso8601">20100811</recordChangeDate>
+                  <recordContentSource authority="marcorg">Deutsche Nationalbibliothek</recordContentSource>
+               </recordInfo>
+               <typeOfResource collection="yes">text</typeOfResource>
+               <name type="personal"
+                     authority="GND"
+                     valueURI="http://d-nb.info/gnd/118587390">
+                  <namePart>Neumark, Fritz (1900-1991)</namePart>
+                  <role>
+                     <roleTerm type="code" authority="marcrelator">org</roleTerm>
+                     <roleTerm>originatator</roleTerm>
+                  </role>
+               </name>
+               <titleInfo>
+                  <title>Splitternachlass Fritz Neumark (Titel)</title>
+               </titleInfo>
+               <abstract type="content">Briefe an Naumark, Briefe von anderer Hand; Dokumente; Fotos</abstract>
+            </mods>
+         </srw:recordData>
+      </srw:record>
+      <srw:record>
+         <srw:recordSchema>mods</srw:recordSchema>
+         <srw:recordPacking>xml</srw:recordPacking>
+         <srw:recordData>
+            <mods xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns="http://www.loc.gov/mods/v3"
+                  version="3.4"
+                  xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-4.xsd">
+               <identifier type="uri">http://kalliope-verbund.info/DE-611-BF-18430</identifier>
+               <recordInfo>
+                  <recordIdentifier source="DE-611">DE-611-BF-18430</recordIdentifier>
+                  <recordCreationDate encoding="marc">20070207</recordCreationDate>
+                  <recordChangeDate encoding="iso8601">20100803</recordChangeDate>
+                  <recordContentSource authority="marcorg">Deutsche Nationalbibliothek</recordContentSource>
+               </recordInfo>
+               <typeOfResource collection="yes">text</typeOfResource>
+               <name type="personal"
+                     authority="GND"
+                     valueURI="http://d-nb.info/gnd/118565478">
+                  <namePart>Korn, Hermann (1907-1946)</namePart>
+                  <role>
+                     <roleTerm type="code" authority="marcrelator">org</roleTerm>
+                     <roleTerm>originatator</roleTerm>
+                  </role>
+               </name>
+               <titleInfo>
+                  <title>Teilnachlass Hermann Korn (Titel)</title>
+               </titleInfo>
+               <abstract type="content">Autobiographisches; Briefe von und an Korn, Briefe von anderer Hand; Werkmanuskripte; Drucke; Sekundärliteratur; Lebensdokumente; Fotos; Memorabilia; 1 Manuskript von anderer Hand</abstract>
+               <location>
+                  <shelfLocator>EB 83/156</shelfLocator>
+               </location>
+            </mods>
+         </srw:recordData>
+      </srw:record>
+      <srw:record>
+         <srw:recordSchema>mods</srw:recordSchema>
+         <srw:recordPacking>xml</srw:recordPacking>
+         <srw:recordData>
+            <mods xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns="http://www.loc.gov/mods/v3"
+                  version="3.4"
+                  xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-4.xsd">
+               <identifier type="uri">http://kalliope-verbund.info/DE-611-BF-18484</identifier>
+               <recordInfo>
+                  <recordIdentifier source="DE-611">DE-611-BF-18484</recordIdentifier>
+                  <recordCreationDate encoding="marc">20070208</recordCreationDate>
+                  <recordChangeDate encoding="iso8601">20100810</recordChangeDate>
+                  <recordContentSource authority="marcorg">Deutsche Nationalbibliothek</recordContentSource>
+               </recordInfo>
+               <typeOfResource collection="yes">text</typeOfResource>
+               <name type="personal"
+                     authority="GND"
+                     valueURI="http://d-nb.info/gnd/117117994">
+                  <namePart>Mohr, Walter (1910-2001)</namePart>
+                  <role>
+                     <roleTerm type="code" authority="marcrelator">org</roleTerm>
+                     <roleTerm>originatator</roleTerm>
+                  </role>
+               </name>
+               <titleInfo>
+                  <title>Teilnachlass Walter Mohr (Titel)</title>
+               </titleInfo>
+               <abstract type="content">Autobiographisches; Briefe von und an Mohr; Werkmanuskripte; Drucke; Sekundärliteratur; zahlreiche Lebensdokumente</abstract>
+               <physicalDescription>
+                  <extent>11 Ordner, 6 Zeitungsbände</extent>
+               </physicalDescription>
+            </mods>
+         </srw:recordData>
+      </srw:record>
+      <srw:record>
+         <srw:recordSchema>mods</srw:recordSchema>
+         <srw:recordPacking>xml</srw:recordPacking>
+         <srw:recordData>
+            <mods xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns="http://www.loc.gov/mods/v3"
+                  version="3.4"
+                  xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-4.xsd">
+               <identifier type="uri">http://kalliope-verbund.info/DE-611-BF-18497</identifier>
+               <recordInfo>
+                  <recordIdentifier source="DE-611">DE-611-BF-18497</recordIdentifier>
+                  <recordCreationDate encoding="marc">20070208</recordCreationDate>
+                  <recordChangeDate encoding="iso8601">20100811</recordChangeDate>
+                  <recordContentSource authority="marcorg">Deutsche Nationalbibliothek</recordContentSource>
+               </recordInfo>
+               <typeOfResource collection="yes">text</typeOfResource>
+               <name type="personal"
+                     authority="GND"
+                     valueURI="http://d-nb.info/gnd/118915363">
+                  <namePart>Olden, Rudolf (1885-1940)</namePart>
+                  <role>
+                     <roleTerm type="code" authority="marcrelator">org</roleTerm>
+                     <roleTerm>originatator</roleTerm>
+                  </role>
+               </name>
+               <titleInfo>
+                  <title>Teilnachlass Rudolf Olden (Titel)</title>
+               </titleInfo>
+               <abstract type="content">Briefe von und an Olden, Briefe von anderer Hand; Werkmanuskripte; Fotos; Memorabilia</abstract>
+               <location>
+                  <shelfLocator>EB 79/20</shelfLocator>
+               </location>
+            </mods>
+         </srw:recordData>
+      </srw:record>
+   </srw:records>
+</srw:searchRetrieveResponse>

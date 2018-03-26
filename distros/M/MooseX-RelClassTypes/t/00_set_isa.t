@@ -89,6 +89,13 @@ use Test::More;
 
 }
 
+use Parent;
+use Child;
+use Child::AbsPack;
+use Child::RelPack;
+use Parent::AbsPack;
+use Parent::RelPack;
+
 my $child = Child->new;
 isa_ok( $child, 'Child', '->new works' );
 isa_ok( $child->child_abs_pack, 'Child::AbsPack', '->child_abs_pack' );

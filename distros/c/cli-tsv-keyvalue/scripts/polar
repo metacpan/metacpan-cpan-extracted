@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+use 5.014 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts 'e:f:nqr~,:' , \my%o ; 
+use Scalar::Util qw/looks_like_number/ ;
+use Term::ANSIColor qw/:constants/ ; $Term::ANSIColor::AUTORESET = 1 ; 
+
+$o{','} //= "\t" ; # 入出力の区切り文字
+$o{e} //= 'undef' ;   # 対応する値が無い場合の代替の値 
+$o{f} //= 1 ;	 # 指定されてない場合の値
+my %val ; # $val{ キーの値 } [ ファイル番号 ] = バリューの値 
+my $pole = 0 ; 
+&reading ; 
+&outputting ; 
+exit 0 ;
+
+sub reading { 
+    while ( <> ) { 
+        chomp ;
+        do { ++$pole ; next } if eof || m/^$/ ;  # 複数のデータセットに対する処理 
+        my @F = split /$o{','}/ , $_ ,  $o{f} + 1 ; 
+        my $key = join $o{','} , splice @F , 0 , $o{f} ;
+        my $value = $F[0] // ''  ; 
+        ($key,$value) = ($value,$key) if $o{'~'} ; 
+        $val{ $key } [ $pole ] = $value if @F  ; # キー(1列目)ごとに ファイル番号を表す $pole ごとに値(2列目)を格納。
+    }
+}
+
+sub outputting { 
+    my @keg = keys %val ; 
+    @keg = 
+        $o{n} ? 
+            (@{[sort {$a <=> $b} grep {   looks_like_number($_) } @keg ]} ,  
+                sort {$a cmp $b} grep { ! looks_like_number($_) } @keg   ) : 
+           sort @keg ;  
+     
+    @keg = reverse @keg if $o{r} ;
+
+    *YELLOW = sub {@_} if $o{q} ;
+    for my $k ( @keg ) { 
+        print YELLOW $k ;
+        print join $o{','} , '' , map {  $val{$k}[$_] // $o{e} } 0 .. $pole -1 ; 
+        print "\n" ; 
+    }
+}
+
+
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE{
+    $0=~s|.*/|| ; $ARGV[1] //= '' ;
+    while(<DATA>){
+        s/\$0/$0/g ;
+        print $_ if $ARGV[1] =~ /opt/ ? m/^\ +\-/ : s/^=head1// .. s/^=cut// ; 
+    }
+    exit 0 ;
+}
+
+__END__ 
+
+=encoding utf8 
+
+=head1
+
+    $0 
+
+入力: 
+   1列目はキーで2列目は参照値を持つ、
+   空行区切りまたは複数のファイルによる
+   複数のデータセット
+    (ひとつひとつのデータセットにおいて、
+     キーは全て異なるとしている。)
+
+出力: 
+   1列目はキーの合併集合。i行目1列目はキーの値 k[i] 。
+   i行 j+1列目の値は、j番目のデータセットにおける
+   キー k[i] に対する参照値となる。
+ 
+オプション: 
+    -, str : 区切り文字をタブから変更する。
+    -e str : 空欄に埋める文字列。たとえば0を指定する。未指定ならundef。
+    -f num : キーとバリューを分離する位置を指定する。1始まりの指定列の左側になる。
+    -~ : キーとバリューを反転する。(左側をバリュー、右側をキーとみなす。) 
+
+    -n : 出力順序に関して、キーをまず、数値については数の順序として、その次に、数値以外を文字列で整列する。
+    -r : キーの出力順序を逆にする。
+
+    -q : 着色をしない。( -q 無しだと、キーは黄色になる。)
+
+その他: 
+   出力は クロス表作成によく似ているが、クロス表の場合は、2列のデータを同じペア毎に集計している。
+   $0 は、2列のデータをデータセットの番号と、キーのペアで集計している。
+
+開発上のメモ: 
+    キーの順序については、指定されたデータセットで現れたキーの順序となるようにすることが
+    考えられる。
+
+
+=cut 

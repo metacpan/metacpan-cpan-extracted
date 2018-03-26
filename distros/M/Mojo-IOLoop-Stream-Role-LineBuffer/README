@@ -1,0 +1,110 @@
+NAME
+
+    Mojo::IOLoop::Stream::Role::LineBuffer - Read and write streams by
+    lines
+
+SYNOPSIS
+
+      use Mojo::IOLoop;
+      use Mojo::IOLoop::Stream;
+      my $output_stream = Mojo::IOLoop::Stream->with_roles('+LineBuffer')->new($handle);
+      Mojo::IOLoop->client({port => 3000} => sub {
+        my ($loop, $err, $stream) = @_;
+        $stream->with_roles('+LineBuffer')->watch_lines->on(read_line => sub {
+          my ($stream, $line) = @_;
+          say "Received line: $line";
+          $output_stream->write_line('Got it!');
+        });
+      });
+
+DESCRIPTION
+
+    Mojo::IOLoop::Stream::Role::LineBuffer composes the method
+    "watch_lines" which causes a Mojo::IOLoop::Stream object to emit the
+    "read_line" event for each line received. The "write_line" method is
+    also provided to add a line separator to the passed data before
+    writing.
+
+EVENTS
+
+    Mojo::IOLoop::Stream::Role::LineBuffer can emit the following events.
+
+ read_line
+
+      $stream->on(read_line => sub {
+        my ($stream, $line, $separator) = @_;
+        ...
+      });
+
+    Emitted when a line ending in "read_line_separator" arrives on the
+    stream, and when the stream closes if data is still buffered. The
+    separator is passed as a separate argument if present.
+
+ATTRIBUTES
+
+    Mojo::IOLoop::Stream::Role::LineBuffer composes the following
+    attributes.
+
+ read_line_separator
+
+      my $separator = $stream->read_line_separator;
+      $stream       = $stream->read_line_separator(qr/\x0D\x0A/);
+
+    Regular expression to indicate new lines in received bytes. Defaults to
+    a newline (LF) character optionally preceded by a CR character
+    (\x0D?\x0A). Note that if you set this to the generic newline or \v
+    (vertical whitespace), this may match the CR character of a CR/LF
+    sequence and consider the LF as a separate line if they are read
+    separately.
+
+ write_line_separator
+
+      my $separator = $stream->write_line_separator;
+      $stream       = $stream->write_line_separator("\x0A");
+
+    Byte sequence to indicate new lines in data written with "write_line".
+    Defaults to the network newline CR/LF (\x0D\x0A).
+
+METHODS
+
+    Mojo::IOLoop::Stream::Role::LineBuffer composes the following methods.
+
+ watch_lines
+
+      $stream = $stream->watch_lines;
+
+    Subscribe to the "read" in Mojo::IOLoop::Stream and "close" in
+    Mojo::IOLoop::Stream events, to buffer received bytes and emit
+    "read_line" when "read_line_separator" is encountered or the stream is
+    closed with buffered data.
+
+ write_line
+
+      $stream = $stream->write_line($bytes);
+      $stream = $stream->write_line($bytes => sub {...});
+
+    Write a line to the stream by appending "write_line_separator" to the
+    data. The optional drain callback will be executed once all data has
+    been written.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Mojo::IOLoop::LineReader, MojoX::LineStream, POE::Filter::Line,
+    IO::Async::Protocol::LineStream
+

@@ -13,5 +13,6 @@ t/00_crypt.t
 t/01_MD5.t
 t/02_SHA.t
 t/03_AutoMigrate.t
+t/04_warnings.t
 META.yml
 MANIFEST

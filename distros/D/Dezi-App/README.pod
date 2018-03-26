@@ -1,0 +1,52 @@
+=head1 Dezi-App
+
+=begin html
+
+<p>
+  <img src="https://travis-ci.org/karpet/dezi-app.png?branch=master" alt="Travis CI build status">
+</p>
+
+=end html
+
+Dezi::App is a Moose port of SWISH::Prog.
+
+Dezi::App drops compatibility with Swish-e version 2.x and focuses
+on tight integration with SWISH::3 and Apache Lucy.
+
+=head2 INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+=head2 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Dezi::App
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dezi-App
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Dezi-App
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Dezi-App
+
+    Search CPAN
+        http://search.cpan.org/dist/Dezi-App/
+
+
+=head2 COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 Peter Karman
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

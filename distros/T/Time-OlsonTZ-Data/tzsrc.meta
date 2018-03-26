@@ -46,10 +46,11 @@
 		"zdump.c",
 		"zic.8",
 		"zic.c",
+		"ziguard.awk",
 		"zishrink.awk",
 		"zone.tab",
 		"zone1970.tab",
 		"zoneinfo2tdf.pl",
 	],
-	version => "2018c",
+	version => "2018d",
 }

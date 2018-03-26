@@ -1,0 +1,177 @@
+#!/usr/bin/perl
+use 5.014 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts 'ek:v013=,:' , \my%o ; 
+use Term::ANSIColor qw/:constants color/ ; $Term::ANSIColor::AUTORESET = 1 ; 
+
+sub AnotherTotal ( $ ) ; 
+sub bitSubtotal ( $ ) ; 
+sub procBeginFlags ( ) ;
+sub procFlags ( $ ) ;
+sub takeKeys ( $ ) ; 
+sub appearbits ( @ ) ;
+sub main ( ) ; 
+
+procBeginFlags ( ) ; 
+main () ; 
+exit 0 ;
+
+sub main ( ) { 
+    my @keyslist ; 
+
+    do { *STDOUT = *STDERR ; HELP_MESSAGE () } unless @ARGV ;
+
+    for ( @ARGV ) { 
+        next if procFlags ( $_ ) ; 
+        push @keyslist , takeKeys ( $_ ) ;     
+        #print join ", " , @{ $keyslist[$#keyslist]} , "\n" ;
+    }
+
+    my $appearRH = appearbits ( @keyslist ) ; 
+    my @b2 = bitSubtotal ( $appearRH ) ; # (0) x 2**2 ;
+    my $b3 ; 
+    $b3 = AnotherTotal ( $appearRH ) if $o{v} ; 
+
+    if ( $o{3} ) { 
+        print join ("\t",qw/AB=10 AB=11 AB=01/) , "\n" ; 
+        print join ("\t",@b2[1,3,2]) , "\n" ; 
+    }
+    else { 
+        print join ( "\t", qw/ AB=10 AB=11 AB=01 IOU / ) , "\n" ; 
+        print join ( "\t" , @b2[1,3,2] , $b2[3] / ($b2[1]+$b2[2]+$b2[3]) ) , "\n" ; 
+    }
+
+    exit 0 if ! $o{v} ;
+
+    #  ベン図における3個の小領域の、各元を出力する。
+    for (1,3,2) {
+    	print CYAN [qw/AB=10 AB=01 AB=11/] -> [ $_ - 1 ] ; print "\n" ;
+    	print eval{ join ( ", " , @{ $b3->[$_] }  )  }, "\n" ; 
+    }
+} 
+
+
+sub AnotherTotal ( $ ) { 
+	my @kBP  ; 
+	for ( keys %{$_[0]} ) { 
+		my $p =  $_[0]->{$_} ;
+		push @{ $kBP [ $p ] } , $_ 
+	}
+	return \@kBP ;  
+}
+
+# BIT SUBTOTAL 
+sub bitSubtotal ( $ ) { 
+	my @B = (0) x 2**2  ;
+	for ( values %{$_[0]} ) { $B[$_] ++ } ; 
+	return @B  ;
+}
+
+
+# 現れたキー文字列のそれぞれについて、第xファイルに現れたら、2進数の下からx桁目を1にする。
+
+sub appearbits ( @ ) {
+    my $bw = 1 ; 
+    my %app ; 
+    for ( @_ ) { 
+        for ( @{$_} ) {
+            $app { $_ } += $bw ;
+        }
+        $bw *= 2 ;
+    }
+    return \%app ;
+}
+
+# ファイルハンドルから、$o{k}のキーに従って、キーを取り出す。
+
+sub takeKeys ( $ ) {
+    my %keys ; 
+    open my $fh , $_[0] or die "File $_ does not open. ; $!" ;
+    print YELLOW $_[0], "\t" , $o{k}, "\n"  if $o{v} ;
+    my $tmp = <$fh> if $o{'='} ; 
+    while ( <$fh> ) {
+        chomp ; 
+        my $keystr = (split $o{','} ,$_,-1) [ $o{k}-1 ]  ; 
+        next if $keystr eq '' && ! defined $o{e} ;
+        $keys { $keystr } ++ if defined $keystr ; 
+    }
+    close $fh ;
+    return \@{[ keys %keys ]} ; 
+}
+
+
+# コマンドラインの引数で - で始まるものの処理
+
+sub procFlags ( $ ) { 
+    state $kflag = 0 ; 
+    if ( $kflag ) { 
+        $o{k} = $_[0] ; 
+        $kflag = 0 ; 
+        return 'next' ; 
+    }
+    if ( $_[0] =~ m/^-.$/ ) {
+        $kflag = 1 if $& eq '-k' ; 
+        $o{'='} = 1 if $& eq '-1' ; 
+        $o{'='} = 0 if $& eq '-0' ; 
+        return 'next' ; 
+    }
+    if ( $_[0] =~ m/^-k(.+)$/ ) { 
+        $o{k} = $1 ; 
+        return 'next' ; 
+    }
+    return '' ;
+}
+
+# まず最初の方のオプションの処理
+
+sub procBeginFlags ( ) { 
+    $o{k} //= 1 ;
+    $o{'='} = 1 if $o{1} ; 
+    $o{','} = do { $o{','} //= "\t" ; eval qq[qq[$o{','}]] } ; 
+}
+
+
+# ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+=encoding utf8
+=head1
+    
+用途と主要な動作:  
+
+    2個のファイル名と、それぞれの列番号(1始まり)が指定された時に、
+    それぞれのファイルの指定された列に現れた文字列がどのように重なるかを見る。
+    各列は、異なるキー文字列だけを対象にする。数万行でも3通りの値が現れなければ
+
+オプション:
+
+    -k num   : 各ファイルの列の位置を1始まりで指定する。 
+    -e   :  処理対象の文字列が 空文字列(長さ0) でも、処理対象とする。ただし、該当行が存在しないときは、-eにも関わらず処理しない。
+    -v   : 処理した対象について詳しい情報を表示する。(主にデバグ用。)
+    -=   :  1行目を処理対象にしない。
+    -0   :  1行目から処理対象にする。
+    -1   :   -= と同様。
+    -3   :  IOU (Intersectoin Over Union) を出力しない。
+    -, str : 入力の区切り文字の指定。未指定なら、タブ文字になる。
+注意点:
+	入力ファイルは、タブ区切りを前提としている。
+	空行は、1列ではなくて、タブで区切ったフィールド(セル)の個数が0個とみなされてしまう。
+
+関連するコマンド: 
+    venn3  venn4 
+
+開発上のメモ: 
+    * 特定の列を抽出するという操作は無駄に難しくしているかもしれない。もしくは、inarrow のような仕組みが必要。
+    * venn4 と比較できる操作が出来る様にしたい。
+    * -L で、-v でコンマ区切り横に並べていたのを縦に並べたい。
+
+=cut

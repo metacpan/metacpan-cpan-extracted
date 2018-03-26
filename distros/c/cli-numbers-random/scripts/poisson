@@ -1,0 +1,99 @@
+#!/usr/bin/perl -T
+use 5.001 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts 'g:m:qs:!#.:,:' , \my %o ; 
+use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+ 
+sub main () ; 
+sub genPoisson () ; 
+sub info2ndary () ; 
+
+$| = 1 if $o{'!'} ; 
+$o{m} //= 1 ; # 生成するポアソン分布の母平均値
+$o{g} = do{ $o{g} //= 8 ; int $o{g} } ;   # 生成する乱数の個数 整数切り捨てとする。
+$o{s} = defined $o{s} ? srand $o{s} : srand ; # random seed の設定と取得   
+$o{','} = do { $o{','} //= "\t" ; eval qq[qq[$o{','}]] } ; # 出力連番との区切り文字
+$o{'.'} = do { $o{'.'} //= "\n" ; eval qq[qq[$o{'.'}]] } ; # 出力の区切り文字
+
+my $c = 0 ; # 乱数の生成済みの個数
+my $explambda = exp -1 *  $o{m} ; # 計算上必要となる母平均値の、自然べき乗。
+my $tsep = $o{','} ; 
+my $osep = $o{'.'} ; 
+
+die "$0 does not work \nif the number more than 600 is specified for the population average.\n" if $o{m} > 600 ; 
+main () ; 
+info2ndary () ; 
+exit 0 ; 
+
+sub main () { 
+    $SIG{INT} = sub { info2ndary ; exit 130 } ; 
+    my $until = $o{g} ; 
+    if ( $o{'#'} ) { 
+        while ( $ c++ < $until ) { print $c , $tsep , genPoisson ()  , $osep }
+    }
+    else { 
+        while ( $c ++ < $until ) { print genPoisson () , $osep }
+    }
+    $c -- ; # 調整のため
+} 
+
+sub genPoisson () { 
+    my $x = -1 ; 
+    my $b = 1.0 ; 
+    while ( $b >= $explambda ) { 
+        $b *= 1 - rand () ; # 区間(0,1]の乱数を生成するため、あえて1から減算した。
+        $x += 1 ;
+    } 
+    return $x ; 
+} 
+
+sub info2ndary ()  { 
+    return if $o{q} ; 
+    use FindBin qw [ $Script ] ; 
+    my $info = '' ; 
+    $info .= color('cyan') . "printed lines: " . color('bright_cyan') . $c ; 
+    $info .= color('cyan') . " ; used random seed: " . color('bright_cyan') . $o{s} ;
+    $info .= color('cyan') . " ($Script) " . color('reset') ; 
+    print STDERR $info , "\n" ; 
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8 
+
+=head1
+
+
+  $0 -g 個数 -m 平均値 
+  ポアソン乱数の生成
+
+ 注意: 
+   このポアソン乱数生成器は、計算時間が母平均値にほぼ比例する。
+   また、内部の計算における浮動小数点がexp(-750)の値はゼロとなるので、
+   指定する母平均は600を超えると望ましくない。
+
+ オプション: 
+  -g num : 乱数を発生させる個数。基本的に整数を指定。Infも指定可能。
+  -m num : 母平均値。未指定なら 1.0 。
+  -q : 乱数シードなどの情報を出力しない。
+  -s num : 乱数シードの設定 (基本的に10桁以内の数) 
+  -# : 行番号付きで出力する。場合によっては -\# と指定するのが良いかも知れない。
+  -. str : 出力の区切り文字
+  -, str : 出力番号と精製した乱数の間の区切り文字
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+ 
+
+=cut

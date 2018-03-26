@@ -2,10 +2,7 @@
 use strict;
 use warnings;
 package Dist::Zilla::PluginBundle::HARTZELL;
-{
-  $Dist::Zilla::PluginBundle::HARTZELL::VERSION = '0.008';
-}
-
+$Dist::Zilla::PluginBundle::HARTZELL::VERSION = '0.011';
 # ABSTRACT: My standard dzil config.
 
 
@@ -131,7 +128,7 @@ sub configure {
                      # gather and prune
                      # skip things that are also already in the build dir
                      [ 'Git::GatherDir' =>
-                       { exclude_filename => [qw/README.pod META.json cpanfile/] }], # core
+                       { exclude_filename => [qw/README.pod META.json/] }], # core
                      'PruneCruft',         # core
                      'ManifestSkip',       # core
 
@@ -191,7 +188,8 @@ sub configure {
                      # build system
                      'ExecDir',            # core
                      'ShareDir',           # core
-                     'ModuleBuild',          # core
+                     [ 'MakeMaker' => { eumm_version => '6.17', default_jobs => 9 } ], # core
+                     'CPANFile',
 
                      # copy files from build back to root for inclusion in VCS
                      [ CopyFilesFromBuild => {
@@ -205,7 +203,7 @@ sub configure {
                      # before release
                      [ 'Git::Check' =>
                        {
-                        allow_dirty => [qw/dist.ini Changes README.pod/]
+                        allow_dirty => [qw/dist.ini Changes README.pod cpanfile/]
                        }
                      ],
                      'CheckMetaResources',
@@ -255,7 +253,7 @@ Dist::Zilla::PluginBundle::HARTZELL - My standard dzil config.
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -287,7 +285,6 @@ dist.ini:
    [Git::GatherDir]         ; everything from git ls-files
    exclude_filename = README.pod   ; skip this generated file
    exclude_filename = META.json    ; skip this generated file
-   exclude_filename = cpanfile     ; skip this generated file
  
    [PruneCruft]        ; default stuff to skip
    [ManifestSkip]      ; if -f MANIFEST.SKIP, skip those, too
@@ -344,6 +341,7 @@ dist.ini:
    [ExecDir]           ; include 'bin/*' as executables
    [ShareDir]          ; include 'share/' for File::ShareDir
    [Module::Build]     ; create Build.PL
+   [CPANFile]          ; build a cpanfile
  
    ; copy META.json back to repo dis
    [CopyFilesFromBuild]
@@ -357,6 +355,7 @@ dist.ini:
    allow_dirty = dist.ini
    allow_dirty = Changes
    allow_dirty = README.pod
+   allow_dirty = cpanfile
  
    [CheckMetaResources]     ; ensure META has 'resources' data
    [CheckPrereqsIndexed]    ; ensure prereqs are on CPAN
@@ -581,7 +580,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by George Hartzell.
+This software is copyright (c) 2018 by George Hartzell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

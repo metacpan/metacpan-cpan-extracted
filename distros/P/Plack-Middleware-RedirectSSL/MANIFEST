@@ -10,3 +10,5 @@ cpanfile
 dist.ini
 lib/Plack/Middleware/RedirectSSL.pm
 t/redirectssl.t
+t/sts.t
+t/sts_policy.t

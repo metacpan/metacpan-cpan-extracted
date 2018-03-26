@@ -20,7 +20,7 @@ build_requires:
   Test::More: '0'
   Test::Routine: '0'
   Test::Routine::Util: '0'
-  blib: '1.01'
+  Text::Template: '!= 1.48, != 1.49, != 1.50, != 1.51'
   if: '0'
   lib: '0'
   perl: '5.008'
@@ -30,7 +30,7 @@ configure_requires:
   Module::Build::Tiny: '0.034'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,10 +39,10 @@ name: Dist-Zilla-Plugin-Templates
 provides:
   Dist::Zilla::Plugin::Templates:
     file: lib/Dist/Zilla/Plugin/Templates.pm
-    version: v0.6.4
+    version: v0.6.5
   Dist::Zilla::Plugin::Templates::File:
     file: lib/Dist/Zilla/Plugin/Templates/File.pm
-    version: v0.6.4
+    version: v0.6.5
 requires:
   Carp: '0'
   Dist::Zilla::File::InMemory: '0'
@@ -63,5 +63,5 @@ resources:
   homepage: https://metacpan.org/release/Dist-Zilla-Plugin-Templates
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: https://vandebugger.fedorapeople.org/hg/perl-Dist-Zilla-Plugin-Templates
-version: v0.6.4
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: v0.6.5
+x_serialization_backend: 'YAML::Tiny version 1.70'

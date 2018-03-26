@@ -8,6 +8,7 @@ use File::Spec;
 
 use_ok('App::Git::Workflow');
 use_ok('App::Git::Workflow::Command');
+use_ok('App::Git::Workflow::Command::BranchAge');
 use_ok('App::Git::Workflow::Command::BranchClean');
 use_ok('App::Git::Workflow::Command::Branches');
 use_ok('App::Git::Workflow::Command::BranchGrep');
@@ -17,15 +18,15 @@ use_ok('App::Git::Workflow::Command::Feature');
 use_ok('App::Git::Workflow::Command::Files');
 use_ok('App::Git::Workflow::Command::Jira');
 use_ok('App::Git::Workflow::Command::Pom');
-use_ok('App::Git::Workflow::Command::TagGrep');
-use_ok('App::Git::Workflow::Command::UpToDate');
 use_ok('App::Git::Workflow::Command::Recent');
 use_ok('App::Git::Workflow::Command::Search');
+use_ok('App::Git::Workflow::Command::TagGrep');
+use_ok('App::Git::Workflow::Command::UpToDate');
 use_ok('App::Git::Workflow::Command::Watch');
 use_ok('App::Git::Workflow::Pom');
 use_ok('App::Git::Workflow::Repository');
-use_ok('Test::Git::Workflow::Command');
 use_ok('Mock::App::Git::Workflow::Repository');
+use_ok('Test::Git::Workflow::Command');
 
 my $perl = File::Spec->rel2abs($^X);
 ok( !(system $perl, "-I $Bin/../lib", '-c', "$Bin/../bin/git-branch-clean"), "bin/git-branch-clean compiles");

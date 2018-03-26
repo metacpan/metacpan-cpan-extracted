@@ -13,7 +13,7 @@ use Term::ANSIColor qw/colored/;
 use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION  = 1.0.4;
+our $VERSION  = 1.0.5;
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -60,7 +60,7 @@ git-branch-grep - grep for branch names
 
 =head1 VERSION
 
-This documentation refers to git-branch-grep version 1.0.4
+This documentation refers to git-branch-grep version 1.0.5
 
 =head1 SYNOPSIS
 

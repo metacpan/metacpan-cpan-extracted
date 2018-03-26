@@ -10,7 +10,7 @@ our @EXPORT = qw(
 	);
 
 use vars qw($VERSION);
-$VERSION = '1.012';
+$VERSION = '1.014';
 
 =encoding utf8
 
@@ -202,13 +202,13 @@ This module is in Github:
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >>
+brian d foy, <bdfoy@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright © 2007-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the same terms as the Artistic License 2.0.
 
 =cut
 

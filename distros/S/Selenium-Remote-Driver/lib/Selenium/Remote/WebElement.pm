@@ -1,5 +1,5 @@
 package Selenium::Remote::WebElement;
-$Selenium::Remote::WebElement::VERSION = '1.26';
+$Selenium::Remote::WebElement::VERSION = '1.27';
 # ABSTRACT: Representation of an HTML Element used by Selenium Remote Driver
 
 use strict;
@@ -54,7 +54,13 @@ sub click {
 
 sub submit {
     my ($self) = @_;
-    return $self->driver->execute_script("return arguments[0].form.submit();",{'element-6066-11e4-a52e-4f735466cecf'=> $self->{id}} ) if $self->driver->{is_wd3} && !(grep { $self->driver->browser_name eq $_ } qw{chrome MicrosoftEdge});
+    if ($self->driver->{is_wd3} && !(grep { $self->driver->browser_name eq $_ } qw{chrome MicrosoftEdge})) {
+        if ($self->get_tag_name() ne 'form') {
+            return $self->driver->execute_script("return arguments[0].form.submit();",{'element-6066-11e4-a52e-4f735466cecf'=> $self->{id}} );
+        } else {
+            return $self->driver->execute_script("return arguments[0].submit();",{'element-6066-11e4-a52e-4f735466cecf'=> $self->{id}} );
+        }
+    }
     my $res = { 'command' => 'submitElement', 'id' => $self->id };
     return $self->_execute_command($res);
 }
@@ -190,6 +196,10 @@ sub get_attribute {
     if ( not defined $attr_name ) {
         croak 'Attribute name not provided';
     }
+
+    #Handle global JSONWire emulation flag
+    $no_i_really_mean_it = 1 unless $self->{driver}->{emulate_jsonwire};
+
     return $self->get_property($attr_name) if $self->driver->{is_wd3} && !(grep { $self->driver->browser_name eq $_ } qw{chrome MicrosoftEdge}) && !$no_i_really_mean_it;
 
     my $res = {
@@ -305,7 +315,7 @@ Selenium::Remote::WebElement - Representation of an HTML Element used by Seleniu
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 DESCRIPTION
 
@@ -550,6 +560,9 @@ Example Output:
  Compatibility:
     In older webDriver, this actually got the value of an element's property.
     If you want to get the initial condition (e.g. the values in the tag hardcoded in HTML), pass 1 as the second argument.
+
+    Or, set $driver->{emulate_jsonwire} = 0 to not have to pass the extra arg.
+
     This can only done on WebDriver 3 enabled servers.
 
  Input: 2
@@ -713,7 +726,7 @@ L<Selenium::Remote::Driver|Selenium::Remote::Driver>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/teodesian/Selenium-Remote-Driver/issues
+L<https://github.com/teodesian/Selenium-Remote-Driver/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

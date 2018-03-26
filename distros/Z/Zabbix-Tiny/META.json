@@ -4,7 +4,7 @@
       ", Ben Kaufman."
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.10",
+   "generated_by" : "Minilla/v3.0.16",
    "license" : [
       "perl_5"
    ],
@@ -45,8 +45,8 @@
             "JSON" : "0",
             "LWP" : "0",
             "LWP::Protocol::https" : "0",
+            "Module::Build" : "0",
             "Moo" : "0",
-            "String::Random" : "0",
             "perl" : "5.008001"
          }
       },
@@ -62,7 +62,7 @@
    "provides" : {
       "Zabbix::Tiny" : {
          "file" : "lib/Zabbix/Tiny.pm",
-         "version" : "1.09"
+         "version" : "1.11"
       }
    },
    "release_status" : "stable",
@@ -76,12 +76,12 @@
          "web" : "https://github.com/whosgonna/Zabbix-Tiny.pm"
       }
    },
-   "version" : "1.09",
+   "version" : "1.11",
    "x_contributors" : [
-      "whosgonna <ben.whosgonna.com@gmail.com>",
-      "richlv <richlv@nakts.net>",
       "Ben Kaufman <whosgonna@users.noreply.github.com>",
-      "ben <ben.kaufman@altigen.com>"
+      "Richlv <richlv@nakts.net>",
+      "ben <ben.kaufman@altigen.com>",
+      "whosgonna <ben.whosgonna.com@gmail.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

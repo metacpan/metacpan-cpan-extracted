@@ -1,10 +1,15 @@
-package WebService::Braintree::AdvancedSearchFields;
-$WebService::Braintree::AdvancedSearchFields::VERSION = '1.1';
+# vim: sw=4 ts=4 ft=perl
+
+package # hide from pause
+    WebService::Braintree::AdvancedSearchFields;
+
 use 5.010_001;
 use strictures 1;
 
 use Carp;
 use Moose;
+
+use WebService::Braintree::Util qw(is_arrayref);
 
 has "metaclass" => (is => 'rw');
 
@@ -50,6 +55,12 @@ sub range {
 
 sub multiple_values {
     my ($self, $name, @allowed_values) = @_;
+
+    # Inflate all arrayrefs
+    @allowed_values = map {
+        is_arrayref($_) ? @$_ : $_
+    } @allowed_values;
+
     my $node = sub {
         return WebService::Braintree::MultipleValuesNode->new(
             searcher => shift,

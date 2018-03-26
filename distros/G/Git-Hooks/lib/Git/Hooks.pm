@@ -1,6 +1,6 @@
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '2.8.1';
+$Git::Hooks::VERSION = '2.9.0';
 use 5.010;
 use strict;
 use warnings;
@@ -55,7 +55,7 @@ sub run_hook {
         if (defined $ok) {
             # Modern hooks return a boolean value indicating their success.
             # If they fail they invoke
-            # Git::Repository::Plugin::GitHooks::error.
+            # Git::Repository::Plugin::GitHooks::fault.
             unless ($ok) {
                 # Let's see if there is a help-on-error message configured
                 # specifically for this plugin.
@@ -111,7 +111,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 2.8.1
+version 2.9.0
 
 =head1 SYNOPSIS
 
@@ -376,15 +376,10 @@ own documentation for more details.
 
 =over
 
-=item * L<Git::Hooks::CheckAcls>
-
-Allow you to specify Access Control Lists to tell who can commit or
-push to the repository and affect which Git refs.
-
 =item * L<Git::Hooks::CheckFile>
 
-Check if the contents of newly added or modified files comply with specified
-policies.
+Check if the names and contents of added, modified, or deleted files comply with
+specified policies.
 
 =item * L<Git::Hooks::CheckJira>
 
@@ -410,9 +405,8 @@ already pushed.
 
 =item * L<Git::Hooks::CheckReference>
 
-Check if newly added reference names (branches, tags are just the most
-common Git references) comply with specified policies, so that you can
-impose a strict structure to the repository's reference hierarchies.
+Restrict who can do what (create, rewrite, update, or delete) to which
+references (branches and tags are just the most common Git references).
 
 =item * L<Git::Hooks::GerritChangeId>
 
@@ -815,8 +809,8 @@ below. Each plugin may define other specific options which are
 described in their own documentation. The options specific to a plugin
 usually are contained in a configuration subsection of section
 C<githooks>, named after the plugin base name. For example, the
-C<Git::Hooks::CheckAcls> plugin has its options contained in the
-configuration subsection C<githooks.checkacls>.
+C<Git::Hooks::CheckFile> plugin has its options contained in the
+configuration subsection C<githooks.checkfile>.
 
 You should get comfortable with C<git config> command (read C<git help
 config>) to know how to configure Git::Hooks.
@@ -841,7 +835,7 @@ configuration files by using Git's inclusion mechanism. Please, read the
 To enable one or more plugins you must add them to this configuration
 option, like this:
 
-    $ git config --add githooks.plugin CheckAcls CheckJira
+    $ git config --add githooks.plugin CheckFile CheckJira
 
 You can add another list to the same variable to enable more plugins,
 like this:
@@ -1020,7 +1014,7 @@ user performing the git action.
 =head2 githooks.admin USERSPEC
 
 There are several hooks that perform access control checks before
-allowing a git action, such as the ones installed by the C<CheckAcls>
+allowing a git action, such as the ones installed by the C<CheckFile>
 and the C<CheckJira> plugins. It's useful to allow some people (the
 "administrators") to bypass those checks. These hooks usually allow
 the users specified by this variable to do whatever they want to the

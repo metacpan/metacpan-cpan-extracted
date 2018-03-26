@@ -6,7 +6,7 @@ extends 'Search::Tools::Object';
 
 use namespace::autoclean;
 
-our $VERSION = '1.004';
+our $VERSION = '1.006';
 
 # debugging only
 my $OPEN  = '[';

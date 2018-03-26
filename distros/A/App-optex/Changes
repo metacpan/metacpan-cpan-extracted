@@ -1,5 +1,10 @@
 Revision history for `optex' command.
 
+v0.0.15 2018-03-24T05:02:13Z
+
+    - Update license.
+    - Update '--ls' output to include aliases.
+
 v0.0.14 2018-02-09T02:09:07Z
 
     - Hmm... `expr -M` does not produce "-M" on freebsd.

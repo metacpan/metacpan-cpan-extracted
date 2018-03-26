@@ -99,7 +99,7 @@ $events{3} = { 1  => "Aragorn meets Gandalf the White, and they set out for Edor
 	       17 => "Battle of Dale, where King Brand and King Dain Ironfoot fall, 1419.\n" .
 		   "Shagrat brings Frodo's cloak, mail-shirt, and sword to Barad-d${u_circ}r, 1419.\n",
 	       18 => "Host of the west leaves Minas Tirith, 1419.\n" .
-		   "Frodo and Sam overtaken by Orcs on the road from Durthang to Udun, 1419.\n",
+		   "Frodo and Sam overtaken by Orcs on the road from Durthang to Ud${u_circ}n, 1419.\n",
 	       19 => "Frodo and Sam escape the Orcs and start on the road toward Mount Doom, 1419.\n",
 	       22 => "L${o_acute}rien assaulted for the third time, 1419.\n",
 	       24 => "Frodo and Sam reach the base of Mount Doom, 1419.\n",

@@ -14,11 +14,11 @@ Driven Development
 
 =head1 VERSION
 
-Version 0.27
+Version 0.29
 
 =cut
 
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 
 =head1 SYNOPSIS
 

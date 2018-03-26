@@ -1,0 +1,159 @@
+#!/usr/bin/perl
+use 5.014 ; use strict ; use warnings ;  # the functions requires 5.10 for "state", 5.14 for srand. 
+use Getopt::Std ; getopts ':.:d:m:n:qs:v:', \my%o ;  
+use Math::Trig qw/pi/ ;
+use Scalar::Util qw/looks_like_number/ ;
+use Term::ANSIColor qw/:constants color/ ;  $Term::ANSIColor::AUTORESET = 1 ;
+
+sub boxmuller ( $$ ) ;  #ボックスミュラー法によるガウス乱数の作成
+
+my ( $mu , $sd ) ;  #mu : 平均 , sd : 標準偏差
+my ( $s1 , $s2 )  = (0,0) ; # 1乗和 と 2乗和
+
+& init ; 
+& main ; 
+& SecondInfo unless $o{q} ; 
+exit 0 ;
+
+sub init ( ) {   #オプションを使った設定
+   $o{n} //= 6 ;   #出力要素数  
+   $o{s} = defined $o{s} ? srand $o{s} : srand ; # 乱数シードの保管/設定
+
+   sub LLN ( $ ) ; * LLN = * looks_like_number ; # 関数名が長すぎるので、短くした。
+   sub printErr( $ ){ print STDERR BRIGHT_RED "Option -$_[0] should have a numeric specification.\n" ; exit 1 }
+   $mu = $o{m} ? LLN $o{m} ? $o{m} : printErr "m" : 0 ;  #m : 平均
+   $sd = $o{d} ? LLN $o{d} ? $o{d} : printErr "d" : $o{v} ? LLN $o{v} ? sqrt  $o{v} : printErr "v" : 1 ;  #sd：標準偏差 
+}
+
+sub main ( ) {  #  乱数の出力
+   for ( 1 .. $o{n} ) { 
+       my $x = boxmuller $mu, $sd ; 
+       $x = sprintf "% .$o{'.'}f" , $x if defined $o{'.'} ; # <-- May be efficientized. 
+       $s1 += $x ; 
+       $s2 += $x **2 ; 
+       print "$_\t" if $o{':'} ;  # <-- Maybe effiecientized by other code structure.
+       print "$x\n" ; 
+   }
+}
+
+sub boxmuller ( $$ ) {  #  ガウス乱数の生成
+    state $piW = atan2(1,1)* 8  ;  #6.28=3.14*2
+    state $z = undef ; 
+    do { my $t = $z ; undef $z ; return $t * $_[1] + $_[0] }  if defined $z ; 
+    
+    my $r1 = 1 - rand ; # ; $r1 = rand until $r1 ; 値が0になることを阻止。
+    my $r2 = $piW * rand ;
+    my $r1R = sqrt ( -2 * log $r1 ); 
+    my $r2S = sin $r2 ; 
+    my $r2C = cos $r2 ; 
+    ( my $t , $z ) = ( $r1R * $r2S , $r1R * $r2C ) ; 
+    return $t * $_[1] + $_[0] ; 
+}
+
+sub SecondInfo( ) {   #  処理したことについての二次情報を出力
+    use FindBin qw [ $Script ] ; 
+    print STDERR 
+       CYAN "printed lines: ", BRIGHT_CYAN $o{n} ,
+       CYAN " , used random seed: " , BRIGHT_CYAN  $o{s} ,
+       RESET "\n" , 
+       CYAN "sum = " , BRIGHT_CYAN  sprintf("%g", $s1 ) ,
+       CYAN " , squared sum = " , BRIGHT_CYAN  sprintf( "%g" , $s2 ) , 
+       CYAN " ($Script) " , RESET "\n" ;
+ }
+
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script $Bin ] ;
+    sub EnvJ ( ) { $ENV{LANG} =~ m/^ja_JP/ ? 1 : 0 } ; # # ja_JP.UTF-8 
+    sub en( ) { grep ( /^en(g(i(sh?)?)?)?/i , @ARGV ) ? 1 : 0 } # English という文字列を先頭から2文字以上を含むか 
+    sub ja( ) { grep ( /^jp$|^ja(p(a(n?)?)?)?/i , @ARGV ) ? 1 : 0 } # jp または japan という文字列を先頭から2文字以上を含むか 
+    sub opt( ) { grep (/^opt(i(o(ns?)?)?)?$/i, @ARGV ) ? 1 : 0 } # options という文字列を先頭から3文字以上含むから
+    sub noPOD ( ) { grep (/^no-?pod\b/i, @ARGV) ? 1 : 0 } # POD を使わないと言う指定がされているかどうか
+    my $jd = "JapaneseManual" ;
+    my $flagE = ! ja && ( en || ! EnvJ ) ; # 英語にするかどうかのフラグ
+
+    exec "perldoc $0" if $flagE &&  ! opt && ! noPOD   ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\Q'=script='\E/$Script/gi ;
+        s/\Q'=bin='\E/$Bin/gi ;
+        if ( s/^=head1\b\s*// .. s/^=cut\b\s*// ) { 
+            if ( s/^=begin\s+$jd\b\s*// .. s/^=end\s+$jd\b\s*// xor $flagE ) {
+                print $_ if ! opt || m/^\s+\-/  ; 
+            }
+        } 
+        #print $_ if /^=head1/ .. /^=cut\b/ and opt ? m/^\s+\-/ : 1 and ( EnvJ && ! en xor s/^=begin $jd\b// .. s/^=end $jd\b// ) ;
+    }
+    close $FH ;
+    exit 0 ;
+
+}
+
+=encoding utf8 
+
+=head1
+
+   Program name : '=script='  ('=bin=')
+
+   Function : generating Gaussian random variables by Box-Muller method.
+
+   Output to STDOUT :  
+      1. The generated Gaussian random number(s).
+
+   Output to STDERR : 
+      2. The random seed used. 
+      3. The sums of the generated numbers and the square of them.
+
+   Options : 
+     -m N : Mean. Default is 0.
+     -d N : Standard Deviation. Default is 1.
+     -v N : Variance. Default is 1. -d is given more priority.
+     -. N : The decimal places after the decimal point.
+
+     -n N : How many numbers you need. Default : 6
+     -q   : Only output the random number without other secondary information.
+     -s N : Random seed specification. Seemingly the residual divided by 2^32 is essential.
+     -:   ; Entail serial number from 1. 
+
+    --help : Print this online help manual of this command "'=SCRIPT='". Similar to "perldoc `which [-t] '=SCRIPT='` ".
+    --help opt ..or..  --help options : Only shows the option helps. It is easy to read when you are in very necessary.
+    --help ja : Shows Japanese online help manual. ; "'=script=' --help ja" で日本語のオンラインマニュアルを表示します。
+    --help nopod : Print this online manual using the code insdide this program without using the function of Perl POD.
+
+=begin JapaneseManual 
+   プログラム名 : '=script='  ('=bin=')
+
+    ボックス=ミュラー法を使ってガウス乱数を生成する。
+
+ 標準出力への出力 :  
+   1. ガウス乱数
+
+ 標準エラー出力への出力 :
+   2. 乱数シード  
+   3. 一乗和と二乗和 
+
+ オプション: 
+   -m N : ガウス分布の平均を指定する。未指定なら 0
+   -v N : ガウス分布の分散を指定する。未指定なら 1（ ただし、-d の指定が優先される。）
+   -d N : ガウス分布の標準偏差を指定する。未指定なら 1 stardard Deviation
+   -. N : 出力する値の小数点以下の桁数を指定する。
+
+   -n N : 出力するガウス乱数の個数を指定する。未指定の場合 6
+   -q   : 標準エラー出力へ出力される乱数シードなどの情報を表示しない。
+   -s N : 乱数シードを指定する。(指定した数の 2**32=約43億で割った剰余が渡される)
+   -:   ; 1から順に連番も出力する。
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+  --help en : 英語版のオンラインヘルプマニュアルを出力。Online help in English version. 
+  
+
+  開発上のメモ 
+    * srand 関数の挙動が Perl 5.14 とそれ以前で異なる。その様子を検知するテストが必要と考えられる。
+ 
+=end JapaneseManual
+=cut

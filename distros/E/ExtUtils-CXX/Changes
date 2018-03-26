@@ -1,5 +1,8 @@
 Revision history for Perl extension ExtUtils::CXX
 
+1.0   Sun Mar 25 08:05:42 CEST 2018
+	- allow for ccache and distcc prefixes before the actual compiler name.
+
 0.03  Mon Aug 14 07:26:13 CEST 2017
 	- oh, yeah, left bloody test code inside.
 	- CONFIGURE_REQUIRES should have been PREREQ_PM.

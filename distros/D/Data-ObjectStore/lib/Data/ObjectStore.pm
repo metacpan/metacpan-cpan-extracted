@@ -3,8 +3,6 @@ package Data::ObjectStore;
 use strict;
 use warnings;
 
-use warnings FATAL => 'all';
-
 no warnings 'numeric';
 no warnings 'uninitialized';
 no warnings 'recursion';
@@ -13,7 +11,7 @@ use Data::RecordStore;
 use Scalar::Util qw(weaken);
 use vars qw($VERSION);
 
-$VERSION = '1.101';
+$VERSION = '1.103';
 
 use constant {
     RECORD_STORE => 0,
@@ -562,7 +560,7 @@ package Data::ObjectStore::Array;
 
 use strict;
 use warnings;
-use warnings FATAL => 'all';
+no warnings 'uninitialized';
 no  warnings 'numeric';
 
 use Tie::Array;
@@ -782,7 +780,7 @@ sub EXISTS {
         return 0;
     }
     if( $self->[LEVEL] == 0 ) {
-        return exists $self->[DATA][$idx] && $self->[DATA][$idx] ne 'u';
+        return exists( $self->[DATA][$idx] ) && $self->[DATA][$idx] ne 'u';
     }
     return $self->_getblock( int( $idx / $self->[BLOCK_SIZE] ) )->EXISTS( $idx % $self->[BLOCK_SIZE] );
 
@@ -1653,7 +1651,7 @@ __END__
        under the same terms as Perl itself.
 
 =head1 VERSION
-       Version 1.101  (Mar, 2018))
+       Version 1.103  (Mar, 2018))
 
 =cut
 

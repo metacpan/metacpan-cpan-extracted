@@ -4,9 +4,10 @@ To install this module, use CPAN, for example:
 
   cpanm Math::SlideRule
 
+
 For the current release, see:
 
-http://github.com/thrig/Math-SlideRule
+https://github.com/thrig/Math-SlideRule
 
 This can be built and installed by running:
 
@@ -15,11 +16,14 @@ This can be built and installed by running:
   make test
   make install
 
+
 Run perldoc(1) on Math::SlideRule for more documentation.
+
 
 DEPENDENCIES
 
 Some knowledge of how a slide rule works may be handy.
+
 
 SUPPORT AND DOCUMENTATION
 
@@ -38,10 +42,3 @@ You can also look for information at:
 
     CPAN Ratings
         http://cpanratings.perl.org/d/Math-SlideRule
-
-LICENSE AND COPYRIGHT
-
-Copyright (C) 2014,2015 Jeremy Mates
-
-This module is free software; you can redistribute it and/or modify it
-under the Artistic License (2.0).

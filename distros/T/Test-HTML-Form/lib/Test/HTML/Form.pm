@@ -9,7 +9,7 @@ Test::HTML::Form - HTML Testing and Value Extracting
 
 =head1 VERSION
 
-0.05
+1.00
 
 =head1 SYNOPSIS
 
@@ -28,13 +28,13 @@ Test::HTML::Form - HTML Testing and Value Extracting
   tag_matches($response,
        'p',
        { class => 'formError',
-	 _content => 'There is an error in this form.' },
+     _content => 'There is an error in this form.' },
        'main error message appears as expected' );
 
   no_tag($filename,
        'p',
        { class => 'formError',
-	 _content => 'Error' },
+     _content => 'Error' },
        'no unexpected errors' );
 
 
@@ -86,14 +86,12 @@ our @EXPORT = qw(
   form_checkbox_field_matches
   );
 
-
-$Data::Dumper::Maxdepth = 2;
 my $Test = Test::Builder->new;
 my $CLASS = __PACKAGE__;
 my %parsed_files = ();
 my %parsed_file_forms = ();
 
-our $VERSION = 0.05;
+our $VERSION = 1.00;
 
 =head1 FUNCTIONS
 
@@ -216,7 +214,7 @@ tag_matches($filename,'a',{ href => $link },$name); # check matching tag found i
 
 Passes when at least one instance found, fails if no matches found.
 
-Takes a list of arguments 
+Takes a list of arguments
 
 =over 4
 
@@ -233,22 +231,22 @@ Takes a list of arguments
 =cut
 
 sub tag_matches {
-    my ($filename,$tag,$attr_ref,$name) = @_;
+    my ($filename, $tag, $attr_ref, $name) = @_;
     my $count = 0;
 
     if (ref $tag ) {
-	foreach my $this_tag (@$tag) {
-	    $count += _tag_count($filename, $this_tag, $attr_ref);
-	}
+        foreach my $this_tag (@$tag) {
+            $count += _tag_count($filename, $this_tag, $attr_ref);
+        }
     } else {
-	$count = _tag_count($filename, $tag, $attr_ref);
+        $count = _tag_count($filename, $tag, $attr_ref);
     }
 
     my $tb = $CLASS->builder;
     my $ok = $tb->ok( $count, $name);
     unless ($ok) {
-	my $tagname = ( ref $tag ) ? join (' or ', @$tag) : $tag ;
-	$tb->diag("Expected at least one tag of type '$tagname' in file $filename matching condition, but got 0\n");
+    my $tagname = ( ref $tag ) ? join (' or ', @$tag) : $tag ;
+    $tb->diag("Expected at least one tag of type '$tagname' in file $filename matching condition, but got 0\n");
     }
     return $ok;
 }
@@ -346,17 +344,17 @@ sub script_matches {
   my $tree = _get_tree($filename);
 
   my @parse_args = sub {
-	    my $elem = shift;
-	    return 0 unless (ref $elem eq 'HTML::Element' );
-	    my $ok = 0;
-	    (my $text = $elem->as_HTML) =~ s/<(.|\n)*?>//g;
-	    if ($pattern) {
-		my $ok = $text =~ m/$pattern/;
-		return $ok || $text =~ m/$pattern/;
-	    } else {
-		$text eq $text_to_match;
-	    }
-	};
+        my $elem = shift;
+        return 0 unless (ref $elem eq 'HTML::Element' );
+        my $ok = 0;
+        (my $text = $elem->as_HTML) =~ s/<(.|\n)*?>//g;
+        if ($pattern) {
+        my $ok = $text =~ m/$pattern/;
+        return $ok || $text =~ m/$pattern/;
+        } else {
+        $text eq $text_to_match;
+        }
+    };
 
   my $count = $tree->look_down( _tag => 'script', @parse_args );
 
@@ -399,8 +397,8 @@ sub form_field_value_matches {
   foreach my $elem (@$elems) {
       my $matches = _compare($elem,$field_value);
       if ($matches) {
-	  $ok = $tb->ok( $matches  , $description);
-	  last;
+      $ok = $tb->ok( $matches  , $description);
+      last;
       }
   }
 
@@ -437,26 +435,32 @@ sub form_select_field_matches {
   my ($filename, $field_value_args, $description) = @_;
   my $form_fields = __PACKAGE__->get_form_values({ filename => $filename, form_name => $field_value_args->{form_name} });
   my $tb = $CLASS->builder;
-
+  my $ok = 0;
   my $field_value = $field_value_args->{selected};
   my $field_name = $field_value_args->{field_name};
 
   my $select_elem = $form_fields->{$field_name}[0];
-  unless (UNIVERSAL::can($select_elem,'descendants')) {
-    die "$select_elem (",$select_elem->tag,") is not a select html element for field : $field_name - did you mean to call form_checkbox_field_matches ?";
-  }
-  my $selected_option;
-  foreach my $option ( $select_elem->descendants ) {
-    next unless (ref($option) && ( lc($option->tag) eq 'option') );
-    if ( _compare($option, $field_value) ) {
-      $selected_option = $option;
-      last;
-    }
-  }
 
-  my $ok = $tb->ok( $selected_option && scalar grep (m/selected/i && $selected_option->attr($_), $selected_option->all_external_attr_names), $description);
+
+  if ($select_elem) {
+      unless (UNIVERSAL::can($select_elem,'descendants')) {
+          die "$select_elem (",$select_elem->tag,") is not a select html element for field : $field_name - did you mean to call form_checkbox_field_matches ?";
+      }
+      my $selected_option;
+      foreach my $option ( $select_elem->descendants ) {
+          next unless (ref($option) && ( lc($option->tag) eq 'option') );
+          if ( _compare($option, $field_value) ) {
+              $selected_option = $option;
+              last;
+          }
+      }
+
+      $ok = $tb->ok( $selected_option && scalar grep (m/selected/i && $selected_option->attr($_), $selected_option->all_external_attr_names), $description);
+  } else {
+      $ok = $tb->ok(0, $description);
+  }
   unless ($ok) {
-    $tb->diag("Expected form to contain field '$field_name' and have option with value of '$field_value' selected but not found in file $filename \n");
+      $tb->diag("Expected form to contain field '$field_name' and have option with value of '$field_value' selected but not found in file $filename \n");
   }
   return $ok;
 }
@@ -531,26 +535,27 @@ sub get_form_values {
     my $tree = _get_tree($args->{filename});
     my $form_fields = { };
     my ($form) = $tree->look_down('_tag', 'form',
-				  sub {
-				    my $form = shift;
-				    if ($form_name) {
-				      return 1 if $form->attr('name') eq $form_name;
-				    } else {
-				      return 1;
-				    }
-				  }
-				 );
+                  sub {
+                    my $form = shift;
+                    if ($form_name) {
+                      return 1 if $form->attr('name') eq $form_name;
+                      return 1 if $form->attr('id') eq $form_name;
+                    } else {
+                      return 1;
+                    }
+                  }
+                 );
     if (ref $form) {
       my @form_nodes = $form->descendants();
       foreach my $node (@form_nodes) {
-	next unless (ref($node));
-	if (lc($node->tag) =~ /^(input|select|textarea|button)$/i)  {
-	  if (lc $node->attr('type')  =~ /(radio|checkbox)/)  {
-	    push (@{$form_fields->{$node->attr('name')}},$node);
-	  } else {
-	    $form_fields->{$node->attr('name')} = [ $node ];
-	  }
-	}
+    next unless (ref($node));
+    if (lc($node->tag) =~ /^(input|select|textarea|button)$/i)  {
+      if (lc $node->attr('type')  =~ /(radio|checkbox)/)  {
+        push (@{$form_fields->{$node->attr('name')}},$node);
+      } else {
+        $form_fields->{$node->attr('name')} = [ $node ];
+      }
+    }
       }
     }
     $parsed_file_forms{$args->{filename}}{$internal_form_name} = $form_fields;
@@ -571,10 +576,10 @@ sub extract_text {
   my $tree = _get_tree($args->{filename});
   my $pattern = $args->{pattern};
   my ($node) = $tree->look_down( sub {
-				  my $thisnode = shift;
-				  $thisnode->normalize_content;
-				  return 1 if ($thisnode->as_trimmed_text =~ m/$pattern/i);
-				});
+                  my $thisnode = shift;
+                  $thisnode->normalize_content;
+                  return 1 if ($thisnode->as_trimmed_text =~ m/$pattern/i);
+                });
   my ($match) = ($node->as_trimmed_text =~ m/$pattern/i);
 
   return $match;
@@ -621,9 +626,9 @@ sub _tag_count {
     @parse_args = %$attr_ref ;
     if ($pattern) {
       push( @parse_args, sub {
-		return 0 unless (ref $_[0] eq 'HTML::Element' );
-		return  $_[0]->as_trimmed_text =~ m/$pattern/;
-	    } );
+        return 0 unless (ref $_[0] eq 'HTML::Element' );
+        return  $_[0]->as_trimmed_text =~ m/$pattern/;
+        } );
     }
   } else {
     @parse_args = $attr_ref ;
@@ -639,23 +644,23 @@ sub _count_text {
   my $tree = _get_tree($args->{filename});
   my $text = $args->{text};
   my $count = $tree->look_down( sub {
-				  my $node = shift;
-				  $node->normalize_content;
-				  return 1 if ($node->as_trimmed_text =~ m/$text/);
-				});
+                  my $node = shift;
+                  $node->normalize_content;
+                  return 1 if ($node->as_trimmed_text =~ m/$text/);
+                });
   return $count || 0;
 }
 
 sub _get_tree {
   my $filename = shift;
   unless ($parsed_files{$filename}) {
-      my $tree = HTML::TreeBuilder->new; 
-      $tree->store_comments(1);     
+      my $tree = HTML::TreeBuilder->new;
+      $tree->store_comments(1);
       if (ref $filename && $filename->can('content')) {
-	  $tree->parse_content($filename->decoded_content);
+      $tree->parse_content($filename->decoded_content);
       } else {
-	  die "can't find file $filename" unless (-f $filename);
-	  $tree->parse_file($filename);
+      die "can't find file $filename" unless (-f $filename);
+      $tree->parse_file($filename);
       }
     $parsed_files{$filename} = $tree;
   }

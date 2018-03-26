@@ -1,4 +1,3 @@
-# $Id$
 BEGIN {
 	@classes = qw(File::Find::Closures);
 	}

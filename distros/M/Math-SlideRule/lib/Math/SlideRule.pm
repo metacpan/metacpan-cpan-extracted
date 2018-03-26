@@ -1,6 +1,6 @@
 # -*- Perl -*-
 #
-# Slide rule virtualization for Perl.
+# slide rule virtualization for Perl
 
 package Math::SlideRule;
 
@@ -10,252 +10,253 @@ use Moo;
 use namespace::clean;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 ########################################################################
 #
 # ATTRIBUTES
 
-# These are taken from common scale names on a slide rule; see code for
-# how they are populated.
+# these are taken from common scale names on a slide rule; see code for
+# how they are populated
 has A => ( is => 'lazy', );
 has C => ( is => 'lazy', );
 
 sub _build_A { $_[0]->_range_exp_weighted( 1, 100 ) }
 sub _build_C { $_[0]->_range_exp_weighted( 1, 10 ) }
 
-# Increased precision comes at the cost of additional memory use.
+# increased precision comes at the cost of additional memory use
 #
 # NOTE changing the precision after A, C and so forth have been
-# generated will do nothing to those values. Instead, construct a new
-# object with a different precision set, if necessary.
+# generated will do nothing to those values. instead, construct a new
+# object with a different precision set, if necessary
 has precision => ( is => 'rw', default => sub { 10_000 } );
 
 ########################################################################
 #
 # METHODS
 
-# Builds two arrays, one of values (1, 2, 3...), another of distances
-# based on the log of those values. These arrays returned in a hash
-# reference. Slide rule lookups obtain the index of a value, then use
+# builds two arrays, one of values (1, 2, 3...), another of distances
+# based on the log of those values. these arrays returned in a hash
+# reference. slide rule lookups obtain the index of a value, then use
 # that to find the distance of that value, then uses other distances
 # to figure out some new location, that a new value can be worked back
-# out from.
+# out from
 #
-# NOTE that these scales are not calibrated directly to one another,
-# as they would be on a slide rule.
+# NOTE that these scales are not calibrated directly to one another
+# as they would be on a slide rule
 sub _range_exp_weighted {
-  my ( $self, $min, $max ) = @_;
+    my ( $self, $min, $max ) = @_;
 
-  my @range = map log, $min, $max;
-  my ( @values, @distances );
+    my @range = map log, $min, $max;
+    my ( @values, @distances );
 
-  my $slope = ( $range[1] - $range[0] ) / $self->precision;
+    my $slope = ( $range[1] - $range[0] ) / $self->precision;
 
-  for my $d ( 0 .. $self->precision ) {
-    # via slope equation; y = mx + b and m = (y2-y1)/(x2-x1) with
-    # assumption that precision 0..$mp and @range[min,max]
-    push @distances, $slope * $d + $range[0];
-    push @values,    exp $distances[-1];
-  }
+    for my $d ( 0 .. $self->precision ) {
+        # via slope equation; y = mx + b and m = (y2-y1)/(x2-x1) with
+        # assumption that precision 0..$mp and @range[min,max]
+        push @distances, $slope * $d + $range[0];
+        push @values,    exp $distances[-1];
+    }
 
-  return { value => \@values, dist => \@distances };
+    return { value => \@values, dist => \@distances };
 }
 
-# Binary search an array of values for a given value, returning index of
-# the closest match. Used to lookup values and their corresponding
+# binary search an array of values for a given value, returning index of
+# the closest match. used to lookup values and their corresponding
 # distances from the various A, C, etc. attribute tables. NOTE this
 # routine assumes that the given value has been normalized e.g. via
 # standard_form to lie somewhere on or between the minimum and maximum
-# values in the given array reference.
+# values in the given array reference
 sub _rank {
-  my ( $self, $value, $ref ) = @_;
+    my ( $self, $value, $ref ) = @_;
 
-  my $lo = 0;
-  my $hi = $#$ref;
+    my $lo = 0;
+    my $hi = $#$ref;
 
-  while ( $lo <= $hi ) {
-    my $mid = int( $lo + ( $hi - $lo ) / 2 );
-    if ( $ref->[$mid] > $value ) {
-      $hi = $mid - 1;
-    } elsif ( $ref->[$mid] < $value ) {
-      $lo = $mid + 1;
-    } else {
-      return $mid;
+    while ( $lo <= $hi ) {
+        my $mid = int( $lo + ( $hi - $lo ) / 2 );
+        if ( $ref->[$mid] > $value ) {
+            $hi = $mid - 1;
+        } elsif ( $ref->[$mid] < $value ) {
+            $lo = $mid + 1;
+        } else {
+            return $mid;
+        }
     }
-  }
 
-  # No exact match; return index of value closest to the numeral supplied
-  if ( $lo > $#$ref ) {
-    return $hi;
-  } else {
-    if ( abs( $ref->[$lo] - $value ) >= abs( $ref->[$hi] - $value ) ) {
-      return $hi;
+    # no exact match; return index of value closest to the numeral supplied
+    if ( $lo > $#$ref ) {
+        return $hi;
     } else {
-      return $lo;
+        if ( abs( $ref->[$lo] - $value ) >= abs( $ref->[$hi] - $value ) ) {
+            return $hi;
+        } else {
+            return $lo;
+        }
     }
-  }
 }
 
-# Division is just multiplication done backwards on a slide rule, as the
-# same physical distances are involved. There are also "CF" and "CI" (C
+# division is just multiplication done backwards on a slide rule, as the
+# same physical distances are involved. there are also "CF" and "CI" (C
 # scale, folded, or inverse) and so forth scales to assist with such
 # operations, though these mostly just help avoid excess motions on the
-# slide rule.
+# slide rule
 #
 # NOTE cannot just pass m*(1/n) to multiply() because that looses
-# precision: .82 for 75/92 while can get .815 on pocket slide rule.
+# precision: .82 for 75/92 while can get .815 on pocket slide rule
 sub divide {
-  my $self = shift;
-  my $n    = shift;
-  my $i    = 0;
+    my $self = shift;
+    my $n    = shift;
+    my $i    = 0;
 
-  die "need at least two numbers\n" if @_ < 1;
-  die "argument index $i not a number\n" if !defined $n or !looks_like_number($n);
+    die "need at least two numbers\n" if @_ < 1;
+    die "argument index $i not a number\n" if !defined $n or !looks_like_number($n);
 
-  my ( $n_coe, $n_exp, $neg_count ) = $self->standard_form($n);
+    my ( $n_coe, $n_exp, $neg_count ) = $self->standard_form($n);
 
-  my $n_idx    = $self->_rank( $n_coe, $self->C->{value} );
-  my $distance = $self->C->{dist}[$n_idx];
-  my $exponent = $n_exp;
+    my $n_idx    = $self->_rank( $n_coe, $self->C->{value} );
+    my $distance = $self->C->{dist}[$n_idx];
+    my $exponent = $n_exp;
 
-  for my $m (@_) {
-    $i++;
-    die "argument index $i not a number\n" if !looks_like_number($m);
+    for my $m (@_) {
+        $i++;
+        die "argument index $i not a number\n" if !looks_like_number($m);
 
-    $neg_count++ if $m < 0;
+        $neg_count++ if $m < 0;
 
-    my ( $m_coe, $m_exp, undef ) = $self->standard_form($m);
-    my $m_idx = $self->_rank( $m_coe, $self->C->{value} );
+        my ( $m_coe, $m_exp, undef ) = $self->standard_form($m);
+        my $m_idx = $self->_rank( $m_coe, $self->C->{value} );
 
-    $distance -= $self->C->{dist}[$m_idx];
-    $exponent -= $m_exp;
+        $distance -= $self->C->{dist}[$m_idx];
+        $exponent -= $m_exp;
 
-    if ( $distance < $self->C->{dist}[0] ) {
-      $distance = $self->C->{dist}[-1] + $distance;
-      $exponent--;
+        if ( $distance < $self->C->{dist}[0] ) {
+            $distance = $self->C->{dist}[-1] + $distance;
+            $exponent--;
+        }
     }
-  }
 
-  my $d_idx = $self->_rank( $distance, $self->C->{dist} );
-  my $product = $self->C->{value}[$d_idx];
+    my $d_idx = $self->_rank( $distance, $self->C->{dist} );
+    my $product = $self->C->{value}[$d_idx];
 
-  $product *= 10**$exponent;
-  $product *= -1 if $neg_count % 2 == 1;
+    $product *= 10**$exponent;
+    $product *= -1 if $neg_count % 2 == 1;
 
-  return $product;
+    return $product;
 }
 
 sub multiply {
-  my $self = shift;
-  my $n    = shift;
-  my $i    = 0;
+    my $self = shift;
+    my $n    = shift;
+    my $i    = 0;
 
-  die "need at least two numbers\n" if @_ < 1;
-  die "argument index $i not a number\n" if !defined $n or !looks_like_number($n);
+    die "need at least two numbers\n" if @_ < 1;
+    die "argument index $i not a number\n" if !defined $n or !looks_like_number($n);
 
-  my ( $n_coe, $n_exp, $neg_count ) = $self->standard_form($n);
+    my ( $n_coe, $n_exp, $neg_count ) = $self->standard_form($n);
 
-  # Chain method has first lookup on D and then subsequent done by
-  # moving C on slider and keeping tabs with the hairline, then reading
-  # back on D for the final result. (Plus incrementing the exponent
-  # count when a reverse slide is necessary, for example for 3.4*4.1, as
-  # that jumps to the next magnitude.)
-  #
-  # One can also do the multiplication on the A and B scales, which is
-  # handy if you then need to pull the square root off of D. But this
-  # implementation ignores such alternatives.
-  my $n_idx    = $self->_rank( $n_coe, $self->C->{value} );
-  my $distance = $self->C->{dist}[$n_idx];
-  my $exponent = $n_exp;
+    # chain method has first lookup on D and then subsequent done by
+    # moving C on slider and keeping tabs with the hairline, then reading
+    # back on D for the final result. (plus incrementing the exponent
+    # count when a reverse slide is necessary, for example for 3.4*4.1, as
+    # that jumps to the next magnitude)
+    #
+    # one can also do the multiplication on the A and B scales, which is
+    # handy if you then need to pull the square root off of D. but this
+    # implementation ignores such alternatives
+    my $n_idx    = $self->_rank( $n_coe, $self->C->{value} );
+    my $distance = $self->C->{dist}[$n_idx];
+    my $exponent = $n_exp;
 
-  for my $m (@_) {
-    $i++;
-    die "argument index $i not a number\n" if !looks_like_number($m);
+    for my $m (@_) {
+        $i++;
+        die "argument index $i not a number\n" if !looks_like_number($m);
 
-    $neg_count++ if $m < 0;
+        $neg_count++ if $m < 0;
 
-    my ( $m_coe, $m_exp, undef ) = $self->standard_form($m);
-    my $m_idx = $self->_rank( $m_coe, $self->C->{value} );
+        my ( $m_coe, $m_exp, undef ) = $self->standard_form($m);
+        my $m_idx = $self->_rank( $m_coe, $self->C->{value} );
 
-    $distance += $self->C->{dist}[$m_idx];
-    $exponent += $m_exp;
+        $distance += $self->C->{dist}[$m_idx];
+        $exponent += $m_exp;
 
-    # Order of magnitude change, adjust back to bounds (these notable on slide
-    # rule by having to index from the opposite direction than usual for the C
-    # and D scales (though one could also obtain the value with the A and B or
-    # the CI and DI scales, but those would then need some rule to track the
-    # exponent change)).
-    if ( $distance > $self->C->{dist}[-1] ) {
-      $distance -= $self->C->{dist}[-1];
-      $exponent++;
+        # order of magnitude change, adjust back to bounds (these are
+        # notable on a slide rule by having to index from the opposite
+        # direction than usual for the C and D scales (though one could
+        # also obtain the value with the A and B or the CI and DI
+        # scales, but those would then need some rule to track the
+        # exponent change))
+        if ( $distance > $self->C->{dist}[-1] ) {
+            $distance -= $self->C->{dist}[-1];
+            $exponent++;
+        }
     }
-  }
 
-  my $d_idx = $self->_rank( $distance, $self->C->{dist} );
-  my $product = $self->C->{value}[$d_idx];
+    my $d_idx = $self->_rank( $distance, $self->C->{dist} );
+    my $product = $self->C->{value}[$d_idx];
 
-  $product *= 10**$exponent;
-  $product *= -1 if $neg_count % 2 == 1;
+    $product *= 10**$exponent;
+    $product *= -1 if $neg_count % 2 == 1;
 
-  return $product;
+    return $product;
 }
 
-# Relies on conversion from A to C scales (and that the distances in
+# relies on conversion from A to C scales (and that the distances in
 # said scales are linked to one another)
 sub sqrt {
-  my ( $self, $n ) = @_;
-  die "argument not a number\n" if !defined $n or !looks_like_number($n);
-  die "Can't take sqrt of $n\n" if $n < 0;
+    my ( $self, $n ) = @_;
+    die "argument not a number\n" if !defined $n or !looks_like_number($n);
+    die "Can't take sqrt of $n\n" if $n < 0;
 
-  my ( $n_coe, $n_exp, undef ) = $self->standard_form($n);
+    my ( $n_coe, $n_exp, undef ) = $self->standard_form($n);
 
-  if ( $n_exp % 2 == 1 ) {
-    $n_coe *= 10;
-    $n_exp--;
-  }
+    if ( $n_exp % 2 == 1 ) {
+        $n_coe *= 10;
+        $n_exp--;
+    }
 
-  my $n_idx = $self->_rank( $n_coe, $self->A->{value} );
+    my $n_idx = $self->_rank( $n_coe, $self->A->{value} );
 
-  # NOTE division is due to A and C scale distances not being calibrated
-  # directly with one another
-  my $distance = $self->A->{dist}[$n_idx] / 2;
+    # NOTE division is due to A and C scale distances not being calibrated
+    # directly with one another
+    my $distance = $self->A->{dist}[$n_idx] / 2;
 
-  my $d_idx = $self->_rank( $distance, $self->C->{dist} );
-  my $sqrt = $self->C->{value}[$d_idx];
+    my $d_idx = $self->_rank( $distance, $self->C->{dist} );
+    my $sqrt = $self->C->{value}[$d_idx];
 
-  $sqrt *= 10**( $n_exp / 2 );
+    $sqrt *= 10**( $n_exp / 2 );
 
-  return $sqrt;
+    return $sqrt;
 }
 
-# Converts numbers to standard form (scientific notation) or otherwise
-# between a particular range of numbers (to support A/B "double decade"
-# scales).
+# converts numbers to standard form (scientific notation) or otherwise
+# between a particular range of numbers (to support A/B "double
+# decade" scales)
 sub standard_form {
-  my ( $self, $val, $min, $max ) = @_;
+    my ( $self, $val, $min, $max ) = @_;
 
-  $min //= 1;
-  $max //= 10;
+    $min //= 1;
+    $max //= 10;
 
-  my $is_neg = $val < 0 ? 1 : 0;
+    my $is_neg = $val < 0 ? 1 : 0;
 
-  $val = abs $val;
-  my $exp = 0;
+    $val = abs $val;
+    my $exp = 0;
 
-  if ( $val < $min ) {
-    while ( $val < $min ) {
-      $val *= 10;
-      $exp--;
+    if ( $val < $min ) {
+        while ( $val < $min ) {
+            $val *= 10;
+            $exp--;
+        }
+    } elsif ( $val >= $max ) {
+        while ( $val >= $max ) {
+            $val /= 10;
+            $exp++;
+        }
     }
-  } elsif ( $val >= $max ) {
-    while ( $val >= $max ) {
-      $val /= 10;
-      $exp++;
-    }
-  }
 
-  return $val, $exp, $is_neg;
+    return $val, $exp, $is_neg;
 }
 
 1;
@@ -268,8 +269,6 @@ Math::SlideRule - slide rule support for Perl
 =head1 SYNOPSIS
 
 Simulate an analog computer.
-
-*** BETA interface, has and may change without warning ***
 
   use Math::SlideRule;
 
@@ -291,9 +290,8 @@ Simulate an analog computer.
 
 Slide rule support for Perl. Or, a complicated way to perform basic
 mathematical operations on a digital computer.
-L<Math::SlideRule::PickettPocket> approximates a N 3P-ES pocket slide
-rule. Useful uses of this code might be to investiage how much error
-calculations on a slide rule can rack up, I guess?
+L<Math::SlideRule::PickettPocket> approximates a N 3P-ES pocket
+slide rule.
 
 =head1 ATTRIBUTES
 
@@ -308,8 +306,7 @@ between B<A> and B<C> will require appropriate math.
 Double decade scale from 1..100. Used by B<sqrt> in conjunction with
 B<C> scale. Weighted towards the low end, so has greater precision near
 1 than at 100. Overall precision may be set by the B<precision>
-attribute, ideally when the object is constructed, as changing the
-B<precision> on the fly is not supported.
+attribute only when the object is constructed.
 
 Internally, a hash reference of C<value> and C<dist> arrays, where the
 index of a particular value corresponds to a particular logarithmic
@@ -380,9 +377,9 @@ that tie various numerals to given logarithmic distances.
 If the bug is in the latest version, send a report to the author.
 Patches that fix problems or add new features are welcome.
 
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Math-SlideRule>
+L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Math-SlideRule>
 
-L<http://github.com/thrig/Math-SlideRule>
+L<https://github.com/thrig/Math-SlideRule>
 
 =head2 Known Issues
 
@@ -400,9 +397,9 @@ thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014,2015 Jeremy Mates.
+Copyright Jeremy Mates
 
-This module is free software; you can redistribute it and/or modify it
-under the Artistic License (2.0).
+This program is distributed under the (Revised) BSD License:
+L<https://opensource.org/licenses/BSD-3-Clause>
 
 =cut

@@ -379,7 +379,7 @@ subtest 'Can find a merchant account by ID' => sub {
     validate_result($result) or return;
 
     my $merchant_account = WebService::Braintree::MerchantAccount->find($params->{id});
-    isa_ok($merchant_account, 'WebService::Braintree::MerchantAccount');
+    isa_ok($merchant_account, 'WebService::Braintree::_::MerchantAccount');
 };
 
 subtest 'Calling find with a nonexistant ID returns a NotFoundError' => sub {

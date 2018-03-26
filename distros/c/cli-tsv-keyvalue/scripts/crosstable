@@ -1,0 +1,118 @@
+#!/usr/bin/perl
+use 5.014 ; use strict ; use warnings ; 
+use Scalar::Util qw/looks_like_number/; 
+use Getopt::Std; getopts "=3qvx:~",\my%o;
+use Term::ANSIColor qw/:constants color/; $Term::ANSIColor::AUTORESET = 1 ;
+
+&InitConst( \my$sort2 ) ;
+my ( $tableHead, %axis2, %cell, %cellc, %celle  ) ;
+&ReadingInput ; 
+&PrintingOutput ; 
+exit 0 ; 
+
+sub InitConst ($) { 
+	my $LLN=sub{looks_like_number $_[0]} ;
+	${$_[0]} = sub{ return +(sort grep{!$LLN->($_)}@_),(sort{$a<=>$b}grep{$LLN->($_)}@_) } ; 
+    *CYAN = *GREEN = sub { @_ } if $o{q} ; # -q により色出しコマンドを無効化する。
+}
+
+sub ReadingInput { 
+  	$tableHead= $o{'='}? <> : "X1\tX2" ; 
+  	chomp $tableHead; $tableHead =~ s{\t}{*} ;
+
+  	my $intflag ; 
+  	$SIG{INT} = sub { $intflag = 1 ; *STDOUT=*STDERR} ;
+
+	while(<>){
+	    chomp;
+	    my @F = split /\t/ , $_ , 3 ; #3列目以降は連結する。  -x と組み合わせて使うとよいかも。
+	    my $n =  $o{3} ?  (shift@F) : 1 ; # -3 なら先頭を取り出す。
+	    
+	    ( $F[0] , $F[1] ) = ( $F[1] , $F[0] ) if $o{'~'} ; # -x で出力行列の縦と横を反転する	
+	    grep { $_ //= 'undef' } @F[0,1] ; #//= "undef" ;$F[0] //= "undef" ;
+
+	    $cell{ $F[0] } { $F[1] } += $n || 0 ;  
+	    $cellc{ $F[0] } { $F[1] } ++ ;  
+	    $celle{ $F[0] } { $F[1] } ++ if $n eq '' ;
+	    $axis2{ $F[1] } ++ ;  
+
+	    last if ( $intflag ) ;
+	}
+}
+
+sub PrintingOutput { 
+	my @axis1 = $sort2 -> ( keys %cell ) ; # 縦軸の各項目名
+	my @axis2 = $sort2 -> ( keys %axis2 ) ; # 横軸の各項目名
+	
+	# -x のオプションで、指定された数をかけ算して、整数部分を取り出す。
+	if (exists $o{x}) {
+	    for my $i ( @axis1 ) {
+            for my $j ( @axis2 ) {
+                $cell{$i}{$j} = defined $cell{$i}{$j} ? int ( $cell{$i}{$j} * $o{x} ) . "." : '' ;
+            }
+        } 
+	}
+	
+	# 一番目のクロス表を表示
+	PrintMatrix(  \%cell , \@axis1 , \@axis2 , $tableHead ) ;
+	return  if !$o{3} ;
+	
+	# -v が指定しているかどうかで異なるクロス表を表示する。
+	if ( ! $o{v} ) { 
+		print "\n" ;
+		PrintMatrix( \%cellc , \@axis1 , \@axis2 , "items" ) ;  # カウント対象となったすべての行数
+		print "\n" ;
+		PrintMatrix( \%celle , \@axis1 , \@axis2 , "empties" ) ; # 空文字列がいくつ出現したか
+	}
+	else { 
+		my %cellv ; 
+		for my$i(@axis1){for my$j(@axis2){$cellv{$i}{$j}=($cellc{$i}{$j}//0)-($celle{$i}{$j}//0)}}
+		print "\n" ;
+		PrintMatrix( \%cellv , \@axis1 , \@axis2 , "hasVal" ) ;  # 値が入っていた項目がいくつ出現したか。
+	}
+}
+
+sub PrintMatrix ($$$$) { 
+	my ($C,$a1,$a2,$h11) = @_ ;
+	print CYAN "$h11\t",GREEN join("\t",@{$a2} ),"\n" ;
+	for my $i ( @{$a1} ) {
+	    print GREEN $i, "\t" ;
+	    print join("\t",map{ $C->{$i}{$_} || 0 } @{$a2} ),"\n" ;
+	}
+	
+}
+
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+ 
+$0 
+
+ 2列のデータを度数を数えて、クロステーブルにする。
+
+   -3 のオプションにより、先頭列を加算対象の数と見なして合計を出し、クロステーブルの各セルとする。
+
+ その他のオプション : 
+
+   -~   出力するクロステーブルの、縦軸と横軸を反転する。 
+   -x num :    出力するクロステーブルにおいて、numをかけ算した数を表示する。
+   -v   値を含む行数の表示をする。(-3が指定された場合)
+   -q  : 色を出さないようにする。
+
+ 関連するコマンド : 
+   keyvalues 
+
+=cut

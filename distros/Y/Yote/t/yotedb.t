@@ -18,17 +18,19 @@ BEGIN {
 # -----------------------------------------------------
 
 my $dir = tempdir( CLEANUP => 1 );
+#test_suite();
+my $store = Yote::open_store( $dir );
+my $root_node = $store->fetch_root;
+
+test_arry();
+test_hash();
 test_suite();
+test_upgrade_db();
 done_testing;
 
 exit( 0 );
 
 sub test_suite {
-
-    my $store = Yote::open_store( $dir );
-    my $yote_db = $store->{_DATASTORE};
-    my $root_node = $store->fetch_root;
-
     $root_node->add_to_myList( { objy =>
         $store->newobj( {
             someval => 124.42,
@@ -41,6 +43,7 @@ sub test_suite {
                                       } ),
                         } ),
                                } );
+
     is( $root_node->get_myList->[0]{objy}->get_somename, 'Käse', "utf 8 character defore stow" );
 
     $store->stow_all;
@@ -51,25 +54,17 @@ sub test_suite {
     #                   in the hash, a newobj in the obj
     # so 6 things
 
-    my $max_id = $yote_db->_max_id();
-    is( $max_id, 6, "Number of things created" );
-
     my $dup_store = Yote::open_store( $dir );
-
-    my $dup_db = $dup_store->{_DATASTORE};
-
-    $max_id = $dup_db->_max_id();
-    is( $max_id, 6, "Number of things created in newly opened store" );
 
     my $dup_root = $dup_store->fetch_root;
 
-    $max_id = $dup_db->_max_id();
-    is( $max_id, 6, "Number of things created in newly opened store" );
+    is( $dup_root->[Yote::Obj::ID], $root_node->[Yote::Obj::ID] );
+    is_deeply( $dup_root->[Yote::Obj::DATA], $root_node->[Yote::Obj::DATA] );
 
-    is( $dup_root->{ID}, $root_node->{ID} );
-    is_deeply( $dup_root->{DATA}, $root_node->{DATA} );
     is( $dup_root->get_myList->[0]{objy}->get_somename, 'Käse', "utf 8 character saved in yote object" );
-        is( $dup_root->get_myList->[0]{objy}->get_someval, '124.42', "number saved in yote object" );
+
+    is( $dup_root->get_myList->[0]{objy}->get_someval, '124.42', "number saved in yote object" );
+
     is( $dup_root->get_myList->[0]{objy}->get_someobj->get_innerval,
         "This is an \\ inner `val\\`\n with Käse \\\ essen " );
     is( $dup_root->get_myList->[0]{objy}->get_someobj->get_binnerval, "`SPANXZ" );
@@ -92,9 +87,6 @@ sub test_suite {
 
     my $hash_in_list = $list_to_remove->[0];
 
-    my $ltied = tied @$list_to_remove;
-    my $list_block_id = $ltied->[1][0];
-    
     my $list_to_remove_id = $store->_get_id( $list_to_remove );
     my $hash_in_list_id   = $store->_get_id( $hash_in_list );
 
@@ -111,55 +103,39 @@ sub test_suite {
 
     $store->stow_all;
 
-    is_deeply( $store->run_purger('keep_tally'), [], "none 4 deleted things recyled because the top non-weak reference is kept." );
-
-    undef $hash_in_list;
-
-    is_deeply( $store->run_purger('keep_tally'), [], "none 4 deleted things recyled because the top non-weak reference is kept." );
-    $hash_in_list = $list_to_remove->[0];
-
     my $quickly_removed_obj = $store->newobj( { soon => 'gone', bigstuff => ('x'x10000) } );
-    my $quickly_removed_id = $quickly_removed_obj->{ID};
+    my $quickly_removed_id = $quickly_removed_obj->[Yote::Obj::ID];
     push @$list_to_remove, "SDLFKJSDFLKJSDFKJSDHFKJSDHFKJSHDFKJSHDF" x 3, $quickly_removed_obj;
     $list_to_remove->[87] = "EIGHTYSEVEN";
 
     $store->stow_all;
-
-
-
-    undef $list_to_remove;
-    undef $quickly_removed_obj;
-
-    my $keep_db = $store->{_DATASTORE}->_generate_keep_db('keep_tally');
-
-    my $truncated_things = [sort @{$store->{_DATASTORE}->_truncate_dbs( $keep_db, 'keep tally' ) }];
-
-    my $purged_things = $store->{_DATASTORE}->_purge_objects( $keep_db, 'keep tally' );
-
-    is_deeply( [sort @$truncated_things], [ sort $list_block_id, $quickly_removed_id ], "the list had been purged by the pop" );
     
-    is_deeply( [sort @$purged_things], [ sort $list_to_remove_id ], "the list had been purged by the pop" );    
-
-    is_deeply( $store->run_purger('keep_tally'), [], "list and last list contents had been removed removed. it is not referenced by other removed items that still have references." );
+    $store->run_recycler;
+    
+    ok( $store->_fetch( $list_to_remove_id ), "removed list not yet removed" );    
+    ok( $store->_fetch( $hash_in_list_id ), "removed hash id not yet removed" );
+    
+    ok( $store->_fetch( $objy_id ), "removed objy still removed" );
+    ok( $store->_fetch( $someobj_id ), "removed someobj still removed" );
 
     undef $hash_in_list;
-
-    is_deeply( [ sort @{$store->run_purger('keep_tally')} ], [ sort $hash_in_list_id, $objy_id, $someobj_id, @bucket_in_hash_in_list ], "all remaining things that can't trace to the root are removed" );
+    undef $list_to_remove;
+    undef $quickly_removed_obj;
+    
+    $store->run_recycler;
+    
+    ok( ! $store->_fetch( $list_to_remove_id ), "removed list still removed" );
+    ok( ! $store->_fetch( $hash_in_list_id ), "removed hash id still removed" );
+    ok( ! $store->_fetch( $objy_id ), "removed objy still removed" );
+    ok( ! $store->_fetch( $someobj_id ), "removed someobj still removed" );
 
     undef $dup_root;
 
     undef $root_node;
 
-    $store->run_purger('keep_tally');
+    $Yote::Hash::SIZE = 7;
 
-    ok( ! $store->fetch( $list_to_remove_id ), "removed list still removed" );
-    ok( ! $store->fetch( $hash_in_list_id ), "removed hash id still removed" );
-    ok( ! $store->fetch( $objy_id ), "removed objy still removed" );
-    ok( ! $store->fetch( $someobj_id ), "removed someobj still removed" );
-
-    $Yote::BigHash::SIZE = 7;
-
-    my $thash = $store->fetch_root->get_test_hash({});
+    my $thash = $store->fetch_root->set_test_hash({});
     # test for hashes large enough that subhashes are inside
 
     my( %confirm_hash );
@@ -192,9 +168,9 @@ sub test_suite {
         $confirm_hash{$letter} = $val;
         $val++;
     }
-
     $store->stow_all;
-
+    undef $store;
+    
     my $sup_store = Yote::open_store( $dir );
     $thash = $sup_store->fetch_root->get_test_hash;
 
@@ -204,24 +180,26 @@ sub test_suite {
 
     # array tests
     # listy test because
-    $Yote::ArrayGatekeeper::BLOCK_SIZE  = 4;
-    $Yote::ArrayGatekeeper::BLOCK_COUNT = 4;
-    
-     $root_node = $store->fetch_root;
+    $Yote::Array::MAX_BLOCKS  = 4;
+
+    $store = $sup_store;
+    $root_node = $store->fetch_root;
     my $l = $root_node->get_listy( [] );
 
     push @$l, "ONE", "TWO";
     is_deeply( $l, ["ONE", "TWO"], "first push" );
     is( @$l, 2, "Size two" );
+    is( $#$l, 1, "last index 1" );
 
     push @$l, "THREE", "FOUR", "FIVE";
     is_deeply( $l, ["ONE", "TWO", "THREE", "FOUR", "FIVE"], "push 1" );
     is( @$l, 5, "Size five" );
+    is( $#$l, 4, "last index 1" );
 
     push @$l, "SIX", "SEVEN", "EIGHT", "NINE";
+
     is_deeply( $l, ["ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE"], "push 2" );
     is( @$l, 9, "Size nine" );
-
 
     push @$l, "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN", "FIFTEEN", "SIXTEEN";
     is_deeply( $l, ["ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN", "FIFTEEN", "SIXTEEN"], "push 3" );
@@ -240,16 +218,13 @@ sub test_suite {
     push @$l, "TWENTY","TWENTYONE";
     is_deeply( $l, ["ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN", "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTTEEN", "NINETEEN", "TWENTY","TWENTYONE"], "push 6" );
     is( @$l, 21, "Size twentyone" );
-
     my $v = shift @$l;
     is( $v, "ONE" );
     is_deeply( $l, ["TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN", "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTTEEN", "NINETEEN", "TWENTY","TWENTYONE"], "first shift" );
     is( @$l, 20, "Size twenty" );
-
     push @$l, $v;
     is_deeply( $l, ["TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN", "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTTEEN", "NINETEEN", "TWENTY","TWENTYONE", "ONE"], "push 7" );
     is( @$l, 21, "Size twentyone again" );
-
     unshift @$l, 'ZERO';
 
     is_deeply( $l, ["ZERO", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN", "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTTEEN", "NINETEEN", "TWENTY","TWENTYONE", "ONE"], "first unshift" );
@@ -281,7 +256,7 @@ sub test_suite {
     is_deeply( $l, ["ZERO", undef, "THREE", "NEENER", "BOINK", "NEENER",
                     "NINE", "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN", "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTTEEN", "NINETEEN", "TWENTY","TWENTYONE"], "first delete" );
     ok( exists( $l->[0] ), "exists" );
-    ok( !exists( $l->[1] ), "doesnt exist" );
+    ok( !exists( $l->[1] ), "undefined" );
     ok( !exists( $l->[$#$l+1] ), "doesnt exist beyond" );
     ok( exists( $l->[$#$l] ), "exists at end" );
 
@@ -296,8 +271,196 @@ sub test_suite {
     is( $#$l, -1, "last after clear" );
     is( scalar(@$l), 0, "size after clear" );
 
+    $Yote::Array::MAX_BLOCKS  = 82;
+    
+    push @$l, 0..10000;
+    $store->stow_all;
+    my $other_store = Yote::open_store( $dir );
+    $root_node = $store->fetch_root;
+    my $ol = $root_node->get_listy( [] );
+
+    is_deeply( $l, $ol, "lists compare" );
+
 } #test suite
 
+sub _cmpa {
+    my( $title, @pairs ) = @_;
+    while( @pairs ) {
+        my $actual = shift @pairs;
+        my $expected = shift @pairs;
+        if( ref( $expected ) ) {
+            is_deeply( $actual, $expected, $title );
+            is( scalar( @$actual ), scalar( @$expected ), "$title size" );
+            is( $#$actual, $#$expected, "$title index" );
+        } else {
+            is( $actual, $expected, $title );
+        }
+    }
+}
+
+sub _cmph {
+    my( $title, @pairs ) = @_;
+    while( @pairs ) {
+        my $actual = shift @pairs;
+        my $expected = shift @pairs;
+        if( ref( $expected ) ) {
+            is_deeply( $actual, $expected, $title );
+            is_deeply( [sort keys( %$actual )], [sort  keys( %$expected ) ], "$title keys" );
+            is( scalar( values( %$actual )), scalar(  values( %$expected ) ), "$title value counts" );
+        } else {
+            is( $actual, $expected, $title );
+        }
+    }
+}
+
+
+sub test_hash {
+    for my $SZ (2..30) {
+        $Yote::Hash::SIZE = $SZ;
+        my $hash = $root_node->set_hash({});
+        my $match = {};
+        $hash->{FOO} = "BAR";
+        $match->{FOO} = "BAR";
+
+        _cmph( "FIRSTFROO", $hash, $match );
+        $hash->{FOO} = "BAF";
+        $match->{FOO} = "BAF";
+        _cmph( "SecondFOO", $hash, $match );
+
+        my( @keys ) = ("A".."Z");
+        my( @vals ) = (1..26);
+        while( @keys ) {
+            my $k = shift @keys;
+            my $v = shift @vals;
+            $hash->{$k} = $v;
+            $match->{$k} = $v;
+        }
+        _cmph( "alphawet buckets $SZ", $hash, $match );
+
+    } #each size
+}
+
+sub test_arry {
+#    for my $SZ (2..9) {
+    for my $SZ (7..7) {
+        $Yote::Array::MAX_BLOCKS  = $SZ;
+
+        my $arry = $root_node->set_arry( [] );
+        my $match = [];
+
+        _cmpa( "empty start $SZ", $arry, $match );
+
+        _cmpa( "fifth el $SZ", $arry->[4], $match->[4] );
+
+        $arry->[8] = "EI";
+        $match->[8] = "EI";
+        _cmpa( "oneel $SZ", $arry, $match );
+
+        _cmpa( "exists nothing $SZ", exists $arry->[9], exists $match->[9] );
+        _cmpa( "exists yada $SZ", exists $arry->[8], exists $match->[8] );
+        _cmpa( "exists bevore $SZ", exists $arry->[4], exists $match->[4] );
+
+        $arry->[81] = "EI2";
+        $match->[81] = "EI2";
+        _cmpa( "oneel $SZ", $arry, $match );
+
+        $store->stow_all;
+
+        my $other_store = Yote::open_store( $dir );
+        my $aloaded = $other_store->fetch_root->get_arry;
+
+        _cmpa( "SAVED LOADED", $aloaded, $match );
+
+        my $a = $arry->[82];
+        my $m = $match->[82];
+
+        _cmpa( "delnow1 $SZ", $arry, $match, $a, $m );
+
+        $a = delete $arry->[81];
+        $m = delete $match->[81];
+        _cmpa( "delnow2 $SZ", $arry, $match, $a, $m );
+
+        $a = delete $arry->[81];
+        $m = delete $match->[81];
+        _cmpa( "delnowagain $SZ", $arry, $match, $a, $m );
+
+        $a = pop @$arry;
+        $m = pop @$match;
+        _cmpa( "pops $SZ", $arry, $match, $a, $m );
+
+        @{$arry} = ();
+        @{$match} = ();
+        _cmpa( "clear $SZ", $arry, $match );
+
+        $#$arry = 17;
+        $#$match = 17;
+        _cmpa( "setsize $SZ", $arry, $match );
+
+        unshift @$arry, "HERE ARE SOME THINGS", "AND AGAIN";
+        unshift @$match, "HERE ARE SOME THINGS", "AND AGAIN";
+        _cmpa( "unshift $SZ", $arry, $match );
+
+        $a = shift @$arry;
+        $m = shift @$match;
+        _cmpa( "shift $SZ", $arry, $match, $a, $m );
+
+        unshift @$arry, 'A'..'L';
+        unshift @$match, 'A'..'L';
+
+        _cmpa( "unshift more $SZ", $arry, $match, $a, $m );
+
+        $arry = $root_node->set_arry_more( [ 1 .. 19 ] );
+        $match = [ 1 .. 19 ];
+        is_deeply( $arry, $match, "INITIAL $SZ" );
+        is( @$arry, 19, "19 items" );
+        is( $#$arry, 18, "last idx is 18" );
+        $a = shift @$arry;
+        $m = shift @$match;
+        is( $a, $m, "SHIFT $SZ" );
+        is_deeply( $arry, $match, "AFTER SHIFT $SZ" );
+        is( @$arry, 18, "18 items" );
+        is( $#$arry, 17, "last idx is 17" );
+        $a = pop @$arry;
+        $m = pop @$match;
+        is( $a, $m, "POP $SZ" );
+        is_deeply( $arry, $match, "AFTER POP $SZ" );
+        is( @$arry, 17, "17 items" );
+        is( $#$arry, 16, "last idx is 16" );
+
+        my( @a ) = splice @$arry, 3, 4, ("A".."N");
+        my( @m ) = splice @$match, 3, 4, ("A".."N");
+
+        is_deeply( $arry, $match, "AFTER SPLICE $SZ" );
+        is_deeply( \@a, \@m, "SPLICE return $SZ" );
+
+        my $a2 = $root_node->set_arry2([]);
+        my $m2 = [];
+
+        $a2->[55] = "Z";
+        $m2->[55] = "Z";
+        is( $#$a2, $#$m2, "Same last index $SZ" );
+        is( @$a2, @$m2, "Same size $SZ" );
+        is_deeply( $a2, $m2, "Same stuff $SZ" );
+
+        my( @sa ) = splice @$a2, 3, 44;
+        my( @sm ) = splice @$m2, 3, 44;
+        is( $#$a2, $#$m2, "empty splice last idx $SZ" );
+        is( @$a2, @$m2, "empty splice size $SZ" );
+        is_deeply( $a2, $m2, "empty splice stuff $SZ" );
+
+
+        print STDERR Data::Dumper->Dump(["NOW DO EDGE CASE for when each is called but not finished and the thing has a live WEAK ref but no trace to the root and make sure it gets removed when that WEAK ref died"]);
+        
+    } #each bucketsize
+} #test_arry
+
+sub test_upgrade_db {
+    "get an old db and make sure it updates properly. go back versions
+and create databases for those versions";
+
+    
+    
+} #test_upgrade_db
 
 __END__
 

@@ -1,33 +1,58 @@
 ---
 abstract: 'Catmandu module for working with SRU data'
 author:
-  - 'Wouter Willaert <wouterw@inuits.eu>'
+  - 'Wouter Willaert, C<< <wouterw@inuits.eu> >>'
 build_requires:
-  Software::License: 0
-  Test::Exception: 0
-  Test::More: 0
+  Module::Build: '0.28'
+  Test::Exception: '0'
+  Test::More: '1.001003'
+  Test::Pod: '0'
+  Test::Simple: '1.001003'
+  XML::XPath: '1.13'
 configure_requires:
-  Module::Build: 0.38
-dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.120921'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Catmandu-SRU
-provides:
-  Catmandu::Importer::SRU:
-    file: lib/Catmandu/Importer/SRU.pm
-    version: 0
-  Catmandu::SRU:
-    file: lib/Catmandu/SRU.pm
-    version: 0.0101
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
-  Catmandu: 0.0302
-  Furl: 0.41
-  Moo: 1.000003
-  XML::LibXML::Simple: 0.91
+  Catmandu: '0.9204'
+  Catmandu::MODS: '0.31'
+  Cpanel::JSON::XS: '3.0213'
+  Furl: '0.41'
+  Moo: '1.005000'
+  URI::Escape: '1.60'
+  XML::LibXML::Simple: '0.91'
+  XML::Struct: '0.16'
+  YAML::XS: '0.34'
   perl: v5.10.1
 resources:
-  license: http://dev.perl.org/licenses/
-version: 0.0101
+  bugtracker: https://github.com/LibreCat/Catmandu-SRU/issues
+  homepage: https://github.com/LibreCat/Catmandu-SRU
+  repository: https://github.com/LibreCat/Catmandu-SRU.git
+version: '0.421'
+x_contributors:
+  - 'Carsten Klee <carsten.klee@sbb.spk-berlin.de>'
+  - 'Carsten Klee <cKlee@users.noreply.github.com>'
+  - 'Christian Pietsch <christian.pietsch@uni-bielefeld.de>'
+  - 'Jakob Voss <jakob@nichtich.de>'
+  - 'Jakob Voss <voss@gbv.de>'
+  - 'Johann Rolschewski <jorol@cpan.org>'
+  - 'Johann Rolschewski <rolschewski@gmail.com>'
+  - 'Nicolas Franck <njfranck@ca20c526.ugent.be>'
+  - 'Nicolas Steenlant <nicolas.steenlant@gmail.com>'
+  - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
+  - 'wouterw <wouter.willaert@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

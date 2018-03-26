@@ -1,5 +1,5 @@
 package Statocles::Link;
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 # ABSTRACT: A link object to build <a> and <link> tags
 
 use Statocles::Base 'Class';
@@ -17,8 +17,8 @@ has href => (
     required => 1,
     coerce => sub {
         my ( $href ) = @_;
-        if ( blessed $href && $href->isa( 'Path::Tiny' ) ) {
-            return $href->absolute( '/' )->stringify;
+        if ( blessed $href && $href->isa( 'Mojo::Path' ) ) {
+            return $href->to_abs_string;
         }
         return $href;
     },
@@ -105,7 +105,7 @@ Statocles::Link - A link object to build <a> and <link> tags
 
 =head1 VERSION
 
-version 0.088
+version 0.089
 
 =head1 SYNOPSIS
 

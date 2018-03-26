@@ -1,5 +1,15 @@
 Release history for perl-Dist-Zilla-Plugin-Templates
 
+v0.6.5 @ 2018-03-22 20:35 UTC
+
+    -   `Text::Template` != 1.48, != 1.49, != 1.50, != 1.51 required because these versions will
+        definitely cause test failure, see
+        <https://github.com/mschout/perl-text-template/issues/10>.
+
+    -   SPDX license identifier added to source files.
+
+    -   Tiny documentation update.
+
 v0.6.4 @ 2016-12-28 20:24 UTC
 
     -   No user-visible changes.

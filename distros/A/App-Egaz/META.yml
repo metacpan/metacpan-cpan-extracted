@@ -1,0 +1,62 @@
+---
+abstract: "It's new $module"
+author:
+  - 'wang-q <wang-q@outlook.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.16, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Egaz
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::Egaz:
+    file: lib/App/Egaz.pm
+    version: v0.0.8
+  App::Egaz::Command::formats:
+    file: lib/App/Egaz/Command/formats.pm
+  App::Egaz::Command::lav2axt:
+    file: lib/App/Egaz/Command/lav2axt.pm
+  App::Egaz::Command::lav2psl:
+    file: lib/App/Egaz/Command/lav2psl.pm
+  App::Egaz::Command::masked:
+    file: lib/App/Egaz/Command/masked.pm
+  App::Egaz::Command::maskfasta:
+    file: lib/App/Egaz/Command/maskfasta.pm
+  App::Egaz::Command::normalize:
+    file: lib/App/Egaz/Command/normalize.pm
+  App::Egaz::Command::partition:
+    file: lib/App/Egaz/Command/partition.pm
+  App::Egaz::Common:
+    file: lib/App/Egaz/Common.pm
+requires:
+  App::Cmd: '0.330'
+  App::Fasops: v0.5.11
+  File::ShareDir: '1.102'
+  IO::Zlib: '0'
+  IPC::Cmd: '0'
+  List::Util: '0'
+  Path::Tiny: '0.076'
+  Template: '2.26'
+  YAML::Syck: '1.29'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/wang-q/App-Egaz/issues
+  homepage: https://github.com/wang-q/App-Egaz
+  repository: git://github.com/wang-q/App-Egaz.git
+version: 0.0.8
+x_authority: cpan:WANGQ

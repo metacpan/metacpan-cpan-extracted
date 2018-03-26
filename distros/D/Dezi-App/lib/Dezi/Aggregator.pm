@@ -12,7 +12,7 @@ use Data::Dump qw( dump );
 
 use namespace::autoclean;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 has 'set_parser_from_type' => ( is => 'rw', isa => Bool, default => sub {1} );
 has 'indexer' => (
@@ -47,25 +47,25 @@ Dezi::Aggregator - document aggregation base class
  package MyAggregator;
  use Moose;
  extends 'Dezi::Aggregator';
- 
+
  sub get_doc {
     my ($self, $url) = @_;
-    
+
     # do something to create a Dezi::Indexer::Doc object from $url
-    
+
     return $doc;
  }
- 
+
  sub crawl {
     my ($self, @where) = @_;
-    
+
     foreach my $place (@where) {
-       
+
        # do something to search $place for docs to pass to get_doc()
-       
+
     }
  }
- 
+
  1;
 
 =head1 DESCRIPTION
@@ -81,7 +81,7 @@ of aggregators that crawl the filesystem and web, respectively.
 
 =head2 BUILD
 
-Set object flags per Dezi::Class API. These are also accessors, 
+Set object flags per Dezi::Class API. These are also accessors,
 and include:
 
 =over
@@ -381,7 +381,7 @@ Peter Karman, E<lt>perl@peknet.comE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-swish-prog at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
@@ -420,10 +420,10 @@ L<http://search.cpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008-2009 by Peter Karman
+Copyright 2008-2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

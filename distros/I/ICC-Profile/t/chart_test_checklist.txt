@@ -1,0 +1,67 @@
+√ indicates '40_Chart.t' tests are complete / 2013-07-20
+
+new (ASCII, CxF3, TIFF, ICC, folders, array, hash)
+header
+array
+size
+√rows
+√cols
+√fmt_keys
+√context
+√test
+keyword
+created
+√slice
+colorimetry
+√id
+√name
+√rgb
+√cmyk
+√hex
+√nCLR
+√device
+ctv
+lab
+xyz
+density
+√spectral
+nm
+wavelength
+iwtpt
+wtpt
+bkpt
+splice_rows
+splice_cols
+add_avg
+add_fmt
+add_ctv
+add_lab
+add_xyz
+add_density
+select_matrix
+select_template
+ramp
+range
+randomize
+analyze
+write
+writeCxF3
+writeTIFF
+writeASE
+dump
+sdump
+
+Math::Matrix
+rotate
+flip
+randomize
+
+notes:
+
+- all of the shortcut methods have some basic tests. the 'xyz' method is missing from some test groups. there is XYZ data in the CMYK-Lab files.
+
+- 'lab', 'xyz' and 'density' now have encoding options, which need testing.
+
+- ASE and TIFF files can be written and read, so it is now possible to do round trip testing.
+
+

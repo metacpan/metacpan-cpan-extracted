@@ -1,11 +1,12 @@
 package Statocles::App::Blog;
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 # ABSTRACT: A blog application
 
 use Text::Unidecode;
 use Statocles::Base 'Class';
 use Getopt::Long qw( GetOptionsFromArray );
 use Statocles::Store;
+use Statocles::Document;
 use Statocles::Page::Document;
 use Statocles::Page::List;
 use Statocles::Util qw( run_editor );
@@ -184,18 +185,15 @@ sub command {
             map { "$_:s" } @doc_opts,
         );
 
-        my %doc = (
-            %{ $self->_default_post },
-            (map { defined $opt{$_} ? ( $_, $opt{$_} ) : () } @doc_opts),
-            title => join " ", @argv[1..$#argv],
-        );
+        my $doc;
 
         # Read post content on STDIN
         if ( !-t *STDIN ) {
             my $content = do { local $/; <STDIN> };
-            %doc = (
-                %doc,
-                $self->store->parse_frontmatter( "<STDIN>", $content ),
+            $doc = Statocles::Document->parse_content(
+                (map { defined $opt{$_} ? ( $_, $opt{$_} ) : () } @doc_opts),
+                ( @argv > 1 ? ( title => join( " ", @argv[1..$#argv] ) ) : () ),
+                content => $content,
             );
 
             # Re-open STDIN as the TTY so that the editor (vim) can use it
@@ -205,8 +203,15 @@ sub command {
                 open STDIN, '/dev/tty';
             }
         }
+        else {
+            $doc = Statocles::Document->new(
+                %{ $self->_default_post },
+                (map { defined $opt{$_} ? ( $_, $opt{$_} ) : () } @doc_opts),
+                ( @argv > 1 ? ( title => join( " ", @argv[1..$#argv] ) ) : () ),
+            );
+        }
 
-        if ( !$ENV{EDITOR} && !$doc{title} ) {
+        if ( !$ENV{EDITOR} && !$doc->title ) {
             say STDERR <<"ENDHELP";
 Title is required when \$EDITOR is not set.
 
@@ -231,20 +236,31 @@ ENDHELP
             sprintf( '%02i', $day ),
         );
 
-        my $slug = $self->make_slug( $doc{title} || "new post" );
-        my $path = Path::Tiny->new( @date_parts, $slug, "index.markdown" );
-        $self->store->write_document( $path => \%doc );
-        my $full_path = $self->store->path->child( $path );
+        my $slug = $self->make_slug( $doc->title || "new post" );
+        my @partsdir = (@date_parts, $slug);
+        my @partsfile = (@partsdir, "index.markdown");
+        my $path = Mojo::Path->new->parts(\@partsfile);
+        $self->store->write_file( $path => $doc );
+        my $full_path = $self->store->path->child( @partsfile );
 
         if ( run_editor( $full_path ) ) {
-            my $old_title = $doc{title};
-            %doc = %{ $self->store->read_document( $path ) };
-            if ( $doc{title} ne $old_title ) {
-                $self->store->path->child( $path->parent )->remove_tree;
-                $slug = $self->make_slug( $doc{title} || "new post" );
-                $path = Path::Tiny->new( @date_parts, $slug, "index.markdown" );
-                $self->store->write_document( $path => \%doc );
-                $full_path = $self->store->path->child( $path );
+            my $old_title = $doc->title;
+            ; say "Old title: " . $doc->title;
+            my $content = $full_path->slurp_utf8;
+            my $doc = Statocles::Document->parse_content(
+                path => $path.'',
+                store => $self->store,
+                content => $content,
+            );
+            ; say "New title: " . $doc->title;
+            if ( $doc->title ne $old_title ) {
+                $self->store->path->child( @partsdir )->remove_tree;
+                $slug = $self->make_slug( $doc->title || "new post" );
+                @partsdir = (@date_parts, $slug);
+                @partsfile = (@partsdir, "index.markdown");
+                $path = Mojo::Path->new->parts(\@partsfile);
+                $self->store->write_file( $path => $doc );
+                $full_path = $self->store->path->child( @partsfile );
             }
         }
 
@@ -323,8 +339,8 @@ sub index {
 
     my @pages = Statocles::Page::List->paginate(
         after => $self->page_size,
-        path => $self->url_root . '/page/%i/index.html',
-        index => $self->url_root . '/index.html',
+        path => $self->url( 'page/%i/index.html', 1 ),
+        index => $self->url( 'index.html' ),
         pages => [ _sort_page_list( @index_post_pages ) ],
         app => $self,
         template => $self->template( 'index.html' ),
@@ -340,7 +356,7 @@ sub index {
         my $page = Statocles::Page::List->new(
             app => $self,
             pages => $index->pages,
-            path => $self->url_root . '/index.' . $feed,
+            path => $self->url( 'index.' . $feed ),
             template => $self->template( $FEEDS{$feed}{template} ),
             links => {
                 alternate => [
@@ -356,7 +372,7 @@ sub index {
         push @feed_pages, $page;
         push @feed_links, $self->link(
             text => $FEEDS{ $feed }{ text },
-            href => $page->path->stringify,
+            href => $page->path.'',
             type => $page->type,
         );
     }
@@ -384,10 +400,11 @@ sub tag_pages {
 
     my @pages;
     for my $tag ( keys %$tagged_docs ) {
+        my $tagroot = $self->url( join "/", 'tag', $self->_tag_url( $tag ) );
         my @tag_pages = Statocles::Page::List->paginate(
             after => $self->page_size,
-            path => join( "/", $self->url_root, 'tag', $self->_tag_url( $tag ), 'page/%i/index.html' ),
-            index => join( "/", $self->url_root, 'tag', $self->_tag_url( $tag ), 'index.html' ),
+            path => join( "/", $tagroot, 'page/%i/index.html' ),
+            index => join( "/", $tagroot, 'index.html' ),
             pages => [ _sort_page_list( @{ $tagged_docs->{ $tag } } ) ],
             app => $self,
             template => $self->template( 'index.html' ),
@@ -407,7 +424,7 @@ sub tag_pages {
             my $page = Statocles::Page::List->new(
                 app => $self,
                 pages => $index->pages,
-                path => join( "/", $self->url_root, 'tag', $tag_file ),
+                path => $self->url( join( "/", 'tag', $tag_file ) ),
                 template => $self->template( $FEEDS{$feed}{template} ),
                 links => {
                     alternate => [
@@ -423,7 +440,7 @@ sub tag_pages {
             push @feed_pages, $page;
             push @feed_links, $self->link(
                 text => $FEEDS{ $feed }{ text },
-                href => $page->path->stringify,
+                href => $page->path.'',
                 type => $page->type,
             );
         }
@@ -649,7 +666,7 @@ Statocles::App::Blog - A blog application
 
 =head1 VERSION
 
-version 0.088
+version 0.089
 
 =head1 DESCRIPTION
 

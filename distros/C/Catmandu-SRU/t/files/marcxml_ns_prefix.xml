@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+  <zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/" xmlns:mytestprefix="http://www.loc.gov/MARC21/slim" >
+    <zs:version>1.1</zs:version>
+    <zs:numberOfRecords>79446</zs:numberOfRecords>
+    <zs:records>
+        <zs:record>
+          <zs:recordPacking>xml</zs:recordPacking>
+          <zs:recordData>
+              	<mytestprefix:record>
+		<mytestprefix:leader>00000ndd a2200000 u 4500</mytestprefix:leader>
+		<mytestprefix:controlfield tag="001">004641415</mytestprefix:controlfield>
+		<mytestprefix:controlfield tag="003">DE-633</mytestprefix:controlfield>
+		<mytestprefix:controlfield tag="005">20161205081635.0</mytestprefix:controlfield>
+		<mytestprefix:datafield tag="031" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">1</mytestprefix:subfield>
+			<mytestprefix:subfield code="b">1</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">1</mytestprefix:subfield>
+			<mytestprefix:subfield code="d">[without title].</mytestprefix:subfield>
+			<mytestprefix:subfield code="g">F-4</mytestprefix:subfield>
+			<mytestprefix:subfield code="m">V</mytestprefix:subfield>
+			<mytestprefix:subfield code="n">bBEA</mytestprefix:subfield>
+			<mytestprefix:subfield code="o">3/4</mytestprefix:subfield>
+			<mytestprefix:subfield code="p">,8GAG/4.G8DEC/4D8-</mytestprefix:subfield>
+			<mytestprefix:subfield code="r">E|b</mytestprefix:subfield>
+			<mytestprefix:subfield code="t">Wer nie sein Brot mit Tränen aß</mytestprefix:subfield>
+			<mytestprefix:subfield code="u">20042863</mytestprefix:subfield>
+			<mytestprefix:subfield code="2">pe</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="040" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">DE-633</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="041" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">ger</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="100" ind1="1" ind2=" ">
+			<mytestprefix:subfield code="a">Zelter, Carl Friedrich</mytestprefix:subfield>
+			<mytestprefix:subfield code="d">1758-1832</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">98629</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="240" ind1="1" ind2="0">
+			<mytestprefix:subfield code="a">Wer nie sein Brot mit Tränen aß</mytestprefix:subfield>
+			<mytestprefix:subfield code="m">V</mytestprefix:subfield>
+			<mytestprefix:subfield code="r">E|b</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">3917680</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="245" ind1="1" ind2="0">
+			<mytestprefix:subfield code="a">[without title]</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="300" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">score: 1p. [p. 3]</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">34 x 21 cm</mytestprefix:subfield>
+			<mytestprefix:subfield code="8">01</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="500" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">Einsystemige Skizze von Zelters Hand mit Blei auf den Text &quot;Wer nie sein Brot mit Tränen aß&quot;.</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="592" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">[letters in circle, countermark letters (not to identify)]</mytestprefix:subfield>
+			<mytestprefix:subfield code="8">01</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="593" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">Autograph manuscript</mytestprefix:subfield>
+			<mytestprefix:subfield code="8">01</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="594" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="b">B</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">1</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="594" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">B</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="650" ind1="0" ind2="0">
+			<mytestprefix:subfield code="a">Lieder</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">25227</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="700" ind1="1" ind2=" ">
+			<mytestprefix:subfield code="a">Goethe, Johann Wolfgang von</mytestprefix:subfield>
+			<mytestprefix:subfield code="d">1749-1832</mytestprefix:subfield>
+			<mytestprefix:subfield code="j">Ascertained</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">173930</mytestprefix:subfield>
+			<mytestprefix:subfield code="4">lyr</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="773" ind1="0" ind2=" ">
+			<mytestprefix:subfield code="w">464141752</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="852" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">D-B</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">Mus.ms.autogr. Zelter, K. F. 17 (3)</mytestprefix:subfield>
+			<mytestprefix:subfield code="e">Staatsbibliothek zu Berlin - Preußischer Kulturbesitz, Musikabteilung</mytestprefix:subfield>
+			<mytestprefix:subfield code="x">30000655</mytestprefix:subfield>
+		</mytestprefix:datafield>
+	</mytestprefix:record>
+
+          </zs:recordData>
+          <zs:recordPosition>1</zs:recordPosition>
+        </zs:record>
+        <zs:record>
+          <zs:recordPacking>xml</zs:recordPacking>
+          <zs:recordData>
+              	<mytestprefix:record>
+		<mytestprefix:leader>00000ndd a2200000 u 4500</mytestprefix:leader>
+		<mytestprefix:controlfield tag="001">004641416</mytestprefix:controlfield>
+		<mytestprefix:controlfield tag="003">DE-633</mytestprefix:controlfield>
+		<mytestprefix:controlfield tag="005">20161205081635.0</mytestprefix:controlfield>
+		<mytestprefix:datafield tag="031" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">1</mytestprefix:subfield>
+			<mytestprefix:subfield code="b">1</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">1</mytestprefix:subfield>
+			<mytestprefix:subfield code="d">Andantino.</mytestprefix:subfield>
+			<mytestprefix:subfield code="g">G-2</mytestprefix:subfield>
+			<mytestprefix:subfield code="m">V</mytestprefix:subfield>
+			<mytestprefix:subfield code="n">bBEA</mytestprefix:subfield>
+			<mytestprefix:subfield code="o">2/4</mytestprefix:subfield>
+			<mytestprefix:subfield code="p">&#39;{6CE}/8GGG&#39;&#39;C/&#39;GGG&#39;&#39;C/&#39;nBG&#39;&#39;C&#39;C/</mytestprefix:subfield>
+			<mytestprefix:subfield code="r">c</mytestprefix:subfield>
+			<mytestprefix:subfield code="t">Es war ein Kind das wollte nie</mytestprefix:subfield>
+			<mytestprefix:subfield code="u">20042865</mytestprefix:subfield>
+			<mytestprefix:subfield code="2">pe</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="040" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">DE-633</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="041" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">ger</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="100" ind1="1" ind2=" ">
+			<mytestprefix:subfield code="a">Zelter, Carl Friedrich</mytestprefix:subfield>
+			<mytestprefix:subfield code="d">1758-1832</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">98629</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="240" ind1="1" ind2="0">
+			<mytestprefix:subfield code="a">Die wackelnde Glocke</mytestprefix:subfield>
+			<mytestprefix:subfield code="m">V, pf</mytestprefix:subfield>
+			<mytestprefix:subfield code="r">c</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">3917682</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="245" ind1="1" ind2="0">
+			<mytestprefix:subfield code="a">[caption title, p. 4:] Die wackelnde Glocke [right:] B. 5. Januar 1814.</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="260" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="c">1814</mytestprefix:subfield>
+			<mytestprefix:subfield code="8">01</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="300" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">score: 1p. [p. 4]</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">34 x 21 cm</mytestprefix:subfield>
+			<mytestprefix:subfield code="8">01</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="592" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">[letters in circle, countermark letters (not to identify)]</mytestprefix:subfield>
+			<mytestprefix:subfield code="8">01</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="593" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">Autograph manuscript</mytestprefix:subfield>
+			<mytestprefix:subfield code="8">01</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="594" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="b">V</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">1</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="594" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="b">pf</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">1</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="594" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">V, pf</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="650" ind1="0" ind2="0">
+			<mytestprefix:subfield code="a">Lieder</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">25227</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="700" ind1="1" ind2=" ">
+			<mytestprefix:subfield code="a">Goethe, Johann Wolfgang von</mytestprefix:subfield>
+			<mytestprefix:subfield code="d">1749-1832</mytestprefix:subfield>
+			<mytestprefix:subfield code="j">Ascertained</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">173930</mytestprefix:subfield>
+			<mytestprefix:subfield code="4">lyr</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="730" ind1="0" ind2=" ">
+			<mytestprefix:subfield code="a">Es war ein Kind das wollte nie</mytestprefix:subfield>
+			<mytestprefix:subfield code="g">RISM</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">3917681</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="773" ind1="0" ind2=" ">
+			<mytestprefix:subfield code="w">464141752</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="852" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">D-B</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">Mus.ms.autogr. Zelter, K. F. 17 (4)</mytestprefix:subfield>
+			<mytestprefix:subfield code="e">Staatsbibliothek zu Berlin - Preußischer Kulturbesitz, Musikabteilung</mytestprefix:subfield>
+			<mytestprefix:subfield code="x">30000655</mytestprefix:subfield>
+		</mytestprefix:datafield>
+	</mytestprefix:record>
+
+          </zs:recordData>
+          <zs:recordPosition>2</zs:recordPosition>
+        </zs:record>
+        <zs:record>
+          <zs:recordPacking>xml</zs:recordPacking>
+          <zs:recordData>
+              	<mytestprefix:record>
+		<mytestprefix:leader>00000ndd a2200000 u 4500</mytestprefix:leader>
+		<mytestprefix:controlfield tag="001">004641417</mytestprefix:controlfield>
+		<mytestprefix:controlfield tag="003">DE-633</mytestprefix:controlfield>
+		<mytestprefix:controlfield tag="005">20161205081635.0</mytestprefix:controlfield>
+		<mytestprefix:datafield tag="031" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">1</mytestprefix:subfield>
+			<mytestprefix:subfield code="b">1</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">1</mytestprefix:subfield>
+			<mytestprefix:subfield code="d">[without title].</mytestprefix:subfield>
+			<mytestprefix:subfield code="g">C-4</mytestprefix:subfield>
+			<mytestprefix:subfield code="m">Coro T</mytestprefix:subfield>
+			<mytestprefix:subfield code="n">bBEA</mytestprefix:subfield>
+			<mytestprefix:subfield code="o">3/4</mytestprefix:subfield>
+			<mytestprefix:subfield code="p">,8GA/4.B8B&#39;C,A/4B4-</mytestprefix:subfield>
+			<mytestprefix:subfield code="r">c</mytestprefix:subfield>
+			<mytestprefix:subfield code="t">Was verklärt im Sturmes Drang</mytestprefix:subfield>
+			<mytestprefix:subfield code="u">20042867</mytestprefix:subfield>
+			<mytestprefix:subfield code="2">pe</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="040" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">DE-633</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="041" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">ger</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="100" ind1="1" ind2=" ">
+			<mytestprefix:subfield code="a">Zelter, Carl Friedrich</mytestprefix:subfield>
+			<mytestprefix:subfield code="d">1758-1832</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">98629</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="240" ind1="1" ind2="0">
+			<mytestprefix:subfield code="a">Was verklärt im Sturmes Drang</mytestprefix:subfield>
+			<mytestprefix:subfield code="m">coro</mytestprefix:subfield>
+			<mytestprefix:subfield code="r">c</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">3917677</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="245" ind1="1" ind2="0">
+			<mytestprefix:subfield code="a">[without title]</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="260" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="c">1815 (&quot;B 30 8br | 1815.&quot;)</mytestprefix:subfield>
+			<mytestprefix:subfield code="8">01</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="300" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">score: 1p. [p. 5]</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">37 x 22 cm</mytestprefix:subfield>
+			<mytestprefix:subfield code="8">01</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="592" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">[not to identify]</mytestprefix:subfield>
+			<mytestprefix:subfield code="8">01</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="593" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">Autograph manuscript</mytestprefix:subfield>
+			<mytestprefix:subfield code="8">01</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="594" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="b">Coro S</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">1</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="594" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="b">Coro A</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">1</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="594" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="b">Coro T</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">2</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="594" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="b">Coro B</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">1</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="594" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">Coro S, Coro A, Coro T (2), Coro B</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="650" ind1="0" ind2="0">
+			<mytestprefix:subfield code="a">Partsongs</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">25460</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="773" ind1="0" ind2=" ">
+			<mytestprefix:subfield code="w">464141752</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="852" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">D-B</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">Mus.ms.autogr. Zelter, K. F. 17 (5)</mytestprefix:subfield>
+			<mytestprefix:subfield code="e">Staatsbibliothek zu Berlin - Preußischer Kulturbesitz, Musikabteilung</mytestprefix:subfield>
+			<mytestprefix:subfield code="x">30000655</mytestprefix:subfield>
+		</mytestprefix:datafield>
+	</mytestprefix:record>
+
+          </zs:recordData>
+          <zs:recordPosition>3</zs:recordPosition>
+        </zs:record>
+        <zs:record>
+          <zs:recordPacking>xml</zs:recordPacking>
+          <zs:recordData>
+              	<mytestprefix:record>
+		<mytestprefix:leader>00000ndd a2200000 u 4500</mytestprefix:leader>
+		<mytestprefix:controlfield tag="001">004641418</mytestprefix:controlfield>
+		<mytestprefix:controlfield tag="003">DE-633</mytestprefix:controlfield>
+		<mytestprefix:controlfield tag="005">20161205081636.0</mytestprefix:controlfield>
+		<mytestprefix:datafield tag="031" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">1</mytestprefix:subfield>
+			<mytestprefix:subfield code="b">1</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">1</mytestprefix:subfield>
+			<mytestprefix:subfield code="d">Munter und würdig.</mytestprefix:subfield>
+			<mytestprefix:subfield code="g">C-4</mytestprefix:subfield>
+			<mytestprefix:subfield code="m">Coro T</mytestprefix:subfield>
+			<mytestprefix:subfield code="o">3/4</mytestprefix:subfield>
+			<mytestprefix:subfield code="p">, 4E/GEE/GEG/4.F8G4F/ 4E4-</mytestprefix:subfield>
+			<mytestprefix:subfield code="r">C</mytestprefix:subfield>
+			<mytestprefix:subfield code="t">Ihr mystischen Zahlen Drei, Sieben und Neun</mytestprefix:subfield>
+			<mytestprefix:subfield code="u">20042877</mytestprefix:subfield>
+			<mytestprefix:subfield code="2">pe</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="040" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">DE-633</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="041" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">ger</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="100" ind1="1" ind2=" ">
+			<mytestprefix:subfield code="a">Zelter, Carl Friedrich</mytestprefix:subfield>
+			<mytestprefix:subfield code="d">1758-1832</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">98629</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="240" ind1="1" ind2="0">
+			<mytestprefix:subfield code="a">Patriotisches Rheinweinlied der Elfer</mytestprefix:subfield>
+			<mytestprefix:subfield code="m">coro maschile</mytestprefix:subfield>
+			<mytestprefix:subfield code="r">C</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">3917679</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="245" ind1="1" ind2="0">
+			<mytestprefix:subfield code="a">[caption title, p. 6:] [with pencil: &quot;No 10.&quot;] Rheinweinlied</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="260" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="c">1815 (&quot;Berlin d 2 November | 1815&quot;)</mytestprefix:subfield>
+			<mytestprefix:subfield code="8">01</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="300" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">score: 2p. [p. 6-7]</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">37 x 22 cm</mytestprefix:subfield>
+			<mytestprefix:subfield code="8">01</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="500" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">p. 7 Strophen 2-7 von der Hand Zelters, darunter die Datierung.</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="592" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">[not to identify]</mytestprefix:subfield>
+			<mytestprefix:subfield code="8">01</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="593" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">Autograph manuscript</mytestprefix:subfield>
+			<mytestprefix:subfield code="8">01</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="594" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="b">Coro T</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">2</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="594" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="b">Coro B</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">2</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="594" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">Coro T (2), Coro B (2)</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="650" ind1="0" ind2="0">
+			<mytestprefix:subfield code="a">Partsongs</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">25460</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="700" ind1="1" ind2=" ">
+			<mytestprefix:subfield code="a">Tismar, G.</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">20002373</mytestprefix:subfield>
+			<mytestprefix:subfield code="4">lyr</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="730" ind1="0" ind2=" ">
+			<mytestprefix:subfield code="a">Ihr mystischen Zahlen Drei, Sieben und Neun</mytestprefix:subfield>
+			<mytestprefix:subfield code="g">RISM</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">3917678</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="773" ind1="0" ind2=" ">
+			<mytestprefix:subfield code="w">464141752</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="852" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">D-B</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">Mus.ms.autogr. Zelter, K. F. 17 (6)</mytestprefix:subfield>
+			<mytestprefix:subfield code="e">Staatsbibliothek zu Berlin - Preußischer Kulturbesitz, Musikabteilung</mytestprefix:subfield>
+			<mytestprefix:subfield code="x">30000655</mytestprefix:subfield>
+		</mytestprefix:datafield>
+	</mytestprefix:record>
+
+          </zs:recordData>
+          <zs:recordPosition>4</zs:recordPosition>
+        </zs:record>
+        <zs:record>
+          <zs:recordPacking>xml</zs:recordPacking>
+          <zs:recordData>
+              	<mytestprefix:record>
+		<mytestprefix:leader>00000ndd a2200000 u 4500</mytestprefix:leader>
+		<mytestprefix:controlfield tag="001">046414174</mytestprefix:controlfield>
+		<mytestprefix:controlfield tag="003">DE-633</mytestprefix:controlfield>
+		<mytestprefix:controlfield tag="005">20161205081643.0</mytestprefix:controlfield>
+		<mytestprefix:datafield tag="031" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">1</mytestprefix:subfield>
+			<mytestprefix:subfield code="b">1</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">1</mytestprefix:subfield>
+			<mytestprefix:subfield code="d">Munter und gesanglich.</mytestprefix:subfield>
+			<mytestprefix:subfield code="g">C-4</mytestprefix:subfield>
+			<mytestprefix:subfield code="m">T</mytestprefix:subfield>
+			<mytestprefix:subfield code="n">xFC</mytestprefix:subfield>
+			<mytestprefix:subfield code="o">3/4</mytestprefix:subfield>
+			<mytestprefix:subfield code="p">,8.F6G4AA/8.B6A2G/&#39;8.D6C4DE/</mytestprefix:subfield>
+			<mytestprefix:subfield code="r">D</mytestprefix:subfield>
+			<mytestprefix:subfield code="t">Lauriger horatius quam dixit verum</mytestprefix:subfield>
+			<mytestprefix:subfield code="u">20042861</mytestprefix:subfield>
+			<mytestprefix:subfield code="2">pe</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="040" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">DE-633</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="041" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">lat</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="100" ind1="1" ind2=" ">
+			<mytestprefix:subfield code="a">Zelter, Carl Friedrich</mytestprefix:subfield>
+			<mytestprefix:subfield code="d">1758-1832</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">98629</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="240" ind1="1" ind2="0">
+			<mytestprefix:subfield code="a">Lauriger Horatius</mytestprefix:subfield>
+			<mytestprefix:subfield code="m">V(3), coro maschile</mytestprefix:subfield>
+			<mytestprefix:subfield code="r">D</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">3917684</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="245" ind1="1" ind2="0">
+			<mytestprefix:subfield code="a">[caption title, p. 2:] 15 febr 14.</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="260" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="c">1814</mytestprefix:subfield>
+			<mytestprefix:subfield code="8">01</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="300" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">score: 2p. [p. 2-3]</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">34 x 21 cm</mytestprefix:subfield>
+			<mytestprefix:subfield code="8">01</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="500" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">Vor dem ersten System die Namen der solistisch singenden Männerstimmen: &quot;Langermann | Ritschel | Hartung&quot;.</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="500" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">Unter der letzten Akkolade eine Skizze von Zelters Hand mit Blei auf den Text &quot;Wer nie sein Brot mit Tränen aß&quot;.</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="592" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">[letters in circle, countermark letters (not to identify)]</mytestprefix:subfield>
+			<mytestprefix:subfield code="8">01</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="593" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">Autograph manuscript</mytestprefix:subfield>
+			<mytestprefix:subfield code="8">01</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="594" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="b">T</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">2</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="594" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="b">B</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">1</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="594" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="b">Coro T</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">2</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="594" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="b">Coro B</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">1</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="594" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">T (2), B, Coro T (2), Coro B</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="650" ind1="0" ind2="0">
+			<mytestprefix:subfield code="a">Partsongs</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">25460</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="700" ind1="1" ind2=" ">
+			<mytestprefix:subfield code="a">Hoffmann von Fallersleben, August Heinrich</mytestprefix:subfield>
+			<mytestprefix:subfield code="d">1798-1874</mytestprefix:subfield>
+			<mytestprefix:subfield code="j">Ascertained</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">95806</mytestprefix:subfield>
+			<mytestprefix:subfield code="4">lyr</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="700" ind1="1" ind2=" ">
+			<mytestprefix:subfield code="a">Langermann, Johann Gottfried</mytestprefix:subfield>
+			<mytestprefix:subfield code="d">1768-1832</mytestprefix:subfield>
+			<mytestprefix:subfield code="0">72725</mytestprefix:subfield>
+			<mytestprefix:subfield code="4">oth</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="773" ind1="0" ind2=" ">
+			<mytestprefix:subfield code="w">464141752</mytestprefix:subfield>
+		</mytestprefix:datafield>
+		<mytestprefix:datafield tag="852" ind1=" " ind2=" ">
+			<mytestprefix:subfield code="a">D-B</mytestprefix:subfield>
+			<mytestprefix:subfield code="c">Mus.ms.autogr. Zelter, K. F. 17 (2)</mytestprefix:subfield>
+			<mytestprefix:subfield code="e">Staatsbibliothek zu Berlin - Preußischer Kulturbesitz, Musikabteilung</mytestprefix:subfield>
+			<mytestprefix:subfield code="x">30000655</mytestprefix:subfield>
+		</mytestprefix:datafield>
+	</mytestprefix:record>
+
+          </zs:recordData>
+          <zs:recordPosition>5</zs:recordPosition>
+        </zs:record>
+    </zs:records>
+    <zs:echoedSearchRetrieveRequest>
+      <zs:version>1.1</zs:version>
+      <zs:query>bath.possessingInstitution=D-B</zs:query>
+      <zs:maximumRecords>5</zs:maximumRecords>
+      <zs:recordPacking>xml</zs:recordPacking>
+    </zs:echoedSearchRetrieveRequest>
+  </zs:searchRetrieveResponse>

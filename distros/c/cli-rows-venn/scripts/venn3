@@ -1,0 +1,175 @@
+#!/usr/bin/perl
+
+use 5.016 ; use strict ; use warnings ; 
+use Term::ANSIColor qw/:constants color/ ; $Term::ANSIColor::AUTORESET = 1 ;
+use POSIX qw/floor strftime/ ;
+use Getopt::Std ; getopts "=i:u:l:r:", \my%o ; 
+use List::Util qw/minstr maxstr min max sum/ ;
+use List::Compare ;
+my $usedcommand = join " ", $0,  @ARGV  ;
+
+# 入出力のモード(?) の指定
+$/ = "\n"  ; # \r\n は chomp の後に s/\r$// で対応する。
+binmode STDOUT, ":utf8" ;
+
+# 各ファイルのオープン処理
+my @args = @ARGV ; 
+my $fNum = scalar @args  ;
+( $args[0] , $fNum ) = ( '-' , 1 ) if ( @args == 0 ) ; 
+my $fhA ; $args[0] eq q/-/ ? ($fhA=*STDIN):(open $fhA,"<:utf8",$args[0] or die $!);
+my $fhB ; $args[1] eq q/-/ ? ($fhB=*STDIN):(open $fhB,"<:utf8",$args[1] or die $!) if ( $fNum >= 2) ; 
+my $fhC ; $args[2] eq q/-/ ? ($fhC=*STDIN):(open $fhC,"<:utf8",$args[2] or die $!) if ( $fNum >= 3) ; 
+
+# 読み取り処理
+my %wA = &dinfo ( $fhA , "A: $args[0]" ) ;
+my %wB = &dinfo ( $fhB , "B: $args[1]" ) if  $fNum >= 2  ;
+my %wC = &dinfo ( $fhC , "C: $args[2]" ) if  $fNum >= 3  ;
+
+# ファイルの違いについて表示する処理
+my ($gi2,$gu2,$gl2,$gr2) = &fileAB if  $fNum >= 2  ;
+&fileABC if  $fNum >= 3  ;
+
+# クローズ
+grep { close $_ } grep { $_ } $fhA, $fhB, $fhC  ;  # 定義済みのファイルハンドルを順次クローズ
+exit 0 ;
+
+# 3個のファイルについて
+sub fileABC { 
+    my @wC = keys %wC ; 
+    my @wA = keys %wA ; 
+    my @wB = keys %wB ;
+    print UNDERSCORE GREEN "\t" , "HOW 3 files A,B,C differ" , RESET GREEN " : \n" ; 
+    my $gi3 = List::Compare->new( $gi2 , \@wC ) -> get_intersection_ref ; 
+    & rprint ( $gi3 , "intersection among 3" ) ;
+    my $gu3 = List::Compare->new( $gu2 , \@wC ) -> get_union_ref ; ;
+    & rprint ( $gu3 , "union over 3 files" ) ;
+
+    my $gcAB3 = List::Compare->new( $gu2 , \@wC ) -> get_Ronly_ref ; ;
+    & rprint ( $gcAB3 , "C minus A minus B", scalar @wC);
+    my $gaBC3 = List::Compare->new( $gl2 , \@wC ) -> get_Lonly_ref ; ;
+    & rprint ( $gaBC3 , "A minus B minus C", scalar @wA);
+    my $gbCA3 = List::Compare->new( $gr2 , \@wC ) -> get_Lonly_ref ; ;
+    & rprint ( $gbCA3 , "B minus C minus A", scalar @wB);
+
+
+    my $gabC3 = List::Compare->new( $gi2 , \@wC ) -> get_Lonly_ref ; ;
+    & rprint ( $gabC3 , "A common B minus C");
+    my $gacB3 = List::Compare->new( $gl2 , \@wC ) -> get_intersection_ref ; ;
+    & rprint ( $gacB3 , "A common C minus B");
+    my $gbcA3 = List::Compare->new( $gr2 , \@wC ) -> get_intersection_ref ; ;
+    & rprint ( $gbcA3 , "B common C minus A");
+
+
+
+
+}
+
+## 以下は関数
+
+# 2個のファイルについて
+sub fileAB { 
+    my $lc2 = List::Compare->new( \@{[keys %wA]} , \@{[keys %wB]} ) ; 
+    my $gi2 = $lc2 -> get_intersection_ref ; 
+    my $gu2 = $lc2 -> get_union_ref ; 
+    my $gl2 = $lc2 -> get_Lonly_ref ; 
+    my $gr2 = $lc2 -> get_Ronly_ref ; 
+    print UNDERSCORE GREEN "\t" , "How files A and B differ" , RESET GREEN " : \n" ;
+    print CYAN "\t" , "intersection : " ;  print scalar @{$gi2} ; # $lc-> get_intersection ; 
+    print CYAN "\t" , "union : " ;  print scalar @{$gu2}  ; #$lc-> get_union ; 
+    print "\n" ;
+    & rprint ( $gl2 , "A_only" , scalar keys %wA ) ;
+    & rprint ( $gr2 , "B_only" , scalar keys %wB ) if ( $fNum>=2) ;
+    & writeout ( $o{i} , $gi2 ) if ( $o{i} ) ;
+    & writeout ( $o{u} , $gu2 ) if ( $o{u} ) ;
+    & writeout ( $o{l} , $gl2 ) if ( $o{l} ) ;
+    & writeout ( $o{r} , $gr2 ) if ( $o{r} ) ;
+    return ($gi2,$gu2,$gl2,$gr2) ; 
+}
+
+# ファイルにデータ値を出力する。
+sub writeout { 
+    my ($ofn,$g)  = @_ ; 
+    open my $FH, ">:utf8" , $ofn or die $!  ;
+    my $now = strftime "%Y-%m-%d %H:%M:%S" , localtime ;
+    print {$FH} "# $usedcommand\t$now\n" ;
+    grep { print {$FH} $_ , "\n" } @{$g} ;
+    close $FH ;
+    print BRIGHT_BLUE 'File "', $ofn, '" produced. 1 + ', scalar @{$g}, " lines.\n" ;
+}
+
+# 具体的なデータ値6+6個くらい書き出す。
+sub rprint { 
+    my @w = sort @{$_[0]} ;
+    my $str = $_[1] ;
+    my $wNum = $_[2] ;
+    my $tNum = scalar @w ; 
+    print CYAN "\t" , "$str : " ;  print scalar $tNum ;
+    print GREEN "\t" , sprintf("%2.1f %%", floor($tNum/$wNum*1000+0.5)/10 )  if ( defined $wNum ) ; 
+    print CYAN '  ('  ; 
+    print join "," , splice @w,0,6 ;
+    print scalar @w > 6 ? " .. " :  "," if (@w) ;
+    print join "," , splice @{[@w]}, -min(6,scalar @w) ,6  if (@w) ; 
+    print CYAN ')'  ; 
+    print "\n" ;
+}
+
+# 各ファイルについての情報を書き出す。
+sub dinfo { 
+    my ( %words , %len ); 
+    my $FH = $_[0] ; # <-- necessary . 
+    my $fname = $_[1] ;
+    my $blanks = 0 ;
+    while ( <$FH> ) {
+	next if ( $. == 1 && $o{'='}) ;
+	chomp ; s/\r$// ;
+        if ( $_ eq q// ) { ++ $blanks ; next }  ;
+	$words{$_} ++ ;
+	$len{ length ($_) } ++ ;
+    } 
+    print CYAN "non-blank lines in " , BRIGHT_CYAN $fname , CYAN " (different/all): " ;
+    my $nonblanks = sum values %words ;
+    if( ! %words ) { print  "0/0 no words." } else { print BRIGHT_WHITE scalar (keys %words) , WHITE " / " , $nonblanks  } ; 
+    if ( $blanks != 0 ) { 
+	print "\t" , GREEN "(blanks: ", BRIGHT_GREEN $blanks , GREEN " / ", $blanks+$nonblanks , " , " ;
+	print BRIGHT_GREEN sprintf("%2.1f %%", floor($blanks/($blanks+$nonblanks) *1000+0.5)/10 )  , GREEN ")"  } 
+    print "\t" , CYAN "lengths of words : " , RESET  min (keys %len), "-", max (keys %len) ;
+    print "\t" , CYAN 'range of words : "' , RESET minstr (keys %words) , CYAN  '" - "', RESET maxstr ( keys %words ) , CYAN '"' ;
+    print "\n" ;
+    return ( %words ) ;
+}
+
+
+# ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+=encoding utf8
+=head1 
+
+  - ASCII or UTF-8 is assumed for input files.
+  - Input files are 1 or 2 files. You can also specify "-" that means STDIO.
+
+Options : 
+
+  -i filename  
+  -u filename
+  -l filename
+  -r filename 
+       Those 4 above specifies the output file names that will be written
+         `intersection', `union', `Left-Only', `Right-Only' data.
+  -= 
+     ` $0 -=  file1  file2 '  means that both of the 1-st lines of file1 and file2 are ignored. 
+     This is useful when files contain header lines as data files. 
+
+
+=cut 
+

@@ -3,42 +3,70 @@
 use strict;
 use warnings;
 use Math::Trig qw(pi);
+sub insert (+$);
+sub number2str ($;$);
 
 my ( @values, @distances );
 
-# Generate C scale values and distances according to what is present on
-# a Pickett Model N 3P-ES pocket slide rule, same doubling of resolution
-# as in gena.
+# generate C scale values and distances according to what is present on
+# a Pickett Model N 3P-ES pocket slide rule. same doubling of resolution
+# as in gena
 my $pad_by = 2;
 
 genvd( 1, 3,  50 );
 genvd( 3, 5,  20 );
 genvd( 5, 10, 10 );
 
-push @values,    10;
-push @distances, log $values[-1];
+push @values,    number2str(10);
+push @distances, log 10;
 
 # pi is indicated on the scale
-push @values,    pi;
-push @distances, log $values[-1];
+my $value = pi;
+insert @distances, log $value;
+insert @values,    number2str($value);
 
 # TODO "R" on scale at a hair above 5.7 is what?
-
-@values    = sort { $a <=> $b } @values;
-@distances = sort { $a <=> $b } @distances;
 
 use Data::Dumper::Concise;
 print Dumper { value => \@values, dist => \@distances };
 
-exit 0;
+write_out( 'c-distances', \@distances );
+write_out( 'c-values',    \@values );
 
 sub genvd {
-  my ( $min, $max, $precision ) = @_;
+    my ( $min, $max, $precision ) = @_;
 
-  my $ticks = $precision * ( $max - $min ) * $pad_by;
-  my $slope = ( $max - $min ) / $ticks;
-  for my $v ( 0 .. $ticks - 1 ) {
-    push @values,    $slope * $v + $min;
-    push @distances, log $values[-1];
-  }
+    my $ticks = $precision * ( $max - $min ) * $pad_by;
+    my $slope = ( $max - $min ) / $ticks;
+    for my $v ( 0 .. $ticks - 1 ) {
+        my $value = $slope * $v + $min;
+        push @distances, log $value;
+        push @values,    $value;
+    }
+}
+
+sub insert (+$) {
+    for my $i ( 0 .. $#{ $_[0] } ) {
+        if ( $_[0]->[$i] > $_[1] ) {
+            splice @{ $_[0] }, $i, 0, $_[1];
+            return;
+        }
+    }
+    push @{ $_[0] }, $_[1];
+}
+
+sub number2str ($;$) {
+    my $number    = shift;
+    my $precision = shift // 3;
+    my $str       = sprintf "%0${precision}f", $number;
+    $str =~ s/(?<!\.)0+$//;
+    return $str;
+}
+
+sub write_out {
+    my ( $file, $ref ) = @_;
+    open my $fh, '>', $file or die "could not write '$file': $!\n";
+    for my $x (@$ref) {
+        say $fh $x;
+    }
 }

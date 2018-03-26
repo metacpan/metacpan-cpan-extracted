@@ -1,0 +1,606 @@
+<?xml version='1.0'?>
+
+<searchRetrieveResponse xmlns="http://www.loc.gov/zing/srw/">
+<version>1.1</version>
+<numberOfRecords>4744</numberOfRecords>
+<records>
+<record><recordSchema>info:srw/schema/1/marcxml-v1.1</recordSchema><recordPacking>xml</recordPacking><recordData><record xmlns="http://www.loc.gov/MARC21/slim">
+<leader>00000ngm  22      a 4500</leader>
+  <controlfield tag="001">9759148</controlfield>
+  <controlfield tag="005">20131219083553.0</controlfield>
+  <controlfield tag="008">s2009    xx dut||||||||||||||||| u</controlfield>
+  <datafield tag="245" ind1="1" ind2="4" >
+    <subfield code="a">DNA onbekend: deel 4</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">DNA onbekend; jrg.1</subfield>
+  </datafield>
+
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">NCRV</subfield>
+  </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">DNA</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">psychologie</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">persoonlijkheidsleer159.9</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">159.93</subfield>
+   </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="b">Hilversum : NCRV,</subfield>
+    <subfield code="c">2009</subfield>
+   </datafield>
+
+  <datafield tag="520" ind1="3" ind2=" ">
+    <subfield code="a">In de vierde aflevering van DNA Onbekend het verhaal van Diana. Zij is de jongste van drie dochters. Diana is er echter niet zo zeker van dat haar vader haar biologische vader is. Als ze gaat trouwen, ontdekt ze namelijk dat haar geboorte niet is aangegeven door haar vader, maar door haar oma. Wanneer ze haar vader hiermee confronteert, reageert hij boos. Hij wil er niet over praten. Daarbij vindt Diana dat ze totaal niet op haar twee zussen lijkt. Omdat haar beide ouders zijn overleden, kan ze dit niet meer aan hen vragen. Diana wil graag het verleden laten rusten, maar dat kan pas als de onderste steen boven is. Alleen DNA-onderzoek kan onomstotelijk bewijs leveren. Verder het ongelofelijke verhaal van de 61-jarige Nel. Voordat haar zus Miep overlijdt in 1996, ontvangt Nel een telefoontje van haar waarin ze zegt dat ze een groot geheim moet delen. Dan krijgt Miep een hartaanval en ze neemt het grote geheim mee haar graf in. Maar Nel denkt te weten wat ze wilde vertellen. Miep zou niet haar zus zijn, maar haar moeder! Er zijn echter nauwelijks manieren om dit bevestigd te krijgen en voor Nel lopen alle sporen naar het verleden dood. Met een reguliere DNA-test kan niet worden aangetoond of haar zus inderdaad haar moeder was. Maar Nel heeft twee haren en sieraden bewaard die mogelijk voor opheldering kunnen zorgen. Door middel van forensisch DNA-onderzoek wordt geprobeerd om het ware verhaal over haar afkomst te achterhalen (Bron: http://dna.ncrv.nl).</subfield>
+   </datafield>
+
+
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">KHLEUVEN</subfield>
+    <subfield code="u">008616731</subfield>
+  </datafield>
+
+
+</record>
+</recordData><recordPosition>1</recordPosition></record>
+<record><recordSchema>info:srw/schema/1/marcxml-v1.1</recordSchema><recordPacking>xml</recordPacking><recordData><record xmlns="http://www.loc.gov/MARC21/slim">
+<leader>00000ngm  22      a 4500</leader>
+  <controlfield tag="001">9759207</controlfield>
+  <controlfield tag="005">20131219083553.0</controlfield>
+  <controlfield tag="008">s2009    xx dut||||||||||||||||| u</controlfield>
+  <datafield tag="245" ind1="1" ind2="4" >
+    <subfield code="a">DNA onbekend: deel 5</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">DNA onbekend; jrg.1</subfield>
+  </datafield>
+
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">NCRV</subfield>
+  </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">DNA</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">psychologie</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">persoonlijkheidsleer159.9</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">159.93</subfield>
+   </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="b">Hilversum : NCRV,</subfield>
+    <subfield code="c">2009</subfield>
+   </datafield>
+
+  <datafield tag="520" ind1="3" ind2=" ">
+    <subfield code="a">In deze vijfde aflevering van DNA Onbekend het verhaal van de 45-jarige Petra. Zij groeide op in een gezin van drie kinderen. Vijfentwintig jaar geleden ontdekte ze dat haar vader mogelijk geen drie, maar vier kinderen heeft. Want voordat Petra&#39;s vader haar moeder ontmoette, was hij vier jaar lang verloofd met een andere vrouw. Uit deze relatie zou Jörg geboren zijn. Maar de vrouw heeft altijd ontkend dat Petra&#39;s vader de vader is van Jörg. Anderhalf jaar geleden start Petra de zoektocht naar deze Jörg en in maart van dit jaar is het raak. Hij blijkt volledig in het ongewisse te zijn over de verhalen over zijn afkomst. Heeft hij een andere vader dan hij altijd heeft gedacht? Zijn ze elkaars verwanten? Ook in DNA Onbekend de wonderlijke verwantschapskwestie van de vriendinnen Tara en Trushna uit Friesland. Beiden zijn geboren in India en geadopteerd door Nederlandse gezinnen. De ouders van de meisjes hebben, zeker in de eerste jaren na de adoptie, veel contact gehouden, waardoor Tara en Trushna hartsvriendinnen zijn geworden. Ze delen niet alleen hun geboorteland India, ook komen ze uit dezelfde stad en zelfs uit hetzelfde tehuis. Ook schelen ze slechts één dag in leeftijd. Hun hele leven horen ze al dat ze erg op elkaar lijken en wordt hun gevraagd of ze geen tweeling zijn. Ze voelen ook een verwantschap, maar achten de kans erg klein dat ze ook daadwerkelijk zussen zijn. De hoop is er echter wel degelijk! Omdat in India alle sporen naar hun afkomst zijn doodgelopen, is een DNA-test nog de enige manier om er achter te komen of Tara en Trushna familie zijn. (Bron:dna.ncrv.nl)</subfield>
+   </datafield>
+
+
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">KHLEUVEN</subfield>
+    <subfield code="u">008616806</subfield>
+  </datafield>
+
+
+</record>
+</recordData><recordPosition>2</recordPosition></record>
+<record><recordSchema>info:srw/schema/1/marcxml-v1.1</recordSchema><recordPacking>xml</recordPacking><recordData><record xmlns="http://www.loc.gov/MARC21/slim">
+<leader>00000ngm  22      a 4500</leader>
+  <controlfield tag="001">9759032</controlfield>
+  <controlfield tag="005">20131219083551.0</controlfield>
+  <controlfield tag="008">s2009    xx dut||||||||||||||||| u</controlfield>
+  <datafield tag="245" ind1="1" ind2="4" >
+    <subfield code="a">DNA onbekend: deel 2</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">DNA onbekend; jrg.1</subfield>
+  </datafield>
+
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">NCRV</subfield>
+  </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">DNA</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">psychologie</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">persoonlijkheidsleer159.9</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">159.93</subfield>
+   </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="b">Hilversum : NCRV,</subfield>
+    <subfield code="c">2009</subfield>
+   </datafield>
+
+  <datafield tag="520" ind1="3" ind2=" ">
+    <subfield code="a">Is mijn vader wel mijn echte vader? Zijn mijn broers en zussen wel mijn echte familie? Grote twijfels en onbeantwoorde vragen over familiebanden laten diepe sporen na in het leven van de mensen. Caroline Tensen helpt mensen om voor eens en altijd duidelijkheid te scheppen. -Het verhaal van Marjan (1943). In haar kindertijd zijn haar ouders goed bevriend met een getrouwd stel verderop in hun straat. Ook Marjan komt daar regelmatig over de vloer. Als haar ouders in 1990 allebei zijn overleden, komt diezelfde buurvrouw langs met een schokkend bericht: Marjan zou verwekt zijn door de buurman! Buurjongen Peter kreeg op zijn elfde al van zijn moeder te horen dat Marjan zijn halfzus zou zijn, maar hem wordt verboden hierover te spreken. Nadat zijn moeder, al die jaren later, het zwijgen verbreekt, besluit Peter om Marjan een brief te schrijven. Ze wil het verleden laten rusten en houdt het contact met hem af. Ze wil eigenlijk niets weten over het eventuele ware verhaal van haar afkomst. Tot Peters verdriet die dolgraag een zus zou willen hebben. Bijna twintig jaar is er geen contact en vandaag ontmoeten ze elkaar weer voor het eerst. Zal een DNA-test eindelijk duidelijk maken of Peter en Marjan inderdaad broer en zus zijn? -Verder het verhaal van de 32-jarige Johan. Zestien jaar geleden ontmoet hij voor het eerst zijn vermeende biologische vader, Piet en zijn halfzus Alexandra. De band tussen de drie is sinds die tijd zeer hecht. Maar Johan blijft twijfelen en niemand weet 100 procent zeker of Johan en Piet wel echt vader en zoon zijn. Het is voor Johan heel belangrijk om uitsluitsel te krijgen over zijn vader; hij overweegt zelfs naamsverandering als blijkt dat Piet inderdaad zijn echte vader is. Zal DNA-onderzoek het onomstotelijke bewijs leveren? Presentatie: Caroline Tensen.(Bron: http://dna.ncrv.nl/ncrvgemist/dna-onbekend-0)</subfield>
+   </datafield>
+
+
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">KHLEUVEN</subfield>
+    <subfield code="u">008616600</subfield>
+  </datafield>
+
+
+</record>
+</recordData><recordPosition>3</recordPosition></record>
+<record><recordSchema>info:srw/schema/1/marcxml-v1.1</recordSchema><recordPacking>xml</recordPacking><recordData><record xmlns="http://www.loc.gov/MARC21/slim">
+<leader>00000ngm  22      a 4500</leader>
+  <controlfield tag="001">9758981</controlfield>
+  <controlfield tag="005">20131219083551.0</controlfield>
+  <controlfield tag="008">s2009    xx dut||||||||||||||||| u</controlfield>
+  <datafield tag="245" ind1="1" ind2="4" >
+    <subfield code="a">DNA onbekend: deel 1</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">DNA onbekend; jrg.1</subfield>
+  </datafield>
+
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">NCRV</subfield>
+  </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">DNA</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">psychologie</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">persoonlijkheidsleer159.9</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">159.93</subfield>
+   </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="b">Hilversum : NCRV,</subfield>
+    <subfield code="c">2009</subfield>
+   </datafield>
+
+  <datafield tag="520" ind1="3" ind2=" ">
+    <subfield code="a">Is mijn vader wel mijn echte vader? Zijn mijn broers en zussen wel mijn echte familie? Grote twijfels en onbeantwoorde vragen over familiebanden laten diepe sporen na in het leven van de mensen. Caroline Tensen helpt mensen om voor eens en altijd duidelijkheid te scheppen. Caroline ontmoet de Amsterdamse muzikant Willem. Hij wil graag uitzoeken of de 21-jarige Thialda uit Vlieland echt zijn dochter is. Willem heeft ernstig uitgezaaide darmkanker en heeft waarschijnlijk niet lang meer te leven. Voordat hij overlijdt, wil Willem duidelijkheid. Ook Thialda wil de waarheid weten. Is Willem haar vader, of is het Dirk, de man met wie haar moeder al ruim twintig jaar samen is? Een DNA-onderzoek brengt eindelijk een einde aan de onzekerheid. -Ook het indrukwekkende verhaal van Ton. Zijn hele leven lang weigert zijn moeder te vertellen wie zijn vader is. Na het overlijden van zijn moeder, lijkt het familiegeheim zich eindelijk te ontrafelen. Ton vindt tussen de spullen van zijn moeder een liefdesbrief en een foto van een Canadese soldaat. Inmiddels denkt de 61-jarige Ton zelfs een halfbroer te hebben gevonden; een zoon van zijn vermoedelijke vader. Ze zien vele gelijkenissen bij elkaar, maar alleen een DNA-onderzoek kan Ton eindelijk die gewenste honderd procent zekerheid geven (Bron: http://www.hebikietsgemist.nl).</subfield>
+   </datafield>
+
+
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">KHLEUVEN</subfield>
+    <subfield code="u">008616540</subfield>
+  </datafield>
+
+
+</record>
+</recordData><recordPosition>4</recordPosition></record>
+<record><recordSchema>info:srw/schema/1/marcxml-v1.1</recordSchema><recordPacking>xml</recordPacking><recordData><record xmlns="http://www.loc.gov/MARC21/slim">
+<leader>00000ngm  22      a 4500</leader>
+  <controlfield tag="001">9759071</controlfield>
+  <controlfield tag="005">20131219083552.0</controlfield>
+  <controlfield tag="008">s2009    xx dut||||||||||||||||| u</controlfield>
+  <datafield tag="245" ind1="1" ind2="4" >
+    <subfield code="a">DNA onbekend: deel 3</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">DNA onbekend; jrg.1</subfield>
+  </datafield>
+
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">NCRV</subfield>
+  </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">DNA</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">psychologie</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">persoonlijkheidsleer159.9</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">159.93</subfield>
+   </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="b">Hilversum : NCRV,</subfield>
+    <subfield code="c">2009</subfield>
+   </datafield>
+
+  <datafield tag="520" ind1="3" ind2=" ">
+    <subfield code="a">Is mijn vader wel mijn echte vader? Zijn mijn broers en zussen wel mijn echte familie? Grote twijfels en onbeantwoorde vragen over familiebanden laten diepe sporen na in het leven van de mensen. Caroline Tensen helpt mensen om voor eens en altijd duidelijkheid te scheppen. De familie Wehnes staat centraal. Een groot gezin met maar liefst vijftien kinderen. Eén van hen is Elly en zij krijgt als kind regelmatig ingewreven dat Pa Wehnes niet haar vader zou zijn. Hun relatie is nooit goed geweest. Elly werd geestelijk en zelfs lichamelijk door hem mishandeld. Zij hoopt dan ook vurig dan hij niet haar echte vader is. Het verhaal doet de ronde dat Elly een kind zou zijn van de bloemenman, Joop van Tuyne. Elly is niet het enige kind in het gezin met twijfels. Ook haar broer Peter worstelt met zijn afkomst. Zijn hele leven gaan er geruchten dat ook híj geen echte Wehnes zou zijn. In zijn geval wordt de naam van ene meneer Koek genoemd, hoewel Elly denkt dat Peter ook wel eens van de bloemenman zou kunnen zijn. Wanneer Peter na het overlijden van zijn moeder documenten van meneer Koek tussen haar spullen vindt, is de twijfel compleet. Is Peter een kind van Koek, van bloemenman Van Tuyne of van Pa Wehnes? Een DNA-test zal het moeten uitwijzen. Presentatie: Caroline Tensen (Bron: http://dna.ncrv.nl).</subfield>
+   </datafield>
+
+
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">KHLEUVEN</subfield>
+    <subfield code="u">008616648</subfield>
+  </datafield>
+
+
+</record>
+</recordData><recordPosition>5</recordPosition></record>
+<record><recordSchema>info:srw/schema/1/marcxml-v1.1</recordSchema><recordPacking>xml</recordPacking><recordData><record xmlns="http://www.loc.gov/MARC21/slim">
+<leader>00000ngm  22      a 4500</leader>
+  <controlfield tag="001">9759319</controlfield>
+  <controlfield tag="005">20131219083554.0</controlfield>
+  <controlfield tag="008">s2009    xx dut||||||||||||||||| u</controlfield>
+  <datafield tag="245" ind1="1" ind2="4" >
+    <subfield code="a">DNA onbekend: deel 9</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">DNA onbekend; jrg.1</subfield>
+  </datafield>
+
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">NCRV</subfield>
+  </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">DNA</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">psychologie</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">persoonlijkheidsleer159.9</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">159.93</subfield>
+   </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="b">Hilversum : NCRV,</subfield>
+    <subfield code="c">2009</subfield>
+   </datafield>
+
+  <datafield tag="520" ind1="3" ind2=" ">
+    <subfield code="a">-Het indringende verhaal van de 35-jarige Olaf. Hij werd geboren in een opvanghuis voor alleenstaande (ongewenst) zwangere vrouwen. Zijn moeder stond hem af en Olaf werd als peuter geadopteerd door zijn oom en tante. Olaf groeit op in dit streng christelijke gezin waar hij het zowel geestelijk als lichamelijk zwaar te verduren heeft. De relatie met zijn adoptie-ouders is zo slecht dat Olaf op 21-jarige leeftijd de adoptie laat herroepen. Inmiddels is ook het contact met Olafs biologische moeder voorzichtig in gang gezet. Dit verloopt redelijk, zolang het oppervlakkig blijft. Op het moment dat Olaf vragen begint te stellen over zijn echte vader zwijgt zij in alle toonaarden. Het gaat zelfs zover dat Olaf haar voor de rechter daagt. Het enige wat in de rechtszaak boven water komt, is de naam van zijn moeders vriendje ten tijde van Olafs verwekking. Hoewel moeder verklaart dat deze man niet de vader is, komen zijn naam en leeftijd wel overeen met aanwijzingen die Olaf heeft gevonden in het dossier van het opvanghuis. Zijn zoektocht lijkt zich te hebben toegespitst op één manen de eerste ontmoeting met hem is moeilijk en verwarrend. Olaf hoopt op duidelijkheid, maar er gaan jaren overeen voordat de man instemt met een DNA-test. Vandaag krijgt Olaf eindelijk uitsluitsel over zijn vader. -De 55-jarige Neja groeide op in een gezin van vier kinderen. Vanaf haar vroegste jeugd kreeg ze opmerkingen te horen over haar afkomst. Regelmatig werd er gegrapt dat ze geadopteerd zou zijn of dat ze &#39;onder een boom&#39; gevonden was. Nooit wist ze hoe serieus ze deze opmerkingen moest nemen. Pas later begon ze steeds vaker te twijfelen of er niet werkelijk een kern van waarheid zou kunnen zitten in de toespelingen. Neja&#39;s moeder was voor de buitenwacht een vrolijke en joviale vrouw, maar binnen het gezin had ze een andere kant. Neja en haar jongste broer omschrijven de moeder als een echte toneelspeelster. Ze was een behoorlijke flirt, had regelmatig mannen over de vloer en kon ook da</subfield>
+   </datafield>
+
+
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">KHLEUVEN</subfield>
+    <subfield code="u">008616940</subfield>
+  </datafield>
+
+
+</record>
+</recordData><recordPosition>6</recordPosition></record>
+<record><recordSchema>info:srw/schema/1/marcxml-v1.1</recordSchema><recordPacking>xml</recordPacking><recordData><record xmlns="http://www.loc.gov/MARC21/slim">
+<leader>00000nam  22      a 4500</leader>
+  <controlfield tag="001">728175</controlfield>
+  <controlfield tag="005">20131217203139.0</controlfield>
+  <controlfield tag="008">s2001    xx eng||||||||||||||||| u</controlfield>
+  <datafield tag="245" ind1="1" ind2="4" >
+    <subfield code="a">DNA technology: the awesome skill</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">DNA TECHNOLOGY THE AWESOME SKILL</subfield>
+  </datafield>
+
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Alcamo, I. Edward</subfield>
+  </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">DNA</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">DNA</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">GENETIC TECHNIQUES</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">GENE THERAPY</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">DNA</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">ANIMALS, GENETICALLY MODIFIED</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">AGRICULTURE</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">HUMAN GENOME PROJECTHISTORY</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">ULTRASTRUCTURE</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">ANALYSIS</subfield>
+   </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">0120489201 9780120489206</subfield>
+   </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="b">New York ; London : Academic Press,</subfield>
+    <subfield code="c">2001</subfield>
+   </datafield>
+
+  <datafield tag="520" ind1="3" ind2=" ">
+    <subfield code="a">DNA Technology, Second Edition, is a survey of biotechnology written to enlighten readers about the breakthroughs made possible by the science and technologies associated with current DNA research. Ed Alcamo gives the educated layperson a survey of DNA by presenting a brief history of genetics, a clear outline of techniques that are in use, and indications of breakthroughs in cloning and other DNA advances. Appropriate for a wide range of courses for non-biology majors, including a DNA for Lawyers course or allied health and nursing courses. * An introductory treatment of aspects of DNA technology written to enlighten the reader about the breakthroughs made possible by the science and technologies associated with DNA * Emphasizes the practical implications and applications of the new genetic technologies; readers will come away saying, &quot;So that&#39;s what DNA technology is all about!&quot; * Helps students, business people, lawyers, and jurists gain more confidence in their ability to to understand and appreciate DNA technology and human genetics * Persons with genetic diseases will gain a clearer understanding of their afflictions and understand the bases for possible cures * Agriculturists will have insight into the genetic basis for gene-altered plants and animals * The general public will better appreciate the nature and reasons for the Human Genome Project now in progress.</subfield>
+   </datafield>
+
+
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">UAntwerpen</subfield>
+    <subfield code="u">3070913</subfield>
+  </datafield>
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">ULB</subfield>
+    <subfield code="u">941666</subfield>
+  </datafield>
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">ULg</subfield>
+    <subfield code="u">ALEPH_ULG000939672</subfield>
+  </datafield>
+
+
+</record>
+</recordData><recordPosition>7</recordPosition></record>
+<record><recordSchema>info:srw/schema/1/marcxml-v1.1</recordSchema><recordPacking>xml</recordPacking><recordData><record xmlns="http://www.loc.gov/MARC21/slim">
+<leader>00000nam  22      a 4500</leader>
+  <controlfield tag="001">6096916</controlfield>
+  <controlfield tag="005">20131218215254.0</controlfield>
+  <controlfield tag="008">s2005    xx eng||||||||||||||||| u</controlfield>
+  <datafield tag="245" ind1="1" ind2="4" >
+    <subfield code="a">Multiple aspects of DNA and RNA : from biophysics to bioinformatics: école d&#39;été de physique des Houches, session LXXXII [82], 2-27 August 2004 : Euro summer school, NATO advanced study institute, école thématique du CNRS</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">Multiple aspects of deoxyribonucleic acid and ribonucleic acid</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">From biophysics to bioinformatics</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">École d&#39;été de physique des Houches, session LXXXII, 2-27 August 2004</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">Les Houches, session LXXXII, NATO ASI</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">MULTIPLE ASPECTS OF DNA AND RNA FROM BIOPHYSICS TO BIOINFORMATICS éCOLE D&#39;éTé DE PHYSIQUE DES HOUCHES SESSION LXXXII 82 2 27 AUGUST 2004 EURO SUMMER SCHOOL NATO ADVANCED STUDY INSTITUTE éCOLE THéMATIQUE DU CNRS</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">&lt;&lt;Les&gt;&gt; Houches</subfield>
+  </datafield>
+
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">CHATENAY, Didier</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">COCCO, Simona</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">MONASSON, Rémi</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">THIEFFRY, Denis</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">DALIBARD, Jean</subfield>
+  </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">DNA</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">RNA</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">Biophysics</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">Computational Biology</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">Models, Biological</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">Nucleic acids</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">Biophysics</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">Computational biology</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">Acides nucléiques</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">Biophysique</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">Bio-informatiqueCongresses</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">Congresses.</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">Congresses.</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">Congrès</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">Congrès</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">Congresses</subfield>
+   </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">9780444520814 0444520813</subfield>
+   </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="b">Amsterdam : Elsevier,</subfield>
+    <subfield code="c">2005</subfield>
+   </datafield>
+
+  <datafield tag="520" ind1="3" ind2=" ">
+    <subfield code="a">This book is dedicated to the multiple aspects, that is, biological, physical and computational of DNA and RNA molecules. These molecules, central to vital processes, have been experimentally studied by molecular biologists for five decades since the discovery of the structure of DNA by Watson and Crick in 1953. Recent progresses (e.g. use of DNA chips, manipulations at the single molecule level, availability of huge genomic databases...) have revealed an imperious need for theoretical modelling. Further progresses will clearly not be possible without an integrated understanding of all DNA and RNA aspects and studies.&lt;P&gt; The book is intended to be a desktop reference for advanced graduate students or young researchers willing to acquire a broad interdisciplinary understanding of the multiple aspects of DNA and RNA. It is divided in three main sections:&lt;P&gt; The first section comprises an introduction to biochemistry and biology of nucleic acids. The structure and function of DNA are reviewed in R. Lavery&#39;s chapter. The next contribution, by V. Fritsch and E. Westhof, concentrates on the folding properties of RNA molecules. The cellular processes involving these molecules are reviewed by J. Kadonaga, with special emphasis on the regulation of transcription. These chapters does not require any preliminary knowledge in the field (except that of elementary biology and chemistry).&lt;P&gt; The second section covers the biophysics of DNA and RNA, starting with basics in polymer physics in the contribution by R. Khokhlov. A large space is then devoted to the presentation of recent experimental and theoretical progresses in the field of single molecule studies. T. Strick&#39;s contribution presents a detailed description of the various micro-manipulation techniques, and reviews recent experiments on the interactions between DNA and proteins (helicases, topoisomerases, ...). The theoretical modeling of single molecules is presented by J. Marko, with a special attention paid to the elastic and topological properties of DNA. Finally, advances in the understanding of electrophoresis, a technique of crucial importance in everyday molecular biology, are exposed in T. Duke&#39;s contribution.&lt;P&gt; The third section presents provides an overview of the main computational approaches to integrate, analyse and simulate molecular and genetic networks. First, J. van Helden introduces a series of statistical and computational methods allowing the identification of short nucleic fragments putatively involved in the regulation of gene expression from sets of promoter sequences controlling co-expressed genes. Next, the chapter by Samsonova et al. connects this issue of transcriptional regulation with that of the control of cell differentiation and pattern formation during embryonic development. Finally, H. de Jong and D. Thieffry review a series of mathematical approaches to model the dynamical behaviour of complex genetic regulatory networks. This contribution includes brief descriptions and references to successful applications of these approaches, including the work of B. Novak, on the dynamical modelling of cell cycle in different model organisms, from yeast to mammals.&lt;P&gt; . Provides a comprehensive overview of the structure and function of DNA and RNA at the interface between physics, biology and information science.</subfield>
+   </datafield>
+
+
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">ULB</subfield>
+    <subfield code="u">942924</subfield>
+  </datafield>
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">ULg</subfield>
+    <subfield code="u">ALEPH_ULG000469807</subfield>
+  </datafield>
+
+
+</record>
+</recordData><recordPosition>8</recordPosition></record>
+<record><recordSchema>info:srw/schema/1/marcxml-v1.1</recordSchema><recordPacking>xml</recordPacking><recordData><record xmlns="http://www.loc.gov/MARC21/slim">
+<leader>00000nam  22      a 4500</leader>
+  <controlfield tag="001">6095696</controlfield>
+  <controlfield tag="005">20131218215219.0</controlfield>
+  <controlfield tag="008">s1996    xx eng||||||||||||||||| u</controlfield>
+  <datafield tag="245" ind1="1" ind2="4" >
+    <subfield code="a">Enzymology primer for recombinant DNA technology</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">Recombinant DNA technology</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">ENZYMOLOGY PRIMER FOR RECOMBINANT DNA TECHNOLOGY</subfield>
+  </datafield>
+
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Eun, Hyone-Myong</subfield>
+  </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">Enzymes.</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">Genetic engineering.</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">Recombinant DNA.</subfield>
+   </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">9780122437403 0122437403</subfield>
+   </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="b">San Diego (Calif.) : Academic press,</subfield>
+    <subfield code="c">1996</subfield>
+   </datafield>
+
+  <datafield tag="520" ind1="3" ind2=" ">
+    <subfield code="a">Enzymes are indispensable tools in recombinant DNA technology and genetic engineering. This book not only provides information for enzymologists, but does so in a manner that will also aid nonenymologists in making proper use of these biocatalysts in their research. The Enzymology Primer for Recombinant DNA Technology includes information not usually found in the brief descriptions given in most books on recombinant DNA methodology and gene cloning. Key Features * Provides essential basics as well as up-to-date information on enzymes most commonly used in recombinant DNA technology * Presents information in an easily accessible format to serve as a quick reference source * Leads to a better understanding of the role of biocatalysts in recombinant DNA techniques.</subfield>
+   </datafield>
+
+
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">UGent</subfield>
+    <subfield code="u">rug01/000394251</subfield>
+  </datafield>
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">ULB</subfield>
+    <subfield code="u">941470</subfield>
+  </datafield>
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">ULg</subfield>
+    <subfield code="u">ALEPH_ULG001015906</subfield>
+  </datafield>
+
+
+</record>
+</recordData><recordPosition>9</recordPosition></record>
+<record><recordSchema>info:srw/schema/1/marcxml-v1.1</recordSchema><recordPacking>xml</recordPacking><recordData><record xmlns="http://www.loc.gov/MARC21/slim">
+<leader>00000nam  22      a 4500</leader>
+  <controlfield tag="001">881141</controlfield>
+  <controlfield tag="005">20131217205051.0</controlfield>
+  <controlfield tag="008">s        xx    ||||||||||||||||| u</controlfield>
+  <datafield tag="245" ind1="1" ind2="4" >
+    <subfield code="a">DNA and cell biology</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">DNA Cell Biol</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">DNA</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">Deoxyribonucleic acid and cell biology</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">DNA cell biol.</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">DNA and cell biology</subfield>
+  </datafield>
+  <datafield tag="246" ind1="0" ind2=" " >
+    <subfield code="a">DCB</subfield>
+  </datafield>
+
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">DNA.</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">Genes.</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">Genetic Techniques.</subfield>
+   </datafield>
+  <datafield tag="653" ind1=" " ind2="0">
+    <subfield code="a">Nucleic Acids.</subfield>
+   </datafield>
+  <datafield tag="022" ind1=" " ind2=" ">
+    <subfield code="a">1044-5498 10445498 15577430</subfield>
+   </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="b">New York Liebert</subfield>
+   </datafield>
+
+
+
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">AP</subfield>
+    <subfield code="u">338668</subfield>
+  </datafield>
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">FUCAM</subfield>
+    <subfield code="u">000946290</subfield>
+  </datafield>
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">KULEUVEN</subfield>
+    <subfield code="u">001136582</subfield>
+  </datafield>
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">UAntwerpen</subfield>
+    <subfield code="u">338668</subfield>
+  </datafield>
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">UCL</subfield>
+    <subfield code="u">000946290</subfield>
+  </datafield>
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">ULg</subfield>
+    <subfield code="u">ALEPH_ULG000540784</subfield>
+  </datafield>
+  <datafield tag="852" ind1=" " ind2=" ">
+    <subfield code="a">VUB</subfield>
+    <subfield code="u">241601</subfield>
+  </datafield>
+
+
+</record>
+</recordData><recordPosition>10</recordPosition></record>
+</records>
+
+<extraResponseData></extraResponseData> 
+<echoedSearchRetrieveRequest><version>1.1</version><query>dna</query><startRecord>1</startRecord><maximumRecords>10</maximumRecords><recordSchema>marcxml</recordSchema><xQuery><searchClause xmlns="http://www.loc.gov/zing/cql/xcql/"><index>srw.ServerChoice</index><relation><value>scr</value></relation><term>dna</term></searchClause></xQuery></echoedSearchRetrieveRequest>
+</searchRetrieveResponse>

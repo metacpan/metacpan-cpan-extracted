@@ -297,28 +297,53 @@ sub _symlink {
 
 sub _ls {
     my($argv, $op) = @_;
-    my @files = @$argv;
+
     use IO::Dir;
     my $dir = IO::Dir->new($bin_dir) or die "$bin_dir: $!\n";
-    my @dirent = @files ? @files : do {
+    my @dirent = do {
 	sort { $a cmp $b }
 	grep { not /^\./ }
 	$dir->read;
     };
     $dir->close;
 
-    my $max = max map length, @dirent;
+    my @aliases = sort keys %{$alias};
+
+    my $max = max map length, @dirent, @aliases;
+
+    print "[link]\n";
     for my $ent (@dirent) {
 	my $path = "$bin_dir/$ent";
 	if (-l $path) {
+	    print "\t";
 	    print $op->{path} ? $path : $ent;
 	    if ($op->{long}) {
 		print ' ' x ($max - length $ent);
-		print " -> ", readlink $path;
+		my $target = do {
+	#	    if (my $val = $alias->{$ent}) {
+	#		ref($val) eq 'ARRAY' ? join(' ', @$val) : $val;
+	#	    } else {
+			readlink $path;
+	#	    }
+		};
+		print " -> ", $target;
 	    }
 	    print "\n";
 	}
 	warn "$ent: not exist\n" unless -f $path;
+    }
+
+    print "[alias]\n";
+    for my $key (@aliases) {
+	my $val = $alias->{$key};
+	my $command = ref($val) eq 'ARRAY' ? join(' ', @$val) : $val;
+	print "\t";
+	print $key;
+	if ($op->{long}) {
+	    print ' ' x ($max - length $key);
+	    printf " => %s", $command;
+	}
+	print "\n";
     }
 }
 
@@ -799,6 +824,12 @@ L<Getopt::EX>, L<Getopt::EX::Loader>, L<Getopt::EX::Module>
 =head1 AUTHOR
 
 Kazumasa Utashiro
+
+
+=head1 LICENSE
+
+You can redistribute it and/or modify it under the same terms
+as Perl itself.
 
 
 =head1 COPYRIGHT

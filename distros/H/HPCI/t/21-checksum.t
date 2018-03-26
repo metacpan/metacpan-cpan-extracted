@@ -87,7 +87,7 @@ $ret = run_test(
 );
 
 is ($ret->{inTestCreateSum}[0]{exit_status}, 0, "stage should run");
-ok ( -e "$in.sum", "  ... and the in file sum file shoud have been created" );
+ok ( -e "$in.sum", "  ... and the in file sum file should have been created" );
 
 $name = 'outTestCreateSum';
 $ret = run_test(

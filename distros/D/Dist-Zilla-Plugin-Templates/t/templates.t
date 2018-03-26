@@ -3,7 +3,7 @@
 #
 #   file: t/templates.t
 #
-#   Copyright © 2015, 2016 Van de Bugger.
+#   Copyright © 2015, 2016, 2018 Van de Bugger.
 #
 #   This file is part of perl-Dist-Zilla-Plugin-Templates.
 #
@@ -17,6 +17,8 @@
 #
 #   You should have received a copy of the GNU General Public License along with
 #   perl-Dist-Zilla-Plugin-Templates. If not, see <http://www.gnu.org/licenses/>.
+#
+#   SPDX-License-Identifier: GPL-3.0-or-later
 #
 #   ---------------------------------------------------------------------- copyright and license ---
 
@@ -36,6 +38,8 @@ with 'TemplatesTester';
 
 ## REQUIRE: Dist::Zilla::Role::TextTemplater v0.8.0
     # ^ Error messages changed in v0.8.0. With earlier version the test fails.
+## REQUIRE: Text::Template != 1.48, != 1.49, != 1.50, != 1.51
+    # Test will fail, see <https://github.com/mschout/perl-text-template/issues/10>.
 
 #   Some tests check error messages, which expected to be in English.
 setlocale( LC_ALL, 'C' )
@@ -396,7 +400,7 @@ run_me 'Pod2text error reporting' => {
             #^^ Bad directive.
             '',
             'Text A<code> B<bold> I<italics>.',
-            #     ^^^^^^^ Badformatting code.
+            #     ^^^^^^^ Bad formatting code.
             '',
             '=cut',
         ],

@@ -1,5 +1,5 @@
 package Statocles::Image;
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 # ABSTRACT: A reference to an image
 
 #pod =head1 SYNOPSIS
@@ -32,8 +32,8 @@ has src => (
     required => 1,
     coerce => sub {
         my ( $href ) = @_;
-        if ( blessed $href && $href->isa( 'Path::Tiny' ) ) {
-            return $href->stringify;
+        if ( blessed $href && $href->isa( 'Mojo::Path' ) ) {
+            return $href->to_string;
         }
         return $href;
     },
@@ -119,7 +119,7 @@ Statocles::Image - A reference to an image
 
 =head1 VERSION
 
-version 0.088
+version 0.089
 
 =head1 SYNOPSIS
 

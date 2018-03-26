@@ -1,0 +1,93 @@
+#!/usr/bin/perl
+
+use 5.001 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts "C:cd:f=" , \my %o ;
+use POSIX qw[ floor ceil ] ; 
+use Scalar::Util qw [ looks_like_number ] ; 
+
+sub rounding ( $ ) ; # 適切な位値で、丸め
+sub integerize ( $ ) ; # 整数化 
+sub integerize ( $ ) { floor $_[0] + 0.5 } ; 
+* integerize = * floor if $o{f} ; 
+* integerize = * ceil  if $o{c} ; 
+sub formatting ( $ ) ;
+sub eachLine ( )  ;
+sub eachLineC ( ) ;  
+* eachLine = * eachLineC if exists $o{C} ; # <- defined ではなくて、exists にすること。
+sub eapand ; # 2..5 や 5..2 を 2,3,4,5 に展開する。
+
+my $dig = $o{d} // 2  ;
+my $pre = $dig <  0 ? "0.1" ** (-$dig) : 10 ** $dig ; 
+my $ten = $dig >= 0 ? "0.1" ** $dig : 10 ** (-$dig) ; 
+
+my $dp = $dig < 0 ? 0 : $dig ; 
+my $fmt = '%'. $dp .'.' . $dp  . 'f' ; 
+
+print (my $head = <> ) if $o{'='} ; 
+eachLine () ; 
+
+
+sub eachLine ( ) { 
+    while ( <> ) { 
+       chomp ; 
+       print formatting $_ ; 
+       print "\n" ;
+    }
+}
+
+sub expand ( $ ) { 
+  m/(\-?\d)\.\.(\-?\d+)/ ? $1 <= $2 ? $1..$2 : reverse $2..$1 : $_ 
+}
+
+sub eachLineC ( ) { 
+    my @C = map { $_ > 0 ? $_ - 1 : $_ } map{ expand $_ } split /,/, $o{C} // '' ; 
+    my $all_col_flag = $o{C} ? 1 : 0 ; # exists ではない。
+
+    while ( <> ) { 
+        chomp ; 
+        my @F = split /\t/ , $_ , -1 ; 
+        $_ = formatting $_ for $all_col_flag ? @F[ @C ] : @F ; 
+        print join ( "\t" , @F ) , "\n" ;
+    }
+}
+
+sub rounding ( $ ) { integerize ( "$_[0]" * "$pre" ) * "$ten" }
+sub formatting ( $ ) { looks_like_number ( $_ ) ? sprintf ( $fmt , rounding $_ ) : $_ } 
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+  $0  [-f] [-c] -d 桁数
+
+    -d で指定された桁数に応じて、１０進数としての丸め変換を行う。
+    負の数が指定された場合は、その絶対値の桁数が小数点から右側へ0になる。
+
+  オプション: 
+  
+    -c : 切り上げを行う。(これが未指定なら四捨五入または切り捨て。)
+    -f : 切り捨てを行う。(これが未指定なら四捨五入または切り上げ。)
+
+    -C n1,n2,n3.. : タブ区切りで、その列に対して、丸め変換を行う。列指定は最左を1または最右列を-1とする。
+    -C 0 : タブ区切りの全ての列に対して、丸め変換を行う。
+    -= : 最初の行は変換対象とはしない。
+
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+ 
+=cut 

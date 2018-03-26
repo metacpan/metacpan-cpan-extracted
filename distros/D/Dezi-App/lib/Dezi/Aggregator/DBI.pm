@@ -13,7 +13,7 @@ has 'schema'        => ( is => 'rw', isa => 'HashRef', required => 1 );
 has 'use_quotes'    => ( is => 'rw', isa => 'Bool',    default  => sub {1} );
 has 'quote_char' => ( is => 'rw', isa => 'Str', default => sub {q/`/} );
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 my $XMLer = Search::Tools::XML->new();    # included in Utils
 
@@ -24,10 +24,10 @@ my $XMLer = Search::Tools::XML->new();    # included in Utils
 Dezi::Aggregator::DBI - index DB records
 
 =head1 SYNOPSIS
-    
+
     use Dezi::Aggregator::DBI;
     use Carp;
-    
+
     my $aggregator = Dezi::Aggregator::DBI->new(
         db => [
             "DBI:mysql:database=movies;host=localhost;port=3306",
@@ -55,23 +55,23 @@ Dezi::Aggregator::DBI - index DB records
         alias_columns   => 1,
         indexer         => Dezi::Indexer::Native->new,
     );
-    
+
     $aggregator->crawl();
 
 
 =head1 DESCRIPTION
 
-Dezi::Aggregator::DBI is a Dezi::Aggregator subclass 
+Dezi::Aggregator::DBI is a Dezi::Aggregator subclass
 designed for providing full-text search for databases.
 
 =head1 METHODS
 
-Since Dezi::Aggregator::DBI inherits from Dezi::Aggregator, 
+Since Dezi::Aggregator::DBI inherits from Dezi::Aggregator,
 read that documentation first. Any overridden methods are documented here.
 
 =head2 new( I<opts> )
 
-Create new aggregator object. 
+Create new aggregator object.
 
 The following I<opts> are required:
 
@@ -88,7 +88,7 @@ passed to connect(). Otherwise it will be passed to connect as is.
 =item schema => I<db_schema>
 
 I<db_schema> is a hashref of table names and column descriptions.
-Each key should be a table name. Each value should be a hashref of 
+Each key should be a table name. Each value should be a hashref of
 column descriptions, where the key is the column name and the value
 is a hashref of type and bias. See the SYNOPSIS.
 
@@ -126,7 +126,7 @@ The character to use when C<use_quotes> is true. Default is B<`> (backtick).
 
 =back
 
-B<NOTE:> The new() method simply inherits from Dezi::Aggregator, 
+B<NOTE:> The new() method simply inherits from Dezi::Aggregator,
 so any params valid for that method are allowed here.
 
 =head2 BUILD
@@ -350,7 +350,7 @@ Peter Karman, E<lt>karpet@dezi.orgE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-dezi-app at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
@@ -395,10 +395,10 @@ L<https://metacpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2014 by Peter Karman
+Copyright 2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the terms of the GPL v2 or later.
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

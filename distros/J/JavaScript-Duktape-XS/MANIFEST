@@ -1,0 +1,20 @@
+.gitignore
+Changes
+duk.xs
+duk_config.h
+duktape.c
+duktape.h
+duk_poll.c
+duk_poll.h
+ecma_eventloop.js
+lib/JavaScript/Duktape/XS.pm
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+ppport.h
+README.md
+t/gonzo.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

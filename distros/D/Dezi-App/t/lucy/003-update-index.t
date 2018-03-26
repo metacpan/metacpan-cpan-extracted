@@ -1,5 +1,7 @@
-use Test::More tests => 31;
+#!perl
 use strict;
+use warnings;
+use Test::More tests => 31;
 use Data::Dump qw( dump );
 
 use_ok('Dezi::App');

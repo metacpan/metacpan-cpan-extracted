@@ -1,5 +1,7 @@
+# vim: sw=4 ts=4 ft=perl
+
 package WebService::Braintree::ApplePay;
-$WebService::Braintree::ApplePay::VERSION = '1.1';
+$WebService::Braintree::ApplePay::VERSION = '1.2';
 use 5.010_001;
 use strictures 1;
 
@@ -14,11 +16,12 @@ This class lists, registers, and unregisters ApplePay domains.
 =cut
 
 use Moose;
-extends "WebService::Braintree::ResultObject";
+
+with 'WebService::Braintree::Role::Interface';
 
 =head2 registered_domains()
 
-This returns all the registered ApplePay domains
+This returns a L<response|WebService::Braintee::Result> with the C<< apple_pay_options() >> set.
 
 =cut
 
@@ -29,7 +32,8 @@ sub registered_domains {
 
 =head2 register_domain()
 
-This registers the domain provided.
+This registers the domain provided. This returns a L<response|WebService::Braintee::Result> with nothing set.
+
 
 =cut
 
@@ -41,7 +45,7 @@ sub register_domain {
 
 =head2 unregister_domain()
 
-This unregisters the domain provided.
+This unregisters the domain provided. This returns a L<response|WebService::Braintee::Result> with nothing set.
 
 =cut
 
@@ -51,31 +55,19 @@ sub unregister_domain {
     $class->gateway->apple_pay->unregister_domain($domain);
 }
 
-sub gateway {
-    return WebService::Braintree->configuration->gateway;
-}
-
-sub BUILD {
-    my ($self, $attributes) = @_;
-
-    $self->set_attributes_from_hash($self, $attributes);
-}
-
 __PACKAGE__->meta->make_immutable;
 
 1;
 __END__
 
-=head1 TODO
+=head1 NOTES
 
-=over 4
+This code was transcribed from the Ruby SDK.
 
-=item Need to document the keys and values that are returned
+=head2 UNTESTED
 
-=item Need to document the required and optional input parameters
-
-=item Need to document the possible errors/exceptions
-
-=back
+This class is untested because there is no obvious way to setup the integration
+sandbox to trigger these scenarios. If you have a way of testing this, please
+reach out to the maintainers.
 
 =cut

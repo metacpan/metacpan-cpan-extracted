@@ -32,4 +32,4 @@ resources:
   bugtracker: https://github.com/pablrod/p5-Bat-Interpreter/issues
   homepage: https://github.com/pablrod/p5-Bat-Interpreter
   repository: https://github.com/pablrod/p5-Bat-Interpreter.git
-version: '0.002'
+version: '0.003'

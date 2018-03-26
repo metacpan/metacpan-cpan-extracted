@@ -10,7 +10,23 @@ use Sub::Install;
 
 use parent 'DateTime::Moonpig';
 
-our $VERSION = '0.2.3';
+our $VERSION = '0.3.0';
+
+use overload
+    '=='  => \&_dt_int_eq,
+    '!='  => \&_dt_int_ne,
+    '<=>' => \&_dt_int_cmp,
+    '<'   => \&_dt_int_lt,
+    '<='  => \&_dt_int_le,
+    '>'   => \&_dt_int_gt,
+    '>='  => \&_dt_int_ge,
+    'eq'  => \&_dt_str_eq,
+    'ne'  => \&_dt_str_ne,
+    'cmp' => \&_dt_str_cmp,
+    'lt'  => \&_dt_str_lt,
+    'le'  => \&_dt_str_le,
+    'gt'  => \&_dt_str_gt,
+    'ge'  => \&_dt_str_ge;
 
 my ($HAVE_PG, $HAVE_ISO);
 
@@ -105,6 +121,69 @@ sub pg_timestamp_tz {
     }
 }
 
+############## PRIVATE METHODS BELOW ##############
+
+sub _promote {
+    my $side_b = $_[1];
+    
+    # Deliberately not catching errors here
+    $side_b = DT->new($side_b)
+        if not ref($side_b) or not $side_b->isa('DateTime');
+    
+    return ($_[0], $side_b, $_[2]);
+}
+
+sub _dt_int_eq {
+    return undef unless defined $_[1];
+    
+    my ($side_a, $side_b) = _promote(@_);
+    
+    return DateTime::compare($side_a, $side_b) == 0;
+}
+
+sub _dt_int_cmp {
+    return undef unless defined $_[1];
+
+    my ($side_a, $side_b, $flip) = _promote(@_);
+    
+    return $flip ? DateTime::compare($side_b, $side_a)
+         :         DateTime::compare($side_a, $side_b)
+         ;
+}
+
+sub _dt_int_ne { !defined($_[1]) ? undef : !_dt_int_eq(@_) }
+sub _dt_int_lt { !defined($_[1]) ? undef : _dt_int_cmp(@_) < 0 }
+sub _dt_int_le { !defined($_[1]) ? undef : _dt_int_cmp(@_) <= 0 }
+sub _dt_int_gt { !defined($_[1]) ? undef : _dt_int_cmp(@_) > 0 }
+sub _dt_int_ge { !defined($_[1]) ? undef : _dt_int_cmp(@_) >= 0 }
+
+sub _dt_str_eq {
+    return undef unless defined $_[1];
+    
+    my ($side_a, $side_b) = _promote(@_);
+    
+    return ("$side_a" || '') eq ("$side_b" || '');
+}
+
+sub _dt_str_cmp {
+    return undef unless defined $_[1];
+    
+    my ($side_a, $side_b) = _promote(@_);
+    
+    $side_b = DT->new($side_b)
+        if not ref($side_b) or not $side_b->isa('DateTime');
+    
+    return $_[2] ? ("$side_b" || '') cmp ("$side_a" || '')
+         :         ("$side_a" || '') cmp ("$side_b" || '')
+         ;
+}
+
+sub _dt_str_ne { !defined($_[1]) ? undef : !_dt_str_eq(@_) }
+sub _dt_str_lt { !defined($_[1]) ? undef : _dt_str_cmp(@_) < 0 }
+sub _dt_str_le { !defined($_[1]) ? undef : _dt_str_cmp(@_) <= 0 }
+sub _dt_str_gt { !defined($_[1]) ? undef : _dt_str_cmp(@_) > 0 }
+sub _dt_str_ge { !defined($_[1]) ? undef : _dt_str_cmp(@_) >= 0 }
+
 1;
 
 __END__
@@ -132,6 +211,8 @@ DT - DateTime wrapper that tries hard to DWYM
 
     my ($pg_time_str) = $pg_dbh->selectrow_array("SELECT now();")
     my $dt_pg = DT->new($pg_time_str); # Also just works
+    
+    say "Wowza!" if $dt_now < time + 1; # Unexpectedly, works too!
 
     my $timestamp_notz = $dt_pg->pg_timestamp_notz;
     my $timestamp_tz = $dt->pg->pg_timestamp_tz;
@@ -185,6 +266,20 @@ or subtracting days/months/etc.
 
 A more reasonable approach is to clone the date object, perform the mutation
 on the copy and return the new object.
+
+=head1 DATE COMPARISON
+
+Yet another pretty annoying L<DateTime> quirk is comparison operator overloading.
+In my humble opinion it is not very unreasonable to expect a sophisticated date module
+to automatically grok something like this and Just Work without throwing an exception,
+or requiring a metric ton of boilerplate:
+
+    if ( $dt < time ) {
+        ...
+    }
+
+As a side effect of added operator overload C<DT> also has saner semantics for
+comparing with C<undef> values: the result of course is C<undef>.
 
 =head1 METHODS
 

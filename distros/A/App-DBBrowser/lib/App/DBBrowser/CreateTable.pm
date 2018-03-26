@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.006';
+our $VERSION = '2.008';
 
 use File::Basename qw( basename );
 use List::Util     qw( none any );
@@ -16,6 +16,8 @@ use Term::Choose::Util qw( choose_a_number );
 use Term::Form         qw();
 use Term::TablePrint   qw( print_table );
 
+use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
+
 use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;
 use App::DBBrowser::Opt;
@@ -24,35 +26,41 @@ use App::DBBrowser::Table::Insert;
 
 
 sub new {
-    my ( $class, $info, $opt ) = @_;
-    bless { i => $info, o => $opt }, $class;
+    my ( $class, $info, $options, $data ) = @_;
+    bless {
+        i => $info,
+        o => $options,
+        d => $data
+    }, $class;
 }
 
 
 sub delete_table {
-    my ( $sf, $dbh, $data ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o} );
+    my ( $sf ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $lyt_3 = Term::Choose->new( $sf->{i}{lyt_3} );
     my $sql = {};
-    my $prompt = '"' . basename( $data->{db} ) . '"' . "\n" . 'Drop table';
+    my $prompt = '"' . basename( $sf->{d}{db} ) . '"' . "\n" . 'Drop table';
     # Choose
     my $table = $lyt_3->choose( #
-        [ undef, map { "- $_" } @{$data->{user_tbls}} ],
+        [ undef, map { "- $_" } @{$sf->{d}{user_tables}} ],
         { prompt => $prompt }
     );
     if ( ! defined $table || ! length $table ) {
         return;
     }
     $table =~ s/\-\s//;
-    $sql->{table} = $ax->quote_table( $dbh, $data->{tables}{$table} );
-    my $sth = $dbh->prepare( "SELECT * FROM " . $sql->{table} );
+    $sql->{table} = $ax->quote_table( $sf->{d}{tables_info}{$table} );
+    my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sql->{table} );
     $sth->execute();
     my $col_names = $sth->{NAME}; # mysql: before fetchall_arrayref
     my $all_arrayref = $sth->fetchall_arrayref;
     my $row_count = @$all_arrayref;
     unshift @$all_arrayref, $col_names;
-    my $prompt_pt = "ENTER to continue\n$sql->{table}:";
-    print_table( $all_arrayref, { %{$sf->{o}{table}}, prompt => $prompt_pt, max_rows => 0, table_expand => 0 } );
+    if ( @$all_arrayref > 1 ) {
+        my $prompt_pt = "i: table to be deleted: $sql->{table}\n";
+        print_table( $all_arrayref, { %{$sf->{o}{table}}, prompt => $prompt_pt, max_rows => 0, keep_header => 0 } ); #
+    }
     $prompt = sprintf 'DROP TABLE %s  (%d %s)', $sql->{table}, $row_count, $row_count == 1 ? 'row' : 'rows';
     $prompt .= "\n\nCONFIRM:";
     # Choose
@@ -61,7 +69,7 @@ sub delete_table {
         { %{$sf->{i}{lyt_m}}, prompt => $prompt, undef => 'NO' }
     );
     if ( defined $choice && $choice eq 'YES' ) {
-        $dbh->do( "DROP TABLE $sql->{table}" ) or die "DROP TABLE $sql->{table} failed!";
+        $sf->{d}{dbh}->do( "DROP TABLE $sql->{table}" ) or die "DROP TABLE $sql->{table} failed!";
         return 1;
     }
     return;
@@ -69,25 +77,25 @@ sub delete_table {
 
 
 sub __table_name {
-    my ( $sf, $sql, $dbh, $stmt_typeS, $data ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o} );
+    my ( $sf, $sql, $stmt_typeS ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $table;
     my $c = 0;
 
     TABLENAME: while ( 1 ) {
         my $trs = Term::Form->new( 'tn' );
         my $info;
-        if ( defined $data->{file_name} ) {
-            $info = sprintf "File: '%s'\n", basename( delete $data->{file_name} );
+        if ( defined $sf->{d}{file_name} ) {
+            $info = sprintf "File: '%s'\n", basename( delete $sf->{d}{file_name} );
         }
         # Readline
         $table = $trs->readline( 'Table name: ', { info => $info } );
         if ( ! length $table ) {
             return;
         }
-        my $tmp_td = [ undef, $data->{schema}, $table ];
-        $sql->{table} = $ax->quote_table( $dbh, $tmp_td );
-        if ( none { $sql->{table} eq $ax->quote_table( $dbh, $data->{tables}{$_} ) } keys %{$data->{tables}} ) {
+        my $tmp_td = [ undef, $sf->{d}{schema}, $table ];
+        $sql->{table} = $ax->quote_table( $tmp_td );
+        if ( none { $sql->{table} eq $ax->quote_table( $sf->{d}{tables_info}{$_} ) } keys %{$sf->{d}{tables_info}} ) {
             return 1;
         }
         $ax->print_sql( $sql, $stmt_typeS );
@@ -111,8 +119,8 @@ sub __reset_create_table_sql {
 }
 
 sub create_new_table {
-    my ( $sf, $dbh, $data ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o} );
+    my ( $sf ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $sql = {};
     $sf->__reset_create_table_sql( $sql );
     my @cu_keys = ( qw/create_table_plain create_table_form_copy create_table_form_file settings/ );
@@ -126,7 +134,7 @@ sub create_new_table {
     MENU: while ( 1 ) {
         my $stmt_typeS = [ 'Create_table' ];
         my $choices = [ undef, @cu{@cu_keys} ];
-        my $prompt = 'Create table';
+        my $prompt = $sf->{d}{db_string} . "\n" . 'Create table';
         # Choose
         $ENV{TC_RESET_AUTO_UP} = 0;
         my $idx = choose(
@@ -146,13 +154,13 @@ sub create_new_table {
         }
         delete $ENV{TC_RESET_AUTO_UP};
         if ( $custom eq $cu{settings} ) {
-            my $obj_opt = App::DBBrowser::Opt->new( $sf->{i}, $sf->{o} );
-            $obj_opt->config_insert();
+            my $opt = App::DBBrowser::Opt->new( $sf->{i}, $sf->{o} );
+            $opt->config_insert();
             next MENU;
         }
         $ax->reset_sql( $sql ); #
         if ( $custom eq $cu{create_table_plain} ) {
-            my $ok = $sf->__data_from_plain( $sql, $dbh, $stmt_typeS, $data );
+            my $ok = $sf->__data_from_plain( $sql, $stmt_typeS );
             if ( ! $ok ) {
                 $sf->__reset_create_table_sql( $sql );
                 next MENU;
@@ -161,7 +169,7 @@ sub create_new_table {
         else {
             if ( $custom eq $cu{create_table_form_copy} ) {
                 push @$stmt_typeS, 'Insert';
-                my $tbl_in = App::DBBrowser::Table::Insert->new( $sf->{i}, $sf->{o} );
+                my $tbl_in = App::DBBrowser::Table::Insert->new( $sf->{i}, $sf->{o}, $sf->{d} );
                 my $ok = $tbl_in->from_copy_and_paste( $sql, $stmt_typeS );
                 if ( ! $ok ) {
                     $sf->__reset_create_table_sql( $sql );
@@ -170,15 +178,15 @@ sub create_new_table {
             }
             elsif ( $custom eq $cu{create_table_form_file} ) {
                 push @$stmt_typeS, 'Insert';
-                my $tbl_in = App::DBBrowser::Table::Insert->new( $sf->{i}, $sf->{o} );
+                my $tbl_in = App::DBBrowser::Table::Insert->new( $sf->{i}, $sf->{o}, $sf->{d} );
                 my $file_name = $tbl_in->from_file( $sql, $stmt_typeS );
                 if ( ! $file_name ) {
                     $sf->__reset_create_table_sql( $sql );
                     next MENU;
                 }
-                $data->{file_name} = $file_name;
+                $sf->{d}{file_name} = $file_name;
             }
-            my $ok = $sf->__table_name( $sql, $dbh, $stmt_typeS, $data );
+            my $ok = $sf->__table_name( $sql, $stmt_typeS );
             if ( ! $ok ) {
                 $sf->__reset_create_table_sql( $sql );
                 next MENU;
@@ -218,7 +226,7 @@ sub create_new_table {
         }
         die "Column with no name!" if any { ! length } @{$sql->{insert_into_cols}};
         my @cols = @{$sql->{insert_into_cols}}; #
-        $sql->{insert_into_cols} = $ax->quote_simple_many( $dbh, $sql->{insert_into_cols} );
+        $sql->{insert_into_cols} = $ax->quote_simple_many( $sql->{insert_into_cols} );
         # Datatypes
         my $trs = Term::Form->new( 'cols' );
         $ax->print_sql( $sql, $stmt_typeS );
@@ -247,17 +255,17 @@ sub create_new_table {
             next MENU;
         }
         my $ct = sprintf "CREATE TABLE $qt_table (%s)", join( ', ', @{$sql->{create_table_cols}} );
-        $dbh->do( $ct ) or die "$ct failed!";
+        $sf->{d}{dbh}->do( $ct ) or die "$ct failed!";
         delete $sql->{create_table_cols};
-        my $sth = $dbh->prepare( "SELECT * FROM $qt_table LIMIT 0" );
-        $sth->execute() if $sf->{i}{driver} ne 'SQLite';
+        my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM $qt_table LIMIT 0" );
+        $sth->execute() if $sf->{d}{driver} ne 'SQLite';
         if ( $stmt_typeS->[-1] eq 'Insert' ) {
             $stmt_typeS = [ $stmt_typeS->[-1] ];
             my @columns = @{$sth->{NAME}};
             $sth->finish();
-            $sql->{insert_into_cols} = $ax->quote_simple_many( $dbh, \@columns );
-            my $obj_table = App::DBBrowser::Table->new( $sf->{i}, $sf->{o} );
-            my $commit_ok = $obj_table->commit_sql( $sql, $stmt_typeS, $dbh );
+            $sql->{insert_into_cols} = $ax->quote_simple_many( \@columns );
+            my $tbl = App::DBBrowser::Table->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            my $commit_ok = $tbl->commit_sql( $sql, $stmt_typeS );
         }
         return 1;
     }
@@ -265,12 +273,12 @@ sub create_new_table {
 
 
 sub __data_from_plain {
-    my ( $sf, $sql, $dbh, $stmt_typeS, $data ) = @_;
-    my $ok = $sf->__table_name( $sql, $dbh, $stmt_typeS, $data );
+    my ( $sf, $sql, $stmt_typeS ) = @_;
+    my $ok = $sf->__table_name( $sql, $stmt_typeS );
     if ( ! $ok ) {
         return;
     }
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o} );
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $ax->print_sql( $sql, $stmt_typeS );
     my $col_count = choose_a_number( 3, { small => 1, confirm => 'Confirm', mouse => $sf->{o}{table}{mouse},
                                           back => 'Back', name => 'Number of columns: ', clear_screen => 0 } );

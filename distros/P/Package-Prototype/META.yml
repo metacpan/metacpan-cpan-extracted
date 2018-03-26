@@ -1,0 +1,40 @@
+---
+abstract: 'Super easily to create prototype object'
+author:
+  - 'K <x00.x7f@gmail.com>'
+build_requires:
+  Test::LeakTrace: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.4005'
+  Module::Build::XSUtil: '0.03'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Package-Prototype
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Package::Prototype:
+    file: lib/Package/Prototype.pm
+    version: '0.01'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Code-Hex/p5-Package-Prototype/issues
+  homepage: https://github.com/Code-Hex/p5-Package-Prototype
+  repository: git://github.com/Code-Hex/p5-Package-Prototype.git
+version: '0.01'
+x_authority: cpan:CODEHEX
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

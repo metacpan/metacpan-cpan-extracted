@@ -26,7 +26,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=JSON-Decode-Regexp
   homepage: https://metacpan.org/release/JSON-Decode-Regexp
   repository: git://github.com/perlancar/perl-JSON-Decode-Regexp.git
-version: '0.100'
+version: '0.101'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

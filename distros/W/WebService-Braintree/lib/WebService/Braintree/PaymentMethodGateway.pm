@@ -1,25 +1,41 @@
-package WebService::Braintree::PaymentMethodGateway;
-$WebService::Braintree::PaymentMethodGateway::VERSION = '1.1';
+# vim: sw=4 ts=4 ft=perl
+
+package # hide from pause
+    WebService::Braintree::PaymentMethodGateway;
+
 use 5.010_001;
 use strictures 1;
 
 use Moose;
-with 'WebService::Braintree::Role::MakeRequest';
+extends 'WebService::Braintree::PaymentMethodGatewayBase';
 
 use Carp qw(confess);
-
-has 'gateway' => (is => 'ro');
+use Scalar::Util qw(blessed);
 
 use WebService::Braintree::Util qw(validate_id);
 
+use WebService::Braintree::PaymentMethodResult;
+
 sub create {
     my ($self, $params) = @_;
-    $self->_make_request("/payment_methods", 'post', {payment_method => $params});
+    return $self->_create(
+        "/payment_methods", 'post', {payment_method => $params},
+    );
 }
 
 sub update {
     my ($self, $token, $params) = @_;
-    $self->_make_request("/payment_methods/any/" . $token, "put", {payment_method => $params});
+    return $self->_update(
+        "/payment_methods/any/" . $token, "put", {payment_method => $params},
+    );
+}
+
+sub find {
+    my ($self, $token) = @_;
+    confess "NotFoundError" unless validate_id($token);
+    return $self->_find(payment_method => (
+        "/payment_methods/any/${token}", 'get', undef,
+    ));
 }
 
 sub delete {
@@ -37,18 +53,7 @@ sub revoke {
     $self->_make_request("/payment_methods/revoke", 'post', {payment_method => { shared_payment_method_token => $token}});
 }
 
-sub find {
-    my ($self, $token) = @_;
-    if (!validate_id($token)) {
-        confess "NotFoundError";
-    }
-
-    my $response = $self->_make_request("/payment_methods/any/" . $token, 'get');
-    return $response->payment_method;
-}
-
 __PACKAGE__->meta->make_immutable;
 
 1;
 __END__
-

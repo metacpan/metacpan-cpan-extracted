@@ -48,45 +48,18 @@ sub import ($;$$) {
 
 __END__
 
+# Code example demonstrating how to use this module.
 
-use strict;
-use warnings;
-
-package ABC;       
+# MyConstants.pm
+package MyConstants;
 use Games::Checkers::DeclareConstant { a1 => "Checkers", a2 => ':' };
 use Games::Checkers::DeclareConstant { a3 => "Games" };
-package Real;
-ABC->import;
-print "Expected: Games::Checkers, real: ", a3(), a2(), a2(), a1(), "\n";
+1;
 
-package World;  
-use vars '@ISA';
-@ISA = ('Real');
-ABC->import;
-print "Expected: Games::Checkers, real: ", a3(), a2(), a2(), a1(), "\n";
-print "Expected: Games::Checkers, real: ", a3, a2, a2, a1, "\n";
-
-
-
-
-
-
-
+# MyModule.pm
+package MyModule;
 use strict;
 use warnings;
-
-package Real;
-use ABC;
-print "Expected: Games::Checkers, real: ", a3(), a2(), a2(), a1(), "\n";
-
-package World;
-use vars '@ISA';
-@ISA = ('Real');
-use ABC;
-print "Expected: Games::Checkers, real: ", a3(), a2(), a2(), a1(), "\n";
+use MyConstants;
 print "Expected: Games::Checkers, real: ", a3, a2, a2, a1, "\n";
-
-sub abc {
-	if (NL > 30) { print "NL\n"; }
-}
-abc();
+1;

@@ -1,7 +1,13 @@
 Revision history for Perl extension Net::DNS::SEC.
 
 
-**** 1.05 March 20, Tuesday
+**** 1.06 March 22, 2018
+
+	Functionally identical to 1.05
+	All changes address build/test issues on some platforms
+
+
+**** 1.05 March 20, 2018
 
 Feature
 	Support added for Ed25519 and Ed448 algorithms
@@ -563,4 +569,4 @@ Net::DNS. The history of those is documented below.
 
 
 ---------------------------------------------------------------------------
-$Id: Changes 1655 2018-03-20 08:41:36Z willem $
+$Id: Changes 1656 2018-03-22 14:36:14Z willem $

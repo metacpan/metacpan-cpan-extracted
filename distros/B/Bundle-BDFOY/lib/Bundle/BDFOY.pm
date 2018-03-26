@@ -1,6 +1,6 @@
 package Bundle::BDFOY;
 
-$VERSION = '20170402';
+our $VERSION   = '20180323';
 
 1;
 
@@ -220,7 +220,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2006-2017, brian d foy.
+Copyright © 2006-2018, brian d foy.
 
 This code is licensed under the Artisitic License 2.0
 

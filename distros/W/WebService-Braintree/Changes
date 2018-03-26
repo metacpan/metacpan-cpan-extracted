@@ -1,4 +1,16 @@
 Revision history for WebService-Braintree
+1.2     2018-03-20
+        Added new interfaces:
+            TransactionLineItem
+                ->find_all()
+        Added a ton of missing object methods from the Ruby SDK
+        Added a TON of documentation around ... well, everything.
+        BREAKING: All result objects now inherit from WebService::Braintree::_
+        and are named WebService::Braintree::_::Foo
+            This is because Perl does not support a clean distinction between
+            class and object methods. All methods in Perl are both. In order to
+            use the result objects as parsing types, that distinction needed to
+            be extremely clear.
 1.1    2018-02-24
         Added new interfaces:
             DocumentUpload
@@ -17,7 +29,6 @@ Revision history for WebService-Braintree
                 ->add_file_evidence()
         Unsuccessful results are now ::ErrorResult, not ::Result.
             ::Result->api_error_repsonse is now removed.
-
 1.0    2018-01-13
         Added new interfaces:
             AddOn

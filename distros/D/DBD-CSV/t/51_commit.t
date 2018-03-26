@@ -7,7 +7,7 @@ use warnings;
 use Test::More;
 
 BEGIN { use_ok ("DBI") }
-do "t/lib.pl";
+do "./t/lib.pl";
 
 my $nano = $ENV{DBI_SQL_NANO};
 my @tbl_def = (

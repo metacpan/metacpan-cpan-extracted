@@ -1,5 +1,5 @@
 package Statocles::Page;
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 # ABSTRACT: Base role for rendering files
 
 use Statocles::Base 'Role';
@@ -39,8 +39,8 @@ has app => (
 
 has path => (
     is => 'rw',
-    isa => Path,
-    coerce => Path->coercion,
+    isa => PagePath,
+    coerce => PagePath->coercion,
     required => 1,
 );
 
@@ -76,7 +76,9 @@ has type => (
     lazy => 1,
     default => sub {
         my ( $self ) = @_;
-        my ( $ext ) = $self->path =~ /[.]([^.]+)$/;
+        my $filename = (split '/', $self->path.'', -1)[-1];
+        return $TYPES{html} if $filename eq '';
+        my ( $ext ) = $filename =~ /[.]([^.]+)$/;
         return $TYPES{ $ext };
     },
 );
@@ -306,7 +308,7 @@ sub render {
 
 sub basename {
     my ( $self ) = @_;
-    return $self->path->basename;
+    return $self->path->[-1];
 }
 
 #pod =method dirname
@@ -321,7 +323,9 @@ sub basename {
 
 sub dirname {
     my ( $self ) = @_;
-    return $self->path->parent->stringify;
+    my $clone = $self->path->clone;
+    pop @$clone;
+    return $clone.'';
 }
 
 1;
@@ -338,7 +342,7 @@ Statocles::Page - Base role for rendering files
 
 =head1 VERSION
 
-version 0.088
+version 0.089
 
 =head1 DESCRIPTION
 

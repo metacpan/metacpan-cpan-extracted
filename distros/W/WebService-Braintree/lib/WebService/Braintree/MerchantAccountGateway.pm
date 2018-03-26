@@ -1,5 +1,8 @@
-package WebService::Braintree::MerchantAccountGateway;
-$WebService::Braintree::MerchantAccountGateway::VERSION = '1.1';
+# vim: sw=4 ts=4 ft=perl
+
+package # hide from pause
+    WebService::Braintree::MerchantAccountGateway;
+
 use 5.010_001;
 use strictures 1;
 
@@ -13,6 +16,8 @@ use WebService::Braintree::Util qw(validate_id is_hashref);
 use WebService::Braintree::Result;
 
 has 'gateway' => (is => 'ro');
+
+use WebService::Braintree::_::MerchantAccount;
 
 sub create {
     my ($self, $params) = @_;
@@ -37,7 +42,7 @@ sub all {
 
     return $self->paginated_collection({
         url => "/merchant_accounts",
-        inflate => [qw/merchant_accounts merchant_account MerchantAccount/],
+        inflate => [qw/merchant_accounts merchant_account _::MerchantAccount/],
     });
 }
 

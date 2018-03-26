@@ -1,0 +1,6 @@
+name = "App-Egaz"
+badges = ['travis', 'codecov']
+authority="cpan:WANGQ"
+
+module_maker="ModuleBuildTiny"
+

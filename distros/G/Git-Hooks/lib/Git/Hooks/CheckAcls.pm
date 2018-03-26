@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 
 package Git::Hooks::CheckAcls;
-# ABSTRACT: Git::Hooks plugin for branch/tag access control
-$Git::Hooks::CheckAcls::VERSION = '2.8.1';
+# ABSTRACT: [DEPRECATED] Git::Hooks plugin for branch/tag access control
+$Git::Hooks::CheckAcls::VERSION = '2.9.0';
 use 5.010;
 use utf8;
 use strict;
@@ -86,7 +86,7 @@ EOS
     # Assign meaningful names to op codes.
     my %op = (
         C => 'create',
-        R => 'rewind/rebase',
+        R => 'rewrite',
         U => 'update',
         D => 'delete',
     );
@@ -138,11 +138,11 @@ __END__
 
 =head1 NAME
 
-Git::Hooks::CheckAcls - Git::Hooks plugin for branch/tag access control
+Git::Hooks::CheckAcls - [DEPRECATED] Git::Hooks plugin for branch/tag access control
 
 =head1 VERSION
 
-version 2.8.1
+version 2.9.0
 
 =head1 SYNOPSIS
 
@@ -150,18 +150,26 @@ As a C<Git::Hooks> plugin you don't use this Perl module directly. Instead, you
 may configure it in a Git configuration file like this:
 
   [githooks]
+
+    # Enable the plugin
     plugin = CheckAcls
+
+    # These users are exempt from all checks
     admin = joe molly
 
   [githooks "checkacls"]
+
+    # Any user can create, rewrite, update, and delete branches prefixed with
+    # their own usernames.
     acl = ^.      CRUD ^refs/heads/{USER}/
+
+    # Any user can update any branch.
     acl = ^.      U    ^refs/heads/
 
-This allows users C<joe> and C<molly> do anything. Every other user can create,
-rewind, update, and delete branches prefixed with their own usernames, but they
-can only update other branches.
-
 =head1 DESCRIPTION
+
+This plugin is deprecated. Please, use the L<Git::Hooks::CheckReference> plugin
+instead.
 
 This L<Git::Hooks> plugin hooks itself to the hooks below to guarantee that
 only allowed users can push commits and tags to specific branches.
@@ -197,7 +205,7 @@ option:
 
 =head1 NAME
 
-Git::Hooks::CheckAcls - Git::Hooks plugin for branch/tag access control
+Git::Hooks::CheckAcls - [DEPRECATED] Git::Hooks plugin for branch/tag access control
 
 =head1 CONFIGURATION
 
@@ -234,7 +242,7 @@ specified as a string of one or more of the following opcodes:
 
 =item * B<C> - Create a new ref.
 
-=item * B<R> - Rewind/Rebase an existing ref. (With commit loss.)
+=item * B<R> - Rewrite an existing ref. (With commit loss.)
 
 =item * B<U> - Update an existing ref. (A fast-forward with no commit loss.)
 

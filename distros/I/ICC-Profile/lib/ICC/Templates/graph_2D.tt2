@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>[% title %]</title>
+<script src="[% jsFolder %]/modernizr.js"></script>
+<script type="text/javascript">
+window.addEventListener('load', eventWindowLoaded, false);
+function eventWindowLoaded() {
+
+	canvasApp();
+
+}
+
+function canvasSupport () {
+	return Modernizr.canvas;
+}
+
+
+function canvasApp() {
+
+	if (!canvasSupport()) {
+		return;
+	} else {
+		var theCanvas = document.getElementById('canvas');
+		var context = theCanvas.getContext('2d');
+	}
+
+	drawScreen();
+
+	function drawScreen() {
+[% drawScreen %]
+	}
+
+}
+
+
+</script> 
+</head>
+<body>
+<div style="position: absolute; top: 50px; left: 50px;">
+<canvas id="canvas" width="[% width %]" height="[% height %]">
+ Your browser does not support the HTML 5 Canvas.
+</canvas>
+</div>
+</body>
+</html>

@@ -1,5 +1,9 @@
 Revision history for perl module XML::Hash::XS
 
+0.52    2018-03-25
+    - Implement searilization of objects with overloaded stringification
+        - Thanks to Slobodan Mišković for advice
+
 0.51    2017-08-28
     - Add partial support for DTD
 

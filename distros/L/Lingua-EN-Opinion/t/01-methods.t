@@ -106,7 +106,7 @@ is_deeply $x, $expected, 'nrc_get_word';
 $text = 'I am actually very happy today.';
 $x = $obj->get_sentence($text);
 $expected = {
-    I        => undef,
+    i        => undef,
     am       => undef,
     actually => undef,
     very     => undef,
@@ -117,7 +117,7 @@ is_deeply $x, $expected, 'get_sentence';
 
 $x = $obj->nrc_get_sentence($text);
 $expected = {
-    I        => undef,
+    i        => undef,
     am       => undef,
     actually => undef,
     very     => undef,

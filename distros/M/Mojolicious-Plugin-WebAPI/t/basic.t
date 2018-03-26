@@ -8,6 +8,8 @@ use lib dirname(__FILE__) . '/lib';
 
 my $t = Test::Mojo->new('ApiTest');
 
+$t->get_ok('/')->status_is(200)->content_like( qr/WebAPI test app/ );
+
 $t->get_ok('/api/v0/')->status_is(200)->json_is(
     {
         "_links" => {
@@ -18,7 +20,7 @@ $t->get_ok('/api/v0/')->status_is(200)->json_is(
             "test_table{/1}" => {
                 "href"      => "/api/v0/test_table{/1}",
                 "title"     => "Schema TestTable",
-                "templated" => 1
+                "templated" => "1",
             },
             "self" => {
                 "href" => "/api/v0/"

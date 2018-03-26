@@ -13,7 +13,7 @@ use File::Which;
 use POSIX qw(SIGQUIT SIGKILL WNOHANG getuid setuid);
 use User::pwent;
 
-our $VERSION = '1.24';
+our $VERSION = '1.25';
 our $errstr;
 
 # Deprecate use of %Defaults as we want to remove this package global
@@ -31,6 +31,24 @@ tie our %Defaults, 'Tie::Hash::Method', FETCH => sub {
     auto_start      => 2,
     initdb_args     => '-U postgres -A trust',
     postmaster_args => '-h 127.0.0.1 -F',
+);
+
+has dbname => (
+    is => 'ro',
+    isa => Str,
+    default => 'test',
+);
+
+has dbowner => (
+    is => 'ro',
+    isa => Str,
+    default => 'postgres',
+);
+
+has host => (
+    is => 'ro',
+    isa => Str,
+    default => '127.0.0.1',
 );
 
 # Various paths that Postgres gets installed under, sometimes with a version on the end,
@@ -114,7 +132,7 @@ has initdb_args => (
 );
 
 method _build_initdb_args() {
-    return "-U postgres -A trust " . $self->extra_initdb_args;
+    return '-U '. $self->dbowner . ' -A trust ' . $self->extra_initdb_args;
 }
 
 has extra_initdb_args => (
@@ -150,6 +168,11 @@ method _pg_ctl_builder() {
   return;
 }
 
+has pg_config => (
+    is => 'ro',
+    isa => Str,
+);
+
 has psql => (
     is => 'ro',
     isa => Str,
@@ -163,7 +186,7 @@ has psql_args => (
 );
 
 method _build_psql_args() {
-    return '-U postgres -d test -h '.
+    return '-U ' . $self->dbowner . ' -d ' . $self->dbname . ' -h '.
         ($self->unix_socket ? $self->socket_dir : '127.0.0.1') .
         ' -p ' . $self->port
         . $self->extra_psql_args;
@@ -173,6 +196,19 @@ has extra_psql_args => (
     is => 'ro',
     isa => Str,
     default => '',
+);
+
+has run_psql_args => (
+    is => 'ro',
+    isa => Str,
+    # Single transaction, skip .psqlrc, be quiet, echo errors, stop on first error
+    default => '-1Xqb -v ON_ERROR_STOP=1',
+);
+
+has seed_scripts => (
+    is => 'ro',
+    isa => ArrayRef[Str],
+    default => sub { [] },
 );
 
 has pid => (
@@ -277,17 +313,17 @@ sub dsn {
 
 sub _default_args {
     my ($self, %args) = @_;
-    # If we're doing socket-only (IE, not listening on localhost),
+    # If we're doing socket-only (i.e., not listening on localhost),
     # then provide the path to the socket
     if ($self->{unix_socket}) {
         $args{host} //= $self->socket_dir;
     } else {
-        $args{host} ||= '127.0.0.1';
+        $args{host} ||= $self->host;
     }
 
     $args{port} ||= $self->port;
-    $args{user} ||= 'postgres';
-    $args{dbname} ||= 'test';
+    $args{user} ||= $self->dbowner;
+    $args{dbname} ||= $self->dbname;
     return %args;
 }
 
@@ -313,7 +349,7 @@ method start() {
     }
 
     # create "test" database
-    $self->_create_test_database;
+    $self->_create_test_database($self->dbname);
 }
 
 # This whole method was mostly cargo-culted from the earlier test-postgresql;
@@ -353,7 +389,7 @@ method _try_start($port) {
                 $port,                  '-k',
                 $self->socket_dir)
         );
-        $self->setuid_cmd(@cmd);
+        $self->setuid_cmd(\@cmd, 1);
 
         my $pid_path = File::Spec->catfile( $self->base_dir, 'data', 'postmaster.pid' );
 
@@ -425,7 +461,7 @@ method stop($sig = SIGQUIT) {
             File::Spec->catdir( $self->base_dir, 'data' ),
             '-m', 'fast'
         );
-        $self->setuid_cmd(@cmd);
+        $self->setuid_cmd(\@cmd);
     }
     else {
         # old style or $self->base_dir File::Temp obj already DESTROYed
@@ -433,7 +469,7 @@ method stop($sig = SIGQUIT) {
 
         kill $sig, $self->pid;
         my $timeout = 10;
-        while ($timeout > 0 and waitpid($self->pid, WNOHANG) <= 0) {
+        while ($timeout > 0 and waitpid($self->pid, WNOHANG) == 0) {
             $timeout -= sleep(1);
         }
 
@@ -441,7 +477,7 @@ method stop($sig = SIGQUIT) {
             warn "Pg refused to die gracefully; killing it violently.\n";
             kill SIGKILL, $self->pid;
             $timeout = 5;
-            while ($timeout > 0 and waitpid($self->pid, WNOHANG) <= 0) {
+            while ($timeout > 0 and waitpid($self->pid, WNOHANG) == 0) {
                 $timeout -= sleep(1);
             }
             if ($timeout <= 0) {
@@ -453,7 +489,7 @@ method stop($sig = SIGQUIT) {
     return;
 }
 
-method _create_test_database() {
+method _create_test_database($dbname) {
   my $tries = 5;
   my $dbh;
   while ($tries) {
@@ -476,11 +512,17 @@ method _create_test_database() {
   die "Connection to the database failed even after 5 tries"
       unless ($dbh);
 
-  if ($dbh->selectrow_arrayref(q{SELECT COUNT(*) FROM pg_database WHERE datname='test'})->[0] == 0) {
-      $dbh->do('CREATE DATABASE test')
+  if ($dbh->selectrow_arrayref(qq{SELECT COUNT(*) FROM pg_database WHERE datname='$dbname'})->[0] == 0) {
+      $dbh->do("CREATE DATABASE $dbname")
           or die $dbh->errstr;
   }
-  return;
+
+    my $seed_scripts = $self->seed_scripts || [];
+    
+    $self->run_psql_scripts(@$seed_scripts)
+        if @$seed_scripts;
+    
+    return;
 }
 
 method setup() {
@@ -510,7 +552,7 @@ method setup() {
                 '-o',
                 $self->initdb_args,
             );
-            $self->setuid_cmd(@cmd);
+            $self->setuid_cmd(\@cmd);
         }
         else {
             # old style
@@ -552,10 +594,20 @@ method setup() {
                 if $? != 0;
 
         }
-        # use postgres hard-coded configuration as some packagers mess
-        # around with postgresql.conf.sample too much:
-        truncate File::Spec->catfile( $self->base_dir, 'data',
-            'postgresql.conf' ), 0;
+        
+        my $conf_file
+            = File::Spec->catfile($self->base_dir, 'data', 'postgresql.conf');
+        
+        if (my $pg_config = $self->pg_config) {
+            open my $fh, '>', $conf_file or die "Can't open $conf_file: $!";
+            print $fh $pg_config;
+            close $fh;
+        }
+        else {
+            # use postgres hard-coded configuration as some packagers mess
+            # around with postgresql.conf.sample too much:
+            truncate $conf_file, 0;
+        }
     }
 }
 
@@ -571,18 +623,50 @@ method _find_program($prog) {
     return;
 }
 
-method setuid_cmd(@cmd) {
+method setuid_cmd($cmd, $suppress_errors = !1) {
   my $pid = fork;
   if ($pid == 0) {
     chdir $self->base_dir;
     if (defined $self->uid) {
       setuid($self->uid) or die "setuid failed: $!";
     }
-    exec(@cmd) or die "Failed to exec pg_ctl: $!";
+    close STDERR if $suppress_errors;
+    exec(@$cmd) or die "Failed to exec pg_ctl: $!";
   }
   else {
     waitpid($pid, 0);
   }
+}
+
+method run_psql(@psql_args) {
+    my $cmd = join ' ', (
+        $self->psql,
+        
+        # Default connection settings
+        $self->psql_args,
+        
+        # Extra connection settings or something else
+        $self->extra_psql_args,
+        
+        # run_psql specific arguments
+        $self->run_psql_args,
+        
+        @psql_args,
+    );
+    
+    # Usually anything less than WARNING is not really helpful
+    # in batch mode. Does it make sense to make this configurable?
+    local $ENV{PGOPTIONS} = '--client-min-messages=warning';
+    
+    my $psql_out = qx{$cmd 2>&1};
+    
+    die "Error executing psql: $psql_out" unless $? == 0;
+}
+
+method run_psql_scripts(@script_paths) {
+    my $psql_args = join ' ', map {; "-f $_" } @script_paths;
+    
+    $self->run_psql($psql_args);
 }
 
 1;
@@ -607,8 +691,8 @@ Test::PostgreSQL - PostgreSQL runner for tests
   #
   # $ENV{POSTGRES_HOME} = '/path/to/my/pgsql/installation';
 
-  my $pgsql = Test::PostgreSQL->new()
-      or plan skip_all => $Test::PostgreSQL::errstr;
+  my $pgsql = eval { Test::PostgreSQL->new() }
+      or plan skip_all => $@;
 
   plan tests => XXX;
 
@@ -622,56 +706,109 @@ directory, and destroys it when the perl script exits.
 This module is a fork of Test::postgresql, which was abandoned by its author
 several years ago.
 
-=head1 FUNCTIONS
+=head1 ATTRIBUTES
 
-=head2 new
+C<Test::PostgreSQL> object has the following attributes, overridable by passing
+corresponding argument to constructor:
 
-Create and run a PostgreSQL instance.  The instance is terminated when the
-returned object is being DESTROYed.  If required programs (initdb and
-postmaster) were not found, the function returns undef and sets appropriate
-message to $Test::PostgreSQL::errstr.
+=head2 dbname
+
+Database name to use in this C<Test::PostgreSQL> instance. Default is C<test>.
+
+=head2 dbowner
+
+Database owner user name. Default is C<postgres>.
+
+=head2 host
+
+Host name or IP address to use for PostgreSQL instance connections. Default is
+C<127.0.0.1>.
 
 =head2 base_dir
 
-Returns directory under which the PostgreSQL instance is being created.  The
-property can be set as a parameter of the C<new> function, in which case the
+Base directory under which the PostgreSQL instance is being created. The
+property can be passed as a parameter to the constructor, in which case the
 directory will not be removed at exit.
 
-=head2 initdb
+=head2 base_port
 
-=head2 postmaster
+Connection port number to start with. If the port is already used we will increment
+the value and try again.
 
-Path to C<initdb> and C<postmaster> which are part of the PostgreSQL
-distribution.  If not set, the programs are automatically searched by looking
-up $PATH and other prefixed directories. Since C<postmaster> is deprecated in
-newer PostgreSQL versions C<postgres> is used in preference to C<postmaster>.
+Default: C<15432>.
+
+=head2 unix_socket
+
+Whether to only connect via UNIX sockets; if false (the default),
+connections can occur via localhost. [This changes the L</dsn>
+returned to only give the UNIX socket directory, and avoids any issues with
+conflicting TCP ports on localhost.]
+
+=head2 socket_dir
+
+Unix socket directory to use if L</unix_socket> is true. Default is C<$basedir/tmp>.
 
 =head2 pg_ctl
 
-Path to C<pg_ctl> which is part of the PostgreSQL distribution.
+Path to C<pg_ctl> program which is part of the PostgreSQL distribution.
 
-Starting with PostgreSQL version 9.0 <pg_ctl> can be used to start/stop
+Starting with PostgreSQL version 9.0 C<pg_ctl> can be used to start/stop
 postgres without having to use fork/pipe and will be chosen automatically
 if L</pg_ctl> is not set but the program is found and the version is recent
 enough.
 
 B<NOTE:> do NOT use this with PostgreSQL versions prior to version 9.0.
 
+By default we will try to find C<pg_ctl> in PostgresSQL directory.
+
+=head2 initdb
+
+Path to C<initdb> program which is part of the PostreSQL distribution. Default is
+to try and find it in PostgreSQL directory.
+
 =head2 initdb_args
 
-Defaults to C<-U postgres -A trust>
+Arguments to pass to C<initdb> program when creating a new PostgreSQL database
+cluster for Test::PostgreSQL session.
+
+Defaults to C<-U postgres -A trust>. See L</db_owner>.
 
 =head2 extra_initdb_args
 
-Extra args to be appended to L</initdb_args>
+Extra args to be appended to L</initdb_args>. Default is empty.
+
+=head2 pg_config
+
+Configuration to place in C<$basedir/data/postgresql.conf>. Use this to override
+PostgreSQL configuration defaults, e.g. to speed up PostgreSQL database init
+and seeding one might use something like this:
+
+    my $pgsql = Test::PostgreSQL->new(
+        pg_config => q|
+        # foo baroo mymse throbbozongo
+        fsync = off
+        synchronous_commit = off
+        full_page_writes = off
+        bgwriter_lru_maxpages = 0
+        shared_buffers = 512MB
+        effective_cache_size = 512MB
+        work_mem = 100MB
+    |);
+
+=head2 postmaster
+
+Path to C<postmaster> which is part of the PostgreSQL distribution. If not set,
+the programs are automatically searched by looking up $PATH and other prefixed
+directories. Since C<postmaster> is deprecated in newer PostgreSQL versions
+C<postgres> is used in preference to C<postmaster>.
 
 =head2 postmaster_args
 
-Defaults to C<-h 127.0.0.1 -F>
+Defaults to C<-h 127.0.0.1 -F>.
 
 =head2 extra_postmaster_args
 
-Extra args to be appended to L</postmaster_args>
+Extra args to be appended to L</postmaster_args>. Default is empty.
 
 =head2 psql
 
@@ -690,23 +827,95 @@ by L</new>:
 =head2 psql_args
 
 Command line arguments necessary for C<psql> to connect to the correct PostgreSQL
-instance. Defaults to C<-U postgres -d test -h 127.0.0.1 -p $self->port>
+instance.
+
+Defaults to C<-U postgres -d test -h 127.0.0.1 -p $self-E<gt>port>.
+
+See also L</db_owner>, L</dbname>, L</host>, L</base_port>.
 
 =head2 extra_psql_args
 
 Extra args to be appended to L</psql_args>.
 
+=head2 run_psql_args
+
+Arguments specific for L</run_psql> invocation, used mostly to set up and seed
+database schema after PostgreSQL instance is launched and configured.
+
+Default is C<-1Xqb -v ON_ERROR_STOP=1>. This means:
+
+=over 4
+
+=item *
+
+1: Run all SQL statements in passed scripts as single transaction
+
+=item *
+
+X: Skip C<.psqlrc> files
+
+=item *
+
+q: Run quietly, print only notices and errors on stderr (if any)
+
+=item *
+
+b: Echo SQL statements that cause PostgreSQL exceptions
+
+=item *
+
+-v ON_ERROR_STOP=1: Stop processing SQL statements after the first error
+
+=back
+
+=head2 seed_scripts
+
+Arrayref with the list of SQL scripts to run after the database was instanced
+and set up. Default is C<[]>.
+
+=head2 auto_start
+
+Integer value that controls whether PostgreSQL server is started and setup
+after creating C<Test::PostgreSQL> instance. Possible values:
+
+=over 4
+
+=item C<0>
+
+Do not start PostgreSQL.
+
+=item C<1>
+
+Start PostgreSQL but do not run L</setup>.
+
+=item C<2>
+
+Start PostgreSQL and run L</setup>.
+
+Default is C<2>.
+
+=back
+
+=head1 METHODS
+
+=head2 new
+
+Create and run a PostgreSQL instance. The instance is terminated when the
+returned object is being DESTROYed.  If required programs (initdb and
+postmaster) were not found, the function returns undef and sets appropriate
+message to $Test::PostgreSQL::errstr.
+
 =head2 dsn
 
 Builds and returns dsn by using given parameters (if any).  Default username is
-'postgres', and dbname is 'test' (an empty database).
+C<postgres>, and dbname is C<test> (an empty database).
 
 =head2 uri
 
 Builds and returns a connection URI using the given parameters (if any). See
 L<URI::db> for details about the format.
 
-Default username is 'postgres', and dbname is 'test' (an empty database).
+Default username is C<postgres>, and dbname is C<test> (an empty database).
 
 =head2 pid
 
@@ -727,14 +936,30 @@ Stops postmaster.
 
 =head2 setup
 
-Setups the PostgreSQL instance.
+Setups the PostgreSQL instance. Note that this method should be invoked I<before>
+L</start>.
 
-=head2 unix_socket
+=head2 run_psql
 
-Whether to only connect via UNIX sockets; if false (the default),
-connections can occur via localhost. [This changes the L</dsn>
-returned to only give the UNIX socket directory, and avoids any issues with
-conflicting TCP ports on localhost.]
+Execute C<psql> program with the given list of arguments. Usually this would be
+something like:
+
+    $pgsql->run_psql('-c', q|'INSERT INTO foo (bar) VALUES (42)'|);
+
+Or:
+
+    $pgsql->run_psql('-f', '/path/to/script.sql');
+
+Note that when using literal SQL statements with C<-c> parameter you will need
+to escape them manually like shown above. C<run_psql> will not quote them for you.
+
+The actual command line to execute C<psql> will be concatenated from L</psql_args>,
+L</extra_psql_args>, and L</run_psql_args>.
+
+=head2 run_psql_scripts
+
+Given a list of script file paths, invoke L</run_psql> once with C<-f 'script'>
+for every path.
 
 =head1 ENVIRONMENT
 
@@ -744,14 +969,14 @@ If your postgres installation is not located in a well known path, or you have
 many versions installed and want to run your tests against particular one, set
 this environment variable to the desired path. For example:
 
- export POSTGRES_HOME='/usr/local/pgsql94beta'
+    export POSTGRES_HOME='/usr/local/pgsql94beta'
 
 This is the same idea and variable name which is used by the installer of
 L<DBD::Pg>.
 
 =head1 AUTHOR
 
-Toby Corkindale, Kazuho Oku, Peter Mottram, plus various contributors.
+Toby Corkindale, Kazuho Oku, Peter Mottram, Alex Tokarev, plus various contributors.
 
 =head1 COPYRIGHT
 

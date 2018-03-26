@@ -1,0 +1,23 @@
+branches:
+  only:
+    - master
+dist: trusty  # This is necessary for net-snmp 5.7.2.
+language: perl
+sudo: required
+before_install:
+  - sudo apt-get -y install cpanminus
+  - sudo perl Makefile.PL
+  - sudo make manifest
+  - sudo make dist
+install:
+  - sudo apt-get -y install libsnmp-perl libsnmp-info-perl
+  - sudo cpanm --installdeps --notest App-Netsync-*.tar.gz
+before_script:
+  - sudo make clean
+  - sudo rm Makefile.old MANIFEST
+script:
+  - sudo perl Makefile.PL
+  - sudo make manifest
+  - sudo RELEASE_TESTING=true make test
+  - sudo make install
+  - netsync --help

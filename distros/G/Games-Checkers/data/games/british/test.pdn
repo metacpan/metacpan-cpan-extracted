@@ -1,0 +1,11 @@
+[Event "Game 1"]
+[Black "Nemet,A"]
+[White "Terens,B"]
+[Date "11.05.2002"]
+[Result "1-0"]
+[GameType "21"]
+[SetUp "1"]
+[FEN "W:WK4,28:BK11,19."]
+
+1. 4-8 11x4 2. 28-24 19x28 {black win...} 1-0
+

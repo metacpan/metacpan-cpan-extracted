@@ -42,7 +42,7 @@ use DateTime;
 
         package Other::Date;
         use overload
-            q[""] => sub { return ${ $_[0] }; },
+            q[""]    => sub { return ${ $_[0] }; },
             fallback => 1;
 
         sub new {

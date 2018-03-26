@@ -185,7 +185,7 @@ subtest 'file evidence (add and find)' => sub {
     );
 
     my $file = File::Spec->catfile($fixtures, 'bt_logo.png');
-    my $kind = WebService::Braintree::DocumentUpload::Kind->IdentityDocument;
+    my $kind = WebService::Braintree::DocumentUpload::Kind->EvidenceDocument;
     my $response = WebService::Braintree::DocumentUpload->create({
         kind => $kind,
         file => $file,
@@ -223,6 +223,7 @@ subtest 'file evidence (add and find)' => sub {
 
 subtest search => sub {
     subtest 'Not found' => sub {
+        plan skip_all => "This is inconsistently returning 500-ServerError";
         my $collection = perform_search(Dispute => {
             id => 'non_existent_dispute',
         });

@@ -1,3 +1,4 @@
+CHANGES
 COPYING
 INSTALL
 Makefile.PL
@@ -7,6 +8,8 @@ TODO
 bin/pcheckers-auto-play
 bin/pcheckers-replay-games
 data/games/british/British_Computer_Championship_2002.pdn.bz2
+data/games/british/test.pdn
+data/games/czech/MR_Ceska_Dama_Druzstev_2008.pdn.bz2
 data/games/internt/az2000.pdn.bz2
 data/games/internt/candidate95.pdn.bz2
 data/games/internt/Cannes_Open_Tournament_2002.pdn.bz2
@@ -18,6 +21,7 @@ data/games/italian/40champ-1996.pdn.bz2
 data/games/italian/ci98-fero.pdn.bz2
 data/games/italian/ci98-perani.pdn.bz2
 data/games/italian/partite.pdn.bz2
+data/games/pool/3_vs_1_King_Theory.phn
 data/games/russian/abatsiev.pdn.bz2
 data/games/russian/First_Computers_Match_Moscow_1998.pdn
 data/games/russian/test.pdn
@@ -31,32 +35,37 @@ data/images/pawn-black.png
 data/images/pawn-white.png
 data/spec/game-codes.txt
 data/spec/pdn-format.txt
+doc/extra-variants
 doc/rules
+doc/variants
 examples/print-initial-board
 examples/print-initial-moves
 examples/test-iterators
+examples/show-board
 lib/Games/Checkers.pm
 lib/Games/Checkers/Board.pm
-lib/Games/Checkers/BoardConstants.pm
+lib/Games/Checkers/Board/_4x4.pm
+lib/Games/Checkers/Board/_6x6.pm
+lib/Games/Checkers/Board/_8x8.pm
+lib/Games/Checkers/Board/_8x10.pm
+lib/Games/Checkers/Board/_10x8.pm
+lib/Games/Checkers/Board/_10x10.pm
+lib/Games/Checkers/Board/_12x12.pm
+lib/Games/Checkers/Board/_14x14.pm
+lib/Games/Checkers/Board/_16x16.pm
 lib/Games/Checkers/BoardTree.pm
-lib/Games/Checkers/CompPlayer.pm
 lib/Games/Checkers/Constants.pm
 lib/Games/Checkers/CreateMoveList.pm
 lib/Games/Checkers/DeclareConstant.pm
 lib/Games/Checkers/ExpandMoveList.pm
 lib/Games/Checkers/Game.pm
-lib/Games/Checkers/IteratorConstants.pm
 lib/Games/Checkers/Iterators.pm
-lib/Games/Checkers/LocationConversions.pm
 lib/Games/Checkers/Move.pm
 lib/Games/Checkers/MoveConstants.pm
-lib/Games/Checkers/MoveListNode.pm
 lib/Games/Checkers/MoveLocationConstructor.pm
 lib/Games/Checkers/PDNParser.pm
-lib/Games/Checkers/Player.pm
-lib/Games/Checkers/PlayerConstants.pm
+lib/Games/Checkers/Rules.pm
 lib/Games/Checkers/SDL.pm
-lib/Games/Checkers/UserPlayer.pm
 t/0-use.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

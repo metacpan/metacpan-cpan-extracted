@@ -2,7 +2,7 @@
 Build.PL                                   #                   3rd party file built by ModuleBuildTiny
 COPYING                                    # Dist-Zilla-Plugin-Templates file built by GenerateFile
 Changes                                    # Dist-Zilla-Plugin-Templates file added by Manifest::Read
-GPLv3                                      # Dist-Zilla-Plugin-Templates file added by Manifest::Read
+GPL-3.0                                    # Dist-Zilla-Plugin-Templates file added by Manifest::Read
 MANIFEST                                   #                    metainfo file built by Manifest::Write
 META.json                                  #                    metainfo file built by MetaJSON
 META.yml                                   #                    metainfo file built by MetaYAML

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TransferCurveSet>
+	<TransferCurve Separation="Cyan"/>
+	<TransferCurve Separation="Magenta"/>
+	<TransferCurve Separation="Yellow"/>
+	<TransferCurve Separation="Black"/>
+</TransferCurveSet>

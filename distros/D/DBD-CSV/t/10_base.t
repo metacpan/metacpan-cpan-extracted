@@ -13,7 +13,7 @@ BEGIN {
 
 ok ($SQL::Statement::VERSION, "SQL::Statement::Version $SQL::Statement::VERSION");
 
-do "t/lib.pl";
+do "./t/lib.pl";
 
 my $nano = $ENV{DBI_SQL_NANO};
 defined $nano or $nano = "not set";

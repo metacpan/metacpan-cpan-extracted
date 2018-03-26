@@ -217,13 +217,13 @@ sub test_suite {
         );
 
     $trans->rollback;
-"
-    also, test to make sure a broken written record at the end of a silo file
-        doesn't sink the whole thing
 
-    there is something in the silo that shouldnt be there
-        rollback didnt work for this case
- ";
+    # also, test to make sure a broken written record at the end of a silo file
+    #     doesn't sink the whole thing
+
+    # there is something in the silo that shouldnt be there
+    #     rollback didnt work for this case
+
     check( $store, "after transaction rollback",
            trans   => 0, #transaction done
            entries => 3,

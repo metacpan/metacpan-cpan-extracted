@@ -9,7 +9,7 @@ use SWISH::3 qw( :constants );
 
 use namespace::autoclean;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 has 'invindex' => ( is => 'rw', isa => DeziInvIndex, required => 1 );
 has 'file' => ( is => 'ro', isa => 'Path::Class::File', coerce => 1, );
@@ -144,7 +144,7 @@ Dezi::InvIndex::Header - read/write InvIndex metadata
  for my $key (keys %{ $meta->data }) {
     dump $meta->$key;
  }
- 
+
 =head1 DESCRIPTION
 
 A Dezi::InvIndex::Header object represents the metadata for an
@@ -156,7 +156,11 @@ at this time.
 All the L<SWISH::3> constants are imported into this namespace,
 including:
 
-=head2 SWISH_DOC_PROP_MAP
+=over 4
+
+=item * SWISH_DOC_PROP_MAP
+
+=back
 
 =head1 METHODS
 
@@ -167,7 +171,7 @@ Default is C<swish.xml>.
 
 =head2 swish_header_file
 
-Alias for header_file(). For backwards compatability with SWISH::Prog.
+Alias for header_file(). For backwards compatibility with SWISH::Prog.
 
 =head2 BUILD
 
@@ -208,7 +212,7 @@ Peter Karman, E<lt>karpet@dezi.orgE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-dezi-app at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
@@ -253,10 +257,10 @@ L<https://metacpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2014 by Peter Karman
+Copyright 2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the terms of the GPL v2 or later.
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

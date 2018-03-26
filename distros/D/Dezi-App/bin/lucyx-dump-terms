@@ -7,7 +7,7 @@ my $usage = "$0 path/to/index\n";
 
 die $usage unless @ARGV;
 
-binmode STDOUT, ":utf8";
+binmode STDOUT, ":encoding(UTF-8)";
 
 for my $invindex (@ARGV) {
     my $reader      = Lucy::Index::IndexReader->open( index => $invindex );

@@ -2,7 +2,7 @@ To prepare the package, run from command line:
 
 	% perl Makefile.PL
 	% make
-	% make tests
+	% make test
 
 To install the package (probably as root), run:
 

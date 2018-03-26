@@ -38,6 +38,7 @@
             "App::MusicTools" : "0",
             "Csound" : "0",
             "File::Format::RIFF" : "0",
+            "Guitar::Scale" : "0",
             "MIDI" : "0",
             "MIDI::Drummer::Tiny" : "0",
             "MIDI::Morph" : "0",
@@ -99,7 +100,7 @@
          "web" : "https://github.com/ology/Task-MusicBundle"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"

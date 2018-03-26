@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Exporter" => 0,
-    "Hash::Wrap" => "0.03",
+    "Hash::Wrap" => "0.08",
     "PDL" => 0,
     "PDL::Image2D" => 0,
     "PDL::Lite" => 0,
@@ -58,7 +58,7 @@ my %WriteMakefileArgs = (
     "Test::Fatal" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.09",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -71,7 +71,7 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "Hash::Wrap" => "0.03",
+  "Hash::Wrap" => "0.08",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Number::Tolerant" => 0,

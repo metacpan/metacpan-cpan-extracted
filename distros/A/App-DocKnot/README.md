@@ -1,4 +1,4 @@
-# DocKnot 1.03
+# DocKnot 1.04
 
 Copyright 2013-2018 Russ Allbery <rra@cpan.org>.  This software is
 distributed under a BSD-style license.  Please see the section

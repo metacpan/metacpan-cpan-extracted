@@ -1,5 +1,9 @@
 This file documents the revision history for Perl extension Text::SimpleTable.
 
+2.04  2018-03-23 14:13:00
+        - Add line drawing using Unicode line drawing characters as an option (pjsg)
+        - Update metadata (grinnz)
+
 2.03  2010-03-11 11:38:00
         - New maintainer.
 

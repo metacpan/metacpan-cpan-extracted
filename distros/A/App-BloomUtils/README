@@ -1,0 +1,184 @@
+NAME
+    App::BloomUtils - Utilities related to bloom filters
+
+VERSION
+    This document describes version 0.002 of App::BloomUtils (from Perl
+    distribution App-BloomUtils), released on 2018-03-23.
+
+DESCRIPTION
+    This distributions provides the following command-line utilities:
+
+    *   bloom-filter-calculator
+
+    *   check-with-bloom-filter
+
+    *   gen-bloom-filter
+
+FUNCTIONS
+  bloom_filter_calculator
+    Usage:
+
+     bloom_filter_calculator(%args) -> [status, msg, result, meta]
+
+    Help calculate num_bits (m) and num_hashes (k).
+
+    Bloom filter is setup using two parameters: "num_bits" ("m") which is
+    the size of the bloom filter (in bits) and "num_hashes" ("k") which is
+    the number of hash functions to use which will determine the write and
+    lookup speed.
+
+    Some rules of thumb:
+
+    *   One byte per item in the input set gives about a 2% false positive
+        rate. So if you expect two have 1024 elements, create a 1KB bloom
+        filter with about 2% false positive rate. For other false positive
+        rates:
+
+        1% - 9.6 bits per item 0.1% - 14.4 bits per item 0.01% - 19.2 bits
+        per item
+
+    *   Optimal number of hash functions is 0.7 times number of bits per
+        item.
+
+    *   What is an acceptable false positive rate? This depends on your
+        needs.
+
+    Ref: https://corte.si/posts/code/bloom-filter-rules-of-thumb/index.html
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   false_positive_rate => *num* (default: 0.02)
+
+    *   num_hashes => *num*
+
+    *   num_hashes_to_bits_per_item_ratio => *num* (default: 0.7)
+
+        0.7 (the default) is optimal.
+
+    *   num_items* => *posint*
+
+        Expected number of items to add to bloom filter.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  check_with_bloom_filter
+    Usage:
+
+     check_with_bloom_filter(%args) -> [status, msg, result, meta]
+
+    Check with bloom filter.
+
+    You supply the bloom filter in STDIN, items to check as arguments, and
+    this utility will print lines containing 0 or 1 depending on whether
+    items in the arguments are tested to be, respectively, not in the set
+    (0) or probably in the set (1).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   items* => *array[str]*
+
+        Items to check.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  gen_bloom_filter
+    Usage:
+
+     gen_bloom_filter(%args) -> [status, msg, result, meta]
+
+    Generate bloom filter.
+
+    You supply lines of text from STDIN and it will output the bloom filter
+    bits on STDOUT. You can also customize "num_bits" ("m") and "num_hashes"
+    ("k"). Some rules of thumb to remember:
+
+    *   One byte per item in the input set gives about a 2% false positive
+        rate. So if you expect two have 1024 elements, create a 1KB bloom
+        filter with about 2% false positive rate. For other false positive
+        rates:
+
+        1% - 9.6 bits per item 0.1% - 14.4 bits per item 0.01% - 19.2 bits
+        per item
+
+    *   Optimal number of hash functions is 0.7 times number of bits per
+        item.
+
+    *   What is an acceptable false positive rate? This depends on your
+        needs.
+
+    Ref: https://corte.si/posts/code/bloom-filter-rules-of-thumb/index.html
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   num_bits => *num* (default: 80000)
+
+        The default is 80000 (generates a ~10KB bloom filter). If you supply
+        10,000 items (meaning 1 byte per 1 item) then the false positive
+        rate will be ~2%. If you supply fewer items the false positive rate
+        is smaller and if you supply more than 10,000 items the false
+        positive rate will be higher.
+
+    *   num_hashes => *num* (default: 5.7)
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-BloomUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-BloomUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-BloomUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    bloom-filter-calculator.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

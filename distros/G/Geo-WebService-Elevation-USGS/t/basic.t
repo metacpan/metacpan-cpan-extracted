@@ -5,6 +5,8 @@ use warnings;
 
 use Test::More 0.88;
 
+use constant HASH_REF	=> ref {};
+
 my $module = 'Geo::WebService::Elevation::USGS';
 
 require_ok($module)
@@ -30,7 +32,7 @@ $ele->set(places => 2);	# USGS returns insane precision
 is($ele->get('places'), 2, 'Places can be set to 2');
 my $rslt = eval {$ele->attributes()};
 ok($rslt, 'attributes() returned something');
-is(ref $rslt, 'HASH', 'attributes() returned a hash reference');
+is(ref $rslt, HASH_REF, 'attributes() returned a hash reference');
 is($rslt->{places}, 2, 'attributes() returned places => 2');
 $rslt->{places} = undef;
 is($ele->get('places'), 2,

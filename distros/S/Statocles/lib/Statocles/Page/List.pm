@@ -1,5 +1,5 @@
 package Statocles::Page::List;
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 # ABSTRACT: A page presenting a list of other pages
 
 use Statocles::Base 'Class';
@@ -54,8 +54,8 @@ sub pages {
 
 has [qw( next prev )] => (
     is => 'rw',
-    isa => Path,
-    coerce => Path->coercion,
+    isa => PagePath,
+    coerce => PagePath->coercion,
 );
 
 #pod =attr date
@@ -221,7 +221,7 @@ Statocles::Page::List - A page presenting a list of other pages
 
 =head1 VERSION
 
-version 0.088
+version 0.089
 
 =head1 DESCRIPTION
 

@@ -13,7 +13,8 @@ WriteMakefile(
       'strict'   => 0,
       'Business::OnlinePayment' => 3,
       'Business::OnlinePayment::HTTPS' => 0,
-      'XML::Hash::LX' => 0,
+      'XML::Writer' => 0,
+      'XML::Hash::XS' => 0,
       'Digest::HMAC_SHA1' => 0,
     },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
@@ -28,4 +29,3 @@ WriteMakefile(
      : ()
     ),
 );
-

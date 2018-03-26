@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -57,6 +57,17 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.06",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Against-Dev"
+      },
+      "homepage" : "http://thenceforward.net/perl/modules/Test-Against-Dev/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jkeenan/test-against-dev.git",
+         "web" : "https://github.com/jkeenan/test-against-dev"
+      }
+   },
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

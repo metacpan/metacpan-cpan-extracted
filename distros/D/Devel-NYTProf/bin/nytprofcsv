@@ -16,7 +16,7 @@ use Getopt::Long;
 
 use Devel::NYTProf::Reader;
 
-our $VERSION = '6.04';
+our $VERSION = '6.05';
 
 use constant NUMERIC_PRECISION => 5;
 
@@ -202,7 +202,7 @@ the source might be misaligned
 
 Mailing list and discussion at L<http://groups.google.com/group/develnytprof-dev>
 
-Public SVN Repository and hacking instructions at L<http://code.google.com/p/perl-devel-nytprof/>
+Public Github Repository and hacking instructions at L<https://github.com/timbunce/devel-nytprof/>
 
 L<Devel::NYTProf>
 L<Devel::NYTProf::Reader>

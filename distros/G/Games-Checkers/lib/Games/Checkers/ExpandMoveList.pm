@@ -19,8 +19,7 @@ use warnings;
 package Games::Checkers::ExpandMoveList;
 
 use base 'Games::Checkers::MoveLocationConstructor';
-use Games::Checkers::Constants; 
-use Games::Checkers::IteratorConstants;
+use Games::Checkers::Constants;
 
 sub new ($$$) {
 	my $class = shift;
@@ -52,27 +51,13 @@ sub build ($) {
 sub build_continue ($) {
 	my $self = shift;
 
-	my $iterator_class = "Games::Checkers::";
-	$iterator_class .= (qw(PawnStepIterator PawnBeatIterator KingStepIterator KingBeatIterator))
-		[($self->{piece} == King) * 2 + $self->{must_beat}];
-	my $rule_iterator = $iterator_class->new($self->dst_1, $self->{color});
+	my $method = $self->{must_beat} ? 'beat_destinations' : 'step_destinations';
+	my $destinations = $self->{work_board}->$method($self->dst_1, $self->{piece}, $self->{color});
 
-#	if (type == Pawn &&  must_beat) rule_iterator = &pawn_beat_iterator;
-#	if (type == Pawn && !must_beat) rule_iterator = &pawn_step_iterator;
-#	if (type == King &&  must_beat) rule_iterator = &king_beat_iterator;
-#	if (type == King && !must_beat) rule_iterator = &king_step_iterator;
-#	rule_iterator->init(dst_1(), color);
-#	if (type == Pawn && !must_beat) rule_iterator = new PawnStepIterator(dst_1(), color);
-#	if (type == Pawn &&  must_beat) rule_iterator = new PawnBeatIterator(dst_1(), color);
-#	if (type == King && !must_beat) rule_iterator = new KingStepIterator(dst_1(), color);
-#	if (type == King &&  must_beat) rule_iterator = new KingBeatIterator(dst_1(), color);
-#	if (type == King &&  must_beat) rule_iterator = new ValidKingBeatIterator(dst_1(), color, *this);
-#	unless ($rule_iterator)
-
-	while ($rule_iterator->left) {
-		next if $self->add_dst($rule_iterator->next) == Err;
+	for my $dst (@$destinations) {
+		next if $self->add_dst($dst) == Err;
 		if ($self->can_create_move) {
-			$self->{status} = $self->add_move;
+			$self->{status} = $self->gather_move;
 		} else {
 			$self->build_continue;
 		}
@@ -81,7 +66,7 @@ sub build_continue ($) {
 	}
 }
 
-sub add_move ($) {
+sub gather_move ($) {
 	my $self = shift;
 	die "Pure virtual method is called";
 }

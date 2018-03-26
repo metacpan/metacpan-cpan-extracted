@@ -1,5 +1,8 @@
-package WebService::Braintree::Digest;
-$WebService::Braintree::Digest::VERSION = '1.1';
+# vim: sw=4 ts=4 ft=perl
+
+package # hide from pause
+    WebService::Braintree::Digest;
+
 use 5.010_001;
 use strictures 1;
 

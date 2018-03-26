@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,28 +15,27 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 e8b32e1468843acab987a49494655d552a6a4fc5 Changes
-SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
+SHA1 f39aaa3c10268126db6fd7a4fee8f86f65416dcb LICENSE
 SHA1 0ce294f887820dbb07c2239beb7e9dda9ca6be6f MANIFEST
-SHA1 89e524121667a0ae60e4bdd531ce5deec93ef5eb META.json
-SHA1 610c1be295e303df13a852933595deb0cadb9bd6 META.yml
-SHA1 36a2d2089b2fda8e0bb2443b0372b349f2f6636a Makefile.PL
-SHA1 523d042978c59939b4c44774f8dabf1db4297c08 README
-SHA1 cf9ef48f5cb0e4456ce99bd4906de3b9236f1eac gena
-SHA1 86295c6281dfd748c5ae11c656dfbc75900a92b5 genc
-SHA1 ce81dfb660e3c5d66b1238d61a77683f687c1969 lib/Math/SlideRule.pm
-SHA1 2014611cf1677eba814ecc695033fe562c6e4700 lib/Math/SlideRule/PickettPocket.pm
-SHA1 59bce3997d6b42ab36c8fd8c2f7346bca1c58c8d t/00-Math-SlideRule.t
-SHA1 838140c22b375b7b6443d3fe1114e0ad2505cca0 t/01-PickettPocket.t
-SHA1 9e6e8302c6371ed788b40cd7ecff1eaed834b22f t/pod-coverage.t
-SHA1 6c20761b6a8f5ab2e199ce47aa25b1413ca0115e t/pod.t
+SHA1 96dde8341d23ac5c78d490cf49f404151f0dfff4 META.json
+SHA1 71d21e895b2b5475725f54c9b8b1ac05b84ef522 META.yml
+SHA1 ab7cc2ef63c01a2455d7d70daa8919058c4d4254 Makefile.PL
+SHA1 d302841c58925d0af719eac889b6a522a9395d6e README
+SHA1 659c4fa80ef5e572844e42a47cdd6102bdbbddb8 gena
+SHA1 a314259c9d03f613cfe349c165bd55e6d5c07efa genc
+SHA1 187d74d412e3e3a64ea92c7cefca93efc40d34ab lib/Math/SlideRule.pm
+SHA1 026b7a6b3287c18edb23f78e569d2899d3cd4593 lib/Math/SlideRule/PickettPocket.pm
+SHA1 b5d32c81917b90d35def7a1c7e35b2360058464b t/00-Math-SlideRule.t
+SHA1 412615ff5e75b8af3fe7f959da2a6a7c1b9998c2 t/01-PickettPocket.t
+SHA1 d369164d0149a8fde73b25573b516ea031000589 t/pod-coverage.t
+SHA1 85e510761a2abf5b9865d84dfaa835eb6a94c248 t/pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWhW7WAAoJEDTEVWqwTuCUp6sIAJNPUUt5RfsJCw/aMMRvq7/k
-OlGXu6EYLpjAQeAklLsPpHflFXsXpl7Li4rC11lPzYSznZqW9QepTenHSJ0aCmkZ
-yOZBG0EF0Ro3yKyhISKZDFXxpNM04dl+Sc3Xl1ve4sn3m/IxKO1toJXCFIYmF2fl
-woJkCa8yW1ae+9MITCsfihhfRek+D0aKuZhiAXc5jkLyT6V/bhF452ZfulVeUV7c
-tZl6fr0Hvj9EtgOMB6sFNfFGMOJdhUfyNuC5fwD6NubnZg43uEO1yDe5QwYNyZYI
-oIldK+SxPfkvBtNMXWFfXyPmKWcariEH2XgjylAXZR92g72zo1hbjXW+ascRPWU=
-=SQYG
+iQEcBAEBAgAGBQJat7F7AAoJEKSYBH5dablgxswIAJQDLhvq9+B/4/MZHb0BKGDx
+BsElq4z9lJmvsBThapiLLu3IHX5K2naN/+656u7xnZc1c9DBIhea/bhGYmsnkfrE
+QWpmQRa3ilWcFVgQqzFmauoBQjjJYsyRynAnyCpXkVv6bl4Cus6xTu6Xm/ktaxhN
+uA9yj1g7aUIHS2DECIddyBEwEgqEgqQoIDLOAGBdp71ymgRF/UXDOQ/ClS3lr1xL
+jy2dupoLJvael7gKeESAtLGFq/FDgXYBdLQZoZGicQiGvwUTU8bioGp0xcxCxqer
+R3FGbxUIMH5rsrJMJLP4KMevUDLOsh8Ris7J/5mcCcCWBfE7/6VVYmiS7Xhw1K0=
+=DZHo
 -----END PGP SIGNATURE-----

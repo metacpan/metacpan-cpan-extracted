@@ -1,0 +1,23 @@
+=pod
+
+=encoding utf8
+
+=head1 CSV
+
+=head2 read CSV
+
+=head2 write CSV
+
+    use Text::CSV_XS qw[];
+
+    Text::CSV_XS::csv(
+        in          => Array[HashRef],
+        out         => 'filename.csv',
+        headers     => [qw[field1 field2 ...]],
+        binary      => 1,
+        encoding    => 'UTF-8',
+        decode_utf8 => 0,
+        eol         => $LF,
+    );
+
+=cut

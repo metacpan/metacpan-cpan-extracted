@@ -13,12 +13,13 @@ NAME
 
  DOCUMENTATION
 
-    The module is sparsely documented, at best. The public facing API is
-    very similar to the Ruby libraries which are documented at
+    The module is fully documented, but that documentation is
+    reverse-engineered. The public facing API is very similar to the Ruby
+    libraries which are documented at
     https://developers.braintreepayments.com/ruby/sdk/server/overview.
 
     You can also look over the test suite for guidance of usage, especially
-    the xt/sandbox tests. Not all of these tests work (ones marked
+    the t/sandbox tests. Not all of these tests work (ones marked
     todo_skip). This is because they are an adaptation of code used against
     Braintree's private integration server.
 
@@ -32,6 +33,9 @@ NAME
     In general, clients of this library will not instantiate any objects.
     Every call you make will be a class method. Some methods will return
     objects. In those cases, those objects will be documented for you.
+
+    Unless otherwise noted, all attributes in these objects will be
+    read-only and will have been populated by the responses from Braintree.
 
  CONFIGURATION
 
@@ -62,7 +66,9 @@ NAME
  INTERFACE
 
     These are the classes that you will interface with. Please see their
-    respective documentation for more detail on how to use them.
+    respective documentation for more detail on how to use them. These
+    classes only provide class methods. These methods all invoke some part
+    of the Braintree API.
 
   WebService::Braintree::AddOn
 
@@ -142,6 +148,10 @@ NAME
     Create, manage, and search for transactions. This is the workhorse
     class and it has many methods.
 
+  WebService::Braintree::TransactionLineItem
+
+    Find all the transaction line-items.
+
   WebService::Braintree::TransparentRedirect
 
     Manage the transparent redirection of ????.
@@ -158,7 +168,42 @@ NAME
     is unique in that it takes a subroutine reference (subref) instead of a
     hashref or other parameters.
 
-    Documentation for this is forthcoming.
+  Example
+
+        my $results = WebService::Braintree::Transaction->search(sub {
+            my $search = shift;
+            $search->amount->between(10, 20);
+        });
+
+  Additional Documentation
+
+    The various field types are documenated at
+    WebService::Braintree::AdvancedSearchNodes.
+
+ RESPONSES
+
+    Responses from the interface methods will either be a Result or an
+    ErrorResult. You can distinguish between them by calling
+    $result->is_success.
+
+  Success
+
+    If the request is successful, Braintee will reply back and you will
+    receive (in most cases) a "WebService::Braintree::Result" in result
+    object. This object will allow you to access the various components of
+    the response.
+
+    In some cases, you will receive something different. Those cases are
+    documented in the method itself.
+
+  Failure
+
+    If there is an issue with the request, Braintree will reply back and
+    you will receive a "WebService::Braintree::ErrorResult" in ErrorResult
+    object. It will contain a
+    "WebService::Braintree::ValidationErrorCollection" in collection of
+    "WebService::Braintree::Error" in errors explaining each issue with the
+    request.
 
  ISSUES
 
@@ -183,13 +228,27 @@ NAME
       Bash script in the root called run_tests that provides an entrypoint
       to how this project uses Docker. The sequence is:
 
-      run_tests build [ command ]
+      run_tests build
 
-      run_tests test [ command ]
+	This will build the Docker developer environment for each Perl
+	version listed in PERL_VERSIONS
+
+      run_tests unit [ command ]
+
+	This will run the unit tests for each Perl version listed in
+	PERL_VERSIONS. You can provide a prove command to limit which
+	test(s) you run.
 
       run_tests integration [ command ]
 
+	This will run the sandbox tests for each Perl version listed in
+	PERL_VERSIONS. You can provide a prove command to limit which
+	test(s) you run.
+
       run_tests cover
+
+	This will run the all the tests for each Perl version listed in
+	PERL_VERSIONS and calculate the coverage.
 
       You can optionally select a Perl version or versions (5.10 through
       5.24) to run the command against by setting the PERL_VERSIONS
@@ -198,18 +257,11 @@ NAME
       This Bash script has been tested to work in Linux, OSX, and GitBash
       on Windows.
 
-    Running the tests in xt/
-
-      The tests in t/ are unit tests. The tests in xt/ are E2E tests that
-      run against Braintree's sandbox / integration environment. To run
-      them, you will need to have a Braintree sandbox account linked to
-      Paypal.
-
       Signup
 
 	Navigate to https://www.braintreepayments.com/sandbox. Enter your
-	first name, last name, Comany name of "WebService::Braintree", your
-	country, and your email address.
+	first name, last name, Company name of "WebService::Braintree",
+	your country, and your email address.
 
       Activate your account
 
@@ -260,56 +312,20 @@ NAME
 
  TODO/WISHLIST/ROADMAP
 
-    There is no pod documentation.
+    Many of the integration tests are still skipped.
 
-    Sandbox tests fail
+    There aren't enough unit tests.
 
-      Some of this is likely needed because the sandbox account needs to be
-      set up just right, and some may be because the paypal test
-      integration server is emulating stateful transactions.
-
-    Excessive metaobject wrangling
-
-      The usage of Moose in this code is sub-opimtimal. In particular the
-      following classes use the metaobject in a way that makes what is
-      happening difficult to understand:
-
-      WebService::Braintree::ResultObject
-
-	This class is now the only one that is not immutable in the
-	codebase. Unpicking how to make this mutable is problematic.
-
-	The constructors for the following should be fixed to be explicit
-	(requires understanding of what ResultObject is doing):
-
-      WebService::Braintree::AdvancedSearchFields
-
-      WebService::Braintree::SubscriptionSearch
-
-      WebService::Braintree::CreditCardVerificationSearch
-
-      WebService::Braintree::CustomerSearch
-
-      WebService::Braintree::Result
-
-      WebService::Braintree::TransactionSearch
-
-      Also, having stared at the internals of some objects in the perl
-      debugger for a bit, I fear there may be memory leaks, but I have not
-      investigated this closely. It's also possible that the way that
-      several of the above methods use a $field variable in package lexical
-      scope that this module may not be fork-safe. These concerns also
-      apply to Net::Braintree (only it has a bigger memory footprint).
-
-    Sandbox tests
-
-      One of the sandbox tests is really really slow.
+    The documentation is still sparse, especially for the PURPOSE sections.
 
  ACKNOWLEDGEMENTS
 
     Thanks to the staff at Braintree for endorsing this fork.
 
     Thanks to ZipRecruiter for sponsoring improvements to the forked code.
+
+    Thanks to Rob Kinyon for refactoring significant portions of the
+    codebase.
 
  LICENSE AND COPYRIGHT
 

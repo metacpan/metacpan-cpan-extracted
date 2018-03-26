@@ -1,5 +1,5 @@
 package Git::Raw::Error::Category;
-$Git::Raw::Error::Category::VERSION = '0.78';
+$Git::Raw::Error::Category::VERSION = '0.79';
 use strict;
 use warnings;
 use Carp;
@@ -29,7 +29,7 @@ Git::Raw::Error::Category - Error category class
 
 =head1 VERSION
 
-version 0.78
+version 0.79
 
 =head1 DESCRIPTION
 

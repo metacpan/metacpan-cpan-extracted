@@ -15,7 +15,7 @@ use SWISH::3 qw( :constants );
 my $SWISH3 = SWISH::3->new();
 my $XML    = Search::Tools::XML->new;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 =pod
 
@@ -26,14 +26,14 @@ Dezi::Utils - utility variables and methods
 =head1 SYNOPSIS
 
  use Dezi::Utils;
- 
+
  my $ext = Dezi::Utils->get_file_ext( $filename );
  my $mime = Dezi::Utils->get_mime( $filename );
  if (Dezi::Utils->looks_like_gz( $filename )) {
      $mime = Dezi::Utils->get_real_mime( $filename );
  }
  my $parser = Dezi::Utils->get_parser_for_mime( $mime );
- 
+
 =head1 DESCRIPTION
 
 This class provides commonly used variables and methods
@@ -215,7 +215,7 @@ this method eases the pain.
 I<key> should be a SWISH::3::Config reserved word. Use
 the SWISH::3::Constants for safety.
 
-I<value> is passed through perl_to_xml(). 
+I<value> is passed through perl_to_xml().
 If I<value> is a hashref, it should be a simple key/value set with strings.
 You may use arrayref values, where items in the array are strings.
 
@@ -226,11 +226,11 @@ is missing.
 Example:
 
  use SWISH::3 qw( :constants );
- $utils->merge_swish3_config( 
-     SWISH_PARSERS() => { 
+ $utils->merge_swish3_config(
+     SWISH_PARSERS() => {
          'XML'  => [ 'application/x-bar', 'application/x-foo' ],
-         'HTML' => [ 'application/x-blue', 'application/x-red' ] 
-     } 
+         'HTML' => [ 'application/x-blue', 'application/x-red' ]
+     }
  );
  $utils->merge_swish3_config(
      'foo' => 'bar'
@@ -319,7 +319,7 @@ Peter Karman, E<lt>karpet@dezi.orgE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-dezi-app at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
@@ -364,10 +364,10 @@ L<https://metacpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2014 by Peter Karman
+Copyright 2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the terms of the GPL v2 or later.
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

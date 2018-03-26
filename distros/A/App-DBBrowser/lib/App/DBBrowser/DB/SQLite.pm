@@ -25,6 +25,7 @@ sub new {
     my ( $class, $info ) = @_;
     my $self = {
         driver  => 'SQLite',
+        home_dir => $info->{home_dir},
         app_dir => $info->{app_dir},
         reset_search_cache => $info->{reset_search_cache},
     };
@@ -65,9 +66,9 @@ sub get_databases {
     my ( $self ) = @_;
     return \@ARGV if @ARGV;
     my $cache_sqlite_files = catfile $self->{app_dir}, 'cache_SQLite_files.json';
-    my $ax = App::DBBrowser::Auxil->new( {}, {} );
+    my $ax = App::DBBrowser::Auxil->new( {}, {}, {} );
     my $db_cache = $ax->read_json( $cache_sqlite_files );
-    my $dirs = $db_cache->{directories} || [];
+    my $dirs = $db_cache->{directories} || [ $self->{home_dir} ];
     my $databases = $db_cache->{databases} || [];
     if ( ! $self->{reset_search_cache} && @$databases ) {
         return $databases;
@@ -77,10 +78,10 @@ sub get_databases {
     if ( ! defined $choice ) {
         return;
     }
-    elsif ( $choice eq $change ) {
-        my $info = '<< ' . join( ', ', @$dirs );
-        my $name = 'OK ';
-        my $new_dirs = choose_dirs( { info => $info, name => $name } );
+    if ( $choice eq $change ) {
+        my $info = 'Del ' . join( ', ', @$dirs );
+        my $name = ' OK ';
+        my $new_dirs = choose_dirs( { info => "Where to search for databases?\n" . $info, name => $name } );
         if ( defined $new_dirs && @$new_dirs ) {
             $dirs = $new_dirs;
         }

@@ -258,9 +258,10 @@ sub main {
 		return 0;
 	}
 
-	if (!$app->cache_contains_data()) {
-		$opts{"adhoc"} = 1;
-		$log->warning("Cache is empty. --adhoc has been enabled for you automatically");
+	if (!$app->cache_contains_data() && !$opts{adhoc}) {
+		$log->error("Cache is empty. Either the cache path is incorrect or you did not run --update yet.");
+		$log->error("If you did not create a cache yet, you may want to rerun with --adhoc to simply list all backups.");
+		return 1;
 	}
 
 	my @paths = @ARGV;

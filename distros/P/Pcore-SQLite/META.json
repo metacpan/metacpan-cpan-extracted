@@ -49,6 +49,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-sqlite/overview"
       }
    },
-   "version" : "v0.10.3",
+   "version" : "v0.10.6",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

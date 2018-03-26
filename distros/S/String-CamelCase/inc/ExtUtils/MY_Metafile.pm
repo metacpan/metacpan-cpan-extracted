@@ -282,6 +282,7 @@ sub _gen_meta_yml
 					$yaml->{$key} .= '  - ' . $elem . "\n";
 				}
 			}
+			next;
 		}
 		if( $yaml->{$key} )
 		{

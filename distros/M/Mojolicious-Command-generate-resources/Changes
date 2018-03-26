@@ -71,3 +71,7 @@ Revision history for Perl module Mojolicious::Command::generate::routes
     - Added some very basic tests.
     - Improved 'description' attribute.
     - Improved documentation.
+
+0.15 Sun Mar 25 23:11:44 CEST 2018
+    - Added optional argument "db_helper" to be used by the command instead of
+      only "sqlite", "mysql" or "pg". Defaults to "sqlite".

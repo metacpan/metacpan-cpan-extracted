@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Role::FileFinderUser" => 0,
     "Dist::Zilla::Role::FileMunger" => 0,
     "Moose" => 0,
+    "WordList::Namespace" => "0.3.1",
     "namespace::autoclean" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.053",
+  "VERSION" => "0.054",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +48,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Moose" => 0,
   "Test::More" => 0,
+  "WordList::Namespace" => "0.3.1",
   "namespace::autoclean" => 0,
   "strict" => 0,
   "warnings" => 0

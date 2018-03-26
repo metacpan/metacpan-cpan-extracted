@@ -25,5 +25,5 @@ requires:
   Math::Prime::Util: '0'
   Mozilla::CA: '0'
   Wx: '0'
-version: '1.003'
+version: '1.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

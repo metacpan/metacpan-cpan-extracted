@@ -1,40 +1,45 @@
-package WebService::Braintree::PayPalAccountGateway;
-$WebService::Braintree::PayPalAccountGateway::VERSION = '1.1';
+# vim: sw=4 ts=4 ft=perl
+
+package # hide from pause
+    WebService::Braintree::PayPalAccountGateway;
+
 use 5.010_001;
 use strictures 1;
 
 use Moose;
-with 'WebService::Braintree::Role::MakeRequest';
+extends 'WebService::Braintree::PaymentMethodGatewayBase';
 
 use Carp qw(confess);
 
-has 'gateway' => (is => 'ro');
+use WebService::Braintree::_::PayPalAccount;
 
 sub find {
     my ($self, $token) = @_;
-    $self->_make_request(
-        "/payment_methods/paypal_account/$token", "get", undef,
-    )->paypal_account;
+    $self->_find(paypal_account => (
+        "/payment_methods/paypal_account/$token", 'get', undef,
+    ));
 }
 
 sub create {
     my ($self, $token, $params) = @_;
-    $self->_make_request("/payment_methods", "post", {
-        paypal_account => $params
-    });
+    $self->_create(
+        "/payment_methods", 'post', { paypal_account => $params },
+    );
 }
 
 sub update {
     my ($self, $token, $params) = @_;
-    $self->_make_request("/payment_methods/paypal_account/$token", "put", {
-        paypal_account => $params
-    });
+    $self->_update(
+        "/payment_methods/paypal_account/$token", 'put', {
+            paypal_account => $params,
+        },
+    );
 }
 
 sub delete {
     my ($self, $token) = @_;
     $self->_make_request(
-        "/payment_methods/paypal_account/$token", "delete", undef,
+        "/payment_methods/paypal_account/$token", 'delete', undef,
     );
 }
 

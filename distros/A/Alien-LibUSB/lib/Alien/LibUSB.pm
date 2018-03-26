@@ -3,7 +3,7 @@ use warnings;
 package Alien::LibUSB;
 
 # ABSTRACT: Perl distribution for LibUSB
-our $VERSION = '0.2'; # VERSION
+our $VERSION = '0.3'; # VERSION
 
 use parent 'Alien::Base';
 

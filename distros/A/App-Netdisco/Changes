@@ -1,3 +1,21 @@
+2.039019 - 2018-03-23
+
+  [BUG FIXES]
+
+  * fix device search SQL error (reported by bhuddah)
+
+2.039018 - 2018-03-22
+
+  [ENHANCEMENTS]
+
+  * #371 usernames are case insensitive but case preserving
+  * #12 store Cisco PortFast status in device_port_properties:faststart
+
+  [BUG FIXES]
+
+  * access to manual topology for admins without port_control role
+  * network map working with pseudo devices
+
 2.039017 - 2018-03-20
 
   [BUG FIXES]

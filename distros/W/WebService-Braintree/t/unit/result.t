@@ -38,19 +38,4 @@ subtest "allow access to relevant objects on response" => sub {
     is($result->customer, undef);
 };
 
-subtest "allow access to relevant objects on error response" => sub {
-    my $response = {
-        'api_error_response' => {
-            subscription => {
-                id => "42",
-                random_subscription_info => "foo"
-            }
-        }
-    };
-
-    my $result = WebService::Braintree::ErrorResult->new($response->{api_error_response});
-    is($result->subscription->random_subscription_info, "foo");
-    is($result->transaction, undef);
-};
-
 done_testing();

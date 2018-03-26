@@ -1,4 +1,3 @@
-MANIFEST			This list of files
 Changes
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
@@ -10,13 +9,21 @@ inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 lib/Test/PostgreSQL.pm
 Makefile.PL
-META.yml
+MANIFEST			This list of files
 META.json
+META.yml
 README.md
 t/00-base.t
 t/01-raii.t
 t/02-multi.t
 t/04-multiprocess.t
 t/05-recycle-base-dir.t
+t/06-unix-socket.t
+t/07-configs.t
+t/08-postgresql_conf.t
+t/09-run_psql.t
+t/10-seed_scripts.t
 t/deadlock.t
 t/pod.t
+t/seed/init.sql
+t/seed/seed.sql

@@ -66,7 +66,7 @@ package ExtUtils::CXX;
 
 use common::sense;
 
-our $VERSION = 0.03;
+our $VERSION = '1.0';
 
 use Exporter 'import';
 
@@ -92,6 +92,8 @@ our %cc = (
    c89   => "g++",
 );
 
+our $PREFIX = qr{(?:\S+[\/\\])? (?:ccache|distcc)}x;
+
 sub _ccrepl {
    my ($cfgvar, $env) = @_;
 
@@ -106,11 +108,11 @@ sub _ccrepl {
    } else {
       keys %cc;
       while (my ($k, $v) = each %cc) {
-         $val =~ s/^ (\S*[\/\\])? $k (-|\s|\d|$) /$1$v$2/x
+         $val =~ s/^ ((?:$PREFIX\s+)? \S*[\/\\])? $k (-|\s|\d|$) /$1$v$2/x
             and goto done;
       }
 
-      $val =~ s/^\S+/g++/;
+      $val =~ s/^($PREFIX\s+)? \S+/$1g++/x;
 
       done: ;
    }

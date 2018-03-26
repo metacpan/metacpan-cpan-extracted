@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::WordList;
 
-our $DATE = '2018-03-19'; # DATE
-our $VERSION = '0.053'; # VERSION
+our $DATE = '2018-03-23'; # DATE
+our $VERSION = '0.054'; # VERSION
 
 use 5.014;
 use strict;
@@ -11,6 +11,7 @@ use Moose;
 use namespace::autoclean;
 
 use Data::Dmp;
+use WordList::Namespace qw(is_actual_wordlist_module);
 
 with (
     'Dist::Zilla::Role::FileMunger',
@@ -36,6 +37,10 @@ sub munge_files {
 
         my $package_pm = $1;
         my $package = $2; $package =~ s!/!::!g;
+        unless (is_actual_wordlist_module($package)) {
+            $self->log(["Module %s is not an actual wordlist module, skipped", $package]);
+            next;
+        }
 
         my $content = $file->content;
 
@@ -109,7 +114,7 @@ Dist::Zilla::Plugin::WordList - Plugin to use when building WordList::* distribu
 
 =head1 VERSION
 
-This document describes version 0.053 of Dist::Zilla::Plugin::WordList (from Perl distribution Dist-Zilla-Plugin-WordList), released on 2018-03-19.
+This document describes version 0.054 of Dist::Zilla::Plugin::WordList (from Perl distribution Dist-Zilla-Plugin-WordList), released on 2018-03-23.
 
 =head1 SYNOPSIS
 

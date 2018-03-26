@@ -9,23 +9,23 @@ use autodie;
 use base 'TestsFor';
  
 use constant {
-	VERBOSE            => 0,
-	COUNT_LOOPS_BY     => 'coverage',
-	COVERAGE           => 8,
-	STRAND_BIAS        => 'random',
-	SEQID_WEIGHT       => 'length',
-	SEQUENCING_TYPE    => 'paired-end',
-	SEQUENCING_SYSTEM  => 'poisson',
-	JOBS               => 2,
-	OUTPUT_GZIP        => 0,
-	SEQ_SYS            => 'poisson',
-	QUALITY_SIZE       => 10,
-	GENOME             => '.data.fa',
-	GENOME_SIZE        => 2280,
-	COVERAGE           => 5,
-	PREFIX             => 'ponga',
-	OUTPUT_SINGLE_END  => 'ponga_simulation_read.fastq',
-	OUTPUT_PAIRED_END  => ['ponga_simulation_read_R1.fastq', 'ponga_simulation_read_R2.fastq']
+	VERBOSE           => 0,
+	COUNT_LOOPS_BY    => 'coverage',
+	COVERAGE          => 8,
+	STRAND_BIAS       => 'random',
+	SEQID_WEIGHT      => 'length',
+	SEQUENCING_TYPE   => 'paired-end',
+	SEQUENCING_SYSTEM => 'poisson',
+	JOBS              => 2,
+	OUTPUT_GZIP       => 0,
+	SEQ_SYS           => 'poisson',
+	QUALITY_SIZE      => 10,
+	GENOME            => '.data.fa',
+	GENOME_SIZE       => 2280,
+	COVERAGE          => 5,
+	PREFIX            => 'ponga',
+	OUTPUT_SINGLE_END => 'ponga_R1_001.fastq',
+	OUTPUT_PAIRED_END => ['ponga_R1_001.fastq', 'ponga_R2_001.fastq']
 };
 
 sub startup : Tests(startup) {
@@ -107,6 +107,7 @@ sub setup : Tests(setup) {
 			quality_profile   => 'poisson',
 			read_size         => QUALITY_SIZE,
 			sequencing_error  => 0.1,
+			template_id       => 'sr0001 simulation_read length=%r position=%c:%t-%n'
 		)
 	);
 
@@ -117,7 +118,8 @@ sub setup : Tests(setup) {
 			read_size         => QUALITY_SIZE,
 			sequencing_error  => 0.1,
 			fragment_mean     => 50,
-			fragment_stdd     => 10
+			fragment_stdd     => 10,
+			template_id       => 'sr0001 simulation_read length=%r position=%c:%t-%n'
 		)
 	);
 
@@ -132,7 +134,7 @@ sub cleanup : Tests(shutdown) {
 	$test->SUPER::shutdown;
 }
 
-sub constructor : Tests(16) {
+sub constructor : Tests(18) {
 	my $test = shift;
 
 	my $class = $test->class_to_test;

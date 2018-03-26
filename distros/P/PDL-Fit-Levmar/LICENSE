@@ -1,0 +1,9 @@
+All of the software in ./levmar-2.1.3 and only the software
+therein is copyrighted by Manolis Lourakis and is licensed
+here under terms of the Gnu General Public License (GPL).
+See the file LICENSE in ./levmar-2.1.3.  The remainder of
+the contents of the files in this package is copyrighted by
+John Lapeyre (2006) and may be distributed only under the
+terms of the GPL or the perl Artistic License.
+
+John Lapeyre 2006

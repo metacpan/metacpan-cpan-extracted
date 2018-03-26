@@ -4,8 +4,9 @@ use strict;
 use warnings;
 use File::Spec;
 use Carp;
+use Data::Dumper;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub new{
 	my ($class,%opts) = @_;
@@ -197,7 +198,7 @@ sub _fill_in{
             $replaced = 1 if $frags[$i] =~ s/(?<!\\)$tda\s*$param_name\s*$tdb/$param_val/g;
 
         }
-        confess "Could not replace template param '$param_name': token does not exist in template '$template_name' - frags: ".Dumper( \@frags ) unless $replaced;
+        confess "Could not replace template param '$param_name': token does not exist in template '$template_name'" unless $replaced;
 
     }
 

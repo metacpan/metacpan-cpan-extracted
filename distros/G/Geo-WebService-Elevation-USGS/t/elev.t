@@ -8,6 +8,11 @@ use HTTP::Status;
 use JSON;
 use Test::More 0.88;
 
+use constant ARRAY_REF	=> ref [];
+use constant CODE_REF	=> ref sub {};
+use constant HASH_REF	=> ref {};
+use constant REGEXP_REF	=> ref qr{};
+
 no warnings qw{ deprecated };
 
 use constant BAD_EXTENT_SOURCE => 'NED.AK_NED';
@@ -60,7 +65,7 @@ SKIP: {
     ok(!$@, 'getElevation succeeded')
 	or _skip_tests( 6 );
     ok($rslt, 'getElevation returned a result');
-    is(ref $rslt, 'HASH', 'getElevation returned a hash');
+    is(ref $rslt, HASH_REF, 'getElevation returned a hash');
     is( $rslt->{Data_Source}, $ele_dataset,
 	"Data came from $ele_dataset" );
     is($rslt->{Units}, 'Feet', 'Elevation is in feet');
@@ -83,7 +88,7 @@ SKIP: {
     # Note that prior to version 0.106_01 the default for
     # the 'compatibility' attribute was true, which caused an array to
     # be returned.
-    is( ref $rslt, 'HASH', 'elevation() returned a hash' );
+    is( ref $rslt, HASH_REF, 'elevation() returned a hash' );
     $rslt ||= {};	# To keep following from blowing up.
     is( $rslt->{Data_Source}, $ele_dataset,
 	"Data came from $ele_dataset" );
@@ -92,7 +97,7 @@ SKIP: {
 }
 
 $ele->set(source => []);
-is(ref ($ele->get('source')), 'ARRAY', 'Source can be set to an array ref');
+is(ref ($ele->get('source')), ARRAY_REF, 'Source can be set to an array ref');
 
 SKIP: {
     $rslt = eval {$ele->elevation( @ele_loc )};
@@ -102,7 +107,7 @@ SKIP: {
     # Note that prior to version 0.106_01 the default for
     # the 'compatibility' attribute was true, which caused an array to
     # be returned.
-    is( ref $rslt, 'HASH', 'elevation() still returns a hash');
+    is( ref $rslt, HASH_REF, 'elevation() still returns a hash');
     $rslt ||= {};	# To keep following from blowing up.
     is( $rslt->{Data_Source}, $ele_dataset,
 	"We have results from $ele_dataset" );
@@ -111,7 +116,7 @@ SKIP: {
 }
 
 $ele->set(source => {});
-is(ref ($ele->get('source')), 'HASH', 'Source can be set to a hash ref');
+is(ref ($ele->get('source')), HASH_REF, 'Source can be set to a hash ref');
 
 SKIP: {
     $rslt = eval {$ele->elevation( @ele_loc )};
@@ -121,7 +126,7 @@ SKIP: {
     # Note that prior to version 0.106_01 the default for
     # the 'compatibility' attribute was true, which caused an array to
     # be returned.
-    is( ref $rslt, 'HASH',
+    is( ref $rslt, HASH_REF,
 	'elevation() with hash source still returns a hash');
     $rslt ||= {};	# To keep following from blowing up.
     is( $rslt->{Data_Source}, $ele_dataset,
@@ -142,7 +147,7 @@ SKIP: {
     # Note that prior to version 0.106_01 the default for
     # the 'compatibility' attribute was true, which caused an array to
     # be returned.
-    is( ref $rslt, 'HASH', 'elevation() still returns a hash' );
+    is( ref $rslt, HASH_REF, 'elevation() still returns a hash' );
     $rslt ||= {};	# To keep following from blowing up.
     is( $rslt->{Data_Source}, $ele_dataset,
 	"We have results from $ele_dataset" );
@@ -167,7 +172,7 @@ SKIP: {
     # Note that prior to version 0.106_01 the default for
     # the 'compatibility' attribute was true, which caused an array to
     # be returned.
-    is( ref $rslt, 'HASH', 'elevation() still returns a hash' );
+    is( ref $rslt, HASH_REF, 'elevation() still returns a hash' );
     $rslt ||= {};	# To keep following from blowing up.
     is( $rslt->{Data_Source}, $ele_dataset,
 	"We have results from $ele_dataset" );
@@ -183,7 +188,7 @@ SKIP: {
     # Note that prior to version 0.106_01 the default for
     # the 'compatibility' attribute was true, which caused an array to
     # be returned.
-    is( ref $rslt, 'HASH', 'elevation(valid) still returns a hash' );
+    is( ref $rslt, HASH_REF, 'elevation(valid) still returns a hash' );
     $rslt ||= {};	# To keep following from blowing up.
     is( $rslt->{Data_Source}, $ele_dataset,
 	"We have results from $ele_dataset" );
@@ -223,7 +228,7 @@ SKIP: {
 	$rslt = eval {$bogus->getElevation(40, 90, 'NED.CONUS_NED_13E')};
 	ok(!$@, 'getElevation without returned value succeeded')
 	    or _skip_tests( 3 );
-	ok( ref $rslt eq 'HASH', 'getElevation result is a hash ref' );
+	ok( ref $rslt eq HASH_REF, 'getElevation result is a hash ref' );
     }
 
 =end comment
@@ -239,7 +244,7 @@ SKIP: {
 	source => sub {$_[1]{Data_Source} eq $ele_dataset },
 	use_all_limit => 0,
     );
-    is(ref $bogus->get('source'), 'CODE', 'Can set source to code ref');
+    is(ref $bogus->get('source'), CODE_REF, 'Can set source to code ref');
     SKIP: {
 	$rslt = eval {$bogus->elevation( @ele_loc )};
 	_skip_on_server_error($bogus, 5);
@@ -249,7 +254,7 @@ SKIP: {
 	# Note that prior to version 0.106_01 the default
 	# for the 'compatibility' attribute was true, which caused an
 	# array to be returned.
-	is( ref $rslt, 'HASH', 'Got hash ref when using code ref as source' );
+	is( ref $rslt, HASH_REF, 'Got hash ref when using code ref as source' );
 	$rslt ||= {};	# To keep following from blowing up.
 	is( $rslt->{Data_Source}, $ele_dataset,
 	    'Got correct Data_Source when using code ref as source');
@@ -390,10 +395,10 @@ SKIP: {
     ok(!$bogus->get('error'),
 	'Should not declare an error processing an individual point')
 	or diag 'Error: ' . $bogus->get( 'error' );
-    is(ref $rslt, 'ARRAY', 'Result should still be an array ref')
+    is(ref $rslt, ARRAY_REF, 'Result should still be an array ref')
 	or $rslt = [];
     cmp_ok(scalar @$rslt, '==', 1, 'getAllelevations() returned one result');
-    ok(!(grep {ref $_ ne 'HASH'} @$rslt),
+    ok(!(grep {ref $_ ne HASH_REF} @$rslt),
 	'elevation\'s results are all hashes');
     $rslt = {map {$_->{Data_ID} => $_} @$rslt};
     ok($rslt->{$ele_dataset}, "We have results from $ele_dataset" );
@@ -420,7 +425,7 @@ SKIP: {
 	ok(!$@, 'getElevation succeeded on retry')
 	    or _skip_tests( 6 );
 	ok($rslt, 'getElevation returned a result on retry');
-	is(ref $rslt, 'HASH', 'getElevation returned a hash on retry');
+	is(ref $rslt, HASH_REF, 'getElevation returned a hash on retry');
 	is( $rslt->{Data_Source}, $ele_dataset,
 	    "Data came from $ele_dataset on retry" );
 	is($rslt->{Units}, 'Feet', 'Elevation is in feet on retry');
@@ -436,7 +441,7 @@ SKIP: {
 	ok(!$@, 'getAllElevations succeeded on retry')
 	    or _skip_tests( 6 );
 	ok($rslt, 'getAllElevations returned a result on retry');
-	is(ref $rslt, 'ARRAY', 'getAllElevations returned an array on retry');
+	is(ref $rslt, ARRAY_REF, 'getAllElevations returned an array on retry');
 	my %hash = map { $_->{Data_Source} => $_ } @{ $rslt };
 	ok( $hash{$ele_dataset},
 	    "Results contain $ele_dataset on retry" );
@@ -477,7 +482,7 @@ SKIP: {
     ok(!$@, 'getElevation again succeeded')
 	or _skip_tests( 6 );
     ok($rslt, 'getElevation again returned a result');
-    is(ref $rslt, 'HASH', 'getElevation again returned a hash');
+    is(ref $rslt, HASH_REF, 'getElevation again returned a hash');
     is( $rslt->{Data_Source}, $ele_dataset, "Data again came from $ele_dataset" );
     is($rslt->{Units}, 'Meters', 'Elevation is in meters');
     is($rslt->{Elevation}, $ele_mt, "Elevation is $ele_mt");
@@ -496,10 +501,10 @@ SKIP: {
     _skip_on_server_error($ele, 7);
     ok(!$@, 'elevation() succeeded in list context')
 	or _skip_tests( 7 );
-    is(ref $rslt, 'ARRAY', 'elevation() returns an array in list context');
-    ref $rslt eq 'ARRAY' or $rslt = [];	# To keep following from blowing up.
+    is(ref $rslt, ARRAY_REF, 'elevation() returns an array in list context');
+    ref $rslt eq ARRAY_REF or $rslt = [];	# To keep following from blowing up.
     cmp_ok(scalar @$rslt, '==', 1, 'elevation() returned a single result');
-    is(ref ($rslt->[0]), 'HASH', 'elevation\'s only result was a hash');
+    is(ref ($rslt->[0]), HASH_REF, 'elevation\'s only result was a hash');
     is( $rslt->[0]{Data_Source}, $ele_dataset, "Data came from $ele_dataset" );
     is($rslt->[0]{Units}, 'Meters', 'Elevation is in meters');
     is($rslt->[0]{Elevation}, $ele_mt, "Elevation is $ele_mt");
@@ -509,15 +514,15 @@ eval {$ele->set(source => \*STDOUT)};
 like($@, qr{^Attribute source may not be a GLOB ref},
     'Can not set source as a glob ref');
 $ele->set( source => $ele_re );
-is(ref $ele->get('source'), 'Regexp', 'Can set source as a regexp ref');
+is(ref $ele->get('source'), REGEXP_REF, 'Can set source as a regexp ref');
 
 SKIP: {
     $rslt = eval {[$ele->elevation( @ele_loc )]};
     _skip_on_server_error($ele, 6);
     ok(!$@, 'elevation() succeeded with regexp source')
 	or _skip_tests( 6 );
-    is(ref $rslt, 'ARRAY', 'Get an array back from regexp source');
-    ref $rslt eq 'ARRAY' or $rslt = [];	# To keep following from blowing up.
+    is(ref $rslt, ARRAY_REF, 'Get an array back from regexp source');
+    ref $rslt eq ARRAY_REF or $rslt = [];	# To keep following from blowing up.
     cmp_ok(scalar @$rslt, '>=', 1, 'Should have at least one result');
     $rslt = {map {$_->{Data_Source} => $_} @$rslt};
     ok($rslt->{$ele_dataset}, "We have results from $ele_dataset");
@@ -527,7 +532,7 @@ SKIP: {
 
 my $gp = bless [ @ele_loc ], 'Geo::Point';
 $ele->set(source => {$ele_dataset => 1});
-is(ref $ele->get('source'), 'HASH', 'Can set source as a hash');
+is(ref $ele->get('source'), HASH_REF, 'Can set source as a hash');
 
 SKIP: {
     $rslt = eval {$ele->elevation($gp)};
@@ -537,7 +542,7 @@ SKIP: {
     # Note that prior to version 0.106_01 the default for
     # the 'compatibility' attribute was true, which caused an array to
     # be returned.
-    is( ref $rslt, 'HASH',
+    is( ref $rslt, HASH_REF,
 	'elevation(Geo::Point) returns a hash' );
     $rslt ||= {};	# To keep following from blowing up.
     is( $rslt->{Data_Source}, $ele_dataset, "Data came from $ele_dataset" );
@@ -554,7 +559,7 @@ SKIP: {
     # Note that prior to version 0.106_01 the default for
     # the 'compatibility' attribute was true, which caused an array to
     # be returned.
-    is( ref $rslt, 'HASH',
+    is( ref $rslt, HASH_REF,
 	'elevation(Geo::Point) returns a hash');
 }
 
@@ -580,7 +585,7 @@ SKIP: {
     # Note that prior to version 0.106_01 the default for
     # the 'compatibility' attribute was true, which caused an array to
     # be returned.
-    is( ref $rslt, 'HASH', "elevation($kind) returns a hash");
+    is( ref $rslt, HASH_REF, "elevation($kind) returns a hash");
     $rslt ||= {};	# To keep following from blowing up.
     is($rslt->{Data_Source}, $ele_dataset,
 	"$kind data came from $ele_dataset");

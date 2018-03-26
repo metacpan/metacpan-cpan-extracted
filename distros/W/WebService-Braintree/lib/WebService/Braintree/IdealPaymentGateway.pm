@@ -1,17 +1,22 @@
-package WebService::Braintree::IdealPaymentGateway;
-$WebService::Braintree::IdealPaymentGateway::VERSION = '1.1';
+# vim: sw=4 ts=4 ft=perl
+
+package # hide from pause
+    WebService::Braintree::IdealPaymentGateway;
+
 use 5.010_001;
 use strictures 1;
 
 use Moose;
-with 'WebService::Braintree::Role::MakeRequest';
+extends 'WebService::Braintree::PaymentMethodGatewayBase';
 
-has 'gateway' => (is => 'ro');
+use WebService::Braintree::_::IdealPayment;
 
 sub find {
     my ($self, $token) = @_;
     confess "NotFoundError" unless validate_id($token);
-    $self->_make_request("/payment_methods/ideal_payments/$token", "get", undef)->ideal_payment;
+    return $self->_find(ideal_payment => (
+        "/payment_methods/ideal_payment/${token}", 'get', undef,
+    ));
 }
 
 __PACKAGE__->meta->make_immutable;

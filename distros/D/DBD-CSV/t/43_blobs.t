@@ -7,7 +7,7 @@ use warnings;
 use Test::More;
 
 BEGIN { use_ok ("DBI") }
-do "t/lib.pl";
+do "./t/lib.pl";
 
 my $size = 128;
 my @tbl_def = (

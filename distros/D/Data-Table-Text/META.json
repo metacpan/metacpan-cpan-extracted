@@ -33,6 +33,7 @@
             "String::Numeric" : "0",
             "Test2::API" : "0",
             "Test::More" : "0",
+            "Time::HiRes" : "0",
             "utf8" : "0"
          }
       }
@@ -40,7 +41,7 @@
    "provides" : {
       "Data::Table::Text" : {
          "file" : "lib/Data/Table/Text.pm",
-         "version" : "20180316"
+         "version" : "20180327"
       }
    },
    "release_status" : "stable",
@@ -49,5 +50,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20180316"
+   "version" : "20180327"
 }

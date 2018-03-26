@@ -1,5 +1,8 @@
-package WebService::Braintree::Util;
-$WebService::Braintree::Util::VERSION = '1.1';
+# vim: sw=4 ts=4 ft=perl
+
+package # hide from pause
+    WebService::Braintree::Util;
+
 use 5.010_001;
 use strictures 1;
 
@@ -24,7 +27,7 @@ sub hash_to_query_string {
     return $query->stringify();
 }
 
-# USED only by hash_to_query_string()
+# USED only by __hash_to_query_string()
 sub __flatten {
     my($hash, $namespace) = @_;
     my %flat_hash = ();
@@ -39,7 +42,7 @@ sub __flatten {
     return \%flat_hash;
 }
 
-# USED only by flatten()
+# USED only by __flatten()
 sub __add_namespace {
     my ($key, $namespace) = @_;
     return $key unless $namespace;

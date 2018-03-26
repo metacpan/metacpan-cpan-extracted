@@ -1,5 +1,7 @@
+# vim: sw=4 ts=4 ft=perl
+
 package WebService::Braintree::Customer;
-$WebService::Braintree::Customer::VERSION = '1.1';
+$WebService::Braintree::Customer::VERSION = '1.2';
 use 5.010_001;
 use strictures 1;
 
@@ -14,11 +16,12 @@ This class creates, updates, deletes, and finds customers.
 =cut
 
 use Moose;
-extends 'WebService::Braintree::ResultObject';
+
+with 'WebService::Braintree::Role::Interface';
 
 =head2 create()
 
-This takes a hashref of parameters and returns the customer created.
+This takes a hashref of parameters and returns a L<response|WebService::Braintee::Result> with the C<< customer() >> set.
 
 =cut
 
@@ -29,7 +32,8 @@ sub create {
 
 =head2 find()
 
-This takes a customer_id returns the customer (if it exists).
+This takes a token and returns a L<response|WebService::Braintee::Result> with
+the C<< customer() >> set (if found).
 
 =cut
 
@@ -40,8 +44,9 @@ sub find {
 
 =head2 update()
 
-This takes a customer_id and a hashref of parameters. It will update the
-corresponding customer (if found) and returns the updated customer.
+This takes a customer_id and a hashref of parameters. It will update the corresponding
+credit card (if found) and return a L<response|WebService::Braintee::Result>
+with the C<< customer() >> set.
 
 =cut
 
@@ -52,7 +57,9 @@ sub update {
 
 =head2 delete()
 
-This takes a customer_id and deletes the corresponding customer (if found).
+This takes a customer_id. It will delete the corresponding customer (if found)
+and return a L<response|WebService::Braintee::Result> with the C<< customer() >>
+set.
 
 =cut
 
@@ -64,10 +71,14 @@ sub delete {
 =head2 search()
 
 This takes a subref which is used to set the search parameters and returns a
-collection of Customer objects.
+L<collection|WebService::Braintree::ResourceCollection> of the matching
+L<customers|WebService::Braintree::_::Customer>.
 
 Please see L<Searching|WebService::Braintree/SEARCHING> for more information on
 the subref and how it works.
+
+Please see L<WebService::Braintree::CustomerSearch> for more
+information on what specfic fields you can set for this method.
 
 =cut
 
@@ -78,7 +89,8 @@ sub search {
 
 =head2 all()
 
-This returns all the customers.
+This returns a L<collection|WebService::Braintree::ResourceCollection> of all
+L<customers|WebService::Braintree::_::Customer>.
 
 =cut
 
@@ -89,7 +101,8 @@ sub all {
 
 =head2 transactions()
 
-This takes a customer_id. It returns all the transactions for that customer.
+This takes a customer_id. It returns a L<collection|WebService::Braintree::ResourceCollection> of all L<customers|WebService::Braintree::_::Transaction> for
+that customer.
 
 =cut
 
@@ -100,8 +113,9 @@ sub transactions {
 
 =head2 credit()
 
-This takes a customer_id and a hashref of parameters. It will create a credit
-transaction for the corresponding customer and return it;
+This takes a customer_id and an optional hashref of parameters. This delegates
+to L<WebService::Braintree::Transaction/credit>, setting the C<< customer_id >>
+appropriately.
 
 =cut
 
@@ -115,8 +129,9 @@ sub credit {
 
 =head2 sale()
 
-This takes a customer_id and a hashref of parameters. It will create a sale
-transaction for the corresponding customer and return it;
+This takes a customer_id and an optional hashref of parameters. This delegates
+to L<WebService::Braintree::Transaction/sale>, setting the C<< customer_id >>
+appropriately.
 
 =cut
 
@@ -128,68 +143,7 @@ sub sale {
     });
 }
 
-sub gateway {
-    return WebService::Braintree->configuration->gateway;
-}
-
-sub BUILD {
-    my ($self, $attributes) = @_;
-    my $sub_objects = {
-        addresses => "WebService::Braintree::Address",
-        credit_cards => "WebService::Braintree::CreditCard",
-        paypal_accounts => "WebService::Braintree::PayPalAccount",
-    };
-
-    $self->setup_sub_objects($self, $attributes, $sub_objects);
-    $self->set_attributes_from_hash($self, $attributes);
-}
-
-=head1 OBJECT METHODS
-
-In addition to the methods provided by the keys returned from Braintree, this
-class provides the following methods:
-
-=head2 payment_types()
-
-This returns a list of all the payment types supported by this class.
-
-=cut
-
-sub payment_types {
-    return qw(credit_cards paypal_accounts);
-}
-
-=head2 payment_methods()
-
-This returns an arrayref of all available payment methods across all types.
-
-=cut
-
-sub payment_methods {
-    my $self = shift;
-
-    my @methods = map {
-        @{$self->$_ // []}
-    } $self->payment_types;
-
-    return \@methods;
-}
-
 __PACKAGE__->meta->make_immutable;
 
 1;
 __END__
-
-=head1 TODO
-
-=over 4
-
-=item Need to document the keys and values that are returned
-
-=item Need to document the required and optional input parameters
-
-=item Need to document the possible errors/exceptions
-
-=back
-
-=cut

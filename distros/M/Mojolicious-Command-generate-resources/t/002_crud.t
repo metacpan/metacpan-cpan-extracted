@@ -71,6 +71,7 @@ like $buffer, qr/Usage: APPLICATION generate resources \[OPTIONS\]/,
              tables               => [qw(users groups)],
              controller_namespace => $cm->app->routes->namespaces->[0],
              model_namespace      => ref($cm->app) . '::Model',
+             db_helper            => 'sqlite',
             },
             'proper default arguments'
            );

@@ -1,0 +1,27 @@
+---
+abstract: 'Perl XS binding for the Duktape Javascript embeddable engine'
+author:
+  - 'Gonzalo Diethelm (gonzus@cpan.org)'
+build_requires:
+  Data::Dumper: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JavaScript-Duktape-XS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  XSLoader: '0'
+  perl: '5.018'
+resources:
+  repository: https://github.com/gonzus/NONE
+version: '0.000032'

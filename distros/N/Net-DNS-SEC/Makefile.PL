@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1647 2018-03-12 15:34:40Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1656 2018-03-22 14:36:14Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -44,8 +44,8 @@ my $inc = '';
 my $nul = $^O eq 'MSWin32' ? 'nul' : '/dev/null';
 
 if ( my $dir = $ENV{OPENSSL_PREFIX} ) {
-	$lib = "-L$dir/lib -lcrypto";
 	$inc = "-I$dir/include";
+	$lib = "-L$dir/lib -lcrypto";
 
 } elsif ( $ENV{OPENSSL_LIB} ) {
 	$lib = $ENV{OPENSSL_LIB};
@@ -81,8 +81,15 @@ WriteMakefile(
 	INC	   => "$inc",
 	LIBS	   => [$lib],
 	OBJECT	   => "SEC.o @OBJECT",
-	META_MERGE => {recommends => {%optional}},
-	);
+	META_MERGE => {
+		'meta-spec' => {version => 2},
+		resources   => {
+			type	   => 'cpan',
+			bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Net-DNS-SEC',
+			repository => 'https://search.cpan.org/~nlnetlabs/Net-DNS-SEC/'
+			},
+		recommends => {%optional},
+		} );
 
 
 package MY;				## customise generated Makefile

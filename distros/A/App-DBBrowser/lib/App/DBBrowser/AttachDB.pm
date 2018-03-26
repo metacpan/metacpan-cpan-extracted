@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.006';
+our $VERSION = '2.008';
 
 use File::Basename qw( basename );
 use List::Util     qw( any );
@@ -19,22 +19,26 @@ use App::DBBrowser::Auxil;
 
 
 sub new {
-    my ( $class, $info, $opt ) = @_;
-    bless { i => $info, o => $opt }, $class;
+    my ( $class, $info, $options, $data ) = @_;
+    bless {
+        i => $info,
+        o => $options,
+        d => $data
+    }, $class;
 }
 
 
 sub attach_db {
-    my ( $sf, $dbh, $data ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o} );
+    my ( $sf ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cur;
     if ( -s $sf->{i}{file_attached_db} ) {
         my $h_ref = $ax->read_json( $sf->{i}{file_attached_db} );
-        $cur = $h_ref->{$data->{db}} || [];
+        $cur = $h_ref->{$sf->{d}{db}} || [];
     }
-    my $choices = [ undef, @{$data->{user_dbs}}, @{$data->{sys_dbs}} ];
+    my $choices = [ undef, @{$sf->{d}{user_dbs}}, @{$sf->{d}{sys_dbs}} ];
     my $new = [];
-    my $root = 'DB: "' . basename( $data->{db} ) . "\"\n";
+    my $root = 'DB: "' . basename( $sf->{d}{db} ) . "\"\n";
 
     ATTACH: while ( 1 ) {
 
@@ -99,7 +103,7 @@ sub attach_db {
                         return;
                     }
                     my $h_ref = $ax->read_json( $sf->{i}{file_attached_db} );
-                    $h_ref->{$data->{db}} = [ sort( @$cur, @$new  ) ];;
+                    $h_ref->{$sf->{d}{db}} = [ sort( @$cur, @$new  ) ];;
                     $ax->write_json( $sf->{i}{file_attached_db}, $h_ref );
                     return 1;
                 }
@@ -113,13 +117,13 @@ sub attach_db {
 
 
 sub detach_db {
-    my ( $sf, $dbh, $data ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o} );
-    my $info = 'DB: "' . basename( $data->{db} ) . "\"";
+    my ( $sf ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $info = 'DB: "' . basename( $sf->{d}{db} ) . "\"";
     my $attached_db;
     if ( -s $sf->{i}{file_attached_db} ) {
         my $h_ref = $ax->read_json( $sf->{i}{file_attached_db} );
-        $attached_db = $h_ref->{$data->{db}} || [];
+        $attached_db = $h_ref->{$sf->{d}{db}} || [];
     }
     my @choices;
     for my $elem ( @$attached_db ) {
@@ -127,21 +131,20 @@ sub detach_db {
     }
     my $idx = choose_a_subset(
         [ @choices ],
-        { mouse => $sf->{o}{table}{mouse}, info => $info, index => 1, show_fmt => 2, keep_chosen => 0 }
+        { mouse => $sf->{o}{table}{mouse}, info => $info, index => 1, show_fmt => 1, keep_chosen => 0 }
     ); # prompt
     if ( ! defined $idx || ! @$idx ) {
         return;
     }
-    my $detach = [];
     for my $i ( sort { $b <=> $a } @$idx ) {
         my $ref = splice( @$attached_db, $i, 1 );
     }
     my $h_ref = $ax->read_json( $sf->{i}{file_attached_db} );
     if ( @$attached_db ) {
-        $h_ref->{$data->{db}} = $attached_db;
+        $h_ref->{$sf->{d}{db}} = $attached_db;
     }
     else {
-        delete $h_ref->{$data->{db}};
+        delete $h_ref->{$sf->{d}{db}};
     }
     $ax->write_json( $sf->{i}{file_attached_db}, $h_ref );
     return 1;

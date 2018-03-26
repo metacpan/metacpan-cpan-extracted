@@ -381,6 +381,11 @@ format.
 
 Kazumasa Utashiro
 
+# LICENSE
+
+You can redistribute it and/or modify it under the same terms
+as Perl itself.
+
 # COPYRIGHT
 
 The following copyright notice applies to all the files provided in

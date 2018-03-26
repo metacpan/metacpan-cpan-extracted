@@ -1,0 +1,15 @@
+Optimization:
+
+  I did some crude speed tests: I timed the test suite with  1e6
+data points. "-O3 --unroll-loops" and "-O2" and 
+" -march=athlon64 -O2 -pipe -fomit-frame-pointer " all took 33s.
+"-Os" took 36s.  This means very little. Eg. perhaps most of the time
+was spent in the very simple loops that compute a gaussian function
+ 1e6 times.
+
+#
+ -lf77blas -lcblas -latlas -
+
+The following was useful and may be again
+
+#define FPOINT (void (*)(double *, double *, int, int, void *))

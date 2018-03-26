@@ -1,5 +1,5 @@
 package Text::Password::SHA;
-our $VERSION = "0.13";
+our $VERSION = "0.15";
 
 use Moose;
 extends 'Text::Password::MD5';
@@ -66,19 +66,14 @@ returns true if the verification succeeds.
 sub verify {
     my $self = shift;
     my ( $input, $data ) = @_;
-     die __PACKAGE__. " doesn't allow any Wide Characters or white spaces\n"
-    if length $input and $input !~ /[!-~]/ or $input =~ /\s/;
 
-    if ( $data =~ /^\$6\$([!-~]{1,8})\$[!-~]{86}$/ ) {
-        my $salt = $1;
-        return $data eq Crypt::Passwd::XS::unix_sha512_crypt( $input, $salt );
+    carp "Empty data strings" unless length $data;
 
-    }elsif( $data =~ /^\$5\$([!-~]{1,8})\$[!-~]{43}$/ ) {
-        my $salt = $1;
-        return $data eq Crypt::Passwd::XS::unix_sha256_crypt( $input, $salt );
-    }elsif( $data =~ /^[0-9a-f]{40}$/i ) {
-        return $data eq sha1_hex($input);
-    }
+     return $data eq Crypt::Passwd::XS::unix_sha512_crypt( $input, $data )
+    if $data =~ /^\$6\$[!-~]{1,8}\$[!-~]{86}$/;
+     return $data eq Crypt::Passwd::XS::unix_sha256_crypt( $input, $data )
+    if $data =~ /^\$5\$([!-~]{1,8})\$[!-~]{43}$/;
+    return $data eq sha1_hex($input) if $data =~ /^[0-9a-f]{40}$/i;
     return 0;
 }
 
@@ -100,9 +95,8 @@ sub encrypt {
     my $self = shift;
     my $input = shift;
     my $min = $self->minimum();
-    croak __PACKAGE__ ." requires at least $min length" if length $input < $min;
-     die __PACKAGE__. " doesn't allow any Wide Characters or white spaces\n"
-    if $input =~ /[^!-~]/ or $input =~ /\s/;
+    croak ref($self) ." requires at least $min length" if length $input < $min;
+    croak ref($self). " doesn't allow any Wide Characters or white spaces\n" if $input =~ /[^ -~]/;
 
     return Crypt::Passwd::XS::unix_sha512_crypt( $input, $self->_salt() );
 }

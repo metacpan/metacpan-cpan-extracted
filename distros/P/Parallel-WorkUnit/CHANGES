@@ -1,3 +1,31 @@
+1.116 - Mar 24, 2018
+Joelle Maslak <jmaslak@antelope.net>
+ * Released as prod version with 1.115 fixes
+ * Require newer Test::UseAllModules (0.14 has bugs that cause tests to
+   fail)
+
+1.115 - Mar 24, 2018
+Joelle Maslak <jmaslak@antelope.net>
+ * Fix Windows hang
+ * Fix Windows warnings
+ * Released as DEV (TRIAL) version for CPAN Testers validation
+
+1.114 - Mar 23, 2018
+Joelle Maslak <jmaslak@antelope.net>
+ * Properly handle nested workunit() calls
+ * Adjust Demolish warning - Parent PID will no longer be the check now
+   that we can handle nesting properly - all child processes have
+   workunit variables properly cleared.
+ * Released as DEV (TRIAL) version for CPAN Testers validation
+
+1.113 - Mar 23, 2018
+Joelle Maslak <jmaslak@antelope.net>
+ * Add test on queue() and async() to validate that params were coderefs
+   (or "coderef like")
+ * Add Demolish that tests for running processes and emits warning for
+   running processes
+ * Released as DEV (TRIAL) version for CPAN Testers validation
+
 1.112 - Feb 23, 2018
 Joelle Maslak <jmaslak@antelope.net>
  * Released as prod version with 1.111 fixes

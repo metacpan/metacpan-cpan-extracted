@@ -3,7 +3,7 @@ package PDL::Algorithm::Center::Failure;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use custom::failures();
 

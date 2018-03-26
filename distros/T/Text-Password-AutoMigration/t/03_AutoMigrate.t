@@ -41,11 +41,13 @@ subtest 'verify with MD5 100 times' => sub {                            # 4
 note('generated hash strings with SHA512 is ' . $hash );
 
 subtest 'verify with SHA512 100 times' => sub {                         # 5
-    plan tests => 100;
+    plan tests => 200;
     foreach ( 1 .. 100 ){
         $flag = $pwd->verify( $raw, $hash );
-         like $flag, qr/^\$6\$[!-~]{1,8}\$[!-~]{86}$/,
+         like $flag, qr/^\$6\$[!-~]{1,8}\$[!-~]{86}$/,                  # 5.1
         "verify: " . $ok[ $flag ne '' ];
+         isnt $flag, $hash,                                             # 5.2
+        "succeed to make new hash from same password";
     }
 };
 

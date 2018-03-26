@@ -5,7 +5,7 @@ with 'Dezi::Role';
 use Carp;
 use namespace::autoclean;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 has 'hits' => ( is => 'ro', isa => 'Int', required => 1 );
 has 'query' => ( is => 'ro', isa => 'Search::Query::Dialect', required => 1 );
@@ -23,7 +23,7 @@ Dezi::Results - base results class
                     query_class     => 'Dezi::Query',
                     query_parser    => $swish_prog_queryparser,
                 );
-                
+
  my $results = $searcher->search( 'foo bar' );
  while (my $result = $results->next) {
      printf("%4d %s\n", $result->score, $result->uri);
@@ -77,7 +77,7 @@ Peter Karman, E<lt>karpet@dezi.orgE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-dezi-app at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
@@ -122,10 +122,10 @@ L<https://metacpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2014 by Peter Karman
+Copyright 2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the terms of the GPL v2 or later.
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

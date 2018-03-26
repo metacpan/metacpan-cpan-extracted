@@ -3,12 +3,14 @@ package App::Scheme79asm;
 use 5.014000;
 use strict;
 use warnings;
+use re '/s';
+use Carp qw/croak/;
 
 use Data::Dumper qw/Dumper/;
 use Data::SExpression qw/consp scalarp/;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 our %TYPES = (
 	LIST => 0,
@@ -57,29 +59,17 @@ sub process {
 
 	$addr = $self->process($addr) if ref $addr eq 'ARRAY';
 	die 'Addr of toplevel is not atom: ', Dumper($addr), "\n" unless scalarp($addr);
-
 	my ($comment_type, $comment_addr) = ($type, $addr);
-
-	unless (looks_like_number $addr) { # is symbol
-		unless (exists $self->{symbols}{$addr}) {
-			$self->{symbols}{$addr} = $self->{nsymbols};
-			$self->{nsymbols}++;
-		}
-		$addr = $self->{symbols}{$addr}
-	}
-
 	die 'Computed addr is not a number: ', Dumper($addr), "\n" unless looks_like_number $addr;
 
-	if (ref $type eq 'Data::SExpression::Symbol') {
+	if (!looks_like_number $type) {
 		die "No such type: $type\n" unless exists $TYPES{$type};
 		$type = $TYPES{$type};
-	} elsif (!looks_like_number $type) {
-		die "Type is not a number or symbol: $type\n"
 	}
 
 	$addr += (1 << $self->{addr_bits}) if $addr < 0;
-	die "Type too large: $type\n" unless $type < (1 << $self->{type_bits});
-	die "Addr too large: $addr\n" unless $addr < (1 << $self->{addr_bits});
+	die "Type too large: $type\n" if $type >= (1 << $self->{type_bits});
+	die "Addr too large: $addr\n" if $addr >= (1 << $self->{addr_bits});
 	my $result = ($type << $self->{addr_bits}) + $addr;
 	unless ($location) {
 		$self->{freeptr}++;
@@ -116,28 +106,29 @@ sub new {
 	$args{addr_bits} //= 8;
 	$args{freeptr} //= 6;
 	$args{memory} //= [0, 0, (1<<$args{addr_bits}), (1<<$args{addr_bits}), 0, 0, 0];
-	$args{symbols}{T} = 2;
-	$args{nsymbols} = 3;
-	$args{comment} = ['(cdr part of NIL)', '(car part of NIL)', '(cdr part of T)', '(car part of T)', '(free storage pointer)', '', '(result of computation)'];
+	my @default_comments = ('(cdr part of NIL)', '(car part of NIL)', '(cdr part of T)', '(car part of T)', '(free storage pointer)', '', '(result of computation)');
+	for (0 .. $#default_comments) {
+		$args{comment}[$_] = $default_comments[$_]
+	}
 	bless \%args, $class
 }
 
 sub print_binary16 {
 	my ($self, $fh) = @_;
-	$fh //= \*STDOUT;
+	$fh //= \*STDOUT; # uncoverable condition right
 
 	die "addr_bits + type_bits >= 16\n"if $self->{addr_bits} + $self->{type_bits} > 16;
 
 	my $length = @{$self->{memory}};
-	print $fh pack('n', $length);
+	print $fh pack 'n', $length or croak "Failed to print memory size: $!";
 	for (@{$self->{memory}}) {
-		print $fh pack('n', $_)
+		print $fh pack 'n', $_ or croak "Failed to print memory: $!"
 	}
 }
 
 sub print_verilog {
 	my ($self, $fh) = @_;
-	$fh //= \*STDOUT;
+	$fh //= \*STDOUT; # uncoverable condition right
 
 	my $bits = $self->{type_bits} + $self->{addr_bits};
 	my $index_length = length $#{$self->{memory}};
@@ -152,7 +143,10 @@ sub print_verilog {
 		}
 		my $spaces = ' ' x ($bits + 5 - (length $val));
 		$index = sprintf $index_format, $index;
-		say $fh "mem[$index] <= $val;$spaces // $comment"
+
+		my $string = "mem[$index] <= $val;";
+		$string .= "$spaces // $comment" if defined $comment;
+		say $fh $string or croak "Failed to print verilog: $!";
 	}
 
 }
@@ -194,9 +188,9 @@ The SIMPLE processor expects input in a particular tagged-pointer
 format. This module takes a string containing a sequence of
 S-expressions. Each S-expression is a list of one of three types:
 
-C<(tag value)>, for example C<(symbol nil)>, represents a value to be
+C<(tag value)>, for example C<(symbol 2)>, represents a value to be
 put in memory (for example a number, or a symbol, or a variable
-reference).
+reference). The value must be a number.
 
 C<(tag list)>, where C<list> is of one of these three types,
 represents a tagged pointer. In this case, C<list> is (recursively)
@@ -279,7 +273,7 @@ are the possible keys:
 A word is made of a type and an address, with the type occupying the
 most significant C<type_bits> (default 3) bits, and the address
 occupying the least significant C<address_bits> (default 8) bits.
-Therefore the word size is C<type_bits + address_bits> (default 13).
+Therefore the word size is C<type_bits + address_bits> (default 11).
 
 =item freeptr
 
@@ -295,17 +289,11 @@ C<freeptr>.
 =item comment
 
 The initial comments for memory entries. C<< $comment->[$i] >> is the
-comment for C<< $memory->[$i] >>.
-
-=item symbols
-
-The initial symbol map, as a hashref from symbol name to the index of
-that symbol. Defaults to C<< {T => 2} >>.
-
-=item nsymbols
-
-The number to give to the "next" symbol (default 3, because T is
-defined to be 2).
+comment for C<< $memory->[$i] >>. Note that the first 7 entries of
+this array will be overwritten with the default comments. This is
+useful when using custom initial memory contents and freeptr, because
+this key can be used to provide comments for the extra reserved
+locations in memory.
 
 =back
 

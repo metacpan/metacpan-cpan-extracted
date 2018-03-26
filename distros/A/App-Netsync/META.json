@@ -1,0 +1,86 @@
+{
+   "abstract" : "network/database synchronization library",
+   "author" : [
+      "dmtucker@ucsc.edu"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Netsync",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::CheckManifest" : "0.9",
+            "Test::Kwalitee" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.22"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Simple" : "4.58",
+            "DBI" : "1.622",
+            "File::Basename" : "0",
+            "Getopt::Std" : "0",
+            "Net::DNS" : "0.66",
+            "POSIX" : "0",
+            "Pod::Usage" : "1.61",
+            "SNMP" : "5.0702",
+            "SNMP::Info" : "3.05",
+            "Scalar::Util" : "1.32",
+            "Text::CSV" : "1.32",
+            "perl" : "5.010001",
+            "version" : "0.9917"
+         }
+      }
+   },
+   "provides" : {
+      "App::Netsync" : {
+         "file" : "lib/App/Netsync.pm",
+         "version" : "v4.0.0"
+      },
+      "App::Netsync::Configurator" : {
+         "file" : "lib/App/Netsync/Configurator.pm",
+         "version" : "v4.0.0"
+      },
+      "App::Netsync::Network" : {
+         "file" : "lib/App/Netsync/Network.pm",
+         "version" : "v4.0.0"
+      },
+      "App::Netsync::SNMP" : {
+         "file" : "lib/App/Netsync/SNMP.pm",
+         "version" : "v4.0.0"
+      },
+      "App::Netsync::Scribe" : {
+         "file" : "lib/App/Netsync/Scribe.pm",
+         "version" : "v4.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dmtucker/netsync.git",
+         "web" : "https://github.com/dmtucker/netsync"
+      }
+   },
+   "version" : "v4.0.0",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

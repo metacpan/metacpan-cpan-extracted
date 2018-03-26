@@ -4,7 +4,6 @@ author:
   - 'Jeremy Mates <jmates@cpan.org>'
 build_requires:
   Pod::Coverage: '0.18'
-  Test::Exception: '0'
   Test::Most: '0'
   Test::Pod: '1.22'
   Test::Pod::Coverage: '1.08'
@@ -13,8 +12,8 @@ configure_requires:
   ExtUtils::MakeMaker: '6.48'
   strict: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
-license: artistic_2
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -28,5 +27,10 @@ requires:
   Scalar::Util: '0'
   namespace::clean: '0'
   perl: '5.010000'
-version: '1.05'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+resources:
+  bugtracker: https://github.com/thrig/Math-SlideRule/issues
+  homepage: https://github.com/thrig/Math-SlideRule
+  license: https://opensource.org/licenses/BSD-3-Clause
+  repository: git://github.com/thrig/Math-SlideRule.git
+version: '1.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

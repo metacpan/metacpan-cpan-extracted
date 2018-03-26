@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README
+README.md
 dist.ini
 lib/Task/MusicBundle.pm
 t/00-compile.t

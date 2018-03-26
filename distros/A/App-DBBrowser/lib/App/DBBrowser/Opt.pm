@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.006';
+our $VERSION = '2.008';
 
 use File::Basename        qw( fileparse );
 use File::Spec::Functions qw( catfile );
@@ -17,15 +17,25 @@ use Term::Choose       qw( choose );
 use Term::Choose::Util qw( insert_sep print_hash choose_a_number choose_a_subset settings_menu choose_a_dir );
 use Term::Form         qw();
 
+use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
+
 use App::DBBrowser::Auxil;
 use App::DBBrowser::OptDB;
 
 
 sub new {
-    my ( $class, $info, $opt ) = @_;
-    bless { i => $info, o => $opt }, $class;
+    my ( $class, $info, $options ) = @_;
+    bless {
+        i => $info,
+        o => $options,
+        avail_operators => [
+            "REGEXP", "REGEXP_i", "NOT REGEXP", "NOT REGEXP_i", "LIKE", "NOT LIKE", "IS NULL", "IS NOT NULL",
+            "IN", "NOT IN", "BETWEEN", "NOT BETWEEN", " = ", " != ", " <> ", " < ", " > ", " >= ", " <= ",
+            " = col", " != col", " <> col", " < col", " > col", " >= col", " <= col",
+            "LIKE %col%", "NOT LIKE %col%",  "LIKE col%", "NOT LIKE col%", "LIKE %col", "NOT LIKE %col" ],
+            # "LIKE col", "NOT LIKE col"
+        }, $class;
 }
-#write_config
 
 
 sub defaults {
@@ -39,8 +49,10 @@ sub defaults {
             meta                 => 0,
             lock_stmt            => 0,
             operators            => [ "REGEXP", "REGEXP_i", " = ", " != ", " < ", " > ", "IS NULL", "IS NOT NULL" ],
-            expert_aggregate     => 0,
-            expert_subqueries    => 0,
+            #subqueries_select    => 0,
+            #subqueries_set       => 0,
+            #subqueries_w_h       => 0,
+            subqueries           => 0,
             alias                => 0,
             parentheses          => 0,
             quote_identifiers    => 1,
@@ -48,7 +60,7 @@ sub defaults {
             insert_ok            => 0,
             update_ok            => 0,
             delete_ok            => 0,
-            create_table_o       => 0,
+            create_table_ok       => 0,
             drop_table_ok        => 0,
         },
         table => {
@@ -107,7 +119,6 @@ sub __menu_insert {
     my ( $sf, $group ) = @_;
     my $menu_insert = {
         main_insert => [
-#            { name => 'input_modes',           text => "- Read",           section => 'insert' },
 #            { name => 'files_dir',             text => "- File Dir",         section => 'insert' },
             { name => '_parse_mode',           text => "- Parse Module",     section => 'insert' },
             { name => '_module_Text_CSV',      text => "- Config Text::CSV", section => 'csv'    },
@@ -155,9 +166,9 @@ sub config_insert {
                     redo GROUP_INSERT;
                 }
                 else {
-                    if ( $sf->{i}{write_config} ) {
+                    if ( $sf->{write_config} ) {
                         $sf->__write_config_files();
-                        delete $sf->{i}{write_config};
+                        delete $sf->{write_config};
                     }
                     return
                 }
@@ -186,15 +197,6 @@ sub config_insert {
             my $section  = $sub_menu_insert->[$idx - @pre]{section};
             #my $opt_type = 'o';
             my $no_yes   = [ 'NO', 'YES' ];
-#            if ( $opt eq 'input_modes' ) {
-#                    my $available = [ 'Cols', 'Rows', 'Multi-row', 'File' ];
-#                    my $prompt = 'Input Modes:';
-#                    $sf->__choose_a_subset_wrap( $section, $opt, $available, $prompt );
-#            }
-#            if ( $opt eq 'files_dir' ) {
-#                $sf->__choose_a_dir_wrap( $section, $opt );
-#            }
-#            els
             if ( $opt eq 'file_encoding' ) {
                 my $items = [
                     { name => 'file_encoding', prompt => "file_encoding" },
@@ -333,9 +335,9 @@ sub set_options {
                     redo GROUP;
                 }
                 else {
-                    if ( $sf->{i}{write_config} ) {
+                    if ( $sf->{write_config} ) {
                         $sf->__write_config_files();
-                        delete $sf->{i}{write_config};
+                        delete $sf->{write_config};
                     }
                     exit();
                 }
@@ -369,9 +371,9 @@ sub set_options {
                 redo GROUP;
             }
             elsif ( $opt eq $sf->{i}{_continue} ) {
-                if ( $sf->{i}{write_config} ) {
+                if ( $sf->{write_config} ) {
                     $sf->__write_config_files();
-                    delete $sf->{i}{write_config};
+                    delete $sf->{write_config};
                 }
                 return $sf->{o};
             }
@@ -396,8 +398,8 @@ sub set_options {
                 next OPTION;
             }
             elsif ( $opt eq '_db_defaults' ) {
-                my $obj_o_db = App::DBBrowser::OptDB->new( $sf->{i}, $sf->{o} );
-                $obj_o_db->database_setting();
+                my $odb = App::DBBrowser::OptDB->new( $sf->{i}, $sf->{o} );
+                $odb->database_setting();
                 next OPTION;
             }
             #my $opt_type = 'o';
@@ -471,22 +473,18 @@ sub set_options {
             }
             elsif ( $opt eq '_expert' ) {
                 my $sub_menu = [
-                    [ 'expert_aggregate',  "- Aggregate in SELECT",    [ 'NO', 'YES' ] ],
-                    [ 'expert_subqueries', "- Subqueries",             [ 'NO', 'YES' ] ],
-                    [ 'alias',             "- Alias for complex cols", [ 'NO', 'YES' ] ],
-                    [ 'parentheses',       "- Parentheses",            [ 'NO', 'YES' ] ],
+                    [ 'subqueries',        "- Subqueries",                 [ 'NO', 'YES' ] ],
+                    #[ 'subqueries_select', "- Subqueries SELECT",          [ 'NO', 'YES' ] ],
+                    #[ 'subqueries_set',    "- Subqueries UPDATE-SET",      [ 'NO', 'YES' ] ],
+                    #[ 'subqueries_w_h',    "- Subqueries WHERE/HAVING TO", [ 'NO', 'YES' ] ],
+                    [ 'alias',             "- Alias for complex cols",     [ 'NO', 'YES' ] ],
+                    [ 'parentheses',       "- Parentheses",                [ 'NO', 'YES' ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu );
             }
             elsif ( $opt eq 'operators' ) {
-                my $available =[
-                    "REGEXP", "REGEXP_i", "NOT REGEXP", "NOT REGEXP_i", "LIKE", "NOT LIKE", "IS NULL", "IS NOT NULL",
-                    "IN", "NOT IN", "BETWEEN", "NOT BETWEEN", " = ", " != ", " <> ", " < ", " > ", " >= ", " <= ",
-                    " = col", " != col", " <> col", " < col", " > col", " >= col", " <= col",
-                    "LIKE %col%", "NOT LIKE %col%",  "LIKE col%", "NOT LIKE col%", "LIKE %col", "NOT LIKE %col" ];
-                    # "LIKE col", "NOT LIKE col"
                 my $prompt = 'Choose operators:';
-                $sf->__choose_a_subset_wrap( $section, $opt, $available, $prompt );
+                $sf->__choose_a_subset_wrap( $section, $opt, $sf->{avail_operators}, $prompt );
             }
             elsif ( $opt eq '_sql_identifiers' ) {
                 my $prompt = 'Choose: ';
@@ -537,7 +535,7 @@ sub __settings_menu_wrap {
     my ( $sf, $section, $sub_menu, $prompt ) = @_;
     my $changed = settings_menu( $sub_menu, $sf->{o}{$section}, { prompt => $prompt, mouse => $sf->{o}{table}{mouse} } );
     return if ! $changed;
-    $sf->{i}{write_config}++;
+    $sf->{write_config}++;
 }
 
 sub __choose_a_subset_wrap {
@@ -554,7 +552,7 @@ sub __choose_a_subset_wrap {
     return if ! defined $list;
     return if ! @$list;
     $sf->{o}{$section}{$opt} = $list;
-    $sf->{i}{write_config}++;
+    $sf->{write_config}++;
     return;
 }
 
@@ -570,7 +568,7 @@ sub __choose_a_number_wrap {
     );
     return if ! defined $choice;
     $sf->{o}{$section}{$opt} = $choice;
-    $sf->{i}{write_config}++;
+    $sf->{write_config}++;
     return;
 }
 
@@ -591,7 +589,7 @@ sub __group_readline {
         for my $i ( 0 .. $#$items ) {
             $sf->{o}{$section}{$items->[$i]{name}} = $new_list->[$i][1];
         }
-        $sf->{i}{write_config}++;
+        $sf->{write_config}++;
     }
 }
 
@@ -605,7 +603,7 @@ sub __choose_a_dir_wrap {
     my $dir = choose_a_dir( { mouse => $sf->{o}{table}{mouse}, info => $info, name => 'OK ' } );
     return if ! length $dir;
     $sf->{o}{$section}{$opt} = $dir;
-    $sf->{i}{write_config}++;
+    $sf->{write_config}++;
     return;
 }
 
@@ -618,7 +616,7 @@ sub __write_config_files {
             $tmp->{$section}{$opt} = $sf->{o}{$section}{$opt};
         }
     }
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o} );
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, {} );
     my $file_name = $sf->{i}{file_settings};
     $ax->write_json( $file_name, $tmp  );
 }
@@ -626,7 +624,7 @@ sub __write_config_files {
 sub read_config_files {
     my ( $sf ) = @_;
     my $o = $sf->defaults();
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o} );
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, {} );
     my $file_name = $sf->{i}{file_settings};
     if ( -f $file_name && -s $file_name ) {
         my $tmp = $ax->read_json( $file_name );

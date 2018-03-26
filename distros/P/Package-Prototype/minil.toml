@@ -1,0 +1,11 @@
+name = "Package-Prototype"
+badges = ["travis"]
+authority="cpan:CODEHEX"
+
+module_maker="ModuleBuild"
+
+[build]
+build_class = "Module::Build::XSUtil"
+
+[XSUtil]
+needs_compiler_c99 = 1

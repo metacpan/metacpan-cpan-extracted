@@ -6,7 +6,7 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '1.87';
+our $VERSION = '1.88';
 
 use Tie::RefHash;
 use HTTP::Request 1.30;
@@ -903,8 +903,8 @@ sub tick {
         $index++;
     } # while
 
-    # got self far?  Didn't find anything
-    $self->warn( qq{No checkbox "$name" for value "$value" in form} );
+    # got this far?  Didn't find anything
+    $self->die( qq{No checkbox "$name" for value "$value" in form} );
 } # tick()
 
 
@@ -1663,7 +1663,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 1.87
+version 1.88
 
 =head1 SYNOPSIS
 
@@ -1674,7 +1674,7 @@ selected, form fields can be filled and the next page can be fetched.
 Mech also stores a history of the URLs you've visited, which can
 be queried and revisited.
 
-    use WWW::Mechanize;
+    use WWW::Mechanize ();
     my $mech = WWW::Mechanize->new();
 
     $mech->get( $url );
@@ -1763,15 +1763,14 @@ for that. Please check L<WWW::Mechanize::FAQ/"JavaScript"> for more.
 
 =item * L<https://github.com/libwww-perl/WWW-Mechanize/issues>
 
-The queue for bugs & enhancements in WWW::Mechanize and
-Test::WWW::Mechanize.  Please note that the queue at L<http://rt.cpan.org>
-is no longer maintained.
+The queue for bugs & enhancements in WWW::Mechanize.  Please note that the
+queue at L<http://rt.cpan.org> is no longer maintained.
 
-=item * L<http://search.cpan.org/dist/WWW-Mechanize/>
+=item * L<https://metacpan.org/pod/WWW::Mechanize>
 
 The CPAN documentation page for Mechanize.
 
-=item * L<http://search.cpan.org/dist/WWW-Mechanize/lib/WWW/Mechanize/FAQ.pod>
+=item * L<https://metacpan.org/pod/distribution/WWW-Mechanize/lib/WWW/Mechanize/FAQ.pod>
 
 Frequently asked questions.  Make sure you read here FIRST.
 
@@ -2693,7 +2692,10 @@ the name or number of the form to do this.
 
 (calls C<L</form_with_fields()>> and C<L</set_fields()>>).
 
-If you choose this, the form_number, form_name, form_id and fields options will be ignored.
+If you choose C<with_fields>, the C<fields> option will be ignored. The
+C<form_number>, C<form_name> and C<form_id> options will still be used.  An
+exception will be thrown unless exactly one form matches all of the provided
+criteria.
 
 =item * C<< form_number => n >>
 
@@ -3051,6 +3053,67 @@ C<onwarn> in the constructor.
 
 Centralized error method.  Defaults to calling C<CORE::die>, but
 may be overridden by setting C<onerror> in the constructor.
+
+=head1 BEST PRACTICES
+
+The default settings can get you up and running quickly, but there are settings
+you can change in order to make your life easier.
+
+=over4
+
+=item autocheck
+
+C<autocheck> can save you the overhead of checking status codes for success.
+You may outgrow it as your needs get more sophisticated, but it's a safe option
+to start with.
+
+    my $agent = WWW::Mechanize->new( autocheck => 1 );
+
+=item cookie_jar
+
+You are encouraged to install L<Mozilla::PublicSuffix> and use
+L<HTTP::CookieJar::LWP> as your cookie jar.  L<HTTP::CookieJar::LWP> provides a
+better security model matching that of current Web browsers when
+L<Mozilla::PublicSuffix> is installed.
+
+    use HTTP::CookieJar::LWP ();
+
+    my $jar = HTTP::CookieJar::LWP->new;
+    my $agent = WWW::Mechanize->new( cookie_jar => $jar );
+
+=item protocols_allowed
+
+This option is inherited directly from L<LWP::UserAgent>.  It allows you to
+whitelist the protocols you're willing to allow.
+
+    my $agent = WWW::Mechanize->new(
+        protocols_allowed => [ 'http', 'https' ]
+    );
+
+This will prevent you from inadvertently following URLs like
+C<file:///etc/passwd>
+
+=item protocols_forbidden
+
+This option is also inherited directly from L<LWP::UserAgent>.  It allows you to
+blacklist the protocols you're unwilling to allow.
+
+    my $agent = WWW::Mechanize->new(
+        protocols_forbidden => [ 'file', 'mailto', 'ssh', ]
+    );
+
+This will prevent you from inadvertently following URLs like
+C<file:///etc/passwd>
+
+=item strict_forms
+
+Consider supplying the C<strict_forms> argument as a rule when you are using
+C<submit_form>.  This will perform a helpful sanity check on the form fields
+you are submitting, which can save you a lot of debugging time.
+
+    $agent->submit_form( fields => { foo => 'bar' } , strict_forms => 1 );
+
+=back
 
 =head1 WWW::MECHANIZE'S GIT REPOSITORY
 

@@ -4,9 +4,9 @@
       "Jeremy Mates <jmates@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "artistic_2"
+      "bsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -21,14 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Pod::Coverage" : "0.18",
-            "Test::Exception" : "0",
-            "Test::Most" : "0",
-            "Test::Pod" : "1.22",
-            "Test::Pod::Coverage" : "1.08",
-            "lib" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -43,9 +36,32 @@
             "namespace::clean" : "0",
             "perl" : "5.010000"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Pod::Coverage" : "0.18",
+            "Test::Most" : "0",
+            "Test::Pod" : "1.22",
+            "Test::Pod::Coverage" : "1.08",
+            "lib" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "1.05",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/thrig/Math-SlideRule/issues"
+      },
+      "homepage" : "https://github.com/thrig/Math-SlideRule",
+      "license" : [
+         "https://opensource.org/licenses/BSD-3-Clause"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/thrig/Math-SlideRule.git",
+         "web" : "https://github.com/thrig/Math-SlideRule"
+      }
+   },
+   "version" : "1.06",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

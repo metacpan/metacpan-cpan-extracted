@@ -1,0 +1,57 @@
+PDL::PP has some facilities for taking care of a number of
+the following tasks.
+
+=== Potential bugs or porting problems:
+
+-- Use PP::Options to handle options rather than using hand coding.
+
+=== Bugs:
+
+=== Missing Features:
+
+--- liblevmar prints warnings and errors to sterr and sometimes exits. Instead
+    pass  a buffer to the routines to collect messages. And return, don't exit
+    on failed mallocs, etc.
+
+==== Efficiency 
+
+---- Strings representing lpp and C code are copied quite a bit in the
+     routines. This should be fixed. refs to strings should be allowed
+     in the FUNC option. If a contstant is passed to Func, it should store
+     a copy in the object and continue to use pointers.
+     Note, this is more difficult now because more code manipulation is required
+     for support of single and double precision.
+
+---- In generate_C_src() the regexs that replace t with t[i],
+     etc. could probably be made more efficient. Currently I use
+     while($fdef =~ s/([^\w]|^)t([^\w\[])/$1t[i]$2/g){}
+
+#---------------------------------------------
+ THINGS LISTED BELOW HAVE BEEN DONE  
+
+Fri Jul  7 23:19:36 MST 2006
+
+-- liblevmar has float support, but I only use the double functions.
+   This should be fixed.
+
+-- liblevmar can either allocate workspace or have the calling routine
+   do it. I should add support for allocating space on the perl side
+   for efficiency. Not hard.
+
+---- The levmar_driver function is cruft from an earlier version of this
+     module. It is an extra routine call that could be eliminated by
+     moving it into the pp_def.
+
+---- Fix kludged, info(q) and [o] oinfo(q) solution to getting q==9.
+     (more on this in levmar.pd)
+
+--- liblevmar has routines for testing the jacobian that are not implemented
+    here.
+
+-- I assume sizeof(int) == sizeof(void *), and let
+   perl make code for passing an int. Better is
+   using $Config{ptrsize} and packing a string and
+   using 'char *' in xs code. That way, this module
+   has a better chance of being portable
+
+    

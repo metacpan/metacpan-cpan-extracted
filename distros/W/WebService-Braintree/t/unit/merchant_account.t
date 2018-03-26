@@ -10,42 +10,41 @@ use lib qw(lib t/lib);
 
 use WebService::Braintree;
 use WebService::Braintree::TestHelper;
-use WebService::Braintree::MerchantAccount;
 
 subtest 'create new merchant account with all params', sub {
     my $params = {
-        id => "sub_merchant_account",
-        status => "active",
+        id => 'sub_merchant_account',
+        status => 'active',
         master_merchant_account => {
-            id => "master_merchant_account",
-            status => "active"
+            id => 'master_merchant_account',
+            status => 'active'
         },
         individual => {
-            first_name => "John",
-            last_name => "Doe",
-            email => "john.doe\@example.com",
-            date_of_birth => "1970-01-01",
-            phone => "3125551234",
-            ssn_last_4 => "6789",
+            first_name => 'John',
+            last_name => 'Doe',
+            email => 'john.doe@example.com',
+            date_of_birth => '1970-01-01',
+            phone => '3125551234',
+            ssn_last_4 => '6789',
             address => {
-                street_address => "123 Fake St",
-                locality => "Chicago",
-                region => "IL",
-                postal_code => "60622",
+                street_address => '123 Fake St',
+                locality => 'Chicago',
+                region => 'IL',
+                postal_code => '60622',
             }
         },
         business => {
             dba_name => "James's Bloggs",
-            tax_id => "123456789",
+            tax_id => '123456789',
         },
         funding => {
-            account_number_last_4 => "8798",
-            routing_number => "071000013",
-            descriptor => "James Bloggs MI",
+            account_number_last_4 => '8798',
+            routing_number => '071000013',
+            descriptor => 'James Bloggs MI',
         }
     };
 
-    my $merchant_account = WebService::Braintree::MerchantAccount->new($params);
+    my $merchant_account = WebService::Braintree::_::MerchantAccount->new($params);
     is $merchant_account->status, "active";
     is $merchant_account->id, "sub_merchant_account";
     is $merchant_account->master_merchant_account->id, "master_merchant_account";

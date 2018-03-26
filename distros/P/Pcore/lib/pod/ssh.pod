@@ -1,0 +1,11 @@
+=pod
+
+=encoding utf8
+
+=head1 SSH
+
+=head2 forward remote HTTP ports to the local
+
+    autossh -M 20000 -f -N -R *:80:127.0.0.1:80 -R *:443:127.0.0.1:443 user@host
+
+=cut

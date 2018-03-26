@@ -1,5 +1,11 @@
 Revision history for Plack-Middleware-RedirectSSL
 
+1.300 Sat 24 Mar 2018
+	- Fix for subtle runtime mutator usage compat breakage in 1.200
+	- Arbitrary HSTS header value support
+	- Comprehensive RFC 6797 support
+	- Chrome HSTS preload list support
+
 1.200 Sat 09 Dec 2017
 	- Minimum perl requirement reduction to 5.6
 	- Minimum Test::More requirement dropped

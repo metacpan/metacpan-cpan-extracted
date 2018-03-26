@@ -1,3 +1,4 @@
+bin/git-branch-age
 bin/git-branch-clean
 bin/git-branch-grep
 bin/git-branches
@@ -20,6 +21,7 @@ hooks/commit-msg
 install.pl
 lib/App/Git/Workflow.pm
 lib/App/Git/Workflow/Command.pm
+lib/App/Git/Workflow/Command/BranchAge.pm
 lib/App/Git/Workflow/Command/BranchClean.pm
 lib/App/Git/Workflow/Command/Branches.pm
 lib/App/Git/Workflow/Command/BranchGrep.pm

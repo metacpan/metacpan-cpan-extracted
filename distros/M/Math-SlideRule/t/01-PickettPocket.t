@@ -3,14 +3,13 @@
 use strict;
 use warnings;
 
-use Test::More;    # plan is down at bottom
-use Test::Exception;
+use Test::Most;    # plan is down at bottom
 
 BEGIN {
-  use_ok('Math::SlideRule::PickettPocket') || print "Bail out!\n";
+    use_ok('Math::SlideRule::PickettPocket') || print "Bail out!\n";
 }
 diag(
-  "Testing Math::SlideRule::PickettPocket $Math::SlideRule::PickettPocket::VERSION, Perl $], $^X"
+    "Testing Math::SlideRule::PickettPocket $Math::SlideRule::PickettPocket::VERSION, Perl $], $^X"
 );
 
 my $sr = Math::SlideRule::PickettPocket->new;
@@ -21,12 +20,13 @@ isa_ok( $sr, 'Math::SlideRule::PickettPocket' );
 # Public methods
 
 is( $sr->divide( 75, 92 ), 0.815, 'simple divide' );
-# Hmm, frequent rounding to tickmarks gets different result than what one can
-# do by matching up the hairline (which suggested something closer to 5.1 for
-# me, on a second take I'd pick 5.075 as the hairline is in the middle of the
-# upper half of the 5.0 to 5.1 space). That is, in a chain operation, can skip
-# the round-to-nearest that this code does at each step. This might compound
-# accuracy or error depending on how well the rule is used?
+# hmm, frequent rounding to tickmarks gets different result than what
+# one can do by matching up the hairline (which suggested something
+# closer to 5.1 for me, on a second take I'd pick 5.075 as the hairline
+# is in the middle of the upper half of the 5.0 to 5.1 space). that is,
+# in a chain operation, can skip the round-to-nearest that this code
+# does at each step. this might compound accuracy or error depending on
+# how well the rule is used?
 is( $sr->divide( 14, 92, 3 ), 0.0505, 'less simple divide' );
 
 is( $sr->multiply( 1.1,  2.2 ),  2.42,   'simple multiply' );

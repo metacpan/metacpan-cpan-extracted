@@ -40,7 +40,7 @@ sub start_create
   print STDERR "start_create: $tbl_id\n" if $verbose;
 
 
-  $fh = IO::File->new( $udata->{data}, 'w' ) 
+  $fh = IO::File->new( $udata->{data}, 'w' )
     or die( "unable to create $udata->{data}\n" );
 }
 
@@ -98,8 +98,8 @@ for my $html ( @html )
 
 
   my %req = ( hdr => \&header, row => \&row,
-	      udata => { hdr => $hdrfile }
-	      );
+              udata => { hdr => $hdrfile }
+              );
 
   my $data;
   unless( $create )
@@ -120,7 +120,7 @@ for my $html ( @html )
 
     ( my $datafile = $html ) =~ s/.html/.$type.data/;
     $req{udata}{data} = $datafile;
-    
+
     {
       local $req{id} = 1;
       my $p = HTML::TableParser->new( [ \%req ], \%attr );
@@ -175,8 +175,8 @@ for my $html ( @html )
   my $hdrfile = 'data/table2-1.hdr';
 
   my %req = ( hdr => \&header, row => \&row,
-	      udata => { hdr => $hdrfile }
-	      );
+              udata => { hdr => $hdrfile }
+              );
 
   my $data;
   my $datafile;
@@ -222,10 +222,10 @@ for my $html ( @html )
   my $hdrfile = 'data/table2-1.hdr';
 
   my %req = ( hdr => \&header, row => \&row, start => \&start,
-	      id => sub { $_[0] eq '1.1' },
-	      udata => { hdr => $hdrfile, 
-			 data => 'data/table2-1.Default.data' }
-	    );
+              id => sub { $_[0] eq '1.1' },
+              udata => { hdr => $hdrfile,
+                         data => 'data/table2-1.Default.data' }
+            );
 
 
   my ( $data, $datafile );
@@ -238,7 +238,7 @@ for my $html ( @html )
   $p->parse_file( $html ) || die;
   ok( eq_array( $header, $columns ), "$fakehtml id = coderef" );
 
-  ok( eq_array( $data->{Default}, \@parse_data ), 
+  ok( eq_array( $data->{Default}, \@parse_data ),
       "$fakehtml(Default) id = coderef data" );
 
 }
@@ -253,10 +253,10 @@ for my $html ( @html )
   my $hdrfile = 'data/table2-1.hdr';
 
   my %req = ( hdr => \&header, row => \&row, start => \&start,
-	      id => [ '-', sub { $_[0] eq '1' }, 'DEFAULT' ],
-	      udata => { hdr => $hdrfile, 
-			 data => 'data/table2-1.Default.data' }
-	    );
+              id => [ '-', sub { $_[0] eq '1' }, 'DEFAULT' ],
+              udata => { hdr => $hdrfile,
+                         data => 'data/table2-1.Default.data' }
+            );
 
 
   my ( $data, $datafile );
@@ -269,7 +269,7 @@ for my $html ( @html )
   $p->parse_file( $html ) || die;
   ok( eq_array( $header, $columns ), "$fakehtml id exclude" );
 
-  ok( eq_array( $data->{Default}, \@parse_data ), 
+  ok( eq_array( $data->{Default}, \@parse_data ),
       "$fakehtml(Default) id exclude data" );
 
 }
@@ -285,14 +285,14 @@ for my $html ( @html )
   my $fakehtml = 'data/table2-1.html';
   my $hdrfile = 'data/table2-1.hdr';
 
-  my @reqs = 
-    ( 
+  my @reqs =
+    (
       { id => [ '--', '1' ] },
       {
        hdr => \&header, row => \&row, start => \&start,
        id => 'DEFAULT',
-       udata => { hdr => $hdrfile, 
-		  data => 'data/table2-1.Default.data' }
+       udata => { hdr => $hdrfile,
+                  data => 'data/table2-1.Default.data' }
       }
     );
 
@@ -307,7 +307,7 @@ for my $html ( @html )
   $p->parse_file( $html ) || die;
   ok( eq_array( $header, $columns ), "$fakehtml id skip" );
 
-  ok( eq_array( $data->{Default}, \@parse_data ), 
+  ok( eq_array( $data->{Default}, \@parse_data ),
       "$fakehtml(Default) id skip data" );
 
 }
@@ -323,10 +323,10 @@ for my $html ( @html )
   my $hdrfile = 'data/table2-1.hdr';
 
   my %req = ( hdr => \&header, row => \&row, start => \&start,
-	      id => qr/\.1$/,
-	      udata => { hdr => $hdrfile, 
-			 data => 'data/table2-1.Default.data' }
-	    );
+              id => qr/\.1$/,
+              udata => { hdr => $hdrfile,
+                         data => 'data/table2-1.Default.data' }
+            );
 
 
   my ( $data, $datafile );
@@ -338,7 +338,7 @@ for my $html ( @html )
   $p->parse_file( $html ) || die;
   ok( eq_array( $header, $columns ), "$fakehtml idre" );
 
-  ok( eq_array( $data->{Default}, \@parse_data ), 
+  ok( eq_array( $data->{Default}, \@parse_data ),
       "$fakehtml(Default) idre data" );
 }
 
@@ -354,10 +354,10 @@ for my $html ( @html )
   my $hdrfile  = 'data/screwy.hdr';
 
   my %req = ( hdr => \&header, row => \&row, start => \&start,
-	      cols => sub { grep { /Widget A/ } @{$_[2]}  },
-	      udata => { hdr => $hdrfile, 
-			 data => $datafile }
-	    );
+              cols => sub { grep { /Widget A/ } @{$_[2]}  },
+              udata => { hdr => $hdrfile,
+                         data => $datafile }
+            );
 
 
   my $data;
@@ -370,8 +370,7 @@ for my $html ( @html )
   $p->parse_file( $html ) || die;
   ok( eq_array( $header, $columns ), "$html cols = coderef" );
 
-  ok( eq_array( $data->{Default}, \@parse_data ), 
+  ok( eq_array( $data->{Default}, \@parse_data ),
       "$html(Default) cols = coderef data" );
 
 }
-

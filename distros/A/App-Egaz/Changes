@@ -1,0 +1,34 @@
+Revision history for Perl extension App-Egaz
+
+0.0.8 2018-03-24T17:32:15Z
+    - Move `egaz mergecsv` to `fasops mergecsv`
+    - Escape braces in regex
+    - Add overlap_ranges() to Common.pm
+    - Add `egaz partition`
+    - Add `egaz normalize`
+
+0.0.7 2018-03-18T16:00:35Z
+    - Add `egaz masked`
+    - Use `fasops check` in t/04-lav2axt.t
+
+0.0.6 2018-03-18T13:28:34Z
+    - Add `egaz maskfasta`
+    - Use markdown syntax in formats.pm
+
+0.0.5 2018-03-18T11:57:35Z
+    - Add `egaz formats`
+
+0.0.4 2018-03-18T08:54:47Z
+    - Add `egaz lav2psl`
+    - Add round() to Common.pm
+
+0.0.3 2018-03-17T08:18:33Z
+    - Add `egaz lav2axt`
+    - Add resolve_file() to Common.pm
+
+0.0.2 2018-03-16T07:14:30Z
+    - Add `egaz mergecsv`
+
+0.0.1 2018-03-15T20:54:33Z
+    - original version
+

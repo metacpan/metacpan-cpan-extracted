@@ -1,0 +1,199 @@
+---
+file_path: '../t/data/CMYK-Lab_CxF3'
+file_type: CXFX
+read_rs: "\n"
+xrp:CustomAttributes:
+  BarCodeEnabled: 'False'
+  ColorCorrectionPatchCount: None
+  ColorSpace: CMYK
+  DarkLightRatio: 50
+  DimensionUnit: mm
+  HeaderEdgeSizePercent: '-2147483648'
+  ImagePath: ''
+  InkLimit: 400
+  LockWriteProtection: 'False'
+  LowTestChartResolution: 'False'
+  MeasurementDevice: 'i1Pro 2'
+  MeasurementMode: 'Dual (UVincl. [M0] + UVexcl. [M2])'
+  MeasurementPerPatch: 0
+  NumberPatchColumns: 10
+  NumberPatchPages: 1
+  NumberPatchRows: 1
+  OptimizeProfile: ''
+  PLUS_1_COLOR: Orange|68.02|43.06|68.15|1|2|50|50|1
+  PLUS_2_COLOR: Green|87.82|-81.04|71.47|1|2|50|50|2
+  PLUS_3_COLOR: Red|54.28|78.98|64.91|1|2|50|50|3
+  PLUS_4_COLOR: Blue|29.57|67.02|-128|1|2|50|50|4
+  PageHeight: 50.00
+  PageWidth: 50.00
+  Paper: Plain
+  PaperFormat: 'Paper Size Letter  216 x 279 mm'
+  PaperOrientation: Landscape
+  PaperType: 'Not Specified (default)'
+  PatchSizeHeightPercent: 0
+  PatchSizeHeightValue: 0.00
+  PatchSizeWidthPercent: 12.5
+  PatchSizeWidthValue: 0.00
+  PrintMarginBottom: 5.00
+  PrintMarginLeft: 5.00
+  PrintMarginRight: 5.00
+  PrintMarginTop: 5.00
+  PrinterName: 'CMYK Printer'
+  PrinterType: 'Not specified (default)'
+  ScramblePatches: 'False'
+  SelectedMeasurementCondition: 'UV included [M0]'
+  TestChartType: 'CMYK Variable'
+  TightMarginsEnabled: 'False'
+  TitleString: CMYK-Lab_ASCII_A
+  UseLegacyTestChart: 'False'
+  UsePatchSettingDefaults: 'True'
+  WriteProtected: 'False'
+  linearMeasurements: ''
+  numLinearSteps: 28
+  numberCorePatches: 10
+  numberImagePatches: 0
+  numberSpotPatches: 0
+---
+-
+  - Target|CMYK_C
+  - Target|CMYK_M
+  - Target|CMYK_Y
+  - Target|CMYK_K
+  - M0_Measurement|LAB_L
+  - M0_Measurement|LAB_A
+  - M0_Measurement|LAB_B
+-
+  - 0
+  - 100
+  - 20
+  - 0
+  - 44.5001781833197
+  - 64.5170546647771
+  - 0.35898417873909
+-
+  - 0
+  - 85
+  - 20
+  - 0
+  - 49.3539933929804
+  - 55.2723749767089
+  - '-0.055217971644045'
+-
+  - 0
+  - 70
+  - 20
+  - 0
+  - 55.9535594493547
+  - 42.9765040065072
+  - 0.140462548624719
+-
+  - 0
+  - 55
+  - 20
+  - 0
+  - 62.9168149915561
+  - 30.6181807670157
+  - 0.908637123001738
+-
+  - 0
+  - 40
+  - 20
+  - 0
+  - 69.5840982589088
+  - 19.3868620474691
+  - 2.08861733931592
+-
+  - 0
+  - 30
+  - 20
+  - 0
+  - 74.1188965648697
+  - 12.3207625693383
+  - 3.25913157372556
+-
+  - 0
+  - 20
+  - 20
+  - 0
+  - 78.7435818919355
+  - 5.39616266410033
+  - 4.69525769735065
+-
+  - 0
+  - 10
+  - 20
+  - 0
+  - 83.1307587446541
+  - '-0.941663492290921'
+  - 6.33034492012053
+-
+  - 0
+  - 0
+  - 20
+  - 0
+  - 87.5324254113652
+  - '-7.14399488623007'
+  - 8.13953174849103
+-
+  - 0
+  - 100
+  - 10
+  - 0
+  - 44.4080336847495
+  - 65.4624099242309
+  - '-4.85173884850322'
+---
+- []
+- ~
+-
+  - ~
+  - ~
+  - ~
+  - ~
+  - 96.42
+  - 100
+  - 82.49
+- ~
+- ~
+-
+  - Unknown
+  - Unknown
+  - Unknown
+  - Unknown
+  - M0_Measurement_spec
+  - M0_Measurement_spec
+  - M0_Measurement_spec
+---
+-
+  - ORIGINATOR
+  - "\"X-Rite - Prism\""
+  - FileInformation
+-
+  - CREATED
+  - "\"2013-01-06T12:32:41-05:00\""
+  - FileInformation
+-
+  - FILE_DESCRIPTOR
+  - "\"Prism CXF3 file\""
+  - FileInformation
+-
+  - PrismAppName
+  - "\"i1Profiler\""
+  - FileInformation
+-
+  - PrismAppVersion
+  - "\"1.1.0\""
+  - FileInformation
+-
+  - MEASUREMENT_GEOMETRY
+  - "\"<GeometryChoice><SingleAngle><SingleAngleConfiguration>Uniplanar</SingleAngleConfiguration><IlluminationAngle>0</IlluminationAngle><MeasurementAngle>45</MeasurementAngle></SingleAngle></GeometryChoice>\""
+  - M0_Measurement_spec
+-
+  - FILTER
+  - "\"Filter_None\""
+  - M0_Measurement_spec
+-
+  - MEASUREMENT_SOURCE
+  - "\"M0_Incandescent\""
+  - M0_Measurement_spec
+--- {}

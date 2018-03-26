@@ -10,12 +10,13 @@ use strict;
 use warnings;
 use Getopt::Long;
 use Pod::Usage ();
+use List::MoreUtils qw/uniq/;
 use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION  = 1.0.4;
+our $VERSION  = 1.0.5;
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -25,12 +26,19 @@ sub run {
 
     get_options(
         \%option,
-        'since|s=s',
+        'all|a',
+        'branch|b',
+        'branches|B',
         'day|d',
-        'week|w',
+        'files|f',
         'month|m',
         'out|o=s',
         'quiet|q',
+        'remote|r',
+        'since|s=s',
+        'tag|t',
+        'users|u',
+        'week|w',
     );
 
     # get a list of recent commits
@@ -38,6 +46,42 @@ sub run {
 
     # find the files in each commit
     my %changed = $self->changed_from_shas(@commits);
+
+    if ( $option{users} ) {
+        my %users;
+        for my $file (keys %changed) {
+            for my $user (@{ $changed{$file}{users} }) {
+                $users{$user} ||= {};
+                @{ $users{$user}{files} } = (
+                    uniq sort @{ $users{$user}{files} || [] }, @{ $changed{$file}{files} || [] }
+                );
+                @{ $users{$user}{branches} } = (
+                    uniq sort @{ $users{$user}{branches} || [] }, @{ $changed{$file}{branches} || [] }
+                );
+            }
+        }
+        %changed = %users;
+    }
+    elsif ( $option{branches} ) {
+        my %branches;
+        for my $file (keys %changed) {
+            for my $branch (@{ $changed{$file}{branches} }) {
+                $branches{$branch} ||= {};
+                @{ $branches{$branch}{files} } = (
+                    uniq sort @{ $branches{$branch}{files} || [] }, @{ $changed{$file}{files} || [] }
+                );
+                @{ $branches{$branch}{users} } = (
+                    uniq sort @{ $branches{$branch}{users} || [] }, @{ $changed{$file}{users} || [] }
+                );
+            }
+        }
+        %changed = %branches;
+    }
+    else {
+        for my $file (keys %changed) {
+            delete $changed{$file}{files};
+        }
+    }
 
     # display results
     my $out = 'out_' . ($option{out} || 'text');
@@ -75,7 +119,16 @@ sub out_json {
     my ($self, $changed) = @_;
 
     require JSON;
-    print JSON::encode_json($changed);
+    print JSON::encode_json($changed), "\n";
+
+    return;
+}
+
+sub out_yaml {
+    my ($self, $changed) = @_;
+
+    require YAML;
+    print YAML::Dump($changed);
 
     return;
 }
@@ -95,7 +148,12 @@ sub recent_commits {
             :                     ('--since', sprintf "%04d-%02d-%02d", $year, $month, $day - 1 );
     }
 
-    return $workflow->git->rev_list('--all', @args);
+    unshift @args, $option{tag} ? '--tags'
+        : $option{branch}       ? '--branches'
+        : $option{remote}       ? '--remotes'
+        :                         '--all';
+
+    return $workflow->git->rev_list(@args);
 }
 
 sub changed_from_shas {
@@ -104,19 +162,23 @@ sub changed_from_shas {
 
     for my $sha (@commits) {
         my $changed = $workflow->commit_details($sha, branches => 1, files => 1, user => 1);
-        for my $file (keys %{ $changed->{files} }) {
-            $changed{$file} ||= { branches => {} };
-            $changed{$file}{users}{$changed->{user}}++;
-            $changed{$file}{branches} = {
-                %{ $changed{$file}{branches} },
+        for my $type (keys %{ $changed->{files} }) {
+            $changed{$type}{users}{$changed->{user}}++;
+            $changed{$type}{files} = {
+                %{ $changed{$type}{files} || {} },
+                %{ $changed->{files} },
+            };
+            $changed{$type}{branches} = {
+                %{ $changed{$type}{branches} || {} },
                 %{ $changed->{branches} },
             };
         }
     }
 
-    for my $file (sort keys %changed) {
-        $changed{$file}{users}    = [ sort keys %{ $changed{$file}{users   } } ];
-        $changed{$file}{branches} = [ sort keys %{ $changed{$file}{branches} } ];
+    for my $type (keys %changed) {
+        $changed{$type}{users   } = [ sort keys %{ $changed{$type}{users   } } ];
+        $changed{$type}{files   } = [ sort keys %{ $changed{$type}{files   } } ];
+        $changed{$type}{branches} = [ sort keys %{ $changed{$type}{branches} } ];
     }
 
     return %changed;
@@ -132,7 +194,7 @@ git-recent - Find what files have been changed recently in a repository
 
 =head1 VERSION
 
-This documentation refers to git-recent version 1.0.4
+This documentation refers to git-recent version 1.0.5
 
 =head1 SYNOPSIS
 
@@ -147,6 +209,15 @@ This documentation refers to git-recent version 1.0.4
   -d --day      Show changed files from the last day (Default action)
   -w --week     Show changed files from the last week
   -m --month    Show changed files from the last month
+  -a --all      Show recent based on everything
+  -b --branch   Show recent based on branches only
+  -r --remote   Show recent based on remotes only
+  -t --tag      Show recent based on tags only
+
+ OUTPUT:
+  -B --branches Show the output by what's changed in each branch
+  -u --users    Show the output by who has made the changes
+  -f --files    Show the output the files changed (Default)
   -o --out[=](text|json|perl)
                 Specify how to display the results
                     - text : Nice human readable format (Default)
@@ -191,6 +262,10 @@ Displays changed files in a Perl format
 =head2 C<out_json ($changed)>
 
 Displays changed files in a JSON format
+
+=head2 C<out_yaml ($changed)>
+
+Displays changed files in a YAML format
 
 =head1 DIAGNOSTICS
 

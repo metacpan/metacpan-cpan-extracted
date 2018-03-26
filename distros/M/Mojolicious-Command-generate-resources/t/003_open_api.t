@@ -18,7 +18,11 @@ my $blog = $test->app;
   my $buffer = '';
   open my $handle, '>', \$buffer;
   local *STDOUT = $handle;
-  $blog->start('generate', 'resources', '-t' => 'users,groups');
+  $blog->start(
+               'generate', 'resources',
+               '-t'         => 'users,groups',
+               '-db_helper' => 'dbx',
+              );
 
   like($buffer, qr{\[write\].+?api[\\/]api.json}, "written api/api.json");
 }
@@ -32,7 +36,7 @@ for my $t (qw(groups users)) {
   Mojo::Loader::load_class $class;
   $blog->helper(
     $t => sub {
-      state $table = $class->new(sqlite => shift->sqlite);
+      state $table = $class->new(dbx => shift->dbx);
     }
   );
   ok($blog->renderer->get_helper($t), "\$blog has helper $t");

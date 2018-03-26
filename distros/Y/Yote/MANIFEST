@@ -1,4 +1,4 @@
-bin/yote_exporer
+bin/yote_explorer
 Build.PL
 ChangeLog
 lib/Yote.pm

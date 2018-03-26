@@ -9,7 +9,7 @@ use Data::Dump qw( dump );
 use Search::Tools::UTF8;
 use Dezi::Aggregator::Spider::Response;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 # if Compress::Zlib is installed, this should handle gzip transparently.
 # thanks to
@@ -34,12 +34,12 @@ Dezi::Aggregator::Spider::UA - spider user agent
 
  use Dezi::Aggregator::Spider::UA;
  my $ua = Dezi::Aggregator::Spider::UA->new;
- 
+
  # $ua is a LWP::RobotUA object
 
 =head1 DESCRIPTION
 
-Dezi::Aggregator::Spider::UA is a subclass of 
+Dezi::Aggregator::Spider::UA is a subclass of
 LWP::RobotUA.
 
 =head1 METHODS
@@ -212,7 +212,7 @@ Peter Karman, E<lt>perl@peknet.comE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-swish-prog at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
@@ -247,10 +247,10 @@ L<http://search.cpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008-2009 by Peter Karman
+Copyright 2008-2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

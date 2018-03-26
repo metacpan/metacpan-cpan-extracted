@@ -1,46 +1,46 @@
+# vim: sw=4 ts=4 ft=perl
+
 package WebService::Braintree;
-$WebService::Braintree::VERSION = '1.1';
+$WebService::Braintree::VERSION = '1.2';
 use 5.010_001;
 use strictures 1;
 
-use WebService::Braintree::AchMandate;
-use WebService::Braintree::Address;
-use WebService::Braintree::AddOn;
+# These have to be loaded first-er-est because they weren't loaded before.
 use WebService::Braintree::AdvancedSearchFields;
 use WebService::Braintree::AdvancedSearchNodes;
+
+# Load the error codes omnibus so clients can get at them.
+use WebService::Braintree::ErrorCodes;
+
+# Load all the interfaces so clients can get at them.
+use WebService::Braintree::AddOn;
+use WebService::Braintree::Address;
 use WebService::Braintree::ApplePay;
-use WebService::Braintree::ApplePayCard;
+use WebService::Braintree::ClientToken;
 use WebService::Braintree::CreditCard;
 use WebService::Braintree::CreditCardVerification;
 use WebService::Braintree::Customer;
-use WebService::Braintree::CustomerSearch;
-use WebService::Braintree::DisbursementDetails;
 use WebService::Braintree::Discount;
 use WebService::Braintree::Dispute;
-use WebService::Braintree::DisputeSearch;
 use WebService::Braintree::DocumentUpload;
-use WebService::Braintree::ErrorCodes;
 use WebService::Braintree::EuropeBankAccount;
-use WebService::Braintree::IbanBankAccount;
 use WebService::Braintree::IdealPayment;
 use WebService::Braintree::Merchant;
 use WebService::Braintree::MerchantAccount;
-use WebService::Braintree::PartnerMerchant;
 use WebService::Braintree::PaymentMethod;
+use WebService::Braintree::PaymentMethodNonce;
 use WebService::Braintree::PayPalAccount;
 use WebService::Braintree::Plan;
-use WebService::Braintree::PayPalDetails;
 use WebService::Braintree::SettlementBatchSummary;
 use WebService::Braintree::Subscription;
-use WebService::Braintree::SubscriptionSearch;
 use WebService::Braintree::Transaction;
-use WebService::Braintree::TransactionSearch;
-use WebService::Braintree::Disbursement;
+use WebService::Braintree::TransactionLineItem;
 use WebService::Braintree::TransparentRedirect;
 use WebService::Braintree::UsBankAccount;
 use WebService::Braintree::WebhookNotification;
 use WebService::Braintree::WebhookTesting;
 
+# Finally, load the configuration class.
 use WebService::Braintree::Configuration;
 
 =head1 NAME
@@ -58,13 +58,12 @@ going forward.
 
 =head2 DOCUMENTATION
 
-The module is sparsely documented, at best.  The public facing API is very
-similar to the Ruby libraries which are documented at
-L<https://developers.braintreepayments.com/ruby/sdk/server/overview>.
-
+The module is fully documented, but that documentation is reverse-engineered.
+The public facing API is very similar to the Ruby libraries which are documented
+at L<https://developers.braintreepayments.com/ruby/sdk/server/overview>.
 
 You can also look over the test suite for guidance of usage, especially the
-C<xt/sandbox> tests.  Not all of these tests work (ones marked
+C<t/sandbox> tests.  Not all of these tests work (ones marked
 C<todo_skip>).  This is because they are an adaptation of code used against
 Braintree's private integration server.
 
@@ -78,11 +77,15 @@ In general, clients of this library will not instantiate any objects.  Every
 call you make will be a class method.  Some methods will return objects.  In
 those cases, those objects will be documented for you.
 
+Unless otherwise noted, all attributes in these objects will be read-only and
+will have been populated by the responses from Braintree.
+
 =cut
 
-my $configuration_instance = WebService::Braintree::Configuration->new;
-
-sub configuration { return $configuration_instance; }
+{
+    my $configuration_instance = WebService::Braintree::Configuration->new;
+    sub configuration { return $configuration_instance; }
+}
 
 =head2 CONFIGURATION
 
@@ -111,7 +114,9 @@ This token is created with L<WebService::Braintree::ClientToken/generate>.
 =head2 INTERFACE
 
 These are the classes that you will interface with.  Please see their
-respective documentation for more detail on how to use them.
+respective documentation for more detail on how to use them. These classes
+only provide class methods. These methods all invoke some part of the
+Braintree API.
 
 =head3 L<WebService::Braintree::AddOn>
 
@@ -190,6 +195,10 @@ Create, update, cancel, find, and handle charges for subscriptions.
 Create, manage, and search for transactions.  This is the workhorse class and it
 has many methods.
 
+=head3 L<WebService::Braintree::TransactionLineItem>
+
+Find all the transaction line-items.
+
 =head3 L<WebService::Braintree::TransparentRedirect>
 
 Manage the transparent redirection of ????.
@@ -206,12 +215,43 @@ Several of the class interfaces provide a C<< search() >> method.  This method
 is unique in that it takes a subroutine reference (subref) instead of a hashref
 or other parameters.
 
-Documentation for this is forthcoming.
+=head3 Example
+
+    my $results = WebService::Braintree::Transaction->search(sub {
+        my $search = shift;
+        $search->amount->between(10, 20);
+    });
+
+=head3 Additional Documentation
+
+The various field types are documenated at L<WebService::Braintree::AdvancedSearchNodes>.
+
+=head2 RESPONSES
+
+Responses from the interface methods will either be a
+L<Result|WebService::Braintree::Result/> or an
+L<ErrorResult|WebService::Braintree::ErrorResult/>. You can distinguish between
+them by calling C<< $result->is_success >>.
+
+=head3 Success
+
+If the request is successful, Braintee will reply back and you will receive
+(in most cases) a L<result/WebService::Braintree::Result> object. This object
+will allow you to access the various components of the response.
+
+In some cases, you will receive something different. Those cases are documented
+in the method itself.
+
+=head3 Failure
+
+If there is an issue with the request, Braintree will reply back and you will
+receive a L<ErrorResult/WebService::Braintree::ErrorResult> object. It will
+contain a L<collection/WebService::Braintree::ValidationErrorCollection> of
+L<errors/WebService::Braintree::Error> explaining each issue with the request.
 
 =head2 ISSUES
 
-The bugtracker is at
-L<https://github.com/singingfish/braintree_perl/issues>.
+The bugtracker is at L<https://github.com/singingfish/braintree_perl/issues>.
 
 Patches welcome!
 
@@ -235,13 +275,27 @@ project uses Docker.  The sequence is:
 
 =over 4
 
-=item run_tests build [ command ]
+=item run_tests build
 
-=item run_tests test [ command ]
+This will build the Docker developer environment for each Perl version listed
+in C<< PERL_VERSIONS >>
+
+=item run_tests unit [ command ]
+
+This will run the unit tests for each Perl version listed in
+C<< PERL_VERSIONS >>. You can provide a C<< prove >> command to limit which
+test(s) you run.
 
 =item run_tests integration [ command ]
 
+This will run the sandbox tests for each Perl version listed in
+C<< PERL_VERSIONS >>. You can provide a C<< prove >> command to limit which
+test(s) you run.
+
 =item run_tests cover
+
+This will run the all the tests for each Perl version listed in
+C<< PERL_VERSIONS >> and calculate the coverage.
 
 =back
 
@@ -251,18 +305,12 @@ variable.  Use a space to separate multiple versions.
 
 This Bash script has been tested to work in Linux, OSX, and GitBash on Windows.
 
-=item Running the tests in xt/
-
-The tests in C<< t/ >> are unit tests.  The tests in C<< xt/ >> are E2E tests
-that run against Braintree's sandbox / integration environment.  To run them,
-you will need to have a Braintree sandbox account linked to Paypal.
-
 =over 4
 
 =item Signup
 
 Navigate to L<https://www.braintreepayments.com/sandbox>.  Enter your first name,
-last name, Comany name of "WebService::Braintree", your country, and your email
+last name, Company name of "WebService::Braintree", your country, and your email
 address.
 
 =item Activate your account
@@ -322,54 +370,11 @@ tests will take between 5 and 20 minutes.
 
 =over 4
 
-=item There is no pod documentation.
+=item Many of the integration tests are still skipped.
 
-=item Sandbox tests fail
+=item There aren't enough unit tests.
 
-Some of this is likely needed because the sandbox account needs to be set
-up just right, and some may be because the paypal test integration server
-is emulating stateful transactions.
-
-=item Excessive metaobject wrangling
-
-The usage of L<Moose> in this code is sub-opimtimal.  In particular the
-following classes use the metaobject in a way that makes what is happening
-difficult to understand:
-
-=over 4
-
-=item L<WebService::Braintree::ResultObject>
-
-This class is now the only one that is not immutable in the codebase.
-Unpicking how to make this mutable is problematic.
-
-The constructors for the following should be fixed to be explicit (requires
-understanding of what ResultObject is doing):
-
-=item L<WebService::Braintree::AdvancedSearchFields>
-
-=item L<WebService::Braintree::SubscriptionSearch>
-
-=item L<WebService::Braintree::CreditCardVerificationSearch>
-
-=item L<WebService::Braintree::CustomerSearch>
-
-=item L<WebService::Braintree::Result>
-
-=item L<WebService::Braintree::TransactionSearch>
-
-=back
-
-Also, having stared at the internals of some objects in the perl debugger
-for a bit, I fear there may be memory leaks, but I have not investigated
-this closely.  It's also possible that the way that several of the above
-methods use a C<$field> variable in package lexical scope that this module
-may not be fork-safe.  These concerns also apply to L<Net::Braintree> (only
-it has a bigger memory footprint).
-
-=item Sandbox tests
-
-One of the sandbox tests is really really slow.
+=item The documentation is still sparse, especially for the PURPOSE sections.
 
 =back
 
@@ -378,6 +383,8 @@ One of the sandbox tests is really really slow.
 Thanks to the staff at Braintree for endorsing this fork.
 
 Thanks to ZipRecruiter for sponsoring improvements to the forked code.
+
+Thanks to Rob Kinyon for refactoring significant portions of the codebase.
 
 =head2 LICENSE AND COPYRIGHT
 
@@ -390,7 +397,6 @@ under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
-
 
 =cut
 

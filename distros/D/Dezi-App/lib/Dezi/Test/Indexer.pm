@@ -6,7 +6,7 @@ use SWISH::3 qw( :constants );
 use Search::Tools::UTF8;
 use Data::Dump qw( dump );
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 sub invindex_class       {'Dezi::Test::InvIndex'}
 sub use_swish3_tokenizer {1}
@@ -80,7 +80,7 @@ Dezi::Test::Indexer - test indexer class
 =head1 SYNOPSIS
 
  use Dezi::Test::Indexer;
- 
+
  my $spider = Dezi::Aggregator::Spider->new(
     indexer => Dezi::Test::Indexer->new()
  );
@@ -88,7 +88,7 @@ Dezi::Test::Indexer - test indexer class
 
 =head1 DESCRIPTION
 
-Dezi::Test::Indexer uses Dezi::Test::InvIndex for 
+Dezi::Test::Indexer uses Dezi::Test::InvIndex for
 running tests on the API, particularly Aggregator classes.
 
 =head1 CONSTANTS
@@ -96,7 +96,11 @@ running tests on the API, particularly Aggregator classes.
 All the L<SWISH::3> constants are imported into this namespace,
 including:
 
-=head2 SWISH_DOC_PROP_MAP
+=over 4
+
+=item * SWISH_DOC_PROP_MAP
+
+=back
 
 =head1 METHODS
 
@@ -124,7 +128,7 @@ Peter Karman, E<lt>perl@peknet.comE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-swish-prog at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
@@ -163,10 +167,10 @@ L<http://search.cpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008-2009 by Peter Karman
+Copyright 2008-2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

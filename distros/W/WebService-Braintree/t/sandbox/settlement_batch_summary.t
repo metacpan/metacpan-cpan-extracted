@@ -46,7 +46,7 @@ subtest "returns transactions settled on a given day" => sub {
     validate_result($result) or return;
 
     my @mastercard_records = grep {
-        $_->{card_type} eq 'MasterCard'
+        $_->card_type eq 'MasterCard'
     } @{$result->settlement_batch_summary->records};
 
     ok grep { $_->count >= 1 } @mastercard_records;
@@ -70,11 +70,11 @@ subtest "returns transactions grouped by custom field" => sub {
     validate_result($result) or return;
 
     my @mastercard_records = grep {
-        $_->{store_me} eq 'custom_value' && $_->{card_type} eq 'MasterCard'
+        $_->store_me eq 'custom_value' && $_->card_type eq 'MasterCard'
     } @{$result->settlement_batch_summary->records};
 
-    ok($mastercard_records[0]->{count} >= 1);
-    ok($mastercard_records[0]->{amount_settled} >= $transaction_params->{amount});
+    ok($mastercard_records[0]->count >= 1);
+    ok($mastercard_records[0]->amount_settled >= $transaction_params->{amount});
 };
 
 done_testing();

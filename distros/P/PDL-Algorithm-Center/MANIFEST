@@ -8,6 +8,7 @@ META.yml
 Makefile.PL
 Makefile.PL.orig
 README
+README.mkdn.orig
 TODO
 cpanfile
 cpanfile.orig

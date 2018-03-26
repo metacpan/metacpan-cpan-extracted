@@ -1,5 +1,7 @@
+# vim: sw=4 ts=4 ft=perl
+
 package WebService::Braintree::DocumentUpload;
-$WebService::Braintree::DocumentUpload::VERSION = '1.1';
+$WebService::Braintree::DocumentUpload::VERSION = '1.2';
 use 5.010_001;
 use strictures 1;
 
@@ -14,13 +16,29 @@ This class creates document uploads.
 =cut
 
 use Moose;
-extends "WebService::Braintree::ResultObject";
+
+with 'WebService::Braintree::Role::Interface';
 
 use WebService::Braintree::DocumentUpload::Kind;
 
 =head2 create()
 
-This takes a hashref of params and returns the create document upload.
+This takes a hashref of parameters and returns a L<response|WebService::Braintee::Result> with the C<< document_upload() >> set.
+
+The parameters are:
+
+=over 4
+
+=item kind
+
+This is the L<kind of document|WebService::Braintree::DocumentUpload::Kind>.
+
+=item file
+
+This is a path on the server for the file to upload. The extension will be used
+to determine the mime type.
+
+=back
 
 =cut
 
@@ -29,31 +47,7 @@ sub create {
     $class->gateway->document_upload->create($params // {});
 }
 
-sub gateway {
-    return WebService::Braintree->configuration->gateway;
-}
-
-sub BUILD {
-    my ($self, $attributes) = @_;
-
-    $self->set_attributes_from_hash($self, $attributes);
-}
-
 __PACKAGE__->meta->make_immutable;
 
 1;
 __END__
-
-=head1 TODO
-
-=over 4
-
-=item Need to document the keys and values that are returned
-
-=item Need to document the required and optional input parameters
-
-=item Need to document the possible errors/exceptions
-
-=back
-
-=cut

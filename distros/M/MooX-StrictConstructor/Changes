@@ -1,5 +1,26 @@
 Revision history for MooX-StrictConstructor
 
+0.010     2018-03-25 10:15:40-07:00 America/Los_Angeles
+
+        - Undo the previous "fix" for the minimum perl version.
+          The basic requirement is for 5.004 but the tests require
+          5.006.
+
+0.009     2018-03-24 14:12:47-07:00 America/Los_Angeles
+
+        - Built using current Dist::Zilla, so various things
+          are better, e.g. includes a LICENSE.
+        - A couple of things that are only used in xt tests
+          used to be test requirements, now their develop
+          requirements.
+        - No longer includes explicit dependencies on a handful
+          of modules (e.g. indirect) that Moo's use of strictures
+          used to require.
+        - Now only includes a Makefile.PL.
+        - The build now includes a cpanfile in the repo.
+        - The minimum perl version is now consistent between the
+          Makefile.PL and the META.{yml,json} files.
+
 0.008     2015-05-11 08:22:24-07:00 America/Los_Angeles
 
         - Improve the POD about bugs and incompatibilities.

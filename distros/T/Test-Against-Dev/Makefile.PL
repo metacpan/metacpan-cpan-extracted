@@ -31,4 +31,20 @@ WriteMakefile(
                      'Capture::Tiny'                    => 0,
                      'Test::RequiresInternet'           => 0,
     },
+   ($mm_ver < 6.46 ? () : (META_MERGE => {
+        'meta-spec' => { version => 2 },
+        dynamic_config => 1,
+        resources => {
+            homepage => 'http://thenceforward.net/perl/modules/Test-Against-Dev/',
+            repository => {
+                url => 'https://github.com/jkeenan/test-against-dev.git',
+                web => 'https://github.com/jkeenan/test-against-dev',
+                type => 'git',
+            },
+            bugtracker => {
+                web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Against-Dev',
+            },
+        },
+    })),
+    ($mm_ver < 6.31 ? () : (LICENSE => 'perl_5')),
 );

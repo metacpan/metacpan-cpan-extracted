@@ -3,6 +3,7 @@ use Test::Lib;
 use My::Test;
 use Statocles::App::Blog;
 use Statocles::Page::Document;
+use TestStore;
 my $SHARE_DIR = path( __DIR__ )->parent->parent->child( 'share' );
 
 my $site = build_test_site(
@@ -10,37 +11,42 @@ my $site = build_test_site(
 );
 
 my $app = Statocles::App::Blog->new(
-    store => $SHARE_DIR->child( 'app', 'blog' ),
+    store => TestStore->new(
+        path => $SHARE_DIR->child( qw( app blog ) ),
+        objects => [
+            Statocles::Document->new(
+                path => '2018/01/01/post-one/index.markdown',
+                tags => [qw( foo not-bar )],
+            ),
+            Statocles::Document->new(
+                path => '2018/01/02/post-two/index.markdown',
+                tags => [qw( foo )],
+            ),
+            Statocles::Document->new(
+                path => '2018/01/03/post-three/index.markdown',
+                tags => [qw( not-bar )],
+            ),
+        ],
+    ),
     url_root => '/blog',
     site => $site,
 );
 
 subtest 'recent_posts' => sub {
     my @pages = $app->recent_posts( 2 );
-    cmp_deeply [ @pages ], [
-        methods(
-            path => Path::Tiny->new(
-                qw{ blog 2014 06 02 more_tags index.html }
-            )->absolute( '/' ),
-        ),
-        methods(
-            path => Path::Tiny->new(
-                qw{ blog 2014 05 22 (regex)[name].file.html }
-            )->absolute( '/' ),
-        ),
-    ];
+    is_deeply [ map $_->path.'', @pages ], [
+        '/blog/2018/01/03/post-three/index.html',
+        '/blog/2018/01/02/post-two/index.html',
+    ] or diag explain [ map { $_->path } @pages ];
 };
 
 subtest 'posts with given tag' => sub {
 
     subtest 'single tag (not enough posts)' => sub {
-        my @pages = $app->recent_posts( 2, tags => 'more' );
-        cmp_deeply \@pages, [
-            methods(
-                path => Path::Tiny->new(
-                    qw{ blog 2014 06 02 more_tags index.html }
-                )->absolute( '/' ),
-            ),
+        my @pages = $app->recent_posts( 3, tags => 'foo' );
+        is_deeply [ map $_->path.'', @pages ], [
+            '/blog/2018/01/02/post-two/index.html',
+            '/blog/2018/01/01/post-one/index.html',
         ] or diag explain [ map { $_->path } @pages ];
     };
 

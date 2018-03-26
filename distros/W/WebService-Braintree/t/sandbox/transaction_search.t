@@ -13,7 +13,6 @@ BEGIN {
 use lib qw(lib t/lib);
 
 use WebService::Braintree;
-use WebService::Braintree::Nonce;
 use WebService::Braintree::SandboxValues::Nonce;
 use WebService::Braintree::SandboxValues::TransactionAmount;
 use WebService::Braintree::Util;

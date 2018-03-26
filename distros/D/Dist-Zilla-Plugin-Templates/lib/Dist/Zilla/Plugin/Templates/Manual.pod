@@ -2,7 +2,7 @@
 #
 #   file: lib/Dist/Zilla/Plugin/Templates/Manual.pod
 #
-#   Copyright © 2015, 2016 Van de Bugger.
+#   Copyright © 2015, 2016, 2018 Van de Bugger.
 #
 #   This file is part of perl-Dist-Zilla-Plugin-Templates.
 #
@@ -16,6 +16,8 @@
 #
 #   You should have received a copy of the GNU General Public License along with
 #   perl-Dist-Zilla-Plugin-Templates. If not, see <http://www.gnu.org/licenses/>.
+#
+#   SPDX-License-Identifier: GPL-3.0-or-later
 #
 #   ---------------------------------------------------------------------- copyright and license ---
 
@@ -152,6 +154,8 @@
 #pod
 #pod =option template
 #pod
+#pod C<template> is an alias for C<templates>.
+#pod
 #pod =option templates
 #pod
 #pod Name of file finder to provide files to be treated as templates. The default value is C<:NoFiles>.
@@ -174,8 +178,6 @@
 #pod
 #pod     templates = :InstallModules
 #pod     templates = :AllFiles
-#pod
-#pod C<template> is an alias for C<templates>.
 #pod
 #pod =for comment ---------------------------------------------------------------------------------------
 #pod
@@ -279,7 +281,7 @@
 #pod
 #pod =head1 COPYRIGHT AND LICENSE
 #pod
-#pod Copyright (C) 2015, 2016 Van de Bugger
+#pod Copyright (C) 2015, 2016, 2018 Van de Bugger
 #pod
 #pod License GPLv3+: The GNU General Public License version 3 or later
 #pod <http://www.gnu.org/licenses/gpl-3.0.txt>.
@@ -294,7 +296,11 @@
 #
 #   file: doc/what.pod
 #
+#   Copyright © 2015, 2016, 2018 Van de Bugger.
+#
 #   This file is part of perl-Dist-Zilla-Plugin-Templates.
+#
+#   SPDX-License-Identifier: GPL-3.0-or-later
 #
 #   ------------------------------------------------------------------------------------------------
 
@@ -314,7 +320,11 @@
 #
 #   file: doc/why.pod
 #
+#   Copyright © 2015, 2016, 2018 Van de Bugger.
+#
 #   This file is part of perl-Dist-Zilla-Plugin-Templates.
+#
+#   SPDX-License-Identifier: GPL-3.0-or-later
 #
 #   ------------------------------------------------------------------------------------------------
 
@@ -372,7 +382,7 @@ Dist::Zilla::Plugin::Templates::Manual - C<Templates> plugin user manual
 
 =head1 VERSION
 
-Version v0.6.4, released on 2016-12-28 20:24 UTC.
+Version v0.6.5, released on 2018-03-22 20:35 UTC.
 
 =head1 WHAT?
 
@@ -505,6 +515,8 @@ L<C<TextTemplater> manual|Dist::Zilla::Role::TextTemplater::Manual> for descript
 
 =head2 template
 
+C<template> is an alias for C<templates>.
+
 =head2 templates
 
 Name of file finder to provide files to be treated as templates. The default value is C<:NoFiles>.
@@ -527,8 +539,6 @@ Each selected file will be processed only once, even if a file "found" by more t
 
     templates = :InstallModules
     templates = :AllFiles
-
-C<template> is an alias for C<templates>.
 
 =head1 KNOWN BUGS
 
@@ -683,7 +693,7 @@ Van de Bugger <van.de.bugger@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015, 2016 Van de Bugger
+Copyright (C) 2015, 2016, 2018 Van de Bugger
 
 License GPLv3+: The GNU General Public License version 3 or later
 <http://www.gnu.org/licenses/gpl-3.0.txt>.

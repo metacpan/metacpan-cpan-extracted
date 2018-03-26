@@ -230,7 +230,7 @@ OPTIONS
         Note: for 'LX' method following additional options are available:
         attr cdata text comm
 
-OBJECT_SERIALISATION(hash2xml)
+OBJECT SERIALISATION(hash2xml)
     1. When object has a "toString" method
       In this case, the <toString> method of object is invoked in scalar
       context. It must return a single scalar that can be directly encoded
@@ -247,7 +247,30 @@ OBJECT_SERIALISATION(hash2xml)
             <doc><foo bar="1"/></doc>
           </root>
 
-    2. When object has a "iternext" method ("NATIVE" method only)
+    2. When object has overloaded stringification
+      In this case, the stringification method of object is invoked and
+      result is directly encoded into XML.
+
+      Example:
+
+          package Test {
+              use overload '""' => sub { shift->stringify }, fallback => 1;
+              sub new {
+                  my ($class, $str) = @_;
+                  bless { str => $str }, $class;
+              }
+              sub stringify {
+                  shift->{str}
+              }
+          }
+          my $obj = Test->new('test string');
+          print hash2xml({ obj => $obj }, indent => 2, xml_decl => 0);
+          =>
+          <root>
+            <obj>test string</obj>
+          </root>
+
+    3. When object has a "iternext" method ("NATIVE" method only)
       In this case, the <iternext> method method will invoke a few times
       until the return value is not undefined.
 

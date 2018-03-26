@@ -1,3 +1,6 @@
+0.108		2018-03-24	T. R. Wyant
+    Guard against undef in method is_valid().
+
 0.107		2018-03-03	T. R. Wyant
     Default 'compatible' attribute to 0 (false).
 

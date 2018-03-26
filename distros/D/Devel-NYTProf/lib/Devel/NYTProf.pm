@@ -9,7 +9,7 @@
 ###########################################################
 package Devel::NYTProf;
 
-our $VERSION = '6.04'; # also change in Devel::NYTProf::Core
+our $VERSION = '6.05'; # also change in Devel::NYTProf::Core
 
 package    # hide the package from the PAUSE indexer
     DB;
@@ -36,7 +36,8 @@ if ($use_db_sub) {                     # install DB::DB sub
 # DB::sub shouldn't be called, but needs to exist for perl <5.8.7 (<perl@24265)
 # Could be called in obscure cases, e.g. if "perl -d" (not -d:NYTProf)
 # was used with Devel::NYTProf loaded some other way
-sub sub { die "DB::sub called unexpectedly" }
+*sub = sub { warn "DB::sub called unexpectedly (@{[ caller(0) ]})" }
+  if $] < 5.008008;
 
 sub CLONE { DB::disable_profiler }
 
@@ -1143,7 +1144,7 @@ Mailing list and discussion at L<http://groups.google.com/group/develnytprof-dev
 
 Blog posts L<http://blog.timbunce.org/tag/nytprof/>
 
-Public SVN Repository and hacking instructions at L<http://code.google.com/p/perl-devel-nytprof/>
+Public Github Repository and hacking instructions at L<https://github.com/timbunce/devel-nytprof/>
 
 L<nytprofhtml> is a script included that produces html reports.
 L<nytprofcsv> is another script included that produces plain text CSV reports.

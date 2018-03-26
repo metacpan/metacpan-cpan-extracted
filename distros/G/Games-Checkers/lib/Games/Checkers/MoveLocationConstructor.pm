@@ -18,20 +18,16 @@ use warnings;
 
 package Games::Checkers::MoveLocationConstructor;
 
-use base 'Games::Checkers::Board';
 use Games::Checkers::Constants;
-use Games::Checkers::BoardConstants;
+use Games::Checkers::Board;
 use Games::Checkers::MoveConstants;
-
-use constant MAX_MOVE_JUMP_NUM => 9;
 
 sub new ($$$) {
 	my $class = shift;
 	my $board = shift;
 	my $color = shift;
 
-	my $self = $class->SUPER::new($board);
-	my $fields = {
+	my $self = {
 		color => $color,
 		destin => [],
 		src => NL,
@@ -39,40 +35,55 @@ sub new ($$$) {
 		must_beat => $board->can_color_beat($color),
 		orig_board => $board,
 	};
-	$self->{$_} = $fields->{$_} foreach keys %$fields;
+	bless $self, $class;
+
 	return $self;
 }
 	
-sub init ($) {
+sub init_work_board ($) {
 	my $self = shift;
-	$self->{destin} = [];
-	$self->{src} = NL;
-	$self->copy($self->{orig_board});
+
+	return $self->{work_board}
+		? $self->{work_board}->copy($self->{orig_board})
+		: ($self->{work_board} = $self->{orig_board}->clone);
 }
 
 sub source ($$) {
 	my $self = shift;
 	my $loc = shift;
-	$self->init;
-	return Err if $loc == NL || !$self->occup($loc) || $self->color($loc) != $self->{color};
-	return Err if $self->{must_beat} && !$self->can_piece_beat($loc) || !$self->{must_beat} && !$self->can_piece_step($loc);
-	$self->{piece} = $self->piece($self->{src} = $loc);
+
+	my $board = $self->{orig_board};
+	return Err
+		if $loc == NL
+		|| !$board->occup($loc)
+		|| $board->color($loc) != $self->{color}
+		||  $self->{must_beat} && !$board->can_piece_beat($loc)
+		|| !$self->{must_beat} && !$board->can_piece_step($loc);
+
+	$self->{piece} = $board->piece($self->{src} = $loc);
+	$self->{destin} = [];
+	$self->init_work_board;
+
 	return Ok;
 }
 
 sub add_dst ($$) {
 	my $self = shift;
 	my $dst = shift;
-	return Err if $self->{src} == NL || @{$self->{destin}} == MAX_MOVE_JUMP_NUM-1;
+
+	return Err if $self->{src} == NL || @{$self->{destin}} == 100;
+
+	my $board = $self->{work_board} or die "Internal";
 	if ($self->{must_beat}) {
-		die "Internal" unless $self->occup($self->dst_1);
-		return Err unless $self->can_piece_beat($self->dst_1, $dst);
+		die "Internal" unless $board->occup($self->dst_1);
+		return Err unless $board->can_piece_beat($self->dst_1, $dst);
 	} else {
 		return Err if @{$self->{destin}} > 0;
-		return Err unless $self->can_piece_step($self->{src}, $dst);
+		return Err unless $board->can_piece_step($self->{src}, $dst);
 	}
 	push @{$self->{destin}}, $dst;
-	$self->transform_one;
+	$self->apply_last_dst;
+
 	return Ok;
 }
 
@@ -80,14 +91,14 @@ sub del_dst ($) {
 	my $self = shift;
 	return NL if $self->{src} == NL || @{$self->{destin}} == 0;
 	my $dst = pop @{$self->{destin}};
-	$self->transform_all;
+	$self->reapply_all;
 	return $dst;
 }
 
 sub can_create_move ($) {
 	my $self = shift;
 	return $self->{must_beat} && @{$self->{destin}} > 0
-		&& $self->can_piece_beat($self->dst_1) == No
+		&& $self->{work_board}->can_piece_beat($self->dst_1) == No
 		|| !$self->{must_beat} && @{$self->{destin}} == 1;
 }
 
@@ -100,29 +111,33 @@ sub create_move ($) {
 		$self->{must_beat}, $self->{src}, $self->{destin});
 }
 
-sub transform_one ($) {
+sub apply_last_dst ($) {
 	my $self = shift;
+
+	my $board = $self->{work_board};
 	my $src = $self->dst_2;
 	my $dst = $self->dst_1;
-	$self->clr($src);
-	$self->set($dst, $self->{color}, $self->{piece});
-	$self->clr($self->figure_between($src, $dst)) if $self->{must_beat};
-	if (convert_type->[$self->{color}][$self->{piece}] & (1 << $dst)) {
-		$self->{piece_map} ^= (1 << $dst);
+	$board->clr($src);
+	$board->set($dst, $self->{color}, $self->{piece});
+	$board->clr($board->enclosed_figure($src, $dst)) if $self->{must_beat};
+	if ($self->{piece} == Pawn && $board->is_crowning->[$self->{color}][$dst]) {
+		$board->cnv($dst);
 		$self->{piece} ^= 1;
 	}
 }
 
-sub transform_all ($) {
+sub reapply_all ($) {
 	my $self = shift;
-	$self->copy($self->{orig_board});
+
+	my $board = $self->init_work_board;
 	return if $self->{src} == NL || @{$self->{destin}} == 0;
-	$self->{piece} = $self->piece($self->{src});
+
+	$self->{piece} = $board->piece($self->{src});
 	my $destin = $self->{destin};
 	$self->{destin} = [];
 	while (@$destin) {
 		push @{$self->{destin}}, shift @$destin;
-		$self->transform_one;
+		$self->apply_last_dst;
 	}
 }
 

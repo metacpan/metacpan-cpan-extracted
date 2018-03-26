@@ -1,43 +1,113 @@
+# vim: sw=4 ts=4 ft=perl
+
 package WebService::Braintree::Result;
-$WebService::Braintree::Result::VERSION = '1.1';
+$WebService::Braintree::Result::VERSION = '1.2';
 use 5.010_001;
 use strictures 1;
 
+=head1 NAME
+
+WebService::Braintree::Result
+
+=head1 PURPOSE
+
+This class represents a result from the Braintree API with no validation errors.
+
+This class is a sibling class to L<WebService::Braintree::PaymentMethodResult>.
+
+=cut
+
 use Moose;
 
-use WebService::Braintree::Util qw(is_hashref);
-use WebService::Braintree::ValidationErrorCollection;
+=head1 METHODS
 
-# Load these here because they aren't an interface, but a result class.
-use WebService::Braintree::Nonce;
+=cut
+
+=head2 Possible objects
+
+These are the possible objects that are returnable by this object. If this
+result does not have anything for that method, it will return undef.
+
+=over 4
+
+=item L<add_on|WebService::Braintree::_::AddOn>
+
+=item L<address|WebService::Braintree::_::Address>
+
+=item L<apple_pay_card|WebService::Braintree::_::ApplePayCard>
+
+=item L<apple_pay_options|WebService::Braintree::_::ApplePayOptions>
+
+=item L<credit_card|WebService::Braintree::_::CreditCard>
+
+=item L<credit_card_verification|WebService::Braintree::_::CreditCardVerification>
+
+=item L<customer|WebService::Braintree::_::Customer>
+
+=item L<dispute|WebService::Braintree::_::Dispute>
+
+=item L<discount|WebService::Braintree::_::Discount>
+
+=item L<document_upload|WebService::Braintree::_::DocumentUpload>
+
+=item L<europe_bank_account|WebService::Braintree::_::EuropeBankAccount>
+
+=item L<evidence|WebService::Braintree::_::Dispute::Evidence>
+
+=item L<ideal_payment|WebService::Braintree::_::IdealPayment>
+
+=item L<merchant|WebService::Braintree::_::Merchant>
+
+=item L<merchant_account|WebService::Braintree::_::MerchantAccount>
+
+=item L<payment_method_nonce|WebService::Braintree::_::PaymentMethodNonce>
+
+=item L<paypal_account|WebService::Braintree::_::PayPalAccount>
+
+=item L<settlement_batch_summary|WebService::Braintree::_::SettlementBatchSummary>
+
+=item L<subscription|WebService::Braintree::_::Subscription>
+
+=item L<transaction|WebService::Braintree::_::Transaction>
+
+=item L<us_bank_account|WebService::Braintree::_::UsBankAccount>
+
+=item L<verification|WebService::Braintree::_::CreditCardVerification>
+
+=back
+
+=cut
 
 my $response_objects = {
-    add_on => 'WebService::Braintree::AddOn',
-    address => 'WebService::Braintree::Address',
-    apple_pay => 'WebService::Braintree::ApplePay',
-    apple_pay_card => 'WebService::Braintree::ApplePayCard',
-    credit_card => 'WebService::Braintree::CreditCard',
-    credit_card_verification => 'WebService::Braintree::CreditCardVerification',
-    customer => 'WebService::Braintree::Customer',
-    dispute => 'WebService::Braintree::Dispute',
-    discount => 'WebService::Braintree::Discount',
-    document_upload => 'WebService::Braintree::DocumentUpload',
-    europe_bank_account => 'WebService::Braintree::EuropeBankAccount',
-    evidence => 'WebService::Braintree::Dispute::Evidence',
+    add_on => 'WebService::Braintree::_::AddOn',
+    address => 'WebService::Braintree::_::Address',
+    apple_pay_card => 'WebService::Braintree::_::ApplePayCard',
+    apple_pay_options => 'WebService::Braintree::ApplePayOptions',
+    credit_card => 'WebService::Braintree::_::CreditCard',
+    credit_card_verification => 'WebService::Braintree::_::CreditCardVerification',
+    customer => 'WebService::Braintree::_::Customer',
+    dispute => 'WebService::Braintree::_::Dispute',
+    discount => 'WebService::Braintree::_::Discount',
+    document_upload => 'WebService::Braintree::_::DocumentUpload',
+    europe_bank_account => 'WebService::Braintree::_::EuropeBankAccount',
+    evidence => 'WebService::Braintree::_::Dispute::Evidence',
     ideal_payment => 'WebService::Braintree::IdealPayment',
-    merchant => 'WebService::Braintree::Merchant',
-    merchant_account => 'WebService::Braintree::MerchantAccount',
-    payment_method => {
-        credit_card => 'WebService::Braintree::CreditCard',
-        paypal_account => 'WebService::Braintree::PayPalAccount',
-    },
-    payment_method_nonce => 'WebService::Braintree::Nonce',
-    paypal_account => 'WebService::Braintree::PayPalAccount',
-    settlement_batch_summary => 'WebService::Braintree::SettlementBatchSummary',
-    subscription => 'WebService::Braintree::Subscription',
-    transaction => 'WebService::Braintree::Transaction',
-    us_bank_account => 'WebService::Braintree::UsBankAccount',
+    merchant => 'WebService::Braintree::_::Merchant',
+    merchant_account => 'WebService::Braintree::_::MerchantAccount',
+    payment_method_nonce => 'WebService::Braintree::_::PaymentMethodNonce',
+    paypal_account => 'WebService::Braintree::_::PayPalAccount',
+    settlement_batch_summary => 'WebService::Braintree::_::SettlementBatchSummary',
+    subscription => 'WebService::Braintree::_::Subscription',
+    transaction => 'WebService::Braintree::_::Transaction',
+    us_bank_account => 'WebService::Braintree::_::UsBankAccount',
+    verification => 'WebService::Braintree::_::CreditCardVerification',
 };
+
+=head2 response
+
+This is the actual response received from Braintree.
+
+=cut
 
 has response => ( is => 'ro' );
 
@@ -46,37 +116,23 @@ my $meta = __PACKAGE__->meta;
 sub patch_in_response_accessors {
     my $field_rules = shift;
     while (my($key, $rule) = each(%$field_rules)) {
-        if (is_hashref($rule)) {
-            $meta->add_method($key => sub {
-                my $self = shift;
-                my $response = $self->response();
-                while (my($subkey, $subrule) = each(%$rule)) {
-                    my $field_value = $self->$subkey;
-                    if ($field_value) {
-                        keys %$rule;
-                        return $field_value;
-                    }
-                }
+        $meta->add_method($key => sub {
+            my $self = shift;
+            my $response = $self->response();
+            return if !$response->{$key};
 
-                return;
-            });
-
-            patch_in_response_accessors($rule);
-        } else {
-            $meta->add_method($key => sub {
-                my $self = shift;
-                my $response = $self->response();
-                if (!$response->{$key}) {
-                    return;
-                }
-
-                return $rule->new($response->{$key});
-            });
-        }
+            return $rule->new($response->{$key});
+        });
     }
 }
 
 patch_in_response_accessors($response_objects);
+
+=head2 is_success
+
+This always returns true.
+
+=cut
 
 sub is_success { 1 }
 

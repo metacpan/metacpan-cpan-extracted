@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 with 'Bat::Interpreter::Role::FileStore';
 
-our $VERSION = '0.002';    # VERSION
+our $VERSION = '0.003';    # VERSION
 
 =encoding utf-8
 

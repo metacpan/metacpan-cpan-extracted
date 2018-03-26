@@ -17,7 +17,7 @@ use Text::Abbrev();
 use Exporter ();
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 our @EXPORT_OK = qw{
     __am_or_pm
@@ -735,6 +735,7 @@ sub _fmt_on_date {
 			$day =~ s/ \b Nazgul \b /Nazg${u_circ}l/smxgo;
 			$day =~ s/ \b Theoden \b /Th${e_acute}oden/smxgo;
 			$day =~ s/ \b Theodred \b /Th${e_acute}odred/smxgo;
+			$day =~ s/ \b Udun \b /Ud${u_circ}n/smxgo;
 		    }
 		    push @{ $on_date_accented[-1] }, $day;
 		}
@@ -1995,7 +1996,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Thomas R. Wyant, III
+Copyright (C) 2017-2018 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

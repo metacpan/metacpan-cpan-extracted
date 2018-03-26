@@ -6,7 +6,7 @@ use Mojo::File 'path';
 use List::Util 'first';
 
 our $AUTHORITY = 'cpan:BEROV';
-our $VERSION   = '0.14';
+our $VERSION   = '0.15';
 
 has args => sub { {} };
 has description =>
@@ -85,6 +85,7 @@ my $_init = sub ($self, @options) {
     # TODO: 'O|overwrite'              => \$args->{overwrite},
     'T|templates_root=s' => \$args->{templates_root},
     't|tables=s@'        => \$args->{tables},
+    'D|db_helper=s'      => \$args->{db_helper},
         );
 
   @{$args->{tables}} = split(/\s*?\,\s*?/, join(',', @{$args->{tables}}));
@@ -98,6 +99,7 @@ my $_init = sub ($self, @options) {
   $args->{api_dir} //= path($args->{home_dir})->realpath->child('api');
   $args->{templates_root}
     //= path($app->renderer->paths->[0])->realpath->to_string;
+  $args->{db_helper} //= 'sqlite';
 
   # Find templates.
   for my $path (@INC) {
@@ -109,8 +111,11 @@ my $_init = sub ($self, @options) {
     }
   }
 
-  # Find the used database helper. One of sqlite, pg, mysql
+  # Find the used database helper. One of sqlite, pg, mysql or passed on the
+  # commandline
   my @db_helpers = qw(sqlite pg mysql);
+  unshift @db_helpers, $args->{db_helper}
+    unless first sub { $_ eq $args->{db_helper} }, @db_helpers;
   for (@db_helpers) {
     if ($app->renderer->get_helper($_)) {
       $self->_db_helper($_);
@@ -120,7 +125,8 @@ my $_init = sub ($self, @options) {
   if (!$self->_db_helper) {
     die <<'MSG';
 Guessing the used database wrapper helper failed. One of (@db_helpers) is
-required. This application does not use any of the supported database helpers.
+required. This application does not use any of the supported database helpers
+nor the one provided as argument.
 One of Mojo::Pg, Mojo::mysql or Mojo::SQLite must be used to generate models.
 Aborting!..
 MSG
@@ -434,6 +440,7 @@ Mojolicious::Command::generate::resources - Generate MVC & OpenAPI RESTful API f
 
     my_app.pl generate help resources # help with all available options
     my_app.pl generate resources --tables users,groups
+    my_app.pl generate resources --tables users,groups -D dbx
 
 =head1 PERL REQUIREMENTS
 
@@ -536,6 +543,15 @@ C<app-E<gt>renderer-E<gt>paths> in C<myapp.conf>.
     # Application/site specific templates
     # See /perldoc/Mojolicious/Renderer#paths
     unshift @{app->renderer->paths}, $home->rel_file('site_templates');
+
+=head2 D|db_helper=s
+
+Optional. If passed, this method name will be used when generating Model
+classes and helpers. The application is still expected to support the unified
+API of the supported database adapters. This feature helps to generate code
+for an application that wants to support all the three adaptors or if for
+example tomorrow suddenly appears a Mojo::Oracle tiny wrapper around
+L<DBD::Oracle>.
 
 =head2 t|tables=s@
 

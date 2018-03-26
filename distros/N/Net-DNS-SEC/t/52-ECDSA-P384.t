@@ -1,13 +1,13 @@
-# $Id: 52-ECDSA-P384.t 1654 2018-03-19 15:53:37Z willem $	-*-perl-*-
+# $Id: 52-ECDSA-P384.t 1656 2018-03-22 14:36:14Z willem $	-*-perl-*-
 #
 
 use strict;
 use Test::More;
 
 my %prerequisite = (
-	'Digest::SHA'  => 5.23,
-	'Net::DNS'     => 1.01,
-	'MIME::Base64' => 2.13,
+	'Digest::SHA'	=> 5.23,
+	'Net::DNS::SEC'	=> 1.01,
+	'MIME::Base64'	=> 2.13,
 	);
 
 foreach my $package ( sort keys %prerequisite ) {
@@ -16,6 +16,9 @@ foreach my $package ( sort keys %prerequisite ) {
 	plan skip_all => "missing prerequisite $package @revision";
 	exit;
 }
+
+plan skip_all => 'disabled ECDSA'
+		unless eval { Net::DNS::SEC::libcrypto->can('ECDSA_sign') };
 
 plan tests => 8;
 

@@ -69,7 +69,7 @@ SQL
 
 sub _db_add_roles ( $self, $dbh, $roles, $cb ) {
     $dbh->do(
-        [ q[INSERT INTO "api_role" VALUES], [ map { { id => uuid_str, name => $_ } } $roles->@* ], 'ON CONFLICT DO NOTHING' ],
+        [ q[INSERT INTO "api_role"], VALUES [ map { { id => uuid_str, name => $_ } } $roles->@* ], 'ON CONFLICT DO NOTHING' ],
         sub ( $dbh, $res, $data ) {
             $cb->($res);
 
@@ -85,7 +85,7 @@ sub _db_create_user ( $self, $dbh, $user_name, $hash, $enabled, $cb ) {
 
     $dbh->do(
         'INSERT INTO "api_user" ("id", "name", "hash", "enabled") VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING',
-        [ [ $user_id, $SQL_UUID ], $user_name, [ $hash, $SQL_BYTEA ], [ $enabled, $SQL_BOOL ] ],
+        [ SQL_UUID $user_name, SQL_BYTEA $hash, SQL_BOOL $enabled ],
         sub ( $dbh, $res, $data ) {
             if ( !$res->{rows} ) {
                 $cb->( result 500 );
@@ -105,7 +105,7 @@ sub _db_set_user_permissions ( $self, $dbh, $user_id, $roles_ids, $cb ) {
     my $modified;
 
     $dbh->do(
-        [ 'INSERT INTO "api_user_permission" VALUES', [ map { { role_id => $_, user_id => [ $user_id, $SQL_UUID ] } } $roles_ids->@* ], 'ON CONFLICT DO NOTHING' ],
+        [ 'INSERT INTO "api_user_permission"', VALUES [ map { { role_id => $_, user_id => SQL_UUID $user_id } } $roles_ids->@* ], 'ON CONFLICT DO NOTHING' ],
         sub ( $dbh, $res, $data ) {
             if ( !$res ) {
                 $cb->( result 500 );
@@ -116,7 +116,7 @@ sub _db_set_user_permissions ( $self, $dbh, $user_id, $roles_ids, $cb ) {
                 $modified += $res->{rows};
 
                 $dbh->do(
-                    [ 'DELETE FROM "api_user_permission" WHERE "user_id" =', \[ $user_id, $SQL_UUID ], 'AND "role_id" NOT IN', $roles_ids ],
+                    [ 'DELETE FROM "api_user_permission" WHERE "user_id" =', SQL_UUID $user_id, 'AND "role_id" NOT', IN $roles_ids ],
                     sub ( $dbh, $res, $data ) {
                         if ( !$res ) {
                             $cb->( result 500 );

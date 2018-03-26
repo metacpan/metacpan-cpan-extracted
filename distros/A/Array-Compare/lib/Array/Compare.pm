@@ -62,7 +62,7 @@ character, either by passing and alternative to the C<new> function
 
   my $comp = Array::Compare->new(Sep => '|');
 
-or by changing the seperator for an existing comparator object
+or by changing the separator for an existing comparator object
 
   $comp->Sep('|');
 
@@ -82,9 +82,9 @@ or by altering an existing object:
 
   $comp->WhiteSpace(0);
 
-You can also control whether or not the case of the data is significant 
-in the comparison. The default is that the case of data is taken into 
-account. This can be changed in the standard ways when creating a new 
+You can also control whether or not the case of the data is significant
+in the comparison. The default is that the case of data is taken into
+account. This can be changed in the standard ways when creating a new
 comparator object:
 
   my $comp = Array::Compare->new(Case => 0);
@@ -99,7 +99,7 @@ a full comparison which returns a list containing the indexes of elements
 which differ between the two arrays. If the arrays are the same it returns
 an empty list. In scalar context the full comparison returns the length of
 this list (i.e. the number of elements that differ). You can access the full
-comparision in two ways. Firstly, there is a C<DefFull> attribute. If this
+comparison in two ways. Firstly, there is a C<DefFull> attribute. If this
 is C<true> then a full comparison if carried out whenever the C<compare>
 method is called.
 
@@ -169,12 +169,12 @@ they contain the same elements but in a different order.
     print "Nope. Arrays are completely different\n";
   }
 
-In this case the values of C<WhiteSpace> and C<Case> are still used, 
+In this case the values of C<WhiteSpace> and C<Case> are still used,
 but C<Skip> is ignored for, hopefully, obvious reasons.
 
 =head1 METHODS
 
-=cut 
+=cut
 
 package Array::Compare;
 
@@ -187,7 +187,7 @@ use Moo;
 use Types::Standard qw(Str Bool HashRef);
 use Carp;
 
-$VERSION = '3.0.0';
+$VERSION = '3.0.1';
 
 has Sep        => ( is => 'rw', isa => Str,     default => '^G' );
 has WhiteSpace => ( is => 'rw', isa => Bool,    default => 1 );
@@ -323,9 +323,8 @@ sub simple_compare {
   # Filter @check so it only contains indexes that should be compared.
   # N.B. Makes no sense to do this if we are called from 'perm'.
   unless ($perm) {
-    @check = grep {!(exists $self->Skip->{$_}
-		     && $self->Skip->{$_}) } @check
-		       if keys %{$self->Skip};
+    @check = grep {!(exists $self->Skip->{$_} && $self->Skip->{$_}) } @check
+      if keys %{$self->Skip};
   }
 
   # Build two strings by taking array slices containing only the columns
@@ -389,9 +388,9 @@ sub full_compare {
     if (wantarray) {
       my ($max, $min);
       if ($#{$row1} > $#{$row2}) {
-	($max, $min) = ($#{$row1}, $#{$row2} + 1);
+        ($max, $min) = ($#{$row1}, $#{$row2} + 1);
       } else {
-	($max, $min) = ($#{$row2}, $#{$row1} + 1);
+        ($max, $min) = ($#{$row2}, $#{$row1} + 1);
       }
       return ($min .. $max);
     } else {
@@ -466,6 +465,6 @@ perl(1).
 Copyright (C) 2000-2005, Magnum Solutions Ltd.  All Rights Reserved.
 
 This script is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself. 
+under the same terms as Perl itself.
 
 =cut

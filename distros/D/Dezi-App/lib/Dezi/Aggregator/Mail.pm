@@ -8,7 +8,7 @@ use Data::Dump qw( dump );
 use Search::Tools::XML;
 use Mail::Box::Manager;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 my $XMLer = Search::Tools::XML->new();
 
@@ -19,14 +19,14 @@ my $XMLer = Search::Tools::XML->new();
 Dezi::Aggregator::Mail - crawl a mail box
 
 =head1 SYNOPSIS
-    
+
     use Dezi::Aggregator::Mail;
-    
-    my $aggregator = 
-        Dezi::Aggregator::Mail->new( 
+
+    my $aggregator =
+        Dezi::Aggregator::Mail->new(
             indexer => Dezi::Indexer::Native->new()
         );
-    
+
     $aggregator->indexer->start;
     $aggregator->crawl('path/to/my/maildir');
     $aggregator->indexer->finish;
@@ -41,8 +41,8 @@ Dezi::Aggregator::Mail uses Mail::Box, available from CPAN.
 
 =head1 METHODS
 
-Since Dezi::Aggregator::Mail inherits from Dezi::Aggregator, 
-read the Dezi::Aggregator docs first. 
+Since Dezi::Aggregator::Mail inherits from Dezi::Aggregator,
+read the Dezi::Aggregator docs first.
 Any overridden methods are documented here.
 
 =head2 BUILD
@@ -92,7 +92,7 @@ sub BUILD {
 
 =head2 crawl( I<path_to_maildir> )
 
-Create index. 
+Create index.
 
 Returns number of emails indexed.
 
@@ -281,7 +281,7 @@ Peter Karman, E<lt>karpet@dezi.orgE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-dezi-app at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.
 I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
@@ -326,10 +326,10 @@ L<https://metacpan.org/dist/Dezi-App/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2014 by Peter Karman
+Copyright 2015 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the terms of the GPL v2 or later.
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

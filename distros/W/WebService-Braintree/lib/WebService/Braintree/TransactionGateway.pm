@@ -1,5 +1,8 @@
-package WebService::Braintree::TransactionGateway;
-$WebService::Braintree::TransactionGateway::VERSION = '1.1';
+# vim: sw=4 ts=4 ft=perl
+
+package # hide from pause
+    WebService::Braintree::TransactionGateway;
+
 use 5.010_001;
 use strictures 1;
 
@@ -15,6 +18,9 @@ use WebService::Braintree::Validations qw(
 );
 
 has 'gateway' => (is => 'ro');
+
+use WebService::Braintree::_::Transaction;
+use WebService::Braintree::TransactionSearch;
 
 sub create {
     my ($self, $params) = @_;
@@ -71,7 +77,7 @@ sub search {
                 verify_params($response, transaction_search_results_signature);
         },
         obj_url => "/transactions/advanced_search",
-        inflate => [qw/credit_card_transactions transaction Transaction/],
+        inflate => [qw/credit_card_transactions transaction _::Transaction/],
         search => $block->(WebService::Braintree::TransactionSearch->new),
     });
 }
@@ -107,7 +113,7 @@ sub all {
     return $self->resource_collection({
         ids_url => "/transactions/advanced_search_ids",
         obj_url => "/transactions/advanced_search",
-        inflate => [qw/credit_card_transactions transaction Transaction/],
+        inflate => [qw/credit_card_transactions transaction _::Transaction/],
     });
 }
 

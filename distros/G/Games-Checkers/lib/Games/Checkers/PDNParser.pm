@@ -18,12 +18,14 @@ use warnings;
 
 package Games::Checkers::PDNParser;
 
-use Games::Checkers::LocationConversions;
+use Games::Checkers::Board;
+use Games::Checkers::Rules;
 use IO::File;
 
-sub new ($$) {
+sub new ($$;$) {
 	my $class = shift;
 	my $filename = shift;
+	my $variant = shift;
 
 	-r "$filename.$_" and $filename .= ".$_"
 		for qw(pdn.gz pdn.xz pdn.bz2 pdn gz xz bz2);
@@ -35,7 +37,7 @@ sub new ($$) {
 	my $fd = new IO::File $file_to_open;
 	die "Can't open PDN for reading ($filename)\n" unless $fd;
 
-	my $self = { fn => $filename, fd => $fd, lineno => 0 };
+	my $self = { fn => $filename, fd => $fd, lineno => 0, variant => $variant };
 	bless $self, $class;
 	return $self;
 }
@@ -48,7 +50,7 @@ sub error_prefix {
 sub next_record ($) {
 	my $self = shift;
 
-	my $record_values = {};
+	my $values = {};
 
 	my $line;
 	my $not_end = 0;
@@ -57,52 +59,66 @@ sub next_record ($) {
 		next if $line =~ /^\s*(([#;]|{.*}|\(.*\))\s*)?$/;
 		$not_end = 1;
 		if ($line =~ /\[(\w+)\s+"?(.*?)"?\]/) {
-			$record_values->{$1} = $2;
+			$values->{$1} = $2;
 			next;
 		}
 		last;
 	}
 	return undef unless $not_end;
 
-	my $result = $record_values->{Result};
+	for (qw(White Black)) {
+		next unless $values->{$_};
+		$values->{$_} = join(' ', reverse split(/\s*,\s*/, $values->{$_}));
+	}
+
+	my $result = $values->{Result};
 	die $self->error_prefix . "\tNon empty named value 'Result' is missing\n"
 		unless $result;
 	my $lineno = $self->{lineno};
+
+	my $variant = $values->{GameType} || $self->{variant};
+	Games::Checkers::Rules::set_variant($variant);
+	my $board = Games::Checkers::Board->new($values->{FEN});
 
 	my $move_string = "";
 	while (!$move_string || ($line = $self->{fd}->getline) && $self->{lineno}++) {
 		$line =~ s/[\r\n]+$/ /;
 		$move_string .= $line;
-		last if $line =~ /$result/;
+		last if $line =~ /\Q$result\E\s*$/;
 
 		# tolerate some broken PDNs without trailing result separator
 		my $next_char = $self->{fd}->getc;
+		last unless defined $next_char;
 		$self->{fd}->ungetc(ord($next_char));
 		last if $next_char eq "[";
 	}
 
 	# tolerate some broken PDNs without result separator
-#	die $self->error_prefix . "\tSeparator ($result) is not found from line $lineno\n"
-#		unless $line;
+#	warn $self->error_prefix . "\tSeparator ($result) from line $lineno is not found, continuing anyway\n"
+#		unless $line =~ /\Q$result\E\s*$/;
 
-	$move_string =~ s/\b$result\b.*//;
+	$move_string =~ s/\Q$result\E\s*$//;
 	$move_string =~ s/{[^}]*}//g;  # remove comments
 	$move_string =~ s/\([^\)]*(\)[^(]*)?\)//g;  # remove comments
 	$move_string =~ s/([x:*-])\s+(\d|\w)/$1$2/gi;  # remove alignment spaces
-	my @move_verge_strings = split(/(?:\s+|\d+\.\s*)+/, $move_string);
+	my @move_verge_strings = split(/(?:\s+|\d+\.+\s*)+/, $move_string);
 	shift @move_verge_strings while @move_verge_strings && !$move_verge_strings[0];
 
-	my @move_verge_trios = map {
-		/^((\d+)|\w\d)([x:*-])((\d+)|\w\d)$/i
-			|| die $self->error_prefix . "\tIncorrect move notation ($_)\n";
+	# tolerate some broken PDNs with no real moves, like: 1. - - 2. - -
+	pop @move_verge_strings while @move_verge_strings && $move_verge_strings[0] eq '-';
+
+	my @move_verges = map {
+		die $self->error_prefix . "\tIncorrect move notation ($_)\n"
+			unless /^(\d+|\w\d)([x:*-])(\d+|\w\d)((?!-)\2(\d+|\w\d))*$/i;
 		[
-			$3 eq "-" ? 0 : 1,
-			defined $2 ? num_to_location($1) : str_to_location($1),
-			defined $5 ? num_to_location($4) : str_to_location($4),
+			$2 eq "-" ? 0 : 1,
+			map {
+				/^\d+$/ ? $board->num_to_loc($_) : $board->str_to_loc($_)
+			} split(/[x:*-]/)
 		]
 	} @move_verge_strings;
 
-	return [ \@move_verge_trios, $record_values ];
+	return [ \@move_verges, $values, $variant, $board ];
 }
 
 1;

@@ -1,5 +1,5 @@
 package Text::Password::CoreCrypt;
-our $VERSION = "0.13";
+our $VERSION = "0.15";
 
 use 5.8.8;
 use Moose;
@@ -10,7 +10,7 @@ has minimum => ( is => 'ro', isa => 'Int', default => 4 );
 subtype 'Default',
     as 'Int',
     where { $_ >=  4 },
-    message {"default must be larger than 4"};
+    message {"The Default must be 4 or higher."};
 has default => ( is => 'rw', isa => 'Default', default => 8 );
 
 has readability => ( is => 'rw', isa => 'Bool', default => 1 );
@@ -83,11 +83,7 @@ returns true if the verification succeeds.
 sub verify {
     my $self = shift;
     my ( $input, $data ) = @_;
-    die __PACKAGE__. " doesn't allow any Wide Characters or white spaces\n"
-    if length $input and $input !~ /[!-~]/ or $input =~ /\s/;
-    croak "CORE::crypt makes 13bytes hash strings. Your data must be wrong."
-    if $data !~ /^[!-~]{13}$/;
-
+    warn "CORE::crypt makes 13bytes hash strings. Your data must be wrong: $data" if $data !~ /^[!-~]{13}$/;
     return $data eq CORE::crypt( $input, $data );
 }
 
@@ -102,7 +98,7 @@ the length defaults to 8($self->default).
 sub nonce {
     my $self = shift;
     my $length = shift || 8;
-    croak "unvalid length for nonce was set" unless $length =~ /^\d+$/ and $length >= 4;
+    croak "Unvalid length for nonce was set" unless $length =~ /^\d+$/ and $length >= 4;
 
     my $n;
     do {	# redo unless it gets enough strength
@@ -125,10 +121,9 @@ sub encrypt {
     my $self = shift;
     my $input = shift;
     my $min = $self->minimum();
-    croak __PACKAGE__ ." requires at least $min length" if length $input < $min;
-     die __PACKAGE__. " doesn't allow any Wide Characters or white spaces\n"
-    if $input =~ /[^!-~]/ or $input =~ /\s/;
-    carp __PACKAGE__ . " ignores the password with over 8bytes" unless $input =~ /^[!-~]{8}$/;
+    carp __PACKAGE__ . " requires at least $min length" if length $input < $min;
+    carp __PACKAGE__  . " ignores the password with over 8 bytes" if length $input > 8;
+    carp __PACKAGE__ . " doesn't allow any Wide Characters or white spaces\n" if $input =~ /[^ -~]/;
 
     return CORE::crypt( $input, $self->_salt() );
 }

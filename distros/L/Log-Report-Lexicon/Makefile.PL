@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 use 5.010;
 
-my $version = '1.10';
+my $version = '1.11';
 
 my %prereq  =
   ( Test::More               => '0.86'
@@ -34,9 +34,9 @@ WriteMakefile
   , PREREQ_PM => \%prereq
   , EXE_FILES => [ 'bin/xgettext-perl' ]
 
-  , AUTHOR    => 'Mark Overmeer'
+  , AUTHOR    => 'Mark Overmeer <markov@cpan.org>'
   , ABSTRACT  => 'Log::Report translation table management'
-  , LICENSE   => 'perl'
+  , LICENSE   => 'perl_5'
 
   , META_MERGE =>
       { 'meta-spec' => { version => 2 }
@@ -46,9 +46,9 @@ WriteMakefile
             , url  => 'https://github.com/markov2/perl5-Log-Report-Lexicon.git'
             , web  => 'https://github.com/markov2/perl5-Log-Report-Lexicon'
             }
+         , homepage => 'http://perl.overmeer.net/CPAN/'
+         , license  => [ 'http://dev.perl.org/licenses/' ]
          }
-      , homepage => 'http://perl.overmeer.net/CPAN/'
-      , license  => [ 'http://dev.perl.org/licenses/' ]
       }
 
   );
@@ -63,7 +63,7 @@ DISTDIR         = ../public_html/log-report-lexicon/source
 FIRST_YEAR      = 2007
 EMAIL           = markov@cpan.org
 WEBSITE         = http://perl.overmeer.net/CPAN/
-EXTENDS         = ../Log-Report-Optional:../String-Print:../../perl/LogReport:../Log-Report-Template
+EXTENDS         = ../Log-Report-Optional:../String-Print:../Log-Report:../Log-Report-Template
 
 __POSTAMBLE
 

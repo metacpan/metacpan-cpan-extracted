@@ -5,7 +5,7 @@ use warnings;
 use Test::More;
 
 BEGIN { use_ok ("DBI"); }
-do "t/lib.pl";
+do "./t/lib.pl";
 
 my @tbl_def = (
     [ "id",   "INTEGER",  4, 0 ],

@@ -2,7 +2,7 @@
 
 package Git::Hooks::Notify;
 # ABSTRACT: Git::Hooks plugin to notify users via email
-$Git::Hooks::Notify::VERSION = '2.8.1';
+$Git::Hooks::Notify::VERSION = '2.9.0';
 use 5.010;
 use utf8;
 use strict;
@@ -86,6 +86,19 @@ sub sha1_link {
     my ($git, $sha1, $html) = @_;
     if (my $commit_url = $git->get_config($CFG, 'commit-url')) {
         $commit_url =~ s/%H/$sha1/g;
+        if ($commit_url =~ /%R/) {
+            # %R must be replaced by the repository name.
+            my $repository_name = $git->repository_name;
+            # HACK: for Bitbucket Server the repository name is composed: a
+            # project ID and a repository name separated by a slash. We have to
+            # insert a "repos/" string between these two parts in order to
+            # construct a valid URL. Ideally we should be able to get the
+            # repository name and the project name separately, but I'll live
+            # with this hack for now, since, as far as I know, only Bitbucket
+            # has this notion of a "project".
+            $repository_name =~ s:/:/repos/:;
+            $commit_url =~ s/%R/$repository_name/g;
+        }
         return $html ? "<a href=\"$commit_url\">$sha1</a>" : $commit_url;
     } else {
         return $sha1;
@@ -270,7 +283,7 @@ Git::Hooks::Notify - Git::Hooks plugin to notify users via email
 
 =head1 VERSION
 
-version 2.8.1
+version 2.9.0
 
 =head1 SYNOPSIS
 
@@ -278,31 +291,27 @@ As a C<Git::Hooks> plugin you don't use this Perl module directly. Instead, you
 may configure it in a Git configuration file like this:
 
   [githooks]
+
+    # Enable the plugin
     plugin = Notify
 
   [githooks "notify"]
+
+    # Define notifications From: header
     from = githooks@example.net
+
+    # Define a URL pattern to embed links to commits in the notifications.
     commit-url = https://github.com/userid/repoid/commit/%H
+
+    # Notify this email about all pushes
     rule = gnustavo@cpan.org
+
+    # Notify these emails about changes in the lib/Git/Hooks/Notify.pm file.
     rule = fred@example.net barney@example.net -- lib/Git/Hooks/Notify.pm
+
+    # Notify these emails about changes in the file Changes and below the
+    # directory lib/.
     rule = batman@example.net robin@example.net -- Changes lib/
-
-The first section enables the plugin.
-
-The second instance enables C<some> of the options specific to this plugin.
-
-The C<from> option defines the value of the C<From:> header in the
-notifications.
-
-The C<commit-url> option defines a URL pattern to embed links to commits in
-the notifications.
-
-The C<rule> options specifies who must be notified about what changes in the
-repository. The first rule notifies C<gnustavo@cpan.org> about every new
-commits. The second rule notifies to the Bedrock fellows only about changes
-affecting the F<lib/Git/Hooks/Notify.pm> file. The third rule notifies the
-Dynamic Duo about changes affecting the F<Changes> file in the repository root
-and changes affecting any file under the F<lib/> directory.
 
 =head1 DESCRIPTION
 
@@ -499,6 +508,9 @@ commits shown in the notification message. If configured, each SHA1 contained in
 the C<git-log> output is substituted by C<URL_PATTERN>, with the C<%H>
 placeholder replaced by the SHA1.
 
+The C<%R> is another placeholder which is substituted by the repository name, as
+returned by L<Git::Repository::Plugin::GitHooks>'s C<repository_name> method.
+
 See below how to configure this for some common Git servers. Replace the
 angle-bracketed names with values appropriate to your context:
 
@@ -514,11 +526,11 @@ angle-bracketed names with values appropriate to your context:
 
 =item * Bitbucket Server
 
-  <BITBUCKET_BASE_URL>/projects/<PROJECTID>/repos/<REPOID>/commits/%H
+  <BITBUCKET_BASE_URL>/projects/%R/commits/%H
 
 =item * Gerrit with Gitblit
 
-  <GERRIT_BASE_URL>/plugins/gitblit/commit/?r=<REPO>&h=%H
+  <GERRIT_BASE_URL>/plugins/gitblit/commit/?r=%R&h=%H
 
 =back
 

@@ -12,7 +12,7 @@ use WebService::Braintree;
 use WebService::Braintree::TestHelper;
 
 subtest 'does have correct attributes' => sub {
-    my $subscription = WebService::Braintree::Subscription->new(balance => '12.00');
+    my $subscription = WebService::Braintree::_::Subscription->new(balance => '12.00');
 
     is $subscription->balance, '12.00';
     has_attribute_ok $subscription, 'balance';

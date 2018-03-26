@@ -13,7 +13,7 @@ Statocles::Help::Config - A guide to configuring a Statocles site
 
 =head1 VERSION
 
-version 0.088
+version 0.089
 
 =head1 DESCRIPTION
 

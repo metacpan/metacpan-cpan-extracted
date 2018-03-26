@@ -1,0 +1,238 @@
+#!/usr/bin/perl 
+use 5.001 ; use strict ; use warnings ; # Already confirmed that 5.001, 5.011, 5.018 is ok.
+use List::Util qw[ sum sum0 ] ; 
+use Getopt::Std ; getopts ':1efkl:nqrsx:y:=%@:' , \my %o  ; 
+use Term::ANSIColor qw/color :constants/ ; $Term::ANSIColor::AUTORESET = 1 ;
+use FindBin qw[ $Script ] ; 
+use autodie qw [ open ] ;
+
+sub readKeyList ( ) ; # 別ファイルに読み取るべき、行が指定されている場合を想定している。
+sub reading ( ) ; # 1. 読む
+sub output ( ) ; # 2. 出力する
+
+my $time0 = time ; 
+my $cyc_len = $o{'@'} // 1e7 ; # 何行毎にレポートを発生させるか。
+my %strcnt ; # 数える対象の文字列(各行から最後の改行文字列を取り除いたもの) に対して、数えた数を入れる。
+my %strcntX ; # $strcntX{$_}{$tail} で度数を表す。
+my %strfst ; # 最初の出現位置を保持
+my %strlst ; # 最後の出現位置を保持
+my $header = <> if $o{q/=/} ;
+my $isep = $o{','} //= do { $o{','} //= "\t" ; eval qq[qq[$o{','}]] } ; # 入力の区切り文字 
+my $osep = "\t" ; # 出力用セパレータ
+my $readLines ; # 読み取った行数
+my @givenL ;   
+my %gl ; # 個数を数える対象を指定されて場合は、それを読み取る。
+
+readKeyList if $o{l} ;
+reading ;  ### 1. 読む
+output ;  ### 2. 出力する
+exit ;
+
+sub readKeyList ( ) { 
+    open my $FH , '<' , $o{l} ; while ( <$FH> ) { chomp ; push @givenL, $_ ; $gl { $_ } = 1 } ; close $FH ; 
+}
+
+# 読取り
+sub reading ( ) { 
+
+    our $timec = time ; 
+    our $intflg ;
+    our $cycred = $cyc_len ; # 1ずつ減らしてカウントする。
+
+    sub treat_x { 
+        my @F = split /$isep/, $_ , $o{x} + 1  ; 
+        $_ = join $isep , splice @F, 0 , $o{x} ;
+        my $tail = join "\t" , @F ; # , $o{x} , 1 ; # pop @F ; 
+        $strcntX { $_ }{ $tail } ++ ;
+    }
+
+    sub cyc_rep ( ) {
+        (my $num = $. ) =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g ; # 3桁毎にコンマで区切る
+        print STDERR GREEN "$num:\t",(sprintf"%02d:%02d:%02d",(localtime)[2,1,0]), "\t",time-$timec," sec.\t($Script)" ;  
+        print STDERR BLUE "\t$.\n" ; 
+        $timec = time ;
+        $cycred = $cyc_len ;
+        local $| = 1 ; 
+    }
+
+    # 何行目を処理中かを表示(Ctrl-Cを押した時)
+    sub sigint1 ( ) { 
+
+        sub sigint2 ( ) {     # Ctrl-C で 結果まで出力する。
+            $SIG{ INT } = sub { print color('reset') ; die } ;
+            $SIG{ ALRM } = sub { $SIG{ INT } = 'sigint1' } ; 
+            alarm 1 ;
+            print color('cyan') ; output ; print color('reset') ; # 中間結果の表をシアン色で出力する。その後、通常のように処理続行する。
+        }
+
+        print STDERR YELLOW "Processing $.-th line. ", scalar localtime , "\n"  ; 
+        $SIG{ INT } = 'sigint2' ; 
+        $SIG{ ALRM } = sub { $SIG{ INT } = 'sigint1' } ; #  sub { $intflg = 1 }  } ; 
+        alarm 1 ; 
+    }
+
+    # ここから処理
+    $SIG{ INT } = \& sigint1 ;
+
+    sub fcntbare { $strcnt { $_ } ++ }
+    sub fcntfilt { $strcnt { $_ } ++ if exists $gl { $_ } }
+    sub fcntbareC { $strcnt { $_ } ++ ; $strfst { $_ } //= $. ; $strlst { $_ } = $. }
+    sub fcntfiltC { if(exists $gl{$_} ){ $strcnt { $_ } ++ ; $strfst { $_ } //= $. ; $strlst { $_ } = $. } } 
+    sub fcnt ; 
+
+    * fcnt = * fcntbare if ! exists $o{l} ; 
+    * fcnt = * fcntfilt if exists $o{l} ;
+    * fcnt = * fcntbareC if ! exists $o{l} && $o{':'} ; 
+    * fcnt = * fcntfiltC if exists $o{l} && $o{':'} ;
+
+    # 動作の高速化のため、似た様な処理を3個も書いてしまった。もっと良い方法は無いだろうか?
+    if ( ! exists $o{x} && ! $cyc_len ) { while ( <> ) { chomp ; fcnt } } # 最高速
+    elsif ( ! exists $o{x} ) { while ( <> ) { chomp ; cyc_rep if -- $cycred <= 0  ; fcnt } }
+    else { while ( <> ) { chomp ; cyc_rep if -- $cycred <= 0 ; treat_x ; fcnt } } 
+
+    $readLines = $. ;
+}
+ 
+sub output ( ) { 
+
+    our @y_ranges = () ; # 出力される値の範囲が指定された場合の挙動を指定する。
+    # 次の2個の関数は、出力すべき値の範囲をフィルターの様に指定する。
+    sub y_init ( ) { 
+         my @ranges = split /,/ , $o{y} // '' , -1 ; 
+        grep { $_ = $_ . ".." . $_ unless m/\.\./ }  @ranges ; # = split /,/ , $o{y} // '' , -1 ; 
+        do { m/^(\d*)\.\.(\d*)/ ; push @y_ranges , [ $1||1 , $2||'Inf' ] } for @ranges ; 
+    }
+    sub y_filter ( $ ) { 
+        do { return not 0 if $_->[0] <= $_[0] && $_[0] <= $_->[1] } for @y_ranges ; 
+        return @y_ranges ? not 1 : not 0 ; # 指定が無かった場合はとにかく真を返す。
+    }
+    
+    y_init  ; 
+
+    # キー集合、特にその順序の調整 
+    my @k ;
+    @k = defined $o{l} ? @givenL : sort keys %strcnt ; # <-- - ここの sort を消そうかどうか迷った。
+    @k = sort { $strcnt{$a} <=> $strcnt{$b} } @k if $o{f} ;  # -f オプションによりコンテンツの数であらかじめ、ソートする 
+    @k = sort { $a cmp $b } @k if $o{k} ;  # -k オプションによりキー文字列であらかじめ、ソートする 
+    @k = sort { $a <=> $b } @k if $o{n} ; # -n オプションによりキー文字列であらかじめ、ソートする 
+    @k = reverse @k if $o{r} ;   # r オプションで逆順ソート
+    our $totalSum = sum0 ( values %strcnt ) ; # 総行数の格納。
+    our $outLines = 0 ; # 出力した行数
+    our $cumsum =  0  ; # 累和カウンタ
+
+    # 書き出し
+    $header = "LINE_STR" unless defined $header ; 
+    $header = "FREQ" . $osep . $header ; 
+    $header = "RATIO" . $osep . $header if $o{'%'} ; 
+    $header = "ACCUM" . $osep . $header if $o{'s'} ;
+    $header = "CUMRA" . $osep . $header if $o{'s'} && $o{'%'} ;
+    $header = "WHERE" . $osep . $header if $o{':'} ; 
+    $header = $header . $osep . "RIGHT_FIELDS.." if $o{x} ;
+    $header .= "\n" ;
+    $o{'='} ? print $header : $o{q} ? 0 : print STDERR GREEN $header ;  
+
+
+    for ( @k ) { 
+
+        sub tailx {
+            my @keys = sort {  $strcntX{$_}{$b} <=> $strcntX{$_}{$a} } keys %{ $strcntX{ $_ } } ; 
+            my $out = '' ; 
+            for my $k ( @keys ) { $out .= "\t[$k]x$strcntX{$_}{$k}" } ; 
+            return $out ; 
+        }
+
+        sub headS { 
+            $cumsum += $strcnt { $_ } ;
+            return $cumsum . sprintf ( "\t%5.2f%%", 100.0 * $cumsum / $totalSum) if $o{'%'} ;   
+            return $cumsum ;
+        }
+
+        sub headW { 
+            $strfst{$_} //= 0 ; 
+            $strlst{$_} //= 0 ; 
+            return "$strfst{$_}-$strlst{$_}:" ; 
+        }
+
+        $strcnt{ $_ } //=  0 ;
+        next unless y_filter ( $strcnt{$_} ) ; 
+        print headW () , "\t" if exists $o{':'} ; # -: オプションにより、どの行番号で現れたのかを出力。
+        print headS () , "\t" if exists $o{s} ; # -s オプションにより、累和を表示。 
+        printf "%5.2f%%$osep", 100.0 * $strcnt{$_} / $totalSum if $o{'%'} ;  
+        print $o{1} ? $_ : $strcnt{$_} . $osep . $_ ; # -1オプションがあれば個数を表示しない。
+        print tailx()  if exists $o{x} ; 
+        print "\n" ;
+        $outLines ++ ; 
+    } 
+
+
+    my $sec = time - $time0 ; # このプログラムの処理にかかった秒数。比較する2個の時刻は秒単位なので、±1秒未満の誤差は発生する。
+    $readLines //= $. ; # Ctrl+Cの連打で必要となる処理。
+
+    return if exists $o{q} ; 
+    print STDERR CYAN "$readLines lines processed. " ; 
+    print STDERR CYAN "$totalSum lines are counted. " ; 
+    print STDERR CYAN "$outLines lines output. " ; 
+    print STDERR CYAN "($Script ; $sec sec.)\n"
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+=head1
+
+コマンド
+
+  $0 datafile 
+  $0 < datafile 
+  cat datafile | $0 
+
+オプションに関して
+
+ [入力に関係するオプション]
+ 
+    -= : 先頭行をヘッダ(列名の並びなどでありデータでは無い)と見なして処理
+    -@ num : 入力ファイルを読む際に、何行毎に標準エラー出力に報告を出すか。未指定なら1000万行毎。
+    -l ファイル名 : 個数を数える文字列の対象を含んだファイル名を指定する。出力順序がファイルの各行に記載の順序になる。
+    -l は、プロセス置換 <( ) を使うと便利。; -l により、メモリを節約できる。; -l と -@ が共にあると、見つかった行数しかざたない。
+
+ [出力のオプション]
+
+    -f : 出現数で整列する    -fr なら逆順にする
+    -k : キー文字列で整列する    -kr なら逆順にする
+    -n : キー文字列を数と見なして整列する    -nr なら逆順にする
+    -r : 上記を逆順にする。
+
+    -s : 累和を出力
+    -% : データ件数全体に対する割合を出力
+    -1 : 個数を出力しない。出現したキー文字列のみ出力。
+    -q : 最後の二次情報を出力しない。
+
+    -y 数値範囲 : 頻度が指定回数のもののみ出力。例 -y 1..3 なら3以下。 3.. なら3以上。2,4,6..8 なら2と4と6,7,8。
+
+ [派生のオプション]
+     -x 切断位置 ; 
+     -, str ; 入力区切り文字
+ 
+    
+ Ctrl-C を押したときの挙動: (要確認↓)
+
+  1. 処理中の行番号の表示。
+  2. そして、1秒以内に再びCtrl+C が押下されると、それまでの集計状態を表示。
+  3. さらにそれから1秒以内にCtrl+Cが押下されると、停止する。
+
+その他: 
+  * freqfreq のような、頻度の頻度を出力するオプションを作りたい。オプションは -F で表したい。
+
+=cut

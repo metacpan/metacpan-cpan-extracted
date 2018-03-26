@@ -4,7 +4,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.006';
+our $VERSION = '2.008';
 
 use Encode::Locale qw();
 
@@ -34,7 +34,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.006
+Version 2.008
 
 =cut
 
@@ -121,9 +121,6 @@ the C<Enter> key means entering an empty string.
 =head3 SQL menu
 
 The SQL menu is the menu which opens after a table was selected.
-
-If C<AGGREGATE> or C<GROUP BY> is set, the C<SELECT> statement is automatically formed; a previous user defined
-C<SELECT> statement is reset. A user defined C<SELECT> resets a previous set C<AGGREGATE> or C<GROUP BY> statement.
 
 To reset a SQL "sub-statement" (e.g C<WHERE>) re-enter into the respective menu and choose C<-OK->.
 
@@ -325,10 +322,6 @@ Set the default I<lock> value:
 =head4 Expert (experimental)
 
 =over
-
-=item I<Aggregate in SELECT>
-
-Enables aggregate function in the SELECT substatement C<&>.
 
 =item I<Subqueries>
 

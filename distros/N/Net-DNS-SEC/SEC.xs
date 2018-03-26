@@ -1,5 +1,5 @@
 
-#define XS_Id "$Id: SEC.xs 1654 2018-03-19 15:53:37Z willem $"
+#define XS_Id "$Id: SEC.xs 1656 2018-03-22 14:36:14Z willem $"
 
 #define PERL_NO_GET_CONTEXT
 
@@ -12,17 +12,25 @@ extern "C" {
 #include "XSUB.h"
 
 #include <openssl/opensslv.h>
+#include <openssl/opensslconf.h>
 
 #if (OPENSSL_VERSION_NUMBER < 0x00908000L)
 #error	Incompatible OpenSSL version
 #endif
 
 #include <openssl/bn.h>
+#include <openssl/objects.h>
 #include <openssl/dsa.h>
+#include <openssl/rsa.h>
+
+#ifdef OPENSSL_NO_EC
+#define NO_ECDSA
+#endif
+
+#ifndef NO_ECDSA
 #include <openssl/ec.h>
 #include <openssl/ecdsa.h>
-#include <openssl/objects.h>
-#include <openssl/rsa.h>
+#endif
 
 #ifdef __cplusplus
 }
@@ -131,21 +139,6 @@ int DSA_SIG_set0(DSA_SIG *sig, BIGNUM *r, BIGNUM *s)
 	return 1;
 }
 
-void ECDSA_SIG_get0(const ECDSA_SIG *sig, const BIGNUM **pr, const BIGNUM **ps)
-{
-	if (pr != NULL) *pr = sig->r;
-	if (ps != NULL) *ps = sig->s;
-}
-
-int ECDSA_SIG_set0(ECDSA_SIG *sig, BIGNUM *r, BIGNUM *s)
-{
-	if (sig->r != NULL) BN_free(sig->r);
-	sig->r = r;
-	if (sig->s != NULL) BN_free(sig->s);
-	sig->s = s;
-	return 1;
-}
-
 int RSA_set0_key(RSA *r, BIGNUM *n, BIGNUM *e, BIGNUM *d)
 {
 	BN_free(r->n);
@@ -166,7 +159,23 @@ int RSA_set0_factors(RSA *r, BIGNUM *p, BIGNUM *q)
 	return 1;
 }
 
-#endif
+
+#ifndef NO_ECDSA
+
+void ECDSA_SIG_get0(const ECDSA_SIG *sig, const BIGNUM **pr, const BIGNUM **ps)
+{
+	if (pr != NULL) *pr = sig->r;
+	if (ps != NULL) *ps = sig->s;
+}
+
+int ECDSA_SIG_set0(ECDSA_SIG *sig, BIGNUM *r, BIGNUM *s)
+{
+	if (sig->r != NULL) BN_free(sig->r);
+	sig->r = r;
+	if (sig->s != NULL) BN_free(sig->s);
+	sig->s = s;
+	return 1;
+}
 
 
 #if (OPENSSL_VERSION_NUMBER < 0x10001000L)
@@ -196,6 +205,8 @@ int EC_KEY_set_public_key_affine_coordinates(EC_KEY *eckey, BIGNUM *x, BIGNUM *y
 	return retval;
 }
 
+#endif
+#endif
 #endif
 
 
@@ -342,6 +353,8 @@ DSA_do_verify(SV *dgst, DSA_SIG *sig, DSA *dsa)
 
 ####	ECDSA	####
 
+#ifndef NO_ECDSA
+
 # Creates new EC_KEY object using prescribed curve
 # as underlying EC_GROUP object.
 EC_KEY*
@@ -429,7 +442,7 @@ ECDSA_SIG_set0(ECDSA_SIG *sig, SV *r_SV, SV *s_SV)
 	RETVAL
 
 ECDSA_SIG*
-ECDSA_do_sign(SV *dgst, EC_KEY *key)
+ECDSA_sign(SV *dgst, EC_KEY *key)
     PREINIT:
 	ECDSA_SIG *sig;
 	const unsigned char *bin;
@@ -442,7 +455,7 @@ ECDSA_do_sign(SV *dgst, EC_KEY *key)
 	RETVAL
 
 int
-ECDSA_do_verify(SV *dgst, ECDSA_SIG *sig, EC_KEY *key)
+ECDSA_verify(SV *dgst, ECDSA_SIG *sig, EC_KEY *key)
     PREINIT:
 	const unsigned char *bin;
 	STRLEN  len;
@@ -451,6 +464,8 @@ ECDSA_do_verify(SV *dgst, ECDSA_SIG *sig, EC_KEY *key)
 	RETVAL = ECDSA_do_verify( bin, (int)len, sig, key );
     OUTPUT:
 	RETVAL
+
+#endif
 
 
 ####	Ed25519	####

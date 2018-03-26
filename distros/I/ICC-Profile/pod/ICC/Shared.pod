@@ -1,0 +1,974 @@
+# documentation for Shared.pm module / 2018-03-25
+
+=encoding utf8
+
+=head1 NAME
+
+ICC::Shared - Parent class for ICC::Profile and ICC::Support modules.
+
+=head1 SYNOPSIS
+
+    use parent 'ICC::Shared'; # add as parent class (to another module)
+
+    use ICC::Shared; # export all functions and constants
+
+    use ICC::Shared qw(Lab2xyz xyz2Lab D50); # export selected functions and a constant
+
+    # copy an object
+    $clone = $obj->copy(); # copy an object
+    @clones = $obj->copy(4); # make an array of 4 copies
+
+    # print object structure
+    $obj->dump();
+    $obj->dump($format);
+
+    # Math::Matrix additions
+    $matrix->sdump([$format]); # print object contents to string
+    $matrix->dump([$format]); # print object contents
+    $matrix2 = $matrix->power($exponent); # exponentiate matrix elements, exponent may be a scalar or vector
+    $matrix2 = $matrix->xyz2XYZ([$XYZ_white_point]); # convert matrix working space from xyz to XYZ
+    $matrix2 = $matrix->XYZ2xyz([$XYZ_white_point]); # convert matrix working space from XYZ to xyz
+
+    # color encoding functions
+    @Lab = xyz2Lab(@xyz); @xyz = Lab2xyz(@Lab); # array
+    $Lab = xyz2Lab($xyz); $xyz = Lab2xyz($Lab); # vector, matrix, array structure
+
+    @Lxyz = xyz2Lxyz(@xyz); @xyz = Lxyz2xyz(@Lxyz); # array
+    $Lxyz = xyz2Lxyz($xyz); $xyz = Lxyz2xyz($Lxyz); # vector, matrix, array structure
+
+    @Lab = Lxyz2Lab(@Lxyz); @Lxyz = Lab2Lxyz(@Lab); # array
+    $Lab = Lxyz2Lab($Lxyz); $Lxyz = Lab2Lxyz($Lab); # vector, matrix, array structure
+
+    @Lab = XYZ2Lab(@XYZ); @XYZ = Lab2XYZ(@Lab); # array (D50)
+    $Lab = XYZ2Lab($XYZ); $XYZ = Lab2XYZ($Lab); # vector, matrix, array structure (D50)
+    @Lab = XYZ2Lab(@XYZ, $wtpt); @XYZ = Lab2XYZ(@Lab, $wtpt); # array
+    $Lab = XYZ2Lab($XYZ, $wtpt); $XYZ = Lab2XYZ($Lab, $wtpt); # vector, matrix, array structure
+
+    @Lxyz = XYZ2Lxyz(@XYZ); @XYZ = Lxyz2XYZ(@Lxyz); # array (D50)
+    $Lxyz = XYZ2Lxyz($XYZ); $XYZ = Lxyz2XYZ($Lxyz); # vector, matrix, array structure (D50)
+    @Lxyz = XYZ2Lxyz(@XYZ, $wtpt); @XYZ = Lxyz2XYZ(@Lxyz, $wtpt); # array
+    $Lxyz = XYZ2Lxyz($XYZ, $wtpt); $XYZ = Lxyz2XYZ($Lxyz, $wtpt); # vector, matrix, array structure
+
+    @XYZ = xyz2XYZ(@xyz); @xyz = XYZ2xyz(@XYZ); # array (D50)
+    $XYZ = xyz2XYZ($xyz); $xyz = XYZ2xyz($XYZ); # vector, matrix, array structure (D50)
+    @XYZ = xyz2XYZ(@xyz, $wtpt); @xyz = XYZ2xyz(@XYZ, $wtpt); # array
+    $XYZ = xyz2XYZ($xyz, $wtpt); $xyz = XYZ2xyz($XYZ, $wtpt); # vector, matrix, array structure
+
+    @xyY = XYZ2xyY(@XYZ); @XYZ = xyY2XYZ(@xyY); # array
+    $xyY = XYZ2xyY($XYZ); $XYZ = xyY2XYZ($xyY); # vector, matrix, array structure
+
+    $L = x2L($x); $x = L2x($L); # CIE L* function
+
+    $dLdx = dLdx($x); $dxdL = dxdL($L); derivative of CIE L* function
+
+    $jac = xyz2Lab_jac($xyz); # Jacobian matrix of xyz2Lab function
+    $jac = Lab2xyz_jac($Lab); # Jacobian matrix of Lab2xyz function
+
+    $W = XYZ2W(@XYZ, $wtpt); # CIE Whiteness
+
+    $dwv = xyz2dwv($xyz); # density weighted value
+
+    # color difference functions
+    $dE = dEab(@Lab1, @Lab2); # CIE ∆E*ab color difference
+    $dE = dE94(@Lab1, @Lab2); # CIE ∆E94 color difference
+    $dE = dE00(@Lab1, @Lab2); # CIE ∆E00 color difference
+    $dE = dE99(@Lab1, @Lab2); # DIN99 color difference
+    $dE = dE99(@Lab1, @Lab2, Ke, Kch); # DIN99 color difference
+    $dE = dEcmc(@Lab1, @Lab2); # CMC(l:c) color difference
+    $dE = dEcmc(@Lab1, @Lab2, l, c); # CMC(l:c) color difference
+    $dF = dCh(@Lab1, @Lab2); # ∆Ch chroma difference
+
+    # illuminant functions
+    ($cct, $err) = CCT($x, $y); # correlated color temperature
+    $cct = CCT2($x, $y); # correlated color temperature using McCamy's approximation
+    $rad = bbrad($nm, $T); # black body radiance using Planck's law
+    ($x, $y) = bbxy($T); # chromaticity of black body radiator
+    ($u, $v) = bbuv($T); CIE UCS 1960 of black body radiator
+    ($u, $v) = XYZ2ucs(@XYZ); # CIE UCS 1960
+    ($u, $v) = xy2ucs(@xy); # CIE UCS 1960
+    ($range, $spd) = daylight($cct); range and SPD of daylight
+
+    # interpolation functions
+    $vec_out = linear($vec_in, $range_in, $range_out); # interpolate a vector (linear)
+    $matrix = linear_matrix($range_in, $range_out); # make interpolating matrix (linear)
+    $vec_out = cspline($vec_in, $range_in, $range_out); # interpolate a vector (natural cubic spline)
+    $matrix = cspline_matrix($range_in, $range_out); # make interpolating matrix (natural cubic spline)
+    $vec_out = lagrange($vec_in, $range_in, $range_out); # interpolate a vector (Lagrange, ASTM E 2022)
+    $matrix = lagrange_matrix($range_in, $range_out); # make interpolating matrix (Lagrange, ASTM E 2022)
+
+    # vector functions
+    $scalar = dotProduct($vec1, $vec2); # vector dot product
+    $vector = crossProduct($vec1, $vec2); # vector cross product
+
+    # utility functions
+    $vector = flatten($structure); # flatten an array structure
+    clip_struct($structure); # clip each element of an array structure
+    $integer = round($value); # round off value to nearest integer (+/-)
+    $vector = s15f162v($s15f16); # convert from s15Fixed16Number vector
+    $s15f16 = v2s15f16($vector); # convert to s15Fixed16Number vector
+    (profiles_folder_path, directory_segs, customer, job) = makeProfileFolder(file/folder_path); # make folder for profiles
+    (profiles_folder_path, directory_segs, customer, job) = makeProfileFolder(file/folder_path, alias_folder_path);
+    $path = getICCPath(); # get path to 'ICC' distribution folder
+    $path = getICCPath('Data'); # get path to 'ICC' distribution 'Data' folder
+    $path = getICCPath('Data/ASTM_E308_data.yml'); # get path to 'ICC' distribution 'ASTM_E308_data.yml' file
+    filterPath($path); # interpret '~' and '\' in file paths
+    setFile(path_to_file, creator, type); # set Mac OSX creator and file type (deprecated by Apple)
+
+    # constants
+    D50 – D50 illuminant XYZ values (CIE 1931 2 degree observer)
+    d50 – D50 illuminant XYZ values, encoded as 32-bit ICC XYZNumber
+    d50P – D50 illuminant XYZ values, encoded as 16-bit ICC XYZ
+    PI –  circumference of a unit circle, approximately 3.14159
+    radian – degrees in a radian, approximately 57.29578
+    ln10 –  natural logarithm of 10, approximately 2.30258
+
+=head1 DESCRIPTION
+
+ICC::Shared is a parent class for all ICC::Profile and ICC::Support modules. It includes a collection of useful functions and constants.
+
+=head2 Data structure and functions
+
+Many functions provided by this module take color data for their input. All of these functions will take an array as input.
+Some functions will also take vector, matrix and array structure inputs, as noted in the B<Usage> section. Here are examples
+of the various data structures,
+
+    @list = (50, 20, 20); # single sample, an array, also known as a list
+
+    $vector = [50, 20, 20]; # single sample, a vector
+
+    $matrix = [
+        [50, 20, 20],
+        [50, 20, 20],
+        [50, 20, 20],
+    ]; # multiple samples, a matrix, also known as a 2-D array
+
+    $struct = [
+        [50, 20, 20],
+        [
+            [50, 20, 20],
+            [50, 20, 20],
+        ]
+    ]; # multiple samples, an array structure
+
+Functions that take vector, matrix and array structure inputs will return the same data type and structure.
+
+=head2 Color spaces
+
+There are many ways to encode colorimetric measurements. These are normally called color spaces.
+
+The basic calculation of colorimetry from spectral measurements produces so-called tristimulus values – the CIE XYZ
+color space. By convention, the XYZ values of an illuminant are scaled so that the Y-value is 100. A perfectly white
+reference sample will have the same XYZ values as the illuminant.
+
+When the XYZ values of a sample are divided by the XYZ values of the illuminant, the result is xyz values (lower case),
+which normally range from 0 - 1 (unless there is fluorescence).
+
+In 1976, the CIE standardized a perceptually uniform color space called CIE L*a*b*. The transformation from xyz to
+L*a*b* is non-linear. The x, y and z values are passed through an identical non-linear transform. The transformed y
+value is known as L* or lightness. The a* and b* values are computed from the difference between the transformed y
+value, and the the transformed x and z values.
+
+The intermediate L*a*b* calculation, where x, y and z are transformed non-linearly, is often useful. This is called
+Lxyz color space. It is not a CIE standard color space.
+
+The color encoding functions below convert all 12 combinations of these color spaces – XYZ, xyz, L*a*b* and Lxyz.
+The 6 functions involving XYZ require the illuminant white point. If this is omitted, D50 illuminant is used.
+
+Sometimes XYZ values are converted to chromaticity values, or xyY color space. The x and y values indicate color, and
+the Y value Lightness. This color space is generally used for illuminants.
+
+=head1 METHODS
+
+=head2 Common methods
+
+=head3 copy
+
+This method copies (clones) an object. The copies are separate objects.
+
+B<Usage>
+
+    $clone = $obj->copy(); # copy an object
+    @clones = $obj->copy(4); # make an array of 4 copies
+
+B<Examples>
+
+    use ICC::Profile;
+
+    $curve = ICC::Profile::curv->new([0, 1]); # make a 'curv' object
+    $curve_set = ICC::Profile::cvst->new([$curve->copy(4)]); # make a 'cvst' object
+
+=head3 dump
+
+This method prints the structure of an object.
+
+B<Usage>
+
+    $obj->dump();
+    $obj->dump($format);
+
+B<Examples>
+
+    use ICC::Profile;
+
+    $profile = ICC::Profile->new('~/Desktop/my_profile.icc'); # make a 'Profile' object
+    $profile->dump(); # print the object structure
+
+=head2 Math::Matrix additions
+
+A few methods are appended to the standard Math::Matrix module. Rather than subclass a new module, we just put them
+in the Math::Matrix name space.
+
+=head3 sdump
+
+print object contents to string
+
+=head3 dump
+
+print object contents
+
+=head3 power
+
+exponentiate matrix elements
+
+=head3 xyz2XYZ, XYZ2xyz
+
+convert matrix working space between xyz and XYZ
+
+=head1 FUNCTIONS
+
+=head2 Color encoding functions
+
+=head3 xyz2Lab, Lab2xyz
+
+These functions convert between xyz and L*a*b* encoding.
+
+B<Usage>
+
+    @Lab = xyz2Lab(@xyz); @xyz = Lab2xyz(@Lab); # array
+    $Lab = xyz2Lab($xyz); $xyz = Lab2xyz($Lab); # vector, matrix, array structure
+
+B<Examples>
+
+    use ICC::Profile;
+
+    $chart = ICC::Support::Chart->new(''~/Desktop/GRACoL2006_Coated1_CGATS.txt'); # make a 'Chart' object
+    $xyz = $chart->xyz([], {'encoding' => 9}); # get all xyz data
+
+    $Lab = xyz2Lab($xyz); # convert xyz matrix to L*a*b* encoding
+    $xyz_rt = Lab2xyz($Lab); # convert back to xyz encoding
+    $vector = xyz2Lab($xyz->[0]); # convert a vector
+    @array = xyz2Lab(@{$xyz->[0]}); # convert an array
+
+=head3 xyz2Lxyz, Lxyz2xyz
+
+These functions convert between xyz and Lxyz encoding.
+
+B<Usage>
+
+    @Lxyz = xyz2Lxyz(@xyz); @xyz = Lxyz2xyz(@Lxyz); # array
+    $Lxyz = xyz2Lxyz($xyz); $xyz = Lxyz2xyz($Lxyz); # vector, matrix, array structure
+
+B<Examples>
+
+    use ICC::Profile;
+
+    $chart = ICC::Support::Chart->new(''~/Desktop/GRACoL2006_Coated1_CGATS.txt'); # make a 'Chart' object
+    $xyz = $chart->xyz([], {'encoding' => 9}); # get all xyz data
+
+    $Lxyz = xyz2Lxyz($xyz); # convert xyz matrix to Lxyz encoding
+    $xyz_rt = Lxyz2xyz($Lxyz); # convert back to xyz encoding
+    $vector = xyz2Lxyz($xyz->[0]); # convert a vector
+    @array = xyz2Lxyz(@{$xyz->[0]}); # convert an array
+
+=head3 Lab2Lxyz, Lxyz2Lab
+
+These functions convert between L*a*b* and Lxyz encoding.
+
+B<Usage>
+
+    @Lxyz = Lab2Lxyz(@Lab); @Lab = Lxyz2Lab(@Lxyz); # array
+    $Lxyz = Lab2Lxyz($Lab); $Lab = Lxyz2Lab($Lxyz); # vector, matrix, array structure
+
+B<Examples>
+
+    use ICC::Profile;
+
+    $chart = ICC::Support::Chart->new(''~/Desktop/GRACoL2006_Coated1_CGATS.txt'); # make a 'Chart' object
+    $Lab = $chart->Lab([]); # get all L*a*b* data
+
+    $Lxyz = Lab2Lxyz($Lab); # convert L*a*b* matrix to Lxyz encoding
+    $Lab_rt = Lxyz2Lab($Lxyz); # convert back to L*a*b* encoding
+    $vector = Lab2Lxyz($Lab->[0]); # convert a vector
+    @array = Lab2Lxyz(@{$Lab->[0]}); # convert an array
+
+
+=head3 XYZ2Lab, Lab2XYZ
+
+These functions convert between XYZ and L*a*b* encoding.
+
+B<Usage>
+
+    @Lab = XYZ2Lab(@XYZ); @XYZ = Lab2XYZ(@Lab); # array (D50)
+    $Lab = XYZ2Lab($XYZ); $XYZ = Lab2XYZ($Lab); # vector, matrix, array structure (D50)
+    @Lab = XYZ2Lab(@XYZ, $wtpt); @XYZ = Lab2XYZ(@Lab, $wtpt); # array
+    $Lab = XYZ2Lab($XYZ, $wtpt); $XYZ = Lab2XYZ($Lab, $wtpt); # vector, matrix, array structure
+
+B<Examples>
+
+    use ICC::Profile;
+
+    $chart = ICC::Support::Chart->new(''~/Desktop/GRACoL2006_Coated1_CGATS.txt'); # make a 'Chart' object
+    $XYZ = $chart->xyz([]); # get all XYZ data
+
+    # illuminant is D50 (default)
+    $Lab = XYZ2Lab($XYZ); # convert XYZ matrix to L*a*b* encoding
+    $XYZ_rt = Lab2XYZ($Lab); # convert back to XYZ encoding
+    $vector = XYZ2Lab($XYZ->[0]); # convert a vector
+    @array = XYZ2Lab(@{$XYZ->[0]}); # convert an array
+
+    # get F11 illuminant white point
+    $color = ICC::Support::Color->new({'illuminant' => 'F11'});
+    $wtpt = $color->iwtpt();
+
+    # illuminant is F11 (see note 1)
+    $Lab = XYZ2Lab($XYZ, $wtpt); # convert XYZ matrix to L*a*b* encoding
+    $XYZ_rt = Lab2XYZ($Lab, $wtpt); # convert back to XYZ encoding
+    $vector = XYZ2Lab($XYZ->[0], $wtpt); # convert a vector
+    @array = XYZ2Lab(@{$XYZ->[0]}, $wtpt); # convert an array
+
+=over
+
+=item 1
+
+These L*a*b* values are computed per CIE 15. Be aware that the PCS for ICC profiles is always D50, and that non-D50 XYZ
+values are transformed to D50 using a CAT (Chromatic Adaptation Transform) before converting to L*a*b*. See Annex E of the
+ICC specification for an explanation. A CAT may be created directly using the ICC::Profile::matf module, or as a hash
+option in ICC::Support::Chart.
+
+=back
+
+=head3 XYZ2Lxyz, Lxyz2XYZ
+
+These functions convert between XYZ and Lxyz encoding.
+
+B<Usage>
+
+    @Lxyz = XYZ2Lxyz(@XYZ); @XYZ = Lxyz2XYZ(@Lxyz); # array (D50)
+    $Lxyz = XYZ2Lxyz($XYZ); $XYZ = Lxyz2XYZ($Lxyz); # vector, matrix, array structure (D50)
+    @Lxyz = XYZ2Lxyz(@XYZ, $wtpt); @XYZ = Lxyz2XYZ(@Lxyz, $wtpt); # array
+    $Lxyz = XYZ2Lxyz($XYZ, $wtpt); $XYZ = Lxyz2XYZ($Lxyz, $wtpt); # vector, matrix, array structure
+
+B<Examples>
+
+    use ICC::Profile;
+
+    $chart = ICC::Support::Chart->new(''~/Desktop/GRACoL2006_Coated1_CGATS.txt'); # make a 'Chart' object
+    $XYZ = $chart->xyz([]); # get all XYZ data
+
+    # illuminant is D50 (default)
+    $Lxyz = XYZ2Lxyz($XYZ); # convert XYZ matrix to Lxyz encoding
+    $XYZ_rt = Lxyz2XYZ($Lxyz); # convert back to XYZ encoding
+    $vector = XYZ2Lxyz($XYZ->[0]); # convert a vector
+    @array = XYZ2Lxyz(@{$XYZ->[0]}); # convert an array
+
+    # get F11 illuminant white point
+    $color = ICC::Support::Color->new({'illuminant' => 'F11'});
+    $wtpt = $color->iwtpt();
+
+    # illuminant is F11 (see note 1)
+    $Lxyz = XYZ2Lxyz($XYZ, $wtpt); # convert XYZ matrix to Lxyz encoding
+    $XYZ_rt = Lxyz2XYZ($Lxyz, $wtpt); # convert back to XYZ encoding
+    $vector = XYZ2Lxyz($XYZ->[0], $wtpt); # convert a vector
+    @array = XYZ2Lxyz(@{$XYZ->[0]}, $wtpt); # convert an array
+
+=over
+
+=item 1
+
+These Lxyz values are computed per CIE 15. Be aware that the PCS for ICC profiles is always D50, and that non-D50 XYZ
+values are transformed to D50 using a CAT (Chromatic Adaptation Transform) before converting to Lxyz. See Annex E of the
+ICC specification for an explanation. A CAT may be created directly using the ICC::Profile::matf module, or as a hash
+option in ICC::Support::Chart.
+
+=back
+
+=head3 XYZ2xyz, xyz2XYZ
+
+These functions convert between XYZ and xyz encoding.
+
+B<Usage>
+
+    @xyz = XYZ2xyz(@XYZ); @XYZ = xyz2XYZ(@xyz); # array (D50)
+    $xyz = XYZ2xyz($XYZ); $XYZ = xyz2XYZ($xyz); # vector, matrix, array structure (D50)
+    @xyz = XYZ2xyz(@XYZ, $wtpt); @XYZ = xyz2XYZ(@xyz, $wtpt); # array
+    $xyz = XYZ2xyz($XYZ, $wtpt); $XYZ = xyz2XYZ($xyz, $wtpt); # vector, matrix, array structure
+
+B<Examples>
+
+    use ICC::Profile;
+
+    $chart = ICC::Support::Chart->new(''~/Desktop/GRACoL2006_Coated1_CGATS.txt'); # make a 'Chart' object
+    $XYZ = $chart->xyz([]); # get all XYZ data
+
+    # illuminant is D50 (default)
+    $xyz = XYZ2xyz($XYZ); # convert XYZ matrix to xyz encoding
+    $XYZ_rt = xyz2XYZ($xyz); # convert back to XYZ encoding
+    $vector = XYZ2xyz($XYZ->[0]); # convert a vector
+    @array = XYZ2xyz(@{$XYZ->[0]}); # convert an array
+
+    # get F11 illuminant white point
+    $color = ICC::Support::Color->new({'illuminant' => 'F11'});
+    $wtpt = $color->iwtpt();
+
+    # illuminant is F11 (see note 1)
+    $xyz = XYZ2xyz($XYZ, $wtpt); # convert XYZ matrix to xyz encoding
+    $XYZ_rt = xyz2XYZ($xyz, $wtpt); # convert back to XYZ encoding
+    $vector = XYZ2xyz($XYZ->[0], $wtpt); # convert a vector
+    @array = XYZ2xyz(@{$XYZ->[0]}, $wtpt); # convert an array
+
+=over
+
+=item 1
+
+These xyz values are computed per CIE 15. Be aware that the PCS for ICC profiles is always D50, and that non-D50 XYZ
+values are transformed to D50 using a CAT (Chromatic Adaptation Transform) before converting to xyz. See Annex E of the
+ICC specification for an explanation. A CAT may be created directly using the ICC::Profile::matf module, or as a hash
+option in ICC::Support::Chart.
+
+=back
+
+=head3 XYZ2xyY, xyY2XYZ
+
+These functions convert between XYZ and xyY encoding. The x and y values are called chromaticity coordinates, and are often
+shown on a chromaticity diagram. See L<https://en.wikipedia.org/wiki/File:CIE1931xy_blank.svg>.
+
+B<Usage>
+
+    @xyY = XYZ2xyY(@XYZ); @XYZ = xyY2XYZ(@xyY); # array
+    $xyY = XYZ2xyY($XYZ); $XYZ = xyY2XYZ($xyY); # vector, matrix, array structure
+
+B<Examples>
+
+    use ICC::Profile;
+
+    $chart = ICC::Support::Chart->new(''~/Desktop/GRACoL2006_Coated1_CGATS.txt'); # make a 'Chart' object
+    $XYZ = $chart->xyz([]); # get all XYZ data
+
+    $xyY = XYZ2xyY($XYZ); # convert XYZ matrix to xyY encoding
+    $XYZ_rt = xyY2XYZ($xyY); # convert back to XYZ encoding
+    $vector = XYZ2xyY($XYZ->[0]); # convert a vector
+    @array = XYZ2xyY(@{$XYZ->[0]}); # convert an array
+
+=head3 x2L, L2x
+
+These functions convert between linear and CIE L* encoding.
+
+B<Usage>
+
+    $L = x2L($x); $x = L2x($L); # CIE L* function
+
+B<Examples>
+
+    use ICC::Profile;
+
+    $chart = ICC::Support::Chart->new(''~/Desktop/GRACoL2006_Coated1_CGATS.txt'); # make a 'Chart' object
+    $xyz = $chart->xyz([], {'encoding' => 9}); # get all xyz data
+
+    $L = x2L($xyz->[99][1]); # compute L* value of sample 99
+    $y = L2x($L); # convert back to y value
+
+=head3 dLdx, dxdL
+
+These functions compute the derivatives of the CIE L* function and its inverse.
+
+B<Usage>
+
+    $dLdx = dLdx($x); $dxdL = dxdL($L); derivative of CIE L* function
+
+B<Examples>
+
+
+=head3 xyz2Lab_jac, Lab2xyz_jac
+
+These functions compute the Jacobian matrix of the C<xyz2Lab> and C<Lab2xyz> functions.
+
+B<Usage>
+
+    $jac = xyz2Lab_jac($xyz); # Jacobian matrix of xyz2Lab function
+    $jac = Lab2xyz_jac($Lab); # Jacobian matrix of Lab2xyz function
+
+B<Examples>
+
+
+=head3 XYZ2W
+
+This function computes the CIE Whiteness value.
+
+B<Usage>
+
+    $W = XYZ2W(@XYZ, $wtpt); # CIE Whiteness
+
+B<Examples>
+
+
+=head3 xyz2dwv
+
+This function computes the density weighted value.
+
+B<Usage>
+
+    $dwv = xyz2dwv($xyz); # density weighted value
+
+B<Examples>
+
+
+=head2 Color difference functions
+
+=head3 dEab
+
+This function computes the CIE ∆E*ab color difference.
+
+B<Usage>
+
+    $dE = dEab(@Lab1, @Lab2); # CIE ∆E*ab color difference
+
+B<Examples>
+
+
+=head3 dE94
+
+This function computes the CIE ∆E94 color difference.
+
+B<Usage>
+
+    $dE = dE94(@Lab1, @Lab2); # CIE ∆E94 color difference
+
+B<Examples>
+
+
+=head3 dE00
+
+This function computes the CIE ∆E00 color difference.
+
+B<Usage>
+
+    $dE = dE00(@Lab1, @Lab2); # CIE ∆E00 color difference
+
+B<Examples>
+
+
+=head3 dE99
+
+This function computes the DIN99 color difference
+
+B<Usage>
+
+    $dE = dE99(@Lab1, @Lab2); # DIN99 color difference
+    $dE = dE99(@Lab1, @Lab2, Ke, Kch); # DIN99 color difference
+
+B<Examples>
+
+
+=head3 dEcmc
+
+This function computes the CMC(l:c) color difference.
+
+B<Usage>
+
+    $dE = dEcmc(@Lab1, @Lab2); # CMC(l:c) color difference
+    $dE = dEcmc(@Lab1, @Lab2, l, c); # CMC(l:c) color difference
+
+B<Examples>
+
+
+=head3 dCh
+
+This function computes the ∆Ch chroma difference, also known as ∆F.
+
+B<Usage>
+
+    $dF = dCh(@Lab1, @Lab2); # ∆Ch chroma difference
+
+B<Examples>
+
+
+=head2 Illuminant functions
+
+=head3 CCT
+
+This function computes the correlated color temperature of an illuminant, and the black body error value.
+
+B<Usage>
+
+    ($cct, $err) = CCT($x, $y); # correlated color temperature
+
+B<Examples>
+
+
+=head3 CCT2
+
+This function computes the correlated color temperature of an illuminant using McCamy's approximation.
+
+B<Usage>
+
+    $cct = CCT2($x, $y); # correlated color temperature using McCamy's approximation
+
+B<Examples>
+
+
+=head3 bbrad
+
+This function computes the black body radiance using Planck's law.
+
+B<Usage>
+
+    $rad = bbrad($nm, $T); # black body radiance using Planck's law
+
+B<Examples>
+
+
+=head3 bbxy
+
+This function computes the chromaticity of black body radiator.
+
+B<Usage>
+
+    ($x, $y) = bbxy($T); # chromaticity of black body radiator
+
+B<Examples>
+
+
+=head3 bbuv
+
+This function computes the CIE UCS 1960 coordinates of black body radiator.
+
+B<Usage>
+
+    ($u, $v) = bbuv($T); CIE UCS 1960 of black body radiator
+
+B<Examples>
+
+
+=head3 XYZ2ucs
+
+This function converts XYZ values to CIE UCS 1960 coordinates.
+
+B<Usage>
+
+    ($u, $v) = XYZ2ucs(@XYZ); # CIE UCS 1960
+
+B<Examples>
+
+
+=head3 xy2ucs
+
+This function converts chromaticity values to CIE UCS 1960 coordinates.
+
+B<Usage>
+
+    ($u, $v) = xy2ucs(@xy); # CIE UCS 1960
+
+B<Examples>
+
+
+=head3 daylight
+
+This function computes the SPD of CIE daylight at a given correlated color temperature.
+
+B<Usage>
+
+    ($range, $spd) = daylight($cct); range and SPD of daylight
+
+B<Examples>
+
+
+=head2 Interpolation functions
+
+=head3 linear
+
+This function interpolates a vector, using linear approximation.
+
+B<Usage>
+
+    $vec_out = linear($vec_in, $range_in, $range_out); # interpolate a vector (linear)
+
+B<Examples>
+
+
+=head3 linear_matrix
+
+This function computes an interpolation matrix, using linear approximation.
+
+B<Usage>
+
+    $matrix = linear_matrix($range_in, $range_out); # make interpolating matrix (linear)
+
+B<Examples>
+
+
+=head3 cspline
+
+This function interpolates a vector, using cubic spline approximation.
+
+B<Usage>
+
+    $vec_out = cspline($vec_in, $range_in, $range_out); # interpolate a vector (natural cubic spline)
+
+B<Examples>
+
+
+=head3 cspline_matrix
+
+This function computes an interpolation matrix, using cubic spline approximation.
+
+B<Usage>
+
+    $matrix = cspline_matrix($range_in, $range_out); # make interpolating matrix (natural cubic spline)
+
+B<Examples>
+
+
+=head3 lagrange
+
+This function interpolates a vector, using Lagrange approximation.
+
+B<Usage>
+
+    $vec_out = lagrange($vec_in, $range_in, $range_out); # interpolate a vector (Lagrange, ASTM E 2022)
+
+B<Examples>
+
+
+=head3 lagrange_matrix
+
+This function computes an interpolation matrix, using Lagrange approximation.
+
+B<Usage>
+
+    $matrix = lagrange_matrix($range_in, $range_out); # make interpolating matrix (Lagrange, ASTM E 2022)
+
+B<Examples>
+
+
+=head2 Vector functions
+
+=head3 dotProduct
+
+This function computes the dot product of two vectors.
+
+B<Usage>
+
+    $scalar = dotProduct($vec1, $vec2); # vector dot product
+
+B<Examples>
+
+
+=head3 crossProduct
+
+This function computes the cross product of two vectors.
+
+B<Usage>
+
+    $vector = crossProduct($vec1, $vec2); # vector cross product
+
+B<Examples>
+
+
+=head2 Utility functions
+
+=head3 flatten
+
+This function flattens an array structure.
+
+B<Usage>
+
+    $vector = flatten($structure); # flatten an array structure
+
+B<Examples>
+
+
+=head3 clip_struct
+
+This function clips all of the values within an array structure.
+
+B<Usage>
+
+    clip_struct($structure); # clip each element of an array structure
+
+B<Examples>
+
+
+=head3 round
+
+This function rounds off a value to the nearest integer.
+
+B<Usage>
+
+    $integer = round($value); # round off value to nearest integer (+/-)
+
+B<Examples>
+
+
+=head3 s15f162v
+
+This function converts a vector from ICC s15Fixed16Number encoding.
+
+B<Usage>
+
+    $vector = s15f162v($s15f16); # convert from s15Fixed16Number vector
+
+B<Examples>
+
+
+=head3 v2s15f16
+
+This function converts a vector to ICC s15Fixed16Number encoding.
+
+B<Usage>
+
+    $s15f16 = v2s15f16($vector); # convert to s15Fixed16Number vector
+
+B<Examples>
+
+
+=head3 makeProfileFolder
+
+This function makes a folder for saving ICC profiles.
+
+B<Usage>
+
+    (profiles_folder_path, directory_segs, customer, job) = makeProfileFolder(file/folder_path); # make folder for profiles
+    (profiles_folder_path, directory_segs, customer, job) = makeProfileFolder(file/folder_path, alias_folder_path);
+
+B<Examples>
+
+
+=head3 getICCPath
+
+This function gets the path to the 'ICC' distribution folder. The optional parameter is appended to the path.
+
+B<Usage>
+
+    $path = getICCPath(); # get path to 'ICC' distribution folder
+    $path = getICCPath(sub_path); # get path to some item within the 'ICC' distribution folder
+
+B<Examples>
+
+    $path = getICCPath(); # get path to 'ICC' folder
+    $path = getICCPath('Data'); # get path to 'ICC/Data' folder
+    $path = getICCPath('Data/ASTM_E308_data.yml'); # get path to 'ICC/Data/ASTM_E308_data.yml' file
+
+
+=head3 filterPath
+
+This function interprets '~' as the user's home path, and removes any '\' characters.
+
+B<Usage>
+
+    filterPath($path);
+
+B<Examples>
+
+    $path = '~/Desktop/test.txt';
+    filterPath($path);
+    print "$path\n";
+
+    $path = 'name\ with\ spaces.txt';
+    filterPath($path);
+    print "$path\n";
+
+=head3 setFile
+
+This function sets Mac OSX creator and file type.
+
+B<Usage>
+
+    setFile(path_to_file, creator, type); # set Mac OSX creator and file type (deprecated by Apple)
+
+B<Examples>
+
+
+=head1 CONSTANTS
+
+=head2 Perl handling of constants
+
+Perl's C<constant> pragma is used to make the following constants. These are actually subroutines, created at compile time.
+Their values cannot be altered, so they are effectively constants. Because they are subroutines, there are no sigils, which
+occasionally leads to ambiguity. This can be resolved by enclosing the constant in parentheses (see example below).
+
+=head3 D50
+
+D50 illuminant XYZ values, as specified by the ICC (based on the CIE 1931 2 degree observer)
+
+Note that the ICC values for D50 ([96.42, 100, 82.49]) are slightly different from the CIE values ([96.42, 100, 82.51]).
+
+B<Examples>
+
+    $XYZ = D50; # vector
+
+    $Z = D50->[2]; # Z value
+
+    @XYZ = @{(D50)}; # array, note the parentheses
+
+    @XYZ = Lab2XYZ(@Lab, D50); # use as white point to change encoding
+
+=head3 d50
+
+D50 illuminant XYZ values, encoded as 32-bit ICC XYZNumber, [0.9624, 1, 0.8249].
+
+=head3 d50P
+
+D50 illuminant XYZ values, encoded as 16-bit ICC XYZ, approximately [0.48211, 0.50001, 0.41246].
+
+=head3 PI
+
+circumference of a unit circle, approximately 3.14159
+
+=head3 radian
+
+degrees in a radian, approximately 57.29578
+
+=head3 ln10
+
+natural logarithm of 10, approximately 2.30258
+
+=head1 SEE ALSO
+
+=head2 ASTM Standards
+
+B<ASTM E 2022> I<Standard Practice for Calculation of Weighting Factors for Tristimulus Integration>
+
+=head2 CIE Standards
+
+B<CIE 15> I<Colorimetry>
+
+=head2 DIN Standards
+
+B<DIN 6176> I<Colorimetric evaluation of colour differences of surface colours according to DIN99 formula>
+
+=head2 ICC Specification
+
+The ICC (International Color Consortium) maintains a web site at L<http://www.color.org>
+The ICC specification and related materials may be downloaded from this web site.
+
+The ICC specification is also published as ISO 15076-1.
+
+=head2 ISO Standards
+
+B<ISO 15076-1> I<Image technology colour management — Architecture, profile format and data structure — Part 1: Based on ICC.1:2010>
+
+=head1 LICENSE
+
+Programs in this distribution, authored by William B. Birkett, are licensed under the GNU General Public License, v3.
+
+See L<http://www.gnu.org/licenses/gpl.html> for license details.
+
+=head1 AUTHOR
+
+William B. Birkett, E<lt>wbirkett@doplganger.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright E<0x00A9> 2004-2018 by William B. Birkett
+
+=cut

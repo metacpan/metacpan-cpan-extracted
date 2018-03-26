@@ -15,18 +15,18 @@ subtest "validate params" => sub {
 };
 
 subtest "builds attributes from build args" => sub {
-    my $cc = WebService::Braintree::CreditCard->new(bin => "123456", last_4 => "7890");
+    my $cc = WebService::Braintree::_::CreditCard->new(bin => "123456", last_4 => "7890");
 
     is $cc->bin, "123456";
     is $cc->last_4, "7890";
 };
 
 subtest "instance methods" => sub {
-    my $cc = WebService::Braintree::CreditCard->new(bin => "123456", last_4 => "7890", default => "0");
+    my $cc = WebService::Braintree::_::CreditCard->new(bin => "123456", last_4 => "7890", default => "0");
     is $cc->masked_number, "123456******7890";
     not_ok $cc->is_default;
 
-    my $default = WebService::Braintree::CreditCard->new(default => 1);
+    my $default = WebService::Braintree::_::CreditCard->new(default => 1);
     ok $default->is_default;
 };
 

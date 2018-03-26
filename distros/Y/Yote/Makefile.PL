@@ -6,8 +6,7 @@ WriteMakefile
   'NAME' => 'Yote',
   'VERSION_FROM' => 'lib/Yote.pm',
   'PREREQ_PM' => {
-                   'Data::RecordStore' => '2',
-                   'JSON' => 0,
+                   'Data::RecordStore' => '3.15',
                    'Module::Build' => '0.4',
                    'Test::More' => 0
                  },
@@ -15,7 +14,7 @@ WriteMakefile
   'EXE_FILES' => [
                    'bin/convert',
                    'bin/convert~',
-                   'bin/yote_exporer'
+                   'bin/yote_explorer'
                  ],
   'PL_FILES' => {}
 )

@@ -10,9 +10,11 @@ alienfile
 dist.ini
 lib/Alien/LibUSB.pm
 t/00-alien.t
+t/00-compile.t
 t/00-load.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/99-postinstall.t
 xt/author/00-compile.t
 xt/author/pod-syntax.t
+xt/release/minimum-version.t

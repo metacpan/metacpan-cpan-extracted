@@ -1,5 +1,7 @@
+# vim: sw=4 ts=4 ft=perl
+
 package WebService::Braintree::Dispute;
-$WebService::Braintree::Dispute::VERSION = '1.1';
+$WebService::Braintree::Dispute::VERSION = '1.2';
 use 5.010_001;
 use strictures 1;
 
@@ -13,20 +15,19 @@ This class represents a dispute.
 
 =cut
 
-use WebService::Braintree::Dispute::Evidence;
 use WebService::Braintree::Dispute::Kind;
 use WebService::Braintree::Dispute::Reason;
 use WebService::Braintree::Dispute::Status;
-use WebService::Braintree::Dispute::TransactionDetails;
 
 use Moose;
-extends 'WebService::Braintree::ResultObject';
+
+with 'WebService::Braintree::Role::Interface';
 
 =head1 CLASS METHODS
 
 =head2 accept
 
-This takes a dispute id and marks it as accepted.
+This takes a dispute_id, marks it as accepted, and returns a L<response|WebService::Braintee::Result> (if found).
 
 =cut
 
@@ -37,7 +38,7 @@ sub accept {
 
 =head2 finalize
 
-This takes a dispute id and marks it as disputed.
+This takes a dispute_id, marks it as finalized, and returns a L<response|WebService::Braintee::Result> (if found).
 
 =cut
 
@@ -48,8 +49,8 @@ sub finalize {
 
 =head2 add_file_evidence
 
-This takes a dispute id and a document_upload id and adds the upload to the
-dispute's evidence.
+This takes a dispute_id and a C<document_upload_id|WebService::Braintree::DocumentUpload>,
+adds the upload to the dispute, and returns a L<response|WebService::Braintee::Result> (if found) with the C<< evidence() >> set.
 
 =cut
 
@@ -60,8 +61,7 @@ sub add_file_evidence {
 
 =head2 add_text_evidence
 
-This takes a dispute id and a comment and adds the comment to the dispute's
-evidence.
+This takes a dispute_id and a comment, adds the comment to the dispute, and returns a L<response|WebService::Braintee::Result> (if found) with the C<< evidence() >> set.
 
 =cut
 
@@ -72,8 +72,8 @@ sub add_text_evidence {
 
 =head2 remove_evidence
 
-This takes a dispute id and an evidence id and removes the evidence from the
-dispute's evidence.
+This takes a dispute_id and an evidence_id, removes the evidence from the dispute, and returns a L<response|WebService::Braintee::Result> (if found).
+
 
 =cut
 
@@ -84,7 +84,7 @@ sub remove_evidence {
 
 =head2 find
 
-This takes a dispute id and returns it.
+This takes a dispute_id and returns a L<response|WebService::Braintee::Result> with the C<< dispute() >> set.
 
 =cut
 
@@ -96,10 +96,13 @@ sub find {
 =head2 search()
 
 This takes a subref which is used to set the search parameters and returns a
-collection of Dispute objects.
+L<collection|WebService::Braintree::ResourceCollection> of the matching
+L<customers|WebService::Braintree::_::Dispute>.
 
 Please see L<Searching|WebService::Braintree/SEARCHING> for more information on
 the subref and how it works.
+
+Please see L<WebService::Braintree::DisputeSearch> for more
 
 =cut
 
@@ -108,56 +111,7 @@ sub search {
     $class->gateway->dispute->search($block);
 }
 
-sub gateway {
-    return WebService::Braintree->configuration->gateway;
-}
-
-=head1 OBJECT METHODS
-
-=cut
-
-sub BUILD {
-    my ($self, $attrs) = @_;
-
-    $self->build_sub_object($attrs,
-        method => 'transaction_details',
-        class  => 'Dispute::TransactionDetails',
-        key    => 'transaction',
-    );
-
-    $self->set_attributes_from_hash($self, $attrs);
-}
-
-=pod
-
-In addition to the methods provided by B<TODO>, this class provides the
-following methods:
-
-=head2 transaction_details()
-
-This returns the transaction details associated with this dispute (if any).
-This will be an object of type
-L<WebService::Braintree::Dispute::TransactionDetails/>.
-
-=cut
-
-has transaction_details => (is => 'rw');
-
 __PACKAGE__->meta->make_immutable;
 
 1;
 __END__
-
-=head1 TODO
-
-=over 4
-
-=item Need to document the keys and values that are returned
-
-=item Need to document the required and optional input parameters
-
-=item Need to document the possible errors/exceptions
-
-=back
-
-=cut

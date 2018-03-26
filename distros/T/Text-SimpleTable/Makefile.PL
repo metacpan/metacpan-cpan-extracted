@@ -22,13 +22,18 @@ WriteMakefile(
     (   $mm < 6.46
         ? ()
         : ( META_MERGE => {
-                requires  => {perl => '5.008001'},
+                dynamic_config => 0,
+                'meta-spec' => {version => 2},
+                no_index => {directory => [qw/t/]},
+                prereqs => {runtime => {requires => {perl => '5.008001'}}},
                 resources => {
-                    license => 'http://dev.perl.org/licenses/',
-                    repository =>
-                      'http://github.com/kraih/text-simpletable/tree/master'
+                    license => ['http://www.opensource.org/licenses/artistic-license-2.0'],
+                    repository => {
+                        type => 'git',
+                        url => 'http://github.com/marcusramberg/text-simpletable.git',
+                        web => 'http://github.com/marcusramberg/text-simpletable',
+                    },
                 },
-                no_index => {directory => [qw/t/]}
             },
             META_ADD => {
                 build_requires     => {},

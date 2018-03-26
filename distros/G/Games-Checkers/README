@@ -1,26 +1,52 @@
 Games::Checkers is a set of Perl classes implementing the Checkers game
-play. Several national rule variants are supported. A basic AI heuristics is
-implemented using the Minimax algorithm. Replay of previously recorded games
-is supported too.
+play. 17 different national rule variants (and any custom mix of rules)
+are supported on any arbitrary board sizes. A basic AI heuristics is
+implemented using the Minimax algorithm. Replay of previously recorded
+games is supported too.
 
 This package is intended to provide complete infrastructure for interactive
-and automatic playing and manipulating of Checkers games. Some features are
-not implemented yet.
+and automatic playing and manipulating of Checkers games.
 
 See doc/rules to read about the Checkers game rules.
+See doc/variants to find the rule differences in all supported variants.
 Alternatively see Games::Checkers man page after installing this package.
 You can run perl scripts in bin/ directory without installing anything.
 
+Currently supported checkers/draughts variants (AI and game replay):
+
+	* russian
+	* russian_give_away
+	* russian_10x8 (spantsiretti)
+	* international (polish)
+	* english
+	* english_give_away
+	* italian
+	* spanish
+	* argentinian
+	* portuguese
+	* czech
+	* german
+	* thai
+	* pool (american_pool)
+	* brazilian
+	* frisian
+	* canadian
+	* sri_lankian
+
 Currently supported board sizes:
 
+	* 4x4, 6x6, 8x10 (just for fun)
 	* 8x8
-	* 10x10 (not yet, but will be soon hopefully)
+	* 10x8
+	* 10x10
+	* 12x12
+	* 14x14, 16x16 (not too practical)
 
-Currently supported variants:
-
-	* Russian Checkers (AI and game replay)
-	* British Checkers (game replay)
-	* Italian Checkers (game replay, set $ENV{ITALIAN_BOARD_NOTATION})
+Note that every variant configures its own board size, but it is made
+possible to play using any variant rules on different board sizes too,
+for example Russian Checkers on 12x12 board. Or even construct own
+rule variants, like: Give-Away International Checkers on the 8x10 board
+without the requirement to capture maximal amount of pieces.
 
 Currently supported game file formats:
 
@@ -39,7 +65,7 @@ In the future one script pcheckers may be installed that will include:
 	* interactive game play of 1 or 2 human players
 
 If SDL perl modules are installed, then the SDL support is automatically
-detected and activated that replaces the default terminal IO. 
+detected and activated that replaces the default terminal IO.
 
 See also files INSTALL and TODO, and directory data/.
 

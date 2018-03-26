@@ -1,0 +1,20 @@
+#!/usr/bin/env perl
+
+use Mojo::Base -strict;
+use Mojo::File 'path';
+
+BEGIN {
+  $ENV{MOJO_HOME} ||= path(__FILE__)->sibling('../')->realpath;
+  my @libs = (
+              path($ENV{MOJO_HOME}, 'lib',  'perl5')->to_string,
+              path($ENV{MOJO_HOME}, 'site', 'lib')->to_string,
+              path($ENV{MOJO_HOME}, 'lib')->to_string
+             );
+  for my $d (@libs) {
+    unshift @INC, $d if -d $d;
+  }
+}
+use Mojolicious::Commands;
+
+# Start command line interface for application
+Mojolicious::Commands->start_app('Slovo');

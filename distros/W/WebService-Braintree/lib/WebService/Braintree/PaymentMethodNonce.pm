@@ -1,23 +1,50 @@
+# vim: sw=4 ts=4 ft=perl
+
 package WebService::Braintree::PaymentMethodNonce;
-$WebService::Braintree::PaymentMethodNonce::VERSION = '1.1';
+$WebService::Braintree::PaymentMethodNonce::VERSION = '1.2';
 use 5.010_001;
 use strictures 1;
 
+=head1 NAME
+
+WebService::Braintree::PaymentMethodNonce
+
+=head1 PURPOSE
+
+This class creates and finds payment method nonces.
+
+=head1 EXPLANATION
+
+TODO
+
+=cut
+
 use Moose;
-extends 'WebService::Braintree::ResultObject';
+
+with 'WebService::Braintree::Role::Interface';
+
+=head1 CLASS METHODS
+
+=head2 create()
+
+This method takes a token and creates a payment method nonce.
+
+=cut
 
 sub create {
     my ($class, $token) = @_;
     $class->gateway->payment_method_nonce->create($token);
 }
 
+=head2 find()
+
+This method takes a token and finds the related payment method nonce (if any).
+
+=cut
+
 sub find {
     my ($class, $token) = @_;
     $class->gateway->payment_method_nonce->find($token);
-}
-
-sub gateway {
-    return WebService::Braintree->configuration->gateway;
 }
 
 __PACKAGE__->meta->make_immutable;

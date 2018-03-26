@@ -60,6 +60,10 @@ xh_h2x_resolve_value(xh_h2x_ctx_t *ctx, SV *value, xh_uint_t *type)
 {
     xh_int_t  nitems;
     GV       *method;
+    SV       *tmpsv, *rv;
+#if PERL_VERSION <= 8
+    MAGIC    *mg;
+#endif
 
     *type = 0;
 
@@ -67,11 +71,20 @@ xh_h2x_resolve_value(xh_h2x_ctx_t *ctx, SV *value, xh_uint_t *type)
         if (++ctx->depth > ctx->opts.max_depth)
             croak("Maximum recursion depth exceeded");
 
+        rv    = value;
         value = SvRV(value);
         *type = 0;
 
         if (SvOBJECT(value)) {
-            if ((method = gv_fetchmethod_autoload(SvSTASH(value), "toString", 0)) != NULL) {
+            if (SvGMAGICAL(value))
+                mg_get(value);
+
+            if (XH_AMAGIC(value) && (tmpsv = XH_AMG_CALL_STRING(rv)) != NULL) {
+                value = tmpsv;
+                SvREFCNT_inc_void(value);
+                xh_stash_push(&ctx->stash, value);
+            }
+            else if ((method = gv_fetchmethod_autoload(SvSTASH(value), "toString", 0)) != NULL) {
                 dSP;
 
                 ENTER; SAVETMPS; PUSHMARK(SP);

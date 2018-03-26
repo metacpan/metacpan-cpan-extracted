@@ -16,9 +16,9 @@ require './t/counts.pl';
     bless $self, $class;
   }
 
-  sub start { shift; &::start } 
-  sub end   { shift; &::end } 
-  sub hdr   { shift; &::hdr } 
+  sub start { shift; &::start }
+  sub end   { shift; &::end }
+  sub hdr   { shift; &::hdr }
   sub row   { shift; &::row }
 }
 

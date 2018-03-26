@@ -1,10 +1,12 @@
 package Pcore::PgSQL::DBH;
 
-use Pcore -class, -result, -const, -sql;
+use Pcore -class, -result, -const;
+use Pcore::Handle::DBI::Const qw[:CONST];
 use Pcore::Handle::pgsql qw[:ALL];
-use Pcore::Util::Scalar qw[weaken looks_like_number is_plain_arrayref is_plain_coderef];
+use Pcore::Util::Scalar qw[weaken looks_like_number is_plain_arrayref is_plain_coderef is_blessed_arrayref];
 use Pcore::Util::UUID qw[uuid_str];
 use Pcore::Util::Digest qw[md5_hex];
+use Pcore::Util::Data qw[from_json];
 use Pcore::AE::Handle;
 
 has handle     => ( is => 'ro', isa => InstanceOf ['Pcore::Handle::pgsql'], required => 1 );
@@ -21,6 +23,7 @@ has tx_status    => ( is => 'ro', isa => Enum [ $TX_STATUS_IDLE, $TX_STATUS_TRAN
 has wbuf         => ( is => 'ro', isa => ArrayRef,                                                     init_arg => undef );    # outgoing messages buffer
 has sth          => ( is => 'ro', isa => HashRef,                                                      init_arg => undef );    # currently executed sth
 has prepared_sth => ( is => 'ro', isa => HashRef,                                                      init_arg => undef );
+has query        => ( is => 'ro', isa => ScalarRef,                                                    init_arg => undef );    # ref to the last query
 
 const our $PROTOCOL_VER => "\x00\x03\x00\x00";                                                                                 # v3
 
@@ -220,7 +223,7 @@ sub _on_error ( $self, $reason, $fatal ) {
         $self->{state} = $STATE_DISCONNECTED;
     }
 
-    warn "DBI: $reason";
+    warn qq[DBI: "$reason"] . ( defined $self->{query} ? qq[, current query: "$self->{query}->$*"] : q[] );
 
     if ( $state == $STATE_BUSY ) {
         $self->{sth}->{error} = $reason;
@@ -427,6 +430,15 @@ sub _ON_DATA_ROW ( $self, $dataref ) {
                     $col = $col eq 'f' ? 0 : 1;
                 }
 
+                # TODO decode ARRAY
+                # elsif ( $type == $SQL_TEXTARRAY ) {
+                # }
+
+                # decode JSON
+                elsif ( $type == $SQL_JSON ) {
+                    $col = from_json $col;
+                }
+
                 # decode text value
                 else {
                     utf8::decode $col;
@@ -565,14 +577,14 @@ sub _execute ( $self, $query, $bind, $cb, %args ) {
     else {
 
         # convert "?" placeholders to postgres "$1" style
-        if ( index( $query, '?' ) != -1 ) {
-            my $i;
+        my $i;
 
-            $query =~ s/[?]/'$' . ++$i/smge;
-        }
+        $query =~ s/[?]/'$' . ++$i/smge;
 
         utf8::encode $query if utf8::is_utf8 $query;
     }
+
+    $self->{query} = \$query;
 
     # simple query mode
     # multiple queries in single statement are allowed
@@ -601,25 +613,33 @@ sub _execute ( $self, $query, $bind, $cb, %args ) {
             my @bind = $bind->@*;
 
             for my $param (@bind) {
-                if ( is_plain_arrayref $param) {
-                    if ( $param->[1] == $SQL_BYTEA ) {
+                if ( is_blessed_arrayref $param) {
+                    if ( $param->[0] == $SQL_BYTEA ) {
                         $param_format_codes .= "\x00\x01";    # binary
 
-                        $param = $param->[0];
-                    }
-                    elsif ( $param->[1] == $SQL_BOOL ) {
-                        $param_format_codes .= "\x00\x00";    # text
-
-                        $param = $param->[0] ? '1' : '0';
+                        $param = $param->[1];
                     }
                     else {
                         $param_format_codes .= "\x00\x00";    # text
 
-                        $param = $param->[0];
+                        if ( $param->[0] == $SQL_BOOL ) {
+                            $param = $param->[1] ? '1' : '0';
+                        }
+                        elsif ( $param->[0] == $SQL_JSON ) {
+                            $param = $self->encode_json( $param->[1] )->$*;
+                        }
+                        else {
+                            $param = $param->[1];
+                        }
                     }
                 }
+                elsif ( is_plain_arrayref $param) {
+                    $param_format_codes .= "\x00\x00";    # text
+
+                    $param = $self->encode_array($param)->$*;
+                }
                 else {
-                    $param_format_codes .= "\x00\x00";        # text
+                    $param_format_codes .= "\x00\x00";    # text
                 }
 
                 if ( defined $param ) {
@@ -967,8 +987,16 @@ sub quote_id ( $self, $id ) {
     return $self->{handle}->quote_id($id);
 }
 
-sub quote ( $self, $var, $type = undef ) {
-    return $self->{handle}->quote( $var, $type );
+sub quote ( $self, $var ) {
+    return $self->{handle}->quote($var);
+}
+
+sub encode_array ( $self, $var ) {
+    return $self->{handle}->encode_array($var);
+}
+
+sub encode_json ( $self, $var ) {
+    return $self->{handle}->encode_json($var);
 }
 
 1;
@@ -978,20 +1006,20 @@ sub quote ( $self, $var, $type = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 178                  | ControlStructures::ProhibitCascadingIfElse - Cascading if-elsif chain                                          |
+## |    3 | 181                  | ControlStructures::ProhibitCascadingIfElse - Cascading if-elsif chain                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 523                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (27)                  |
+## |    3 | 535                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (29)                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 895                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 625, 915             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 25, 148, 356, 514,   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
-## |      | 580, 590, 606, 611,  |                                                                                                                |
-## |      | 616, 622, 631, 638,  |                                                                                                                |
-## |      | 642, 646, 650, 653   |                                                                                                                |
+## |    2 | 28, 151, 359, 526,   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |      | 592, 602, 618, 623,  |                                                                                                                |
+## |      | 637, 642, 651, 658,  |                                                                                                                |
+## |      | 662, 666, 670, 673   |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 732, 895             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 752, 915             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 771                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
+## |    2 | 791                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

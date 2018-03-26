@@ -1,5 +1,24 @@
 Revision history for git-workflow-tools
 
+1.0.5   2018-03-26
+        Updating for release of version 1.0.5
+        Adding YAML to dependencies (Ivan Wills)
+        Adding List::MoreUtils to dependencies (Ivan Wills)
+        Added missing branch-age files to default tests (Ivan Wills)
+        Fixing POD (Ivan Wills)
+        Added missing files to manifest (Ivan Wills)
+        Added ability to show output by branch and updated documentation (Ivan Wills)
+        Added ability to show recent by user (Ivan Wills)
+        Decided that recent could do it all (Ivan Wills)
+        Changing how recent chooses commits (Ivan Wills)
+        Sorted arguments (Ivan Wills)
+        Starting implementation (Ivan Wills)
+        Starting tests (Ivan Wills)
+        Fixing docs from copied files (Ivan Wills)
+        WIP recent-files and recent-users commands (Ivan Wills)
+        Creating helpers for editing commands (Ivan Wills)
+        New command to show the age of git branches (Ivan Wills)
+
 1.0.4   2018-02-26
         Updating for release of version 1.0.4
         Added perl 5.26 to travis (Ivan Wills)

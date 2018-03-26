@@ -6,7 +6,8 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::More: '0'
+  Test::Exception: '0'
+  Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -17,12 +18,14 @@ meta-spec:
   version: '1.4'
 name: WordList
 requires:
+  Exporter: '5.57'
   strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WordList
   homepage: https://metacpan.org/release/WordList
   repository: git://github.com/perlancar/perl-WordList.git
-version: 0.2.1
+version: 0.3.1
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -267,6 +270,10 @@ x_Dist_Zilla:
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
               version: '0.06'
+            -
+              class: Pod::Weaver::Plugin::WordList
+              name: -WordList
+              version: '0.060'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -348,6 +355,10 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'
       version: '0.04'
     -
+      class: Dist::Zilla::Plugin::WordList
+      name: WordList
+      version: '0.053'
+    -
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
@@ -359,9 +370,9 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
-          phase: develop
-          type: recommends
-      name: DevelopRecommends
+          phase: test
+          type: requires
+      name: TestRequires
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode

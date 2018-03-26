@@ -7,7 +7,7 @@ use latest;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 use Types::Standard -types;
 use Types::PDL -types;
@@ -135,7 +135,7 @@ PDL::Algorithm::Center::Types - Type::Tiny types for PDL::Algorithm::Center
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 BUGS
 

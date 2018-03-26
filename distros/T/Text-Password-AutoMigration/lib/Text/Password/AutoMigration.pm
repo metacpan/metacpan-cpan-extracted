@@ -1,6 +1,7 @@
 package Text::Password::AutoMigration;
-our $VERSION = "0.13";
+our $VERSION = "0.15";
 
+use Carp;
 use Moose;
 extends 'Text::Password::SHA';
 
@@ -103,8 +104,6 @@ New hash length is at least 98. So you have to change your DB like below:
 override 'verify' => sub {
     my $self = shift;
     my ( $input, $data ) = @_;
-     die __PACKAGE__. " doesn't allow any Wide Characters or white spaces\n"
-    if $input =~ /[^!-~]/ or $input =~ /\s/;
 
     if ( super() ){
         return $self->encrypt($input) if $self->migrate();

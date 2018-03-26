@@ -2,15 +2,6 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
-BEGIN { push @INC, "." }
-use inc::ExtUtils::MY_Metafile qw(my_metafile);
-
-my_metafile {
-  no_index => {
-    directory => [ qw(inc t), ],
-  },
-  license  => 'perl',
-};
 
 WriteMakefile(
     NAME                => 'String::CamelCase',
@@ -18,6 +9,7 @@ WriteMakefile(
     VERSION_FROM        => 'lib/String/CamelCase.pm',
     ABSTRACT_FROM       => 'lib/String/CamelCase.pm',
     PL_FILES            => {},
+    LICENSE             => 'perl_5',
     PREREQ_PM => {
         'Test::More' => 0,
     },

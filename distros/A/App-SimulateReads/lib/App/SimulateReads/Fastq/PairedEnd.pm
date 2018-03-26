@@ -6,16 +6,24 @@ use App::SimulateReads::Read::PairedEnd;
 
 extends 'App::SimulateReads::Fastq';
 
-our $VERSION = '0.10'; # VERSION
+with 'App::SimulateReads::Role::RunTimeTemplate';
+
+our $VERSION = '0.13'; # VERSION
+
+has 'template_id' => (
+	is         => 'ro',
+	isa        => 'Str',
+	required   => 1
+);
 
 has 'fragment_mean' => (
-	is         => 'rw',
+	is         => 'ro',
 	isa        => 'My:IntGt0',
 	required   => 1
 );
 
 has 'fragment_stdd' => (
-	is         => 'rw',
+	is         => 'ro',
 	isa        => 'My:IntGe0',
 	required   => 1
 );
@@ -34,6 +42,37 @@ has '_read' => (
 	handles    => [qw{ gen_read }]
 );
 
+has '_gen_header' => (
+	is         => 'ro',
+	isa        => 'CodeRef',
+	builder    => '_build_gen_header',
+	lazy_build => 1
+);
+
+has '_info1' => (
+	traits     => ['Hash'],
+	is         => 'ro',
+	isa        => 'HashRef[Str]',
+	builder    => '_build_info',
+	lazy_build => 1,
+	handles    => {
+		set_info1 => 'set',
+		get_info1 => 'get'
+	}
+);
+
+has '_info2' => (
+	traits     => ['Hash'],
+	is         => 'ro',
+	isa        => 'HashRef[Str]',
+	builder    => '_build_info',
+	lazy_build => 1,
+	handles    => {
+		set_info2 => 'set',
+		get_info2 => 'get'
+	}
+);
+
 sub BUILD {
 	my $self = shift;
 	## Just to ensure that the lazy attributes are built before &new returns
@@ -50,22 +89,98 @@ sub _build_read {
 	);
 }
 
+sub _build_gen_header {
+	my $self = shift;
+	my %sym_table = (
+		'%q' => '$info->{quality_profile}',
+		'%r' => '$info->{read_size}',
+		'%e' => '$info->{sequencing_error}',
+		'%m' => '$info->{fragment_mean}',
+		'%d' => '$info->{fragment_stdd}',
+		'%f' => '$info->{fragment_size}',
+		'%S' => '$info->{fragment_start}',
+		'%E' => '$info->{fragment_end}',
+		'%c' => '$info->{seq_id}',
+		'%t' => '$info->{start}',
+		'%n' => '$info->{end}',
+		'%T' => '$info->{mate_start}',
+		'%N' => '$info->{mate_end}',
+		'%D' => '$info->{tlen}',
+		'%i' => '$info->{instrument}',
+		'%I' => '$info->{id}',
+		'%R' => '$info->{read}',
+		'%U' => '$info->{num}',
+		'%s' => '$info->{strand}'
+	);
+
+#	return  $self->compile_template('%i.%U %U simulation_read length=%r position=%c:%t-%n distance=%D', 'info', \%sym_table);
+	return  $self->compile_template($self->template_id, 'info', \%sym_table);
+}
+
+sub _build_info {
+	my $self = shift;
+
+	my %info = (
+		instrument       => sprintf("SR%d", getppid),
+		quality_profile  => $self->quality_profile,
+		read_size        => $self->read_size,
+		sequencing_error => $self->sequencing_error,
+		fragment_mean    => $self->fragment_mean,
+		fragment_stdd    => $self->fragment_stdd
+	);
+
+	return \%info;
+}
+
 sub sprint_fastq {
-	my ($self, $id, $seq_name, $seq_ref, $seq_size, $is_leader) = @_;
+	my ($self, $id, $num, $seq_id, $seq_ref, $seq_size, $is_leader) = @_;
 
 	my ($read1_ref, $read2_ref, $fragment_pos, $fragment_size) = $self->gen_read($seq_ref, $seq_size, $is_leader);
 
-	my ($seq_pos1, $seq_pos2) = (
-		"$seq_name:" . ($fragment_pos + 1) . "-" . ($fragment_pos + $self->read_size),
-		"$seq_name:" . ($fragment_pos + $fragment_size) . "-" . ($fragment_pos + $fragment_size - $self->read_size + 1)
-	);
+	my ($fragment_start, $fragment_end) = ($fragment_pos + 1, $fragment_pos + $fragment_size);
+
+	my ($start1, $end1) = ($fragment_start, $fragment_start + $self->read_size - 1);
+	my ($start2, $end2) = ($fragment_end, $fragment_end - $self->read_size + 1);
 
 	unless ($is_leader) {
-		($seq_pos1, $seq_pos2) = ($seq_pos2, $seq_pos1);
+		($start1, $end1, $start2, $end2) = ($start2, $end2, $start1, $end1);
 	}
 
-	my $header1 = "$id simulation_read length=" . $self->read_size . " position=$seq_pos1";
-	my $header2 = "$id simulation_read length=" . $self->read_size . " position=$seq_pos2";
+	$self->set_info1(
+		'id'               => $id,
+		'num'              => $num,
+		'fragment_size'    => $fragment_size,
+		'fragment_start'   => $fragment_start,
+		'fragment_end'     => $fragment_end,
+		'seq_id'           => $seq_id,
+		'start'            => $start1,
+		'end'              => $end1,
+		'mate_start'       => $start2,
+		'mate_end'         => $end2,
+		'tlen'             => $end2 - $end1,
+		'read'             => 1,
+		'strand'           => $is_leader ? 'P' : 'M'
+	);
+
+	$self->set_info2(
+		'id'               => $id,
+		'num'              => $num,
+		'fragment_size'    => $fragment_size,
+		'fragment_start'   => $fragment_start,
+		'fragment_end'     => $fragment_end,
+		'seq_id'           => $seq_id,
+		'start'            => $start2,
+		'end'              => $end2,
+		'mate_start'       => $start1,
+		'mate_end'         => $end1,
+		'tlen'             => $end1 - $end2,
+		'read'             => 2,
+		'strand'           => $is_leader ? 'P' : 'M'
+	);
+
+	my $gen_header = $self->_gen_header;
+	my $header1 = $gen_header->($self->_info1);
+	my $header2 = $gen_header->($self->_info2);
 
 	my $fastq1_ref = $self->fastq_template(\$header1, $read1_ref);
 	my $fastq2_ref = $self->fastq_template(\$header2, $read2_ref);
@@ -85,7 +200,7 @@ App::SimulateReads::Fastq::PairedEnd - App::SimulateReads::Fastq subclass for si
 
 =head1 VERSION
 
-version 0.10
+version 0.13
 
 =head1 AUTHOR
 
@@ -93,7 +208,7 @@ Thiago L. A. Miller <tmiller@mochsl.org.br>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Teaching and Research Institute from Sírio-Libanês Hospital.
+This software is Copyright (c) 2018 by Teaching and Research Institute from Sírio-Libanês Hospital.
 
 This is free software, licensed under:
 

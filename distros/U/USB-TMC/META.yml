@@ -3,7 +3,6 @@ abstract: 'Perl interface to USB Test & Measurement (USBTMC) backend.'
 author:
   - 'Simon Reinhardt <simon.reinhardt@stud.uni-regensburg.de>'
 build_requires:
-  Module::Load: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -29,5 +28,5 @@ resources:
   bugtracker: https://github.com/lab-measurement/USB-TMC/issues
   homepage: http://www.labmeasurement.de/
   repository: https://github.com/lab-measurement/USB-TMC.git
-version: '0.006'
+version: '0.007'
 x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -45,7 +45,7 @@ use Test::RRA qw(skip_unless_automated);
 # skip for this check.
 ## no critic (RegularExpressions::ProhibitFixedStringMatches)
 my @IGNORE = (
-    qr{ \A Build \z }xms,                   # Generated file from Build.PL
+    qr{ \A Build ( [.] .* )? \z }ixms,      # Generated file from Build.PL
     qr{ \A LICENSE \z }xms,                 # Generated file, no license itself
     qr{ \A (Changes|NEWS|TODO) \z }xms,     # Package license should be fine
     qr{ \A MANIFEST ( [.] .* )? \z }xms,    # Package license should be fine
