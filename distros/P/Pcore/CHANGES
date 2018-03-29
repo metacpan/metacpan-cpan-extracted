@@ -1,3 +1,9 @@
+v0.58.4 2018-03-28T01:56:34Z
+ - dist build pause, docker remove --keep option added
+ - Pcore UUID interface updated
+ - POD
+ - app local API without auth
+
 v0.58.3 2018-03-25T08:14:37Z
  - SQL_ARRAY removed
 

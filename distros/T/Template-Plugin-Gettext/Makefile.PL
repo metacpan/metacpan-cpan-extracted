@@ -36,11 +36,12 @@ my %WriteMakefileArgs = (
     "strict" => 0
   },
   "TEST_REQUIRES" => {
+    "File::Spec" => 0,
     "Locale::XGettext::Util::Keyword" => 0,
     "Test::More" => 0,
     "vars" => 0
   },
-  "VERSION" => "0.4",
+  "VERSION" => "0.5",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,6 +50,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Cwd" => 0,
+  "File::Spec" => 0,
   "Getopt::Long" => 0,
   "Locale::Messages" => 0,
   "Locale::TextDomain" => "1.20",

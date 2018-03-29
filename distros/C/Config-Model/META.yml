@@ -4,6 +4,7 @@ author:
   - 'Dominique Dumont'
 build_requires:
   Config::Model::Tester: '2.062'
+  File::Copy: '0'
   Module::Build: '0.34'
   Test::Differences: '0'
   Test::Exception: '0'
@@ -35,7 +36,6 @@ requires:
   Encode: '0'
   English: '0'
   Fcntl: '0'
-  File::Copy: '0'
   File::HomeDir: '0'
   File::Path: '0'
   Hash::Merge: '0.12'
@@ -67,5 +67,5 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model.git
-version: '2.117'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '2.118'
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -1,5 +1,8 @@
 Revision history for DBIx::JSON
 
+0.05  Thu Mar  22 11:30:00JST 2018
+        - Minor updates
+
 0.04  Wed Mar  21 17:00:00JST 2018
         - Fixed a package issue (RT Bug 124841)
 

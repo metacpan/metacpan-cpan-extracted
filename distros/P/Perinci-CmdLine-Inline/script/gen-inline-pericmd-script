@@ -1,11 +1,11 @@
 #!perl
 
-# Note: This script is a CLI  for Riap function /Perinci/CmdLine/Inline/gen_inline_pericmd_script
-# and generated automatically using Perinci::CmdLine::Gen version 0.482
+# Note: This script is a CLI for Riap function /Perinci/CmdLine/Inline/gen_inline_pericmd_script
+# and generated automatically using Perinci::CmdLine::Gen version 0.485
 
-our $DATE = '2017-08-16'; # DATE
+our $DATE = '2018-03-28'; # DATE
 our $DIST = 'Perinci-CmdLine-Inline'; # DIST
-our $VERSION = '0.541'; # VERSION
+our $VERSION = '0.542'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,11 +14,13 @@ use Log::ger;
 
 use Perinci::CmdLine::Lite;
 
-Perinci::CmdLine::Lite->new(
+my $cmdline = Perinci::CmdLine::Lite->new(
     url => "/Perinci/CmdLine/Inline/gen_inline_pericmd_script",
     program_name => "gen-inline-pericmd-script",
     log => 1,
-)->run;
+);
+
+$cmdline->run;
 
 # ABSTRACT: Generate inline Perinci::CmdLine CLI script
 # PODNAME: gen-inline-pericmd-script
@@ -35,7 +37,7 @@ gen-inline-pericmd-script - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.541 of gen-inline-pericmd-script (from Perl distribution Perinci-CmdLine-Inline), released on 2017-08-16.
+This document describes version 0.542 of gen-inline-pericmd-script (from Perl distribution Perinci-CmdLine-Inline), released on 2018-03-28.
 
 =head1 SYNOPSIS
 
@@ -652,7 +654,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

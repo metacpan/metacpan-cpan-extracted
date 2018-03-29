@@ -1,3 +1,19 @@
+0.245   2018-03-27 (PERLANCAR)
+
+	- [ux] Redisplay progress bar after printing log message.
+
+
+0.244   2018-03-26 (PERLANCAR)
+
+        - Add option: freq.
+
+        - [Bugfix] Make sure we patch logger (and avoid clobbered output when
+          mixing output with logger) by doing it in update(), not in constructor
+          because by that time logger might not be setup yet.
+
+        - [optimize] Calculate color in template once, not in every update().
+
+
 0.243   2018-03-21 (PERLANCAR)
 
 	- [Bugfix] Check -t against the actual handle used, not hardcoded

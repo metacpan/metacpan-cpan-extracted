@@ -47,6 +47,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-pgsql/overview"
       }
    },
-   "version" : "v0.14.11",
+   "version" : "v0.14.12",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

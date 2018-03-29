@@ -1,5 +1,5 @@
 package Statocles::Page::File;
-our $VERSION = '0.089';
+our $VERSION = '0.091';
 # ABSTRACT: A page wrapping a file (handle)
 
 use Statocles::Base 'Class';
@@ -82,7 +82,7 @@ Statocles::Page::File - A page wrapping a file (handle)
 
 =head1 VERSION
 
-version 0.089
+version 0.091
 
 =head1 SYNOPSIS
 

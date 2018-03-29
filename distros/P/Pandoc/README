@@ -234,6 +234,9 @@ SEE ALSO
     the Pandoc GitHub Wiki for a list of wrappers in other programming
     languages.
 
+    Use Pandoc::Release to get information about and download pandoc
+    releases, (for instance to test against multiple pandoc versions).
+
     Other Pandoc related but outdated modules at CPAN include
     Orze::Sources::Pandoc and App::PDoc.
 

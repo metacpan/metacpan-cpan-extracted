@@ -1,5 +1,8 @@
 Revision history for Business-cXML
 
+v0.6.7  2018-03-27
+        Enhancement: built-in logging removes line-breaking whitespace from XML
+
 v0.6.6  2018-02-15
         New: debug and trace logging levels
 		  New: POSR extrinsic "UserId"

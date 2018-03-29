@@ -23,7 +23,8 @@
          "requires" : {
             "Carp" : "0",
             "Data::Dump" : "0",
-            "Data::Table::Text" : "20180316",
+            "Data::NFA" : "20180329",
+            "Data::Table::Text" : "20180328",
             "Test2::API" : "0",
             "Test::More" : "0"
          }
@@ -32,7 +33,7 @@
    "provides" : {
       "Data::DFA" : {
          "file" : "lib/Data/DFA.pm",
-         "version" : "20180328"
+         "version" : "20180329"
       },
       "Data::DFA::Parser" : {
          "file" : "lib/Data/DFA.pm"
@@ -44,5 +45,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20180328"
+   "version" : "20180329"
 }

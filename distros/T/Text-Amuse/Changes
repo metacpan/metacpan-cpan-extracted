@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse
 
+1.00 2018-02-26
+
+ - Revert previous change for multiparagraph footnotes (and add a
+   protect for good measure).
+
 0.99 2018-02-23
 
  - Use \par instead of \endgraf in multiparagraph footnotes

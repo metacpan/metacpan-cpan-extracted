@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Header::Comment;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180314'; # VERSION
+our $VERSION = '1.20180328'; # VERSION
 use Scalar::Util qw{ weaken };
 use Carp;
 
@@ -68,10 +68,10 @@ sub set_value {
     return $self;
 }
 
-sub as_string {
-    my ( $self ) = @_;
-    my $string = '(' . $self->value() . ')';
-    return $string;
+sub build_string {
+    my ( $self, $header ) = @_;
+    $header->comment( '(' . $self->value() . ')' );
+    return;
 }
 
 1;
@@ -88,7 +88,7 @@ Mail::AuthenticationResults::Header::Comment - Class modelling Comment parts of 
 
 =head1 VERSION
 
-version 1.20180314
+version 1.20180328
 
 =head1 DESCRIPTION
 

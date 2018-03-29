@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 
 package Devel::Events::Handler::Log::Memory;
+# ABSTRACT: An optional base role for event generators.
+our $VERSION = '0.09';
 use Moose;
 
 with qw/Devel::Events::Handler/;
@@ -61,9 +63,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Devel::Events::Handler::Log::Memory - An optional base role for event generators.
+
+=head1 VERSION
+
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -171,6 +179,20 @@ Add an option to always hash all the event data for convenience.
 
 Make C<grep> and C<limit> into exportable functions, too.
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-Events>
+(or L<bug-Devel-Events@rt.cpan.org|mailto:bug-Devel-Events@rt.cpan.org>).
+
+=head1 AUTHOR
+
+יובל קוג'מן (Yuval Kogman) <nothingmuch@woobling.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2007 by יובל קוג'מן (Yuval Kogman).
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =cut
-
-

@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use Test::Most tests => 5;
 use Test::NoWarnings;
+use lib 't/lib';
+use MyLogger;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
@@ -27,39 +29,4 @@ JSON: {
 	my $i = new_ok('CGI::Info' => [ logger => MyLogger->new() ]);
 	ok(defined($i->params(allow => $allowed)));
 	ok($i->first() eq 'Nigel');
-}
-
-package MyLogger;
-
-sub new {
-	my ($proto, %args) = @_;
-
-	my $class = ref($proto) || $proto;
-
-	return bless { }, $class;
-}
-
-sub warn {
-	my $self = shift;
-	my $message = shift;
-
-	::diag($message);
-}
-
-sub trace {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
-	}
-}
-
-sub debug {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
-	}
 }

@@ -1,5 +1,8 @@
 Revision history for Perl extension Locale::Utils::Autotranslator.
 
+1.008  Mon Mar 26 17:02:48 2018
+- fixed warning i case of undef from API
+
 1.007  Sun Jul 16 20:48:04 2017
 - remove Module::Build from makefile dependencies (2nd try)
 - solved rights of tar directory (2nd try)

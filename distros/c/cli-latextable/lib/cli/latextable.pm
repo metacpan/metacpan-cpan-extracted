@@ -9,16 +9,16 @@ use warnings;
 cli::latextable 
   Command to produce LaTeX table 
   from TSV format data and also
-  from EXCEL tables by copy-paste.
+  from EXCEL tables or SQL outputs easily by copy-paste.
 
 
 =head1 VERSION
 
-Version 0.112
+Version 0.113
 
 =cut
 
-our $VERSION = '0.112';
+our $VERSION = '0.113';
 
 
 =head1 SYNOPSIS

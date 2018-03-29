@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# ICC::Profile::clro test module / 2014-05-26
+# ICC::Profile::clro test module / 2018-03-27
 #
 # Copyright © 2004-2018 by William B. Birkett
 
@@ -47,6 +47,9 @@ $temp = File::Spec->catfile('t', 'data', 'temp.dat');
 
 # open file for write-read access
 open($fh, "+>$temp");
+
+# set binary mode
+binmode($fh);
 
 # make tag table entry
 $ttab = ['clro', 100, 0, 0];

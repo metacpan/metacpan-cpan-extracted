@@ -1,3 +1,8 @@
+0.041   2018-03-26 (PERLANCAR)
+
+	- Update to Progress::Any 0.214.
+
+
 0.040   2018-03-21 (PERLANCAR)
 
         - [Incompatible change] By default send output to STDERR instead of

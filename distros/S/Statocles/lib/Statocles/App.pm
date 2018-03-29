@@ -1,5 +1,5 @@
 package Statocles::App;
-our $VERSION = '0.089';
+our $VERSION = '0.091';
 # ABSTRACT: Base role for Statocles applications
 
 use Statocles::Base 'Role', 'Emitter';
@@ -208,7 +208,7 @@ Statocles::App - Base role for Statocles applications
 
 =head1 VERSION
 
-version 0.089
+version 0.091
 
 =head1 SYNOPSIS
 

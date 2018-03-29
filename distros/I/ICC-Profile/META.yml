@@ -43,7 +43,7 @@ provides:
     version: '2.11'
   ICC::Profile::cvst:
     file: lib/ICC/Profile/cvst.pm
-    version: '0.3'
+    version: '0.31'
   ICC::Profile::data:
     file: lib/ICC/Profile/data.pm
     version: '0.12'
@@ -109,7 +109,7 @@ provides:
     version: '0.53'
   ICC::Support::Chart:
     file: lib/ICC/Support/Chart.pm
-    version: '1.69'
+    version: '1.7'
   ICC::Support::Color:
     file: lib/ICC/Support/Color.pm
     version: '0.22'
@@ -175,5 +175,5 @@ requires:
   XSLoader: '0'
   YAML::Tiny: '0'
   perl: v5.10.0
-version: '0.603'
+version: '0.604'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

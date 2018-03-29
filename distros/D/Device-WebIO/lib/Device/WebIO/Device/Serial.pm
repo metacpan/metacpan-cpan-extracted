@@ -1,5 +1,5 @@
 package Device::WebIO::Device::Serial;
-$Device::WebIO::Device::Serial::VERSION = '0.010';
+$Device::WebIO::Device::Serial::VERSION = '0.020';
 use v5.12;
 use Moo;
 use namespace::clean;

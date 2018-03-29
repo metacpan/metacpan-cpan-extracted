@@ -1,5 +1,9 @@
 Revision history for perl module Device::WebIO
 
+0.020 2018-03-26
+
+- Add AnyEvent-based input interrupt handling
+
 0.010 2015-03-22
 
 - Fix adc_max_int() being required for ADC classes when it doesn't need to be

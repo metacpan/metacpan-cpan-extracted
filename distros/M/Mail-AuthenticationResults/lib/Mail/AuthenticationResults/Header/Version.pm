@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Header::Version;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180314'; # VERSION
+our $VERSION = '1.20180328'; # VERSION
 use Scalar::Util qw{ weaken };
 use Carp;
 
@@ -13,22 +13,21 @@ use base 'Mail::AuthenticationResults::Header::Base';
 
 sub _HAS_VALUE{ return 1; }
 
-sub as_string {
-    my ( $self ) = @_;
+sub build_string {
+    my ( $self, $header ) = @_;
 
     if ( ! $self->value() ) {
-        return q{};
+        return;
     }
-
-    my $string = q{};
 
     if ( ref $self->parent() ne 'Mail::AuthenticationResults::Header::AuthServID' ) {
-        $string = '/ ';
+        $header->separator( '/' );
+        $header->space( ' ' );
     }
 
-    $string .= $self->value();
+    $header->string( $self->value() );
 
-    return $string;
+    return;
 }
 
 sub safe_set_value {
@@ -68,7 +67,7 @@ Mail::AuthenticationResults::Header::Version - Class modelling the AuthServID pa
 
 =head1 VERSION
 
-version 1.20180314
+version 1.20180328
 
 =head1 DESCRIPTION
 

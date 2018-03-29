@@ -2,6 +2,7 @@ use strict;
 use warnings FATAL => 'all';
 use utf8;
 
+use lib '.';
 use t::Util;
 use Scope::UndefSafe qw/apply/;
 

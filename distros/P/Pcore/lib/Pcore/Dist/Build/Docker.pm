@@ -503,20 +503,61 @@ sub create_tag ( $self, $tag_name, $source_name, $source_type, $dockerfile_locat
     return $res;
 }
 
-sub remove_tag ( $self, $tags ) {
-    my $results;
+sub remove_tag ( $self, $keep, $tags ) {
+    my $remove = sub ($tags) {
+        my $results;
 
-    for my $tag ( is_plain_arrayref $tags ? $tags->@* : $tags ) {
-        print qq[Removing tag "$tag" ... ];
+        for my $tag ( is_plain_arrayref $tags ? $tags->@* : $tags ) {
+            print qq[Removing tag "$tag" ... ];
 
-        my $res = $self->dockerhub_api->unlink_tag( $self->dist->docker->{repo_id}, $tag );
+            my $res = $self->dockerhub_api->unlink_tag( $self->dist->docker->{repo_id}, $tag );
 
-        $results->{$tag} = $res;
+            $results->{$tag} = $res;
 
-        say $res;
+            say $res;
+        }
+
+        return $results;
+    };
+
+    if ( !defined $tags ) {
+        my $cv = AE::cv;
+
+        print q[Get docker tags ... ];
+
+        $self->dockerhub_api->get_tags(
+            $self->dist->docker->{repo_id},
+            sub ($res) {
+                say $res;
+
+                if ($res) {
+                    my @vers;
+
+                    for my $tag ( values $res->{data}->%* ) {
+                        push @vers, $tag->{name} if $tag->{name} =~ /v\d+[.]\d+[.]\d+/sm;
+                    }
+
+                    $tags = [ map {"$_"} reverse sort map { version->new($_) } @vers ];
+
+                    # keep last releases
+                    splice $tags->@*, 0, $keep, ();
+
+                    $cv->();
+                }
+                else {
+                    $tags = [];
+
+                    $cv->();
+                }
+
+                return;
+            }
+        );
+
+        $cv->recv;
     }
 
-    return $results;
+    return $remove->($tags);
 }
 
 sub trigger_build ( $self, $tag ) {

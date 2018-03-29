@@ -1,14 +1,14 @@
+bin/info.pl
+bin/testjson.pl
 Changes
 ignore.txt
+lib/CGI/Info.pm
 LICENCE
 Makefile.PL
 MANIFEST
 META.yml			Module meta-data (added by MakeMaker)
 README
 README.md
-bin/info.pl
-bin/testjson.pl
-lib/CGI/Info.pm
 t/00-load.t
 t/10-new.t
 t/allow.t
@@ -30,6 +30,7 @@ t/is_search.t
 t/is_tablet.t
 t/json.t
 t/kwalitee.t
+t/lib/MyLogger.pm
 t/manifest.t
 t/metrics.t
 t/namespaces.t

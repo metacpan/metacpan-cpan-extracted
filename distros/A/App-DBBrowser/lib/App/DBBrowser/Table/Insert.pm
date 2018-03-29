@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.008';
+our $VERSION = '2.009';
 
 use Cwd                   qw( realpath );
 use Encode                qw( encode decode );
@@ -49,6 +49,16 @@ sub __insert_into_stmt_cols {
     my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $sql->{insert_into_cols} = [];
     my @cols = ( @{$sql->{cols}} );
+        if ( $sf->{d}{driver} eq 'SQLite' ) {
+        my ( $row ) = $sf->{d}{dbh}->selectrow_array( "SELECT sql FROM sqlite_master WHERE name = ?", {}, $sf->{d}{table} );
+        my $qt_col   = $sf->{d}{dbh}->quote_identifier( $sf->{d}{cols}[0] );
+        my $qt_table = $sf->{d}{dbh}->quote_identifier( $sf->{d}{table} );
+        if ( $row =~ /^\s*CREATE\s+TABLE\s+(?:\Q$sf->{d}{table}\E|\Q$qt_table\E)\s+\(
+                                \s*(?:\Q$sf->{d}{cols}[0]\E|\Q$qt_col\E)\s+INTEGER\s+PRIMARY\s+KEY\s*,/ix ) {
+            shift @cols;
+        }
+    }
+    my $bu_cols = [ @cols ];
 
     COL_NAMES: while ( 1 ) {
         my @pre = ( undef, $sf->{i}{ok} );
@@ -65,6 +75,20 @@ sub __insert_into_stmt_cols {
             @cols = ( @{$sql->{cols}} );
             next COL_NAMES;
         }
+        my $confirmed;
+        if ( $idx[0] == first_index { $sf->{i}{ok} eq $_ } @pre ) {
+            $confirmed = 1;
+            shift @idx;
+        }
+        for my $col ( map { $choices->[$_] } @idx ) {
+            push @{$sql->{insert_into_cols}}, $col;
+        }
+        if ( $confirmed ) {
+            if ( ! @{$sql->{insert_into_cols}} ) {
+                $sql->{insert_into_cols} = $bu_cols;
+            }
+            return 1;
+        }
         my $c = 0;
         for my $i ( @idx ) {
             last if ! @cols;
@@ -72,22 +96,7 @@ sub __insert_into_stmt_cols {
             splice( @cols, $ni, 1 );
             ++$c;
         }
-        my @chosen = map { $choices->[$_] } @idx;
-        if ( $chosen[0] eq $sf->{i}{ok} ) {
-            shift @chosen;
-            for my $col ( @chosen ) {
-                push @{$sql->{insert_into_cols}}, $col;
-            }
-            if ( ! @{$sql->{insert_into_cols}} ) {
-                @{$sql->{insert_into_cols}} = @{$sql->{cols}};
-            }
-            last COL_NAMES;
-        }
-        for my $col ( @chosen ) {
-            push @{$sql->{insert_into_cols}}, $col;
-        }
     }
-    return 1;
 }
 
 
@@ -238,7 +247,7 @@ sub __file_name {
         }
         if ( $file eq $add_file ) {
             my $prompt = sprintf "%s", $sf->__parse_setting( 'file' );
-            my $dir = $sf->{tmp_files_dir} || $sf->{i}{home_dir};
+            my $dir = $sf->{i}{tmp_files_dir} || $sf->{i}{home_dir};
             # Choose_a_file
             $file = choose_a_file( { dir => $dir, mouse => $sf->{o}{table}{mouse} } );
             if ( ! defined $file || ! length $file ) {
@@ -257,7 +266,7 @@ sub __file_name {
                 }
                 close $fh_out;
             }
-            $sf->{tmp_files_dir} = dirname $file;
+            $sf->{i}{tmp_files_dir} = dirname $file;
             return $file;
         }
         elsif ( $file eq $del_file ) {
@@ -298,8 +307,8 @@ sub __parse_setting {
     elsif ( $i == 1 ) {
         $sep = $sf->{o}{split}{i_f_s};
     }
-    my $str = "(Tool: $parse_mode";
-    $str .= ", sep: $sep" if defined $sep;
+    my $str = "($parse_mode";
+    $str .= " - sep[$sep]" if defined $sep;
     $str .= ")";
     return $str;
 }
@@ -307,7 +316,8 @@ sub __parse_setting {
 
 sub from_copy_and_paste {
     my ( $sf, $sql, $stmt_typeS ) = @_;
-    print $sf->{i}{clear_screen};
+    my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    $ax->print_sql( $sql, $stmt_typeS );
     my $prompt = sprintf "Mulit row  %s:\n", $sf->__parse_setting( 'copy_and_paste' );
     print $prompt;
     my $file = $sf->{tmp_copy_paste};
@@ -328,7 +338,6 @@ sub from_copy_and_paste {
         die "Error __parse_file!" if ! $ok;
         1 }
     ) {
-        my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
         $ax->print_error_message( $@, join ', ', @$stmt_typeS, 'copy & paste' );
         unlink $file or warn $!;
         return;
@@ -427,7 +436,6 @@ sub __parse_file {
         my $tmp = [];
         local $/;
         seek $fh, 0, 0;
-        #push @$tmp, map { [ split /$sf->{o}{split}{i_f_s}/ ] } split /$sf->{o}{split}{i_r_s}/, <$fh>;
         my $lead  = $sf->{o}{split}{trim_leading};
         my $trail = $sf->{o}{split}{trim_trailing};
         for my $row ( split /$sf->{o}{split}{i_r_s}/, <$fh> ) {

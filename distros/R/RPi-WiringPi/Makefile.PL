@@ -46,6 +46,6 @@ WriteMakefile(
         'RPi::Serial'               => 2.3603,
         'RPi::SPI'                  => 2.3608,
         'RPi::StepperMotor'         => 2.3604,
-        'WiringPi::API'             => 2.3614,
+        'WiringPi::API'             => 2.3616,
     },
 );

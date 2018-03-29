@@ -1,0 +1,27 @@
+<%ARGS>
+$UserId => undef;
+$TicketId => undef;
+$Content => undef;
+$ContentType => undef;
+</%ARGS>
+
+<%INIT>
+my $Ticket = LoadTicket($TicketId);
+my $Draft = RT::Attribute->new($session{'CurrentUser'});
+$Draft->LoadByNameAndObject(Object => $session{'CurrentUser'}->UserObj, Name => 'Draft-' . $Ticket->id);
+my ($ok, $msg) = (0, '');
+if ($Content) {
+    if ($Draft && $Draft->Id) {
+        ($ok, $msg) = $Draft->SetContent($Content);
+        $Draft->SetContentType($ContentType);
+    } else {
+        ($ok, $msg) = $Draft->Create(Name => 'Draft-' . $Ticket->id,
+            Object => $session{'CurrentUser'}->UserObj,
+            Content => $Content,
+            ContentType => $ContentType,
+        );
+    }
+}
+$m->out($msg);
+$m->abort;
+</%INIT>

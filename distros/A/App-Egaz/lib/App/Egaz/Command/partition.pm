@@ -39,7 +39,7 @@ sub validate_args {
     my ( $self, $opt, $args ) = @_;
 
     if ( @{$args} < 1 ) {
-        my $message = "This command need one or more input file.\n\tIt found";
+        my $message = "This command need one or more input files.\n\tIt found";
         $message .= sprintf " [%s]", $_ for @{$args};
         $message .= ".\n";
         $self->usage_error($message);

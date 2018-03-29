@@ -37,5 +37,6 @@ IFS
 RaiseError
 Subqueries
 subqueries
+subquery
 substatement
 MERCHANTIBILITY

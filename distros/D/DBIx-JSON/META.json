@@ -1,12 +1,12 @@
 {
-   "abstract" : "Perl extension for creating JSON from existing DBI datasources",
+   "abstract" : "JSON serialization plugin for DBIx",
    "author" : [
       "Koji Komatsu <yosty@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -41,5 +41,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.04"
+   "version" : "0.05"
 }

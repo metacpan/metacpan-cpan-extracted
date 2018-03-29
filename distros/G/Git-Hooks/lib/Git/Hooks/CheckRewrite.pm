@@ -2,12 +2,11 @@
 
 package Git::Hooks::CheckRewrite;
 # ABSTRACT: Git::Hooks plugin for checking against unsafe rewrites
-$Git::Hooks::CheckRewrite::VERSION = '2.9.0';
+$Git::Hooks::CheckRewrite::VERSION = '2.9.1';
 use 5.010;
 use utf8;
 use strict;
 use warnings;
-use Try::Tiny;
 use Path::Tiny;
 use Git::Hooks;
 
@@ -116,14 +115,12 @@ sub check_rebase {
     unless (defined $branch) {
         # This means we're rebasing the current branch. We try to grok
         # it's name using git symbolic-ref.
-        my $success = try {
-            chomp($branch = $git->run(qw/symbolic-ref -q HEAD/));
-        } catch {
-            # The command git symbolic-ref fails if we're in a
-            # detached HEAD. In this situation we don't care about the
-            # rewriting.
-            undef;
-        };
+        my $success = eval { chomp($branch = $git->run(qw/symbolic-ref -q HEAD/)) };
+
+        # The command git symbolic-ref fails if we're in a
+        # detached HEAD. In this situation we don't care about the
+        # rewriting.
+
         return 1 unless defined $success;
     }
 
@@ -184,7 +181,7 @@ Git::Hooks::CheckRewrite - Git::Hooks plugin for checking against unsafe rewrite
 
 =head1 VERSION
 
-version 2.9.0
+version 2.9.1
 
 =head1 SYNOPSIS
 
@@ -218,7 +215,8 @@ provide a way to detect unsafe amends before committing them.
 To enable it you should add it to the githooks.plugin configuration
 option:
 
-    git config --add githooks.plugin CheckRewrite
+    [githooks]
+      plugin = CheckRewrite
 
 =for Pod::Coverage check_commit_amend check_rebase record_commit_parents
 

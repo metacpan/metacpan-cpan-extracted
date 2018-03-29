@@ -1,0 +1,1 @@
+[% loc("Price: {price}") %]

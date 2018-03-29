@@ -1,5 +1,13 @@
 Revision history for perl module C::Utility
 
+0.009 2018-03-27
+
+* Dependency bug fix
+
+0.008 2018-03-27
+
+* Add "read_includes" function
+
 0.007 2017-10-13
 
 * Documentation

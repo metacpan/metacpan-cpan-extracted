@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 
 package Devel::Events::Filter::HandlerOptional;
+# ABSTRACT: A role for filters that are useful even without a handler
+our $VERSION = '0.09';
 use Moose::Role;
 
 with 'Devel::Events::Filter' => { excludes => [qw(send_filtered_event)] };
@@ -36,10 +38,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-Devel::Events::Filter::HandlerOptional - A role for filters that are useful
-even without a handler.
+Devel::Events::Filter::HandlerOptional - A role for filters that are useful even without a handler
+
+=head1 VERSION
+
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -61,6 +68,20 @@ C<handler> is unset, but instead just drop events.
 
 L<Deve::Events::Filter::Warn>
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-Events>
+(or L<bug-Devel-Events@rt.cpan.org|mailto:bug-Devel-Events@rt.cpan.org>).
+
+=head1 AUTHOR
+
+יובל קוג'מן (Yuval Kogman) <nothingmuch@woobling.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2007 by יובל קוג'מן (Yuval Kogman).
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =cut
-
-

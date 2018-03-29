@@ -43,6 +43,7 @@ lib/Pcore/App/API/Auth/Request.pm
 lib/Pcore/App/API/Local.pm
 lib/Pcore/App/API/Local/pgsql.pm
 lib/Pcore/App/API/Local/sqlite.pm
+lib/Pcore/App/API/LocalNoAuth.pm
 lib/Pcore/App/API/Map.pm
 lib/Pcore/App/API/RPC/Hash.pm
 lib/Pcore/App/API/Remote.pm
@@ -206,6 +207,7 @@ lib/pod/perl-code.pod
 lib/pod/pgsql.pod
 lib/pod/sqlite.pod
 lib/pod/ssh.pod
+lib/pod/utf8.pod
 script/pcore
 script/pcore-vim-rpc.pl
 script/src

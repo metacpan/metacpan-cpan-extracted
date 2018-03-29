@@ -90,7 +90,7 @@ FUNCTIONS
 
  generator
 
-    The default secret generator, a SHA-1 sum of a few low-effort sources.
+    The default secret generator, using Session::Token
 
 SEE ALSO
 

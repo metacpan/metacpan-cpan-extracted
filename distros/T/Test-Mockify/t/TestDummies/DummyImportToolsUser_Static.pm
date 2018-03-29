@@ -10,7 +10,7 @@ sub useDummyImportTools {
     my $Doubled = Doubler($Value);
     return "In useDummyImportTools, result Doubler call: \"$Doubled\"";
 }
-sub OverrideDummyFunctionUser {
+sub OverrideDummyFunctionUser($) {
     my ($Value) = @_;
     return '('._OverrideDummyFunction($Value)." with '$Value')";
 }
@@ -19,7 +19,7 @@ sub _OverrideDummyFunction {
     my ($Value) = @_;
     return "(_OverrideDummyFunction: '$Value')";
 }
-sub CallAConstructor {
+sub CallAConstructor($) {
     my ($Parameter) = @_;
     return TestDummies::FakeModuleForMockifyTest->new($Parameter)->returnParameterListNew();
 }

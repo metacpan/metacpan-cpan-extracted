@@ -1,12 +1,13 @@
 #!/usr/bin/perl 
-use v5.8 ; use strict ; use warnings ; 
-use Getopt::Std ; getopts q['=_3:9c:fjs:H] , \my%o ; # 5.
-use utf8 ; # 5.006 ~ 
-use Encode qw[ encode_utf8 decode_utf8 ] ; # 5.007 ~ 
-use Term::ANSIColor qw [:constants ] ; $Term::ANSIColor::AUTORESET = 1 ; # 5.006 ~ 
+use v5.14 ; use strict ; use warnings ; # cpantersのレポートによると、5.14より前はNAだった。
+use Getopt::Std ; getopts q['/:=_3:9c:fjs:H] , \my%o ; # 5.
+use utf8 ; # v5.6 ~ 
+use Encode qw[ encode_utf8 decode_utf8 ] ; # v5.7 ~ 
+use Term::ANSIColor qw [:constants ] ; $Term::ANSIColor::AUTORESET = 1 ; # v5.6 ~ 
 
 $o{s} //= "1." ; # 表示拡大率  LaTeX displaying magnification efficient.
 
+my $isep = $o{'/'} // "\t" ; # 入力の区切り文字
 my $colspec = '' ; # LaTeXのtable環境の列指定  LaTeX table environment "column specifier"
 my @r3 = () ; #  3桁コンマ区切りにして右寄せにしたい列の指定。 Which columns are to be decimal being separated every 3 digits.
 my $angle = $o{9} ? 90 : 0 ; # 全体を回転する場合の指定  When -9 is specified, the entire table rotates in 90 degree.
@@ -70,7 +71,7 @@ sub main ( ) {
         chomp ; 
         $_ = decode_utf8 ($_) ;
         $zflag = 1 if m/　/ ; #全角空白 \x{3000} のチェック
-        my @F = split /\t/ , plain2latex ( $_ )  , -1 ; 
+        my @F = split /$isep/ , plain2latex ( $_ )  , -1 ; 
         splice @F , $o{c} if defined $o{c} ; # 切り取り
         s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g for @F[ @r3 ] ; # 数値3桁区切りの処理
 
@@ -165,6 +166,7 @@ sub HELP_MESSAGE {
     (6) by with -z, emphasizing the fullsize hyphen to indicate that it differs from prolonged sound sign.
 
  Options :     
+    -/ REGEX : Specifying the input delimter. Default is tab character. You can specify as -/ ,  for pseudo-CSV.
     -=   : To indicate that the first line in STDIN is the header, to yield "\hline" btw. 1st and 2nd lines.
     -c N : To explicitly indicate that the table has N columns. (Else, automatically determined by 1st line)
     -j   : For Japanese half-width character. The LaTeX output utilize \scalebox{0.5}[1]{...}
@@ -204,6 +206,7 @@ sub HELP_MESSAGE {
     (5) 半角空白と全角空白を目立たせること
     (6) 全角ハイフンも、全角長音と区別させること
 オプション : 
+    -/ REGEX :  区切り文字を 正規表現で指定する。単純なコンマ区切りであれば、-/ , と指定。未指定ならタブ文字。
     -=   : 標準入力の最初の行は、作りたいテーブルのヘッダであると仮定する。(\hlineの処理に関わる)
     -c N : 表が幅何列かを明示的に指定する。未指定なら先頭行の列数で判定する。
     -j   : 日本語の半角カナに対応する。
@@ -227,8 +230,10 @@ sub HELP_MESSAGE {
  
  このプログラムの開発上のメモ : 
    * 3桁区切りにしたい数ではなくて、単に右寄せしたい列の指定をする -r を実装したい。
-   * ドルマークとバックスラッシュの処理は内部処理上でトリッキーだった。正規表現の \Gで解決した。   
+   * ドルマークとバックスラッシュの処理は内部処理上でトリッキーだった。正規表現の \Gで解決した。<-- テストを書くべし。
    * 入力時に、何も入力が3秒程度発生しなかった場合に、催促するメッセージを STDERRに色つきで表示する機能。
+   * graphicxを要求することの明示を分かり安く(STDERRにも出力したい)。また、-1で、シンプルな、graphicxを要求しないものを生成する機能を作りたい。
+   * 列数が変わる場合に警告を出して、可能なら、空文字列で埋めるようにする。
 
 # このブログラムは 2018年2月9日(金)から表形式データに対する道具作りの一環として、下野寿之が作成したものである。
 =end JapaneseManual

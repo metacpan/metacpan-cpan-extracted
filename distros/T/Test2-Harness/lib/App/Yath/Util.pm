@@ -2,12 +2,13 @@ package App::Yath::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.001062';
+our $VERSION = '0.001063';
 
 use File::Spec;
 
 use Cwd qw/realpath/;
 use Carp qw/croak/;
+use File::Basename qw/dirname/;
 
 use Importer Importer => 'import';
 
@@ -68,6 +69,8 @@ sub read_config {
 
     open(my $fh, '<', $rcfile) or croak "Could not open '$rcfile': $!";
 
+    my $base = dirname(File::Spec->rel2abs($rcfile));
+
     my @out;
 
     my $in_cmd = 0;
@@ -82,7 +85,13 @@ sub read_config {
         $line =~ s/;.*$//g;
         $line =~ s/^\s*//g;
         $line =~ s/\s*$//g;
-        push @out => split /\s+/, $line, 2;
+        my ($key, $val) = split /\s+/, $line, 2;
+        if ($val && $val =~ s/^rel\(//) {
+            die "Syntax error in $rcfile line $.: Expected ')'\n" unless $val =~ s/\)$//;
+            $val = File::Spec->catfile($base, $val);
+        }
+        push @out => $key if defined $key;
+        push @out => $val if defined $val;
     }
 
     return @out;

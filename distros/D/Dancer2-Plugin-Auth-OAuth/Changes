@@ -1,5 +1,9 @@
 Revision history for Dancer2-Plugin-Auth-OAuth
 
+0.14  2018-03-27 23:17:45 CEST
+        - added Odnoklassniki and VKontakte provider modules,
+          thanks to beast-den
+
 0.13  2017-08-15 13:26:14 CEST
         - twitter expects a oauth_verifier header
 

@@ -1,5 +1,5 @@
 package Statocles::Util;
-our $VERSION = '0.089';
+our $VERSION = '0.091';
 # ABSTRACT: Various utility functions to reduce dependencies
 
 use Statocles::Base;
@@ -7,7 +7,7 @@ use Exporter 'import';
 use Mojo::JSON qw( to_json );
 
 our @EXPORT_OK = qw(
-    trim dircopy run_editor uniq_by derp
+    trim dircopy run_editor uniq_by derp read_stdin
 );
 
 #pod =sub trim
@@ -114,6 +114,30 @@ sub derp(@) {
     $DERPED{ $key } = 1;
 }
 
+#pod =sub read_stdin
+#pod
+#pod     my $test = read_stdin();
+#pod
+#pod Reads the standard input. Intended to provide a point to monkey-patch
+#pod for tests.
+#pod
+#pod =cut
+
+sub read_stdin {
+    if ( !-t *STDIN && !-z _ ) {
+        my $content = do { local $/; <STDIN> };
+
+        # Re-open STDIN as the TTY so that the editor (vim) can use it
+        # XXX Is this also a problem on Windows?
+        if ( -e '/dev/tty' ) {
+            close STDIN;
+            open STDIN, '/dev/tty';
+        }
+
+        return $content;
+    }
+}
+
 1;
 
 __END__
@@ -128,7 +152,7 @@ Statocles::Util - Various utility functions to reduce dependencies
 
 =head1 VERSION
 
-version 0.089
+version 0.091
 
 =head1 SYNOPSIS
 
@@ -176,6 +200,13 @@ This lets us get unique links from their C<href> attribute.
 
 Print out a deprecation message as a warning. A message will only be
 printed once for each set of arguments.
+
+=head2 read_stdin
+
+    my $test = read_stdin();
+
+Reads the standard input. Intended to provide a point to monkey-patch
+for tests.
 
 =head1 AUTHOR
 

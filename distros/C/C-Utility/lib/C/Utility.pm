@@ -4,6 +4,8 @@ use strict;
 use File::Spec;
 use Carp;
 use File::Versions 'make_backup';
+use File::Slurper 'read_text';
+use C::Tokenize '$comment_re';
 
 require Exporter;
 
@@ -24,6 +26,7 @@ our @EXPORT_OK = qw/
 		       lineout
 		       print_bottom_h_wrapper
 		       print_top_h_wrapper
+		       read_includes
 		       remove_quotes
 		       stamp_file
 		       valid_c_variable
@@ -33,7 +36,7 @@ our %EXPORT_TAGS = (
     'all' => \@EXPORT_OK,
 );
 
-our $VERSION = '0.007';
+our $VERSION = '0.009';
 
 sub convert_to_c_string
 {
@@ -310,5 +313,16 @@ EOF
     print_out ($fh, $stamp);
 }
 
+sub read_includes
+{
+    my ($file) = @_;
+    my $text = read_text ($file);
+    $text =~ s/$comment_re//g;
+    my @hfiles;
+    while ($text =~ /#include\s*"(.*?)"/g) {
+	push @hfiles, $1;
+    }
+    return \@hfiles;
+}
 
 1;

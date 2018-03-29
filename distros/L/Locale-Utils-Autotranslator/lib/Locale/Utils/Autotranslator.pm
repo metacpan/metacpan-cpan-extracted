@@ -13,7 +13,7 @@ use MooX::Types::MooseLike::Numeric qw(PositiveInt);
 use Try::Tiny;
 use namespace::autoclean;
 
-our $VERSION = '1.007';
+our $VERSION = '1.008';
 
 # plural_ref e.g. ru
 # The key is the plural form 0, 1 or 2.
@@ -685,6 +685,8 @@ sub _translate_paragraph {
                 $fail_message
                     and die $fail_message, "\n";
                 my $msgstr = $self->translate_text($_);
+                defined $msgstr
+                    or $msgstr = q{};
                 $self->_item_translation_count_increment;
                 $msgstr =~ s{ [\x{0}\x{4}] }{}xmsg; # because of mo file conflicts
                 length $msgstr
@@ -694,6 +696,8 @@ sub _translate_paragraph {
         )
         : do {
             my $msgstr = $self->translate_text($msgid);
+            defined $msgstr
+                or $msgstr = q{};
             $self->_item_translation_count_increment;
             $msgstr =~ s{ [\x{0}\x{4}] }{}xmsg; # because of mo file conflicts
             length $msgstr
@@ -749,7 +753,7 @@ sub translate_any_msgid {
 sub translate_text {
     my ( $self, $msgid ) = @_;
 
-    return q{};
+    return;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -762,13 +766,13 @@ __END__
 
 Locale::Utils::Autotranslator - Base class to translate automaticly
 
-$Id: Autotranslator.pm 669 2017-07-16 16:37:09Z steffenw $
+$Id: Autotranslator.pm 671 2017-07-16 19:22:17Z steffenw $
 
 $HeadURL: $
 
 =head1 VERSION
 
-1.007
+1.008
 
 =head1 SYNOPSIS
 

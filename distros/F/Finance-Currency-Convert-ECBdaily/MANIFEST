@@ -1,6 +1,7 @@
 eurofxref-daily.xml
 Finance-Currency-Convert-ECBdaily-0.01.tar.gz
 Finance-Currency-Convert-ECBdaily-0.02.tar.gz
+Finance-Currency-Convert-ECBdaily-0.03.tar.gz
 lib/Finance/Currency/Convert/ECBdaily.pm
 LICENSE
 Makefile.PL

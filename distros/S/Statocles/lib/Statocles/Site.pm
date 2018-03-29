@@ -1,5 +1,5 @@
 package Statocles::Site;
-our $VERSION = '0.089';
+our $VERSION = '0.091';
 # ABSTRACT: An entire, configured website
 
 use Statocles::Base 'Class', 'Emitter';
@@ -720,7 +720,7 @@ sub _get_status {
 
 sub _write_status {
     my ( $self, $status ) = @_;
-    Path::Tiny->new( '.statocles', 'status.yml' )->spew_utf8( YAML::Dump( $status ) );
+    Path::Tiny->new( '.statocles', 'status.yml' )->touchpath->spew_utf8( YAML::Dump( $status ) );
 }
 
 #pod =method deploy
@@ -738,11 +738,11 @@ sub deploy {
     $self->build( %options );
     $self->_deploy->site( $self );
     $self->_deploy->deploy( $self->build_store, %options );
-    $self->_clear_write_deploy;
     $self->_write_status( {
         last_deploy_date => time(),
         last_deploy_args => \%options,
     } );
+    $self->_clear_write_deploy;
 }
 
 #pod =method links
@@ -851,7 +851,7 @@ Statocles::Site - An entire, configured website
 
 =head1 VERSION
 
-version 0.089
+version 0.091
 
 =head1 SYNOPSIS
 

@@ -3,6 +3,8 @@
 
 Localization for the Template Toolkit 2
 
+The POD version of this document exhibits errors.  Consider reading the markdown version instead at L<https://github.com/gflohr/Template-Plugin-Gettext.>
+
 
 =head2 Description
 

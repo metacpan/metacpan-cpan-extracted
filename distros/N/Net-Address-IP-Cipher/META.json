@@ -36,7 +36,7 @@
             "Crypt::PBKDF2" : "0",
             "MIME::Base64" : "0",
             "Net::IP" : "0",
-            "perl" : "5.006"
+            "perl" : "5.012000"
          }
       }
    },
@@ -48,5 +48,5 @@
          "web" : "https://github.com/huguei/p5-Net-Address-IP-Cipher"
       }
    },
-   "version" : "0.2"
+   "version" : "0.3"
 }

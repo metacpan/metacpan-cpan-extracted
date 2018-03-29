@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Token;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180314'; # VERSION
+our $VERSION = '1.20180328'; # VERSION
 use Carp;
 
 
@@ -16,6 +16,16 @@ sub new {
 
     $self->{ 'header' } = $header;
     $self->parse();
+
+    return $self;
+}
+
+
+sub new_from_value {
+    my ( $class, $value ) = @_;
+
+    my $self = { 'value' => $value };
+    bless $self, $class;
 
     return $self;
 }
@@ -59,7 +69,7 @@ Mail::AuthenticationResults::Token - Base class for modelling AuthenticationResu
 
 =head1 VERSION
 
-version 1.20180314
+version 1.20180328
 
 =head1 DESCRIPTION
 
@@ -78,6 +88,10 @@ L<Mail::AuthenticationResults::Token::Comment> a comment
 L<Mail::AuthenticationResults::Token::QuotedString> a quoted string
 L<Mail::AuthenticationResults::Token::Separator> a separator
 L<Mail::AuthenticationResults::Token::String> a string
+
+=head2 new_from_value( $value )
+
+Create a new token from the given value
 
 =head2 value()
 

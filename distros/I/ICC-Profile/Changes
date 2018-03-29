@@ -4848,5 +4848,26 @@ after updates, the Lapack module built successfully on 10.6.8 and 10.8.5.
 
 - updated 'cmp_matrix' function of '60_Chart.t' to compare numeric values more carefully.
 
+- uploaded the v0.603 distribution to CPAN.
+
+2018-03-27
+
+- modified '02_Generic.t', '03_curv.t', '04_para.t', '10_XYZ_.t', '11_desc.t', '12_text.t', '13_mft1.t', '14_mft2.t', '15_mAB_.t', '16_mBA_.t', '18_mluc.t', '19_sf32.t', '20_sig_.t', and '21_clro.t' by adding 'binmode' to write handle. (caused CPAN testing errors on Windows).
+
+- modified 'cvst.pm' by adding 'binmode' in various places.
+
+2018-03-28
+
+- modified 'writeTIFF', and 'writeASE' methods of 'Chart.pm' by adding 'binmode'.
+
+- modified '_readChartASE', '_readChartSS3', and '_readChartTIFF' functions of 'Chart.pm' by adding 'binmode'.
+
+- modified '_readChart' and '_readChartASCII' functions of 'Chart.pm' by setting 'binmode' when testing file type, and moving the line ending test from '_readChartASCII' to '_readChart'.
+
+- modified '_readChartASCII' function of 'Chart.pm' to add appended data if $append is defined (v1.70).
+
+- edited the 'README' document.
+
+
 
 

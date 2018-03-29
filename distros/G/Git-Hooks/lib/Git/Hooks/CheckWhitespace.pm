@@ -2,13 +2,12 @@
 
 package Git::Hooks::CheckWhitespace;
 # ABSTRACT: Git::Hooks plugin for checking whitespace errors
-$Git::Hooks::CheckWhitespace::VERSION = '2.9.0';
+$Git::Hooks::CheckWhitespace::VERSION = '2.9.1';
 use 5.010;
 use utf8;
 use strict;
 use warnings;
 use Git::Hooks;
-use Text::Glob qw/glob_to_regex/;
 
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
 
@@ -145,7 +144,7 @@ Git::Hooks::CheckWhitespace - Git::Hooks plugin for checking whitespace errors
 
 =head1 VERSION
 
-version 2.9.0
+version 2.9.1
 
 =head1 SYNOPSIS
 
@@ -192,7 +191,8 @@ commit/push is aborted.
 To enable it you should add it to the githooks.plugin configuration
 option:
 
-    git config --add githooks.plugin CheckWhitespace
+    [githooks]
+      plugin = CheckWhitespace
 
 =for Pod::Coverage check_affected_refs check_commit check_patchset
 

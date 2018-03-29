@@ -1,0 +1,4 @@
+%grammar xrandr-monitors
+%version 0.0.1
+
+xrandr-monitors : +screen +outputs

@@ -22,7 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Device::WebIO;
-$Device::WebIO::VERSION = '0.010';
+$Device::WebIO::VERSION = '0.020';
 # ABSTRACT: Duct Tape for the Internet of Things
 use v5.12;
 use Moo;
@@ -41,6 +41,12 @@ sub register
     my ($self, $name, $device) = @_;
     $self->_device_by_name->{$name} = $device;
     return 1;
+}
+
+sub device_names
+{
+    my ($self) = @_;
+    return keys %{ $self->_device_by_name };
 }
 
 
@@ -147,6 +153,15 @@ sub digital_input_begin_loop
     my $obj = $self->_get_obj( $name );
     $self->_role_check( $obj, 'DigitalInputCallback' );
     return $obj->input_begin_loop();
+}
+
+sub set_input_condvar
+{
+    my ($self, $name, $cv) = @_;
+    my $obj = $self->_get_obj( $name );
+    $self->_role_check( $obj, 'DigitalInputCallback' );
+
+    return;
 }
 
 sub digital_output_port
@@ -670,6 +685,10 @@ Constructor.
 
 Register a driver object with the given name.  The object must do the 
 c<Device::WebIO::Device> role.
+
+=head3 device_names
+
+Return a list of the names of all devices that are currently registered.
 
 =head3 all_desc
 

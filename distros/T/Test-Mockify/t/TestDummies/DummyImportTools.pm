@@ -4,7 +4,7 @@ use warnings;
 use base qw ( Exporter );
 our @EXPORT_OK = qw (Doubler);
 
-sub Doubler {
+sub Doubler($) {
     my ($Value) = @_;
     return $Value * 2;
 }

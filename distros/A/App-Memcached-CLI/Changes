@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Memcached-CLI
 
+v0.9.5 2018-03-28T08:49:45Z
+
+    - Fix test: require script by full path (#2)
+
 v0.9.4 2016-03-26T06:04:43Z
 
     - Bug Fix: in "dump_all" command, set expiration time 0 correctly for data

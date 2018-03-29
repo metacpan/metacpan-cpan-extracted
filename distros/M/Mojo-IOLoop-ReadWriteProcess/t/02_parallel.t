@@ -14,7 +14,7 @@ subtest parallel => sub {
   my $fired;
 
   my $c = parallel(
-    code => sub { sleep 2; print "Hello world\n"; },
+    code                  => sub { sleep 2; print "Hello world\n"; },
     kill_sleeptime        => 1,
     sleeptime_during_kill => 1,
     separate_err          => 1,
@@ -47,7 +47,7 @@ subtest batch => sub {
   push(
     @stack,
     process(
-      code => sub { sleep 2; print "Hello world\n" },
+      code         => sub { sleep 2; print "Hello world\n" },
       separate_err => 0,
       set_pipes    => 1
     )) for (1 .. $n_proc);
@@ -138,7 +138,7 @@ subtest stress_test => sub {
   my $p = pool;
   $p->maximum_processes($n_proc);
   $p->add(
-    code => sub { sleep 3; exit(20) },
+    code           => sub { sleep 3; exit(20) },
     internal_pipes => 0,
     set_pipes      => 0
   ) for 1 .. $n_proc;

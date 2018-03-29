@@ -1,0 +1,108 @@
+---
+abstract: 'An interface to the X11 XRandR extension'
+author:
+  - 'Diab Jerius <djerius@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: X11-XRandR
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  X11::XRandR:
+    file: lib/X11/XRandR.pm
+    version: '0.01'
+  X11::XRandR::Border:
+    file: lib/X11/XRandR/Border.pm
+    version: '0.01'
+  X11::XRandR::CurCrtc:
+    file: lib/X11/XRandR/CurCrtc.pm
+    version: '0.01'
+  X11::XRandR::CurMode:
+    file: lib/X11/XRandR/CurMode.pm
+    version: '0.01'
+  X11::XRandR::Dimension:
+    file: lib/X11/XRandR/Dimension.pm
+    version: '0.01'
+  X11::XRandR::Frequency:
+    file: lib/X11/XRandR/Frequency.pm
+    version: '0.01'
+  X11::XRandR::Geometry:
+    file: lib/X11/XRandR/Geometry.pm
+    version: '0.01'
+  X11::XRandR::Grammar::Monitors:
+    file: lib/X11/XRandR/Grammar/Monitors.pm
+    version: '0.01'
+  X11::XRandR::Grammar::Verbose:
+    file: lib/X11/XRandR/Grammar/Verbose.pm
+    version: '0.01'
+  X11::XRandR::Mode:
+    file: lib/X11/XRandR/Mode.pm
+    version: '0.01'
+  X11::XRandR::Offset:
+    file: lib/X11/XRandR/Offset.pm
+    version: '0.01'
+  X11::XRandR::Output:
+    file: lib/X11/XRandR/Output.pm
+    version: '0.01'
+  X11::XRandR::Property:
+    file: lib/X11/XRandR/Property.pm
+    version: '0.01'
+  X11::XRandR::PropertyEDID:
+    file: lib/X11/XRandR/PropertyEDID.pm
+    version: '0.01'
+  X11::XRandR::Receiver::Verbose:
+    file: lib/X11/XRandR/Receiver/Verbose.pm
+    version: '0.01'
+  X11::XRandR::Screen:
+    file: lib/X11/XRandR/Screen.pm
+    version: '0.01'
+  X11::XRandR::State:
+    file: lib/X11/XRandR/State.pm
+    version: '0.01'
+  X11::XRandR::Transform:
+    file: lib/X11/XRandR/Transform.pm
+    version: '0.01'
+  X11::XRandR::Types:
+    file: lib/X11/XRandR/Types.pm
+    version: '0.01'
+  X11::XRandR::XRRModeInfo:
+    file: lib/X11/XRandR/XRRModeInfo.pm
+    version: '0.01'
+requires:
+  Data::Dump: '0'
+  IPC::Cmd: '0'
+  Memoize: '0'
+  Module::Runtime: '0.016'
+  Moo: '2.003004'
+  MooX::StrictConstructor: '0'
+  Pegex: '0.64'
+  String::CamelCase: '0'
+  Type::Library: '1.002001'
+  Type::Utils: '1.002001'
+  Types::Common::Numeric: '1.002001'
+  Types::Standard: '1.002001'
+  namespace::clean: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=X11-XRandR
+  repository: git://github.com/djerius/x11-xrandr.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.70'

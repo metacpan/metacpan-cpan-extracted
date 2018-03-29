@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.117';
+$Config::Model::BackendMgr::VERSION = '2.118';
 use Mouse;
 use strict;
 use warnings;
@@ -18,9 +18,6 @@ use 5.10.1;
 
 use Config::Model::Exception;
 use Data::Dumper;
-use File::Path;
-use File::Copy;
-use File::HomeDir;
 use IO::File;
 use Storable qw/dclone/;
 use Scalar::Util qw/weaken reftype/;
@@ -111,11 +108,6 @@ sub get_cfg_file_path {
     # config file override
     my $cfo = $args{config_file};
 
-    if ( defined $cfo and $cfo eq '-' and $w == 0 ) {
-        $logger->trace("auto_read: $args{backend} override target file is STDIN");
-        return ( 1, '-' );
-    }
-
     if ( defined $cfo ) {
         my $override =  $args{root} ? path($args{root})->child($cfo) : path($cfo);
         my $mode = $w ? 'write' : 'read';
@@ -137,24 +129,11 @@ sub get_cfg_file_path {
         return ( $dir_ok, $res );
     }
 
-    if (defined $args{suffix}) {
-        $logger->warn("Suffix method is deprecated. you can remove it from backend  $args{backend}");
-    }
     return 0;
 }
 
 sub open_read_file {
     my ($self, $file_path) = @_;
-
-    if ( $file_path eq '-' ) {
-        my $io = IO::Handle->new();
-        if ( $io->fdopen( fileno(STDIN), "r" ) ) {
-            return $io;
-        }
-        else {
-            return;
-        }
-    }
 
     my $fh = new IO::File;
     if ( -e $file_path ) {
@@ -318,25 +297,44 @@ sub try_read_backend {
         config_file => $config_file_override
     );
 
-    my ( $res, $file_path, $error );
-
     my $backend_obj = $self->backend_obj();
 
-    my ($file_ok, $fh, $suffix);
-    $suffix = $backend_obj->suffix if $backend_obj->can('suffix');
-    ( $file_ok, $file_path ) = $self->get_cfg_file_path(
-        @read_args,
-        suffix => $suffix,
-        skip_compute => $backend_obj->skip_open,
-    );
-    $fh = $self->open_read_file($file_path)
-        if $file_ok and not $backend_obj->skip_open;
+    if ($backend_obj->can('suffix')) {
+        $logger->warn("suffix method is deprecated. you can remove it from backend $backend");
+    }
+
+    my ($file_path, $fh);
+
+    if ( defined $config_file_override and $config_file_override eq '-' ) {
+        $file_path = $config_file_override; # may be used in error messages
+        $logger->trace("auto_read: $backend override target file is STDIN");
+        $logger->warn("Using STDIN to read config (option -file '-') is deprecated and will be removed in June 2018. Please contact the author if you think this is a bad idea.");
+        $fh = IO::Handle->new();
+        if ($fh->fdopen( fileno(STDIN), "r" )) {
+            $fh->binmode(":utf8");
+        }
+        else {
+            return ( 0, '-');
+        }
+    }
+    else {
+        ( my $file_ok, $file_path ) = $self->get_cfg_file_path(
+            @read_args,
+            skip_compute => $backend_obj->skip_open,
+        );
+
+        if (not $backend_obj->skip_open and $file_ok) {
+            $fh = $self->open_read_file($file_path) ;
+        }
+    }
 
     my $f = $self->rw_config->{function} || 'read';
     if ($logger->is_info) {
         my $fp = defined $file_path ? " on $file_path":'' ;
         $logger->info( "Read with $backend " . reftype($backend_obj) . "::$f".$fp);
     }
+
+    my $res;
 
     eval {
         $res = $backend_obj->$f(
@@ -346,7 +344,7 @@ sub try_read_backend {
             object    => $self->node,
         );
     };
-    $error = $@;
+    my $error = $@;
 
     # catch eval error
     if ( ref($error) and $error->isa('Config::Model::Exception::Syntax') ) {
@@ -404,7 +402,7 @@ sub auto_write_init {
 
     my $wb;
     my $f = $rw_config->{function} || 'write';
-    my $c = load_backend_class( $backend, $f );
+    my $backend_class = load_backend_class( $backend, $f );
     my $location = $self->node->name;
     my $node = $self->node;     # closure
 
@@ -415,11 +413,26 @@ sub auto_write_init {
         my $force_delete = delete $cb_args{force_delete} ;
         $logger->debug( "write cb ($backend) called for $location ", $force_delete ? '' : ' (deleted)' );
         my $backend_obj = $self->backend_obj();
-        my $suffix = $backend_obj->suffix if $backend_obj->can('suffix');
-        my ( $file_ok, $file_path, $fh );
-        ( $file_ok, $file_path, $fh ) =
-            $self->open_file_to_write( $backend, suffix => $suffix, @wr_args, %cb_args )
-            unless $c->skip_open;
+
+        my ($fh, $file_ok, $file_path );
+
+        if (not $backend_class->skip_open) {
+            ( $file_ok, $file_path ) = $self->get_cfg_file_path( @wr_args, %cb_args);
+        }
+
+        if ($file_ok and $file_path eq '-' ) {
+            my $io = IO::Handle->new();
+            if ( $io->fdopen( fileno(STDOUT), "w" ) ) {
+                $file_ok = 1;
+                $io->binmode(':utf8');
+            }
+            else {
+                return ( 0, '-' );
+            }
+        }
+        elsif ($file_ok) {
+            $fh = $self->open_file_to_write( $backend, $file_path, delete $args{backup} );
+        }
 
         # override needed for "save as" button
         my %backend_args = (
@@ -437,11 +450,12 @@ sub auto_write_init {
         else {
             $res = eval { $backend_obj->$f( %backend_args ); };
             my $error = $@;
-            $logger->warn( "write backend $backend $c" . '::' . "$f failed: $error" ) if $error;
+            $logger->warn( "write backend $backend $backend_class" . '::' . "$f failed: $error" )
+                if $error;
             $self->close_file_to_write( $error, $fh, $file_path, $rw_config->{file_mode} );
 
             $self->auto_delete($file_path, \%backend_args)
-                if $rw_config->{auto_delete} and not $c->skip_open ;
+                if $rw_config->{auto_delete} and not $backend_class->skip_open ;
         }
 
         return defined $res ? $res : $@ ? 0 : 1;
@@ -472,36 +486,18 @@ sub auto_delete {
 
 
 sub open_file_to_write {
-    my ( $self, $backend, %args ) = @_;
+    my ( $self, $backend, $file_path, $backup ) = @_;
 
-    my $backup    = delete $args{backup};
     my $do_backup = defined $backup;
     $backup ||= 'old';    # use old only if defined
     $backup = '.' . $backup unless $backup =~ /^\./;
 
-    my ( $file_ok, $file_path ) = $self->get_cfg_file_path(%args);
-
-    if ( $file_ok and $file_path eq '-' ) {
-        my $io = IO::Handle->new();
-        if ( $io->fdopen( fileno(STDOUT), "w" ) ) {
-            return ( 1, '-', $io );
-        }
-        else {
-            return ( 0, '-' );
-        }
+    my $file = path($file_path);
+    if ( $do_backup and $file->is_file ) {
+        $file->copy( $file_path . $backup ) or die "Backup copy failed: $!";
     }
-    elsif ($file_ok) {
-        my $file = path($file_path);
-        if ( $do_backup and $file->is_file ) {
-            $file->copy( $file_path . $backup ) or die "Backup copy failed: $!";
-        }
-        $logger->debug("$backend backend opened file $file_path to write");
-        my $fh = $file->openw_utf8;
-        return ( $file_ok, $file_path, $fh );
-    }
-    else {
-        return ( 0, $file_path );
-    }
+    $logger->debug("$backend backend opened file $file_path to write");
+    return $file->openw_utf8;
 }
 
 sub close_file_to_write {
@@ -553,7 +549,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.117
+version 2.118
 
 =head1 SYNOPSIS
 

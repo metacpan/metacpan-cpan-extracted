@@ -1,7 +1,7 @@
 package Pcore::Core::Event::Listener;
 
 use Pcore -class;
-use Pcore::Util::UUID qw[uuid_str];
+use Pcore::Util::UUID qw[uuid_v1mc_str];
 
 has broker => ( is => 'ro', isa => InstanceOf ['Pcore::Core::Event'], required => 1 );
 has masks => ( is => 'ro', isa => ArrayRef, required => 1 );
@@ -10,7 +10,7 @@ has cb => ( is => 'ro', isa => CodeRef | Object, required => 1 );
 has id => ( is => 'ro', isa => Str, init_arg => undef );
 
 sub BUILD ( $self, $args ) {
-    $self->{id} = uuid_str;
+    $self->{id} = uuid_v1mc_str;
 
     return;
 }

@@ -19,7 +19,7 @@ my %module_build_args = (
     "Guido Flohr <guido.flohr\@cantanea.com>"
   ],
   "dist_name" => "Template-Plugin-Gettext",
-  "dist_version" => "0.4",
+  "dist_version" => "0.5",
   "license" => "lgpl",
   "module_name" => "Template::Plugin::Gettext",
   "recursive_test_files" => 1,
@@ -40,6 +40,7 @@ my %module_build_args = (
     "bin/xgettext-tt2"
   ],
   "test_requires" => {
+    "File::Spec" => 0,
     "Locale::XGettext::Util::Keyword" => 0,
     "Test::More" => 0,
     "vars" => 0
@@ -48,6 +49,7 @@ my %module_build_args = (
 
 
 my %fallback_build_requires = (
+  "File::Spec" => 0,
   "Locale::XGettext::Util::Keyword" => 0,
   "Module::Build" => "0.28",
   "Test::More" => 0,

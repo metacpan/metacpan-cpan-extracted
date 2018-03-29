@@ -127,6 +127,9 @@ t/testfiles/fn-ordering.muse
 t/testfiles/footnotes-2.exp.html
 t/testfiles/footnotes-2.exp.ltx
 t/testfiles/footnotes-2.muse
+t/testfiles/footnotes-multiline-2.exp.html
+t/testfiles/footnotes-multiline-2.exp.ltx
+t/testfiles/footnotes-multiline-2.muse
 t/testfiles/footnotes-multiline.exp.html
 t/testfiles/footnotes-multiline.exp.ltx
 t/testfiles/footnotes-multiline.muse

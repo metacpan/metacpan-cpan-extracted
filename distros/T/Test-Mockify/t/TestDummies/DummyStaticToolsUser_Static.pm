@@ -6,13 +6,13 @@ use lib ($FindBin::Bin.'/..');
 use t::TestDummies::DummyStaticTools;
 
 
-sub useDummyStaticTools {
+sub useDummyStaticTools ($){
     my ($Value) = @_;
      my $Triplet = t::TestDummies::DummyStaticTools::Tripler($Value);
     return "In useDummyStaticTools, result Tripler call: \"$Triplet\"";
 }
 
-sub OverrideDummyFunctionUser {
+sub OverrideDummyFunctionUser ($){
     my ($Value) = @_;
     return '('._OverrideDummyFunction($Value)." with '$Value')";
 }

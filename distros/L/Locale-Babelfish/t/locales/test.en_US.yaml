@@ -9,3 +9,6 @@ simple:
         big_nails: 'I have #{test} ((big nail|big nails)):test with spaces'
     some:
         combine: 'I have  #{count} ((nail|nails)):count  for  #{single.test.deep} for #{test} ((test|tests)):test'
+    list:
+      - 'List Item 1: #{test}'
+      - 'List Item 2: #{test}'

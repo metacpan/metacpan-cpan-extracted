@@ -34,11 +34,11 @@ requires:
   RPi::SPI: '2.3608'
   RPi::Serial: '2.3603'
   RPi::StepperMotor: '2.3604'
-  WiringPi::API: '2.3614'
+  WiringPi::API: '2.3616'
   parent: '0'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/stevieb9/rpi-wiringpi/issues
   repository: https://github.com/stevieb9/rpi-wiringpi.git
-version: '2.3623'
+version: '2.3624'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

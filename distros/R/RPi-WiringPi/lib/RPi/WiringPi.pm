@@ -20,7 +20,7 @@ use RPi::SPI;
 use RPi::StepperMotor;
 use RPi::Const qw(:all);
 
-our $VERSION = '2.3623';
+our $VERSION = '2.3624';
 
 my $fatal_exit = 1;
 

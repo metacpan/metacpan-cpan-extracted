@@ -34,6 +34,7 @@ t/crash-on-loops.t
 t/epub-meta.t
 t/epub-toc.t
 t/epub.t
+t/failures-2.t
 t/failures.t
 t/filenames.t
 t/fonts-compat.t
@@ -95,6 +96,7 @@ t/testfile/deep/deep/dir/manual.muse
 t/testfile/deleted.muse
 t/testfile/epub-meta.muse
 t/testfile/for-epub.muse
+t/testfile/for-multipar-footnotes.muse
 t/testfile/invalid.muse
 t/testfile/slides.muse
 t/testfile/strike.muse

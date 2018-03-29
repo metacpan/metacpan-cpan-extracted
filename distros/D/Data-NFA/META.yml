@@ -15,13 +15,13 @@ name: Data-NFA
 provides:
   Data::NFA:
     file: lib/Data/NFA.pm
-    version: '20180328'
+    version: '20180329'
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::Table::Text: '20180316'
+  Data::Table::Text: '20180328'
   Test2::API: '0'
   Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20180328'
+version: '20180329'

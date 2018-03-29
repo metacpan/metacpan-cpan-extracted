@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.008_001;
 
-use version; our $VERSION = 'v0.9.4';
+use version; our $VERSION = 'v0.9.5';
 
 our $DEBUG; # set by option
 
@@ -39,14 +39,14 @@ L<http://www.memcached.org/>
 
 =head1 LICENSE
 
-Copyright (C) YASUTAKE Kiyoshi.
+Copyright (C) IKEDA Kiyoshi.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-YASUTAKE Kiyoshi E<lt>yasutake.kiyoshi@gmail.comE<gt>
+IKEDA Kiyoshi E<lt>progrhyme@gmail.comE<gt>
 
 =cut
 

@@ -73,9 +73,9 @@ SUBROUTINES
         Therefore, "all_critic_ok" generally cannot be used in a test script
         that includes other sorts of tests.
 
-        all_critic_ok() is also optimized to run tests in parallel over
+        "all_critic_ok()" is also optimized to run tests in parallel over
         multiple cores (if you have them) so it is usually better to call
-        this function than calling critic_ok() directly.
+        this function than calling "critic_ok()" directly.
 
     critic_ok( $FILE [, $TEST_NAME ] )
         Okays the test if Perl::Critic does not find any violations in
@@ -199,7 +199,7 @@ FOR Dist::Zilla USERS
     Perl::Critic rules. In particular, the standard
     Dist::Zilla::Plugin::PkgVersion will inject a $VERSION declaration at
     the top of the file, which will violate
-    Perl::Critic::Policy::TestingAndDebughgin::RequireUseStrict. One
+    Perl::Critic::Policy::TestingAndDebugging::RequireUseStrict. One
     solution is to use the Dist::Zilla::Plugin::OurPkgVersion which allows
     you to control where the $VERSION declaration appears.
 
@@ -209,7 +209,7 @@ EXPORTS
 
 BUGS
     If you find any bugs, please submit them to
-    <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perl-Critic>. Thanks.
+    <https://github.com/Perl-Critic/Test-Perl-Critic/issues>. Thanks.
 
 SEE ALSO
     Module::Starter::PBP
@@ -226,7 +226,7 @@ AUTHOR
     Jeffrey Ryan Thalhammer <jeff@thaljef.org>
 
 COPYRIGHT
-    Copyright (c) 2005-2014 Jeffrey Ryan Thalhammer.
+    Copyright (c) 2005-2018 Jeffrey Ryan Thalhammer.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself. The full text of this license can

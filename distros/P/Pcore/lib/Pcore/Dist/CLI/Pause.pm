@@ -5,7 +5,17 @@ use Pcore -class, -ansi;
 with qw[Pcore::Dist::CLI];
 
 sub CLI ($self) {
-    return { abstract => 'work with perl PAUSE' };
+    return {
+        abstract => 'work with perl PAUSE',
+
+        opt => {
+            keep => {
+                desc    => 'Number of releases to keep',
+                isa     => 'PositiveInt',
+                default => 2,
+            },
+        },
+    };
 }
 
 sub CLI_RUN ( $self, $opt, $arg, $rest ) {
@@ -18,7 +28,7 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
 
     print 'clean PAUSE ... ';
 
-    my $res = $pause->clean( keep => 2 );
+    my $res = $pause->clean( keep => $opt->{keep} );
 
     say $res;
 

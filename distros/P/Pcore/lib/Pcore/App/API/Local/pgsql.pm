@@ -1,7 +1,7 @@
 package Pcore::App::API::Local::pgsql;
 
 use Pcore -class, -result, -sql;
-use Pcore::Util::UUID qw[uuid_str];
+use Pcore::Util::UUID qw[uuid_v1mc_str];
 
 with qw[Pcore::App::API::Local];
 
@@ -69,7 +69,7 @@ SQL
 
 sub _db_add_roles ( $self, $dbh, $roles, $cb ) {
     $dbh->do(
-        [ q[INSERT INTO "api_role"], VALUES [ map { { id => uuid_str, name => $_ } } $roles->@* ], 'ON CONFLICT DO NOTHING' ],
+        [ q[INSERT INTO "api_role"], VALUES [ map { { id => uuid_v1mc_str, name => $_ } } $roles->@* ], 'ON CONFLICT DO NOTHING' ],
         sub ( $dbh, $res, $data ) {
             $cb->($res);
 
@@ -81,7 +81,7 @@ sub _db_add_roles ( $self, $dbh, $roles, $cb ) {
 }
 
 sub _db_create_user ( $self, $dbh, $user_name, $hash, $enabled, $cb ) {
-    my $user_id = uuid_str;
+    my $user_id = uuid_v1mc_str;
 
     $dbh->do(
         'INSERT INTO "api_user" ("id", "name", "hash", "enabled") VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING',

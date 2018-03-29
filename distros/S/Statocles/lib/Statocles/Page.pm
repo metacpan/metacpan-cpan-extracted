@@ -1,5 +1,5 @@
 package Statocles::Page;
-our $VERSION = '0.089';
+our $VERSION = '0.091';
 # ABSTRACT: Base role for rendering files
 
 use Statocles::Base 'Role';
@@ -342,7 +342,7 @@ Statocles::Page - Base role for rendering files
 
 =head1 VERSION
 
-version 0.089
+version 0.091
 
 =head1 DESCRIPTION
 

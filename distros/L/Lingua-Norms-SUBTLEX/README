@@ -1,16 +1,10 @@
-Lingua-Norms-SUBTLEX-0.05
+Lingua-Norms-SUBTLEX-0.06
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+This Perl module provides programmatic access to the frequency-related statistics
+about words derived from video subtitles in various languages. It also calculates stats
+about the orthographic relatedness of the words included in these corpora.  
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
-
+Default hand-wise installation instructions follow:
 
 INSTALLATION
 
@@ -38,16 +32,16 @@ perldoc command.
 You can also look for information at:
 
     RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-Norms-SUBTLEX-0.05
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-Norms-SUBTLEX-0.06
 
     AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Lingua-Norms-SUBTLEX-0.05
+        http://annocpan.org/dist/Lingua-Norms-SUBTLEX-0.06
 
     CPAN Ratings
-        http://cpanratings.perl.org/d/Lingua-Norms-SUBTLEX-0.05
+        http://cpanratings.perl.org/d/Lingua-Norms-SUBTLEX-0.06
 
     Search CPAN
-        http://search.cpan.org/dist/Lingua-Norms-SUBTLEX-0.05/
+        http://search.cpan.org/dist/Lingua-Norms-SUBTLEX-0.06/
 
 
 LICENSE AND COPYRIGHT

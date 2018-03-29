@@ -2,18 +2,15 @@
 
 package Git::Hooks::Notify;
 # ABSTRACT: Git::Hooks plugin to notify users via email
-$Git::Hooks::Notify::VERSION = '2.9.0';
+$Git::Hooks::Notify::VERSION = '2.9.1';
 use 5.010;
 use utf8;
 use strict;
 use warnings;
-use Carp;
 use Git::Hooks;
-use Git::Repository::Log;
 use Encode qw/decode/;
-use Set::Scalar;
-use List::MoreUtils qw/any/;
-use Try::Tiny;
+use Email::Sender::Simple;
+use Email::Simple;
 
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
 
@@ -131,9 +128,6 @@ sub notify {
         push @headers, (From => $from);
     }
 
-    require Email::Sender::Simple;
-    require Email::Simple;
-
     my $body = $git->get_config($CFG, 'preamble') || '';
 
     $body .= "\n" if length $body;
@@ -247,10 +241,8 @@ sub notify_affected_refs {
 
             my $message = pretty_log($git, \@commits);
 
-            try {
-                notify($git, $ref, $old_commit, $new_commit, $rule, $message);
-            } catch {
-                my $error = $_;
+            eval { notify($git, $ref, $old_commit, $new_commit, $rule, $message) };
+            if (my $error = $@) {
                 $git->fault(
                     sprintf('I could not send mail to the following recipients: %s\n',
                             join(", ", $error->recipients)),
@@ -283,7 +275,7 @@ Git::Hooks::Notify - Git::Hooks plugin to notify users via email
 
 =head1 VERSION
 
-version 2.9.0
+version 2.9.1
 
 =head1 SYNOPSIS
 
@@ -330,7 +322,8 @@ push>. It's used to notify JIRA of commits citing its issues via comments.
 To enable it you should add it to the githooks.plugin configuration
 option:
 
-    git config --add githooks.plugin Notify
+    [githooks]
+      plugin = Notify
 
 By default no notifications are sent. You have to specify rules telling the
 plugin which email addresses should receive notifications about any change or
@@ -397,13 +390,14 @@ Notify - Git::Hooks plugin to notify users via email
 
 =head1 CONFIGURATION
 
-The plugin is configured by the following git options.
+The plugin is configured by the following git options under the
+C<githooks.checkacls> subsection.
 
 It can be disabled for specific references via the C<githooks.ref> and
 C<githooks.noref> options about which you can read in the L<Git::Hooks>
 documentation.
 
-=head2 githooks.notify.rule RECIPIENTS [-- PATHSPECS]
+=head2 rule RECIPIENTS [-- PATHSPECS]
 
 The B<rule> directive adds a notification rule specifying which RECIPIENTS
 should be notified of pushed commits affecting the specified PATHSPECS.
@@ -435,7 +429,7 @@ file under the F<lib/> directory.
 
 You can read all about I<pathspecs> in the C<git help glossary>.
 
-=head2 githooks.notify.transport TRANSPORT [ARGS...]
+=head2 transport TRANSPORT [ARGS...]
 
 By default the messages are sent using L<Email::Simple>'s default transport. On
 Unix systems, it is usually the C<sendmail> command. You can specify another
@@ -460,7 +454,7 @@ tucked in a hash and passed to the transport's constructor. For example:
 Please, read the transport's class documentation to know which arguments are
 available.
 
-=head2 githooks.notify.from SENDER
+=head2 from SENDER
 
 This allows you to specify a sender address to be used in the notification's
 C<To> header. If you don't specify it, the sender will probably be the user
@@ -470,7 +464,7 @@ with a valid email address that your users can reply to. Something like this:
   [githooks "notify"]
     from = "Git::Hooks" <git@yourdomain.com>
 
-=head2 githooks.notify.subject SUBJECT
+=head2 subject SUBJECT
 
 This allows you to specify the subject of the notification emails. If you don't
 specify it, the default is like this:
@@ -490,18 +484,18 @@ three placeholders defined are:
 
 =back
 
-=head2 githooks.notify.preamble TEXT
+=head2 preamble TEXT
 
 This allows you to specify a preamble for the notification emails. There is no
 default preamble.
 
-=head2 githooks.notify.max-count INT
+=head2 max-count INT
 
 This allows you to specify the limit of commits that should be shown for each
 changed branch. Read about the --max-count option in C<git help log>. If not
 specified, a limit of 10 is used.
 
-=head2 githooks.notify.commit-url URL_PATTERN
+=head2 commit-url URL_PATTERN
 
 If your Git repository has a web interface it's useful to provide links to the
 commits shown in the notification message. If configured, each SHA1 contained in
@@ -534,7 +528,7 @@ angle-bracketed names with values appropriate to your context:
 
 =back
 
-=head2 githooks.notify.html BOOL
+=head2 html BOOL
 
 By default the email messages are sent in plain text. Enabling this option sends
 HTML-formatted messages, which look better on some email readers.

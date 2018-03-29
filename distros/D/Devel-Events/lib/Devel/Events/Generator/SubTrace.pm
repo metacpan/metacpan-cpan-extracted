@@ -6,6 +6,8 @@ use Moose::Role ();
 BEGIN { $^P |= 0x01 }
 
 package Devel::Events::Generator::SubTrace;
+# ABSTRACT: generate C<executing_line> events using the perl debugger api
+our $VERSION = '0.09';
 use Moose;
 
 with qw/Devel::Events::Generator/;
@@ -18,7 +20,8 @@ our ( $IGNORE, $DEPTH ); # can't local a lexical ;_;
 BEGIN { $DEPTH = -1 };
 
 {
-	package DB;
+	package # hide from PAUSE, version management
+            DB;
 
 	our $sub;
 
@@ -104,13 +107,17 @@ __PACKAGE__;
 
 __END__
 
-
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-Devel::Events::Generator::SubTrace - generate C<executing_line> events using
-the perl debugger api.
+Devel::Events::Generator::SubTrace - generate C<executing_line> events using the perl debugger api
+
+=head1 VERSION
+
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -173,11 +180,11 @@ The context of the call as given by C<wantarray>
 
 Exactly like C<enter_sub>, but fired just after leaving the subroutine.
 
-=over 4
-
 All the fields of C<enter_sub> are passed.
 
 Additional fields:
+
+=over 4
 
 =item ret
 
@@ -213,5 +220,21 @@ Called by C<DB::sub>. Sends the C<leave_sub> event.
 =head1 SEE ALSO
 
 L<perldebguts>, L<Devel::CallTrace>, L<DB>, L<Devel::ebug>, L<perl5db.pl>
+
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-Events>
+(or L<bug-Devel-Events@rt.cpan.org|mailto:bug-Devel-Events@rt.cpan.org>).
+
+=head1 AUTHOR
+
+יובל קוג'מן (Yuval Kogman) <nothingmuch@woobling.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2007 by יובל קוג'מן (Yuval Kogman).
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

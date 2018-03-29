@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.008';
+our $VERSION = '2.009';
 
 use File::Basename        qw( fileparse );
 use File::Spec::Functions qw( catfile );
@@ -49,10 +49,10 @@ sub defaults {
             meta                 => 0,
             lock_stmt            => 0,
             operators            => [ "REGEXP", "REGEXP_i", " = ", " != ", " < ", " > ", "IS NULL", "IS NOT NULL" ],
-            #subqueries_select    => 0,
-            #subqueries_set       => 0,
-            #subqueries_w_h       => 0,
-            subqueries           => 0,
+            subqueries_select    => 0,
+            subqueries_set       => 0,
+            subqueries_w_h       => 0,
+            subqueries_table     => 0,
             alias                => 0,
             parentheses          => 0,
             quote_identifiers    => 1,
@@ -76,17 +76,15 @@ sub defaults {
             binary_filter        => 0,
         },
         insert => {
-        # Input
             #input_modes          => [ 'Cols', 'Rows', 'Multi-row', 'File' ],
             #files_dir            => undef,
             file_encoding        => 'UTF-8',
             max_files            => 15,
-        # Parsing
-            #_parse_mode
             file_parse_mode      => 0,
             copy_parse_mode      => 1,
-        # create table defaults:
-#            id_col_name          => 'ID_a',
+        },
+        create => {
+            auto_inc_col_name    => 'Id',
             default_data_type    => 'TEXT',
         },
         split => {
@@ -120,12 +118,12 @@ sub __menu_insert {
     my $menu_insert = {
         main_insert => [
 #            { name => 'files_dir',             text => "- File Dir",         section => 'insert' },
-            { name => '_parse_mode',           text => "- Parse Module",     section => 'insert' },
-            { name => '_module_Text_CSV',      text => "- Config Text::CSV", section => 'csv'    },
-            { name => '_parse_with_split',     text => "- Config 'split'",   section => 'split'  },
+            { name => '_parse_mode',           text => "- Parse Tool",     section => 'insert' },
+            { name => '_module_Text_CSV',      text => "- Text::CSV config", section => 'csv'    },
+            { name => '_parse_with_split',     text => "- 'split'   config",   section => 'split'  },
             { name => 'file_encoding',         text => "- File Encoding",    section => 'insert' },
             { name => 'max_files',             text => "- File History",     section => 'insert' },
-            { name => 'create_table_defaults', text => "- Create-table",     section => 'insert' }, ##
+            { name => '_create_table',         text => "- Create-table",     section => 'create' }, ##
         ],
         _module_Text_CSV => [
             { name => '_csv_char',    text => "- *_char attributes", section => 'csv' },
@@ -249,9 +247,9 @@ sub config_insert {
                 my $prompt = 'Separators (regexp)';
                 $sf->__group_readline( $section, $items, $prompt );
             }
-            elsif ( $opt eq 'create_table_defaults' ) {
+            elsif ( $opt eq '_create_table' ) {
                 my $items = [
-                    #{ name => 'id_col_name',       prompt => "Default ID col name" },
+                    { name => 'auto_inc_col_name', prompt => "Auto-increment column name" },
                     { name => 'default_data_type', prompt => "Default data type" },
                 ];
                 my $prompt = 'Create-table defaults';
@@ -473,12 +471,12 @@ sub set_options {
             }
             elsif ( $opt eq '_expert' ) {
                 my $sub_menu = [
-                    [ 'subqueries',        "- Subqueries",                 [ 'NO', 'YES' ] ],
-                    #[ 'subqueries_select', "- Subqueries SELECT",          [ 'NO', 'YES' ] ],
-                    #[ 'subqueries_set',    "- Subqueries UPDATE-SET",      [ 'NO', 'YES' ] ],
-                    #[ 'subqueries_w_h',    "- Subqueries WHERE/HAVING TO", [ 'NO', 'YES' ] ],
-                    [ 'alias',             "- Alias for complex cols",     [ 'NO', 'YES' ] ],
-                    [ 'parentheses',       "- Parentheses",                [ 'NO', 'YES' ] ],
+                    [ 'subqueries_select', "- Subqueries in SELECT",    [ 'NO', 'YES' ] ],
+                    [ 'subqueries_w_h',    "- Subqueries in WHERE",     [ 'NO', 'YES' ] ], # docu
+                    [ 'subqueries_set',    "- Subqueries as SET value", [ 'NO', 'YES' ] ],
+                    [ 'subqueries_table',  "- Subqueries as table",     [ 'NO', 'YES' ] ], # docu
+                    [ 'alias',             "- Alias for complex cols",  [ 'NO', 'YES' ] ],
+                    [ 'parentheses',       "- Parentheses",             [ 'NO', 'YES' ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu );
             }

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# ICC::Profile::Generic test module / 2014-05-26
+# ICC::Profile::Generic test module / 2018-03-27
 #
 # Copyright © 2004-2018 by William B. Birkett
 
@@ -30,6 +30,9 @@ $profile = t::lib::Boot->new(File::Spec->catfile('t', 'data', 'GRACoL2006_Coated
 
 # open temporary file for write-read access
 open($temp, '+>' . File::Spec->catfile('t', 'data', 'temp.dat'));
+
+# set binary mode
+binmode($temp);
 
 # for each tag table entry
 for $ttab (@{$profile->tag_table}) {
@@ -61,3 +64,4 @@ close($profile->fh);
 
 # close temporary file
 close($temp);
+

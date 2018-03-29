@@ -1,10 +1,10 @@
 {
-   "abstract" : "Retrieve frequency values and frequency-based lists for words from Subtitles Corpora",
+   "abstract" : "Retrieve word frequencies and related values and lists from subtitles corpora",
    "author" : [
       "Roderick Garton <rgarton@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -16,35 +16,40 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Array::Compare" : "2.11",
+            "Array::Compare" : "2.012",
             "FindBin" : "1.51",
-            "Test::More" : "0.98"
+            "Test::More" : "1.302073"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.421"
+            "Module::Build" : "0.4220"
          }
       },
       "runtime" : {
          "requires" : {
-            "Config" : "0",
-            "English" : "1.05",
+            "Config" : "5.020002",
+            "English" : "1.10",
             "File::RandomLine" : "0.20",
-            "File::Slurp" : "9999.19",
-            "File::Spec" : "3.40",
-            "Lingua::Orthon" : "0.01",
+            "File::Spec" : "3.63_01",
+            "Lingua::Orthon" : "0.03",
+            "List::AllUtils" : "0.14",
+            "Number::Misc" : "1.2",
+            "Path::Tiny" : "0.104",
             "Readonly" : "1.03",
-            "Statistics::Lite" : "3.6",
-            "String::Util" : "1.24",
-            "Text::CSV::Separator" : "0.20"
+            "Statistics::Lite" : "3.62",
+            "String::Trim" : "0.005",
+            "String::Util" : "1.26",
+            "Text::CSV::Hashify" : "0.08",
+            "Text::CSV::Separator" : "0.20",
+            "Text::Unidecode" : "1.30"
          }
       }
    },
    "provides" : {
       "Lingua::Norms::SUBTLEX" : {
          "file" : "lib/Lingua/Norms/SUBTLEX.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -53,5 +58,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

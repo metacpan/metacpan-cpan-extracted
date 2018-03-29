@@ -9,6 +9,10 @@
     Mojo::IOLoop::ReadWriteProcess::Exception
     Mojo::IOLoop::ReadWriteProcess::Queue
     Mojo::IOLoop::ReadWriteProcess::Session
+    Mojo::IOLoop::ReadWriteProcess::Container
+    Mojo::IOLoop::ReadWriteProcess::CGroup
+    Mojo::IOLoop::ReadWriteProcess::CGroup::v1
+    Mojo::IOLoop::ReadWriteProcess::CGroup::v2
   );
 
   done_testing;

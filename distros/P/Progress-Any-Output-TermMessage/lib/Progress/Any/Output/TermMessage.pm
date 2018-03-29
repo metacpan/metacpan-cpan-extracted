@@ -1,18 +1,11 @@
 package Progress::Any::Output::TermMessage;
 
-our $DATE = '2018-03-21'; # DATE
-our $VERSION = '0.040'; # VERSION
+our $DATE = '2018-03-26'; # DATE
+our $VERSION = '0.041'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-
-sub output_data {
-    +{
-        # do not throttle the frequency of update to this output
-        freq => 0,
-    };
-}
 
 sub new {
     my ($class, %args0) = @_;
@@ -21,6 +14,8 @@ sub new {
 
     $args{fh} = delete($args0{fh});
     $args{fh} //= \*STDERR;
+
+    $args{freq} = delete($args0{freq}) // 0;
 
     $args{template}          = delete($args0{template}) // "(%P/%T) %m";
     $args{single_line_task}  = delete($args0{single_line_task}) // 0;
@@ -76,7 +71,7 @@ Progress::Any::Output::TermMessage - Output progress to terminal as simple messa
 
 =head1 VERSION
 
-This document describes version 0.040 of Progress::Any::Output::TermMessage (from Perl distribution Progress-Any-Output-TermMessage), released on 2018-03-21.
+This document describes version 0.041 of Progress::Any::Output::TermMessage (from Perl distribution Progress-Any-Output-TermMessage), released on 2018-03-26.
 
 =head1 SYNOPSIS
 
@@ -87,7 +82,7 @@ This document describes version 0.040 of Progress::Any::Output::TermMessage (fro
 
 This output displays progress indicators as messages on terminal.
 
-=for Pod::Coverage ^(update|output_data)$
+=for Pod::Coverage ^(update)$
 
 =head1 METHODS
 

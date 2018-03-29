@@ -1,5 +1,5 @@
 package Statocles::Link;
-our $VERSION = '0.089';
+our $VERSION = '0.091';
 # ABSTRACT: A link object to build <a> and <link> tags
 
 use Statocles::Base 'Class';
@@ -105,7 +105,7 @@ Statocles::Link - A link object to build <a> and <link> tags
 
 =head1 VERSION
 
-version 0.089
+version 0.091
 
 =head1 SYNOPSIS
 

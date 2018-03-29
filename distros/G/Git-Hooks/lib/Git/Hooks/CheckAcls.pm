@@ -2,12 +2,11 @@
 
 package Git::Hooks::CheckAcls;
 # ABSTRACT: [DEPRECATED] Git::Hooks plugin for branch/tag access control
-$Git::Hooks::CheckAcls::VERSION = '2.9.0';
+$Git::Hooks::CheckAcls::VERSION = '2.9.1';
 use 5.010;
 use utf8;
 use strict;
 use warnings;
-use Try::Tiny;
 use Git::Hooks;
 
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
@@ -56,13 +55,10 @@ sub check_ref {
         $op = 'R';              # rewrite a non-branch
     } else {
         # This is an U if "merge-base(old, new) == old". Otherwise it's an R.
-        $op = try {
+        $op = eval {
             chomp(my $merge_base = $git->run('merge-base' => $old_commit, $new_commit));
             ($merge_base eq $old_commit) ? 'U' : 'R';
-        } catch {
-            # Probably $old_commit and $new_commit do not have a common ancestor.
-            'R';
-        };
+        } || 'R'; # Probably $old_commit and $new_commit do not have a common ancestor.
     }
 
     foreach my $acl (grok_acls($git)) {
@@ -142,7 +138,7 @@ Git::Hooks::CheckAcls - [DEPRECATED] Git::Hooks plugin for branch/tag access con
 
 =head1 VERSION
 
-version 2.9.0
+version 2.9.1
 
 =head1 SYNOPSIS
 
@@ -199,7 +195,8 @@ in question.
 To enable it you should add it to the githooks.plugin configuration
 option:
 
-    git config --add githooks.plugin CheckAcls
+    [githooks]
+      plugin = CheckAcls
 
 =for Pod::Coverage check_ref grok_acls match_ref check_affected_refs
 
@@ -209,13 +206,14 @@ Git::Hooks::CheckAcls - [DEPRECATED] Git::Hooks plugin for branch/tag access con
 
 =head1 CONFIGURATION
 
-The plugin is configured by the following git options.
+The plugin is configured by the following git options under the
+C<githooks.checkacls> subsection.
 
 It can be disabled for specific references via the C<githooks.ref> and
 C<githooks.noref> options about which you can read in the L<Git::Hooks>
 documentation.
 
-=head2 githooks.checkacls.acl ACL
+=head2 acl ACL
 
 The authorization specification for a repository is defined by the set
 of ACLs defined by this option. Each ACL specify 'who' has 'what' kind
@@ -283,8 +281,9 @@ This is useful, for instance, if you want developers to be restricted
 in what they can do to official branches but to have complete control
 with their own branch namespace.
 
-    git config githooks.CheckAcls.acl '^. CRUD ^refs/heads/{USER}/'
-    git config githooks.CheckAcls.acl '^. U    ^refs/heads'
+    [githooks "checkacls"]
+      acl = ^. CRUD ^refs/heads/{USER}/
+      acl = ^. U    ^refs/heads
 
 In this example, every user (^.) has complete control (CRUD) to the
 branches below "refs/heads/{USER}". Supposing the environment variable

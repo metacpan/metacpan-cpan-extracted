@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckFile;
 # ABSTRACT: Git::Hooks plugin for checking files
-$Git::Hooks::CheckFile::VERSION = '2.9.0';
+$Git::Hooks::CheckFile::VERSION = '2.9.1';
 use 5.010;
 use utf8;
 use strict;
@@ -12,7 +12,6 @@ use Git::Hooks;
 use Text::Glob qw/glob_to_regex/;
 use Path::Tiny;
 use List::MoreUtils qw/any none/;
-use Data::Dump;
 
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
 
@@ -496,7 +495,7 @@ Git::Hooks::CheckFile - Git::Hooks plugin for checking files
 
 =head1 VERSION
 
-version 2.9.0
+version 2.9.1
 
 =head1 SYNOPSIS
 
@@ -584,7 +583,8 @@ specified constraints. If they don't, the commit/push is aborted.
 To enable it you should add it to the githooks.plugin configuration
 option:
 
-    git config --add githooks.plugin CheckFile
+    [githooks]
+      plugin = CheckFile
 
 =for Pod::Coverage check_command check_new_files deny_case_conflicts deny_token check_acls check_everything check_affected_refs check_commit check_patchset
 
@@ -594,13 +594,14 @@ CheckFile - Git::Hooks plugin for checking files
 
 =head1 CONFIGURATION
 
-The plugin is configured by the following git options.
+The plugin is configured by the following git options under the
+C<githooks.checkfile> subsection.
 
 It can be disabled for specific references via the C<githooks.ref> and
 C<githooks.noref> options about which you can read in the L<Git::Hooks>
 documentation.
 
-=head2 githooks.checkfile.name PATTERN COMMAND
+=head2 name PATTERN COMMAND
 
 This directive tells which COMMAND should be used to check files matching
 PATTERN.
@@ -611,13 +612,15 @@ PATTERN is usually expressed with
 L<globbing|https://metacpan.org/pod/File::Glob> to match files based on
 their extensions, for example:
 
-    git config githooks.checkfile.name *.pl perlcritic --stern
+    [githooks "checkfile"]
+      name = *.pl perlcritic --stern
 
 If you need more power than globs can provide you can match using L<regular
 expressions|http://perldoc.perl.org/perlre.html>, using the C<qr//>
 operator, for example:
 
-    git config githooks.checkfile.name qr/xpto-\\d+.pl/ perlcritic --stern
+    [githooks "checkfile"]
+      name = qr/xpto-\\d+.pl/ perlcritic --stern
 
 COMMAND is everything that comes after the PATTERN. It is invoked once for
 each file matching PATTERN with the name of a temporary file containing the
@@ -629,19 +632,21 @@ If the filename can't be the last argument to COMMAND you must tell where in
 the command-line it should go using the placeholder C<{}> (like the argument
 to the C<find> command's C<-exec> option). For example:
 
-    git config githooks.checkfile.name *.xpto cmd1 --file {} | cmd2
+    [githooks "checkfile"]
+      name = *.xpto cmd1 --file {} | cmd2
 
 COMMAND is invoked as a single string passed to C<system>, which means it
 can use shell operators such as pipes and redirections.
 
 Some real examples:
 
-    git config --add githooks.checkfile.name *.p[lm] perlcritic --stern --verbose 5
-    git config --add githooks.checkfile.name *.pp    puppet parser validate --verbose --debug
-    git config --add githooks.checkfile.name *.pp    puppet-lint --no-variable_scope-check
-    git config --add githooks.checkfile.name *.sh    bash -n
-    git config --add githooks.checkfile.name *.sh    shellcheck --exclude=SC2046,SC2053,SC2086
-    git config --add githooks.checkfile.name *.erb   erb -P -x -T - {} | ruby -c
+    [githooks "checkfile"]
+      name = *.p[lm] perlcritic --stern --verbose 5
+      name = *.pp    puppet parser validate --verbose --debug
+      name = *.pp    puppet-lint --no-variable_scope-check
+      name = *.sh    bash -n
+      name = *.sh    shellcheck --exclude=SC2046,SC2053,SC2086
+      name = *.erb   erb -P -x -T - {} | ruby -c
 
 COMMAND may rely on the B<GIT_COMMIT> environment variable to identify the
 commit being checked according to the hook being used, as follows.
@@ -672,7 +677,8 @@ wanted to check Python scripts with the C<pylint> command passing to its
 C<--rcfile> option the configuration file F<pylint.rc> sitting on the
 repository root. So, we configured CheckFile like this:
 
-    git config --add githooks.checkfile.name *.py mypylint.sh
+    [githooks "checkfile"]
+      name = *.py mypylint.sh
 
 And the F<mypylint.sh> script was something like this:
 
@@ -686,19 +692,19 @@ And the F<mypylint.sh> script was something like this:
 
     pylint --rcfile=$RC "$@"
 
-=head2 githooks.checkfile.sizelimit INT
+=head2 sizelimit INT
 
 This directive specifies a size limit (in bytes) for any file in the
 repository. If set explicitly to 0 (zero), no limit is imposed, which is the
 default. But it can be useful to override a global specification in a particular
 repository.
 
-=head2 githooks.checkfile.basename.sizelimit BYTES REGEXP
+=head2 basename.sizelimit BYTES REGEXP
 
 This directive takes precedence over the C<githooks.checkfile.sizelimit> for
 files which basename matches REGEXP.
 
-=head2 githooks.checkfile.deny-case-conflict BOOL
+=head2 deny-case-conflict BOOL
 
 This directive checks for newly added files that would conflict in
 case-insensitive filesystems.
@@ -714,7 +720,7 @@ Note that this check have to check the newly added files against all files
 already in the repository. It can be a little slow for large repositories. Take
 heed!
 
-=head2 githooks.checkfile.deny-token REGEXP
+=head2 deny-token REGEXP
 
 This directive rejects commits or pushes which diff (patch) matches REGEXP. This
 is a multi-valued directive, i.e., you can specify it multiple times to check
@@ -726,7 +732,7 @@ commit, but as it so often happens, they end up being forgotten.
 
 Note that this option requires Git 1.7.4 or newer.
 
-=head2 githooks.checkfile.executable PATTERN
+=head2 executable PATTERN
 
 This directive requires that all added or modified files with names matching
 PATTERN must have the executable permission. This allows you to detect common
@@ -737,7 +743,7 @@ above.
 
 You can specify this option multiple times so that all PATTERNs are considered.
 
-=head2 githooks.checkfile.non-executable PATTERN
+=head2 non-executable PATTERN
 
 This directive requires that all added or modified files with names matching
 PATTERN must B<not> have the executable permission. This allows you to detect
@@ -748,7 +754,7 @@ above.
 
 You can specify this option multiple times so that all PATTERNs are considered.
 
-=head2 githooks.checkfile.acl RULE
+=head2 acl RULE
 
 This multi-valued option specifies rules allowing or denying specific users to
 perform specific actions on specific files. By default any user can perform any
@@ -787,7 +793,7 @@ potentially many files (e.g. F<^lib/.*\\.pm$>).
 
 See the L</SYNOPSIS> section for some examples.
 
-=head2 [DEPRECATED] githooks.checkfile.basename.deny REGEXP
+=head2 [DEPRECATED] basename.deny REGEXP
 
 This option is deprecated. Please, use an C<acl> option like this, instead:
 
@@ -796,7 +802,7 @@ This option is deprecated. Please, use an C<acl> option like this, instead:
 
 This directive denies files which basenames match REGEXP.
 
-=head2 [DEPRECATED] githooks.checkfile.basename.allow REGEXP
+=head2 [DEPRECATED] basename.allow REGEXP
 
 This option is deprecated. Please, use an C<acl> option like this, instead:
 
@@ -817,7 +823,7 @@ file with a name beginning with a dot.
         basename.allow ^\\.gitignore
         basename.deny  ^\\.
 
-=head2 [DEPRECATED] githooks.checkfile.path.deny REGEXP
+=head2 [DEPRECATED] path.deny REGEXP
 
 This option is deprecated. Please, use an C<acl> option like this, instead:
 
@@ -826,7 +832,7 @@ This option is deprecated. Please, use an C<acl> option like this, instead:
 
 This directive denies files which full paths match REGEXP.
 
-=head2 [DEPRECATED] githooks.checkfile.path.allow REGEXP
+=head2 [DEPRECATED] path.allow REGEXP
 
 This option is deprecated. Please, use an C<acl> option like this, instead:
 

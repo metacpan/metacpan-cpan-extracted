@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Inline;
 
-our $DATE = '2017-08-16'; # DATE
-our $VERSION = '0.541'; # VERSION
+our $DATE = '2018-03-28'; # DATE
+our $VERSION = '0.542'; # VERSION
 
 # line 820, don't know how to turn off this warning?
 ## no critic (ValuesAndExpressions::ProhibitCommaSeparatedStatements)
@@ -117,6 +117,7 @@ sub _gen_read_config {
 
     push @l2, 'if ($_pci_r->{read_config}) {', "\n";
     _add_module($cd, "Perinci::CmdLine::Util::Config");
+    _add_module($cd, "Log::ger"); # required by Perinci::CmdLine::Util::Config
     _add_module($cd, "Config::IOD::Reader"); # required by Perinci::CmdLine::Util::Config
     _add_module($cd, "Config::IOD::Base"); # required by Config::IOD::Reader
     _add_module($cd, "Data::Sah::Normalize"); # required by Perinci::CmdLine::Util::Config
@@ -1556,7 +1557,7 @@ Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.541 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2017-08-16.
+This document describes version 0.542 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2018-03-28.
 
 =head1 SYNOPSIS
 
@@ -1887,7 +1888,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

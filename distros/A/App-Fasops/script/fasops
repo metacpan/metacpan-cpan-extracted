@@ -63,3 +63,6 @@ cat t/Arabid_thaliana.pair.fas | perl -I lib script/fasops check stdin t/NC_0009
 cat t/example.fas | perl -I lib script/fasops concat stdin t/example.name.list -o stdout
 
 cat t/example.fas | perl -I lib script/fasops stat stdin -o stdout
+
+perl -I lib/ script/fasops mergecsv -c t/links.copy.csv t/links.count.csv
+perl -I lib/ t/19-mergecsv.t

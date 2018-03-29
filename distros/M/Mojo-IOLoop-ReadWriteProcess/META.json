@@ -55,10 +55,67 @@
    "provides" : {
       "Mojo::IOLoop::ReadWriteProcess" : {
          "file" : "lib/Mojo/IOLoop/ReadWriteProcess.pm",
-         "version" : "0.19"
+         "version" : "0.20"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::CGroup" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::CGroup::v1" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup/v1.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::CGroup::v1::Cpuacct" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup/v1/Cpuacct.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::CGroup::v1::Cpuset" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup/v1/Cpuset.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::CGroup::v1::Devices" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup/v1/Devices.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::CGroup::v1::Freezer" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup/v1/Freezer.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::CGroup::v1::Memory" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup/v1/Memory.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::CGroup::v1::Netcls" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup/v1/Netcls.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::CGroup::v1::Netprio" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup/v1/Netprio.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::CGroup::v1::PID" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup/v1/PID.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::CGroup::v1::RDMA" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup/v1/RDMA.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::CGroup::v2" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup/v2.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::CGroup::v2::CPU" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup/v2/CPU.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::CGroup::v2::IO" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup/v2/IO.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::CGroup::v2::Memory" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup/v2/Memory.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::CGroup::v2::PID" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup/v2/PID.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::CGroup::v2::RDMA" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup/v2/RDMA.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::Container" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/Container.pm"
       },
       "Mojo::IOLoop::ReadWriteProcess::Exception" : {
          "file" : "lib/Mojo/IOLoop/ReadWriteProcess/Exception.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::Namespace" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/Namespace.pm"
       },
       "Mojo::IOLoop::ReadWriteProcess::Pool" : {
          "file" : "lib/Mojo/IOLoop/ReadWriteProcess/Pool.pm"
@@ -81,7 +138,7 @@
          "web" : "https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_contributors" : [
       "Ettore Di Giacinto <mudler@gentoo.org>",
       "Ettore Di Giacinto <mudler@users.noreply.github.com>"

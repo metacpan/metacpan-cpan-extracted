@@ -12,7 +12,7 @@ our @EXPORT_OK = qw(
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-use version; our $VERSION = 'v0.9.4';
+use version; our $VERSION = 'v0.9.5';
 
 my $DEFAULT_PORT = 11211;
 
@@ -40,14 +40,14 @@ This module provides constants for other modules.
 
 =head1 LICENSE
 
-Copyright (C) YASUTAKE Kiyoshi.
+Copyright (C) IKEDA Kiyoshi.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-YASUTAKE Kiyoshi E<lt>yasutake.kiyoshi@gmail.comE<gt>
+IKEDA Kiyoshi E<lt>progrhyme@gmail.comE<gt>
 
 =cut
 

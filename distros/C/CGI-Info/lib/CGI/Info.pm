@@ -1,6 +1,7 @@
 package CGI::Info;
 
 # TODO: remove the expect argument
+# TODO: add Test::Distribution
 
 use warnings;
 use strict;
@@ -8,7 +9,9 @@ use Class::Autouse qw{Carp File::Spec};
 use Socket;	# For AF_INET
 use 5.006_001;
 use Log::Any qw($log);
+use Cwd;
 use JSON::Parse;
+use List::MoreUtils;	# Can go when expect goes
 
 use namespace::clean;
 
@@ -18,11 +21,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.64
+Version 0.67
 
 =cut
 
-our $VERSION = '0.64';
+our $VERSION = '0.67';
 
 =head1 SYNOPSIS
 
@@ -75,6 +78,10 @@ sub new {
 
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
+	if($args{expect} && (ref($args{expect}) ne 'ARRAY')) {
+		warn 'expect must be a reference to an array';
+		return;
+	}
 	return bless {
 		# _script_name => undef,
 		# _script_path => undef,
@@ -89,7 +96,7 @@ sub new {
 		_logger => $args{logger},
 		_syslog => $args{syslog},
 		_cache => $args{cache},	# e.g. CHI
-		_status => 200,
+		# _status => 200,
 	}, $class;
 }
 
@@ -292,7 +299,7 @@ sub _find_site_details {
 		require Sys::Hostname;
 		Sys::Hostname->import;
 
-		$self->{_cgi_site} = Sys::Hostname->hostname;
+		$self->{_cgi_site} = Sys::Hostname::hostname();
 	}
 
 	unless($self->{_site}) {
@@ -310,9 +317,7 @@ sub _find_site_details {
 		$self->{_cgi_site} = "$protocol://" . $self->{_cgi_site};
 	}
 	unless($self->{_site} && $self->{_cgi_site}) {
-		$self->_warn({
-			warning => 'Could not determine site name'
-		});
+		$self->_warn('Could not determine site name');
 	}
 	if($self->{_logger}) {
 		$self->{_logger}->trace('Leaving _find_site_details');
@@ -473,13 +478,20 @@ sub params {
 		$self->{_allow} = $args{allow};
 	}
 	if(defined($args{expect})) {
-		$self->{_expect} = $args{expect};
+		if(ref($args{expect}) eq 'ARRAY') {
+			$self->{_expect} = $args{expect};
+		} else {
+			$self->_warn('expect must be a reference to an array');
+		}
 	}
 	if(defined($args{upload_dir})) {
 		$self->{_upload_dir} = $args{upload_dir};
 	}
 	if(defined($args{logger})) {
 		$self->{_logger} = $args{logger};
+	}
+	if($self->{_logger}) {
+		$self->{_logger}->trace('Entering params');
 	}
 
 	my @pairs;
@@ -529,13 +541,12 @@ sub params {
 			return;
 		}
 		if((defined($content_type)) && ($content_type =~ /multipart\/form-data/i)) {
-			$self->_warn({
-				warning => 'Multipart/form-data not supported for GET'
-			});
+			$self->_warn('Multipart/form-data not supported for GET');
 		}
 		@pairs = split(/&/, $ENV{'QUERY_STRING'});
 	} elsif($ENV{'REQUEST_METHOD'} eq 'POST') {
 		if(!defined($ENV{'CONTENT_LENGTH'})) {
+			$self->{_status} = 411;
 			return;
 		}
 		my $content_length = $ENV{'CONTENT_LENGTH'};
@@ -543,7 +554,7 @@ sub params {
 			# TODO: Design a way to tell the caller to send HTTP
 			# status 413
 			$self->{_status} = 413;
-			$self->_warn({ warning => 'Large upload prohibited' });
+			$self->_warn('Large upload prohibited');
 			return;
 		}
 
@@ -553,9 +564,7 @@ sub params {
 				$buffer = $stdin_data;
 			} else {
 				if(read(STDIN, $buffer, $content_length) != $content_length) {
-					$self->_warn({
-						warning => 'POST failed: something else may have read STDIN'
-					});
+					$self->_warn('POST failed: something else may have read STDIN');
 				}
 				$stdin_data = $buffer;
 			}
@@ -652,14 +661,16 @@ sub params {
 				warning => "POST: Invalid or unsupported content type: $content_type: $buffer",
 			});
 		}
-	# } elsif($ENV{'REQUEST_METHOD'} eq 'OPTIONS') {
-		# return;
-	# } elsif($ENV{'REQUEST_METHOD'} eq 'DELETE') {
-		# return;
+	} elsif($ENV{'REQUEST_METHOD'} eq 'OPTIONS') {
+		$self->{_status} = 405;
+		return;
+	} elsif($ENV{'REQUEST_METHOD'} eq 'DELETE') {
+		$self->{_status} = 405;
+		return;
 	} else {
 		# TODO: Design a way to tell the caller to send HTTP
-		# status 405
-		$self->{_status} = 405;
+		# status 501
+		$self->{_status} = 501;
 		$self->_warn({
 			warning => 'Use POST, GET or HEAD'
 		});
@@ -669,11 +680,6 @@ sub params {
 		return;
 	}
 
-	# Can go when expect has been removed
-	if($self->{_expect}) {
-		require List::Member;
-		List::Member->import();
-	}
 	require String::Clean::XSS;
 	String::Clean::XSS->import();
 	# require String::EscapeCage;
@@ -715,7 +721,7 @@ sub params {
 			}
 		}
 
-		if($self->{_expect} && (member($key, @{$self->{_expect}}) == nota_member())) {
+		if($self->{_expect} && (List::MoreUtils::none { $_ eq $key } @{$self->{_expect}})) {
 			next;
 		}
 		$value = $self->_sanitise_input($value);
@@ -817,9 +823,18 @@ sub param {
 
 # Emit a warning message somewhere
 sub _warn {
-	my ($self, $params) = @_;
+	my $self = shift;
 
-	my $warning = $$params{'warning'};
+	my %params;
+	if(ref($_[0]) eq 'HASH') {
+		%params = %{$_[0]};
+	} elsif(scalar(@_) % 2 == 0) {
+		%params = @_;
+	} else {
+		$params{'warning'} = shift;
+	}
+
+	my $warning = $params{'warning'};
 
 	return unless($warning);
 	if($self eq __PACKAGE__) {
@@ -869,8 +884,14 @@ sub _sanitise_input {
 sub _multipart_data {
 	my ($self, $args) = @_;
 
+	if($self->{_logger}) {
+		$self->{_logger}->trace('Entering _multipart_data');
+	}
 	my $total_bytes = $$args{length};
 
+	if($self->{_logger}) {
+		$self->{_logger}->trace("_multipart_data: total_bytes = $total_bytes");
+	}
 	if($total_bytes == 0) {
 		return;
 	}
@@ -919,23 +940,20 @@ sub _multipart_data {
 				if($field =~ /filename="(.+)?"/) {
 					my $filename = $1;
 					unless(defined($filename)) {
-						$self->_warn({
-							warning => 'No upload filename given'
-						});
+						$self->_warn('No upload filename given');
 					} elsif($filename =~ /[\\\/\|]/) {
-						$self->_warn({
-							warning => "Disallowing invalid filename: $filename"
-						});
+						$self->_warn("Disallowing invalid filename: $filename");
 					} else {
 						$filename = $self->_create_file_name({
 							filename => $filename
 						});
 
+						# Don't do this since it taints the string and I can't work out how to untaint it
+						# my $full_path = Cwd::realpath(File::Spec->catfile($self->{_upload_dir}, $filename));
+						# $full_path =~ m/^(\/[\w\.]+)$/;
 						my $full_path = File::Spec->catfile($self->{_upload_dir}, $filename);
 						unless(open($fout, '>', $full_path)) {
-							$self->_warn({
-								warning => "Can't open $full_path"
-							});
+							$self->_warn("Can't open $full_path");
 						}
 						$writing_file = 1;
 						push(@pairs, "$key=$filename");
@@ -1136,7 +1154,7 @@ sub protocol {
 	}
 
 	if($ENV{'REMOTE_ADDR'}) {
-		$self->_warn({ warning => "Can't determine the calling protocol" });
+		$self->_warn("Can't determine the calling protocol");
 	}
 	return;
 }
@@ -1314,7 +1332,7 @@ sub is_robot {
 			# Mine
 			'http://www.seokicks.de/robot.html',
 		);
-		if(($referrer =~ /\)/) || (grep(/^$referrer/, @crawler_lists))) {
+		if(($referrer =~ /\)/) || (List::MoreUtils::any { $_ =~ /^$referrer/ } @crawler_lists)) {
 			if($self->{_logger}) {
 				$self->{_logger}->debug("is_robot: blocked trawler $referrer");
 			}
@@ -1509,7 +1527,7 @@ Deprecated - use cookie() instead.
 sub get_cookie {
 	my $self = shift;
 	my %params;
-	
+
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
 	} elsif(@_ % 2 == 0) {
@@ -1519,9 +1537,7 @@ sub get_cookie {
 	}
 
 	if(!defined($params{'cookie_name'})) {
-		$self->_warn({
-			warning => 'cookie_name argument not given'
-		});
+		$self->_warn('cookie_name argument not given');
 		return;
 	}
 
@@ -1559,9 +1575,7 @@ sub cookie {
 	my ($self, $field) = @_;
 
 	if(!defined($field)) {
-		$self->_warn({
-			warning => 'what cookie do you want?'
-		});
+		$self->_warn('what cookie do you want?');
 		return;
 	}
 
@@ -1592,7 +1606,7 @@ Returns the status of the object, 200 for OK, otherwise an HTTP error code
 sub status {
 	my $self = shift;
 
-	return $self->{_status};
+	return $self->{_status} || 200;
 }
 
 =head2 set_logger
@@ -1702,7 +1716,7 @@ L<http://search.cpan.org/dist/CGI-Info/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2017 Nigel Horne.
+Copyright 2010-2018 Nigel Horne.
 
 This program is released under the following licence: GPL
 

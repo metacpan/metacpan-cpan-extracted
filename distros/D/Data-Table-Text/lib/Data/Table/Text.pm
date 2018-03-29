@@ -8,7 +8,7 @@
 
 package Data::Table::Text;
 use v5.8.0;
-our $VERSION = '20180327';
+our $VERSION = '20180328';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -707,13 +707,16 @@ sub formatTableBasic($;$)                                                       
  {my ($data, $separator) = @_;                                                  # Reference to an array of arrays of data to be formatted as a table, optional line separator to use instead of new line for each row.
   my $d = $data;
   ref($d) =~ /array/i or confess "Array reference required not:\n".dump($d);
-  my @D;
+  my @D;                                                                        # Maximum width of each column
+  my @C;                                                                        # Whether column has non numeric
   for   my $e(@$d)
    {ref($e) =~ /array/i or confess "Array reference required not:\n".dump($e);
-    for my $D(0..$#$e)
-     {my $a = $D[$D]           // 0;                                            # Maximum length of data so far
-      my $b = length($e->[$D]) // 0;                                            # Length of current item
+    for my $D(0..$#$e)                                                          # Each column index
+     {my $a  = $D[$D]           // 0;                                           # Maximum length of data so far
+      my $b  = length($e->[$D]) // 0;                                           # Length of current item
       $D[$D] = ($a > $b ? $a : $b);                                             # Update maximum length
+      $C[$D] = 1 if !$C[$D] and                                                 # Not a number in this column
+          $e->[$D] !~ /\A\s*[-+]?\s*[0-9,]+(\.\d+)?([Ee]\s*[-+]?\s*\d+)?\s*\Z/;
      }
    }
 
@@ -723,7 +726,7 @@ sub formatTableBasic($;$)                                                       
     for my $D(0..$#$e)
      {my $m = $D[$D];                                                           # Maximum width
       my $i = $e->[$D]//'';                                                     # Current item
-      if ($i !~ /\A\s*[-+]?\s*[0-9,]+(\.\d+)?([Ee]\s*[-+]?\s*\d+)?\s*\Z/)       # Not a number - left justify
+      if ($C[$D])                                                               # Not a number - left justify
        {$t .= substr($i.(' 'x$m), 0, $m)."  ";
        }
       else                                                                      # Number - right justify
@@ -1073,6 +1076,7 @@ sub updateDocumentation(;$)                                                     
   my %methodX;                                                                  # Method names for methods that have an version suffixed with X that die rather than returning undef
   my %private;                                                                  # Private methods
   my %static;                                                                   # Static methods
+  my %exported;                                                                 # Exported methods
   my %userFlags;                                                                # User flags
   my @doc = (<<END);                                                            # Documentation
 `head1 Description
@@ -1087,7 +1091,7 @@ END
   my $Source = my $source  = readFile($perlModule);                             # Read the perl module
 
   if ($source =~ m(our\s+\$VERSION\s*=\s*(\S+)\s*;)s)                           # Update references to examples so we can include html and images etc. in the module
-   {my $V = $1;                                                                # Quoted version
+   {my $V = $1;                                                                 # Quoted version
     if (my $v = eval $V)                                                        # Remove any quotes
      {my $s = $source;
       $source =~                                                                # Replace example references in source
@@ -1171,12 +1175,14 @@ END
       my $private   = $flags =~ m/P/;                                           # Private
       my $static    = $flags =~ m/S/;                                           # Static
       my $iUseful   = $flags =~ m/I/;                                           # Immediately useful
-      my $userFlags = $flags =~ s/[IPSX]//gsr;                                  # User flags == all flags minus the known flags
+      my $exported  = $flags =~ m/E/;                                           # Exported
+      my $userFlags = $flags =~ s/[EIPSX]//gsr;                                 # User flags == all flags minus the known flags
 
       $methodX  {$name} = $methodX   if $methodX;                               # MethodX
       $private  {$name} = $private   if $private;                               # Private
       $static   {$name} = $static    if $static;                                # Static
       $iUseful  {$name} = $comment   if $iUseful;                               # Immediately useful
+      $exported {$name} = $exported if $exported;                               # Exported
 
       $userFlags{$name} =                                                       # Process user flags
         &docUserFlags($userFlags, $perlModule, $package, $name)
@@ -1261,6 +1267,10 @@ END
        "\nThis is a static method and so should be invoked as:\n\n".
        "  $package::$name\n"                   if $static;
 
+      push @method,                                                             # Exported
+       "\nThis method can be imported via:\n\n".
+       "  use $package qw($name)\n"            if $exported;
+
       push @{$private ? \@private : \@doc}, @method;                            # Save method documentation in correct section
      }
     elsif ($level and $line =~                                                  # Documentation for a generated lvalue * method = sub name comment
@@ -1310,6 +1320,29 @@ END
     for my $s(sort {lc($a) cmp lc($b)} keys %methodParms)                       # Alphabetic listing of methods
      {my $t = $methodParms{$s};
       push @doc, ++$n." L<$s|/$t>\n"
+     }
+   }
+
+  if (keys %exported)                                                           # Exported methods available
+   {push @doc, <<END;
+
+
+=head1 Exports
+
+All of the following methods can be imported via:
+
+  use $package qw(:all);
+
+Or individually via:
+
+  use $package qw(<method>);
+
+
+END
+
+    my $n = 0;
+    for my $s(sort {lc($a) cmp lc($b)} keys %exported)                          # Alphabetic listing of exported methods
+     {push @doc, ++$n." L<$s|/$s>\n"
      }
    }
 
@@ -2695,7 +2728,7 @@ test unless caller;
 1;
 # podDocumentation
 __DATA__
-use Test::More tests => 140;
+use Test::More tests => 142;
 
 #Test::More->builder->output("/dev/null");
 my $windows = $^O =~ m(MSWin32)is;
@@ -2853,8 +2886,20 @@ if (1)                                                                          
            [qw(AA  BB  CC)],
            [qw(AAA BBB CCC)],
            [qw(1   22  333)]];
-  ok formatTableBasic($d,     '|') eq                       'A    B    C    |AA   BB   CC   |AAA  BBB  CCC  |  1   22  333  |';
-  ok formatTable     ($d, $t, '|') eq '   aa   bb   cc   |1  A    B    C    |2  AA   BB   CC   |3  AAA  BBB  CCC  |4    1   22  333  |';
+
+  ok formatTableBasic($d,     '|') eq "A    B    C    |AA   BB   CC   |AAA  BBB  CCC  |1    22   333  |";
+  ok formatTable     ($d, $t, '|') eq "   aa   bb   cc   |1  A    B    C    |2  AA   BB   CC   |3  AAA  BBB  CCC  |4  1    22   333  |";
+ }
+
+if (1)                                                                          # Format table and AA
+ {my $t = [qw(aa bb cc)];
+  my $d = [[qw(1     B   C)],
+           [qw(22    BB  CC)],
+           [qw(333   BBB CCC)],
+           [qw(4444  22  333)]];
+
+  ok formatTableBasic($d,     '|') eq "   1  B    C    |  22  BB   CC   | 333  BBB  CCC  |4444  22   333  |";
+  ok formatTable     ($d, $t, '|') eq "   aa    bb   cc   |1  1     B    C    |2  22    BB   CC   |3  333   BBB  CCC  |4  4444  22   333  |";
  }
 
 if (1)                                                                          # AH
@@ -2863,17 +2908,17 @@ if (1)                                                                          
            {aa=>'AAA', bb=>'BBB', cc=>'CCC'},
            {aa=>'1', bb=>'22', cc=>'333'}
           ];
-  ok formatTable($d, undef, '|') eq '   aa   bb   cc   |1  A    B    C    |2  AA   BB   CC   |3  AAA  BBB  CCC  |4    1   22  333  |';
+  ok formatTable($d, undef, '|') eq "   aa   bb   cc   |1  A    B    C    |2  AA   BB   CC   |3  AAA  BBB  CCC  |4  1    22   333  |";
  }
 
 if (1)                                                                          # HA
  {my $d = {''=>[qw(aa bb cc)], 1=>[qw(A B C)], 22=>[qw(AA BB CC)], 333=>[qw(AAA BBB CCC)],  4444=>[qw(1 22 333)]};
-  ok formatTable($d, undef, '|') eq '      aa   bb   cc   |   1  A    B    C    |  22  AA   BB   CC   | 333  AAA  BBB  CCC  |4444    1   22  333  |';
+  ok formatTable($d, undef, '|') eq "      aa   bb   cc   |1     A    B    C    |22    AA   BB   CC   |333   AAA  BBB  CCC  |4444  1    22   333  |";
  }
 
 if (1)                                                                          # HH
  {my $d = {a=>{aa=>'A', bb=>'B', cc=>'C'}, aa=>{aa=>'AA', bb=>'BB', cc=>'CC'}, aaa=>{aa=>'AAA', bb=>'BBB', cc=>'CCC'}, aaaa=>{aa=>'1', bb=>'22', cc=>'333'}};
-  ok formatTable($d, undef, '|') eq '      aa   bb   cc   |a     A    B    C    |aa    AA   BB   CC   |aaa   AAA  BBB  CCC  |aaaa    1   22  333  |';
+  ok formatTable($d, undef, '|') eq "      aa   bb   cc   |a     A    B    C    |aa    AA   BB   CC   |aaa   AAA  BBB  CCC  |aaaa  1    22   333  |";
  }
 
 if (1)                                                                          # A
@@ -2966,7 +3011,8 @@ if (1)                                                                          
  {my $t = [qw(aa bb cc)];
   my $d = [[qw(A B C)], [qw(AA BB CC)], [qw(AAA BBB CCC)],  [qw(1 22 333)]];
   my $s = indentString(formatTable($d), '  ') =~ s/\n/|/gr;
-  ok $s eq "  1  A    B    C    |  2  AA   BB   CC   |  3  AAA  BBB  CCC  |  4    1   22  333  ", "indent";
+
+  ok $s eq "  1  A    B    C    |  2  AA   BB   CC   |  3  AAA  BBB  CCC  |  4  1    22   333  ", "indent";
  }
 
 ok trim(" a b ") eq join ' ', qw(a b);                                          # Trim

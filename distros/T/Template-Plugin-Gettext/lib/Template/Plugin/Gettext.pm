@@ -21,7 +21,7 @@
 # ABSTRACT: Gettext Support For the Template Toolkit Version 2
 
 package Template::Plugin::Gettext;
-$Template::Plugin::Gettext::VERSION = '0.4';
+$Template::Plugin::Gettext::VERSION = '0.5';
 use strict;
 
 use Locale::TextDomain 1.20 qw(com.cantanea.Template-Plugin-Gettext);
@@ -40,6 +40,7 @@ our @LOCALE_DIRS;
 
 sub __find_domain($);
 sub __expand($%);
+sub __fixup;
 
 BEGIN {
     foreach my $dir (qw('/usr/share/locale /usr/local/share/locale')) {
@@ -188,13 +189,28 @@ sub new {
     return $self;
 }
 
+sub __fixup {
+    my ($msgid, $trans, $msgid_plural, $count) = @_;
+
+    if (@_ > 2) {
+        ($trans, $msgid_plural, $count) = ($msgid_plural, $count, $trans);
+    }
+    my $ref = @_ > 2 && $count != 1 ? $msgid_plural : $msgid;
+    my $trans = $_[-1];
+    if ($trans ne $ref && Encode::is_utf8($ref, 0)) {
+        Encode::_utf8_on($trans);
+    }
+
+    return $trans;
+}
+
 sub __gettext {
     my ($textdomain, $msgid) = @_;
 
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
 
-    return Locale::Messages::dgettext($textdomain => $msgid);
+    return __fixup $msgid, Locale::Messages::dgettext($textdomain => $msgid);
 }
 
 sub gettext {
@@ -209,8 +225,9 @@ sub __ngettext {
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
 
-    return Locale::Messages::dngettext($textdomain => $msgid, $msgid_plural,
-                                       $count);
+    return __fixup $msgid, $msgid_plural, $count,
+                   Locale::Messages::dngettext($textdomain => $msgid, 
+                                               $msgid_plural, $count);
 }
 
 sub ngettext {
@@ -225,7 +242,8 @@ sub __pgettext {
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
 
-    return Locale::Messages::dpgettext($textdomain => $context, $msgid);
+    return __fixup $msgid, 
+                   Locale::Messages::dpgettext($textdomain => $context, $msgid);
 }
 
 sub pgettext {
@@ -240,7 +258,8 @@ sub __gettextp {
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
 
-    return Locale::Messages::dpgettext($textdomain => $context, $msgid);
+    return __fixup $msgid, 
+                   Locale::Messages::dpgettext($textdomain => $context, $msgid);
 }
 
 sub gettextp {
@@ -255,8 +274,9 @@ sub __npgettext {
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
 
-    return Locale::Messages::dnpgettext($textdomain => $context, $msgid,
-                                        $msgid_plural, $count);
+    return __fixup $msgid, $msgid_plural, $count,
+                   Locale::Messages::dnpgettext($textdomain, $context, $msgid,
+                                                $msgid_plural, $count);
 }
 
 sub npgettext {
@@ -272,8 +292,9 @@ sub __ngettextp {
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
 
-    return Locale::Messages::dnpgettext($textdomain => $context, $msgid,
-                                        $msgid_plural, $count);
+    return __fixup $msgid, $msgid_plural, $count,
+                   Locale::Messages::dnpgettext($textdomain => $context, $msgid,
+                                                $msgid_plural, $count);
 }
 
 sub ngettextp {
@@ -289,7 +310,8 @@ sub __xgettext {
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
 
-    return __expand((Locale::Messages::dgettext($textdomain => $msgid)), %vars);
+    return __expand((__fixup $msgid,
+                             Locale::Messages::dgettext($textdomain => $msgid)),                    %vars);
 }
 
 sub xgettext {
@@ -307,8 +329,10 @@ sub __nxgettext {
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
 
-    return __expand((Locale::Messages::dngettext($textdomain => $msgid,
-                                                 $msgid_plural, $count)), 
+    return __expand((__fixup $msgid, $msgid_plural, $count, 
+                             Locale::Messages::dngettext($textdomain => $msgid,
+                                                         $msgid_plural,
+                                                         $count)), 
                     %vars);
 }
 
@@ -328,8 +352,9 @@ sub __pxgettext {
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
 
-    return __expand((Locale::Messages::dpgettext($textdomain => $context, 
-                                                 $msgid)), 
+    return __expand((__fixup $msgid,
+                             Locale::Messages::dpgettext($textdomain => $context, 
+                                                         $msgid)), 
                     %vars);
 }
 
@@ -348,8 +373,9 @@ sub __xgettextp {
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
 
-    return __expand((Locale::Messages::dpgettext($textdomain => $context, 
-                                                 $msgid)), 
+    return __expand((__fixup $msgid,
+                             Locale::Messages::dpgettext($textdomain => $context, 
+                                                         $msgid)), 
                     %vars);
 }
 
@@ -368,9 +394,10 @@ sub __npxgettext {
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
 
-    return __expand((Locale::Messages::dnpgettext($textdomain => $context, 
-                                                 $msgid, $msgid_plural,
-                                                 $count)), 
+    return __expand((__fixup $msgid, $msgid_plural, $count,
+                             Locale::Messages::dnpgettext($textdomain => $context, 
+                                                          $msgid, $msgid_plural,
+                                                          $count)), 
                     %vars);
 }
 
@@ -389,9 +416,10 @@ sub __nxgettextp {
     __find_domain $textdomain
         if defined $textdomain && exists $bound_dirs{$textdomain};
 
-    return __expand((Locale::Messages::dnpgettext($textdomain => $context, 
-                                                 $msgid, $msgid_plural,
-                                                 $count)), 
+    return __expand((__fixup $msgid, $msgid_plural, $count,
+                             Locale::Messages::dnpgettext($textdomain => $context, 
+                                                          $msgid, $msgid_plural,
+                                                          $count)), 
                     %vars);
 }
 

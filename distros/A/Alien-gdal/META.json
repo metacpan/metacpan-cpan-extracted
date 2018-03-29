@@ -1,0 +1,93 @@
+{
+   "abstract" : "Find or build gdal",
+   "author" : [
+      "Shawn Laffan <shawnlaffan@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-gdal",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
+            "Alien::MSYS" : "0.07",
+            "Alien::patch" : "0.09",
+            "Archive::Tar" : "0",
+            "ExtUtils::MakeMaker" : "6.52",
+            "File::Find::Rule" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Zlib" : "0",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
+            "Alien::MSYS" : "0",
+            "Alien::patch" : "0",
+            "ExtUtils::MakeMaker" : "6.52",
+            "File::Find::Rule" : "0",
+            "HTTP::Tiny" : "0.044",
+            "PkgConfig" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.038",
+            "Alien::Build" : "0.25"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::CChecker" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/shawnlaffan/perl-alien-gdal/issues/"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/shawnlaffan/perl-alien-gdal"
+      }
+   },
+   "version" : "1.02",
+   "x_alienfile" : {
+      "generated_by" : "Alien::Build::MM version 1.32",
+      "requires" : {
+         "share" : {
+            "Alien::MSYS" : "0.07",
+            "Alien::patch" : "0.09",
+            "Archive::Tar" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Zlib" : "0",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

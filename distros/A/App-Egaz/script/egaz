@@ -18,6 +18,9 @@ perl -I lib/ script/egaz help
 lastz t/pseudocat.fa t/pseudopig.fa > t/default.lav
 lavToPsl t/default.lav t/default.psl
 
+perl -I lib/ script/egaz exactmatch t/pig2.fa t/pseudopig.fa --debug
+perl -I lib/ t/03-exactmatch.t
+
 perl -I lib/ script/egaz lav2axt t/default.lav
 perl -I lib/ t/04-lav2axt.t
 
@@ -46,4 +49,10 @@ cat t/partition.q.lav | perl ~/Downloads/blastz-normalizeLav 18803 22929 > t/par
 perl -I lib/ script/egaz normalize t/partition.t.lav --tlen 18803
 perl -I lib/ t/10-normalize.t
 
+perl -I lib/ script/egaz raxml t/YDL184C.fas --verbose
+perl -I lib/ t/11-raxml.t
+
+blastn
+
 sortaxt
+

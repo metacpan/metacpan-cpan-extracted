@@ -121,6 +121,33 @@ subtest "RFC 7677 example (SHA256)" => sub {
 
 };
 
+subtest "Unicode username" => sub {
+    my $client = get_client(
+        username         => "ram\N{U+00F3}n",
+        password         => "p\N{U+00C5}ssword",
+        _nonce_generator => sub { "cT4Z0nGchlcAXXkDBrYFlC7b3bXA24xr" }
+    );
+    my $first = $client->first_msg();
+    is(
+        $first,
+        "n,,n=ram\N{U+00F3}n,r=cT4Z0nGchlcAXXkDBrYFlC7b3bXA24xr",
+        "client first message"
+    ) or diag explain $client;
+
+    my $server_first =
+      "r=cT4Z0nGchlcAXXkDBrYFlC7b3bXA24xrB3rw8xNSLYx23V0qdkD/t7ZjoUcyDrTy,s=c2FsdA==,i=4096";
+    my $final = $client->final_msg($server_first);
+    is(
+        $final,
+        'c=biws,r=cT4Z0nGchlcAXXkDBrYFlC7b3bXA24xrB3rw8xNSLYx23V0qdkD/t7ZjoUcyDrTy,p=lfZL47BCT5wdBisDystprtNLsbA=',
+        "client final message"
+    ) or diag explain $client;
+
+    ok( $client->validate("v=etGS4QFClYMJTMeRBMs0lnWRmV8="),
+        "server message validated" );
+
+};
+
 subtest "Minimum iteration count" => sub {
     {
         # force client nonce to match RFC5802 example

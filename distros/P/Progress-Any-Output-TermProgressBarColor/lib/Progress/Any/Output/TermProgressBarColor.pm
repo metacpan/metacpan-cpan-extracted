@@ -1,7 +1,7 @@
 package Progress::Any::Output::TermProgressBarColor;
 
-our $DATE = '2018-03-21'; # DATE
-our $VERSION = '0.243'; # VERSION
+our $DATE = '2018-03-27'; # DATE
+our $VERSION = '0.245'; # VERSION
 
 use 5.010001;
 use strict;
@@ -26,7 +26,7 @@ sub _patch {
             sub {
                 # we install a hook to clean up progress indicator first before
                 # we print log message to the screen.
-                $out->cleanup;
+                $out->cleanup(1);
                 $Progress::Any::output_data{"$out"}{force_update} = 1;
             }
         );
@@ -36,7 +36,7 @@ sub _patch {
             sub {
                 # we install a hook to clean up progress indicator first before
                 # we print log message to the screen.
-                $out->cleanup;
+                $out->cleanup(1);
                 $Progress::Any::output_data{"$out"}{force_update} = 1;
             }
         );
@@ -47,8 +47,15 @@ sub _patch {
             'Log::Any::Adapter::Screen', 'hook_after_log', 'replace',
             sub {
                 my ($self, $msg) = @_;
+                # make sure we print a newline after logging so progress bar
+                # starts at column 1
                 print { $self->{_fh} } "\n" unless $msg =~ /\R\z/;
+
+                # reset show_delay because we have displayed something
                 $out->keep_delay_showing if $out->{show_delay};
+
+                # redisplay progress bar if were cleaned up
+                print { $self->{_fh} } $out->{_bar} if $out->{_bar};
             }
         );
     } elsif (defined &{"Log::ger::Output::Screen::hook_after_log"}) {
@@ -56,8 +63,15 @@ sub _patch {
             'Log::ger::Output::Screen', 'hook_after_log', 'replace',
             sub {
                 my ($ctx, $msg) = @_;
+                # make sure we print a newline after logging so progress bar
+                # starts at column 1
                 print { $ctx->{_fh} } "\n" unless $msg =~ /\R\z/;
+
+                # reset show_delay because we have displayed something
                 $out->keep_delay_showing if $out->{show_delay};
+
+                # redisplay progress bar if were cleaned up
+                print { $ctx->{_fh} } $out->{_bar} if $out->{_bar};
             }
         );
     }
@@ -70,6 +84,7 @@ sub _unpatch {
 
 sub _template_length {
     require Progress::Any; # for $template_regex
+    no warnings 'once'; # $Progress::Any::template_regex
 
     my ($self, $template) = @_;
 
@@ -132,6 +147,8 @@ sub new {
 
     $args{show_delay} = delete($args0{show_delay});
 
+    $args{freq} = delete($args0{freq});
+
     $args{wide} = delete($args0{wide});
 
     $args{template} = delete($args0{template}) //
@@ -157,7 +174,9 @@ sub new {
         $self->{_default_b_width} = $args{width} - $len;
     }
 
-    $self->_patch;
+    # render color in template
+    ($self->{_template} = $self->{template}) =~ s!<color (\w+)>|<(/)color>!$1 ? ansifg($1) : "\e[0m"!eg;
+
     $self;
 }
 
@@ -206,11 +225,8 @@ sub _handle_unknown_conversion {
             $msg = Text::ANSI::Util::ta_trunc($msg, $bwidth);
             $mwidth = Text::ANSI::Util::ta_length($msg);
         }
-        $bar_bar = ansifg("808080") . $msg . ansifg("ff8000") .
-            substr($bar_bar, $mwidth);
+        $bar_bar = $msg . substr($bar_bar, $mwidth);
     }
-
-    $bar_bar = ansifg("ff8000") . $bar_bar;
 
     return ("%s", $bar_bar);
 }
@@ -227,19 +243,14 @@ sub update {
         return if $now - $self->{show_delay} < $self->{_last_hide_time};
     }
 
-    # "erase" previous display
-    my $ll = $self->{_lastlen};
-    if (defined $self->{_lastlen}) {
-        print { $self->{fh} } "\b" x $self->{_lastlen};
-        undef $self->{_lastlen};
-    }
+    $self->_patch;
+
+    $self->cleanup;
 
     my $p = $args{indicator};
     my $is_finished = $p->{state} eq 'finished';
     if ($is_finished) {
-        if ($ll) {
-            my $fh = $self->{fh};
-            print $fh " " x $ll, "\b" x $ll;
+        if ($self->{_lastlen}) {
             $self->{_last_hide_time} = $now;
         }
         return;
@@ -247,7 +258,7 @@ sub update {
 
     my $bar = $p->fill_template(
         {
-            template => $self->{template},
+            template => $self->{_template},
             handle_unknown_conversion => sub {
                 _handle_unknown_conversion(
                     self => $self,
@@ -258,15 +269,14 @@ sub update {
         %args,
     );
 
-    $bar =~ s!<color (\w+)>|<(/)color>!$1 ? ansifg($1) : "\e[0m"!eg;
-
-    print { $self->{fh} } $bar;
-
-    $self->{_lastlen} = Text::ANSI::Util::ta_length($bar);
+    my $len = Text::ANSI::Util::ta_length($bar);
+    $self->{_bar}   = $bar . ("\b" x $len);
+    print { $self->{fh} } $self->{_bar};
+    $self->{_lastlen} = $len;
 }
 
 sub cleanup {
-    my ($self) = @_;
+    my ($self, $dont_reset_lastlen) = @_;
 
     # sometimes (e.g. when a subtask's target is undefined) we don't get
     # state=finished at the end. but we need to cleanup anyway at the end of
@@ -275,7 +285,8 @@ sub cleanup {
 
     my $ll = $self->{_lastlen};
     return unless $ll;
-    print { $self->{fh} } "\b" x $ll, " " x $ll, "\b" x $ll;
+    print { $self->{fh} } " " x $ll, "\b" x $ll;
+    undef $self->{_lastlen} unless $dont_reset_lastlen;
 }
 
 sub keep_delay_showing {
@@ -304,7 +315,7 @@ Progress::Any::Output::TermProgressBarColor - Output progress to terminal as col
 
 =head1 VERSION
 
-This document describes version 0.243 of Progress::Any::Output::TermProgressBarColor (from Perl distribution Progress-Any-Output-TermProgressBarColor), released on 2018-03-21.
+This document describes version 0.245 of Progress::Any::Output::TermProgressBarColor (from Perl distribution Progress-Any-Output-TermProgressBarColor), released on 2018-03-27.
 
 =head1 SYNOPSIS
 
@@ -358,6 +369,24 @@ Known arguments:
 
 =over
 
+=item * freq => num
+
+Limit the frequency of output updating. 0 means no frequency limiting (update
+output after every C<update()>).
+
+A positive number means to update output when there has been that amount of
+difference in position since last C<update()>. For example, if C<freq> is 10 and
+the last C<update()> was at position 5, then the next output update will be when
+position is at least 15.
+
+A negative number means to update output when time has passed that amount of
+absolute value (in seconds). For example, if C<freq> is -3 and the last
+C<update()> was 1 second ago, then the next output update will not be until the
+next two seconds has passed.
+
+By default undef, in which case Progress::Any will use the default -0.5 (at most
+once every 0.5 seconds).
+
 =item * wide => bool
 
 If set to 1, enable wide character support (requires L<Text::ANSI::WideUtil>.
@@ -383,12 +412,11 @@ determine the characters used for drawing the bar, alignment, etc.
 
 =item * template => str
 
-See B<fill_template> in Progress::Any's documentation. Aside from template
-strings supported by Progress::Any, this output recognizes these additional
-strings: C<%b> to display the progress bar (with width using the rest of the
-available width), C<%B> to display the progress bar as well as the message
-inside it. You can also enclose parts of text with "<color RGB>" ... "</color>"
-to give color.
+See B<fill_template> in Progress::Any's documentation. Aside from conversions
+supported by Progress::Any, this output recognizes these additional conversions:
+C<%b> to display the progress bar (with width using the rest of the available
+width), C<%B> to display the progress bar as well as the message inside it. You
+can also enclose parts of text with "<color RGB>" ... "</color>" to give color.
 
 The default template is:
 
@@ -415,6 +443,13 @@ C<show_delay> is defined. For example, if C<show_delay> is 5 seconds and two
 seconds have passed, it should've been 3 seconds before progress bar is shown in
 the next C<update()>. However, if you call this method, it will be 5 seconds
 again before showing.
+
+=head1 FAQ
+
+=head2 How to update progress bar output more often?
+
+Set C<freq> to e.g. -0.1 or -0.05. The default C<freq>, when unset, is -0.5
+which means to update output at most once every 0.5 second.
 
 =head1 ENVIRONMENT
 

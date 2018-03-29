@@ -1,3 +1,17 @@
+0.22 2018-03-27
+-bugfix: add 'name' and 'version' parameters to `use Inline` statment and call
+ to `Inline->init` to avoid runtime lookup errors
+
+0.21 2018-03-27
+-compromise: attempt to decode utf8 from percent-encoded sequences, but
+ fail gracefully
+
+0.20 2018-03-27
+-don't croak on invalid utf8; uri may include arbitrary encoded bytes
+
+0.19 2018-03-27
+-added minimal validation of decoded utf8 (croaks on invalid sequences)
+
 0.18 2018-03-21
 -support for tied scalar inputs in XS code
 

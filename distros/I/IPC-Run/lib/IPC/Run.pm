@@ -15,10 +15,10 @@ IPC::Run - system() and background procs w/ piping, redirs, ptys (Unix, Win32)
    ## Using run() instead of system():
       use IPC::Run qw( run timeout );
 
-      run \@cmd, \$in, \$out, \$err, timeout( 10 ) or die "cat: $?"
+      run \@cat, \$in, \$out, \$err, timeout( 10 ) or die "cat: $?"
 
       # Can do I/O to sub refs and filenames, too:
-      run \@cmd, '<', "in.txt", \&out, \&err or die "cat: $?"
+      run \@cat, '<', "in.txt", \&out, \&err or die "cat: $?"
       run \@cat, '<', "in.txt", '>>', "out.txt", '2>>', "err.txt";
 
 
@@ -1015,7 +1015,7 @@ use Exporter ();
 use vars qw{$VERSION @ISA @FILTER_IMP @FILTERS @API @EXPORT_OK %EXPORT_TAGS};
 
 BEGIN {
-    $VERSION = '0.96';
+    $VERSION = '0.97';
     @ISA     = qw{ Exporter };
 
     ## We use @EXPORT for the end user's convenience: there's only one function
@@ -4349,11 +4349,9 @@ Message ylln51p2b6.fsf@windlord.stanford.edu, on 2000/02/04.
 
 =head1 SUPPORT
 
-Bugs should always be submitted via the CPAN bug tracker
+Bugs should always be submitted via the GitHub bug tracker
 
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=IPC-Run>
-
-For other issues, contact the maintainer (the first listed author)
+L<https://github.com/toddr/IPC-Run/issues>
 
 =head1 AUTHORS
 

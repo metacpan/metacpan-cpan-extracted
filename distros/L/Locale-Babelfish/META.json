@@ -7,7 +7,7 @@
       "REG.RU LLC"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -100,43 +100,43 @@
    "provides" : {
       "Locale::Babelfish" : {
          "file" : "lib/Locale/Babelfish.pm",
-         "version" : "2.003"
+         "version" : "2.004"
       },
       "Locale::Babelfish::Phrase::Compiler" : {
          "file" : "lib/Locale/Babelfish/Phrase/Compiler.pm",
-         "version" : "2.003"
+         "version" : "2.004"
       },
       "Locale::Babelfish::Phrase::Literal" : {
          "file" : "lib/Locale/Babelfish/Phrase/Literal.pm",
-         "version" : "2.003"
+         "version" : "2.004"
       },
       "Locale::Babelfish::Phrase::Node" : {
          "file" : "lib/Locale/Babelfish/Phrase/Node.pm",
-         "version" : "2.003"
+         "version" : "2.004"
       },
       "Locale::Babelfish::Phrase::Parser" : {
          "file" : "lib/Locale/Babelfish/Phrase/Parser.pm",
-         "version" : "2.003"
+         "version" : "2.004"
       },
       "Locale::Babelfish::Phrase::ParserBase" : {
          "file" : "lib/Locale/Babelfish/Phrase/ParserBase.pm",
-         "version" : "2.003"
+         "version" : "2.004"
       },
       "Locale::Babelfish::Phrase::PluralForms" : {
          "file" : "lib/Locale/Babelfish/Phrase/PluralForms.pm",
-         "version" : "2.003"
+         "version" : "2.004"
       },
       "Locale::Babelfish::Phrase::PluralFormsParser" : {
          "file" : "lib/Locale/Babelfish/Phrase/PluralFormsParser.pm",
-         "version" : "2.003"
+         "version" : "2.004"
       },
       "Locale::Babelfish::Phrase::Pluralizer" : {
          "file" : "lib/Locale/Babelfish/Phrase/Pluralizer.pm",
-         "version" : "2.003"
+         "version" : "2.004"
       },
       "Locale::Babelfish::Phrase::Variable" : {
          "file" : "lib/Locale/Babelfish/Phrase/Variable.pm",
-         "version" : "2.003"
+         "version" : "2.004"
       }
    },
    "release_status" : "stable",
@@ -151,7 +151,7 @@
          "web" : "https://github.com/regru/Locale-Babelfish"
       }
    },
-   "version" : "2.003",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "2.004",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

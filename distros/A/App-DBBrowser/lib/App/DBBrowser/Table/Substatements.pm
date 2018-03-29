@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.008';
+our $VERSION = '2.009';
 
 use List::MoreUtils   qw( any );
 
@@ -107,7 +107,7 @@ sub columns {
     my $sq_col = '(Q';
     my $bu = [];
     my @pre = ( undef, $sf->{i}{ok} );
-    push @pre, $sq_col if $sf->{o}{G}{subqueries};
+    push @pre, $sq_col if $sf->{o}{G}{subqueries_select};
 
     COLUMNS: while ( 1 ) {
         my $choices = [ @pre, @{$sql->{cols}} ];
@@ -256,7 +256,7 @@ sub where {
     my $bu = [];
     my $sq_col = '(Q';
     my @pre = ( undef, $sf->{i}{ok} );
-    push @pre, $sq_col if $sf->{o}{G}{subqueries};
+    push @pre, $sq_col if $sf->{o}{G}{subqueries_w_h};
 
     WHERE: while ( 1 ) {
         my @choices = ( @cols );
@@ -599,12 +599,12 @@ sub __set_operator_sql {
     if ( $clause eq 'set' ) {
         @operators    = ( ' = ' );
         @opr_subquery = ( ' = ' );
-        unshift @operators, $op_query if $sf->{o}{G}{subqueries};
+        unshift @operators, $op_query if $sf->{o}{G}{subqueries_set};
     }
     else {
         @operators    = @{$sf->{o}{G}{operators}};
         @opr_subquery = @{$sf->{opr_subquery}};
-        unshift @operators, $op_query if $sf->{o}{G}{subqueries};
+        unshift @operators, $op_query if $sf->{o}{G}{subqueries_w_h};
     }
 
     OPERATOR: while( 1 ) {

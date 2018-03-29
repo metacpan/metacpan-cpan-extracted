@@ -1,5 +1,23 @@
 Changelog for Statocles
 
+0.091     2018-03-27 16:51:32-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed test failures when STDIN was attached to /dev/null during
+      testing. Thanks @mohawk2!
+    - Fixed test failures writing to site status file before
+      `.statocles` directory is created
+
+0.090     2018-03-26 12:06:38-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed test failure with misspelled module name. Thanks @mohawk2!
+      [Github #560]
+    - Increased requirement on Test::Exception to hopefully stop some
+      test failures.
+
 0.089     2018-03-25 18:56:42-05:00 America/Chicago
 
     [BREAKING CHANGES]

@@ -1,3 +1,14 @@
+[1.04] Released on 2018-03-26
+
+     Sped up critic_ok() by 4x by not recreating a Perl::Critic object
+     over and over.  Thanks, Jan Holčapek.  (GH#10)
+
+     Now requires Test::Builder~0.88 or later to support the done_testing()
+     method. (GH#2)
+
+     Now requires MCE 1.827 to deal with problems running under taint
+     mode.  Thanks, Alexandr Ciornii.  (GH #6)
+
 [1.03] Released on 2015-02-03
 
      all_critic_ok() will now run tests in parallel over multiple cores. So if

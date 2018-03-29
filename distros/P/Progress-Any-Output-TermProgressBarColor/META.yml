@@ -23,7 +23,7 @@ recommends:
 requires:
   Color::ANSI::Util: '0.160'
   Monkey::Patch::Action: '0'
-  Progress::Any: '0.212'
+  Progress::Any: '0.214'
   String::Elide::Parts: '0.07'
   Text::ANSI::Util: '0.22'
   perl: '5.010001'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Progress-Any-Output-TermProgressBarColor
   homepage: https://metacpan.org/release/Progress-Any-Output-TermProgressBarColor
   repository: git://github.com/perlancar/perl-Progress-Any-Output-TermProgressBarColor.git
-version: '0.243'
+version: '0.245'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

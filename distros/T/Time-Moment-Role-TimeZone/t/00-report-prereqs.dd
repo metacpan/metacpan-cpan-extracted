@@ -15,7 +15,9 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Carp' => '0',
                                       'Role::Tiny' => '2.000001',
+                                      'Time::Local' => '0',
                                       'Time::Moment' => '0.18',
                                       'perl' => '5.008001'
                                     }

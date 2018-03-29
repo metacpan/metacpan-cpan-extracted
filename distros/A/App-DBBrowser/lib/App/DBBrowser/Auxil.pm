@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.008';
+our $VERSION = '2.009';
 
 use Encode         qw( encode );
 use File::Basename qw( dirname );
@@ -51,17 +51,18 @@ sub backup_href {
 
 
 sub print_sql {
-    my ( $sf, $sql, $stmt_typeS, $tmp ) = @_;
+    my ( $sf, $sql, $stmt_typeS, $tmp ) = @_; ###
+    return if ! defined $stmt_typeS;
     $tmp = {} if ! defined $tmp;
-    my $p_sql = {};
-    for my $key ( keys %$sql ) {
-        $p_sql->{$key} = exists $tmp->{$key} ? $tmp->{$key} : $sql->{$key}; #
+    my $pr_sql = { %$sql };
+    for my $key ( keys %$tmp ) {
+        $pr_sql->{$key} = exists $tmp->{$key} ? $tmp->{$key} : $sql->{$key}; #
     }
-    my $table = $p_sql->{table};
+    my $table = $pr_sql->{table};
     my $str = '';
     for my $stmt_type ( @$stmt_typeS ) {
         if ( $stmt_type eq 'Create_table' ) {
-            my @cols = defined $p_sql->{create_table_cols} ? @{$p_sql->{create_table_cols}} : @{$p_sql->{insert_into_cols}};
+            my @cols = @{$pr_sql->{create_table_cols}};
             $str .= "CREATE TABLE $table (";
             if ( @cols ) {
                 $str .= join( ', ',  map { defined $_ ? $_ : '' } @cols );
@@ -69,7 +70,7 @@ sub print_sql {
             $str .= ")\n";
         }
         if ( $stmt_type eq 'Insert' ) {
-            my @cols = @{$p_sql->{insert_into_cols}};
+            my @cols = @{$pr_sql->{insert_into_cols}};
             $str .= "INSERT INTO $table (";
             if ( @cols ) {
                 $str .= join( ', ', map { defined $_ ? $_ : '' } @cols );
@@ -78,15 +79,15 @@ sub print_sql {
             $str .= "  VALUES(\n";
             my $val_indent = 4;
             my $max = 9;
-            if ( @{$p_sql->{insert_into_args}} > $max ) {
-                for my $insert_row ( @{$p_sql->{insert_into_args}}[ 0 .. $max - 3 ] ) {
+            if ( @{$pr_sql->{insert_into_args}} > $max ) {
+                for my $insert_row ( @{$pr_sql->{insert_into_args}}[ 0 .. $max - 3 ] ) {
                     $str .= ( ' ' x $val_indent ) . join( ', ', map { defined $_ ? $_ : '' } @$insert_row ) . "\n";
                 }
                 $str .= sprintf "%s...\n",       ' ' x $val_indent;
-                $str .= sprintf "%s[%d rows]\n", ' ' x $val_indent, scalar @{$p_sql->{insert_into_args}};
+                $str .= sprintf "%s[%d rows]\n", ' ' x $val_indent, scalar @{$pr_sql->{insert_into_args}};
             }
             else {
-                for my $insert_row ( @{$p_sql->{insert_into_args}} ) {
+                for my $insert_row ( @{$pr_sql->{insert_into_args}} ) {
                     $str .= ( ' ' x $val_indent ) . join( ', ', map { defined $_ ? $_ : '' } @$insert_row ) . "\n";
                 }
             }
@@ -100,23 +101,23 @@ sub print_sql {
             );
             my $cols_sql;
             if ( $stmt_type eq 'Select' ) {
-                $cols_sql = $sf->cols_as_string( $p_sql );
+                $cols_sql = $sf->prepare_select_cols( $pr_sql );
             }
             $str .= $type_sql{$stmt_type};
-            $str .= $p_sql->{distinct_stmt}                   if $p_sql->{distinct_stmt};
-            $str .= ' '      . $cols_sql               . "\n" if $cols_sql;
-            $str .= " FROM"                                   if $stmt_type eq 'Select' || $stmt_type eq 'Delete';
-            $str .= ' '      . $table                  . "\n";
-            $str .= ' '      . $p_sql->{set_stmt}      . "\n" if $p_sql->{set_stmt};
-            $str .= ' '      . $p_sql->{where_stmt}    . "\n" if $p_sql->{where_stmt};
-            $str .= ' '      . $p_sql->{group_by_stmt} . "\n" if $p_sql->{group_by_stmt};
-            $str .= ' '      . $p_sql->{having_stmt}   . "\n" if $p_sql->{having_stmt};
-            $str .= ' '      . $p_sql->{order_by_stmt} . "\n" if $p_sql->{order_by_stmt};
-            $str .= ' '      . $p_sql->{limit_stmt}    . "\n" if $p_sql->{limit_stmt};
-            $str .= ' '      . $p_sql->{offset_stmt}   . "\n" if $p_sql->{offset_stmt};
+            $str .= $pr_sql->{distinct_stmt}                   if $pr_sql->{distinct_stmt};
+            $str .= ' '      . $cols_sql                . "\n" if $cols_sql;
+            $str .= " FROM"                                    if $stmt_type eq 'Select' || $stmt_type eq 'Delete';
+            $str .= ' '      . $table                   . "\n";
+            $str .= ' '      . $pr_sql->{set_stmt}      . "\n" if $pr_sql->{set_stmt};
+            $str .= ' '      . $pr_sql->{where_stmt}    . "\n" if $pr_sql->{where_stmt};
+            $str .= ' '      . $pr_sql->{group_by_stmt} . "\n" if $pr_sql->{group_by_stmt};
+            $str .= ' '      . $pr_sql->{having_stmt}   . "\n" if $pr_sql->{having_stmt};
+            $str .= ' '      . $pr_sql->{order_by_stmt} . "\n" if $pr_sql->{order_by_stmt};
+            $str .= ' '      . $pr_sql->{limit_stmt}    . "\n" if $pr_sql->{limit_stmt};
+            $str .= ' '      . $pr_sql->{offset_stmt}   . "\n" if $pr_sql->{offset_stmt};
         }
     }
-    for my $val ( @{$p_sql->{set_args}}, @{$p_sql->{where_args}}, @{$p_sql->{having_args}} ) {
+    for my $val ( @{$pr_sql->{set_args}}, @{$pr_sql->{where_args}}, @{$pr_sql->{having_args}} ) {
         $str =~ s/\?/$val/;
     }
     $str .= "\n";
@@ -130,17 +131,17 @@ sub alias_key {
 }
 
 
-sub cols_as_string {
-    my ( $sf, $p_sql ) = @_; # p_sql
+sub prepare_select_cols {
+    my ( $sf, $sql ) = @_;
     my @tmp;
-    if ( ! keys %{$p_sql->{alias}} ) {
-        @tmp = ( @{$p_sql->{group_by_cols}}, @{$p_sql->{aggr_cols}}, @{$p_sql->{chosen_cols}} );
+    if ( ! keys %{$sql->{alias}} ) {
+        @tmp = ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}}, @{$sql->{chosen_cols}} );
     }
     else {
-        push @tmp, @{$p_sql->{group_by_cols}};
-        for ( @{$p_sql->{aggr_cols}}, @{$p_sql->{chosen_cols}} ) {
-            if ( exists $p_sql->{alias}{$_} && defined  $p_sql->{alias}{$_} && length $p_sql->{alias}{$_} ) {
-                push @tmp, $_ . " AS " . $p_sql->{alias}{$_};
+        push @tmp, @{$sql->{group_by_cols}};
+        for ( @{$sql->{aggr_cols}}, @{$sql->{chosen_cols}} ) {
+            if ( exists $sql->{alias}{$_} && defined  $sql->{alias}{$_} && length $sql->{alias}{$_} ) {
+                push @tmp, $_ . " AS " . $sql->{alias}{$_};
             }
             else {
                 push @tmp, $_;
@@ -148,6 +149,9 @@ sub cols_as_string {
         }
     }
     if ( ! @tmp ) {
+        if ( $sf->{i}{multi_tbl} eq 'join' ) {
+             return join( ', ', @{$sql->{cols}} );
+        }
         return "*";
     }
     return join( ', ', @tmp );
@@ -159,7 +163,7 @@ sub alias {
     my $alias;
     if ( $sf->{o}{G}{alias} ) {
         my $tf = Term::Form->new();
-        $alias = $tf->readline( $raw . " AS " );
+        $alias = $tf->readline( " AS ", { info => $raw } );
     }
     if ( ! defined $alias || ! length $alias ) {
         $alias = $default;
@@ -219,7 +223,8 @@ sub reset_sql {
     my @array  = qw(       chosen_cols      aggr_cols      group_by_cols
                       orig_chosen_cols orig_aggr_cols orig_group_by_cols  modified_cols
                       set_args where_args having_args
-                      insert_into_cols insert_into_args );
+                      insert_into_cols insert_into_args
+                      create_table_cols );
     my @hash   = qw( alias );
     @{$sql}{@string} = ( '' ) x  @string;
     @{$sql}{@array}  = map{ [] } @array;

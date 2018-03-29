@@ -6,7 +6,7 @@ use Pcore::App::API::Auth;
 use Pcore::Util::Data qw[from_b64 from_b64_url];
 use Pcore::Util::Digest qw[sha3_512];
 use Pcore::Util::Text qw[encode_utf8];
-use Pcore::Util::UUID qw[create_uuid_from_bin];
+use Pcore::Util::UUID qw[uuid_from_bin];
 
 has app => ( is => 'ro', isa => ConsumerOf ['Pcore::App'], required => 1 );
 
@@ -27,8 +27,6 @@ const our $TOKEN_TYPE => {
 };
 
 sub new ( $self, $app ) {
-    my $uri = P->uri( $app->{app_cfg}->{api}->{connect} );
-
     state $scheme_class = {
         sqlite => 'Pcore::App::API::Local::sqlite',
         pgsql  => 'Pcore::App::API::Local::pgsql',
@@ -36,14 +34,19 @@ sub new ( $self, $app ) {
         wss    => 'Pcore::App::API::Local::Remote',
     };
 
-    if ( my $class = $scheme_class->{ $uri->scheme } ) {
-        return P->class->load($class)->new( { app => $app } );
+    if ( defined $app->{app_cfg}->{api}->{connect} ) {
+        my $uri = P->uri( $app->{app_cfg}->{api}->{connect} );
+
+        if ( my $class = $scheme_class->{ $uri->scheme } ) {
+            return P->class->load($class)->new( { app => $app } );
+        }
+        else {
+            die 'Unknown API scheme';
+        }
     }
     else {
-        die 'Unknown API scheme';
+        return P->class->load('Pcore::App::API::LocalNoAuth')->new( { app => $app } );
     }
-
-    return;
 }
 
 # setup events listeners
@@ -115,7 +118,7 @@ sub authenticate ( $self, $user_name_utf8, $token, $cb ) {
             $token_type = unpack 'C', $token_bin;
 
             # unpack token id
-            $token_id = create_uuid_from_bin( substr $token_bin, 1, 16 )->str;
+            $token_id = uuid_from_bin( substr $token_bin, 1, 16 )->str;
 
             $private_token_hash = sha3_512 $token;
         };
@@ -211,9 +214,9 @@ around authenticate_private => sub ( $orig, $self, $private_token, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 78                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 81                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 111                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 114                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

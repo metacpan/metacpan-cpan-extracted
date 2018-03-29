@@ -58,6 +58,7 @@ Hauke
 Helpers
 Hill
 Hoblitt
+Howarth
 IEEE
 Iain
 Infinite
@@ -86,6 +87,7 @@ Ovid
 POSIX
 PP
 PPExtra
+Paul
 PayPal
 Philippe
 Precious
@@ -169,6 +171,7 @@ nitty
 olaf
 oschwald
 other's
+paul
 proleptic
 qqq
 qqqq

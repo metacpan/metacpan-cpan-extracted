@@ -19,14 +19,14 @@ sub new {
 
 	# get object class
 	my $class = shift();
-	
+
 	# create empty profile object
 	my $self = [
-				{},		# object header
-				[],		# profile header
-				[]		# tag table
-			];
-			
+		{},  # object header
+		[],  # profile header
+		[]   # tag table
+	];
+
 	# if one parameter, a file path
 	if (@_ == 1 && ! ref($_[0]) && -f $_[0]) {
 		
@@ -37,10 +37,10 @@ sub new {
 
 	# bless object
 	bless($self, $class);
-	
+
 	# return object reference
 	return($self);
-	
+
 }
 
 # get reference to profile header
@@ -83,40 +83,40 @@ sub fh {
 # parameters: (ref_to_object, path_to_profile)
 # returns: (success_flag)
 sub _readICCprofile {
-	
+
 	# get parameters
 	my ($self, $path) = @_;
 
 	# local variables
 	my ($fh, $buf);
-	
+
 	# open the profile file
 	open($fh, $path) || return(0);
-	
-	# save file handle
-	$self->[3] = $fh;
-	
+
 	# set binary mode
 	binmode($fh);
-	
+
+	# save file handle
+	$self->[3] = $fh;
+
 	# seek to profile file signature
 	seek($fh, 36, 0);
-	
+
 	# read profile file signature
 	read($fh, $buf, 4);
-	
+
 	# return if not an ICC profile
 	($buf eq 'acsp') || return(0);
-	
+
 	# read the header
 	_readICCheader($fh, $self->[1]) || return(0);
-	
+
 	# read the tag table
 	_readICCtagtable($fh, $self->[2]) || return(0);
-	
+
 	# return
 	return(1);
-	
+
 }
 
 # read ICC header
@@ -126,19 +126,19 @@ sub _readICCheader {
 
 	# get parameters
 	my ($fh, $header) = @_;
-	
+
 	# local variables
 	my ($buf, $check);
-	
+
 	# seek to start of header
 	seek($fh, 0, 0);
-	
+
 	# read the header (128 bytes)
 	(read($fh, $buf, 128) == 128) || return(0);
-	
+
 	# unpack the header
 	@{$header} = unpack('N a4 H8 a4 a4 a4 n6 a4 a4 N a4 a4 N2 N N3 a4 H32 x28', $buf);
-	
+
 	# return success if profile file signature verified
 	return($header->[12] eq 'acsp' ? 1 : 0);
 
@@ -151,22 +151,22 @@ sub _readICCtagtable {
 
 	# get parameters
 	my ($fh, $tagtab) = @_;
-	
+
 	# local variables
 	my ($buf, $i, $n);
-	
+
 	# seek to start of tag table
 	seek($fh, 128, 0);
-	
+
 	# read tag count (4 bytes)
 	(read($fh, $buf, 4) == 4) || return(0);
-	
+
 	# unpack tag count
 	$n = unpack('N', $buf);
-	
+
 	# read tag entries
 	for $i (0 .. $n - 1) {
-	
+		
 		# read tag entry (12 bytes)
 		(read($fh, $buf, 12) == 12) || return(0) ;
 		
@@ -174,7 +174,7 @@ sub _readICCtagtable {
 		@{$tagtab->[$i]} = unpack('a4 N N', $buf);
 		
 	}
-	
+
 	# return
 	return(1);
 

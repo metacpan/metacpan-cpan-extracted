@@ -1,11 +1,12 @@
 #!/usr/bin/perl
 
-package Devel::Events;
+package Devel::Events; # git description: 695e81c
+# ABSTRACT: Extensible instrumentation framework
 
 use strict;
 use warnings;
 
-our $VERSION = "0.08";
+our $VERSION = '0.09';
 
 __PACKAGE__;
 
@@ -13,9 +14,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-Devel::Events - Extensible instrumentation framework.
+Devel::Events - Extensible instrumentation framework
+
+=head1 VERSION
+
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -59,6 +66,8 @@ properly analyze the events you are interested in.
 
 =head2 Generators
 
+=over 4
+
 =item L<Devel::Events::Generator::Objects>
 
 Generate C<object_bless> and C<object_destroy> events by overriding
@@ -76,7 +85,11 @@ Fires an C<executing_line> event for every line using the perl debugger hook.
 
 Fires events for C<require> and c<use> calls.
 
+=back
+
 =head2 Handlers
+
+=over 4
 
 =item L<Devel::Events::Handler::Multiplex>
 
@@ -123,7 +136,6 @@ Add size reports to events using L<Devel::Size>
 
 Remove certain fields from events.
 
-
 =item L<Devel::Events::Filter::Warn>
 
 Runs C<warn "@event"> before delegating to the sub handler. Useful for
@@ -138,16 +150,26 @@ All events are passed as lists.
 The default components will generate lists containing a single string which is
 the event name, and then a list of key/value pairs.
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-Events>
+(or L<bug-Devel-Events@rt.cpan.org|mailto:bug-Devel-Events@rt.cpan.org>).
+
 =head1 AUTHOR
 
-Yuval Kogman <nothingmuch@woobling.org>
+יובל קוג'מן (Yuval Kogman) <nothingmuch@woobling.org>
 
-=head1 COPYRIGHT & LICENSE
+=head1 CONTRIBUTOR
 
-	Copyright (c) 2007 Yuval Kogman. All rights reserved
-	This program is free software; you can redistribute it and/or modify it
-	under the terms of the MIT license or the same terms as Perl itself.
+=for stopwords Karen Etheridge
+
+Karen Etheridge <ether@cpan.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2007 by יובל קוג'מן (Yuval Kogman).
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-

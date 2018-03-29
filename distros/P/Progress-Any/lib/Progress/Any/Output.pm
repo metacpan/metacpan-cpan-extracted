@@ -1,7 +1,7 @@
 package Progress::Any::Output;
 
-our $DATE = '2018-03-17'; # DATE
-our $VERSION = '0.212'; # VERSION
+our $DATE = '2018-03-26'; # DATE
+our $VERSION = '0.214'; # VERSION
 
 use 5.010001;
 use strict;
@@ -45,11 +45,6 @@ sub _set_or_add {
         push @{ $Progress::Any::outputs{$task} }, $outputo;
     }
 
-    if ($outputo->can("output_data")) {
-        my $odata = $outputo->output_data;
-        $Progress::Any::output_data{"$outputo"} = $odata;
-    }
-
     $outputo;
 }
 
@@ -78,7 +73,7 @@ Progress::Any::Output - Assign output to progress indicators
 
 =head1 VERSION
 
-This document describes version 0.212 of Progress::Any::Output (from Perl distribution Progress-Any), released on 2018-03-17.
+This document describes version 0.214 of Progress::Any::Output (from Perl distribution Progress-Any), released on 2018-03-26.
 
 =head1 SYNOPSIS
 

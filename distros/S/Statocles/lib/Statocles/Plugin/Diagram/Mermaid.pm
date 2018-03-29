@@ -1,5 +1,5 @@
 package Statocles::Plugin::Diagram::Mermaid;
-our $VERSION = '0.089';
+our $VERSION = '0.091';
 # ABSTRACT: Render diagrams using mermaid https://mermaidjs.github.io
 
 #pod =head1 SYNOPSIS
@@ -132,7 +132,7 @@ Statocles::Plugin::Diagram::Mermaid - Render diagrams using mermaid https://merm
 
 =head1 VERSION
 
-version 0.089
+version 0.091
 
 =head1 SYNOPSIS
 

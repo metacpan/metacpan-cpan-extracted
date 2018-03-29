@@ -1,5 +1,6 @@
 use Test::Most;
 
+use warnings;
 use strict;
 
 eval 'use Test::Portability::Files';

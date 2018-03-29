@@ -1,8 +1,9 @@
 Revision history for Perl extension Locale::Babelfish.
 
-2.003   Fri Oct 27 08:01:02 2017 +0000
+2.004   Wed Mar 28 07:49:33 2018 +0000
 
     - Added some missing test dependencies
+    - Added feature to work with lists in dictionaries
 
 2.002
     - Removed one internal (unexisting on CPAN) dependency

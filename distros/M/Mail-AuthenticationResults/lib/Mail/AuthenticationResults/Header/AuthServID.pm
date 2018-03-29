@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Header::AuthServID;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180314'; # VERSION
+our $VERSION = '1.20180328'; # VERSION
 use Carp;
 
 use base 'Mail::AuthenticationResults::Header::Base';
@@ -22,10 +22,17 @@ sub _ALLOWED_CHILDREN {
     return 0;
 }
 
-sub as_string {
-    my ( $self ) = @_;
-    my $string = q{};
-    return join( ' ', $self->stringify( $self->value() ), map { $_->as_string() } @{ $self->children() } );
+sub build_string {
+    my ( $self, $header ) = @_;
+
+    $header->string( $self->stringify( $self->value() ) );
+    foreach my $child ( @{ $self->children() } ) {
+        $header->space( ' ' );
+        #$header->concat( $child->as_string_prefix() );
+        $child->build_string( $header );
+    }
+
+    return;
 }
 
 1;
@@ -42,7 +49,7 @@ Mail::AuthenticationResults::Header::AuthServID - Class modelling the AuthServID
 
 =head1 VERSION
 
-version 1.20180314
+version 1.20180328
 
 =head1 DESCRIPTION
 

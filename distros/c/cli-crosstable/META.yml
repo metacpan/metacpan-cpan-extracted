@@ -16,8 +16,8 @@ name: cli-crosstable
 provides:
   cli::crosstable:
     file: lib/cli/crosstable.pm
-    version: '1.01'
+    version: '1.031'
 resources:
   license: http://www.gnu.org/licenses/gpl-3.0.txt
-version: '1.01'
+version: '1.031'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

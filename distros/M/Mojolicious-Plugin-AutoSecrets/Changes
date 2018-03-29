@@ -1,6 +1,9 @@
 Changelog for Mojolicious-Plugin-AutoSecrets
 
-0.003 2018-02-11T05:34:35
+0.004 2018-03-27T22:15:35
+ - replaced rand()+$ENV concat with Session::Token (Stig)
+
+0.003 2018-02-11T05:34:35Z
  - Remove stray VERSION assignment (Meredith Howard)
  - v0.002 (Meredith Howard)
  - Switch to Mojo::File slurp for >7.31.  Fixes #1 (Meredith Howard)

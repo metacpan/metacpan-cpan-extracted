@@ -1,5 +1,11 @@
 Revision history for Perl extension WiringPi::API.
 
+2.3616  2018-03-27
+        - merged PR#34; Ensure that one test always runs if PI_BOARD (Thanks
+          for the pull request James Keenan!)
+        - added check in Makefile.PL to ensure that we're on version 2.36+ of
+          wiringPi
+
 2.3615  2018-03-23
         - added graceful exit from Makefile.PL if wiringPi header file is not
           found (closes #33)(Thanks James Keenan for the report)

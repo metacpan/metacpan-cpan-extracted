@@ -20,6 +20,7 @@ has params        => sub { +{} };
 has query_time    => 0;
 has start         => 0;
 has terms         => sub { +{} };
+has 'tx';
 
 sub facet_fields_as_hashes {
   my $self = shift;
@@ -43,6 +44,7 @@ sub parse {
   my $facets   = $data->{facet_counts};
   my $terms    = $data->{terms};
   my $field;
+  $self->tx($tx);
 
   if ($data->{error}) {
     $self->error({code => $data->{error}{code} || $tx->res->code, message => $data->{error}{msg}});
@@ -223,6 +225,10 @@ Offset of the search result.
 =head2 terms
 
     $hash_ref = $self->terms;
+
+=head2 tx
+
+    last tx passed to parse
 
 TODO
 

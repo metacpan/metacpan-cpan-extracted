@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 
 package Data::NFA;
-our $VERSION = "20180328";
+our $VERSION = "20180329";
 require v5.16;
 use warnings FATAL => qw(all);
 use strict;
@@ -27,32 +27,32 @@ sub Choice    {q(choice)}
 
 #1 Construct regular expression                                                 # Construct a regular expression that defines the language to be parsed using the following combining operations which can all be imported:
 
-sub element($)                                                                  #S One element.
- {my ($label) = @_;                                                             # Transition label
+sub element($)                                                                  #ES One element.
+ {my ($label) = @_;                                                             # Transition symbol
   [Element, @_]
  }
 
-sub sequence(@)                                                                 #S Sequence of elements.
+sub sequence(@)                                                                 #ES Sequence of elements.
  {my (@elements) = @_;                                                          # Elements
   [Sequence, @elements]
  }
 
-sub optional(@)                                                                 #S An optional sequence of element.
+sub optional(@)                                                                 #ES An optional sequence of element.
  {my (@element) = @_;                                                           # Elements
   [Optional, @element]
  }
 
-sub zeroOrMore(@)                                                               #S Zero or more repetitions of a sequence of elements.
+sub zeroOrMore(@)                                                               #ES Zero or more repetitions of a sequence of elements.
  {my (@element) = @_;                                                           # Elements
   [ZeroOrMore, @element]
  }
 
-sub oneOrMore(@)                                                                #S One or more repetitions of a sequence of elements.
+sub oneOrMore(@)                                                                #ES One or more repetitions of a sequence of elements.
  {my (@element) = @_;                                                           # Elements
   [OneOrMore, @element]
  }
 
-sub choice(@)                                                                   #S Choice from amongst one or more elements.
+sub choice(@)                                                                   #ES Choice from amongst one or more elements.
  {my (@elements) = @_;                                                          # Elements to be chosen from
   [Choice, @elements]
  }
@@ -382,6 +382,11 @@ This is a static method and so should be invoked as:
   Data::NFA::element
 
 
+This method can be imported via:
+
+  use Data::NFA qw(element)
+
+
 =head2 sequence(@)
 
 Sequence of elements.
@@ -406,6 +411,11 @@ Example:
 This is a static method and so should be invoked as:
 
   Data::NFA::sequence
+
+
+This method can be imported via:
+
+  use Data::NFA qw(sequence)
 
 
 =head2 optional(@)
@@ -460,6 +470,11 @@ This is a static method and so should be invoked as:
   Data::NFA::optional
 
 
+This method can be imported via:
+
+  use Data::NFA qw(optional)
+
+
 =head2 zeroOrMore(@)
 
 Zero or more repetitions of a sequence of elements.
@@ -488,6 +503,11 @@ This is a static method and so should be invoked as:
   Data::NFA::zeroOrMore
 
 
+This method can be imported via:
+
+  use Data::NFA qw(zeroOrMore)
+
+
 =head2 oneOrMore(@)
 
 One or more repetitions of a sequence of elements.
@@ -514,6 +534,11 @@ Example:
 This is a static method and so should be invoked as:
 
   Data::NFA::oneOrMore
+
+
+This method can be imported via:
+
+  use Data::NFA qw(oneOrMore)
 
 
 =head2 choice(@)
@@ -547,6 +572,11 @@ Example:
 This is a static method and so should be invoked as:
 
   Data::NFA::choice
+
+
+This method can be imported via:
+
+  use Data::NFA qw(choice)
 
 
 =head1 Non Deterministic finite state machine
@@ -743,6 +773,32 @@ Print the current state of an NFA without jumps
 13 L<symbols|/symbols>
 
 14 L<zeroOrMore|/zeroOrMore>
+
+
+
+=head1 Exports
+
+All of the following methods can be imported via:
+
+  use Data::NFA qw(:all);
+
+Or individually via:
+
+  use Data::NFA qw(<method>);
+
+
+
+1 L<choice|/choice>
+
+2 L<element|/element>
+
+3 L<oneOrMore|/oneOrMore>
+
+4 L<optional|/optional>
+
+5 L<sequence|/sequence>
+
+6 L<zeroOrMore|/zeroOrMore>
 
 =head1 Installation
 

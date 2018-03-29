@@ -3,9 +3,9 @@ NAME
     terminal as color bar
 
 VERSION
-    This document describes version 0.243 of
+    This document describes version 0.245 of
     Progress::Any::Output::TermProgressBarColor (from Perl distribution
-    Progress-Any-Output-TermProgressBarColor), released on 2018-03-21.
+    Progress-Any-Output-TermProgressBarColor), released on 2018-03-27.
 
 SYNOPSIS
      use Progress::Any::Output;
@@ -46,6 +46,24 @@ METHODS
 
     Known arguments:
 
+    *   freq => num
+
+        Limit the frequency of output updating. 0 means no frequency
+        limiting (update output after every "update()").
+
+        A positive number means to update output when there has been that
+        amount of difference in position since last "update()". For example,
+        if "freq" is 10 and the last "update()" was at position 5, then the
+        next output update will be when position is at least 15.
+
+        A negative number means to update output when time has passed that
+        amount of absolute value (in seconds). For example, if "freq" is -3
+        and the last "update()" was 1 second ago, then the next output
+        update will not be until the next two seconds has passed.
+
+        By default undef, in which case Progress::Any will use the default
+        -0.5 (at most once every 0.5 seconds).
+
     *   wide => bool
 
         If set to 1, enable wide character support (requires
@@ -74,8 +92,8 @@ METHODS
     *   template => str
 
         See fill_template in Progress::Any's documentation. Aside from
-        template strings supported by Progress::Any, this output recognizes
-        these additional strings: %b to display the progress bar (with width
+        conversions supported by Progress::Any, this output recognizes these
+        additional conversions: %b to display the progress bar (with width
         using the rest of the available width), %B to display the progress
         bar as well as the message inside it. You can also enclose parts of
         text with "<color RGB>" ... "</color>" to give color.
@@ -103,6 +121,11 @@ METHODS
     and two seconds have passed, it should've been 3 seconds before progress
     bar is shown in the next "update()". However, if you call this method,
     it will be 5 seconds again before showing.
+
+FAQ
+  How to update progress bar output more often?
+    Set "freq" to e.g. -0.1 or -0.05. The default "freq", when unset, is
+    -0.5 which means to update output at most once every 0.5 second.
 
 ENVIRONMENT
   COLOR

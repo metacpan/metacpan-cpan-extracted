@@ -163,7 +163,8 @@ requires 'Text::Xslate';
 requires 'Text::Xslate::Bridge::TT2Like';
 
 # Pcore::Util::UUID
-requires 'Data::UUID';
+requires 'Data::UUID',     v1.221.0;
+requires 'Data::UUID::MT', v1.1.0;
 
 on test => sub {
     requires 'Test::More', '0.88';

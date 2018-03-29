@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use Exporter qw/import/;
 our @EXPORT_OK = qw/let apply/;

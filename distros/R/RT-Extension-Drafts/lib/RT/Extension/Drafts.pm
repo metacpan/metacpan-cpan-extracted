@@ -9,11 +9,11 @@ RT::Extension::Drafts - Allow to save/load drafts in ticket replies/comments
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 =head1 SYNOPSIS
@@ -69,7 +69,7 @@ L<http://search.cpan.org/dist/RT-Extension-Drafts>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2011-2016 Emmanuel Lacour, all rights reserved.
+Copyright 2011-2018 Emmanuel Lacour, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -77,5 +77,16 @@ under the same terms as Perl itself.
 Request Tracker (RT) is Copyright Best Practical Solutions, LLC.
 
 =cut
+
+# User overridable options
+$RT::Config::META{AutoSaveDraftPeriod} = {
+    Section         => 'Ticket composition',
+    Overridable     => 1,
+    SortOrder       => 20,
+    Widget          => '/Widgets/Form/Integer',
+    WidgetArguments => {
+        Description => 'Period (in seconds) to automatically save a response/comment draft'
+    },
+};
 
 1; # End of RT::Extension::Drafts

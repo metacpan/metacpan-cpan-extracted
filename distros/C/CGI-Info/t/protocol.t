@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 use Test::Most tests => 23;
+use lib 't/lib';
+use MyLogger;
 
 BEGIN {
 	use_ok('CGI::Info');
@@ -54,23 +56,4 @@ PROTOCOL: {
 	$ENV{'SERVER_PROTOCOL'} = 'UNKNOWN';
 	$i = new_ok('CGI::Info');
 	ok(!defined($i->protocol()));
-}
-
-# On some platforms it's failing - find out why
-package MyLogger;
-
-sub new {
-	my ($proto, %args) = @_;
-
-	my $class = ref($proto) || $proto;
-
-	return bless { }, $class;
-}
-
-sub warn {
-	my $self = shift;
-	my $message = shift;
-
-	# Enable this for debugging
-	# ::diag($message);
 }

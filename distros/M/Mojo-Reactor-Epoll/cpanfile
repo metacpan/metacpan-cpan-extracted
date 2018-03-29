@@ -3,7 +3,6 @@ requires 'Carp';
 requires 'Linux::Epoll' => '0.012';
 requires 'List::Util';
 requires 'Mojolicious'  => '5.70';
-requires 'POSIX';
 requires 'Scalar::Util';
 requires 'Time::HiRes';
 test_requires 'IO::Socket::INET';

@@ -1,5 +1,20 @@
 Revision history for Authen-SCRAM
 
+0.009     2018-03-26 15:33:59-04:00 America/New_York
+
+    [Fixed]
+
+    - Fixed tests for older Perls
+
+0.008     2018-03-26 14:43:49-04:00 America/New_York
+
+    [Fixed]
+
+    - Correctly handles wide characters in usernames without mojibaking the
+      auth signature.  Previously undetected in roundtrip tests as the
+      error was symmetric between client and server.  Cross-checked via a
+      test conversation generated from http://github.com/xdg/scram.
+
 0.007     2018-01-28 00:00:56-05:00 America/New_York
 
     [Added]

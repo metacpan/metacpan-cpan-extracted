@@ -4,7 +4,7 @@ use Pcore -class, -result;
 use Pcore::WebSocket;
 use Pcore::Util::Scalar qw[is_blessed_ref is_plain_arrayref is_plain_coderef weaken];
 use Pcore::Util::Data qw[to_cbor from_cbor];
-use Pcore::Util::UUID qw[uuid_str];
+use Pcore::Util::UUID qw[uuid_v1mc_str];
 use Pcore::HTTP qw[:TLS_CTX];
 
 has uri => ( is => 'ro', isa => InstanceOf ['Pcore::Util::URI'], required => 1 );    # http://token@host:port/api/, ws://token@host:port/api/
@@ -109,8 +109,8 @@ sub _send_http ( $self, $method, @ ) {
     my $payload = {
         type   => 'rpc',
         method => $method,
-        ( $cb   ? ( tid  => uuid_str ) : () ),
-        ( $data ? ( data => $data )    : () ),
+        ( $cb   ? ( tid  => uuid_v1mc_str ) : () ),
+        ( $data ? ( data => $data )         : () ),
     };
 
     P->http->post(

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Role::NodeLoader;
-$Config::Model::Role::NodeLoader::VERSION = '2.117';
+$Config::Model::Role::NodeLoader::VERSION = '2.118';
 # ABSTRACT: Load Node element in configuration tree
 
 use Mouse::Role;
@@ -50,7 +50,7 @@ Config::Model::Role::NodeLoader - Load Node element in configuration tree
 
 =head1 VERSION
 
-version 2.117
+version 2.118
 
 =head1 SYNOPSIS
 

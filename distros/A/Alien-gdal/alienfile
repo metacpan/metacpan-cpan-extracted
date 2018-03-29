@@ -1,0 +1,158 @@
+use 5.010;
+use alienfile;
+
+#  add existing alien files to path etc
+#  not very elegant...
+#  disable for now - config tests fail
+#  it looks to be already noted in https://github.com/Perl5-Alien/Alien-Build/issues/12
+#  might also be able to access via old hash via https://metacpan.org/pod/Alien::Build#install_prop
+my $have_alien_gdal = eval 'require Alien::gdal';
+if (0 && $have_alien_gdal) {
+    my $ag_version = Alien::gdal->version;
+    say "Found existing gdal via alien ($ag_version) in " .  Alien::gdal->dist_dir;
+    #say -e Alien::gdal->dist_dir . '/lib/pkgconfig/' . 'gdal.pc';
+    #  append the relevant path
+    my $sep = ($^O =~ /mswin/i) ? ';' : ':';
+    $ENV{PKG_CONFIG_PATH}
+      = Alien::gdal->dist_dir . '/lib/pkgconfig/'
+      . $sep
+      . ($ENV{PKG_CONFIG_PATH} // '');
+    $ENV{PATH} = Alien::gdal->dist_dir . '/bin' . $sep . $ENV{PATH};
+}
+
+use Cwd;
+my $base_dir = getcwd();
+my $patch_file = "$base_dir/patch_isnan_gcc.patch";
+
+say "Patch file is $patch_file";
+#say -r $patch_file or die $!;
+
+my $min_target_version = '2.2.0';
+
+plugin 'PkgConfig' => (
+    pkg_name => 'gdal',
+    minimum_version => $min_target_version,
+);
+
+#  we need to probe for gdal v2
+#  Do we need this probe?  PkgConfig seems to handle things?
+#plugin 'Probe::CommandLine' => (
+#  command   => 'gdalwarp',
+#  args      => [ '--version' ],
+#  match     => qr/GDAL 2\.[0-9\.]+/,
+#  version   => qr/GDAL ([0-9\.]+)/,
+#  secondary => 1,
+#  #minimum_version => $min_target_version,
+#);
+
+#  some feedback
+say '$ENV{PATH} is ' . $ENV{PATH};
+
+#print 'gdalwarp version is ' . ($1 //'') ."\n";
+
+share {
+
+  plugin Download => (
+    url     => 'http://download.osgeo.org/gdal/CURRENT',
+    version => qr/^gdal-([0-9\.]+)\.tar\.gz$/,
+  );
+
+  plugin Extract => 'tar.gz';
+  
+  if ($^O =~ /mswin/i) {
+    #  fix known issue in 2.2.3, but need to make this more conditional
+    #  as it should be fixed in 2.2.4
+    patch [
+      '%{patch} --verbose --backup port/cpl_port.h < ' . $patch_file,
+    ];
+  }
+
+  plugin 'Build::Autoconf' => ();
+
+  my $build_static = ($^O =~ /mswin/i) ? '' : '--disable-shared';
+  #  disable by default - we don't want huge binaries and likely don't need a static build
+  #  but travis CI has a 4MB log limit which we otherwise hit
+  #$build_static = ($ENV{CONTINUOUS_INTEGRATION} && $ENV{TRAVIS})
+  #      ? '--disable-shared'
+  #      : '';
+
+  $build_static = '' if $ENV{FORCE_DYNAMIC};
+  
+  my $make_cmd = '%{make}';
+  #  try not to fill up the cpan-testers disk space,
+  #  but need to think more on the approach - the || will likely trap any fails,
+  #  thus installation will proceed regardless
+  #if ($^O =~ /mswin/i) {
+  #  $make_cmd .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|build.log|}; print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type build.log/;
+  #}
+  #else {
+  #  $make_cmd .= q/ | perl -ne 'BEGIN {$|=1; open our $log, ">", "build.log"}; print "\n" if 0 == ($. % 90); print "."; print {$log} $_;' || cat build.log/;
+  #}
+  
+  # the build step is only necessary if you need to customize the
+  # options passed to ./configure.  The default set by the
+  # Build::Autoconf plugin is frequently sufficient.
+  build [
+    '%{configure} ' . $build_static,
+    $make_cmd,
+    \&patch_pkgconfig,
+    '%{make} install',
+  ];
+
+};
+
+
+sub patch_pkgconfig {
+    #my $gdal_config_file = 'bin/gdal-config';
+    #my $pkg_config_file  = 'lib/pkgconfig/gdal.pc';
+    use File::Find::Rule;
+    my @gdal_configs
+      = File::Find::Rule->file()
+                        ->name( 'gdal-config' )
+                        ->in( '.' );
+    my @pkg_configs
+      = File::Find::Rule->file()
+                        ->name( 'gdal.pc' )
+                        ->in( '.' );
+    say 'gdal-configs: ' . join ' ', @gdal_configs;
+    say 'pkg-configs:  ' . join ' ', @pkg_configs;
+    
+    return if !@gdal_configs || !@pkg_configs;
+    
+    open my $gc_fh, '<', $gdal_configs[0] or die $!;
+    my $dep_libs = '';
+    while (defined (my $line = <$gc_fh>)) {
+        if ($line =~ /CONFIG_DEP_LIBS=(.+)$/) {
+            $dep_libs = $1;
+            last;
+        }
+    }
+    close $gc_fh;
+
+    #  trim quotes (could do in prev check, but...)
+    $dep_libs =~ s/^\"//;
+    $dep_libs =~ s/\"$//;
+    
+    open my $pk_fh, '<', $pkg_configs[0] or die $!;
+    my @pkg_conf;
+    while (defined (my $line = <$pk_fh>)) {
+        push @pkg_conf, $line;
+    }
+    close $pk_fh;
+
+    #  change all (we should be more nuanced and do only the one that matters)
+    foreach my $pkg_config_file (@pkg_configs) {
+        say "Adding gdal dep_libs to $pkg_config_file";
+        #  now add the dep libs to the pkg_conf file
+        open $pk_fh, '>', $pkg_config_file or die $!;
+        foreach my $line (@pkg_conf) {
+            if ($line =~ /^CONFIG_INST_LIBS/) {
+                chomp $line;
+                $line .= ' ' . $dep_libs . "\n";
+            }
+            print {$pk_fh} $line;
+        }
+        close $pk_fh;
+    }
+}
+

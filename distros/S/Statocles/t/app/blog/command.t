@@ -54,6 +54,9 @@ subtest 'help' => sub {
 subtest 'post' => sub {
     subtest 'create new post' => sub {
         subtest 'without $EDITOR, title is required' => sub {
+            no warnings 'redefine';
+            # must redefine the imported version
+            local *Statocles::App::Blog::read_stdin = sub { "hello" };
             local $ENV{EDITOR};
             my @args = qw( blog post );
             my ( $out, $err, $exit ) = capture { $app->command( @args ) };
@@ -213,12 +216,10 @@ ENDCONTENT
                 );
 
                 subtest 'run the command' => sub {
-                    diag -t *STDIN
-                        ? "Before test: STDIN is interactive"
-                        : "Before test: STDIN is not interactive";
-
-                    open my $stdin, '<', \"This is content from STDIN\n";
-                    local *STDIN = $stdin;
+                    no warnings 'redefine';
+                    local *Statocles::App::Blog::read_stdin = sub {
+                        return "This is content from STDIN\n";
+                    };
 
                     my @args = qw( blog post This is a Title for stdin );
                     my ( $out, $err, $exit ) = capture { $app->command( @args ) };
@@ -226,12 +227,6 @@ ENDCONTENT
                     is $exit, 0;
                     like $out, qr{New post at: \Q$doc_path},
                         'contains blog post document path';
-
-                    if ( -e '/dev/tty' ) {
-                        diag -t *STDIN
-                            ? "After test: STDIN is interactive"
-                            : "After Test: STDIN is not interactive";
-                    }
                 };
 
                 subtest 'check the generated document' => sub {
@@ -267,12 +262,10 @@ ENDMARKDOWN
                 );
 
                 subtest 'run the command' => sub {
-                    diag -t *STDIN
-                        ? "Before test: STDIN is interactive"
-                        : "Before test: STDIN is not interactive";
-
-                    open my $stdin, '<', \"This is content from STDIN\n";
-                    local *STDIN = $stdin;
+                    no warnings 'redefine';
+                    local *Statocles::App::Blog::read_stdin = sub {
+                        return "This is content from STDIN\n";
+                    };
 
                     my @args = qw( blog post --author iasimov This is a Title for stdin );
                     my ( $out, $err, $exit ) = capture { $app->command( @args ) };
@@ -280,12 +273,6 @@ ENDMARKDOWN
                     is $exit, 0;
                     like $out, qr{New post at: \Q$doc_path},
                         'contains blog post document path';
-
-                    if ( -e '/dev/tty' ) {
-                        diag -t *STDIN
-                            ? "After test: STDIN is interactive"
-                            : "After Test: STDIN is not interactive";
-                    }
                 };
 
                 subtest 'check the generated document' => sub {
@@ -322,18 +309,16 @@ ENDMARKDOWN
                 );
 
                 subtest 'run the command' => sub {
-                    diag -t *STDIN
-                        ? "Before test: STDIN is interactive"
-                        : "Before test: STDIN is not interactive";
-
-                    open my $stdin, '<', \<<ENDSTDIN;
+                    no warnings 'redefine';
+                    local *Statocles::App::Blog::read_stdin = sub {
+                        return <<ENDSTDIN;
 ---
 title: This is Frontmatter
 tags: one, two
 ---
 This is content from STDIN
 ENDSTDIN
-                    local *STDIN = $stdin;
+                    };
 
                     my @args = qw( blog post );
                     my ( $out, $err, $exit ) = capture { $app->command( @args ) };
@@ -342,11 +327,6 @@ ENDSTDIN
                     like $out, qr{New post at: \Q$doc_path},
                         'contains blog post document path';
 
-                    if ( -e '/dev/tty' ) {
-                        diag -t *STDIN
-                            ? "After test: STDIN is interactive"
-                            : "After Test: STDIN is not interactive";
-                    }
                 };
 
                 subtest 'check the generated document' => sub {

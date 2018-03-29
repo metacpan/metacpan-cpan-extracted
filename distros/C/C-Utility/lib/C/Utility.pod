@@ -7,8 +7,8 @@ C::Utility - utilities for generating C programs
 
 =head1 VERSION
 
-This documents C::Utility version 0.007
-corresponding to git commit L<7f927fd0b669289294fc7a207ce373b4303d835e|https://github.com/benkasminbullock/C-Utility/commit/7f927fd0b669289294fc7a207ce373b4303d835e> released on Fri Oct 13 18:28:05 2017 +0900.
+This documents C::Utility version 0.009
+corresponding to git commit L<3ddad303724b7d7b1e8a30afe53edd09bed484f7|https://github.com/benkasminbullock/C-Utility/commit/3ddad303724b7d7b1e8a30afe53edd09bed484f7> released on Tue Mar 27 15:32:59 2018 +0900.
 
 =head1 DESCRIPTION
 
@@ -53,7 +53,7 @@ produces output
     "jumped %over the lazy dog.\n"
 
 
-(This example is included as L<F<fox.pl>|https://fastapi.metacpan.org/source/BKB/C-Utility-0.007/examples/fox.pl> in the distribution.)
+(This example is included as L<F<fox.pl>|https://fastapi.metacpan.org/source/BKB/C-Utility-0.009/examples/fox.pl> in the distribution.)
 
 
 It also removes backslashes from before the @ symbol, so \@ is
@@ -83,7 +83,7 @@ produces output
     "jumped %%over the lazy dog.\n"
 
 
-(This example is included as L<F<fox-pc.pl>|https://fastapi.metacpan.org/source/BKB/C-Utility-0.007/examples/fox-pc.pl> in the distribution.)
+(This example is included as L<F<fox-pc.pl>|https://fastapi.metacpan.org/source/BKB/C-Utility-0.009/examples/fox-pc.pl> in the distribution.)
 
 
 =head2 c_string
@@ -207,7 +207,7 @@ produces output
     #endif /* MY_H */
 
 
-(This example is included as L<F<michael-caine.pl>|https://fastapi.metacpan.org/source/BKB/C-Utility-0.007/examples/michael-caine.pl> in the distribution.)
+(This example is included as L<F<michael-caine.pl>|https://fastapi.metacpan.org/source/BKB/C-Utility-0.009/examples/michael-caine.pl> in the distribution.)
 
 
 The keys of the hash are checked with L</valid_c_variable>, and the
@@ -249,7 +249,7 @@ produces output
     #line 99 "balloons.c"
 
 
-(This example is included as L<F<line-directive.pl>|https://fastapi.metacpan.org/source/BKB/C-Utility-0.007/examples/line-directive.pl> in the distribution.)
+(This example is included as L<F<line-directive.pl>|https://fastapi.metacpan.org/source/BKB/C-Utility-0.009/examples/line-directive.pl> in the distribution.)
 
 
 =head2 brute_force_line
@@ -318,7 +318,7 @@ produces output
     int main () { return 0; }
 
 
-(This example is included as L<F<lineout.pl>|https://fastapi.metacpan.org/source/BKB/C-Utility-0.007/examples/lineout.pl> in the distribution.)
+(This example is included as L<F<lineout.pl>|https://fastapi.metacpan.org/source/BKB/C-Utility-0.009/examples/lineout.pl> in the distribution.)
 
 
 =head2 stamp_file
@@ -348,10 +348,23 @@ produces output
     */
 
 
-(This example is included as L<F<stamp-file.pl>|https://fastapi.metacpan.org/source/BKB/C-Utility-0.007/examples/stamp-file.pl> in the distribution.)
+(This example is included as L<F<stamp-file.pl>|https://fastapi.metacpan.org/source/BKB/C-Utility-0.009/examples/stamp-file.pl> in the distribution.)
 
 
 This function was added in version 0.006.
+
+=head2 read_includes
+
+    my $includes = read_includes ($file);
+
+Read lines of the form
+
+    #include "some.h"
+
+from C<$file> and return the list of included files as an array
+reference.
+
+This function was added in version 0.008.
 
 =head1 DEPENDENCIES
 
@@ -371,6 +384,14 @@ file in L</add_lines>.
 
 L<File::Versions> is used to back up files
 
+=item C::Tokenize
+
+L<C::Tokenize> is used by L</read_includes>.
+
+=item File::Slurper
+
+L<File::Slurper> is used by L</read_includes>.
+
 =back
 
 =head1 HISTORY
@@ -384,6 +405,7 @@ but I decided to restore it to CPAN anyway, since I'm still using and
 maintaining it, and it might be useful to somebody.
 
 
+
 =head1 AUTHOR
 
 Ben Bullock, <bkb@cpan.org>
@@ -391,7 +413,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2012-2017
+2012-2018
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

@@ -12,6 +12,7 @@ lib/App/Fasops/Command/covers.pm
 lib/App/Fasops/Command/join.pm
 lib/App/Fasops/Command/links.pm
 lib/App/Fasops/Command/maf2fas.pm
+lib/App/Fasops/Command/mergecsv.pm
 lib/App/Fasops/Command/names.pm
 lib/App/Fasops/Command/refine.pm
 lib/App/Fasops/Command/replace.pm
@@ -43,6 +44,7 @@ t/15-xlsx.t
 t/16-check.t
 t/17-concat.t
 t/18-stat.t
+t/19-mergecsv.t
 t/90-common-variations.t
 t/90-common.t
 t/91-common-trim.t
@@ -60,6 +62,8 @@ t/example.fa
 t/example.fas
 t/example.maf
 t/example.name.list
+t/links.copy.csv
+t/links.count.csv
 t/refine.fas
 t/refine2.fas
 t/replace.fail.tsv

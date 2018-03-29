@@ -1,17 +1,34 @@
-Revision history for Lingua-Norms-SUBTLEX-0.05
+Revision history for Lingua-Norms-SUBTLEX-0.06
+
+0.06    2016.11.17
+        - case- and mark-sensitivity control introduced: Following what is used in the Perl module "Text::Levenshtein". By a "matching level" set in new() and via "set_eq()" method. The default remains to search case (and mark) insensitively.
+        - pos_all method added
+        - pos_ methods have added argument 'conform' to transliterate the file-given strings into common code.
+        - set_lang() and get_lang() methods introduced to query the datafile being used and to change it.
+        - frq_count, frq_opm, cd_count and cd_pct now return 0 rather than empty-string if the looked-up string was not found in the language file.
+        - all_strings now culls duplicates with uniq() after firstly ensuring have a non-empty string; given some empty lines and duplicate strings for different POS in some files; and then alphabetically sorts them.
+        - method "list_strings" renamed "select_strings" to avoid confusion with "all_strings", which also returns a list of strings.
+        - select_strings checks that value is defined for a language file, and that if retrieved it is numeric ahead of checking its range--in case the field is empty for a file (as seems to happen for cd_count with UK file).
+        - cv_pattern regex check in select_strings transliterates tested strings to ASCII to capture, say, 'é' in the string with just 'e' in the pattern.
+        - frq_sum method added and POD for related methods indicate that they all can be used to obtain descriptives of frq_count as well.
+        - POD documentation for stats methods corrected: "raw" should have been "opm", and there is no argument named "log".
+        - added a croak if "The requested value is not defined for the SUBTLEX-x corpus" of a particular language x.
+        - Dependency on File::Slurp removed in place of Path::Tiny.
+        - croak messages expanded to include statement of the method called.
+        - NL lang: need to specify _all or _min files; see table in POD
 
 0.05    2015.02.28
-        - Added support for DE, in addition to NL, UK and US files.
+        - Added support for German SUBTLEX (language DE), in addition to NL, UK and US files.
 
 0.04    2015.02.27
-        - Added support for UK and NL (assuming csv files)
+        - Added support for UK and NL
 
 0.03    2015.01.11
         - Misc. code and doc clean-ups, including corrected version numbering and internal linking.
 
 0.02    2015.01.10
         - Added methods to directly retrieve the "contextual diversity" measures as percentage, and log of percentage.
-        - Corrected the calculation of mean Levenshtein Distance by the function on_ldist - it should not previously have been public. Two pre-installation tests, based on the example data in the Yarkoni et al. (2008) paper, have been added, ensuring that the method returns the correct values.
+        - Corrected the calculation of mean Levenshtein Distance by the function on_ldist - it should not previously have been a public method. Two pre-installation tests, based on the example data in the Yarkoni et al. (2008) paper, have been added, ensuring that the method returns the correct values.
         - Revised POD documentation, including doi links.
 
 0.01    2014.08.08

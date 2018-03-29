@@ -4,7 +4,7 @@
       "Qiang Wang <wang-q@outlook.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.12",
+   "generated_by" : "Minilla/v3.0.16",
    "license" : [
       "perl_5"
    ],
@@ -67,7 +67,7 @@
    "provides" : {
       "App::Fasops" : {
          "file" : "lib/App/Fasops.pm",
-         "version" : "v0.5.12"
+         "version" : "v0.5.14"
       },
       "App::Fasops::Command::axt2fas" : {
          "file" : "lib/App/Fasops/Command/axt2fas.pm"
@@ -89,6 +89,9 @@
       },
       "App::Fasops::Command::maf2fas" : {
          "file" : "lib/App/Fasops/Command/maf2fas.pm"
+      },
+      "App::Fasops::Command::mergecsv" : {
+         "file" : "lib/App/Fasops/Command/mergecsv.pm"
       },
       "App::Fasops::Command::names" : {
          "file" : "lib/App/Fasops/Command/names.pm"
@@ -132,6 +135,6 @@
          "web" : "https://github.com/wang-q/App-Fasops"
       }
    },
-   "version" : "0.5.12",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.5.14",
+   "x_authority" : "cpan:WANGQ"
 }

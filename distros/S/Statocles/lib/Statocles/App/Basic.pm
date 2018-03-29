@@ -1,10 +1,10 @@
 package Statocles::App::Basic;
-our $VERSION = '0.089';
+our $VERSION = '0.091';
 # ABSTRACT: Build Markdown and collateral files
 
 use Statocles::Base 'Class';
 use Statocles::Document;
-use Statocles::Util qw( run_editor );
+use Statocles::Util qw( run_editor read_stdin );
 with 'Statocles::App::Role::Store';
 
 #pod =attr store
@@ -50,21 +50,13 @@ sub command {
         );
 
         # Read post content on STDIN
-        if ( !-t *STDIN ) {
-            my $content = do { local $/; <STDIN> };
+        if ( my $content = read_stdin() ) {
             my $doc = Statocles::Document->parse_content(
                 path => $path.'',
                 store => $self->store,
                 content => $content,
             );
             $self->store->write_file( $path => $doc );
-
-            # Re-open STDIN as the TTY so that the editor (vim) can use it
-            # XXX Is this also a problem on Windows?
-            if ( -e '/dev/tty' ) {
-                close STDIN;
-                open STDIN, '/dev/tty';
-            }
         }
         elsif ( !$self->store->has_file( $path ) ) {
             my $doc = Statocles::Document->new(
@@ -102,7 +94,7 @@ Statocles::App::Basic - Build Markdown and collateral files
 
 =head1 VERSION
 
-version 0.089
+version 0.091
 
 =head1 SYNOPSIS
 

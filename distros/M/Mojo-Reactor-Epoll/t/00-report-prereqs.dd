@@ -17,7 +17,6 @@ do { my $x = {
                                       'Linux::Epoll' => '0.012',
                                       'List::Util' => '0',
                                       'Mojolicious' => '5.70',
-                                      'POSIX' => '0',
                                       'Scalar::Util' => '0',
                                       'Time::HiRes' => '0',
                                       'perl' => '5.010001'

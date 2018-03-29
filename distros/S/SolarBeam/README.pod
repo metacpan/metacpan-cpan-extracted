@@ -8,7 +8,7 @@ use SolarBeam::Query;
 use SolarBeam::Response;
 use SolarBeam::Util 'escape';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has ua            => sub { Mojo::UserAgent->new };
 has default_query => sub { {} };

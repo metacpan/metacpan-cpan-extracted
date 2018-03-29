@@ -1,20 +1,20 @@
-#title title & title & title <em>test</em>"'
-#subtitle title & subtitle & subtitle
+#title title & title & title~~2 <em>test</em>"'
+#subtitle title & subtitle & subtitle~~2
 #author pinco & pallino & tizio
 #source from 1 & 2 & 3
 #notes notes1 & notes2 & notes3
 
-*** first & chapter & chapter  <em>test</em>"'
+*** first & chapter & chapter~~2  <em>test</em>"'
 
 #firstref
-body first & chapter & chapter
+body first & chapter & chapter~~2
 
-*** second & chapter & chapter  <em>test</em>"'
+*** second~~and & chapter & chapter  <em>test</em>"'
 
 #secondref
 body second & chapter & chapter
 
-*** third & chapter & chapter  <em>test</em>"'
+*** third & chapter~~NO-BREAK~~and & chapter  <em>test</em>"'
 
 #thirdref
 body third & chapter & chapter

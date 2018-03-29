@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Yaml;
-$Config::Model::Backend::Yaml::VERSION = '2.117';
+$Config::Model::Backend::Yaml::VERSION = '2.118';
 use 5.10.1;
 use Carp;
 use strict;
@@ -127,7 +127,7 @@ Config::Model::Backend::Yaml - Read and write config as a YAML data structure
 
 =head1 VERSION
 
-version 2.117
+version 2.118
 
 =head1 SYNOPSIS
 

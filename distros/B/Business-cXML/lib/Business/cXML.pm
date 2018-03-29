@@ -108,7 +108,7 @@ use Scalar::Util 'blessed';
 use Business::cXML::Transmission;
 
 BEGIN {
-	our $VERSION = 'v0.6.6';
+	our $VERSION = 'v0.6.7';
 	our $CXML_VERSION = '1.2.036';
 	our $USERAGENT = "Business::cXML.pm $VERSION";
 }
@@ -308,6 +308,7 @@ sub _log_default {
 	$level = ('error', 'warning', 'info', 'debug', 'trace')[$level-1];
 	# use Data::Dumper;
 	# print STDERR "cXML[$level]: ", $desc, " -- ", $xml, " -- ", Dumper($cxml), "\n";
+	$xml =~ s/>\s+</> </g;
 	print STDERR "cXML[$level]: ", $desc, " -- ", $xml, "\n";
 }
 
@@ -574,7 +575,7 @@ sub stringify {
 
 =head1 VERSION
 
-0.6.6 based on cXML DTD 1.2.036
+0.6.7 based on cXML DTD 1.2.036
 
 =head1 AUTHOR
 

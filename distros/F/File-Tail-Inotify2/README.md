@@ -35,11 +35,11 @@ This module works on Linux. Other OS are not supported.
 
 # SEE ALSO
 
-[Linux::Inotify2](http://search.cpan.org/perldoc?Linux::Inotify2), [File::Tail](http://search.cpan.org/perldoc?File::Tail), [File::SmartTail](http://search.cpan.org/perldoc?File::SmartTail), [Tail::Tool](http://search.cpan.org/perldoc?Tail::Tool)
+[Linux::Inotify2](https://metacpan.org/pod/Linux::Inotify2), [File::Tail](https://metacpan.org/pod/File::Tail), [File::SmartTail](https://metacpan.org/pod/File::SmartTail), [Tail::Tool](https://metacpan.org/pod/Tail::Tool)
 
 # AUTHOR
 
-Yoshihiro Sasaki, <ysasaki at cpan.org>
+Yoshihiro Sasaki, &lt;ysasaki at cpan.org>
 
 # COPYRIGHT AND LICENSE
 

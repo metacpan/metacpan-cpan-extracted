@@ -4,7 +4,7 @@ use Pcore -class, -result, -const;
 use Pcore::Handle::DBI::Const qw[:CONST];
 use Pcore::Handle::pgsql qw[:ALL];
 use Pcore::Util::Scalar qw[weaken looks_like_number is_plain_arrayref is_plain_coderef is_blessed_arrayref];
-use Pcore::Util::UUID qw[uuid_str];
+use Pcore::Util::UUID qw[uuid_v1mc_str];
 use Pcore::Util::Digest qw[md5_hex];
 use Pcore::Util::Data qw[from_json];
 use Pcore::AE::Handle;
@@ -595,7 +595,7 @@ sub _execute ( $self, $query, $bind, $cb, %args ) {
     # extended query mode
     else {
         my $query_id  = $self->{sth}->{id} // q[];
-        my $portal_id = q[];                         # uuid_str;
+        my $portal_id = q[];                         # uuid_v1mc_str;
 
         # parse query
         if ( !$self->{sth}->{is_parse_complete} ) {

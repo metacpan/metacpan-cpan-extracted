@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::js::date::str;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.023'; # VERSION
+our $DATE = '2018-03-27'; # DATE
+our $VERSION = '0.024'; # VERSION
 
 use 5.010001;
 use strict;
@@ -49,7 +49,7 @@ Data::Sah::Coerce::js::date::str - Coerce date from string
 
 =head1 VERSION
 
-This document describes version 0.023 of Data::Sah::Coerce::js::date::str (from Perl distribution Data-Sah-Coerce), released on 2017-07-10.
+This document describes version 0.024 of Data::Sah::Coerce::js::date::str (from Perl distribution Data-Sah-Coerce), released on 2018-03-27.
 
 =head1 DESCRIPTION
 
@@ -80,7 +80,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

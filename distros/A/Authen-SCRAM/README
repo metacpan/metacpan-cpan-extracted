@@ -3,7 +3,7 @@ NAME
     5802)
 
 VERSION
-    version 0.007
+    version 0.009
 
 SYNOPSIS
         use Authen::SCRAM::Client;
@@ -66,7 +66,7 @@ NAME
     5802)
 
 VERSION
-    version 0.007
+    version 0.009
 
 SUPPORT
   Bugs / Feature Requests

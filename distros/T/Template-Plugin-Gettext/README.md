@@ -2,6 +2,8 @@
 
 Localization for the Template Toolkit 2
 
+The POD version of this document exhibits errors.  Consider reading the markdown version instead at https://github.com/gflohr/Template-Plugin-Gettext.
+
 ## Description
 
 This Perl library offers an end-to-end localization and internationalization solution for the Template Toolkit 2.

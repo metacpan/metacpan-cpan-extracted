@@ -4,7 +4,7 @@ use Pcore -class;
 
 with qw[Pcore::App::API];
 
-sub init ( $self, $connect, $cb ) {
+sub init ( $self, $cb ) {
     ...;
 
     return;

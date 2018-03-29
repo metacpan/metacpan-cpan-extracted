@@ -3,9 +3,9 @@ package ICC::Profile::cvst;
 use strict;
 use Carp;
 
-our $VERSION = 0.30;
+our $VERSION = 0.31;
 
-# revised 2018-03-01
+# revised 2018-03-27
 #
 # Copyright © 2004-2018 by William B. Birkett
 
@@ -1072,6 +1072,9 @@ sub photoshop {
 	# open the file
 	open($fh, '>', $files[0]) or croak("can't open $files[0]: $!");
 
+	# set binary mode
+	binmode($fh);
+
 	# print the version and number of curves (including master curve)
 	print $fh pack('n2', 4, scalar(@{$self->[1]}) + 1);
 
@@ -1451,6 +1454,9 @@ sub trueflow {
 
 	# open the file
 	open($fh, '>', $files[0]) or croak("can't open $files[0]: $!");
+
+	# set binary mode
+	binmode($fh);
 
 	# print the header
 	print $fh pack('C4a4', 4, 3, 2, 1, 'DGT'); 	# file signature

@@ -1,5 +1,13 @@
 Revision history for Perl extension App-Egaz
 
+0.0.10 2018-03-26T14:26:50Z
+    - Add `egaz raxml`
+    - Add exec_cmd() to Common.pm
+
+0.0.9 2018-03-24T22:16:24Z
+    - Add `egaz exactmatch`
+    - Add run_sparsemem() and get_size() to Common.pm
+
 0.0.8 2018-03-24T17:32:15Z
     - Move `egaz mergecsv` to `fasops mergecsv`
     - Escape braces in regex

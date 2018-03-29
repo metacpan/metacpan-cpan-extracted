@@ -1,15 +1,20 @@
 package URI::Fast;
-$URI::Fast::VERSION = '0.18';
 # ABSTRACT: A fast(er) URI parser
-
-use utf8;
+$URI::Fast::VERSION = '0.22';
 use strict;
 use warnings;
 no strict 'refs';
+
 use Carp;
-use Inline;
 use Exporter;
-use Inline C => 'DATA', optimize => '-O2';
+
+use Inline
+  C        => 'DATA',
+  name     => 'URI::Fast',
+  version  => eval '$URI::Fast::VERSION',
+  optimize => '-O2';
+
+Inline->init;
 
 use parent 'Exporter';
 our @EXPORT_OK = qw(uri uri_split);
@@ -137,7 +142,7 @@ URI::Fast - A fast(er) URI parser
 
 =head1 VERSION
 
-version 0.18
+version 0.22
 
 =head1 SYNOPSIS
 
@@ -495,40 +500,50 @@ static const unsigned char hex[0x100] = {
 };
 #undef __
 
+static inline
+char unhex(const char *in) {
+  unsigned char v1 = hex[ (unsigned char) in[0] ];
+  unsigned char v2 = hex[ (unsigned char) in[1] ];
+
+  /* skip invalid hex sequences */
+  if ((v1 | v2) != 0xFF) {
+    return (v1 << 4) | v2;
+  }
+
+  return '\0';
+}
+
 size_t uri_decode(const char *in, size_t len, char *out) {
   size_t i = 0, j = 0;
   unsigned char v1, v2;
-  int copy_char;
+  char decoded;
 
   if (len == 0) {
     len = strlen((char*) in);
   }
 
   while (i < len) {
-    copy_char = 1;
+    decoded = '\0';
 
-    if (in[i] == '+') {
-      out[j] = ' ';
-      ++i;
-      ++j;
-      copy_char = 0;
+    switch (in[i]) {
+      case '+':
+        decoded = ' ';
+        ++i;
+        break;
+      case '%':
+        if (i + 2 < len) {
+          decoded = unhex( &in[i + 1] );
+          if (decoded != '\0') {
+            i += 3;
+            break;
+          }
+        }
+      default:
+        decoded = in[i++];
     }
-    else if (in[i] == '%' && i + 2 < len) {
-      v1 = hex[ (unsigned char)in[i+1] ];
-      v2 = hex[ (unsigned char)in[i+2] ];
 
-      /* skip invalid hex sequences */
-      if ((v1 | v2) != 0xFF) {
-        out[j] = (v1 << 4) | v2;
-        ++j;
-        i += 3;
-        copy_char = 0;
-      }
-    }
-    if (copy_char) {
-      out[j] = in[i];
-      ++i;
-      ++j;
+    if (decoded != '\0') {
+      out[j++] = decoded;
     }
   }
 
@@ -579,7 +594,7 @@ SV* decode(SV* in) {
     SvUTF8_on(in);
 
     if (!sv_utf8_downgrade(in, TRUE)) {
-      croak("decode: wide character in octet string");
+      croak("decode: wide character in input octet string");
     }
 
     src = SvPV_nomg_const(in, ilen);
@@ -592,7 +607,7 @@ SV* decode(SV* in) {
 
   olen = uri_decode(src, ilen, dest);
   out  = newSVpv(dest, olen);
-  SvUTF8_on(out);
+  sv_utf8_decode(out);
 
   return out;
 }
@@ -803,7 +818,7 @@ SV* split_path(SV* uri) {
   while (idx < len) {
     brk = strcspn(&str[idx], "/");
     tmp = newSVpvn(&str[idx], brk);
-    SvUTF8_on(tmp);
+    sv_utf8_decode(tmp);
     av_push(arr, tmp);
     idx += brk + 1;
   }
@@ -866,7 +881,7 @@ SV* query_hash(SV* uri) {
 
       // Create new sv to store value
       tmp = newSVpv(val, vlen);
-      SvUTF8_on(tmp);
+      sv_utf8_decode(tmp);
     }
 
     // Move to next key
@@ -913,11 +928,9 @@ SV* get_param(SV* uri, SV* sv_key) {
 
       char val[brk + 1];
       vlen = uri_decode(&src[idx], brk, val);
-
       idx += brk + 1;
-
       value = newSVpv(val, vlen);
-      SvUTF8_on(value);
+      sv_utf8_decode(value);
       av_push(out, value);
     }
     else {

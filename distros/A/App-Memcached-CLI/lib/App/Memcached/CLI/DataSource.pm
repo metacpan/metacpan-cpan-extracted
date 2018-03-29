@@ -334,14 +334,14 @@ This provides data access interface for Memcached server.
 
 =head1 LICENSE
 
-Copyright (C) YASUTAKE Kiyoshi.
+Copyright (C) IKEDA Kiyoshi.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-YASUTAKE Kiyoshi E<lt>yasutake.kiyoshi@gmail.comE<gt>
+IKEDA Kiyoshi E<lt>progrhyme@gmail.comE<gt>
 
 =cut
 

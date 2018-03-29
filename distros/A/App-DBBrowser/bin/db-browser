@@ -4,7 +4,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.008';
+our $VERSION = '2.009';
 
 use Encode::Locale qw();
 
@@ -34,7 +34,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.008
+Version 2.009
 
 =cut
 
@@ -79,10 +79,6 @@ The elements in a column are right-justified if one or more elements of that col
 are left-justified.
 
 See L<Term::TablePrint|Term::TablePrint/DESCRIPTION> for more details.
-
-=head3 Legacy encodings
-
-Non mappable characters will break the output.
 
 =head1 USAGE
 
@@ -157,6 +153,9 @@ C<mysql> and C<JOIN>).
 =head3 Create table, Drop table
 
 To reach the I<Create table>/I<Drop table> menu, select the prompt in the menu where the tables are selected.
+
+C<SQLite> only: if the C<ai> column is set, an auto-increment column is added automatically when creating the table. If
+the first column of a table is an auto-increment column, an C<INSERT INTO> statement is build without the first column.
 
 I<Drop table>: the table is shown (here I<Auto Limit> has no effect, the whole table is fetched) before the user
 confirms to drop the table.
@@ -326,7 +325,7 @@ Set the default I<lock> value:
 =item I<Subqueries>
 
 If this option is enabled, the last 20 queries are saved temporary. Saved queries can than be chosen as subqueries by
-selecting C<(Q>.
+selecting C<(Q> (C<SQ> for subquery as table).
 A query is saved when the table is printed. If a new database is selected the query-history is removed.
 
 =item I<Alias for complex columns>
@@ -535,6 +534,12 @@ Default data type
 
 The default data type of the columns.
 
+=item
+
+Auto-increment column name
+
+SQLite only.
+
 =back
 
 =head2 CONFIGURATION FILES
@@ -553,6 +558,8 @@ Requires Perl version 5.8.3 or greater.
 =head2 Decoded strings
 
 C<db-browser> expects decoded strings.
+
+Non mappable characters will break the output.
 
 =head2 Terminal
 

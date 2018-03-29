@@ -2,6 +2,21 @@
 <input type="submit" class="button" name="LoadDraft" value="<&|/l&>Load draft</&>" />
 % }
 <input type="submit" class="button" name="SaveDraft" value="<% ($Draft && $Draft->id) ? loc('Update draft') : loc('Save draft')%>" />
+
+<script type="text/javascript">
+jQuery(function() {
+    timeout_save_draft = window.setTimeout(save_draft, <% RT->Config->Get('AutoSaveDraftPeriod', $session{'CurrentUser'}) || 300 %> * 1000);
+});
+
+function save_draft() {
+    jQuery.post("/Helpers/SaveDraft", {UserId: "<% $session{'CurrentUser'}->id %>", TicketId: "<% $Ticket->id %>", Content: jQuery('#UpdateContent').val(), ContentType: jQuery('#UpdateContent').hasClass('richtext') ? 'text/html' : 'text/plain'},
+        function(res) {
+            console.log(res);
+        }
+    );
+    timeout_save_draft = window.setTimeout(save_draft, <% RT->Config->Get('AutoSaveDraftPeriod', $session{'CurrentUser'}) || 300 %> * 1000);
+}
+</script>
 <%init>
 my $Ticket = LoadTicket($ARGS{'id'});
 

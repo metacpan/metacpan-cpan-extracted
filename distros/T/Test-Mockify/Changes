@@ -1,5 +1,8 @@
 Revision history for Perl extension Devel-Mockify
 
+2.2 2018-03-26T21:49:15Z
+    - fix issue #34 Prototype mismatch warning when running tests
+
 2.1 2018-03-21T21:24:26Z
     - fix typo in docu
     - fix lexical scope Issue with mockimported and mockStatic

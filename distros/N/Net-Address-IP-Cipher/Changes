@@ -1,5 +1,8 @@
 Revision history for Net-Address-IP-Cipher
 
+0.3     2018-03-27/19:25
+        More requirements for syntax of package version.
+
 0.2     2018-03-17/10:47
         Fixed requirements.
 

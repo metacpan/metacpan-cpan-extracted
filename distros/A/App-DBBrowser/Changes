@@ -1,6 +1,11 @@
 Revision history for App-DBBrowser
 
 
+2.009    2018-03-27
+        - Subquery as a table.
+        - Auto-increment for SQLite databases.
+        - Update documentation.
+
 2.008    2018-03-24
         - Refactoring aggregate and subqueries.
         - Update documentation.

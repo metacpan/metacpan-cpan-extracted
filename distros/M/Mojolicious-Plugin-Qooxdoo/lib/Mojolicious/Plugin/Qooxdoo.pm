@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use File::Spec::Functions qw(splitdir updir catdir file_name_is_absolute);
 use Cwd qw(abs_path);
 
-our $VERSION = '0.905';
+our $VERSION = '0.906';
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -30,7 +30,7 @@ sub register {
             : $app->home->rel_file($ENV{QX_SRC_PATH} || catdir(updir,'frontend','source'))
         );
         $app->log->info("Runnning in QX_SRC_MODE with files from $qx_app_src");
-        $app->static->paths([$qx_app_src]);
+        unshift @{$app->static->paths}, $qx_app_src;
         my %prefixCache;
         my $static = Mojolicious::Static->new();
         my $static_cb = sub {

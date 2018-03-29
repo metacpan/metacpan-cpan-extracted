@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.008';
+our $VERSION = '2.009';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile );
@@ -93,6 +93,12 @@ sub connect_parameter {
             }
         }
     }
+    if ( @$env_vars + @$attrs + @$arg ) {
+        $sf->{i}{db_settings} = 1;
+    }
+    else {
+        $sf->{i}{db_settings} = 0;
+    }
     if ( exists $sf->{i}{login_error} ) {
         delete $sf->{i}{login_error};
     }
@@ -168,7 +174,10 @@ sub database_setting {
         push @groups, [ 'env_variables', "- ENV Variables" ] if @{$items->{env_variables}};
         push @groups, [ 'arguments',     "- Login Data"    ] if @{$items->{arguments}};
         push @groups, [ 'attributes',    "- Attributes"    ] if @{$items->{attributes}};
-        my $prompt = defined $db ? 'DB: "' . $db . '"' : '"' . $plugin . '"';
+        if ( ! @groups ) {
+            return 0;
+        }
+        my $prompt = defined $db ? 'DB: ' . $db . '' : '' . $plugin . '';
         my $db_opt = $sf->read_db_config_files();
 
         my $changed = 0;

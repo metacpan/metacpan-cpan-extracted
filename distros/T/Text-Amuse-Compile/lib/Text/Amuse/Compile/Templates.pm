@@ -727,7 +727,7 @@ sub latex {
 \usepackage{bookmark}
 
 % footnote handling
-\usepackage{bigfoot}
+\usepackage[fragile]{bigfoot}
 \usepackage{perpage}
 \DeclareNewFootnote{default}
 [% IF safe_options.secondary_footnotes_alpha %]
@@ -738,6 +738,7 @@ sub latex {
 \MakeSorted{footnoteB}
 \renewcommand*\thefootnoteB{(\arabic{footnoteB})}
 [% END %]
+\deffootnote[3em]{0em}{4em}{\textsuperscript{\thefootnotemark}~}
 
 % continuous numbering across the document. Defaults to resetting at chapter. Unclear
 % \usepackage{chngcntr}

@@ -2,7 +2,7 @@ package Locale::Babelfish;
 
 # ABSTRACT: Perl I18n using https://github.com/nodeca/babelfish format.
 
-our $VERSION = '2.003'; # VERSION
+our $VERSION = '2.004'; # VERSION
 
 
 use utf8;
@@ -121,6 +121,10 @@ sub t_or_undef {
                 $parser->parse( $$r, $locale ),
             );
         }
+        elsif ( ref( $r ) eq 'ARRAY' ) {
+            $self->{dictionaries}{$locale}{$dictname_key} = $r
+                                                          = _process_list_items( $r, $locale );
+        }
     }
      # fallbacks
     else {
@@ -138,6 +142,10 @@ sub t_or_undef {
                         $self->{dictionaries}->{$_}->{$dictname_key} = $r = $compiler->compile(
                             $parser->parse( $$r, $_ ),
                         );
+                    }
+                    elsif ( ref( $r ) eq 'ARRAY' ) {
+                        $self->{dictionaries}{$locale}{$dictname_key} = $r
+                                                                      = _process_list_items( $r, $locale );
                     }
                     last;
                 }
@@ -336,6 +344,31 @@ sub _flat_hash_keys {
 }
 
 
+sub _process_list_items {
+    my ( $r, $locale ) = @_;
+
+    my @compiled_items;
+
+    for my $item ( @{ $r } ) {
+        push @compiled_items, $compiler->compile( $parser->parse( $item, $locale ) );
+    }
+
+    return sub {
+        my $results = [];
+
+        for my $item ( @compiled_items )  {
+            if (ref( $item ) eq 'CODE' ) {
+                push @{ $results }, $item->(@_);
+            } else {
+                push @{ $results }, $item;
+            }
+        }
+
+        return $results;
+    };
+}
+
+
 1;
 
 __END__
@@ -350,7 +383,7 @@ Locale::Babelfish - Perl I18n using https://github.com/nodeca/babelfish format.
 
 =head1 VERSION
 
-version 2.003
+version 2.004
 
 =head1 DESCRIPTION
 
@@ -433,6 +466,9 @@ C<dictionary> is name of dictionary and C<en_US> - its locale.
                     title : Last message
     demo:
         apples: I have #{count} ((apple|apples))
+        list:
+            - some content #{data}
+            - some other content #{data}
 
 =head1 DETAILS
 
@@ -446,7 +482,10 @@ $self->{dictionaries}->{ru_RU}->{dictname_key}...
 
 Если это ссылка на скаляр, то парсит и компилирует строку.
 
-Результат компиляции либо ссылка на подпрограмму, лмбо просто строка.
+Если это ссылка на массив, то работаем со всеми элементами массива как со скалярами,
+собираем полученные результаты компиляции в новый массив и возвращаем ссылку на этот массив.
+
+Результат компиляции либо ссылка на подпрограмму, либо просто строка.
 
 Если это ссылка на подпрограмму, мы просто вызываем ее с плоскими параметрами.
 
@@ -549,6 +588,12 @@ $params - хэш параметров
 
 Внутренняя, рекурсивная.
 Преобразует хэш любой вложенности в строку, где ключи хешей разделены точками.
+
+=item _process_list_items
+
+    _process_list_items( $dictinary_values);
+
+Обрабатывает ключи словарей содержащие списки, и оборачивает в фунцию для компиляции списка
 
 =back
 

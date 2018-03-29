@@ -1,5 +1,15 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.03 2018-03-27
+
+ - Add a helpful error message when bigfoot doesn't have the fragile
+   option (needed by the template)
+
+1.02 2018-03-26
+
+ - Normalize the footnotes (make them similar to the standard class)
+ - Properly decode the latex output
+
 1.01 2018-01-28
 
  - Bump Text::Amuse dependency

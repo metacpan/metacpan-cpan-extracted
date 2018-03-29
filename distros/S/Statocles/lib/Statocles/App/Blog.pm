@@ -1,5 +1,5 @@
 package Statocles::App::Blog;
-our $VERSION = '0.089';
+our $VERSION = '0.091';
 # ABSTRACT: A blog application
 
 use Text::Unidecode;
@@ -9,7 +9,7 @@ use Statocles::Store;
 use Statocles::Document;
 use Statocles::Page::Document;
 use Statocles::Page::List;
-use Statocles::Util qw( run_editor );
+use Statocles::Util qw( run_editor read_stdin );
 
 with 'Statocles::App::Role::Store';
 
@@ -188,20 +188,12 @@ sub command {
         my $doc;
 
         # Read post content on STDIN
-        if ( !-t *STDIN ) {
-            my $content = do { local $/; <STDIN> };
+        if ( my $content = read_stdin() ) {
             $doc = Statocles::Document->parse_content(
                 (map { defined $opt{$_} ? ( $_, $opt{$_} ) : () } @doc_opts),
                 ( @argv > 1 ? ( title => join( " ", @argv[1..$#argv] ) ) : () ),
                 content => $content,
             );
-
-            # Re-open STDIN as the TTY so that the editor (vim) can use it
-            # XXX Is this also a problem on Windows?
-            if ( -e '/dev/tty' ) {
-                close STDIN;
-                open STDIN, '/dev/tty';
-            }
         }
         else {
             $doc = Statocles::Document->new(
@@ -666,7 +658,7 @@ Statocles::App::Blog - A blog application
 
 =head1 VERSION
 
-version 0.089
+version 0.091
 
 =head1 DESCRIPTION
 

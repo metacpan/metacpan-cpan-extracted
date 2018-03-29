@@ -1,0 +1,180 @@
+%grammar state
+%version 0.0.1
+
+state : +screen +outputs
+
+screen :
+ 	- 'Screen' .BLANK+ +screen_id COLON
+        screen_dims
+        EOL
+
+screen_id : integer
+screen_dims : ( / + ( 'minimum' | 'maximum' | 'current' ) / .BLANK+ +dimension )+ %% COMMA
+
+outputs : output+
+output :
+         output_header
+         +Identifier
+	 +Timestamp
+	 +Subpixel
+	 +Gamma?
+         +Brightness?
+         +Clones
+         +CRTC?
+         +CRTCs
+         +Panning? +Tracking? +Border?
+         +Transform
+         +properties
+         +modes?
+
+output_header :
+         +output_name
+         .BLANK+ +output_connection
+	 +output_primary
+         ( .BLANK+ +cur_mode )?
+	 .BLANK+ LPAREN +rotations - +output_header_reflections RPAREN
+
+         # only if cur_mode
+	 ( .BLANK+ +dimension_mm )?
+
+         ( +cur_crtc )?
+	 EOL
+
+output_name		: /( NS+ )/
+output_connection	: /  ( 'connected' | 'disconnected' | 'unknown connection' ) /
+output_primary		:  ( BLANK+ 'primary' )?
+
+cur_mode :
+	( +geometry .BLANK+ )?
+	( .LPAREN +mode_id .RPAREN .BLANK+ )?
+	+rotation
+	( .BLANK+ +cur_mode_reflection )?
+
+cur_mode_reflection : / ( 'none' | 'X axis' | 'Y axis' | 'X and Y axis' ) /
+
+cur_crtc :
+	 ( .BLANK+ +panning )?
+         ( .BLANK+ +tracking )?
+         ( .BLANK+ +border )?
+
+panning:  'panning' .BLANK+ geometry
+tracking: 'tracking' .BLANK+ geometry
+border:  'border' .BLANK+ border_values
+border_values: +left SLASH +top SLASH +right SLASH +bottom
+
+# Properties
+
+properties : property_type+ %% EOL
+
+property_type : ( property_EDID | property )
+
+property_EDID       : /+ 'EDID:' + / +EDID_value
+EDID_value : <hexraw>8 % .WS+
+property  : / + ( [^: EOL ]+ ) ':' + ( ANY* NS )? / .BLANK*  ( +supported | +ranges )?
+supported :
+        + 'supported:' .BLANK+ property_values
+
+ranges :
+        + / 'range:' | 'ranges:' / .BLANK+ +range+ %% COMMA
+
+range : LPAREN .BLANK* property_values .BLANK* RPAREN
+
+property_values : property_value+ % COMMA
+property_value : / - ( [^,\n]+ ) /
+
+# Graphics Modes
+
+modes : mode+ %% EOL
+mode : +mode_name
+       .BLANK+ LPAREN +mode_id RPAREN
+       .BLANK+ +dotClock
+       .BLANK+ +modeFlags
+       +mode_current
+       +mode_preferred
+       EOL
+       +hMode
+       EOL
+       +vMode
+
+mode_name : /+ ( WORD+ ) /
+modeFlags : modeFlag+ % +
+mode_current : ( BLANK+  '*current'  )?
+mode_preferred : ( BLANK+ '+preferred' )?
+
+modeFlag : / ( PLUS 'HSync' | DASH 'HSync' | PLUS 'VSync' | DASH 'VSync' | 'Interlace' | 'DoubleScan' | 'CSync' | PLUS 'CSync' | DASH 'CSync') /
+
+hMode :
+  + 'h:' .BLANK+ +mode_width .BLANK+ +hSyncStart .BLANK+ +hSyncEnd .BLANK+ +hTotal .BLANK+ +hSkew .BLANK+ +hSync
+
+vMode :
+  + 'v:' .BLANK+ +mode_height .BLANK+ +vSyncStart .BLANK+ +vSyncEnd .BLANK+ +vTotal .BLANK+ +vSync
+
+mode_width	: / 'width' + integer /
+hSyncStart	: / 'start' + integer /
+hSyncEnd	: / 'end'   + integer /
+hTotal		: / 'total' + integer /
+hSkew		: / 'skew'  + integer /
+hSync		:   'clock' + frequency
+
+mode_height	: / 'height' + integer /
+vSyncStart	: / 'start'  + integer /
+vSyncEnd	: / 'end'    + integer /
+vTotal		: / 'total'  + integer /
+vSync		:   'clock'  + frequency
+
+dotClock        : frequency
+
+frequency : +frequency_value +frequency_unit
+frequency_value : float
+frequency_unit : / ( (: 'M' | 'K' )? 'Hz' ) /
+
+mode_id :  hexint
+
+geometry : +dimension +offset
+
+x : / integer /
+y : / integer /
+
+left	: / integer /
+right	: / integer /
+top	: / integer /
+bottom	: / integer /
+
+dimension : +x .BLANK* 'x' .BLANK* +y
+offset : / ( PLUS | DASH ) / x / ( PLUS | DASH ) / y
+dimension_mm : +x 'mm' .BLANK+ 'x' .BLANK+ +y  'mm'
+
+minimum : .BLANK+ 'minimum' .BLANK+ dimension
+current : .BLANK+ 'current' .BLANK+ dimension
+maximum : .BLANK+ 'maximum' .BLANK+ dimension
+
+Transform :
+	+ 'Transform:' + <float>9 % .WS+
+        filter?
+
+filter : /+ 'filter:' BLANK* ( WORD+ )? / EOL
+
+NotSpace: /(\S+)/
+
+Identifier : + 'Identifier:' .BLANK+  hexint  EOL
+Timestamp  : + 'Timestamp:' .BLANK+  integer EOL
+Subpixel   : + 'Subpixel:' .BLANK+ / ( ANY+ ) / EOL
+Panning    : + 'Panning:' .BLANK+  geometry EOL
+Gamma      : + 'Gamma:' .BLANK+   -( float+ % COLON ) EOL
+Brightness : + 'Brightness:' .BLANK+  float EOL
+Clones     : + 'Clones:' .BLANK* ( NotSpace+ % .BLANK+ )? EOL
+Tracking   : + 'Tracking:' .BLANK+  geometry EOL
+Border     : + 'Border:' .BLANK+  border_values EOL
+CRTC       : + 'CRTC:' .BLANK+  /( ANY* ) / EOL
+CRTCs      : + 'CRTCs:' .BLANK+  integer+ % .BLANK EOL
+
+rotations : rotation* % +
+rotation  : / ( 'normal' | 'left' | 'inverted' | 'right' ) /
+
+output_header_reflections : output_header_reflection_xy* % +
+output_header_reflection_xy  : / ( 'x axis' | 'y axis' ) /
+
+integer : / ( DIGIT+ ) /
+float   : / ( DIGIT+? [.] DIGIT+ ) /
+hexint : / ( '0x' <HEX>{2} ) /
+hexraw : / ( HEX+ ) /

@@ -1,0 +1,23 @@
+=pod
+
+=encoding utf8
+
+=head1 PERL UTF-8
+
+=head2 encode variable to bytes;
+
+    Encode::_utf8_off $buf;
+
+=head2 decode 100% valid utf8 data
+
+    Encode::_utf8_on $str;
+
+If we are sure, that input data is valid utf8 string.
+
+=head2 decode possible utf8 data
+
+    my $success = utf8::decode $buf;
+
+The UTF-8 flag is turned on only if the source string contains multiple-byte UTF-8 characters.
+
+=cut

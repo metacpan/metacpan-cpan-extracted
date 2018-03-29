@@ -9,6 +9,7 @@ README
 cpanfile
 dist.ini
 lib/Pandoc.pm
+lib/Pandoc/Release.pm
 lib/Pandoc/Version.pm
 t/binmode.t
 t/convert.t
@@ -20,5 +21,7 @@ t/lists.t
 t/methods.t
 t/parse.t
 t/release-pod-syntax.t
+t/release.t
 t/run.t
 t/version.t
+xt/download.pl

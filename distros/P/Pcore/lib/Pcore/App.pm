@@ -14,16 +14,17 @@ has api => ( is => 'ro', isa => Maybe [ ConsumerOf ['Pcore::App::API'] ], init_a
 
 sub BUILD ( $self, $args ) {
 
-    # create HTTP router
+    # apply default HTTP router settings
     $self->{app_cfg}->{router} //= { '*' => ref $self };
 
+    # create HTTP router
     $self->{router} = Pcore::App::Router->new( {
         app   => $self,
         hosts => $self->{app_cfg}->{router},
     } );
 
-    # init api
-    $self->{api} = Pcore::App::API->new($self) if $self->{app_cfg}->{api}->{connect};
+    # create API object
+    $self->{api} = Pcore::App::API->new($self);
 
     return;
 }
@@ -80,6 +81,14 @@ around run => sub ( $orig, $self, $cb = undef ) {
 
     return $self;
 };
+
+sub api_call ( $self, @args ) {
+    my $auth = bless { app => $self }, 'Pcore::App::API::Auth';
+
+    $auth->api_call(@args);
+
+    return;
+}
 
 1;
 __END__

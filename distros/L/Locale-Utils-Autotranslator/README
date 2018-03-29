@@ -1,4 +1,4 @@
-Locale::Utils::Autotranslator version 1.007
+Locale::Utils::Autotranslator version 1.008
 ===========================================
 
 Utils to expand placeholders in named style.
@@ -33,7 +33,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (c) 2014 - 2017,
+Copyright (c) 2014 - 2018,
 Steffen Winkler
 steffenw at cpan.org.
 All rights reserved.

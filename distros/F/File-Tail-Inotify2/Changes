@@ -1,5 +1,11 @@
 Revision history for Perl extension File::Tail::Inotify2.
 
+1.02 2018-03-28T09:50:24Z
+    - Bump version.
+
+1.01 2018-03-28T09:37:53Z
+    - Add IN_MOVED_TO support like logrotate empty file create (AnthraxCompany #1)
+
 1.00 2013-06-20T09:50:02Z
     - Uses Minilla.
     - Updates docs.

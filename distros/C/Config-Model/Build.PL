@@ -68,6 +68,7 @@ my $build = $class->new(
 
   'build_requires' => {
     'Config::Model::Tester' => '2.062',
+    'File::Copy' => '0',
     'Module::Build' => '0.34',
     'Test::Differences' => '0',
     'Test::Exception' => '0',
@@ -95,7 +96,6 @@ my $build = $class->new(
     'Encode' => '0',
     'English' => '0',
     'Fcntl' => '0',
-    'File::Copy' => '0',
     'File::HomeDir' => '0',
     'File::Path' => '0',
     'Hash::Merge' => '0.12',

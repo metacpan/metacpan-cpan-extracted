@@ -51,6 +51,7 @@
       },
       "test" : {
          "requires" : {
+            "File::Spec" : "0",
             "Locale::XGettext::Util::Keyword" : "0",
             "Test::More" : "0",
             "vars" : "0"
@@ -69,7 +70,7 @@
          "web" : "http://github.com/gflohr/Template-Plugin-Gettext.git"
       }
    },
-   "version" : "0.4",
+   "version" : "0.5",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

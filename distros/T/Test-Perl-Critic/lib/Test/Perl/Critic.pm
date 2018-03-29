@@ -7,7 +7,6 @@ use warnings;
 
 use Carp qw(croak);
 use English qw(-no_match_vars);
-use MCE::Grep;
 
 use Test::Builder qw();
 use Perl::Critic qw();
@@ -16,13 +15,19 @@ use Perl::Critic::Utils;
 
 #---------------------------------------------------------------------------
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 #---------------------------------------------------------------------------
 
 my $TEST = Test::Builder->new;
 my $DIAG_INDENT = q{  };
 my %CRITIC_ARGS = ();
+
+my $CRITIC_OBJ = undef;
+my $BUILD_CRITIC = sub {
+    return $CRITIC_OBJ if defined $CRITIC_OBJ;
+    $CRITIC_OBJ = Perl::Critic->new( @_ );
+};
 
 #---------------------------------------------------------------------------
 
@@ -37,9 +42,12 @@ sub import {
         *{ $caller . '::all_critic_ok' } = \&all_critic_ok;
     }
 
-    # -format is supported for backward compatibility
+    # -format is supported for backward compatibility.
     if ( exists $args{-format} ) { $args{-verbose} = $args{-format}; }
     %CRITIC_ARGS = %args;
+
+    # Reset possibly lazy-initialized Perl::Critic.
+    $CRITIC_OBJ = undef;
 
     $TEST->exported_to($caller);
 
@@ -61,7 +69,7 @@ sub critic_ok {
 
     # Run Perl::Critic
     my $status = eval {
-        $critic     = Perl::Critic->new( %CRITIC_ARGS );
+        $critic     = $BUILD_CRITIC->( %CRITIC_ARGS );
         @violations = $critic->critique( $file );
         $ok         = not scalar @violations;
         1;
@@ -93,23 +101,45 @@ sub all_critic_ok {
     my @files = Perl::Critic::Utils::all_perl_files(@dirs_or_files);
     croak 'Nothing to critique' if not @files;
 
-    # Since tests are running in forked MCE workers, test results could arrive
-    # in any order. The test numbers will be meaningless, so turn them off.
-    $TEST->use_numbers(0);
+    my $have_mce = eval { require MCE::Grep; MCE::Grep->import; 1 };
+    return $have_mce ? _test_parallel(@files) : _test_serial(@files);
+}
 
-    # The parent won't know about any of the tests that were run by the forked
-    # workers. So we disable the T::B sanity checks at the end of its life.
-    $TEST->no_ending(1);
+#---------------------------------------------------------------------------
 
-    my $okays = mce_grep { critic_ok($_) } @files;
-    my $pass = $okays == @files;
+sub _test_parallel {
+      my @files = @_;
 
-    # To make Test::Harness happy, we must emit a test plan and a sensible exit
-    # status. Usually, T::B does this for us, but we disabled the ending above.
-    $pass || eval 'END { $? = 1 }'; ## no critic qw(Eval Interpolation)
-    $TEST->done_testing(scalar @files);
+      # Since tests are running in forked MCE workers, test results could arrive
+      # in any order. The test numbers will be meaningless, so turn them off.
+      $TEST->use_numbers(0);
 
-    return $pass;
+      # The parent won't know about any of the tests that were run by the forked
+      # workers. So we disable the T::B sanity checks at the end of its life.
+      $TEST->no_ending(1);
+
+      my $okays = MCE::Grep->run( sub { critic_ok($_) }, @files );
+      my $pass = $okays == @files;
+
+      # To make Test::Harness happy, we must emit a test plan and a sensible exit
+      # status. Usually, T::B does this for us, but we disabled the ending above.
+      $pass || eval 'END { $? = 1 }'; ## no critic qw(Eval Interpolation)
+      $TEST->done_testing(scalar @files);
+
+      return $pass;
+}
+
+#---------------------------------------------------------------------------
+
+sub  _test_serial {
+  my @files = @_;
+
+  my $okays = grep {critic_ok($_)} @files;
+  my $pass = $okays == @files;
+
+  $TEST->done_testing(scalar @files);
+
+  return $pass;
 }
 
 #---------------------------------------------------------------------------
@@ -204,13 +234,13 @@ This subroutine emits its own test plan, so you do not need to specify the
 expected number of tests or call C<done_testing()>. Therefore, C<all_critic_ok>
 generally cannot be used in a test script that includes other sorts of tests.
 
-all_critic_ok() is also optimized to run tests in parallel over multiple cores
+C<all_critic_ok()> is also optimized to run tests in parallel over multiple cores
 (if you have them) so it is usually better to call this function than calling
-critic_ok() directly.
+C<critic_ok()> directly.
 
 =item critic_ok( $FILE [, $TEST_NAME ] )
 
-Okays the test if Perl::Critic does not find any violations in $FILE.  If it
+Okays the test if Perl::Critic does not find any violations in C<$FILE>.  If it
 does, the violations will be reported in the test diagnostics.  The optional
 second argument is the name of test, which defaults to "Perl::Critic test for
 $FILE".
@@ -227,8 +257,8 @@ invokes Perl::Critic with its default configuration.  But if you have
 developed your code against a custom Perl::Critic configuration, you will want
 to configure Test::Perl::Critic to do the same.
 
-Any arguments passed through the C<use> pragma (or via C<<
-Test::Perl::Critic->import() >> )will be passed into the L<Perl::Critic>
+Any arguments passed through the C<use> pragma (or via
+C<< Test::Perl::Critic->import() >> )will be passed into the L<Perl::Critic>
 constructor.  So if you have developed your code using a custom
 F<~/.perlcriticrc> file, you can direct L<Test::Perl::Critic> to use your
 custom file too.
@@ -337,7 +367,7 @@ If you use Test::Perl::Critic with L<Dist::Zilla>, beware that some DZ plugins
 may mutate your code in ways that are not compliant with your Perl::Critic
 rules. In particular, the standard L<Dist::Zilla::Plugin::PkgVersion> will
 inject a C<$VERSION> declaration at the top of the file, which will violate
-L<Perl::Critic::Policy::TestingAndDebughgin::RequireUseStrict>. One solution
+L<Perl::Critic::Policy::TestingAndDebugging::RequireUseStrict>. One solution
 is to use the L<Dist::Zilla::Plugin::OurPkgVersion> which allows you to control
 where the C<$VERSION> declaration appears.
 
@@ -349,7 +379,7 @@ where the C<$VERSION> declaration appears.
 =head1 BUGS
 
 If you find any bugs, please submit them to
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perl-Critic>.  Thanks.
+L<https://github.com/Perl-Critic/Test-Perl-Critic/issues>.  Thanks.
 
 
 =head1 SEE ALSO
@@ -371,7 +401,7 @@ Jeffrey Ryan Thalhammer <jeff@thaljef.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2005-2014 Jeffrey Ryan Thalhammer.
+Copyright (c) 2005-2018 Jeffrey Ryan Thalhammer.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.  The full text of this license

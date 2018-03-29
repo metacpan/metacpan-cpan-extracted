@@ -27,4 +27,4 @@ resources:
   bugtracker: https://github.com/oetiker/Mojolicious-Plugin-Qooxdoo/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/oetiker/Mojolicious-Plugin-Qooxdoo
-version: '0.905'
+version: '0.906'

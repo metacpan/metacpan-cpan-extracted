@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.008';
+our $VERSION = '2.009';
 
 use List::MoreUtils qw( any first_index );
 
@@ -154,7 +154,7 @@ sub on_table {
             }
         }
         elsif ( $custom eq $cu{'print_tbl'} ) {
-            my $select .= "SELECT" . $sql->{distinct_stmt} . " " . $ax->cols_as_string( $sql );
+            my $select .= "SELECT" . $sql->{distinct_stmt} . " " . $ax->prepare_select_cols( $sql ); #
             $select .= " FROM " . $sql->{table};
             $select .= $sql->{where_stmt};
             $select .= $sql->{group_by_stmt};
@@ -170,7 +170,7 @@ sub on_table {
                 $sf->{o}{table}{max_rows} = 0;
             }
             my @arguments = ( @{$sql->{where_args}}, @{$sql->{having_args}} );
-            if ( $sf->{o}{G}{subqueries} ) {
+            if ( $sf->{i}{subqueries} ) {
                 my $tmp;
                 if ( @{$sf->{i}{stmt_history}||[]} ) {
                     if ( $select . join( ',', @arguments ) ne $sf->{i}{stmt_history}[0] . join( ',', @{$sf->{i}{stmt_history}[1]||[]} ) ) {
@@ -359,10 +359,10 @@ sub commit_sql {
                     $filled =~ s/\?/$val/;
                 }
                 $filled =~ s/^\s+//;
-                $prompt_pt = "i: These records will be updated with [$filled]\n";
+                $prompt_pt = "These records will be updated with [$filled]\n";
             }
             else {
-                $prompt_pt = "i: These records will be deleted\n";
+                $prompt_pt = "These records will be deleted\n";
             }
             if ( @$all_arrayref > 1 ) {
                 print_table( $all_arrayref, { %{$sf->{o}{table}}, prompt => $prompt_pt, max_rows => 0, keep_header => 0 } ); #

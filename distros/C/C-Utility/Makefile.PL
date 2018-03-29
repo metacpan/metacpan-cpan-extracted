@@ -16,6 +16,8 @@ WriteMakefile (
     PREREQ_PM => {
 	'File::Versions' => 0,
 	'File::Spec' => 0,
+	'File::Slurper' => '0.012',
+	'C::Tokenize' => '0.18',
     },
     META_MERGE => {
         resources => {

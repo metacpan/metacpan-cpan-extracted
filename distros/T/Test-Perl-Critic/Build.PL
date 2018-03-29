@@ -23,7 +23,7 @@ my $class = Module::Build->subclass( code => <<'END_SUBCLASS' );
         $self->depends_on('manifest');
         $self->depends_on('distmeta');
 
-        $self->test_files( qw< t xt/author > );
+        $self->test_files( qw< t xt > );
         $self->recursive_test_files(1);
 
         $self->depends_on('test');
@@ -57,12 +57,12 @@ my $builder = $class->new(
     requires             => {
         'Carp'                      => 0,
         'English'                   => 0,
-        'MCE'                       => 1.520,
+        'MCE'                       => 1.827,
         'Perl::Critic'              => 1.105,
         'Perl::Critic::Utils'       => 1.105,
         'Perl::Critic::Violation'   => 1.105,
         'strict'                    => 0,
-        'Test::Builder'             => 0,
+        'Test::Builder'             => 0.88,
         'warnings'                  => 0,
     },
 

@@ -3,13 +3,9 @@ use warnings;
 
 use Test::More;
 
-BEGIN {
-    if (! $ENV{PI_BOARD}){
-        plan skip_all => "not a Pi board";
-        exit;
-    }
+SKIP: {
+    skip "not a Pi board", 1 unless $ENV{PI_BOARD};
+    use_ok('WiringPi::API');
 }
-
-BEGIN { use_ok('WiringPi::API') };
 
 done_testing();

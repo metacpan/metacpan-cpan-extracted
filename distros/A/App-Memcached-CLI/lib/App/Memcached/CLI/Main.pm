@@ -18,7 +18,7 @@ use App::Memcached::CLI::Help;
 use App::Memcached::CLI::Item;
 use App::Memcached::CLI::Util ':all';
 
-use version; our $VERSION = 'v0.9.4';
+use version; our $VERSION = 'v0.9.5';
 
 my $PROGRAM = basename $0;
 
@@ -674,14 +674,14 @@ L<memcached-cli>
 
 =head1 LICENSE
 
-Copyright (C) YASUTAKE Kiyoshi.
+Copyright (C) IKEDA Kiyoshi.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-YASUTAKE Kiyoshi E<lt>yasutake.kiyoshi@gmail.comE<gt>
+IKEDA Kiyoshi E<lt>progrhyme@gmail.comE<gt>
 
 =cut
 

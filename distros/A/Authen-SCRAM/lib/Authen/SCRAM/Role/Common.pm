@@ -4,7 +4,7 @@ use warnings;
 
 package Authen::SCRAM::Role::Common;
 
-our $VERSION = '0.007';
+our $VERSION = '0.009';
 
 use Moo::Role 1.001000;
 
@@ -149,10 +149,7 @@ sub _base64 {
 
 sub _client_sig {
     my ($self) = @_;
-    return $self->_hmac_fcn->(
-        $self->_session->{_stored_key},
-        encode_utf8( $self->_auth_msg )
-    );
+    return $self->_hmac_fcn->( $self->_session->{_stored_key}, $self->_auth_msg );
 }
 
 sub _construct_gs2 {
@@ -224,7 +221,7 @@ sub _saslprep {
     return $name if $self->skip_saslprep;
 
     my $prepped = try {
-        saslprep($name, 1); # '1' makes it use stored mode
+        saslprep( $name, 1 ); # '1' makes it use stored mode
     }
     catch {
         croak "SCRAM username '$name' invalid: $_";

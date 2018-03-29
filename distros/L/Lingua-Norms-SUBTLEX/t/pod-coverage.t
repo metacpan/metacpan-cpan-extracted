@@ -16,6 +16,6 @@ eval "use Pod::Coverage $min_pc";
 plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
     if $@;
 
-all_pod_coverage_ok({trustme => [qw/all_words isa_word freq ldist list_words on_zipf_mean opm random_word zipf/]});
+all_pod_coverage_ok({trustme => [qw/all_words isa_word freq ldist list_words list_strings nlines pos select_words on opm random_word zipf/]});
 
 1;

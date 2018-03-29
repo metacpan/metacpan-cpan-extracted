@@ -26,7 +26,9 @@ no_index:
 provides:
   App::Egaz:
     file: lib/App/Egaz.pm
-    version: v0.0.8
+    version: v0.0.10
+  App::Egaz::Command::exactmatch:
+    file: lib/App/Egaz/Command/exactmatch.pm
   App::Egaz::Command::formats:
     file: lib/App/Egaz/Command/formats.pm
   App::Egaz::Command::lav2axt:
@@ -41,6 +43,8 @@ provides:
     file: lib/App/Egaz/Command/normalize.pm
   App::Egaz::Command::partition:
     file: lib/App/Egaz/Command/partition.pm
+  App::Egaz::Command::raxml:
+    file: lib/App/Egaz/Command/raxml.pm
   App::Egaz::Common:
     file: lib/App/Egaz/Common.pm
 requires:
@@ -49,14 +53,16 @@ requires:
   File::ShareDir: '1.102'
   IO::Zlib: '0'
   IPC::Cmd: '0'
+  JSON: '2.97001'
   List::Util: '0'
   Path::Tiny: '0.076'
   Template: '2.26'
+  Tie::IxHash: '1.23'
   YAML::Syck: '1.29'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/wang-q/App-Egaz/issues
   homepage: https://github.com/wang-q/App-Egaz
   repository: git://github.com/wang-q/App-Egaz.git
-version: 0.0.8
+version: 0.0.10
 x_authority: cpan:WANGQ

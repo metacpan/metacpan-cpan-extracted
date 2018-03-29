@@ -1,10 +1,10 @@
 package Mail::AuthenticationResults::Token::Separator;
-# ABSTRACT: Class for modelling AuthenticationResults Header parts detected as quoted separators
+# ABSTRACT: Class for modelling AuthenticationResults Header parts detected as separators
 
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180314'; # VERSION
+our $VERSION = '1.20180328'; # VERSION
 use Carp;
 
 use base 'Mail::AuthenticationResults::Token';
@@ -42,11 +42,11 @@ __END__
 
 =head1 NAME
 
-Mail::AuthenticationResults::Token::Separator - Class for modelling AuthenticationResults Header parts detected as quoted separators
+Mail::AuthenticationResults::Token::Separator - Class for modelling AuthenticationResults Header parts detected as separators
 
 =head1 VERSION
 
-version 1.20180314
+version 1.20180328
 
 =head1 DESCRIPTION
 

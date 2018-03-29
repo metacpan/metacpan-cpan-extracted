@@ -16,7 +16,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.008'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,16 +33,16 @@ no_index:
 provides:
   Authen::SCRAM:
     file: lib/Authen/SCRAM.pm
-    version: '0.007'
+    version: '0.009'
   Authen::SCRAM::Client:
     file: lib/Authen/SCRAM/Client.pm
-    version: '0.007'
+    version: '0.009'
   Authen::SCRAM::Role::Common:
     file: lib/Authen/SCRAM/Role/Common.pm
-    version: '0.007'
+    version: '0.009'
   Authen::SCRAM::Server:
     file: lib/Authen/SCRAM/Server.pm
-    version: '0.007'
+    version: '0.009'
 recommends:
   String::Compare::ConstantTime: '0.310'
 requires:
@@ -64,7 +64,7 @@ resources:
   bugtracker: https://github.com/dagolden/Authen-SCRAM/issues
   homepage: https://github.com/dagolden/Authen-SCRAM
   repository: https://github.com/dagolden/Authen-SCRAM.git
-version: '0.007'
+version: '0.009'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'David Golden <xdg@xdg.me>'

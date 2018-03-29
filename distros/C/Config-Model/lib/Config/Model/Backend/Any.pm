@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Any;
-$Config::Model::Backend::Any::VERSION = '2.117';
+$Config::Model::Backend::Any::VERSION = '2.118';
 use Carp;
 use strict;
 use warnings;
@@ -57,6 +57,7 @@ sub read_global_comments {
 
     my $cc_re = length $cc > 1 ? "[$cc]" : $cc;
     my @global_comments;
+    my @global_comment_lines;
 
     while ( defined( my $l = shift @$lines ) ) {
         next if $l =~ /^$cc_re{2}/;    # remove comments added by Config::Model
@@ -74,17 +75,26 @@ sub read_global_comments {
 
         my ( $data, $comment ) = split /\s*$cc_re\s?/, $l, 2;
 
-        push @global_comments, $comment if defined $comment;
+        if (defined $comment) {
+            push @global_comment_lines, $l;
+            push @global_comments, $comment;
+        }
 
-        if ( $l =~ /^\s*$/ or $data ) {
+        if ( $l =~ /^\s*$/ ) {
+            # we indeed had global comments which are now finished by
+            # a blank line.  Store them and bail out
             if (@global_comments) {
                 $self->node->annotation(@global_comments);
-                $logger->debug("Setting global comment with @global_comments");
+                $logger->debug("Setting global comment with @global_comments on ", $self->node->name);
             }
-            # put back any data and comment
-            unshift @$lines, $l unless $l =~ /^\s*$/;
+            # stop global comment at first blank line
+            last;
+        }
+        if ( $data ) {
+            # The comment found is not global, put back line and any captured comment
+            unshift @$lines, @global_comment_lines, $l;
 
-            # stop global comment at first blank or non comment line
+            # stop global comment
             last;
         }
     }
@@ -183,7 +193,7 @@ Config::Model::Backend::Any - Virtual class for other backends
 
 =head1 VERSION
 
-version 2.117
+version 2.118
 
 =head1 SYNOPSIS
 
@@ -427,7 +437,8 @@ comment to begin with 'C<#>' or 'C<;>')
 
 Read the global comments (i.e. the first block of comments until the
 first blank or non comment line) and store them as root node
-annotation.
+annotation. Note that the global comment must be separated from the
+first data line by a blank line.
 
 Example:
 

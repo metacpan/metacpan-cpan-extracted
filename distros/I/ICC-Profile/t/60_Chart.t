@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# ICC::Support::Chart test module / 2018-03-26
+# ICC::Support::Chart test module / 2018-03-27
 #
 # Copyright © 2004-2018 by William B. Birkett
 
@@ -641,7 +641,7 @@ sub cmp_matrix {
 	my ($mat1, $mat2) = @_;
 
 	# local variables
-	my(@fp1, @fp2, @dif);
+	my(@m1, @m2, @dif);
 
 	# return failed if different number rows
 	return(0) if ($#{$mat1} != $#{$mat2});
@@ -662,12 +662,12 @@ sub cmp_matrix {
 				if ($mat1->[$i][$j] != $mat2->[$i][$j]) {
 					
 					# compute binary mantissa and exponent
-					@fp1 = POSIX::frexp($mat1->[$i][$j]);
-					@fp2 = POSIX::frexp($mat2->[$i][$j]);
+					@m1 = POSIX::frexp($mat1->[$i][$j]);
+					@m2 = POSIX::frexp($mat2->[$i][$j]);
 					@dif = POSIX::frexp($mat1->[$i][$j] - $mat2->[$i][$j]);
 					
 					# return failed if maximum exponent difference < 40 (about 12 decimal digits)
-					return(0) if (($fp1[1] > $fp2[1] ? $fp1[1] : $fp2[1]) - $dif[1] < 40);
+					return(0) if (($m1[1] > $m2[1] ? $m1[1] : $m2[1]) - $dif[1] < 40);
 					
 				}
 				

@@ -5,7 +5,7 @@ use Pcore::App::API qw[:CONST];
 use Pcore::Util::Data qw[to_b64_url];
 use Pcore::Util::Digest qw[sha3_512];
 use Pcore::Util::Text qw[encode_utf8];
-use Pcore::Util::UUID qw[create_uuid looks_like_uuid];
+use Pcore::Util::UUID qw[uuid_v4 looks_like_uuid];
 
 with qw[Pcore::App::API];
 
@@ -15,7 +15,6 @@ has _hash_cache => ( is => 'ro', isa => InstanceOf ['Pcore::Util::Hash::RandKey'
 has _hash_cache_size => ( is => 'ro', isa => PositiveInt, default => 10_000 );
 
 sub init ( $self, $cb ) {
-
     $self->{_hash_cache} = P->hash->limited( $self->{_hash_cache_size} );
 
     # create DBH
@@ -177,7 +176,7 @@ sub _generate_user_password_hash ( $self, $user_name_utf8, $user_password_utf8, 
 }
 
 sub _generate_token ( $self, $token_type, $cb ) {
-    my $token_id = create_uuid;
+    my $token_id = uuid_v4;
 
     my $public_token = to_b64_url pack( 'C', $token_type ) . $token_id->bin . P->random->bytes(32);
 
@@ -1052,9 +1051,9 @@ SQL
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 132, 154, 204, 312,  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |      | 518, 731, 814, 898,  |                                                                                                                |
-## |      | 1016                 |                                                                                                                |
+## |    3 | 131, 153, 203, 311,  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |      | 517, 730, 813, 897,  |                                                                                                                |
+## |      | 1015                 |                                                                                                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

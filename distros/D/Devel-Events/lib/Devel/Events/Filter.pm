@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 
 package Devel::Events::Filter;
+# ABSTRACT: A handler role that filters events and delegates to another
+our $VERSION = '0.09';
 use Moose::Role;
 
 with qw/Devel::Events::Handler/;
@@ -33,10 +35,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-Devel::Events::Filter - A handler role that filters events and delegates to
-another.
+Devel::Events::Filter - A handler role that filters events and delegates to another
+
+=head1 VERSION
+
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -70,9 +77,13 @@ In the future this design choice might change.
 
 =head1 ATTRIBUTES
 
+=over 4
+
 =item handler
 
 A L<Devel::Events::Handler> to delegate to.
+
+=back
 
 =head1 METHODS
 
@@ -96,5 +107,21 @@ it may raise an error.
 
 L<Devel::Events>, L<Devel::Events::Handler>, L<Devel::Events::Filter::Stamp>,
 L<Devel::Events::Filter::Warn>
+
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-Events>
+(or L<bug-Devel-Events@rt.cpan.org|mailto:bug-Devel-Events@rt.cpan.org>).
+
+=head1 AUTHOR
+
+יובל קוג'מן (Yuval Kogman) <nothingmuch@woobling.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2007 by יובל קוג'מן (Yuval Kogman).
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

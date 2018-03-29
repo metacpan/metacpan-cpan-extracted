@@ -17,7 +17,7 @@ meta-spec:
   version: '1.4'
 name: Progress-Any-Output-TermMessage
 requires:
-  Progress::Any: '0.212'
+  Progress::Any: '0.214'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -25,7 +25,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Progress-Any-Output-TermMessage
   homepage: https://metacpan.org/release/Progress-Any-Output-TermMessage
   repository: git://github.com/perlancar/perl-Progress-Any-Output-TermMessage.git
-version: '0.040'
+version: '0.041'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

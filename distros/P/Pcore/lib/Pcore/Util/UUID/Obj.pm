@@ -7,15 +7,23 @@ has str => ( is => 'lazy', isa => Str );
 has hex => ( is => 'lazy', isa => Str );
 
 sub _build_bin ($self) {
-    return defined $self->{str} ? $Pcore::Util::UUID::UUID->from_string( $self->{str} ) : defined $self->{hex} ? $Pcore::Util::UUID::UUID->from_hexstring( $self->{hex} ) : die q[UUID was not found];
+    if ( defined $self->{str} ) {
+        return Data::UUID->from_string( $self->{str} );
+    }
+    elsif ( defined $self->{hex} ) {
+        return Data::UUID->from_hexstring( $self->{hex} );
+    }
+    else {
+        die q[UUID was not found];
+    }
 }
 
 sub _build_str ($self) {
-    return lc $Pcore::Util::UUID::UUID->to_string( $self->bin );
+    return join '-', unpack 'H8H4H4H4H12', $self->bin;
 }
 
 sub _build_hex ($self) {
-    return lc $Pcore::Util::UUID::UUID->to_hexstring( $self->bin );
+    return unpack 'h*', $self->bin;
 }
 
 1;

@@ -17,9 +17,10 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "Mojolicious::Plugin::AutoSecrets",
   "PREREQ_PM" => {
-    "Mojolicious" => "7.15"
+    "Mojolicious" => "7.15",
+    "Session::Token" => "1.503"
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -27,7 +28,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Mojolicious" => "7.15"
+  "Mojolicious" => "7.15",
+  "Session::Token" => "1.503"
 );
 
 

@@ -4,7 +4,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -97,19 +97,19 @@
    "provides" : {
       "Authen::SCRAM" : {
          "file" : "lib/Authen/SCRAM.pm",
-         "version" : "0.007"
+         "version" : "0.009"
       },
       "Authen::SCRAM::Client" : {
          "file" : "lib/Authen/SCRAM/Client.pm",
-         "version" : "0.007"
+         "version" : "0.009"
       },
       "Authen::SCRAM::Role::Common" : {
          "file" : "lib/Authen/SCRAM/Role/Common.pm",
-         "version" : "0.007"
+         "version" : "0.009"
       },
       "Authen::SCRAM::Server" : {
          "file" : "lib/Authen/SCRAM/Server.pm",
-         "version" : "0.007"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
@@ -124,7 +124,7 @@
          "web" : "https://github.com/dagolden/Authen-SCRAM"
       }
    },
-   "version" : "0.007",
+   "version" : "0.009",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "David Golden <xdg@xdg.me>"

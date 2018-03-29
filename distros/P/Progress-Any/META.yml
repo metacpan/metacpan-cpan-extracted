@@ -27,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Progress-Any
   homepage: https://metacpan.org/release/Progress-Any
   repository: git://github.com/perlancar/perl-Progress-Any.git
-version: '0.212'
+version: '0.214'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

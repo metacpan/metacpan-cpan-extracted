@@ -15,6 +15,7 @@ t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/dttz.t
 t/olson.t
+t/system.t
 t/tz.t
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t

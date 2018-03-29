@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::IniFile;
-$Config::Model::Backend::IniFile::VERSION = '2.117';
+$Config::Model::Backend::IniFile::VERSION = '2.118';
 use Carp;
 use Mouse;
 use 5.10.0;
@@ -135,6 +135,7 @@ sub read {
     while ( my ( $k, $v ) = each %ini_comment ) {
         my $item = $obj->grab( step => $k, mode => 'loose' ) or next;
         $item = $item->fetch_with_id(0) if $item->get_type eq 'list';
+        $logger->debug("annotate '$v' on ", $item->location);
         $item->annotation($v);
     }
 
@@ -412,7 +413,7 @@ Config::Model::Backend::IniFile - Read and write config as a INI file
 
 =head1 VERSION
 
-version 2.117
+version 2.118
 
 =head1 SYNOPSIS
 

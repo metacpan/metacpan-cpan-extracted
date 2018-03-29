@@ -5,6 +5,8 @@ use warnings;
 use Test::Most tests => 164;
 use Test::NoWarnings;
 use File::Spec;
+use lib 't/lib';
+use MyLogger;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
@@ -457,24 +459,4 @@ EOF
 	};
 
 	ok($@ =~ /Reset is a class method/);
-}
-
-# On some platforms it's failing - find out why
-package MyLogger;
-
-sub new {
-	my ($proto, %args) = @_;
-
-	my $class = ref($proto) || $proto;
-
-	return bless { }, $class;
-}
-
-sub debug {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
-	}
 }

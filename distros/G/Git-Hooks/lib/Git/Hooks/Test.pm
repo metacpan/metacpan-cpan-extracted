@@ -1,6 +1,6 @@
 package Git::Hooks::Test;
 # ABSTRACT: Git::Hooks testing utilities
-$Git::Hooks::Test::VERSION = '2.9.0';
+$Git::Hooks::Test::VERSION = '2.9.1';
 ## no critic (RequireExplicitPackage)
 ## no critic (ErrorHandling::RequireCarping)
 use 5.010;
@@ -10,12 +10,8 @@ use Carp;
 use Config;
 use Exporter qw/import/;
 use Path::Tiny;
-use File::pushd;
-use URI::file;
 use Git::Repository 'GitHooks';
-use Try::Tiny;
 use Test::More;
-use Cwd;
 
 our @EXPORT_OK = qw/
 	install_hooks
@@ -36,7 +32,7 @@ our %EXPORT_TAGS = (
 # Make sure the git messages come in English.
 local $ENV{LC_ALL} = 'C';
 
-my $cwd = path(cwd);
+my $cwd = Path::Tiny->cwd;
 
 # It's better to perform all tests in a temporary directory because
 # otherwise the author runs the risk of messing with its local
@@ -168,23 +164,13 @@ sub new_repos {
 
     my $stderr = $T->child('stderr');
 
-    return try {
-        my ($repo, $clone);
+    my @result = eval {
+        Git::Repository->run(qw/init -q/, "--template=$tmpldir", $repodir);
 
-        {
-            # It would be easier to pass a directory argument to
-            # git-init but it started to accept it only on v1.6.5. To
-            # support previous gits we chdir to $repodir to avoid the
-            # need to pass the argument. Then we have to go back to
-            # where we were.
-            my $dir = pushd($repodir);
-            Git::Repository->run(qw/init -q/, "--template=$tmpldir");
+        my $repo = Git::Repository->new(work_tree => $repodir);
 
-            $repo = Git::Repository->new();
-
-            $repo->run(qw/config user.email myself@example.com/);
-            $repo->run(qw/config user.name/, 'My Self');
-        }
+        $repo->run(qw/config user.email myself@example.com/);
+        $repo->run(qw/config user.name/, 'My Self');
 
         {
             my $cmd = Git::Repository->command(
@@ -204,13 +190,14 @@ sub new_repos {
             croak "Can't git-clone $repodir into $clonedir" unless $cmd->exit() == 0;
         }
 
-        $clone = Git::Repository->new(git_dir => $clonedir);
+        my $clone = Git::Repository->new(git_dir => $clonedir);
 
         $repo->run(qw/remote add clone/, $clonedir);
 
-        ($repo, $filename, $clone, $T);
-    } catch {
-        my $E = $_;
+        return ($repo, $filename, $clone, $T);
+    };
+
+    if (my $E = $@) {
         my $exception = "$E";   # stringify it
         if (-s $stderr) {
             open my $err_h, '<', $stderr
@@ -226,8 +213,10 @@ sub new_repos {
         $exception =~ s/\n/;/g;
         local $, = ':';
         BAIL_OUT("Error setting up repos for test: Exception='$exception'; CWD=$T; git-version=$git_version; \@INC=(@INC).\n");
-        ();
+        @result = ();
     };
+
+    return @result;
 }
 
 sub new_commit {
@@ -330,7 +319,7 @@ Git::Hooks::Test - Git::Hooks testing utilities
 
 =head1 VERSION
 
-version 2.9.0
+version 2.9.1
 
 =for Pod::Coverage install_hooks new_commit new_repos newdir test_command test_nok test_nok_match test_ok test_ok_match
 

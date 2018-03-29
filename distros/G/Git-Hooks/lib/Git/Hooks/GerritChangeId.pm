@@ -2,7 +2,7 @@
 
 package Git::Hooks::GerritChangeId;
 # ABSTRACT: Git::Hooks plugin to insert a Change-Id in a commit message
-$Git::Hooks::GerritChangeId::VERSION = '2.9.0';
+$Git::Hooks::GerritChangeId::VERSION = '2.9.1';
 use 5.010;
 use utf8;
 use strict;
@@ -10,8 +10,6 @@ use warnings;
 use Git::Hooks;
 use Git::Message;
 use Path::Tiny;
-use Carp;
-use Try::Tiny;
 
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
 
@@ -32,9 +30,7 @@ sub gen_change_id {
         [ committer => [qw/var GIT_COMMITTER_IDENT/] ],
     ) {
         # It's OK if we can't find info.
-        try {
-            $fh->print($info->[0], ' ', scalar($git->run(@{$info->[1]})));
-        };
+        eval { $fh->print($info->[0], ' ', scalar($git->run(@{$info->[1]}))) };
     }
 
     $fh->print("\n", $msg);
@@ -104,7 +100,7 @@ Git::Hooks::GerritChangeId - Git::Hooks plugin to insert a Change-Id in a commit
 
 =head1 VERSION
 
-version 2.9.0
+version 2.9.1
 
 =head1 SYNOPSIS
 
@@ -173,7 +169,8 @@ existing change viewed on the web.
 To enable the plugin you should add it to the githooks.plugin
 configuration option:
 
-    git config --add githooks.plugin GerritChangeId
+    [githooks]
+      plugin = GerritChangeId
 
 =for Pod::Coverage gen_change_id insert_change_id rewrite_message
 

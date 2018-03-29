@@ -1,14 +1,14 @@
 ---
 abstract: 'Interactive/Batch CLI for Memcached'
 author:
-  - 'YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>'
+  - 'IKEDA Kiyoshi <progrhyme@gmail.com>'
 build_requires:
   Pod::Markdown::Github: '0.01'
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.0.16, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,30 +27,34 @@ no_index:
 provides:
   App::Memcached::CLI:
     file: lib/App/Memcached/CLI.pm
-    version: v0.9.4
+    version: v0.9.5
   App::Memcached::CLI::Constants:
     file: lib/App/Memcached/CLI/Constants.pm
-    version: v0.9.4
+    version: v0.9.5
   App::Memcached::CLI::DataSource:
     file: lib/App/Memcached/CLI/DataSource.pm
   App::Memcached::CLI::Help:
     file: lib/App/Memcached/CLI/Help.pm
-    version: v0.9.4
+    version: v0.9.5
   App::Memcached::CLI::Item:
     file: lib/App/Memcached/CLI/Item.pm
-    version: v0.9.4
+    version: v0.9.5
   App::Memcached::CLI::Main:
     file: lib/App/Memcached/CLI/Main.pm
-    version: v0.9.4
+    version: v0.9.5
   App::Memcached::CLI::Util:
     file: lib/App/Memcached/CLI/Util.pm
-    version: v0.9.4
+    version: v0.9.5
 requires:
   Term::ReadLine: '1.14'
   perl: '5.008001'
 resources:
-  bugtracker: https://github.com/key-amb/perl5-App-Memcached-CLI/issues
-  homepage: https://github.com/key-amb/perl5-App-Memcached-CLI
-  repository: git://github.com/key-amb/perl5-App-Memcached-CLI.git
-version: v0.9.4
+  bugtracker: https://github.com/progrhyme/perl5-App-Memcached-CLI/issues
+  homepage: https://github.com/progrhyme/perl5-App-Memcached-CLI
+  repository: git://github.com/progrhyme/perl5-App-Memcached-CLI.git
+version: v0.9.5
 x_authority: cpan:KEYAMB
+x_contributors:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'key-amb <yasutake.kiyoshi@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

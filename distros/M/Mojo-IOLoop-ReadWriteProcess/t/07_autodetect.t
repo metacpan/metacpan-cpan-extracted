@@ -43,7 +43,7 @@ subtest autodetect => sub {
   attempt {
     attempts  => 10,
     condition => sub { defined $fired && $fired == 3 },
-    cb => sub { sleep 1 }
+    cb        => sub { sleep 1 }
   };
 
   $p->stop;
@@ -97,7 +97,7 @@ subtest autodetect_fork => sub {
   attempt {
     attempts  => 20,
     condition => sub { defined $status && $status == 6 },
-    cb => sub { sleep 1 }
+    cb        => sub { sleep 1 }
   };
 
   $master_p->stop;
@@ -122,7 +122,8 @@ subtest subreaper => sub {
 
   my $sys;
   eval {
-    $sys = $session->_prctl(
+    $sys
+      = $session->_prctl(
       Mojo::IOLoop::ReadWriteProcess::Session::PR_SET_CHILD_SUBREAPER(), 1);
   };
   plan skip_all => "$@ : You do not seem to have subreaper capabilities"
@@ -178,7 +179,7 @@ subtest subreaper => sub {
   attempt {
     attempts  => 20,
     condition => sub { defined $orphans && $orphans == 7 },
-    cb => sub { sleep 1 }
+    cb        => sub { sleep 1 }
   };
 
   $master_p->stop();
@@ -202,7 +203,8 @@ subtest subreaper_bash => sub {
 
   my $sys;
   eval {
-    $sys = $session->_prctl(
+    $sys
+      = $session->_prctl(
       Mojo::IOLoop::ReadWriteProcess::Session::PR_SET_CHILD_SUBREAPER(), 1);
   };
   plan skip_all => "You do not seem to have subreaper capabilities"
@@ -231,7 +233,7 @@ subtest subreaper_bash => sub {
   attempt {
     attempts  => 20,
     condition => sub { defined $orphans && $orphans == 7 },
-    cb => sub { sleep 1 }
+    cb        => sub { sleep 1 }
   };
 
   $master_p->stop();
@@ -253,7 +255,8 @@ subtest subreaper_bash_execute => sub {
 
   my $sys;
   eval {
-    $sys = $session->_prctl(
+    $sys
+      = $session->_prctl(
       Mojo::IOLoop::ReadWriteProcess::Session::PR_SET_CHILD_SUBREAPER(), 1);
   };
   plan skip_all => "You do not seem to have subreaper capabilities"
@@ -279,7 +282,7 @@ subtest subreaper_bash_execute => sub {
   attempt {
     attempts  => 20,
     condition => sub { defined $orphans && $orphans == 7 },
-    cb => sub { sleep 1 }
+    cb        => sub { sleep 1 }
   };
 
   $master_p->stop();
@@ -300,7 +303,8 @@ subtest manager => sub {
 
   my $sys;
   eval {
-    $sys = $session->_prctl(
+    $sys
+      = $session->_prctl(
       Mojo::IOLoop::ReadWriteProcess::Session::PR_SET_CHILD_SUBREAPER(), 1);
   };
   plan skip_all => "You do not seem to have subreaper capabilities"
@@ -338,7 +342,7 @@ subtest manager => sub {
   attempt {
     attempts  => 20,
     condition => sub { defined $status && $status == 1 },
-    cb => sub { sleep 1 }
+    cb        => sub { sleep 1 }
   };
 
   $master_p->stop();
@@ -364,7 +368,8 @@ subtest subreaper_bash_roulette => sub {
 
   my $sys;
   eval {
-    $sys = $session->_prctl(
+    $sys
+      = $session->_prctl(
       Mojo::IOLoop::ReadWriteProcess::Session::PR_SET_CHILD_SUBREAPER(), 1);
   };
   plan skip_all => "You do not seem to have subreaper capabilities"
@@ -392,7 +397,7 @@ subtest subreaper_bash_roulette => sub {
   attempt {
     attempts  => 20,
     condition => sub { defined $orphans && $orphans == 8 },
-    cb => sub { sleep 1 }
+    cb        => sub { sleep 1 }
   };
 
   $master_p->stop();

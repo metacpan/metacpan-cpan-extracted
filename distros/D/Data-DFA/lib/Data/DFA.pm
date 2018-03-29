@@ -5,13 +5,13 @@
 #-------------------------------------------------------------------------------
 
 package Data::DFA;
-our $VERSION = "20180328";
+our $VERSION = "20180329";
 require v5.16;
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess);
 use Data::Dump qw(dump);
-use Data::NFA qw(:all);
+use Data::NFA;
 use Data::Table::Text qw(:all);
 use utf8;
 
@@ -19,6 +19,38 @@ sub StateName{0}                                                                
 sub States{1}
 sub Transitions{2}
 sub Final{3}
+
+#1 Construct regular expression                                                 # Construct a regular expression that defines the language to be parsed using the following combining operations which can all be imported:
+
+sub element($)                                                                  #ES One element.
+ {my ($label) = @_;                                                             # Transition symbol
+  &Data::NFA::element(@_);
+ }
+
+sub sequence(@)                                                                 #ES Sequence of elements.
+ {my (@elements) = @_;                                                          # Elements
+  &Data::NFA::sequence(@_);
+ }
+
+sub optional(@)                                                                 #ES An optional sequence of element.
+ {my (@element) = @_;                                                           # Elements
+  &Data::NFA::optional(@_);
+ }
+
+sub zeroOrMore(@)                                                               #ES Zero or more repetitions of a sequence of elements.
+ {my (@element) = @_;                                                           # Elements
+  &Data::NFA::zeroOrMore(@_);
+ }
+
+sub oneOrMore(@)                                                                #ES One or more repetitions of a sequence of elements.
+ {my (@element) = @_;                                                           # Elements
+  &Data::NFA::oneOrMore(@_);
+ }
+
+sub choice(@)                                                                   #ES Choice from amongst one or more elements.
+ {my (@elements) = @_;                                                          # Elements to be chosen from
+  &Data::NFA::choice(@_);
+ }
 
 #1 Deterministic finite state parser                                            # Create a deterministic finite state automaton to parse sequences of symbols in the language defined by a regular expression.
 
@@ -35,7 +67,7 @@ sub fromExpr(@)                                                                 
   $dfa
  }
 
-sub finalState($$)                                                              # Check whether any of the specified states in the NFA are final
+sub finalState($$)                                                              #P Check whether any of the specified states in the NFA are final
  {my ($nfa, $reach) = @_;                                                       # NFA, hash of states in the NFA
   for my $state(sort keys %$reach)
    {return 1 if $nfa->isFinal($state);
@@ -43,7 +75,7 @@ sub finalState($$)                                                              
   0
  }
 
-sub superState($$$)                                                             # Create super states from existing superstate
+sub superState($$$)                                                             #P Create super states from existing superstate
  {my ($dfa, $superStateName, $nfa) = @_;                                        # DFA, start state in DFA, NFA we are tracking
   my $superState = $$dfa{$superStateName};
   my (undef, $nfaStates, $transitions) = @$superState;
@@ -55,21 +87,23 @@ sub superState($$$)                                                             
      {my $r = $nfa->statesReachableViaSymbol($nfaState, $symbol);               # States in the NFA reachable on the symbol
       $$reach{$_}++ for sort keys %$r;                                          # Accumulate NFA reachable NFA states
      }
-    my $newSuperStateName = join ' ', sort keys %$reach;                        # Name of the super state reached from the start state via the current symbol
-    if (!$$dfa{$newSuperStateName})                                             # Super state does not exists so create it
-     {my $newState = $$dfa{$newSuperStateName} = bless
-       [$newSuperStateName,
-        bless($reach, "Data::DFA::NfaStates"),
-        bless({},     "Data::DFA::Transitions"),
-        finalState($nfa, $reach)], "Data::DFA::State";
-      push @created, $newSuperStateName;                                        # Find all its transitions
+    if (keys %$reach)                                                           # Current symbol takes us somewhere
+     {my $newSuperStateName = join ' ', sort keys %$reach;                      # Name of the super state reached from the start state via the current symbol
+      if (!$$dfa{$newSuperStateName})                                           # Super state does not exists so create it
+       {my $newState = $$dfa{$newSuperStateName} = bless
+         [$newSuperStateName,
+          bless($reach, "Data::DFA::NfaStates"),
+          bless({},     "Data::DFA::Transitions"),
+          finalState($nfa, $reach)], "Data::DFA::State";
+        push @created, $newSuperStateName;                                      # Find all its transitions
+       }
+      $$dfa{$superStateName}[Transitions]{$symbol} = $newSuperStateName;
      }
-    $$dfa{$superStateName}[Transitions]{$symbol} = $newSuperStateName;
    }
   @created
  }
 
-sub superStates($$$)                                                            # Create super states from existing superstate
+sub superStates($$$)                                                            #P Create super states from existing superstate
  {my ($dfa, $SuperStateName, $nfa) = @_;                                        # DFA, start state in DFA, NFA we are tracking
   my @fix = ($SuperStateName);
   while(@fix)                                                                   # Create each superstate as the set of all nfa states we could be in after each transition on a symbol
@@ -77,7 +111,7 @@ sub superStates($$$)                                                            
    }
  }
 
-sub transitionOnSymbol($$$)                                                     # The super state reached by transition on a symbol from a specified state
+sub transitionOnSymbol($$$)                                                     #P The super state reached by transition on a symbol from a specified state
  {my ($dfa, $superStateName, $symbol) = @_;                                     # DFA, start state in DFA, symbol
   my $superState = $$dfa{$superStateName};
   my (undef, $nfaStates, $transitions, $final) = @$superState;
@@ -87,7 +121,7 @@ sub transitionOnSymbol($$$)                                                     
 sub print($$$)                                                                  # Print DFA
  {my ($dfa, $title, $print) = @_;                                               # DFA, title, 1 - STDOUT or 2 - STDERR
   my @out;
-  for my $superStateName(sort keys %$dfa)
+  for my $superStateName(sort keys %$dfa)                                       # Each state
    {my $superState = $$dfa{$superStateName};
     my (undef, $nfaStates, $transitions, $Final) = @$superState;
     my @s = sort keys %$transitions;
@@ -113,6 +147,17 @@ sub print($$$)                                                                  
   "$title: No states in Dfa";
  }
 
+sub symbols($)                                                                  # Return an array of all the symbols accepated by the DFA
+ {my ($dfa) = @_;                                                               # DFA
+  my %symbols;
+  for my $superStateName(keys %$dfa)                                            # Each state
+   {my $superState = $$dfa{$superStateName};
+    my (undef, $nfaStates, $transitions, $final) = @$superState;
+    $symbols{$_}++ for keys %$transitions;                                      # Symbol for each transition
+   }
+  sort keys %symbols;
+ }
+
 sub parser($)                                                                   #S Create a parser from a deterministic finite state automaton constructed from a regular expression.
  {my ($dfa) = @_;                                                               # Deterministic finite state automaton generated from an expression
   package Data::DFA::Parser;
@@ -136,12 +181,12 @@ sub Data::DFA::Parser::accept($$)                                               
     return 1;
    }
   else
-   {my @next      = sort keys %$transitions;
-    my @processed = @{$parser->processed};
-    $parser->next = [@next];
+   {my @next        = sort keys %$transitions;
+    my @processed   = @{$parser->processed};
+    $parser->{next} = [@next];
     my $next = join ' ', @next;
-    confess join "\n",
-      "Already processed: ". join(' ', @processed),
+    die join "\n",
+      "Already processed: ".              join(' ', @processed),
        @next > 0 ? "Expected one of  : ". join(' ', @next) :
                    "Expected nothing more.",
       "But was given    : $symbol",
@@ -210,8 +255,8 @@ Data::DFA - Deterministic finite state parser from regular expression
 Create a deterministic finite state parser to recognize sequences of symbols
 that match a given regular expression.
 
-For example: to recognize sequences of symbols drawn from B<'a'..'e'> that match
-the regular expression: B<a (b|c)+ d? e> proceed as follows:
+To recognize sequences of symbols drawn from B<'a'..'e'> that match
+the regular expression: B<a (b|c)+ d? e>:
 
 # Construct a deterministic finite state automaton from the regular expression:
 
@@ -219,12 +264,15 @@ the regular expression: B<a (b|c)+ d? e> proceed as follows:
   use Data::Table::Text qw(:all);
   use Test::More qw(no_plan);
 
-  my $dfa = dfaFromExpr
+  my $dfa = fromExpr
    (element("a"),
     oneOrMore(choice(element("b"), element("c"))),
     optional(element("d")),
     element("e")
    );
+
+  ok  $dfa->parser->accepts(qw(a b e));
+  ok !$dfa->parser->accepts(qw(a d));
 
 # Print the symbols used and the transitions table:
 
@@ -232,34 +280,147 @@ the regular expression: B<a (b|c)+ d? e> proceed as follows:
 
   ok $dfa->print("Dfa for a(b|c)+d?e :") eq nws <<END;
 Dfa for a(b|c)+d?e :
-Location  F  Transitions
-       0  0  { a => 1 }
-       1  0  { b => 2, c => 2 }
-       2  0  { b => 2, c => 2, d => 6, e => 7 }
-       6  0  { e => 7 }
-       7  1  undef
+    State        Final  Symbol  Target       Final
+1   0                   a       1 3          0
+2   1 2 3 4 5 6  0      b       1 2 3 4 5 6  0
+3                       c       1 3 4 5 6    0
+4                       d       6            0
+5                       e       7            1
+6   1 3          0      b       1 2 3 4 5 6  0
+7                       c       1 3 4 5 6    0
+8   1 3 4 5 6    0      b       1 2 3 4 5 6  0
+9                       c       1 3 4 5 6    0
+10                      d       6            0
+11                      e       7            1
+12  6            0      e       7            1
 END
 
-# Create a parser and parse a sequence of symbols with the returned sub:
+# Create a parser and use it to parse a sequence of symbols
 
-  my ($parser, $end, $next, $processed) = $dfa->parser;                         # New parser
+  my $parser = $dfa->parser;                                                    # New parser
 
-  eval { &$parser($_) } for(qw(a b a));                                         # Try to parse a b a
+  eval { $parser->accept($_) } for qw(a b a);                                   # Try to parse a b a
 
   say STDERR $@;                                                                # Error message
 #   Already processed: a b
 #   Expected one of  : b c d e
 #   But was given    : a
 
-  is_deeply [&$next],      [qw(b c d e)];                                       # Next acceptable symbol
-  is_deeply [&$processed], [qw(a b)];                                           # Symbols processed
-  ok !&$end;                                                                    # Not at the end
+  is_deeply [$parser->next],     [qw(b c d e)];                                 # Next acceptable symbol
+  is_deeply  $parser->processed, [qw(a b)];                                     # Symbols processed
+  ok !$parser->final;                                                           # Not in a final state
 
 =head1 Description
 
 The following sections describe the methods in each functional area of this
 module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
+
+
+=head1 Construct regular expression
+
+Construct a regular expression that defines the language to be parsed using the following combining operations which can all be imported:
+
+=head2 element($)
+
+One element.
+
+     Parameter  Description
+  1  $label     Transition symbol
+
+This is a static method and so should be invoked as:
+
+  Data::DFA::element
+
+
+This method can be imported via:
+
+  use Data::DFA qw(element)
+
+
+=head2 sequence(@)
+
+Sequence of elements.
+
+     Parameter  Description
+  1  @elements  Elements
+
+This is a static method and so should be invoked as:
+
+  Data::DFA::sequence
+
+
+This method can be imported via:
+
+  use Data::DFA qw(sequence)
+
+
+=head2 optional(@)
+
+An optional sequence of element.
+
+     Parameter  Description
+  1  @element   Elements
+
+This is a static method and so should be invoked as:
+
+  Data::DFA::optional
+
+
+This method can be imported via:
+
+  use Data::DFA qw(optional)
+
+
+=head2 zeroOrMore(@)
+
+Zero or more repetitions of a sequence of elements.
+
+     Parameter  Description
+  1  @element   Elements
+
+This is a static method and so should be invoked as:
+
+  Data::DFA::zeroOrMore
+
+
+This method can be imported via:
+
+  use Data::DFA qw(zeroOrMore)
+
+
+=head2 oneOrMore(@)
+
+One or more repetitions of a sequence of elements.
+
+     Parameter  Description
+  1  @element   Elements
+
+This is a static method and so should be invoked as:
+
+  Data::DFA::oneOrMore
+
+
+This method can be imported via:
+
+  use Data::DFA qw(oneOrMore)
+
+
+=head2 choice(@)
+
+Choice from amongst one or more elements.
+
+     Parameter  Description
+  1  @elements  Elements to be chosen from
+
+This is a static method and so should be invoked as:
+
+  Data::DFA::choice
+
+
+This method can be imported via:
+
+  use Data::DFA qw(choice)
 
 
 =head1 Deterministic finite state parser
@@ -278,41 +439,6 @@ This is a static method and so should be invoked as:
   Data::DFA::fromExpr
 
 
-=head2 finalState($$)
-
-Check whether any of the specified states in the NFA are final
-
-     Parameter  Description
-  1  $nfa       NFA
-  2  $reach     Hash of states in the NFA
-
-=head2 superState($$$)
-
-Create super states from existing superstate
-
-     Parameter        Description
-  1  $dfa             DFA
-  2  $superStateName  Start state in DFA
-  3  $nfa             NFA we are tracking
-
-=head2 superStates($$$)
-
-Create super states from existing superstate
-
-     Parameter        Description
-  1  $dfa             DFA
-  2  $SuperStateName  Start state in DFA
-  3  $nfa             NFA we are tracking
-
-=head2 transitionOnSymbol($$$)
-
-The super state reached by transition on a symbol from a specified state
-
-     Parameter        Description
-  1  $dfa             DFA
-  2  $superStateName  Start state in DFA
-  3  $symbol          Symbol
-
 =head2 print($$$)
 
 Print DFA
@@ -321,6 +447,13 @@ Print DFA
   1  $dfa       DFA
   2  $title     Title
   3  $print     1 - STDOUT or 2 - STDERR
+
+=head2 symbols($)
+
+Return an array of all the symbols accepated by the DFA
+
+     Parameter  Description
+  1  $dfa       DFA
 
 =head2 parser($)
 
@@ -369,30 +502,108 @@ Confirm that a DFA accepts an array representing a sequence of symbols
   2  @symbols   Array of symbols
 
 
+=head1 Private Methods
+
+=head2 finalState($$)
+
+Check whether any of the specified states in the NFA are final
+
+     Parameter  Description
+  1  $nfa       NFA
+  2  $reach     Hash of states in the NFA
+
+=head2 superState($$$)
+
+Create super states from existing superstate
+
+     Parameter        Description
+  1  $dfa             DFA
+  2  $superStateName  Start state in DFA
+  3  $nfa             NFA we are tracking
+
+=head2 superStates($$$)
+
+Create super states from existing superstate
+
+     Parameter        Description
+  1  $dfa             DFA
+  2  $SuperStateName  Start state in DFA
+  3  $nfa             NFA we are tracking
+
+=head2 transitionOnSymbol($$$)
+
+The super state reached by transition on a symbol from a specified state
+
+     Parameter        Description
+  1  $dfa             DFA
+  2  $superStateName  Start state in DFA
+  3  $symbol          Symbol
+
+
 =head1 Index
 
 
-1 L<Data::DFA::Parser::accept|/Data::DFA::Parser::accept>
+1 L<choice|/choice>
 
-2 L<Data::DFA::Parser::accepts|/Data::DFA::Parser::accepts>
+2 L<Data::DFA::Parser::accept|/Data::DFA::Parser::accept>
 
-3 L<Data::DFA::Parser::final|/Data::DFA::Parser::final>
+3 L<Data::DFA::Parser::accepts|/Data::DFA::Parser::accepts>
 
-4 L<Data::DFA::Parser::next|/Data::DFA::Parser::next>
+4 L<Data::DFA::Parser::final|/Data::DFA::Parser::final>
 
-5 L<finalState|/finalState>
+5 L<Data::DFA::Parser::next|/Data::DFA::Parser::next>
 
-6 L<fromExpr|/fromExpr>
+6 L<element|/element>
 
-7 L<parser|/parser>
+7 L<finalState|/finalState>
 
-8 L<print|/print>
+8 L<fromExpr|/fromExpr>
 
-9 L<superState|/superState>
+9 L<oneOrMore|/oneOrMore>
 
-10 L<superStates|/superStates>
+10 L<optional|/optional>
 
-11 L<transitionOnSymbol|/transitionOnSymbol>
+11 L<parser|/parser>
+
+12 L<print|/print>
+
+13 L<sequence|/sequence>
+
+14 L<superState|/superState>
+
+15 L<superStates|/superStates>
+
+16 L<symbols|/symbols>
+
+17 L<transitionOnSymbol|/transitionOnSymbol>
+
+18 L<zeroOrMore|/zeroOrMore>
+
+
+
+=head1 Exports
+
+All of the following methods can be imported via:
+
+  use Data::DFA qw(:all);
+
+Or individually via:
+
+  use Data::DFA qw(<method>);
+
+
+
+1 L<choice|/choice>
+
+2 L<element|/element>
+
+3 L<oneOrMore|/oneOrMore>
+
+4 L<optional|/optional>
+
+5 L<sequence|/sequence>
+
+6 L<zeroOrMore|/zeroOrMore>
 
 =head1 Installation
 
@@ -439,10 +650,10 @@ test unless caller;
 
 1;
 # podDocumentation
-#__DATA__
+__DATA__
 use warnings FATAL=>qw(all);
 use strict;
-use Test::More tests=>4;
+use Test::More tests=>11;
 
 if (1)
  {my $s = q(zeroOrMore(choice(element("a"))));
@@ -467,5 +678,52 @@ END
 
   ok  $dfa->parser->accepts(qw(a a a));
   ok !$dfa->parser->accepts(qw(a b a));
+ }
 
+if (1)
+ {my $dfa = fromExpr
+   (element("a"),
+    oneOrMore(choice(element("b"), element("c"))),
+    optional(element("d")),
+    element("e")
+   );
+
+  ok  $dfa->parser->accepts(qw(a b e));
+  ok !$dfa->parser->accepts(qw(a d));
+
+# Print the symbols used and the transitions table:
+
+  is_deeply ['a'..'e'], [$dfa->symbols];
+
+  ok $dfa->print("Dfa for a(b|c)+d?e :") eq nws <<END;
+Dfa for a(b|c)+d?e :
+    State        Final  Symbol  Target       Final
+1   0                   a       1 3          0
+2   1 2 3 4 5 6  0      b       1 2 3 4 5 6  0
+3                       c       1 3 4 5 6    0
+4                       d       6            0
+5                       e       7            1
+6   1 3          0      b       1 2 3 4 5 6  0
+7                       c       1 3 4 5 6    0
+8   1 3 4 5 6    0      b       1 2 3 4 5 6  0
+9                       c       1 3 4 5 6    0
+10                      d       6            0
+11                      e       7            1
+12  6            0      e       7            1
+END
+
+# Create a parser and use it to parse a sequence of symbols
+
+  my $parser = $dfa->parser;                                                    # New parser
+
+  eval { $parser->accept($_) } for qw(a b a);                                   # Try to parse a b a
+
+  say STDERR $@;                                                                # Error message
+#   Already processed: a b
+#   Expected one of  : b c d e
+#   But was given    : a
+
+  is_deeply [$parser->next],     [qw(b c d e)];                                 # Next acceptable symbol
+  is_deeply  $parser->processed, [qw(a b)];                                     # Symbols processed
+  ok !$parser->final;                                                           # Not in a final state
  }

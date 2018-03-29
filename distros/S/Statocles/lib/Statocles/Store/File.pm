@@ -1,5 +1,5 @@
 package Statocles::Store::File;
-our $VERSION = '0.089';
+our $VERSION = '0.091';
 # ABSTRACT: (DEPRECATED) A store made up of plain files
 
 use Statocles::Base 'Class';
@@ -22,7 +22,7 @@ Statocles::Store::File - (DEPRECATED) A store made up of plain files
 
 =head1 VERSION
 
-version 0.089
+version 0.091
 
 =head1 DESCRIPTION
 

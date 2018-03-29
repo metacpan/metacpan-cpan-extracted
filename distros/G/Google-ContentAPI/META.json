@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Google-ContentAPI",
    "no_index" : {
@@ -27,5 +27,5 @@
          "web" : "https://github.com/billgerrard/google-content-api"
       }
    },
-   "version" : "1.00"
+   "version" : "1.01"
 }

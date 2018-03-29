@@ -681,6 +681,11 @@ C<docs/sketch> directory that we test against. Install the sketch, hook up the
 I2C between the Pi and the Arduino, and connect a ground pin on the Arduino to
 the ground bus on the Pi.
 
+The Arudino has a slower I2C bus than the Pi, so we must lower our bus speed.
+Add the following line to the C</boot/config.txt> file, then reboot:
+
+    dtparam=i2c_arm_baudrate=10000
+
 You then set the following environment variable:
 
     export RPI_ARDUINO=1
@@ -695,6 +700,12 @@ between the Tx and Rx pins, and:
     export RPI_SERIAL=1
 
 These tests will skip by default otherwise.
+
+Note that you must enable serial in C<raspi-config>, disable "terminal over
+serial", and then reboot after adding the following line in the
+C</boot/config.txt> file (this disabled Bluetooth on the Serial interface):
+
+    dtoverlay=pi3-disable-bt-overlay
 
 =head3 HCSR04 Ultrasonic Testing
 

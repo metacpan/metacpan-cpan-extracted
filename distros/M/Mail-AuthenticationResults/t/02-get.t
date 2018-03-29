@@ -27,20 +27,34 @@ my $Version = Mail::AuthenticationResults::Header::Version->new();
 my $AuthServID = Mail::AuthenticationResults::Header::AuthServID->new();
 
 #test_get( $Base );
-test_get( $Comment );
-is ( $Comment->as_string(), '()', 'Comment stringifies as expected' );
-test_get( $Entry );
-is ( $Entry->as_string(), '', 'Entry stringifies as expected' );
-test_get( $Group );
-is ( $Group->as_string(), '', 'Group stringifies as expected' );
-test_get( $Header );
-is ( $Header->as_string(), "unknown; none", 'Header stringifies as expected' );
-test_get( $SubEntry );
-is ( $SubEntry->as_string(), '', 'SubEntrystringifies as expected' );
-test_get( $Version );
-is ( $Version->as_string(), '', 'Version stringifies as expected' );
-test_get( $AuthServID );
-is ( $AuthServID->as_string(), '', 'AuthServID stringifies as expected' );
+subtest 'comment' => sub{
+    test_get( $Comment );
+    is ( $Comment->as_string(), '()', 'Comment stringifies as expected' );
+};
+subtest 'entry' => sub{
+    test_get( $Entry );
+    is ( $Entry->as_string(), '', 'Entry stringifies as expected' );
+};
+subtest 'group' => sub{
+    test_get( $Group );
+    is ( $Group->as_string(), '', 'Group stringifies as expected' );
+};
+subtest 'header' => sub{
+    test_get( $Header );
+    is ( $Header->as_string(), "unknown; none", 'Header stringifies as expected' );
+};
+subtest 'subentry' => sub{
+    test_get( $SubEntry );
+    is ( $SubEntry->as_string(), '', 'SubEntrystringifies as expected' );
+};
+subtest 'version' => sub{
+    test_get( $Version );
+    is ( $Version->as_string(), '', 'Version stringifies as expected' );
+};
+subtest 'authservid' => sub{
+    test_get( $AuthServID );
+    is ( $AuthServID->as_string(), '', 'AuthServID stringifies as expected' );
+};
 
 sub test_get {
     my ( $class ) = @_;

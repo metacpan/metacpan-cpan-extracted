@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::More 'no_plan';
+use Test::Deep;
 
 use Devel::Events::Handler::Callback;
 
@@ -19,17 +20,18 @@ $g->enable();
 
 is_deeply( \@log, [], "log empty" );
 
-eval { require "this_file_does_not_exist.pm" };
+eval { +require "this_file_does_not_exist.pm" }; my $line = __LINE__;
 
-is_deeply(
-	\@log,
+my $error = quotemeta("Can't locate this_file_does_not_exist.pm in \@INC ") . ".*" . quotemeta("\@INC contains: @INC) at " . __FILE__ . " line $line.") . "\n";
+cmp_deeply(
+        [ @log[0..1] ],
 	[
 		[ try_require      => generator => $g, file => "this_file_does_not_exist.pm", ],
 		[ require_finished =>
 			generator => $g,
 			file => "this_file_does_not_exist.pm",
 			matched_file => undef,
-			error => "Can't locate this_file_does_not_exist.pm in \@INC (\@INC contains: @INC) at " . __FILE__ . " line 22.\n",
+			error => re(qr{^$error}),
 		],
 	],
 	"log events"
@@ -37,9 +39,10 @@ is_deeply(
 
 @log = ();
 
-eval { require This::Module::Does::Not::Exist };
+eval { +require This::Module::Does::Not::Exist }; $line = __LINE__;
 
-is_deeply(
+$error = quotemeta("Can't locate This/Module/Does/Not/Exist.pm in \@INC ") . ".*" . quotemeta("(\@INC contains: @INC) at " . __FILE__ . " line $line.") . "\n";
+cmp_deeply(
 	\@log,
 	[
 		[ try_require      => generator => $g, file => "This/Module/Does/Not/Exist.pm", ],
@@ -47,7 +50,7 @@ is_deeply(
 			generator => $g,
 			file => "This/Module/Does/Not/Exist.pm",
 			matched_file => undef,
-			error => "Can't locate This/Module/Does/Not/Exist.pm in \@INC (\@INC contains: @INC) at " . __FILE__ . " line 40.\n",
+			error => re(qr{^$error}),
 		],
 	],
 	"log events"
@@ -55,7 +58,7 @@ is_deeply(
 
 @log = ();
 
-eval { require File::Find };
+eval { +require File::Find };
 
 @log = @log[0,-1]; # don't care about what File::Find.pm required
 

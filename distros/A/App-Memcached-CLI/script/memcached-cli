@@ -6,7 +6,7 @@ use 5.008_001;
 
 use Pod::Usage;
 
-use version; our $VERSION = 'v0.9.4';
+use version; our $VERSION = 'v0.9.5';
 
 use App::Memcached::CLI::Main;
 
@@ -237,7 +237,7 @@ Multi-lined queries like C<set> are not supported.
 
 =item B<version>
 
-Shows memcahed server version.
+Shows memcached server version.
 
 =item B<quit|exit|\q>
 
@@ -273,11 +273,11 @@ L<http://www.memcached.org/>
 
 =head1 AUTHORS
 
-YASUTAKE Kiyoshi E<lt>yasutake.kiyoshi@gmail.comE<gt>
+IKEDA Kiyoshi E<lt>progrhyme@gmail.comE<gt>
 
 =head1 LICENSE
 
-Copyright (C) 2015 YASUTAKE Kiyoshi.
+Copyright (C) 2015-2017 IKEDA Kiyoshi.
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.  That means either (a) the GNU General Public

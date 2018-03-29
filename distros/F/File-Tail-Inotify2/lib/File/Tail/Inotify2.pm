@@ -8,11 +8,11 @@ use File::Basename qw(dirname);
 use Fcntl qw(SEEK_SET SEEK_END);
 use Carp ();
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 use constant {
     FMASK => IN_MODIFY | IN_MOVE_SELF,
-    DMASK => IN_CREATE | IN_MOVED_FROM,
+    DMASK => IN_CREATE | IN_MOVED_FROM | IN_MOVED_TO,
 };
 
 sub new {
@@ -100,7 +100,7 @@ sub _set_dir_watcher {
             if ( $event->IN_MOVED_FROM && $event->fullname eq $self->{file} ) {
                 $self->{in_move} = 1;
             }
-            if ( $event->IN_CREATE && $event->fullname eq $self->{file} ) {
+            if ( ($event->IN_CREATE || $event->IN_MOVED_TO) && $event->fullname eq $self->{file} ) {
                 $self->{curpos} = (stat $event->fullname)[7];
                 $self->_set_file_watcher;
                 $self->{in_move} = 0;

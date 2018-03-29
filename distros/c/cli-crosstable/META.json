@@ -28,7 +28,7 @@
    "provides" : {
       "cli::crosstable" : {
          "file" : "lib/cli/crosstable.pm",
-         "version" : "1.01"
+         "version" : "1.031"
       }
    },
    "release_status" : "stable",
@@ -37,6 +37,6 @@
          "http://www.gnu.org/licenses/gpl-3.0.txt"
       ]
    },
-   "version" : "1.01",
+   "version" : "1.031",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

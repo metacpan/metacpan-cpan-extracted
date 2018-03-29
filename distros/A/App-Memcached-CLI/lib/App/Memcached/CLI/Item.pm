@@ -8,7 +8,7 @@ use POSIX 'strftime';
 
 use App::Memcached::CLI::Util ':all';
 
-use version; our $VERSION = 'v0.9.4';
+use version; our $VERSION = 'v0.9.5';
 
 my @FIELDS = qw(key value length expire flags cas);
 my %DISP_METHOD_OF = (
@@ -167,14 +167,14 @@ This package acts as object of Memcached data item.
 
 =head1 LICENSE
 
-Copyright (C) YASUTAKE Kiyoshi.
+Copyright (C) IKEDA Kiyoshi.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-YASUTAKE Kiyoshi E<lt>yasutake.kiyoshi@gmail.comE<gt>
+IKEDA Kiyoshi E<lt>progrhyme@gmail.comE<gt>
 
 =cut
 

@@ -1,0 +1,34 @@
+1_ortho	2_phon	3_lemme	4_cgram	5_genre	6_nombre	7_freqlemfilms2	8_freqlemlivres	9_freqfilms2	10_freqlivres	11_infover	12_nbhomogr	13_nbhomoph	14_islem	15_nblettres	16_nbphons	17_cvcv	18_p_cvcv	19_voisorth	20_voisphon	21_puorth	22_puphon	23_syll	24_nbsyll	25_cv-cv	26_orthrenv	27_phonrenv	28_orthosyll	29_cgramortho	30_deflem	31_defobs	32_old20	33_pld20	34_morphoder	35_nbmorph
+a fortiori	afORsjoRi	a fortiori	ADV			0.04	0.88	0.04	0.88		1	2	1	10	9	V CVCCVVCV	VCVCCYVCV	1	0	3	4	a-fOR-sjo-Ri	4	V-CVC-CYV-CV	iroitrof a	iRojsROfa	a for-tio-ri	ADV			4.4	3.95	a-fortiori	2
+abaisser	abese	abaisser	VER			4.93	18.04	1.09	2.91	inf;	1	10	1	8	5	VCVVCCVC	VCVCV	2	2	8	5	a-be-se	3	V-CV-CV	ressiaba	eseba	a-bais-ser	VER	100	25	1.7	1.8	abaisser	1
+acceptiez	aksEptje	accepter	VER			165.84	144.66	1.00	0.54	ind:imp:2p;	1	1	0	9	8	VCCVCCVVC	VCCVCCYV	0	1	0	0	ak-sEp-tje	3	VC-CVC-CYV	zeitpecca	ejtpEska	ac-cep-tiez	VER	100	10	2.35	1.95	accepter	1
+accorderait	akORdÂ°RE	accorder	VER			52.27	67.84	0.08	0.74	cnd:pre:3s;	1	4	0	11	8	VCCVCCVCVVC	VCVCCVCV	1	4	0	0	a-kOR-dÂ°-RE	4	V-CVC-CV-CV	tiaredrocca	ERÂ°dROka	ac-cor-de-rait	VER	100	25	2.35	1.75	accorder	1
+action	aksj§	action	NOM	f	s	69.27	87.43	49.97	72.91		1	2	1	6	5	VCCVVC	VCCYV	0	5	6	5	ak-sj§	2	VC-CYV	noitca	§jska	ac-tion	NOM	100	16	1.9	1.7	act-ion	2
+admirait	admiRE	admirer	VER			32.39	68.18	0.99	11.49	ind:imp:3s;	1	4	0	8	6	VCCVCVVC	VCCVCV	2	4	0	0	ad-mi-RE	3	VC-CV-CV	tiarimda	ERimda	ad-mi-rait	VER	100	23	1.9	1.65	admirer	1
+admiré	admiRe	admirer	VER	m	s	32.39	68.18	2.00	4.12	par:pas;	1	6	0	6	6	VCCVCV	VCCVCV	2	4	0	6	ad-mi-Re	3	VC-CV-CV	érimda	eRimda	ad-mi-ré	VER	100	23	1.8	1.65	admirer	1
+allure	alyR	allure	NOM	f	s	10.57	65.88	10.00	57.09		1	2	1	6	4	VCCVCV	VCVC	2	11	6	4	a-lyR	2	V-CVC	erulla	Ryla	al-lu-re	NOM	95	23	1.85	1.1	allure	1
+carrément	kaRem@	carrément	ADV			9.99	16.55	9.99	16.55		1	1	1	9	6	CVCCVCVCC	CVCVCV	0	1	6	5	ka-Re-m@	3	CV-CV-CV	tnemérrac	@meRak	car-ré-ment	ADV			2.75	1.85	carrément	1
+chlorhydrate	kloRidRat	chlorhydrate	NOM	m	s	0.17	0	0.17	0		1	1	1	12	9	CCCVCCVCCVCV	CCVCVCCVC	0	0	10	8	klo-Ri-dRat	3	CCV-CV-CCVC	etardyhrolhc	taRdiRolk	ch-lor-hy-dra-te	NOM	90	22	5.45	3.75	chlor-hydrate	2
+cirerait	siRÂ°RE	cirer	VER			6.42	20.27	0	0.07	cnd:pre:3s;	1	2	0	8	6	CVCVCVVC	CVCVCV	4	7	0	0	si-RÂ°-RE	3	CV-CV-CV	tiareric	ERÂ°Ris	ci-re-rait	VER	100	19	1.8		cirer	1
+comprimées	k§pRime	comprimé	ADJ	f	p	0.55	1.82	0.01	0.07		2	12	0	10	7	CVCCCVCVVC	CVCCVCV	0	3	0	7	k§-pRi-me	3	CV-CCV-CV	seémirpmoc	emiRp§k	com-pri-mées	VER,ADJ	95	21	2.35	1.8	comprimé	1
+devineur	d2vin9R	devineur	NOM	m	s	0.15	0.2	0.01	0		1	1	1	8	7	CVCVCVVC	CVCVCVC	0	0	7	5	d2-vi-n9R	3	CV-CV-CVC	ruenived	R9niv2d		NOM			2.45	2.7	devin-eur	2
+dévotieusement	devosj2z°m@	dévotieusement	ADV			0.00	0.14	0.00	0.14		1	1	1	14	11	CVCVCVVVCVCVCC	CVCVCYVCVCV	0	0	7	7	de-vo-sj2-z°-m@	5	CV-CV-CYV-CV-CV	tnemesueitovéd	@m°z2jsoved	dé-vo-tieu-se-ment	ADV			3.9		dévotieusement	1
+divorceras	divORsÂ°Ra	divorcer	VER			27.5	8.11	0.02	0	ind:fut:2s;	1	2	0	10	9	CVCVCCVCVC	CVCVCCVCV	1	3	0	0	di-vOR-sÂ°-Ra	4	CV-CVC-CV-CV	sarecrovid	aRÂ°sROvid	di-vor-ce-ras	VER	100	18	2.45	2.5	divorcer	1
+embâcle	@bakl	embâcle	NOM	m	s	0.01	0.14	0.01	0.14		1	1	1	7	5	VCCVCCV	VCVCC	0	0	4	4	@-bakl	2	V-CVCC	elcâbme	lkab@	em-bâ-cle	NOM	5	18	2.75	1.9	embâcle	1
+émotive	emotiv	émotif	ADJ	f	s	2.65	1.15	1.22	0.27		1	2	0	7	6	VCVCVCV	VCVCVC	0	1	0	0	e-mo-tiv	3	V-CV-CVC	evitomé	vitome	é-mo-ti-ve	ADJ	100	29	2.05	1.85	émotion-if	2
+entretient	@tR°tj5	entretenir	VER			13.27	46.42	1.27	3.38	ind:pre:3s;	1	4	0	10	7	VCCCVCVVCC	VCCVCYV	2	0	0	6	@-tR°-tj5	3	V-CCV-CYV	tneitertne	5jt°Rt@	en-tre-tient	VER	100	19	1.95	2.05	entretenir	1
+envions	@vj§	envier	VER			17.79	26.89	0.05	0.00	imp:pre:1p;ind:pre:1p;	1	1	0	7	4	VCCVVCC	VCYV	0	6	0	0	@-vj§	2	V-CYV	snoivne	§jv@	en-vions	VER	100	19	1.9	1.7	envier	1
+flâne	flan	flâne	NOM	f	s	0.00	0.14	0.00	0.14		2	3	1	5	4	CCVCV	CCVC	2	8	5	4	flan	1	CCVC	enâlf	nalf	flâ-ne	NOM,VER	59	22	1.85	1.25	flâne	1
+fouisseurs	fwis9R	fouisseur	ADJ	m	p	0.01	0.34	0.00	0.07		2	4	0	10	6	CVVVCCVVCC	CYVCVC	1	2	0	4	fwi-s9R	2	CYV-CVC	sruessiuof	R9siwf	fouis-seurs	ADJ,NOM	62	27	2.3	1.9	fouir-eur	2
+gousse	gus	gousse	NOM	f	s	0.58	1.28	0.51	0.81		1	2	1	6	3	CVVCCV	CVC	6	15	6	3	gus	1	CVC	essuog	sug	gous-se	NOM	95	21	1.45	1.05	gousse	1
+je	Z2	je	PRO:per		s	25983.20	10862.77	25983.20	10862.77		2	4	1	2	2	CV	CV	9	23	2	2	Z2	1	CV	ej	2Z	je	NOM,PRO:per			1.35	1	je-:per	2
+jouissive	Zwisiv	jouissif	ADJ	f	s	0.16	1.15	0.01	0.14		1	2	0	9	6	CVVVCCVCV	CYVCVC	0	1	0	0	Zwi-siv	2	CYV-CVC	evissiuoj	visiwZ	jouis-si-ve	ADJ	88	18	2.7	2.3	jouissance-if	2
+materons	matÂ°RÂ§	mater	VER			17.27	14.93	0.01	0.14	ind:fut:1p;	1	2	0	8	6	CVCVCVCC	CVCVCV	2	6	0	0	ma-tÂ°-RÂ§	3	CV-CV-CV	snoretam	Â§RÂ°tam	ma-te-rons	VER	86	22	1.9		mater	1
+meures	m9R	mourir	VER			916.4	391.08	1.88	0.14	sub:pre:2s;	1	5	0	6	3	CVVCVC	CVC	4	15	0	0	m9R	1	CVC	seruem	R9m	meu-res	VER	100	19	1.6	1.1	mourir	1
+nappe	nap	nappe	NOM	f	s	4.34	25.68	3.01	18.18		2	4	1	5	3	CVCCV	CVC	6	20	5	3	nap	1	CVC	eppan	pan	nap-pe	"NOM,VER"	94	19	1.55	1	nappe	1
+nappe	nap	napper	VER			0.31	1.49	0	0.07	ind:pre:3s;	2	4	0	5	3	CVCCV	CVC	6	20	5	3	nap	1	CVC	eppan	pan	nap-pe	"NOM,VER"	91	24	1.55	1	napper	1
+opération	opeRasj§	opération	NOM	f	s	61.94	70.20	50.01	41.42		1	2	1	9	8	VCVCVCVVC	VCVCVCYV	0	0	9	8	o-pe-Ra-sj§	4	V-CV-CV-CYV	noitarépo	§jsaRepo	o-pé-ra-tion	NOM	100	14	2.7	2.65	opérer-ion	2
+plaintifs	pl5tif	plaintif	ADJ	m	p	1.12	6.82	0.06	1.01		1	2	0	9	6	CCVVCCVCC	CCVCVC	0	1	0	6	pl5-tif	2	CCV-CVC	sfitnialp	fit5lp	plain-tif-s	ADJ	92	13	2.65	2.5	plainte-if	2
+soudoyé	sudwaje	soudoyer	VER	m	s	1.92	1.01	0.75	0.20	par:pas;	1	5	0	7	7	CVVCVVV	CVCYVYV	2	4	0	4	su-dwa-je	3	CV-CYV-YV	éyoduos	ejawdus	sou-doyé	VER	100	31	2.2	2	soudoyer	1
+vestibules	vEstibyl	vestibule	NOM	m	p	0.96	12.77	0.00	0.34		1	2	0	10	8	CVCCVCVCVC	CVCCVCVC	0	0	0	6	vEs-ti-byl	3	CVC-CV-CVC	selubitsev	lybitsEv	ves-ti-bu-les	NOM	94	19	2.8	3	vestibule	1
+voyage	vwajaZ	voyager	VER			45.74	27.50	10.01	4.59	imp:pre:2s;ind:pre:1s;ind:pre:3s;sub:pre:3s;	2	5	0	6	6	CVVVCV	CYVYVC	2	1	6	6	vwa-jaZ	2	CYV-YVC	egayov	Zajawv	voya-ge	NOM,VER	100	23	1.7	1.7	voyager	1

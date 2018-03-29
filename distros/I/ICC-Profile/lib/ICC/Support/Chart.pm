@@ -3,9 +3,9 @@ package ICC::Support::Chart;
 use strict;
 use Carp;
 
-our $VERSION = 1.69;
+our $VERSION = 1.70;
 
-# revised 2018-02-09
+# revised 2018-03-28
 #
 # Copyright © 2004-2018 by William B. Birkett
 
@@ -5022,6 +5022,9 @@ sub writeTIFF {
 	# open the file
 	open($fh, '>', $files[0]) || croak("$! when opening $files[0], stopped");
 
+	# set binary mode
+	binmode($fh);
+
 	# write TIFF header
 	print $fh pack("A2$short$long", $le ? 'II' : 'MM', 42, $ifd = $trows * $stripsize + 8);
 
@@ -5235,7 +5238,10 @@ sub writeASE {
 	
 	# open file
 	open($fh, '>', $files[0]);
-	
+
+	# set binary mode
+	binmode($fh);
+
 	# print header (file signature, version, number of blocks)
 	print $fh pack('A4nnN', 'ASEF', 1, 0, scalar(@{$rows}));
 	
@@ -7165,11 +7171,17 @@ sub _readChart {
 	# open the file (read-only)
 	open($fh, '<', $path) || return("$! when opening $path");
 
-	# read start of file
-	read($fh, $buf, 256);
+	# set binary mode
+	binmode($fh);
 
-	# reset file pointer
-	seek($fh, 0, 0);
+	# read start of file
+	read($fh, $buf, 1024);
+
+	# close file
+	close($fh);
+
+	# re-open the file in text mode (read-only)
+	open($fh, '<', $path) || return("$! when opening $path");
 
 	# if an ASE file
 	if ($buf =~ m/^ASEF/) {
@@ -7213,10 +7225,39 @@ sub _readChart {
 		# save file type
 		$self->[0]{'file_type'} = 'SS3';
 		
-		# read CxF3 file
+		# read SS3 file
 		$result = _readChartSS3($self, $fh, $hash);
 		
 	} else {
+		
+		# check for CR-LF (DOS/Windows)
+		if ($buf =~ m/\015\012/) {
+			
+			# set record separator
+			$self->[0]{'read_rs'} = "\015\012";
+			
+		# check for LF (Unix/OSX)
+		} elsif ($buf =~ m/\012/) {
+			
+			# set record separator
+			$self->[0]{'read_rs'} = "\012";
+			
+		# check for CR (Mac)
+		} elsif ($buf =~ m/\015/) {
+			
+			# set record separator
+			$self->[0]{'read_rs'} = "\015";
+			
+		# not a text file
+		} else {
+			
+			# close the file
+			close($fh);
+			
+			# return
+			return('unknown file type');
+			
+		}
 		
 		# save file type
 		$self->[0]{'file_type'} = 'TEXT';
@@ -7243,41 +7284,11 @@ sub _readChartASCII {
 	my ($self, $fh, $hash) = @_;
 
 	# local variables
-	my ($buf, $rs);
 	my ($state, $iflag, $eflag, $index);
 	my (@fields, $illum, $append);
 
-	# read first 1024 bytes of file
-	read($fh, $buf, 1024);
-
-	# check for CR-LF (DOS)
-	if ($buf =~ m/\015\012/) {
-		
-		# set record separator
-		$rs = "\015\012";
-		
-	# check for LF (Unix/OSX)
-	} elsif ($buf =~ m/\012/) {
-		
-		# set record separator
-		$rs = "\012";
-		
-	# check for CR (Mac)
-	} elsif ($buf =~ m/\015/) {
-		
-		# set record separator
-		$rs = "\015";
-		
-	# not an ASCII file
-	} else {
-		
-		# return
-		return('not an ASCII file');
-		
-	}
-
 	# localize input record separator
-	local $/ = $rs;
+	local $/ = $self->[0]{'read_rs'};
 
 	# localize loop variable
 	local $_;
@@ -7433,16 +7444,13 @@ sub _readChartASCII {
 		
 	}
 
-	# save record separator
-	$self->[0]{'read_rs'} = $rs;
-
 	# save illuminant data, if any
 	$self->[0]{'illuminant'} = $illum if defined($illum->[1]);
 
 	# save appended data, if any
-	$self->[0]{'append'} = $append if (length($append));
+	$self->[0]{'append'} = $append if (defined($append));
 
-	# apply rotation/flip 
+	# apply rotation/flip (special keywords)
 	_rotateChartASCII($self);
 
 	# return success flag
@@ -7508,6 +7516,9 @@ sub _readChartASE {
 
 	# get little-endian flag
 	$le = ($Config{'byteorder'} =~ m/1234/);
+
+	# set binary mode
+	binmode($fh);
 
 	# read header (file signature, version, number of blocks)
 	read($fh, $buf, 12);
@@ -7711,6 +7722,9 @@ sub _readChartICC {
 
 	# load ICC::Profile modules, if not already included
 	require ICC::Profile;
+
+	# set binary mode
+	binmode($fh);
 
 	# read the profile header
 	ICC::Profile::_readICCheader($fh, \@header) || return('failed reading ICC profile header');
@@ -8204,6 +8218,9 @@ sub _readChartSS3 {
 		[qw(Notes ACQUIRE_NOTE P)],
 	];
 
+	# set binary mode
+	binmode($fh);
+
 	# read version, samples, Collection Notes length
 	read($fh, $buf, 7);
 
@@ -8415,6 +8432,9 @@ sub _readChartTIFF {
 	my ($trows, $tcols, $crop, $roff, $coff);
 	my ($res, $size, $frac, $ratio, $rxo, $cxo, $pixels, $width);
 	my ($lower, $upper, $left, $right, $band, $pval, @data, @pix);
+
+	# set binary mode
+	binmode($fh);
 
 	# read the header
 	read($fh, $buf, 8);

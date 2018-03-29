@@ -8,7 +8,7 @@ use warnings;
 use warnings::register;
 use namespace::autoclean 0.19;
 
-our $VERSION = '1.47';
+our $VERSION = '1.48';
 
 use Carp;
 use DateTime::Duration;
@@ -2348,7 +2348,7 @@ DateTime - A date and time object for Perl
 
 =head1 VERSION
 
-version 1.47
+version 1.48
 
 =head1 SYNOPSIS
 
@@ -4610,7 +4610,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ben Bennett Christian Hansen Daisuke Maki Dan Book Stewart David E. Wheeler Precious Doug Bell Flávio Soibelmann Glock Gianni Ceccarelli Gregory Oschwald Hauke D Iain Truskett Jason McIntosh Joshua Hoblitt Karen Etheridge Michael Conrad R. Davis M Somerville Nick Tonkin Olaf Alders Ovid Philippe Bruhat (BooK) Ricardo Signes Richard Bowen Ron Hill Sam Kington viviparous
+=for stopwords Ben Bennett Christian Hansen Daisuke Maki Dan Book Stewart David E. Wheeler Precious Doug Bell Flávio Soibelmann Glock Gianni Ceccarelli Gregory Oschwald Hauke D Iain Truskett Jason McIntosh Joshua Hoblitt Karen Etheridge Michael Conrad R. Davis M Somerville Nick Tonkin Olaf Alders Ovid Paul Howarth Philippe Bruhat (BooK) Ricardo Signes Richard Bowen Ron Hill Sam Kington viviparous
 
 =over 4
 
@@ -4701,6 +4701,10 @@ Olaf Alders <olaf@wundersolutions.com>
 =item *
 
 Ovid <curtis_ovid_poe@yahoo.com>
+
+=item *
+
+Paul Howarth <paul@city-fan.org>
 
 =item *
 

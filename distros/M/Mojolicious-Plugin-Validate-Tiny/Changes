@@ -1,0 +1,28 @@
+Revision history for Mojolicious::Plugin::ValidateTiny
+
+0.07
+        First version, released on an unsuspecting world.
+
+0.08
+        Fixed typo
+
+0.10
+        Added "validator_error_string" helper
+
+0.11
+        Improved POD
+        Added fix for potential problem which will appear if $c->param($field) will return empty list
+
+0.12
+        Added support for parameters with multiple values
+
+0.14
+        Added support for latest Mojolicious 6.
+            - params no longer gives us a list back
+0.15
+        Fix compatibility with the latest version of Validate::Tiny
+
+0.16
+        Maintain compatability with older versions of Validate::Tiny,
+        useful for breaking the link between Validate::Tiny and Mojolicious 
+        both forcing you to update each other        

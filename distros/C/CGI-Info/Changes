@@ -1,5 +1,17 @@
 Revision history for CGI-Info
 
+0.67	Tue Mar 27 12:31:12 EDT 2018
+	Remove the 'provides' tag
+
+0.66	Thu Dec 14 18:36:31 EST 2017
+	Added MyLogger to the MANIFEST
+
+0.65	Tue Dec 12 16:54:42 EST 2017
+	Fix breakage on 5.27.5 and beyond (Github issue 7)
+	Send 501 on unknown request, not 405
+	Bump minimum version of File::Spec
+	Use List::MoreUtils instead of grep
+
 0.64	Thu Oct 12 10:30:18 EDT 2017
 	Added mechanism to speak to setlogsock - useful for Dreamhost customers
 	Added set_logger

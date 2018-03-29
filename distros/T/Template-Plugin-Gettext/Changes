@@ -1,3 +1,15 @@
+0.5  2018-03-27
+        - Template::Plugin::Gettext now automatically sets the utf8 flag
+          on translated strings, when the original string (the msgid) had
+          the utf8 flag set.
+        - xgettext-tt2 can now be used without a plug-in, i. e. for functions
+          in the root namespace.
+        - Issues fixed:
+          o https://github.com/gflohr/Template-Plugin-Gettext/issues/6
+          o https://github.com/gflohr/Template-Plugin-Gettext/issues/7
+          o https://github.com/gflohr/Template-Plugin-Gettext/issues/8
+          o https://github.com/gflohr/Template-Plugin-Gettext/issues/9
+
 0.4  2018-01-23
         - Issues fixed:
           o https://github.com/gflohr/Template-Plugin-Gettext/issues/2

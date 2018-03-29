@@ -11,7 +11,7 @@ Pandoc - wrapper for the mighty Pandoc document converter
 
 =cut
 
-our $VERSION = '0.6.1';
+our $VERSION = '0.7.0';
 
 use Pandoc::Version;
 use Carp 'croak';
@@ -101,7 +101,7 @@ sub run {
 
     if ( @_ ) {
         if ( !$args ) {                                     # @args
-            if ($_[0] =~ /^-/ or $opts) {
+            if ($_[0] =~ /^-/ or $opts or @_ % 2) {
                 $args = \@_;
             } else {                                        # %opts
                 $opts = { @_ };
@@ -518,6 +518,9 @@ Pandoc documents for more elaborate document processing.
 See L<Pandoc wrappers and interfaces|https://github.com/jgm/pandoc/wiki/Pandoc-wrappers-and-interfaces>
 in the Pandoc GitHub Wiki for a list of wrappers in other programming
 languages.
+
+Use L<Pandoc::Release> to get information about and download pandoc releases,
+(for instance to test against multiple pandoc versions).
 
 Other Pandoc related but outdated modules at CPAN include
 L<Orze::Sources::Pandoc> and L<App::PDoc>.

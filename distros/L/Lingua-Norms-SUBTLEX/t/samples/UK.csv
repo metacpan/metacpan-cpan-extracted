@@ -1,0 +1,7 @@
+Spelling,FreqCount,Cbeebies_freq,CBBC_freq,BNC_freq,LogFreq(Zipf),LogFreqCbeebies(Zipf),LogFreqCBBC(Zipf),LogFreqBNC(Zipf),CD_count,CD_count_Cbeebies,CD_count_CBBC,CD,CD_cbeebies,CD_cbbc,DomPoS,DomPoSLemma,DomPoSFreq,DomPoSLemmaTotalFreq,AllPoS,AllPoSFreq,CapitFreq,Spell_check,Hyphen,Homophonic_entry,Double_word_entry,Freq_double_entry
+labour,45591,1,81,27108,5.35,2.53,3.78,5.43,8196,1,68,0.182,0.000,0.014,name,labour,40420,40420,.name.noun.adjective.verb.unclassified.,.40420.4240.631.284.16.,41050,UK,0,,,
+programme,31950,42,731,19071,5.20,3.86,4.73,5.28,15482,23,508,0.343,0.005,0.105,noun,programme,30786,35165,.noun.name.verb.adjective.adverb.unclassified.,.30786.458.440.246.11.9.,459,UK,0,"program, programme",,
+favourite,27052,2015,3481,4769,5.13,5.54,5.41,4.68,13805,1068,1668,0.306,0.220,0.345,adjective,favourite,16964,16964,.adjective.noun.name.verb.unclassified.,.16964.9727.268.92.1.,308,UK,0,,,
+colour,22651,1665,1789,11541,5.05,5.45,5.12,5.06,10120,664,949,0.224,0.137,0.196,noun,colour,20686,30119,.noun.verb.name.adjective.unclassified.adverb.,.20686.1107.622.230.3.3.,622,UK,0,"color, colour",,
+realise,15715,117,910,3904,4.89,4.30,4.82,4.59,11118,97,722,0.247,0.020,0.149,verb,realise,15112,27226,.verb.noun.name.adjective.,.15112.577.18.8.,25,UK,0,"realise, realize(2)",,
+

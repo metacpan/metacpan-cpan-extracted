@@ -38,7 +38,7 @@ $watcher = File::Tail::Inotify2->new(
     my $new_temp = temp($filename);
 
     my @events = $watcher->{inotify}->read;
-    is scalar @events, 3, '3 events are triggered';
+    is scalar @events, 4, '4 events are triggered';
 
     syswrite $new_temp, $content or die $!;
     close $new_temp;

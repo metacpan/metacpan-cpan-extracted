@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use utf8;
-use Test::More tests => 37;
+use Test::More tests => 47;
 use File::Spec;
 use Text::Amuse::Compile;
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
@@ -46,6 +46,8 @@ foreach my $file (qw/piece000001.xhtml
                                              $file));
     like $page, qr{<title>.*\&amp\;.*\&amp\;.*</title>}, "Title escaped on $file";
     like $page, qr{\&amp\;.*\&amp\;}, "& escaped on $file";
+    unlike $page, qr{\&amp\;nbsp;};
+    like $page, qr{\&nbsp;};
     if ($file =~ m/piece000/) {
         like $page, qr{<a id="text-amuse-label}, "Found anchor";
     }
@@ -100,4 +102,11 @@ foreach my $file (qw/piece000001.xhtml
     my $coverpage = read_file(File::Spec->catfile($tmpdir->dirname,
                                                   'coverpage.xhtml'));
     like ($coverpage, qr{xlink:href="logo.png"}, "coverpage has the image");
+}
+
+{
+    my $toc = read_file(File::Spec->catfile($tmpdir->dirname,
+                                            'toc.ncx'));
+    like $toc, qr{chapter NO-BREAK and}, "found ~ replaced in toc";
+    like $toc, qr{<docTitle>\s*\Q<text>title &amp; title &amp; title 2 test"'</text>\E}i;
 }

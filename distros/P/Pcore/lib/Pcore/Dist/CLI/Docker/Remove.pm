@@ -8,10 +8,20 @@ sub CLI ($self) {
     return {
         abstract => 'remove tags',
         name     => 'rm',
-        arg      => [
+
+        opt => {
+            keep => {
+                desc    => 'Number of builds to keep',
+                isa     => 'PositiveInt',
+                default => 2,
+            },
+        },
+
+        arg => [
             tag => {
                 desc => 'tag',
                 isa  => 'Str',
+                min  => 0,
                 max  => 0,
             },
         ],
@@ -21,7 +31,7 @@ sub CLI ($self) {
 sub CLI_RUN ( $self, $opt, $arg, $rest ) {
     my $dist = $self->get_dist;
 
-    $dist->build->docker->remove_tag( $arg->{tag} );
+    $dist->build->docker->remove_tag( $opt->{keep}, $arg->{tag} );
 
     $dist->build->docker->status;
 

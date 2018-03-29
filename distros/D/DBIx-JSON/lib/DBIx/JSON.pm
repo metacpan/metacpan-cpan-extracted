@@ -5,25 +5,23 @@ use strict;
 
 =head1 NAME
 
-DBIx::JSON - Perl extension for creating JSON from existing DBI datasources
+DBIx::JSON - JSON serialization plugin for DBIx
 
 =head1 DESCRIPTION
 
-This module is perl extension for creating JSON from existing DBI datasources.
+This module is a DBIx extension to fetch data in JSON format from 
+datasources.
 
-One use of this module might be to extract data on the web
-server, and send the raw data (in JSON format) to a client's
-browser, and then JavaScript do eval it to generate dynamic HTML.
-
-This module was inspired by DBIx::XML_RDB.
+One of use cases of this module is to simply implement a back-end 
+service for a WEB application.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -68,7 +66,7 @@ sub _init {
         $self->{dbh} =
           DBI->connect( "dbi:$driver:$dsn", $userid, $passwd,
             { PrintWarn => 0, PrintError => 1 } );
-      }
+    }
       or $@ && Carp::croak $@;
     if ( !$self->{dbh} ) {
         return ();
@@ -87,7 +85,7 @@ sub do_select {
     if ($key_field) {
         eval {
             $self->{data} = $self->{dbh}->selectall_hashref( $sql, $key_field );
-          }
+        }
           or $@ && Carp::croak $@;
         if ( $self->{dbh}->err ) {
             Carp::carp $self->{dbh}->errstr;
@@ -257,13 +255,7 @@ This returns $DBI::errstr.
 
 =head1 AUTHOR
 
-JSON::Syck by Tatsuhiko Miyagawa, C<< <miyagawa@bulknews.net> >>
-Tweaked by Koji Komatsu, C<< <yosty@cpan.org> >>
-
-=head1 TODO
-
-support encoding
-test
+Koji Komatsu, C<< <yosty@cpan.org> >>
 
 =head1 BUGS
 
@@ -279,19 +271,9 @@ You can find documentation for this module with the perldoc command.
 
     perldoc DBIx::JSON
 
-You can also look for information at:
-
 =head1 SEE ALSO
 
-=over 4
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/DBIx-JSON>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/DBIx-JSON>
+=over 2
 
 =item * RT: CPAN's request tracker
 
@@ -303,15 +285,11 @@ L<http://search.cpan.org/dist/DBIx-JSON>
 
 =back
 
-=head1 ACKNOWLEDGEMENTS
-
-None.
-
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2006 Koji Komatsu, all rights reserved.
+Copyright 2006-2018 by Koji Komatsu, all rights reserved.
 
-This program is a free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

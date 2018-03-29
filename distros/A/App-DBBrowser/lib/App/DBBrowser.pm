@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.008';
+our $VERSION = '2.009';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -132,6 +132,8 @@ sub __init {
             $sf->{i}{$key}{mouse} = $sf->{o}{table}{mouse};
         }
     }
+    $sf->{i}{subqueries} =    $sf->{o}{G}{subqueries_select} || $sf->{o}{G}{subqueries_set}
+                           || $sf->{o}{G}{subqueries_w_h}    || $sf->{o}{G}{subqueries_table};
 }
 
 
@@ -174,7 +176,6 @@ sub run {
             next DB_PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
             last DB_PLUGIN;
         }
-
 
         # DATABASES
 
@@ -248,7 +249,8 @@ sub run {
                 delete $ENV{TC_RESET_AUTO_UP};
             }
             $db =~ s/^[-\ ]\s// if $driver ne 'SQLite';
-            my $db_string = 'DB: '. basename( $db ) . '';
+            my $db_string = 'DB '. basename( $db ) . '';
+
             # DB-HANDLE
 
             my $dbh;
@@ -256,7 +258,8 @@ sub run {
                 print $sf->{i}{clear_screen};
                 print $db_string . "\n";
                 $dbh = $plui->get_db_handle( $db, $odb->connect_parameter( $db_opt, $db) );
-                $sf->{i}{sep_char} = $dbh->get_info(41)  || '.'; # SQL_CATALOG_NAME_SEPARATOR
+                #$sf->{i}{quote_char} = $dbh->get_info(29)  || '"', # SQL_IDENTIFIER_QUOTE_CHAR
+                $sf->{i}{sep_char}   = $dbh->get_info(41)  || '.'; # SQL_CATALOG_NAME_SEPARATOR
                 1 }
             ) {
                 $ax->print_error_message( $@, 'Get database handle' );
@@ -274,9 +277,6 @@ sub run {
                 user_dbs => $user_dbs,
                 sys_dbs  => $sys_dbs,
             };
-            #if ( $sf->{o}{G}{subqueries} ) {
-            #    $sf->{i}{sq_file} = catfile $sf->{i}{app_dir}, 'subqueries.json';
-            #}
             $sf->{i}{file_attached_db} = catfile $sf->{i}{app_dir}, 'attached_DB.json';
             $sf->{db_attached} = 0;
             if ( $driver eq 'SQLite' && -s $sf->{i}{file_attached_db} ) {
@@ -329,7 +329,7 @@ sub run {
                 }
                 else {
                     my $back   = $auto_one == 2 ? $sf->{i}{_quit} : $sf->{i}{_back};
-                    my $prompt = 'DB "'. basename( $db ) . '" - choose Schema:';
+                    my $prompt = $db_string . ' - choose Schema:';
                     my $choices_schema = [ undef, @schemas ];
                     # Choose
                     $ENV{TC_RESET_AUTO_UP} = 0;
@@ -356,7 +356,7 @@ sub run {
                     delete $ENV{TC_RESET_AUTO_UP};
                     $schema =~ s/^[-\ ]\s//;
                 }
-                $db_string = 'DB: '. basename( $db ) . ( @schemas > 1 ? '.' . $schema : '' ) . '';
+                $db_string = 'DB '. basename( $db ) . ( @schemas > 1 ? '.' . $schema : '' ) . '';
                 $sf->{d}{schema}       = $schema;
                 $sf->{d}{user_schemas} = $user_schemas;
                 $sf->{d}{sys_schemas}  = $sys_schemas;
@@ -386,14 +386,17 @@ sub run {
 
                 TABLE: while ( 1 ) {
 
-                    my ( $join, $union, $new, $db_setting ) = ( '  Join', '  Union', '  New', '  Database settings' );
+                    my ( $join, $union, $subquery, $db_setting ) = ( '  Join', '  Union', '  SQ', '  DB settings' );
                     my $hidden = $db_string;
                     my $table;
                     if ( $sf->{redo_table} ) {
                         $table = delete $sf->{redo_table};
                     }
                     else {
-                        my $choices_table = [ $hidden, undef, @tables, $join, $union, $db_setting ]; # db_setting only if any
+                        my $choices_table = [ $hidden, undef, @tables ];
+                        push @$choices_table, $subquery      if $sf->{o}{G}{subqueries_table};
+                        push @$choices_table, $join, $union;
+                        push @$choices_table, $db_setting    if $sf->{i}{db_settings};
                         my $back = $auto_one == 3 ? $sf->{i}{_quit} : $sf->{i}{_back};
                         # Choose
                         $ENV{TC_RESET_AUTO_UP} = 0;
@@ -452,7 +455,7 @@ sub run {
                                 push @$choices_hidden, $attach_databases;
                                 push @$choices_hidden, $detach_databases if $sf->{db_attached};
                             }
-                            push @$choices_hidden, $edit_sq_file if $sf->{o}{G}{subqueries};
+                            push @$choices_hidden, $edit_sq_file if $sf->{i}{subqueries};
                             if ( @$choices_hidden == 0 ) {
                                 next TABLE;
                             }
@@ -554,15 +557,48 @@ sub run {
                         }
                         next TABLE if ! defined $qt_table;
                     }
+                    elsif ( $table eq $subquery ) {
+                        $sf->{i}{multi_tbl} = 'subquery';
+                        my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+                        my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
+                        my $tmp = {};
+                        $ax->reset_sql( $tmp );
+                        my $subquery = $sq->choose_subquery( {}, $tmp, 'Select' );
+                        if ( ! defined $subquery ) {
+                            next TABLE;
+                        }
+                        $qt_table = "(" . $subquery . ")";
+                        my $alias = $ax->alias( $qt_table );
+                        if ( defined $alias && length $alias ) {
+                            $qt_table .= " AS " . $alias;
+                        }
+                        if ( ! eval {
+                            my $sth = $dbh->prepare( "SELECT * FROM " . $qt_table . " LIMIT 0" );
+                            $sth->execute() if $driver ne 'SQLite';
+                            $qt_columns = $ax->quote_simple_many( $sth->{NAME} );
+                            1 }
+                        ) {
+                            $ax->print_error_message( $@, 'Subquery table' );
+                            next TABLE;
+                        }
+                    }
                     else {
                         $sf->{i}{multi_tbl} = '';
-                        $table =~ s/^[-\ ]\s//;
-                        my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                        $qt_table = $ax->quote_table( $sf->{d}{tables_info}{$table} );
-                        my $sth = $dbh->prepare( "SELECT * FROM " . $qt_table . " LIMIT 0" );
-                        $sth->execute() if $driver ne 'SQLite';
-                        $qt_columns = $ax->quote_simple_many( $sth->{NAME} );
-                        $sth->finish();
+                        if ( ! eval {
+                            $table =~ s/^[-\ ]\s//;
+                            $sf->{d}{table} = $table;
+                            my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+                            $qt_table = $ax->quote_table( $sf->{d}{tables_info}{$table} );
+                            my $sth = $dbh->prepare( "SELECT * FROM " . $qt_table . " LIMIT 0" );
+                            $sth->execute() if $driver ne 'SQLite';
+                            $sf->{d}{cols} = [ @{$sth->{NAME}} ];
+                            $sth->finish();
+                            $qt_columns = $ax->quote_simple_many( $sf->{d}{cols} );
+                            1 }
+                        ) {
+                            $ax->print_error_message( $@, 'Ordinary table' );
+                            next TABLE;
+                        }
                     }
                     #if ( ! eval {
                     $sf->__browse_the_table( $qt_table, $qt_columns );
@@ -662,7 +698,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.008
+Version 2.009
 
 =head1 DESCRIPTION
 

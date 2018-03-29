@@ -13,7 +13,7 @@ URI::Fast::Benchmarks - Benchmarks comparing URI::Fast and URI
 
 =head1 VERSION
 
-version 0.18
+version 0.22
 
 =head1 BENCHMARKS
 
@@ -26,45 +26,105 @@ L<perlbrew|https://perlbrew.pl>.
 
 =head2 Constructor
 
-                            Rate            IRI            URI
-              IRI        14762/s             --           -85%
-              URI       101215/s           586%             --
-        URI::Fast       769231/s          5111%           660%
+                            Rate            URI      URI::Fast
+              URI        97276/s             --           -88%
+        URI::Fast       819672/s           743%             --
 
 =head2 Parse scheme
 
-                            Rate            IRI            URI
-              IRI        13224/s             --           -85%
-              URI        88339/s           568%             --
-        URI::Fast       694444/s          5151%           686%
+                            Rate            URI      URI::Fast
+              URI        84034/s             --           -88%
+        URI::Fast       704225/s           738%             --
 
 =head2 Update scheme
 
-                            Rate            IRI            URI
-              IRI        19099/s             --           -64%
-              URI        53476/s           180%             --
-        URI::Fast       675676/s          3438%          1164%
+                            Rate            URI      URI::Fast
+              URI        54765/s             --           -92%
+        URI::Fast       675676/s          1134%             --
 
 =head2 Parse authorization
 
-                            Rate            IRI            URI
-              IRI        12658/s             --           -80%
-              URI        63776/s           404%             --
-        URI::Fast       675676/s          5238%           959%
+                            Rate            URI      URI::Fast
+              URI        68306/s             --           -90%
+        URI::Fast       714286/s           946%             --
 
 =head2 Update authorization
 
-                            Rate            IRI            URI
-              IRI        13113/s             --           -68%
-              URI        41494/s           216%             --
-        URI::Fast       581395/s          4334%          1301%
+                            Rate            URI      URI::Fast
+              URI        43821/s             --           -93%
+        URI::Fast       617284/s          1309%             --
 
 =head2 Parse path (scalar)
 
-                            Rate            IRI            URI
-              IRI        12987/s             --           -85%
-              URI        84746/s           553%             --
-        URI::Fast       490196/s          3675%           478%
+                            Rate            URI      URI::Fast
+              URI        83056/s             --           -84%
+        URI::Fast       526316/s           534%             --
+
+=head2 Parse path (list)
+
+                            Rate            URI      URI::Fast
+              URI        61425/s             --           -80%
+        URI::Fast       314465/s           412%             --
+
+=head2 Update path (scalar)
+
+                            Rate            URI      URI::Fast
+              URI        69930/s             --           -87%
+        URI::Fast       555556/s           694%             --
+
+=head2 Update path (array)
+
+                            Rate            URI      URI::Fast
+              URI        69061/s             --           -84%
+        URI::Fast       442478/s           541%             --
+
+=head2 Parse query
+
+                            Rate            URI      URI::Fast
+              URI        37793/s             --           -90%
+        URI::Fast       364964/s           866%             --
+
+=head2 Set query parameter
+
+                            Rate            URI      URI::Fast
+              URI        47348/s             --           -88%
+        URI::Fast       400000/s           745%             --
+
+=head2 Query form
+
+                            Rate            URI      URI::Fast
+              URI        35689/s             --           -86%
+        URI::Fast       261780/s           634%             --
+
+=head2 Query keys
+
+                            Rate            URI      URI::Fast
+              URI        35537/s             --           -87%
+        URI::Fast       277778/s           682%             --
+
+=head2 Stringification
+
+                            Rate            URI      URI::Fast
+              URI        84034/s             --           -67%
+        URI::Fast       257732/s           207%             --
+
+=head2 uri_split
+
+                            Rate     URI::Split      URI::Fast
+       URI::Split       294118/s             --           -50%
+        URI::Fast       588235/s           100%             --
+
+=head2 Encode
+
+                            RateURI::Encode::XS      URI::Fast
+  URI::Encode::XS       709220/s             --           -57%
+        URI::Fast      1666667/s           135%             --
+
+=head2 Decode
+
+                            Rate      URI::FastURI::Encode::XS
+        URI::Fast       722022/s             --           -23%
+  URI::Encode::XS       943396/s            31%             --
 
 =head1 AUTHOR
 

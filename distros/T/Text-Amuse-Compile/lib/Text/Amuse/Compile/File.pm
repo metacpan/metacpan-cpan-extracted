@@ -655,10 +655,46 @@ sub _compile_pdf {
         my $shitout;
         while (my $line = <$pipe>) {
             if ($line =~ m/^[!#]/) {
+                if ($line =~ m/^! Paragraph ended before/) {
+                    $self->log_info("***** WARNING *****\n"
+                                    . "It is possible that you have a multiparagraph footnote\n"
+                                    . "inside an header or inside a em or strong tag.\n"
+                                    . "Unfortunately this is not supported in the PDF output.\n"
+                                    . "Please correct it.\n");
+                }
+                if ($line =~ m/^! LaTeX Error: Unknown option.*fragile.*for package.*bigfoot/) {
+                    my $help =<<HELP;
+It appears that your TeX installation has an obsolete version of the
+bigfoot package. You can upgrade this package following this
+procedure (per user, not global).
+
+cd /tmp/
+mkdir -p `kpsewhich -var-value TEXMFHOME`/tex/latex/bigfoot
+wget http://mirrors.ctan.org/macros/latex/contrib/bigfoot.zip
+unzip bigfoot.zip
+cd bigfoot
+make
+mv *.sty `kpsewhich -var-value TEXMFHOME`/tex/latex/bigfoot
+texhash `kpsewhich -var-value TEXMFHOME`
+
+Please contact the sys-admin if the commands above mean nothing to you.
+HELP
+                    $self->log_info("***** WARNING *****\n" . $help);
+                }
                 $shitout++;
             }
             if ($shitout) {
-                $self->log_info($line);
+                # List of CHECK values
+                # FB_DEFAULT
+                #   I<CHECK> = Encode::FB_DEFAULT ( == 0)
+                # If CHECK is 0, encoding and decoding replace any
+                # malformed character with a substitution character.
+                # When you encode, SUBCHAR is used. When you decode,
+                # the Unicode REPLACEMENT CHARACTER, code point
+                # U+FFFD, is used. If the data is supposed to be
+                # UTF-8, an optional lexical warning of warning
+                # category "utf8" is given.
+                $self->log_info(decode_utf8($line));
             }
         }
         wait;
@@ -1004,6 +1040,7 @@ sub _clean_html {
     $string =~ s/&gt;/>/g;
     $string =~ s/&quot;/"/g;
     $string =~ s/&#x27;/'/g;
+    $string =~ s/&nbsp;/ /g;
     $string =~ s/&amp;/&/g;
     return $string;
 }

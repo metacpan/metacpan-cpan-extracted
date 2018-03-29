@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::date::str_iso8601;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.023'; # VERSION
+our $DATE = '2018-03-27'; # DATE
+our $VERSION = '0.024'; # VERSION
 
 use 5.010001;
 use strict;
@@ -27,8 +27,8 @@ sub coerce {
     $res->{expr_match} = join(
         " && ",
         "!ref($dt)",
-        #                   1=Y        2=M        3=D         4="T" 5=h      6=m        7=s       8="Z"
-        "$dt =~ /\\A([0-9]{4})-([0-9]{2})-([0-9]{2})(?:(T)([0-9]{2}):([0-9]{2}):([0-9]{2})(Z?))?\\z/",
+        #            1=Y        2=M        3=D          4="T" 5=h        6=m        7=s       8="Z"
+        "$dt =~ /\\A([0-9]{4})-([0-9]{2})-([0-9]{2})(?:([T ])([0-9]{2}):([0-9]{2}):([0-9]{2})(Z?))?\\z/",
     );
 
     $res->{modules}{"Time::Local"} //= 0;
@@ -65,7 +65,7 @@ Data::Sah::Coerce::perl::date::str_iso8601 - Coerce date from (a subset of) ISO8
 
 =head1 VERSION
 
-This document describes version 0.023 of Data::Sah::Coerce::perl::date::str_iso8601 (from Perl distribution Data-Sah-Coerce), released on 2017-07-10.
+This document describes version 0.024 of Data::Sah::Coerce::perl::date::str_iso8601 (from Perl distribution Data-Sah-Coerce), released on 2018-03-27.
 
 =head1 DESCRIPTION
 
@@ -74,6 +74,9 @@ Currently only the following formats are accepted:
  "YYYY-MM-DD"            ; # date (local time), e.g.: 2016-05-13
  "YYYY-MM-DDThh:mm:ss"   ; # date+time (local time), e.g.: 2016-05-13T22:42:00
  "YYYY-MM-DDThh:mm:ssZ"  ; # date+time (UTC), e.g.: 2016-05-13T22:42:00Z
+
+ "YYYY-MM-DD hh:mm:ss"   ; # date+time (local time), MySQL format, e.g.: 2016-05-13 22:42:00
+ "YYYY-MM-DD hh:mm:ssZ"  ; # date+time (UTC), MySQL format, e.g.: 2016-05-13 22:42:00Z
 
 =for Pod::Coverage ^(meta|coerce)$
 
@@ -99,7 +102,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

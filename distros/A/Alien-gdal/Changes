@@ -1,0 +1,11 @@
+Revision history for Alien::gdal
+
+1.02 2018-03-28
+    - update changes file for 1.01 changes
+    
+1.01 2018-03-28
+    - add github details to Makefile.PL
+
+1.00 2018-03-28
+    - First release
+

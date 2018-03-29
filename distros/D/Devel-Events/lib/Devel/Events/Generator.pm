@@ -1,6 +1,8 @@
 #!/usr/bin/perl
 
 package Devel::Events::Generator;
+# ABSTRACT: An optional base role for event generators.
+our $VERSION = '0.09';
 use Moose::Role;
 
 has handler => (
@@ -21,9 +23,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Devel::Events::Generator - An optional base role for event generators.
+
+=head1 VERSION
+
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -70,5 +78,20 @@ prepended.
 
 =back
 
-=cut
+=head1 SUPPORT
 
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-Events>
+(or L<bug-Devel-Events@rt.cpan.org|mailto:bug-Devel-Events@rt.cpan.org>).
+
+=head1 AUTHOR
+
+יובל קוג'מן (Yuval Kogman) <nothingmuch@woobling.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2007 by יובל קוג'מן (Yuval Kogman).
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,3 +1,9 @@
+0.024   2018-03-27 (PERLANCAR)
+
+	- Allow space in addition to 'T' as date and time separator, so we
+	  can accept MySQL datetime format.
+
+
 0.023   2017-07-10 (PERLANCAR)
 
 	- No functional changes.

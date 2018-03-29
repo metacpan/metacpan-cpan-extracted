@@ -84,7 +84,8 @@
             "Crypt::Argon2" : "0",
             "Crypt::CBC" : "0",
             "Crypt::DES" : "0",
-            "Data::UUID" : "0",
+            "Data::UUID" : "v1.221.0",
+            "Data::UUID::MT" : "v1.1.0",
             "Devel::Refcount" : "0",
             "Digest" : "0",
             "Digest::MD5" : "0",
@@ -159,6 +160,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v0.58.3",
+   "version" : "v0.58.4",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

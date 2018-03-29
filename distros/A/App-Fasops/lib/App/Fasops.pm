@@ -1,6 +1,6 @@
 package App::Fasops;
 
-our $VERSION = '0.5.12';
+our $VERSION = '0.5.14';
 
 use strict;
 use warnings;
@@ -31,12 +31,14 @@ App::Fasops - operating blocked fasta files
           join: join multiple blocked fasta files by common target
          links: scan blocked fasta files and output bi/multi-lateral range links
        maf2fas: convert maf to blocked fasta
+      mergecsv: merge csv files based on @fields
          names: scan blocked fasta files and output all species names
         refine: realign blocked fasta file with external programs
        replace: replace headers from a blocked fasta
       separate: separate blocked fasta files by species
          slice: extract alignment slices from a blocked fasta
          split: split blocked fasta files to separate per-alignment files
+          stat: basic statistics on alignments
         subset: extract a subset of species from a blocked fasta
           xlsx: paint substitutions and indels to an excel file
 

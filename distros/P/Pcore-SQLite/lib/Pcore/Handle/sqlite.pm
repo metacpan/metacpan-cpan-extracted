@@ -6,7 +6,7 @@ use Pcore::Handle::DBI::Const qw[:CONST];
 use DBD::SQLite qw[];
 use DBD::SQLite::Constants qw[:file_open];
 use Pcore::Util::Scalar qw[weaken is_blessed_ref looks_like_number is_plain_arrayref is_plain_coderef is_blessed_arrayref];
-use Pcore::Util::UUID qw[uuid_str];
+use Pcore::Util::UUID qw[uuid_v1mc_str uuid_v4_str];
 use Pcore::Util::Data qw[to_json];
 
 # NOTE http://habrahabr.ru/post/149635/
@@ -127,7 +127,9 @@ sub BUILD ( $self, $args ) {
     $dbh->sqlite_busy_timeout( $self->{busy_timeout} );
 
     # create custom functions
-    $dbh->sqlite_create_function( 'uuid', 0, sub { return uuid_str } );
+    $dbh->sqlite_create_function( 'uuid_generate_v1mc', 0, sub { return uuid_v1mc_str } );
+    $dbh->sqlite_create_function( 'uuid_generate_v4',   0, sub { return uuid_v4_str } );
+    $dbh->sqlite_create_function( 'gen_random_uuid',    0, sub { return uuid_v4_str } );
 
     $self->{on_connect}->($self) if $self->{on_connect};
 
@@ -139,7 +141,7 @@ sub BUILD ( $self, $args ) {
 # STH
 sub prepare ( $self, $query ) {
     my $sth = bless {
-        id    => uuid_str,
+        id    => uuid_v1mc_str,
         query => $query,
       },
       'Pcore::Handle::DBI::STH';
@@ -707,18 +709,18 @@ sub attach ( $self, $name, $path = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 157                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
+## |    3 | 159                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
 ## |      |                      | declared but not used                                                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 377                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (36)                        |
+## |    3 | 379                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (36)                        |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 451                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 453                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 233                  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 235                  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 352                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 354                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 632                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 634                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

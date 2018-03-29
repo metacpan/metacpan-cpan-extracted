@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Header;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180314'; # VERSION
+our $VERSION = '1.20180328'; # VERSION
 use Carp;
 
 use Mail::AuthenticationResults::Header::AuthServID;
@@ -88,6 +88,32 @@ sub eol {
 }
 
 
+sub fold_at {
+    my ( $self ) = @_;
+    return $self->{ 'fold_at' };
+}
+
+
+sub set_fold_at {
+    my ( $self, $fold_at ) = @_;
+    $self->{ 'fold_at' } = $fold_at;
+    return $self;
+}
+
+
+sub force_fold_at {
+    my ( $self ) = @_;
+    return $self->{ 'force_fold_at' };
+}
+
+
+sub set_force_fold_at {
+    my ( $self, $fold_at ) = @_;
+    $self->{ 'force_fold_at' } = $fold_at;
+    return $self;
+}
+
+
 sub set_indent_style {
     my ( $self, $style ) = @_;
 
@@ -150,26 +176,44 @@ sub add_child {
 
 sub as_string {
     my ( $self ) = @_;
-    my $string = q{};
+    my $header = Mail::AuthenticationResults::FoldableHeader->new();
+    $header->set_try_fold_at( $self->fold_at() ) if defined $self->fold_at();
+    $header->set_force_fold_at( $self->force_fold_at() ) if defined $self->force_fold_at();
+    $header->set_eol( $self->eol() );
+    $header->set_indent( ' ' x $self->indent_by() );
+    $header->set_sub_indent( '  ' );
+    $self->build_string( $header );
+    return $header->as_string();
+}
+
+sub build_string {
+    my ( $self, $header ) = @_;
     my $value = q{};
     if ( $self->value() ) {
-        $value = $self->value()->as_string();
+        $self->value()->build_string( $header );
     }
     else {
-        $value = 'unknown';
+        $header->string( 'unknown' );
     }
-    $value .= ";";
+    $header->separator( ';' );
 
-    $value .= join( ";", map { $_->as_string_prefix() . $_->as_string() } @{ $self->children() } );
+    my $sep = 0;
+    foreach my $child ( @{ $self->children() } ) {
+        $header->separator( ';' ) if $sep;
+        $sep = 1;
+        $child->as_string_prefix( $header );
+        $child->build_string( $header );
+    }
 
     if ( scalar @{ $self->search({ 'isa' => 'entry' } )->children() } == 0 ) {
         #if ( scalar @{ $self->children() } > 0 ) {
         #    $value .= ' ';
         #}
-        $value .= ' none';
+        $header->space( ' ' );
+        $header->string ( 'none' );
     }
 
-    return $value;
+    return;
 }
 
 1;
@@ -186,7 +230,7 @@ Mail::AuthenticationResults::Header - Class modelling the Entire Authentication 
 
 =head1 VERSION
 
-version 1.20180314
+version 1.20180328
 
 =head1 DESCRIPTION
 
@@ -223,6 +267,30 @@ Set the eol style for as_string
 =head2 eol()
 
 Return the current eol style
+
+=head2 fold_at()
+
+Return the current fold at value if set
+
+Strings will be folded if longer than this value where possible.
+
+=head2 set_fold_at( $fold_at )
+
+set the current fold_at value for as_string
+
+Strings will be folded if longer than this value where possible.
+
+=head2 force_fold_at()
+
+Return the current force fold at value if set
+
+Strings WILL be folded if longer than this value.
+
+=head2 set_force_fold_at( $fold_at )
+
+set the current force_fold_at value for as_string
+
+Strings WILL be folded if longer than this value.
 
 =head2 set_indent_style( $style )
 

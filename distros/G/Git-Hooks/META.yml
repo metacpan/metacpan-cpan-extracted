@@ -4,7 +4,6 @@ author:
   - 'Gustavo L. de M. Chaves <gnustavo@cpan.org>'
 build_requires:
   Config: '0'
-  Data::Dumper: '0'
   Email::Sender::Transport::Mbox: '0'
   Path::Tiny: '0.060'
   Test::Requires::Git: '0'
@@ -25,80 +24,69 @@ name: Git-Hooks
 provides:
   Git::Hooks:
     file: lib/Git/Hooks.pm
-    version: v2.9.0
+    version: v2.9.1
   Git::Hooks::CheckAcls:
     file: lib/Git/Hooks/CheckAcls.pm
-    version: v2.9.0
+    version: v2.9.1
   Git::Hooks::CheckCommit:
     file: lib/Git/Hooks/CheckCommit.pm
-    version: v2.9.0
+    version: v2.9.1
   Git::Hooks::CheckFile:
     file: lib/Git/Hooks/CheckFile.pm
-    version: v2.9.0
+    version: v2.9.1
   Git::Hooks::CheckJira:
     file: lib/Git/Hooks/CheckJira.pm
-    version: v2.9.0
+    version: v2.9.1
   Git::Hooks::CheckLog:
     file: lib/Git/Hooks/CheckLog.pm
-    version: v2.9.0
+    version: v2.9.1
   Git::Hooks::CheckReference:
     file: lib/Git/Hooks/CheckReference.pm
-    version: v2.9.0
+    version: v2.9.1
   Git::Hooks::CheckRewrite:
     file: lib/Git/Hooks/CheckRewrite.pm
-    version: v2.9.0
+    version: v2.9.1
   Git::Hooks::CheckWhitespace:
     file: lib/Git/Hooks/CheckWhitespace.pm
-    version: v2.9.0
+    version: v2.9.1
   Git::Hooks::GerritChangeId:
     file: lib/Git/Hooks/GerritChangeId.pm
-    version: v2.9.0
+    version: v2.9.1
   Git::Hooks::Notify:
     file: lib/Git/Hooks/Notify.pm
-    version: v2.9.0
+    version: v2.9.1
   Git::Hooks::PrepareLog:
     file: lib/Git/Hooks/PrepareLog.pm
-    version: v2.9.0
+    version: v2.9.1
   Git::Hooks::Test:
     file: lib/Git/Hooks/Test.pm
-    version: v2.9.0
+    version: v2.9.1
   Git::Message:
     file: lib/Git/Message.pm
-    version: v2.9.0
+    version: v2.9.1
   Git::Repository::Plugin::GitHooks:
     file: lib/Git/Repository/Plugin/GitHooks.pm
-    version: v2.9.0
+    version: v2.9.1
 recommends:
-  Authen::SASL: '0'
-  Email::Sender: '0'
   Email::Valid: '0'
   Gerrit::REST: '0'
   HTML::Entities: '0'
   JIRA::REST: '0'
-  MIME::Base64: '0'
   Text::SpellChecker: '0'
 requires:
   Carp: '0'
-  Cwd: '0'
-  Data::Dump: '0'
+  Email::Sender::Simple: '0'
   Email::Simple: '0'
-  Email::Valid: '0'
   Encode: '0'
   Exporter: '0'
-  File::pushd: '0'
   Git::Repository: '0'
   Git::Repository::Log: '0'
   Git::Repository::Plugin: '0'
-  HTML::Entities: '0'
   List::MoreUtils: '0'
   Path::Tiny: '0.060'
-  Set::Scalar: '0'
-  Sub::Util: '0'
   Test::More: '0'
   Text::Glob: '0'
-  Try::Tiny: '0'
   URI::Escape: '0'
-  URI::file: '0'
   parent: '0'
   perl: '5.010'
   strict: '0'
@@ -108,7 +96,7 @@ resources:
   bugtracker: https://github.com/gnustavo/Git-Hooks/issues
   homepage: https://github.com/gnustavo/Git-Hooks/blob/next/README.pod
   repository: https://github.com/gnustavo/Git-Hooks.git
-version: 2.9.0
+version: 2.9.1
 x_contributors:
   - 'Mikko Koivunalho <mikkoi@cpan.org>'
   - 'Dave Rolsky <autarch@urth.org>'

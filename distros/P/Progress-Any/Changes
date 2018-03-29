@@ -1,3 +1,14 @@
+0.214   2018-03-26 (PERLANCAR)
+
+	- Forget to remove old code.
+
+
+0.213   2018-03-26 (PERLANCAR)
+
+	- [Incompatible change] [internal] Remove output_data structure, store
+	  state in output objects directly. This simplifies things a bit.
+
+
 0.212   2018-03-16 (PERLANCAR)
 
         - Make regex to parse template available as package variable

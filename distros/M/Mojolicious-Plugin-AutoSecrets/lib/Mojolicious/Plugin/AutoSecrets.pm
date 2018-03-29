@@ -1,10 +1,10 @@
 package Mojolicious::Plugin::AutoSecrets;
 # ABSTRACT: Automatic, Rotating Mojolicious Secrets
-$Mojolicious::Plugin::AutoSecrets::VERSION = '0.003';
+$Mojolicious::Plugin::AutoSecrets::VERSION = '0.004';
 
 use Mojo::Base 'Mojolicious::Plugin';
-use Mojo::Util qw(sha1_sum);
 use Mojo::JSON qw(encode_json decode_json);
+use Session::Token;
 use Carp qw(croak);
 use Fcntl qw(:DEFAULT :flock);
 use autodie;
@@ -56,7 +56,7 @@ sub register {
 
 
 sub generator {
-  sha1_sum(join '', rand(1000) x 2, $$, localtime)
+  Session::Token->new->get;
 }
 
 
@@ -156,7 +156,7 @@ from AutoSecrets.
 
 =head2 generator
 
-The default secret generator, a SHA-1 sum of a few low-effort sources.
+The default secret generator, using Session::Token
 
 =head1 SEE ALSO
 

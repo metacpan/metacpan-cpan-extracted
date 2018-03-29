@@ -3,9 +3,9 @@ NAME
     simple message
 
 VERSION
-    This document describes version 0.040 of
+    This document describes version 0.041 of
     Progress::Any::Output::TermMessage (from Perl distribution
-    Progress-Any-Output-TermMessage), released on 2018-03-21.
+    Progress-Any-Output-TermMessage), released on 2018-03-26.
 
 SYNOPSIS
      use Progress::Any::Output;

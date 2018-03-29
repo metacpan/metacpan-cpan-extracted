@@ -2,7 +2,7 @@ package Pcore::WebSocket::Protocol::pcore;
 
 use Pcore -class, -result, -const;
 use Pcore::Util::Data;
-use Pcore::Util::UUID qw[uuid_str];
+use Pcore::Util::UUID qw[uuid_v1mc_str];
 use Pcore::Util::Text qw[trim];
 use Pcore::Util::Scalar qw[is_blessed_ref is_plain_arrayref weaken is_plain_coderef];
 use Pcore::WebSocket::Protocol::pcore::Request;
@@ -36,7 +36,7 @@ sub rpc_call ( $self, $method, @ ) {
     if ( is_plain_coderef $_[-1] || ( is_blessed_ref $_[-1] && $_[-1]->can('IS_CALLBACK') ) ) {
         $msg->{data} = [ @_[ 2 .. $#_ - 1 ] ];
 
-        $msg->{tid} = uuid_str();
+        $msg->{tid} = uuid_v1mc_str;
 
         $self->{_callbacks}->{ $msg->{tid} } = $_[-1];
     }

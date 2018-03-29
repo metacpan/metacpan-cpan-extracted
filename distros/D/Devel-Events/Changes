@@ -1,24 +1,36 @@
-0.08
+Revision history for Devel-Events
+
+0.09      2018-03-27 00:57:48Z
+        - converted packaging to Dist::Zilla
+        - fixed tests that expect an error message that changed in perl 5.18.0
+          (RT#124882)
+
+0.08    2009-10-08
 	- missing dep in Try::Tiny
 
-0.07
+0.07    2009-09-21
 	- use Try::Tiny when evaling
 	- don't import from Moose (breaks the Perl debugger hooks)
 	- missing dep on Sub::Uplevel
 
-0.06
+0.06    2008-06-22
 	- use File::Find for testing instead of URI (just needed a core module)
 
-0.05
+0.05    2008-03-21
 	- Remove now broken workaround for pre 0.33 roles
 
-0.04
+0.04    2007-12-25
 	- Improve Devel::Events::Filter::Warn
 	- Add Devel::Events::Generator::Require
 
-0.03
+0.03    2007-09-17
 	- More docs
 	- Devel::Events::Match
 	- Add Filter::HandlerOptional
 	- Devel::Events::Filter::Callback
 	- A pony (stolen from Jifty)
+
+0.02    2007-09-14
+
+0.01    2007-09-13
+

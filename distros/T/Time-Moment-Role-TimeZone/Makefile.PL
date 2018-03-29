@@ -17,7 +17,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008001",
   "NAME" => "Time::Moment::Role::TimeZone",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Role::Tiny" => "2.000001",
+    "Time::Local" => 0,
     "Time::Moment" => "0.18"
   },
   "TEST_REQUIRES" => {
@@ -26,7 +28,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.88",
     "Test::Needs" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,11 +36,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Role::Tiny" => "2.000001",
   "Test::More" => "0.88",
   "Test::Needs" => 0,
+  "Time::Local" => 0,
   "Time::Moment" => "0.18"
 );
 

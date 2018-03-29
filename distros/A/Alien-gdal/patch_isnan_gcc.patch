@@ -1,0 +1,34 @@
+From f025c449fbb005896172b9dd8dfd83dd8dc6f040 Mon Sep 17 00:00:00 2001
+From: Shawn Laffan <shawnlaffan@gmail.com>
+Date: Mon, 11 Dec 2017 16:43:52 +1100
+Subject: [PATCH] Avoid perl binding failures due to isnan clash
+
+examples look like:
+
+C:\berrybrew\5.26.1_64_PDL\perl\lib\CORE/win32.h:361:16: error: '_isnan' is not a member of 'std'
+ #define isnan  _isnan /* ...same libraries as MSVC */
+                ^
+C:/shawn/git/perl-alien-gdal/blib/lib/auto/share/dist/Alien-gdal/include/cpl_port.h:661:51: note: in expansion of macro 'isnan'
+ static inline int CPLIsNan(float f) { return std::isnan(f); }
+                                                   ^
+                ^
+---
+ gdal/port/cpl_port.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gdal/port/cpl_port.h b/gdal/port/cpl_port.h
+index 2314238..6dc523a 100644
+--- a/port/cpl_port.h
++++ b/port/cpl_port.h
+@@ -634,7 +634,7 @@ static inline char* CPL_afl_friendly_strstr(const char* haystack, const char* ne
+ /*      function but no corresponding macro, but I can live with        */
+ /*      that since it isn't that important a test.                      */
+ /* -------------------------------------------------------------------- */
+-#ifdef _MSC_VER
++#if defined(WIN64) || defined(_MSC_VER)
+ #  include <float.h>
+ #  define CPLIsNan(x) _isnan(x)
+ #  define CPLIsInf(x) (!_isnan(x) && !_finite(x))
+-- 
+2.9.2.windows.1
+

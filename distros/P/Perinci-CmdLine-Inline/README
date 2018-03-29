@@ -2,8 +2,8 @@ NAME
     Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
 VERSION
-    This document describes version 0.541 of Perinci::CmdLine::Inline (from
-    Perl distribution Perinci-CmdLine-Inline), released on 2017-08-16.
+    This document describes version 0.542 of Perinci::CmdLine::Inline (from
+    Perl distribution Perinci-CmdLine-Inline), released on 2018-03-28.
 
 SYNOPSIS
      % gen-inline-pericmd-script /Perinci/Examples/gen_array -o gen-array
@@ -336,7 +336,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

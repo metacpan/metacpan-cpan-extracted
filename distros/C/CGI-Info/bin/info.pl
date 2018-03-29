@@ -6,9 +6,6 @@ use strict;
 
 use CGI::Info;
 
-print "Status: 200 OK\n",
-	"Content-type: text/plain\n\n";
-
 my $info = CGI::Info->new();
 
 my $tmpdir = $info->tmpdir();
@@ -21,6 +18,9 @@ my $is_robot = $info->is_robot();
 my $script_dir = $info->script_dir();
 my $rootdir = $info->rootdir();
 my $is_search_engine = $info->is_search_engine();
+
+print 'Status: ', $info->status(), "\n",
+	"Content-type: text/plain\n\n";
 
 print "Domain_name: $domain\n",
 	"Host_name: $host\n",

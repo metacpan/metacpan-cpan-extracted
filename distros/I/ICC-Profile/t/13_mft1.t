@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# ICC::Profile::mft1 test module / 2014-05-26
+# ICC::Profile::mft1 test module / 2018-03-27
 #
 # Copyright © 2004-2018 by William B. Birkett
 
@@ -43,6 +43,9 @@ ok($tag->size == $profile->tag_table->[9][2], 'tag size');
 
 # open temporary file for write-read access
 open($temp, '+>' . File::Spec->catfile('t', 'data', 'temp.dat'));
+
+# set binary mode
+binmode($temp);
 
 # write tag to temporary file
 $tag->write_fh($profile, $temp, $profile->tag_table->[9]);

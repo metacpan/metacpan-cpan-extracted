@@ -21,4 +21,4 @@ requires:
   LWP::Simple: '6.0'
   strict: '0'
   warnings: '0'
-version: '0.03'
+version: '0.05'

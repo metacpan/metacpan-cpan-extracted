@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use Test::Most tests => 28;
 use Test::NoWarnings;
+use lib 't/lib';
+use MyLogger;
 
 BEGIN {
 	use_ok('CGI::Info');
@@ -58,23 +60,4 @@ PARAM: {
 	ok($i->param('foo', logger => MyLogger->new()) eq 'bar');
 	ok($i->param('fred') eq 'wilma');
 	ok($i->as_string() eq 'foo=bar;fred=wilma');
-}
-
-# On some platforms it's failing - find out why
-package MyLogger;
-
-sub new {
-	my ($proto, %args) = @_;
-
-	my $class = ref($proto) || $proto;
-
-	return bless { }, $class;
-}
-
-sub debug {
-	my $self = shift;
-	my $message = shift;
-
-	# Enable this for debugging
-	# ::diag($message);
 }

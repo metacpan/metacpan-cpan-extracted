@@ -1,0 +1,30 @@
+Change log for Mail::AuthenticationResults
+
+1.20180328 2018-03-28 21:35:34+11:00 Australia/Melbourne
+        - Folding of headers rendered as string for
+          the Mail::AuthenticationResults::Header object.
+
+1.20180314 2018-03-14
+        - Correctly stringify zero
+        - Method to remove chindren from an instance
+
+1.20180215 2018-02-15
+        - Perl 5.8 compatability
+
+1.20180211 2018-02-11
+        - Test improvements
+        - Coverage improvements
+        - Stringify and validation improvements
+
+1.20180113 2018-01-13
+        - Added safe set methods
+        - General improvements
+
+1.20171230 2017-12-30
+        - Improve test suite
+        - Add search method
+        - Improve parser
+
+1.20171226 2017-12-26
+        - First Release, Module for handing Authentication-Results headers.
+

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.47';
+our $VERSION = '1.48';
 
 use Carp ();
 use DateTime;
@@ -274,9 +274,9 @@ sub subtract_duration { return $_[0]->add_duration( $_[1]->inverse ) }
 
 {
     my $check = validation_for(
-        name   => '_check_multiply_params',
-        slurpy => 1,
-        params => [
+        name             => '_check_multiply_params',
+        name_is_optional => 1,
+        params           => [
             { type => t('Int') },
         ],
     );
@@ -337,7 +337,7 @@ sub _multiply_overload {
 
     my $new = $self->clone;
 
-    return $new->multiply(@_);
+    return $new->multiply(shift);
 }
 
 sub _compare_overload {
@@ -362,7 +362,7 @@ DateTime::Duration - Duration objects for date math
 
 =head1 VERSION
 
-version 1.47
+version 1.48
 
 =head1 SYNOPSIS
 

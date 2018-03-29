@@ -1,5 +1,7 @@
 Revision history for cli-crosstable
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+1.01    2018-03-26 First version after implementing -/ option (for specifying input column delimiter).
+1.02    2018-03-27 Efficitizing within refactoring.
 
+1.03    2018-03-28 Ctrl+C response implemented. New options such as -/ -+ -, are implemented. -3 option is replaced by -+.
+1.031   2018-03-28 Perl select functions are employed to swtich the output handle while showing the intermediate result.

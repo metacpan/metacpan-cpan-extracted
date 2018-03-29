@@ -3,6 +3,7 @@ abstract: 'Gettext Support For the Template Toolkit Version 2'
 author:
   - 'Guido Flohr <guido.flohr@cantanea.com>'
 build_requires:
+  File::Spec: '0'
   Locale::XGettext::Util::Keyword: '0'
   Module::Build: '0.28'
   Test::More: '0'
@@ -33,5 +34,5 @@ resources:
   bugtracker: https://github.com/gflohr/Template-Plugin-Gettext/issues
   homepage: http://www.guido-flohr.net/en/projects#template-plugin-xgettext
   repository: git://github.com/gflohr/Template-Plugin-Gettext.git
-version: '0.4'
+version: '0.5'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -4,7 +4,7 @@
       "Menno Blom <blom@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.042, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.15",
+            "Dist::Milla" : "v1.0.18",
             "Test::Pod" : "1.41"
          }
       },
@@ -43,6 +43,7 @@
             "HTTP::Message" : "0",
             "JSON::MaybeXS" : "0",
             "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
             "Module::Load" : "0",
             "Net::OAuth" : "0",
             "Scalar::Util" : "0",
@@ -71,7 +72,7 @@
          "web" : "https://github.com/b10m/p5-Dancer2-Plugin-Auth-OAuth"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_contributors" : [
       "B10m <menno@b10m.net>",
       "Biafra <paulo.a.ferreira@gmail.com>",
@@ -79,6 +80,7 @@
       "Menno Blom <menno.blom@booking.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Peter Mottram (SysPete) <peter@sysnix.com>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

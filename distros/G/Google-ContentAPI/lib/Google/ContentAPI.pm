@@ -15,6 +15,7 @@
 #
 # VERSION HISTORY
 #
+# + v1.01       03/27/2018 Added config_json, merchant_id options and switched to Crypt::JWT
 # + v1.00       03/23/2018 initial release
 #
 # COPYRIGHT AND LICENSE
@@ -43,14 +44,11 @@ use warnings;
 use Carp;
 
 use JSON;
-use JSON::WebToken;
-use Crypt::OpenSSL::RSA;
+use Crypt::JWT qw(encode_jwt);
 use REST::Client;
 use HTML::Entities;
 
-use Data::Dumper;
-
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 sub new {
     my ($class, $params) = @_;
@@ -58,10 +56,14 @@ sub new {
 
     if ($params->{config_file}) {
         $self->{config} = load_google_config($params->{config_file});
-        $self->{merchant_id} = $self->{config}->{merchant_id};
+    } elsif ($params->{config_json}) {
+         $self->{config} = decode_json $params->{config_json};
     } else {
-      croak "config_file not provided in new()";
+      croak "config_file or config_json not provided in new()";
     }
+    $self->{merchant_id} = $self->{config}->{merchant_id}
+        || $params->{merchant_id}
+        || croak "'merchant_id' not provided in json config in new()";
 
     $self->{debug} = 1 if $params->{debug};
     $self->{google_auth_token} = get_google_auth_token($self);
@@ -101,7 +103,7 @@ sub prepare_method {
 
   if ($opt->{resource} eq 'products') {
     # add merchant ID to request URL for non-batch requests
-    $opt->{resource} = $self->{config}->{merchant_id} .'/'. $opt->{resource} if $opt->{method} ne 'batch';
+    $opt->{resource} = $self->{merchant_id} .'/'. $opt->{resource} if $opt->{method} ne 'batch';
     # drop list/insert methods; these are for coding convenience only
     $opt->{method} = '' if $opt->{method} eq 'list';
     $opt->{method} = '' if $opt->{method} eq 'insert';
@@ -165,13 +167,16 @@ sub get_google_auth_token {
     # 1) Create JSON Web Token
     # https://developers.google.com/accounts/docs/OAuth2ServiceAccount
     #
-    my $jwt = JSON::WebToken->encode({
+    my $jwt = encode_jwt(
+        payload => {
             iss => $self->{config}->{client_email},
             scope => $gapiContentScope,
             aud => $gapiTokenURI,
             exp => $time + 3660, # max 60 minutes
             iat => $time,
-        }, $self->{config}->{private_key}, 'RS256', {typ => 'JWT'}
+        },
+        key => \$self->{config}->{private_key},
+        alg => 'RS256',
     );
 
     # 2) Request an access token
@@ -223,9 +228,9 @@ __END__
   Your complete *.json file, after adding your merchant ID, will look something like this:
 
   {
-    "merchant_id": "120960455",
+    "merchant_id": "123456789",
     "type": "service_account",
-    "project_id": "content-api-test-197421",
+    "project_id": "content-api-194321",
     "private_key_id": "11b8e20c2540c788e98b49e623ae8167dc3e4a6f",
     "private_key": "-----BEGIN PRIVATE KEY-----
     ...
@@ -243,10 +248,11 @@ __END__
   use Google::ContentAPI;
   use Data::Dumper;
 
-  # get account auth info (merchantId)
   my $google = Google::ContentAPI->new({
       debug => 0,
-      config_file => 'content-api-key.json'
+      config_file => 'content-api-key.json',
+      config_json => $json_text,
+      merchant_id => '123456789',
   });
 
   my ($result, $products, $batch_id);
@@ -431,6 +437,31 @@ __END__
 
 =head1 METHODS AND FUNCTIONS
 
+=head2 new()
+
+  Create a new Google::ContentAPI object
+
+=head3 debug
+
+  Displays API debug information
+
+=head3 config_file
+
+  Path and filename of external .json config file.
+  Either config_file or config_json must be provided. If both config_file
+  and config_json are provided, config_file will be used.
+
+=head3 config_json
+
+  Text containing contents of the json config. Useful if you want to
+  store the json config in another resource such as a database.
+  Either config_file or config_json must be provided. If both config_file
+  and config_json are provided, config_file will be used.
+
+=head3 merchant_id
+
+  optional if merchant_id is specificed in json config
+
 =head2 ACCOUNTS
 
 =head3 authinfo
@@ -468,8 +499,7 @@ Certain API methods are not yet implemented (no current personal business need).
 =head1 PREREQUISITES
 
   JSON
-  JSON::WebToken
-  Crypt::OpenSSL::RSA
+  Crypt::JWT
   REST::Client
   HTML::Entities
 

@@ -761,7 +761,8 @@ sub _format_footnote {
         # multiple paragraphs separated by a blank line in a footnote.
         # However, this is going to fail with footnotes in the
         # headings, so we have to call \endgraf instead
-        $footnote =~ s/\\forcelinebreak /\\par /g;
+        # https://tex.stackexchange.com/questions/248620/footnote-of-several-paragraphs-length-to-section-title
+        $footnote =~ s/\\forcelinebreak /\\protect\\endgraf /g;
         if ($element->type eq 'secondary_footnote') {
             return '\footnoteB{' . $footnote . '}';
         }

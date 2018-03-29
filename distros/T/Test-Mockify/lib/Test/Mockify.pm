@@ -46,7 +46,7 @@ use Sub::Override;
 
 use strict;
 
-our $VERSION = '2.1';
+our $VERSION = '2.2';
 
 sub new {
     my $class = shift;
@@ -325,7 +325,7 @@ sub _overrideInternalFunction {
     my ($MethodName, $MockedMethodBody) = @_;
 
     my $FullyQualifiedMethodName = sprintf('%s::%s', $self->_mockedModulePath(), $MethodName);
-    $self->{'__override'}->replace($FullyQualifiedMethodName, $MockedMethodBody);
+    $self->_replaceWithPrototype($FullyQualifiedMethodName, $self->$MockedMethodBody);
 
     return;
 }
@@ -333,7 +333,22 @@ sub _overrideInternalFunction {
 sub _overrideExternalFunction {
     my $self = shift;
     my ($FullyQualifiedMethodName, $MockedMethodBody) = @_;
-    $self->{'__override'}->replace($FullyQualifiedMethodName, $MockedMethodBody);
+    $self->_replaceWithPrototype($FullyQualifiedMethodName, $MockedMethodBody);
+    return;
+}
+#----------------------------------------------------------------------------------------
+sub _replaceWithPrototype {
+    my $self = shift;
+    my ($FullyQualifiedMethodName, $Sub) = @_;
+    Error ('not a code ref ') unless ref $Sub eq 'CODE';
+    my $Prototype = prototype($FullyQualifiedMethodName);
+    if($Prototype){
+        my $SubWithPrototype =  eval( 'return sub ('. $Prototype .') {$Sub->(@_)}'); ## no critic (ProhibitStringyEval RequireInterpolationOfMetachars ) This is the only dynamic way to add the prototype
+        Error($@, {'Error in eval, line' => __LINE__ - 1}) if($@); # Rethrow error if something went wrong in the eval. (For debugging)
+        $self->{'__override'}->replace($FullyQualifiedMethodName, $SubWithPrototype);
+        return;
+    }
+    $self->{'__override'}->replace($FullyQualifiedMethodName, $Sub);
     return;
 }
 #----------------------------------------------------------------------------------------
@@ -352,10 +367,8 @@ sub _addImportedMock {
         $self->{'MethodStore'}{$MethodName} = $Method;
         my $MockedSelf = $self->_mockedSelf();
         my $MockedMethodBody = $self->_buildMockSub($MockedSelf, $MethodName, $Method);
-        $self->{'__override'}->replace(
-            sprintf ('%s::%s', $self->_mockedModulePath(), $self->{'IsImportedMockStore'}{$MethodName}->{'MethodName'}),
-            $MockedMethodBody
-        );
+        my $FullyQualifiedMethodName = sprintf ('%s::%s', $self->_mockedModulePath(), $self->{'IsImportedMockStore'}{$MethodName}->{'MethodName'});
+        $self->_replaceWithPrototype( $FullyQualifiedMethodName, $MockedMethodBody );
     }
     return $self->{'MethodStore'}{$MethodName};
 }

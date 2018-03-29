@@ -16,7 +16,7 @@ MOBILE: {
 	my $i = new_ok('CGI::Info');
 	ok($i->is_mobile() == 0);
 
-	$ENV{'HTTP_X_WAP_PROFILE'} = 'http://www.blackberry.net/go/mobile/profiles/uaprof/9000_80211g/5.0.0.rdf';;
+	$ENV{'HTTP_X_WAP_PROFILE'} = 'http://www.blackberry.net/go/mobile/profiles/uaprof/9000_80211g/5.0.0.rdf';
 	$i = new_ok('CGI::Info');
 	ok($i->is_mobile() == 1);
 	ok($i->browser_type eq 'mobile');

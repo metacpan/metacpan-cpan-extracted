@@ -2,7 +2,7 @@ package Finance::Currency::Convert::ECBdaily;
 
 use vars qw/$VERSION $DATE $CHAT %currencies/;
 
-$VERSION = 0.03;
+$VERSION = 0.05;
 $DATE = "01 March 2018";
 
 =head1 NAME
@@ -43,61 +43,17 @@ $CHAT = 0;		# Set for real-time notes to STDERR
 
 # Should have been %CURRENCIES but too late now.
 our %CURRENCIES = %currencies = (
-	'AFA'=>'Afghanistan Afghani', 		'ALL'=>'Albanian Lek', 				'DZD'=>'Algerian Dinar',
-	'ADF'=>'Andorran Franc', 			'ADP'=>'Andorran Peseta', 			'ARS'=>'Argentine Peso',
-	'AWG'=>'Aruba Florin', 				'AUD'=>'Australian Dollar', 		'ATS'=>'Austrian Schilling',
-	'BSD'=>'Bahamian Dollar', 			'BHD'=>'Bahraini Dinar', 			'BDT'=>'Bangladesh Taka',
-	'BBD'=>'Barbados Dollar', 			'BEF'=>'Belgian Franc', 			'BZD'=>'Belize Dollar',
-	'BMD'=>'Bermuda Dollar', 			'BTN'=>'Bhutan Ngultrum', 			'BOB'=>'Bolivian Boliviano',
-	'BWP'=>'Botswana Pula', 			'BRL'=>'Brazilian Real', 			'GBP'=>'British Pound',
-	'BND'=>'Brunei Dollar', 			'BIF'=>'Burundi Franc', 			'XOF'=>'CFA Franc (BCEAO)',
-	'XAF'=>'CFA Franc (BEAC)', 			'KHR'=>'Cambodia Riel', 			'CAD'=>'Canadian Dollar',
-	'CVE'=>'Cape Verde Escudo', 		'KYD'=>'Cayman Islands Dollar', 	'CLP'=>'Chilean Peso',
-	'CNY'=>'Chinese Yuan', 				'COP'=>'Colombian Peso', 			'KMF'=>'Comoros Franc',
-	'CRC'=>'Costa Rica Colon', 			'HRK'=>'Croatian Kuna', 			'CUP'=>'Cuban Peso',
-	'CYP'=>'Cyprus Pound', 				'CZK'=>'Czech Koruna', 				'DKK'=>'Danish Krone',
-	'DJF'=>'Dijibouti Franc', 			'DOP'=>'Dominican Peso', 			'NLG'=>'Dutch Guilder',
-	'XCD'=>'East Caribbean Dollar', 	'ECS'=>'Ecuadorian Sucre', 			'EGP'=>'Egyptian Pound',
-	'SVC'=>'El Salvador Colon', 		'EEK'=>'Estonian Kroon', 			'ETB'=>'Ethiopian Birr',
-	'EUR'=>'Euro', 						'FKP'=>'Falkland Islands Pound',	'FJD'=>'Fiji Dollar',
-	'FIM'=>'Finnish Mark', 				'FRF'=>'French Franc', 				'GMD'=>'Gambian Dalasi',
-	'DEM'=>'German Mark', 				'GHC'=>'Ghanian Cedi', 				'GIP'=>'Gibraltar Pound',
-	'XAU'=>'Gold Ounces', 				'GRD'=>'Greek Drachma', 			'GTQ'=>'Guatemala Quetzal',
-	'GNF'=>'Guinea Franc', 				'GYD'=>'Guyana Dollar', 			'HTG'=>'Haiti Gourde',
-	'HNL'=>'Honduras Lempira', 			'HKD'=>'Hong Kong Dollar', 			'HUF'=>'Hungarian Forint',
-	'ISK'=>'Iceland Krona', 			'INR'=>'Indian Rupee', 				'IDR'=>'Indonesian Rupiah',
-	'IQD'=>'Iraqi Dinar', 				'IEP'=>'Irish Punt', 				'ILS'=>'Israeli Shekel',
-	'ITL'=>'Italian Lira', 				'JMD'=>'Jamaican Dollar', 			'JPY'=>'Japanese Yen',
-	'JOD'=>'Jordanian Dinar', 			'KZT'=>'Kazakhstan Tenge', 			'KES'=>'Kenyan Shilling',
-	'KRW'=>'Korean Won', 				'KWD'=>'Kuwaiti Dinar', 			'LAK'=>'Lao Kip', 	'LVL'=>'Latvian Lat',
-	'LBP'=>'Lebanese Pound', 			'LSL'=>'Lesotho Loti', 				'LRD'=>'Liberian Dollar',
-	'LYD'=>'Libyan Dinar', 				'LTL'=>'Lithuanian Lita', 			'LUF'=>'Luxembourg Franc',
-	'MOP'=>'Macau Pataca', 				'MKD'=>'Macedonian Denar', 			'MGF'=>'Malagasy Franc',
-	'MWK'=>'Malawi Kwacha', 			'MYR'=>'Malaysian Ringgit', 		'MVR'=>'Maldives Rufiyaa',
-	'MTL'=>'Maltese Lira', 				'MRO'=>'Mauritania Ougulya', 		'MUR'=>'Mauritius Rupee',
-	'MXN'=>'Mexican Peso', 				'MDL'=>'Moldovan Leu', 				'MNT'=>'Mongolian Tugrik',
-	'MAD'=>'Moroccan Dirham', 			'MZM'=>'Mozambique Metical', 		'MMK'=>'Myanmar Kyat',
-	'NAD'=>'Namibian Dollar', 			'NPR'=>'Nepalese Rupee', 			'ANG'=>'Neth Antilles Guilder',
-	'NZD'=>'New Zealand Dollar', 		'NIO'=>'Nicaragua Cordoba', 		'NGN'=>'Nigerian Naira',
-	'KPW'=>'North Korean Won', 			'NOK'=>'Norwegian Krone', 			'OMR'=>'Omani Rial',
-	'XPF'=>'Pacific Franc', 			'PKR'=>'Pakistani Rupee', 			'XPD'=>'Palladium Ounces',
-	'PAB'=>'Panama Balboa', 			'PGK'=>'Papua New Guinea Kina', 	'PYG'=>'Paraguayan Guarani',
-	'PEN'=>'Peruvian Nuevo Sol', 		'PHP'=>'Philippine Peso', 			'XPT'=>'Platinum Ounces',
-	'PLN'=>'Polish Zloty', 				'PTE'=>'Portuguese Escudo', 		'QAR'=>'Qatar Rial',
-	'ROL'=>'Romanian Leu', 				'RUB'=>'Russian Rouble', 			'WST'=>'Samoa Tala',
-	'STD'=>'Sao Tome Dobra', 			'SAR'=>'Saudi Arabian Riyal', 		'SCR'=>'Seychelles Rupee',
-	'SLL'=>'Sierra Leone Leone', 		'XAG'=>'Silver Ounces', 			'SGD'=>'Singapore Dollar',
-	'SKK'=>'Slovak Koruna', 			'SIT'=>'Slovenian Tolar', 			'SBD'=>'Solomon Islands Dollar',
-	'SOS'=>'Somali Shilling', 			'ZAR'=>'South African Rand', 		'ESP'=>'Spanish Peseta',
-	'LKR'=>'Sri Lanka Rupee', 			'SHP'=>'St Helena Pound', 			'SDD'=>'Sudanese Dinar',
-	'SRG'=>'Surinam Guilder', 			'SZL'=>'Swaziland Lilageni', 		'SEK'=>'Swedish Krona',
-	'CHF'=>'Swiss Franc', 				'SYP'=>'Syrian Pound', 				'TWD'=>'Taiwan Dollar',
-	'TZS'=>'Tanzanian Shilling', 		'THB'=>'Thai Baht', 				'TOP'=>"Tonga Pa'anga",
-	'TTD'=>'Trinida and Tobago Dollar', 'TND'=>'Tunisian Dinar', 			'TRY'=>'Turkish Lira',
-	'USD'=>'US Dollar', 				'AED'=>'UAE Dirham', 				'UGX'=>'Ugandan Shilling',
-	'UAH'=>'Ukraine Hryvnia', 			'UYU'=>'Uruguayan New Peso',		'VUV'=>'Vanuatu Vatu',
-	'VEB'=>'Venezuelan Bolivar', 		'VND'=>'Vietnam Dong', 				'YER'=>'Yemen Riyal',
-	'YUM'=>'Yugoslav Dinar', 			'ZMK'=>'Zambian Kwacha', 			'ZWD'=>'Zimbabwe Dollar'
+	'USD'=>'US Dollar',			 'JPY'=>'Japanese Yen',			'BGN'=>'Bulgarian Lev equals',
+	'CZK'=>'Czech Koruna',		 'DKK'=>'Danish Krone',			'GBP'=>'British Pound',
+	'HUF'=>'Hungarian Forint',	 'PLN'=>'Polish Zloty',			'RON'=>'Romanian Leu',
+	'SEK'=>'Swedish Krona',		 'CHF'=>'Swiss Franc',			'ISK'=>'Iceland Krona',
+	'NOK'=>'Norwegian Krone', 	 'HRK'=>'Croatian Kuna',		'RUB'=>'Russian Rouble',
+	'TRY'=>'Turkish Lira',		 'AUD'=>'Australian Dollar',	'BRL'=>'Brazilian Real',
+	'CAD'=>'Canadian Dollar',	 'CNY'=>'Chinese Yuan',			'HKD'=>'Hong Kong Dollar',
+	'IDR'=>'Indonesian Rupiah',  'ILS'=>'Israeli Shekel',		'INR'=>'Indian Rupee',
+	'KRW'=>'Korean Won',		 'MXN'=>'Mexican Peso',			'MYR'=>'Malaysian Ringgit',
+	'NZD'=>'New Zealand Dollar', 'PHP'=>'Philippine Peso',		'SGD'=>'Singapore Dollar',
+	'THB'=>'Thai Baht',			 'ZAR'=>'South African Rand',	'EUR'=>'Euro'
 );
 
 
@@ -130,15 +86,15 @@ and target currencies, and the rest is stuff I've not looked into....
 sub convert { 
 	my ($amount, $from, $to) = (shift,shift,shift);
 
-	die "Please call as ...::convert(\$amount,\$from,\$to) " unless (defined $amount and defined $from and defined $to);
-	carp "No such currency code as <$from>." and return undef if not exists $currencies{$from};
-	carp "No such currency code as <$to>." and return undef if not exists $currencies{$to};
-	carp "Please supply a positive sum to convert <received $amount>." and return undef if $amount<0;
-	warn "Converting <$amount> from <$from> to <$to> " if $CHAT;
+	die "\nPlease call as ...::convert(\$amount,\$from,\$to) " unless (defined $amount and defined $from and defined $to);
+	carp "\nNo such currency code as <$from>." and return undef if not exists $currencies{$from};
+	carp "\nNo such currency code as <$to>." and return undef if not exists $currencies{$to};
+	carp "\nPlease supply a positive sum to convert <received $amount>." and return undef if $amount<0;
+	warn "\nConverting <$amount> from <$from> to <$to> " if $CHAT;
 
 	my ($value);
 	for my $attempt (0..3){
-		warn "Attempt $attempt ...\n" if $CHAT;
+		warn "\nAttempt $attempt ...\n" if $CHAT;
 		$value = _get_document_xml($amount,$from,$to);
 		# Can't really say "last if defined $doc" as $doc may be a ECBdaily 404-like error?
 		last if defined $value;
@@ -159,7 +115,7 @@ sub _get_document_xml {
 	die "get_document requires a \$amount,\$from_currency,\$target_currency arrity" unless (defined $amount and defined $to and defined $from);
 
 	my $url = 'https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml';
-	warn "Attempting to access <$url> ...\n" if $CHAT;
+	warn "\nAttempting to access <$url> ...\n" if $CHAT;
 
 	my $content = get $url or die "Unable to get $url\n";
 
@@ -196,7 +152,7 @@ sub _get_rate {
 
 	$r =~ s/^\s*([\d.]+)\s*$/$1/sg;
 	if ($r eq ''){
-		warn "...document contained no data/unexpected data for $cur\n";
+		warn "\n...document contained no data/unexpected data for $cur\n";
 		return undef;
 	}	
 

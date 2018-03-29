@@ -1,0 +1,22 @@
+<SOFTPKG NAME="Lingua-Norms-SUBTLEX" VERSION="0.06">
+    <ABSTRACT>Retrieve word frequencies and related values and lists from subtitles corpora</ABSTRACT>
+    <AUTHOR>Roderick Garton &lt;rgarton@cpan.org&gt;</AUTHOR>
+    <IMPLEMENTATION>
+        <REQUIRE NAME="Config::" VERSION="5.020002" />
+        <REQUIRE NAME="English::" VERSION="1.10" />
+        <REQUIRE NAME="File::RandomLine" VERSION="0.20" />
+        <REQUIRE NAME="File::Spec" VERSION="3.63_01" />
+        <REQUIRE NAME="Lingua::Orthon" VERSION="0.03" />
+        <REQUIRE NAME="List::AllUtils" VERSION="0.14" />
+        <REQUIRE NAME="Number::Misc" VERSION="1.2" />
+        <REQUIRE NAME="Path::Tiny" VERSION="0.104" />
+        <REQUIRE NAME="Readonly::" VERSION="1.03" />
+        <REQUIRE NAME="Statistics::Lite" VERSION="3.62" />
+        <REQUIRE NAME="String::Trim" VERSION="0.005" />
+        <REQUIRE NAME="String::Util" VERSION="1.26" />
+        <REQUIRE NAME="Text::CSV::Hashify" VERSION="0.08" />
+        <REQUIRE NAME="Text::CSV::Separator" VERSION="0.20" />
+        <REQUIRE NAME="Text::Unidecode" VERSION="1.30" />
+        <CODEBASE HREF="PPM-Lingua-Norms-SUBTLEX-0.06.tar.gz" />
+    </IMPLEMENTATION>
+</SOFTPKG>

@@ -1,5 +1,9 @@
 Revision history for Pandoc Perl module
 
+0.7.0  2018-03-26 22:31:51 CEST
+    - Add Pandoc::Release
+    - fix bug when calling with uneven number of arguments (#22)
+
 0.6.1  2017-10-17 20:43:51 CEST
     - make sure to override existing options and output destination (#16)
 

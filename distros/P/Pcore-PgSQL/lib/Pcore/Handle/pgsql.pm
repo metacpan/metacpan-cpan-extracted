@@ -7,7 +7,7 @@ use Pcore -class, -const, -result,
   };
 use Pcore::Handle::DBI::Const qw[:CONST];
 use Pcore::Util::Scalar qw[looks_like_number is_plain_arrayref is_blessed_arrayref];
-use Pcore::Util::UUID qw[uuid_str];
+use Pcore::Util::UUID qw[uuid_v1mc_str];
 use Pcore::Util::Data qw[to_json];
 
 with qw[Pcore::Handle::DBI];
@@ -142,7 +142,7 @@ sub prepare ( $self, $query ) {
     }
 
     my $sth = bless {
-        id    => uuid_str,
+        id    => uuid_v1mc_str,
         query => $query,
       },
       'Pcore::Handle::DBI::STH';

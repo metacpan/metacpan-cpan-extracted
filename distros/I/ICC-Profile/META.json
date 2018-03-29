@@ -88,7 +88,7 @@
       },
       "ICC::Profile::cvst" : {
          "file" : "lib/ICC/Profile/cvst.pm",
-         "version" : "0.3"
+         "version" : "0.31"
       },
       "ICC::Profile::data" : {
          "file" : "lib/ICC/Profile/data.pm",
@@ -176,7 +176,7 @@
       },
       "ICC::Support::Chart" : {
          "file" : "lib/ICC/Support/Chart.pm",
-         "version" : "1.69"
+         "version" : "1.7"
       },
       "ICC::Support::Color" : {
          "file" : "lib/ICC/Support/Color.pm",
@@ -239,6 +239,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.603",
+   "version" : "0.604",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

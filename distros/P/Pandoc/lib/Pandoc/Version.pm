@@ -11,7 +11,7 @@ Pandoc::Version - version number of pandoc and its libraries
 
 =cut
 
-our $VERSION = '0.6.1';
+our $VERSION = '0.7.0';
 
 use overload '""' => 'string', '0+' => 'number', 
     cmp => 'cmp', '<=>' => 'cmp', fallback => 1;
@@ -164,5 +164,7 @@ Return an array reference of the version number to serialize in JSON format.
 L<version> is a similar module for Perl version numbers.
 
 L<SemVer> extends versions to Semantic Versioning as described at L<http://semver.org/>.
+
+L<Pandoc::Release> to get information about and download pandoc releases.
 
 =cut
