@@ -16,6 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Config::Model" : "2.118",
             "Module::Build" : "0.34"
          }
       },
@@ -30,7 +31,7 @@
             "Config::Model::TkUI" : "0"
          },
          "requires" : {
-            "Config::Model" : "2.111",
+            "Config::Model" : "2.118",
             "Config::Model::Backend::Any" : "0",
             "Config::Model::Backend::IniFile" : "0",
             "Log::Log4perl" : "0",
@@ -61,7 +62,7 @@
          "web" : "http://github.com/dod38fr/config-model-systemd"
       }
    },
-   "version" : "0.236.1",
+   "version" : "0.238.1",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

@@ -3,9 +3,9 @@ package ICC::Support::Chart;
 use strict;
 use Carp;
 
-our $VERSION = 1.70;
+our $VERSION = 1.71;
 
-# revised 2018-03-28
+# revised 2018-03-29
 #
 # Copyright © 2004-2018 by William B. Birkett
 
@@ -7177,11 +7177,8 @@ sub _readChart {
 	# read start of file
 	read($fh, $buf, 1024);
 
-	# close file
-	close($fh);
-
-	# re-open the file in text mode (read-only)
-	open($fh, '<', $path) || return("$! when opening $path");
+	# reset file pointer
+	seek($fh, 0, 0);
 
 	# if an ASE file
 	if ($buf =~ m/^ASEF/) {
@@ -7299,9 +7296,6 @@ sub _readChartASCII {
 	$index = 1;
 	$state = 0;
 	$iflag = 0;
-
-	# reset file pointer
-	seek($fh, 0, 0);
 
 	# read the file, line by line
 	while (<$fh>) {
@@ -7517,9 +7511,6 @@ sub _readChartASE {
 	# get little-endian flag
 	$le = ($Config{'byteorder'} =~ m/1234/);
 
-	# set binary mode
-	binmode($fh);
-
 	# read header (file signature, version, number of blocks)
 	read($fh, $buf, 12);
 
@@ -7722,9 +7713,6 @@ sub _readChartICC {
 
 	# load ICC::Profile modules, if not already included
 	require ICC::Profile;
-
-	# set binary mode
-	binmode($fh);
 
 	# read the profile header
 	ICC::Profile::_readICCheader($fh, \@header) || return('failed reading ICC profile header');
@@ -8218,9 +8206,6 @@ sub _readChartSS3 {
 		[qw(Notes ACQUIRE_NOTE P)],
 	];
 
-	# set binary mode
-	binmode($fh);
-
 	# read version, samples, Collection Notes length
 	read($fh, $buf, 7);
 
@@ -8432,9 +8417,6 @@ sub _readChartTIFF {
 	my ($trows, $tcols, $crop, $roff, $coff);
 	my ($res, $size, $frac, $ratio, $rxo, $cxo, $pixels, $width);
 	my ($lower, $upper, $left, $right, $band, $pval, @data, @pix);
-
-	# set binary mode
-	binmode($fh);
 
 	# read the header
 	read($fh, $buf, 8);

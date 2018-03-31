@@ -3,7 +3,23 @@ use Test::Alien;
 use Alien::libuv;
 
 alien_ok 'Alien::libuv';
-xs_ok do { local $/; <DATA> }, with_subtest {
+# Some options behave differently on Windows
+sub WINLIKE () {
+    return 1 if $^O eq 'MSWin32';
+    #return 1 if $^O eq 'cygwin';
+    return 1 if $^O eq 'msys';
+    return '';
+}
+
+my $xs = {xs => do { local $/; <DATA> },};
+
+if (WINLIKE) {
+    $xs->{cbuilder_compile} = {
+        extra_compiler_flags => ['-D_WIN32_WINNT=0x0600'],
+    };
+}
+
+xs_ok $xs, with_subtest {
   my $version = UVTest::uv_version_string();
   ok $version, 'version returns okay';
   note "version=$version";
@@ -22,5 +38,3 @@ MODULE = UVTest PACKAGE = UVTest
 
 const char *
 uv_version_string()
-
-

@@ -4,6 +4,7 @@ author:
   - 'Jonas Smedegaard (JONASS) <jonass@cpan.org>'
 build_requires:
   Regexp::Pattern: '0'
+  Test::Builder::Module: '0'
   Test::Exception: '0'
   Test::More: '0.98'
 configure_requires:
@@ -29,10 +30,10 @@ optional_features: {}
 provides:
   Regexp::Pattern::License:
     file: lib/Regexp/Pattern/License.pm
-    version: v3.1.0
+    version: v3.1.90
   Regexp::Pattern::License::Parts:
     file: lib/Regexp/Pattern/License/Parts.pm
-    version: v3.1.0
+    version: v3.1.90
 requires:
   perl: '5'
   strictures: '2'
@@ -42,7 +43,7 @@ resources:
   homepage: https://metacpan.org/release/Regexp-Pattern-License
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: https://anonscm.debian.org/git/build-common/regexp-pattern-license.git
-version: v3.1.0
+version: v3.1.90
 x_help_wanted:
   - documenter
   - tester

@@ -31,11 +31,11 @@ App::Licensecheck - functions for a simple license checker for source files
 
 =head1 VERSION
 
-Version v3.0.33
+Version v3.0.34
 
 =cut
 
-our $VERSION = version->declare("v3.0.33");
+our $VERSION = version->declare("v3.0.34");
 
 =head1 SYNOPSIS
 
@@ -54,6 +54,9 @@ to check for licenses of source files.
 See the script for casual usage.
 
 =cut
+
+# TODO: make naming scheme configurable
+my %L = licensepatterns(qw(debian spdx));
 
 my $under_terms_of
 	= qr/(?:(?:Licensed|released) under|(?:according to|under) the (?:conditions|terms) of)/i;
@@ -313,9 +316,15 @@ sub clean_comments
 	# Remove generic comments: look for 4 or more lines beginning with
 	# regular comment pattern and trim it. Fall back to old algorithm
 	# if no such pattern found.
-	my @matches = m/^[ \t]*([^a-zA-Z0-9\s]{1,3}|\bdnl\b|\bREM\b)[ \t]+\S/mg;
+	my @matches = m/^[ \t]*([^a-zA-Z0-9\s]{1,3})[ \t]+\S/mg;
 	if ( @matches >= 4 ) {
 		my $comment_re = qr/[ \t]*[\Q$matches[0]\E]{1,3}[ \t]*/;
+		s/^$comment_re//mg;
+	}
+
+	my @wordmatches = m/^[ \t]*(dnl|REM|COMMENT)[ \t]+\S/mg;
+	if ( @wordmatches >= 4 ) {
+		my $comment_re = qr/[ \t]*\Q$wordmatches[0]\E[ \t]*/;
 		s/^$comment_re//mg;
 	}
 
@@ -360,29 +369,35 @@ sub clean_cruft_and_spaces
 
 sub licensepatterns
 {
-	my $org = shift;
+	my @org = @_;
 
 	my %list;
 
-	while ( my ( $key, $val ) = each %Regexp::Pattern::License::RE ) {
-		if ($org) {
-			$list{name}{$key}    = $val->{ 'name.alt.org.' . $org };
-			$list{caption}{$key} = $val->{ 'caption.alt.org.' . $org };
+	for my $key ( grep {/^[a-z]/} keys(%Regexp::Pattern::License::RE) ) {
+		my $val = $Regexp::Pattern::License::RE{$key};
+		for (@org) {
+			$list{name}{$key}    ||= $val->{"name.alt.org.$_"};
+			$list{caption}{$key} ||= $val->{"caption.alt.org.$_"};
 		}
 		$list{name}{$key} ||= $val->{name} || $key;
 		$list{caption}{$key} ||= $val->{caption} || $val->{name} || $key;
 		$list{re}{$key} = re( 'License::' . $key );
-		for ( map {/^type:([^:]+(?::[^:]+)?)$/} @{ $val->{tags} } ) {
-			push @{ $list{type}{$_} }, $key;
-		}
-		for ( map {/^family:([^:]+)/} @{ $val->{tags} } ) {
-			push @{ $list{family}{$_} }, $key;
+		$list{re}{$key} = qr/$list{re}{$key}/
+			unless ( ref( $list{re}{$key} ) eq 'Regexp' );
+		for ( @{ $val->{tags} } ) {
+			/^(family|type):([a-z][a-z0-9_]*)(?::([a-z][a-z0-9_]*))?/;
+			$list{family}{$2}{$key} = 1
+				if ( $2 and $1 eq 'family' );
+			$list{type}{$2}{$key} = 1
+				if ( $2 and $1 eq 'type' );
+			$list{series}{$key} = $3
+				if ( $3 and $1 eq 'type' and $2 eq 'singleversion' );
 		}
 	}
 
 	# TODO: use Regexp::Common
 	$list{re}{version}{'-keep'}
-		= qr/$list{re}{version_prefix}?($list{re}{version_number})/i;
+		= qr/(?:$list{re}{version_prefix})?($list{re}{version_number})/i;
 	$list{re}{xgpl}{'-keep'} = qr/(?:the )?(?:GNU )?([AL]?GPL)/i;
 
 	return %list;
@@ -397,9 +412,6 @@ sub parse_license
 	my $extrainfo = "";
 	my $license   = "";
 	my @spdx_gplver;
-
-	# TODO: make naming scheme configurable
-	my %L = licensepatterns('debian');
 
 	my @custom_done = ();
 
@@ -612,12 +624,12 @@ sub parse_license
 
 	# CC
 	given ($licensetext) {
-		foreach my $id ( @{ $L{family}{cc} } ) {
+		foreach my $id ( keys %{ $L{family}{cc} } ) {
 			when ( /$L{re}{$id}(?i: version)? ($L{re}{version_number}) or ($L{re}{version_number})/i ) {
 				$license = "$L{caption}{$id} (v$1 or v$2) $license";
 				push @spdx_license, "$L{name}{$id}-$1 or $L{name}{$id}-$1";
 			}
-			when ( /$L{re}{$id}(?: $L{re}{version}{-keep}?)(?: License)?($L{re}{version_later})?(?:,? (?:and|or) $L{re}{xgpl}{-keep}(?:-?($L{re}{version_number})(,? $L{re}{version_later_postfix})?)?)?/i ) {
+			when ( /$L{re}{$id}(?: (?:$L{re}{version}{-keep})?)(?: License)?($L{re}{version_later})?(?:,? (?:and|or) $L{re}{xgpl}{-keep}(?:-?($L{re}{version_number})(,? $L{re}{version_later_postfix})?)?)?/i ) {
 				$gen_license->( $id, $1, $2, $3, $4 );
 			}
 		}
@@ -651,10 +663,10 @@ sub parse_license
 
 	# Artistic
 	given ($licensetext) {
-		when ( /$L{re}{perl}/ ) {
+		when ( $L{re}{perl} ) {
 			$gen_license->('perl');
 		}
-		when ( /$L{re}{artistic_2}/ ) {
+		when ( $L{re}{artistic_2} ) {
 			$gen_license->('artistic_2');
 		}
 		when ( /$L{re}{artistic}(?:,? $L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?)?/ ) {
@@ -667,7 +679,7 @@ sub parse_license
 	given ($licensetext) {
 
 		# skip referenced license
-		when (/$L{re}{rpsl}/) {
+		when ($L{re}{rpsl}) {
 			break;
 		}
 
@@ -732,22 +744,22 @@ sub parse_license
 
 	# CECILL
 	given ($licensetext) {
-		when ( /$L{re}{cecill_1}/ ) {
+		when ( $L{re}{cecill_1} ) {
 			$gen_license->('cecill_1');
 		}
-		when ( /$L{re}{cecill_1_1}/ ) {
+		when ( $L{re}{cecill_1_1} ) {
 			$gen_license->('cecill_1_1');
 		}
-		when ( /$L{re}{cecill_2}/ ) {
+		when ( $L{re}{cecill_2} ) {
 			$gen_license->('cecill_2');
 		}
-		when ( /$L{re}{cecill_2_1}/ ) {
+		when ( $L{re}{cecill_2_1} ) {
 			$gen_license->('cecill_2_1');
 		}
-		when ( /$L{re}{cecill_b}/ ) {
+		when ( $L{re}{cecill_b} ) {
 			$gen_license->('cecill_b');
 		}
-		when ( /$L{re}{cecill_c}/ ) {
+		when ( $L{re}{cecill_c} ) {
 			$gen_license->('cecill_c');
 		}
 		when ( /$L{re}{cecill}(?:(?:-|\s*$L{re}{version_prefix})($L{re}{version_number}))?/ ) {
@@ -789,13 +801,25 @@ sub parse_license
 
 	given ($licensetext) {
 
+		# singleversion
+		foreach my $id ( sort keys %{ $L{type}{singleversion} } ) {
+			next if ( grep { $id eq $_ } @custom_done );
+
+			when ( $L{re}{$id} ) {
+				$gen_license->($id);
+				push @custom_done, $L{series}{$id}
+					if ( $L{series}{$id} );
+				continue;
+			}
+		}
+
 		# versioned
-		foreach my $id ( @{ $L{type}{'versioned:decimal'} } ) {
-			next if ( grep {/^$id$/} @custom_done );
+		foreach my $id ( keys %{ $L{type}{versioned} } ) {
+			next if ( grep { $id eq $_ } @custom_done );
 
 			# skip embedded or referenced licenses
-			if ( grep {/^$id$/} qw(mpl python) ) {
-				next if $licensetext =~ /$L{re}{rpsl}/;
+			if ( grep { $id eq $_ } qw(mpl python) ) {
+				next if $licensetext =~ $L{re}{rpsl};
 			}
 
 			when (
@@ -808,22 +832,22 @@ sub parse_license
 		}
 
 		# unversioned
-		foreach my $id ( @{ $L{type}{unversioned} } ) {
-			next if ( grep {/^$id$/} @custom_done );
+		foreach my $id ( keys %{ $L{type}{unversioned} } ) {
+			next if ( grep { $id eq $_ } @custom_done );
 
 			# skip embedded or referenced licenses
-			if ( grep {/^$id$/} qw(zlib) ) {
-				next if $licensetext =~ /$L{re}{cube}/;
+			if ( grep { $id eq $_ } qw(zlib) ) {
+				next if $licensetext =~ $L{re}{cube};
 			}
-			if ( grep {/^$id$/} qw(ntp) ) {
-				next if $licensetext =~ /$L{re}{ntp_disclaimer}/;
-				next if $licensetext =~ /$L{re}{dsdp}/;
+			if ( grep { $id eq $_ } qw(ntp) ) {
+				next if $licensetext =~ $L{re}{ntp_disclaimer};
+				next if $licensetext =~ $L{re}{dsdp};
 			}
-			if ( grep {/^$id$/} qw(ntp_disclaimer) ) {
-				next if $licensetext =~ /$L{re}{mit_cmu}/;
+			if ( grep { $id eq $_ } qw(ntp_disclaimer) ) {
+				next if $licensetext =~ $L{re}{mit_cmu};
 			}
 
-			when (/$L{re}{$id}/) {
+			when ( $L{re}{$id} ) {
 				$gen_license->($id);
 				continue;
 			}

@@ -4,26 +4,29 @@ package Data::Record::Serialize::Encode::rdb;
 
 use Moo::Role;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
-before BUILD => sub {
-
-    my $self = shift;
-
-    $self->_set__use_integer( 0 );
-    $self->_set__map_types( { N => 'N', I => 'N', S => 'S' } );
-
-    $self->_set__needs_eol( 1 );
-
-};
+has '+_need_types' => (
+    is      => 'rwp',
+    default => 1,
+);
+has '+_use_integer' => (
+    is      => 'rwp',
+    default => 0,
+);
+has '+_map_types' => (
+    is      => 'rwp',
+    default => sub { { N => 'N', I => 'N', S => 'S' } },
+);
+has '+_needs_eol' => (
+    is      => 'rwp',
+    default => 1,
+);
 
 use namespace::clean;
 
-#pod =begin pod_coverage
-#pod
-#pod =head3 setup
-#pod
-#pod =end pod_coverage
+#pod =for Pod::Coverage
+#pod   setup
 #pod
 #pod =cut
 
@@ -36,11 +39,8 @@ sub setup {
 
 }
 
-#pod =begin pod_coverage
-#pod
-#pod =head3 encode
-#pod
-#pod =end pod_coverage
+#pod =for Pod::Coverage
+#pod  encode
 #pod
 #pod =cut
 
@@ -55,6 +55,18 @@ with 'Data::Record::Serialize::Role::Encode';
 
 1;
 
+#
+# This file is part of Data-Record-Serialize
+#
+# This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
+__END__
+
 =pod
 
 =head1 NAME
@@ -63,7 +75,7 @@ Data::Record::Serialize::Encode::rdb - encoded a record as /rdb
 
 =head1 VERSION
 
-version 0.13
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -78,24 +90,16 @@ version 0.13
 B<Data::Record::Serialize::Encode::rdb> encodes a record as
 L<RDB|http://compbio.soe.ucsc.edu/rdb>.
 
-It performs the L<B<Data::Record::Serialize::Role::Encode>> role.
+It performs the L<Data::Record::Serialize::Role::Encode> role.
 
-=begin pod_coverage
+=for Pod::Coverage setup
 
-=head3 setup
-
-=end pod_coverage
-
-=begin pod_coverage
-
-=head3 encode
-
-=end pod_coverage
+=for Pod::Coverage encode
 
 =head1 INTERFACE
 
 There are no additional attributes which may be passed to
-L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>:
+L<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.
 
 =head1 BUGS AND LIMITATIONS
 
@@ -127,26 +131,3 @@ This is free software, licensed under:
   The GNU General Public License, Version 3, June 2007
 
 =cut
-
-__END__
-
-#pod =head1 SYNOPSIS
-#pod
-#pod     use Data::Record::Serialize;
-#pod
-#pod     my $s = Data::Record::Serialize->new( encode => 'rdb', ... );
-#pod
-#pod     $s->send( \%record );
-#pod
-#pod =head1 DESCRIPTION
-#pod
-#pod B<Data::Record::Serialize::Encode::rdb> encodes a record as
-#pod L<RDB|http://compbio.soe.ucsc.edu/rdb>.
-#pod
-#pod It performs the L<B<Data::Record::Serialize::Role::Encode>> role.
-#pod
-#pod
-#pod =head1 INTERFACE
-#pod
-#pod There are no additional attributes which may be passed to
-#pod L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>:

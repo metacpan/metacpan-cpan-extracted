@@ -4,25 +4,17 @@ package Data::Record::Serialize::Encode::yaml;
 
 use Moo::Role;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 use YAML::Any qw[ Dump ];
 
 use namespace::clean;
 
-before BUILD => sub {
+has '+_need_types' => ( is => 'rwp', default => 0 );
+has '+_needs_eol' => ( is => 'rwp', default => 1 );
 
-    my $self = shift;
-
-    $self->_set__need_types( 0 );
-    $self->_set__needs_eol( 1 );
-};
-
-#pod =begin pod_coverage
-#pod
-#pod =head3 encode
-#pod
-#pod =end pod_coverage
+#pod =for Pod::Coverage
+#pod  encode
 #pod
 #pod =cut
 
@@ -33,6 +25,18 @@ with 'Data::Record::Serialize::Role::Encode';
 
 1;
 
+#
+# This file is part of Data-Record-Serialize
+#
+# This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
+__END__
+
 =pod
 
 =head1 NAME
@@ -41,7 +45,7 @@ Data::Record::Serialize::Encode::yaml - encode a record as YAML
 
 =head1 VERSION
 
-version 0.13
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -55,18 +59,14 @@ version 0.13
 
 B<Data::Record::Serialize::Encode::yaml> encodes a record as YAML.
 
-It performs the L<B<Data::Record::Serialize::Role::Encode>> role.
+It performs the L<Data::Record::Serialize::Role::Encode> role.
 
-=begin pod_coverage
-
-=head3 encode
-
-=end pod_coverage
+=for Pod::Coverage encode
 
 =head1 INTERFACE
 
 There are no additional attributes which may be passed to
-L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.
+L<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.
 
 =head1 BUGS AND LIMITATIONS
 
@@ -98,25 +98,3 @@ This is free software, licensed under:
   The GNU General Public License, Version 3, June 2007
 
 =cut
-
-__END__
-
-#pod =head1 SYNOPSIS
-#pod
-#pod     use Data::Record::Serialize;
-#pod
-#pod     my $s = Data::Record::Serialize->new( encode => 'yaml', ... );
-#pod
-#pod     $s->send( \%record );
-#pod
-#pod =head1 DESCRIPTION
-#pod
-#pod B<Data::Record::Serialize::Encode::yaml> encodes a record as YAML.
-#pod
-#pod It performs the L<B<Data::Record::Serialize::Role::Encode>> role.
-#pod
-#pod
-#pod =head1 INTERFACE
-#pod
-#pod There are no additional attributes which may be passed to
-#pod L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.

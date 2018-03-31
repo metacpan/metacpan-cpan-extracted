@@ -3,7 +3,7 @@ package Test::Licensecheck;
 my $CLASS = __PACKAGE__;
 
 use parent qw(Test::Builder::Module);
-@EXPORT = qw(is_licensed done_testing);
+@EXPORT = qw(license_is license_like done_testing);
 
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ my $app = App::Licensecheck->new;
 $app->lines(0);
 $app->deb_fmt(1);
 
-sub is_licensed ($$)
+sub license_is ($$)
 {
 	my ( $corpus, $expected ) = @_;
 	my $tb = $CLASS->builder;
@@ -54,6 +54,22 @@ sub is_licensed ($$)
 			$detected_copyright, $expected_copyright,
 			"detect copyright \"$expected_copyright\" for " . basename($_)
 		) if ($expected_copyright);
+	}
+}
+
+sub license_like ($$)
+{
+	my ( $corpus, $expected ) = @_;
+	my $tb = $CLASS->builder;
+
+	# expected is either regexp, or array of regexp
+	for ( ref($expected) eq 'ARRAY' ? @{$expected} : $expected ) {
+		my ($detected) = $app->parse($corpus);
+
+		$tb->like(
+			$detected, $_,
+			"detect licensing \"$_\" for " . basename($corpus)
+		);
 	}
 }
 

@@ -4,7 +4,7 @@
       "['Peter Sergeant <pete@clueball.com>']"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -50,6 +50,7 @@
          "web" : "https://github.com/pjlsergeant/p5-xml-writer-lazy"
       }
    },
-   "version" : "0.04"
+   "version" : "0.05",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"
 }
 

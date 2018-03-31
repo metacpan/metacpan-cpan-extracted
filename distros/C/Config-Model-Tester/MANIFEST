@@ -8,6 +8,7 @@ META.json
 META.yml
 README.pod
 lib/Config/Model/Tester.pm
+lib/Config/Model/Tester/Setup.pm
 t/model_tests.t
 t/pod.t
 weaver.ini

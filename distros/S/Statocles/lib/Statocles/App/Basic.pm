@@ -1,5 +1,5 @@
 package Statocles::App::Basic;
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 # ABSTRACT: Build Markdown and collateral files
 
 use Statocles::Base 'Class';
@@ -66,7 +66,10 @@ sub command {
         }
 
         my $full_path = $self->store->path->child( $path );
-        if ( !run_editor( $full_path ) ) {
+        if ( my $content = run_editor( $full_path ) ) {
+            $full_path->spew_utf8( $content );
+        }
+        else {
             say "New page at: $full_path";
         }
 
@@ -94,7 +97,7 @@ Statocles::App::Basic - Build Markdown and collateral files
 
 =head1 VERSION
 
-version 0.091
+version 0.092
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ package App::Yath::Command;
 use strict;
 use warnings;
 
-our $VERSION = '0.001063';
+our $VERSION = '0.001064';
 
 use Carp qw/croak confess/;
 use File::Temp qw/tempdir/;
@@ -263,6 +263,7 @@ sub make_run_from_settings {
         cover       => $settings->{cover},
         event_uuids => $settings->{event_uuids},
         mem_usage   => $settings->{mem_usage},
+        default_search => $settings->{default_search},
 
         plugins => $self->{+PLUGINS} ? [@{$self->{+PLUGINS}}] : undef,
 

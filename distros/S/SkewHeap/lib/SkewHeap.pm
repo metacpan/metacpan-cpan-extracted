@@ -1,9 +1,16 @@
 package SkewHeap;
 # ABSTRACT: A fast heap structure for Perl
-$SkewHeap::VERSION = '0.02';
+$SkewHeap::VERSION = '0.03';
 use strict;
 use warnings;
-use Inline C => 'DATA', optimize => '-O2';
+
+use Inline
+  C        => 'DATA',
+  name     => 'SkewHeap',
+  version  => eval '$SkewHeap::VERSION',
+  optimize => '-O2';
+
+Inline->init;
 
 1;
 
@@ -17,7 +24,7 @@ SkewHeap - A fast heap structure for Perl
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -164,33 +171,6 @@ void DESTROY(SV *ref) {
   Safefree(heap);
 }
 
-void _explain(skewnode_t *node, int depth) {
-  int i;
-
-  for (i = 0; i < depth; ++i) printf("--");
-  printf("VALUE: %ld\n", SvIV(node->value));
-
-  if (node->left != NULL) {
-    for (i = 0; i < depth; ++i) printf("--");
-    printf("LEFT:\n");
-    _explain(node->left, depth + 1);
-  }
-
-  if (node->right != NULL) {
-    for (i = 0; i < depth; ++i) printf("--");
-    printf("RIGHT:\n");
-    _explain(node->right, depth + 1);
-  }
-}
-
-void explain(SV *ref) {
-  skewheap_t *heap = SKEW(ref);
-  printf("SKEWHEAP:\n");
-  if (heap->root != NULL) {
-    _explain(heap->root, 2);
-  }
-}
-
 void sort_nodes(skewnode_t *nodes[], int length, SV* cmp) {
   skewnode_t *tmp, *x;
   int p, j;
@@ -330,7 +310,7 @@ void put(SV *ref, ...) {
   skewheap_t *heap = SKEW(ref);
   skewnode_t *node;
   int i;
- 
+
   for (i = 1; i < Inline_Stack_Items; ++i) {
     node = new_node(Inline_Stack_Item(i));
     ++heap->size;

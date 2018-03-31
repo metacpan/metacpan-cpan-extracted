@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Tie::Hash::DBD;
 
-require "t/util.pl";
+require "./t/util.pl";
 
 my %hash;
 my $DBD = "Oracle";

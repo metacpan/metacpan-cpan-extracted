@@ -20,12 +20,17 @@ my $meta = {
                           configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
                           runtime => { requires => { perl => 5, strictures => 2 } },
                           test => {
-                            requires => { "Regexp::Pattern" => 0, "Test::Exception" => 0, "Test::More" => 0.98 },
+                            requires => {
+                              "Regexp::Pattern"       => 0,
+                              "Test::Builder::Module" => 0,
+                              "Test::Exception"       => 0,
+                              "Test::More"            => 0.98,
+                            },
                           },
                         },
   "provides"         => {
-                          "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.1.0" },
-                          "Regexp::Pattern::License::Parts" => { file => "lib/Regexp/Pattern/License/Parts.pm", version => "v3.1.0" },
+                          "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.1.90" },
+                          "Regexp::Pattern::License::Parts" => { file => "lib/Regexp/Pattern/License/Parts.pm", version => "v3.1.90" },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -38,7 +43,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/project",
                         },
-  "version"          => "v3.1.0",
+  "version"          => "v3.1.90",
   "x_help_wanted"    => ["documenter", "tester"],
   "x_static_install" => 1,
 };

@@ -130,8 +130,8 @@ subtest 'set' => sub {
         is_deeply $backend->get( people => $set_id ), $new_person,
             'person is not saved';
 
-        my $message = $@->[0]{message};
-        my $path = $@->[0]{path};
+        $message = $@->[0]{message};
+        $path = $@->[0]{path};
         is $t->app->log->history->[-1][1], 'error',
             'error message is logged at error level';
         like $t->app->log->history->[-1][2], qr{Error validating item with ID "$set_id" in collection "people": $message \($path\)},
@@ -180,6 +180,17 @@ subtest 'plugin' => sub {
     $t->get_ok( '/plugin' )
       ->status_is( 200 )
       ->json_is( [ { route => '/plugin', args => 1 } ] );
+};
+
+subtest 'openapi' => sub {
+    my $t = Test::Mojo->new( Mojolicious->new );
+    $t->app->plugin( 'Yancy', {
+        backend => $backend_url,
+        collections => $collections,
+        read_schema => 1,
+    } );
+    my $openapi = $t->app->yancy->openapi;
+    ok $openapi->validator, 'openapi helper returned meaningful object';
 };
 
 done_testing;

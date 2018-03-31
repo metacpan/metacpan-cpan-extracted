@@ -1,5 +1,5 @@
 package Statocles::Test;
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 # ABSTRACT: Common test routines for Statocles
 
 use Statocles::Base;
@@ -250,7 +250,7 @@ sub test_pages {
 sub build_temp_site {
     my ( $share_dir ) = @_;
 
-    my $tmp = Path::Tiny->tempdir;
+    my $tmp = Path::Tiny->tempdir( CLEANUP => $ENV{STATOCLES_TEST_CLEANUP} // 1 );
     dircopy $share_dir->child( qw( app blog ) ), $tmp->child( 'blog' );
     dircopy $share_dir->child( 'theme' ), $tmp->child( 'theme' );
     $tmp->child( 'build_site' )->mkpath;
@@ -370,7 +370,7 @@ Statocles::Test - Common test routines for Statocles
 
 =head1 VERSION
 
-version 0.091
+version 0.092
 
 =head1 DESCRIPTION
 

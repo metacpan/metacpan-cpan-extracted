@@ -25,21 +25,24 @@
             "Test2::Workflow" : "0",
             "Test2::Workflow::Runner" : "0",
             "Test2::Workflow::Task::Action" : "0",
+            "perl" : "v5.12.0",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
+            "Attribute::Handlers" : "0",
             "Test2::API" : "0",
-            "Test2::V0" : "0"
+            "Test2::V0" : "0",
+            "parent" : "0"
          }
       }
    },
    "provides" : {
       "Test2::Tools::xUnit" : {
          "file" : "lib/Test2/Tools/xUnit.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -53,7 +56,7 @@
          "web" : "https://github.com/cv-library/Test2-Tools-xUnit"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

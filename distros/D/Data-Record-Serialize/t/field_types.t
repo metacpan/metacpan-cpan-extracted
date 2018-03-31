@@ -5,7 +5,7 @@ use Test2::V0;
 use Data::Dumper;
 use Data::Record::Serialize;
 
-use lib 't/lib';
+use Test::Lib;
 
 
 subtest "illegal types" => sub {
@@ -69,9 +69,10 @@ subtest "allow type fields to differ from fields" => sub {
     ok(
         lives {
             $s = Data::Record::Serialize->new(
-                encode => 'types_nis',
-                types  => { a => 'N' },
-                fields => [qw( b )],
+                encode       => 'types_nis',
+                types        => { a => 'N' },
+                fields       => [qw( b )],
+                default_type => 'S',
             );
         },
         'create serializer'

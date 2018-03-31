@@ -1,5 +1,5 @@
 package Statocles::Util;
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 # ABSTRACT: Various utility functions to reduce dependencies
 
 use Statocles::Base;
@@ -52,18 +52,19 @@ sub dircopy($$) {
 
 #pod =sub run_editor
 #pod
-#pod     my $was_run = run_editor( $path );
+#pod     my $content = run_editor( $path );
 #pod
 #pod Invoke the user's text editor (from the C<EDITOR> environment variable)
-#pod to edit the given path. Returns true if an editor was invoked, false if
-#pod C<EDITOR> was not set. If the editor was not able to be invoked
-#pod (C<EDITOR> was set but could not be run), an exception is thrown.
+#pod to edit the given path. Returns the content if the editor was invoked,
+#pod or C<undef> C<EDITOR> was not set. If the editor was not able to be
+#pod invoked (C<EDITOR> was set but could not be run), an exception is
+#pod thrown.
 #pod
 #pod =cut
 
 sub run_editor {
     my ( $path ) = @_;
-    return 0 unless $ENV{EDITOR};
+    return undef unless $ENV{EDITOR};
     no warnings 'exec'; # We're checking everything ourselves
     # use string "system" as env-vars need to quote to protect from spaces
     # therefore, we quote path, then append it
@@ -71,7 +72,7 @@ sub run_editor {
     if ($? != 0) {
         die sprintf qq{Editor "%s" exited with error (non-zero) status: %d\n}, $ENV{EDITOR}, $?;
     }
-    return 1;
+    return $path->slurp_utf8;
 }
 
 #pod =sub uniq_by
@@ -152,7 +153,7 @@ Statocles::Util - Various utility functions to reduce dependencies
 
 =head1 VERSION
 
-version 0.091
+version 0.092
 
 =head1 SYNOPSIS
 
@@ -180,12 +181,13 @@ Copy everything in $source to $destination, recursively.
 
 =head2 run_editor
 
-    my $was_run = run_editor( $path );
+    my $content = run_editor( $path );
 
 Invoke the user's text editor (from the C<EDITOR> environment variable)
-to edit the given path. Returns true if an editor was invoked, false if
-C<EDITOR> was not set. If the editor was not able to be invoked
-(C<EDITOR> was set but could not be run), an exception is thrown.
+to edit the given path. Returns the content if the editor was invoked,
+or C<undef> C<EDITOR> was not set. If the editor was not able to be
+invoked (C<EDITOR> was set but could not be run), an exception is
+thrown.
 
 =head2 uniq_by
 

@@ -10,11 +10,13 @@ use Regexp::Pattern;
 dies_ok { re("License::foo") } "get unknown -> dies";
 
 subtest "get" => sub {
-	my $re1 = re("License::fsful");
-	ok $re1;
-	ok( 'This configure script is free software; the Free Software Foundation gives unlimited permission to copy, distribute and modify it.'
-			=~ $re1 );
-	ok( !( 'foo' =~ $re1 ) );
+	my $re = re("License::fsful");
+	ok $re;
+	like(
+		'This configure script is free software; the Free Software Foundation gives unlimited permission to copy, distribute and modify it.',
+		$re
+	);
+	unlike( 'foo', $re );
 };
 
 # TODO

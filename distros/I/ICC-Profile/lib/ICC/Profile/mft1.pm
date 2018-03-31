@@ -1232,7 +1232,6 @@ sub _writeICCmft1 {
 		
 		# copy matrix values
 		@mft[4 .. 12] = ICC::Shared::v2s15f16(@{$mat->[0]}, @{$mat->[1]}, @{$mat->[2]});
-
 		
 	} else {
 		

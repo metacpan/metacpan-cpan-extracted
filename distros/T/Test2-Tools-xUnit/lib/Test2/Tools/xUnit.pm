@@ -1,6 +1,6 @@
-package Test2::Tools::xUnit 0.004;
+package Test2::Tools::xUnit 0.005;
 
-use strict;
+use v5.12;
 use warnings;
 
 use B;
@@ -48,13 +48,15 @@ sub import {
     Test2::API::test2_stack->top->follow_up(
         sub { Test2::Workflow::Runner->new( task => $root->compile )->run } );
 
+    my $orig = $caller[0]->can('MODIFY_CODE_ATTRIBUTES');
+
     # This sub will be called whenever the Perl interpreter hits a subroutine
     # with attributes in our caller.
     #
     # It closes over $root so that it can add the actions, and @caller so that
     # it knows which package it's in.
     my $modify_code_attributes = sub {
-        my ( undef, $code, @attrs ) = @_;
+        my ( $pkg, $code, @attrs ) = @_;
 
         my $name = B::svref_2object($code)->GV->NAME;
 
@@ -118,12 +120,30 @@ sub import {
             $root->$method($task);
         }
 
+        @_ = ( $pkg, $code, @unhandled );
+        if ($orig) {
+            goto $orig;
+        }
+        else {
+            # A package like Attribute::Handlers might have modified @ISA
+            # after we were imported. Note that SUPER won't work because it
+            # finds the compile-time package of this sub.
+            no strict 'refs';
+            my @parents = @{ $pkg . '::ISA' };
+            @parents = 'UNIVERSAL' unless @parents;
+            for my $parent (@parents) {
+                if ( my $subref = $parent->can('MODIFY_CODE_ATTRIBUTES') ) {
+                    goto $subref;
+                }
+            }
+        }
+
         return @unhandled;
     };
 
-    # Let's hope the caller doesn't try to load two modules which pull this
-    # trick!
     no strict 'refs';
+    no warnings 'redefine';
+
     *{"$caller[0]::MODIFY_CODE_ATTRIBUTES"} = $modify_code_attributes;
 }
 

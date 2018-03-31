@@ -1,0 +1,4 @@
+set -x
+
+cd ../cgi-bin
+perlbrew exec --with perl-5.26.1-thread ./page.fcgi page=query q='1600+Pennsylvania+Avenue+NW+Washington+DC+USA'

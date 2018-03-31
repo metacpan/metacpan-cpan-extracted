@@ -6,7 +6,7 @@ use warnings;
 
 my $Indicators = __PACKAGE__->INDICATORS;
 my $StartingOf = {
-    'message' => [' This is an automatically generated Delivery Status Notification'],
+    'message' => ['      This is an automatically generated Delivery Status Notification.'],
     'rfc822'  => ['Content-Type: message/rfc822'],
 };
 

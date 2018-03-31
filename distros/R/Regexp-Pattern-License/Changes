@@ -7,6 +7,64 @@ Home page:    <https://metacpan.org/pod/Regexp::Pattern::License>
 Bug tracker:  <https://bugs.debian.org/regexp-pattern-license>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.1.90	2018-03-29
+
+ [ Bug Fixes ]
+ - Fix object cecill_b subject pattern license.
+ - Fix object fsfullr to match grant at all.
+ - Fix relax object mit_new_materials to match license at all.
+ - Fix strip duplicate tagline for object ntp, accidentally suppressing tag
+   family:mit.
+ - Tighten objects qpl sgi_b: Avoid bogusly match optional trailing FSF
+   credit.
+
+ [ Documentation ]
+ - Add TODO file to source, with a bunch of ideas.
+
+ [ Test Suite ]
+ - Extend testsuite to cover most license patterns.
+
+ [ Other ]
+ - Added: Add object json.
+ - Added: Add object kevlin_henney (replacing recently added but broken
+   isc_minidiscl).
+ - Added: Add objects bsl bsl_1.
+ - Added: Add objects jython python_2.
+ - Added: Extend object cc_cc0: Add subject pattern grant.
+ - Added: Extend object ftl: Add subject pattern license.
+ - Added: Extend objects ms_pl ms_rl: Add subject pattern license.
+ - Added: Generate default pattern dynamically, and provide alternative
+   subject patterns statically as plaintext (also for non-Perl use). Drop
+   alternative flavor pattern artifact.
+ - Added: Implement DefHash option "subject".
+ - Added: Synthesize metadata caption, and subject pattern grant.
+ - Added: Synthesize metadata iri, and subject pattern iri.
+ - Added: Synthesize subject pattern license.
+ - Extend metadata: Add iri.
+ - Extend object public_domain: Improve subject pattern license.
+ - Fix and extend metadata: Consistently use "name" for license shortname
+   (i.e. single-word), "caption" for license name, and "summary" for
+   non-name short description.
+ - Fix metadata for objects cecill_b cecill_c: Use tag
+   type:versioned:decimal (not type:unversioned).
+ - Implement per-object default pattern.
+ - Relax license objects agpl beerware gpl lgpl public_domain qpl: Detect
+   uppercase variations.
+ - Relax object bsd_3_clause to match SPDX template.
+ - Stringify patterns (as preparation for central compilation).
+ - Synthesize metadata name.
+ - Synthesize subject pattern trait.
+ - Tighten  object openssl to differentiate from apache_1.
+ - Tighten object eurosym: Avoid wildcard.
+ - Tighten object postgresql: Limit to lowercase pattern (uppercase or
+   varying case seemingly unused).
+ - Tighten objects ntp ntp_disclaimer: Disambiguate from kevlin_henney.
+ - Uniformly detect copyright sign.
+ - Uniformly detect hyphens.
+ - Uniformly detect quotation marks.
+ - Uniformly detect sentence and paragraph endings.
+ - Uniformly detect sentence enumerators.
+
 v3.1.0	2018-02-09
 
  [ Documentation ]

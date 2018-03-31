@@ -8,7 +8,7 @@ configure_requires:
   Module::Build: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
-license: unknown
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -16,7 +16,7 @@ name: ICC-Profile
 provides:
   ICC::Profile:
     file: lib/ICC/Profile.pm
-    version: '0.6'
+    version: '0.61'
   ICC::Profile::Generic:
     file: lib/ICC/Profile/Generic.pm
     version: '0.21'
@@ -109,7 +109,7 @@ provides:
     version: '0.53'
   ICC::Support::Chart:
     file: lib/ICC/Support/Chart.pm
-    version: '1.7'
+    version: '1.71'
   ICC::Support::Color:
     file: lib/ICC/Support/Color.pm
     version: '0.22'
@@ -175,5 +175,5 @@ requires:
   XSLoader: '0'
   YAML::Tiny: '0'
   perl: v5.10.0
-version: '0.604'
+version: '0.605'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

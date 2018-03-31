@@ -10,11 +10,11 @@ Table::Hack - The great new Table::Hack!
 
 =head1 VERSION
 
-Version 0.003
+Version 0.0031
 
 =cut
 
-our $VERSION = '0.003';
+our $VERSION = '0.0031';
 
 
 =head1 SYNOPSIS

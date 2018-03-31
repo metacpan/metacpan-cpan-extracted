@@ -10,7 +10,7 @@ use Locale::Babelfish::Phrase::Pluralizer ();
 
 use parent qw( Locale::Babelfish::Phrase::Node );
 
-our $VERSION = '2.004'; # VERSION
+our $VERSION = '2.005'; # VERSION
 
 __PACKAGE__->mk_accessors( qw( text ) );
 
@@ -35,7 +35,7 @@ Locale::Babelfish::Phrase::Literal - Babelfish AST Literal node.
 
 =head1 VERSION
 
-version 2.004
+version 2.005
 
 =head1 METHODS
 
@@ -64,6 +64,10 @@ Victor Efimov <efimov@reg.ru>
 =item *
 
 REG.RU LLC
+
+=item *
+
+Kirill Sysoev <k.sysoev@me.com>
 
 =back
 

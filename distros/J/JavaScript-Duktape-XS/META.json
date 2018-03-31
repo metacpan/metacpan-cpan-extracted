@@ -39,6 +39,7 @@
       "test" : {
          "requires" : {
             "Data::Dumper" : "0",
+            "Path::Tiny" : "0",
             "Test::More" : "0"
          }
       }
@@ -50,5 +51,5 @@
          "web" : "https://github.com/gonzus/NONE"
       }
    },
-   "version" : "0.000032"
+   "version" : "0.000035"
 }

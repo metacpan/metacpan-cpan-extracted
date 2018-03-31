@@ -6,11 +6,23 @@ use Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 requires 'encode';
 
 1;
+
+#
+# This file is part of Data-Record-Serialize
+#
+# This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
+__END__
 
 =pod
 
@@ -20,7 +32,7 @@ Data::Record::Serialize::Role::Encode - Encode Role
 
 =head1 VERSION
 
-version 0.13
+version 0.15
 
 =head1 DESCRIPTION
 
@@ -57,10 +69,3 @@ This is free software, licensed under:
   The GNU General Public License, Version 3, June 2007
 
 =cut
-
-__END__
-
-#pod =head1 DESCRIPTION
-#pod
-#pod If a role consumes this, it signals that it provides encoding
-#pod capabilities.

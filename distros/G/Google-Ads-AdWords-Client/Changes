@@ -1,3 +1,9 @@
+5.3.0
+- Removed examples and support for v201705 and v201708.
+For future sunset dates, see
+https://developers.google.com/adwords/api/docs/sunset-dates
+- Fixed https://github.com/googleads/googleads-perl-lib/issues/25.
+
 5.2.0
 - Added support and examples for v201802.
 - Added new example add_shopping_dynamic_remarketing_campaign.pl showing how to

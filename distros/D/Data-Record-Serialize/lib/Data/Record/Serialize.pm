@@ -6,9 +6,12 @@ use 5.010000;
 
 use strict;
 use warnings;
-use Carp;
 
-our $VERSION = '0.13';
+use warnings::register qw( Encode::dbi::queue );
+
+use Data::Record::Serialize::Error -all;
+
+our $VERSION = '0.15';
 
 use Package::Variant
   importing => ['Moo'],
@@ -16,18 +19,33 @@ use Package::Variant
 
 use namespace::clean;
 
-#pod =begin pod_coverage
+#pod =for Pod::Coverage make_variant
 #pod
-#pod =head3 make_variant
+#pod =cut
+
+#pod =attr C<encode>
 #pod
-#pod =end pod_coverage
+#pod I<Required>. The encoding format.  Specific encoders may provide
+#pod additional, or require specific, attributes. See L</Encoders>
+#pod for more information.
+#pod
+#pod =attr C<sink>
+#pod
+#pod Where the encoded data will be sent.  Specific sinks may provide
+#pod additional, or require specific attributes. See L</Sinks> for more
+#pod information.
+#pod
+#pod The default output sink is C<stream>, unless the encoder is also a
+#pod sink.
+#pod
+#pod It is an error to specify a sink if the encoder already acts as one.
 #pod
 #pod =cut
 
 sub make_variant {
     my ( $class, $target, %attr ) = @_;
 
-    croak( "must specify 'encode' attribute\n" )
+    error( 'attribute::value', "must specify <encode> attribute" )
       unless defined $attr{encode};
 
     with 'Data::Record::Serialize::Role::Base';
@@ -38,14 +56,13 @@ sub make_variant {
 
     if ( $target->does( 'Data::Record::Serialize::Role::Sink' ) ) {
 
-        croak(
-            "encoder ($attr{encode}) is already a sink; don't specify a sink attribute\n"
+    error( 'attribute::value', "encoder ($attr{encode}) is already a sink; don't specify a sink attribute\n"
         ) if defined $attr{sink};
     }
 
     else {
 
-	# default sink
+        # default sink
         my $sink = 'Data::Record::Serialize::Sink::'
           . ( $attr{sink} ? lc $attr{sink} : 'stream' );
 
@@ -54,6 +71,16 @@ sub make_variant {
 
     with 'Data::Record::Serialize::Role::Default';
 }
+
+
+#pod =method B<new>
+#pod
+#pod   $s = Data::Record::Serialize->new( <attributes> );
+#pod
+#pod Construct a new object. I<attributes> may either be a hashref or a
+#pod list of key-value pairs. See L</ATTRIBUTES> for more information.
+#pod
+#pod =cut
 
 
 sub new {
@@ -84,6 +111,8 @@ sub new {
 #   The GNU General Public License, Version 3, June 2007
 #
 
+__END__
+
 =pod
 
 =head1 NAME
@@ -92,7 +121,7 @@ Data::Record::Serialize - Flexible serialization of a record
 
 =head1 VERSION
 
-version 0.13
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -104,12 +133,12 @@ version 0.13
 
     # cleanup record before sending
     $s = Data::Record::Serialize->new( encode => 'json',
-	fields => [ qw( obsid chip_id phi theta ) ],
+        fields => [ qw( obsid chip_id phi theta ) ],
         format => 1,
-	format_types => { N => '%0.4f' },
-	format_fields => { obsid => '%05d' },
-	rename_fields => { chip_id => 'CHIP' },
-	types => { obsid => 'I', chip_id => 'S',
+        format_types => { N => '%0.4f' },
+        format_fields => { obsid => '%05d' },
+        rename_fields => { chip_id => 'CHIP' },
+        types => { obsid => 'I', chip_id => 'S',
                    phi => 'N', theta => 'N' },
     );
     $s->send( \%record );
@@ -117,15 +146,15 @@ version 0.13
 
     # send to an SQLite database
     $s = Data::Record::Serialize->new(
-	encode => 'dbi',
-	dsn => [ 'SQLite', [ dbname => $dbname ] ],
-	table => 'stuff',
+        encode => 'dbi',
+        dsn => [ 'SQLite', [ dbname => $dbname ] ],
+        table => 'stuff',
         format => 1,
-	fields => [ qw( obsid chip_id phi theta ) ],
-	format_types => { N => '%0.4f' },
-	format_fields => { obsid => '%05d' },
-	rename_fields => { chip_id => 'CHIP' },
-	types => { obsid => 'I', chip_id => 'S',
+        fields => [ qw( obsid chip_id phi theta ) ],
+        format_types => { N => '%0.4f' },
+        format_fields => { obsid => '%05d' },
+        rename_fields => { chip_id => 'CHIP' },
+        types => { obsid => 'I', chip_id => 'S',
                    phi => 'N', theta => 'N' },
     );
     $s->send( \%record );
@@ -177,20 +206,20 @@ The available encoders and their respective documentation are:
 
 =item *
 
-C<dbi> - L<B<Data::Record::Serialize::Encode::dbi>>
+C<dbi> - L<Data::Record::Serialize::Encode::dbi>
 
 Write to a database via B<DBI>. This is a combined
 encoder and sink.
 
 =item *
 
-C<ddump> - L<B<Data::Record::Serialize::Encode::ddump>>
+C<ddump> - L<Data::Record::Serialize::Encode::ddump>
 
-encode via L<B<Data::Dumper>>
+encode via L<Data::Dumper>
 
 =item *
 
-C<json> - L<B<Data::Record::Serialize::Encode::json>>
+C<json> - L<Data::Record::Serialize::Encode::json>
 
 =item *
 
@@ -199,11 +228,11 @@ encoder and sink.
 
 =item *
 
-C<rdb>  - L<B<Data::Record::Serialize::Encode::rdb>>
+C<rdb>  - L<Data::Record::Serialize::Encode::rdb>
 
 =item *
 
-C<yaml> - L<B<Data::Record::Serialize::Encode::yaml>>
+C<yaml> - L<Data::Record::Serialize::Encode::yaml>
 
 =back
 
@@ -217,7 +246,7 @@ The available sinks and their documentation are:
 
 =item *
 
-C<stream> - L<B<Data::Record::Serialize::Sink::stream>>
+C<stream> - L<Data::Record::Serialize::Sink::stream>
 
 =item *
 
@@ -249,68 +278,158 @@ C<S> - String
 Not all encoders support a separate integral type; in those cases
 integer fields are treated as general numeric fields.
 
-=head2 Output field and type determination
+=head2 Fields and their types
 
-The selection of output fields and determination of their types
-depends upon the C<fields>, C<types>, and C<default_type> attributes.
+Which fields are output and how their types are determined depends
+upon the C<fields>, C<types>, and C<default_type> attributes.
 
-=over
+In the following table:
 
-=item *
+ N   => not specified
+ Y   => specified
+ X   => doesn't matter
+ all => the string 'all'
 
-C<fields> specified, C<types> I<not> specified
+Automatic type determination is done by examining the first
+record send to the output stream.
 
-The fields in C<fields> are output. Types are derived from the values
-in the first record.
+  fields types default_type  Result
+  ------ ----- ------------  ------
 
-=item *
+  N/all   N        N         All fields are output.
+                             Types are automatically determined.
 
-C<fields> I<not> specified, C<types> specified
+  N/all   N        Y         All fields are output.
+                             Types are set to <default_type>.
 
-The fields by C<types> are output and are given the specified types.
+    Y     N        N         Fields in <fields> are output.
+                             Types are automatically determined.
 
-=item *
+    Y     Y        N         Fields in <fields> are output.
+                             Fields in <types> get the specified type.
+                             Types for other fields are automatically determined.
 
-C<fields> specified, C<types> specified
+    Y     Y        Y         Fields in <fields> are output.
+                             Fields in <types> get the specified type.
+                             Types for other fields are set to <default_type>.
 
-The fields specified by the C<fields> array are output with the types
-specified by C<types>.  For fields not specified in C<types>, the
-C<default_type> attribute value is used.
+   all    Y        N         All fields are output.
+                             Fields in <types> get the specified type.
+                             Types for other fields are automatically determined.
 
-=item *
+   all    Y        Y         All fields are output.
+                             Fields in <types> get the specified type.
+                             Types for other fields are set to <default_type>.
 
-C<fields> I<not> specified, C<types> I<not> specified
+    N     Y        X         Fields in <types> are output.
+                             Types are specified by <types>.
 
-The first record determines the fields and types (by examination).
+=head2 Errors
 
-=back
+Most errors result in exception objects being thrown, typically in the
+L<Data::Record::Serialize::Error> hierarchy.
 
-=begin pod_coverage
-
-=head3 make_variant
-
-=end pod_coverage
-
-=head1 INTERFACE
+=head1 METHODS
 
 =head2 B<new>
 
   $s = Data::Record::Serialize->new( <attributes> );
 
 Construct a new object. I<attributes> may either be a hashref or a
-list of key-value pairs.
+list of key-value pairs. See L</ATTRIBUTES> for more information.
 
-The available attributes are:
+=head2 has_types
+
+returns true if L</types> has been set.
+
+=head2 has_fields
+
+returns true if L</fields> has been set.
+
+=head2 B<output_fields>
+
+  $array_ref = $s->output_fields;
+
+The names of the transformed output fields, in order of output (not
+obeyed by all encoders);
+
+=head2 has_nullify
+
+returns true if L</nullify> has been set.
+
+=head2 nullified
+
+  $fields = $obj->nullified;
+
+Returns a list of fields which are checked for empty values (see L</nullify>).
+
+This will return C<undef> if the list is not yet available (for example, if
+fields names are determined from the first output record and none has been sent).
+
+If the list of fields is available, calling B<nullified> may result in
+verification of the list of nullified fields against the list of
+actual fields.  A disparity will result in an exception of class
+C<Data::Record::Serialize::Error::Role::Base::fields>.
+
+=head2 B<numeric_fields>
+
+  $array_ref = $s->numeric_fields;
+
+The input field names for those fields deemed to be numeric.
+
+=head2 B<type_index>
+
+  $hash = $s->type_index;
+
+A hash, keyed off of field type or category.  The values are
+an array of field names.  I<Don't edit this!>.
+
+The hash keys are:
 
 =over
 
-=item C<encode>
+=item C<I>
+
+=item C<N>
+
+=item C<S>
+
+=item C<numeric>
+
+C<N> and C<I>.
+
+=item C<not_string>
+
+Everything but C<S>.
+
+=back
+
+=head2 B<output_types>
+
+  $hash_ref = $s->output_types;
+
+The mapping between output field name and output field type.  If the
+encoder has specified a type map, the output types are the result of
+that mapping.
+
+=head2 B<send>
+
+  $s->send( \%record );
+
+Encode and send the record to the associated sink.
+
+B<WARNING>: the passed hash is modified.  If you need the original
+contents, pass in a copy.
+
+=head1 ATTRIBUTES
+
+=head2 C<encode>
 
 I<Required>. The encoding format.  Specific encoders may provide
 additional, or require specific, attributes. See L</Encoders>
 for more information.
 
-=item C<sink>
+=head2 C<sink>
 
 Where the encoded data will be sent.  Specific sinks may provide
 additional, or require specific attributes. See L</Sinks> for more
@@ -321,13 +440,7 @@ sink.
 
 It is an error to specify a sink if the encoder already acts as one.
 
-=item C<default_type>=I<type>
-
-If the C<types> attribute was specified, this type is assigned to
-fields given in the C<fields> attributes which were not specified via
-the C<types> attribute.
-
-=item C<types>
+=head2 C<types>
 
 A hash or array mapping input field names to types (C<N>, C<I>,
 C<S>).  If an array, the fields will be output in the specified
@@ -340,103 +453,104 @@ order, provided the encoder permits it (see below, however).  For example,
   types => { c => 'N', a => 'N', b => 'N' }
 
 If C<fields> is specified, then its order will override that specified
-here.  If no type is specified for elements in C<fields>, they will
-default to having the type specified by the C<default_type> attribute.
-For example,
+here.
 
-  types => [ c => 'N', a => 'N' ],
-  fields => [ qw( a b c ) ],
-  default_type => 'I',
+To understand how this attribute works in concert with L</fields> and
+L</default_type>, please see L</Fields and their types>.
 
-will result in fields being output in the order
+=head2 C<default_type> I<type>
 
-   a b c
+If set, output fields whose types were not
+specified via the C<types> attribute will be assigned this type.
+To understand how this attribute works in concert with L</fields> and
+L</types>, please see L</Fields and their types>.
 
-with types
+=head2 C<fields>
 
-   a => 'N',
-   b => 'I',
-   c => 'N',
+Which fields to output.  It may be one of:
 
-=item C<fields>
+=over
+
+=item *
 
 An array containing the input names of the fields to be output. The
 fields will be output in the specified order, provided the encoder
 permits it.
 
-If this attribute is not specified, the fields specified by the
-C<types> attribute will be output.  If that is not specified, the
-fields as found in the first data record will be output.
+=item *
 
-If a field name is specified in C<fields> but no type is defined in
-C<types>, it defaults to what is specified via C<default_type>.
+The string C<all>, indicating that all input fields will be output.
 
-=item C<rename_fields>
+=item *
 
-A hash mapping input to output field names.  By default the input
-field names are used unaltered.
+Unspecified or undefined.
 
-=item C<format_fields>
+=back
+
+To understand how this attribute works in concert with L</types> and
+L</default_type>, please see L<Data::Record::Serialize/Fields and their types>.
+
+=head2 nullify
+
+  $obj->nullify( $array | $code | $bool );
+
+Specify which fields should be set to C<undef> if they are
+empty. Sinks should encode C<undef> as the C<null> value.  By default,
+no fields are nullified.
+
+B<nullify> may be passed:
+
+=over
+
+=item *  an array
+
+It should be a list of input field names.  These names are verified
+against the input fields after the first record is read.
+
+=item * a code ref
+
+The coderef is passed the object, and should return a list of input
+field names.  These names are verified against the input fields after
+the first record is read.
+
+=item * a boolean
+
+If true, all field names are added to the list. When false, the list
+is emptied.
+
+=back
+
+During verification, a
+C<Data::Record::Serialize::Error::Role::Base::fields> error is thrown
+if non-existent fields are specified.  Verification is I<not>
+performed until the next record is sent (or the L</nullified> method
+is called), so there is no immediate feedback.
+
+=head2 C<format_fields>
 
 A hash mapping the input field names to a C<sprintf> style
 format. This will be applied prior to encoding the record, but only if
 the C<format> attribute is also set.  Formats specified here override
 those specified in C<format_types>.
 
-=item C<format_types>
+=head2 C<format_types>
 
 A hash mapping a field type (C<N>, C<I>, C<S>) to a C<sprintf> style
 format.  This will be applied prior to encoding the record, but only
 if the C<format> attribute is also set.  Formats specified here may be
 overridden for specific fields using the C<format_fields> attribute.
 
-=item C<format>
+=head2 C<rename_fields>
+
+A hash mapping input to output field names.  By default the input
+field names are used unaltered.
+
+=head2 C<format>
 
 If true, format the output fields using the formats specified in the
 C<format_fields> and/or C<format_types> options.  The default is false.
 
-=back
-
-=head2 B<send>
-
-  $s->send( \%record );
-
-Encode and send the record to the associated sink.
-
-B<WARNING>: the passed hash is modified.  If you need the original
-contents, pass in a copy.
-
-=head2 B<close>
-
-  $s->close;
-
-Flush any data written to the sink and close it.  While this will be
-performed automatically when the object is destroyed, if the object is
-not destroyed prior to global destruction at the end of the program,
-it is quite possible that it will not be possible to perform this
-cleanly.  In other words, make sure that sinks are closed prior to
-global destruction.
-
-=head2 B<output_fields>
-
-  $array_ref = $s->fields;
-
-The names of the transformed output fields, in order of output (not
-obeyed by all encoders);
-
-=head2 B<output_types>
-
-  $hash_ref = $s->output_types;
-
-The mapping between output field name and output field type.  If the
-encoder has specified a type map, the output types are the result of
-that mapping.
-
-=head2 B<numeric_fields>
-
-  $array_ref = $s->numeric_fields;
-
-The input field names for those fields deemed to be numeric.
+=for Pod::Coverage make_variant
 
 =head1 EXAMPLES
 
@@ -503,6 +617,8 @@ The input field names for those fields deemed to be numeric.
     types => { obsid => 'N', chip_id => 'S', phi => 'N', theta => 'N' }'
    );
 
+=for Pod::Coverage BUILD
+
 =head1 BUGS AND LIMITATIONS
 
 You can make new bug reports, and view existing ones, through the
@@ -516,11 +632,7 @@ Please see those modules/websites for more information related to this module.
 
 =item *
 
-L<Other modules:|Other modules:>
-
-=item *
-
-L<B<Data::Serializer>>
+L<Data::Serializer>
 
 =back
 
@@ -537,425 +649,3 @@ This is free software, licensed under:
   The GNU General Public License, Version 3, June 2007
 
 =cut
-
-__END__
-
-#pod =head1 SYNOPSIS
-#pod
-#pod     use Data::Record::Serialize;
-#pod
-#pod     # simple output to json
-#pod     $s = Data::Record::Serialize->new( encode => 'json', \%attr );
-#pod     $s->send( \%record );
-#pod
-#pod     # cleanup record before sending
-#pod     $s = Data::Record::Serialize->new( encode => 'json',
-#pod 	fields => [ qw( obsid chip_id phi theta ) ],
-#pod         format => 1,
-#pod 	format_types => { N => '%0.4f' },
-#pod 	format_fields => { obsid => '%05d' },
-#pod 	rename_fields => { chip_id => 'CHIP' },
-#pod 	types => { obsid => 'I', chip_id => 'S',
-#pod                    phi => 'N', theta => 'N' },
-#pod     );
-#pod     $s->send( \%record );
-#pod
-#pod
-#pod     # send to an SQLite database
-#pod     $s = Data::Record::Serialize->new(
-#pod 	encode => 'dbi',
-#pod 	dsn => [ 'SQLite', [ dbname => $dbname ] ],
-#pod 	table => 'stuff',
-#pod         format => 1,
-#pod 	fields => [ qw( obsid chip_id phi theta ) ],
-#pod 	format_types => { N => '%0.4f' },
-#pod 	format_fields => { obsid => '%05d' },
-#pod 	rename_fields => { chip_id => 'CHIP' },
-#pod 	types => { obsid => 'I', chip_id => 'S',
-#pod                    phi => 'N', theta => 'N' },
-#pod     );
-#pod     $s->send( \%record );
-#pod
-#pod =head1 DESCRIPTION
-#pod
-#pod B<Data::Record::Serialize> encodes data records and sends them
-#pod somewhere. This module is primarily useful for output of sets of
-#pod uniformly structured data records.  It provides a uniform, thin,
-#pod interface to various serializers and output sinks.  Its I<raison
-#pod d'etre> is its ability to manipulate the records prior to encoding
-#pod and output.
-#pod
-#pod =over
-#pod
-#pod =item *
-#pod
-#pod A record is a collection of fields, i.e. keys and I<scalar>
-#pod values.
-#pod
-#pod =item *
-#pod
-#pod All records are assumed to have the same structure.
-#pod
-#pod =item *
-#pod
-#pod Fields may have simple types which may be determined automatically.
-#pod Some encoders use this information during encoding.
-#pod
-#pod =item *
-#pod
-#pod Fields may be renamed upon output
-#pod
-#pod =item *
-#pod
-#pod A subset of the fields may be selected for output.
-#pod
-#pod =item *
-#pod
-#pod Fields may be formatted via C<sprintf> prior to output
-#pod
-#pod =back
-#pod
-#pod =head2 Encoders
-#pod
-#pod The available encoders and their respective documentation are:
-#pod
-#pod =over
-#pod
-#pod =item *
-#pod
-#pod C<dbi> - L<B<Data::Record::Serialize::Encode::dbi>>
-#pod
-#pod Write to a database via B<DBI>. This is a combined
-#pod encoder and sink.
-#pod
-#pod =item *
-#pod
-#pod C<ddump> - L<B<Data::Record::Serialize::Encode::ddump>>
-#pod
-#pod encode via L<B<Data::Dumper>>
-#pod
-#pod =item *
-#pod
-#pod C<json> - L<B<Data::Record::Serialize::Encode::json>>
-#pod
-#pod =item *
-#pod
-#pod C<null> - send the data to the bit bucket.  This is a combined
-#pod encoder and sink.
-#pod
-#pod =item *
-#pod
-#pod C<rdb>  - L<B<Data::Record::Serialize::Encode::rdb>>
-#pod
-#pod =item *
-#pod
-#pod C<yaml> - L<B<Data::Record::Serialize::Encode::yaml>>
-#pod
-#pod =back
-#pod
-#pod
-#pod =head2 Sinks
-#pod
-#pod Sinks are where encoded data are sent.
-#pod
-#pod The available sinks and their documentation are:
-#pod
-#pod =over
-#pod
-#pod =item *
-#pod
-#pod C<stream> - L<B<Data::Record::Serialize::Sink::stream>>
-#pod
-#pod =item *
-#pod
-#pod C<null> - send the encoded data to the bit bucket.
-#pod
-#pod =back
-#pod
-#pod
-#pod =head2 Types
-#pod
-#pod Some output encoders care about the type of a
-#pod field. B<Data::Record::Serialize> recognizes three types:
-#pod
-#pod =over
-#pod
-#pod =item *
-#pod
-#pod C<N> - Numeric
-#pod
-#pod =item *
-#pod
-#pod C<I> - Integral
-#pod
-#pod =item *
-#pod
-#pod C<S> - String
-#pod
-#pod =back
-#pod
-#pod Not all encoders support a separate integral type; in those cases
-#pod integer fields are treated as general numeric fields.
-#pod
-#pod =head2 Output field and type determination
-#pod
-#pod The selection of output fields and determination of their types
-#pod depends upon the C<fields>, C<types>, and C<default_type> attributes.
-#pod
-#pod =over
-#pod
-#pod =item *
-#pod
-#pod C<fields> specified, C<types> I<not> specified
-#pod
-#pod The fields in C<fields> are output. Types are derived from the values
-#pod in the first record.
-#pod
-#pod =item *
-#pod
-#pod C<fields> I<not> specified, C<types> specified
-#pod
-#pod The fields by C<types> are output and are given the specified types.
-#pod
-#pod =item *
-#pod
-#pod C<fields> specified, C<types> specified
-#pod
-#pod The fields specified by the C<fields> array are output with the types
-#pod specified by C<types>.  For fields not specified in C<types>, the
-#pod C<default_type> attribute value is used.
-#pod
-#pod =item *
-#pod
-#pod C<fields> I<not> specified, C<types> I<not> specified
-#pod
-#pod The first record determines the fields and types (by examination).
-#pod
-#pod
-#pod =back
-#pod
-#pod
-#pod =head1 INTERFACE
-#pod
-#pod =head2 B<new>
-#pod
-#pod   $s = Data::Record::Serialize->new( <attributes> );
-#pod
-#pod Construct a new object. I<attributes> may either be a hashref or a
-#pod list of key-value pairs.
-#pod
-#pod The available attributes are:
-#pod
-#pod =over
-#pod
-#pod =item C<encode>
-#pod
-#pod I<Required>. The encoding format.  Specific encoders may provide
-#pod additional, or require specific, attributes. See L</Encoders>
-#pod for more information.
-#pod
-#pod =item C<sink>
-#pod
-#pod Where the encoded data will be sent.  Specific sinks may provide
-#pod additional, or require specific attributes. See L</Sinks> for more
-#pod information.
-#pod
-#pod The default output sink is C<stream>, unless the encoder is also a
-#pod sink.
-#pod
-#pod It is an error to specify a sink if the encoder already acts as one.
-#pod
-#pod =item C<default_type>=I<type>
-#pod
-#pod If the C<types> attribute was specified, this type is assigned to
-#pod fields given in the C<fields> attributes which were not specified via
-#pod the C<types> attribute.
-#pod
-#pod =item C<types>
-#pod
-#pod A hash or array mapping input field names to types (C<N>, C<I>,
-#pod C<S>).  If an array, the fields will be output in the specified
-#pod order, provided the encoder permits it (see below, however).  For example,
-#pod
-#pod   # use order if possible
-#pod   types => [ c => 'N', a => 'N', b => 'N' ]
-#pod
-#pod   # order doesn't matter
-#pod   types => { c => 'N', a => 'N', b => 'N' }
-#pod
-#pod If C<fields> is specified, then its order will override that specified
-#pod here.  If no type is specified for elements in C<fields>, they will
-#pod default to having the type specified by the C<default_type> attribute.
-#pod For example,
-#pod
-#pod   types => [ c => 'N', a => 'N' ],
-#pod   fields => [ qw( a b c ) ],
-#pod   default_type => 'I',
-#pod
-#pod will result in fields being output in the order
-#pod
-#pod    a b c
-#pod
-#pod with types
-#pod
-#pod    a => 'N',
-#pod    b => 'I',
-#pod    c => 'N',
-#pod
-#pod =item C<fields>
-#pod
-#pod An array containing the input names of the fields to be output. The
-#pod fields will be output in the specified order, provided the encoder
-#pod permits it.
-#pod
-#pod If this attribute is not specified, the fields specified by the
-#pod C<types> attribute will be output.  If that is not specified, the
-#pod fields as found in the first data record will be output.
-#pod
-#pod If a field name is specified in C<fields> but no type is defined in
-#pod C<types>, it defaults to what is specified via C<default_type>.
-#pod
-#pod =item C<rename_fields>
-#pod
-#pod A hash mapping input to output field names.  By default the input
-#pod field names are used unaltered.
-#pod
-#pod =item C<format_fields>
-#pod
-#pod A hash mapping the input field names to a C<sprintf> style
-#pod format. This will be applied prior to encoding the record, but only if
-#pod the C<format> attribute is also set.  Formats specified here override
-#pod those specified in C<format_types>.
-#pod
-#pod =item C<format_types>
-#pod
-#pod A hash mapping a field type (C<N>, C<I>, C<S>) to a C<sprintf> style
-#pod format.  This will be applied prior to encoding the record, but only
-#pod if the C<format> attribute is also set.  Formats specified here may be
-#pod overridden for specific fields using the C<format_fields> attribute.
-#pod
-#pod =item C<format>
-#pod
-#pod If true, format the output fields using the formats specified in the
-#pod C<format_fields> and/or C<format_types> options.  The default is false.
-#pod
-#pod =back
-#pod
-#pod =head2 B<send>
-#pod
-#pod   $s->send( \%record );
-#pod
-#pod Encode and send the record to the associated sink.
-#pod
-#pod B<WARNING>: the passed hash is modified.  If you need the original
-#pod contents, pass in a copy.
-#pod
-#pod
-#pod =head2 B<close>
-#pod
-#pod   $s->close;
-#pod
-#pod Flush any data written to the sink and close it.  While this will be
-#pod performed automatically when the object is destroyed, if the object is
-#pod not destroyed prior to global destruction at the end of the program,
-#pod it is quite possible that it will not be possible to perform this
-#pod cleanly.  In other words, make sure that sinks are closed prior to
-#pod global destruction.
-#pod
-#pod =head2 B<output_fields>
-#pod
-#pod   $array_ref = $s->fields;
-#pod
-#pod The names of the transformed output fields, in order of output (not
-#pod obeyed by all encoders);
-#pod
-#pod =head2 B<output_types>
-#pod
-#pod   $hash_ref = $s->output_types;
-#pod
-#pod The mapping between output field name and output field type.  If the
-#pod encoder has specified a type map, the output types are the result of
-#pod that mapping.
-#pod
-#pod =head2 B<numeric_fields>
-#pod
-#pod   $array_ref = $s->numeric_fields;
-#pod
-#pod The input field names for those fields deemed to be numeric.
-#pod
-#pod =head1 EXAMPLES
-#pod
-#pod =head2 Generate a JSON stream to the standard output stream
-#pod
-#pod   $s = Data::Record::Serialize->new( encode => 'json' );
-#pod
-#pod =head2 Only output select fields
-#pod
-#pod   $s = Data::Record::Serialize->new(
-#pod     encode => 'json',
-#pod     fields => [ qw( obsid chip_id phi theta ) ],
-#pod    );
-#pod
-#pod =head2 Format numeric fields
-#pod
-#pod   $s = Data::Record::Serialize->new(
-#pod     encode => 'json',
-#pod     fields => [ qw( obsid chip_id phi theta ) ],
-#pod     format => 1,
-#pod     format_types => { N => '%0.4f' },
-#pod    );
-#pod
-#pod =head2 Override formats for specific fields
-#pod
-#pod   $s = Data::Record::Serialize->new(
-#pod     encode => 'json',
-#pod     fields => [ qw( obsid chip_id phi theta ) ],
-#pod     format_types => { N => '%0.4f' },
-#pod     format_fields => { obsid => '%05d' },
-#pod    );
-#pod
-#pod =head2 Rename fields
-#pod
-#pod   $s = Data::Record::Serialize->new(
-#pod     encode => 'json',
-#pod     fields => [ qw( obsid chip_id phi theta ) ],
-#pod     format_types => { N => '%0.4f' },
-#pod     format_fields => { obsid => '%05d' },
-#pod     rename_fields => { chip_id => 'CHIP' },
-#pod    );
-#pod
-#pod =head2 Specify field types
-#pod
-#pod   $s = Data::Record::Serialize->new(
-#pod     encode => 'json',
-#pod     fields => [ qw( obsid chip_id phi theta ) ],
-#pod     format_types => { N => '%0.4f' },
-#pod     format_fields => { obsid => '%05d' },
-#pod     rename_fields => { chip_id => 'CHIP' },
-#pod     types => { obsid => 'N', chip_id => 'S', phi => 'N', theta => 'N' }'
-#pod    );
-#pod
-#pod =head2 Switch to an SQLite database in C<$dbname>
-#pod
-#pod   $s = Data::Record::Serialize->new(
-#pod     encode => 'dbi',
-#pod     dsn => [ 'SQLite', [ dbname => $dbname ] ],
-#pod     table => 'stuff',
-#pod     fields => [ qw( obsid chip_id phi theta ) ],
-#pod     format_types => { N => '%0.4f' },
-#pod     format_fields => { obsid => '%05d' },
-#pod     rename_fields => { chip_id => 'CHIP' },
-#pod     types => { obsid => 'N', chip_id => 'S', phi => 'N', theta => 'N' }'
-#pod    );
-#pod
-#pod
-#pod
-#pod =head1 SEE ALSO
-#pod
-#pod Other modules:
-#pod
-#pod L<B<Data::Serializer>>
-#pod
-#pod
-#pod
-#pod

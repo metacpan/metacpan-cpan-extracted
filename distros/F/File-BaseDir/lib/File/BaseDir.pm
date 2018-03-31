@@ -5,7 +5,7 @@ use Carp;
 require File::Spec;
 require Exporter;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 our @ISA = qw(Exporter);
 our %EXPORT_TAGS = (

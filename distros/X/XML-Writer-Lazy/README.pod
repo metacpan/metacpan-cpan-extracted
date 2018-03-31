@@ -298,6 +298,14 @@ sub start_prefix_mapping {
     return;
 }
 
+# Allegedly passes through some kind of locator object, but appears
+# to essentially be a no-op? ¯\_(ツ)_/¯
+sub set_document_locator {
+    my $self = shift;
+    my $data = shift;
+    return;
+}
+
 # No work needed, as the insides will already be magically quoted
 sub start_cdata { return; }
 sub end_cdata   { return; }
@@ -310,12 +318,6 @@ but XML::Writer::Lazy doesn't yet handle those. You can either simplify your
 input XML or alternatively you could monkey-patch `XML::Writer::Lazy::Handler`
 to add a `$event()` handler method to it.
 MSG
-}
-
-sub set_document_locator {
-    my $self = shift;
-    my $data = shift;
-    return croak( not_implemented('set_document_locator') );
 }
 
 sub skipped_entity {

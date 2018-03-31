@@ -11,7 +11,7 @@
  * http://duktape.org/index.html
  */
 #include "duktape.h"
-#include "duk_poll.h"
+#include "c_eventloop.h"
 
 #define UNUSED_ARG(x) (void) x
 #define DUK_SLOT_CALLBACK "_perl_.callback"
@@ -324,7 +324,8 @@ static int session_dtor(pTHX_ SV* sv, MAGIC* mg)
 static void duk_fatal_error_handler(void* data, const char *msg)
 {
     UNUSED_ARG(data);
-    fprintf(stderr, "duktape fatal error, aborting: %s\n", msg ? msg : "*NONE*");
+    dTHX;
+    PerlIO_printf(PerlIO_stderr(), "duktape fatal error, aborting: %s\n", msg ? msg : "*NONE*");
     abort();
 }
 
@@ -344,8 +345,36 @@ static int register_native_functions(pTHX_ duk_context* duk)
             croak("Could not register native function %s\n", data[j].name);
         }
     }
-    poll_register(duk);
+
+    // Register our event loop dispatcher, otherwise calls to
+    // dispatch_function_in_event_loop will not work.
+    eventloop_register(duk);
+
     return n;
+}
+
+static int run_function_in_event_loop(duk_context* duk, const char* func)
+{
+    // Start a zero timer which will call our function from the event loop.
+    int rc = 0;
+    char js[256];
+    int len = sprintf(js, "setTimeout(function() { %s(); }, 0);", func);
+    rc = duk_peval_lstring(duk, js, len);
+    if (rc != 0) {
+        croak("Could not eval JS event loop dispatcher %*.*s: %d - %s\n",
+              len, len, js, rc, duk_safe_to_string(duk, -1));
+    }
+    duk_pop(duk);
+
+    // Launch eventloop; this call only returns after the eventloop terminates.
+    rc = duk_safe_call(duk, eventloop_run, NULL, 0 /*nargs*/, 1 /*nrets*/);
+    if (rc != 0) {
+        croak("JS event loop run failed: %d - %s\n",
+              rc, duk_safe_to_string(duk, -1));
+    }
+    duk_pop(duk);
+
+    return 0;
 }
 
 static MGVTBL session_magic_vtbl = { .svt_free = session_dtor };
@@ -390,4 +419,10 @@ eval(duk_context* duk, const char* js)
     }
     RETVAL = duk_to_perl(aTHX_ duk, -1);
     duk_pop(duk);
+  OUTPUT: RETVAL
+
+SV*
+dispatch_function_in_event_loop(duk_context* duk, const char* func)
+  CODE:
+    RETVAL = newSViv(run_function_in_event_loop(duk, func));
   OUTPUT: RETVAL

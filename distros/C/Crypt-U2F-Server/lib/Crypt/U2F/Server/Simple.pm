@@ -1,6 +1,6 @@
 package Crypt::U2F::Server::Simple;
 
-use 5.008008;
+use 5.018001;
 use strict;
 use warnings;
 use Carp;
@@ -8,7 +8,7 @@ use Carp;
 require Exporter;
 
 our @ISA = qw(Exporter);
-our $VERSION = '0.40';
+our $VERSION = '0.42';
 
 use Crypt::U2F::Server;
 
@@ -111,13 +111,11 @@ sub registrationVerify {
         return;
     }
 
-    my $keydata = Crypt::U2F::Server::u2fclib_verifyRegistration($self->{ctx}, $registration);
-    if(!defined($keydata)) {
+    ($self->{publicKey}, $self->{keyHandle}) = Crypt::U2F::Server::u2fclib_verifyRegistration($self->{ctx}, $registration);
+    if(not(defined($self->{publicKey}) and defined($self->{keyHandle}))) {
         $errstr = Crypt::U2F::Server::u2fclib_getError();
         return;
     }
-
-    ($self->{publicKey}, $self->{keyHandle}) = split/\#\#DELIMITER\#\#/, $keydata;
 
     return ($self->{keyHandle}, $self->{publicKey});
 }
@@ -263,13 +261,19 @@ Crypt::U2F::Server::Simple - Register and Authenticate U2F compatible security d
   # Generate a registration request
   my $registerRequest = $crypter->registrationChallenge();
 
-  # Give $registerRequest to client, recieve $registrationData from client
+  # Give $registerRequest to client, receive $registrationData from client
+  # NB: if Crypt::U2F::Server::Simple has been recreated (web process for example), challenge
+  #     value must be restored (value only, not JSON blob):
+  #$crypter->setChallenge($challenge)
   my ($keyHandle, $userKey) = $crypter->registrationVerify($registrationData)
 
   # Generate an authentication request (using the previously generated key handle and user key)
   my $authrequest = $crypter->authenticationChallenge();
 
-  # Send $authrequest to client, recieve $authSignature
+  # Send $authrequest to client, receive $authSignature
+  # NB: if Crypt::U2F::Server::Simple has been recreated (web process for example), challenge
+  #     value must be restored (value only, not JSON blob):
+  #$crypter->setChallenge($challenge)
   my $authok = $crypter->authenticationVerify($authSignature);
 
 =head1 DESCRIPTION
@@ -281,13 +285,13 @@ of this perl module. To clarify You can run registration from another instance t
 in another program on another server. But, as far as it is currently implemented, you must run both registration
 steps in the same instance of this module, the same goes for authentication. Needs more testing, really.
 
-A succesfull registration of a key yields to two scalars, a key handle and a public key. It is B<your>
+A successful registration of a key yields to two scalars, a key handle and a public key. It is B<your>
 responsibility to keep them safe somewhere and reload them into this module whenever you want to do
 authentication.
 
 =head1 INSTALLATION
 
-This module requires the Yubico u2f-server shared libary installed, please see the official
+This module requires the Yubico u2f-server shared library installed, please see the official
 project page at L<https://developers.yubico.com/libu2f-server/> on how to do that.
 
 =head1 NO MULTITHREADING
@@ -356,6 +360,18 @@ Gives you a unique registration challenge on every call. This is a JSON string a
 
 If something goes wrong, $challenge will be I<undef>.
 
+$challenge is a JSON blob that contains a hash. Here are the main keys
+
+=over
+
+=item version: the protocol version
+
+=item appId: the appId given in new()
+
+=item challenge: the challenge value
+
+=back
+
 =head2 registrationVerify()
 
     my ($keyHandle, $publicKey) = $auth->registrationVerify($reply);
@@ -374,13 +390,15 @@ module!
 
 =head2 authenticationChallenge()
 
-This function generates an authentification challenge. To do that, it needs keyHandle and publicKey, since this
-is key dependend.
+This function generates an authentication challenge. To do that, it needs keyHandle and publicKey, since this
+is key dependent.
 
     my $challenge = $auth->authenticationChallenge();
 
 Otherwise, this works the same as the registration challenge. You get a JSON blob, send that to the client and
 get an answer.
+
+The JSON blob structure is described in registrationChallenge() doc.
 
 =head2 authenticationVerify()
 
@@ -390,6 +408,16 @@ After you get the authentication answer, you need to verify it:
 
 $isValid is true if authentication succeedsr. If something went wrong (library error, fake user), $isValid is false, in which
 case you can look into lastError() to see what went wrong.
+
+=head2 setChallenge()
+
+If Crypt::U2F::Server::Simple has been recreated since registrationChallenge()
+or authenticationChallenge() usage, challenge value must be restored:
+
+    $auth->setChallenge($challenge)
+
+Note that $challenge must be the string value of challenge, not the JSON blob.
+See registrationChallenge() doc to get challenge description.
 
 =head1 SEE ALSO
 
@@ -406,10 +434,13 @@ Also, at the moment, this module has seen only very limited testing.
 
 =head1 AUTHOR
 
-Rene Schickbauer, E<lt>rene.schickbauer@magnapowertrain.comE<gt>
+=over
 
-Patches contributed by:
-Robert Norris E<lt>ROBN@cpan.orgE<gt>
+=item Rene Schickbauer, E<lt>rene.schickbauer@magnapowertrain.comE<gt>
+
+=item Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -421,8 +452,8 @@ C library, see L<https://developers.yubico.com/libu2f-server/>
 In order for this to work, you need to install that
 library.
 
-This adaption is (C) 2014-2015 Rene 'cavac' Schickbauer, but as it
-is based on Yubico's code, the licence below applies!
+This adaption is (C) 2014-2018 Rene 'cavac' Schickbauer and 2018 Xavier
+Guimard, but as it is based on Yubico's code, the licence below applies!
 
 I<We, the community, would hereby thank Yubico for open sourcing their code!>
 

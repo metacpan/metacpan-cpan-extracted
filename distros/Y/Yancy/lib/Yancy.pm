@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 # ABSTRACT: A simple CMS for administrating data
 
 #pod =head1 SYNOPSIS
@@ -168,7 +168,7 @@ Yancy - A simple CMS for administrating data
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 
@@ -299,17 +299,17 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Mohammad S Anwar mohawk2 William Lindley
+=for stopwords Ed J Mohammad S Anwar William Lindley
 
 =over 4
 
 =item *
 
-Mohammad S Anwar <mohammad.anwar@yahoo.com>
+Ed J <mohawk2@users.noreply.github.com>
 
 =item *
 
-mohawk2 <mohawk2@users.noreply.github.com>
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =item *
 

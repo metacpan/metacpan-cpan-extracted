@@ -1,0 +1,19 @@
+<%init>
+my ($good, $msg, $next) = RT::Authen::OAuth2::LogUserIn(\%session, \%ARGS) if defined $ARGS{code};
+
+my $actions;
+$actions = [$msg] if not $good and $msg;
+
+$m->callback(%ARGS, CallbackName => 'SuccessfulLogin', CallbackPage => '/autohandler', RedirectTo => \$next) if $next and $good;
+RT::Interface::Web::Redirect($next) if $next and $good;
+</%init>
+
+<& /Elements/Header, Title => 'OAuthRedirect' &>
+<div id="body" class="login-body">
+<& /Elements/ListActions,
+    title => loc('Error'),
+    titlebox => { class => 'error', hideable => 0 },
+    actions => $actions
+&>
+<a href="<% RT->Config->Get('WebURL')%>"><&|/l&>Go Home</&></a>
+</div>

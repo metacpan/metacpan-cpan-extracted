@@ -2,7 +2,7 @@ NAME
     Regexp::Pattern::License - Regular expressions for legal licenses
 
 VERSION
-    Version v3.1.0
+    Version v3.1.90
 
 DESCRIPTION
     Regexp::Pattern::License provides a hash of regular expression patterns
@@ -46,6 +46,10 @@ PATTERNS
     *   bsd_3_clause
 
     *   bsd_4_clause
+
+    *   bsl
+
+    *   bsl_1
 
     *   cc_by
 
@@ -105,17 +109,21 @@ PATTERNS
 
     *   isc
 
-    *   isc_minidiscl
-
     *   icu
+
+    *   json
+
+    *   jython
+
+    *   kevlin_henney
 
     *   lgpl
 
     *   lgpl_bdwgc
 
-    *   llgpl
-
     *   libpng
+
+    *   llgpl
 
     *   mit_advertising
 
@@ -158,6 +166,8 @@ PATTERNS
     *   public_domain
 
     *   python
+
+    *   python_2
 
     *   qpl
 
@@ -224,7 +234,69 @@ PATTERNS
 
 STRUCTURE
     The regexp patterns follows the DefHash specification, and more
-    specifically the structure of Regexp::Pattern.
+    specifically the structure of Regexp::Pattern, defining access to one
+    pattern per DefHash object, as `pat`.
+
+    Additionally, (sub)patterns are available in plaintext form, as
+    `pat.alt.*`.
+
+  SUBJECT
+    Each pattern targets one or more subjects, i.e. ways to directly or
+    indirectly represent a license.
+
+    Beware that not all pattern objects fully cover all subjects.
+
+    trait
+        Distinguishing trait or feature expressed in licensing strings, e.g.
+        an advertising clause or granting "...or any later version."
+
+        Coverage for this subject is currently rather weak.
+
+    name
+        Distinguishing name, e.g. usable in license grant.
+
+    grant
+        Text granting the license.
+
+    license
+        Text containing licensing terms.
+
+        Texts containing both license grant and licensing terms (e.g. BSD- and
+        MIT-style licensing) may be classified as either subject grant or
+        subject license. This may change, as needs for distinction is better
+        understood.
+
+  SCOPE
+    Each pattern can process material within some scope, i.e. a certain sample
+    size of the full subject.
+
+    As an example, <https://codesearch.debian.net/> use line-based processing,
+    where patterns spanning multiple lines are not applicable.
+
+    line
+        Pattern typically found within a single line. Typically this means
+        less than 70 characters within scope.
+
+    sentence
+        Pattern matching within a sentence.
+
+        May span multiple lines, but not across multiple sentences. Typically
+        this means no full-stop or colon within scope.
+
+    paragraph
+        Pattern matching distinguishing paragraph.
+
+        May span multiple sentences, but not multiple paragraphs. Typically
+        this means no newline within scope.
+
+    section
+        Pattern matching distinguishing section.
+
+        May span multiple paragraphs, but not multiple sections. Typically
+        this means blank line within scope.
+
+    multisection
+        Pattern may span multiple sections.
 
   TAGS
     Pattern defhashes optionally includes tags, which may help in selecting

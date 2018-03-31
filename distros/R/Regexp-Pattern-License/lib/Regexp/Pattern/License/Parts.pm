@@ -10,11 +10,11 @@ Regexp::Pattern::License::Parts - Regular expressions for licensing sub-parts
 
 =head1 VERSION
 
-Version v3.1.0
+Version v3.1.90
 
 =cut
 
-our $VERSION = version->declare("v3.1.0");
+our $VERSION = version->declare("v3.1.90");
 
 =head STATUS
 
@@ -28,281 +28,294 @@ It is a class of internally used patterns.
 
 =cut
 
-my $D  = qr/[-–]/;     # dash
-my $SD = qr/[ -–]/;    # space or dash
-
-#my $I  = qr/[iI\d\W]+/; # bullet or count
-my $I = qr/\W*\S\W*/;    # bullet or count
+# internal patterns compiled into patterns
+#  * must be unique, to not collide at their final use in gen_pat sub
+#  * must be a unit, so that e.g. suffix "?" applies to whole chunk
+my $BB = '[*1-9. ]';    # start-of-sentence bullet or count
+my $E  = '[ ]';         # end-of-sentence space
+my $Q  = '["]';         # quote
+my $QB = '["*]';        # quote or bullet
+my $SD = '[ -]';        # space or dash
 
 our %RE = (
 
 	# assets (original or derived)
 	doc_mat_dist => {
 		pat =>
-			qr/the documentation and\/or other materials provided with the distribution/
+			'the documentation and/or other materials provided with the distribution'
 	},
-	sw           => { pat => qr/the Software/ },
+	sw           => { pat => 'the Software' },
 	the_material => {
 		pat =>
-			qr/this software and associated documentation files \(the "?Material"?\)/
+			"this software and(?:/or)? associated documentation files \\(?the ${Q}Materials?$Q\\)?"
 	},
-	cp_sw => { pat => qr/all copies of the Software/ },
+	cp_sw => { pat => 'all copies of the Software' },
 	cp_sw_copr =>
-		{ pat => qr/all copies of the Software and its Copyright notices/ },
+		{ pat => 'all copies of the Software and its Copyright notices' },
 	cp_sw_doc =>
-		{ pat => qr/all copies of the Software and its documentation/ },
-	sw_doc => { pat => qr/this software and its documentation/ },
+		{ pat => 'all copies of the Software and its documentation' },
+	sw_doc => { pat => 'this software and its documentation' },
 	the_sw => {
 		pat =>
-			qr/this software and associated documentation files \(the "?Software"?\)/
+			"this software and associated documentation files \\(the ${Q}Software$Q\\)"
 	},
-	this_prg => { pat => qr/this program/ },
+	this_prg => { pat => 'this program' },
 
 	# rights
-	perm        => { pat => qr/Permission/ },
-	any_purpose => { pat => qr/for any purpose/ },
-	to_deal_mat =>
-		{ pat => qr/to deal in the Materials without restriction/ },
-	granted               => { pat => qr/is(?: hereby)? granted/ },
+	perm        => { pat => 'Permission' },
+	any_purpose => { pat => 'for any purpose' },
+	to_deal_mat => { pat => 'to deal in the Materials without restriction' },
+	granted     => { pat => 'is(?: hereby)? granted' },
 	to_deal_the_sw_rights => {
 		pat =>
-			qr/to deal in the Software without restriction, including without limitation the rights/
+			'to deal in the Software without restriction, including without limitation the rights'
 	},
-	to_copy => { pat => qr/to use or copy/ },
-	to_dist => { pat => qr/to use, copy, modify,? and distribute/ },
+	to_copy => { pat => 'to use or copy' },
+	to_dist => { pat => 'to use, copy, modify,? and distribute' },
 	to_dist_mod =>
-		{ pat => qr/to modify the code and to distribute modified code/ },
+		{ pat => 'to modify the code and to distribute modified code' },
 	to_mod_sublic => {
 		pat =>
-			qr/to use, copy, modify, merge, publish, distribute, sublicense, and\/or sell copies of/
+			'to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of'
 	},
 	to_perm_pers => {
 		caption => 'to permit person',
-		pat =>
-			qr/to permit persons to whom the Software is furnished to do so/
+		pat => 'to permit persons to whom the Software is furnished to do so'
 	},
 
 	# agents
-	to_pers => { pat => qr/to any person obtaining a copy of/ },
+	to_pers => { pat => 'to any person obtaining a copy of' },
 
 	# charges
-	free_charge    => { pat => qr/free of charge/ },
+	free_charge    => { pat => 'free of charge' },
 	free_agree_fee => {
 		pat =>
-			qr/without written agreement and without license or royalty fees/
+			'without written agreement and without license or royalty fees'
 	},
-	nofee => { pat => qr/without fee/ },
+	nofee => { pat => 'without fee' },
 
 	# conditions
-	subj_cond           => { pat => qr/subject to the following conditions/ },
+	subj_cond           => { pat => 'subject to the following conditions' },
 	ack_doc_mat_pkg_use => {
 		pat =>
-			qr/acknowledgment shall be given in the documentation, materials and software packages that this Software was used/
+			'acknowledgment shall be given in the documentation, materials and software packages that this Software was used'
 	},
 	ack_doc_pkg_use => {
 		pat =>
-			qr/acknowledgment shall be given in the documentation and software packages that this Software was used/
+			'acknowledgment shall be given in the documentation and software packages that this Software was used'
 	},
 	ack_pub_use_nosrc => {
 		pat =>
-			qr/In addition publicly documented acknowledgment must be given that this software has been used if no source code of this software is made available publicly/
+			'In addition publicly documented acknowledgment must be given that this software has been used if no source code of this software is made available publicly'
 	},
 	altered_srcver_mark => {
 		pat =>
-			qr/$I?Altered source versions must be plainly marked as such,? and must not be misrepresented as being the original software/
+			"$BB?Altered source versions must be plainly marked as such,? and must not be misrepresented as being the original software"
 	},
 	altered_ver_mark => {
 		pat =>
-			qr/$I?Altered versions must be plainly marked as such,? and must not be misrepresented as being the original source/
+			"$BB?Altered versions must be plainly marked as such,? and must not be misrepresented as being the original source"
 	},
 	change_redist_share => {
 		pat =>
-			qr/If you change this software and redistribute parts or all of it in any form, you must make the source code of the altered version of this software available/
+			'If you change this software and redistribute parts or all of it in any form, you must make the source code of the altered version of this software available'
 	},
-	incl => { pat => qr/shall be included/ },
-	name => { pat => qr/[Tt]he names?(?: \S+){1,15}/ },
+	incl => { pat => 'shall be included' },
+	name => { pat => '[Tt]he names?(?: \S+){1,15}' },
 	namenot =>
-		{ pat => qr/[Tt]he names?(?: \S+){1,15} (?:may|must|shall) not/ },
+		{ pat => '[Tt]he names?(?: \S+){1,15} (?:may|must|shall) not' },
 	neithername => {
 		pat =>
-			qr/Neither the (?:names?(?: \S+){1,15}|authors?) nor the names of(?: (?:its|their|other|any))? contributors may/
+			'Neither the (?:names?(?: \S+){1,15}|authors?) nor the names of(?: (?:its|their|other|any))? contributors\W? may'
 	},
 	notice_no_alter =>
-		{ pat => qr/$I?This notice may not be removed or altered/ },
+		{ pat => "$BB?This notice may not be removed or altered" },
 	notice_no_alter_any => {
 		pat =>
-			qr/$I?This notice may not be removed or altered from any source distribution/
+			"$BB?This notice may not be removed or altered from any source distribution"
 	},
 	copr_no_alter => {
 		pat =>
-			qr/$I?This Copyright notice may not be removed or altered from any source or altered source distribution/
+			"$BB?This Copyright notice may not be removed or altered from any source or altered source distribution"
 	},
 	license_not_lib => {
 		pat =>
-			qr/This License does not apply to any software that links to the libraries provided by this software \(statically or dynamically\), but only to the software provided/,
+			'This License does not apply to any software that links to the libraries provided by this software \(statically or dynamically\), but only to the software provided'
 	},
 	redist_bin_repro =>
-		{ pat => qr/Redistributions in binary form must reproduce/ },
+		{ pat => 'Redistributions in binary form must reproduce' },
 	src_no_relicense => {
 		pat =>
-			qr/$I?Source versions may not be "?relicensed"? under a different license without my explicitly written permission/
+			"$BB?Source versions may not be ${Q}relicensed$Q under a different license without my explicitly written permission"
 	},
 	used_endorse_deriv => {
 		pat =>
-			qr/be used to endorse or promote products derived from this software/
+			'be used to endorse or promote products derived from this software'
 	},
-	used_ad      => { pat => qr/be used in advertising/ },
+	used_ad      => { pat => 'be used in advertising' },
 	used_ad_dist => {
 		pat =>
-			qr/be used in (?:any )?advertising or publicity pertaining to distribution of the software/
+			'be used in (?:any )?advertising or publicity pertaining to distribution of the software'
+	},
+	you_not_use_ad_dist => {
+		pat =>
+			'You must not use any of the names of the authors or copyright holders of the original software for advertising or publicity pertaining to distribution'
 	},
 	without_prior_written =>
-		{ pat => qr/without specific prior written permission/ },
-	without_written => { pat => qr/without specific written permission/ },
+		{ pat => 'without specific prior written permission' },
+	without_written => { pat => 'without specific written permission' },
 	without_written_prior =>
-		{ pat => qr/without specific, written prior permission/ },
+		{ pat => 'without specific, written prior permission' },
 	origin_sw_no_misrepresent => {
-		pat => qr/$I?The origin of this software must not be misrepresented/
+		pat => "$BB?The origin of this software must not be misrepresented"
 	},
 	origin_src_no_misrepresent => {
 		pat =>
-			qr/$I?The origin of this source code must not be misrepresented/
+			"$BB?The origin of this source code must not be misrepresented"
 	},
-	you_not_claim_wrote => {
-		pat => qr/you must not claim that you wrote the original software/
-	},
-	use_ack_nonreq => {
+	you_not_claim_wrote =>
+		{ pat => 'you must not claim that you wrote the original software' },
+	use_ack_apprec => {
 		pat =>
-			qr/If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required/
+			'If you use this software in a product, an acknowledgment in the product documentation would be appreciated'
+	},
+	use_ack_apprec_not_req => {
+		pat =>
+			'If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required'
 	},
 	use_ack_req => {
 		pat =>
-			qr/If you use this software in a product, an acknowledgment \(see the following\) in the product documentation is required/
+			'If you use this software in a product, an acknowledgment \(see the following\) in the product documentation is required'
 	},
 
 	# disclaimers
-	asis_expr_warranty => { pat => qr/without express or implied warranty/ },
-	asis_name_sw    => { pat => qr/(?:\S+ ){1,15}PROVIDES? THIS SOFTWARE/ },
-	asis_sw_by_name => { pat => qr/THIS SOFTWARE IS PROVIDED BY/ },
+	asis_expr_warranty => {
+		pat => "provided $Q?as${SD}is$Q? without express or implied warranty"
+	},
+	asis_name_sw    => { pat => '(?:\S+ ){1,15}PROVIDES? THIS SOFTWARE' },
+	asis_sw_by_name => { pat => 'THIS SOFTWARE IS PROVIDED BY' },
 	asis_sw_expr_warranty => {
 		pat =>
-			qr/This software is supplied \*as is\W* without express or implied warranty/
+			"This software is supplied $Q?as${SD}is$Q? without express or implied warranty"
 	},
 	asis_sw_name_discl => {
 		pat =>
-			qr/THE SOFTWARE IS PROVIDED \W*AS\W+IS\W*(?:,?|AND) (?:\S+ ){1,15}DISCLAIMS/
+			"THE SOFTWARE IS PROVIDED ${QB}AS$QB?$SD$QB?IS$QB(?:,?|AND) (?:\\S+ ){1,15}DISCLAIMS"
 	},
 	asis_sw_warranty => {
-		pat => qr/THE SOFTWARE IS PROVIDED \W*AS\W+IS\W* WITHOUT WARRANTY/
+		pat =>
+			"THE SOFTWARE IS PROVIDED ${QB}AS$QB?$SD$QB?IS$QB,? WITHOUT WARRANTY"
 	},
 
 	# versioning
-	ver_later_para    => { pat => qr/Later versions are permitted/ },
+	ver_later_para    => { pat => 'Later versions are permitted' },
 	ver_later_postfix => {
 		pat =>
-			qr/(?:and|or)(?: ?\(?at your option\)?)?(?: any)? (?:later|newer)(?: version)?/
+			'(?:and|or)(?: ?\(?at your option\)?)?(?: any)? (?:later|newer)(?: version)?'
 	},
-	ver_number => { pat => qr/\d(?:\.\d+)*/ },
-	ver_prefix => { pat => qr/[Vv](?:ersion |ERSION |\.? ?)/ },
+	ver_number => { pat => '\d(?:\.\d+)*' },
+	ver_prefix => { pat => '[Vv](?:ersion |ERSION |\.? ?)' },
 
 	# Creative Commons
-	cc     => { pat => qr/(?:Creative Commons|CC)/ },
-	cc_by  => { pat => qr/(?:Attribution)/ },
-	cc_cc0 => { pat => qr/(?:CC0|Zero|0)/ },
-	cc_nc  => { pat => qr/(?:Non$SD?Commercial)/ },
-	cc_nd  => { pat => qr/(?:No$SD?Deriv(?:ative)?s)/ },
-	cc_sa  => { pat => qr/(?:Share$SD?Alike)/ },
-	cc_sp  => { pat => qr/(?:Sampling$SD?Plus)/ },
+	cc     => { pat => '(?:Creative Commons|CC)' },
+	cc_by  => { pat => '(?:Attribution)' },
+	cc_cc0 => { pat => '(?:CC0|Zero|0)' },
+	cc_nc  => { pat => "(?:Non$SD?Commercial)" },
+	cc_nd  => { pat => "(?:No$SD?Deriv(?:ative)?s)" },
+	cc_sa  => { pat => "(?:Share$SD?Alike)" },
+	cc_sp  => { pat => "(?:Sampling$SD?Plus)" },
 	cc_url =>
-		{ pat => qr"(?:(?:https?:?)?(?://)?creativecommons.org/licenses/)" },
+		{ pat => '(?:(?:https?:?)?(?://)?creativecommons.org/licenses/)' },
 	cc_url_pd => {
-		pat => qr"(?:(?:https?:?)?(?://)?creativecommons.org/publicdomain/)"
+		pat => '(?:(?:https?:?)?(?://)?creativecommons.org/publicdomain/)'
 	},
 
 	# texts
 	ack_name => {
 		pat =>
-			qr/the following acknowledge?ment\W+This product includes software developed by/
+			"the following acknowledge?ments?:?$E$Q?This product includes software developed by"
 	},
-	authors_copr    => { pat => qr/the Authors, the Copyright/ },
-	copr            => { pat => qr/[Tt]he above copyright notice/ },
+	authors_copr    => { pat => 'the Authors, the Copyright' },
+	copr            => { pat => '[Tt]he above copyright notice' },
 	copr_avail_orig => {
 		pat =>
-			qr/the Copyright, this License, and the Availability of the original version/
+			'the Copyright, this License, and the Availability of the original version'
 	},
 	copr_avail_note => {
-		pat => qr/the Copyright, this License, (?:and )?the Availability note/
+		pat => 'the Copyright, this License, (?:and )?the Availability note'
 	},
 	copr_perm => {
 		pat =>
-			qr/(?:both t|t|T)(?:hat|he|he above) copyright notice(?:s|\(s\))? and this permission notice/
+			'(?:both t|t|T)(?:hat|he|he above) copyright notice(?:s|\(s\))? and this permission notice'
 	},
 	copr_perm_warr => {
 		pat =>
-			qr/(?:both t|t|T)(?:hat|he|he above) copyright notice(?:s|\(s\))? and this permission notice and warranty disclaimer/
+			'(?:both t|t|T)(?:hat|he|he above) copyright notice(?:s|\(s\))? and this permission notice and warranty disclaimer'
 	},
+	copr_perms      => { pat => 'this copyright and permissions notice' },
 	copr_cond_discl => {
 		pat =>
-			qr/the above copyright notice, this list of conditions and the following disclaimer/
+			'the above copyright notice, this list of conditions and the following disclaimer'
 	},
-	notices   => { pat => qr/[Tt]he above notices/ },
-	used_perm => { pat => qr/[Uu]sed by permission/ },
+	notices   => { pat => '[Tt]he above notices' },
+	used_perm => { pat => '[Uu]sed by permission' },
 
 	# combinations
 	discl_name_warranties =>
-		{ pat => qr/(?:\S+ ){1,15}DISCLAIMS? ALL WARRANTIES/ },
-	permission_use_fee_agree =>
-		{ pat => qr/and without a written agreement/ },
+		{ pat => '(?:\S+ ){1,15}DISCLAIMS? ALL WARRANTIES' },
+	permission_use_fee_agree => { pat => 'and without a written agreement' },
 );
 
-$RE{perm_granted}{pat} = qr/$RE{perm}{pat} $RE{granted}{pat}/;
+$RE{perm_granted}{pat} = "$RE{perm}{pat} $RE{granted}{pat}";
 $RE{ad_mat_ack_this}{pat}
-	= qr/All advertising materials mentioning features or use of this software must display $RE{ack_name}{pat}/;
+	= "All advertising materials mentioning features or use of this software must display $RE{ack_name}{pat}";
 $RE{note_copr_perm}{pat}
-	= qr/provided that$I? $RE{copr_perm}{pat} appear in all copies/;
+	= "provided that$BB? $RE{copr_perm}{pat} appear in all copies";
+$RE{note_copr_perms_deriv}{pat}
+	= "provided that$BB? $RE{copr_perms}{pat} appear in all copies and derivatives";
 $RE{repro_code_cite_authors_copr}{pat}
-	= qr/User documentation of any code that uses this code must cite $RE{authors_copr}{pat}/;
+	= "User documentation of any code that uses this code must cite $RE{authors_copr}{pat}";
 $RE{repro_code_modcode_cite_copr_avail_note}{pat}
-	= qr/User documentation of any code that uses this code or any modified version of this code must cite $RE{copr_avail_note}{pat}/;
+	= "User documentation of any code that uses this code or any modified version of this code must cite $RE{copr_avail_note}{pat}";
 $RE{repro_copr_perm_warr_appear_doc}{pat}
-	= qr/$RE{copr_perm_warr}{pat} appear in supporting documentation/;
+	= "$RE{copr_perm_warr}{pat} appear in supporting documentation";
 $RE{repro_matlab_cite_authors}{pat}
-	= qr/If this code is accessible from within Matlab, then typing(?: \S+){2,5} \(with no arguments\) must cite the Authors/;
+	= 'If this code is accessible from within Matlab, then typing(?: \S+){2,5} \(with no arguments\) must cite the Authors';
 $RE{note_marketing}{pat}
-	= qr/$RE{incl}{pat} in $RE{cp_sw}{pat}, its documentation and marketing/;
-$RE{note_mod}{pat} = qr/a notice that the code was modified is included/;
+	= "$RE{incl}{pat} in $RE{cp_sw}{pat}, its documentation and marketing";
+$RE{note_mod}{pat} = 'a notice that the code was modified is included';
 $RE{retain_copr_appear}{pat}
-	= qr/provided that $RE{copr}{pat} appears? in all copies/;
+	= "provided that $RE{copr}{pat} appears? in all copies";
 $RE{retain_copr_avail_note}{pat}
-	= qr/provided $RE{copr_avail_note}{pat} are retained/;
+	= "provided $RE{copr_avail_note}{pat} are retained";
 $RE{retain_copr_avail_orig}{pat}
-	= qr/provided that $RE{copr_avail_orig}{pat} is retained on all copies/;
+	= "provided that $RE{copr_avail_orig}{pat} is retained on all copies";
 $RE{retain_copr_perm_subst}{pat}
-	= qr/$RE{copr_perm}{pat} $RE{incl}{pat} in all copies or substantial portions of the Software/;
+	= "$RE{copr_perm}{pat} $RE{incl}{pat} in all copies or substantial portions of the Software";
 $RE{retain_copr_perm_sw_copr}{pat}
-	= qr/$RE{copr_perm}{pat} $RE{incl}{pat} in $RE{cp_sw_copr}{pat}/;
+	= "$RE{copr_perm}{pat} $RE{incl}{pat} in $RE{cp_sw_copr}{pat}";
 $RE{retain_copr_perm_sw_doc}{pat}
-	= qr/$RE{copr_perm}{pat} $RE{incl}{pat} in $RE{cp_sw_doc}{pat}/;
+	= "$RE{copr_perm}{pat} $RE{incl}{pat} in $RE{cp_sw_doc}{pat}";
 $RE{retain_notice_cond_discl}{pat}
-	= qr/Redistributions of source code must retain $RE{copr_cond_discl}{pat}/;
-$RE{retain_notices}{pat}     = qr/provided $RE{notices}{pat} are retained/;
-$RE{retain_notices_all}{pat} = qr/$RE{retain_notices}{pat} on all copies/;
+	= "Redistributions of source code must retain $RE{copr_cond_discl}{pat}";
+$RE{retain_notices}{pat}     = "provided $RE{notices}{pat} are retained";
+$RE{retain_notices_all}{pat} = "$RE{retain_notices}{pat} on all copies";
 $RE{retain_you_avail_orig}{pat}
-	= qr/You must also retain the Availability information below, of the original version/;
+	= 'You must also retain the Availability information below, of the original version';
 $RE{nopromo_except}{pat}
-	= qr/Except as contained in this notice, $RE{namenot}{pat} $RE{used_ad}{pat}/;
+	= "Except as contained in this notice, $RE{namenot}{pat} $RE{used_ad}{pat}";
 $RE{nopromo_name_written}{pat}
-	= qr/$RE{name}{pat} not $RE{used_ad_dist}{pat} $RE{without_written}{pat}/;
+	= "$RE{name}{pat} not $RE{used_ad_dist}{pat} $RE{without_written}{pat}";
 $RE{nopromo_name_written_prior}{pat}
-	= qr/$RE{name}{pat} not $RE{used_ad_dist}{pat} $RE{without_written_prior}{pat}/;
+	= "$RE{name}{pat} not $RE{used_ad_dist}{pat} $RE{without_written_prior}{pat}";
 $RE{repro_copr_cond_discl}{pat}
-	= qr/$RE{redist_bin_repro}{pat} $RE{copr_cond_discl}{pat} in $RE{doc_mat_dist}{pat}/;
+	= "$RE{redist_bin_repro}{pat} $RE{copr_cond_discl}{pat} in $RE{doc_mat_dist}{pat}";
 $RE{repro_copr_perm_appear_doc}{pat}
-	= qr/$RE{copr_perm}{pat} appear in supporting documentation/;
+	= "$RE{copr_perm}{pat} appear in supporting documentation";
 $RE{nopromo_neither}{pat}
-	= qr/(?:$RE{neithername}{pat}|$RE{namenot}{pat}) $RE{used_endorse_deriv}{pat} $RE{without_prior_written}{pat}/;
+	= "(?:$RE{neithername}{pat}|$RE{namenot}{pat}) $RE{used_endorse_deriv}{pat} $RE{without_prior_written}{pat}";
 $RE{redist_ack_this}{pat}
-	= qr/Redistributions of any form whatsoever must retain $RE{ack_name}{pat}/;
+	= "Redistributions of any form whatsoever must retain $RE{ack_name}{pat}";
 
 =encoding UTF-8
 

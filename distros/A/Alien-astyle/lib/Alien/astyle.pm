@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Alien::astyle;
 
-our $VERSION = '0.009000';
+our $VERSION = '0.010000';
 
 use base qw( Alien::Base );
 

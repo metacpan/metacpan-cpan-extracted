@@ -1,0 +1,72 @@
+{
+   "abstract" : "Ethereum JSON-RPC Client",
+   "author" : [
+      "binary.com <BINARY@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Ethereum-RPC-Client",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.1101"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::EOL" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.41",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Future" : "0.38",
+            "JSON" : "2.97001",
+            "JSON::MaybeXS" : "1.003010",
+            "Math::BigFloat" : "1.999811",
+            "Math::BigInt" : "1.999811",
+            "Mojo::UserAgent" : "0",
+            "Moo" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/binary-com/perl-Ethereum-RPC-Client/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/binary-com/perl-Ethereum-RPC-Client.git",
+         "web" : "https://github.com/binary-com/perl-Ethereum-RPC-Client"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0222"
+}
+

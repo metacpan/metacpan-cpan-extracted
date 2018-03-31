@@ -35,6 +35,11 @@
             "Test::Pod" : "1.41"
          }
       },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "4.200006"
+         }
+      },
       "test" : {
          "requires" : {
             "Test::More" : "0.96"
@@ -53,7 +58,7 @@
          "web" : "https://github.com/vlyon/Dist-Zilla-Plugin-UseBuildPL"
       }
    },
-   "version" : "0.1",
+   "version" : "0.2",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

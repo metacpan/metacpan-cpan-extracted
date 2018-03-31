@@ -3,7 +3,7 @@
 use Term::Highlight ();
 
 ( $PROGNAME = $0 ) =~ s/.*\///;
-$VERSION = "1.9.4";
+$VERSION = "2.0.0";
 $TAGTYPE = "term";
 $RC_FILE = "$ENV{ HOME }/.hlrc";
 $SNIPPET_PTN = qr/^\s*snippet\s+(\S+)\s+(.*)/;
@@ -384,9 +384,10 @@ if ( $GrepRecursively )
                     my $matches = $AlwaysMatches;
                     unless ( $matches )
                     {
+                        ( my $stripped_line = $_ ) =~ s/\R$//;
                         for my $ptn ( @$Patterns )
                         {
-                            if ( $_ =~ @$ptn[ 0 ] )
+                            if ( $stripped_line =~ @$ptn[ 0 ] )
                             {
                                 $matches = 1;
                                 last;
@@ -462,12 +463,15 @@ else
         while ( <$FileHandle> )
         {
             #pre-check that line matches: it is cheaper than calling Process()!
+            #Notice that newline characters get removed from the current line
+            #before the check
             my $matches = $AlwaysMatches;
             unless ( $matches )
             {
+                ( my $stripped_line = $_ ) =~ s/\R$//;
                 for my $ptn ( @$Patterns )
                 {
-                    if ( $_ =~ @$ptn[ 0 ] )
+                    if ( $stripped_line =~ @$ptn[ 0 ] )
                     {
                         $matches = 1;
                         last;

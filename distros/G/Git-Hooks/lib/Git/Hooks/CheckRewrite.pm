@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckRewrite;
 # ABSTRACT: Git::Hooks plugin for checking against unsafe rewrites
-$Git::Hooks::CheckRewrite::VERSION = '2.9.1';
+$Git::Hooks::CheckRewrite::VERSION = '2.9.2';
 use 5.010;
 use utf8;
 use strict;
@@ -65,21 +65,16 @@ Please, check if you forgot to create the pre-commit hook.
 EOS
         and return 0;
 
-    my ($old_commit, $old_parents) = $record_file->lines;
+    my ($old_commit, $old_parents) = $record_file->lines({chomp => 1});
 
     # For a brand new repository the commit information is empty and we
     # don't have to check anything.
     return 1 unless $old_commit;
 
-    chomp $old_commit;
     $old_commit =~ s/^commit\s+//;
 
-    if (defined $old_parents) {
-        chomp $old_parents;
-    } else {
-        # the repo's first commit has no parents.
-        $old_parents = '';
-    }
+    # the repo's first commit has no parents.
+    $old_parents //= '';
 
     my $new_parents = ($git->run(qw/rev-list --pretty=format:%P -n 1 HEAD/))[1];
 
@@ -115,7 +110,7 @@ sub check_rebase {
     unless (defined $branch) {
         # This means we're rebasing the current branch. We try to grok
         # it's name using git symbolic-ref.
-        my $success = eval { chomp($branch = $git->run(qw/symbolic-ref -q HEAD/)) };
+        my $success = eval { $branch = $git->run(qw/symbolic-ref -q HEAD/) };
 
         # The command git symbolic-ref fails if we're in a
         # detached HEAD. In this situation we don't care about the
@@ -181,7 +176,7 @@ Git::Hooks::CheckRewrite - Git::Hooks plugin for checking against unsafe rewrite
 
 =head1 VERSION
 
-version 2.9.1
+version 2.9.2
 
 =head1 SYNOPSIS
 

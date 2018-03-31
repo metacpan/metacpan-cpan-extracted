@@ -4,11 +4,28 @@ use strict;
 use warnings;
 
 use lib 't/lib';
-use Test::Licensecheck tests => 2;
+use Test::Licensecheck tests => 15;
 
-is_licensed(
+license_like(
 	't/fedora/MIT',
-	[   'Adobe-Glyph and/or BSL and/or DSDP and/or Expat and/or ICU and/or MIT-CMU and/or MIT-CMU~warranty and/or MIT-enna and/or MIT-feh and/or MIT~old and/or MIT~oldstyle and/or MIT~oldstyle~disclaimer and/or PostgreSQL and/or bdwgc',
+	[   qr/Adobe\-Glyph/,
+		qr/BSL/, qr/DSDP/,
+		qr/Expat/,
+		qr/ICU/,
+		qr/MIT\-CMU/,
+		qr/MIT\-CMU~warranty/,
+		qr/MIT\-enna/,
+		qr/MIT\-feh/,
+		qr/MIT~old/,
+		qr/MIT~oldstyle/,
+		qr/MIT~oldstyle~disclaimer/,
+		qr/PostgreSQL/,
+		qr/MIT~Boehm|bdwgc/,
+	]
+);
+license_is(
+	't/fedora/MIT',
+	[   undef,
 		'an even longer list...'
 	]
 );

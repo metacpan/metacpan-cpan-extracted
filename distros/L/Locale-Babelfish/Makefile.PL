@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Perl I18n using https://github.com/nodeca/babelfish format.",
-  "AUTHOR" => "Akzhan Abdulin <akzhan\@cpan.org>, Igor Mironov <grif\@cpan.org>, Victor Efimov <efimov\@reg.ru>, REG.RU LLC",
+  "AUTHOR" => "Akzhan Abdulin <akzhan\@cpan.org>, Igor Mironov <grif\@cpan.org>, Victor Efimov <efimov\@reg.ru>, REG.RU LLC, Kirill Sysoev <k.sysoev\@me.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -49,7 +49,7 @@ my %WriteMakefileArgs = (
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "2.004",
+  "VERSION" => "2.005",
   "test" => {
     "TESTS" => "t/*.t t/Phrase/*.t"
   }

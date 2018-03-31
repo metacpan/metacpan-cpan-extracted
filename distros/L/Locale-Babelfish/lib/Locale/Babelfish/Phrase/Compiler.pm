@@ -15,7 +15,7 @@ use Locale::Babelfish::Phrase::PluralForms ();
 
 use parent qw( Class::Accessor::Fast );
 
-our $VERSION = '2.004'; # VERSION
+our $VERSION = '2.005'; # VERSION
 
 __PACKAGE__->mk_accessors( qw( ast ) );
 
@@ -93,7 +93,7 @@ Locale::Babelfish::Phrase::Compiler - Babelfish AST Compiler
 
 =head1 VERSION
 
-version 2.004
+version 2.005
 
 =head1 DESCRIPTION
 
@@ -146,6 +146,10 @@ Victor Efimov <efimov@reg.ru>
 =item *
 
 REG.RU LLC
+
+=item *
+
+Kirill Sysoev <k.sysoev@me.com>
 
 =back
 

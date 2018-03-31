@@ -909,7 +909,7 @@ L<Unicode::GCString~[ja]>.
 
 =head1 AUTHOR
 
-Copyright (C) 2009-2017 Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>.
+Copyright (C) 2009-2018 Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>.
 
 This program is free software; you can redistribute it and/or modify it 
 under the same terms as Perl itself.

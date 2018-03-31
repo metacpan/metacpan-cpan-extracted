@@ -4,6 +4,7 @@ use strict;
 use Getopt::Long;
 use FB3::Convert;
 use utf8;
+use File::ShareDir qw/dist_dir/;
 
 my %OPT;
 GetOptions(
@@ -25,14 +26,22 @@ GetOptions(
   'meta_date=s' => \$OPT{'meta_date'},
 ) || help();
 
-$OPT{'source'} = $ARGV[0] unless $OPT{'source'};
-$OPT{'df'} = $ARGV[1] unless $OPT{'df'};
+my $XsdPath = dist_dir("FB3");
 
 if ($OPT{'vl'}) {
   my $Obj = new FB3::Convert(empty=>1);
-  my $Valid = $Obj->Validate($OPT{'vl'});
+  my $Valid = $Obj->Validate('path'=>$OPT{'vl'},'xsd'=>$XsdPath);
   print $Valid;
   exit;
+}
+
+$OPT{'source'} = $ARGV[0] unless $OPT{'source'};
+$OPT{'df'} = $ARGV[1] unless $OPT{'df'};
+
+if (!$OPT{'dd'} && !$OPT{'df'}) {
+  my $FName = $OPT{'source'};
+  $FName =~ s/\.\w+$//;
+  $OPT{'df'} = $FName.'.fb3';
 }
 
 unless ($OPT{'source'}) {
@@ -62,7 +71,7 @@ my $Obj = new FB3::Convert(
 $Obj->Reap();
 my $FB3Path =  $Obj->FB3Create();
 $Obj->Msg("FB3: ".$FB3Path." created\n","w");
-my $ValidErr = $Obj->Validate();
+my $ValidErr = $Obj->Validate('xsd'=>$XsdPath);
 print $ValidErr;
 $Obj->FB3_2_Zip() if $OPT{'df'} && !$ValidErr;
 $Obj->Cleanup($ValidErr?1:0);

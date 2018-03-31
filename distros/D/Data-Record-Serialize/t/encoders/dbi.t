@@ -3,9 +3,11 @@
 use Test2::V0;
 use Test2::Tools::AfterSubtest;
 
-use lib 't/lib';
+use Test::Lib;
 
 use Data::Record::Serialize;
+
+use warnings;
 
 eval 'use DBI; 1'
   or plan skip_all => "Need DBI to run the DBI backend tests\n";
@@ -14,19 +16,21 @@ eval 'use DBI; 1'
 our @DBDs;
 
 eval 'use DBD::SQLite; 1'
-  and push @DBDs, [ 'SQLite', '', '', '' ] ;
+  and push @DBDs, [ 'SQLite', '', '', '' ];
 
 
-if ( $ENV{DBI_DRIVER} )
-{
+if ( $ENV{DBI_DRIVER} ) {
     diag( "unable to load DBD::$ENV{DBI_DRIVER}" )
       unless eval "use DBD::$ENV{DBI_DRIVER}; 1";
 
-    push @DBDs, [ $ENV{DBI_DRIVER},
-                  $ENV{DBI_DBNAME} || '',
-                  $ENV{DBI_USER} || '',
-                  $ENV{DBI_PASS} || ''
-                  ],
+    push @DBDs,
+      [
+        $ENV{DBI_DRIVER},
+        $ENV{DBI_DBNAME} || '',
+        $ENV{DBI_USER}   || '',
+        $ENV{DBI_PASS}   || ''
+      ],
+      ;
 }
 
 @DBDs
@@ -45,24 +49,27 @@ sub tmpfile {
 
 
 my @test_data = (
-    { a => 1, b => 2, c => 'nyuck nyuck' },
-    { a => 3, b => 4, c => 'niagara falls' },
-    { a => 5, b => 6, c => 'why youuu !' },
-    { a => 7, b => 8, c => 'scale that fish !' },
-    { a => 9, b => 10 },
+    { a => 1,  b => 2,  c => 'nyuck nyuck' },
+    { a => 3,  b => 4,  c => 'niagara falls' },
+    { a => 5,  b => 6,  c => 'why youuu !' },
+    { a => 7,  b => 8,  c => 'scale that fish !' },
+    { a => 9,  c => "that's all folks" },
+    { a => 11, b => undef, c => "pronoun problems" },
 );
 
-my @expected_data = map { my $obj = $_;
-                          @{$obj}{ grep !defined $obj->{$_}, qw[ a b c ] } = undef;
-                          $obj;
-                      } @test_data;
+my @expected_data = map {
+    my $obj = { %$_ };
+    @{$obj}{ grep !defined $obj->{$_} || !length $obj->{$_}, qw[ a b c ] }
+      = undef;
+    $obj;
+} @test_data;
 
 # just in case we corrupt @test_data;
 my $test_data_nrows = @test_data;
 
 my $TEST_TABLE = "drststtbl";
 
-my $after_cb = sub {};
+my $after_cb = sub { };
 
 after_subtest( sub { $after_cb->() } );
 
@@ -79,7 +86,7 @@ for my $dbinfo ( @DBDs ) {
     }
     else {
 
-        $dbf = sub { $db } ;
+        $dbf = sub { $db };
 
         $after_cb = sub { clear_db( $dbd, $db, $user, $pass ) };
 
@@ -109,8 +116,7 @@ for my $dbinfo ( @DBDs ) {
             ) or diag $@;
 
             $s->send( {%$_} ) foreach @test_data;
-
-            undef $s;
+            $s->close;
 
             test_db( $dbd, $db, $user, $pass );
 
@@ -124,10 +130,10 @@ for my $dbinfo ( @DBDs ) {
             ok(
                 lives {
                     $s = Data::Record::Serialize->new(
-                        encode => 'dbi',
-                        dsn    => [ $dbd, { dbname => $db } ],
-                        table  => $TEST_TABLE,
-                        batch  => $test_data_nrows,
+                        encode  => 'dbi',
+                        dsn     => [ $dbd, { dbname => $db } ],
+                        table   => $TEST_TABLE,
+                        batch   => $test_data_nrows,
                     );
                 },
                 "constructor"
@@ -141,7 +147,7 @@ for my $dbinfo ( @DBDs ) {
             ok( !$s->_dbh->{AutoCommit},
                 "Ensure that AutoCommit is really off" );
 
-            undef $s;
+            $s->close;
 
             test_db( $dbd, $db, $user, $pass );
         };
@@ -154,18 +160,17 @@ for my $dbinfo ( @DBDs ) {
             ok(
                 lives {
                     $s = Data::Record::Serialize->new(
-                        encode => 'dbi',
-                        dsn    => [ $dbd, { dbname => $db } ],
-                        table  => $TEST_TABLE,
-                        batch  => $test_data_nrows + 1,
+                        encode  => 'dbi',
+                        dsn     => [ $dbd, { dbname => $db } ],
+                        table   => $TEST_TABLE,
+                        batch   => $test_data_nrows + 1,
                     );
                 },
                 "constructor"
             ) or diag $@;
 
             $s->send( {%$_} ) foreach @test_data;
-
-            undef $s;
+            $s->close;
 
             test_db( $dbd, $db, $user, $pass );
         };
@@ -178,10 +183,10 @@ for my $dbinfo ( @DBDs ) {
             ok(
                 lives {
                     $s = Data::Record::Serialize->new(
-                        encode => 'dbi',
-                        dsn    => [ $dbd, { dbname => $db } ],
-                        table  => $TEST_TABLE,
-                        batch  => $test_data_nrows - 1,
+                        encode  => 'dbi',
+                        dsn     => [ $dbd, { dbname => $db } ],
+                        table   => $TEST_TABLE,
+                        batch   => $test_data_nrows - 1,
                     );
                 },
                 "constructor"
@@ -189,7 +194,7 @@ for my $dbinfo ( @DBDs ) {
 
             $s->send( {%$_} ) foreach @test_data;
 
-            undef $s;
+            $s->close;
 
             test_db( $dbd, $db, $user, $pass );
         };
@@ -202,7 +207,9 @@ for my $dbinfo ( @DBDs ) {
             my $dbh;
             ok(
                 lives {
-                    $dbh = DBI->connect( "dbi:${dbd}:dbname=${db}", $user, $pass, { RaiseError => 1 } );
+                    $dbh
+                      = DBI->connect( "dbi:${dbd}:dbname=${db}", $user, $pass,
+                        { RaiseError => 1 } );
                 },
                 'open db file'
             ) or diag $@;
@@ -230,7 +237,7 @@ for my $dbinfo ( @DBDs ) {
 
             $s->send( {%$_} ) foreach @test_data;
 
-            undef $s;
+            $s->close;
 
             test_db( $dbd, $db, $user, $pass );
         };
@@ -272,6 +279,36 @@ sub test_db {
     is( $rows->[$_], $expected_data[$_], "row[$_]: stored data eq passed data" )
       foreach 0 .. $#expected_data;
 
+    ok(
+        lives {
+            $rows
+              = $dbh->selectall_arrayref(
+                "select * from $TEST_TABLE where b is null",
+                { Slice => {} } );
+        },
+        'select rows with b is NULL from file',
+    ) or diag $@;
+
+    # yeah, this is hard coded.
+    is(
+        $rows,
+        [
+            hash {
+                field a => 9;
+                field b => undef;
+                field c => "that's all folks" ;
+                end;
+            },
+            hash {
+                field a => 11;
+                field b => undef;
+                field c => "pronoun problems";
+                end;
+            }
+        ],
+        "correct rows with nulls",
+    );
+
     $ctx->release;
 }
 
@@ -280,9 +317,12 @@ sub clear_db {
     my ( $dbd, $db, $user, $pass ) = @_;
 
     if ( $dbd ne 'SQLite' ) {
-        my $dbh = DBI->connect( "dbi:${dbd}:dbname=${db}", $user, $pass,
-                                { PrintError => 0 } )
-          or bail_out( "Unable to connect to database: dbi:${dbd}:dbname=${db} user:$user" );
+        my $dbh
+          = DBI->connect( "dbi:${dbd}:dbname=${db}", $user, $pass,
+            { PrintError => 0 } )
+          or bail_out(
+            "Unable to connect to database: dbi:${dbd}:dbname=${db} user:$user"
+          );
         $dbh->do( "drop table $TEST_TABLE cascade" );
     }
 }

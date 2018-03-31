@@ -1,0 +1,26 @@
+bin/new_docclaimes_test
+Changes
+lib/Test/DocClaims.pm
+lib/Test/DocClaims/Line.pm
+lib/Test/DocClaims/Lines.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/00-Line.t
+t/01-Lines.t
+t/10-basic.t
+t/11-fail.t
+t/doc-bin-new_docclaimes_test.t
+t/doc-Test-DocClaims-01-SYNOPSIS-1.t
+t/doc-Test-DocClaims-01-SYNOPSIS-2.t
+t/doc-Test-DocClaims-01-SYNOPSIS-3.t
+t/doc-Test-DocClaims-02-DESCRIPTION.t
+t/doc-Test-DocClaims-03-FUNCTIONS-01.t
+t/doc-Test-DocClaims-03-FUNCTIONS-02.t
+t/doc-Test-DocClaims-Line.t
+t/doc-Test-DocClaims-Lines.t
+t/doc_claims.t
+t/lib/TestTester.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

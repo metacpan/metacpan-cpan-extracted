@@ -6,17 +6,12 @@ use Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
-#pod =begin pod_coverage
-#pod
-#pod =head3 print
-#pod
-#pod =head3 say
-#pod
-#pod =head3 close
-#pod
-#pod =end pod_coverage
+#pod =for Pod::Coverage
+#pod  print
+#pod  say
+#pod  close
 #pod
 #pod =cut
 
@@ -29,6 +24,18 @@ with 'Data::Record::Serialize::Role::Sink';
 
 1;
 
+#
+# This file is part of Data-Record-Serialize
+#
+# This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
+__END__
+
 =pod
 
 =head1 NAME
@@ -37,7 +44,7 @@ Data::Record::Serialize::Sink::null - send output to nowhere.
 
 =head1 VERSION
 
-version 0.13
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -51,17 +58,11 @@ version 0.13
 
 B<Data::Record::Serialize::Sink::stream> sends data to the bitbucket.
 
-It performs the L<B<Data::Record::Serialize::Role::Sink>> role.
+It performs the L<Data::Record::Serialize::Role::Sink> role.
 
-=begin pod_coverage
-
-=head3 print
-
-=head3 say
-
-=head3 close
-
-=end pod_coverage
+=for Pod::Coverage print
+ say
+ close
 
 =head1 BUGS AND LIMITATIONS
 
@@ -93,19 +94,3 @@ This is free software, licensed under:
   The GNU General Public License, Version 3, June 2007
 
 =cut
-
-__END__
-
-#pod =head1 SYNOPSIS
-#pod
-#pod     use Data::Record::Serialize;
-#pod
-#pod     my $s = Data::Record::Serialize->new( sink => 'null', ... );
-#pod
-#pod     $s->send( \%record );
-#pod
-#pod =head1 DESCRIPTION
-#pod
-#pod B<Data::Record::Serialize::Sink::stream> sends data to the bitbucket.
-#pod
-#pod It performs the L<B<Data::Record::Serialize::Role::Sink>> role.

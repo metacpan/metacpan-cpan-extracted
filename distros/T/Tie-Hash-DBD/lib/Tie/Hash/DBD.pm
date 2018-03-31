@@ -1,6 +1,6 @@
 package Tie::Hash::DBD;
 
-our $VERSION = "0.16";
+our $VERSION = "0.18";
 
 use strict;
 use warnings;
@@ -39,6 +39,13 @@ my %DB = (
 	autoc	=> 0,
 	k_asc	=> 1,
 	},
+    MariaDB	=> {
+	temp	=> "temporary",
+	t_key	=> "blob",	# Does not allow binary to be primary key
+	t_val	=> "blob",
+	clear	=> "truncate table",
+	autoc	=> 0,
+	},
     mysql	=> {
 	temp	=> "temporary",
 	t_key	=> "blob",	# Does not allow binary to be primary key
@@ -68,8 +75,7 @@ my %DB = (
 	},
     );
 
-sub _create_table
-{
+sub _create_table {
     my ($cnf, $tmp) = @_;
     $cnf->{tmp} = $tmp;
 
@@ -97,8 +103,7 @@ sub _create_table
     $dbt eq "Unify" and $dbh->commit;
     } # create table
 
-sub TIEHASH
-{
+sub TIEHASH {
     my $pkg = shift;
     my $usg = qq{usage: tie %h, "$pkg", \$dbh [, { tbl => "tbl", key => "f_key", fld => "f_value" }];};
     my $dsn = shift or croak $usg;
@@ -186,8 +191,7 @@ sub TIEHASH
     bless $h, $pkg;
     } # TIEHASH
 
-sub _stream
-{
+sub _stream {
     my ($self, $val) = @_;
     defined $val or return undef;
     $self->{str} or return $val;
@@ -196,8 +200,7 @@ sub _stream
     return $val;
     } # _stream
 
-sub _unstream
-{
+sub _unstream {
     my ($self, $val) = @_;
     defined $val or return undef;
     $self->{str} or return $val;
@@ -206,8 +209,7 @@ sub _unstream
     return $val;
     } # _unstream
 
-sub STORE
-{
+sub STORE {
     my ($self, $key, $value) = @_;
     my $k = $self->{asc} ? unpack "H*", $key : $key;
     my $v = $self->_stream ($value);
@@ -219,8 +221,7 @@ sub STORE
     $r;
     } # STORE
 
-sub DELETE
-{
+sub DELETE {
     my ($self, $key) = @_;
     $self->{asc} and $key = unpack "H*", $key;
     $self->{trh} and $self->{dbh}->begin_work unless $self->{dbt} eq "SQLite";
@@ -236,22 +237,19 @@ sub DELETE
     $self->_unstream ($r->[0]);
     } # DELETE
 
-sub CLEAR
-{
+sub CLEAR {
     my $self = shift;
     $self->{dbh}->do ("$DB{$self->{dbt}}{clear} $self->{tbl}");
     } # CLEAR
 
-sub EXISTS
-{
+sub EXISTS {
     my ($self, $key) = @_;
     $self->{asc} and $key = unpack "H*", $key;
     $self->{sel}->execute ($key);
     return $self->{sel}->fetch ? 1 : 0;
     } # EXISTS
 
-sub FETCH
-{
+sub FETCH {
     my ($self, $key) = @_;
     $self->{asc} and $key = unpack "H*", $key;
     $self->{sel}->execute ($key);
@@ -259,8 +257,7 @@ sub FETCH
     $self->_unstream ($r->[0]);
     } # STORE
 
-sub FIRSTKEY
-{
+sub FIRSTKEY {
     my $self = shift;
     $self->{trh} and $self->{dbh}->begin_work unless $self->{dbt} eq "SQLite";
     $self->{key} = $self->{dbh}->selectcol_arrayref ("select $self->{f_k} from $self->{tbl}");
@@ -275,8 +272,7 @@ sub FIRSTKEY
     pop @{$self->{key}};
     } # FIRSTKEY
 
-sub NEXTKEY
-{
+sub NEXTKEY {
     my $self = shift;
     unless (@{$self->{key}}) {
 	$self->{trh} and $self->{dbh}->commit;
@@ -285,22 +281,19 @@ sub NEXTKEY
     pop @{$self->{key}};
     } # FIRSTKEY
 
-sub SCALAR
-{
+sub SCALAR {
     my $self = shift;
     $self->{cnt}->execute;
     my $r = $self->{cnt}->fetch or return 0;
     $r->[0];
     } # SCALAR
 
-sub drop
-{
+sub drop {
     my $self = shift;
     $self->{tmp} = 1;
     } # drop
 
-sub DESTROY
-{
+sub DESTROY {
     my $self = shift;
     my $dbh = $self->{dbh} or return;
     for (qw( sel ins upd del cnt ctv )) {
@@ -381,17 +374,18 @@ all by itself, but uses the connection provided in the handle.
 
 If the first argument is a scalar, it is used as DSN for DBI->connect ().
 
-Supported DBD drivers include DBD::Pg, DBD::SQLite, DBD::CSV, DBD::mysql,
-DBD::Oracle, DBD::Unify, and DBD::Firebird.  Note that due to limitations
-they won't all perform equally well. Firebird is not tested anymore.
+Supported DBD drivers include DBD::Pg, DBD::SQLite, DBD::CSV, DBD::MariaDB,
+DBD::mysql, DBD::Oracle, DBD::Unify, and DBD::Firebird.  Note that due to
+limitations they won't all perform equally well. Firebird is not tested
+anymore.
 
 DBD::Pg and DBD::SQLite have an unexpected great performance when server
 is the local system. DBD::SQLite is even almost as fast as DB_File.
 
 The current implementation appears to be extremely slow for CSV, as
-expected, mysql, and Unify. For Unify and mysql that is because these do
-not allow indexing on the key field so they cannot be set to be primary
-key.
+expected, MariaDB/mysql, and Unify. For Unify and MariaDB/mysql that is
+because these do not allow indexing on the key field so they cannot be
+set to be primary key.
 
 When using DBD::CSV with Text::CSV_XS version 1.02 or newer, it might be
 wise to disable utf8 encoding (only supported as of DBD::CSV-0.48):
@@ -429,6 +423,14 @@ C<h_key>.
 
 Defines the type of the key field in the database table.  The default is
 depending on the underlying database. Probably unwise to change.
+
+If the database allows the type to be indexed, the key field is defined
+as primary key.
+
+Note that if your data conflicts with internal (database)limits, like
+having a key that is longer than what the index on a primary key permits,
+you should probably want to create the table yourself with a different
+index or field type.
 
 =item fld
 
@@ -593,7 +595,7 @@ H.Merijn Brand <h.m.brand@xs4all.nl>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2015 H.Merijn Brand
+Copyright (C) 2010-2018 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

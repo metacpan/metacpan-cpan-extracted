@@ -1,5 +1,5 @@
 package Statocles::Template;
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 # ABSTRACT: A template object to pass around
 
 use Statocles::Base 'Class';
@@ -47,8 +47,8 @@ has path => (
 
 has theme => (
     is => 'ro',
-    isa => Theme,
-    coerce => Theme->coercion,
+    isa => ThemeType,
+    coerce => ThemeType->coercion,
 );
 
 #pod =attr include_stores
@@ -61,14 +61,14 @@ has theme => (
 
 has include_stores => (
     is => 'ro',
-    isa => ArrayRef[Store],
+    isa => ArrayRef[StoreType],
     default => sub { [] },
     coerce => sub {
         my ( $thing ) = @_;
         if ( ref $thing eq 'ARRAY' ) {
-            return [ map { Store->coercion->( $_ ) } @$thing ];
+            return [ map { StoreType->coercion->( $_ ) } @$thing ];
         }
-        return [ Store->coercion->( $thing ) ];
+        return [ StoreType->coercion->( $thing ) ];
     },
 );
 
@@ -301,7 +301,7 @@ Statocles::Template - A template object to pass around
 
 =head1 VERSION
 
-version 0.091
+version 0.092
 
 =head1 DESCRIPTION
 

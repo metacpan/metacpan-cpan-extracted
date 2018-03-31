@@ -15,6 +15,7 @@ meta-spec:
 name: Config-Model-Tester
 requires:
   File::Copy::Recursive: '0'
+  Getopt::Std: '0'
   Log::Log4perl: '1.11'
   Path::Tiny: '0'
   Test::Differences: '0'
@@ -28,5 +29,5 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model-tester/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model-tester.git
-version: '3.003'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '3.004'
+x_serialization_backend: 'YAML::Tiny version 1.73'

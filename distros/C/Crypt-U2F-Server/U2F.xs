@@ -68,7 +68,14 @@ u2fclib_verifyAuthentication(ctx, buf)
 	void *	ctx
 	char *	buf
 
-char *
+void
 u2fclib_verifyRegistration(ctx, buf)
-	void *	ctx
-	char *	buf
+		void *	ctx
+		char *	buf
+	INIT:
+		char* pk[65];
+		char kh[1000];
+	PPCODE:
+		strncpy(kh,u2fclib_verifyRegistration(ctx, buf, pk),1000);
+		XPUSHs(sv_2mortal(newSVpvn(pk,65)));
+		XPUSHs(sv_2mortal(newSVpvn(kh,strlen(kh))));

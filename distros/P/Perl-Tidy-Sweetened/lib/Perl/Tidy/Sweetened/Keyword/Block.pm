@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 $|++;
 
-our $VERSION = '1.12';
+our $VERSION = '1.14';
 
 # Regex to match balanced params. Reproduced from Regexp::Common to avoid
 # adding a non-core dependency.
@@ -35,14 +35,13 @@ sub emit_placeholder {
     # Store the signature and returns() for later use
     my $id = $self->{counter}++;
     $self->{store_clause}->{$id} = $clauses;
-    $self->{store_sub}->{$id} = $subname;
+    $self->{store_sub}->{$id}    = $subname;
 
     # Turns 'my_method_name' into 'SUB4ethod_name'
     my $marker = $self->marker . $id;
     substr( $subname, 0, length($marker), $marker );
 
-    return sprintf '%s %s %s',
-      $self->replacement, $marker, $brace;
+    return sprintf '%s %s %s', $self->replacement, $marker, $brace;
 }
 
 sub emit_keyword {
@@ -59,6 +58,11 @@ sub emit_keyword {
     $clause = ' ' . $clause if length $clause;
 
     return sprintf '%s %s%s%s', $self->keyword, $subname, $clause, $brace;
+}
+
+sub emit_csc {
+    my ( $self, $id ) = @_;
+    return sprintf "## tidy end: %s %s", $self->keyword, $self->{store_sub}->{$_};
 }
 
 sub clauses {
@@ -116,6 +120,7 @@ sub postfilter {
     my $marker      = $self->marker;
     my $replacement = $self->replacement;
     my $subname     = $self->identifier;
+    my @ids;
 
     # Convert back to method
     $code =~ s{
@@ -128,8 +133,16 @@ sub postfilter {
         (?<brace>   .*?     ) [ ]* # opening brace on followed orig comments
         [ ]*                       # trailing spaces (not all whitespace)
     }{
+        push @ids, $+{id};
         $self->emit_keyword( $+{newline} . $+{brace}, $+{id} );
     }egmx;
+
+    # Restore the orig sub name when inserted via the -csc flag
+    $code =~ s{
+        \#\# \s tidy \s end: \s sub \s ${marker} $_
+    }{
+        $self->emit_csc( $_ );
+    }egx for @ids;
 
     return $code;
 }
@@ -146,7 +159,7 @@ Perl::Tidy::Sweetened::Keyword::Block - Perl::Tidy::Sweetened filter plugin to d
 
 =head1 VERSION
 
-version 1.12
+version 1.14
 
 =head1 SYNOPSIS
 
@@ -239,6 +252,10 @@ Curtis Brandt (@aggrolite)
 
 @pblaberge
 
+=item *
+
+Peter Roberts (@pwr22)
+
 =back
 
 =head1 SOURCE
@@ -255,7 +272,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Mark Grimes E<lt>mgrimes@cpan.orgE<gt>.
+This software is copyright (c) 2018 by Mark Grimes E<lt>mgrimes@cpan.orgE<gt>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

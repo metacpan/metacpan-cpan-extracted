@@ -1,9 +1,17 @@
   * Implement decoding options:
     * --decode-html
       regular expression for paths to parse as html.
+      Pass empty regexp to only enable support (see --decode-magic).
     * --decode-exif
       regular expression for paths to extract EXIF and other metadata from
       (see exiftool and Image::ExifTool).
+      Pass empty regexp to only enable support (see --decode-magic).
+    * --decode-skip
+      regular expression for paths to read as-is.
+    * --decode-magic
+      Determine needed decoding using libmagic.
+      If needed decoding method is not enabled, then that file is skipped.
+      (see File::LibMagic).
     * --decode-auto
       enable all --decode-* options for common file extensions.
   * Move detection code to separate module(s).
@@ -27,10 +35,25 @@
     * --fast implies...
       * --exclude-common
       * --decode-none
+  * Implement extensibility through YAML/JSON file
+    Similar to license-reconsile, but adding/overriding DefHash objects:
+    * http://git.hands.com/?p=freeswitch.git;a=blob;f=debian/license-reconcile.yml;h=0e40cba01eeb67f82d18ca8f11210271848d0549;hb=refs/heads/copyright2
+    * https://lists.debian.org/87efl0kvzu.fsf@hands.com
+  * Implement smarter processing:
+    * Optionally spawn "workers" for a boost on multi-core systems,
+      e.g. using Parallel::ForkManager
+    * Gather statistics on files processed and objects detected,
+      and emit progress during long-running scans,
+      e.g. using Progress::Any or Time::Progress (see SeeAlso of Time::Progress).
   * Detect non-commercial license.
     (?i:(?:\w{4}|\W(?:[^oO]\w|\w[^rR]|[^aA]\w\w|\w[^nN]\w|\w\w[^dD])) non[-_ ]commercial)
   * Compare against competitors
     + ripper
+    + https://salsa.debian.org/stuart/package-license-checker
+    + r-base /share/licenses/license.db
+    + license-reconcile
+    + https://wiki.debian.org/CopyrightReviewTools
+    + https://docs.clearlydefined.io/clearly#licensed
   * Warn about licensing conflicts
     + See adequate
   * Sort Files sections to list common over exotic:
@@ -43,3 +66,7 @@
     + License inlined
     + Copyright
     + Filenames
+  * Optimize:
+    + Map matches, and skip repeatedly scanning parts already identified
+    + First scan for well-formed grants using prefix + name + postfix patterns
+    + Support detection reversion, and first scan for grants then licenses - reverting embedded grants

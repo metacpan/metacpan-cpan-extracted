@@ -4,7 +4,7 @@
       "Andreas Voegele <voegelas@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -70,7 +70,7 @@
          "url" : "https://github.com/voegelas/CPANPLUS-Dist-Slackware.git"
       }
    },
-   "version" : "1.025",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "1.027",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

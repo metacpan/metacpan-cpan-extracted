@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.02
+    Version 0.04
 
 INSTALLATION
 
@@ -26,9 +26,9 @@ INSTALLATION
 DEPENDENCIES
 
             Test::More      1.001014
+            Moo     1
+            Carp
             JSON
             WWW::Zotero     0.04
-            Moo     1
             URI::Escape
-            Carp
 

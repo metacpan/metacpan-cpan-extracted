@@ -20,6 +20,9 @@ t/attribute-skip.t
 t/attribute-test.t
 t/attribute-todo.t
 t/attribute-unhandled.t
+t/existing-attribute-handlers.t
+t/existing-parent.t
+t/existing_modify_code_attributes.t
 t/fixtures/after-each.it
 t/fixtures/attribute-skip.it
 t/fixtures/attribute-test.it

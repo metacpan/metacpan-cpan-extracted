@@ -70,12 +70,12 @@ xml:
 	$(PERL) tools/gen_help.pl src/xsh_grammar.xml > lib/XML/XSH2/Help.pm
 	$(PERL) tools/gen_pod.pl src/xsh_grammar.xml > XSH2.pod
 	$(PERL) tools/gen_completions.pl src/xsh_grammar.xml > lib/XML/XSH2/CompletionList.pm
-	$(PERL) -e "chdir q(lib/XML/XSH2); require Grammar; XML::XSH2::Grammar::compile()"
+	$(PERL) -e "use lib q(lib/XML/XSH2); require Grammar; XML::XSH2::Grammar::compile()"
 	$(MAKE) hide
 	$(PERL) -c lib/XML/XSH2/Parser.pm
 
 grammar:
-	$(PERL) -e "chdir q(lib/XML/XSH2); require Grammar; XML::XSH2::Grammar::compile()"
+	$(PERL) -e "use lib q(lib/XML/XSH2); require Grammar; XML::XSH2::Grammar::compile()"
 	$(PERL) -c lib/XML/XSH2/Parser.pm
 
 docs: all

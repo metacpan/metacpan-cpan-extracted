@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution Net-Statsd-Client,
-version 0.32:
+version 0.33:
 
   Send data to StatsD / Graphite
 
-This software is copyright (c) 2017 by Andrew Rodland.
+This software is copyright (c) 2018 by Andrew Rodland.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

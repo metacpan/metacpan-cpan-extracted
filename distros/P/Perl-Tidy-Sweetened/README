@@ -3,7 +3,7 @@ NAME
     sugar
 
 VERSION
-    version 1.12
+    version 1.14
 
 STATUS
 DESCRIPTION
@@ -34,9 +34,9 @@ DESCRIPTION
 
     *   Moops
 
-    *   MooseX::Declare
-
     *   perl 5.20 signatures
+
+    *   Kavorka
 
 THANKS
     The idea and much of original code taken from Jonathan Swartz' blog
@@ -58,6 +58,8 @@ CONTRIBUTORS
 
     *   @pblaberge
 
+    *   Peter Roberts (@pwr22)
+
 SOURCE
     Source repository is at
     <https://github.com/mvgrimes/Perl-Tidy-Sweetened>.
@@ -70,7 +72,7 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2016 by Mark Grimes <mgrimes@cpan.org>.
+    This software is copyright (c) 2018 by Mark Grimes <mgrimes@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

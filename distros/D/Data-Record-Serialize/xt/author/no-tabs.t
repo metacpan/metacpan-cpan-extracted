@@ -14,6 +14,7 @@ my @files = (
     'lib/Data/Record/Serialize/Encode/null.pm',
     'lib/Data/Record/Serialize/Encode/rdb.pm',
     'lib/Data/Record/Serialize/Encode/yaml.pm',
+    'lib/Data/Record/Serialize/Error.pm',
     'lib/Data/Record/Serialize/Role/Base.pm',
     'lib/Data/Record/Serialize/Role/Default.pm',
     'lib/Data/Record/Serialize/Role/Encode.pm',
@@ -27,19 +28,23 @@ my @files = (
     't/bugs/rename-field-to-self.t',
     't/constructor.t',
     't/encoders/dbi.t',
+    't/encoders/dbi.t.resolve',
     't/encoders/ddump.t',
     't/encoders/json.t',
-    't/encoders/json.t.orig',
+    't/encoders/null.t',
     't/encoders/rdb.t',
     't/encoders/yaml.t',
     't/field_format.t',
     't/field_names.t',
+    't/field_type_selection.t',
     't/field_types.t',
     't/lib/Data/Record/Serialize/Encode/both.pm',
+    't/lib/Data/Record/Serialize/Encode/store_one.pm',
     't/lib/Data/Record/Serialize/Encode/types_map.pm',
     't/lib/Data/Record/Serialize/Encode/types_map_ns.pm',
     't/lib/Data/Record/Serialize/Encode/types_nis.pm',
-    't/lib/Data/Record/Serialize/Encode/types_ns.pm'
+    't/lib/Data/Record/Serialize/Encode/types_ns.pm',
+    't/nullify.t'
 );
 
 notabs_ok($_) foreach @files;

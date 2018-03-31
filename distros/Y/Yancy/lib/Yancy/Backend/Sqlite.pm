@@ -1,5 +1,5 @@
 package Yancy::Backend::Sqlite;
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 # ABSTRACT: A backend for SQLite using Mojo::SQLite
 
 #pod =head1 SYNOPSIS
@@ -257,7 +257,7 @@ sub _map_type {
         elsif ( $db_type =~ /^(?:double|float|money|numeric|real)/i ) {
             %conf = ( type => 'number' );
         }
-        elsif ( $db_type =~ /^(?:timestamp)/i ) {
+        elsif ( $db_type =~ /^(?:timestamp|datetime)/i ) {
             %conf = ( type => 'string', format => 'date-time' );
         }
         else {
@@ -285,7 +285,7 @@ Yancy::Backend::Sqlite - A backend for SQLite using Mojo::SQLite
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 

@@ -14,7 +14,7 @@ use Carp;
 
 our @ISA = qw(Exporter Tie::Array);
 
-our $VERSION = '0.21';
+our $VERSION = '0.24';
 
 # There's a common misspelling of sepArated (an E instead of A)
 # That's why all csv file definitions are defined even with an E and an A
@@ -92,7 +92,8 @@ sub TIEARRAY {
         $options{sep_char} = ',';
     }
     unless ( (my $l = length $options{sep_char}) == 1) {
-        carp "The sep_char should have a length of 1, not $l"
+        carp "The sep_char should have a length of 1, not $l - reset it to default ','";
+        $options{sep_char} = ',';
     }
     if (defined(my $c = $options{sep_char}) && defined(my $r = $options{sep_re})) {
         carp "The sep_char '$c' is itself not matched by the sep_re '$r'"
@@ -100,16 +101,28 @@ sub TIEARRAY {
     }
     
     tie my @lines, 'Tie::File', $fname or die "Can't open $fname: $!";
+    # options are almost same for Text::CSV_XS
+    # but sep_re is unknown to Text::CSV_XS
+    # so remove it temporarely
+    my %csv_xs_options = %options;
+    delete $csv_xs_options{sep_re};
+    if (not defined($csv_xs_options{eol})) {
+        delete $csv_xs_options{eol};
+    }
+    my $csv_xs = Text::CSV_XS->new(\%csv_xs_options);
+    if (not defined($csv_xs)) {
+        die "Could not initialize Text::CSV_XS with options " . Dumper(\%csv_xs_options);
+    }
     my $self = {
         lines       => \@lines,
-        csv         =>  Text::CSV_XS->new(\%options),
+        csv         => $csv_xs, 
         quote_char  => $options{quote_char},
-        eol         => $options{eol},
-        sep_char    => $options{sep_char},
-        sep_re      => $options{sep_re},
         escape_char => $options{escape_char},
         always_quote=> $options{always_quote},
     };
+    $self->{sep_char} = $options{sep_char};
+    $self->{eol} = $options{eol};
+    $self->{sep_re} = $options{sep_re};
     bless $self, $class;
 }
 
@@ -184,7 +197,12 @@ sub columns {
     defined($line) or return $self->{fields} = \@fields;
     if (defined( my $eol = $self->{eol} )) {
         $line =~ s/\Q$eol\E$//;
+    } else {
+        $line =~ s:$/$::;  # remove default eol in $/ at the end
     }
+    if (length($line) == 0) {
+        return $self->{fields} = []
+    };
     if (defined( my $re = $self->{sep_re} )) {
         push @fields, 
             map {defined($_) ? $_ : ''}  # empty fields shall be '', not undef

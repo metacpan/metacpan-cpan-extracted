@@ -346,9 +346,10 @@ as an exercise for the reader.
 
 =head1 COMPATIBILITY
 
-Test2::Tools::xUnit might collide with other Perl modules which handle
-subroutine attributes, if both try to create MODIFY_CODE_ATTRIBUTES in the
-caller - see L<attributes>.
+Test2::Tools::xUnit attempts to co-operate with other modules which also
+define subroutine attributes.  However, if another module imports attributes
+with the same name (e.g. C<:Test>), it's unlikely that both will work
+correctly!
 
 Currently only Perl 5.12 and higher are supported.
 

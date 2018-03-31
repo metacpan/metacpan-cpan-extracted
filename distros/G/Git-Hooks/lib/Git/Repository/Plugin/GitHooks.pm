@@ -1,6 +1,6 @@
 package Git::Repository::Plugin::GitHooks;
 # ABSTRACT: A Git::Repository plugin with some goodies for hook developers
-$Git::Repository::Plugin::GitHooks::VERSION = '2.9.1';
+$Git::Repository::Plugin::GitHooks::VERSION = '2.9.2';
 use parent qw/Git::Repository::Plugin/;
 
 use 5.010;
@@ -1284,9 +1284,7 @@ sub blob {
 sub file_size {
     my ($git, $rev, $file) = @_;
 
-    chomp(my $size = $git->run(qw/cat-file -s/, "$rev:$file"));
-
-    return $size;
+    return $git->run(qw/cat-file -s/, "$rev:$file");
 }
 
 sub file_mode {
@@ -1516,7 +1514,7 @@ Git::Repository::Plugin::GitHooks - A Git::Repository plugin with some goodies f
 
 =head1 VERSION
 
-version 2.9.1
+version 2.9.2
 
 =head1 SYNOPSIS
 

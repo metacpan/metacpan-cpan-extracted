@@ -9,7 +9,7 @@ our @ISA = qw( Exporter );
 
 our @EXPORT = qw( LoadArgs LoadPatterns ClearPatterns GetPatterns Process );
 
-our $VERSION = "1.8";
+our $VERSION = "2.0.0";
 
 
 sub new
@@ -129,8 +129,24 @@ sub FindPositionsOfTags
             {
                 my $length = $+[ 0 ] - $-[ 0 ];
                 next if $length == 0;
+                my $offset = 0;
+                #trailing new lines cause problems: put the color tag before them
+                #BEWARE: in classis Mac OS "\r" was used as the line terminator,
+                #which is not supported here
+                if ( substr( $$string_ref, $+[0] - 1, 1 ) eq "\n" )
+                {
+                    --$length;
+                    ++$offset;
+                    next if $length == 0;
+                    if ( substr( $$string_ref, $+[0] - 2, 1 ) eq "\r" )
+                    {
+                        --$length;
+                        ++$offset;
+                    }
+                }
+                next if $length == 0;
                 push @$positions, ( [ $-[ 0 ], $length, 1, $i, \$$patterns[ $i ] ],
-                                    [ $+[ 0 ], $length, 0, $i, \$$patterns[ $i ] ] );
+                                    [ $+[ 0 ] - $offset, $length, 0, $i, \$$patterns[ $i ] ] );
                 ++$result;
             }
         }
@@ -140,8 +156,12 @@ sub FindPositionsOfTags
             ++$result;
             my $length = length $$string_ref;
             next if $length == 0;
-            #trailing new lines cause problems: put the color tag before them
-            --$length if substr( $$string_ref, -1 ) eq "\n";
+            if ( substr( $$string_ref, -1 ) eq "\n" )
+            {
+                --$length;
+                next if $length == 0;
+                --$length if substr( $$string_ref, -2, 1 ) eq "\r";
+            }
             next if $length == 0;
             push @$positions, ( [ 0, $length, 1, $i, \$$patterns[ $i ] ],
                                 [ $length, $length, 0, $i, \$$patterns[ $i ] ] );

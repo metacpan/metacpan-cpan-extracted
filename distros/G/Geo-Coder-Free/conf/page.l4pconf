@@ -1,0 +1,28 @@
+log4perl.logger.page=TRACE, A1, A2
+
+log4perl.appender.A1=Log::Dispatch::File
+log4perl.appender.A1.Filter=RangeAll
+log4perl.appender.A1.filename=/tmp/openaddresses.log
+log4perl.appender.A1.mode=append
+log4perl.appender.A1.layout=Log::Log4perl::Layout::PatternLayout
+log4perl.appender.A1.layout.ConversionPattern=%d %p> %F{1}:%L %M - %m%n
+
+log4perl.appender.A2=Log::Dispatch::Null
+# log4perl.appender.A2=Log::Dispatch::Email::Sendmail
+log4perl.appender.A2.Filter=RangeError
+log4perl.appender.A2.from=webmaster@example.com
+log4perl.appender.A2.to=example@example.com
+log4perl.appender.A2.subject=Error in openaddresses
+log4perl.appender.A2.layout=Log::Log4perl::Layout::PatternLayout
+log4perl.appender.A2.layout.ConversionPattern=%d %p> %F{1}:%L %M - %m%n
+
+log4perl.filter.RangeAll=Log::Log4perl::Filter::LevelRange
+# log4perl.filter.RangeAll.LevelMin=TRACE
+log4perl.filter.RangeAll.LevelMin=WARN
+log4perl.filter.RangeAll.LevelMax=FATAL
+log4perl.filter.RangeAll.AcceptOnMatch=true
+
+log4perl.filter.RangeError=Log::Log4perl::Filter::LevelRange
+log4perl.filter.RangeError.LevelMin=WARN
+log4perl.filter.RangeError.LevelMax=FATAL
+log4perl.filter.RangeError.AcceptOnMatch=true

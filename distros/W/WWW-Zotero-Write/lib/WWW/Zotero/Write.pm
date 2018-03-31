@@ -18,11 +18,11 @@ WWW::Zotero::Write - Perl interface to the Zotero Write API
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -208,6 +208,37 @@ sub updateItems {
         if ( scalar @$data > 50 );
     my ( $groupid, $userid ) = @opt{qw(group user)};
     my $url = $self->_build_url( $groupid, $userid ) . "/items";
+    my $token = encode_json($data);
+    $self->_header_last_modif_ver( $groupid, $userid );
+    my $response = $self->client->POST( $url, $token );
+    $self->last_modif_ver(
+        $response->responseHeader('Last-Modified-Version') )
+        if ( $response->responseCode eq "200" );
+    return $self->_check_response( $response, "200" );
+}
+
+=head2 =head2 updateCollections($data, group => $groupid | user => $userid)
+
+Update an array of collections.
+
+Param: the array ref of hash ref which must include the key of the collection, and the new value.
+
+Param: the group id or the user id pass with the hash keys group or user.
+
+Returns undef if the ResponseCode is not 200 (see https://www.zotero.org/support/dev/web_api/v3/write_requests).
+
+Returns an array with three hash ref (or undef if the hashes are empty): changed, unchanged, failed. 
+
+The keys are the index of the hash received in argument. The values are the keys given by zotero
+
+=cut
+
+sub updateCollections {
+    my ( $self, $data, %opt ) = @_;
+    croak "updateCollections: can't treat more then 50 elements"
+        if ( scalar @$data > 50 );
+    my ( $groupid, $userid ) = @opt{qw(group user)};
+    my $url = $self->_build_url( $groupid, $userid ) . "/collections";
     my $token = encode_json($data);
     $self->_header_last_modif_ver( $groupid, $userid );
     my $response = $self->client->POST( $url, $token );

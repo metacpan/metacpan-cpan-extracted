@@ -2,7 +2,7 @@ package App::Yath::Plugin;
 use strict;
 use warnings;
 
-our $VERSION = '0.001063';
+our $VERSION = '0.001064';
 
 sub options {}
 
@@ -13,6 +13,8 @@ sub post_init {}
 sub post_run {}
 
 sub find_files {}
+
+sub munge_files {}
 
 sub block_default_search {}
 

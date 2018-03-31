@@ -26,7 +26,7 @@ no_index:
 provides:
   Task::BeLike::ZAKAME:
     file: lib/Task/BeLike/ZAKAME.pm
-    version: '0.15'
+    version: '0.16'
 recommends:
   App::Nopaste: '0'
   App::rainbarf: '0'
@@ -40,7 +40,10 @@ recommends:
   Paws: '0'
   Perl::Critic: '0'
   Perl::Critic::Freenode: '0'
+  Term::ReadLine::Gnu: '0'
   Web::Query: '0'
+  indirect: '0'
+  perlsecret: '0'
 requires:
   AnyEvent: '0'
   App::Ack: '0'
@@ -54,6 +57,7 @@ requires:
   Data::Printer: '0'
   Devel::Confess: '0'
   Import::Base: '0'
+  Log::Any: '0'
   Minilla: '0'
   Mojolicious: '0'
   Moo: '0'
@@ -72,7 +76,7 @@ resources:
   bugtracker: https://github.com/zakame/Task-BeLike-ZAKAME/issues
   homepage: https://github.com/zakame/Task-BeLike-ZAKAME
   repository: git://github.com/zakame/Task-BeLike-ZAKAME.git
-version: '0.15'
+version: '0.16'
 x_contributors:
   - 'Zak B. Elep <zak.elep@yoyo.ph>'
   - 'Zak B. Elep <zakame@zakame.net>'

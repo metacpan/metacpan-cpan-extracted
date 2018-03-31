@@ -1,5 +1,5 @@
 package Yancy::Backend::Mysql;
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 # ABSTRACT: A backend for MySQL using Mojo::mysql
 
 #pod =head1 SYNOPSIS
@@ -235,7 +235,7 @@ sub _map_type {
     elsif ( $db_type =~ /^(?:double|float|money|numeric|real)/i ) {
         %conf = ( type => 'number' );
     }
-    elsif ( $db_type =~ /^(?:timestamp)/i ) {
+    elsif ( $db_type =~ /^(?:timestamp|datetime)/i ) {
         %conf = ( type => 'string', format => 'date-time' );
     }
     elsif ( $db_type =~ /^(?:enum)/i ) {
@@ -266,7 +266,7 @@ Yancy::Backend::Mysql - A backend for MySQL using Mojo::mysql
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 

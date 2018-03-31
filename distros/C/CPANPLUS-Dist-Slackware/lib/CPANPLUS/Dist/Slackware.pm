@@ -3,7 +3,7 @@ package CPANPLUS::Dist::Slackware;
 use strict;
 use warnings;
 
-our $VERSION = '1.025';
+our $VERSION = '1.027';
 
 use base qw(CPANPLUS::Dist::Base);
 
@@ -14,7 +14,6 @@ use CPANPLUS::Dist::Slackware::Util
     qw(can_run run catdir catfile spurt filetype gzip strip);
 use CPANPLUS::Error;
 
-use Config;
 use Cwd qw();
 use ExtUtils::Packlist;
 use File::Find qw();
@@ -63,11 +62,14 @@ sub init {
 sub prepare {
     my ( $dist, @params ) = @_;
 
-    my $status = $dist->status;
-    my $module = $dist->parent;
+    my $param_ref = $dist->_parse_params(@params) or die;
+    my $status    = $dist->status;
+    my $module    = $dist->parent;
 
     my $pkgdesc = CPANPLUS::Dist::Slackware::PackageDescription->new(
-        module => $module );
+        module      => $module,
+        installdirs => $param_ref->{installdirs},
+    );
     $status->_pkgdesc($pkgdesc);
 
     $status->dist( $pkgdesc->outputname );
@@ -163,6 +165,10 @@ sub _parse_params {
             keep_source => { default => 0 },
             make        => { default => $conf->get_program('make') },
             perl        => { default => $EXECUTABLE_NAME },
+            installdirs => {
+                default => $ENV{INSTALLDIRS} || 'vendor',
+                allow => [ 'site', 'vendor' ]
+            },
         };
         $param_ref = Params::Check::check( $tmpl, \%params ) or return;
     }
@@ -189,39 +195,36 @@ sub _call_plugins {
     return 1;
 }
 
-sub _mandirs {
-    my $dist = shift;
-
-    my %mandir = map {
-        my $dir = $Config{"vendorman${_}direxp"};
-        if ( !$dir ) {
-            $dir = catdir( $Config{'prefix'}, 'man', "man${_}" );
-        }
-        $dir =~ s,/usr/share/man/,/usr/man/,;
-        $_ => $dir
-    } ( 1, 3 );
-    return %mandir;
-}
-
 sub _perl_mm_opt {
     my $dist = shift;
 
-    my %mandir = $dist->_mandirs;
+    my $status  = $dist->status;
+    my $pkgdesc = $status->_pkgdesc;
+
+    my $installdirs = $pkgdesc->installdirs;
+    my $INSTALLDIRS = uc $installdirs;
+    my %mandir      = $pkgdesc->mandirs;
+
     return << "END_PERL_MM_OPT";
-INSTALLDIRS=vendor
-INSTALLVENDORMAN1DIR=$mandir{1}
-INSTALLVENDORMAN3DIR=$mandir{3}
+INSTALLDIRS=$installdirs
+INSTALL${INSTALLDIRS}MAN1DIR=$mandir{1}
+INSTALL${INSTALLDIRS}MAN3DIR=$mandir{3}
 END_PERL_MM_OPT
 }
 
 sub _perl_mb_opt {
     my $dist = shift;
 
-    my %mandir = $dist->_mandirs;
+    my $status  = $dist->status;
+    my $pkgdesc = $status->_pkgdesc;
+
+    my $installdirs = $pkgdesc->{installdirs};
+    my %mandir      = $pkgdesc->mandirs;
+
     return << "END_PERL_MB_OPT";
---installdirs vendor
---config installvendorman1dir=$mandir{1}
---config installvendorman3dir=$mandir{3}
+--installdirs $installdirs
+--config install${installdirs}man1dir=$mandir{1}
+--config install${installdirs}man3dir=$mandir{3}
 END_PERL_MB_OPT
 }
 
@@ -261,7 +264,7 @@ sub _fake_install {
         return;
     }
 
-    msg( loc( q{Staging distribution in '%2'}, $destdir ) );
+    msg( loc( q{Staging distribution in '%1'}, $destdir ) );
 
     return run( $cmd, { dir => $wrksrc, verbose => $verbose } );
 }
@@ -388,7 +391,7 @@ sub _compress_manual_pages {
     my $status  = $dist->status;
     my $pkgdesc = $status->_pkgdesc;
 
-    my %mandir = $dist->_mandirs;
+    my %mandir = $pkgdesc->mandirs;
     my @mandirs = grep { -d $_ }
         map { catdir( $pkgdesc->destdir, $_ ) } values %mandir;
 
@@ -717,7 +720,7 @@ CPANPLUS::Dist::Slackware - Install Perl distributions on Slackware Linux
 
 =head1 VERSION
 
-This document describes CPANPLUS::Dist::Slackware version 1.025.
+This document describes CPANPLUS::Dist::Slackware version 1.027.
 
 =head1 SYNOPSIS
 
@@ -747,7 +750,7 @@ Start an interactive shell to edit the CPANPLUS settings:
 
 Once CPANPLUS is configured, modules can be installed.  Example:
 
-    CPAN Terminal> i Smart::Comments --format=CPANPLUS::Dist::Slackware
+    CPAN Terminal> i Mojolicious --format=CPANPLUS::Dist::Slackware
 
 You can make CPANPLUS::Dist::Slackware your default format by setting the
 C<dist_type> key:
@@ -767,8 +770,8 @@ User settings are stored in F<$HOME/.cpanplus/lib/CPANPLUS/Config/User.pm>.
 
 Packages may also be created from the command-line.  Example:
 
-    $ cpan2dist --format CPANPLUS::Dist::Slackware Smart::Comments
-    $ sudo /sbin/installpkg /tmp/perl-Smart-Comments-1.06-x86_64-1_CPANPLUS.tgz
+    $ cpan2dist --format CPANPLUS::Dist::Slackware Mojolicious
+    $ sudo /sbin/installpkg /tmp/perl-Mojolicious-7.51-x86_64-1_CPANPLUS.tgz
 
 =head2 Managing packages as a non-root user
 
@@ -776,11 +779,25 @@ The C<sudo> command must be installed and configured.  If the C<fakeroot>
 command is installed, packages will be built without the help of C<sudo>.
 Installing packages still requires root privileges though.
 
+=head2 Installation location
+
+By default distributions are installed in Perl's vendor location.  Set the
+"installdirs" parameter to select the site location, which is usually
+F</usr/local>.
+
+    $ cpanp
+    CPAN Terminal> i EV --format=CPANPLUS::Dist::Slackware --installdirs=site
+
+    $ env INSTALLDIRS=site cpanp i Minion --format=CPANPLUS::Dist::Slackware
+
+    $ cpan2dist --format CPANPLUS::Dist::Slackware \
+                --dist-opts installdirs=site Mojo::Pg
+
 =head2 Documentation files
 
 README files and changelogs are stored in a package-specific subdirectory in
-F</usr/doc>.  In addition, a F<README.SLACKWARE> file that lists the package's
-build dependencies is supplied.
+F</usr/doc> or F</usr/local/doc>.  In addition, a F<README.SLACKWARE> file
+that lists the package's build dependencies is supplied.
 
 =head2 Configuration files
 
@@ -816,18 +833,18 @@ Runs C<perl Makefile.PL> or C<perl Build.PL> and determines what prerequisites
 this distribution declared.
 
     $success = $dist->prepare(
-        perl    => '/path/to/perl',
-        force   => (1|0),
-        verbose => (1|0)
+        perl        => '/path/to/perl',
+        force       => (1|0),
+        verbose     => (1|0),
+        installdirs => ('vendor'|'site')
     );
 
-If you set C<force> to true, it will go over all the stages of the C<prepare>
-process again, ignoring any previously cached results.
+If you set C<force> to true, CPANPLUS will go over all the stages of the
+C<prepare> process again, ignoring any previously cached results.
 
 Returns true on success and false on failure.
 
-You may then call C<< $dist->create >> on the object to build the distribution
-and to create a Slackware compatible package.
+You may then call C<< $dist->create >> to build the distribution.
 
 =item B<< $dist->create(%params) >>
 
@@ -840,19 +857,19 @@ prerequisites the module may have.
         make        => '/path/to/make',
         skiptest    => (1|0),
         force       => (1|0),
-        verbose     => (1|0)
+        verbose     => (1|0),
         keep_source => (1|0)
     );
 
 If you set C<skiptest> to true, the test stage will be skipped.  If you set
 C<force> to true, C<create> will go over all the stages of the build process
-again, ignoring any previously cached results.  It will also ignore a bad
-return value from the test stage and still allow the operation to return true.
+again, ignoring any previously cached results.  CPANPLUS will also ignore a
+bad return value from the test stage.
 
 Returns true on success and false on failure.
 
-You may then call C<< $dist->install >> on the object to actually install the
-created package.
+You may then call C<< $dist->install >> to actually install the created
+package.
 
 =item B<< $dist->install(%params) >>
 
@@ -883,8 +900,8 @@ distribution.
 
 Use this method to patch a distribution or to set environment variables that
 help to configure the distribution.  Called before the Perl distribution is
-prepared, i.e. before the command C<perl Makefile.PL> or C<perl Build.PL> is
-run.  Returns true on success.
+prepared.  That is, before the command C<perl Makefile.PL> or C<perl Build.PL>
+is run.  Returns true on success.
 
 =item B<< $plugin->post_prepare($dist) >>
 
@@ -981,15 +998,15 @@ to F<$TMPDIR> or F</tmp>.
 =item B<ARCH>
 
 The package architecture.  Defaults to "i586" on x86-based platforms, to "arm"
-on ARM-based platforms and to the system's hardware identifier, i.e. the
-output of C<uname -m> on all other platforms.
+on ARM-based platforms and to the output of C<uname -m> on all other
+platforms.
 
 =item B<BUILD>
 
 The build number that is added to the filename.  Defaults to "1".
 
 As packages may be built recursively, setting this variable is mainly useful
-when all packages are rebuilt, e.g. after Perl has been upgraded.
+when all packages are rebuilt.  For example, after Perl has been upgraded.
 
 =item B<TAG>
 
@@ -998,8 +1015,12 @@ This tag is added to the package filename.  Defaults to "_CPANPLUS".
 =item B<PKGTYPE>
 
 The package extension.  Defaults to "tgz".  May be set to "tbz", "tlz" or
-"txz".  The proper compression utility, i.e. C<gzip>, C<bzip2>, C<lzma>, or
-C<xz>, needs to be installed on the machine.
+"txz".  The respective compression utility needs to be installed on the
+machine.
+
+=item B<INSTALLDIRS>
+
+The installation destination. Can be "vendor" or "site". Defaults to "vendor".
 
 =back
 
@@ -1050,7 +1071,7 @@ through the web interface at L<http://rt.cpan.org/>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2017 Andreas Voegele
+Copyright 2012-2018 Andreas Voegele
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

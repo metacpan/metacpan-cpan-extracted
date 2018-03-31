@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # ABSTRACT: Run Statocles commands
 package statocles;
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 
 # Mojolicious::Commands currently calls GetOptions and clobbers a few of
 # our command-line options. Since I don't want to rely on the envvars
@@ -13,8 +13,8 @@ our $VERSION = '0.091';
 my @argv;
 BEGIN { @argv = @ARGV };
 
-use Statocles::Command;
-exit Statocles::Command->main( @argv );
+use Statocles;
+exit Statocles->run( @argv );
 
 __END__
 
@@ -28,7 +28,7 @@ statocles - Run Statocles commands
 
 =head1 VERSION
 
-version 0.091
+version 0.092
 
 =head1 SYNOPSIS
 

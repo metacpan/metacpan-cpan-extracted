@@ -4,7 +4,7 @@ use Test2::V0;
 
 use Data::Record::Serialize;
 
-use lib 't/lib';
+use Test::Lib;
 
 {
     package Data::Record::Serialize::Encode::pass;

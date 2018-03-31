@@ -1,5 +1,5 @@
 package Statocles::Theme;
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 # ABSTRACT: Templates, headers, footers, and navigation
 
 use Statocles::Base 'Class';
@@ -34,14 +34,14 @@ has '+url_root' => ( default => sub { '/theme' } );
 
 has include_stores => (
     is => 'ro',
-    isa => ArrayRef[Store],
+    isa => ArrayRef[StoreType],
     default => sub { [] },
     coerce => sub {
         my ( $thing ) = @_;
         if ( ref $thing eq 'ARRAY' ) {
-            return [ map { Store->coercion->( $_ ) } @$thing ];
+            return [ map { StoreType->coercion->( $_ ) } @$thing ];
         }
-        return [ Store->coercion->( $thing ) ];
+        return [ StoreType->coercion->( $thing ) ];
     },
 );
 
@@ -264,7 +264,7 @@ Statocles::Theme - Templates, headers, footers, and navigation
 
 =head1 VERSION
 
-version 0.091
+version 0.092
 
 =head1 SYNOPSIS
 

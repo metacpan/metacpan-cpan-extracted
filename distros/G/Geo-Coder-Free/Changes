@@ -1,5 +1,19 @@
 Revision history for Geo-Coder-Free
 
+0.06	Thu Mar 29 09:12:56 EDT 2018
+	Fix Github issue 14
+	Updated to latest MaxMind databases
+	Started support for a local copy of results.openaddresses.io
+	Fixed Canadian lookups
+	Match a street even if the house number isn't known
+	Started geocoder website - see cgi-bin
+
+0.05	Sun Jan 28 17:33:33 EST 2018
+	Fix http://www.cpantesters.org/cpan/report/b10c956b-6bf9-1014-9a47-dc46d49c4260
+	Allow known peculiarities to be found
+	Improve handling of US lookups
+	Added DISTINCT when only wanting one row
+
 0.04	Thu Oct 26 22:05:54 EDT 2017
 	Fix throw in http://www.cpantesters.org/cpan/report/ab86a142-b8d9-11e7-a1cf-bb670eaac09d
 	Various speedups

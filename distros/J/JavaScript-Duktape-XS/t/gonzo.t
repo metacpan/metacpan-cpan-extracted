@@ -1,8 +1,6 @@
 use strict;
 use warnings;
 
-use POSIX qw< dup dup2 >;
-use Devel::Peek;
 use Data::Dumper;
 use Test::More;
 use JavaScript::Duktape::XS;
@@ -17,7 +15,7 @@ sub test_set_get {
         '0_int' => 0,
         '1' => 1,
         '0_double' => 0.0,
-        '1/10' => 0.1,
+        'one_half' => 0.5,
         'empty'  => '',
         'string'  => 'gonzo',
         'aref_empty' => [],

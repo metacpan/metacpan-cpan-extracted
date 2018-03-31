@@ -21,9 +21,11 @@ no_index:
     - share
     - t
     - xt
+requires:
+  Dist::Zilla: '4.200006'
 resources:
   bugtracker: https://github.com/vlyon/Dist-Zilla-Plugin-UseBuildPL/issues
   homepage: https://github.com/vlyon/Dist-Zilla-Plugin-UseBuildPL
   repository: https://github.com/vlyon/Dist-Zilla-Plugin-UseBuildPL.git
-version: '0.1'
+version: '0.2'
 x_serialization_backend: 'YAML::Tiny version 1.70'

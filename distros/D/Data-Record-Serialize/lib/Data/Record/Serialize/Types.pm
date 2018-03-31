@@ -5,7 +5,7 @@ package Data::Record::Serialize::Types;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 use Type::Utils -all;
 use Types::Standard -types;
@@ -43,7 +43,7 @@ Data::Record::Serialize::Types - Types for Data::Record::Serialize
 
 =head1 VERSION
 
-version 0.13
+version 0.15
 
 =head1 BUGS AND LIMITATIONS
 

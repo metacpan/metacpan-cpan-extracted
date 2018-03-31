@@ -1,5 +1,8 @@
 Revision history for Alien-libuv
 
+0.017     2018-03-29
+  - Update to the libuv v1.19.2 release
+
 0.016     2018-01-29
   - Update to the libuv v1.19.1 release
 

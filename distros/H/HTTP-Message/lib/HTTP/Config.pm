@@ -3,7 +3,7 @@ package HTTP::Config;
 use strict;
 use warnings;
 
-our $VERSION = '6.15';
+our $VERSION = '6.16';
 
 use URI;
 
@@ -245,7 +245,7 @@ HTTP::Config - Configuration for request and response objects
 
 =head1 VERSION
 
-version 6.15
+version 6.16
 
 =head1 SYNOPSIS
 

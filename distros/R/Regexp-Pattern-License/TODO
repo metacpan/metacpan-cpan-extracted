@@ -1,0 +1,89 @@
+  * Add pattern tolerance option:
+    + none
+    + case
+    + punctuation
+    + names
+    + versioning
+    + hyphenation - add hyphenation pattern at each syllable (or suppress original hyphenation): (?:[-·]\s*)?
+  * Add pattern scope option.
+  * Add pattern keep option, like similar feature in Regexp::Common.
+  * Add pattern keep-named option:
+    + canonical - for the variation of a (sub)pattern preferred upstream
+    + popular - skip obscure variations
+  * Add pattern no-compile option, when compiling later e.g. with re::engine::RE2.
+  * Cover license directories:
+    + FSF: https://directory.fsf.org/wiki/Category:License
+    + CC (retired): https://creativecommons.org/retiredlicenses/
+    + GNU: https://www.gnu.org/licenses/license-list.html
+    + Fedora: https://fedoraproject.org/wiki/Licensing#SoftwareLicenses
+    + SUSE: https://github.com/openSUSE/spec-cleaner
+    + Microsoft (non-free): https://en.wikipedia.org/wiki/Shared_source
+    + Wikipedia: https://en.wikipedia.org/wiki/Category:Copyright_licenses
+    + Debian (website): https://www.debian.org/legal/licenses/
+    + Debian (wiki): https://wiki.debian.org/DFSGLicenses
+    + W3C: https://www.w3.org/Consortium/Legal/2002/ipr-notice-20021231
+    + http://www.linfo.org/main_index.html
+  * Add author test checking validity of URLs.
+    + Expand iri.alt.archive.FOO=BAR to https://web.archive.org/web/FOO/BAR
+  * Add author test checking coverage of URL directories.
+  * Cover comment styles (most possible):
+    * https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(syntax)#Comments
+  * Cover RFN notice: https://wiki.debian.org/Fonts/Bugs/rfn-violation
+  * Cover patent-related clauses:
+    * http://en.swpat.org/wiki/Patent_clauses_in_software_licences
+  * Cover a need of debian-policy to count popularity of licenses:
+    * https://sources.debian.org/src/debian-policy/4.1.3.0/tools/license-count/?hl=63#L63
+  * Maybe link (where appropriate) to kemitchell:
+    * https://writing.kemitchell.com/
+  * Cover P2P licensing:
+    * https://wiki.p2pfoundation.net/P2P_Licensing
+  * Locate and cover previous lesser-free licenses:
+    * https://en.wikipedia.org/wiki/List_of_formerly_proprietary_software
+  * Tag classifications:
+    * https://en.wikipedia.org/wiki/Free_license#Classification_and_licenses
+  * Improve testsuite:
+    + Test static patterns directly (i.e. not using Regexp::Pattern::re)
+
+Cover either grant or license for all objects, document as promise, and use both by default (not all patterns)
+
+bail out if variants exists but no default (and simplify resolving)
+
+test static patterns without using Regexp::Pattern::re
+
+synthesize type:versioned iri from singleversion:$STEM as iri.alt.version.[/^$STEM_/]
+
+speedup synthesizing by processing simplest first
+
+Limit metadata name to shortnames usable in grant statements:
+  * Move wikidata keys to new metadata field
+  * Move elaborate wikipedia captions to summary
+  * Synthesize tldr directly from caption
+
+Improve grant synthesizing:
+  * Expand to also cover lowercased names/captions
+  * Expand to replace leading "Creative Commons" with "CC"
+  * Expand to make leading "Creative Commons" (or "CC") optional
+  * Reduce to skip duplicate names/captions (by mapping into a hash?)
+
+Improve iri synthesizing:
+  * Expand protocol https → http
+  * Expand to alternate websites with same identifier
+
+Relax tag "versioned" to any (even unknown) version
+
+Fix join data from other licenses in code loop (not declared as a seed) e.g. for group gnu
+
+Distinguish in testsuite between TODO (pending) and SKIP (irrelevant)
+
+Assemble DefHash during build.
+  * Maybe use Regexp::Assemble at build-time (but then optionally disable to support deterministic builds)
+  * Install as YAML (and JSON?) below /usr/share/misc, for reuse by non-Perl tools.
+
+Document new features:
+  * Document subject option, including enabling multiple subjects.
+  * Add note about "re" use...:
+    adaptable by passing option C<subject> to L<Regexp::Pattern::re>.
+
+Tighten what is public:
+  * Join data from other licenses in code loop (not declared as a seed) e.g. for group gnu
+  * Turn most possible into seed patterns.

@@ -1,5 +1,5 @@
 package Statocles::Deploy::Git;
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 # ABSTRACT: Deploy a site to a Git repository
 
 use Statocles::Base 'Class';
@@ -39,10 +39,9 @@ has remote => (
 
 #pod =method deploy
 #pod
-#pod     my @paths = $deploy->deploy( $from_store, %options );
+#pod     my @paths = $deploy->deploy( $pages, %options );
 #pod
-#pod Deploy the site, copying from the given L<from_store|Statocles::Store>.
-#pod Returns the paths that were deployed.
+#pod Deploy the site, rendering the given pages.
 #pod
 #pod Possible options are:
 #pod
@@ -62,7 +61,7 @@ has remote => (
 #pod =cut
 
 around 'deploy' => sub {
-    my ( $orig, $self, $from_store, %options ) = @_;
+    my ( $orig, $self, $pages, %options ) = @_;
 
     my $deploy_dir = $self->path;
 
@@ -107,7 +106,7 @@ around 'deploy' => sub {
     }
 
     # Copy the files
-    my @files = $self->$orig( $from_store, %options );
+    $self->$orig( $pages, %options );
 
     # Check to see which files were changed
     # --porcelain was added in 1.7.0
@@ -125,10 +124,10 @@ around 'deploy' => sub {
     #; say Dumper \%in_status;
 
     # Commit the files
-    #; say "Copied files: " . join "; ", @files;
-    @files    = grep { $in_status{ $_ } }
-                map { Path::Tiny->new( $rel_path, $_ ) }
-                @files;
+    #; say "Copied files: " . join "; ", map { $_->path } @$pages;
+    my @files = grep { $in_status{ $_ } }
+                map { Path::Tiny->new( $rel_path, $_->path ) }
+                @$pages;
     #; say "Files in git status: " . join "; ", @files;
 
     #; say "Committing: " . Dumper \@files;
@@ -152,8 +151,6 @@ around 'deploy' => sub {
 
     # Tidy up
     $self->_run( $git, checkout => $current_branch );
-
-    return @files;
 };
 
 # Run the given git command on the given git repository, logging the
@@ -218,7 +215,7 @@ Statocles::Deploy::Git - Deploy a site to a Git repository
 
 =head1 VERSION
 
-version 0.091
+version 0.092
 
 =head1 DESCRIPTION
 
@@ -246,10 +243,9 @@ The name of the remote to deploy to. Defaults to 'origin'.
 
 =head2 deploy
 
-    my @paths = $deploy->deploy( $from_store, %options );
+    my @paths = $deploy->deploy( $pages, %options );
 
-Deploy the site, copying from the given L<from_store|Statocles::Store>.
-Returns the paths that were deployed.
+Deploy the site, rendering the given pages.
 
 Possible options are:
 

@@ -1,5 +1,5 @@
 package Statocles::File;
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 # ABSTRACT: A wrapper for a file on the filesystem
 
 #pod =head1 SYNOPSIS
@@ -31,8 +31,8 @@ use Statocles::Base 'Class';
 
 has store => (
     is => 'ro',
-    isa => Store,
-    coerce => Store->coercion,
+    isa => StoreType,
+    coerce => StoreType->coercion,
 );
 
 #pod =attr path
@@ -76,7 +76,7 @@ Statocles::File - A wrapper for a file on the filesystem
 
 =head1 VERSION
 
-version 0.091
+version 0.092
 
 =head1 SYNOPSIS
 

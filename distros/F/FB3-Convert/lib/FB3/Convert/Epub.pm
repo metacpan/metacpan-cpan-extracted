@@ -35,9 +35,10 @@ sub Reaper {
   $AllowElements->{'a'} = {
     'allow_attributes' => ['src','id','xlink:href'],
     'processor' => \&ProcessHref,
+    'allow_elements_inside' => $FB3::Convert::ElsMainList,
   };
   $AllowElements->{'b'} = {
-    'allow_attributes' => [],
+    'allow_attributes' => ['id'],
     processor => \&TransformTo,
     processor_params => ['strong']
   };
@@ -47,7 +48,7 @@ sub Reaper {
     processor_params => ['underline']
   };
   $AllowElements->{'div'} = {
-    'exclude_if_inside' => ['p','ul','ol','h1','h2','h3','h4','h5','h6','li','pre','table'], #Если div содежрит block-level элементы, мы его чикаем 
+    'exclude_if_inside' => ['div','p','ul','ol','h1','h2','h3','h4','h5','h6','li','pre','table'], #Если div содежрит block-level элементы, мы его чикаем 
     'allow_attributes' => [],
     processor => \&TransformTo,
     processor_params => ['p'],
@@ -64,12 +65,23 @@ sub Reaper {
   $AllowElements->{'h5'} = $AllowElements->{'h1'};
   $AllowElements->{'h6'} = $AllowElements->{'h1'};
 
+  
+###### счетчики, настройки, аккмуляторы и пр.
+  $X->{'MaxMoveCount'} = 100; # максимальное кол-во символов принятия решения пустых <a id="good_link" href=""> на перенос 
+  $X->{'EmptyLinksList'} = {}; # список пустых <a id="good_link" href=""> на перенос или превращение
+  
 ##### где хранится содержимое книги
   my $ContainerFile = $Source."/META-INF/container.xml";
   die $self." ".$ContainerFile." not found!" unless -f $ContainerFile;
 
   $X->Msg("Parse container ".$ContainerFile."\n");
-  my $CtDoc = XML::LibXML->new()->parse_file($ContainerFile) || die "Can't parse file ".$ContainerFile;
+  my $CtDoc = XML::LibXML->load_xml(
+    location=>$ContainerFile,
+    expand_entities => 0,
+    no_network => 1,
+    load_ext_dtd => 0
+  ) || die "Can't parse file ".$ContainerFile;
+  
   my $RootFile = $XC->findnodes('/container:container/container:rootfiles/container:rootfile',$CtDoc)->[0]->getAttribute('full-path');
   die "Can't find full-path attribute in Container [".$NS{'container'}." space]" unless $RootFile;
 
@@ -83,7 +95,12 @@ sub Reaper {
 
   $X->Msg("Parse rootfile ".$RootFile."\n");
   
-  my $RootDoc = XML::LibXML->load_xml( location => $RootFile ) || die "Can't parse file ".$RootFile;
+  my $RootDoc = XML::LibXML->load_xml(
+    location => $RootFile,
+    expand_entities => 0,
+    no_network => 1,
+    load_ext_dtd => 0
+  ) || die "Can't parse file ".$RootFile;
   $RootDoc->setEncoding('utf-8');
 
   # список файлов с контентом
@@ -141,7 +158,7 @@ sub Reaper {
     my @Genres;
     for my $Genre ($XC->findnodes('/root:package/root:metadata/dc:subject',$RootDoc)) {
       next unless $Genre->to_literal;
-      push @Genres, $self->html_trim($Genre->to_literal),
+      push @Genres, $self->EncodeUtf8($self->html_trim($Genre->to_literal)),
     }
     push @Genres, 'Unknown' unless @Genres;
     
@@ -168,12 +185,12 @@ sub Reaper {
       my $Author = $self->BuildAuthorName($self->EncodeUtf8($self->html_trim($Author->to_literal)));
       push @Authors, $Author;
     }
-    push @Authors, $self->BuildAuthorName('Unknown');
+    push @Authors, $self->BuildAuthorName('Unknown') unless scalar @Authors;
     $Description->{'TITLE-INFO'}->{'AUTHORS'} = \@Authors;
   }
 
   #print Data::Dumper::Dumper($AC);
-  
+
   #КОНТЕНТ
 
   my @Pages;
@@ -187,55 +204,42 @@ sub Reaper {
 
   #Клеим смежные title
   #Отрезаем ненужное
+  
   foreach my $Page (@Pages) {
 
     $Page->{'content'} = CleanNodeEmptyId($X,$Page->{'content'});
+    $Page->{'content'} = CleanEmptyP($X,$Page->{'content'});
 
-    #^<p/> и emptyline режем в начале
-    foreach my $Item (@{$Page->{'content'}}) {
-
-      if (
-          ref $Item eq 'HASH'
-          && exists $Item->{'p'}
-          && ( $X->IsEmptyLineValue($Item->{'p'}->{'value'}) )
-        ) {
-        $Item = undef;
-      } else {
-        last;
-      }
-    }
-
-    #^<p/> и emptyline режем в конце
-    foreach my $Item (reverse @{$Page->{'content'}}) {
-      if (
-          ref $Item eq 'HASH'
-          && exists $Item->{'p'}
-          && ( $X->IsEmptyLineValue($Item->{'p'}->{'value'}) )
-        ) {
-        $Item = undef;
-      } else {
-        last;
-      }
-    }
-    
     my $c=-1;
     my $EmptyLineDetect=undef;
+    my $LastSpace=0;
     foreach my $Item (@{$Page->{'content'}}) {
       $c++;
       next unless defined $Item;
-      if (ref $Item eq '' && $X->trim($Item) eq '') {
+      if (ref $Item eq '' && $Item eq '') {
         $Item=undef;
         next;
       }
-      
+
+      if (ref $Item eq '' && $Item =~ /^[\s\n\r\t]+$/) {
+        if ($LastSpace) {
+          $Item=undef;
+        } else {
+          $Item=" ";
+        }  
+        $LastSpace=1;
+        next;
+      }
+      $LastSpace=0;
+
       #клеим смежные emptyline
       if (ref $Item eq 'HASH'
           && exists $Item->{'p'}
           && $X->IsEmptyLineValue($Item->{'p'}->{'value'})
         ) {
-       
+
         if (defined $EmptyLineDetect) {
-          push @{$Page->{'content'}->[$EmptyLineDetect]->{p}->{'value'}}, $Item->{'p'}->{'value'};
+          push @{$Page->{'content'}->[$EmptyLineDetect]->{p}->{'value'}}, @{$Item->{'p'}->{'value'}};
           $Item = undef;
           next;
         }
@@ -243,7 +247,7 @@ sub Reaper {
       } else {
         $EmptyLineDetect = undef;
       }
-    
+
       #<title/> иногда попадаются - режем
       if (
           ref $Item eq 'HASH'
@@ -252,7 +256,7 @@ sub Reaper {
           $Item->{'title'}->{'value'} = CleanTitle($X,$Item->{'title'}->{'value'});
           $Item = undef unless @{$Item->{'title'}->{'value'}};
       }
-      
+
     }
 
     for (my $c = scalar @{$Page->{'content'}}; $c>=0; $c--) {
@@ -262,22 +266,20 @@ sub Reaper {
         next if (ref $Item ne 'HASH' || !exists $Item->{'title'});
 
         for (my $i=$c-1;$i>=0;$i--) { #бежим назад и ищем, нет ли перед нами title?
-
           my $Last = $Page->{'content'}->[$i];
-
           next if !ref($Last) && $X->trim($Last) eq ''; #если перед нами перенос строки, игнорим, ищем title дальше
-
           if (ref $Last eq 'HASH' && exists $Last->{'title'}) { #перед нами title, будем клеить текущий title с ним
             $LastTitleOK = $i;
             last;
           } else {
             last; #наткнулись на НЕ-title, хватит перебирать
           }
-          
+
         }
 
         if ($LastTitleOK > -1) {
-          push @{$Page->{'content'}->[$LastTitleOK]->{'title'}->{'value'}}, clone(\@{$Item->{'title'}->{'value'}}); #переносим title в предыдущий
+          my $TitleMove = clone($Item->{'title'}->{'value'});
+          push @{$Page->{'content'}->[$LastTitleOK]->{'title'}->{'value'}},  @$TitleMove; #переносим title в предыдущий
           delete $Page->{'content'}->[$c];
           delete $Page->{'content'}->[$c-1] #перенос строки тоже грохнем
             if (
@@ -288,21 +290,50 @@ sub Reaper {
 
     }
 
-    #РИсуем section's
-     my @P;
-     my $Sec = { #заготовка section
-      'section' => {
-        'value' => [],
-        'attributes' => {
-          'id' => $Page->{'ID_SUB'},
-        }
-      }
-     };
+    #MOVE EMPTY LINKS to title
+    for (my $c = scalar @{$Page->{'content'}}; $c>=0; $c--) {
+        my $Item = $Page->{'content'}->[$c];
+        
+        next if (ref $Item ne 'HASH' || !exists $Item->{'title'});
 
-     my $c=0;
-     my $TitleOK = 0;
-     push @{$Page->{'content'}},''; #пустышка-закрывашка (так легче обработать массив)
-     foreach my $Item (@{$Page->{'content'}}) {
+        my @LinksMove2Title;
+        for (my $i=$c-1;$i>=0;$i--) { #бежим назад и ищем, нет ли перед нами <a id="some"/>?
+          my $Last = $Page->{'content'}->[$i];
+          next if !ref($Last) && $X->trim($Last) eq ''; #если перед нами перенос строки, игнорим, ищем <a> дальше
+          if (
+            ref $Last eq 'HASH'
+            && IsEmptyA($Last)
+          ) {
+            my $Move = delete $Page->{'content'}->[$i];
+            my $key = each %$Move; 
+            push @LinksMove2Title, $key ne 'a' ? @{$Move->{$key}->{'value'}} : $Move;
+          } else {
+            last; #наткнулись на НЕ-<a>, хватит перебирать
+          }
+        }
+
+        if (@LinksMove2Title && ref $Item eq 'HASH' && exists $Item->{'title'}) {
+          push @{$Item->{'title'}->{'value'}}, @LinksMove2Title; #переносим <a> в ближайший
+        }
+        CleanTitle($X,$Item->{'title'}->{'value'});
+    }
+
+    #Clean undef
+    my @Push;
+    foreach (@{$Page->{'content'}}) {
+      next unless defined $_;
+      push @Push, $_; 
+    }
+    $Page->{'content'} = \@Push;
+  
+    #РИсуем section's
+    my @P;
+    my $Sec = SectionBody($X);
+
+    my $c=0;
+    my $TitleOK = 0;
+    push @{$Page->{'content'}},''; #пустышка-закрывашка (так легче обработать массив)
+    foreach my $Item (@{$Page->{'content'}}) {
 
       $c++;
       if (ref $Item eq 'HASH') {
@@ -317,7 +348,11 @@ sub Reaper {
       }
 
       if ($TitleOK) { #встретили title
-        push @P, clone($Sec) if @{$Sec->{'section'}->{'value'}};
+        if (@{$Sec->{'section'}->{'value'}}) {
+          my $CloneSec = clone($Sec);
+          $CloneSec->{'section'}->{'attributes'}->{'id'} = $X->UUID();
+          push @P, clone($CloneSec);
+        }
         $Sec->{'section'}->{'value'} = []; #надо закрыть section
         push @{$Sec->{'section'}->{'value'}}, $Item; #и продолжить пушить в новый
         next;
@@ -328,11 +363,14 @@ sub Reaper {
       if ( #страница закрывается, пушим section что там в нем осталось
         $c >= scalar @{$Page->{'content'}}
       ) {
-        push @P, clone($Sec);
+        my $CloneSec = clone($Sec);
+        $CloneSec->{'section'}->{'attributes'}->{'id'} = $X->UUID();
+        push @P, $CloneSec;
         $Sec->{'section'}->{'value'} = [];
       }
 
     }
+    pop @{$Page->{'content'}}; #закрывашка
 
     #одиночки title нам в section не нужны - не валидно
     #таких разжалуем в subtitle
@@ -366,7 +404,12 @@ sub Reaper {
       $Content = $P[0]->{'section'}->{'value'};  #если section один, то берем только его внутренности, контейнер section лишний 
     }
 
-    push @PagesComplete, {ID=>$Page->{'ID'},'content'=>$Content};
+    if (@$Content) {
+      push @PagesComplete, {ID=>$Page->{'ID'},'content'=>$Content};
+    } else {
+      $X->Msg("Find empty page. Skip [id: $Page->{'ID'}]\n");      
+    }
+  
   }
   @Pages = ();
 
@@ -382,9 +425,232 @@ sub Reaper {
     };
   }
 
+  #анализируем и переносим пустые <a> и элементы с несушествующими id
+  foreach my $Page (@Body) {
+    AnaliseIdEmptyHref($X,$Page->{'section'});
+  }
+  MoveIdEmptyHref($X,\@Body);
+  
+  #финальная подчистка
+  foreach my $Page (@Body) {
+    CleanEmptyP($X,$Page->{'section'}->{'value'});
+  }
+
   $Structure->{'PAGES'} = {
     value => \@Body
   };
+
+}
+
+sub CleanEmptyP {
+  my $X = shift;
+  my $Data = shift;
+  return $Data unless ref $Data eq 'ARRAY';
+
+  #^<p/> и emptyline режем в начале
+  foreach my $Item (@$Data) {
+    next unless defined $Item;
+    if (
+        (ref $Item eq 'HASH'
+        && exists $Item->{'p'}
+        && ( $X->IsEmptyLineValue($Item->{'p'}->{'value'}))
+        || !defined $Item || (ref $Item eq '' && $Item =~ /^[\s\t]$/))
+      ) {
+      $Item=undef;
+    } else {
+      last;
+    }
+  }
+
+  #^<p/> и emptyline режем в конце
+  foreach my $Item (reverse @$Data) {
+    if (
+        (ref $Item eq 'HASH'
+        && exists $Item->{'p'}
+        && ( $X->IsEmptyLineValue($Item->{'p'}->{'value'}))
+        || (!defined $Item || (ref $Item eq '' && $Item =~ /^[\s\t]+$/))
+           )
+      ) {
+      $Item = undef;
+    } else {
+      last;
+    }
+  }
+
+  #^<p/> и emptyline режем после title
+  my $LastTitleOK=0;
+  foreach my $Item (@$Data) {
+
+    next unless defined $Item;
+    
+    if (ref $Item eq 'HASH'
+        && exists $Item->{'title'}
+    ) {
+      $LastTitleOK=1;
+      next;
+    }
+
+    if ( $LastTitleOK &&
+        (ref $Item eq 'HASH'
+        && exists $Item->{'p'}
+        && ( $X->IsEmptyLineValue($Item->{'p'}->{'value'}))
+        || !defined $Item || (ref $Item eq '' && $Item =~ /^[\s\t]$/))
+      ) {
+      $Item=undef;
+    } else {
+      $LastTitleOK=0;
+      #next;
+    }
+
+    if (ref $Item eq 'HASH'
+        && exists $Item->{'section'}) {
+      $Item->{'section'}->{'value'} = CleanEmptyP($X,$Item->{'section'}->{'value'});
+    }
+
+  }
+  
+  return $Data;
+}
+
+sub IsEmptyA {
+  my $Data = shift;
+  return 0 unless ref $Data eq 'HASH';
+  
+  return 1 if (
+    (
+    exists $Data->{'p'}
+    && @{$Data->{'p'}->{'value'}} == 1
+    && IsEmptyA($Data->{'p'}->{'value'}->[0])
+    )
+    ||
+    (
+    exists $Data->{'span'}
+    && @{$Data->{'span'}->{'value'}} == 1
+    && IsEmptyA($Data->{'span'}->{'value'}->[0])
+    )
+    ||
+    (exists $Data->{'a'}
+    && $Data->{'a'}->{'attributes'}->{'xlink:href'} eq ''
+    && !@{$Data->{'a'}->{'value'}}
+    )
+  ); #в <a> ничего нет. Иначе это уже полезный контент, и нечего его в title переносить
+  return 0;      
+}
+
+sub SectionBody {
+  my $X=shift;
+  my $Sec = { #заготовка section
+    'section' => {
+      'value' => [],
+      'attributes' => {
+        'id' => $X->UUID(),
+      }
+    }
+  };
+}
+  
+# заполняет $X->{'EmptyLinksList'}
+# <a id="ID" href=""> ID => newID
+sub AnaliseIdEmptyHref {
+  my $X = shift;
+  my $Data = shift;
+  my $Hash4Move = shift;
+
+  my $First = 0;
+  unless ($Hash4Move) {
+   $Hash4Move = {
+     'count_abs' =>  0, #счетчик от начала секции
+     'neighbour' => {}, #счетчик от начала секции - кандидатов, куда можно переносить
+     'candidates' => {} #счетчик от начала секции кандидатов на перенос
+   };
+   $First = 1;
+  }
+
+  foreach my $Item (@{$Data->{'value'}}) {
+
+    if (ref $Item eq '') { # это голый текст
+      $Hash4Move->{'count_abs'} += length($Item);
+    } elsif (ref $Item eq 'HASH') { # это нода
+
+      foreach my $El (keys %$Item) {   
+        if ($El eq 'section') {
+          AnaliseIdEmptyHref($X,$Item->{$El}); #вложенную секцию обрабатывает как отдельную
+        } else {
+          if (exists $Item->{$El}->{'attributes'}->{'id'} && $Item->{$El}->{'attributes'}->{'id'} ne '') {
+            if ($El eq 'a' && exists $Item->{$El}->{'attributes'}->{'xlink:href'} && $Item->{$El}->{'attributes'}->{'xlink:href'} eq '') {
+              #ссылка - кандидат на перенос
+              $Hash4Move->{'candidates'}->{$Item->{$El}->{'attributes'}->{'id'}} = $Hash4Move->{'count_abs'};
+            } else {
+              #кандидат, куда можно перенести ссылку
+              $Hash4Move->{'neighbour'}->{$Item->{$El}->{'attributes'}->{'id'}} = $Hash4Move->{'count_abs'};
+            }
+          }
+          AnaliseIdEmptyHref($X,$Item->{$El},$Hash4Move);
+        }
+      }
+    
+    }
+
+  }
+  
+  if ($First) {
+    #анализируем и собираем элементы для переноса или превращения
+    foreach my $Cand (keys %{$Hash4Move->{'candidates'}}) {
+    
+      if ( $Hash4Move->{'candidates'}->{$Cand} <= $X->{'MaxMoveCount'} ) {
+        #переносим в id секции
+        $X->{'EmptyLinksList'}->{$Cand} = $Data->{'attributes'}->{'id'};
+      } else {
+        #вычислим ближайшего соседа для переноса
+        my %Sort = ();
+        foreach (keys %{$Hash4Move->{'neighbour'}}) {
+          $Sort{$_} = abs($Hash4Move->{'candidates'}->{$Cand} - $Hash4Move->{'neighbour'}->{$_});
+        }
+        my $MinNeigh = [sort {$Sort{$a} <=> $Sort{$b}} keys %Sort]->[0];
+        $X->{'EmptyLinksList'}->{$Cand} = $MinNeigh if (%Sort && $Sort{$MinNeigh} <= $X->{'MaxMoveCount'});
+      }
+      #иначе отдаем на превращение
+      $X->{'EmptyLinksList'}->{$Cand} = 'rename' if !exists $X->{'EmptyLinksList'}->{$Cand} || !defined $X->{'EmptyLinksList'}->{$Cand};
+    }
+  }
+  
+}
+
+sub MoveIdEmptyHref {
+  my $X = shift;
+  my $Data = shift;
+  return unless ref $Data eq 'ARRAY';
+
+  foreach my $Item (@$Data) {
+    next unless ref $Item eq 'HASH';
+    foreach my $ElName (keys %$Item) {
+      my $El = $Item->{$ElName};
+      #меняем ссылку
+      if (
+        $X->{'EmptyLinksList'}->{ $X->CutLinkDiez($El->{'attributes'}->{'xlink:href'}) } ne 'rename'
+        && exists $El->{'attributes'}
+        && exists $El->{'attributes'}->{'xlink:href'}
+        && exists $X->{'EmptyLinksList'}->{ $X->CutLinkDiez($El->{'attributes'}->{'xlink:href'}) }
+      ) {
+        $El->{'attributes'}->{'xlink:href'} = "#".$X->{'EmptyLinksList'}->{ $X->CutLinkDiez($El->{'attributes'}->{'xlink:href'}) };
+        $X->Msg("Empty link move to neighbour id $El->{'attributes'}->{'xlink:href'} [".($X->{'id_list'}->{$X->CutLinkDiez($El->{'attributes'}->{'xlink:href'})}||'section')."]\n","w");
+      }
+      #удаляем элемент со старым id либо превращаем в span, если нет кандидатов на перенос
+      if (
+          exists $El->{'attributes'}
+          && exists $El->{'attributes'}->{'id'}
+          && exists $X->{'EmptyLinksList'}->{ $El->{'attributes'}->{'id'} }
+      ) {
+        if ($X->{'EmptyLinksList'}->{ $El->{'attributes'}->{'id'} } eq 'rename') {
+          $Item = $El->{'value'} = {'span'=>{'value'=>$El->{'value'},'attributes'=>{'id'=>$El->{'attributes'}->{'id'}}}}; #-> span
+          $X->Msg("Empty link rename to <span> [".$X->{'id_list'}->{$El->{'attributes'}->{'id'}}."]\n","w");
+        } else {
+          $Item = $El->{'value'}; #удаляем
+        }
+      }
+      MoveIdEmptyHref($X,$El->{'value'});
+    }
+  }
 
 }
 
@@ -432,17 +698,22 @@ sub AssembleContent {
 
       $X->Msg("Parse content file ".$ContentFile."\n");
 
+      my $Content;
+      open F,"<".$ContentFile;
+      map {$Content.=$_} <F>;
+      close F;
+      $Content = HTML::Entities::decode_entities(Encode::decode_utf8($Content));
+      $Content =~ s/\&/&#38;/g;
+
       my $ContentDoc = XML::LibXML->load_xml(
-        location => $ContentFile,
+        string => $Content,
         expand_entities => 0, # не считать & за entity
         no_network => 1, # не будем тянуть внешние вложения
         recover => 2, # не падать при кривой структуре. например, не закрыт тег. entity и пр | => 1 - вопить, 2 - совсем молчать
         load_ext_dtd => 0 # полный молчок про dtd
       );
       $ContentDoc->setEncoding('utf-8');
-      
       my $Body = $XC->findnodes('/xhtml:html/xhtml:body',$ContentDoc)->[0];
-      
       $X->Error("Can't find /html/body node in file $ContentFile. This is true XML?") unless $Body;
 
       #перерисуем все ns-подобные атрибуты. мешают при дальнейшем парсинге
@@ -491,7 +762,6 @@ sub CleanTitle {
   my $Node = shift;
 
   return $Node unless ref $Node eq 'ARRAY';
-
   foreach my $Item (@$Node) {
     $Item = undef if ref $Item eq 'HASH' && exists $Item->{'p'} && !scalar @{$Item->{'p'}->{'value'}};  
   }
@@ -517,15 +787,23 @@ sub CleanNodeEmptyId {
     next unless ref $Item eq 'HASH';
     foreach my $El (keys %$Item) {
       $Item->{$El}->{'value'} = CleanNodeEmptyId($X,$Item->{$El}->{'value'});
-      if (exists $Item->{$El}->{'attributes'}->{'id'}) {
-        my $Id = $Item->{$El}->{'attributes'}->{'id'};
-        unless (exists $X->{'href_list'}->{"#".$Id}) { #элементы с несуществующими id
-          $X->Msg("Find non exists ID and delete '$Id' in node '$El' [".$X->{'id_list'}->{$Id}."]\n","w");
-          delete $Item->{$El}->{'attributes'}->{'id'}; #удалим id
+      if (exists $Item->{$El}->{'attributes'}->{'id'} || $El =~ /^(a|span)$/) {
+        my $Id = exists $Item->{$El}->{'attributes'}->{'id'} ? $Item->{$El}->{'attributes'}->{'id'} : '';
+        if (!exists $X->{'href_list'}->{"#".$Id} || !$Id) { #элементы с несуществующими id
+          
+          my $Link;
+          $Link = $X->trim($Item->{$El}->{'attributes'}->{'xlink:href'})if exists $Item->{$El}->{'attributes'}->{'xlink:href'};
+          
+          if ($Id) {
+            $X->Msg("Find non exists ID and delete '$Id' in node '$El' [".$X->{'id_list'}->{$Id}."]\n","w");
+            delete $Item->{$El}->{'attributes'}->{'id'}; #удалим id
+          } elsif ($Link eq '') {
+            $X->Msg("Find node '$El' without id\n","w");
+          }
+          
           next unless $El =~ /^(a|span)$/;
-          my $Link = $X->trim($Item->{$El}->{'attributes'}->{'xlink:href'});
           if ($El eq 'a' && $Link ne '') { #<a> c линками оставим
-            $X->Msg("Find link [$Link]. Skip\n");
+            $X->Msg("Find link [$Link]. Skip\n","w");
             next;
           }
           pop @$Ret;
@@ -590,12 +868,13 @@ sub ProcessHref {
 
   my $Href = $Node->getAttribute('href') || "";
 
+  $Href = $X->trim_soft($Href);
   my ($Link, $Anchor) = split /\#/, $Href, 2;
 
   my $NewHref =
   $Href ?
-        $Href =~ /^[a-zA-Z]+\:/
-          ? $Href
+        $Href =~ /^[a-z]+\:/i
+          ? $X->CorrectOuterLink($Href)
           : '#'.($Anchor ? 'link_' : '').$X->Path2ID( ($Link
                                                        ?$Href: #внешний section
                                                        basename($RelPath)."#".$Anchor #текущий section
@@ -624,16 +903,19 @@ sub TransformH2Title {
   my %Args = @_;
   my $Node = $Args{'node'};
 
-  $Node->setNodeName('title');
-
-  foreach my $Child ($Node->getChildnodes) {
-    next if $Child->nodeName =~ /^p$/i;
-    my $NewNode = XML::LibXML::Element->new("p");
-    $NewNode->addChild($Child->cloneNode(1));
-    $Child->replaceNode($NewNode);
+  my $NewNode = XML::LibXML::Element->new('title');
+  foreach ($Node->getAttributes) { #скопируем атрибуты
+    $NewNode->setAttribute($_->name => $_->value);
   }
-  
-  return $Node;
+
+  my $Wrap = XML::LibXML::Element->new("p"); #wrapper
+  foreach my $Child ($Node->getChildnodes) {
+    $Wrap->addChild($Child->cloneNode(1));
+  }
+ 
+  $NewNode->addChild($Wrap);
+
+  return $NewNode;
 }
 
 1;

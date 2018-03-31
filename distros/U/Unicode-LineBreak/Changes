@@ -1,3 +1,9 @@
+2018.003  Thu Mar 29 2018
+# No new features.
+! Makefile.PL.sombok
+  - CPAN RT#120370: Build fails with recent EUMM and some make variants.
+    Patch by Alexandr Ciornii.
+
 2017.004  Tue Apr 11 2017
 # No new features.
 

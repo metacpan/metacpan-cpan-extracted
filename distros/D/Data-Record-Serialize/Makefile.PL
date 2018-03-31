@@ -17,9 +17,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "Data::Record::Serialize",
   "PREREQ_PM" => {
-    "Carp" => 0,
     "DBI" => 0,
     "Data::Dumper" => 0,
+    "Exporter::Shiny" => 0,
     "Hash::Util" => 0,
     "IO::File" => 0,
     "JSON::MaybeXS" => 0,
@@ -27,15 +27,18 @@ my %WriteMakefileArgs = (
     "Moo::Role" => "2.003",
     "POSIX" => 0,
     "Package::Variant" => 0,
+    "Ref::Util" => 0,
     "SQL::Translator" => 0,
     "SQL::Translator::Schema" => 0,
     "Type::Library" => 0,
     "Type::Utils" => 0,
     "Types::Standard" => "1.000005",
     "YAML::Any" => 0,
+    "custom::failures" => 0,
     "namespace::clean" => 0,
     "strict" => 0,
-    "warnings" => 0
+    "warnings" => 0,
+    "warnings::register" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -50,11 +53,11 @@ my %WriteMakefileArgs = (
     "Test2::Plugin::NoWarnings" => 0,
     "Test2::Tools::AfterSubtest" => 0,
     "Test2::V0" => 0,
+    "Test::Lib" => 0,
     "Test::More" => 0,
-    "YAML::Any" => 0,
-    "lib" => 0
+    "YAML::Any" => 0
   },
-  "VERSION" => "0.13",
+  "VERSION" => "0.15",
   "test" => {
     "TESTS" => "t/*.t t/bugs/*.t t/encoders/*.t"
   }
@@ -62,9 +65,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
   "DBI" => 0,
   "Data::Dumper" => 0,
+  "Exporter::Shiny" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Slurper" => 0,
   "File::Spec" => 0,
@@ -79,21 +82,24 @@ my %FallbackPrereqs = (
   "Moo::Role" => "2.003",
   "POSIX" => 0,
   "Package::Variant" => 0,
+  "Ref::Util" => 0,
   "SQL::Translator" => 0,
   "SQL::Translator::Schema" => 0,
   "Test2::Bundle::More" => 0,
   "Test2::Plugin::NoWarnings" => 0,
   "Test2::Tools::AfterSubtest" => 0,
   "Test2::V0" => 0,
+  "Test::Lib" => 0,
   "Test::More" => 0,
   "Type::Library" => 0,
   "Type::Utils" => 0,
   "Types::Standard" => "1.000005",
   "YAML::Any" => 0,
-  "lib" => 0,
+  "custom::failures" => 0,
   "namespace::clean" => 0,
   "strict" => 0,
-  "warnings" => 0
+  "warnings" => 0,
+  "warnings::register" => 0
 );
 
 

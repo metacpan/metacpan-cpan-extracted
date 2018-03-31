@@ -62,6 +62,9 @@ read($temp, $raw2, $tag->size);
 # test raw data round-trip integrity
 ok($raw1 eq $raw2, 'raw data round-trip');
 
+# compare strings, if different
+str_cmp($raw1, $raw2) if ($raw1 ne $raw2);
+
 # close profile
 close($profile->fh);
 
@@ -69,4 +72,51 @@ close($profile->fh);
 close($temp);
 
 ##### more tests needed #####
+
+# compare strings
+sub str_cmp {
+
+	# get strings
+	my ($s1, $s2) = @_;
+
+	# local variables
+	my ($len1, $len2, $lenmax, $mm, $c1, $c2);
+
+	# get string lengths
+	$len1 = length($s1);
+	$len2 = length($s2);
+
+	# print string lengths
+	print STDERR "\n\tlen1 $len1 : len2 $len2\n";
+
+	# get maximum length
+	$lenmax = $len1 > $len2 ? $len1 : $len2;
+
+	# init mismatch counter
+	$mm = 0;
+
+	# for each character
+	for my $i (0 .. $lenmax - 1) {
+		
+		# get characters
+		$c1 = $i < $len1 ? sprintf('%02x', ord(substr($s1, $i, 1))) : 'undef';
+		$c2 = $i < $len2 ? sprintf('%02x', ord(substr($s2, $i, 1))) : 'undef';
+		
+		# if strings differ
+		if ($c1 ne $c2) {
+			
+			# print difference
+			printf STDERR "\tindex %d  - %s : %s\n", $i, $c1, $c2;
+			
+			# increment counter
+			$mm++;
+			
+		}
+		
+		# quit if number of mismatches > 10
+		last if ($mm > 10);
+		
+	}
+	
+}
 

@@ -1,11 +1,10 @@
 package Statocles::App::Blog;
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 # ABSTRACT: A blog application
 
 use Text::Unidecode;
 use Statocles::Base 'Class';
 use Getopt::Long qw( GetOptionsFromArray );
-use Statocles::Store;
 use Statocles::Document;
 use Statocles::Page::Document;
 use Statocles::Page::List;
@@ -235,16 +234,13 @@ ENDHELP
         $self->store->write_file( $path => $doc );
         my $full_path = $self->store->path->child( @partsfile );
 
-        if ( run_editor( $full_path ) ) {
+        if ( my $content = run_editor( $full_path ) ) {
             my $old_title = $doc->title;
-            ; say "Old title: " . $doc->title;
-            my $content = $full_path->slurp_utf8;
             my $doc = Statocles::Document->parse_content(
                 path => $path.'',
                 store => $self->store,
                 content => $content,
             );
-            ; say "New title: " . $doc->title;
             if ( $doc->title ne $old_title ) {
                 $self->store->path->child( @partsdir )->remove_tree;
                 $slug = $self->make_slug( $doc->title || "new post" );
@@ -658,7 +654,7 @@ Statocles::App::Blog - A blog application
 
 =head1 VERSION
 
-version 0.091
+version 0.092
 
 =head1 DESCRIPTION
 

@@ -40,6 +40,9 @@ GetOptions (\%opt, "from=s") or die("Error in command line arguments\n");
 
 die "Missing '-from' option " unless $opt{from};
 
+# make sure that Systemd model is created from scratch
+path('lib/Config/Model/models')->remove_tree;
+
 my $systemd_path = path($opt{from});
 die "Can't open directory ".$opt{from}."\n" unless $systemd_path->is_dir;
 
@@ -184,10 +187,17 @@ sub setup_element ($meta_root, $config_class, $element, $desc, $extra_info, $sup
 
     my @log;
 
-    my $obj = $meta_root->grab(
-        step => "class:$config_class element:$element",
-        autoadd => 1
-    );
+    if (not $meta_root->fetch_element('class')->exists($config_class)) {
+        say "Creating model class $config_class";
+        $meta_root->load( steps => [
+            qq!class:$config_class!,
+            q!generated_by="parseman.pl from systemd doc"!,
+            qq!accept:".*" type=leaf value_type=uniline warn="Unknown parameter"!
+        ]);
+    }
+    my $step = "class:$config_class element:$element";
+
+    my $obj = $meta_root->grab(step => $step, autoadd => 1);
 
     # trim description (which is not saved in this sub) to simplify
     # the regexp below
@@ -284,6 +294,56 @@ sub extract_choices($choices) {
     return $choices =~ /C<([\w\-+]+)>/g;
 }
 
+sub move_deprecated_element ($meta_root, $from, $to) {
+    say "Handling move of service/$from to unit/$to...";
+    # create deprecated moved element in Service for backward compat
+    my $warn = $from eq $to ? "$from is now part of Unit. Migrating..."
+        : "service/$from is now Unit/$to. Migrating...";
+    $meta_root->load( steps => [
+        'class:Systemd::Section::Service',
+        qq!element:$from type=leaf value_type=uniline status=deprecated!,
+        qq!warn="$warn"!
+    ]);
+
+    # Due to the fact that Unit are used in Service, Timer, Socket but
+    # only Service needs backward compat, a special Unit class is created
+    # for each Service.
+
+    # Saving $to definition stored from data extracted from Systemd
+    # doc
+    my $from_element_dump = $meta_root->grab(
+        "class:Systemd::Section::Unit element:$to"
+    )->dump_tree;
+
+    # remove $from element from common Unit class
+    $meta_root->load("class:Systemd::Section::Unit element:.rm($to)");
+
+    foreach my $service (@service_list) {
+        my $unit_class = "Systemd::Section::". ucfirst($service).'Unit';
+
+        # inject $from element in Special Unit class
+        $meta_root
+            ->grab("class:$unit_class element:$to")
+            ->load($from_element_dump);
+
+        # make sure that special Unit class provide all elements from
+        # common Unit class
+        $meta_root->load(steps => [
+            "class:$unit_class include=Systemd::Section::Unit",
+            'accept:".*" type=leaf value_type=uniline warn="Unknown parameter"'
+        ]);
+    }
+
+    # inject the migration instruction that retrieve $from element setting
+    # from Service class (where it's deprecated) and copy them to the new
+    # $from element in Unit class in a service file (hence this migration
+    # instruction is done only in ServiceUnit class)
+    $meta_root->load( steps => [
+        qq!class:Systemd::Section::ServiceUnit element:$to!,
+        qq!migrate_from variables:service="- - Service $from" formula="\$service"!
+    ]);
+}
+
 my $data = parse_xml([@list, @service_list], \%map) ;
 
 # Itself constructor returns an object to read or write the data
@@ -308,6 +368,7 @@ foreach my $config_class ($meta_root->fetch_element('class')->fetch_all_indexes)
 say "Creating systemd model...";
 
 foreach my $config_class (keys $data->{class}->%*) {
+    say "Creating model class $config_class";
     my $desc_ref = $data->{class}{$config_class};
 
     # cleanup leading white space and add formatting
@@ -351,23 +412,40 @@ $meta_root->load(
                                  choice=0,1,2,3,none,realtime,best-effort,idle'
 );
 
+# these warping instructions are used for most services. Serives are
+# disables when a service file is a symlink to /dev/null
+my $common_warp = qq!warp follow:disable="- disable" rules:\$disable level=hidden - - !;
+
 foreach my $service (@service_list) {
     my $name = ucfirst($service);
     my $class = 'Systemd::'.( $map{$name} || 'Section::'.ucfirst($name));
 
+    my $unit_class = $name.'Unit';
+    # make sure that the unit class exists (and fill it later when needed)
+    $meta_root->load("class:Systemd::Section::$unit_class");
+
     # create class that hold the service created by parsing man page
-    $meta_root->load(
-        qq!
+    $meta_root->load(qq!
         class:Systemd::$name
           generated_by="parse-man.pl from systemd doc"
+          element:disable
+            type=leaf
+            value_type=boolean
+            upstream_default=0
+            summary="disable configuration file supplied by the vendor"
+            description="When true, cme will disable a configuration file supplied by the vendor by placing place a symlink to /dev/null with the same filename as the vendor configuration file. See L<systemd-system.conf> for details." -
           element:$name
             type=warped_node
             config_class_name=$class
-            warp
-              follow:disable="- disable"
-              rules:\$disable
-                level=hidden - - -
-          include:=Systemd::CommonElements
+            $common_warp -
+          element:Unit
+            type=warped_node
+            config_class_name=Systemd::Section::$unit_class
+            $common_warp -
+          element:Install
+            type=warped_node
+            config_class_name=Systemd::Section::Install
+            $common_warp -
           rw_config
             backend=Systemd::Unit
             file=&index.$service
@@ -396,6 +474,44 @@ foreach my $service (@service_list) {
           !
     );
 }
+
+my @moved = qw/FailureAction SuccessAction StartLimitBurst StartLimitInterval RebootArgument/;
+my %move_target = qw/StartLimitInterval StartLimitIntervalSec/;
+
+# check also src/core/load-fragment-gperf.gperf.m4 is systemd source
+# for "compatibility" elements
+foreach my $from (@moved) {
+    my $to = $move_target{$from} || $from;
+    move_deprecated_element($meta_root, $from, $to);
+}
+
+# StartLimitInterval is also deprecated in Unit
+say "Handling move of StartLimitInterval to StartLimitIntervalSec in unit";
+$meta_root->load( steps => [
+    'class:Systemd::Section::Unit',
+    qq!element:StartLimitInterval type=leaf value_type=uniline status=deprecated!,
+    qq!warn="StartLimitInterval is now StartLimitIntervalSec. Migrating..."!
+]);
+
+# handle migration from both service and unit
+$meta_root->load( steps => [
+    qq!class:Systemd::Section::ServiceUnit element:StartLimitIntervalSec!,
+    qq!migrate_from variables:unit="- StartLimitInterval"!,
+    # $service variable is defined in move_deprecated element function
+    q!use_eval=1 formula="$unit || $service"!
+]);
+
+# renamed element in Unit
+say "Handling move of OnFailureIsolate to OnFailureJobMode in unit";
+$meta_root->load( steps => [
+    'class:Systemd::Section::Unit',
+    q!element:OnFailureIsolate type=leaf value_type=uniline status=deprecated!,
+    q!warn="OnFailureIsolate is now OnFailureJobMode. Migrating..." -!,
+    q!element:OnFailureJobMode!,
+    q!migrate_from variables:unit="- OnFailureIsolate"!,
+    q!formula="$unit"!
+]);
+
 
 say "Saving systemd model...";
 $rw_obj->write_all;

@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Tokyo
 
+0.41  Fri Mar 30 07:45:00 2018
+      - Making use of 'lazy' of Moo.
+
 0.40  Thu Mar 22 14:20:00 2018
       - Updated dependency on Map::Tube v3.45.
 

@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use Perl::Tidy qw();
 
-our $VERSION = '1.12';
+our $VERSION = '1.14';
 
 use Perl::Tidy::Sweetened::Pluggable;
 use Perl::Tidy::Sweetened::Keyword::Block;
@@ -37,6 +37,17 @@ $plugins->add_filter(
     ) );
 
 # Create a subroutine filter for:
+#    fun foo (Int $i) {}
+# where the parameter list is optional
+$plugins->add_filter(
+    Perl::Tidy::Sweetened::Keyword::Block->new(
+        keyword     => 'fun',
+        marker      => 'FUN',
+        replacement => 'sub',
+        clauses     => [ 'PAREN?' ],
+    ) );
+
+# Create a subroutine filter for:
 #    method foo (Int $i) returns (Bool) {}
 # where both the parameter list and the returns type are optional
 $plugins->add_filter(
@@ -45,6 +56,28 @@ $plugins->add_filter(
         marker      => 'METHOD',
         replacement => 'sub',
         clauses     => [ 'PAREN?', '(returns \s* PAREN)?' ],
+    ) );
+
+# Create a subroutine filter for:
+#    classmethod foo (Int $i) {}
+# where the parameter list is optional
+$plugins->add_filter(
+    Perl::Tidy::Sweetened::Keyword::Block->new(
+        keyword     => 'classmethod',
+        marker      => 'CLASSMETHOD',
+        replacement => 'sub',
+        clauses     => [ 'PAREN?' ],
+    ) );
+
+# Create a subroutine filter for:
+#    objectmethod foo (Int $i) {}
+# where the parameter list is optional
+$plugins->add_filter(
+    Perl::Tidy::Sweetened::Keyword::Block->new(
+        keyword     => 'objectmethod',
+        marker      => 'OBJECTMETHOD',
+        replacement => 'sub',
+        clauses     => [ 'PAREN?' ],
     ) );
 
 # Create a subroutine filter for:
@@ -88,7 +121,7 @@ Perl::Tidy::Sweetened - Tweaks to Perl::Tidy to support some syntactic sugar
 
 =head1 VERSION
 
-version 1.12
+version 1.14
 
 =head1 STATUS
 
@@ -126,9 +159,9 @@ following modules, but most of the new syntax styles should work:
 
 =item * Moops
 
-=item * MooseX::Declare
-
 =item * perl 5.20 signatures
+
+=item * Kavorka
 
 =back
 
@@ -165,6 +198,10 @@ Curtis Brandt (@aggrolite)
 
 @pblaberge
 
+=item *
+
+Peter Roberts (@pwr22)
+
 =back
 
 =head1 SOURCE
@@ -181,7 +218,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Mark Grimes E<lt>mgrimes@cpan.orgE<gt>.
+This software is copyright (c) 2018 by Mark Grimes E<lt>mgrimes@cpan.orgE<gt>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

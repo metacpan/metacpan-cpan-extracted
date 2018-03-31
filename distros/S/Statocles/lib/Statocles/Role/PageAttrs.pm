@@ -1,5 +1,5 @@
 package Statocles::Role::PageAttrs;
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 # ABSTRACT: A role implementing common attributes for pages/documents
 
 use Statocles::Base 'Role';
@@ -28,8 +28,8 @@ has title => (
 
 has author => (
     is => 'rw',
-    isa => Maybe[Person],
-    coerce => Person->coercion,
+    isa => Maybe[PersonType],
+    coerce => PersonType->coercion,
     lazy => 1,
     builder => '_build_author',
 );
@@ -119,7 +119,7 @@ has _images => (
 sub links {
     my ( $self, $name, @add_links ) = @_;
     if ( @add_links ) {
-        push @{ $self->_links->{ $name } }, map { Link->coerce( $_ ) } @add_links;
+        push @{ $self->_links->{ $name } }, map { LinkType->coerce( $_ ) } @add_links;
         return;
     }
     return $self->_links if !$name;
@@ -160,7 +160,7 @@ Statocles::Role::PageAttrs - A role implementing common attributes for pages/doc
 
 =head1 VERSION
 
-version 0.091
+version 0.092
 
 =head1 ATTRIBUTES
 

@@ -23,21 +23,12 @@
          "requires" : {
             "Module::Build" : "0"
          }
-      },
-      "runtime" : {
-         "requires" : {
-            "cli::numbers::util" : "0.31",
-            "cli::rows::util" : "0.31",
-            "cli::rows::venn" : "0.001",
-            "cli::tsv::keyvalue" : "0.31",
-            "cli::tsv::util" : "0.511"
-         }
       }
    },
    "provides" : {
       "Table::Hack" : {
          "file" : "lib/Table/Hack.pm",
-         "version" : "0.003"
+         "version" : "0.0031"
       }
    },
    "release_status" : "stable",
@@ -46,6 +37,6 @@
          "http://www.gnu.org/licenses/gpl-3.0.txt"
       ]
    },
-   "version" : "0.003",
+   "version" : "0.0031",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

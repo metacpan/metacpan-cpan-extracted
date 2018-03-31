@@ -2,7 +2,7 @@
 Unicode-LineBreak - UAX #14 Unicode Line Breaking Algorithm
 ===========================================================
 
-Unicode-LineBreak Package is Copyright (C) 2009-2017,
+Unicode-LineBreak Package is Copyright (C) 2009-2018,
 by Hatuka*nezumi - IKEDA Soji.
 
 This package is free software; you can redistribute it and/or modify it 
@@ -65,7 +65,7 @@ Python
 Author
 ======
 
-Copyright (C) 2009-2013 Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>.
+Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>.
 
 
 $$

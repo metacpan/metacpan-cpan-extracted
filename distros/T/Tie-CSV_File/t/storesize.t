@@ -7,6 +7,7 @@ use Test::More qw/no_plan/;
 use Tie::CSV_File;
 use File::Temp qw/tmpnam/;
 use t::CommonStuff;
+use Data::Dumper;
 
 my $fname = tmpnam();
 tie my @file, 'Tie::CSV_File', $fname;
@@ -35,5 +36,6 @@ is_deeply
 $#{$file[-1]} = -1;
 is scalar(@{$file[-1]}),0,"Reset last row to zero columns";
 is_deeply
-    \@file, [ ([]) x 9 ],
-    "Should be 5 empty rows";
+    \@file, [ ([]) x 10 ],
+    "Should be 5 empty rows"
+or diag "File contains " . Dumper(\@file);

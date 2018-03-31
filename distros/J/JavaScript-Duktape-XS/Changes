@@ -1,3 +1,14 @@
+0.000035    2018-03-30
+            * Test timeouts firing in the correct order.
+            * Fix dependencies for testing.
+
+0.000034    2018-03-29
+            * Add method dispatch_function_in_event_loop to call a function
+              inside an actual event loop; this makes setTimeout actually work.
+
+0.000033    2018-03-28
+            * Switch to an almost pure C-based implementation of setInterval.
+
 0.000032    2018-03-26
             * Avoid floating point values in tests that would cause rounding
               errors.

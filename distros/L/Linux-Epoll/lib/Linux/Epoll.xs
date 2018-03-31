@@ -16,7 +16,28 @@
 #define NEED_sv_unmagicext
 #include "ppport.h"
 
-#define get_fd(self) PerlIO_fileno(IoIFP(sv_2io(SvRV(self))))
+static int S_get_fd(pTHX_ SV* fh) {
+	IO* io = sv_2io(fh);
+
+	MAGIC* magic = mg_find((SV*)io, PERL_MAGIC_tiedscalar);
+	if (magic) {
+		int ret = -1;
+		dSP;
+		SAVETMPS;
+		PUSHMARK(SP);
+		PUSHs(magic->mg_obj);
+		PUTBACK;
+		call_method("FILENO", G_SCALAR);
+		SPAGAIN;
+		ret = POPi;
+		PUTBACK;
+		FREETMPS;
+		return ret;
+	}
+	else
+		return PerlIO_fileno(IoIFP(io));
+}
+#define get_fd(fh) S_get_fd(aTHX_ fh)
 
 static void get_sys_error(char* buffer, size_t buffer_size) {
 #if _POSIX_VERSION >= 200112L
@@ -149,7 +170,7 @@ static void S_set_backref(pTHX_ SV* epoll, SV* fh, CV* callback) {
 	AV* backrefs = get_backrefs(epoll);
 	int fd = get_fd(fh);
 	struct data backref = { backrefs, fd };
-	SV* ref = sv_rvweaken(newSVsv(fh));
+	SV* ref = sv_rvweaken(SvROK(fh) ? newSVsv(fh) : newRV(fh));
 
 	av_store(backrefs, fd, ref);
 	sv_magicext(ref, (SV*)callback, PERL_MAGIC_ext, &weak_magic, (const char*)&backref, sizeof backref);

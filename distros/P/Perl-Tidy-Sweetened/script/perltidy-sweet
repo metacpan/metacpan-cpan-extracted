@@ -21,7 +21,7 @@ perltidy-sweet - Script to execute Perl::Tidy::Sweetened cleanup
 This script is a drop in replacement for L<Perl::Tidy>'s C<perltidy> which
 uses L<Perl::Tidy::Sweetened> to cleanup Perl code with a more "modern" syntax
 (ie, L<Method::Signatures::Simple>, L<MooseX::Method::Signatures>,
-L<MooseX::Declare>, etc).
+L<MooseX::Declare>, L<Kavorka>, etc).
 
 See the documentation for L<Perl::Tidy> and L<perltidy> for usage. See
 L<Perl::Tidy::Sweetened> for more information about the changes introduced.
@@ -54,6 +54,10 @@ Curtis Brandt (@aggrolite)
 
 @pblaberge
 
+=item *
+
+Peter Roberts (@pwr22)
+
 =back
 
 =head1 SOURCE
@@ -70,7 +74,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Mark Grimes E<lt>mgrimes@cpan.orgE<gt>.
+This software is copyright (c) 2018 by Mark Grimes E<lt>mgrimes@cpan.orgE<gt>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

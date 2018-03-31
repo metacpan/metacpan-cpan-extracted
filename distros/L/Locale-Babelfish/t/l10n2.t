@@ -114,8 +114,9 @@ cmp_ok($l10n->t('test.markdown' , {  link => 1 }  ) ,
 is $l10n->t('test.zero_plural', 0), "у меня нет гвоздей", 'zero plural form';
 
 my @items_ru = @{ $l10n->t('test.simple.list', { test => 'content' } ) };
-is $items_ru[0], 'Элемент списка 1: content', 'Fisrt list item is correct in ru locale';
-is $items_ru[1], 'Элемент списка 2: content', 'Second list item is correct in ru locale';
+is $items_ru[0], undef, 'Undefined list item return as is';
+is $items_ru[1], 'Элемент списка 1: content', 'Fisrt list item is correct in ru locale';
+is $items_ru[2], 'Элемент списка 2: content', 'Second list item is correct in ru locale';
 
 # Переключаем язык
 $l10n->locale('en_US');
@@ -142,8 +143,10 @@ is $l10n->t('test.simple.escapes', { who => 'Man', count => '1' }), 'I have #{wh
 
 # списки
 my @items_en = @{ $l10n->t('test.simple.list', { test => 'content' } ) };
-is $items_en[0], 'List Item 1: content', 'Fisrt list item is correct in en locale';
-is $items_en[1], 'List Item 2: content', 'Second list item is correct in en locale';
+is $items_en[0], undef, 'Undefined list item return as is';
+is $items_en[1], 'List Item 1: content', 'Fisrt list item is correct in en locale';
+is $items_en[2], 'List Item 2: content', 'Second list item is correct in en locale';
+
 
 # передача невалидных данных должна давать warning.
 

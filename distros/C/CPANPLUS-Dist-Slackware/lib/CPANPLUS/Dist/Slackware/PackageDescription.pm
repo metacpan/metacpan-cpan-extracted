@@ -3,7 +3,7 @@ package CPANPLUS::Dist::Slackware::PackageDescription;
 use strict;
 use warnings;
 
-our $VERSION = '1.025';
+our $VERSION = '1.027';
 
 use English qw( -no_match_vars );
 
@@ -149,10 +149,49 @@ sub outputname {
     return $outputname;
 }
 
+sub installdirs {
+    my $self = shift;
+    return $self->{installdirs};
+}
+
+sub prefix {
+    my $self = shift;
+
+    my $installdirs = $self->installdirs;
+
+    return $Config{"${installdirs}prefixexp"};
+}
+
+sub bindir {
+    my $self = shift;
+
+    my $installdirs = $self->installdirs;
+
+    return $Config{"${installdirs}binexp"};
+}
+
+sub mandirs {
+    my $self = shift;
+
+    my $installdirs = $self->installdirs;
+
+    my %mandir = map {
+        my $dir = $Config{"${installdirs}man${_}direxp"};
+        if ( !$dir ) {
+            $dir = catdir( $self->prefix, 'man', "man${_}" );
+        }
+        $dir =~ s,/usr/share/man/,/usr/man/,;
+        $_ => $dir
+    } ( 1, 3 );
+    return %mandir;
+}
+
 sub docdir {
     my $self = shift;
-    return $self->{docdir}
-        || catfile( $Config{prefix}, 'doc', $self->distname );
+
+    my $installdirs = $self->installdirs;
+
+    return catfile( $self->prefix, 'doc', $self->distname );
 }
 
 sub docfiles {
@@ -162,7 +201,8 @@ sub docfiles {
     my $wrksrc = $module->status->extract;
     return if !$wrksrc;
 
-    opendir(my $dh, $wrksrc) or return;
+    my $dh;
+    opendir( $dh, $wrksrc ) or return;
     my @docfiles = grep {
         m{ ^(?:
                 AUTHORS
@@ -364,10 +404,11 @@ sub slack_desc {
 }
 
 sub build_script {
-    my $self    = shift;
-    my $module  = $self->module;
-    my $name    = $module->package_name;
-    my $version = $module->package_version;
+    my $self        = shift;
+    my $module      = $self->module;
+    my $name        = $module->package_name;
+    my $version     = $module->package_version;
+    my $installdirs = $self->installdirs;
 
     # Quote single quotes.
     $name =~ s/('+)/'"$1"'/g;
@@ -377,7 +418,8 @@ sub build_script {
 #!/bin/sh
 SRCNAM='$name'
 VERSION=\${VERSION:-'$version'}
-cpan2dist --format CPANPLUS::Dist::Slackware \$SRCNAM-\$VERSION
+INSTALLDIRS=\${INSTALLDIRS:-$installdirs}
+cpan2dist --format CPANPLUS::Dist::Slackware --dist-opts installdirs=\$INSTALLDIRS \$SRCNAM-\$VERSION
 END_SCRIPT
 }
 
@@ -494,7 +536,7 @@ CPANPLUS::Dist::Slackware::PackageDescription - Collect information on a new Sla
 
 =head1 VERSION
 
-This document describes CPANPLUS::Dist::Slackware::PackageDescription version 1.025.
+This document describes CPANPLUS::Dist::Slackware::PackageDescription version 1.027.
 
 =head1 SYNOPSIS
 
@@ -591,6 +633,24 @@ F<$OUTPUT>, F<$TMPDIR> or F</tmp>.
 Returns the package's full filename, e.g.
 F</tmp/perl-Some-Module-0.01-i586-1_CPANPLUS.tgz>.
 
+=item B<< $pkgdesc->installdirs >>
+
+Returns "vendor" or "site".
+
+=item B<< $pkgdesc->prefix >>
+
+Returns the directory below which the package will be installed, e.g. "/usr"
+or "/usr/local".
+
+=item B<< $pkgdesc->bindir >>
+
+Returns the location of executables, e.g. "/usr/bin".
+
+=item B<< $pkgdesc->mandirs >>
+
+Returns a map of manual page directories, e.g. (1 => "/usr/man/man1", 3 =>
+"/usr/man/man3").
+
 =item B<< $pkgdesc->docdir >>
 
 Returns the packages's documentation directory, e.g.
@@ -677,7 +737,7 @@ through the web interface at L<http://rt.cpan.org/>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2017 Andreas Voegele
+Copyright 2012-2018 Andreas Voegele
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

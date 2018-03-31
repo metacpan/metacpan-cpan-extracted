@@ -1,6 +1,6 @@
 requires 'perl'         => '5.010001';
 requires 'Carp';
-requires 'Linux::Epoll' => '0.012';
+requires 'Linux::Epoll' => '0.013';
 requires 'List::Util';
 requires 'Mojolicious'  => '5.70';
 requires 'Scalar::Util';

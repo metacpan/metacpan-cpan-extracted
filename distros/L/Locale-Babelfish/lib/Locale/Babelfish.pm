@@ -2,7 +2,7 @@ package Locale::Babelfish;
 
 # ABSTRACT: Perl I18n using https://github.com/nodeca/babelfish format.
 
-our $VERSION = '2.004'; # VERSION
+our $VERSION = '2.005'; # VERSION
 
 
 use utf8;
@@ -348,9 +348,12 @@ sub _process_list_items {
     my ( $r, $locale ) = @_;
 
     my @compiled_items;
-
     for my $item ( @{ $r } ) {
-        push @compiled_items, $compiler->compile( $parser->parse( $item, $locale ) );
+        if ( defined $item ) {
+            push @compiled_items, $compiler->compile( $parser->parse( $item, $locale ) );
+        } else {
+            push @compiled_items, $item;
+        }
     }
 
     return sub {
@@ -383,7 +386,7 @@ Locale::Babelfish - Perl I18n using https://github.com/nodeca/babelfish format.
 
 =head1 VERSION
 
-version 2.004
+version 2.005
 
 =head1 DESCRIPTION
 
@@ -616,6 +619,10 @@ Victor Efimov <efimov@reg.ru>
 =item *
 
 REG.RU LLC
+
+=item *
+
+Kirill Sysoev <k.sysoev@me.com>
 
 =back
 

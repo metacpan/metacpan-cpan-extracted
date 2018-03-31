@@ -8,7 +8,7 @@ use warnings;
 
 use parent qw( Class::Accessor::Fast );
 
-our $VERSION = '2.004'; # VERSION
+our $VERSION = '2.005'; # VERSION
 
 __PACKAGE__->mk_accessors( qw( phrase index length prev piece escape ) );
 
@@ -115,7 +115,7 @@ Locale::Babelfish::Phrase::ParserBase - Babelfish abstract parser.
 
 =head1 VERSION
 
-version 2.004
+version 2.005
 
 =head1 METHODS
 
@@ -204,6 +204,10 @@ Victor Efimov <efimov@reg.ru>
 =item *
 
 REG.RU LLC
+
+=item *
+
+Kirill Sysoev <k.sysoev@me.com>
 
 =back
 

@@ -1,5 +1,5 @@
 package Statocles::Document;
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 # ABSTRACT: Base class for all Statocles documents
 
 use Statocles::Base 'Class';
@@ -30,8 +30,8 @@ has path => (
 
 has store => (
     is => 'ro',
-    isa => Store,
-    coerce => Store->coercion,
+    isa => StoreType,
+    coerce => StoreType->coercion,
 );
 
 #pod =attr title
@@ -469,7 +469,7 @@ Statocles::Document - Base class for all Statocles documents
 
 =head1 VERSION
 
-version 0.091
+version 0.092
 
 =head1 DESCRIPTION
 

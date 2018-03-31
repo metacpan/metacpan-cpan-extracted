@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckReference;
 # ABSTRACT: Git::Hooks plugin for checking references
-$Git::Hooks::CheckReference::VERSION = '2.9.1';
+$Git::Hooks::CheckReference::VERSION = '2.9.2';
 use 5.010;
 use utf8;
 use strict;
@@ -37,13 +37,10 @@ sub check_ref {
         $action = 'R';              # rewrite a non-branch
     } else {
         # This is an U if "merge-base(old, new) == old". Otherwise it's an R.
-        $action = try {
-            chomp(my $merge_base = $git->run('merge-base' => $old_commit, $new_commit));
+        $action = eval {
+            my $merge_base = $git->run('merge-base' => $old_commit, $new_commit);
             ($merge_base eq $old_commit) ? 'U' : 'R';
-        } catch {
-            # Probably $old_commit and $new_commit do not have a common ancestor.
-            'R';
-        };
+        } || 'R'; # Probably $old_commit and $new_commit do not have a common ancestor.
     }
 
     my @acls = eval { $git->grok_acls($CFG, 'CRUD') };
@@ -133,7 +130,7 @@ Git::Hooks::CheckReference - Git::Hooks plugin for checking references
 
 =head1 VERSION
 
-version 2.9.1
+version 2.9.2
 
 =head1 SYNOPSIS
 

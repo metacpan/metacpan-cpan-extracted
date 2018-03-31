@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Tester
 #
-# This software is Copyright (c) 2013-2017 by Dominique Dumont.
+# This software is Copyright (c) 2013-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,7 +9,7 @@
 #
 package Config::Model::Tester;
 # ABSTRACT: Test framework for Config::Model
-$Config::Model::Tester::VERSION = '3.003';
+$Config::Model::Tester::VERSION = '3.004';
 use warnings;
 use strict;
 use locale;
@@ -56,6 +56,9 @@ sub setup_test {
 
     my $wr_dir    = $wr_root->child('test-' . $t_name);
     my $wr_dir2   = $wr_root->child('test-' . $t_name.'-w');
+    $wr_dir->mkpath;
+    $wr_dir2->mkpath;
+
     my $conf_file ;
     $conf_file = $wr_dir->child($conf_dir,$conf_file_name)
         if $conf_dir and $conf_file_name;
@@ -539,7 +542,7 @@ sub run_model_test {
 
         load_instructions ($i2_root,$t->{load2},$trace) if $t->{load2} ;
 
-        my $p2_dump = dump_tree("second $app_to_test", $i2_root, 'custom', $t->{no_warnings},{}) ;
+        my $p2_dump = dump_tree("second $app_to_test", $i2_root, 'custom', $t->{no_warnings},{}, $trace) ;
 
         unified_diff;
         eq_or_diff(
@@ -631,7 +634,7 @@ Config::Model::Tester - Test framework for Config::Model
 
 =head1 VERSION
 
-version 3.003
+version 3.004
 
 =head1 SYNOPSIS
 
@@ -1272,7 +1275,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013-2017 by Dominique Dumont.
+This software is Copyright (c) 2013-2018 by Dominique Dumont.
 
 This is free software, licensed under:
 
@@ -1325,7 +1328,7 @@ L<http://cpants.cpanauthors.org/dist/Config-Model-Tester>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/C/Config-Model-Tester>
 

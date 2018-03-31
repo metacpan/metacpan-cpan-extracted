@@ -32,6 +32,6 @@ resources:
   homepage: http://metacpan.org/release/Net-Statsd-Client
   license: http://dev.perl.org/licenses/
   repository: git://github.com/arodland/Net-Statsd-Client.git
-version: '0.32'
+version: '0.33'
 x_authority: cpan:ARODLAND
 x_serialization_backend: 'YAML::Tiny version 1.70'

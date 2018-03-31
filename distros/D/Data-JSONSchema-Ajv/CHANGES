@@ -1,3 +1,6 @@
+0.03  - 28-Mar-2018
+- Used JavaScript::Duktape::XS instead, as it's much faster, and no inline C
+- Upgraded to Ajv 4.11.8
 0.02  - 06-Oct-2016
 - Bumped required JavaScript::Duktape version:
     http://www.cpantesters.org/cpan/report/d119e0ea-89f0-11e6-bfb8-d6a6247258b5

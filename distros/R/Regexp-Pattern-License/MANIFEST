@@ -9,8 +9,11 @@ META.yml
 Makefile.PL
 README
 SIGNATURE
+TODO
 dist.ini
 doap.ttl
 lib/Regexp/Pattern/License.pm
 lib/Regexp/Pattern/License/Parts.pm
 t/01-basic.t
+t/lib/MyTest.pm
+t/normalized.t

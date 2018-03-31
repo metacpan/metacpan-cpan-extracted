@@ -84,13 +84,13 @@ EOW
         "Dan Book <dbook\@cpan.org>"
       ],
       "dist_name" => "Mojo-Reactor-Epoll",
-      "dist_version" => "0.007",
+      "dist_version" => "0.008",
       "license" => "artistic_2",
       "module_name" => "Mojo::Reactor::Epoll",
       "recursive_test_files" => 1,
       "requires" => {
         "Carp" => 0,
-        "Linux::Epoll" => "0.012",
+        "Linux::Epoll" => "0.013",
         "List::Util" => 0,
         "Mojolicious" => "5.70",
         "Scalar::Util" => 0,

@@ -31,7 +31,8 @@ sub sends_ok (&@) {
     return;
   }
   my $buf;
-  my $ret = recv $sock, $buf, 8192, 0;
+  my $ret;
+  do { $ret = recv $sock, $buf, 8192, 0 } while !defined $ret && $!{EAGAIN};
   if (!defined $ret) {
     diag "recv failed with $!";
     fail $desc;

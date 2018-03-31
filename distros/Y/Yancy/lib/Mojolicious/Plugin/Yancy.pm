@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -288,6 +288,13 @@ our $VERSION = '1.002';
 #pod Run the configured filters on the given C<$item_data>. C<$collection> is
 #pod a collection name. Returns the hash of C<$filtered_data>.
 #pod
+#pod =head2 yancy.openapi
+#pod
+#pod     my $openapi = $c->yancy->openapi;
+#pod
+#pod Get the L<Mojolicious::Plugin::OpenAPI> object containing the OpenAPI
+#pod interface for this Yancy API.
+#pod
 #pod =head1 TEMPLATES
 #pod
 #pod This plugin uses the following templates. To override these templates
@@ -376,9 +383,7 @@ sub register {
     my %validator;
     $app->helper( 'yancy.validate' => sub {
         my ( $c, $coll, $item ) = @_;
-        my $v = $validator{ $coll } ||= JSON::Validator->new->schema(
-            $config->{collections}{ $coll }
-        );
+        my $v = $validator{ $coll } ||= _build_validator( $config->{collections}{ $coll } );
         my @errors = $v->validate( $item );
         return @errors;
     } );
@@ -462,11 +467,16 @@ sub register {
     }
 
     # Add OpenAPI spec
-    $app->plugin( OpenAPI => {
+    my $openapi = $app->plugin( OpenAPI => {
         route => $route->any( '/api' )->name( 'yancy.api' ),
         spec => $self->_build_openapi_spec( $config ),
     } );
+    $app->helper( 'yancy.openapi' => sub { $openapi } );
 
+    # Add supported formats to silence warnings from JSON::Validator
+    my $formats = $openapi->validator->formats;
+    $formats->{ markdown } = sub { 1 };
+    $formats->{ tel } = sub { 1 };
 }
 
 sub _build_openapi_spec {
@@ -706,6 +716,23 @@ sub _build_openapi_spec {
     };
 }
 
+#=sub _build_validator
+#
+#   my $validator = _build_validator( $schema );
+#
+# Build a JSON::Validator object for the given schema, adding all the
+# necessary attributes.
+#
+sub _build_validator {
+    my ( $schema ) = @_;
+    my $v = JSON::Validator->new;
+    my $formats = $v->formats;
+    $formats->{ markdown } = sub { 1 };
+    $formats->{ tel } = sub { 1 };
+    $v->schema( $schema );
+    return $v;
+}
+
 1;
 
 __END__
@@ -718,7 +745,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 
@@ -1005,6 +1032,13 @@ And you configure this on a field using C<< x-filter >> and C<< x-digest >>:
 
 Run the configured filters on the given C<$item_data>. C<$collection> is
 a collection name. Returns the hash of C<$filtered_data>.
+
+=head2 yancy.openapi
+
+    my $openapi = $c->yancy->openapi;
+
+Get the L<Mojolicious::Plugin::OpenAPI> object containing the OpenAPI
+interface for this Yancy API.
 
 =head1 TEMPLATES
 

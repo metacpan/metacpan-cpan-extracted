@@ -3,9 +3,9 @@ package ICC::Profile;
 use strict;
 use Carp;
 
-our $VERSION = 0.60;
+our $VERSION = 0.61;
 
-# revised 2017-08-05
+# revised 2018-03-29
 #
 # Copyright © 2004-2018 by William B. Birkett
 
@@ -28,14 +28,19 @@ BEGIN {
 		
 	}
 
-	# add development directories to @INC
-	unshift(@INC, "$home/Projects/Software/ICC_Modules/ICC-Profile/lib");
-	unshift(@INC, "$home/Projects/Software/ICC_Modules/ICC-Support-Image/lib");
-	unshift(@INC, "$home/Projects/Software/ICC_Modules/ICC-Support-Image/blib/arch");
-	unshift(@INC, "$home/Projects/Software/ICC_Modules/ICC-Support-Lapack/blib/lib");
-	unshift(@INC, "$home/Projects/Software/ICC_Modules/ICC-Support-Lapack/blib/arch");
-	unshift(@INC, "$home/Projects/Software/ICC_Modules/ICC-Support-Levmar/blib/lib");
-	unshift(@INC, "$home/Projects/Software/ICC_Modules/ICC-Support-Levmar/blib/arch");
+	# if my ICC::Profile development directory exists
+	if (-d "$home/Projects/Software/ICC_Modules/ICC-Profile/lib") {
+		
+		# add all development directories to @INC
+		unshift(@INC, "$home/Projects/Software/ICC_Modules/ICC-Profile/lib");
+		unshift(@INC, "$home/Projects/Software/ICC_Modules/ICC-Support-Image/lib");
+		unshift(@INC, "$home/Projects/Software/ICC_Modules/ICC-Support-Image/blib/arch");
+		unshift(@INC, "$home/Projects/Software/ICC_Modules/ICC-Support-Lapack/blib/lib");
+		unshift(@INC, "$home/Projects/Software/ICC_Modules/ICC-Support-Lapack/blib/arch");
+		unshift(@INC, "$home/Projects/Software/ICC_Modules/ICC-Support-Levmar/blib/lib");
+		unshift(@INC, "$home/Projects/Software/ICC_Modules/ICC-Support-Levmar/blib/arch");
+		
+	}
 
 }
 

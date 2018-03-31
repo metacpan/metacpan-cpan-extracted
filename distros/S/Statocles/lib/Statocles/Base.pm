@@ -1,5 +1,5 @@
 package Statocles::Base;
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 # ABSTRACT: Base module for Statocles modules
 
 use strict;
@@ -18,7 +18,6 @@ our @IMPORT_MODULES = (
     feature => [qw( :5.10 )],
     'Path::Tiny' => [qw( rootdir cwd )],
     'DateTime::Moonpig',
-    'Statocles',
 );
 
 my @class_modules = (
@@ -51,6 +50,17 @@ our %IMPORT_BUNDLES = (
         @class_modules,
     ],
 
+    Command => [
+        '<Moo',
+        @class_modules,
+        'Getopt::Long' => [qw( GetOptionsFromArray )],
+        sub {
+            my ( $bundles, $args ) = @_;
+            $args->{package}->can( 'extends' )->( 'Statocles::Command' );
+            return;
+        },
+    ],
+
     Emitter => [
         'Beam::Emitter',
         'Statocles::Event',
@@ -76,7 +86,7 @@ Statocles::Base - Base module for Statocles modules
 
 =head1 VERSION
 
-version 0.091
+version 0.092
 
 =head1 SYNOPSIS
 

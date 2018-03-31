@@ -26,3 +26,6 @@ Revision history for Mojolicious::Plugin::ValidateTiny
         Maintain compatability with older versions of Validate::Tiny,
         useful for breaking the link between Validate::Tiny and Mojolicious 
         both forcing you to update each other        
+
+0.17   
+        Validate Uploaded files by default

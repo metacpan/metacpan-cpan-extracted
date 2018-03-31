@@ -13,6 +13,7 @@ ppport.h
 README
 t/01-lowlevel-basic.t
 t/11-highlevel-basic.t
+t/12-full-test.t
 typemap
 u2f.c
 u2f.h

@@ -1,5 +1,17 @@
 Revision history for Perl extension Tie::CSV_File.
 
+0.24  Wed Mar 28, 2018
+       - updated version nr (again)
+
+0.23  Wed Mar 28, 2018
+       - updated version nr
+
+0.22  Wed Mar 28, 2018
+       - fixed several bugs:
+            * creating anonymous hashes with undef values has changed in Perl
+            * Text::CSV_XS changed way it handles blank fields/lines (in a more consistent way), so I had to adopt logic and tests for it
+
+
 0.21  Mon May 12, 2003
        - implemented exists operation
        - added Test::ManyParams to the (test) requirements 

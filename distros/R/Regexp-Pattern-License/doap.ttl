@@ -359,7 +359,9 @@
 	cpan-uri:x_help_wanted <http://usefulinc.com/ns/doap#documenter>, <http://usefulinc.com/ns/doap#tester>;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/jonass>;
 	doap-deps:runtime-requirement [ doap-deps:on "strictures 2"^^doap-deps:CpanId ], [ doap-deps:on "perl 5"^^doap-deps:CpanId ];
-	doap-deps:test-requirement [ doap-deps:on "Regexp::Pattern 0"^^doap-deps:CpanId ], [ doap-deps:on "Test::Exception 0"^^doap-deps:CpanId ], [ doap-deps:on "Test::More 0.98"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Regexp::Pattern 0"^^doap-deps:CpanId ], [
+		doap-deps:on "Test::Builder::Module 0"^^doap-deps:CpanId;
+	], [ doap-deps:on "Test::Exception 0"^^doap-deps:CpanId ], [ doap-deps:on "Test::More 0.98"^^doap-deps:CpanId ];
 	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Regexp-Pattern-License>, <https://bugs.debian.org/regexp-pattern-license>;
 	doap:category        [ rdfs:label "Sourcecode" ], [ rdfs:label "Licensing" ];
 	doap:created         "2016-11-23"^^xsd:date;
@@ -370,7 +372,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/jonass>;
 	doap:name            "Regexp-Pattern-License";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-0-31>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-0>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-0-31>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-0>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-90>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://anonscm.debian.org/git/build-common/regexp-pattern-license.git>;
@@ -419,6 +421,131 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/Regexp-Pattern-License-v3.1.0.tar.gz>;
 	doap:revision        "v3.1.0"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-90>
+	a                    doap:Version;
+	dc:identifier        "Regexp-Pattern-License-v3.1.90"^^xsd:string;
+	dc:issued            "2018-03-29"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Extend testsuite to cover most license patterns.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Fix metadata for objects cecill_b cecill_c: Use tag type:versioned:decimal (not type:unversioned).";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Relax object bsd_3_clause to match SPDX template.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix object fsfullr to match grant at all.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix relax object mit_new_materials to match license at all.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix strip duplicate tagline for object ntp, accidentally suppressing tag family:mit.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add object kevlin_henney (replacing recently added but broken isc_minidiscl).";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Tighten objects ntp ntp_disclaimer: Disambiguate from kevlin_henney.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Tighten object eurosym: Avoid wildcard.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Tighten objects qpl sgi_b: Avoid bogusly match optional trailing FSF credit.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Tighten object postgresql: Limit to lowercase pattern (uppercase or varying case seemingly unused).";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Fix and extend metadata: Consistently use \"name\" for license shortname (i.e. single-word), \"caption\" for license name, and \"summary\" for non-name short description.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Extend metadata: Add iri.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Relax license objects agpl beerware gpl lgpl public_domain qpl: Detect uppercase variations.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Uniformly detect quotation marks.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Uniformly detect hyphens.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Uniformly detect sentence enumerators.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Uniformly detect sentence and paragraph endings.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Uniformly detect copyright sign.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Stringify patterns (as preparation for central compilation).";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Generate default pattern dynamically, and provide alternative subject patterns statically as plaintext (also for non-Perl use). Drop alternative flavor pattern artifact.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix object cecill_b subject pattern license.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Implement DefHash option \"subject\".";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add object json.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Extend objects ms_pl ms_rl: Add subject pattern license.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Extend object cc_cc0: Add subject pattern grant.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Implement per-object default pattern.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Synthesize subject pattern license.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Synthesize metadata caption, and subject pattern grant.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Synthesize metadata name.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Synthesize metadata iri, and subject pattern iri.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Synthesize subject pattern trait.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Extend object public_domain: Improve subject pattern license.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Extend object ftl: Add subject pattern license.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add objects jython python_2.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Tighten  object openssl to differentiate from apache_1.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add objects bsl bsl_1.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Add TODO file to source, with a bunch of ideas.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/Regexp-Pattern-License-v3.1.90.tar.gz>;
+	doap:revision        "v3.1.90"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/jonass>
 	a                    foaf:Person;

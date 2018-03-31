@@ -1,0 +1,172 @@
+#!/usr/bin/perl
+
+use 5.008;
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use File::Find;
+use Cwd qw< abs_path >;
+
+use FindBin;
+use lib "$FindBin::RealBin/../lib";
+
+use Test::DocClaims::Lines;
+
+my $lib_dir  = "lib";
+my $test_dir = "t";
+
+Getopt::Long::Configure(qw(bundling));
+GetOptions(
+    'help|h' => sub { pod2usage(1) },
+    'man'    => sub { pod2usage( -verbose => 2 ), exit 0 },
+    'force|f!' => \( my $force = 0 ),
+    'all'      => \( my $all   = 0 ),
+    'lib-directory=s'  => \$lib_dir,
+    'test-directory=s' => \$test_dir,
+) or pod2usage(2);
+pod2usage "missing arg"                if !@ARGV && !$all;
+pod2usage "arg not allowed with --all" if @ARGV  && $all;
+die "no such directory: $lib_dir (use --lib-directory)\n"   if not -d $lib_dir;
+die "no such directory: $test_dir (use --test-directory)\n" if not -d $test_dir;
+
+if ($all) {
+    write_all();
+} else {
+    my $path = shift;
+    pod2usage "missing arg" if !defined $path;
+    die "no such file: $path\n" if !-f $path;
+    my $lib_dir_abs = abs_path($lib_dir);
+    my $module      = abs_path($path);
+    $module =~ s{^\Q$lib_dir_abs/\E}{};
+    $module =~ s{/}{::}g;
+    $module =~ s{\.pm}{};
+    print generate_test( $path, $module );
+}
+exit;
+
+#------------------------------------------------------------------------------
+
+sub write_all {
+    my $lib_dir_abs = abs_path($lib_dir);
+    find(
+        {
+            wanted => sub {
+                return if $_ !~ /\.pm$/;
+                return if -l $_ || !-f $_;
+                my $doc_path  = $_;
+                my $test_path = $doc_path;
+                $test_path =~ s{^\Q$lib_dir_abs/\E}{};
+                $test_path =~ s{/}{-}g;
+                $test_path =~ s{\.pm}{.t}g;
+                $test_path = "t/doc-$test_path";
+                my $module = $doc_path;
+                $module =~ s{^\Q$lib_dir_abs/\E}{};
+                $module =~ s{/}{::}g;
+                $module =~ s{\.pm}{};
+
+                if ( -e $test_path && !$force ) {
+                    warn "file already exists: $test_path\n";
+                } else {
+                    write_file( $test_path,
+                        generate_test( $doc_path, $module ) );
+                }
+            },
+            preprocess => sub {
+                return sort @_;
+            },
+            no_chdir => 1
+        },
+        $lib_dir_abs
+    );
+}
+
+sub write_file {
+    my $path = shift;
+    my $text = shift;
+    print "Writing $path\n";
+    open my $fh, ">", $path or die "cannot write $path: $!\n";
+    print $fh $text;
+    close $fh;
+}
+
+sub generate_test {
+    my $doc_path = shift;
+    my $module   = shift;
+    my $doc = Test::DocClaims::Lines->new( { path => $doc_path, white => 1 } );
+    my $output = "";
+    $output .= "#!perl\n";
+    $output .= "\n";
+    $output .= "use strict;\n";
+    $output .= "use warnings;\n";
+    $output .= "use Test::More tests => 1;\n";
+    $output .= "\n";
+    $output .= "BEGIN { use_ok('$module'); }\n";
+    $output .= "\n";
+
+    my $state = 0;
+    while ( !$doc->is_eof ) {
+        my $line = $doc->current_line;
+        my $text = $line->text;
+        $text =~ s/\s*$//;
+        if ( $line->has_pod && $line->is_doc ) {
+            if ( $state == 0 ) {
+                $state++ if $text eq "";
+            } elsif ( $state == 1 ) {
+                if ( length $text ) {
+                    if ( $text =~ /^=[a-zA-Z]/ ) {
+                        $state = 0;
+                    } else {
+                        $state++;
+                    }
+                }
+            } elsif ( $state == 2 ) {
+                if ( $text eq "" ) {
+                    $output .= "\n";
+                    $output .= "=for DC_TODO\n";
+                    $state = 1;
+                }
+            }
+        } else {
+            $state = 0;
+        }
+        $output .= "$text\n" if $line->is_doc;
+        $doc->advance_line;
+    }
+    return $output;
+}
+
+__END__
+
+=head1 NAME
+
+sample - Using GetOpt::Long and Pod::Usage
+
+=head1 SYNOPSIS
+
+sample [-help] [-man]
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a short usage synopsis (also -?).
+
+=item B<-man>
+
+Print the full command manual entry.
+
+=back
+
+=head1 DESCRIPTION
+
+B<This program> will read the given input files and do something
+useful with the contents thereof.
+
+=head1 FOOBAR
+
+This is a test.
+
+=cut

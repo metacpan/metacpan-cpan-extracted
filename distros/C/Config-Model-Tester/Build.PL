@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Tester
 #
-# This software is Copyright (c) 2013-2017 by Dominique Dumont.
+# This software is Copyright (c) 2013-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -27,12 +27,13 @@ my %module_build_args = (
     "Dominique Dumont"
   ],
   "dist_name" => "Config-Model-Tester",
-  "dist_version" => "3.003",
+  "dist_version" => "3.004",
   "license" => "lgpl",
   "module_name" => "Config::Model::Tester",
   "recursive_test_files" => 1,
   "requires" => {
     "File::Copy::Recursive" => 0,
+    "Getopt::Std" => 0,
     "Log::Log4perl" => "1.11",
     "Path::Tiny" => 0,
     "Test::Differences" => 0,

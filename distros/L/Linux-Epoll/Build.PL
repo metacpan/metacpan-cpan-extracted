@@ -4,17 +4,14 @@ use warnings;
 use Module::Build;
 
 if ($^O ne 'linux') {
-	print "No support for OS\n";
-	exit 0;
+	die "No support for OS\n";
 }
 
 my $builder = Module::Build->new(
 	module_name => 'Linux::Epoll',
 	  'build_requires' => {
-    'File::Spec' => '0',
-    'IO::Handle' => '0',
-    'IPC::Open3' => '0',
     'Module::Build' => '0.28',
+    'POSIX' => '0',
     'Scalar::Util' => '0',
     'Socket' => '0',
     'Test::More' => '0',

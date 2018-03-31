@@ -16,3 +16,5 @@ t/storesize.t
 t/warn_parameter.t
 t/wrong_parameter.t
 t/exists.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Tie::Hash::DBD;
 
-require "t/util.pl";
+require "./t/util.pl";
 
 my %hash;
 my $DBD = "CSV";
@@ -21,10 +21,11 @@ ok (tied %hash,				"Hash tied");
 
 my %data = (
     UND => undef,
-    IV  => 1,
+    IV  => 3,
     NV  => 3.14159265358979,
-    PV  => "string",
+    PV  => "\xcf\x80",
     );
+DBD::CSV->VERSION < 0.48 and delete $data{PV};
 my $data = $dsn =~ m/utf8/ ? _bindata () : "123\x{ff}";
 
 ok (%hash = %data,			"Set data");

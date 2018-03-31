@@ -6,13 +6,40 @@ use Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 requires 'print';
 requires 'say';
+
+#pod =method B<close>
+#pod
+#pod   $s->close;
+#pod
+#pod Flush any data written to the sink and close it.  While this will be
+#pod performed automatically when the object is destroyed, if the object is
+#pod not destroyed prior to global destruction at the end of the program,
+#pod it is quite possible that it will not be possible to perform this
+#pod cleanly.  In other words, make sure that sinks are closed prior to
+#pod global destruction.
+#pod
+#pod
+#pod =cut
+
 requires 'close';
 
 1;
+
+#
+# This file is part of Data-Record-Serialize
+#
+# This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
+__END__
 
 =pod
 
@@ -22,12 +49,25 @@ Data::Record::Serialize::Role::Sink - Sink Role
 
 =head1 VERSION
 
-version 0.13
+version 0.15
 
 =head1 DESCRIPTION
 
 If a role consumes this, it signals that it provides sink
 capabilities.
+
+=head1 METHODS
+
+=head2 B<close>
+
+  $s->close;
+
+Flush any data written to the sink and close it.  While this will be
+performed automatically when the object is destroyed, if the object is
+not destroyed prior to global destruction at the end of the program,
+it is quite possible that it will not be possible to perform this
+cleanly.  In other words, make sure that sinks are closed prior to
+global destruction.
 
 =head1 BUGS AND LIMITATIONS
 
@@ -59,10 +99,3 @@ This is free software, licensed under:
   The GNU General Public License, Version 3, June 2007
 
 =cut
-
-__END__
-
-#pod =head1 DESCRIPTION
-#pod
-#pod If a role consumes this, it signals that it provides sink
-#pod capabilities.

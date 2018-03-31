@@ -1,5 +1,5 @@
 package Statocles::App::Role::Store;
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 # ABSTRACT: Role for applications using files
 
 #pod =head1 SYNOPSIS
@@ -38,9 +38,9 @@ with 'Statocles::App';
 
 has store => (
     is => 'ro',
-    isa => Store,
+    isa => StoreType,
     required => 1,
-    coerce => Store->coercion,
+    coerce => StoreType->coercion,
 );
 
 #pod =method pages
@@ -106,7 +106,7 @@ Statocles::App::Role::Store - Role for applications using files
 
 =head1 VERSION
 
-version 0.091
+version 0.092
 
 =head1 SYNOPSIS
 

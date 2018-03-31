@@ -1,0 +1,11 @@
+<%init>
+RT::Authen::OAuth2::RequestAuthorization(\%session, \%ARGS) if defined $ARGS{next};
+# Shouldn't come to this page directly; bounce them back to /
+RT::Interface::Web::Redirect(RT->Config->Get('WebURL'));
+</%init>
+
+% # user should be redirected before ever seeing this
+<& /Elements/Header, Title => 'OAuth' &>
+<div id="body" class="login-body">
+<p><&|/l&>Redirecting to the OAuth2 endpoint...</&></p>
+</div>

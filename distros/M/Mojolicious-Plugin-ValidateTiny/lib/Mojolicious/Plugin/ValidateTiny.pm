@@ -8,7 +8,7 @@ use Carp qw/croak/;
 use Validate::Tiny;
 no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 sub register {
     my ( $self, $app, $conf ) = @_;
@@ -35,6 +35,9 @@ sub register {
 
             # Validate GET+POST parameters by default
             $params ||= $c->req->params->to_hash();
+
+            # Validate Uploaded files by default
+            $params->{ $_->name } ||= $_ for (@{ $c->req->uploads });
 
             #Latest mojolicious has an issue in that it doesn't include route supplied parameters so we need to hack that in.
             $params = { %{$params},  %{$c->stash->{'mojo.captures'}} };
@@ -170,6 +173,8 @@ Mojolicious::Plugin::ValidateTiny - Lightweight validator for Mojolicious
 
 =head1 SYNOPSIS
 
+    use Validate::Tiny ':all';
+
     # Mojolicious
     $self->plugin('ValidateTiny');
 
@@ -223,7 +228,7 @@ Mojolicious::Plugin::ValidateTiny - Lightweight validator for Mojolicious
     __DATA__
 
     @@ user.html.ep
-    %= if (validator_has_errors) {
+    % if (validator_has_errors) {
         <div class="error">Please, correct the errors below.</div>
     % }
     %= form_for 'user' => begin
@@ -302,7 +307,7 @@ Check if there are any errors.
         $self->render_text( $self->validator_any_error );
     }
 
-    %= if (validator_has_errors) {
+    % if (validator_has_errors) {
         <div class="error">Please, correct the errors below.</div>
     % }
 

@@ -2,7 +2,7 @@ package Test2::Harness::Job::Runner::IPC;
 use strict;
 use warnings;
 
-our $VERSION = '0.001063';
+our $VERSION = '0.001064';
 
 use Test2::Harness::Util qw/open_file write_file local_env/;
 use Test2::Harness::Util::IPC qw/run_cmd/;
@@ -29,14 +29,13 @@ sub command_file {
 
 sub command {
     my $class = shift;
-    my ($test, $event_file) = @_;
+    my ($test, $event_file, $inc) = @_;
 
     my $job = $test->job;
 
-    my %seen;
     return (
         $^X,
-        (map { "-I$_" } grep { !$seen{$_}++ } @{$job->libs}, $class->find_inc, @INC),
+        (map { "-I$_" } @$inc),
         $ENV{HARNESS_PERL_SWITCHES} ? $ENV{HARNESS_PERL_SWITCHES} : (),
         @{$job->switches},
         $job->event_uuids ? ('-MTest2::Plugin::UUID') : (),
@@ -69,12 +68,14 @@ sub run {
         $job->use_stream ? (T2_FORMATTER => 'Stream') : (),
     };
 
-    my @cmd = $class->command($test, $event_file);
+    my %seen;
+    my @inc = (grep { !$seen{$_}++ } map { File::Spec->rel2abs($_) } @{$job->libs}, $class->find_inc, @INC);
 
     my $pid;
     local_env $env => sub {
         $pid = run_cmd(
-            command => \@cmd,
+            chdir   => $job->ch_dir,
+            command => sub { $class->command($test, $event_file, \@inc) },
             stdin   => $in_fh,
             stdout  => $out_fh,
             stderr  => $err_fh,

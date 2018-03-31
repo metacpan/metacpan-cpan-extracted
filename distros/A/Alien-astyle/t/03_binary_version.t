@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-our $VERSION = 0.003_000;
+our $VERSION = 0.004_000;
 
 use Test::More tests => 8;
 use File::Spec;
@@ -34,4 +34,4 @@ ok($version_0 =~ m/([\d\.]+)$/xms, '`astyle --version` 1 line of output ends cor
 
 my $version_split = [split /[.]/, $1];
 my $version_split_0 = $version_split->[0] + 0;
-cmp_ok($version_split_0, '==', 2, '`astyle --version` returns major version 2 or newer');
+cmp_ok($version_split_0, '>=', 2, '`astyle --version` returns major version 2 or newer');

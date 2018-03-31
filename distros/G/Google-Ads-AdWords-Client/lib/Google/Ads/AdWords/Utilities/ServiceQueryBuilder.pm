@@ -42,8 +42,9 @@ sub START {
 
   # If a query builder was specified, then make a copy.
   if ($self->get_query_builder()) {
-    push($self->get_select(),   @{$self->get_query_builder()->get_select()});
-    push($self->get_order_by(), @{$self->get_query_builder()->get_order_by()});
+    push(@{$self->get_select()}, @{$self->get_query_builder()->get_select()});
+    push(@{$self->get_order_by()},
+         @{$self->get_query_builder()->get_order_by()});
     $self->set_start_index($self->get_query_builder()->get_start_index());
     $self->set_page_size($self->get_query_builder()->get_page_size());
   }

@@ -17,6 +17,7 @@ Data
 Default
 Diab
 Encode
+Error
 Jerius
 Observatory
 Record
@@ -32,6 +33,7 @@ ddump
 djerius
 json
 lib
+msg
 null
 raison
 rdb

@@ -8,11 +8,18 @@ use POSIX qw(strftime);
 use Sort::Versions;
 use Test::Deep;
 use Test::Exception;
+use File::Spec;
+use Cwd qw/abs_path/;
+
+my $DO_WIN32_GETLONGPATHNAME = ($^O eq 'MSWin32') ? eval 'use Win32; 1' : 0;
 
 eval "use Path::Class 0.26; 1" or plan skip_all =>
     "Path::Class 0.26 is required for this test.";
 
-my $tempdir = tempdir(CLEANUP => 1);
+my $tmpdir = File::Spec->tmpdir;
+$tmpdir = Win32::GetLongPathName(abs_path($tmpdir)) if $DO_WIN32_GETLONGPATHNAME;
+
+my $tempdir = tempdir(DIR => $tmpdir, CLEANUP => 1);
 
 my $dir = Path::Class::dir($tempdir);
 
@@ -27,6 +34,9 @@ if ( versioncmp( $git->version , '1.5.0') eq -1 ) {
 diag( "Testing git version: " . $version );
 
 $git->init; # 'git init' also added in v1.5.0 so we're safe
+
+# see https://github.com/genehack/Git-Wrapper/issues/91
+$git->config('commit.gpgsign', 'false');
 
 $git->config( 'user.name'  , 'Test User'        );
 $git->config( 'user.email' , 'test@example.com' );

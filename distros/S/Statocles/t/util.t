@@ -1,6 +1,6 @@
 use Test::Lib;
 use My::Test;
-use Statocles::Util qw( trim dircopy run_editor uniq_by derp );
+use Statocles::Util qw( trim dircopy run_editor uniq_by derp read_stdin );
 use Statocles::Link;
 my $SHARE_DIR = path( __DIR__, 'share' );
 
@@ -63,10 +63,12 @@ subtest 'run_editor' => sub {
     };
 
     subtest 'editor found' => sub {
+        my $path = $SHARE_DIR->child(qw( store docs required.markdown ));
         local $ENV{EDITOR} = $editor;
-        local $ENV{STATOCLES_TEST_EDITOR_CONTENT} = "".$SHARE_DIR->child(qw( app blog draft a-draft-post.markdown ));
+        local $ENV{STATOCLES_TEST_EDITOR_CONTENT} = "".$path;
         my $tmp = tempdir;
-        ok run_editor( $tmp->child( 'index.markdown' ) ), 'editor invoked, so return true';
+        ok my $content = run_editor( $tmp->child( 'index.markdown' ) ), 'editor invoked, so return true';
+        is $content, $path->slurp_utf8, 'run_editor returns edited content';
     };
 
     subtest 'editor set but invalid' => sub {
@@ -94,6 +96,13 @@ subtest 'run_editor' => sub {
             run_editor( $tmp->child( 'index.markdown' ) );
         } qr[Editor "\Q$ENV{EDITOR}\E" exited with error \(non-zero\) status: \d+\n];
     };
+};
+
+subtest 'read_stdin' => sub {
+    my $content = "Content on STDIN\n";
+    open my $stdin, '<', \$content or die "Could not create scalar filehandle: $!";
+    local *STDIN = $stdin;
+    is read_stdin(), $content, 'STDIN content is correct';
 };
 
 subtest 'uniq_by' => sub {

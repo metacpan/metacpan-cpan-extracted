@@ -47,8 +47,8 @@ sub add_crm_based_user_list {
   my $user_list = Google::Ads::AdWords::v201802::CrmBasedUserList->new({
     name        => "Customer relationship management list #" . uniqid(),
     description => "A list of customers that originated from email addresses",
-    # See limit here:
-    # https://support.google.com/adwords/answer/6276125#requirements.
+    # CRM-based user lists can use a membershipLifeSpan of 10000 to indicate
+    # unlimited; otherwise normal values apply.
     membershipLifeSpan => "30",
     uploadKeyType => "CONTACT_INFO"
   });

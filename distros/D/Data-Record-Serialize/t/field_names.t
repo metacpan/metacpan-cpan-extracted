@@ -5,7 +5,7 @@ use Test2::V0 qw[ :DEFAULT bag ];
 use Data::Dumper;
 use Data::Record::Serialize;
 
-use lib 't/lib';
+use Test::Lib;
 
 
 subtest "unspecified" => sub {

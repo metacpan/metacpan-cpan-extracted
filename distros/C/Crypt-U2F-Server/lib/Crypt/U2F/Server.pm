@@ -1,6 +1,6 @@
 package Crypt::U2F::Server;
 
-use 5.008008;
+use 5.018001;
 use strict;
 use warnings;
 use Carp;
@@ -9,7 +9,7 @@ require Exporter;
 use AutoLoader;
 
 our @ISA = qw(Exporter);
-our $VERSION = '0.40';
+our $VERSION = '0.42';
 
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
@@ -71,7 +71,7 @@ __END__
 
 =head1 NAME
 
-Crypt::U2F::Server - Low level wrapper around the U2F two factor athentication C library (server side)
+Crypt::U2F::Server - Low level wrapper around the U2F two factor authentication C library (server side)
 
 =head1 SYNOPSIS
 
@@ -90,7 +90,7 @@ of L<Crypt::U2F::Server> to use.
 
 =head1 INSTALLATION
 
-This module requires the Yubico u2f-server shared libary installed, please see the official
+This module requires the Yubico u2f-server shared library installed, please see the official
 project page at L<https://developers.yubico.com/libu2f-server/> on how to do that.
 
 =head1 NO MULTITHREADING / MULTI INSTANCES
@@ -142,7 +142,13 @@ Also, at the moment, this module has seen only very limited testing.
 
 =head1 AUTHOR
 
-Rene Schickbauer, E<lt>rene.schickbauer@magnapowertrain.comE<gt>
+=over
+
+=item Rene Schickbauer, E<lt>rene.schickbauer@magnapowertrain.comE<gt>
+
+=item Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -154,8 +160,8 @@ C library, see L<https://developers.yubico.com/libu2f-server/>
 In order for this to work, you need to install that
 library.
 
-This adaption is (C) 2014-2015 Rene 'cavac' Schickbauer, but as it
-is based on Yubico's code, the licence below applies!
+This adaption is (C) 2014-2018 Rene 'cavac' Schickbauer and 2018 Xavier
+Guimard, but as it is based on Yubico's code, the licence below applies!
 
 I<We, the community, would hereby thank Yubico for open sourcing their code!>
 

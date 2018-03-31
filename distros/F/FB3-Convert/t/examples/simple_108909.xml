@@ -1,26 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<fb3-body xmlns:xlink="http://www.w3.org/1999/xlink" id="2afe396e-5065-4c9b-a225-02c2ed5bd3f9" xmlns="http://www.fictionbook.org/FictionBook3/body">
-  <section id="2afe396e-5065-4c9b-a225-02c2ed5bd3f9">
-    <section id="b0df166f-cc92-5524-802a-0c2c3035231e">
+<fb3-body xmlns="http://www.fictionbook.org/FictionBook3/body" xmlns:xlink="http://www.w3.org/1999/xlink" id="a2a28908-60e9-47d4-91b6-36d292b16681">
+    <section id="1a50fdba-deaa-5072-a85d-c660233ce8c3">
       <title>
         <p>ВСТУПЛЕНИЕ</p>
         <p>Глава 1</p>
       </title>
-      <p>
-Иностранная речь
-</p>
-      <p>
-        <span>“Get me a gin!”</span>
-      </p>
+      <p>Иностранная речь</p>
+      <p>“Get me a gin!”</p>
       <p>“Do you know what you want to do when you get old?”</p>
     </section>
-    <section id="21025300-3fd2-5225-aec5-016672b78023">
-      <section id="2b9f9047-800c-441d-ac13-56f0f2e282f2">
+    <section id="b2a368bd-d3ea-54b1-bc49-99951618338a">
+      <section id="51861d38-c604-4498-a66f-649cd8e63e55">
         <p>
-          <a xlink:href="#b0df166f-cc92-5524-802a-0c2c3035231e">Page 1</a>
+          <a xlink:href="#1a50fdba-deaa-5072-a85d-c660233ce8c3">Page 1</a>
         </p>
       </section>
-      <section id="2b9f9047-800c-441d-ac13-56f0f2e282f2">
+      <section id="94ec0387-7254-42ad-8c24-2682551c2dc3">
         <title>
           <p>«Пучина страстей»</p>
         </title>
@@ -28,5 +23,4 @@
         <p>Позабыв свою тревогу И сомнений целый ряд, Выбегает на дорогу Барабанщиков отряд. </p>
       </section>
     </section>
-  </section>
 </fb3-body>

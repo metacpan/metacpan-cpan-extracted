@@ -1,12 +1,12 @@
 package XML::Writer::Lazy;
-$XML::Writer::Lazy::VERSION = '0.04';
+$XML::Writer::Lazy::VERSION = '0.05';
 =head1 NAME
 
 XML::Writer::Lazy - Pass stringified XML to XML::Writer
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 
@@ -183,7 +183,7 @@ MIT - see the C<LICENSE> file included in the tar.gz of this distribution.
 
 # I capture output that's produced by calling XML::Writer's methods directly
 package XML::Writer::Lazy::InterceptPrint;
-$XML::Writer::Lazy::InterceptPrint::VERSION = '0.04';
+$XML::Writer::Lazy::InterceptPrint::VERSION = '0.05';
 our $intercept = 1;
 
 use vars '$AUTOLOAD';
@@ -225,7 +225,7 @@ sub AUTOLOAD {
 
 # I'm the handling class the SAX parser calls when events are generated
 package XML::Writer::Lazy::Handler;
-$XML::Writer::Lazy::Handler::VERSION = '0.04';
+$XML::Writer::Lazy::Handler::VERSION = '0.05';
 our $writer;
 our $xml_dec = 0;
 
@@ -304,6 +304,14 @@ sub start_prefix_mapping {
     return;
 }
 
+# Allegedly passes through some kind of locator object, but appears
+# to essentially be a no-op? ¯\_(ツ)_/¯
+sub set_document_locator {
+    my $self = shift;
+    my $data = shift;
+    return;
+}
+
 # No work needed, as the insides will already be magically quoted
 sub start_cdata { return; }
 sub end_cdata   { return; }
@@ -316,12 +324,6 @@ but XML::Writer::Lazy doesn't yet handle those. You can either simplify your
 input XML or alternatively you could monkey-patch `XML::Writer::Lazy::Handler`
 to add a `$event()` handler method to it.
 MSG
-}
-
-sub set_document_locator {
-    my $self = shift;
-    my $data = shift;
-    return croak( not_implemented('set_document_locator') );
 }
 
 sub skipped_entity {
@@ -430,7 +432,7 @@ sub fatal_error {
 # and don't actually want to redispatch that to XML::Writer. I accept and
 # silently drop all method calls.
 package XML::Writer::Lazy::NullHandler;
-$XML::Writer::Lazy::NullHandler::VERSION = '0.04';
+$XML::Writer::Lazy::NullHandler::VERSION = '0.05';
 sub AUTOLOAD { }
 
 1;

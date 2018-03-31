@@ -6,14 +6,12 @@ use warnings;
 use Encode qw( encode decode );
 
 my $data;
-sub _bindata
-{
+sub _bindata {
     $data ||= pack "LA20A*", time, "#sys", encode "UTF-8", "Value \x{20ac}";
     return $data;
     } # _bindata
 
-sub _dsn
-{
+sub _dsn {
     my $type = shift;
 
     $type eq "SQLite"	and return "dbi:SQLite:dbname=db.3";
@@ -24,7 +22,8 @@ sub _dsn
 	my $xsv = eval q{use Text::CSV_XS; $Text::CSV_XS::VERSION; } || 0;
 	my $dbv = eval q{use DBD::CSV;     $DBD::CSV::VERSION;     } || 0;
 	my $dsn = "dbi:CSV:f_ext=.csv/r;csv_null=1";
-	$xsv > 1.01 && $dbv > 0.47 and $dsn .= ";csv_decode_utf8=0";
+	$xsv > 1.01 && $dbv > 0.47     and $dsn .= ";csv_decode_utf8=0";
+	$dbv > 0.29 && $]   < 5.008009 and $dsn .= ";csv_auto_diag=0";
 	return $dsn;
 	}
 
@@ -45,10 +44,10 @@ sub _dsn
 	return "dbi:Oracle:";
 	}
 
-    if ($type eq "mysql") {
+    if ($type eq "mysql" || $type eq "MariaDB") {
 	my $db = $ENV{MYSQLDB} || $user or
 	    plan skip_all => "Not a testable MariaDB/MySQL env";
-	return "dbi:mysql:database=$db";
+	return "dbi:$type:database=$db";
 	}
 
     if ($type eq "Unify") {
@@ -61,27 +60,25 @@ sub _dsn
 
     if ($type eq "Firebird") {
 	# use flamerobin for DB administration
+	# Default pass for SYSDBA is "masterkey"
 	# I gave up on this. Too hard to make it work. Connection always fails
-	$ENV{ISC_USER} || $user eq "merijn" or
-	    plan skip_all => "Not a testable Firebird env";
-	$ENV{ISC_USER}     ||= $user;
-	$ENV{ISC_PASSWORD} ||= "";
+	$ENV{ISC_USER}     ||= "SYSDBA";
+	$ENV{ISC_PASSWORD} ||= "masterkey";
+	$ENV{ISC_DATABASE} ||= ""; # Prevent warnings in Firebird.pm
 	$ENV{DBI_USER} = $ENV{ISC_USER};
 	$ENV{DBI_PASS} = $ENV{ISC_PASSWORD};
 	return "dbi:Firebird:";
 	}
     } # _dsn
 
-sub dsn
-{
+sub dsn {
     my $type = shift;
     my $dsn  = _dsn ($type);
     cleanup ($type);
     return $dsn;
     } # dsn
 
-sub plan_fail
-{
+sub plan_fail {
     my $type = shift;
 
     my $reason = DBI->errstr;
@@ -110,8 +107,7 @@ sub plan_fail
     plan skip_all => "DBD::$type$reason";
     } # plan_fail
 
-sub cleanup
-{
+sub cleanup {
     my $type = shift;
 
     $type eq "Pg"	and return;

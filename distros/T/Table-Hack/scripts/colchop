@@ -1,0 +1,106 @@
+#!/usr/bin/perl 
+use 5.008 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts ':.:/:!b:u:v:wy:' , \my%o ; # 5.014 で何度か実行済み
+use Encode qw[ decode_utf8 ] ; 
+use List::Util qw [ any ] ; 
+if ( $o{v} ) { eval 'use Text::VisualWidth::UTF8 qw[ trim width ] ; 1 ' 
+  or die 'Installing Text::VisualWidth::UTF8 is necessary.'}; 
+#use Text::VisualWidth::UTF8 qw [ width ] ;
+
+sub trim ( $$ ) { substr ( $_[0], 0 , $_[1] ) }
+no warnings  ; 
+* trim = * Text::VisualWidth::UTF8::trim if $o{v} ; 
+use warnings ;
+
+$| = 1 if $o{'!'} ; # オートフラッシュの設定
+my $size ; # 出力する文字列の長さの最大値
+my $cont = $o{'.'} // '..' ;
+my $iosep = $o{'/'} // "\t" ; # 入出力の区切り文字
+
+& Init ; 
+& main ; 
+exit ; 
+
+sub Line ( $ @ ) { 
+  my @cells ;
+  for ( @_[1..$#_] ) { 
+    push @cells , undef and next if ! defined $_ ;
+    my $str = trim ( $_ , $size ) ; 
+    my $q = quotemeta $str ; # 次行を \Q \E で挟むことは用事は済んだかも知れない
+    s/^$q// ; 
+    $_ = undef if m/^$/ ;
+    push @cells , $str . ( defined $_ ? $cont : '' ) ;
+  }
+  unshift @cells , "$_[0]" if $o{':'} ;
+  print join $iosep , map { $_ // '' } @cells ;  
+  print "\n" ;
+}
+
+sub main ( ) { 
+  while ( <> ) { 
+    chomp ; 
+    my @F = split /$iosep/ , $_ , -1 ; 
+    my $m = $o{y} // 3 ;
+    my $v = "$.:" ; 
+    do { Line ( $v , @F ) ; $v = '' }  while ( any { defined $_ } @F  ) ;
+        #Line ( @F ) 
+  }
+}
+
+# 1. 読取りのハンドラの文字コードを決めたりする。
+sub Init ( ) { 
+  # binmode の指定は、 substr関数に影響する。
+  binmode STDIN, ":encoding(utf8)" if ! $o{w} && $o{u} ; 
+  binmode STDIN, ":encoding(cp932)" if $o{w} ; # <-- - SJIS <<? "cp932" 絵文字も考えたい
+  binmode STDOUT,":encoding(utf8)" if $o{u};
+  #$/ = "\r\n" if $o{W} ;
+
+  $o{u} = 3 unless defined $o{b} || defined $o{u} || defined $o{v} ; # 何行まで折り返すか。
+  $size = $o{b} // $o{u} // $o{v} // 0 ;
+  #HELP_MESSAGE () if $size == 0 ;
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8 
+
+=head1
+
+ $0 -b バイト数
+ $0 -u UTF-8の文字数
+ $0 -v 半角文字幅
+
+  タブ文字などで区切られた各フィールドを、指定された幅のみ表示する。
+   Unix/Linux の　tabs コマンドで表示設定を変えながら見るのも良い。
+   ビューアless を起動中に -x N(数) と入力してEnter するもの良い。
+
+オプション :
+
+  -b num : バイト数で計算する。
+  -u num :  utf-8 とみなして、長さを計算する。そうでなければ、単純なバイト長になる。
+  -v num :  utf-8 の文字幅で長さを計算する(半角は1、全角は2)。(visual-width)
+  -y N  ; 折り返しを何回まで行うか。未指定なら3。
+  -w    ; CP932 (SJIS)として処理をする。
+
+  -. STRING ; セル内改行の末尾に付ける文字列を .. から変更する。
+  -/ REGEX : 入出力の区切り文字のタブ文字からの変更。
+  -!  : フラッシュする。バッファに貯めない。 
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+ 
+ 開発メモ : 
+  * 半角空白で、最大許容幅に足りない分を埋めるオプションを実装したい。
+
+=cut

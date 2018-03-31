@@ -64,29 +64,56 @@ Data::Record::Serialize recognizes three types:
 Not all encoders support a separate integral type; in those cases
 integer fields are treated as general numeric fields.
 
-  Output field and type determination
+  Fields and their types
 
-The selection of output fields and determination of their types depends
-upon the "fields", "types", and "default_type" attributes.
+Which fields are output and how their types are determined depends upon
+the "fields", "types", and "default_type" attributes.
 
-*   "fields" specified, "types" *not* specified
+In the following table:
 
-    The fields in "fields" are output. Types are derived from the values
-    in the first record.
+ N   => not specified
+ Y   => specified
+ X   => doesn't matter
+ all => the string 'all'
 
-*   "fields" *not* specified, "types" specified
+Automatic type determination is done by examining the first record send
+to the output stream.
 
-    The fields by "types" are output and are given the specified types.
+  fields types default_type  Result
+  ------ ----- ------------  ------
 
-*   "fields" specified, "types" specified
+  N/all   N        N         All fields are output.
+                             Types are automatically determined.
 
-    The fields specified by the "fields" array are output with the types
-    specified by "types". For fields not specified in "types", the
-    "default_type" attribute value is used.
+  N/all   N        Y         All fields are output.
+                             Types are set to <default_type>.
 
-*   "fields" *not* specified, "types" *not* specified
+    Y     N        N         Fields in <fields> are output.
+                             Types are automatically determined.
 
-    The first record determines the fields and types (by examination).
+    Y     Y        N         Fields in <fields> are output.
+                             Fields in <types> get the specified type.
+                             Types for other fields are automatically determined.
+
+    Y     Y        Y         Fields in <fields> are output.
+                             Fields in <types> get the specified type.
+                             Types for other fields are set to <default_type>.
+
+   all    Y        N         All fields are output.
+                             Fields in <types> get the specified type.
+                             Types for other fields are automatically determined.
+
+   all    Y        Y         All fields are output.
+                             Fields in <types> get the specified type.
+                             Types for other fields are set to <default_type>.
+
+    N     Y        X         Fields in <types> are output.
+                             Types are specified by <types>.
+
+  Errors
+
+Most errors result in exception objects being thrown, typically in the
+Data::Record::Serialize::Error hierarchy.
 
 INSTALLATION
 

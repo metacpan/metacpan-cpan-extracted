@@ -1,0 +1,33 @@
+Test-DocClaims version 0.001
+===========================
+
+Help assure that documentation claims are tested.
+
+A module should have documentation that defines its interface. All claims in
+that documentation should have corresponding tests to verify that they are
+true. Test::DocClaims is designed to help assure that those tests are written
+and maintained.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2016 by Scott E. Lee
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.2 or,
+at your option, any later version of Perl 5 you may have available.
+

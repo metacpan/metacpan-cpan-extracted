@@ -1,0 +1,27 @@
+bin/generate_test_expectations.pl
+Changes
+lib/Markua/Parser.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/01-test.t
+t/dom/bulleted-list-dash.json
+t/dom/bulleted-list.json
+t/dom/headers.json
+t/dom/heading1.json
+t/dom/include.json
+t/dom/numbered-list-1-3.json
+t/dom/paragraphs.json
+t/errors/include.json
+t/input/bulleted-list-dash.md
+t/input/bulleted-list.md
+t/input/headers.md
+t/input/heading1.md
+t/input/include.md
+t/input/include/a.pl
+t/input/include/b.pl
+t/input/include/d.py
+t/input/numbered-list-1-3.md
+t/input/paragraphs.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

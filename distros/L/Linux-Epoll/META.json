@@ -3,14 +3,14 @@
    "author" : [
       "Leon Timmermans <leont@cpan.org>"
    ],
-   "dynamic_config" : "1",
-   "generated_by" : "Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Linux-Epoll",
    "prereqs" : {
@@ -28,6 +28,7 @@
          "requires" : {
             "Devel::PPPort" : "3.23",
             "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08"
          }
@@ -43,9 +44,7 @@
       },
       "test" : {
          "requires" : {
-            "File::Spec" : "0",
-            "IO::Handle" : "0",
-            "IPC::Open3" : "0",
+            "POSIX" : "0",
             "Scalar::Util" : "0",
             "Socket" : "0",
             "Test::More" : "0",
@@ -56,7 +55,7 @@
    "provides" : {
       "Linux::Epoll" : {
          "file" : "lib/Linux/Epoll.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       }
    },
    "release_status" : "stable",
@@ -71,6 +70,7 @@
          "web" : "https://github.com/Leont/linux-epoll"
       }
    },
-   "version" : "0.012"
+   "version" : "0.013",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0215"
 }
 

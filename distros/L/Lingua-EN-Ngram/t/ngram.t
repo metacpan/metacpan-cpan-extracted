@@ -50,18 +50,18 @@ dies_ok { $ngram->ngram( 5.5 ) } 'trapped need to pass an integer to ngram';
 
 # individual words
 my $ngrams = $ngram->ngram( 1 );
-is( scalar( keys %$ngrams ), 2738, 'ngrams(1) in a hash reference with 2738 keys' );
+is( scalar( keys %$ngrams ), 2892, 'ngrams(1) in a hash reference with 2738 keys' );
 is( $$ngrams{ 'éditeur' }, 1, '"éditeur" is a key that appears once' );
 
 # bigrams
 $ngrams = $ngram->ngram( 2 );
-is( scalar( keys %$ngrams ), 7039, 'ngrams(2) in a hash reference with 7039 keys' );
+is( scalar( keys %$ngrams ), 7167, 'ngrams(2) in a hash reference with 7039 keys' );
 is( $$ngrams{ 'éditeur des' }, 1, '"éditeur des" is as bigram appearing once' );
 
 # trigram
 $ngrams = $ngram->ngram( 3 );
-is( scalar( keys %$ngrams ), 8668, 'ngrams(3) in a hash reference with 8668 keys' );
-is( $$ngrams{ 'éditeur des annales' }, 1, '"éditeur des annales" is as trigram appearing once' );
+is( scalar( keys %$ngrams ), 8694, 'ngrams(3) in a hash reference with 8668 keys' );
+is( $$ngrams{ 'nous tout le' }, 1, '"nous tout le" is as trigram appearing once' );
 
 # n-gram
 $ngrams = $ngram->ngram( 8 );

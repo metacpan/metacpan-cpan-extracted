@@ -13,7 +13,7 @@ Statocles::Help::Policy - Development and deprecation policies
 
 =head1 VERSION
 
-version 0.091
+version 0.092
 
 =head1 DESCRIPTION
 

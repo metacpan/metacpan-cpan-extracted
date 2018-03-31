@@ -7,7 +7,7 @@ use Test::More;
 use Time::HiRes qw( gettimeofday tv_interval );
 use Tie::Hash::DBD;
 
-require "t/util.pl";
+require "./t/util.pl";
 
 my %hash;
 my $DBD = "CSV";

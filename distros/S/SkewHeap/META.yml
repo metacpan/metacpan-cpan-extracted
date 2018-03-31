@@ -23,7 +23,7 @@ name: SkewHeap
 provides:
   SkewHeap:
     file: lib/SkewHeap.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Inline: '0.80'
   Inline::C: '0.78'
@@ -32,5 +32,5 @@ resources:
   bugtracker: https://github.com/sysread/SkewHeap/issues
   homepage: https://github.com/sysread/SkewHeap
   repository: https://github.com/sysread/SkewHeap.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'YAML::Tiny version 1.70'

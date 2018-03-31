@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Systemd ;
-$Config::Model::Backend::Systemd::VERSION = '0.236.1';
+$Config::Model::Backend::Systemd::VERSION = '0.238.1';
 use strict;
 use warnings;
 use 5.010;
@@ -25,6 +25,8 @@ has config_dir => (
     is => 'rw',
     isa => 'Path::Tiny'
 );
+
+has 'annotation' => ( is => 'ro', isa => 'Bool', default => 1 );
 
 # TODO: accepts other systemd suffixes
 my @service_types = qw/service socket/;
@@ -233,7 +235,7 @@ Config::Model::Backend::Systemd - R/W backend for systemd configurations files
 
 =head1 VERSION
 
-version 0.236.1
+version 0.238.1
 
 =head1 SYNOPSIS
 

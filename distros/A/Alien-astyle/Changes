@@ -1,5 +1,11 @@
 Revision history for Alien::astyle.
 
+0.010000 2018-03-28 Codename Tutu
+
+    - HOLIDAY EDITION: Happy Birthday, Anna!
+    - Allow AStyle Major Version 3
+    - Upgrade Various Alien Dependencies
+
 0.009000 2017-04-14 Codename Good Shepherd
 
     - HOLIDAY EDITION: Happy Good Friday!

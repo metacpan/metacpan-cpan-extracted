@@ -53,7 +53,7 @@ int u2fclib_setAppID(void* ctx, char* appid);
 int u2fclib_setChallenge(void* ctx, char* challenge);
 char* u2fclib_calcRegistrationChallenge(void* ctx);
 char* u2fclib_calcAuthenticationChallenge(void* ctx);
-char* u2fclib_verifyRegistration(void* ctx, char* buf);
+char* u2fclib_verifyRegistration(void* ctx, char* buf, char** pk);
 int u2fclib_verifyAuthentication(void* ctx, char* buf);
 int u2fclib_free_context(void* ctx);
 int u2fclib_deInit(void);

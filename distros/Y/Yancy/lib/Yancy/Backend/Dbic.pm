@@ -1,5 +1,5 @@
 package Yancy::Backend::Dbic;
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 # ABSTRACT: A backend for DBIx::Class schemas
 
 #pod =head1 SYNOPSIS
@@ -236,7 +236,7 @@ sub _map_type {
     elsif ( $db_type =~ /^(?:double|float|money|numeric|real)/i ) {
         %conf = ( %conf, type => 'number' );
     }
-    elsif ( $db_type =~ /^(?:timestamp)/i ) {
+    elsif ( $db_type =~ /^(?:timestamp|datetime)/i ) {
         %conf = ( %conf, type => 'string', format => 'date-time' );
     }
     else {
@@ -247,6 +247,10 @@ sub _map_type {
     if ( $column->{is_nullable} ) {
         $conf{ type } = [ $conf{ type }, 'null' ];
     }
+
+    #; use Data::Dumper;
+    #; say "Field: " . Dumper $column;
+    #; say "Conf: " . Dumper \%conf;
 
     return %conf;
 }
@@ -263,7 +267,7 @@ Yancy::Backend::Dbic - A backend for DBIx::Class schemas
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 

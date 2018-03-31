@@ -4868,6 +4868,29 @@ after updates, the Lapack module built successfully on 10.6.8 and 10.8.5.
 
 - edited the 'README' document.
 
+- uploaded the v0.604 distribution to CPAN.
+
+2018-03-29
+
+- modified '_readChart' function of 'Chart.pm' to set file handle to 'binmode'. ASCII files are now read in binary mode, setting $/ to the line ending characters. this fixes Windows (Strawberry Perl) read failures.
+
+- reverted adding 'binmode' to '_readChartASE', '_readChartSS3', and '_readChartTIFF' functions of 'Chart.pm'
+
+- changed 'license' value in 'Build.PL' to 'GPL_3'.
+
+- modified first 'BEGIN' block of 'Profile.pm' to check for my development directories before adding them to @INC.
+
+2018-03-30
+
+- modified '02_Generic.t', '13_mft1.t', '14_mft2.t', '15_mAB_.t', and '16_mBA_.t' by adding 'str_cmp' function to debug round trip errors on certain Unix OS.
+
+
+
+
+
+
+
+
 
 
 

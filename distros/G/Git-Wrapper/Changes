@@ -1,8 +1,20 @@
 Revision history for Git-Wrapper
 
+0.048     2018-03-29 11:14:42-07:00 America/Los_Angeles
+
+        No changes since last development release.
+
+0.047_090 2018-03-19 21:19:22-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+        update t/path_class.t to remove tilde; fixes [#41] (Jean-Damien.Durand)
+        Unset (possible) global gpgsign [#91] (Sergey Romanov)
+        remove timing bug in basic.t (Christian Walde)
+        POD typo fix (Сергей Романов)
+        Include dist.ini in distribution (Karen Etheridge)
+
 0.047     2016-09-18 15:30:58-07:00 America/Los_Angeles
 
-       Properly track commits in test (Graham Knop)
+        Properly track commits in test (Graham Knop)
 
 0.046     2016-09-12 20:13:04-07:00 America/Los_Angeles
 

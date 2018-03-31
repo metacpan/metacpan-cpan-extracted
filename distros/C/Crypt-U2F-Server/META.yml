@@ -1,13 +1,16 @@
 ---
-abstract: 'Low level wrapper around the U2F two factor athentication C library (server side)'
+abstract: 'Low level wrapper around the U2F two factor authentication C library (server side)'
 author:
   - 'Rene Schickbauer <rene.schickbauer@magnapowertrain.com>'
 build_requires:
+  Authen::U2F::Tester: '0.02'
   ExtUtils::MakeMaker: '0'
+  JSON::XS: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,5 +20,7 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
-version: '0.40'
+requires:
+  DynaLoader: '0'
+version: '0.42'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

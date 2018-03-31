@@ -1,10 +1,11 @@
 use strict;
 use warnings;
 
-use Carp qw/croak/;
-use JavaScript::Duktape;
-use Data::Visitor::Callback;
+use JavaScript::Duktape::XS;
+use Types::Serialiser;
+
 use Data::JSONSchema::Ajv::src;
+use Data::JSONSchema::Ajv::Types;
 
 =head1 NAME
 
@@ -12,7 +13,7 @@ Data::JSONSchema::Ajv - JSON Schema Validator wrapping Ajv
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 
@@ -24,7 +25,7 @@ JSON Schema Validator wrapping Ajv
     use Data::JSONSchema::Ajv;
 
     my $ajv_options = {};
-    my $my_options  = { convert_boolean => 1 };
+    my $my_options  = {};
 
     my $ajv     = Data::JSONSchema::Ajv->new($ajv_options, $my_options);
 
@@ -73,10 +74,6 @@ JSON Schema Validator wrapping Ajv
 This module is an offensively light-weight wrapper
 L<Ajv|https://epoberezkin.github.io/ajv/>.
 
-Light-weight may be a misleading statement. It relies on L<JavaScript::Duktape>
-which in turn relies on L<Inline::C>. The very first time you run this, expect
-an instantiation time of ~20 seconds. After that, it's fast.
-
 Light-weight in this context just means it's only 50 lines or so of actual Perl.
 
 =head1 METHODS
@@ -84,18 +81,17 @@ Light-weight in this context just means it's only 50 lines or so of actual Perl.
 =head2 new
 
   my $ajv = Data::JSONSchema::Ajv->new(
-      { v5 => JavaScript::Duktape::Bool->true },
-      { convert_boolean => 1 },
+      { v5 => $JSON::PP::true }, # Ajv options. Try: {},
+      {}, # Module options. None at this time
   );
 
-Instantiates a new L<JavaScript::Duktape> environment and loads C<Ajv> into it.
+Instantiates a new L<JavaScript::Duktape::XS> environment and loads C<Ajv> into it.
 Accepts two hashrefs (or undefs). The first is passed straight through to
 C<Ajv>, whose options are documented L<here|https://epoberezkin.github.io/ajv/>.
 
-The second is options for this module. Currently only C<convert_boolean> is
-allowed (default: false), and specifies whether incoming data-structures should
-have various Perl JSON's modules boolean values converted to
-L<JavaScript::Duktape>'s boolean values. See L<BOOLEANS> below.
+There are no options at this time to pass this module itself.
+
+You *must* read the section on SCHEMA VERSIONING below.
 
 =head2 make_validator
 
@@ -103,6 +99,11 @@ L<JavaScript::Duktape>'s boolean values. See L<BOOLEANS> below.
 
 Compiles your schema using C<Ajv> and return a
 C<Data::JSONSchema::Ajv::Validator> object, documented immediately below.
+
+=head2 duktape
+
+Need to do something else, and something magic? This is a read-only accessor
+to the Duktape env.
 
 =head1 Data::JSONSchema::Ajv::Validator
 
@@ -117,22 +118,33 @@ a data-structure complaining on failure. The data-structure is whatever C<Ajv>
 produces - you can either read its documentation, or be lazy and simply
 L<Data::Dumper> it.
 
-=head1 BOOLEANS
+=head1 BOOLEANS AND UNDEFINED/NULL
 
 Perl has no special Boolean types. JSON (and indeed JavaScript) does. On load,
-this module creates a package singleton called C<$visitor> which recognizes and
-converts common workarounds for this in to L<JavaScript::Duktape::Bool>.
+this module does a bit of magic in the very simple L<Data::JSONSchema::Ajv::Types>
+module, which recognizes and converts common Perl-defined standins for this in to
+L<JavaScript::Duktape::XS::Bool>.
 
-Currently that's a small list consisting of L<Types::Serialiser::BooleanBase>'s
-and L<JSON::Boolean>'s Boolean values, but you can easily overwrite the
-C<$visitor> object and send me a patch for your favourite type.
+Currently that's a small list consisting of the boolean objects from
+L<Types::Serialiser::BooleanBase>, L<JSON::Boolean>, and L<JSON::PP::Boolean>
+but you can easily overwrite the C<$visitor> object and send me a patch for your
+favourite type.
 
-If you've set C<convert_boolean> to true, then calls to C<make_validator> and
+Calls to C<make_validator> and
 C<validate> will run their input through the visitor object, and convert their
 Booleans. This means you can push data in that you've read with, say,
 L<JSON::XS> without having to think about it.
 
-Also: C<undef> --> L<JavaScript::Duktape::NULL>.
+Also: C<undef> --> will be converted to JS null values -- undefined isn't
+value in JSON.
+
+=head1 SCHEMA VERSIONING
+
+The Ajv docs have the somewhat confusing messages about schema versions, and
+when trying to support the most recent Ajv, I got confusing message about
+Duktape. As a result, we're using Ajv 4.11.8 which supports draft-04 style
+schemas only. This will probably change in the future, but life's too short
+right now and I need something that works. Patches encouraged.
 
 =head1 SEE ALSO
 
@@ -164,46 +176,35 @@ This Perl wrapper written by Peter Sergeant.
 =cut
 
 package Data::JSONSchema::Ajv {
-$Data::JSONSchema::Ajv::VERSION = '0.02';
-my $convert = sub {
-        my ( $v, $obj ) = @_;
-        if ($obj) {
-            return JavaScript::Duktape::Bool->true;
-        }
-        else {
-            return JavaScript::Duktape::Bool->false;
-        }
-    };
-
-    our $visitor = Data::Visitor::Callback->new(
-        'Types::Serialiser::BooleanBase' => $convert,
-        'JSON::Boolean'                  => $convert,
-        # undef -> JavaScript::Duktape->null
-        value => sub { $_ // JavaScript::Duktape->null }
-    );
+    use Carp qw/croak/;
+    use Storable qw/dclone/;
 
     sub new {
         my ( $class, $ajv_options, $my_options ) = @_;
 
-        $ajv_options ||= {};
-        $my_options  ||= {};
+        $ajv_options = {
+            logger => $Types::Serialiser::false,
+            %{ $ajv_options || {} }
+        };
 
-        my $convert_boolean
-            = ( delete $my_options->{'convert_boolean'} ) || 0;
+        $my_options ||= {};
         if ( keys %$my_options ) {
             croak( "Unknown options: " . ( join ', ', keys %$my_options ) );
         }
 
-        my $js = JavaScript::Duktape->new();
+        my $js = JavaScript::Duktape::XS->new();
+        $js->eval($Data::JSONSchema::Ajv::Types::src);
         $js->eval($Data::JSONSchema::Ajv::src::src);
-        $js->set( ajvOptions => $ajv_options );
-        $js->eval('var ajv = new Ajv(ajvOptions);');
 
-        return bless {
-            '_convert' => $convert_boolean,
+        my $self = bless {
             '_context' => $js,
             '_counter' => 0,
         }, $class;
+
+        $self->_inject_escaped( ajvOptions => $ajv_options );
+        $js->eval('var ajv = new Ajv(ajvOptions);');
+
+        return $self;
     }
 
     sub make_validator {
@@ -213,20 +214,36 @@ my $convert = sub {
         my $schema_name    = "schemaDef_$counter";
         my $validator_name = "validator_$counter";
 
-        if ( $self->{'_convert'} ) {
-            $schema = $visitor->visit($schema);
-        }
-        $self->{'_context'}->set( $schema_name, $schema );
+        $self->_inject_escaped( $schema_name, $schema );
+
         $self->{'_context'}
             ->eval("var $validator_name = ajv.compile($schema_name);");
         return bless [ $self => $validator_name ],
             'Data::JSONSchema::Ajv::Validator';
     }
 
-};
+    sub duktape { my $self = shift; return $self->{'_context'}; }
+
+    sub _inject_escaped {
+        my ( $self, $name, $data ) = @_;
+
+        my $js = $self->duktape;
+
+        # Change various markers to be magic strings
+        $data = dclone( [$data] );
+        $data = $Data::JSONSchema::Ajv::Types::visitor->visit( $data->[0] );
+
+        # Push that input into JS land
+        $js->set( $name, $data );
+
+        # Change them back in JS land if needed
+        $js->eval("$name = data_json_schema_ajv_type_exchange($name);");
+    }
+}
+$Data::JSONSchema::Ajv::VERSION = '0.03';;
 
 package Data::JSONSchema::Ajv::Validator {
-$Data::JSONSchema::Ajv::Validator::VERSION = '0.02';
+$Data::JSONSchema::Ajv::Validator::VERSION = '0.03';
 use strict;
     use warnings;
 
@@ -235,13 +252,9 @@ use strict;
         my ( $parent, $name )  = @$self;
         my $js = $parent->{'_context'};
 
-        if ( $self->[0]->{'_convert'} ) {
-            $input = $Data::JSONSchema::Ajv::visitor->visit($input);
-        }
-
         my $data_name = "data_$name";
+        $parent->_inject_escaped( $data_name, $input );
 
-        $js->set( $data_name, $input );
         $js->eval("var result = $name($data_name)");
         $js->set( $data_name, undef );
 

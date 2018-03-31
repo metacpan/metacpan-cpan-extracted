@@ -121,6 +121,8 @@ source path, destination path and option string, where the latter two are option
 specified the source and destination is taken to be the same. The option string may be either
 C<rbind> or C<norbind> for configuring a recursive or non-recursive bind
 mount. If the destination path is omitted, the option string must be omitted too.
+Each bind mount definition may be prefixed with C<->, in which case it will be ignored
+when its source path does not exist.
 
 C<BindPaths> creates regular writable bind mounts (unless the source file system mount
 is already marked read-only), while C<BindReadOnlyPaths> creates read-only bind mounts. These
@@ -148,6 +150,8 @@ source path, destination path and option string, where the latter two are option
 specified the source and destination is taken to be the same. The option string may be either
 C<rbind> or C<norbind> for configuring a recursive or non-recursive bind
 mount. If the destination path is omitted, the option string must be omitted too.
+Each bind mount definition may be prefixed with C<->, in which case it will be ignored
+when its source path does not exist.
 
 C<BindPaths> creates regular writable bind mounts (unless the source file system mount
 is already marked read-only), while C<BindReadOnlyPaths> creates read-only bind mounts. These
@@ -358,12 +362,14 @@ C<+>.',
         'description' => 'Takes a boolean argument. If true, ensures that the service process and all its children can
 never gain new privileges through execve() (e.g. via setuid or setgid bits, or filesystem
 capabilities). This is the simplest and most effective way to ensure that a process and its children can never
-elevate privileges again. Defaults to false, but certain settings force C<NoNewPrivileges=yes>,
-ignoring the value of this setting.  This is the case when C<SystemCallFilter>,
+elevate privileges again. Defaults to false, but certain settings override this and ignore the value of this
+setting.  This is the case when C<SystemCallFilter>,
 C<SystemCallArchitectures>, C<RestrictAddressFamilies>,
 C<RestrictNamespaces>, C<PrivateDevices>,
 C<ProtectKernelTunables>, C<ProtectKernelModules>,
-C<MemoryDenyWriteExecute>, or C<RestrictRealtime> are specified. Also see
+C<MemoryDenyWriteExecute>, C<RestrictRealtime>, or
+C<LockPersonality> are specified. Note that even if this setting is overridden by them,
+systemctl show shows the original value of this setting. Also see
 No New Privileges
 Flag.  ',
         'type' => 'leaf',
@@ -1118,8 +1124,8 @@ C<User> is linked into it, so that keys assigned to the user may be requested by
 processes. In this modes multiple units running processes under the same user ID may share key material. Unless
 C<inherit> is selected the unique invocation ID for the unit (see below) is added as a protected
 key by the name C<invocation_id> to the newly created session keyring. Defaults to
-C<private> for the system service manager and to C<inherit> for the user service
-manager.',
+C<private> for services of the system service manager and to C<inherit> for
+non-service units and for services of the user service manager.',
         'type' => 'leaf',
         'value_type' => 'enum'
       },
@@ -1314,16 +1320,27 @@ below. Defaults to off.',
         'choice' => [
           'no',
           'yes',
-          'read-only'
+          'read-only',
+          'tmpfs'
         ],
-        'description' => 'Takes a boolean argument or C<read-only>. If true, the directories
-/home, /root and /run/user are made inaccessible
-and empty for processes invoked by this unit. If set to C<read-only>, the three directories are
-made read-only instead. It is recommended to enable this setting for all long-running services (in particular
-network-facing ones), to ensure they cannot get access to private user data, unless the services actually
-require access to the user\'s private data. This setting is implied if C<DynamicUser> is
-set. For this setting the same restrictions regarding mount propagation and privileges apply as for
-C<ReadOnlyPaths> and related calls, see below.',
+        'description' => 'Takes a boolean argument or the special values C<read-only> or
+C<tmpfs>. If true, the directories /home, /root and
+/run/user are made inaccessible and empty for processes invoked by this unit. If set to
+C<read-only>, the three directories are made read-only instead. If set to C<tmpfs>,
+temporary file systems are mounted on the three directories in read-only mode. The value C<tmpfs>
+is useful to hide home directories not relevant to the processes invoked by the unit, while necessary directories
+are still visible by combining with C<BindPaths> or C<BindReadOnlyPaths>.
+
+Setting this to C<yes> is mostly equivalent to set the three directories in
+C<InaccessiblePaths>. Similary, C<read-only> is mostly equivalent to
+C<ReadOnlyPaths>, and C<tmpfs> is mostly equivalent to
+C<TemporaryFileSystem>.
+
+ It is recommended to enable this setting for all long-running services (in particular network-facing ones),
+to ensure they cannot get access to private user data, unless the services actually require access to the user\'s
+private data. This setting is implied if C<DynamicUser> is set. For this setting the same
+restrictions regarding mount propagation and privileges apply as for C<ReadOnlyPaths> and related
+calls, see below.',
         'replace' => {
           '0' => 'no',
           '1' => 'yes',
@@ -1730,9 +1747,13 @@ access modes as from outside of it. Paths listed in C<ReadOnlyPaths> are accessi
 reading only, writing will be refused even if the usual file access controls would permit this. Nest
 C<ReadWritePaths> inside of C<ReadOnlyPaths> in order to provide writable
 subdirectories within read-only directories. Use C<ReadWritePaths> in order to whitelist
-specific paths for write access if C<ProtectSystem=strict> is used. Paths listed in
-C<InaccessiblePaths> will be made inaccessible for processes inside the namespace (along with
-everything below them in the file system hierarchy).
+specific paths for write access if C<ProtectSystem=strict> is used.
+
+Paths listed in C<InaccessiblePaths> will be made inaccessible for processes inside
+the namespace along with everything below them in the file system hierarchy. This may be more restrictive than
+desired, because it is not possible to nest C<ReadWritePaths>, C<ReadOnlyPaths>,
+C<BindPaths>, or C<BindReadOnlyPaths> inside it. For a more flexible option,
+see C<TemporaryFileSystem>.
 
 Note that restricting access with these options does not extend to submounts of a directory that are
 created later on.  Non-directory paths may be specified as well. These options may be specified more than once,
@@ -1773,9 +1794,13 @@ access modes as from outside of it. Paths listed in C<ReadOnlyPaths> are accessi
 reading only, writing will be refused even if the usual file access controls would permit this. Nest
 C<ReadWritePaths> inside of C<ReadOnlyPaths> in order to provide writable
 subdirectories within read-only directories. Use C<ReadWritePaths> in order to whitelist
-specific paths for write access if C<ProtectSystem=strict> is used. Paths listed in
-C<InaccessiblePaths> will be made inaccessible for processes inside the namespace (along with
-everything below them in the file system hierarchy).
+specific paths for write access if C<ProtectSystem=strict> is used.
+
+Paths listed in C<InaccessiblePaths> will be made inaccessible for processes inside
+the namespace along with everything below them in the file system hierarchy. This may be more restrictive than
+desired, because it is not possible to nest C<ReadWritePaths>, C<ReadOnlyPaths>,
+C<BindPaths>, or C<BindReadOnlyPaths> inside it. For a more flexible option,
+see C<TemporaryFileSystem>.
 
 Note that restricting access with these options does not extend to submounts of a directory that are
 created later on.  Non-directory paths may be specified as well. These options may be specified more than once,
@@ -1816,9 +1841,13 @@ access modes as from outside of it. Paths listed in C<ReadOnlyPaths> are accessi
 reading only, writing will be refused even if the usual file access controls would permit this. Nest
 C<ReadWritePaths> inside of C<ReadOnlyPaths> in order to provide writable
 subdirectories within read-only directories. Use C<ReadWritePaths> in order to whitelist
-specific paths for write access if C<ProtectSystem=strict> is used. Paths listed in
-C<InaccessiblePaths> will be made inaccessible for processes inside the namespace (along with
-everything below them in the file system hierarchy).
+specific paths for write access if C<ProtectSystem=strict> is used.
+
+Paths listed in C<InaccessiblePaths> will be made inaccessible for processes inside
+the namespace along with everything below them in the file system hierarchy. This may be more restrictive than
+desired, because it is not possible to nest C<ReadWritePaths>, C<ReadOnlyPaths>,
+C<BindPaths>, or C<BindReadOnlyPaths> inside it. For a more flexible option,
+see C<TemporaryFileSystem>.
 
 Note that restricting access with these options does not extend to submounts of a directory that are
 created later on.  Non-directory paths may be specified as well. These options may be specified more than once,
@@ -1840,6 +1869,34 @@ settings may be undone by privileged processes. In order to set up an effective 
 unit it is thus recommended to combine these settings with either
 C<CapabilityBoundingSet=~CAP_SYS_ADMIN> or
 C<SystemCallFilter=~@mount>.',
+        'type' => 'list'
+      },
+      'TemporaryFileSystem',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => 'Takes a space-separated list of mount points for temporary file systems (tmpfs). If set, a new file
+system namespace is set up for executed processes, and a temporary file system is mounted on each mount point.
+This option may be specified more than once, in which case temporary file systems are mounted on all listed mount
+points. If the empty string is assigned to this option, the list is reset, and all prior assignments have no effect.
+Each mount point may optionally be suffixed with a colon (C<:>) and mount options such as
+C<size=10%> or C<ro>. By default, each temporary file system is mounted
+with C<nodev,strictatime,mode=0755>. These can be disabled by explicitly specifying the corresponding
+mount options, e.g., C<dev> or C<nostrictatime>.
+
+This is useful to hide files or directories not relevant to the processes invoked by the unit, while necessary
+files or directories can be still accessed by combining with C<BindPaths> or
+C<BindReadOnlyPaths>. See the example below.
+
+Example: if a unit has the following,
+
+    TemporaryFileSystem=/var:ro
+    BindReadOnlyPaths=/var/lib/systemd
+
+then the invoked processes by the unit cannot see any files or directories under /var except for
+/var/lib/systemd or its contents.',
         'type' => 'list'
       },
       'PrivateTmp',
@@ -2257,17 +2314,19 @@ be terminated immediately when the filter is triggered.',
 filter. The known architecture identifiers are the same as for C<ConditionArchitecture>
 described in L<systemd.unit(5)>,
 as well as C<x32>, C<mips64-n32>, C<mips64-le-n32>, and
-the special identifier C<native>. Only system calls of the specified architectures will be
-permitted to processes of this unit. This is an effective way to disable compatibility with non-native
-architectures for processes, for example to prohibit execution of 32-bit x86 binaries on 64-bit x86-64
-systems. The special C<native> identifier implicitly maps to the native architecture of the
-system (or more strictly: to the architecture the system manager is compiled for). If running in user mode, or
-in system mode, but without the C<CAP_SYS_ADMIN> capability (e.g. setting
-C<User=nobody>), C<NoNewPrivileges=yes> is implied. Note that setting this
-option to a non-empty list implies that C<native> is included too. By default, this option is
-set to the empty list, i.e. no system call architecture filtering is applied.
+the special identifier C<native>.  The special identifier C<native>
+implicitly maps to the native architecture of the system (or more precisely: to the architecture the system
+manager is compiled for). If running in user mode, or in system mode, but without the
+C<CAP_SYS_ADMIN> capability (e.g. setting C<User=nobody>),
+C<NoNewPrivileges=yes> is implied. By default, this option is set to the empty list, i.e. no
+system call architecture filtering is applied.
 
-Note that system call filtering is not equally effective on all architectures. For example, on x86
+If this setting is used, processes of this unit will only be permitted to call native system calls, and
+system calls of the specified architectures. For the purposes of this option, the x32 architecture is treated
+as including x86-64 system calls. However, this setting still fulfills its purpose, as explained below, on
+x32.
+
+System call filtering is not equally effective on all architectures. For example, on x86
 filtering of network socket-related calls is not possible, due to ABI limitations \x{2014} a limitation that x86-64
 does not have, however. On systems supporting multiple ABIs at the same time \x{2014} such as x86/x86-64 \x{2014} it is hence
 recommended to limit the set of permitted system call architectures so that secondary ABIs may not be used to

@@ -1,3 +1,5 @@
+Release 2.1.27: 18/03/29
+Don't assume . is in @INC.
 
 Release 2.1.26: 2016/08/26
 regex fixed: 5.25.x complained about an unescaped {

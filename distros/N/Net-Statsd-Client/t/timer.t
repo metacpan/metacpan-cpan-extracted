@@ -28,6 +28,6 @@ sends_ok {
 my $timer = $client->timer('foo');
 sleep 0.1;
 my $elapsed_ms = $timer->finish;
-ok( $elapsed_ms > 100, "timer->finish returned elapsed ms");
+ok( $elapsed_ms >= 99, "timer->finish returned elapsed ms");
 
 done_testing;

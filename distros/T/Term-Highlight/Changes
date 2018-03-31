@@ -76,3 +76,6 @@ Revision history for Perl module Term::Highlight and script hl.
 2016/07/22 - Version 1.9.4 - optimization: always pre-check that line matches.
                 Highlight.pm version 1.8 - minor cleanup.
 
+2018/03/29 - Version 2.0.0 - fixed color tags offsets at ends of lines
+                with better support for "\r\n" line endings.
+

@@ -1,16 +1,16 @@
 {
-   "abstract" : "Provides a geocoding functionality using free databases of towns",
+   "abstract" : "Provides a geocoding functionality using free databases",
    "author" : [
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Geo-Coder-Free",
    "no_index" : {
@@ -23,7 +23,12 @@
       "build" : {
          "requires" : {
             "App::csv2sqlite" : "0",
-            "File::Copy" : "0"
+            "DBD::SQLite" : "0",
+            "File::Copy" : "0",
+            "IPC::System::Simple" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent::Throttled" : "0",
+            "autodie" : "0"
          }
       },
       "configure" : {
@@ -33,13 +38,19 @@
       },
       "runtime" : {
          "requires" : {
+            "CHI" : "0",
             "DBD::CSV" : "0",
             "DBI" : "0",
-            "Error::Simple" : "0",
+            "Digest::MD5" : "0",
+            "Encode" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "File::pfopen" : "0.02",
+            "Geo::StreetAddress::US" : "0",
             "Gzip::Faster" : "0",
+            "Locale::CA" : "0",
+            "Locale::Country" : "0",
+            "Locale::US" : "0",
             "Module::Info" : "0",
             "Text::xSV::Slurp" : "0",
             "perl" : "5.006002"
@@ -66,6 +77,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-Free"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

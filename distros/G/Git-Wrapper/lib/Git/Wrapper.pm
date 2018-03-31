@@ -4,7 +4,7 @@ use warnings;
 
 package Git::Wrapper;
 #ABSTRACT: Wrap git(7) command-line interface
-$Git::Wrapper::VERSION = '0.047';
+$Git::Wrapper::VERSION = '0.048';
 our $DEBUG=0;
 
 # Prevent ANSI color with extreme prejudice
@@ -36,8 +36,8 @@ sub new {
   if ( scalar @_ == 1 ) {
     my $arg = shift;
     if ( ref $arg eq 'HASH' ) { $args = $arg }
-    elsif ( blessed $arg )    { $args = { dir => "$arg" } }  # my objects, let me
-                                                             # show you them.
+    elsif ( blessed $arg )    { $args = { dir => "$arg" } } # my objects, let me
+                                                            # show you them.
     elsif ( ! ref $arg )      { $args = { dir =>  $arg  } }
     else { die "Single arg must be hashref, scalar, or stringify-able object" }
   }
@@ -67,6 +67,14 @@ sub AUTOLOAD {
 
 sub ERR { shift->{err} }
 sub OUT { shift->{out} }
+
+sub AUTOPRINT {
+    my $self = shift;
+
+    $self->{autoprint} = shift if @_;
+
+    return $self->{autoprint};
+}
 
 sub RUN {
   my $self = shift;
@@ -132,11 +140,14 @@ sub RUN {
     );
   }
 
-  chomp(@err);
   $self->{err} = \@err;
-
-  chomp(@out);
   $self->{out} = \@out;
+
+  if( $self->{autoprint} ) {
+      print $_, "\n" for @out;
+
+      warn $_, "\n" for @err;
+  }
 
   return @out;
 }
@@ -283,7 +294,7 @@ sub supports_hash_object_filters {
   my $self = shift;
 
   # The '--no-filters' option to 'git-hash-object' was added in version 1.6.1
-  return 0 if ( versioncmp( $self->version , '1.6.1' ) eq -1 );
+  return 0 if ( versioncmp( $self->version , '1.6.1' ) == -1 );
   return 1;
 }
 
@@ -291,14 +302,14 @@ sub supports_log_no_abbrev_commit {
   my $self = shift;
 
   # The '--no-abbrev-commit' option to 'git log' was added in version 1.7.6
-  return ( versioncmp( $self->version , '1.7.6' ) eq -1 ) ? 0 : 1;
+  return ( versioncmp( $self->version , '1.7.6' ) == -1 ) ? 0 : 1;
 }
 
 sub supports_log_no_expand_tabs {
   my $self = shift;
 
   # The '--no-expand-tabs' option to git log was added in version 2.9.0
-  return 0 if ( versioncmp( $self->version , '2.9' ) eq -1 );
+  return 0 if ( versioncmp( $self->version , '2.9' ) == -1 );
   return 1;
 }
 
@@ -306,7 +317,7 @@ sub supports_log_raw_dates {
   my $self = shift;
 
   # The '--date=raw' option to 'git log' was added in version 1.6.2
-  return 0 if ( versioncmp( $self->version , '1.6.2' ) eq -1 );
+  return 0 if ( versioncmp( $self->version , '1.6.2' ) == -1 );
   return 1;
 }
 
@@ -314,7 +325,7 @@ sub supports_status_porcelain {
   my $self = shift;
 
   # The '--porcelain' option to git status was added in version 1.7.0
-  return 0 if ( versioncmp( $self->version , '1.7' ) eq -1 );
+  return 0 if ( versioncmp( $self->version , '1.7' ) == -1 );
   return 1;
 }
 
@@ -415,7 +426,7 @@ Git::Wrapper - Wrap git(7) command-line interface
 
 =head1 VERSION
 
-version 0.047
+version 0.048
 
 =head1 SYNOPSIS
 
@@ -426,7 +437,7 @@ version 0.047
 
   # specify which git binary to use
   my $git = Git::Wrapper->new({
-    dir        => '/var/foo ,
+    dir        => '/var/foo' ,
     git_binary => '/path/to/git/bin/git' ,
   });
 
@@ -507,7 +518,7 @@ yourself before passing it to C<Git::Wrapper> methods.
 =head2 Error handling
 
 If a git command exits nonzero, a C<Git::Wrapper::Exception> object will be
-thrown (via C<die>) and may be capture via C<eval> or L<Try::Tiny>, for
+thrown (via C<die>) and may be captured via C<eval> or L<Try::Tiny>, for
 example.
 
 The error object has three useful methods:
@@ -528,7 +539,7 @@ C<git> will frequently not have any output with a successful command.
 
 =item * status
 
-Returns the non-zero exit code reported by git on error
+Returns the non-zero exit code reported by git on error.
 
 =back
 
@@ -597,6 +608,10 @@ RECOMMENDED!>
   # To force the git binary location
   my $git = Git::Wrapper->new($dir, 'git_binary' => '/usr/local/bin/git');
 
+  # prints the content of OUT and ERR to STDOUT and STDERR
+  # after a command is run
+  my $git = Git::Wrapper->new($dir, autoprint => 1);
+
 =head2 git
 
   print $git->git; # /path/to/git/binary/being/used
@@ -647,7 +662,7 @@ Only populated with when C<< raw => 1 >> option is set; see L<Raw logs> below.
 Calling the C<log> method with the C<< raw => 1 >> option set, as below, will
 do additional parsing to populate the C<modifications> attribute on each
 C<Git::Wrapper::Log> object. This method returns a list of
-C<Git::Wrapper::File::RawModification> objects, with can be used to get
+C<Git::Wrapper::File::RawModification> objects, which can be used to get
 filenames, permissions, and other metadata associated with individual files in
 the given commit. A short example, to loop over all commits in the log and
 print the filenames that were changed in each commit, one filename per file:
@@ -740,7 +755,7 @@ There are four status groups, each of which may contain zero or more changes.
 
 =back
 
-Note that a single file can occur in more than one group. Eg, a modified file
+Note that a single file can occur in more than one group. E.g., a modified file
 that has been added to the index will appear in the 'indexed' list. If it is
 subsequently further modified it will additionally appear in the 'changed'
 group.
@@ -762,7 +777,7 @@ an empty string.
 Indicates what has changed about the file.
 
 Within each group (except 'conflict') a file can be in one of a number of
-modes, although some modes only occur in some groups (eg, 'added' never appears
+modes, although some modes only occur in some groups (e.g., 'added' never appears
 in the 'unknown' group).
 
 =over
@@ -847,6 +862,11 @@ values, and then a list of any other arguments.
 
     # getting the full of commit SHAs via `git log` by using the '--format' option
     my @log_lines = $git->RUN('log', '--format=%H');
+
+=head2 AUTOPRINT( $enabled )
+
+If set to C<true>, the content of C<OUT> and C<ERR> will automatically
+be printed on, respectively, STDOUT and STDERR after a command is run.
 
 =head2 ERR
 

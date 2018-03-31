@@ -55,7 +55,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/HTTP-Message/issues
   homepage: https://github.com/libwww-perl/HTTP-Message
   repository: https://github.com/libwww-perl/HTTP-Message.git
-version: '6.15'
+version: '6.16'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -155,7 +155,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InstallGuide
       name: '@Author::OALDERS/InstallGuide'
-      version: '1.200007'
+      version: '1.200009'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::OALDERS/ExecDir'
@@ -416,7 +416,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v6.15
+          tag: v6.16
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

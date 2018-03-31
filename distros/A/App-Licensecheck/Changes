@@ -7,6 +7,39 @@ Home page:    <https://metacpan.org/pod/App::Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.0.34	2018-03-29
+
+ [ Bug Fixes ]
+ - Fix support uncompiled patterns from Regexp::Pattern::License.
+ - Fix tighten license key loop (skip eventual DefHash attributes).
+ - Fix tighten version matching: Wrap in group when optional.
+ - Fix word-based comment removal.
+
+ [ Documentation ]
+ - Extend TODO with more ideas.
+
+ [ Test Suite ]
+ - Demote ScanCode tests to maintainer tests.
+ - Fix Software-License test to match license shortnames (not captions
+   which are not fixed).
+ - Relax devscripts test to match SPDX-style license captions as supported
+   post Regexp::Patterns::License v3.1.0.
+ - Testsuite speed boost: Parse skipfile once per set, not once per file in
+   each set.
+ - Testsuite: Add function license_like.
+ - Testsuite: handle alternative name of license bdwgc → MIT~Boehm post
+   Regexp::Pattern::License v3.1.0.
+
+ [ Other ]
+ - Generalize singleversion patterns.
+ - Resolve license patterns as Debian → SPDX → generic (not just Debian →
+   generic) to support less SPDX-centric names post
+   Regexp::Pattern::License v3.1.0.
+ - Simplify pattern tag resolving.
+ - Slight speed boost: Use eq (not regexp) for simple comparisons.
+ - Speed boost: Fix load regexp patterns once (not once or twice per file).
+ - Use regexp patterns as-is (avoid recompiling).
+
 v3.0.33	2018-02-15
 
  [ Test Suite ]

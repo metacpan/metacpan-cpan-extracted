@@ -1,6 +1,6 @@
 package Map::Tube::London;
 
-$Map::Tube::London::VERSION   = '0.98';
+$Map::Tube::London::VERSION   = '0.99';
 $Map::Tube::London::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::London - Interface to the London Tube Map.
 
 =head1 VERSION
 
-Version 0.98
+Version 0.99
 
 =cut
 
@@ -20,12 +20,12 @@ use File::Share ':all';
 use Moo;
 use namespace::autoclean;
 
-has json => (is => 'ro', default => sub { return dist_file('Map-Tube-London', 'london-map.json') });
-has skip => (is => 'ro', default => sub { _skip(); });
+has json => (is => 'lazy');
+has skip => (is => 'lazy');
 with 'Map::Tube';
 
-sub _skip {
-
+sub _build_json { dist_file('Map-Tube-London', 'london-map.json') }
+sub _build_skip {
     return {
         'Jubilee'  => {
             'Baker Street'  => { 'Finchley Road' => 1 },

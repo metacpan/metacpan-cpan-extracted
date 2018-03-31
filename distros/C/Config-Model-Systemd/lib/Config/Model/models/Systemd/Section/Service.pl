@@ -18,7 +18,7 @@
       }
     ],
     'class_description' => 'A unit configuration file whose name ends in
-.service encodes information about a process
+C<.service> encodes information about a process
 controlled and supervised by systemd.
 
 This man page lists the configuration options specific to
@@ -126,10 +126,10 @@ if used in combination with
 C<PrivateNetwork>C<yes>.
 
 Behavior of C<idle> is very similar to C<simple>; however, actual execution
-of the service binary is delayed until all active jobs are dispatched. This may be used to avoid interleaving
+of the service program is delayed until all active jobs are dispatched. This may be used to avoid interleaving
 of output of shell services with the status output on the console. Note that this type is useful only to
 improve console output, it is not useful as a general unit ordering tool, and the effect of this service type
-is subject to a 5s time-out, after which the service binary is invoked anyway.',
+is subject to a 5s time-out, after which the service program is invoked anyway.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -167,15 +167,14 @@ Defaults to C<yes>.',
       },
       'PIDFile',
       {
-        'description' => 'Takes an absolute filename pointing to the
-PID file of this daemon. Use of this option is recommended for
-services where C<Type> is set to
-C<forking>. systemd will read the PID of the
-main process of the daemon after start-up of the service.
-systemd will not write to the file configured here, although
-it will remove the file after the service has shut down if it
-still exists.
-',
+        'description' => 'Takes an absolute path referring to the PID file of the service. Usage of this option is
+recommended for services where C<Type> is set to C<forking>. The service manager
+will read the PID of the main process of the service from this file after start-up of the service. The service
+manager will not write to the file configured here, although it will remove the file after the service has shut
+down if it still exists. The PID file does not need to be owned by a privileged user, but if it is owned by an
+unprivileged user additional safety restrictions are enforced: the file may not be a symlink to a file owned by
+a different user (neither directly nor indirectly), and the PID file must refer to a process already belonging
+to the service.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -604,7 +603,8 @@ Note that service restart is subject to unit start rate
 limiting configured with C<StartLimitIntervalSec>
 and C<StartLimitBurst>, see
 L<systemd.unit(5)>
-for details.
+for details.  A restarted service enters the failed state only
+after the start limits are reached.
 
 Setting this to C<on-failure> is the
 recommended choice for long-running services, in order to
@@ -828,6 +828,41 @@ C<USBFunctionDescriptors>
 above.',
         'type' => 'leaf',
         'value_type' => 'uniline'
+      },
+      'FailureAction',
+      {
+        'status' => 'deprecated',
+        'type' => 'leaf',
+        'value_type' => 'uniline',
+        'warn' => 'FailureAction is now part of Unit. Migrating...'
+      },
+      'SuccessAction',
+      {
+        'status' => 'deprecated',
+        'type' => 'leaf',
+        'value_type' => 'uniline',
+        'warn' => 'SuccessAction is now part of Unit. Migrating...'
+      },
+      'StartLimitBurst',
+      {
+        'status' => 'deprecated',
+        'type' => 'leaf',
+        'value_type' => 'uniline',
+        'warn' => 'StartLimitBurst is now part of Unit. Migrating...'
+      },
+      'StartLimitInterval',
+      {
+        'status' => 'deprecated',
+        'type' => 'leaf',
+        'value_type' => 'uniline',
+        'warn' => 'service/StartLimitInterval is now Unit/StartLimitIntervalSec. Migrating...'
+      },
+      'RebootArgument',
+      {
+        'status' => 'deprecated',
+        'type' => 'leaf',
+        'value_type' => 'uniline',
+        'warn' => 'RebootArgument is now part of Unit. Migrating...'
       }
     ],
     'generated_by' => 'parse-man.pl from systemd doc',

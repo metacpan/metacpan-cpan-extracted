@@ -1,3 +1,15 @@
+0.18	- 30 Mar 2018, H.Merijn Brand
+    * Skip test that is documented to fail on older versions of DBD::CSV
+
+0.17	- 29 Mar 2018, H.Merijn Brand
+    * It's 2017
+    * Tested with perl-5.26.0
+    * Fix tests for perl without dot in @INC
+    * Document database restriction on idexed primary keys
+    * It's 2018
+    * Add support for DBD::MariaDB
+    * Tested with perl-5.8.3 .. 5.27.9 & most recent DBD's
+
 0.16	- 10 Oct 2015, H.Merijn Brand
     * Add CONTRIBUTING.md
     * Testing tables include test number

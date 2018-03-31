@@ -41,7 +41,7 @@ sub test_delete_a_cell {
 }
 
 sub test_delete_a_line {
-    my $line = shift;
+    my ($line, $last_line) = @_;
     my $fname = tmpnam();
     my @data = ();
     push @data, [ @$_ ] for @{CSV_DATA()};
@@ -56,10 +56,17 @@ sub test_delete_a_line {
     or diag "Tied File: " . Dumper(\@file) . "\n",
             "CSV Data: " . Dumper(\@data) . "\n";          
        
-    $data[$line] = [];
-    
+    if ($last_line) {
+        delete $data[$line];
+    } else {
+        $data[$line] = [];
+    }
+
     is_deeply \@file, \@data,
-              "Deletion of \$file[$line] should be the same as deleting in normal array";
+              "Deletion of \$file[$line] should be the same as deleting in normal array"
+    or diag "Tied File: " . Dumper(\@file) . "\n",
+            "CSV Data: " . Dumper(\@data) . "\n",
+            "delete in line $line (last_line=$last_line) of tmp file $fname\n";          
 
     untie @file;
     tie my @file2, 'Tie::CSV_File', $fname;
@@ -74,7 +81,8 @@ use Test::More tests => 60;
 my @csv_data = @{CSV_DATA()};
 foreach my $line (0 .. $#csv_data) {
     my @csv_line = @{$csv_data[$line]};
-    test_delete_a_line($line) if @{$csv_data[$line]};
+    my $last_line = $line == $#csv_data;
+    test_delete_a_line($line, $last_line) if @{$csv_data[$line]};
     foreach my $col (0 .. $#csv_line) {
         test_delete_a_cell($line,$col) if $csv_data[$line][$col];
     }

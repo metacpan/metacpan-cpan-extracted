@@ -1,4 +1,6 @@
 -----
+0.05: 30 Mar 2018
+    - Handle set_document_locator, which has magically started appearing
 0.04: 05 Jan 2017
     - Minor Kwalitee fixes
     - Remove // operator

@@ -1,5 +1,15 @@
 Revision history for CPANPLUS-Dist-Slackware
 
+1.027  2018-03-30 08:58:46 CEST
+
+  - Remove some files from the distribution.
+
+1.026  2018-03-30 08:24:28 CEST
+
+  - Support site installations in /usr/local. Example:
+    cpanp i Mojolicious --format=CPANPLUS::Dist::Slackware --installdirs=site
+  - Fix console output.
+
 1.025  2017-10-08 18:54:06 CEST
 
   - Support prefixes other than /usr, e.g. /opt/cperl.

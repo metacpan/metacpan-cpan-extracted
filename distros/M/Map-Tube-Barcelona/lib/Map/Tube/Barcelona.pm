@@ -1,6 +1,6 @@
 package Map::Tube::Barcelona;
 
-$Map::Tube::Barcelona::VERSION   = '0.55';
+$Map::Tube::Barcelona::VERSION   = '0.56';
 $Map::Tube::Barcelona::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Barcelona - Interface to the Barcelona Metro Map.
 
 =head1 VERSION
 
-Version 0.55
+Version 0.56
 
 =cut
 
@@ -20,9 +20,10 @@ use File::Share ':all';
 use Moo;
 use namespace::autoclean;
 
-has xml => (is => 'ro', default => sub { return dist_file('Map-Tube-Barcelona', 'barcelona-map.xml') });
-
+has xml => (is => 'lazy');
 with 'Map::Tube';
+
+sub _build_xml { dist_file('Map-Tube-Barcelona', 'barcelona-map.xml') }
 
 =head1 DESCRIPTION
 

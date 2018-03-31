@@ -7,11 +7,16 @@ do { my $x = {
                       },
        'runtime' => {
                       'requires' => {
+                                      'Digest' => '0',
+                                      'Exporter' => '0',
                                       'File::Spec::Functions' => '0',
                                       'FindBin' => '0',
+                                      'JSON::Validator' => '2.05',
                                       'Mojolicious' => '7.15',
                                       'Mojolicious::Plugin::OpenAPI' => '1.22',
+                                      'Scalar::Util' => '0',
                                       'Sys::Hostname' => '0',
+                                      'Text::Balanced' => '0',
                                       'perl' => '5.010'
                                     }
                     },

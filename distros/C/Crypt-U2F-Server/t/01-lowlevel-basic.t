@@ -27,7 +27,7 @@ if(!$rc) {
 my $ctx = Crypt::U2F::Server::u2fclib_get_context();
 ok(defined($ctx), 'u2fclib_init ctx defined');
 ok($ctx > 0, 'u2fclib_init ctx != 0');
-diag("ctx pointer': $ctx");
+#diag("ctx pointer': $ctx");
 
 $rc = Crypt::U2F::Server::u2fclib_setAppID($ctx, 'Perl');
 is($rc, 1, 'u2fclib_setAppID');
@@ -49,7 +49,7 @@ if(!length($challenge)) {
 
 my $parsed = JSON::XS->new->utf8->decode($challenge);
 ok(defined($parsed), 'Parsing JSON string');
-diag(Dumper(\$parsed));
+#diag(Dumper(\$parsed));
 
 foreach my $key (qw[challenge version appId]) {
     ok(defined($parsed->{$key}), "Defined: $key");

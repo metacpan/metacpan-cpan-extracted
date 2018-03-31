@@ -1,5 +1,5 @@
 package Statocles::App::Static;
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 # ABSTRACT: (DEPRECATED) Manage static files like CSS, JS, images, and other untemplated content
 
 use Statocles::Base 'Class';
@@ -15,9 +15,9 @@ with 'Statocles::App';
 
 has store => (
     is => 'ro',
-    isa => Store,
+    isa => StoreType,
     required => 1,
-    coerce => Store->coercion,
+    coerce => StoreType->coercion,
 );
 
 #pod =method pages
@@ -59,7 +59,7 @@ Statocles::App::Static - (DEPRECATED) Manage static files like CSS, JS, images, 
 
 =head1 VERSION
 
-version 0.091
+version 0.092
 
 =head1 DESCRIPTION
 

@@ -29,9 +29,11 @@ use Google::Ads::AdWords::v201802::CampaignFeedOperation;
 use Google::Ads::AdWords::v201802::Feed;
 use Google::Ads::AdWords::v201802::FeedAttribute;
 use Google::Ads::AdWords::v201802::FeedItem;
+use Google::Ads::AdWords::v201802::FeedItemAdGroupTarget;
 use Google::Ads::AdWords::v201802::FeedItemAttributeValue;
 use Google::Ads::AdWords::v201802::FeedItemGeoRestriction;
 use Google::Ads::AdWords::v201802::FeedItemOperation;
+use Google::Ads::AdWords::v201802::FeedItemTargetOperation;
 use Google::Ads::AdWords::v201802::FeedMapping;
 use Google::Ads::AdWords::v201802::FeedMappingOperation;
 use Google::Ads::AdWords::v201802::FeedOperation;
@@ -51,11 +53,13 @@ use constant PLACEHOLDER_FIELD_SITELINK_LINE_3_TEXT => 4;
 
 # Replace with valid values of your account.
 my $campaign_id = "INSERT_CAMPAIGN_ID_HERE";
+# Optional: Ad group to restrict targeting to. Set to undef to not use it.
+my $ad_group_id = "INSERT_AD_GROUP_ID_HERE";
 my $feed_name   = "INSERT_FEED_NAME_HERE";
 
 # Example main subroutine.
 sub add_site_links_using_feeds {
-  my ($client, $campaign_id, $feed_name) = @_;
+  my ($client, $campaign_id, $ad_group_id, $feed_name) = @_;
 
   my $site_links_data = {
     "siteLinksFeedId"             => 0,
@@ -180,7 +184,7 @@ sub create_site_links_feed_items {
   foreach my $feed_item (@{$result->get_value()}) {
     printf "FeedItem with feedItemId %d was added.\n",
       $feed_item->get_feedItemId();
-    push $site_links_data->{"feedItemIds"}, $feed_item->get_feedItemId();
+    push @{$site_links_data->{"feedItemIds"}}, $feed_item->get_feedItemId();
   }
 }
 
@@ -323,6 +327,32 @@ sub create_site_links_campaign_feed {
 
   printf "Campaign with ID %d was associated with feed with ID %d.\n",
     $campaign_feed->get_campaignId(), $campaign_feed->get_feedId();
+
+  # Optional: Restrict the first feed item to only service with ads for the
+  # specified ad group ID.
+  if ($ad_group_id) {
+    my $feed_item_target =
+      Google::Ads::AdWords::v201802::FeedItemAdGroupTarget->new({
+        feedId => $site_links_data->{"siteLinksFeedId"},
+        feedItemId => $site_links_data->{"feedItemIds"}->[0],
+        adGroupId => $ad_group_id
+      });
+
+    my $result = $client->FeedItemTargetService()->mutate({
+        operations => [
+          Google::Ads::AdWords::v201802::FeedItemTargetOperation->new({
+              operand  => $feed_item_target,
+              operator => "ADD"
+            })]});
+
+    $feed_item_target = $result->get_value(0);
+
+    printf("Feed item target for feed ID %d and feed item ID %d" .
+           " was created to restrict serving to ad group ID %d\n",
+           $feed_item_target->get_feedId(),
+           $feed_item_target->get_feedItemId(),
+           $feed_item_target->get_adGroupId());
+  }
 }
 
 # Don't run the example if the file is being included.
@@ -340,4 +370,4 @@ my $client = Google::Ads::AdWords::Client->new({version => "v201802"});
 $client->set_die_on_faults(1);
 
 # Call the example
-add_site_links_using_feeds($client, $campaign_id, $feed_name);
+add_site_links_using_feeds($client, $campaign_id, $ad_group_id, $feed_name);

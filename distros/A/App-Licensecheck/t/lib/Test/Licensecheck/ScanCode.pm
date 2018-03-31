@@ -166,15 +166,14 @@ sub are_licensed_like_scancode ($;$$)
 
 	#note explain $licenses;
 
+	my $skiplist = parse_skipfile( $skipfile, $testpaths );
+
 	for (
 		sort { lc($a) cmp lc($b) }
 		map  { path($corpus)->child($_)->children } @{$testpaths}
 		)
 	{
-		is_licensed_like_scancode(
-			$_, $licenses,
-			parse_skipfile( $skipfile, $testpaths ), $overrides
-		);
+		is_licensed_like_scancode( $_, $licenses, $skiplist, $overrides );
 	}
 }
 

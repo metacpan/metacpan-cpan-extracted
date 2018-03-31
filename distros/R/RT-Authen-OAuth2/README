@@ -1,0 +1,70 @@
+NAME
+    RT-Authen-OAuth2 - External authentication for OAuth 2 sources, like
+    Google, Twitter, GitHub, etc.
+
+DESCRIPTION
+    External authentication for OAuth2 sources.
+
+RT VERSION
+    Works with RT 4.4
+
+DEPENDENCIES
+    Requires Net::OAuth2::Profile::WebServer
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Plugin('RT::Authen::OAuth2');
+
+    Add / Edit OAuth2 configs found in OAuth2_Config.pm
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-RT-Authen-OAuth2@rt.cpan.org|mailto:bug-RT-Authen-OAuth2@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Authen-OAuth2>.
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2016 by Best Practical Solutions LLC
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+
+METHODS
+  RequestAuthorization()
+        Creates an Authorization Request on behalf of the Resource Owner
+        (user), and initiates the OAuth 2 protocol with the Authorization
+        Server. The browser will redirect to the $OAuthRedirect endpoint
+        specified in the config.
+
+  LogUserIn()
+        Called from the $OAuthRedirect endpoint handler element. Validates
+        the user exists and is allowed to log in, auto-populates user
+        metadata returned from the OAuth 2 server, and sets up a session. If
+        successful, returns to the handler template element to redirect to
+        the final destination.
+
+  IDPLoginButtonImage()
+        Returns the appropriate login button image for the active OAuth 2
+        server. This is displayed on the RT login page.
+
+  LogOutURL()
+        Returns the appropriate logout URL active OAuth 2 server.
+

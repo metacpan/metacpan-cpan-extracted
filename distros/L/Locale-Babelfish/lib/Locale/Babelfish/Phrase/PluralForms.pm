@@ -14,7 +14,7 @@ use Locale::Babelfish::Phrase::Compiler ();
 
 use parent qw( Locale::Babelfish::Phrase::Node );
 
-our $VERSION = '2.004'; # VERSION
+our $VERSION = '2.005'; # VERSION
 
 __PACKAGE__->mk_accessors( qw( forms name compiled locale ) );
 
@@ -87,7 +87,7 @@ Locale::Babelfish::Phrase::PluralForms - Babelfish AST pluralization node.
 
 =head1 VERSION
 
-version 2.004
+version 2.005
 
 =head1 METHODS
 
@@ -116,6 +116,10 @@ Victor Efimov <efimov@reg.ru>
 =item *
 
 REG.RU LLC
+
+=item *
+
+Kirill Sysoev <k.sysoev@me.com>
 
 =back
 

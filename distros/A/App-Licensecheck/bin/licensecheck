@@ -25,11 +25,11 @@ licensecheck - simple license checker for source files
 
 =head1 VERSION
 
-Version v3.0.33
+Version v3.0.34
 
 =cut
 
-our $VERSION = version->declare("v3.0.33");
+our $VERSION = version->declare("v3.0.34");
 
 binmode STDOUT, ':utf8';
 

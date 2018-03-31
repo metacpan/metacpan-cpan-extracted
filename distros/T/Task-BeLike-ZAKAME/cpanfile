@@ -12,6 +12,7 @@ requires 'CPAN::Uploader';
 requires 'Data::Printer';
 requires 'Devel::Confess';
 requires 'Import::Base';
+requires 'Log::Any';
 requires 'Minilla';
 requires 'Mojolicious';
 requires 'Moo';
@@ -26,6 +27,8 @@ requires 'Type::Tiny';
 requires 'Version::Next';
 requires 'Net::Async::HTTP';
 
+recommends 'indirect';
+recommends 'perlsecret';
 recommends 'App::rainbarf';
 recommends 'App::scan_prereqs_cpanfile';
 recommends 'App::Nopaste';
@@ -38,6 +41,7 @@ recommends 'LWP::Protocol::rsync';
 recommends 'Paws';
 recommends 'Perl::Critic';
 recommends 'Perl::Critic::Freenode';
+recommends 'Term::ReadLine::Gnu';
 recommends 'Web::Query';
 
 on 'test' => sub {

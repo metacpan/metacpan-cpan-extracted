@@ -13,7 +13,7 @@ use File::Basename qw(dirname);
 use Scalar::Util qw(weaken);
 use IPC::ConcurrencyLimit::WithStandby;
 
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 
 # Accessor building
 my @accessors = qw(
@@ -907,7 +907,7 @@ sub _create_dir {
         }
 
         make_path($dir, $make_path_args);
-        @$errors and $self->die("failed make_path: " . join(' ', map { keys $_, values $_ } @$errors));
+        @$errors and $self->die("failed make_path: " . join(' ', map { keys %$_, values %$_ } @$errors));
         $self->trace("Created dir ($dir)");
     }
 }

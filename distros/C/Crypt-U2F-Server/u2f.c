@@ -54,7 +54,7 @@
 
 char *p;
 char errorstring[10000];
-char regdata[20000];
+char kh[1000];
 
 char* u2fclib_getError(void) {
     return errorstring;
@@ -171,25 +171,21 @@ char* u2fclib_calcAuthenticationChallenge(void* ctx) {
     return p;
 }
 
-char* u2fclib_verifyRegistration(void* ctx, char* buf) {
-  u2fs_rc rc;
+char* u2fclib_verifyRegistration(void* ctx, char* buf, char** pk) {
+    u2fs_rc rc;
     u2fs_reg_res_t *reg_result;
+    int i;
 
     rc = u2fs_registration_verify(ctx, buf, &reg_result);
     if (rc != U2FS_OK) {
         sprintf(errorstring, "error (%d): %s", rc, u2fs_strerror(rc));
       return 0;
     }
-    const char *k = u2fs_get_registration_publicKey(reg_result);
-    memcpy(regdata, k, U2FS_PUBLIC_KEY_LEN);
-    regdata[U2FS_PUBLIC_KEY_LEN] = 0;
+    memcpy(pk, u2fs_get_registration_publicKey(reg_result), U2FS_PUBLIC_KEY_LEN);
 
-    strcat(regdata, "##DELIMITER##");
-    strcat(regdata, u2fs_get_registration_keyHandle(reg_result));
+    strncpy(kh, u2fs_get_registration_keyHandle(reg_result), 1000);
+    return kh;
 
-    //sprintf(regdata.keyHandle, "%s", u2fs_get_registration_keyHandle(reg_result));
-
-    return regdata;
 }
 
 int u2fclib_verifyAuthentication(void* ctx, char* buf) {
@@ -225,3 +221,5 @@ int u2fclib_deInit(void) {
   u2fs_global_done();
   return 1;
 }
+
+

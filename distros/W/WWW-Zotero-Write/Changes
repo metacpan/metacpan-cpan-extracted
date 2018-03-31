@@ -5,4 +5,5 @@ Revision history for Perl module WWW::Zotero::Write
 0.02 2017.07.06: 
     - last_modified_version in header also sent when items are updated
 0.03 2017.09.06 Updated synopsis
+0.04 2018.03.29 UpdateCollections to update an array of collection given by their keys
 

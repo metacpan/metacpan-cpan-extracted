@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3988c6171da148c67828a03226cdc98517594698 Changes
+SHA1 4cc77b90af91e615a64ae04893fdffa7939db84c LICENSE
+SHA1 c3f15c18d768f8b70fd171d3b13be80138cbe8e5 MANIFEST
+SHA1 02f6f212f4ff4c324fbe53b10698cfef757245e3 META.yml
+SHA1 bd7050f85ee8d78e931b0645e5e9e0330c580b48 Makefile.PL
+SHA1 c4deb47488835f281801759b1465e89365bf11c2 README
+SHA1 92d9660a3265b1a499aa5146e41376f1dfc3e625 etc/OAuth2_Config.pm
+SHA1 7aff7809efaff0a40ff10701664b8fa3ef5e216e html/Callbacks/OAuth/Elements/Login/Default
+SHA1 87e92238e4f7ae4cfa628575edde85e8a708ca04 html/Callbacks/OAuth/NoAuth/Logout.html/Default
+SHA1 ae5433cca3e7e7d4214f4ecea8f56e06c2565046 html/Callbacks/OAuth/NoAuth/Logout.html/ModifyLoginRedirect
+SHA1 20bae5f23785a0c146381397a2f8de4fd2e73afb html/NoAuth/OAuth
+SHA1 88ddef0a8f04e03d28e75b62eedbe6cda4829348 html/NoAuth/OAuthRedirect
+SHA1 c3f8f9f2a209f80b7ca3c8af3a6b1b7b408ad620 inc/Module/Install.pm
+SHA1 de30b539a326675c42e6ad360fddb05902d621be inc/Module/Install/Base.pm
+SHA1 81fffeca82bcd7100d8435b139f0780fcc5cdf9c inc/Module/Install/Can.pm
+SHA1 b4dd9cb3cf0cb60390c575bd3405e2297d4a0b1a inc/Module/Install/Fetch.pm
+SHA1 85254e101a40b265981d7165d2b8cf0277ebfed2 inc/Module/Install/Include.pm
+SHA1 b84cf97b12f8e5ef37bea54e33ddce32dff804d1 inc/Module/Install/Makefile.pm
+SHA1 0d9fd69718198fcd1560214c4f23fcaa44f8395e inc/Module/Install/Metadata.pm
+SHA1 0771221f89b940bd9523987126a5ad8938f2eade inc/Module/Install/RTx.pm
+SHA1 a17d6d01c9da7a5bed6fcef0038727e63d9b932a inc/Module/Install/RTx/Runtime.pm
+SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
+SHA1 99b8179fbd9e05422b161cf91abe198744188064 inc/Module/Install/Win32.pm
+SHA1 6a91e14bbecc64e9c8e2261dfa4b360641d152e4 inc/Module/Install/WriteAll.pm
+SHA1 61eb6159a86c81ec77f4a7ae9a177e187cad4634 inc/YAML/Tiny.pm
+SHA1 4cf583038a754bb2d9731d539c94ff5bab61cf81 lib/RT/Authen/OAuth2.pm
+SHA1 dbaef397986f8f64989dcd006e71ebeeeab3ed39 lib/RT/Authen/OAuth2/Google.pm
+SHA1 570d2d1248fdb89b703871ee54cbcf59d00262a0 lib/RT/Authen/OAuth2/Unimplemented.pm
+SHA1 a3866ae5f82a4114e9d5f80670357090bcd9ad8d static/images/btn_auth0_signin.png
+SHA1 79ed19930de9c19e2b65813f126b36bd2a135339 static/images/btn_google_signin_dark_normal_web.png
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.15 (Darwin)
+
+iQEcBAEBAgAGBQJau87UAAoJEI1a+/f/jPtrr9AH/Rs3MpF9eEQIainPZzohQ9wq
+e/EjNkzRhGNnsbwFMWVHsyyAhMyjQfb3GhJ9DiW70fAdmwYJBEXdlSvTnBJty7qP
++8mpOzmG4xZPovtn0W12qMDDTnIV8DCAcB36mf32NTePdOG4U6i3wFjwwIQWklGw
+SZOQRqYFVyeu+clZb0jQ/ytBMngLz432PUZpXG9mxLYFo2vhc5dm/XPXeq7goMTm
+LNOarWQQK9KzrAtJz5/5/ylDP23DmOFfUwYnMYnv9XkUEWB8Kr5uZHyj/ZUIDR6B
+UE+9S28zRWmy3DRg7knV5OunN2pfM5dWpxLbz0BCpzuN4/zle0P8ALwvTroAa7s=
+=x3zg
+-----END PGP SIGNATURE-----

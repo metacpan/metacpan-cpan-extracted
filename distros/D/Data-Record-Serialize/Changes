@@ -1,3 +1,44 @@
+0.15      2018-03-28 15:00:21-04:00 America/New_York
+
+  [BEHAVIOR CHANGE]
+
+    * the dbi backend now translates empty numeric fields into
+      NULL fields.
+
+  [ENHANCEMENT]
+
+    * empty fields may now optionally be turned into NULL values.
+      see the <nullify> attribute.
+
+
+    * new method <type_index>, returns fields with a given type
+
+
+0.14      2018-03-21 13:03:45-04:00 America/New_York
+
+  [API CHANGE]
+
+    * dbi encoder:
+
+      * The encoder no longer writes queued records at object
+        destruction.  If there is an error writing a record to the
+        database, an exception is raised. However, during object
+        destruction Perl effectively ignores exceptions, suppressing
+        notification of the failed writes.
+
+      * if the record queue is not empty at the time of object destruction,
+        a warning is issued.
+
+  [ENHANCEMENT]
+
+    * dbi encoder:
+
+        * the encoder provides the <flush> method, which explicitly writes
+          queued records to the database.
+
+        * The record queue is available via the <queue> method.
+
+
 0.13      2018-02-12 15:59:58-05:00 America/New_York
 
   [BUG FIX]

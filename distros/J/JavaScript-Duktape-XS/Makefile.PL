@@ -11,8 +11,9 @@ WriteMakefile(
         'XSLoader'    => 0,
     },
     TEST_REQUIRES  => {
-        'Test::More'            => 0,
-        'Data::Dumper'          => 0,
+        'Test::More'   => 0,
+        'Data::Dumper' => 0,
+        'Path::Tiny'   => 0,
     },
     AUTHOR         => [
         'Gonzalo Diethelm (gonzus@cpan.org)',

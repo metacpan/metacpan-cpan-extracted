@@ -2,7 +2,7 @@
 
 use Test2::V0;
 
-use lib 't/lib';
+use Test::Lib;
 
 use Data::Record::Serialize;
 
@@ -13,8 +13,9 @@ my ( $s, $buf );
 ok(
     lives {
         $s = Data::Record::Serialize->new(
-            encode => 'json',
-            output => \$buf,
+            encode  => 'json',
+            output  => \$buf,
+            nullify => ['c'],
           ),
           ;
     },
@@ -23,21 +24,32 @@ ok(
 
 $s->send( { a => 1, b => 2, c => 'nyuck nyuck' } );
 $s->send( { a => 1, b => 2 } );
+$s->send( { a => 1, b => 2, c => '' } );
 
 my @VAR1;
 
-ok( lives { @VAR1 = JSON->new->incr_parse( $buf ) }, 'deserialize record', ) or diag $@;
+ok( lives { @VAR1 = JSON->new->incr_parse( $buf ) }, 'deserialize record', )
+  or diag $@;
 
 is(
     \@VAR1,
-    [ {
-            a => '1',
-            b => '2',
-            c => 'nyuck nyuck',
+    [
+        hash {
+            field a => '1';
+            field b => '2';
+            field c => 'nyuck nyuck';
+            end;
         },
-        {
-            a => '1',
-            b => '2',
+        hash {
+            field a => '1';
+            field b => '2';
+            end;
+        },
+        hash {
+            field a => '1';
+            field b => '2';
+            field c => undef;
+           end;
         },
     ],
     'properly formatted'

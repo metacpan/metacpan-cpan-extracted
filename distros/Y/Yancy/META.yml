@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,53 +29,58 @@ no_index:
 provides:
   Mojolicious::Plugin::Yancy:
     file: lib/Mojolicious/Plugin/Yancy.pm
-    version: '1.002'
+    version: '1.003'
   Yancy:
     file: lib/Yancy.pm
-    version: '1.002'
+    version: '1.003'
   Yancy::Backend::Dbic:
     file: lib/Yancy/Backend/Dbic.pm
-    version: '1.002'
+    version: '1.003'
   Yancy::Backend::Mysql:
     file: lib/Yancy/Backend/Mysql.pm
-    version: '1.002'
+    version: '1.003'
   Yancy::Backend::Pg:
     file: lib/Yancy/Backend/Pg.pm
-    version: '1.002'
+    version: '1.003'
   Yancy::Backend::Sqlite:
     file: lib/Yancy/Backend/Sqlite.pm
-    version: '1.002'
+    version: '1.003'
   Yancy::Controller::Yancy:
     file: lib/Yancy/Controller/Yancy.pm
-    version: '1.002'
+    version: '1.003'
   Yancy::Controller::Yancy::API:
     file: lib/Yancy/Controller/Yancy/API.pm
-    version: '1.002'
+    version: '1.003'
   Yancy::Controller::Yancy::MultiTenant:
     file: lib/Yancy/Controller/Yancy/MultiTenant.pm
-    version: '1.002'
+    version: '1.003'
   Yancy::Plugin::Auth::Basic:
     file: lib/Yancy/Plugin/Auth/Basic.pm
-    version: '1.002'
+    version: '1.003'
   Yancy::Util:
     file: lib/Yancy/Util.pm
-    version: '1.002'
+    version: '1.003'
 requires:
+  Digest: '0'
+  Exporter: '0'
   File::Spec::Functions: '0'
   FindBin: '0'
+  JSON::Validator: '2.05'
   Mojolicious: '7.15'
   Mojolicious::Plugin::OpenAPI: '1.22'
+  Scalar::Util: '0'
   Sys::Hostname: '0'
+  Text::Balanced: '0'
   perl: '5.010'
 resources:
   IRC: irc://irc.perl.org/#yancy
   bugtracker: https://github.com/preaction/Yancy/issues
   homepage: https://github.com/preaction/Yancy
   repository: https://github.com/preaction/Yancy.git
-version: '1.002'
+version: '1.003'
 x_authority: cpan:PREACTION
 x_contributors:
+  - 'Ed J <mohawk2@users.noreply.github.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
-  - 'mohawk2 <mohawk2@users.noreply.github.com>'
   - 'William Lindley <wlindley@wlindley.com>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.73'

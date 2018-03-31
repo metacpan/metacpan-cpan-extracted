@@ -9,7 +9,7 @@ use XML::LibXSLT;
 use XML::LibXML;
 use File::Basename;
 use Hash::Merge;
-use Cwd qw(cwd abs_path getcwd);
+use Cwd qw(cwd abs_path getcwd realpath);
 use UUID::Tiny ':std';
 use File::Copy qw(copy);
 use File::Temp qw/ tempfile tempdir /;
@@ -18,7 +18,7 @@ use utf8;
 use Encode qw(encode_utf8 decode_utf8);
 use HTML::Entities;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 =head1 NAME
 
@@ -40,6 +40,11 @@ my %MODULES;
   'fb2.zip' => \$MODULES{'fb2'},
 );
 
+my @BlockLevel =
+('address','article','aside','blockquote','canvas','dd','div','dl','dt','fieldset','figcaption','figure','footer','form',
+'h1','h2','h3','h4','h5','h6',
+'header','hr','li','main','nav','noscript','ol','output','p','pre','section','table','tfoot','ul','video',
+);
 
 #Элементы, которые парсим в контенте и сохраняем в структуру 
 our $ElsMainList = {
@@ -56,10 +61,9 @@ our $ElsMainList = {
   'strong'=>undef, #разрешение переименованной ноды
 };
 
-
 my %AllowElementsMain = (
   'strong' => {
-    'allow_attributes' => [],
+    'allow_attributes' => ['id'],
     'allow_elements_inside' => $ElsMainList,
   },
   'underline' => {
@@ -80,7 +84,7 @@ my %AllowElementsMain = (
   },
   'p' => {
     'allow_attributes' => ['id'],
-    'allow_elements_inside' => $ElsMainList
+    'allow_elements_inside' => $ElsMainList,
   },
   'span' => {
     'allow_attributes' => ['id'],
@@ -97,18 +101,21 @@ my %AllowElementsMain = (
   },
   'ul' => {
     'allow_attributes' => ['id'],
-    'allow_elements_inside' => {'li'=>undef, 'title'=>undef, 'epigraph'=>undef}
+    'allow_elements_inside' => {'li'=>undef, 'title'=>undef, 'epigraph'=>undef},
   },
   'ol' => {
     'allow_attributes' => ['id'],
-    'allow_elements_inside' => {'li'=>undef, 'title'=>undef, 'epigraph'=>undef}
+    'allow_elements_inside' => {'li'=>undef, 'title'=>undef, 'epigraph'=>undef},
   },
   'li' => {
     'allow_attributes' => [],
-    'allow_elements_inside' => {'em'=>undef,a=>undef}
+    'allow_elements_inside' => {'em'=>undef,a=>undef},
   },
   'root_fb3_container' => {
     'allow_elements_inside' => {
+      'underline'=>undef,
+      'b'=>undef,
+      'strong'=>undef,
       'span'=>undef, 
       'div'=>undef,
       'b'=>undef,
@@ -315,10 +322,6 @@ my %GenreTranslate = (
   'visual_arts'=>'Изобразительное искусство, фотография',
 );
 
-# Local paths
-our $LocalPath = "/litres/www/WWWHub";
-our $XsdPath = $LocalPath.'/xsd/fb3';
-
 my $XSLT = XML::LibXSLT->new;
 my $XC = XML::LibXML::XPathContext->new();
 my $Parser = XML::LibXML->new();
@@ -379,7 +382,7 @@ sub new {
   $X->{'allow_elements'} = \%AllowElementsMain;
   $X->{'href_list'} = {}; #собираем ссылки в документе
   $X->{'id_list'} = {}; #собираем ссылки в документе
-  
+
   #Наша внутренняя структура данных конвертора. шаг влево  - расстрел
   $X->{'STRUCTURE'} = {
 
@@ -481,11 +484,10 @@ sub Reap {
   my $X = shift;
   my $Processor = $MODULES{$X->{'ClassName'}};
   my $File = $X->{'Source'};
-  
+
   $X->Msg("working with file ".$File."\n",'w',1) if $X->{'showname'} || $X->{'verbose'};
   $File = $Processor->{class}->_Unpacker($X,$File) if $Processor->{'unpack'};
-  
-  my $ProcStrcture = $Processor->{'class'}->Reaper($X, source => ($File || $X->{'Source'}));
+  $Processor->{'class'}->Reaper($X, source => ($File || $X->{'Source'}));
   return $X->{'STRUCTURE'};
 }
 
@@ -601,12 +603,15 @@ sub FB3Create {
     'id'=>$GlobalID,
   };
   my $Body = Obj2DOM($X,
-              obj=>{ attributes=>{CP_compact=>1},value=>{section=>{attributes=>{id=>$GlobalID}, value=>$Structure->{'PAGES'}->{'value'} }} },
+              obj=>{
+                attributes=>{CP_compact=>1},
+                value=>$Structure->{'PAGES'}->{'value'}
+              },
               root=>{name=>'fb3-body', attributes=>$BodyAttr}
             );  
   
   #финальное приведение section к валидному виду
-  foreach my $Section ($XC->findnodes( "/fb3-body/section/section/section", $Body), $XC->findnodes( "/fb3-body/section/section", $Body)) {
+  foreach my $Section ($XC->findnodes( "/fb3-body/section/section", $Body), $XC->findnodes( "/fb3-body/section", $Body)) {
     $Section = $X->Transform2Valid(node=>$Section);
   }
   
@@ -753,7 +758,7 @@ sub FB3_2_Zip {
 
   my $old_dir = cwd();
   chdir("$X->{'DestinationDir'}");
-  system("/usr/bin/zip -rq9 ".$X->{'DestinationFile'}." ./*");
+  system("/usr/bin/zip -rq9 '".$X->{'DestinationFile'}."' ./*");
   chdir $old_dir if $old_dir;
   Msg($X,"Delete dir after zip: $X->{'DestinationDir'}\n");
   ForceRmDir($X,$X->{'DestinationDir'});
@@ -902,8 +907,14 @@ sub Content2Tree {
   my $Content = $Obj->{'content'};
   my $File = $Obj->{'file'};
 
+  $Content = $X->trim($Content);
+
+  #ровняем пробелы у block-level
+  my $BlockRegExp = '('.(join "|", @BlockLevel).')';
+  $Content =~ s#\s*(</?$BlockRegExp[^>]*>)\s*#$1#gi;
+
   my $XMLDoc = XML::LibXML->new(
-      #expand_entities => 0, # не считать & за entity
+      expand_entities => 0, # не считать & за entity
       no_network => 1, # не будем тянуть внешние вложения
       recover => ($X->{'verbose'} && $X->{'verbose'} > 1 ? 1 : 2), # не падать при кривой структуре. например, не закрыт тег. entity и пр | => 1 - вопить, 2 - совсем молчать
       load_ext_dtd => 0, # полный молчок про dtd
@@ -1126,6 +1137,18 @@ sub trim {
   $str =~ s/\s+/ /g;
   $str =~ s/^\s*//;
   $str =~ s/\s*$//;
+  $str =~ s/^\t*//;
+  $str =~ s/\t*$//;
+  return $str;
+}
+
+sub trim_soft {
+  my $X = shift;
+  my $str = shift;
+  $str =~ s/^\s*//;
+  $str =~ s/\s*$//;
+  $str =~ s/^\t*//;
+  $str =~ s/\t*$//;
   return $str;
 }
 
@@ -1205,7 +1228,9 @@ sub Error {
 #проверка валидности полученного FB3
 sub Validate {
   my $X = shift;
-  my $ValidateDir = shift;
+  my %Args = @_;
+  my $ValidateDir = $Args{'path'};
+  my $XsdPath = $Args{'xsd'};
   
   my $Valid = FB3::Validator->new( $XsdPath );
   return $Valid->Validate($ValidateDir||$X->{'DestinationDir'});
@@ -1258,19 +1283,34 @@ sub Transform2Valid {
   my %Args = @_;
   my $Node = $Args{'node'};
 
-  foreach my $Child ($Node->getChildnodes) {
-    next if $Child->nodeName =~ /^(p|ul|ol|title|subtitle|section)$/;
-
-    if ($Child->toString =~ /^[\s\t\n\r]+$/) { #почистим пустые текстовые ноды
-      $Child->parentNode()->removeChild($Child);
-    } else {# остальные в <p>node</p>
-      my $NewNode = XML::LibXML::Element->new("p");
-      $NewNode->addChild($Child->cloneNode(1));
-      $Child->replaceNode($NewNode);
-    }
-  
+  my $NewNode = XML::LibXML::Element->new($Node->nodeName); #будем собирать новую ноду
+  foreach ($Node->getAttributes) { #скопируем атрибуты
+    $NewNode->setAttribute($_->name => $_->value);
   }
-  
+
+  my $Wrap = XML::LibXML::Element->new("p");
+
+  foreach my $Child ($Node->getChildnodes) {
+    if ($Child->nodeName =~ /^(p|ul|ol|title|subtitle|section)$/) {
+      if ($Wrap->hasChildNodes) {
+        #закроем текуший враппер и создадим новый
+        $NewNode->addChild($Wrap->cloneNode(1));
+        $Wrap = XML::LibXML::Element->new("p") if $Wrap->hasChildNodes;
+      }
+      #на текущие ноды не применяем враппер
+      $NewNode->addChild($Child->cloneNode(1));
+      next;
+    }
+
+    # остальные в <p>node</p>
+    $Wrap->addChild($Child->cloneNode(1));
+
+  }
+
+  #закрываем остатки враппера
+  $NewNode->addChild($Wrap->cloneNode(1)) if $Wrap->hasChildNodes;
+
+  $Node->replaceNode($NewNode);
   return $Node;
 }
 
@@ -1290,7 +1330,12 @@ sub BuildOuterMeta {
 
   my $MetaFile = $X->{'metadata'} if -s $X->{'metadata'};
 	if (-s $MetaFile) {
-    my $xpc = XML::LibXML::XPathContext->new($Parser->load_xml( location =>  $MetaFile ));
+    my $xpc = XML::LibXML::XPathContext->new($Parser->load_xml(
+      location =>  $MetaFile,
+      expand_entities => 0,
+      no_network => 1,
+      load_ext_dtd => 0
+    ));
     $xpc->registerNs('fbd', &NS_FB3_DESCRIPTION);
 		$ID = ($xpc->findnodes('/fbd:fb3-description')->[0])->getAttribute('id');
 	};
@@ -1340,6 +1385,73 @@ sub IsEmptyLineValue {
   return 0;
 }
 
+sub CutLinkDiez {
+  my $X = shift;
+  my $Str = shift;
+  $Str =~ s/^#//;
+  return $Str;
+}
+
+sub CorrectOuterLink{
+  my $X = shift;
+  my $Str = shift;
+  
+  unless ($Str =~ /^(http|https|mailto|ftp)\:(.+)/i) {
+    $X->Msg("Find not valid Link and delete [$Str]\n");
+    return "";
+  }
+  
+  
+  my $Protocol = $1;
+  my $Link = $2;
+  $Link = $X->trim_soft($Link);
+ 
+  if ($Protocol eq 'mailto') {
+    unless (ValidEMAIL($Link)) {
+      $X->Msg("Find not valid Email and delete [".$Protocol.":".$Link."]\n");
+      return "";
+    }
+  } else {
+    unless (ValidURL($Protocol.':'.$Link)) {
+      $X->Msg("Find not valid URL and delete [".$Protocol.":".$Link."]\n");
+      return "";
+    }
+  }
+    
+  return $Protocol.':'.$Link;
+}
+
+sub ValidURL{
+  my $Url=shift;
+  return 0 unless $Url;
+  return 0 if length($Url)>300;
+
+  my $RegExp =
+  '^(https|http|ftp):\/\/'.                                  # protocol
+  '(([a-z0-9$_\.\+!\*\'\(\),;\?&=-]|%[0-9a-f]{2})+'.         # username
+  '(:([a-z0-9$_\.\+!\*\'\(\),;\?&=-]|%[0-9a-f]{2})+)?'.      # password
+  '@)?(?#'.                                                  # auth requires @
+  ')((([a-z0-9]\.|[a-z0-9][a-z0-9-]*[a-z0-9]\.)*'.           # domain segments AND
+  '[a-z][a-z0-9-]*[a-z0-9]'.                                 # top level domain  OR
+  '|((\d|[1-9]\d|1\d{2}|2[0-4][0-9]|25[0-5])\.){3}'.
+  '(\d|[1-9]\d|1\d{2}|2[0-4][0-9]|25[0-5])'.                 # IP address
+  ')(:\d{1,5})?'.                                            # port
+  ')(((\/+([a-z0-9$_\.\+!\*\'\(\),;:@&=-]|%[0-9a-f]{2})*)*'. # path
+  '(\?([a-z0-9$_\.\+!\*\'\(\),;:@&=-]|%[0-9a-f]{2})*)'.      # query string
+  '?)?)?'.                                                   # path and query string optional
+  '(#([a-z0-9$_\.\+!\*\'\(\),;:@&=-]|%[0-9a-f]{2})*)?'.      # fragment
+  '$';
+	
+  return $Url=~/$RegExp/i;
+}
+
+sub ValidEMAIL{
+  my $Email=shift;
+  return 0 unless $Email;
+  return 0 if length($Email)>50;
+  return $Email=~ /^[-+a-z0-9_]+(\.[-+a-z0-9_]+)*\@([-a-z0-9_]+\.)+[a-z]{2,10}$/i;
+}
+
 sub ParseMetaFile {
   my $X = shift;
 
@@ -1350,7 +1462,12 @@ sub ParseMetaFile {
     my $DESCRIPTION = $X->{'STRUCTURE'}->{'DESCRIPTION'};
  
     Msg($X,"Parse metafile ".$MetaFile."\n");
-    my $xpc = XML::LibXML::XPathContext->new($Parser->load_xml( location => $MetaFile ));
+    my $xpc = XML::LibXML::XPathContext->new($Parser->load_xml(
+      location => $MetaFile,
+      expand_entities => 0,
+      no_network => 1,
+      load_ext_dtd => 0
+    ));
     $xpc->registerNs('fbd', &NS_FB3_DESCRIPTION);
 
     my $ID = ($xpc->findnodes('/fbd:fb3-description')->[0])->getAttribute('id');

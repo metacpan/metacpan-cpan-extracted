@@ -1,5 +1,5 @@
 package Statocles::Plugin;
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 # ABSTRACT: Base role for Statocles plugins
 
 #pod =head1 SYNOPSIS
@@ -60,7 +60,7 @@ Statocles::Plugin - Base role for Statocles plugins
 
 =head1 VERSION
 
-version 0.091
+version 0.092
 
 =head1 SYNOPSIS
 

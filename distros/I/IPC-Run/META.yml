@@ -4,6 +4,8 @@ author:
   - 'Barrie Slaymaker <barries@slaysys.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Readonly: '0'
+  Readonly::Array: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -27,5 +29,5 @@ resources:
   bugtracker: https://github.com/toddr/IPC-Run/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/toddr/IPC-Run
-version: '0.97'
+version: '0.98'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

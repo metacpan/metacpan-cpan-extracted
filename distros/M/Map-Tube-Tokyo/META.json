@@ -44,15 +44,15 @@
    "provides" : {
       "Map::Tube::Tokyo" : {
          "file" : "lib/Map/Tube/Tokyo.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       },
       "Map::Tube::Tokyo::Line::Asakusa" : {
          "file" : "lib/Map/Tube/Tokyo/Line/Asakusa.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       },
       "Map::Tube::Tokyo::Line::Chiyoda" : {
          "file" : "lib/Map/Tube/Tokyo/Line/Chiyoda.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       }
    },
    "release_status" : "stable",
@@ -63,6 +63,6 @@
          "web" : "https://github.com/manwar/Map-Tube-Tokyo"
       }
    },
-   "version" : "0.40",
+   "version" : "0.41",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

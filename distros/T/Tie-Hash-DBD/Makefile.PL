@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2010-2015 H.Merijn Brand
+# Copyright 2010-2018 H.Merijn Brand
 
 require 5.008003;
 use strict;
@@ -39,8 +39,7 @@ if ($rv && -s "Makefile") {
 
 package MY;
 
-sub postamble
-{
+sub postamble {
     my $make_sep = $^O eq "VMS" ? "," : "";
     my $min_vsn = ($] >= 5.010 && -d "xt" && ($ENV{AUTOMATED_TESTING} || 0) != 1)
 	? join "\n" =>

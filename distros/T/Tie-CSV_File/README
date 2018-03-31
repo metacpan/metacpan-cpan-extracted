@@ -1,4 +1,4 @@
-Tie/CSV_File version 0.21
+Tie/CSV_File version 0.24
 =========================
 
 Tie::CSV_File - ties a csv-file to an array of arrays
@@ -73,7 +73,7 @@ Please note that the Text::CSV_XS module needs to be proper installed.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2002 Janek Schleicher
+Copyright (C) 2002, 2018 Janek Schleicher
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

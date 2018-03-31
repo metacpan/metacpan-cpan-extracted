@@ -13,13 +13,13 @@ requires no dependencies:
 Once installed (or maybe even before) you should be able to see how it
 works by:
 
+  $ ngrams ../etc/walden.txt 5
   $ cd bin
-  $ ./ngrams.pl ../etc/walden.txt 5
   $ ./intersections.pl 5
 
 Enjoy!
 
 -- 
 Eric Lease Morgan <eric_morgan@infomotions.com>
-September 12, 2010
+March 28, 2018
 

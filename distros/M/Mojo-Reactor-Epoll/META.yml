@@ -27,10 +27,10 @@ no_index:
 provides:
   Mojo::Reactor::Epoll:
     file: lib/Mojo/Reactor/Epoll.pm
-    version: '0.007'
+    version: '0.008'
 requires:
   Carp: '0'
-  Linux::Epoll: '0.012'
+  Linux::Epoll: '0.013'
   List::Util: '0'
   Mojolicious: '5.70'
   Scalar::Util: '0'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Mojo-Reactor-Epoll/issues
   homepage: https://github.com/Grinnz/Mojo-Reactor-Epoll
   repository: https://github.com/Grinnz/Mojo-Reactor-Epoll.git
-version: '0.007'
+version: '0.008'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -186,7 +186,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.007
+          tag: v0.008
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

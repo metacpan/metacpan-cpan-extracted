@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 14 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 15 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Record/Serialize.pm',
@@ -16,6 +16,7 @@ my @module_files = (
     'Data/Record/Serialize/Encode/null.pm',
     'Data/Record/Serialize/Encode/rdb.pm',
     'Data/Record/Serialize/Encode/yaml.pm',
+    'Data/Record/Serialize/Error.pm',
     'Data/Record/Serialize/Role/Base.pm',
     'Data/Record/Serialize/Role/Default.pm',
     'Data/Record/Serialize/Role/Encode.pm',

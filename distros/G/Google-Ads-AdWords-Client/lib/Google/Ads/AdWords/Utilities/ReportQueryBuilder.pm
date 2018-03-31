@@ -43,7 +43,7 @@ sub START {
 
   # If a query builder was specified, then make a copy.
   if ($self->get_query_builder()) {
-    push($self->get_select(), @{$self->get_query_builder()->get_select()});
+    push(@{$self->get_select()}, @{$self->get_query_builder()->get_select()});
     $self->set_from_report($self->get_query_builder()->get_from_report());
     $self->set_date_range($self->get_query_builder()->get_date_range());
     $self->set_start_date($self->get_query_builder()->get_start_date());

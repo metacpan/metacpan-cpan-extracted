@@ -1,3 +1,11 @@
+3.004 2018-03-28
+
+    * Add Config::Model::Tester::Setup module to reduce
+      boilerplate found in t/*.t
+    * Tester: create test directories
+      (See https://github.com/dod38fr/config-model/issues/16)
+    * Tester: allow trace of second config tree dump
+
 3.003 2017-11-05
 
     * fix test file contents to work with utf-8

@@ -29,7 +29,7 @@ my $challenge = $crypter->registrationChallenge();
 
 my $parsed = JSON::XS->new->utf8->decode($challenge);
 ok(defined($parsed), 'Parsing JSON string');
-diag(Dumper(\$parsed));
+#diag(Dumper(\$parsed));
 
 foreach my $key (qw[challenge version appId]) {
     ok(defined($parsed->{$key}), "Defined: $key");

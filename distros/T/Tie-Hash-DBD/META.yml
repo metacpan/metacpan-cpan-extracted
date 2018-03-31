@@ -5,7 +5,7 @@ author:
 configure_requires: 
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: Author, CPAN::Meta::Converter version 2.150005
+generated_by: Author, CPAN::Meta::Converter version 2.150010
 license: perl
 meta-spec: 
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,16 +14,16 @@ name: Tie-Hash-DBD
 provides: 
   Tie::Array::DBD: 
     file: lib/Tie/Array/DBD.pm
-    version: '0.16'
+    version: '0.18'
   Tie::Hash::DBD: 
     file: lib/Tie/Hash/DBD.pm
-    version: '0.16'
+    version: '0.18'
 recommends: 
-  DBD::CSV: '0.48'
-  DBD::Pg: v3.5.3
-  DBD::SQLite: '1.48'
-  DBI: '1.634'
-  Test::More: '1.001014'
+  DBD::CSV: '0.51'
+  DBD::Pg: v3.7.4
+  DBD::SQLite: '1.58'
+  DBI: '1.641'
+  Test::More: '1.302133'
 requires: 
   Carp: 0
   DBI: '1.613'
@@ -35,4 +35,4 @@ requires:
 resources: 
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Tie-Hash-DBD
-version: '0.16'
+version: '0.18'

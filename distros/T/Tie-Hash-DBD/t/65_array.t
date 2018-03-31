@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Tie::Array::DBD;
 
-require "t/util.pl";
+require "./t/util.pl";
 
 my @array;
 my $DBD = "Oracle";

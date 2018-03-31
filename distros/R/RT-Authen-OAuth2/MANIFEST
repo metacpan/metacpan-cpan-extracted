@@ -1,0 +1,31 @@
+Changes
+etc/OAuth2_Config.pm
+html/Callbacks/OAuth/Elements/Login/Default
+html/Callbacks/OAuth/NoAuth/Logout.html/Default
+html/Callbacks/OAuth/NoAuth/Logout.html/ModifyLoginRedirect
+html/NoAuth/OAuth
+html/NoAuth/OAuthRedirect
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/ReadmeFromPod.pm
+inc/Module/Install/RTx.pm
+inc/Module/Install/RTx/Runtime.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/YAML/Tiny.pm
+lib/RT/Authen/OAuth2.pm
+lib/RT/Authen/OAuth2/Google.pm
+lib/RT/Authen/OAuth2/Unimplemented.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+static/images/btn_auth0_signin.png
+static/images/btn_google_signin_dark_normal_web.png
+SIGNATURE                                Public-key signature (added by MakeMaker)

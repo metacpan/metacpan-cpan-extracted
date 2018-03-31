@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckCommit;
 # ABSTRACT: Git::Hooks plugin to enforce commit policies
-$Git::Hooks::CheckCommit::VERSION = '2.9.1';
+$Git::Hooks::CheckCommit::VERSION = '2.9.2';
 use 5.010;
 use utf8;
 use strict;
@@ -173,8 +173,8 @@ sub _canonical_identity {
     my $cache = $git->cache($PKG);
 
     unless (exists $cache->{canonical}{$identity}) {
-        chomp($cache->{canonical}{$identity} = 
-                  $git->run('-c', "mailmap.file=$mailmap", 'check-mailmap', $identity));
+        $cache->{canonical}{$identity} =
+            $git->run('-c', "mailmap.file=$mailmap", 'check-mailmap', $identity);
     }
 
     return $cache->{canonical}{$identity};
@@ -469,7 +469,7 @@ Git::Hooks::CheckCommit - Git::Hooks plugin to enforce commit policies
 
 =head1 VERSION
 
-version 2.9.1
+version 2.9.2
 
 =head1 SYNOPSIS
 

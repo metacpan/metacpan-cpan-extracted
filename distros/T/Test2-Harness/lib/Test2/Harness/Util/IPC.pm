@@ -2,7 +2,7 @@ package Test2::Harness::Util::IPC;
 use strict;
 use warnings;
 
-our $VERSION = '0.001063';
+our $VERSION = '0.001064';
 
 use POSIX;
 
@@ -63,6 +63,12 @@ sub run_cmd {
     swap_io(\*STDERR, $stderr, $die) if $stderr;
     swap_io(\*STDOUT, $stdout, $die) if $stdout;
     swap_io(\*STDIN,  $stdin,  $die) if $stdin;
+
+    if (my $dir = $params{chdir}) {
+        chdir($dir) or die "Could not chdir: $!";
+    }
+
+    $cmd = [$cmd->()] if ref($cmd) eq 'CODE';
 
     exec(@$cmd) or $die->("Failed to exec!");
 }

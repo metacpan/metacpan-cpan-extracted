@@ -4,7 +4,15 @@ package Data::Record::Serialize::Encode::dbi;
 
 use Moo::Role;
 
-our $VERSION = '0.13';
+use Data::Record::Serialize::Error { errors =>
+  [ qw( param
+        connect
+        schema
+        create
+        insert
+   )] }, -all;
+
+our $VERSION = '0.15';
 
 use Data::Record::Serialize::Types -types;
 
@@ -15,7 +23,6 @@ use Types::Standard -types;
 use List::Util qw[ pairmap ];
 
 use DBI;
-use Carp;
 
 use namespace::clean;
 
@@ -78,11 +85,7 @@ has table => (
 #pod
 #pod The schema to which the table belongs.  Optional.
 #pod
-#pod =begin pod_coverage
-#pod
-#pod =head3 has_schema
-#pod
-#pod =end pod_coverage
+#pod =for  Pod::Coverage has_schema
 #pod
 #pod =cut
 
@@ -209,30 +212,43 @@ has batch => (
 
 #pod =attr C<dbitrace>
 #pod
-#pod A trace setting passed to  L<B<DBI>>.
+#pod A trace setting passed to  L<DBI>.
 #pod
 #pod =cut
 
 has dbitrace => ( is => 'ro', );
 
-has _cache => (
+#pod =method C<queue>
+#pod
+#pod   $queue = $obj->queue;
+#pod
+#pod The queue containing records not yet successfully transmitted
+#pod to the database.  This is only of interest if L</batch> is not C<0>.
+#pod
+#pod Each element is an array containing values to be inserted into the database,
+#pod in the same order as the fields in L<Data::Serialize/output_fields>.
+#pod
+#pod =cut
+
+has queue => (
     is       => 'ro',
     init_arg => undef,
     default  => sub { [] },
 );
 
-before BUILD => sub {
+has '+_use_integer' => ( is => 'rwp', default => 1 );
+
+has '+_need_types' => ( is => 'rwp', default => 1 );
+
+has '+_map_types' => (
+    is      => 'rwp',
+    default => sub { {S => 'text', N => 'real', I => 'integer'} },
+);
+
+before '_build__nullify' => sub {
 
     my $self = shift;
-
-    $self->_set__map_types( {
-        S => 'text',
-        N => 'real',
-        I => 'integer'
-    } );
-
-    $self->_set__use_integer( 1 );
-    $self->_set__need_types( 1 );
+    $self->_set__nullify( $self->type_index->{'numeric'} );
 
 };
 
@@ -252,11 +268,7 @@ sub _fq_table_name {
     join( '.', ( $self->has_schema ? ( $self->schema ) : () ), $self->table );
 }
 
-#pod =begin pod_coverage
-#pod
-#pod =head3  setup
-#pod
-#pod =end pod_coverage
+#pod =for Pod::Coverage setup
 #pod
 #pod =cut
 
@@ -277,7 +289,7 @@ sub setup {
     return if $self->_dbh;
 
     my @dsn = DBI->parse_dsn( $self->dsn )
-      or croak( "unable to parse DSN: ", $self->dsn );
+      or error( 'param', "unable to parse DSN: ", $self->dsn );
     my $dbi_driver = $dsn[1];
 
     my $producer = $producer{$dbi_driver} || $dbi_driver;
@@ -285,6 +297,7 @@ sub setup {
     my %attr = (
         AutoCommit => !$self->batch,
         RaiseError => 1,
+        PrintError => 0,
     );
 
     $attr{sqlite_allow_multiple_statements} = 1
@@ -292,7 +305,7 @@ sub setup {
 
     $self->_set__dbh(
         DBI->connect( $self->dsn, $self->db_user, $self->db_pass, \%attr ) )
-      or croak( 'error connection to ', $self->dsn, "\n" );
+      or error( 'connect', 'error connecting to ', $self->dsn, "\n" );
 
     $self->_dbh->trace( $self->dbitrace )
       if $self->dbitrace;
@@ -303,19 +316,19 @@ sub setup {
             from => sub {
                 my $schema = $_[0]->schema;
                 my $table = $schema->add_table( name => $self->_fq_table_name )
-                  or croak $schema->error;
+                  or error( 'schema', $schema->error );
 
                 for my $field_name ( @{ $self->output_fields } ) {
 
                     $table->add_field(
                         name      => $field_name,
                         data_type => $self->output_types->{$field_name}
-                    ) or croak $table->error;
+                    ) or error( 'schema',  $table->error );
                 }
 
                 if ( @{ $self->primary } ) {
                     $table->primary_key( @{ $self->primary } )
-                      or croak $table->error;
+                      or error( 'schema', $table->error );
                 }
 
                 1;
@@ -327,12 +340,12 @@ sub setup {
 
 
         my $sql = $tr->translate
-          or croak $tr->error;
+          or error( 'schema', $tr->error );
 
         # print STDERR $sql;
         eval { $self->_dbh->do( $sql ); };
 
-        croak( "error in table creation: $@:\n$sql\n" )
+        error( 'create', { msg => "error in table creation: $@", payload => $sql } )
           if $@;
 
         $self->_dbh->commit if $self->batch;
@@ -350,32 +363,100 @@ sub setup {
     return;
 }
 
-sub _empty_cache {
+#pod =method flush
+#pod
+#pod   $s->flush;
+#pod
+#pod Flush the queue of records to the database. It returns true if
+#pod all of the records have been successfully written.
+#pod
+#pod If writing fails:
+#pod
+#pod =over
+#pod
+#pod =item *
+#pod
+#pod Writing of records ceases.
+#pod
+#pod =item *
+#pod
+#pod The failing record is left at the head of the queue.  This ensures
+#pod that it is possible to retry writing the record.
+#pod
+#pod =item *
+#pod
+#pod an exception object (in the
+#pod C<Data::Record::Serialize::Error::Encode::dbi::insert> class) will be
+#pod thrown.  The failing record (in its final form after formatting, etc)
+#pod is available via the object's C<payload> method.
+#pod
+#pod =back
+#pod
+#pod If a record fails to be written, it will still be queued for the next
+#pod attempt at writing to the database.  If this behavior is undesired,
+#pod make sure to remove it from the queue:
+#pod
+#pod   use Data::Dumper;
+#pod
+#pod   if ( ! eval { $output->flush } ) {
+#pod       warn "$@", Dumper( $@->payload );
+#pod       shift $output->queue->@*;
+#pod   }
+#pod
+#pod As an example of completely flushing the queue while notifying of errors:
+#pod
+#pod   use Data::Dumper;
+#pod
+#pod   until ( eval { $output->flush } ) {
+#pod       warn "$@", Dumper( $@->payload );
+#pod       shift $output->queue->@*;
+#pod   }
+#pod
+#pod =cut
+
+sub flush {
 
     my $self = shift;
 
-    if ( @{ $self->_cache } ) {
+    my $queue = $self->queue;
 
+    if ( @{ $queue } ) {
+
+        my $last;
         eval {
-            $self->_sth->execute( @$_ ) foreach @{ $self->_cache };
-            $self->_dbh->commit;
+            $self->_sth->execute( @$last )
+              while $last = shift @{ $queue };
         };
 
-        # don't bother rolling back aborted transactions;
-        # individual inserts are independent of each other.
-        croak "Transaction aborted: $@" if $@;
+        my $error = $@;
+        $self->_dbh->commit;
 
-        @{ $self->_cache } = ();
+        if ( $error ) {
+            unshift @{ $queue }, $last;
+
+            my %query;
+            @query{ @{ $self->output_fields } } = @$last;
+            error( "insert", { msg => "Transaction aborted: $error", payload => \%query } );
+        }
     }
 
-    return;
+    1;
 }
 
-#pod =begin pod_coverage
+#pod =method send
 #pod
-#pod =head3 send
+#pod   $s->send( \%record );
 #pod
-#pod =end pod_coverage
+#pod Send a record to the database.
+#pod If there is an error, an exception object (with class
+#pod C<Data::Record::Serialize::Error::Encode::dbi::insert>) will be
+#pod thrown, and the record which failed to be written will be available
+#pod via the object's C<payload> method.
+#pod
+#pod If in L</batch> mode, the record is queued for later transmission.
+#pod When the number of records queued reaches that specified by the
+#pod L</batch> attribute, the C<flush> method is called.  See L</flush> for
+#pod more information on how errors are handled.
 #pod
 #pod =cut
 
@@ -385,14 +466,19 @@ sub send {
 
     if ( $self->batch ) {
 
-        push @{ $self->_cache }, [ @{ $_[0] }{ @{ $self->output_fields } } ];
+        push @{ $self->queue }, [ @{ $_[0] }{ @{ $self->output_fields } } ];
 
-        $self->_empty_cache
-          if @{ $self->_cache } == $self->batch;
+        $self->flush
+          if @{ $self->queue } == $self->batch;
 
     }
     else {
-        $self->_sth->execute( @{ $_[0] }{ @{ $self->output_fields } } );
+
+        eval {
+            $self->_sth->execute( @{ $_[0] }{ @{ $self->output_fields } } );
+        };
+        error( "insert", { msg => "record insertion failed: $@", payload => $_[0] } )
+          if $@;
     }
 
 }
@@ -407,11 +493,24 @@ after '_trigger_output_types' => sub {
 };
 
 
-#pod =begin pod_coverage
+#pod =method close
 #pod
-#pod =head3 close
+#pod   $s->close;
 #pod
-#pod =end pod_coverage
+#pod Close the database handle. If writing is batched, records in the queue
+#pod are written to the database via L</flush>. An exception will be thrown
+#pod if a record cannot be written.  See L</flush> for more details.
+#pod
+#pod As an example of draining the queue while notifying of errors:
+#pod
+#pod   use Data::Dumper;
+#pod
+#pod   until ( eval { $output->close } ) {
+#pod       warn "$@", Dumper( $@->payload );
+#pod       shift $output->queue->@*;
+#pod   }
+#pod
+#pod
 #pod
 #pod =cut
 
@@ -419,38 +518,71 @@ sub close {
 
     my $self = shift;
 
-    $self->_empty_cache
+    $self->flush
       if $self->batch;
 
     $self->_dbh->disconnect
       if defined $self->_dbh;
+
+    1;
 }
+
+
+#pod =method DEMOLISH
+#pod
+#pod This method is called when the object is destroyed.  It closes the
+#pod database handle B<but does not flush the record queue>.
+#pod
+#pod A warning is emitted if the record queue is not empty; turn off the
+#pod C<Data::Record::Serialize::Encode::dbi::queue> warning to silence it.
+#pod
+#pod =cut
+
+sub DEMOLISH {
+
+    my $self = shift;
+
+    warnings::warnif( 'Data::Record::Serialize::Encode::dbi::queue', __PACKAGE__.": record queue is not empty in object destruction" )
+        if @{ $self->queue };
+
+    $self->_dbh->disconnect
+      if defined $self->_dbh;
+
+}
+
 
 # these are required by the Sink/Encode interfaces but should never be
 # called in the ordinary run of things.
 
-#pod =begin pod_coverage
-#pod
-#pod =head3 say
-#pod
-#pod =head3 print
-#pod
-#pod =head3 encode
-#pod
-#pod =end pod_coverage
+#pod =for  Pod::Coverage
+#pod   say
+#pod   print
+#pod   encode
 #pod
 #pod =cut
 
 
-sub say    { croak }
-sub print  { croak }
-sub encode { croak }
+sub say    { error( 'Encode::stub_method', 'internal error: stub method <say> invoked' ) }
+sub print  { error( 'Encode::stub_method', 'internal error: stub method <print> invoked' ) }
+sub encode { error( 'Encode::stub_method', 'internal error: stub method <encode> invoked' ) }
 
 with 'Data::Record::Serialize::Role::Sink';
 with 'Data::Record::Serialize::Role::Encode';
 
 
 1;
+
+#
+# This file is part of Data-Record-Serialize
+#
+# This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
+__END__
 
 =pod
 
@@ -460,7 +592,7 @@ Data::Record::Serialize::Encode::dbi - store a record in a database
 
 =head1 VERSION
 
-version 0.13
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -473,13 +605,13 @@ version 0.13
 =head1 DESCRIPTION
 
 B<Data::Record::Serialize::Encode::dbi> writes a record to a database using
-L<B<DBI>>.
+L<DBI>.
 
-It performs both the L<B<Data::Record::Serialize::Role::Encode>> and
-L<B<Data::Record::Serialize::Role::Sink>> roles.
+It performs both the L<Data::Record::Serialize::Role::Encode> and
+L<Data::Record::Serialize::Role::Sink> roles.
 
-B<You cannot construct this directly; you must use
-L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.>
+B<You cannot construct this directly>. You must use
+L<Data::Record::Serialize/new>.
 
 =head2 Types
 
@@ -489,6 +621,11 @@ Field types are recognized and converted to SQL types via the following map:
   N => 'real'
   I => 'integer'
 
+=head2 NULL values
+
+By default numeric fields are set to C<NULL> if they are empty.  This
+can be changed by setting the C<nullify> attribute.
+
 =head2 Performance
 
 Records are by default written to the database in batches (see the
@@ -496,10 +633,118 @@ C<batch> attribute) to improve performance.  Each batch is performed
 as a single transaction.  If there is an error during the transaction,
 record insertions during the transaction are I<not> rolled back.
 
+=head2 Errors
+
+Transaction errors result in an exception in the
+C<Data::Record::Serialize::Error::Encode::dbi::insert> class. See
+L<Data::Record::Serialize::Error> for more information on exception
+objects.
+
+=head1 METHODS
+
+=head2 C<queue>
+
+  $queue = $obj->queue;
+
+The queue containing records not yet successfully transmitted
+to the database.  This is only of interest if L</batch> is not C<0>.
+
+Each element is an array containing values to be inserted into the database,
+in the same order as the fields in L<Data::Serialize/output_fields>.
+
+=head2 flush
+
+  $s->flush;
+
+Flush the queue of records to the database. It returns true if
+all of the records have been successfully written.
+
+If writing fails:
+
+=over
+
+=item *
+
+Writing of records ceases.
+
+=item *
+
+The failing record is left at the head of the queue.  This ensures
+that it is possible to retry writing the record.
+
+=item *
+
+an exception object (in the
+C<Data::Record::Serialize::Error::Encode::dbi::insert> class) will be
+thrown.  The failing record (in its final form after formatting, etc)
+is available via the object's C<payload> method.
+
+=back
+
+If a record fails to be written, it will still be queued for the next
+attempt at writing to the database.  If this behavior is undesired,
+make sure to remove it from the queue:
+
+  use Data::Dumper;
+
+  if ( ! eval { $output->flush } ) {
+      warn "$@", Dumper( $@->payload );
+      shift $output->queue->@*;
+  }
+
+As an example of completely flushing the queue while notifying of errors:
+
+  use Data::Dumper;
+
+  until ( eval { $output->flush } ) {
+      warn "$@", Dumper( $@->payload );
+      shift $output->queue->@*;
+  }
+
+=head2 send
+
+  $s->send( \%record );
+
+Send a record to the database.
+If there is an error, an exception object (with class
+C<Data::Record::Serialize::Error::Encode::dbi::insert>) will be
+thrown, and the record which failed to be written will be available
+via the object's C<payload> method.
+
+If in L</batch> mode, the record is queued for later transmission.
+When the number of records queued reaches that specified by the
+L</batch> attribute, the C<flush> method is called.  See L</flush> for
+more information on how errors are handled.
+
+=head2 close
+
+  $s->close;
+
+Close the database handle. If writing is batched, records in the queue
+are written to the database via L</flush>. An exception will be thrown
+if a record cannot be written.  See L</flush> for more details.
+
+As an example of draining the queue while notifying of errors:
+
+  use Data::Dumper;
+
+  until ( eval { $output->close } ) {
+      warn "$@", Dumper( $@->payload );
+      shift $output->queue->@*;
+  }
+
+=head2 DEMOLISH
+
+This method is called when the object is destroyed.  It closes the
+database handle B<but does not flush the record queue>.
+
+A warning is emitted if the record queue is not empty; turn off the
+C<Data::Record::Serialize::Encode::dbi::queue> warning to silence it.
+
 =head1 ATTRIBUTES
 
 These attributes are available in addition to the standard attributes
-defined for L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.
+defined for L<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.
 
 =head2 C<dsn>
 
@@ -557,41 +802,15 @@ single transaction.  See L</Performance> for more information.
 
 =head2 C<dbitrace>
 
-A trace setting passed to  L<B<DBI>>.
+A trace setting passed to  L<DBI>.
 
-=begin pod_coverage
+=for Pod::Coverage has_schema
 
-=head3 has_schema
+=for Pod::Coverage setup
 
-=end pod_coverage
-
-=begin pod_coverage
-
-=head3 setup
-
-=end pod_coverage
-
-=begin pod_coverage
-
-=head3 send
-
-=end pod_coverage
-
-=begin pod_coverage
-
-=head3 close
-
-=end pod_coverage
-
-=begin pod_coverage
-
-=head3 say
-
-=head3 print
-
-=head3 encode
-
-=end pod_coverage
+=for Pod::Coverage say
+  print
+  encode
 
 =head1 BUGS AND LIMITATIONS
 
@@ -623,45 +842,3 @@ This is free software, licensed under:
   The GNU General Public License, Version 3, June 2007
 
 =cut
-
-__END__
-
-#pod =head1 SYNOPSIS
-#pod
-#pod     use Data::Record::Serialize;
-#pod
-#pod     my $s = Data::Record::Serialize->new( encode => 'sqlite', ... );
-#pod
-#pod     $s->send( \%record );
-#pod
-#pod =head1 DESCRIPTION
-#pod
-#pod B<Data::Record::Serialize::Encode::dbi> writes a record to a database using
-#pod L<B<DBI>>.
-#pod
-#pod It performs both the L<B<Data::Record::Serialize::Role::Encode>> and
-#pod L<B<Data::Record::Serialize::Role::Sink>> roles.
-#pod
-#pod B<You cannot construct this directly; you must use
-#pod L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.>
-#pod
-#pod =head2 Types
-#pod
-#pod Field types are recognized and converted to SQL types via the following map:
-#pod
-#pod   S => 'text'
-#pod   N => 'real'
-#pod   I => 'integer'
-#pod
-#pod
-#pod =head2 Performance
-#pod
-#pod Records are by default written to the database in batches (see the
-#pod C<batch> attribute) to improve performance.  Each batch is performed
-#pod as a single transaction.  If there is an error during the transaction,
-#pod record insertions during the transaction are I<not> rolled back.
-#pod
-#pod =head1 ATTRIBUTES
-#pod
-#pod These attributes are available in addition to the standard attributes
-#pod defined for L<B<Data::Record::Serialize-E<gt>new>|Data::Record::Serialize/new>.

@@ -42,6 +42,7 @@
       "test" : {
          "requires" : {
             "Regexp::Pattern" : "0",
+            "Test::Builder::Module" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0.98"
          }
@@ -50,11 +51,11 @@
    "provides" : {
       "Regexp::Pattern::License" : {
          "file" : "lib/Regexp/Pattern/License.pm",
-         "version" : "v3.1.0"
+         "version" : "v3.1.90"
       },
       "Regexp::Pattern::License::Parts" : {
          "file" : "lib/Regexp/Pattern/License/Parts.pm",
-         "version" : "v3.1.0"
+         "version" : "v3.1.90"
       }
    },
    "release_status" : "stable",
@@ -72,7 +73,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/project"
    },
-   "version" : "v3.1.0",
+   "version" : "v3.1.90",
    "x_help_wanted" : [
       "documenter",
       "tester"

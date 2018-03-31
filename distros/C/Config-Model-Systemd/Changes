@@ -1,3 +1,20 @@
+0.238.1 2018-03-29
+
+  Model update:
+    * The script generating Systemd model from systemd documentation
+      was modified to generate Systemd model from scratch. 
+    * Old systemd parameters are migrated to the new ones:
+      * OnFailureIsolate in unit
+      * RebootArgument
+      * StartLimitInterval to StartLimitIntervalSec
+      * SuccesAction and StartLimitBurst
+      * FailureAction
+    * updated from systemd 238 doc
+
+  Other changes:
+    * Systemd comments are now preserved
+    * Build require Config::Model 2.118
+
 0.236.1 2018-01-03
 
   Systemd model update:

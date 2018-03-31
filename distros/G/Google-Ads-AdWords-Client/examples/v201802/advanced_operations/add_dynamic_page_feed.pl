@@ -205,9 +205,9 @@ sub _create_dsa_url_add_operation {
   my $url_attribute_value =
     Google::Ads::AdWords::v201802::FeedItemAttributeValue->new({
       feedAttributeId => $feed_details->{"urlAttributeId"},
-      # Optional: Add the {feeditem} valuetrack parameter to track which page
-      # feed items lead to each click.
-      stringValues => sprintf("%s?id={feeditem}", $url)});
+      # See https://support.google.com/adwords/answer/7166527 for
+      # page feed URL recommendations and rules.
+      stringValues => sprintf("%s", $url)});
 
   my $label_attribute_value =
     Google::Ads::AdWords::v201802::FeedItemAttributeValue->new({

@@ -1,7 +1,5 @@
 use Mojo::Base -strict;
 
-BEGIN { $ENV{MOJO_NO_NNR} = 1 }
-
 use Test::More;
 use IO::Socket::INET;
 use Mojo::Reactor::Epoll;

@@ -86,6 +86,14 @@ subtest "no_proxy empty arrayref", sub {
     is $c->proxy_for("bar.quux.net",443), "http://hoge.com";
 };
 
+subtest "no_proxy environment should be ignored if env_proxy option is not specified", sub {
+    local $ENV{no_proxy} = "foo.com";
+    my $c = AnyEvent::Connector->new(
+        proxy => "http://bar.net:8080"
+    );
+    is $c->proxy_for("www.foo.com", 80), "http://bar.net:8080";
+    is $c->proxy_for("foo.com", 80), "http://bar.net:8080";
+    is $c->proxy_for("hoge.com", 5000), "http://bar.net:8080";
+};
 
 done_testing;
-

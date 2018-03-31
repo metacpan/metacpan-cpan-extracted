@@ -19,6 +19,7 @@ if (which 'xdg-user-dir') {
 
 my $temphomedir = tempdir(CLEANUP => 1);
 local $ENV{HOME} = $temphomedir;
+local $ENV{XDG_CONFIG_HOME} = '';
 mkdir "$temphomedir/.config";
 my $udd = "$temphomedir/.config/user-dirs.dirs";
 

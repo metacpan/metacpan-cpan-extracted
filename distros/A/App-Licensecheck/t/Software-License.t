@@ -8,34 +8,34 @@ use Test::More;
 use Test::Script;
 
 my %LICENSES = (
-	Apache_2_0   => 'Apache (v2.0)',
-	FreeBSD      => 'BSD (2 clause)',
-	GPL_1        => 'GPL (v1)',
-	GPL_2        => 'GPL (v2)',
-	GPL_3        => 'GPL (v3)',
-	LGPL_2       => 'LGPL (v2)',
-	LGPL_2_1     => 'LGPL (v2.1)',
-	LGPL_3_0     => 'LGPL (v3)',
-	MIT          => 'MIT/X11 (BSD like)',
-	Mozilla_2_0  => 'MPL (v2.0)',
-	QPL_1_0      => 'QPL (v1.0)',
-	Zlib         => 'zlib/libpng',
+	AGPL_3       => 'AGPL-3',
+	Apache_1_1   => 'Apache-1.1',
+	Apache_2_0   => 'Apache-2.0',
+	Artistic_1_0 => 'Artistic-1.0',
+	Artistic_2_0 => 'Artistic-2.0',
+	BSD          => 'BSD-3-clause',
 	CC0_1_0      => 'UNKNOWN',
-	GFDL_1_3     => 'GFDL (v1.3 or later)',
-	Artistic_1_0 => 'Artistic (v1.0)',
-	Artistic_2_0 => 'Artistic (v2.0)',
-	Mozilla_1_0  => 'MPL (v1.0)',
+	FreeBSD      => 'BSD-2-clause',
+	GFDL_1_2     => 'GFDL-1.2+',
+	GFDL_1_3     => 'GFDL-1.3+',
+	GPL_1        => 'GPL-1',
+	GPL_2        => 'GPL-2',
+	GPL_3        => 'GPL-3',
+	LGPL_2_1     => 'LGPL-2.1',
+	LGPL_2       => 'LGPL-2',
+	LGPL_3_0     => 'LGPL-3',
+	MIT          => 'Expat',
+	Mozilla_1_0  => 'MPL-1.0',
+	Mozilla_1_1  => 'MPL-1.1',
+	Mozilla_2_0  => 'MPL-2.0',
 	None         => 'UNKNOWN',
-	PostgreSQL   => 'PostgreSQL',
-	AGPL_3       => 'AGPL (v3)',
-	SSLeay       => 'BSD (2 clause)',
-	Apache_1_1   => 'Apache (v1.1)',
-	Mozilla_1_1  => 'MPL (v1.1)',
-	GFDL_1_2     => 'GFDL (v1.2 or later)',
-	Sun          => 'UNKNOWN',
-	BSD          => 'BSD (3 clause)',
 	OpenSSL      => 'OpenSSL',
-	Perl_5       => 'Perl',
+	Perl_5       => 'Artistic or GPL-1+',
+	PostgreSQL   => 'PostgreSQL',
+	QPL_1_0      => 'QPL-1.0',
+	SSLeay       => 'BSD-2-clause',
+	Sun          => 'UNKNOWN',
+	Zlib         => 'Zlib',
 );
 
 my $workdir = Path::Tiny->tempdir( CLEANUP => ( not $ENV{PRESERVE} ) );
@@ -57,7 +57,7 @@ foreach ( keys %LICENSES ) {
 plan tests => scalar( 1 + keys %LICENSES );
 my $corpus = $workdir;
 script_runs(
-	[ 'bin/licensecheck', qw(--recursive -m -c .+), "$corpus" ],
+	[ 'bin/licensecheck', qw(--recursive -m --deb-fmt -c .+), "$corpus" ],
 	{ stdout => \my $stdout },
 );
 foreach ( split /\v+/, $stdout ) {

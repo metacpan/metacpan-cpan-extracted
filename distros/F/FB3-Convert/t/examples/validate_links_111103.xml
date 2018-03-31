@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<fb3-body xmlns:xlink="http://www.w3.org/1999/xlink" id="2d6af588-29e2-4f56-8ff2-ba39d3dc7d11" xmlns="http://www.fictionbook.org/FictionBook3/body">
+    <section id="169638ef-2b25-5863-8dae-fed090fc99e4">
+      <p>
+        <a xlink:href="http://www.litres.ru">good link1</a>
+      </p>
+      <p>
+        <a xlink:href="http://www.litres.ru/">good link2</a>
+      </p>
+      <p>
+        <a xlink:href="http://www.litres.ru/o-kompanii/contactnaya-informaciya/">good link3</a>
+      </p>
+      <p>
+        <a xlink:href="https://www.litres.ru">good link4</a>
+      </p>
+      <p>
+        <a xlink:href="https://www.litres.ru/">good link5</a>
+      </p>
+      <p>
+        <a xlink:href="https://www.litres.ru/o-kompanii/contactnaya-informaciya/">good link6</a>
+      </p>
+      <p>
+        <a xlink:href="https://user:pwd@www.litres.ru:65535/o-kompanii/contactnaya-informaciya/?ddd=1&amp;rrr=243434343">good link7</a>
+      </p>
+      <p>
+        <a xlink:href="ftp://www.litres.ru">good FTP link8</a>
+      </p>
+      <p>
+        <a xlink:href="mailto:planputina@kremlin.ru">good mail link</a>
+      </p>
+      <p>
+        <a xlink:href="mailto:planputina2@kremlin.ru">good mail link2. trim spaces</a>
+      </p>
+      <p>failed mail link1</p>
+      <p>failed mail link2</p>
+      <p>failed mail link3</p>
+      <p>empty link</p>
+      <p>failed link1</p>
+      <p>failed &amp; link2</p>
+    </section>
+</fb3-body>

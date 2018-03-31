@@ -1,5 +1,5 @@
 package Linux::Epoll;
-$Linux::Epoll::VERSION = '0.012';
+$Linux::Epoll::VERSION = '0.013';
 use 5.010;
 use strict;
 use warnings FATAL => 'all';
@@ -24,7 +24,7 @@ Linux::Epoll - O(1) multiplexing for Linux
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

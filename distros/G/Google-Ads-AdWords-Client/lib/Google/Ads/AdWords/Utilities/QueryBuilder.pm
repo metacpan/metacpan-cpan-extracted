@@ -45,7 +45,7 @@ sub START {
 
   if ($self->get_query_builder()) {
     push(
-      $self->get_where_builders(),
+      @{$self->get_where_builders()},
       @{$self->get_query_builder()->get_where_builders()});
   }
   return $self;
@@ -69,7 +69,7 @@ sub where {
       field                 => $field,
       current_query_builder => $self
     });
-  push($self->get_where_builders(), $where_builder);
+  push(@{$self->get_where_builders()}, $where_builder);
   return $where_builder;
 }
 

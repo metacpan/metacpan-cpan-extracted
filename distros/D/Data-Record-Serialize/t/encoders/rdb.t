@@ -3,7 +3,7 @@
 use Test2::V0;
 use Test2::Plugin::NoWarnings;
 
-use lib 't/lib';
+use Test::Lib;
 
 use Data::Record::Serialize;
 
@@ -17,6 +17,7 @@ ok(
             encode => 'rdb',
             output => \$buf,
             fields => [qw[ a b c ]],
+            nullify => [ 'c' ],
           ),
           ;
     },
@@ -25,6 +26,7 @@ ok(
 
 $s->send( { a => 1, b => 2, c => 'nyuck nyuck' } );
 $s->send( { a => 1, b => 2 } );
+$s->send( { a => 1, b => 2, c => '' } );
 
 is(
     $buf,

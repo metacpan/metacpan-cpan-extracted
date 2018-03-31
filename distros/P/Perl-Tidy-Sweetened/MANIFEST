@@ -19,6 +19,8 @@ t/annon-func.t
 t/args-sbl.t
 t/basic.t
 t/bugs.t
+t/csc.t
+t/kavorka.t
 t/lib/TidierTests.pm
 t/method-signature-simple.t
 t/moops.t

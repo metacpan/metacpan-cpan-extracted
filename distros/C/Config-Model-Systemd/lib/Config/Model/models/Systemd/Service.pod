@@ -15,9 +15,7 @@ Configuration classes used by L<Config::Model>
 
 =head2 disable - disable configuration file supplied by the vendor
 
-When true, cme will disable a configuration file supplied by the vendor by placing place a symlink to
-/dev/null with the same filename as the vendor configuration file.
-See L<systemd-system.conf> for details. I< Optional. Type boolean.  > 
+When true, cme will disable a configuration file supplied by the vendor by placing place a symlink to /dev/null with the same filename as the vendor configuration file. See L<systemd-system.conf> for details. I< Optional. Type boolean.  > 
 
 =over 4
 
@@ -29,17 +27,17 @@ See L<systemd-system.conf> for details. I< Optional. Type boolean.  >
 
 
 
+=head2 Service
+
+I< Optional. Type warped_node of class L<Systemd::Section::Service|Config::Model::models::Systemd::Section::Service> .  > 
+
 =head2 Unit
 
-I< Optional. Type warped_node of class L<Systemd::Section::Unit|Config::Model::models::Systemd::Section::Unit> .  > 
+I< Optional. Type warped_node of class L<Systemd::Section::ServiceUnit|Config::Model::models::Systemd::Section::ServiceUnit> .  > 
 
 =head2 Install
 
 I< Optional. Type warped_node of class L<Systemd::Section::Install|Config::Model::models::Systemd::Section::Install> .  > 
-
-=head2 Service
-
-I< Optional. Type warped_node of class L<Systemd::Section::Service|Config::Model::models::Systemd::Section::Service> .  > 
 
 =head1 SEE ALSO
 
@@ -59,7 +57,7 @@ L<Config::Model::models::Systemd::Section::Service>
 
 =item *
 
-L<Config::Model::models::Systemd::Section::Unit>
+L<Config::Model::models::Systemd::Section::ServiceUnit>
 
 =back
 

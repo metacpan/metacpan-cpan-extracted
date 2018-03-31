@@ -1,6 +1,6 @@
 package Net::GitHub::V3::ResultSet;
 
-our $VERSION = '0.94';
+our $VERSION = '0.95';
 our $AUTHORITY = 'cpan:FAYLAND';
 
 use Types::Standard qw(Int Str ArrayRef Bool);
@@ -19,7 +19,7 @@ __END__
 
 =head1 NAME
 
-Net::GitHub::V3::ResultSet
+Net::GitHub::V3::ResultSet - GitHub query iteration helper
 
 =head1 SYNOPSIS
 

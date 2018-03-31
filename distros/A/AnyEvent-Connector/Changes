@@ -1,5 +1,9 @@
 Revision history for AnyEvent-Connector
 
+0.02    2018-03-28
+        [Bug fix]
+        fix no_proxy env is loaded even if env_proxy option is not specified (gh#1)
+
 0.01    2018-03-26
         First version, released on an unsuspecting world.
 

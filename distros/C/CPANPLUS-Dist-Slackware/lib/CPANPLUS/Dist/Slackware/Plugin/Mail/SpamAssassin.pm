@@ -3,7 +3,7 @@ package CPANPLUS::Dist::Slackware::Plugin::Mail::SpamAssassin;
 use strict;
 use warnings;
 
-our $VERSION = '1.025';
+our $VERSION = '1.027';
 
 use CPANPLUS::Dist::Slackware::Util qw(catdir catfile slurp spurt run);
 
@@ -31,6 +31,7 @@ sub _install_init_script {
     my $pkgdesc = $status->_pkgdesc;
 
     my $destdir = $pkgdesc->destdir;
+    my $bindir  = $pkgdesc->bindir;
 
     my $script;
     my $srcfile = catfile( 'spamd', 'slackware-rc-script.sh' );
@@ -39,6 +40,7 @@ sub _install_init_script {
     }
     if ($script) {
         $script =~ s/^SNAME=rc\.spamassassin/SNAME=rc.spamd/xms;
+        $script =~ s%^DAEMON=/usr/bin/spamd%DAEMON=$bindir/spamd%xms;
 
         my $sysconfdir = catdir( $destdir, 'etc' );
 
@@ -185,7 +187,7 @@ CPANPLUS::Dist::Slackware::Plugin::Mail::SpamAssassin - Add an init script and d
 
 =head1 VERSION
 
-This document describes CPANPLUS::Dist::Slackware::Plugin::Mail::SpamAssassin version 1.025.
+This document describes CPANPLUS::Dist::Slackware::Plugin::Mail::SpamAssassin version 1.027.
 
 =head1 SYNOPSIS
 
@@ -244,7 +246,7 @@ through the web interface at L<http://rt.cpan.org/>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2017 Andreas Voegele
+Copyright 2012-2018 Andreas Voegele
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

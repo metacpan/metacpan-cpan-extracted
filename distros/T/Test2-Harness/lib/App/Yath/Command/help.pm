@@ -4,7 +4,7 @@ use warnings;
 
 use Test2::Util qw/pkg_to_file/;
 
-our $VERSION = '0.001063';
+our $VERSION = '0.001064';
 
 use parent 'App::Yath::Command';
 use Test2::Harness::Util::HashBase;
@@ -14,7 +14,7 @@ use List::Util ();
 
 sub show_bench { 0 }
 
-sub summary { 'Show a this list of commands' }
+sub summary { 'Show this list of commands' }
 
 sub description {
     return <<"    EOT"

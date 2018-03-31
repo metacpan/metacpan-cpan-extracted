@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4224",
    "license" : [
-      "unknown"
+      "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -52,7 +52,7 @@
    "provides" : {
       "ICC::Profile" : {
          "file" : "lib/ICC/Profile.pm",
-         "version" : "0.6"
+         "version" : "0.61"
       },
       "ICC::Profile::Generic" : {
          "file" : "lib/ICC/Profile/Generic.pm",
@@ -176,7 +176,7 @@
       },
       "ICC::Support::Chart" : {
          "file" : "lib/ICC/Support/Chart.pm",
-         "version" : "1.7"
+         "version" : "1.71"
       },
       "ICC::Support::Color" : {
          "file" : "lib/ICC/Support/Color.pm",
@@ -239,6 +239,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.604",
+   "version" : "0.605",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

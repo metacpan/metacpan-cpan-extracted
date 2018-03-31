@@ -5,11 +5,11 @@ use warnings;
 use version;
 use Module::Load '';
 
-our $VERSION = version->declare('v4.22.4');
+our $VERSION = version->declare('v4.22.5');
 our $PATCHLV = 0;
 sub version { return $VERSION.($PATCHLV > 0 ? 'p'.$PATCHLV : '') }
-sub sysname { 'bouncehammer'  }
-sub libname { 'Sisimai'       }
+sub sysname { 'bouncehammer' }
+sub libname { 'Sisimai'      }
 
 sub make {
     # Wrapper method for parsing mailbox or Maildir/

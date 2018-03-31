@@ -44,6 +44,14 @@ pure_all ::
 	$(NOECHO) $(NOOP)
 
 ';
+if ($ExtUtils::MakeMaker::VERSION >= 7.16) { #https://rt.cpan.org/Ticket/Display.html?id=117800
+#when it would be fixed in EUMM, <= condition should be added
+    $r .= '
+dynamic ::
+	$(NOECHO) $(NOOP)
+
+';
+}
     $r .= '
 # This is a workaround, the problem is that our old GNU make exports
 # variables into the environment so $(MYEXTLIB) is set in here to this

@@ -3,6 +3,7 @@ abstract: 'Editor and validator for systemd configuration files'
 author:
   - 'Dominique Dumont'
 build_requires:
+  Config::Model: '2.118'
   Config::Model::Tester: '2.054'
   Module::Build: '0.34'
   Test::File::Contents: '0'
@@ -20,7 +21,7 @@ recommends:
   App::Cme: '0'
   Config::Model::TkUI: '0'
 requires:
-  Config::Model: '2.111'
+  Config::Model: '2.118'
   Config::Model::Backend::Any: '0'
   Config::Model::Backend::IniFile: '0'
   Log::Log4perl: '0'
@@ -32,5 +33,5 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model-systemd/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model-systemd.git
-version: 0.236.1
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: 0.238.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

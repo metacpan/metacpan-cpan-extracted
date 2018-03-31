@@ -426,15 +426,17 @@ prefixed with C<BlockIO> or C<StartupBlockIO>.',
       {
         'description' => "Takes a boolean argument. If true, turns on IPv4 and IPv6 network traffic accounting for packets sent
 or received by the unit. When this option is turned on, all IPv4 and IPv6 sockets created by any process of
-the unit are accounted for. When this option is used in socket units, it applies to all IPv4 and IPv6 sockets
+the unit are accounted for.
+
+When this option is used in socket units, it applies to all IPv4 and IPv6 sockets
 associated with it (including both listening and connection sockets where this applies). Note that for
 socket-activated services, this configuration setting and the accounting data of the service unit and the
 socket unit are kept separate, and displayed separately. No propagation of the setting and the collected
 statistics is done, in either direction. Moreover, any traffic sent or received on any of the socket unit's
 sockets is accounted to the socket unit \x{2014} and never to the service unit it might have activated, even if the
-socket is used by it. Note that IP accounting is currently not supported for slice units, and enabling this
-option for them has no effect. The system default for this setting may be controlled with
-C<DefaultIPAccounting> in
+socket is used by it.
+
+The system default for this setting may be controlled with C<DefaultIPAccounting> in
 L<systemd-system.conf(5)>.",
         'type' => 'leaf',
         'value_type' => 'boolean',
