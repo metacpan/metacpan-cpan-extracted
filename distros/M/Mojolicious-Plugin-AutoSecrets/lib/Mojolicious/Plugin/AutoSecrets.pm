@@ -1,12 +1,13 @@
 package Mojolicious::Plugin::AutoSecrets;
 # ABSTRACT: Automatic, Rotating Mojolicious Secrets
-$Mojolicious::Plugin::AutoSecrets::VERSION = '0.004';
+$Mojolicious::Plugin::AutoSecrets::VERSION = '0.005';
 
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::JSON qw(encode_json decode_json);
 use Session::Token;
 use Carp qw(croak);
 use Fcntl qw(:DEFAULT :flock);
+use IO::File;
 use autodie;
 
 

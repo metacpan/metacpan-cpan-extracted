@@ -77,6 +77,8 @@ subtest $_->{testname} => sub {
         'build proceeds normally',
     );
 
+    is($tzil->version, '0.002', 'version properly extracted from main module');
+
     my $post_release_commit_plugin = $tzil->plugin_named('@Git::VersionManager/post-release commit');
 
     if ($test->{expected_installers_in_git_commit}) {

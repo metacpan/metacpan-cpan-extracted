@@ -6,7 +6,9 @@ use autodie;
 use App::Egaz -command;
 use App::Egaz::Common;
 
-use constant abstract => 'normalize lav files';
+sub abstract {
+    return 'normalize lav files';
+}
 
 sub opt_spec {
     return (

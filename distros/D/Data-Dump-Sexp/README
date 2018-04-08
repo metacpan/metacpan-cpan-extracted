@@ -1,0 +1,59 @@
+Data-Dump-Sexp version 0.001
+============================
+
+Data::Dump::Sexp converts Perl structures to S-expressions.
+
+The conversion rules are as follows:
+
+1. A blessed object with a to_sexp method is replaced with the result
+   of calling the method, and this procedure is restarted.
+
+2. An instance of Data::SExpression::Symbol is converted to a symbol.
+
+3. An instance of Data::SExpression::Cons is converted to a cons cell
+   (like (A . B)), a proper list (like (A B C)) or an improper list
+   (like (A B . C)), where A, B, C are S-expressions.
+
+4. undef is converted to the empty list.
+
+5. A defined scalar that looks like a number is left as-is.
+
+6. A defined scalar that does not look like a number is surrounded by
+   double quotes after any backslashes and double quote characters are
+   escaped with a backslash.
+
+7. An arrayref is converted to a proper list.
+
+8. A hashref is converted to an alist, which is a proper list of cons
+   cells (like ((A . B) (C . D) (E . F))).
+
+9. A scalarref or a reference to another ref is dereferenced and this
+   procedure is restarted.
+
+10. Anything else (regexp, filehandle, format, glob, version string)
+    causes an exception to be raised
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* Data::SExpression
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2018 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

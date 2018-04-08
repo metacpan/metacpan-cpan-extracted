@@ -1,5 +1,12 @@
 Revision history for Net-Async-SOCKS
 
+0.003     2018-04-02 18:04:54+01:00 Europe/London
+        * Deconfigure $stream's on_read after setup
+	* Slightly neater sequencing; always remember to $loop->remove($stream) even after failure
+	* Only add/remove $stream to loop if we constructed it; stream given by 'handle' argument should already be a member
+	* Use ATYPE_FQDN except for hostnames that look a bit like IPv4 addresses (see also RT124730)
+	(RT124746)
+
 0.002     2014-08-29 06:43:15+01:00 Europe/London
 	No new features.
 

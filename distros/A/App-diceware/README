@@ -1,0 +1,40 @@
+NAME
+
+    App::diceware - A simple Diceware passphrase generator.
+
+SYNOPSIS
+
+      # via command line
+      $ diceware.pl
+      earthlinghandbookspiltunwillingappendage
+      $ diceware.pl --language en --length 2 --pretty
+      earthling-handbook
+    
+      # in Perl
+      use App::diceware;
+    
+      my $diceware = App::diceware->new({language => 'en'});
+      my $passphrase = diceware->passphrase({length => 5, pretty => 1});
+
+DESCRIPTION
+
+    App::diceware is a simple Diceware passphrase generator. It supports
+    English and German wordlists.
+
+AUTHOR
+
+    Johann Rolschewski <jorol@cpan.org>
+
+COPYRIGHT
+
+    Copyright 2018- Johann Rolschewski
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    Diceware <https://en.wikipedia.org/wiki/Diceware>
+

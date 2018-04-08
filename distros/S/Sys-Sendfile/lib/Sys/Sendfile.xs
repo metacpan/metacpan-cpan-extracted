@@ -55,27 +55,35 @@
 #  define TO_SOCKET(x) (x)
 #endif /* USE_SOCKETS_AS_HANDLES */
 
+#define undef &PL_sv_undef
+
 MODULE = Sys::Sendfile				PACKAGE = Sys::Sendfile
 
 SV*
-sendfile(out, in, count = 0, offset = &PL_sv_undef)
+sendfile(out, in, count = undef, offset = undef)
 	int out = PerlIO_fileno(IoOFP(sv_2io(ST(0))));
 	int in  = PerlIO_fileno(IoIFP(sv_2io(ST(1))));
-	size_t count;
+	SV* count;
 	SV* offset;
 	PROTOTYPE: **@
 	CODE:
 	{
 	Off_t real_offset = SvOK(offset) ? SvUV(offset) : (off_t)lseek(in, 0, SEEK_CUR);
-#if defined OS_LINUX
-	if (count == 0) {
+	Off_t real_count = SvOK(count) ? SvUV(count) : 0u;
+#if defined(OS_BSD) || defined(OS_X)
+	if (SvOK(count) && real_count == 0)
+		XSRETURN_IV(0);
+#else
+	if (!SvOK(count)) {
 		struct stat info;
 		if (fstat(in, &info) == -1)
 			XSRETURN_EMPTY;
-		count = info.st_size - real_offset;
+		real_count = info.st_size - real_offset;
 	}
+#endif
+#if defined OS_LINUX
 	{
-		ssize_t success = sendfile(out, in, &real_offset, count);
+		ssize_t success = sendfile(out, in, &real_offset, real_count);
 		if (success == -1)
 			XSRETURN_EMPTY;
 		else
@@ -83,13 +91,13 @@ sendfile(out, in, count = 0, offset = &PL_sv_undef)
 	}
 #elif defined OS_BSD
 	off_t bytes;
-	int ret = sendfile(in, out, real_offset, count, NULL, &bytes, 0);
+	int ret = sendfile(in, out, real_offset, real_count, NULL, &bytes, 0);
 	if (ret == -1 && bytes == 0 && ! (errno == EAGAIN || errno == EINTR))
 		XSRETURN_EMPTY;
 	else
 		XSRETURN_IV(bytes);
 #elif defined OS_X
-	off_t bytes = count;
+	off_t bytes = real_count;
 	int ret = sendfile(in, out, real_offset, &bytes, NULL, 0);
 	if (ret == -1 && bytes == 0 && ! (errno == EAGAIN || errno == EINTR))
 		XSRETURN_EMPTY;
@@ -100,24 +108,17 @@ sendfile(out, in, count = 0, offset = &PL_sv_undef)
 	int ret;
 	if (SvOK(offset))
 		SetFilePointer(hFile, real_offset, NULL, FILE_BEGIN);
-	ret = TransmitFile(TO_SOCKET(out), hFile, (DWORD)count, 0, NULL, NULL, 0);
+	ret = TransmitFile(TO_SOCKET(out), hFile, (DWORD)real_count, 0, NULL, NULL, 0);
 	if (!ret)
 		XSRETURN_EMPTY;
 	else
-		XSRETURN_IV(count);
+		XSRETURN_IV(real_count);
 #else
-	void* buffer;
 	int ret;
-	if (count == 0) {
-		struct stat info;
-		if (fstat(in, &info) == -1)
-			XSRETURN_EMPTY;
-		count = info.st_size - real_offset;
-	}
-	buffer = mmap(NULL, count, PROT_READ, MAP_SHARED | MAP_FILE, in, real_offset);
+	void* buffer = mmap(NULL, real_count, PROT_READ, MAP_SHARED | MAP_FILE, in, real_offset);
 	if (buffer == MAP_FAILED)
 		XSRETURN_EMPTY;
-	ret = write(out, buffer, count);
+	ret = write(out, buffer, real_count);
 	if (ret == -1)
 		XSRETURN_EMPTY;
 	else

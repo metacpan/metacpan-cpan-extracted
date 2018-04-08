@@ -1,22 +1,21 @@
 package String::Validator::Phone::NANP;
-
-use 5.006;
+$String::Validator::Phone::NANP::VERSION = '2.00';
+use 5.008;
 use strict;
 use warnings;
-use String::Validator::Common ;
+use String::Validator::Common 1.90;
 use Number::Phone ;
 
-=head1 NAME
+# ABSTRACT: Validate North American Phone Numbers
 
-String::Validator::Phone::NANP - Check a Phone Number (North American Numbering Plan)!
 
-=head1 VERSION
-
-Version 0.96
-
-=cut
-
-our $VERSION = '0.96';
+my $phonenanp_messages = {
+    phonenanp_not10 => sub {
+        my $D = shift; # num1, num2, len
+        return "Not a 10 digit Area-Number $D->{num1} .. $D->{num2} = $D->{len}.";
+    },
+    phonenanp_badarea => 'Invalid Number, perhaps non-existent Area Code',
+};
 
 sub new {
     my $class = shift ;
@@ -24,8 +23,11 @@ sub new {
     use base ( 'String::Validator::Common' ) ;
     unless ( defined $self->{ alphanum } ) { $self->{ alphanum } = 0 } ;
     # disable length checking.
-    $self->{ min_len } = 0 ; $self->{ max_len } = 0 ;    
+    $self->{ min_len } = 0 ; $self->{ max_len } = 0 ;
     bless $self, $class ;
+    $self->{messages}
+        = String::Validator::Common::_Messages(
+                $phonenanp_messages, $self->{language}, $self->{custom_messages} );
     return $self ;
 }
 
@@ -55,7 +57,9 @@ sub _must_be10 {
     my $l = length $num2 ;
     if ( 10 == $l ) { return 1 }
     else { $self->IncreaseErr(
-        "Not a 10 digit Area-Number $num .. $num2 = $l." ) }
+        $self->{messages}{phonenanp_not10}->({
+            num1 => $num, num2 => $num2, len => $l }));
+        }
     return 0 ;
 }
 
@@ -80,12 +84,8 @@ sub Check {
     $self->{ international } = '1-' . $self->{ string } ;
     my $Phone = Number::Phone->new( $self->{ international } ) ;
     unless ( $Phone ) {
-        $self->IncreaseErr( 'Invalid Number, perhaps non-existent Area Code' ) }
-	else {
-		unless ( $Phone->is_valid ) {
-			$self->IncreaseErr( 'Invalid Number, perhaps non-existent Area Code' ) }
-		}
-return $self->{ error } ;
+        $self->IncreaseErr( $self->{messages}{phonenanp_badarea} ) }
+    return $self->{ error } ;
 }
 
 # sub String # is inherited from String::Validator::Common.
@@ -96,11 +96,11 @@ sub Areacode {
 	my $self = shift ;
 	return ( $self->{ areacode } ) ;
 	}
-	
+
 sub Exchange {
 	my $self = shift ;
 	return ( $self->{ exchange } ) ;
-	}	
+	}
 
 sub Local {
 	my $self = shift ;
@@ -123,11 +123,32 @@ sub Number_Phone {
 	return Number::Phone->new( $self->{ international } ) ;
 	}
 
+
+1; # End of String::Validator::Phone::NANP
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+String::Validator::Phone::NANP - Validate North American Phone Numbers
+
+=head1 VERSION
+
+version 2.00
+
 =head1 SYNOPSIS
 
 String::Validator::Phone::NANP is part of the String Validator Collection. It checks a string
 against validation rules for phone numbers from countries participating in the North American
 Numbering Plan, which includes the United States and Canada.
+
+=head1 NAME
+
+String::Validator::Phone::NANP - Check a Phone Number (North American Numbering Plan)!
 
 =head1 String::Validator Methods and Usage
 
@@ -139,16 +160,16 @@ String::Validator::Common for information on the base String::Validator Class.
 
 =head2 Parameters to New with (default) behaviour.
 
- alphanum    (OFF) : Allow Alphanumeric formats. 
+ alphanum    (OFF) : Allow Alphanumeric formats.
 
-=head2 Original, String, International, Areacode, Parens, Local
+=head2 Original, String, International, Areacode, Parens, Exchange, Local
 
 Returns:
 
-Original: the Orignial string provided, 
+Original: the Orignial string provided,
 
 String: the internal representations of the phone number, which
-is in the format of AREA-EXCHANGE-NUMBER, (the most commonly used representation in the United 
+is in the format of AREA-EXCHANGE-NUMBER, (the most commonly used representation in the United
 States).
 
 International: Prepends 1- in front of the string.
@@ -166,13 +187,13 @@ number evaluated was not valid it returns 0.
 
  use String::Validator::Phone::NANP ;
  my $Validator = String::Validator::Phone::NANP->new( alphanum => 1 ) ;
- 
+
  if ( $Validator->IsNot_Valid( '6464') { say $Validator->Errstr() }
- # IsNot_Valid returns Errstr on failure. 
+ # IsNot_Valid returns Errstr on failure.
  # So the preceding and following are the same.
  my $badone = $Validator->IsNot_Valid( '999') ;
- if ( $badone ) { say "$badone' } ; 
- 
+ if ( $badone ) { say "$badone' } ;
+
  if ( $Validator->Is_Valid( '646-SG7-6464' ) { say "good" }
  say $Validator->Areacode ; # print the Areacode.
  my $PhoneNum = $Validator->Number_Phone ; # Get a Number Phone object.
@@ -180,18 +201,12 @@ number evaluated was not valid it returns 0.
 
 =head1 ToDo
 
-The major TO DO items are to provide String::Validator::Phone modules for other numbering 
+The major TO DO items are to provide String::Validator::Phone modules for other numbering
 schemes and to fully encapsulate Number::Phone.
 
 =head1 AUTHOR
 
 John Karr, C<< <brainbuz at brainbuz.org> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-string-validator-phone at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=String-Validator-Phone>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -199,36 +214,15 @@ You can find documentation for this module with the perldoc command.
 
     perldoc String::Validator::Phone
 
+=head1 Bug Reports and Patches
 
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=String-Validator-Phone>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/String-Validator-Phone>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/String-Validator-Phone>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/String-Validator-Phone/>
-
-=back
-
+Please submit Bug Reports and Patches via https://github.com/brainbuz/String-Validator.
 
 =head1 ACKNOWLEDGEMENTS
 
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 John Karr.
+Copyright 2012, 2018 John Karr.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -244,7 +238,16 @@ A copy of the GNU General Public License is available in the source tree;
 if not, write to the Free Software Foundation, Inc.,
 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+=head1 AUTHOR
+
+John Karr <brainbuz@brainbuz.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014,2018 by John Karr.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
 
 =cut
-
-1; # End of String::Validator::Phone::NANP

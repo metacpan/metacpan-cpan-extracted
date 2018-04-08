@@ -1,3 +1,9 @@
+libmojolicious-plugin-mailexception-perl (0.21-1) nowtaxi; urgency=medium
+
+  * Stacksize limit.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 04 Apr 2018 16:53:52 +0300
+
 libmojolicious-plugin-mailexception-perl (0.20-1) unstable; urgency=medium
 
   * Update for latest mojolicious, Debian FTBFS, closes: 825541.

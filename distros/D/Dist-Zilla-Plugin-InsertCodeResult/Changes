@@ -1,4 +1,7 @@
-Revision history for Dist-Zilla-Plugin-InsertCodeResult
+0.050   2018-04-06 (PERLANCAR)
+
+	- Log result of code for debugging.
+
 
 0.04    2015-05-05 (PERLANCAR)
 

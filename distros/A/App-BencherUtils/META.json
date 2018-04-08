@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "App::lcpan::Call" : "0.11",
-            "Bencher::Backend" : "1.040",
+            "Bencher::Backend" : "1.041",
             "Browser::Open" : "0",
             "Complete::Module" : "0",
             "Complete::Util" : "0.57",
@@ -53,10 +53,12 @@
             "PERLANCAR::Module::List" : "0",
             "POSIX" : "0",
             "Perinci::CmdLine::Any" : "0",
-            "Perinci::CmdLine::Base" : "1.80",
+            "Perinci::CmdLine::Base" : "1.810",
+            "Perinci::CmdLine::Classic" : "1.770",
             "Perinci::Object" : "0.26",
             "Perinci::Sub::Util" : "0.46",
             "PerlX::Maybe" : "0",
+            "Sah::Schema::perl::modargs" : "0",
             "Sah::Schema::perl::modname" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -84,7 +86,7 @@
          "web" : "https://github.com/perlancar/perl-App-BencherUtils"
       }
    },
-   "version" : "0.240",
+   "version" : "0.241",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

@@ -1,13 +1,12 @@
-# RT::Client::REST::Queue -- queue object representation.
-
-package RT::Client::REST::Queue;
+#!perl
+# PODNAME: RT::Client::REST::Queue
+# ABSTRACT: queue object representation.
 
 use strict;
 use warnings;
 
-use vars qw($VERSION);
-$VERSION = '0.02';
-
+package RT::Client::REST::Queue;
+$RT::Client::REST::Queue::VERSION = '0.52';
 use Params::Validate qw(:types);
 use RT::Client::REST 0.20;
 use RT::Client::REST::Object 0.01;
@@ -16,28 +15,6 @@ use RT::Client::REST::SearchResult 0.02;
 use RT::Client::REST::Ticket;
 use base 'RT::Client::REST::Object';
 
-=head1 NAME
-
-RT::Client::REST::Queue -- queue object representation.
-
-=head1 SYNOPSIS
-
-  my $rt = RT::Client::REST->new(server => $ENV{RTSERVER});
-
-  my $queue = RT::Client::REST::Queue->new(
-    rt  => $rt,
-    id  => 'General',
-  )->retrieve;
-
-=head1 DESCRIPTION
-
-B<RT::Client::REST::Queue> is based on L<RT::Client::REST::Object>.
-The representation allows one to retrieve, edit, comment on, and create
-queue in RT.
-
-Note: RT currently does not allow REST client to search queues.
-
-=cut
 
 sub _attributes {{
     id  => {
@@ -106,6 +83,58 @@ sub _attributes {{
         },
     },
 }}
+
+
+sub tickets {
+    my $self = shift;
+
+    $self->_assert_rt_and_id;
+
+    return RT::Client::REST::Ticket
+        ->new(rt => $self->rt)
+        ->search(limits => [
+            {attribute => 'queue', operator => '=', value => $self->id},
+        ]);
+}
+
+
+sub rt_type { 'queue' }
+
+
+__PACKAGE__->_generate_methods;
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RT::Client::REST::Queue - queue object representation.
+
+=head1 VERSION
+
+version 0.52
+
+=head1 SYNOPSIS
+
+  my $rt = RT::Client::REST->new(server => $ENV{RTSERVER});
+
+  my $queue = RT::Client::REST::Queue->new(
+    rt  => $rt,
+    id  => 'General',
+  )->retrieve;
+
+=head1 DESCRIPTION
+
+B<RT::Client::REST::Queue> is based on L<RT::Client::REST::Object>.
+The representation allows one to retrieve, edit, comment on, and create
+queue in RT.
+
+Note: RT currently does not allow REST client to search queues.
 
 =head1 ATTRIBUTES
 
@@ -179,20 +208,6 @@ Note: tickets with status "deleted" will not be shown.
 Object of type L<RT::Client::REST::SearchResult> is returned which then
 can be used to get to objects of type L<RT::Client::REST::Ticket>.
 
-=cut
-
-sub tickets {
-    my $self = shift;
-
-    $self->_assert_rt_and_id;
-
-    return RT::Client::REST::Ticket
-        ->new(rt => $self->rt)
-        ->search(limits => [
-            {attribute => 'queue', operator => '=', value => $self->id},
-        ]);
-}
-
 =back
 
 =head1 INTERNAL METHODS
@@ -203,10 +218,6 @@ sub tickets {
 
 Returns 'queue'.
 
-=cut
-
-sub rt_type { 'queue' }
-
 =back
 
 =head1 SEE ALSO
@@ -215,16 +226,45 @@ L<RT::Client::REST>, L<RT::Client::REST::Object>,
 L<RT::Client::REST::SearchResult>,
 L<RT::Client::REST::Ticket>.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Abhijit Menon-Sen <ams@wiw.org>
+
+=item *
 
 Dmitri Tikhonov <dtikhonov@yahoo.com>
 
-=head1 LICENSE
+=item *
 
-Perl license.
+Damien "dams" Krotkine <dams@cpan.org>
+
+=item *
+
+Dean Hamstead <dean@bytefoundry.com.au>
+
+=item *
+
+Miquel Ruiz <mruiz@cpan.org>
+
+=item *
+
+JLMARTIN
+
+=item *
+
+SRVSH
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Dmitri Tikhonov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-__PACKAGE__->_generate_methods;
-
-1;

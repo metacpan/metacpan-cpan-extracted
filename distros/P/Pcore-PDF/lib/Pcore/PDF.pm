@@ -1,4 +1,4 @@
-package Pcore::PDF v0.4.5;
+package Pcore::PDF v0.4.6;
 
 use Pcore -dist, -class, -const, -result;
 use Config;
@@ -38,9 +38,9 @@ const our $PAGE_SIZE => {
     Tabloid   => '279.4 x 431.8 mm',
 };
 
-has bin         => ( is => 'lazy', isa => Str );
-has max_threads => ( is => 'ro',   isa => PositiveInt, default => ( $MSWIN ? 1 : 4 ) );
-has page_size   => ( is => 'ro',   isa => Enum [ keys $PAGE_SIZE->%* ], default => 'A4' );
+has bin => ( is => 'ro', isa => 'Str', default => 'prince', isa => Str );
+has max_threads => ( is => 'ro', isa => PositiveInt, default => ( $MSWIN ? 1 : 4 ) );
+has page_size => ( is => 'ro', isa => Enum [ keys $PAGE_SIZE->%* ], default => 'A4' );
 
 has _threads => ( is => 'ro', isa => Int, default => 0, init_arg => undef );
 has _proc  => ( is => 'ro', isa => ArrayRef, default => sub { [] }, init_arg => undef );
@@ -94,57 +94,6 @@ has _queue => ( is => 'ro', isa => ArrayRef, default => sub { [] }, init_arg => 
 #     },
 #     'job-resource-count' => 1,
 # };
-
-# TODO MSWIN support
-sub update_all ( $self, $cb = undef ) {
-    die qq[MSWIN is not supported] if $MSWIN;
-
-    my $blocking_cv = defined wantarray ? AE::cv : undef;
-
-    my $princexml_ver = $ENV->dist('Pcore-PDF')->cfg->{princexml_ver};
-
-    my $url = "https://www.princexml.com/download/prince-$princexml_ver" . ( $MSWIN ? '-win64.zip' : '-linux-generic-x86_64.tar.gz' );
-
-    P->http->get(
-        $url,
-        buf_size    => 1,
-        on_progress => 1,
-        sub ($res) {
-            my $success;
-
-            if ($res) {
-                $success = eval {
-                    if ($MSWIN) {
-
-                        # TODO
-                    }
-                    else {
-                        P->file->untar( $res->body->path, $ENV->share->get_lib('Pcore-PDF') . "bin/princexml-linux-generic-x64-$princexml_ver/", strip_component => 1 );
-                    }
-
-                    1;
-                };
-            }
-
-            $cb->($success) if $cb;
-
-            $blocking_cv->($success) if $blocking_cv;
-
-            return;
-        }
-    );
-
-    return $blocking_cv ? $blocking_cv->recv : ();
-}
-
-# TODO MSWIN support
-sub _build_bin ($self) {
-    my $princexml_ver = $ENV->dist('Pcore-PDF')->cfg->{princexml_ver};
-
-    my $path = '/bin/princexml-linux-generic' . ( $Config{archname} =~ /x64|x86_64/sm ? '-x64' : q[] ) . "-$princexml_ver/lib/prince/bin/prince";
-
-    return $ENV->share->get($path);
-}
 
 sub generate_pdf ( $self, $html, $cb ) {
     push $self->{_queue}->@*, [ $html, $cb ];
@@ -413,12 +362,10 @@ sub _run_task ( $self, $proc, $task ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 100                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | Documentation::RequirePodLinksIncludeText                                                                      |
-## |      | 426                  | * Link L<Pcore::Util::Result> on line 483 does not specify text                                                |
-## |      | 426                  | * Link L<Pcore::Util::Result> on line 493 does not specify text                                                |
-## |      | 426                  | * Link L<Pcore> on line 491 does not specify text                                                              |
+## |      | 373                  | * Link L<Pcore::Util::Result> on line 430 does not specify text                                                |
+## |      | 373                  | * Link L<Pcore::Util::Result> on line 440 does not specify text                                                |
+## |      | 373                  | * Link L<Pcore> on line 438 does not specify text                                                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,10 +1,18 @@
-Revision history for Perl module RT::Client::REST
+﻿Revision history for Perl module RT::Client::REST
 
-0.51	Tue Feb 27 2017 "Dmitri Tikhonov" <dmitri@cpan.org>
+0.52 Fri Apr 06 2018 "Dean Hamstead" <dean@bytefoundry.com.au>
+  - Fix up lots of Pod Critic complaints
+  - Fix up lots of Perl Critic complaints
+  - Use Dist-Zilla for releases
+  - Remove Pod, tests and other files that Dist-Zilla provides
+  - Adjust git repo slightly
+  - Note: no functional changes
+
+0.51 Tue Feb 27 2017 "Dmitri Tikhonov" <dmitri@cpan.org>
   - Add method to retrieve attachment metadata. Thanks Oriol Soriano.
   - Fix filename parsing bug in get_attachment_ids(). Thanks djstauffer.
 
-0.50	Fri Dec 11 2015 "Sarvesh Das" <sarveshd@opmbx.org>
+0.50 Fri Dec 11 2015 "Sarvesh Das" <sarveshd@opmbx.org>
   - Added the 'disabled' attribute to RT::Client::REST::Group and
     RT::Client::REST::Queue to match the addition in RT 4.2.2 --
     commit 7557633. Thanks Tom.
@@ -19,7 +27,7 @@ Revision history for Perl module RT::Client::REST
     RT#98160.
   - Removed MYMETA* files from distribution -- RT#108083
 
-0.49	Sat May 10 2014 "Dmitri Tikhonov" <dtikhonov@yahoo.com>
+0.49 Sat May 10 2014 "Dmitri Tikhonov" <dtikhonov@yahoo.com>
   - This module is now all covered by the Perl Artistic License:
     GPL is gone.  This was done with permission from the original
     author of the command-line `rt' utility, Abhijit Menon-Sen.
@@ -110,15 +118,15 @@ Revision history for Perl module RT::Client::REST
  - Add Test::More as a test_requires to help distros which split it out
    of their core perl package (RT#45150)
 
-0.40 
+0.40
   Jerrad Pierce <jpierce@cpan.org>
   - #38710, more user attributes
   - #39868 & #42391, Alter CF parsing to accomodate 3.8 as well as 3.6
-	This required tweaks to Forms as well as Object.
+    This required tweaks to Forms as well as Object.
   - #38591 & #43844, Add requestor attribute to Ticket so that autoreplies
-	are sent to users under RT3.8
+    are sent to users under RT3.8
 
-0.37	Fri Aug 15 2008 "Dmitri Tikhonov" <dtikhonov@yahoo.com>
+0.37 Fri Aug 15 2008 "Dmitri Tikhonov" <dtikhonov@yahoo.com>
   - Fri Aug 15 2008 "Dmitri Tikhonov" <dtikhonov@yahoo.com>
     Improvement: reorganized exceptions, made
     RT::Client::REST::Object::Exception a subclass of
@@ -151,7 +159,7 @@ Revision history for Perl module RT::Client::REST
 
   - Tue, 29 Jan 2008 "Damien Krotkine" <dams@cpan.org>
     Decode data from REST from the proper encoding to Perl internal.
-    Thanks to "S�bastien Aperghis-Tramoni" <sebastien@aperghis.net> 
+    Thanks to "Sébastien Aperghis-Tramoni" <sebastien@aperghis.net>
 
   - Fri, 25 Jan 2008 "Damien Krotkine" <dams@cpan.org>
     Add dirty custom fields handling. Without it, cf are always submitted,
@@ -403,7 +411,7 @@ Revision history for Perl module RT::Client::REST
   ! lib/RT/Client/REST/Object/Exception.pm
     * Added exceptions:
       * RT::Client::REST::Object::NoopOperationException
-      *	RT::Client::REST::Object::RequiredAttributeUnsetException
+      * RT::Client::REST::Object::RequiredAttributeUnsetException
 
   ! lib/RT/Client/REST/Ticket.pm
   ! t/22-ticket.t
@@ -607,7 +615,7 @@ Revision history for Perl module RT::Client::REST
     * Added TODO file.
 
 0.11    Sat Jul 22 2006 "Dmitri Tikhonov" <dtikhonov@vonage.com>
-  ! lib/RT/Client/REST.pm 
+  ! lib/RT/Client/REST.pm
     * Make $VERSION a string so that 'make tardist' works as
       expected (i.e. version 0.10 instead of 0.1).
 

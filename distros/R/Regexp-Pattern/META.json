@@ -1,5 +1,5 @@
 {
-   "abstract" : "Collection of regexp patterns",
+   "abstract" : "Convention/framework for modules that contain collection of regexes",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -58,7 +58,7 @@
          "web" : "https://github.com/perlancar/perl-Regexp-Pattern"
       }
    },
-   "version" : "0.2.2",
+   "version" : "0.2.3",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

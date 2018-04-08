@@ -1,10 +1,9 @@
 #!perl
 
-use Test::More tests => 6;
+use Test2::V0;
+use Test::Lib;
 
-use lib 't';
-
-BEGIN { use_ok('App::Env') };
+use App::Env;
 
 my %AppOpts = ( a => 3 );
 
@@ -13,8 +12,8 @@ my $obj1 = App::Env->new( 'App1', { AppOpts => \%AppOpts } );
 is( $obj1->env('Site1_App1'), 1, "method 1, AppOpts sig" );
 
 # now get App1 again, with AppID signature
-my $obj2 = App::Env->new( 'App1', { CacheID => 'AppID', 
-				    AppOpts => \%AppOpts } );
+my $obj2 = App::Env->new( 'App1', { CacheID => 'AppID',
+                                    AppOpts => \%AppOpts } );
 is( $obj2->env('Site1_App1'), 2, "method 2, AppID sig" );
 is( $obj2->cacheid, 'App::Env::Site1::App1', "method 2, AppID cache id" );
 
@@ -26,3 +25,4 @@ is( $obj3->env('Site1_App1'), 2, "method 3, AppID cache" );
 my $obj4 = App::Env->new( 'App1', { AppOpts => \%AppOpts } );
 is( $obj4->env('Site1_App1'), 1, "method 4, AppOpts cache" );
 
+done_testing;

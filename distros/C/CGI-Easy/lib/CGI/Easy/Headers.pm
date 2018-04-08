@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use CGI::Easy::Util qw( date_http make_cookie );
 
@@ -95,7 +95,7 @@ CGI::Easy::Headers - Manage HTTP headers
 
 =head1 VERSION
 
-This document describes CGI::Easy::Headers version v2.0.0
+This document describes CGI::Easy::Headers version v2.0.1
 
 
 =head1 SYNOPSIS
@@ -130,9 +130,10 @@ headers while preparing them for sending in CGI reply.
 
 =head1 INTERFACE 
 
-=over
+=head2 new
 
-=item new( [\%headers] )
+    $h = CGI::Easy::Headers->new();
+    $h = CGI::Easy::Headers->new( \%headers );
 
 Create new CGI::Easy::Headers object/hash with these fields:
 
@@ -159,12 +160,14 @@ few exceptions from this rule: 'ETag', 'WWW-Authenticate' and 'Digest-MD5'.
 
 Return created CGI::Easy::Headers object.
 
+=head2 add_cookie
 
-=item add_cookie( \%cookie, … )
+    $h->add_cookie( \%cookie );
+    $h->add_cookie( \%cookie1, \%cookie2, ... );
 
 Add new cookies to current HTTP headers. Actually it's just do this:
 
-    push @{ $self->{'Set-Cookie'} }, \%cookie, …;
+    push @{ $h->{'Set-Cookie'} }, \%cookie, ...;
 
 Possible keys in %cookie:
 
@@ -180,8 +183,10 @@ Format for "expires" should be either correct date
 
 Return nothing.
 
+=head2 redirect
 
-=item redirect( $url [, $status] )
+    $h->redirect( $url );
+    $h->redirect( $url, $status );
 
 Set HTTP headers 'Location' and 'Status'.
 
@@ -189,15 +194,18 @@ If $status not provided, use '302 Found'.
 
 Return nothing.
 
+=head2 require_basic_auth
 
-=item require_basic_auth( [$realm] )
+    $h->require_basic_auth();
+    $h->require_basic_auth( $realm );
 
 Set HTTP headers 'WWW-Authenticate' and 'Status'.
 
 Return nothing.
 
+=head2 compose
 
-=item compose( )
+    $headers = $h->compose();
 
 Render all object's fields into single string with all HTTP headers suitable
 for sending to user's browser.
@@ -240,9 +248,6 @@ add_cookie() above).
 
 Return string with HTTP headers ending with empty line.
 Throw exception on keys named with wrong case (see new() about details).
-
-
-=back
 
 
 =head1 SUPPORT
@@ -297,7 +302,7 @@ Alex Efros E<lt>powerman@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2009-2010 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+This software is Copyright (c) 2009- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
 
 This is free software, licensed under:
 

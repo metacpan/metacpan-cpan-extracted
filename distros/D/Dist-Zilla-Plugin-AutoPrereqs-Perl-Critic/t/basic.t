@@ -242,7 +242,7 @@ $http_tiny->mock( 'get', Local::HTTP::Tiny::Mock::get_404() );
         },
     );
 
-    like( exception { $tzil->build; }, "/ \Q[AutoPrereqs::Perl::Critic] Unable to download latest package information for Perl::Critic. Please ensure that your system can access 'http://cpanmetadb.plackperl.org/v1.0/package/Perl::Critic' or disable 'remove_core_policies' in your dist.ini\E /xsm", 'throws an exception if http://cpanmetadb.plackperl.org/v1.0/package/Perl::Critic cannot be downloaded' );
+    like( exception { $tzil->build; }, "/ \Q[AutoPrereqs::Perl::Critic] Unable to download latest package information for Perl::Critic: Not Found. Please ensure that your system can access 'http://cpanmetadb.plackperl.org/v1.0/package/Perl::Critic' or disable 'remove_core_policies' in your dist.ini\E /xsm", 'throws an exception if http://cpanmetadb.plackperl.org/v1.0/package/Perl::Critic cannot be downloaded' );
 }
 
 done_testing();

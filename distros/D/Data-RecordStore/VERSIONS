@@ -1,3 +1,7 @@
+3.17 - fix Makefile.PL issue with junk files included
+       add flock locking for datastore writes
+       use binmode in hopes of getting windows tests to work
+
 3.16 - removed silly ~ files
 
 3.15 - removed obsolete dependency

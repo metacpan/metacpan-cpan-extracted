@@ -1,6 +1,6 @@
 #!perl -T
 
-use Test::More tests => 19;
+use Test::More tests => 20;
 
 BEGIN {
     use_ok( 'String::Validator::Password' ) || print "Bail out!\n";
@@ -37,6 +37,8 @@ $Validator = String::Validator::Password->new( min_types => 4 ) ;
 is ( $Validator->Check( '1234567689' ), 1, 	'1234567689  fails with types set to 4.' ) ;
 is ( $Validator->Check( 'has2types2' ), 1, 	'has2types2  fails with types set to 4.' ) ;
 is ( $Validator->Check( 'THREE3type' ), 1, 	'THREE3type  fails with types set to 4.' ) ;
+like ( $Validator->Errstr(), qr/Input contained 3 types of character, 4 are required./,
+	'Errstr: Input contained 3 types of character, 4 are required.');
 is ( $Validator->Check( 'FOUR>4type' ), 0, 	'FOUR>4type passes with types set to 4.' ) ;
 
 

@@ -6,7 +6,8 @@
 # - unix socket
 use warnings;
 use strict;
-use t::share;
+use lib 't';
+use share;
 
 @CheckPoint = (
     [ 'client',     SENT            ], 'client: SENT',

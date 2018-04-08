@@ -6,7 +6,7 @@ use Test::Exception;
 
 use constant METHODS => (
     'new', 'to_form', 'from_form', 'rt_type', 'tickets',
-    
+
     # attrubutes:
     'id', 'name', 'description', 'correspond_address', 'comment_address',
     'initial_priority', 'final_priority', 'default_due_in',

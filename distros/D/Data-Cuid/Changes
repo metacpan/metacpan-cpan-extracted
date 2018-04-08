@@ -1,0 +1,11 @@
+Revision history for Perl extension Data-cuid
+
+0.02 2018-04-07T15:01:26Z
+
+    - Simplify parts of test and module
+    - Fix timestamp of slug() as it should contain only 2 chars
+
+0.01 2018-04-07T08:26:34Z
+
+    - Initial release
+

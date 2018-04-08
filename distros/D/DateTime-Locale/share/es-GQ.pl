@@ -61,8 +61,8 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ 'de' y",
-    "yw-count-one" => "'semana' w 'de' Y",
-    "yw-count-other" => "'semana' w 'de' Y",
+    "yw-count-one" => "'semana' w 'de' y",
+    "yw-count-other" => "'semana' w 'de' y",
   },
   code => "es-GQ",
   date_format_full => "EEEE, d 'de' MMMM 'de' y",
@@ -279,5 +279,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => undef,
-  version => 32,
+  version => 33,
 }

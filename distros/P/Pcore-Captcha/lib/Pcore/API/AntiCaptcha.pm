@@ -142,11 +142,9 @@ sub recaptcha_proxy ( $self, @ ) {
 sub get_balance ( $self, $cb ) {
     P->http->post(
         'https://api.anti-captcha.com/getBalance',
-        body => to_json(
-            {    #
-                clientKey => $self->api_key,
-            }
-        ),
+        body => to_json( {    #
+            clientKey => $self->api_key,
+        } ),
         on_finish => sub ($res) {
             my $result;
 
@@ -180,11 +178,10 @@ sub get_balance ( $self, $cb ) {
 sub get_queue_stats ( $self, $queue_id, $cb ) {
     P->http->post(
         'https://api.anti-captcha.com/getQueueStats',
-        body => to_json(
-            {   clientKey => $self->api_key,
-                queueId   => $queue_id,
-            }
-        ),
+        body => to_json( {
+            clientKey => $self->api_key,
+            queueId   => $queue_id,
+        } ),
         on_finish => sub ($res) {
             my $result;
 
@@ -282,11 +279,10 @@ sub _run_resolver ($self) {
 
             P->http->post(
                 'https://api.anti-captcha.com/getTaskResult',
-                body => to_json(
-                    {   clientKey => $self->api_key,
-                        taskId    => $id,
-                    }
-                ),
+                body => to_json( {
+                    clientKey => $self->api_key,
+                    taskId    => $id,
+                } ),
                 on_finish => sub ($res) {
                     if ($res) {
                         my $data = from_json $res->body->$*;

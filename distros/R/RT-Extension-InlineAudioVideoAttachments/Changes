@@ -1,0 +1,6 @@
+Revision history for RT-Extension-InlineAudioVideoAttachments
+
+0.01 2018-04-06
+ - Add preload=metadata attribute
+0.01 2018-04-06
+ - Initial commit

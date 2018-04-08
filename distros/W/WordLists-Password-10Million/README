@@ -3,12 +3,16 @@ NAME
     (10_million_password_list)
 
 VERSION
-    This document describes version 0.002 of WordLists::Password::10Million
+    This document describes version 0.003 of WordLists::Password::10Million
     (from Perl distribution WordLists-Password-10Million), released on
-    2018-03-19.
+    2018-04-02.
 
 DESCRIPTION
     This distribution contains the following modules:
+
+    *   WordList::Bloom::Password::10Million::Top100000
+
+    *   WordList::Bloom::Password::10Million::Top1000000
 
     *   WordList::Password::10Million::Top100000
 

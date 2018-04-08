@@ -1,0 +1,34 @@
+==================================================
+Changes from 2017-03-31 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2018-03-31 02:44:28 +0000
+------------------------------------------
+
+  Change: 852684d1684fe8459551e2b64993076c9732c9ca
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-30 23:42:24 +0000
+
+    Bug fixes
+
+    Missed renaming %OPTIONS_MAP. Included App:SpamcupNG module to be
+    excluded to be checked by tidyall. Added .tidyall to .gitignore 
+
+  Change: 87ea859a728f2e937d087cb93d34511b7f0333e7
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-18 18:58:11 +0000
+
+    Initial release
+
+    Not yet published to CPAN 
+
+  Change: 5467668f41012f3b412118e0903dbb2a795e7552
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-03-18 17:58:21 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

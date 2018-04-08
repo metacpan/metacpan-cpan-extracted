@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Render;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use constant TRACE => $ENV{YAML_PP_TRACE};
 my $WS = '[\t ]';
@@ -11,9 +11,9 @@ my $WS = '[\t ]';
 sub render_tag {
     my ($tag, $map) = @_;
     if ($tag eq '!') {
-        return "<!>";
+        return "!";
     }
-    elsif ($tag =~ m/^!(<.*)/) {
+    elsif ($tag =~ m/^!<(.*)>/) {
         return $1;
     }
     elsif ($tag =~ m/^(![^!]*!|!)(.+)/) {
@@ -21,13 +21,13 @@ sub render_tag {
         my $name = $2;
         $name =~ s/%([0-9a-fA-F]{2})/chr hex $1/eg;
         if (exists $map->{ $alias }) {
-            $tag = "<" . $map->{ $alias }. $name . ">";
+            $tag = $map->{ $alias }. $name;
         }
         else {
             if ($alias ne '!' and $alias ne '!!') {
                 die "Found undefined tag handle '$alias'";
             }
-            $tag = "<!$name>";
+            $tag = "!$name";
         }
     }
     else {

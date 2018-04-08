@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Role::FileHandler;
-$Config::Model::Role::FileHandler::VERSION = '2.118';
+$Config::Model::Role::FileHandler::VERSION = '2.120';
 # ABSTRACT: role to read or write configuration files
 
 use strict;
@@ -43,7 +43,7 @@ sub get_tuned_config_dir {
         $dir =~ s/^~/$home/;
     }
 
-    return $args{root} ? path($args{root})->child($dir)
+    return $args{root} ? $args{root}->child($dir)
         : $dir ?  path($dir)
         :         path ('.');
 }
@@ -62,7 +62,7 @@ Config::Model::Role::FileHandler - role to read or write configuration files
 
 =head1 VERSION
 
-version 2.118
+version 2.120
 
 =head1 SYNOPSIS
 

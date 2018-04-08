@@ -1,0 +1,16 @@
+0.006  2018-04-04 22:51:51 CEST
+   - release after 96 PASSes in CPAN Testers (Thanks!)
+
+0.005001  2018-04-04 08:12:18 CEST
+   - stricter pre-requirements for 01-simple.t
+
+0.004  2018-04-02 22:42:30 CEST
+   - try to fix some races in tests
+
+0.002  2018-04-02 10:42:26 CEST
+   - add method remove_alert()
+   - extended method set_alert() to also remove alerts
+   - add etymology of distribution/module name
+
+0.001  2018-03-31 15:30:25 CEST
+   - first test release

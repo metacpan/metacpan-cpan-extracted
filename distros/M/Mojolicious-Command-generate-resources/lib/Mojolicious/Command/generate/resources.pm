@@ -6,7 +6,7 @@ use Mojo::File 'path';
 use List::Util 'first';
 
 our $AUTHORITY = 'cpan:BEROV';
-our $VERSION   = '0.15';
+our $VERSION   = '0.20';
 
 has args => sub { {} };
 has description =>
@@ -78,7 +78,7 @@ my $_init = sub ($self, @options) {
     \@options,
     'H|home_dir=s'             => \$args->{home_dir},
     'L|lib=s'                  => \$args->{lib},
-    'A|api_dir'                => \$args->{api_dir},
+    'A|api_dir=s'              => \$args->{api_dir},
     'C|controller_namespace=s' => \$args->{controller_namespace},
     'M|model_namespace=s'      => \$args->{model_namespace},
 
@@ -500,7 +500,7 @@ Optional. Defaults to C<app-E<gt>home/lib> (relative to the C<--home_dir>
 directory). If you installed L<MyApp> in some custom path and you wish to
 generate your controllers into e.g. C<site_lib>, set this option.
 
-=head2 api_dir
+=head2 api_dir=s
 
 Optional. Directory where
 the L<OpenAPI|https://github.com/OAI/OpenAPI-Specification> C<json> file will
@@ -652,6 +652,8 @@ The work on the features may not go in the same order specified here. Some
 parts may be fully implemented while others may be left for later.
 
     - Improve documentation.
+    - Add initial documentation stub to the generated classes.
+    - Improve templates to generate code to which is more ready to use.
     - Append to the existing api.json if it already exists. More tests.
 
 =head1 AUTHOR

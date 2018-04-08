@@ -876,7 +876,17 @@ sub _use_files_builder {
             push @$dest_list, $dest_hash;
         }
     }
-    # TODO: handle rename
+    if ( my $renamelist = $file->{rename} ) {
+        $self->_croak('rename files element an array')
+            unless ref($renamelist) eq 'ARRAY';
+        my $use_pairs = $use_files->{rename} = [];
+        for my $pair (@$renamelist) {
+            $self->_croak('rename files array element must be an array with two values')
+                unless ref($pair) eq 'ARRAY' && scalar(@$pair) == 2;
+            my ($from, $to) = @$pair;
+            push @$use_pairs, [ $self->_get_file_obj($from), $to ];
+        }
+    }
     return $use_files;
 };
 
@@ -1291,19 +1301,13 @@ sub _files_actions_after_success {
     my $self = shift;
     my $run  = shift;
     return 1 unless $self->_use_files;
-    # TODO: update after _use_files is set up to support rename
-    if (my $pairs = $self->files->{rename}) {
+    if (my $pairs = $self->_use_files->{rename}) {
         for my $pair (@$pairs) {
-            if (ref($pair) ne 'ARRAY' && @$pair != 2) {
-                $self->error( "Ignoring bad rename pair element: ", Dumper($pair) );
-                next;
-            }
-            $self->_rename_file( @$pair );
+            my ($from, $to) = @$pair;
+            $from->rename($to);
         }
     }
-    for my $file ( @{ $self->files->{delete} } ) {
-        $file->delete if $file->exists;
-    }
+    $_->delete for @{ $self->_use_files->{delete} };
 }
 
 sub _file_exists {

@@ -222,8 +222,8 @@
     "Dekabr",
   ],
   name => "Turkmen",
-  native_language => "T\N{U+00fc}rkmen dili",
-  native_name => "T\N{U+00fc}rkmen dili",
+  native_language => "t\N{U+00fc}rkmen dili",
+  native_name => "t\N{U+00fc}rkmen dili",
   native_script => undef,
   native_territory => undef,
   native_variant => undef,
@@ -270,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 32,
+  version => 33,
 }

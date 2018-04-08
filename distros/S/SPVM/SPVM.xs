@@ -70,7 +70,9 @@ SPVM_OBJECT* SPVM_XS_UTIL_get_object(SV* sv_object) {
 
 int SPVM_XS_UTIL_compile_jit_sub(SPVM_API* api, int32_t sub_id) {
   dSP;
-  
+  I32 ax;
+  int return_value_count;  
+
   (void)api;
 
   SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
@@ -101,11 +103,13 @@ int SPVM_XS_UTIL_compile_jit_sub(SPVM_API* api, int32_t sub_id) {
   XPUSHs(sv_jitcode_source);
   PUTBACK;
 
-  call_pv("SPVM::compile_jit_sub", G_SCALAR);
+  return_value_count = call_pv("SPVM::compile_jit_sub", G_SCALAR);
 
   SPAGAIN;
-
-  int32_t success = POPi;
+  SP -= return_value_count;
+  ax = (SP - PL_stack_base) + 1;
+  
+  int32_t success = SvIV(ST(0));
 
   PUTBACK;
   FREETMPS;
@@ -153,14 +157,14 @@ new_string(...)
   SV* sv_class = ST(0);
   (void)sv_class;
   
-  SV* sv_chars = ST(1);
-  int32_t length = sv_len(sv_chars);
+  SV* sv_bytes = ST(1);
+  int32_t length = sv_len(sv_bytes);
   
   // API
   SPVM_API* api = SPVM_XS_UTIL_get_api();
   
   // New string
-  SPVM_API_OBJECT* string =  api->new_string(api, SvPV_nolen(sv_chars), length);
+  SPVM_API_OBJECT* string =  api->new_string(api, (int8_t*)SvPV_nolen(sv_bytes), length);
   
   // Increment reference count
   api->inc_ref_count(api, string);
@@ -188,9 +192,9 @@ to_data(...)
   
   int32_t string_length = api->get_string_length(api, string);
   
-  char* chars = api->get_string_chars(api, string);
+  int8_t* bytes = api->get_string_bytes(api, string);
   
-  SV* sv_data = sv_2mortal(newSVpvn(chars, string_length));
+  SV* sv_data = sv_2mortal(newSVpvn((char*)bytes, string_length));
   
   XPUSHs(sv_data);
   XSRETURN(1);
@@ -3632,59 +3636,48 @@ call_sub(...)
   SPVM_TYPE* return_type = sub->op_return_type->uv.type;
   int32_t return_type_id = return_type->id;
   
+  PUSHMARK(SP);
+          
   // Return count
-  int32_t return_count;
+  SV* sv_return_value = NULL;
   switch (return_type_id) {
     case SPVM_TYPE_C_ID_VOID:  {
       api->call_void_sub(api, sub_id, call_sub_args);
-      return_count = 0;
       break;
     }
     case SPVM_TYPE_C_ID_BYTE: {
       int8_t return_value = api->call_byte_sub(api, sub_id, call_sub_args);
-      SV* sv_return_value = sv_2mortal(newSViv(return_value));
-      XPUSHs(sv_return_value);
-      return_count = 1;
+      sv_return_value = sv_2mortal(newSViv(return_value));
       break;
     }
     case SPVM_TYPE_C_ID_SHORT: {
       int16_t return_value = api->call_short_sub(api, sub_id, call_sub_args);
-      SV* sv_return_value = sv_2mortal(newSViv(return_value));
-      XPUSHs(sv_return_value);
-      return_count = 1;
+      sv_return_value = sv_2mortal(newSViv(return_value));
       break;
     }
     case SPVM_TYPE_C_ID_INT: {
       int32_t return_value = api->call_int_sub(api, sub_id, call_sub_args);
-      SV* sv_return_value = sv_2mortal(newSViv(return_value));
-      XPUSHs(sv_return_value);
-      return_count = 1;
+      sv_return_value = sv_2mortal(newSViv(return_value));
       break;
     }
     case SPVM_TYPE_C_ID_LONG: {
       int64_t return_value = api->call_long_sub(api, sub_id, call_sub_args);
-      SV* sv_return_value = sv_2mortal(newSViv(return_value));
-      XPUSHs(sv_return_value);
-      return_count = 1;
+      sv_return_value = sv_2mortal(newSViv(return_value));
       break;
     }
     case SPVM_TYPE_C_ID_FLOAT: {
       float return_value = api->call_float_sub(api, sub_id, call_sub_args);
-      SV* sv_return_value = sv_2mortal(newSVnv(return_value));
-      XPUSHs(sv_return_value);
-      return_count = 1;
+      sv_return_value = sv_2mortal(newSVnv(return_value));
       break;
     }
     case SPVM_TYPE_C_ID_DOUBLE: {
       double return_value = api->call_double_sub(api, sub_id, call_sub_args);
-      SV* sv_return_value = sv_2mortal(newSVnv(return_value));
-      XPUSHs(sv_return_value);
-      return_count = 1;
+      sv_return_value = sv_2mortal(newSVnv(return_value));
       break;
     }
     default: {
       SPVM_API_OBJECT* return_value = api->call_object_sub(api, sub_id, call_sub_args);
-      SV* sv_return_value = NULL;
+      sv_return_value = NULL;
       if (return_value != NULL) {
         api->inc_ref_count(api, return_value);
         
@@ -3726,16 +3719,26 @@ call_sub(...)
       else {
         sv_return_value = &PL_sv_undef;
       }
-      XPUSHs(sv_return_value);
-      return_count = 1;
     }
   }
+  SPAGAIN;
+  ax = (SP - PL_stack_base) + 1;
+  
   SPVM_API_OBJECT* exception = api->get_exception(api);
   if (exception) {
     int32_t length = api->get_string_length(api, exception);
-    char* exception_chars = (char*)api->get_string_chars(api, exception);
-    SV* sv_exception = sv_2mortal(newSVpvn(exception_chars, length));
+    int8_t* exception_bytes = api->get_string_bytes(api, exception);
+    SV* sv_exception = sv_2mortal(newSVpvn((char*)exception_bytes, length));
     croak("%s", SvPV_nolen(sv_exception));
+  }
+  
+  int32_t return_count;
+  if (return_type_id == SPVM_TYPE_C_ID_VOID) {
+    return_count = 0;
+  }
+  else {
+    XPUSHs(sv_return_value);
+    return_count = 1;
   }
   
   XSRETURN(return_count);

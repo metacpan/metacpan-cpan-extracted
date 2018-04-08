@@ -12,5 +12,6 @@ scripts/colsplit
 scripts/colgrep
 scripts/latextable
 scripts/csv2tsv
+scripts/colsummary
 META.yml
 META.json

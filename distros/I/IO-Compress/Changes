@@ -1,6 +1,28 @@
 CHANGES
 -------
 
+  2.080 2 April 2018
+
+      * bin/zipdetails
+        #124003: zipdetails SYNOPSIS section got a typo: zipdetaile-> zipdetails
+
+      * IO::Uncompress::Base.pm
+        Changes for Archive::Zip::SimpleUnzip
+
+      * bin/zipdetails
+        Fix issues with zip64 archives.
+
+      * bin/zipdetails       
+        Cope with zip archives where there is padding data after the compressed payload.
+        Example is Microsoft appx file.
+
+      * File::GlobMapper
+        #120580: File::GlobMapper::$VERSION needs increment; trailing whitespace
+
+      * t/cz-03zlib-v1.t
+        valgrind errors fixed in Compress::Raw::Zlib 2.0.75 for issue #121074
+        #121076: uninitialized errors from valgrind
+
   2.074 19 Feb 2017
 
       * Fix bad 2.073 release
@@ -49,7 +71,7 @@ CHANGES
         and BEST_SPEED use the values 2 & 4 respectively. They should
         be 4 & 2. Code for setting XFL was correct.
 
-      * RT #95494: IO::Uncompress::Gunzip: Can no longer gunzip to in-memory 
+      * RT #95494: IO::Uncompress::Gunzip: Can no longer gunzip to in-memory
         file handle
 
   2.064 1 February 2014
@@ -64,17 +86,17 @@ CHANGES
   2.062 11 August 2013
 
       * RT#87335: [PATCH] Fix up tests for imminent bleadperl changes
-      
+
       * RT#84647: typo fixes
 
-      * RT#86814: IO::Compress::Gzip test t/100generic-bzip2.t hangs on Cygwin 
+      * RT#86814: IO::Compress::Gzip test t/100generic-bzip2.t hangs on Cygwin
 
   2.061 19 May 2013
 
       * zipdetails (1.06)
         Get it to cope with Android 'zipalign' non-standard extra fields.
-        These are used to make sure that a non-compressed member starts on 
-        a 4 byte boundary. 
+        These are used to make sure that a non-compressed member starts on
+        a 4 byte boundary.
 
       * RT#84647: unzip example with IO::Uncompress::Unzip
 
@@ -84,7 +106,7 @@ CHANGES
         RT# 82138: Example code not clear - gunzip() takes filenames!
 
       * IO::Compress::Base
-        Remove the flush call when opening a filehandle. 
+        Remove the flush call when opening a filehandle.
 
   2.059 10 December 2012
 
@@ -100,15 +122,15 @@ CHANGES
 
       * IO::Compress::Zip
         Allow member name & Zip Comment to be "0"
-   
+
       * IO::Compress::Base::Common
         Remove "-r" test - the file open will catch this.
         RT# 80855: IO::Compress::Base::Common returns that it cannot read readable files in NFS
 
       * RT# 79820: Install to 'site' instead of 'perl' when perl version is 5.11+
-      
+
       * General Performance improvements.
-                
+
   2.055 5 August 2012
 
       * FAQ
@@ -117,14 +139,14 @@ CHANGES
 
       * Compress::Zip
         speed up compress, uncompress, memGzip & memGunzip.
-        [RT# #77350: Compress::Zlib::uncompress() is slowed down needlessly 
+        [RT# #77350: Compress::Zlib::uncompress() is slowed down needlessly
                      by parameter validation
 
   2.052 29 April 2012
 
       * IO::Compress::Zip
         Force a ZIP64 archive when it contains >= 0xFFFF entries.
-        
+
       * Typos in POD
         [RT# #76130: Gunzip Pod typo in OO section: $$output instead of $$input
 
@@ -137,11 +159,11 @@ CHANGES
   2.048 29 January 2012
 
       * Set minimum zlib version to 1.2.0
-      
-      * IO::Compress test suite fails with Compress::Raw::Zlib 2.047 
+
+      * IO::Compress test suite fails with Compress::Raw::Zlib 2.047
         and zlib < 1.2.4
         [RT# 74503]
-      
+
   2.047 28 January 2012
 
       * Set minimum Perl version to 5.6
@@ -149,7 +171,7 @@ CHANGES
       * IO::Compress::Zip
         - In one-shot zip, set the Text Flag if "-T" thinks the file is a
           text file.
-        - In one-shot mode, wrote mod time & access time in wrong order 
+        - In one-shot mode, wrote mod time & access time in wrong order
           in the "UT" extended field.
 
   2.046 18 December 2011
@@ -177,16 +199,16 @@ CHANGES
       * Added bin/zipdetails
 
       * IO::Compress::Zip
-        - In one-shot mode enable Zip64 mode if the input file/buffer 
+        - In one-shot mode enable Zip64 mode if the input file/buffer
           >= 0xFFFFFFFF bytes.
 
       * IO::Compress::FAQ
-        - Updates 
+        - Updates
 
   2.043 20 November 2011
 
       * IO::Compress::Base
-        - Fixed issue that with handling of Zip files with two (or more) 
+        - Fixed issue that with handling of Zip files with two (or more)
           entries that were STORED. Symptom is the first is uncompressed
           ok, but the next will terminate early if the size of the file is
           greater than BlockSize.

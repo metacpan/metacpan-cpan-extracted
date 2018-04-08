@@ -1,3 +1,9 @@
+2018-03-31T00:35:22+08:00 : 发布0.1.36到cpan.org
+2018-03-31T00:34:45+08:00 : 添加tools/supervisor 工具
+2018-03-30T22:51:33+08:00 : 发布0.1.35到cpan.org
+2018-03-30T22:50:23+08:00 : add  dan/agent/code/sexec
+2018-03-30T22:49:18+08:00 : box 中添加diskSpaceControl工具
+2018-03-30T22:48:36+08:00 : 添加tools/diskSpaceControl 工具
 2018-03-19T18:56:59+08:00 : 发布0.1.34到cpan.org
 2018-03-19T18:56:19+08:00 : lib/MYDan/Agent/Proxy.pm 添加使用Cache
 2018-03-19T18:33:28+08:00 : agent 添加 secret exec

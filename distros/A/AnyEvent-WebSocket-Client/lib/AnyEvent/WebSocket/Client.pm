@@ -7,13 +7,14 @@ use AE;
 use AnyEvent;
 use AnyEvent::Handle;
 use AnyEvent::Socket ();
+use AnyEvent::Connector;
 use Protocol::WebSocket::Request;
 use Protocol::WebSocket::Handshake::Client;
 use AnyEvent::WebSocket::Connection;
 use PerlX::Maybe qw( maybe provided );
 
 # ABSTRACT: WebSocket client for AnyEvent
-our $VERSION = '0.44'; # VERSION
+our $VERSION = '0.46'; # VERSION
 
 
 has timeout => (
@@ -68,6 +69,14 @@ has max_payload_size => (
 );
 
 
+
+has env_proxy => (
+  is => 'ro',
+  default => sub { 0 },
+);
+
+
+
 sub connect
 {
   my($self, $uri) = @_;
@@ -87,7 +96,7 @@ sub connect
     return $done;
   }
     
-  AnyEvent::Socket::tcp_connect $uri->host, $uri->port, sub {
+  $self->_make_tcp_connection($uri->scheme, $uri->host, $uri->port, sub {
     my $fh = shift;
     unless($fh)
     {
@@ -167,8 +176,33 @@ sub connect
         undef $done;
       }
     });
-  }, sub { $self->timeout };
+  }, sub { $self->timeout });
   $done;
+}
+
+sub _make_tcp_connection
+{
+  my $self = shift;
+  my $scheme = shift;
+  my ($host, $port) = @_;
+  if(!$self->env_proxy)
+  {
+    return &AnyEvent::Socket::tcp_connect(@_);
+  }
+  my @connectors =
+      $scheme eq "ws"
+      ? (map { AnyEvent::Connector->new(env_proxy => $_) } qw(ws http))
+      : $scheme eq "wss"
+      ? (map { AnyEvent::Connector->new(env_proxy => $_) } qw(wss https))
+      : ();
+  foreach my $connector (@connectors)
+  {
+    if(defined($connector->proxy_for($host, $port)))
+    {
+      return $connector->tcp_connect(@_);
+    }
+  }
+  return &AnyEvent::Socket::tcp_connect(@_);
 }
 
 1;
@@ -185,7 +219,7 @@ AnyEvent::WebSocket::Client - WebSocket client for AnyEvent
 
 =head1 VERSION
 
-version 0.44
+version 0.46
 
 =head1 SYNOPSIS
 
@@ -307,6 +341,20 @@ Although, the order cannot be guaranteed when using the hash style.
 
 The maximum payload size for received frames.  Currently defaults to whatever
 L<Protocol::WebSocket> defaults to.
+
+=head2 env_proxy
+
+If you set true to this boolean attribute, it loads proxy settings
+from environment variables. If it finds valid proxy settings,
+C<connect> method will use that proxy.
+
+Default: false.
+
+For C<ws> WebSocket end-points, first it reads C<ws_proxy> (or
+C<WS_PROXY>) environment variable. If it is not set or empty string,
+then it reads C<http_proxy> (or C<HTTP_PROXY>). For C<wss> WebSocket
+end-points, it reads C<wss_proxy> (C<WSS_PROXY>) and C<https_proxy>
+(C<HTTPS_PROXY>) environment variables.
 
 =head1 METHODS
 

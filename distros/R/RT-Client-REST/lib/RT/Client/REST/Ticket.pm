@@ -1,13 +1,12 @@
-# RT::Client::REST::Ticket -- ticket object representation.
-
-package RT::Client::REST::Ticket;
+#!perl
+# PODNAME: RT::Client::REST::Ticket
+# ABSTRACT: ticket object representation.
 
 use strict;
 use warnings;
 
-use vars qw($VERSION);
-$VERSION = 0.10;
-
+package RT::Client::REST::Ticket;
+$RT::Client::REST::Ticket::VERSION = '0.52';
 use Error qw(:try);
 use Params::Validate qw(:types);
 use RT::Client::REST 0.18;
@@ -18,46 +17,6 @@ use RT::Client::REST::SearchResult 0.02;
 use RT::Client::REST::Transaction;
 use base 'RT::Client::REST::Object';
 
-=head1 NAME
-
-RT::Client::REST::Ticket -- this object represents a ticket.
-
-=head1 SYNOPSIS
-
-  my $rt = RT::Client::REST->new(server => $ENV{RTSERVER});
-
-  # Create a new ticket:
-  my $ticket = RT::Client::REST::Ticket->new(
-    rt => $rt,
-    queue => "General",
-    subject => $subject,
-  )->store(text => "This is the initial text of the ticket");
-  print "Created a new ticket, ID ", $ticket->id, "\n";
-
-  # Update
-  my $ticket = RT::Client::REST::Ticket->new(
-    rt  => $rt,
-    id  => $id,
-    priority => 10,
-  )->store;
-
-  # Retrieve
-  my $ticket => RT::Client::REST::Ticket->new(
-    rt => $rt,
-    id => $id,
-  )->retrieve;
-
-  unless ($ticket->owner eq $me) {
-    $ticket->steal;     # Give me more work!
-  }
-
-=head1 DESCRIPTION
-
-B<RT::Client::REST::Ticket> is based on L<RT::Client::REST::Object>.
-The representation allows one to retrieve, edit, comment on, and create
-tickets in RT.
-
-=cut
 
 sub _attributes {{
 
@@ -228,6 +187,162 @@ sub _attributes {{
     },
 }}
 
+
+# comment and correspond are really the same method, so we save ourselves
+# some duplication here.
+for my $method (qw(comment correspond)) {
+    no strict 'refs'; ## no critic (ProhibitNoStrict)
+    *$method = sub {
+        my $self = shift;
+
+        if (@_ & 1) {
+            RT::Client::REST::Object::OddNumberOfArgumentsException->throw;
+        }
+
+        $self->_assert_rt_and_id($method);
+
+        my %opts = @_;
+
+        unless (defined($opts{message})) {
+            RT::Client::REST::Object::InvalidValueException->throw(
+                "No message was provided",
+            );
+        }
+
+        $self->rt->$method(
+            ticket_id => $self->id,
+            %opts,
+        );
+
+        return;
+    };
+}
+
+
+sub attachments {
+    my $self = shift;
+
+    $self->_assert_rt_and_id;
+
+    RT::Client::REST::SearchResult->new(
+        ids => [ $self->rt->get_attachment_ids(id => $self->id) ],
+        object => sub {
+            RT::Client::REST::Attachment->new(
+                id => shift,
+                parent_id => $self->id,
+                rt => $self->rt,
+            );
+        },
+    );
+}
+
+
+sub transactions {
+    my $self = shift;
+
+    if (@_ & 1) {
+        RT::Client::REST::Object::OddNumberOfArgumentsException->throw;
+    }
+
+    $self->_assert_rt_and_id;
+
+    my %opts = @_;
+    my %params = (
+        parent_id => $self->id,
+    );
+    if (defined(my $type = delete($opts{type}))) {
+        $params{transaction_type} = $type;
+    }
+
+    RT::Client::REST::SearchResult->new(
+        ids => [ $self->rt->get_transaction_ids(%params) ],
+        object => sub {
+            RT::Client::REST::Transaction->new(
+                id => shift,
+                parent_id => $self->id,
+                rt => $self->rt,
+            );
+        },
+    );
+}
+
+
+for my $method (qw(take untake steal)) {
+    no strict 'refs'; ## no critic (ProhibitNoStrict)
+    *$method = sub {
+        my $self = shift;
+
+        $self->_assert_rt_and_id($method);
+
+        try {
+            $self->rt->$method(id => $self->id);
+        } catch RT::Client::REST::AlreadyTicketOwnerException with {
+            # Rename the exception.
+            RT::Client::REST::Object::NoopOperationException
+                ->throw(shift->message);
+        };
+
+        return;
+    };
+}
+
+
+sub rt_type { 'ticket' }
+
+
+__PACKAGE__->_generate_methods;
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RT::Client::REST::Ticket - ticket object representation.
+
+=head1 VERSION
+
+version 0.52
+
+=head1 SYNOPSIS
+
+  my $rt = RT::Client::REST->new(server => $ENV{RTSERVER});
+
+  # Create a new ticket:
+  my $ticket = RT::Client::REST::Ticket->new(
+    rt => $rt,
+    queue => "General",
+    subject => $subject,
+  )->store(text => "This is the initial text of the ticket");
+  print "Created a new ticket, ID ", $ticket->id, "\n";
+
+  # Update
+  my $ticket = RT::Client::REST::Ticket->new(
+    rt  => $rt,
+    id  => $id,
+    priority => 10,
+  )->store;
+
+  # Retrieve
+  my $ticket => RT::Client::REST::Ticket->new(
+    rt => $rt,
+    id => $id,
+  )->retrieve;
+
+  unless ($ticket->owner eq $me) {
+    $ticket->steal;     # Give me more work!
+  }
+
+=head1 DESCRIPTION
+
+B<RT::Client::REST::Ticket> is based on L<RT::Client::REST::Object>.
+The representation allows one to retrieve, edit, comment on, and create
+tickets in RT.
+
 =head1 ATTRIBUTES
 
 =over 2
@@ -266,22 +381,24 @@ Ticket priority.  Usually a numeric value.
 
 =item B<final_priority>
 
+=for stopwords requestor requestors
+
 =item B<requestor>
 
 This is the attribute for setting the requestor on ticket creation.
 If you use requestors to do this in 3.8, the recipient may not receive
-an autoreply from RT because the ticket is initially created as the user
+an auto-reply from RT because the ticket is initially created as the user
 your REST session is connected as.
 
 It is a list attribute (for explanation of list attributes, see
-B<LIST ATTRIBUTE PROPERTIES> in L<RT::Client::REST::Object>). 
+B<LIST ATTRIBUTE PROPERTIES> in L<RT::Client::REST::Object>).
 
 =item B<requestors>
 
 This contains e-mail addresses of the requestors.
 
 It is a list attribute (for explanation of list attributes, see
-B<LIST ATTRIBUTE PROPERTIES> in L<RT::Client::REST::Object>). 
+B<LIST ATTRIBUTE PROPERTIES> in L<RT::Client::REST::Object>).
 
 =item B<cc>
 
@@ -321,7 +438,7 @@ and therefore the value cannot be changed..
 =head2 Attributes storing a time
 
 The attributes which store a time stamp have an additional accessor with the
-suffix C<_datetime> (eg., C<resolved_datetime>).  This allows you can get and
+suffix C<_datetime> (e.g. C<resolved_datetime>).  This allows you can get and
 set the stored value as a DateTime object.  Internally, it is converted into
 the date-time string which RT uses, which is assumed to be in UTC.
 
@@ -367,6 +484,8 @@ ticket along with the comment.
 
 List of e-mail addresses to send carbon copies to (an array reference).
 
+=for stopwords bcc
+
 =item B<bcc>
 
 List of e-mail addresses to send blind carbon copies to (an array
@@ -379,62 +498,11 @@ reference).
 Add correspondence to the ticket.  Takes exactly the same arguments
 as the B<comment> method above.
 
-=cut
-
-# comment and correspond are really the same method, so we save ourselves
-# some duplication here.
-for my $method (qw(comment correspond)) {
-    no strict 'refs';
-    *$method = sub {
-        my $self = shift;
-
-        if (@_ & 1) {
-            RT::Client::REST::Object::OddNumberOfArgumentsException->throw;
-        }
-
-        $self->_assert_rt_and_id($method);
-
-        my %opts = @_;
-
-        unless (defined($opts{message})) {
-            RT::Client::REST::Object::InvalidValueException->throw(
-                "No message was provided",
-            );
-        }
-
-        $self->rt->$method(
-            ticket_id => $self->id,
-            %opts,
-        );
-
-        return;
-    };
-}
-
 =item B<attachments>
 
 Get attachments associated with this ticket.  What is returned is an
 object of type L<RT::Client::REST::SearchResult> which can then be used
 to get at objects of type L<RT::Client::REST::Attachment>.
-
-=cut
-
-sub attachments {
-    my $self = shift;
-    
-    $self->_assert_rt_and_id;
-
-    RT::Client::REST::SearchResult->new(
-        ids => [ $self->rt->get_attachment_ids(id => $self->id) ],
-        object => sub {
-            RT::Client::REST::Attachment->new(
-                id => shift,
-                parent_id => $self->id,
-                rt => $self->rt,
-            );
-        },
-    );
-}
 
 =item B<transactions>
 
@@ -450,42 +518,13 @@ Return value is an object of type L<RT::Client::REST::SearchResult> which
 can then be used to iterate over transaction objects
 (L<RT::Client::REST::Transaction>).
 
-=cut
-
-sub transactions {
-    my $self = shift;
-
-    if (@_ & 1) {
-        RT::Client::REST::Object::OddNumberOfArgumentsException->throw;
-    }
-
-    $self->_assert_rt_and_id;
-
-    my %opts = @_;
-    my %params = (
-        parent_id => $self->id,
-    );
-    if (defined(my $type = delete($opts{type}))) {
-        $params{transaction_type} = $type;
-    }
-    
-    RT::Client::REST::SearchResult->new(
-        ids => [ $self->rt->get_transaction_ids(%params) ],
-        object => sub {
-            RT::Client::REST::Transaction->new(
-                id => shift,
-                parent_id => $self->id,
-                rt => $self->rt,
-            );
-        },
-    );
-}
-
 =item B<take>
 
 Take this ticket.
 If you already the owner of this ticket,
 C<RT::Client::REST::Object::NoopOperationException> will be thrown.
+
+=for stopwords Untake untake
 
 =item B<untake>
 
@@ -498,27 +537,6 @@ C<RT::Client::REST::Object::NoopOperationException> will be thrown.
 Steal this ticket.
 If you already the owner of this ticket,
 C<RT::Client::REST::Object::NoopOperationException> will be thrown.
-
-=cut
-
-for my $method (qw(take untake steal)) {
-    no strict 'refs';
-    *$method = sub {
-        my $self = shift;
-
-        $self->_assert_rt_and_id($method);
-
-        try {
-            $self->rt->$method(id => $self->id);
-        } catch RT::Client::REST::AlreadyTicketOwnerException with {
-            # Rename the exception.
-            RT::Client::REST::Object::NoopOperationException
-                ->throw(shift->message);
-        };
-
-        return;
-    };
-}
 
 =back
 
@@ -556,10 +574,6 @@ Some more examples:
 
 Returns 'ticket'.
 
-=cut
-
-sub rt_type { 'ticket' }
-
 =back
 
 =head1 SEE ALSO
@@ -569,16 +583,45 @@ L<RT::Client::REST::Attachment>,
 L<RT::Client::REST::SearchResult>,
 L<RT::Client::REST::Transaction>.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Abhijit Menon-Sen <ams@wiw.org>
+
+=item *
 
 Dmitri Tikhonov <dtikhonov@yahoo.com>
 
-=head1 LICENSE
+=item *
 
-Perl license.
+Damien "dams" Krotkine <dams@cpan.org>
+
+=item *
+
+Dean Hamstead <dean@bytefoundry.com.au>
+
+=item *
+
+Miquel Ruiz <mruiz@cpan.org>
+
+=item *
+
+JLMARTIN
+
+=item *
+
+SRVSH
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Dmitri Tikhonov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-__PACKAGE__->_generate_methods;
-
-1;

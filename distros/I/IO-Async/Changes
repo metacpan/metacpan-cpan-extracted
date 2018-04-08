@@ -1,5 +1,23 @@
 Revision history for IO-Async
 
+0.72    2018-04-02 19:34:27
+        [CHANGES]
+         * Expanded docs on Stream's on_read sub return values
+         * Overridable timeout for IO::Async::Test::wait_for
+         * Hide IO::Async::ChildManager as an internal implementation detail;
+           move the docs into main IO::Async::Loop
+         * Added $loop->open_process; suggest using that instead of
+           ->open_child
+         * Begin implementation of $loop->is_running method (part of RT123780)
+
+        [BUGFIXES]
+         * Make IO::Async::Future->await wait until it's ready
+         * Fix calculation of periodic timer in 'skip' mode (RT124414)
+         * Perform synchronous getaddrinfo shortcut even for service-less
+           lookups
+         * Make sure that errors from underlying read/write functions are
+           debug-logged by IO::Async::Stream
+
 0.71    2016/12/22 15:05:50
         [CHANGES]
          * Added 'prefork' option to IO::Async::Channel (RT115920) - thanks

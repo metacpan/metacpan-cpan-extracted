@@ -22,7 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Device::WebIO;
-$Device::WebIO::VERSION = '0.020';
+$Device::WebIO::VERSION = '0.022';
 # ABSTRACT: Duct Tape for the Internet of Things
 use v5.12;
 use Moo;
@@ -155,11 +155,13 @@ sub digital_input_begin_loop
     return $obj->input_begin_loop();
 }
 
-sub set_input_condvar
+sub set_anyevent_condvar
 {
-    my ($self, $name, $cv) = @_;
+    my ($self, $name, $pin, $cv) = @_;
     my $obj = $self->_get_obj( $name );
-    $self->_role_check( $obj, 'DigitalInputCallback' );
+    $self->_role_check( $obj, 'DigitalInputAnyEvent' );
+
+    $obj->set_anyevent_condvar( $pin, $cv );
 
     return;
 }
@@ -799,6 +801,17 @@ C<$callback> is a subref that will be called.
   digital_input_begin_loop( $name );
 
 Start the loop that will trigger callbacks.
+
+=head2 Input AnyEvent
+
+These can be used if the device does the C<DigitalInputAnyEvent> role.
+
+=head3 set_anyevent_condvar
+
+  set_anyevent_condvar( $name, $pin, $cv );
+
+Set an AnyEvent condvar, which will trigger on both the rising and falling 
+edge. When triggered, the condvar's callback will be called.
 
 =head2 Output
 

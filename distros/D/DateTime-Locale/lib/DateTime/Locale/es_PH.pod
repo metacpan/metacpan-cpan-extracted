@@ -669,13 +669,13 @@ Spanish Philippines locale.
    1995-12-22T09:05:02 = 4.º trimestre de 1995
   -0010-09-15T04:44:23 = 3.er trimestre de -10
 
-=head3 yw-count-one ('semana' w 'de' Y)
+=head3 yw-count-one ('semana' w 'de' y)
 
    2008-02-05T18:30:30 = semana 6 de 2008
    1995-12-22T09:05:02 = semana 51 de 1995
   -0010-09-15T04:44:23 = semana 37 de -10
 
-=head3 yw-count-other ('semana' w 'de' Y)
+=head3 yw-count-other ('semana' w 'de' y)
 
    2008-02-05T18:30:30 = semana 6 de 2008
    1995-12-22T09:05:02 = semana 51 de 1995

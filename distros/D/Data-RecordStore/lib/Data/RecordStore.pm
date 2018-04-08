@@ -45,9 +45,9 @@ package Data::RecordStore;
 
  my $new_id = $transaction->stow( $data );
 
- my $new_or_recycled_id = $store->next_id;
+ my $new_or_reused_id = $store->next_id;
 
- $transaction->stow( "MORE DATA", $new_or_recycled_id );
+ $transaction->stow( "MORE DATA", $new_or_reused_id );
 
  $transaction->delete_record( $someid );
 
@@ -126,7 +126,7 @@ use Data::Dumper;
 
 use vars qw($VERSION);
 
-$VERSION = '3.16';
+$VERSION = '3.17';
 
 use constant {
     DIRECTORY    => 0,
@@ -505,11 +505,19 @@ sub _swapout {
     }
     elsif( $vacated_silo_id == $last_id ) {
         #
-        # this was the last record, so just remove it
+        # this was the last record, so just remove it and
+        # the silo it rode in on.
         #
         $silo->pop;
     }
     else {
+
+        # this is a bug caused when two entries are swapped out on the same silo
+        # where they both were at the end at the time the vacated id record was
+        # created by the transaction commit. The answer is to sort the
+        # ids by the the lastid here.
+        
+#        use Carp 'longmess'; print STDERR Data::Dumper->Dump([longmess]);
         die "Data::RecordStore::_swapout : error, swapping out id $vacated_silo_id is larger than the last id $last_id";
     }
 
@@ -601,6 +609,7 @@ use constant {
     FILE_SIZE        => 2,
     FILE_MAX_RECORDS => 3,
     TMPL             => 4,
+    LOCK             => 5,
 };
 
 $Data::RecordStore::Silo::MAX_SIZE = 2_000_000_000;
@@ -630,7 +639,7 @@ sub open_silo {
         $file_max_records = 1;
     }
     my $file_max_size = $file_max_records * $record_size;
-
+    my $lock_fh;
     unless( -d $directory ) {
         die "Data::RecordStore::Silo->open_silo Error opening record store. $directory exists and is not a directory" if -e $directory;
         make_path( $directory ) or die "Data::RecordStore::Silo->open_silo : Unable to create directory $directory";
@@ -639,6 +648,8 @@ sub open_silo {
         CORE::open( my $fh, ">", "$directory/0" ) or die "Data::RecordStore::Silo->open_silo : Unable to open '$directory/0' : $!";
         close $fh;
     }
+    CORE::open( $lock_fh, ">", "$directory/l" ) or die "Data::RecordStore::Silo->open_silo : Unable to open '$directory/l' : $!";
+
     unless( -w "$directory/0" ){
         die "Data::RecordStore::Silo->open_silo Error operning record store. $directory exists but is not writeable" if -e $directory;
     }
@@ -649,6 +660,7 @@ sub open_silo {
         $file_max_size,
         $file_max_records,
         $template,
+        $lock_fh,
     ], $class;
 
     $silo;
@@ -661,11 +673,13 @@ This empties out the database, setting it to zero records.
 =cut
 sub empty {
     my $self = shift;
+    $self->_lock_write;
     my( $first, @files ) = map { "$self->[DIRECTORY]/$_" } $self->_files;
     truncate $first, 0;
     for my $file (@files) {
         unlink $file;
     }
+    $self->_unlock;
     undef;
 } #empty
 
@@ -679,11 +693,13 @@ by the record size.
 sub entry_count {
     # return how many entries this index has
     my $self = shift;
+    $self->_lock_read;
     my @files = $self->_files;
     my $filesize;
     for my $file (@files) {
         $filesize += -s "$self->[DIRECTORY]/$file";
     }
+    $self->_unlock;
     int( $filesize / $self->[RECORD_SIZE] );
 } #entry_count
 
@@ -696,6 +712,7 @@ The array in question is the unpacked template.
 sub get_record {
     my( $self, $id ) = @_;
 
+    $self->_lock_read;
     die "Data::RecordStore::Silo->get_record : index $id out of bounds. Store has entry count of ".$self->entry_count if $id > $self->entry_count || $id < 1;
 
     my( $f_idx, $fh, $file, $file_id ) = $self->_fh( $id );
@@ -704,10 +721,10 @@ sub get_record {
         or die "Data::RecordStore::Silo->get_record : error reading id $id at file $file_id at index $f_idx. Could not seek to ($self->[RECORD_SIZE] * $f_idx) : $@ $!";
     my $srv = sysread $fh, my $data, $self->[RECORD_SIZE];
     close $fh;
+    $self->_unlock;
 
     defined( $srv )
         or die "Data::RecordStore::Silo->get_record : error reading id $id at file $file_id at index $f_idx. Could not read : $@ $!";
-
     [unpack( $self->[TMPL], $data )];
 } #get_record
 
@@ -718,8 +735,10 @@ adds an empty record and returns its id, starting with 1
 =cut
 sub next_id {
     my( $self ) = @_;
+    $self->_lock_write;
     my $next_id = 1 + $self->entry_count;
     $self->_ensure_entry_count( $next_id );
+    $self->_unlock;
     $next_id;
 } #next_id
 
@@ -734,6 +753,7 @@ sub pop {
 
     my $entries = $self->entry_count;
     return undef unless $entries;
+    $self->_lock_write;
     my $ret = $self->get_record( $entries );
     my( $f_idx, $fh, $file ) = $self->_fh( $entries );
     my $new_fs = $f_idx * $self->[RECORD_SIZE];
@@ -742,6 +762,7 @@ sub pop {
     } else {
         unlink $file;
     }
+    $self->_unlock;
     close $fh;
 
     $ret;
@@ -800,7 +821,9 @@ sub put_record {
 
     my( $f_idx, $fh, $file, $file_id ) = $self->_fh( $id );
 
+    $self->_lock_write;
     sysseek( $fh, $self->[RECORD_SIZE] * ($f_idx), SEEK_SET ) && ( my $swv = syswrite( $fh, $to_write ) ) || die "Data::RecordStore::Silo->put_record : unable to put record id $id at file $file_id index $f_idx : $@ $!";
+    $self->_unlock;
     close $fh;
 
     1;
@@ -864,9 +887,12 @@ sub _ensure_entry_count {
         my $existing_file_records = int( (-s "$self->[DIRECTORY]/$write_file" ) / $self->[RECORD_SIZE] );
         my $records_needed_to_fill = $self->[FILE_MAX_RECORDS] - $existing_file_records;
         $records_needed_to_fill = $needed if $records_needed_to_fill > $needed;
+        $self->_lock_write;
         if( $records_needed_to_fill > 0 ) {
             # fill the last flie up with \0
+
             CORE::open( my $fh, "+<", "$self->[DIRECTORY]/$write_file" ) or die "Data::RecordStore::Silo->ensure_entry_count : unable to open '$self->[DIRECTORY]/$write_file' : $!";
+            binmode $fh; # for windows
             my $nulls = "\0" x ( $records_needed_to_fill * $self->[RECORD_SIZE] );
             (my $pos = sysseek( $fh, $self->[RECORD_SIZE] * $existing_file_records, SEEK_SET )) && (my $wrote = syswrite( $fh, $nulls )) || die "Data::RecordStore::Silo->ensure_entry_count : unable to write blank to '$self->[DIRECTORY]/$write_file' : $!";
             close $fh;
@@ -878,6 +904,7 @@ sub _ensure_entry_count {
 
             die "Data::RecordStore::Silo->ensure_entry_count : file $self->[DIRECTORY]/$write_file already exists" if -e $write_file;
             CORE::open( my $fh, ">", "$self->[DIRECTORY]/$write_file" ) or die "Data::RecordStore::Silo->ensure_entry_count : unable to create '$self->[DIRECTORY]/$write_file' : $!";
+            binmode $fh; # for windows
             my $nulls = "\0" x ( $self->[FILE_MAX_RECORDS] * $self->[RECORD_SIZE] );
             (my $pos = sysseek( $fh, 0, SEEK_SET )) && (my $wrote = syswrite( $fh, $nulls )) || die "Data::RecordStore::Silo->ensure_entry_count : unable to write blank to '$self->[DIRECTORY]/$write_file' : $!";
             $needed -= $self->[FILE_MAX_RECORDS];
@@ -889,10 +916,12 @@ sub _ensure_entry_count {
 
             die "Data::RecordStore::Silo->ensure_entry_count : file $self->[DIRECTORY]/$write_file already exists" if -e $write_file;
             CORE::open( my $fh, ">", "$self->[DIRECTORY]/$write_file" ) or die "Data::RecordStore::Silo->ensure_entry_count : unable to create '$self->[DIRECTORY]/$write_file' : $!";
+            binmode $fh; # for windows
             my $nulls = "\0" x ( $needed * $self->[RECORD_SIZE] );
             (my $pos = sysseek( $fh, 0, SEEK_SET )) && (my $wrote = syswrite( $fh, $nulls )) || die "Data::RecordStore::Silo->ensure_entry_count : unable to write blank to '$self->[DIRECTORY]/$write_file' : $!";
             close $fh;
         }
+        $self->_unlock;
     }
 } #_ensure_entry_count
 
@@ -922,6 +951,7 @@ sub _fh {
 
     my $file = $files[$f_idx];
     CORE::open( my $fh, "+<", "$self->[DIRECTORY]/$file" ) or die "Data::RecordStore::Silo->_fhu nable to open '$self->[DIRECTORY]/$file' : $! $?";
+    binmode $fh; # for windows
 
     (($id - ($f_idx*$self->[FILE_MAX_RECORDS])) - 1,$fh,"$self->[DIRECTORY]/$file",$f_idx);
 
@@ -938,6 +968,18 @@ sub _files {
     @files;
 } #_files
 
+sub _lock_read {
+    my $fh = shift->[LOCK];
+    flock( $fh, 1 );
+}
+sub _lock_write {
+    my $fh = shift->[LOCK];
+    flock( $fh, 2 );
+}
+sub _unlock {
+    my $fh = shift->[LOCK];
+    flock( $fh, 8 );
+}
 
 # ----------- end Data::RecordStore::Silo
 
@@ -1226,51 +1268,37 @@ sub commit {
     my $actions = $trans_silo->entry_count;
 
     #
-    # Rewire the index to the new silo/location
+    # in this phase, the indexes are updated. The blank spaces
+    # are not purged here.
     #
-    my( %record_id2tsteps );
-
-    for my $a_id (1..$actions) {
+    my $purges = [];
+    my( %foundid );
+    for( my $a_id=$actions; $a_id > 0; $a_id-- ) {
         my $tstep = $trans_silo->get_record($a_id);
         my( $action, $record_id, $from_silo_id, $from_record_id, $to_silo_id, $to_record_id ) = @$tstep;
-        push @{$record_id2tsteps{$record_id}}, $tstep;
-        if( $action eq 'S' ) {
-            $index->put_record( $record_id, [ $to_silo_id, $to_record_id ] );
-        } else {
-            $index->put_record( $record_id, [ 0, 0 ] );
+        if( 0 == $foundid{$record_id}++ ) {
+            if( $action eq 'S' ) {
+                $index->put_record( $record_id, [ $to_silo_id, $to_record_id ] );
+            } else {
+                $index->put_record( $record_id, [ 0, 0 ] );
+            }
+            push @$purges, [ $action, $record_id, $from_silo_id, $from_record_id ];
+            
+        } elsif( $action eq 'S' ) {
+            push @$purges, [ $action, $record_id, $to_silo_id, $to_record_id ];
         }
     }
 
-    $dir_silo->put_record( $trans_id, [ $trans_id, $$, time, TRA_CLEANUP_COMMIT ] );
-    $self->[STATE] = TRA_CLEANUP_COMMIT;
-
-    #
-    # Cleanup discarded data. If the same record moved around a bunch, clean things up
-    # incrementally.
-    #
-    for my $record_id (keys %record_id2tsteps) {
-        my $tsteps = $record_id2tsteps{$record_id};
-        my( $last_to_silo_id, $last_to_record_id );
-        for my $tstep (@$tsteps) {
-            my( $action, $record_id, $from_silo_id, $from_record_id, $to_silo_id, $to_record_id ) = @$tstep;
-            if( $action eq 'S' ) {
-                if( $last_to_silo_id ) {
-                    my $silo = $store->_get_silo( $last_to_silo_id );
-                    $store->_swapout( $silo, $last_to_silo_id, $last_to_record_id );
-                }
-                $last_to_silo_id   = $to_silo_id;
-                $last_to_record_id = $to_record_id;
-                if( $from_silo_id ) {
-                    my $silo = $store->_get_silo( $from_silo_id );
-                    $store->_swapout( $silo, $from_silo_id, $from_record_id );
-                }
-            }
-            elsif( $action eq 'D' ) {
-                $store->delete_record( $record_id );
-            }
-            elsif( $action eq 'R' ) {
-                $store->recycle_id( $record_id );
-            }
+    $purges = [ sort { $b->[3] <=> $a->[3] } @$purges ];
+    for my $purge (@$purges) {
+        my( $action, $record_id, $from_silo_id, $from_record_id ) = @$purge;
+        if ( $action eq 'S' ) {
+            my $silo = $store->_get_silo( $from_silo_id );
+            $store->_swapout( $silo, $from_silo_id, $from_record_id );
+        } elsif ( $action eq 'D' ) {
+            $store->delete_record( $record_id );
+        } elsif ( $action eq 'R' ) {
+            $store->recycle_id( $record_id );
         }
     }
 
@@ -1362,10 +1390,10 @@ __END__
 
 =head1 COPYRIGHT AND LICENSE
 
-       Copyright (c) 2015-2017 Eric Wolf. All rights reserved.  This program is free software; you can redistribute it and/or modify it
+       Copyright (c) 2015-2018 Eric Wolf. All rights reserved.  This program is free software; you can redistribute it and/or modify it
        under the same terms as Perl itself.
 
 =head1 VERSION
-       Version 3.16  (Mar 14, 2017))
+       Version 3.17  (April, 2018))
 
 =cut

@@ -1,5 +1,8 @@
 Revision history for WWW-Correios-SRO
 
+0.13    2018-04-06
+    - updated sro prefix list (GARU)
+
 0.12    2017-05-23
     - support for multiple codes in the same sro() query (GARU)
 

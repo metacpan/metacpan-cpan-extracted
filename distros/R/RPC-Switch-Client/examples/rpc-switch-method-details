@@ -1,0 +1,68 @@
+#!/usr/bin/perl
+
+use Mojo::Base -base;
+
+# standard modules
+#use Data::Dumper;
+use Time::HiRes qw(time);
+
+# us
+use RPC::Switch::Client;
+
+# cpan
+use JSON::MaybeXS;
+
+exit main(@ARGV);
+
+sub main {
+	if (scalar @_ != 1) {
+		die "usage: $0 <method> ";
+	}
+
+	my ($method) = @_;
+
+	my $client = RPC::Switch::Client->new(
+		#port => 6551,
+		who => 'theCustomer',
+		token => 'wantsThings',
+		json => 0,
+		#debug => 1,
+		#tls => 1,
+		#tls_ca => 'myCA.crt',
+		#tls_cert => 'client.crt',
+		#tls_key => 'client.key',
+	);
+
+	die 'no client?' unless $client;
+
+	my $start = time();
+
+	my ($status, $outargs) = $client->call(
+		method => 'rpcswitch.get_method_details',
+		inargs => { method => $method },
+	);
+
+	my $took = time() - $start;
+	
+	my $json = JSON::MaybeXS->new(pretty => 1);
+
+	if ($status) {
+		if ($status eq 'RES_OK') {
+			say "method details for $method: ", $json->encode($outargs);
+		} else {
+			say "status: $status, outargs: ", $outargs;	
+		}
+	} else {
+		say 'no methods?';
+	}
+
+	printf("took %0.4f\n", $took);
+
+	$client->close();
+
+	say 'done?';
+	return 0;
+}
+
+1;
+

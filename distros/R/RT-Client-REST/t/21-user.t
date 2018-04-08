@@ -7,7 +7,7 @@ use Test::Exception;
 use constant METHODS => (
     'new', 'to_form', 'from_form',
     'rt_type', 'id',
-    
+
     # attributes:
     'name', 'password', 'real_name', 'gecos',
     'privileged', 'email_address',  'comments', 'organization',

@@ -9,7 +9,7 @@ my ($dsn, $user, $pw) = split m|[/]|, $ENV{TEST_PG};
 
 my $pg = Mojo::Pg::Che->connect($dsn, $user, $pw,);
 
-my $seq_name = 'test_seq_remove_it';
+my $seq_name = 'Mojo_Pg_Che_test_seq_remove_it';
 
 my $seq_tx = sub {
   my $tx = $pg->begin;
@@ -29,10 +29,13 @@ my $tx = $seq_tx->();
 $tx->commit;
 
 $res = eval { $seq->() };
-is $@, '', 'right commit';
+is  $res->hash->{last_value}, 1, 'right commit';
 
-my $rc = $tx->do("drop sequence $seq_name; select pg_sleep(1);", {Async=>1});
-is $rc, 1, 'do async drop';
+my ($rc, $sth) = $tx->do("drop sequence $seq_name;", {Async=>1});
+Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+#~ warn $sth;
+#~ warn $$rc->()->hash;
+#~ is $rc, 1, 'do async drop';
 
 
 $res = eval { $seq->() };

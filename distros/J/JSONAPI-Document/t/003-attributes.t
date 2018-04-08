@@ -16,7 +16,7 @@ $dbix_row_mock->mock(
     }
 );
 
-my $t = Test::JSONAPI->new();
+my $t = Test::JSONAPI->new({ api_url => 'http://example.com/api' });
 
 is( $t->attributes_via, 'get_inflated_columns', 'default attrs method' );
 
@@ -35,7 +35,7 @@ subtest 'custom attributes via constructor' => sub {
         }
     );
 
-    $t = Test::JSONAPI->new( { attributes_via => 'to_hash' } );
+    $t = Test::JSONAPI->new( { api_url => 'http://example.com', attributes_via => 'to_hash' } );
     $t->resource_document($post);
     is( $method_called, 2, 'attributes method called' );
 };
@@ -48,7 +48,7 @@ subtest 'custom attributes via method argument' => sub {
         }
     );
 
-    $t = Test::JSONAPI->new( { attributes_via => 'to_hash' } );
+    $t = Test::JSONAPI->new( { api_url => 'http://example.com', attributes_via => 'to_hash' } );
     $t->resource_document( $post, { attributes_via => 'another_hash_method' } );
     is( $method_called, 3, 'attributes method called' );
 };

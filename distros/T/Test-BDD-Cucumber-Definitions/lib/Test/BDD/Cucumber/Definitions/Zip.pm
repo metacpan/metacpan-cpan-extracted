@@ -12,7 +12,7 @@ use Test::BDD::Cucumber::Definitions::Validator qw(:all);
 use Test::More;
 use Try::Tiny;
 
-our $VERSION = '0.29';
+our $VERSION = '0.31';
 
 our @EXPORT_OK = qw(
     http_response_content_read_zip

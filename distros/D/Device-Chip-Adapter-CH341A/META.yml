@@ -16,8 +16,11 @@ name: Device-Chip-Adapter-CH341A
 provides:
   Device::Chip::Adapter::CH341A:
     file: lib/Device/Chip/Adapter/CH341A.pm
-    version: '0.01'
+    version: '0.02'
+requires:
+  Device::Chip::Adapter: '0'
+  Device::Chip::ProtocolBase::SPI: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

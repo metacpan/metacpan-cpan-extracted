@@ -627,25 +627,25 @@ Scottish Gaelic United Kingdom locale.
    1995-12-22T09:05:02 = 4mh cairteal 1995
   -0010-09-15T04:44:23 = 3s cairteal -10
 
-=head3 yw-count-few ('seachdain' w 'dhe' Y)
+=head3 yw-count-few ('seachdain' w 'dhe' y)
 
    2008-02-05T18:30:30 = seachdain 6 dhe 2008
    1995-12-22T09:05:02 = seachdain 51 dhe 1995
   -0010-09-15T04:44:23 = seachdain 37 dhe -10
 
-=head3 yw-count-one ('seachdain' w 'dhe' Y)
+=head3 yw-count-one ('seachdain' w 'dhe' y)
 
    2008-02-05T18:30:30 = seachdain 6 dhe 2008
    1995-12-22T09:05:02 = seachdain 51 dhe 1995
   -0010-09-15T04:44:23 = seachdain 37 dhe -10
 
-=head3 yw-count-other ('seachdain' w 'dhe' Y)
+=head3 yw-count-other ('seachdain' w 'dhe' y)
 
    2008-02-05T18:30:30 = seachdain 6 dhe 2008
    1995-12-22T09:05:02 = seachdain 51 dhe 1995
   -0010-09-15T04:44:23 = seachdain 37 dhe -10
 
-=head3 yw-count-two ('seachdain' w 'dhe' Y)
+=head3 yw-count-two ('seachdain' w 'dhe' y)
 
    2008-02-05T18:30:30 = seachdain 6 dhe 2008
    1995-12-22T09:05:02 = seachdain 51 dhe 1995

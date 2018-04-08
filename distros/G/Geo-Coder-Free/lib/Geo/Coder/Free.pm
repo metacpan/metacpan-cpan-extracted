@@ -14,11 +14,11 @@ Geo::Coder::Free - Provides a geocoding functionality using free databases
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -80,8 +80,8 @@ sub new {
 
     $location = $geocoder->geocode(location => $location);
 
-    print 'Latitude: ', $location->{'latt'}, "\n";
-    print 'Longitude: ', $location->{'longt'}, "\n";
+    print 'Latitude: ', $location->{'latitude'}, "\n";
+    print 'Longitude: ', $location->{'longitude'}, "\n";
 
     # TODO:
     # @locations = $geocoder->geocode('Portland, USA');
@@ -120,6 +120,35 @@ Does nothing, here for compatibility with other geocoders
 =cut
 
 sub ua {
+}
+
+=head2 run
+
+You can also run this module from the command line:
+
+    perl lib/Geo/Coder/Free.pm 1600 Pennsylvania Avenue NW, Washington DC
+
+=cut
+
+__PACKAGE__->run(@ARGV) unless caller();
+
+sub run {
+	require Data::Dumper;
+
+	my $class = shift;
+
+	my $location = join(' ', @_);
+
+	my @rc;
+	if($ENV{'OPENADDR_HOME'}) {
+		@rc = $class->new(openaddr => $ENV{'OPENADDR_HOME'})->geocode($location);
+	} else {
+		@rc = $class->new()->geocode($location);
+	}
+
+	die "$0: geocoding failed" unless(scalar(@rc));
+
+	print Data::Dumper->new([\@rc])->Dump();
 }
 
 =head1 AUTHOR

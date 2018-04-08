@@ -1,7 +1,8 @@
 # DNS error.
 use warnings;
 use strict;
-use t::share;
+use lib 't';
+use share;
 
 @CheckPoint = (
     {

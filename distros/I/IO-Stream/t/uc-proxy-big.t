@@ -3,7 +3,8 @@
 #           send/recv a lot of data.
 use warnings;
 use strict;
-use t::share;
+use lib 't';
+use share;
 
 my $SIZE = 204800;
 

@@ -54,8 +54,8 @@
     "yw-count-other" => "Y '\N{U+043e}\N{U+043d}\N{U+044b}' w-'\N{U+0440}' '\N{U+0434}\N{U+043e}\N{U+043b}\N{U+043e}\N{U+043e}' '\N{U+0445}\N{U+043e}\N{U+043d}\N{U+043e}\N{U+0433}'",
   },
   code => "mn",
-  date_format_full => "y '\N{U+043e}\N{U+043d}\N{U+044b}' MMM'\N{U+044b}\N{U+043d}' d. EEEE '\N{U+0433}\N{U+0430}\N{U+0440}\N{U+0430}\N{U+0433}'.",
-  date_format_long => "y '\N{U+043e}\N{U+043d}\N{U+044b}' MMM'\N{U+044b}\N{U+043d}' d",
+  date_format_full => "y.MM.dd, EEEE",
+  date_format_long => "y.MM.dd",
   date_format_medium => "y.MM.dd",
   date_format_short => "y.MM.dd",
   datetime_format_full => "{1} {0}",
@@ -268,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 32,
+  version => 33,
 }

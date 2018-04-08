@@ -3,16 +3,16 @@ use Test::More;
 use Switch::Again qw/all/;
 
 my $switch = switch(
-	a => sub {
+	'a' => sub {
 		return 1;
 	},
-	b => sub {
+	'b' => sub {
 		return 2;
 	},
-	c => sub {
+	'c' => sub {
 		return 3;
 	},
-	default => sub {
+	'default' => sub {
 		return 4;
 	}
 );
@@ -41,7 +41,6 @@ $val = switch('e',
 );
 
 is ($val, 2);
-
 $val = $switch->('b');
 is ($val, 2);
 $val = $switch->('c');

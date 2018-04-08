@@ -9,7 +9,7 @@ has share_dir    => ( is => 'ro', isa => Str,         required => 1 );    # abso
 
 has module => ( is => 'lazy', isa => InstanceOf ['Pcore::Util::Perl::Module'], predicate => 1 );
 
-has cfg => ( is => 'lazy', isa => HashRef, clearer => 1, init_arg => undef );    # dist.perl
+has cfg => ( is => 'lazy', isa => HashRef, clearer => 1, init_arg => undef );    # dist cfg
 has docker_cfg => ( is => 'lazy', isa => Maybe [HashRef], clearer => 1, init_arg => undef );    # docker.json
 has par_cfg => ( is => 'lazy', isa => Maybe [HashRef], init_arg => undef );                     # par.ini
 has name     => ( is => 'lazy', isa => Str,  init_arg => undef );                               # Dist-Name
@@ -104,7 +104,7 @@ around new => sub ( $orig, $self, $dist ) {
     # remove .pm suffix
     substr $dist_name, -3, 3, q[];
 
-    if ( -f $module_lib . "auto/share/dist/$dist_name/dist.perl" ) {
+    if ( -f $module_lib . "auto/share/dist/$dist_name/dist.$Pcore::Core::Const::DIST_CFG_TYPE" ) {
 
         # module is installed
         return $self->$orig( {
@@ -152,7 +152,7 @@ sub find_dist_root ( $self, $path ) {
 }
 
 sub dir_is_dist_root ( $self, $path ) {
-    return -f $path . '/share/dist.perl' ? 1 : 0;
+    return -f $path . "/share/dist.$Pcore::Core::Const::DIST_CFG_TYPE" ? 1 : 0;
 }
 
 # BUILDERS
@@ -179,7 +179,7 @@ sub _build_module ($self) {
 }
 
 sub _build_cfg ($self) {
-    return P->cfg->load( $self->share_dir . 'dist.perl' );
+    return P->cfg->load( $self->share_dir . 'dist.' . $Pcore::Core::Const::DIST_CFG_TYPE );
 }
 
 sub _build_docker_cfg ($self) {

@@ -1,4 +1,85 @@
+20180403  2018-01-30 (PERLANCAR)
+
+          - New exchanges:
+            + Bitbns
+            + Bithesap
+            + BitShares Asset Exchange
+            + C-Patex
+            + cfinex
+            + Coinbe
+            + Coinlink
+            + CoinTiger
+            + Crex24
+            + CRXzone
+            + Cryptohub
+            + Cryptonex
+            + DDEX
+            + Ethfinex
+            + Fatbtc
+            + EtherDelta (ForkDelta)
+            + IDAX
+            + LATOKEN
+            + Lendconnect
+            + MBAex
+            + Nanex
+            + Neraex
+            + Octaex
+            + Omicrex
+            + OOOBTC
+            + OTCBTC
+            + Ovis
+            + Paradex
+            + Paymium
+            + Rfinex
+            + RuDEX
+            + Simex
+            + Sistemkoin
+            + Stellarport
+            + Stronghold
+            + Trade By Trade
+            + Unocoin
+            + Zebpay
+
+          - Removed exchanges:
+            + alcurEX
+            + BitGrail
+            + CoinEgg
+            + CoolCoin
+            + EtherDelta
+            + ETHEXIndia
+            + Nxt Asset Exchange
+            + Omni DEX
+            + VirtacoinWorld
+
+          - Changed exchanges:
+            + CoinBene changed name from Coinbene
+
+          - Total exchanges now 213 (from 184)
+
+
+20180130.1.0  2018-01-30 (PERLANCAR)
+
+          - [ux] Make by_name() case-insensitive.
+
+
+20180130   2018-01-30 (PERLANCAR)
+
+          - Update to CMC 2018-01-30.
+
+          - New exchanges:
+            + Iquant
+            + TradeOgre
+            + Vebitcoin
+
+          - Removed exchanges:
+            + BitShares Asset Exchange
+
+          - Total exchanges now 184 (from 182)
+
+
 20180116   2018-01-16 (PERLANCAR)
+
+          - Update to CMC 2018-01-16.
 
           - New exchanges:
             + BarterDEX

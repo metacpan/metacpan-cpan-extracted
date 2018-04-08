@@ -12,11 +12,11 @@ Regexp::Pattern::License - Regular expressions for legal licenses
 
 =head1 VERSION
 
-Version v3.1.90
+Version v3.1.92
 
 =cut
 
-our $VERSION = version->declare("v3.1.90");
+our $VERSION = version->declare("v3.1.92");
 
 =head1 DESCRIPTION
 
@@ -129,7 +129,6 @@ $RE{adobe_2006} = {
 
 $RE{adobe_glyph} = {
 	name                                => 'Adobe-Glyph',
-	'name.alt.org.fedora'               => 'MIT',
 	'name.alt.org.fedora.web.mit.short' => 'AdobeGlyph',
 	'name.alt.org.spdx'                 => 'Adobe-Glyph',
 	'name.alt.org.tldr'                 => 'adobe-glyph-list-license',
@@ -190,15 +189,45 @@ $RE{agpl} = {
 
 =item * aladdin
 
+=item * aladdin_8
+
+=item * aladdin_9
+
 =cut
 
 $RE{aladdin} = {
 	name                  => 'Aladdin',
 	'name.alt.misc.short' => 'AFPL',
 	caption               => 'Aladdin Free Public License',
-	tags                  => ['type:unversioned'],
+	tags                  => ['type:versioned:decimal'],
 
 	'pat.alt.subject.name' => "$the?Aladdin Free Public License",
+	'pat.alt.subject.grant.scope.line.scope.sentence' =>
+		'under the terms of the Aladdin Free Public License',
+	'_pat.alt.subject.license.scope.line.scope.sentence' => [
+		'hereby grants to anyone the permission to apply',
+		'This License applies to the computer programs? known as',
+	],
+};
+
+$RE{aladdin_8} = {
+	name                    => 'Aladdin-8',
+	'name.alt.org.scancode' => 'afpl-8',
+	'name.alt.org.spdx'     => 'Aladdin',
+	'name.alt.org.debian'   => 'Aladdin-8',
+	caption                 => 'Aladdin Free Public License, Version 8',
+	tags                    => ['type:singleversion:aladdin'],
+};
+
+$RE{aladdin_9} = {
+	name                           => 'Aladdin-9',
+	'name.alt.org.scancode'        => 'afpl-9',
+	'name.alt.org.tldr.path.short' => 'aladdin',
+	caption                => 'Aladdin Free Public License, Version 9',
+	'caption.alt.org.tldr' => 'Aladdin Free Public License',
+	'iri.alt.archive.20130804020135' =>
+		'http://www.artifex.com/downloads/doc/Public.htm',
+	tags => ['type:singleversion:aladdin'],
 };
 
 =item * apache
@@ -277,7 +306,6 @@ $RE{artistic_2} = {
 
 $RE{bdwgc} = {
 	'name.alt.org.debian'               => 'MIT~Boehm',
-	'name.alt.org.fedora.web'           => 'MIT',
 	'name.alt.org.fedora.web.mit.short' => 'AnotherMinimalVariant',
 	caption                             => 'Boehm GC License',
 	'caption.alt.org.fedora.web.mit' =>
@@ -757,7 +785,6 @@ $RE{curl} = {
 
 $RE{dsdp} = {
 	name                             => 'DSDP',
-	'name.alt.org.fedora'            => 'MIT',
 	'name.alt.org.fedora.web'        => 'DSDP',
 	'name.alt.org.spdx'              => 'DSDP',
 	caption                          => 'DSDP License',
@@ -956,7 +983,6 @@ $RE{isc} = {
 
 $RE{icu} = {
 	name                             => 'ICU',
-	'name.alt.org.fedora'            => 'MIT',
 	caption                          => 'ICU License',
 	'caption.alt.org.fedora.web.mit' => 'Modern style (ICU Variant)',
 	tags                             => [ 'family:mit', 'type:unversioned' ],
@@ -1085,6 +1111,7 @@ $RE{llgpl} = {
 	'name.alt.org.tldr'    => 'lisp-lesser-general-public-license',
 	caption                => 'Lisp Lesser General Public License',
 	'caption.alt.org.tldr' => 'Lisp Lesser General Public License (LLGPL)',
+	iri                    => 'http://opensource.franz.com/preamble.html',
 	tags                   => ['type:unversioned'],
 
 	'_pat.alt.subject.name' => [
@@ -1113,7 +1140,6 @@ $RE{mit_advertising} = {
 
 $RE{mit_cmu} = {
 	name                             => 'MIT-CMU',
-	'name.alt.org.fedora'            => 'MIT',
 	'name.alt.org.spdx'              => 'MIT-CMU',
 	caption                          => 'CMU License',
 	'caption.alt.org.fedora.web.mit' => 'CMU Style',
@@ -1143,7 +1169,6 @@ END
 
 $RE{mit_cmu_warranty} = {
 	'name.alt.org.debian' => 'MIT-CMU~warranty',
-	'name.alt.org.fedora' => 'MIT',
 	caption               => 'CMU License (retain warranty disclaimer)',
 	'caption.alt.org.fedora.web.mit' => 'Standard ML of New Jersey Variant',
 	'caption.alt.org.fedora.web.mit.short' => 'MLton variant',
@@ -1167,7 +1192,6 @@ END
 
 $RE{mit_enna} = {
 	name                                => 'MIT-enna',
-	'name.alt.org.fedora'               => 'MIT',
 	'name.alt.org.fedora.web.mit.short' => 'enna',
 	'name.alt.org.spdx'                 => 'MIT-enna',
 	caption                             => 'enna License',
@@ -1187,7 +1211,6 @@ $RE{mit_enna} = {
 
 $RE{mit_feh} = {
 	name                                => 'MIT-feh',
-	'name.alt.org.fedora'               => 'MIT',
 	'name.alt.org.fedora.web.mit.short' => 'feh',
 	'name.alt.org.spdx'                 => 'MIT-feh',
 	caption                             => 'feh License',
@@ -1260,7 +1283,6 @@ $RE{mit_old} = {
 
 $RE{mit_oldstyle} = {
 	'name.alt.org.debian'            => 'MIT~oldstyle',
-	'name.alt.org.fedora'            => 'MIT',
 	caption                          => 'MIT (Old Style)',
 	'caption.alt.org.fedora.web.mit' => 'Old Style',
 	description                      => <<'END',
@@ -1280,7 +1302,6 @@ END
 
 $RE{mit_oldstyle_disclaimer} = {
 	'name.alt.org.debian'            => 'MIT~oldstyle~disclaimer',
-	'name.alt.org.fedora'            => 'MIT',
 	caption                          => 'MIT (Old Style, legal disclaimer)',
 	'caption.alt.org.fedora.web.mit' => 'Old Style with legal disclaimer',
 	tags                             => [ 'family:mit', 'type:unversioned' ],
@@ -1297,7 +1318,6 @@ $RE{mit_oldstyle_disclaimer} = {
 
 $RE{mit_oldstyle_permission} = {
 	'name.alt.org.debian' => 'MIT~oldstyle~permission',
-	'name.alt.org.fedora' => 'MIT',
 	'caption.alt.org.fedora.web.mit' =>
 		'Old Style (no advertising without permission)',
 	tags => [ 'family:mit', 'type:unversioned' ],
@@ -1688,6 +1708,18 @@ Each of these patterns has the tag B< type:trait >.
 
 =over
 
+=item * any_of
+
+=cut
+
+$RE{any_of} = {
+	caption => 'license grant "any of the following" phrase',
+	tags    => ['type:trait'],
+
+	'pat.alt.subject.trait.scope.line.scope.sentence' =>
+		'(?P<_any_of>(?:any|one or more) of the following(?: licenses(?: at your choice)?)?)[.:]? ?',
+};
+
 =item * clause_retention
 
 =cut
@@ -1763,6 +1795,41 @@ $RE{'fsf_unlimited_retention'} = {
 	'pat.alt.subject.trait.scope.sentence' => $fsf_ullr,
 };
 
+=item * licensed_under
+
+=cut
+
+$RE{licensed_under} = {
+	caption => 'license grant "licensed under" phrase',
+	tags    => ['type:trait'],
+
+	'pat.alt.subject.trait.scope.line.scope.sentence' =>
+		'(?P<_licensed_under>(?:[Ll]icen[sc]ed|[Dd]istribut(?:able|ed)|permitted|provided|[Pp]ublished|[Rr]eleased?) under'
+		. '|(?:in form of source code|may be copied|placed their code|to you) under' # sloppy - may need to include granting keyword
+		. '|(?:[Tt]his|[Mm]y) (?:software|file|work) is under'                       # vague descriptor - object included
+		. '|(?:(?:according|subject) to|[Uu]nder) the (?:conditions|terms) of) ',
+};
+
+=item * or_at_option
+
+=cut
+
+$RE{'or_at_option'} = {
+	caption => 'license grant "or at your option" phrase',
+	tags    => ['type:trait'],
+
+	'pat.alt.subject.trait.scope.line.scope.sentence' =>
+		'(?P<_or_at_option>(?:and|or)(?: ?\(?at your (?:option|choice)\)?)?)',
+};
+
+=item * version
+
+=cut
+
+$RE{'version'} = {
+	tags => ['type:trait'],
+};
+
 =item * version_later
 
 =cut
@@ -1770,11 +1837,6 @@ $RE{'fsf_unlimited_retention'} = {
 $RE{'version_later'} = {
 	caption => 'version "or later"',
 	tags    => ['type:trait'],
-
-	'_pat.alt.subject.trait.scope.line.scope.sentence' => [
-		",? $P{ver_later_postfix}",
-		"$F$E$P{ver_later_para}",
-	],
 };
 
 =item * version_later_paragraph
@@ -1785,7 +1847,8 @@ $RE{'version_later_paragraph'} = {
 	caption => 'version "or later" postfix (paragraphs)',
 	tags    => ['type:trait'],
 
-	'pat.alt.subject.trait.scope.paragraph' => $P{ver_later_para},
+	'pat.alt.subject.trait.scope.paragraph' =>
+		'(?P<_version_later_paragraph>Later versions are permitted)',
 };
 
 =item * version_later_postfix
@@ -1797,8 +1860,16 @@ $RE{'version_later_postfix'} = {
 	tags    => ['type:trait'],
 
 	'pat.alt.subject.trait.scope.line.scope.sentence' =>
-		$P{ver_later_postfix},
+		'\(?(?P<_version_later_postfix>'
+		. $RE{or_at_option}{'pat.alt.subject.trait.scope.line.scope.sentence'}
+		. '(?: any)? (?:later|newer)(?: version)?'
+		. '|or any later at your option)\)?',
 };
+
+$RE{version_later}{'pat.alt.subject.trait.scope.paragraph'}
+	= "(?:$F$E|,? )(?P<version_later>"
+	. $RE{version_later_paragraph}{'pat.alt.subject.trait.scope.paragraph'}
+	. "|$RE{version_later_postfix}{'pat.alt.subject.trait.scope.line.scope.sentence'})";
 
 =item * version_number
 
@@ -1808,7 +1879,17 @@ $RE{'version_number'} = {
 	caption => 'version number',
 	tags    => ['type:trait'],
 
-	'pat.alt.subject.trait.scope.line.scope.sentence' => $P{ver_number},
+	'pat.alt.subject.trait.scope.line.scope.sentence' =>
+		'(?P<version_number>\d(?:\.\d+)*)',
+};
+
+=item * version_numberstring
+
+=cut
+
+$RE{'version_numberstring'} = {
+	caption => 'version numberstring',
+	tags    => ['type:trait'],
 };
 
 =item * version_prefix
@@ -1819,8 +1900,20 @@ $RE{'version_prefix'} = {
 	caption => 'version prefix',
 	tags    => ['type:trait'],
 
-	'pat.alt.subject.trait.scope.line.scope.sentence' => $P{ver_prefix},
+	'pat.alt.subject.trait.scope.line.scope.sentence' =>
+		'[Vv](?:ersion |ERSION |\.? ?)',
 };
+
+$RE{version_numberstring}{'pat.alt.subject.trait.scope.line.scope.sentence'}
+	= "(?:$RE{version_prefix}{'pat.alt.subject.trait.scope.line.scope.sentence'})?"
+	. $RE{version_number}{'pat.alt.subject.trait.scope.line.scope.sentence'}
+	. '(?:(?: of the)? License)?';
+
+$RE{version}{'pat.alt.subject.trait.scope.paragraph'}
+	= "(?:$D|[,;] ?|$DD|:?$E)?\\(?(?P<_version>"
+	. $RE{version_numberstring}
+	{'pat.alt.subject.trait.scope.line.scope.sentence'}
+	. "(?:$RE{version_later}{'pat.alt.subject.trait.scope.paragraph'})?)\\)?";
 
 =back
 
@@ -2040,20 +2133,32 @@ for my $id (@_OBJECTS) {
 	# synthesize metadata: name from caption
 	CAPTION: for ( keys %{ $RE{$id} } ) {
 		my ( $slug, $org ) = (/^caption\.(alt\.org\.($_prop)$_any*)/);
-		$RE{$id}{"name.$slug"}
-			||= $RE{$id}{$_} =~ s/\s/_/gr =~ s/\(/.28/gr =~ s/\)/.29/gr
-			and next CAPTION
-			if ( $slug and $slug =~ /\.alt\.org\.fedora\.web/ );
-		if ( $org and $org eq 'tldr' ) {
-			$RE{$id}{"name.$slug"} ||= lc( $RE{$id}{$_} ) =~ s/\s/-/gr
+		next CAPTION unless ($org);
+		next CAPTION if ( $RE{$id}{"name.$slug"} );
+		if ( $org eq 'fedora' and $slug =~ /alt\.org\.fedora\.web/ ) {
+			$_ = $RE{$id}{$_};
+			s/\s/_/g;
+			s/\(/.28/g;
+			s/\)/.29/g;
+			$RE{$id}{"name.$slug"} = $_;
+			next CAPTION;
+		}
+		if ( $org eq 'tldr' ) {
+			$_ = lc( $RE{$id}{$_} );
+			s/ /-/g;
+			$RE{$id}{"name.$slug"} = $_
 				if ( $slug eq 'alt.org.tldr' );
-			$RE{$id}{"name.alt.org.$slug"} ||= lc( $RE{$id}{$_} ) =~ s/\s/-/gr
+			$RE{$id}{"name.alt.org.$slug"} = $_
 				if ( $slug eq 'alt.org.tldr.path.short' );
 			next CAPTION;
 		}
-		$RE{$id}{"name.$slug"} ||= $RE{$id}{$_} =~ s/ /_/gr =~ s/"/%22/gr   #"
-			and next CAPTION
-			if ( $org and $org eq 'wikipedia' );
+		if ( $org eq 'wikipedia' ) {
+			$_ = $RE{$id}{$_};
+			s/ /_/g;
+			s/"/%22/g;    #"
+			$RE{$id}{"name.$slug"} = $_;
+			next CAPTION;
+		}
 	}
 
 	# synthesize metadata: series alternate name from name
@@ -2164,7 +2269,7 @@ for my $id (@_OBJECTS) {
 		or $_TYPE{$id} eq 'trait' )
 	{
 # TODO: filter duplicates (by mapping into a hash?)
-		my $caption = _join_pats(
+		$_ = _join_pats(
 			map      {s/^$the?/$the?/r}
 				map  {s/,//gr}
 				map  {s/(?: [Ll]icense)/\(?: \[Ll\]icense\)?/r}
@@ -2175,10 +2280,11 @@ for my $id (@_OBJECTS) {
 				grep {/^(?:caption|name)(?:$_delim|\z)/}
 				keys %{ $RE{$id} }
 		);
+		next unless ($_);
+		s/ - /${DD}/g;
 		$RE{$id}{'_pat.alt.subject.grant.synth.caption'}
-			||= '(?:(?:[Ll]icensed|[Rr]eleased) under|(?:according to|under) the (?:conditions|terms) of) '
-			. $caption =~ s/ - /${DD}/gr
-			if ($caption);
+			= '(?:(?:[Ll]icensed|[Rr]eleased) under|(?:according to|as governed by|under) the (?:conditions|terms) of) '
+			. $_;
 	}
 
 	# synthesize subject pattern license from metadata caption
@@ -2214,17 +2320,49 @@ for my $id (@_OBJECTS) {
 	# provide default dynamic pattern: all available patterns
 	$RE{$id}{gen} = sub {
 		my %args = @_;
+
+		my $capture = $args{capture} || 'no';
+
 		my $subjects
 			= $args{subject}
 			? [ split( /,/, $args{subject} ) ]
 			: [ $RE{$id}{'.default_pat'} || @pat_subject ];
 
-		return _pat_compile( $id, $subjects );
+		my $pat = _join_pats( map { $RE{$id}{"pat.alt.subject.$_"} }
+				@{$subjects} );
+
+		return ''
+			unless ($pat);
+
+		$pat =~ s/$_->[0]/$_->[1]/g for (@_re);
+
+		if ( $capture eq 'named' ) {
+			$pat =~ s/\(\?P<\K_//g;
+		}
+		elsif ( $capture eq 'numbered' ) {
+			$pat =~ s/\(\?P<_[^>]+>/(?:/g;
+			$pat =~ s/\(\?P<[^>]+>/(/g;
+		}
+		else {
+			$pat =~ s/\(\?P<[^>]+>/(?:/g;
+		}
+
+		$pat =~ s/$_->[0]/$_->[1]/g for (@_re);
+
+		return qr/$pat/;
 	};
 
-	# offer available patterns through option subjects
+	# option keep: include capturing parantheses in pattern
+	$RE{$id}{'gen_args'}{capture} = {
+		summary => 'include capturing parantheses, named or numbered',
+		schema  => [ 'str*', in => [qw(named numbered no)] ],
+		default => 'no',
+		req     => 1,
+	};
+
+	# option subject: which subject(s) to cover in pattern
 	$RE{$id}{'gen_args'}{subject} = {
-		summary => 'Choose subject',
+		summary => 'Choose subject (or several, comma-separated)',
 		schema  => [ 'str*', in => [@pat_subject] ],
 		default => $RE{$id}{'.default_pat'} || join ',', @pat_subject,
 		req     => 1,
@@ -2242,33 +2380,6 @@ sub _prop_populate
 		$RE{$series}{"$property.alt$slug.version.$id$lang"} ||= $RE{$id}{$_}
 			if ($stem);
 	}
-}
-
-my %_pat_cache;
-
-sub _pat_compile
-{
-	my ( $id, $subjects ) = @_;
-
-	my $subject = join '_', @{$subjects};
-
-	if ( $_pat_cache{$id}{$subject} ) {
-		return $_pat_cache{$id}{$subject};
-	}
-
-	my $pat
-		= _join_pats( map { $RE{$id}{"pat.alt.subject.$_"} } @{$subjects} );
-	unless ($pat) {
-		return '';
-	}
-
-	for (@_re) {
-		$pat =~ s/$_->[0]/$_->[1]/g;
-	}
-
-	$_pat_cache{$id}{$subject} = qr/$pat/;
-
-	return $_pat_cache{$id}{$subject};
 }
 
 sub _join_pats

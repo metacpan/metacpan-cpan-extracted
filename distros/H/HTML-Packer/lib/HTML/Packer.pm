@@ -8,10 +8,11 @@ use Regexp::RegGrp;
 
 # -----------------------------------------------------------------------------
 
-our $VERSION = '2.06';
+our $VERSION = '2.07';
 
 our @BOOLEAN_ACCESSORS = (
     'remove_comments',
+    'remove_comments_aggressive',
     'remove_newlines',
     'no_compress_comment',
     'html5',
@@ -36,7 +37,8 @@ our @VOID_ELEMENTS = (
 
 # Some regular expressions are from HTML::Clean
 
-our $COMMENT        = '((?>\s*))(<!--(?:(?![#\[]| google_ad_section_).*?)?-->)((?>\s*))';
+our $COMMENT        = '((?>\s*))(<!--(?:.*?)?-->)((?>\s*))';
+our $COMMENT_SAFE   = '((?>\s*))(<!--(?:(?![#\[]| google_ad_section_).*?)?-->)((?>\s*))';
 
 our $PACKER_COMMENT = '<!--\s*HTML::Packer\s*(\w+)\s*-->';
 
@@ -190,6 +192,7 @@ sub do_stylesheet {
 # to a reference cycle and thus memory leak, and we can't scope them to
 # the init method as they may change. they are set by the minify sub
 our $remove_comments;
+our $remove_comments_aggressive;
 our $remove_newlines;
 our $html5;
 our $do_javascript;
@@ -222,7 +225,9 @@ sub init {
             }
         },
         {
-            regexp      => $COMMENT,
+			# this is using a variable that won't be initialized until after we have
+			# called ->minify so we endup calling ->init again (see FIXME)
+            regexp      => $remove_comments_aggressive ? $COMMENT : $COMMENT_SAFE,
             replacement => sub {
                 return $remove_comments ? (
                     $remove_newlines ? ' ' : (
@@ -365,7 +370,8 @@ sub minify {
     }
 
 	# (re)initialize variables used in the closures
-	$remove_comments = $self->remove_comments;
+	$remove_comments = $self->remove_comments || $self->remove_comments_aggressive;
+	$remove_comments_aggressive = $self->remove_comments_aggressive;
 	$remove_newlines = $self->remove_newlines;
 	$html5           = $self->html5;
 	$do_javascript   = $self->do_javascript;
@@ -373,6 +379,9 @@ sub minify {
 	$js_packer       = $self->javascript_packer;
 	$css_packer      = $self->css_packer;
 	$reggrp_ws       = $self->reggrp_whitespaces;
+
+	# FIXME: hacky way to get around ->init being called before ->minify
+	$self = __PACKAGE__->init if $remove_comments_aggressive;
 
     $self->reggrp_global()->exec( $html );
     $self->reggrp_whitespaces()->exec( $html );
@@ -439,7 +448,7 @@ HTML::Packer - Another HTML code cleaner
 
 =head1 VERSION
 
-Version 2.06
+Version 2.07
 
 =head1 DESCRIPTION
 
@@ -468,7 +477,12 @@ Second argument must be a hashref of options. Possible options are
 
 =item remove_comments
 
-HTML-Comments will be removed if 'remove_comments' has a true value.
+HTML-Comments will be removed if 'remove_comments' has a true value.  Comments starting with C<<!--#>,
+C<<!--[> or C<<!-- google_ad_section_> will be preserved unless 'remove_comments_aggressive' has a true value. 
+
+=item remove_comments_aggressive
+
+See 'remove_comments'.
 
 =item remove_newlines
 
@@ -503,7 +517,11 @@ If set to a true value closing slashes will be removed from void elements.
 =head1 AUTHOR
 
 Merten Falk, C<< <nevesenin at cpan.org> >>. Now maintained by Lee
-Johnson (LEEJO).
+Johnson (LEEJO) with contributions from:
+
+	Alexander Krizhanovsky <ak@natsys-lab.com>
+	Bas Bloemsaat <bas@bloemsaat.com>
+	girst <girst@users.noreply.github.com>
 
 =head1 BUGS
 

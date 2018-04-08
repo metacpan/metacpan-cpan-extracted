@@ -1,4 +1,4 @@
-# SMB Perl library, Copyright (C) 2014 Mikhael Goikhman, migo@cpan.org
+# SMB Perl library, Copyright (C) 2014-2018 Mikhael Goikhman, migo@cpan.org
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,17 +20,38 @@ use warnings;
 
 use parent 'SMB::v1::Command';
 
+sub init ($) {
+	$_[0]->set(
+		dialect_names => [],
+	);
+}
+
 sub parse ($$%) {
 	my $self = shift;
 	my $parser = shift;
 
+	if ($self->is_response) {
+		# unsupported
+	} else {
+		$parser->skip(1);  # word count
+		$self->dialect_names([
+			map { substr($_, 1) } grep { substr($_, 0, 1) eq "\x02" }
+				split("\x00", $parser->bytes($parser->uint16))
+		]);
+	}
+
 	return $self;
 }
 
-sub supports_protocol ($$) {
+sub supports_smb_dialect ($$) {
 	my $self = shift;
+	my $dialect0 = shift;
 
-	return 1;
+	for (@{$self->dialect_names}) {
+		return 1 if /^SMB (\d+)\.[0?](\d{2}|\?\?)/ && ($1 << 8 + ($2 eq '??' ? 0 : $2)) > $dialect0;
+	}
+
+	return 0;
 }
 
 1;

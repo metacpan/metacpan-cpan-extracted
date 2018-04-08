@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ProcUtils/table
-# and generated automatically using Perinci::CmdLine::Gen version 0.484
+# and generated automatically using Perinci::CmdLine::Gen version 0.485
 
-our $DATE = '2018-01-17'; # DATE
+our $DATE = '2018-04-03'; # DATE
 our $DIST = 'App-ProcUtils'; # DIST
-our $VERSION = '0.030'; # VERSION
+our $VERSION = '0.031'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ proc-table - Run Proc::ProcessTable and display the result
 
 =head1 VERSION
 
-This document describes version 0.030 of proc-table (from Perl distribution App-ProcUtils), released on 2018-01-17.
+This document describes version 0.031 of proc-table (from Perl distribution App-ProcUtils), released on 2018-04-03.
 
 =head1 SYNOPSIS
 

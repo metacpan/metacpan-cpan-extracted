@@ -10,7 +10,7 @@ HTML::Packer - Another HTML code cleaner
 
 # VERSION
 
-Version 2.06
+Version 2.07
 
 # DESCRIPTION
 
@@ -37,7 +37,12 @@ Second argument must be a hashref of options. Possible options are
 
 - remove\_comments
 
-    HTML-Comments will be removed if 'remove\_comments' has a true value.
+    HTML-Comments will be removed if 'remove\_comments' has a true value.  Comments starting with `<!--#`,
+    `<!--[` or `<!-- google_ad_section_` will be preserved unless 'remove\_comments\_aggressive' has a true value. 
+
+- remove\_comments\_aggressive
+
+    See 'remove\_comments'.
 
 - remove\_newlines
 
@@ -70,7 +75,11 @@ Second argument must be a hashref of options. Possible options are
 # AUTHOR
 
 Merten Falk, `<nevesenin at cpan.org>`. Now maintained by Lee
-Johnson (LEEJO).
+Johnson (LEEJO) with contributions from:
+
+        Alexander Krizhanovsky <ak@natsys-lab.com>
+        Bas Bloemsaat <bas@bloemsaat.com>
+        girst <girst@users.noreply.github.com>
 
 # BUGS
 

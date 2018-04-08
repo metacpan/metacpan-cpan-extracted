@@ -1,0 +1,91 @@
+---
+set01:
+  comment: Hg17vsPanTro1
+  C: 2
+  E: 30
+  K: 3000
+  L: 2200
+  O: 400
+  Q: similar
+  Y: 3400
+set02:
+  comment: "Hg19vsPanTro2, Hg19vsRheMac2, Hg19vsCalJac3"
+  C: 2
+  E: 150
+  H: 2000
+  K: 4500
+  L: 2200
+  M: 254
+  O: 600
+  Q: similar2
+  T: 2
+  Y: 15000
+set03:
+  comment: Hg17vsMm5
+  C: 2
+  E: 30
+  K: 3000
+  L: 2200
+  O: 400
+  Q: default
+set04:
+  comment: Hg17vsRheMac2
+  C: 2
+  E: 30
+  H: 2000
+  K: 3000
+  L: 2200
+  O: 400
+  Q: default
+set05:
+  comment: Hg17vsBosTau2
+  C: 2
+  E: 30
+  H: 2000
+  K: 3000
+  L: 2200
+  M: 50
+  O: 400
+  Q: default
+set06:
+  comment: Hg17vsDanRer3
+  C: 2
+  E: 30
+  H: 2000
+  K: 2200
+  L: 6000
+  O: 400
+  Q: distant
+  Y: 3400
+set07:
+  comment: Hg17vsMonDom1
+  C: 2
+  E: 30
+  H: 2000
+  K: 2200
+  L: 10000
+  O: 400
+  Q: distant
+  Y: 3400
+set08:
+  C: 2
+  E: 30
+  H: 2000
+  K: 3000
+  L: 2200
+  O: 400
+  Q: distant
+set09:
+  C: 2
+  E: 30
+  K: 6000
+  L: 2000
+  O: 400
+  Q: distant
+set10:
+  C: 2
+  E: 30
+  K: 10000
+  L: 2200
+  O: 400
+  Q: distant

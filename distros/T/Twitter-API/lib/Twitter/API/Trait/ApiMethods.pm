@@ -1,6 +1,6 @@
 package Twitter::API::Trait::ApiMethods;
 # ABSTRACT: Convenient API Methods
-$Twitter::API::Trait::ApiMethods::VERSION = '0.0113';
+$Twitter::API::Trait::ApiMethods::VERSION = '1.0001';
 use 5.14.1;
 use Carp;
 use Moo::Role;
@@ -1212,7 +1212,7 @@ Twitter::API::Trait::ApiMethods - Convenient API Methods
 
 =head1 VERSION
 
-version 0.0113
+version 1.0001
 
 =head1 DESCRIPTION
 
@@ -1744,7 +1744,7 @@ Marc Mims <marc@questright.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2016 by Marc Mims.
+This software is copyright (c) 2015-2018 by Marc Mims.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

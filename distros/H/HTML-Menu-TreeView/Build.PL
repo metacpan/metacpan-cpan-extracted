@@ -15,6 +15,7 @@ my $class = Module::Build->subclass(class => "Module::Build::Custom",code  => <<
         &change($dir);
         $self->SUPER::ACTION_build;
         &replacePath('blib/lib/HTML/Menu/TreeView.pm');
+
     }
 
     sub change {
@@ -38,7 +39,7 @@ my $class = Module::Build->subclass(class => "Module::Build::Custom",code  => <<
         }
     }
 
-    sub replacePath {
+    sub replacePath{
         my $f = shift;
         chmod 0644, $f;
         open( EDIT, "+<$f" ) or die "replacePath $f $! $/";
@@ -52,6 +53,25 @@ my $class = Module::Build->subclass(class => "Module::Build::Custom",code  => <<
         truncate( EDIT, tell(EDIT) );
         close(EDIT);
     }
+	
+	sub replace{
+		my $replace = shift;
+		my $with    = shift;
+		my $f       = shift;
+		chmod 0644, $f;
+		open(EDIT, "+<$f") or die "$! $f  $/";
+		my $files = '';
+		while (<EDIT>)
+		{
+			$_ =~ s/$replace/$with/g;
+			$files .= $_;
+		}
+		seek(EDIT, 0, 0);
+		print EDIT $files;
+		truncate ( EDIT, tell( EDIT ) );
+		close( EDIT );
+		chmod 0755, $f if ($f =~ /^.*.pl$/);
+	}
 
     sub ACTION_install_examples {
         my $self = shift;
@@ -67,6 +87,7 @@ my $class = Module::Build->subclass(class => "Module::Build::Custom",code  => <<
         for( my $i = 0 ; $i <= $#files ; $i++ ) {
             my $c = "$dir/$files[$i]";
             copy( $c, "$release/$files[$i]" ) or die $!;
+			&replace('#!/usr/bin/perl', '#!perl', "$release/$files[$i]") if $^O eq 'MSWin32';
             chmod 0755, "$release/$files[$i]";
         }
         $dir .= '/html';
@@ -91,7 +112,7 @@ my $inctance = $class->new(
                  'Test::More'    => '>=0.7',
                  'perl'          => '5.006000',
                 },
-    ($] >= 5.005 ? (AUTHOR => 'Dirk Lindner <lze@cpan.org>') : ()),
+    ($] >= 5.005 ? (AUTHOR => 'Dirk Lindner <dirk.lze@gmail.com>') : ()),
     dist_abstract      => 'Create a HTML TreeView from scratch',
     license            => 'lgpl',
     create_makefile_pl => 'passthrough',
@@ -99,8 +120,8 @@ my $inctance = $class->new(
     resources => {
         repository => 'https://sourceforge.net/p/lindnerei/ajax/HEAD/tree/HTML-Menu-TreeView'
     }
-    }
-    #   sign =>1,
+    },
+      sign =>1,
 );
 $inctance->{properties}{htd} = "/var/www/htdocs";
 eval 'use HTML::Menu::TreeView qw(documentRoot)';

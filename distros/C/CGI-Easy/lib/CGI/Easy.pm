@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 
 1; # Magic true value required at end of module
@@ -20,7 +20,7 @@ CGI::Easy - simple and straightforward helpers to make CGI easy
 
 =head1 VERSION
 
-This document describes CGI::Easy version v2.0.0
+This document describes CGI::Easy version v2.0.1
 
 
 =head1 SYNOPSIS
@@ -144,7 +144,7 @@ output all headers from this object/hash you should call compose() method,
 and it will return string with all HTTP headers suitable for sending to
 browser.
 
-There one exception: value for key 'Set-Cookie' is ARRAYREF with HASHREFs,
+There one exception: value for key 'Set-Cookie' is ARRAYREF with HASHREF,
 where each HASHREF keep cookie details:
 
     $h->{'Set-Cookie'} = [
@@ -237,7 +237,6 @@ provided by CGI::Easy::Headers->new().
     } else {
         printf "<p>You browser doesn't support cookies</p>\n";
     }
-
 
 =head2 FCGI with cookies
 
@@ -388,7 +387,7 @@ Alex Efros E<lt>powerman@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2009-2010 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+This software is Copyright (c) 2009- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
 
 This is free software, licensed under:
 

@@ -2,7 +2,8 @@
 # Use case: client connect to echo server using proxy.
 use warnings;
 use strict;
-use t::share;
+use lib 't';
+use share;
 
 
 use constant ACCEPTED => 123;

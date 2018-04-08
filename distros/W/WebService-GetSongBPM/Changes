@@ -1,0 +1,8 @@
+Revision history for WebService-GetSongBPM
+
+0.0101 2018-04-01 13:46:38
+    - Improved documentation.
+    - Cleaned up code a bit.
+
+0.01 2018-03-31 20:35:04
+    - Minted by Dist::Zilla.

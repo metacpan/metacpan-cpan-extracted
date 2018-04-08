@@ -7,22 +7,23 @@ package Comics::Plugin::LeastICouldDo;
 
 use parent qw(Comics::Fetcher::Cascade);
 
-our $VERSION = "1.00";
-
-# Current image is date formatted.
-# Unfortunately, this is not reliable (e.g., on nov 1 the image
-# was 2016/10/20161101.jpg)
+our $VERSION = "1.02";
 
 our $name    = "Least I Could Do";
 our $url     = "http://www.leasticoulddo.com/";
 our @patterns =
   ( qr{ <a \s+
-	 href="(?<url>http://www.leasticoulddo.com/comic/\d+/)" \s+
-	 id="feature-comic">
+	 href="(?<url>https?://(?:www.)?leasticoulddo.com/comic/\d+/?)" \s+
+	 id="latest-comic">
       }six,
     qr{ <meta \s+
+         property="og:description" \s+
+	 content="(?<title>.*?)" \s*
+	/>
+	.*?
+	<meta \s+
          property="og:image" \s+
-         content="(?<url>http://www.leasticoulddo.com/wp-content/uploads/
+         content="(?<url>https?://(?:www.)?leasticoulddo.com/wp-content/uploads/
                    \d+/\d+/(?<image>.*?\.\w+))" \s*
         />
       }six,

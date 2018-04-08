@@ -15,10 +15,9 @@ has map => ( is => 'ro', isa => InstanceOf ['Pcore::App::API::Map'], init_arg =>
 has _auth_cb_queue => ( is => 'ro', isa => HashRef, init_arg => undef );
 has _auth_cache    => ( is => 'ro', isa => HashRef, init_arg => undef );
 
-const our $TOKEN_TYPE_USER_PASSWORD      => 1;
-const our $TOKEN_TYPE_APP_INSTANCE_TOKEN => 2;
-const our $TOKEN_TYPE_USER_TOKEN         => 3;
-const our $TOKEN_TYPE_USER_SESSION       => 4;
+const our $TOKEN_TYPE_USER_PASSWORD => 1;
+const our $TOKEN_TYPE_USER_TOKEN    => 3;
+const our $TOKEN_TYPE_USER_SESSION  => 4;
 
 const our $TOKEN_TYPE => {
     $TOKEN_TYPE_USER_PASSWORD => undef,
@@ -143,7 +142,7 @@ sub authenticate ( $self, $user_name_utf8, $token, $cb ) {
     return;
 }
 
-around authenticate_private => sub ( $orig, $self, $private_token, $cb ) {
+sub authenticate_private ( $self, $private_token, $cb ) {
 
     # try to find token in cache
     my $auth = $self->{_auth_cache}->{ $private_token->[2] };
@@ -160,7 +159,7 @@ around authenticate_private => sub ( $orig, $self, $private_token, $cb ) {
     return if $self->{_auth_cb_queue}->{ $private_token->[2] }->@* > 1;
 
     # authenticate on backend
-    $self->$orig(
+    $self->do_authenticate_private(
         $private_token,
         sub ( $res ) {
 
@@ -205,7 +204,7 @@ around authenticate_private => sub ( $orig, $self, $private_token, $cb ) {
     );
 
     return;
-};
+}
 
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
@@ -214,9 +213,9 @@ around authenticate_private => sub ( $orig, $self, $private_token, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 81                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 80                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 114                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 113                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

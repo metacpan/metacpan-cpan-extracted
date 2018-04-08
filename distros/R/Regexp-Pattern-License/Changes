@@ -7,6 +7,36 @@ Home page:    <https://metacpan.org/pod/Regexp::Pattern::License>
 Bug tracker:  <https://bugs.debian.org/regexp-pattern-license>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.1.92	2018-04-05
+
+ [ Bug Fixes ]
+ - Fix avoid chained regexes (seemingly unsupported in perl <5.16).
+
+ [ Documentation ]
+ - Update and slightly reorganize TODOs.
+
+ [ Other ]
+ - Added: Add trait objects any_of licensed_under or_at_option version
+   version_numberstring.
+ - Added: Implement DefHash option "capture".
+ - Improve embedded summary (and related comment) for option "subject".
+ - Stop cache compiled patterns internally: Not part of Regexp::Pattern
+   spec and better handled externally when really needed.
+
+v3.1.91	2018-03-30
+
+ [ Bug Fixes ]
+ - Fix avoid alternate name MIT except for objects expat mit.
+ - Fix metadata for object aladdin: Use tag type:versioned:decimal (not
+   type:unversioned).
+ - Fix resolve Fedora IRIs.
+
+ [ Other ]
+ - Added: Add objects aladdin_8 aladdin_9.
+ - Added: Cover more types of generic grants (used mostly for llgpl and
+   gpl).
+ - Added: Extend object llgpl: Add canonical iri.
+
 v3.1.90	2018-03-29
 
  [ Bug Fixes ]

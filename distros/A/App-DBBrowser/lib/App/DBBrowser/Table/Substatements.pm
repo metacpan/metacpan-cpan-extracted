@@ -6,21 +6,18 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.009';
+our $VERSION = '2.012';
 
 use List::MoreUtils   qw( any );
 
-use Term::Choose           qw( choose );
-use Term::Choose::LineFold qw( print_columns );
-use Term::Choose::Util     qw( choose_a_file choose_a_subset choose_a_number insert_sep term_width );
-use Term::Form             qw();
+use Term::Choose       qw( choose );
+use Term::Choose::Util qw( choose_a_number );
+use Term::Form         qw();
 
 use if $^O eq 'MSWin32', 'Win32::Console::ANSI'; #
 
 use App::DBBrowser::Auxil;
-
-
-use App::DBBrowser::Subqueries; ###
+use App::DBBrowser::Subqueries;
 
 
 sub new {
@@ -96,7 +93,6 @@ sub __add_aggregate_substmt {
 }
 
 
-
 sub columns {
     my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -150,6 +146,7 @@ sub columns {
     }
 }
 
+
 sub distinct {
     my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -177,6 +174,7 @@ sub distinct {
     }
 }
 
+
 sub aggregate {
     my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;
     my $tmp = {
@@ -199,6 +197,7 @@ sub aggregate {
         }
     }
 }
+
 
 sub set {
     my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;
@@ -241,6 +240,7 @@ sub set {
         $col_sep = ', ';
     }
 }
+
 
 sub where {
     my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;
@@ -328,6 +328,7 @@ sub where {
     }
 }
 
+
 sub group_by {
     my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -363,6 +364,7 @@ sub group_by {
         $tmp->{group_by_stmt} = " GROUP BY " . join ', ', @{$tmp->{group_by_cols}};
     }
 }
+
 
 sub having {
     my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;
@@ -462,6 +464,7 @@ sub having {
     }
 }
 
+
 sub order_by {
     my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -520,6 +523,7 @@ sub order_by {
         $col_sep = ', ';
     }
 }
+
 
 sub limit_offset {
     my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;

@@ -1,13 +1,12 @@
-# RT::Client::REST::Attachment -- attachment object representation.
-
-package RT::Client::REST::Attachment;
+#!perl
+# PODNAME: RT::Client::REST::Attachment
+# ABSTRACT: attachment object representation.
 
 use strict;
 use warnings;
 
-use vars qw($VERSION);
-$VERSION = 0.03;
-
+package RT::Client::REST::Attachment;
+$RT::Client::REST::Attachment::VERSION = '0.52';
 use Params::Validate qw(:types);
 use RT::Client::REST::Object 0.01;
 use RT::Client::REST::Object::Exception 0.03;
@@ -124,7 +123,7 @@ sub retrieve {
 my @unsupported = qw(store search count);
 # Override unsupported methods.
 for my $method (@unsupported) {
-    no strict 'refs';
+    no strict 'refs'; ## no critic (ProhibitNoStrict)
     *$method = sub {
         my $self = shift;
         RT::Client::REST::Object::IllegalMethodException->throw(
@@ -133,6 +132,7 @@ for my $method (@unsupported) {
     };
 }
 
+# FIXME this is kind of horrible, probably functions should be provided via mixin?
 sub can {
     my ($self, $method) = @_;
     if (grep { $_ eq $method } @unsupported) {
@@ -147,9 +147,17 @@ __PACKAGE__->_generate_methods;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-RT::Client::REST::Attachment -- this object represents an attachment.
+RT::Client::REST::Attachment - attachment object representation.
+
+=head1 VERSION
+
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -255,6 +263,10 @@ be set.
 
 =over 2
 
+=item B<can>
+
+Wraps the normal I<can()> call, to exclude unsupported methods from parent.
+
 =item B<rt_type>
 
 Returns 'attachment'.
@@ -266,12 +278,45 @@ Returns 'attachment'.
 L<RT::Client::REST::Ticket>,
 L<RT::Client::REST::SearchResult>.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Abhijit Menon-Sen <ams@wiw.org>
+
+=item *
 
 Dmitri Tikhonov <dtikhonov@yahoo.com>
 
-=head1 LICENSE
+=item *
 
-Perl license.
+Damien "dams" Krotkine <dams@cpan.org>
+
+=item *
+
+Dean Hamstead <dean@bytefoundry.com.au>
+
+=item *
+
+Miquel Ruiz <mruiz@cpan.org>
+
+=item *
+
+JLMARTIN
+
+=item *
+
+SRVSH
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Dmitri Tikhonov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

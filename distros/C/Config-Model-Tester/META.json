@@ -33,6 +33,7 @@
             "Test::Differences" : "0",
             "Test::Exception" : "0",
             "Test::File::Contents" : "0",
+            "Test::Log::Log4perl" : "0",
             "Test::Memory::Cycle" : "0",
             "Test::More" : "0",
             "Test::Warn" : "0",
@@ -53,7 +54,7 @@
          "web" : "http://github.com/dod38fr/config-model-tester.git"
       }
    },
-   "version" : "3.004",
+   "version" : "3.005",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

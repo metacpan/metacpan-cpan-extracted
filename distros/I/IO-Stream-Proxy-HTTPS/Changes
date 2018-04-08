@@ -1,5 +1,9 @@
 Revision history for IO-Stream-Proxy-HTTPS
 
+v2.0.1  2018-04-03 19:46:43 EEST
+	- Fix compatibility with perl-5.26.
+	- Reformat doc.
+
 v2.0.0  2016-02-20 14:53:06 EET
 	- Switch to Dist::Milla.
 

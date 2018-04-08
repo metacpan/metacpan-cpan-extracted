@@ -1,0 +1,8 @@
+0.002   2018-04-02 (PERLANCAR)
+
+	- [Bugfix] Forgot to set $DYNAMIC=1.
+
+
+0.001   2018-04-02 (PERLANCAR)
+
+        - First release.

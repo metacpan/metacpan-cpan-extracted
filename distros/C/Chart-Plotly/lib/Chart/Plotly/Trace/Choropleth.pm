@@ -1,16 +1,38 @@
 package Chart::Plotly::Trace::Choropleth;
 use Moose;
 use MooseX::ExtraArgs;
+use Moose::Util::TypeConstraints qw(enum union);
+if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
+    Moose::Util::TypeConstraints::type('PDL');
+}
 
-use Chart::Plotly::Trace::Attribute::Colorbar;
-use Chart::Plotly::Trace::Attribute::Marker;
+use Chart::Plotly::Trace::Choropleth::Colorbar;
+use Chart::Plotly::Trace::Choropleth::Hoverlabel;
+use Chart::Plotly::Trace::Choropleth::Marker;
+use Chart::Plotly::Trace::Choropleth::Selected;
+use Chart::Plotly::Trace::Choropleth::Stream;
+use Chart::Plotly::Trace::Choropleth::Unselected;
 
-our $VERSION = '0.013';    # VERSION
+our $VERSION = '0.017';    # VERSION
+
+# ABSTRACT: The data that describes the choropleth value-to-color mapping is set in `z`. The geographic locations corresponding to each value in `z` are set in `locations`.
 
 sub TO_JSON {
     my $self       = shift;
     my $extra_args = $self->extra_args // {};
-    my %hash       = ( %$self, %$extra_args );
+    my $meta       = $self->meta;
+    my %hash       = %$self;
+    for my $name ( sort keys %hash ) {
+        my $attr = $meta->get_attribute($name);
+        if ( defined $attr ) {
+            my $value = $hash{$name};
+            my $type  = $attr->type_constraint;
+            if ( $type && $type->equals('Bool') ) {
+                $hash{$name} = $value ? \1 : \0;
+            }
+        }
+    }
+    %hash = ( %hash, %$extra_args );
     delete $hash{'extra_args'};
     if ( $self->can('type') && ( !defined $hash{'type'} ) ) {
         $hash{type} = $self->type();
@@ -18,80 +40,183 @@ sub TO_JSON {
     return \%hash;
 }
 
-has autocolorscale => (
-            is            => 'rw',
-            isa           => "Bool",
-            documentation => "Determines whether or not the colorscale is picked using the sign of the input z values.",
-);
-
-has colorbar => ( is  => 'rw',
-                  isa => "Maybe[HashRef]|Chart::Plotly::Trace::Attribute::Colorbar" );
-
-has colorscale => (
-    is => 'rw',
-    documentation =>
-      "Sets the colorscale. The colorscale must be an array containing arrays mapping a normalized value to an rgb, rgba, hex, hsl, hsv, or named color string. At minimum, a mapping for the lowest (0) and highest (1) values are required. For example, `[[0, 'rgb(0,0,255)', [1, 'rgb(255,0,0)']]`. To control the bounds of the colorscale in z space, use zmin and zmax",
-);
-
-has hoverinfo => (
-    is => 'rw',
-    documentation =>
-      "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
-);
-
-has locationmode => (
-         is            => 'rw',
-         documentation => "Determines the set of locations used to match entries in `locations` to regions on the map.",
-);
-
-has locations => ( is            => 'rw',
-                   documentation => "Sets the coordinates via location IDs or names. See `locationmode` for more info.",
-);
-
-has marker => ( is  => 'rw',
-                isa => "Maybe[HashRef]|Chart::Plotly::Trace::Attribute::Marker" );
-
-has reversescale => ( is            => 'rw',
-                      isa           => "Bool",
-                      documentation => "Reverses the colorscale.",
-);
-
-has showscale => ( is            => 'rw',
-                   isa           => "Bool",
-                   documentation => "Determines whether or not a colorbar is displayed for this trace.",
-);
-
-has text => ( is            => 'rw',
-              documentation => "Sets the text elements associated with each location.", );
-
-has z => ( is            => 'rw',
-           documentation => "Sets the color values.", );
-
-has zauto => (
-          is            => 'rw',
-          isa           => "Bool",
-          documentation => "Determines the whether or not the color domain is computed with respect to the input data.",
-);
-
-has zmax => ( is            => 'rw',
-              isa           => "Num",
-              documentation => "Sets the upper bound of color domain.",
-);
-
-has zmin => ( is            => 'rw',
-              isa           => "Num",
-              documentation => "Sets the lower bound of color domain.",
-);
-
-has name => ( is            => 'rw',
-              isa           => "Str",
-              documentation => "Sets the trace name",
-);
-
 sub type {
     my @components = split( /::/, __PACKAGE__ );
     return lc( $components[-1] );
 }
+
+has autocolorscale => (
+            is            => "rw",
+            isa           => "Bool",
+            documentation => "Determines whether or not the colorscale is picked using the sign of the input z values.",
+);
+
+has colorbar => ( is  => "rw",
+                  isa => "Maybe[HashRef]|Chart::Plotly::Trace::Choropleth::Colorbar", );
+
+has colorscale => (
+    is => "rw",
+    documentation =>
+      "Sets the colorscale. The colorscale must be an array containing arrays mapping a normalized value to an rgb, rgba, hex, hsl, hsv, or named color string. At minimum, a mapping for the lowest (0) and highest (1) values are required. For example, `[[0, 'rgb(0,0,255)', [1, 'rgb(255,0,0)']]`. To control the bounds of the colorscale in z space, use zmin and zmax",
+);
+
+has customdata => (
+    is  => "rw",
+    isa => "ArrayRef|PDL",
+    documentation =>
+      "Assigns extra data each datum. This may be useful when listening to hover, click and selection events. Note that, *scatter* traces also appends customdata items in the markers DOM elements",
+);
+
+has customdatasrc => ( is            => "rw",
+                       isa           => "Str",
+                       documentation => "Sets the source reference on plot.ly for  customdata .",
+);
+
+has geo => (
+    is => "rw",
+    documentation =>
+      "Sets a reference between this trace's geospatial coordinates and a geographic map. If *geo* (the default value), the geospatial coordinates refer to `layout.geo`. If *geo2*, the geospatial coordinates refer to `layout.geo2`, and so on.",
+);
+
+has hoverinfo => (
+    is  => "rw",
+    isa => "Maybe[ArrayRef]",
+    documentation =>
+      "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
+);
+
+has hoverinfosrc => ( is            => "rw",
+                      isa           => "Str",
+                      documentation => "Sets the source reference on plot.ly for  hoverinfo .",
+);
+
+has hoverlabel => ( is  => "rw",
+                    isa => "Maybe[HashRef]|Chart::Plotly::Trace::Choropleth::Hoverlabel", );
+
+has ids => (
+    is  => "rw",
+    isa => "ArrayRef|PDL",
+    documentation =>
+      "Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.",
+);
+
+has idssrc => ( is            => "rw",
+                isa           => "Str",
+                documentation => "Sets the source reference on plot.ly for  ids .",
+);
+
+has legendgroup => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.",
+);
+
+has locationmode => (
+         is            => "rw",
+         isa           => enum( [ "ISO-3", "USA-states", "country names" ] ),
+         documentation => "Determines the set of locations used to match entries in `locations` to regions on the map.",
+);
+
+has locations => ( is            => "rw",
+                   isa           => "ArrayRef|PDL",
+                   documentation => "Sets the coordinates via location IDs or names. See `locationmode` for more info.",
+);
+
+has locationssrc => ( is            => "rw",
+                      isa           => "Str",
+                      documentation => "Sets the source reference on plot.ly for  locations .",
+);
+
+has marker => ( is  => "rw",
+                isa => "Maybe[HashRef]|Chart::Plotly::Trace::Choropleth::Marker", );
+
+has name => ( is            => "rw",
+              isa           => "Str",
+              documentation => "Sets the trace name. The trace name appear as the legend item and on hover.",
+);
+
+has opacity => ( is            => "rw",
+                 isa           => "Num",
+                 documentation => "Sets the opacity of the trace.",
+);
+
+has reversescale => ( is            => "rw",
+                      isa           => "Bool",
+                      documentation => "Reverses the colorscale.",
+);
+
+has selected => ( is  => "rw",
+                  isa => "Maybe[HashRef]|Chart::Plotly::Trace::Choropleth::Selected", );
+
+has selectedpoints => (
+    is  => "rw",
+    isa => "Any",
+    documentation =>
+      "Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.",
+);
+
+has showlegend => (
+               is            => "rw",
+               isa           => "Bool",
+               documentation => "Determines whether or not an item corresponding to this trace is shown in the legend.",
+);
+
+has showscale => ( is            => "rw",
+                   isa           => "Bool",
+                   documentation => "Determines whether or not a colorbar is displayed for this trace.",
+);
+
+has stream => ( is  => "rw",
+                isa => "Maybe[HashRef]|Chart::Plotly::Trace::Choropleth::Stream", );
+
+has text => ( is            => "rw",
+              isa           => "Str|ArrayRef[Str]",
+              documentation => "Sets the text elements associated with each location.",
+);
+
+has textsrc => ( is            => "rw",
+                 isa           => "Str",
+                 documentation => "Sets the source reference on plot.ly for  text .",
+);
+
+has uid => ( is  => "rw",
+             isa => "Str", );
+
+has unselected => ( is  => "rw",
+                    isa => "Maybe[HashRef]|Chart::Plotly::Trace::Choropleth::Unselected", );
+
+has visible => (
+    is => "rw",
+    documentation =>
+      "Determines whether or not this trace is visible. If *legendonly*, the trace is not drawn, but can appear as a legend item (provided that the legend itself is visible).",
+);
+
+has z => ( is            => "rw",
+           isa           => "ArrayRef|PDL",
+           documentation => "Sets the color values.",
+);
+
+has zauto => (
+          is            => "rw",
+          isa           => "Bool",
+          documentation => "Determines the whether or not the color domain is computed with respect to the input data.",
+);
+
+has zmax => ( is            => "rw",
+              isa           => "Num",
+              documentation => "Sets the upper bound of color domain.",
+);
+
+has zmin => ( is            => "rw",
+              isa           => "Num",
+              documentation => "Sets the lower bound of color domain.",
+);
+
+has zsrc => ( is            => "rw",
+              isa           => "Str",
+              documentation => "Sets the source reference on plot.ly for  z .",
+);
 
 __PACKAGE__->meta->make_immutable();
 1;
@@ -104,11 +229,11 @@ __END__
 
 =head1 NAME
 
-Chart::Plotly::Trace::Choropleth
+Chart::Plotly::Trace::Choropleth - The data that describes the choropleth value-to-color mapping is set in `z`. The geographic locations corresponding to each value in `z` are set in `locations`.
 
 =head1 VERSION
 
-version 0.013
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -253,16 +378,26 @@ version 0.013
 
 =head1 DESCRIPTION
 
+The data that describes the choropleth value-to-color mapping is set in `z`. The geographic locations corresponding to each value in `z` are set in `locations`.
+
+Screenshot of the above example:
+
+=for HTML <p>
+<img src="https://raw.githubusercontent.com/pablrod/p5-Chart-Plotly/master/examples/traces/choropleth.png" alt="Screenshot of the above example">
+</p>
+
+=for markdown ![Screenshot of the above example](https://raw.githubusercontent.com/pablrod/p5-Chart-Plotly/master/examples/traces/choropleth.png)
+
+=for HTML <p>
+<iframe src="https://raw.githubusercontent.com/pablrod/p5-Chart-Plotly/master/examples/traces/choropleth.html" style="border:none;" width="80%" height="520"></iframe>
+</p>
+
 This file has been autogenerated from the official plotly.js source.
 
 If you like Plotly, please support them: L<https://plot.ly/> 
 Open source announcement: L<https://plot.ly/javascript/open-source-announcement/>
 
 Full reference: L<https://plot.ly/javascript/reference/#choropleth>
-
-=head1 NAME 
-
-Chart::Plotly::Trace::Choropleth
 
 =head1 DISCLAIMER
 
@@ -274,6 +409,10 @@ But I think plotly.js is a great library and I want to use it with perl.
 =head2 TO_JSON
 
 Serialize the trace to JSON. This method should be called only by L<JSON> serializer.
+
+=head2 type
+
+Trace type.
 
 =head1 ATTRIBUTES
 
@@ -289,9 +428,39 @@ Determines whether or not the colorscale is picked using the sign of the input z
 
 Sets the colorscale. The colorscale must be an array containing arrays mapping a normalized value to an rgb, rgba, hex, hsl, hsv, or named color string. At minimum, a mapping for the lowest (0) and highest (1) values are required. For example, `[[0, 'rgb(0,0,255)', [1, 'rgb(255,0,0)']]`. To control the bounds of the colorscale in z space, use zmin and zmax
 
+=item * customdata
+
+Assigns extra data each datum. This may be useful when listening to hover, click and selection events. Note that, *scatter* traces also appends customdata items in the markers DOM elements
+
+=item * customdatasrc
+
+Sets the source reference on plot.ly for  customdata .
+
+=item * geo
+
+Sets a reference between this trace's geospatial coordinates and a geographic map. If *geo* (the default value), the geospatial coordinates refer to `layout.geo`. If *geo2*, the geospatial coordinates refer to `layout.geo2`, and so on.
+
 =item * hoverinfo
 
 Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.
+
+=item * hoverinfosrc
+
+Sets the source reference on plot.ly for  hoverinfo .
+
+=item * hoverlabel
+
+=item * ids
+
+Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.
+
+=item * idssrc
+
+Sets the source reference on plot.ly for  ids .
+
+=item * legendgroup
+
+Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.
 
 =item * locationmode
 
@@ -301,19 +470,55 @@ Determines the set of locations used to match entries in `locations` to regions 
 
 Sets the coordinates via location IDs or names. See `locationmode` for more info.
 
+=item * locationssrc
+
+Sets the source reference on plot.ly for  locations .
+
 =item * marker
+
+=item * name
+
+Sets the trace name. The trace name appear as the legend item and on hover.
+
+=item * opacity
+
+Sets the opacity of the trace.
 
 =item * reversescale
 
 Reverses the colorscale.
 
+=item * selected
+
+=item * selectedpoints
+
+Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.
+
+=item * showlegend
+
+Determines whether or not an item corresponding to this trace is shown in the legend.
+
 =item * showscale
 
 Determines whether or not a colorbar is displayed for this trace.
 
+=item * stream
+
 =item * text
 
 Sets the text elements associated with each location.
+
+=item * textsrc
+
+Sets the source reference on plot.ly for  text .
+
+=item * uid
+
+=item * unselected
+
+=item * visible
+
+Determines whether or not this trace is visible. If *legendonly*, the trace is not drawn, but can appear as a legend item (provided that the legend itself is visible).
 
 =item * z
 
@@ -331,15 +536,11 @@ Sets the upper bound of color domain.
 
 Sets the lower bound of color domain.
 
-=item * name
+=item * zsrc
 
-Sets the trace name
+Sets the source reference on plot.ly for  z .
 
 =back
-
-=head2 type
-
-Trace type.
 
 =head1 AUTHOR
 
@@ -347,7 +548,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2017 by Pablo Rodríguez González.
+This software is Copyright (c) 2017 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

@@ -1,9 +1,9 @@
 #!/usr/bin/perl
-#$Id: getkeyset.pl 1295 2015-01-08 13:14:03Z willem $
+#$Id: getkeyset.pl 1661 2018-04-04 09:51:45Z willem $
 
 use strict;
 use Net::DNS::SEC;
-use Net::DNS::Keyset;
+use Net::DNS::SEC::Keyset;
 
 
 my $domain = shift || die "At least one argument needed";
@@ -17,8 +17,8 @@ $res->nameservers($nameserver) if defined $nameserver;
 my $packet = $res->query( $domain, 'DNSKEY', 'IN' )
 		|| die "No results for query $domain DNSKEY";
 
-my $keyset = Net::DNS::Keyset->new($packet)
-		|| print $Net::DNS::Keyset::keyset_err && return 0;
+my $keyset = Net::DNS::SEC::Keyset->new($packet)
+		|| die $Net::DNS::SEC::Keyset::keyset_err;
 
 
 # Print DS records to STD out

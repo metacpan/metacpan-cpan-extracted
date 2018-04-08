@@ -100,7 +100,7 @@ sub init ( $self, $cb ) {
 }
 
 # AUTHENTICATE
-sub authenticate_private ( $self, $private_token, $cb ) {
+sub do_authenticate_private ( $self, $private_token, $cb ) {
     if ( $private_token->[0] == $TOKEN_TYPE_USER_PASSWORD ) {
         $self->_auth_user_password( $private_token, $cb );
     }
@@ -108,7 +108,7 @@ sub authenticate_private ( $self, $private_token, $cb ) {
         $self->_auth_user_token( $private_token, $cb );
     }
     elsif ( $private_token->[0] == $TOKEN_TYPE_USER_SESSION ) {
-        $self->_auth_user_session( $private_token, $cb );
+        $self->_auth_user_token( $private_token, $cb );
     }
     else {
         $cb->( result [ 400, 'Invalid token type' ] );
@@ -702,7 +702,7 @@ SQL
             # verify token
             $self->_verify_token_hash(
                 $private_token->[2],
-                $user_token->{user_session_hash},
+                $user_token->{user_token_hash},
                 sub ($status) {
 
                     # token is not valid
@@ -726,15 +726,166 @@ SQL
     return;
 }
 
-# TODO
 sub create_user_token ( $self, $user_id, $desc, $permissions, $cb ) {
+    my $type = $TOKEN_TYPE_USER_TOKEN;
+
+    # resolve user
+    $self->_db_get_user(
+        $self->{dbh},
+        $user_id,
+        sub ($user) {
+
+            # user wasn't found
+            if ( !$user ) {
+                $cb->($user);
+            }
+            else {
+
+                # generate user token
+                $self->_generate_token(
+                    $type,
+                    sub ($token) {
+
+                        # token generation error
+                        if ( !$token ) {
+                            $cb->($token);
+                        }
+
+                        # token geneerated
+                        else {
+
+                            # get user permissions
+                            $self->_db_get_user_permissions(
+                                $self->{dbh},
+                                $user->{data}->{id},
+                                sub ($user_permissions) {
+
+                                    # error
+                                    if ( !$user_permissions ) {
+                                        $cb->($user_permissions);
+
+                                        return;
+                                    }
+
+                                    # find user permissions id's
+                                    if ( defined $permissions ) {
+
+                                        # create index by role name
+                                        my $idx = { map { $_ => 1 } $permissions->@* };
+
+                                        $user_permissions->{data} = [ grep { exists $idx->{ $_->{role_name} } } $user_permissions->{data}->@* ];
+
+                                        # some permissions are invalid or not allowed
+                                        if ( $permissions->@* != $user_permissions->{data}->@* ) {
+                                            $cb->( result 500 );
+
+                                            return;
+                                        }
+                                    }
+
+                                    # begin transaction
+                                    $self->{dbh}->begin_work(
+                                        sub ( $dbh, $res ) {
+
+                                            # error
+                                            if ( !$res ) {
+                                                $cb->($res);
+
+                                                return;
+                                            }
+
+                                            my $on_finish = sub ($res) {
+                                                if ( !$res ) {
+                                                    $dbh->rollback(
+                                                        sub ( $dbh, $res ) {
+                                                            $cb->( result 500 );
+
+                                                            return;
+                                                        }
+                                                    );
+                                                }
+                                                else {
+                                                    $dbh->commit(
+                                                        sub ( $dbh, $res1 ) {
+                                                            if ( !$res1 ) {
+                                                                $cb->( result 500 );
+                                                            }
+                                                            else {
+                                                                $cb->(
+                                                                    result 200,
+                                                                    {   id    => $token->{data}->{id},
+                                                                        type  => $type,
+                                                                        token => $token->{data}->{token},
+                                                                    }
+                                                                );
+                                                            }
+
+                                                            return;
+                                                        }
+                                                    );
+                                                }
+
+                                                return;
+                                            };
+
+                                            # insert token
+                                            $dbh->do(
+                                                'INSERT INTO "api_user_token" ("id", "type", "user_id", "hash", "desc" ) VALUES (?, ?, ?, ?, ?)',
+                                                [ SQL_UUID $token->{data}->{id}, $type, SQL_UUID $user->{data}->{id}, SQL_BYTEA $token->{data}->{hash}, $desc ],
+                                                sub ( $dbh, $res, $data ) {
+                                                    if ( !$res ) {
+                                                        $on_finish->($res);
+                                                    }
+                                                    else {
+
+                                                        # no permissions to insert, eg: root user
+                                                        if ( !$user_permissions->{data}->@* ) {
+                                                            $cb->($res);
+
+                                                            return;
+                                                        }
+
+                                                        # insert user token permissions
+                                                        $dbh->do(
+                                                            [ q[INSERT INTO "api_user_token_permission"], VALUES [ map { { user_token_id => SQL_UUID $token->{data}->{id}, user_permission_id => SQL_UUID $_->{id} } } $user_permissions->{data}->@* ] ],
+                                                            sub ( $dbh, $res, $data ) {
+                                                                $on_finish->($res);
+
+                                                                return;
+                                                            }
+                                                        );
+
+                                                    }
+
+                                                    return;
+                                                }
+                                            );
+
+                                            return;
+                                        }
+                                    );
+
+                                    return;
+                                }
+                            );
+                        }
+
+                        return;
+                    }
+                );
+            }
+
+            return;
+        }
+    );
+
     return;
 }
 
 sub remove_user_token ( $self, $user_token_id, $cb ) {
     $self->{dbh}->do(
-        'DELETE FROM "api_user_token" WHERE "id" = ?',
-        [ SQL_UUID $user_token_id ],
+        'DELETE FROM "api_user_token" WHERE "id" = ? AND "type" = ?',
+        [ SQL_UUID $user_token_id, $TOKEN_TYPE_USER_TOKEN ],
         sub ( $dbh, $res, $data ) {
             if ( !$res ) {
                 $cb->( result 500 );
@@ -756,61 +907,8 @@ sub remove_user_token ( $self, $user_token_id, $cb ) {
 }
 
 # USER SESSION
-sub _auth_user_session ( $self, $private_token, $cb ) {
-
-    # get user session
-    $self->{dbh}->selectrow(
-        <<'SQL',
-            SELECT
-                "api_user"."id" AS "user_id",
-                "api_user"."name" AS "user_name",
-                "api_user"."enabled" AS "user_enabled",
-                "api_user_session"."hash" AS "user_session_hash"
-            FROM
-                "api_user",
-                "api_user_session"
-            WHERE
-                "api_user"."id" = "api_user_session"."user_id"
-                AND "api_user_session"."id" = ?
-SQL
-        [ SQL_UUID $private_token->[1] ],
-        sub ( $dbh, $res, $user_session ) {
-
-            # user is disabled
-            if ( !$user_session->{user_enabled} ) {
-                $cb->( result 404 );
-
-                return;
-            }
-
-            # verify token
-            $self->_verify_token_hash(
-                $private_token->[2],
-                $user_session->{user_session_hash},
-                sub ($status) {
-
-                    # token is not valid
-                    if ( !$status ) {
-                        $cb->($status);
-                    }
-
-                    # token is valid
-                    else {
-                        $self->_return_auth( $private_token, $user_session->{user_id}, $user_session->{user_name}, $cb );
-                    }
-
-                    return;
-                }
-            );
-
-            return;
-        }
-    );
-
-    return;
-}
-
-sub create_user_session ( $self, $user_id, $ip, $agent, $cb ) {
+sub create_user_session ( $self, $user_id, $cb ) {
+    my $type = $TOKEN_TYPE_USER_SESSION;
 
     # resolve user
     $self->_db_get_user(
@@ -826,7 +924,7 @@ sub create_user_session ( $self, $user_id, $ip, $agent, $cb ) {
 
                 # generate session token
                 $self->_generate_token(
-                    $TOKEN_TYPE_USER_SESSION,
+                    $type,
                     sub ($token) {
 
                         # token generation error
@@ -837,8 +935,8 @@ sub create_user_session ( $self, $user_id, $ip, $agent, $cb ) {
                         # token geneerated
                         else {
                             $self->{dbh}->do(
-                                'INSERT INTO "api_user_session" ("id", "user_id", "hash", "ip", "agent") VALUES (?, ?, ?, ?, ?)',
-                                [ SQL_UUID $token->{data}->{id}, SQL_UUID $user->{data}->{id}, SQL_BYTEA $token->{data}->{hash}, SQL_BYTEA $ip, $agent ],
+                                'INSERT INTO "api_user_token" ("id", "type", "user_id", "hash") VALUES (?, ?, ?, ?)',
+                                [ SQL_UUID $token->{data}->{id}, $type, SQL_UUID $user->{data}->{id}, SQL_BYTEA $token->{data}->{hash} ],
                                 sub ( $dbh, $res, $data ) {
                                     if ( !$res->{rows} ) {
                                         $cb->( result 500 );
@@ -847,7 +945,7 @@ sub create_user_session ( $self, $user_id, $ip, $agent, $cb ) {
                                         $cb->(
                                             result 200,
                                             {   id    => $token->{data}->{id},
-                                                type  => $TOKEN_TYPE_USER_SESSION,
+                                                type  => $type,
                                                 token => $token->{data}->{token},
                                             }
                                         );
@@ -872,8 +970,8 @@ sub create_user_session ( $self, $user_id, $ip, $agent, $cb ) {
 
 sub remove_user_session ( $self, $user_sid, $cb ) {
     $self->{dbh}->do(
-        'DELETE FROM "api_user_session" WHERE "id" = ?',
-        [ SQL_UUID $user_sid ],
+        'DELETE FROM "api_user_token" WHERE "id" = ? AND "type" = ?',
+        [ SQL_UUID $user_sid, $TOKEN_TYPE_USER_SESSION ],
         sub ( $dbh, $res, $data ) {
             if ( !$res ) {
                 $cb->( result 500 );
@@ -884,28 +982,6 @@ sub remove_user_session ( $self, $user_sid, $cb ) {
             else {
                 P->fire_event('APP.API.AUTH');
 
-                $cb->( result 200 );
-            }
-
-            return;
-        }
-    );
-
-    return;
-}
-
-sub update_user_session ( $self, $user_sid, $ip, $agent, $cb ) {
-    $self->{dbh}->do(
-        'UPDATE "api_user_session" SET "updated" = ?, "ip" = ?, "agent" = ? WHERE "id" = ?',
-        [ time, $ip, $agent, SQL_UUID $user_sid ],
-        sub ( $dbh, $res, $data ) {
-            if ( !$res ) {
-                $cb->( result 500 );
-            }
-            elsif ( !$res->{rows} ) {
-                $cb->( result 404 );    # not found
-            }
-            else {
                 $cb->( result 200 );
             }
 
@@ -1052,8 +1128,7 @@ SQL
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 | 131, 153, 203, 311,  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |      | 517, 730, 813, 897,  |                                                                                                                |
-## |      | 1015                 |                                                                                                                |
+## |      | 517, 729, 1091       |                                                                                                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -8,25 +8,25 @@ use HTTP::Cookies 6.01;
 use Getopt::Std;
 use YAML::XS 0.62 qw(LoadFile);
 use File::Spec;
+use constant DEPRECATED =>
+'DEPRECATED: this application is deprecated. Please checkout App::SpamcupNG for a replacement.';
 
-# :TODO:21/01/2018 12:41:41:ARFREITAS: must capture die/croak to be able to log those messages
 use SpamcupNG qw(main_loop get_browser read_config %MAP config_logger);
 
-our $VERSION = '1.1'; # VERSION
+our $VERSION = '1.2'; # VERSION
 # Delay between HTTP requests. Adjust this if Spamcop.net asks!
 use constant DELAY => 5;
 
 my %opts;
 my $accounts;
 
-# :TODO:23/04/2017 17:15:49:ARFREITAS: migrate to Getopt::Long, too many options here
 # to use mnemonics
 getopts( 'vnac:shul:p:V:', \%opts );
 
 print_footer() if ( $opts{v} );
 
 if ( $opts{h} ) {
-
+    warn DEPRECATED;
     print qq(Usage: $0 [options] <Spamcop-Username>\n
  $0 <options> <Spamcop-Username>
 
@@ -116,7 +116,6 @@ else {
     run_report( $ua, \%opts );
 }
 
-# :TODO:23/04/2017 17:31:11:ARFREITAS: for compatibility between old
 # version of spamcup, it should go away once Getopts::Std is replaced with Getopts::Long
 
 # changes opts in place
@@ -136,6 +135,7 @@ sub compat_opts {
 sub run_report {
     my ( $ua, $opts_ref ) = @_;
     my $retval;
+    warn DEPRECATED;
 
     if ( $opts_ref->{all} and not( $opts_ref->{check_only} ) ) {
 

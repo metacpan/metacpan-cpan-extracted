@@ -18,19 +18,29 @@ ok defined($pg), "test instance 1 created";
 my $datadir = File::Spec->catfile($pg->base_dir, 'data');
 my $conf_file = File::Spec->catfile($datadir, 'postgresql.conf');
 
+my $ver_cmd = join' ', (
+    $pg->postmaster,
+    '--version'
+);
+
+my ($ver) = qx{$ver_cmd} =~ /(\d+(?:\.\d+)?)/;
+
 # By default postgresql.conf is truncated
 is -s $conf_file, 0, "test 1 postgresql.conf size 0";
 
-my $cmd = join ' ', (
-    $pg->postmaster,
-    '-D', $datadir,
-    '-C', 'synchronous_commit'
-);
+SKIP: {
+    skip "No -C switch on PostgreSQL $ver (9.2 required)", 1 if $ver < 9.2;
+    my $cmd = join ' ', (
+        $pg->postmaster,
+        '-D', $datadir,
+        '-C', 'synchronous_commit'
+    );
 
-my $config_value = qx{$cmd};
+    my $config_value = qx{$cmd};
 
-# Default for synchronous_commit is on
-like $config_value, qr/^on/, "test 1 synchronous_commit = on";
+    # Default for synchronous_commit is on
+    like $config_value, qr/^on/, "test 1 synchronous_commit = on";
+}
 
 my @pids = ($pg->pid);
 
@@ -58,16 +68,19 @@ ok defined($dbh), "test instance 2 connected";
 $datadir = File::Spec->catfile($pg->base_dir, 'data');
 $conf_file = File::Spec->catfile($datadir, 'postgresql.conf');
 
-$cmd = join ' ', (
-    $pg->postmaster,
-    '-D', $datadir,
-    '-C', 'synchronous_commit'
-);
+SKIP: {
+    skip "No -C switch on PostgreSQL $ver (9.2 required)", 1 if $ver < 9.2;
+    my $cmd = join ' ', (
+        $pg->postmaster,
+        '-D', $datadir,
+        '-C', 'synchronous_commit'
+    );
 
-$config_value = qx{$cmd};
+    my $config_value = qx{$cmd};
 
-# Now it should be off (overridden above)
-like $config_value, qr/^off/, "test 2 synchronous_commit = off";
+    # Now it should be off (overridden above)
+    like $config_value, qr/^off/, "test 2 synchronous_commit = off";
+}
 
 open my $fh, '<', $conf_file;
 my $pg_conf = join '', <$fh>;

@@ -1,21 +1,25 @@
 package String::Validator::Email;
-
-use 5.006;
+$String::Validator::Email::VERSION = '2.00';
+use 5.008;
 use strict;
 use warnings;
-use String::Validator::Common ;
+no warnings 'uninitialized';
+use String::Validator::Common 2.00;
 use Regexp::Common qw /net/;
 use Net::DNS;
 use Email::Valid;
-use Email::Address;
 
-our $VERSION = '0.98';
+# ABSTRACT: String::Validator for checking Email Addresses.
 
-=head1 VERSION
+my $email_messages = {
+    email_fqdn        => 'Does not appear to contain a Fully Qualified Domain Name.',
+    email_rfc822_noat => 'Missing @ symbol',
+    email_rfc822      => 'Does not look like an email address.',
+    email_tld         => 'This TLD (Top Level Domain) is not recognized.',
+    email_nomx1       => 'Mail Exchanger for ',
+    email_nomx2       => ' is missing from Public DNS. Mail cannot be delivered.',
 
-Version 0.98
-
-=cut
+};
 
 sub new {
     my $class = shift ;
@@ -27,7 +31,7 @@ sub new {
                 { $self->{ max_len } = 64 ; }
 	# allow_ip wont work with fqdn or tldcheck
 	if ( $self->{ allow_ip } ) {
-	    $self->{ mxcheck } = 0 ; 
+	    $self->{ mxcheck } = 0 ;
 		$self->{ fqdn } = 0 ;
 		$self->{ tldcheck } = 0 ;
 		}
@@ -45,31 +49,35 @@ sub new {
         $self->{ fqdn } = 1 ; #before mx, must pass fqdn.
         $self->{ NetDNS } = Net::DNS::Resolver->new;
         }
-        
+    $self->{messages}
+        = String::Validator::Common::_Messages(
+                $email_messages, $self->{language}, $self->{custom_messages} );
     bless $self, $class ;
     return $self ;
 }
 
 # Email::Valid has very terse error codes.
-# Not an OO method must use &
+# Not an OO method
 sub _expound {
+    my $self = shift ;
     my $errors = shift || '';
     my $string = shift ;
     my $expounded = '' ;
     if ( $errors =~ m/fqdn/ ) {
-        $expounded .= 'Does not appear to contain a Fully Qualified Domain Name.' }
+        $expounded .= $self->{messages}{ email_fqdn } }
     if ( $errors =~ m/rfc822/ ) {
-        unless ( $string =~ /\@/ ) { $expounded .= 'Missing @ symbol' }
+        unless ( $string =~ /\@/ ) {
+            $expounded .= $self->{messages}{ email_rfc822_noat } }
         else {
-        $expounded .= 'Does not look like an email address.' }
+            $expounded .= $self->{messages}{ email_rfc822 } }
         }
     if ( $errors =~ m/tld/ ) {
-        $expounded .=
-        'The TLD (Top Level Domain) is not recognized.' ;
+        $string =~ m/\.(.*)$/;
+        $expounded .= "'$1' : $self->{messages}{ email_tld }" ;
         }
     if ( $errors =~ m/mx/ ) {
-    	$expounded .= "Mail Exchanger for $string " .
-            "is missing from Public DNS. Mail cannot be delivered." ;
+    	$expounded .= $self->{messages}{ email_nomx1 } . $string .
+            $self->{messages}{ email_nomx2 } ;
     	}
     return $expounded ;
 }
@@ -89,11 +97,13 @@ sub Check{
         return $self->{ error } }
     my %switchhash = %{ $self->{switchhash} } ;
     $switchhash{ -address  } = $self->{ string } ;
+    my $fail = 0;
     my $addr = Email::Valid->address( %switchhash );
-    unless ( $addr ) {
-        $self->IncreaseErr( $Email::Valid::Details ) ;
-        $self->{ expounded } = &_expound(
-            $Email::Valid::Details, $self->{ string } ) ;
+       $fail = $Email::Valid::Details unless $addr;
+    if ( $fail ) {
+        $self->IncreaseErr( $fail ) ;
+        $self->{ expounded } = $self->_expound(
+            $fail, $self->{ string } ) ;
         }
 	else {
 		unless ( $self->{ allow_ip } ) {
@@ -104,12 +114,11 @@ sub Check{
     $self->{maildomain} =~ tr/\>//d ; #clean out unwanted chars.
     if ( $self->{ mxcheck } ) {
 		if ( $self->{ error } == 0 ) {
-		    my $res = $self->{ NetDNS };
-		    unless ( mx( $res, $self->{ maildomain } ) ) {
+		    unless ( mx( $self->{ NetDNS }, $self->{ maildomain } ) ) {
                 $self->IncreaseErr( "MX" ) ;
-                $self->{ expounded } = 
-                    &_expound( 'mx', $self->{ maildomain} ) ;
-		    }    
+                $self->{ expounded } =
+                    $self->_expound( 'mx', $self->{ maildomain} ) ;
+		    }
 		}
     }
 return $self->{ error } ;
@@ -120,17 +129,32 @@ sub Expound {
     return $self->{ expounded } ;
     }
 
+
+1; # End of String::Validator::Email
+
+__END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-String::Validator::Email - Check if a string is an email address.
+String::Validator::Email - String::Validator for checking Email Addresses.
+
+=head1 VERSION
+
+version 2.00
 
 =head1 SYNOPSIS
 
 String::Validator::Email is part of the String Validator Collection. It will
 check a string against any number of email validation rules, and optionally
 against a second string (as in a confirmation box on a webform).
+
+=head1 NAME
+
+String::Validator::Email - Check if a string is an email address.
 
 =head1 String::Validator Methods and Usage
 
@@ -152,7 +176,7 @@ String::Validator::Common for information on the base String::Validator Class.
 Important notes -- SVE uses Email::Valid, however, tldcheck is defaulted to on.
 The choice to turn tldcheck should be obvious. The fudge and local_rules
 options are specific to aol and compuserve, and are not supported.
-Finally mxcheck is not tried if there is already an error, since Email::Valid's 
+Finally mxcheck is not tried if there is already an error, since Email::Valid's
 DNS check does not work, that is performed directly through Net::DNS.
 
 =head2 Expound
@@ -167,14 +191,9 @@ for returning to an end user.
  if ( $Validator->Is_Valid( 'real@address.com' ) { say "good" }
  if ( $Validator->IsNot_Valid( 'bad@address=com') { say $Validator->Errstr() }
 
-=head1 ToDo
-
-The major TO DO items are to replace Email::Valid methods, return an Email::Address object and to use it to create methods for returning information
-from an extended mail string like: Jane Brown <jane.brown@domain.com>.
-
 =head1 AUTHOR
 
-John Karr, C<< <brainbuz at brainbuz.org> >>
+John Karr, C<< <brainbuz at cpan.org> >>
 
 =head1 BUGS
 
@@ -182,45 +201,21 @@ Please report any bugs or feature requests to C<bug-string-validator-email at rt
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=String-Validator-Email>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-
-
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc String::Validator::Email
 
+=head1 Bug Reports and Patches
 
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=String-Validator-Email>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/String-Validator-Email>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/String-Validator-Email>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/String-Validator-Email/>
-
-=back
-
+Please submit Bug Reports and Patches via https://github.com/brainbuz/String-Validator.
 
 =head1 ACKNOWLEDGEMENTS
 
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 John Karr.
+Copyright 2018, 2012 John Karr.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -236,7 +231,16 @@ A copy of the GNU General Public License is available in the source tree;
 if not, write to the Free Software Foundation, Inc.,
 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+=head1 AUTHOR
+
+John Karr <brainbuz@brainbuz.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by John Karr.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
 
 =cut
-
-1; # End of String::Validator::Email

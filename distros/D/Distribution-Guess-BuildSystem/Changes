@@ -1,5 +1,16 @@
 Revision history for Perl module Distribution::Guess::BuildSystem
 
+1.002 2018-03-30T15:27:59Z
+	* Bump to user release
+
+1.001_02 2018-03-26T21:05:27Z
+	* internal method _get_version returns a defined value even
+	when the target module is not install.
+
+1.001_01 2018-03-26T17:41:00Z
+	* Allow Windows tests to look for gmake too. Strawberry Perl 
+	switched to that awhile ago.
+
 1.001 2016-06-07T18:30:21Z
 	* Bump to full release
 

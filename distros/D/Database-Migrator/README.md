@@ -4,7 +4,7 @@ Database::Migrator - A system for implementing database migrations
 
 # VERSION
 
-version 0.12
+version 0.13
 
 # DESCRIPTION
 
@@ -190,13 +190,14 @@ Dave Rolsky <autarch@urth.org>
 
 # CONTRIBUTORS
 
+- Florian Ragwitz <rafl@debian.org>
 - Gregory Oschwald <goschwald@maxmind.com>
 - Kevin Phair <phair.kevin@gmail.com>
 - Olaf Alders <olaf@wundersolutions.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2017 by MaxMind, Inc.
+This software is Copyright (c) 2012 - 2018 by MaxMind, Inc.
 
 This is free software, licensed under:
 

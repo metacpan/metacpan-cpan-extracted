@@ -1,4 +1,4 @@
-use t::narada1::share; guard my $guard;
+use lib 't'; use narada1::share; guard my $guard;
 
 BEGIN {
     system('echo file > config/log/type');

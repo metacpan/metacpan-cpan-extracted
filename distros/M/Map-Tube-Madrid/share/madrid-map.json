@@ -1,0 +1,68 @@
+{
+    "name": "Madrid Metro",
+    "lines":
+    {
+        "line":
+        [
+            { "id": "L3", "name": "L3", "color": "red"   },
+            { "id": "L5", "name": "L5", "color": "green" }
+        ]
+    },
+    "stations":
+    {
+        "station":
+        [
+            { "id": "CALLAO", "name": "Callao", "line": "L3:14,L5:17", "link": "L5-16,L5-18,L3-13,L3-15" },
+
+            { "id": "L3-01", "name": "Villaverde Alto",        "line": "L3:1",  "link": "L3-02"        },
+            { "id": "L3-02", "name": "San Cristóbal",          "line": "L3:2",  "link": "L3-01,L3-03"  },
+            { "id": "L3-03", "name": "Villaverde Bajo-Cruce",  "line": "L3:3",  "link": "L3-02,L3-04"  },
+            { "id": "L3-04", "name": "Ciudad de los Ángeles",  "line": "L3:4",  "link": "L3-03,L3-05"  },
+            { "id": "L3-05", "name": "San Fermín-Orcasur",     "line": "L3:5",  "link": "L3-04,L3-06"  },
+            { "id": "L3-06", "name": "Hospital 12 de Octubre", "line": "L3:6",  "link": "L3-05,L3-07"  },
+            { "id": "L3-07", "name": "Almendrales",            "line": "L3:7",  "link": "L3-06,L3-08"  },
+            { "id": "L3-08", "name": "Legazpi",                "line": "L3:8",  "link": "L3-07,L3-09"  },
+            { "id": "L3-09", "name": "Delicias",               "line": "L3:9",  "link": "L3-08,L3-10"  },
+            { "id": "L3-10", "name": "Palos de la Frontera",   "line": "L3:10", "link": "L3-09,L3-11"  },
+            { "id": "L3-11", "name": "Embajadores",            "line": "L3:11", "link": "L3-10,L3-12"  },
+            { "id": "L3-12", "name": "Lavapiés",               "line": "L3:12", "link": "L3-11,L3-13"  },
+            { "id": "L3-13", "name": "Sol",                    "line": "L3:13", "link": "L3-12,CALLAO" },
+            { "id": "L3-15", "name": "Plaza de España",        "line": "L3:15", "link": "CALLAO,L3-16" },
+            { "id": "L3-16", "name": "Ventura Rodríguez",      "line": "L3:16", "link": "L3-15,L3-17"  },
+            { "id": "L3-17", "name": "Argüelles",              "line": "L3:17", "link": "L3-16,L3-18"  },
+            { "id": "L3-18", "name": "Moncloa",                "line": "L3:18", "link": "L3-17"        },
+
+            { "id": "L5-01", "name": "Alameda de Osuna",       "line": "L5:1",  "link": "L5-02"        },
+            { "id": "L5-02", "name": "El Capricho",            "line": "L5:2",  "link": "L5-01,L5-03"  },
+            { "id": "L5-03", "name": "Canillejas",             "line": "L5:3",  "link": "L5-02,L5-04"  },
+            { "id": "L5-04", "name": "Torre Arias",            "line": "L5:4",  "link": "L5-03,L5-05"  },
+            { "id": "L5-05", "name": "Suanzes",                "line": "L5:5",  "link": "L5-04,L5-06"  },
+            { "id": "L5-06", "name": "Ciudad Lineal",          "line": "L5:6",  "link": "L5-05,L5-07"  },
+            { "id": "L5-07", "name": "Pueblo Nuevo",           "line": "L5:7",  "link": "L5-06,L5-08"  },
+            { "id": "L5-08", "name": "Quintana",               "line": "L5:8",  "link": "L5-07,L5-09"  },
+            { "id": "L5-09", "name": "El Carmen",              "line": "L5:9",  "link": "L5-08,L5-10"  },
+            { "id": "L5-10", "name": "Ventas",                 "line": "L5:10", "link": "L5-09,L5-11"  },
+            { "id": "L5-11", "name": "Diego de León",          "line": "L5:11", "link": "L5-10,L5-12"  },
+            { "id": "L5-12", "name": "Núñez de Balboa",        "line": "L5:12", "link": "L5-11,L5-13"  },
+            { "id": "L5-13", "name": "Rubén Darío",            "line": "L5:13", "link": "L5-12,L5-14"  },
+            { "id": "L5-14", "name": "Alonso Martínez",        "line": "L5:14", "link": "L5-13,L5-15"  },
+            { "id": "L5-15", "name": "Chueca",                 "line": "L5:15", "link": "L5-14,L5-16"  },
+            { "id": "L5-16", "name": "Gran Vía",               "line": "L5:16", "link": "L5-15,CALLAO" },
+            { "id": "L5-18", "name": "Ópera",                  "line": "L5:18", "link": "CALLAO,L5-19" },
+            { "id": "L5-19", "name": "La Latina",              "line": "L5:19", "link": "L5-18,L5-20"  },
+            { "id": "L5-20", "name": "Puerta de Toledo",       "line": "L5:20", "link": "L5-19,L5-21"  },
+            { "id": "L5-21", "name": "Acacias",                "line": "L5:21", "link": "L5-20,L5-22"  },
+            { "id": "L5-22", "name": "Pirámides",              "line": "L5:22", "link": "L5-21,L5-23"  },
+            { "id": "L5-23", "name": "Marqués de Vadillo",     "line": "L5:23", "link": "L5-22,L5-24"  },
+            { "id": "L5-24", "name": "Urgel",                  "line": "L5:24", "link": "L5-23,L5-25"  },
+            { "id": "L5-25", "name": "Oporto",                 "line": "L5:25", "link": "L5-24,L5-26"  },
+            { "id": "L5-26", "name": "Vista Alegre",           "line": "L5:26", "link": "L5-25,L5-27"  },
+            { "id": "L5-27", "name": "Carabanchel",            "line": "L5:27", "link": "L5-26,L5-28"  },
+            { "id": "L5-28", "name": "Eugenia de Montijo",     "line": "L5:28", "link": "L5-27,L5-29"  },
+            { "id": "L5-29", "name": "Aluche",                 "line": "L5:29", "link": "L5-28,L5-30"  },
+            { "id": "L5-30", "name": "Empalme",                "line": "L5:30", "link": "L5-29,L5-31"  },
+            { "id": "L5-31", "name": "Campamento",             "line": "L5:31", "link": "L5-30,L5-32"  },
+            { "id": "L5-32", "name": "Casa de Campo",          "line": "L5:32", "link": "L5-31"        }
+        ]
+    }
+}

@@ -1,11 +1,7 @@
 #!/usr/bin/env perl
 
 use strict;
-# use warnings; # Use just for development
-use constant {
-    TRUE  => 1,
-    FALSE => 0
-};
+# use warnings; # Use just for development, otherwise leave warnings off
 
 # We use Time::HiRes for the alarm, and we need fractions of a second.
 use Time::HiRes qw(alarm);

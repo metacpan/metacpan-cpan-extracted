@@ -69,12 +69,12 @@ struct SPVM_compiler {
   
   // Types(This is all type ops in source id)
   SPVM_LIST* op_types;
-  
+
   // Subroutine names
-  SPVM_LIST* sub_names;
+  SPVM_LIST* method_signatures;
 
   // Subroutine name symtable
-  SPVM_HASH* sub_name_symtable;
+  SPVM_HASH* method_signature_symtable;
   
   // Types(This is unique types)
   SPVM_LIST* types;

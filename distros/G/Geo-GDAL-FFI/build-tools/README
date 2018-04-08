@@ -1,0 +1,21 @@
+FFI::Platypus object is attached to foreign functions using 'attach'
+method call. These calls are in lib/Geo/GDAL/FFI.pm.
+
+parse_h.pl is a program to create these calls (wrapped in eval{};)
+from C/C++ header files. Currently it is used for the following header
+files:
+
+gcore/gdal.h
+ogr/ogr_api.h
+ogr/ogr_srs_api.h
+apps/gdal_utils.h
+
+To update lib/Geo/GDAL/FFI.pm run parse_h.pl with those files as
+arguments and paste the output to lib/Geo/GDAL/FFI.pm.
+
+Some foreign functions that are defined in header files
+
+port/*.h
+ogr/ogr_core.h
+
+are attached using manually written calls in lib/Geo/GDAL/FFI.pm.

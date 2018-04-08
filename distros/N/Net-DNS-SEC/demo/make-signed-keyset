@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-#$Id: make-signed-keyset 1295 2015-01-08 13:14:03Z willem $
+#$Id: make-signed-keyset 1661 2018-04-04 09:51:45Z willem $
 
 #
 # takes a bind public key file and creates a self-signed keyset
@@ -7,7 +7,7 @@
 
 use Getopt::Std;
 use Net::DNS::SEC;
-use Net::DNS::Keyset;
+use Net::DNS::SEC::Keyset;
 use Net::DNS::ZoneFile;
 use File::Basename;
 
@@ -78,12 +78,12 @@ sub make_keyset {
 
 	print("Creating keyset\n") if $verbose;
 
-	my $keyset = Net::DNS::Keyset->new( \@keys, "$directory" )
-			or die("$progname: unable to create keyset. $Net::DNS::Keyset::keyset_err.\n");
+	my $keyset = Net::DNS::SEC::Keyset->new( \@keys, "$directory" )
+			or die("$progname: unable to create keyset. $Net::DNS::SEC::Keyset::keyset_err.\n");
 
 	print("Verifying keyset\n") if $verbose;
 	$keyset->verify()
-			or die("$progname: unable to verify keyset. $Net::DNS::Keyset::keyset_err.\n");
+			or die("$progname: unable to verify keyset. $Net::DNS::SEC::Keyset::keyset_err.\n");
 
 	if ($verbose) {
 		print("Keyset:\n");
@@ -91,7 +91,7 @@ sub make_keyset {
 		print("Writing keyset\n");
 	}
 	$keyset->writekeyset("signed-")
-			or die("$progname: unable to write keyset. $Net::DNS::Keyset::keyset_err.\n");
+			or die("$progname: unable to write keyset. $Net::DNS::SEC::Keyset::keyset_err.\n");
 
 	if ($printds) {
 		print("Extracting DS RR\n") if $verbose;

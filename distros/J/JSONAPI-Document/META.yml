@@ -23,14 +23,16 @@ name: JSONAPI-Document
 provides:
   JSONAPI::Document:
     file: lib/JSONAPI/Document.pm
-    version: '0.4'
+    version: '1.0'
 requires:
+  CHI: '0'
   Lingua::EN::Inflexion: '0'
+  Lingua::EN::Segment: '0'
   Moo: '0'
   perl: '5.010'
 resources:
   repository: https://github.com/ziali088/jsonapi-document.git
-version: '0.4'
+version: '1.0'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

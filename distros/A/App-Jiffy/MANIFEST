@@ -19,5 +19,6 @@ t/01-time-entry.t
 t/02-jiffy-app.t
 t/basic.t
 t/lib/CreateTimeEntries.pm
+t/lib/MongoDBTest.pm
 t/release-pod-syntax.t
 t/test.yml

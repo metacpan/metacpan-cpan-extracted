@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use Export::Attrs;
 use URI::Escape qw( uri_unescape uri_escape_utf8 );
@@ -195,7 +195,7 @@ CGI::Easy::Util - low-level helpers for HTTP/CGI
 
 =head1 VERSION
 
-This document describes CGI::Easy::Util version v2.0.0
+This document describes CGI::Easy::Util version v2.0.1
 
 
 =head1 SYNOPSIS
@@ -238,24 +238,26 @@ Nothing by default, but all documented functions can be explicitly imported.
 
 =head1 INTERFACE 
 
-=over
+=head2 date_http
 
-=item date_http( $seconds )
+    $date = date_http( $seconds );
 
 Convert given time into text format suitable for sending in HTTP headers.
 
 Return date string.
 
+=head2 date_cookie
 
-=item date_cookie( $seconds )
+    $date = date_cookie( $seconds );
 
 Convert given time into text format suitable for sending in HTTP header
 Set-Cookie's "expires" option.
 
 Return date string.
 
+=head2 make_cookie
 
-=item make_cookie( \%cookie )
+    $header = make_cookie( \%cookie );
 
 Convert HASHREF with cookie properties to "Set-Cookie: ..." HTTP header.
 
@@ -273,14 +275,17 @@ Format for "expires" should be either correct date
 
 Return HTTP header string.
 
+=head2 uri_unescape_plus
 
-=item uri_unescape_plus( $uri_escaped_value )
+    $unescaped = uri_unescape_plus( $uri_escaped_value );
 
 Same as uri_unescape from L<URI::Escape> but additionally replace '+' with space.
 
 Return unescaped string.
 
-=item burst_urlencoded( $url_encoded_name_value_pairs )
+=head2 burst_urlencoded
+
+    my %param = %{ burst_urlencoded( $url_encoded_name_value_pairs ) };
 
 Unpack name/value pairs from url-encoded string (like $ENV{QUERY_STRING}
 or STDIN content for non-multipart forms sent using POST method).
@@ -288,7 +293,9 @@ or STDIN content for non-multipart forms sent using POST method).
 Return HASHREF with params, each param's value will be ARRAYREF
 (because there can be more than one value for any parameter in source string).
 
-=item burst_multipart( $buffer, $boundary )
+=head2 burst_multipart
+
+    ($params, $filenames, $mimetypes) = burst_multipart( $buffer, $boundary );
 
 Unpack buffer with name/value pairs in multipart/form-data format.
 This format usually used to upload files from forms, and each name/value
@@ -299,8 +306,6 @@ with param's mime types), all values in all three HASHREF are ARRAYREF
 (because there can be more than one value for any parameter in source string).
 For non-file-upload parameters corresponding values in last two hashes
 (with file names and mime types) will be undef().
-
-=back
 
 
 =head1 SUPPORT
@@ -355,7 +360,7 @@ Alex Efros E<lt>powerman@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2009-2010 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+This software is Copyright (c) 2009- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
 
 This module also include some code derived from
 

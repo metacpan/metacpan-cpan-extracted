@@ -33,7 +33,7 @@ package Apache2::AMF51DegreesFilter;
   # 
 
   use vars qw($VERSION);
-  $VERSION= "4.30";;;
+  $VERSION= "4.32";;;
   my $CommonLib = new Apache2::AMFCommonLib ();
   
   # this is the environment........

@@ -19,7 +19,7 @@ L<https://www.postgresql.org/docs/current/static/uuid-ossp.html>
 
     CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
-    # use UUID v5 - random
+    # use UUID v4 - random
     "id" UUID PRIMARY KEY NOT NULL DEFAULT gen_random_uuid()
 
 =cut

@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2018 -- leonerd@leonerd.org.uk
 
 package Devel::MAT::Tool::Reachability;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use constant FOR_UI => 1;
 
@@ -177,7 +177,7 @@ sub mark_reachable
                 $stash->mro_linearcurrent,
                 $stash->mro_nextmethod,
                 $stash->mro_isa,
-                grep { defined } pairvalues $stash->magic;
+                grep { defined } $stash->magic_svs;
 
          $count++;
          $progress->( sprintf "Walking symbol table %d...", $count ) if $progress and $count % 1000 == 0;
@@ -276,7 +276,7 @@ sub mark_reachable
          $_ and !$_->{tool_reachable} and !$_->immortal and
             $_->{tool_reachable} = REACH_INTERNAL, push @internal, $_ for
                @more_internal,
-               grep { defined } pairvalues $sv->magic;
+               grep { defined } $sv->magic_svs;
 
          $count++;
          $progress->( sprintf "Marking user reachability %d...", $count ) if $progress and $count % 1000 == 0;

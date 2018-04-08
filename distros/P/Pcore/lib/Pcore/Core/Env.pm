@@ -148,7 +148,7 @@ sub _INIT ($self) {
     $self->{UID}       = undef;
     $self->{GID}       = undef;
 
-    # load dist.perl
+    # load dist cfg
     if ( my $dist = $self->dist ) {
         if ( $self->is_par ) {
             $self->{DATA_DIR} = $self->{SCRIPT_DIR};

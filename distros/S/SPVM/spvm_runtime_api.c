@@ -26,6 +26,10 @@
 #include "spvm_my.h"
 #include "spvm_op.h"
 #include "spvm_list.h"
+#include "spvm_op_checker.h"
+
+
+
 
 
 
@@ -58,7 +62,7 @@ static const void* SPVM_NATIVE_INTERFACE[]  = {
   SPVM_RUNTIME_API_set_double_field,
   SPVM_RUNTIME_API_set_object_field,
   SPVM_RUNTIME_API_get_sub_id,
-  SPVM_RUNTIME_API_get_method_sub_id,
+  SPVM_RUNTIME_API_get_sub_id_interface_method,
   SPVM_RUNTIME_API_get_class_method_sub_id,
   SPVM_RUNTIME_API_call_void_sub,
   SPVM_RUNTIME_API_call_byte_sub,
@@ -78,8 +82,9 @@ static const void* SPVM_NATIVE_INTERFACE[]  = {
   SPVM_RUNTIME_API_new_double_array,
   SPVM_RUNTIME_API_new_object_array,
   SPVM_RUNTIME_API_new_string,
+  SPVM_RUNTIME_API_new_string_chars,
   SPVM_RUNTIME_API_get_string_length,
-  SPVM_RUNTIME_API_get_string_chars,
+  SPVM_RUNTIME_API_get_string_bytes,
   SPVM_RUNTIME_API_get_exception,
   SPVM_RUNTIME_API_set_exception,
   SPVM_RUNTIME_API_get_ref_count,
@@ -92,17 +97,25 @@ static const void* SPVM_NATIVE_INTERFACE[]  = {
   SPVM_RUNTIME_API_weaken,
   SPVM_RUNTIME_API_isweak,
   SPVM_RUNTIME_API_unweaken,
-  SPVM_RUNTIME_API_concat_string_byte,
-  SPVM_RUNTIME_API_concat_string_short,
-  SPVM_RUNTIME_API_concat_string_int,
-  SPVM_RUNTIME_API_concat_string_long,
-  SPVM_RUNTIME_API_concat_string_float,
-  SPVM_RUNTIME_API_concat_string_double,
-  SPVM_RUNTIME_API_concat_string_string,
+  SPVM_RUNTIME_API_concat,
   SPVM_RUNTIME_API_weaken_object_field,
   SPVM_RUNTIME_API_create_exception_stack_trace,
-  NULL
+  NULL,
+  SPVM_RUNTIME_API_check_cast,
 };
+
+int32_t SPVM_RUNTIME_API_check_cast(SPVM_API* api, int32_t cast_type_id, SPVM_OBJECT* object) {
+  (void)api;
+  
+  SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
+  SPVM_COMPILER* compiler = runtime->compiler;
+  
+  SPVM_TYPE* cast_type = SPVM_LIST_fetch(compiler->types, cast_type_id);
+ 
+  SPVM_TYPE* object_type = SPVM_LIST_fetch(compiler->types, object->type_id);
+  
+  return SPVM_OP_CHECKER_can_assign(compiler, cast_type, object_type);
+}
 
 SPVM_OBJECT* SPVM_RUNTIME_API_create_exception_stack_trace(SPVM_API* api, SPVM_OBJECT* exception, int32_t sub_id, int32_t current_line) {
 
@@ -124,7 +137,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_create_exception_stack_trace(SPVM_API* api, SPVM_O
   const char* at = "() at ";
 
   // Exception
-  char* exception_chars = api->get_string_chars(api, exception);
+  int8_t* exception_bytes = api->get_string_bytes(api, exception);
   int32_t exception_length = api->get_string_length(api, exception);
   
   // Total string length
@@ -144,16 +157,16 @@ SPVM_OBJECT* SPVM_RUNTIME_API_create_exception_stack_trace(SPVM_API* api, SPVM_O
   
   // Create exception message
   SPVM_API_OBJECT* new_exception = api->new_string(api, NULL, total_length);
-  char* new_exception_chars = api->get_string_chars(api, new_exception);
+  int8_t* new_exception_bytes = api->get_string_bytes(api, new_exception);
   
   memcpy(
-    (void*)(new_exception_chars),
-    (void*)(exception_chars),
+    (void*)(new_exception_bytes),
+    (void*)(exception_bytes),
     exception_length
   );
 
   sprintf(
-    new_exception_chars + exception_length,
+    (char*)new_exception_bytes + exception_length,
     "%s%s%s%s%s%" PRId32,
     from,
     sub_name,
@@ -166,16 +179,30 @@ SPVM_OBJECT* SPVM_RUNTIME_API_create_exception_stack_trace(SPVM_API* api, SPVM_O
   return new_exception;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_concat_string_string(SPVM_API* api, SPVM_OBJECT* string1, SPVM_OBJECT* string2) {
+void SPVM_RUNTIME_API_print(SPVM_API* api, SPVM_OBJECT* string) {
+  (void)api;
+  
+  int8_t* bytes = api->get_string_bytes(api, string);
+  int32_t string_length = api->get_string_length(api, string);
+  
+  {
+    int32_t i;
+    for (i = 0; i < string_length; i++) {
+      putchar((char)bytes[i]);
+    }
+  }
+}
+
+SPVM_OBJECT* SPVM_RUNTIME_API_concat(SPVM_API* api, SPVM_OBJECT* string1, SPVM_OBJECT* string2) {
   (void)api;
 
   if (string1 == NULL) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, ". operater left string must be defined(string . string)", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_chars(api, ". operater left string must be defined(string . string)");
     SPVM_RUNTIME_API_set_exception(api, exception);
     return NULL;
   }
   else if (string2 == NULL) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, ". operater right string must be defined(string . string)", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_chars(api, ". operater right string must be defined(string . string)");
     SPVM_RUNTIME_API_set_exception(api, exception);
     return NULL;
   }
@@ -186,174 +213,12 @@ SPVM_OBJECT* SPVM_RUNTIME_API_concat_string_string(SPVM_API* api, SPVM_OBJECT* s
   int32_t string3_length = string1_length + string2_length;
   SPVM_OBJECT* string3 = SPVM_RUNTIME_API_new_string(api, NULL, string3_length);
   
-  char* string1_chars = (char*)SPVM_RUNTIME_API_get_string_chars(api, string1);
-  char* string2_chars = (char*)SPVM_RUNTIME_API_get_string_chars(api, string2);
-  char* string3_chars = (char*)SPVM_RUNTIME_API_get_string_chars(api, string3);
+  int8_t* string1_bytes = SPVM_RUNTIME_API_get_string_bytes(api, string1);
+  int8_t* string2_bytes = SPVM_RUNTIME_API_get_string_bytes(api, string2);
+  int8_t* string3_bytes = SPVM_RUNTIME_API_get_string_bytes(api, string3);
   
-  memcpy(string3_chars, string1_chars, string1_length);
-  memcpy(string3_chars + string1_length, string2_chars, string2_length);
-  
-  return string3;
-}
-
-SPVM_OBJECT* SPVM_RUNTIME_API_concat_string_byte(SPVM_API* api, SPVM_OBJECT* string1, int8_t string2) {
-  (void)api;
-
-  if (string1 == NULL) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, ". operater left string must be defined(string . byte)", 0);
-    SPVM_RUNTIME_API_set_exception(api, exception);
-    return NULL;
-  }
-  
-  char tmp_string[30];
-  sprintf(tmp_string, "%" PRId8, string2);
-  
-  int32_t string1_length = SPVM_RUNTIME_API_get_string_length(api, string1);
-  int32_t tmp_string_length = strlen(tmp_string);
-  
-  int32_t string3_length = string1_length + tmp_string_length;
-  SPVM_OBJECT* string3 = SPVM_RUNTIME_API_new_string(api, NULL, string3_length);
-  
-  char* string1_chars = (char*)SPVM_RUNTIME_API_get_string_chars(api, string1);
-  char* string3_chars = (char*)SPVM_RUNTIME_API_get_string_chars(api, string3);
-  
-  memcpy(string3_chars, string1_chars, string1_length);
-  memcpy(string3_chars + string1_length, tmp_string, tmp_string_length);
-  
-  return string3;
-}
-
-SPVM_OBJECT* SPVM_RUNTIME_API_concat_string_short(SPVM_API* api, SPVM_OBJECT* string1, int16_t string2) {
-  (void)api;
-
-  if (string1 == NULL) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, ". operater left string must be defined(string . short)", 0);
-    SPVM_RUNTIME_API_set_exception(api, exception);
-    return NULL;
-  }
-  
-  char tmp_string[30];
-  sprintf(tmp_string, "%" PRId16, string2);
-  
-  int32_t string1_length = SPVM_RUNTIME_API_get_string_length(api, string1);
-  int32_t tmp_string_length = strlen(tmp_string);
-  
-  int32_t string3_length = string1_length + tmp_string_length;
-  SPVM_OBJECT* string3 = SPVM_RUNTIME_API_new_string(api, NULL, string3_length);
-  
-  char* string1_chars = (char*)SPVM_RUNTIME_API_get_string_chars(api, string1);
-  char* string3_chars = (char*)SPVM_RUNTIME_API_get_string_chars(api, string3);
-  
-  memcpy(string3_chars, string1_chars, string1_length);
-  memcpy(string3_chars + string1_length, tmp_string, tmp_string_length);
-  
-  return string3;
-}
-
-SPVM_OBJECT* SPVM_RUNTIME_API_concat_string_int(SPVM_API* api, SPVM_OBJECT* string1, int32_t string2) {
-  (void)api;
-
-  if (string1 == NULL) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, ". operater left string must be defined(string . int)", 0);
-    SPVM_RUNTIME_API_set_exception(api, exception);
-    return NULL;
-  }
-  
-  char tmp_string[30];
-  sprintf(tmp_string, "%" PRId32, string2);
-  
-  int32_t string1_length = SPVM_RUNTIME_API_get_string_length(api, string1);
-  int32_t tmp_string_length = strlen(tmp_string);
-  
-  int32_t string3_length = string1_length + tmp_string_length;
-  SPVM_OBJECT* string3 = SPVM_RUNTIME_API_new_string(api, NULL, string3_length);
-  
-  char* string1_chars = (char*)SPVM_RUNTIME_API_get_string_chars(api, string1);
-  char* string3_chars = (char*)SPVM_RUNTIME_API_get_string_chars(api, string3);
-  
-  memcpy(string3_chars, string1_chars, string1_length);
-  memcpy(string3_chars + string1_length, tmp_string, tmp_string_length);
-  
-  return string3;
-}
-
-SPVM_OBJECT* SPVM_RUNTIME_API_concat_string_long(SPVM_API* api, SPVM_OBJECT* string1, int64_t string2) {
-  (void)api;
-  
-  if (string1 == NULL) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, ". operater left string must be defined(string . long)", 0);
-    SPVM_RUNTIME_API_set_exception(api, exception);
-    return NULL;
-  }
-  
-  char tmp_string[30];
-  sprintf(tmp_string, "%" PRId64, string2);
-  
-  int32_t string1_length = SPVM_RUNTIME_API_get_string_length(api, string1);
-  int32_t tmp_string_length = strlen(tmp_string);
-  
-  int32_t string3_length = string1_length + tmp_string_length;
-  SPVM_OBJECT* string3 = SPVM_RUNTIME_API_new_string(api, NULL, string3_length);
-  
-  char* string1_chars = (char*)SPVM_RUNTIME_API_get_string_chars(api, string1);
-  char* string3_chars = (char*)SPVM_RUNTIME_API_get_string_chars(api, string3);
-  
-  memcpy(string3_chars, string1_chars, string1_length);
-  memcpy(string3_chars + string1_length, tmp_string, tmp_string_length);
-  
-  return string3;
-}
-
-SPVM_OBJECT* SPVM_RUNTIME_API_concat_string_float(SPVM_API* api, SPVM_OBJECT* string1, float string2) {
-  (void)api;
-
-  if (string1 == NULL) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, ". operater left string must be defined(string . float)", 0);
-    SPVM_RUNTIME_API_set_exception(api, exception);
-    return NULL;
-  }
-  
-  char tmp_string[30];
-  sprintf(tmp_string, "%f", string2);
-  
-  int32_t string1_length = SPVM_RUNTIME_API_get_string_length(api, string1);
-  int32_t tmp_string_length = strlen(tmp_string);
-  
-  int32_t string3_length = string1_length + tmp_string_length;
-  SPVM_OBJECT* string3 = SPVM_RUNTIME_API_new_string(api, NULL, string3_length);
-  
-  char* string1_chars = (char*)SPVM_RUNTIME_API_get_string_chars(api, string1);
-  char* string3_chars = (char*)SPVM_RUNTIME_API_get_string_chars(api, string3);
-  
-  memcpy(string3_chars, string1_chars, string1_length);
-  memcpy(string3_chars + string1_length, tmp_string, tmp_string_length);
-  
-  return string3;
-}
-
-SPVM_OBJECT* SPVM_RUNTIME_API_concat_string_double(SPVM_API* api, SPVM_OBJECT* string1, double string2) {
-  (void)api;
-
-  if (string1 == NULL) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, ". operater left string must be defined(string . double)", 0);
-    SPVM_RUNTIME_API_set_exception(api, exception);
-    return NULL;
-  }
-  
-  char tmp_string[30];
-  sprintf(tmp_string, "%f", string2);
-  
-  int32_t string1_length = SPVM_RUNTIME_API_get_string_length(api, string1);
-  int32_t tmp_string_length = strlen(tmp_string);
-  
-  int32_t string3_length = string1_length + tmp_string_length;
-  SPVM_OBJECT* string3 = SPVM_RUNTIME_API_new_string(api, NULL, string3_length);
-  
-  char* string1_chars = (char*)SPVM_RUNTIME_API_get_string_chars(api, string1);
-  char* string3_chars = (char*)SPVM_RUNTIME_API_get_string_chars(api, string3);
-  
-  memcpy(string3_chars, string1_chars, string1_length);
-  memcpy(string3_chars + string1_length, tmp_string, tmp_string_length);
+  memcpy(string3_bytes, string1_bytes, string1_length);
+  memcpy(string3_bytes + string1_length, string2_bytes, string2_length);
   
   return string3;
 }
@@ -801,25 +666,42 @@ int32_t SPVM_RUNTIME_API_get_array_length(SPVM_API* api, SPVM_OBJECT* object) {
   return object->length;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_string(SPVM_API* api, const char* chars, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_string(SPVM_API* api, int8_t* bytes, int32_t length) {
   (void)api;
 
-  if (length == 0) {
-    if (chars != NULL) {
-      length = strlen(chars);
-    }
-  }
-  
-  SPVM_OBJECT* value = SPVM_RUNTIME_API_new_byte_array(api, length + 1);
+  SPVM_OBJECT* value = SPVM_RUNTIME_API_new_byte_array(api, length);
   
   if (length > 0) {
-    if (chars == NULL) {
+    if (bytes == NULL) {
       memset((void*)((intptr_t)value + sizeof(SPVM_OBJECT)), 0, length);
     }
     else {
-      memcpy((void*)((intptr_t)value + sizeof(SPVM_OBJECT)), chars, length);
+      memcpy((void*)((intptr_t)value + sizeof(SPVM_OBJECT)), (char*)bytes, length);
     }
   }
+  
+  int32_t string_type_id = SPVM_TYPE_C_ID_STRING;
+  
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_object(api, string_type_id);
+
+  static int32_t field_id;
+  field_id = SPVM_RUNTIME_API_get_field_id(api, object, "value");
+  
+  SPVM_RUNTIME_API_set_object_field(api, object, field_id, value);
+  
+  return object;
+}
+
+SPVM_OBJECT* SPVM_RUNTIME_API_new_string_chars(SPVM_API* api, const char* chars) {
+  (void)api;
+  
+  assert(chars);
+  
+  int32_t length = (int32_t)strlen(chars);
+  
+  SPVM_OBJECT* value = SPVM_RUNTIME_API_new_byte_array(api, length);
+  
+  memcpy((void*)((intptr_t)value + sizeof(SPVM_OBJECT)), chars, length);
   
   int32_t string_type_id = SPVM_TYPE_C_ID_STRING;
   
@@ -841,12 +723,12 @@ int32_t SPVM_RUNTIME_API_get_string_length(SPVM_API* api, SPVM_OBJECT* object) {
 
   SPVM_OBJECT* value = SPVM_RUNTIME_API_get_object_field(api, object, field_id);
   
-  int32_t length = SPVM_RUNTIME_API_get_array_length(api, value) - 1;
+  int32_t length = SPVM_RUNTIME_API_get_array_length(api, value);
   
   return length;
 }
 
-char* SPVM_RUNTIME_API_get_string_chars(SPVM_API* api, SPVM_OBJECT* object) {
+int8_t* SPVM_RUNTIME_API_get_string_bytes(SPVM_API* api, SPVM_OBJECT* object) {
   (void)api;
 
   static int32_t field_id;
@@ -854,9 +736,9 @@ char* SPVM_RUNTIME_API_get_string_chars(SPVM_API* api, SPVM_OBJECT* object) {
 
   SPVM_OBJECT* value = SPVM_RUNTIME_API_get_object_field(api, object, field_id);
   
-  char* chars = (char*)SPVM_RUNTIME_API_get_byte_array_elements(api, value);
+  int8_t* bytes = SPVM_RUNTIME_API_get_byte_array_elements(api, value);
   
-  return chars;
+  return bytes;
 }
 
 int8_t* SPVM_RUNTIME_API_get_byte_array_elements(SPVM_API* api, SPVM_OBJECT* object) {
@@ -1163,6 +1045,27 @@ int32_t SPVM_RUNTIME_API_get_sub_id(SPVM_API* api, const char* name) {
   return sub_id;
 }
 
+int32_t SPVM_RUNTIME_API_get_sub_id_interface_method(SPVM_API* api, SPVM_OBJECT* object, int32_t decl_sub_id) {
+  (void)api;
+  
+  SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
+  SPVM_COMPILER* compiler = runtime->compiler;
+  
+  SPVM_OP* op_sub_decl_sub = SPVM_LIST_fetch(compiler->op_subs, decl_sub_id);
+
+  const char* method_signature = op_sub_decl_sub->uv.sub->method_signature;
+  
+  int32_t type_id = object->type_id;
+  
+  SPVM_TYPE* type = SPVM_LIST_fetch(compiler->types, type_id);
+  
+  SPVM_PACKAGE* package = type->op_package->uv.package;
+  
+  SPVM_SUB* sub_call_sub = SPVM_HASH_search(package->method_signature_symtable, method_signature, strlen(method_signature));
+  
+  return  sub_call_sub->id;
+}
+
 int32_t SPVM_RUNTIME_API_get_method_sub_id(SPVM_API* api, SPVM_OBJECT* object, const char* sub_name) {
   (void)api;
   
@@ -1225,7 +1128,7 @@ int32_t SPVM_RUNTIME_API_get_type_id(SPVM_API* api, const char* name) {
   
   // Can't find type id
   if (type == NULL) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, "Unknown type(SPVM_RUNTIME_API_get_type_id())", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_chars(api, "Unknown type(SPVM_RUNTIME_API_get_type_id())");
     SPVM_RUNTIME_API_set_exception(api, exception);
     
     return 0;
@@ -1237,7 +1140,7 @@ int32_t SPVM_RUNTIME_API_get_type_id(SPVM_API* api, const char* name) {
 int8_t SPVM_RUNTIME_API_get_byte_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_byte_offset) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, "Object must be not undef(get_byte_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_chars(api, "Object must be not undef(get_byte_field).");
     SPVM_RUNTIME_API_set_exception(api, exception);
     return 0;
   }
@@ -1250,7 +1153,7 @@ int8_t SPVM_RUNTIME_API_get_byte_field(SPVM_API* api, SPVM_OBJECT* object, int32
 int16_t SPVM_RUNTIME_API_get_short_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_byte_offset) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, "Object must be not undef(get_short_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_chars(api, "Object must be not undef(get_short_field).");
     SPVM_RUNTIME_API_set_exception(api, exception);
     return 0;
   }
@@ -1263,7 +1166,7 @@ int16_t SPVM_RUNTIME_API_get_short_field(SPVM_API* api, SPVM_OBJECT* object, int
 int32_t SPVM_RUNTIME_API_get_int_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_byte_offset) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, "Object must be not undef(get_int_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_chars(api, "Object must be not undef(get_int_field).");
     SPVM_RUNTIME_API_set_exception(api, exception);
     return 0;
   }
@@ -1275,7 +1178,7 @@ int32_t SPVM_RUNTIME_API_get_int_field(SPVM_API* api, SPVM_OBJECT* object, int32
 int64_t SPVM_RUNTIME_API_get_long_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_byte_offset) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, "Object must be not undef(get_long_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_chars(api, "Object must be not undef(get_long_field).");
     SPVM_RUNTIME_API_set_exception(api, exception);
     return 0;
   }
@@ -1288,7 +1191,7 @@ int64_t SPVM_RUNTIME_API_get_long_field(SPVM_API* api, SPVM_OBJECT* object, int3
 float SPVM_RUNTIME_API_get_float_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_byte_offset) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, "Object must be not undef(get_float_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_chars(api, "Object must be not undef(get_float_field).");
     SPVM_RUNTIME_API_set_exception(api, exception);
     return 0;
   }
@@ -1301,7 +1204,7 @@ float SPVM_RUNTIME_API_get_float_field(SPVM_API* api, SPVM_OBJECT* object, int32
 double SPVM_RUNTIME_API_get_double_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_byte_offset) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, "Object must be not undef(get_double_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_chars(api, "Object must be not undef(get_double_field).");
     SPVM_RUNTIME_API_set_exception(api, exception);
     return 0;
   }
@@ -1314,7 +1217,7 @@ double SPVM_RUNTIME_API_get_double_field(SPVM_API* api, SPVM_OBJECT* object, int
 void SPVM_RUNTIME_API_weaken_object_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_byte_offset) {
 
   if (__builtin_expect(!object, 0)) {
-    SPVM_OBJECT* exception = api->new_string(api, "Object to weaken an object field must not be undefined.", 0);
+    SPVM_OBJECT* exception = api->new_string_chars(api, "Object to weaken an object field must not be undefined.");
     api->set_exception(api, exception);
     return;
   }
@@ -1332,7 +1235,7 @@ void SPVM_RUNTIME_API_weaken_object_field(SPVM_API* api, SPVM_OBJECT* object, in
 SPVM_OBJECT* SPVM_RUNTIME_API_get_object_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_byte_offset) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, "Object must be not undef(get_object_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_chars(api, "Object must be not undef(get_object_field).");
     SPVM_RUNTIME_API_set_exception(api, exception);
     return NULL;
   }
@@ -1345,7 +1248,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_get_object_field(SPVM_API* api, SPVM_OBJECT* objec
 void SPVM_RUNTIME_API_set_byte_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_byte_offset, int8_t value) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, "Object must be not undef(set_byte_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_chars(api, "Object must be not undef(set_byte_field).");
     SPVM_RUNTIME_API_set_exception(api, exception);
     return;
   }
@@ -1356,7 +1259,7 @@ void SPVM_RUNTIME_API_set_byte_field(SPVM_API* api, SPVM_OBJECT* object, int32_t
 void SPVM_RUNTIME_API_set_short_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_byte_offset, int16_t value) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, "Object must be not undef(set_short_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_chars(api, "Object must be not undef(set_short_field).");
     SPVM_RUNTIME_API_set_exception(api, exception);
     return;
   }
@@ -1367,7 +1270,7 @@ void SPVM_RUNTIME_API_set_short_field(SPVM_API* api, SPVM_OBJECT* object, int32_
 void SPVM_RUNTIME_API_set_int_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_byte_offset, int32_t value) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, "Object must be not undef(set_int_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_chars(api, "Object must be not undef(set_int_field).");
     SPVM_RUNTIME_API_set_exception(api, exception);
     return;
   }
@@ -1378,7 +1281,7 @@ void SPVM_RUNTIME_API_set_int_field(SPVM_API* api, SPVM_OBJECT* object, int32_t 
 void SPVM_RUNTIME_API_set_long_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_byte_offset, int64_t value) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, "Object must be not undef(set_long_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_chars(api, "Object must be not undef(set_long_field).");
     SPVM_RUNTIME_API_set_exception(api, exception);
     return;
   }
@@ -1389,7 +1292,7 @@ void SPVM_RUNTIME_API_set_long_field(SPVM_API* api, SPVM_OBJECT* object, int32_t
 void SPVM_RUNTIME_API_set_float_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_byte_offset, float value) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, "Object must be not undef(set_float_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_chars(api, "Object must be not undef(set_float_field).");
     SPVM_RUNTIME_API_set_exception(api, exception);
     return;
   }
@@ -1400,7 +1303,7 @@ void SPVM_RUNTIME_API_set_float_field(SPVM_API* api, SPVM_OBJECT* object, int32_
 void SPVM_RUNTIME_API_set_double_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_byte_offset, double value) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, "Object must be not undef(set_double_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_chars(api, "Object must be not undef(set_double_field).");
     SPVM_RUNTIME_API_set_exception(api, exception);
     return;
   }
@@ -1411,7 +1314,7 @@ void SPVM_RUNTIME_API_set_double_field(SPVM_API* api, SPVM_OBJECT* object, int32
 void SPVM_RUNTIME_API_set_object_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_byte_offset, SPVM_OBJECT* value) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(api, "Object must be not undef(set_object_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_chars(api, "Object must be not undef(set_object_field).");
     SPVM_RUNTIME_API_set_exception(api, exception);
     return;
   }

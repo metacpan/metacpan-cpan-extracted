@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw( Alien::Base );
 
-our $VERSION = '0.017';
+our $VERSION = '1.000';
 $VERSION = eval $VERSION;
 
 1;
@@ -29,7 +29,7 @@ In your C<Makefile.PL>:
     WriteMakefile(
       ...
       CONFIGURE_REQUIRES => {
-        'Alien::libuv' => '0',
+        'Alien::libuv' => '1.000',
       },
       CCFLAGS => Alien::libuv->cflags . " $Config{ccflags}",
       LIBS    => [ Alien::libuv->libs ],

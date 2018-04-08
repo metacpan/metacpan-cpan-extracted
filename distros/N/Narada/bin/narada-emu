@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-VERSION='v2.3.7'
+VERSION='v2.3.8'
 
 warn()  { echo "$@" >&2;        }
 die()   { warn "$@"; exit 1;    }
@@ -16,6 +16,7 @@ if [ $# -eq 1 ]; then
 fi
 
 export INFERNO_HOME=$(pwd)
+unset LD_PRELOAD
 exec emu-g "${opts[@]}" "${cmd[@]}"
 
 
@@ -30,7 +31,7 @@ narada-emu - start OS Inferno's emu-g for this project
 
 =head1 VERSION
 
-This document describes narada-emu version v2.3.7
+This document describes narada-emu version v2.3.8
 
 
 =head1 USAGE

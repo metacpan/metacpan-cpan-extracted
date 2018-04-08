@@ -1,6 +1,7 @@
 package Pcore::App;
 
 use Pcore -role;
+use Pcore::Nginx;
 use Pcore::HTTP::Server;
 use Pcore::App::Router;
 use Pcore::App::API;
@@ -86,6 +87,56 @@ sub api_call ( $self, @args ) {
     my $auth = bless { app => $self }, 'Pcore::App::API::Auth';
 
     $auth->api_call(@args);
+
+    return;
+}
+
+sub nginx_cfg ($self) {
+    my $params = {
+        name              => lc( ref $self ) =~ s/::/-/smgr,
+        data_dir          => $ENV->{DATA_DIR},
+        www_root_dir      => $ENV->share->get_storage('www')->[0],          # TODO
+        default_server    => 1,                                             # generate default server config
+        nginx_default_key => $ENV->share->get('/data/nginx/default.key'),
+        nginx_default_pem => $ENV->share->get('/data/nginx/default.pem'),
+        upstream          => $self->{app_cfg}->{server}->{listen},
+    };
+
+    for my $host ( keys $self->{router}->{_path_class_cache}->%* ) {
+        my $host_name;
+
+        if ( $host eq '*' ) {
+            $params->{default_server} = 0;
+
+            $host_name = q[""];
+        }
+        else {
+            $host_name = $host;
+        }
+
+        for my $path ( keys $self->{router}->{_path_class_cache}->{$host}->%* ) {
+            my $ctrl = $self->{router}->{_path_class_cache}->{$host}->{$path};
+
+            push $params->{host}->{$host_name}->{location}->@*, $ctrl->get_nginx_cfg;
+        }
+    }
+
+    return P->tmpl->new->render( $self->{app_cfg}->{server}->{ssl} ? 'nginx/host_conf.nginx' : 'nginx/host_conf_no_ssl.nginx', $params );
+}
+
+sub start_nginx ($self) {
+    $self->{nginx} = Pcore::Nginx->new;
+
+    $self->{nginx}->add_vhost( 'vhost', $self->nginx_cfg ) if !$self->{nginx}->is_vhost_exists('vhost');
+
+    # SIGNUP -> nginx reload
+    $SIG->{HUP} = AE::signal HUP => sub {
+        kill 'HUP', $self->{nginx}->proc->pid || 0;
+
+        return;
+    };
+
+    $self->{nginx}->run;
 
     return;
 }

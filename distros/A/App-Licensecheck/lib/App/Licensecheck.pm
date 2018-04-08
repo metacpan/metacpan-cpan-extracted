@@ -10,7 +10,7 @@ use Path::Tiny;
 use Fcntl qw/:seek/;
 use Encode;
 use Regexp::Pattern;
-use Regexp::Pattern::License 3.1.0;
+use Regexp::Pattern::License 3.1.92;
 use String::Copyright 0.003 {
 	format => sub { join ' ', $_->[0] || (), $_->[1] || () }
 };
@@ -31,11 +31,11 @@ App::Licensecheck - functions for a simple license checker for source files
 
 =head1 VERSION
 
-Version v3.0.34
+Version v3.0.36
 
 =cut
 
-our $VERSION = version->declare("v3.0.34");
+our $VERSION = version->declare("v3.0.36");
 
 =head1 SYNOPSIS
 
@@ -58,10 +58,12 @@ See the script for casual usage.
 # TODO: make naming scheme configurable
 my %L = licensepatterns(qw(debian spdx));
 
-my $under_terms_of
-	= qr/(?:(?:Licensed|released) under|(?:according to|under) the (?:conditions|terms) of)/i;
-my $any_of       = qr/(?:any|one or more) of the following/i;
-my $or_option_re = qr/(?:and|or)(?: ?\(?at your (?:choice|option)\)?)?/i;
+my @L_family_cc          = sort keys %{ $L{family}{cc} };
+my @L_type_singleversion = sort keys %{ $L{type}{singleversion} };
+my @L_type_versioned     = sort keys %{ $L{type}{versioned} };
+my @L_type_unversioned   = sort keys %{ $L{type}{unversioned} };
+my @L_type_combo         = sort keys %{ $L{type}{combo} };
+my @L_type_group         = sort keys %{ $L{type}{group} };
 
 my $default_check_regex = q!
 	/[\w-]+$ # executable scripts or README like file
@@ -381,9 +383,6 @@ sub licensepatterns
 		}
 		$list{name}{$key} ||= $val->{name} || $key;
 		$list{caption}{$key} ||= $val->{caption} || $val->{name} || $key;
-		$list{re}{$key} = re( 'License::' . $key );
-		$list{re}{$key} = qr/$list{re}{$key}/
-			unless ( ref( $list{re}{$key} ) eq 'Regexp' );
 		for ( @{ $val->{tags} } ) {
 			/^(family|type):([a-z][a-z0-9_]*)(?::([a-z][a-z0-9_]*))?/;
 			$list{family}{$2}{$key} = 1
@@ -393,12 +392,29 @@ sub licensepatterns
 			$list{series}{$key} = $3
 				if ( $3 and $1 eq 'type' and $2 eq 'singleversion' );
 		}
+		for my $subject (qw(grant_license name)) {
+			my $re = re( "License::$key", subject => $subject =~ tr/_/,/r )
+				or next;
+			$list{"re_$subject"}{$key} = ref($re) ? $re : qr/$re/;
+		}
 	}
-
-	# TODO: use Regexp::Common
-	$list{re}{version}{'-keep'}
-		= qr/(?:$list{re}{version_prefix})?($list{re}{version_number})/i;
-	$list{re}{xgpl}{'-keep'} = qr/(?:the )?(?:GNU )?([AL]?GPL)/i;
+	for my $trait (
+		qw(any_of licensed_under or_at_option
+		clause_advertising clause_non_endorsement clause_reproduction
+		fsf_unlimited fsf_unlimited_retention
+		version_later version_later_postfix)
+		)
+	{
+		my $re = re( "License::$trait", subject => 'trait' );
+		$list{re_trait}{$trait} = ref($re) ? $re : qr/$re/;
+	}
+	for my $trait (qw(version version_numberstring)) {
+		my $re = re(
+			"License::$trait", subject => 'trait',
+			capture => 'numbered'
+		);
+		$list{re_trait_keep}{$trait} = ref($re) ? $re : qr/$re/;
+	}
 
 	return %list;
 }
@@ -413,7 +429,11 @@ sub parse_license
 	my $license   = "";
 	my @spdx_gplver;
 
-	my @custom_done = ();
+	my @agpl = qw(agpl agpl_1 agpl_2 agpl_3);
+	my @gpl  = qw(gpl gpl_1 gpl_2 gpl_3);
+	my @lgpl = qw(lgpl lgpl_2 lgpl_2_1 lgpl_3);
+
+	my %match;
 
   # @spdx_license contains identifiers from https://spdx.org/licenses/
   # it would be more efficient to store license info only in this
@@ -463,27 +483,43 @@ sub parse_license
 		$license = join( ' ', $L{caption}{$legacy} || $legacy, $license );
 	};
 
+	for my $id ( keys %{ $L{re_name} } ) {
+		my @pos;
+
+		while ( $licensetext =~ /$L{re_name}{$id}/g ) {
+			push @pos, $-[0], $+[0];
+		}
+		$match{$id}{name} = {@pos}
+			if (@pos);
+	}
+
 	#<<<  do not let perltidy touch this (keep long regex on one line)
+
+	if ( grep { $match{$_}{name} } @agpl, @gpl ) {
 
 	# version of AGPL/GPL
 	given ($licensetext) {
-		when ( /version ($L{re}{version_number})[.,]? (?:\(?only\)?.? )?(?:of $L{re}{gnu}|(as )?published by the Free Software Foundation)/i ) {
+		when ( /$L{re_trait_keep}{version_numberstring}(?:[.,])? (?:\(?only\)?.? )?(?:of $L{re_name}{gnu}|(as )?published by the Free Software Foundation)/i ) {
 			$gplver      = " (v$1)";
 			@spdx_gplver = ($1)
 		}
-		when ( /$L{re}{gnu}\b[;,] $L{re}{version}{-keep}\b[.,]? /i ) {
+		when ( /$L{re_name}{gnu}\b[;,] $L{re_trait_keep}{version_numberstring}\b[.,]? /i ) {
 			$gplver      = " (v$1)";
 			@spdx_gplver = ($1);
 		}
-		when ( /either $L{re}{version}{-keep}(?: of the License)?,? $L{re}{version_later_postfix}/ ) {
+		when ( /either $L{re_trait_keep}{version_numberstring},? $L{re_trait}{version_later_postfix}/ ) {
 			$gplver      = " (v$1 or later)";
 			@spdx_gplver = ( $1 . '+' );
 		}
-		when ( /GPL as published by the Free Software Foundation, version ($L{re}{version_number})/i ) {
+		when ( /GPL as published by the Free Software Foundation, $L{re_trait_keep}{version_numberstring}/i ) {
 			$gplver      = " (v$1)";
 			@spdx_gplver = ($1)
 		}
 	}
+
+	}
+
+	if ( grep { $match{$_}{name} } @agpl, @gpl, @lgpl ) {
 
 	# address in AGPL/GPL/LGPL
 	given ($licensetext) {
@@ -498,6 +534,8 @@ sub parse_license
 			$extrainfo  = " (with Qt exception)$extrainfo";
 			$spdx_extra = 'with Qt exception';
 		}
+	}
+
 	}
 
 	# generated file
@@ -515,50 +553,60 @@ sub parse_license
 	given ($licensetext) {
 		my @multilicenses;
 		# same sentence
-		when ( /$under_terms_of $any_of(?:[^.]|\.\S)* $L{re}{lgpl}(?:[,;:]? ?$L{re}{version}{-keep}(?: of the License)?($L{re}{version_later})?)?/i ) {
+		if ( grep { $match{$_}{name} } @lgpl ) {
+		when ( /$L{re_trait}{licensed_under}$L{re_trait}{any_of}(?:[^.]|\.\S)*$L{re_name}{lgpl}$L{re_trait_keep}{version}?/i ) {
 			push @multilicenses, 'lgpl', $1, $2;
 			continue;
 		}
-		when ( /$under_terms_of $any_of(?:[^.]|\.\S)* $L{re}{gpl}(?:[,;:]? ?$L{re}{version}{-keep}(?: of the License)?($L{re}{version_later})?)?/i ) {
+		}
+		if ( grep { $match{$_}{name} } @gpl ) {
+		when ( /$L{re_trait}{licensed_under}$L{re_trait}{any_of}(?:[^.]|\.\S)*$L{re_name}{gpl}$L{re_trait_keep}{version}?/i ) {
 			push @multilicenses, 'gpl', $1, $2;
 			continue;
+		}
 		}
 		$gen_license->( @multilicenses ) if (@multilicenses);
 	}
 
+	if ( grep { $match{$_}{name} } @lgpl ) {
+
 	# LGPL
 	given ($licensetext) {
 		# LGPL, among several
-		when ( /$under_terms_of $any_of(?:[^.]|\.\S)* $L{re}{lgpl}(?:[,;:]? ?$L{re}{version}{-keep}(?: of the License)?($L{re}{version_later})?)?/i ) {
+		when ( /$L{re_trait}{licensed_under}$L{re_trait}{any_of}(?:[^.]|\.\S)*$L{re_name}{lgpl}$L{re_trait_keep}{version}?/i ) {
 			break; # handled in multi-licensing loop
 		}
 		# AFL or LGPL
-		when ( /either $L{re}{afl}(?:[,;]? ?$L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?)?, or $L{re}{lgpl}(?:[,;]? ?$L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?)?/i ) {
+		when ( /either $L{re_name}{afl}$L{re_trait_keep}{version}?, or $L{re_name}{lgpl}/i ) {
 			break; # handled in AFL loop
 		}
 		# GPL or LGPL
-		when ( /either $L{re}{gpl}(?:[,;]? ?$L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?)?(?: \((?:the )?"?GPL"?\))?, or $L{re}{lgpl}/i ) {
+		when ( /either $L{re_name}{gpl}$L{re_trait_keep}{version}?(?: \((?:the )?"?GPL"?\))?, or $L{re_name}{lgpl}/i ) {
 			break; # handled in GPL loop
 		}
 		# LGPL, version first
-		when ( /$under_terms_of $L{re}{version}{-keep}( $L{re}{version_later_postfix})? of $L{re}{lgpl}/i ) {
+		when ( /$L{re_trait}{licensed_under}$L{re_trait_keep}{version}? of $L{re_name}{lgpl}/i ) {
 			$gen_license->( 'lgpl', $1, $2 );
 		}
 		# LGPL, dual versions last
-		when ( /$under_terms_of $L{re}{lgpl}\b[,;:]?(?: either)? ?$L{re}{version}{-keep}(?: of the License)?,? $or_option_re $L{re}{version}{-keep}/i ) {
+		when ( /$L{re_trait}{licensed_under}$L{re_name}{lgpl}\b[,;:]?(?: either)? ?$L{re_trait_keep}{version_numberstring},? $L{re_trait}{or_at_option} $L{re_trait_keep}{version_numberstring}/i ) {
 			$license = "LGPL (v$1 or v$2) $license";
 			push @spdx_license, "LGPL-$1 or LGPL-$2";
 		}
 		# LGPL, version last
-		when ( /$under_terms_of $L{re}{lgpl}(?:[,;:]?(?: either)? ?$L{re}{version}{-keep}(?: of the License)?($L{re}{version_later})?)?/i ) {
+		when ( /$L{re_trait}{licensed_under}$L{re_name}{lgpl}(?:[,;:]?(?: either)?$L{re_trait_keep}{version}?)?/i ) {
 			$gen_license->( 'lgpl', $1, $2 );
 		}
 	}
-	push @custom_done, qw(lgpl);
+	$match{lgpl}{custom} = 1;
+
+	}
+
+	if ( grep { $match{$_}{name} } @agpl ) {
 
 	# AGPL
 	given ($licensetext) {
-		when ( /is free software.? you can redistribute (it|them) and[ \/]or modify (it|them) under the terms of $L{re}{agpl}/i ) {
+		when ( /$L{re_trait}{licensed_under}$L{re_name}{agpl}/i ) {
 			$license = "AGPL$gplver$extrainfo $license";
 			push @spdx_license, $gen_spdx->('AGPL');
 		}
@@ -571,14 +619,18 @@ sub parse_license
 			break;
 		}
 		# exclude MPL-2.0 license
-		when ( /means either ([^.]+$L{re}{version_number})+, the GNU Affero General Public License/i ) {
+		when ( /means either the GNU/i ) {
 			break;
 		}
-		when ( /AFFERO GENERAL PUBLIC LICENSE(?:,? $L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?)?/i ) {
+		when ( /AFFERO GENERAL PUBLIC LICENSE$L{re_trait_keep}{version}?/i ) {
 			$gen_license->( 'agpl', $1, $2 );
 		}
 	}
-	push @custom_done, qw(agpl);
+	$match{agpl}{custom} = 1;
+
+	}
+
+	if ( grep { $match{$_}{name} } @gpl ) {
 
 	# GPL
 	given ($licensetext) {
@@ -603,49 +655,52 @@ sub parse_license
 			break;
 		}
 		# GPL, among several
-		when ( /$under_terms_of $any_of(?:[^.]|\.\S)* $L{re}{gpl}(?:[,;:]? ?$L{re}{version}{-keep}(?: of the License)?($L{re}{version_later})?)?/i ) {
+		when ( /$L{re_trait}{licensed_under}$L{re_trait}{any_of}(?:[^.]|\.\S)*$L{re_name}{gpl}$L{re_trait_keep}{version}?/i ) {
 			break; # handled in multi-licensing loop
 		}
 		# GPL or LGPL
-		when ( /either $L{re}{gpl}(?:[,;]? ?$L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?)?(?: \((?:the )?"?GPL"?\))?, or $L{re}{lgpl}(?:[,;]? ?$L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?)?/i ) {
+		when ( /either $L{re_name}{gpl}$L{re_trait_keep}{version}?(?: \((?:the )?"?GPL"?\))?, or $L{re_name}{lgpl}$L{re_trait_keep}{version}?/i ) {
 			$gen_license->( 'gpl', $1, $2, 'lgpl', $3, $4 );
 		}
 		if ( $gplver or $extrainfo ) {
-			when ( /under (?:the terms of )?(?:version \S+ (?:\(?only\)? )?of )?$L{re}{gpl}/i ) {
+			when ( /$L{re_trait}{licensed_under}(?:version \S+ (?:\(?only\)? )?of )?$L{re_name}{gpl}/i ) {
 				$license = "GPL$gplver$extrainfo $license";
 				push @spdx_license, $gen_spdx->('GPL');
 			}
 		}
-		when ( /under (?:the terms of )?(?:version \S+ (?:\(?only\)? )?of )?$L{re}{gpl}(?:,? $L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?)?/i ) {
+		when ( /$L{re_trait}{licensed_under}(?:version \S+ (?:\(?only\)? )?of )?$L{re_name}{gpl}$L{re_trait_keep}{version}?/i ) {
 			$gen_license->( 'gpl', $1, $2 );
 		}
 	}
-	push @custom_done, qw(gpl);
+	$match{gpl}{custom} = 1;
+
+	}
 
 	# CC
 	given ($licensetext) {
-		foreach my $id ( keys %{ $L{family}{cc} } ) {
-			when ( /$L{re}{$id}(?i: version)? ($L{re}{version_number}) or ($L{re}{version_number})/i ) {
+		foreach my $id (@L_family_cc) {
+#			next unless ( $match{$id}{name} );
+			when ( /$L{re_name}{$id}$L{re_trait_keep}{version_numberstring} or $L{re_trait_keep}{version_numberstring}/i ) {
 				$license = "$L{caption}{$id} (v$1 or v$2) $license";
 				push @spdx_license, "$L{name}{$id}-$1 or $L{name}{$id}-$1";
 			}
-			when ( /$L{re}{$id}(?: (?:$L{re}{version}{-keep})?)(?: License)?($L{re}{version_later})?(?:,? (?:and|or) $L{re}{xgpl}{-keep}(?:-?($L{re}{version_number})(,? $L{re}{version_later_postfix})?)?)?/i ) {
+			when ( /$L{re_name}{$id}$L{re_trait_keep}{version}(?:,? (?:and|or) (?:the )?(?:GNU )?([AL]?GPL)-?$L{re_trait_keep}{version})?/i ) {
 				$gen_license->( $id, $1, $2, $3, $4 );
 			}
 		}
 	}
-	push @custom_done, qw(cc_by cc_by_nc cc_by_nc_nd cc_by_nc_sa cc_by_nd cc_by_sa cc_cc0 cc_sp);
+	$match{$_}{custom} = 1 for ( qw(cc_by cc_by_nc cc_by_nc_nd cc_by_nc_sa cc_by_nd cc_by_sa cc_cc0 cc_sp) );
 
 	# BSD
 	if ( $licensetext =~ /THIS SOFTWARE IS PROVIDED .*AS IS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY/ ) {
 		given ($licensetext) {
-			when ( /$L{re}{clause_advertising}/i ) {
+			when ( /$L{re_trait}{clause_advertising}/i ) {
 				$gen_license->('bsd_4_clause');
 			}
-			when ( /$L{re}{clause_non_endorsement}/i ) {
+			when ( /$L{re_trait}{clause_non_endorsement}/i ) {
 				$gen_license->('bsd_3_clause');
 			}
-			when ( /$L{re}{clause_reproduction}/i ) {
+			when ( /$L{re_trait}{clause_reproduction}/i ) {
 				$gen_license->('bsd_2_clause');
 			}
 			default {
@@ -659,141 +714,166 @@ sub parse_license
 	elsif ( $licensetext =~ /licen[sc]e:? ?bsd\b/i ) {
 		$gen_license->('bsd');
 	}
-	push @custom_done, qw(bsd_2_clause bsd_3_clause bsd_4_clause);
+	$match{$_}{custom} = 1 for ( qw(bsd_2_clause bsd_3_clause bsd_4_clause) );
 
 	# Artistic
 	given ($licensetext) {
-		when ( $L{re}{perl} ) {
+		when ( $L{re_grant_license}{perl} ) {
 			$gen_license->('perl');
 		}
-		when ( $L{re}{artistic_2} ) {
+		when ( $L{re_grant_license}{artistic_2} ) {
 			$gen_license->('artistic_2');
 		}
-		when ( /$L{re}{artistic}(?:,? $L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?)?/ ) {
+		when ( /$L{re_name}{artistic}$L{re_trait_keep}{version}?/ ) {
 			$gen_license->('artistic', $1, $2);
 		}
 	}
-	push @custom_done, qw(artistic artistic_2 perl);
+	$match{$_}{custom} = 1 for ( qw(artistic artistic_2 perl) );
 
 	# Apache
 	given ($licensetext) {
 
 		# skip referenced license
-		when ($L{re}{rpsl}) {
+		when ($L{re_grant_license}{rpsl}) {
 			break;
 		}
 
-		when ( /$L{re}{apache}(?:,? $L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?)?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]+\))*,? or $L{re}{gpl}(?: $L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?)?/i ) {
+		if ( $match{apache}{name} ) {
+
+		when ( /$L{re_name}{apache}$L{re_trait_keep}{version}?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]+\))*,? or $L{re_name}{gpl}$L{re_trait_keep}{version}?/i ) {
 			$gen_license->( 'apache', $1, $2, 'gpl', $3, $4 );
 		}
-		when ( /$L{re}{apache}(?:,? $L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?)?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]\))*,? or(?: the)? bsd(?:[ -](\d)-clause)?\b/i ) {
+		when ( /$L{re_name}{apache}$L{re_trait_keep}{version}?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]\))*,? or(?: the)? bsd(?:[ -](\d)-clause)?\b/i ) {
 			$gen_license->( 'apache', $1, $2, "bsd_${3}_clause" );
 		}
-		when ( /$L{re}{apache}(?:,? $L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?)?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]\))*,? or $L{re}{mit_new}\b/i ) {
+		when ( /$L{re_name}{apache}$L{re_trait_keep}{version}?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]\))*,? or $L{re_grant_license}{mit_new}\b/i ) {
 			$gen_license->( 'apache', $1, $2, 'mit_new', $3, $4 );
 		}
-		when ( /$L{re}{apache}(?:,? $L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?)?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]\))*,? or $L{re}{mit}\b/i ) {
+		when ( /$L{re_name}{apache}$L{re_trait_keep}{version}?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]\))*,? or $L{re_name}{mit}\b/i ) {
 			$gen_license->( 'apache', $1, $2, 'mit', $3, $4 );
 		}
-		when ( /$L{re}{apache}(?:,? $L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?)?/i ) {
+		when ( /$L{re_name}{apache}$L{re_trait_keep}{version}?/i ) {
 			$gen_license->( 'apache', $1, $2 );
 		}
-		when ( m<https?www.apache.org/licenses(?:/LICENSE-($L{re}{version_number}))?>i ) {
+
+		}
+
+		when ( m<https?www.apache.org/licenses(?:/LICENSE-([12]\.[01]))?> ) {
 			$gen_license->( 'apache', $1 );
 		}
 	}
-	push @custom_done, qw(apache);
+	$match{apache}{custom} = 1;
 
 	# FSFUL
 	given ($licensetext) {
-		when ( /$L{re}{fsful}/i ) {
+		when ( /$L{re_grant_license}{fsful}/ ) {
 			$gen_license->('fsful');
 		}
-		when ( /This (\w+)(?: (?:file|script))? is free software; $L{re}{fsf_unlimited}/i ) {
+		when ( /This (\w+)(?: (?:file|script))? is free software; $L{re_trait}{fsf_unlimited}/i ) {
 			$license = "FSF Unlimited ($1 derivation) $license";
 			push @spdx_license, "FSFUL~$1";
 		}
 	}
-	push @custom_done, qw(fsful);
+	$match{fsful}{custom} = 1;
 
 	# FSFULLR
 	given ($licensetext) {
-		when ( /$L{re}{fsfullr}/i ) {
+		when ( /$L{re_grant_license}{fsfullr}/ ) {
 			$gen_license->('fsfullr');
 		}
-		when ( /This (\w+)(?: (?:file|script))?  is free software; $L{re}{fsf_unlimited_retention}/i ) {
+		when ( /This (\w+)(?: (?:file|script))?  is free software; $L{re_trait}{fsf_unlimited_retention}/i ) {
 			$license = "FSF Unlimited (with Retention, $1 derivation) $license";
 			push @spdx_license, "FSFULLR~$1";
 		}
 	}
-	push @custom_done, qw(fsfullr);
+	$match{fsfullr}{custom} = 1;
 
 	# JSON
 	given ($licensetext) {
-		when ( /The Software shall be used for Good, not Evil/ ) {
+		when ( $L{re_grant_license}{json} ) {
 			$gen_license->('JSON');
 		}
 	}
 
 	# PHP
 	given ($licensetext) {
-		when ( /This source file is subject to version ($L{re}{version_number}) of the PHP license/ ) {
+		when ( /$L{re_trait}{licensed_under}$L{re_trait_keep}{version_numberstring} of the PHP license/ ) {
 			$gen_license->( 'PHP', $1 );
 		}
 	}
 
 	# CECILL
 	given ($licensetext) {
-		when ( $L{re}{cecill_1} ) {
-			$gen_license->('cecill_1');
-		}
-		when ( $L{re}{cecill_1_1} ) {
-			$gen_license->('cecill_1_1');
-		}
-		when ( $L{re}{cecill_2} ) {
-			$gen_license->('cecill_2');
-		}
-		when ( $L{re}{cecill_2_1} ) {
-			$gen_license->('cecill_2_1');
-		}
-		when ( $L{re}{cecill_b} ) {
+		when ( $L{re_grant_license}{cecill_b} ) {
 			$gen_license->('cecill_b');
 		}
-		when ( $L{re}{cecill_c} ) {
+		when ( /$L{re_name}{cecill}-[Bb]/ ) {
+			$gen_license->('cecill_b');
+		}
+		when ( $L{re_grant_license}{cecill_c} ) {
 			$gen_license->('cecill_c');
 		}
-		when ( /$L{re}{cecill}(?:(?:-|\s*$L{re}{version_prefix})($L{re}{version_number}))?/ ) {
+		when ( /$L{re_name}{cecill}-[Cc]/ ) {
+			$gen_license->('cecill_c');
+		}
+		when ( $L{re_grant_license}{cecill_1} ) {
+			$gen_license->('cecill_1');
+		}
+		when ( $L{re_grant_license}{cecill_1_1} ) {
+			$gen_license->('cecill_1_1');
+		}
+		when ( $L{re_grant_license}{cecill_2} ) {
+			$gen_license->('cecill_2');
+		}
+		when ( $L{re_grant_license}{cecill_2_1} ) {
+			$gen_license->('cecill_2_1');
+		}
+		when ( /$L{re_name}{cecill}$L{re_trait_keep}{version}/ ) {
 			$gen_license->( 'cecill', $1 );
 		}
 	}
-	push @custom_done, qw(cecill cecill_1 cecill_1_1 cecill_2 cecill_2_1 cecill_b cecill_c);
+	$match{$_}{custom} = 1 for ( qw(cecill cecill_1 cecill_1_1 cecill_2 cecill_2_1 cecill_b cecill_b_1 cecill_c cecill_c_1) );
 
 	# public-domain
 	given ($licensetext) {
-		when ( /is in $L{re}{public_domain}/i ) {
+		when ( /$L{re_grant_license}{public_domain}/ ) {
 			$gen_license->('public_domain');
 		}
 	}
-	push @custom_done, qw(public_domain);
+	$match{public_domain}{custom} = 1;
+
+	if ( $match{afl}{name} ) {
 
 	given ($licensetext) {
+
+		if ( $match{lgpl}{name} ) {
+
 		# AFL or LGPL
-		when ( /either $L{re}{afl}(?:,? ?$L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?)?, or $L{re}{lgpl}(?:,? ?$L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?)?/i ) {
+		when ( /either $L{re_name}{afl}$L{re_trait_keep}{version}, or $L{re_name}{lgpl}$L{re_trait_keep}{version}?/i ) {
 			$gen_license->( 'afl', $1, $2, 'lgpl', $3, $4 );
 		}
+
+		}
+
 		# AFL
-		when ( /Licensed under $L{re}{afl}(?: $L{re}{version}{-keep})?/ ) {
+		when ( /$L{re_trait}{licensed_under}$L{re_name}{afl}$L{re_trait_keep}{version}?/ ) {
 			$gen_license->( 'afl', $1 );
 		}
 	}
-	push @custom_done, qw(afl);
+	$match{afl}{custom} = 1;
+
+	}
 
 	# BSL
 	given ($licensetext) {
+		when ( /$L{re_grant_license}{bsl_1}/ ) {
+			$gen_license->( 'bsl_1' );
+			$match{bsl_1}{custom} = 1;
+		}
 		when ( /Permission is hereby granted, free of charge, to any person or organization obtaining a copy of the software and accompanying documentation covered by this license \(the Software\)/ ) {
 			$gen_license->('BSL');
 		}
-		when ( /Boost Software License(?:[ ,-]+ $L{re}{version}{-keep})?/i ) {
+		when ( /Boost Software License$L{re_trait_keep}{version}?/i ) {
 			$gen_license->( 'BSL', $1, $2 );
 		}
 	}
@@ -802,52 +882,59 @@ sub parse_license
 	given ($licensetext) {
 
 		# singleversion
-		foreach my $id ( sort keys %{ $L{type}{singleversion} } ) {
-			next if ( grep { $id eq $_ } @custom_done );
+		foreach my $id (@L_type_singleversion) {
+			next if ( $match{$id}{custom} );
 
-			when ( $L{re}{$id} ) {
+			when ( $L{re_grant_license}{$id} ) {
 				$gen_license->($id);
-				push @custom_done, $L{series}{$id}
+				$match{ $L{series}{$id} }{custom} = 1
 					if ( $L{series}{$id} );
 				continue;
 			}
 		}
 
 		# versioned
-		foreach my $id ( keys %{ $L{type}{versioned} } ) {
-			next if ( grep { $id eq $_ } @custom_done );
+		foreach my $id (@L_type_versioned) {
+			next if ( $match{$id}{custom} );
 
 			# skip embedded or referenced licenses
 			if ( grep { $id eq $_ } qw(mpl python) ) {
-				next if $licensetext =~ $L{re}{rpsl};
+				next if $licensetext =~ $L{re_grant_license}{rpsl};
 			}
 
-			when (
-				/$L{re}{$id}(?:\W*\(?$L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?\)?)?/
-				)
-			{
-				$gen_license->( $id, $1, $2 );
-				continue;
+			if ( $L{re_name}{$id} ) {
+				when (/$L{re_name}{$id}$L{re_trait_keep}{version}?/) {
+					$gen_license->( $id, $1, $2 );
+					$match{$id}{custom} = 1;
+					continue;
+				}
+			}
+			next if ( $match{$id}{custom} );
+			if ( $L{re_grant_license}{$id} ) {
+				when (/$L{re_grant_license}{$id}/) {
+					$gen_license->($id);
+					continue;
+				}
 			}
 		}
 
 		# unversioned
-		foreach my $id ( keys %{ $L{type}{unversioned} } ) {
-			next if ( grep { $id eq $_ } @custom_done );
+		foreach my $id (@L_type_unversioned) {
+			next if ( $match{$id}{custom} );
 
 			# skip embedded or referenced licenses
 			if ( grep { $id eq $_ } qw(zlib) ) {
-				next if $licensetext =~ $L{re}{cube};
+				next if $licensetext =~ $L{re_grant_license}{cube};
 			}
 			if ( grep { $id eq $_ } qw(ntp) ) {
-				next if $licensetext =~ $L{re}{ntp_disclaimer};
-				next if $licensetext =~ $L{re}{dsdp};
+				next if $licensetext =~ $L{re_grant_license}{ntp_disclaimer};
+				next if $licensetext =~ $L{re_grant_license}{dsdp};
 			}
 			if ( grep { $id eq $_ } qw(ntp_disclaimer) ) {
-				next if $licensetext =~ $L{re}{mit_cmu};
+				next if $licensetext =~ $L{re_grant_license}{mit_cmu};
 			}
 
-			when ( $L{re}{$id} ) {
+			when ( $L{re_grant_license}{$id} ) {
 				$gen_license->($id);
 				continue;
 			}

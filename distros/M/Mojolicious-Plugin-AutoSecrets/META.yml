@@ -15,7 +15,7 @@ name: Mojolicious-Plugin-AutoSecrets
 provides:
   Mojolicious::Plugin::AutoSecrets:
     file: lib/Mojolicious/Plugin/AutoSecrets.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Mojolicious: '7.15'
   Session::Token: '1.503'
@@ -24,5 +24,5 @@ resources:
   bugtracker: https://github.com/merrilymeredith/p5-Mojolicious-Plugin-AutoSecrets/issues
   homepage: http://search.cpan.org/dist/Mojolicious-Plugin-AutoSecrets/
   repository: git://github.com/merrilymeredith/p5-Mojolicious-Plugin-AutoSecrets.git
-version: '0.004'
+version: '0.005'
 x_serialization_backend: 'YAML::Tiny version 1.70'

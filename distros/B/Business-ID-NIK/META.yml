@@ -3,7 +3,6 @@ abstract: 'Parse Indonesian citizenship registration number (NIK)'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  Data::Clean::JSON: '0.38'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
@@ -29,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Business-ID-NIK
   homepage: https://metacpan.org/release/Business-ID-NIK
   repository: git://github.com/perlancar/perl-Business-ID-NIK.git
-version: '0.090'
+version: '0.092'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

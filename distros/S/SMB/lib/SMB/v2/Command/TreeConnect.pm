@@ -1,4 +1,4 @@
-# SMB Perl library, Copyright (C) 2014 Mikhael Goikhman, migo@cpan.org
+# SMB Perl library, Copyright (C) 2014-2018 Mikhael Goikhman, migo@cpan.org
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ sub init ($) {
 		capabilities => 0,
 		access_mask  => 0x1f01ff,
 		uri          => undef,
+		tree         => undef,
 	)
 }
 
@@ -64,10 +65,11 @@ sub pack ($$) {
 	my $packer = shift;
 
 	if ($self->is_response) {
+		my $is_ipc = $self->tree && $self->tree->is_ipc;
 		$packer
-			->uint8($self->share_type)
+			->uint8($is_ipc ? 2 : $self->share_type)
 			->uint8(0)  # reserved
-			->uint32($self->share_flags)
+			->uint32($is_ipc ? 0x30 : $self->share_flags)
 			->uint32($self->capabilities)
 			->uint32($self->access_mask)
 		;

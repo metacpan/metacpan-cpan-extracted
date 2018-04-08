@@ -7,7 +7,9 @@ use App::Fasops -command;
 use App::RL::Common;
 use App::Fasops::Common;
 
-use constant abstract => 'convert maf to blocked fasta';
+sub abstract {
+    return 'convert maf to blocked fasta';
+}
 
 sub opt_spec {
     return (
@@ -23,9 +25,14 @@ sub usage_desc {
 
 sub description {
     my $desc;
-    $desc .= "Convert UCSC maf multiple alignment file to blocked fasta file.\n";
-    $desc .= "\t<infiles> are paths to maf files, .maf.gz is supported\n";
-    $desc .= "\tinfile == stdin means reading from STDIN\n";
+    $desc .= ucfirst(abstract) . ".\n";
+    $desc .= <<'MARKDOWN';
+
+* <infiles> are paths to maf files, .maf.gz is supported
+* infile == stdin means reading from STDIN
+
+MARKDOWN
+
     return $desc;
 }
 

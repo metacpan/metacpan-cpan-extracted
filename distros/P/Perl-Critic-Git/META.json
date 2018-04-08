@@ -4,7 +4,7 @@
       "Guillaume Aubert <aubertg@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -45,7 +45,7 @@
    "provides" : {
       "Perl::Critic::Git" : {
          "file" : "lib/Perl/Critic/Git.pm",
-         "version" : "v1.3.0"
+         "version" : "v1.3.1"
       }
    },
    "release_status" : "stable",
@@ -54,12 +54,10 @@
          "web" : "https://github.com/guillaumeaubert/Perl-Critic-Git/issues"
       },
       "homepage" : "https://metacpan.org/release/Perl-Critic-Git",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
          "url" : "https://github.com/guillaumeaubert/Perl-Critic-Git"
       }
    },
-   "version" : "v1.3.0"
+   "version" : "v1.3.1",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

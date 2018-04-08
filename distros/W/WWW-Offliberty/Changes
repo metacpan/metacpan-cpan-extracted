@@ -1,5 +1,8 @@
 Revision history for Perl extension WWW::Offliberty.
 
+1.000008 2018-04-07T20:35+03:00
+ - Relax test because Offliberty no longer seems to return audio files
+
 1.000007 2017-10-21T17:20+01:00
  - Change OFF_URL to use new version of Offliberty (as old version was
    shut down)

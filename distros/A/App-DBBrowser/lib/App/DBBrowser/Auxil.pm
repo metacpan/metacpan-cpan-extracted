@@ -5,14 +5,12 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.009';
+our $VERSION = '2.012';
 
-use Encode         qw( encode );
-use File::Basename qw( dirname );
+use Encode qw( encode );
 
-use Encode::Locale  qw();
-use JSON            qw( decode_json );
-use List::MoreUtils qw( any );
+use Encode::Locale qw();
+use JSON           qw( decode_json );
 
 use Term::Choose           qw( choose );
 use Term::Choose::LineFold qw( line_fold );
@@ -32,106 +30,70 @@ sub new {
 }
 
 
-sub backup_href {
-    my ( $sf, $href ) = @_;
-    my $backup = {};
-    for ( keys %$href ) {
-        if ( ref $href->{$_} eq 'ARRAY' ) {
-            $backup->{$_} = [ @{$href->{$_}} ];
-        }
-        elsif ( ref $href->{$_} eq 'HASH' ) {
-            $backup->{$_} = { %{$href->{$_}} };
+sub get_stmt {
+    my ( $sf, $sql, $stmt_type, $used_for ) = @_;
+    my $in = $used_for eq 'print' ? ' ' : '';
+    my $table = $sql->{table};
+    my @tmp;
+    if ( $stmt_type eq 'Drop_table' ) {
+        @tmp = ( "DROP TABLE $table" );
+    }
+    elsif ( $stmt_type eq 'Create_table' ) {
+        @tmp = ( sprintf "CREATE TABLE $table (%s)", join ', ', @{$sql->{create_table_cols}} );
+    }
+    elsif ( $stmt_type eq 'Select' ) {
+        @tmp = ( "SELECT" . $sql->{distinct_stmt} . $sf->__select_cols( $sql ) );
+        push @tmp, " FROM " . $table;
+        push @tmp, $in . $sql->{where_stmt}    if $sql->{where_stmt};
+        push @tmp, $in . $sql->{group_by_stmt} if $sql->{group_by_stmt};
+        push @tmp, $in . $sql->{having_stmt}   if $sql->{having_stmt};
+        push @tmp, $in . $sql->{order_by_stmt} if $sql->{order_by_stmt};
+        push @tmp, $in . $sql->{limit_stmt}    if $sql->{limit_stmt};
+        push @tmp, $in . $sql->{offset_stmt}   if $sql->{offset_stmt};
+    }
+    elsif ( $stmt_type eq 'Delete' ) {
+        @tmp = ( "DELETE FROM " . $table );
+        push @tmp, $in . $sql->{where_stmt} if $sql->{where_stmt};
+    }
+    elsif ( $stmt_type eq 'Update' ) {
+        @tmp = ( "UPDATE " . $table );
+        push @tmp, $in . $sql->{set_stmt}   if $sql->{set_stmt};
+        push @tmp, $in . $sql->{where_stmt} if $sql->{where_stmt};
+    }
+    elsif ( $stmt_type eq 'Insert' ) {
+        @tmp = ( sprintf "INSERT INTO $table (%s)", join ', ', @{$sql->{insert_into_cols}} );
+        if ( $used_for eq 'prepare' ) {
+            push @tmp, sprintf " VALUES(%s)", join( ', ', ( '?' ) x @{$sql->{insert_into_cols}} );
         }
         else {
-            $backup->{$_} = $href->{$_};
-        }
-    }
-    return $backup;
-}
-
-
-sub print_sql {
-    my ( $sf, $sql, $stmt_typeS, $tmp ) = @_; ###
-    return if ! defined $stmt_typeS;
-    $tmp = {} if ! defined $tmp;
-    my $pr_sql = { %$sql };
-    for my $key ( keys %$tmp ) {
-        $pr_sql->{$key} = exists $tmp->{$key} ? $tmp->{$key} : $sql->{$key}; #
-    }
-    my $table = $pr_sql->{table};
-    my $str = '';
-    for my $stmt_type ( @$stmt_typeS ) {
-        if ( $stmt_type eq 'Create_table' ) {
-            my @cols = @{$pr_sql->{create_table_cols}};
-            $str .= "CREATE TABLE $table (";
-            if ( @cols ) {
-                $str .= join( ', ',  map { defined $_ ? $_ : '' } @cols );
-            }
-            $str .= ")\n";
-        }
-        if ( $stmt_type eq 'Insert' ) {
-            my @cols = @{$pr_sql->{insert_into_cols}};
-            $str .= "INSERT INTO $table (";
-            if ( @cols ) {
-                $str .= join( ', ', map { defined $_ ? $_ : '' } @cols );
-            }
-            $str .= ")\n";
-            $str .= "  VALUES(\n";
-            my $val_indent = 4;
+            my $row_in = ' '  x 4;
             my $max = 9;
-            if ( @{$pr_sql->{insert_into_args}} > $max ) {
-                for my $insert_row ( @{$pr_sql->{insert_into_args}}[ 0 .. $max - 3 ] ) {
-                    $str .= ( ' ' x $val_indent ) . join( ', ', map { defined $_ ? $_ : '' } @$insert_row ) . "\n";
+            push @tmp, "  VALUES(";
+            if ( @{$sql->{insert_into_args}} > $max ) {
+                for my $row ( @{$sql->{insert_into_args}}[ 0 .. $max - 3 ] ) {
+                    push @tmp, $row_in . join ', ', map { defined $_ ? $_ : '' } @$row;
                 }
-                $str .= sprintf "%s...\n",       ' ' x $val_indent;
-                $str .= sprintf "%s[%d rows]\n", ' ' x $val_indent, scalar @{$pr_sql->{insert_into_args}};
+                push @tmp, $row_in . '...';
+                push @tmp, $row_in . '[' . scalar( @{$sql->{insert_into_args}} ) . ' rows]';
             }
             else {
-                for my $insert_row ( @{$pr_sql->{insert_into_args}} ) {
-                    $str .= ( ' ' x $val_indent ) . join( ', ', map { defined $_ ? $_ : '' } @$insert_row ) . "\n";
+                for my $row ( @{$sql->{insert_into_args}} ) {
+                    push @tmp, $row_in . join ', ', map { defined $_ ? $_ : '' } @$row;
                 }
             }
-            $str .= "  )\n";
-        }
-        if ( $stmt_type =~ /^(?:Select|Delete|Update)\z/ ) {
-            my %type_sql = (
-                Select => "SELECT",
-                Delete => "DELETE",
-                Update => "UPDATE",
-            );
-            my $cols_sql;
-            if ( $stmt_type eq 'Select' ) {
-                $cols_sql = $sf->prepare_select_cols( $pr_sql );
-            }
-            $str .= $type_sql{$stmt_type};
-            $str .= $pr_sql->{distinct_stmt}                   if $pr_sql->{distinct_stmt};
-            $str .= ' '      . $cols_sql                . "\n" if $cols_sql;
-            $str .= " FROM"                                    if $stmt_type eq 'Select' || $stmt_type eq 'Delete';
-            $str .= ' '      . $table                   . "\n";
-            $str .= ' '      . $pr_sql->{set_stmt}      . "\n" if $pr_sql->{set_stmt};
-            $str .= ' '      . $pr_sql->{where_stmt}    . "\n" if $pr_sql->{where_stmt};
-            $str .= ' '      . $pr_sql->{group_by_stmt} . "\n" if $pr_sql->{group_by_stmt};
-            $str .= ' '      . $pr_sql->{having_stmt}   . "\n" if $pr_sql->{having_stmt};
-            $str .= ' '      . $pr_sql->{order_by_stmt} . "\n" if $pr_sql->{order_by_stmt};
-            $str .= ' '      . $pr_sql->{limit_stmt}    . "\n" if $pr_sql->{limit_stmt};
-            $str .= ' '      . $pr_sql->{offset_stmt}   . "\n" if $pr_sql->{offset_stmt};
+            push @tmp, "  )";
         }
     }
-    for my $val ( @{$pr_sql->{set_args}}, @{$pr_sql->{where_args}}, @{$pr_sql->{having_args}} ) {
-        $str =~ s/\?/$val/;
+    if ( $used_for eq 'prepare' ) {
+        return join '', @tmp;
     }
-    $str .= "\n";
-    print $sf->{i}{clear_screen};
-    print line_fold( $str, term_width() - 2, '', ' ' x $sf->{i}{stmt_init_tab} );
-}
-
-sub alias_key {
-    my ( $sf, $stmt, $values ) = @_;
-    return $stmt . '__[' . join( '_', @$values ) . ']';
+    else {
+        return join( "\n", @tmp ) . "\n";
+    }
 }
 
 
-sub prepare_select_cols {
+sub __select_cols {
     my ( $sf, $sql ) = @_;
     my @tmp;
     if ( ! keys %{$sql->{alias}} ) {
@@ -150,11 +112,45 @@ sub prepare_select_cols {
     }
     if ( ! @tmp ) {
         if ( $sf->{i}{multi_tbl} eq 'join' ) {
-             return join( ', ', @{$sql->{cols}} );
+             return ' ' . join ', ', @{$sql->{cols}};
         }
-        return "*";
+        return " *";
     }
-    return join( ', ', @tmp );
+    return ' ' . join ', ', @tmp;
+}
+
+
+sub print_sql {
+    my ( $sf, $sql, $stmt_typeS, $tmp ) = @_; ###
+    return if ! defined $stmt_typeS;
+    $tmp = {} if ! defined $tmp;
+    my $pr_sql = { %$sql };
+    for my $key ( keys %$tmp ) {
+        $pr_sql->{$key} = exists $tmp->{$key} ? $tmp->{$key} : $sql->{$key}; #
+    }
+    my $str = '';
+    for my $stmt_type ( @$stmt_typeS ) {
+         $str .= $sf->get_stmt( $pr_sql, $stmt_type, 'print' );
+    }
+    my $filled = $sf->fill_stmt( $str, [ @{$pr_sql->{set_args}}, @{$pr_sql->{where_args}}, @{$pr_sql->{having_args}} ] );
+    $str = $filled if defined $filled;
+    $str .= "\n";
+    print $sf->{i}{clear_screen};
+    print line_fold( $str, term_width() - 2, '', ' ' x $sf->{i}{stmt_init_tab} );
+}
+
+
+sub fill_stmt {
+    my ( $sf, $stmt, $args, $quote ) = @_;
+    my $rx_placeholder = qr/(?<=(?:,|\s|\())\?(?=(?:,|\s|\)|$))/;
+    for my $arg ( @$args ) {
+        $arg = $sf->{d}{dbh}->quote( $arg ) if $quote;
+        $stmt =~ s/$rx_placeholder/$arg/;
+    }
+    if ( $stmt !~ $rx_placeholder ) {
+        return $stmt;
+    }
+    return;
 }
 
 
@@ -197,6 +193,24 @@ sub quote_simple_many {
         return [ map { $sf->{d}{dbh}->quote_identifier( $_ ) } @$list ];
     }
     return [ @$list ];
+}
+
+
+sub backup_href {
+    my ( $sf, $href ) = @_;
+    my $backup = {};
+    for ( keys %$href ) {
+        if ( ref $href->{$_} eq 'ARRAY' ) {
+            $backup->{$_} = [ @{$href->{$_}} ];
+        }
+        elsif ( ref $href->{$_} eq 'HASH' ) {
+            $backup->{$_} = { %{$href->{$_}} };
+        }
+        else {
+            $backup->{$_} = $href->{$_};
+        }
+    }
+    return $backup;
 }
 
 
@@ -267,6 +281,8 @@ sub read_json {
     }
     return $h_ref;
 }
+
+
 
 
 

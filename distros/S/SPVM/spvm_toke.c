@@ -49,10 +49,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
   
   while(1) {
     // Get current character
-    char c = *compiler->bufptr;
+    char ch = *compiler->bufptr;
     
     // line end
-    switch(c) {
+    switch (ch) {
       case '\0':
         compiler->cur_file = NULL;
         free(compiler->cur_src);
@@ -197,6 +197,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       /* Skip space character */
       case ' ':
       case '\t':
+      case '\r':
         compiler->bufptr++;
         continue;
 
@@ -212,14 +213,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         if (*compiler->bufptr == '=') {
           compiler->bufptr++;
           SPVM_OP* op_special_assign = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_SPECIAL_ASSIGN);
-          op_special_assign->flag = SPVM_OP_C_FLAG_SPECIAL_ASSIGN_CONCAT_STRING;
+          op_special_assign->flag = SPVM_OP_C_FLAG_SPECIAL_ASSIGN_CONCAT;
           
           yylvalp->opval = op_special_assign;
           
           return SPECIAL_ASSIGN;
         }
         else {
-          yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_CONCAT_STRING);
+          yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_CONCAT);
           return '.';
         }
       
@@ -766,7 +767,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       }
       default:
         /* Variable */
-        if (c == '$') {
+        if (ch == '$') {
           /* Save current position */
           const char* cur_token_ptr = compiler->bufptr;
           
@@ -801,7 +802,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           return VAR_NAME;
         }
         /* Number literal */
-        else if (isdigit(c)) {
+        else if (isdigit(ch)) {
           const char* cur_token_ptr;
           
           // Before character is minus
@@ -1019,7 +1020,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           return CONSTANT;
         }
         // Keyword or name
-        else if (isalpha(c) || c == '_') {
+        else if (isalpha(ch) || ch == '_') {
           // Save current position
           const char* cur_token_ptr = compiler->bufptr;
           
@@ -1178,6 +1179,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_ENUM);
                   return ENUM;
                 }
+                else if (strcmp(keyword, "eq") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_STRING_EQ);
+                  return REL;
+                }
                 else if (strcmp(keyword, "eval") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_EVAL);
                   return EVAL;
@@ -1191,6 +1196,16 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 else if (strcmp(keyword, "float") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_FLOAT);
                   return FLOAT;
+                }
+                break;
+              case 'g' :
+                if (strcmp(keyword, "gt") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_STRING_GT);
+                  return REL;
+                }
+                else if (strcmp(keyword, "ge") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_STRING_GE);
+                  return REL;
                 }
                 break;
               case 'h' :
@@ -1208,12 +1223,21 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_INT);
                   return INT;
                 }
+                else if (strcmp(keyword, "interface") == 0) {
+                  SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_INTERFACE, compiler->cur_file, compiler->cur_line);
+                  yylvalp->opval = op_descriptor;
+                  
+                  return DESCRIPTOR;
+                }
+                else if (strcmp(keyword, "isa") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_ISA);
+                  return ISA;
+                }
                 break;
               case 'j' :
                 if (strcmp(keyword, "jit") == 0) {
-                  SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_DESCRIPTOR);
-                  op->id = SPVM_DESCRIPTOR_C_ID_JIT;
-                  yylvalp->opval = op;
+                  SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_JIT, compiler->cur_file, compiler->cur_line);
+                  yylvalp->opval = op_descriptor;
                   
                   return DESCRIPTOR;
                 }
@@ -1230,11 +1254,22 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   
                   return ARRAY_LENGTH;
                 }
+                else if (strcmp(keyword, "lt") == 0) {
+                  SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_STRING_LT);
+                  yylvalp->opval = op;
+                  
+                  return REL;
+                }
+                else if (strcmp(keyword, "le") == 0) {
+                  SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_STRING_LE);
+                  yylvalp->opval = op;
+                  
+                  return REL;
+                }
                 else if (strcmp(keyword, "long") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_LONG);
                   return LONG;
                 }
-                break;
                 break;
               case 'm' :
                 if (strcmp(keyword, "my") == 0) {
@@ -1244,11 +1279,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 break;
               case 'n' :
                 if (strcmp(keyword, "native") == 0) {
-                  SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_DESCRIPTOR);
-                  op->id = SPVM_DESCRIPTOR_C_ID_NATIVE;
-                  yylvalp->opval = op;
+                  SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_NATIVE, compiler->cur_file, compiler->cur_line);
+                  yylvalp->opval = op_descriptor;
                   
                   return DESCRIPTOR;
+                }
+                else if (strcmp(keyword, "ne") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_STRING_NE);
+                  return REL;
                 }
                 else if (strcmp(keyword, "next") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_NEXT);
@@ -1278,9 +1316,21 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   compiler->before_is_package = 1;
                   
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_PACKAGE);
+                  
                   return PACKAGE;
                 }
-                
+                else if (strcmp(keyword, "private") == 0) {
+                  SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_PRIVATE, compiler->cur_file, compiler->cur_line);
+                  yylvalp->opval = op_descriptor;
+                  
+                  return DESCRIPTOR;
+                }
+                else if (strcmp(keyword, "public") == 0) {
+                  SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_PUBLIC, compiler->cur_file, compiler->cur_line);
+                  yylvalp->opval = op_descriptor;
+                  
+                  return DESCRIPTOR;
+                }
                 break;
               case 'r' :
                 if (strcmp(keyword, "return") == 0) {
@@ -1346,6 +1396,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 break;
             }
           }
+
+    
           
           if (has_double_underline) {
             fprintf(stderr, "Can't contain __ in package, subroutine or field name at %s line %" PRId32 "\n", compiler->cur_file, compiler->cur_line);
@@ -1383,7 +1435,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         compiler->bufptr++;
         yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_NULL);
         
-        return (int) (uint8_t) c;
+        return (int) (uint8_t) ch;
     }
   }
 }

@@ -1,6 +1,6 @@
 package Twitter::API::Util;
 # ABSTRACT: Utilities for working with the Twitter API
-$Twitter::API::Util::VERSION = '0.0113';
+$Twitter::API::Util::VERSION = '1.0001';
 use 5.14.1;
 use warnings;
 use Carp qw/croak/;
@@ -59,7 +59,7 @@ Twitter::API::Util - Utilities for working with the Twitter API
 
 =head1 VERSION
 
-version 0.0113
+version 1.0001
 
 =head1 SYNOPSIS
 
@@ -114,7 +114,7 @@ Marc Mims <marc@questright.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2016 by Marc Mims.
+This software is copyright (c) 2015-2018 by Marc Mims.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

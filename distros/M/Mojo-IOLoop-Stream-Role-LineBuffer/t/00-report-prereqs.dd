@@ -24,6 +24,7 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'File::Spec' => '0',
+                                   'IO::Pipely' => '0',
                                    'Module::Metadata' => '0',
                                    'Test::More' => '0.88'
                                  }

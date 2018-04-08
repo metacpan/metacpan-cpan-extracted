@@ -2,18 +2,26 @@
 abstract: 'iterators for objects that know the next element'
 author:
   - 'brian d foy <bdfoy@cpan.org>'
-build_requires: {}
+build_requires:
+  Test::Data: '0'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.132830'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Object-Iterate
 no_index:
   directory:
     - t
     - inc
+requires:
+  perl: '5.008'
 resources:
   repository: https://github.com/briandfoy/Object-Iterate
-version: 1.14
+version: '1.141'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,7 +4,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.009';
+our $VERSION = '2.012';
 
 use Encode::Locale qw();
 
@@ -34,7 +34,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.009
+Version 2.012
 
 =cut
 
@@ -80,11 +80,7 @@ are left-justified.
 
 See L<Term::TablePrint|Term::TablePrint/DESCRIPTION> for more details.
 
-=head1 USAGE
-
-The best way to find out how C<db-browser> works is calling C<db-browser>.
-
-=head3 Keys to move around
+=head1 NAVIGATION
 
 =over
 
@@ -107,68 +103,213 @@ With the option I<mouse> enabled it can be used the mouse with the left mouse ke
 
 To confirm a chosen menu item use the C<Return> key.
 
-In some sub-menus it is possible to select more then one item before C<Return> is pressed; in such sub-menus the list of
-items marked with the C<SpaceBar> key including the highlighted item are added to the chosen items when C<Return>
-is pressed. If a mouse mode is enabled, it can be used the right mouse key instead of the C<SpaceBar>.
+In some sub-menus it is possible to select more then one item before C<Return> is pressed (for example I<Choose Rows>
+and I<Choose Columns> from the input filter - see L<Insert Into>); in such sub-menus the list of items marked with the
+C<SpaceBar> key including the highlighted item are added to the chosen items when C<Return> is pressed. If a mouse mode
+is enabled, it can be used the right mouse key instead of the C<SpaceBar>. A C<Ctrl-SpaceBar> inverts the made choices
+ - so for example with no items chosen C<Ctrl-SpaceBar> chooses everything.
 
 To leave a "readline" without entering anything enter the C<eof> control character (C<Ctrl-D> for *nix). Pressing only
 the C<Enter> key means entering an empty string.
 
-=head3 SQL menu
+=head1 MENUS
 
-The SQL menu is the menu which opens after a table was selected.
+=head2 Plugin Menu
 
-To reset a SQL "sub-statement" (e.g C<WHERE>) re-enter into the respective menu and choose C<-OK->.
+Choosing a plugin leads to the I<Database Menu>.
 
-Changing the I<lock> mode (C<Lk0>,C<Lk1>) resets the entire SQL.
+If there is only one plugin, the menu is not shown but the plugin is chosen automatically.
 
-See option I<Expert> for the use of subqueries.
+=head2 Database Menu
 
-=head3 Delete, Update and Insert
+Choosing a database leads to the I<Schema Menu>.
 
-To get to the I<Delete>/I<Update>/I<Insert> menu, navigate to the SQL menu and then select the prompt line.
+If there is only one database, the menu is not shown but the database is chosen automatically.
+
+=head2 Schema Menu
+
+Choosing a schema leads to the I<Table Menu>.
+
+If there is not more than one schema, this menu is not shown but the schema is chosen automatically.
+
+=head2 Table Menu
+
+The menu entries of the table menu:
+
+=head3 Prompt Line
+
+Selecting the prompt line (the database name) opens a menu with this entries:
+
+=head4 CREATE Table
+
+Selecting I<CREATE Table> opens a sub-menu with this entries:
+
+=over
+
+=item Plain
+
+Create a table.
+
+=item Copy and Paste
+
+Reads from STDIN until the end of input. Then it creates a table and inserts the records of fields parsed from the input
+data. In I<Settings> one can configure to how the data is parsed.
+
+C<SQLite> only: when ask for the column names the first entry is the C<ai> column if the option L<Auto incr col name> is
+set. If C<ai> is set, an auto-increment column is added automatically. One can disable this per table by removing the
+value from the C<ai> slot.
+
+See also L<Insert Into>.
+
+=item From File
+
+Like I<Copy and Paste> with the difference that the data is read from a chosen file.
+
+=item Settings
+
+Selecting I<Settings> allows one to set the options described in option group L<Create and Insert> for the current
+database.
+
+=back
+
+=head4 Drop table
+
+Drop a table. The whole table is shown (if not empty) before the user confirms to drop the table.
+
+=head4 Attache DB
+
+I<Attache DB> is available only for C<SQLite> databases. I<Attach DB> can be used to attach databases to the current
+database.
+
+=head4 Detach DB
+
+This entry is available if a SQLite database has attached databases.
+
+=head4 SQ File
+
+This menu entry is available if at least one of the sub-queries options is enabled.
+
+Selecting this entry allow one to edit the file with the saved statements. It is possible to add, remove and
+edit statements. Adding a statement can be done by entering a string via C<readline> or by choosing a statement from the
+list of the temporary saved statements. (The last 20 statements from a printed table are saved in memory until the current
+database goes out of scope).
+
+=head4 Tables
+
+Choosing a table leads to the I<SQL Menu>.
+
+=head4 SQ
+
+Choosing this entry allows one to enter a sub-query instead of table name.
+
+This entry is available only if L<Subqueries as table> is enabled.
+
+=head4 Join
+
+Join tables.
+
+=head4 Union
+
+Combine the result from multiple SELECT statements.
+
+=head4 Settings
+
+See L<DB Settings>.
+
+=head2 SQL Menu
+
+In this menu it can be formed the SQL query.
+
+The SQL Menu has the following menu entries:
+
+=head3 Prompt Line
+
+Selecting this prompt line (Customize:) opens a menu with these entries:
+
+(C<DELETE>, C<UPDATE> or C<INSERT INTO> are not available with C<JOIN> and C<UNION> statements (except C<INSERT> with
+C<mysql> and C<JOIN>))
+
+=head4 Insert Into
 
 Three different ways to insert data into a table are available:
 
-=head4 plain
+=over
+
+=item Plain
 
 Insert data column by column.
 
-=head4 copy and paste
+=item Copy and Paste
 
 Multi line input: reads until the end of input. It is OS-depend how to indicate the end of input.
 
-In this mode leading and trailing whitespaces of the fields/columns are removed.
+=item From File
 
-=head4 from file
+Read the input from am file. Supported file formats: text files and file formats supported by L<Spreadsheet::Read>.
 
-Read the input from am file. Supported file formats: text-files and file formats supported by L<Spreadsheet::Read>.
+=back
 
-Setting the insert mode to I<from file> or I<copy and paste> enables different filters: it possible to choose the
-columns and rows which should be inserted.
+Setting the insert mode to I<From File> or to I<Copy and Paste> enables different filters: so it is possible to insert
+only selected columns or selected rows.
 
-C<DELETE>, C<UPDATE> or C<INSERT INTO> are not available with C<JOIN> and C<UNION> statements (except C<INSERT> with
-C<mysql> and C<JOIN>).
+SQLite: If the first column of a table is an auto-increment column, an C<INSERT INTO> statement is build without this
+first column.
 
-=head3 Create table, Drop table
+=head4 Update
 
-To reach the I<Create table>/I<Drop table> menu, select the prompt in the menu where the tables are selected.
+Update records.
 
-C<SQLite> only: if the C<ai> column is set, an auto-increment column is added automatically when creating the table. If
-the first column of a table is an auto-increment column, an C<INSERT INTO> statement is build without the first column.
+If the option L<Subqueries as SET value> is enabled, one can use the result of a sub-queries as the value of C<SET>.
 
-I<Drop table>: the table is shown (here I<Auto Limit> has no effect, the whole table is fetched) before the user
-confirms to drop the table.
+=head4 Delete
 
-For C<SQLite> databases there are additional entries are available in this menu: I<Attach DB> to attach databases to the
-current database and if the current database has attached databases also I<Detach DB>.
+Delete records.
 
-=head3 Scalar functions
+=head3 The Sub Statements
 
-The scalar functions can be reached in the main SQL menu and also in the C<DELETE> and C<UPDATE> SQL sub-menus by
-selecting the entry I<Func>.
+Use I<Print TABLE> the get the output from the formed statement.
 
-The available functions are:
+To reset a SQL "sub-statement" (e.g C<WHERE>) re-enter into the respective menu and choose C<-OK->.
+
+=over
+
+=item SELECT
+
+If the option I<Subqueries in SELECT> is enabled, it is possible to use a sub-query instead a column by selecting C<(Q>.
+
+=item AGGREGATE
+
+Chosen aggregate functions are added automatically to the SELECT columns.
+
+=item DISTINCT
+
+=item WHERE
+
+If the option I<Subqueries in WHERE/HAVING> is enabled, one can use sub-queries on the left side of an operator by
+selecting C<(Q> and on the right side of an operator by selecting C<=(Q>.
+
+=item GROUP BY
+
+Chosen C<GROUP BY> columns are added automatically to the SELECT columns.
+
+=item HAVING
+
+If the option I<Subqueries in WHERE/HAVING> is enabled, one can use sub-queries on the right side of an operator by
+selecting C<=(Q>.
+
+=item ORDER BY
+
+=item LIMIT
+
+=back
+
+=head3 Func
+
+Opens the scalar functions menu.
+
+To reset a modified a column select the column with the function a second time.
+
+The available scalar functions are:
 
 =head4 Epoch_to_DateTime
 
@@ -195,32 +336,34 @@ C<length> return the number of bytes the C<bytes> pragma is C<use>d.
 With C<SQLite> the function C<Char_Length> is a user-defined function which uses the Perl builtin C<length> to get the
 number of characters.
 
-To reset a modified a column select the column with the function a second time.
+=head3 Lk1
 
-=head2 OPTIONS
+Changing the I<lock> mode (C<Lk0>,C<Lk1>) resets the entire SQL.
+
+=head1 OPTIONS
 
 The options menu is called with C<db-browser -h>.
 
-=head3 HELP
+=head2 HELP
 
 Show this Info.
 
-=head3 Path
+=head2 Path
 
 Shows the version and the path of the running C<db-browser> and the path of the application directory.
 
-=head3 Database
+=head2 DB
 
-=head4 DB Plugins
+=head3 DB Plugins
 
 Choose the required database plugins.
 
-=head4 DB Settings
+=head3 DB Settings
 
 These driver specific I<DB Settings> are used as the default database settings.
 
-There is also in each database sub-menu the menu entry I<Database settings>. If these database specific parameter are not
-set, the global (to the database plugin) I<DB Settings> are use instead.
+There is also in each L<Tables Menu> the entry I<Settings> to make database specific settings. If no database
+specific settings are set, these global (to the database plugin) I<DB Settings> are used.
 
 User defined database plugins: it depends on the plugin which items are offered to set in each option and whether the
 selections made by the user are considered.
@@ -233,8 +376,8 @@ Set which fields are required to connect to a database.
 
 =item ENV Variables
 
-The user can choose environment variables form a list of environment variables that should be used to connect to the
-database.
+The user can choose environment variables form a list of environment variables that should be used - if set - to connect
+to the database.
 
 =item Login Data
 
@@ -245,34 +388,21 @@ saved).
 
 For the meaning of these driver specific attributes check the appropriate driver documentation.
 
-=item SQLite directories
-
-This is a C<SQLite>-only option.
-
-Sets the directories where C<db-browser> searches for C<SQLite> databases. Defaults to the home directory.
-
-To move around in the directory tree select a directory and press C<Return> to enter in the selected directory or choose
-C< .. > to move upwards. To add the current working-directory to the list of chosen directories use the C< . > (single
-dot) menu entry. Select C< = > to confirm the made choices. The C< < > menu entry resets the list of chosen directories if
-any. If the list of chosen directories is empty, C< < > goes back without changing anything.
-
-This setting can not be overwritten in a single database.
-
 =item Reset DB
 
 Reset database specific parameter to the global I<DB Settings>.
 
 =back
 
-=head3 Menu
+=head2 Menu
 
 Set the behavior of the interactive menus.
 
-=head4 Menu Memory
+=head3 Menu Memory
 
 If enabled: saves the menu position while entering in a sub menu.
 
-=head4 Table
+=head3 Table
 
 Expand Rows:
 
@@ -292,17 +422,17 @@ do not expand the first row if the cursor auto-jumped to the first row.
 
 =back
 
-=head4 Mouse Mode
+=head3 Mouse Mode
 
 Set the I<Mouse Mode> (see L<Term::Choose/mouse>).
 
-=head3 SQL
+=head2 SQL
 
-=head4 Metadata
+=head3 Metadata
 
 If I<Metadata> is enabled, system tables/schemas/databases are appended to the respective list.
 
-=head4 Operators
+=head3 Operators
 
 Choose the required operators.
 
@@ -310,7 +440,7 @@ There are two regexp entries: C<REGEXP> matches case sensitive while C<REGEXP_i>
 
 With C<MySQL> the sensitive match is achieved by enabling the C<BINARY> operator.
 
-=head4 Lock
+=head3 Lock
 
 Set the default I<lock> value:
 
@@ -318,28 +448,52 @@ Set the default I<lock> value:
 
 - C<Lk1>: Reset the SQL-statement only when a table is selected.
 
-=head4 Expert (experimental)
+
+=head3 Auto Limit
+
+Sets C<LIMIT> automatically to I<Auto Limit>. This can be overwritten by setting a SQL C<LIMIT> statement manually.
+Fetched table rows are kept in memory.
+
+To disable the automatic limit set I<Auto Limit> to C<0>.
+
+=head3 Subqueries
 
 =over
 
-=item I<Subqueries>
+=item I<Subqueries in SELECT>
 
-If this option is enabled, the last 20 queries are saved temporary. Saved queries can than be chosen as subqueries by
-selecting C<(Q> (C<SQ> for subquery as table).
-A query is saved when the table is printed. If a new database is selected the query-history is removed.
+Choose C<(Q> to add a query as a SELECT column.
 
-=item I<Alias for complex columns>
+=item I<Subqueries in WHERE/HAVING>
 
-If enable, it is asked for an alias for columns with a function, for subqueries, for joined tables and for unions. If
-entered nothing, no alias is added except for joined tables and unions which get a default alias.
+Choose C<(Q> to use a query instead of a column in a C<WHERE> clause.
 
-=item I<Parentheses>
+Choose C<=(Q> to use a query as a value in a C<WHERE> or C<HAVING> clause.
 
-Enable parentheses in C<WHERE> and/or C<HAVING> clauses.
+=item I<Subqueries as SET value>
+
+Choose C<=(Q> to use a query as a C<SET> value in an C<UPDATE>.
+
+=item I<Subqueries as table>
+
+Choose C<SQ> in the I<Tables Menu> to use a query instead of a table.
+
+If at least one of the sub-query options is enabled, the last 20 queries are saved temporary.
+
+Available sub-queries: the statements saved in the L<SQ File> and the temporarily saved statements.
 
 =back
 
-=head4 Identifiers
+=head3 I<Alias for complex columns>
+
+If enable, it is asked for an alias for columns with a function, for sub-queries, for joined tables and for unions. If
+entered nothing, no alias is added except for joined tables and unions which get a default alias.
+
+=head3 I<Parentheses>
+
+Enable parentheses in C<WHERE> and/or C<HAVING> clauses.
+
+=head3 Identifiers
 
 - I<Qualified table names>: if set to C<YES> qualified table names are used in SQL statements.
 
@@ -351,68 +505,65 @@ C<SQLite>:
 
 - if the current database has attached databases, the use of qualified table names is enabled automatically.
 
-=head4 Write access
+=head3 Write access
 
 Enable write access - use with care.
 
-=head3 Output
+=over
 
-=head4 Max Rows
+=item Insert records
 
-Sets C<LIMIT> automatically to I<Max Rows>. This can be overwritten by setting a SQL C<LIMIT> statement manually. Fetched
-table rows are kept in memory.
+=item Update records
 
-To disable the automatic limit set I<Max Rows> to C<0>.
+=item Delete records
 
-=head4 Colwidth
+=item Create table
+
+=item Drop table
+
+=back
+
+=head2 Output
+
+=head3 Colwidth
 
 Columns with a width below or equal I<Colwidth> are only trimmed if it is still required to lower the row width despite
 all columns wider than I<Colwidth> have been trimmed to I<Colwidth>.
 
-=head4 ProgressBar
+=head3 ProgressBar
 
 Set the progress bar threshold. If the number of fields (rows x columns) is higher than the threshold, a progress bar is
 shown while preparing the data for the output.
 
-=head4 Tabwidth
+=head3 Tabwidth
 
 Set the number of spaces between columns.
 
-=head4 Grid
+=head3 Grid
 
 Separate the columns from each other and the header from the body with lines.
 
-=head4 Keep Header
+=head3 Keep Header
 
 Show the table header on top of each page.
 
-=head4 Undef
+=head3 Undef
 
 Set the string that will be shown on the screen instead of an undefined field.
 
-On C<MSWin32> only single-byte character sets are supported when entering the setting I<Undef>, I<user>, I<host> or I<port>
-with the C<db-browser>s readline. But it is possible to edit the entry in configuration files directly after the entry
-was created with this options menu.
+On C<MSWin32> only single-byte character sets are supported when entering the setting I<Undef>, I<user>, I<host> or
+I<port> with the C<db-browser>s readline. But it is possible to edit the entry in configuration files directly after the
+entry was created with this options menu.
 
-=head4 Binary binary
+=head3 Binary binary
 
 Setting the I<binary_filter> to C<1> means: print "BNRY" instead of arbitrary binary data. If data matches the repexp
 C</[\x00-\x08\x0B-\x0C\x0E-\x1F]/>, it is considered arbitrary binary data. Printing arbitrary binary data could break
 the output.
 
-=head3 Insert
+=head2 Create and Insert
 
-These I<Insert> settings can also be set in the C<INSERT INTO> sub-statement menu.
-
-=head4 File History
-
-Set how many input file names should be saved. A value of C<0> disables the file history.
-
-=head4 File encoding
-
-How to decode text files.
-
-=head4 Parse mode
+=head3 Parse Tool
 
 Set how to parse text files or the "multi row" input. Files where C<-T $filename> returns true are considered text
 files.
@@ -490,11 +641,11 @@ Auto-detects the separation character for csv-files
 
 =back
 
-=head4 Config Text::CSV
+=head3 Text::CSV config
 
 Set different L<Text::CSV> options.
 
-=head4 Config 'split'
+=head3 'split' config
 
 =over
 
@@ -524,25 +675,26 @@ Expects a regex pattern. If set removes trailing characters matching regexp from
 
 =back
 
-=head4 Create table
+=head3 File encoding
 
-=over
+How to decode text files.
 
-=item
+=head3 File History
 
-Default data type
+Set how many input file names should be saved. A value of C<0> disables the file history.
+
+=head3 Default data type
 
 The default data type of the columns.
 
-=item
+=head3 Auto incr col name
 
-Auto-increment column name
+SQLite only:
 
-SQLite only.
+Set the auto-increment column name. If this option is set, a auto-increment column is added automatically to created
+tables.
 
-=back
-
-=head2 CONFIGURATION FILES
+=head1 CONFIGURATION FILES
 
 To find out the location of the configuration files call C<db-browser -h> and choose I<Path>. The data is saved in JSON
 format.

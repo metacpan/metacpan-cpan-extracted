@@ -27,3 +27,64 @@ sub slurp {
    local $/;
    return <$fh>;
 }
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+generate-standalone - Generates a standalone version of tptree
+
+=head1 VERSION
+
+This document describes generate-standalone version 1.52.
+
+=head1 SYNOPSIS
+
+   sh generate-standalone
+
+=head1 DESCRIPTION
+
+tptree is a feeble attempt to have ttree functionalities in one companion
+script. It relies on Template::Perlish being available somewhere.
+
+This script generates a fully self-contained version of
+tptree by just calling the generate-standalone script.
+
+=head1 DEPENDENCIES
+
+None, apart a fairly recent version of Perl.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests through http://rt.cpan.org/
+
+=head1 AUTHOR
+
+Flavio Poletti C<polettix@cpan.org>
+
+Manified by Berrak <bkronmailbox-git@yahoo.se>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2008-2015 by Flavio Poletti C<polettix@cpan.org>.
+
+Copyright (c) 2018 by Berrak <bkronmailbox-git@yahoo.se>.
+
+This module is free software.  You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=head1 SEE ALSO
+
+Yet Another Templating system for Perl
+L<Template::Perlish>.
+
+=cut
+

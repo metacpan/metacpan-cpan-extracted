@@ -1,9 +1,9 @@
 use Chart::Plotly;
 use Chart::Plotly::Plot;
 use Chart::Plotly::Trace::Scattermapbox;
-use Chart::Plotly::Trace::Attribute::Marker;
+use Chart::Plotly::Trace::Scattermapbox::Marker;
 my $mapbox_access_token =
-  'pk.eyJ1IjoiY2hlbHNlYXBsb3RseSIsImEiOiJjaXFqeXVzdDkwMHFrZnRtOGtlMGtwcGs4In0.SLidkdBMEap9POJGIe1eGw';
+  'Insert your access token here';
 my $scattermapbox = Chart::Plotly::Trace::Scattermapbox->new(
                 mode => 'markers',
                 text => [ "The coffee bar",
@@ -18,7 +18,7 @@ my $scattermapbox = Chart::Plotly::Trace::Scattermapbox->new(
                 lat => [ '38.91427', '38.91538', '38.91458', '38.92239', '38.93222', '38.90842', '38.91931', '38.93260',
                          '38.91368', '38.88516', '38.921894', '38.93206', '38.91275'
                 ],
-                marker => Chart::Plotly::Trace::Attribute::Marker->new( size => 9 ),
+                marker => Chart::Plotly::Trace::Scattermapbox::Marker->new( size => 9 ),
 );
 my $plot = Chart::Plotly::Plot->new( traces => [$scattermapbox],
                                      layout => { autosize  => 'True',

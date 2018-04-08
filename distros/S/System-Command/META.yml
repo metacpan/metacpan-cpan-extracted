@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,8 +36,9 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=System-Command
   repository: http://github.com/book/System-Command.git
-version: '1.118'
+version: '1.119'
 x_contributors:
+  - 'Ed J <etj@cpan.org>'
   - 'viviparous <viviparous@github.com>'
   - 'Rob Kinyon <rkinyon@cpan.org>'
   - 'Tim Bunce <timb@cpan.org>'
@@ -49,3 +50,4 @@ x_contributors:
   - 'Olivier Mengué <dolmen@cpan.org>'
   - 'mokko <mauricemengel@gmail.com>'
   - 'Alessandro Ghedini <al3xbio@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

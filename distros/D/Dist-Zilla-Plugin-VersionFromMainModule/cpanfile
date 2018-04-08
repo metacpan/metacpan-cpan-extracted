@@ -1,5 +1,5 @@
+requires "Dist::Zilla::Role::ModuleMetadata" => "0";
 requires "Dist::Zilla::Role::VersionProvider" => "0";
-requires "Module::Metadata" => "1.000005";
 requires "Moose" => "0";
 requires "namespace::autoclean" => "0";
 requires "strict" => "0";
@@ -8,7 +8,12 @@ requires "warnings" => "0";
 on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::Spec" => "0";
+  requires "Path::Tiny" => "0";
+  requires "Test::DZil" => "0";
+  requires "Test::Deep" => "0";
+  requires "Test::Fatal" => "0";
   requires "Test::More" => "0.96";
+  requires "if" => "0";
 };
 
 on 'test' => sub {
@@ -43,6 +48,5 @@ on 'develop' => sub {
   requires "Test::Spelling" => "0.12";
   requires "Test::Vars" => "0.009";
   requires "Test::Version" => "2.05";
-  requires "blib" => "1.01";
   requires "perl" => "5.006";
 };

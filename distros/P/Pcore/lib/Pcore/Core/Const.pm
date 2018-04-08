@@ -54,6 +54,8 @@ const our $MSWIN => $^O =~ /MSWin/sm ? 1 : 0;
 const our $CRLF  => qq[\x0D\x0A];               ## no critic qw[ValuesAndExpressions::ProhibitEscapedCharacters]
 const our $LF    => qq[\x0A];                   ## no critic qw[ValuesAndExpressions::ProhibitEscapedCharacters]
 
+const our $DIST_CFG_TYPE => 'yaml';
+
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
 ##

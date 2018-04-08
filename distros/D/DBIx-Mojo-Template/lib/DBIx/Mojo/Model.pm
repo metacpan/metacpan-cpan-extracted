@@ -50,6 +50,7 @@ sub new {
 sub sth {
   my $self = shift;
   my $name = shift;
+  my $attr = ref $_[0] eq 'HASH' ? shift : {};
   my $class = ref $self;
   my $dict = $self->dict;
   my $st = $dict->{$name}
@@ -59,14 +60,14 @@ sub sth {
   if (my $param_cached = $st->param && $st->param->{cached} || $st->param->{cache}) {
     $self->debug
       && say STDERR sprintf("[DEBUG $PKG sth] statement [%s]::[%s] is a %s", $class, $name, $self->dbi_cache_st ? 'DBI prepare_cached' : 'self model cached');
-    return $self->dbh->prepare_cached($sql)
+    return $self->dbh->prepare_cached($sql, $attr, $attr->{Async} || $attr->{pg_async} ? 3 : ())  # attr Acync for Mojo::Pg::Che
       if $self->dbi_cache_st;
-    return $st->sth || $st->sth($self->dbh->prepare($sql))->sth;
+    return $st->sth || $st->sth($self->dbh->prepare($sql, $attr))->sth;
   }
   $self->debug
     && say STDERR sprintf("[DEBUG $PKG sth] statement [%s]::[%s] is a dbh prepare", $class, $name);
   #~ local $dbh->{TraceLevel} = "3|DBD";
-  return $self->dbh->prepare($sql);
+  return $self->dbh->prepare($sql, $attr);
 }
 
 =pod

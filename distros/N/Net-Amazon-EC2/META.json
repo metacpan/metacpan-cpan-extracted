@@ -59,7 +59,7 @@
          "web" : "https://github.com/mrallen1/net-amazon-ec2"
       }
    },
-   "version" : "0.35",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "0.36",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

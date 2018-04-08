@@ -9,7 +9,7 @@
 %= $a->{helpers};
 
 # Routes go after your already defined routes
-
+# See below if you are using Mojolicious::Plugin::RoutesConfig.
 % for my $r (@{$a->{routes}}) {
     % for my $via (@{$r->{via}}) {
   $r-><%= lc $via %>('<%= $r->{route}
@@ -17,6 +17,13 @@
     % }
 % }
 
+[
+% for my $r (@{$a->{routes}}) {
+    % for my $via (@{$r->{via}}) {
+  {<%= lc $via %> => '<%= $r->{route}%>', to => '<%= $r->{to} %>', name =>'<%= $r->{name} %>'},
+    % }
+% }
+]
 # To use the OpenAPI functionality, you have to add the following code to
 # your 'start' method.
 #

@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2018 -- leonerd@leonerd.org.uk
 
 package IO::Async::Loop::Select;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 use constant API_VERSION => '0.49';
 
 use base qw( IO::Async::Loop );
@@ -205,6 +205,12 @@ sub post_select
    $self->_manage_queues;
 
    alarm( 0 ) if WATCHDOG_ENABLE;
+}
+
+sub is_running
+{
+   my $self = shift;
+   return $self->{running};
 }
 
 =head2 loop_once

@@ -213,15 +213,17 @@ current entry.
 
 package App::WRT;
 
-use version; our $VERSION = version->declare("v4.2.2");
+use version; our $VERSION = version->declare("v4.3.0");
 
 use strict;
 use warnings;
 no  warnings 'uninitialized';
+use 5.10.0;
 
 use base 'App::WRT::MethodSpit';
 
 use Cwd;
+use File::Find;
 use File::Spec;
 use HTML::Entities;
 use JSON;
@@ -267,6 +269,7 @@ Here's a verbatim copy of C<%default>, with some commentary about values.
       stylesheet_url => undef,       # path to a CSS file (used in template)
       favicon_url    => undef,       # path to a favicon (used in template)
       feed_alias     => 'feed',      # what entry path should correspond to feed?
+      feed_length    => 30,          # how many entries should there be in the feed?
       author         => undef,       # author name (used in template, feed)
       description    => undef,       # site description (used in template)
       content        => undef,       # place to stash content for templates
@@ -307,6 +310,7 @@ my %default = (
   stylesheet_url => undef,       # path to a CSS file (used in template)
   favicon_url    => undef,       # path to a favicon (used in template)
   feed_alias     => 'feed',      # what entry path should correspond to feed?
+  feed_length    => 30,          # how many entries should there be in the feed?
   author         => undef,       # author name (used in template, feed)
   description    => undef,       # site description (used in template)
   content        => undef,       # place to stash content for templates
@@ -473,7 +477,7 @@ sub display {
   $self->content(undef);
   my $output;
   for my $option (@options) {
-    return $self->feed_print() if $option eq $self->feed_alias;
+    return $self->feed_print_latest() if $option eq $self->feed_alias;
     $output .= $self->handle($option);
   }
   $self->content($output); # ${content} may now be used in the template below...
@@ -613,6 +617,63 @@ sub fulltext {
   return @individual_entries;
 }
 
+=item get_all_source_files()
+
+Returns a list of all source files for the current entry archive.
+
+This was originally in App::WRT::Renderer, so there may be some pitfalls here.
+
+=cut
+
+sub get_all_source_files {
+  my ($self) = shift;
+  my $entry_dir = $self->entry_dir;
+
+  state @source_files;
+
+  return @source_files if @source_files;
+
+  find(
+    sub {
+      # We skip index files, because they'll be rendered from the dir path:
+      return if /index$/;
+      if ($File::Find::name =~ m{^ \Q$entry_dir\E / (.*) $}x) {
+        my $target = $1;
+        push @source_files, $target;
+      }
+    },
+    $entry_dir
+  );
+  return @source_files;
+}
+
+=item get_all_day_entries()
+
+Returns a list of all entries which are a specific day.
+
+=cut
+
+sub get_all_day_entries {
+  my ($self) = @_;
+  # https://en.wikipedia.org/wiki/Schwartzian_transform
+  return map  { $_->[0] }
+         sort { $a->[1] cmp $b->[1] }
+         map  { [$_, sortable_date_from_entry($_)] }
+         grep m{^ \d+/\d+/\d+ $}x, $self->get_all_source_files();
+}
+
+=item get_all_day_entries()
+
+Returns an easily sortable date of the form nnnn-nn-nn for a given entry.
+
+=cut
+
+sub sortable_date_from_entry {
+  my ($entry) = @_;
+  my ($year, $month, $day) = split '/', $entry;
+  return sprintf("%d-%2d-%2d", $year, $month, $day);
+}
+
 =item link_bar(@extra_links)
 
 Returns a little context-sensitive navigation bar.
@@ -661,46 +722,46 @@ Very naive; there has got to be a smarter way.
 
 =cut
 
-{ my %cache; # cheap memoization
+sub month_before {
+  my $self = shift;
+  my ($this_month) = @_;
 
-  sub month_before {
-    my $self = shift;
-    my ($this_month) = @_;
+  state %cache;
 
-    if (exists $cache{$this_month}) {
-      return $cache{$this_month};
+  if (exists $cache{$this_month}) {
+    return $cache{$this_month};
+  }
+
+  my ($year, $month) = $this_month =~
+    m/^            # start of string
+      ([0-9]{4})   # 4 digit year
+      \/           #
+      ([0-9]{1,2}) # 2 digit month
+     /x;
+
+  if ($month == 1) {
+    $month = 12;
+    $year--;
+  } else {
+    $month--;
+  }
+
+  until (-e $self->local_path("$year/$month")) {
+
+    if (! -d $self->local_path($year) ) {
+      # Give up easily, wrapping to newest month.
+      return $self->recent_month();
     }
 
-    my ($year, $month) = $this_month =~
-      m/^            # start of string
-        ([0-9]{4})   # 4 digit year
-        \/           #
-        ([0-9]{1,2}) # 2 digit month
-       /x;
-
+    # handle January:
     if ($month == 1) {
       $month = 12; $year--;
-    } else {
-      $month--;
+      next;
     }
-
-    until (-e $self->local_path("$year/$month")) {
-
-      if (! -d $self->local_path($year) ) {
-        # Give up easily, wrapping to newest month.
-        return $self->recent_month;
-      }
-
-      # handle January:
-      if ($month == 1) {
-        $month = 12; $year--;
-        next;
-      }
-      $month--;
-    }
-
-    return $cache{$this_month} = "$year/$month";
+    $month--;
   }
+
+  return $cache{$this_month} = "$year/$month";
 }
 
 =item year($year)
@@ -1147,23 +1208,41 @@ sub local_path {
   return $_[0]->entry_dir . '/' . $_[1];
 }
 
-=item feed_print($month)
+=item feed_print_latest()
 
-Return an Atom feed of entries for a month. Defaults to the most
-recent month in the archive.
+Return an Atom feed for the most recent entries.
 
-Called from handle(), requires XML::Atom::SimpleFeed.
+Called from display().
+
+=cut
+
+sub feed_print_latest {
+  my ($self) = @_;
+
+  # Get most recent feed_length entries:
+  my @feed_entries;
+  for my $feed_entry (reverse $self->get_all_day_entries()) {
+    last if scalar(@feed_entries) == $self->feed_length;
+    push @feed_entries, $feed_entry;
+  }
+  return $self->feed_print(@feed_entries);
+}
+
+=item feed_print(@entries)
+
+Return an Atom feed for the given list of entries.
+
+Requires XML::Atom::SimpleFeed.
 
 =cut
 
 sub feed_print {
   my $self = shift;
-  my ($month) = @_;
-  $month ||= $self->recent_month();
+  my (@entries) = @_;
 
   my $feed_url = $self->url_root . $self->feed_alias;
 
-  my ($month_file, $month_url) = $self->root_locations($month);
+  my ($first_entry_file, $first_entry_url) = $self->root_locations($entries[0]);
 
   my $feed = XML::Atom::SimpleFeed->new(
     title     => $self->title_prefix . '::' . $self->title,
@@ -1173,22 +1252,13 @@ sub feed_print {
     author    => $self->author,
     id        => $self->url_root,
     generator => 'App::WRT.pm / XML::Atom::SimpleFeed',
-    updated   => App::WRT::Date::iso_date(App::WRT::Date::get_mtime($month_file)),
+    updated   => App::WRT::Date::iso_date(App::WRT::Date::get_mtime($first_entry_file)),
   );
 
-  my @entry_files;
-
-  if (-d $month_file) {
-    @entry_files = dir_list($month_file, 'high_to_low', qr/^[0-9]{1,2}$/);
-  } else {
-    return 0;
-  }
-
-  foreach my $entry_file (@entry_files) {
-    my $entry     = "$month/$entry_file";
-    my $entry_url = $month_url . "/$entry_file";
-    my $title     = $entry;
-    my $content   = $self->entry($entry) . "\n" . $self->datestamp($entry);
+  foreach my $entry (@entries) {
+    my $title   = $entry;
+    my $content = $self->entry($entry) . "\n" . $self->datestamp($entry);
+    my ($entry_file, $entry_url) = $self->root_locations($entry);
 
     # try to pull out a header:
     my ($extracted_title) = $content =~ m{<h1>(.*?)</h1>}s;
@@ -1206,7 +1276,7 @@ sub feed_print {
       link      => $entry_url,
       id        => $entry_url,
       content   => $content,
-      updated   => App::WRT::Date::iso_date(App::WRT::Date::get_mtime("$month_file/$entry_file")),
+      updated   => App::WRT::Date::iso_date(App::WRT::Date::get_mtime($entry_file)),
     );
   }
 

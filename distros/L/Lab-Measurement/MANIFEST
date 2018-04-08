@@ -7,6 +7,7 @@ HACKING
 MANIFEST
 MANIFEST.SKIP
 META.json
+META.yml
 Makefile.PL
 Measurement/t/Instrument/load_moose_instrument.t
 README
@@ -180,6 +181,7 @@ lib/Lab/Moose/Instrument/Common.pm
 lib/Lab/Moose/Instrument/DummySource.pm
 lib/Lab/Moose/Instrument/HP34410A.pm
 lib/Lab/Moose/Instrument/HP3458A.pm
+lib/Lab/Moose/Instrument/HP8596E.pm
 lib/Lab/Moose/Instrument/Keysight34470A.pm
 lib/Lab/Moose/Instrument/LinearStepSweep.pm
 lib/Lab/Moose/Instrument/Log.pm
@@ -188,6 +190,7 @@ lib/Lab/Moose/Instrument/RS_FSV.pm
 lib/Lab/Moose/Instrument/RS_SMB.pm
 lib/Lab/Moose/Instrument/RS_ZVA.pm
 lib/Lab/Moose/Instrument/RS_ZVM.pm
+lib/Lab/Moose/Instrument/SCPI/Display/Window.pm
 lib/Lab/Moose/Instrument/SCPI/Format.pm
 lib/Lab/Moose/Instrument/SCPI/Initiate.pm
 lib/Lab/Moose/Instrument/SCPI/Instrument.pm
@@ -203,6 +206,7 @@ lib/Lab/Moose/Instrument/SCPI/Source/Function.pm
 lib/Lab/Moose/Instrument/SCPI/Source/Level.pm
 lib/Lab/Moose/Instrument/SCPI/Source/Power.pm
 lib/Lab/Moose/Instrument/SCPI/Source/Range.pm
+lib/Lab/Moose/Instrument/SCPI/Unit.pm
 lib/Lab/Moose/Instrument/SCPIBlock.pm
 lib/Lab/Moose/Instrument/SR830.pm
 lib/Lab/Moose/Instrument/VNASweep.pm

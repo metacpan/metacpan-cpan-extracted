@@ -1,0 +1,103 @@
+#!/usr/bin/perl
+
+use 5.001 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts 'alrqw~@' , \my %o ;  
+use Encode qw[ decode ] ; 
+use Encode::JP ; 
+use Term::ANSIColor qw[ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use FindBin qw [ $Script ] ;
+
+$/ = "\r\n" if $o{r} ;
+
+my $line_count = 0 ;  # 行数を格納:
+my @files_init = @ARGV ; 
+my %files_read ;  # 
+
+
+while ( <> )  {
+
+    print STDERR RED "Waiting input from STDIN.. ($Script)  \n" if $ARGV eq '-' and -t ; # -q で対処するかどうかは、要考慮。
+    $line_count ++ ; 
+    $files_read{ $ARGV } = 1 ; 
+
+    $_ = decode ( 'cp932' , $_ ) if $o{w} ; 
+
+    if ( eof ) { 
+        my $end = $/ ;
+        my $eof_flag = m/$end$/ ? 0 : -1 ; 
+        next if $o{'@'} && ! $eof_flag ; 
+        my @out = ( $eof_flag ) ; 
+        push @out , $line_count if $o{l} ; 
+        splice @out, ( $o{'~'} ? 0 : scalar @out ) , 0 , $ARGV ;
+        print join ( "\t" , @out ) , "\n" ; 
+        $line_count = 0 ;
+
+        if ( $o{a} && $eof_flag && $ARGV ne '-' ) { 
+          if ( open my $fh , '>>' , $ARGV ) {
+            print {$fh} "\n" ;
+            print STDERR YELLOW  qq[$ARGV : Added \"\\n\" at the end.\n] ;
+            close $fh ;  
+          }
+          else { 
+            print STDERR RED  qq[$ARGV : Failed to add \"\\n\".\n] 
+          }
+        }
+    }
+}
+
+my @files_notsv = grep { ! $files_read{ $_ } } @files_init ; 
+exit 0 unless @files_notsv ; 
+
+exit 0 if $o{q} ;
+print STDERR BRIGHT_CYAN "Files not checked the end of lines:\n" ;
+for ( @files_notsv) { 
+  print STDERR CYAN $_  ; 
+  print STDERR CYAN "\tFile has zero size." if -z ; 
+  print STDERR CYAN "\tFile is a directory." if -d ; 
+  print STDERR CYAN "\tNot readable by real uid/gid." unless -R ; 
+  print STDERR CYAN "\n" ;
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+
+=encoding utf8
+
+=head1
+ $0 
+
+  標準入力、または、与えられたファイル名のリストのそれぞれについて、
+  改行文字で終わっているかどうかを確認する。ただし空ファイルについては
+  調べない。
+
+  改行文字で終わっている場合の出力値は、0。
+  そうでない場合の出力値は -1 。
+  
+ オプション : 
+
+   -~  : ファイル名の表示を各行の末尾では無くて、先頭にする。
+   -@  : 改行で終わっていないファイルについてのみ、出力する。
+
+   -a  : 改行で終わっていないファイルについては、改行文字を追加するようにファイルを書き換える。０バイトファイルは除く。
+   -l  : 行数も数える
+   -q  : 調査が出来なかったファイルについての情報を、出力しない。
+
+   -r  : 入力の改行コードを "\r\n" と見なす。
+   -w  : 各ファイル内の文字コードを CP932 (シフトJISのマイクロソフトによる拡張)と見なす。 <-- 意味があるのか??
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+ 
+=cut

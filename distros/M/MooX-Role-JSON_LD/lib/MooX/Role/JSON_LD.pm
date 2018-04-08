@@ -135,14 +135,14 @@ That configuration will give us the following output:
 
 package MooX::Role::JSON_LD;
 
-use feature 'say';
+use 5.6.0;
 
 use Moo::Role;
 use JSON;
 use Carp;
 use Types::Standard 'InstanceOf';
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.5';
 
 requires qw[json_ld_type json_ld_fields];
 

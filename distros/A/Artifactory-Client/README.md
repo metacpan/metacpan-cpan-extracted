@@ -6,7 +6,7 @@ Artifactory::Client - Perl client for Artifactory REST API
 
 # VERSION
 
-Version 1.5.2
+Version 1.5.3
 
 # SYNOPSIS
 
@@ -794,6 +794,21 @@ Returned default Export Settings JSON
 ## export\_system( exportPath => '/export/path', includeMetadata => 'true' etc )
 
 Export full system to a server local directory
+
+## ignore\_xray\_alert( $path )
+
+Sets an alert to be ignored until next time the repository hosting the artifact about which the alert was issued, is scanned. Note that this endpoint does not
+affect artifacts that are blocked because they have not been scanned at all.
+
+## allow\_download\_of\_blocked\_artifacts( 'true'|'false' )
+
+When a repository is configured to block downloads of artifacts, you may override that configuration (and allow download of blocked artifacts). Note that this
+setting cannot override the blocking of unscanned artifacts.
+
+## allow\_download\_when\_xray\_is\_unavailable( 'true'|'false' )
+
+You may configure Artifactory to block downloads of artifacts when the connected Xray instance is unavailable. This endpoint lets you override that
+configuration (and allow download of artifacts).
 
 ## create\_bundle( %hash of data structure )
 

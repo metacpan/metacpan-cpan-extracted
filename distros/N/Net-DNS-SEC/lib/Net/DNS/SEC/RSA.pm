@@ -1,9 +1,9 @@
 package Net::DNS::SEC::RSA;
 
 #
-# $Id: RSA.pm 1626 2018-01-31 09:48:15Z willem $
+# $Id: RSA.pm 1660 2018-04-03 14:12:42Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1626 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1660 $)[1];
 
 
 =head1 NAME
@@ -44,18 +44,17 @@ public key resource record.
 use strict;
 use integer;
 use warnings;
-use Carp;
 use Digest::SHA;
 use MIME::Base64;
 
 eval { require Digest::MD5 };		## deprecated ##
 
 my %RSA = (
-	1  => ['MD5',	 'Digest::MD5'],
-	5  => ['SHA1',	 'Digest::SHA'],
-	7  => ['SHA1',	 'Digest::SHA'],
-	8  => ['SHA256', 'Digest::SHA', 256],
-	10 => ['SHA512', 'Digest::SHA', 512],
+	1  => [4,	'Digest::MD5'],
+	5  => [64,	'Digest::SHA'],
+	7  => [64,	'Digest::SHA'],
+	8  => [672,	'Digest::SHA', 256],
+	10 => [674,	'Digest::SHA', 512],
 	);
 
 
@@ -63,12 +62,11 @@ sub sign {
 	my ( $class, $sigdata, $private ) = @_;
 
 	my $algorithm = $private->algorithm;			# digest sigdata
-	my ( $mnemonic, $object, @param ) = @{$RSA{$algorithm} || []};
+	my ( $nid, $object, @param ) = @{$RSA{$algorithm} || []};
 	die 'public key not RSA' unless $object;
 	my $hash = $object->new(@param);
 	$hash->add($sigdata);
 
-	my $nid = Net::DNS::SEC::libcrypto::get_NID($mnemonic);
 	my $rsa = Net::DNS::SEC::libcrypto::RSA_new();
 
 	my ( $n, $e, $d, $p, $q ) = map decode_base64( $private->$_ ),
@@ -88,14 +86,13 @@ sub verify {
 	my ( $class, $sigdata, $keyrr, $sigbin ) = @_;
 
 	my $algorithm = $keyrr->algorithm;			# digest sigdata
-	my ( $mnemonic, $object, @param ) = @{$RSA{$algorithm} || []};
+	my ( $nid, $object, @param ) = @{$RSA{$algorithm} || []};
 	die 'public key not RSA' unless $object;
 	my $hash = $object->new(@param);
 	$hash->add($sigdata);
 
 	return unless $sigbin;
 
-	my $nid = Net::DNS::SEC::libcrypto::get_NID($mnemonic);
 	my $rsa = Net::DNS::SEC::libcrypto::RSA_new();
 
 	my $keybin = $keyrr->keybin;				# public key

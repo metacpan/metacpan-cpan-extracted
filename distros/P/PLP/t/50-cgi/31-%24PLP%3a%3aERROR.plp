@@ -1,0 +1,1 @@
+<: $PLP::ERROR = sub {print "Oh no: $_[0]"} :> <(missinginclude)>.

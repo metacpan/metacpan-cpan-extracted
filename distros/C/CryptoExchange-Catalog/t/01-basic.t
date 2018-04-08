@@ -12,7 +12,8 @@ my $cat = CryptoExchange::Catalog->new;
 
 subtest "by_name" => sub {
     is_deeply($cat->by_name("BX Thailand"), {name=>"BX Thailand", safename=>"bx-thailand"});
-    dies_ok { $cat->by_name("bx thailand") };
+    is_deeply($cat->by_name("bx thailand"), {name=>"BX Thailand", safename=>"bx-thailand"});
+    dies_ok { $cat->by_name("foo") };
 };
 
 subtest "by_safename" => sub {

@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use IO::Stream::const;
 use IO::Stream::EV;
@@ -119,7 +119,7 @@ IO::Stream::Proxy::SOCKSv4 - SOCKSv4 proxy plugin for IO::Stream
 
 =head1 VERSION
 
-This document describes IO::Stream::Proxy::SOCKSv4 version v2.0.0
+This document describes IO::Stream::Proxy::SOCKSv4 version v2.0.1
 
 
 =head1 SYNOPSIS
@@ -168,15 +168,19 @@ target {host} (and not when socket will connect to SOCKS proxy itself).
 
 =head1 INTERFACE 
 
-=over
+=head2 new
 
-=item new({ host=>$host, port=>$port })
-
-=item new({ host=>$host, port=>$port, userid=>$ENV{USER} })
+    $plugin = IO::Stream::Proxy::SOCKSv4->new({
+        host    => $host,
+        port    => $port,
+    });
+    $plugin = IO::Stream::Proxy::SOCKSv4->new({
+        host    => $host,
+        port    => $port,
+        userid  => $ENV{USER},
+    });
 
 Connect to proxy $host:$port, optionally using given userid (empty by default).
-
-=back
 
 
 =head1 DIAGNOSTICS
@@ -253,7 +257,7 @@ Alex Efros E<lt>powerman@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2009 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+This software is Copyright (c) 2009- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
 
 This is free software, licensed under:
 

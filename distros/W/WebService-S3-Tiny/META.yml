@@ -1,0 +1,28 @@
+---
+abstract: 'Perl module for using S3 or compatible APIs'
+author:
+  - 'James Raspass <j.raspass@cv-library.co.uk>'
+build_requires:
+  HTTP::Request: '0'
+  perl: '5.014'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-S3-Tiny
+provides:
+  WebService::S3::Tiny:
+    file: lib/WebService/S3/Tiny.pm
+    version: '0.001'
+requires:
+  HTTP::Tiny: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/cv-library/WebService-S3-Tiny/issues
+  repository: git://github.com/cv-library/WebService-S3-Tiny.git
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.73'

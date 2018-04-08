@@ -6,7 +6,7 @@ Template::Perlish - Yet Another Templating system for Perl
 
 =head1 VERSION
 
-This document describes Template::Perlish version 1.52.
+This document describes Template::Perlish version 1.54.
 
 
 =head1 SYNOPSIS
@@ -214,7 +214,7 @@ it's also why this module is called C<Perlish>.
 
 =back
 
-Take a look at the example in the L</SYNOPSYS>, it actually contains all
+Take a look at the example in the L</SYNOPSIS>, it actually contains all
 that this module provides.
 
 To start, you'll need a C<Template::Perlish> object and, of course, a
@@ -326,7 +326,7 @@ Defaults to C<[%>;
 
 =item I<stdout>
 
-boolean value, allows to I<clobber> C<STDOUT> for collecting the
+boolean value, allows one to I<clobber> C<STDOUT> for collecting the
 expansion of a template, or to leave C<STDOUT> untouched.
 
 New option as of release 1.52. Until the previous stable release, this

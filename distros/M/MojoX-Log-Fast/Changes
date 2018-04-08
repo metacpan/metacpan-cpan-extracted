@@ -1,5 +1,8 @@
 Revision history for MojoX-Log-Fast
 
+v1.0.1  2018-04-03 20:15:42 EEST
+	- Reformat doc.
+
 v1.0.0  2016-02-17 23:41:22 EET
 	- Switch to Dist::Milla.
 

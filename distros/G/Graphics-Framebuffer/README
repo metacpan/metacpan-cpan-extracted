@@ -42,25 +42,16 @@ To make your system ready for this module, then please install the following:
 
 DEBIAN BASED SYSTEMS (Ubuntu, Mint, Raspian, etc):
 
-  sudo apt-get update
-  sudo apt-get install build-essential linux-headers libimager-perl \
-   libinline-c-perl libmath-gradient-perl libmath-bezier-perl libsys-mmap-perl
-
-  Suggested (some of the demo scripts use it), but not required for module to
-  work:
-
-    sudo apt-get install libsys-cpu-perl
+  sudo apt update
+  sudo apt install build-essential linux-headers libimager-perl \
+   libinline-c-perl libmath-gradient-perl libmath-bezier-perl libsys-mmap-perl \
+   libtest-most-perl libsys-cpu-perl
 
 REDHAT BASED SYSTEMS (Fedora, CentOS, etc):
 
   sudo yum update
   sudo yum upgrade kernel-headers build-essential perl-math-gradient \
-    perl-math-bezier perl-sys-mmap perl-imager perl-inline-c
-
-  Suggested (some of the demo scripts use it), but not required for module to
-  work:
-
-    sudo yum upgrade perl-sys-cpu
+    perl-math-bezier perl-sys-mmap perl-imager perl-inline-c perl-sys-cpu
 
 With that out of the way, you can now install this module.
 

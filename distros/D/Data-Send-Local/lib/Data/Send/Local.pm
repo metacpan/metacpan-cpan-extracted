@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 
 package Data::Send::Local;
-our $VERSION = 20170926;
+our $VERSION = 20180405;
 use v5.8.0;
 use warnings FATAL => qw(all);
 use strict;
@@ -32,13 +32,18 @@ sub sendLocal($$;$)                                                             
   undef                                                                         # Return without errors
  }
 
-sub recvLocal($;$)                                                              #S Receive a block of data sent locally.  Returns the data received.
- {my ($socketName, $length) = @_;                                               # Socket name (a socket file name that is created), optional maximum length to receive - defaults to one megabyte.
+sub recvLocal($;$$)                                                             #S Receive a block of data sent locally.  Returns the data received.
+ {my ($socketName, $user, $length) = @_;                                        # Socket name (a socket file name that is created), optional username of the owner of the socket, maximum length to receive - defaults to one megabyte.
 
   unlink $socketName;                                                           # Remove existing socket to avoid 'already in use';
   makePath($socketName);                                                        # Create socket directory
   socket(my $socket, AF_UNIX, SOCK_DGRAM, 0) or confess $!;
   bind($socket, sockaddr_un($socketName))    or confess $!;
+
+  if ($user)                                                                    # Do this to make the socket writable by some one else
+   {qx(chown $user:$user $socketName);
+   }
+
   recv($socket, my $read, $length // 1e6, 0);
   close($socket);
   unlink $socketName;                                                           # Remove existing socket to force send to wait while the socket is created
@@ -61,11 +66,11 @@ sub test2()
   if ($^O !~ m/\AMSWin32\Z/)                                                    # Ignore windows
    {say STDOUT "1..2";
     if (fork())
-     {say STDOUT "ok" if Data::Send::Local::recvLocal($socket) eq $data;      # Receive data
+     {say STDOUT "ok" if Data::Send::Local::recvLocal($socket) eq $data;        # Receive data
      }
     else
      {autoflush STDOUT 1;
-      say STDOUT "ok" unless Data::Send::Local::sendLocal($socket, $data);    # Send data without error
+      say STDOUT "ok" unless Data::Send::Local::sendLocal($socket, $data);      # Send data without error
      }
    }
  }

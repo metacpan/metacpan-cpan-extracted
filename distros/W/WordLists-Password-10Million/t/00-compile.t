@@ -6,9 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'WordList/Bloom/Password/10Million/Top100000.pm',
+    'WordList/Bloom/Password/10Million/Top1000000.pm',
     'WordList/Password/10Million/Top100000.pm',
     'WordList/Password/10Million/Top1000000.pm',
     'WordLists/Password/10Million.pm'

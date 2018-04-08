@@ -75,7 +75,7 @@ sub _build_dist_cfg ($self) {
         # load and cache dist config if path is related to some dist
         if ( $path->{$dirname} ) {
             if ( !exists $dists->{ $path->{$dirname} } ) {
-                my $dist_cfg = P->cfg->load( $path->{$dirname} . 'share/dist.perl' );
+                my $dist_cfg = P->cfg->load( $path->{$dirname} . "share/dist.$Pcore::Core::Const::DIST_CFG_TYPE" );
 
                 if ( exists $dist_cfg->{src} ) {
                     $dists->{ $path->{$dirname} } = $dist_cfg->{src};

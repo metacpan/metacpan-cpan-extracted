@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.0113
+    version 1.0001
 
 SYNOPSIS
 
@@ -15,7 +15,7 @@ SYNOPSIS
             traits              => 'Enchilada',
             consumer_key        => $YOUR_CONSUMER_KEY,
             consumer_secret     => $YOUR_CONSUMER_SECRET,
-            access_token        => $YOUR_ACCESS_TOKEN
+            access_token        => $YOUR_ACCESS_TOKEN,
             access_token_secret => $YOUR_ACCESS_TOKEN_SECRET,
         );
     
@@ -68,8 +68,6 @@ DESCRIPTION
 
     Twitter::API provides an interface to the Twitter REST API for perl.
 
-    This in an alpha release. The interface may change. Feedback welcome.
-
     Features:
 
       * full support for all Twitter REST API endpoints
@@ -79,11 +77,11 @@ DESCRIPTION
       * optionally specify access tokens per API call
 
       * error handling via an exception object that captures the full
-      reqest/response context
+      request/response context
 
-      * full support for OAuth handshake and xauth authentication
+      * full support for OAuth handshake and Xauth authentication
 
-    Additionl features are availble via optional traits:
+    Additional features are available via optional traits:
 
       * convenient methods for API endpoints with simplified argument
       handling via ApiMethods
@@ -99,7 +97,9 @@ DESCRIPTION
 
       * app-only (OAuth2) support via AppAuth
 
-    Some featuers are provided by separate distributions to avoid
+      * automatic rate limiting via RateLimiting
+
+    Some features are provided by separate distributions to avoid
     additional dependencies most users won't want or need:
 
       * async support via subclass Twitter::API::AnyEvent
@@ -202,7 +202,7 @@ METHODS
 
     This is the second step in the OAuth handshake. The only required
     argument is oauth_token. Use the value returned by get_request_token.
-    Optional arguments: force_login and screen_name to prefill Twitter's
+    Optional arguments: force_login and screen_name to pre-fill Twitter's
     authentication form.
 
     See https://dev.twitter.com/oauth/reference/get/oauth/authenticate.
@@ -248,7 +248,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2015-2016 by Marc Mims.
+    This software is copyright (c) 2015-2018 by Marc Mims.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

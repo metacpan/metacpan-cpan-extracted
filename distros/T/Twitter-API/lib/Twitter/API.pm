@@ -1,7 +1,7 @@
 package Twitter::API;
 # ABSTRACT: A Twitter REST API library for Perl
 
-our $VERSION = '0.0113';
+our $VERSION = '1.0001';
 use 5.14.1;
 use Moo;
 use Carp;
@@ -436,7 +436,7 @@ Twitter::API - A Twitter REST API library for Perl
 
 =head1 VERSION
 
-version 0.0113
+version 1.0001
 
 =head1 SYNOPSIS
 
@@ -447,7 +447,7 @@ version 0.0113
         traits              => 'Enchilada',
         consumer_key        => $YOUR_CONSUMER_KEY,
         consumer_secret     => $YOUR_CONSUMER_SECRET,
-        access_token        => $YOUR_ACCESS_TOKEN
+        access_token        => $YOUR_ACCESS_TOKEN,
         access_token_secret => $YOUR_ACCESS_TOKEN_SECRET,
     );
 
@@ -500,8 +500,6 @@ version 0.0113
 
 Twitter::API provides an interface to the Twitter REST API for perl.
 
-This in an alpha release. The interface may change. Feedback welcome.
-
 Features:
 
 =over 4
@@ -520,15 +518,15 @@ optionally specify access tokens per API call
 
 =item *
 
-error handling via an exception object that captures the full reqest/response context
+error handling via an exception object that captures the full request/response context
 
 =item *
 
-full support for OAuth handshake and xauth authentication
+full support for OAuth handshake and Xauth authentication
 
 =back
 
-Additionl features are availble via optional traits:
+Additional features are available via optional traits:
 
 =over 4
 
@@ -556,9 +554,13 @@ automatic retry on transient errors via L<RetryOnError|Twitter::API::Trait::Retr
 
 app-only (OAuth2) support via L<AppAuth|Twitter::API::Trait::AppAuth>
 
+=item *
+
+automatic rate limiting via L<RateLimiting|Twitter::API::Trait::RateLimiting>
+
 =back
 
-Some featuers are provided by separate distributions to avoid additional
+Some features are provided by separate distributions to avoid additional
 dependencies most users won't want or need:
 
 =over 4
@@ -667,7 +669,7 @@ See L<https://dev.twitter.com/oauth/reference/post/oauth/request_token>.
 
 This is the second step in the OAuth handshake. The only required argument is
 C<oauth_token>. Use the value returned by C<get_request_token>. Optional
-arguments: C<force_login> and C<screen_name> to prefill Twitter's
+arguments: C<force_login> and C<screen_name> to pre-fill Twitter's
 authentication form.
 
 See L<https://dev.twitter.com/oauth/reference/get/oauth/authenticate>.
@@ -726,7 +728,7 @@ Marc Mims <marc@questright.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2016 by Marc Mims.
+This software is copyright (c) 2015-2018 by Marc Mims.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

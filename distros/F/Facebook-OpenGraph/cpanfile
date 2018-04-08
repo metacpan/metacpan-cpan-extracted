@@ -12,6 +12,7 @@ requires 'Scalar::Util';
 requires 'Sub::Uplevel';
 requires 'URI';
 requires 'parent';
+requires 'CGI';
 
 on test => sub {
     requires 'Test::More', '0.98';

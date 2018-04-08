@@ -4,13 +4,13 @@
       "Alex Efros <powerman@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "MojoX-UserAgent-Throttler",
    "no_index" : {
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.17",
+            "Dist::Milla" : "v1.0.18",
             "Test::Distribution" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41"
@@ -59,7 +59,7 @@
    "provides" : {
       "MojoX::UserAgent::Throttler" : {
          "file" : "lib/MojoX/UserAgent/Throttler.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       }
    },
    "release_status" : "stable",
@@ -74,7 +74,7 @@
          "web" : "https://github.com/powerman/perl-MojoX-UserAgent-Throttler"
       }
    },
-   "version" : "v1.0.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+   "version" : "v1.0.3",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

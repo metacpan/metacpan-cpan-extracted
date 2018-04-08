@@ -16,7 +16,7 @@ use Test::BDD::Cucumber::Definitions::Validator qw(:all);
 use Test::More;
 use Try::Tiny;
 
-our $VERSION = '0.29';
+our $VERSION = '0.31';
 
 our @EXPORT_OK = qw(
     file_path_set
@@ -54,13 +54,13 @@ const my %types => (
 sub file_path_set {
     my ($path) = validator_n->(@_);
 
-    S->{file}->{path} = $path;
+    S->{file} = Test::BDD::Cucumber::Definitions::File::Object->new( path => $path );
 
     return 1;
 }
 
 sub file_exists {
-    my @dirs = splitdir( dirname( S->{file}->{path} ) );
+    my @dirs = splitdir( dirname( S->{file}->path ) );
 
     my $dirname = q{};
 
@@ -89,8 +89,8 @@ sub file_exists {
 
     pass('Intermediate directories exist and are available');
 
-    if ( !ok( -e S->{file}->{path}, "File exists" ) ) {
-        diag( sprintf( q{File '%s': %s}, S->{file}->{path}, $! ) );
+    if ( !ok( -e S->{file}->path, "File exists" ) ) {
+        diag( sprintf( q{File '%s': %s}, S->{file}->path, $! ) );
 
         return;
     }
@@ -99,7 +99,7 @@ sub file_exists {
 }
 
 sub file_noexists {
-    my @dirs = splitdir( dirname( S->{file}->{path} ) );
+    my @dirs = splitdir( dirname( S->{file}->path ) );
 
     my $dirname = q{};
 
@@ -127,7 +127,7 @@ sub file_noexists {
 
     pass('Intermediate catalogs (if any) are available');
 
-    return if ( !ok( !-e S->{file}->{path}, 'File no exists' ) );
+    return if ( !ok( !-e S->{file}->path, 'File no exists' ) );
 
     return 1;
 }
@@ -143,10 +143,10 @@ sub file_type_is {
         return;
     }
 
-    if ( !ok( $types{$type}->( S->{file}->{path} ), "File type is a $type" ) ) {
+    if ( !ok( $types{$type}->( S->{file}->path ), "File type is a $type" ) ) {
         diag( sprintf( q{ Error: %s}, $! ) );
 
-        _stat( S->{file}->{path} );
+        _stat( S->{file}->path );
 
         return;
     }
@@ -173,19 +173,21 @@ sub _file_read {
 
     $capture->start();
 
-    S->{file}->{content} = try {
-        if ( defined $encoding ) {
-            return read_text( S->{file}->{path}, $encoding );
+    S->{file}->content(
+        try {
+            if ( defined $encoding ) {
+                return read_text( S->{file}->path, $encoding );
+            }
+            else {
+                return read_binary( S->{file}->path );
+            }
         }
-        else {
-            return read_binary( S->{file}->{path} );
-        }
-    }
-    catch {
-        $error = $_[0];
+        catch {
+            $error = $_[0];
 
-        return;
-    };
+            return;
+        }
+    );
 
     $capture->stop();
 
@@ -223,5 +225,23 @@ sub _dirpath {
 
     return $dirname;
 }
+
+## no critic [Modules::ProhibitMultiplePackages]
+package Test::BDD::Cucumber::Definitions::File::Object;
+
+use Moose;
+use namespace::autoclean;
+
+has path => (
+    is  => 'ro',
+    isa => 'Str',
+);
+
+has content => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+__PACKAGE__->meta->make_immutable;
 
 1;

@@ -6,14 +6,14 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.009';
+our $VERSION = '2.012';
 
 use List::MoreUtils qw( any );
 
 use Term::Choose           qw( choose );
 use Term::Choose::LineFold qw( line_fold );
 use Term::Choose::Util     qw( term_width );
-use Term::TablePrint       qw( print_table);
+use Term::TablePrint       qw( print_table );
 
 use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 
@@ -221,7 +221,6 @@ sub __print_union_statement {
 }
 
 
-
 sub __column_names_and_types {
     my ( $sf, $tables ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -427,6 +426,7 @@ sub __print_join_info {
     print_table( $aref, { keep_header => 0, tab_width => 3 } );
 }
 
+
 sub __get_join_info {
     my ( $sf ) = @_;
     return if $sf->{d}{pk_info};
@@ -459,6 +459,9 @@ sub __get_join_info {
     $sf->{d}{pk_info} = $pk;
     $sf->{d}{fk_info} = $fk;
 }
+
+
+
 
 1;
 

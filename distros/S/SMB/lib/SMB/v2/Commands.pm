@@ -1,4 +1,4 @@
-# SMB-Perl library, Copyright (C) 2014 Mikhael Goikhman, migo@cpan.org
+# SMB-Perl library, Copyright (C) 2014-2018 Mikhael Goikhman, migo@cpan.org
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -208,15 +208,17 @@ sub pack ($$$%) {
 	$packer->uint16($command->is_success ? $struct_size : 9);
 	$packer->mark('command-start');
 
-	$command->pack($packer) if $command->is_success || $command->is('SessionSetup');
-	$packer->zero(6 + 1) if $command->is_error && !$command->is('SessionSetup');
+	my $is_error_packet = $command->is_error && !$command->is('SessionSetup');
+
+	$command->pack($packer) if !$is_error_packet;
+	$packer->zero(6 + 1) if $is_error_packet;
 
 	my $payload_allowed = $struct_size % 2;
 	$payload_allowed = 1 if $command->is('Negotiate') && !$is_response;
 	my $size = $packer->diff('header-end');
 	my $size0 = $struct_size & ~1;
 	die "SMB2 command $command->{name} pack produced size $size, expected $size0\n"
-		if $size > $size0 && !$payload_allowed;
+		if $size > $size0 && !$payload_allowed && !$is_error_packet;
 	$packer->zero($size0 - $size) if $size0 > $size;
 
 	$packer->mark('end');

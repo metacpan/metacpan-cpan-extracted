@@ -1,40 +1,43 @@
-# This package provides functions from RT::Interface::REST, because we don't
-# want to depend on rt being installed.  Derived from rt 3.4.5.
-
-package RT::Client::REST::Forms;
+#!perl
+# PODNAME: RT::Client::REST::Forms
+# ABSTRACT: This package provides functions from RT::Interface::REST, because we don't want to depend on rt being installed.  Derived from rt 3.4.5.
 
 use strict;
 use warnings;
+
+package RT::Client::REST::Forms;
+$RT::Client::REST::Forms::VERSION = '0.52';
 use Exporter;
 
-use vars qw(@EXPORT @ISA $VERSION);
+use vars qw(@EXPORT @ISA);
 
 @ISA = qw(Exporter);
 @EXPORT = qw(expand_list form_parse form_compose vpush vsplit);
-$VERSION = .02;
 
 my $CF_name = q%[#\s\w:()?/-]+%;
 my $field   = qr/[a-z][\w-]*|C(?:ustom)?F(?:ield)?-$CF_name|CF\.\{$CF_name}/i;
 
+
 sub expand_list {
     my ($list) = @_;
-    my ($elt, @elts, %elts);
+    my (@elts, %elts);
 
-    foreach $elt (split /,/, $list) {
-        if ($elt =~ /^(\d+)-(\d+)$/) { push @elts, ($1..$2) }
-        else                         { push @elts, $elt }
+    for my $elt (split /,/, $list) {
+        if ($elt =~ m/^(\d+)-(\d+)$/) { push @elts, ($1..$2) }
+        else                          { push @elts, $elt }
     }
 
     @elts{@elts}=();
-    return sort {$a<=>$b} keys %elts;
+    my @return = sort {$a<=>$b} keys %elts;
+    return @return
 }
 
-# Returns a reference to an array of parsed forms.
+
 sub form_parse {
     my $state = 0;
     my @forms = ();
     my @lines = split /\n/, $_[0];
-    my ($c, $o, $k, $e) = ("", [], {}, "");
+    my ($c, $o, $k, $e) = ('', [], {}, '');
 
     LINE:
     while (@lines) {
@@ -47,22 +50,22 @@ sub form_parse {
             # empty, and store it otherwise, errors and all.
             if ($e || $c || @$o) {
                 push @forms, [ $c, $o, $k, $e ];
-                $c = ""; $o = []; $k = {}; $e = "";
+                $c = ''; $o = []; $k = {}; $e = '';
             }
             $state = 0;
         }
         elsif ($state != -1) {
-            if ($state == 0 && $line =~ /^#/) {
+            if ($state == 0 && $line =~ m/^#/) {
                 # Read an optional block of comments (only) at the start
                 # of the form.
                 $state = 1;
                 $c = $line;
-                while (@lines && $lines[0] =~ /^#/) {
-                    $c .= "\n".shift @lines;
+                while (@lines && $lines[0] =~ m/^#/) {
+                    $c .= "\n" . shift @lines;
                 }
                 $c .= "\n";
             }
-            elsif ($state <= 1 && $line =~ /^($field):(?:\s+(.*))?$/) {
+            elsif ($state <= 1 && $line =~ m/^($field):(?:\s+(.*))?$/) {
                 # Read a field: value specification.
                 my $f  = $1;
                 my @v  = ($2 || ());
@@ -74,8 +77,8 @@ sub form_parse {
                 pop @v while (@v && $v[-1] eq '');
 
                 # Strip longest common leading indent from text.
-                my ($ws, $ls) = ("");
-                foreach $ls (map {/^(\s+)/} @v[1..$#v]) {
+                my $ws = '';
+                for my $ls (map {/^(\s+)/} @v[1..$#v]) {
                     $ws = $ls if (!$ws || length($ls) < length($ws));
                 }
                 s/^$ws// foreach @v;
@@ -85,11 +88,11 @@ sub form_parse {
 
                 $state = 1;
             }
-            elsif ($line !~ /^#/) {
+            elsif ($line !~ m/^#/) {
                 # We've found a syntax error, so we'll reconstruct the
                 # form parsed thus far, and add an error marker. (>>)
                 $state = -1;
-                $e = form_compose([[ "", $o, $k, "" ]]);
+                $e = form_compose([[ '', $o, $k, '' ]]);
                 $e.= $line =~ /^>>/ ? "$line\n" : ">> $line\n";
             }
         }
@@ -101,22 +104,21 @@ sub form_parse {
     }
     push(@forms, [ $c, $o, $k, $e ]) if ($e || $c || @$o);
 
-    my $l;
-    foreach $l (keys %$k) {
+    for my $l (keys %$k) {
         $k->{$l} = vsplit($k->{$l}) if (ref $k->{$l} eq 'ARRAY');
     }
 
     return \@forms;
 }
 
-# Returns text representing a set of forms.
+
 sub form_compose {
     my ($forms) = @_;
-    my (@text, $form);
+    my @text;
 
-    foreach $form (@$forms) {
+    for my $form (@$forms) {
         my ($c, $o, $k, $e) = @$form;
-        my $text = "";
+        my $text = '';
 
         if ($c) {
             $c =~ s/\n*$/\n/;
@@ -126,10 +128,10 @@ sub form_compose {
             $text .= $e;
         }
         elsif ($o) {
-            my (@lines, $key);
+            my @lines;
 
-            foreach $key (@$o) {
-                my ($line, $sp, $v);
+            for my $key (@$o) {
+                my ($line, $sp);
                 my @values = (ref $k->{$key} eq 'ARRAY') ?
                                @{ $k->{$key} } :
                                   $k->{$key};
@@ -137,16 +139,16 @@ sub form_compose {
                 $sp = " "x(length("$key: "));
                 $sp = " "x4 if length($sp) > 16;
 
-                foreach $v (@values) {
+                for my $v (@values) {
                     if ($v =~ /\n/) {
                         $v =~ s/^/$sp/gm;
                         $v =~ s/^$sp//;
 
                         if ($line) {
                             push @lines, "$line\n\n";
-                            $line = "";
+                            $line = '';
                         }
-                        elsif (@lines && $lines[-1] !~ /\n\n$/) {
+                        elsif (@lines && $lines[-1] !~ m/\n\n$/) {
                             $lines[-1] .= "\n";
                         }
                         push @lines, "$key: $v\n\n";
@@ -163,8 +165,8 @@ sub form_compose {
 
                 $line = "$key:" unless @values;
                 if ($line) {
-                    if ($line =~ /\n/) {
-                        if (@lines && $lines[-1] !~ /\n\n$/) {
+                    if ($line =~ m/\n/) {
+                        if (@lines && $lines[-1] !~ m/\n\n$/) {
                             $lines[-1] .= "\n";
                         }
                         $line .= "\n";
@@ -173,7 +175,7 @@ sub form_compose {
                 }
             }
 
-            $text .= join "", @lines;
+            $text .= join '', @lines;
         }
         else {
             chomp $text;
@@ -184,7 +186,7 @@ sub form_compose {
     return join "\n--\n\n", @text;
 }
 
-# Add a value to a (possibly multi-valued) hash key.
+
 sub vpush {
     my ($hash, $key, $val) = @_;
     my @val = ref $val eq 'ARRAY' ? @$val : $val;
@@ -201,12 +203,12 @@ sub vpush {
     }
 }
 
-# "Normalise" a hash key that's known to be multi-valued.
+
 sub vsplit {
     my ($val) = @_;
-    my ($line, $word, @words);
+    my (@words);
 
-    foreach $line (map {split /\n/} (ref $val eq 'ARRAY') ? @$val : $val)
+    for my $line (map {split /\n/} (ref $val eq 'ARRAY') ? @$val : $val)
     {
         # XXX: This should become a real parser, à la Text::ParseWords.
         $line =~ s/^\s+//;
@@ -217,4 +219,89 @@ sub vsplit {
     return \@words;
 }
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RT::Client::REST::Forms - This package provides functions from RT::Interface::REST, because we don't want to depend on rt being installed.  Derived from rt 3.4.5.
+
+=head1 VERSION
+
+version 0.52
+
+=head2 METHODS
+
+=over 4
+
+=item expand_list
+
+Expands a list, splitting on commas and stuff.
+
+=item form_parse
+
+Returns a reference to an array of parsed forms.
+
+=item form_compose
+
+Returns text representing a set of forms.
+
+=for stopwords vpush vsplit
+
+=item vpush
+
+Add a value to a (possibly multi-valued) hash key.
+
+=item vsplit
+
+"Normalise" a hash key that's known to be multi-valued.
+
+=back
+
 1;
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Abhijit Menon-Sen <ams@wiw.org>
+
+=item *
+
+Dmitri Tikhonov <dtikhonov@yahoo.com>
+
+=item *
+
+Damien "dams" Krotkine <dams@cpan.org>
+
+=item *
+
+Dean Hamstead <dean@bytefoundry.com.au>
+
+=item *
+
+Miquel Ruiz <mruiz@cpan.org>
+
+=item *
+
+JLMARTIN
+
+=item *
+
+SRVSH
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Dmitri Tikhonov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

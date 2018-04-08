@@ -1,16 +1,18 @@
 package Pg::CLI::psql;
-{
-  $Pg::CLI::psql::VERSION = '0.11';
-}
 
-use Moose;
-
+use strict;
+use warnings;
 use namespace::autoclean;
 
+our $VERSION = '0.13';
+
 use MooseX::Params::Validate qw( validated_hash );
-use MooseX::SemiAffordanceAccessor;
+use MooseX::Types qw( as coerce from subtype via where );
 use MooseX::Types::Moose qw( ArrayRef Bool Defined Str );
 use MooseX::Types::Path::Class qw( File );
+
+use Moose;
+use MooseX::SemiAffordanceAccessor;
 
 with qw( Pg::CLI::Role::Connects Pg::CLI::Role::Executable );
 
@@ -20,28 +22,39 @@ has quiet => (
     default => 1,
 );
 
-sub execute_file {
-    my $self = shift;
-    my %p    = validated_hash(
-        \@_,
-        database => { isa => Str },
-        file     => { isa => Str | File },
-        options  => { isa => ArrayRef [Str], optional => 1 },
-        stdin  => { isa => Defined, optional => 1 },
-        stdout => { isa => Defined, optional => 1 },
-        stderr => { isa => Defined, optional => 1 },
+{
+
+    my $array_of_files = subtype(
+        as ArrayRef [ Str | File ],
+        where { @$_ > 0 },
     );
+    coerce $array_of_files, from Str | File, via { [$_] };
 
-    push @{ $p{options} }, '-f', ( delete $p{file} ) . q{};
+    sub execute_file {
+        my $self = shift;
+        my %p    = validated_hash(
+            \@_,
+            database => { isa => Str,             optional => 1 },
+            file     => { isa => $array_of_files, coerce   => 1 },
+            options => { isa => ArrayRef [Str], optional => 1 },
+            stdin   => { isa => Defined,        optional => 1 },
+            stdout  => { isa => Defined,        optional => 1 },
+            stderr  => { isa => Defined,        optional => 1 },
+        );
 
-    $self->run(%p);
+        push @{ $p{options} }, map { ( '-f', "$_" ) } @{ delete $p{file} };
+
+        $self->run(%p);
+    }
 }
 
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 sub _run_options {
     my $self = shift;
 
     return ( $self->quiet() ? '-q' : () );
 }
+## use critic
 
 __PACKAGE__->meta()->make_immutable();
 
@@ -53,13 +66,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Pg::CLI::psql - Wrapper for the F<psql> utility
 
 =head1 VERSION
 
-version 0.11
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -80,6 +95,7 @@ version 0.11
       file     => 'thing.sql',
   );
 
+  my $sql = '...';
   my $errors;
   $psql->run(
       database => 'foo',
@@ -148,8 +164,10 @@ parameter or capture output sent to C<stdout> or C<stderr>
 
 =head2 $psql->execute_file( database => ..., file => ... )
 
-This method executes the specified file against the database. You can also
-pass additional options via the C<options> parameter.
+This method executes the specified file or files against the database. C<file>
+should either be the path to a single file as a string or C<Path::Class::File>
+or an arrayref of such paths. You can also pass additional options via the
+C<options> parameter.
 
 This method also accepts optional C<stdin>, C<stdout>, and C<stderr>
 parameters, just like the C<< $psql->run() >> method.
@@ -162,9 +180,15 @@ Returns a the three part version as a string.
 
 Returns the first two decimal numbers in the version.
 
-=head1 BUGS
+=head1 SUPPORT
 
-See L<Pg::CLI> for bug reporting details.
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Pg-CLI> or via email to L<bug-pg-cli@rt.cpan.org|mailto:bug-pg-cli@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Pg-CLI can be found at L<https://github.com/houseabsolute/Pg-CLI>.
 
 =head1 AUTHOR
 
@@ -172,10 +196,13 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by Dave Rolsky.
+This software is Copyright (c) 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

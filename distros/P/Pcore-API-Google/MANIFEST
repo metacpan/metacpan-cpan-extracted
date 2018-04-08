@@ -8,6 +8,6 @@ cpanfile
 lib/Pcore/API/Google.pm
 lib/Pcore/API/Google/Search.pm
 share/dist-id.json
-share/dist.perl
+share/dist.yaml
 t/001.t
 t/author-pod-syntax.t

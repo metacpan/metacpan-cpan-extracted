@@ -1,7 +1,7 @@
 package Crypt::Random::Source::Strong;
 # ABSTRACT: Abstract base class for strong random data sources
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Moo;
 use namespace::clean;
@@ -20,7 +20,7 @@ Crypt::Random::Source::Strong - Abstract base class for strong random data sourc
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

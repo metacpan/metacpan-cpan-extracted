@@ -86,8 +86,13 @@ subtest 'is_api_version_eq_or_older_than' => sub {
         content     => $content,
     });
 
+    ok(!$res->is_api_version_eq_or_older_than('v1.3'));
+    ok(!$res->is_api_version_eq_or_older_than('v1.4'));
     ok($res->is_api_version_eq_or_older_than('v2.3'));
     ok($res->is_api_version_eq_or_older_than('v2.4'));
+    ok($res->is_api_version_eq_or_older_than('v2.10'));
+    ok($res->is_api_version_eq_or_older_than('v3.3'));
+    ok($res->is_api_version_eq_or_older_than('v3.4'));
 };
 
 subtest 'is_api_version_eq_or_later_than' => sub {
@@ -112,8 +117,13 @@ subtest 'is_api_version_eq_or_later_than' => sub {
         content     => $content,
     });
 
-    ok($res->is_api_version_eq_or_later_than('v2.3'));
+    ok($res->is_api_version_eq_or_later_than('v1.2'));
+    ok($res->is_api_version_eq_or_later_than('v1.3'));
     ok($res->is_api_version_eq_or_later_than('v2.2'));
+    ok($res->is_api_version_eq_or_later_than('v2.3'));
+    ok(!$res->is_api_version_eq_or_later_than('v2.10'));
+    ok(!$res->is_api_version_eq_or_later_than('v3.2'));
+    ok(!$res->is_api_version_eq_or_later_than('v3.3'));
 };
 
 done_testing;

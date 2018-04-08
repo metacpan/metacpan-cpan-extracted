@@ -6,9 +6,8 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.009';
+our $VERSION = '2.012';
 
-use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile );
 
 use Term::Choose       qw( choose );
@@ -104,7 +103,6 @@ sub connect_parameter {
     }
     return $para;
 }
-
 
 
 sub database_setting {
@@ -325,6 +323,7 @@ sub __settings_menu_wrap_db {
     return if ! $changed;
     $sf->{write_config}++;
 }
+
 
 sub __group_readline_db {
     my ( $sf, $db_opt, $section, $items, $prompt ) = @_;

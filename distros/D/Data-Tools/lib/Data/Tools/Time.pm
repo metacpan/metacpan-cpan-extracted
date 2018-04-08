@@ -1,7 +1,7 @@
 ##############################################################################
 #
 #  Data::Tools perl module
-#  (c) Vladi Belperchinov-Shabanski "Cade" 2013-2016
+#  2013-2017 (c) Vladi Belperchinov-Shabanski "Cade"
 #  http://cade.datamax.bg
 #  <cade@bis.bg> <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
 #
@@ -188,7 +188,7 @@ sub julian_date_diff_in_words_relative
 
 =head2 unix_time_diff_in_words( $unix_time_diff )
 
-Returns human-friendly text for the give time difference (in seconds).
+Returns human-friendly text for the given time difference (in seconds).
 This function returns absolute difference text, for relative 
 (before/after/ago/in) see unix_time_diff_in_words_relative().
 
@@ -199,7 +199,7 @@ Same as unix_time_diff_in_words() but returns relative text
 
 =head2 julian_date_diff_in_words( $julian_date_diff );
 
-Returns human-friendly text for the give date difference (in days).
+Returns human-friendly text for the given date difference (in days).
 This function returns absolute difference text, for relative 
 (before/after/ago/in) see julian_day_diff_in_words_relative().
 

@@ -1,0 +1,39 @@
+NAME
+    Sah::Schemas::CPAN - Sah schemas related to CPAN
+
+VERSION
+    This document describes version 0.002 of Sah::Schemas::CPAN (from Perl
+    distribution Sah-Schemas-CPAN), released on 2018-04-06.
+
+SYNOPSIS
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Sah-Schemas-CPAN>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Sah-Schemas-CPAN>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-CPAN>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Sah::Schemas::CPANMeta
+
+    Sah - specification
+
+    Data::Sah
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

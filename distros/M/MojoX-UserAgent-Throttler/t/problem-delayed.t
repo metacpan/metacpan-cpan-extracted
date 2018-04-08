@@ -1,5 +1,6 @@
 use Mojo::Base -strict;
-use t::share;
+use lib 't';
+use share;
 use Mojo::UserAgent;
 use Sub::Throttler qw( throttle_it );
 use Sub::Throttler::Limit;

@@ -1,3 +1,5 @@
+4.02
+ -  mfr_subnormalize() in _d_bytes(), _ld_bytes() and f128_bytes().
 4.01
  - Automatically build Math::MPFR with __float128 support if mpfr_buildopt_float128_p() returns
    true && 'F128=0' has not been provided as an argument to Makefile.PL.

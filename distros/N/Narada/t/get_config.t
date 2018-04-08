@@ -1,4 +1,4 @@
-use t::share; guard my $guard;
+use lib 't'; use share; guard my $guard;
 
 use Narada::Config qw( get_config );
 

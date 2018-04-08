@@ -1,3 +1,10 @@
+2018-04-05 Webqq::Encryption v1.7
+1）重要文档typo纠正
+
+2018-01-08 Webqq::Encryption v1.6
+1）更新RSA公钥
+2）更新加密算法
+
 2015-09-06 Webqq::Encryption v1.5
 1）去掉默认依赖模块JE，改为Crypt::RSA
 2）测试脚本中增加多种模块可选择的提示

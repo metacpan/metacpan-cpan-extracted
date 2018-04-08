@@ -8,6 +8,7 @@ package Comics::Plugin::HaraKiri;
 use parent qw(Comics::Fetcher::Cascade);
 
 our $VERSION = "0.01";
+our $disabled = 1;		# deceased
 
 sub register {
     shift->SUPER::register

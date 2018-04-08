@@ -14,7 +14,7 @@ Lab::Moose::Sweep::Tutorial - Documentation of high-level sweep framework
 
 =head1 VERSION
 
-version 3.623
+version 3.624
 
 =head1 Datafiles and datafolders
 

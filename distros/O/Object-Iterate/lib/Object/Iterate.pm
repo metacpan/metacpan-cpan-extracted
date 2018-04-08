@@ -5,9 +5,12 @@ use warnings;
 no warnings;
 
 use subs qw(_check_object);
-use vars qw(@ISA $VERSION @EXPORT_OK %EXPORT_TAGS
+use vars qw(
+	@EXPORT_OK %EXPORT_TAGS
 	$Next $More $Init $Final
 	);
+
+=encoding utf8
 
 =head1 NAME
 
@@ -63,22 +66,21 @@ objects.
 
 Before any control structure does its job, it checks the object to see
 if it can respond to these two methods, whatever you decide to call
-them, so your object must know that it can respond to these methods. 
+them, so your object must know that it can respond to these methods.
 AUTOLOADed methods cannot work since the module cannot know if they
 exist.
 
 =cut
 
 use Carp qw(croak);
-use Exporter;
-
-@ISA         = qw(Exporter);
-@EXPORT_OK   = qw(iterate igrep imap);
-$VERSION     = '1.14';
-
-%EXPORT_TAGS = (
+use Exporter qw(import);
+our @EXPORT_OK   = qw(iterate igrep imap);
+our %EXPORT_TAGS = (
 	all => \@EXPORT_OK,
 	);
+
+our $VERSION     = '1.141';
+
 
 $Next  = '__next__';
 $More  = '__more__';
@@ -256,10 +258,10 @@ brian d foy, C<< <bdfoy@cpan.org> >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2002-2014 brian d foy.  All rights reserved.
+Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the terms of the Artistic License 2.0.
 
 =cut
 

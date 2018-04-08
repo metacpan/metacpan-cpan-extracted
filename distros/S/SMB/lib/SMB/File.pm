@@ -1,4 +1,4 @@
-# SMB-Perl library, Copyright (C) 2014 Mikhael Goikhman, migo@cpan.org
+# SMB-Perl library, Copyright (C) 2014-2018 Mikhael Goikhman, migo@cpan.org
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -88,6 +88,7 @@ sub new ($%) {
 	$name =~ s!\\!\/!g;
 	$name =~ s!/{2,}!/!g;
 	$name =~ s!/$!!;
+	my $is_directory = delete $options{is_directory};
 	my $root = $options{share_root} //= undef;
 	my $filename = undef;
 	if ($root) {
@@ -110,7 +111,7 @@ sub new ($%) {
 		change_time      => @stat ? to_nttime($stat[ 9])  : 0,
 		allocation_size  => @stat ? ($stat[12] || 0) * 512: 0,
 		end_of_file      => @stat ? $stat[ 7]             : 0,
-		attributes       => @stat ? to_ntattr($stat[ 2])  : 0,
+		attributes       => @stat ? to_ntattr($stat[ 2])  : $is_directory ? ATTR_DIRECTORY : 0,
 		exists           => @stat || $is_srv ? 1 : 0,
 		opens            => 0,
 		%options,
@@ -142,7 +143,7 @@ sub is_directory ($) {
 	return $self->is_ipc ? 0 : $self->attributes & ATTR_DIRECTORY ? 1 : 0;
 }
 
-sub to_string ($;$) {
+sub time_to_string ($;$) {
 	my $time = shift;
 	my $format = shift || "%4Y-%2m-%2d %2H:%2M";
 
@@ -153,17 +154,17 @@ sub ctime { from_nttime($_[0]->creation_time) }
 sub atime { from_nttime($_[0]->last_access_time) }
 sub wtime { from_nttime($_[0]->last_write_time) }
 sub mtime { from_nttime($_[0]->change_time) }
-sub ctime_string { to_string($_[0]->ctime, $_[1]) }
-sub atime_string { to_string($_[0]->atime, $_[1]) }
-sub wtime_string { to_string($_[0]->wtime, $_[1]) }
-sub mtime_string { to_string($_[0]->mtime, $_[1]) }
+sub ctime_string { time_to_string($_[0]->ctime, $_[1]) }
+sub atime_string { time_to_string($_[0]->atime, $_[1]) }
+sub wtime_string { time_to_string($_[0]->wtime, $_[1]) }
+sub mtime_string { time_to_string($_[0]->mtime, $_[1]) }
 
 sub add_openfile ($$$) {
 	my $self = shift;
-	my $action = shift;
 	my $handle = shift;
+	my $action = shift;
 
-	my $openfile = SMB::OpenFile->new($self, $action, $handle);
+	my $openfile = SMB::OpenFile->new($self, $handle, $action);
 
 	$self->{opens}++;
 	$self->exists(1);
@@ -263,7 +264,7 @@ sub open_by_disposition ($$) {
 	my $self = shift;
 	my $disposition = shift;
 
-	return $self->add_openfile(ACTION_OPENED, undef)
+	return $self->add_openfile(undef, ACTION_OPENED)
 		if $self->is_ipc;
 
 	return $self->supersede    if $disposition == DISPOSITION_SUPERSEDE;
@@ -277,6 +278,25 @@ sub open_by_disposition ($$) {
 	return;
 }
 
+sub normalize_name_in_share ($$) {
+	my $self = shift;
+	my $name = shift // die "Missing file name to normalize in share\n";
+
+	my $root = $self->share_root;
+	return unless $root;
+
+	$name =~ s=\\=\/=g;
+	$name =~ s=/{2,}=/=g;
+	$name =~ s=^/|/$==;
+	$name =~ s=(^|/)\.(/|$)=$1=g;
+	while ($name =~ s=(^|/)(?!\.\./)[^/]+/\.\./=$1=) {}
+
+	# refuse to go below the root
+	return if $name =~ m=^\.\.?(/|$)=;
+
+	return $name eq '' ? $root : "$root/$name";
+}
+
 sub find_files ($%) {
 	my $self = shift;
 	my %params = @_;
@@ -286,14 +306,14 @@ sub find_files ($%) {
 	my $pattern = $params{pattern} || '*';
 	my $want_all = $pattern eq '*';
 	my $start_idx = $params{start_idx} || 0;
-	my $files = $self->{files};  # cached
+	my $files = $self->{files};  # cached for fragmented queries
 	my $name = $self->name;
 
 	# fix pattern if needed
 	my $pattern0 = $pattern;
 	$pattern0 =~ s/^\*/{.*,*}/;
 
-	unless ($want_all && $files) {
+	if (!$files || $start_idx == 0) {
 		my @filenames = map { -e $_ && basename($_) } bsd_glob($self->filename . "/$pattern0", GLOB_NOCASE | GLOB_BRACE);
 		$self->msg("Find [$self->{filename}/$pattern] - " . scalar(@filenames) . " files");
 		$files = [ map { SMB::File->new(
@@ -306,4 +326,228 @@ sub find_files ($%) {
 	return $start_idx ? [ @{$files}[$start_idx .. (@$files - 1)] ] : $files;
 }
 
+sub remove ($) {
+	my $self = shift;
+
+	if ($self->is_directory) {
+		rmdir($self->filename);
+	} else {
+		unlink($self->filename);
+	}
+
+	return $! == 0;
+}
+
+sub rename ($$;$) {
+	my $self = shift;
+	my $new_filename = shift // die "Missing new filename to rename\n";
+	my $replace = shift // 0;
+
+	my $filename = $self->filename;
+
+	return (SMB::STATUS_OBJECT_NAME_NOT_FOUND, "Bad name [$new_filename]")
+		unless $new_filename = $self->normalize_name_in_share($new_filename);
+	return (SMB::STATUS_NO_SUCH_FILE, "No such file $filename")
+		unless -e $filename;
+	return (SMB::STATUS_SHARING_VIOLATION, "New name can't be existing directory")
+		if -d $new_filename;
+	return (SMB::STATUS_OBJECT_NAME_COLLISION, "Already exists")
+		if !$replace && -e $new_filename;
+
+	return (SMB::STATUS_ACCESS_DENIED, "Failed to rename")
+		unless rename($self->filename, $new_filename);
+
+	return (SMB::STATUS_SUCCESS);
+}
+
 1;
+
+__END__
+# ----------------------------------------------------------------------------
+
+=head1 NAME
+
+SMB::File - Remote or local file abstraction for SMB
+
+=head1 SYNOPSIS
+
+	use SMB::File;
+
+	# create local file object for server
+	my $file = SMB::File->new(
+		name => $create_request->file_name,
+		share_root => $tree->root,
+		is_ipc => $tree->is_ipc,
+	);
+	say $file->name;      # "john\\file.txt"
+	say $file->filename;  # "/my/shares/Users/john/file.txt"
+
+
+	# acquire remote file object(s) for client
+	my $file = $create_response->openfile->file;
+	my @files = @{$querydirectory_response->files};
+
+=head1 DESCRIPTION
+
+This class implements an SMB file abstraction for a client or a server.
+
+This class inherits from L<SMB>, so B<msg>, B<err>, B<mem>, B<dump>,
+auto-created field accessor and other methods are available as well.
+
+=head1 CONSTANTS
+
+The following constants are available as SMB::File::CONSTANT_NAME.
+
+	ATTR_READONLY
+	ATTR_HIDDEN
+	ATTR_SYSTEM
+	ATTR_DIRECTORY
+	ATTR_ARCHIVE
+	ATTR_DEVICE
+	ATTR_NORMAL
+	ATTR_TEMPORARY
+	ATTR_SPARSE_FILE
+	ATTR_REPARSE_POINT
+	ATTR_COMPRESSED
+	ATTR_OFFLINE
+	ATTR_NOT_CONTENT_INDEXED
+	ATTR_ENCRYPTED
+
+	DISPOSITION_SUPERSEDE
+	DISPOSITION_OPEN
+	DISPOSITION_CREATE
+	DISPOSITION_OPEN_IF
+	DISPOSITION_OVERWRITE
+	DISPOSITION_OVERWRITE_IF
+
+	ACTION_NONE
+	ACTION_SUPERSEDED
+	ACTION_OPENED
+	ACTION_CREATED
+	ACTION_OVERWRITTEN
+
+=head1 METHODS
+
+=over 4
+
+=item new [OPTIONS]
+
+Class constructor. Creates an instance of SMB::File.
+
+The following keys of OPTIONS hash are recognized in addition to the ones
+recognized by superclass L<SMB>:
+
+	name          SMB name, no need to start with a backslash
+	is_directory  for remote file, this is an attribute hint
+	share_root    for local file, this is the share directory
+	is_ipc        for local or remote file in IPC tree
+
+=item update CREATION_TIME LAST_ACCESS_TIME LAST_WRITE_TIME CHANGE_TIME ALLOCATION_SIZE END_OF_FILE ATTRIBUTES [SWAPPED=0]
+
+Updates corresponding file times (each uint64), sizes (each uint64) and
+attributes (uint32). Flag SWAPPED indicates that the sizes are swapped
+(first end_of_file, then allocation_size).
+
+=item is_directory
+
+Returns true when the file is marked or stat'd as a directory.
+
+=item ctime
+
+Returns file creation_time as unix time.
+
+=item atime
+
+Returns file last_access_time as unix time.
+
+=item wtime
+
+Returns file last_write_time as unix time.
+
+=item mtime
+
+Returns file change_time as unix time.
+
+=item ctime_string [FORMAT]
+
+Returns file creation_time as string using function B<time_to_string>.
+
+=item atime_string [FORMAT]
+
+Returns file last_access_time as string using function B<time_to_string>.
+
+=item wtime_string [FORMAT]
+
+Returns file last_write_time as string using function B<time_to_string>.
+
+=item mtime_string [FORMAT]
+
+Returns file change_time as string using function B<time_to_string>.
+
+=item add_openfile HANDLE ACTION
+
+Create and return an L<SMB::OpenFile> object using supplied HANDLE and
+ACTION, intended for local files on server side. HANDLE may be undef for
+special open files (like IPC files I<srvsvc> and I<wkssvc>). Increments
+the number of open files for this file object.
+
+=item delete_openfile OPENFILE
+
+The opposite of B<add_openfile>, closes handle if needed and decrements
+the number of open files for this file object.
+
+=item supersede
+
+=item open
+
+=item create
+
+=item overwrite
+
+=item open_if
+
+=item overwrite_if
+
+=item open_by_disposition DISPOSITION
+
+Opens local file by given disposition (using NTFS / SMB semantics).
+Returns an L<SMB::OpenFile> object on success or undef on failure.
+The openfile object is created by calling B<add_openfile> internally.
+
+=item find_files PARAMS
+
+Returns an array ref of L<SMB::File> objects corresponding to the files
+in this local file object that is a directory. PARAMS is a hash with
+optional keys "pattern" (default "*") and "start_idx" (default 0).
+
+=back
+
+=head1 FUNCTIONS
+
+None of the following functions are exported. But they may be called as
+SMB::File::FUNC_NAME.
+
+=over 4
+
+=item from_ntattr NTFS_ATTR
+
+Converts from NTFS attributes (uint32) to Unix mode (unsigned int).
+
+=item to_ntattr UNIX_MODE
+
+Converts from Unix mode (unsigned int) to NTFS attributes (uint32).
+
+=item time_to_string TIME [FORMAT="%4Y-%2m-%2d %2H:%2M"]
+
+Returns human readable representation of unix time (uint32).
+
+=back
+
+=head1 SEE ALSO
+
+L<SMB::OpenFile>, L<SMB::Tree>, L<SMB::Client>, L<SMB::Server>, L<SMB>.
+
+=head1 AUTHOR
+
+Mikhael Goikhman <migo@cpan.org>
+

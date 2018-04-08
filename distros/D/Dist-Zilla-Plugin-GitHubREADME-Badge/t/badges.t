@@ -38,6 +38,7 @@ test_badges
       github_tag
       license
       version
+      docker_build
     )],
   },
   'non default badges';

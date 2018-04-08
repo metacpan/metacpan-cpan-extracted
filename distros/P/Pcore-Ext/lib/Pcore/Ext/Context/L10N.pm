@@ -3,10 +3,10 @@ package Pcore::Ext::Context::L10N;
 use Pcore -class;
 use Pcore::Util::Scalar qw[refaddr];
 
-has ext => ( is => 'ro', isa => InstanceOf ['Pcore::Ext::Context'], required => 1 );
-has is_plural => ( is => 'ro', isa => Bool, required => 1 );
-has msgid     => ( is => 'ro', isa => Str,  required => 1 );
-has domain    => ( is => 'ro', isa => Str,  required => 1 );
+has ext       => ( is => 'ro', isa => InstanceOf ['Pcore::Ext::Context'], required => 1 );
+has is_plural => ( is => 'ro', isa => Bool,                               required => 1 );
+has msgid     => ( is => 'ro', isa => Str,                                required => 1 );
+has domain    => ( is => 'ro', isa => Str,                                required => 1 );
 has msgid_plural => ( is => 'ro', isa => Maybe [Str] );
 has num          => ( is => 'ro', isa => Maybe [Str] );
 

@@ -2,6 +2,7 @@ bin/webtidy5
 Changes
 lib/HTML/Tidy5.pm
 lib/HTML/Tidy5/Message.pm
+lib/Test/HTML/Tidy5.pm
 Makefile.PL
 MANIFEST
 perlcriticrc
@@ -15,6 +16,7 @@ t/cfg-for-parse.t
 t/clean.t
 t/clean-crash.t
 t/extra-quote.t
+t/html_tidy_ok.t
 t/ignore-text.t
 t/ignore.t
 t/illegal-options.t

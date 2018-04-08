@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::LinearStepSweep;
-$Lab::Moose::Instrument::LinearStepSweep::VERSION = '3.623';
+$Lab::Moose::Instrument::LinearStepSweep::VERSION = '3.624';
 #ABSTRACT: Role for linear step sweeps used by voltage/current sources.
 use 5.010;
 use Moose::Role;
@@ -15,6 +15,21 @@ requires qw/max_units_per_second max_units_per_step min_units max_units
     source_level cached_source_level source_level_timestamp/;
 
 
+# Enforce max_units/min_units.
+sub check_max_and_min {
+    my $self = shift;
+    my $to   = shift;
+
+    my $min = $self->min_units();
+    my $max = $self->max_units();
+    if ( $to < $min ) {
+        croak "target $to is below minimum allowed value $min";
+    }
+    elsif ( $to > $max ) {
+        croak "target $to is above maximum allowed value $max";
+    }
+}
+
 sub linear_step_sweep {
     my ( $self, %args ) = validated_hash(
         \@_,
@@ -28,15 +43,7 @@ sub linear_step_sweep {
     my $last_timestamp = $self->source_level_timestamp();
     my $distance       = abs( $to - $from );
 
-    # Enforce max_units/min_units.
-    my $min = $self->min_units();
-    my $max = $self->max_units();
-    if ( $to < $min ) {
-        croak "target $to is below minimum allowed value $min";
-    }
-    elsif ( $to > $max ) {
-        croak "target $to is above maximum allowed value $max";
-    }
+    $self->check_max_and_min($to);
 
     if ( not defined $last_timestamp ) {
         $last_timestamp = time();
@@ -120,7 +127,7 @@ Lab::Moose::Instrument::LinearStepSweep - Role for linear step sweeps used by vo
 
 =head1 VERSION
 
-version 3.623
+version 3.624
 
 =head1 METHODS
 
@@ -141,7 +148,7 @@ source_level, cached_source_level, source_level_timestamp >
 
 This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
-  Copyright 2017       Simon Reinhardt
+  Copyright 2017-2018  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

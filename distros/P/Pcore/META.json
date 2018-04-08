@@ -1,7 +1,7 @@
 {
    "abstract" : "perl applications development environment",
    "author" : [
-      "zdm <zdm@cpan.org>"
+      "zdm <zdm@softvisio.net>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "CPAN::Meta version 2.150010",
@@ -53,6 +53,7 @@
       },
       "develop" : {
          "requires" : {
+            "BerkeleyDB" : "0",
             "CPAN::Changes" : "0",
             "CSS::Packer" : "0",
             "Devel::Cover" : "0",
@@ -73,7 +74,6 @@
             "AnyEvent" : "0",
             "B::Hooks::AtRuntime" : "0",
             "B::Hooks::EndOfScope::XS" : "0",
-            "BerkeleyDB" : "0",
             "CBOR::XS" : "0",
             "Class::XSAccessor" : "0",
             "Clone" : "0",
@@ -160,6 +160,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v0.58.4",
+   "version" : "v0.59.1",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v2.0.2';
+our $VERSION = 'v2.0.3';
 
 use Scalar::Util qw( weaken );
 
@@ -204,7 +204,7 @@ IO::Stream - ease non-blocking I/O streams based on EV
 
 =head1 VERSION
 
-This document describes IO::Stream version v2.0.2
+This document describes IO::Stream version v2.0.3
 
 
 =head1 SYNOPSIS

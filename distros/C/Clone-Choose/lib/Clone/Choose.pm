@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = "0.008";
+our $VERSION = "0.009";
 $VERSION = eval $VERSION;
 
 our @BACKENDS = (
@@ -55,8 +55,6 @@ sub backend
 
         return $pkg;
     }
-
-    return;
 }
 
 sub can
@@ -155,6 +153,13 @@ __END__
 =head1 NAME
 
 Clone::Choose - Choose appropriate clone utility
+
+=begin html
+
+<a href="https://travis-ci.org/perl5-utils/Clone-Choose"><img src="https://travis-ci.org/perl5-utils/Clone-Choose.svg?branch=master" alt="Travis CI"/></a>
+<a href='https://coveralls.io/github/perl5-utils/Clone-Choose?branch=master'><img src='https://coveralls.io/repos/github/perl5-utils/Clone-Choose/badge.svg?branch=master' alt='Coverage Status'/></a>
+
+=end html
 
 =head1 SYNOPSIS
 

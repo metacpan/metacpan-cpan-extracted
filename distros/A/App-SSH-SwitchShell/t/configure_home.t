@@ -15,10 +15,6 @@ use Test::TempDir::Tiny;
 
 use lib qw(.);
 
-## no critic (RegularExpressions::RequireDotMatchAnything)
-## no critic (RegularExpressions::RequireExtendedFormatting)
-## no critic (RegularExpressions::RequireLineBoundaryMatching)
-
 main();
 
 sub main {
@@ -70,7 +66,7 @@ sub main {
         my ( $stdout, $stderr, @result ) = capture { App::SSH::SwitchShell::configure_home() };
         is( $result[0], undef, 'configure_home() returns undef' );
         is( $stdout,    q{},   '... prints nothing to STDOUT' );
-        like( $stderr, qr{^Could not chdir to home '\Q$not_existing_home\E': }, '... prints that chdir() failed to STDERR' );
+        like( $stderr, "/ ^ \QCould not chdir to home '$not_existing_home':\E /xsm", '... prints that chdir() failed to STDERR' );
         is( $ENV{HOME}, $not_existing_home, '... HOME environment variable is correctly set' );
         is( cwd(),      $basedir,           '... cwd is not changed because dir does not exist' );
 

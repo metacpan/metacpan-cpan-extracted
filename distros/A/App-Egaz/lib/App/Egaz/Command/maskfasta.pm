@@ -6,7 +6,9 @@ use autodie;
 use App::Egaz -command;
 use App::Egaz::Common;
 
-use constant abstract => 'soft/hard-masking sequences in a fasta file';
+sub abstract {
+    return 'soft/hard-masking sequences in a fasta file';
+}
 
 sub opt_spec {
     return (

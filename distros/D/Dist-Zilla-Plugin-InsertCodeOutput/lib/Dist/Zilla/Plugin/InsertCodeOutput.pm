@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::InsertCodeOutput;
 
-our $DATE = '2015-05-05'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2018-04-06'; # DATE
+our $VERSION = '0.040'; # VERSION
 
 use 5.010001;
 use strict;
@@ -31,7 +31,7 @@ sub munge_file {
     my ($self, $file) = @_;
     my $content = $file->content;
     if ($content =~ s{^#\s*CODE:\s*(.*)\s*$}{$self->_code_output($1)."\n"}egm) {
-        $self->log(["inserting output of code '%s' in %s", $1, $file->name]);
+        $self->log(["inserting output of code '%s' in %s: '%s'", $1, $file->name, $content]);
         $file->content($content);
     }
 }
@@ -69,7 +69,7 @@ Dist::Zilla::Plugin::InsertCodeOutput - Insert the output of Perl code into your
 
 =head1 VERSION
 
-This document describes version 0.03 of Dist::Zilla::Plugin::InsertCodeOutput (from Perl distribution Dist-Zilla-Plugin-InsertCodeOutput), released on 2015-05-05.
+This document describes version 0.040 of Dist::Zilla::Plugin::InsertCodeOutput (from Perl distribution Dist-Zilla-Plugin-InsertCodeOutput), released on 2018-04-06.
 
 =head1 SYNOPSIS
 
@@ -93,17 +93,6 @@ true), build will be aborted.
 
 =for Pod::Coverage .+
 
-=head1 SEE ALSO
-
-L<Dist::Zilla::Plugin::InsertCodeResult> which is similar and uses the same C<#
-CODE> directive, but instead of inserting output, will insert the result of the
-code (which can be a reference, in which case will be dumped using
-L<Data::Dump>).
-
-L<Dist::Zilla::Plugin::InsertCommandOutput>
-
-L<Dist::Zilla::Plugin::InsertExample>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla-Plugin-InsertCodeOutput>.
@@ -120,13 +109,24 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Dist::Zilla::Plugin::InsertCodeResult> which is similar and uses the same C<#
+CODE> directive, but instead of inserting output, will insert the result of the
+code (which can be a reference, in which case will be dumped using
+L<Data::Dump>).
+
+L<Dist::Zilla::Plugin::InsertCommandOutput>
+
+L<Dist::Zilla::Plugin::InsertExample>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

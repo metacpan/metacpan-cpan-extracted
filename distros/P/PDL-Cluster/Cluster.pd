@@ -1,0 +1,2160 @@
+#-*- Mode: CPerl -*-
+
+##======================================================================
+## Header Administrivia
+##======================================================================
+
+our $VERSION = '1.54.001';
+pp_setversion("'$VERSION'");
+
+use PDL::Bad; ##-- for $PDL::Bad::Status
+
+##------------------------------------------------------
+## pm additions
+pp_addpm({At=>'Top'},<<'EOPM');
+
+#---------------------------------------------------------------------------
+# File: PDL::Cluster.pm
+# Author: Bryan Jurish <moocow@cpan.org>
+# Description: PDL wrappers for the C Clustering library.
+#
+# Copyright (c) 2005-2018 Bryan Jurish. All rights reserved.
+# This program is free software.  You may modify and/or
+# distribute it under the same terms as Perl itself.
+#
+#---------------------------------------------------------------------------
+# Based on the C clustering library for cDNA microarray data,
+# Copyright (C) 2002-2005 Michiel Jan Laurens de Hoon.
+#
+# The C clustering library was written at the Laboratory of DNA Information
+# Analysis, Human Genome Center, Institute of Medical Science, University of
+# Tokyo, 4-6-1 Shirokanedai, Minato-ku, Tokyo 108-8639, Japan.
+# Contact: michiel.dehoon 'AT' riken.jp
+#
+# See the files "cluster.c" and "cluster.h" in the PDL::Cluster distribution
+# for details.
+#---------------------------------------------------------------------------
+
+=pod
+
+=head1 NAME
+
+PDL::Cluster - PDL interface to the C Clustering Library
+
+=head1 SYNOPSIS
+
+ use PDL::Cluster;
+
+ ##-----------------------------------------------------
+ ## Data Format
+ $d =   42;                     ##-- number of features
+ $n = 1024;                     ##-- number of data elements
+
+ $data = random($d,$n);         ##-- data matrix
+ $elt  = $data->slice(",($i)"); ##-- element data vector
+ $ftr  = $data->slice("($j),"); ##-- feature vector over all elements
+
+ $wts  = ones($d)/$d;           ##-- feature weights
+ $msk  = ones($d,$n);           ##-- missing-datum mask (1=ok)
+
+ ##-----------------------------------------------------
+ ## Library Utilties
+
+ $mean = $ftr->cmean();
+ $median = $ftr->cmedian();
+
+ calculate_weights($data,$msk,$wts, $cutoff,$expnt,
+                   $weights);
+
+ ##-----------------------------------------------------
+ ## Distance Functions
+
+ clusterdistance($data,$msk,$wts, $n1,$n2,$idx1,$idx2,
+                 $dist,
+                 $distFlag, $methodFlag2);
+
+ distancematrix($data,$msk,$wts, $distmat, $distFlag);
+
+ ##-----------------------------------------------------
+ ## Partitioning Algorithms
+
+ getclustermean($data,$msk,$clusterids,
+                $ctrdata, $ctrmask);
+
+ getclustermedian($data,$msk,$clusterids,
+                  $ctrdata, $ctrmask);
+
+ getclustermedoid($distmat,$clusterids,$centroids,
+                  $errorsums);
+
+ kcluster($k, $data,$msk,$wts, $npass,
+          $clusterids, $error, $nfound,
+          $distFlag, $methodFlag);
+
+ kmedoids($k, $distmat,$npass,
+          $clusterids, $error, $nfound);
+
+ ##-----------------------------------------------------
+ ## Hierarchical Algorithms
+
+ treecluster($data,$msk,$wts,
+             $tree, $lnkdist,
+             $distFlag, $methodFlag);
+
+ treeclusterd($data,$msk,$wts, $distmat,
+              $tree, $lnkdist,
+              $distFlag, $methodFlag);
+
+ cuttree($tree, $nclusters,
+         $clusterids);
+
+ ##-----------------------------------------------------
+ ## Self-Organizing Maps
+
+ somcluster($data,$msk,$wts, $nx,$ny,$tau,$niter,
+            $clusterids,
+            $distFlag);
+
+ ##-----------------------------------------------------
+ ## Principal Component Analysis
+
+ pca($U, $S, $V);
+
+ ##-----------------------------------------------------
+ ## Extensions
+
+ rowdistances($data,$msk,$wts, $rowids1,$rowids2, $distvec, $distFlag);
+ clusterdistances($data,$msk,$wts, $rowids, $index2,
+                  $dist,
+                  $distFlag, $methodFlag);
+
+ clustersizes($clusterids, $clustersizes);
+ clusterelements($clustierids, $clustersizes, $eltids);
+ clusterelementmask($clusterids, $eltmask);
+
+ clusterdistancematrix($data,$msk,$wts,
+                       $rowids, $clustersizes, $eltids,
+                       $dist,
+                       $distFlag, $methodFlag);
+
+ clusterenc($clusterids, $clens,$cvals,$crowids, $k);
+ clusterdec($clens,$cvals,$crowids, $clusterids, $k);
+ clusteroffsets($clusterids, $coffsets,$cvals,$crowids, $k);
+ clusterdistancematrixenc($data,$msk,$wts,
+                          $clens1,$crowids1, $clens2,$crowids2,
+                          $dist,
+                          $distFlag, $methodFlag);
+
+=cut
+
+EOPM
+## /pm additions
+##------------------------------------------------------
+
+##------------------------------------------------------
+## Exports: None
+#pp_export_nothing();
+
+##------------------------------------------------------
+## Includes
+pp_addhdr(<<'EOH');
+#include "cluster.h"
+EOH
+
+##======================================================================
+## XS additions
+##======================================================================
+pp_addxs(<<'EOXS');
+
+char *
+library_version()
+ CODE:
+   RETVAL = CLUSTERVERSION;
+ OUTPUT:
+   RETVAL
+
+EOXS
+
+##======================================================================
+## C Support Functions
+##======================================================================
+
+##------------------------------------------------------
+## Debugging Utilities
+pp_addhdr(<<'EOH');
+
+//#define CDEBUG 1
+//#undef CDEBUG
+
+void print_pp_dbl(int nrows, int ncols, double **pp) {
+  int i,j;
+  for (i=0; i<nrows; i++) {
+    printf("  %d:[ ", i);
+    for (j=0; j<ncols; j++) {
+      printf("%d=%lf ", j, pp[i][j]);
+    }
+    printf("]\n");
+  }
+}
+EOH
+
+
+##----------------------------------------------------------------------
+## Allocation Utilities
+pp_addhdr(<<'EOH');
+static
+void **pp_alloc(int nrows)
+{
+  return ((void **)malloc(nrows*sizeof(void**)));
+}
+EOH
+
+##----------------------------------------------------------------------
+## Assignment utilities (new)
+pp_addhdr(<<'EOH');
+static
+double **p2pp_dbl(int nrows, int ncols, double *p, double **matrix)
+{
+  int i;
+  if (!(p && nrows && ncols)) return NULL;
+  if (!matrix) matrix = (double **)pp_alloc(nrows);
+  for (i=0; i < nrows; i++) {
+    matrix[i] = p + (i*ncols);
+#ifdef CDEBUG
+    printf("p2pp_dbl(nr=%d,nc=%d,p=%p) : (p+%d*%d)=%p\n", nrows,ncols,p, i,ncols,matrix[i]);
+#endif
+  }
+  return matrix;
+}
+EOH
+
+pp_addhdr(<<'EOH');
+int **p2pp_int(int nrows, int ncols, int *p, int **matrix)
+{
+  int i;
+  if (!(p && nrows && ncols)) return NULL;
+  if (!matrix) matrix = (int **)pp_alloc(nrows);
+  for (i=0; i < nrows; i++) {
+    matrix[i] = p + (i*ncols);
+  }
+  return matrix;
+}
+EOH
+
+##-- ragged conversion: just using p2pp_dbl()
+pp_addhdr(<<'EOH');
+static
+double **p2pp_dbl_ragged(int nrows, int ncols, double *p, double **matrix)
+{
+  int i;
+  if (!(p && nrows && ncols)) return NULL;
+  if (!matrix) matrix = (double **)pp_alloc(nrows);
+  for (i=0; i < nrows; i++) {
+    matrix[i] = p + (i*ncols);
+  }
+  return matrix;
+}
+EOH
+
+
+pp_addhdr(<<'EOH');
+static
+void pp2pdl_ragged_dbl(int nrows, int ncols, double **pp, double *p)
+{
+  int i,j;
+  if (!(pp && nrows && ncols)) return;
+  for (i=0; i<nrows; i++) {
+    for (j=0; j<i; j++) {
+      p[i*ncols+j] = pp[i][j];
+      p[j*ncols+i] = pp[i][j];
+    }
+    p[i*ncols+i] = 0;
+  }
+}
+EOH
+
+
+pp_addhdr(<<'EOH');
+static
+void pp2pdl_dbl(int nrows, int ncols, double **pp, double *p)
+{
+  int i,j;
+  if (!(pp && nrows && ncols)) return;
+  for (i=0; i<nrows; i++) {
+    for (j=0; j<ncols; j++) {
+      p[i*ncols+j] = pp[i][j];
+    }
+  }
+}
+EOH
+
+##------------------------------------------------------
+## tree clustering solution utilities
+
+pp_addhdr(<<'EOH');
+static
+Node* p2node(int nnodes, int* tree, double *lnkdist)
+{
+  int i;
+  Node *nod = NULL;
+  if (!(nnodes && (tree || lnkdist))) return NULL;
+  nod = (Node*)malloc(nnodes*sizeof(Node));
+  for (i=0; i < nnodes; ++i) {
+    nod[i].left     = tree    ? tree[i*2+0] : 0;
+    nod[i].right    = tree    ? tree[i*2+1] : 0;
+    nod[i].distance = lnkdist ? lnkdist[i] : 0;
+  }
+  return nod;
+}
+
+void node2p(int nnodes, Node* nod, int* tree, double *lnkdist)
+{
+  int i;
+  if (!(nnodes && nod && (tree || lnkdist))) return;
+  for (i=0; i < nnodes; ++i) {
+    if (tree) {
+      tree[i*2+0] = nod[i].left;
+      tree[i*2+1] = nod[i].right;
+    }
+    if (lnkdist) {
+      lnkdist[i] = nod[i].distance;
+    }
+  }
+  return;
+}
+
+EOH
+
+##======================================================================
+## Library Utility Routines
+##======================================================================
+
+##------------------------------------------------------
+## Mean
+pp_def
+  ('cmean',
+   Pars => 'double a(n); double [o]b()',
+   GenericTypes => [D],
+   Code => '$b() = mean($SIZE(n), $P(a));',
+   Doc => 'Computes arithmetic mean of the vector $a().  See also PDL::Primitive::avg().',
+  );
+
+##------------------------------------------------------
+## Median
+pp_def
+  ('cmedian',
+   Pars => 'double a(n); double [o]b()',
+   GenericTypes => [D],
+   Code => '$b() = median($SIZE(n), $P(a));',
+   Doc => 'Computes median of the vector $a().  See also PDL::Primitive::median().',
+  );
+
+
+##------------------------------------------------------
+## Weights
+pp_def
+('calculate_weights',
+ Pars => join("\n   ", '',
+	      q(double    data(d,n);),   ##-- n="rows"|"elts", d="columns"|"features"
+	      q(int       mask(d,n);),   ##-- n="rows"|"elts", d="columns"|"features"
+	      q(double    weight(d);),   ##-- feature-weighting factors
+	      q(double    cutoff();),    ##-- distance cutoff
+	      q(double    exponent();),  ##-- distance exponent
+	      q(double [o]oweights(d);), ##-- output weights
+	      ''
+	     ),
+ OtherPars => join("\n   ", '', 'char *distFlag;', ''),
+ Code =>
+('
+  double **datapp = (double **)pp_alloc($SIZE(n));
+  int    **maskpp = (int    **)pp_alloc($SIZE(n));
+  int    transpose=0;
+  int    i;
+  double *owp;
+  //
+  threadloop %{
+    p2pp_dbl($SIZE(n), $SIZE(d), $P(data), datapp);
+    p2pp_int($SIZE(n), $SIZE(d), $P(mask), maskpp);
+     owp =  calculate_weights($SIZE(n), $SIZE(d), datapp, maskpp,
+                              $P(weight), transpose, *$COMP(distFlag),
+                              $cutoff(), $exponent());
+    if (owp)  {
+      loop (d) %{
+        $oweights() = owp[d];
+      %}
+      free(owp);
+    }
+  %}
+  //
+  /*-- cleanup --*/
+  if (datapp) free(datapp);
+  if (maskpp) free(maskpp);
+'),
+
+  Doc=>
+('
+This function calculates weights for the features using the weighting scheme
+proposed by Michael Eisen:
+
+ w[i] = 1.0 / sum_{j where dist(i,j)<cutoff} (1 - dist(i,j)/cutoff)^exponent
+
+where the cutoff and the exponent are specified by the user.
+'),
+       );
+
+##======================================================================
+## Chapter 2: Distance Functions
+##======================================================================
+
+##------------------------------------------------------
+## Cluster Distance
+pp_def
+('clusterdistance',
+ Pars => join("\n   ", '',
+	      q(double data(d,n);), ##-- n="rows"|"elts", d="columns"|"features"
+	      q(int    mask(d,n);), ##-- n="rows"|"elts", d="columns"|"features"
+	      q(double weight(d);), ##-- normalization
+	      q(int    n1();),
+	      q(int    n2();),
+	      q(int    index1(n1);),
+	      q(int    index2(n2);),
+	      q(double [o]dist();),
+	      #q(int transpose=>0;),
+	      ''
+	     ),
+ OtherPars => join("\n   ", '', 'char *distFlag;', 'char *methodFlag;', ''),
+
+ Doc =>
+('
+Computes distance between two clusters $index1() and $index2().
+Each of the $index() vectors represents a single cluster whose values
+are the row-indices in the $data() matrix of the elements assigned
+to the respective cluster.  $n1() and $n2() are the number of elements
+in $index1() and $index2(), respectively.  Each $index$i() must have
+at least $n$i() elements allocated.
+
+B<CAVEAT:> the $methodFlag argument is interpreted differently than
+by the treecluster() method, namely:
+
+=over 4
+
+=item a
+
+Distance between the arithmetic means of the two clusters,
+as for treecluster() "f".
+
+=item m
+
+Distance between the medians of the two clusters,
+as for treecluster() "c".
+
+=item s
+
+Minimum pairwise distance between members of the two clusters,
+as for treecluster() "s".
+
+=item x
+
+Maximum pairwise distance between members of the two clusters
+as for treecluster() "m".
+
+=item v
+
+Average of the pairwise distances between members of the two clusters,
+as for treecluster() "a".
+
+=back
+
+=cut
+
+'),
+
+  Code =>
+('
+  double **datapp = (double **)pp_alloc($SIZE(n));
+  int    **maskpp = (int    **)pp_alloc($SIZE(n));
+  int    transpose=0;
+  double retval;
+
+  threadloop %{
+    p2pp_dbl($SIZE(n), $SIZE(d), $P(data), datapp);
+    p2pp_int($SIZE(n), $SIZE(d), $P(mask), maskpp);
+    retval = clusterdistance($SIZE(n), $SIZE(d), datapp, maskpp,
+                             $P(weight), $n1(), $n2(), $P(index1), $P(index2),
+                             *$COMP(distFlag), *$COMP(methodFlag), transpose);
+    $dist() = retval;
+  %}
+
+  /*-- cleanup --*/
+  if (datapp) free(datapp);
+  if (maskpp) free(maskpp);
+'),
+);
+
+##----------------------------------------------------------------------
+## Distance Matrix
+pp_def
+  ('distancematrix',
+   Pars => join("\n   ", '',
+		q(double data(d,n);),
+		q(int    mask(d,n);),
+		q(double weight(d);),
+		#q(int    transpose();),
+		q(double [o]dists(n,n);),
+		''
+	       ),
+   OtherPars => join("\n   ", '', 'char *distFlag;', ''),
+   Code =>
+('
+  int    transpose = 0;
+  double **datapp = (double **)pp_alloc($SIZE(n));
+  int    **maskpp = (int    **)pp_alloc($SIZE(n));
+  double **retval;
+  //
+  threadloop %{
+    p2pp_dbl($SIZE(n), $SIZE(d), $P(data), datapp);
+    p2pp_int($SIZE(n), $SIZE(d), $P(mask), maskpp);
+    retval = distancematrix($SIZE(n), $SIZE(d), datapp, maskpp,
+                            $P(weight), *$COMP(distFlag), transpose);
+    //
+    if (!retval) barf("Cluster matrix allocation failed!");
+    pp2pdl_ragged_dbl($SIZE(n), $SIZE(n), retval, $P(dists));
+    //
+    if (retval) free(retval);
+  %}
+  //
+  /*-- cleanup --*/
+  if (datapp) free(datapp);
+  if (maskpp) free(maskpp);
+'),
+
+  Doc => 'Compute triangular distance matrix over all data points.',
+);
+
+##======================================================================
+## REMOVED: Random number generation
+##  + REMOVED: initran()
+
+##======================================================================
+## Chapter 3: Partitioning Algorithms
+##  + REMOVED: randomassign
+
+##----------------------------------------------------------------------
+## Cluster Centroids: Generic
+pp_def
+  ('getclustercentroids',
+   Pars => join("\n   ", '',
+		q(double data(d,n);),     ##-- n="rows"|"elts", d="columns"|"features"
+		q(int    mask(d,n);),     ##-- n="rows"|"elts", d="columns"|"features"
+		#q(int    transpose();),   ##-- probably dangerous
+		q(int    clusterids(n);),  ##-- maps elts to cluster-ids
+		q(double [o]cdata(d,k);), ##-- centroid data
+		q(int    [o]cmask(d,k);), ##-- centroid data
+		''
+	       ),
+    OtherPars => join("\n   ", '', 'char *ctrMethodFlag;', ''),
+   Code =>
+('
+  int    transpose = 0;
+  double **datapp  = (double **)pp_alloc($SIZE(n));
+  int    **maskpp  = (int    **)pp_alloc($SIZE(n));
+  double **cdatapp = (double **)pp_alloc($SIZE(k));
+  int    **cmaskpp = (int    **)pp_alloc($SIZE(k));
+
+  threadloop %{
+    p2pp_dbl($SIZE(n), $SIZE(d), $P(data), datapp);
+    p2pp_int($SIZE(n), $SIZE(d), $P(mask), maskpp);
+    p2pp_dbl($SIZE(k), $SIZE(d), $P(cdata), cdatapp);
+    p2pp_int($SIZE(k), $SIZE(d), $P(cmask), cmaskpp);
+
+    getclustercentroids($SIZE(k), $SIZE(n), $SIZE(d), datapp, maskpp,
+                        $P(clusterids), cdatapp, cmaskpp, transpose, *$COMP(ctrMethodFlag));
+  %}
+
+  /*-- cleanup --*/
+  if (datapp) free(datapp);
+  if (maskpp) free(maskpp);
+  if (cdatapp) free(cdatapp);
+  if (cmaskpp) free(cmaskpp);
+'),
+
+  Doc => 'Find cluster centroids by arithmetic mean (C<ctrMethodFlag="a">) or median over each dimension (C<ctrMethodFlag="m">).'
+);
+
+
+##----------------------------------------------------------------------
+## Cluster Centroids: Mean
+##  + now just a wrapper for 'getclustercentroids(...,"a")'
+pp_add_exported('','getclustermean');
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 getclustermean
+
+=for sig
+
+  Signature: (
+   double data(d,n);
+   int    mask(d,n);
+   int    clusterids(n);
+   double [o]cdata(d,k);
+   int    [o]cmask(d,k);
+   )
+
+Really just a wrapper for getclustercentroids(...,"a").
+
+=cut
+
+sub getclustermean {
+  my ($data,$mask,$cids,$cdata,$cmask) = @_;
+  return getclustercentroids($dat,$mask,$cids,$cdata,$cmask,'a');
+}
+
+EOPM
+
+##----------------------------------------------------------------------
+## Cluster Centroids: Median
+##  + now just a wrapper for 'getclustercentroids(...,"m")'
+pp_add_exported('','getclustermedian');
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 getclustermedian
+
+=for sig
+
+  Signature: (
+   double data(d,n);
+   int    mask(d,n);
+   int    clusterids(n);
+   double [o]cdata(d,k);
+   int    [o]cmask(d,k);
+   )
+
+Really just a wrapper for getclustercentroids(...,"m").
+
+=cut
+
+sub getclustermedian {
+  my ($data,$mask,$cids,$cdata,$cmask) = @_;
+  return getclustercentroids($dat,$mask,$cids,$cdata,$cmask,'m');
+}
+
+EOPM
+
+
+##----------------------------------------------------------------------
+## Cluster Centroids: Medoids
+pp_def
+  ('getclustermedoids',
+   Pars => join("\n   ", '',
+		q(double distance(n,n);),     ##-- (in) distance matrix (ragged, lower-left-triangle)
+		q(int    clusterids(n);),     ##-- (in) cluster ids indexed by gene-id
+		q(int    [o]centroids(k);),   ##-- (out) centroid-(elt-)ids indexed by cluster-id
+		q(double [o]errors(k);),      ##-- (out) maps cluster-id c -> sum(dist(x \in c, ctr(c)))
+		''
+	       ),
+   Code =>
+('
+  double **distpp = (double **)pp_alloc($SIZE(n));
+  threadloop %{
+    p2pp_dbl_ragged($SIZE(n), $SIZE(n), $P(distance), distpp);
+    getclustermedoids($SIZE(k), $SIZE(n), distpp,
+                      $P(clusterids), $P(centroids), $P(errors));
+  %}
+  //
+  /*-- cleanup --*/
+  if (distpp) free(distpp);
+'),
+
+  Doc => 'The getclustermedoid routine calculates the cluster centroids, given to which
+cluster each element belongs. The centroid is defined as the element with the
+smallest sum of distances to the other elements.
+'
+);
+
+
+##----------------------------------------------------------------------
+## K-Means
+pp_def
+  ('kcluster',
+   Pars => join("\n   ", '',
+		q(int    nclusters();),	##-- number of clusters to find
+		q(double data(d,n);), ##-- n="rows"|"elts", d="columns"|"features"
+		q(int    mask(d,n);), ##-- n="rows"|"elts", d="columns"|"features"
+		q(double weight(d);), ##-- weights
+		#q(int    transpose();),   ##-- probably dangerous
+		q(int    npass();), ##-- n passes
+		q(int    [o]clusterids(n);), ##-- maps elts to cluster-ids
+		q(double [o]error();)   , ##-- solution error
+		q(int    [o]nfound();),	##-- number of times solution found
+		''
+	       ),
+   OtherPars => join("\n   ", '', 'char *distFlag;', 'char *ctrMethodFlag;', ''),
+   Code =>
+('
+  int    transpose = 0;
+  double **datapp  = (double **)pp_alloc($SIZE(n));
+  int    **maskpp  = (int    **)pp_alloc($SIZE(n));
+  //
+  threadloop %{
+    p2pp_dbl($SIZE(n), $SIZE(d), $P(data), datapp);
+    p2pp_int($SIZE(n), $SIZE(d), $P(mask), maskpp);
+    kcluster($nclusters(), $SIZE(n), $SIZE(d), datapp, maskpp,
+             $P(weight), transpose, $npass(), *$COMP(ctrMethodFlag), *$COMP(distFlag),
+             $P(clusterids), $P(error), $P(nfound));
+  %}
+  //
+  /*-- cleanup --*/
+  if (datapp) free(datapp);
+  if (maskpp) free(maskpp);
+'),
+  Doc => ('K-Means clustering algorithm. The "ctrMethodFlag" determines how
+clusters centroids are to be computed; see getclustercentroids() for details.
+
+See also: kmedoids().
+'),
+);
+
+
+
+##----------------------------------------------------------------------
+## K-Means (specify maximum # / iterations) : NOT AVAILABLE
+##  + NOT AVAILABLE: kclusteri
+
+##----------------------------------------------------------------------
+## K-Medoids
+pp_def
+('kmedoids',
+ Pars => join("\n   ", '',
+	      q(int    nclusters();), ##-- number of clusters to find
+	      q(double distance(n,n);), ##-- distance matrix
+	      q(int    npass();), ##-- n passes
+	      q(int    [o]clusterids(n);), ##-- maps elts to cluster-ids
+	      q(double [o]error();)   ,	##-- solution error
+	      q(int    [o]nfound();), ##-- number of times solution found
+	      ''
+	     ),
+ Code => ('
+  double **distpp = (double **)pp_alloc($SIZE(n));
+  threadloop %{
+    p2pp_dbl_ragged($SIZE(n), $SIZE(n), $P(distance), distpp);
+    kmedoids($nclusters(), $SIZE(n), distpp,
+             $npass(), $P(clusterids), $P(error), $P(nfound));
+  %}
+  /*-- cleanup --*/
+  if (distpp) free(distpp);
+'),
+
+ Doc => 'K-Medoids clustering algorithm (uses distance matrix).
+
+See also: kcluster().
+'
+);
+
+##----------------------------------------------------------------------
+## K-Medoids (given max #/iterations)
+##  + NOT AVAILABLE: kmedoidsi
+
+##======================================================================
+## Chapter 4: Hierarchical Clustering
+
+##----------------------------------------------------------------------
+## Hierarchical Clustering, without distances
+pp_def
+('treecluster',
+ Pars => join("\n   ", '',
+	      q(double data(d,n);), ##-- n="rows"|"elts", d="columns"|"features"
+	      q(int    mask(d,n);), ##-- n="rows"|"elts", d="columns"|"features"
+	      q(double weight(d);), ##-- weights
+	      q(int    [o]tree(2,n);),   ##-- result tree: uses only (2,n-1)
+	      q(double [o]lnkdist(n);),	 ##-- link distance (n-1)
+	      ''
+	     ),
+ OtherPars => join("\n   ", '', 'char *distFlag;', 'char *methodFlag;', ''),
+ Code => ('
+  int    transpose = 0;
+  double **datapp  = (double **)pp_alloc($SIZE(n));
+  int    **maskpp  = (int    **)pp_alloc($SIZE(n));
+  double **distpp  = NULL;
+  Node    *nod     = NULL;
+  int      nmax    = $SIZE(n)-1;
+  threadloop %{
+    p2pp_dbl($SIZE(n),   $SIZE(d), $P(data), datapp);
+    p2pp_int($SIZE(n),   $SIZE(d), $P(mask), maskpp);
+    nod = treecluster($SIZE(n), $SIZE(d), datapp, maskpp,
+                      $P(weight), transpose, *$COMP(distFlag), *$COMP(methodFlag),
+                      NULL);
+
+    node2p(nmax, nod, $P(tree), $P(lnkdist));
+    $tree(2=>0, n=>nmax) = 0;
+    $tree(2=>1, n=>nmax) = 0;
+    $lnkdist(n=>nmax) = 0;
+  %}
+  //
+  /*-- cleanup --*/
+  if (datapp) free(datapp);
+  if (maskpp) free(maskpp);
+  if (nod)    free(nod);
+'),
+
+ Doc => '
+Hierachical agglomerative clustering.
+
+$tree(2,n) represents the clustering solution.
+Each row in the matrix describes one linking event,
+with the two columns containing the name of the nodes that were joined.
+The original genes are numbered 0..(n-1), nodes are numbered
+-1..-(n-1).
+$tree(2,n) thus actually uses only (2,n-1) cells.
+
+$lnkdist(n) represents the distance between the two subnodes that were joined.
+As for $tree(), $lnkdist() uses only (n-1) cells.
+'
+);
+
+##----------------------------------------------------------------------
+## Hierarchical Clustering, given distances
+pp_def
+  ('treeclusterd',
+   Pars => join("\n   ", '',
+		q(double data(d,n);), ##-- n="rows"|"elts", d="columns"|"features"
+		q(int    mask(d,n);), ##-- n="rows"|"elts", d="columns"|"features"
+		q(double weight(d);), ##-- weights
+		#q(int    transpose();),      ##-- probably dangerous
+		q(double distances(n,n);), ##-- distance matrix, should already be populated
+		q(int    [o]tree(2,n);),  ##-- result tree: uses only (2,n-1)
+		q(double [o]lnkdist(n);), ##-- link distance uses only (n-1)
+		''
+	       ),
+   OtherPars => join("\n   ", '', 'char *distFlag;', 'char *methodFlag;', ''),
+   Code => '
+  int    transpose = 0;
+  double **datapp  = (double **)pp_alloc($SIZE(n));
+  int    **maskpp  = (int    **)pp_alloc($SIZE(n));
+  double **distpp  = (double **)pp_alloc($SIZE(n));
+  Node    *nod     = NULL;
+  int      nmax    = $SIZE(n)-1;
+  //
+  threadloop %{
+    p2pp_dbl($SIZE(n),   $SIZE(d), $P(data), datapp);
+    p2pp_int($SIZE(n),   $SIZE(d), $P(mask), maskpp);
+    p2pp_dbl_ragged($SIZE(n), $SIZE(n), $P(distances), distpp);
+    nod = treecluster($SIZE(n), $SIZE(d), datapp, maskpp,
+                      $P(weight), transpose, *$COMP(distFlag), *$COMP(methodFlag),
+                      distpp);
+
+    node2p(nmax, nod, $P(tree), $P(lnkdist));
+    $tree(2=>0, n=>nmax) = 0;
+    $tree(2=>1, n=>nmax) = 0;
+    $lnkdist(n=>nmax) = 0;
+  %}
+  /*-- cleanup --*/
+  if (datapp) free(datapp);
+  if (maskpp) free(maskpp);
+  if (distpp) free(distpp);
+  if (nod)    free(nod);
+',
+
+       Doc => '
+Hierachical agglomerative clustering using given distance matrix.
+
+See distancematrix() and treecluster(), above.
+'
+      );
+
+##----------------------------------------------------------------------
+## Hierarchical Clustering: cut
+pp_def('cuttree',
+       Pars => join("\n   ", '',
+		    q(int    tree(2,n);),        ##-- result tree using (n-1,2)
+		    q(int    nclusters();),      ##-- number of desired clusters
+		    q(int [o]clusterids(n);),    ##-- output map: cluster-id by elt-id
+		    ''
+		   ),
+ Code => ('
+    Node *nod = p2node($SIZE(n)-1,$P(tree),NULL);
+    cuttree($SIZE(n), nod, $nclusters(), $P(clusterids));
+    if (nod) free(nod);
+'),
+       Doc => '
+Cluster selection for hierarchical clustering trees.
+'
+      );
+
+
+##======================================================================
+## Chapter 5: SOM Clustering
+
+##----------------------------------------------------------------------
+## SOM clustering, without saving centroid vectors
+pp_def
+('somcluster',
+ Pars => join("\n   ", '',
+	      q(double  data(d,n);), ##-- n="rows"|"elts", d="columns"|"features"
+	      q(int     mask(d,n);), ##-- n="rows"|"elts", d="columns"|"features"
+	      q(double  weight(d);), ##-- weights
+	      q(int     nxnodes();), ##-- number of horizontal cells in target topology
+	      q(int     nynodes();), ##-- number of vertical cells in target topology
+	      q(double  inittau();), ##-- initial value for \tau: usually ca. 0.02
+	      q(int     niter();), ##-- total number of iterations
+	      #q(double  [o]celldata(d,ny,nx);), ##-- centroid data vectors
+	      q(int     [o]clusterids(2,n);), ##-- output cluster indices (x,y) by elt
+	      ''
+	     ),
+ OtherPars => join("\n   ", '', 'char *distFlag;', ''),
+ Code => '
+  int    transpose = 0;
+  double **datapp  = (double **)pp_alloc($SIZE(n));
+  int    **maskpp  = (int    **)pp_alloc($SIZE(n));
+  threadloop %{
+    p2pp_dbl($SIZE(n),   $SIZE(d), $P(data), datapp);
+    p2pp_int($SIZE(n),   $SIZE(d), $P(mask), maskpp);
+    somcluster($SIZE(n), $SIZE(d), datapp, maskpp,
+                $P(weight), transpose, $nxnodes(), $nynodes(),
+                $inittau(), $niter(), *$COMP(distFlag), NULL,
+                (int (*)[2])($P(clusterids)));
+  %}
+  /*-- cleanup --*/
+  if (datapp) free(datapp);
+  if (maskpp) free(maskpp);
+',
+ Doc => 'Self-Organizing Map clustering, does not return centroid data.'
+);
+
+
+##======================================================================
+## Chapter 6: PCA
+
+pp_def
+  ('pca',
+   Pars => join("\n   ", '',
+		q(double  [o]U(d,n);), ##-- U_out = U_in · S · V^T
+		q(double  [o]S(d);),   ##-- Singular values (diagonal(?))
+		q(double  [o]V(d,d);), ##-- orthogonal matrix of the decomposition
+		''
+	       ),
+   Code => '
+  double **Upp  = (double **)pp_alloc($SIZE(n));
+  double **Vpp  = (double **)pp_alloc($SIZE(d));
+  if ($SIZE(n) < $SIZE(d)) {
+    barf("svd(): Number of rows (=%d) must be >= number of columns (=%d)!\n", $SIZE(n), $SIZE(d));
+  }
+  //
+  threadloop %{
+    p2pp_dbl($SIZE(n), $SIZE(d), $P(U), Upp);
+    p2pp_dbl($SIZE(d), $SIZE(d), $P(V), Vpp);
+    //
+    pca($SIZE(n), $SIZE(d), Upp, Vpp, $P(S));
+  %}
+  /*-- cleanup --*/
+  if (Upp) free(Upp);
+  if (Vpp) free(Vpp);
+',
+   Doc => '
+Principal Component Analysis (SVD), operates in-place on $U() and requires ($SIZE(n) E<gt>= $SIZE(d)).
+'
+  );
+
+##======================================================================
+## Extensions
+
+##------------------------------------------------------
+## rowdistances(): selected row-row distances
+pp_def
+('rowdistances',
+ Pars => join("\n   ", '',
+	      q(double data(d,n);),  ##-- n="rows"|"elts", d="columns"|"features"
+	      q(int    mask(d,n);),  ##-- n="rows"|"elts", d="columns"|"features"
+	      q(double weight(d);),  ##-- normalization
+	      q(int    rowids1(ncmps);), ##-- $data() row-ids: 0 <= $rowids1[$i] <= $n
+	      q(int    rowids2(ncmps);), ##-- $data() row-ids: 0 <= $rowids2[$i] <= $n
+	      q(double [o]dist(ncmps);),
+	      ''
+	     ),
+ OtherPars => join("\n   ", '', 'char *distFlag;', ''),
+ Doc => '
+Computes pairwise distances between rows of $data().
+$rowids1() contains the row-indices of the left (first) comparison operand,
+and $rowids2() the row-indices of the right (second) comparison operand.  Since each
+of these are assumed to be indices into the first dimension $data(), it should be the case that:
+
+ 0 <= $rowids1(i),rowids2(i) < $SIZE(n)    for 0 <= i < $SIZE(ncmps)
+
+See also clusterdistance(), clusterdistances(), clusterdistancematrixenc(), distancematrix().
+',
+
+ Code => '
+  double **datapp   = (double **)pp_alloc($SIZE(n));
+  int    **maskpp   = (int    **)pp_alloc($SIZE(n));
+  int    rowid1, rowid2;
+  char   methodChar = \'x\'; /*-- doesnt matter --*/
+  int    transpose=0;
+  //
+  threadloop %{
+    p2pp_dbl($SIZE(n),   $SIZE(d),   $P(data), datapp);
+    p2pp_int($SIZE(n),   $SIZE(d),   $P(mask), maskpp);
+    //
+    loop(ncmps) %{
+      rowid1 = $rowids1();
+      rowid2 = $rowids2();
+      $dist() = clusterdistance($SIZE(n), $SIZE(d), datapp, maskpp, $P(weight),
+                                1, 1,
+                                &rowid1, &rowid2,
+                                *$COMP(distFlag), methodChar, transpose);
+    %}
+  %}
+  /*-- cleanup --*/
+  if (datapp) free(datapp);
+  if (maskpp) free(maskpp);
+',
+);
+
+##------------------------------------------------------
+## Cluster + rows -> row distance vectors to cluster
+pp_def
+('clusterdistances',
+ Pars => join("\n   ", '',
+	      q(double data(d,n);), ##-- n="rows"|"elts", d="columns"|"features"
+	      q(int    mask(d,n);), ##-- n="rows"|"elts", d="columns"|"features"
+	      q(double weight(d);), ##-- normalization
+	      q(int    rowids(nr);),
+	      q(int    index2(n2);),
+	      q(double [o]dist(nr);),
+	      ''
+	     ),
+ OtherPars => join("\n   ", '', 'char *distFlag;', 'char *methodFlag;', ''),
+
+ Doc => '
+Computes pairwise distance(s) from each of $rowids() as a singleton cluster
+with the cluster represented by $index2(), which should be an index
+vector as for clusterdistance().  See also clusterdistancematrixenc().
+',
+
+ Code => '
+  double **datapp = (double **)pp_alloc($SIZE(n));
+  int    **maskpp = (int    **)pp_alloc($SIZE(n));
+  int    transpose=0;
+  //
+  threadloop %{
+    p2pp_dbl($SIZE(n), $SIZE(d), $P(data), datapp);
+    p2pp_int($SIZE(n), $SIZE(d), $P(mask), maskpp);
+    loop(nr) %{
+      $dist() = clusterdistance($SIZE(n), $SIZE(d), datapp, maskpp, $P(weight),
+                                1, $SIZE(n2), &($rowids()), $P(index2),
+                                *$COMP(distFlag), *$COMP(methodFlag), transpose);
+    %}
+  %}
+  /*-- cleanup --*/
+  if (datapp) free(datapp);
+  if (maskpp) free(maskpp);
+',
+);
+
+##------------------------------------------------------
+## Cluster-Ids -> Cluster sizes
+pp_def
+('clustersizes',
+ Pars => q(int clusterids(n); int [o]clustersizes(k);),
+ Doc => '
+Computes the size (number of elements) of each cluster in $clusterids().
+Useful for allocating less than maximmal space for $clusterelements().
+',
+ Code => '
+ int cid, csize;
+ loop (k) %{ $clustersizes() = 0; %}
+ loop (n) %{
+   cid = $clusterids();
+   if (cid < 0 || cid >= $SIZE(k)'
+       .($PDL::Bad::Status ? ' || $ISBADVAR(cid,clusterids)' : '')
+    .') continue; /*-- sanity check --*/
+   $clustersizes(k=>cid)++;
+ %}
+',
+ HandleBad => 1,
+ BadDoc => 'The output piddle should never be marked BAD.',
+ ($PDL::Bad::Status ?
+  (CopyBadStatusCode =>'$SETPDLSTATEGOOD(clustersizes); /* always make sure the output is "good" */')
+  : qw()),
+);
+
+
+##------------------------------------------------------
+## clusterelements(): Cluster-Ids -> Item-Ids
+pp_def
+('clusterelements',
+ Pars => q(int clusterids(n); int [o]clustersizes(k); int [o]eltids(mcsize,k);),
+ Doc => '
+Converts the vector $clusterids() to a matrix $eltids() of element (row) indices
+indexed by cluster-id.  $mcsize() is the maximum number of elements per cluster,
+at most $n.  The output PDLs $clustersizes() and $eltids() can be passed to
+clusterdistancematrix().
+',
+
+ Code => '
+  int cid, csize;
+  loop (k) %{ $clustersizes() = 0; %}
+  loop (n) %{
+    cid   = $clusterids();
+    csize = $clustersizes(k=>cid)++;
+    $eltids(mcsize=>csize,k=>cid) = n;
+  %}
+',
+);
+
+##------------------------------------------------------
+## clusterelementmask(): Cluster-Ids x Item-Ids -> bool (mask)
+pp_def
+('clusterelementmask',
+ Pars => q(int clusterids(n); byte [o]eltmask(k,n);),
+ Doc => '
+Get boolean membership mask $eltmask() based on cluster assignment in $clusterids().
+No value in $clusterids() may be greater than or equal to $k.
+On completion, $eltmask(k,n) is a true value iff $clusterids(n)=$k.
+',
+
+ Code => '
+  int cid, csize;
+  loop (n) %{
+    cid   = $clusterids();
+    $eltmask(k=>cid) = 1;
+  %}
+',
+);
+
+##------------------------------------------------------
+## clusterdistancematrix(): all row<->cluster distances
+pp_def
+('clusterdistancematrix',
+ Pars => join("\n   ", '',
+	      q(double data(d,n);), ##-- n="rows"|"elts", d="columns"|"features"
+	      q(int    mask(d,n);), ##-- n="rows"|"elts", d="columns"|"features"
+	      q(double weight(d);), ##-- normalization
+	      q(int    rowids(nr);), ##-- rows to check
+	      q(int    clustersizes(k);),  ##-- cluster sizes
+	      q(int    eltids(mcsize,k);), ##-- row-ids by cluster
+	      q(double [o]dist(k,nr);),
+	      ''
+	     ),
+ OtherPars => join("\n   ", '', 'char *distFlag;', 'char *methodFlag;', ''),
+ Doc => '
+B<DEPRECATED> in favor of clusterdistancematrixenc().
+In the future, this method is expected to become a wrapper for clusterdistancematrixenc().
+
+Computes distance between each row index in $rowids()
+considered as a singleton cluster
+and each of the $k clusters whose elements are given by a single row of $eltids().
+$clustersizes() and $eltids() are as output by the clusterelements() method.
+
+See also clusterdistance(), clusterdistances(), clustersizes(), clusterelements(), clusterdistancematrixenc().
+',
+
+ Code => '
+  double **datapp   = (double **)pp_alloc($SIZE(n));
+  int    **maskpp   = (int    **)pp_alloc($SIZE(n));
+  int    **eltidspp = (int    **)pp_alloc($SIZE(k));
+  int    transpose=0;
+  int    rowid;
+  //
+  threadloop %{
+    p2pp_dbl($SIZE(n),   $SIZE(d),   $P(data), datapp);
+    p2pp_int($SIZE(n),   $SIZE(d),   $P(mask), maskpp);
+    p2pp_int($SIZE(k),   $SIZE(mcsize), $P(eltids), eltidspp);
+    //
+    loop(nr) %{
+      rowid = $rowids();
+      loop (k) %{
+        $dist() = clusterdistance($SIZE(n), $SIZE(d), datapp, maskpp, $P(weight),
+                                  1,        $clustersizes(),
+                                  &rowid,   eltidspp[k],
+                                  *$COMP(distFlag), *$COMP(methodFlag), transpose);
+      %}
+    %}
+  %}
+  /*-- cleanup --*/
+  if (datapp) free(datapp);
+  if (maskpp) free(maskpp);
+  if (eltidspp) free(eltidspp);
+',
+);
+
+##------------------------------------------------------
+## clusterenc(): ccs-like encoding cluster-to-row
+
+pp_add_exported('','clusterenc');
+
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 clusterenc
+
+=for sig
+
+  Signature: (
+   int    clusterids(n);
+   int [o]clusterlens(k1);
+   int [o]clustervals(k1);
+   int [o]clusterrows(n);
+   ;
+   int k1;
+   )
+
+Encodes datum-to-cluster vector $clusterids() for efficiently mapping
+clusters-to-data.  Returned PDL $clusterlens() holds the lengths of each
+cluster containing at least one element.  $clustervals() holds the IDs
+of such clusters as they appear as values in $clusterids().  $clusterrows()
+is such that:
+
+ all( rld($clusterlens, $clustervals) == $clusterids )
+
+... if all available cluster-ids are in use.
+
+If specified, $k1 is a perl scalar
+holding the number of clusters (maximum cluster index + 1); an
+appropriate value will guessed from $clusterids() otherwise.
+
+Really just a wrapper for some lower-level PDL and PDL::Cluster calls.
+
+=cut
+
+sub clusterenc {
+  my ($cids, $clens,$cvals,$crows, $kmax) = @_;
+  $kmax  = $cids->max+1 if (!defined($kmax));
+
+  ##-- cluster sizes
+  $clens = zeroes(long, $kmax) if (!defined($clens));
+  clustersizes($cids,$clens);
+
+  ##-- cluster-id values
+  if (!defined($cvals)) { $cvals  = PDL->sequence(long,$kmax); }
+  else                  { $cvals .= PDL->sequence(long,$kmax); }
+
+  ##-- cluster-row values: handle BAD and negative values
+  #if (!defined($crows)) { $crows  = $cids->qsorti->where($cids->isgood & $cids>=0); }
+  #else                  { $crows .= $cids->qsorti->where($cids->isgood & $cids>=0); }
+
+  ##-- cluster-row values: treat BAD and negative values like anything else
+  if (!defined($crows)) { $crows  = $cids->qsorti; }
+  else                  { $crows .= $cids->qsorti; }
+
+  return ($clens,$cvals,$crows);
+}
+
+EOPM
+
+
+##------------------------------------------------------
+## clusterdec(): ccs-like decoding cluster-to-row
+
+pp_add_exported('','clusterdec');
+
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 clusterdec
+
+=for sig
+
+  Signature: (
+   int    clusterlens(k1);
+   int    clustervals(k1);
+   int    clusterrows(n);
+   int [o]clusterids(n);
+   )
+
+Decodes cluster-to-datum vectors ($clusterlens,$clustervals,$clusterrows)
+into a single datum-to-cluster vector $clusterids().
+$(clusterlens,$clustervals,$clusterrows) are as returned by the clusterenc() method.
+
+Un-addressed row-index values in $clusterrows() will be assigned the pseudo-cluster (-1)
+in $clusterids().
+
+Really just a wrapper for some lower-level PDL calls.
+
+=cut
+
+sub clusterdec {
+  my ($clens,$cvals,$crows, $cids2) = @_;
+
+  ##-- get $cids
+  $cids2  = zeroes($cvals->type, $crows->dims) if (!defined($cids2));
+  $cids2 .= -1;
+
+  ##-- trim $crows
+  #my $crows_good = $crows->slice("0:".($clens->sum-1)); ##-- assume bad indices are at END       of $crows (BAD,inf,...)
+  my $crows_good  = $crows->slice(-$clens->sum.":-1"); ##-- assume bad indices are at BEGINNING of $crows (-1, ...)
+
+  ##-- decode
+  $clens->rld($cvals, $cids2->index($crows_good));
+
+  return $cids2;
+}
+
+EOPM
+
+##------------------------------------------------------
+## clusteroffsets(): ccs-like encoding cluster-to-row
+
+pp_add_exported('','clusteroffsets');
+
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 clusteroffsets
+
+=for sig
+
+  Signature: (
+   int    clusterids(n);
+   int [o]clusteroffsets(k1+1);
+   int [o]clustervals(k1);
+   int [o]clusterrows(n);
+   ;
+   int k1;
+   )
+
+Encodes datum-to-cluster vector $clusterids() for efficiently mapping
+clusters-to-data. Like clusterenc(), but returns cumulative offsets
+instead of lengths.
+
+Really just a wrapper for clusterenc(), cumusumover(), and append().
+
+=cut
+
+sub clusteroffsets {
+  my ($cids, $coffsets,$cvals,$crows, $kmax) = @_;
+  my ($clens);
+  ($clens,$cvals,$crows) = clusterenc($cids,undef,$cvals,$crows,$kmax);
+  $coffsets = $clens->append(0)->rotate(1)->cumusumover;
+
+  return ($coffsets,$cvals,$crows);
+}
+
+EOPM
+
+##------------------------------------------------------
+## clusterdistancematrixenc(): all cluster<->cluster distances for "encoded" cluster-to-row matrices
+pp_def
+('clusterdistancematrixenc',
+ Pars => join("\n   ", '',
+	      q(double data(d,n);), ##-- n="rows"|"elts", d="columns"|"features"
+	      q(int    mask(d,n);), ##-- n="rows"|"elts", d="columns"|"features"
+	      q(double weight(d);), ##-- normalization
+	      q(int    clens1(k1);),         ##-- (encoded): X (dim=0) cluster sizes
+	      q(int    crowids1(nc1);),      ##-- (encoded): X (dim=0) clustered-element row-ids
+	      q(int    clens2(k2);),         ##-- (encoded): Y (dim=1) cluster sizes
+	      q(int    crowids2(nc2);),      ##-- (encoded): Y (dim=1) clustered-element row-ids
+	      q(double [o]dist(k1,k2);),
+	      ''
+	     ),
+ OtherPars => join("\n   ", '', 'char *distFlag;', 'char *methodFlag;', ''),
+ Doc => '
+Computes cluster-distance between each pair of clusters in (sequence($k1) x sequence($k2)), where \'x\'
+is the Cartesian product.  Cluster contents are passed as pairs ($clens(),$crowids()) as returned
+by the clusterenc() function (assuming that the $cvals() vector returned by clusterenc() is a flat sequence).
+
+The deprecated method clusterdistancematrix() can be simulated by this function in the following
+manner: if a clusterdistancematrix() call was:
+
+ clustersizes   ($cids, $csizes=zeroes(long,$k));
+ clusterelements($cids, $celts =zeroes(long,$csizes->max)-1);
+ clusterdistancematrix($data,$msk,$wt, $rowids, $csizes,$celts,
+                       $cdmat=zeroes(double,$k,$rowids->dim(0)),
+                       $distFlag, $methodFlag
+                      );
+
+Then the corresponding use of clusterdistancematrixenc() would be:
+
+ ($clens,$cvals,$crows) = clusterenc($cids);
+ clusterdistancematrixenc($data,$msk,$wt,
+                          $clens,        $crows,   ##-- "real" clusters in output dim 0
+                          $rowids->ones, $rowids,  ##-- $rowids as singleton clusters in output dim 1
+                          $cdmat=zeroes(double,$clens->dim(0),$rowids->dim(0)),
+                          $distFlag, $methodFlag);
+
+If your $cvals() are not a flat sequence, you will probably need to do some index-twiddling
+to get things into the proper shape:
+
+ if ( !all($cvals==$cvals->sequence) || $cvals->dim(0) != $k )
+ {
+   my $cdmat0 = $cdmat;
+   my $nr     = $rowids->dim(0);
+   $cdmat     = pdl(double,"inf")->slice("*$k,*$nr")->make_physical(); ##-- "missing" distances are infinite
+   $cdmat->dice_axis(0,$cvals) .= $cdmat0;
+ }
+
+$distFlag and $methodFlag are interpreted as for clusterdistance().
+
+See also clusterenc(), clusterdistancematrix().
+',
+
+ Code => '
+  double **datapp   = (double **)pp_alloc($SIZE(n));
+  int    **maskpp   = (int    **)pp_alloc($SIZE(n));
+  int    transpose=0;
+  int    *crowids1p, *crowids2p;
+  //
+  threadloop %{
+    p2pp_dbl($SIZE(n),   $SIZE(d),   $P(data), datapp);
+    p2pp_int($SIZE(n),   $SIZE(d),   $P(mask), maskpp);
+    crowids1p = $P(crowids1);
+    //
+    loop(k1) %{
+      crowids2p = $P(crowids2);
+      loop (k2) %{
+        $dist() = clusterdistance($SIZE(n), $SIZE(d), datapp, maskpp, $P(weight),
+                                  $clens1(), $clens2(),
+                                  crowids1p, crowids2p,
+                                  *$COMP(distFlag), *$COMP(methodFlag), transpose);
+        crowids2p += $clens2();
+      %}
+      crowids1p += $clens1();
+    %}
+  %}
+  /*-- cleanup --*/
+  if (datapp) free(datapp);
+  if (maskpp) free(maskpp);
+',
+);
+
+
+##------------------------------------------------------
+## clusterdistancesenc(): selected cluster<->cluster distances for "encoded" cluster-to-row matrices
+pp_def
+('clusterdistancesenc',
+ Pars => join("\n   ", '',
+	      q(double data(d,n);), ##-- n="rows"|"elts", d="columns"|"features"
+	      q(int    mask(d,n);), ##-- n="rows"|"elts", d="columns"|"features"
+	      q(double weight(d);), ##-- normalization
+	      q(int    coffsets1(k1);),      ##-- (encoded): X (dim=0) cluster offsets (k1+1)
+	      q(int    crowids1(nc1);),      ##-- (encoded): X (dim=0) clustered-element row-ids
+	      q(int    cwhich1(ncmps);),     ##-- selected left comparison operands
+	      q(int    coffsets2(k2);),      ##-- (encoded): Y (dim=1) cluster offsets (k2+1)
+	      q(int    crowids2(nc2);),      ##-- (encoded): Y (dim=1) clustered-element row-ids
+	      q(int    cwhich2(ncmps);),     ##-- selected right comparison operands
+	      q(double [o]dists(ncmps);),    ##-- output matrix
+	      ''
+	     ),
+ OtherPars => join("\n   ", '', 'char *distFlag;', 'char *methodFlag;', ''),
+ Doc => '
+Computes cluster-distance between selected pairs of co-indexed clusters in ($cwhich1,$cwhich2).
+Cluster contents are passed as pairs ($coffsetsX(),$crowidsX()) as returned
+by the clusteroffsets() function.
+
+$distFlag and $methodFlag are interpreted as for clusterdistance().
+
+See also clusterenc(), clusterdistancematrixenc().
+',
+
+ Code => '
+  double **datapp   = (double **)pp_alloc($SIZE(n));
+  int    **maskpp   = (int    **)pp_alloc($SIZE(n));
+  int    transpose=0;
+  //
+  threadloop %{
+    p2pp_dbl($SIZE(n),   $SIZE(d),   $P(data), datapp);
+    p2pp_int($SIZE(n),   $SIZE(d),   $P(mask), maskpp);
+    //
+    loop (ncmps) %{
+      int c1 = $cwhich1();
+      int c2 = $cwhich2();
+      int succ_c1=c1+1;
+      int succ_c2=c2+1;
+      int beg1 = $coffsets1(k1=>c1);
+      int beg2 = $coffsets2(k2=>c2);
+      int len1 = $coffsets1(k1=>succ_c1) - beg1;
+      int len2 = $coffsets2(k2=>succ_c2) - beg2;
+      int *crowids1p = $P(crowids1) + beg1;
+      int *crowids2p = $P(crowids2) + beg2;
+
+      $dists() = clusterdistance($SIZE(n), $SIZE(d), datapp, maskpp, $P(weight),
+                                 len1,      len2,
+                                 crowids1p, crowids2p,
+                                 *$COMP(distFlag), *$COMP(methodFlag), transpose);
+    %}
+  %}
+  /*-- cleanup --*/
+  if (datapp) free(datapp);
+  if (maskpp) free(maskpp);
+',
+);
+
+##----------------------------------------------------------------------
+## Cluster Centroids via Weighted Sum [p(datum_n|cluster_k)]
+pp_def
+('getclusterwsum',
+       Pars => join("\n   ", '',
+		    q(double data(d,n);),       ##-- n="rows"|"elts", d="columns"|"features"
+		    q(int    mask(d,n);),       ##-- n="rows"|"elts", d="columns"|"features"
+		    q(double clusterwts(k,n);), ##-- maps (cluster,elt) to weight [p(elt|cluster)]
+		                                ##   : should probably sum to 1 over each cluster (k)
+		    q(double [o]cdata(d,k);),   ##-- centroid data
+		    q(int    [o]cmask(d,k);),   ##-- centroid mask
+		    ''
+		   ),
+       Code =>
+('
+ int rid, rwt, cmaskdk;
+ loop (d) %{
+   loop (k) %{
+     cmaskdk = 0;
+     loop (n) %{
+       if ($mask()) {
+         cmaskdk = 1;
+	 $cdata() += $clusterwts() * $data();
+       }
+     %}
+     $cmask() = cmaskdk;
+   %}
+ %}
+'),
+
+ Doc => '
+Find cluster centroids by weighted sum.  This can be considered an
+expensive generalization of the getclustermean() and getclustermedian()
+functions.  Here, the input PDLs $data() and $mask(), as well as the
+output PDL $cdata() are as for getclustermean().  The matrix $clusterwts()
+determines the relative weight of each data row in determining the
+centroid of each cluster, potentially useful for "fuzzy" clustering.
+The equation used to compute cluster means is:
+
+ $cdata(d,k) = sum_{n} $clusterwts(k,n) * $data(d,n) * $mask(d,n)
+
+For centroids in the same range as data elements, $clusterwts()
+should sum to 1 over each column (k):
+
+ all($clusterwts->xchg(0,1)->sumover == 1)
+
+getclustermean() can be simulated by instantiating $clusterwts() with
+a uniform distribution over cluster elements:
+
+ $clusterwts = zeroes($k,$n);
+ $clusterwts->indexND(cat($clusterids, xvals($clusterids))->xchg(0,1)) .= 1;
+ $clusterwts /= $clusterwts->xchg(0,1)->sumover;
+ getclusterwsum($data,$mask, $clusterwts, $cdata=zeroes($d,$k));
+
+Similarly, getclustermedian() can be simulated by setting $clusterwts() to
+1 for cluster medians and otherwise to 0.  More sophisticated centroid
+discovery methods can be computed by this function by setting
+$clusterwts(k,n) to some estimate of the conditional probability
+of the datum at row $n given the cluster with index $k:
+p(Elt==n|Cluster==k).  One
+way to achieve such an estimate is to use (normalized inverses of) the
+singleton-row-to-cluster distances as output by clusterdistancematrix().
+
+'
+);
+
+##----------------------------------------------------------------------
+## Attach data to nearest centroid
+pp_def
+('attachtonearest',
+       Pars => join("\n   ", '',
+		    q(double data(d,n);),         ##-- n="rows"|"elts", d="columns"|"features"
+		    q(int    mask(d,n);),         ##-- n="rows"|"elts", d="columns"|"features"
+		    q(double weight(d);),         ##-- feature weights
+		    q(int    rowids(nr);),        ##-- rows to attach
+		    q(double cdata(d,k);),        ##-- centroid data
+		    q(int    cmask(d,k);),        ##-- centroid mask
+		    q(int    [o]clusterids(nr);), ##-- output cluster ids
+		    q(double [o]cdist(nr);),      ##-- distances to best clusters
+		    ''
+		   ),
+ OtherPars => join("\n   ", '', 'char *distFlag;', 'char *methodFlag;', ''),
+       Code =>
+('
+  double **datapp  = (double **)pp_alloc($SIZE(n));
+  int    **maskpp  = (int    **)pp_alloc($SIZE(n));
+  double **cdatapp = (double **)pp_alloc($SIZE(k));
+  int    **cmaskpp = (int    **)pp_alloc($SIZE(k));
+  double *tmpdatapp[2];
+  int    *tmpmaskpp[2];
+  int    transpose=0;
+  //
+  threadloop %{
+    int    tmprowid = 0;
+    int    tmpctrid = 1;
+    int    ni;
+    int    ki, kbest;
+    double dist, dbest;
+    //
+    p2pp_dbl($SIZE(n), $SIZE(d), $P(data), datapp);
+    p2pp_int($SIZE(n), $SIZE(d), $P(mask), maskpp);
+    p2pp_dbl($SIZE(k), $SIZE(d), $P(cdata), cdatapp);
+    p2pp_int($SIZE(k), $SIZE(d), $P(cmask), cmaskpp);
+    //
+    /*-- loop over all target rows --*/
+    loop (nr) %{
+      ni = $rowids();
+      tmpdatapp[tmprowid] = datapp[ni];
+      tmpmaskpp[tmprowid] = maskpp[ni];
+      //
+      /*-- initialize --*/
+      tmpdatapp[tmpctrid] = cdatapp[0];
+      tmpmaskpp[tmpctrid] = cmaskpp[0];
+      kbest = 0;
+      dbest = clusterdistance(2, $SIZE(d), tmpdatapp, tmpmaskpp, $P(weight),
+                              1, 1, &tmprowid, &tmpctrid,
+                              *$COMP(distFlag), *$COMP(methodFlag), transpose);
+      //
+      /*-- loop over all centroids --*/
+      for (ki=1; ki < $SIZE(k); ki++) {
+        tmpdatapp[tmpctrid] = cdatapp[ki];
+        tmpmaskpp[tmpctrid] = cmaskpp[ki];
+        //
+        dist = clusterdistance(2, $SIZE(d), tmpdatapp, tmpmaskpp, $P(weight),
+                               1, 1, &tmprowid, &tmpctrid,
+                               *$COMP(distFlag), *$COMP(methodFlag), transpose);
+        if (dist < dbest) {
+          kbest = ki;
+          dbest = dist;
+        }
+      }
+      //
+      /*-- save best data --*/
+      $clusterids() = kbest;
+      $cdist()      = dbest;
+    %}
+  %}
+  //
+  /*-- cleanup --*/
+  if (datapp) free(datapp);
+  if (maskpp) free(maskpp);
+  if (cdatapp) free(cdatapp);
+  if (cmaskpp) free(cmaskpp);
+'),
+
+ Doc => '
+Assigns each specified data row to the nearest cluster centroid.
+Data elements are given by $data() and $mask(), feature weights are
+given by $weight(), as usual.  Cluster centroids are defined by
+by $cdata() and $cmask(), and the indices of rows to be attached
+are given in the vector $rowids().  The output vector $clusterids()
+contains for each specified row index the identifier of the nearest
+cluster centroid.  The vector $cdist() contains the distance to
+the best clusters.
+
+See also: clusterdistancematrix(), attachtonearestd().
+'
+);
+
+
+##----------------------------------------------------------------------
+## Attach data to nearest centroid, given datum-to-centroid distance matrix
+pp_add_exported('','attachtonearestd');
+
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 attachtonearestd
+
+=for sig
+
+  Signature: (
+   double cdistmat(k,n);
+   int rowids(nr);
+   int [o]clusterids(nr);
+   double [o]dists(nr);
+   )
+
+Assigns each specified data row to the nearest cluster centroid,
+as for attachtonearest(), given the datum-to-cluster distance
+matrix $cdistmat().  Currently just a wrapper for a few PDL calls.
+In scalar context returns $clusterids(), in list context returns
+the list ($clusterids(),$dists()).
+
+=cut
+
+sub attachtonearestd {
+  my ($cdm,$rowids,$cids,$dists)=@_;
+  $cids = zeroes(long, $rowids->dim(0))    if (!defined($cids));
+  $dists = zeroes(double, $rowids->dim(0)) if (!defined($dists));
+
+  ##-- dice matrix
+  my $cdmr   = $cdm->dice_axis(1,$rowids);
+
+  ##-- get best
+  $cdmr->minimum_ind($cids);
+  $dists .= $cdmr->index($cids);
+
+  return wantarray ? ($cids,$dists) : $cids;
+}
+
+EOPM
+
+##======================================================================
+## Cluster assignment: checking
+##======================================================================
+
+##----------------------------------------------------------------------
+## checkprototypes(): ensure no repeats of $k values in the range [0,$n(
+pp_def
+('checkprototypes',
+ Pars => join("\n   ", '',
+ 	      q(protos(k);),           ##-- prototypes: $protos($i) \in [0,$n(
+	      q([o]cprotos(k);),       ##-- protos without repetitions
+	      q(byte [t]otmp(n);),     ##-- $otmp($i)==1 iff $protos($j)==$i for some $j [must be specified]
+	      ''
+	      ),
+ OtherPars => q(int nsize => n),
+ GenericTypes => [qw(B S U L)],
+ Inplace => ['protos'],
+ Code =>
+('
+ /*-- sanity check --*/
+ if ($SIZE(k) > $SIZE(n)) {
+   barf("checkprototypes(): number of prototypes \"k\" (=%d) must be <= number of objects \"n\" (=%d)!\n",
+        $SIZE(k), $SIZE(n));
+ }
+ threadloop %{
+   loop (n) %{ $otmp() = 0; %}
+   loop (k) %{
+     int protoi = $protos();
+     for (; $otmp(n=>protoi); protoi = (protoi+1)%$SIZE(n)) { ; }
+     $cprotos() = protoi;
+     $otmp(n=>protoi) = 1;
+   %}
+ %}
+'),
+  Doc =>
+('(Deterministic)
+
+Ensure that the assignment $protos() from $k objects to
+integer "prototype" indices in the range [0,$n( contains no repetitions of any
+of the $n possible prototype values.  One use for this function is
+the restriction of (randomly generated) potential clustering solutions
+for $k clusters in which each cluster is represented by a
+"prototypical" element from a data sample of size $n.
+
+Requires: $n >= $k.
+'),
+);
+
+
+##----------------------------------------------------------------------
+## checkpartitions(): ensure no gaps in $k values for $n objects
+pp_def
+('checkpartitions',
+ Pars => join("\n   ", '',
+	      q(part(n);),            ##-- partitioning of $n objects into to $k partitions
+	      q([o]cpart(n);),        ##-- partitioning using full codomain
+	      q([t]ptmp(k);),         ##-- $ptmp($i)==1 iff $map($j)==$i for some $j
+	      ''
+	      ),
+ OtherPars => q(int ksize => k),
+ GenericTypes => [qw(B S U L)],
+ Inplace => ['part'],
+ Code =>
+('
+ /*-- sanity check --*/
+ if ($SIZE(k) > $SIZE(n)) {
+   barf("checkpartitions(): number of partitions \"k\" (=%d) must be <= number of objects \"n\" (=%d)!\n",
+        $SIZE(k), $SIZE(n));
+ }
+ threadloop %{
+   int ni, ki, kj;
+   loop (k) %{ $ptmp() = 0; %}
+   loop (n) %{
+     ki = $part();
+     $cpart() = ki;
+     $ptmp(k=>ki) += 1;
+   %}
+   ni = 0;
+   for (ki=0; ki < $SIZE(k); ki++) {
+     if (!$ptmp(k=>ki)) {
+       for (; 1; ni = (ni+1)%$SIZE(n)) {
+	 kj = $cpart(n=>ni);
+	 if ($ptmp(k=>kj) > 1) break;
+       }
+       $cpart(n=>ni)   = ki;
+       $ptmp(k=>ki) += 1;
+       $ptmp(k=>kj) -= 1;
+     }
+   }
+ %}
+'),
+  Doc =>
+('(Deterministic)
+
+Ensure that the partitioning $part() of $n objects into $k bins
+(identified by integer values in the range [0,$k-1])
+contains at least one instance of each of the
+$k possible values.  One use for this function is
+the restriction of (randomly generated) potential clustering solutions
+for $n elements into $k clusters to those which assign at least one
+element to each cluster.
+
+Requires: $n >= $k.
+'),
+);
+
+##======================================================================
+## Cluster assignment: generation
+##======================================================================
+
+##----------------------------------------------------------------------
+## randomprototypes(): generate a random prototype solution
+pp_add_exported('','randomprototypes');
+
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 randomprototypes
+
+=for sig
+
+  Signature: (int k; int n; [o]prototypes(k))
+
+Generate a random set of $k prototype indices drawn from $n objects,
+ensuring that no object is used more than once.  Calls checkprototypes().
+
+See also: checkprototypes(), randomassign(), checkpartitions(), randompartition().
+
+=cut
+
+sub randomprototypes {
+  my ($k,$n,$protos) = @_;
+  $protos  = zeroes(long, $k) if (!defined($protos));
+  $protos .= PDL->random($k)*$n;
+  checkprototypes($protos->inplace, $n);
+  return $protos;
+}
+
+EOPM
+
+
+##----------------------------------------------------------------------
+## randompartition(): generate a random partition solution
+pp_add_exported('','randompartition');
+
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 randompartition
+
+=for sig
+
+  Signature: (int k; int n; [o]partition(n))
+
+Generate a partitioning of $n objects into $k clusters,
+ensuring that every cluster contains at least one object.
+Calls checkpartitions().
+This method is identical in functionality to randomassign(),
+but may be faster if $k is significantly smaller than $n.
+
+See also: randomassign(), checkpartitions(), checkprototypes(), randomprototypes().
+
+=cut
+
+sub randompartition {
+  my ($k,$n,$part) = @_;
+  $part  = zeroes(long, $n) if (!defined($part));
+  $part .= PDL->random($n)*$k;
+  checkpartitions($part->inplace, $k);
+  return $part;
+}
+
+EOPM
+
+
+
+
+##======================================================================
+## Footer Administrivia
+##======================================================================
+
+##------------------------------------------------------
+## pm additions
+pp_addpm(<<'EOPM');
+
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 COMMON ARGUMENTS
+
+Many of the functions described above require one or
+more of the following parameters:
+
+=over 4
+
+=item d
+
+The number of features defined for each data element.
+
+=item n
+
+The number of data elements to be clustered.
+
+=item k
+
+=item nclusters
+
+The number of desired clusters.
+
+=item data(d,n)
+
+A matrix representing the data to be clustered, double-valued.
+
+=item mask(d,n)
+
+A matrix indicating which data values are missing. If
+mask(i,j) == 0, then data(i,j) is treated as missing.
+
+=item weights(d)
+
+The (feature-) weights that are used to calculate the distance.
+
+B<Warning:> Not all distance metrics make use of weights;
+you must provide some nonetheless.
+
+=item clusterids(n)
+
+A clustering solution. $clusterids() maps data elements
+(row indices in $data()) to values in the range [0,$k-1].
+
+=back
+
+=cut
+
+##---------------------------------------------------------------------
+=pod
+
+=head2 Distance Metrics
+
+Distances between data elements (and cluster centroids, where applicable)
+are computed using one of a number of built-in metrics.  Which metric
+is to be used for a given computation is indicated by a character
+flag denoted above with $distFlag().  In the following, w[i] represents
+a weighting factor in the $weights() matrix, and $W represents the total
+of all weights.
+
+Currently implemented distance
+metrics and the corresponding flags are:
+
+=over 4
+
+=item e
+
+Pseudo-Euclidean distance:
+
+ dist_e(x,y) = 1/W * sum_{i=1..d} w[i] * (x[i] - y[i])^2
+
+Note that this is not the "true" Euclidean distance, which is defined as:
+
+ dist_E(x,y) = sqrt( sum_{i=1..d} (x[i] - y[i])^2 )
+
+
+=item b
+
+City-block ("Manhattan") distance:
+
+ dist_b(x,y) = 1/W * sum_{i=1..d} w[i] * |x[i] - y[i]|
+
+
+
+=item c
+
+Pearson correlation distance:
+
+ dist_c(x,y) = 1-r(x,y)
+
+where r is the Pearson correlation coefficient:
+
+ r(x,y) = 1/d * sum_{i=1..d} (x[i]-mean(x))/stddev(x) * (y[i]-mean(y))/stddev(y)
+
+=item a
+
+Absolute value of the correlation,
+
+ dist_a(x,y) = 1-|r(x,y)|
+
+where r(x,y) is the Pearson correlation coefficient.
+
+=item u
+
+Uncentered correlation (cosine of the angle):
+
+ dist_u(x,y) = 1-r_u(x,y)
+
+where:
+
+ r_u(x,y) = 1/d * sum_{i=1..d} (x[i]/sigma0(x)) * (y[i]/sigma0(y))
+
+and:
+
+ sigma0(w) = sqrt( 1/d * sum_{i=1..d} w[i]^2 )
+
+=item x
+
+Absolute uncentered correlation,
+
+ dist_x(x,y) = 1-|r_u(x,y)|
+
+=item s
+
+Spearman's rank correlation.
+
+ dist_s(x,y) = 1-r_s(x,y) ~= dist_c(ranks(x),ranks(y))
+
+where r_s(x,y) is the Spearman rank correlation.  Weights are ignored.
+
+=item k
+
+Kendall's tau (does not use weights).
+
+ dist_k(x,y) = 1 - tau(x,y)
+
+=item (other values)
+
+For other values of dist, the default (Euclidean distance) is used.
+
+=back
+
+=cut
+
+
+##---------------------------------------------------------------------
+=pod
+
+=head2 Link Methods
+
+For hierarchical clustering, the 'link method' must be specified
+by a character flag, denoted above as $methodFlag.
+Known link methods are:
+
+=over 4
+
+=item s
+
+Pairwise minimum-linkage ("single") clustering.
+
+Defines the distance between two clusters as the
+least distance between any two of their respective elements.
+
+=item m
+
+Pairwise maximum-linkage ("complete") clustering.
+
+Defines the distance between two clusters as the
+greatest distance between any two of their respective elements.
+
+=item a
+
+Pairwise average-linkage clustering (centroid distance using arithmetic mean).
+
+Defines the distance between two clusters as the
+distance between their respective centroids, where each
+cluster centroid is defined as the arithmetic mean of
+that cluster's elements.
+
+=item c
+
+Pairwise centroid-linkage clustering (centroid distance using median).
+
+Identifies the distance between two clusters as the
+distance between their respective centroids, where each
+cluster centroid is computed as the median of
+that cluster's elements.
+
+=item (other values)
+
+Behavior for other values is currently undefined.
+
+=back
+
+For the first three, either the distance matrix or the gene expression data is
+sufficient to perform the clustering algorithm. For pairwise centroid-linkage
+clustering, however, the gene expression data are always needed, even if the
+distance matrix itself is available.
+
+=cut
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+Perl by Larry Wall.
+
+PDL by Karl Glazebrook, Tuomas J. Lukka, Christian Soeller, and others.
+
+C Clustering Library by
+Michiel de Hoon,
+Seiya Imoto,
+and Satoru Miyano.
+
+Orignal Algorithm::Cluster module by John Nolan and Michiel de Hoon.
+
+=cut
+
+##----------------------------------------------------------------------
+=pod
+
+=head1 KNOWN BUGS
+
+Dimensional requirements are sometimes too strict.
+
+Passing weights to Spearman and Kendall link methods wastes space.
+
+=cut
+
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt> wrote and maintains the PDL::Cluster distribution.
+
+Michiel de Hoon wrote the underlying C clustering library for cDNA microarray data.
+
+=head1 COPYRIGHT
+
+PDL::Cluster is a set of wrappers around the C Clustering library for cDNA microarray data.
+
+=over 4
+
+=item *
+
+The C clustering library for cDNA microarray data.
+Copyright (C) 2002-2005 Michiel Jan Laurens de Hoon.
+
+This library was written at the Laboratory of DNA Information Analysis,
+Human Genome Center, Institute of Medical Science, University of Tokyo,
+4-6-1 Shirokanedai, Minato-ku, Tokyo 108-8639, Japan.
+Contact: michiel.dehoon 'AT' riken.jp
+
+See the files F<REAMDE.cluster>, F<cluster.c> and F<cluster.h> in the PDL::Cluster distribution
+for details.
+
+=item *
+
+PDL::Cluster wrappers copyright (C) Bryan Jurish 2005-2018. All rights reserved.
+This package is free software, and entirely without warranty.
+You may redistribute it and/or modify it under the same terms
+as Perl itself.
+
+=back
+
+=head1 SEE ALSO
+
+perl(1), PDL(3perl), Algorithm::Cluster(3perl), cluster(1),
+L<http://bonsai.hgc.jp/~mdehoon/software/cluster/software.htm|http://bonsai.hgc.jp/~mdehoon/software/cluster/software.htm>
+
+=cut
+
+EOPM
+
+# Always make sure that you finish your PP declarations with
+# pp_done
+pp_done();
+##----------------------------------------------------------------------

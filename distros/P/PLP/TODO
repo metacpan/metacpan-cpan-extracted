@@ -1,0 +1,8 @@
+In no particular order or significance:
+- lvalue %cookie (similar to AddCookie) [3.25?]
+- multipart posts [3.25]
+- install rules for servers
+- complete plp parsing tests [3.23]
+- redisplay include errors [3.23]
+- object instead of $PLP::
+- update plp.shiar.net, maybe reg plpage.nl or something

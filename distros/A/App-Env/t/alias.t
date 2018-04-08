@@ -1,9 +1,9 @@
 #!perl
-use Test::More tests => 9;
 
-use lib 't';
+use Test2::V0;
+use Test::Lib;
 
-BEGIN { use_ok('App::Env') };
+use App::Env;
 
 #############################################################
 
@@ -62,3 +62,6 @@ BEGIN { use_ok('App::Env') };
     App::Env::import( 'app1', { Force => 1 } );
     is( $ENV{App1}, 1, "import lower case alias" );
 }
+
+
+done_testing;

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright (C) 2014 Mikhael Goikhman <migo@freeshell.org>
+# Copyright (C) 2014-2018 Mikhael Goikhman <migo@freeshell.org>
 
 use strict;
 use warnings;
@@ -13,6 +13,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use SMB::Client;
 
+my $quiet = 0;
 my $verbose = 0;
 my $username = $ENV{USER} || $ENV{LOGNAME} || 'guest';
 
@@ -25,7 +26,8 @@ sub show_usage (;$) {
 
 		Options:
 			-h --help            show this usage
-			-v --verbose         print more messages
+			-q --quiet           do not show any errors
+			-v --verbose         print more messages (multiple)
 			-U --username u[%p]  SMB username and password (prompted if absent)
 	};
 	$usage =~ s/^\n//; $usage =~ s/^\t\t?//mg;
@@ -35,6 +37,7 @@ sub show_usage (;$) {
 
 GetOptions(
 	'h|help'       => sub { show_usage(0) },
+	'q|quiet+'     => \$quiet,
 	'v|verbose+'   => \$verbose,
 	'U|username=s' => \$username,
 ) or show_usage(1);
@@ -52,6 +55,9 @@ $Term::ReadLine::Gnu::Attribs{term_set} = [ "\033[1;36m", "\033[m", "\033[1;31m"
 	if %Term::ReadLine::Gnu::Attribs;
 @Term::ReadLine::TermCap::rl_term_set = ("\033[1;36m", "\033[m", "\033[1;31m", "\033[m")
 	if @Term::ReadLine::TermCap::rl_term_set;
+warn "# Consider to install perl(Term::ReadLine::Gnu) to get history.\n"
+	if $verbose && !%Term::ReadLine::Gnu::Attribs;
+$SIG{INT} = sub { die "Terminated by user\n"; };
 
 my @args;
 sub prompt ($;$$) {
@@ -86,7 +92,9 @@ my $client = SMB::Client->new(
 	$share_uri,
 	username => $username,
 	password => $password,
+	quiet    => $quiet,
 	verbose  => $verbose,
+	log_level => SMB::LOG_LEVEL_INFO,
 );
 
 my $tree = $client->connect_tree
@@ -128,34 +136,37 @@ my %commands = (
 	},
 	get => sub {
 		return unless check_tree();
-		$tree->dnload(prompt("File to get"), shift @args);
+		$tree->dnload(prompt("File to download"), shift @args);
 	},
 	put => sub {
 		return unless check_tree();
-		$tree->upload(prompt("File to put"), shift @args);
+		$tree->upload(prompt("File to upload"), shift @args);
+	},
+	del => sub {
+		return unless check_tree();
+		my $recursive = @args && $args[0] eq '-r' && shift @args && 1;
+		$tree->remove({ recursive => $recursive }, prompt("File to remove"));
+	},
+	rmdir => sub {
+		return unless check_tree();
+		my $recursive = @args && $args[0] eq '-r' && shift @args && 1;
+		$tree->remove({ recursive => $recursive }, prompt("Dir to remove"), 1);
+	},
+	rename => sub {
+		return unless check_tree();
+		my $force = @args && $args[0] eq '-f' && shift @args && 1;
+		$tree->rename({ force => $force }, prompt("File to rename"), prompt("New file name"));
 	},
 	copy => sub {
 		return unless check_tree();
 		$tree->copy(prompt("File to copy"), prompt("New file name"));
-	},
-	del => sub {
-		return unless check_tree();
-		$tree->remove(prompt("File to remove"));
-	},
-	rmdir => sub {
-		return unless check_tree();
-		$tree->remove(prompt("File to remove"), 1);
-	},
-	rename => sub {
-		return unless check_tree();
-		$tree->rename(prompt("File to rename"), prompt("New file name"));
 	},
 	help => sub {
 		my $help = qq{
 			Operations available:
 
 			connect ADDR  connect to server, ADDR is host[:port]
-			disconnect    disconnect of the current connection
+			disconnect    disconnect from the current server
 			tree-connect  connect to share, argument syntax //host[:port]/share
 			tree-disconn  disconnect from the current share
 
@@ -166,9 +177,10 @@ my %commands = (
 			dir [MASK]    list all or matching files
 			get SRC [DST] download remote file SRC from server
 			put SRC [DST] upload local file SRC file to server
-			del FILE      remove file
-			rmdir DIR     remove dir
-			rename F1 F2  rename file
+			del [-r] FILE remove file
+			rmdir [-r] D  remove dir (use -r to remove recursively)
+			rename F1 F2  rename file (add -f to force)
+			copy F1 F2    copy file
 
 			quit          exit the client (close all connections)
 		};
@@ -183,6 +195,10 @@ my %aliases = (
 	download => 'get',
 	upload => 'put',
 	rm => 'del',
+	remove => 'del',
+	mv => 'rename',
+	move => 'rename',
+	cp => 'copy',
 	exit => 'quit',
 );
 
@@ -190,14 +206,15 @@ print "Connected to $share_uri. Enter 'help' to list commands.\n";
 
 while (1) {
 	my $dir = format_cwd();
-	my $cmd = prompt("smb:$dir> ", 2) // last;
+	my $cmd = prompt("smb:$dir> ", 3) // last;
 	$cmd = $aliases{$cmd} if $aliases{$cmd};
 	last if $cmd eq 'quit';
 	my $func = $commands{$cmd};
 	if ($func) {
 		$func->();
 	} else {
-		print "Invalid command, try 'help'\n";
+		print "Invalid command '$cmd', try 'help'\n";
 	}
+	@args = ();  # forget unconsumed args
 }
 

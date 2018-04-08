@@ -46,15 +46,15 @@ subtest 'Testing sub sro_ok' => sub {
 
 subtest 'Testing sub sro_sigla' => sub {
     my $code = 'SS123456785BR';
-    is( WWW::Correios::SRO::sro_sigla($code), 'SEDEX',
+    is( WWW::Correios::SRO::sro_sigla($code), 'SEDEX FISICO',
       "$code -> SS" );
 
     $code = 'SL473124829BR';
-    is( WWW::Correios::SRO::sro_sigla($code), 'SEDEX',
+    is( WWW::Correios::SRO::sro_sigla($code), 'SEDEX LOGICO',
       "$code -> SL" );
 
     $code = "RE897448272BR";
-    is( WWW::Correios::SRO::sro_sigla($code), 'OBJETO REGISTRADO ECONÔMICO',
+    is( WWW::Correios::SRO::sro_sigla($code), 'MALA DIRETA POSTAL ESPECIAL',
       "$code -> RE" );
 
     $code = "ZZ897448272BR";

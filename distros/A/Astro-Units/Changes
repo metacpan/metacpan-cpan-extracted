@@ -1,0 +1,6 @@
+Revision history for Astro-Units
+
+1.00    02-Apr-2018
+        First version, Astro::Units a module to covert the astrological units till n'th precision for large value.
+1.10    04-Apr-2018 
+	Regex improvment , POD doc fix, Fixed CPAN installation ticket RT#124993 fix

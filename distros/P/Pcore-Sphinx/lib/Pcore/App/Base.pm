@@ -11,10 +11,10 @@ has app_dir         => ( is => 'lazy', isa => Str,          init_arg => undef );
 has _local_cfg_path => ( is => 'lazy', isa => Str,          init_arg => undef );
 
 # RUN-TIME ENVIRONMENT
-has runtime_env => ( is => 'rwp', isa => Enum [qw[development test production]], default => 'production' );
-has env_is_devel => ( is => 'lazy', isa => Bool, init_arg => undef );
-has env_is_test  => ( is => 'lazy', isa => Bool, init_arg => undef );
-has env_is_prod  => ( is => 'lazy', isa => Bool, init_arg => undef );
+has runtime_env  => ( is => 'rwp',  isa => Enum [qw[development test production]], default  => 'production' );
+has env_is_devel => ( is => 'lazy', isa => Bool,                                   init_arg => undef );
+has env_is_test  => ( is => 'lazy', isa => Bool,                                   init_arg => undef );
+has env_is_prod  => ( is => 'lazy', isa => Bool,                                   init_arg => undef );
 
 our $CFG = { SECRET => undef, };
 

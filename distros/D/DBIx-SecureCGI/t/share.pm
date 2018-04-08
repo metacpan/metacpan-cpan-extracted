@@ -1,4 +1,4 @@
-package t::share;
+package share;
 use 5.010001;
 use warnings;
 use strict;

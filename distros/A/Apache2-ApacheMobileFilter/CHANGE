@@ -1,6 +1,18 @@
-ApacheMobileFilter 4.22
-Add TypeGraphicLibrary directive to chose which graphic library to use ('gd' or 'magick')
-Add TypeGraphicLibrary directive to chose which graphic library to use ('gd' or 'magick')
+ApacheMobileFilter 4.32
+fix minor bug
+
+ApacheMobileFilter 4.31
+Add TypeGraphicLibrary directive to chose which graphic library to use 'gd' (libgd, is the default) or 'magick' (GraphicsMagick)
+Add TypeMagickFilter, only with GraphicsMagick directive to chose which filter to use (for more info: http://www.imagemagick.org/Usage/filter/)
+Add QualityImage to define the quality to convert the images (0 lower, 100 higher)
+Add MaxAgeImage to define max age before refresh in second  
+AMFImageRendering now save the filename in base64
+
+
+ApacheMobileFilter 4.30
+Add TypeGraphicLibrary directive to chose which graphic library to use 'gd' (libgd, is the default) or 'magick' (GraphicsMagick)
+Add TypeMagickFilter, only with GraphicsMagick directive to chose which filter to use (for more info: http://www.imagemagick.org/Usage/filter/)
+Add QualityJpeg for define the quality to convert the jpeg images (0 lower, 100 higher)
 AMFImageRendering save the filename in base64
 
 

@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use Export::Attrs;
 use JSON::XS qw( encode_json );
@@ -123,7 +123,7 @@ Text::MiniTmpl - Compile and render templates
 
 =head1 VERSION
 
-This document describes Text::MiniTmpl version v2.0.0
+This document describes Text::MiniTmpl version v2.0.1
 
 
 =head1 SYNOPSIS
@@ -230,7 +230,6 @@ AS IS, without any escaping.
 
 ... will be output AS IS
 
-
 =back
 
 Example templates:
@@ -269,9 +268,9 @@ Nothing by default, but all documented functions can be explicitly imported.
 
 =head1 INTERFACE 
 
-=over
+=head2 render
 
-=item render( $filename, %params )
+    $html = render( $filename, %params );
 
 Render template from $filename with %params.
 
@@ -287,8 +286,9 @@ Example:
 
 Return STRING with rendered template.
 
+=head2 tmpl2code
 
-=item tmpl2code( $filename )
+    $code = tmpl2code( $filename );
 
 Read template from $filename (may be absolute or relative to current
 template's directory or current working directory - see L</DESCRIPTION>),
@@ -305,8 +305,9 @@ Example:
 
 Return CODEREF to that function.
 
+=head2 raw
 
-=item raw( $is_raw )
+    raw( $is_raw );
 
 If $is_raw TRUE disable Unicode support.
 To enable Unicode again call raw() with $is_raw FALSE.
@@ -320,8 +321,9 @@ This mean you shouldn't use perl Unicode scalars in these parameters anymore.
 This affect only templates processed by tmpl2code() after calling raw()
 (beware caching effect of render()).
 
+=head2 encode_js
 
-=item encode_js( $scalar )
+    $js = encode_js( $scalar );
 
 Encode $scalar (string or number) for inserting into JavaScript code
 (usually inside HTML templates).
@@ -335,8 +337,9 @@ Example:
 
 Return encoded string.
 
+=head2 encode_js_data
 
-=item encode_js_data( $complex )
+    $js_data = encode_js_data( $complex );
 
 Encode $complex data structure (HASHREF, ARRAYREF, etc. - any data type
 supported by JSON::XS) for inserting into JavaScript code (usually inside
@@ -350,9 +353,6 @@ Example:
     </script>
 
 Return encoded string.
-
-
-=back
 
 
 =head1 SPEED AND SIZE
@@ -402,7 +402,6 @@ render it on each run - no caches used at all (except HDD files caching by OS).
     TeTmpl   448/s  Y  Text::Tmpl (0.33)
     TeCS     725/s  Y  Text::ClearSilver (0.10.5.4)
     HTP     1422/s  Y  HTML::Template::Pro (0.9504)
-
 
 =back
 
@@ -459,7 +458,7 @@ Alex Efros E<lt>powerman@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2007-2014 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+This software is Copyright (c) 2007- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
 
 This is free software, licensed under:
 

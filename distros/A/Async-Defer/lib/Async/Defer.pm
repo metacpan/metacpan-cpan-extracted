@@ -5,7 +5,7 @@ use strict;
 use Carp;
 no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 use Scalar::Util qw( refaddr );
 use List::Util qw( any );
@@ -560,7 +560,7 @@ Async::Defer - VM to write and run async code in usual sync-like way
 
 =head1 VERSION
 
-This document describes Async::Defer version v1.0.0
+This document describes Async::Defer version v1.0.1
 
 
 =head1 SYNOPSIS
@@ -818,13 +818,17 @@ Nothing.
 
 =head1 INTERFACE 
 
-=over
+=head2 GENERAL METHODS
 
-=item new()
+=head3 new
+
+    $defer = Async::Defer->new();
 
 Create and return Async::Defer object.
 
-=item clone()
+=head3 clone
+
+    $defer2 = $defer->clone();
 
 Clone existing Async::Defer object and return clone.
 
@@ -838,9 +842,10 @@ It's possible to C<clone()> object which is running right now, cloned object
 will not be in running state - this is safe way to C<run()> objects which may
 or may not be already running.
 
-=item run( [ $parent_defer, @params ] )
+=head3 run
 
-=item run( [ \&callback, @params ] )
+    $defer->run( $parent_defer, @params );
+    $defer->run( \&callback, @params );
 
 Start executing object's current I<program>, which must be defined first by
 adding at least one I<STATEMENT> (C<do()> or C<<catch(FINALLY=>sub{})>>)
@@ -871,7 +876,7 @@ In this case, the callback is called after break I<STATEMENT> in this object.
 The arguments for the callback are the results of the break I<STATEMENT>.
 Any value returned from C<\&callback> will be ignored.
 
-=item iter()
+=head3 iter
 
 This method available only inside C<while()> - both in C<while()>'s
 C<\&conditional> argument and C<while()>'s body I<STATEMENTS>. It return
@@ -886,18 +891,16 @@ current iteration number for nearest C<while()>, starting from 1.
         });
     $d->end_while();
 
-=back
-
 =head2 STATEMENTS and OPERATORS
 
 All I<STATEMENTS> methods return the Async::Defer object,
 so that you can chain method calls.
 
-=over
+=head3 do
 
-=item do( \&sync_or_async_code, … )
+    $defer = $defer->do( \&sync_or_async_code, … );
 
-=item do( $child_defer, … )
+    $defer = $defer->do( $child_defer, … );
 
 Add I<STATEMENT> to this object's I<program>.
 
@@ -910,21 +913,30 @@ C<do()> accepts multiple arguments. Those I<STATEMENTS> are added to the object
 in that order, and can be mix of any types - i.e. it's same as call C<do()>
 sequentially multiple times providing these arguments one-by-one.
 
-    do(
-        \&code,
-        $defer,
-        [$defer1, $defer2, \&code3],
+    $defer->do(
+        \&code1,
+        $defer2,
+        [$defer3, $defer4, \&code5],
         {
-            task1 => $defer4,
-            task2 => \&code5,
+            task1 => $defer6,
+            task2 => \&code7,
         },
         \&more_code,
-        …
+        ...
     );
 
-=item do( [\&sync_or_async_code, $child_defer, …], … )
-
-=item do( {task1=>\&sync_or_async_code, task2=>$child_defer, …}, … )
+    $defer = $defer->do(
+        [\&sync_or_async_code, $child_defer, ...],
+        ...
+    );
+    $defer = $defer->do(
+        {
+            task1 => \&sync_or_async_code,
+            task2 => $child_defer,
+            ...
+        },
+        ...
+    )
 
 Add one I<STATEMENT> to this object's I<program>.
 
@@ -983,11 +995,15 @@ depends on how these tasks was named - by id (ARRAY) or by name (HASH):
         }
     });
 
-=item if( \&conditional )
+=head3 if
 
-=item else()
+=head3 else
 
-=item end_if()
+=head3 end_if
+
+    $defer = $defer->if( \&conditional );
+    $defer = $defer->else();
+    $defer = $defer->end_if();
 
 Add conditional I<OPERATOR> to this object's I<program>.
 
@@ -998,9 +1014,12 @@ with single param:
 
 The C<\&conditional> B<MUST> be sync, and return true/false.
 
-=item while( \&conditional )
+=head3 while
 
-=item end_while()
+=head3 end_while
+
+    $defer = $defer->while( \&conditional );
+    $defer = $defer->end_while();
 
 Add loop I<OPERATOR> to this object's I<program>.
 
@@ -1011,9 +1030,15 @@ single param:
 
 The C<\&conditional> B<MUST> be sync, and return true/false.
 
-=item try()
+=head3 try
 
-=item catch( $regex_or_FINALLY => \&sync_or_async_code, ... )
+=head3 catch
+
+    $defer = $defer->try();
+    $defer = $defer->catch(
+        $regex_or_FINALLY => \&sync_or_async_code,
+        ...
+    );
 
 Add exception handling to this object's I<program>.
 
@@ -1040,39 +1065,41 @@ be executed with different params:
     # without exception
     ( $defer_object, @optional_results_from_previous_STATEMENT )
 
-=back
-
 =head2 FLOW CONTROL in STATEMENTS
 
 Unless you are nesting child defers, one and only one of these methods B<MUST> be
 called at end of each I<STATEMENT>, both sync and async!
 In the case of nested defers, see L</"NESTED DEFERS">.
 
-=over
+=head3 done
 
-=item done( @optional_result )
+    $defer->done( @optional_result );
 
 Go to continue I<STATEMENT>/I<OPERATOR>. If continue is I<STATEMENT>, it will receive
 C<@optional_result> in it parameters.
 
-=item throw( $error )
+=head3 throw
+
+    $defer->throw( $error );
 
 Throw exception. Nearest matching C<catch()> or FINALLY I<STATEMENT> will be
 executed and receive C<$error> in it parameter.
 
-=item continue()
+=head3 continue
+
+    $defer->continue();
 
 Move to beginning of nearest C<while()> (or to first I<STATEMENT> if
 called outside C<while()>) and continue with continue iteration (if C<while()>'s
 C<\&conditional> still returns true).
 
-=item break()
+=head3 break
+
+    $defer->break();
 
 Move to first I<STATEMENT>/I<OPERATOR> after nearest C<while()> (or finish this
 I<program> if called outside C<while()> - returning to parent's Defer object
 if any).
-
-=back
 
 
 =head1 SUPPORT
@@ -1132,7 +1159,7 @@ Toshio Ito C<< toshioito [at] cpan.org >>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2011-2012 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+This software is Copyright (c) 2011- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
 
 This is free software, licensed under:
 

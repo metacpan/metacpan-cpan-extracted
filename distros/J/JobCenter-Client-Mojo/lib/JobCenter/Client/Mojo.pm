@@ -1,7 +1,7 @@
 package JobCenter::Client::Mojo;
 use Mojo::Base -base;
 
-our $VERSION = '0.32'; # VERSION
+our $VERSION = '0.33'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -35,8 +35,8 @@ use JSON::MaybeXS qw(decode_json encode_json);
 use MojoX::NetstringStream 0.06; # for the enhanced close
 
 has [qw(
-	actions address auth clientid conn daemon debug jobs json lastping log
-	method ns ping_timeout port rpc timeout tls token who
+	actions address auth clientid conn daemon debug jobs json lastping
+	log method ns ping_timeout port rpc timeout tls token who
 )];
 
 sub new {
@@ -98,6 +98,7 @@ sub new {
 		$ns->on(close => sub {
 			$conn->close;
 			$log->info('connection to API closed');
+			$self->{_exit} = 91; # todo: doc
 			Mojo::IOLoop->stop;
 			#exit(1);
 		});
@@ -428,14 +429,16 @@ sub work {
 		return if ($self->lastping // 0) > time - $pt;
 		$self->log->error('ping timeout');
 		$ioloop->remove($self->clientid);
+		$self->{_exit} = 92; # todo: doc
 		$ioloop->stop;
 	}) if $pt > 0;
 
+	$self->{_exit} = 0;
 	$self->log->debug('JobCenter::Client::Mojo starting work');
 	Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 	$self->log->debug('JobCenter::Client::Mojo done?');
 
-	return 0;
+	return $self->{_exit};
 }
 
 sub announce {

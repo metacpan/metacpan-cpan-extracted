@@ -1,5 +1,8 @@
 Revision history for MojoX-UserAgent-Throttler
 
+v1.0.3  2018-04-03 18:47:46 EEST
+	- Fix compatibility with perl-5.26.
+
 v1.0.2  2017-02-22 06:51:27 EET
 	- Require Mojolicious-7.13.
 

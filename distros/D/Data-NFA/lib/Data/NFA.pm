@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 
 package Data::NFA;
-our $VERSION = "20180329";
+our $VERSION = "20180406";
 require v5.16;
 use warnings FATAL => qw(all);
 use strict;
@@ -24,43 +24,49 @@ sub Optional  {q(optional)}
 sub ZeroOrMore{q(zeroOrMore)}
 sub OneOrMore {q(OneOrMore)}
 sub Choice    {q(choice)}
+sub Except    {q(except)}
 
 #1 Construct regular expression                                                 # Construct a regular expression that defines the language to be parsed using the following combining operations which can all be imported:
 
-sub element($)                                                                  #ES One element.
+sub element($)                                                                  #ES One element. An element can also be represented by a string or number
  {my ($label) = @_;                                                             # Transition symbol
   [Element, @_]
  }
 
-sub sequence(@)                                                                 #ES Sequence of elements.
+sub sequence(@)                                                                 #ES Sequence of elements and/or symbols.
  {my (@elements) = @_;                                                          # Elements
   [Sequence, @elements]
  }
 
-sub optional(@)                                                                 #ES An optional sequence of element.
+sub optional(@)                                                                 #ES An optional sequence of elements and/or symbols.
  {my (@element) = @_;                                                           # Elements
   [Optional, @element]
  }
 
-sub zeroOrMore(@)                                                               #ES Zero or more repetitions of a sequence of elements.
+sub zeroOrMore(@)                                                               #ES Zero or more repetitions of a sequence of elements and/or symbols.
  {my (@element) = @_;                                                           # Elements
   [ZeroOrMore, @element]
  }
 
-sub oneOrMore(@)                                                                #ES One or more repetitions of a sequence of elements.
+sub oneOrMore(@)                                                                #ES One or more repetitions of a sequence of elements and/or symbols.
  {my (@element) = @_;                                                           # Elements
   [OneOrMore, @element]
  }
 
-sub choice(@)                                                                   #ES Choice from amongst one or more elements.
+sub choice(@)                                                                   #ES Choice from amongst one or more elements and/or symbols.
  {my (@elements) = @_;                                                          # Elements to be chosen from
   [Choice, @elements]
  }
 
+sub except(@)                                                                   #ES Choice from amongst all symbols except the ones mentioned
+ {my (@elements) = @_;                                                          # Elements not to be chosen from
+  [Except, @elements]
+ }
+
 #1 Non Deterministic finite state machine
 
-sub fromExpr2($$)                                                               #P Create an NFA from a regular expression.
- {my ($states, $expr) = @_;                                                     # States, regular expression constructed from L<element|/element> L<sequence|/sequence> L<optional|/optional> L<zeroOrMore|/zeroOrMore> L<oneOrMore|/oneOrMore> L<choice|/choice>.
+sub fromExpr2($$$)                                                              #P Create an NFA from a regular expression.
+ {my ($states, $expr, $symbols) = @_;                                           # States, regular expression constructed from L<element|/element> L<sequence|/sequence> L<optional|/optional> L<zeroOrMore|/zeroOrMore> L<oneOrMore|/oneOrMore> L<choice|/choice>, set of symbols used by the NFA.
   $states       //= {};
   my $next        = sub{scalar keys %$states};                                  # Next state name
   my $last        = sub{&$next - 1};                                            # Last state created
@@ -70,49 +76,72 @@ sub fromExpr2($$)                                                               
     $states->{$from}->[Jumps]->{$_}++ for @to
    };
   my $start       = &$next;
-  my ($structure) = @$expr;
-  if ($structure eq Element)                                                    # Element
-   {my (undef, $label, $data) = @$expr;
-    &$save({$label=>$start+1}, undef);
+  if (!ref($expr))                                                              # Element not wrapped with element()
+   {&$save({$expr=>$start+1}, undef);
    }
-  elsif ($structure eq Sequence)                                                # Sequence of elements
-   {my (undef, @elements) = @$expr;
-    $states->fromExpr2($_) for @elements;
-   }
-  elsif ($structure eq Optional)                                                # Optional element
-   {my (undef, @elements) = @$expr;
-    $states->fromExpr2($_) for @elements;
-    &$jump($start, &$next);                                                     # Optional so we have the option of jumping over it
-   }
-  elsif ($structure eq ZeroOrMore)                                              # Zero or more
-   {my (undef, @elements) = @$expr;
-    $states->fromExpr2($_) for @elements;
-    &$jump($start, &$next+1);                                                   # Optional so we have the option of jumping over it
-    &$save(undef, {$start=>1});                                                 # Repeated so we have the option of redoing it
-   }
-  elsif ($structure eq OneOrMore)                                               # One or more
-   {my (undef, @elements) = @$expr;
-    $states->fromExpr2($_) for @elements;
-    my $N = &$next;
-    &$jump($N, $start, $N+1);                                                   # Do it again or move on
-   }
-  elsif ($structure eq Choice)                                                  # Choice
-   {my (undef, @elements) = @$expr;
-    my @fix;
-    for my $i(keys @elements)                                                   # Each element index
-     {my $element = $elements[$i];                                              # Each element separate by a gap so we can not jump in then jump out
-      &$jump($start, &$next) if $i;
-      $states->fromExpr2($element);                                          # Choice
-      if ($i < $#elements)
-       {push @fix, &$next;
-        &$save();                                                               # Fixed later to jump over subsequent choices
-       }
+  else
+   {my ($structure) = @$expr;
+    if ($structure eq Element)                                                  # Element
+     {my (undef, $element) = @$expr;                                            
+      &$save({$element=>$start+1}, undef);                                      
+     }                                                                          
+    elsif ($structure eq Sequence)                                              # Sequence of elements
+     {my (undef, @elements) = @$expr;                                           
+      $states->fromExpr2($_, $symbols) for @elements;                           
+     }                                                                          
+    elsif ($structure eq Optional)                                              # Optional element
+     {my (undef, @elements) = @$expr;                                           
+      $states->fromExpr2($_, $symbols) for @elements;                           
+      &$jump($start, &$next);                                                   # Optional so we have the option of jumping over it
+     }                                                                          
+    elsif ($structure eq ZeroOrMore)                                            # Zero or more
+     {my (undef, @elements) = @$expr;                                           
+      $states->fromExpr2($_, $symbols) for @elements;                           
+      &$jump($start, &$next+1);                                                 # Optional so we have the option of jumping over it
+      &$save(undef, {$start=>1});                                               # Repeated so we have the option of redoing it
+     }                                                                          
+    elsif ($structure eq OneOrMore)                                             # One or more
+     {my (undef, @elements) = @$expr;                                           
+      $states->fromExpr2($_, $symbols) for @elements;                           
+      my $N = &$next;                                                           
+      &$jump($N, $start, $N+1);                                                 # Do it again or move on
+     }                                                                          
+    elsif ($structure eq Choice)                                                # Choice
+     {my (undef, @elements) = @$expr;                                           
+      my @fix;                                                                  
+      for my $i(keys @elements)                                                 # Each element index
+       {my $element = $elements[$i];                                            # Each element separate by a gap so we can not jump in then jump out
+        &$jump($start, &$next) if $i;                                           
+        $states->fromExpr2($element, $symbols);                                 # Choice
+        if ($i < $#elements)                                                    
+         {push @fix, &$next;                                                    
+          &$save();                                                             # Fixed later to jump over subsequent choices
+         }                                                                      
+       }                                                                        
+      my $N = &$next;                                                           # Fix intermediates
+      &$jump($_, $N) for @fix;                                                  
+     }                                                                          
+    elsif ($structure eq Except)                                                # Except
+     {my (undef, @exclude) = @$expr;                                            
+      my %exclude = map{(ref $_ ? $$_[1] : $_)=>1} @exclude;                    # Names of elements to exclude
+      my @fix;                                                                  
+      my @elements = grep {!$exclude{$_}}                                       
+                     sort keys %$symbols;                                       # Each element not excluded
+      for my $i(keys @elements)                                                 # Each element index
+       {my $element = $elements[$i];                                            # Each element separate by a gap so we can not jump in then jump out
+        &$jump($start, &$next) if $i;                                           
+        $states->fromExpr2(element($element), $symbols);                        # Choice of not excluded symbols
+        if ($i < $#elements)                                                    
+         {push @fix, &$next;                                                    
+          &$save();                                                             # Fixed later to jump over subsequent choices
+         }                                                                      
+       }                                                                        
+      my $N = &$next;                                                           # Fix intermediates
+      &$jump($_, $N) for @fix;                                                  
+     }                                                                          
+    else                                                                        # Unknown request
+     {confess "Unknown structuring operation: $structure";
      }
-    my $N = &$next;                                                             # Fix intermediates
-    &$jump($_, $N) for @fix;
-   }
-  else                                                                          # Unknown request
-   {confess "Unknown structuring operation: $structure";
    }
   $states
  }
@@ -156,17 +185,34 @@ sub statesReachableViaJumps($$)                                                 
     push @check, keys %$jumps;                                                  # Make a jump and try again
    }
 
-  \%reachable
+  [sort keys %reachable]
  } # statesReachableViaJumps
 
 sub fromExpr(@)                                                                 #S Create an NFA from a regular expression.
  {my (@expr) = @_;                                                              # Expressions
   my $states = bless {};
-  $states->fromExpr2($_) for @expr;                                             # Create state transitions
+  my %symbols;                                                                  # Symbols named in expression
+  my $symbols; $symbols = sub                                                   # Locate symbols
+   {my ($expr) = @_;
+    if (ref $expr)
+     {$symbols{$$expr[1]}++ if $$expr[0] eq Element;                            # Add symbol enclosed in element 
+      my ($type, @elements) = @$expr;
+      for(@elements)
+       {ref $_ ? $symbols->($_) : $symbols{$_}++;
+       }  
+     }
+    else                                                                        # Process sub expressions
+     {$symbols{$expr}++;                                                        # Add symbol not enclosed in element() 
+     }
+   };
+  $symbols->($_) for @expr;                                                     # Locate all symbols
+
+  $states->fromExpr2($_, \%symbols) for @expr;                                  # Create state transitions
   $states->{keys %$states} = [undef, undef, 1];                                 # End state
 
   for my $stateName(sort keys %$states)
-   {$$states{$stateName}[Jumps] = $states->statesReachableViaJumps($stateName);
+   {$$states{$stateName}[Jumps] =
+      {map {$_=>1} @{statesReachableViaJumps($states, $stateName)}};
    }
 
   $states->propogateFinalState;
@@ -214,6 +260,11 @@ sub print($$;$)                                                                 
   if ($j) {&printWithJumps(@_)} else {&printWithOutJumps(@_)}
  }
 
+sub printNws($$;$)                                                              # Print the current state of the finite automaton. If it is non deterministic, the non deterministic jumps will be shown as well as the transitions table. If deterministic, only the transitions table will be shown. Normalize white space to simplify testing.
+ {my ($states, $title, $print) = @_;                                            # States, title, print to STDERR if 2 or to STDOUT if 1
+  nws &print(@_);
+ }
+
 sub symbols($)                                                                  # Return an array of all the transition symbols.
  {my ($states) = @_;                                                            # States
   my %s;
@@ -224,33 +275,13 @@ sub symbols($)                                                                  
   sort keys %s
  }
 
-#sub exitSymbolsForState($$)                                                     #P Find all the symbols that can exit a state via its transitions or jumps
-# {my ($states, $StateName) = @_;                                                # States, name of start state
-#  my %symbols;
-#  my @check = ($StateName);
-#  my %checked;
-#
-#  while(@check)                                                                 # Reachable from the start state by a single transition after zero or more jumps
-#   {my $stateName = pop @check;
-#    next if $checked{$stateName}++;
-#    my $state = $$states{$stateName};
-#    my ($transitions, $jumps, $final) = @$state;
-#    push @check, sort keys %$jumps;
-#    for my $transition(keys %$transitions)
-#     {$symbols{$transition}++;
-#     }
-#   }
-#
-#  sort keys %symbols                                                           # The symbols that can exit this state
-# } # exitSymbolsForState
-
 sub isFinal($$)                                                                 # Whether this is a final state or not
  {my ($states, $stateName) = @_;                                                # States, name of state
   $$states{$stateName}[Final]
  }
 
-sub statesReachableViaSymbol($$$)                                               # Find the names of all the states that can be reached from a specified state via a specified symbol and all the jumps available.
- {my ($states, $StateName, $symbol) = @_;                                       # States, name of start state, symbol to reach on
+sub statesReachableViaSymbol($$$$)                                              #P Find the names of all the states that can be reached from a specified state via a specified symbol and all the jumps available.
+ {my ($states, $StateName, $symbol, $cache) = @_;                               # States, name of start state, symbol to reach on, a hash to be used as a cache
   my %reachable;
   my @check = ($StateName);
   my %checked;
@@ -264,14 +295,83 @@ sub statesReachableViaSymbol($$$)                                               
 
     if (my $t = $$transitions{$symbol})                                         # Transition on the symbol
      {$reachable{$t}++;
-      my $r = $states->statesReachableViaJumps($t);
-      $reachable{$_}++ for sort keys %$r;
+      $reachable{$_}++
+        for @{$$cache{$t} //= statesReachableViaJumps($states, $t)};            # Cache results of this expensive call
      }
     push @check, keys %$jumps;                                                  # Make a jump and try again
    }
 
-  \%reachable
+  [sort keys %reachable]
  } # statesReachableViaSymbol
+
+sub allTransitions($)                                                           # Return all transitions in the NFA as {stateName}{symbol} = [reachble states]
+ {my ($states) = @_;                                                            # States
+  my $symbols = [$states->symbols];                                             # Symbols in nfa
+  my $cache = {};                                                               # Cache results
+
+  my $nfaSymbolTransitions;
+  for my $StateName(sort keys %$states)                                         # Each NFA state
+   {our $symbol;                                                                # Each symbol to avoid the overhead of passing it as a parameter at a cost of a loss of reentrancy
+    our %reachable;
+    our @check;
+    our %checked;
+    our $stateName;
+    our $state;
+    our ($transitions, $jumps);
+    our $to;
+
+    my $statesReachableViaSymbol = sub                                          #P Find the names of all the states that can be reached from a specified state via a specified symbol and all the jumps available.
+     {%reachable = ();
+      @check     = ($StateName);
+      %checked   = ();
+
+      while(@check)                                                             # Reachable from the start state by a single transition after zero or more jumps
+       {$stateName = pop @check;
+        next if $checked{$stateName}++;
+        $state = $$states{$stateName};
+        confess "No such state: $stateName" unless $state;
+        ($transitions, $jumps) = @$state;
+
+        if ($to = $$transitions{$symbol})                                       # Transition on the symbol
+         {$reachable{$to}++;
+          $reachable{$_}++
+            for @{$$cache{$to} //= statesReachableViaJumps($states, $to)};      # Cache results of this expensive call
+         }
+        push @check, keys %$jumps;                                              # Make a jump and try again
+       }
+
+      [sort keys %reachable]                                                    # List of reachable states
+     }; # statesReachableViaSymbol
+
+    my $target = $$nfaSymbolTransitions{$StateName} = {};
+    for $symbol(@$symbols)                                                      # Each NFA symbol
+     {$$target{$symbol} = &$statesReachableViaSymbol;                           # States in the NFA reachable on the symbol
+     }
+   }
+
+  $nfaSymbolTransitions
+ } # allTransitions
+
+#sub exitSymbolsForState($$)                                                    #P Find all the symbols that can exit a state via its transitions or jumps
+# {my ($states, $StateName) = @_;                                               # States, name of start state
+#  my %symbols;
+#  my @check = ($StateName);
+#  my %checked;
+#
+#  while(@check)                                                                # Reachable from the start state by a single transition after zero or more jumps
+#   {my $stateName = pop @check;
+#    next if $checked{$stateName}++;
+#    my $state = $$states{$stateName};
+#    my ($transitions, $jumps, $final) = @$state;
+#    push @check, sort keys %$jumps;
+#    for my $transition(keys %$transitions)
+#     {$symbols{$transition}++;
+#     }
+#   }
+#
+#  sort keys %symbols                                                           # The symbols that can exit this state
+# } # exitSymbolsForState
+
 
 #-------------------------------------------------------------------------------
 # Export
@@ -285,6 +385,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 @EXPORT_OK    = qw(
 choice
 element
+except
 oneOrMore optional
 sequence
 zeroOrMore
@@ -323,7 +424,7 @@ produces the following machine:
 
   my $nfa = eval qq(fromExpr(($s)x$N));
 
-  ok $nfa->print("((a|b)*)**$N: ") eq nws <<END;
+  ok $nfa->printNws("((a|b)*)**$N: ") eq nws <<END;
 ((a|b)*)**4:
 Location  F  Transitions  Jumps
        0  1  { a => 1 }   [2, 4, 6, 8, 10, 12, 14, 16]
@@ -358,24 +459,44 @@ Construct a regular expression that defines the language to be parsed using the 
 
 =head2 element($)
 
-One element.
+One element. An element can also be represented by a string or number
 
-     Parameter  Description
-  1  $label     Transition label
+     Parameter  Description        
+  1  $label     Transition symbol  
 
 Example:
 
 
   my $nfa = fromExpr(element("a"));
-
-  ok $nfa->print("Element: a") eq nws <<END;
+  
+  ok $nfa->printNws("Element: a") eq nws <<END;
   Element: a
   Location  F  Transitions
          0  0  { a => 1 }
          1  1  undef
-
+  
   END
-
+  
+  my $nfa = fromExpr(q(b));
+  
+  ok $nfa->printNws("Element: b") eq nws <<END;
+  Element: b
+  Location  F  Transitions
+         0  0  { b => 1 }
+         1  1  undef
+  
+  END
+  
+  my $nfa = fromExpr(2);
+  
+  ok $nfa->printNws("Element: 2") eq nws <<END;
+  Element: 2
+  Location  F  Transitions
+         0  0  { 2 => 1 }
+         1  1  undef
+  
+  END
+  
 
 This is a static method and so should be invoked as:
 
@@ -389,24 +510,24 @@ This method can be imported via:
 
 =head2 sequence(@)
 
-Sequence of elements.
+Sequence of elements and/or symbols.
 
-     Parameter  Description
-  1  @elements  Elements
+     Parameter  Description  
+  1  @elements  Elements     
 
 Example:
 
 
   my $nfa = fromExpr(sequence(element("a"), element("b")));
-
-  ok $nfa->print("Sequence: ab") eq nws <<END;
+  
+  ok $nfa->printNws("Sequence: ab") eq nws <<END;
   Sequence: ab
   Location  F  Transitions
          0  0  { a => 1 }
          1  0  { b => 2 }
          2  1  undef
   END
-
+  
 
 This is a static method and so should be invoked as:
 
@@ -420,17 +541,17 @@ This method can be imported via:
 
 =head2 optional(@)
 
-An optional sequence of element.
+An optional sequence of elements and/or symbols.
 
-     Parameter  Description
-  1  @element   Elements
+     Parameter  Description  
+  1  @element   Elements     
 
 Example:
 
 
   my $nfa = fromExpr(element("a"), optional(element("b")), element("c"));
-
-  ok $nfa->print("Optional: ab?c") eq nws <<END;
+  
+  ok $nfa->printNws("Optional: ab?c") eq nws <<END;
   Optional: ab?c
   Location  F  Transitions  Jumps
          0  0  { a => 1 }   undef
@@ -438,20 +559,20 @@ Example:
          2  0  { c => 3 }   undef
          3  1  undef        undef
   END
-
+  
   my $nfa = fromExpr
-
+  
   (element("a"),
-
-  oneOrMore(choice(element("b"), element("c"))),
-
+  
+  oneOrMore(choice(qw(b c))),
+  
   optional(element("d")),
-
+  
   element("e")
-
+  
   );
-
-  ok $nfa->print("a(b|c)+d?e :") eq nws <<END;
+  
+  ok $nfa->printNws("a(b|c)+d?e :") eq nws <<END;
   a(b|c)+d?e :
   Location  F  Transitions  Jumps
          0  0  { a => 1 }   undef
@@ -463,7 +584,7 @@ Example:
          6  0  { e => 7 }   undef
          7  1  undef        undef
   END
-
+  
 
 This is a static method and so should be invoked as:
 
@@ -477,17 +598,17 @@ This method can be imported via:
 
 =head2 zeroOrMore(@)
 
-Zero or more repetitions of a sequence of elements.
+Zero or more repetitions of a sequence of elements and/or symbols.
 
-     Parameter  Description
-  1  @element   Elements
+     Parameter  Description  
+  1  @element   Elements     
 
 Example:
 
 
   my $nfa = fromExpr(element("a"), zeroOrMore(element("b")), element("c"));
-
-  ok $nfa->print("Zero Or More: ab*c") eq nws <<END;
+  
+  ok $nfa->printNws("Zero Or More: ab*c") eq nws <<END;
   Zero Or More: ab*c
   Location  F  Transitions  Jumps
          0  0  { a => 1 }   undef
@@ -496,7 +617,7 @@ Example:
          3  0  { c => 4 }   undef
          4  1  undef        undef
   END
-
+  
 
 This is a static method and so should be invoked as:
 
@@ -510,17 +631,17 @@ This method can be imported via:
 
 =head2 oneOrMore(@)
 
-One or more repetitions of a sequence of elements.
+One or more repetitions of a sequence of elements and/or symbols.
 
-     Parameter  Description
-  1  @element   Elements
+     Parameter  Description  
+  1  @element   Elements     
 
 Example:
 
 
   my $nfa = fromExpr(element("a"), oneOrMore(element("b")), element("c"));
-
-  ok $nfa->print("One or More: ab+c") eq nws <<END;
+  
+  ok $nfa->printNws("One or More: ab+c") eq nws <<END;
   One or More: ab+c
   Location  F  Transitions  Jumps
          0  0  { a => 1 }   undef
@@ -529,7 +650,7 @@ Example:
          3  0  { c => 4 }   undef
          4  1  undef        undef
   END
-
+  
 
 This is a static method and so should be invoked as:
 
@@ -543,21 +664,21 @@ This method can be imported via:
 
 =head2 choice(@)
 
-Choice from amongst one or more elements.
+Choice from amongst one or more elements and/or symbols.
 
-     Parameter  Description
-  1  @elements  Elements to be chosen from
+     Parameter  Description                 
+  1  @elements  Elements to be chosen from  
 
 Example:
 
 
   my $nfa = fromExpr(element("a"),
-
+  
   choice(element("b"), element("c")),
-
+  
   element("d"));
-
-  ok $nfa->print("Choice: (a(b|c)d") eq nws <<END;
+  
+  ok $nfa->printNws("Choice: (a(b|c)d") eq nws <<END;
   Choice: (a(b|c)d
   Location  F  Transitions  Jumps
          0  0  { a => 1 }   undef
@@ -567,7 +688,7 @@ Example:
          4  0  { d => 5 }   undef
          5  1  undef        undef
   END
-
+  
 
 This is a static method and so should be invoked as:
 
@@ -579,31 +700,73 @@ This method can be imported via:
   use Data::NFA qw(choice)
 
 
+=head2 except(@)
+
+Choice from amongst all symbols except the ones mentioned
+
+     Parameter  Description                     
+  1  @elements  Elements not to be chosen from  
+
+Example:
+
+
+  my $nfa = fromExpr(choice(qw(a b c)), except(qw(c x)), choice(qw(a b c)));
+  
+  ok $nfa->printNws("(a|b|c)(c!x)(a|b|c): ") eq nws <<END;
+  (a|b|c)(c!x)(a|b|c):
+  Location  F  Transitions  Jumps
+     0      0  { a => 1 }   [2, 4]
+     1      0  undef        [5, 7]
+     2      0  { b => 3 }   undef
+     3      0  undef        [5, 7]
+     4      0  { c => 5 }   undef
+     5      0  { a => 6 }   [7]
+     6      0  undef        [8, 10, 12]
+     7      0  { b => 8 }   undef
+     8      0  { a => 9 }   [10, 12]
+     9      1  undef        [13]
+    10      0  { b => 11 }  undef
+    11      1  undef        [13]
+    12      0  { c => 13 }  undef
+    13      1  undef        undef
+  END
+  
+
+This is a static method and so should be invoked as:
+
+  Data::NFA::except
+
+
+This method can be imported via:
+
+  use Data::NFA qw(except)
+
+
 =head1 Non Deterministic finite state machine
 
 =head2 fromExpr(@)
 
 Create an NFA from a regular expression.
 
-     Parameter  Description
-  1  @expr      Expressions
+     Parameter  Description  
+  1  @expr      Expressions  
 
 Example:
 
 
   my $nfa = fromExpr
-
+  
   (element("a"),
-
-  oneOrMore(choice(element("b"), element("c"))),
-
+  
+  oneOrMore(choice(qw(b c))),
+  
   optional(element("d")),
-
+  
   element("e")
-
+  
   );
-
-  ok $nfa->print("a(b|c)+d?e :") eq nws <<END;
+  
+  ok $nfa->printNws("a(b|c)+d?e :") eq nws <<END;
   a(b|c)+d?e :
   Location  F  Transitions  Jumps
          0  0  { a => 1 }   undef
@@ -615,7 +778,7 @@ Example:
          6  0  { e => 7 }   undef
          7  1  undef        undef
   END
-
+  
 
 This is a static method and so should be invoked as:
 
@@ -626,27 +789,27 @@ This is a static method and so should be invoked as:
 
 Print the current state of the finite automaton. If it is non deterministic, the non deterministic jumps will be shown as well as the transitions table. If deterministic, only the transitions table will be shown.
 
-     Parameter  Description
-  1  $states    States
-  2  $title     Title
-  3  $print     Print to STDERR if 2 or to STDOUT if 1
+     Parameter  Description                             
+  1  $states    States                                  
+  2  $title     Title                                   
+  3  $print     Print to STDERR if 2 or to STDOUT if 1  
 
 Example:
 
 
   my $nfa = fromExpr
-
+  
   (element("a"),
-
-  oneOrMore(choice(element("b"), element("c"))),
-
+  
+  oneOrMore(choice(qw(b c))),
+  
   optional(element("d")),
-
+  
   element("e")
-
+  
   );
-
-  ok $nfa->print("a(b|c)+d?e :") eq nws <<END;
+  
+  ok $nfa->printNws("a(b|c)+d?e :") eq nws <<END;
   a(b|c)+d?e :
   Location  F  Transitions  Jumps
          0  0  { a => 1 }   undef
@@ -658,31 +821,40 @@ Example:
          6  0  { e => 7 }   undef
          7  1  undef        undef
   END
+  
 
+=head2 printNws($$$)
+
+Print the current state of the finite automaton. If it is non deterministic, the non deterministic jumps will be shown as well as the transitions table. If deterministic, only the transitions table will be shown. Normalize white space to simplify testing.
+
+     Parameter  Description                             
+  1  $states    States                                  
+  2  $title     Title                                   
+  3  $print     Print to STDERR if 2 or to STDOUT if 1  
 
 =head2 symbols($)
 
 Return an array of all the transition symbols.
 
-     Parameter  Description
-  1  $states    States
+     Parameter  Description  
+  1  $states    States       
 
 Example:
 
 
   my $nfa = fromExpr
-
+  
   (element("a"),
-
-  oneOrMore(choice(element("b"), element("c"))),
-
+  
+  oneOrMore(choice(qw(b c))),
+  
   optional(element("d")),
-
+  
   element("e")
-
+  
   );
-
-  ok $nfa->print("a(b|c)+d?e :") eq nws <<END;
+  
+  ok $nfa->printNws("a(b|c)+d?e :") eq nws <<END;
   a(b|c)+d?e :
   Location  F  Transitions  Jumps
          0  0  { a => 1 }   undef
@@ -694,85 +866,181 @@ Example:
          6  0  { e => 7 }   undef
          7  1  undef        undef
   END
-
+  
   is_deeply ['a'..'e'], [$nfa->symbols];
+  
 
+=head2 isFinal($$)
+
+Whether this is a final state or not
+
+     Parameter   Description    
+  1  $states     States         
+  2  $stateName  Name of state  
+
+Example:
+
+
+  ok $nfa->printNws("Element: a") eq nws <<END;
+  Element: a
+  Location  F  Transitions
+         0  0  { a => 1 }
+         1  1  undef
+  
+  END
+  
+  ok  $nfa->isFinal(1);
+  
+  ok !$nfa->isFinal(0);
+  
+  ok $nfa->printNws("Element: b") eq nws <<END;
+  Element: b
+  Location  F  Transitions
+         0  0  { b => 1 }
+         1  1  undef
+  
+  END
+  
+  ok $nfa->printNws("Element: 2") eq nws <<END;
+  Element: 2
+  Location  F  Transitions
+         0  0  { 2 => 1 }
+         1  1  undef
+  
+  END
+  
+
+=head2 allTransitions($)
+
+Return all transitions in the NFA as {stateName}{symbol} = [reachble states]
+
+     Parameter  Description  
+  1  $states    States       
+
+Example:
+
+
+  ok $nfa->printNws("a*a* 1: ") eq nws <<END;
+  a*a* 1:
+  Location  F  Transitions  Jumps
+         0  1  { a => 1 }   [2, 4]
+         1  1  undef        [0, 2, 4]
+         2  1  { a => 3 }   [4]
+         3  1  undef        [2, 4]
+         4  1  undef        undef
+  END
+  
+  is_deeply $nfa->allTransitions, {
+  
+  "0" => { a => [0 .. 4] },
+  
+  "1" => { a => [0 .. 4] },
+  
+  "2" => { a => [2, 3, 4] },
+  
+  "3" => { a => [2, 3, 4] },
+  
+  "4" => { a => [] },
+  
+  };
+  
 
 
 =head1 Private Methods
 
-=head2 fromExpr2($$)
+=head2 fromExpr2($$$)
 
 Create an NFA from a regular expression.
 
-     Parameter  Description
-  1  $states    States
-  2  $expr      Regular expression constructed from L<element|/element> L<sequence|/sequence> L<optional|/optional> L<zeroOrMore|/zeroOrMore> L<oneOrMore|/oneOrMore> L<choice|/choice>.
+     Parameter  Description                                                                                                                                                              
+  1  $states    States                                                                                                                                                                   
+  2  $expr      Regular expression constructed from L<element|/element> L<sequence|/sequence> L<optional|/optional> L<zeroOrMore|/zeroOrMore> L<oneOrMore|/oneOrMore> L<choice|/choice>  
+  3  $symbols   Set of symbols used by the NFA.                                                                                                                                          
 
 =head2 propogateFinalState($)
 
 Mark the states that can reach the final  state with a jump as final
 
-     Parameter  Description
-  1  $states    States
+     Parameter  Description  
+  1  $states    States       
 
 =head2 statesReachableViaJumps($$)
 
 Find the names of all the states that can be reached from a specified state via jumps alone
 
-     Parameter   Description
-  1  $states     States
-  2  $StateName  Name of start state
+     Parameter   Description          
+  1  $states     States               
+  2  $StateName  Name of start state  
 
 =head2 printWithJumps($$$)
 
 Print the current state of an NFA with jumps.
 
-     Parameter  Description
-  1  $states    States
-  2  $title     Title
-  3  $print     Print to STDERR if 2 or to STDOUT if 1
+     Parameter  Description                             
+  1  $states    States                                  
+  2  $title     Title                                   
+  3  $print     Print to STDERR if 2 or to STDOUT if 1  
 
 =head2 printWithOutJumps($$$)
 
 Print the current state of an NFA without jumps
 
-     Parameter  Description
-  1  $states    States
-  2  $title     Title
-  3  $print     Print to STDERR if 2 or to STDOUT if 1
+     Parameter  Description                             
+  1  $states    States                                  
+  2  $title     Title                                   
+  3  $print     Print to STDERR if 2 or to STDOUT if 1  
+
+=head2 statesReachableViaSymbol($$$$)
+
+Find the names of all the states that can be reached from a specified state via a specified symbol and all the jumps available.
+
+     Parameter   Description                   
+  1  $states     States                        
+  2  $StateName  Name of start state           
+  3  $symbol     Symbol to reach on            
+  4  $cache      A hash to be used as a cache  
 
 
 =head1 Index
 
 
-1 L<choice|/choice>
+1 L<allTransitions|/allTransitions>
 
-2 L<element|/element>
+2 L<choice|/choice>
 
-3 L<fromExpr|/fromExpr>
+3 L<element|/element>
 
-4 L<fromExpr2|/fromExpr2>
+4 L<except|/except>
 
-5 L<oneOrMore|/oneOrMore>
+5 L<fromExpr|/fromExpr>
 
-6 L<optional|/optional>
+6 L<fromExpr2|/fromExpr2>
 
-7 L<print|/print>
+7 L<isFinal|/isFinal>
 
-8 L<printWithJumps|/printWithJumps>
+8 L<oneOrMore|/oneOrMore>
 
-9 L<printWithOutJumps|/printWithOutJumps>
+9 L<optional|/optional>
 
-10 L<propogateFinalState|/propogateFinalState>
+10 L<print|/print>
 
-11 L<sequence|/sequence>
+11 L<printNws|/printNws>
 
-12 L<statesReachableViaJumps|/statesReachableViaJumps>
+12 L<printWithJumps|/printWithJumps>
 
-13 L<symbols|/symbols>
+13 L<printWithOutJumps|/printWithOutJumps>
 
-14 L<zeroOrMore|/zeroOrMore>
+14 L<propogateFinalState|/propogateFinalState>
+
+15 L<sequence|/sequence>
+
+16 L<statesReachableViaJumps|/statesReachableViaJumps>
+
+17 L<statesReachableViaSymbol|/statesReachableViaSymbol>
+
+18 L<symbols|/symbols>
+
+19 L<zeroOrMore|/zeroOrMore>
 
 
 
@@ -792,13 +1060,15 @@ Or individually via:
 
 2 L<element|/element>
 
-3 L<oneOrMore|/oneOrMore>
+3 L<except|/except>
 
-4 L<optional|/optional>
+4 L<oneOrMore|/oneOrMore>
 
-5 L<sequence|/sequence>
+5 L<optional|/optional>
 
-6 L<zeroOrMore|/zeroOrMore>
+6 L<sequence|/sequence>
+
+7 L<zeroOrMore|/zeroOrMore>
 
 =head1 Installation
 
@@ -848,24 +1118,50 @@ test unless caller;
 __DATA__
 use warnings FATAL=>qw(all);
 use strict;
-use Test::More tests=>33;
+use Test::More tests=>42;
 
 if (1)
  {my $nfa = fromExpr(element("a"));                                             #Telement
-  ok $nfa->print("Element: a") eq nws <<END;                                    #Telement
+  ok $nfa->printNws("Element: a") eq nws <<END;                                 #Telement #TisFinal
 Element: a
 Location  F  Transitions
        0  0  { a => 1 }
        1  1  undef
 
 END
-  ok  $nfa->isFinal(1);
-  ok !$nfa->isFinal(0);
+  ok  $nfa->isFinal(1);                                                         #TisFinal
+  ok !$nfa->isFinal(0);                                                         #TisFinal
+ }
+
+if (1)
+ {my $nfa = fromExpr(q(b));                                                     #Telement
+  ok $nfa->printNws("Element: b") eq nws <<END;                                 #Telement #TisFinal
+Element: b
+Location  F  Transitions
+       0  0  { b => 1 }
+       1  1  undef
+
+END
+  ok  $nfa->isFinal(1);   
+  ok !$nfa->isFinal(0);   
+ }
+
+if (1)
+ {my $nfa = fromExpr(2);                                                        #Telement
+  ok $nfa->printNws("Element: 2") eq nws <<END;                                 #Telement #TisFinal
+Element: 2
+Location  F  Transitions
+       0  0  { 2 => 1 }
+       1  1  undef
+
+END
+  ok  $nfa->isFinal(1); 
+  ok !$nfa->isFinal(0); 
  }
 
 if (1)
  {my $nfa = fromExpr(sequence(element("a"), element("b")));                     #Tsequence
-  ok $nfa->print("Sequence: ab") eq nws <<END;                                  #Tsequence
+  ok $nfa->printNws("Sequence: ab") eq nws <<END;                               #Tsequence
 Sequence: ab
 Location  F  Transitions
        0  0  { a => 1 }
@@ -876,7 +1172,7 @@ END
 
 if (1)
  {my $nfa = fromExpr(element("a"), optional(element("b")), element("c"));       #Toptional
-  ok $nfa->print("Optional: ab?c") eq nws <<END;                                #Toptional
+  ok $nfa->printNws("Optional: ab?c") eq nws <<END;                             #Toptional
 Optional: ab?c
 Location  F  Transitions  Jumps
        0  0  { a => 1 }   undef
@@ -888,7 +1184,7 @@ END
 
 if (1)
  {my $nfa = fromExpr(element("a"), zeroOrMore(element("b")), element("c"));     #TzeroOrMore
-  ok $nfa->print("Zero Or More: ab*c") eq nws <<END;                            #TzeroOrMore
+  ok $nfa->printNws("Zero Or More: ab*c") eq nws <<END;                         #TzeroOrMore
 Zero Or More: ab*c
 Location  F  Transitions  Jumps
        0  0  { a => 1 }   undef
@@ -901,7 +1197,7 @@ END
 
 if (1)
  {my $nfa = fromExpr(element("a"), oneOrMore(element("b")), element("c"));      #ToneOrMore
-  ok $nfa->print("One or More: ab+c") eq nws <<END;                             #ToneOrMore
+  ok $nfa->printNws("One or More: ab+c") eq nws <<END;                          #ToneOrMore
 One or More: ab+c
 Location  F  Transitions  Jumps
        0  0  { a => 1 }   undef
@@ -911,9 +1207,9 @@ Location  F  Transitions  Jumps
        4  1  undef        undef
 END
 
-  is_deeply {},                         $nfa->statesReachableViaSymbol(2,"a");
-  is_deeply { 1 => 1, 2 => 1, 3 => 1 }, $nfa->statesReachableViaSymbol(2,"b");
-  is_deeply { 4 => 1 },                 $nfa->statesReachableViaSymbol(2,"c");
+  is_deeply [],     $nfa->statesReachableViaSymbol(2,"a");
+  is_deeply [1..3], $nfa->statesReachableViaSymbol(2,"b");
+  is_deeply [4],    $nfa->statesReachableViaSymbol(2,"c");
 
 #  is_deeply [],         [$nfa->exitSymbolsForState(4)];
 #  is_deeply ["b"],      [$nfa->exitSymbolsForState(1)];
@@ -924,7 +1220,7 @@ if (1)
  {my $nfa = fromExpr(element("a"),                                              #Tchoice
                      choice(element("b"), element("c")),                        #Tchoice
                      element("d"));                                             #Tchoice
-  ok $nfa->print("Choice: (a(b|c)d") eq nws <<END;                              #Tchoice
+  ok $nfa->printNws("Choice: (a(b|c)d") eq nws <<END;                           #Tchoice
 Choice: (a(b|c)d
 Location  F  Transitions  Jumps
        0  0  { a => 1 }   undef
@@ -935,9 +1231,9 @@ Location  F  Transitions  Jumps
        5  1  undef        undef
 END
 
-  is_deeply {},                 $nfa->statesReachableViaSymbol(1, "a");
-  is_deeply { 2 => 1, 4 => 1 }, $nfa->statesReachableViaSymbol(1, "b");
-  is_deeply { 4 => 1 },         $nfa->statesReachableViaSymbol(1, "c");
+  is_deeply [],     $nfa->statesReachableViaSymbol(1, "a");
+  is_deeply [2, 4], $nfa->statesReachableViaSymbol(1, "b");
+  is_deeply [4],    $nfa->statesReachableViaSymbol(1, "c");
   is_deeply ['a'..'d'], [$nfa->symbols];
  }
 
@@ -946,7 +1242,7 @@ if (1)
                      zeroOrMore(choice(element("a"),
                      element("a"))),
                      element("a"));
-  ok $nfa->print("aChoice: (a(a|a)*a") eq nws <<END;
+  ok $nfa->printNws("aChoice: (a(a|a)*a") eq nws <<END;
 aChoice: (a(a|a)*a
 Location  F  Transitions  Jumps
        0  0  { a => 1 }   undef
@@ -959,17 +1255,16 @@ Location  F  Transitions  Jumps
 END
 
 # is_deeply [q(a)],      [$nfa->exitSymbolsForState(1)];
-  is_deeply [1 .. 6],     [sort keys %{$nfa->statesReachableViaSymbol(1, "a")}];
-  is_deeply [1 .. 6],     [sort keys %{$nfa->statesReachableViaSymbol(2, "a")}];
-  is_deeply [1, 3, 4, 5], [sort keys %{$nfa->statesReachableViaSymbol(3, "a")}];
+  is_deeply [1 .. 6],     $nfa->statesReachableViaSymbol(1, "a");
+  is_deeply [1 .. 6],     $nfa->statesReachableViaSymbol(2, "a");
+  is_deeply [1, 3, 4, 5], $nfa->statesReachableViaSymbol(3, "a");
  }
 
 if (1)
  {my $nfa = fromExpr(element("a"),
-                     zeroOrMore(choice(element("b"),
-                     element("c"))),
+                     zeroOrMore(choice(element("b"), element("c"))),
                      element("d"));
-  ok $nfa->print("aChoice: (a(b|c)*d") eq nws <<END;
+  ok $nfa->printNws("aChoice: (a(b|c)*d") eq nws <<END;
 aChoice: (a(b|c)*d
 Location  F  Transitions  Jumps
        0  0  { a => 1 }   undef
@@ -993,12 +1288,12 @@ END
 if (1)
  {my $nfa = fromExpr                                                            #TfromExpr #Toptional #Tprint #Tsymbols  #Tparser
    (element("a"),                                                               #TfromExpr #Toptional #Tprint #Tsymbols  #Tparser
-    oneOrMore(choice(element("b"), element("c"))),                              #TfromExpr #Toptional #Tprint #Tsymbols  #Tparser
+    oneOrMore(choice(qw(b c))),                                                 #TfromExpr #Toptional #Tprint #Tsymbols  #Tparser
     optional(element("d")),                                                     #TfromExpr #Toptional #Tprint #Tsymbols  #Tparser
     element("e")                                                                #TfromExpr #Toptional #Tprint #Tsymbols  #Tparser
    );                                                                           #TfromExpr #Toptional #Tprint #Tsymbols  #Tparser
 
-  ok $nfa->print("a(b|c)+d?e :") eq nws <<END;                                  #TfromExpr #Toptional #Tprint #Tsymbols  #Tparser
+  ok $nfa->printNws("a(b|c)+d?e :") eq nws <<END;                               #TfromExpr #Toptional #Tprint #Tsymbols  #Tparser
 a(b|c)+d?e :
 Location  F  Transitions  Jumps
        0  0  { a => 1 }   undef
@@ -1019,7 +1314,7 @@ if (1)                                                                          
  {my $s = q(choice(element(q(a)), element(q(b))));
   my $nfa = eval qq(fromExpr($s));
 
-  ok $nfa->print("(a|b): ") eq nws <<END;
+  ok $nfa->printNws("(a|b): ") eq nws <<END;
 (a|b):
 Location  F  Transitions  Jumps
        0  0  { a => 1 }   [2]
@@ -1030,10 +1325,10 @@ END
  }
 
 if (1)                                                                          # Dfa from string
- {my $s = q(choice(element(q(a)), element(q(b))));
+ {my $s = q(choice(qw(a b)));
   my $nfa = eval qq(fromExpr($s));
 
-  ok $nfa->print("(a|b): ") eq nws <<END;
+  ok $nfa->printNws("(a|b): ") eq nws <<END;
 (a|b):
 Location  F  Transitions  Jumps
        0  0  { a => 1 }   [2]
@@ -1047,7 +1342,7 @@ if (1)                                                                          
  {my $s = q(choice(element("a"), element("b")));
   my $nfa = eval qq(fromExpr(sequence($s,$s)));
 
-  ok $nfa->print("(a|b)(a|b): ") eq nws <<END;
+  ok $nfa->printNws("(a|b)(a|b): ") eq nws <<END;
 (a|b)(a|b):
 Location  F  Transitions  Jumps
        0  0  { a => 1 }   [2]
@@ -1064,7 +1359,7 @@ if (1)                                                                          
  {my $s = q(zeroOrMore(choice(element("a"))));
   my $nfa = eval qq(fromExpr(sequence($s)));
 
-  ok $nfa->print("a*: ") eq nws <<END;
+  ok $nfa->printNws("a*: ") eq nws <<END;
 a*:
 Location  F  Transitions  Jumps
        0  1  { a => 1 }   [2]
@@ -1078,7 +1373,7 @@ if (1)                                                                          
 
   my $nfa = eval qq(fromExpr(sequence($s,$s)));
 
-  ok $nfa->print("a*a* 1: ") eq nws <<END;
+  ok $nfa->printNws("a*a* 1: ") eq nws <<END;                                      #TallTransitions
 a*a* 1:
 Location  F  Transitions  Jumps
        0  1  { a => 1 }   [2, 4]
@@ -1090,12 +1385,20 @@ END
 
 # is_deeply [qw(a)], [$nfa->exitSymbolsForState(0)];
 
-  is_deeply [0 .. 4],   [sort keys %{$nfa->statesReachableViaSymbol(0, q(a))}];
-  is_deeply [0 .. 4],   [sort keys %{$nfa->statesReachableViaSymbol(1, q(a))}];
-  is_deeply [2, 3, 4],  [sort keys %{$nfa->statesReachableViaSymbol(2, q(a))}];
-  is_deeply [2, 3, 4],  [sort keys %{$nfa->statesReachableViaSymbol(3, q(a))}];
+  is_deeply [0 .. 4],  $nfa->statesReachableViaSymbol(0, q(a));
+  is_deeply [0 .. 4],  $nfa->statesReachableViaSymbol(1, q(a));
+  is_deeply [2, 3, 4], $nfa->statesReachableViaSymbol(2, q(a));
+  is_deeply [2, 3, 4], $nfa->statesReachableViaSymbol(3, q(a));
 
-  ok $nfa->print("a*a* 2: ") eq nws <<END;
+  is_deeply $nfa->allTransitions, {                                             #TallTransitions
+  "0" => { a => [0 .. 4] },                                                     #TallTransitions
+  "1" => { a => [0 .. 4] },                                                     #TallTransitions
+  "2" => { a => [2, 3, 4] },                                                    #TallTransitions
+  "3" => { a => [2, 3, 4] },                                                    #TallTransitions
+  "4" => { a => [] },                                                           #TallTransitions
+ };                                                                             #TallTransitions
+
+  ok $nfa->printNws("a*a* 2: ") eq nws <<END;
 a*a* 2:
 Location  F  Transitions  Jumps
        0  1  { a => 1 }   [2, 4]
@@ -1110,7 +1413,7 @@ if (1)
  {my $N = 4;
   my $s = q(zeroOrMore(choice(element("a"), element("b"))));
   my $nfa = eval qq(fromExpr(($s)x$N));
-  ok $nfa->print("((a|b)*)**$N: ") eq nws <<END;
+  ok $nfa->printNws("((a|b)*)**$N: ") eq nws <<END;
 ((a|b)*)**4:
 Location  F  Transitions  Jumps
        0  1  { a => 1 }   [2, 4, 6, 8, 10, 12, 14, 16]
@@ -1130,5 +1433,51 @@ Location  F  Transitions  Jumps
       14  0  { b => 15 }  undef
       15  1  undef        [12, 14, 16]
       16  1  undef        undef
+END
+ }
+
+if (1)                                                                        
+ {my $nfa = fromExpr(choice(qw(a b c)), except(qw(c x)), choice(qw(a b c)));    #Texcept  
+
+  ok $nfa->printNws("(a|b|c)(c!x)(a|b|c): ") eq nws <<END;                      #Texcept
+(a|b|c)(c!x)(a|b|c):
+Location  F  Transitions  Jumps
+   0      0  { a => 1 }   [2, 4]
+   1      0  undef        [5, 7]
+   2      0  { b => 3 }   undef
+   3      0  undef        [5, 7]
+   4      0  { c => 5 }   undef
+   5      0  { a => 6 }   [7]
+   6      0  undef        [8, 10, 12]
+   7      0  { b => 8 }   undef
+   8      0  { a => 9 }   [10, 12]
+   9      1  undef        [13]
+  10      0  { b => 11 }  undef
+  11      1  undef        [13]
+  12      0  { c => 13 }  undef
+  13      1  undef        undef
+END
+ }
+
+if (1)                                                                          # Dfa from string elements
+ {my $nfa = fromExpr(choice(qw(a b c)), except(qw(c x)), choice(qw(a b c)));            
+
+  ok $nfa->printNws("(a|b|c)(c!x)(a|b|c): ") eq nws <<END;                  
+(a|b|c)(c!x)(a|b|c):
+Location  F  Transitions  Jumps
+   0      0  { a => 1 }   [2, 4]
+   1      0  undef        [5, 7]
+   2      0  { b => 3 }   undef
+   3      0  undef        [5, 7]
+   4      0  { c => 5 }   undef
+   5      0  { a => 6 }   [7]
+   6      0  undef        [8, 10, 12]
+   7      0  { b => 8 }   undef
+   8      0  { a => 9 }   [10, 12]
+   9      1  undef        [13]
+  10      0  { b => 11 }  undef
+  11      1  undef        [13]
+  12      0  { c => 13 }  undef
+  13      1  undef        undef
 END
  }

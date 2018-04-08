@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# ICC::Profile::clrt test module / 2014-05-26
+# ICC::Profile::clrt test module / 2018-03-31
 #
 # Copyright © 2004-2018 by William B. Birkett
 
@@ -10,7 +10,7 @@ use File::Spec;
 use Test::More tests => 6;
 
 # local variables
-my ($temp, $fh, $clrt1, $clrt2, $channel, @all, $ttab);
+my ($clrt1, $channel, @all);
 
 # test if module loads
 BEGIN { use_ok('ICC::Profile::clrt') };

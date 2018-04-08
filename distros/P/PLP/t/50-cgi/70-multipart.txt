@@ -1,0 +1,10 @@
+--knip
+Content-Disposition: form-data; name="foo"
+
+b a r
+--knip
+Content-Disposition: form-data; name="upload"; filename="82.results"
+Content-Type: text/plain
+
+ok
+--knip--

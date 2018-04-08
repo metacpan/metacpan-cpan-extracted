@@ -6,7 +6,7 @@ require Exporter;
 use vars qw($color_Keys $formatter $perldoc_Keys @EXPORT @ISA );
 @ISA                = qw(Exporter);
 @showsource::EXPORT = qw(showSource path);
-use Syntax::Highlight::Perl ':FULL';    # or ':FULL'
+use Syntax::Highlight::Perl ':FULL';
 
 sub showSource
 {

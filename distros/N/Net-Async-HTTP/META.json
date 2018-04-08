@@ -4,13 +4,13 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-Async-HTTP",
    "prereqs" : {
@@ -21,6 +21,11 @@
             "Test::Identity" : "0",
             "Test::More" : "0.88",
             "Test::Refcount" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
@@ -38,22 +43,23 @@
             "IO::Async::Timer::Countdown" : "0",
             "List::Util" : "1.29",
             "Struct::Dumb" : "0.07",
-            "URI" : "0"
+            "URI" : "0",
+            "perl" : "5.010"
          }
       }
    },
    "provides" : {
       "Net::Async::HTTP" : {
          "file" : "lib/Net/Async/HTTP.pm",
-         "version" : "0.41"
+         "version" : "0.42"
       },
       "Net::Async::HTTP::Connection" : {
          "file" : "lib/Net/Async/HTTP/Connection.pm",
-         "version" : "0.41"
+         "version" : "0.42"
       },
       "Net::Async::HTTP::StallTimer" : {
          "file" : "lib/Net/Async/HTTP/StallTimer.pm",
-         "version" : "0.41"
+         "version" : "0.42"
       }
    },
    "release_status" : "stable",
@@ -63,6 +69,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.41",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.42",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

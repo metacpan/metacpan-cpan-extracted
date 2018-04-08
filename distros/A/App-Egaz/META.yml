@@ -1,7 +1,7 @@
 ---
-abstract: "It's new $module"
+abstract: 'Backend of B<E>asy B<G>enome B<A>ligner'
 author:
-  - 'wang-q <wang-q@outlook.com>'
+  - 'Qiang Wang <wang-q@outlook.com>'
 build_requires:
   Test::More: '0.98'
 configure_requires:
@@ -26,23 +26,35 @@ no_index:
 provides:
   App::Egaz:
     file: lib/App/Egaz.pm
-    version: v0.0.10
+    version: v0.0.14
+  App::Egaz::Command::blastn:
+    file: lib/App/Egaz/Command/blastn.pm
   App::Egaz::Command::exactmatch:
     file: lib/App/Egaz/Command/exactmatch.pm
   App::Egaz::Command::formats:
     file: lib/App/Egaz/Command/formats.pm
+  App::Egaz::Command::lastz:
+    file: lib/App/Egaz/Command/lastz.pm
   App::Egaz::Command::lav2axt:
     file: lib/App/Egaz/Command/lav2axt.pm
   App::Egaz::Command::lav2psl:
     file: lib/App/Egaz/Command/lav2psl.pm
+  App::Egaz::Command::lpcnam:
+    file: lib/App/Egaz/Command/lpcnam.pm
   App::Egaz::Command::masked:
     file: lib/App/Egaz/Command/masked.pm
   App::Egaz::Command::maskfasta:
     file: lib/App/Egaz/Command/maskfasta.pm
+  App::Egaz::Command::multiz:
+    file: lib/App/Egaz/Command/multiz.pm
   App::Egaz::Command::normalize:
     file: lib/App/Egaz/Command/normalize.pm
   App::Egaz::Command::partition:
     file: lib/App/Egaz/Command/partition.pm
+  App::Egaz::Command::plottree:
+    file: lib/App/Egaz/Command/plottree.pm
+  App::Egaz::Command::prepseq:
+    file: lib/App/Egaz/Command/prepseq.pm
   App::Egaz::Command::raxml:
     file: lib/App/Egaz/Command/raxml.pm
   App::Egaz::Common:
@@ -50,19 +62,27 @@ provides:
 requires:
   App::Cmd: '0.330'
   App::Fasops: v0.5.11
+  Bio::Phylo: v2.0.1
+  File::Find::Rule: '0.34'
   File::ShareDir: '1.102'
   IO::Zlib: '0'
   IPC::Cmd: '0'
   JSON: '2.97001'
+  List::MoreUtils: '0.428'
   List::Util: '0'
+  MCE: '1.835'
+  Number::Format: '1.75'
   Path::Tiny: '0.076'
+  Set::Scalar: '1.29'
+  Statistics::R: '0.34'
+  String::Similarity: '1.04'
   Template: '2.26'
   Tie::IxHash: '1.23'
   YAML::Syck: '1.29'
-  perl: '5.010001'
+  perl: '5.018001'
 resources:
   bugtracker: https://github.com/wang-q/App-Egaz/issues
   homepage: https://github.com/wang-q/App-Egaz
   repository: git://github.com/wang-q/App-Egaz.git
-version: 0.0.10
+version: 0.0.14
 x_authority: cpan:WANGQ

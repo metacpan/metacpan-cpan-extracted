@@ -6,7 +6,9 @@ use autodie;
 use App::Egaz -command;
 use App::Egaz::Common;
 
-use constant abstract => 'masked (or gaps) regions in fasta files';
+sub abstract {
+    return 'masked (or gaps) regions in fasta files';
+}
 
 sub opt_spec {
     return (
@@ -53,10 +55,10 @@ sub execute {
     #----------------------------#
     my $region_of = {};
     for my $infile ( @{$args} ) {
-        my $seq_of = App::Fasops::Common::read_fasta( $infile );
+        my $seq_of = App::Fasops::Common::read_fasta($infile);
 
         for my $seq_name ( keys %{$seq_of} ) {
-            if (exists $region_of->{$seq_name}) {
+            if ( exists $region_of->{$seq_name} ) {
                 Carp::carp "Duplicated seqname [$seq_name]\n";
                 next;
             }
@@ -65,18 +67,18 @@ sub execute {
             my $len = length $seq;
 
             my @lists;
-            for my $i ( 1 .. $len) {
+            for my $i ( 1 .. $len ) {
                 my $nt = substr $seq, $i - 1, 1;
 
                 my $regex;
-                if ($opt->{gaps}) {
+                if ( $opt->{gaps} ) {
                     $regex = qr{[Nn]};
                 }
                 else {
                     $regex = qr{[Nacgtun]};
                 }
 
-                if ($nt =~ m{$regex}) {
+                if ( $nt =~ m{$regex} ) {
                     push @lists, $i;
                 }
             }
@@ -94,7 +96,7 @@ sub execute {
         open $out_fh, ">", $opt->{outfile};
     }
 
-    print {$out_fh} YAML::Syck::Dump( $region_of );
+    print {$out_fh} YAML::Syck::Dump($region_of);
 
     close $out_fh;
 }

@@ -30,7 +30,7 @@ my @messages = $tidy->messages( $clean );
 
 is_deeply( \@messages, [], q{The cleaned stuff shouldn't have any errors} );
 
-$clean =~ remove_specificity( $clean );
+$clean = remove_specificity( $clean );
 
 my $expected = do { local $/ = undef; <DATA> };
 is( $clean, $expected, 'Cleaned up properly' );
@@ -42,7 +42,7 @@ __DATA__
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="generator" content="HTML Tidy for HTML5 for Linux version 5.6.0">
+<meta name="generator" content="TIDY">
 <title></title>
 </head>
 <body>

@@ -1,5 +1,8 @@
 Revision history for IO-Stream-HTTP-Persistent
 
+v0.2.2  2018-04-03 19:36:50 EEST
+	- Fix compatibility with perl-5.26.
+
 v0.2.1  2016-03-01 04:40:43 EET
 	- Reformat doc.
 	- Fixed tests for portability.

@@ -1,4 +1,4 @@
-# $Id: 00-install.t 1612 2018-01-11 16:31:47Z willem $ -*-perl-*-
+# $Id: 00-install.t 1658 2018-03-29 15:07:50Z willem $ -*-perl-*-
 
 use strict;
 use Test::More;
@@ -15,7 +15,7 @@ eval {
 	}
 	close MAKEFILE;
 
-	my %install_type = qw(perl INSTALLPRIVLIB site INSTALLSITELIB vendor INSTALLVENDORLIB);
+	my %install_type = qw(perl INSTALLARCHLIB site INSTALLSITEARCH vendor INSTALLVENDORARCH);
 	my $install_site = join '', '$(DESTDIR)$(', $install_type{$macro{INSTALLDIRS}}, ')';
 	for ($install_site) {
 		s/\$\(([A-Z_]+)\)/$macro{$1}/eg while /\$\(/;	# expand Makefile macros

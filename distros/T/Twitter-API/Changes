@@ -1,5 +1,9 @@
 Revision history for Twitter::API
 
+1.0001  2018-03-30 20:19:15 PDT
+  - added RateLimiting trait (thanks Rob Hoelz)
+  - removed the alpha designation - it's production ready
+
 0.0113  2017-07-18 16:20:14 PDT
   - make Dist::Zilla happy again
   - minor POD fixes

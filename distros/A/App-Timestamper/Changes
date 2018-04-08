@@ -1,5 +1,8 @@
 Revision history for App-Timestamper
 
+0.2.0       2018-03-31
+    - Refer to App-Timestamper-Format.
+
 v0.0.7      2015-09-28
     - Set the minimal perl version to 5.14.x due to failing tests in ancient
     perl versions.

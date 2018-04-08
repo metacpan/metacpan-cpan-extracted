@@ -1,0 +1,84 @@
+NAME
+    UUID::URandom - UUIDs based on /dev/urandom or the Windows Crypto API
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+        use UUID::URandom qw/create_uuid/;
+
+        my $uuid = create_uuid();
+
+DESCRIPTION
+    This module provides a portable, secure generator of RFC-4122
+    <https://tools.ietf.org/html/rfc4122> version 4 (random) UUIDs. It is a
+    thin wrapper around Crypt::URandom to set the UUID version and variant
+    bits required by the RFC.
+
+USAGE
+    No functions are exported by default.
+
+FUNCTIONS
+  create_uuid
+        my $uuid = create_uuid();
+
+        # "\x95\x5a\xe4\x96\x8b\xb2\x45\x0b\x9c\x7e\x99\xf5\x01\xdf\x90\xfe"
+
+    This returns a new UUID as a 16 byte 'binary' string.
+
+  create_uuid_hex
+        my $uuid = create_uuid_hex();
+
+        # "955ae4968bb2450b9c7e99f501df90fe"
+
+    This returns a new UUID as a 32-byte hexadecimal string.
+
+  create_uuid_string
+        my $uuid = create_uuid_string();
+
+        # "955ae496-8bb2-450b-9c7e-99f501df90fe"
+
+    This returns a new UUID in the 36-byte RFC-4122 canonical string
+    representation. (N.B. The canonical representation is lower-case.)
+
+FORK AND THREAD SAFETY
+    The underlying Crypt::URandom is believed to be fork and thread safe.
+
+SEE ALSO
+    There are a number of other modules that provide version 4 UUIDs. Many
+    rely on insecure or non-crypto-strength random number generators.
+
+    *   Data::GUID::Any
+
+    *   Data::UUID::LibUUID
+
+    *   UUID
+
+    *   UUID::Tiny
+
+    *   Data::UUID::MT
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/UUID-URandom/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/UUID-URandom>
+
+      git clone https://github.com/dagolden/UUID-URandom.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2018 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

@@ -1,41 +1,64 @@
 Revision history for PGObject-Util-DBAdmin
 
+
+0.120.0 2018-03-27
+        Documentation fixes
+        Don't use shell to execute external commands, blocks command injection
+        Trap shell errors running external commands
+        Test exit code after running external commands
+        Don't attempt to parse stderr from external commands for errors
+        External command stdout/stderr available via object property
+        Default to temporary directory provided by File::Temp
+        Respect method parameters if defined (previously only if true)
+        Add further tests, including Perl::Critic
+        Create backup output files with umask 0600
+        Delete incomplete backup files after error
+        Raise exceptions with croak/carp rather than die/warn
+        external psql command now run with `--set=ON_ERROR_STOP=on`
+        external pg_restore command now run with `--exit-on-error`
+        Bump minimum perl version to 5.10
+
+0.110.0 2017-11-21
+        Correctly invoke 'pg_dump' (it doesn't recognise a '-d' option)
+        Remove tabs from sources
+        Fix #6: 'host' and 'port' arguments not used in 'connect()'
+
 0.100.0 2016-12-17
         Publish 0.10 as 0.100; CPAN considers 0.09 equal to 0.090, which is
-	higher than 0.10.0 (which is 0.010_000)
+        higher than 0.10.0 (which is 0.010_000)
 
 0.10.0  2016-12-17
         Removed MYMETA.* (rt.cpan.org#109062)
-	Correct spelling errors reported by Robert James Clay (jame@rocasa.ru)
-	Correct copyright years (rt.cpan.org#117202 and #10)
+        Correct spelling errors reported by Robert James Clay (jame@rocasa.ru)
+        Correct copyright years (rt.cpan.org#117202 and #10)
 
 0.09    2016-07-18
- 	Fixed handling of &'s in db names
+        Fixed handling of &'s in db names
 
 0.08    2016-02-11
-	Added ability to pass connection parameters to connect()
+        Added ability to pass connection parameters to connect()
 
-0.07	2015-07-16
-	Fixed handling of connection when connection fails
+0.07    2015-07-16
+        Fixed handling of connection when connection fails
 
-0.06	2014-09-18
-	Fixed support for remote hosts.
+0.06    2014-09-18
+        Fixed support for remote hosts.
 
-0.05	2014-09-14
-	Added backup of globals
+0.05    2014-09-14
+        Added backup of globals
 
-0.04	2014-09-14
-	Additional tests
-	Fixing packaging bugs
-	Adding server_version api
+0.04    2014-09-14
+        Additional tests
+        Fixing packaging bugs
+        Adding server_version api
 
-0.03	2014-09-13
-	Better handling of auth environment variables so they don't always clobber
-	Fixes to exception handling
-	More tests
+0.03    2014-09-13
+        Better handling of auth environment variables so they don't always clobber
+        Fixes to exception handling
+        More tests
 
-0.02	2014-09-12
-	Better error handling of external programs, using Tiny::Capture to 
+0.02    2014-09-12
+        Better error handling of external programs, using Tiny::Capture to 
         process external stderr
 
 0.01    2014-09-11

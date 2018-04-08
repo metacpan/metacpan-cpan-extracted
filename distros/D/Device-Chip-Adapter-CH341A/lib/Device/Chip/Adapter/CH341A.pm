@@ -12,7 +12,7 @@ use base qw( Device::Chip::Adapter );
 use Future;
 use USB::LibUSB;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =encoding UTF-8
 
@@ -108,6 +108,7 @@ sub _bulk_read
 
 package
    Device::Chip::Adapter::CH341A::_SPI;
+use base qw( Device::Chip::ProtocolBase::SPI );
 
 use constant {
    CMD_SPI_STREAM => 0xA8,
@@ -119,6 +120,8 @@ use constant {
    CMD_UIO_STM_OUT => 0x80,
    CMD_UIO_STM_US  => 0xC0,
    CMD_UIO_STM_END => 0x20,
+
+   MAX_PACKETLEN => Device::Chip::Adapter::CH341A::MAX_PACKETLEN,
 };
 
 sub new
@@ -135,6 +138,8 @@ sub configure
 {
    my $self = shift;
    my %args = @_;
+
+   die "Cannot support SPI wordsize other than 8" if ( $args{wordsize} // 8 ) != 8;
 
    die "TODO: configure mode other than 0\n" if $args{mode};
    die "TODO: configure a slower speed than 2MHz"
@@ -170,27 +175,10 @@ sub _set_ss
    return Future->done;
 }
 
-sub write { $_[0]->readwrite( $_[1] )->then_done() }
-
-sub readwrite
-{
-   my $self = shift;
-   my ( $out ) = @_;
-
-   $self->assert_ss
-      ->then( sub { $self->readwrite_no_ss( $out ) } )
-      ->followed_by( sub {
-         my ( $f ) = @_;
-         $self->release_ss->then( sub { $f } );
-      });
-}
-
 sub _bitswap
 {
    return join "", map { pack "b8", unpack "B8", $_ } split //, $_[0];
 }
-
-sub write_no_ss { $_[0]->readwrite_no_ss( $_[1] )->then_done() }
 
 sub readwrite_no_ss
 {
@@ -198,12 +186,16 @@ sub readwrite_no_ss
    my ( $out ) = @_;
    my $adapter = $self->{adapter};
 
-   # CH341A is odd LSB-first device; we need to bit-swap bytes out and in
+   my $in = "";
 
-   # TODO: split into MAX_PACKETLEN chunks
-   $adapter->_bulk_write( pack "C a*", CMD_SPI_STREAM, _bitswap $out );
+   while( length $out ) {
+      my $packetout = substr $out, 0, MAX_PACKETLEN-1, "";
 
-   my $in = _bitswap $adapter->_bulk_read( length $out );
+      # CH341A is odd LSB-first device; we need to bit-swap bytes out and in
+      $adapter->_bulk_write( pack "C a*", CMD_SPI_STREAM, _bitswap $packetout );
+
+      $in .= _bitswap $adapter->_bulk_read( length $packetout );
+   }
 
    return Future->done( $in );
 }

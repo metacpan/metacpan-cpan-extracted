@@ -6,7 +6,7 @@ use Mojo::Base '<%= $a->{controller_namespace} %>', -signatures;
 # GET /<%= $a->{t} %>/create
 # Display form for creating resource in table <%= $a->{t} %>.
 sub create($c) {
-  $c->render(<%= $a->{t} %> => {})
+  return $c->render(<%= $a->{t} %> => {})
 }
 
 # POST /<%= $a->{t} %>
@@ -17,8 +17,7 @@ sub store($c) {
     my $in = $c->validation->output;
     my $id = $c-><%= $a->{t} %>->add($in);
     $c->res->headers->location($c->url_for("api.show_<%= $a->{t} %>", id => $id)->to_string);
-    $c->render(openapi => '', status => 201);
-    return;
+    return $c->render(openapi => '', status => 201);
   }
 
   # 1. Validate input
@@ -29,13 +28,13 @@ sub store($c) {
   my $id = $c-><%= $a->{t} %>->add($validation->output);
   # 3. Prepare the response data or just return "201 Created"
   # See https://developer.mozilla.org/docs/Web/HTTP/Status/201
-  $c->redirect_to('show_<%= $a->{t} %>', id => $id);
+  return $c->redirect_to('show_<%= $a->{t} %>', id => $id);
 }
 
 # GET /<%= $a->{t} %>/:id/edit 
 # Display form for edititing resource in table <%= $a->{t} %>.
 sub edit($c) {
-  $c->render(<%= $a->{t} %> => $c-><%= $a->{t} %>->find($c->param('id')));
+  return $c->render(<%= $a->{t} %> => $c-><%= $a->{t} %>->find($c->param('id')));
 }
 
 # PUT /<%= $a->{t} %>/:id
@@ -53,7 +52,7 @@ sub update($c) {
 
   # Redirect to the updated record or just send "204 No Content"
   # See https://developer.mozilla.org/docs/Web/HTTP/Status/204
-  $c->redirect_to('show_<%= $a->{t} %>', id => $id);
+  return $c->redirect_to('show_<%= $a->{t} %>', id => $id);
 }
 
 # GET /<%= $a->{t} %>/:id
@@ -61,28 +60,27 @@ sub update($c) {
 sub show($c) {
   my $row = $c-><%= $a->{t} %>->find($c->param('id'));
   if($c->current_route =~ /^api\./) { #invoked via OpenAPI
-    $c->render(openapi=> {
+    return $c->render(openapi=> {
         errors => [{path => $c->url_for, message => 'Not Found'}]
-      }, status => 404) && return unless $row;
-    $c->render(openapi => $row);
-    return;
+      }, status => 404) unless $row;
+    return $c->render(openapi => $row);
   }
-    $row = $c-><%= $a->{t} %>->find($c->param('id'));
-    $c->render(text => $c->res->default_message(404), status => 404) && return 
-        unless $row;
-  $c->render(<%= $a->{t} %> => $row);
+  $row = $c-><%= $a->{t} %>->find($c->param('id'));
+  return $c->render(text => $c->res->default_message(404), status => 404) 
+    unless $row;
+  return $c->render(<%= $a->{t} %> => $row);
 }
 
 # GET /<%= $a->{t} %>
 # List resources from table <%= $a->{t} %>.
+## no critic qw(Subroutines::ProhibitBuiltinHomonyms)
 sub index($c) {
   if($c->current_route =~ /^api\./) { #invoked via OpenAPI
     $c->openapi->valid_input or return;
     my $input = $c->validation->output;
-    $c->render(openapi => $c-><%= $a->{t} %>->all($input));
-    return;
+    return $c->render(openapi => $c-><%= $a->{t} %>->all($input));
   }
-  $c->render(<%= $a->{t} %> => $c-><%= $a->{t} %>->all);
+  return $c->render(<%= $a->{t} %> => $c-><%= $a->{t} %>->all);
 }
 
 # DELETE /<%= $a->{t} %>/:id
@@ -95,11 +93,10 @@ sub remove($c) {
         errors => [{path => $c->url_for, message => 'Not Found'}]
       }, status => 404) && return unless $row;
     $c-><%= $a->{t} %>->remove($input->{id});
-    $c->render(openapi => '', status=> 204 );
-    return;
+    return $c->render(openapi => '', status=> 204 );
   }
   $c-><%= $a->{t} %>->remove($c->param('id'));
-  $c->redirect_to('home_<%= $a->{t} %>');
+  return $c->redirect_to('home_<%= $a->{t} %>');
 }
 
 

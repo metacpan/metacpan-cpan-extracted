@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::ListId;
-$Config::Model::ListId::VERSION = '2.118';
+$Config::Model::ListId::VERSION = '2.120';
 use 5.10.1;
 use Mouse;
 
@@ -49,8 +49,14 @@ sub BUILD {
     }
 
     if ( defined $self->{migrate_keys_from} ) {
-        warn $self->name, "Using migrate_keys_from with list element is deprecated.",
-            " Use migrate_values_from\n";
+        if ($::_use_log4perl_to_warn) {
+            $logger->warn($self->name, "Using migrate_keys_from with list element is deprecated.",
+                          " Use migrate_values_from");
+        }
+        else {
+            warn $self->name, "Using migrate_keys_from with list element is deprecated.",
+                " Use migrate_values_from\n";
+        }
     }
 
     # Supply the mandatory parameter
@@ -509,7 +515,7 @@ Config::Model::ListId - Handle list element for configuration model
 
 =head1 VERSION
 
-version 2.118
+version 2.120
 
 =head1 SYNOPSIS
 

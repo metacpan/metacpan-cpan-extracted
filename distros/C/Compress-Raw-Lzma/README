@@ -1,11 +1,11 @@
 
                             Compress-Raw-Lzma
 
-                         Version 2.074
+                         Version 2.080
 
-                            19th February 2017
+                            21st November 2017
 
-       Copyright (c) 2009-2017 Paul Marquess. All rights reserved.
+       Copyright (c) 2009-2018 Paul Marquess. All rights reserved.
           This program is free software; you can redistribute it
            and/or modify it under the same terms as Perl itself.
 
@@ -23,7 +23,7 @@ installed on your system:
 
     * A C compiler
 
-    * Perl 5.006 or better. 
+    * Perl 5.006 or better.
 
     * A copy of liblzma
       liblzma is part of the XZ Utils which is available at
@@ -139,16 +139,16 @@ To help me help you, I need all of the following information:
     This includes:
 
      a. The *complete* output from running this
-     
+ 
             perl -V
-     
+ 
         Do not edit the output in any way.
         Note, I want you to run "perl -V" and NOT "perl -v".
-     
+ 
         If your perl does not understand the "-V" option it is too
-        old. This module needs Perl version 5.004 or better.     
+        old. This module needs Perl version 5.004 or better.
 
-     b. The version of Compress-Raw-Lzma you have. 
+     b. The version of Compress-Raw-Lzma you have.
         If you have successfully installed Compress-Raw-Lzma, this one-liner
         will tell you:
 
@@ -161,15 +161,15 @@ To help me help you, I need all of the following information:
         If you haven't installed Compress-Raw-Lzma then search Compress::Raw::Lzma.pm
         for a line like this:
 
-          $VERSION = "2.074" ;
+          $VERSION = "2.080" ;
 
      c. The version of lzma you have used.
         If you have successfully installed Compress-Raw-Lzma, this one-liner
         will tell you:
 
-          perl -MCompress::Raw::Lzma -e "print q[lzma ver ]. Compress::Raw::Lzma::ZLIB_VERSION.qq[\n]" 
+          perl -MCompress::Raw::Lzma -e "print q[lzma ver ]. Compress::Raw::Lzma::ZLIB_VERSION.qq[\n]"
 
-        If not, look at the beginning of the file zlib.h. 
+        If not, look at the beginning of the file zlib.h.
 
  2. If you are having problems building Compress-Raw-Lzma, send me a
     complete log of what happened. Start by unpacking the Compress-Raw-Lzma
@@ -178,6 +178,6 @@ To help me help you, I need all of the following information:
         [edit config.in, if necessary]
         perl Makefile.PL
         make
-        make test TEST_VERBOSE=1          
+        make test TEST_VERBOSE=1
 
 Paul Marquess <pmqs@cpan.org>

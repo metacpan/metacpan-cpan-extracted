@@ -14,7 +14,7 @@ use Scalar::Util qw/looks_like_number/;
 
 extends 'Math::SlideRule';
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 ########################################################################
 #
@@ -1665,7 +1665,7 @@ as I do not not what that value is, nor what its exact value is.)
 
 =head1 METHODS
 
-See L<Math::SlideRule>.
+Nothing beyond present in L<Math::SlideRule>.
 
 =head1 BUGS
 

@@ -7,7 +7,7 @@ use utf8;
 use Test::BDD::Cucumber::Definitions qw(Given When Then);
 use Test::BDD::Cucumber::Definitions::Struct qw(:util);
 
-our $VERSION = '0.29';
+our $VERSION = '0.31';
 
 ## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
 ## no critic [RegularExpressions::RequireExtendedFormatting]
@@ -71,6 +71,20 @@ sub import {
     #       http response content read JSON
     When qr/содержимое HTTP-ответа прочитано как JSON/, sub {
         http_response_content_read_json();
+    };
+
+=pod
+
+Прочитать JSON из L<Файла|Test::BDD::Cucumber::Definitions::File::Ru>
+в perl-структуру:
+
+    When содержимое файла прочитано как JSON
+
+=cut
+
+    #       file content read JSON
+    When qr/содержимое файла прочитано как JSON/, sub {
+        file_content_read_json();
     };
 
 =pod
@@ -162,6 +176,32 @@ L<JSON::Path>.
         sub {
         struct_data_array_count( $1, $2 );
         };
+
+=pod
+
+Проверить элемент на наличие ключа:
+
+    Then элемент структуры данных "$.user" содержит ключ "login"
+
+=cut
+
+    #       struct data element "(.+?)" key "(.*)"
+    Then qr/элемент структуры данных "(.+?)" содержит ключ "(.*)"/, sub {
+        struct_data_element_key( $1, $2 );
+    };
+
+=pod
+
+Проверить элементы в списке на наличие ключа:
+
+    Then все элементы в списке структур данных "$.users" содержат ключ "login"
+
+=cut
+
+    #       struct data list "(.+?)" all key "(.*)"
+    Then qr/все элементы в списке структур данных "(.+?)" содержат ключ "(.*)"/, sub {
+        struct_data_list_all_key( $1, $2 );
+    };
 
     return;
 }

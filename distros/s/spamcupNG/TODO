@@ -1,7 +1,0 @@
-TODO for spamcupNG project
-
-- allow user to give (regex match?) report addresses where he doesn't want
-  reports to be sent
-- create RPM/DEB packages
-- review HTML parser (use one instead of just regular expressions)
-- refactor the SpamcupNG module, some functions are too large and doing too much

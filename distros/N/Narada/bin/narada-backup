@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-VERSION='v2.3.7'
+VERSION='v2.3.8'
 
 DETECT=$(perl -MNarada -E 'say Narada::detect(@ARGV)') || exit 1
 
@@ -71,7 +71,7 @@ narada-backup - prepare consistent project backup
 
 =head1 VERSION
 
-This document describes narada-backup version v2.3.7
+This document describes narada-backup version v2.3.8
 
 
 =head1 USAGE

@@ -148,7 +148,7 @@ sub test_suite {
            recyc   => 1, # recycle
            ids     => 2,
            silo    => 0, # 2 instances of one id recycled away
-        );
+       );
 
     $next_id = $store->next_id;
 
@@ -290,7 +290,7 @@ sub test_suite {
     $trans->commit;
 
     is( $store->fetch( $id ), "MEW NEW mind", "transaction value" );
-    
+
     check( $store, "new trans commit",
            trans   => 0,
            entries => 6,
@@ -298,5 +298,112 @@ sub test_suite {
            ids     => 6, #same id used
            silo    => 2, #one more silo entry though
        );
+
+    my $dir2 = tempdir( CLEANUP => 1 );
+    my $store2 = Data::RecordStore->open_store( $dir2 );
+    my $val1 = "x" x 12;
+    my $val2 = "x" x 1224;
+    my( @ids );
+    for (1..10) {
+        push @ids, $store2->stow( $val1 );
+    }
+    my $t = $store2->create_transaction;
+    for my $id (@ids) {
+        $t->stow( $val2, $id );
+    }
+    check( $store2, "simple swap check before commit",
+           trans   => 1,  #1 transaction
+           entries => 10, #new entry
+           recyc   => 0,
+           ids     => 10, #new id for new entry
+           silo    => 10, #all in silo 4
+       );
+    eval {
+        $t->commit;
+    };
+    unlike( $@, qr/\S/, 'no commit error simple' );
+    unlike( $@, qr/_swapout/, 'no swapout error simple' );
+    check( $store2, "simple swap check after commit",
+           trans   => 0,
+           entries => 10, #new entry
+           recyc   => 0,
+           ids     => 10, #new id for new entry
+           silo    => 0, # none in silo 4 aymore
+       );
+
+    my $dir3 = tempdir( CLEANUP => 1 );
+    my $store3 = Data::RecordStore->open_store( $dir3 );
+    $val1 = "x" x 12;
+    $val2 = "x" x 1224;
+    my $val3 = "x" x 12;
+    my $val4 = "x" x 10_000;
+    ( @ids ) = ();
+    for (1..10) {
+        push @ids, $store3->stow( $val1 );
+    }
+    $t = $store3->create_transaction;
+    for my $id (@ids) {
+        $t->stow( $val2, $id );
+    }
+    for my $id (@ids) {
+        $t->stow( $val3, $id );
+    }
+    
+    for my $id (@ids) {
+        $t->stow( $val4, $id );
+    }
+    check( $store3, "multimove swap check before commit",
+           trans   => 1,  #1 transaction
+           entries => 10, #new entry
+           recyc   => 0,
+           ids     => 10, #new id for new entry
+           silo    => 20, #all twice in silo 4
+       );
+    eval {
+        $t->commit;
+    };
+    unlike( $@, qr/\S/, 'no commit error multimove' );
+    unlike( $@, qr/_swapout/, 'no swapout error multimove' );
+    check( $store3, "multimove swap check after commit",
+           trans   => 0,
+           entries => 10, #new entry
+           recyc   => 0,
+           ids     => 10, #new id for new entry
+           silo    => 0, #no more in silo 4
+       );
+
+    my $dir4 = tempdir( CLEANUP => 1 );
+    my $store4 = Data::RecordStore->open_store( $dir );
+    $val1 = "x" x 12;
+    $val2 = "x" x 1224;
+    $val3 = "x" x 12;
+    $val4 = "x" x 10_000;
+    for (1..10) {
+        push @ids, $store4->stow( $val1 );
+    }
+
+    $t = $store4->create_transaction;
+    for my $id (@ids) {
+        $t->stow( $val2, $id );
+    }
+    eval {
+        $t->commit;
+    };
+    unlike( $@, qr/\S/, 'no commit error moar multimove' );
+    unlike( $@, qr/_swapout/, 'no swapout error moar multimove' );
+
+    $t = $store4->create_transaction;
+    for my $id (@ids) {
+        $t->stow( $val3, $id );
+    }
+    for my $id (@ids) {
+        $t->stow( $val4, $id );
+    }
+    eval {
+        $t->commit;
+    };
+    unlike( $@, qr/\S/, 'no commit error moar multimove' );
+    unlike( $@, qr/_swapout/, 'no swapout error moar multimove' );
+
 
 } #test_suite

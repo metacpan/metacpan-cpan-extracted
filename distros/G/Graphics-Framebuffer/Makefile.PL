@@ -22,6 +22,24 @@ if (defined($ENV{'DISPLAY'})) {
     sleep 1;
 }
 
+print "\n\nAdding C to Module...";
+my $ccode = slurp_file('src/Framebuffer.c');
+my $template = slurp_file('src/Framebuffer.template.pm');
+if ($template =~ /^(.*?)\n/s) {
+    my ($version, $month, $day, $year) = split(/\s/, $1 );
+    $template =~ s/^.*?\n//s;
+    $template =~ s/\#\# VERSION \#\#/$version/sg;
+    $template =~ s/\#\# VERSION DATE \#\#/$month $day $year/sg;
+    $template =~ s/\#\# YEAR \#\#/$year/sg;
+}
+$template =~ s/\#\# C CODE \#\#/$ccode/s;
+
+open(my $FILE,'>','lib/Graphics/Framebuffer.pm');
+print $FILE $template;
+close($FILE);
+
+print "Added\n\n";
+
 if (WriteMakefile(
     NAME               => 'Graphics::Framebuffer',
     AUTHOR             => q{Richard Kelsch <rich@rk-internet.com>},
@@ -32,7 +50,7 @@ if (WriteMakefile(
     MIN_PERL_VERSION   => 5.008,
     CONFIGURE_REQUIRES => {
         'Inline::MakeMaker'   => 0.45,
-        'ExtUtils::MakeMaker' => 6.52,
+        'ExtUtils::MakeMaker' => 4.52,
     },
     BUILD_REQUIRES => {
         'Test::Most' => '0.30',
@@ -52,9 +70,7 @@ if (WriteMakefile(
     clean => {FILES    => 'Graphics-Framebuffer* _Inline* examples/_Inline*'},
 )) {
 
-    print "\nNow run:\n\n\t",colored(['bold green'],'make'),"\n";
-    print "\nUse to test:\n\n\t",colored(['bold green'],'make test'),"\n\nUse to install (you may need to do it as root with sudo):\n\n\tsudo ",colored(['bold green'],'make install'),"\n\n";
-    print qq{The "examples" directory (in this package) has some handy scripts to help get\nyou started, and show you how to use the module.  Just 'perldoc' each to see\nhow to use them:\n\n};
+    print qq{\n\nThe "examples" directory (in this package) has some handy scripts to help get\nyou started, and show you how to use the module.  Just 'perldoc' each to see\nhow to use them:\n\n};
 
     print "\t",colored(['bold green'],'primitives.pl'),"\t- This script will pretty much demonstrate all of the\n\t\t\t  capabilities of this module.\n\n";
     print "\t",colored(['bold green'],'threadstest.pl'),"\t- This script demonstrates how to use the module in a\n\t\t\t  threading environment.\n\n";
@@ -62,4 +78,11 @@ if (WriteMakefile(
     print "\t",colored(['bold green'],'viewpic.pl'),"\t- This script shows one specific image (or animation).\n\n";
     print "\t",colored(['bold green'],'dump.pl'),"\t\t- This script does a diagnostic variable dump to STDERR\n\t\t\t  for the author to help you with troubleshooting.\n\n";
     print "\t",colored(['bold green'],'fonts.pl'),"\t- This script prints installed font names.\n\n";
+    print "Now run:\n\n\t",colored(['bold green'],'make'),"\n";
+    print "\nUse to test:\n\n\t",colored(['bold green'],'make test'),"\n\nUse to install (you may need to do it as root with sudo):\n\n\tsudo ",colored(['bold green'],'make install'),"\n\n";
+}
+
+sub slurp_file {
+    my $file = shift;
+    return( do { local (@ARGV, $/) = $file; <> } );
 }

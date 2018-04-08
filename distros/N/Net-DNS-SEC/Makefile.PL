@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1656 2018-03-22 14:36:14Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1660 2018-04-03 14:12:42Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -25,62 +25,46 @@ my %metadata = (
 
 
 my %prerequisite = (
-	'Net::DNS'     => 1.01,
 	'Digest::SHA'  => 5.23,
+	'DynaLoader'   => 1.04,
 	'File::Find'   => 1.05,
 	'File::Spec'   => 0.86,
 	'IO::File'     => 1.08,
 	'MIME::Base64' => 2.13,
+	'Net::DNS'     => 1.01,
 	'Test::More'   => 0.47,
-	'DynaLoader'   => 1.04,
 	);
 
 
 my %optional;
 
 
-my $lib = '-lcrypto';
 my $inc = '';
+my $lib = '-lcrypto';
 my $nul = $^O eq 'MSWin32' ? 'nul' : '/dev/null';
 
 if ( my $dir = $ENV{OPENSSL_PREFIX} ) {
 	$inc = "-I$dir/include";
 	$lib = "-L$dir/lib -lcrypto";
 
-} elsif ( $ENV{OPENSSL_LIB} ) {
-	$lib = $ENV{OPENSSL_LIB};
-	$inc = $ENV{OPENSSL_INCLUDE};
-
 } elsif (`pkg-config --modversion libcrypto 2>$nul`) {
-	$lib = `pkg-config --libs   libcrypto 2>$nul`;
 	$inc = `pkg-config --cflags libcrypto 2>$nul`;
+	$lib = `pkg-config --libs   libcrypto 2>$nul`;
 
 } elsif ( $^O eq 'MSWin32' ) {
 	$lib = '-llibeay32' if $Config{cc} =~ /cl/;
 	$lib = '-leay32'    if $Config{cc} =~ /gcc/;
 }
 
-
-my @DEFINE;
-my @OBJECT;
-if ( -d './curve25519' ) {
-	push @DEFINE, qw(-DINC_ED25519);
-	push @OBJECT, qw(curve25519/*.o);
-}
-
-if ( -d './curve448' ) {
-	push @DEFINE, qw(-DINC_ED448);
-	push @OBJECT, qw(curve448/*.o);
-}
+$inc = $ENV{OPENSSL_INCLUDE} if $ENV{OPENSSL_INCLUDE};
+$lib = $ENV{OPENSSL_LIB}     if $ENV{OPENSSL_LIB};
 
 
 WriteMakefile(
 	%metadata,
 	PREREQ_PM  => {%prerequisite},
-	DEFINE	   => "@DEFINE",
 	INC	   => "$inc",
 	LIBS	   => [$lib],
-	OBJECT	   => "SEC.o @OBJECT",
 	META_MERGE => {
 		'meta-spec' => {version => 2},
 		resources   => {
@@ -97,7 +81,7 @@ package MY;				## customise generated Makefile
 sub install {
 	my $self = shift;
 
-	my %install_type = qw(perl INSTALLPRIVLIB site INSTALLSITELIB vendor INSTALLVENDORLIB);
+	my %install_type = qw(perl INSTALLARCHLIB site INSTALLSITEARCH vendor INSTALLVENDORARCH);
 	my $install_site = join '', '$(DESTDIR)$(', $install_type{$self->{INSTALLDIRS}}, ')';
 	for ($install_site) {
 		s/\$\(([A-Z_]+)\)/$self->{$1}/eg while /\$\(/;	# expand Makefile macros

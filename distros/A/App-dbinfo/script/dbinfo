@@ -32,7 +32,7 @@ dbinfo - Get/extract information from database
 
 =head1 VERSION
 
-This document describes version 0.003 of dbinfo (from Perl distribution App-dbinfo), released on 2017-10-30.
+This document describes version 0.004 of dbinfo (from Perl distribution App-dbinfo), released on 2018-04-03.
 
 =head1 SYNOPSIS
 
@@ -368,7 +368,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

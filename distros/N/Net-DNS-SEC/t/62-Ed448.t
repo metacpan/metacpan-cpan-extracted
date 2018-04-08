@@ -1,4 +1,4 @@
-# $Id: 62-Ed448.t 1654 2018-03-19 15:53:37Z willem $	-*-perl-*-
+# $Id: 62-Ed448.t 1664 2018-04-05 10:03:14Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -16,8 +16,8 @@ foreach my $package ( sort keys %prerequisite ) {
 	exit;
 }
 
-plan skip_all => "disabled ED448"
-		unless eval { Net::DNS::SEC::libcrypto->can('ED448_sign') };
+plan skip_all => "disabled EdDSA"
+		unless eval { Net::DNS::SEC::libcrypto->can('EdDSA_sign') };
 
 plan tests => 8;
 
@@ -69,8 +69,8 @@ my $signature = pack 'H*', join '', qw(
 		f7651f828fb64c200e2ee5d0686490910c00
 		);
 
-my $signed = Net::DNS::SEC::EdDSA->sign( $sigdata, $private );
-ok( ( $signed eq $signature ), 'signature created using private key' );
+my $signed = eval { Net::DNS::SEC::EdDSA->sign( $sigdata, $private ) } || '';
+ok( $signed eq $signature, 'signature created using private key' );
 
 
 {

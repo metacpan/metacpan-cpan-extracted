@@ -49,7 +49,7 @@
     yMd => "dd.MM.y",
     yQQQ => "QQQ, y '\N{U+0435}\N{U+043b}'",
     yQQQQ => "QQQQ, y '\N{U+0435}\N{U+043b}'",
-    "yw-count-other" => "Y '\N{U+0435}\N{U+043b}\N{U+043d}\N{U+044b}\N{U+04a3}' w '\N{U+0430}\N{U+0442}\N{U+043d}\N{U+0430}\N{U+0441}\N{U+044b}'",
+    "yw-count-other" => "y '\N{U+0435}\N{U+043b}\N{U+043d}\N{U+044b}\N{U+04a3}' w '\N{U+0430}\N{U+0442}\N{U+043d}\N{U+0430}\N{U+0441}\N{U+044b}'",
   },
   code => "tt",
   date_format_full => "d MMMM, y '\N{U+0435}\N{U+043b}', EEEE",
@@ -266,5 +266,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => undef,
-  version => 32,
+  version => 33,
 }

@@ -30,7 +30,9 @@ sub badge_patterns {
     license      => qr{//img.shields.io/cpan/l/$repo\.},
     version      => qr{//img.shields.io/cpan/v/$repo\.},
     gitlab_ci    => qr{//github.com/$ur/badges/master/build.svg},
-    gitlab_cover => qr{//github.com/$ur/badges/master/coverage.svg}
+    gitlab_cover => qr{//github.com/$ur/badges/master/coverage.svg},
+    docker_automated=> qr{//img.shields.io/docker/automated/\L$ur\E\.},
+    docker_build    => qr{//img.shields.io/docker/build/\L$ur\E\.},
   };
 }
 
@@ -44,8 +46,8 @@ sub build_dist {
   my $test   = {
     content => 'ReadMe, please',
     name    => 'README.mkdn',
-    user    => 'test-author',
-    repo    => 'test-badges',
+    user    => 'Test-Author',
+    repo    => 'Test-Badges',
     %{ shift() || {} },
   };
 

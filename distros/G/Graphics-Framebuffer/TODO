@@ -2,6 +2,14 @@ TO DO
 
 The following are some ideas for the future:
 
+* Use DRM Framebuffer Compatibility Mode
+
+DRM drivers (those without a "/dev/fb0" file) have a framebuffer compatibility
+capability I may exploit to allow all video cards to work with this module.
+
+However, this won't guarantee hardware acceleration, but it will be a step in
+that direction.
+
 * Polygons With Rounded Corners *
 
 Polygons with rounded corners would be difficult, but doable.  It has become
@@ -9,7 +17,8 @@ quite difficult to get working so far.  I haven't given up.
 
 * Completely accelerate all primitive drawing
 
-Currently only some functions are C code accelerated.
+Currently only some functions are C code accelerated.  More are added as work
+progresses.
 
 The slowest will be addressed first.
 
@@ -22,14 +31,3 @@ increase in speed won't hurt either.
 * Make double-buffering the default for 16 bit and make it seamless. *
 
 It's close right now
-
-############# MAYBEs - BIG MAYBEs below ################
-
-Access the DRM mode framebuffer for those drivers without native FBDEV
-support.   If I succeed with this, then MAYBE I can also incorporate some GPU
-accelerated methods.
-
-For this module's intended design philosophy, accessing the DRM may be too
-much overhead.  If GPU acceleration methods deviate too much from this
-module's intended design, then that doesn't mean a "Graphics::DRM" won't be
-possible.  Just don't get your hopes up right now.

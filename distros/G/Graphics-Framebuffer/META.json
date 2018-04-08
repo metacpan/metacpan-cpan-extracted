@@ -28,7 +28,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.52",
+            "ExtUtils::MakeMaker" : "4.52",
             "Inline::MakeMaker" : "0.45"
          }
       },
@@ -47,5 +47,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "6.04"
+   "version" : "6.09"
 }

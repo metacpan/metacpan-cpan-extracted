@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Role-ModuleMetadata
 
+0.005     2018-04-01 23:13:32Z
+          - now supports passing collect_pod => 1 to module_metadata_for_file.
+
 0.004     2016-06-21 00:54:35Z
           - added argument validation
 

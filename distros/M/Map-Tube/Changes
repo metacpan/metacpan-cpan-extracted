@@ -1,5 +1,17 @@
 Revision history for Map::Tube
 
+3.49  2018-04-07T08:30:00+00:00
+      - Updated mininmum version of Test::Map::Tube v0.41.
+
+3.48  2018-04-05T06:00:00+00:00
+      - Fixed bug in the method get_next_stations() w.r.t. fetching links.
+
+3.47  2018-04-04T07:20:00+00:00
+      - Added handy method get_next_stations().
+
+3.46  2018-04-03T11:45:00+00:00
+      - Updated mininmum version of Test::Map::Tube v0.40.
+
 3.45  2018-03-18T05:05:00+00:00
       - Documented method get_stations() for Map::Tube::Line.
       - Added test script line-stations.t.

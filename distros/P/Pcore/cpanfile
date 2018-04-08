@@ -42,9 +42,6 @@ feature linux => sub {
 requires 'Inline';
 requires 'Inline::C';
 
-# Handle
-requires 'BerkeleyDB';
-
 # Pcore::App
 requires 'Crypt::Argon2';
 
@@ -77,6 +74,7 @@ requires 'HTTP::Message',             v6.13.0;
 # Pcore::Src
 requires 'Perl::Tidy';
 on develop => sub {
+    requires 'BerkeleyDB';
     requires 'Perl::Stripper';
     requires 'Perl::Strip';
     requires 'Perl::Critic';

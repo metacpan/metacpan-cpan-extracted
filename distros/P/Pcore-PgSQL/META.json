@@ -1,7 +1,7 @@
 {
    "abstract" : "unknown",
    "author" : [
-      "zdm <zdm@cpan.org>"
+      "zdm <zdm@softvisio.net>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "CPAN::Meta version 2.150010",
@@ -47,6 +47,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-pgsql/overview"
       }
    },
-   "version" : "v0.14.12",
+   "version" : "v0.14.14",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

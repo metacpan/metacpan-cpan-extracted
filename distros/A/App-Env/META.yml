@@ -1,42 +1,63 @@
 ---
 abstract: 'manage application specific environments'
 author:
-  - 'Diab Jerius, <djerius@cpan.org>'
+  - 'Diab Jerius <djerius@cpan.org>'
 build_requires:
+  Capture::Tiny: '0'
   Env::Path: '0'
-  ExtUtils::MakeMaker: '6.59'
-  Test::Fatal: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::API: '0'
+  Test2::V0: '0'
+  Test::Lib: '0'
   Test::More: '0'
 configure_requires:
-  CPAN::Meta: '0'
-  ExtUtils::MakeMaker: '6.59'
-dynamic_config: '0'
-generated_by: 'Module::Install version 1.16, CPAN::Meta::Converter version 2.150005'
-license: unknown
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: App-Env
 no_index:
   directory:
+    - eg
+    - examples
     - inc
+    - share
     - t
     - xt
+provides:
+  App::Env:
+    file: lib/App/Env.pm
+    version: '0.34'
+  App::Env::Example:
+    file: lib/App/Env/Example.pm
+    version: '0.34'
+  App::Env::Null:
+    file: lib/App/Env/Null.pm
+    version: '0.34'
 requires:
-  Capture::Tiny: '0.09'
+  Capture::Tiny: '0'
+  Digest: '0'
+  Env::Path: '0'
   File::Basename: '0'
   File::Spec::Functions: '0'
-  File::Temp: '0'
-  Getopt::Long: '2.24'
+  Getopt::Long: '0'
   IPC::System::Simple: '0'
   Module::Find: '0'
   Params::Validate: '0'
   Pod::Usage: '0'
   Scalar::Util: '0'
-  perl: v5.8.0
+  Shell::GetEnv: '0'
+  Storable: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Env
-  license: http://www.gnu.org/licenses/gpl-3.0.html
-  repository: https://bitbucket.org/djerius/app-env
-version: '0.33'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  repository: git://github.com/djerius/app-env.git
+version: '0.34'
+x_serialization_backend: 'YAML::Tiny version 1.70'

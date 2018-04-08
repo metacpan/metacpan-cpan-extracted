@@ -1,0 +1,142 @@
+
+<div class="row">
+ 
+  <form class="form-horizontal">
+    <fieldset>
+    
+      <!-- Form Name -->
+        <legend>[% heading %]</legend>
+        
+        <div id="ajax_error"></div>
+        [% IF error != "" %]
+        <div  class="alert alert-danger">
+           <strong>[% error %]
+        </div>
+        [% END %]
+        
+        <style>
+        pre {
+            height: auto;
+            max-height: 450px;
+            overflow: auto;
+            background-color: #eeeeee;
+            word-break: normal !important;
+            word-wrap: normal !important;
+            white-space: pre !important;
+        }
+        
+        .FixedHeightContainer {
+          float:   left;
+          height:  450px;
+          width:   750px;  
+          padding: 3px; 
+        
+        }
+  
+        .LogContent {
+          height:   400px;
+          overflow: auto;
+        
+        }
+        </style>
+
+        <pre id="stats"> </pre>
+      
+        <div class="form-group">
+          <div class="col-md-8">
+            <button id="closebutton" name="closebutton" class="btn btn-primary">Close Window</button>
+          </div>
+
+        </div>
+      
+        <input type="hidden" id="heading"      name="heading"      value="[% heading %]">
+        <input type="hidden" id="tail_file_id" name="tail_file_id" value="[% tail_file_id %]">
+        <input type="hidden" id="curr_pos"     name="curr_pos"     value="0">
+    
+    </fieldset>
+  </form>
+
+</div>
+
+
+<script>
+  var empty_resp_cnt    = 0;
+  var refreshIntervalId = 0;
+
+  $('#closebutton').on( 'click', function(e) {
+    window.close();
+  });
+
+  setTimeout( after_pause, 1000 );
+
+  function after_pause() {
+    refreshIntervalId = setInterval( gettail, [% update_interval %] );
+  }
+
+  function gettail( ) {
+    var curr_pos     = $('#curr_pos').val();
+    var tail_file_id = $('#tail_file_id').val();
+
+    var full_url = '[% app_host_url %][% data_url %]?tail_file_id=' + tail_file_id + '&curr_pos=' + curr_pos ;
+
+    $.ajax({
+      url :         full_url,
+      dataType :    'json',
+      type :        '[% data_method %]',
+      crossDomain : true,
+      async :       false,
+      cache :       false,
+      timeout:      5000,
+      error :     function(xhr, status, e) {
+            console.log("got an AJAX error: " + xhr.responseText);
+            console.log("Status:            " + status);
+
+            $('#ajax_error').text(
+                "An error ocurred while contacting server. "
+                    + xhr.responseText);
+
+            if (status == 'timeout') {
+              $('#ajax_error').text("Unable to reach server.");
+            }
+          },
+      success : function(json) {
+
+        // Store old position
+        var curr_pos     = $('#curr_pos').val();
+
+        // Retrieve new current position from json response
+        var new_curr_pos = json.new_curr_pos;
+
+        // If it's not undefined, then save it to the hidden field
+        if ( new_curr_pos != undefined ) {
+          $('#curr_pos').val( new_curr_pos );
+        }
+
+        // Get the output
+        var output   = json.output;
+        $('#stats').append( output );
+
+        // Did the file position change?
+        if ( curr_pos != new_curr_pos ) {
+          // Reset empty to 0
+          empty_resp_cnt = 0;
+
+          // Scroll to bottom
+          $('#stats').scrollTop($('#stats')[0].scrollHeight);
+        } else { 
+          // Increment empty count
+          empty_resp_cnt++;
+        }
+
+        // Stop if number of empty responses >= to stop_resp_cnt
+        if ( empty_resp_cnt >= [% stop_on_empty_cnt %] ) {
+          clearInterval(refreshIntervalId);
+        }
+ 
+      }   // success  
+    });   // ajax
+
+  }   //gettail
+
+</script>
+

@@ -1,43 +1,50 @@
-Revision history for Perl module Mojolicious::Command::generate::routes
+Revision history for Perl module Mojolicious::Command::generate::resources
 
-0.01 Tue Dec 12 21:58:36 2017
-    - original version; created by ExtUtils::ModuleMaker 0.56
-    - Written some POD.
-    - Created repository on Github.
+0.20 Sat Apr  7 18:36:22 CEST 2018
+    - Fixed bug in generated code - missing @bind parameters passed to query in
+      model class.
+    - Added option 'where' (HASHREF) to generated method 'all' in generated
+      model class for refining SQL query. 
 
-0.02 Sun Dec 17 00:54:36 2017
-    - Implemented run().
-    - Added initial templates.
+0.19 Thu Apr  5 23:40:04 CEST 2018
+    - Improved generated show.html.ep
+    - Improved some tests.
+
+0.18 Sat Mar 31 03:00:42 CEST 2018
+    - Improved generated code to be compliant with Perl::Critic severity
+      "harsh".
+    - TODO: May be add some POD even some day.
+
+0.17 Sat Mar 31 01:07:42 CEST 2018
+    - Fixed bug. --api_dir argument was treated as boolean. Should be treated
+      as a string. Added test.
+
+0.16 Mon Mar 26 00:08:07 CEST 2018
+    - Reversed order of versions in file Changes.
+
+0.15 Sun Mar 25 23:11:44 CEST 2018
+    - Added optional argument "db_helper" to be used by the command instead of
+      only "sqlite", "mysql" or "pg". Defaults to "sqlite".
+
+0.14 Sun Feb 18 14:47:45 CET 2018
+    - Added some very basic tests.
+    - Improved 'description' attribute.
     - Improved documentation.
-    - Added tests for file generation from templates.
-
-0.03 Thu Jan 11 22:13:56 CET 2018
-    - Added Model templates.
-    - Added TODO template containig generated helpers and routes.
-    - Added some additional tests and cleaned up the templates.
-
-0.04 Thu Jan 11 22:48:38 CET 2018
-    - Fixed inconsistencies in the documentation.
-
-0.05 Sun Jan 14 23:50:40 CET 2018
-    - Added Mojo::SQLite to the TEST_REQURES section in Makefile.PL
-    - Added pod and manifest tests.
-    - Made path to test.db more specific.
-
-0.06 Mon Jan 15 22:49:50 CET 2018
-    - Fixed failing tests on Windows.
-
-0.07 Wed Jan 17 12:10:35 CET 2018
-
-    - Templates' folder can be copied and pushed to app->renderer->paths for
-      customisation.
-    - Strictly require Perl 5.20.1
-
-0.08 Sat Jan 20 09:52:49 CET 2018
-    - Using signatures wherever feasible.
-    - Fixed failing tests on Windows again.
-    - Small change in show.html.ep
-
+0.13 Sun Feb 18 02:00:31 CET 2018
+    - Heavy refactoring. Now all the API is in just one file - api.json.
+    - Added tests for generated API.
+    - Added tests for the generated code via the API.
+0.12 Sun Feb 11 22:21:14 CET 2018
+    - Using Mojo::File instead of File::Spec.
+    - Fixed potential bug in 'routes' attribite.
+    - New instruction in generated TODO file.
+    - Using now Mojo::Util::getop().
+0.11 Sun Feb 11 02:03:42 CET 2018
+    - Code optimisations and POD improvements
+    - Added templates for description of resources in OpenAPI format.
+    - Implemented generation of Schema object definitions for each table.
+0.10 Sun Jan 28 20:42:50 CET 2018
+    - Improved Makefile.PL.
 0.09 Sun Jan 28 20:25:37 CET 2018
     - Improved Makefile.PL. Automated generation of README and README.md.
     - Attribute 'description' now extracts description form POD.
@@ -47,31 +54,33 @@ Revision history for Perl module Mojolicious::Command::generate::routes
     - Using Test::Perl::Critic for `env TEST_AUTHOR=1`.
     - Running tests on the generated resources.
     - Mention that Perl 5.20 is required.
-
-0.10 Sun Jan 28 20:42:50 CET 2018
-    - Improved Makefile.PL.
-
-0.11 Sun Feb 11 02:03:42 CET 2018
-    - Code optimisations and POD improvements
-    - Added templates for description of resources in OpenAPI format.
-    - Implemented generation of Schema object definitions for each table.
-
-0.12 Sun Feb 11 22:21:14 CET 2018
-    - Using Mojo::File instead of File::Spec.
-    - Fixed potential bug in 'routes' attribite.
-    - New instruction in generated TODO file.
-    - Using now Mojo::Util::getop().
-
-0.13 Sun Feb 18 02:00:31 CET 2018
-    - Heavy refactoring. Now all the API is in just one file - api.json.
-    - Added tests for generated API.
-    - Added tests for the generated code via the API.
-
-0.14 Sun Feb 18 14:47:45 CET 2018
-    - Added some very basic tests.
-    - Improved 'description' attribute.
+0.08 Sat Jan 20 09:52:49 CET 2018
+    - Using signatures wherever feasible.
+    - Fixed failing tests on Windows again.
+    - Small change in show.html.ep
+    - Templates' folder can be copied and pushed to app->renderer->paths for
+      customisation.
+    - Strictly require Perl 5.20.1
+0.07 Wed Jan 17 12:10:35 CET 2018
+0.06 Mon Jan 15 22:49:50 CET 2018
+    - Fixed failing tests on Windows.
+0.05 Sun Jan 14 23:50:40 CET 2018
+    - Added Mojo::SQLite to the TEST_REQURES section in Makefile.PL
+    - Added pod and manifest tests.
+    - Made path to test.db more specific.
+0.04 Thu Jan 11 22:48:38 CET 2018
+    - Fixed inconsistencies in the documentation.
+0.03 Thu Jan 11 22:13:56 CET 2018
+    - Added Model templates.
+    - Added TODO template containig generated helpers and routes.
+    - Added some additional tests and cleaned up the templates.
+0.02 Sun Dec 17 00:54:36 2017
+    - Implemented run().
+    - Added initial templates.
     - Improved documentation.
+    - Added tests for file generation from templates.
+0.01 Tue Dec 12 21:58:36 2017
+    - original version; created by ExtUtils::ModuleMaker 0.56
+    - Written some POD.
+    - Created repository on Github.
 
-0.15 Sun Mar 25 23:11:44 CEST 2018
-    - Added optional argument "db_helper" to be used by the command instead of
-      only "sqlite", "mysql" or "pg". Defaults to "sqlite".

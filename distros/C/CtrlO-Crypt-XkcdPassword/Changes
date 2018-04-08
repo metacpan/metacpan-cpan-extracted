@@ -1,5 +1,13 @@
 Revision history for CtrlO-Crypt-XkcdPassword
 
+1.005   2018-04-02T21:36:04
+    - improve error-tests
+    - Fixed broken link in docs, reported by manwar via
+      https://github.com/domm/CtrlO-Crypt-XkcdPassword/pull/2
+    - Added params check for method xkcd() with unit tests.
+      (Mohammad S Anwar)
+
+
 1.004   2018-03-19T10:28:04
     - add author test in xt to check for bad words
     - remove a few more bad-ish words

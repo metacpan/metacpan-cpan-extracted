@@ -1,0 +1,4 @@
+<:
+$headers{_test}=2;
+print $header{x_PLP_version};
+BEGIN { $header{"-tesT"} = 1 }

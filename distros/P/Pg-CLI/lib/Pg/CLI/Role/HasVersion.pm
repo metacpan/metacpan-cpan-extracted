@@ -1,20 +1,20 @@
 package Pg::CLI::Role::HasVersion;
-{
-  $Pg::CLI::Role::HasVersion::VERSION = '0.11';
-}
 
-use Moose::Role;
-
+use strict;
+use warnings;
 use namespace::autoclean;
+
+our $VERSION = '0.13';
 
 use IPC::Run3 qw( run3 );
 use MooseX::Types::Moose qw( Str );
-use Pg::CLI::pg_config;
+
+use Moose::Role;
 
 has version => (
     is       => 'ro',
     isa      => Str,
-    init_arg => '_version', # for testing
+    init_arg => '_version',         # for testing
     lazy     => 1,
     builder  => '_build_version',
 );
@@ -41,13 +41,17 @@ sub _build_version {
 
     die $error if $error;
 
+    ## no critic (RegularExpressions::ProhibitCaptureWithoutTest)
+    #
+    # https://github.com/Perl-Critic/Perl-Critic/issues/533
     return $1 if $output =~ /(\d\.\d\.\d)/;
 }
 
 sub _build_two_part_version {
     my $self = shift;
 
-    return $1 if $self->version() =~ /(\d\.\d)/;
+    ## no critic (RegularExpressions::ProhibitCaptureWithoutTest)
+    return $1 if $self->version() =~ /^(\d\.\d)/;
 }
 
 1;

@@ -8,7 +8,7 @@ use IO::Async::Test;
 use Test::More;
 
 use Socket 1.93 qw( 
-   AF_INET SOCK_STREAM INADDR_LOOPBACK AI_PASSIVE
+   AF_INET SOCK_STREAM SOCK_RAW INADDR_LOOPBACK AI_PASSIVE
    pack_sockaddr_in inet_aton getaddrinfo getnameinfo
 );
 
@@ -255,6 +255,21 @@ my ( $localhost_err, @localhost_addrs ) = getaddrinfo( "localhost", "www", { fam
    my @got = @{$result}[1..$#$result];
 
    is_deeply( \@got, \@lo_addrs, '$resolver->getaddrinfo resolved addresses synchronously' );
+
+   undef $result;
+   $resolver->getaddrinfo(
+      host        => "127.0.0.1",
+      socktype    => SOCK_RAW,
+      on_resolved => sub { $result = [ 'resolved', @_ ] },
+      on_error    => sub { $result = [ 'error',    @_ ] },
+   );
+
+   is( $result->[0], 'resolved', '$resolver->getaddrinfo on numeric host/no service is synchronous' );
+
+   my @got_sinaddrs = map { $_->{addr} } @{$result}[1..$#$result];
+
+   is_deeply( \@got_sinaddrs, [ map { pack_sockaddr_in( 0, inet_aton "127.0.0.1" ) } @got_sinaddrs ],
+      '$resolver->getaddrinfo resolved addresses synchronously with no service' );
 }
 
 {

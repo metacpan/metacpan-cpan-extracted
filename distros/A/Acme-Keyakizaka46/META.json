@@ -1,0 +1,204 @@
+{
+   "abstract" : "All about Japanse idol group \"Keyakizaka46\"",
+   "author" : [
+      "Okawara Ayato <2044taiga@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.16",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Keyakizaka46",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "DateTime" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Keyakizaka46" : {
+         "file" : "lib/Acme/Keyakizaka46.pm",
+         "version" : "v0.0.1"
+      },
+      "Acme::Keyakizaka46::AkaneMoriya" : {
+         "file" : "lib/Acme/Keyakizaka46/AkaneMoriya.pm"
+      },
+      "Acme::Keyakizaka46::AkariNibu" : {
+         "file" : "lib/Acme/Keyakizaka46/AkariNibu.pm"
+      },
+      "Acme::Keyakizaka46::AoiHarada" : {
+         "file" : "lib/Acme/Keyakizaka46/AoiHarada.pm"
+      },
+      "Acme::Keyakizaka46::AyakaTakamoto" : {
+         "file" : "lib/Acme/Keyakizaka46/AyakaTakamoto.pm"
+      },
+      "Acme::Keyakizaka46::Base" : {
+         "file" : "lib/Acme/Keyakizaka46/Base.pm",
+         "version" : "v0.0.1"
+      },
+      "Acme::Keyakizaka46::FuyukaSaito" : {
+         "file" : "lib/Acme/Keyakizaka46/FuyukaSaito.pm"
+      },
+      "Acme::Keyakizaka46::HinaKawata" : {
+         "file" : "lib/Acme/Keyakizaka46/HinaKawata.pm"
+      },
+      "Acme::Keyakizaka46::HiyoriHamagishi" : {
+         "file" : "lib/Acme/Keyakizaka46/HiyoriHamagishi.pm"
+      },
+      "Acme::Keyakizaka46::KonokaMatsuda" : {
+         "file" : "lib/Acme/Keyakizaka46/KonokaMatsuda.pm"
+      },
+      "Acme::Keyakizaka46::KumiSasaki" : {
+         "file" : "lib/Acme/Keyakizaka46/KumiSasaki.pm"
+      },
+      "Acme::Keyakizaka46::KyokoSaito" : {
+         "file" : "lib/Acme/Keyakizaka46/KyokoSaito.pm"
+      },
+      "Acme::Keyakizaka46::ManaTakase" : {
+         "file" : "lib/Acme/Keyakizaka46/ManaTakase.pm"
+      },
+      "Acme::Keyakizaka46::ManakaShida" : {
+         "file" : "lib/Acme/Keyakizaka46/ManakaShida.pm"
+      },
+      "Acme::Keyakizaka46::ManamoMiyata" : {
+         "file" : "lib/Acme/Keyakizaka46/ManamoMiyata.pm"
+      },
+      "Acme::Keyakizaka46::MaoIguchi" : {
+         "file" : "lib/Acme/Keyakizaka46/MaoIguchi.pm"
+      },
+      "Acme::Keyakizaka46::MeiHigashimura" : {
+         "file" : "lib/Acme/Keyakizaka46/MeiHigashimura.pm"
+      },
+      "Acme::Keyakizaka46::MemiKakizaki" : {
+         "file" : "lib/Acme/Keyakizaka46/MemiKakizaki.pm"
+      },
+      "Acme::Keyakizaka46::MihoWatanabe" : {
+         "file" : "lib/Acme/Keyakizaka46/MihoWatanabe.pm"
+      },
+      "Acme::Keyakizaka46::MikuKanemura" : {
+         "file" : "lib/Acme/Keyakizaka46/MikuKanemura.pm"
+      },
+      "Acme::Keyakizaka46::MinamiKoike" : {
+         "file" : "lib/Acme/Keyakizaka46/MinamiKoike.pm"
+      },
+      "Acme::Keyakizaka46::MireiSasaki" : {
+         "file" : "lib/Acme/Keyakizaka46/MireiSasaki.pm"
+      },
+      "Acme::Keyakizaka46::MiyuSuzumoto" : {
+         "file" : "lib/Acme/Keyakizaka46/MiyuSuzumoto.pm"
+      },
+      "Acme::Keyakizaka46::MizuhoHabu" : {
+         "file" : "lib/Acme/Keyakizaka46/MizuhoHabu.pm"
+      },
+      "Acme::Keyakizaka46::NanaOda" : {
+         "file" : "lib/Acme/Keyakizaka46/NanaOda.pm"
+      },
+      "Acme::Keyakizaka46::NanakoNagasawa" : {
+         "file" : "lib/Acme/Keyakizaka46/NanakoNagasawa.pm"
+      },
+      "Acme::Keyakizaka46::NanamiYonetani" : {
+         "file" : "lib/Acme/Keyakizaka46/NanamiYonetani.pm"
+      },
+      "Acme::Keyakizaka46::NaoKosaka" : {
+         "file" : "lib/Acme/Keyakizaka46/NaoKosaka.pm"
+      },
+      "Acme::Keyakizaka46::NeruNagahama" : {
+         "file" : "lib/Acme/Keyakizaka46/NeruNagahama.pm"
+      },
+      "Acme::Keyakizaka46::NijikaIshimori" : {
+         "file" : "lib/Acme/Keyakizaka46/NijikaIshimori.pm"
+      },
+      "Acme::Keyakizaka46::RikaOzeki" : {
+         "file" : "lib/Acme/Keyakizaka46/RikaOzeki.pm"
+      },
+      "Acme::Keyakizaka46::RikaWatanabe" : {
+         "file" : "lib/Acme/Keyakizaka46/RikaWatanabe.pm"
+      },
+      "Acme::Keyakizaka46::RinaUemura" : {
+         "file" : "lib/Acme/Keyakizaka46/RinaUemura.pm"
+      },
+      "Acme::Keyakizaka46::RisaWatanabe" : {
+         "file" : "lib/Acme/Keyakizaka46/RisaWatanabe.pm"
+      },
+      "Acme::Keyakizaka46::SarinaUshio" : {
+         "file" : "lib/Acme/Keyakizaka46/SarinaUshio.pm"
+      },
+      "Acme::Keyakizaka46::ShihoKato" : {
+         "file" : "lib/Acme/Keyakizaka46/ShihoKato.pm"
+      },
+      "Acme::Keyakizaka46::ShioriSato" : {
+         "file" : "lib/Acme/Keyakizaka46/ShioriSato.pm"
+      },
+      "Acme::Keyakizaka46::SuzukaTomita" : {
+         "file" : "lib/Acme/Keyakizaka46/SuzukaTomita.pm"
+      },
+      "Acme::Keyakizaka46::YuiImaizumi" : {
+         "file" : "lib/Acme/Keyakizaka46/YuiImaizumi.pm"
+      },
+      "Acme::Keyakizaka46::YuiKobayashi" : {
+         "file" : "lib/Acme/Keyakizaka46/YuiKobayashi.pm"
+      },
+      "Acme::Keyakizaka46::YukaKageyama" : {
+         "file" : "lib/Acme/Keyakizaka46/YukaKageyama.pm"
+      },
+      "Acme::Keyakizaka46::YurinaHirate" : {
+         "file" : "lib/Acme/Keyakizaka46/YurinaHirate.pm"
+      },
+      "Acme::Keyakizaka46::YuukaSugai" : {
+         "file" : "lib/Acme/Keyakizaka46/YuukaSugai.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tearon4/Acme-Keyakizaka46/issues"
+      },
+      "homepage" : "https://github.com/tearon4/Acme-Keyakizaka46",
+      "repository" : {
+         "url" : "git://github.com/tearon4/Acme-Keyakizaka46.git",
+         "web" : "https://github.com/tearon4/Acme-Keyakizaka46"
+      }
+   },
+   "version" : "0.0.1",
+   "x_contributors" : [
+      "tearon4 <okawara-ayato@kayac.com>"
+   ]
+}

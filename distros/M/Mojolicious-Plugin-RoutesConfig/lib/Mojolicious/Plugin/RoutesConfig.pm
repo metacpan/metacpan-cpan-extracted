@@ -2,7 +2,7 @@ package Mojolicious::Plugin::RoutesConfig;
 use Mojo::Base 'Mojolicious::Plugin::Config', -signatures;
 use List::Util qw(first);
 
-our $VERSION   = 0.04;
+our $VERSION   = 0.05;
 our $AUTHORITY = 'cpan:BEROV';
 
 sub register {
@@ -23,7 +23,7 @@ sub register {
   return $conf;
 }
 
-#generates routes (TODO:recursively?)
+# generates routes (recursively for under)
 sub _generate_routes {
   my ($self, $app, $routes, $routes_conf, $file_msg) = @_;
   my $init_rx = '^(?:any|route|get|post|patch|put|delete|options|under)$';
@@ -42,7 +42,6 @@ sub _generate_routes {
     my $route = _call_method($routes, $init_method, $init_params);
     if ($init_method eq 'under') {    # recourse
       $self->_generate_routes($app, $route, $rconf->{routes}, $file_msg);
-      next;
     }
     for my $method (keys %$rconf) {
       next if $method =~ /^(?:$init_method|routes)$/;
@@ -96,6 +95,14 @@ Mojolicious::Plugin::RoutesConfig - Describe routes in configuration
       {get  => '/groups', to => 'groups#list', name => 'list_groups'},
       {post => '/groups', to => 'groups#create'},
       {any => {[qw(GET POST)] => '/users'}, to => 'users#list_or_create'},
+
+      {under => '/управление', to => 'auth#under_management',
+        routes => [
+            {any  => '/', to   => 'upravlenie#index', name => 'home_upravlenie'},
+            {get  => '/groups', to   => 'groups#index', name => 'home_groups'},
+            #...
+        ],
+      },
     ],
   }
 

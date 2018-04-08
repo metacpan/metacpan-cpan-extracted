@@ -51,6 +51,7 @@ my %WriteMakefileArgs = (
     "Music::Note::Role::Operators" => 0,
     "Music::PitchNum" => 0,
     "Music::RecRhythm" => 0,
+    "Music::ScaleNote" => 0,
     "Music::Scales" => 0,
     "Music::Tempo" => 0,
     "Music::Tension" => 0,
@@ -67,7 +68,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.13",
+  "VERSION" => "0.14",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -112,6 +113,7 @@ my %FallbackPrereqs = (
   "Music::Note::Role::Operators" => 0,
   "Music::PitchNum" => 0,
   "Music::RecRhythm" => 0,
+  "Music::ScaleNote" => 0,
   "Music::Scales" => 0,
   "Music::Tempo" => 0,
   "Music::Tension" => 0,

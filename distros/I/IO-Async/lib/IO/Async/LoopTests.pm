@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2018 -- leonerd@leonerd.org.uk
 
 package IO::Async::LoopTests;
 
@@ -27,7 +27,7 @@ use POSIX qw( SIGTERM );
 use Socket qw( sockaddr_family AF_UNIX );
 use Time::HiRes qw( time );
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 # Abstract Units of Time
 use constant AUT => $ENV{TEST_QUICK_TIMERS} ? 0.1 : 1;
@@ -790,7 +790,7 @@ behave correctly
 
 =cut
 
-use constant count_tests_control => 8;
+use constant count_tests_control => 9;
 sub run_tests_control
 {
    time_between { $loop->loop_once( 0 ) } 0, 0.1, 'loop_once(0) when idle';
@@ -815,6 +815,15 @@ sub run_tests_control
    is( $result, "result", 'First ->stop argument returned by ->run in scalar context' );
 
    $loop->watch_time( after => 0.1, code => sub {
+      SKIP: {
+         unless( $loop->can( 'is_running' ) ) {
+            diag "Unsupported \$loop->is_running";
+            skip "Unsupported \$loop->is_running", 1;
+         }
+
+         ok( $loop->is_running, '$loop->is_running' );
+      }
+
       $loop->watch_time( after => 0.1, code => sub { $loop->stop( "inner" ) } );
       my @result = $loop->run;
       $loop->stop( @result, "outer" );

@@ -1,13 +1,12 @@
-# RT::Client::REST::Transaction -- transaction object representation.
-
-package RT::Client::REST::Transaction;
+#!perl
+# PODNAME: RT::Client::REST::Transaction
+# ABSTRACT: transaction object representation.
 
 use strict;
 use warnings;
 
-use vars qw($VERSION);
-$VERSION = 0.01;
-
+package RT::Client::REST::Transaction;
+$RT::Client::REST::Transaction::VERSION = '0.52';
 use Params::Validate qw(:types);
 use RT::Client::REST::Object 0.01;
 use RT::Client::REST::Object::Exception 0.03;
@@ -119,7 +118,7 @@ sub retrieve {
 
 # Override unsupported methods.
 for my $method (qw(store search count)) {
-    no strict 'refs';
+    no strict 'refs'; ## no critic (ProhibitNoStrict)
     *$method = sub {
         my $self = shift;
         RT::Client::REST::Object::IllegalMethodException->throw(
@@ -134,9 +133,17 @@ __PACKAGE__->_generate_methods;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-RT::Client::REST::Transaction -- this object represents a transaction.
+RT::Client::REST::Transaction - transaction object representation.
+
+=head1 VERSION
+
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -178,7 +185,7 @@ Numeric ID of the object the transaction is associated with.
 
 =item B<type>
 
-Type of the transactions.  Please referer to L<RT::Client::REST>
+Type of the transactions.  Please refer to L<RT::Client::REST>
 documentation for the list of transaction types you can expect this
 field to contain.  Note that there may be some transaction types not
 (dis)covered yet.
@@ -248,12 +255,45 @@ L<RT::Client::REST>,
 L<RT::Client::REST::Ticket>,
 L<RT::Client::REST::SearchResult>.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Abhijit Menon-Sen <ams@wiw.org>
+
+=item *
 
 Dmitri Tikhonov <dtikhonov@yahoo.com>
 
-=head1 LICENSE
+=item *
 
-Perl license.
+Damien "dams" Krotkine <dams@cpan.org>
+
+=item *
+
+Dean Hamstead <dean@bytefoundry.com.au>
+
+=item *
+
+Miquel Ruiz <mruiz@cpan.org>
+
+=item *
+
+JLMARTIN
+
+=item *
+
+SRVSH
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Dmitri Tikhonov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

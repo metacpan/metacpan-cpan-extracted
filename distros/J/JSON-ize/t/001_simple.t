@@ -28,7 +28,7 @@ dies_ok { jsonize(File::Spec->catfile($tdir,"bad.json")) };
 if ($^O =~ /darwin|linux/){
   my $cmd = "cat ".
     File::Spec->catfile($tdir,"good.json") .
-      " | perl -Ilib -I../lib -MJSON::ize -ne 'parsej;' -e 'END{ print J->{good} }'";
+      " | $^X -Ilib -I../lib -MJSON::ize -ne 'parsej;' -e 'END{ print J->{good} }'";
   my ($try) = `$cmd`;
   is $try, "json";
 }

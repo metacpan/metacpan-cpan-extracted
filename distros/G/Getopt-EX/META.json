@@ -55,7 +55,7 @@
    "provides" : {
       "Getopt::EX" : {
          "file" : "lib/Getopt/EX.pm",
-         "version" : "v1.7.2"
+         "version" : "v1.7.3"
       },
       "Getopt::EX::Colormap" : {
          "file" : "lib/Getopt/EX/Colormap.pm"
@@ -90,9 +90,10 @@
          "web" : "https://github.com/kaz-utashiro/Getopt-EX"
       }
    },
-   "version" : "v1.7.2",
+   "version" : "v1.7.3",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kaz Utashiro <utashiro@cpan.org>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

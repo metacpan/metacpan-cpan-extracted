@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Carp;
 
-our $VERSION = 'v2.3.7';
+our $VERSION = 'v2.3.8';
 
 use Narada::Config qw( get_config_line );
 use Log::Fast;
@@ -64,7 +64,7 @@ Narada::Log - setup project log
 
 =head1 VERSION
 
-This document describes Narada::Log version v2.3.7
+This document describes Narada::Log version v2.3.8
 
 
 =head1 SYNOPSIS

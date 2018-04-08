@@ -1,9 +1,9 @@
 package Sah::SchemaR::cryptocurrency::code;
 
-our $DATE = '2018-03-08'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-04-06'; # DATE
+our $VERSION = '0.005'; # VERSION
 
-our $rschema = ["str",[{summary=>"Cryptocurrency code","x.completion"=>"cryptocurrency_code"}],["str"]];
+our $rschema = ["str",[{summary=>"Cryptocurrency code","x.completion"=>"cryptocurrency_code","x.perl.coerce_rules"=>["str_toupper"]}],["str"]];
 
 1;
 # ABSTRACT: Cryptocurrency code
@@ -20,7 +20,7 @@ Sah::SchemaR::cryptocurrency::code - Cryptocurrency code
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::SchemaR::cryptocurrency::code (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-03-08.
+This document describes version 0.005 of Sah::SchemaR::cryptocurrency::code (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-04-06.
 
 =head1 DESCRIPTION
 

@@ -6,24 +6,38 @@ SYNOPSIS
 
 DESCRIPTION
 
+    Version 0.46 (Algorithm::Bertsekas-0.46 Released on 06th Abr 2018)
+		1. Little changes and improvements.
+		
+    Version 0.45 (Algorithm::Bertsekas-0.45 Released on 05th Abr 2018)
+		1. Little changes and improvements.
+		   
+    Version 0.40 (Algorithm::Bertsekas-0.40 Released on 03th Abr 2018)
+		1. The @objects_with_greater_benefits are updated dynamically by 
+		   $objects_desired_by_this{$person} considering the price update of objects.
+		
+    Version 0.35 (Algorithm::Bertsekas-0.31 Released on 25th Mar 2018)
+		1. Calculate $bid02ForPersonI to try to predict the values of the next round.
+		2. Bug fixes.
+		
     Version 0.31 (Algorithm::Bertsekas-0.31 Released on 25th Mar 2018)
 		1. Added $ThdOptValForPersonI and $FthOptValForPersonI.
 		2. Updated README.
 		
     Version 0.30 (Algorithm::Bertsekas-0.30 Released on 21th Mar 2018)
-		1. improvements with the use of @objects_with_greater_benefits 
+		1. Improvements with the use of @objects_with_greater_benefits 
 		working sets that are updated dynamically by %most_wanted_object hash.
 		
     Version 0.25 (Algorithm::Bertsekas-0.25 Released on 03th Mar 2018)
-		1. little changes and improvements.
+		1. Little changes and improvements.
 		
     Version 0.23 (Algorithm::Bertsekas-0.23 Released on 27th Feb 2018)
 	    1. Added the 'delete_multiple_columns' subroutine.
-		2. some improvements.
+		2. Some improvements.
 	
 	Version 0.21 (Algorithm::Bertsekas-0.21 Released on 22th Feb 2018)
 	    1. Modified the 'auction' subroutine.
-		2. removed the 'get_edges', 'mkbg' and 'bidding' subroutines.
+		2. Removed the 'get_edges', 'mkbg' and 'bidding' subroutines.
 		3. Added the 'auctionRound' subroutine.
 		4. Updated perldoc for Bertsekas.pm
 

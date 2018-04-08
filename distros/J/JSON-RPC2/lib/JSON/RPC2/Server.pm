@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v2.1.1';
+our $VERSION = 'v2.1.2';
 
 use JSON::MaybeXS;
 
@@ -204,7 +204,7 @@ JSON::RPC2::Server - Transport-independent JSON-RPC 2.0 server
 
 =head1 VERSION
 
-This document describes JSON::RPC2::Server version v2.1.1
+This document describes JSON::RPC2::Server version v2.1.2
 
 
 =head1 SYNOPSIS
@@ -288,16 +288,19 @@ in parallel on server).
 
 =head1 INTERFACE 
 
-=over
+=head2 new
 
-=item new()
+    $rpcsrv = JSON::RPC2::Server->new();
 
 Create and return new server object, which can be used to register and
 execute user methods.
 
-=item register( $rpc_method_name, \&method_handler )
+=head2 register
 
-=item register_named( $rpc_method_name, \&method_handler )
+=head2 register_named
+
+    $rpcsrv->register( $rpc_method_name, \&method_handler );
+    $rpcsrv->register_named( $rpc_method_name, \&method_handler );
 
 Register $rpc_method_name as allowed method name for remote procedure call
 and set \&method_handler as BLOCKING handler for that method.
@@ -324,9 +327,12 @@ only if $code defined.
 
 Return nothing.
 
-=item register_nb( $rpc_method_name, \&nb_method_handler )
+=head2 register_nb
 
-=item register_named_nb( $rpc_method_name, \&nb_method_handler )
+=head2 register_named_nb
+
+    $rpcsrv->register_nb( $rpc_method_name, \&nb_method_handler );
+    $rpcsrv->register_named_nb( $rpc_method_name, \&nb_method_handler );
 
 Register $rpc_method_name as allowed method name for remote procedure call
 and set \&method_handler as NON-BLOCKING handler for that method.
@@ -353,7 +359,9 @@ register() above.
 
 Return nothing.
 
-=item execute( $json_request, $callback )
+=head2 execute
+
+    $rpcsrv->execute( $json_request, $callback );
 
 The $json_request can be either JSON string or ARRAYREF/HASHREF (useful
 with C<< $handle->push_read(json => sub{...}) >> from L<AnyEvent::Handle>).
@@ -368,8 +376,6 @@ $json_request - even if request type was "notification" (in this case
 $json_response will be an empty string).
 
 Return nothing.
-
-=back
 
 
 =head1 SUPPORT
@@ -424,7 +430,7 @@ Alex Efros E<lt>powerman@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2009-2014 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+This software is Copyright (c) 2009- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
 
 This is free software, licensed under:
 

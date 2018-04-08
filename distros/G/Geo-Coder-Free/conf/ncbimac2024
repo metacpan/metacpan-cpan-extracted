@@ -15,7 +15,7 @@ twitter: nigelhorne
 # twitter_related: bbportal, The Brass Band Portal
 links_database: bb-links
 # cache: driver=BerkeleyDB root_dir=/tmp/cache
-# cache: driver=Memcached server=127.0.0.1,192.168.1.2
+# cache: driver=Memcached server=127.0.0.1,192.168.1.2 port=11211
 disc_cache: driver=File, root_dir=/tmp/cache
 memory_cache: driver=File, root_dir=/tmp/cache
 OPENADDR_HOME: /Users/hornenj/Downloads/openaddr

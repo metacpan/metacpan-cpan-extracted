@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,6 +18,8 @@ no_index:
   directory:
     - t
     - inc
+  file:
+    - lib/LWP/UserAgent/Custom.pm
 requires:
   Digest::MD5: '0'
   HTTP::Cookies: '0'
@@ -25,7 +27,6 @@ requires:
   JSON: '0'
   LWP::UserAgent: '0'
   perl: '5.012000'
-resources:
-  repository: git://github.com/sciurius/comics.git
-version: '1.07'
+resources: {}
+version: '1.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

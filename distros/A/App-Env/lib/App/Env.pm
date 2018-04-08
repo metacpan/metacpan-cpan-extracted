@@ -1,44 +1,23 @@
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2007-2015 Smithsonian Astrophysical Observatory
-#
-# This file is part of App::Env
-#
-# App::Env is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at
-# your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# -->8-->8-->8-->8--
-
 package App::Env;
 
-use 5.00800;
+# ABSTRACT: manage application specific environments
 
+use 5.00800;
 use strict;
 use warnings;
 
-use Scalar::Util qw[ blessed ];
-use Storable qw[ dclone ];
+use Scalar::Util;
+use Storable ();
 
-use Carp;
-use Params::Validate qw(:all);
-
+use Carp();
+use Params::Validate ();
 
 # need to distinguish between a non-existent module
 # and one which has compile errors.
 use Module::Find qw( );
 
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use overload
   '%{}' => '_envhash',
@@ -93,7 +72,7 @@ BEGIN {
     if ( ! exists $ENV{APP_ENV_SITE} && _existsModule('App::Env::Site') )
     {
         eval { require App::Env::Site };
-        croak( ref $@ ? $@ : "Error loading App::Env::Site: $@\n" ) if $@;
+        Carp::croak( ref $@ ? $@ : "Error loading App::Env::Site: $@\n" ) if $@;
     }
 }
 
@@ -106,19 +85,19 @@ my %SharedOptions =
      Site     => { default => undef },
      CacheID  => { default => undef },
      Temp     => { default => 0     },
-     SysFatal => { default => 0, type => BOOLEAN },
+     SysFatal => { default => 0, type => Params::Validate::BOOLEAN },
   );
 
 my %ApplicationOptions =
   (
-     AppOpts  => { default => {} , type => HASHREF   },
+     AppOpts  => { default => {} , type => Params::Validate::HASHREF   },
      %SharedOptions,
   );
 
-my %CloneOptions = %{ dclone({ map { $_ => $SharedOptions{$_} } qw[ CacheID Cache SysFatal ]} ) };
+my %CloneOptions = %{ Storable::dclone({ map { $_ => $SharedOptions{$_} } qw[ CacheID Cache SysFatal ]} ) };
 $CloneOptions{Cache}{default} = 0;
 
-my %TempOptions = %{ dclone({ map { $_ => $SharedOptions{$_} } qw[ SysFatal Temp ]} ) };
+my %TempOptions = %{ Storable::dclone({ map { $_ => $SharedOptions{$_} } qw[ SysFatal Temp ]} ) };
 
 # options for whom defaults may be changed.  The values
 # in %OptionDefaults are references to the same hashes as in
@@ -139,8 +118,8 @@ our %EnvCache;
 # contexts:
 #
 #    * as a class method, i.e.
-#	use App:Env qw( application )
-#	App:Env->import( $application )
+#       use App:Env qw( application )
+#       App:Env->import( $application )
 #
 #    * as a class function (just so as not to confuse folks
 #       App::Env::import( $application )
@@ -153,26 +132,26 @@ sub import {
     my $this = $_[0];
 
     # object method?
-    if ( blessed $this && $this->isa(__PACKAGE__) )
+    if ( Scalar::Util::blessed $this && $this->isa(__PACKAGE__) )
     {
-	my $self = shift;
-	die( __PACKAGE__, "->import: too many arguments\n" )
-	  if @_;
+        my $self = shift;
+        die( __PACKAGE__, "->import: too many arguments\n" )
+          if @_;
 
-	while( my ( $key, $value ) = each %{$self} )
-	{
-	    $ENV{$key} = $value;
-	}
+        while( my ( $key, $value ) = each %{$self} )
+        {
+            $ENV{$key} = $value;
+        }
     }
 
     else
     {
 
-	# if class method, get rid of class in argument list
-	shift if ! ref $this && $this eq __PACKAGE__;
+        # if class method, get rid of class in argument list
+        shift if ! ref $this && $this eq __PACKAGE__;
 
-	# if no arguments, nothing to do.  "use App::Env;" will cause this.
-	return unless @_;
+        # if no arguments, nothing to do.  "use App::Env;" will cause this.
+        return unless @_;
 
         # if the only argument is a hash, it sets defaults
         if ( @_ == 1 && 'HASH' eq ref $_[0] )
@@ -181,7 +160,7 @@ sub import {
             return;
         }
 
-	App::Env->new( @_ )->import;
+        App::Env->new( @_ )->import;
     }
 }
 
@@ -196,9 +175,9 @@ sub retrieve {
 
     if ( defined $EnvCache{ $cacheid } )
     {
-	$self = __PACKAGE__->new();
+        $self = __PACKAGE__->new();
 
-	$self->_var( app => $EnvCache{ $cacheid } );
+        $self->_var( app => $EnvCache{ $cacheid } );
     }
 
 
@@ -209,7 +188,7 @@ sub retrieve {
 
 sub config {
 
-    my %default = validate( @_, \%OptionDefaults );
+    my %default = Params::Validate::validate( @_, \%OptionDefaults );
 
     $OptionDefaults{$_}{default} = $default{$_} for keys %default;
 
@@ -240,9 +219,9 @@ sub clone
 {
     my $self = shift;
 
-    my %nopt = validate( @_, \%CloneOptions );
+    my %nopt = Params::Validate::validate( @_, \%CloneOptions );
 
-    my $clone = dclone( $self );
+    my $clone = Storable::dclone( $self );
     delete ${$clone}->{id};
 
     # create new cache id
@@ -277,10 +256,10 @@ sub _load_envs
     # an array containing the app name and options), treat @opts as
     # ApplicationOptions, else SharedOptions
 
-    my %opts =  validate( @opts,
-			  @apps == 1 && ! ref($apps[0])
-			       ? \%ApplicationOptions
-			       : \%SharedOptions );
+    my %opts =  Params::Validate::validate( @opts,
+                          @apps == 1 && ! ref($apps[0])
+                               ? \%ApplicationOptions
+                               : \%SharedOptions );
 
 
     $opts{Cache} = 0 if $opts{Temp};
@@ -292,8 +271,8 @@ sub _load_envs
     my @Apps;
     for my $app ( @apps )
     {
-	# initialize the application specific opts from the shared opts
-	my %app_opt = %opts;
+        # initialize the application specific opts from the shared opts
+        my %app_opt = %opts;
 
         # special filtering of options if this is part of a multi-app
         # merge
@@ -312,13 +291,13 @@ sub _load_envs
         }
 
         # handle application specific options.
-	if ( 'ARRAY' eq ref($app) )
-	{
-	    ( $app, my $opts ) = @$app;
-	    croak( "$app: application options must be a hashref\n" )
-	      unless 'HASH' eq ref $opts;
+        if ( 'ARRAY' eq ref($app) )
+        {
+            ( $app, my $opts ) = @$app;
+            Carp::croak( "$app: application options must be a hashref\n" )
+              unless 'HASH' eq ref $opts;
 
-	    %app_opt = ( %app_opt, %$opts );
+            %app_opt = ( %app_opt, %$opts );
 
             if ( @apps > 1 )
             {
@@ -326,12 +305,12 @@ sub _load_envs
                 {
                   if ( exists $app_opt{$iopt})
                   {
-                      croak( "$app: do not specify the $iopt option for individual applications in a merge\n" );
+                      Carp::croak( "$app: do not specify the $iopt option for individual applications in a merge\n" );
                       delete $app_opt{$iopt};
                   }
               }
             }
-	}
+        }
 
         # set forced options for apps in multi-app merges, otherwise
         # the defaults will be set by the call to validate below.
@@ -341,22 +320,22 @@ sub _load_envs
             $app_opt{Cache} = 0;
         }
 
-	# validate possible application options and get default
-	# values. Params::Validate wants a real array
-	my ( @opts ) = %app_opt;
+        # validate possible application options and get default
+        # values. Params::Validate wants a real array
+        my ( @opts ) = %app_opt;
 
-	# return an environment object, but don't load it. we need the
+        # return an environment object, but don't load it. we need the
         # module name to create a cacheid for the merged environment.
         # don't load now to prevent unnecessary loading of uncached
         # environments if later it turns out this is a cached
         # multi-application environment
-	%app_opt = ( validate( @opts, \%ApplicationOptions ));
-	my $appo = App::Env::_app->new( pid => $self->lobject_id,
-					app => $app,
-					NoLoad => 1,
-					opt => \%app_opt );
-	push @cacheids, $appo->cacheid;
-	push @Apps, $appo;
+        %app_opt = ( Params::Validate::validate( @opts, \%ApplicationOptions ));
+        my $appo = App::Env::_app->new( pid => $self->lobject_id,
+                                        app => $app,
+                                        NoLoad => 1,
+                                        opt => \%app_opt );
+        push @cacheids, $appo->cacheid;
+        push @Apps, $appo;
     }
 
 
@@ -367,31 +346,31 @@ sub _load_envs
     # use cache if possible
     if ( ! $opts{Force} && exists $EnvCache{$cacheid} )
     {
-	# if this is a temporary object and a cached version exists,
-	# clone it and assign a new cache id.
-	if ( $opts{Temp} )
-	{
-	    $App = dclone( $EnvCache{$cacheid} );
+        # if this is a temporary object and a cached version exists,
+        # clone it and assign a new cache id.
+        if ( $opts{Temp} )
+        {
+            $App = Storable::dclone( $EnvCache{$cacheid} );
 
-	    # should really call $self->cacheid here, but $self
-	    # doesn't have an app attached to it yet so that'll fail.
-	    $App->cacheid( $self->lobject_id );
+            # should really call $self->cacheid here, but $self
+            # doesn't have an app attached to it yet so that'll fail.
+            $App->cacheid( $self->lobject_id );
 
-	    # update Temp compatible options
-	    $App->_opt( { %{$App->_opt}, map { $_ => $opts{$_} } keys %TempOptions } );
-	}
+            # update Temp compatible options
+            $App->_opt( { %{$App->_opt}, map { $_ => $opts{$_} } keys %TempOptions } );
+        }
 
-	else
-	{
-	    $App = $EnvCache{$cacheid};
-	}
+        else
+        {
+            $App = $EnvCache{$cacheid};
+        }
     }
 
     # not cached; is this really just a single application?
     elsif ( @Apps == 1 )
     {
-	$App = shift @Apps;
-	$App->load;
+        $App = shift @Apps;
+        $App->load;
     }
 
     # ok, create new environment by iteration through the apps
@@ -405,21 +384,21 @@ sub _load_envs
         # apps get loaded in the current environment.
         local %ENV = %ENV;
 
-	my @modules;
-	foreach my $app ( @Apps )
-	{
-	    push @modules, $app->module;
+        my @modules;
+        foreach my $app ( @Apps )
+        {
+            push @modules, $app->module;
 
             # embrace new merged environment
             %ENV = %{$app->load};
-	}
+        }
 
-	$App = App::Env::_app->new( ref => $self,
-				    env => { %ENV },
-				    module => join( $;, @modules),
-				    cacheid => $cacheid,
-				    opt => \%opts,
-				  );
+        $App = App::Env::_app->new( ref => $self,
+                                    env => { %ENV },
+                                    module => join( $;, @modules),
+                                    cacheid => $cacheid,
+                                    opt => \%opts,
+                                  );
 
         if ( $opts{Cache} ) { $App->cache; }
     }
@@ -458,15 +437,15 @@ sub _envhash { $_[0]->_app->{ENV} }
 {
     my $Last_ID = "a";
 
-=pod
-
-=begin Pod::Coverage
-
-=item lobject_id
-
-=end Pod::Coverage
-
-=cut
+#pod =pod
+#pod
+#pod =begin Pod::Coverage
+#pod
+#pod =item lobject_id
+#pod
+#pod =end Pod::Coverage
+#pod
+#pod =cut
 
     sub lobject_id {
         my $self = shift;
@@ -483,54 +462,54 @@ sub cache
     my ( $self, $cache ) = @_;
 
     defined $cache or
-      croak( "missing or undefined cache argument\n" );
+      Carp::croak( "missing or undefined cache argument\n" );
 
     if ( $cache )
     {
-	$self->_app->cache;
+        $self->_app->cache;
     }
     else
     {
-	$self->_app->uncache;
+        $self->_app->uncache;
     }
 }
 
 sub uncache
 {
-    my %opt = validate( @_, {
-			     All     => { default => 0,     type => SCALAR },
-			     App     => { default => undef, type => SCALAR },
-			     Site    => { default => undef, type => SCALAR },
-			     CacheID => { default => undef, type => SCALAR },
-			    } );
+    my %opt = Params::Validate::validate( @_, {
+                             All     => { default => undef, type => Params::Validate::SCALAR },
+                             App     => { default => undef, type => Params::Validate::SCALAR },
+                             Site    => { default => undef, type => Params::Validate::SCALAR },
+                             CacheID => { default => undef, type => Params::Validate::SCALAR },
+                            } );
 
     if ( $opt{All} )
     {
-	delete $opt{All};
-	croak( "can't specify All option with other options\n" )
-	  if grep { defined $_ } values %opt;
+        delete $opt{All};
+        Carp::croak( "can't specify All option with other options\n" )
+          if grep { defined $_ } values %opt;
 
-	delete $EnvCache{$_} foreach keys %EnvCache;
+        delete $EnvCache{$_} foreach keys %EnvCache;
     }
 
     elsif ( defined $opt{CacheID} )
     {
-	my $cacheid = delete $opt{CacheID};
-	croak( "can't specify CacheID option with other options\n" )
-	  if grep { defined $_ } values %opt;
+        my $cacheid = delete $opt{CacheID};
+        Carp::croak( "can't specify CacheID option with other options\n" )
+          if grep { defined $_ } values %opt;
 
-	delete $EnvCache{$opt{CacheID}};
+        delete $EnvCache{$cacheid};
     }
     else
     {
-	croak( "must specify App or CacheID options\n" )
-	  unless defined $opt{App};
+        Carp::croak( "must specify App or CacheID options\n" )
+          unless defined $opt{App};
 
         $opt{Site} ||= _App_Env_Site();
 
         # don't use normal rules for Site specification as we're trying
         # to delete a specific one.
-	delete $EnvCache{ _modulename( $opt{Site}, $opt{App} )};
+        delete $EnvCache{ _modulename( $opt{Site}, $opt{App} )};
     }
 
     return;
@@ -625,10 +604,10 @@ sub env     {
 
     # mostly a duplicate of what's in str(). ick.
     my %opt =
-      validate( @opts,
-	      { Exclude => { callbacks => { 'type' => \&_exclude_param_check },
-			     default => undef
-			   },
+      Params::Validate::validate( @opts,
+              { Exclude => { callbacks => { 'type' => \&_exclude_param_check },
+                             default => undef
+                           },
               } );
 
     # Exclude is only allowed in scalar calling context where
@@ -668,7 +647,7 @@ sub setenv {
     my $var  = shift;
 
     defined $var or
-      croak( "missing variable name argument\n" );
+      Carp::croak( "missing variable name argument\n" );
 
     if ( @_ )
     {
@@ -692,10 +671,10 @@ sub str
     # validate type.  Params::Validate doesn't do Regexp, so
     # this is a bit messy.
     my %opt =
-      validate( @opts,
-	      { Exclude => { callbacks => { 'type' => \&_exclude_param_check },
-			     optional => 1
-			   },
+      Params::Validate::validate( @opts,
+              { Exclude => { callbacks => { 'type' => \&_exclude_param_check },
+                             optional => 1
+                           },
               } );
 
     my $include =  [@_ ? @_ : qr/.*/];
@@ -712,8 +691,8 @@ sub str
     my @vars = grep { exists $env->{$_} }
                     $self->_filter_env( $include, $opt{Exclude} );
     return join( ' ',
-		 map { "$_=" . _shell_escape($env->{$_}) } @vars
-	       );
+                 map { "$_=" . _shell_escape($env->{$_}) } @vars
+               );
 }
 
 #-------------------------------------------------------
@@ -749,7 +728,7 @@ sub _match_var
     my @keys;
     for my $spec ( @$match )
     {
-	next unless defined $spec;
+        next unless defined $spec;
 
         if ( ! ref $spec )
         {
@@ -805,7 +784,7 @@ sub system
     my $self = shift;
 
     {
-	local %ENV = %{$self};
+        local %ENV = %{$self};
         if ( $self->_opt->{SysFatal} )
         {
             require IPC::System::Simple;
@@ -834,8 +813,8 @@ sub qexec
 
     if ( $@ ) {
 
-	die($@) if $self->_opt->{SysFatal};
-	return;
+        die($@) if $self->_opt->{SysFatal};
+        return;
     }
 
     return wantarray ? @res : $res;
@@ -855,20 +834,28 @@ sub capture
 
     my $sub = $self->_opt->{SysFatal}
             ? sub { IPC::System::Simple::system( @args ) }
-	    : sub { CORE::system( @args ) }
-	    ;
+            : sub { CORE::system( @args ) }
+            ;
 
     my ( $stdout, $stderr );
 
+    # Capture::Tiny::capture is prototyped as (&;@). App::Env
+    # lazy-loads Capture::Tiny and thus nominally avoids the prototype
+    # check. However, if Capture::Tiny is explicitly loaded prior to
+    # App::Env, the prototype check will be performed when App::Env is
+    # compiled.  In that case the following calls to capture are
+    # singled out, as while the calls are correct, the prototype
+    # requires an explicit block or sub{}.  So, explicitly
+    # ignore prototypes.
+
     if ( wantarray )
     {
-
-	( $stdout, $stderr ) = eval { Capture::Tiny::capture( $sub ) };
+        ( $stdout, $stderr ) = eval { &Capture::Tiny::capture( $sub ) };
 
     }
     else
     {
-	$stdout = eval { Capture::Tiny::capture( $sub ) };
+        $stdout = eval { &Capture::Tiny::capture( $sub ) };
     }
 
     die( $@) if $@;
@@ -883,8 +870,8 @@ sub exec
     my $self = shift;
 
     {
-	local %ENV = %{$self};
-	exec( @_ );
+        local %ENV = %{$self};
+        exec( @_ );
     }
 }
 
@@ -896,8 +883,8 @@ sub exec
 
 package App::Env::_app;
 
-use Carp;
-use Storable qw[ dclone freeze ];
+use Carp();
+use Storable ();
 use Digest;
 
 use strict;
@@ -910,20 +897,20 @@ sub new
     my ( $class, %opt ) = @_;
 
     # make copy of options
-    my $self = bless dclone( \%opt ), $class;
+    my $self = bless Storable::dclone( \%opt ), $class;
 
     if ( exists $self->{env} )
     {
-	$self->{opt} = {} unless defined $self->{opt};
-	$self->{ENV} = delete $self->{env};
+        $self->{opt} = {} unless defined $self->{opt};
+        $self->{ENV} = delete $self->{env};
     }
     else
     {
 
-	( $self->{module}, my $app_opts )
+        ( $self->{module}, my $app_opts )
           = eval { App::Env::_require_module( $self->{app}, $self->{opt}{Site} ) };
 
-        croak( ref $@ ? $@ : "error loading application environment module for $self->{app}:\n", $@ )
+        Carp::croak( ref $@ ? $@ : "error loading application environment module for $self->{app}:\n", $@ )
           if $@;
 
         die( "application environment module for $self->{app} does not exist\n" )
@@ -933,19 +920,19 @@ sub new
         $self->{opt}{AppOpts} ||= {};
         $self->{opt}{AppOpts} = { %$app_opts, %{$self->{opt}{AppOpts}} };
 
-	$self->mk_cacheid;
+        $self->mk_cacheid;
     }
 
     # return cached entry if possible
     if ( exists $App::Env::EnvCache{$self->cacheid} && ! $opt{opt}{Force} )
     {
-	$self = $App::Env::EnvCache{$self->cacheid};
+        $self = $App::Env::EnvCache{$self->cacheid};
     }
 
     else
     {
-	$self->load unless $self->{NoLoad};
-	delete $self->{NoLoad};
+        $self->load unless $self->{NoLoad};
+        delete $self->{NoLoad};
     }
 
 
@@ -964,40 +951,40 @@ sub mk_cacheid
 
     if ( defined $cacheid )
     {
-	push @elements, $cacheid eq 'AppID' ? $self->{module} : $cacheid;
+        push @elements, $cacheid eq 'AppID' ? $self->{module} : $cacheid;
     }
     else
     {
-	# create a hash of unique stuff which will be folded
-	# into the cacheid
-	my %uniq;
-	$uniq{AppOpts} = $self->{opt}{AppOpts}
-	  if defined $self->{opt}{AppOpts} && keys %{$self->{opt}{AppOpts}};
+        # create a hash of unique stuff which will be folded
+        # into the cacheid
+        my %uniq;
+        $uniq{AppOpts} = $self->{opt}{AppOpts}
+          if defined $self->{opt}{AppOpts} && keys %{$self->{opt}{AppOpts}};
 
-	my $digest;
+        my $digest;
 
-	if ( keys %uniq )
-	{
-	    local $Storable::canonical = 1;
-	    $digest = freeze( \%uniq );
+        if ( keys %uniq )
+        {
+            local $Storable::canonical = 1;
+            $digest = Storable::freeze( \%uniq );
 
-	    # use whatever digest aglorithm we can find.  if none is
-	    # found, default to the frozen representation of the
-	    # options
-	    for my $alg ( qw[ SHA-256 SHA-1 MD5 ] )
-	    {
-		my $ctx = eval { Digest->new( $alg ) };
+            # use whatever digest aglorithm we can find.  if none is
+            # found, default to the frozen representation of the
+            # options
+            for my $alg ( qw[ SHA-256 SHA-1 MD5 ] )
+            {
+                my $ctx = eval { Digest->new( $alg ) };
 
-		if ( defined $ctx )
-		{
-		    $digest = $ctx->add( $digest )->digest;
-		    last;
-		}
-	    }
+                if ( defined $ctx )
+                {
+                    $digest = $ctx->add( $digest )->digest;
+                    last;
+                }
+            }
 
-	}
+        }
 
-	push @elements, $self->{module}, $digest;
+        push @elements, $self->{module}, $digest;
     }
 
 
@@ -1018,12 +1005,12 @@ sub load {
     my $envs;
     my $fenvs = $module->can('envs' );
 
-    croak( "$module does not have an 'envs' function\n" )
+    Carp::croak( "$module does not have an 'envs' function\n" )
       unless $fenvs;
 
     $envs = eval { $fenvs->( $self->{opt}{AppOpts} ) };
 
-    croak( ref $@ ? $@ : "error in ${module}::envs: $@\n" )
+    Carp::croak( ref $@ ? $@ : "error in ${module}::envs: $@\n" )
       if $@;
 
     # make copy of environment
@@ -1052,7 +1039,7 @@ sub uncache {
 
     delete $App::Env::EnvCache{$cacheid}
       if exists $App::Env::EnvCache{$cacheid}
-	&& $App::Env::EnvCache{$cacheid}{pid} eq $self->{pid};
+        && $App::Env::EnvCache{$cacheid}{pid} eq $self->{pid};
 }
 
 #-------------------------------------------------------
@@ -1065,11 +1052,28 @@ sub module  { $_[0]->{module} };
 #-------------------------------------------------------
 
 1;
+
+#
+# This file is part of App-Env
+#
+# This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
 __END__
+
+=pod
 
 =head1 NAME
 
 App::Env - manage application specific environments
+
+=head1 VERSION
+
+version 0.34
 
 =head1 SYNOPSIS
 
@@ -1111,7 +1115,6 @@ App::Env - manage application specific environments
 
   # pretend it's a hash; read only, though
   %ENV = %$env;
-
 
 =head1 DESCRIPTION
 
@@ -1170,7 +1173,7 @@ full module name, ignoring the contents of B<AppOpts>.  This is useful
 if an application wishes to load an environment using special options
 but make it available under the more generic cache id.
 
-To prevent cacheing, use the C<Cache> option. It doesn't prevent
+To prevent caching, use the C<Cache> option. It doesn't prevent
 B<App::Env> from I<retrieving> an existing cached environment -- to do
 that, use the C<Force> option, which will result in a freshly
 generated environment.
@@ -1179,7 +1182,7 @@ To retrieve a cached environment using its cache id use the
 B<retrieve()> function.
 
 If multiple applications are loaded via a single call to B<import> or
-B<new> the applications will be loaded incremently in the order
+B<new> the applications will be loaded incrementally in the order
 specified.  In order to ensure a properly merged environment the
 applications will be loaded freshly (any caches will be ignored) and
 the merged environment will be cached.  The cache id will by default
@@ -1216,7 +1219,7 @@ the latter taking precedence.
 In some situations an application's environment will depend upon which
 host or network it is executed on.  In such instances B<App::Env>
 provides a means for loading an alternate application module.  It does
-this by loading the first existant module from the following set of
+this by loading the first existent module from the following set of
 module names:
 
   App::Env::$SITE::$app
@@ -1225,7 +1228,7 @@ module names:
 The C<$SITE> variable is taken from the environment variable
 B<APP_ENV_SITE> if it exists, or from the B<Site> option to the class
 B<import()> function or the B<new()> object constructor.
-Additionally, if the B<APP_ENV_SITE> environemnt variable does I<not
+Additionally, if the B<APP_ENV_SITE> environment variable does I<not
 exist> (it is not merely empty), B<App::Env> will first attempt to
 load the B<App::Env::Site> module, which can set the B<APP_ENV_SITE>
 environment variable.
@@ -1240,7 +1243,7 @@ C<App::Env::LAN1::myapp> and C<App::Env::LAN2::myapp>), and switch
 between them based upon the B<APP_ENV_SITE> environment variable.
 
 The logic for setting that variable might be encoded in an
-B<App::Env::Site> module to transparenlty automate things:
+B<App::Env::Site> module to transparently automate things:
 
   package App::Env::Site;
 
@@ -1264,7 +1267,7 @@ B<App::Env::Site> module to transparenlty automate things:
 
 B<App::Env> provides the C<null> environment, which simply returns a
 snapshot of the current environment.  This may be useful to provide
-fallbacks in case an application specific environment was not found,
+fall-backs in case an application specific environment was not found,
 but the code should fallback to using the existing environment.
 
   $env = eval { App::Env->new( "MyApp" ) } \
@@ -1277,6 +1280,12 @@ should not be cached (e.g. C<Cache =E<gt> 0>).  The C<Force =E<gt> 1>
 option is specified to ensure that the environment is not being read
 from cache, just in case a prior C<null> environment was inadvertently
 cached.
+
+=begin Pod::Coverage
+
+=item lobject_id
+
+=end Pod::Coverage
 
 =head1 INTERFACE
 
@@ -1364,7 +1373,7 @@ an exception if the passed command exits with a non-zero error.
 If true, and the requested environment does not exist in the cache,
 create it but do not cache it (this overrides the B<Cache> option).
 If the requested environment does exist in the cache, return an
-uncached clone of it.  The following options are updated in
+non-cached clone of it.  The following options are updated in
 the cloned environment:
 
   SysFatal
@@ -1395,7 +1404,6 @@ Option Values> for more information.
 
   App::Env::uncache( App => $app, [ Site => $site ] )
   App::Env::uncache( CacheID => $cacheid )
-
 
 Delete the cache entry for the given application.  If C<Site> is not
 specified, the site is determined as specified in L</Site Specific
@@ -1431,9 +1439,7 @@ B<App> or B<Site> are specified.
 
 If true uncache all of the cached environments.
 
-
 =back
-
 
 =back
 
@@ -1441,7 +1447,6 @@ If true uncache all of the cached environments.
 
 B<App::Env> objects give greater flexibility when dealing with
 multiple applications with incompatible environments.
-
 
 =head3 Constructors
 
@@ -1453,7 +1458,6 @@ multiple applications with incompatible environments.
 
 B<new> takes the same arguments as B<App::Env::import> and returns
 an B<App::Env> object.  It does not modify the environment.
-
 
 =item clone
 
@@ -1470,7 +1474,6 @@ This generated cache id is not based on a signature of the
 environment, so this environment will effectively not be automatically
 reused when a similar environment is requested via the B<new>
 constructor (see L</Environment Caching>).
-
 
 =back
 
@@ -1501,7 +1504,6 @@ cached, delete the cache.
 Note that only the original B<App::Env> object which cached the
 environment may delete it.  Objects which reuse existing, cached,
 environments cannot.
-
 
 =item cacheid
 
@@ -1602,7 +1604,7 @@ affect all instances of the environment which share the cache.
 
 This returns the name of the module which was used to load the
 environment.  If multiple modules were used, the names are
-concatenated, seperated by the C<$;> (subscript separator) character.
+concatenated, separated by the C<$;> (subscript separator) character.
 
 =item str
 
@@ -1637,7 +1639,6 @@ If the B<SysFatal> flag is set for this environment,
 B<IPC::System::Simple::system> is called, which will cause this method
 to throw an exception if the command returned a non-zero exit value.
 It also avoid invoking a shell to run the command if possible.
-
 
 =item exec
 
@@ -1704,9 +1705,7 @@ The following options may have their default values changed:
 
   Force  Cache  Site  SysFatal
 
-
 =head1 EXAMPLE USAGE
-
 
 =head2 A single application
 
@@ -1751,7 +1750,7 @@ if you prefer not to use the B<system> method.
 =head2 Two incompatible applications
 
 If two applications can't share the environment, you'll need to
-load them seperately:
+load them separately:
 
   $env1 = App::Env->new( 'Application1' );
   $env2 = App::Env->new( 'Application2' );
@@ -1768,7 +1767,6 @@ into play:
 This hopefully won't overfill the shell's command buffer. If you need
 to specify only parts of the environment, use the B<str> method to
 explicitly create the arguments to the B<env> command.
-
 
 =head2 Localizing changes to an environment
 
@@ -1790,36 +1788,43 @@ option; this will either create a new environment if none exists or
 clone an existing one.  In either case the result won't be cached and
 any changes will be localized.
 
+=head1 BUGS
 
-=head1 BUGS AND LIMITATIONS
+Please report any bugs or feature requests on the bugtracker website
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Env> or by email to
+L<bug-App-Env@rt.cpan.org|mailto:bug-App-Env@rt.cpan.org>.
 
-No bugs have been reported.
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
-Please report any bugs or feature requests to
-C<bug-app-env@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-Env>.
+=head1 SOURCE
 
-The cache id is generated from the contents of the B<AppOpts> hash by
-freezing it with B<Storable::freeze> and either generating a digest
-using B<Digest> (if the proper modules are available) or using it
-directly.  This may cause strangeness if B<AppOpts> contains data or
-objects which do not freeze well.
+The development version is on github at L<https://github.com/djerius/app-env>
+and may be cloned from L<git://github.com/djerius/app-env.git>
 
 =head1 SEE ALSO
 
-B<appexec>
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<B<appexec>|B<appexec>>
+
+=back
 
 =head1 AUTHOR
 
-Diab Jerius, E<lt>djerius@cpan.orgE<gt>
+Diab Jerius <djerius@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2007-2015 Smithsonian Astrophysical Observatory
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
 
-This software is released under the GNU General Public License.  You
-may find a copy at
+This is free software, licensed under:
 
-          http://www.gnu.org/licenses
+  The GNU General Public License, Version 3, June 2007
 
 =cut

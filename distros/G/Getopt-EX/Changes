@@ -1,5 +1,12 @@
 Revision history for Perl extension Getopt-EX
 
+v1.7.3 2018-04-05T10:49:59Z
+
+    - Update the colormap syntax.
+    
+    Now multiple / is allows to change foreground and background.
+    Escape sequence before EL is copied to ending RESET.
+
 v1.7.2 2018-03-19T01:12:08Z
 
     - Improve color spec handling (now accept multiple shashes).

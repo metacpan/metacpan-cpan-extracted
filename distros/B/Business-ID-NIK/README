@@ -3,8 +3,8 @@ NAME
     (NIK)
 
 VERSION
-    This document describes version 0.090 of Business::ID::NIK (from Perl
-    distribution Business-ID-NIK), released on 2018-02-07.
+    This document describes version 0.092 of Business::ID::NIK (from Perl
+    distribution Business-ID-NIK), released on 2018-04-08.
 
 SYNOPSIS
         use Business::ID::NIK qw(parse_nik);
@@ -77,6 +77,10 @@ BUGS
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Business::ID::NKK to parse family card number (nomor kartu keluarga,
+    nomor KK, NKK)
 
 AUTHOR
     perlancar <perlancar@cpan.org>

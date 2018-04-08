@@ -1,3 +1,8 @@
+1.54  2018-03-30 23:04:16 CEST
+   - reverted spelling of SYNOPSYS... it was correct in the first place!
+   - merge contributions for easing production of Debian package
+     (thanks berrak)
+
 1.52  2016-04-09 18:34:36 CEST
    - fixed spelling of SYNOPSIS in documentation
    - release after 335 passes on CPAN Testers (thanks!)

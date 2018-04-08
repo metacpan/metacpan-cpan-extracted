@@ -1,14 +1,13 @@
 package WordList::Password::10Million::Top100000;
 
-our $DATE = '2018-03-19'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-04-02'; # DATE
+our $VERSION = '0.003'; # VERSION
 
-use WordList;
-our @ISA = qw(WordList);
+use parent qw(WordList);
 
 our $SORT = 'popularity';
 
-our %STATS = ("num_words_contains_unicode",1,"avg_word_len",6.81894,"shortest_word_len",3,"num_words_contains_nonword_chars",97,"num_words",100000,"num_words_contains_whitespace",0,"longest_word_len",20); # STATS
+our %STATS = ("num_words_contains_whitespace",0,"num_words",100000,"longest_word_len",20,"num_words_contains_unicode",1,"avg_word_len",6.81894,"shortest_word_len",3,"num_words_contains_nonword_chars",97); # STATS
 
 1;
 # ABSTRACT: Top 100,000 passwords from 10_million_password_list
@@ -23,7 +22,7 @@ WordList::Password::10Million::Top100000 - Top 100,000 passwords from 10_million
 
 =head1 VERSION
 
-This document describes version 0.002 of WordList::Password::10Million::Top100000 (from Perl distribution WordLists-Password-10Million), released on 2018-03-19.
+This document describes version 0.003 of WordList::Password::10Million::Top100000 (from Perl distribution WordLists-Password-10Million), released on 2018-04-02.
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,6 @@
-# RT::Client::REST
+#!perl
+# PODNAME: RT::Client::REST
+# ABSTRACT: Client for RT using REST API
 #
 # Dmitri Tikhonov <dtikhonov@yahoo.com>
 #
@@ -18,15 +20,11 @@
 #------------------------
 
 
-package RT::Client::REST;
-
 use strict;
 use warnings;
 
-use vars qw/$VERSION/;
-$VERSION = '0.51';
-$VERSION = eval $VERSION;
-
+package RT::Client::REST;
+$RT::Client::REST::VERSION = '0.52';
 use Error qw(:try);
 use HTTP::Cookies;
 use HTTP::Request::Common;
@@ -36,7 +34,7 @@ use RT::Client::REST::HTTPClient;
 
 # Generate accessors/mutators
 for my $method (qw(server _cookie timeout)) {
-    no strict 'refs';
+    no strict 'refs'; ## no critic (ProhibitNoStrict)
     *{__PACKAGE__ . '::' . $method} = sub {
         my $self = shift;
         if (@_) {
@@ -124,7 +122,7 @@ sub show {
     }
 
     my $form = form_parse($self->_submit("$type/$id")->decoded_content);
-    my ($c, $o, $k, $e) = @{$$form[0]};
+    my ($c, $o, $k) = @{$$form[0]}; # my ($c, $o, $k, $e)
 
     if (!@$o && $c) {
         RT::Client::REST::Exception->_rt_content_to_exception($c)->throw;
@@ -146,7 +144,7 @@ sub get_attachment_ids {
     my $form = form_parse(
         $self->_submit("$type/$id/attachments/")->decoded_content
     );
-    my ($c, $o, $k, $e) = @{$$form[0]};
+    my ($c, $o, $k) = @{$$form[0]}; # my ($c, $o, $k, $e)
 
     if (!@$o && $c) {
         RT::Client::REST::Exception->_rt_content_to_exception($c)->throw;
@@ -168,7 +166,7 @@ sub get_attachments_metadata {
     my $form = form_parse(
         $self->_submit("$type/$id/attachments/")->decoded_content
     );
-    my ($c, $o, $k, $e) = @{$$form[0]};
+    my ($c, $o, $k) = @{$$form[0]}; # my ($c, $o, $k, $e)
 
     if (!@$o && $c) {
         RT::Client::REST::Exception->_rt_content_to_exception($c)->throw;
@@ -201,7 +199,7 @@ sub get_attachment {
     }
     my $form = form_parse($content);
 
-    my ($c, $o, $k, $e) = @{$$form[0]};
+    my ($c, $o, $k) = @{$$form[0]}; # my ($c, $o, $k, $e)
 
     if (!@$o && $c) {
         RT::Client::REST::Exception->_rt_content_to_exception($c)->throw;
@@ -223,7 +221,7 @@ sub get_links {
     my $form = form_parse(
         $self->_submit("$type/$id/links/$id")->decoded_content
     );
-    my ($c, $o, $k, $e) = @{$$form[0]};
+    my ($c, $o, $k) = @{$$form[0]}; # my ($c, $o, $k, $e)
 
     if (!@$o && $c) {
         RT::Client::REST::Exception->_rt_content_to_exception($c)->throw;
@@ -275,7 +273,7 @@ sub get_transaction_ids {
     } elsif ('ARRAY' eq ref($tr_type)) {
         # OK, more than one type.  Call ourselves for each.
         # NOTE: this may be very expensive.
-        return sort map {
+        my @return = sort map {
             $self->get_transaction_ids(
                 parent_id => $parent_id,
                 transaction_type => $_,
@@ -285,6 +283,7 @@ sub get_transaction_ids {
             # error this way.
             $self->_valid_transaction_type($_)
         } @$tr_type;
+        return @return
     } else {
         $tr_type = $self->_valid_transaction_type($tr_type);
         $path = "$type/$parent_id/history/type/$tr_type"
@@ -319,7 +318,7 @@ sub get_transaction {
     my $form = form_parse(
         $self->_submit("$type/$parent_id/history/id/$id")->decoded_content
     );
-    my ($c, $o, $k, $e) = @{$$form[0]};
+    my ($c, $o, $k) = @{$$form[0]}; # my ($c, $o, $k, $e)
 
     if (!@$o && $c) {
         RT::Client::REST::Exception->_rt_content_to_exception($c)->throw;
@@ -405,7 +404,7 @@ sub comment {
     my $ticket_id = $self->_valid_numeric_object_id(delete($opts{ticket_id}));
     my $msg = $self->_valid_comment_message(delete($opts{message}));
 
-    my @objects = ("Ticket", "Action", "Text");
+    my @objects = ('Ticket', 'Action', 'Text');
     my %values  = (
         Ticket      => $ticket_id,
         Action      => $action,
@@ -413,12 +412,12 @@ sub comment {
     );
 
     if (exists($opts{cc})) {
-        push @objects, "Cc";
+        push @objects, 'Cc';
         $values{Cc} = delete($opts{cc});
     }
 
     if (exists($opts{bcc})) {
-        push @objects, "Bcc";
+        push @objects, 'Bcc';
         $values{Bcc} = delete($opts{bcc});
     }
 
@@ -430,7 +429,7 @@ sub comment {
                 "'attachments' must be an array reference",
             );
         }
-        push @objects, "Attachment";
+        push @objects, 'Attachment';
         $values{Attachment} = $files;
 
         for (my $i = 0; $i < @$files; ++$i) {
@@ -441,7 +440,7 @@ sub comment {
             }
 
             my $index = $i + 1;
-            $data{"attachment_$index"} = bless([ $files->[$i] ], "Attachment");
+            $data{"attachment_$index"} = bless([ $files->[$i] ], 'Attachment');
         }
     }
 
@@ -465,7 +464,7 @@ sub merge_tickets {
     return;
 }
 
-sub link {
+sub _link {
     my $self = shift;
     $self->_assert_even(@_);
     my %opts = @_;
@@ -489,10 +488,10 @@ sub link {
     return;
 }
 
-sub link_tickets { shift->link(@_, type => 'ticket') }
+sub link_tickets { shift->_link(@_, type => 'ticket') }
 
-sub unlink { shift->link(@_, unlink => 1) }
-sub unlink_tickets { shift->link(@_, type => 'ticket', unlink => 1) }
+# sub unlink { shift->_link(@_, unlink => 1) } ## nothing calls this & undocumented, so commenting out for now
+sub unlink_tickets { shift->_link(@_, type => 'ticket', unlink => 1) }
 
 sub _ticket_action {
     my $self = shift;
@@ -573,9 +572,9 @@ sub _submit {
     }
 
     # Then we send the request and parse the response.
-    $self->logger->debug("request: ", $req->as_string);
+    $self->logger->debug('request: ', $req->as_string);
     my $res = $self->_ua->request($req);
-    $self->logger->debug("response: ", $res->as_string);
+    $self->logger->debug('response: ', $res->as_string);
 
     if ($res->is_success) {
         # The content of the response we get from the RT server consists
@@ -583,13 +582,13 @@ sub _submit {
         # a blank line, and arbitrary text.
 
         my ($head, $text) = split /\n\n/, $res->decoded_content(charset => 'none'), 2;
-        my ($status, @headers) = split /\n/, $head;
+        my ($status) = split /\n/, $head; # my ($status, @headers) = split /\n/, $head;
         $text =~ s/\n*$/\n/ if ($text);
 
         # "RT/3.0.1 401 Credentials required"
-	if ($status !~ m#^RT/\d+(?:\S+) (\d+) ([\w\s]+)$#) {
+        if ($status !~ m#^RT/\d+(?:\S+) (\d+) ([\w\s]+)$#) {
             RT::Client::REST::MalformedRTResponseException->throw(
-                "Malformed RT response received from " . $self->server,
+                'Malformed RT response received from ' . $self->server,
             );
         }
 
@@ -838,7 +837,7 @@ sub _ua_string {
     return ref($self) . '/' . $self->_version;
 }
 
-sub _version { $VERSION }
+sub _version { $RT::Client::REST::VERSION }
 
 {
     # This is a noop logger: it discards all log messages.  It is the default
@@ -866,9 +865,10 @@ sub _version { $VERSION }
     # The problem with the second approach is that it creates unrelated
     # methods in RT::Client::REST namespace.
     package RT::Client::REST::NoopLogger;
-    sub new { bless \(my $logger) }
+$RT::Client::REST::NoopLogger::VERSION = '0.52';
+sub new { bless \(my $logger), __PACKAGE__ }
     for my $method (RT::Client::REST::LOGGER_METHODS) {
-        no strict 'refs';
+        no strict 'refs'; ## no critic (ProhibitNoStrict)
         *{$method} = sub {};
     }
 }
@@ -879,9 +879,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-RT::Client::REST -- talk to RT installation using REST protocol.
+RT::Client::REST - Client for RT using REST API
+
+=head1 VERSION
+
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -975,7 +981,7 @@ mostly useful for development.
 Log in to RT.  Throws an exception on error.
 
 Usually, if the other side uses basic HTTP authentication, you do not
-have to log in, but rather prodive HTTP username and password instead.
+have to log in, but rather provide HTTP username and password instead.
 See B<basic_auth_cb> above.
 
 =item show (type => $type, id => $id)
@@ -1010,6 +1016,8 @@ example:
 
 C<%opts> is a list of key-value pairs:
 
+=for stopwords orderby
+
 =over 4
 
 =item B<orderby>
@@ -1042,6 +1050,8 @@ using C<show()> method:
 
 =item comment (ticket_id => $id, message => $message, %opts)
 
+=for stopwords bcc
+
 Comment on a ticket with ID B<$id>.
 Optionally takes arguments B<cc> and B<bcc> which are references to lists
 of e-mail addresses and B<attachments> which is a list of filenames to
@@ -1061,6 +1071,8 @@ B<bcc>, and B<attachments> parameters (see C<comment> above).
 =item get_attachment_ids (id => $id)
 
 Get a list of numeric attachment IDs associated with ticket C<$id>.
+
+=for stopwords undecoded
 
 =item get_attachments_metadata (id => $id)
 
@@ -1098,7 +1110,7 @@ have the following options:
 
 =item B<type>
 
-Type of the object transactions are associated wtih.  Defaults to "ticket"
+Type of the object transactions are associated with.  Defaults to "ticket"
 (I do not think server-side supports anything else).  This is designed with
 the eye on the future, as transactions are not just for tickets, but for
 other objects as well.
@@ -1110,6 +1122,8 @@ scalar, only transactions of that type are returned.  If you want to specify
 more than one type, pass an array reference.
 
 Transactions may be of the following types (case-sensitive):
+
+=for stopwords AddLink AddWatcher CustomField DelWatcher DeleteLink DependedOnBy DependsOn EmailRecord HasMember MemberOf ReferredToBy RefersTo
 
 =over 2
 
@@ -1152,6 +1166,8 @@ Transactions may be of the following types (case-sensitive):
 Get a hashref representation of transaction C<$id> associated with
 parent object C<$id>.  You can optionally specify parent object type in
 C<%opts> (defaults to 'ticket').
+
+=for stopwords dst src
 
 =item merge_tickets (src => $id1, dst => $id2)
 
@@ -1198,6 +1214,8 @@ Remove a link between two tickets (see B<link_tickets()>)
 Take ticket C<$id>.
 This will throw C<RT::Client::REST::AlreadyTicketOwnerException> if you are
 already the ticket owner.
+
+=for stopwords Untake untake
 
 =item untake (id => $id)
 
@@ -1270,12 +1288,10 @@ Most likely.  Please report.
 
 =head1 VARIOUS NOTES
 
+=for stopwords TODO
+
 B<RT::Client::REST> does not (at the moment, see TODO file) retrieve forms from
 RT server, which is either good or bad, depending how you look at it.
-
-=head1 VERSION
-
-This is version 0.51 of B<RT::Client::REST>.
 
 =head1 AUTHORS
 
@@ -1285,8 +1301,45 @@ In January of 2008, Damien "dams" Krotkine <dams@cpan.org> joined as the
 project's co-maintainer. JLMARTIN has become co-maintainer as of March 2010.
 SRVSH became a co-maintainer in November 2015.
 
-=head1 LICENSE
+=head1 AUTHORS
 
-Perl license.
+=over 4
+
+=item *
+
+Abhijit Menon-Sen <ams@wiw.org>
+
+=item *
+
+Dmitri Tikhonov <dtikhonov@yahoo.com>
+
+=item *
+
+Damien "dams" Krotkine <dams@cpan.org>
+
+=item *
+
+Dean Hamstead <dean@bytefoundry.com.au>
+
+=item *
+
+Miquel Ruiz <mruiz@cpan.org>
+
+=item *
+
+JLMARTIN
+
+=item *
+
+SRVSH
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Dmitri Tikhonov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

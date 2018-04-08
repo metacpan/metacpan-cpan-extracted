@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Sah::Schemas;
 
-our $DATE = '2018-01-14'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2018-04-06'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -36,6 +36,7 @@ sub _load_schema_modules {
         my $pkg_pm = $1;
         (my $pkg = $pkg_pm) =~ s/\.pm$//; $pkg =~ s!/!::!g;
         $self->log_debug(["Loading schema module %s ...", $pkg_pm]);
+        delete $INC{$pkg_pm};
         require $pkg_pm;
         $res{$pkg} = $file;
     }
@@ -262,7 +263,7 @@ Dist::Zilla::Plugin::Sah::Schemas - Plugin to use when building Sah-Schemas-* di
 
 =head1 VERSION
 
-This document describes version 0.010 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2018-01-14.
+This document describes version 0.011 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2018-04-06.
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ package PLP::Backend::Apache;
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use PLP;
 
@@ -17,6 +17,7 @@ BEGIN {
 		require Apache2::RequestRec;
 		require Apache2::RequestUtil;
 		require Apache2::RequestIO;
+		require Apache2::Log;
 		Apache2::Const->import(-compile => qw(
 			HTTP_NOT_FOUND HTTP_FORBIDDEN OK
 		));
@@ -33,6 +34,7 @@ sub init {
 
 	$PLP::print = 'PLP::Backend::Apache::print';
 	$PLP::read = \&read;
+	*CORE::GLOBAL::warn = $SIG{__WARN__} = \&Apache2::ServerRec::warn if MP2;
 	
 	$ENV{PLP_FILENAME} = my $filename = $r->filename;
 	
@@ -45,7 +47,7 @@ sub init {
 	
 	$ENV{PLP_NAME} = $r->uri;
 
-	$PLP::use_cache = $r->dir_config('PLPcache') !~ /^off$/i;
+	$PLP::use_cache = ($r->dir_config('PLPcache') || 'on') !~ /^off$/i;
 #S	$PLP::use_safe  = $r->dir_config('PLPsafe')  =~ /^on$/i;
 	my $path = $r->filename();
 	my ($file, $dir) = File::Basename::fileparse($path);

@@ -8,8 +8,11 @@ use Test::NoTabs;
 
 my @files = (
     'lib/Test/Mock/One.pm',
+    'lib/Test/Mock/Two.pm',
     't/00-compile.t',
-    't/mock.t'
+    't/001-mock.t',
+    't/002-mock.t',
+    't/lib/Test/Mock/Testsuite.pm'
 );
 
 notabs_ok($_) foreach @files;

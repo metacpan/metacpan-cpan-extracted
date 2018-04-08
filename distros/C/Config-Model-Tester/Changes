@@ -1,3 +1,10 @@
+3.005 2018-04-02
+
+    * Setup: clarify doc
+    * check dump, update and load warnings with
+      Test::Log::Log4Perl
+    * requires Test::Log::Log4Perl
+
 3.004 2018-03-28
 
     * Add Config::Model::Tester::Setup module to reduce

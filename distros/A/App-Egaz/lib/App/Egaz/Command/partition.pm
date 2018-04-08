@@ -6,7 +6,9 @@ use autodie;
 use App::Egaz -command;
 use App::Egaz::Common;
 
-use constant abstract => 'partitions fasta files by size';
+sub abstract {
+    return 'partitions fasta files by size';
+}
 
 sub opt_spec {
     return (

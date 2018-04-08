@@ -1,15 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2008-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2018 -- leonerd@leonerd.org.uk
 
 package Net::Async::HTTP;
 
 use strict;
 use warnings;
+use 5.010;  # //
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 our $DEFAULT_UA = "Perl + " . __PACKAGE__ . "/$VERSION";
 our $DEFAULT_MAXREDIR = 3;
@@ -34,7 +35,7 @@ use Scalar::Util qw( blessed reftype );
 use List::Util 1.29 qw( first pairs );
 use Socket qw( SOCK_STREAM IPPROTO_IP IP_TOS );
 BEGIN {
-   if( $Socket::VERSION >= '2.010' ) {
+   if( eval { Socket->VERSION( '2.010' ); 1 } ) {
       Socket->import(qw( IPTOS_LOWDELAY IPTOS_THROUGHPUT IPTOS_RELIABILITY IPTOS_MINCOST ));
    }
    else {
@@ -279,8 +280,8 @@ absent, no option will be set.
 Optional. If true, incoming responses that have a recognised
 C<Content-Encoding> are handled by the module, and decompressed content is
 passed to the body handling callback or returned in the C<HTTP::Response>. See
-L</CONTENT DECODING> below for details of which encoding methods are
-recognised. When this option is enabled, outgoing requests also have the
+L</CONTENT DECODING> below for details of which encoding types are recognised.
+When this option is enabled, outgoing requests also have the
 C<Accept-Encoding> header added to them if it does not already exist.
 
 Currently the default is false, because this behaviour is new, but it may
@@ -299,6 +300,14 @@ Optional. If true, then any attempt to make a request that does not use SSL
 (either by calling C<request>, or as a result of a redirection) will
 immediately fail.
 
+=head2 SOCKS_*
+
+I<Since version 0.42.>
+
+Additionally, any parameters whose names start with C<SOCKS_> will be stored
+and used by L<Net::Async::SOCKS> to establish connections via a configured
+proxy.
+
 =cut
 
 sub configure
@@ -316,6 +325,10 @@ sub configure
 
    foreach ( grep { m/^SSL_/ } keys %params ) {
       $self->{ssl_params}{$_} = delete $params{$_};
+   }
+
+   foreach ( grep { m/^SOCKS_/ } keys %params ) {
+      $self->{socks_params}{$_} = delete $params{$_};
    }
 
    if( exists $params{ip_tos} ) {
@@ -361,11 +374,19 @@ sub connect_connection
 
    my $on_error  = $args{on_error};
 
+   if( my $socks_params = $self->{socks_params} ) {
+      require Net::Async::SOCKS;
+      Net::Async::SOCKS->VERSION( '0.003' );
+
+      unshift @{ $args{extensions} }, "SOCKS";
+      $args{$_} = $socks_params->{$_} for keys %$socks_params;
+   }
+
    if( $args{SSL} ) {
       require IO::Async::SSL;
       IO::Async::SSL->VERSION( '0.12' ); # 0.12 has ->connect(handle) bugfix
 
-      push @{ $args{extensions} }, "SSL";
+      unshift @{ $args{extensions} }, "SSL";
    }
 
    my $f = $conn->connect(
@@ -515,13 +536,18 @@ the scheme is C<https> then an SSL connection will be used.
 
 =item method => STRING
 
-Optional. The HTTP method. If missing, C<GET> is used.
+Optional. The HTTP method name. If missing, C<GET> is used.
 
 =item content => STRING or ARRAY ref
 
-Optional. The body content to use for C<PUT> or C<POST> requests. If this is a
-plain scalar instead of an ARRAY ref, it will not be form encoded. In this
-case, a C<content_type> field must also be supplied to describe it.
+Optional. The body content to use for C<PUT> or C<POST> requests.
+
+If this is a plain scalar it will be used directly, and a C<content_type>
+field must also be supplied to describe it.
+
+If this is an ARRAY ref and the request method is C<POST>, it will be form
+encoded. It should contain an even-sized list of field names and values. For
+more detail see L<HTTP::Request::Common/POST>.
 
 =item content_type => STRING
 
@@ -793,13 +819,13 @@ sub _do_request
             my $self = shift;
             ( $response ) = @_;
 
-            return $on_header->( $response ) unless $response->is_redirect;
-
             # Consume and discard the entire body of a redirect
             return sub {
                return if @_;
                return $response;
-            };
+            } if $redirects and $response->is_redirect;
+
+            return $on_header->( $response );
          } ),
       );
    } ),
@@ -978,7 +1004,7 @@ sub _make_request_for_uri
 
 =head2 $response = $http->POST( $uri, $content, %args )->get
 
-Convenient wrappers for using the C<GET>, C<HEAD>, C<PUT> or C<POST> methods
+Convenient wrappers for performing C<GET>, C<HEAD>, C<PUT> or C<POST> requests
 with a C<URI> object and few if any other arguments, returning a C<Future>.
 
 Remember that C<POST> with non-form data (as indicated by a plain scalar

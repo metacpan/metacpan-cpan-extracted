@@ -11,14 +11,6 @@ use ExtUtils::MakeMaker;
 use Config;
 use Alien::libuv ();
 
-# Some options behave differently on Windows
-sub WINLIKE () {
-    return 1 if $^O eq 'MSWin32';
-    return 1 if $^O eq 'cygwin';
-    return 1 if $^O eq 'msys';
-    return '';
-}
-
 # make sure we actually get stuff back from Alien::libuv
 sub TRIM {
     my $s = shift;
@@ -28,10 +20,8 @@ sub TRIM {
     return $s;
 }
 
-#my @flags = ('-I.', '-I../..', $Config{ccflags});
 my @flags = ('-I.', $Config{ccflags});
 my $libs = Alien::libuv->libs();
-$libs .= ' -lpsapi -luserenv -lIphlpapi' if WINLIKE();
 {
     my $cflags = TRIM(Alien::libuv->cflags);
     my $cflags_s = TRIM(Alien::libuv->cflags_static);
@@ -43,16 +33,10 @@ $libs .= ' -lpsapi -luserenv -lIphlpapi' if WINLIKE();
         unshift @flags, $cflags_s if $cflags_s;
     }
 }
+
+# this will get merged into the meta
 my %xsbuild = (
     XSMULTI => 1,
-    # XSBUILD => {
-    #     xs => {
-    #         'lib/UV' => {
-    #           OBJECT => 'lib/UV$(OBJ_EXT) lib/perl_math_int64$(OBJ_EXT)',
-    #         },
-    #     },
-    # },
-    # OBJECT  => '$(O_FILES)',
     LIBS => [$libs],
     CCFLAGS => join(' ', @flags),
 );
@@ -61,7 +45,7 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Some utility functions from libUV.",
   "AUTHOR" => "Chase Whitener <capoeirab\@cpan.org>",
   "BUILD_REQUIRES" => {
-    "Alien::libuv" => "0.006",
+    "Alien::libuv" => "1.000",
     "Config" => 0,
     "ExtUtils::MakeMaker" => "7.12"
   },
@@ -74,19 +58,19 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008001",
   "NAME" => "UV::Util",
   "PREREQ_PM" => {
-    "Alien::libuv" => "0.006",
+    "Alien::libuv" => "1.000",
     "Exporter" => "5.57",
     "XSLoader" => "0.14",
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Alien::libuv" => "0.006",
+    "Alien::libuv" => "1.000",
     "ExtUtils::MakeMaker" => "7.12",
     "File::Spec" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.009",
+  "VERSION" => "1.000",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -98,7 +82,7 @@ my %WriteMakefileArgs = (
 );
 
 my %FallbackPrereqs = (
-  "Alien::libuv" => "0.006",
+  "Alien::libuv" => "1.000",
   "Config" => 0,
   "Exporter" => "5.57",
   "ExtUtils::MakeMaker" => "7.12",

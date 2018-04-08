@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>[% title %]</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- bootstrap and jQuery -->
+    <link rel="stylesheet" href="[% bs_url %]/css/bootstrap.min.css">
+    
+
+    <script src="[% jq_url %]/jquery.min.js"></script>
+    <script src="[% bs_url %]/js/bootstrap.min.js"></script>
+
+    
+    <style>
+      img.displayed {
+          display: block;
+          margin-left: auto;
+          margin-right: auto
+      }
+
+      .control_button {
+        margin-left: 3px;
+        width:       100px;
+      }
+
+      .control_icon {
+        position:    float-left;
+        margin-left: 5px;
+        margin-right: 5px;
+      }
+
+      .icon_text {
+        font-size:   65%;
+        /* display:     block; */
+        display:     inline-block;
+        line-height: 65%;
+        position:    float-right;
+        /* position:    absolute; */
+        margin-top:  5px;
+      }
+
+      /* Make the Stacked Pills Menu 200px wide */
+      .stackedpillsmenu {
+        margin-left: 1px;
+        width:300px;
+      }
+
+      /* Set the button colors */
+      .stackedpillsmenu .nav-stacked > li > a {
+        background-color: #0088cc;
+        color: #ffffff;
+      }
+
+      .stackedpillsmenu .nav-stacked > li > a:hover {
+        background-color: #ff0000;
+      }
+
+    </style>
+
+  </head>
+  <body>
+    <div class="container">
+    [%+ content +%]
+    </div> <!-- container -->
+  </body> 
+</html>

@@ -13,7 +13,8 @@ my %CONFIGURE_DEPS = (
 my %BUILD_DEPS = ();
 
 my %TEST_DEPS = (
-    'Test::More' => 0.90,
+    'Test::More'            => 0.90,
+    'Test::Without::Module' => 0,
 );
 
 if (-d 'Sandbox')
@@ -26,6 +27,7 @@ if (-d 'Sandbox')
     $@ and die $@;
     eval "use File::Path ();";
     File::Path->import;
+    -d 't/Auto'     and rmtree('t/Auto');
     -d 't/Clone'    and rmtree('t/Clone');
     -d 't/Storable' and rmtree('t/Storable');
     -d 't/ClonePP'  and rmtree('t/ClonePP');
@@ -98,8 +100,8 @@ WriteMakefile1(
     PREREQ_PM          => \%RUN_DEPS,
     BUILD_REQUIRES     => \%BUILD_DEPS,
     TEST_REQUIRES      => \%TEST_DEPS,
-    test               => {TESTS => join(' ', 't/Auto/*.t', 't/*.t', 't/Clone/*.t', 't/Storable/*.t', 't/ClonePP/*.t', 'xt/*.t')},
-    (-d "Sandbox" ? (realclean => {FILES => "t/Clone t/Storable t/ClonePP M*.bak"}) : ()),
+    test => {TESTS => join(' ', 't/Auto/*/*.t', 't/*.t', 't/Clone/*/*.t', 't/Storable/*/*.t', 't/ClonePP/*/*.t', 'xt/*.t')},
+    (-d "Sandbox" ? (realclean => {FILES => join(' ', 't/Auto/', 't/Clone', 't/Storable', 't/ClonePP', 'M*.bak')}) : ()),
 );
 
 sub WriteMakefile1

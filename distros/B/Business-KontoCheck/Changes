@@ -3,6 +3,14 @@ Revision history for Perl extension Business::KontoCheck.
 
 The complete history can be found in 0_history.txt (in german).
 
+6.04:
+   - update for some testfiles for perl
+   - new data file blz.lut
+   - removed support^ for austrian bank accounts
+
+6.03:
+   - update for some testfiles for perl 
+
 6.02:
    - minor change in IBAN rule 56
    - bug fixes

@@ -1,3 +1,15 @@
+0.006 2018-04-01 22:59:31+02:00
+
+    - Support YAML Failsafe, JSON and Core Schema
+    - Add dump_file, DumpFile
+    - Add YAML::PP::Writer
+    - Add YAML::PP::Representer
+    - Detect cyclic references when loading
+    - perl boolean false is now the empty string instead of 0
+    - Add column numbers to error messages
+    - Fixed various bugs in Emitter
+    - Can now emit empty collections like [], {}
+
 0.005 2017-11-23 17:09:55+01:00
     - Support reading files
     - Replace load() with load_string(), dump() with dump_string()

@@ -2,7 +2,7 @@ NAME
     Regexp::Pattern::License - Regular expressions for legal licenses
 
 VERSION
-    Version v3.1.90
+    Version v3.1.92
 
 DESCRIPTION
     Regexp::Pattern::License provides a hash of regular expression patterns
@@ -26,6 +26,10 @@ PATTERNS
     *   agpl
 
     *   aladdin
+
+    *   aladdin_8
+
+    *   aladdin_9
 
     *   apache
 
@@ -190,6 +194,8 @@ PATTERNS
 
     Each of these patterns has the tag type:trait .
 
+    *   any_of
+
     *   clause_retention
 
     *   clause_reproduction
@@ -204,6 +210,12 @@ PATTERNS
 
     *   fsf_unlimited_retention
 
+    *   licensed_under
+
+    *   or_at_option
+
+    *   version
+
     *   version_later
 
     *   version_later_paragraph
@@ -211,6 +223,8 @@ PATTERNS
     *   version_later_postfix
 
     *   version_number
+
+    *   version_numberstring
 
     *   version_prefix
 

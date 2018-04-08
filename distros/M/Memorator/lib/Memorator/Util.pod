@@ -1,0 +1,47 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Memorator::Util - utility function(s) for Memorator
+
+=head1 SYNOPSIS
+
+   use Memorator::Util (); # does not export anything by default
+
+   my $extended_name = Memorator::Util::local_name($name, $suffix);
+
+=head1 DESCRIPTION
+
+This module serves as a container for utility functions.
+
+=head1 FUNCTIONS
+
+=head2 B<< local_name >>
+
+   my $extended_name = local_name($name, $suffix);
+
+merge C<$name> and C<$suffix> with an underscore, then turns all non-word
+characters into underscores. Returns the resulting string.
+
+=head1 SEE ALSO
+
+L<Memorator>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2018 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v2.1.1';
+our $VERSION = 'v2.1.2';
 
 use JSON::MaybeXS;
 use Scalar::Util qw( weaken refaddr );
@@ -198,7 +198,7 @@ JSON::RPC2::Client - Transport-independent JSON-RPC 2.0 client
 
 =head1 VERSION
 
-This document describes JSON::RPC2::Client version v2.1.1
+This document describes JSON::RPC2::Client version v2.1.2
 
 
 =head1 SYNOPSIS
@@ -261,9 +261,9 @@ Can be used both in sync (simple, for blocking I/O) and async
 
 =head1 INTERFACE 
 
-=over
+=head2 new
 
-=item new()
+    $client = JSON::RPC2::Client->new();
 
 Create and return new client object, which can be used to generate requests
 (notify(), call()), parse responses (responses()) and cancel pending requests
@@ -272,17 +272,23 @@ Create and return new client object, which can be used to generate requests
 Each client object keep track of request IDs, so you must use dedicated
 client object for each connection to server.
 
-=item notify( $remote_method, @remote_params )
+=head2 notify
 
-=item notify_named( $remote_method, %remote_params )
+=head2 notify_named
+
+    $json_request = $client->notify( $remote_method, @remote_params );
+    $json_request = $client->notify_named( $remote_method, %remote_params );
 
 Notifications doesn't receive any replies, so they unreliable.
 
 Return ($json_request) - scalar which should be sent to server in any way.
 
-=item call( $remote_method, @remote_params )
+=head2 call
 
-=item call_named( $remote_method, %remote_params )
+=head2 call_named
+
+    ($json_request, $call) = $client->call( $remote_method, @remote_params );
+    ($json_request, $call) = $client->call_named( $remote_method, %remote_params );
 
 Return ($json_request, $call) - scalar which should be sent to server in
 any way and identifier of this remote procedure call.
@@ -297,7 +303,15 @@ In scalar context return only $json_request - this enough for simple
 blocking clients which doesn't need to detect which of several pending()
 calls was just replied or cancel() pending calls.
 
-=item batch( $json_request1, $json_request2, $call2, $json_request3, … )
+=head2 batch
+
+    ($json_request, @call) = $client->batch(
+        $json_request1,
+        $json_request2,
+        $call2,
+        $json_request3,
+        ...
+    );
 
 Return ($json_request, @call) - scalar which should be sent to server in
 any way and identifiers of these remote procedure calls (they'll be in
@@ -317,18 +331,22 @@ same order as they was in params). These two example are equivalent:
 If you're using batch() to send some requests then you should process
 RPC server's responses using batch_response(), not response().
 
-=item batch_response( $json_response )
+=head2 batch_response
+
+    @responses = $client->batch_response( $json_response );
 
 The $json_response can be either JSON string or ARRAYREF/HASHREF (useful
 with C<< $handle->push_read(json => sub{...}) >> from L<AnyEvent::Handle>).
 
-Will parse $json_response and return list with ARRAYREFs, which contain
+Will parse $json_response and return list with ARRAYREFS, which contain
 4 elements returned by response().
 
 It is safe to always use batch_response() instead of response(), even if
 you don't send batch() requests at all.
 
-=item response( $json_response )
+=head2 response
+
+    ($failed, $result, $error, $call) = $client->response( $json_response );
 
 The $json_response can be either JSON string or HASHREF (useful
 with C<< $handle->push_read(json => sub{...}) >> from L<AnyEvent::Handle>).
@@ -361,7 +379,9 @@ if $json_response was related to call which was already cancel()ed by user.
 If you're using batch() to send some requests then you should process
 RPC server's responses using batch_response(), not response().
 
-=item cancel( $call )
+=head2 cancel
+
+    $client->cancel( $call );
 
 Will cancel that $call. This doesn't affect server - it will continue
 processing related request and will send response when ready, but that
@@ -369,11 +389,11 @@ response will be ignored by client's response().
 
 Return nothing.
 
-=item pending()
+=head2 pending
+
+    @call = $client->pending();
 
 Return list with all currently pending $call's.
-
-=back
 
 
 =head1 SUPPORT
@@ -428,7 +448,7 @@ Alex Efros E<lt>powerman@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2009-2014 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+This software is Copyright (c) 2009- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
 
 This is free software, licensed under:
 

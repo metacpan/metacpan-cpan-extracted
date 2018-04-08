@@ -15,7 +15,7 @@ if (!defined $ENV{GARMIN_USERNAME} &&
     !defined $ENV{GARMIN_PASSWORD} ) {
   plan skip_all => 'set GARMIN_{USERNAME,PASSWORD} to run network tests';
 } else {
-  plan tests => 11;
+  plan tests => 12;
 }
 
 my $gc = WebService::GarminConnect->new(
@@ -36,8 +36,8 @@ is(scalar @activities, 1, "limit of 1 returns 1 activity");
 my $a = $activities[0];
 ok(defined $a->{activity}, "top-level activity key defined");
 # Check some of the keys that all activities should have.
-foreach my $key ( qw( activityName username activityType beginTimestamp
-                      sumDistance ) ) {
+foreach my $key ( qw( activityName ownerDisplayName activityType beginTimestamp
+                      distance ) ) {
   ok(defined $a->{activity}->{$key}, "activity has key $key");
 }
 
@@ -48,6 +48,14 @@ is(scalar @activities, 7, "limit of 7 returns 7 activities");
 
 # Retrieve with no limit, and make sure we get back all the user's
 # activities.
-my $total = $gc->{total_activities};
 @activities = $gc->activities();
-is(scalar @activities, $total, "no limit returns all $total activities");
+ok(scalar @activities > 100, "no limit returns over 100 activities");
+
+# Make sure there are no duplicate activity IDs.
+my %ids;
+foreach my $a ( @activities ) {
+  $ids{$a->{activity}->{activityId}} = 1;
+}
+my $unique_activity_count = keys %ids;
+my $activity_count = @activities;
+is($unique_activity_count, $activity_count, "unique activity count ($unique_activity_count) matches activity count ($activity_count)");

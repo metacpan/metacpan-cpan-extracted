@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+use strict;
+
+foreach (glob('xt/bin/*')) {
+    next if $_ !~ qr{^xt/bin/pandoc-(\d(\.\d+)*)$};
+    system('prove', "-Pandoc=$_", @ARGV);
+}
+
+=head1 DESCRIPTION
+
+This script runs L<prove> with each pandoc executable found in C<xt/bin>
+via L<App::Prove::Plugin::andoc>.
+
+=cut

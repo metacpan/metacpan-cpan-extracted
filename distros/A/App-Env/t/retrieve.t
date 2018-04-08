@@ -1,13 +1,9 @@
 #!perl
 
-use Test::More tests => 6;
+use Test2::V0;
+use Test::Lib;
 
-use lib 't';
-
-BEGIN { use_ok('App::Env') };
-
-#############################################################
-
+use App::Env;
 
 my $app1 = App::Env->new( 'App1' );
 
@@ -34,3 +30,5 @@ $app1->setenv( 'AppEnvTestID' => $$ );
 
     ok( ! defined $app2, 'retrieve non-existent env' );
 }
+
+done_testing;

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::YokogawaGS200;
-$Lab::Moose::Instrument::YokogawaGS200::VERSION = '3.623';
+$Lab::Moose::Instrument::YokogawaGS200::VERSION = '3.624';
 #ABSTRACT: YokogawaGS200 voltage/current source.
 
 use 5.010;
@@ -9,7 +9,7 @@ use MooseX::Params::Validate;
 use Lab::Moose::Instrument
     qw/validated_getter validated_setter setter_params/;
 use Lab::Moose::Instrument::Cache;
-
+use Carp;
 use namespace::autoclean;
 
 extends 'Lab::Moose::Instrument';
@@ -41,7 +41,18 @@ has verbose => (
 
 sub BUILD {
     my $self = shift;
-    $self->clear();
+
+    #
+
+    # with USB-TMC, clear results in this error:
+    # error in libusb_control_transfer_write: Pipe error at /home/simon/.plenv/versions/5.24.0/lib/perl5/site_perl/5.24.0/x86_64-linux/USB/LibUSB/Device/Handle.pm line 22.
+    # apparently in USB::TMC::clear_feature_endpoint_out
+    if ( $self->connection_type eq 'USB' ) {
+        $self->clear( yoko => 1 );
+    }
+    else {
+        $self->clear();
+    }
     $self->cls();
 }
 
@@ -104,10 +115,124 @@ sub set_voltage {
     return $self->set_level( value => $value );
 }
 
+sub config_sweep {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        points => { isa => 'Num' },
+        rates  => { isa => 'Num' },
+    );
+
+    my $target = delete $args{points};
+    my $rate   = delete $args{rates};
+
+    $self->cls(%args);
+
+    # Enforce limits
+    $self->check_max_and_min($target);
+    my $max_rate = $self->max_units_per_second;
+    if ( $rate > $max_rate ) {
+        croak "Sweep rate $rate exceeds max_untis_per_second ($max_rate)";
+    }
+
+    my $current_level = $self->get_level();
+    my $time = abs( ( $target - $current_level ) / $rate );
+    if ( $time < 0.1 ) {
+        carp "sweep time < 0.1 seconds; adjusting to 0.1 seconds";
+        $time = 0.1;
+    }
+    if ( $time > 3600 ) {
+        croak "sweep time needs to be <= 3600 seconds";
+    }
+
+    $self->write( command => 'PROG:REP 0', %args );
+    $self->write( command => sprintf( 'PROG:INT %.17g',  $time ), %args );
+    $self->write( command => sprintf( 'PROG:SLOP %.17g', $time ), %args );
+
+    $self->write( command => 'PROG:EDIT:STAR', %args );
+
+    # do not use 'source_level', no caching needed here
+    $self->write( command => sprintf( "SOUR:LEV %.15g", $target ), %args );
+    $self->write( command => 'PROG:EDIT:END', %args );
+}
+
+sub wait {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+    );
+    my $verbose   = $self->verbose;
+    my $autoflush = STDOUT->autoflush();
+
+    while (1) {
+        if ($verbose) {
+            my $level = $self->get_level(%args);
+            printf( "Level: %.5e         \r", $level );
+        }
+        if ( not $self->active(%args) ) {
+            last;
+        }
+    }
+
+    if ($verbose) {
+        print " " x 70 . "\r";
+    }
+
+    # reset autoflush to previous value
+    STDOUT->autoflush($autoflush);
+
+}
+
+sub active {
+    my ( $self, %args ) = validated_getter( \@_ );
+
+    # Set EOP (end of program) bit in Extended Event Enable Register
+    $self->write( command => 'STAT:ENAB 128', %args );
+
+    my $status = $self->get_status(%args);
+    if ( $status->{'EES'} == 1 ) {
+        say "not active";
+        return 0;
+    }
+    return 1;
+}
+
+# return hashref
+sub get_status {
+    my ( $self, %args ) = validated_getter( \@_ );
+
+    my $status = int( $self->query( command => '*STB?', %args ) );
+    my @flags  = qw/NONE EES ESB MAX NONE EAV MSS NONE/;
+    my $result = {};
+    for my $i ( 0 .. 7 ) {
+        my $flag = $flags[$i];
+        $result->{$flag} = $status & 1;
+        $status >>= 1;
+    }
+    return $result;
+}
+
+sub trg {
+    my ( $self, %args ) = validated_getter( \@_ );
+    my $output = $self->query( command => 'OUTP:STAT?', %args );
+    if ( $output == 0 ) {
+        croak "output needs to be on before running a program";
+    }
+    $self->write( command => 'PROG:RUN' );
+}
+
 
 sub sweep_to_level {
-    my $self = shift;
-    return $self->set_voltage(@_);
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        target => { isa => 'Num' },
+        rate   => { isa => 'Num' }
+    );
+
+    my $target = delete $args{target};
+    my $rate   = delete $args{rate};
+
+    $self->config_sweep( points => $target, rates => $rate, %args );
+    $self->trg(%args);
+    $self->wait(%args);
 }
 
 with qw(
@@ -133,7 +258,7 @@ Lab::Moose::Instrument::YokogawaGS200 - YokogawaGS200 voltage/current source.
 
 =head1 VERSION
 
-version 3.623
+version 3.624
 
 =head1 SYNOPSIS
 
@@ -198,9 +323,7 @@ For XPRESS voltage sweep. Equivalent to C<< set_level(value => $value) >>.
 
 =head2 sweep_to_level
 
- $yoko->sweep_to_level($value);
-
-For XPRESS voltage sweep. Equivalent to C<set_voltage>.
+ $yoko->sweep_to_level(target => $value, rate => $rate);
 
 =head1 COPYRIGHT AND LICENSE
 

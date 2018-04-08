@@ -7,17 +7,17 @@ use App::Fasops -command;
 use App::RL::Common;
 use App::Fasops::Common;
 
-use constant abstract => 'convert axt to blocked fasta';
+sub abstract {
+    return 'convert axt to blocked fasta';
+}
 
 sub opt_spec {
     return (
         [ "outfile|o=s", "Output filename, [stdout] for screen" ],
-        [ "length|l=i", "the threshold of alignment length", { default => 1 } ],
-        [ "tname|t=s",  "target name",                       { default => "target" } ],
-        [ "qname|q=s",  "query name",                        { default => "query" } ],
-        [   "size|s=s",
-            "query chr.sizes. Without this file, positions of negtive strand of query will be wrong",
-        ],
+        [ "length|l=i", "the threshold of alignment length", { default => 1 }, ],
+        [ "tname|t=s",  "target name",                       { default => "target" }, ],
+        [ "qname|q=s",  "query name",                        { default => "query" }, ],
+        [ "size|s=s",   "query chr.sizes", ],
         { show_defaults => 1, }
     );
 }
@@ -28,9 +28,15 @@ sub usage_desc {
 
 sub description {
     my $desc;
-    $desc .= "Convert UCSC axt pairwise alignment file to blocked fasta file.\n";
-    $desc .= "\t<infiles> are paths to axt files, .axt.gz is supported\n";
-    $desc .= "\tinfile == stdin means reading from STDIN\n";
+    $desc .= ucfirst(abstract) . ".\n";
+    $desc .= <<'MARKDOWN';
+
+* <infiles> are paths to axt files, .axt.gz is supported
+* infile == stdin means reading from STDIN
+* Without query chr.sizes file, positions on negative strand of query will be wrong
+
+MARKDOWN
+
     return $desc;
 }
 

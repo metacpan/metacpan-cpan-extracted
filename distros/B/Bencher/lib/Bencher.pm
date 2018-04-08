@@ -1,7 +1,7 @@
 package Bencher;
 
-our $DATE = '2017-07-13'; # DATE
-our $VERSION = '1.040'; # VERSION
+our $DATE = '2018-04-03'; # DATE
+our $VERSION = '1.041'; # VERSION
 
 1;
 # ABSTRACT: A benchmark framework
@@ -18,7 +18,7 @@ Bencher - A benchmark framework
 
 =head1 VERSION
 
-This document describes version 1.040 of Bencher (from Perl distribution Bencher), released on 2017-07-13.
+This document describes version 1.041 of Bencher (from Perl distribution Bencher), released on 2018-04-03.
 
 =head1 SYNOPSIS
 
@@ -81,11 +81,14 @@ There are several kinds of code you can specify:
 First, you can just specify C<module> (str, a Perl module name). This is useful
 when running scenario in L<module_startup mode/"Running benchmark in module
 startup mode">. Also useful to instruct Bencher to load the module. When not in
-module startup mode, there is no code in this participant to run.
+module startup mode, there is no code in this participant to run. In addition to
+C<module> you can also specify C<import_args> which can be a string or an
+arrayref.
 
 You can also specify C<modules> (an array of Perl module names) if you want to
 benchmark several modules together. Similarly, this is only useful for running
-in module startup mode.
+in module startup mode. To specify import arguments for each of these modules,
+use C<import_args_array>.
 
 You can specify C<code> (a coderef) which contains the code to benchmark.
 However, the point of Bencher is to use C<fcall_template> or at least
@@ -224,7 +227,7 @@ modules can be specified as phase=x_benchmarks, rel=requires prerequisites.
 This is useful when dumping item's codes, so Bencher will use a list context
 when receiving result.
 
-=item * include_by_default> (bool, default 1)
+=item * include_by_default (bool, default 1)
 
 Can be set to false if you want to exclude participant by default when running
 benchmark, unless the participant is explicitly included e.g. using
@@ -646,7 +649,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

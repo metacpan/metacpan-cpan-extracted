@@ -1,0 +1,74 @@
+# Run just the policies listed in this configuration
+only = 1
+
+# Fail if listed policy modules are not available
+profile-strictness = fatal
+
+verbose =%s %p %f   %l\n
+
+
+[RegularExpressions::ProhibitCaptureWithoutTest]
+[ErrorHandling::RequireCarping]
+
+# Policies taken from main ledgersmb project
+[BuiltinFunctions::ProhibitBooleanGrep]
+[BuiltinFunctions::ProhibitStringySplit]
+[BuiltinFunctions::ProhibitUniversalCan]
+[BuiltinFunctions::ProhibitUniversalIsa]
+[ClassHierarchies::ProhibitExplicitISA]
+[CodeLayout::ProhibitHardTabs]
+    allow_leading_tabs = 0
+[CodeLayout::ProhibitTrailingWhitespace]
+[ControlStructures::ProhibitMutatingListFunctions]
+[ControlStructures::ProhibitUnreachableCode]
+[InputOutput::ProhibitBarewordFileHandles]
+[InputOutput::ProhibitInteractiveTest]
+[InputOutput::ProhibitOneArgSelect]
+[InputOutput::ProhibitTwoArgOpen]
+[InputOutput::RequireCheckedClose]
+[InputOutput::RequireCheckedOpen]
+[InputOutput::RequireCheckedSyscalls]
+[InputOutput::RequireEncodingWithUTF8Layer]
+[Miscellanea::ProhibitFormats]
+[Modules::ProhibitAutomaticExportation]
+[Modules::ProhibitConditionalUseStatements]
+[Modules::ProhibitEvilModules]
+[Modules::ProhibitExcessMainComplexity]
+[Modules::ProhibitMultiplePackages]
+[Modules::RequireBarewordIncludes]
+[Modules::RequireEndWithOne]
+[Modules::RequireExplicitInclusion]
+[Modules::RequireExplicitPackage]
+[Modules::RequireFilenameMatchesPackage]
+[Modules::RequireNoMatchVarsWithUseEnglish]
+[Objects::ProhibitIndirectSyntax]
+[Subroutines::ProhibitExplicitReturnUndef]
+[Subroutines::ProhibitReturnSort]
+[Subroutines::ProhibitSubroutinePrototypes]
+[Subroutines::ProtectPrivateSubs]
+[Subroutines::RequireFinalReturn]
+[TestingAndDebugging::ProhibitNoStrict]
+[TestingAndDebugging::ProhibitNoWarnings]
+[TestingAndDebugging::ProhibitProlongedStrictureOverride]
+[TestingAndDebugging::RequireTestLabels]
+[TestingAndDebugging::RequireUseStrict]
+[TestingAndDebugging::RequireUseWarnings]
+[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+[ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+[ValuesAndExpressions::ProhibitMagicNumbers]
+    allowed_values = -1 0 1 2 100
+[ValuesAndExpressions::ProhibitMismatchedOperators]
+[ValuesAndExpressions::ProhibitMixedBooleanOperators]
+[Variables::ProhibitPerl4PackageNames]
+[Variables::ProhibitUnusedVariables]
+[Variables::ProtectPrivateVars]
+[Variables::RequireInitializationForLocalVars]
+[Variables::RequireLexicalLoopIterators]
+[Variables::RequireLocalizedPunctuationVars]
+
+# Not applied
+#
+# Because we use octal values to refer to file permissions
+# Wrapping each of these in an oct(..) as Perl::Critic suggests
+# harms readability.
+# [ValuesAndExpressions::ProhibitLeadingZeros]

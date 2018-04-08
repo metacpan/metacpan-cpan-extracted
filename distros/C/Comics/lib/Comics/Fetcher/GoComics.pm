@@ -54,9 +54,10 @@ Fetcher specific arguments:
 
 =cut
 
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 # Page contents changed, january 10, 2017.
+# Page contents changed, april 5, 2018.
 
 sub register {
     my ( $pkg, $init ) = @_;
@@ -69,12 +70,16 @@ sub register {
     }
 
     # Add the standard pattern for GoComics comics.
-    $self->{pattern} =
-      qr{ <meta \s+ property="og:image" \s+
-	  content="(?<url>http://assets.amuniversal.com/
-	    (?<image>[0-9a-f]+))" \s+
-          />
-        }x;
+    $self->{patterns} =
+      [
+       qr{ href="(?<url>.*?)">Comics</a>
+         }x,
+       qr{ <meta \s+ property="og:image" \s+
+	   content="(?<url>https?://assets.amuniversal.com/
+	   (?<image>[0-9a-f]+))" \s+
+           />
+         }x,
+       ];
 
     return $self;
 }

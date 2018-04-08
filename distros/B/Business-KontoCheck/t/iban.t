@@ -1,7 +1,7 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl iban.t'
 
-use Test::More tests => 114;
+use Test::More tests => 113;
 
 BEGIN { use_ok('Business::KontoCheck') };
 
@@ -29,10 +29,6 @@ if($retval gt 0){
 # Die zweite Gruppe stammt von http://www.iban-rechner.eu/ibancalculator/iban.de.html; sie sind alle korrekt.
 # Eine dritte Gruppe findet sich unter http://www.toms-cafe.de/iban/iban.de.html (ebenfalls komplett ok).
 # Die Dubletten (etwa die Hälfte) wurden entfernt.
-# Als letztes sind noch die IBAN-Fallen von www.ckonto.de enthalten; hier wurde allerdings ein Rückgabewert korrigiert.
-# Die IBAN DE73101206001234567897 ist korrekt; sie stammt zwar von der Santander Bank, diese hat für die BLZ jedoch die
-# Regel 0 spezifiziert, nicht 46; somit muß die BLZ nicht ersetzt werden. Die IBAN wird auch von ckonto selbst als korrekt
-# akzeptiert :-) (Aufruf 7.3.14)
 
 __DATA__
 0 MT87MALT011000012345MTLCAST001S
@@ -145,5 +141,4 @@ __DATA__
 -130 DE27622200001234567890
 -143 DE45606510700000000868
 -130 DE29680501010000000202
-1 DE73101206001234567897
 -130 DE31201333000012345678

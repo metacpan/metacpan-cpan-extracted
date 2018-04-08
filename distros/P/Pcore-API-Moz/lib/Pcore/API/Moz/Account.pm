@@ -11,8 +11,8 @@ use overload    #
   fallback => undef;
 
 has moz => ( is => 'ro', isa => InstanceOf ['Pcore::API::Moz'], required => 1 );
-has id  => ( is => 'ro', isa => Str, required => 1 );
-has key => ( is => 'ro', isa => Str, required => 1 );
+has id  => ( is => 'ro', isa => Str,                            required => 1 );
+has key => ( is => 'ro', isa => Str,                            required => 1 );
 
 has _cookies => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
 

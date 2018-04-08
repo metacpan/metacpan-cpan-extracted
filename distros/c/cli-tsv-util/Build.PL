@@ -9,7 +9,7 @@ my $builder = Module::Build->new(
     dist_author         => q{"Toshiyuki Shimono" <bin4tsv@gmail.com>},
     dist_version_from   => 'lib/cli/tsv/util.pm',
     release_status      => 'stable',
-    script_files        => [ qw[scripts/colwidth scripts/colsplit scripts/colgrep scripts/latextable scripts/csv2tsv]],
+    script_files        => [ qw[scripts/colwidth scripts/colsplit scripts/colgrep scripts/latextable scripts/csv2tsv scripts/colsummary]],
     configure_requires => {
         'Module::Build' => '0',
     },
@@ -17,6 +17,7 @@ my $builder = Module::Build->new(
         'Test::More' => '0',
     },
     requires => {
+        'Text::CSV_XS'      => '1.34', 
         #'ABC'              => '1.6',
         #'Foo::Bar::Module' => '5.0401',
     },

@@ -1,12 +1,13 @@
 #!/usr/bin/perl -w
 
-# ICC::Profile::mAB_ test module / 2018-03-27
+# ICC::Profile::mAB_ test module / 2018-03-31
 #
 # Copyright © 2004-2018 by William B. Birkett
 
 use strict;
 
 use File::Spec;
+use File::Temp;
 use t::lib::Boot;
 use ICC::Profile::matf;
 use ICC::Profile::curv;
@@ -42,14 +43,14 @@ isa_ok($tag, 'ICC::Profile::mAB_');
 # test size method
 ok($tag->size == $profile->tag_table->[1][2], 'tag size');
 
-# open temporary file for write-read access
-open($temp, '+>' . File::Spec->catfile('t', 'data', 'temp.dat'));
-
-# set binary mode
-binmode($temp);
+# open temporary file for write-read access, binmode
+$temp = File::Temp::tempfile();
 
 # write tag to temporary file
 $tag->write_fh($profile, $temp, $profile->tag_table->[1]);
+
+# flush buffer
+$temp->flush;
 
 # read profile raw data
 seek($profile->fh, $profile->tag_table->[1][1], 0);
@@ -65,10 +66,8 @@ ok($raw1 eq $raw2, 'raw data round-trip');
 # compare strings, if different
 str_cmp($raw1, $raw2) if ($raw1 ne $raw2);
 
-# close profile
+# close files
 close($profile->fh);
-
-# close temporary file
 close($temp);
 
 ##### more tests needed #####

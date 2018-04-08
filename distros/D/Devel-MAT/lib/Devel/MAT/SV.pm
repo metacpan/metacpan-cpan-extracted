@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2018 -- leonerd@leonerd.org.uk
 
 package Devel::MAT::SV;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Carp;
 use Scalar::Util qw( weaken );
@@ -20,6 +20,7 @@ use constant immortal => 0;
 
 use Struct::Dumb 0.07 qw( readonly_struct );
 readonly_struct Reference => [qw( name strength sv )];
+readonly_struct Magic     => [qw( type obj ptr )];
 
 =head1 NAME
 
@@ -191,23 +192,49 @@ Returns the (approximate) size in bytes of the SV
 
 =head2 magic
 
-   ( $type, $sv, $type, $sv, ... ) = $sv->magic
+   @magics = $sv->magic
 
-Returns a pair list of magic applied to the SV; each giving the type and
-target SV.
+Returns a list of magic applied to the SV; each giving the type and target SVs
+as struct fields:
+
+   $type = $magic->type
+   $sv = $magic->obj
+   $sv = $magic->ptr
 
 =cut
 
-# TODO: This interface needs fixing
 sub magic
 {
    my $self = shift;
    return unless my $magic = $self->{magic};
 
    my $df = $self->df;
-   return map { my ( $type, undef, $obj_at, $ptr_at ) = @$_;
-                ( $obj_at ? ( $type => $df->sv_at( $obj_at ) ) : () ),
-                ( $ptr_at ? ( $type => $df->sv_at( $ptr_at ) ) : () ) } @$magic;
+   return map {
+      my ( $type, undef, $obj_at, $ptr_at ) = @$_;
+      Magic( $type, $df->sv_at( $obj_at ), $df->sv_at( $ptr_at ) );
+   } @$magic;
+}
+
+=head2 magic_svs
+
+   @svs = $sv->magic_svs
+
+A more efficient way to retrieve just the SVs associated with the applied
+magic.
+
+=cut
+
+sub magic_svs
+{
+   my $self = shift;
+   return unless my $magic = $self->{magic};
+
+   my $df = $self->df;
+   return map {
+      my ( undef, undef, $obj_at, $ptr_at ) = @$_;
+      ( $obj_at ? ( $df->sv_at( $obj_at ) ) : () ),
+      ( $ptr_at ? ( $df->sv_at( $ptr_at ) ) : () )
+   } @$magic;
 }
 
 =head2 backrefs
@@ -387,7 +414,7 @@ boolean true and false. They are
 
 package Devel::MAT::SV::Immortal;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 use constant immortal => 1;
 sub new {
    my $class = shift;
@@ -400,13 +427,13 @@ sub _outrefs { () }
 
 package Devel::MAT::SV::UNDEF;
 use base qw( Devel::MAT::SV::Immortal );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 sub desc { "UNDEF" }
 sub type { "UNDEF" }
 
 package Devel::MAT::SV::YES;
 use base qw( Devel::MAT::SV::Immortal );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 sub desc { "YES" }
 sub type { "SCALAR" }
 
@@ -420,7 +447,7 @@ sub is_weak { '' }
 
 package Devel::MAT::SV::NO;
 use base qw( Devel::MAT::SV::Immortal );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 sub desc { "NO" }
 sub type { "SCALAR" }
 
@@ -434,7 +461,7 @@ sub is_weak { '' }
 
 package Devel::MAT::SV::Unknown;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 __PACKAGE__->register_type( 0xff );
 
 sub desc { "UNKNOWN" }
@@ -443,7 +470,7 @@ sub _outrefs {}
 
 package Devel::MAT::SV::GLOB;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 __PACKAGE__->register_type( 1 );
 use constant $CONSTANTS;
 
@@ -613,7 +640,7 @@ sub _outrefs
 
 package Devel::MAT::SV::SCALAR;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 __PACKAGE__->register_type( 2 );
 use constant $CONSTANTS;
 
@@ -774,7 +801,7 @@ sub _outrefs
 
 package Devel::MAT::SV::REF;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 __PACKAGE__->register_type( 3 );
 use constant $CONSTANTS;
 
@@ -865,7 +892,7 @@ sub _outrefs
 
 package Devel::MAT::SV::ARRAY;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 __PACKAGE__->register_type( 4 );
 use constant $CONSTANTS;
 
@@ -1006,7 +1033,7 @@ sub _outrefs
 package Devel::MAT::SV::PADLIST;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 use constant type => "PADLIST";
 use constant $CONSTANTS;
 
@@ -1055,7 +1082,7 @@ sub _outrefs
 package Devel::MAT::SV::PADNAMES;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 use constant type => "PADNAMES";
 use constant $CONSTANTS;
 
@@ -1139,7 +1166,7 @@ sub _outrefs
 package Devel::MAT::SV::PAD;
 # Synthetic type
 use base qw( Devel::MAT::SV::ARRAY );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 use constant type => "PAD";
 use constant $CONSTANTS;
 
@@ -1232,7 +1259,7 @@ sub _outrefs
 
 package Devel::MAT::SV::HASH;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 __PACKAGE__->register_type( 5 );
 use constant $CONSTANTS;
 
@@ -1393,7 +1420,7 @@ sub _outrefs
 
 package Devel::MAT::SV::STASH;
 use base qw( Devel::MAT::SV::HASH );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 __PACKAGE__->register_type( 6 );
 use constant $CONSTANTS;
 
@@ -1533,7 +1560,7 @@ sub _outrefs
 
 package Devel::MAT::SV::CODE;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 __PACKAGE__->register_type( 7 );
 use constant $CONSTANTS;
 
@@ -2051,7 +2078,7 @@ sub _outrefs
 
 package Devel::MAT::SV::IO;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 __PACKAGE__->register_type( 8 );
 use constant $CONSTANTS;
 
@@ -2125,7 +2152,7 @@ sub _outrefs
 
 package Devel::MAT::SV::LVALUE;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 __PACKAGE__->register_type( 9 );
 use constant $CONSTANTS;
 
@@ -2166,7 +2193,7 @@ sub _outrefs
 
 package Devel::MAT::SV::REGEXP;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 __PACKAGE__->register_type( 10 );
 
 sub load {}
@@ -2177,7 +2204,7 @@ sub _outrefs { () }
 
 package Devel::MAT::SV::FORMAT;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 __PACKAGE__->register_type( 11 );
 
 sub load {}
@@ -2188,7 +2215,7 @@ sub _outrefs { () }
 
 package Devel::MAT::SV::INVLIST;
 use base qw( Devel::MAT::SV );
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 __PACKAGE__->register_type( 12 );
 
 sub load {}

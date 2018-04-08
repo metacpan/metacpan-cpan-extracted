@@ -25,4 +25,4 @@ requires:
   perl: '5.018'
 resources:
   repository: https://github.com/gonzus/NONE
-version: '0.000035'
+version: '0.000036'

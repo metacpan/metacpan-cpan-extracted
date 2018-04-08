@@ -21,6 +21,7 @@ lib/AnyEvent/WebSocket/Message.pm
 t/00_diag.t
 t/01_use.t
 t/anyevent_websocket_client.t
+t/anyevent_websocket_client__proxy.t
 t/anyevent_websocket_client__scope.t
 t/anyevent_websocket_client__server_initial_data_shutdown.t
 t/anyevent_websocket_client__ssl.t

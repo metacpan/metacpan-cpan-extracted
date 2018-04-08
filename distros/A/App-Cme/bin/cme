@@ -2,7 +2,7 @@
 #
 # This file is part of App-Cme
 #
-# This software is Copyright (c) 2017 by Dominique Dumont.
+# This software is Copyright (c) 2014-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -35,7 +35,7 @@ cme - Check or edit configuration data with Config::Model
 
 =head1 VERSION
 
-version 1.026
+version 1.027
 
 =head1 SYNOPSIS
 
@@ -116,13 +116,6 @@ argument, i.e. C<cme command application file_name>. This applies if the
 application requires a configuration file name (like multistrap), or if
 the application allows configuration file override.
 
-When the overridden file is C<-> (a single dash), the configuration is
-read from STDIN. The resulting file may be written on STDOUT. I.e.
-
-  cat debian/confrol | cme migrate dpkg-control -save -file -
-
-will output a fixed control file on STDOUT.
-
 =head1 Main commands
 
 This section describes the main commands shipped with cme. Other
@@ -194,11 +187,11 @@ error during the installation of the application.
 =item -file
 
 For model that support it, specify an alternate file to read and write the
-configuration. Use "C<->" to read from STDIN.
+configuration.
 
 You can use this option for model that require the target file to be
 specified (e.g. multitrap model), but file can in this case be also
-specified with the 4th command argument. E.g. these 2 commands habe
+specified with the 4th command argument. E.g. these 2 commands have
 the same effect:
 
   cme check multistrap foo.conf
@@ -387,7 +380,7 @@ cme exits 0 when no errors are found. Exit 1 otherwise.
 
 If a configuration model is not up-to-date, you will get errors complaining about
 unknown parameters. In such a case, please file a bug on
-L<request tracked|http://rt.cpan.org/> or fix the model and send a pull request.
+L<github|https://github.com/dod38fr/cme-perl/issues> or fix the model and send a pull request.
 You can see this
 L<example from OpenSsh|https://github.com/dod38fr/config-model/wiki/New-parameter-for-openssh-example>
 to learn how to fix a model.
@@ -432,7 +425,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dominique Dumont.
+This software is Copyright (c) 2014-2018 by Dominique Dumont.
 
 This is free software, licensed under:
 

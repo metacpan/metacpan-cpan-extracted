@@ -2,8 +2,8 @@ NAME
     App::BencherUtils - Utilities related to bencher
 
 VERSION
-    This document describes version 0.240 of App::BencherUtils (from Perl
-    distribution App-BencherUtils), released on 2018-02-18.
+    This document describes version 0.241 of App::BencherUtils (from Perl
+    distribution App-BencherUtils), released on 2018-04-03.
 
 SYNOPSIS
 DESCRIPTION
@@ -122,11 +122,25 @@ FUNCTIONS
 
     and running that scenario with "bencher".
 
+    To specify import arguments, you can use:
+
+     % bencher-module-startup-overhead Mod1 Mod2=arg1,arg2
+
+    which will translate to this Bencher scenario:
+
+     {
+         module_startup => 1,
+         participants => [
+             {module=>"Mod1"},
+             {module=>"Mod2", import_args=>'arg1,arg2'},
+         ],
+     }
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
-    *   modules* => *array[perl::modname]*
+    *   modules* => *array[perl::modargs]*
 
     *   with_process_size => *bool*
 

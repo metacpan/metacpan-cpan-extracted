@@ -1,0 +1,48 @@
+0.008   2018-04-06 (PERLANCAR) (unreleased)
+
+        - Rename dist/module from Finance-BTCIndo to Finance-Indodax.
+
+
+0.007   2017-12-09 (PERLANCAR)
+
+	- Allow 4- & 5-character currency (e.g. DOGE or WAVES).
+
+	- Log JSON & TAPI request/response.
+
+
+0.006   2017-11-24 (PERLANCAR)
+
+        - Pass 'pair' argument to cancelOrder trade API function.
+
+
+0.005   2017-06-03 (PERLANCAR)
+
+	- get_price_history(): add argument 'period' to allow getting all
+	  as well as daily data (using API chart_1d).
+
+
+0.004   2017-06-01 (PERLANCAR)
+
+	- Add method: get_price_history.
+
+
+0.003   2017-05-31 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention App::btcindo.
+
+
+0.002   2017-05-31 (PERLANCAR)
+
+	- Avoid perl undef warning.
+
+	- Fix API method name TransHistory -> transHistory (wrong
+	  bitcoin.co.id documentation).
+
+	- Handle (die) when API return non-success.
+
+
+0.001   2017-05-31 (PERLANCAR)
+
+        - First release.

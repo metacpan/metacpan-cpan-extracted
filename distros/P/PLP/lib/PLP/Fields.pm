@@ -105,8 +105,18 @@ are B<not> automatically url-decoded.
 
 =item C<%header>, C<%headers>
 
-In this hash, you can set headers. Underscores are converted to normal minus
-signs, so you can leave out quotes. The hash is case insensitive: the case used
+This is a hash of HTTP headers to accompany the first output.
+By default it will contain C<X-PLP-Version> to identify the serving module,
+and C<Content-Type> set to C<text/html>.
+
+If STDOUT has been opened as :utf8,
+a C<charset=utf-8> attribute will automatically be added.
+This will not be possible with FastCGI
+because FCGI (as of version 0.74) does not support output layers.
+
+Headers can be added and/or changed as long as they have not yet been sent.
+Underscores in key names are converted to normal minus signs,
+so you can leave out quotes.  The hash is case insensitive: the case used
 when sending the headers is the one you used first. The following are equal:
 
     $header{CONTENT_TYPE}
@@ -117,6 +127,15 @@ when sending the headers is the one you used first. The following are equal:
 If a value contains newlines, the header is repeated for each line:
 
 	$header{Allow} = "HEAD\nGET";  # equivalent to HEAD,GET
+
+For example, to send out a non-HTML text instead of the default HTML:
+
+    <:
+    $header{content_type} = 'text/plain';
+    use open ':std', ':utf8';
+    :>
+    This text should be prefixed by the following header:
+        Content-Type: text/plain; charset=utf-8
 
 =back
 

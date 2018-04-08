@@ -175,5 +175,5 @@ requires:
   XSLoader: '0'
   YAML::Tiny: '0'
   perl: v5.10.0
-version: '0.605'
+version: '0.606'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

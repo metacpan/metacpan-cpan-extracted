@@ -1,10 +1,7 @@
 # -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
 # vim:ts=8:sw=2:et:sta:sts=2
 #########
-# Author:        rmp
-# Last Modified: $Date: 2013-12-26 22:25:17 +0000 (Thu, 26 Dec 2013) $
-# Id:            $Id: ADI.pm 344 2013-12-26 22:25:17Z rmp $
-# $HeadURL: svn+ssh://psyphi.net/repository/svn/iotamarathon/trunk/lib/Ham/ADIF/ADI.pm $
+# Author: rmp
 #
 package Ham::ADIF::ADI;
 use strict;
@@ -15,7 +12,7 @@ use base qw(Ham::ADIF);
 use IO::File;
 use English qw(-no_match_vars);
 
-our $VERSION = do { my ($r) = q$Revision: 344 $ =~ /(\d+)/smx; $r; };
+our $VERSION = q[2018.03.31];
 
 sub parse_file {
   my ($self, $filename) = @_;
@@ -31,7 +28,7 @@ sub parse_file {
   my $recs        = [];
 
   while(my $line = <$io>) {
-    if($line =~ m{<EOR>}) {
+    if($line =~ m{<EOR>}smx) {
       #########
       # JA1NLX - ADI with no header
       #
@@ -86,7 +83,7 @@ sub _process_header {
       next;
     }
 
-    my ($tagname, $length, $datatype, $value, $enum) = $tag =~ m{<(.*?):(\d+)(?::(.*?))?>(.*?)(?:,{(.*?)})?$}smix;
+    my ($tagname, $length, $datatype, $value, $enum) = $tag =~ m{<(.*?):(\d+)(?::(.*?))?>(.*?)(?:,[{](.*?)[}])?$}smix;
     if(!$tagname) {
       next;
     }

@@ -1,3 +1,17 @@
+0.2.3   2018-04-03 (PERLANCAR)
+
+	- No spec changes.
+
+	- Remove recommendation to avoid regex modifier.
+
+	- Add recommendation to add 'capturing' tag if pattern has capture
+	  groups.
+
+	- Tweak Abstract and fix grammar in Description.
+
+	- Some fixes.
+
+
 0.2.2   2018-03-24 (PERLANCAR)
 
 	- No spec changes.

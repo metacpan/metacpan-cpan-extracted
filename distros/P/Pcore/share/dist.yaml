@@ -1,0 +1,14 @@
+name: Pcore
+author: zdm <zdm@softvisio.net>
+copyright_holder: zdm
+
+# https://metacpan.org/pod/Software::License#SEE-ALSO
+license: Perl_5
+
+# is the CPAN distributive
+cpan: 1
+
+# paths to skip while create the CPAN distributive
+cpan_manifest_skip:
+    - \Ashare/data/tld[.]dat\z
+    - \Ashare/data/pub_suffix[.]dat\z

@@ -1,4 +1,4 @@
-# SMB Perl library, Copyright (C) 2014 Mikhael Goikhman, migo@cpan.org
+# SMB Perl library, Copyright (C) 2014-2018 Mikhael Goikhman, migo@cpan.org
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,16 +28,11 @@ sub new ($%) {
 	my $class = shift;
 	my %options = @_;
 
-	my $quiet   = $options{quiet}   ||= 0;
-	my $verbose = $options{verbose} ||= 0;
-
 	my %client_options = map { $_ => delete $options{$_} }
-		qw(server_addr server_username server_password quiet verbose);
+		qw(server_addr server_username server_password);
 
 	my $self = $class->SUPER::new(
 		%options,
-		quiet          => $quiet,
-		verbose        => $verbose,
 		share_roots    => '-',
 		client_options => \%client_options,
 	);
@@ -53,8 +48,8 @@ sub on_connect ($$) {
 	my %options = %{$self->{client_options}};
 	my $client = SMB::Client->new(
 		$options{server_addr},
-		quiet    => $options{quiet},
-		verbose  => $options{verbose},
+		quiet    => $self->quiet,
+		verbose  => $self->verbose,
 		username => $options{server_username},
 		password => $options{server_password},
 		just_socket => 1,

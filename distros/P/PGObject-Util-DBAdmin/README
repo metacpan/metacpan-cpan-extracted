@@ -13,6 +13,21 @@ To install this module, run the following commands:
 	make test
 	make install
 
+
+TESTING
+
+By default, tests which interact with a database are not run. To run the
+full test suite, set environment variable DB_TESTING=1.  The database
+password may be set with environment variable PGPASSWORD.
+
+For example:
+
+	 DB_TESTING=1 PGPASSWORD=XXXXX make test
+
+Database tests are run using a database named `pgobject_test_db`, which
+will be dropped if it already exists.
+
+
 SUPPORT AND DOCUMENTATION
 
 After installing, you can find documentation for this module with the
@@ -34,10 +49,13 @@ You can also look for information at:
     Search CPAN
         http://search.cpan.org/dist/PGObject-Util-DBAdmin/
 
+    GitHub source code repository (contribute patches here)
+        https://github.com/ledgersmb/PGObject-Util-DBAdmin
+
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2014-2016 Chris Travers
+Copyright (C) 2014-2018 Chris Travers
 
 This program is distributed under the (Revised) BSD License:
 L<http://www.opensource.org/licenses/BSD-3-Clause>

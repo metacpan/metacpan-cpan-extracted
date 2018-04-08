@@ -19,7 +19,7 @@ use Digest::SHA1;
 use File::Glob;
 use Hash::Util qw( lock_hashref unlock_hashref lock_ref_keys );
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -32,9 +32,14 @@ our @EXPORT = qw(
               file_atime
               file_size
 
+              file_path
+              file_name
+              file_name_ext
+              file_ext
+
               dir_path_make
               dir_path_ensure
-
+              
               str2hash 
               hash2str
 
@@ -65,6 +70,7 @@ our @EXPORT = qw(
 
               str_num_comma
               str_pad
+              str_pad_center
               str_countable
               
               perl_package_to_file
@@ -137,6 +143,31 @@ sub file_size
 
 ##############################################################################
 
+sub file_path
+{
+  return $_[0] =~ /((^|.*?)\/)([^\/]*)$/ ? $1 : undef;
+}
+
+sub file_name
+{
+  # return full name with leadeing dot for dot-files ( .filename )
+  return $_[0] =~ /(^|\/)([^\/]+?)(\.([^\.\/]+))?$/ ? $2 : undef;
+}
+
+sub file_name_ext
+{
+  # return full name with leadeing dot for dot-files ( .filename )
+  return $_[0] =~ /(^|\/)([^\/]+)$/ ? $2 : undef;
+}
+
+sub file_ext
+{
+  # return undef for dot-files ( .filename )
+  return $_[0] =~ /[^\/]\.([^\.\/]+)$/ ? $1 : undef;
+}
+
+##############################################################################
+
 sub dir_path_make
 {
   my $path = shift;
@@ -166,7 +197,7 @@ sub dir_path_ensure
   my $dir = shift;
   my %opt = @_;
 
-  dir_path_make( $dir, $opt{ 'MASK' } ) unless -d $dir;
+  dir_path_make( $dir, @_ ) unless -d $dir;
   return undef unless -d $dir;
   return $dir;
 }
@@ -265,6 +296,21 @@ sub str_pad
   $str = reverse $str if $len < 0;
   $str = substr( $str . ($pad x abs($len)), 0, abs($len) );
   $str = reverse $str if $len < 0;
+
+  return $str;
+}
+
+sub str_pad_center
+{
+  my $str = shift;
+  my $len = shift;
+  my $pad = shift;
+  $pad = ' ' unless defined $pad;
+
+  my $padlen = int((abs($len) - length($str))/2);
+  my $padding = $pad x $padlen if $padlen > 0;
+  
+  $str = substr( $padding . $str . $padding . $pad, 0, abs($len) );
 
   return $str;
 }
@@ -578,7 +624,7 @@ sub read_dir_entries
   my $p = shift; # path
   
   opendir( my $dir, $p ) or return undef;
-  my @e = sort grep { !/^\./ } readdir $dir;
+  my @e = sort grep { !/^\.\.?$/ } readdir $dir;
   closedir( $dir );
   
   return @e;
@@ -621,6 +667,18 @@ INIT  { __url_escapes_init(); }
   my $res  = dir_path_make( '/path/to/somewhere' ); # create full path with 0700
   my $res  = dir_path_make( '/new/path', MASK => 0755 ); # ...with mask 0755
   my $path = dir_path_ensure( '/path/s/t/h' ); # ensure path exists, check+make
+
+  # --------------------------------------------------------------------------
+
+  my $path_with_trailing_slash = file_path( $full_path_or_file_name );
+
+  # file_name() and file_name_ext() return full name with leadeing 
+  # dot for dot-files ( .filename )
+  my $file_name_including_ext  = file_name_ext( $full_path_or_file_name );
+  my $file_name_only_no_ext    = file_name( $full_path_or_file_name );
+
+  # file_ext() returns undef for dot-files ( .filename )
+  my $file_ext_only            = file_ext( $full_path_or_file_name );
 
   # --------------------------------------------------------------------------
   

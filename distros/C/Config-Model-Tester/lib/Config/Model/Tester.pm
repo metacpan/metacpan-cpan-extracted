@@ -9,7 +9,7 @@
 #
 package Config::Model::Tester;
 # ABSTRACT: Test framework for Config::Model
-$Config::Model::Tester::VERSION = '3.004';
+$Config::Model::Tester::VERSION = '3.005';
 use warnings;
 use strict;
 use locale;
@@ -26,6 +26,10 @@ use Test::Exception;
 use Test::File::Contents ;
 use Test::Differences;
 use Test::Memory::Cycle ;
+use Test::Log::Log4perl;
+
+Test::Log::Log4perl->ignore_priority("info");
+
 
 # use eval so this module does not have a "hard" dependency on Config::Model
 # This way, Config::Model can build-depend on Config::Model::Tester without
@@ -149,9 +153,14 @@ sub write_config_file {
 sub check_load_warnings {
     my ($root,$t) = @_ ;
 
-    if ( ($t->{no_warnings} or exists $t->{load_warnings}) and not defined $t->{load_warnings}) {
+    if ( my $info = $t->{log4perl_load_warnings} or $::_use_log4perl_to_warn) {
+        my $tw = Test::Log::Log4perl->expect( @{ $info // [] } );
+        $root->init;
+    }
+    elsif ( ($t->{no_warnings} or exists $t->{load_warnings}) and not defined $t->{load_warnings}) {
         local $Config::Model::Value::nowarning = 1;
         $root->init;
+        note("load_warnings param is DEPRECATED. Please use log4perl_load_warnings");
         ok( 1,"Read configuration and created instance with init() method without warning check" );
     }
     else {
@@ -169,7 +178,13 @@ sub run_update {
     local $Config::Model::Value::nowarning = $args{no_warnings} || $t->{no_warnings} || 0;
 
     my $res ;
-    if (my $uw = delete $args{update_warnings}) {
+    if ( my $info = $t->{log4perl_update_warnings}) {
+        my $tw = Test::Log::Log4perl->expect( $info );
+        note("updating config with log4perl warning check and args: ". join(' ',%args));
+        $res = $inst->update( from_dir => $dir, %args ) ;
+    }
+    elsif (my $uw = delete $args{update_warnings}) {
+        note("update_warnings param is DEPRECATED. Please use log4perl_update_warnings");
         note("updating config with warning check and args: ". join(' ',%args));
         warnings_like { $res = $inst->update( from_dir => $dir, %args ); } $uw,
             "Updated configuration with warning check ";
@@ -183,7 +198,7 @@ sub run_update {
         is($res,$ret,"updated configuration, got expected return value");
     }
     else {
-        ok(1,"updated configuration");
+        ok(1,"dumped configuration");
     }
 }
 
@@ -223,12 +238,19 @@ sub dump_tree {
         }
     }
 
-    if ( ($no_warnings or (exists $t->{dump_warnings}) and not defined $t->{dump_warnings}) ) {
+    if ( my $info = $t->{log4perl_dump_warnings} or $::_use_log4perl_to_warn) {
+        note("checking logged warning while dumping");
+        my $tw = Test::Log::Log4perl->expect( @{$info // [] } );
+        $risky->();
+    }
+    elsif ( ($no_warnings or (exists $t->{dump_warnings}) and not defined $t->{dump_warnings}) ) {
         local $Config::Model::Value::nowarning = 1;
+        note("dump_warnings parameter is DEPRECATED");
         &$risky;
         ok( 1, "Ran dump_tree (no warning check)" );
     }
     else {
+        note("dump_warnings parameter is DEPRECATED");
         warnings_like { &$risky; } $t->{dump_warnings}, "Ran dump_tree";
     }
     ok( $dump, "Dumped $app_to_test config tree in $mode mode" );
@@ -634,7 +656,7 @@ Config::Model::Tester - Test framework for Config::Model
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 
@@ -915,7 +937,28 @@ C<< load_check => 'no' >> if your file is not valid.
 
 =item *
 
-Check for config data warning. You should pass the list of expected warnings.
+Check for config data warnings. You should pass the list of expected warnings that are
+emitted through L<Log::Log4Perl>. The array ref is passed as is to the C<expect> function
+of L<Test::Log::Lo4Perl/expect>. E.g:
+
+    log4perl_load_warnings => [
+         [ 'Tree.Node', (warn => qr/deprecated/) x 2 ]  ,
+         [ 'Tree.Element.Value' , ( warn => qr/skipping/) x 2 ]
+    ]
+
+The Log classes are specified in C<cme/Logging>.
+
+Log levels below "warn" are ignored.
+
+L<Config::Model> is currently transitioning from traditional "warn" to
+warn logs. To avoid breaking all tests based on this module, the
+warnings are emitted through L<Log::Log4Perl> only when
+c<$::_use_log4perl_to_warn> is set. This hack will be removed once all
+warnings checks in tests are ported to log4perl checks.
+
+=item *
+
+DEPRECATED. Check for config data warning. You should pass the list of expected warnings.
 E.g.
 
     load_warnings => [ qr/Missing/, (qr/deprecated/) x 3 , ],
@@ -930,7 +973,7 @@ Optionally run L<update|App::Cme::Command::update> command:
          [ returns => 'foo' , ]
          no_warnings => [ 0 | 1 ], # default 0
          quiet => [ 0 | 1], # default 0, passed to update method
-         update_warnings => [ qr/.../, ]
+         loag4perl_update_warnings => [ ... ] # Test::Log::Log4Perl::expect arguments
  }
 
 Where:
@@ -953,7 +996,14 @@ C<quiet> to suppress progress messages during update.
 
 =item *
 
-C<update_warnings> is an array ref of quoted regexp (See qr operator)
+C<log4perl_update_warnings> is used to check the warnings produced
+ during update. The argument is passed to C<expect> function of
+ L<Test::Log::Log4Perl>. See C<load_warnings> parameter above for more
+ details.
+
+=item *
+
+DEPRECATED. C<update_warnings> is an array ref of quoted regexp (See qr operator)
 to check the warnings produced during update. use C<< update => [] >>
 to check that no warnings are issued during update.
 
@@ -977,7 +1027,7 @@ warning messages:
 
    check_before_fix => {
       dump_errors   => [ ... ] # optional, see below
-      dump_warnings => [ ... ] # optional, see below
+      load4perl_dump_warnings => [ ... ] # optional, see below
    }
 
 Use C<dump_errors> if you expect issues:
@@ -990,20 +1040,16 @@ Use C<dump_errors> if you expect issues:
     ],
   }
 
-Likewise, specify any expected warnings (note the list must contain
-only ref to regular expressions):
+Likewise, specify any expected warnings:
 
   check_before_fix => {
-        dump_warnings => [ (qr/deprecated/) x 3 ],
+        log4perl_dump_warnings => [ ... ],
   }
 
-You can tolerate any dump warning this way:
+C<log4perl_dump_warnings> passes the array ref content to C<expect>
+function of L<Test::Log::Log4Perl>.
 
-  check_before_fix => {
-        dump_warnings => undef ,
-  }
-
-Both C<dump_warnings> and C<dump_errors> can be specified in C<check_before_fix> hash.
+Both C<log4perl_dump_warnings> and C<dump_errors> can be specified in C<check_before_fix> hash.
 
 =item *
 

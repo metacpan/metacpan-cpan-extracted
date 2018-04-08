@@ -4,14 +4,14 @@ JSONAPI::Document - Turn DBIx results into JSON API documents.
 
 # VERSION
 
-version 0.4
+version 1.0
 
 # SYNOPSIS
 
     use JSONAPI::Document;
     use DBIx::Class::Schema;
 
-    my $jsonapi = JSONAPI::Document->new();
+    my $jsonapi = JSONAPI::Document->new({ api_url => 'http://example.com/api' });
     my $schema = DBIx::Class::Schema->connect(['dbi:SQLite:dbname=:memory:', '', '']);
     my $user = $schema->resultset('User')->find(1);
 
@@ -44,6 +44,10 @@ while keeping relationship names intact (i.e. an 'author' relationship will stil
 
 # ATTRIBUTES
 
+## api\_url
+
+Required; An absolute URL pointing to your servers JSON API namespace.
+
 ## kebab\_case\_attrs
 
 Boolean attribute; setting this will make the column keys for each document into
@@ -67,14 +71,12 @@ along with the data of all its relationships.
 Returns a _HashRef_ with the following structure:
 
     {
-        data => [
-            {
-                id => 1,
-                type => 'authors',
-                attributes => {},
-                relationships => {},
-            }
-        ],
+        data => {
+            id => 1,
+            type => 'authors',
+            attributes => {},
+            relationships => {},
+        },
         included => [
             {
                 id => 1,
@@ -110,12 +112,25 @@ Returns a _HashRef_ with the following structure:
 
 View the resource document specification [here](http://jsonapi.org/format/#document-resource-objects).
 
+Uses [Lingua::EN::Segment](https://metacpan.org/pod/metacpan.org#pod-Lingua::EN::Segment) to set the appropriate type of the
+document. This is a bit expensive, but it ensures that your schema results source name gets hyphenated
+appropriately when converted into its plural form. The resulting type is cached eternally into memory
+(sorry) to minimize the need to re-compute the document type.
+
 The following options can be given:
 
 - `with_relationships` _Bool_
 
     If true, will introspect the rows relationships and include each
     of them in the relationships key of the document.
+
+- `with_attributes` _Bool_
+
+    If `with_relationships` is true, for each resulting row of a relationship,
+    the attributes of that relation will be included.
+
+    By default, each relationship will contain a [links object](http://jsonapi.org/format/#document-links).
+    If this option is true, links object will be replaced with attributes.
 
 - `includes` _ArrayRef_
 

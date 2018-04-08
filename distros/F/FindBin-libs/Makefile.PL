@@ -7,7 +7,7 @@ use version;
 use Module::FromPerlVer;
 use ExtUtils::MakeMaker;
 
-my $version = '2.17.8'; 
+my $version = version->parse( '2.17.10' )->numify;
 my $mm_v    = ExtUtils::MakeMaker->VERSION;
 
 #my @merge_spec
@@ -32,7 +32,7 @@ my $mm_v    = ExtUtils::MakeMaker->VERSION;
 #            {
 #                qw
 #                (
-#                    Module::FromPerlVer 0.003,
+#                    Module::FromPerlVer 0.004,
 #                )
 #            },
 #        }
@@ -46,19 +46,17 @@ WriteMakefile
         NAME            FindBin::libs
         LICENSE         perl
     ),
-    VERSION         => version->parse( $version )->numify,
+    VERSION         => $version,
 	AUTHOR     	    => 'Steven Lembark <lembark@wrkhors.com>',
     PREREQ_PM       =>
     {
         # standard distro, particular versions 
         # are unlikely to cause pain.
-        #
-        # deal with meta-spec 2 once I can find a complete
-        # working example...
 
+        Cwd                     => version->parse( '3.73'  )->numify,
+        Module::FromPerlVer     => version->parse( '0.4.0' )->numify,
 		qw
         (
-            Cwd                     3.073
 
             Carp                    0
             File::Basename          0
@@ -66,10 +64,10 @@ WriteMakefile
             File::Temp              0
             FindBin                 0
             List::Util              0
-            Module::FromPerlVer     0
             Test::More              0
             Symbol                  0
             strict                  0
+            version                 0
         )
     },
 

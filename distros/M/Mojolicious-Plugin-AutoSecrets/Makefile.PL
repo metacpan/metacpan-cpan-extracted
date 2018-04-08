@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "Mojolicious" => "7.15",
     "Session::Token" => "1.503"
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }

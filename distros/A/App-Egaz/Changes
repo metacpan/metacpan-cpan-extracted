@@ -1,5 +1,27 @@
 Revision history for Perl extension App-Egaz
 
+0.0.14 2018-04-02T20:22:09Z
+    - Add `egaz multiz`
+    - Add normalize section to `egaz lastz`
+    - Add `share/check_dep.sh`
+    - Update README
+    - Install multiz to $HOME/bin on CI
+    - Add ladder() to Common.pm
+
+0.0.13 2018-04-01T17:32:38Z
+    - Add `egaz prepseq`
+    - Add `egaz lpcnam`
+    - Install lastz, faops and kent-tools to $HOME/bin on CI
+
+0.0.12 2018-03-30T12:11:11Z
+    - Add `egaz lastz`
+    - Use `abstract()` to replace `use constant abstract =>`
+
+0.0.11 2018-03-28T00:36:36Z
+    - Add `egaz plottree`
+    - Test installations of R and its packages
+    - Add `egaz blastn`
+
 0.0.10 2018-03-26T14:26:50Z
     - Add `egaz raxml`
     - Add exec_cmd() to Common.pm

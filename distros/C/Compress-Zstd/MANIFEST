@@ -47,6 +47,10 @@ ext/zstd/build/VS_scripts/build.VS2010.cmd
 ext/zstd/build/VS_scripts/build.VS2012.cmd
 ext/zstd/build/VS_scripts/build.VS2013.cmd
 ext/zstd/build/VS_scripts/build.VS2015.cmd
+ext/zstd/build/VS_scripts/build.VS2017.cmd
+ext/zstd/build/VS_scripts/build.VS2017Community.cmd
+ext/zstd/build/VS_scripts/build.VS2017Enterprise.cmd
+ext/zstd/build/VS_scripts/build.VS2017Professional.cmd
 ext/zstd/build/VS_scripts/build.generic.cmd
 ext/zstd/build/cmake/CMakeLists.txt
 ext/zstd/build/cmake/CMakeModules/AddZstdCompilationFlags.cmake
@@ -73,6 +77,8 @@ ext/zstd/contrib/adaptive-compression/datagencli.c
 ext/zstd/contrib/adaptive-compression/test-correctness.sh
 ext/zstd/contrib/adaptive-compression/test-performance.sh
 ext/zstd/contrib/cleanTabs
+ext/zstd/contrib/docker/Dockerfile
+ext/zstd/contrib/docker/README.md
 ext/zstd/contrib/gen_html/Makefile
 ext/zstd/contrib/gen_html/README.md
 ext/zstd/contrib/gen_html/gen-zstd-manual.sh
@@ -129,13 +135,6 @@ ext/zstd/contrib/linux-kernel/test/include/linux/types.h
 ext/zstd/contrib/linux-kernel/xxhash_test.c
 ext/zstd/contrib/linux-kernel/zstd_compress_test.c
 ext/zstd/contrib/linux-kernel/zstd_decompress_test.c
-ext/zstd/contrib/long_distance_matching/Makefile
-ext/zstd/contrib/long_distance_matching/README.md
-ext/zstd/contrib/long_distance_matching/ldm.c
-ext/zstd/contrib/long_distance_matching/ldm.h
-ext/zstd/contrib/long_distance_matching/ldm_common.c
-ext/zstd/contrib/long_distance_matching/ldm_params.h
-ext/zstd/contrib/long_distance_matching/main.c
 ext/zstd/contrib/meson/README
 ext/zstd/contrib/meson/meson.build
 ext/zstd/contrib/meson/meson_options.txt
@@ -183,15 +182,16 @@ ext/zstd/contrib/seekable_format/zstd_seekable.h
 ext/zstd/contrib/seekable_format/zstd_seekable_compression_format.md
 ext/zstd/contrib/seekable_format/zstdseek_compress.c
 ext/zstd/contrib/seekable_format/zstdseek_decompress.c
+ext/zstd/contrib/snap/snapcraft.yaml
 ext/zstd/doc/README.md
 ext/zstd/doc/educational_decoder/Makefile
 ext/zstd/doc/educational_decoder/README.md
 ext/zstd/doc/educational_decoder/harness.c
 ext/zstd/doc/educational_decoder/zstd_decompress.c
 ext/zstd/doc/educational_decoder/zstd_decompress.h
-ext/zstd/doc/images/Cspeed4.png
+ext/zstd/doc/images/CSpeed2.png
 ext/zstd/doc/images/DCspeed5.png
-ext/zstd/doc/images/Dspeed4.png
+ext/zstd/doc/images/DSpeed3.png
 ext/zstd/doc/images/dict-cr.png
 ext/zstd/doc/images/dict-cs.png
 ext/zstd/doc/images/dict-ds.png
@@ -199,8 +199,10 @@ ext/zstd/doc/images/ldmCspeed.png
 ext/zstd/doc/images/ldmDspeed.png
 ext/zstd/doc/images/linux-4.7-12-compress.png
 ext/zstd/doc/images/linux-4.7-12-decompress.png
+ext/zstd/doc/images/linux-4.7-12-mt-compress.png
 ext/zstd/doc/images/linux-git-compress.png
 ext/zstd/doc/images/linux-git-decompress.png
+ext/zstd/doc/images/linux-git-mt-compress.png
 ext/zstd/doc/images/zstd_logo86.png
 ext/zstd/doc/zstd_compression_format.md
 ext/zstd/doc/zstd_manual.html
@@ -219,6 +221,7 @@ ext/zstd/lib/Makefile
 ext/zstd/lib/README.md
 ext/zstd/lib/common/bitstream.h
 ext/zstd/lib/common/compiler.h
+ext/zstd/lib/common/cpu.h
 ext/zstd/lib/common/entropy_common.c
 ext/zstd/lib/common/error_private.c
 ext/zstd/lib/common/error_private.h
@@ -310,6 +313,7 @@ ext/zstd/programs/zstdgrep
 ext/zstd/programs/zstdless
 ext/zstd/tests/Makefile
 ext/zstd/tests/README.md
+ext/zstd/tests/checkTag.c
 ext/zstd/tests/datagencli.c
 ext/zstd/tests/decodecorpus.c
 ext/zstd/tests/files/huffman-compressed-larger
@@ -356,7 +360,6 @@ ext/zstd/tests/gzip/znew-k.sh
 ext/zstd/tests/invalidDictionaries.c
 ext/zstd/tests/legacy.c
 ext/zstd/tests/longmatch.c
-ext/zstd/tests/namespaceTest.c
 ext/zstd/tests/paramgrill.c
 ext/zstd/tests/playTests.sh
 ext/zstd/tests/poolTests.c

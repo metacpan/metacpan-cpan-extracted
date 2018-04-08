@@ -1,3 +1,8 @@
+0.012   2018-04-06 (PERLANCAR)
+
+	- [Bugfix] grepcoin: Forgot to update symbol -> code key.
+
+
 0.011   2018-03-08 (PERLANCAR)
 
 	- Update to newer CryptoCurrency::Catalog (symbol -> code).

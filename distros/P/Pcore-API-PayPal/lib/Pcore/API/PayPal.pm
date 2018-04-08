@@ -1,4 +1,4 @@
-package Pcore::API::PayPal v0.3.0;
+package Pcore::API::PayPal v0.3.1;
 
 use Pcore -dist, -class, -result, -const;
 use Pcore::Util::Data qw[from_json to_json to_b64];
@@ -43,133 +43,127 @@ sub _get_access_token ( $self, $cb ) {
 
 # https://developer.paypal.com/docs/api/payments/#payment_create
 sub create_payment ( $self, $payment, $cb ) {
-    $self->_get_access_token(
-        sub ($access_token) {
-            my $url = ( $self->{sandbox} ? $SANDBOX_ENDPOINT : $LIVE_ENDPOINT ) . '/v1/payments/payment';
+    $self->_get_access_token( sub ($access_token) {
+        my $url = ( $self->{sandbox} ? $SANDBOX_ENDPOINT : $LIVE_ENDPOINT ) . '/v1/payments/payment';
 
-            P->http->post(
-                $url,
-                headers => {
-                    CONTENT_TYPE  => 'application/json',
-                    ACCCEPT       => 'application/json',
-                    AUTHORIZATION => "$access_token->{token_type} $access_token->{access_token}",
-                },
-                body      => to_json($payment),
-                on_finish => sub ($res) {
-                    my $api_res;
+        P->http->post(
+            $url,
+            headers => {
+                CONTENT_TYPE  => 'application/json',
+                ACCCEPT       => 'application/json',
+                AUTHORIZATION => "$access_token->{token_type} $access_token->{access_token}",
+            },
+            body      => to_json($payment),
+            on_finish => sub ($res) {
+                my $api_res;
 
-                    if ( !$res ) {
-                        my $data = $res->body ? from_json $res->body : {};
+                if ( !$res ) {
+                    my $data = $res->body ? from_json $res->body : {};
 
-                        $api_res = result [ $res->status, $data->{message} // $res->reason ];
+                    $api_res = result [ $res->status, $data->{message} // $res->reason ];
+                }
+                else {
+                    my $data = from_json $res->body;
+
+                    if ( $data->{state} eq 'failed' ) {
+                        $api_res = result [ 400, $data->{failure_reason} ], $data;
                     }
                     else {
-                        my $data = from_json $res->body;
-
-                        if ( $data->{state} eq 'failed' ) {
-                            $api_res = result [ 400, $data->{failure_reason} ], $data;
-                        }
-                        else {
-                            $api_res = result 200, $data;
-                        }
+                        $api_res = result 200, $data;
                     }
-
-                    $cb->($api_res);
-
-                    return;
                 }
-            );
 
-            return;
-        }
-    );
+                $cb->($api_res);
+
+                return;
+            }
+        );
+
+        return;
+    } );
 
     return;
 }
 
 # https://developer.paypal.com/docs/api/payments/#payment_execute
 sub exec_payment ( $self, $payment_id, $payer_id, $cb ) {
-    $self->_get_access_token(
-        sub ($access_token) {
-            my $url = ( $self->{sandbox} ? $SANDBOX_ENDPOINT : $LIVE_ENDPOINT ) . "/v1/payments/payment/$payment_id/execute";
+    $self->_get_access_token( sub ($access_token) {
+        my $url = ( $self->{sandbox} ? $SANDBOX_ENDPOINT : $LIVE_ENDPOINT ) . "/v1/payments/payment/$payment_id/execute";
 
-            P->http->post(
-                $url,
-                headers => {
-                    CONTENT_TYPE  => 'application/json',
-                    ACCCEPT       => 'application/json',
-                    AUTHORIZATION => "$access_token->{token_type} $access_token->{access_token}",
-                },
-                body      => to_json( { payer_id => $payer_id } ),
-                on_finish => sub ($res) {
-                    my $api_res;
+        P->http->post(
+            $url,
+            headers => {
+                CONTENT_TYPE  => 'application/json',
+                ACCCEPT       => 'application/json',
+                AUTHORIZATION => "$access_token->{token_type} $access_token->{access_token}",
+            },
+            body      => to_json( { payer_id => $payer_id } ),
+            on_finish => sub ($res) {
+                my $api_res;
 
-                    if ( !$res ) {
-                        my $data = $res->body ? from_json $res->body : {};
+                if ( !$res ) {
+                    my $data = $res->body ? from_json $res->body : {};
 
-                        $api_res = result [ $res->status, $data->{message} // $res->reason ];
+                    $api_res = result [ $res->status, $data->{message} // $res->reason ];
+                }
+                else {
+                    my $data = from_json $res->body;
+
+                    if ( $data->{state} eq 'failed' ) {
+                        $api_res = result [ 400, $data->{failure_reason} ], $data;
                     }
                     else {
-                        my $data = from_json $res->body;
-
-                        if ( $data->{state} eq 'failed' ) {
-                            $api_res = result [ 400, $data->{failure_reason} ], $data;
-                        }
-                        else {
-                            $api_res = result 200, $data;
-                        }
+                        $api_res = result 200, $data;
                     }
-
-                    $cb->($api_res);
-
-                    return;
                 }
-            );
 
-            return;
-        }
-    );
+                $cb->($api_res);
+
+                return;
+            }
+        );
+
+        return;
+    } );
 
     return;
 }
 
 # https://developer.paypal.com/docs/api/payments.payouts-batch#payouts
 sub payout ( $self, $payment, $cb ) {
-    $self->_get_access_token(
-        sub ($access_token) {
-            my $url = ( $self->{sandbox} ? $SANDBOX_ENDPOINT : $LIVE_ENDPOINT ) . '/v1/payments/payouts?sync_mode=true';
+    $self->_get_access_token( sub ($access_token) {
+        my $url = ( $self->{sandbox} ? $SANDBOX_ENDPOINT : $LIVE_ENDPOINT ) . '/v1/payments/payouts?sync_mode=true';
 
-            P->http->post(
-                $url,
-                headers => {
-                    CONTENT_TYPE  => 'application/json',
-                    ACCCEPT       => 'application/json',
-                    AUTHORIZATION => "$access_token->{token_type} $access_token->{access_token}",
-                },
-                body      => to_json($payment),
-                on_finish => sub ($res) {
-                    my $api_res;
+        P->http->post(
+            $url,
+            headers => {
+                CONTENT_TYPE  => 'application/json',
+                ACCCEPT       => 'application/json',
+                AUTHORIZATION => "$access_token->{token_type} $access_token->{access_token}",
+            },
+            body      => to_json($payment),
+            on_finish => sub ($res) {
+                my $api_res;
 
-                    if ( !$res ) {
-                        my $data = $res->body ? from_json $res->body : {};
+                if ( !$res ) {
+                    my $data = $res->body ? from_json $res->body : {};
 
-                        $api_res = result [ $res->status, $res->reason ], $data;
-                    }
-                    else {
-                        my $data = from_json $res->body;
-
-                        $api_res = result 200, $data;
-                    }
-
-                    $cb->($api_res);
-
-                    return;
+                    $api_res = result [ $res->status, $res->reason ], $data;
                 }
-            );
+                else {
+                    my $data = from_json $res->body;
 
-            return;
-        }
-    );
+                    $api_res = result 200, $data;
+                }
+
+                $cb->($api_res);
+
+                return;
+            }
+        );
+
+        return;
+    } );
 
     return;
 }
@@ -181,7 +175,7 @@ sub payout ( $self, $payment, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 91                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 89                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

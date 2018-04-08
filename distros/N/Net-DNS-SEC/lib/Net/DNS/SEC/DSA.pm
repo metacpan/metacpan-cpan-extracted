@@ -1,9 +1,9 @@
 package Net::DNS::SEC::DSA;
 
 #
-# $Id: DSA.pm 1626 2018-01-31 09:48:15Z willem $
+# $Id: DSA.pm 1660 2018-04-03 14:12:42Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1626 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1660 $)[1];
 
 
 =head1 NAME
@@ -44,7 +44,6 @@ public key resource record.
 use strict;
 use integer;
 use warnings;
-use Carp;
 use Digest::SHA;
 use MIME::Base64;
 

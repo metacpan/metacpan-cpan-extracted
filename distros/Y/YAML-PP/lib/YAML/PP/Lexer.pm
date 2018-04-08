@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Lexer;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use constant TRACE => $ENV{YAML_PP_TRACE};
 use constant DEBUG => $ENV{YAML_PP_DEBUG} || $ENV{YAML_PP_TRACE};
@@ -182,8 +182,7 @@ sub _fetch_next_tokens_plain {
         $ws = $1;
     }
     if ($content =~ s/\A(#.*)\z//) {
-        $self->push_tokens( [ COMMENT => $spaces . $ws . $1 ]);
-        $self->push_tokens( [ EOL => '' ]);
+        $self->push_tokens( [ COMMENT => $spaces . $ws . $1, EOL => '' ]);
         $self->set_context('normal');
         return;
     }
@@ -192,50 +191,52 @@ sub _fetch_next_tokens_plain {
         $self->push_tokens( [ EOL => $spaces . $ws ] );
         return;
     }
-    $self->push_tokens( [ INDENT => $spaces ]);
+    my @tokens;
+    push @tokens, INDENT => $spaces;
+    push @tokens, WS => $ws;
 
+    my $RE = $RE_PLAIN_WORDS2;
+    if ($self->flowcontext) {
+        $RE = $RE_PLAIN_WORDS_FLOW2;
+    }
 
-
-        $self->push_tokens( [ WS => $ws ]);
-
-        my $RE = $RE_PLAIN_WORDS2;
+    if ($content =~ s/\A($RE)//) {
+        my $string = $1;
+        push @tokens, PLAIN => $string;
+        my $ws = '';
+        if ($content =~ s/\A($RE_WS+)//) {
+            $ws = $1;
+        }
+        if ($content =~ s/\A(#.*)\z//) {
+            push @tokens, COMMENT => $ws . $1;
+            push @tokens, EOL => '';
+            $self->set_context('normal');
+            $self->push_tokens( \@tokens );
+            return;
+        }
+        if (length $content) {
+            push @tokens, WS => $ws if $ws;
+            $self->set_context('normal');
+            $next_line->[0] = '';
+            $next_line->[1] = $content;
+            $self->push_tokens( \@tokens );
+            $self->_fetch_next_tokens(1, $indent, $next_line);
+            return;
+        }
+        push @tokens, EOL => $ws;
+    }
+    else {
         if ($self->flowcontext) {
-            $RE = $RE_PLAIN_WORDS_FLOW2;
+            $self->set_context('normal');
+            $next_line->[0] = '';
+            $next_line->[1] = $content;
+            $self->push_tokens( \@tokens );
+            $self->_fetch_next_tokens(1, $indent, $next_line);
+            return;
         }
-
-        if ($content =~ s/\A($RE)//) {
-            my $string = $1;
-            $self->push_tokens( [ PLAIN => $string ]);
-            my $ws = '';
-            if ($content =~ s/\A($RE_WS+)//) {
-                $ws = $1;
-            }
-            if ($content =~ s/\A(#.*)\z//) {
-                $self->push_tokens( [ COMMENT => $ws . $1 ]);
-                $self->push_tokens( [ EOL => '' ]);
-                $self->set_context('normal');
-                return;
-            }
-            if (length $content) {
-                $self->push_tokens( [ WS => $ws ]) if $ws;
-                $self->set_context('normal');
-                $next_line->[0] = '';
-                $next_line->[1] = $content;
-                $self->_fetch_next_tokens(1, $indent, $next_line);
-                return;
-            }
-            $self->push_tokens( [ EOL => $ws ]);
-        }
-        else {
-            if ($self->flowcontext) {
-                $self->set_context('normal');
-                $next_line->[0] = '';
-                $next_line->[1] = $content;
-                $self->_fetch_next_tokens(1, $indent, $next_line);
-                return;
-            }
-            $self->push_tokens( [ ERROR => $content ]);
-        }
+        push @tokens, ERROR => $content;
+    }
+    $self->push_tokens( \@tokens );
 }
 
 sub fetch_next_line {
@@ -410,6 +411,7 @@ sub _fetch_next_tokens {
                 return 1;
             }
             else {
+                push @tokens, ( $token_name2 => $quoted );
                 push @tokens, ( 'Invalid quoted string' => $$yaml );
                 $self->push_tokens(\@tokens);
                 return;
@@ -570,6 +572,7 @@ sub _fetch_next_tokens_quoted {
         $self->push_tokens(\@tokens);
     }
     else {
+        push @tokens, ( $token_name2 => $quoted );
         push @tokens, ( 'Invalid quoted string' => $$yaml );
         $self->push_tokens(\@tokens);
     }
@@ -591,7 +594,13 @@ sub _fetch_next_tokens_directive {
     }
     elsif ($$yaml =~ s/\A(\s*\A%(?:\w+).*)//) {
         push @tokens, ( RESERVED_DIRECTIVE => $1 );
-        warn "Found reserved directive '$1'";
+        my $warn = $ENV{YAML_PP_RESERVED_DIRECTIVE} || 'warn';
+        if ($warn eq 'warn') {
+            warn "Found reserved directive '$1'";
+        }
+        elsif ($warn eq 'fatal') {
+            die "Found reserved directive '$1'";
+        }
     }
     else {
         push @tokens, ( 'Invalid directive' => $$yaml );
@@ -635,6 +644,16 @@ sub push_tokens {
     my $line = $self->line;
 
     my $column = 0;
+
+    if (@$next) {
+        my $previous = $next->[-1];
+        if ($previous->{name} ne 'EOL') {
+            my $C = $previous->{column} + length( $previous->{value} );
+            # TODO
+#            $column = $C;
+        }
+    }
+
     for (my $i = 0; $i < @$new_tokens; $i += 2) {
         my $name = $new_tokens->[ $i ];
         my $value = $new_tokens->[ $i + 1 ];

@@ -1,13 +1,14 @@
 package Monkey::Patch::Action::Handle;
 
+our $DATE = '2018-04-02'; # DATE
+our $VERSION = '0.061'; # VERSION
+
 use 5.010;
 use strict;
 use warnings;
 
 use Scalar::Util qw(weaken);
 use Sub::Delete;
-
-our $VERSION = '0.05'; # VERSION
 
 my %stacks;
 
@@ -122,7 +123,7 @@ Monkey::Patch::Action::Handle
 
 =head1 VERSION
 
-This document describes version 0.05 of Monkey::Patch::Action::Handle (from Perl distribution Monkey-Patch-Action), released on 2017-07-04.
+This document describes version 0.061 of Monkey::Patch::Action::Handle (from Perl distribution Monkey-Patch-Action), released on 2018-04-02.
 
 =for Pod::Coverage .*
 
@@ -132,7 +133,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Monkey-Pat
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Monkey-Patch-Action>.
+Source repository is at L<https://github.com/perlancar/perl-Monkey-Patch-Action>.
 
 =head1 BUGS
 
@@ -148,7 +149,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

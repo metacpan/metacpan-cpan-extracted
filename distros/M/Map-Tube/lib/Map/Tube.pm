@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.45';
+$Map::Tube::VERSION   = '3.49';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.45
+Version 3.49
 
 =cut
 
@@ -426,6 +426,40 @@ sub get_stations {
     }
 
     return $stations;
+}
+
+=head2 get_next_stations($station_name)
+
+Returns ref to a list of next stations from the given C<$station_name> as objects
+of type L<Map::Tube::Node>.
+
+=cut
+
+sub get_next_stations {
+    my ($self, $station_name) = @_;
+
+    my @caller = caller(0);
+    @caller    = caller(2) if $caller[3] eq '(eval)';
+    Map::Tube::Exception::MissingStationName->throw({
+        method      => __PACKAGE__."::get_next_stations",
+        message     => "ERROR: Missing Station Name.",
+        filename    => $caller[1],
+        line_number => $caller[2] }) unless defined $station_name;
+
+    my $node_id = $self->_get_node_id($station_name);
+    Map::Tube::Exception::InvalidStationName->throw({
+        method      => __PACKAGE__."::get_next_stations",
+        message     => "ERROR: Invalid Station Name [$station_name].",
+        filename    => $caller[1],
+        line_number => $caller[2] }) unless defined $node_id;
+
+    my $nodes = [];
+    my $node  = $self->get_node_by_id($node_id);
+    foreach my $link (split /,/,$node->{link}) {
+        push @$nodes, $self->get_node_by_id($link);
+    }
+
+    return $nodes;
 }
 
 #

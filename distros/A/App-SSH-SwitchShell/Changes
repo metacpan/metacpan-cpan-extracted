@@ -1,5 +1,11 @@
 Revision history for App-SSH-SwitchShell
 
+0.006  2018-04-02 23:12:22 UTC
+
+  - No code changes
+  - Distribution cleanup
+  - Bumped dependency on Moose to 2.1203
+
 0.005  2017-09-27 17:42:12 UTC
 
   - Add a "use lib qw(.)" to all tests that require bin/sshss

@@ -1,0 +1,248 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Memorator::Backend - backend base class for Memorator
+
+=head1 SYNOPSIS
+
+   # meant to be used as a base class
+   package Memorator::Backend::Whatever;
+   use Mojo::Base 'Memorator::Backend';
+
+   # this method is required, example taken from M::B::Mojo::Pg
+   sub migration {
+      my $self = shift;
+      my $table = $self->table_name;
+      return <<"END";
+   -- 1 up
+   CREATE TABLE IF NOT EXISTS $table (
+      id     bigserial NOT NULL PRIMARY KEY,
+      eid    text      NOT NULL,
+      jid    bigint    NOT NULL,
+      active int       NOT NULL DEFAULT 1
+   );
+   -- 1 down
+   DROP TABLE $table;
+   END
+   }
+
+   1;
+
+=head1 DESCRIPTION
+
+This is a base class for L<Memorator> backends. A backend encapsulates all
+interactions with a database, most probably with a C<Mojo::*> kind of
+database, like L<Mojo::Pg> and L<Mojo::SQLite> (which are supported
+directly by this distribution). As such, it is of interest only if you
+want to realize a new backend.
+
+When you derive a class, you MUST either provide the C<migration> method,
+or overload the L</ensure_table> method. This will make sure that the
+needed mapping table is properly initialized in the database, with the
+correct name. The easiest way is to provide the C<migration> method, to
+return a string with the I<migration>, like in the following example for
+SQLite:
+
+   sub migration {
+      my $self = shift;
+      my $table = $self->table_name;
+      return <<"END";
+   -- 1 up
+   CREATE TABLE IF NOT EXISTS $table (
+      id     INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+      eid    TEXT    NOT NULL,
+      jid    INTEGER NOT NULL,
+      active INTEGER NOT NULL DEFAULT 1
+   );
+   -- 1 down
+   DROP TABLE $table;
+   END
+   }
+
+A similar example for Postgresql can be found in the L</SYNOPSIS>. If
+a I<simple> migration does not suffice, you can overload L</ensure_table>
+and do whatever is needed to make sure that the table is present, with at
+least the four columns in the examples above.
+
+Operations are performed against the database table whose name is provided
+by L</table_name>.
+
+=head1 METHODS
+
+The base class provides most of the methods that are needed by
+L<Memorator> and you should not need to overload any... until you find out
+that you actually need to do so. Note that some methods have a C<_query>
+counterpart, which lets you only provide the query and the list of binding
+parameters without overloading the whole method for making the call.
+
+=head2 B<< add_mapping >>
+
+   $obj->add_mapping($eid, $jid);
+
+add a mapping between I<external identifier> C<$eid> and the L<Minion>
+I<job identifier> C<$jid>. Return value is ignored.
+
+=head2 B<< deactivate_mapping >>
+
+   $obj->deactivate_mapping($id);
+
+deactivate a mapping (identified by C<$id>), i.e. sets the value of field
+C<active> to C<0>. Return value is ignored.
+
+=head2 B<< deactivate_mapping_query >>
+
+   my @query = $obj->deactivate_mapping_query($id);
+
+provide a list of parameters suitable for a call to C<query()> in the
+actual database backend. It is used by L</deactivate_mapping>. The default
+is:
+
+   sub deactivate_mapping_query {
+      my ($self, $id) = @_;
+      my $table = $self->table_name;
+      return ("UPDATE $table SET active = 0 WHERE id = ?", $id);
+   }
+
+=head2 B<< ensure_table >>
+
+   $obj->ensure_table;
+
+ensure that the table for mapping job identifiers and external identifiers
+is present in the database. The default implementation leverages on the
+presence of method C<migration>, which must be provided by the deriving
+class. See L</DESCRIPTION> for additional details. Return value is
+ignored.
+
+=head2 B<< mapping_between >>
+
+   my $e2j = $obj->mapping_between($eid, $jid);
+
+find a mapping between an external identifier C<$eid> and a job identifier
+C<$jid>. Returns a hash with keys C<eid>, C<jid>, C<id> (which is the
+identifier of the mapping itself, used e.g. in L</deactivate_mapping> and
+L</remove_mapping>) and C<active>.
+
+Note that only I<valid> mappings are returned, i.e. mappings that are
+I<active> (according to the relevant field) and whose identifiers is the
+highest among all mappings with the specific external identifier C<eid>.
+
+Default implementation leverages on L</mapping_between_query>.
+
+=head2 B<< mapping_between_query >>
+
+   my @query = $obj->mapping_between_query($eid, $jid);
+
+query (with binding parameters) for finding the active, fresh mapping
+between an external identifier C<$eid> and a job identifier C<$jid>. The
+default implementation is the following:
+
+   sub mapping_between_query {
+      my ($self, $eid, $jid) = @_;
+      my $table = $self->table_name;
+      my $query =
+         "SELECT * FROM $table "
+      . " WHERE  jid = ? AND eid = ? AND active > 0 "
+      . " AND id IN (SELECT MAX(id) FROM $table WHERE eid = ?)";
+      return ($query, $jid, $eid, $eid);
+   } ## end sub mapping_between_query
+
+Note that the input identifiers are mapped multiple times in the binding
+parameters.
+
+=head2 B<< mojodb >>
+
+   my $mdb = $obj->mojodb;
+   $obj->mojodb($mojo_db_compatible);
+
+accessor for a C<Mojo::Db>ish object, like L<Mojo::Pg> or L<Mojo::SQLite>
+object. Mandatory. Can be set in the constructor via key C<mojodb>.
+
+=head2 B<< name >>
+
+   my $name = $obj->name;
+   $obj->name($new_name);
+
+accessor for a name for generating the local name of the table in the
+database, via L</table_name>. Mandatory. Can be set in the constructor via
+key C<name>.
+
+=head2 B<< new >>
+
+   my $obj = $classname>new(%args);
+   my $obj = $classname>new(\%args);
+
+constructor. The recognized keys in C<%args> correspond to accessors
+L</mojodb> (mandatory) and L</name> (mandatory).
+
+=head2 B<< remove_mapping >>
+
+   $obj->remove_mapping($id);
+
+remove a mapping, identified by C<$id>.
+
+=head2 B<< stale_mappings >>
+
+   my @stale_hashrefs = $obj->stale_mappings;
+
+find I<stale> mappings and return them as hash references, each containing
+all fields for C<id>, C<eid>, C<jid> and C<active>. A I<stale> mapping is
+a mapping that no longer applies, e.g. because a job has been superseded
+by another one for the specific external identifier C<eid>. Stale mappings
+can be removed from the database.
+
+The return value is a list of hash references, each having the keys above.
+
+Leverages L</stale_mappings_query>.
+
+=head2 B<< stale_mappings_query >>
+
+   my @query = $obj->stale_mappings_query;
+
+return a query suitable for finding stale mappings, see
+L</stale_mappings>. The default implementation is the following:
+
+   sub stale_mappings_query {
+      my $self  = shift;
+      my $table = $self->table_name;
+      return
+         "SELECT * FROM $table "
+      . "  WHERE (id, eid) NOT IN "
+      . "  (SELECT MAX(id), eid FROM $table GROUP BY eid)";
+   } ## end sub stale_mappings_query
+
+=head2 B<< table_name >>
+
+   my $table = $obj->table_name;
+
+expand L</TABLE_NAME> with L</name> as a prefix, using
+L<Memorator::Util/local_name>.
+
+=head2 B<< TABLE_NAME >>
+
+   my $bare_table_name = $obj->TABLE_NAME;
+
+the basic suffix for the table name, i.e. the constant C<eid2jid>.
+
+=head1 SEE ALSO
+
+L<Memorator>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2018 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

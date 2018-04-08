@@ -1,4 +1,4 @@
-# SMB Perl library, Copyright (C) 2014 Mikhael Goikhman, migo@cpan.org
+# SMB Perl library, Copyright (C) 2014-2018 Mikhael Goikhman, migo@cpan.org
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -133,10 +133,15 @@ sub pack ($$) {
 	}
 }
 
-sub supports_protocol ($$) {
+sub supports_smb_dialect ($$) {
 	my $self = shift;
+	my $dialect0 = shift || die;
 
-	return 1;
+	for my $dialect (@{$self->dialects}) {
+		return 1 if $dialect > $dialect0;
+	}
+
+	return 0;
 }
 
 1;

@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 76;
+use Test::Most tests => 85;
 use Test::Number::Delta;
 use Test::Carp;
 use lib 't/lib';
@@ -166,15 +166,29 @@ OPENADDR: {
 			delta_within($location->{latitude}, 37.778907, 1e-2);
 			delta_within($location->{longitude}, -122.39760, 1e-2);
 
+			$location = $geocoder->geocode('Wisconsin, USA');
+			delta_within($location->{latitude}, 44.19, 1e-2);
+			delta_within($location->{longitude}, -89.57, 1e-2);
+
 			$location = $geocoder->geocode('At sea or abroad');
 			ok(!defined($location));
 
 			$location = $ogeocoder->geocode('Vessels, Misc Ships At sea or abroad, England');
 			ok(!defined($location));
 
-			# ok(defined($location));
-			# delta_ok($location->{latitude}, 39.04);
-			# delta_ok($location->{longitude}, -86.96);
+			$location = $geocoder->geocode({ location => 'St. Louis, Missouri, USA' });
+			ok(defined($location));
+			delta_within($location->{latitude}, 38.63, 1e-2);
+			delta_within($location->{longitude}, -90.20, 1e-2);
+
+			$location = $geocoder->geocode({ location => 'Saint Louis, Missouri, USA' });
+			delta_within($location->{latitude}, 38.63, 1e-2);
+			delta_within($location->{longitude}, -90.20, 1e-2);
+
+			$location = $geocoder->geocode({ location => 'St Louis, Missouri, USA' });
+			delta_within($location->{latitude}, 38.63, 1e-2);
+			delta_within($location->{longitude}, -90.20, 1e-2);
+
 
 			# my $address = $geocoder->reverse_geocode(latlng => '51.50,-0.13');
 			# like($address->{'city'}, qr/^London$/i, 'test reverse');
@@ -192,7 +206,7 @@ OPENADDR: {
 			});
 		} else {
 			diag('Set OPENADDR_HOME to enable openaddresses.io testing');
-			skip 'OPENADDR_HOME not defined', 75;
+			skip 'OPENADDR_HOME not defined', 84;
 		}
 	}
 }

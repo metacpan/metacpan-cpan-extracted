@@ -44,7 +44,6 @@
       },
       "test" : {
          "requires" : {
-            "Data::Clean::JSON" : "0.38",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -64,7 +63,7 @@
          "web" : "https://github.com/perlancar/perl-Business-ID-NIK"
       }
    },
-   "version" : "0.090",
+   "version" : "0.092",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

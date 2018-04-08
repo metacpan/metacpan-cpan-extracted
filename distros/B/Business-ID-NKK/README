@@ -1,0 +1,91 @@
+NAME
+    Business::ID::NKK - Parse Indonesian family card number (nomor kartu
+    keluarga, NKK)
+
+VERSION
+    This document describes version 0.002 of Business::ID::NKK (from Perl
+    distribution Business-ID-NKK), released on 2018-04-08.
+
+SYNOPSIS
+        use Business::ID::NKK qw(parse_nkk);
+
+        my $res = parse_nkk(nkk => "3273010119170002");
+
+DESCRIPTION
+    This module can be used to validate Indonesian family card number (nomor
+    kartu keluarga, or NKK for short).
+
+    NKK is composed of 16 digits as follow:
+
+     pp.DDSS.ddmmyy.ssss
+
+    pp.DDSS is a 6-digit area code where the NKK was registered (it used to
+    be but nowadays not always [citation needed] composed as: pp 2-digit
+    province code, DD 2-digit city/district [kota/kabupaten] code, SS
+    2-digit subdistrict [kecamatan] code), ddmmyy is date of data entry,
+    ssss is 4-digit serial starting from 1.
+
+    Keywords: nomor KK, family registration number
+
+FUNCTIONS
+  parse_nkk
+    Usage:
+
+     parse_nkk(%args) -> [status, msg, result, meta]
+
+    Parse Indonesian family card number (nomor kartu keluarga, NKK).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   check_locality => *bool* (default: 1)
+
+        Whether to check for known locality (city) codes.
+
+    *   check_province => *bool* (default: 1)
+
+        Whether to check for known province codes.
+
+    *   nkk* => *str*
+
+        Input NKK to be validated.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Business-ID-NKK>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Business-ID-NKK>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Business-ID-NKK>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Business::ID::NIK to parse NIK (nomor induk kependudukan, nomor KTP)
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

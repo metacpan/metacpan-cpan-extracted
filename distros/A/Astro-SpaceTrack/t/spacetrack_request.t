@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More 0.96;
 
-use Astro::SpaceTrack;
+use Astro::SpaceTrack qw{ :ref };
 use HTTP::Status qw{ HTTP_I_AM_A_TEAPOT };
 
 use lib 'inc';
@@ -1301,7 +1301,7 @@ sub warning_like (@) {
 
 sub is_resp (@) {	## no critic (RequireArgUnpacking)
     my @args = @_;
-    my $opt = 'HASH' eq ref $args[0] ? shift @args : {};
+    my $opt = HASH_REF eq ref $args[0] ? shift @args : {};
     my $method = shift @args;
     my $query = pop @args;
     my $name = "\$st->$method(" . join( ', ', map {"'$_'"} @args ) . ')';

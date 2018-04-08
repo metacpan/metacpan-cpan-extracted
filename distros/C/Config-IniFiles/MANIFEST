@@ -49,6 +49,7 @@ t/32mswin-outputs-contain-crs.t
 t/33update-using-tied-fh-w-shorter-names.t
 t/34trailing-comments-double-delimeter.t
 t/35reload-config-no-file.t
+t/35section-iterators.t
 t/allowed-comment-chars.ini
 t/array.ini
 t/author-pod-coverage.t

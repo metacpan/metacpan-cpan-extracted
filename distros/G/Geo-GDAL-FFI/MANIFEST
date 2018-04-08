@@ -1,0 +1,15 @@
+MANIFEST
+LICENSE
+README.md
+Changes
+Makefile.PL
+build-tools/README
+build-tools/parse_h.pl
+lib/Geo/GDAL/FFI.pm
+t/00.t
+t/geometry.t
+t/pdl.t
+t/sr.t
+t/vsistdout.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

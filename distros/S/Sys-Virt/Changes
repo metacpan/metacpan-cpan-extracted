@@ -1,5 +1,12 @@
 Revision history for perl module Sys::Virt
 
+4.2.0 2018-04-03
+
+ - Add missing define_nwfilter and define_secret APIs in Sys::Virt
+ - Misc docs fixes
+ - Add support for VIR_KEYCODE_SET_QNUM
+ - Add support for VIR_DOMAIN_INTERFACE_ADDRESSES_SRC_ARP
+
 4.1.0 2018-03-05
 
  - Add VIR_ERR_DEVICE_MISSING constants

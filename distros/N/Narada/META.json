@@ -4,13 +4,13 @@
       "Alex Efros <powerman@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Narada",
    "no_index" : {
@@ -39,7 +39,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.17",
+            "Dist::Milla" : "v1.0.18",
             "Test::Distribution" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41"
@@ -80,19 +80,19 @@
    "provides" : {
       "Narada" : {
          "file" : "lib/Narada.pm",
-         "version" : "v2.3.7"
+         "version" : "v2.3.8"
       },
       "Narada::Config" : {
          "file" : "lib/Narada/Config.pm",
-         "version" : "v2.3.7"
+         "version" : "v2.3.8"
       },
       "Narada::Lock" : {
          "file" : "lib/Narada/Lock.pm",
-         "version" : "v2.3.7"
+         "version" : "v2.3.8"
       },
       "Narada::Log" : {
          "file" : "lib/Narada/Log.pm",
-         "version" : "v2.3.7"
+         "version" : "v2.3.8"
       }
    },
    "release_status" : "stable",
@@ -107,10 +107,10 @@
          "web" : "https://github.com/powerman/Narada"
       }
    },
-   "version" : "v2.3.7",
+   "version" : "v2.3.8",
    "x_contributors" : [
       "Prylutskyi Anatolii <prylutskyi@qarea.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

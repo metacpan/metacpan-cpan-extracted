@@ -37,7 +37,7 @@ my %regexes = (
 
 lock_hash(%MAP);
 
-our $VERSION = '1.1'; # VERSION
+our $VERSION = '1.2'; # VERSION
 
 =head1 NAME
 
@@ -48,6 +48,8 @@ SpamcupNG - module to export functions for spamcup program
     use SpamcupNG qw(read_config get_browser);
 
 =head1 DESCRIPTION
+
+B<DEPRECATED>: this module is deprecated. Please checkout L<App::SpamcupNG> for a replacement.
 
 SpamcupNG is a Perl web crawler for finishing Spamcop.net reports
 automatically. This module implements the functions used by the spamcup
@@ -119,9 +121,6 @@ Expects two string as parameters: one with the name to associated with the user
 agent and the another as version of it.
 
 =cut
-
-# :TODO:23/04/2017 17:21:28:ARFREITAS: Add options to configure nice things
-# like HTTP proxy
 
 sub get_browser {
     my ( $name, $version ) = @_;
@@ -195,7 +194,6 @@ sub config_logger {
     croak "Must receive a string for the log file parameter"
       unless ( ( defined($log_file) ) and ( $log_file ne '' ) );
 
-# :TODO:21/01/2018 12:07:01:ARFREITAS: Do we need to import :levels from Log::Log4perl at all?
     my %levels = (
         DEBUG => $DEBUG,
         INFO  => $INFO,
@@ -487,7 +485,6 @@ sub main_loop {
         );
     }
 
-# :TODO:07/02/2018 10:17:30:ARFREITAS: too many regexes being compiled repeated times, compile than once and reuse them later!
     $res->content =~
       /(\<form action[^>]+name=\"sendreport\"\>.*?\<\/form\>)/sgi;
     my $form_data = $1;
@@ -502,7 +499,6 @@ sub main_loop {
         $form_data = '';
     }
 
-    # :TODO:18/02/2018 14:19:49:ARFREITAS: refactor to make form parsing a sub
     my $form = HTML::Form->parse( $form_data, $base_uri );
 
     if ( $res->content =~

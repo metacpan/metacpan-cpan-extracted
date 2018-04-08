@@ -5,7 +5,7 @@ use utf8;
 
 use UUID::Tiny ':std';
 
-our $VERSION = '0.013';    # VERSION
+our $VERSION = '0.017';    # VERSION
 
 use Chart::Plotly;
 
@@ -48,12 +48,13 @@ Chart::Plotly::Plot
 
 =head1 VERSION
 
-version 0.013
+version 0.017
 
 =head1 SYNOPSIS
 
  use Chart::Plotly::Trace::Scatter;
  use Chart::Plotly::Plot;
+ use Chart::Plotly qw(show_plot);
  use HTML::Show;
  
  my $x = [1 .. 15];
@@ -62,10 +63,11 @@ version 0.013
  my $plot = Chart::Plotly::Plot->new();
  $plot->add_trace($scatter);
  
- HTML::Show::show($plot->html);
+ show_plot($plot);
  
  # This also works
  # HTML::Show::show(Chart::Plotly::render_full_html(data => $plot));
+ # HTML::Show::show($plot->html);
 
 =head1 DESCRIPTION
 
@@ -116,7 +118,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2017 by Pablo Rodríguez González.
+This software is Copyright (c) 2017 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

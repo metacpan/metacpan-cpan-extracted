@@ -8,7 +8,7 @@ our $JOBJ = JSON->new();
 our $_last_out = "";
 
 our @EXPORT = qw/jsonize jsonise J parsej pretty_json ugly_json/;
-our $VERSION = "0.102";
+our $VERSION = "0.103";
 
 sub jobj { $JOBJ }
 

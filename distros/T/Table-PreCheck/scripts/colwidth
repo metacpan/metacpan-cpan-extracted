@@ -1,0 +1,120 @@
+#!/usr/bin/perl 
+
+######
+#
+#  widths 
+#    2015.02 - 2015.05 下野寿之
+#####
+
+
+use 5.001 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts '1lrcuv=,:!^*:@' , \my%o ; # 5.014 で何度も実行済み
+use Encode qw[ decode_utf8 ] ; 
+if ( $o{v} ) { eval 'use Text::VisualWidth::UTF8 qw[ width ] ; 1 ' 
+  or die 'Installing Text::VisualWidth::UTF8 is necessary.'}; 
+#use Text::VisualWidth::UTF8 qw [ width ] ;
+
+sub LENGTH ( $ ) { length $_[0] }  ; 
+no warnings ; 
+* LENGTH = * Text::VisualWidth::UTF8::width if $o{v} ;
+use warnings ; 
+sub LENGTH ( $ )  ; 
+
+sub optChore ; # オプションスイッチに対する動作
+sub mainproc ; # メインの処理
+
+my $pretreat ; # 各行の文字列に対する前処理(utf-8とみなすか、改行文字を含めるか)
+my $midtreat ; # 各行の文字列に対して何を取り出すか(行の長さか、列の個数であるか、各列の長さか)
+my $printout ; # 各行の処理結果をどう表示するか( -1 指定により、元の文字列も出力する)
+
+optChore ;  
+mainproc ; 
+exit 0 ; 
+
+## メインの処理
+sub mainproc { 
+  print (my $tmp = <> ) if $o{'='} ; 
+  while ( <> ) { 
+    $printout -> ( $midtreat -> ( $pretreat -> ( $_ ) ) ) ; # 関数の順序を逆にする良い書き方があるかも。
+    print eof && $o{'^'} ? "\n^\t$ARGV\n" : "\n" ; 
+    #do { $| = 1 ; print '' ; $|= 0 } if $. % $o{'*'} == 1 ; 
+  } 
+} ;
+
+## 起動処理
+sub optChore { 
+  $| = 1 if $o{'!'} ; # オートフラッシュの設定
+  $o{','} = do { $o{','} //= "\t" ; eval qq[qq[$o{','}]] } ;  # 区切り文字の指定処理
+  #$o{'*'} //= 10 ;
+ 
+  # オプション-u および -L があるかどうかで、各行文字列に対する処理を変更。 
+  $pretreat = 
+    $o{u} ? 
+      $o{r} ? 
+        sub($){ decode_utf8 $_[0] } : 
+        sub($){ chomp $_[0] ; decode_utf8 $_[0] } :  
+      $o{r} ? 
+        sub($){ $_[0] } : 
+        sub($){ chomp $_[0] ; $_[0] }  ;  
+  # 中心となる処理
+  $midtreat = 
+    $o{l} ? 
+      sub($) { LENGTH ( $_[0] ) } : # 行の長さ 
+    $o{c} ? 
+      sub($) { scalar @{[ split /$o{','}/, $_[0] , -1 ]} } : # 列の個数
+      sub($) { join $o{','} , map{ LENGTH $_ } split /$o{','}/,$_[0],-1 } ; # 各列の文字列の長さ 
+  # オプション-1があるかどうかで出力の挙動を変える。
+  $printout = 
+    $o{1} ?  
+      sub { chomp; print @_,$o{','},$_ } : # <- $_ は保守上、まずいかも。 
+    $o{'@'} ? 
+      sub { print @_ , "\t" , $ARGV } :   # <- 処理中のファイル名を表示
+      sub { print @_ } ; 
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8 
+
+=head1
+
+ $0 
+
+ 入力データを各行を区切り文字ごとに区切って、文字の長さに変換して出力する。
+ 行末の改行文字は特にオプションで指示のない限り、長さ計算の対象ではない。
+
+オプション :
+
+  -c   :  列の数を数える。(columns count)
+  -l   :  各行の全体の文字列の長さを算出する。行末の改行文字を含めない。-c は無効化される。 (line-length)
+  -r   :  各行について、行末の改行文字を除去する操作を行わない。 (remain)
+  -u   :  utf-8 とみなして、長さを計算する。そうでなければ、単純なバイト長になる。
+  -v   :  utf-8 の文字幅で長さを計算する(半角は1、全角は2)。(visual-width)
+
+  -1   :  各行について、元の文字列を右側に付加する。
+  -=   :  1行目を(ヘッダと見なして)そのまま出力する。
+  -^   :  ファイルを読み終わった後に、ファイル名を出力する。"^(タブ文字)ファイル名" が出力される。
+  -@   :  ファイル名を行末に出力。(output filename)
+  -!  : フラッシュする。バッファに貯めない。 
+  -, str : 区切り文字の変更。
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+ 
+ヒント: 
+
+  $0 -= some.tsv | colsummary -= とすると、長さの分布が得られる。
+
+=cut

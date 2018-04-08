@@ -19,7 +19,18 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Hash::Merge'=>0.200,
+        'Clone'=>0,
         'Mojolicious'=>6.00,
+    },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+          repository => {
+            type => 'git',
+            url => 'git://github.com/mche/DBIx-Mojo-Template.git',
+            web => 'https://github.com/mche/DBIx-Mojo-Template',
+          },
+        },
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     #clean => { FILES => 'DBIx-Mojo-Template-*' },

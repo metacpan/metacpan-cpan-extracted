@@ -67,7 +67,7 @@
    "provides" : {
       "App::Fasops" : {
          "file" : "lib/App/Fasops.pm",
-         "version" : "v0.5.14"
+         "version" : "v0.5.15"
       },
       "App::Fasops::Command::axt2fas" : {
          "file" : "lib/App/Fasops/Command/axt2fas.pm"
@@ -135,6 +135,6 @@
          "web" : "https://github.com/wang-q/App-Fasops"
       }
    },
-   "version" : "0.5.14",
+   "version" : "0.5.15",
    "x_authority" : "cpan:WANGQ"
 }

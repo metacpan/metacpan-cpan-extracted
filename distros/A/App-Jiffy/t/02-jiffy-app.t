@@ -1,20 +1,27 @@
 #!/usr/bin/env perl
 
+use strict;
+use warnings;
+
 use Test::More;
 use Test::Deep; # (); # uncomment to stop prototype errors
 use Test::Exception;
-
 use Capture::Tiny ':all';
+use MongoDB;
 
-use lib qw{ ./t/lib };
+use lib 't/lib';
+
+use MongoDBTest 'test_db_or_skip';
 
 use CreateTimeEntries qw/generate/;
 
 use YAML::Any qw( LoadFile );
 
-use_ok('App::Jiffy');
-
 my $cfg = LoadFile('t/test.yml');
+
+test_db_or_skip($cfg);
+
+use_ok('App::Jiffy');
 
 my $client = MongoDB::MongoClient->new;
 my $db = $client->get_database('jiffy-test');

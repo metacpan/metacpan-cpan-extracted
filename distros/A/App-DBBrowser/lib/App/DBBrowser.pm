@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.009';
+our $VERSION = '2.012';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -28,15 +28,15 @@ use App::DBBrowser::DB;
 #use App::DBBrowser::Join_Union;  # 'require'-d
 use App::DBBrowser::Opt;
 use App::DBBrowser::OptDB;
+use App::DBBrowser::Subqueries;
 use App::DBBrowser::Table;
 
-
-use App::DBBrowser::Subqueries; ###
 
 BEGIN {
     decode_argv(); # not at the end of the BEGIN block if less than perl 5.16
     1;
 }
+
 
 sub new {
     my ( $class ) = @_;
@@ -165,11 +165,11 @@ sub run {
         my $odb = App::DBBrowser::OptDB->new( $sf->{i}, $sf->{o} );
         my $db_opt = $odb->read_db_config_files();
         my $plui;
-        my $driver;
+        #my $driver;
         if ( ! eval {
             $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
-            $driver = $plui->get_db_driver();
-            die "No database driver!" if ! $driver;
+            #$driver = $plui->get_db_driver();
+            #die "No database driver!" if ! $driver;
             1 }
         ) {
             $ax->print_error_message( $@, 'load plugin' );
@@ -180,14 +180,16 @@ sub run {
         # DATABASES
 
         my @databases;
+        my $prefix;
         my ( $user_dbs, $sys_dbs ) = ( [], [] ); #
         if ( ! eval {
             ( $user_dbs, $sys_dbs ) = $plui->get_databases( $odb->connect_parameter( $db_opt ) );
-            if ( $driver eq 'SQLite' ) {
-                @databases = ( @$user_dbs, $sf->{o}{G}{meta} ? @$sys_dbs : () );
+            $prefix = -f $user_dbs->[0] ? '' : '- ';
+            if ( $prefix ) {
+                @databases = ( map( $prefix . $_, @$user_dbs ), $sf->{o}{G}{meta} ? map( '  ' . $_, @$sys_dbs ) : () );
             }
             else {
-                @databases = ( map( "- $_", @$user_dbs ), $sf->{o}{G}{meta} ? map( "  $_", @$sys_dbs ) : () );
+                @databases = ( @$user_dbs, $sf->{o}{G}{meta} ? @$sys_dbs : () );
             }
             $sf->{i}{sqlite_search} = 0 if $sf->{i}{sqlite_search};
             1 }
@@ -198,7 +200,7 @@ sub run {
             last DB_PLUGIN;
         }
         if ( ! @databases ) {
-            $ax->print_error_message( "no $driver-databases found\n" );
+            $ax->print_error_message( "$plugin: no databases found\n" );
             next DB_PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
             last DB_PLUGIN;
         }
@@ -209,7 +211,7 @@ sub run {
 
             if ( $sf->{redo_db} ) {
                 $db = delete $sf->{redo_db};
-                $db = '- ' . $db if $driver ne 'SQLite';
+                $db = $prefix . $db if $prefix;
             }
             elsif ( @databases == 1 ) {
                 $db = $databases[0];
@@ -217,11 +219,11 @@ sub run {
             }
             else {
                 my $back;
-                if ( $driver eq 'SQLite' ) {
-                    $back = $auto_one ? $sf->{i}{quit} : $sf->{i}{back};
+                if ( $prefix ) {
+                    $back = $auto_one ? $sf->{i}{_quit} : $sf->{i}{_back};
                 }
                 else {
-                    $back = $auto_one ? $sf->{i}{_quit} : $sf->{i}{_back};
+                    $back = $auto_one ? $sf->{i}{quit} : $sf->{i}{back};
                 }
                 my $prompt = 'Choose Database:';
                 my $choices_db = [ undef, @databases ];
@@ -248,7 +250,7 @@ sub run {
                 }
                 delete $ENV{TC_RESET_AUTO_UP};
             }
-            $db =~ s/^[-\ ]\s// if $driver ne 'SQLite';
+            $db =~ s/^[-\ ]\s// if $prefix;
             my $db_string = 'DB '. basename( $db ) . '';
 
             # DB-HANDLE
@@ -270,10 +272,11 @@ sub run {
                 next DB_PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
                 last DB_PLUGIN;
             }
+            my $driver = $dbh->{Driver}{Name};
             $sf->{d} = {
                 db       => $db,
                 dbh      => $dbh,
-                driver   => $dbh->{Driver}{Name},
+                driver   => $driver,
                 user_dbs => $user_dbs,
                 sys_dbs  => $sys_dbs,
             };
@@ -482,11 +485,11 @@ sub run {
                             if ( $choice eq $create_table || $choice eq $drop_table ) {
                                 require App::DBBrowser::CreateTable;
                                 my $ct = App::DBBrowser::CreateTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                                if ( $driver eq 'SQLite' ) {
-                                    $dbh->disconnect();
-                                    $dbh = $plui->get_db_handle( $db, $odb->connect_parameter( $db_opt, $db ) );
-                                    $sf->{d}{dbh} = $dbh; # new $dbh
-                                }
+                                #if ( $driver eq 'SQLite' ) {
+                                #    $dbh->disconnect();
+                                #    $dbh = $plui->get_db_handle( $db, $odb->connect_parameter( $db_opt, $db ) );
+                                #    $sf->{d}{dbh} = $dbh; # new $dbh
+                                #}
                                 my $changed;
                                 if ( $choice eq $create_table ) {
                                     if ( ! eval { $changed = $ct->create_new_table(); 1 } ) {
@@ -698,11 +701,9 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.009
+Version 2.012
 
 =head1 DESCRIPTION
-
-DEVELOPER RELEASE
 
 See L<db-browser> for further information.
 

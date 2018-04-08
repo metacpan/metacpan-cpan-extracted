@@ -1,11 +1,36 @@
 Changes
 lib/Druid.pm
+lib/Druid/Aggregation.pm
+lib/Druid/Constants.pm
+lib/Druid/Factory/FilterFactory.pm
+lib/Druid/Factory/PostAggregatorFactory.pm
+lib/Druid/Filter.pm
+lib/Druid/Filter/Logical.pm
+lib/Druid/Filter/Logical/And.pm
+lib/Druid/Filter/Logical/Not.pm
+lib/Druid/Filter/Logical/Or.pm
+lib/Druid/Filter/Regex.pm
+lib/Druid/Filter/Selector.pm
+lib/Druid/Interval.pm
+lib/Druid/LimitSpec.pm
+lib/Druid/PostAggregator.pm
+lib/Druid/PostAggregator/Arithmetic.pm
+lib/Druid/PostAggregator/Constant.pm
+lib/Druid/PostAggregator/FieldAccess.pm
+lib/Druid/Query.pm
+lib/Druid/Query/GroupBy.pm
+lib/Druid/Query/Timeseries.pm
+lib/Druid/Query/TopN.pm
+lib/Druid/Util.pm
 Makefile.PL
 MANIFEST			This list of files
+MYMETA.json
+MYMETA.yml
 README.md
 t/00-load.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

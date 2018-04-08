@@ -158,7 +158,7 @@ sub HELP_MESSAGE {
 
 =head1 NAME
 
-  $0 - pattern searcher given which column to seek together with regular expression
+  colgrep - pattern searcher given which column to seek together with regular expression
 
 SYNOPSIS
 	$0 -c $col_num -e $regex  # The most usual usage

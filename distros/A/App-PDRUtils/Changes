@@ -1,3 +1,8 @@
+0.120   2018-04-03 (PERLANCAR)
+
+	- Relax module_version's regex.
+
+
 0.11    2017-07-10 (PERLANCAR)
 
 	- No functional changes.

@@ -6,6 +6,9 @@ use AnyEvent::Socket qw(tcp_server);
 use AnyEvent::Handle;
 use AnyEvent::Connector;
 
+my @warnings;
+$SIG{__WARN__} = sub { push @warnings, $_[0] };
+
 sub setup_echo_proxy {
     my $port = empty_port();
     my $cv = AnyEvent->condvar;
@@ -74,6 +77,32 @@ sub setup_closing_proxy {
             close $fh;
             undef $fh;
         });
+    };
+    return ($port, $server);
+}
+
+sub setup_send_junk_proxy {
+    my ($port) = empty_port();
+    my $server = tcp_server '127.0.0.1', $port, sub {
+        my ($fh) = @_;
+        my $ah;
+        $ah = AnyEvent::Handle->new(
+            fh => $fh,
+            on_error => sub {
+                undef $ah;
+                close $fh;
+                undef $fh;
+            },
+            on_read => sub {
+                if($ah->{rbuf} !~ /\r\n\r\n$/) {
+                    return;
+                }
+                delete $ah->{rbuf};
+                $ah->push_write("some junk\r\n");
+                $ah->push_shutdown();
+                undef $ah;
+            },
+        );
     };
     return ($port, $server);
 }
@@ -156,5 +185,21 @@ subtest "proxy not exist", sub {
     my $client_got = $client_cv->recv();
     is_deeply $client_got, [], "no arg passed to connect_cb because there is no proxy listening.";
 };
+
+subtest "proxy sending junk", sub {
+    my ($port, $proxy) = setup_send_junk_proxy();
+    my $conn = AnyEvent::Connector->new(
+        proxy => "http://127.0.0.1:$port"
+    );
+    my $client_cv = AnyEvent->condvar;
+    $conn->tcp_connect("foo.bar.com", 12222, sub {
+        my (@args) = @_;
+        $client_cv->send(\@args);
+    });
+    my $client_got = $client_cv->recv();
+    is_deeply $client_got, [], "proxy sending junk causes failure.";
+};
+
+is_deeply \@warnings, [], "no warnings";
 
 done_testing;

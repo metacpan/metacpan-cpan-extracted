@@ -17,7 +17,7 @@ if (!defined ($version))
 }
 
 my @cmd = (
-    "hg", "tag", "-m",
+    "git", "tag", "-m",
     "Tagging the Config-IniFiles release as $version",
     "releases/$version",
 );

@@ -3,6 +3,7 @@ README.md
 Makefile.PL
 MANIFEST
 lib/Comics.pm
+lib/Comics/Version.pm
 lib/Comics/Plugin/9ChickweedLane.pm
 lib/Comics/Plugin/AbstruseGoose.pm
 lib/Comics/Plugin/AmazingSuperPowers.pm

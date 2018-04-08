@@ -1,10 +1,7 @@
 # -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
 # vim:ts=8:sw=2:et:sta:sts=2
 #########
-# Author:        rmp
-# Last Modified: $Date: 2013-04-28 23:35:11 +0100 (Sun, 28 Apr 2013) $
-# Id:            $Id: ADX.pm 160 2013-04-28 22:35:11Z rmp $
-# $HeadURL: svn+ssh://psyphi.net/repository/svn/iotamarathon/trunk/lib/Ham/ADIF/ADX.pm $
+# Author: rmp
 #
 package Ham::ADIF::ADX;
 use strict;
@@ -13,7 +10,7 @@ use XML::LibXML;
 use Carp;
 use base qw(Ham::ADIF);
 
-our $VERSION = do { my ($r) = q$Revision: 160 $ =~ /(\d+)/smx; $r; };
+our $VERSION = q[2018.03.31];
 
 sub parse_file {
   my ($self, $filename, $schema) = @_;

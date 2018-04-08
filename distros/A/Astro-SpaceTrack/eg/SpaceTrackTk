@@ -5,12 +5,12 @@ use 5.006002;
 use strict;
 use warnings;
 
-use Astro::SpaceTrack;
+use Astro::SpaceTrack qw{ :ref };
 use IO::File;
 use Tk;
 use Tk::Pane;
 
-our $VERSION = '0.104';
+our $VERSION = '0.105';
 
 my @pad = qw{ -padx 5 -pady 5 };	# Standard cell padding
 
@@ -303,7 +303,7 @@ sub main_window {
 	    [ verify_hostname => 'Verify Host Name:', 'Checkbutton' ],
 	    [ webcmd => 'Web Command:' ],
 	) {
-	    if ( 'ARRAY' eq ref $_ ) {
+	    if ( ARRAY_REF eq ref $_ ) {
 		my ( $name, $label, $entry, %args ) = @{ $_ };
 		defined $entry or $entry = 'Entry';
 		if ( $info{$entry}{default} ) {
@@ -858,7 +858,8 @@ sub search_oid_args {
 sub search_options_widgets {
     my ( $widget, $source, $data, $dg, $opt ) = @_;
 
-    ref $opt eq 'HASH' or $opt = {};
+    HASH_REF eq ref $opt
+	or $opt = {};
     defined $opt->{status} or $opt->{status} = 1;
 
     if ( $data->{option}{status} = $opt->{status} ) {

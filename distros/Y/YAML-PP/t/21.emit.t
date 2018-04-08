@@ -9,8 +9,11 @@ use YAML::PP::Test;
 use Data::Dumper;
 use YAML::PP::Parser;
 use YAML::PP::Emitter;
+use YAML::PP::Writer;
 use Encode;
 use File::Basename qw/ dirname basename /;
+
+$ENV{YAML_PP_RESERVED_DIRECTIVE} = 'ignore';
 
 $|++;
 
@@ -25,11 +28,11 @@ my @dirs = YAML::PP::Test->get_tests(
 
 # skip tests that parser can't parse
 my @skip = qw/
-    4ABK 5TRB 87E4 8CWC 8UDB 9MMW
+    4ABK 87E4 8CWC 8UDB 9MMW
     C2DT CN3R CT4Q DFF7
-    EHF6 FRK4
-    KZN9 L9U5 LP6E LQZ7 LX3P
-    M7A3 N782
+    FRK4
+    KZN9 L9U5 LQZ7 LX3P
+    M7A3
     Q9WF QF4Y
     R4YG SBG9 UT92 WZ62 X38W
 
@@ -39,11 +42,15 @@ my @skip = qw/
     36F6
     XLQ9
     Q5MG
+    7ZZ5
+    KK5P
+    EX5H
 
 /;
 
 # emitter
 push @skip, qw/
+4MUZ
 /;
 # quoting
 push @skip, qw/
@@ -174,7 +181,9 @@ sub test {
     my $ok = 0;
     my $error = 0;
     my @events;
-    my $emitter = YAML::PP::Emitter->new;
+    my $writer = YAML::PP::Writer->new;
+    my $emitter = YAML::PP::Emitter->new();
+    $emitter->set_writer($writer);
     my $parser = YAML::PP::Parser->new(
         receiver => sub {
             my ($self, @args) = @_;
@@ -198,7 +207,7 @@ sub test {
     }
     else {
         my $yaml = emit_events($emitter, \@events);
-        $out_yaml = $$yaml;
+        $out_yaml = $yaml;
         $ok = cmp_ok($out_yaml, 'eq', $exp_yaml, "$name - $title - Emit events");
     }
     if ($ok) {
@@ -228,9 +237,13 @@ sub emit_events {
     $emitter->init;
     for my $event (@$events) {
         my ($type, $info) = @$event;
+#warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$type], ['type']);
+        if ($type eq 'sequence_start_event' or $type eq 'mapping_start_event') {
+            delete $info->{style};
+        }
         $emitter->$type($info);
     }
-    my $yaml = $emitter->yaml;
+    my $yaml = $emitter->writer->output;
     return $yaml;
 }
 

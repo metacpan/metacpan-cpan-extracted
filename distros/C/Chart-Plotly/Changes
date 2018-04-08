@@ -1,3 +1,14 @@
+0.016 2018-04-01 19:34:00+0000
+  - Add method to know the plotly.js version used 
+  - Add screenshots of examples to the documentation
+0.015 2018-04-01 09:27:00+0000
+  - Remove _Deparsed_XSubs.pm from distribution added by mistake
+0.014 2018-03-31 20:22:00+0000
+  -INCOMPATIBLE CHANGE: Chart::Plotly::Trace::Attribute::* classes were moved to the corresponding trace,
+    for example: Chart::Plotly::Trace::Attribute::Marker now is a clase per trace: Chart::Plotly::Trace::Scatter::Marker
+  -Update to plotly version 1.35.2
+  -Add new trace types: violin, area, carpet, contourcarpet, parcoords, sankey, scattercarpet, scatterpolar, scatterpolargl, table
+  -Improve tool to generate Moose classes
 0.011 2017-01-15 17:19:00+0000
   -Permit array of markers in Scattergeo
 0.010 2017-01-08 20:00:00+0000

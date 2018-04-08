@@ -1,7 +1,8 @@
 # EREQINEOF and EREQINBUFLIMIT.
 use warnings;
 use strict;
-use t::share;
+use lib 't';
+use share;
 
 @CheckPoint = (
     [ 'reader', 0, EREQINEOF        ], 'reader: EREQINEOF',

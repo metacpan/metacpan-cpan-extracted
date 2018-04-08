@@ -2,8 +2,8 @@ NAME
     App::ProcUtils - Command line utilities related to processes
 
 VERSION
-    This document describes version 0.030 of App::ProcUtils (from Perl
-    distribution App-ProcUtils), released on 2018-01-17.
+    This document describes version 0.031 of App::ProcUtils (from Perl
+    distribution App-ProcUtils), released on 2018-04-03.
 
 SYNOPSIS
     This distribution provides the following command-line utilities:
@@ -69,11 +69,11 @@ FUNCTIONS
 
         Only match processes whose name/cmdline match the pattern.
 
-    *   pgroup => *array[nonnegint]*
+    *   pgroup => *array[uint]*
 
         Only match processes in the process group IDs listed.
 
-    *   session => *array[nonnegint]*
+    *   session => *array[uint]*
 
         Only match processes whose process session ID is listed.
 

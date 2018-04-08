@@ -16,9 +16,9 @@ BEGIN {
 		my ($line) = `svn --version`;
 		diag $line;
 		my ($ver) = $line =~ /\bversion\s+(\d+\.\d+)/i;
-		my $dir = $ver < 1.7 ? 1.6: 1.7;
 		pathrmdir catfile $Bin,'svn','.svn';
-		dircopy catfile($Bin,'svn',"dot-svn-$dir") => catfile($Bin,'svn','.svn') or die $!;
+		dircopy catfile($Bin,'svn',"dot-svn") => catfile($Bin,'svn','.svn') or die $!;
+		system 'svn upgrade ' . catfile($Bin,'svn') and die $! if $ver>1.6;
 	} else {
 		plan skip_all => 'no svn executable found';
 	}
@@ -29,7 +29,7 @@ use Catalyst::Test 'TestApp';
 
 is( get('/'), 'ok', 'index' );
 is( get('/none'), 'not found', 'nonexistent' );
-is( get('/revision'), '5', 'revision' );
+is( get('/revision'), '2', 'revision' );
 
 END {
 	pathrmdir catfile $Bin,'svn','.svn' or die $!;

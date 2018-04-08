@@ -1,4 +1,4 @@
-# Copyright (c) 2015  Timm Murray
+# Copyright (c) 2018  Timm Murray
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without 
@@ -22,15 +22,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Device::WebIO::RaspberryPi;
-$Device::WebIO::RaspberryPi::VERSION = '0.009';
+$Device::WebIO::RaspberryPi::VERSION = '0.900';
 # ABSTRACT: Device::WebIO implementation for the Rapsberry Pi
 use v5.12;
 use Moo;
 use namespace::clean;
-use HiPi::Wiring qw( :wiring );
-use HiPi::Device::I2C;
-use HiPi::BCM2835::I2C qw( :all );
-use HiPi::Device::SPI qw( :spi );
+use RPi::WiringPi;
+use RPi::Const qw{ :all };
 use GStreamer1;
 use Glib qw( TRUE FALSE );
 use AnyEvent;
@@ -40,75 +38,7 @@ use constant {
     TYPE_REV2         => 1,
     TYPE_MODEL_B_PLUS => 2,
 };
-
-use constant {
-    # maps of Rpi Pin -> Wiring lib pin
-    PIN_MAP_REV1 => {
-        0  => 8,
-        1  => 9,
-        4  => 7,
-        7  => 11,
-        8  => 10,
-        9  => 13,
-        10 => 12,
-        11 => 14,
-        14 => 15,
-        15 => 16,
-        17 => 0,
-        18 => 1,
-        21 => 2,
-        22 => 3,
-        23 => 4,
-        24 => 5,
-        25 => 6,
-    },
-    PIN_MAP_REV2 => {
-        2  => 8,
-        3  => 9,
-        4  => 7,
-        7  => 11,
-        8  => 10,
-        9  => 13,
-        10 => 12,
-        11 => 14,
-        14 => 15,
-        15 => 16,
-        17 => 0,
-        18 => 1,
-        27 => 2,
-        28 => 17,
-        22 => 3,
-        23 => 4,
-        24 => 5,
-        25 => 6,
-        30 => 19,
-        29 => 18,
-        31 => 20,
-    },
-    PIN_MAP_MODEL_B_PLUS => {
-        2  => 8,
-        3  => 9,
-        4  => 7,
-        7  => 11,
-        8  => 10,
-        9  => 13,
-        10 => 12,
-        11 => 14,
-        14 => 15,
-        15 => 16,
-        17 => 0,
-        18 => 1,
-        27 => 2,
-        28 => 17,
-        22 => 3,
-        23 => 4,
-        24 => 5,
-        25 => 6,
-        30 => 19,
-        29 => 18,
-        31 => 20,
-    },
-};
+use constant MAX_INPUT_PINS => 25;
 
 my %ALLOWED_VIDEO_TYPES = (
     'video/H264'      => 1,
@@ -131,9 +61,6 @@ has '_type',    is => 'ro';
 has '_pin_mode' => (
     is => 'ro',
 );
-has '_pin_map' => (
-    is => 'ro',
-);
 # Note that _output_pin_value should be mapped by the Wiring library's 
 # pin number, *not* the Rpi's numbering
 has '_output_pin_value' => (
@@ -145,8 +72,14 @@ has '_is_gstreamer_inited' => (
     default => sub { 0 },
 );
 
+has '_pi' => (
+    is => 'ro',
+);
+has '_pins' => (
+    is => 'ro',
+    default => sub {[]},
+);
 
-my $CALLED_WIRING_SETUP = 0;
 
 
 sub BUILDARGS
@@ -155,28 +88,25 @@ sub BUILDARGS
     my $rpi_type = delete($args->{type}) // $class->TYPE_REV1;
 
     $args->{pwm_bit_resolution} = 10;
-    $args->{pwm_max_int}        = 2 ** $args->{pwm_bit_resolution};
+    $args->{pwm_max_int}        = 2 ** $args->{pwm_bit_resolution} - 1;
 
     if( TYPE_REV1 == $rpi_type ) {
         $args->{input_pin_count}  = 26;
         $args->{output_pin_count} = 26;
         $args->{pwm_pin_count}    = 0;
         $args->{pin_desc}         = $class->_pin_desc_rev1;
-        $args->{'_pin_map'}       = $class->PIN_MAP_REV1;
     }
     elsif( TYPE_REV2 == $rpi_type ) {
         $args->{input_pin_count}  = 26;
         $args->{output_pin_count} = 26;
         $args->{pwm_pin_count}    = 1;
         $args->{pin_desc}         = $class->_pin_desc_rev2;
-        $args->{'_pin_map'}       = $class->PIN_MAP_REV2;
     }
     elsif( TYPE_MODEL_B_PLUS == $rpi_type ) {
         $args->{input_pin_count}  = 26;
         $args->{output_pin_count} = 26;
         $args->{pwm_pin_count}    = 1;
         $args->{pin_desc}         = $class->_pin_desc_model_b_plus;
-        $args->{'_pin_map'}       = $class->PIN_MAP_MODEL_B_PLUS;
     }
     else {
         die "Don't know what to do with Rpi type '$rpi_type'\n";
@@ -185,42 +115,124 @@ sub BUILDARGS
     $args->{'_pin_mode'}         = [ ('IN') x $args->{input_pin_count}  ];
     $args->{'_output_pin_value'} = [ (0)    x $args->{output_pin_count} ];
 
-    HiPi::Wiring::wiringPiSetup() unless $CALLED_WIRING_SETUP;
-    $CALLED_WIRING_SETUP = 1;
+    my $pi = RPi::WiringPi->new;
+    $args->{'_pi'} = $pi;
 
     return $args;
 }
 
+sub BUILD
+{
+    my ($self) = @_;
+    my $pi = $self->_pi;
+
+    # Since RPi::Wiring interrupt handling needs a function name as a string, 
+    # rather than a function reference, make all the possible functions for
+    # the pins.
+    foreach my $pin_num (0 .. MAX_INPUT_PINS) {
+        no strict 'refs';
+        my $name_for_pin = $self->_anyevent_callback_name_for_pin( $pin_num );
+        *$name_for_pin = sub {
+            my $cv = $self->condvar_for_pin->{$pin_num};
+            my $callback = $cv->cb;
+
+            my $val = $self->input_pin( $pin_num );
+            $cv->send( $pin_num, $val );
+
+            my $new_cv = AnyEvent->condvar;
+            $new_cv->cb( $callback );
+            $self->condvar_for_pin->{$pin_num} = $new_cv;
+        };
+    }
+
+    return $self;
+}
+
+sub DEMOLISH
+{
+    my ($self) = @_;
+
+    # Cleanup the mess of instance-specific methods we created in BUILD
+    foreach my $pin_num (0 .. MAX_INPUT_PINS) {
+        no strict 'refs';
+        my $name_for_pin = $self->_anyevent_callback_name_for_pin( $pin_num );
+        undef *$name_for_pin;
+    }
+
+    return $self;
+}
+
+sub _input_anyevent_callback
+{
+}
+
+sub _get_pin
+{
+    my ($self, $pin_num) = @_;
+    return $self->_pins->[$pin_num]
+        if defined $self->_pins->[$pin_num];
+
+    my $pin = $self->_pi->pin( $pin_num );
+    $self->_pins->[$pin_num] = $pin;
+    return $self->_pins->[$pin_num];
+}
+
 
 has 'input_pin_count', is => 'ro';
-with 'Device::WebIO::Device::DigitalInput';
+with 'Device::WebIO::Device::DigitalInputAnyEvent';
+
+has 'condvar_for_pin' => (
+    is => 'ro',
+    default => sub {{}},
+);
 
 sub set_as_input
 {
     my ($self, $rpi_pin) = @_;
-    my $pin = $self->_rpi_pin_to_wiring( $rpi_pin );
-    return undef if $pin < 0;
-    $self->{'_pin_mode'}[$pin] = 'IN';
-    HiPi::Wiring::pinMode( $pin, WPI_INPUT );
+
+    my $pin = $self->_get_pin( $rpi_pin );
+    $pin->mode( INPUT );
+    $self->{'_pin_mode'}[$rpi_pin] = 'IN';
+
     return 1;
 }
 
 sub input_pin
 {
     my ($self, $rpi_pin) = @_;
-    my $pin = $self->_rpi_pin_to_wiring( $rpi_pin );
-    return undef if $pin < 0;
-    my $in = HiPi::Wiring::digitalRead( $pin );
+
+    my $pin = $self->_get_pin( $rpi_pin );
+    my $in = $pin->read;
+
     return $in;
 }
 
 sub is_set_input
 {
     my ($self, $rpi_pin) = @_;
-    my $pin = $self->_rpi_pin_to_wiring( $rpi_pin );
-    return undef if $pin < 0;
-    return 1 if $self->_pin_mode->[$pin] eq 'IN';
+    return 1 if $self->_pin_mode->[$rpi_pin] eq 'IN';
     return 0;
+}
+
+sub set_anyevent_condvar
+{
+    my ($self, $rpi_pin, $cv) = @_;
+    my $method_name = $self->_anyevent_callback_name_for_pin( $rpi_pin );
+    $self->condvar_for_pin->{$rpi_pin} = $cv;
+
+    my $pin = $self->_get_pin( $rpi_pin );
+    $pin->mode( INPUT );
+    $pin->set_interrupt( EDGE_BOTH, $method_name );
+
+    return;
+}
+
+sub _anyevent_callback_name_for_pin
+{
+    my ($self, $pin_num) = @_;
+    my $pack_prefix = "$self";
+    my $name = $pack_prefix . '::_pin_' . $pin_num . '_interrupt';
+    return $name;
 }
 
 
@@ -230,29 +242,27 @@ with 'Device::WebIO::Device::DigitalOutput';
 sub set_as_output
 {
     my ($self, $rpi_pin) = @_;
-    my $pin = $self->_rpi_pin_to_wiring( $rpi_pin );
-    return undef if $pin < 0;
-    $self->{'_pin_mode'}[$pin] = 'OUT';
-    HiPi::Wiring::pinMode( $pin, WPI_OUTPUT );
+
+    my $pin = $self->_get_pin( $rpi_pin );
+    $pin->mode( OUTPUT );
+    $self->{'_pin_mode'}[$rpi_pin] = 'OUT';
+
     return 1;
 }
 
 sub output_pin
 {
     my ($self, $rpi_pin, $value) = @_;
-    my $pin = $self->_rpi_pin_to_wiring( $rpi_pin );
-    return undef if $pin < 0;
+    my $pin = $self->_get_pin( $rpi_pin );
     $self->_output_pin_value->[$rpi_pin] = $value;
-    HiPi::Wiring::digitalWrite( $pin, $value ? WPI_HIGH : WPI_LOW );
+    $pin->write( $value ? HIGH : LOW );
     return 1;
 }
 
 sub is_set_output
 {
     my ($self, $rpi_pin) = @_;
-    my $pin = $self->_rpi_pin_to_wiring( $rpi_pin );
-    return undef if $pin < 0;
-    return 1 if $self->_pin_mode->[$pin] eq 'OUT';
+    return 1 if $self->_pin_mode->[$rpi_pin] eq 'OUT';
     return 0;
 }
 
@@ -262,18 +272,25 @@ has 'pwm_bit_resolution', is => 'ro';
 has 'pwm_max_int',        is => 'ro';
 with 'Device::WebIO::Device::PWM';
 
+use constant PWM_PIN_MAP => {
+    0 => 12,
+    1 => 13,
+};
+
 {
     my %did_set_pwm;
     sub pwm_output_int
     {
         my ($self, $rpi_pin, $val) = @_;
-        my $pin = $self->_rpi_pin_to_wiring( $rpi_pin );
-        return undef if $pin < 0;
-        HiPi::Wiring::pinMode( $pin, WPI_PWM_OUTPUT )
-            if ! exists $did_set_pwm{$pin};
-        $did_set_pwm{$pin} = 1;
+        return unless exists $self->PWM_PIN_MAP->{$rpi_pin};
+        my $real_pin_num = $self->PWM_PIN_MAP->{$rpi_pin};
+        my $pin = $self->_get_pin( $real_pin_num );
 
-        HiPi::Wiring::pwmWrite( $pin, $val );
+        $pin->mode( PWM_OUT )
+            if ! exists $did_set_pwm{$rpi_pin};
+        $did_set_pwm{$rpi_pin} = 1;
+
+        $pin->pwm( $val );
         return 1;
     }
 }
@@ -422,38 +439,23 @@ sub i2c_channels { 2 }
 sub i2c_read
 {
     my ($self, $channel, $addr, $register, $len) = @_;
-    my $dev = $self->_get_i2c_device( $channel, $addr );
-    my @data = $dev->bus_read( $register, $len );
+
+    my $dev_str = '/dev/i2c-' . $channel;
+    my $i2c = $self->_pi->i2c( $addr, $dev_str );
+    my @data = $i2c->read_bytes( $len, $register );
+
     return @data;
 }
 
 sub i2c_write
 {
     my ($self, $channel, $addr, $register, @data) = @_;
-    my $dev = $self->_get_i2c_device( $channel, $addr );
-    $dev->bus_write( $register, @data );
+
+    my $dev_str = '/dev/i2c-' . $channel;
+    my $i2c = $self->_pi->i2c( $addr, $dev_str );
+    $i2c->write_block( \@data, $register );
+
     return 1;
-}
-
-{
-    my @DEVS;
-    sub _get_i2c_device
-    {
-        my ($self, $channel, $addr) = @_;
-        return $DEVS[$channel]{$addr} if exists $DEVS[$channel]{$addr};
-
-        my $peri = 
-            $channel == 1 ? BB_I2C_PERI_1 :
-            $channel == 0 ? BB_I2C_PERI_0 :
-            undef;
-        my $hipi = HiPi::BCM2835::I2C->new(
-            peripheral => $peri,
-            address    => $addr,
-        );
-
-        $DEVS[$channel]{$addr} = $hipi;
-        return $hipi;
-    }
 }
 
 
@@ -731,13 +733,6 @@ sub _pin_desc_model_b_plus
 }
 
 
-sub _rpi_pin_to_wiring
-{
-    my ($self, $rpi_pin) = @_;
-    my $pin = $self->_pin_map->{$rpi_pin} // -1;
-    return $pin;
-}
-
 
 sub all_desc
 {
@@ -783,22 +778,15 @@ sub _init_gstreamer
 }
 
 
+# TODO RPi::WiringPi conversion below this line
 with 'Device::WebIO::Device::SPI';
 
-my @CHANNEL_NAMES = sort HiPi::Device::SPI->get_device_list;
-has '_spi_channel_devs' => (
-    is      => 'ro',
-    default => sub {{}},
-);
-
-
-sub spi_channels { scalar @CHANNEL_NAMES }
+sub spi_channels { 0 }
 
 sub spi_set_speed
 {
     my ($self, $channel, $speed) = @_;
-    my $dev = $self->_spi_get_dev( $channel, $speed );
-    $dev->set_bus_maxspeed( $speed );
+    my $spi = $self->_spi_get_dev( $channel, $speed );
     return 1;
 }
 
@@ -806,16 +794,17 @@ sub spi_read
 {
     my ($self, $channel, $len) = @_;
     my $dev  = $self->_spi_get_dev( $channel );
-    my $buf  = pack 'C*', ((0x00) x $len);
-    my $recv = $dev->transfer( $buf );
+    my $recv = $dev->rw( [ (0) x $len ], $len );
+    return $recv;
     return [ unpack 'C*', $recv ];
 }
 
 sub spi_write
 {
     my ($self, $channel, $data) = @_;
-    my $dev  = $self->_spi_get_dev( $channel );
-    $dev->transfer( $data );
+    my $dev = $self->_spi_get_dev( $channel );
+    my @data = unpack 'C*', $data;
+    $dev->rw( \@data, scalar(@data) );
     return 1;
 }
 
@@ -823,19 +812,19 @@ sub _spi_get_dev
 {
     my $self    = shift;
     my $channel = shift;
-    my $channel_name = $CHANNEL_NAMES[$channel];
-    return $self->_spi_channel_devs->{$channel_name}
-        if exists $self->_spi_channel_devs->{$channel_name};
-
+    my $do_set_speed = @_ ? 1 : 0;
     my $speed = @_
         ? shift
-        : SPI_SPEED_KHZ_500;
+        : 500_000;
 
-    my $dev = HiPi::Device::SPI->new(
-        devicename => $channel_name,
-        speed      => $speed,
-    );
-    $self->_spi_channel_devs->{$channel_name} = $dev;
+    my $dev = exists $self->_spi_channel_devs->{$channel}
+        ? $self->_spi_channel_devs->{$channel}
+        : undef;
+
+    if( $do_set_speed || (! defined $dev) ) {
+        $dev = $self->_pi->spi( $channel, $speed );
+    }
+
     return $dev;
 }
 
@@ -891,6 +880,8 @@ set the ALSA device for recording.
 
 =item * DigitalInput
 
+=item * DigitalInputAnyEvent
+
 =item * PWM
 
 =item * StillImageOutput
@@ -927,7 +918,7 @@ use for input. Default is 'hw:1,0'.
 
 =head1 LICENSE
 
-Copyright (c) 2015  Timm Murray
+Copyright (c) 2018  Timm Murray
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are 

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes JSON::RPC2 version v2.1.0
+    This document describes JSON::RPC2 version v2.1.2
 
 SYNOPSIS
 
@@ -115,8 +115,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2009-2014 by Alex Efros
-    <powerman@cpan.org>.
+    This software is Copyright (c) 2009- by Alex Efros <powerman@cpan.org>.
 
     This is free software, licensed under:
 

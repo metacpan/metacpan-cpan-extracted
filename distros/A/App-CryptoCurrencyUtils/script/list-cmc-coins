@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/CryptoCurrencyUtils/list_cmc_coins
 # and generated automatically using Perinci::CmdLine::Gen version 0.485
 
-our $DATE = '2018-03-08'; # DATE
+our $DATE = '2018-04-06'; # DATE
 our $DIST = 'App-CryptoCurrencyUtils'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ list-cmc-coins - List of all coins listed on coinmarketcap.com (CMC) along with 
 
 =head1 VERSION
 
-This document describes version 0.011 of list-cmc-coins (from Perl distribution App-CryptoCurrencyUtils), released on 2018-03-08.
+This document describes version 0.012 of list-cmc-coins (from Perl distribution App-CryptoCurrencyUtils), released on 2018-04-06.
 
 =head1 SYNOPSIS
 

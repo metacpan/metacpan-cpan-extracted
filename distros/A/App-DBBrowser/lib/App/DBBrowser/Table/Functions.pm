@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.009';
+our $VERSION = '2.012';
 
 use List::MoreUtils qw( first_index );
 
@@ -156,7 +156,7 @@ sub __prepare_col_func {
         my $info = "TRUNC $qt_col";
         my $name = "Decimal places: ";
         my $precision = choose_a_number( 2,
-            { info => $info, name => $name, small => 1, mouse => $sf->{o}{table}{mouse}, clear_screen => 0 }
+            { info => $info, name => $name, small_on_top => 1, mouse => $sf->{o}{table}{mouse}, clear_screen => 0 }
         );
         return if ! defined $precision;
         $quote_f = $plui->truncate( $qt_col, $precision );

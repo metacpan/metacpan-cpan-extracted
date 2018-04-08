@@ -5,7 +5,7 @@
 
 #include "ppport.h"
 #include "konto_check.h"
-#include "konto_check-at.h"
+// #include "konto_check-at.h"
 
 MODULE = Business::KontoCheck		PACKAGE = Business::KontoCheck		
 PROTOTYPES: ENABLE
@@ -2498,44 +2498,4 @@ PPCODE:
       XPUSHs(blz_array_p);
       XSRETURN(1);
    }
-
-int
-kto_check_at(blz,kto,lut_name)
-   char *blz;
-   char *kto;
-   char *lut_name;
-
-char *
-kto_check_at_str(blz,kto,lut_name)
-   char *blz;
-   char *kto;
-   char *lut_name;
-
-int
-generate_lut_at(inputname,outputname...)
-   char *inputname;
-   char *outputname;
-PREINIT:
-#line 1419 "KontoCheck.lx"
-   char *plain_name;
-   char *plain_format;
-CODE:
-#line 1422 "KontoCheck.lx"
-   if(items==2){
-      plain_name=NULL;
-      plain_format=NULL;
-   }
-   else if(items==3){
-      plain_name=(char *)SvPV_nolen(ST(2));
-      plain_format=NULL;
-   }
-   else if(items==4){
-      plain_name=(char *)SvPV_nolen(ST(2));
-      plain_format=(char *)SvPV_nolen(ST(3));
-   }
-   else
-      Perl_croak(aTHX_ "Usage: Business::KontoCheck::generate_lut_at(inputname,outputname[,plain_name[,plain_format]])");
-   RETVAL=generate_lut_at(inputname,outputname,plain_name,plain_format);
-OUTPUT:
-   RETVAL
 

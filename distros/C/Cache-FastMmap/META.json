@@ -38,9 +38,12 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/robmueller/cache-fastmmap/issues"
+      },
       "repository" : {
          "url" : "https://github.com/robmueller/cache-fastmmap"
       }
    },
-   "version" : "1.46"
+   "version" : "1.47"
 }

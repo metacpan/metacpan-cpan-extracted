@@ -1,4 +1,19 @@
-Revision history for Perl extension App::Env.
+Revision history for App-Env
+
+0.34      2018-04-02 11:03:48-04:00 America/New_York
+
+  [BUG FIX]
+
+    * compilation of App::Env would fail if Capture::Tiny was
+      previously loaded
+
+    * uncaching via CacheID was broken
+
+  [BUILD]
+
+    * switch to Dist::Zilla
+
+
 0.33  2016-07-13T12:16:55-0400
 
   [BUG FIX]

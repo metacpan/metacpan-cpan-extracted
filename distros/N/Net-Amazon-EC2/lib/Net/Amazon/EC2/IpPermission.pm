@@ -1,5 +1,5 @@
 package Net::Amazon::EC2::IpPermission;
-$Net::Amazon::EC2::IpPermission::VERSION = '0.35';
+$Net::Amazon::EC2::IpPermission::VERSION = '0.36';
 use Moose;
 
 =head1 NAME

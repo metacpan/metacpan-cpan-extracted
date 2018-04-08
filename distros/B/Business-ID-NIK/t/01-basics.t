@@ -5,7 +5,6 @@ use strict;
 use warnings;
 
 use Business::ID::NIK qw(parse_nik);
-use Data::Clean::JSON;
 use Test::More 0.98;
 
 test_parse(
@@ -49,12 +48,9 @@ DONE_TESTING:
 done_testing;
 
 sub test_parse {
-    # just to convert DateTime objects to Unix time
-    state $cleanser = Data::Clean::JSON->get_cleanser;
-
     my %args = @_;
     subtest +($args{name} //= "nik $args{nik}"), sub {
-        my $res = $cleanser->clean_in_place(parse_nik(nik => $args{nik}));
+        my $res = parse_nik(nik => $args{nik});
         if (exists $args{status}) {
             is($res->[0], $args{status}) or diag explain $res;
         }

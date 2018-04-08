@@ -1,5 +1,5 @@
 package System::Command;
-$System::Command::VERSION = '1.118';
+$System::Command::VERSION = '1.119';
 use warnings;
 use strict;
 use 5.006;
@@ -386,6 +386,10 @@ __END__
 
 System::Command - Object for running system commands
 
+=head1 VERSION
+
+version 1.119
+
 =head1 SYNOPSIS
 
     use System::Command;
@@ -616,6 +620,15 @@ The method blocks until the command is completed (or rather, until
 its output and errput handles have been closed), or until one of the
 callbacks returns a false value.
 
+Data is read using L<readline|perlfunc/readline>, which depends on C<$/>
+for its definition of a "line". To that effect, the method takes a third
+optional argument, C<input_record_separator>, which sets the value for
+C<$/> for the duration of the call.
+
+I<Caveat Emptor>: since C<loop_on> is line-based, it may B<block> if
+either output or errput sends incomplete lines (e.g. if the command is
+some sort of interactive shell with a prompt).
+
 The return value is true if the command exited with status 0, and false
 otherwise (i.e. the Unix traditional definition of success).
 
@@ -802,4 +815,3 @@ by the Free Software Foundation; or the Artistic License.
 See L<http://dev.perl.org/licenses/> for more information.
 
 =cut
-

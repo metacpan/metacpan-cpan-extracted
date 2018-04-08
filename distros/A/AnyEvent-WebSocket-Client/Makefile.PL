@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
   },
   "PREREQ_PM" => {
     "AnyEvent"            => "7.13",
+    "AnyEvent::Connector" => "0.03",
     "Moo"                 => "2.0",
     "PerlX::Maybe"        => "0.003",
     "Protocol::WebSocket" => "0.20",
@@ -41,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test2::Require::Module" => "0.000060",
     "Test2::V0"              => "0.000060"
   },
-  "VERSION" => "0.44",
+  "VERSION" => "0.46",
   "test"    => {
     "TESTS" => "t/*.t"
     }
@@ -49,6 +50,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "AnyEvent"               => "7.13",
+  "AnyEvent::Connector"    => "0.03",
   "Moo"                    => "2.0",
   "PerlX::Maybe"           => "0.003",
   "Protocol::WebSocket"    => "0.20",

@@ -1,11 +1,26 @@
-To prepare the package, run from command line:
+To merely try this software, there is no need to install anything.
+The utilities in bin/ may be run from their location.
+
+To generate Makefile and test the package, run from command line:
 
 	% perl Makefile.PL
 	% make
-	% make tests
+	% make test
 
 To install the package (probably as root), run:
 
 	% make install
+
+The default installation directories are usually /usr/local/bin
+for utilities and /usr/local/share/perl5 for perl modules.
+To change them, specify parameters on the "make install" step
+(see "perldoc ExtUtils::MakeMaker") or on the first step, like:
+
+	perl Makefile.PL PREFIX=/tmp/myroot
+
+In this case the installation directories will be:
+/tmp/myroot/bin for utilities,
+/tmp/myroot/share/man/man3 for man pages and
+/tmp/myroot/share/perl5 for perl modules.
 
 Good luck.

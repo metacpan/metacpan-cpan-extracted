@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    This document describes CGI::Stateless version v1.0.2
+    This document describes CGI::Stateless version v2.0.1
 
 SYNOPSIS
 
@@ -75,7 +75,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2009 by Alex Efros <powerman@cpan.org>.
+    This software is Copyright (c) 2009- by Alex Efros <powerman@cpan.org>.
 
     This is free software, licensed under:
 

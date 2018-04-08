@@ -1,38 +1,88 @@
 package App::Egaz;
 
-our $VERSION = "0.0.10";
+our $VERSION = "0.0.14";
 
 use strict;
 use warnings;
 use App::Cmd::Setup -app;
 
-1;
-__END__
+=pod
 
 =encoding utf-8
 
 =head1 NAME
 
-App::Egaz - It's new $module
+App::Egaz - Backend of B<E>asy B<G>enome B<A>ligner
 
 =head1 SYNOPSIS
 
-    use App::Egaz;
+    egaz <command> [-?h] [long options...]
+            -? -h --help  show help
+
+    Available commands:
+
+        commands: list the application's commands
+            help: display a command's help screen
+
+          blastn: blastn wrapper between two fasta files
+      exactmatch: exact matched positions in genome sequences
+         formats: formats of files use in this project
+           lastz: lastz wrapper for two genomes or self alignments
+         lav2axt: convert .lav files to .axt files
+         lav2psl: convert .lav files to .psl files
+          lpcnam: the pipeline of pairwise lav-psl-chain-net-axt-maf
+          masked: masked (or gaps) regions in fasta files
+       maskfasta: soft/hard-masking sequences in a fasta file
+       normalize: normalize lav files
+       partition: partitions fasta files by size
+        plottree: use the ape package to draw newick trees
+         prepseq: preparing steps for lastz
+           raxml: raxml wrapper to construct phylogenetic trees
+
+Run C<egaz help command-name> for usage information.
 
 =head1 DESCRIPTION
 
-App::Egaz is ...
+App::Egaz is the backend of B<E>asy B<G>enome B<A>ligner.
+
+B<Caution>: C<egaz lpcnam> implement UCSC's chain-net pipeline, but some parts,
+e.g. C<axtChain> don't work correctly under macOS. Use C<egaz lastz>'s build in
+chaining mechanism (C<C=2>) instead.
+
+=head1 INSTALLATION
+
+    cpanm --installdeps https://github.com/wang-q/App-Egaz/archive/0.0.11.tar.gz
+    curl -fsSL https://raw.githubusercontent.com/wang-q/App-Egaz/master/share/check_dep.sh | bash
+    cpanm -nq https://github.com/wang-q/App-Egaz/archive/0.0.11.tar.gz
+    # cpanm -nq https://github.com/wang-q/App-Egaz.git
+
+=head1 EXAMPLE
+
+=over 4
+
+=item Procedures of multiple genome alignments
+
+=over 8
+
+=item Detailed/alternative steps for I<Saccharomyces cerevisiae> strains L<https://github.com/wang-q/App-Egaz/blob/master/doc/Scer.md>
+
+=back
+
+=back
+
+=head1 AUTHOR
+
+Qiang Wang E<lt>wang-q@outlook.comE<gt>
 
 =head1 LICENSE
 
-Copyright (C) wang-q.
+This software is copyright (c) 2018 by Qiang Wang.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-=head1 AUTHOR
-
-wang-q E<lt>wang-q@outlook.comE<gt>
-
 =cut
 
+1;
+
+__END__

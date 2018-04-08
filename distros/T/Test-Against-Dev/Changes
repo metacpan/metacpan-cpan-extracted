@@ -1,5 +1,8 @@
 Revision history for Perl module Test::Against::Dev
 
+0.08 Tue Apr  3 11:55:09 EDT 2018
+    - Correct some errors in test files.  No functional changes.
+
 0.07 Thu Mar 22 15:11:55 EDT 2018
     - new_from_existing_perl_cpanm():  Assign cpanm_dir within object.
     - Improved metadata.

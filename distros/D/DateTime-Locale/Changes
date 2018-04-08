@@ -1,3 +1,8 @@
+1.18     2018-04-03
+
+- Rebuilt all locale data with CLDR 33, released on 2018-03-26.
+
+
 1.17     2017-11-04
 
 - Rebuilt all locale data with CLDR 32, released on 2017-11-01.

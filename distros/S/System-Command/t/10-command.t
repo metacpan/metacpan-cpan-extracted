@@ -152,22 +152,28 @@ for my $t ( @tests, @fail ) {SKIP:{
         for grep { !defined $t->{options}{env}{$_} }
         keys %{ $t->{options}{env} || {} };
     delete $env->{$_} for grep /^CONEMU/, keys %ENV;
+    if (MSWin32) {
+        # env vars can't be empty strings on Win32
+        # seems GNU make is adding an empty-string MFLAGS env-var which causes mayhem
+        delete $env->{$_} for grep !length $env->{$_}, keys %$env;
+    }
     my $info;
     eval $output;
     my $w32env = {};
     $w32env = { PWD => $t->{options}{cwd} }
         if MSWin32 && exists $t->{options}{cwd};
-    is_deeply(
-        $info,
-        {   argv  => [],
-            cwd   => $t->{options}{cwd} || $cwd,
-            env   => { %$env, %$w32env },
-            input => $t->{options}{input} || '',
-            name  => $t->{name} || $name,
-            pid   => $cmd->pid,
-        },
-        "perl $name"
-    );
+    my $expected = {   argv  => [],
+        cwd   => $t->{options}{cwd} || $cwd,
+        env   => { %$env, %$w32env },
+        input => $t->{options}{input} || '',
+        name  => $t->{name} || $name,
+        pid   => $cmd->pid,
+    };
+    is_deeply($info, $expected, "perl $name") or do {
+        diag '$t: ', explain $t;
+        diag '$info: ', explain $info;
+        diag '$expected: ', explain $expected;
+    };
 
     # close and check
     my $reaper = $cmd->close();

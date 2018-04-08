@@ -34,6 +34,7 @@
          "requires" : {
             "JSON" : "0",
             "Moo" : "0",
+            "Moose" : "0",
             "Types::Standard" : "0",
             "perl" : "5.006000"
          }
@@ -41,6 +42,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "v0.0.1",
+   "version" : "v0.0.5",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

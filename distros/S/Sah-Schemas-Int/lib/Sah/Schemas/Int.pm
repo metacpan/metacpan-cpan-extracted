@@ -1,7 +1,7 @@
 package Sah::Schemas::Int;
 
-our $DATE = '2017-08-19'; # DATE
-our $VERSION = '0.070'; # VERSION
+our $DATE = '2018-04-03'; # DATE
+our $VERSION = '0.071'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas for various integers
@@ -18,7 +18,7 @@ Sah::Schemas::Int - Sah schemas for various integers
 
 =head1 VERSION
 
-This document describes version 0.070 of Sah::Schemas::Int (from Perl distribution Sah-Schemas-Int), released on 2017-08-19.
+This document describes version 0.071 of Sah::Schemas::Int (from Perl distribution Sah-Schemas-Int), released on 2018-04-03.
 
 =head1 SAH SCHEMAS
 
@@ -75,7 +75,9 @@ Negative odd number.
 
 =item * L<nonnegint|Sah::Schema::nonnegint>
 
-Non-negative integer (0, 1, 2, ...).
+Non-negative integer (0, 1, 2, ...) [DEPRECATED].
+
+This schema is DEPRECATED. Please use the new name C<uint>.
 
 See also C<posint> for integers that start from 1.
 
@@ -99,6 +101,13 @@ negative. See also C<nonnegint> for integers that start from 0.
 =item * L<posodd|Sah::Schema::posodd>
 
 Positive odd number.
+
+=item * L<uint|Sah::Schema::uint>
+
+Non-negative integer (0, 1, 2, ...).
+
+See also C<posint> for integers that start from 1.
+
 
 =item * L<uint128|Sah::Schema::uint128>
 
@@ -150,7 +159,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

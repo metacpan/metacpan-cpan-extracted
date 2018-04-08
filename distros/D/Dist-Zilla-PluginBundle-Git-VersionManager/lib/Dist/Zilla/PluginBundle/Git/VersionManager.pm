@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Git::VersionManager; # git description: v0.004-3-g00cb62d
+package Dist::Zilla::PluginBundle::Git::VersionManager; # git description: v0.005-10-gee115ef
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle that manages your version in git
 # KEYWORDS: bundle distribution git version Changes increment
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use Moose;
 with
@@ -78,23 +78,9 @@ sub configure
 {
     my $self = shift;
 
-    die 'you cannot change the distribution version with $V along with bump_only_matching_versions: update the .pm file(s) first'
-        if $ENV{V} and $self->bump_only_matching_versions;
-
     my $fallback_version_provider =
         $self->payload->{'RewriteVersion::Transitional.fallback_version_provider'}
             // 'Git::NextVersion';  # TODO: move this default to an attribute; be careful of overlays
-
-    # allow override of any config option for the fallback_version_provider plugin
-    # by specifying it as if it was used directly
-    # i.e. Git::NextVersion.foo = ... in dist.ini is rewritten in the payload as
-    # RewriteVersion::Transitional.foo = ... so it can override defaults passed in by the caller
-    # (a wrapper plugin bundle.)
-    foreach my $fallback_key (grep { /^$fallback_version_provider\./ } keys %{ $self->payload })
-    {
-        (my $new_key = $fallback_key) =~ s/^$fallback_version_provider(?=\.)/RewriteVersion::Transitional/;
-        $self->payload->{$new_key} = delete $self->payload->{$fallback_key};
-    }
 
     $self->add_plugins(
         # adding this first indicates the start of the bundle in x_Dist_Zilla metadata
@@ -105,8 +91,14 @@ sub configure
 
         # VersionProvider (and a file munger, for the transitional usecase)
         $self->bump_only_matching_versions
-            ? [ 'VersionFromMainModule' ]
-            : [ 'RewriteVersion::Transitional' => { ':version' => '0.004' } ],
+            ? [ 'VersionFromMainModule' => exists $ENV{V} ? { ':version' => '0.04' } : () ]
+
+            # allow override of any config option for the fallback_version_provider plugin
+            # by specifying it as if it was used directly
+            # i.e. Git::NextVersion.foo = ... in dist.ini is rewritten in the payload as
+            # RewriteVersion::Transitional.foo = ... so it can override defaults passed in by the caller
+            # (a wrapper plugin bundle.)
+            : [ 'RewriteVersion::Transitional' => { ':version' => '0.004', $self->_payload_for($fallback_version_provider), $self->_payload_for('RewriteVersion') } ],
 
         [ 'MetaProvides::Update' ],
 
@@ -117,13 +109,20 @@ sub configure
                 allow_dirty => [ $self->commit_files_after_release ],
             } ],
         [ 'Git::Tag' ],
+    );
 
-        # for all_matching => 1, we presume the author already has versions set up the way he wants them (and for
-        # consistency with the removal of RewriteVersion above), so we do not bother with it;
-        # this also lets us specify the minimum necessary version for the feature.
+    my %bump_version_payload = (
+        $self->_payload_for('BumpVersionAfterRelease'),
+        $self->_payload_for('BumpVersionAfterRelease::Transitional'),
+    );
+
+    $self->add_plugins(
+        # when using all_matching => 1, we presume the author already has versions set up the way he wants them
+        # (and for consistency with the removal of RewriteVersion above), so we do not bother with using
+        # ::Transitional; this also lets us specify the minimum necessary version for the feature.
         $self->bump_only_matching_versions
-            ? [ 'BumpVersionAfterRelease' => { ':version' => '0.016', all_matching => 1 } ]
-            : [ 'BumpVersionAfterRelease::Transitional' => { ':version' => '0.004' } ],
+            ? [ 'BumpVersionAfterRelease' => { ':version' => '0.016', all_matching => 1, %bump_version_payload } ]
+            : [ 'BumpVersionAfterRelease::Transitional' => { ':version' => '0.004', %bump_version_payload } ],
 
         [ 'NextRelease'         => {
                 ':version' => '5.033',
@@ -134,11 +133,10 @@ sub configure
                 ':version' => '2.020',
                 allow_dirty => [
                     'Changes',
-                    !exists($self->payload->{'BumpVersionAfterRelease::Transitional.munge_makefile_pl'})
-                            || $self->payload->{'BumpVersionAfterRelease::Transitional.munge_makefile_pl'}
+                    # these default to true when not provided
+                    !exists($bump_version_payload{munge_makefile_pl}) || $bump_version_payload{munge_makefile_pl}
                         ? 'Makefile.PL' : (),
-                    !exists($self->payload->{'BumpVersionAfterRelease::Transitional.munge_build_pl'})
-                            || $self->payload->{'BumpVersionAfterRelease::Transitional.munge_build_pl'}
+                    !exists($bump_version_payload{munge_build_pl}) || $bump_version_payload{munge_build_pl}
                         ? 'Build.PL' : (),
                 ],
                 allow_dirty_match => [ '^lib/.*\.pm$' ],
@@ -180,6 +178,22 @@ around add_plugins => sub
     return $self->$orig(@plugins);
 };
 
+# extracts all payload configs for a specific plugin, deletes them from the payload,
+# and returns those entries with the plugin name stripped
+sub _payload_for
+{
+    my ($self, $plugin_name) = @_;
+
+    my %extracted;
+    foreach my $full_key (grep { /^\Q$plugin_name.\E/ } keys %{ $self->payload })
+    {
+        (my $base_key = $full_key) =~ s/^\Q$plugin_name.\E//;
+        $extracted{$base_key} = delete $self->payload->{$full_key};
+    }
+
+    return %extracted;
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 
@@ -195,7 +209,7 @@ Dist::Zilla::PluginBundle::Git::VersionManager - A plugin bundle that manages yo
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -233,6 +247,8 @@ When no custom options are passed, it is equivalent to the following configurati
 
     [RewriteVersion::Transitional]
     :version = 0.004
+
+    ; ... and whatever plugin and configs were specified in <fallback_version_provider>
 
     [MetaProvides::Update]
 
@@ -281,7 +297,7 @@ case:
 
 =item *
 
-while preparing the build and release, I<no> module C<$VERSION> declarations will be altered to match the distribution version (therefore they must be set to the desired values in advance). Consequently, attempting to alter the distribution version with C<V=...> will result in a fatal error.
+while preparing the build and release, I<no> module C<$VERSION> declarations will be altered to match the distribution version (therefore they must be set to the desired values in advance).
 
 =item *
 

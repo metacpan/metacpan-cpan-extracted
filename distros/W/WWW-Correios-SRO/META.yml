@@ -22,5 +22,5 @@ requires:
   LWP::UserAgent: '0'
   Test::More: '0.88'
   parent: '0'
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

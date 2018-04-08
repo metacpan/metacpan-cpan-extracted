@@ -11,6 +11,14 @@ Mojolicious::Plugin::RoutesConfig - Describe routes in configuration
         {get  => '/groups', to => 'groups#list', name => 'list_groups'},
         {post => '/groups', to => 'groups#create'},
         {any => {[qw(GET POST)] => '/users'}, to => 'users#list_or_create'},
+
+        {under => '/управление', to => 'auth#under_management',
+          routes => [
+              {any  => '/', to   => 'upravlenie#index', name => 'home_upravlenie'},
+              {get  => '/groups', to   => 'groups#index', name => 'home_groups'},
+              #...
+          ],
+        },
       ],
     }
 

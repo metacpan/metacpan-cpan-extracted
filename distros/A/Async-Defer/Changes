@@ -1,5 +1,8 @@
 Revision history for Async-Defer
 
+v1.0.1  2018-04-03 20:27:05 EEST
+	- Reformat doc.
+
 v1.0.0  2016-02-19 11:49:06 EET
 	- Switch to Dist::Milla.
 

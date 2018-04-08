@@ -1,14 +1,35 @@
 package String::Validator;
-
-use 5.006;
+$String::Validator::VERSION = '2.00';
+use 5.008;
 use strict;
 use warnings;
 
-=head1 NAME 
+# ABSTRACT: A Collection of Routines for validating and transforming strings
 
-String::Validator
 
-=head2 A Collection of Routines for validating strings
+1;
+
+# End of Validator
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+String::Validator - A Collection of Routines for validating and transforming strings
+
+=head1 VERSION
+
+version 2.00
+
+=head1 Description
+
+A Collection of Routines for validating and transforming strings
+
+=head2 Why String::Validator
 
 You have a string and you need to know if it is what you need it to be.
 You just wasted three hours before you realized it was going to take
@@ -19,7 +40,7 @@ Since as often as not you're not just validating strings, but also
 trying to get them into a specific format, many String::Validator Modules
 will do this.
 
-=head3 This Module is Empty
+=head3 The String::Validator Module
 
 The Core Module, String::Validator is empty. It contains some common
 documentation, and all other String::Validator Modules are dependencies
@@ -72,100 +93,49 @@ and will be documented in their own POD.
      maybe
  if ( $Validator->IsNot_Valid('ThisString', 'RepeatThisString') { do something }
  say  $Validator->String ;
- 
+
 =head2 CamelCase lowercase
 
 The base class String::Validator::Common provides both the CamelCase and lowercase
 versions of the methods it provides for use by the end user of the inheriting module,
 this is done to make it even more convenient.
 
+=head1 Customizing with Language and Custom Messages.
+
+As of Version 2.0 the ->new Method to takes two optional parameters: language and custom_messages, which are expected to be a hash of message names and messages, in some cases the messages are code_refs. String::Validator::Language contains translation modules. You may also pass a hash over-riding the messages of a String::Validator with custom_messages. If you want to write customzed messages in a Validator Module, obtain a list of the messages, by using Data::Dumper or Data::Printer against an object of that validator; without any languages loaded.
+
+ my $TranslatedValidator =
+     String::Validator::SomeValidator->new(
+         language=> String::Validator::Language::CHACKOBSA->new,
+         custom_messages => {
+         	somevalidator_sandworm => 'Shai-Halud'});
+
+See String::Validator::Language for a list of available languages.
+
 =head1 Making Validator Better
 
 Everything Validator does is a waste of time (if you had to do it yourself).
 So if you find you've wasted time validating something that fits
 with the Validator theme, write it up and send it in. If you think
-Validator does a poor job of something, send us a better solution.
-If you already made a module even better, Validator is all
-about dependency on other modules that do validation just suggest.
-If you read the sub-modules you'll see that many of them are just
-wrappers around other validation modules.
+Validator does a poor job of something, send a better solution.
+If you already made a module even better, just wrap it up as a Validator.
 
+If you use String Validator in a Language other than English and don't see your language in String::Validator::Language, or that it is missing some messages, Submit a translation patch for String::Validator::Language.
 
-=head1 VERSION
+=head1 Bug Reports and Patches
 
-Version 0.97
-
-=cut
-
-our $VERSION = '0.97';
-
-return 0;
-
-
+Please submit Bug Reports and Patches via https://github.com/brainbuz/String-Validator.
 
 =head1 AUTHOR
 
-John Karr, C<< <brainbuz at brainbuz.org> >>
+John Karr <brainbuz@brainbuz.org>
 
-=head1 BUGS
+=head1 COPYRIGHT AND LICENSE
 
-Please report any bugs or feature requests to C<bug-validor at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Validator>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+This software is Copyright (c) 2018 by John Karr.
 
+This is free software, licensed under:
 
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Validator
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Validator>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Validator>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Validator>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Validator/>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright 2011 John Karr.
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; version 3 or at your option
-any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-A copy of the GNU General Public License is available in the source tree;
-if not, write to the Free Software Foundation, Inc.,
-59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
+  The GNU General Public License, Version 3, June 2007
 
 =cut
-
-1; # End of Validator

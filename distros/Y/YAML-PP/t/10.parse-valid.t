@@ -8,9 +8,10 @@ use lib "$Bin/lib";
 use YAML::PP::Test;
 use Data::Dumper;
 use YAML::PP::Parser;
-use YAML::PP::Loader;
 use Encode;
 use File::Basename qw/ dirname basename /;
+
+$ENV{YAML_PP_RESERVED_DIRECTIVE} = 'ignore';
 
 $|++;
 

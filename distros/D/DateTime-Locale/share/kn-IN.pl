@@ -52,8 +52,8 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'week' w 'of' Y",
-    "yw-count-other" => "'week' w 'of' Y",
+    "yw-count-one" => "'week' w 'of' y",
+    "yw-count-other" => "'week' w 'of' y",
   },
   code => "kn-IN",
   date_format_full => "EEEE, MMMM d, y",
@@ -270,5 +270,5 @@
   time_format_medium => "hh:mm:ss a",
   time_format_short => "hh:mm a",
   variant => undef,
-  version => 32,
+  version => 33,
 }

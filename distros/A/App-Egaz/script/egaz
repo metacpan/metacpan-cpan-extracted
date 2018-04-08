@@ -50,9 +50,36 @@ perl -I lib/ script/egaz normalize t/partition.t.lav --tlen 18803
 perl -I lib/ t/10-normalize.t
 
 perl -I lib/ script/egaz raxml t/YDL184C.fas --verbose
+perl -I lib/ script/egaz raxml t/YDL184C.fas --seed 999 --tmp . --outgroup Spar -o t/YDL184C.nwk
 perl -I lib/ t/11-raxml.t
 
-blastn
+perl -I lib/ script/egaz plottree t/YDL184C.nwk
+perl -I lib/ t/12-plottree.t
+
+perl -I lib/ script/egaz blastn t/pig2.fa t/pseudopig.fa --verbose
+perl -I lib/ t/13-blastn.t
+
+egaz partition t/pseudocat/cat.fa --chunk 10000 --overlap 100
+egaz partition t/pseudopig/pig1.fa --chunk 10000 --overlap 0
+egaz partition t/pseudopig/pig2.fa --chunk 10000 --overlap 0
+
+perl -I lib/ script/egaz lastz t/pseudocat.fa t/pseudopig.fa -v
+perl -I lib/ t/14-lastz.t
+
+perl -I lib/ script/egaz prepseq t/pseudopig.fa -v
+perl -I lib/ t/15-prepseq.t
+
+perl -I lib/ script/egaz prepseq t/pseudocat.fa -o t/pseudocat
+perl -I lib/ script/egaz prepseq t/pseudopig.fa -o t/pseudopig
+
+perl -I lib/ script/egaz lpcnam t/pseudocat t/pseudopig t/default.lav -o t/lpcnam -v
+perl -I lib/ script/egaz lpcnam t/pseudocat t/pseudopig t/lav.tar.gz -o t/lpcnam -v
+rm -fr t/lpcnam
+perl -I lib/ t/16-lpcnam.t
+
+perl -I lib/ script/egaz multiz t/Q_rubravsQ_aliena t/Q_rubravsQ_aquifolioides t/Q_rubravsQ_baronii --tree t/Quercus.nwk
+rm -fr Q_rubra_n4
+perl -I lib/ t/17-multiz.t
 
 sortaxt
 

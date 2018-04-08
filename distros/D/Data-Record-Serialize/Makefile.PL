@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "SQL::Translator::Schema" => 0,
     "Type::Library" => 0,
     "Type::Utils" => 0,
-    "Types::Standard" => "1.000005",
+    "Types::Standard" => "1.002001",
     "YAML::Any" => 0,
     "custom::failures" => 0,
     "namespace::clean" => 0,
@@ -57,7 +57,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "YAML::Any" => 0
   },
-  "VERSION" => "0.15",
+  "VERSION" => "0.16",
   "test" => {
     "TESTS" => "t/*.t t/bugs/*.t t/encoders/*.t"
   }
@@ -93,7 +93,7 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Type::Library" => 0,
   "Type::Utils" => 0,
-  "Types::Standard" => "1.000005",
+  "Types::Standard" => "1.002001",
   "YAML::Any" => 0,
   "custom::failures" => 0,
   "namespace::clean" => 0,

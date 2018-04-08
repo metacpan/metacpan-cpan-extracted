@@ -1,7 +1,7 @@
 #
 # This file is part of App-Cme
 #
-# This software is Copyright (c) 2017 by Dominique Dumont.
+# This software is Copyright (c) 2014-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 #ABSTRACT: Common methods for App::Cme
 
 package App::Cme::Common;
-$App::Cme::Common::VERSION = '1.026';
+$App::Cme::Common::VERSION = '1.027';
 use strict;
 use warnings;
 use 5.10.1;
@@ -67,6 +67,12 @@ sub process_args {
 
     my ( $categories, $appli_info, $appli_map ) = Config::Model::Lister::available_models;
     my $application = shift @$args;
+    unless ($application) {
+        $self->usage_error(
+            "Missing application parameter. Run 'cme list' to get the "
+                . "list of installed cme applications\n"
+            );
+    }
 
     my $root_model = $appli_map->{$application};
     $root_model ||= $application if $opt->{try_app_as_model};
@@ -270,7 +276,7 @@ App::Cme::Common - Common methods for App::Cme
 
 =head1 VERSION
 
-version 1.026
+version 1.027
 
 =head1 SYNOPSIS
 
@@ -286,7 +292,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dominique Dumont.
+This software is Copyright (c) 2014-2018 by Dominique Dumont.
 
 This is free software, licensed under:
 

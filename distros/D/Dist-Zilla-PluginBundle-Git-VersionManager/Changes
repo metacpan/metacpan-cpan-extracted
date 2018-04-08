@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla-PluginBundle-Git-VersionManager
 
+0.006     2018-04-08 00:17:41Z
+          - respect overridden options to RewriteVersion,
+            BumpVersionAfterRelease plugins no matter which variant of the
+            plugins we use internally
+          - distribution version can now be overridden with $V in combination
+            with 'bump_only_matching_versions' option
+
 0.005     2018-01-14 22:56:06Z
           - inject the currently-installed version of the bundle into
             develop-recommends prereqs (this allows one to see which version

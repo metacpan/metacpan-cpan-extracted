@@ -1,5 +1,5 @@
 package Net::Amazon::EC2;
-$Net::Amazon::EC2::VERSION = '0.35';
+$Net::Amazon::EC2::VERSION = '0.36';
 use Moose;
 
 use strict;
@@ -217,7 +217,7 @@ has 'base_url'          => (
 	required => 1,
 	lazy     => 1,
 	default  => sub {
-		return 'http' . ($_[0]->ssl ? 's' : '') . '://ec2.' . $_[0]->region . '.amazonaws.com';
+		return 'http' . ($_[0]->ssl ? 's' : '') . '://ec2.' . $_[0]->region . '.amazonaws.com' . ($_[0]->region =~ m/^cn-/ ? '.cn' : '');
 	}
 );
 has 'temp_creds' => (

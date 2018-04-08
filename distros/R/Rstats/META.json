@@ -4,7 +4,7 @@
       "Yuki Kimoto <kimoto.yuki@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.131560",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -51,5 +51,5 @@
          "url" : "https://github.com/yuki-kimoto/Rstats.git"
       }
    },
-   "version" : "0.0148"
+   "version" : "0.0149"
 }

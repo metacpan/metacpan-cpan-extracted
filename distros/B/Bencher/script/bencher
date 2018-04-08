@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-07-13'; # DATE
-our $VERSION = '1.040'; # VERSION
+our $DATE = '2018-04-03'; # DATE
+our $VERSION = '1.041'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,7 +9,7 @@ use warnings;
 
 use Perinci::CmdLine::Any;
 
-binmode(STDOUT, ":utf8");
+binmode(STDOUT, ":encoding(utf8)");
 Perinci::CmdLine::Any->new(
     url => '/Bencher/Backend/bencher',
     extra_urls_for_version => ['/Bencher/Backend/', '/Bencher/'],
@@ -32,7 +32,7 @@ bencher - A benchmark framework (CLI)
 
 =head1 VERSION
 
-This document describes version 1.040 of bencher (from Perl distribution Bencher), released on 2017-07-13.
+This document describes version 1.041 of bencher (from Perl distribution Bencher), released on 2018-04-03.
 
 =head1 SYNOPSIS
 
@@ -280,7 +280,7 @@ See C<--participants>.
 
 Add participants.
 
-=item B<--precision-limit>=I<f>
+=item B<--precision-limit>=I<s>
 
 Set precision limit.
 
@@ -294,7 +294,7 @@ This setting is useful on slower computers which might not be able to reach the
 required precision before hitting maximum number of iterations.
 
 
-=item B<--precision>=I<f>
+=item B<--precision>=I<s>
 
 Precision.
 
@@ -1073,7 +1073,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

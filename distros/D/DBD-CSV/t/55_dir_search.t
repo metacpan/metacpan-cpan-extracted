@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 
 BEGIN { use_ok ("DBI") }
-require "t/lib.pl";
+require "./t/lib.pl";
 
 my $tstdir = DbDir ();
 my @extdir = ("t", File::Spec->tmpdir ());

@@ -16,7 +16,9 @@ Mojolicious::Plugin::MailException - Mojolicious plugin to send crash informatio
             subject => 'My site crashed!',
             headers => {
                 'X-MySite' => 'crashed'
-            }
+            },
+
+            stack   => 10
         });
     }
 
@@ -44,6 +46,10 @@ Subject for crash email
 =item headers
 
 Hash with headers that have to be added to mail
+
+=item stack
+
+Stack size for crash mail. Default is C<20>.
 
 =item send
 
@@ -91,7 +97,7 @@ at your option, any later version of Perl 5 you may have available.
 
 package Mojolicious::Plugin::MailException;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 use 5.008008;
 use strict;
 use warnings;
@@ -105,7 +111,7 @@ use MIME::Words ':all';
 
 
 my $mail_prepare = sub {
-    my ($e, $conf, $self, $from, $to, $headers) = @_;
+    my ($e, $conf, $self, $from, $to, $headers, $stack_depth) = @_;
     my $subject = $conf->{subject} || 'Caught exception';
     $subject .= ' (' . $self->req->method . ': ' .
         $self->req->url->to_abs->to_string . ')';
@@ -128,10 +134,16 @@ my $mail_prepare = sub {
     $text .= sprintf "   %*d %s\n", $maxl, @{$_}[0,1] for @{ $e->lines_after };
 
     if (@{ $e->frames }) {
+        my $no = 0;
         $text .= "\n";
         $text .= "Stack\n";
         $text .= "~~~~~\n";
         for (@{ $e->frames }) {
+            $no++;
+            if ($no > $stack_depth) {
+                $text .= "    ...\n";
+                last;
+            }
             $text .= sprintf "    %s: %d\n", @{$_}[1,2];
         }
     }
@@ -187,6 +199,8 @@ my $mail_prepare = sub {
 sub register {
     my ($self, $app, $conf) = @_;
 
+    my $stack_depth = $conf->{stack} || 20;
+
     my $cb = $conf->{send} || sub { $_[0]->send };
     croak "Usage: app->plugin('ExceptionMail'[, send => sub { ... })'"
         unless 'CODE' eq ref $cb;
@@ -238,7 +252,7 @@ sub register {
         $hdrs = { %$hdrs, %{ $e->{local_headers} } }
             if ref $e->{local_headers};
 
-        my $mail = $mail_prepare->( $e, $conf, $c, $from, $to, $hdrs );
+        my $mail = $mail_prepare->( $e, $conf, $c, $from, $to, $hdrs, $stack_depth );
 
         eval {
             local $SIG{CHLD} = 'IGNORE';

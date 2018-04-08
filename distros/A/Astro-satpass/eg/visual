@@ -12,7 +12,7 @@ use HTTP::Date;
 use LWP::UserAgent;
 use Pod::Usage;
 
-our $VERSION = '0.091';
+our $VERSION = '0.093';
 
 my %opt;
 
@@ -90,8 +90,8 @@ if ( $opt{merge} ) {
 	    $found{41765} = $found{37820};
 	    $tiangong2 = ' # Assumed same as Tiangong 1';
 	} else {
-	    $found{41765} = 4.0;
-	    $tiangong2 = ' # Assumed 4.0 (old Tiangong 1 value)';
+	    $found{41765} = 3.9;
+	    $tiangong2 = ' # Assumed 3.9 (old Tiangong 1 value)';
 	}
     }
     $opt{decayed}

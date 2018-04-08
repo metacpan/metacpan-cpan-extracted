@@ -2,15 +2,15 @@ NAME
     CryptoExchange::Catalog - Catalog of cryptoexchanges
 
 VERSION
-    This document describes version 20180116 of CryptoExchange::Catalog
-    (from Perl distribution CryptoExchange-Catalog), released on 2018-01-16.
+    This document describes version 20180403 of CryptoExchange::Catalog
+    (from Perl distribution CryptoExchange-Catalog), released on 2018-04-03.
 
 SYNOPSIS
      use CryptoExchange::Catalog;
 
      my $cat = CryptoExchange::Catalog->new;
 
-     my $record = $cat->by_name("BX Thailand");     # note: case-sensitive. => {name=>"BX Thailand", safename=>"bx-thailand"}
+     my $record = $cat->by_name("BX Thailand");     # note: case-insensitive. => {name=>"BX Thailand", safename=>"bx-thailand"}
      my $record = $cat->by_safename("bx-thailand");
      my $record = $cat->by_slug("bx-thailand");     # alias for by_safename(), mixed case also works
 

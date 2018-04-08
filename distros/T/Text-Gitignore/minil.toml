@@ -1,0 +1,6 @@
+name = "Text-Gitignore"
+# badges = ["travis"]
+authority="cpan:VTI"
+
+module_maker="ModuleBuildTiny"
+

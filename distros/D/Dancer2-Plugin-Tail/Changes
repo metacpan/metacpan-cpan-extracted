@@ -1,5 +1,14 @@
 Revision history for Dancer2-Plugin-Tail
 
+0.015   Thu Apr  5 07:11:34 GMT 2018
+        Fixed minor changes in samples
+
+0.014   Thu Apr  5 05:51:13 GMT 2018
+        Forgot to commit samples
+
+0.013   Tue May 30 19:33:26 GMT 2017
+        Code cleanup
+
 0.012   Thu May 11 20:25:07 GMT 2017
         Added samples
         Cleanup POD

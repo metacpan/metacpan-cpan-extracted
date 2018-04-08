@@ -9,7 +9,7 @@ WriteMakefile(
     AUTHOR           => ['G. Casati <fibo@cpan.org>', 'Al Danial <al.danial@gmail.com>'],
     NAME             => 'App::cloc',
     EXE_FILES        => ['bin/cloc'],
-    LICENSE          => 'artistic_2',
+    LICENSE          => 'gpl_2',
     MIN_PERL_VERSION => '5.8.0',
     META_MERGE       => {
         resources => {

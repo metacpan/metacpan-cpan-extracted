@@ -1,10 +1,11 @@
 use warnings;
 use strict;
+use lib 't';
 use Test::More;
 
 plan tests => 61;
 
-use t::share;
+use share;
 use CGI::Easy::Request;
 use CGI::Easy::Headers;
 use CGI::Easy::Session;

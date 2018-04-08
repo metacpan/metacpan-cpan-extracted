@@ -1,0 +1,28 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  Data::Dumper: '0'
+  ExtUtils::MakeMaker: '0'
+  JSON: '0'
+  Test::More: '0'
+configure_requires:
+  Alien::gdal: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-GDAL-FFI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::gdal: '0'
+  FFI::Platypus: '0'
+  PDL: '0'
+version: 0.01
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

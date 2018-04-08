@@ -86,6 +86,7 @@
             "Text::Markdown" : "0",
             "Type::Tiny" : "0",
             "Version::Next" : "0",
+            "curry" : "0",
             "perl" : "5.014002"
          }
       },
@@ -98,7 +99,7 @@
    "provides" : {
       "Task::BeLike::ZAKAME" : {
          "file" : "lib/Task/BeLike/ZAKAME.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       }
    },
    "release_status" : "stable",
@@ -112,7 +113,7 @@
          "web" : "https://github.com/zakame/Task-BeLike-ZAKAME"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_contributors" : [
       "Zak B. Elep <zak.elep@yoyo.ph>",
       "Zak B. Elep <zakame@zakame.net>"

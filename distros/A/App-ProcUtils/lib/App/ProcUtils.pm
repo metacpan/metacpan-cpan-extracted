@@ -1,7 +1,7 @@
 package App::ProcUtils;
 
-our $DATE = '2018-01-17'; # DATE
-our $VERSION = '0.030'; # VERSION
+our $DATE = '2018-04-03'; # DATE
+our $VERSION = '0.031'; # VERSION
 
 use 5.010001;
 use strict;
@@ -103,19 +103,19 @@ _
             tags => ['category:display'],
         },
         full => {
-            summary => 'The pattern is normally only matched against the process name.  When -f is set, the full command line is used.',
+            summary => 'The pattern is normally only matched against the process name. When -f is set, the full command line is used.',
             schema => 'true*',
             cmdline_aliases => {f=>{}},
             tags => ['category:filtering'],
         },
         pgroup => {
             summary => 'Only match processes in the process group IDs listed',
-            schema => ['array*', of=>'nonnegint*', 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>'uint*', 'x.perl.coerce_rules' => ['str_comma_sep']],
             cmdline_aliases => {g=>{}},
             tags => ['category:filtering'],
         },
         group => {
-            summary => 'Only match processes whose real group ID is listed.  Either the numerical or symbolical value may be used.',
+            summary => 'Only match processes whose real group ID is listed. Either the numerical or symbolical value may be used.',
             schema => ['array*', of=>'str*', 'x.perl.coerce_rules' => ['str_comma_sep']],
             cmdline_aliases => {G=>{}},
             tags => ['category:filtering'],
@@ -134,7 +134,7 @@ _
         },
         session => {
             summary => 'Only match processes whose process session ID is listed',
-            schema => ['array*', of=>'nonnegint*', 'x.perl.coerce_rules' => ['str_comma_sep']],
+            schema => ['array*', of=>'uint*', 'x.perl.coerce_rules' => ['str_comma_sep']],
             cmdline_aliases => {s=>{}},
             tags => ['category:filtering'],
         },
@@ -338,7 +338,7 @@ App::ProcUtils - Command line utilities related to processes
 
 =head1 VERSION
 
-This document describes version 0.030 of App::ProcUtils (from Perl distribution App-ProcUtils), released on 2018-01-17.
+This document describes version 0.031 of App::ProcUtils (from Perl distribution App-ProcUtils), released on 2018-04-03.
 
 =head1 SYNOPSIS
 
@@ -388,11 +388,11 @@ Only match processes whose names (or command line if -f is specified) exactly ma
 
 =item * B<full> => I<true>
 
-The pattern is normally only matched against the process name.  When -f is set, the full command line is used.
+The pattern is normally only matched against the process name. When -f is set, the full command line is used.
 
 =item * B<group> => I<array[str]>
 
-Only match processes whose real group ID is listed.  Either the numerical or symbolical value may be used.
+Only match processes whose real group ID is listed. Either the numerical or symbolical value may be used.
 
 =item * B<inverse> => I<true>
 
@@ -410,11 +410,11 @@ List the process name as well as the process ID.
 
 Only match processes whose name/cmdline match the pattern.
 
-=item * B<pgroup> => I<array[nonnegint]>
+=item * B<pgroup> => I<array[uint]>
 
 Only match processes in the process group IDs listed.
 
-=item * B<session> => I<array[nonnegint]>
+=item * B<session> => I<array[uint]>
 
 Only match processes whose process session ID is listed.
 

@@ -34,13 +34,13 @@
       },
       "runtime" : {
          "requires" : {
-            "Compress::Raw::Lzma" : "2.074",
-            "IO::Compress::Base" : "2.074",
-            "IO::Uncompress::Base" : "2.074"
+            "Compress::Raw::Lzma" : "2.080",
+            "IO::Compress::Base" : "2.080",
+            "IO::Uncompress::Base" : "2.080"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "2.074",
+   "version" : "2.080",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

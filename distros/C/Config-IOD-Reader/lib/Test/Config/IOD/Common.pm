@@ -1,7 +1,7 @@
 package Test::Config::IOD::Common;
 
-our $DATE = '2017-08-05'; # DATE
-our $VERSION = '0.33'; # VERSION
+our $DATE = '2018-04-04'; # DATE
+our $VERSION = '0.340'; # VERSION
 
 use 5.010;
 use strict;
@@ -279,7 +279,7 @@ Test::Config::IOD::Common - Common tests for Config::IOD and Config::IOD::Reader
 
 =head1 VERSION
 
-This document describes version 0.33 of Test::Config::IOD::Common (from Perl distribution Config-IOD-Reader), released on 2017-08-05.
+This document describes version 0.340 of Test::Config::IOD::Common (from Perl distribution Config-IOD-Reader), released on 2018-04-04.
 
 =for Pod::Coverage .+
 
@@ -305,7 +305,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

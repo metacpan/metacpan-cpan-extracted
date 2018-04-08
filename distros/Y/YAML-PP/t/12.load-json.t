@@ -7,9 +7,12 @@ use lib "$Bin/lib";
 
 use Data::Dumper;
 use YAML::PP::Test;
-use YAML::PP::Loader;
+use YAML::PP;
 use Encode;
 use File::Basename qw/ dirname basename /;
+
+$ENV{YAML_PP_RESERVED_DIRECTIVE} = 'ignore';
+
 my $json_xs = eval "use JSON::PP; 1";
 
 my $yts = "$Bin/../yaml-test-suite";
@@ -25,35 +28,42 @@ $|++;
 
 my @skip = qw/
     4ABK
-    54T7
     87E4
     8CWC
     8UDB
     C2DT
     CN3R
     CT4Q
-    DBG4
     DFF7
-    F3CP
     FRK4
     L9U5
     LQZ7
     QF4Y
-    U3C3
 
-    5WE3
-    7W2P
-    8KHE
-    JTV5
-    NHX8
-    S3PD
-    W42U
-
-    FH7J
-    LE5A
-    S4JQ
-    8XYN
     Q5MG
+
+/;
+
+# skip multidoc for now
+push @skip, qw/
+
+    35KP
+    6ZKB
+    7Z25
+    8G76
+    98YD
+    9DXL
+    9KAX
+    AVM7
+    JHB9
+    KSS4
+    M7A3
+    PUW8
+    RZT7
+    U9NS
+    UT92
+    W4TN
+    WZ62
 
 /;
 my %skip;
@@ -94,7 +104,7 @@ for my $item (@dirs) {
     $exp_json = decode_utf8 $exp_json;
 
 #    diag "------------------------------ $id";
-    my $ypp = YAML::PP::Loader->new(boolean => 'JSON::PP');
+    my $ypp = YAML::PP->new(boolean => 'JSON::PP');
     my $data = eval { $ypp->load_string($yaml) };
 #    warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$data], ['data']);
     if ($@) {

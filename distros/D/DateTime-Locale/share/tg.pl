@@ -49,7 +49,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'\N{U+04b3}\N{U+0430}\N{U+0444}\N{U+0442}\N{U+0430}\N{U+0438}' w, Y",
+    "yw-count-other" => "'\N{U+04b3}\N{U+0430}\N{U+0444}\N{U+0442}\N{U+0430}\N{U+0438}' w, y",
   },
   code => "tg",
   date_format_full => "EEEE, dd MMMM y",
@@ -266,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 32,
+  version => 33,
 }

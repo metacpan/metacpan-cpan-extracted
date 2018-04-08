@@ -12,6 +12,7 @@ my $post_diag;
 BEGIN { eval q{ use EV; } }
 $modules{$_} = $_ for qw(
   AnyEvent
+  AnyEvent::Connector
   Devel::Cycle
   EV
   ExtUtils::MakeMaker

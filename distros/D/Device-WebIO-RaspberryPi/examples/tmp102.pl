@@ -2,7 +2,6 @@
 use v5.14;
 use Device::WebIO;
 use Device::WebIO::RaspberryPi;
-use HiPi::Device::I2C ();
 use constant DEVICE        => 1;
 use constant SLAVE_ADDR    => 0x48;
 use constant TEMP_REGISTER => 0x00;

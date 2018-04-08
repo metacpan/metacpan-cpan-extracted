@@ -65,16 +65,18 @@ sub expected ($$;$)
 		s/apache\b/Apache/;
 		s/^gfdl\b/GFDL/;
 		s/^gpl\b/GPL/;
+		s/^khronos/Khronos/;
 		s/^lgpl\b/LGPL/;
 
 		# TODO: Report ScanCode bug: Missing SPDX identifier
 		s/^mit-old-style-no-advert$/NTP/;
 
-		# TODO: Report SPDF bug: Duplicate identifier
-		s/^zlib-acknowledgement$/Nunit/;
+		# TODO: Report SPDX bug: Missing versioning
+		s/^Aladdin$/Aladdin-8/;
 
 		# TODO: support (non-SPDX) ScanCode identifiers
 		s/^epl\b/EPL/;
+		s/^kevlin-henney/Kevlin-Henney/;
 		s/^mit$/Expat/;
 		s/^unicode-mappings$/Unicode-strict/;
 
@@ -128,7 +130,6 @@ sub is_licensed_like_scancode ($$;$$)
 
 	# TODO: support SPDX identifiers (not Debian)
 	$detected =~ s/-clause\b/-Clause/g;
-	$detected =~ s/\bNUnit\b/Nunit/g;
 
 	# TODO: normalize to upstream preferred number formats
 	$detected =~ s/\b(?:[AL]?GPL)-\d\K\.0(?![.\d])//g;

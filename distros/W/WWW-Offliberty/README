@@ -1,4 +1,4 @@
-WWW-Offliberty version 1.000007
+WWW-Offliberty version 1.000008
 ===============================
 
 Offliberty is a service that takes a URL to some media (for example a
@@ -30,7 +30,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2013-2017 by Marius Gavrilescu
+Copyright (C) 2013-2018 by Marius Gavrilescu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.1 or,

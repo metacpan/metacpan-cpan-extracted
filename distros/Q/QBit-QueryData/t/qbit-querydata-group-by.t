@@ -58,7 +58,7 @@ cmp_deeply($q->get_all(), $group_by_label_num, 'group by label, num');
 
 $q->distinct();
 
-cmp_deeply($q->get_all(), $group_by_label_num, 'distinct not working with group by');
+cmp_deeply($q->get_all(), $group_by_label_num, 'distinct not needed');
 
 $q->fields([]);
 $q->distinct(FALSE);

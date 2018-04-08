@@ -2,10 +2,13 @@ use strict;
 use warnings;
 
 use Test::More;
-eval 'use Test::YAML::Meta';
-plan skip_all => "Test::YAML::Meta required to test META.yml" if $@;
-plan skip_all => "Test::YAML::Meta v0.10 required to test META.yml correctly"
-	if $Test::YAML::Meta::VERSION < 0.10;
+
+my @metatesters = (
+	'Test::CPAN::Meta::YAML 0.13',
+	'Test::CPAN::Meta 0.14',
+);
+eval "use $_" and last for @metatesters;
+plan skip_all => "Test::CPAN::Meta(::YAML) required to test META.yml" if $@;
 
 meta_yaml_ok();
 

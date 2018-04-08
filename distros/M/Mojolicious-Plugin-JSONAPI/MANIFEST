@@ -12,6 +12,8 @@ lib/Mojolicious/Plugin/JSONAPI.pm
 t/01-load.t
 t/02-routes.t
 t/03-errors.t
+t/04-data-helpers.t
+t/05-request-helpers.t
 t/author-pod-syntax.t
 t/release-check-manifest.t
 t/release-cpan-changes.t

@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2006-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2006-2018 -- leonerd@leonerd.org.uk
 
 package IO::Async::Stream;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 use base qw( IO::Async::Handle );
 
@@ -108,11 +108,14 @@ the next call, the next time more data is received from the handle.
 
 In this way, it is easy to implement code that reads records of some form when
 completed, but ignores partially-received records, until all the data is
-present. If the handler is confident no more useful data remains, it should
-return C<0>. If not, it should return C<1>, and the handler will be called
-again. This makes it easy to implement code that handles multiple incoming
-records at the same time. See the examples at the end of this documentation
-for more detail.
+present. If the handler wishes to be immediately invoke a second time, to have
+another attempt at consuming more content, it should return C<1>. Otherwise,
+it should return C<0>, and the handler will next be invoked when more data has
+arrived from the underlying read handle and appended to the buffer. This makes
+it easy to implement code that handles multiple incoming records at the same
+time. Alternatively, if the handler function already attempts to consume as
+much as possible from the buffer, it will have no need to return C<1> at all.
+See the examples at the end of this documentation for more detail.
 
 The second argument is a scalar indicating whether the stream has reported an
 end-of-file (EOF) condition. A reference to the buffer is passed to the
@@ -594,7 +597,7 @@ sub close_now
    my $self = shift;
 
    foreach ( @{ $self->{writequeue} } ) {
-       $_->on_error->( "stream closing" ) if $_->on_error;
+       $_->on_error->( $self, "stream closing" ) if $_->on_error;
    }
 
    undef @{ $self->{writequeue} };
@@ -810,6 +813,8 @@ sub _flush_one_write
 
       return 0 if _nonfatal_error( $errno );
 
+      $self->debug_printf( "WRITE err=%d/%s", $errno, $errno ) if $IO::Async::Debug::DEBUG > 1;
+
       if( $errno == EPIPE ) {
          $self->{write_eof} = 1;
          $self->maybe_invoke_event( on_write_eof => );
@@ -997,6 +1002,8 @@ sub _do_read
          my $errno = $!;
 
          return if _nonfatal_error( $errno );
+
+         $self->debug_printf( "READ err=%d/%s", $errno, $errno ) if $IO::Async::Debug::DEBUG > 1;
 
          $self->maybe_invoke_event( on_read_error => $errno )
             or $self->close_now;
@@ -1335,10 +1342,9 @@ prints them to the program's C<STDOUT> stream.
 
 Because a reference to the buffer itself is passed, it is simple to use a
 C<s///> regular expression on the scalar it points at, to both check if data
-is ready (i.e. a whole line), and to remove it from the buffer. If no data is
-available then C<0> is returned, to indicate it should not be tried again. If
-a line was successfully extracted, then C<1> is returned, to indicate it
-should try again in case more lines exist in the buffer.
+is ready (i.e. a whole line), and to remove it from the buffer. Since it
+always removes as many complete lines as possible, it doesn't need invoking
+again when it has finished, so it can return a constant C<0>.
 
 =head2 Reading binary data
 
@@ -1362,6 +1368,11 @@ each one.
 
     return 0;
  }
+
+This time, rather than a C<while()> loop we have decided to have the handler
+just process one record, and use the C<return 1> mechanism to ask that the
+handler be invoked again if there still remains data that might contain
+another record; only stopping with C<return 0> when we know we can't find one.
 
 The 4-argument form of C<substr()> extracts the 16-byte record from the buffer
 and assigns it to the C<$record> variable, if there was enough data in the

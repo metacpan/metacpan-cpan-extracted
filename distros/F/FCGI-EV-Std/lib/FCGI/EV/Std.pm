@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use Scalar::Util qw( weaken );
 
@@ -110,7 +110,7 @@ FCGI::EV::Std - Handler class to use with FCGI::EV
 
 =head1 VERSION
 
-This document describes FCGI::EV::Std version v2.0.0
+This document describes FCGI::EV::Std version v2.0.1
 
 
 =head1 SYNOPSIS
@@ -124,6 +124,7 @@ This document describes FCGI::EV::Std version v2.0.0
     $FCGI::EV::Std::HUP        = \&hup;
 
     # for usage example see FCGI::EV module SYNOPSIS
+
 
 =head1 DESCRIPTION
 
@@ -178,9 +179,9 @@ writing non-blocking CGI ease.
 
 Use these global variables to configure FCGI::EV::Std:
 
-=over
+=head2 BLOCKING
 
-=item $FCGI::EV::Std::BLOCKING = 1
+    $FCGI::EV::Std::BLOCKING = 1;
 
 If true, then user function set in $FCGI::EV::Std::MAIN will be called in
 blocking mode and without any parameters.
@@ -190,16 +191,22 @@ non-blocking mode, with parameter $server. Also, if $FCGI::EV::Std::HUP set
 to user function, then it will be called if connection to web server is
 closed before CGI sent it reply.
 
-=item $FCGI::EV::Std::MAX_STDIN = 1*1024*1024
+=head2 MAX_STDIN
+
+    $FCGI::EV::Std::MAX_STDIN = 1*1024*1024;
 
 Limit on STDIN size. Increase if you need to receive large files using POST.
 
-=item $FCGI::EV::Std::MAIN = \&main::main
+=head2 MAIN
+
+    $FCGI::EV::Std::MAIN = \&main::main;
 
 User function called to process (or start processing in non-blocking mode)
 incoming CGI request.
 
-=item $FCGI::EV::Std::HUP = undef
+=head2 HUP
+
+    $FCGI::EV::Std::HUP = undef;
 
 User function called only in non-blocking mode to
 notify about closed connection and, if possible, interrupt current CGI
@@ -210,7 +217,6 @@ given to $FCGI::EV::Std::MAIN function when this request was started (this
 is how user can identify which of currently executing requests was
 interrupted). The $server object will be destroyed shortly after that.
 
-=back
 
 =head1 DIAGNOSTICS
 
@@ -277,7 +283,7 @@ Alex Efros E<lt>powerman@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2009 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+This software is Copyright (c) 2009- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
 
 This is free software, licensed under:
 

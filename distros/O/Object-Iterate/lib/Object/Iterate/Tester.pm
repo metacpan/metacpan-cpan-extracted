@@ -6,7 +6,9 @@ use vars qw($VERSION);
 use warnings;
 no warnings;
 
-$VERSION     = '1.14';
+$VERSION     = '1.141';
+
+=encoding utf8
 
 =head1 NAME
 
@@ -28,17 +30,17 @@ Object::Iterate::Tester - test module that uses Object::Iterate
 This module is on Github:
 
 	http://github.com/briandfoy/Object-Iterate
-	
+
 =head1 AUTHOR
 
 brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2002-2014 brian d foy.  All rights reserved.
+Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the terms of the Artistic License 2.0.
 
 =cut
 

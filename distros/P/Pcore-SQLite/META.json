@@ -1,7 +1,7 @@
 {
    "abstract" : "unknown",
    "author" : [
-      "zdm <zdm@cpan.org>"
+      "zdm <zdm@softvisio.net>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "CPAN::Meta version 2.150010",
@@ -49,6 +49,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-sqlite/overview"
       }
    },
-   "version" : "v0.10.7",
+   "version" : "v0.10.8",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

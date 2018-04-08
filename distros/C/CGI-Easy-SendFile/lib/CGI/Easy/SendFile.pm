@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use Export::Attrs;
 use List::Util qw( min );
@@ -110,7 +110,7 @@ CGI::Easy::SendFile - send files from CGI to browser
 
 =head1 VERSION
 
-This document describes CGI::Easy::SendFile version v2.0.0
+This document describes CGI::Easy::SendFile version v2.0.1
 
 
 =head1 SYNOPSIS
@@ -150,9 +150,12 @@ Nothing by default, but all documented functions can be explicitly imported.
 
 =head1 INTERFACE 
 
-=over
+=head2 send_file
 
-=item send_file( $r, $h, $file, \%opt )
+    $data = send_file( $r, $h, '/path/file.zip' );
+    $data = send_file( $r, $h, '/path/file.zip', \%opt );
+    $data = send_file( $r, $h, \$dynamic_file );
+    $data = send_file( $r, $h, \$dynamic_file, \%opt );
 
 Prepare HTTP headers and content for CGI reply to send file.
 
@@ -231,9 +234,6 @@ Return SCALARREF with (full/partial/empty) file contents which should be
 send as body of CGI reply.
 
 
-=back
-
-
 =head1 LIMITATIONS
 
 Sending large files will use a lot of memory - this module doesn't use
@@ -292,7 +292,7 @@ Alex Efros E<lt>powerman@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2009-2010 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+This software is Copyright (c) 2009- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
 
 This is free software, licensed under:
 

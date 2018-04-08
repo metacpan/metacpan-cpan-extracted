@@ -39,7 +39,6 @@ $input_cv->cb( sub {
 
 my $input = MockDigitalInputAnyEvent->new({
     input_pin_count => 8,
-    input_condvar => $input_cv,
 });
 my $webio = Device::WebIO->new;
 $webio->register( 'foo', $input );
@@ -48,12 +47,15 @@ ok( $input->does( 'Device::WebIO::Device' ), "Does Device role" );
 ok( $input->does( 'Device::WebIO::Device::DigitalInputAnyEvent' ),
     "Does DigitalInputAnyEvent role" );
 
+# We look for interrupts on pin 3 only
+$webio->set_anyevent_condvar( 'foo', 3, $input_cv );
 
 # Mock getting input
 my $input_timer; $input_timer = AnyEvent->timer(
     after => 0.5,
     cb => sub {
         $input->mock_set_input( 3, 1 );
+        $input->mock_set_input( 4, 1 );
     },
 );
 # Make sure we can do it twice
@@ -61,6 +63,7 @@ my $input_timer2; $input_timer2 = AnyEvent->timer(
     after => 0.75,
     cb => sub {
         $input->mock_set_input( 3, 1 );
+        $input->mock_set_input( 4, 1 );
     },
 );
 

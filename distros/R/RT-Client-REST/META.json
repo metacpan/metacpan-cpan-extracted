@@ -1,0 +1,101 @@
+{
+   "abstract" : "Client for RT using REST API",
+   "author" : [
+      "Abhijit Menon-Sen <ams@wiw.org>",
+      "Dmitri Tikhonov <dtikhonov@yahoo.com>",
+      "Damien \"dams\" Krotkine <dams@cpan.org>",
+      "Dean Hamstead <dean@bytefoundry.com.au>",
+      "Miquel Ruiz <mruiz@cpan.org>",
+      "JLMARTIN",
+      "SRVSH"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "RT-Client-REST",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "HTTP::Server::Simple" : "0.44",
+            "HTTP::Server::Simple::CGI" : "0",
+            "HTTP::Server::Simple::CGI::Environment" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::EOF" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::NoBreakpoints" : "0.15",
+            "Test::NoTabs" : "0",
+            "Test::PAUSE::Permissions" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "DateTime::Format::DateParse" : "0",
+            "Encode" : "0",
+            "Error" : "0",
+            "Exception::Class" : "0",
+            "Exporter" : "0",
+            "HTTP::Cookies" : "0",
+            "HTTP::Request::Common" : "0",
+            "LWP" : "0",
+            "Params::Validate" : "0",
+            "URI" : "0",
+            "base" : "0",
+            "constant" : "0",
+            "perl" : "5.004",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/RT-Client-REST/RT-Client-REST",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/RT-Client-REST/RT-Client-REST.git",
+         "web" : "https://github.com/RT-Client-REST/RT-Client-REST"
+      }
+   },
+   "version" : "0.52",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

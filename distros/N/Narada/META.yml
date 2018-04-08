@@ -17,7 +17,7 @@ configure_requires:
   Devel::CheckOS: '1.63'
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,16 +34,16 @@ no_index:
 provides:
   Narada:
     file: lib/Narada.pm
-    version: v2.3.7
+    version: v2.3.8
   Narada::Config:
     file: lib/Narada/Config.pm
-    version: v2.3.7
+    version: v2.3.8
   Narada::Lock:
     file: lib/Narada/Lock.pm
-    version: v2.3.7
+    version: v2.3.8
   Narada::Log:
     file: lib/Narada/Log.pm
-    version: v2.3.7
+    version: v2.3.8
 requires:
   App::migrate: v0.2.0
   App::powerdiff: '0'
@@ -65,7 +65,7 @@ resources:
   bugtracker: https://github.com/powerman/Narada/issues
   homepage: https://github.com/powerman/Narada
   repository: https://github.com/powerman/Narada.git
-version: v2.3.7
+version: v2.3.8
 x_contributors:
   - 'Prylutskyi Anatolii <prylutskyi@qarea.com>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.73'

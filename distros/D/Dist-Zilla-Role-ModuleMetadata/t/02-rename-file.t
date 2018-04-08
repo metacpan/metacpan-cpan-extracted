@@ -73,11 +73,13 @@ is(
 );
 
 cmp_deeply(
-    $tzil->log_messages,
-    superbagof(
+    [ grep { /^\[=FileMover\]/ } @{ $tzil->log_messages } ],
+    [
         '[=FileMover] parsing Foo.pm for Module::Metadata',
+        re(qr/\Q[=FileMover] got MMD object with refaddr 0x\E[0-9a-f]+ for Foo\.pm/),
         '[=FileMover] parsing lib/Foo.pm for Module::Metadata',
-    ),
+        re(qr/\Q[=FileMover] got MMD object with refaddr 0x\E[0-9a-f]+ for lib\/Foo\.pm/),
+    ],
     'when a module filename changes, the cache is invalidated',
 );
 

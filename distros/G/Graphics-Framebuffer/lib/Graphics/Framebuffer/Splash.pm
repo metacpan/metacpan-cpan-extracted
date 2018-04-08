@@ -12,7 +12,7 @@ use constant {
 use List::Util qw(min max);
 
 BEGIN {
-    our $VERSION = 1.04;
+    our $VERSION = 1.05;
 }
 
 sub _perl_logo {
@@ -74,7 +74,8 @@ sub splash {
     my $W = $self->{'W_CLIP'};
     my $H = $self->{'H_CLIP'};
 
-    my $hf = $W / 1920;    # Scales the logo
+    # The logo was designed using 1920x1080 screen.  It is scaled accordingly.
+    my $hf = $W / 1920;    # Scales the logo.  Everything scales according to these values.
     my $vf = $H / 1080;
     $self->{'H_SCALE'}  = $hf;
     $self->{'V_SCALE'}  = $vf;
@@ -88,6 +89,7 @@ sub splash {
     $self->clip_reset();
     $self->normal_mode();
 
+    # If the screen is tiny, then we use a different splash screen
     if ((($W <= 320) || ($H <= 240))) {
         $hf = $W / 320;
         $vf = $H / 240;

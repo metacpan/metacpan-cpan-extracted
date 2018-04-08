@@ -27,8 +27,7 @@ while (<DATA>) {
     push @{$input{$rt}}, $_;
     }
 
-sub rt_file
-{
+sub rt_file {
     return File::Spec->catfile (DbDir (), "rt$_[0]");
     } # rt_file
 

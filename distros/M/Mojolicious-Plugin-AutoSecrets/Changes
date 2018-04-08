@@ -1,6 +1,9 @@
 Changelog for Mojolicious-Plugin-AutoSecrets
 
-0.004 2018-03-27T22:15:35
+0.005 2018-03-31T19:30:59
+ - Ensure IO::File is loaded for 5.10 (Meredith Howard)
+
+0.004 2018-03-27T22:15:35Z
  - replaced rand()+$ENV concat with Session::Token (Stig)
 
 0.003 2018-02-11T05:34:35Z

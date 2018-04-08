@@ -1,9 +1,13 @@
-# We are going to throw exceptions, because we're cool like that.
-package RT::Client::REST::Exception;
-use base qw(Exception::Class);
+#!perl
+# PODNAME: RT::Client::REST::Exception
+# ABSTRACT: Exceptions thrown by RT::Client::REST
 
 use strict;
 use warnings;
+
+package RT::Client::REST::Exception;
+$RT::Client::REST::Exception::VERSION = '0.52';
+use base qw(Exception::Class);
 
 use vars qw($VERSION);
 $VERSION = '0.19';
@@ -178,7 +182,7 @@ sub _rt_content_to_exception {
 
 # Some mildly weird magic to fix up inheritance (see Exception::Class POD).
 {
-    no strict 'refs';
+    no strict 'refs'; ## no critic (ProhibitNoStrict)
     push @{__PACKAGE__ . '::ISA'}, 'Exception::Class::Base';
     push @Exception::Class::Base::ISA, 'Error'
         unless Exception::Class::Base->isa('Error');
@@ -186,12 +190,17 @@ sub _rt_content_to_exception {
 
 1;
 
-__END__
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-RT::Client::REST::Exception -- exceptions thrown by RT::Client::REST
-methods.
+RT::Client::REST::Exception - Exceptions thrown by RT::Client::REST
+
+=head1 VERSION
+
+version 0.52
 
 =head1 DESCRIPTION
 
@@ -337,8 +346,52 @@ ready to be thrown.
 L<Exception::Class>,
 L<RT::Client::REST>.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Abhijit Menon-Sen <ams@wiw.org>
+
+=item *
 
 Dmitri Tikhonov <dtikhonov@yahoo.com>
 
+=item *
+
+Damien "dams" Krotkine <dams@cpan.org>
+
+=item *
+
+Dean Hamstead <dean@bytefoundry.com.au>
+
+=item *
+
+Miquel Ruiz <mruiz@cpan.org>
+
+=item *
+
+JLMARTIN
+
+=item *
+
+SRVSH
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Dmitri Tikhonov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =cut
+
+__END__
+
+
+RT::Client::REST::Exception -- exceptions thrown by RT::Client::REST
+methods.
+

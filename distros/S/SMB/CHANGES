@@ -1,5 +1,21 @@
 Releases of SMB-Perl library and main changes.
 
+0.07 - 2018-04-06
+
+* Added classes for v2 commands QueryInfo and SetInfo.
+* Added more documentation.
+* Added new client functionality: recursive remove.
+* Added alternative remove functionality in client;
+  set env $SMB_CLIENT_REMOVE_FILE_USING_SETINFO for this.
+* Added remove functionality in server (delete-on-close).
+* Added new client functionality: copy (using dnload+upload).
+* Added new client functionality: rename (with -f to force).
+* Added rename functionality in server.
+* Added concept of log level to classes. NONE, ERROR, INFO, DEBUG, TRACE.
+* Improved output of client, now errors are shown even without --verbose.
+* Fixed parsing of SMB1 header and actually parsed Negotiate request.
+* Now server actually checks that client supports SMB2.
+
 0.06 - 2014-08-19
 
 * Removed dependancy on Digest::HMAC_MD5 by fallback md5 implementation.

@@ -33,7 +33,7 @@ static SV* duk_to_perl(pTHX_ duk_context* duk, int pos);
 static int perl_to_duk(pTHX_ SV* value, duk_context* duk);
 
 /*
- * This is an example of a native C function that we can call from our JS code.
+ * Native print callable from JS
  */
 static duk_ret_t native_print(duk_context *duk)
 {
@@ -42,6 +42,22 @@ static duk_ret_t native_print(duk_context *duk)
     duk_join(duk, duk_get_top(duk) - 1);
     PerlIO_stdoutf("%s\n", duk_safe_to_string(duk, -1));
     return 0; // no return value
+}
+
+/*
+ * Get JS compatible 'now' timestamp (millisecs since 1970).
+ */
+static duk_ret_t native_now(duk_context *duk)
+{
+    struct timeval tv;
+    double now = 0.0;
+    int rc = gettimeofday(&tv, 0);
+    if (rc == 0) {
+        now = (((double) tv.tv_sec)  * 1000.0 +
+               ((double) tv.tv_usec) / 1000.0);
+    }
+    duk_push_number(duk, (duk_double_t) now);
+    return 1; //  return value at top
 }
 
 /*
@@ -335,7 +351,8 @@ static int register_native_functions(pTHX_ duk_context* duk)
         const char* name;
         duk_c_function func;
     } data[] = {
-        { "print", native_print },
+        { "print"       , native_print },
+        { "timestamp_ms", native_now   },
     };
     int n = sizeof(data) / sizeof(data[0]);
     int j = 0;

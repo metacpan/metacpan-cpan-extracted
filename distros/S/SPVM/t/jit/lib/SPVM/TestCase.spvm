@@ -1,12 +1,15 @@
 use TestCase::Weaken;
 use TestCase::Minimal;
 use TestCase::Destructor;
+use TestCase::Empty;
+use TestCase::Private;
 
 use TestCase::Template_int_long;
 
 use Byte;
+use Number::Util;
 use Short;
-use Integer;
+use Int;
 use Long;
 use Float;
 use Double;
@@ -37,11 +40,15 @@ package TestCase {
   has weaken3 : TestCase::Weaken;
   has weaken4 : TestCase::Weaken;
   has minimal : TestCase::Minimal;
-  has private_field : int;
+  has private_field : private int;
   
   jit sub INT_VALUE : int () { return 127; }
   jit sub FLOAT_PRECICE : float () { return 16384.5f; }
   jit sub DOUBLE_PRECICE : double () { return 65536.5; }
+  
+  jit sub get_private_field : int ($self : self) {
+    return $self->{private_field};
+  }
   
   jit sub set_x_int_array : void ($self : self, $x_int_array : int[]) {
     $self->{x_int_array} = $x_int_array;
@@ -138,6 +145,174 @@ package TestCase {
     if ($total == 6) {
       return 1;
     }
+    return 0;
+  }
+  
+  jit sub string_comparison_operator : int () {
+    my $string = "abc";
+    my $string_same = "abc";
+    my $string_short = "ab";
+    my $string_long = "abcd";
+    my $string_different_short= "ad";
+    my $string_different_long= "adcd";
+    my $string_empty = "";
+    
+    # eq
+    my $eq_ok = 0;
+    if ($string eq $string_same) {
+      if (!($string eq $string_short)) {
+        if (!($string eq $string_long)) {
+          if (!($string eq $string_different_short)) {
+            if (!($string eq $string_different_long)) {
+              if (!($string eq $string_empty)) {
+                $eq_ok = 1;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    # ne
+    my $ne_ok = 0;
+    if (!($string ne $string_same)) {
+      if (($string ne $string_short)) {
+        if (($string ne $string_long)) {
+          if (($string ne $string_different_short)) {
+            if (($string ne $string_different_long)) {
+              if (($string ne $string_empty)) {
+                $ne_ok = 1;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    # gt
+    my $gt_ok = 0;
+    if (!($string gt $string_same)) {
+      if ($string gt $string_short) {
+        if (!($string gt $string_long)) {
+          if (!($string gt $string_different_short)) {
+            if (!($string gt $string_different_long)) {
+              if ($string gt $string_empty) {
+                $gt_ok = 1;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    # ge
+    my $ge_ok = 0;
+    if ($string ge $string_same) {
+      if ($string ge $string_short) {
+        if (!($string ge $string_long)) {
+          if (!($string ge $string_different_short)) {
+            if (!($string ge $string_different_long)) {
+              if ($string ge $string_empty) {
+                $ge_ok = 1;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    # lt
+    my $lt_ok = 0;
+    if ($string lt $string_same) {
+      if (!($string lt $string_short)) {
+        if ($string lt $string_long) {
+          if ($string lt $string_different_short) {
+            if ($string lt $string_different_long) {
+              if (!($string lt $string_empty)) {
+                $lt_ok = 1;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    # le
+    my $le_ok = 0;
+    if ($string le $string_same) {
+      if (!($string le $string_short)) {
+        if ($string le $string_long) {
+          if ($string le $string_different_short) {
+            if ($string le $string_different_long) {
+              if (!($string le $string_empty)) {
+                $le_ok = 1;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    if ($eq_ok && $ne_ok && $gt_ok && $ge_ok && $lt_ok && $le_ok) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  
+  jit sub convert_to_string : int () {
+    my $byte_string = (String)(byte)23;
+    my $short_string = (String)(short)23;
+    my $int_string = (String)23;
+    my $long_string = (String)23L;
+    my $float_string = (String)0.25f;
+    my $double_string = (String)0.25;
+    
+    my $float_inf = (String)(1.0f / 0.0f);
+    my $float_minus_inf = (String)(-1.0f / 0.0f);
+    my $float_nan = (String)(0.0f / 0.0f);
+
+    my $double_inf = (String)(1.0 / 0.0);
+    my $double_minus_inf = (String)(-1.0 / 0.0);
+    my $double_nan = (String)(0.0 / 0.0);
+    
+    if ($byte_string eq "23") {
+      if ($short_string eq "23") {
+        if ($int_string eq "23") {
+          if ($long_string eq "23") {
+            if ($float_string eq "0.250000") {
+              if ($float_inf eq "inf") {
+                if ($float_minus_inf eq "-inf") {
+                  if ($float_nan eq "nan") {
+                    if ($double_string eq "0.250000") {
+                      if ($double_inf eq "inf") {
+                        if ($double_minus_inf eq "-inf") {
+                          if ($double_nan eq "nan") {
+                            return 1;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+  
+  jit sub isa_basic : int () {
+    my $minimal = new TestCase::Minimal;
+    if ($minimal isa TestCase::Minimal) {
+      if (!($minimal isa TestCase)) {
+        return 1;
+      }
+    }
+    
     return 0;
   }
   
@@ -312,10 +487,10 @@ package TestCase {
   
   jit sub package_var : int () {
     if ($TestCase::PACKAGE_VAR_INT == 0) {
-      $TestCase::PACKAGE_VAR_INT = Integer->MAX_VALUE();
-      if ($TestCase::PACKAGE_VAR_INT == Integer->MAX_VALUE()) {
-        $TestCase::PACKAGE_VAR_LONG = Long->MAX_VALUE();
-        if ($TestCase::PACKAGE_VAR_LONG == Long->MAX_VALUE()) {
+      $TestCase::PACKAGE_VAR_INT = Number::Util->INT_MAX_VALUE();
+      if ($TestCase::PACKAGE_VAR_INT == Number::Util->INT_MAX_VALUE()) {
+        $TestCase::PACKAGE_VAR_LONG = Number::Util->LONG_MAX_VALUE();
+        if ($TestCase::PACKAGE_VAR_LONG == Number::Util->LONG_MAX_VALUE()) {
           $TestCase::PACKAGE_VAR_MINIMAL = TestCase::Minimal::new();
           
           $TestCase::PACKAGE_VAR_MINIMAL->{x} = 4;
@@ -332,10 +507,10 @@ package TestCase {
 
   jit sub package_var_rel_name : int () {
     if ($PACKAGE_VAR_INT2 == 0) {
-      $PACKAGE_VAR_INT2 = Integer->MAX_VALUE();
-      if ($PACKAGE_VAR_INT2 == Integer->MAX_VALUE()) {
-        $PACKAGE_VAR_LONG2 = Long->MAX_VALUE();
-        if ($PACKAGE_VAR_LONG2 == Long->MAX_VALUE()) {
+      $PACKAGE_VAR_INT2 = Number::Util->INT_MAX_VALUE();
+      if ($PACKAGE_VAR_INT2 == Number::Util->INT_MAX_VALUE()) {
+        $PACKAGE_VAR_LONG2 = Number::Util->LONG_MAX_VALUE();
+        if ($PACKAGE_VAR_LONG2 == Number::Util->LONG_MAX_VALUE()) {
           $PACKAGE_VAR_MINIMAL2 = TestCase::Minimal::new();
           
           $PACKAGE_VAR_MINIMAL2->{x} = 4;
@@ -463,11 +638,6 @@ package TestCase {
     return 0;
   }
   
-  jit sub private_field : int () {
-    my $test_case = new TestCase;
-    $test_case->{private_field};
-  }
-
   jit sub get_minimal : TestCase::Minimal ($self : self) {
     return $self->{minimal};
   }
@@ -511,7 +681,7 @@ package TestCase {
   jit sub spvm_set_and_get_byte : int ($nums : byte[]) {
     
     if ($nums->[0] == 0) {
-      if ($nums->[1] == Byte->MAX_VALUE()) {
+      if ($nums->[1] == Number::Util->BYTE_MAX_VALUE()) {
         return 1;
       }
     }
@@ -521,7 +691,7 @@ package TestCase {
   jit sub spvm_set_and_get_short : int ($nums : short[]) {
     
     if ($nums->[0] == 0) {
-      if ($nums->[1] == Short->MAX_VALUE()) {
+      if ($nums->[1] == Number::Util->SHORT_MAX_VALUE()) {
         return 1;
       }
     }
@@ -531,7 +701,7 @@ package TestCase {
   jit sub spvm_set_and_get_int : int ($nums : int[]) {
     
     if ($nums->[0] == 0) {
-      if ($nums->[1] == Integer->MAX_VALUE()) {
+      if ($nums->[1] == Number::Util->INT_MAX_VALUE()) {
         return 1;
       }
     }
@@ -541,7 +711,7 @@ package TestCase {
   jit sub spvm_set_and_get_long : int ($nums : long[]) {
     
     if ($nums->[0] == 0L) {
-      if ($nums->[1] == Long->MAX_VALUE()) {
+      if ($nums->[1] == Number::Util->LONG_MAX_VALUE()) {
         return 1;
       }
     }
@@ -570,7 +740,7 @@ package TestCase {
   }
   
   # Concat
-  jit sub concat_string_special_assign : String () {
+  jit sub concat_special_assign : String () {
     
     my $value = "a";
     
@@ -579,56 +749,10 @@ package TestCase {
     return $value;
   }
   
-  jit sub concat_string_string : String () {
+  jit sub concat : String () {
     "a" . "b";
     
     my $value = "a" . "b";
-    
-    return $value;
-  }
-  
-  jit sub concat_string_byte : String () {
-    my $value = "a" . 3;
-    
-    return $value;
-  }
-
-  jit sub concat_string_short : String () {
-    "a" . (short)3;
-    
-    my $value = "a" . (short)3;
-    
-    return $value;
-  }
-
-  jit sub concat_string_int : String () {
-    "a" . 3;
-    
-    my $value = "a" . 3;
-    
-    return $value;
-  }
-  
-  jit sub concat_string_long : String () {
-    "a" . 3L;
-    
-    my $value = "a" . 3L;
-    
-    return $value;
-  }
-  
-  jit sub concat_string_float : String () {
-    "a" . 3.0f;
-    
-    my $value = "a" . 3.0f;
-    
-    return $value;
-  }
-  
-  jit sub concat_string_double : String () {
-    "a" . 3.0;
-    
-    my $value = "a" . 3.0;
     
     return $value;
   }
@@ -775,6 +899,37 @@ package TestCase {
     if ($value - 1.0 < 0.000001 && $value - 1.0 > -0.000001) {
       return 1;
     }
+    return 0;
+  }
+
+  jit sub call_sub_args_convertion_stab1 : double ($var1 : byte, $var2 : short, $var3 : int, $var4 : long, $var5 : float, $var6 : double) {
+    return ($var1 + $var2 + $var3 + $var4 + $var5 + $var6);
+  }
+  
+  jit sub call_sub_args_convertion : int () {
+    # Constant assignment
+    my $success_constant_narrow = 0;
+    {
+      my $return_value1 = call_sub_args_convertion_stab1(1, 2, 3, 2, 8, 16);
+      if ($return_value1 == 32) {
+        $success_constant_narrow = 1;
+      }
+    }
+    
+    # Widning
+    my $success_constant_wide = 0;
+    {
+      my $return_value1 = call_sub_args_convertion_stab1((byte)1, (byte)2, (byte)3, (byte)2, (byte)8, (byte)16);
+      
+      if ($return_value1 == 32) {
+        $success_constant_wide = 1;
+      }
+    }
+    
+    if ($success_constant_narrow && $success_constant_wide) {
+      return 1;
+    }
+    
     return 0;
   }
 
@@ -1704,19 +1859,19 @@ package TestCase {
   jit sub object_field_set_and_get : int () {
     my $test_case = new TestCase;
     
-    $test_case->{x_byte} = Byte->MAX_VALUE();
-    $test_case->{x_short} = Short->MAX_VALUE();
-    $test_case->{x_int} = Integer->MAX_VALUE();
-    $test_case->{x_long} = Long->MAX_VALUE();
+    $test_case->{x_byte} = Number::Util->BYTE_MAX_VALUE();
+    $test_case->{x_short} = Number::Util->SHORT_MAX_VALUE();
+    $test_case->{x_int} = Number::Util->INT_MAX_VALUE();
+    $test_case->{x_long} = Number::Util->LONG_MAX_VALUE();
     $test_case->{x_float} = TestCase::FLOAT_PRECICE();
     $test_case->{x_double} = TestCase::DOUBLE_PRECICE();
     my $minimal = TestCase::Minimal::new();
     $minimal->{x} = 3;
     $test_case->{minimal} = $minimal;
-    if ((int)$test_case->{x_byte} == (int)Byte->MAX_VALUE()) {
-      if ((int)$test_case->{x_short} == (int)Short->MAX_VALUE()) {
-        if ($test_case->{x_int} == Integer->MAX_VALUE()) {
-          if ($test_case->{x_long} == Long->MAX_VALUE()) {
+    if ((int)$test_case->{x_byte} == (int)Number::Util->BYTE_MAX_VALUE()) {
+      if ((int)$test_case->{x_short} == (int)Number::Util->SHORT_MAX_VALUE()) {
+        if ($test_case->{x_int} == Number::Util->INT_MAX_VALUE()) {
+          if ($test_case->{x_long} == Number::Util->LONG_MAX_VALUE()) {
             if ($test_case->{x_float} == TestCase::FLOAT_PRECICE()) {
               if ($test_case->{x_double} == TestCase::DOUBLE_PRECICE()) {
                 if ($test_case->{minimal}->{x} == 3) {
@@ -1735,28 +1890,28 @@ package TestCase {
   jit sub object_field_set_and_get_again : int () {
     my $test_case = new TestCase;
     
-    $test_case->{x_byte} = Byte->MAX_VALUE();
-    $test_case->{x_short} = Short->MAX_VALUE();
-    $test_case->{x_int} = Integer->MAX_VALUE();
-    $test_case->{x_long} = Long->MAX_VALUE();
+    $test_case->{x_byte} = Number::Util->BYTE_MAX_VALUE();
+    $test_case->{x_short} = Number::Util->SHORT_MAX_VALUE();
+    $test_case->{x_int} = Number::Util->INT_MAX_VALUE();
+    $test_case->{x_long} = Number::Util->LONG_MAX_VALUE();
     $test_case->{x_float} = TestCase::FLOAT_PRECICE();
     $test_case->{x_double} = TestCase::DOUBLE_PRECICE();
     my $minimal = TestCase::Minimal::new();
     $minimal->{x} = 3;
     $test_case->{minimal} = $minimal;
 
-    $test_case->{x_byte} = Byte->MAX_VALUE();
-    $test_case->{x_short} = Short->MAX_VALUE();
-    $test_case->{x_int} = Integer->MAX_VALUE();
-    $test_case->{x_long} = Long->MAX_VALUE();
+    $test_case->{x_byte} = Number::Util->BYTE_MAX_VALUE();
+    $test_case->{x_short} = Number::Util->SHORT_MAX_VALUE();
+    $test_case->{x_int} = Number::Util->INT_MAX_VALUE();
+    $test_case->{x_long} = Number::Util->LONG_MAX_VALUE();
     $test_case->{x_float} = TestCase::FLOAT_PRECICE();
     $test_case->{x_double} = TestCase::DOUBLE_PRECICE();
     $test_case->{minimal} = $minimal;
 
-    if ((int)$test_case->{x_byte} == (int)Byte->MAX_VALUE()) {
-      if ((int)$test_case->{x_short} == (int)Short->MAX_VALUE()) {
-        if ($test_case->{x_int} == Integer->MAX_VALUE()) {
-          if ($test_case->{x_long} == Long->MAX_VALUE()) {
+    if ((int)$test_case->{x_byte} == (int)Number::Util->BYTE_MAX_VALUE()) {
+      if ((int)$test_case->{x_short} == (int)Number::Util->SHORT_MAX_VALUE()) {
+        if ($test_case->{x_int} == Number::Util->INT_MAX_VALUE()) {
+          if ($test_case->{x_long} == Number::Util->LONG_MAX_VALUE()) {
             if ($test_case->{x_float} == TestCase::FLOAT_PRECICE()) {
               if ($test_case->{x_double} == TestCase::DOUBLE_PRECICE()) {
                 if ($test_case->{minimal}->{x} == 3) {
@@ -1853,11 +2008,11 @@ package TestCase {
     return 0;
   }
   jit sub array_init_byte : int () {
-    my $nums = new byte[] {(byte)1, (byte)2, Byte->MAX_VALUE()};
+    my $nums = new byte[] {(byte)1, (byte)2, Number::Util->BYTE_MAX_VALUE()};
     
     if ($nums->[0] == 1) {
       if ($nums->[1] == 2) {
-        if ($nums->[2] == Byte->MAX_VALUE()) {
+        if ($nums->[2] == Number::Util->BYTE_MAX_VALUE()) {
           return 1;
         }
       }
@@ -3064,7 +3219,7 @@ package TestCase {
     
     if ($values->[0] == 97) {
       if ($values->[1] == 98) {
-        if ($values->[2] == Byte->MAX_VALUE()) {
+        if ($values->[2] == Number::Util->BYTE_MAX_VALUE()) {
            if (@$values == 3) {
              return 1;
            }
@@ -3079,7 +3234,7 @@ package TestCase {
     
     if ((int)$values->[0] == (int)(short)97) {
       if ((int)$values->[1] == (int)(short)98) {
-        if ((int)$values->[2] == (int)(short)Short->MAX_VALUE()) {
+        if ((int)$values->[2] == (int)(short)Number::Util->SHORT_MAX_VALUE()) {
            if (@$values == 3) {
              return 1;
            }
@@ -3094,7 +3249,7 @@ package TestCase {
     
     if ($values->[0] == (int)97) {
       if ($values->[1] == (int)98) {
-        if ($values->[2] == (int)Integer->MAX_VALUE()) {
+        if ($values->[2] == (int)Number::Util->INT_MAX_VALUE()) {
            if (@$values == 3) {
              return 1;
            }
@@ -3109,7 +3264,7 @@ package TestCase {
     
     if ($values->[0] == (long)97) {
       if ($values->[1] == (long)98) {
-        if ($values->[2] == (long)Long->MAX_VALUE()) {
+        if ($values->[2] == (long)Number::Util->LONG_MAX_VALUE()) {
            if (@$values == 3) {
              return 1;
            }

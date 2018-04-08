@@ -53,7 +53,7 @@ sub render {
   
 }
 
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 
 #=============================================
 package DBIx::Mojo::Statement;
@@ -72,10 +72,12 @@ sub template { shift->render(@_) }
 sub render {
   my $self = shift;
   my $vars =ref $_[0] ? shift : { @_ };
-  $vars->{dict} ||= $self->dict;
+  my $merge = merge($vars, $self->vars);
+  $merge->{dict} ||= $self->dict;
+  $merge->{DICT} = $self->dict;
   #~ weaken $self->dict;
   
-  $self->mt->render($self->sql, merge($vars, $self->vars));#%$vars ? %{$self->vars} ? merge($vars, $self->vars) : $vars : $self->vars
+  $self->mt->render($self->sql, $merge);#%$vars ? %{$self->vars} ? merge($vars, $self->vars) : $vars : $self->vars
   
 }
 
@@ -95,7 +97,7 @@ DBIx::Mojo::Template - Render SQL statements templates by Mojo::Template
 
 =head1 VERSION
 
-0.055
+0.056
 
 =head1 SYNOPSIS
 

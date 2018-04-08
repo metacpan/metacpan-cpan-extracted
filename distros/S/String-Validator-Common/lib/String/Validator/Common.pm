@@ -1,16 +1,36 @@
 package String::Validator::Common;
-$String::Validator::Common::VERSION = '1.01';
+$String::Validator::Common::VERSION = '2.00';
 # ABSTRACT: Base Module for creating new String::Validator Modules.
 
 use 5.008;
 use strict;
 use warnings;
+no warnings 'uninitialized';
+use Data::Printer;
+
+my $common_messages = {
+    common_strings_not_match => "Strings don\'t match.",
+    common_tooshort          => "Does not meet requirement: Min Length ",
+    common_toolong           => " Does not meet requirement: Max Length ",
+};
+
+sub _Messages {
+    my $messages = {} ;
+    for my $msg ( $common_messages, @_) {
+        for my $c ( keys %{$msg} ) {
+            $messages->{$c} = $msg->{$c};
+        }
+    }
+    return $messages;
+}
 
 sub new {
     my $class = shift;
     my $self  = {@_};
     bless $self, $class;
     $self->{class} = $class;
+    $self->{messages}
+        = _Messages( $self->{language}, $self->{custom_messages} );
     $self->_Init();
     return $self;
 }
@@ -43,7 +63,7 @@ sub Start {
     no warnings 'uninitialized';
     if ( 0 == length $string2 ) { }
     elsif ( $string1 ne $string2 ) {
-        $self->IncreaseErr('Strings don\'t match.');
+        $self->IncreaseErr( $self->{messages}{common_strings_not_match} );
         return 99;
     }
     $self->{string} = $string1;
@@ -53,21 +73,16 @@ sub Start {
 sub Length {
     my $self   = shift;
     my $string = $self->{string};
-    if ( length( $self->{string} ) < $self->{min_len} ) {
-        $self->IncreaseErr( "Length of "
-              . length( $self->{string} )
-              . " Does not meet requirement: Min Length "
-              . $self->{min_len}
-              . "." );
+    my $strlen = length( $self->{string} );
+    if ( $strlen < $self->{min_len} ) {
+        $self->IncreaseErr(
+            $self->{messages}{common_tooshort} . $self->{min_len} );
         return $self->{error};
     }
     if ( $self->{max_len} ) {
-        if ( length( $self->{string} ) > $self->{max_len} ) {
-            $self->IncreaseErr( "Length of "
-                  . length( $self->{string} )
-                  . " Does not meet requirement: Max Length "
-                  . $self->{max_len}
-                  . "." );
+        if ( $strlen > $self->{max_len} ) {
+            $self->IncreaseErr(
+                $self->{messages}{common_toolong} . $self->{max_len} );
             return $self->{error};
         }
     }
@@ -121,11 +136,11 @@ sub String {
 }
 
 # The lowercase version of methods.
-sub errcnt      { my $self = shift; $self->Errcnt() }
-sub errstr      { my $self = shift; $self->Errstr() }
-sub isnot_valid { my $self = shift; $self->IsNot_Valid() }
-sub is_valid    { my $self = shift; $self->Is_Valid() }
-sub string      { my $self = shift; $self->String() }
+sub errcnt      { my $self = shift; $self->Errcnt( @_) }
+sub errstr      { my $self = shift; $self->Errstr( @_) }
+sub isnot_valid { my $self = shift; $self->IsNot_Valid( @_) }
+sub is_valid    { my $self = shift; $self->Is_Valid( @_ ) }
+sub string      { my $self = shift; $self->String( @_ ) }
 
 
 1;    # End of String::Validator::Common
@@ -142,7 +157,7 @@ String::Validator::Common - Base Module for creating new String::Validator Modul
 
 =head1 VERSION
 
-version 1.01
+version 2.00
 
 =head1 DESCRIPTION
 
@@ -166,7 +181,7 @@ Modules Using String Validator Common extend the attributes in their own new met
  sub new {
  my $class = shift ;
  my $self = { @_ } ;
- use base ( 'String::Validator::Common' ) ;
+ use parent ( 'String::Validator::Common' ) ;
  unless ( defined $self->{ some_param } )
    { $self->{ some_param } = 'somedefault'; }
  ...
@@ -178,7 +193,7 @@ Modules Using String Validator Common extend the attributes in their own new met
 
 Check is a stub subroutine, that you will replace in any Validator Module you write
 with the code to validate the string. Is_Valid and IsNot_Valid base their results on Check. Check returns $self->{error}, if there are no errors this will be 0. When you
-replace Check in your Validator Module you should implement the same behaviour so that IsValid and IsNot_Valid work. 
+replace Check in your Validator Module you should implement the same behaviour so that IsValid and IsNot_Valid work.
 
 =head2 IsNot_Valid
 
@@ -205,7 +220,7 @@ the string being evaluated. Arguments are the
 string to be evaluated and optionally a second string to be compared with the
 first. If the strings are mismatched the sub will return 99, and string will
 remain NULL, the inheriting module should immediately return the error and
-not contine. 
+not contine.
 
 =head2 Length
 
@@ -227,7 +242,8 @@ Permit LowerCase invokation of these methods.
 
 =head1 BUGS
 
-Please report any bugs or feature requests through the web interface at L<https://github.com/brainbuz/String-Validator/issues>. I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests through the web interface at L<https://github.com/brainbuz/String-Validator/issues>.
+I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 AUTHOR
 
@@ -235,7 +251,7 @@ John Karr <brainbuz@brainbuz.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by John Karr.
+This software is Copyright (c) 2014,2018 by John Karr.
 
 This is free software, licensed under:
 

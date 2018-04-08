@@ -6,7 +6,7 @@ with qw[Pcore::Dist::CLI];
 
 sub CLI ($self) {
     return {
-        abstract => 'set from tag',
+        abstract => 'view / set from tag',
         arg      => [
             tag => {
                 desc => 'tag',

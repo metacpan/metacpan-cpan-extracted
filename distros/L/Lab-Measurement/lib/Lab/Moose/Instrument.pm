@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument;
-$Lab::Moose::Instrument::VERSION = '3.623';
+$Lab::Moose::Instrument::VERSION = '3.624';
 #ABSTRACT: Base class for instrument drivers
 
 use 5.010;
@@ -266,7 +266,7 @@ Lab::Moose::Instrument - Base class for instrument drivers
 
 =head1 VERSION
 
-version 3.623
+version 3.624
 
 =head1 SYNOPSIS
 

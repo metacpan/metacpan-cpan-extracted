@@ -178,7 +178,7 @@ Rmpfr_nrandom Rmpfr_erandom Rmpfr_fmma Rmpfr_fmms Rmpfr_log_ui Rmpfr_gamma_inc R
 Rmpfr_round_nearest_away rndna
 );
 
-    our $VERSION = '4.01';
+    our $VERSION = '4.02';
     #$VERSION = eval $VERSION;
 
     DynaLoader::bootstrap Math::MPFR $VERSION;

@@ -77,6 +77,37 @@ use Test::PgCLI;
     test_command(
         'psql',
         sub {
+            $psql->execute_file(
+                database => 'Foo',
+                file     => [ 'thing1.sql', 'thing2.sql' ],
+            );
+        },
+        sub {
+            shift;
+            my $cmd = shift;
+
+            ok(
+                !$ENV{PGPASSWORD},
+                'password is not set in environment when command runs'
+            );
+            is_deeply(
+                $cmd,
+                [
+                    'psql',
+                    '-w',
+                    '-q',
+                    '-f', 'thing1.sql',
+                    '-f', 'thing2.sql',
+                    'Foo'
+                ],
+                'command works with multiple file names'
+            );
+        },
+    );
+
+    test_command(
+        'psql',
+        sub {
             $psql->run(
                 database => 'Foo',
                 stdin    => \'in',
@@ -157,6 +188,70 @@ use Test::PgCLI;
                 'command includes connection info'
             );
         },
+    );
+}
+
+{
+    my $psql = Pg::CLI::psql->new( executable => 'psql' );
+
+    test_command(
+        'psql',
+        sub {
+            $psql->run(
+                options => ['-l'],
+            );
+        },
+        sub {
+            shift;
+            my $cmd = shift;
+
+            ok(
+                !$ENV{PGPASSWORD},
+                'password is not set in environment when command runs'
+            );
+            is_deeply(
+                $cmd,
+                [
+                    'psql',
+                    '-w',
+                    '-q',
+                    '-l',
+                ],
+                'command includes -l'
+            );
+        },
+    );
+}
+
+{
+    my $psql = Pg::CLI::psql->new( executable => 'psql' );
+
+    test_command(
+        'psql',
+        sub {
+            $psql->run(
+                options => ['-l'],
+            );
+        },
+        sub {
+            shift;
+            my $cmd = shift;
+
+            ok(
+                !$ENV{PGPASSWORD},
+                'password is not set in environment when command runs'
+            );
+            is_deeply(
+                $cmd,
+                [
+                    'psql',
+                    '-q',
+                    '-l',
+                ],
+                'command does not include -w with older psql'
+            );
+        },
+        '8.0.1',
     );
 }
 

@@ -17,6 +17,10 @@ https://developers.facebook.com/bugs/597779113651383/
 
 ###############################################################################
 
+1.24 2018-04-05T02:17:07Z
+    - Fix API response version comparison. Thanks to chakkit.
+      https://github.com/oklahomer/p5-Facebook-OpenGraph/issues/18
+
 1.23 2015-03-29T07:41:06Z
     - Add support for Graph API v2.3 including parsing JSON formatted response
       from /oauth/access_token

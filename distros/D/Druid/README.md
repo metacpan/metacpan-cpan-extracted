@@ -4,7 +4,7 @@ Druid - Perl client to Druid.io (http://druid.io)
 
 # VERSION
 
-version 0.003
+version 0.004
 
 Table of Contents:
 

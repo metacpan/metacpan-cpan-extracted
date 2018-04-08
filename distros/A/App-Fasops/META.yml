@@ -28,7 +28,7 @@ no_index:
 provides:
   App::Fasops:
     file: lib/App/Fasops.pm
-    version: v0.5.14
+    version: v0.5.15
   App::Fasops::Command::axt2fas:
     file: lib/App/Fasops/Command/axt2fas.pm
   App::Fasops::Command::check:
@@ -82,5 +82,5 @@ resources:
   bugtracker: https://github.com/wang-q/App-Fasops/issues
   homepage: https://github.com/wang-q/App-Fasops
   repository: git://github.com/wang-q/App-Fasops.git
-version: 0.5.14
+version: 0.5.15
 x_authority: cpan:WANGQ

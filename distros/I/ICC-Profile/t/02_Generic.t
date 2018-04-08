@@ -1,12 +1,13 @@
 #!/usr/bin/perl -w
 
-# ICC::Profile::Generic test module / 2018-03-30
+# ICC::Profile::Generic test module / 2018-03-31
 #
 # Copyright © 2004-2018 by William B. Birkett
 
 use strict;
 
 use File::Spec;
+use File::Temp;
 use t::lib::Boot;
 use Test::More tests => 4;
 
@@ -28,11 +29,8 @@ isa_ok($tag, 'ICC::Profile::Generic');
 # read GRACoL2006_Coated1v2 profile
 $profile = t::lib::Boot->new(File::Spec->catfile('t', 'data', 'GRACoL2006_Coated1v2.icc'));
 
-# open temporary file for write-read access
-open($temp, '+>' . File::Spec->catfile('t', 'data', 'temp.dat'));
-
-# set binary mode
-binmode($temp);
+# open temporary file for write-read access, binmode
+$temp = File::Temp::tempfile();
 
 # for each tag table entry
 for $ttab (@{$profile->tag_table}) {
@@ -44,6 +42,9 @@ for $ttab (@{$profile->tag_table}) {
 	$tag->write_fh($profile, $temp, $ttab);
 	
 }
+
+# flush buffer
+$temp->flush;
 
 # compute total tag size
 $size = $profile->tag_table->[-1][2] + $profile->tag_table->[-1][1] - $profile->tag_table->[0][1];
@@ -62,10 +63,8 @@ ok($raw1 eq $raw2, 'raw data round-trip');
 # compare strings, if different
 str_cmp($raw1, $raw2) if ($raw1 ne $raw2);
 
-# close profile
+# close files
 close($profile->fh);
-
-# close temporary file
 close($temp);
 
 # compare strings

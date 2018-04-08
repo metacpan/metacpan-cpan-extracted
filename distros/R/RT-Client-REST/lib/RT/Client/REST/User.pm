@@ -1,13 +1,12 @@
-# RT::Client::REST::User -- user object representation.
-
-package RT::Client::REST::User;
+#!perl
+# PODNAME: RT::Client::REST::User
+# ABSTRACT: user object representation.
 
 use strict;
 use warnings;
 
-use vars qw($VERSION);
-$VERSION = 0.03;
-
+package RT::Client::REST::User;
+$RT::Client::REST::User::VERSION = '0.52';
 use Params::Validate qw(:types);
 use RT::Client::REST 0.14;
 use RT::Client::REST::Object 0.01;
@@ -15,28 +14,6 @@ use RT::Client::REST::Object::Exception 0.01;
 use RT::Client::REST::SearchResult 0.02;
 use base 'RT::Client::REST::Object';
 
-=head1 NAME
-
-RT::Client::REST::User -- user object representation.
-
-=head1 SYNOPSIS
-
-  my $rt = RT::Client::REST->new(server => $ENV{RTSERVER});
-
-  my $user = RT::Client::REST::User->new(
-    rt  => $rt,
-    id  => $id,
-  )->retrieve;
-
-=head1 DESCRIPTION
-
-B<RT::Client::REST::User> is based on L<RT::Client::REST::Object>.
-The representation allows one to retrieve, edit, comment on, and create
-users in RT.
-
-Note: RT currently does not allow REST client to search users.
-
-=cut
 
 sub _attributes {{
     id => {
@@ -182,6 +159,47 @@ sub _attributes {{
     },
 }}
 
+
+sub rt_type { 'user' }
+
+
+__PACKAGE__->_generate_methods;
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RT::Client::REST::User - user object representation.
+
+=head1 VERSION
+
+version 0.52
+
+=head1 SYNOPSIS
+
+  my $rt = RT::Client::REST->new(server => $ENV{RTSERVER});
+
+  my $user = RT::Client::REST::User->new(
+    rt  => $rt,
+    id  => $id,
+  )->retrieve;
+
+=head1 DESCRIPTION
+
+B<RT::Client::REST::User> is based on L<RT::Client::REST::Object>.
+The representation allows one to retrieve, edit, comment on, and create
+users in RT.
+
+Note: RT currently does not allow REST client to search users.
+
+=for stopwords EmailAddress gecos Gecos HomePhone MobilePhone PagerPhone RealName WorkPhone
+
 =head1 ATTRIBUTES
 
 =over 2
@@ -229,6 +247,8 @@ Comments about this user.
 
 Nickname of this user.
 
+=for stopwords lang
+
 =item B<lang>
 
 Language for this user.
@@ -271,6 +291,8 @@ User's cell phone number, MobilePhone.
 
 User's pager number, PagerPhone.
 
+=for stopwords contactinfo
+
 =item B<contactinfo>
 
 Contact info (Extra Info field).
@@ -310,10 +332,6 @@ Currently RT does not allow REST clients to search users.
 
 Returns 'user'.
 
-=cut
-
-sub rt_type { 'user' }
-
 =back
 
 =head1 SEE ALSO
@@ -321,16 +339,45 @@ sub rt_type { 'user' }
 L<RT::Client::REST>, L<RT::Client::REST::Object>,
 L<RT::Client::REST::SearchResult>.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Abhijit Menon-Sen <ams@wiw.org>
+
+=item *
 
 Dmitri Tikhonov <dtikhonov@yahoo.com>
 
-=head1 LICENSE
+=item *
 
-Perl license.
+Damien "dams" Krotkine <dams@cpan.org>
+
+=item *
+
+Dean Hamstead <dean@bytefoundry.com.au>
+
+=item *
+
+Miquel Ruiz <mruiz@cpan.org>
+
+=item *
+
+JLMARTIN
+
+=item *
+
+SRVSH
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Dmitri Tikhonov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-__PACKAGE__->_generate_methods;
-
-1;

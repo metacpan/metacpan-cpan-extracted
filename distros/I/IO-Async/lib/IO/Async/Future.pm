@@ -8,7 +8,7 @@ package IO::Async::Future;
 use strict;
 use warnings;
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 use base qw( Future );
 Future->VERSION( '0.05' ); # to respect subclassing
@@ -98,7 +98,7 @@ sub loop
 sub await
 {
    my $self = shift;
-   $self->{loop}->loop_once;
+   $self->{loop}->await( $self );
 }
 
 =head2 done_later

@@ -1,14 +1,15 @@
 package Pg::CLI::pg_config;
-{
-  $Pg::CLI::pg_config::VERSION = '0.11';
-}
 
-use Moose;
-
+use strict;
+use warnings;
 use namespace::autoclean;
 
-use MooseX::SemiAffordanceAccessor;
+our $VERSION = '0.13';
+
 use MooseX::Types::Moose qw( HashRef Maybe Str );
+
+use Moose;
+use MooseX::SemiAffordanceAccessor;
 
 with 'Pg::CLI::Role::Executable';
 
@@ -48,7 +49,7 @@ my @attrs = qw(
 for my $attr (@attrs) {
     has $attr => (
         is       => 'ro',
-        isa      => Maybe[Str],
+        isa      => Maybe [Str],
         init_arg => undef,
         lazy     => 1,
         default  => sub { $_[0]->_config_info()->{$attr} },
@@ -77,6 +78,7 @@ sub _pg_config_output {
 
     my $command = $self->executable();
 
+    ## no critic (InputOutput::ProhibitBacktickOperators)
     return `$command`;
 }
 
@@ -90,13 +92,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Pg::CLI::pg_config - Wrapper for the F<psql> utility
 
 =head1 VERSION
 
-version 0.11
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -180,9 +184,15 @@ C<undef>.
 
 =back
 
-=head1 BUGS
+=head1 SUPPORT
 
-See L<Pg::CLI> for bug reporting details.
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Pg-CLI> or via email to L<bug-pg-cli@rt.cpan.org|mailto:bug-pg-cli@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Pg-CLI can be found at L<https://github.com/houseabsolute/Pg-CLI>.
 
 =head1 AUTHOR
 
@@ -190,10 +200,13 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by Dave Rolsky.
+This software is Copyright (c) 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

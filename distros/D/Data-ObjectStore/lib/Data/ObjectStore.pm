@@ -11,7 +11,7 @@ use Data::RecordStore;
 use Scalar::Util qw(weaken);
 use vars qw($VERSION);
 
-$VERSION = '1.103';
+$VERSION = '1.104';
 
 use constant {
     RECORD_STORE => 0,
@@ -131,6 +131,7 @@ sub open_store {
     #
     for my $pkg ( qw( Data::ObjectStore::Container Data::ObjectStore::Array Data::ObjectStore::Hash ) ) {
         $INC{ $pkg } or eval("use $pkg");
+        undef $@;
     }
 
     my $store = bless [
@@ -248,12 +249,17 @@ sub create_container {
     }
     $class //= 'Data::ObjectStore::Container';
 
+    unless( $INC{ $class } ) {
+        eval("use $class");
+    }
+
     my $id = $self->_new_id;
     my $obj = bless [ $id,
                       { map { $_ => $self->_xform_in( $data->{$_} ) } keys %$data},
                       $self ], $class;
     $self->_dirty( $obj, $id );
     $self->_store_weak( $id, $obj );
+
     $obj->_init(); #called the first time the object is created.
     $obj;
 } #create_container
@@ -560,7 +566,7 @@ package Data::ObjectStore::Array;
 
 use strict;
 use warnings;
-no warnings 'uninitialized';
+use warnings FATAL => 'all';
 no  warnings 'numeric';
 
 use Tie::Array;
@@ -991,10 +997,11 @@ use warnings;
 
 no warnings 'uninitialized';
 no warnings 'numeric';
+no warnings 'recursion';
 
 use Tie::Hash;
 
-$Data::ObjectStore::Hash::SIZE = 977;
+$Data::ObjectStore::Hash::SIZE = 13337;
 
 use constant {
     ID          => 0,
@@ -1624,6 +1631,9 @@ sub _freezedry {
 sub _reconstitute {
     my( $cls, $store, $id, $data ) = @_;
     my $obj = [$id,{@$data},$store];
+    if( $cls ne 'Data::ObjectStore::Container' && ! $INC{ $cls } ) {
+        eval("use $cls");
+    }
     bless $obj, $cls;
     $obj->_load;
     $obj;
@@ -1651,7 +1661,7 @@ __END__
        under the same terms as Perl itself.
 
 =head1 VERSION
-       Version 1.103  (Mar, 2018))
+       Version 1.104  (Mar, 2018))
 
 =cut
 

@@ -27,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-cryp
   homepage: https://metacpan.org/release/Perinci-CmdLine-cryp
   repository: git://github.com/perlancar/perl-Perinci-CmdLine-cryp.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

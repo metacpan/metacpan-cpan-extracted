@@ -2,8 +2,8 @@ NAME
     Config::IOD::Reader - Read IOD/INI configuration files
 
 VERSION
-    This document describes version 0.33 of Config::IOD::Reader (from Perl
-    distribution Config-IOD-Reader), released on 2017-08-05.
+    This document describes version 0.340 of Config::IOD::Reader (from Perl
+    distribution Config-IOD-Reader), released on 2018-04-04.
 
 SYNOPSIS
      use Config::IOD::Reader;
@@ -289,7 +289,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

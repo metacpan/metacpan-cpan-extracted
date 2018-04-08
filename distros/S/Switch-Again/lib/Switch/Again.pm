@@ -3,32 +3,37 @@ package Switch::Again;
 use 5.006;
 use strict;
 use warnings;
+use Struct::Match qw/struct/;
 use base qw/Import::Export/;
+our $VERSION = '0.02';
 our %EX = (
-	'switch' => [qw/all/]
+	'switch' => [qw/all/],
+	'sr' => [qw/all/]
 );
 
-our $VERSION = '0.01';
-
-our %SWITCH;
 BEGIN {
-	%SWITCH = (
-		SCALAR => sub { ref $_[1] ? undef : $_[0] =~ m/^$_[1]$/; }
-		# tbc
+	@STRUCT{qw/Regexp CODE/} = (
+		sub { $_[0] =~ $_[1]; }, 
+		sub { eval { $_[1]->($_[0]) } // '' } 
 	);
 }
 
 sub switch {
 	my ($value, $default, @cases);
 	$value = shift if (scalar @_ % 2); 
-	$_[0] eq 'default' ? do { shift; $default = shift } : do { push @cases, { case => shift, cb => shift } } 
+	$_[0] eq 'default' ? do { shift; $default = shift } : do { push @cases, { ref => $STRUCT{REF}($_[0]), case => shift, cb => shift } } 
 		while (@_); # I could map to a hash but...
 	my $evil = sub {
-		my ($val, $ref, $result) = ($_[0], ref $_[0] || 'SCALAR');
-		$SWITCH{$ref}($val, $_->{case}) && do { $result = ref $_->{cb} eq 'CODE' ? $_->{cb}->($val) : $_->{cb} } && last for @cases;	
-		defined $result ? $result : $default ? $default->($val) : undef;
+		my ($val, @result) = ($_[0]);
+		do {@result = $STRUCT{$_->{ref}}($val, $_->{case});} and scalar @result && $result[0] ne '' and do {@result = ref $_->{cb} eq 'CODE' ? $_->{cb}->($val, @result) : $_->{cb}} and last for @cases;	
+		@result && (wantarray && @result) || shift @result or $default and $default->($val) or undef;
 	};
 	$value ? $evil->($value) : $evil;
+}
+
+sub sr {
+	my ($search, $replace) = @_;
+	return sub { (my $val = $_[0]) =~ s/$search/$replace/g; $val};
 }
 
 __END__;
@@ -39,46 +44,46 @@ Switch::Again - Switch`ing
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
 =head1 SYNOPSIS
 
 	use Switch::Again qw/switch/;
-	my $switch = switch(
-		a => sub {
+	my $switch = switch
+		'a' => sub {
 			return 1;
 		},
-		b => sub {
+		'b' => sub {
 			return 2;
 		},
-		c => sub {
+		'c' => sub {
 			return 3;
 		},
-		default => sub {
+		'default' => sub {
 			return 4;
 		}
-	);
+	;
 	my $val = $switch->('a'); # 1
 
 	...
 
 	use Switch::Again qw/all/;
-	my $val = switch('e', 
-		d => sub {
+	my $val = switch 'e', 
+		sr('(search)', 'replace') => sub {
 			return 1;
 		},
-		e => sub {
+		qr/(a|b|c|d|e)/ => sub {
 			return 2;
 		},
-		f => sub {
+		sub { $_[0] == 1 } => sub {
 			return 3;
 		},
-		default => sub {
+		'default' => sub {
 			return 4;
 		}
-	); # 2
+	; # 2
 
 =cut
 

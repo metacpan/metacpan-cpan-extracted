@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Carp;
 
-our $VERSION = 'v2.3.7';
+our $VERSION = 'v2.3.8';
 
 
 # Possible types of current directory:
@@ -37,6 +37,13 @@ __END__
 
 =encoding utf8
 
+=begin markdown
+
+[![Docker Automated Build](https://img.shields.io/docker/automated/powerman/narada.svg)](https://github.com/powerman/Narada)
+[![Docker Build Status](https://img.shields.io/docker/build/powerman/narada.svg)](https://hub.docker.com/r/powerman/narada/)
+
+=end markdown
+
 =head1 NAME
 
 Narada - framework for ease deploy and support microservice projects
@@ -44,7 +51,7 @@ Narada - framework for ease deploy and support microservice projects
 
 =head1 VERSION
 
-This document describes Narada version v2.3.7
+This document describes Narada version v2.3.8
 
 
 =head1 SYNOPSIS

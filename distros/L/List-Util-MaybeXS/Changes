@@ -1,0 +1,13 @@
+Revision history for List-Util-MaybeXS
+
+1.500001 - 2018-04-02
+  - only test against PP module, as testing MaybeXS is redundant
+  - added test to ensure List::Util::MaybeXS and List::Util::PP have matching
+    exports
+  - better formatting of prereq version numbers
+  - add correct Test::More dependency for developers
+  - other minor test tweaks
+
+1.50 - 2018-03-30
+  - initial version
+  - tests based on Scalar-List-Utils-1.50

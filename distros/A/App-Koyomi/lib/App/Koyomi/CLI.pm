@@ -20,7 +20,7 @@ use App::Koyomi::Context;
 use App::Koyomi::JobTime::Formatter qw(str2time);
 use App::Koyomi::JobTime::Object;
 
-use version; our $VERSION = 'v0.6.0';
+use version; our $VERSION = 'v0.6.1';
 
 my @CLI_METHODS = qw/help man add list modify delete/;
 
@@ -283,11 +283,11 @@ L<App::Koyomi::Context>
 
 =head1 AUTHORS
 
-YASUTAKE Kiyoshi E<lt>yasutake.kiyoshi@gmail.comE<gt>
+IKEDA Kiyoshi E<lt>progrhyme@gmail.comE<gt>
 
 =head1 LICENSE
 
-Copyright (C) 2015 YASUTAKE Kiyoshi.
+Copyright (C) 2015-2017 IKEDA Kiyoshi.
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.  That means either (a) the GNU General Public

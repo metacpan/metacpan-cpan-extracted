@@ -52,6 +52,11 @@ S_procself_val(pTHX_ SV *sv, char *arg0)
 #include "mktmpdir.c"
 #include "internals.c"
 
+/* turn off automatic globbing of process arguments when using MingW */
+#if defined(WIN32) && defined(__MINGW32__)
+int _CRT_glob = 0;
+#endif
+
 int main ( int argc, char **argv, char **env )
 {
     int exitstatus;
@@ -93,11 +98,6 @@ int main ( int argc, char **argv, char **env )
 #ifdef PERL_EXIT_EXPECTED
     PL_exit_flags |= PERL_EXIT_EXPECTED;
 #endif /* PERL_EXIT_EXPECTED */
-
-#if (defined(CSH) && defined(PL_cshname))
-    if (!PL_cshlen)
-      PL_cshlen = strlen(PL_cshname);
-#endif
 
 #ifdef PERL_PROFILING
 #define PROFILING_OPTION 1

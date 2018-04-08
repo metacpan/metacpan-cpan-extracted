@@ -1,0 +1,1 @@
+<: print $get{test} if defined $get{test} and not exists $get{test2}

@@ -1,13 +1,12 @@
-# RT::Client::REST::Group -- group object representation.
-
-package RT::Client::REST::Group;
+#!perl
+# PODNAME: RT::Client::REST::Group
+# ABSTRACT: group object representation.
 
 use strict;
 use warnings;
 
-use vars qw($VERSION);
-$VERSION = 0.03;
-
+package RT::Client::REST::Group;
+$RT::Client::REST::Group::VERSION = '0.52';
 use Params::Validate qw(:types);
 use RT::Client::REST 0.14;
 use RT::Client::REST::Object 0.01;
@@ -15,27 +14,6 @@ use RT::Client::REST::Object::Exception 0.01;
 use RT::Client::REST::SearchResult 0.02;
 use base 'RT::Client::REST::Object';
 
-=head1 NAME
-
-RT::Client::REST::Group -- group object representation.
-
-=head1 SYNOPSIS
-
-  my $rt = RT::Client::REST->new(server => $ENV{RTSERVER});
-
-  my $group = RT::Client::REST::Group->new(
-    rt  => $rt,
-    id  => $id,
-  )->retrieve;
-
-=head1 DESCRIPTION
-
-B<RT::Client::REST::Group> is based on L<RT::Client::REST::Object>.
-The representation allows one to retrieve, edit, and create groups in RT.
-
-Note: RT currently does not allow REST client to search groups.
-
-=cut
 
 sub _attributes {{
     id => {
@@ -73,6 +51,44 @@ sub _attributes {{
         },
     },
 }}
+
+
+sub rt_type { 'group' }
+
+
+__PACKAGE__->_generate_methods;
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RT::Client::REST::Group - group object representation.
+
+=head1 VERSION
+
+version 0.52
+
+=head1 SYNOPSIS
+
+  my $rt = RT::Client::REST->new(server => $ENV{RTSERVER});
+
+  my $group = RT::Client::REST::Group->new(
+    rt  => $rt,
+    id  => $id,
+  )->retrieve;
+
+=head1 DESCRIPTION
+
+B<RT::Client::REST::Group> is based on L<RT::Client::REST::Object>.
+The representation allows one to retrieve, edit, and create groups in RT.
+
+Note: RT currently does not allow REST client to search groups.
 
 =head1 ATTRIBUTES
 
@@ -127,10 +143,6 @@ Currently RT does not allow REST clients to search groups.
 
 Returns 'group'.
 
-=cut
-
-sub rt_type { 'group' }
-
 =back
 
 =head1 SEE ALSO
@@ -138,16 +150,45 @@ sub rt_type { 'group' }
 L<RT::Client::REST>, L<RT::Client::REST::Object>,
 L<RT::Client::REST::SearchResult>.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Abhijit Menon-Sen <ams@wiw.org>
+
+=item *
+
+Dmitri Tikhonov <dtikhonov@yahoo.com>
+
+=item *
+
+Damien "dams" Krotkine <dams@cpan.org>
+
+=item *
+
+Dean Hamstead <dean@bytefoundry.com.au>
+
+=item *
 
 Miquel Ruiz <mruiz@cpan.org>
 
-=head1 LICENSE
+=item *
 
-Perl license.
+JLMARTIN
+
+=item *
+
+SRVSH
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Dmitri Tikhonov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-__PACKAGE__->_generate_methods;
-
-1;

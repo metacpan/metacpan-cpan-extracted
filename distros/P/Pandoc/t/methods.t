@@ -68,25 +68,29 @@ plan skip_all => 'pandoc executable required' unless pandoc;
 
 # arguments
 {
-    my $pandoc = Pandoc->new(qw(--smart -t html));
-    is_deeply [$pandoc->arguments], [qw(--smart -t html)], 'arguments';
+    my @args = qw(--number-sections -t html);
+    my $pandoc = Pandoc->new(@args);
+    is_deeply [$pandoc->arguments], \@args, 'arguments';
 
-    $pandoc = Pandoc->new(qw(pandoc --smart -t html));
+    $pandoc = Pandoc->new('pandoc', @args);
     is $pandoc->bin, which('pandoc'), 'executable and arguments';
-    is_deeply [$pandoc->arguments], [qw(--smart -t html)], 'arguments';
+    is_deeply [$pandoc->arguments], \@args, 'arguments';
 
-    my ($in, $out) = ('*...*');
+    my ($in, $out) = ('# x');
     is $pandoc->run([], in => \$in, out => \$out), 0, 'run';
-    is $out, "<p><em>…</em></p>\n", 'use default arguments';
+    is $out,
+        '<h1 id="x"><span class="header-section-number">1</span> x</h1>'."\n",
+        'use default arguments';
 
     is $pandoc->run( '-t' => 'latex', { in => \$in, out => \$out }), 0, 'run';
-    is $out, "\\emph{\\ldots{}}\n", 'override default arguments';
+    like $out, qr{\\section\{x\}\\label\{x\}},
+        'override default arguments';
 
     throws_ok { $pandoc->arguments(1) }
         qr/^first default argument must be an -option/;
 
-    pandoc->arguments('--smart');
-    is_deeply [ pandoc->arguments ], ['--smart'], 'set arguments';
+    pandoc->arguments('--number-sections');
+    is_deeply [ pandoc->arguments ], ['--number-sections'], 'set arguments';
     
     pandoc->arguments([]);
     is_deeply [ pandoc->arguments ], [], 'set arguments with array ref';
@@ -102,9 +106,9 @@ plan skip_all => 'pandoc executable required' unless pandoc;
 # libs
 {
     is reftype(pandoc->libs), 'HASH', 'pandoc->libs';
-	if ($ENV{RELEASE_TESTING}) { # don't assume any libraries
-		isa_ok pandoc->libs->{'pandoc-types'}, 'Pandoc::Version';
-	}
+    #if ($ENV{RELEASE_TESTING}) { # don't assume any libraries
+    #	isa_ok pandoc->libs->{'highlighting-kate'}, 'Pandoc::Version';
+    #}
 }
 
 # input_formats / output_formats

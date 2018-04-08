@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.2.2';
 
 use Scalar::Util qw( dualvar );
 use Data::Alias 0.08;
@@ -213,7 +213,7 @@ IO::Stream::HTTP::Persistent - HTTP persistent connections plugin
 
 =head1 VERSION
 
-This document describes IO::Stream::HTTP::Persistent version v0.2.1
+This document describes IO::Stream::HTTP::Persistent version v0.2.2
 
 
 =head1 SYNOPSIS

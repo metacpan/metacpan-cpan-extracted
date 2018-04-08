@@ -1,3 +1,8 @@
+3.15 - fix transaction error where the order was improperly sorted. Added tests for this.
+	 no more pie.
+
+3.14 - pie
+
 3.13 - fix broken transactions
 	
 3.11 - remove backticks from tests, include version info

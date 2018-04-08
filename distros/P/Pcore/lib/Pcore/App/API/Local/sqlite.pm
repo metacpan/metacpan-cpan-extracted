@@ -1,7 +1,7 @@
 package Pcore::App::API::Local::sqlite;
 
 use Pcore -class, -result, -sql;
-use Pcore::Util::UUID qw[uuid_v1mc_str];
+use Pcore::Util::UUID qw[uuid_v4_str];
 
 with qw[Pcore::App::API::Local];
 
@@ -11,13 +11,13 @@ sub _db_add_schema_patch ( $self, $dbh ) {
 
             -- ROLE
             CREATE TABLE IF NOT EXISTS "api_role" (
-                "id" BLOB PRIMARY KEY NOT NULL DEFAULT(UUID()),
+                "id" BLOB PRIMARY KEY NOT NULL DEFAULT(CAST(uuid_generate_v4() AS BLOB)),
                 "name" BLOB NOT NULL UNIQUE
             );
 
             -- USER
             CREATE TABLE IF NOT EXISTS "api_user" (
-                "id" BLOB PRIMARY KEY NOT NULL DEFAULT(UUID()),
+                "id" BLOB PRIMARY KEY NOT NULL DEFAULT(CAST(uuid_generate_v4() AS BLOB)),
                 "name" TEXT NOT NULL UNIQUE,
                 "hash" BLOB NOT NULL,
                 "enabled" INTEGER NOT NULL DEFAULT 0,
@@ -26,7 +26,7 @@ sub _db_add_schema_patch ( $self, $dbh ) {
 
             -- USER PERMISSION
             CREATE TABLE IF NOT EXISTS "api_user_permission" (
-                "id" BLOB PRIMARY KEY NOT NULL DEFAULT(UUID()),
+                "id" BLOB PRIMARY KEY NOT NULL DEFAULT(CAST(uuid_generate_v4() AS BLOB)),
                 "user_id" BLOB NOT NULL REFERENCES "api_user" ("id") ON DELETE CASCADE, -- remove role assoc., on user delete
                 "role_id" BLOB NOT NULL REFERENCES "api_role" ("id") ON DELETE RESTRICT -- prevent deleting role, if has assigned users
             );
@@ -35,7 +35,8 @@ sub _db_add_schema_patch ( $self, $dbh ) {
 
             -- USER TOKEN
             CREATE TABLE IF NOT EXISTS "api_user_token" (
-                "id" BLOB PRIMARY KEY NOT NULL DEFAULT(UUID()),
+                "id" BLOB PRIMARY KEY NOT NULL DEFAULT(CAST(uuid_generate_v4() AS BLOB)),
+                "type" INTEGER NOT NULL,
                 "user_id" BLOB NOT NULL REFERENCES "api_user" ("id") ON DELETE CASCADE,
                 "hash" BLOB NOT NULL,
                 "desc" TEXT,
@@ -44,22 +45,12 @@ sub _db_add_schema_patch ( $self, $dbh ) {
 
             -- USER TOKEN PERMISSION
             CREATE TABLE IF NOT EXISTS "api_user_token_permission" (
+                "id" BLOB PRIMARY KEY NOT NULL DEFAULT(CAST(uuid_generate_v4() AS BLOB)),
                 "user_token_id" BLOB NOT NULL REFERENCES "api_user_token" ("id") ON DELETE CASCADE,
                 "user_permission_id" BLOB NOT NULL REFERENCES "api_user_permission" ("id") ON DELETE CASCADE
             );
 
             CREATE UNIQUE INDEX IF NOT EXISTS "idx_uniq_api_user_token_permission" ON "api_user_token_permission" ("user_token_id", "user_permission_id");
-
-            --- USER SESSION
-            CREATE TABLE IF NOT EXISTS "api_user_session" (
-                "id" BLOB PRIMARY KEY NOT NULL DEFAULT(UUID()),
-                "user_id" BLOB NOT NULL REFERENCES "api_user" ("id") ON DELETE CASCADE,
-                "hash" BLOB NOT NULL,
-                "created" INTEGER NOT NULL DEFAULT(CAST(STRFTIME('%s', 'now') AS INT)),
-                "updated" INTEGER NOT NULL DEFAULT(CAST(STRFTIME('%s', 'now') AS INT)),
-                "ip" BLOB NOT NULL,
-                "agent" TEXT NOT NULL
-            );
 SQL
     );
 
@@ -68,7 +59,7 @@ SQL
 
 sub _db_add_roles ( $self, $dbh, $roles, $cb ) {
     $dbh->do(
-        [ q[INSERT OR IGNORE INTO "api_role"], VALUES [ map { { id => uuid_v1mc_str, name => $_ } } $roles->@* ] ],
+        [ q[INSERT OR IGNORE INTO "api_role"], VALUES [ map { { name => $_ } } $roles->@* ] ],
         sub ( $dbh, $res, $data ) {
             $cb->($res);
 
@@ -80,7 +71,7 @@ sub _db_add_roles ( $self, $dbh, $roles, $cb ) {
 }
 
 sub _db_create_user ( $self, $dbh, $user_name, $hash, $enabled, $cb ) {
-    my $user_id = uuid_v1mc_str;
+    my $user_id = uuid_v4_str;
 
     $dbh->do(
         'INSERT OR IGNORE INTO "api_user" ("id", "name", "hash", "enabled") VALUES (?, ?, ?, ?)',
@@ -104,7 +95,7 @@ sub _db_set_user_permissions ( $self, $dbh, $user_id, $roles_ids, $cb ) {
     my $modified;
 
     $dbh->do(
-        [ 'INSERT OR IGNORE INTO "api_user_permission"', VALUES [ map { { role_id => $_, user_id => SQL_UUID $user_id } } $roles_ids->@* ] ],
+        [ 'INSERT OR IGNORE INTO "api_user_permission"', VALUES [ map { { role_id => SQL_UUID $_, user_id => SQL_UUID $user_id } } $roles_ids->@* ] ],
         sub ( $dbh, $res, $data ) {
             $modified += $res->{rows};
 
@@ -115,7 +106,7 @@ sub _db_set_user_permissions ( $self, $dbh, $user_id, $roles_ids, $cb ) {
             # remove permissions
             else {
                 $dbh->do(
-                    [ 'DELETE FROM "api_user_permission" WHERE "user_id" =', SQL_UUID $user_id, 'AND "role_id" NOT', IN $roles_ids ],
+                    [ 'DELETE FROM "api_user_permission" WHERE "user_id" =', SQL_UUID $user_id, 'AND "role_id" NOT', IN [ map { SQL_UUID $_} $roles_ids->@* ] ],
                     sub ( $dbh, $res, $data ) {
                         if ( !$res ) {
                             $cb->( result 500 );
@@ -152,11 +143,11 @@ sub _db_set_user_permissions ( $self, $dbh, $user_id, $roles_ids, $cb ) {
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
 ## |      | 8                    | * Private subroutine/method '_db_add_schema_patch' declared but not used                                       |
-## |      | 69                   | * Private subroutine/method '_db_add_roles' declared but not used                                              |
-## |      | 82                   | * Private subroutine/method '_db_create_user' declared but not used                                            |
-## |      | 103                  | * Private subroutine/method '_db_set_user_permissions' declared but not used                                   |
+## |      | 60                   | * Private subroutine/method '_db_add_roles' declared but not used                                              |
+## |      | 73                   | * Private subroutine/method '_db_create_user' declared but not used                                            |
+## |      | 94                   | * Private subroutine/method '_db_set_user_permissions' declared but not used                                   |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 82, 103              | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 73, 94               | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

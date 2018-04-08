@@ -1,12 +1,13 @@
 NAME
-    Regexp::Pattern - Collection of regexp patterns
+    Regexp::Pattern - Convention/framework for modules that contain
+    collection of regexes
 
 SPECIFICATION VERSION
     0.2.0
 
 VERSION
-    This document describes version 0.2.2 of Regexp::Pattern (from Perl
-    distribution Regexp-Pattern), released on 2018-03-24.
+    This document describes version 0.2.3 of Regexp::Pattern (from Perl
+    distribution Regexp-Pattern), released on 2018-04-03.
 
 SYNOPSIS
     Subroutine interface:
@@ -43,7 +44,7 @@ SYNOPSIS
 
 DESCRIPTION
     Regexp::Pattern is a convention for organizing reusable regexp patterns
-    in modules, as well as framework for some convenience in using those
+    in modules, as well as framework to provide convenience in using those
     patterns in your program.
 
   Structure of an example Regexp::Pattern::* module
@@ -115,12 +116,11 @@ DESCRIPTION
      {
          summary     => 'PAUSE author ID, or PAUSE ID for short',
          pat         => qr/[A-Z][A-Z0-9]{1,8}/,
-         description => <<_,
-
-    I'm not sure whether PAUSE allows digit for the first letter. For safety
-    I'm assuming no.
-
-    _ }
+         description => <<~HERE,
+         I'm not sure whether PAUSE allows digit for the first letter. For safety
+         I'm assuming no.
+         HERE
+     }
 
   Using a Regexp::Pattern::* module
    Standalone
@@ -179,7 +179,7 @@ DESCRIPTION
 
          pat => qr/foo[abc]+/,
 
-        is preferable over:
+        is preferred over:
 
          pat => 'foo[abc]+',
 
@@ -189,7 +189,7 @@ DESCRIPTION
 
          pat => qr/foo/,
 
-        is preferable over:
+        is preferred over:
 
          pat => qr/^foo/, # or qr/foo$/, or qr/\Afoo\z/
 
@@ -208,10 +208,10 @@ DESCRIPTION
         it can affect the groups of the composed pattern. When composing
         pattern, user can add captures herself if needed.
 
-    *   Regexp pattern should not contain modifiers unless necessary
+        When you define an anchored pattern, adding tag "capturing" is
+        recommended:
 
-        An exception to this rule is the /x modifier which is usually
-        recommended for longer patterns.
+         tags => ['capturing'],
 
 FUNCTIONS
   re

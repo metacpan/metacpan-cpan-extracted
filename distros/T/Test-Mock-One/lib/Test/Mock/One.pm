@@ -4,7 +4,7 @@ use strict;
 
 # ABSTRACT: Mock the world with one object
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 our $AUTOLOAD;
 
@@ -30,6 +30,11 @@ sub AUTOLOAD {
     my $self = shift;
 
     my ($call) = $AUTOLOAD =~ /([^:]+)$/;
+
+    if ($self->{'X-Mock-Called'}) {
+        my @caller = caller(1); # who called the caller of self->$call
+        push(@{ $self->{'X-Mock-Called-By'}{$caller[3]}{$call}}, [ @_ ]);
+    }
 
     if (exists $self->{$call}) {
         my $ref = ref $self->{$call};
@@ -130,7 +135,7 @@ Test::Mock::One - Mock the world with one object
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -190,11 +195,10 @@ Test::Mock::One allows you to write a simple object that allows you to do the sa
 You don't actually need to define anything, by default method on a
 Test::Mock::One object will return itself.  You can tweak the behaviour
 by how you instantiate the object. There are several attributes that
-control the object, these are defined as X-Mock attributes: X-Mock-ISA
-to override the isa(), X-Mock-Strict to override the can() and allowed
-methods and X-Mock-Stringify to tell it how to stringify the object.
+control the object, these are defined as X-Mock attributes, see
+L<Test::Mock::One/METHODS> for more on this.
 
-=head2 Example usage
+=head2 Example
 
 Let's say you want to test a function that retrieves a user from a
 database and checks if it is active
@@ -258,7 +262,7 @@ Instantiate a new Test::Mock::One object
 
 =item X-Mock-Strict
 
-Boolean value. Undefined attributes will not be mocked and calling them makes us die.
+Boolean value. Undefined attributes/methods will not be mocked and calling them makes us die.
 
 =item X-Mock-ISA
 
@@ -277,6 +281,10 @@ Tell us how to stringify the object
     'X-Mock-Stringify' => 'My custom string',
     'X-Mock-Stringify' => sub { return "foo" },
 
+=item X-Mock-Called
+
+Boolean value. Allows mock object to keep caller information. See also L<Test::Mock::Two>.
+
 =item X-Mock-SelfArg
 
 Boolean value. Make all the code blocks use $self. This allows you to do things like
@@ -290,21 +298,27 @@ Boolean value. Make all the code blocks use $self. This allows you to do things 
         }
     );
 
-This also impacts C<X-Mock-ISA> and C<X-Mock->Stringify>.
+This also impacts C<X-Mock-ISA> and C<X-Mock-Stringify>.
 
 =back
 
 =head2 isa
 
-Returns true or false, depending on how X-Mock-ISA is set.
+Returns true or false, depending on how C<X-Mock-ISA> is set.
 
 =head2 can
 
-Returns true or false, depending on how X-Mock-Strict is set.
+Returns true or false, depending on how C<X-Mock-Strict> is set.
 
 =head1 SEE ALSO
 
-L<Sub::Override>
+=over
+
+=item L<Test::Mock::Two>
+
+=item L<Sub::Override>
+
+=back
 
 =head1 AUTHOR
 

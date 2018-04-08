@@ -1,5 +1,5 @@
 package Statocles::Types;
-our $VERSION = '0.092';
+our $VERSION = '0.093';
 # ABSTRACT: Type constraints and coercions for Statocles
 
 use strict;
@@ -114,7 +114,7 @@ Statocles::Types - Type constraints and coercions for Statocles
 
 =head1 VERSION
 
-version 0.092
+version 0.093
 
 =head1 SYNOPSIS
 

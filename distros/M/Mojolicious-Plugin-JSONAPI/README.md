@@ -4,7 +4,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 # VERSION
 
-version 0.4
+version 1.0
 
 # SYNOPSIS
 
@@ -45,6 +45,8 @@ version 0.4
         # PATCH '/api/posts/:post_id/relationships/email-templates' -> to('api-posts#patch_related_email_templates')
         # DELETE '/api/posts/:post_id/relationships/email-templates' -> to('api-posts#delete_related_email_templates')
 
+        # If your not in production mode, your $app->log will show the created routes. Useful!
+
         # You can use the following helpers too:
 
         $self->resource_document($dbic_row, $options);
@@ -73,6 +75,11 @@ See [http://jsonapi.org/](http://jsonapi.org/) for the JSON API specification. A
 
     This is passed to the constructor of `JSONAPI::Document` which will kebab case the attribute keys of each
     record (i.e. '\_' to '-').
+
+- `attributes_via`
+
+    Also passed to the constructor of `JSONAPI::Document`. This is the method that will be used to get
+    the attributes for a resource document. Should return a hash (not a hashref).
 
 # HELPERS
 
@@ -134,6 +141,14 @@ as described in the specification. See [Error Objects](http://jsonapi.org/format
 
 Can optionally provide a reference to the primary data for the route as well as meta information, which will be added
 to the response as-is. Use `resource_document` to generate the right structure for this argument.
+
+## requested\_resources
+
+Convenience helper for controllers. Takes the query param `include`, used to indicate what relationships to include in the
+response, and splits it by ',' to return an ArrayRef.
+
+    # GET /api/posts?include=comments,author
+    my $include = $c->requested_resources(); # ['comments', 'author']
 
 ## resource\_document
 

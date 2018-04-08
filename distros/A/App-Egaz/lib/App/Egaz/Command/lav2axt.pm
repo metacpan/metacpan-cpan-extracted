@@ -6,7 +6,9 @@ use autodie;
 use App::Egaz -command;
 use App::Egaz::Common;
 
-use constant abstract => 'convert .lav files to .axt files';
+sub abstract {
+    return 'convert .lav files to .axt files';
+}
 
 sub opt_spec {
     return ( [ "outfile|o=s", "Output filename. [stdout] for screen", { default => "stdout" }, ],

@@ -56,7 +56,7 @@
          "web" : "https://github.com/perlancar/perl-Sah-Schemas-Country"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -65,7 +65,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Sah::Schemas",
             "name" : "Sah::Schemas",
-            "version" : "0.010"
+            "version" : "0.011"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",

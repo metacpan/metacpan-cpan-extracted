@@ -19,6 +19,12 @@
             "Module::Build" : "0.4004"
          }
       },
+      "runtime" : {
+         "requires" : {
+            "Device::Chip::Adapter" : "0",
+            "Device::Chip::ProtocolBase::SPI" : "0"
+         }
+      },
       "test" : {
          "requires" : {
             "Test::More" : "0.88"
@@ -28,7 +34,7 @@
    "provides" : {
       "Device::Chip::Adapter::CH341A" : {
          "file" : "lib/Device/Chip/Adapter/CH341A.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -37,6 +43,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

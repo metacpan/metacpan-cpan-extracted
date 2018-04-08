@@ -1,0 +1,72 @@
+NAME
+    List::Util::MaybeXS - List::Util but with Pure Perl fallback
+
+SYNOPSIS
+      use List::Util::MaybeXS qw(
+        any all
+      );
+
+DESCRIPTION
+    This module provides the same functions as List::Util, but falls back to
+    pure perl implementations if the installed List::Util is too old to
+    provide them.
+
+    Picking between List::Util's XS accellerated functions and the PP
+    versions is done on a per-sub basis, so using this module should never
+    result in a slowdown over using List::Util directly.
+
+FUNCTIONS
+    all
+    any
+    first
+    min
+    max
+    minstr
+    maxstr
+    none
+    notall
+    product
+    reduce
+    sum
+    sum0
+    shuffle
+    uniq
+    uniqnum
+    uniqstr
+    pairs
+    unpairs
+    pairkeys
+    pairvalues
+    pairmap
+    pairgrep
+    pairfirst
+    head
+    tail
+
+DIFFERENCES FROM List::Util
+    As the subs provided are implemented in perl, there are some minor
+    differences with the interface.
+
+    @_ in blocks
+        Inside a callback block (such as "any { }"), @_ will be empty when
+        using the pure perl implementation. With the XS implementation, the
+        outer @_ will be visible.
+
+AUTHORS
+    Graham Knop <haarg@haarg.org>
+
+    Paul Evans <leonerd@leonerd.org.uk>
+
+    Graham Barr <gbarr@pobox.com>
+
+CONTRIBUTORS
+    None so far.
+
+COPYRIGHT
+    Copyright (c) 2017 the List::Util::MaybeXS "AUTHORS" and "CONTRIBUTORS"
+    as listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself. See <http://dev.perl.org/licenses/>.
+

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.118';
+$Config::Model::BackendMgr::VERSION = '2.120';
 use Mouse;
 use strict;
 use warnings;
@@ -18,7 +18,6 @@ use 5.10.1;
 
 use Config::Model::Exception;
 use Data::Dumper;
-use IO::File;
 use Storable qw/dclone/;
 use Scalar::Util qw/weaken reftype/;
 use Log::Log4perl qw(get_logger :levels);
@@ -54,7 +53,7 @@ sub _build_backend_obj {
     my $self = shift;
 
     my $backend = $self->rw_config->{backend};
-    warn("function parameter for a backend is deprecated. Please implement 'read' method in backend $backend")
+    $logger->warn("function parameter for a backend is deprecated. Please implement 'read' method in backend $backend")
         if $self->rw_config->{function};
     # try to load a specific Backend class
     my $f = $self->rw_config->{function} || 'read';
@@ -109,7 +108,7 @@ sub get_cfg_file_path {
     my $cfo = $args{config_file};
 
     if ( defined $cfo ) {
-        my $override =  $args{root} ? path($args{root})->child($cfo) : path($cfo);
+        my $override =  $args{root}->child($cfo);
         my $mode = $w ? 'write' : 'read';
         $logger->trace("$args{backend} override target file is $override ($mode mode)");
         return ( 1, $override );
@@ -135,16 +134,11 @@ sub get_cfg_file_path {
 sub open_read_file {
     my ($self, $file_path) = @_;
 
-    my $fh = new IO::File;
-    if ( -e $file_path ) {
+    if ( $file_path->is_file ) {
         $logger->debug("open_read_file: open $file_path for read");
-        $fh->open($file_path);
-        $fh->binmode(":utf8");
-
         # store a backup in memory in case there's a problem
-        $self->file_backup( [ $fh->getlines ] );
-        $fh->seek( 0, 0 );    # go back to beginning of file
-        return $fh;
+        $self->file_backup( [ $file_path->lines_utf8 ] );
+        return $file_path->filehandle("<", ":utf8");
     }
     else {
         return;
@@ -431,7 +425,7 @@ sub auto_write_init {
             }
         }
         elsif ($file_ok) {
-            $fh = $self->open_file_to_write( $backend, $file_path, delete $args{backup} );
+            $fh = $self->open_file_to_write( $backend, $file_path, delete $cb_args{backup} );
         }
 
         # override needed for "save as" button
@@ -492,12 +486,15 @@ sub open_file_to_write {
     $backup ||= 'old';    # use old only if defined
     $backup = '.' . $backup unless $backup =~ /^\./;
 
-    my $file = path($file_path);
-    if ( $do_backup and $file->is_file ) {
-        $file->copy( $file_path . $backup ) or die "Backup copy failed: $!";
+    # make sure that parent dir exists before creating file
+    $file_path->parent->mkpath;
+
+    if ( $do_backup and $file_path->is_file ) {
+        $file_path->copy( $file_path.$backup ) or die "Backup copy failed: $!";
     }
+
     $logger->debug("$backend backend opened file $file_path to write");
-    return $file->openw_utf8;
+    return $file_path->filehandle(">",":utf8");
 }
 
 sub close_file_to_write {
@@ -505,24 +502,20 @@ sub close_file_to_write {
 
     return unless defined $file_path;
 
-    if ($error) {
+    $fh->close;
 
+    if ($error) {
         # restore backup and display error
-        my $data = $self->file_backup;
-        $logger->debug(
-            "Error during write, restoring backup in $file_path with " . scalar @$data . " lines" );
-        $fh->seek( 0, 0 );    # go back to beginning of file
-        $fh->print(@$data);
-        $fh->close;
+        $logger->debug("Error during write, restoring backup data in $file_path" );
+        $file_path->spew_utf8( $self->file_backup );
         $error->rethrow if ref($error) and $error->can('rethrow');
         die $error;
     }
 
-    $fh->close;
-    path($file_path)->chmod($file_mode) if $file_mode;
+    $file_path->chmod($file_mode) if $file_mode;
 
     # check file size and remove empty files
-    unlink($file_path) if -z $file_path and not -l $file_path;
+    $file_path->remove if -z $file_path and not -l $file_path;
 }
 
 sub is_auto_write_for_type {
@@ -549,7 +542,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.118
+version 2.120
 
 =head1 SYNOPSIS
 

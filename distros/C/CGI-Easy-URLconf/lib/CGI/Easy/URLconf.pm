@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use Export::Attrs;
 use URI::Escape qw( uri_escape_utf8 );
@@ -181,7 +181,7 @@ CGI::Easy::URLconf - map url path to handler sub and vice versa
 
 =head1 VERSION
 
-This document describes CGI::Easy::URLconf version v2.0.0
+This document describes CGI::Easy::URLconf version v2.0.1
 
 
 =head1 SYNOPSIS
@@ -313,9 +313,18 @@ from path to GET parameters. Example:
 
 =head1 INTERFACE 
 
-=over
+=head2 setup_path
 
-=item setup_path( [METHOD =>] MATCH => [CALLBACK => ...] HANDLER, ... )
+    setup_path(
+        '/path'             =>              $HANDLER,
+        qr{^/path/(\d+)/$}  => @CALLBACKS,  $HANDLER,
+        ...
+    );
+    setup_path( $METHOD =>
+        '/path'             =>              $HANDLER,
+        qr{^/path/(\d+)/$}  => @CALLBACKS,  $HANDLER,
+        ...
+    );
 
 Configure mapping of url's path to handler subroutine (which will be used
 by path2view()).
@@ -335,32 +344,39 @@ HANDLER is REF to your subroutine, which will be returned by path2view()
 when this rule will match current url.
 
 Between MATCH and HANDLER any amount of optional CALLBACK subroutines can
-be used. These CALLBACKs will be called when MATCH rule matches current
+be used. These CALLBACKS will be called when MATCH rule matches current
 url with two parameters: CGI::Easy::Request object and ARRAYREF with
 contents of all capturing parentheses (when MATCH rule is Regexp with
-capturing parentheses). Usual task for such CALLBACKs is convert "hidden"
+capturing parentheses). Usual task for such CALLBACKS is convert "hidden"
 CGI parameters included in url path into usual C<< $r->{GET} >> parameters.
 
 Return nothing.
 
+=head2 path2view
 
-=item path2view( $r )
+    $handler = path2view( $r );
 
 Take CGI::Easy::Request object as parameter, and analyse this request
 according to rules defined previously using setup_path().
 
 Return: HANDLER if find rule which match current request, else undef().
 
+=head2 set_param
 
-=item set_param( @names )
+    $callback = set_param( @names );
 
 Take names of C<< {GET} >> parameters which should be set using parts of
 url path selected by capturing parentheses in MATCH Regexp.
 
 Return CALLBACK subroutine suitable for using in setup_path().
 
+=head2 setup_view
 
-=item setup_view( HANDLER => PATH, ... )
+    setup_view(
+        \&HANDLER1 => $PATH,
+        \&HANDLER2 => \@PATH,
+        ...
+    );
 
 Configure mapping of handler subroutine to url path (which will be used by
 view2path()).
@@ -397,8 +413,9 @@ Example: map \&handler to random article with id 0-999
 
 Return nothing.
 
+=head2 view2path
 
-=item view2path( HANDLER, %params )
+    $url = view2path( \&HANDLER, %params );
 
 Take user handler subroutine and it parameters, and convert it to url
 according to rules defined previously using setup_view().
@@ -426,16 +443,14 @@ Example:
 
 Return: url. Throw exception if unable to make url.
 
+=head2 with_params
 
-=item with_params( @names )
+    $callback = with_params( @names );
 
 Take names of parameters which B<must> exists in %params given to
 view2path().
 
 Return CALLBACK subroutine suitable for using in setup_view().
-
-
-=back
 
 
 =head1 SUPPORT
@@ -490,7 +505,7 @@ Alex Efros E<lt>powerman@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2009-2010 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+This software is Copyright (c) 2009- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
 
 This is free software, licensed under:
 

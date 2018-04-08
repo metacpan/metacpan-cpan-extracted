@@ -1,5 +1,19 @@
 Revision history for Pandoc Perl module
 
+0.8.0  2018-04-06 12:28:03 CEST
+    - Search executable in ~/.pandoc/bin
+    - Download executables with 'pandoc-' prefix
+    - Automatically detect Debian architecture for download releases
+    - Add method Pandoc::Relases->get
+    - Add method Pandoc->extensions
+
+0.7.2  2018-04-03 12:09:40 CEST
+    - Fix test failure since Perl 5.26
+
+0.7.1  2018-04-03 11:09:14 CEST
+    - Add App::Prove::Plugin::andoc
+    - Make sure tests pass on all pandoc versions (#25)
+
 0.7.0  2018-03-26 22:31:51 CEST
     - Add Pandoc::Release
     - fix bug when calling with uneven number of arguments (#22)

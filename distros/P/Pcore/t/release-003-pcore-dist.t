@@ -188,7 +188,7 @@ sub run_test (@args) {
     my %args = (
         skip           => undef,    # skip test
         par            => 0,        # create PAR test environment
-        dist_share_dir => 1,        # generate /dist_root/share/dist.perl
+        dist_share_dir => 1,        # generate /dist_root/share/$Pcore::Core::Const::DIST_CFG_FILENAME
         cpan_lib       => undef,    # generate CPAN lib
         cpan_share_dir => 0,        # make CPAM lib dist
         @args,
@@ -301,10 +301,7 @@ sub generate_test_dir ( $dist_name, $args ) {
 
     my $tree = Pcore::Util::File::Tree->new;
 
-    my $dist_perl = <<"PERL";
-{   name => '$dist_name',
-}
-PERL
+    my $dist_cfg = P->data->encode_data( $Pcore::Util::Config::EXT_TYPE_MAP->{$Pcore::Core::Const::DIST_CFG_TYPE}, { name => $dist_name } );
 
     my $package = <<"PERL";
 package $res->{package_name} v0.1.0;
@@ -315,13 +312,13 @@ PERL
     # create dist root
     $tree->add_file( "$args->{prefix}lib/$res->{module_name}", \$package );
 
-    $tree->add_file( "$args->{prefix}share/dist.perl", \$dist_perl ) if $args->{dist_share_dir};
+    $tree->add_file( "$args->{prefix}share/dist.$Pcore::Core::Const::DIST_CFG_TYPE", $dist_cfg ) if $args->{dist_share_dir};
 
     # create cpan lib
     if ( $args->{cpan_lib} ) {
         $tree->add_file( "$args->{prefix}$args->{cpan_lib}/$res->{module_name}", \$package );
 
-        $tree->add_file( "$args->{prefix}$args->{cpan_lib}/auto/share/dist/$dist_name/dist.perl", \$dist_perl ) if $args->{cpan_share_dir};
+        $tree->add_file( "$args->{prefix}$args->{cpan_lib}/auto/share/dist/$dist_name/dist.$Pcore::Core::Const::DIST_CFG_TYPE", $dist_cfg ) if $args->{cpan_share_dir};
     }
 
     $res->{temp} = $tree->write_to_temp;

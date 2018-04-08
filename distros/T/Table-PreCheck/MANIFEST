@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Table/PreCheck.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+scripts/colwidth
+scripts/eofcheck
+scripts/csv2tsv
+scripts/wideline
+META.yml
+META.json

@@ -1,0 +1,115 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Memorator::Backend::Mojo::Pg - backend for Mojo::Pg
+
+=head1 SYNOPSIS
+
+   # in typical usage, this class is used automatically
+   use Minion;
+   use Memorator;
+   my $minion = Minion->new(Pg => 'postgresql://postgres@/test');
+   my $memorator = Memorator->create(
+      minion => $minion, # <-- this is it
+      ...
+   );
+
+   # The "explicit way" might imply using different databases
+   # for Minion and this class
+   use Mojo::Pg;
+   use Memorator::Backend::Mojo::Pg;
+   my $pg = Mojo::Pg->new('postgresql://postgres@/test');
+   my $mempg = Memorator::Backend::Mojo::Pg->new(
+      mojodb => $pg,         # mandatory
+      name   => 'whatever',  # mandatory
+   );
+
+   # ... then, for Memorator...
+   use Memorator;
+   my $memorator = Memorator->create(
+      backend => $mempg, # <-- this is it
+      ...
+   );
+
+=head1 DESCRIPTION
+
+This class allows you to use L<Mojo::Pg> as a backend for keeping the
+mapping between external identifiers and job identifiers. It heavily
+relies on L<Memorator::Backend>, that is its parent class, so it inherits
+all of its methods while implementing L</migration>, that allows setting
+up the table in the database.
+
+You don't generally need to use this class directly, as it is used behind
+the scenes automatically by L<Memorator> when you set a L<Minion> that
+relies upon L<Mojo::Pg>. It's anyway good to have around if you need to do
+non-standard things, like e.g. use different database technologies for the
+L<Minion> backend and L<Memorator> backend.
+
+=head1 METHODS
+
+This class inherits all methods from L<Memorator::Backend>, adding the
+following one.
+
+=head2 B<< migration >>
+
+   my $text = $obj->migration;
+
+get the text suitable to create the database table(s) via
+L<Mojo::Pg/migrations>. It relies upon L<Memorator::Backend/table_name> to
+set the name of the table to be created.
+
+=begin TRICK
+
+These methods are inherited from L<Memorator::Backend>, but we want to
+avoid giving Test::Pod::Coverage the slightest chance to complain about
+missing documentation for them.
+
+=over
+
+=item add_mapping
+
+=item deactivate_mapping
+
+=item deactivate_mapping_query
+
+=item ensure_table
+
+=item mapping_between
+
+=item mapping_between_query
+
+=item remove_mapping
+
+=item stale_mappings
+
+=item stale_mappings_query
+
+=item table_name
+
+=back
+
+=end TRICK
+
+=head1 SEE ALSO
+
+L<Memorator::Backend>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2018 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

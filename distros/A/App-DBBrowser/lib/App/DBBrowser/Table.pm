@@ -6,13 +6,11 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.009';
-
-use List::MoreUtils qw( any first_index );
+our $VERSION = '2.012';
 
 use Term::Choose     qw( choose );
 use Term::Form       qw();
-use Term::TablePrint qw(print_table);
+use Term::TablePrint qw( print_table );
 
 use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 
@@ -154,16 +152,9 @@ sub on_table {
             }
         }
         elsif ( $custom eq $cu{'print_tbl'} ) {
-            my $select .= "SELECT" . $sql->{distinct_stmt} . " " . $ax->prepare_select_cols( $sql ); #
-            $select .= " FROM " . $sql->{table};
-            $select .= $sql->{where_stmt};
-            $select .= $sql->{group_by_stmt};
-            $select .= $sql->{having_stmt};
-            $select .= $sql->{order_by_stmt};
-            $select .= $sql->{limit_stmt};
-            $select .= $sql->{offset_stmt};
+            my $select = $ax->get_stmt( $sql, 'Select', 'prepare' );
             if ( $sf->{o}{G}{max_rows} && ! $sql->{limit_stmt} ) {
-                $select .= sprintf " LIMIT %d", $sf->{o}{G}{max_rows};
+                $select .= " LIMIT " . $sf->{o}{G}{max_rows};
                 $sf->{o}{table}{max_rows} = $sf->{o}{G}{max_rows};
             }
             else {
@@ -195,7 +186,7 @@ sub on_table {
             my $all_arrayref = $sth->fetchall_arrayref;
             unshift @$all_arrayref, $col_names;
             print $sf->{i}{clear_screen};
-            # return $sql explicitly since after a restore backup it refers to a different hash. ?
+            # return $sql explicitly since after a restore backup it refers to a different hash.
             return $all_arrayref, $sql;
         }
         else {
@@ -317,72 +308,60 @@ sub commit_sql {
     local $| = 1;
     print $sf->{i}{clear_screen};
     print 'DB work ...' . "\n" if $sf->{o}{table}{progress_bar}; #
-    my $transaction;
-    eval { $transaction = $dbh->begin_work } or do { $dbh->{AutoCommit} = 1; $transaction = 0 };
+    my $stmt_type = $stmt_typeS->[-1];
     my $rows_to_execute = [];
     my $row_count;
-    my $stmt;
-    my $stmt_type = $stmt_typeS->[-1];
     if ( $stmt_type eq 'Insert' ) {
-        if ( ! @{$sql->{insert_into_args}} ) {
-            return 1; #
-        }
-        $stmt  = sprintf "INSERT INTO %s (%s) VALUES(%s)",
-                            $sql->{table},
-                            join( ', ', @{$sql->{insert_into_cols}} ),
-                            join( ', ', ( '?' ) x @{$sql->{insert_into_cols}} );
+        return 1 if ! @{$sql->{insert_into_args}};
         $rows_to_execute = $sql->{insert_into_args};
         $row_count = @$rows_to_execute;
     }
     else {
-        my %map_stmt_types = (
-            Update => "UPDATE",
-            Delete => "DELETE",
-        );
-        $stmt  = $map_stmt_types{$stmt_type};
-        $stmt .= " FROM"               if $map_stmt_types{$stmt_type} eq "DELETE";
-        $stmt .= ' ' . $sql->{table};
-        $stmt .= $sql->{set_stmt}      if $sql->{set_stmt};
-        $stmt .= $sql->{where_stmt}    if $sql->{where_stmt};
-        $rows_to_execute->[0] = [ @{$sql->{set_args}}, @{$sql->{where_args}} ];
+        $rows_to_execute = [ [ @{$sql->{set_args}}, @{$sql->{where_args}} ] ];
+        my $all_arrayref = [];
         if ( ! eval {
-            my $sth = $dbh->prepare( "SELECT * FROM " . $sql->{table} . ( $sql->{where_stmt} ? $sql->{where_stmt} : '' ) );
+            my $sth = $dbh->prepare( "SELECT * FROM " . $sql->{table} . $sql->{where_stmt} );
             $sth->execute( @{$sql->{where_args}} );
             my $col_names = $sth->{NAME};
-            my $all_arrayref = $sth->fetchall_arrayref;
+            $all_arrayref = $sth->fetchall_arrayref;
             $row_count = @$all_arrayref;
             unshift @$all_arrayref, $col_names;
-            my $prompt_pt;
-            if ( $stmt_type eq 'Update' ) {
-                my $filled = $sql->{set_stmt};
-                for my $val ( @{$sql->{set_args}} ) {
-                    $filled =~ s/\?/$val/;
-                }
-                $filled =~ s/^\s+//;
-                $prompt_pt = "These records will be updated with [$filled]\n";
-            }
-            else {
-                $prompt_pt = "These records will be deleted\n";
-            }
-            if ( @$all_arrayref > 1 ) {
-                print_table( $all_arrayref, { %{$sf->{o}{table}}, prompt => $prompt_pt, max_rows => 0, keep_header => 0 } ); #
-            }
-            die "'row_count' undefined" if ! defined $row_count;
             1 }
         ) {
             $ax->print_error_message( "$@Fetching info: affected records ...\n", $stmt_type );
         }
-
+        my $prompt;
+        if ( $stmt_type eq 'Update' ) {
+            my $filled = $sql->{set_stmt};
+            for my $val ( @{$sql->{set_args}} ) {
+                $filled =~ s/(?<=\ \=\ )\?/$val/;
+            }
+            $filled =~ s/^\s+//;
+            $prompt = "These records will be updated with [ $filled ]:\n";
+        }
+        else {
+            $prompt = "These records will be deleted:\n";
+        }
+        if ( @$all_arrayref > 1 ) {
+            print_table( $all_arrayref, { %{$sf->{o}{table}}, prompt => $prompt, max_rows => 0, keep_header => 0 } ); #
+        }
     }
+    my $transaction;
+    eval {
+        $dbh->{AutoCommit} = 1;
+        $transaction = $dbh->begin_work;
+    } or do {
+        $dbh->{AutoCommit} = 1;
+        $transaction = 0;
+    };
     if ( $transaction ) {
         my $rolled_back;
         if ( ! eval {
-            my $sth = $dbh->prepare( $stmt );
+            my $sth = $dbh->prepare(
+                $ax->get_stmt( $sql, $stmt_type, 'prepare' )
+            );
             for my $values ( @$rows_to_execute ) {
                 $sth->execute( @$values );
-            }
-            if ( ! defined $row_count ) {
-                $row_count = $sth->rows;
             }
             my $commit_ok = sprintf qq(  %s %d "%s"), 'COMMIT', $row_count, $stmt_type;
             $ax->print_sql( $sql, $stmt_typeS );
@@ -409,10 +388,6 @@ sub commit_sql {
         return 1;
     }
     else {
-        if ( ! defined $row_count ) {
-            my $count_stmt = "SELECT COUNT(*) FROM " . $sql->{table} . $sql->{where_stmt};
-            ( $row_count ) = $dbh->selectrow_array( $count_stmt, undef, @{$sql->{where_args}} );
-        }
         my $commit_ok = sprintf qq(  %s %d "%s"), 'EXECUTE', $row_count, $stmt_type;
         $ax->print_sql( $sql, $stmt_typeS ); #
         # Choose
@@ -424,7 +399,9 @@ sub commit_sql {
             return;
         }
         if ( ! eval {
-            my $sth = $dbh->prepare( $stmt );
+            my $sth = $dbh->prepare(
+                $ax->get_stmt( $sql, $stmt_type, 'prepare' )
+            );
             for my $values ( @$rows_to_execute ) {
                 $sth->execute( @$values );
             }

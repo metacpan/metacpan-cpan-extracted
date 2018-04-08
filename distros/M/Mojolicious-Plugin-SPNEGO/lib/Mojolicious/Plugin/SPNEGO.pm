@@ -2,7 +2,7 @@ package Mojolicious::Plugin::SPNEGO;
 use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
 
-our $VERSION = '0.2.7';
+our $VERSION = '0.3.0';
 
 my %cCache;
 
@@ -18,7 +18,7 @@ sub register {
             my $cfg = { %$plugin_cfg, %$helper_cfg };
             my $cId = $c->tx->connection;
 
-            my $authorization = $c->req->headers->header('Authorization') // '';
+            my $authorization = $c->req->headers->header(($cfg->{web_proxy_mode} ? 'Proxy-' : '' ) .'Authorization') // '';
             my ($AuthBase64) = ($authorization =~ /^NTLM\s(.+)$/);
             # $c->app->log->debug("AuthBase64: $AuthBase64") if $AuthBase64;
 
@@ -39,7 +39,7 @@ sub register {
                     /^Type1/ && do {
                         my $mesg = $ldap->bind_type1($AuthBase64);
                         if ($mesg->{ntlm_type2_base64}){
-                            $c->res->headers->header( 'WWW-Authenticate' => 'NTLM '.$mesg->{ntlm_type2_base64});
+                            $c->res->headers->header( ($cfg->{web_proxy_mode} ? 'Proxy' : 'WWW' ) . '-Authenticate' => 'NTLM '.$mesg->{ntlm_type2_base64});
                             $c->render( text => 'Waiting for Type3 NTLM Token', status => 401);
                             $cCache->{status} = 'expectType3';
                             return 0;
@@ -133,7 +133,7 @@ the L<Net::LDAP::SPNEGO> module.
 
 On loading the plugin default values for the helpers can be configured:
 
- plugin 'SPNEGO', ad_server => $SERVER;
+ plugin 'SPNEGO', ad_server => $SERVER, web_proxy_mode => 1;
 
 or
 
@@ -141,7 +141,7 @@ or
 
 The plugin provides the following helper method:
 
-=head2 $c->ntlm_auth(ad_server => $AD_SERVER, auth_success_cb => $cb)
+=head2 $c->ntlm_auth(ad_server => $AD_SERVER, web_proxy_mode => 1, auth_success_cb => $cb)
 
 The C<ntlm_auth> method runs an NTLM authentication dialog with the browser
 by forwarding the tokens coming from the browser to the AD server specified
@@ -151,8 +151,11 @@ If a C<auth_success_cb> is specified it will be executed once the ntlm dialog
 has completed successfully. Depending on the return value of the
 callback the entire process will be considered successfull or not.
 
-Since ntlm authentication is reather complex, you may want to save
-authentication success in a cookie.
+To use NTLM for authenticating a web proxy, you have to enable the C<web_proxy_mode>
+to use the appropriate Authentication and Authorization headers.
+
+Since ntlm authentication is rather complex and time consuming, you may want
+to save authentication success in a cookie.
 
 Note that windows will only do automatic NTLM SSO with hosts in the local zone
 so you may have to add your webserver to this group of machines in the

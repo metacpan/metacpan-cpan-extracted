@@ -2,8 +2,8 @@ NAME
     Text::DiffU - Diff two sequences and print unified-style output
 
 VERSION
-    This document describes version 0.001 of Text::DiffU (from Perl
-    distribution Text-DiffU), released on 2017-08-19.
+    This document describes version 0.002 of Text::DiffU (from Perl
+    distribution Text-DiffU), released on 2018-04-03.
 
 FUNCTIONS
   diff_u
@@ -17,7 +17,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   ctx => *nonnegint* (default: 3)
+    *   ctx => *uint* (default: 3)
 
     *   hook_format_diff_items => *code*
 
@@ -105,7 +105,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

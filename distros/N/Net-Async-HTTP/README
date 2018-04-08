@@ -196,7 +196,7 @@ PARAMETERS
     Optional. If true, incoming responses that have a recognised
     Content-Encoding are handled by the module, and decompressed content is
     passed to the body handling callback or returned in the HTTP::Response.
-    See "CONTENT DECODING" below for details of which encoding methods are
+    See "CONTENT DECODING" below for details of which encoding types are
     recognised. When this option is enabled, outgoing requests also have
     the Accept-Encoding header added to them if it does not already exist.
 
@@ -216,6 +216,14 @@ PARAMETERS
     Optional. If true, then any attempt to make a request that does not use
     SSL (either by calling request, or as a result of a redirection) will
     immediately fail.
+
+ SOCKS_*
+
+    Since version 0.42.
+
+    Additionally, any parameters whose names start with SOCKS_ will be
+    stored and used by Net::Async::SOCKS to establish connections via a
+    configured proxy.
 
 METHODS
 
@@ -269,14 +277,18 @@ METHODS
 
     method => STRING
 
-      Optional. The HTTP method. If missing, GET is used.
+      Optional. The HTTP method name. If missing, GET is used.
 
     content => STRING or ARRAY ref
 
-      Optional. The body content to use for PUT or POST requests. If this
-      is a plain scalar instead of an ARRAY ref, it will not be form
-      encoded. In this case, a content_type field must also be supplied to
-      describe it.
+      Optional. The body content to use for PUT or POST requests.
+
+      If this is a plain scalar it will be used directly, and a
+      content_type field must also be supplied to describe it.
+
+      If this is an ARRAY ref and the request method is POST, it will be
+      form encoded. It should contain an even-sized list of field names and
+      values. For more detail see "POST" in HTTP::Request::Common.
 
     content_type => STRING
 
@@ -425,8 +437,8 @@ METHODS
 
  $response = $http->POST( $uri, $content, %args )->get
 
-    Convenient wrappers for using the GET, HEAD, PUT or POST methods with a
-    URI object and few if any other arguments, returning a Future.
+    Convenient wrappers for performing GET, HEAD, PUT or POST requests with
+    a URI object and few if any other arguments, returning a Future.
 
     Remember that POST with non-form data (as indicated by a plain scalar
     instead of an ARRAY reference of form data name/value pairs) needs a

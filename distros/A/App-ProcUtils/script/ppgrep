@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ProcUtils/grep_parents
-# and generated automatically using Perinci::CmdLine::Gen version 0.484
+# and generated automatically using Perinci::CmdLine::Gen version 0.485
 
-our $DATE = '2018-01-17'; # DATE
+our $DATE = '2018-04-03'; # DATE
 our $DIST = 'App-ProcUtils'; # DIST
-our $VERSION = '0.030'; # VERSION
+our $VERSION = '0.031'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ ppgrep - Look up parents' processes based on name and other attributes
 
 =head1 VERSION
 
-This document describes version 0.030 of ppgrep (from Perl distribution App-ProcUtils), released on 2018-01-17.
+This document describes version 0.031 of ppgrep (from Perl distribution App-ProcUtils), released on 2018-04-03.
 
 =head1 SYNOPSIS
 
@@ -88,11 +88,11 @@ Only match processes whose names (or command line if -f is specified) exactly ma
 
 =item B<--full>, B<-f>
 
-The pattern is normally only matched against the process name.  When -f is set, the full command line is used..
+The pattern is normally only matched against the process name. When -f is set, the full command line is used..
 
 =item B<--group>=I<s>, B<-G>
 
-Only match processes whose real group ID is listed.  Either the numerical or symbolical value may be used..
+Only match processes whose real group ID is listed. Either the numerical or symbolical value may be used..
 
 =item B<--inverse>, B<-v>
 

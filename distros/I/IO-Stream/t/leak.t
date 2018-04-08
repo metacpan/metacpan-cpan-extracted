@@ -1,7 +1,8 @@
 # Resources (mem/fd) shouldn't leak.
 use warnings;
 use strict;
-use t::share;
+use lib 't';
+use share;
 
 if ($^O !~ /linux/i) {
     plan skip_all => 'require /proc';

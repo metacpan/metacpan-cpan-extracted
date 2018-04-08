@@ -27,7 +27,7 @@ sub accepts {
 
   # List representations
   my $req  = $c->req;
-  my $fmt  = $c->stash->{format} || $req->param('format');
+  my $fmt  = $req->param('format') || $c->stash->{format};
   my @exts = $fmt ? ($fmt) : ();
   push @exts, @{$c->app->types->detect($req->headers->accept)};
   return \@exts unless @_;
@@ -272,7 +272,8 @@ application startup.
   $renderer   = $renderer->default_format('html');
 
 The default format to render if C<format> is not set in the stash, defaults to
-C<html>.
+C<html>. Note that changing the default away from C<html> is not recommended, as
+it has the potential to break, for example, plugins with bundled templates.
 
 =head2 default_handler
 
@@ -329,7 +330,7 @@ the following new ones.
   my $best = $renderer->accepts(Mojolicious::Controller->new, 'html', 'json');
 
 Select best possible representation for L<Mojolicious::Controller> object from
-C<format> stash value, C<format> C<GET>/C<POST> parameter or C<Accept> request
+C<format> C<GET>/C<POST> parameter, C<format> stash value, or C<Accept> request
 header, defaults to returning the first extension if no preference could be
 detected.
 

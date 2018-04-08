@@ -1,13 +1,19 @@
 Revision history for String-Validator-Email
 
+2.00    4 April 2018
+1.97    1 April 2018
+	Prepping for release 2.0
+0.99	30 March 2018
+	Update to work with String::Validator 2.0
+	Remove Email::Address
 0.98	30 September 2012
 	MXCheck Method is working because it now calls Net::DNS directly.
 0.97	May 20, 2012
-	A test os failing with latest Email::Valid 
-	I don't have time to work on module so I just 
+	A test os failing with latest Email::Valid
+	I don't have time to work on module so I just
 	marked test todo.
-0.94	February 21, 2012 
+0.94	February 21, 2012
 	Resolved Missing Pre-Req.
-0.93	February 20, 2012 
+0.93	February 20, 2012
         First version, released on an unsuspecting world.
 

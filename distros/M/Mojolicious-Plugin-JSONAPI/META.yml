@@ -5,13 +5,14 @@ author:
 build_requires:
   Mojolicious::Lite: '0'
   Test::CPAN::Changes: '0'
+  Test::MockObject: '0'
   Test::Mojo: '0'
   Test::Most: '0'
   Test::Pod: '0'
   perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.004'
+  perl: '5.010'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -22,7 +23,7 @@ name: Mojolicious-Plugin-JSONAPI
 provides:
   Mojolicious::Plugin::JSONAPI:
     file: lib/Mojolicious/Plugin/JSONAPI.pm
-    version: '0.4'
+    version: '1.0'
 requires:
   JSONAPI::Document: '0'
   Lingua::EN::Inflexion: '0'
@@ -30,7 +31,7 @@ requires:
   perl: '5.010'
 resources:
   repository: https://github.com/ziali088/mojolicious-plugin-jsonapi.git
-version: '0.4'
+version: '1.0'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

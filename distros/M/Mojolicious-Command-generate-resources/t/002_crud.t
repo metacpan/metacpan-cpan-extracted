@@ -137,7 +137,7 @@ like $buffer, qr/Usage: APPLICATION generate resources \[OPTIONS\]/,
       $form = {name => 'g1', description => 'g1 description'};
       $test->post_ok("/$t" => {Accept => '*/*'}, form => $form)->status_is(302);
       $test->get_ok("/$t/$id")->status_is(200)
-        ->content_like(qr/Id:\s$id.+?$form->{name}.+?$form->{description}/sm);
+        ->content_like(qr/.+?$form->{description}/sm);
       $test->get_ok("/$t/$id/edit")->status_is(200)
         ->element_exists("input[type=hidden][name=id]");
     }
@@ -149,8 +149,7 @@ like $buffer, qr/Usage: APPLICATION generate resources \[OPTIONS\]/,
                about    => 'about u1'
               };
       $test->post_ok("/$t" => {Accept => '*/*'}, form => $form)->status_is(302);
-      $test->get_ok("/$t/$id")->status_is(200)
-        ->content_like(qr/Id:\s$id.+?$form->{group_id}.+?$form->{name}/sm);
+      $test->get_ok("/$t/$id")->status_is(200)->text_is('p b' => 'Id:', 'id');
       $test->get_ok("/$t/$id/edit")->status_is(200)
         ->element_exists("input[type=hidden][name=id]");
     }
@@ -160,7 +159,12 @@ like $buffer, qr/Usage: APPLICATION generate resources \[OPTIONS\]/,
     $form->{name} = "$form->{name} edited";
     $test->put_ok("/$t/$id" => {Accept => '*/*'}, form => $form)
       ->status_is(302);
-    $test->get_ok("/$t/$id")->status_is(200)->content_like(qr/$form->{name}/);
+
+    # show
+    my $title = "$id from table $t";
+    $test->get_ok("/$t/$id")->status_is(200)->content_like(qr/$form->{name}/)
+      ->text_is('head title' => $title, 'right title for show.html.ep')
+      ->text_is('body h1'    => $title, 'h1 is same as title');
 
     # index with item(s)
     $test->get_ok("/$t")->status_is(200)

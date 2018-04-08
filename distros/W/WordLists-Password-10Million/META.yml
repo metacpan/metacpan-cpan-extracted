@@ -17,12 +17,13 @@ meta-spec:
   version: '1.4'
 name: WordLists-Password-10Million
 requires:
-  WordList: v0.2.0
+  WordList: v0.3.0
+  parent: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WordLists-Password-10Million
   homepage: https://metacpan.org/release/WordLists-Password-10Million
   repository: git://github.com/perlancar/perl-WordListsC-Password-10Million.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -34,7 +35,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::WordList
       name: WordList
-      version: '0.052'
+      version: '0.053'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:

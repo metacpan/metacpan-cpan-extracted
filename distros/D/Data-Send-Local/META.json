@@ -32,7 +32,7 @@
    "provides" : {
       "Data::Send::Local" : {
          "file" : "lib/Data/Send/Local.pm",
-         "version" : "20170926"
+         "version" : "20180405"
       }
    },
    "release_status" : "stable",
@@ -41,5 +41,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20170926"
+   "version" : "20180405"
 }

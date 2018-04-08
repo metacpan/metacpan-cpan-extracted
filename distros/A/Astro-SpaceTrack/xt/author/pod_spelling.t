@@ -66,6 +66,7 @@ login
 mccants
 McCants
 merchantability
+metacpan
 multimonth
 NAVSTAR
 NORAD

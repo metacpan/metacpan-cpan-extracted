@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::JSONAPI;
-$Mojolicious::Plugin::JSONAPI::VERSION = '0.4';
+$Mojolicious::Plugin::JSONAPI::VERSION = '1.0';
 use Mojo::Base 'Mojolicious::Plugin';
 
 use JSONAPI::Document;
@@ -12,23 +12,40 @@ sub register {
     my ( $self, $app, $args ) = @_;
     $args ||= {};
 
+    my %jsonapi_args;
+    if (defined($args->{kebab_case_attrs})) {
+        $jsonapi_args{kebab_case_attrs} = $args->{kebab_case_attrs};
+    }
+    if (defined($args->{namespace})) {
+        # It's not really a JSONAPI::Document arg, but it's as close as
+        # we'll get to defining a base URL at startup time.
+        $jsonapi_args{namespace} = $args->{namespace};
+    }
+    if (defined($args->{attributes_via})) {
+        $jsonapi_args{attributes_via} = $args->{attributes_via};
+    }
+
     # Detect application/vnd.api+json content type, fallback to application/json
     $app->types->type(
         json => [ 'application/vnd.api+json', 'application/json' ] );
 
     $self->create_route_helpers( $app, $args->{namespace} );
-    $self->create_data_helpers($app, { kebab_case_attrs => $args->{kebab_case_attrs} });
+    $self->create_data_helpers($app, \%jsonapi_args);
+    $self->create_request_helpers($app);
     $self->create_error_helpers($app);
 }
 
 sub create_route_helpers {
     my ( $self, $app, $namespace ) = @_;
 
+    my $DEV_MODE = $app->mode ne 'production';
+
     $app->helper(
         resource_routes => sub {
             my ( $c, $spec ) = @_;
             $spec->{resource} || Carp::confess('resource is a required param');
             $spec->{relationships} ||= [];
+            my @DEV_LOGS;
 
             my $resource = Lingua::EN::Inflexion::noun( $spec->{resource} );
             my $resource_singular = $resource->singular;
@@ -40,12 +57,15 @@ sub create_route_helpers {
 
             my $base_path = (!$spec->{router} && $namespace) ? "/$namespace/$resource_plural" : "/$resource_plural";
             my $router = $spec->{router} ? $spec->{router} : $app->routes;
-            my $controller = $spec->{controller} || "api-$resource_plural";
+            my $controller = $spec->{controller} || "api-$action_plural";
 
             my $r = $router->any($base_path)->to( controller => $controller );
             $r->get('/')->to( action => "fetch_${action_plural}" );
             $r->post('/')->to( action => "post_${action_singular}" );
+            push @DEV_LOGS, "GET $base_path/ -> ${controller}#fetch_${action_plural}";
+            push @DEV_LOGS, "POST $base_path/ -> ${controller}#post_${action_singular}";
             foreach my $method (qw/get patch delete/) {
+                push @DEV_LOGS, uc($method) . " $base_path/:${action_singular}_id -> ${controller}#${method}_${action_singular}";
                 $r->$method("/:${action_singular}_id")->to( action => "${method}_${action_singular}" );
             }
 
@@ -54,8 +74,14 @@ sub create_route_helpers {
                 my $relationship_action = $relationship;
                 $relationship_action =~ s/-/_/g;
                 foreach my $method (qw/get post patch delete/) {
+                    push @DEV_LOGS, uc($method) . " ${base_path}${path} -> ${controller}#${method}_related_${relationship_action}";
                     $r->$method($path)->to(action => "${method}_related_${relationship_action}" );
                 }
+            }
+
+            if ( $DEV_MODE ) {
+                $app->log->debug('Created the following JSONAPI routes:');
+                $app->log->debug($_) for @DEV_LOGS;
             }
         }
     );
@@ -64,26 +90,36 @@ sub create_route_helpers {
 sub create_data_helpers {
     my ( $self, $app, $args ) = @_;
 
-    my $jsonapi = JSONAPI::Document->new($args);
+    my $namespace = delete $args->{namespace} // '';
+    my $api_path = $namespace ? '/' . $namespace : '/';
+    my $jsonapi_cb = sub {
+        my ($c) = @_;
+        my $api_url = $c->url_for($api_path)->to_abs;
+        if ($api_url =~ m|/$|) {
+            chop($api_url);
+        }
+        $args->{api_url} = $api_url;
+        return JSONAPI::Document->new($args);
+    };
 
     $app->helper(
         resource_document => sub {
             my ( $c, $row, $options ) = @_;
-            return $jsonapi->resource_document( $row, $options );
+            return $jsonapi_cb->($c)->resource_document( $row, $options );
         }
     );
 
     $app->helper(
         compound_resource_document => sub {
             my ( $c, $row, $options ) = @_;
-            return $jsonapi->compound_resource_document( $row, $options );
+            return $jsonapi_cb->($c)->compound_resource_document( $row, $options );
         }
     );
 
     $app->helper(
         resource_documents => sub {
             my ( $c, $resultset, $options ) = @_;
-            return $jsonapi->resource_documents( $resultset, $options );
+            return $jsonapi_cb->($c)->resource_documents( $resultset, $options );
         }
     );
 }
@@ -116,6 +152,20 @@ sub create_error_helpers {
     );
 }
 
+sub create_request_helpers {
+    my ( $self, $app ) = @_;
+
+    $app->helper(
+        requested_resources => sub {
+            my ($c) = @_;
+            my $param = $c->param('include') // '';
+            $param =~ s/-/_/g;
+            my @include = split(',', $param);
+            return \@include;
+        }
+    );
+}
+
 1;
 
 __END__
@@ -128,7 +178,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 =head1 VERSION
 
-version 0.4
+version 1.0
 
 =head1 SYNOPSIS
 
@@ -169,6 +219,8 @@ version 0.4
         # PATCH '/api/posts/:post_id/relationships/email-templates' -> to('api-posts#patch_related_email_templates')
         # DELETE '/api/posts/:post_id/relationships/email-templates' -> to('api-posts#delete_related_email_templates')
 
+        # If your not in production mode, your $app->log will show the created routes. Useful!
+
         # You can use the following helpers too:
 
         $self->resource_document($dbic_row, $options);
@@ -199,6 +251,11 @@ meaing no prefix will be added.
 
 This is passed to the constructor of C<JSONAPI::Document> which will kebab case the attribute keys of each
 record (i.e. '_' to '-').
+
+=item C<attributes_via>
+
+Also passed to the constructor of C<JSONAPI::Document>. This is the method that will be used to get
+the attributes for a resource document. Should return a hash (not a hashref).
 
 =back
 
@@ -266,6 +323,14 @@ as described in the specification. See L<Error Objects|http://jsonapi.org/format
 
 Can optionally provide a reference to the primary data for the route as well as meta information, which will be added
 to the response as-is. Use C<resource_document> to generate the right structure for this argument.
+
+=head2 requested_resources
+
+Convenience helper for controllers. Takes the query param C<include>, used to indicate what relationships to include in the
+response, and splits it by ',' to return an ArrayRef.
+
+ # GET /api/posts?include=comments,author
+ my $include = $c->requested_resources(); # ['comments', 'author']
 
 =head2 resource_document
 

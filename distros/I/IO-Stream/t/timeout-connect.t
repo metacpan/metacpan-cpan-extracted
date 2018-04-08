@@ -1,12 +1,13 @@
 # Connect timeout (Looks like Google DROP incoming packets on port 21.)
 use warnings;
 use strict;
+use lib 't';
 use IO::Stream::const ();
 BEGIN {
     local $SIG{__WARN__} = sub {};  # no 'constant redefined' warning
     *IO::Stream::const::TOCONNECT   = sub () { 0.1 };
 }
-use t::share;
+use share;
 
 
 @CheckPoint = (

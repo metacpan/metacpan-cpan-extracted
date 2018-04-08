@@ -1,7 +1,8 @@
 # errors in sysread/syswrite
 use warnings;
 use strict;
-use t::share;
+use lib 't';
+use share;
 
 use Config;
 plan skip_all => 'unstable on CPAN Testers (libev crashes)'

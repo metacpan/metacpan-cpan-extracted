@@ -14,7 +14,6 @@ is( $Validator->isa('String::Validator::Password'), 1 ,  'New validator isa Stri
 
 is ( $Validator->Check( 'aBC123*', 'aBC123*' ), 0,
 	'A simple password that passes the default rules' ) ;
-#print $Validator->{ errstring }, "\n" ;
 
 is ( $Validator->Check( 'aBC123*', '1234567689' ), 1,
 	'Mismatched passwords fail.' ) ;

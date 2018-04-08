@@ -35,6 +35,10 @@ my $tzil = Builder->from_config(
                         'Git::Tag.tag_message' => 'my tag is v%v',
                         'RewriteVersion::Transitional.fallback_version_provider' => 'Foo::Bar',
                         'Foo::Bar.version_regexp' => '^ohhai',
+                        'RewriteVersion.global' => 1,                           # not the default value
+                        # these configs are nonsensical together, but that is irrelevant
+                        'BumpVersionAfterRelease::Transitional.global' => 1,    # not the default value
+                        'BumpVersionAfterRelease.all_matching' => 1,            # not the default value
                     } ],
             )
             # we want to test how the .ini config string makes itself into the plugin bundle attribute
@@ -95,12 +99,14 @@ cmp_deeply(
     '[Prereqs] plugin(s) do not inject into requires relationship; no plugin prereqs by default',
 );
 
-my $rewrite_version_plugin = first { $_->isa('Dist::Zilla::Plugin::RewriteVersion::Transitional') } @{ $tzil->plugins };
-is($rewrite_version_plugin->fallback_version_provider, 'Foo::Bar', 'override passed for fallback_version_provider');
 cmp_deeply(
-    $rewrite_version_plugin->_fallback_version_provider_args,
-    { version_regexp => '^ohhai' },
-    '..and it was used to extract the arguments for that plugin',
+    (first { $_->isa('Dist::Zilla::Plugin::RewriteVersion::Transitional') } @{ $tzil->plugins }),
+    methods(
+        fallback_version_provider => 'Foo::Bar',
+        _fallback_version_provider_args => { version_regexp => '^ohhai' },
+        global => 1,
+    ),
+    'marshalled all RewriteVersion::Transitional arguments',
 );
 
 my $git_tag_plugin = first { $_->isa('Dist::Zilla::Plugin::Git::Tag') } @{ $tzil->plugins };
@@ -110,6 +116,15 @@ cmp_deeply(
     $tzil->plugin_named('@Git::VersionManager/release snapshot')->allow_dirty,
     bag(str('extra_file'), str('Changes')),
     'additional commit_files_after_release file does not overshadow the defaults',
+);
+
+cmp_deeply(
+    (first { $_->isa('Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional') } @{ $tzil->plugins }),
+    methods(
+        global => 1,
+        all_matching => 1,
+    ),
+    'marshalled all BumpVersionAfterRelease::Transitional arguments',
 );
 
 diag 'got log messages: ', explain $tzil->log_messages

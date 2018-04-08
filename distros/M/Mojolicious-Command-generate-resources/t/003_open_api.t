@@ -20,8 +20,9 @@ my $blog = $test->app;
   local *STDOUT = $handle;
   $blog->start(
                'generate', 'resources',
-               '-t'         => 'users,groups',
-               '-db_helper' => 'dbx',
+               '-t'          => 'users,groups',
+               '--db_helper' => 'dbx',
+               '--api_dir'   => $blog->home->child('api')
               );
 
   like($buffer, qr{\[write\].+?api[\\/]api.json}, "written api/api.json");

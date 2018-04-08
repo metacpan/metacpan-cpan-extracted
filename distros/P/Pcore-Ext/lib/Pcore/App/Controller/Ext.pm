@@ -2,14 +2,14 @@ package Pcore::App::Controller::Ext;
 
 use Pcore -const, -role, -result;
 use Pcore::Ext;
-use Pcore::Share::Ext_v6_2_0;
-use Pcore::Share::WWW;
 use Pcore::Util::Data qw[to_json];
 use Pcore::Util::Scalar qw[is_plain_arrayref];
 use JavaScript::Packer qw[];
 use JavaScript::Beautifier qw[];
 
 with qw[Pcore::App::Controller];
+
+require Pcore::Share::Ext_v6_2_0;
 
 requires qw[ext_app ext_app_title];
 

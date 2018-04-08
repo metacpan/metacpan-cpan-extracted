@@ -1,0 +1,23 @@
+---
+abstract: 'dirhier and madeafter. To supplement Unix/Linux commands for handling Files.'
+author:
+  - '"Toshiyuki Shimono" <bin4tsv@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CLI-ComputerFiles-Util
+provides:
+  CLI::ComputerFiles::Util:
+    file: lib/CLI/ComputerFiles/Util.pm
+    version: '0.102'
+resources:
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
+version: '0.102'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

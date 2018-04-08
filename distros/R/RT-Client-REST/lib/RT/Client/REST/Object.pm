@@ -1,142 +1,12 @@
-package RT::Client::REST::Object;
-
-=head1 NAME
-
-RT::Client::REST::Object -- base class for RT objects.
-
-=head1 SYNOPSIS
-
-  # Create a new type
-  package RT::Client::REST::MyType;
-
-  use base qw(RT::Client::REST::Object);
-
-  sub _attributes {{
-    myattribute => {
-      validation => {
-        type => SCALAR,
-      },
-    },
-  }}
-
-  sub rt_type { "mytype" }
-
-  1;
-
-=head1 DESCRIPTION
-
-The RT::Client::REST::Object module is a superclass providing a whole
-bunch of class and object methods in order to streamline the development
-of RT's REST client interface.
-
-=head1 ATTRIBUTES
-
-Attributes are defined by method C<_attributes> that should be defined
-in your class.  This method returns a reference to a hash whose keys are
-the attributes.  The values of the hash are attribute settings, which are
-as follows:
-
-=over 2
-
-=item list
-
-If set to true, this is a list attribute.  See
-L</LIST ATTRIBUTE PROPERTIES> below.
-
-=item validation
-
-A hash reference.  This is passed to validation routines when associated
-mutator is called.  See L<Params::Validate> for reference.
-
-=item rest_name
-
-This specifies this attribute's REST name.  For example, attribute
-"final_priority" corresponds to RT REST's "FinalPriority".  This option
-may be omitted if the two only differ in first letter capitalization.
-
-=item form2value
-
-Convert form value (one that comes from the server) into attribute-digestible
-format.
-
-=item value2form
-
-Convert value into REST form format.
-
-=back
-
-Example:
-
-  sub _attributes {{
-    id  => {
-        validation  => {
-            type    => SCALAR,
-            regex   => qr/^\d+$/,
-        },
-        form2value  => sub {
-            shift =~ m~^ticket/(\d+)$~i;
-            return $1;
-        },
-        value2form  => sub {
-            return 'ticket/' . shift;
-        },
-    },
-    admin_cc        => {
-        validation  => {
-            type    => ARRAYREF,
-        },
-        list        => 1,
-        rest_name   => 'AdminCc',
-    },
-  }}
-
-=head1 LIST ATTRIBUTE PROPERTIES
-
-List attributes have the following properties:
-
-=over 2
-
-=item *
-
-When called as accessors, return a list of items
-
-=item *
-
-When called as mutators, only accept an array reference
-
-=item *
-
-Convenience methods "add_attr" and "delete_attr" are available.  For
-example:
-
-  # Get the list
-  my @requestors = $ticket->requestors;
-
-  # Replace with a new list
-  $ticket->requestors( [qw(dude@localhost)] );
-
-  # Add some random guys to the current list
-  $ticket->add_requestors('randomguy@localhost', 'evil@local');
-
-=back
-
-=head1 SPECIAL ATTRIBUTES
-
-B<id> and B<parent_id> are special attributes.  They are used by
-various DB-related methods and are especially relied upon by
-B<autostore>, B<autosync>, and B<autoget> features.
-
-=head1 METHODS
-
-=over 2
-
-=cut
+#!perl
+# PODNAME: RT::Client::REST::Object
+# ABSTRACT: base class for RT objects
 
 use strict;
 use warnings;
 
-use vars qw($VERSION);
-$VERSION = '0.09';
+package RT::Client::REST::Object;
+$RT::Client::REST::Object::VERSION = '0.52';
 
 use Error qw(:try);
 use Params::Validate;
@@ -145,11 +15,6 @@ use RT::Client::REST::SearchResult 0.02;
 use DateTime;
 use DateTime::Format::DateParse;
 
-=item new
-
-Constructor
-
-=cut
 
 sub new {
     my $class = shift;
@@ -186,30 +51,13 @@ sub new {
     return $self;
 }
 
-=item _generate_methods
-
-This class method generates accessors and mutators based on
-B<_attributes> method which your class should provide.  For items
-that are lists, 'add_' and 'delete_' methods are created.  For instance,
-the following two attributes specified in B<_attributes> will generate
-methods 'creator', 'cc', 'add_cc', and 'delete_cc':
-
-  creator => {
-    validation => { type => SCALAR },
-  },
-  cc => {
-    list => 1,
-    validation => { type => ARRAYREF },
-  },
-
-=cut
 
 sub _generate_methods {
     my $class = shift;
     my $attributes = $class->_attributes;
 
     while (my ($method, $settings) = each(%$attributes)) {
-        no strict 'refs';
+        no strict 'refs'; ## no critic (ProhibitNoStrict)
 
         *{$class . '::' . $method} = sub {
             my $self = shift;
@@ -262,12 +110,11 @@ sub _generate_methods {
         };
 
         if ($settings->{is_datetime}) {
-            *{$class. '::' . $method . "_datetime"} = sub {
+            *{$class. '::' . $method . '_datetime'} = sub {
                 # All dates are in UTC
                 # http://requesttracker.wikia.com/wiki/REST#Data_format
 
                 my ($self) = shift;
-                my $real_method = $class.'::'.$method;
                 if (@_) {
                     unless ($_[0]->isa('DateTime')) {
                             RT::Client::REST::Object::InvalidValueException
@@ -277,8 +124,8 @@ sub _generate_methods {
 
                     }
                     my $z = $_[0]->clone;
-                    $z->set_time_zone("UTC");
-                    $self->$method($_[0]->strftime("%a %b %d %T %Y"));
+                    $z->set_time_zone('UTC');
+                    $self->$method($_[0]->strftime('%a %b %d %T %Y'));
                     return $z;
                 }
 
@@ -333,22 +180,12 @@ sub _generate_methods {
     }
 }
 
-=item _mark_dirty($attrname)
-
-Mark an attribute as dirty.
-
-=cut
 
 sub _mark_dirty {
     my ($self, $attr) = @_;
     $self->{__dirty}{$attr} = 1;
 }
 
-=item _dirty
-
-Return the list of dirty attributes.
-
-=cut
 
 sub _dirty {
     my $self = shift;
@@ -360,22 +197,12 @@ sub _dirty {
     return;
 }
 
-=item _mark_dirty_cf($attrname)
-
-Mark an custom flag as dirty.
-
-=cut
 
 sub _mark_dirty_cf {
     my ($self, $cf) = @_;
     $self->{__dirty_cf}{$cf} = 1;
 }
 
-=item _dirty_cf
-
-Return the list of dirty custom flags.
-
-=cut
 
 sub _dirty_cf {
     my $self = shift;
@@ -387,14 +214,6 @@ sub _dirty_cf {
     return;
 }
 
-=item to_form($all)
-
-Convert the object to 'form' (used by REST protocol). This is done based on
-B<_attributes> method. If C<$all> is true, create a form from all of the
-object's attributes and custom flags, otherwise use only dirty (see B<_dirty>
-method) attributes and custom flags. Defaults to the latter.
-
-=cut
 
 sub to_form {
     my ($self, $all) = @_;
@@ -427,15 +246,10 @@ sub to_form {
     return \%hash;
 }
 
-=item from_form
-
-Set object's attributes from form received from RT server.
-
-=cut
 
 sub from_form {
     my $self = shift;
-    
+
     unless (@_) {
         RT::Client::REST::Object::NoValuesProvidedException->throw;
     }
@@ -463,8 +277,8 @@ sub from_form {
     # Now set attributes:
     while (my ($key, $value) = each(%$hash)) {
         # Handle custom fields, ideally /(?(1)})/ would be appened to RE
-	if( $key =~ m%^(?:cf|customfield)(?:-|\.\{)([#\s\w_:()?/-]+)% ){
-	    $key = $1;
+        if ( $key =~ m%^(?:cf|customfield)(?:-|\.\{)([#\s\w_:()?/-]+)% ){
+             $key = $1;
 
             # XXX very sketchy. Will fail on long form data e.g; wiki CF
             if ($value =~ /,/) {
@@ -653,11 +467,6 @@ sub _assert_rt {
     }
 }
 
-=item param($name, $value)
-
-Set an arbitrary parameter.
-
-=cut
 
 sub param {
     my $self = shift;
@@ -675,15 +484,6 @@ sub param {
     return $self->{__param}{$name};
 }
 
-=item cf([$name, [$value]])
-
-Given no arguments, returns the list of custom field names.  With
-one argument, returns the value of custom field C<$name>.  With two
-arguments, sets custom field C<$name> to C<$value>.  Given a reference
-to a hash, uses it as a list of custom fields and their values, returning
-the new list of all custom field names.
-
-=cut
 
 sub cf {
     my $self = shift;
@@ -710,11 +510,6 @@ sub cf {
     }
 }
 
-=item rt
-
-Get or set the 'rt' object, which should be of type L<RT::Client::REST>.
-
-=cut
 
 sub rt {
     my $self = shift;
@@ -729,6 +524,285 @@ sub rt {
 
     return $self->{__rt};
 }
+
+
+sub use_single_rt {
+    my ($class, $rt) = @_;
+
+    unless (UNIVERSAL::isa($rt, 'RT::Client::REST')) {
+        RT::Client::REST::Object::InvalidValueException->throw;
+    }
+
+    no strict 'refs'; ## no critic (ProhibitNoStrict)
+    no warnings 'redefine';
+    *{(ref($class) || $class) . '::rt'} = sub { $rt };
+}
+
+
+sub autostore {}
+
+sub use_autostore {
+    my ($class, $autostore) = @_;
+
+    no strict 'refs'; ## no critic (ProhibitNoStrict)
+    no warnings 'redefine';
+    *{(ref($class) || $class) . '::autostore'} = sub { $autostore };
+}
+
+sub DESTROY {
+    my $self = shift;
+
+    $self->autostore && $self->can('store') && $self->store;
+}
+
+
+sub autoget {}
+
+sub use_autoget {
+    my ($class, $autoget) = @_;
+
+    no strict 'refs'; ## no critic (ProhibitNoStrict)
+    no warnings 'redefine';
+    *{(ref($class) || $class) . '::autoget'} = sub { $autoget };
+}
+
+
+sub autosync {}
+
+sub use_autosync {
+    my ($class, $autosync) = @_;
+
+    no strict 'refs'; ## no critic (ProhibitNoStrict)
+    no warnings 'redefine';
+    *{(ref($class) || $class) . '::autosync'} = sub { $autosync };
+}
+
+
+sub be_transparent {
+    my ($class, $rt) = @_;
+    $class->use_autosync(1);
+    $class->use_autoget(1);
+    $class->use_single_rt($rt);
+}
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+RT::Client::REST::Object - base class for RT objects
+
+=head1 VERSION
+
+version 0.52
+
+=head1 SYNOPSIS
+
+  # Create a new type
+  package RT::Client::REST::MyType;
+
+  use base qw(RT::Client::REST::Object);
+
+  sub _attributes {{
+    myattribute => {
+      validation => {
+        type => SCALAR,
+      },
+    },
+  }}
+
+  sub rt_type { "mytype" }
+
+  1;
+
+=head1 DESCRIPTION
+
+The RT::Client::REST::Object module is a superclass providing a whole
+bunch of class and object methods in order to streamline the development
+of RT's REST client interface.
+
+=head1 ATTRIBUTES
+
+Attributes are defined by method C<_attributes> that should be defined
+in your class.  This method returns a reference to a hash whose keys are
+the attributes.  The values of the hash are attribute settings, which are
+as follows:
+
+=over 2
+
+=item list
+
+If set to true, this is a list attribute.  See
+L</LIST ATTRIBUTE PROPERTIES> below.
+
+=item validation
+
+A hash reference.  This is passed to validation routines when associated
+mutator is called.  See L<Params::Validate> for reference.
+
+=item rest_name
+
+=for stopwords FinalPriority
+
+This specifies this attribute's REST name.  For example, attribute
+"final_priority" corresponds to RT REST's "FinalPriority".  This option
+may be omitted if the two only differ in first letter capitalization.
+
+=item form2value
+
+Convert form value (one that comes from the server) into attribute-digestible
+format.
+
+=item value2form
+
+Convert value into REST form format.
+
+=back
+
+Example:
+
+  sub _attributes {{
+    id  => {
+        validation  => {
+            type    => SCALAR,
+            regex   => qr/^\d+$/,
+        },
+        form2value  => sub {
+            shift =~ m~^ticket/(\d+)$~i;
+            return $1;
+        },
+        value2form  => sub {
+            return 'ticket/' . shift;
+        },
+    },
+    admin_cc        => {
+        validation  => {
+            type    => ARRAYREF,
+        },
+        list        => 1,
+        rest_name   => 'AdminCc',
+    },
+  }}
+
+=head1 LIST ATTRIBUTE PROPERTIES
+
+List attributes have the following properties:
+
+=over 2
+
+=item *
+
+When called as accessors, return a list of items
+
+=item *
+
+When called as mutators, only accept an array reference
+
+=item *
+
+Convenience methods "add_attr" and "delete_attr" are available.  For
+example:
+
+  # Get the list
+  my @requestors = $ticket->requestors;
+
+  # Replace with a new list
+  $ticket->requestors( [qw(dude@localhost)] );
+
+  # Add some random guys to the current list
+  $ticket->add_requestors('randomguy@localhost', 'evil@local');
+
+=back
+
+=for stopwords autoget autostore autosync
+
+=head1 SPECIAL ATTRIBUTES
+
+B<id> and B<parent_id> are special attributes.  They are used by
+various DB-related methods and are especially relied upon by:
+
+=over 2
+
+=item autostore
+
+=item autosync
+
+=item autoget
+
+=back
+
+=head1 METHODS
+
+=over 2
+
+=item new
+
+Constructor
+
+=item _generate_methods
+
+This class method generates accessors and mutators based on
+B<_attributes> method which your class should provide.  For items
+that are lists, 'add_' and 'delete_' methods are created.  For instance,
+the following two attributes specified in B<_attributes> will generate
+methods 'creator', 'cc', 'add_cc', and 'delete_cc':
+
+  creator => {
+    validation => { type => SCALAR },
+  },
+  cc => {
+    list => 1,
+    validation => { type => ARRAYREF },
+  },
+
+=item _mark_dirty($attrname)
+
+Mark an attribute as dirty.
+
+=item _dirty
+
+Return the list of dirty attributes.
+
+=item _mark_dirty_cf($attrname)
+
+Mark an custom flag as dirty.
+
+=item _dirty_cf
+
+Return the list of dirty custom flags.
+
+=item to_form($all)
+
+Convert the object to 'form' (used by REST protocol). This is done based on
+B<_attributes> method. If C<$all> is true, create a form from all of the
+object's attributes and custom flags, otherwise use only dirty (see B<_dirty>
+method) attributes and custom flags. Defaults to the latter.
+
+=item from_form
+
+Set object's attributes from form received from RT server.
+
+=item param($name, $value)
+
+Set an arbitrary parameter.
+
+=item cf([$name, [$value]])
+
+Given no arguments, returns the list of custom field names.  With
+one argument, returns the value of custom field C<$name>.  With two
+arguments, sets custom field C<$name> to C<$value>.  Given a reference
+to a hash, uses it as a list of custom fields and their values, returning
+the new list of all custom field names.
+
+=item rt
+
+Get or set the 'rt' object, which should be of type L<RT::Client::REST>.
 
 =back
 
@@ -762,6 +836,8 @@ results.  C<%opts> is a list of key-value pairs, which are as follows:
 This is a reference to array containing hash references with limits to
 apply to the search (think SQL limits).
 
+=for stopwords orderby reverseorder
+
 =item orderby
 
 Specifies attribute to sort the result by (in ascending order).
@@ -791,6 +867,8 @@ object is created and the 'id' attribute is set.  Note that only changed
 
 =item use_single_rt
 
+=for stopwords instantiations
+
 This method takes a single argument -- L<RT::Client::REST> object
 and makes this class use it for all instantiations.  For example:
 
@@ -802,23 +880,11 @@ and makes this class use it for all instantiations.  For example:
   # Now make all objects use it:
   RT::Client::REST::Object->use_single_rt($rt);
 
-=cut
-
-sub use_single_rt {
-    my ($class, $rt) = @_;
-
-    unless (UNIVERSAL::isa($rt, 'RT::Client::REST')) {
-        RT::Client::REST::Object::InvalidValueException->throw;
-    }
-
-    no strict 'refs';
-    no warnings 'redefine';
-    *{(ref($class) || $class) . '::rt'} = sub { $rt };
-}
+=for stopwords autostoring autostore
 
 =item use_autostore
 
-Turn autostoring on and off.  Autostoring means that you do not have
+Turn I<autostoring> on and off.  I<Autostoring> means that you do not have
 to explicitly call C<store()> on an object - it will be called when
 the object goes out of scope.
 
@@ -828,27 +894,9 @@ the object goes out of scope.
   $ticket->priority(10);
   # Don't have to call store().
 
-=cut
-
-sub autostore {}
-
-sub use_autostore {
-    my ($class, $autostore) = @_;
-    
-    no strict 'refs';
-    no warnings 'redefine';
-    *{(ref($class) || $class) . '::autostore'} = sub { $autostore };
-}
-
-sub DESTROY {
-    my $self = shift;
-
-    $self->autostore && $self->can('store') && $self->store;
-}
-
 =item use_autoget
 
-Turn autoget feature on or off (off by default).  When set to on,
+Turn I<autoget> feature on or off (off by default). When set to on,
 C<retrieve()> will be automatically called from the constructor if
 it is called with that object's special attributes (see
 L</SPECIAL ATTRIBUTES> above).
@@ -858,35 +906,13 @@ L</SPECIAL ATTRIBUTES> above).
   # Now all attributes are available:
   my $subject = $ticket->subject;
 
-=cut
-
-sub autoget {}
-
-sub use_autoget {
-    my ($class, $autoget) = @_;
-    
-    no strict 'refs';
-    no warnings 'redefine';
-    *{(ref($class) || $class) . '::autoget'} = sub { $autoget };
-}
+=for stopwords autosync
 
 =item use_autosync
 
-Turn autosync feature on or off (off by default).  When set, every time
+Turn I<autosync> feature on or off (off by default).  When set, every time
 an attribute is changed, C<store()> method is invoked.  This may be pretty
 expensive.
-
-=cut
-
-sub autosync {}
-
-sub use_autosync {
-    my ($class, $autosync) = @_;
-
-    no strict 'refs';
-    no warnings 'redefine';
-    *{(ref($class) || $class) . '::autosync'} = sub { $autosync };
-}
 
 =item be_transparent
 
@@ -900,19 +926,10 @@ C<retrieve()> and C<store()> calls invisible:
   my $ticket = RT::Client::REST::Ticket->new(id => $id); # retrieved
   $ticket->add_cc('you@localhost.localdomain'); # stored
   $ticket->status('stalled'); # stored
-  
+
   # etc.
 
 Do not forget to pass RT::Client::REST object to this method.
-
-=cut
-
-sub be_transparent {
-    my ($class, $rt) = @_;
-    $class->use_autosync(1);
-    $class->use_autoget(1);
-    $class->use_single_rt($rt);
-}
 
 =back
 
@@ -921,10 +938,45 @@ sub be_transparent {
 L<RT::Client::REST::Ticket>,
 L<RT::Client::REST::SearchResult>.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Abhijit Menon-Sen <ams@wiw.org>
+
+=item *
 
 Dmitri Tikhonov <dtikhonov@yahoo.com>
 
-=cut
+=item *
 
-1;
+Damien "dams" Krotkine <dams@cpan.org>
+
+=item *
+
+Dean Hamstead <dean@bytefoundry.com.au>
+
+=item *
+
+Miquel Ruiz <mruiz@cpan.org>
+
+=item *
+
+JLMARTIN
+
+=item *
+
+SRVSH
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Dmitri Tikhonov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

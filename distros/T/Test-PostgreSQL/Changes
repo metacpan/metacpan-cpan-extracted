@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::PostgreSQL.
 
+1.26
+    - Fix postgresql.conf test on PostgreSQL prior to 9.2
+
 1.25
     - Don't continue to wait if Postgres PID has gone
     - Database seeding after startup

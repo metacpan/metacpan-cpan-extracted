@@ -1,0 +1,6 @@
+name = "Acme-Pointer"
+# badges = ["travis"]
+authority="cpan:CODEHEX"
+
+module_maker="ModuleBuildTiny"
+

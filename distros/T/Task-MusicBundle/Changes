@@ -1,5 +1,8 @@
 Revision history for Task-MusicBundle
 
+0.14 2018-04-06 15:30:42
+    - Added Music::ScaleNote.
+
 0.13 2018-03-24 19:36:21
     - Added Guitar::Scale.
 

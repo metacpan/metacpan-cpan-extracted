@@ -1,12 +1,13 @@
 #!/usr/bin/perl -w
 
-# ICC::Profile::clro test module / 2018-03-27
+# ICC::Profile::clro test module / 2018-03-31
 #
 # Copyright © 2004-2018 by William B. Birkett
 
 use strict;
 
 use File::Spec;
+use File::Temp;
 use Test::More tests => 8;
 
 # local variables
@@ -42,26 +43,20 @@ is_deeply($clro1, $clro2, 'clro new from array');
 # test size method
 ok($clro1->size == (12 + 4), 'clro size');
 
-# make path to temporary file
-$temp = File::Spec->catfile('t', 'data', 'temp.dat');
-
-# open file for write-read access
-open($fh, "+>$temp");
-
-# set binary mode
-binmode($fh);
+# open temporary file for write-read access, binmode
+$temp = File::Temp::tempfile();
 
 # make tag table entry
 $ttab = ['clro', 100, 0, 0];
 
 # write clro object to file
-$clro1->write_fh(0, $fh, $ttab);
+$clro1->write_fh(0, $temp, $ttab);
 
 # read new clro object from file
-$clro2 = ICC::Profile::clro->new_fh(0, $fh, $ttab);
+$clro2 = ICC::Profile::clro->new_fh(0, $temp, $ttab);
 
 # close file
-close $fh;
+close $temp;
 
 # test object header signature
 ok($clro2->[0]{'signature'} eq 'clro', 'clro object header signature');

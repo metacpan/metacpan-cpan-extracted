@@ -1,0 +1,51 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Devel::CheckOS' => '0',
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::Code::TidyAll' => '0.50',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::More' => '0.88',
+                                      'Test::Pod' => '1.41',
+                                      'lib' => '0',
+                                      'perl' => '5.006'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Getopt::Std' => '0',
+                                      'HTML::Entities' => '3.69',
+                                      'HTML::Form' => '6.03',
+                                      'HTML::TreeBuilder::XPath' => '0.14',
+                                      'HTTP::Cookies' => '6.01',
+                                      'LWP::UserAgent' => '6.05',
+                                      'Log::Log4perl' => '1.48',
+                                      'YAML::XS' => '0.62',
+                                      'perl' => '5.010001'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Perl::Tidy::Sweetened' => '1.12',
+                                   'Pod::Tidy' => '0.10',
+                                   'SpamcupNG' => '0',
+                                   'Test::Code::TidyAll' => '0.69',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

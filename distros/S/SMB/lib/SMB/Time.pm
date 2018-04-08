@@ -1,4 +1,4 @@
-# SMB-Perl library, Copyright (C) 2014 Mikhael Goikhman, migo@cpan.org
+# SMB-Perl library, Copyright (C) 2014-2018 Mikhael Goikhman, migo@cpan.org
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

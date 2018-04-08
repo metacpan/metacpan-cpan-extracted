@@ -1,17 +1,37 @@
 package Chart::Plotly::Trace::Ohlc;
 use Moose;
 use MooseX::ExtraArgs;
+use Moose::Util::TypeConstraints qw(enum union);
+if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
+    Moose::Util::TypeConstraints::type('PDL');
+}
 
-use Chart::Plotly::Trace::Attribute::Decreasing;
-use Chart::Plotly::Trace::Attribute::Increasing;
-use Chart::Plotly::Trace::Attribute::Line;
+use Chart::Plotly::Trace::Ohlc::Decreasing;
+use Chart::Plotly::Trace::Ohlc::Hoverlabel;
+use Chart::Plotly::Trace::Ohlc::Increasing;
+use Chart::Plotly::Trace::Ohlc::Line;
+use Chart::Plotly::Trace::Ohlc::Stream;
 
-our $VERSION = '0.013';    # VERSION
+our $VERSION = '0.017';    # VERSION
+
+# ABSTRACT: The ohlc (short for Open-High-Low-Close) is a style of financial chart describing open, high, low and close for a given `x` coordinate (most likely time). The tip of the lines represent the `low` and `high` values and the horizontal segments represent the `open` and `close` values. Sample points where the close value is higher (lower) then the open value are called increasing (decreasing). By default, increasing candles are drawn in green whereas decreasing are drawn in red.
 
 sub TO_JSON {
     my $self       = shift;
     my $extra_args = $self->extra_args // {};
-    my %hash       = ( %$self, %$extra_args );
+    my $meta       = $self->meta;
+    my %hash       = %$self;
+    for my $name ( sort keys %hash ) {
+        my $attr = $meta->get_attribute($name);
+        if ( defined $attr ) {
+            my $value = $hash{$name};
+            my $type  = $attr->type_constraint;
+            if ( $type && $type->equals('Bool') ) {
+                $hash{$name} = $value ? \1 : \0;
+            }
+        }
+    }
+    %hash = ( %hash, %$extra_args );
     delete $hash{'extra_args'};
     if ( $self->can('type') && ( !defined $hash{'type'} ) ) {
         $hash{type} = $self->type();
@@ -19,51 +39,188 @@ sub TO_JSON {
     return \%hash;
 }
 
-has close => ( is            => 'rw',
-               documentation => "Sets the close values.", );
-
-has decreasing => ( is  => 'rw',
-                    isa => "Maybe[HashRef]|Chart::Plotly::Trace::Attribute::Decreasing" );
-
-has high => ( is            => 'rw',
-              documentation => "Sets the high values.", );
-
-has increasing => ( is  => 'rw',
-                    isa => "Maybe[HashRef]|Chart::Plotly::Trace::Attribute::Increasing" );
-
-has line => ( is  => 'rw',
-              isa => "Maybe[HashRef]|Chart::Plotly::Trace::Attribute::Line" );
-
-has low => ( is            => 'rw',
-             documentation => "Sets the low values.", );
-
-has open => ( is            => 'rw',
-              documentation => "Sets the open values.", );
-
-has text => (
-    is  => 'rw',
-    isa => "Maybe[ArrayRef]|Str",
-    documentation =>
-      "Sets hover text elements associated with each sample point. If a single string, the same string appears over all the data points. If an array of string, the items are mapped in order to this trace's sample points.",
-);
-
-has tickwidth => ( is            => 'rw',
-                   isa           => "Num",
-                   documentation => "Sets the width of the open/close tick marks relative to the *x* minimal interval.",
-);
-
-has x => ( is            => 'rw',
-           documentation => "Sets the x coordinates. If absent, linear coordinate will be generated.", );
-
-has name => ( is            => 'rw',
-              isa           => "Str",
-              documentation => "Sets the trace name",
-);
-
 sub type {
     my @components = split( /::/, __PACKAGE__ );
     return lc( $components[-1] );
 }
+
+has close => ( is            => "rw",
+               isa           => "ArrayRef|PDL",
+               documentation => "Sets the close values.",
+);
+
+has closesrc => ( is            => "rw",
+                  isa           => "Str",
+                  documentation => "Sets the source reference on plot.ly for  close .",
+);
+
+has customdata => (
+    is  => "rw",
+    isa => "ArrayRef|PDL",
+    documentation =>
+      "Assigns extra data each datum. This may be useful when listening to hover, click and selection events. Note that, *scatter* traces also appends customdata items in the markers DOM elements",
+);
+
+has customdatasrc => ( is            => "rw",
+                       isa           => "Str",
+                       documentation => "Sets the source reference on plot.ly for  customdata .",
+);
+
+has decreasing => ( is  => "rw",
+                    isa => "Maybe[HashRef]|Chart::Plotly::Trace::Ohlc::Decreasing", );
+
+has high => ( is            => "rw",
+              isa           => "ArrayRef|PDL",
+              documentation => "Sets the high values.",
+);
+
+has highsrc => ( is            => "rw",
+                 isa           => "Str",
+                 documentation => "Sets the source reference on plot.ly for  high .",
+);
+
+has hoverinfo => (
+    is  => "rw",
+    isa => "Maybe[ArrayRef]",
+    documentation =>
+      "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
+);
+
+has hoverinfosrc => ( is            => "rw",
+                      isa           => "Str",
+                      documentation => "Sets the source reference on plot.ly for  hoverinfo .",
+);
+
+has hoverlabel => ( is  => "rw",
+                    isa => "Maybe[HashRef]|Chart::Plotly::Trace::Ohlc::Hoverlabel", );
+
+has ids => (
+    is  => "rw",
+    isa => "ArrayRef|PDL",
+    documentation =>
+      "Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.",
+);
+
+has idssrc => ( is            => "rw",
+                isa           => "Str",
+                documentation => "Sets the source reference on plot.ly for  ids .",
+);
+
+has increasing => ( is  => "rw",
+                    isa => "Maybe[HashRef]|Chart::Plotly::Trace::Ohlc::Increasing", );
+
+has legendgroup => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.",
+);
+
+has line => ( is  => "rw",
+              isa => "Maybe[HashRef]|Chart::Plotly::Trace::Ohlc::Line", );
+
+has low => ( is            => "rw",
+             isa           => "ArrayRef|PDL",
+             documentation => "Sets the low values.",
+);
+
+has lowsrc => ( is            => "rw",
+                isa           => "Str",
+                documentation => "Sets the source reference on plot.ly for  low .",
+);
+
+has name => ( is            => "rw",
+              isa           => "Str",
+              documentation => "Sets the trace name. The trace name appear as the legend item and on hover.",
+);
+
+has opacity => ( is            => "rw",
+                 isa           => "Num",
+                 documentation => "Sets the opacity of the trace.",
+);
+
+has open => ( is            => "rw",
+              isa           => "ArrayRef|PDL",
+              documentation => "Sets the open values.",
+);
+
+has opensrc => ( is            => "rw",
+                 isa           => "Str",
+                 documentation => "Sets the source reference on plot.ly for  open .",
+);
+
+has selectedpoints => (
+    is  => "rw",
+    isa => "Any",
+    documentation =>
+      "Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.",
+);
+
+has showlegend => (
+               is            => "rw",
+               isa           => "Bool",
+               documentation => "Determines whether or not an item corresponding to this trace is shown in the legend.",
+);
+
+has stream => ( is  => "rw",
+                isa => "Maybe[HashRef]|Chart::Plotly::Trace::Ohlc::Stream", );
+
+has text => (
+    is  => "rw",
+    isa => "Str|ArrayRef[Str]",
+    documentation =>
+      "Sets hover text elements associated with each sample point. If a single string, the same string appears over all the data points. If an array of string, the items are mapped in order to this trace's sample points.",
+);
+
+has textsrc => ( is            => "rw",
+                 isa           => "Str",
+                 documentation => "Sets the source reference on plot.ly for  text .",
+);
+
+has tickwidth => ( is            => "rw",
+                   isa           => "Num",
+                   documentation => "Sets the width of the open/close tick marks relative to the *x* minimal interval.",
+);
+
+has uid => ( is  => "rw",
+             isa => "Str", );
+
+has visible => (
+    is => "rw",
+    documentation =>
+      "Determines whether or not this trace is visible. If *legendonly*, the trace is not drawn, but can appear as a legend item (provided that the legend itself is visible).",
+);
+
+has x => ( is            => "rw",
+           isa           => "ArrayRef|PDL",
+           documentation => "Sets the x coordinates. If absent, linear coordinate will be generated.",
+);
+
+has xaxis => (
+    is => "rw",
+    documentation =>
+      "Sets a reference between this trace's x coordinates and a 2D cartesian x axis. If *x* (the default value), the x coordinates refer to `layout.xaxis`. If *x2*, the x coordinates refer to `layout.xaxis2`, and so on.",
+);
+
+has xcalendar => ( is  => "rw",
+                   isa => enum(
+                           [ "gregorian", "chinese", "coptic", "discworld", "ethiopian", "hebrew", "islamic", "julian",
+                             "mayan", "nanakshahi", "nepali", "persian", "jalali", "taiwan", "thai", "ummalqura"
+                           ]
+                   ),
+                   documentation => "Sets the calendar system to use with `x` date data.",
+);
+
+has xsrc => ( is            => "rw",
+              isa           => "Str",
+              documentation => "Sets the source reference on plot.ly for  x .",
+);
+
+has yaxis => (
+    is => "rw",
+    documentation =>
+      "Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.",
+);
 
 __PACKAGE__->meta->make_immutable();
 1;
@@ -76,22 +233,41 @@ __END__
 
 =head1 NAME
 
-Chart::Plotly::Trace::Ohlc
+Chart::Plotly::Trace::Ohlc - The ohlc (short for Open-High-Low-Close) is a style of financial chart describing open, high, low and close for a given `x` coordinate (most likely time). The tip of the lines represent the `low` and `high` values and the horizontal segments represent the `open` and `close` values. Sample points where the close value is higher (lower) then the open value are called increasing (decreasing). By default, increasing candles are drawn in green whereas decreasing are drawn in red.
 
 =head1 VERSION
 
-version 0.013
+version 0.017
 
 =head1 SYNOPSIS
 
- use HTML::Show;
  use Chart::Plotly;
  use Chart::Plotly::Trace::Ohlc;
- my $ohlc = Chart::Plotly::Trace::Ohlc->new( x => [ 1 .. 5 ], y => [ 1 .. 5 ] );
+ my $ohlc = Chart::Plotly::Trace::Ohlc->new(
+     x     => [ 1 .. 5 ],
+     open  => [ 1, 6, 7 ],
+     close => [ 7, 12, 5 ],
+     high  => [ 8, 15, 10 ],
+     low   => [ 0.5, 5, 4 ]
+ );
  
- HTML::Show::show( Chart::Plotly::render_full_html( data => [$ohlc] ) );
+ Chart::Plotly::show_plot([ $ohlc ]);
 
 =head1 DESCRIPTION
+
+The ohlc (short for Open-High-Low-Close) is a style of financial chart describing open, high, low and close for a given `x` coordinate (most likely time). The tip of the lines represent the `low` and `high` values and the horizontal segments represent the `open` and `close` values. Sample points where the close value is higher (lower) then the open value are called increasing (decreasing). By default, increasing candles are drawn in green whereas decreasing are drawn in red.
+
+Screenshot of the above example:
+
+=for HTML <p>
+<img src="https://raw.githubusercontent.com/pablrod/p5-Chart-Plotly/master/examples/traces/ohlc.png" alt="Screenshot of the above example">
+</p>
+
+=for markdown ![Screenshot of the above example](https://raw.githubusercontent.com/pablrod/p5-Chart-Plotly/master/examples/traces/ohlc.png)
+
+=for HTML <p>
+<iframe src="https://raw.githubusercontent.com/pablrod/p5-Chart-Plotly/master/examples/traces/ohlc.html" style="border:none;" width="80%" height="520"></iframe>
+</p>
 
 This file has been autogenerated from the official plotly.js source.
 
@@ -99,10 +275,6 @@ If you like Plotly, please support them: L<https://plot.ly/>
 Open source announcement: L<https://plot.ly/javascript/open-source-announcement/>
 
 Full reference: L<https://plot.ly/javascript/reference/#ohlc>
-
-=head1 NAME 
-
-Chart::Plotly::Trace::Ohlc
 
 =head1 DISCLAIMER
 
@@ -115,6 +287,10 @@ But I think plotly.js is a great library and I want to use it with perl.
 
 Serialize the trace to JSON. This method should be called only by L<JSON> serializer.
 
+=head2 type
+
+Trace type.
+
 =head1 ATTRIBUTES
 
 =over
@@ -123,13 +299,51 @@ Serialize the trace to JSON. This method should be called only by L<JSON> serial
 
 Sets the close values.
 
+=item * closesrc
+
+Sets the source reference on plot.ly for  close .
+
+=item * customdata
+
+Assigns extra data each datum. This may be useful when listening to hover, click and selection events. Note that, *scatter* traces also appends customdata items in the markers DOM elements
+
+=item * customdatasrc
+
+Sets the source reference on plot.ly for  customdata .
+
 =item * decreasing
 
 =item * high
 
 Sets the high values.
 
+=item * highsrc
+
+Sets the source reference on plot.ly for  high .
+
+=item * hoverinfo
+
+Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.
+
+=item * hoverinfosrc
+
+Sets the source reference on plot.ly for  hoverinfo .
+
+=item * hoverlabel
+
+=item * ids
+
+Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.
+
+=item * idssrc
+
+Sets the source reference on plot.ly for  ids .
+
 =item * increasing
+
+=item * legendgroup
+
+Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.
 
 =item * line
 
@@ -137,31 +351,75 @@ Sets the high values.
 
 Sets the low values.
 
+=item * lowsrc
+
+Sets the source reference on plot.ly for  low .
+
+=item * name
+
+Sets the trace name. The trace name appear as the legend item and on hover.
+
+=item * opacity
+
+Sets the opacity of the trace.
+
 =item * open
 
 Sets the open values.
+
+=item * opensrc
+
+Sets the source reference on plot.ly for  open .
+
+=item * selectedpoints
+
+Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.
+
+=item * showlegend
+
+Determines whether or not an item corresponding to this trace is shown in the legend.
+
+=item * stream
 
 =item * text
 
 Sets hover text elements associated with each sample point. If a single string, the same string appears over all the data points. If an array of string, the items are mapped in order to this trace's sample points.
 
+=item * textsrc
+
+Sets the source reference on plot.ly for  text .
+
 =item * tickwidth
 
 Sets the width of the open/close tick marks relative to the *x* minimal interval.
+
+=item * uid
+
+=item * visible
+
+Determines whether or not this trace is visible. If *legendonly*, the trace is not drawn, but can appear as a legend item (provided that the legend itself is visible).
 
 =item * x
 
 Sets the x coordinates. If absent, linear coordinate will be generated.
 
-=item * name
+=item * xaxis
 
-Sets the trace name
+Sets a reference between this trace's x coordinates and a 2D cartesian x axis. If *x* (the default value), the x coordinates refer to `layout.xaxis`. If *x2*, the x coordinates refer to `layout.xaxis2`, and so on.
+
+=item * xcalendar
+
+Sets the calendar system to use with `x` date data.
+
+=item * xsrc
+
+Sets the source reference on plot.ly for  x .
+
+=item * yaxis
+
+Sets a reference between this trace's y coordinates and a 2D cartesian y axis. If *y* (the default value), the y coordinates refer to `layout.yaxis`. If *y2*, the y coordinates refer to `layout.xaxis2`, and so on.
 
 =back
-
-=head2 type
-
-Trace type.
 
 =head1 AUTHOR
 
@@ -169,7 +427,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2017 by Pablo Rodríguez González.
+This software is Copyright (c) 2017 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

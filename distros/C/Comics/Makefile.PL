@@ -7,14 +7,15 @@ use v5.12;
 
 use ExtUtils::MakeMaker;
 
-my $master = 'lib/Comics.pm';
+my $master = 'lib/Comics/Version.pm';
 my $version = MM->parse_version($master);
+$master =~ s;/Version;;;
 
 WriteMakefile
 (
  NAME		=> 'Comics',
  ABSTRACT_FROM  => $master,
- VERSION_FROM	=> $master,
+ VERSION	=> $version,
  AUTHOR	        => 'Johan Vromans <jvromans@squirrel.nl>',
  MIN_PERL_VERSION => 5.12.0,
  INSTALLDIRS	=> 'site',
@@ -42,12 +43,14 @@ WriteMakefile
   license      => "perl_5",
   resources    =>
   {
-   repository  =>
-   {
-    url  => 'git://github.com/sciurius/comics.git',
-    web  => 'http://github.com/sciurius/comics',
-    type => 'git',
-   },
+   repository => "https://github.com/sciurius/comics",
+   bugtracker => "https://github.com/sciurius/comics/issues",
+  },
+  no_index =>
+  {
+   file => [
+	    "lib/LWP/UserAgent/Custom.pm",
+	   ],
   },
   'meta-spec' =>
   {

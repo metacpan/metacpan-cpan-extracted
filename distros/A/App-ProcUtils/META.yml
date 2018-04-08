@@ -23,11 +23,12 @@ requires:
   Data::Sah::Compiler::perl::TH::int: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   Perinci::CmdLine::Any: '0'
-  Perinci::CmdLine::Base: '1.80'
+  Perinci::CmdLine::Base: '1.810'
+  Perinci::CmdLine::Classic: '1.770'
   Proc::Find::Parents: '0.631'
   Proc::ProcessTable: '0'
-  Sah::Schema::nonnegint: '0'
   Sah::Schema::true: '0'
+  Sah::Schema::uint: '0'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -35,7 +36,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ProcUtils
   homepage: https://metacpan.org/release/App-ProcUtils
   repository: git://github.com/perlancar/perl-App-ProcUtils.git
-version: '0.030'
+version: '0.031'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -127,7 +128,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.591'
+      version: '0.592'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -339,7 +340,7 @@ x_Dist_Zilla:
           skips: []
           switch: []
       name: '@Author::PERLANCAR/Test::Compile'
-      version: '2.057'
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::Test::Perl::Critic
       name: '@Author::PERLANCAR/Test::Perl::Critic'

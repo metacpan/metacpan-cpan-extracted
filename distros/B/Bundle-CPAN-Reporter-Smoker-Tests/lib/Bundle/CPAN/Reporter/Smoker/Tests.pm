@@ -2,7 +2,7 @@ package Bundle::CPAN::Reporter::Smoker::Tests;
 use strict;
 use warnings;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 =pod
 
@@ -24,8 +24,6 @@ way to include those tests that have a good chance to be required to be used by 
     Test::Perl::Critic [1.02]
     Test::Pod [1.48]
     Test::Pod::Coverage [1.10]
-    Test::Script [1.07]
-    Test::WWW::Mechanize [1.44]
     Test::Warn [0.30]
     Test::Strict [0.23]
     Test::Distribution [2.00]

@@ -7,6 +7,9 @@ Makefile.PL
 README
 dist.ini
 examples/rpc-switch-client
+examples/rpc-switch-method-details
+examples/rpc-switch-methods
 examples/rpc-switch-worker
+examples/rpc-switch-workers
 lib/RPC/Switch/Client.pm
 t/00-load.t

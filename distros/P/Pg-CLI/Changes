@@ -1,3 +1,17 @@
+0.13    2018-04-07
+
+- Fixed some pod sections appearing twice. Reported by Красимир Беров. GH #3.
+
+
+0.12    2018-04-07
+
+- Made the database argument optional for Pg::CLI::psql->execute_file() as
+  well.
+
+- Pg::CLI::psql->execute_file will now accept an arrayref of file paths
+  as the value for the "file" argument.
+
+
 0.11    2013-04-01
 
 - Added Pg::CLI::createdb and Pg::CLI::dropdb classes.

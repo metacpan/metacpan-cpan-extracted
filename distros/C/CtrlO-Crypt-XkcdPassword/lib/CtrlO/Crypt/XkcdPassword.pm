@@ -4,7 +4,7 @@ use warnings;
 
 # ABSTRACT: Yet another xkcd style password generator
 
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 
 use Carp qw(croak);
 use Crypt::Rijndael;
@@ -98,6 +98,15 @@ sub xkcd {
         $self->_reinit_after_fork;
     }
 
+    foreach my $key (keys %args) {
+        croak "Invalid key [$key] received."
+            unless ($key eq 'words' || $key eq 'digits');
+
+        if (defined $args{$key} && ($args{$key} !~ /^[1-9][0-9]?$/)) {
+            croak "Invalid value [$args{$key}] for key [$key].";
+        }
+    }
+
     my $word_count = $args{words} || 4;
 
     my $words = with_entropy_source(
@@ -141,7 +150,7 @@ CtrlO::Crypt::XkcdPassword - Yet another xkcd style password generator
 
 =head1 VERSION
 
-version 1.004
+version 1.005
 
 =head1 SYNOPSIS
 
@@ -286,7 +295,7 @@ load your word list:
     wordlist => 'Your::Cool::Wordlist'
   );
 
-You can check out L<CtrlO::Crypt::XkcdPassword::Wordlist::en_GB> (included in
+You can check out L<CtrlO::Crypt::XkcdPassword::Wordlist::en_gb> (included in
 this distribution) for an example. But it's really quite simple: Just
 subclass C<Wordlist> and put your list of words into the C<__DATA__>
 section of the module, one line per word.

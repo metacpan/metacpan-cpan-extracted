@@ -1,0 +1,1039 @@
+#!perl
+
+our $DATE = '2018-04-06'; # DATE
+our $VERSION = '0.023'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+my $prefix = '/App/indodax/';
+
+Perinci::CmdLine::Any->new(
+    url => $prefix,
+    subcommands => {
+        public          => { url => "${prefix}public" },
+        private         => { url => "${prefix}private" },
+
+        # public
+        ticker          => { url => "${prefix}ticker", },
+        trades          => { url => "${prefix}trades", },
+        depth           => { url => "${prefix}depth", },
+        "price-history" => { url => "${prefix}price_history", },
+        pairs           => { url => "${prefix}pairs", },
+
+        info                => { url => "${prefix}info", },
+        balance             => { url => "${prefix}balance", },
+        "tx-history"        => { url => "${prefix}tx_history", },
+        "trade-history"     => { url => "${prefix}trade_history", },
+        "open-orders"       => { url => "${prefix}open_orders", },
+        "create-order"      => { url => "${prefix}create_order", },
+        "cancel-order"      => { url => "${prefix}cancel_order", },
+        "cancel-orders"     => { url => "${prefix}cancel_orders", },
+        "cancel-all-orders" => { url => "${prefix}cancel_all_orders", },
+        "hold-details"      => { url => "${prefix}hold_details", },
+
+        # aliases
+        "trade" => { url => "${prefix}create_order", },
+
+        # not yet
+        "profit" => { url => "${prefix}profit", show_in_help => 0, },
+        "trade-history-total" => { url => "${prefix}trade_history_total", show_in_help => 0 },
+    },
+    log => 1,
+)->run;
+
+# ABSTRACT: CLI for Indodax.com
+# PODNAME: indodax
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+indodax - CLI for Indodax.com
+
+=head1 VERSION
+
+This document describes version 0.023 of indodax (from Perl distribution App-indodax), released on 2018-04-06.
+
+=head1 SYNOPSIS
+
+First, create an account at L<https://bitcoin.co.id>, create the trade API key
+then insert the API key and secret key in F<~/.config/indodax.conf>. Since the
+configuration file contains the API secret key, please make sure that the
+permission of the file is set so that unauthorized users cannot read it (e.g.
+chmod it to 0600).
+
+ # In ~/.config/indodax.conf
+ key = ...
+ secret = ...
+
+To list available pairs:
+
+ % indodax pairs
+
+To show ticker:
+
+ % indodax ticker                     ;# default pair: btc_idr
+ % indodax ticker --pair eth_idr
+
+To show latest trades:
+
+ % indodax trades
+
+To show your balance:
+
+ % indodax balance
+
+To show transaction history (Rupiah deposits & withdrawals):
+
+ % indodax tx-history
+
+To show your trade history:
+
+ % indodax trade-history
+ % indodax trade-history --time-from 2017-05-31
+ % indodax trade-history --trade-id-from 1200000 --trade-id-to 1200100
+
+To show your open/pending orders:
+
+ % indodax open-orders
+
+To create a new order:
+
+ # buy Rp 1.500.000-worth of bitcoin at Rp 34.000.000/BTC
+ % indodax trade buy 34000000 --idr 1500000
+
+ # sell 0.01 bitcoin at Rp 38.000.000/BTC (create-order is alias for trade)
+ % indodax create-order sell 38000000 --btc 0.01
+
+Cancel an existing order:
+
+ % indodax cancel-order sell 2345678 ;# btc_idr
+ % indodax cancel-order sell 345678 --pair bch_idr
+
+Cancelling multiple orders in one go:
+
+ % indodax cancel-all-orders
+ % indodax cancel-orders --type buy
+ % indodax cancel-orders --type buy --pair btc_idr
+ % indodax cancel-orders --currency idr
+
+For other available commands, see the help message or documentation:
+
+ % indodax -h
+
+=head1 SUBCOMMANDS
+
+=head2 B<balance>
+
+Show current balances.
+
+=head2 B<cancel-all-orders>
+
+Cancel all existing open orders.
+
+=head2 B<cancel-order>
+
+Cancel an existing open order.
+
+=head2 B<cancel-orders>
+
+Cancel one or more open orders matching criteria.
+
+=head2 B<create-order>
+
+Create a new order.
+
+=head2 B<depth>
+
+Show depth.
+
+=head2 B<hold-details>
+
+Show in which open orders your currency is being held.
+
+=head2 B<info>
+
+Show balance, server timestamp, and some other information.
+
+=head2 B<open-orders>
+
+Show open orders.
+
+=head2 B<pairs>
+
+List available pairs.
+
+=head2 B<price-history>
+
+Show price history, which can be used to draw candlestick chart.
+
+The function will return an array of records. Each record is an array with the
+following data:
+
+ [timestamp-in-unix-epoch, open, high, low, close]
+
+
+=head2 B<private>
+
+Perform private API (TAPI) request.
+
+=head2 B<profit>
+
+Calculate your profit.
+
+=head2 B<public>
+
+Perform public API request.
+
+=head2 B<ticker>
+
+Show ticker.
+
+=head2 B<trade>
+
+Create a new order.
+
+=head2 B<trade-history>
+
+Show history of trades.
+
+=head2 B<trade-history-total>
+
+Show total amount of trades.
+
+=head2 B<trades>
+
+Show latest trades.
+
+=head2 B<tx-history>
+
+Show history of deposits and withdrawals.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head2 Options for subcommand balance
+
+=over
+
+=item B<--key>=I<s>*
+
+=item B<--secret>=I<s>*
+
+=item B<--with-idr-estimates>, B<-e>
+
+Also show the value of all assets in IDR, using current prices information.
+
+=back
+
+=head2 Options for subcommand cancel-all-orders
+
+=over
+
+=item B<--key>=I<s>*
+
+=item B<--secret>=I<s>*
+
+=back
+
+=head2 Options for subcommand cancel-order
+
+=over
+
+=item B<--buy*>
+
+Alias for --type buy.
+
+See C<--type>.
+
+=item B<--key>=I<s>*
+
+=item B<--order-id>=I<s>*
+
+=item B<--pair>=I<s>
+
+Pair.
+
+Default value:
+
+ "btc_idr"
+
+Valid values:
+
+ ["btc_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+
+=item B<--secret>=I<s>*
+
+=item B<--sell*>
+
+Alias for --type sell.
+
+See C<--type>.
+
+=item B<--type>=I<s>*
+
+Valid values:
+
+ ["buy","sell"]
+
+=back
+
+=head2 Options for subcommand cancel-orders
+
+=over
+
+=item B<--currency>=I<s>
+
+Filter by currency.
+
+Valid values:
+
+ ["ada","bcd","bch","btc","btg","bts","dash","doge","etc","eth","idr","ignis","ltc","nxt","ten","waves","xem","xlm","xrp","xzc"]
+
+=item B<--key>=I<s>*
+
+=item B<--pair>=I<s>
+
+Filter by pair.
+
+Valid values:
+
+ ["btc_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+
+=item B<--secret>=I<s>*
+
+=item B<--type>=I<s>
+
+Filter by type (buy/sell).
+
+Valid values:
+
+ ["buy","sell"]
+
+=back
+
+=head2 Options for subcommand create-order
+
+=over
+
+=item B<--btc>=I<s>
+
+=item B<--buy*>
+
+Alias for --type buy.
+
+See C<--type>.
+
+=item B<--idr>=I<s>
+
+=item B<--key>=I<s>*
+
+=item B<--pair>=I<s>
+
+Pair.
+
+Default value:
+
+ "btc_idr"
+
+Valid values:
+
+ ["btc_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+
+=item B<--price>=I<s>*
+
+=item B<--secret>=I<s>*
+
+=item B<--sell*>
+
+Alias for --type sell.
+
+See C<--type>.
+
+=item B<--type>=I<s>*
+
+Valid values:
+
+ ["buy","sell"]
+
+=back
+
+=head2 Options for subcommand depth
+
+=over
+
+=item B<--pair>=I<s>
+
+Pair.
+
+Default value:
+
+ "btc_idr"
+
+Valid values:
+
+ ["btc_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+
+=item B<--type>=I<s>
+
+Filter by type (buy/sell).
+
+Valid values:
+
+ ["buy","sell"]
+
+=back
+
+=head2 Options for subcommand hold-details
+
+=over
+
+=item B<--currency>=I<s>
+
+Currency name.
+
+Default value:
+
+ "idr"
+
+Valid values:
+
+ ["ada","bcd","bch","btc","btg","bts","dash","doge","etc","eth","idr","ignis","ltc","nxt","ten","waves","xem","xlm","xrp","xzc"]
+
+=item B<--key>=I<s>*
+
+=item B<--secret>=I<s>*
+
+=back
+
+=head2 Options for subcommand info
+
+=over
+
+=item B<--key>=I<s>*
+
+=item B<--secret>=I<s>*
+
+=back
+
+=head2 Options for subcommand open-orders
+
+=over
+
+=item B<--key>=I<s>*
+
+=item B<--pair>=I<s>
+
+Filter by pair.
+
+Valid values:
+
+ ["btc_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+
+=item B<--secret>=I<s>*
+
+=item B<--type>=I<s>
+
+Filter by type (buy/sell).
+
+Valid values:
+
+ ["buy","sell"]
+
+=back
+
+=head2 Options for subcommand price-history
+
+=over
+
+=item B<--period>=I<s>
+
+Default value:
+
+ "day"
+
+Valid values:
+
+ ["day","all"]
+
+=back
+
+=head2 Options for subcommand private
+
+=over
+
+=item B<--arg>=I<s>%
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+
+=item B<--args-json>=I<s>
+
+See C<--arg>.
+
+=back
+
+=head2 Options for subcommand profit
+
+=over
+
+=item B<--key>=I<s>*
+
+=item B<--pair>=I<s>
+
+Pair.
+
+Default value:
+
+ "btc_idr"
+
+Valid values:
+
+ ["btc_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+
+=item B<--secret>=I<s>*
+
+=item B<--time-from>=I<s>
+
+Filter by beginning time.
+
+=item B<--time-to>=I<s>
+
+Filter by ending time.
+
+=back
+
+=head2 Options for subcommand public
+
+=over
+
+=item B<--arg>=I<s>%
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+
+=item B<--args-json>=I<s>
+
+See C<--arg>.
+
+=item B<--method>=I<s>
+
+Default value:
+
+ "GET"
+
+=item B<--uri>=I<s>*
+
+=back
+
+=head2 Options for subcommand ticker
+
+=over
+
+=item B<--pair>=I<s>
+
+Pair.
+
+Default value:
+
+ "btc_idr"
+
+Valid values:
+
+ ["btc_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+
+=back
+
+=head2 Options for subcommand trade
+
+=over
+
+=item B<--btc>=I<s>
+
+=item B<--buy*>
+
+Alias for --type buy.
+
+See C<--type>.
+
+=item B<--idr>=I<s>
+
+=item B<--key>=I<s>*
+
+=item B<--pair>=I<s>
+
+Pair.
+
+Default value:
+
+ "btc_idr"
+
+Valid values:
+
+ ["btc_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+
+=item B<--price>=I<s>*
+
+=item B<--secret>=I<s>*
+
+=item B<--sell*>
+
+Alias for --type sell.
+
+See C<--type>.
+
+=item B<--type>=I<s>*
+
+Valid values:
+
+ ["buy","sell"]
+
+=back
+
+=head2 Options for subcommand trade-history
+
+=over
+
+=item B<--key>=I<s>*
+
+=item B<--pair>=I<s>
+
+Pair.
+
+Default value:
+
+ "btc_idr"
+
+Valid values:
+
+ ["btc_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+
+=item B<--secret>=I<s>*
+
+=item B<--time-from>=I<s>
+
+Filter by beginning time.
+
+=item B<--time-to>=I<s>
+
+Filter by ending time.
+
+=item B<--trade-id-from>=I<s>
+
+Filter by beginning trade ID.
+
+=item B<--trade-id-to>=I<s>
+
+Filter by ending trade ID.
+
+=back
+
+=head2 Options for subcommand trade-history-total
+
+=over
+
+=item B<--key>=I<s>*
+
+=item B<--market>=I<s>
+
+Market.
+
+Default value:
+
+ "idr"
+
+Valid values:
+
+ ["idr","btc"]
+
+=item B<--secret>=I<s>*
+
+=item B<--time-from>=I<s>
+
+Filter by beginning time.
+
+=item B<--time-to>=I<s>
+
+Filter by ending time.
+
+=back
+
+=head2 Options for subcommand trades
+
+=over
+
+=item B<--pair>=I<s>
+
+Pair.
+
+Default value:
+
+ "btc_idr"
+
+Valid values:
+
+ ["btc_idr","ada_idr","bcd_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+
+=item B<--type>=I<s>
+
+Filter by type (buy/sell).
+
+Valid values:
+
+ ["buy","sell"]
+
+=back
+
+=head2 Options for subcommand tx-history
+
+=over
+
+=item B<--currency>=I<s>
+
+Filter by currency.
+
+Valid values:
+
+ ["ada","bcd","bch","btc","btg","bts","dash","doge","etc","eth","idr","ignis","ltc","nxt","ten","waves","xem","xlm","xrp","xzc"]
+
+=item B<--key>=I<s>*
+
+=item B<--secret>=I<s>*
+
+=item B<--txtype>=I<s>
+
+Filter by transaction type (deposit/withdraw).
+
+Valid values:
+
+ ["deposit","withdraw"]
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C indodax indodax
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete indodax 'p/*/`indodax`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/indodax.conf>, F<~/indodax.conf>, or F</etc/indodax.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+To put configuration for a certain subcommand only, use a section name like C<[subcommand=NAME]> or C<[SOMESECTION subcommand=NAME]>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]> or C<[subcommand=SUBCOMMAND_NAME profile=SOMENAME]> or C<[SOMESECTION subcommand=SUBCOMMAND_NAME profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+=head2 Common for all subcommands
+
+ format (see --format)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+
+=head2 Configuration for subcommand balance
+
+ key (see --key)
+ secret (see --secret)
+ with_idr_estimates (see --with-idr-estimates)
+
+=head2 Configuration for subcommand cancel-all-orders
+
+ key (see --key)
+ secret (see --secret)
+
+=head2 Configuration for subcommand cancel-order
+
+ key (see --key)
+ order_id (see --order-id)
+ pair (see --pair)
+ secret (see --secret)
+ type (see --type)
+
+=head2 Configuration for subcommand cancel-orders
+
+ currency (see --currency)
+ key (see --key)
+ pair (see --pair)
+ secret (see --secret)
+ type (see --type)
+
+=head2 Configuration for subcommand create-order
+
+ btc (see --btc)
+ idr (see --idr)
+ key (see --key)
+ pair (see --pair)
+ price (see --price)
+ secret (see --secret)
+ type (see --type)
+
+=head2 Configuration for subcommand depth
+
+ pair (see --pair)
+ type (see --type)
+
+=head2 Configuration for subcommand hold-details
+
+ currency (see --currency)
+ key (see --key)
+ secret (see --secret)
+
+=head2 Configuration for subcommand info
+
+ key (see --key)
+ secret (see --secret)
+
+=head2 Configuration for subcommand open-orders
+
+ key (see --key)
+ pair (see --pair)
+ secret (see --secret)
+ type (see --type)
+
+=head2 Configuration for subcommand pairs
+
+
+=head2 Configuration for subcommand price-history
+
+ period (see --period)
+
+=head2 Configuration for subcommand private
+
+ args (see --arg)
+
+=head2 Configuration for subcommand profit
+
+ key (see --key)
+ pair (see --pair)
+ secret (see --secret)
+ time_from (see --time-from)
+ time_to (see --time-to)
+
+=head2 Configuration for subcommand public
+
+ args (see --arg)
+ method (see --method)
+ uri (see --uri)
+
+=head2 Configuration for subcommand ticker
+
+ pair (see --pair)
+
+=head2 Configuration for subcommand trade
+
+ btc (see --btc)
+ idr (see --idr)
+ key (see --key)
+ pair (see --pair)
+ price (see --price)
+ secret (see --secret)
+ type (see --type)
+
+=head2 Configuration for subcommand trade-history
+
+ key (see --key)
+ pair (see --pair)
+ secret (see --secret)
+ time_from (see --time-from)
+ time_to (see --time-to)
+ trade_id_from (see --trade-id-from)
+ trade_id_to (see --trade-id-to)
+
+=head2 Configuration for subcommand trade-history-total
+
+ key (see --key)
+ market (see --market)
+ secret (see --secret)
+ time_from (see --time-from)
+ time_to (see --time-to)
+
+=head2 Configuration for subcommand trades
+
+ pair (see --pair)
+ type (see --type)
+
+=head2 Configuration for subcommand tx-history
+
+ currency (see --currency)
+ key (see --key)
+ secret (see --secret)
+ txtype (see --txtype)
+
+=head1 ENVIRONMENT
+
+=head2 INDODAX_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/indodax.conf>
+
+F<~/indodax.conf>
+
+F</etc/indodax.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-indodax>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-indodax>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-indodax>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

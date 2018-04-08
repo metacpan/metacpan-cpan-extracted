@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Plugin-GetSentry",
    "no_index" : {
@@ -32,10 +32,14 @@
       },
       "runtime" : {
          "requires" : {
+            "Data::Dump" : "0",
+            "Devel::StackTrace::Extract" : "0",
+            "Mojo::IOLoop" : "0",
+            "Sentry::Raven" : "0",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.1.4"
+   "version" : "v1.1.6"
 }

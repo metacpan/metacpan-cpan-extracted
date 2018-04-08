@@ -1,4 +1,4 @@
-Webqq::Encryption v1.6
+Webqq::Encryption v1.7
 ========================
 
 安装方法:
@@ -18,12 +18,20 @@ Webqq::Encryption v1.6
 
     3) Ubuntu/MacOS
 
-        apt-get install libcrypt-opensssl-bignum-perl libcrypt-openssl-rsa-perl
+        apt-get install libcrypt-openssl-bignum-perl libcrypt-openssl-rsa-perl
 
 
    2. 在线安装 Webqq::Encryption
    
         cpanm Webqq::Encryption
+
+调用方法：
+
+    use Webqq::Encryption qw(pwd_encrypt);
+    use Digest::MD5 qw(md5_hex);
+ 
+    #pwd_encrypt接受的参数依次是：登录密码的32位MD5值，盐，验证码
+    my $encrypt_pwd = pwd_encrypt(md5_hex('QQ原始登录密码'),$md5_salt,$verifycode);
 
 COPYRIGHT and LICENCE
 

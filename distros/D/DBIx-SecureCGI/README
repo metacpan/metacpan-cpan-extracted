@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes DBIx::SecureCGI version v2.0.7
+    This document describes DBIx::SecureCGI version v3.0.1
 
 SYNOPSIS
 
@@ -764,8 +764,7 @@ AUTHORS
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2002-2014 by Alex Efros
-    <powerman@cpan.org>.
+    This software is Copyright (c) 2002- by Alex Efros <powerman@cpan.org>.
 
     This is free software, licensed under:
 

@@ -1,3 +1,6 @@
+v0.2.2 2018-04-05T06:29:02Z
+ - dist.perl renamed to dist.yaml
+
 v0.2.1 2018-03-10T22:13:56Z
  - useless AE::postpone removed
 

@@ -1,5 +1,8 @@
 Revision history for IO-Stream
 
+v2.0.3  2018-04-03 19:09:12 EEST
+	- Fix compatibility with perl-5.26.
+
 v2.0.2  2016-03-05 01:39:23 EET
 	- Fixed tests for portability.
 

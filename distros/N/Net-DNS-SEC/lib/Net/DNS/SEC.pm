@@ -1,11 +1,11 @@
 package Net::DNS::SEC;
 
 #
-# $Id: SEC.pm 1657 2018-03-22 14:37:04Z willem $
+# $Id: SEC.pm 1666 2018-04-05 12:39:01Z willem $
 #
 our $VERSION;
-$VERSION = '1.06';
-our $SVNVERSION = (qw$LastChangedRevision: 1657 $)[1];
+$VERSION = '1.07';
+our $SVNVERSION = (qw$LastChangedRevision: 1666 $)[1];
 our $XS_VERSION = $VERSION;
 $VERSION = eval($VERSION);
 
@@ -23,6 +23,11 @@ Net::DNS::SEC - DNSSEC extensions to Net::DNS
 The Net::DNS::SEC suite provides additional packages required to support
 DNSSEC as described in RFC4033, RFC4034, RFC4035 and subsequent related
 documents.
+
+It also provides support for SIG0 which is useful for dynamic updates
+using key-pairs.
+
+RSA, DSA and elliptic curve crypto algorithms are supported.
 
 Net::DNS::SEC is installed as an extension to an existing Net::DNS
 installation.

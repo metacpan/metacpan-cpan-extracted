@@ -15,7 +15,7 @@ name: Data-NFA
 provides:
   Data::NFA:
     file: lib/Data/NFA.pm
-    version: '20180329'
+    version: '20180406'
 requires:
   Carp: '0'
   Data::Dump: '0'
@@ -24,4 +24,4 @@ requires:
   Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20180329'
+version: '20180406'

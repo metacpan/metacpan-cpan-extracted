@@ -1,6 +1,7 @@
 package Lab::Moose::Instrument::SCPI::Sense::Frequency;
+$Lab::Moose::Instrument::SCPI::Sense::Frequency::VERSION = '3.624';
 #ABSTRACT: Role for the SCPI SENSe:FREQuency subsystem
-$Lab::Moose::Instrument::SCPI::Sense::Frequency::VERSION = '3.623';
+
 use Moose::Role;
 use Lab::Moose::Instrument::Cache;
 use Lab::Moose::Instrument
@@ -89,7 +90,7 @@ Lab::Moose::Instrument::SCPI::Sense::Frequency - Role for the SCPI SENSe:FREQuen
 
 =head1 VERSION
 
-version 3.623
+version 3.624
 
 =head1 METHODS
 
@@ -124,6 +125,7 @@ This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2018       Eugeniy E. Mikhailov
 
 
 This is free software; you can redistribute it and/or modify it under

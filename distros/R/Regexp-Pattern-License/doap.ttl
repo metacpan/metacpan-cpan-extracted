@@ -372,7 +372,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/jonass>;
 	doap:name            "Regexp-Pattern-License";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-0-31>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-0>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-90>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-0-31>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-0>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-90>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-91>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-92>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://anonscm.debian.org/git/build-common/regexp-pattern-license.git>;
@@ -546,6 +546,64 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/Regexp-Pattern-License-v3.1.90.tar.gz>;
 	doap:revision        "v3.1.90"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-91>
+	a                    doap:Version;
+	dc:identifier        "Regexp-Pattern-License-v3.1.91"^^xsd:string;
+	dc:issued            "2018-03-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Cover more types of generic grants (used mostly for llgpl and gpl).";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Extend object llgpl: Add canonical iri.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix avoid alternate name MIT except for objects expat mit.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix resolve Fedora IRIs.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add objects aladdin_8 aladdin_9.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix metadata for object aladdin: Use tag type:versioned:decimal (not type:unversioned).";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/Regexp-Pattern-License-v3.1.91.tar.gz>;
+	doap:revision        "v3.1.91"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-92>
+	a                    doap:Version;
+	dc:identifier        "Regexp-Pattern-License-v3.1.92"^^xsd:string;
+	dc:issued            "2018-04-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix avoid chained regexes (seemingly unsupported in perl <5.16).";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add trait objects any_of licensed_under or_at_option version version_numberstring.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Stop cache compiled patterns internally: Not part of Regexp::Pattern spec and better handled externally when really needed.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Improve embedded summary (and related comment) for option \"subject\".";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Implement DefHash option \"capture\".";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Update and slightly reorganize TODOs.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/Regexp-Pattern-License-v3.1.92.tar.gz>;
+	doap:revision        "v3.1.92"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/jonass>
 	a                    foaf:Person;

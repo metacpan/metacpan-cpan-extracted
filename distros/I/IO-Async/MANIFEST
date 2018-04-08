@@ -9,13 +9,13 @@ examples/tcp-proxy.pl
 examples/whoami-server.pl
 lib/IO/Async.pm
 lib/IO/Async/Channel.pm
-lib/IO/Async/ChildManager.pm
 lib/IO/Async/Debug.pm
 lib/IO/Async/File.pm
 lib/IO/Async/FileStream.pm
 lib/IO/Async/Function.pm
 lib/IO/Async/Future.pm
 lib/IO/Async/Handle.pm
+lib/IO/Async/Internals/ChildManager.pm
 lib/IO/Async/Internals/Connector.pm
 lib/IO/Async/Internals/TimeQueue.pm
 lib/IO/Async/Listener.pm
@@ -44,7 +44,6 @@ lib/IO/Async/Timer/Absolute.pm
 lib/IO/Async/Timer/Countdown.pm
 lib/IO/Async/Timer/Periodic.pm
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml
@@ -92,7 +91,7 @@ t/31loop-spawnchild.t
 t/32loop-spawnchild-setup.t
 t/33process.t
 t/34process-handles.t
-t/35loop-openchild.t
+t/35loop-openprocess.t
 t/36loop-runchild.t
 t/37loop-child-root.t
 t/38loop-thread.t

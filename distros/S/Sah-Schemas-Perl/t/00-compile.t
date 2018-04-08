@@ -2,11 +2,11 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.057
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
-plan tests => 22 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 24 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Coerce/perl/obj/str_perl_version.pm',
@@ -18,6 +18,7 @@ my @module_files = (
     'Data/Sah/Coerce/perl/str/str_normalize_perl_modname.pm',
     'Sah/Schema/perl/distname.pm',
     'Sah/Schema/perl/filename.pm',
+    'Sah/Schema/perl/modargs.pm',
     'Sah/Schema/perl/modname.pm',
     'Sah/Schema/perl/pm_filename.pm',
     'Sah/Schema/perl/pod_filename.pm',
@@ -25,6 +26,7 @@ my @module_files = (
     'Sah/Schema/perl/version.pm',
     'Sah/SchemaR/perl/distname.pm',
     'Sah/SchemaR/perl/filename.pm',
+    'Sah/SchemaR/perl/modargs.pm',
     'Sah/SchemaR/perl/modname.pm',
     'Sah/SchemaR/perl/pm_filename.pm',
     'Sah/SchemaR/perl/pod_filename.pm',

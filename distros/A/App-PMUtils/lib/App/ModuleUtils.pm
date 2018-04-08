@@ -1,7 +1,7 @@
 package App::ModuleUtils;
 
-our $DATE = '2017-07-31'; # DATE
-our $VERSION = '0.71'; # VERSION
+our $DATE = '2018-04-03'; # DATE
+our $VERSION = '0.720'; # VERSION
 
 1;
 # ABSTRACT: Alias for App::PMUtils
@@ -18,7 +18,7 @@ App::ModuleUtils - Alias for App::PMUtils
 
 =head1 VERSION
 
-This document describes version 0.71 of App::ModuleUtils (from Perl distribution App-PMUtils), released on 2017-07-31.
+This document describes version 0.720 of App::ModuleUtils (from Perl distribution App-PMUtils), released on 2018-04-03.
 
 =head1 HOMEPAGE
 
@@ -26,7 +26,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-PMUtil
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-PMUtils>.
+Source repository is at L<https://github.com/perlancar/perl-App-PMUtils>.
 
 =head1 BUGS
 
@@ -46,7 +46,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

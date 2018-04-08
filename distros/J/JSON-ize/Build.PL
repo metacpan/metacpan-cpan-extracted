@@ -7,6 +7,7 @@ my $build = Module::Build->new(
   license => 'apache',
   requires => {
     'JSON' => 2,
+    'perl' => '5.8.0'
    },
   build_requires => {
     'Test::More' => 0,
@@ -17,7 +18,7 @@ my $build = Module::Build->new(
    },
   meta_merge => {
     resources => {
-      bugtracker => 'http://rt.cpan.org/Public/Dist/Display.html?Name=JSONize',
+      bugtracker => 'http://rt.cpan.org/Public/Dist/Display.html?Name=JSON::ize',
       repository => 'https://github.com/majensen/jsonize'
      }
    },

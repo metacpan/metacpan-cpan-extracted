@@ -16,6 +16,7 @@ use Locale::Country;
 use Geo::StreetAddress::US;
 use Digest::MD5;
 use Encode;
+use Storable;
 
 #  Some locations aren't found because of inconsistencies in the way things are stored - these are some values I know
 # FIXME: Should be in a configuration file
@@ -28,22 +29,17 @@ my %known_locations = (
 
 our $libpostal_is_installed = 0;
 
-if(eval { require Geo::libpostal; } ) {
-	Geo::libpostal->import();
-	$libpostal_is_installed = 1;
-}
-
 =head1 NAME
 
 Geo::Coder::Free::OpenAddresses - Provides a geocoding functionality to the data from openaddresses.io
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our $OLDCODE = 0;
 
 =head1 SYNOPSIS
@@ -87,6 +83,11 @@ sub new {
 	# Geo::Coder::Free->new not Geo::Coder::Free::new
 	return unless($class);
 
+	if(eval { require Geo::libpostal; } ) {
+		Geo::libpostal->import();
+		$libpostal_is_installed = 1;
+	}
+
 	if(my $openaddr = $param{'openaddr'}) {
 		Carp::carp "Can't find the directory $openaddr"
 			if((!-d $openaddr) || (!-r $openaddr));
@@ -99,8 +100,8 @@ sub new {
 
     $location = $geocoder->geocode(location => $location);
 
-    print 'Latitude: ', $location->{'latt'}, "\n";
-    print 'Longitude: ', $location->{'longt'}, "\n";
+    print 'Latitude: ', $location->{'latitude'}, "\n";
+    print 'Longitude: ', $location->{'longitude'}, "\n";
 
     # TODO:
     # @locations = $geocoder->geocode('Portland, USA');
@@ -144,6 +145,59 @@ sub geocode {
 	my $country;
 	my $street;
 	my $openaddr_db;
+
+	$location =~ s/\.//g;
+
+	if($location !~ /,/) {
+		if($location =~ /^(.+?)\s+(United States|USA|US)$/i) {
+			my $l = $1;
+			$l =~ s/\s+//g;
+			if(my $rc = $self->_get($l . 'US')) {
+				return $rc;
+			}
+		}
+	}
+
+	if($location =~ /^(.+?)[,\s]+(United States|USA|US)$/i) {
+		my $l = $1;
+		$l =~ s/,/ /g;
+		$l =~ s/\s\s+/ /g;
+		if(my $href = Geo::StreetAddress::US->parse_address($l)) {
+			# print Data::Dumper->new([$href])->Dump();
+			$state = $href->{'state'};
+			if(length($state) > 2) {
+				if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
+					$state = $twoletterstate;
+				}
+			}
+			my $city;
+			if($href->{city}) {
+				$city = uc($href->{city});
+			}
+			if($street = $href->{street}) {
+				if(my $type = $self->_normalize($href->{'type'})) {
+					$street .= " $type";
+				}
+				if($href->{suffix}) {
+					$street .= ' ' . $href->{suffix};
+				}
+			}
+			if($street) {
+				if(my $prefix = $href->{prefix}) {
+					$street = "$prefix $street";
+				}
+				my $rc;
+				if($href->{'number'}) {
+					if($rc = $self->_get($href->{'number'} . "$street$city$state" . 'US')) {
+						return $rc;
+					}
+				}
+				if($rc = $self->_get("$street$city$state" . 'US')) {
+					return $rc;
+				}
+			}
+		}
+	}
 
 	if($libpostal_is_installed) {
 		if(my %addr = Geo::libpostal::parse_address($location)) {
@@ -203,61 +257,11 @@ sub geocode {
 		}
 	}
 
-	if($location !~ /,/) {
-		if($location =~ /^(.+?)\s+(United States|USA|US)$/i) {
-			my $l = $1;
-			$l =~ s/\s+//g;
-			if(my $rc = $self->_get($l . 'US')) {
-				return $rc;
-			}
-		}
-	}
-
-	if($location =~ /^(.+?)[,\s]+(United States|USA|US)$/i) {
-		my $l = $1;
-		$l =~ s/,/ /g;
-		$l =~ s/\s\s+/ /g;
-		if(my $href = Geo::StreetAddress::US->parse_address($l)) {
-			$state = $href->{'state'};
-			if(length($state) > 2) {
-				if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
-					$state = $twoletterstate;
-				}
-			}
-			my $city;
-			if($href->{city}) {
-				$city = uc($href->{city});
-			}
-			if($street = $href->{street}) {
-				if(my $type = $self->_normalize($href->{'type'})) {
-					$street .= " $type";
-				}
-				if($href->{suffix}) {
-					$street .= ' ' . $href->{suffix};
-				}
-			}
-			if($street) {
-				if(my $prefix = $href->{prefix}) {
-					$street = "$prefix $street";
-				}
-				my $rc;
-				if($href->{'number'}) {
-					if($rc = $self->_get($href->{'number'} . "$street$city$state" . 'US')) {
-						return $rc;
-					}
-				}
-				if($rc = $self->_get("$street$city$state" . 'US')) {
-					return $rc;
-				}
-			}
-		}
-	}
-
 	if($location =~ /(.+),\s*([\s\w]+),\s*([\w\s]+)$/) {
 		my $city = $1;
 		$state = $2;
-		$state =~ s/\s$//g;
 		$country = $3;
+		$state =~ s/\s$//g;
 		$country =~ s/\s$//g;
 		$openaddr_db = $self->{openaddr_db} ||
 			Geo::Coder::Free::DB::openaddresses->new(
@@ -642,6 +646,28 @@ sub geocode {
 				}
 			}
 		}
+	} elsif($location =~ /([a-z\s]+),?\s*(United States|USA|US|Canada)$/i) {
+		# Looking for a state/province in Canada or the US
+		my $state = $1;
+		my $country = $2;
+		if($country =~ /Canada/i) {
+			$country = 'CA';
+			if(length($state) > 2) {
+				if(my $twoletterstate = Locale::CA->new()->{province2code}{uc($state)}) {
+					$state = $twoletterstate;
+				}
+			}
+		} else {
+			$country = 'US';
+			if(length($state) > 2) {
+				if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
+					$state = $twoletterstate;
+				}
+			}
+		}
+		if(my $rc = $self->_get("$state$country")) {
+			return $rc;
+		}
 	}
 
 	return unless($OLDCODE);
@@ -913,6 +939,11 @@ sub _get {
 
 	$location =~ s/,\s*//g;
 	my $digest = Digest::MD5::md5_base64(uc($location));
+	if(my $cache = $self->{'cache'}) {
+		if(my $rc = $cache->get_object($digest)) {
+			return Storable::thaw($rc->value());
+		}
+	}
 	my $openaddr_db = $self->{openaddr_db} ||
 		Geo::Coder::Free::DB::openaddresses->new(
 			directory => $self->{openaddr},
@@ -929,6 +960,10 @@ sub _get {
 		$rc->{'latitude'} = delete $rc->{'lat'};
 		$rc->{'longitude'} = delete $rc->{'lon'};
 		# ::diag(Data::Dumper->new([\$rc])->Dump());
+		if(my $cache = $self->{'cache'}) {
+			$cache->set($digest, Storable::freeze($rc), '1 week');
+		}
+			
 		return $rc;
 	}
 }
@@ -952,6 +987,8 @@ sub _normalize {
 		return 'FORT';
 	} elsif(($type eq 'CTR') || ($type eq 'CENTER')) {
 		return 'CENTER';
+	} elsif($type eq 'BLVD') {
+		return 'BLVD';
 	} elsif($type eq 'PIKE') {
 		return 'PIKE';
 	}

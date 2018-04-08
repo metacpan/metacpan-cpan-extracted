@@ -16,15 +16,13 @@ use Test::TempDir::Tiny;
 
 use lib qw(.);
 
-## no critic (RegularExpressions::RequireDotMatchAnything)
-## no critic (RegularExpressions::RequireExtendedFormatting)
-## no critic (RegularExpressions::RequireLineBoundaryMatching)
-## no critic (Subroutines::RequireArgUnpacking)
-
 main();
 
 sub main {
-    if ( !eval { my @x = getpwuid $EUID; 1 } ) {
+
+    # $x is used to suppress warning
+    # $x is used twice to shut up perlcritic
+    if ( !eval { my $x = getpwuid $EUID; $x = 1; 1 } ) {
         plan skip_all => 'The getpwuid function is unimplemented';
     }
 
@@ -113,7 +111,7 @@ sub main {
         my ( $stdout, $stderr, @result ) = capture { App::SSH::SwitchShell::main() };
         is( $result[0], undef, 'main() returns undef (because we mocked _exec)' );
         is( $stdout,    q{},   '... prints nothing to STDOUT' );
-        like( $stderr, qr{^Could not chdir to home '$not_existing_home': }, '... prints that chdir() failed to STDERR' );
+        like( $stderr, "/ ^ \QCould not chdir to home '$not_existing_home':\E /xsm", '... prints that chdir() failed to STDERR' );
         is( $ENV{HOME},  $not_existing_home, '... HOME environment variable is correctly set' );
         is( $ENV{SHELL}, $shell,             '... SHELL environment variable is correctly set' );
         is( cwd(),       $basedir,           '... cwd is not changed because dir does not exist' );

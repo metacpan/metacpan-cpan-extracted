@@ -241,8 +241,8 @@ Bosnian Latin locale.
 
 =head3 Narrow (format)
 
-  p. n. e.
-  n. e.
+  p.n.e.
+  n.e.
 
 =head2 Date Formats
 
@@ -627,19 +627,19 @@ Bosnian Latin locale.
    1995-12-22T09:05:02 = Četvrti kvartal 1995.
   -0010-09-15T04:44:23 = Treći kvartal -10.
 
-=head3 yw-count-few (w. 'sedmica' 'u' Y.)
+=head3 yw-count-few (w. 'sedmica' 'u' y.)
 
    2008-02-05T18:30:30 = 6. sedmica u 2008.
    1995-12-22T09:05:02 = 51. sedmica u 1995.
   -0010-09-15T04:44:23 = 37. sedmica u -10.
 
-=head3 yw-count-one (w. 'sedmica' 'u' Y.)
+=head3 yw-count-one (w. 'sedmica' 'u' y.)
 
    2008-02-05T18:30:30 = 6. sedmica u 2008.
    1995-12-22T09:05:02 = 51. sedmica u 1995.
   -0010-09-15T04:44:23 = 37. sedmica u -10.
 
-=head3 yw-count-other (w. 'sedmica' 'u' Y.)
+=head3 yw-count-other (w. 'sedmica' 'u' y.)
 
    2008-02-05T18:30:30 = 6. sedmica u 2008.
    1995-12-22T09:05:02 = 51. sedmica u 1995.

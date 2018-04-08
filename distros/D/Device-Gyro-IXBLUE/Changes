@@ -1,0 +1,6 @@
+Revision history for Perl extension Device::Gyro::IXBLUE.
+
+0.01  Sat May 11 15:51:16 2013
+	- original version; created by h2xs 1.23 with options
+		-XAn Device::Gyro::IXBLUE
+

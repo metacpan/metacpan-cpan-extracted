@@ -1,0 +1,1 @@
+ok <:=$ENV{SCRIPT_NAME}:> <:=$ENV{SCRIPT_FILENAME}

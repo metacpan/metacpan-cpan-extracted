@@ -131,7 +131,7 @@
     "\N{U+11108}\N{U+11133}\N{U+11122}\N{U+11128}\N{U+1110c}\N{U+11134}\N{U+11111}\N{U+11134}\N{U+1111b}\N{U+1112b}\N{U+11122}\N{U+11134}\N{U+1111d}\N{U+11127}",
     "\N{U+11108}\N{U+11133}\N{U+11122}\N{U+11128}\N{U+1110c}\N{U+11134}\N{U+11111}\N{U+1111b}\N{U+11134}\N{U+11118}\N{U+11127}",
   ],
-  first_day_of_week => 5,
+  first_day_of_week => 7,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
   glibc_date_format => "%m/%d/%y",
   glibc_datetime_format => "%a %b %e %H:%M:%S %Y",
@@ -271,5 +271,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 32,
+  version => 33,
 }

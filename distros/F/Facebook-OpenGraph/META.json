@@ -4,7 +4,7 @@
       "Oklahomer <hagiwara dot go at gmail dot com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v0.15.2",
+   "generated_by" : "Minilla/v3.0.16",
    "license" : [
       "perl_5"
    ],
@@ -28,9 +28,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "CPAN::Meta" : "0",
-            "CPAN::Meta::Prereqs" : "0",
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
@@ -44,6 +42,7 @@
       },
       "runtime" : {
          "requires" : {
+            "CGI" : "0",
             "Data::Recursive::Encode" : "0",
             "Digest::SHA" : "0",
             "Furl" : "0",
@@ -72,7 +71,7 @@
    "provides" : {
       "Facebook::OpenGraph" : {
          "file" : "lib/Facebook/OpenGraph.pm",
-         "version" : "1.23"
+         "version" : "1.24"
       },
       "Facebook::OpenGraph::Response" : {
          "file" : "lib/Facebook/OpenGraph/Response.pm"
@@ -89,7 +88,7 @@
          "web" : "https://github.com/oklahomer/p5-Facebook-OpenGraph"
       }
    },
-   "version" : "1.23",
+   "version" : "1.24",
    "x_contributors" : [
       "Oklahomer <go.hagiwara@facebook.com>",
       "Oklahomer <hagiwara.go@gmail.com>"

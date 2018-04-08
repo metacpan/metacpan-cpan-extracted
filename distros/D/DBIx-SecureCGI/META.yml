@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   DBIx::SecureCGI:
     file: lib/DBIx/SecureCGI.pm
-    version: v3.0.0
+    version: v3.0.1
 requires:
   AnyEvent: '0'
   AnyEvent::DBI::MySQL: v1.0.2
@@ -39,4 +39,5 @@ resources:
   bugtracker: https://github.com/powerman/perl-DBIx-SecureCGI/issues
   homepage: https://github.com/powerman/perl-DBIx-SecureCGI
   repository: https://github.com/powerman/perl-DBIx-SecureCGI.git
-version: v3.0.0
+version: v3.0.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

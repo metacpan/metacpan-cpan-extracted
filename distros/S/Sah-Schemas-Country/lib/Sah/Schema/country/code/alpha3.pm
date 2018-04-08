@@ -1,7 +1,7 @@
 package Sah::Schema::country::code::alpha3;
 
-our $DATE = '2018-03-25'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-04-08'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use Locale::Codes::Country_Codes ();
 
@@ -16,6 +16,8 @@ our $schema = [str => {
     description => <<'_',
 
 Accept only current (not retired) codes. Only alpha-3 codes are accepted.
+
+Code will be converted to lowercase.
 
 _
     match => '\A[a-z]{3}\z',
@@ -38,11 +40,13 @@ Sah::Schema::country::code::alpha3 - Country code (alpha-3)
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schema::country::code::alpha3 (from Perl distribution Sah-Schemas-Country), released on 2018-03-25.
+This document describes version 0.002 of Sah::Schema::country::code::alpha3 (from Perl distribution Sah-Schemas-Country), released on 2018-04-08.
 
 =head1 DESCRIPTION
 
 Accept only current (not retired) codes. Only alpha-3 codes are accepted.
+
+Code will be converted to lowercase.
 
 =head1 HOMEPAGE
 

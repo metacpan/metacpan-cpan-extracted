@@ -1,6 +1,7 @@
 package Lab::Moose::Instrument::SCPI::Sense::Bandwidth;
+$Lab::Moose::Instrument::SCPI::Sense::Bandwidth::VERSION = '3.624';
 #ABSTRACT: Role for the SCPI SENSe:BANDwidth subsystem
-$Lab::Moose::Instrument::SCPI::Sense::Bandwidth::VERSION = '3.623';
+
 use Moose::Role;
 use Lab::Moose::Instrument::Cache;
 use Lab::Moose::Instrument
@@ -32,6 +33,28 @@ sub sense_bandwidth_resolution {
         %args
     );
     $self->cached_sense_bandwidth_resolution($value);
+}
+
+
+cache sense_bandwidth_video => ( getter => 'sense_bandwidth_video_query' );
+
+sub sense_bandwidth_video_query {
+    my ( $self, $channel, %args ) = validated_channel_getter( \@_ );
+
+    return $self->cached_sense_bandwidth_video(
+        $self->query( command => "SENS${channel}:BAND:VIDEO?", %args ) );
+}
+
+sub sense_bandwidth_video {
+    my ( $self, $channel, $value, %args ) = validated_channel_setter(
+        \@_,
+        value => { isa => 'Num' }
+    );
+    $self->write(
+        command => sprintf( "SENS%s:BAND:VIDEO %.17g", $channel, $value ),
+        %args
+    );
+    $self->cached_sense_bandwidth_video($value);
 }
 
 
@@ -70,7 +93,7 @@ Lab::Moose::Instrument::SCPI::Sense::Bandwidth - Role for the SCPI SENSe:BANDwid
 
 =head1 VERSION
 
-version 3.623
+version 3.624
 
 =head1 METHODS
 
@@ -79,6 +102,12 @@ version 3.623
 =head2 sense_bandwidth_resolution
 
 Query/Set the bandwidth resolution (in Hz).
+
+=head2 sense_bandwidth_video_query
+
+=head2 sense_bandwidth_video
+
+Query/Set the video bandwidth (in Hz).
 
 =head2 sense_bandwidth_resolution_select_query
 
@@ -93,6 +122,7 @@ Used by R&S VNAs.
 This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Andreas K. Huettel, Simon Reinhardt
+            2018       Eugeniy E. Mikhailov
 
 
 This is free software; you can redistribute it and/or modify it under

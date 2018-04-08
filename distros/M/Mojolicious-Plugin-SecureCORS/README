@@ -4,35 +4,35 @@ NAME
 
 VERSION
 
-    This document describes Mojolicious::Plugin::SecureCORS version v1.0.4
+    This document describes Mojolicious::Plugin::SecureCORS version v2.0.1
 
 SYNOPSIS
 
-      # in Mojolicious app
-      sub startup {
-        my $app = shift;
-        …
+        # in Mojolicious app
+        sub startup {
+            my $app = shift;
+            …
     
-        # load and configure
-        $app->plugin('SecureCORS');
-        $app->plugin('SecureCORS', { max_age => undef });
+            # load and configure
+            $app->plugin('SecureCORS');
+            $app->plugin('SecureCORS', { max_age => undef });
     
-        # set app-wide CORS defaults
-        $app->routes->to('cors.credentials'=>1);
+            # set app-wide CORS defaults
+            $app->routes->to('cors.credentials'=>1);
     
-        # set default CORS options for nested routes
-        $r = $r->under(…, {'cors.origin' => '*'}, …);
+            # set default CORS options for nested routes
+            $r = $r->under(…, {'cors.origin' => '*'}, …);
     
-        # set CORS options for this route (at least "origin" option must be
-        # defined to allow CORS, either here or in parent routes)
-        $r->get(…, {'cors.origin' => '*'}, …);
-        $r->route(…)->to('cors.origin' => '*');
+            # set CORS options for this route (at least "origin" option must be
+            # defined to allow CORS, either here or in parent routes)
+            $r->get(…, {'cors.origin' => '*'}, …);
+            $r->route(…)->to('cors.origin' => '*');
     
-        # allow non-simple (with preflight) CORS on this route
-        $r->cors(…);
+            # allow non-simple (with preflight) CORS on this route
+            $r->cors(…);
     
-        # create under to protect all nested routes
-        $r = $app->routes->under_strict_cors('/resource');
+            # create under to protect all nested routes
+            $r = $app->routes->under_strict_cors('/resource');
 
 DESCRIPTION
 
@@ -57,146 +57,149 @@ DESCRIPTION
 
 INTERFACE
 
-    CORS options
+ CORS options
 
-      To allow CORS on some route you should define relevant CORS options
-      for that route. These options will be processed automatically using
-      "after_render" in Mojolicious hook and result in adding corresponding
-      HTTP headers to the response.
+    To allow CORS on some route you should define relevant CORS options for
+    that route. These options will be processed automatically using
+    "after_render" in Mojolicious hook and result in adding corresponding
+    HTTP headers to the response.
 
-      Options should be added into default parameters for the route or it
-      parent routes. Defining CORS options on parent route allow you to set
-      some predefined defaults for their nested routes.
+    Options should be added into default parameters for the route or it
+    parent routes. Defining CORS options on parent route allow you to set
+    some predefined defaults for their nested routes.
 
-      'cors.origin' => '*'
+    'cors.origin' => '*'
 
-      'cors.origin' => 'null'
+    'cors.origin' => 'null'
 
-      'cors.origin' => 'http://example.com'
+    'cors.origin' => 'http://example.com'
 
-      'cors.origin' => 'https://example.com http://example.com:8080 null'
+    'cors.origin' => 'https://example.com http://example.com:8080 null'
 
-      'cors.origin' => qr/\.local\z/ms
+    'cors.origin' => qr/\.local\z/ms
 
-      'cors.origin' => undef (default)
+    'cors.origin' => undef (default)
 
-	This option is required to enable CORS support for the route.
+      This option is required to enable CORS support for the route.
 
-	Only matched origins will be allowed to process returned response
-	('*' will match any origin).
+      Only matched origins will be allowed to process returned response
+      ('*' will match any origin).
 
-	When set to false value no origins will match, so it effectively
-	disable CORS support (may be useful if you've set this option value
-	on parent route).
+      When set to false value no origins will match, so it effectively
+      disable CORS support (may be useful if you've set this option value
+      on parent route).
 
-      'cors.credentials' => 1
+    'cors.credentials' => 1
 
-      'cors.credentials' => undef (default)
+    'cors.credentials' => undef (default)
 
-	While handling preflight request true/false value will tell browser
-	to send or not send credentials (cookies, http auth, ssl
-	certificate) with actual request.
+      While handling preflight request true/false value will tell browser
+      to send or not send credentials (cookies, http auth, SSL certificate)
+      with actual request.
 
-	While handling simple/actual request if set to false and browser
-	has sent credentials will disallow to process returned response.
+      While handling simple/actual request if set to false and browser has
+      sent credentials will disallow to process returned response.
 
-      'cors.expose' => 'X-Some'
+    'cors.expose' => 'X-Some'
 
-      'cors.expose' => 'X-Some, X-Other, Server'
+    'cors.expose' => 'X-Some, X-Other, Server'
 
-      'cors.expose' => undef (default)
+    'cors.expose' => undef (default)
 
-	Allow access to these headers while processing returned response.
+      Allow access to these headers while processing returned response.
 
-	These headers doesn't need to be included in this option:
+      These headers doesn't need to be included in this option:
 
-          Cache-Control
-          Content-Language
-          Content-Type
-          Expires
-          Last-Modified
-          Pragma
+        Cache-Control
+        Content-Language
+        Content-Type
+        Expires
+        Last-Modified
+        Pragma
 
-      'cors.headers' => 'X-Requested-With'
+    'cors.headers' => 'X-Requested-With'
 
-      'cors.headers' => 'X-Requested-With, Content-Type, X-Some'
+    'cors.headers' => 'X-Requested-With, Content-Type, X-Some'
 
-      'cors.headers' => qr/\AX-|\AContent-Type\z/msi
+    'cors.headers' => qr/\AX-|\AContent-Type\z/msi
 
-      'cors.headers' => undef (default)
+    'cors.headers' => undef (default)
 
-	Define headers which browser is allowed to send. Work only for
-	non-simple CORS because it require preflight.
+      Define headers which browser is allowed to send. Work only for
+      non-simple CORS because it require preflight.
 
-      'cors.methods' => 'POST'
+    'cors.methods' => 'POST'
 
-      'cors.methods' => 'GET, POST, PUT, DELETE'
+    'cors.methods' => 'GET, POST, PUT, DELETE'
 
-	This option can be used only for cors() route. It's needed in
-	complex cases when it's impossible to automatically detect CORS
-	option while handling preflight - see below for example.
+      This option can be used only for cors() route. It's needed in complex
+      cases when it's impossible to automatically detect CORS option while
+      handling preflight - see below for example.
 
-    $r->cors(…)
+ cors
 
-      Accept same params as "route" in Mojolicious::Routes::Route.
+        $app->routes->cors(...);
 
-      Add handler for preflight (OPTIONS) CORS request - it's required to
-      allow non-simple CORS requests on given path.
+    Accept same params as "route" in Mojolicious::Routes::Route.
 
-      To be able to respond on preflight request this handler should know
-      CORS options for requested method/path. In most cases it will be able
-      to detect them automatically by searching for route defined for same
-      path and HTTP method given in CORS request. Example:
+    Add handler for preflight (OPTIONS) CORS request - it's required to
+    allow non-simple CORS requests on given path.
 
-          $r->cors('/rpc');
-          $r->get('/rpc', { 'cors.origin' => 'http://example.com' });
-          $r->put('/rpc', { 'cors.origin' => qr/\.local\z/ms });
+    To be able to respond on preflight request this handler should know
+    CORS options for requested method/path. In most cases it will be able
+    to detect them automatically by searching for route defined for same
+    path and HTTP method given in CORS request. Example:
 
-      But in some cases target route can't be detected, for example if
-      you've defined several routes for same path using different
-      conditions which can't be checked while processing preflight request
-      because browser didn't sent enough information yet (like
-      Content-Type: value which will be used in actual request). In this
-      case you should manually define all relevant CORS options on
-      preflight route - in addition to CORS options defined on target
-      routes. Because you can't know which one of defined routes will be
-      used to handle actual request, in case they use different CORS
-      options you should use combined in less restrictive way options for
-      preflight route. Example:
+        $r->cors('/rpc');
+        $r->get('/rpc', { 'cors.origin' => 'http://example.com' });
+        $r->put('/rpc', { 'cors.origin' => qr/\.local\z/ms });
 
-          $r->cors('/rpc')->to(
-              'cors.methods'      => 'GET, POST',
-              'cors.origin'       => 'http://localhost http://example.com',
-              'cors.credentials'  => 1,
-          );
-          $r->any([qw(GET POST)] => '/rpc',
-              headers => { 'Content-Type' => 'application/json-rpc' },
-          )->to('jsonrpc#handler',
-              'cors.origin'       => 'http://localhost',
-          );
-          $r->post('/rpc',
-              headers => { 'Content-Type' => 'application/soap+xml' },
-          )->to('soaprpc#handler',
-              'cors.origin'       => 'http://example.com',
-              'cors.credentials'  => 1,
-          );
+    But in some cases target route can't be detected, for example if you've
+    defined several routes for same path using different conditions which
+    can't be checked while processing preflight request because browser
+    didn't sent enough information yet (like Content-Type: value which will
+    be used in actual request). In this case you should manually define all
+    relevant CORS options on preflight route - in addition to CORS options
+    defined on target routes. Because you can't know which one of defined
+    routes will be used to handle actual request, in case they use
+    different CORS options you should use combined in less restrictive way
+    options for preflight route. Example:
 
-      This route use "headers" condition, so you can add your own handler
-      for OPTIONS method on same path after this one, to handle non-CORS
-      OPTIONS requests on same path.
+        $r->cors('/rpc')->to(
+            'cors.methods'      => 'GET, POST',
+            'cors.origin'       => 'http://localhost http://example.com',
+            'cors.credentials'  => 1,
+        );
+        $r->any([qw(GET POST)] => '/rpc',
+            headers => { 'Content-Type' => 'application/json-rpc' },
+        )->to('jsonrpc#handler',
+            'cors.origin'       => 'http://localhost',
+        );
+        $r->post('/rpc',
+            headers => { 'Content-Type' => 'application/soap+xml' },
+        )->to('soaprpc#handler',
+            'cors.origin'       => 'http://example.com',
+            'cors.credentials'  => 1,
+        );
 
-    $route = $r->under_strict_cors(…)
+    This route use "headers" condition, so you can add your own handler for
+    OPTIONS method on same path after this one, to handle non-CORS OPTIONS
+    requests on same path.
 
-      Accept same params as "under" in Mojolicious::Routes::Route.
+ under_strict_cors
 
-      Under returned route CORS requests to any route which isn't
-      configured for CORS (i.e. won't have 'cors.origin' in route's default
-      parameters) will be rendered as "403 Forbidden".
+        $route = $app->routes->under_strict_cors(...)
 
-      This feature should make it harder to attack your site by injecting
-      JavaScript into the victim's browser on vulnerable website. More
-      details:
-      https://code.google.com/p/html5security/wiki/CrossOriginRequestSecurity#Processing_rogue_COR:.
+    Accept same params as "under" in Mojolicious::Routes::Route.
+
+    Under returned route CORS requests to any route which isn't configured
+    for CORS (i.e. won't have 'cors.origin' in route's default parameters)
+    will be rendered as "403 Forbidden".
+
+    This feature should make it harder to attack your site by injecting
+    JavaScript into the victim's browser on vulnerable website. More
+    details:
+    https://code.google.com/p/html5security/wiki/CrossOriginRequestSecurity#Processing_rogue_COR:.
 
 OPTIONS
 
@@ -273,7 +276,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2014 by Alex Efros <powerman@cpan.org>.
+    This software is Copyright (c) 2014- by Alex Efros <powerman@cpan.org>.
 
     This is free software, licensed under:
 

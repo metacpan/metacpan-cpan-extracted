@@ -6,7 +6,9 @@ use autodie;
 use App::Egaz -command;
 use App::Egaz::Common;
 
-use constant abstract => 'raxml wrapper to construct phylogenetic trees';
+sub abstract {
+    return 'raxml wrapper to construct phylogenetic trees';
+}
 
 sub opt_spec {
     return (
@@ -15,7 +17,7 @@ sub opt_spec {
         [ "seed|s=i",      "specify a random number seed", ],
         [ "bootstrap|b=i", "the number of alternative runs",       { default => 100 }, ],
         [ "tmp=s",         "user defined tempdir", ],
-        [ "parallel|p=i",  "number of threads",                    { default => 8 }, ],
+        [ "parallel|p=i",  "number of threads",                    { default => 2 }, ],
         [ "verbose|v",     "verbose mode", ],
         { show_defaults => 1, }
     );
@@ -33,6 +35,7 @@ sub description {
 * <infile> should be a blocked fasta file (*.fas)
 * use `fasops concat` to create a temp relaxed phylip file
 * `raxmlHPC` or `raxmlHPC-*` should be in $PATH
+* `raxml` is very sensitive to CPU resources. Any competitions on cores will dramatically slow down it.
 
 MARKDOWN
 

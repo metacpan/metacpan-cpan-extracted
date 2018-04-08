@@ -1,0 +1,1 @@
+.<: BEGIN{$header{A}="1\n2"} $header{A}=3

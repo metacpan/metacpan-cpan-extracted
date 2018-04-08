@@ -1,7 +1,7 @@
 package Regexp::Pattern;
 
-our $DATE = '2018-03-24'; # DATE
-our $VERSION = '0.2.2'; # VERSION
+our $DATE = '2018-04-03'; # DATE
+our $VERSION = '0.2.3'; # VERSION
 
 use strict 'subs', 'vars';
 #use warnings;
@@ -115,7 +115,7 @@ sub import {
 }
 
 1;
-# ABSTRACT: Collection of regexp patterns
+# ABSTRACT: Convention/framework for modules that contain collection of regexes
 
 __END__
 
@@ -125,7 +125,7 @@ __END__
 
 =head1 NAME
 
-Regexp::Pattern - Collection of regexp patterns
+Regexp::Pattern - Convention/framework for modules that contain collection of regexes
 
 =head1 SPECIFICATION VERSION
 
@@ -133,7 +133,7 @@ Regexp::Pattern - Collection of regexp patterns
 
 =head1 VERSION
 
-This document describes version 0.2.2 of Regexp::Pattern (from Perl distribution Regexp-Pattern), released on 2018-03-24.
+This document describes version 0.2.3 of Regexp::Pattern (from Perl distribution Regexp-Pattern), released on 2018-04-03.
 
 =head1 SYNOPSIS
 
@@ -172,7 +172,7 @@ that is only 1-level deep):
 =head1 DESCRIPTION
 
 Regexp::Pattern is a convention for organizing reusable regexp patterns in
-modules, as well as framework for some convenience in using those patterns in
+modules, as well as framework to provide convenience in using those patterns in
 your program.
 
 =head2 Structure of an example Regexp::Pattern::* module
@@ -244,12 +244,10 @@ description, tags, and so on, for example (taken from L<Regexp::Pattern::CPAN>):
  {
      summary     => 'PAUSE author ID, or PAUSE ID for short',
      pat         => qr/[A-Z][A-Z0-9]{1,8}/,
-     description => <<_,
-
-I'm not sure whether PAUSE allows digit for the first letter. For safety I'm
-assuming no.
-
-_
+     description => <<~HERE,
+     I'm not sure whether PAUSE allows digit for the first letter. For safety
+     I'm assuming no.
+     HERE
  }
 
 =head2 Using a Regexp::Pattern::* module
@@ -314,7 +312,7 @@ Using a string literal is less desirable. That is:
 
  pat => qr/foo[abc]+/,
 
-is preferable over:
+is preferred over:
 
  pat => 'foo[abc]+',
 
@@ -324,7 +322,7 @@ That is:
 
  pat => qr/foo/,
 
-is preferable over:
+is preferred over:
 
  pat => qr/^foo/, # or qr/foo$/, or qr/\Afoo\z/
 
@@ -341,10 +339,9 @@ Adding capture groups limits the reusability of the pattern because it can
 affect the groups of the composed pattern. When composing pattern, user can add
 captures herself if needed.
 
-=item * Regexp pattern should not contain modifiers unless necessary
+When you define an anchored pattern, adding tag C<capturing> is recommended:
 
-An exception to this rule is the /x modifier which is usually recommended for
-longer patterns.
+ tags => ['capturing'],
 
 =back
 

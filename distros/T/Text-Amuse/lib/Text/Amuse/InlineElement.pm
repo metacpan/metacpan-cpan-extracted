@@ -163,7 +163,7 @@ sub stringify {
             return '~';
         }
         elsif ($self->is_html) {
-            return '&nbsp;'
+            return '&#160;'
         }
     }
     elsif ($type eq 'br') {
@@ -192,7 +192,7 @@ sub stringify {
     }
     elsif ($type eq 'verbatim_code') {
         # remove the prefixes
-        warn "<code> is already verbatim! in <$string>" if $string =~ m/<\/?verbatim>/;
+        warn qq{<code> is already verbatim! in "$string"\n} if $string =~ m{<verbatim>.+</verbatim>};
         if ($string =~ /\A=(.+)=\z/s) {
             $string = $1;
         }

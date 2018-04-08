@@ -1,7 +1,7 @@
 package Text::DiffU;
 
-our $DATE = '2017-08-19'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-04-03'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ $SPEC{diff_u} = {
             default => '(seq2)',
         },
         ctx => {
-            schema => 'nonnegint*',
+            schema => 'uint*',
             default => 3,
         },
         hook_format_seq_header => {
@@ -271,7 +271,7 @@ Text::DiffU - Diff two sequences and print unified-style output
 
 =head1 VERSION
 
-This document describes version 0.001 of Text::DiffU (from Perl distribution Text-DiffU), released on 2017-08-19.
+This document describes version 0.002 of Text::DiffU (from Perl distribution Text-DiffU), released on 2018-04-03.
 
 =head1 FUNCTIONS
 
@@ -290,7 +290,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<ctx> => I<nonnegint> (default: 3)
+=item * B<ctx> => I<uint> (default: 3)
 
 =item * B<hook_format_diff_items> => I<code>
 
@@ -386,7 +386,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

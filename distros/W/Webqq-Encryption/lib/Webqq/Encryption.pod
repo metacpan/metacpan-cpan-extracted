@@ -15,7 +15,7 @@ Webqq::Encryption - Webqq Login Encryption Library
 
 =head1 DESCRIPTION
 
-    此模块应用在 L<Mojo::Webqq>中，也可能应用在其他的基于web的腾讯登录页面
+    此模块应用在 Mojo::Webqq 中，也可能应用在其他的基于web的腾讯登录页面
 
     安装方法:
 
@@ -34,7 +34,7 @@ Webqq::Encryption - Webqq Login Encryption Library
 
     3) Ubuntu/MacOS
 
-        apt-get install libcrypt-opensssl-bignum-perl libcrypt-openssl-rsa-perl
+        apt-get install libcrypt-openssl-bignum-perl libcrypt-openssl-rsa-perl
 
 
    2. 在线安装 Webqq::Encryption

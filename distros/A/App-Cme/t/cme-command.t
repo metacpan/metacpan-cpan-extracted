@@ -178,6 +178,15 @@ my @script_tests = (
         args => ['foobar3'],
         test => qr/"\$namefoobar3"/
     },
+    {
+        label => "modification with a script and var section which uses regexp and capture",
+        script => [
+            "app:  popcon",
+            'load: ! MY_HOSTID=aaaaab MY_HOSTID=~s/(a{$times})/$1x$times/',
+        ],
+        args => [qw/--arg times=4/],
+        test => qr/aaaax4ab/
+    },
 );
 
 

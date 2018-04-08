@@ -1,637 +1,185 @@
-NAME
-    App::Env - manage application specific environments
+App::Env
 
-SYNOPSIS
-      # import environment from application1 then application2 into current
-      # environment
-      use App::Env ( $application1, $application2, \%opts );
+App::Env presents a uniform interface to initializing environments for
+applications which require special environments. App::Env only handles
+the loading, merging, and caching of environments; it does not create
+them. That is done within modules for each application suite (e.g.
+App::Env::MyApp). App::Env ships with two such modules, App::Env::Null
+which simply returns a snapshot of the current environment, and
+App::Env::Example, which provides example code for creating an
+application specific environment.
 
-      # import an environment at your leisure
-      use App::Env;
-      App::Env::import( $application, \%opts );
-
-      # set defaults
-      use App::Env ( \%defaults )
-      App::Env::config( %defaults );
-
-      # retrieve an environment but don't import it
-      $env = App::Env->new( $application, \%opts );
-
-      # execute a command in that environment; just as a convenience
-      $env->system( $command );
-
-      # exec a command in that environment; just as a convenience
-      $env->exec( $command );
-
-      # oh bother, just import the environment
-      $env->import;
-
-      # cache this environment as the default for $application
-      $env->cache( 1 );
-
-      # uncache this environment if it is the default for $application
-      $env->cache( 0 );
-
-      # generate a string compatible with the *NIX env command
-      $envstr = $env->str( \%opts );
-
-      # or, stringify it for (mostly) the same result
-      system( 'env -i $env command' );
-
-      # pretend it's a hash; read only, though
-      %ENV = %$env;
-
-DESCRIPTION
-    App::Env presents a uniform interface to initializing environments for
-    applications which require special environments. App::Env only handles
-    the loading, merging, and caching of environments; it does not create
-    them. That is done within modules for each application suite (e.g.
-    App::Env::MyApp). App::Env ships with two such modules, App::Env::Null
-    which simply returns a snapshot of the current environment, and
-    App::Env::Example, which provides example code for creating an
-    application specific environment.
-
-    App::Env is probably most useful in situations where a Perl program must
-    invoke multiple applications each of which may require an environment
-    different and possibly incompatible from the others. The simplified
-    interface it provides makes it useful even in less complicated
-    situations.
+App::Env is probably most useful in situations where a Perl program must
+invoke multiple applications each of which may require an environment
+different and possibly incompatible from the others. The simplified
+interface it provides makes it useful even in less complicated
+situations.
 
   Initializing Application Environments
-    As mentioned above, App::Env does not itself provide the environments
-    for applications; it relies upon application specific Perl modules to do
-    so. Such modules must provide an envs() function which should return a
-    hash reference containing the environment. Application specific options
-    (e.g. version) may be passed to the module.
 
-    See App::Env::Example for information on how to write such modules.
+As mentioned above, App::Env does not itself provide the environments
+for applications; it relies upon application specific Perl modules to do
+so. Such modules must provide an envs() function which should return a
+hash reference containing the environment. Application specific options
+(e.g. version) may be passed to the module.
+
+See App::Env::Example for information on how to write such modules.
 
   Managing Environments
-    In the simplest usage, App::Env can merge ("import") the application's
-    environment directly into the current environment. For situations where
-    multiple incompatible environments are required, it can encapsulate
-    those as objects with convenience methods to easily run applications
-    within those environments.
+
+In the simplest usage, App::Env can merge ("import") the application's
+environment directly into the current environment. For situations where
+multiple incompatible environments are required, it can encapsulate
+those as objects with convenience methods to easily run applications
+within those environments.
 
   Environment Caching
-    Environments are (by default) cached to improve performance; the default
-    cache id is generated from the name of the Perl module which creates the
-    environment and the options passed to it. signature. When a environment
-    is requested its signature is compared against those stored in the cache
-    and if matched, the associated cached environment is returned.
 
-    The cache id is (by default) generated from the full module name
-    (beginning with "App::Env" and including the optional site path -- see
-    "Site Specific Contexts") and the contents of the AppOpts hash passed to
-    the module. If the AppOpts hash is empty, the id is just the module
-    name. The cache id may be explicitly specified with the "CacheID"
-    option.
+Environments are (by default) cached to improve performance; the default
+cache id is generated from the name of the Perl module which creates the
+environment and the options passed to it. signature. When a environment
+is requested its signature is compared against those stored in the cache
+and if matched, the associated cached environment is returned.
 
-    If "CacheID" is set to the string "AppID" the cache id is set to the
-    full module name, ignoring the contents of AppOpts. This is useful if an
-    application wishes to load an environment using special options but make
-    it available under the more generic cache id.
+The cache id is (by default) generated from the full module name
+(beginning with "App::Env" and including the optional site path -- see
+"Site Specific Contexts") and the contents of the AppOpts hash passed to
+the module. If the AppOpts hash is empty, the id is just the module
+name. The cache id may be explicitly specified with the "CacheID"
+option.
 
-    To prevent cacheing, use the "Cache" option. It doesn't prevent App::Env
-    from *retrieving* an existing cached environment -- to do that, use the
-    "Force" option, which will result in a freshly generated environment.
+If "CacheID" is set to the string "AppID" the cache id is set to the
+full module name, ignoring the contents of AppOpts. This is useful if an
+application wishes to load an environment using special options but make
+it available under the more generic cache id.
 
-    To retrieve a cached environment using its cache id use the retrieve()
-    function.
+To prevent caching, use the "Cache" option. It doesn't prevent App::Env
+from *retrieving* an existing cached environment -- to do that, use the
+"Force" option, which will result in a freshly generated environment.
 
-    If multiple applications are loaded via a single call to import or new
-    the applications will be loaded incremently in the order specified. In
-    order to ensure a properly merged environment the applications will be
-    loaded freshly (any caches will be ignored) and the merged environment
-    will be cached. The cache id will by default be generated from all of
-    the names of the environment modules invoked; again, this can be
-    overridden using the CacheID option.
+To retrieve a cached environment using its cache id use the retrieve()
+function.
+
+If multiple applications are loaded via a single call to import or new
+the applications will be loaded incrementally in the order specified. In
+order to ensure a properly merged environment the applications will be
+loaded freshly (any caches will be ignored) and the merged environment
+will be cached. The cache id will by default be generated from all of
+the names of the environment modules invoked; again, this can be
+overridden using the CacheID option.
 
   Application Aliases
-    App::Env performs a case-insensitive search for application modules. For
-    example, if the application module is named App::Env::CIAO, a request
-    for "ciao" will resolve to it.
 
-    Explicit aliases are also possible. A module should be created for each
-    alias with the single class method alias which should return the name of
-    the original application. For example, to make "App3" be an alias for
-    "App1" create the following App3.pm module:
+App::Env performs a case-insensitive search for application modules. For
+example, if the application module is named App::Env::CIAO, a request
+for "ciao" will resolve to it.
 
-      package App::Env::App3;
-      sub alias { return 'App1' };
-      1;
+Explicit aliases are also possible. A module should be created for each
+alias with the single class method alias which should return the name of
+the original application. For example, to make "App3" be an alias for
+"App1" create the following App3.pm module:
 
-    The aliased environment can provide presets for AppOpts by returning a
-    hash as well as the application name:
+  package App::Env::App3;
+  sub alias { return 'App1' };
+  1;
 
-      package App::Env::ciao34;
-      sub alias { return 'CIAO', { Version => 3.4 } };
-      1;
+The aliased environment can provide presets for AppOpts by returning a
+hash as well as the application name:
 
-    These will be merged with any "AppOpts" passed in via import(), with the
-    latter taking precedence.
+  package App::Env::ciao34;
+  sub alias { return 'CIAO', { Version => 3.4 } };
+  1;
+
+These will be merged with any "AppOpts" passed in via import(), with the
+latter taking precedence.
 
   Site Specific Contexts
-    In some situations an application's environment will depend upon which
-    host or network it is executed on. In such instances App::Env provides a
-    means for loading an alternate application module. It does this by
-    loading the first existant module from the following set of module
-    names:
 
-      App::Env::$SITE::$app
-      App::Env::$app
+In some situations an application's environment will depend upon which
+host or network it is executed on. In such instances App::Env provides a
+means for loading an alternate application module. It does this by
+loading the first existent module from the following set of module
+names:
 
-    The $SITE variable is taken from the environment variable APP_ENV_SITE
-    if it exists, or from the Site option to the class import() function or
-    the new() object constructor. Additionally, if the APP_ENV_SITE
-    environemnt variable does *not exist* (it is not merely empty), App::Env
-    will first attempt to load the App::Env::Site module, which can set the
-    APP_ENV_SITE environment variable.
+  App::Env::$SITE::$app
+  App::Env::$app
 
-    Take as an example the situation where an application's environment is
-    stored in /usr/local/myapp/setup on one host and /opt/local/myapp/setup
-    on another. One could include logic in a single "App::Env::myapp" module
-    which would recognize which file is appropriate. If there are multiple
-    applications, this gets messy. A cleaner method is to have separate
-    site-specific modules (e.g. "App::Env::LAN1::myapp" and
-    "App::Env::LAN2::myapp"), and switch between them based upon the
-    APP_ENV_SITE environment variable.
+The $SITE variable is taken from the environment variable APP_ENV_SITE
+if it exists, or from the Site option to the class import() function or
+the new() object constructor. Additionally, if the APP_ENV_SITE
+environment variable does *not exist* (it is not merely empty), App::Env
+will first attempt to load the App::Env::Site module, which can set the
+APP_ENV_SITE environment variable.
 
-    The logic for setting that variable might be encoded in an
-    App::Env::Site module to transparenlty automate things:
+Take as an example the situation where an application's environment is
+stored in /usr/local/myapp/setup on one host and /opt/local/myapp/setup
+on another. One could include logic in a single "App::Env::myapp" module
+which would recognize which file is appropriate. If there are multiple
+applications, this gets messy. A cleaner method is to have separate
+site-specific modules (e.g. "App::Env::LAN1::myapp" and
+"App::Env::LAN2::myapp"), and switch between them based upon the
+APP_ENV_SITE environment variable.
 
-      package App::Env::Site;
+The logic for setting that variable might be encoded in an
+App::Env::Site module to transparently automate things:
 
-      my %LAN1 = map { ( $_ => 1 ) } qw( sneezy breezy queasy );
-      my %LAN2 = map { ( $_ => 1 ) } qw( dopey  mopey  ropey  );
+  package App::Env::Site;
 
-      use Sys::Hostname;
+  my %LAN1 = map { ( $_ => 1 ) } qw( sneezy breezy queasy );
+  my %LAN2 = map { ( $_ => 1 ) } qw( dopey  mopey  ropey  );
 
-      if ( $LAN1{hostname()} )
-      {
-        $ENV{APP_ENV_SITE} = 'LAN1';
-      }
-      elsif ( $LAN2{hostname()} )
-      {
-        $ENV{APP_ENV_SITE} = 'LAN2';
-      }
+  use Sys::Hostname;
 
-      1;
+  if ( $LAN1{hostname()} )
+  {
+    $ENV{APP_ENV_SITE} = 'LAN1';
+  }
+  elsif ( $LAN2{hostname()} )
+  {
+    $ENV{APP_ENV_SITE} = 'LAN2';
+  }
+
+  1;
 
   The Null Environment
-    App::Env provides the "null" environment, which simply returns a
-    snapshot of the current environment. This may be useful to provide
-    fallbacks in case an application specific environment was not found, but
-    the code should fallback to using the existing environment.
 
-      $env = eval { App::Env->new( "MyApp" ) } \
-         // App::Env->new( "null", { Force => 1, Cache => 0 } );
+App::Env provides the "null" environment, which simply returns a
+snapshot of the current environment. This may be useful to provide
+fall-backs in case an application specific environment was not found,
+but the code should fallback to using the existing environment.
 
-    As the "null" environment is a *snapshot* of the current environment, if
-    future "null" environments should reflect the environment at the time
-    they are constructed, C"null" environments should not be cached (e.g.
-    "Cache => 0"). The "Force => 1" option is specified to ensure that the
-    environment is not being read from cache, just in case a prior "null"
-    environment was inadvertently cached.
+  $env = eval { App::Env->new( "MyApp" ) } \
+     // App::Env->new( "null", { Force => 1, Cache => 0 } );
 
-INTERFACE
-    App::Env may be used to directly import an application's environment
-    into the current environment, in which case the non-object oriented
-    interface will suffice.
+As the "null" environment is a *snapshot* of the current environment, if
+future "null" environments should reflect the environment at the time
+they are constructed, C"null" environments should not be cached (e.g.
+"Cache => 0"). The "Force => 1" option is specified to ensure that the
+environment is not being read from cache, just in case a prior "null"
+environment was inadvertently cached.
 
-    For more complicated uses, the object oriented interface allows for
-    manipulating multiple separate environments.
+INSTALLATION
 
-  Using App::Env without objects
-    Application environments may be imported into the current environment
-    either when loading App::Env or via the App::Env::import() function.
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-    import
-          use App::Env ( $application, \%options );
-          use App::Env ( @applications, \%shared_options );
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-          App::Env::import( $application, \%options );
-          App::Env::import( @applications, \%shared_options );
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-        Import the specified applications.
-
-        Options may be applied to specific applications by grouping
-        application names and option hashes in arrays:
-
-          use App::Env ( [ 'app1', \%app1_options ],
-                         [ 'app2', \%app2_options ],
-                         \%shared_options );
-
-          App::Env::import( [ 'app1', \%app1_options ],
-                            [ 'app2', \%app2_options ],
-                            \%shared_options );
-
-        Shared (or default) values for options may be specified in a hash
-        passed as the last argument.
-
-        The available options are listed below. Not all options may be
-        shared; these are noted.
-
-        AppOpts *hashref*
-            This is a hash of options to pass to the
-            "App::Env::<application>" module. Their meanings are application
-            specific.
-
-            This option may not be shared.
-
-        Force *boolean*
-            Don't use the cached environment for this application.
-
-        Site
-            Specify a site. See "Application Environments" for more
-            information
-
-        Cache *boolean*
-            Cache (or don't cache) the environment. By default it is cached.
-            If multiple environments are loaded the *combination* is also
-            cached.
-
-        CacheID
-            A unique name for the environment. See "Environment Caching" for
-            more information.
-
-            When used as a shared option for multiple applications, this
-            will be used to identify the merged environment. If set to the
-            string "AppID", the full module name will be used as the cache
-            id (ignoring the contents of the AppOpts option hash).
-
-        SysFatal *boolean*
-            If true, the system, qexec, and capture object methods will
-            throw an exception if the passed command exits with a non-zero
-            error.
-
-        Temp *boolean*
-            If true, and the requested environment does not exist in the
-            cache, create it but do not cache it (this overrides the Cache
-            option). If the requested environment does exist in the cache,
-            return an uncached clone of it. The following options are
-            updated in the cloned environment:
-
-              SysFatal
-
-    retrieve
-          $env = App::Env::retrieve( $cacheid );
-
-        Retrieve the environment with the given cache id, or undefined if it
-        doesn't exist.
-
-  Managing Environments
-    config
-          App::Env::config( %Defaults );
-
-        Configure default options for environments. See "Changing Default
-        Option Values" for more information.
-
-    uncache
-          App::Env::uncache( App => $app, [ Site => $site ] )
-          App::Env::uncache( CacheID => $cacheid )
-
-        Delete the cache entry for the given application. If "Site" is not
-        specified, the site is determined as specified in "Site Specific
-        Contexts".
-
-        It is currently *not* possible to use this interface to explicitly
-        uncache multi-application environments if they have not been given a
-        unique cache id. It is possible using App::Env objects.
-
-        The available options are:
-
-        App The application name. This may not be specified if CacheID is
-            specified.
-
-        Site
-            If the Site option was used when first loading the environment,
-            it must be specified here in order to delete the correct cache
-            entry. Do not specify this option if CacheID is specified.
-
-        CacheID
-            If the CacheID option was used to provide a cache key for the
-            cache entry, this must be specified here. Do not specify this
-            option if App or Site are specified.
-
-        All If true uncache all of the cached environments.
-
-  Using App::Env objects
-    App::Env objects give greater flexibility when dealing with multiple
-    applications with incompatible environments.
-
-   Constructors
-    new
-          $env = App::Env->new( ... )
-
-        new takes the same arguments as App::Env::import and returns an
-        App::Env object. It does not modify the environment.
-
-    clone
-          $clone = $app->clone( \%opts );
-
-        Clone an existing environment. The available options are "CacheID",
-        "Cache", "SysFatal" (see the documentation for the import function).
-
-        The cloned environment is by default not cached. If caching is
-        requested and a cache id is not provided, a unique id is created --
-        it will *not* be the same as that of the original environment.
-
-        This generated cache id is not based on a signature of the
-        environment, so this environment will effectively not be
-        automatically reused when a similar environment is requested via the
-        new constructor (see "Environment Caching").
-
-   Overloaded operators
-    App::Env overloads the %{} and "" operators. When dereferenced as a hash
-    an App::Env object returns a hash of the environmental variables:
-
-      %ENV = %$env;
-
-    When interpolated in a string, it is replaced with a string suitable for
-    use with the *NIX env command; see the str() method below for its
-    format.
-
-   Methods
-    cache
-          $env->cache( $cache_state );
-
-        If $cache_state is true, cache this environment using the object's
-        cache id. If $cache_state is false and this environment is being
-        cached, delete the cache.
-
-        Note that only the original App::Env object which cached the
-        environment may delete it. Objects which reuse existing, cached,
-        environments cannot.
-
-    cacheid
-          $cacheid = $env->cacheid;
-
-        Returns the cache id for this environment.
-
-    env
-          # return a hashref of the entire environment (similar to %{$env})
-          $hashref = $env->env( );
-
-          # return the value of a given variable in the environment
-          $value = $env->env( $variable_name )
-
-          # return an array of values of particular variables.
-          # names should be strings
-          @values = $env->env( @variable_names );
-
-          # match variable names and return a hashref
-          $hashref = $env->env( @match_specifications );
-
-          # exclude specific variables
-          $hashref = $env->env( { Exclude => $match_spec   } );
-          $hashref = $env->env( { Exclude => \@match_specs } );
-          $hashref = $env->env( @match_specs, { Exclude => $match_spec   } );
-          $hashref = $env->env( @match_specs, { Exclude => \@match_specs } );
-
-        Return all or parts of the environment. What is returned depends
-        upon the type of argument and which of the following contexts
-        matches:
-
-        1   If called with no arguments (or just an Exclude option, as
-            discussed below) return a hashref containing the environment.
-
-        2   If called in a scalar context and passed a single variable name
-            (which must be a string) return the value for that variable, or
-            *undef* if it is not in the environment.
-
-        3   If called in a list context and passed a list of variable names
-            (which must be strings) return an array of values for those
-            variables (*undef* for those not in the environment).
-
-        4   If called in a scalar context and passed one or more *match
-            specifications*, return a hashref containing the subset of the
-            environment which matches. The "Exclude" option (see below) may
-            be present.
-
-            A *match specification* may be a string, (for an exact match of
-            a variable name), a regular expression created with the qr
-            operator, or a subroutine reference. The subroutine will be
-            passed two arguments, the variable name and its value, and
-            should return true if the variable should be excluded, false
-            otherwise.
-
-            To avoid mistaking this context for context 1 if the *match
-            specification* is a single string, enclose it in an array, e.g.
-
-               # this is context 1
-               $value = $env->env( $variable_name );
-
-               # this is context 3
-               $hash = $env->env( [ $variable_name ] );
-
-        Variable names may be excluded from the list by passing a hash with
-        the key "Exclude" as the last argument (valid only in contexts 0 and
-        3). The value is either a scalar or an arrayref composed of match
-        specifications (as an arrayref) as described in context 3.
-
-    setenv
-          # set an environmental variable
-          $env->setenv( $var, $value );
-
-          # delete an environmetal variable
-          $env->setenv( $var );
-
-        If $value is present, assign it to the named environmental variable.
-        If it is not present, delete the variable.
-
-        Note: If the environment refers to a cached environment, this will
-        affect all instances of the environment which share the cache.
-
-    module
-          $module = $env->module;
-
-        This returns the name of the module which was used to load the
-        environment. If multiple modules were used, the names are
-        concatenated, seperated by the $; (subscript separator) character.
-
-    str
-          $envstr = $env->str( @match_specifications, \%options );
-
-        This function returns a string which may be used with the *NIX env
-        command to set the environment. The string contains space separated
-        "var=value" pairs, with shell magic characters escaped.
-
-        The environment may be pared down by passing *match specifications*
-        and an "Exclude" option; see the documentation for the env method,
-        context 3, for more information.
-
-        Because the TERMCAP environment variable is often riddled with
-        escape characters, which are not always handled well by shells, the
-        TERMCAP variable is *always* excluded unless it is explicitly
-        included via an exact variable name match specification. For
-        example,
-
-          $envstr = $env->str( qr/.*/, 'TERMCAP );
-
-        is the only means of getting all of the environment returned.
-
-    system
-          $env->system( $command, @args );
-
-        This runs the passed command in the environment defined by $env. It
-        has the same argument and returned value convention as the core Perl
-        system command.
-
-        If the SysFatal flag is set for this environment,
-        IPC::System::Simple::system is called, which will cause this method
-        to throw an exception if the command returned a non-zero exit value.
-        It also avoid invoking a shell to run the command if possible.
-
-    exec
-          $env->exec( $command, @args );
-
-        This execs the passed command in the environment defined by $env. It
-        has the same argument and returned value convention as the core Perl
-        exec command.
-
-    qexec
-          $output = $env->qexec( $command, @args );
-          @lines = $env->qexec( $command, @args );
-
-        This acts like the qx{} Perl operator. It executes the passed
-        command in the environment defined by $env and returns its
-        (standard) output. If called in a list context the output is split
-        into lines.
-
-        If the SysFatal flag is set for this environment,
-        IPC::System::Simple::capture is called, which will cause this method
-        to throw an exception if the command returned a non-zero exit value.
-        It also avoid invoking a shell to run the command if possible.
-
-    capture
-          $stdout = $env->capture( $command, @args );
-          ($stdout, $stderr) = $env->capture( $command, @args );
-
-        Execute the passed command in the environment defined by $env and
-        returns content of its standard output and (optionally) standard
-        error streams.
-
-        If the SysFatal flag is set for this environment,
-        IPC::System::Simple::capture is called, which will cause this method
-        to throw an exception if the command returned a non-zero exit value.
-        It also avoid invoking a shell to run the command if possible.
-
-  Changing Default Option Values
-    Default values for some options may be changed via any of the following:
-
-    *   Passing a hashref as the only argument when initially importing the
-        package:
-
-          use App::Env \%Default;
-
-    *   Calling the config function:
-
-          App::Env::config( %Default );
-
-    The following options may have their default values changed:
-
-      Force  Cache  Site  SysFatal
-
-EXAMPLE USAGE
-  A single application
-    This is the simplest case. If you don't care if you "pollute" the
-    current environment, then simply
-
-      use App::Env qw( ApplicationName );
-
-  A single application with options
-    If the CIAO environment module provides a "Version" option:
-
-      use App::Env ( 'CIAO', { AppOpts => { Version => 3.4 } } );
-
-  Two compatible applications
-    If two applications can share an environment, and you don't mind
-    changing the current environment;
-
-      use App::Env qw( Application1 Application2 );
-
-    If you need to preserve the environment you need to be a little more
-    circumspect.
-
-      $env = App::Env->new( qw( Application1 Application 2 ) );
-      $env->system( $command1, @args );
-      $env->system( $command2, @args );
-
-    or even
-
-      $env->system( "$command1 | $command2" );
-
-    Or,
-
-      {
-        local %ENV = %$env;
-        system( $command1);
-      }
-
-    if you prefer not to use the system method.
-
-  Two incompatible applications
-    If two applications can't share the environment, you'll need to load
-    them seperately:
-
-      $env1 = App::Env->new( 'Application1' );
-      $env2 = App::Env->new( 'Application2' );
-
-      $env1->system( $command1 );
-      $env2->system( $command2 );
-
-    Things are trickier if you need to construct a pipeline. That's where
-    the *NIX env command and App::Env object stringification come into play:
-
-      system( "env -i $env1 $command1 | env -i $env2 $command2" );
-
-    This hopefully won't overfill the shell's command buffer. If you need to
-    specify only parts of the environment, use the str method to explicitly
-    create the arguments to the env command.
-
-  Localizing changes to an environment
-    In some contexts an environment must be customized but the changes
-    shouldn't propagate into the (possibly) cached version. A good example
-    of this is in sandboxing functions which may manipulate an environment.
-
-    The new() constructor doesn't indicate whether an environment was
-    freshly constructed or pulled from cache, so the user can't tell if
-    manipulating it will affect other code paths. One way around this is to
-    force construction of a fresh environment using the "Force" option and
-    turning off caching via the "Cache" option.
-
-    This guarantees isolation but is inefficient (if a compatible
-    environment is cached it won't be used) and any tweaks made to the
-    environment by the application are not seen. Instead, use the "Temp"
-    option; this will either create a new environment if none exists or
-    clone an existing one. In either case the result won't be cached and any
-    changes will be localized.
-
-BUGS AND LIMITATIONS
-    No bugs have been reported.
-
-    Please report any bugs or feature requests to "bug-app-env@rt.cpan.org",
-    or through the web interface at
-    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-Env>.
-
-    The cache id is generated from the contents of the AppOpts hash by
-    freezing it with Storable::freeze and either generating a digest using
-    Digest (if the proper modules are available) or using it directly. This
-    may cause strangeness if AppOpts contains data or objects which do not
-    freeze well.
-
-SEE ALSO
-    appexec
-
-AUTHOR
-    Diab Jerius, <djerius@cpan.org>
+  perl Makefile.PL
+  make
+  make test
+  make install
 
 COPYRIGHT AND LICENSE
-    Copyright 2007-2015 Smithsonian Astrophysical Observatory
 
-    This software is released under the GNU General Public License. You may
-    find a copy at
+This software is Copyright (c) 2018 by Smithsonian Astrophysical
+Observatory.
 
-              http://www.gnu.org/licenses
+This is free software, licensed under:
 
+  The GNU General Public License, Version 3, June 2007

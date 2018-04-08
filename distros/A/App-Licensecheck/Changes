@@ -7,6 +7,44 @@ Home page:    <https://metacpan.org/pod/App::Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.0.36	2018-04-05
+
+ - Limit to compile only trait patterns actually used.
+ - Match name alone, before recompiled custom regexes.
+ - Simplify AGPL-related pattern slightly.
+ - Sort license keys once.
+ - Tighten apache pattern slightly.
+ - Tighten gpl pattern.
+ - Track matches in hash (not array).
+ - Use Regexp::Pattern::License trait patterns any_of licensed_under
+   or_at_option version version_numberstring.
+
+v3.0.35	2018-03-30
+
+ [ Bug Fixes ]
+ - Fix tolerate alternative regexp compilers.
+
+ [ Test Suite ]
+ - Adapt testsuite for detecting uppercase GPL or LGPL post
+   Regexp::Pattern::License v3.1.0.
+ - Adapt testsuite for detection of FSFULLR post Regexp::Pattern::License
+   v3.1.0.
+ - Adapt testsuite for improved detection since Regexp::Pattern::License
+   v3.1.0.
+ - Adapt testsuite for renamed pattern kevlin-henney → Kevlin-Henney post
+   Regexp::Pattern::License v3.1.0.
+ - Adapt testsuite for renamed pattern khronos → Khronos post
+   Regexp::Pattern::License v3.1.0.
+ - Testsuite: Improve workarounds for license
+   zlib-acknowledgement/Nunit/NUnit.
+ - Testsuite: Tolerate Aladdin License mis-categorized as unversioned by
+   SPDX, as reflected post Regexp::Pattern::License v3.1.0.
+
+ [ Other ]
+ - Improve license patterns cecill_b cecill_c to detect more forms
+   (previously misdetected as cecill).
+ - Use Regexp::Pattern::License subject patterns.
+
 v3.0.34	2018-03-29
 
  [ Bug Fixes ]

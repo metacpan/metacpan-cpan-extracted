@@ -1,0 +1,191 @@
+NAME
+
+    Memorator - Remind of events via Minion
+
+VERSION
+
+    This document describes Memorator version 0.006.
+
+SYNOPSIS
+
+       use Minion;
+       my $minion = Minion->new(...);
+    
+       use Memorator;
+       my $memorator = Memorator->create(
+          alert_callback => sub {
+             my $id = shift;
+             print "notification for id <$id>\n";
+             return;
+          },
+          minion => $minion,
+          name => 'memorator', # this is the default
+       );
+    
+       $minion->enqueue(memorator_process_update =>
+          {
+             id => 'id-001',       # identifier meaningful for you
+             epoch => (time + 30), # when you want the alert
+             attempts => 5,        # how many retries before giving up
+          }
+       );
+
+DESCRIPTION
+
+      memorātor
+
+	  * imperative passive future of verb memorāre, can be translated
+	  like you will be reminded (see
+	  https://en.wiktionary.org/wiki/memoro, expand section on
+	  Inflection).
+
+	  * nominative singular of memorātor, male third descension, can be
+	  translated like someone who mentions (see
+	  https://en.wiktionary.org/wiki/memorator)
+
+    This module allows you to set alerts for some events you need to be
+    warned of. It's as simple as asking an alarm to ring at a certain
+    date/time.
+
+    The module leverages on Minion for the heavylifting. It's actually a
+    thin API on top of it, installing two tasks which by default go under
+    the names memorator_process_update and memorator_process_alert
+    (although you can change the memorator part using "name").
+
+    The interaction model is simple:
+
+      * you create an object with an "alert_callback" and a minion object
+      that will do the hard work. The "alert_callback" is where you will
+      implement your logic for when the alert expires;
+
+      * you enqueue updates to set new alarms or modify existing ones,
+      based on an identifier that is meaningful for you;
+
+      * at the expiration of the alarm time, the "alert_callback" is called
+      with the specific identifier, so that you can figure out what has to
+      be done next.
+
+    To add a new reminder, or change an existing one, you use
+    memorator_process_update passing a hash reference like this:
+
+       $minion->enqueue(memorator_process_update =>
+          {
+             eid => 'id-001',      # identifier meaningful for you
+             epoch => (time + 30), # when you want the alert
+             attempts => 5,        # how many retries before giving up
+          }
+       );
+
+    You can also set alerts directly, without the mediation of Minion,
+    using "set_alert":
+
+       $memorator->set_alert(\%same_hashref_as_before);
+
+    See "set_alert" for the allowed keys.
+
+METHODS
+
+ alert_callback
+
+       my $sub_reference = $obj->alert_callback;
+       $obj->alert_callback(sub {...});
+
+    accessor for the callback to be run when an alert has to be sent. It is
+    mandatory to set this before the first alert is sent. Can be set in the
+    constructor.
+
+    The callback will be invoked like follows:
+
+       $callback->($identifier);
+
+    where $identifier is a meaningful identifier for your applications
+    (which is also the identifier passed upon creation of the event).
+
+ minion
+
+       my $minion = $obj->minion;
+       $obj->minion($minion_instance);
+
+    accessor for the Minion used behind the scenes. Note that in callbacks
+    called in jobs the minion instance will be drawn from the jobs
+    themselves, as it might prove to be fresher.
+
+ name
+
+       my $name = $obj->name;
+       $obj->name($new_name);
+
+    accessor for a name for generating local names of tables in the
+    database, as well as task names in Minion. This allows you to have more
+    instances living inside the same Minion, should you ever need to do
+    this. Defaults to memorator. Can be set in the constructor.
+
+ new
+
+       my $obj = Memorator->new(%args);
+       my $obj = Memorator->new(\%args);
+
+    constructor. The recognized keys in %args correspond to accessors
+    "alert_callback" (mandatory), "minion" (mandatory) and "name"
+    (optional).
+
+ remove_alert
+
+       $obj->remove_alert(\%hashref); # OR
+       $obj->remove_alert($eid);
+
+    remove an alert. You can pass either a hash reference compatible with
+    "set_alert", or the external identifier for which you don't need the
+    alert any more. Returns nothing.
+
+ set_alert
+
+       $obj->set_alert(\%hashref);
+
+    Set an alert. The following keys are supported:
+
+    attempts
+
+      how many times Minion will retry upon failure of your callback. In
+      this case, failure means thrown exception.
+
+    epoch
+
+      the UTC epoch at which you want the alert callback to be triggered.
+      If this field is missing, the alert will be removed.
+
+    id
+
+      the identifier for your event, which can help you retrieve the
+      details of your event somewhere else. It has a textual form, so you
+      might want to abuse it to store more data (e.g. some JSON data); just
+      keep in mind that it is treated as an opaque identifier, i.e. a
+      string that is compared to other strings for equality.
+
+    You don't need to call this directly if you use Minion for enqueuing
+    alerts via memorator_process_update (or whatever name the task has,
+    based on "name").
+
+BUGS AND LIMITATIONS
+
+    Report bugs through GitHub (patches welcome).
+
+SEE ALSO
+
+    Minion.
+
+AUTHOR
+
+    Flavio Poletti <polettix@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2018 by Flavio Poletti <polettix@cpan.org>
+
+    This module is free software. You can redistribute it and/or modify it
+    under the terms of the Artistic License 2.0.
+
+    This program is distributed in the hope that it will be useful, but
+    without any warranty; without even the implied warranty of
+    merchantability or fitness for a particular purpose.
+

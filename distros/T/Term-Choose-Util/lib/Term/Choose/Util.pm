@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.061';
+our $VERSION = '0.062';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu insert_sep
                      length_longest print_hash term_size term_width unicode_sprintf unicode_trim );
@@ -125,7 +125,7 @@ sub _prepare_opt_choose_path {
         confirm      => ' OK ',
         add_dir      => ' ++ ',
         up           => ' .. ',
-        file         => ' >F ',
+        choose_file => ' >F ',
         back         => ' << ',
         decoded      => 1,
     };
@@ -156,7 +156,7 @@ sub choose_a_file {
 sub _choose_a_path {
     my ( $opt, $a_file ) = @_;
     my ( $o, $dir ) = _prepare_opt_choose_path( $opt );
-    my @pre = ( undef, ( $a_file ? $o->{file} : $o->{confirm} ), $o->{up} );
+    my @pre = ( undef, ( $a_file ? $o->{choose_file} : $o->{confirm} ), $o->{up} );
     my $default_idx = $o->{enchanted}  ? 2 : 0;
     my $previous = $dir;
     my $wildcard = ' ? ';
@@ -207,7 +207,7 @@ sub _choose_a_path {
             return decode 'locale_fs', $previous if $o->{decoded};
             return $previous;
         }
-        elsif ( $choice eq $o->{file} ) {
+        elsif ( $choice eq $o->{choose_file} ) {
             my $file = _a_file( $o, $dir, $wildcard );
             next if ! length $file;
             return decode 'locale_fs', $file if $o->{decoded};
@@ -296,17 +296,16 @@ sub choose_a_number {
         $digits = 7;
     }
     $opt = {} if ! defined $opt;
-    my $prompt     = $opt->{prompt};
     my $info       = defined $opt->{info}         ? $opt->{info}         : '';
-    my $name       = $opt->{name};
-    my $thsd_sep   = defined $opt->{thsd_sep}     ? $opt->{thsd_sep}     : ',';
-
+    my $prompt     =         $opt->{prompt};
+    my $name       =         $opt->{name};
     my $clear      = defined $opt->{clear_screen} ? $opt->{clear_screen} : 0;
+    my $small      = defined $opt->{small_on_top} ? $opt->{small_on_top} : 0;
+    my $thsd_sep   = defined $opt->{thsd_sep}     ? $opt->{thsd_sep}     : ',';
     my $mouse      = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
-    my $small      = defined $opt->{small}        ? $opt->{small}        : 0;     # small # experimental
-    #-------------------------------------------#
     my $back       = defined $opt->{back}         ? $opt->{back}         : '<<'; #'BACK';
     my $confirm    = defined $opt->{confirm}      ? $opt->{confirm}      : 'OK'; #'CONFIRM';
+    #-------------------------------------------#
     my $back_short = defined $opt->{back_short}   ? $opt->{back_short}   : '<<';
     my $reset      = defined $opt->{reset}        ? $opt->{reset}        : 'reset';
     my $tab        = '  -  ';
@@ -409,25 +408,23 @@ sub choose_a_number {
 
 sub choose_a_subset {
     my ( $available, $opt ) = @_;
-    $opt = {} if ! defined $opt; # check ?
-    my $show_fmt    = defined $opt->{show_fmt}     ? $opt->{show_fmt}     : 0;      # experimental # fmt_info
-    my $keep_chosen = defined $opt->{keep_chosen}  ? $opt->{keep_chosen}  : 1;      # experimental
-    my $mark        = $opt->{mark};                                                 # experimental
-    my $info        = defined $opt->{info}         ? $opt->{info}         : '';
-    my $name        = $opt->{name};                                                 # docu
-    my $prompt      = $opt->{prompt};
-    my $index       = defined $opt->{index}        ? $opt->{index}        : 0;
-    my $clear       = defined $opt->{clear_screen} ? $opt->{clear_screen} : 0;
-    my $mouse       = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
-    my $layout      = defined $opt->{layout}       ? $opt->{layout}       : 3;
-    my $order       = defined $opt->{order}        ? $opt->{order}        : 1;
-    my $prefix      = defined $opt->{prefix}       ? $opt->{prefix}       : ( $layout == 3 ? '  ' : '' );
-    my $justify     = defined $opt->{justify}      ? $opt->{justify}      : 0;
+    $opt = {} if ! defined $opt;
+    my $info          = defined $opt->{info}          ? $opt->{info}          : '';
+    my $name          =         $opt->{name};
+    my $prompt        =         $opt->{prompt};
+    my $fmt_chosen    = defined $opt->{fmt_chosen}    ? $opt->{fmt_chosen}    : 0;
+    my $remove_chosen = defined $opt->{remove_chosen} ? $opt->{remove_chosen} : 1;
+    my $mark          =         $opt->{mark};
+    my $index         = defined $opt->{index}         ? $opt->{index}         : 0;
+    my $clear         = defined $opt->{clear_screen}  ? $opt->{clear_screen}  : 0;
+    my $mouse         = defined $opt->{mouse}         ? $opt->{mouse}         : 0;
+    my $layout        = defined $opt->{layout}        ? $opt->{layout}        : 3;
+    my $order         = defined $opt->{order}         ? $opt->{order}         : 1;
+    my $prefix        = defined $opt->{prefix}        ? $opt->{prefix}        : ( $layout == 3 ? '  ' : '' );
+    my $justify       = defined $opt->{justify}       ? $opt->{justify}       : 0;
+    my $confirm       = defined $opt->{confirm}       ? $opt->{confirm}       : ( ' ' x length $prefix ) . '-OK-';
+    my $back          = defined $opt->{back}          ? $opt->{back}          : ( ' ' x length $prefix ) . ' << ';
     #--------------------------------------#
-    #my $confirm     = defined $opt->{confirm}     ? $opt->{confirm}     : ( $layout == 3 ? ( ' ' x length $prefix ) . 'CONFIRM' : '-OK-' );
-    #my $back        = defined $opt->{back}        ? $opt->{back}        : ( $layout == 3 ? ( ' ' x length $prefix ) . 'BACK'    : '<<'   );
-    my $confirm     = defined $opt->{confirm}     ? $opt->{confirm}     : ( ' ' x length $prefix ) . '[OK]';
-    my $back        = defined $opt->{back}        ? $opt->{back}        : ( ' ' x length $prefix ) . '[<<]';
     #my $subseq_tab = 4;
     #my $subseq_tab = print_columns( $name || '  ' );
     my $new_idx =[];
@@ -439,7 +436,7 @@ sub choose_a_subset {
         if ( length $info ) {
             push @tmp, $info;
         }
-        if ( $show_fmt == 0 ) {
+        if ( $fmt_chosen == 0 ) {
             $name = '> ' if ! defined $name;
             push @tmp,  $name . join( ', ', map { defined $_ ? $_ : '' } @{$available}[@$new_idx] );
         }
@@ -475,7 +472,7 @@ sub choose_a_subset {
         my @tmp_idx;
         for my $i ( reverse @idx ) {
             $i -= @pre;
-            if ( ! $keep_chosen ) {
+            if ( $remove_chosen ) {
                 splice( @$curr_avail, $i, 1 );
                 for my $u ( sort @$new_idx ) {
                     last if $u > $i;
@@ -496,13 +493,12 @@ sub settings_menu {
     my ( $menu, $curr, $opt ) = @_;
     $opt = {} if ! defined $opt;
     die "'in_place' is no longer a valid option!'" if exists $opt->{in_place} && defined $opt->{in_place}; ###
-    my $info     = $opt->{info}                 ? $opt->{info}         : '';
-    my $prompt   = defined $opt->{prompt}       ? $opt->{prompt}       : 'Choose:';
-    my $clear    = defined $opt->{clear_screen} ? $opt->{clear_screen} : 0;
-    my $mouse    = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
-    #---------------------------------------#
-    my $confirm = defined $opt->{confirm} ? $opt->{confirm} : 'CONFIRM';
-    my $back    = defined $opt->{back}    ? $opt->{back}    : 'BACK';
+    my $info    = defined $opt->{info}         ? $opt->{info}         : '';
+    my $prompt  = defined $opt->{prompt}       ? $opt->{prompt}       : 'Choose:';
+    my $clear   = defined $opt->{clear_screen} ? $opt->{clear_screen} : 0;
+    my $mouse   = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
+    my $confirm = defined $opt->{confirm}      ? $opt->{confirm}      : 'CONFIRM';
+    my $back    = defined $opt->{back}         ? $opt->{back}         : 'BACK';
     $back    = '  ' . $back;
     $confirm = '  ' . $confirm;
     my $longest = 0;
@@ -703,7 +699,7 @@ Term::Choose::Util - CLI related functions.
 
 =head1 VERSION
 
-Version 0.061
+Version 0.062
 
 =cut
 
@@ -745,17 +741,27 @@ A string placed on top of of the output.
 
 =item
 
+mouse
+
+See the option I<mouse> in L<Term::Choose>
+
+Values: [0],1,2,3,4.
+
 prompt
 
 A string placed on top of the available choices.
 
 =item
 
-mouse
+back
 
-See the option I<mouse> in L<Term::Choose>
+Allows to overwrite the default string of the menu entry "back".
 
-Values: [0],1,2,3,4.
+=item
+
+confirm
+
+Allows to overwrite the default string of the menu entry "confirm".
 
 =back
 
@@ -770,11 +776,11 @@ To move around in the directory tree:
 
 - select a directory and press C<Return> to enter in the selected directory.
 
-- choose the "up"-menu-entry ("C< .. >") to move upwards.
+- choose the "up"-menu-entry (C< .. >) to move upwards.
 
-To return the current working-directory as the chosen directory choose "C< OK >".
+To return the current working-directory as the chosen directory choose C< OK >.
 
-The "back"-menu-entry ("C< << >") causes C<choose_a_dir> to return nothing.
+The "back"-menu-entry (C< << >) causes C<choose_a_dir> to return nothing.
 
 As an argument it can be passed a reference to a hash. With this hash the user can set the different options:
 
@@ -838,14 +844,20 @@ If enabled, hidden directories are added to the available directories.
 
 Values: 0,[1].
 
+=item
+
+up
+
+Overwrite the default string (C< .. >) of the menu entry "up".
+
 =back
 
 =head2 choose_a_file
 
     $chosen_file = choose_a_file( { layout => 1, ... } )
 
-Browse the directory tree the same way as described for C<choose_a_dir>. Select "C<E<gt>F>" to get the files of the
-current directory. To return the chosen file select C< OK >.
+Browse the directory tree the same way as described for C<choose_a_dir>. Select C<E<gt>F> (string can be changed with
+the option I<choose_file>) to get the files of the current directory. To return the chosen file select C< OK >.
 
 The options are passed as a reference to a hash. See L</choose_a_dir> for the different options
 
@@ -857,12 +869,12 @@ C<choose_dirs> is similar to C<choose_a_dir> but it is possible to return multip
 
 Different to C<choose_a_dir>:
 
-"C< ++ >" adds the current directory to the list of chosen directories.
+C< ++ > (change with option I<add_dir>) adds the current directory to the list of chosen directories.
 
-To return the chosen list of directories (as an array reference) select the "confirm"-menu-entry "C< OK >".
+To return the chosen list of directories (as an array reference) select the "confirm"-menu-entry C< OK >.
 
-The "back"-menu-entry ( "C< << >" ) removes the last added directory. If the list of chosen directories is empty,
-"C< << >" causes C<choose_dirs> to return nothing.
+The "back"-menu-entry ( C< << > ) removes the last added directory. If the list of chosen directories is empty,
+C< << > causes C<choose_dirs> to return nothing.
 
 C<choose_dirs> uses the same option as C<choose_a_dir>
 
@@ -893,6 +905,12 @@ Default: "> ";
 
 =item
 
+small_on_top
+
+Put the small number ranges on top.
+
+=item
+
 thsd_sep
 
 Sets the thousands separator.
@@ -915,6 +933,14 @@ The optional second argument is a hash reference. The following options are avai
 
 =item
 
+fmt_chosen
+
+If I<fmt_chosen> is set to C<1>, each chosen item gets its own line in the output on the screen.
+
+Values: [0], 1;
+
+=item
+
 index
 
 If true, the index positions in the available list of the made choices is returned.
@@ -934,6 +960,13 @@ layout
 See the option I<layout> in L<Term::Choose>.
 
 Values: 0,1,2,[3].
+
+=item
+
+mark
+
+Expects as its value a reference to an array with indexes. Elements corresponding to these indexes are preselected when
+C<choose_a_subset> is called.
 
 =item
 
@@ -960,7 +993,20 @@ printing. The chosen elements are returned without this I<prefix>.
 
 The default value is "  " if the I<layout> is 3 else the default is the empty string ("").
 
+=item
+
+remove_chosen
+
+If enabled, the chosen items are remove from the available choices.
+
+Values: [0], 1;
+
 =back
+
+To return the chosen subset (as an array reference) select the "confirm"-menu-entry C<-OK->.
+
+The "back"-menu-entry (C< << >) removes the last added chosen items. If the list of chosen items is empty,
+" << " causes C<choose_a_subset> to return nothing.
 
 =head2 settings_menu
 
@@ -1016,7 +1062,9 @@ When C<settings_menu> is called, it displays for each array entry a row with the
 It is possible to scroll through the rows. If a row is selected, the set and displayed value changes to the next. If the
 end of the list of the values is reached, it begins from the beginning of the list.
 
-C<settings_menu> returns true if changes were made else false.
+If the "back"-menu-entry (C<BACK>) is chosen, C<settings_menu> does not apply the made changes and returns nothing. If
+the "confirm"-menu-entry (C<CONFIRM>) is chosen, C<settings_menu> applies the made changes and returns the number of
+made changes.
 
 =head1 REQUIREMENTS
 

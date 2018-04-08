@@ -1,3 +1,16 @@
+3.25 - April 1, 2018:
+- Fix newer perl.vim compatibility
+- Test::PLP class to run scripts
+  - Test plpinfo script for errors
+- Override warn under mod_perl for vhost-specific logging
+
+3.24 - November 20, 2013:
+- Avoid tie replacement broken in Perl >= 5.18
+  - Test correct %post behaviour
+- Various test fixes and improvements
+- Document %header defaults and encoding
+- Update META.yml to v1.4 specs
+
 3.23 - October 21, 2009:
 - Make tests pass on various systems
 - Fix header output using say() on Perl >= 5.10.1

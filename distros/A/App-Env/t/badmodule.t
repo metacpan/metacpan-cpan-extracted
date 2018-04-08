@@ -1,6 +1,7 @@
-use Test::More tests => 2;
+#! perl
 
-use lib 't';
+use Test2::V0;
+use Test::Lib;
 
 use App::Env;
 
@@ -15,3 +16,5 @@ eval {
      };
 
 ok( $@, "import non-existent module" );
+
+done_testing;

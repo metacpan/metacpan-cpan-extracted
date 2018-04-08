@@ -1,14 +1,13 @@
 package Pg::CLI::createdb;
-{
-  $Pg::CLI::createdb::VERSION = '0.11';
-}
 
-use Moose;
-
+use strict;
+use warnings;
 use namespace::autoclean;
 
+our $VERSION = '0.13';
+
+use Moose;
 use MooseX::SemiAffordanceAccessor;
-use MooseX::Types::Moose qw( Str );
 
 with qw( Pg::CLI::Role::Connects Pg::CLI::Role::Executable );
 
@@ -22,13 +21,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Pg::CLI::createdb - Wrapper for the F<createdb> utility
 
 =head1 VERSION
 
-version 0.11
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -114,9 +115,15 @@ A list of additional options to pass to the command. Optional.
 
 =back
 
-=head1 BUGS
+=head1 SUPPORT
 
-See L<Pg::CLI> for bug reporting details.
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Pg-CLI> or via email to L<bug-pg-cli@rt.cpan.org|mailto:bug-pg-cli@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Pg-CLI can be found at L<https://github.com/houseabsolute/Pg-CLI>.
 
 =head1 AUTHOR
 
@@ -124,10 +131,13 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by Dave Rolsky.
+This software is Copyright (c) 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

@@ -20,7 +20,7 @@ my $proj    = tempdir('narada.project.XXXXXX');
 my $guard   = bless {};
 CHECK       { chdir q{/}    }
 INIT        { chdir $proj   }
-sub DESTROY { system('narada-setup-cron --clean >/dev/null 2>&1'); chdir q{/} }
+sub DESTROY { system('narada-setup-cron --clean >/dev/null 2>&1 || :'); chdir q{/} }
 sub guard   { ($_[0], $guard) = ($guard, undef) }
 
 my $work        = cwd();

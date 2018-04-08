@@ -4,7 +4,7 @@
       "Wesley Schwengle <waterkip@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       },
       "develop" : {
@@ -54,10 +54,13 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
             "List::Util" : "1.33",
             "Scalar::Util" : "0",
+            "Test::Builder" : "0",
             "overload" : "0",
-            "perl" : "5.006",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -71,7 +74,8 @@
             "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
-            "perl" : "5.006"
+            "lib" : "0",
+            "perl" : "5.010"
          }
       }
    },
@@ -83,7 +87,7 @@
          "web" : "https://gitlab.com/waterkip/test-mock-one"
       }
    },
-   "version" : "0.007",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0210"
+   "version" : "0.008",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

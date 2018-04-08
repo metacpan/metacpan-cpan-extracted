@@ -17,7 +17,7 @@ WriteMakefile(
 	VERSION_FROM => 'lib/SMB.pm',
 	ABSTRACT_FROM => 'lib/SMB.pm',
 	AUTHOR => 'Mikhael Goikhman <migo@cpan.org>',
-	LICENSE => 'gpl',
+	LICENSE => 'gpl_3',
 	MIN_PERL_VERSION => 5.010,  # mainly to use '//'
 	PREREQ_PM => {
 		# usually distributed with perl

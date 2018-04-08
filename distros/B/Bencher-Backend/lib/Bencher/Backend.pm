@@ -1,7 +1,7 @@
 package Bencher::Backend;
 
-our $DATE = '2017-07-13'; # DATE
-our $VERSION = '1.040'; # VERSION
+our $DATE = '2018-04-03'; # DATE
+our $VERSION = '1.041'; # VERSION
 
 use 5.010001;
 use strict;
@@ -755,7 +755,19 @@ sub _gen_items {
                     name => $key,
                     type => 'command',
                     module => $p0->{module},
-                    perl_cmdline => ["-M$p0->{module}", "-e1"],
+                    (import_args => $p0->{import_args}) x !!defined($p0->{import_args}),
+                    perl_cmdline => [do {
+                        my $mod = $p0->{module};
+                        my $ia  = $p0->{import_args};
+
+                        if (defined $ia && $ia eq '') {
+                            "-m$mod";
+                        } elsif (defined $ia) {
+                            "-M$mod=".(ref($ia) eq 'ARRAY' ? join(",",@$ia) : $ia);
+                        } else {
+                            "-M$mod";
+                        }
+                    }, "-e1"],
                 };
             } elsif (defined $p0->{modules}) {
                 $key = join("+", @{ $p0->{modules} });
@@ -765,7 +777,24 @@ sub _gen_items {
                     name => $key,
                     type => 'command',
                     modules => $p0->{modules},
-                    perl_cmdline => [(map {"-M$_"} @{ $p0->{modules} }), "-e1"],
+                    (import_args_array => $p0->{import_args_array}) x !!defined($p0->{import_args_array}),
+                    perl_cmdline => [do {
+                        my @argv;
+                        my $mods = $p0->{modules};
+                        my $iaa  = $p0->{import_args_array};
+                        for my $i (0..$#{$mods}) {
+                            my $mod = $mods->[$i];
+                            my $ia  = defined $iaa && defined $iaa->[$i] ? $iaa->[$i] : undef;
+                            if (defined $ia && $ia eq '') {
+                                push @argv, "-m$mod";
+                            } elsif (defined $ia) {
+                                push @argv, "-M$mod=".(ref($ia) eq 'ARRAY' ? join(",",@$ia) : $ia);
+                            } else {
+                                push @argv, "-M$mod";
+                            }
+                        }
+                        @argv;
+                    }, "-e1"],
                 };
             }
         }
@@ -869,8 +898,6 @@ sub _gen_items {
 
         if (@$paths < 1) {
             return [412, "Can't find module '$pargs->{multimodver}', try adding some --include-path"];
-        } elsif (@$paths == 1) {
-            return [412, "Only found one path for module '$pargs->{multimodver}', try adding some --include-path"];
         }
         for my $path (@$paths) {
             my $v = MM->parse_version($path);
@@ -887,8 +914,6 @@ sub _gen_items {
         }
         return [412, "Can't find version number for module '$pargs->{multimodver}'"]
             unless keys(%versions);
-        return [412, "Only found one version of module '$pargs->{multimodver}', try adding some --include-path"]
-            unless keys(%versions) > 1;
         push @permute, "modver", [keys %versions];
     }
 
@@ -3166,7 +3191,7 @@ sub bencher {
             'Bencher::Scenario::', {list_modules=>1, recurse=>1});
         $envres =
             [200, "OK",
-             [map {s/^Bencher::Scenario:://; $_} sort keys %$mods]];
+             [map {(my $tmp = $_) =~ s/^Bencher::Scenario:://; $tmp} sort keys %$mods]];
         goto L_END;
     }
 
@@ -3562,10 +3587,7 @@ sub bencher {
         }
 
         my $with_process_size = $args{with_process_size} //
-            $parsed->{with_process_size} //
-            # turn on with_process_size by default if we are in {module,code}_startup
-            # mode on linux
-            (($module_startup || $code_startup) && $^O =~ /linux/);
+            $parsed->{with_process_size};
 
         # test code first
         my $test = $args{test} // $parsed->{test} // 1;
@@ -4159,7 +4181,7 @@ Bencher::Backend - Backend for Bencher
 
 =head1 VERSION
 
-This document describes version 1.040 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2017-07-13.
+This document describes version 1.041 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2018-04-03.
 
 =head1 FUNCTIONS
 
@@ -4816,7 +4838,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

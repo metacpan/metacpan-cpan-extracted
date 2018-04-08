@@ -3,7 +3,7 @@ package Net::Async::SOCKS;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 =head1 NAME
 
@@ -75,7 +75,12 @@ sub IO::Async::Loop::SOCKS_connect {
 	my $on_socks_error = delete $params{on_socks_error} or defined wantarray or
 		croak "Expected 'on_socks_error' or to return a Future";
 
-	my $stream = delete $params{handle} || IO::Async::Stream->new;
+	my $orig_stream = delete $params{handle};
+	my $stream = $orig_stream || IO::Async::Stream->new;
+
+	# If 'handle' is already given then it will already be a member of the
+	# Loop
+	my $must_add = not defined $stream->loop;
 
 	$stream->isa( "IO::Async::Stream" ) or
 		croak "Can only SOCKS_connect a handle instance of IO::Async::Stream";
@@ -122,7 +127,7 @@ sub IO::Async::Loop::SOCKS_connect {
 				}
 			}
 		);
-		$loop->add($stream);
+		$loop->add($stream) if $must_add;
 
 		# Version and auth header goes first
 		$stream->write($proto->init_packet);
@@ -134,18 +139,19 @@ sub IO::Async::Loop::SOCKS_connect {
 		# process.
 		$proto->auth(
 		)->then(sub {
+			my $host = $params{host};
+
 			$proto->connect(
-				ATYPE_IPV4,
-				$params{host},
+				$host =~ m/^\d{1,3}(\.\d{1,3}){3}$/ ? ATYPE_IPV4 : ATYPE_FQDN,
+				$host,
 				$params{service},
-			)->transform(
-				done => sub {
-					$loop->remove($stream);
-					$stream
-				}
-			)
-		})
+			);
+		})->then_done($orig_stream // $sock);
+	})->on_ready(sub {
+		$loop->remove($stream) if $must_add;
+		$stream->configure(on_read => undef);
 	});
+
 	$f->on_done($on_done) if $on_done;
 	$f->on_fail(sub {
 		$on_socks_error->($_[0]) if defined $_[1] and $_[1] eq "socks";

@@ -72,9 +72,9 @@ If you are using a Debian based system (Ubuntu, Weezy, Mint, etc.) then run the 
 
 =over 6
 
- sudo apt-get update
- sudo apt-get upgrade
- sudo apt-get install build-essential linux-headers-generic libjpeg-dev libgif-dev libtiff5-dev libfreetype6-dev fbset libimager-perl libinline-c-perl libmath-bezier-perl libmath-gradient-perl libsys-mmap-perl
+ sudo apt update
+ sudo apt upgrade
+ sudo apt install build-essential linux-headers-generic fbset libimager-perl libinline-c-perl libmath-bezier-perl libmath-gradient-perl libsys-mmap-perl libtest-most-perl
 
 =back
 
@@ -84,7 +84,7 @@ If you are using a RedHat based system (Fedora, CentOS, etc):
 
  sudo yum update
  sudo yum upgrade
- sudo yum upgrade kernel-headers build-essential perl-math-bezier perl-math-gradient perl-sys-mmap perl-imager perl-inline-c
+ sudo yum upgrade kernel-headers build-essential perl-math-bezier perl-math-gradient perl-sys-mmap perl-imager perl-inline-c perl-test-most
 
 =back
 
@@ -401,7 +401,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.04';
+    our $VERSION   = '6.09';
     our @ISA       = qw(Exporter Graphics::Framebuffer::Splash);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -474,7 +474,11 @@ DESTROY {
 
 # use Inline 'info', 'noclean', 'noisy'; # Only needed for debugging
 
-use Inline C => <<CC, 'name' => 'Graphics::Framebuffer', 'VERSION' => $VERSION;
+use Inline C => <<'C_CODE','name' => 'Graphics::Framebuffer', 'VERSION' => $VERSION;
+
+/* Copyright 2018 Richard Kelsch, All Rights Reserved
+ * See the Perl documentation for Graphics::Framebuffer for licensing information.
+*/
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -510,11 +514,12 @@ use Inline C => <<CC, 'name' => 'Graphics::Framebuffer', 'VERSION' => $VERSION;
 #define rfpart_(X) (1.0-fpart_(X))
 #define swap_(a, b) do { __typeof__(a) tmp;  tmp = a; a = b; b = tmp; } while(0)
 
-
+/* Global Structures */
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
 
-unsigned int c_get_screen_info(char *fb_file) {
+/* This gets the framebuffer info and populates the above structures, then runs them to Perl */
+void c_get_screen_info(char *fb_file) {
     int fbfd = 0;
 
     fbfd = open(fb_file,O_RDWR);
@@ -522,12 +527,65 @@ unsigned int c_get_screen_info(char *fb_file) {
     ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo);
     close(fbfd);
 
-    return(finfo.line_length);
+    Inline_Stack_Vars;
+    Inline_Stack_Reset;
+
+    Inline_Stack_Push(sv_2mortal(newSVpvn(finfo.id,16)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(finfo.smem_start)));
+    Inline_Stack_Push(sv_2mortal(newSVuv(finfo.smem_len)));
+    Inline_Stack_Push(sv_2mortal(newSVuv(finfo.type)));
+    Inline_Stack_Push(sv_2mortal(newSVuv(finfo.type_aux)));
+    Inline_Stack_Push(sv_2mortal(newSVuv(finfo.visual)));
+    Inline_Stack_Push(sv_2mortal(newSVuv(finfo.xpanstep)));
+    Inline_Stack_Push(sv_2mortal(newSVuv(finfo.ypanstep)));
+    Inline_Stack_Push(sv_2mortal(newSVuv(finfo.ywrapstep)));
+    Inline_Stack_Push(sv_2mortal(newSVuv(finfo.line_length)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(finfo.mmio_start)));
+    Inline_Stack_Push(sv_2mortal(newSVuv(finfo.mmio_len)));
+    Inline_Stack_Push(sv_2mortal(newSVuv(finfo.accel)));
+
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.xres)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.yres)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.xres_virtual)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.yres_virtual)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.xoffset)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.yoffset)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.bits_per_pixel)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.grayscale)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.red.offset)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.red.length)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.red.msb_right)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.green.offset)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.green.length)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.green.msb_right)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.blue.offset)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.blue.length)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.blue.msb_right)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.transp.offset)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.transp.length)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.transp.msb_right)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.nonstd)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.activate)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.height)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.accel_flags)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.pixclock)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.left_margin)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.right_margin)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.upper_margin)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.lower_margin)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.hsync_len)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.vsync_len)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.sync)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.vmode)));
+    Inline_Stack_Push(sv_2mortal(newSVnv(vinfo.rotate)));
+
+    Inline_Stack_Done;
 }
 
+/* Draws a filled circle fast */
 void c_filled_circle(
     char *framebuffer,
-    short x, short y, short r,
+    short x, short y, unsigned short r,
     unsigned char draw_mode,
     unsigned int color,
     unsigned int bcolor,
@@ -538,20 +596,21 @@ void c_filled_circle(
     unsigned short xoffset, unsigned short yoffset,
     unsigned char alpha)
 {
-    int r2   = r * r;
-    int area = r2 << 2;
-    int rr   = r  << 1;
-    int i;
+    short r2   = r * r;
+    short area = r2 << 2;
+    short rr   = r  << 1;
+    short i;
 
     for (i = 0; i < area; i++) {
-        int tx = (i % rr) - r;
-        int ty = (i / rr) - r;
+        short tx = (i % rr) - r;
+        short ty = (i / rr) - r;
 
         if (tx * tx + ty * ty <= r2)
           c_plot(framebuffer,x + tx, y + ty, draw_mode, color, bcolor, bytes_per_pixel, bytes_per_line, x_clip, y_clip, xx_clip, yy_clip, xoffset, yoffset, alpha);
     }
 }
 
+/* The other routines call this.  It handles all draw modes */
 void c_plot(
     char *framebuffer,
     short x, short y,
@@ -778,12 +837,12 @@ void c_line(
     unsigned short xoffset, unsigned short yoffset,
     unsigned char alpha)
 {
-    int shortLen = y2 - y1;
-    int longLen  = x2 - x1;
+    short shortLen = y2 - y1;
+    short longLen  = x2 - x1;
     int yLonger  = false;
 
     if (abs(shortLen) > abs(longLen)) {
-        int swap = shortLen;
+        short swap = shortLen;
         shortLen   = longLen;
         longLen    = swap;
         yLonger    = true;
@@ -826,6 +885,7 @@ void c_line(
     }
 }
 
+/* Reads in rectangular screen data as a string to a previously allocated buffer */
 void c_blit_read(
     char *framebuffer,
     unsigned short screen_width,
@@ -879,6 +939,7 @@ void c_blit_read(
     }
 }
 
+/* Blits a rectangle of graphics to the screen using the specified draw mode */
 void c_blit_write(
     char *framebuffer,
     unsigned short screen_width,
@@ -1128,6 +1189,7 @@ void c_blit_write(
     }
 }
 
+/* Fast rotate blit graphics data */
 void c_rotate(
     char *image,
     char *new_img,
@@ -1173,26 +1235,26 @@ void c_flip_both(char* pixels, unsigned short width, unsigned short height, unsi
     c_flip_horizontal(pixels,width,height,bytes);
 }
 
-void c_flip_horizontal(char* pixels, unsigned short width, unsigned short height, unsigned short bytes) {
+void c_flip_horizontal(char* pixels, unsigned short width, unsigned short height, unsigned char bytes_per_pixel) {
     short y;
     short x;
     unsigned short offset;
     unsigned char left;
-    unsigned int bpl = width * bytes;
+    unsigned int bpl = width * bytes_per_pixel;
     unsigned short hwidth = width / 2;
     for ( y = 0; y < height; y++ ) {
         unsigned int ydx = y * bpl;
         for (x = 0; x < hwidth ; x++) { // Stop when you reach the middle
-            for (offset = 0; offset < bytes; offset++) {
-                left    = *(pixels + (x * bytes) + ydx + offset);
-                *(pixels + (x * bytes) + ydx + offset)           = *(pixels + ((width - x) * bytes) + ydx + offset);
-                *(pixels + ((width - x) * bytes) + ydx + offset) = left;
+            for (offset = 0; offset < bytes_per_pixel; offset++) {
+                left    = *(pixels + (x * bytes_per_pixel) + ydx + offset);
+                *(pixels + (x * bytes_per_pixel) + ydx + offset)           = *(pixels + ((width - x) * bytes_per_pixel) + ydx + offset);
+                *(pixels + ((width - x) * bytes_per_pixel) + ydx + offset) = left;
             }
         }
     }
 }
 
-void c_flip_vertical(char *pixels, unsigned short width, unsigned short height, unsigned short bytes_per_pixel) {
+void c_flip_vertical(char *pixels, unsigned short width, unsigned short height, unsigned char bytes_per_pixel) {
     unsigned int stride = width * bytes_per_pixel;        // Bytes per line
     unsigned char *row  = malloc(stride);                 // Allocate a temporary buffer
     unsigned char *low  = pixels;                         // Pointer to the beginning of the image
@@ -1206,7 +1268,8 @@ void c_flip_vertical(char *pixels, unsigned short width, unsigned short height, 
     free(row);
 }
 
-void c_convert_16_24( char* buf16, unsigned int size16, char* buf24, unsigned short color_order ) {
+/* bitmap conversions */
+void c_convert_16_24( char* buf16, unsigned int size16, char* buf24, unsigned char color_order ) {
     unsigned int loc16 = 0;
     unsigned int loc24 = 0;
     unsigned char r5;
@@ -1233,7 +1296,7 @@ void c_convert_16_24( char* buf16, unsigned int size16, char* buf24, unsigned sh
     }
 }
 
-void c_convert_16_32( char* buf16, unsigned int size16, char* buf32, unsigned short color_order ) {
+void c_convert_16_32( char* buf16, unsigned int size16, char* buf32, unsigned char color_order ) {
     unsigned int loc16 = 0;
     unsigned int loc32 = 0;
     unsigned char r5;
@@ -1265,7 +1328,7 @@ void c_convert_16_32( char* buf16, unsigned int size16, char* buf32, unsigned sh
     }
 }
 
-void c_convert_24_16(char* buf24, unsigned int size24, char* buf16, unsigned short color_order) {
+void c_convert_24_16(char* buf24, unsigned int size24, char* buf16, unsigned char color_order) {
     unsigned int loc16 = 0;
     unsigned int loc24 = 0;
     unsigned short rgb565 = 0;
@@ -1287,7 +1350,7 @@ void c_convert_24_16(char* buf24, unsigned int size24, char* buf16, unsigned sho
     }
 }
 
-void c_convert_32_16(char* buf32, unsigned int size32, char* buf16, unsigned short color_order) {
+void c_convert_32_16(char* buf32, unsigned int size32, char* buf16, unsigned char color_order) {
     unsigned int loc16 = 0;
     unsigned int loc32 = 0;
     unsigned short rgb565 = 0;
@@ -1296,7 +1359,7 @@ void c_convert_32_16(char* buf32, unsigned int size32, char* buf16, unsigned sho
         unsigned char g8 = *(buf32 + loc32++);
         unsigned char b8 = *(buf32 + loc32++);
         unsigned char a8 = *(buf32 + loc32++); // This is not used, but is needed
-          unsigned char r5 = ( r8 * 249 + 1014 ) >> 11;
+        unsigned char r5 = ( r8 * 249 + 1014 ) >> 11;
         unsigned char g6 = ( g8 * 253 + 505  ) >> 10;
         unsigned char b5 = ( b8 * 249 + 1014 ) >> 11;
         if (color_order == 0) {
@@ -1310,7 +1373,7 @@ void c_convert_32_16(char* buf32, unsigned int size32, char* buf16, unsigned sho
     }
 }
 
-void c_convert_32_24(char* buf32, unsigned int size32, char* buf24, unsigned short color_order) {
+void c_convert_32_24(char* buf32, unsigned int size32, char* buf24, unsigned char color_order) {
     unsigned int loc24 = 0;
     unsigned int loc32 = 0;
     while(loc32 < size32) {
@@ -1321,7 +1384,7 @@ void c_convert_32_24(char* buf32, unsigned int size32, char* buf24, unsigned sho
     }
 }
 
-void c_convert_24_32(char* buf24, unsigned int size24, char* buf32, unsigned short color_order) {
+void c_convert_24_32(char* buf24, unsigned int size24, char* buf32, unsigned char color_order) {
     unsigned int loc32 = 0;
     unsigned int loc24 = 0;
     while(loc24 < size24) {
@@ -1339,7 +1402,7 @@ void c_convert_24_32(char* buf24, unsigned int size24, char* buf32, unsigned sho
     }
 }
 
-void c_monochrome(char *pixels, unsigned int size, unsigned short color_order, unsigned short bytes_per_pixel) {
+void c_monochrome(char *pixels, unsigned int size, unsigned short color_order, unsigned char bytes_per_pixel) {
     unsigned int idx;
     unsigned char r;
     unsigned char g;
@@ -1405,11 +1468,9 @@ void c_monochrome(char *pixels, unsigned int size, unsigned short color_order, u
     }
 }
 
-CC
 
-if ($@) {
-    warn __LINE__ . " $@\n";
-}
+C_CODE
+
 
 our $THIS_CONSOLE = 1;
 
@@ -1560,6 +1621,7 @@ Defines the colorspace for the graphics routines to draw in.  The possible (and 
     'GBR'  for Green-Blue-Red
     'BRG'  for Blue-Red-Green
     'BGR'  for Blue-Green-Red (Many video cards are this)
+
 =back
 
 =cut
@@ -1593,6 +1655,132 @@ sub new {
         'B_COLOR'     => undef,           # Global Background Color
         'DRAW_MODE'   => NORMAL_MODE,     # Drawing mode (Normal default)
         'DIAGNOSTICS' => FALSE,
+
+        'PIXEL_TYPES'  => [
+            'Packed Pixels',
+            'Planes',
+            'Interleaved Planes',
+            'Text',
+            'VGA Planes',
+        ],
+        'PIXEL_TYPES_AUX' => {
+            'Packed Pixels' => [
+                '',
+            ],
+            'Planes' => [
+                '',
+            ],
+            'Interleaved Planes' => [
+                '',
+            ],
+            'Text' => [
+                'MDA',
+                'CGA',
+                'S3 MMIO',
+                'MGA Step 16',
+                'MGA Step 8',
+                'SVGA Group',
+                'SVGA Mask',
+                'SVGA Step 2',
+                'SVGA Step 4',
+                'SVGA Step 8',
+                'SVGA Step 16',
+                'SVGA Last',
+            ],
+            'VGA Planes' => [
+                'VGA 4',
+                'CFB 4',
+                'CFB 8',
+            ],
+        },
+        'VISUAL_TYPES' => [
+            'Mono 01',
+            'Mono 10',
+            'True Color',
+            'Pseudo Color',
+            'Direct Color',
+            'Static Pseudo Color',
+        ],
+        'ACCEL_TYPES' => [
+            'NONE',
+            'Atari Blitter',
+            'Amiga Blitter',
+            'S3 Trio64',
+            'NCR 77C32BLT',
+            'S3 Virge',
+            'ATI Mach 64 GX',
+            'ATI DEC TGA',
+            'ATI Mach 64 CT',
+            'ATI Mach 64 VT',
+            'ATI Mach 64 GT',
+            'Sun Creator',
+            'Sun CG Six',
+            'Sun Leo',
+            'IWS Twin Turbo',
+            '3D Labs Permedia2',
+            'Matrox MGA 2064W',
+            'Matrox MGA 1064SG',
+            'Matrox MGA 2164W',
+            'Matrox MGA 2164W AGP',
+            'Matrox MGA G100',
+            'Matrox MGA G200',
+            'Sun CG14',
+            'Sun BW Two',
+            'Sun CG Three',
+            'Sun TCX',
+            'Matrox MGA G400',
+            'NV3',
+            'NV4',
+            'NV5',
+            'CT 6555x',
+            '3DFx Banshee',
+            'ATI Rage 128',
+            'IGS Cyber 2000',
+            'IGS Cyber 2010',
+            'IGS Cyber 5000',
+            'SIS Glamour',
+            '3D Labs Permedia',
+            'ATI Radeon',
+            'i810',
+            'NV 10',
+            'NV 20',
+            'NV 30',
+            'NV 40',
+            'XGI Volari V',
+            'XGI Volari Z',
+            'OMAP i610',
+            'Trident TGUI',
+            'Trident 3D Image',
+            'Trident Blade 3D',
+            'Trident Blade XP',
+            'Cirrus Alpine',
+            'Neomagic NM2070',
+            'Neomagic NM2090',
+            'Neomagic NM2093',
+            'Neomagic NM2097',
+            'Neomagic NM2160',
+            'Neomagic NM2200',
+            'Neomagic NM2230',
+            'Neomagic NM2360',
+            'Neomagic NM2380',
+            'PXA3XX', # 99
+            '','','','','','','','','','','','','','','','','','','','','','','','','','','','',
+            'Savage 4',
+            'Savage 3D',
+            'Savage 3D MV',
+            'Savage 2000',
+            'Savage MX MV',
+            'Savage MX',
+            'Savage IX MV',
+            'Savage IX',
+            'Pro Savage PM',
+            'Pro Savage KM',
+            'S3 Twister P',
+            'S3 Twister K',
+            'Super Savage',
+            'Pro Savage DDR',
+            'Pro Savage DDRX',
+        ],
 
         'NORMAL_MODE'   => NORMAL_MODE,     #   Constants for DRAW_MODE
         'XOR_MODE'      => XOR_MODE,
@@ -1777,78 +1965,129 @@ sub new {
     if (!defined($ENV{'DISPLAY'}) && defined($self->{'FB_DEVICE'}) && $self->{'FB_DEVICE'} !~ /virtual/i && open($self->{'FB'}, '+<', $self->{'FB_DEVICE'})) {    # Can we open the framebuffer device??
         binmode($self->{'FB'});                                                                                                                                   # We have to be in binary mode first
         $|++;
+        if ($self->{'ACCELERATED'}) {
+            (
+                $self->{'fscreeninfo'}->{'id'},
+                $self->{'fscreeninfo'}->{'smem_start'},
+                $self->{'fscreeninfo'}->{'smem_len'},
+                $self->{'fscreeninfo'}->{'type'},
+                $self->{'fscreeninfo'}->{'type_aux'},
+                $self->{'fscreeninfo'}->{'visual'},
+                $self->{'fscreeninfo'}->{'xpanstep'},
+                $self->{'fscreeninfo'}->{'ypanstep'},
+                $self->{'fscreeninfo'}->{'ywrapstep'},
+                $self->{'fscreeninfo'}->{'line_length'},
+                $self->{'fscreeninfo'}->{'mmio_start'},
+                $self->{'fscreeninfo'}->{'mmio_len'},
+                $self->{'fscreeninfo'}->{'accel'},
 
-        # Make the IOCTL call to get info on the virtual (viewable) screen (Sometimes different than physical)
-        (
-            $self->{'vscreeninfo'}->{'xres'},                                                                                                                     # (32)
-            $self->{'vscreeninfo'}->{'yres'},                                                                                                                     # (32)
-            $self->{'vscreeninfo'}->{'xres_virtual'},                                                                                                             # (32)
-            $self->{'vscreeninfo'}->{'yres_virtual'},                                                                                                             # (32)
-            $self->{'vscreeninfo'}->{'xoffset'},                                                                                                                  # (32)
-            $self->{'vscreeninfo'}->{'yoffset'},                                                                                                                  # (32)
-            $self->{'vscreeninfo'}->{'bits_per_pixel'},                                                                                                           # (32)
-            $self->{'vscreeninfo'}->{'grayscale'},                                                                                                                # (32)
-            $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'},                                                                                           # (32)
-            $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'},                                                                                           # (32)
-            $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'msb_right'},                                                                                        # (32)
-            $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'},                                                                                         # (32)
-            $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'},                                                                                         # (32)
-            $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'msb_right'},                                                                                      # (32)
-            $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'},                                                                                          # (32)
-            $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'},                                                                                          # (32)
-            $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'msb_right'},                                                                                       # (32)
-            $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'},                                                                                         # (32)
-            $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'length'},                                                                                         # (32)
-            $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'msb_right'},                                                                                      # (32)
-            $self->{'vscreeninfo'}->{'nonstd'},                                                                                                                   # (32)
-            $self->{'vscreeninfo'}->{'activate'},                                                                                                                 # (32)
-            $self->{'vscreeninfo'}->{'height'},                                                                                                                   # (32)
-            $self->{'vscreeninfo'}->{'width'},                                                                                                                    # (32)
-            $self->{'vscreeninfo'}->{'accel_flags'},                                                                                                              # (32)
-            $self->{'vscreeninfo'}->{'pixclock'},                                                                                                                 # (32)
-            $self->{'vscreeninfo'}->{'left_margin'},                                                                                                              # (32)
-            $self->{'vscreeninfo'}->{'right_margin'},                                                                                                             # (32)
-            $self->{'vscreeninfo'}->{'upper_margin'},                                                                                                             # (32)
-            $self->{'vscreeninfo'}->{'lower_margin'},                                                                                                             # (32)
-            $self->{'vscreeninfo'}->{'hsync_len'},                                                                                                                # (32)
-            $self->{'vscreeninfo'}->{'vsync_len'},                                                                                                                # (32)
-            $self->{'vscreeninfo'}->{'sync'},                                                                                                                     # (32)
-            $self->{'vscreeninfo'}->{'vmode'},                                                                                                                    # (32)
-            $self->{'vscreeninfo'}->{'rotate'},                                                                                                                   # (32)
-            $self->{'vscreeninfo'}->{'colorspace'},                                                                                                               # (32)
-            @{ $self->{'vscreeninfo'}->{'reserved_fb_vir'} }                                                                                                      # (32) x 4
-        ) = _get_ioctl(FBIOGET_VSCREENINFO, $self->{'FBioget_vscreeninfo'}, $self->{'FB'});
-
-        # Make the IOCTL call to get info on the physical screen
-        my $extra = 1;
-        do {                                                                                                                                                      # A hacked way to do this, but it seems to work
-            my $typedef = '' . $self->{'FBioget_fscreeninfo'};
-            if ($extra > 1) {                                                                                                                                     # It turns out it was byte alignment issues, not driver weirdness
-                if ($extra == 2) {
-                    $typedef =~ s/S1/S$extra/;
-                } elsif ($extra == 3) {
-                    $typedef =~ s/S1/L/;
-                } elsif ($extra == 4) {
-                    $typedef =~ s/S1/I/;
-                }
-                (
-                    $self->{'fscreeninfo'}->{'id'},                                                                                                               # (8) x 16
-                    $self->{'fscreeninfo'}->{'smem_start'},                                                                                                       # LONG
-                    $self->{'fscreeninfo'}->{'smem_len'},                                                                                                         # (32)
-                    $self->{'fscreeninfo'}->{'type'},                                                                                                             # (32)
-                    $self->{'fscreeninfo'}->{'type_aux'},                                                                                                         # (32)
-                    $self->{'fscreeninfo'}->{'visual'},                                                                                                           # (32)
-                    $self->{'fscreeninfo'}->{'xpanstep'},                                                                                                         # (16)
-                    $self->{'fscreeninfo'}->{'ypanstep'},                                                                                                         # (16)
-                    $self->{'fscreeninfo'}->{'ywrapstep'},                                                                                                        # (16)
-                    $self->{'fscreeninfo'}->{'filler'},                                                                                                           # (16) - Just a filler
-                    $self->{'fscreeninfo'}->{'line_length'},                                                                                                      # (32)
-                    $self->{'fscreeninfo'}->{'mmio_start'},                                                                                                       # LONG
-                    $self->{'fscreeninfo'}->{'mmio_len'},                                                                                                         # (32)
-                    $self->{'fscreeninfo'}->{'accel'},                                                                                                            # (32)
-                    $self->{'fscreeninfo'}->{'capailities'},                                                                                                      # (16)
-                    @{ $self->{'fscreeninfo'}->{'reserved_fb_phys'} }                                                                                             # (16) x 2
-                ) = _get_ioctl(FBIOGET_FSCREENINFO, $typedef, $self->{'FB'});
+                $self->{'vscreeninfo'}->{'xres'},
+                $self->{'vscreeninfo'}->{'yres'},
+                $self->{'vscreeninfo'}->{'xres_virtual'},
+                $self->{'vscreeninfo'}->{'yres_virtual'},
+                $self->{'vscreeninfo'}->{'xoffset'},
+                $self->{'vscreeninfo'}->{'yoffset'},
+                $self->{'vscreeninfo'}->{'bits_per_pixel'},
+                $self->{'vscreeninfo'}->{'grayscale'},
+                $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'},
+                $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'},
+                $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'msb_right'},
+                $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'},
+                $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'},
+                $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'msb_right'},
+                $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'},
+                $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'},
+                $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'msb_right'},
+                $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'},
+                $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'length'},
+                $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'msb_right'},
+                $self->{'vscreeninfo'}->{'nonstd'},
+                $self->{'vscreeninfo'}->{'activate'},
+                $self->{'vscreeninfo'}->{'height'},
+                $self->{'vscreeninfo'}->{'width'},
+                $self->{'vscreeninfo'}->{'accel_flags'},
+                $self->{'vscreeninfo'}->{'pixclock'},
+                $self->{'vscreeninfo'}->{'left_margin'},
+                $self->{'vscreeninfo'}->{'right_margin'},
+                $self->{'vscreeninfo'}->{'upper_margin'},
+                $self->{'vscreeninfo'}->{'lower_margin'},
+                $self->{'vscreeninfo'}->{'hsync_len'},
+                $self->{'vscreeninfo'}->{'vsync_len'},
+                $self->{'vscreeninfo'}->{'sync'},
+                $self->{'vscreeninfo'}->{'vmode'},
+                $self->{'vscreeninfo'}->{'rotate'},
+            ) = (c_get_screen_info($self->{'FB_DEVICE'}));
+        } else {
+            # Make the IOCTL call to get info on the virtual (viewable) screen (Sometimes different than physical)
+            (
+                $self->{'vscreeninfo'}->{'xres'},                                                                                                                     # (32)
+                $self->{'vscreeninfo'}->{'yres'},                                                                                                                     # (32)
+                $self->{'vscreeninfo'}->{'xres_virtual'},                                                                                                             # (32)
+                $self->{'vscreeninfo'}->{'yres_virtual'},                                                                                                             # (32)
+                $self->{'vscreeninfo'}->{'xoffset'},                                                                                                                  # (32)
+                $self->{'vscreeninfo'}->{'yoffset'},                                                                                                                  # (32)
+                $self->{'vscreeninfo'}->{'bits_per_pixel'},                                                                                                           # (32)
+                $self->{'vscreeninfo'}->{'grayscale'},                                                                                                                # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'},                                                                                           # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'},                                                                                           # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'msb_right'},                                                                                        # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'},                                                                                         # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'},                                                                                         # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'msb_right'},                                                                                      # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'},                                                                                          # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'},                                                                                          # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'msb_right'},                                                                                       # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'},                                                                                         # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'length'},                                                                                         # (32)
+                $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'msb_right'},                                                                                      # (32)
+                $self->{'vscreeninfo'}->{'nonstd'},                                                                                                                   # (32)
+                $self->{'vscreeninfo'}->{'activate'},                                                                                                                 # (32)
+                $self->{'vscreeninfo'}->{'height'},                                                                                                                   # (32)
+                $self->{'vscreeninfo'}->{'width'},                                                                                                                    # (32)
+                $self->{'vscreeninfo'}->{'accel_flags'},                                                                                                              # (32)
+                $self->{'vscreeninfo'}->{'pixclock'},                                                                                                                 # (32)
+                $self->{'vscreeninfo'}->{'left_margin'},                                                                                                              # (32)
+                $self->{'vscreeninfo'}->{'right_margin'},                                                                                                             # (32)
+                $self->{'vscreeninfo'}->{'upper_margin'},                                                                                                             # (32)
+                $self->{'vscreeninfo'}->{'lower_margin'},                                                                                                             # (32)
+                $self->{'vscreeninfo'}->{'hsync_len'},                                                                                                                # (32)
+                $self->{'vscreeninfo'}->{'vsync_len'},                                                                                                                # (32)
+                $self->{'vscreeninfo'}->{'sync'},                                                                                                                     # (32)
+                $self->{'vscreeninfo'}->{'vmode'},                                                                                                                    # (32)
+                $self->{'vscreeninfo'}->{'rotate'},                                                                                                                   # (32)
+                $self->{'vscreeninfo'}->{'colorspace'},                                                                                                               # (32)
+                @{ $self->{'vscreeninfo'}->{'reserved_fb_vir'} }                                                                                                      # (32) x 4
+            ) = _get_ioctl(FBIOGET_VSCREENINFO, $self->{'FBioget_vscreeninfo'}, $self->{'FB'});
+            # Make the IOCTL call to get info on the physical screen
+            my $extra = 1;
+            do {                                                                                                                                                      # A hacked way to do this, but it seems to work
+                my $typedef = '' . $self->{'FBioget_fscreeninfo'};
+                if ($extra > 1) {                                                                                                                                     # It turns out it was byte alignment issues, not driver weirdness
+                    if ($extra == 2) {
+                        $typedef =~ s/S1/S$extra/;
+                    } elsif ($extra == 3) {
+                        $typedef =~ s/S1/L/;
+                    } elsif ($extra == 4) {
+                        $typedef =~ s/S1/I/;
+                    }
+                    (
+                        $self->{'fscreeninfo'}->{'id'},                                                                                                               # (8) x 16
+                        $self->{'fscreeninfo'}->{'smem_start'},                                                                                                       # LONG
+                        $self->{'fscreeninfo'}->{'smem_len'},                                                                                                         # (32)
+                        $self->{'fscreeninfo'}->{'type'},                                                                                                             # (32)
+                        $self->{'fscreeninfo'}->{'type_aux'},                                                                                                         # (32)
+                        $self->{'fscreeninfo'}->{'visual'},                                                                                                           # (32)
+                        $self->{'fscreeninfo'}->{'xpanstep'},                                                                                                         # (16)
+                        $self->{'fscreeninfo'}->{'ypanstep'},                                                                                                         # (16)
+                        $self->{'fscreeninfo'}->{'ywrapstep'},                                                                                                        # (16)
+                        $self->{'fscreeninfo'}->{'filler'},                                                                                                           # (16) - Just a filler
+                        $self->{'fscreeninfo'}->{'line_length'},                                                                                                      # (32)
+                        $self->{'fscreeninfo'}->{'mmio_start'},                                                                                                       # LONG
+                        $self->{'fscreeninfo'}->{'mmio_len'},                                                                                                         # (32)
+                        $self->{'fscreeninfo'}->{'accel'},                                                                                                            # (32)
+                        $self->{'fscreeninfo'}->{'capailities'},                                                                                                      # (16)
+                        @{ $self->{'fscreeninfo'}->{'reserved_fb_phys'} }                                                                                             # (16) x 2
+                    ) = _get_ioctl(FBIOGET_FSCREENINFO, $typedef, $self->{'FB'});
             } else {
                 (
                     $self->{'fscreeninfo'}->{'id'},                                                                                                               # (8) x 16
@@ -1871,8 +2110,21 @@ sub new {
 
             #            print "$typedef - \n",Dumper($self->{'fscreeninfo'}),"\n";
             $extra++;
-        } until (($self->{'fscreeninfo'}->{'line_length'} < $self->{'fscreeninfo'}->{'smem_len'} && $self->{'fscreeninfo'}->{'line_length'} > 0) || $extra > 4);
-        $self->{'GPU'}     = ($self->{'fscreeninfo'}->{'id'} eq '') ? $self->{'FB_DEVICE'} : $self->{'fscreeninfo'}->{'id'};
+            } until (($self->{'fscreeninfo'}->{'line_length'} < $self->{'fscreeninfo'}->{'smem_len'} && $self->{'fscreeninfo'}->{'line_length'} > 0) || $extra > 4);
+        }
+        $self->{'fscreeninfo'}->{'id'} =~ s/[\x00-\x1F,\x7F-\xFF]//gs;
+
+        if ($self->{'fscreeninfo'}->{'id'} eq '') {
+            chomp(my $model = `cat /proc/device-tree/model`);
+            $model =~ s/[\x00-\x1F,\x7F-\xFF]//gs;
+            if ($model ne '') {
+                $self->{'fscreeninfo'}->{'id'} = $model;
+            } else {
+                $self->{'fscreeninfo'}->{'id'} = $self->{'FB_DEVICE'};
+            }
+        }
+
+        $self->{'GPU'}     = $self->{'fscreeninfo'}->{'id'};
         $self->{'VXRES'}   = $self->{'vscreeninfo'}->{'xres_virtual'};
         $self->{'VYRES'}   = $self->{'vscreeninfo'}->{'yres_virtual'};
         $self->{'XRES'}    = $self->{'vscreeninfo'}->{'xres'};
@@ -1881,7 +2133,6 @@ sub new {
         $self->{'YOFFSET'} = $self->{'vscreeninfo'}->{'yoffset'} || 0;
         $self->{'BITS'}    = $self->{'vscreeninfo'}->{'bits_per_pixel'};
         $self->{'BYTES'}   = $self->{'BITS'} / 8;
-        $self->{'fscreeninfo'}->{'line_length'} = c_get_screen_info($self->{'FB_DEVICE'}) if ($self->{'ACCELERATED'});
         $self->{'BYTES_PER_LINE'} = $self->{'fscreeninfo'}->{'line_length'};
 
         #        $self->{'fscreeninfo'}->{'id'} =~ s/\s+//g;
@@ -1899,12 +2150,17 @@ sub new {
             }
         }
 
-        ## For debugging only
-        #       print Dumper($self,\%Config),"\n"; exit;
-
         $self->{'PIXELS'} = (($self->{'XOFFSET'} + $self->{'VXRES'}) * ($self->{'YOFFSET'} + $self->{'VYRES'}));
         $self->{'SIZE'} = $self->{'PIXELS'} * $self->{'BYTES'};
-        $self->{'fscreeninfo'}->{'smem_len'} = $self->{'BYTES'} * ($self->{'VXRES'} * $self->{'VYRES'}) if (!defined($self->{'fscreeninfo'}->{'smem_len'}) || $self->{'fscreeninfo'}->{'smem_len'} <= 0);
+        $self->{'fscreeninfo'}->{'smem_len'} = $self->{'BYTES_PER_LINE'} * $self->{'VYRES'} if (!defined($self->{'fscreeninfo'}->{'smem_len'}) || $self->{'fscreeninfo'}->{'smem_len'} <= 0);
+
+        $self->{'fscreeninfo'}->{'type'}     = $self->{'PIXEL_TYPES'}->[$self->{'fscreeninfo'}->{'type'}];
+        $self->{'fscreeninfo'}->{'type_aux'} = $self->{'PIXEL_TYPES_AUX'}->{$self->{'fscreeninfo'}->{'type'}}->[$self->{'fscreeninfo'}->{'type_aux'}];
+        $self->{'fscreeninfo'}->{'visual'}   = $self->{'VISUAL_TYPES'}->[$self->{'fscreeninfo'}->{'visual'}];
+        $self->{'fscreeninfo'}->{'accel'}    = $self->{'ACCEL_TYPES'}->[$self->{'fscreeninfo'}->{'accel'}];
+
+        ## For debugging only
+        # print Dumper($self,\%Config),"\n"; exit;
 
         # Only useful for debugging and for troubleshooting the module for specific display resolutions
         if (defined($self->{'SIMULATED_X'})) {
@@ -1931,7 +2187,7 @@ sub new {
             $self->{'SCREEN_ADDRESS'} = mmap($self->{'SCREEN'}, $self->{'fscreeninfo'}->{'smem_len'}, PROT_READ | PROT_WRITE, MAP_SHARED, $self->{'FB'});
         };
         if ($@) {
-        print STDERR qq{
+            print STDERR qq{
 OUCH!  Graphics::Framebuffer cannot memory map the framebuffer!
 
 This is usually caused by one or more of the following:
@@ -2212,6 +2468,8 @@ When called in a scalar context, it returns a hash reference:
      'height_clip'    => height of clipp rectangle,
      'color_order'    => RGB, BGR, etc,
  }
+
+=back
 
 =cut
 
@@ -5294,13 +5552,13 @@ Copies one screen buffer to another for double buffering.  Due to artifacts in d
 
 It takes the source object as its single parameter.
 
-You set up two Graphics::Framebuffer objects.  The first being mapped to your display in 16 bit as normal.  The second being a virtual framebuffer that is 32 bits.  Do all of your drawing to the second frambuffer object, and when you want to display it, you call this method to "flip" it over to the display.
+You set up two Graphics::Framebuffer objects.  The first being mapped to your display in 16 bit as normal.  The second being a virtual framebuffer that is 32 bits.  Do all of your drawing to the second (32 bit) frambuffer object, and when you want to display it, you call this method to "flip" it over to the display.
 
 =over 4
 
- my ($fb1,$fb2) = Graphics::Framebuffer->new('DOUBLE_BUFFER' => 1);
+ my ($fb16,$fb32) = Graphics::Framebuffer->new('DOUBLE_BUFFER' => 1);
 
- $fb2->box(
+ $fb32->box(
      {
          'x'      => 20,
          'y'      => 60,
@@ -5309,9 +5567,11 @@ You set up two Graphics::Framebuffer objects.  The first being mapped to your di
          'filled' => 1
      }
  );
- $fb1->blit_flip($fb2);
+ $fb16->blit_flip($fb32);
 
 =back
+
+You can use the "alarm" function to always update the screen (with a loss of speed, but always works), or you can just call blit_flip after you draw what you need to then update the physical screen with it.  This is how double buffering works, except in this case, it's also converting the 32 bit screen to a 16 bit one.
 
 =cut
 
@@ -5399,16 +5659,16 @@ Plays an animation sequence loaded from "load_image"
 
  my $animation = $fb->load_image(
      {
-         'file'   => 'filename.gif',
-         'center' => CENTER_XY
+         'file'            => 'filename.gif',
+         'center'          => CENTER_XY,
      }
  );
 
- $fb->play_animation($animation);
+ $fb->play_animation($animation,$rate_multiplier);
 
 =back
 
-The animation is played at the speed described by the file's metadata.
+The animation is played at the speed described by the file's metadata multiplied by "rate_multiplier".
 
 You need to enclose this in a loop if you wish it to play more than once.
 
@@ -5417,13 +5677,14 @@ You need to enclose this in a loop if you wish it to play more than once.
 sub play_animation {
     my $self  = shift;
     my $image = shift;
-    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
+    my $rate  = shift || 1;
+#    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
 
     foreach my $frame (0 .. (scalar(@{$image}) - 1)) {
         my $begin = time;
         $self->blit_write($image->[$frame]);
 
-        my $delay = (($image->[$frame]->{'tags'}->{'gif_delay'} * .01)) - (time - $begin);
+        my $delay = ((($image->[$frame]->{'tags'}->{'gif_delay'} * .01)) * $rate) - (time - $begin);
         if ($delay > 0) {
             sleep $delay;
         }
@@ -5442,11 +5703,13 @@ When called without parameters, it returns the current setting.
 
 =over 4
 
- $fb->acceleration(1); # Turn acceleration ON
+ $fb->acceleration(HARDWARE); # Turn hardware acceleration ON, along with some C acceleration (HARDWARE IS NOT YET IMPLEMENTED!)
 
- $fb->acceleration(0); # Turn acceleration OFF
+ $fb->acceleration(SOFTWARE); # Turn C (software) acceleration ON
 
- my $accel = $fb->acceleration(); # Get current acceleration state.
+ $fb->acceleration(PERL); # Turn acceleration OFF, using Perl
+
+ my $accel = $fb->acceleration(); # Get current acceleration state.  0 = PERL, 1 = SOFTWARE, 2 = HARDWARE (not yet implemented)
 
 =back
 
@@ -5461,6 +5724,39 @@ sub acceleration {
         $self->{'ACCELERATED'} = $set;
     }
     return ($self->{'ACCELERATED'});
+}
+
+=head2 perl
+
+This is an alias to "acceleration(PERL)"
+
+=cut
+
+sub perl {
+    my $self = shift;
+    $self->acceleration(PERL);
+}
+
+=head2 perl
+
+This is an alias to "acceleration(SOFTWARE)"
+
+=cut
+
+sub software {
+    my $self = shift;
+    $self->acceleration(SOFTWARE);
+}
+
+=head2 perl
+
+This is an alias to "acceleration(HARDWARE)"
+
+=cut
+
+sub hardware {
+    my $self = shift;
+    $self->acceleration(HARDWARE);
 }
 
 =head2 blit_read
@@ -5496,7 +5792,7 @@ Returns:
 
 All you have to do is change X and Y, and just pass it to "blit_write" and it will paste it there.
 
-* Not Imager accelerated, but pretty darn fast regardless.
+* Acceleration mode affects this (although even the Perl one works pretty fast).
 
 =cut
 
@@ -5556,7 +5852,7 @@ It takes a hash reference.  It draws in the current drawing mode.
 
 =back
 
-* Not Imager accelerated, but pretty darn fast regardless.
+* Acceleration mode affects this (although even the Perl one works pretty fast).
 
 =cut
 
@@ -5575,15 +5871,16 @@ sub blit_write {
     my $draw_mode      = $self->{'DRAW_MODE'};
     my $bytes          = $self->{'BYTES'};
     my $bytes_per_line = $self->{'BYTES_PER_LINE'};
-    my $scrn           = $params->{'image'};
-    return unless (defined($scrn) && $scrn ne '' && $h && $w);
+
+    return unless (defined($params->{'image'}) && $params->{'image'} ne '' && $h && $w);
 #    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
 
     if ($self->{'ACCELERATED'}) { # && $h > 1) {
-        c_blit_write($self->{'SCREEN'}, $self->{'XRES'}, $self->{'YRES'}, $bytes_per_line, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $scrn, $x, $y, $w, $h, $bytes, $draw_mode, $self->{'COLOR_ALPHA'}, $self->{'B_COLOR'}, $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},);
+        c_blit_write($self->{'SCREEN'}, $self->{'XRES'}, $self->{'YRES'}, $bytes_per_line, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $params->{'image'}, $x, $y, $w, $h, $bytes, $draw_mode, $self->{'COLOR_ALPHA'}, $self->{'B_COLOR'}, $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},);
         return;
     }
 
+    my $scrn = $params->{'image'};
     my $max  = $self->{'fscreeninfo'}->{'smem_len'} - $bytes;
     my $scan = $w * $bytes;
     my $yend = $y + $h;
@@ -5787,7 +6084,7 @@ sub _blit_adjust_for_clipping {
 
 This performs transformations on your blit objects.
 
-You can only have one of "rotate", "scale", "merge" or "flip".
+You can only have one of "rotate", "scale", "merge", "flip", or make "monochrome".  You may use only one transformation per call.
 
 =head3 B<blit_data> (mandatory)
 
@@ -5807,7 +6104,7 @@ This is very usefull in 32 bit mode due to its alpha channel capabilities.
 
 Rotates the "blit_data" image an arbitrary degree.  Positive degree values are counterclockwise and negative degree values are clockwise.
 
-Two types of rotate methods are available, an extrememly fast, but visually slightly less appealing method, and a slower, but looks better, method.
+Two types of rotate methods are available, an extrememly fast, but visually slightly less appealing method, and a slower, but looks better, method.  Seriously though, the fast method looks pretty darn good anyway.  I recommend "fast".
 
 =head3 B<scale>
 
@@ -5863,7 +6160,7 @@ Scales the image to "width" x "height".  This is the same as how scale works in 
 
 =back
 
-It returns the transformed image in the same format the other BLIT methods use.  Note, the width and height may be changed!
+It returns the transformed image in the same format the other BLIT methods use.  Note, the width and height may be changed!  So always use the returned data as the correct new data.
 
 =over 4
 
@@ -6145,6 +6442,7 @@ Turns off clipping, and resets the clipping values to the full size of the scree
 =back
 =cut
 
+# Clipping is not really turned off.  It's just set to the screen borders.  To turn off clipping for real is asking for crashes.
 sub clip_reset {
     my $self = shift;
 
@@ -7570,8 +7868,6 @@ sub which_console {
 
 ** DEPRECIATED, Now always returns 1
 
-=back
-
 =cut
 
 sub active_console {
@@ -7645,6 +7941,9 @@ sub _get_ioctl {
     ##########################################################
     # Used to return an array specific to the ioctl function #
     ##########################################################
+
+    # This really needs to be moved over to the C routines, as the structure really is hard to parse for different processor long types
+
     my $command = shift;
     my $format  = shift;
     my $fb      = shift;
@@ -7694,15 +7993,13 @@ This module is highly CPU dependent.  So the more optimized your Perl installati
 
 =head2 THREADS
 
-The module can NOT have separate threads calling the same object.  You WILL crash. However, you can instantiate an object for each thread to use, and it will work just fine.
+The module can NOT have separate threads calling the same object.  You WILL crash. However, you can instantiate an object for each thread to use on the same framebuffer, and it will work just fine.
 
 See the "examples" directory for "threadstest.pl" as an example of a threading script that uses this module.  Just add the number of threads you want it to use to the command line when you run it.
 
-If you are running a threaded Perl, this module opens its own thread to monitor and update the status of the active console.
-
 =head2 FORKS
 
-I have never tested with forks.  Do at your own risk, but follow the same rules as in threads, and it should work.
+I have never tested with forks.  Do at your own risk, but follow the same rules as in threads, and it should work.  Instantiate an object per fork AFTER forking.
 
 =head2 BLITTING
 
@@ -7710,7 +8007,7 @@ Use "blit_read" and "blit_write" to save portions of the screen instead of redra
 
 =head2 SPRITES
 
-Someone asked me about sprites.  Well, that's what blitting is for.  You'll have to do your own collision detection.
+Someone asked me about sprites.  Well, that's what blitting is for.  You'll have to do your own collision detection.  Using the "XOR" drawing mode, you can "erase" a sprite by rewriting it to the screen via xor.
 
 =head2 HORIZONTAL "MAGIC"
 
@@ -7720,11 +8017,15 @@ Horizontal lines and filled boxes draw very fast.  Learn to exploit them.
 
 Pixel sizes over 1 utilize a filled "box" or "circle" (negative numbers for circle) to do the drawing.  This is why the larger the "pixel", the slower the draw.
 
+=head2 MULTIPLE "HEADS" (monitors)
+
+As long as each framebuffer for each display is accessible, you can open an instance of the module for each framebuffer and access both.
+
 =head2 MAKING WINDOWS
 
 So, you want to be able to manage some sort of windows...
 
-You just instantiate a new instance of the module per "Window" and give it its own clipping region.  This region is your drawing space for your window.
+You just instantiate a new instance of the module per "Window" and give it its own clipping region.  This region is your drawing space for your window.  The threading example does this.
 
 It is up to you to actually decorate (draw) the windows.
 
@@ -7738,7 +8039,7 @@ It doesn't work natively, (other than in emulation mode) and likely never will. 
 
 You can run Linux inside VirtualBox and it works fine.  Put it in full screen mode, and voila, it's "running in Windows" in an indirect kinda-sorta way.  Make sure you install the VirtualBox extensions, as it has the correct video driver for framebuffer access.  It's as close as you'll ever get to get it running in MS Windows.  Seriously...
 
-This isn't a design choice nor preference.  It's simply because of the fact MS Windows does not allow file mapping of the display, nor variable memory mapping of the display (that I know of), both are the techniques this module uses to achieve its magic.  DirectX is more like OpenGL in how it works, and thus defeats the purpose of this module.  You're better off with SDL instead, if you want to draw in MS Windows from Perl.
+This isn't a design choice, nor preference, nor some anti-Windows ego trip.  It's simply because of the fact MS Windows does not allow file mapping of the display, nor variable memory mapping of the display (that I know of), both are the techniques this module uses to achieve its magic.  DirectX is more like OpenGL in how it works, and thus defeats the purpose of this module.  You're better off with SDL instead, if you want to draw in MS Windows from Perl.
 
 * However, if someone knows how to access the framebuffer in MS Windows, and be able to do it reasonable from within Perl, then send me instructions on how to do it, and I'll do my best to get it to work.
 
@@ -7754,23 +8055,41 @@ Ok, you've installed the module, but can't seem to get it to work properly.  Her
 
 A console window doesn't count as "the console".  You cannot use this module from within X-Windows.  It won't work, and likely will only go into emulation mode if you do, or maybe crash, or even corrupt your X-Windows screen.
 
-If you want to run your program within X-Windows, then you have the wrong module.  Use SDL or GTK or something similar.
+If you want to run your program within X-Windows, then you have the wrong module.  Use SDL, QT, or GTK or something similar.
 
-You HAVE to have a framebuffer based video driver for this to work.  The device ("/dev/fb0" for example) must exist.
+You MUST have a framebuffer based video driver for this to work.  The device ("/dev/fb0" for example) must exist.
 
-If it does exist, but is not "/dev/fb0", then you can define it in the 'new' method with the "FB_DEVICE" parameter.
+If it does exist, but is not "/dev/fb0", then you can define it in the 'new' method with the "FB_DEVICE" parameter, although the module is pretty good at finding it.
+
+=item B< It's Crashing >
+
+Ok, segfaults suck.  Believe me, I had plenty in the early days of writing this module.  There is hope for you.
+
+This is almost always caused by the module incorrectly calculating the framebuffer memory size, and it's guessing too small.
+
+Try running the "primitives.pl" in the "examples" directory in the following way (assuming your screen is larger than 640x480):
+
+   C<perl examples/primitives.pl --x=640 --y=480>
+
+This forces the module to pretend it is rendering for a smaller resolution (by placing this screen in the middle of the actual one).  If it works fine, then try changing the "x" value back to your screen's actual width, but still make the "y" value slightly smaller.  Keep decreasing this value until it works.
+
+If you get this behavior, then it is a bug, and the author needs to be notified, although as of version 6.06 this should no longer be an issue.
+
+So how does that help you right now?  Try installing the program F<fbset> via your package manager, then rerun the F<primitives.pl> script without the "x" or "y" options.  If it works, then that is your immediate solution.
+
+How does that suddenly fix things?  Calculating the screen size involves complex data structures returned by an ioget call, and Perl handles these very poorly, as it is not very good with typedef size, and the data can end up being in the wrong place.  The "fbset" utility can just tell us what these values are correctly, and the module uses it as a last resort.  Thus now the module can set up the screen corrwectly, and not cause a crash.  This crash happens because it is trying to access memory that has not been allocated to it.
 
 =item B< It Just Plain Isn't Working >
 
-Well, either your system doesn't have a framebuffer driver, or perhaps the module is getting confusing data back from it and can't properly initialize.
+Well, either your system doesn't have a framebuffer driver, or perhaps the module is getting confusing data back from it and can't properly initialize (see the previous item).
 
-First, make sure your system has a framebuffer by seeing if "/dev/fb0" (actually "fb" then any number).  If you don't see any "fb0" - "fb31" files inside "/dev", then you don't have a framebuffer driver running.  You need to fix that first.
+First, make sure your system has a framebuffer by seeing if F</dev/fb0> (actually "fb" then any number) exists.  If you don't see any "fb0" - "fb31" files inside "/dev", then you don't have a framebuffer driver running.  You need to fix that first.  Sometimes you have to manually load the driver with C<modprobe -a drivername> (replacing "drivername" with the actual driver name).
 
-Second, ok, you have a framebuffer driver, but nothing is showing, or it's all funky looking.  Now make sure you have the program "fbset" installed.  It's used as a last resort by this module to figure out how to draw on the screen when all else fails.  To see if you have "fbset" installed, just type "fbset -i" and it should show you information about the framebuffer.  If you get an error, then you need to install "fbset".
+Second, ok, you have a framebuffer driver, but nothing is showing, or it's all funky looking.  Now make sure you have the program F<fbset> installed.  It's used as a last resort by this module to figure out how to draw on the screen when all else fails.  To see if you have "fbset" installed, just type "fbset -i" and it should show you information about the framebuffer.  If you get an error, then you need to install "fbset".
 
-Third, you did the above, but still nothing.  You need to check permissions.  The account you are running this under needs to have permission to use the screen.  This typically means being a member of the "B<video>" group.  Let's say the account is called "sparky", and you want to give it permission.  In a Linux (Debian/Ubuntu/Mint) environment you would use this to add "sparky" to the "video" group:
+Third, you did the above, but still nothing.  You need to check permissions.  The account you are running this under needs to have permission to use the screen.  This typically means being a member of the "B<video>" group.  Let's say the account is called "sparky", and you want to give it permission.  In a Linux (Debian/Ubuntu/Mint/RedHat/Fedora) environment you would use this to add "sparky" to the "video" group:
 
- sudo usermod -a -G video sparky
+ C<sudo usermod -a -G video sparky>
 
 Once that is run (changing "sparky" to whatever your username is), log out, then log back in, and it should work.
 
@@ -7778,7 +8097,7 @@ Once that is run (changing "sparky" to whatever your username is), log out, then
 
 It is?  Well then turn it off.  Use the $obj->cls('OFF') method to do it.  Use $obj->cls('ON') to turn it back on.
 
-If your script exits without turning the cursor back on, then it will still be off.  To get your cursor back, just type the command "reset" (and make sure you turn it back on before your code exits).
+If your script exits without turning the cursor back on, then it will still be off.  To get your cursor back, just type the command "reset" (and make sure you turn it back on before your code exits, so it doesn't do that).
 
 * UPDATE:  The new default behavior is to do this for you via the "RESET" parameter when creating the object.  See the "new" method documentation above for more information.
 
@@ -7786,7 +8105,7 @@ If your script exits without turning the cursor back on, then it will still be o
 
 This is likely caused by the Imager library either being unable to locate the font file, or when it was compiled, it couldn't find the FreeType development libraries, and was thus compiled without TrueType text support.
 
-See the INSTALLATION instructions (above) on getting Imager properly compiled.  If you have a package based Perl installation, then installing the Imager (usually "libimager-perl") package will always work.  If you already installed Imager via CPAN, then you should uninstall it via CPAN, then go install the package version, in that order.  You may also install "libfreetype6-dev" and then re-install Imager via CPAN with a forced install.
+See the INSTALLATION instructions (above) on getting Imager properly compiled.  If you have a package based Perl installation, then installing the Imager (usually "libimager-perl") package will always work.  If you already installed Imager via CPAN, then you should uninstall it via CPAN, then go install the package version, in that order.  You may also install "libfreetype6-dev" and then re-install Imager via CPAN with a forced install.  If you don't want the package version but still want the CPAN version, then still uninstall what is there, then go an make sure the TrueType and FreeType development libraries are installed on your system, along with PNG, JPEG, and GIF development libraries.  Now you can go to CPAN and install Imager.
 
 =item B< It's Too Slow >
 
@@ -7794,7 +8113,7 @@ Ok, it does say a PERL graphics library in the description, if I am not mistaken
 
 First, check to make sure the C acceleration routines are compiling properly.  Call the "acceleration" method without parameters.  It SHOULD return 1 and not 0 if C is properly compiling.  If it's not, then you need to make sure "Inline::C" is properly installed in your Perl environment.  THIS WILL BE THE BIGGEST HELP TO YOU, IF YOU GET THIS SOLVED FIRST.
 
-Second, you could try recompiling Perl with optimizations specific to your hardware.  That can help.
+Second, you could try recompiling Perl with optimizations specific to your hardware.  That can help, but this is very advanced and you should know what you are doing before attempting this.  Keep in mind that if you do this, then ALL of the modules installed via your distribution packager won't work, and will have to be reinstalled via CPAN for the new perl.
 
 You can also try simplifying your drawing to exploit the speed of horizontal lines.  Horizonal line drawing is incredibly fast, even for very slow systems.
 
@@ -7802,15 +8121,15 @@ Only use pixel sizes of 1.  Anything larger requires a box to be drawn at the pi
 
 Try using 'polygon' to draw complex shapes instead of a series of plot or line commands.
 
-Does your device have more than one core?  Well, how about using threads?  Just make sure you do it according to the example "threadstest.pl" in the "examples" directory.
+Does your device have more than one core?  Well, how about using threads?  Just make sure you do it according to the example F<threadstest.pl> in the "examples" directory.  Yes, I know this can be too advanced for the average coder, but the option is there.
 
 Plain and simple, your device just may be too slow for some CPU intensive operations, specifically anything involving images and blitting.  If you must use images, then make sure they are already the right size for your needs.  Don't force the module to resize them when loading.
 
 =item B< Ask For Help >
 
-If none of these ideas work, then send me an email, and I may be able to get it functioning for you.  Please run the "dump.pl" script inside the "examples" directory inside this module's package:
+If none of these ideas work, then send me an email, and I may be able to get it functioning for you.  Please run the F<dump.pl> script inside the "examples" directory inside this module's package:
 
- perl dump.pl 2> dump.txt
+ C<perl dump.pl 2> dump.txt>
 
 Please include this dump file as an attachment to your email.  Please do not include it inline as part of the message text.
 
@@ -7830,13 +8149,13 @@ Richard Kelsch <rich@rk-internet.com>
 
 =head1 COPYRIGHT
 
-Copyright 2003-2016 Richard Kelsch, All Rights Reserved.
+Copyright 2003-2018 Richard Kelsch, All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =head1 VERSION
 
-Version 6.04 (March 11, 2018)
+Version 6.09 (April 6, 2018)
 
 =head1 THANKS
 
@@ -7850,7 +8169,6 @@ I'd love to know if you are using this library in your project.  So send me an e
 
 There is a YouTube channel with demonstrations of the module's capabilities.  Eventually it will have examples of output from a variety of different types of hardware.
 
-L<https://youtu.be/4Yzs55Wpr7E>
+L<YouTube Framebuffer::Graphics Channel|https://youtu.be/4Yzs55Wpr7E>
 
 =cut
-

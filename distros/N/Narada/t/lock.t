@@ -1,4 +1,4 @@
-use t::share; guard my $guard;
+use lib 't'; use share; guard my $guard;
 use Time::HiRes qw( time sleep );
 use Fcntl qw(:DEFAULT :flock F_SETFD FD_CLOEXEC);
 use Errno;

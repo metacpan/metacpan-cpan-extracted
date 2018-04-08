@@ -1,11 +1,17 @@
 Math::GMP - High speed arbitrary size integer math
 
-To install this package, you will need a version of the GMP library. You can
-get it at the homepage of GMP:
+To install this package, you will need a version of the GMP library. You
+have different alternatives:
+
+- get it at the homepage of GMP:
 
 	http://www.gmplib.org/
 
-After installing GMP, do the following:
+- install a pre-compiled package provided by your distribution
+
+- let Math::GMP download and install GMP for you (thanks to Alien::GMP)
+
+After installing GMP (if you want to do it yourself), do the following:
 
 	perl Makefile.PL
 	make

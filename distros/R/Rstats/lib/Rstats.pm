@@ -2,7 +2,7 @@ package Rstats;
 use strict;
 use warnings;
 
-our $VERSION = '0.0148';
+our $VERSION = '0.0149';
 
 use Rstats::Class;
 
@@ -45,7 +45,7 @@ XSLoader::load('Rstats', $VERSION);
 
 Rstats - R language build on Perl
 
-B<Rstats is yet experimental release. Incompatible change will occur without warning.>
+B<Rstats is an experimental project, started to implement R language API in Perl, but stopped development on April 7, 2018.>
 
 =head1 SYNOPSYS
   

@@ -5,6 +5,7 @@ author:
   - 'Stefan Hermes <hermes@cpan.org>'
 build_requires:
   Test::More: '0.9'
+  Test::Without::Module: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -28,5 +29,5 @@ resources:
   homepage: https://metacpan.org/release/Clone-Choose
   license: http://dev.perl.org/licenses/
   repository: https://github.com:perl5-utils/Clone-Choose.git
-version: '0.008'
+version: '0.009'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

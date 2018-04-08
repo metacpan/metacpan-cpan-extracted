@@ -72,8 +72,8 @@ http {
     ssl_session_cache         shared:SSL:10m;
     ssl_session_timeout       10m;
 
-    add_header                Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";
-    add_header                X-Frame-Options DENY;
+    # add_header                Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";
+    # add_header                X-Frame-Options DENY;
     add_header                X-Content-Type-Options nosniff;
 
     # for websocket proxy connection

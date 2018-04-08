@@ -9,7 +9,9 @@ use Test::NoTabs;
 my @files = (
     'lib/Dist/Zilla/Plugin/VersionFromMainModule.pm',
     't/00-report-prereqs.dd',
-    't/00-report-prereqs.t'
+    't/00-report-prereqs.t',
+    't/01-basic.t',
+    't/02-env-v.t'
 );
 
 notabs_ok($_) foreach @files;

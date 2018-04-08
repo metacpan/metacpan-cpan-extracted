@@ -39,5 +39,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Against-Dev
   homepage: http://thenceforward.net/perl/modules/Test-Against-Dev/
   repository: https://github.com/jkeenan/test-against-dev.git
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

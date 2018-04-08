@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 # shortcuts
 #  os and distros
@@ -662,6 +662,16 @@ sub mapping {
        [package => 'libsodium']],
      ],
 
+     [cpanmod => 'Crypt::U2F::Server',
+      [like_debian,
+       [linuxdistrocodename => [qw(squeeze wheezy jessie)],
+	[package => []], # not available before xenial and stretch
+       ],
+       [package => 'libu2f-server-dev']],
+      [os_darwin,
+       [package => 'libu2f-server']],
+     ],
+
      [cpanmod => 'CSS::Croco',
       [os_freebsd,
        [package => ['libcroco', 'pkgconf']]],
@@ -1004,6 +1014,8 @@ sub mapping {
       [os_openbsd,
        [package => [ 'firefox' ]]],
       [like_debian,
+       [linuxdistrocodename => [qw(trusty xenial)],
+	[package => [qw(firefox xvfb xauth)]]], # there's no firefox-esr for Ubuntu
        [package => [ 'firefox-esr', 'xvfb', 'xauth' ]]],
       [like_fedora,
        [package => [ 'firefox', 'xorg-x11-server-Xvfb', 'xorg-x11-xauth' ]]],
@@ -1438,6 +1450,17 @@ sub mapping {
        [package => 'neon-devel']], # compilation fails: ne_cookies.h: No such file or directory
      ],
 
+     [cpanmod => 'HTML::Tidy5',
+      [os_freebsd,
+       [package => 'tidy-html5']],
+      [like_debian,
+       [before_debian_stretch,
+	[package => []]], # not available?
+       [package => 'libtidy-dev']],
+      [os_darwin,
+       [package => 'tidy-html5']], # but does not work (-L and -I needs to be adjusted, Symbol not found: _tidyBufFree)
+     ],
+
      [cpanmod => 'HTML::Tidy',
       [os_freebsd,
        [package => 'tidyp']],
@@ -1471,7 +1494,7 @@ sub mapping {
        [package => ['libgeotiff-dev']]], # conflict between libtiff4 and libtiff5 possible
      ],
 
-     [cpanmod => 'Image::Imlib2',
+     [cpanmod => ['Image::Imlib2', 'Ithumb::XS'],
       [os_freebsd,
        [package => 'imlib2']],
       [like_debian,
@@ -2465,8 +2488,11 @@ sub mapping {
 
      [cpanmod => 'Search::Namazu',
       [os_freebsd,
-       [package => 'namazu3']],
-      # XXX what about debian?
+       [package => 'namazu2']],
+      [like_debian,
+       [package => 'libnmz7-dev']],
+      [os_darwin,
+       [package => 'namazu']],
      ],
 
      [cpanmod => 'Search::Odeum',
@@ -2506,6 +2532,13 @@ sub mapping {
        [package => 'net-snmp']],
       [like_debian,
        [package => ['libsnmp-dev', 'snmp-mibs-downloader']]]],
+
+     [cpanmod => 'Sort::Naturally::ICU',
+      [os_freebsd,
+       [package => 'icu']], # but build fails
+      [like_debian,
+       [package => 'libicu-dev']],
+     ],
 
      [cpanmod => 'Speech::Recognizer::SPX',
       [os_freebsd,
@@ -2607,6 +2640,13 @@ sub mapping {
        [package => 'readline-devel']],
       # XXX what about freebsd?
       # XXX no homebrew package for darwin (checked 2016-05-22)
+     ],
+
+     [cpanmod => 'Term::Terminfo',
+      [like_debian,
+       [package => 'libncurses5-dev']],
+      [like_fedora,
+       [package => 'ncurses-devel']],
      ],
 
      [cpanmod => 'Term::VTerm',
@@ -2763,6 +2803,11 @@ sub mapping {
       [like_fedora,
        [package => 'rpm-devel']],
       # XXX what about freebsd?
+     ],
+
+     [cpanmod => 'USB::LibUSB',
+      [like_debian,
+       [package => 'libusb-1.0-0-dev']], # exists on wheezy, but: Minimum required version of libusb-1.0 is 1.0.17. Installed: 1.0.11
      ],
 
      # Since UV::Util 0.03 Alien::libuv is used

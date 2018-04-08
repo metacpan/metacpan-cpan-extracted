@@ -1,4 +1,4 @@
-# SMB-Perl library, Copyright (C) 2014 Mikhael Goikhman, migo@cpan.org
+# SMB-Perl library, Copyright (C) 2014-2018 Mikhael Goikhman, migo@cpan.org
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@ package SMB;
 use strict;
 use warnings;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 use constant {
 	STATUS_SUCCESS                  => 0x00000000,
@@ -55,12 +55,21 @@ use constant {
 	STATUS_NOT_A_REPARSE_POINT      => 0xc0000275,
 };
 
+use constant {
+	LOG_LEVEL_NONE  => 0,
+	LOG_LEVEL_ERROR => 1,
+	LOG_LEVEL_INFO  => 2,
+	LOG_LEVEL_DEBUG => 3,
+	LOG_LEVEL_TRACE => 4,
+};
+
 sub new ($%) {
 	my $class = shift;
 	my %options = @_;
 
+	$options{log_level} ||= LOG_LEVEL_INFO;
+
 	my $self = {
-		disable_log => $options{quiet} ? 1 : 0,
 		%options,
 	};
 
@@ -69,31 +78,37 @@ sub new ($%) {
 
 sub log ($$@) {
 	my $self = shift;
-	my $is_err = shift;
+	my $level = shift || LOG_LEVEL_INFO;
 	my $format = shift;
-	return if $self->disable_log;
-	print sprintf("%s $format\n", $is_err ? '!' : '*', @_);
+
+	return if $level > $self->log_level;
+	$format =~ s/\r?\n$//;
+
+	print sprintf("%s $format\n", $level == LOG_LEVEL_ERROR ? '!' : '*', @_);
 }
 
-sub msg ($@) { shift()->log(0, @_) }
-sub err ($@) { shift()->log(1, @_); return }
+sub err ($@) { shift()->log(LOG_LEVEL_ERROR, @_); return }
+sub msg ($@) { shift()->log(LOG_LEVEL_INFO,  @_); return }
+sub dbg ($@) { shift()->log(LOG_LEVEL_DEBUG, @_); return }
+sub trc ($@) { shift()->log(LOG_LEVEL_TRACE, @_); return }
 
 my $MAX_DUMP_BYTES = 8 * 1024;
 my $dump_line_format = "%03x | 00 53 54 52 49 4E 47 aa  aa aa aa aa aa aa       | _STRING. ......   |\n";
 
-sub mem ($$;$) {
+sub mem ($$;$$) {
 	my $self = shift;
 	my $data = shift;
 	my $label = shift || "Data dump";
-	return if $self->disable_log;
+	my $level = shift || LOG_LEVEL_TRACE;
+	return if $level > $self->log_level;
 
 	if (!defined $data) {
-		$self->msg("$label (undef)");
+		$self->log($level, "$label (undef)");
 		return;
 	}
 
 	my $len = length($data);
-	$self->msg(sprintf("%s (%lu bytes%s):", $label, $len, $len > $MAX_DUMP_BYTES ? ", shorten" : ""), @_);
+	$self->log($level, sprintf("%s (%lu bytes%s):", $label, $len, $len > $MAX_DUMP_BYTES ? ", shorten" : ""), @_);
 	$len = $MAX_DUMP_BYTES if $len > $MAX_DUMP_BYTES;
 
 	for (my $n = 0; $n < ($len + 15) / 16; $n++) {
@@ -125,9 +140,10 @@ sub parse_share_uri ($$) {
 
 our %dump_seen;
 our $dump_is_newline = 1;
-our $dump_level_limit = 7;
-our $dump_array_limit = 20;
-our $dump_string_limit = 50;
+our $dump_level_limit  = $ENV{DUMP_FULLY} || $ENV{DUMP_DEPTH_FULLY}  ? 100 : 8;
+our $dump_array_limit  = $ENV{DUMP_FULLY} || $ENV{DUMP_ARRAY_FULLY}  ? 10000 : 24;
+our $dump_string_limit = $ENV{DUMP_FULLY} || $ENV{DUMP_STRING_FULLY} ? 100000 : 60;
+our $dump_compress_array_elems = $ENV{DUMP_FULLY} || $ENV{DUMP_ARRAY_FULLY} ? 0 : 1;
 
 sub _dump_prefix ($) {
 	my $level = shift;
@@ -144,8 +160,10 @@ sub _dump_eol () {
 	return "\n";
 }
 
-sub _dump_string ($) {
+sub dump_string ($) {
 	my $value = shift;
+
+	my $quote_ch = $value =~ /"/ && $value !~ /'/ ? "'" : '"';
 
 	my $len = length($value);
 	if ($len > $dump_string_limit) {
@@ -154,13 +172,13 @@ sub _dump_string ($) {
 			"..+" . ($len - $dump_string_limit + 3 + $llen);
 	}
 
-	$value =~ s/([\\"])/\\$1/g;
-	$value =~ s/([^\\" -\x7e])/sprintf("\\x%02x", ord($1))/ge;
+	$value =~ s/([\\$quote_ch])/\\$1/g;
+	$value =~ s/([^ -\x7e])/sprintf("\\x%02x", ord($1))/ge;
 
-	return $value;
+	return "$quote_ch$value$quote_ch";
 }
 
-sub _dump_value ($) {
+sub dump_value ($) {
 	my $value = shift;
 	my $level  = shift || 0;
 	my $inline = shift || 0;
@@ -174,8 +192,8 @@ sub _dump_value ($) {
 
 	if (! $type) {
 		$dump .= defined $value
-			? $value =~ /^-?\d+$/ ||$inline == 2 && $value =~ /^-?\w+$/
-				? $value : '"' . _dump_string($value) . '"'
+			? $value =~ /^-?\d+(?:\.\d+)?$/ || $inline == 2 && $value =~ /^-?\w+$/
+				? $value : dump_string($value)
 			: 'undef';
 	} elsif ($type eq 'ARRAY') {
 		if ($is_seen) {
@@ -185,10 +203,11 @@ sub _dump_value ($) {
 			my @array = @$value > $dump_array_limit ? (@$value)[0 .. $dump_array_limit - 2] : @$value;
 			my $prev_elem = '';
 			foreach (@array) {
-				# compress equal consecutive elements
-				my $elem = &_dump_value($_, $level + 1, 1);
-				if ($elem eq $prev_elem) {
-					$dump =~ s/^(\s+)(?:\()?(.*?)(?:\) x (\d+))?,$(\n)\z/my $c = ($3 || 1) + 1; "$1($2) x $c," . _dump_eol()/me;
+				# compress equal consecutive elements (does not look too good for non scalar elems)
+				my $elem = &dump_value($_, $level + 1, 1);
+				if ($dump_compress_array_elems && $elem eq $prev_elem) {
+					my ($elem_without_indent) = $elem =~ /^\s*(.*?)\s*$/s;
+					$dump =~ s/^(\s+)(?:\()?(\Q$elem_without_indent\E)(?:\) x (\d+))?,$(\n)\z/my $c = ($3 || 1) + 1; "$1($2) x $c," . _dump_eol()/me;
 					next;
 				}
 				$dump .= _dump_prefix($level + 1);
@@ -213,9 +232,9 @@ sub _dump_value ($) {
 				my $val = $value->{$key};
 				last if ++$idx == $dump_array_limit && $size > $dump_array_limit;
 				$dump .= _dump_prefix($level + 1);
-				$dump .= &_dump_value($key, $level + 1, 2);
+				$dump .= &dump_value($key, $level + 1, 2);
 				$dump .= " => ";
-				$dump .= &_dump_value($val, $level + 1, 1);
+				$dump .= &dump_value($val, $level + 1, 1);
 				$dump .= "," . _dump_eol();
 			}
 			if ($size > $dump_array_limit) {
@@ -232,7 +251,9 @@ sub _dump_value ($) {
 		$dump .= "GLOB";
 	} elsif ($type eq 'SCALAR') {
 		$dump .= "\\";
-		$dump .= &_dump_value($$value, $level + 1, 1);
+		$dump .= &dump_value($$value, $level + 1, 1);
+	} elsif ($type eq 'JSON::PP::Boolean') {
+		$dump .= $$value;  # 0 or 1
 	} else {
 		$dump .= "$type ";
 		my $native_type;
@@ -243,21 +264,20 @@ sub _dump_value ($) {
 
 		$dump_seen{$value} = 0;
 		bless($value, $native_type);
-		$dump .= &_dump_value($value, $level, 1);
+		$dump .= &dump_value($value, $level, 1);
 		bless($value, $type);
 	}
 
 	$dump .= _dump_eol() unless $inline;
 
 	return $dump;
-
 }
 
 sub dump ($;$) {
 	my $self = shift;
-	my $level = 0;
+	my $value = @_ ? shift : $self;
 
-	my $dump = _dump_value($self);
+	my $dump = dump_value($value);
 
 	%dump_seen = ();
 
@@ -409,7 +429,6 @@ in bytes and then a nice memory dump, looking like:
 Returns a neat object's presentation as a multi-line string, like:
 
  SMB::v2::Command::Close {
-     disable_log => 0,
      fid => [
          2,
          0,
@@ -420,8 +439,8 @@ Returns a neat object's presentation as a multi-line string, like:
          code => 6,
          credit_charge => 1,
          credits => 7802,
-         disable_log => 0,
          flags => 0,
+         log_level => 2,
          mid => 15,
          signature => [
              ("\x00") x 16,
@@ -431,6 +450,7 @@ Returns a neat object's presentation as a multi-line string, like:
          tid => 2,
          uid => 1,
      },
+     log_level => 2,
      name => "Close",
      openfile => undef,
      smb => 2,
@@ -447,6 +467,35 @@ about what was omitted.
 For each field in the object, the method of this name is auto-create on
 demand. This method returns the field value if there are no arguments
 (getter) and sets NEW_VALUE if there is a single argument (setter).
+
+=back
+
+=head1 FUNCTIONS
+
+No functions are exported, so functions and status code constants should
+be prefixed by the package namespace, like:
+
+	print SMB::dump_value($nested_array);
+
+	$status = SMB::STATUS_CANNOT_DELETE
+		if $status == SMB::STATUS_ACCESS_DENIED;
+
+=over 4
+
+=item dump_value PERL_VALUE
+
+Returns a neat PERL_VALUE presentation as a multi-line string.
+
+Used by B<dump> method.
+
+=item dump_string STRING
+
+Returns a printable STRING presentation as a one-line string.
+Long strings over 50 characters are cut, like "very lon..+8".
+Backslash and quote characters are prefixed with a backslash, and non
+printable or non-ascii characters are presented in hex, like "\x0a\xa0".
+
+Used by B<dump_value> function.
 
 =back
 

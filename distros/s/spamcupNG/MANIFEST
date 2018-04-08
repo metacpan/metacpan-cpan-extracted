@@ -7,7 +7,6 @@ META.json
 META.yml
 Makefile.PL
 README.md
-TODO
 bin/spamcup
 cpanfile
 dist.ini

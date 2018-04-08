@@ -1,3 +1,8 @@
+0.071   2018-04-03 (PERLANCAR)
+
+	- Deprecate nonnegint in favor of the new name 'uint'.
+
+
 0.070   2017-08-19 (PERLANCAR)
 
 	- Add schema: nonnegint.

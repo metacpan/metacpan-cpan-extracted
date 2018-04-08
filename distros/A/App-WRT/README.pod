@@ -240,6 +240,7 @@ Here's a verbatim copy of C<%default>, with some commentary about values.
       stylesheet_url => undef,       # path to a CSS file (used in template)
       favicon_url    => undef,       # path to a favicon (used in template)
       feed_alias     => 'feed',      # what entry path should correspond to feed?
+      feed_length    => 30,          # how many entries should there be in the feed?
       author         => undef,       # author name (used in template, feed)
       description    => undef,       # site description (used in template)
       content        => undef,       # place to stash content for templates
@@ -253,9 +254,6 @@ Here's a verbatim copy of C<%default>, with some commentary about values.
       # situations where every page of a site should serve some other
       # content in-place, like Net Neutrality protest blackouts):
       overlay        => undef,
-
-      # List of years for the menu:
-      year_list      => [ reverse(1997..(get_date('year') + 1900)) ],
 
       # What gets considered an entry _path_:
       entrypath_expr => qr/^ ([a-z0-9_\/-]+) $/x,
@@ -366,6 +364,20 @@ If a year file is text, returns that instead.
 
 Returns the full text of all entries, in order.
 
+=item get_all_source_files()
+
+Returns a list of all source files for the current entry archive.
+
+This was originally in App::WRT::Renderer, so there may be some pitfalls here.
+
+=item get_all_day_entries()
+
+Returns a list of all entries which are a specific day.
+
+=item get_all_day_entries()
+
+Returns an easily sortable date of the form nnnn-nn-nn for a given entry.
+
 =item link_bar(@extra_links)
 
 Returns a little context-sensitive navigation bar.
@@ -451,12 +463,17 @@ Return an absolute path for a given file. Called by root_locations.
 
 Arguably this is stupid and inefficient.
 
-=item feed_print($month)
+=item feed_print_latest()
 
-Return an Atom feed of entries for a month. Defaults to the most
-recent month in the archive.
+Return an Atom feed for the most recent entries.
 
-Called from handle(), requires XML::Atom::SimpleFeed.
+Called from display().
+
+=item feed_print(@entries)
+
+Return an Atom feed for the given list of entries.
+
+Requires XML::Atom::SimpleFeed.
 
 =back
 

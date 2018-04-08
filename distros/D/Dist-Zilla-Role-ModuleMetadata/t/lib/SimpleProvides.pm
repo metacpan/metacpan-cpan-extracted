@@ -13,7 +13,7 @@ sub metadata {
                 my $file = $_;
                 my $mmd = $self->module_metadata_for_file($file);
                 map {
-                    # $modulename => { file => $filename, version => #version }
+                    # $modulename => { file => $filename, version => version }
                     $_ => +{
                         file => $file->name,
                         version => $mmd->version($_)->stringify,

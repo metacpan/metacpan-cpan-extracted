@@ -1,15 +1,17 @@
 package Monkey::Patch::Action;
 
+our $DATE = '2018-04-02'; # DATE
+our $VERSION = '0.061'; # VERSION
+
 use 5.010001;
 use warnings;
 use strict;
 
-our $VERSION = '0.05'; # VERSION
-
 use Monkey::Patch::Action::Handle;
+use Scalar::Util qw(blessed);
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(patch_package);
+our @EXPORT_OK = qw(patch_package patch_object);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 sub patch_package {
@@ -55,6 +57,54 @@ sub patch_package {
     );
 }
 
+sub patch_object {
+    my ($obj, $methname, $action0, $code0, @extra) = @_;
+
+    die "'$obj' not an object" unless blessed($obj);
+    die "Please specify action" unless $action0;
+    die "Invalid action '$action0', please choose add|replace|add_or_replace|wrap|delete"
+        unless $action0 =~ /\A(add|replace|add_or_replace|wrap|delete)\z/;
+    if ($action0 eq 'delete') {
+        die "code not needed for 'delete' action" if $code0;
+    } else {
+        die "Please specify code" unless $code0;
+    }
+
+    my $package = ref($obj);
+    my $name = "$package\::$methname";
+    my $action = defined(&$name) ? 'wrap' : 'add';
+
+    my $code = sub {
+        my $ctx  = $action eq 'wrap' ? shift : undef;
+        my $self = $_[0];
+        no warnings 'numeric';
+        if ($obj == $self) {
+            if ($action0 eq 'add') {
+                $code0->(@_);
+            } elsif ($action0 eq 'replace') {
+                $code0->(@_);
+            } elsif ($action0 eq 'add_or_replace') {
+                $code0->(@_);
+            } elsif ($action0 eq 'wrap') {
+                my $octx = {%$ctx};
+                $code0->($octx, @_);
+            } elsif ($action0 eq 'delete') {
+                die "Undefined method '$methname' for object '$obj'";
+            } else {
+                die "BUG: Unknown action '$action0'";
+            }
+        } else {
+            if ($action eq 'wrap') {
+                return $ctx->{orig}->(@_);
+            } else {
+                die "Undefined method '$methname' for object '$obj'";
+            }
+        }
+    };
+
+    patch_package($package, $methname, $action, $code, @extra);
+}
+
 1;
 # ABSTRACT: Wrap/add/replace/delete subs from other package (with restore)
 
@@ -70,9 +120,11 @@ Monkey::Patch::Action - Wrap/add/replace/delete subs from other package (with re
 
 =head1 VERSION
 
-This document describes version 0.05 of Monkey::Patch::Action (from Perl distribution Monkey-Patch-Action), released on 2017-07-04.
+This document describes version 0.061 of Monkey::Patch::Action (from Perl distribution Monkey-Patch-Action), released on 2018-04-02.
 
 =head1 SYNOPSIS
+
+Patching package or class:
 
  use Monkey::Patch::Action qw(patch_package);
 
@@ -134,6 +186,57 @@ This document describes version 0.05 of Monkey::Patch::Action (from Perl distrib
  undef $h;
  Foo::sub1(); # says "Foo's sub1"
 
+Patching object:
+
+ use Monkey::Patch::Action qw(patch_package);
+
+ package Foo;
+ sub meth1 { say "Foo's meth1" }
+
+ package Bar;
+ our @ISA = qw(Foo);
+ sub meth2 { say "Bar's meth2" }
+
+ package main;
+ my $h; # handle object
+ my $foo1 = Foo->new;
+ my $foo2 = Foo->new;
+ my $bar1 = Bar->new;
+ my $bar2 = Bar->new;
+
+ # replacing a method
+ $h = patch_object($foo1, 'meth1', 'replace', sub { say "Foo's modified meth1" });
+ $foo1->meth1; # says "Foo's modified meth1"
+ $foo2->meth1; # says "Foo's meth1"
+ undef $h;
+ $foo1->meth1; # says "Foo's meth1"
+
+ $h = patch_object($bar1, 'meth3', 'add', sub { "Bar's meth3" });
+ $bar1->meth3; # says "Bar's meth3"
+ $bar2->meth3; # dies
+ undef $h;
+ $bar1->meth3; # dies
+
+ # deleting a method
+ $h = patch_object($foo1, 'meth1', 'delete');
+ $foo1->meth1; # dies
+ $foo2->meth1; # says "Foo's meth1"
+ undef $h;
+ $foo1->meth1; # says "Foo's meth1"
+
+ # wrapping a method
+ $h = patch_object($foo1, 'meth1', 'wrap',
+     sub {
+         my $ctx = shift;
+         say "Wrapping $ctx->{package}::$ctx->{subname}";
+         $ctx->{orig}->(@_);
+     }
+ );
+ $foo1->meth1; # says "Wrapping Foo::meth1" then "Foo's meth1"
+ $foo2->meth1; # says "Foo's meth1"
+ undef $h;
+ $foo1->meth1; # says "Foo's meth1"
+
 =head1 DESCRIPTION
 
 Monkey-patching is the act of modifying a package at runtime: adding a
@@ -155,11 +258,15 @@ unapply them later in flexible order.
 
 =head1 FUNCTIONS
 
-=head2 patch_package($package, $subname, $action, $code, @extra) => HANDLE
+=head2 patch_package
+
+Usage:
+
+ patch_package($package, $subname, $action, $code, @extra) => HANDLE
 
 Patch C<$package>'s subroutine named C<$subname>. C<$action> is either:
 
-=over 4
+=over
 
 =item * C<wrap>
 
@@ -200,6 +307,33 @@ subroutine and second patch (P2) wraps it. If P1 is unapplied before P2, the
 subroutine is now no longer there, and P2 no longer works. Unapplying P1 after
 P2 works, of course.
 
+=head2 patch_object
+
+Usage:
+
+ patch_object($obj, $methname, $action, $code, @extra) => HANDLE
+
+Basically just a wrapper for C<patch_package> to patch "only specific
+object(s)". Basically it does something like this:
+
+ die "'$obj' is not an object" unless blessed($obj);
+ my $package = ref($obj);
+ patch_package($package, $methname, 'wrap',
+     sub {
+         my $ctx = shift;
+         my $self = shift;
+
+         my $o = $ctx->{extra}[0];
+         no warnings 'numeric';
+         if ($o == $self) {
+             # do stuff
+         } else {
+             # not our target object
+             $ctx->{orig}->(@_);
+         }
+     },
+ );
+
 =head1 FAQ
 
 =head2 Differences with Monkey::Patch?
@@ -207,7 +341,7 @@ P2 works, of course.
 This module is based on the wonderful L<Monkey::Patch> by Paul Driver. The
 differences are:
 
-=over 4
+=over
 
 =item *
 
@@ -225,11 +359,6 @@ Using this module, the wrapper receives a context hash instead of just the
 original subroutine.
 
 =item *
-
-Monkey::Patch adds convenience for patching classes and objects. To keep things
-simple, no such convenience is currently provided by this module.
-C<patch_package()> *can* patch classes and objects as well (see the next FAQ
-entry).
 
 =back
 
@@ -263,13 +392,15 @@ behavior for a certain object only, you can do something like:
      $ctx->{orig}->(@_);
  }, $obj);
 
+This is basically what L</"patch_object"> does.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Monkey-Patch-Action>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Monkey-Patch-Action>.
+Source repository is at L<https://github.com/perlancar/perl-Monkey-Patch-Action>.
 
 =head1 BUGS
 
@@ -289,7 +420,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

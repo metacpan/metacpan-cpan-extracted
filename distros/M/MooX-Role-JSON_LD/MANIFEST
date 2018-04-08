@@ -1,9 +1,8 @@
 lib/MooX/Role/JSON_LD.pm
 Makefile.PL
 MANIFEST			This list of files
-MooX-Role-JSON_LD-0/META.json
-MooX-Role-JSON_LD-0/META.yml
 README.md
+Changes.md
 t/01-load.t
 t/02-moo-basic.t
 t/03-moose-basic.t

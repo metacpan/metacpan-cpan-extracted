@@ -4,9 +4,9 @@ use Pcore -class, -const;
 use Pcore::API::Google;
 use Pcore::HTTP qw[http_get];
 
-has max_threads => ( is => 'ro', isa => PositiveInt, default => 1 );
+has max_threads     => ( is => 'ro', isa => PositiveInt, default => 1 );
 has anticaptcha_key => ( is => 'ro', isa => Str );
-has cookies => ( is => 'ro', isa => HashRef, default => sub { {} } );
+has cookies         => ( is => 'ro', isa => HashRef, default => sub { {} } );
 
 has _anticaptcha => ( is => 'lazy', isa => Maybe [ InstanceOf ['Pcore::API::AntiCaptcha'] ], init_arg => undef );
 has _threads => ( is => 'ro', isa => PositiveOrZeroInt, default => 0, init_arg => undef );
@@ -158,14 +158,13 @@ sub _resolve_captcha ( $self, $url, $res, $cb ) {
                     }
 
                     # enter captcha
-                    my $query = P->data->to_uri(
-                        {   continue => $url,
-                            id       => $id,
-                            q        => $q,
-                            submit   => 'Submit',
-                            captcha  => $captcha->{result}
-                        }
-                    );
+                    my $query = P->data->to_uri( {
+                        continue => $url,
+                        id       => $id,
+                        q        => $q,
+                        submit   => 'Submit',
+                        captcha  => $captcha->{result}
+                    } );
 
                     http_get(
                         P->uri( '/sorry/CaptchaRedirect?' . $query, base => $base_url ),

@@ -13,8 +13,6 @@ use Test::TempDir::Tiny;
 
 use lib qw(.);
 
-## no critic(Modules::ProhibitMultiplePackages)
-
 main();
 
 sub main {

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Test::More 0.88;
-use Test::Exception;
+use Test::Fatal;
 
 use ok 'Crypt::Random::Source::Base::Handle';
 
@@ -14,12 +14,12 @@ use ok 'Crypt::Random::Source::Base::Handle';
 
     is( $p->get(4), "foo\n", "read some bytes" );
 
-    throws_ok {  $p->get(100) } qr/enough bytes/i, "underread";
+    like exception { $p->get(100) }, qr/enough bytes/i, "underread";
 
     $p->allow_under_read(1);
 
     my $buf;
-    lives_ok { $buf = $p->get(100) } "underread now allowed";
+    is exception { $buf = $p->get(100) }, undef, "underread now allowed";
 
     is( $buf, '', "nothing read" );
 }

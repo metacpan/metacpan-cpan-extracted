@@ -1,5 +1,13 @@
-SYNOPSIS
+NAME
+    Dist::Zilla::Plugin::InsertCommandOutput - Insert the output of command
+    into your POD
 
+VERSION
+    This document describes version 0.050 of
+    Dist::Zilla::Plugin::InsertCommandOutput (from Perl distribution
+    Dist-Zilla-Plugin-InsertCommandOutput), released on 2018-04-06.
+
+SYNOPSIS
     In dist.ini:
 
      [InsertCommandOutput]
@@ -10,22 +18,46 @@ SYNOPSIS
      # COMMAND: netstat -anp
 
 DESCRIPTION
-
-    This module finds # COMMAND: ... directives in your POD, pass it to the
-    Perl's backtick operator, and insert the result into your POD as a
-    verbatim paragraph (unless if you set make_verbatim to 0, in which case
-    output will be inserted as-is). If command fails ($? is non-zero),
+    This module finds "# COMMAND: ..." directives in your POD, pass it to
+    the Perl's backtick operator, and insert the result into your POD as a
+    verbatim paragraph (unless if you set "make_verbatim" to 0, in which
+    case output will be inserted as-is). If command fails ($? is non-zero),
     build will be aborted.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-InsertCommandOutput>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertCommandOutput
+    >.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Ins
+    ertCommandOutput>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Dist::Zilla::Plugin::InsertCodeResult, which can also be used to
-    accomplish the same thing, e.g. with # CODE: my $res = `netstat -anp`;
-    die if $?; $res except the DZP::InstallCommandResult plugin is shorter.
+    accomplish the same thing, e.g. with "# CODE: my $res = `netstat -anp`;
+    die if $?; $res" except the DZP::InstallCommandResult plugin is shorter.
 
     Dist::Zilla::Plugin::InsertCodeOutput, which can also be used to
-    accomplish the same thing, e.g. with # CODE: system "netstat -anp"; die
-    if $?.
+    accomplish the same thing, e.g. with "# CODE: system "netstat -anp"; die
+    if $?".
 
     Dist::Zilla::Plugin::InsertExample
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2015, 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

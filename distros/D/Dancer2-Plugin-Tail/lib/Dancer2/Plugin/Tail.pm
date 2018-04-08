@@ -13,11 +13,11 @@ Dancer2::Plugin::Tail - Tail a file from Dancer2
 
 =head1 VERSION
 
-Version 0.012
+Version 0.015
 
 =cut
 
-our $VERSION = '0.012';
+our $VERSION = '0.015';
 
 
 =head1 SYNOPSIS
@@ -278,6 +278,7 @@ sub BUILD {
   $plugin->app->log( debug => "Adding Route ");
   $plugin->app->log( debug => "      Method " . $data_method);
   $plugin->app->log( debug => "      Regexp " . $data_url);
+
   # Use regexp to match part of the file, then splat inside code
   $plugin->app->add_route(
     method => $data_method,
@@ -299,10 +300,10 @@ sub display_tail {
   $plugin->app->log( debug => "Params:");
   $plugin->app->log( debug => $params );
 
-  my $file_id  = $params->{'id'};        ### ID in config
-  my $curr_pos = $params->{'curr_pos'};  ### Current position to read from
+  my $tail_file_id = $params->{'tail_file_id'};        ### ID in config
+  my $curr_pos     = $params->{'curr_pos'};    ### Current position to read from
 
-  my $tail_id  = 'tail-' . $file_id;                  ### ID from session
+  my $tail_id      = 'tail-' . $tail_file_id;  ### ID from session
 
   my $file         = undef;
   my $tail_file    = undef;
@@ -311,17 +312,17 @@ sub display_tail {
 
   $plugin->app->log( debug => "Files:" );
   $plugin->app->log( debug => $files );
-  $plugin->app->log( debug => "File id:" . $file_id );
+  $plugin->app->log( debug => "File id:" . $tail_file_id );
   $plugin->app->log( debug => "tail id:" . $tail_id );
-  $plugin->app->log( debug => "if "      . $files->{$file_id} );
-  $plugin->app->log( debug => "file:"    . $files->{$file_id}->{file} );
-  $plugin->app->log( debug => "heading"  . $files->{$file_id}->{heading} );
+  $plugin->app->log( debug => "if "      . $files->{$tail_file_id} );
+  $plugin->app->log( debug => "file:"    . $files->{$tail_file_id}->{file} );
+  $plugin->app->log( debug => "heading"  . $files->{$tail_file_id}->{heading} );
 
   # Predefined
-  if ( $files->{$file_id} ) {
-    $plugin->app->log( debug => "Predefined file_id=" . $file_id );
-    $tail_file    = $files->{$file_id}->{file} ;
-    $tail_heading = $files->{$file_id}->{heading};
+  if ( $files->{$tail_file_id} ) {
+    $plugin->app->log( debug => "Predefined file_id=" . $tail_file_id );
+    $tail_file    = $files->{$tail_file_id}->{file} ;
+    $tail_heading = $files->{$tail_file_id}->{heading};
 
   # User defined
   } else {
@@ -379,14 +380,14 @@ sub _tail_the_file {
   my $app      = shift;
   my $plugin   = $app->with_plugin('Tail');
 
-  my $params  = $app->request->params;
-
   $plugin->app->log( debug => "In _tail_the_file " );
 
-  my $file_id  = $params->{'id'};
-  my $curr_pos = $params->{'curr_pos'};
+  my $params  = $app->request->params;
 
-  my $tail_id  = 'tail-' . $file_id ;
+  my $tail_file_id = $params->{'tail_file_id'};
+  my $curr_pos     = $params->{'curr_pos'};
+
+  my $tail_id      = 'tail-' . $tail_file_id ;
 
   my $files        = $plugin->files;
   my $file         = undef;
@@ -397,10 +398,10 @@ sub _tail_the_file {
   $plugin->app->log( debug => $files );
 
   # Predefined
-  if ( $files->{$file_id} ) {
-    $plugin->app->log( debug => "Predefined " . $file_id );
-    $tail_file    = $files->{$file_id}->{file} ;
-    $tail_heading = $files->{$file_id}->{heading};
+  if ( $files->{$tail_file_id} ) {
+    $plugin->app->log( debug => "Predefined " . $tail_file_id );
+    $tail_file    = $files->{$tail_file_id}->{file} ;
+    $tail_heading = $files->{$tail_file_id}->{heading};
 
   # User defined
   } else {

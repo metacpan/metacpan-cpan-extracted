@@ -4,8 +4,8 @@ use File::Find;
 
 # Configuration part
 
-$use_german   = 1;   # Test für österreichische Bankkonten einbauen
-$use_austrian = 1;   # Test für deutsche Bankkonten einbauen
+$use_german   = 1;   # Test für deutsche Bankkonten einbauen
+$use_austrian = 0;   # Test für österreichische Bankkonten einbauen
 $use_lx2l     = 0;   # lx2l benutzen (nur für die Entwicklung)
 
 # In der folgenden Variablen kann der komplette Pfad von zlib.a eingetragen

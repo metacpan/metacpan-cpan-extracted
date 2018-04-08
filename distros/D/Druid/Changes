@@ -1,5 +1,8 @@
 Revision history for Druid
 
+0.004   2018-04-03
+        Fixed missing files and added them to MANIFEST file
+
 0.003   2018-03-25
         Merged review commits and fixed the test failing because of missing test dependencies.
 

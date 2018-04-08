@@ -50,7 +50,7 @@
     yMd => "dd-MM-y",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-other" => "Y \N{U+1001}\N{U+102f} w \N{U+1015}\N{U+1010}\N{U+103a}\N{U+1019}\N{U+103c}\N{U+1031}\N{U+102c}\N{U+1000}\N{U+103a}",
+    "yw-count-other" => "y \N{U+1001}\N{U+102f} w \N{U+1015}\N{U+1010}\N{U+103a}\N{U+1019}\N{U+103c}\N{U+1031}\N{U+102c}\N{U+1000}\N{U+103a}",
   },
   code => "my",
   date_format_full => "y\N{U+104a} MMMM d\N{U+104a} EEEE",
@@ -267,5 +267,5 @@
   time_format_medium => "B HH:mm:ss",
   time_format_short => "B H:mm",
   variant => undef,
-  version => 32,
+  version => 33,
 }

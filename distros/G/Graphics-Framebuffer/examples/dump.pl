@@ -28,6 +28,7 @@ if (open(my $FILE,'>','dump.log')) {
         print $FILE Dumper($copy);
     };
     if ($@) {
+        print "\nCRASH LOGGED\n\n$@\n";
         print $FILE "\nCRASH\n\n$@\n";
     }
     close($FILE);

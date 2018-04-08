@@ -1,0 +1,23 @@
+version: '2'
+services:
+    minio:
+        command:
+            - server
+            - /tmp
+        environment:
+            MINIO_ACCESS_KEY: access_key
+            MINIO_SECRET_KEY: secret_key
+        image: minio/minio
+        logging:
+            driver: none
+        tmpfs: /tmp
+    test:
+        command:
+            - prove
+            - -lv
+            - xt
+        depends_on:
+            - minio
+        image: perl:5.26
+        volumes:
+            - .:/root

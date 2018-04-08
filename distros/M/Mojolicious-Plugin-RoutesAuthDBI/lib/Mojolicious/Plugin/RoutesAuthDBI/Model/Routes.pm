@@ -47,6 +47,9 @@ where r.id2=?;
 select r.*, coalesce(ac.controller, c.controller) as controller, coalesce(r.namespace, coalesce(ac.namespace, c.namespace)) as namespace, ac.action, ac.callback, ac.id as action_id, coalesce(ac.controller_id, c.id) as controller_id, case when r.namespace is not null then null else coalesce(ac.namespace_id, c.namespace_id) end as namespace_id
 from "{%= $schema %}"."{%= $tables->{routes} %}" r
 ---  join "{%= $schema %}"."{%= $tables->{refs} %}" rf on r.id=rf.id2
+
+  left join lateral (select (regexp_matches(r.descr, '(?:опции|options):({.+}):(?:опции|options)'))[1]::jsonb as data ) r_opt on true
+
   left join ( -- связь действие-маршрут
     select a.*, c.*, r.id2 as "ref_route_action"
     from 
@@ -71,7 +74,8 @@ from "{%= $schema %}"."{%= $tables->{routes} %}" r
     
   ) c on r.id=c."ref_route_controller"
 --- where not coalesce(r.disable, false)
-order by regexp_replace(r.request, '^.* ', '') ---r.ts - (coalesce(r.interval_ts, 0::int)::varchar || ' second')::interval
+order by regexp_replace(r.request, '^.* ', ''), (coalesce(r_opt.data->'приоритет', r_opt.data->'prio'))::text
+---r.ts - (coalesce(r.interval_ts, 0::int)::varchar || ' second')::interval
 
 ;
 

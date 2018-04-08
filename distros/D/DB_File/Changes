@@ -1,4 +1,8 @@
 
+1.841 2 Apr 2018
+
+   * #124944 allow ppport.h-less builds in core
+
 1.840 29 Dec 2016
 
    * #119569: Failed to install DB_File-1.839 into Linux

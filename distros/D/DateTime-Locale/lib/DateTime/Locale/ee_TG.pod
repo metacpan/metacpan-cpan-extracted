@@ -609,13 +609,13 @@ Ewe Togo locale.
    1995-12-22T09:05:02 = kɔta enelia 1995
   -0010-09-15T04:44:23 = kɔta etɔ̃lia -10
 
-=head3 yw-count-one ('kɔsiɖa' w 'lia' 'le' 'ƒe' Y 'me')
+=head3 yw-count-one ('kɔsiɖa' w 'lia' 'le' 'ƒe' y 'me')
 
    2008-02-05T18:30:30 = kɔsiɖa 6 lia le ƒe 2008 me
    1995-12-22T09:05:02 = kɔsiɖa 51 lia le ƒe 1995 me
   -0010-09-15T04:44:23 = kɔsiɖa 37 lia le ƒe -10 me
 
-=head3 yw-count-other ('kɔsiɖa' w 'lia' 'le' 'ƒe' Y 'me')
+=head3 yw-count-other ('kɔsiɖa' w 'lia' 'le' 'ƒe' y 'me')
 
    2008-02-05T18:30:30 = kɔsiɖa 6 lia le ƒe 2008 me
    1995-12-22T09:05:02 = kɔsiɖa 51 lia le ƒe 1995 me

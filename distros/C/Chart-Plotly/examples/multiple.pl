@@ -27,4 +27,20 @@ use Data::Table;
 
 my $table = Data::Table::fromFile('morley.csv');
 
-show_plot([$data], [$scattergl], [$bessel], $table);
+use Chart::Plotly::Trace::Table;
+use List::AllUtils 0.14;
+my $text_table = Chart::Plotly::Trace::Table->new(
+    header => { values => [map {[$_]} $table->header],
+        align  => "center",
+        line   => { width => 1, color => 'black' },
+        fill   => { color => "grey" },
+        font   => { family => "Arial", size => 12, color => "white" }
+    },
+    cells => {values => [ List::AllUtils::zip_by( sub { [ @_ ] }, @{$table->data}) ],
+        align  => "center",
+        line   => { color => "black", width => 1 },
+        font   => { family => "Arial", size => 11, color => [ "black" ] }
+    }
+);
+
+show_plot([$data], [$scattergl], [$bessel], $table, [$text_table]);

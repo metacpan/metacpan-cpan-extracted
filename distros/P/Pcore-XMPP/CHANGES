@@ -1,3 +1,6 @@
+v0.10.1 2018-04-05T06:47:08Z
+ - dist.perl renamed to dist.yaml
+
 v0.10.0 2017-06-02T07:19:33Z
  - No issues on bugtracker were closed since the last release
  - log pipes attrs changed to private

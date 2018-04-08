@@ -1,12 +1,14 @@
 package Sah::Schema::nonnegint;
 
-our $DATE = '2017-08-19'; # DATE
-our $VERSION = '0.070'; # VERSION
+our $DATE = '2018-04-03'; # DATE
+our $VERSION = '0.071'; # VERSION
 
 our $schema = [int => {
-    summary   => 'Non-negative integer (0, 1, 2, ...)',
+    summary   => 'Non-negative integer (0, 1, 2, ...) [DEPRECATED]',
     min       => 0,
    description => <<'_',
+
+This schema is DEPRECATED. Please use the new name `uint`.
 
 See also `posint` for integers that start from 1.
 
@@ -14,7 +16,7 @@ _
  }, {}];
 
 1;
-# ABSTRACT: Non-negative integer (0, 1, 2, ...)
+# ABSTRACT: Non-negative integer (0, 1, 2, ...) [DEPRECATED]
 
 __END__
 
@@ -24,13 +26,15 @@ __END__
 
 =head1 NAME
 
-Sah::Schema::nonnegint - Non-negative integer (0, 1, 2, ...)
+Sah::Schema::nonnegint - Non-negative integer (0, 1, 2, ...) [DEPRECATED]
 
 =head1 VERSION
 
-This document describes version 0.070 of Sah::Schema::nonnegint (from Perl distribution Sah-Schemas-Int), released on 2017-08-19.
+This document describes version 0.071 of Sah::Schema::nonnegint (from Perl distribution Sah-Schemas-Int), released on 2018-04-03.
 
 =head1 DESCRIPTION
+
+This schema is DEPRECATED. Please use the new name C<uint>.
 
 See also C<posint> for integers that start from 1.
 
@@ -56,7 +60,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

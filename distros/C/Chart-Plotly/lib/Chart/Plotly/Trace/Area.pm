@@ -1,0 +1,308 @@
+package Chart::Plotly::Trace::Area;
+use Moose;
+use MooseX::ExtraArgs;
+use Moose::Util::TypeConstraints qw(enum union);
+if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
+    Moose::Util::TypeConstraints::type('PDL');
+}
+
+use Chart::Plotly::Trace::Area::Hoverlabel;
+use Chart::Plotly::Trace::Area::Marker;
+use Chart::Plotly::Trace::Area::Stream;
+
+our $VERSION = '0.017';    # VERSION
+
+# ABSTRACT:
+
+sub TO_JSON {
+    my $self       = shift;
+    my $extra_args = $self->extra_args // {};
+    my $meta       = $self->meta;
+    my %hash       = %$self;
+    for my $name ( sort keys %hash ) {
+        my $attr = $meta->get_attribute($name);
+        if ( defined $attr ) {
+            my $value = $hash{$name};
+            my $type  = $attr->type_constraint;
+            if ( $type && $type->equals('Bool') ) {
+                $hash{$name} = $value ? \1 : \0;
+            }
+        }
+    }
+    %hash = ( %hash, %$extra_args );
+    delete $hash{'extra_args'};
+    if ( $self->can('type') && ( !defined $hash{'type'} ) ) {
+        $hash{type} = $self->type();
+    }
+    return \%hash;
+}
+
+sub type {
+    my @components = split( /::/, __PACKAGE__ );
+    return lc( $components[-1] );
+}
+
+has customdata => (
+    is  => "rw",
+    isa => "ArrayRef|PDL",
+    documentation =>
+      "Assigns extra data each datum. This may be useful when listening to hover, click and selection events. Note that, *scatter* traces also appends customdata items in the markers DOM elements",
+);
+
+has customdatasrc => ( is            => "rw",
+                       isa           => "Str",
+                       documentation => "Sets the source reference on plot.ly for  customdata .",
+);
+
+has hoverinfo => (
+    is  => "rw",
+    isa => "Maybe[ArrayRef]",
+    documentation =>
+      "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
+);
+
+has hoverinfosrc => ( is            => "rw",
+                      isa           => "Str",
+                      documentation => "Sets the source reference on plot.ly for  hoverinfo .",
+);
+
+has hoverlabel => ( is  => "rw",
+                    isa => "Maybe[HashRef]|Chart::Plotly::Trace::Area::Hoverlabel", );
+
+has ids => (
+    is  => "rw",
+    isa => "ArrayRef|PDL",
+    documentation =>
+      "Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.",
+);
+
+has idssrc => ( is            => "rw",
+                isa           => "Str",
+                documentation => "Sets the source reference on plot.ly for  ids .",
+);
+
+has legendgroup => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.",
+);
+
+has marker => ( is  => "rw",
+                isa => "Maybe[HashRef]|Chart::Plotly::Trace::Area::Marker", );
+
+has name => ( is            => "rw",
+              isa           => "Str",
+              documentation => "Sets the trace name. The trace name appear as the legend item and on hover.",
+);
+
+has opacity => ( is            => "rw",
+                 isa           => "Num",
+                 documentation => "Sets the opacity of the trace.",
+);
+
+has r => ( is  => "rw",
+           isa => "ArrayRef|PDL",
+           documentation =>
+             "For legacy polar chart only.Please switch to *scatterpolar* trace type.Sets the radial coordinates.",
+);
+
+has rsrc => ( is            => "rw",
+              isa           => "Str",
+              documentation => "Sets the source reference on plot.ly for  r .",
+);
+
+has selectedpoints => (
+    is  => "rw",
+    isa => "Any",
+    documentation =>
+      "Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.",
+);
+
+has showlegend => (
+               is            => "rw",
+               isa           => "Bool",
+               documentation => "Determines whether or not an item corresponding to this trace is shown in the legend.",
+);
+
+has stream => ( is  => "rw",
+                isa => "Maybe[HashRef]|Chart::Plotly::Trace::Area::Stream", );
+
+has t => ( is  => "rw",
+           isa => "ArrayRef|PDL",
+           documentation =>
+             "For legacy polar chart only.Please switch to *scatterpolar* trace type.Sets the angular coordinates.",
+);
+
+has tsrc => ( is            => "rw",
+              isa           => "Str",
+              documentation => "Sets the source reference on plot.ly for  t .",
+);
+
+has uid => ( is  => "rw",
+             isa => "Str", );
+
+has visible => (
+    is => "rw",
+    documentation =>
+      "Determines whether or not this trace is visible. If *legendonly*, the trace is not drawn, but can appear as a legend item (provided that the legend itself is visible).",
+);
+
+__PACKAGE__->meta->make_immutable();
+1;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Chart::Plotly::Trace::Area -  
+
+=head1 VERSION
+
+version 0.017
+
+=head1 SYNOPSIS
+
+ use Chart::Plotly qw(show_plot);
+ use Chart::Plotly::Trace::Area;
+ # Example data from: https://plot.ly/javascript/wind-rose-charts/#wind-rose-chart
+ my $area = Chart::Plotly::Trace::Area->new(
+     r      => [ 77.5, 72.5, 70.0, 45.0, 22.5, 42.5, 40.0, 62.5 ],
+     t      => [ 'North', 'N-E', 'East', 'S-E', 'South', 'S-W', 'West', 'N-W' ],
+     name   => '11-14 m/s',
+     marker => { color => 'rgb(106,81,163)' },
+ );
+ 
+ show_plot([ $area ]);
+
+=head1 DESCRIPTION
+
+Screenshot of the above example:
+
+=for HTML <p>
+<img src="https://raw.githubusercontent.com/pablrod/p5-Chart-Plotly/master/examples/traces/area.png" alt="Screenshot of the above example">
+</p>
+
+=for markdown ![Screenshot of the above example](https://raw.githubusercontent.com/pablrod/p5-Chart-Plotly/master/examples/traces/area.png)
+
+=for HTML <p>
+<iframe src="https://raw.githubusercontent.com/pablrod/p5-Chart-Plotly/master/examples/traces/area.html" style="border:none;" width="80%" height="520"></iframe>
+</p>
+
+This file has been autogenerated from the official plotly.js source.
+
+If you like Plotly, please support them: L<https://plot.ly/> 
+Open source announcement: L<https://plot.ly/javascript/open-source-announcement/>
+
+Full reference: L<https://plot.ly/javascript/reference/#area>
+
+=head1 DISCLAIMER
+
+This is an unofficial Plotly Perl module. Currently I'm not affiliated in any way with Plotly. 
+But I think plotly.js is a great library and I want to use it with perl.
+
+=head1 METHODS
+
+=head2 TO_JSON
+
+Serialize the trace to JSON. This method should be called only by L<JSON> serializer.
+
+=head2 type
+
+Trace type.
+
+=head1 ATTRIBUTES
+
+=over
+
+=item * customdata
+
+Assigns extra data each datum. This may be useful when listening to hover, click and selection events. Note that, *scatter* traces also appends customdata items in the markers DOM elements
+
+=item * customdatasrc
+
+Sets the source reference on plot.ly for  customdata .
+
+=item * hoverinfo
+
+Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.
+
+=item * hoverinfosrc
+
+Sets the source reference on plot.ly for  hoverinfo .
+
+=item * hoverlabel
+
+=item * ids
+
+Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.
+
+=item * idssrc
+
+Sets the source reference on plot.ly for  ids .
+
+=item * legendgroup
+
+Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.
+
+=item * marker
+
+=item * name
+
+Sets the trace name. The trace name appear as the legend item and on hover.
+
+=item * opacity
+
+Sets the opacity of the trace.
+
+=item * r
+
+For legacy polar chart only.Please switch to *scatterpolar* trace type.Sets the radial coordinates.
+
+=item * rsrc
+
+Sets the source reference on plot.ly for  r .
+
+=item * selectedpoints
+
+Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.
+
+=item * showlegend
+
+Determines whether or not an item corresponding to this trace is shown in the legend.
+
+=item * stream
+
+=item * t
+
+For legacy polar chart only.Please switch to *scatterpolar* trace type.Sets the angular coordinates.
+
+=item * tsrc
+
+Sets the source reference on plot.ly for  t .
+
+=item * uid
+
+=item * visible
+
+Determines whether or not this trace is visible. If *legendonly*, the trace is not drawn, but can appear as a legend item (provided that the legend itself is visible).
+
+=back
+
+=head1 AUTHOR
+
+Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Pablo Rodríguez González.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

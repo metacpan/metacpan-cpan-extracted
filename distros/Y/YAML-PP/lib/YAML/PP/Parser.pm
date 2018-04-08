@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Parser;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use constant TRACE => $ENV{YAML_PP_TRACE};
 use constant DEBUG => $ENV{YAML_PP_DEBUG} || $ENV{YAML_PP_TRACE};
@@ -777,7 +777,7 @@ sub event_to_test_suite {
 
         my $properties = '';
         $properties .= " &$info->{anchor}" if defined $info->{anchor};
-        $properties .= " $info->{tag}" if defined $info->{tag};
+        $properties .= " <$info->{tag}>" if defined $info->{tag};
 
         if ($ev eq 'document_start_event') {
             $string = "+DOC";
@@ -963,6 +963,8 @@ sub exception {
     my $next_line = $self->lexer->next_line;
     my $caller = $args{caller} || [ caller(0) ];
     my $e = YAML::PP::Exception->new(
+        got => $args{got},
+        expected => $args{expected},
         line => $line,
         msg => $msg,
         next => $next,
@@ -980,6 +982,8 @@ sub expected {
     my @caller = caller(0);
     $self->exception("Expected (@$expected), but got $got",
         caller => \@caller,
+        expected => $expected,
+        got => $args{got},
     );
 }
 

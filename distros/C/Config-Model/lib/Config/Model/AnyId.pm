@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::AnyId;
-$Config::Model::AnyId::VERSION = '2.118';
+$Config::Model::AnyId::VERSION = '2.120';
 use 5.010;
 
 use Mouse;
@@ -23,8 +23,6 @@ use Mouse::Util::TypeConstraints;
 use Scalar::Util qw/weaken/;
 
 extends qw/Config::Model::AnyThing/;
-
-use Mouse::Util::TypeConstraints;
 
 subtype 'KeyArray' => as 'ArrayRef' ;
 coerce 'KeyArray' => from 'Str' => via { [$_] } ;
@@ -439,9 +437,11 @@ sub notify_change {
     my $self = shift;
     my %args = @_;
 
-    $change_logger->trace( "called for ", $self->name, " from ", join( ' ', caller ),
-        " with ", join( ' ', %args ) )
-        if $change_logger->is_trace;
+    if ($change_logger->is_trace) {
+        my @a = map { ( $_ => $args{$_} // '<undef>' ); } sort keys %args;
+        $change_logger->trace( "called for ", $self->name, " from ", join( ' ', caller ),
+        " with ", join( ' ', @a ) );
+    }
 
     # $idx may be undef if $self has changed, not necessarily its content
     my $idx = $args{index};
@@ -514,7 +514,14 @@ sub check_content {
         push @error, "Too many instances ($nb) limit $self->{max_nb}, "
             if defined $self->{max_nb} and $nb > $self->{max_nb};
 
-        map { warn( "Warning in '" . $self->location_short . "': $_\n" ) } @warn
+        map {
+            if ($::_use_log4perl_to_warn) {
+                $logger->warn( "Warning in '" . $self->location_short . "': $_" )
+            }
+            else {
+                warn( "Warning in '" . $self->location_short . "': $_\n" )
+            }
+        } @warn
             unless $silent;
 
         $self->{content_warning_list} = \@warn;
@@ -585,7 +592,14 @@ sub check_idx {
     $self->{warning_hash}{$idx} = \@warn;
 
     if (@warn and not $silent and $check ne 'no') {
-        map { warn( "Warning in '" . $self->location_short . "': $_\n" ) } @warn;
+        map {
+            if ($::_use_log4perl_to_warn) {
+                $logger->warn( "Warning in '" . $self->location_short . "': $_" );
+            }
+            else {
+                warn( "Warning in '" . $self->location_short . "': $_\n" )
+            }
+        } @warn;
     }
 
     return scalar @error ? 0 : 1;
@@ -1037,7 +1051,7 @@ Config::Model::AnyId - Base class for hash or list element
 
 =head1 VERSION
 
-version 2.118
+version 2.120
 
 =head1 SYNOPSIS
 

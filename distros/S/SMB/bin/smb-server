@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright (C) 2014 Mikhael Goikhman <migo@freeshell.org>
+# Copyright (C) 2014-2018 Mikhael Goikhman <migo@freeshell.org>
 
 use strict;
 use warnings;
@@ -30,7 +30,7 @@ sub show_usage (;$) {
 			-h --help            show this usage
 			-p --port PORT       use port different from the default $port
 			-f --fifo FILENAME   use named file (fifo) file to listen on instead
-			-q --quiet           do not show any messages
+			-q --quiet           do not show any messages (multiple)
 			-v --verbose         show more debug messages (multiple)
 	};
 	$usage =~ s/^\n//; $usage =~ s/^\t\t?//mg;
@@ -42,7 +42,7 @@ GetOptions(
 	'h|help'     => sub { show_usage(0) },
 	'p|port=i'   => \$port,
 	'f|fifo=s'   => \$fifo_filename,
-	'q|quiet'    => \$quiet,
+	'q|quiet+'   => \$quiet,
 	'v|verbose+' => \$verbose,
 ) or show_usage(1);
 

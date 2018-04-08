@@ -30,14 +30,14 @@ sub listen {
 sub subws {
   my ($self, $ws) = @_;
   my $n = push @{$self->ws}, $ws;
-  $self->pubsub->notify($_ => {msg=>sprintf('Subcribed socket number #%s, pid %s', $n, $$)})
+  $self->pubsub->notify($_ => {msg=>sprintf('Подписался сокет #%s, pid %s', $n, $$)})
     for @{$ws->{chans}};
   return $n;
 }
 sub unsubws {
   my ($self, $n) = @_;
   my $ws = splice(@{$self->ws}, $n - 1, 1);
-  $self->pubsub->notify($_ => {msg=>sprintf('Unsubcribed socket number #%s, pid %s', $n, $$)})
+  $self->pubsub->notify($_ => {msg=>sprintf('Отписался сокет #%s, pid %s', $n, $$)})
     for @{$ws->{chans}};
 }
 
@@ -45,6 +45,8 @@ sub unsubws {
 package main;
 use Mojolicious::Lite;
 use Mojo::Pg::Che;
+
+app->config(hypnotoad => {listen => ['https://*:443?cert=ssl.crt&key=ssl.key'],});
 
 helper pubsub => sub {
   state $pubsub = PubSub->new->pubsub(Mojo::Pg::Che->new("postgres://guest@/test")->pubsub)
@@ -77,6 +79,7 @@ __DATA__
 </head>
 <body>
 <style>
+body {color: teal;}
 h1 {text-align: center;}
 .col1 {float:left; width: 50%;}
 .col2 {margin-left:50%; border-left: 3px double; padding: 0.3rem;}

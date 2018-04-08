@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" version="2.0">
+    <channel>
+        <title>The Treatment</title>
+        <link>http://www.kcrw.com/news-culture/shows/the-treatment</link>
+        <atom:link href="http://www.kcrw.com/podcast/show/tt" rel="self" />
+        
+        <atom:link href="http://www.kcrw.com/podcast/show/tt?paged=2" rel="next" />
+        <description><![CDATA[  The Treatment is a weekly journey into the heart of film led by film critic Elvis Mitchell. From an array of film industry guests, Elvis highlights one each week   discussing topics from film inspirations to inner personal conflicts. With a straightforward style that understates his vast knowledge, Elvis extracts depth and insight from his many guests including Dustin Hoffman, Quentin Tarantino and Oprah Winfrey. Subscribe to KCRW’s The Treatment!  
+ 
+ News and Events 
+ 
+   The Black List, Volume 2 , the acclaimed documentary by Elvis Mitchell and Timothy Greenfield-Sanders, features interviews with Laurence Fishburne, Massachusetts Gov. Deval Patrick, Melvin Van Peebles, Maya Rudolph and RZA. 
+ To learn more about The Black List, visit  www.blacklistproject.com  and  www.onemillionstories.org . You can also listen to Elvis and Timothy talk about their project on this  recent edition  of KCRW's Politics of Culture. ]]></description>
+        <itunes:summary><![CDATA[  The Treatment is a weekly journey into the heart of film led by film critic Elvis Mitchell. From an array of film industry guests, Elvis highlights one each week   discussing topics from film inspirations to inner personal conflicts. With a straightforward style that understates his vast knowledge, Elvis extracts depth and insight from his many guests including Dustin Hoffman, Quentin Tarantino and Oprah Winfrey. Subscribe to KCRW’s The Treatment!  
+ 
+ News and Events 
+ 
+   The Black List, Volume 2 , the acclaimed documentary by Elvis Mitchell and Timothy Greenfield-Sanders, features interviews with Laurence Fishburne, Massachusetts Gov. Deval Patrick, Melvin Van Peebles, Maya Rudolph and RZA. 
+ To learn more about The Black List, visit  www.blacklistproject.com  and  www.onemillionstories.org . You can also listen to Elvis and Timothy talk about their project on this  recent edition  of KCRW's Politics of Culture. ]]></itunes:summary>
+        <media:description type="plain"><![CDATA[In-depth interviews with the most innovative & influential people in entertainment, art, and pop culture. Hosted by film critic Elvis Mitchell, at KCRW.com.]]></media:description>
+        <itunes:subtitle><![CDATA[In-depth interviews with the most innovative & influential people in entertainment, art, and pop culture. Hosted by film critic Elvis Mitchell, at KCRW.com.]]></itunes:subtitle>
+        <media:credit role="author">KCRW, Elvis Mitchell</media:credit>
+        <itunes:author>KCRW, Elvis Mitchell</itunes:author>
+        <itunes:owner>
+            <itunes:email>webmaster@kcrw.org</itunes:email>
+            <itunes:name>KCRW, Elvis Mitchell</itunes:name>
+        </itunes:owner>
+        <copyright>KCRW 2018</copyright>
+        <media:copyright>KCRW 2018</media:copyright>
+        <media:keywords>interview,film,movie</media:keywords>
+        <itunes:keywords>352865,interview,film,movie</itunes:keywords>
+        <itunes:category text="Arts" />
+        <image>
+            <link>http://www.kcrw.com/news-culture/shows/the-treatment</link>
+            <url>http://www.kcrw.com/news-culture/shows/the-treatment/@@images/2aefa26b-a787-4c23-b5cf-23ba12388b9d.png</url>
+            <title>The Treatment</title>
+        </image>
+        <media:thumbnail url="http://www.kcrw.com/news-culture/shows/the-treatment/@@images/fde6f70d-76aa-4055-9958-677fc43b06d4.png" />
+        <itunes:image href="http://www.kcrw.com/news-culture/shows/the-treatment/@@images/2aefa26b-a787-4c23-b5cf-23ba12388b9d.png" />
+        <media:rating>nonadult</media:rating>
+        <itunes:explicit>no</itunes:explicit>
+        <geo:lat>34.009276</geo:lat>
+        <geo:long>-118.472869</geo:long>
+        <language>en-us</language>
+
+        
+            <item>
+                <title><![CDATA[Amman Abbasi: "Dayveon"]]></title>
+                <link>http://www.kcrw.com/news-culture/shows/the-treatment/amman-abbasi-dayveon</link>
+                <description><![CDATA[<p>Director, composer and writer Amman Abbasi discusses his debut feature film “Dayveon”.</p>]]></description>
+                <itunes:summary><![CDATA[ Director, composer and writer Amman Abbasi discusses his debut feature film “Dayveon”. ]]></itunes:summary>
+                <itunes:subtitle><![CDATA[Director and composer Amman Abbasi discusses his debut feature film “Dayveon”.]]></itunes:subtitle>
+                <author>webmaster@kcrw.org (KCRW, Elvis Mitchell)</author>
+                <itunes:author>KCRW, Elvis Mitchell</itunes:author>
+                <pubDate>Wed, 21 Mar 2018 14:30:00 -0700</pubDate>
+                <guid isPermaLink="false">8eb545de7f024933b497a131017ab404</guid>
+                <enclosure length="27439855" type="audio/mpeg" url="https://podcast-download.kcrw.com/kcrw/audio/podcast/etc/tt/KCRW-the_treatment-amman_abbasi_dayveon-180321.mp3" />
+                <media:content type="audio/mpeg" url="https://podcast-download.kcrw.com/kcrw/audio/podcast/etc/tt/KCRW-the_treatment-amman_abbasi_dayveon-180321.mp3" />
+                <itunes:explicit>no</itunes:explicit>
+                
+                
+                <itunes:keywords>Drama,Gang,USA,Sundance,Dustin Lane</itunes:keywords>
+        </item>
+        
+            <item>
+                <title><![CDATA[Peter Becker: “The Criterion Collection”]]></title>
+                <link>http://www.kcrw.com/news-culture/shows/the-treatment/peter-becker-201cthe-criterion-collection201d</link>
+                <description><![CDATA[<p><span> Peter Becker, president of the home video distribution company The Criterion Collection, has made a business on a mission not a product. Focusing on licensing "important classic and contemporary films" and selling them to film aficionados, Becker discusses what sets Criterion apart from any other dvd/blu-ray distribution service as well as utilizing their film stock in classic theatre and museum use. He also explains his theory in most people wanting to attend film school 10 minutes a month and producing upcoming projects around this idea. </span></p>
+<div><span><br /></span></div>]]></description>
+                <itunes:summary><![CDATA[   Peter Becker, president of the home video distribution company The Criterion Collection, has made a business on a mission not a product. Focusing on licensing "important classic and contemporary films" and selling them to film aficionados, Becker discusses what sets Criterion apart from any other dvd/blu-ray distribution service as well as utilizing their film stock in classic theatre and museum use. He also explains his theory in most people wanting to attend film school 10 minutes a month and producing upcoming projects around this idea.   
+     ]]></itunes:summary>
+                <itunes:subtitle><![CDATA[Peter Becker, president of the home video distribution company The Criterion Collection, has made a business on a mission not a product. Focusing on licensing "important classic and contemporary films" and selling them to film aficiona]]></itunes:subtitle>
+                <itunes:author>KCRW, Elvis Mitchell</itunes:author>
+                <author>webmaster@kcrw.org (KCRW, Elvis Mitchell)</author>
+                <pubDate>Wed, 14 Mar 2018 14:30:00 -0700</pubDate>
+                <guid isPermaLink="false">0488fc38996e4c8c84ef7856ab375f15</guid>
+                <enclosure length="27429406" type="audio/mpeg" url="https://podcast-download.kcrw.com/kcrw/audio/podcast/etc/tt/KCRW-the_treatment-peter_becker_201cthe_criterion_collection201d-180314.mp3" />
+                <media:content type="audio/mpeg" url="https://podcast-download.kcrw.com/kcrw/audio/podcast/etc/tt/KCRW-the_treatment-peter_becker_201cthe_criterion_collection201d-180314.mp3" />
+                <itunes:explicit>no</itunes:explicit>
+                
+                
+                <itunes:keywords>film,filmstruck,movies,rare,collectible,classic</itunes:keywords>
+        </item>
+       
+    </channel>
+</rss>

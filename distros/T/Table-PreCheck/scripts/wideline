@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+# longline 入力の各行で指定した数以上の長さまたは列数のものを見つける  
+# developed by 下野寿之 Toshiyuki Shimono in Tokyo, Japan. 2016/04/20 - 06/20
+
+use 5.001 ; use strict ; use warnings ; 
+use Encode qw/encode_utf8 decode_utf8/ ; 
+use Getopt::Std ; getopts 'c:l:u@,:~' , \my%o ;
+
+sub initProc ( ) ; 
+sub mainL ( ) ; # -l num が指定された時に実行する
+sub mainC ( ) ; # -c num が指定された時に実行する
+sub main ( ) ; 
+
+initProc ; 
+main ;
+exit 0 ; 
+
+sub initProc ( ) { 
+    $o{','} = do { $o{','} = "\t" ; eval qq[qq[$o{','}]] } ; # 区切り文字
+    if ( $o{u} ) { 
+        binmode *STDIN , ":utf8" ; 
+        binmode *STDOUT , ":utf8" ;
+    }
+}
+
+sub main ( ) { 
+    if ( $o{l} ) { mainL }
+    elsif ( $o{c} ) { mainC }
+    else { HELP_MESSAGE () }
+}
+
+sub mainC ( ) { 
+    while ( <> ) { 
+        chomp ; 
+        my $c = split /$o{','}/ , $_ , -1 ;
+        print "$_\n" if $c >= $o{c} and ! $o{'@'} || $c == $o{c} xor $o{'~'} ;
+    }
+}
+
+sub mainL ( ) { 
+    while ( <> ) { 
+        chomp ; 
+        my $l = length $_ ; 
+        print "$_\n" if $l >= $o{l} and ! $o{'@'} || $l == $o{l} xor $o{'~'}  ;
+    }
+}
+
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ;
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if $ARGV[1] eq 'opt' ? m/^\ +\-/ : s/^=head1// .. s/^=cut// ;
+  }
+  close $FH ;
+  exit 0 ;
+}
+
+=encoding utf8 
+
+=head1 
+  $0 
+
+  -l で指定された長さより長い文字数の行、
+  もしくは -c で指定された数より多いセルを持つ行を表示する。
+
+ オプション: 
+  -c num  : num以上の個数の列を持つ行を出力する。
+  -l num  : num以上長い文字数の行を出力する。
+  -u     : 入出力を utf-8 で処理する。これがないと、アスキーもしくは単純な1バイト単位の処理となる。
+  -@     : 上記の "num以上" が "丁度num" に置き換わる。ぴったり num文字か、num列のもののみ出力。
+  -, str : 列数を数える際( -c num を指定した場合) の、列の区切り文字の指定。
+  -~     : 指定条件を反転する。「〜以上」が「〜未満」になり、「丁度num」が「num以外」になる。
+=cut 
+

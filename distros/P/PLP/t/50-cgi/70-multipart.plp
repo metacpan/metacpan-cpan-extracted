@@ -1,0 +1,5 @@
+<:
+print scalar keys %post;
+
+require Data::Dumper;
+print Data::Dumper->new([\%post])->Indent(0)->Terse(1)->Dump;

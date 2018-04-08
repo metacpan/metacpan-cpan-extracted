@@ -41,7 +41,7 @@
          "web" : "https://github.com/a6502/RPC-Switch-Client"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "0.03",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

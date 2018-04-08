@@ -17,7 +17,7 @@ use Text::Abbrev();
 use Exporter ();
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 our @EXPORT_OK = qw{
     __am_or_pm
@@ -638,7 +638,7 @@ sub _fmt_on_date {
     $on_date[3][27]  = "Bard II and Thorin III Stonehelm drive the enemy from Dale, 1419.\n";
     $on_date[3][28]  = "Celeborn crosses the Anduin and begins destruction of Dol Guldur, 1419.\n";
 
-    $on_date[4][6]   = "The mallorn tree flowers in the party field, 1420.\n";
+    $on_date[4][6]   = "The mallorn tree flowers in the Party Field, 1420.\n";
     $on_date[4][8]   = "Ring bearers are honored on the Field of Cormallen, 1419.\n";
     $on_date[4][12]  = "Gandalf arrives in Hobbiton, 1418\n";
 
@@ -1747,6 +1747,9 @@ range, C<undef> is returned.
 
 The actual text returned is from Appendix B of "Lord Of The Rings", and
 is copyright J. R. R. Tolkien, renewed by Christopher R. Tolkien et al.
+Specifically, I use the Houghton Mifflin trade paperback. I find no date
+of publication, but believe it to be the early 2000s because the cover
+illustrations appear to be movie tie-ins.
 
 =head2 __on_date_accented
 

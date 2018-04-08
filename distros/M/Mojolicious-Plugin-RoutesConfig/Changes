@@ -1,9 +1,13 @@
 Revision history for Perl module Mojolicious::Plugin::RoutesConfig
 
+0.05 сб апр  7 19:08:16 CEST 2018
+    - Now "under" is fully supported. It accepts all the methods as keys
+    (e.g. "name", "to") like other ordinary routes.
+
 0.04 вт мар 20 23:33:29 CET 2018
     - Now "under" is recognised too and has its own "routes =>[]" array. See
       t/blog/etc/complex_routes.conf for example.
-    - If parameters is a reference to CODE it will be executed and whatever it
+    - If parameters are a reference to CODE it will be executed and whatever it
       returns will be the parameters for the respective method.
 
 0.03 пт мар 16 23:45:07 CET 2018

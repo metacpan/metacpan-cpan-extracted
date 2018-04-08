@@ -1,27 +1,16 @@
 #!perl
 
-use Test::More tests => 3;
-use Test::Fatal;
+use Test2::V0;
+use Test::Lib;
 
-use lib 't';
 use App::Env;
 
 my $env = App::Env->new( 'App1', { SysFatal => 1 } );
 
-isnt(
-     exception { $env->system( $^X, '-e', 'exit(1)' ) },
-     undef,
-     'system'
-);
+ok( dies { $env->system( $^X, '-e', 'exit(1)' ) }, 'system' );
 
-isnt (
-      exception { $env->capture( $^X, '-e', 'exit(1)' ) },
-      undef,
-      'capture'
-);
+ok( dies { $env->capture( $^X, '-e', 'exit(1)' ) }, 'capture' );
 
-isnt (
-      exception { $env->qexec( $^X, '-e', 'exit(1)' ) },
-      undef,
-      'qexec'
-);
+ok( dies { $env->qexec( $^X, '-e', 'exit(1)' ) }, 'qexec' );
+
+done_testing;

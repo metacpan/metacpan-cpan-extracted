@@ -4884,7 +4884,11 @@ after updates, the Lapack module built successfully on 10.6.8 and 10.8.5.
 
 - modified '02_Generic.t', '13_mft1.t', '14_mft2.t', '15_mAB_.t', and '16_mBA_.t' by adding 'str_cmp' function to debug round trip errors on certain Unix OS.
 
+- uploaded the v0.605 distribution to CPAN.
 
+2018-03-31
+
+- modified '02_Generic.t', '03_curv.t', '04_para.t', '10_XYZ_.t', '11_desc.t', '12_text.t', '13_mft1.t', '14_mft2.t', '15_mAB_.t', '16_mBA_.t', '18_mluc.t', '19_sf32.t', '20_sig_.t', and '21_clro.t' by creating the temporary file using the 'File::Temp' module, and flushing the file.
 
 
 

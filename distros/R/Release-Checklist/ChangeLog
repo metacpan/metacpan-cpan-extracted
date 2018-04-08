@@ -1,0 +1,36 @@
+0.08	03 Apr 2018 - H.Merijn Brand
+    * Add Travis CI
+
+0.07	31 Mar 2018 - H.Merijn Brand
+    * Add META.resources
+    * Make Pod::Wordlist optional in pod-spell-check
+
+0.06	30 Mar 2018 - H.Merijn Brand
+    * Portable tar format
+
+0.05	30 Mar 2018 - H.Merijn Brand
+    * Indexer (of course) needs a single directory
+
+0.04	30 Mar 2018 - H.Merijn Brand
+    * Make distclean
+
+0.03	30 Mar 2018 - H.Merijn Brand
+    * PAUSE needs a pm or provides in META
+    * Make a real Makefile.PL (for install etc)
+
+0.02	30 Mar 2018 - H.Merijn Brand
+    * It's 2016
+    * Small changes to dashboard script
+    * It's 2017
+    * It's 2018
+    * Update .perlcriticrc
+    * Add -Duselongdouble example
+    * Updated makewww.pl
+    * Add pm6 & pod6 for spellcheck
+    * Update used-by.pl
+    * Add reference to Test2::Harness
+    * Mention CPANTESTERS and version deps
+    * Update to a real valid dist
+
+0.01	18 Aug 2015 - H.Merijn Brand
+    * First release

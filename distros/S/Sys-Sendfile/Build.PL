@@ -7,13 +7,9 @@ my $builder = Module::Build->new(
   module_name         => 'Sys::Sendfile',
     'build_requires' => {
     'Fcntl' => '0',
-    'File::Spec' => '0',
-    'IO::Handle' => '0',
     'IO::Socket::INET' => '0',
-    'IPC::Open3' => '0',
     'Module::Build' => '0.28',
-    'Test::More' => '0',
-    'perl' => '5.006'
+    'Test::More' => '0'
   },
   'configure_requires' => {
     'Module::Build' => '0.28'
@@ -21,7 +17,6 @@ my $builder = Module::Build->new(
   'requires' => {
     'Exporter' => '5.57',
     'XSLoader' => '0',
-    'perl' => '5.006',
     'strict' => '0',
     'warnings' => '0'
   },

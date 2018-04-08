@@ -1,7 +1,48 @@
+NAME
+    App::IndonesianNumberUtils - CLIs related to Indonesian numbers (NIK,
+    NOPPBB, NPWP, etc)
+
+VERSION
+    This document describes version 0.030 of App::IndonesianNumberUtils
+    (from Perl distribution App-IndonesianNumberUtils), released on
+    2018-04-08.
+
 
     This distribution contains several CLI's related to Indonesian numbers:
 
-    # INSERT_EXECS_LIST
+    *   parse-nik
+
+    *   parse-nkk
+
+    *   parse-nop-pbb
+
+    *   parse-npwp
+
+    *   parse-sim
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-IndonesianNumberUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-IndonesianNumberUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-IndonesianNumberU
+    tils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

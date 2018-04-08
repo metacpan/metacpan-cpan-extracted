@@ -49,6 +49,8 @@ is(
     'build proceeds normally',
 );
 
+is($tzil->version, '0.002', 'version properly extracted from main module');
+
 cmp_deeply(
     $tzil->plugins,
     superbagof(

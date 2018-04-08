@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2018 -- leonerd@leonerd.org.uk
 
 package IO::Async::Resolver;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Function );
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 # Socket 2.006 fails to getaddrinfo() AI_NUMERICHOST properly on MSWin32
 use Socket 2.007 qw(
@@ -370,7 +370,7 @@ sub getaddrinfo
    # These address tests don't have to be perfect as if it fails we'll get
    # EAI_NONAME and just try it asynchronously anyway
    if( ( $host =~ m/^[\d.]+$/ or $host =~ m/^[[:xdigit:]:]$/ or $host eq "" ) and
-       $service =~ m/^\d+$/ ) {
+       $service =~ m/^\d*$/ ) {
 
        my ( $err, @results ) = Socket::getaddrinfo( $host, $service,
           { %args, flags => $flags | AI_NUMERICHOST }

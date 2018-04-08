@@ -1,4 +1,4 @@
-use t::share; guard my $guard;
+use lib 't'; use share; guard my $guard;
 
 
 plan skip_all => 'git not installed'        if !grep {-x "$_/git"} split /:/, $ENV{PATH};
@@ -8,6 +8,7 @@ $ENV{GIT_AUTHOR_NAME} = $ENV{GIT_COMMITTER_NAME} = 'Your Name';
 $ENV{GIT_AUTHOR_EMAIL}= $ENV{GIT_COMMITTER_EMAIL}= 'you@example.com';
 system('{
     git init &&
+    git config commit.gpgsign false &&
     git add . && git commit -m 1 &&
     git checkout -b socklog &&
     narada-install 0.2.0 &&

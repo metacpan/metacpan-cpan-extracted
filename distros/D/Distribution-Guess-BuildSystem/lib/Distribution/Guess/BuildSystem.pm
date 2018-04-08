@@ -14,7 +14,7 @@ use File::Spec::Functions qw(catfile);
 
 use Module::Extract::VERSION;
 
-$VERSION = '1.001';
+$VERSION = '1.002';
 
 =encoding utf8
 
@@ -41,14 +41,12 @@ Distribution::Guess::BuildSystem - Guess what this distribution uses to build it
 
 	my $build_command = $guesser->build_commands; # Hash ref
 
-	if( $guesser->uses_module_install )
-		{
+	if( $guesser->uses_module_install ) {
 		my $version = $guesser->module_install_version;
 		my $pita    = $guesser->uses_auto_install;
 		}
 
-	if( $guesser->uses_makemaker )
-		{
+	if( $guesser->uses_makemaker ) {
 		my $version = $guesser->makemaker_version;
 		my $make    = $guesser->make_command;
 		}
@@ -104,8 +102,7 @@ The defaults are:
 
 =cut
 
-sub new
-	{
+sub new {
 	my %defaults = (
 		dist_dir            => cwd(),
 		prefer_module_build => 1,
@@ -124,8 +121,7 @@ Returns or sets the distribution directory.
 
 =cut
 
-sub dist_dir
-	{
+sub dist_dir {
 	my( $self ) = shift;
 	$self->_setting( 'dist_dir', @_ );
 	}
@@ -138,8 +134,7 @@ a perl binary.
 
 =cut
 
-sub perl_binary
-	{
+sub perl_binary {
 	my( $self ) = shift;
 	$self->_setting( 'perl_binary', @_ );
 	}
@@ -153,8 +148,7 @@ C<prefer_makemaker> and C<prefer_module_build> are true, then
 MakeMaker wins.
 =cut
 
-sub prefer_makemaker
-	{
+sub prefer_makemaker {
 	my( $self ) = shift;
 	$self->_setting( 'prefer_makemaker', @_ );
 	}
@@ -169,14 +163,12 @@ MakeMaker wins.
 
 =cut
 
-sub prefer_module_build
-	{
+sub prefer_module_build {
 	my( $self ) = shift;
 	$self->_setting( 'prefer_module_build', @_ );
 	}
 
-sub _setting
-	{
+sub _setting {
 	my( $self, $key, $value ) = @_;
 
 	if( @_ == 3 ) {
@@ -206,19 +198,16 @@ my @files = (
 
 	);
 
-sub build_files
-	{
+sub build_files {
 	my %found;
 
-	foreach my $pairs ( @files )
-		{
+	foreach my $pairs ( @files ) {
 		my( $check, $file ) = @$pairs;
 		$found{ $_[0]->$file() } = $_[0]->$file() if $_[0]->$check()
 		}
 
 	return \%found;
 	}
-
 }
 
 =item preferred_build_file
@@ -237,8 +226,7 @@ C<prefer_makemaker>, use that.
 
 =cut
 
-sub preferred_build_file
-	{
+sub preferred_build_file {
 	# preference doesn't matter in single build system cases
 	return $_[0]->makefile_pl if $_[0]->uses_makemaker_only;
 	return $_[0]->build_pl    if $_[0]->uses_module_build_only;
@@ -265,8 +253,7 @@ or C<make_command>.
 
 =cut
 
-sub preferred_build_command
-	{
+sub preferred_build_command {
 	return $_[0]->build_command if $_[0]->preferred_build_file eq $_[0]->build_pl;
 	return $_[0]->make_command if $_[0]->preferred_build_file eq $_[0]->makefile_pl;
 	return;
@@ -281,12 +268,10 @@ the paths.
 
 =cut
 
-sub build_file_paths
-	{
+sub build_file_paths {
 	my %paths;
 
-	foreach my $file ( keys %{ $_[0]->build_files } )
-		{
+	foreach my $file ( keys %{ $_[0]->build_files } ) {
 		$paths{$file} = File::Spec->catfile( $_[0]->dist_dir, $file );
 		}
 
@@ -297,8 +282,7 @@ sub build_file_paths
 
 =cut
 
-sub makefile_pl_path
-	{
+sub makefile_pl_path {
 	return unless $_[0]->has_makefile_pl;
 
 	File::Spec->catfile( $_[0]->dist_dir, $_[0]->makefile_pl );
@@ -308,8 +292,7 @@ sub makefile_pl_path
 
 =cut
 
-sub build_pl_path
-	{
+sub build_pl_path {
 	return unless $_[0]->has_build_pl;
 
 	File::Spec->catfile( $_[0]->dist_dir, $_[0]->build_pl );
@@ -321,8 +304,7 @@ Has the file name returned by C<build_pl>.
 
 =cut
 
-sub _has_file
-	{
+sub _has_file {
 	my( $self, $file ) = @_;
 
 	my $path = File::Spec->catfile(
@@ -349,8 +331,7 @@ Has both the files returned by C<makefile_pl> and C<build_pl>.
 
 =cut
 
-sub has_build_and_makefile
-	{
+sub has_build_and_makefile {
 	$_[0]->has_build_pl
 		&&
 	$_[0]->has_makefile_pl
@@ -391,8 +372,7 @@ distribution. The keys are the commands, such as C<make> or C<perl Build.PL>.
 =cut
 
 
-sub build_commands
-	{
+sub build_commands {
 	my %commands;
 
 	$commands{ $_[0]->make_command } = 1
@@ -410,15 +390,13 @@ Returns true if the distro uses C<ExtUtils::Makemaker>.
 
 =cut
 
-sub _get_modules
-	{
+sub _get_modules {
 	my( $self, $path ) = @_;
 	my $extractor = $self->module_extractor_class->new;
 	$extractor->get_modules( $path );
 	}
 
-sub uses_makemaker
-	{
+sub uses_makemaker {
 	return unless $_[0]->has_makefile_pl;
 
 	scalar grep { $_ eq $_[0]->makemaker_name }
@@ -433,8 +411,7 @@ possibilities or preferences.
 
 =cut
 
-sub uses_makemaker_only
-	{
+sub uses_makemaker_only {
 	return unless $_[0]->has_makefile_pl;
 	return if     $_[0]->has_build_pl;
 
@@ -447,15 +424,13 @@ Returns the version of Makemaker installed for the perl running this code.
 
 =cut
 
-sub makemaker_version
-	{
+sub makemaker_version {
 	return unless $_[0]->uses_makemaker;
 
 	my $version = $_[0]->_get_version( $_[0]->makemaker_name );
 	}
 
-sub _get_version
-	{
+sub _get_version {
 	require Module::Extract::VERSION;
 
 	my( $self, $module, @dirs ) = @_;
@@ -464,14 +439,17 @@ sub _get_version
 
 	my $file = catfile( split /::/, $module ) . ".pm";
 
-	foreach my $dir ( @dirs )
-		{
+	my $found_module = 0;
+	foreach my $dir ( @dirs ) {
 		my $module = catfile( $dir, $file );
 		next unless -e $module;
 
+		$found_module = 1;
 		return Module::Extract::VERSION->parse_version_safely( $module );
 		}
 
+	return '$module not installed' unless $found_module;
+	return;
 	}
 
 =item uses_module_build
@@ -481,8 +459,7 @@ has a F<Build.PL> and that the F<Build.PL> actually uses C<Module::Build>.
 
 =cut
 
-sub uses_module_build
-	{
+sub uses_module_build {
 	return unless $_[0]->has_build_pl;
 
 	scalar grep { $_ eq $_[0]->module_build_name }
@@ -497,8 +474,7 @@ possibilities or preferences.
 
 =cut
 
-sub uses_module_build_only
-	{
+sub uses_module_build_only {
 	return unless $_[0]->has_build_pl;
 	return if     $_[0]->has_makefile_pl;
 
@@ -511,8 +487,7 @@ Returns the version of C<Module::Build> install for perl running this code.
 
 =cut
 
-sub module_build_version
-	{
+sub module_build_version {
 	return unless $_[0]->uses_module_build;
 
 	my $version = $_[0]->_get_version( $_[0]->module_build_name );
@@ -524,8 +499,7 @@ Returns true if this distribution uses C<Module::Install>.
 
 =cut
 
-sub uses_module_install
-	{
+sub uses_module_install {
 	return unless $_[0]->has_makefile_pl;
 
 	scalar grep { $_ eq $_[0]->module_install_name }
@@ -542,8 +516,7 @@ C<auto_install> in the build file, it returns true.
 
 =cut
 
-sub uses_auto_install
-	{
+sub uses_auto_install {
 	return unless $_[0]->has_makefile_pl && $_[0]->uses_module_install;
 
 	$_[0]->_file_has_string( $_[0]->makefile_pl_path, 'auto_install' );
@@ -555,8 +528,7 @@ Returns the version of C<Module::Install>.
 
 =cut
 
-sub module_install_version
-	{
+sub module_install_version {
 	return unless $_[0]->uses_module_install;
 
 	my $version = $_[0]->_get_version(
@@ -574,8 +546,7 @@ C<create_makefile_pl> in the build file, it returns true.
 
 =cut
 
-sub uses_module_build_compat
-	{
+sub uses_module_build_compat {
 	return unless $_[0]->has_build_pl && $_[0]->uses_module_build;
 
 	$_[0]->_file_has_string( $_[0]->build_pl_path, 'create_makefile_pl' );
@@ -587,19 +558,16 @@ Returns true if C<Build.PL> is a wrapper around C<Makefile.PL>.
 
 =cut
 
-sub build_pl_wraps_makefile_pl
-	{
+sub build_pl_wraps_makefile_pl {
 	return unless $_[0]->has_build_pl && $_[0]->has_makefile_pl;
 
 	$_[0]->_file_has_string( $_[0]->build_pl_path,
 		"Makefile.PL" );
 	}
 
-sub _file_has_string
-	{
+sub _file_has_string {
 	my $fh;
-	unless( open $fh, "<", $_[1] )
-		{
+	unless( open $fh, "<", $_[1] ) {
 		carp "Could not open $_[1]: $!";
 		return;
 		}
@@ -637,12 +605,10 @@ my @methods = qw(
 	build_pl_wraps_makefile_pl
 	);
 
-sub just_give_me_a_hash
-	{
+sub just_give_me_a_hash {
 	my %hash = ();
 
-	foreach my $method ( @methods )
-		{
+	foreach my $method ( @methods ) {
 		$hash{ $method } = $_[0]->$method();
 		}
 
@@ -742,9 +708,9 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2008-2015, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2008-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms of the Artistic License 2.0.
 
 =cut
 

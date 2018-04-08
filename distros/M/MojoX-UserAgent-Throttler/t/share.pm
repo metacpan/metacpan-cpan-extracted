@@ -3,6 +3,7 @@ use Test::More;
 use ojo;
 use Mojo::Util qw( monkey_patch trim );
 use vars qw( $SITE );
+no if $] >= 5.020, feature => 'signatures';
 
 # avoid (in cleanup) error (should be fixed in Mojolicious-5.69)
 my $orig_DESTROY = \&Mojo::UserAgent::DESTROY;

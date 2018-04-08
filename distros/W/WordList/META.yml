@@ -25,7 +25,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WordList
   homepage: https://metacpan.org/release/WordList
   repository: git://github.com/perlancar/perl-WordList.git
-version: 0.3.1
+version: 0.4.1
 x_Dist_Zilla:
   perl:
     version: '5.026001'

@@ -1,5 +1,5 @@
 name = "App-Egaz"
-badges = ['travis', 'codecov']
+badges = ['travis', 'codecov', 'metacpan']
 authority="cpan:WANGQ"
 
 module_maker="ModuleBuildTiny"

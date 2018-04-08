@@ -11,8 +11,8 @@ use App::WRT::Util qw(file_put_contents);
 use Data::Dumper;
 use File::Basename;
 use File::Copy;
-use File::Find;
 use File::Path qw(make_path);
+use Time::HiRes;
 
 sub render {
   # This is invoked off of an App::WRT object, so it's passing in $self:
@@ -26,6 +26,9 @@ sub render {
   my $entry_dir = $wrt->entry_dir;
   my $publish_dir = $wrt->publish_dir;
 
+  # Use this to log elapsed render time:
+  my $start_time = [Time::HiRes::gettimeofday()];
+
   # Insure that publication path exists and is a directory:
   if (-e $publish_dir) {
     unless (-d $publish_dir) {
@@ -34,6 +37,7 @@ sub render {
   } else {
     my $path_err;
     make_path($publish_dir, { error => \$path_err });
+    $logger->("Attempting to create $publish_dir");
     if (@{ $path_err }) {
       $logger->(Dumper($path_err));
       die("Could not create $publish_dir: " . Dumper($path_err));
@@ -53,7 +57,7 @@ sub render {
 
   my $rendered_count = 0;
   my $copied_count   = 0;
-  for my $target (get_source_files($entry_dir), @meta_paths)
+  for my $target ($wrt->get_all_source_files(), @meta_paths)
   {
     my $path_err;
 
@@ -88,26 +92,12 @@ sub render {
 
   $logger->("rendered $rendered_count entries");
   $logger->("copied $copied_count static files");
+  $logger->(
+    "  in "
+    . Time::HiRes::tv_interval($start_time)
+    . " seconds"
+  );
 
   # Presumed success:
   return 1;
-}
-
-# Collect a list of things to render:
-sub get_source_files {
-  my ($entry_dir) = @_;
-
-  my @source_files;
-  find(
-    sub {
-      # We skip index files, because they'll be rendered from the dir path:
-      return if /index$/;
-      if ($File::Find::name =~ m{^ \Q$entry_dir\E / (.*) $}x) {
-        my $target = $1;
-        push @source_files, $target;
-      }
-    },
-    $entry_dir
-  );
-  return @source_files;
 }

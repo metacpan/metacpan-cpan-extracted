@@ -1,0 +1,22 @@
+name: <: $dist_name :>
+author: <: $author :> <<: $author_email :>>
+copyright_holder: <: $copyright_holder :>
+
+# https://metacpan.org/pod/Software::License#SEE-ALSO
+license: <: $license :>
+
+# is the CPAN distributive
+cpan: <: $cpan_distribution :>
+
+# paths to skip while create the CPAN distributive
+cpan_manifest_skip:
+    - \Abin/        # ignore "/bin/" directory
+
+meta:
+    homepage:       # project homepage url
+    repository:
+        web:        # upstream repository web url
+        url:        # upstream repository clone url
+        type:       # upstream repository SCM type: hg, git
+    bugtracker:
+        web:        # bugtracker url

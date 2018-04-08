@@ -13,12 +13,14 @@ use HTTP::Response;
 use LWP::UserAgent;
 use JSON;
 
-our $VERSION = '0.104';
+our $VERSION = '0.105';
 
 our $CANNED_RESPONSE_DIR = File::Spec->catdir(
     qw{ t data Mock-LWP-UserAgent } );
 
 our $LOG_FILE_NAME = $ENV{MOCK_LWP_USERAGENT_LOG_FILE_NAME};
+
+use constant HASH_REF	=> ref {};
 
 $LOG_FILE_NAME
     and eval {
@@ -47,7 +49,7 @@ sub import {
 	my ( $self, $data ) = @_;
 	my $old = $self->{cookie_jar};
 	if ( $data ) {
-	    if ( 'HASH' eq ref $data ) {
+	    if ( HASH_REF eq ref $data ) {
 		require HTTP::Cookies;
 		$data = HTTP::Cookies->new( %{ $data } );
 	    }

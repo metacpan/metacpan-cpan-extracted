@@ -50,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' Y",
+    "yw-count-other" => "'week' w 'of' y",
   },
   code => "yo",
   date_format_full => "EEEE, d MMMM y",
@@ -267,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 32,
+  version => 33,
 }

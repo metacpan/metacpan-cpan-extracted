@@ -85,7 +85,7 @@ EOT
 my $html_expected       = '<script>alert(\'test\');</script><br><img src="/bild.jpg" alt="hmpf"> <a href="/">link 1 </a> <a href="/"> link 2 </a>';
 my $html_expected_no_js = '<script>/*<![CDATA[*/' . "\n\n\n\n  " . 'alert(\'test\');/*]]>*/</script><br><img src="/bild.jpg" alt="hmpf"> <a href="/">link 1 </a> <a href="/"> link 2 </a>';
 
-my $not = 11;
+my $not = 12;
 
 SKIP: {
     eval { use HTML::Packer; };
@@ -100,6 +100,7 @@ SKIP: {
     minTest( 's4', { remove_comments => 1, remove_newlines => 1 }, 'Test remove_newlines and remove_comments.' );
     minTest( 's5', { remove_comments => 1, remove_newlines => 1 }, 'Test _no_compress_ comment.' );
     minTest( 's6', { remove_comments => 1, remove_newlines => 1, no_compress_comment => 1 }, 'Test _no_compress_ comment with no_compress_comment option.' );
+    minTest( 's7', { remove_comments_aggressive => 1 }, 'Test aggresive comment removal.' );
 
     my $packer = HTML::Packer->init();
     my $js_comp_input   = $js_input;

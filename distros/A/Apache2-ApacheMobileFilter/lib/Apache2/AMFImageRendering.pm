@@ -8,6 +8,8 @@
 # Mail: idel.fuschini@gmail.com
 
 
+#https://www.imagemagick.org/script/perl-magick.php
+
 
 package Apache2::AMFImageRendering; 
   
@@ -27,6 +29,7 @@ package Apache2::AMFImageRendering;
   use LWP::Simple;
   use Image::Resize;
   use Image::Scale;
+  use Image::Magick;
   use File::Copy;
   use Imager;
   use Apache2::Const -compile => qw(OK REDIRECT DECLINED HTTP_MOVED_TEMPORARILY);
@@ -38,7 +41,7 @@ package Apache2::AMFImageRendering;
   # 
 
   use vars qw($VERSION);
-  $VERSION= "4.30";;;
+  $VERSION= "4.32";;;
   my $CommonLib = new Apache2::AMFCommonLib ();
   my %Capability;
   my %Array_fb;
@@ -85,7 +88,8 @@ package Apache2::AMFImageRendering;
   my $par_perc='dim';
   my $typeGraphicLibrary='gd';
   my $filterMagick='Lanczos';
-  my $qualityJpeg=90;
+  my $qualityImage=90;
+  my $maxAgeImage=99999999999999999;
 
   $ImageType{'image/png'}="png";
   $ImageType{'image/gif'}="gif";
@@ -134,14 +138,22 @@ sub loadConfigFile {
 			    ModPerl::Util::exit();        
       }
 		}
-		if ($ENV{QualityJpeg}) {
-      if (($ENV{QualityJpeg} =~ /^\d+?$/) && $ENV{QualityJpeg} > -1 && $ENV{QualityJpeg} < 101) {
-        $qualityJpeg=$ENV{QualityJpeg};
+		if ($ENV{QualityImage}) {
+      if (($ENV{QualityImage} =~ /^\d+?$/) && $ENV{QualityImage} > -1 && $ENV{QualityImage} < 101) {
+        $qualityImage=$ENV{QualityImage};
       } else {
-			    $CommonLib->printLog("ERROR: QualityJpeg must be a number from 0 (lower) to 100 (higher), default is: ".$qualityJpeg);
+			    $CommonLib->printLog("ERROR: QualityImage must be a number from 0 (lower) to 100 (higher), default is: ".$qualityImage);
       }
 		}
-    $CommonLib->printLog("QualityJpeg is: ".$qualityJpeg);
+		if ($ENV{MaxAgeImage}) {
+      if (($ENV{MaxAgeImage} =~ /^\d+?$/) && $ENV{MaxAgeImage} > 0 ) {
+        $maxAgeImage=$ENV{MaxAgeImage};
+        $CommonLib->printLog("MaxAgeImage is: ".$maxAgeImage." (seconds)");
+      } else {
+			    $CommonLib->printLog("ERROR: MaxAgeImage must be a number > 0");
+      }
+		}
+    $CommonLib->printLog("QualityImage is: ".$qualityImage);
 		if ($ENV{TypeMagickFilter}) {
       my %params = map { $_ => 1 } @arrayFilterMagick;
       if(exists($params{$ENV{TypeMagickFilter}})) {
@@ -269,8 +281,8 @@ sub handler    {
 						#
 						
 						if ( -e "$imageToConvert") {						  
-							my $filesize; 
-							if ( -e "$imagefile") {
+							my $filesize;
+							if ( -e "$imagefile" && time - (stat ($imagefile))[9] < $maxAgeImage) {
 							} else {
 								my $image = Image::Resize->new("$imageToConvert");
 								if ($image->width() < $width && $resizeimagesmall eq 'false') {
@@ -312,22 +324,34 @@ sub handler    {
 										rename($dummy, $imagefile);
 								  } 
 								  if ($content_type eq "image/png") {
-										 my $img = Image::Scale->new("$imageToConvert") ;
                     if ($typeGraphicLibrary eq 'gd') {
-                        $img->resize_gd( { width => $width } );
+                      my $img = Image::Scale->new("$imageToConvert") ;
+                      $img->resize_gd( { width => $width } );
+                      $img->save_png("$imagefile");
                     } else {
-                        $img->resize_gm( { width => $width, filter => $filterMagick } );                      
+                        my $img = Image::Magick->new;
+                        $img->Read($imageToConvert);
+                        $img->Comment("Resized by AMF (http://www.apachemobilefilter.org)");
+                        $img->Set(quality=>$qualityImage);
+                        $img->Resize(geometry => $width);
+                        $img->Write($imagefile);
                     }
-										 $img->save_png("$imagefile");
 								  }
 								  if ($content_type eq "image/jpeg") {
-                    my $img = Image::Scale->new("$imageToConvert");
                     if ($typeGraphicLibrary eq 'gd') {
+                        my $img = Image::Scale->new("$imageToConvert");
                         $img->resize_gd( { width => $width } );
+										    $img->save_jpeg("$imagefile",$qualityImage);
                     } else {
-                        $img->resize_gm( { width => $width, filter => $filterMagick } );                      
+                        my $img = Image::Magick->new;
+                        $img->Read($imageToConvert);
+                        #unsharp  0x2+1+0
+                        $img->Comment("Resized by AMF (http://www.apachemobilefilter.org)");
+                        $img->UnsharpMask(radius=>0,sigma=>2,gain=>1,threshold=>0);
+                        $img->Set(quality=>$qualityImage);
+                        $img->Resize(geometry => $width);
+                        $img->Write($imagefile);
                     }
-										 $img->save_jpeg("$imagefile",$qualityJpeg);
 								  }
 							   }
 	  

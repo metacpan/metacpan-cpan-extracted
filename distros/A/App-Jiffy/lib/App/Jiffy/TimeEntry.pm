@@ -70,14 +70,14 @@ sub save {
 
     # Update the existing record
     $self->db->get_collection($collection)
-      ->update( { _id => $self->id }, { '$set' => $document } );
+      ->update_one( { _id => $self->id }, { '$set' => $document } );
   } else {
 
     # Insert new record
-    $_id = $self->db->get_collection($collection)->insert($document);
+    my $result = $self->db->get_collection($collection)->insert_one($document);
 
     # Update id
-    $self->id($_id);
+    $self->id($result->inserted_id);
   }
 }
 

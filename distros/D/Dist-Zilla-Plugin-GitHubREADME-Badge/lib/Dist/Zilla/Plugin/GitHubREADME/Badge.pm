@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::GitHubREADME::Badge;
 use strict;
 use warnings;
 use 5.008_005;
-our $VERSION = '0.23';
+our $VERSION = '0.26';
 
 use Moose;
 use Moose::Util::TypeConstraints qw(enum);
@@ -116,6 +116,10 @@ sub add_badges {
             push @badges, "[![build status](https://$base_url/$user_name/$repository_name/badges/master/build.svg)]($repository/$user_name/$repository_name/commits/master)";
         } elsif ($badge eq 'gitlab_cover') {
             push @badges, "[![coverage report](https://$base_url/$user_name/$repository_name/badges/master/coverage.svg)]($repository/$user_name/$repository_name/commits/master)";
+        } elsif ($badge eq 'docker_automated') {
+            push @badges, "[![Docker Automated Build](https://img.shields.io/docker/automated/\L$user_name/$repository_name\E.svg)](https://github.com/$user_name/$repository_name)";
+        } elsif ($badge eq 'docker_build') {
+            push @badges, "[![Docker Build Status](https://img.shields.io/docker/build/\L$user_name/$repository_name\E.svg)](https://hub.docker.com/r/\L$user_name/$repository_name\E/)";
         }
     }
 
@@ -165,6 +169,8 @@ Dist::Zilla::Plugin::GitHubREADME::Badge - Dist::Zilla - add badges to github RE
     badges = codecov
     badges = gitlab_ci
     badges = gitlab_cover
+    badges = docker_automated
+    badges = docker_build
     place = bottom
     phase = release
 

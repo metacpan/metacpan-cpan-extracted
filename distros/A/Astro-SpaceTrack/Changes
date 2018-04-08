@@ -1,3 +1,18 @@
+0.105		2018-04-05	T. R. Wyant
+    Add 'identity' to canned help text.
+
+    Launch meta::cpan for help if webcmd attribute set.
+
+    Iridium 23 decayed March 28 2018. This necessitates updating all
+    the canned Iridium status tables.
+
+    Kelso marks Iridiums 12, 13 & 76 partly operational.
+
+    Replace reference names with manifest constants. That is, replace
+    'ARRAY' by ARRAY_REF, where ARRAY_REF is 'ref []'. And so on.
+
+    Kelso marks Iridium 94 as spare.
+
 0.104		2018-02-22	T. R. Wyant
     Add Celestrak Planet Labs & Spire Global datasets
 

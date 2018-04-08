@@ -28,6 +28,7 @@ dan/agent/code/mrsync
 dan/agent/code/proxy
 dan/agent/code/scripts
 dan/agent/code/sdump
+dan/agent/code/sexec
 dan/agent/code/shell
 dan/agent/code/show
 dan/agent/code/version
@@ -97,6 +98,7 @@ dan/tools/alarm
 dan/tools/alias
 dan/tools/bigest
 dan/tools/config
+dan/tools/diskSpaceControl
 dan/tools/expect
 dan/tools/fileupdate
 dan/tools/gateway
@@ -114,6 +116,7 @@ dan/tools/rcall
 dan/tools/release
 dan/tools/rsync
 dan/tools/shell
+dan/tools/supervisor
 dan/tools/sync
 dan/tools/tai64nlocal
 dan/tools/tcpserver
@@ -248,6 +251,7 @@ lib/MYDan/Util/Alias.pm
 lib/MYDan/Util/Command.pm
 lib/MYDan/Util/Contact.pm
 lib/MYDan/Util/DirConf.pm
+lib/MYDan/Util/DiskSpaceControl.pm
 lib/MYDan/Util/ExpSSH.pm
 lib/MYDan/Util/File.pm
 lib/MYDan/Util/FileUpdate.pm
@@ -273,6 +277,7 @@ lib/MYDan/Util/Say.pm
 lib/MYDan/Util/Screen.pm
 lib/MYDan/Util/SQLiteDB.pm
 lib/MYDan/Util/Sudo.pm
+lib/MYDan/Util/Supervisor.pm
 lib/MYDan/Util/Sync.pm
 lib/MYDan/Util/Sysrw.pm
 lib/MYDan/Util/TcpServer.pm

@@ -4,13 +4,13 @@
       "Hagop \"Jack\" Bilemjian <jck000@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dancer2-Plugin-Tail",
    "no_index" : {
@@ -55,6 +55,5 @@
          "url" : "https://github.com/jck000/Dancer2-Plugin-Tail"
       }
    },
-   "version" : "0.012",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.015"
 }

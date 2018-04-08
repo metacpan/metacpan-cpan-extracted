@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.04 2018-03-31
+
+ - Handle the new way Text::Amuse encodes the non-breaking space
+
 1.03 2018-03-27
 
  - Add a helpful error message when bigfoot doesn't have the fragile

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes FCGI::EV version v1.0.9
+    This document describes FCGI::EV version v2.0.1
 
 SYNOPSIS
 
@@ -78,17 +78,19 @@ DESCRIPTION
 
 INTERFACE
 
-    new( $sock, $class )
+ new
 
-      Start talking FastCGI protocol on $sock (which should be socket open
-      to just-connected web server), and use $class to handle received CGI
-      requests.
+        FCGI::EV->new( $sock, $class );
 
-      Module $class should implement "FCGI::EV handler" interface. You can
-      use either FCGI::EV::Std from CPAN or develop your own.
+    Start talking FastCGI protocol on $sock (which should be socket open to
+    just-connected web server), and use $class to handle received CGI
+    requests.
 
-      Return nothing. (Created FCGI::EV object will work in background and
-      will be automatically destroyed after finishing I/O with web server.)
+    Module $class should implement "FCGI::EV handler" interface. You can
+    use either FCGI::EV::Std from CPAN or develop your own.
+
+    Return nothing. (Created FCGI::EV object will work in background and
+    will be automatically destroyed after finishing I/O with web server.)
 
 HANDLER CLASS INTERFACE
 
@@ -247,7 +249,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2009 by Alex Efros <powerman@cpan.org>.
+    This software is Copyright (c) 2009- by Alex Efros <powerman@cpan.org>.
 
     This is free software, licensed under:
 

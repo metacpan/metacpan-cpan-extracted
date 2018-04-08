@@ -5,11 +5,10 @@ author:
 build_requires:
   Test::Exception: '0'
   Test::More: '0'
-  Test::Perl::Critic: '0'
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,19 +25,19 @@ no_index:
 provides:
   CGI::Easy:
     file: lib/CGI/Easy.pm
-    version: v2.0.0
+    version: v2.0.1
   CGI::Easy::Headers:
     file: lib/CGI/Easy/Headers.pm
-    version: v2.0.0
+    version: v2.0.1
   CGI::Easy::Request:
     file: lib/CGI/Easy/Request.pm
-    version: v2.0.0
+    version: v2.0.1
   CGI::Easy::Session:
     file: lib/CGI/Easy/Session.pm
-    version: v2.0.0
+    version: v2.0.1
   CGI::Easy::Util:
     file: lib/CGI/Easy/Util.pm
-    version: v2.0.0
+    version: v2.0.1
 requires:
   Data::UUID: '0'
   Export::Attrs: '0'
@@ -49,4 +48,5 @@ resources:
   bugtracker: https://github.com/powerman/perl-CGI-Easy/issues
   homepage: https://github.com/powerman/perl-CGI-Easy
   repository: https://github.com/powerman/perl-CGI-Easy.git
-version: v2.0.0
+version: v2.0.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

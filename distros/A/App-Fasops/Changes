@@ -1,5 +1,8 @@
 Revision history for App-Fasops
 
+0.5.15 2018-04-01T17:27:20Z
+    - Fix maf2fas for reverse-complemented strands
+
 0.5.14 2018-03-28T04:55:06Z
     - Update help
     - Release to CPAN

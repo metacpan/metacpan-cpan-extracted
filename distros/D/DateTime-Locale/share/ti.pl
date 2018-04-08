@@ -53,8 +53,8 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "y QQQQ",
-    "yw-count-one" => "\N{U+1218}\N{U+1260}\N{U+120d} w \N{U+1230}\N{U+1219}\N{U+1295} \N{U+1293}\N{U+12ed} Y",
-    "yw-count-other" => "\N{U+1218}\N{U+1260}\N{U+120d} w \N{U+1230}\N{U+1219}\N{U+1295} \N{U+1293}\N{U+12ed} Y",
+    "yw-count-one" => "\N{U+1218}\N{U+1260}\N{U+120d} w \N{U+1230}\N{U+1219}\N{U+1295} \N{U+1293}\N{U+12ed} y",
+    "yw-count-other" => "\N{U+1218}\N{U+1260}\N{U+120d} w \N{U+1230}\N{U+1219}\N{U+1295} \N{U+1293}\N{U+12ed} y",
   },
   code => "ti",
   date_format_full => "EEEE\N{U+1363} dd MMMM \N{U+1218}\N{U+12d3}\N{U+120d}\N{U+1272} y G",
@@ -271,5 +271,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 32,
+  version => 33,
 }

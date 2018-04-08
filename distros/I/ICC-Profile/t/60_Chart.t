@@ -25,7 +25,6 @@ can_ok('ICC::Support::Chart', qw(add_rows add_cols add_avg add_fmt add_ctv add_l
 can_ok('ICC::Support::Chart', qw(select_matrix select_template find ramp range randomize analyze write writeASCII writeCxF3 writeTIFF writeASE sdump));
 can_ok('Math::Matrix', qw(rotate flip randomize));
 
-
 # make empty Chart object
 $chart = ICC::Support::Chart->new();
 

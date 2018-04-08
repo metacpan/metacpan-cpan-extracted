@@ -1,10 +1,10 @@
 {
    "abstract" : "Inline display of plotly charts in Jupyter notebooks using L<Devel::IPerl> kernel",
    "author" : [
-      "Pablo Rodr\u00edguez Gonz\u00e1lez <pablo.rodriguez.gonzalez@gmail.com>"
+      "Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "mit"
    ],
@@ -35,12 +35,11 @@
          "requires" : {
             "Chart::Plotly::Plot" : "0",
             "Devel::IPerl::Display::HTML" : "0",
-            "English" : "0",
             "Module::Find" : "0",
             "Moo::Role" : "0",
             "Role::Tiny" : "0",
             "namespace::autoclean" : "0",
-            "perl" : "5.022001",
+            "perl" : "5.008",
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
@@ -59,7 +58,9 @@
          "web" : "https://github.com/pablrod/p5-Devel-IPerl-Plugin-Chart-Plotly"
       }
    },
-   "version" : "0.002",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
+   "version" : "0.003",
+   "x_contributors" : [
+      "Roy Storey <kiwiroy@users.noreply.github.com>"
+   ]
 }
 

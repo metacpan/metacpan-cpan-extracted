@@ -53,7 +53,7 @@ SYNOPSIS
  98 [ 26  1 69 10 86 72 57 ]
   1 [ 71 98 28 87 11 25 40 ]
   
- my ( $optimal, $assignement_ref, $output_index_ref ) = auction( matrix_ref => \@input_matrix, maximize_total_benefit => 0, verbose => 5 );
+ my ( $optimal, $assignment_ref, $output_index_ref ) = auction( matrix_ref => \@input_matrix, maximize_total_benefit => 0, verbose => 5 );
   
  Objective: to Minimize the total benefit
  Number of left nodes: 4
@@ -120,7 +120,7 @@ SYNOPSIS
  [  50,  80,  31,  90,  10,  83,  51,  55,  57,  40 ]
  );
 
- my ( $optimal, $assignement_ref, $output_index_ref ) = auction( matrix_ref => \@input_matrix, maximize_total_benefit => 1, verbose => 3 );
+ my ( $optimal, $assignment_ref, $output_index_ref ) = auction( matrix_ref => \@input_matrix, maximize_total_benefit => 1, verbose => 3 );
 
  Objective: to Maximize the total benefit
  Number of left nodes: 10
@@ -162,17 +162,19 @@ SYNOPSIS
 
  Common use of the solution:
    
- foreach my $i ( sort { $a <=> $b } keys %{$assignement_ref} ){     
-   my $j = $assignement_ref->{$i};   
+ foreach my $i ( sort { $a <=> $b } keys %{$assignment_ref} ){     
+   my $j = $assignment_ref->{$i};   
    ...
  }
- 
+
  my $sum = 0;
  for my $i ( 0 .. $#{$output_index_ref} ){
 	my $j = $output_index_ref->[$i];   
-	my $value = $input_matrix[$i]->[$j];  
-	$sum += $value;
-	printf " Auction Algorithm, output index --> \$i = %3d ; \$j = %3d ; \$value = %5s ; \$sum = %5s \n", $i, $j, $value, $sum;
+	my $value = $input_matrix[$i]->[$j];
+	$sum += $value if (defined $value);
+	
+	$value = defined $value ? sprintf( "%6s", $value ) : ' ' x 6 ; # %6s  
+	printf " Auction Algorithm, output index --> \$i = %3d ; \$j = %3d ; \$value = $value ; \$sum = %8s \n", $i, $j, $sum;
  }
  
 OPTIONS
@@ -181,7 +183,7 @@ OPTIONS
  maximize_total_benefit => 0,    0: minimize the total benefit ; 1: maximize the total benefit.
  inicial_stepsize       => 1,    auction algorithm terminates with a feasible assignment if the problem data are integer and stepsize < 1/min(N,M).
  inicial_price          => 0,			
- verbose                => 3,    print messages on the screen, level of verbosity, 0: quiet; 1, 2, 3, 4, 9, 10: debug information.
+ verbose                => 3,    print messages on the screen, level of verbosity, 0: quiet; 1, 2, 3, 4, 5, 8, 10: debug information.
 
 EXPORT
 
@@ -195,7 +197,7 @@ INPUT
 OUTPUT
 
     The $output_index_ref is the reference to the output_index array.
-	The $assignement_ref  is the reference to the assignement hash.
+	The $assignment_ref  is the reference to the assignment hash.
 	The $optimal is the total benefit which can be a minimum or maximum value.
 	
 
@@ -220,7 +222,7 @@ SEE ALSO
 AUTHOR
 
     Claudio Fernandes de Souza Rodrigues
-	March 25, 2018
+	April 6, 2018
 	Sao Paulo, Brasil
 	claudiofsr@yahoo.com
 	

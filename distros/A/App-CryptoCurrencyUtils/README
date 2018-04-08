@@ -2,8 +2,8 @@ NAME
     App::CryptoCurrencyUtils - CLI utilities related to cryptocurrencies
 
 VERSION
-    This document describes version 0.011 of App::CryptoCurrencyUtils (from
-    Perl distribution App-CryptoCurrencyUtils), released on 2018-03-08.
+    This document describes version 0.012 of App::CryptoCurrencyUtils (from
+    Perl distribution App-CryptoCurrencyUtils), released on 2018-04-06.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:

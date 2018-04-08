@@ -1,7 +1,7 @@
 #
 # This file is part of App-Cme
 #
-# This software is Copyright (c) 2017 by Dominique Dumont.
+# This software is Copyright (c) 2014-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 # ABSTRACT: Edit the configuration of an application
 
 package App::Cme::Command::edit ;
-$App::Cme::Command::edit::VERSION = '1.026';
+$App::Cme::Command::edit::VERSION = '1.027';
 use strict;
 use warnings;
 use 5.10.1;
@@ -125,7 +125,7 @@ App::Cme::Command::edit - Edit the configuration of an application
 
 =head1 VERSION
 
-version 1.026
+version 1.027
 
 =head1 SYNOPSIS
 
@@ -196,7 +196,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dominique Dumont.
+This software is Copyright (c) 2014-2018 by Dominique Dumont.
 
 This is free software, licensed under:
 

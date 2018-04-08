@@ -1,3 +1,25 @@
+libqbit-querydata-perl (0.010) raring; urgency=low
+
+  * fix aggregation
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Fri, 06 Apr 2018 00:17:48 +0300
+
+libqbit-querydata-perl (0.009) raring; urgency=low
+
+  * added documentation, fix FIELD
+
+  * functions refactoring - fix DISTINCT
+
+  * distinct - ok
+
+  * added functions
+
+  * added MAX/MIN
+
+  * added functions
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Thu, 05 Apr 2018 23:20:17 +0300
+
 libqbit-querydata-perl (0.008) raring; urgency=low
 
   * added tests

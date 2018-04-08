@@ -42,6 +42,11 @@ sub Reaper {
     processor => \&TransformTo,
     processor_params => ['strong']
   };
+  $AllowElements->{'i'} = {
+    'allow_attributes' => ['id'],
+    processor => \&TransformTo,
+    processor_params => ['em']
+  };
   $AllowElements->{'u'} = {
     'allow_attributes' => [],
     processor => \&TransformTo,
@@ -196,7 +201,9 @@ sub Reaper {
   my @Pages;
   foreach (@$AC) {
     $X->Msg("Processing in structure: ".$_->{'file'}."\n",'i');
+    $X->_bs('c2tree','Контент в дерево согласно схеме');
     push @Pages, $X->Content2Tree($_);
+    $X->_be('c2tree');
   }
 
   # [#01]
@@ -313,7 +320,17 @@ sub Reaper {
         }
 
         if (@LinksMove2Title && ref $Item eq 'HASH' && exists $Item->{'title'}) {
-          push @{$Item->{'title'}->{'value'}}, @LinksMove2Title; #переносим <a> в ближайший
+            foreach my $Link (@LinksMove2Title) {
+              #занято
+              if (exists $Item->{'title'}->{'attributes'}->{'id'} && $Item->{'title'}->{'attributes'}->{'id'}) {
+                #тогда будем менять линк на текущий
+                $X->{'EmptyLinksList'}->{$Link->{'a'}->{'attributes'}->{'id'}} = $Item->{'title'}->{'attributes'}->{'id'};
+              } else {
+                #пусто, займем это место! 
+                $Item->{'title'}->{'attributes'}->{'id'} = $Link->{'a'}->{'attributes'}->{'id'};
+              }
+
+            }
         }
         CleanTitle($X,$Item->{'title'}->{'value'});
     }
@@ -398,13 +415,23 @@ sub Reaper {
     }
 
     my $Content;
-    if (scalar @P > 1) {
-      $Content = \@P;
-    } else {
-      $Content = $P[0]->{'section'}->{'value'};  #если section один, то берем только его внутренности, контейнер section лишний 
+    my @PN; #финальная подчистка
+    foreach my $Item (@P) {
+      next unless defined $Item;
+      my $NotEmpty = 0;
+      foreach my $String (@{$Item->{'section'}->{'value'}}) {
+        $NotEmpty = 1 if defined $String && (ref $String eq 'HASH' || (ref $String eq '' && $X->trim($String) ne ''));
+      }
+      push @PN, $Item if $NotEmpty;
     }
 
-    if (@$Content) {
+    if (scalar @PN > 1) {
+      $Content = \@PN;
+    } elsif (scalar @PN) {
+      $Content = $PN[0]->{'section'}->{'value'};  #если section один, то берем только его внутренности, контейнер section лишний 
+    }
+
+    if ($Content && @$Content) {
       push @PagesComplete, {ID=>$Page->{'ID'},'content'=>$Content};
     } else {
       $X->Msg("Find empty page. Skip [id: $Page->{'ID'}]\n");      
@@ -556,6 +583,8 @@ sub AnaliseIdEmptyHref {
   my $Data = shift;
   my $Hash4Move = shift;
 
+  return if (ref $Data ne 'HASH' || !exists $Data->{'value'});
+
   my $First = 0;
   unless ($Hash4Move) {
    $Hash4Move = {
@@ -576,7 +605,7 @@ sub AnaliseIdEmptyHref {
         if ($El eq 'section') {
           AnaliseIdEmptyHref($X,$Item->{$El}); #вложенную секцию обрабатывает как отдельную
         } else {
-          if (exists $Item->{$El}->{'attributes'}->{'id'} && $Item->{$El}->{'attributes'}->{'id'} ne '') {
+          if (ref $Item->{$El} eq 'HASH' && exists $Item->{$El}->{'attributes'}->{'id'} && $Item->{$El}->{'attributes'}->{'id'} ne '') {
             if ($El eq 'a' && exists $Item->{$El}->{'attributes'}->{'xlink:href'} && $Item->{$El}->{'attributes'}->{'xlink:href'} eq '') {
               #ссылка - кандидат на перенос
               $Hash4Move->{'candidates'}->{$Item->{$El}->{'attributes'}->{'id'}} = $Hash4Move->{'count_abs'};
@@ -625,6 +654,7 @@ sub MoveIdEmptyHref {
     next unless ref $Item eq 'HASH';
     foreach my $ElName (keys %$Item) {
       my $El = $Item->{$ElName};
+      next unless ref $El eq 'HASH';
       #меняем ссылку
       if (
         $X->{'EmptyLinksList'}->{ $X->CutLinkDiez($El->{'attributes'}->{'xlink:href'}) } ne 'rename'
@@ -698,13 +728,20 @@ sub AssembleContent {
 
       $X->Msg("Parse content file ".$ContentFile."\n");
 
+      $X->_bs('parse_epub_xhtml', 'xml-парсинг файлов epub [Открытие, первичные преобразования, парсинг]');
       my $Content;
       open F,"<".$ContentFile;
       map {$Content.=$_} <F>;
       close F;
-      $Content = HTML::Entities::decode_entities(Encode::decode_utf8($Content));
-      $Content =~ s/\&/&#38;/g;
 
+      $X->_bs('Entities', 'Преобразование Entities');
+      $Content = $X->qent(Encode::decode_utf8($Content));
+      $X->_be('Entities');
+
+      $X->Msg("Fix strange text\n");
+      $Content = $X->ShitFix($Content);
+
+      $X->Msg("Parse XML\n");
       my $ContentDoc = XML::LibXML->load_xml(
         string => $Content,
         expand_entities => 0, # не считать & за entity
@@ -713,6 +750,7 @@ sub AssembleContent {
         load_ext_dtd => 0 # полный молчок про dtd
       );
       $ContentDoc->setEncoding('utf-8');
+
       my $Body = $XC->findnodes('/xhtml:html/xhtml:body',$ContentDoc)->[0];
       $X->Error("Can't find /html/body node in file $ContentFile. This is true XML?") unless $Body;
 
@@ -744,7 +782,9 @@ sub AssembleContent {
         content=>$Content,
         file=>$Item->{'href'}
       };
-  
+
+      $X->_be('parse_epub_xhtml');
+
     } else {
       $X->Msg("ID ".$Item->{'id'}.": I not understood what is it '".$Item->{'type'}."[".$Item->{'href'}."]'\n",'w');
     }
@@ -786,6 +826,7 @@ sub CleanNodeEmptyId {
     push @$Ret, $Item;
     next unless ref $Item eq 'HASH';
     foreach my $El (keys %$Item) {
+      next if ref $Item->{$El} ne 'HASH' || !exists $Item->{$El}->{'value'};
       $Item->{$El}->{'value'} = CleanNodeEmptyId($X,$Item->{$El}->{'value'});
       if (exists $Item->{$El}->{'attributes'}->{'id'} || $El =~ /^(a|span)$/) {
         my $Id = exists $Item->{$El}->{'attributes'}->{'id'} ? $Item->{$El}->{'attributes'}->{'id'} : '';
@@ -851,7 +892,9 @@ sub ProcessImg {
   #Копируем исходник на новое место с новым уникальным именем
   unless (-f $ImgDestFile) {
     $X->Msg("copy $ImgSrcFile -> $ImgDestFile\n");
+    $X->_bs('img_copy','Копирование IMG');
     FB3::Convert::copy($ImgSrcFile, $ImgDestFile) or $X->Error($!." [copy $ImgSrcFile -> $ImgDestFile]");        
+    $X->_be('img_copy','Копирование IMG');
   }
 
   $Node->setAttribute('src' => $ImgID);
@@ -880,8 +923,7 @@ sub ProcessHref {
                                                        basename($RelPath)."#".$Anchor #текущий section
                                                        ), $RelPath , 'process_href')
         : '';
-        
-        
+
   $X->{'href_list'}->{$NewHref} = $Href if $X->trim($NewHref) ne '';     
   $Node->setAttribute('xlink:href' => $NewHref);
 

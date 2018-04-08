@@ -3,7 +3,7 @@ package Database::Migrator::Types;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use MooseX::Types::Moose;
 use MooseX::Types::Path::Class;
@@ -32,7 +32,7 @@ Database::Migrator::Types - Type library for use by Database::Migrator
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =for Pod::Coverage .*
 
@@ -46,7 +46,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2017 by MaxMind, Inc.
+This software is Copyright (c) 2012 - 2018 by MaxMind, Inc.
 
 This is free software, licensed under:
 

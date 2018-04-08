@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,7 +24,7 @@ no_index:
 provides:
   MojoX::Log::Fast:
     file: lib/MojoX/Log/Fast.pm
-    version: v1.0.0
+    version: v1.0.1
 requires:
   Log::Fast: '0'
   Mojo::Base: '0'
@@ -34,4 +34,5 @@ resources:
   bugtracker: https://github.com/powerman/perl-MojoX-Log-Fast/issues
   homepage: https://github.com/powerman/perl-MojoX-Log-Fast
   repository: https://github.com/powerman/perl-MojoX-Log-Fast.git
-version: v1.0.0
+version: v1.0.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

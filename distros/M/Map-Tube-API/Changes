@@ -1,5 +1,8 @@
 Revision history for Map::Tube::API
 
+0.04  Mon Apr 02 04:00:00 2018
+      - General tidied up.
+
 0.03  Sat Dec 16 16:20:00 2017
       - Added key 'provides' to the Makefile.PL script.
 

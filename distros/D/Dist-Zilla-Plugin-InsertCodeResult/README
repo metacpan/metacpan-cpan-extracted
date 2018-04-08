@@ -1,5 +1,13 @@
-SYNOPSIS
+NAME
+    Dist::Zilla::Plugin::InsertCodeResult - Insert the result of Perl code
+    into your POD
 
+VERSION
+    This document describes version 0.050 of
+    Dist::Zilla::Plugin::InsertCodeResult (from Perl distribution
+    Dist-Zilla-Plugin-InsertCodeResult), released on 2018-04-06.
+
+SYNOPSIS
     In dist.ini:
 
      [InsertCodeResult]
@@ -10,15 +18,38 @@ SYNOPSIS
      # CODE: require MyLib; MyLib::gen_stuff("some", "param");
 
 DESCRIPTION
-
-    This module finds # CODE: ... directives in your POD, evals the
+    This module finds "# CODE: ..." directives in your POD, evals the
     specified Perl code, and insert the result into your POD as a verbatim
-    paragraph (unless you set make_verbatim to 0, in which case output will
-    be inserted as-is). If result is a simple scalar, it is printed as is.
-    If it is undef or a reference, it will be dumped using Data::Dump. If
-    eval fails, build will be aborted.
+    paragraph (unless you set "make_verbatim" to 0, in which case output
+    will be inserted as-is). If result is a simple scalar, it is printed as
+    is. If it is undef or a reference, it will be dumped using Data::Dump.
+    If eval fails, build will be aborted.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-InsertCodeResult>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertCodeResult>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Ins
+    ertCodeResult>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Dist::Zilla::Plugin::InsertExample
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2015, 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

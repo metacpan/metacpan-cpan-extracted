@@ -16,7 +16,7 @@ is ( $Validator->IsNot_Valid( 'aBC123*', 'aBC123*' ), 0,
 	'A simple password that passes the default rules' ) ;
 #print $Validator->{ errstring }, "\n" ;
 
-is ( $Validator->IsNot_Valid( 'aBC123*', '1234567689' ),
+is ( $Validator->isnot_valid( 'aBC123*', '1234567689' ),
 	"Strings don\'t match.\n",
 	'Mismatched passwords fail.' ) ;
 

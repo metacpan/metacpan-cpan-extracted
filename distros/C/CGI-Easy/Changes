@@ -1,5 +1,9 @@
 Revision history for CGI-Easy
 
+v2.0.1  2018-04-03 18:50:05 EEST
+	- Fix compatibility with perl-5.26.
+	- Reformat doc.
+
 v2.0.0  2016-02-15 22:51:07 EET
 	- Bump version.
 

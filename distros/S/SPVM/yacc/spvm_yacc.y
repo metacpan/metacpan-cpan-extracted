@@ -16,18 +16,18 @@
 %}
 
 %token <opval> MY HAS SUB PACKAGE IF ELSIF ELSE RETURN FOR WHILE USE NEW OUR SELF CLASS
-%token <opval> LAST NEXT NAME CONSTANT ENUM DESCRIPTOR CORETYPE UNDEF CROAK VAR_NAME
+%token <opval> LAST NEXT NAME CONSTANT ENUM DESCRIPTOR CORETYPE UNDEF CROAK VAR_NAME INTERFACE REF ISA
 %token <opval> SWITCH CASE DEFAULT VOID EVAL BYTE SHORT INT LONG FLOAT DOUBLE STRING WEAKEN
 
 %type <opval> grammar opt_statements statements statement my_var field if_statement else_statement
-%type <opval> block enumeration_block package_block sub opt_declarations_in_package call_sub unop binop
+%type <opval> block enumeration_block package_block sub opt_declarations_in_package call_sub unop binop isa
 %type <opval> opt_assignable_terms assignable_terms assignable_term args arg opt_args use declaration_in_package declarations_in_package term logical_term relative_term
 %type <opval> enumeration_values enumeration_value weaken_field our_var invocant
 %type <opval> type package_name field_name sub_name package declarations_in_grammar opt_enumeration_values type_array
 %type <opval> for_statement while_statement expression opt_declarations_in_grammar var
 %type <opval> call_field array_elem convert_type enumeration new_object type_name array_length declaration_in_grammar
 %type <opval> switch_statement case_statement default_statement type_array_with_length
-%type <opval> ';' opt_descriptors descriptors type_or_void normal_statement normal_statement_for_end eval_block
+%type <opval> ';' opt_descriptors opt_colon_descriptors descriptors type_or_void normal_statement normal_statement_for_end eval_block
 
 
 %right <opval> ASSIGN SPECIAL_ASSIGN
@@ -104,12 +104,9 @@ use
     }
 
 package
-  : PACKAGE package_name package_block
+  : PACKAGE package_name opt_colon_descriptors package_block
     {
-      $$ = SPVM_OP_build_package(compiler, $1, $2, $3);
-      if (compiler->fatal_error) {
-        YYABORT;
-      }
+      $$ = SPVM_OP_build_package(compiler, $1, $2, $4, $3);
     }
 
 opt_declarations_in_package
@@ -424,6 +421,11 @@ term
   : assignable_term
   | relative_term
   | logical_term
+  | isa
+  | '(' term ')'
+    {
+      $$ = $2;
+    }
 
 assignable_term
   : var
@@ -469,6 +471,12 @@ expression
       $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
     }
   | weaken_field
+
+isa
+  : term ISA type
+    {
+      $$ = SPVM_OP_build_isa(compiler, $2, $1, $3);
+    }
 
 new_object
   : NEW type_name
@@ -560,7 +568,7 @@ binop
     }
   | assignable_term '.' assignable_term
     {
-      $$ = SPVM_OP_build_concat_string(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_concat(compiler, $2, $1, $3);
     }
   | assignable_term MULTIPLY assignable_term
     {
@@ -744,6 +752,23 @@ invocant
       $$ = SPVM_OP_build_arg(compiler, $1, $3);
     }
 
+opt_colon_descriptors
+  :	/* Empty */
+    {
+      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
+    }
+  |	':' descriptors
+    {
+      if ($2->id == SPVM_OP_C_ID_LIST) {
+        $$ = $2;
+      }
+      else {
+        SPVM_OP* op_list = SPVM_OP_new_op_list(compiler, $2->file, $2->line);
+        SPVM_OP_insert_child(compiler, op_list, op_list->last, $2);
+        $$ = op_list;
+      }
+    }
+
 opt_descriptors
   :	/* Empty */
     {
@@ -756,7 +781,7 @@ opt_descriptors
       }
       else {
         SPVM_OP* op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
-        SPVM_OP_insert_child(compiler, op_list, op_list->first, $1);
+        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
         $$ = op_list;
       }
     }

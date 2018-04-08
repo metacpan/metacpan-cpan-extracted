@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes IO::Stream::Proxy::HTTPS version v1.0.5
+    This document describes IO::Stream::Proxy::HTTPS version v2.0.1
 
 SYNOPSIS
 
@@ -46,11 +46,20 @@ DESCRIPTION
 
 INTERFACE
 
-    new({ host=>$host, port=>$port })
+ new
 
-    new({ host=>$host, port=>$port, user=>$user, pass=>$pass })
+        $plugin = IO::Stream::Proxy::HTTPS->new({
+            host=>$host,
+            port=>$port,
+        });
+        $plugin = IO::Stream::Proxy::HTTPS->new({
+            host=>$host,
+            port=>$port,
+            user=>$user,
+            pass=>$pass,
+        });
 
-      Connect to proxy $host:$port, optionally using basic authorization.
+    Connect to proxy $host:$port, optionally using basic authorization.
 
 DIAGNOSTICS
 
@@ -117,7 +126,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2008 by Alex Efros <powerman@cpan.org>.
+    This software is Copyright (c) 2008- by Alex Efros <powerman@cpan.org>.
 
     This is free software, licensed under:
 

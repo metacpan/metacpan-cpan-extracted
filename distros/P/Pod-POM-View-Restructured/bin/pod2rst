@@ -1,8 +1,8 @@
 #!/usr/local/bin/perl
 
-# Original authors: don
-# $Revision$
-
+# AUTHOR: Don Owens <don@regexguy.com>
+# OWNER: 2010 Don Owens <don@regexguy.com>
+# LICENSE: Perl_5
 
 use strict;
 use warnings;
@@ -11,10 +11,12 @@ use Getopt::Long qw(:config no_ignore_case bundling);
 
 use Pod::POM::View::Restructured;
 
+our $VERSION = '1.000'; # VERSION
+
 # main
 {
     # local($SIG{__DIE__}) = sub { &Carp::confess };
-    my $self = bless { };
+    my $self = bless { }, __PACKAGE__;
 
     my $opts = $self->get_options([ "help|h",
                                     "in_file|infile|in-file|i=s",
@@ -153,6 +155,7 @@ sub get_options {
 }
 ########## end option processing ##########
 
+__END__
 
 =pod
 
@@ -196,27 +199,24 @@ Specifies the section title for the file.
 
 =back
 
-=head1 AUTHOR
-
-Don Owens <don@regexguy.com>
-
 =head1 SEE ALSO
 
 L<Pod::POM::View::Restructured>, L<pod2html>
 
 Sphinx: L<http://sphinx.pocoo.org/>
 
-=head1 LICENSE AND COPYRIGHT
+=head1 AUTHOR
 
-Copyright (c) 2010 Don Owens <don@regexguy.com>.  All rights reserved.
+Don Owens <don@regexguy.com>
 
-This is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.  See perlartistic.
+=head1 COPYRIGHT
 
-This program is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied
-warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.
+This software is copyright (c) 2010 by Don Owens <don@regexguy.com>.
 
+This software is available under the same terms as the perl 5 programming language system itself.
+
+=head1 VERSION
+
+1.000
 
 =cut

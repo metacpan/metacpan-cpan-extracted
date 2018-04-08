@@ -1,5 +1,13 @@
 Revision history for perl module Device::WebIO
 
+0.022 2018-04-06
+
+- Pass through AnyEvent condvar setting
+
+0.021 2018-04-06
+
+- Slight change to interface of AnyEvent handling
+
 0.020 2018-03-26
 
 - Add AnyEvent-based input interrupt handling

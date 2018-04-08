@@ -18,7 +18,7 @@ for my $module (keys %hold){
 }
 
 ok($hold{'Digest::MD5'} eq "ok", "module Digest::MD5 hasn't been installed?");
-ok(($hold{'Crypt::OpenSSL::RSA'} eq "ok" and $hold{'Crypt::OpenSSL::Bignum'} eq "ok") || ($hold{'Crypt::RSA'} eq "ok") , "module Crypt::OpenSSL::RSA && Crypt::OpenSSL::Bignum hasn't been installed? \n see https://metacpan.org/pod/distribution/Webqq-Encryption/lib/Webqq/Encryption.pod for installation\n");
+ok(($hold{'Crypt::OpenSSL::RSA'} eq "ok" and $hold{'Crypt::OpenSSL::Bignum'} eq "ok") || ($hold{'Crypt::RSA'} eq "ok") , "module Crypt::OpenSSL::RSA && Crypt::OpenSSL::Bignum hasn't been installed? \n see https://github.com/sjdy521/Webqq-Encryption for installation\n");
 
 #########################
 

@@ -1,16 +1,39 @@
 package Chart::Plotly::Trace::Pie;
 use Moose;
 use MooseX::ExtraArgs;
+use Moose::Util::TypeConstraints qw(enum union);
+if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
+    Moose::Util::TypeConstraints::type('PDL');
+}
 
-use Chart::Plotly::Trace::Attribute::Domain;
-use Chart::Plotly::Trace::Attribute::Marker;
+use Chart::Plotly::Trace::Pie::Domain;
+use Chart::Plotly::Trace::Pie::Hoverlabel;
+use Chart::Plotly::Trace::Pie::Insidetextfont;
+use Chart::Plotly::Trace::Pie::Marker;
+use Chart::Plotly::Trace::Pie::Outsidetextfont;
+use Chart::Plotly::Trace::Pie::Stream;
+use Chart::Plotly::Trace::Pie::Textfont;
 
-our $VERSION = '0.013';    # VERSION
+our $VERSION = '0.017';    # VERSION
+
+# ABSTRACT: A data visualized by the sectors of the pie is set in `values`. The sector labels are set in `labels`. The sector colors are set in `marker.colors`
 
 sub TO_JSON {
     my $self       = shift;
     my $extra_args = $self->extra_args // {};
-    my %hash       = ( %$self, %$extra_args );
+    my $meta       = $self->meta;
+    my %hash       = %$self;
+    for my $name ( sort keys %hash ) {
+        my $attr = $meta->get_attribute($name);
+        if ( defined $attr ) {
+            my $value = $hash{$name};
+            my $type  = $attr->type_constraint;
+            if ( $type && $type->equals('Bool') ) {
+                $hash{$name} = $value ? \1 : \0;
+            }
+        }
+    }
+    %hash = ( %hash, %$extra_args );
     delete $hash{'extra_args'};
     if ( $self->can('type') && ( !defined $hash{'type'} ) ) {
         $hash{type} = $self->type();
@@ -18,95 +41,217 @@ sub TO_JSON {
     return \%hash;
 }
 
-has direction => ( is            => 'rw',
-                   documentation => "Specifies the direction at which succeeding sectors follow one another.", );
+sub type {
+    my @components = split( /::/, __PACKAGE__ );
+    return lc( $components[-1] );
+}
 
-has dlabel => ( is            => 'rw',
+has customdata => (
+    is  => "rw",
+    isa => "ArrayRef|PDL",
+    documentation =>
+      "Assigns extra data each datum. This may be useful when listening to hover, click and selection events. Note that, *scatter* traces also appends customdata items in the markers DOM elements",
+);
+
+has customdatasrc => ( is            => "rw",
+                       isa           => "Str",
+                       documentation => "Sets the source reference on plot.ly for  customdata .",
+);
+
+has direction => ( is            => "rw",
+                   isa           => enum( [ "clockwise", "counterclockwise" ] ),
+                   documentation => "Specifies the direction at which succeeding sectors follow one another.",
+);
+
+has dlabel => ( is            => "rw",
                 isa           => "Num",
                 documentation => "Sets the label step. See `label0` for more info.",
 );
 
-has domain => ( is  => 'rw',
-                isa => "Maybe[HashRef]|Chart::Plotly::Trace::Attribute::Domain" );
+has domain => ( is  => "rw",
+                isa => "Maybe[HashRef]|Chart::Plotly::Trace::Pie::Domain", );
 
-has hole => ( is            => 'rw',
+has hole => ( is            => "rw",
               isa           => "Num",
               documentation => "Sets the fraction of the radius to cut out of the pie. Use this to make a donut chart.",
 );
 
 has hoverinfo => (
-    is => 'rw',
+    is  => "rw",
+    isa => "Maybe[ArrayRef]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
 
-has insidetextfont => ( is            => 'rw',
-                        documentation => "Sets the font used for `textinfo` lying inside the pie.", );
+has hoverinfosrc => ( is            => "rw",
+                      isa           => "Str",
+                      documentation => "Sets the source reference on plot.ly for  hoverinfo .",
+);
+
+has hoverlabel => ( is  => "rw",
+                    isa => "Maybe[HashRef]|Chart::Plotly::Trace::Pie::Hoverlabel", );
+
+has hovertext => (
+    is  => "rw",
+    isa => "Str|ArrayRef[Str]",
+    documentation =>
+      "Sets hover text elements associated with each sector. If a single string, the same string appears for all data points. If an array of string, the items are mapped in order of this trace's sectors. To be seen, trace `hoverinfo` must contain a *text* flag.",
+);
+
+has hovertextsrc => ( is            => "rw",
+                      isa           => "Str",
+                      documentation => "Sets the source reference on plot.ly for  hovertext .",
+);
+
+has ids => (
+    is  => "rw",
+    isa => "ArrayRef|PDL",
+    documentation =>
+      "Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.",
+);
+
+has idssrc => ( is            => "rw",
+                isa           => "Str",
+                documentation => "Sets the source reference on plot.ly for  ids .",
+);
+
+has insidetextfont => ( is  => "rw",
+                        isa => "Maybe[HashRef]|Chart::Plotly::Trace::Pie::Insidetextfont", );
 
 has label0 => (
-    is  => 'rw',
+    is  => "rw",
     isa => "Num",
     documentation =>
       "Alternate to `labels`. Builds a numeric set of labels. Use with `dlabel` where `label0` is the starting label and `dlabel` the step.",
 );
 
-has labels => ( is            => 'rw',
-                documentation => "Sets the sector labels.", );
+has labels => (
+    is  => "rw",
+    isa => "ArrayRef|PDL",
+    documentation =>
+      "Sets the sector labels. If `labels` entries are duplicated, we sum associated `values` or simply count occurrences if `values` is not provided. For other array attributes (including color) we use the first non-empty entry among all occurrences of the label.",
+);
 
-has marker => ( is  => 'rw',
-                isa => "Maybe[HashRef]|Chart::Plotly::Trace::Attribute::Marker" );
+has labelssrc => ( is            => "rw",
+                   isa           => "Str",
+                   documentation => "Sets the source reference on plot.ly for  labels .",
+);
 
-has outsidetextfont => ( is            => 'rw',
-                         documentation => "Sets the font used for `textinfo` lying outside the pie.", );
+has legendgroup => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.",
+);
+
+has marker => ( is  => "rw",
+                isa => "Maybe[HashRef]|Chart::Plotly::Trace::Pie::Marker", );
+
+has name => ( is            => "rw",
+              isa           => "Str",
+              documentation => "Sets the trace name. The trace name appear as the legend item and on hover.",
+);
+
+has opacity => ( is            => "rw",
+                 isa           => "Num",
+                 documentation => "Sets the opacity of the trace.",
+);
+
+has outsidetextfont => ( is  => "rw",
+                         isa => "Maybe[HashRef]|Chart::Plotly::Trace::Pie::Outsidetextfont", );
 
 has pull => (
-    is  => 'rw',
-    isa => "Num",
+    is  => "rw",
+    isa => "Num|ArrayRef[Num]",
     documentation =>
       "Sets the fraction of larger radius to pull the sectors out from the center. This can be a constant to pull all slices apart from each other equally or an array to highlight one or more slices.",
 );
 
-has rotation => ( is            => 'rw',
+has pullsrc => ( is            => "rw",
+                 isa           => "Str",
+                 documentation => "Sets the source reference on plot.ly for  pull .",
+);
+
+has rotation => ( is            => "rw",
                   isa           => "Num",
                   documentation => "Instead of the first slice starting at 12 o'clock, rotate to some other angle.",
 );
 
 has scalegroup => (
-    is  => 'rw',
+    is  => "rw",
     isa => "Str",
     documentation =>
       "If there are multiple pies that should be sized according to their totals, link them by providing a non-empty group id here shared by every trace in the same group.",
 );
 
-has sort => ( is            => 'rw',
-              isa           => "Bool",
-              documentation => "Determines whether or not the sectors of reordered from largest to smallest.",
+has selectedpoints => (
+    is  => "rw",
+    isa => "Any",
+    documentation =>
+      "Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.",
 );
 
-has text => ( is            => 'rw',
-              documentation => "Sets text elements associated with each sector.", );
+has showlegend => (
+               is            => "rw",
+               isa           => "Bool",
+               documentation => "Determines whether or not an item corresponding to this trace is shown in the legend.",
+);
 
-has textfont => ( is            => 'rw',
-                  documentation => "Sets the font used for `textinfo`.", );
+has sort => ( is            => "rw",
+              isa           => "Bool",
+              documentation => "Determines whether or not the sectors are reordered from largest to smallest.",
+);
 
-has textinfo => ( is            => 'rw',
+has stream => ( is  => "rw",
+                isa => "Maybe[HashRef]|Chart::Plotly::Trace::Pie::Stream", );
+
+has text => (
+    is  => "rw",
+    isa => "ArrayRef|PDL",
+    documentation =>
+      "Sets text elements associated with each sector. If trace `textinfo` contains a *text* flag, these elements will seen on the chart. If trace `hoverinfo` contains a *text* flag and *hovertext* is not set, these elements will be seen in the hover labels.",
+);
+
+has textfont => ( is  => "rw",
+                  isa => "Maybe[HashRef]|Chart::Plotly::Trace::Pie::Textfont", );
+
+has textinfo => ( is            => "rw",
                   documentation => "Determines which trace information appear on the graph.", );
 
-has textposition => ( is            => 'rw',
-                      documentation => "Specifies the location of the `textinfo`.", );
-
-has values => ( is            => 'rw',
-                documentation => "Sets the values of the sectors of this pie chart.", );
-
-has name => ( is            => 'rw',
-              isa           => "Str",
-              documentation => "Sets the trace name",
+has textposition => ( is            => "rw",
+                      isa           => union( [ enum( [ "inside", "outside", "auto", "none" ] ), "ArrayRef" ] ),
+                      documentation => "Specifies the location of the `textinfo`.",
 );
 
-sub type {
-    my @components = split( /::/, __PACKAGE__ );
-    return lc( $components[-1] );
-}
+has textpositionsrc => ( is            => "rw",
+                         isa           => "Str",
+                         documentation => "Sets the source reference on plot.ly for  textposition .",
+);
+
+has textsrc => ( is            => "rw",
+                 isa           => "Str",
+                 documentation => "Sets the source reference on plot.ly for  text .",
+);
+
+has uid => ( is  => "rw",
+             isa => "Str", );
+
+has values => ( is  => "rw",
+                isa => "ArrayRef|PDL",
+                documentation =>
+                  "Sets the values of the sectors of this pie chart. If omitted, we count occurrences of each label.",
+);
+
+has valuessrc => ( is            => "rw",
+                   isa           => "Str",
+                   documentation => "Sets the source reference on plot.ly for  values .",
+);
+
+has visible => (
+    is => "rw",
+    documentation =>
+      "Determines whether or not this trace is visible. If *legendonly*, the trace is not drawn, but can appear as a legend item (provided that the legend itself is visible).",
+);
 
 __PACKAGE__->meta->make_immutable();
 1;
@@ -119,11 +264,11 @@ __END__
 
 =head1 NAME
 
-Chart::Plotly::Trace::Pie
+Chart::Plotly::Trace::Pie - A data visualized by the sectors of the pie is set in `values`. The sector labels are set in `labels`. The sector colors are set in `marker.colors`
 
 =head1 VERSION
 
-version 0.013
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -137,16 +282,26 @@ version 0.013
 
 =head1 DESCRIPTION
 
+A data visualized by the sectors of the pie is set in `values`. The sector labels are set in `labels`. The sector colors are set in `marker.colors`
+
+Screenshot of the above example:
+
+=for HTML <p>
+<img src="https://raw.githubusercontent.com/pablrod/p5-Chart-Plotly/master/examples/traces/pie.png" alt="Screenshot of the above example">
+</p>
+
+=for markdown ![Screenshot of the above example](https://raw.githubusercontent.com/pablrod/p5-Chart-Plotly/master/examples/traces/pie.png)
+
+=for HTML <p>
+<iframe src="https://raw.githubusercontent.com/pablrod/p5-Chart-Plotly/master/examples/traces/pie.html" style="border:none;" width="80%" height="520"></iframe>
+</p>
+
 This file has been autogenerated from the official plotly.js source.
 
 If you like Plotly, please support them: L<https://plot.ly/> 
 Open source announcement: L<https://plot.ly/javascript/open-source-announcement/>
 
 Full reference: L<https://plot.ly/javascript/reference/#pie>
-
-=head1 NAME 
-
-Chart::Plotly::Trace::Pie
 
 =head1 DISCLAIMER
 
@@ -159,9 +314,21 @@ But I think plotly.js is a great library and I want to use it with perl.
 
 Serialize the trace to JSON. This method should be called only by L<JSON> serializer.
 
+=head2 type
+
+Trace type.
+
 =head1 ATTRIBUTES
 
 =over
+
+=item * customdata
+
+Assigns extra data each datum. This may be useful when listening to hover, click and selection events. Note that, *scatter* traces also appends customdata items in the markers DOM elements
+
+=item * customdatasrc
+
+Sets the source reference on plot.ly for  customdata .
 
 =item * direction
 
@@ -181,9 +348,29 @@ Sets the fraction of the radius to cut out of the pie. Use this to make a donut 
 
 Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.
 
-=item * insidetextfont
+=item * hoverinfosrc
 
-Sets the font used for `textinfo` lying inside the pie.
+Sets the source reference on plot.ly for  hoverinfo .
+
+=item * hoverlabel
+
+=item * hovertext
+
+Sets hover text elements associated with each sector. If a single string, the same string appears for all data points. If an array of string, the items are mapped in order of this trace's sectors. To be seen, trace `hoverinfo` must contain a *text* flag.
+
+=item * hovertextsrc
+
+Sets the source reference on plot.ly for  hovertext .
+
+=item * ids
+
+Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.
+
+=item * idssrc
+
+Sets the source reference on plot.ly for  ids .
+
+=item * insidetextfont
 
 =item * label0
 
@@ -191,17 +378,35 @@ Alternate to `labels`. Builds a numeric set of labels. Use with `dlabel` where `
 
 =item * labels
 
-Sets the sector labels.
+Sets the sector labels. If `labels` entries are duplicated, we sum associated `values` or simply count occurrences if `values` is not provided. For other array attributes (including color) we use the first non-empty entry among all occurrences of the label.
+
+=item * labelssrc
+
+Sets the source reference on plot.ly for  labels .
+
+=item * legendgroup
+
+Sets the legend group for this trace. Traces part of the same legend group hide/show at the same time when toggling legend items.
 
 =item * marker
 
-=item * outsidetextfont
+=item * name
 
-Sets the font used for `textinfo` lying outside the pie.
+Sets the trace name. The trace name appear as the legend item and on hover.
+
+=item * opacity
+
+Sets the opacity of the trace.
+
+=item * outsidetextfont
 
 =item * pull
 
 Sets the fraction of larger radius to pull the sectors out from the center. This can be a constant to pull all slices apart from each other equally or an array to highlight one or more slices.
+
+=item * pullsrc
+
+Sets the source reference on plot.ly for  pull .
 
 =item * rotation
 
@@ -211,17 +416,25 @@ Instead of the first slice starting at 12 o'clock, rotate to some other angle.
 
 If there are multiple pies that should be sized according to their totals, link them by providing a non-empty group id here shared by every trace in the same group.
 
+=item * selectedpoints
+
+Array containing integer indices of selected points. Has an effect only for traces that support selections. Note that an empty array means an empty selection where the `unselected` are turned on for all points, whereas, any other non-array values means no selection all where the `selected` and `unselected` styles have no effect.
+
+=item * showlegend
+
+Determines whether or not an item corresponding to this trace is shown in the legend.
+
 =item * sort
 
-Determines whether or not the sectors of reordered from largest to smallest.
+Determines whether or not the sectors are reordered from largest to smallest.
+
+=item * stream
 
 =item * text
 
-Sets text elements associated with each sector.
+Sets text elements associated with each sector. If trace `textinfo` contains a *text* flag, these elements will seen on the chart. If trace `hoverinfo` contains a *text* flag and *hovertext* is not set, these elements will be seen in the hover labels.
 
 =item * textfont
-
-Sets the font used for `textinfo`.
 
 =item * textinfo
 
@@ -231,19 +444,29 @@ Determines which trace information appear on the graph.
 
 Specifies the location of the `textinfo`.
 
+=item * textpositionsrc
+
+Sets the source reference on plot.ly for  textposition .
+
+=item * textsrc
+
+Sets the source reference on plot.ly for  text .
+
+=item * uid
+
 =item * values
 
-Sets the values of the sectors of this pie chart.
+Sets the values of the sectors of this pie chart. If omitted, we count occurrences of each label.
 
-=item * name
+=item * valuessrc
 
-Sets the trace name
+Sets the source reference on plot.ly for  values .
+
+=item * visible
+
+Determines whether or not this trace is visible. If *legendonly*, the trace is not drawn, but can appear as a legend item (provided that the legend itself is visible).
 
 =back
-
-=head2 type
-
-Trace type.
 
 =head1 AUTHOR
 
@@ -251,7 +474,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2017 by Pablo Rodríguez González.
+This software is Copyright (c) 2017 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

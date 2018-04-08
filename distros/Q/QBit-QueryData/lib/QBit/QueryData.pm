@@ -1,5 +1,5 @@
 package QBit::QueryData;
-$QBit::QueryData::VERSION = '0.008';
+$QBit::QueryData::VERSION = '0.010';
 use qbit;
 
 use base qw(QBit::Class);
@@ -66,6 +66,10 @@ sub data {
             $self->{'__ALL_FIELDS__'}{$field} = '';
         }
 
+        unless (%{$self->{'__PROCESS_FIELDS__'} // {}}) {
+            $self->fields($self->get_fields());
+        }
+
         $self->{'data'} = $data;
     }
 
@@ -73,26 +77,17 @@ sub data {
 }
 
 sub fields {
-    my ($self, $fields) = @_;
+    my ($self, $set_fields) = @_;
 
-    if (defined($fields)) {
-        $fields = {map {$_ => ''} @$fields} if ref($fields) eq 'ARRAY';
+    if (defined($set_fields)) {
+        $set_fields = {map {$_ => ''} @$set_fields} if ref($set_fields) eq 'ARRAY';
 
-        unless (%$fields) {
+        unless (%$set_fields) {
             #default
             delete($self->{'__FIELDS__'});
         } else {
             #set fields
-            if (exists($self->{'__ALL_FIELDS__'})) {
-                my @not_exists = grep {
-                    (!exists($self->{'__ALL_FIELDS__'}{$_}) && $fields->{$_} eq '')
-                      || (!exists($self->{'__ALL_FIELDS__'}{$fields->{$_}})
-                        && $fields->{$_} ne '')
-                } keys(%$fields);
-                throw gettext('Unknown fields: %s', join(', ', @not_exists)) if @not_exists;
-            }
-
-            $self->{'__FIELDS__'} = $fields;
+            $self->{'__FIELDS__'} = $set_fields;
         }
     } else {
         #all fields
@@ -100,7 +95,52 @@ sub fields {
         delete($self->{'fields'});
     }
 
+    if (exists($self->{'__ALL_FIELDS__'})) {
+        delete($self->{'__PROCESS_FIELDS__'});
+
+        my $fields = $self->get_fields();
+
+        foreach my $field (keys(%$fields)) {
+            my $path = $self->_get_path($field);
+
+            my $func_name;
+            if (@$path > 1 || ref($fields->{$field}) eq '') {
+                $func_name = 'FIELD';
+            } elsif (ref($fields->{$field}) eq 'HASH') {
+                $func_name = [%{$fields->{$field}}]->[0];
+            } else {
+                throw 'Unknown field';
+            }
+
+            my $class = $self->_get_process_class($func_name);
+
+            $self->{'__PROCESS_FIELDS__'}{$field} =
+              $class->new(name => $func_name, qd => $self, path => $path, fields => $fields, field => $field);
+        }
+
+        my $error_message =
+          join("\n", map {$_->get_error_message} grep {$_->has_errors} values(%{$self->{'__PROCESS_FIELDS__'}}));
+
+        throw Exception $error_message if $error_message;
+    }
+
     return $self;
+}
+
+sub _get_process_class {
+    my ($self, $name) = @_;
+
+    my $class_prefix = 'QBit::QueryData::Function::';
+    my $class        = $class_prefix . uc($name);
+
+    my $file_path = "$class.pm";
+    $file_path =~ s/::/\//g;
+
+    unless (exists($INC{$file_path})) {
+        require $file_path;
+    }
+
+    return $class;
 }
 
 sub get_fields {
@@ -195,46 +235,79 @@ sub found_rows {
 sub get_all {
     my ($self, %opts) = @_;
 
-    my $fields         = $self->get_fields() // {};
-    my @fields         = keys(%$fields);
-    my @db_fields      = ();
-    my @precess_fields = ();
+    my $fields      = $self->get_fields() // {};
+    my @fields      = keys(%$fields);
+    my @aggregators = ();
 
     foreach (@fields) {
-        if ($fields->{$_}) {
-            push(@precess_fields, $_);
-        } else {
-            push(@db_fields, $_);
+        if ($self->{'__PROCESS_FIELDS__'}{$_}) {
+            if ($self->{'__PROCESS_FIELDS__'}{$_}->can('init_storage')) {
+                $self->{'__PROCESS_FIELDS__'}{$_}->init_storage();
+            }
+
+            if ($self->{'__PROCESS_FIELDS__'}{$_}->can('aggregation')) {
+                push(@aggregators, $_);
+            }
+
+            #TODO: подумать над реализацией двух функций над одним полем
+            #проверить что две группирующие функции не используются над одним полем
         }
     }
 
-    my @group_by = @{$self->{'__GROUP_BY__'} // []};
-
-    if (!@group_by && $self->{'__DISTINCT__'}) {
-        @group_by = map {$self->_get_path($_)} @fields;
-    }
+    my @group_by = @{$self->{'__PATHS_GROUP_BY__'} // []};
 
     my %uniq = ();
     my @data = ();
     foreach my $row (@{$self->{'data'}}) {
         next if defined($self->{'__FILTER__'}) && !$self->{'__FILTER__'}->($row);
 
-        my $new_row = {map {$_ => $row->{$fields->{$_}}} @precess_fields};
+        my $new_row = {};
+        foreach my $field (@fields) {
+            $new_row->{$field} = $self->{'__PROCESS_FIELDS__'}{$field}->process($row);
+        }
 
         if (@group_by) {
-            my $key = join($;, map {$self->_get_field_value_by_path($fields, $row, $new_row, undef, @$_) // 'UNDEF'} @group_by);
+            my $key =
+              join($;, map {$self->get_field_value_by_path($row, $new_row, undef, @$_) // '__UNDEF__'} @group_by);
 
-            unless ($uniq{$key}) {
-                $new_row->{$_} = $row->{$_} foreach @db_fields;
-
+            unless (exists($uniq{$key})) {
+                # строка с новым ключом
                 push(@data, $new_row);
 
-                $uniq{$key} = TRUE;
+                $uniq{$key} = $#data;
             }
+
+            # агрегируем
+            $data[$uniq{$key}]->{$_} = $self->{'__PROCESS_FIELDS__'}{$_}->aggregation($row, $key) foreach @aggregators;
+        } elsif (@aggregators) {
+            # нет группировок но есть агригирующие функции
+            unless (@data) {
+                # результат одна строка
+                push(@data, $new_row);
+            }
+
+            $data[0]->{$_} = $self->{'__PROCESS_FIELDS__'}{$_}->aggregation($row, $_) foreach @aggregators;
         } else {
-            $new_row->{$_} = $row->{$_} foreach @db_fields;
             push(@data, $new_row);
         }
+    }
+
+    if ($self->_has_distinct && (!@group_by || !$self->_grouping_has_resulting_fields())) {
+        %uniq = ();
+
+        #TODO: inplace algorithm?
+        my @tmp_data = ();
+        foreach my $row (@data) {
+            my $key = join($;, map {$row->{$_} // '__UNDEF__'} @fields);
+
+            unless ($uniq{$key}) {
+                $uniq{$key} = TRUE;
+
+                push(@tmp_data, $row);
+            }
+        }
+
+        @data = @tmp_data;
     }
 
     if (defined($self->{'__ORDER_BY__'})) {
@@ -256,11 +329,32 @@ sub get_all {
     return \@data;
 }
 
+sub _has_distinct {
+    my ($self) = @_;
+
+    return $self->{'__DISTINCT__'}
+      || grep {ref($self->{'__PROCESS_FIELDS__'}{$_}) =~ /::DISTINCT\z/} keys(%{$self->{'__PROCESS_FIELDS__'}});
+}
+
+sub _grouping_has_resulting_fields {
+    my ($self) = @_;
+
+    my %group_by = map {$_ => TRUE} @{$self->{'__GROUP_BY__'} // []};
+
+    foreach my $field (keys(%{$self->{'__PROCESS_FIELDS__'}})) {
+        my $main_field = $self->{'__PROCESS_FIELDS__'}{$field}->get_main_field();
+        return TRUE if $group_by{$main_field};
+    }
+
+    return FALSE;
+}
+
 sub group_by {
     my ($self, @group_by) = @_;
 
     unless (@group_by) {
         delete($self->{'__GROUP_BY__'});
+        delete($self->{'__PATHS_GROUP_BY__'});
 
         return $self;
     }
@@ -287,7 +381,8 @@ sub group_by {
         join(', ', @not_grouping_fields))
       if @not_grouping_fields;
 
-    $self->{'__GROUP_BY__'} = \@paths;
+    $self->{'__GROUP_BY__'}       = \@group_by;
+    $self->{'__PATHS_GROUP_BY__'} = \@paths;
 
     return $self;
 }
@@ -360,7 +455,7 @@ sub _filter {
         my $path = $self->_get_path($field);
 
         throw gettext('Unknown field "%s"', $path->[0]{'key'})
-                  if exists($self->{'__ALL_FIELDS__'}) && !exists($self->{'__ALL_FIELDS__'}{$path->[0]{'key'}});
+          if exists($self->{'__ALL_FIELDS__'}) && !exists($self->{'__ALL_FIELDS__'}{$path->[0]{'key'}});
 
         $op    = uc($op);
         $value = $$value;
@@ -451,26 +546,30 @@ sub _get_field_code_by_path {
     return $value;
 }
 
-sub _get_field_value_by_path {
-    my ($self, $fields, $row, $new_row, $last_field, @paths) = @_;
+sub get_field_value_by_path {
+    my ($self, $row, $new_row, $last_field, @paths) = @_;
+    #last argument is a array, for shallow copy
 
     unless (@paths) {
         return $last_field eq 'new_row' ? $new_row : $row;
     }
 
     my $path = shift(@paths);
+    my $fields = $self->get_fields() // {};
 
     if ($path->{'type'} eq 'array') {
-        if ($fields->{$path->{'key'}}) {
-            return $self->_get_field_value_by_path($fields, $row, $new_row->[$path->{'key'}], 'new_row', @paths);
+        if ((defined($last_field) && $last_field eq 'new_row') || (!defined($last_field) && $fields->{$path->{'key'}}))
+        {
+            return $self->get_field_value_by_path($row, $new_row->[$path->{'key'}], 'new_row', @paths);
         } else {
-            return $self->_get_field_value_by_path($fields, $row->[$path->{'key'}], $new_row, 'row', @paths);
+            return $self->get_field_value_by_path($row->[$path->{'key'}], $new_row, 'row', @paths);
         }
     } else {
-        if ($fields->{$path->{'key'}}) {
-            return $self->_get_field_value_by_path($fields, $row, $new_row->{$path->{'key'}}, 'new_row', @paths);
+        if ((defined($last_field) && $last_field eq 'new_row') || (!defined($last_field) && $fields->{$path->{'key'}}))
+        {
+            return $self->get_field_value_by_path($row, $new_row->{$path->{'key'}}, 'new_row', @paths);
         } else {
-            return $self->_get_field_value_by_path($fields, $row->{$path->{'key'}}, $new_row, 'row', @paths);
+            return $self->get_field_value_by_path($row->{$path->{'key'}}, $new_row, 'row', @paths);
         }
     }
 }
@@ -620,7 +719,9 @@ B<Example:>
     $q->fields([qw(caption)]);
     $q->fields({
         caption => '',
-        key => 'id', # create alias 'key' for field 'id'
+        key     => 'id',                 # create alias 'key' for field 'id'
+        k1      => 'data.k1',            # alias on complex field
+        sum_k1  => {SUM => ['data.k1']}, # Function SUM
     });
 
     # use default fields
@@ -629,6 +730,46 @@ B<Example:>
 
     # all fields
     $q->fields();
+
+B<Functions:>
+
+All functions like in MySQL (except FIELD)
+
+=over
+
+=item *
+
+B<FIELD> - This is not a function, but it also inherits from Function.
+
+=item *
+
+B<CONCAT>
+
+=item *
+
+B<COUNT>
+
+=item *
+
+B<MAX>
+
+=item *
+
+B<MIN>
+
+=item *
+
+B<SUM>
+
+=item *
+
+B<DISTINCT>
+
+=back
+
+Namespace for functions:
+
+  QBit::QueryData::Function::YOUFUNC # you can create self functions (name in uppercase)
 
 =item *
 

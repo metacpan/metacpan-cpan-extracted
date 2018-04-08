@@ -11,10 +11,10 @@ my $document =
   Text::Amuse->new(file => catfile(t => testfiles => 'headings-with-fn.muse'));
 
 my $htmltoc =<<'EOF';
-<p class="tableofcontentline toclevel1"><span class="tocprefix">&nbsp;&nbsp;</span><a href="#toc1">Part</a></p>
-<p class="tableofcontentline toclevel2"><span class="tocprefix">&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="#toc2">Chapter</a></p>
-<p class="tableofcontentline toclevel3"><span class="tocprefix">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="#toc3">Section</a></p>
-<p class="tableofcontentline toclevel4"><span class="tocprefix">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="#toc4">Subsection</a></p>
+<p class="tableofcontentline toclevel1"><span class="tocprefix">&#160;&#160;</span><a href="#toc1">Part</a></p>
+<p class="tableofcontentline toclevel2"><span class="tocprefix">&#160;&#160;&#160;&#160;</span><a href="#toc2">Chapter</a></p>
+<p class="tableofcontentline toclevel3"><span class="tocprefix">&#160;&#160;&#160;&#160;&#160;&#160;</span><a href="#toc3">Section</a></p>
+<p class="tableofcontentline toclevel4"><span class="tocprefix">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span><a href="#toc4">Subsection</a></p>
 EOF
 
 ok($document->as_html);

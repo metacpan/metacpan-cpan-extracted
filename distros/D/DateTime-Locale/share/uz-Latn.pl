@@ -50,8 +50,8 @@
     yMd => "dd/MM/y",
     yQQQ => "y, QQQ",
     yQQQQ => "y, QQQQ",
-    "yw-count-one" => "Y, w-'hafta'",
-    "yw-count-other" => "Y, w-'hafta'",
+    "yw-count-one" => "y, w-'hafta'",
+    "yw-count-other" => "y, w-'hafta'",
   },
   code => "uz-Latn",
   date_format_full => "EEEE, d-MMMM, y",
@@ -268,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 32,
+  version => 33,
 }

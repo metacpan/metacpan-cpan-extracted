@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v2.1.1';
+our $VERSION = 'v2.1.2';
 
 
 1; # Magic true value required at end of module
@@ -20,7 +20,7 @@ JSON::RPC2 - Transport-independent implementation of JSON-RPC 2.0
 
 =head1 VERSION
 
-This document describes JSON::RPC2 version v2.1.1
+This document describes JSON::RPC2 version v2.1.2
 
 
 =head1 SYNOPSIS
@@ -146,7 +146,7 @@ Alex Efros E<lt>powerman@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2009-2014 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+This software is Copyright (c) 2009- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
 
 This is free software, licensed under:
 

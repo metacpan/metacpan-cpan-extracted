@@ -36,11 +36,16 @@ foreach my $string ( @Stringset ) {
 	is( $Phone->country, $country, "$original Country: $country" ) ;
 }
 
+is( $Validator->isnot_valid( '415-AKA-THEM' ), 0,
+	'test isnot_valid against alphanumeric number' );
+is( $Validator->Exchange(), 252, 'read translated exchange');
+
 my $bad = '221-321-ABC' ;
 is ( $Validator->Is_Valid( $bad ), 0 , "$bad fails Is_Valid") ;
 is ( $Validator->Number_Phone(), 0 ,
 	"After $bad cannot create a Number::Phone object.") ;
-
+like( $Validator->isnot_valid( '221-321-ABC', '672-662-1212' ),
+	qr/Strings don\'t match/, 'mismatched strings will always fail');
 
 done_testing() ;
 

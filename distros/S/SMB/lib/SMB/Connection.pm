@@ -1,4 +1,4 @@
-# SMB Perl library, Copyright (C) 2014 Mikhael Goikhman, migo@cpan.org
+# SMB Perl library, Copyright (C) 2014-2018 Mikhael Goikhman, migo@cpan.org
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -47,20 +47,15 @@ sub new ($$$%) {
 	my $id = shift || die "No id";
 	my %options = @_;
 
-	my $quiet   = delete $options{quiet}   || 0;
-	my $verbose = delete $options{verbose} || 0;
-
 	my $self = $class->SUPER::new(
 		%options,
-		quiet   => $quiet,
-		verbose => $verbose,
 		socket  => $socket,
 		id      => $id,
 		parser  => SMB::Parser->new,
 		packer  => SMB::Packer->new,
 	);
 
-	unless ($self->disable_log) {
+	unless ($self->log_level == SMB::LOG_LEVEL_NONE) {
 		my $addr_with_port = $self->get_socket_addr;
 		my ($id0, $str) = $id =~ /^-(.*)/ ? ($1, 'server') : ($id, 'client');
 		$self->{id_str} = "$str #$id0 [$addr_with_port]";
@@ -107,7 +102,7 @@ sub recv_nbss ($) {
 	my $data2;  # SMB packet
 	my $header_label = 'NetBIOS Session Service header';
 	my $len = $socket->read($data1, 4) //
-		return $self->err("Read failed: $!");
+		return $self->err("Socket read failed: $!");
 	if ($len != 4) {
 		$self->err("Can't read $header_label (got $len bytes)");
 		return;
@@ -141,15 +136,14 @@ sub recv_command ($) {
 		return;
 	}
 	my $is_smb1 = $smb_num == 0xff;
-	$self->mem($self->parser->data, "<- SMB Packet")
-		if $self->verbose;
+	$self->mem($self->parser->data, "<- SMB Packet");
 
 	my $command = $is_smb1
 		? $self->parse_smb1
 		: $self->parse_smb2;
 
 	if ($command) {
-		$self->msg("%s", $command->dump);
+		$self->dbg("%s", $command->to_string);
 	} else {
 		$self->err("Failed to parse SMB%d packet", $is_smb1 ? 1 : 2);
 	}
@@ -161,8 +155,7 @@ sub send_nbss ($$) {
 	my $self = shift;
 	my $data = shift;
 
-	$self->mem($data, "-> NetBIOS Packet")
-		if $self->verbose;
+	$self->mem($data, "-> NetBIOS Packet");
 
 	if (!$self->socket->write($data, length($data))) {
 		$self->err("Can't write full packet");
@@ -174,7 +167,7 @@ sub send_command ($$) {
 	my $self = shift;
 	my $command = shift;
 
-	$self->msg("%s", $command->dump);
+	$self->dbg("%s", $command->to_string);
 
 	$self->packer->reset;
 
@@ -187,11 +180,12 @@ sub send_command ($$) {
 
 sub log ($$$) {
 	my $self = shift;
-	my $is_err = shift;
+	my $level = shift;
 	my $format = shift;
-	return if $self->{disable_log};
+	return if $level > $self->{log_level};
+
 	$format =~ s/(:?$)/ - $self->{id_str}$1/;
-	$self->SUPER::log($is_err, $format, @_);
+	$self->SUPER::log($level, $format, @_);
 }
 
 1;

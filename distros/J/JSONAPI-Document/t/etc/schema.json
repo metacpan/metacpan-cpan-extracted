@@ -3,7 +3,8 @@
     "resultsets": [
         "Post",
         "Comment",
-        "Author"
+        "Author",
+        "EmailTemplate"
     ],
     "fixture_sets": {
         "basic": {
@@ -55,7 +56,22 @@
                     "Intro to JSON API",
                     "This is a Perl transformer for the JSON API specification"
                 ]
+            ],
+            "EmailTemplate": [
+                [
+                    "id",
+                    "author_id",
+                    "name",
+                    "body"
+                ],
+                [
+                    1,
+                    1,
+                    "Test Template",
+                    "Test template body"
+                ]
             ]
+
         }
     }
 }

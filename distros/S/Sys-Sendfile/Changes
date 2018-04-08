@@ -1,5 +1,8 @@
 Revision history for Sys-Sendfile
 
+0.17      2018-04-04 22:20:11+02:00 Europe/Amsterdam
+          - Make count=0 write zero bytes
+
 0.16      2015-02-17 16:34:45+01:00 Europe/Amsterdam
           Moved PERL_VERSION_ATLEAST to after perl headers
 

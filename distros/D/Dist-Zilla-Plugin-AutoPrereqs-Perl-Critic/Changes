@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-Plugin-AutoPrereqs-Perl-Critic
 
+0.006  2018-04-02 22:51:55 UTC
+
+  - Test for success of HTTP::Tiny instead of status
+  - Distribution cleanup
+  - Bumped dependency on Moose to 2.1203
+
 0.005  2017-10-21 09:53:51 UTC
 
   - Create a .perlcritic_package.yml cache file to reduce network access

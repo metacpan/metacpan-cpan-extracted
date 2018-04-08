@@ -1,5 +1,10 @@
 Revision history for perl module Device::WebIO::RaspberryPi
 
+0.900 2018-04-06
+
+- Implement against RPi::Wiring rather than HiPi
+- Implement DigitalInputAnyEvent role
+
 0.009 2015-04-05
 
 - I2C methods will cache device

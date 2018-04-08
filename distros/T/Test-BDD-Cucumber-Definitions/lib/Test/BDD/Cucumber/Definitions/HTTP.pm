@@ -13,7 +13,7 @@ use Test::BDD::Cucumber::Definitions qw(S);
 use Test::BDD::Cucumber::Definitions::Validator qw(:all);
 use Test::More;
 
-our $VERSION = '0.29';
+our $VERSION = '0.31';
 
 our @EXPORT_OK = qw(
     http_request_header_set

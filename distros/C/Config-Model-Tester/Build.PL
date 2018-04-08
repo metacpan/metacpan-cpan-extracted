@@ -27,7 +27,7 @@ my %module_build_args = (
     "Dominique Dumont"
   ],
   "dist_name" => "Config-Model-Tester",
-  "dist_version" => "3.004",
+  "dist_version" => "3.005",
   "license" => "lgpl",
   "module_name" => "Config::Model::Tester",
   "recursive_test_files" => 1,
@@ -39,6 +39,7 @@ my %module_build_args = (
     "Test::Differences" => 0,
     "Test::Exception" => 0,
     "Test::File::Contents" => 0,
+    "Test::Log::Log4perl" => 0,
     "Test::Memory::Cycle" => 0,
     "Test::More" => 0,
     "Test::Warn" => 0,

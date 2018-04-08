@@ -51,6 +51,7 @@
          },
          "requires" : {
             "AnyEvent" : "7.13",
+            "AnyEvent::Connector" : "0.03",
             "Moo" : "2.0",
             "PerlX::Maybe" : "0.003",
             "Protocol::WebSocket" : "0.20",
@@ -88,7 +89,7 @@
          "web" : "https://github.com/plicease/AnyEvent-WebSocket-Client"
       }
    },
-   "version" : "0.44",
+   "version" : "0.46",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Toshio Ito (debug-ito, TOSHIOITO)",
@@ -96,7 +97,7 @@
       "Kivanc Yazan (KYZN)",
       "Yanick Champoux (YANICK)"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
    "x_use_unsafe_inc" : 0
 }
 

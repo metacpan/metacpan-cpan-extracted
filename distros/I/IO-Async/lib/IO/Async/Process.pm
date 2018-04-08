@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2018 -- leonerd@leonerd.org.uk
 
 package IO::Async::Process;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 use Carp;
 
@@ -55,6 +55,28 @@ C<IO::Async::Process> - start and manage a child process
 
  $loop->run;
 
+Also accessible via the L<IO::Async::Loop/open_process> method:
+
+ $loop->open_process(
+    command => [ "/bin/ping", "-c4", "some.host" ],
+
+    stdout => {
+       on_read => sub {
+          my ( $stream, $buffref, $eof ) = @_;
+          while( $$buffref =~ s/^(.*)\n// ) {
+             print "PING wrote: $1\n";
+          }
+          return 0;
+       },
+    },
+
+    on_finish => sub {
+       my ( $pid, $exitcode ) = @_;
+       my $status = ( $exitcode >> 8 );
+       ...
+    },
+ );
+
 =head1 DESCRIPTION
 
 This subclass of L<IO::Async::Notifier> starts a child process, and invokes a
@@ -82,7 +104,7 @@ number and string values. After a successful C<exec()> call, this condition
 can no longer happen.
 
 Note that this has a different name and a different argument order from
-C<< Loop->open_child >>'s C<on_error>.
+C<< Loop->open_process >>'s C<on_error>.
 
 If this is not provided and the process exits with an exception, then
 C<on_finish> is invoked instead, being passed just the exit code.

@@ -63,7 +63,7 @@ has 'abs_file' => (
     isa      => File,
     lazy     => 1,
     init_arg => undef,
-    default  => sub { $_[0]->file->absolute },
+    default  => sub { $_[0]->file->absolute->cleanup },
 );
 
 use overload '""' => '_stringify';
@@ -390,13 +390,24 @@ sub accepted_for_out {
 }
 
 sub delete {
-    $_[0]->file->remove;
+    my $self = shift;
+    $self->file->remove if $self->exists_base_file;
+    $self->_sum_file->remove if $self->sum;
 }
 
 sub rename {
     my $self   = shift;
     my $target = shift;
-    $self->file->move_to( $target );
+    # clone $from because move_to method modifies the file path of the from file
+    my $clone  = Path::Class::File->new( "".$self->file );
+    $clone->move_to( $target )
+        or $self->croak("failed attempt to rename $self to $target");
+    if ($self->sum) {
+        $target .= ".sum";
+        my $clone  = Path::Class::File->new( "".$self->_sum_file );
+        $clone->move_to( "$target" )
+            or $self->croak("failed attempt to rename $self to $target");
+    }
 }
 
 package HPCI::File::Classes;

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Instance;
-$Config::Model::Instance::VERSION = '2.118';
+$Config::Model::Instance::VERSION = '2.120';
 #use Scalar::Util qw(weaken) ;
 use strict;
 
@@ -236,17 +236,14 @@ has [qw/name application backend backend_arg backup/] => (
     isa => 'Maybe[Str]',
 );
 
-has 'root_dir' => (
-    is => 'bare',
-    isa => 'Maybe[Str]',
-);
+subtype 'RootPath' => as 'Maybe[Path::Tiny]' ;
+coerce 'RootPath' => from 'Str' => via sub { defined ?  Path::Tiny::path($_) : undef ; } ;
 
-sub root_dir {
-    my $self = shift;
-    my $d = $self->{root_dir} // '';
-    # add trailing '/' if it's missing
-    return $d && $d !~ m!/$! ? "$d/" : $d;
-}
+has 'root_dir' => (
+    is => 'ro',
+    isa => 'RootPath',
+    coerce => 1
+);
 
 sub read_root_dir {
     my $self = shift;
@@ -661,7 +658,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.118
+version 2.120
 
 =head1 SYNOPSIS
 
@@ -726,8 +723,9 @@ Constructor parameters are:
 =item root_dir
 
 Pseudo root directory where to read I<and> write configuration
-files. Configuration directory specified in model or with
-C<config_dir> option is appended to this root directory
+files (L<Path::Tiny> object or string). Configuration directory
+specified in model or with C<config_dir> option is appended to this
+root directory
 
 =item root_path
 
@@ -737,7 +735,7 @@ directory if C<root_dir> is empty.
 =item config_dir
 
 Directory to read or write configuration file. This parameter must be
-supplied if not provided by the configuration model.
+supplied if not provided by the configuration model. (string)
 
 =item backend
 
@@ -1014,12 +1012,12 @@ constructor).
 
 =head2 root_dir()
 
-Returns root directory where configuration data is read from or written to.
+Returns a L<Path::Tiny> object for the root directory where
+configuration data is read from or written to.
 
 =head2 root_path()
 
-Returns a L<Path::Tiny> object for the root directory where
-configuration data is read from or written to.
+Same as C<root_dir>
 
 =head2 register_write_back ( node_location )
 

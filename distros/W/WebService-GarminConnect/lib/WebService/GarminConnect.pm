@@ -7,8 +7,9 @@ use Carp;
 use LWP::UserAgent;
 use URI;
 use JSON;
+use Data::Dumper;
 
-our $VERSION = '1.0.5'; # VERSION
+our $VERSION = '1.0.6'; # VERSION
 
 =head1 NAME
 
@@ -16,7 +17,7 @@ WebService::GarminConnect - Access data from Garmin Connect
 
 =head1 VERSION
 
-version 1.0.5
+version 1.0.6
 
 =head1 SYNOPSIS
 
@@ -76,7 +77,7 @@ sub new {
     username  => $options{username},
     password  => $options{password},
     loginurl  => $options{loginurl} || 'https://sso.garmin.com/sso/login',
-    searchurl => $options{searchurl} || 'http://connect.garmin.com/proxy/activity-search-service-1.0/json/activities',
+    searchurl => $options{searchurl} || 'https://connect.garmin.com/modern/proxy/activitylist-service/activities/search/activities',
   }, $self;
 }
 
@@ -92,7 +93,7 @@ sub _login {
 
   # Retrieve the login page
   my %params = (
-    service   => "https://connect.garmin.com/modern",
+    service   => "https://connect.garmin.com/post-auth/login",
     gauthHost => "https://sso.garmin.com/sso",
     clientId  => "GarminConnect",
     consumeServiceTicket => "false",
@@ -114,8 +115,22 @@ sub _login {
   });
   croak "Can't retrieve sso page: " . $response->status_line
     unless $response->is_success;
+  if ($response->content =~ />sendEvent\('FAIL'\)/) {
+    croak "invalid login";
+  }
+  if ($response->content =~ />sendEvent\('ACCOUNT_LOCKED'\)/) {
+    croak "account locked";
+  }
+  if ($response->content =~ /renewPassword/) {
+    croak "renew password";
+  }
+  if ($response->content !~ /\?ticket=([^"]+)"/) {
+    croak "no service ticket in response";
+  }
+  my $ticket=$1;
 
-  $uri = URI->new('https://connect.garmin.com/post-auth/login');
+  #$uri = URI->new('https://connect.garmin.com/post-auth/login?ticket=$1');
+  $uri = URI->new('https://connect.garmin.com/modern/?ticket=$1');
   $response = $ua->get($uri);
   croak "Can't retrieve post-auth page: " . $response->status_line
     unless $response->is_success;
@@ -156,9 +171,7 @@ sub activities {
   $self->_login();
   my $ua = $self->{useragent};
 
-  # We can only fetch a fixed number of activities at a time. Each
-  # result set returned by the web service includes the total number of
-  # requests, along with the current "page" number.
+  # We can only fetch a fixed number of activities at a time.
   my @activities;
   my $start = 0;
   my $pagesize = 50;
@@ -167,24 +180,17 @@ sub activities {
       $pagesize = $opts{pagesize};
     }
   }
-  my $activities_to_retrieve;
 
   # Special case when the limit is smaller than one page.
   if( defined $opts{limit} ) {
     if( $opts{limit} < $pagesize ) {
-      $activities_to_retrieve = $opts{limit};
       $pagesize = $opts{limit};
     }
   }
 
+  my $data = [];
   do {
     # Make a search request
-    if( defined $activities_to_retrieve ) {
-      my $remaining = $activities_to_retrieve - @activities;
-      if( $remaining < $pagesize ) {
-        $pagesize = $remaining;
-      }
-    }
     my $searchurl = $self->{searchurl} .
       "?start=$start&limit=$pagesize";
 
@@ -194,28 +200,27 @@ sub activities {
       unless $response->is_success;
 
     # Parse the JSON search results
-    my $data = $json->decode($response->content);
+    $data = $json->decode($response->content);
 
-    if( !defined $activities_to_retrieve ) {
-      # On the first request, set the total to retrieve based on
-      # the total available and the optional limit.
-      $activities_to_retrieve = $data->{results}->{search}->{totalFound};
-      $self->{total_activities} = $data->{results}->{search}->{totalFound};
+    # Add this set of activities to the list.
+    foreach my $activity ( @{$data} ) {
       if( defined $opts{limit} ) {
-        # Retrieve the lesser of what's available or the limit.
-        if( $opts{limit} < $activities_to_retrieve ) {
-          $activities_to_retrieve = $opts{limit};
-        }
+        # add this activity only if we're under the limit
+        if( @activities < $opts{limit} ) {
+          push @activities, { activity => $activity };
+        } else {
+          $data = []; # stop retrieving more activities
+          last;
+	}
+      } else {
+        push @activities, { activity => $activity };
       }
     }
 
-    # Add this set of activities to the list.
-    push @activities, @{$data->{results}->{activities}};
-
     # Increment the start offset for the next request.
-    $start += @{$data->{results}->{activities}};
+    $start += $pagesize;
 
-  } while( @activities < $activities_to_retrieve );
+  } while( @{$data} > 0 );
 
   return @activities;
 }

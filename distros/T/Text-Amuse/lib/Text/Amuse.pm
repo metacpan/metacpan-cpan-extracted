@@ -13,11 +13,11 @@ Text::Amuse - Generate HTML and LaTeX documents from Emacs Muse markup.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 
 =head1 SYNOPSIS
@@ -226,7 +226,7 @@ sub toc_as_html {
         next unless $item->{index}; # skip the 0 one, is dummy
         my $line = qq{<p class="tableofcontentline toclevel} .
           $item->{level} . qq{"><span class="tocprefix">} .
-          "&nbsp;&nbsp;" x  $item->{level} . "</span>" .
+          '&#160;&#160;' x  $item->{level} . "</span>" .
             qq{<a href="#toc} . $item->{index} . qq{">} .
               $item->{string} . "</a></p>";
         push @out, $line;

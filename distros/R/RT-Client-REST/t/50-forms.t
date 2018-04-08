@@ -9,10 +9,10 @@ use Test::More tests => 3;
 use RT::Client::REST::Forms qw(form_parse);
 use File::Spec::Functions qw(catfile);
 
-my $testfile = "test.png";
-my $testfile_path = catfile(t => $testfile);
+my $testfile = 'test.png';
+my $testfile_path = catfile('t' => 'data' => $testfile);
 
-open (my $fh, "<", $testfile_path) or die "Couldn't open $testfile_path $!";
+open (my $fh, '<', $testfile_path) or die "Couldn't open $testfile_path $!";
 my $contents = do { local $/; <$fh>; };
 close $fh;
 
@@ -23,12 +23,12 @@ sub create_http_body {
     $binary_string .= "\n\n";
     my $body = <<"EOF";
 id: 873
-Subject: 
+Subject:
 Creator: 12
 Created: 2013-11-06 07:15:36
 Transaction: 1457
 Parent: 871
-MessageId: 
+MessageId:
 Filename: prova2.png
 ContentType: image/png
 ContentEncoding: base64
@@ -45,7 +45,7 @@ EOF
 
 my $body = create_http_body($contents);
 my $form = form_parse($body);
-is(ref($form), "ARRAY", "form is an array reference");
+is(ref($form), 'ARRAY', 'form is an array reference');
 my ($c, $o, $k, $e) = @{$$form[0]};
-is(ref($k), "HASH", "third element (\$k) is a hash reference");
-ok($k->{Content} eq $contents, "form parsed out contents correctly");
+is(ref($k), 'HASH', 'third element ($k) is a hash reference');
+ok($k->{Content} eq $contents, 'form parsed out contents correctly');

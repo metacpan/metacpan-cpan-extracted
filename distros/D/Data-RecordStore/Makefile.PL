@@ -11,10 +11,8 @@ WriteMakefile
                  },
   'INSTALLDIRS' => 'site',
   'EXE_FILES' => [
-                   'bin/converter.pl~',
                    'bin/record_store_convert',
-                   'bin/recordstore_explorer',
-                   'bin/recordstore_explorer~'
+                   'bin/recordstore_explorer'
                  ],
   'PL_FILES' => {}
 )

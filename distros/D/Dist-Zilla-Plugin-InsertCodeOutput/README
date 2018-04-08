@@ -1,5 +1,13 @@
-SYNOPSIS
+NAME
+    Dist::Zilla::Plugin::InsertCodeOutput - Insert the output of Perl code
+    into your POD
 
+VERSION
+    This document describes version 0.040 of
+    Dist::Zilla::Plugin::InsertCodeOutput (from Perl distribution
+    Dist-Zilla-Plugin-InsertCodeOutput), released on 2018-04-06.
+
+SYNOPSIS
     In dist.ini:
 
      [InsertCodeOutput]
@@ -10,23 +18,46 @@ SYNOPSIS
      # CODE: require MyLib; MyLib::gen_stuff("some", "param");
 
 DESCRIPTION
-
-    This module finds # CODE: ... directives in your POD, evals the
+    This module finds "# CODE: ..." directives in your POD, evals the
     specified Perl code while capturing the output using Capture::Tiny's
-    capture_merged (which means STDOUT and STDERR output are both
+    "capture_merged" (which means STDOUT and STDERR output are both
     captured), and insert the output to your POD as verbatim paragraph
-    (indented with a whitespace), unless when make_verbatim is set to 0
+    (indented with a whitespace), unless when "make_verbatim" is set to 0
     then it is inserted as-is. If eval fails ($@ is true), build will be
     aborted.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-InsertCodeOutput>.
 
-    Dist::Zilla::Plugin::InsertCodeResult which is similar and uses the
-    same # CODE directive, but instead of inserting output, will insert the
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertCodeOutput>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Ins
+    ertCodeOutput>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Dist::Zilla::Plugin::InsertCodeResult which is similar and uses the same
+    "# CODE" directive, but instead of inserting output, will insert the
     result of the code (which can be a reference, in which case will be
     dumped using Data::Dump).
 
     Dist::Zilla::Plugin::InsertCommandOutput
 
     Dist::Zilla::Plugin::InsertExample
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2015, 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -10,11 +10,11 @@ Regexp::Pattern::License::Parts - Regular expressions for licensing sub-parts
 
 =head1 VERSION
 
-Version v3.1.90
+Version v3.1.92
 
 =cut
 
-our $VERSION = version->declare("v3.1.90");
+our $VERSION = version->declare("v3.1.92");
 
 =head STATUS
 
@@ -206,15 +206,6 @@ our %RE = (
 		pat =>
 			"THE SOFTWARE IS PROVIDED ${QB}AS$QB?$SD$QB?IS$QB,? WITHOUT WARRANTY"
 	},
-
-	# versioning
-	ver_later_para    => { pat => 'Later versions are permitted' },
-	ver_later_postfix => {
-		pat =>
-			'(?:and|or)(?: ?\(?at your option\)?)?(?: any)? (?:later|newer)(?: version)?'
-	},
-	ver_number => { pat => '\d(?:\.\d+)*' },
-	ver_prefix => { pat => '[Vv](?:ersion |ERSION |\.? ?)' },
 
 	# Creative Commons
 	cc     => { pat => '(?:Creative Commons|CC)' },

@@ -1,5 +1,14 @@
 Revision history for Devel-MAT
 
+0.34    2018-04-02 18:39:36
+        [CHANGES]
+         * Have 'show' on a PAD use ->format_sv_with_value and ->format_note
+         * Better external API for $sv->magic_svs
+         * Print details of magic in 'show' command
+
+        [BUGFIXES]
+         * Fix for Sizes tool to use $cv->padnames_av (RT124834)
+
 0.33    2018-01-23 01:22:25
         [CHANGES]
          * Added `inrefs` and `outrefs` commands

@@ -77,5 +77,10 @@ Revision history for Perl module Term::Highlight and script hl.
                 Highlight.pm version 1.8 - minor cleanup.
 
 2018/03/29 - Version 2.0.0 - fixed color tags offsets at ends of lines
-                with better support for "\r\n" line endings.
+                with support for "\r\n" line endings.
+
+2018/03/30 - Version 2.0.1 - do not pass newlines from hl to the module part.
+
+2018/04/01 - Version 2.0.2 - better treatment of the trailing highlight options
+                not followed by a pattern.
 

@@ -4,7 +4,7 @@
       "Chris Travers <chris@efficito.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "bsd"
    ],
@@ -22,6 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Perl::Critic" : "0",
+            "Perl::Critic::Policy::Modules::RequireExplicitInclusion" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0"
          }
@@ -37,7 +39,8 @@
             "DBD::Pg" : "0",
             "DBI" : "0",
             "Moo" : "0",
-            "perl" : "5.008"
+            "namespace::clean" : "0",
+            "perl" : "5.01"
          }
       }
    },
@@ -49,5 +52,5 @@
          "web" : "https://github.com/einhverfr/PGObject-Util-DBAdmin"
       }
    },
-   "version" : "v0.100.0"
+   "version" : "v0.120.0"
 }

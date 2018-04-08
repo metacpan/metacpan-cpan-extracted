@@ -2,8 +2,8 @@ package App::IndonesianNumberUtils;
 
 use 5.010001;
 
-our $DATE = '2016-01-18'; # DATE
-our $VERSION = '0.02'; # VERSION
+our $DATE = '2018-04-08'; # DATE
+our $VERSION = '0.030'; # VERSION
 
 1;
 # ABSTRACT: CLIs related to Indonesian numbers (NIK, NOPPBB, NPWP, etc)
@@ -20,7 +20,7 @@ App::IndonesianNumberUtils - CLIs related to Indonesian numbers (NIK, NOPPBB, NP
 
 =head1 VERSION
 
-This document describes version 0.02 of App::IndonesianNumberUtils (from Perl distribution App-IndonesianNumberUtils), released on 2016-01-18.
+This document describes version 0.030 of App::IndonesianNumberUtils (from Perl distribution App-IndonesianNumberUtils), released on 2018-04-08.
 
 =head1
 
@@ -29,6 +29,8 @@ This distribution contains several CLI's related to Indonesian numbers:
 =over
 
 =item * L<parse-nik>
+
+=item * L<parse-nkk>
 
 =item * L<parse-nop-pbb>
 
@@ -62,7 +64,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

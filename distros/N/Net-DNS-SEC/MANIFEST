@@ -7,8 +7,6 @@ typemap
 demo/getkeyset.pl
 demo/key2ds
 demo/make-signed-keyset
-include/Ed25519.h
-include/Ed448.h
 lib/Net/DNS/SEC.pm
 lib/Net/DNS/SEC/Keyset.pm
 lib/Net/DNS/SEC/Private.pm
@@ -31,5 +29,6 @@ t/51-ECDSA-P256.t
 t/52-ECDSA-P384.t
 t/61-Ed25519.t
 t/62-Ed448.t
+t/NonFatal.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

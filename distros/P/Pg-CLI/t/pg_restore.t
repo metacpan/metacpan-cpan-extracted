@@ -38,8 +38,8 @@ use Test::PgCLI;
                 'command includes options and -w, but no other connection info'
             );
         },
-        );
-    }
+    );
+}
 
 {
     my $pg_restore = Pg::CLI::pg_restore->new(

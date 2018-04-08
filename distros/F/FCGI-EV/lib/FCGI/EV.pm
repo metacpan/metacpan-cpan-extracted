@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use Scalar::Util qw( weaken );
 use IO::Stream;
@@ -220,7 +220,7 @@ FCGI::EV - Implement FastCGI protocol for use in EV-based applications
 
 =head1 VERSION
 
-This document describes FCGI::EV version v2.0.0
+This document describes FCGI::EV version v2.0.1
 
 
 =head1 SYNOPSIS
@@ -297,9 +297,9 @@ FCGI::EV handler module).
 
 =head1 INTERFACE 
 
-=over
+=head2 new
 
-=item new( $sock, $class )
+    FCGI::EV->new( $sock, $class );
 
 Start talking FastCGI protocol on $sock (which should be socket open to
 just-connected web server), and use $class to handle received CGI requests.
@@ -309,8 +309,6 @@ either L<FCGI::EV::Std> from CPAN or develop your own.
 
 Return nothing. (Created FCGI::EV object will work in background and will
 be automatically destroyed after finishing I/O with web server.)
-
-=back
 
 
 =head1 HANDLER CLASS INTERFACE
@@ -485,7 +483,7 @@ Alex Efros E<lt>powerman@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2009 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+This software is Copyright (c) 2009- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
 
 This is free software, licensed under:
 

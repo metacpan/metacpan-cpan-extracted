@@ -120,7 +120,7 @@ SAVE_J2SDK
 my $javac = File::Spec->catfile($jdk_dir, $jdk_bin, 'javac' . $ext) ;
 my $jar = File::Spec->catfile($jdk_dir, $jdk_bin, 'jar' . $ext) ;                      
 my $src_dir = File::Spec->catdir('Java', 'sources', 'org', 'perl', 'inline', 'java') ;
-my $src = File::Spec->catfile($src_dir, '*.java') ;
+my @src = glob File::Spec->catfile($src_dir, '*.java') ;
 my $obj_dir = File::Spec->catdir('Java', 'classes') ;
 my $server_arch = File::Spec->catfile(qw(lib Inline Java InlineJavaServer.jar)) ;
 my $user_arch = File::Spec->catfile(qw(lib Inline Java InlineJavaUser.jar)) ;
@@ -137,7 +137,7 @@ my $INST_ARCHLIB = '' ;
 sub MY::postamble {
 	my $this = shift ;
 
-	my $java_src = join(' ', glob($src), File::Spec->catfile($obj_dir, 'InlineJava.properties')) ;
+	my $java_src = join(' ', @src, File::Spec->catfile($obj_dir, 'InlineJava.properties')) ;
 
 	my $make = <<MAKE ;
 # Added by Inline::Java installation
@@ -145,7 +145,7 @@ JAVA_SRC=$java_src
 
 java.ts: \$(JAVA_SRC)
 	\@\$(MKPATH) $obj_dir
-	"$javac" -deprecation -g -d $obj_dir $src
+	"$javac" -deprecation -g -d $obj_dir @src
 	\@\$(TOUCH) java.ts
 
 $server_arch : java.ts

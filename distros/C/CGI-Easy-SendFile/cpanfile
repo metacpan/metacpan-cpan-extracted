@@ -12,9 +12,9 @@ on configure => sub {
 on test => sub {
     requires 'CGI::Easy::Headers';
     requires 'Test::More';
-    recommends 'Pod::Coverage', '0.18';
-    recommends 'Test::CheckManifest', '0.9';
-    recommends 'Test::Perl::Critic';
-    recommends 'Test::Pod', '1.22';
-    recommends 'Test::Pod::Coverage', '1.08';
+};
+
+on develop => sub {
+    requires 'Test::Distribution';
+    requires 'Test::Perl::Critic';
 };

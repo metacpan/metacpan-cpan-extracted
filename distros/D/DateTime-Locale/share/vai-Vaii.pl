@@ -135,7 +135,7 @@
   glibc_time_format => "%H:%M:%S",
   language => "Vai",
   month_format_abbreviated => [
-    "\N{U+a5a8}\N{U+a56a}\N{U+a583}",
+    "\N{U+a5a8}\N{U+a595}\N{U+a51e}",
     "\N{U+a552}\N{U+a561}",
     "\N{U+a57e}\N{U+a5ba}",
     "\N{U+a5a2}\N{U+a595}",
@@ -146,7 +146,7 @@
     "\N{U+a562}\N{U+a54c}",
     "\N{U+a56d}\N{U+a583}",
     "\N{U+a51e}\N{U+a60b}",
-    "\N{U+a5a8}\N{U+a56a}\N{U+a571}",
+    "\N{U+a5a8}\N{U+a595}\N{U+a5cf}",
   ],
   month_format_narrow => [
     1,
@@ -163,7 +163,7 @@
     12,
   ],
   month_format_wide => [
-    "\N{U+a5a8}\N{U+a56a}\N{U+a583} \N{U+a51e}\N{U+a56e}",
+    "\N{U+a5a8}\N{U+a595} \N{U+a56a}\N{U+a574} \N{U+a51e}\N{U+a500}\N{U+a56e}\N{U+a54a}",
     "\N{U+a552}\N{U+a561}\N{U+a59d}\N{U+a595}",
     "\N{U+a57e}\N{U+a5ba}",
     "\N{U+a5a2}\N{U+a595}",
@@ -174,10 +174,10 @@
     "\N{U+a562}\N{U+a54c}",
     "\N{U+a56d}\N{U+a583}",
     "\N{U+a51e}\N{U+a60b}\N{U+a554}\N{U+a57f} \N{U+a578}\N{U+a583}\N{U+a5cf}",
-    "\N{U+a5a8}\N{U+a56a}\N{U+a571} \N{U+a5cf}\N{U+a56e}",
+    "\N{U+a5a8}\N{U+a595} \N{U+a56a}\N{U+a574} \N{U+a5cf}\N{U+a5ba}\N{U+a56e}\N{U+a54a}",
   ],
   month_stand_alone_abbreviated => [
-    "\N{U+a5a8}\N{U+a56a}\N{U+a583}",
+    "\N{U+a5a8}\N{U+a595}\N{U+a51e}",
     "\N{U+a552}\N{U+a561}",
     "\N{U+a57e}\N{U+a5ba}",
     "\N{U+a5a2}\N{U+a595}",
@@ -188,7 +188,7 @@
     "\N{U+a562}\N{U+a54c}",
     "\N{U+a56d}\N{U+a583}",
     "\N{U+a51e}\N{U+a60b}",
-    "\N{U+a5a8}\N{U+a56a}\N{U+a571}",
+    "\N{U+a5a8}\N{U+a595}\N{U+a5cf}",
   ],
   month_stand_alone_narrow => [
     1,
@@ -205,7 +205,7 @@
     12,
   ],
   month_stand_alone_wide => [
-    "\N{U+a5a8}\N{U+a56a}\N{U+a583} \N{U+a51e}\N{U+a56e}",
+    "\N{U+a5a8}\N{U+a595} \N{U+a56a}\N{U+a574} \N{U+a51e}\N{U+a500}\N{U+a56e}\N{U+a54a}",
     "\N{U+a552}\N{U+a561}\N{U+a59d}\N{U+a595}",
     "\N{U+a57e}\N{U+a5ba}",
     "\N{U+a5a2}\N{U+a595}",
@@ -216,7 +216,7 @@
     "\N{U+a562}\N{U+a54c}",
     "\N{U+a56d}\N{U+a583}",
     "\N{U+a51e}\N{U+a60b}\N{U+a554}\N{U+a57f} \N{U+a578}\N{U+a583}\N{U+a5cf}",
-    "\N{U+a5a8}\N{U+a56a}\N{U+a571} \N{U+a5cf}\N{U+a56e}",
+    "\N{U+a5a8}\N{U+a595} \N{U+a56a}\N{U+a574} \N{U+a5cf}\N{U+a5ba}\N{U+a56e}\N{U+a54a}",
   ],
   name => "Vai Vai",
   native_language => "\N{U+a559}\N{U+a524}",
@@ -267,5 +267,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 32,
+  version => 33,
 }

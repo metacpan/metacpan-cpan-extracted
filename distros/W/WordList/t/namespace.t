@@ -17,8 +17,8 @@ subtest is_actual_wordlist_module => sub {
     ok(!is_actual_wordlist_module("WordList::Namespace"));
     ok(!is_actual_wordlist_module("WordList::MetaSyntactic"));
 
-    ok(!is_actual_wordlist_module("WordList::Role"));
-    ok(!is_actual_wordlist_module("WordList::Role::Foo"));
+    ok(!is_actual_wordlist_module("WordList::Mod"));
+    ok(!is_actual_wordlist_module("WordList::Mod::Foo"));
 };
 
 done_testing;

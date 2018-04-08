@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2018 -- leonerd@leonerd.org.uk
 
 package IO::Async::Loop;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 # When editing this value don't forget to update the docs below
 use constant NEED_API_VERSION => '0.33';
@@ -888,94 +888,109 @@ sub later
    $loop->spawn_child( %params )
 
 This method creates a new child process to run a given code block or command.
-For more detail, see the C<spawn_child> method on the
-L<IO::Async::ChildManager> class.
-
-=cut
-
-sub spawn_child
-{
-   my $self = shift;
-   my %params = @_;
-
-   my $childmanager = $self->{childmanager} ||=
-      $self->__new_feature( "IO::Async::ChildManager" );
-
-   $childmanager->spawn_child( %params );
-}
-
-=head2 open_child
-
-   $pid = $loop->open_child( %params )
-
-This creates a new child process to run the given code block or command, and
-attaches filehandles to it that the parent will watch. This method is a light
-wrapper around constructing a new L<IO::Async::Process> object, provided
-largely for backward compatibility. New code ought to construct such an object
-directly, as it may provide more features than are available here.
-
 The C<%params> hash takes the following keys:
 
 =over 8
 
 =item command => ARRAY or STRING
 
+Either a reference to an array containing the command and its arguments, or a
+plain string containing the command. This value is passed into perl's
+C<exec> function.
+
 =item code => CODE
 
-The command or code to run in the child process (as per the C<spawn> method)
-
-=item on_finish => CODE
-
-A continuation to be called when the child process exits and has closed all of
-the filehandles that were set up for it. It will be invoked in the following
-way:
-
- $on_finish->( $pid, $exitcode )
-
-The second argument is passed the plain perl C<$?> value.
-
-=item on_error => CODE
-
-Optional continuation to be called when the child code block throws an
-exception, or the command could not be C<exec(2)>ed. It will be invoked in the
-following way (as per C<spawn>)
-
- $on_error->( $pid, $exitcode, $dollarbang, $dollarat )
-
-If this continuation is not supplied, then C<on_finish> is used instead. The
-value of C<$!> and C<$@> will not be reported.
+A block of code to execute in the child process. It will be called in scalar
+context inside an C<eval> block.
 
 =item setup => ARRAY
 
-Optional reference to an array to pass to the underlying C<spawn> method.
+A reference to an array which gives file descriptors to set up in the child
+process before running the code or command. See below.
+
+=item on_exit => CODE
+
+A continuation to be called when the child processes exits. It will be invoked
+in the following way:
+
+ $on_exit->( $pid, $exitcode, $dollarbang, $dollarat )
+
+The second argument is passed the plain perl C<$?> value.
 
 =back
 
-In addition, the hash takes keys that define how to set up file descriptors in
-the child process. (If the C<setup> array is also given, these operations will
-be performed after those specified by C<setup>.)
+Exactly one of the C<command> or C<code> keys must be specified.
+
+If the C<command> key is used, the given array or string is executed using the
+C<exec> function. 
+
+If the C<code> key is used, the return value will be used as the C<exit(2)>
+code from the child if it returns (or 255 if it returned C<undef> or thows an
+exception).
+
+ Case          | ($exitcode >> 8)       | $dollarbang | $dollarat
+ --------------+------------------------+-------------+----------
+ exec succeeds | exit code from program |     0       |    ""
+ exec fails    |         255            |     $!      |    ""
+ $code returns |     return value       |     $!      |    ""
+ $code dies    |         255            |     $!      |    $@
+
+It is usually more convenient to use the C<open_process> method in simple
+cases where an external program is being started in order to interact with it
+via file IO, or even C<run_child> when only the final result is required,
+rather than interaction while it is running.
+
+=head3 C<setup> array
+
+This array gives a list of file descriptor operations to perform in the child
+process after it has been C<fork(2)>ed from the parent, before running the code
+or command. It consists of name/value pairs which are ordered; the operations
+are performed in the order given.
 
 =over 8
 
-=item fdI<n> => HASH
+=item fdI<n> => ARRAY
 
-A hash describing how to set up file descriptor I<n>. The hash may contain one
-of the following sets of keys:
+Gives an operation on file descriptor I<n>. The first element of the array
+defines the operation to be performed:
 
 =over 4
 
-=item on_read => CODE
+=item [ 'close' ]
 
-The child will be given the writing end of a pipe. The reading end will be
-wrapped by an L<IO::Async::Stream> using this C<on_read> callback function.
+The file descriptor will be closed.
 
-=item from => STRING
+=item [ 'dup', $io ]
 
-The child will be given the reading end of a pipe. The string given by the
-C<from> parameter will be written to the child. When all of the data has been
-written the pipe will be closed.
+The file descriptor will be C<dup2(2)>ed from the given IO handle.
+
+=item [ 'open', $mode, $file ]
+
+The file descriptor will be opened from the named file in the given mode. The
+C<$mode> string should be in the form usually given to the C<open> function;
+such as '<' or '>>'.
+
+=item [ 'keep' ]
+
+The file descriptor will not be closed; it will be left as-is.
 
 =back
+
+A non-reference value may be passed as a shortcut, where it would contain the
+name of the operation with no arguments (i.e. for the C<close> and C<keep>
+operations).
+
+=item IO => ARRAY
+
+Shortcut for passing C<fdI<n>>, where I<n> is the fileno of the IO
+reference. In this case, the key must be a reference that implements the
+C<fileno> method. This is mostly useful for
+
+ $handle => 'keep'
+
+=item fdI<n> => IO
+
+A shortcut for the C<dup> case given above.
 
 =item stdin => ...
 
@@ -985,7 +1000,153 @@ written the pipe will be closed.
 
 Shortcuts for C<fd0>, C<fd1> and C<fd2> respectively.
 
+=item env => HASH
+
+A reference to a hash to set as the child process's environment.
+
+Note that this will entirely set a new environment, completely replacing the
+existing one. If you want to simply add new keys or change the values of some
+keys without removing the other existing ones, you can simply copy C<%ENV>
+into the hash before setting new keys:
+
+ env => {
+    %ENV,
+    ANOTHER => "key here",
+ }
+
+=item nice => INT
+
+Change the child process's scheduling priority using C<POSIX::nice>.
+
+=item chdir => STRING
+
+Change the child process's working directory using C<chdir>.
+
+=item setuid => INT
+
+=item setgid => INT
+
+Change the child process's effective UID or GID.
+
+=item setgroups => ARRAY
+
+Change the child process's groups list, to those groups whose numbers are
+given in the ARRAY reference.
+
+On most systems, only the privileged superuser change user or group IDs.
+L<IO::Async> will B<NOT> check before detaching the child process whether
+this is the case.
+
+If setting both the primary GID and the supplementary groups list, it is
+suggested to set the primary GID first. Moreover, some operating systems may
+require that the supplementary groups list contains the primary GID.
+
 =back
+
+If no directions for what to do with C<stdin>, C<stdout> and C<stderr> are
+given, a default of C<keep> is implied. All other file descriptors will be
+closed, unless a C<keep> operation is given for them.
+
+If C<setuid> is used, be sure to place it after any other operations that
+might require superuser privileges, such as C<setgid> or opening special
+files.
+
+Z<>
+
+   my ( $pipeRd, $pipeWr ) = IO::Async::OS->pipepair;
+   $loop->spawn_child(
+      command => "/usr/bin/my-command",
+
+      setup => [
+         stdin  => [ "open", "<", "/dev/null" ],
+         stdout => $pipeWr,
+         stderr => [ "open", ">>", "/var/log/mycmd.log" ],
+         chdir  => "/",
+      ]
+
+      on_exit => sub {
+         my ( $pid, $exitcode ) = @_;
+         my $status = ( $exitcode >> 8 );
+         print "Command exited with status $status\n";
+      },
+   );
+
+   $loop->spawn_child(
+      code => sub {
+         do_something; # executes in a child process
+         return 1;
+      },
+
+      on_exit => sub {
+         my ( $pid, $exitcode, $dollarbang, $dollarat ) = @_;
+         my $status = ( $exitcode >> 8 );
+         print "Child process exited with status $status\n";
+         print " OS error was $dollarbang, exception was $dollarat\n";
+      },
+   );
+
+=cut
+
+sub spawn_child
+{
+   my $self = shift;
+   my %params = @_;
+
+   my $childmanager = $self->{childmanager} ||=
+      $self->__new_feature( "IO::Async::Internals::ChildManager" );
+
+   $childmanager->spawn_child( %params );
+}
+
+=head2 open_process
+
+   $process = $loop->open_process( %params )
+
+I<Since version 0.72.>
+
+This creates a new child process to run the given code block or command, and
+attaches filehandles to it that the parent will watch. This method is a light
+wrapper around constructing a new L<IO::Async::Process> object, adding it to
+the loop, and returning it.
+
+The C<%params> hash is passed directly to the L<IO::Async::Process>
+constructor.
+
+=cut
+
+sub open_process
+{
+   my $self = shift;
+   my %params = @_;
+
+   $params{on_exit} and croak "Cannot pass 'on_exit' parameter through ->open_process";
+
+   require IO::Async::Process;
+   my $process = IO::Async::Process->new( %params );
+
+   $self->add( $process );
+
+   return $process;
+}
+
+=head2 open_child
+
+   $pid = $loop->open_child( %params )
+
+A back-compatibility wrapper to calling L</open_process> and returning the PID
+of the newly-constructed L<IO::Async::Process> instance. The C<on_finish>
+continuation likewise will be invoked with the PID rather than the process
+instance.
+
+   $on_finish->( $pid, $exitcode )
+
+Similarly, a C<on_error> continuation is accepted, though note its arguments
+come in a different order to those of the Process's C<on_exception>:
+
+   $on_error->( $pid, $exitcode, $errno, $exception )
+
+This method should not be used in new code; instead use L</open_process>
+directly.
 
 =cut
 
@@ -1011,14 +1172,7 @@ sub open_child
       };
    }
 
-   $params{on_exit} and croak "Cannot pass 'on_exit' parameter through ChildManager->open";
-
-   require IO::Async::Process;
-   my $process = IO::Async::Process->new( %params );
-
-   $self->add( $process );
-
-   return $process->pid;
+   return $self->open_process( %params )->pid;
 }
 
 =head2 run_child
@@ -1071,6 +1225,18 @@ with
        ...
     }
  );
+
+Z<>
+
+   $loop->run_child(
+      command => "/bin/ps",
+
+      on_finish => sub {
+         my ( $pid, $exitcode, $stdout, $stderr ) = @_;
+         my $status = ( $exitcode >> 8 );
+         print "ps [PID $pid] exited with status $status\n";
+      },
+   );
 
 =cut
 

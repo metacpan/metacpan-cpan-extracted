@@ -30,6 +30,7 @@ recommends:
   PerlX::Maybe::XS: '0'
 requires:
   AnyEvent: '7.13'
+  AnyEvent::Connector: '0.03'
   Moo: '2.0'
   PerlX::Maybe: '0.003'
   Protocol::WebSocket: '0.20'
@@ -40,7 +41,7 @@ resources:
   bugtracker: https://github.com/plicease/AnyEvent-WebSocket-Client/issues
   homepage: https://metacpan.org/pod/AnyEvent::WebSocket::Client
   repository: git://github.com/plicease/AnyEvent-WebSocket-Client.git
-version: '0.44'
+version: '0.46'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Toshio Ito (debug-ito, TOSHIOITO)'

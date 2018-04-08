@@ -22,7 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Device::WebIO::Device::DigitalInputAnyEvent;
-$Device::WebIO::Device::DigitalInputAnyEvent::VERSION = '0.020';
+$Device::WebIO::Device::DigitalInputAnyEvent::VERSION = '0.022';
 use v5.12;
 use Moo::Role;
 
@@ -32,6 +32,8 @@ with 'Device::WebIO::Device::DigitalInput';
 has 'input_condvar' => (
     is => 'rw',
 );
+
+requires 'set_anyevent_condvar';
 
 
 1;
@@ -46,6 +48,9 @@ __END__
 
 Role for doing event-based input. This does the 
 C<Device::WebIO::Device::DigitalInput> role, as well.
+
+Requires C<set_anyevent_condvar()>. This method takes a pin number to set 
+the interrupt on, and a condvar that will be called.
 
 Provides an C<input_condvar> attribute. This should be set with an 
 C<AnyEvent::Condvar>, and should be triggered any time an input pin changes. 
@@ -63,9 +68,8 @@ Example user code:
   });
 
   # Setup device
-  my $dev = Device::WebIO::AnyEventExample->new({
-      input_condvar => $condvar,
-  });
+  my $dev = Device::WebIO::AnyEventExample->new({});
+  $dev->set_anyevent_condvar( 3, $condvar );
   
   # Set AnyEvent loop going
   my $cv = AE::cv

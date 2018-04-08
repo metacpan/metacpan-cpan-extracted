@@ -14,7 +14,7 @@ use File::Spec;
 use strict;
 use warnings;
 
-our $VERSION = '3.23';
+our $VERSION = '3.25';
 
 # Subs in this package:
 #  _default_error($plain, $html)    Default error handler
@@ -450,7 +450,7 @@ Originally by Juerd Waalboer <juerd@cpan.org>
 
 =head1 LICENSE
 
-Copyright (c) 2000-2002 Juerd Waalboer, 2005-2008 Mischa POSLAWSKY.
+Copyright (c) 2000-2002 Juerd Waalboer, 2005-2018 Mischa POSLAWSKY.
 All rights reserved.
 
 This software is free software;

@@ -29,14 +29,13 @@ do { my $x = {
                                       'Test::Spelling' => '0.12',
                                       'Test::Vars' => '0.009',
                                       'Test::Version' => '2.05',
-                                      'blib' => '1.01',
                                       'perl' => '5.006'
                                     }
                     },
        'runtime' => {
                       'requires' => {
+                                      'Dist::Zilla::Role::ModuleMetadata' => '0',
                                       'Dist::Zilla::Role::VersionProvider' => '0',
-                                      'Module::Metadata' => '1.000005',
                                       'Moose' => '0',
                                       'namespace::autoclean' => '0',
                                       'strict' => '0',
@@ -50,7 +49,12 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Test::More' => '0.96'
+                                   'Path::Tiny' => '0',
+                                   'Test::DZil' => '0',
+                                   'Test::Deep' => '0',
+                                   'Test::Fatal' => '0',
+                                   'Test::More' => '0.96',
+                                   'if' => '0'
                                  }
                  }
      };

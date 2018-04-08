@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More 0.88;
-use Test::Exception;
+use Test::Fatal;
 
 use ok 'Crypt::Random::Source::Base::Proc';
 
@@ -11,7 +11,7 @@ use ok 'Crypt::Random::Source::Base::Proc';
 
     is( $p->get(3), 'foo', "got data" );
 
-    throws_ok { $p->get(50) } qr/enough bytes/, "not having enough data is fatal";
+    like exception { $p->get(50) }, qr/enough bytes/, "not having enough data is fatal";
 }
 
 done_testing;

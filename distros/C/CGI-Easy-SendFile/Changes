@@ -1,5 +1,8 @@
 Revision history for CGI-Easy-SendFile
 
+v2.0.1  2018-04-03 20:24:55 EEST
+	- Reformat doc.
+
 v2.0.0  2016-02-15 23:51:54 EET
 	- Switch from Perl6::Export::Attrs to Export::Attrs.
 	- Switch to Dist::Milla.

@@ -15,7 +15,7 @@ our @EXPORT = qw'symbols_list
                  industry_list
                 ' ;
 
-our $VERSION = '3.03';
+our $VERSION = '3.11';
 
 our $long;
 
@@ -36,14 +36,16 @@ sub _http2name($){
 
 my  $_ua ;
 sub  _ua() {
+
     use LWP ;
-    # use HTTP::Cookies;
-    # use File::Temp 'tempfile' ;
-    # my $ua = new LWP::UserAgent(Accept => "text/html, */*;q=0.1", referer => 'http://google.com') ;
-    my $ua = new LWP::UserAgent() ;
+    use HTTP::Cookies;
+    use File::Temp 'tempfile' ;
+    my $ua = new LWP::UserAgent(Accept => "text/html, */*;q=0.1", referer => 'http://google.com') ;
+    # my $ua = new LWP::UserAgent() ;
     $ua -> env_proxy() ;
-    # $ua -> cookie_jar( new HTTP::Cookies (file => tempfile()));
-    $ua -> agent("");
+    $ua -> cookie_jar( new HTTP::Cookies (file => tempfile()));
+    # print STDERR "I am chrome\n";
+    # $ua -> agent("");
     $ua
 }
 

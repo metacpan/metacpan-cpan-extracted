@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/Table/PreAnalysis.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+scripts/quantile
+scripts/venn
+scripts/freq
+scripts/crosstable
+scripts/colsummary
+META.yml
+META.json

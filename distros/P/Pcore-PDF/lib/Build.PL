@@ -6,16 +6,10 @@ use FindBin;
 use lib $FindBin::RealBin;
 
 use Pcore;
-use Pcore::PDF;
 
 sub CLI {
     return { arg => [ script => { isa => 'Str' } ] };
 }
-
-say 'Updating Pcore::PDF deps ...';
-
-# update deps
-Pcore::PDF->update_all or exit 3;
 
 1;
 __END__

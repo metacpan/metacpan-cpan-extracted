@@ -1,0 +1,44 @@
+---
+abstract: 'collision-resistant IDs'
+author:
+  - 'Zak B. Elep <zakame@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.16, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Cuid
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::Cuid:
+    file: lib/Data/Cuid.pm
+    version: '0.02'
+requires:
+  Exporter: '5.57'
+  List::Util: '0'
+  Math::Base36: '0'
+  Time::HiRes: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/zakame/Data-Cuid/issues
+  homepage: https://github.com/zakame/Data-Cuid
+  repository: git://github.com/zakame/Data-Cuid.git
+version: '0.02'
+x_authority: cpan:ZAKAME
+x_contributors:
+  - 'Zak B. Elep <zakame@zakame.net>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

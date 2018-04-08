@@ -1,45 +1,62 @@
 {
-   "abstract" : "Check a Phone Number (North American Numbering Plan)!",
+   "abstract" : "Validate North American Phone Numbers",
    "author" : [
       "John Karr <brainbuz@brainbuz.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "open_source"
+      "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "String-Validator-Phone-NANP",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : 0
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
          "requires" : {
-            "Number::Phone" : "2",
-            "Number::Phone::Country" : "1.7",
-            "Number::Phone::NANP" : "1.3",
-            "String::Validator::Common" : "0.96",
-            "Test::More" : 0
+            "Number::Phone" : "0",
+            "String::Validator::Common" : "1.90",
+            "base" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "perl" : "5.008"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.96"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/brainbuz/String-Validator/issues"
+      },
+      "homepage" : "https://github.com/brainbuz/String-Validator",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/brainbuz/String-Validator.git",
+         "web" : "https://github.com/brainbuz/String-Validator"
+      }
+   },
+   "version" : "2.00",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"
 }
+

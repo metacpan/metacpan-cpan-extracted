@@ -49,6 +49,7 @@
          },
          "requires" : {
             "File::Spec" : "0",
+            "IO::Pipely" : "0",
             "Module::Metadata" : "0",
             "Test::More" : "0.88"
          }
@@ -57,7 +58,7 @@
    "provides" : {
       "Mojo::IOLoop::Stream::Role::LineBuffer" : {
          "file" : "lib/Mojo/IOLoop/Stream/Role/LineBuffer.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -72,7 +73,7 @@
          "web" : "https://github.com/Grinnz/Mojo-IOLoop-Stream-Role-LineBuffer"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -261,7 +262,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.002",
+                  "tag" : "v0.003",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

@@ -1,7 +1,7 @@
 package RPC::Switch::Client;
 use Mojo::Base -base;
 
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -113,6 +113,7 @@ sub new {
 		$ns->on(close => sub {
 			$conn->close;
 			$log->info('connection to rpcswitch closed');
+			$self->{_exit} = 91; # todo: doc
 			Mojo::IOLoop->stop;
 		});
 	});
@@ -406,14 +407,16 @@ sub work {
 		return if ($self->lastping // 0) > time - $pt;
 		$self->log->error('ping timeout');
 		$ioloop->remove($self->clientid);
+		$self->{_exit} = 92; # todo: doc
 		$ioloop->stop;
 	}) if $pt > 0;
 
+	$self->{_exit} = 0;
 	$self->log->debug(blessed($self) . ' starting work');
 	Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 	$self->log->debug(blessed($self) . ' done?');
 
-	return 0;
+	return $self->{_exit};
 }
 
 sub announce {
@@ -903,7 +906,9 @@ suggested format is something like:
 
 =head2 work
 
-Starts the L<Mojo::IOLoop>.
+Starts the L<Mojo::IOLoop>.  Returns a non-zero value when the IOLoop was
+stopped due to some error condition (like a lost connection or a ping
+timeout).
 
 =head1 REMOTE METHOD INFORMATION
 

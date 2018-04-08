@@ -1,3 +1,9 @@
+# UPDATE YOUR BOOKMARKS
+
+This project is deprecated: no new releases will be made available.
+
+Please visit [App-SpamcupNG](https://github.com/glasswalk3r/App-SpamcupNG) for the same aplication and functionallity, but
+on a different Perl distribution name!
 
 # DESCRIPTION
 

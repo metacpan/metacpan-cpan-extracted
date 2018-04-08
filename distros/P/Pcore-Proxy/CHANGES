@@ -1,3 +1,7 @@
+v0.2.1 2018-04-05T06:37:59Z
+ - dist.perl renamed to dist.yaml
+ - src formatted
+
 v0.2.0 2017-10-13T19:05:46Z
  - http recurse renamed to max_redirects
  - TODO

@@ -1,5 +1,8 @@
 Revision history for Map::Tube::London
 
+1.00  2018-04-08
+      - Updated dependency on Map::Tube v3.49.
+
 0.99  2018-03-28
       - Making use of 'lazy' of Moo.
 

@@ -1,5 +1,8 @@
 Revision history for Perl module Net::ACME2
 
+0.10 2 Apr 2018
+- Add “Content-Type” header to outgoing POSTs.
+
 0.09 14 Mar 2018
 - Fix MANIFEST (sorry!)
 - Update documentation a bit for the production endpoint.

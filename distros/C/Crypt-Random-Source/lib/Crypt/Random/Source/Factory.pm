@@ -1,7 +1,7 @@
 package Crypt::Random::Source::Factory;
 # ABSTRACT: Load and instantiate sources of random data
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Moo;
 use Carp qw(croak);
@@ -181,7 +181,7 @@ Crypt::Random::Source::Factory - Load and instantiate sources of random data
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

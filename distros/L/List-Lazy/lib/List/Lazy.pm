@@ -1,7 +1,7 @@
 package List::Lazy;
 our $AUTHORITY = 'cpan:YANICK'; 
 # ABSTRACT: Generate lists lazily
-$List::Lazy::VERSION = '0.3.0';
+$List::Lazy::VERSION = '0.3.1';
 
 
 
@@ -33,14 +33,16 @@ sub _exporter_validate_opts {
 
 our @EXPORT_OK = qw/ lazy_list lazy_range lazy_fixed_list /;
 
-sub lazy_list ($generator,$state=undef) :prototype(&@) {
+sub _lazy_list ($generator,$state=undef) {
     return List::Lazy->new(
         generator => $generator,
         state     => $state,
     );
 }
 
-sub lazy_range ($min,$max,$step=1) :prototype($$@) {
+sub lazy_list :prototype(&@) { goto &_lazy_list }
+
+sub _lazy_range ($min,$max,$step=1) {
     my $it = ref $step ? $step : sub { $_ + $step };
 
     return scalar lazy_list { 
@@ -50,6 +52,9 @@ sub lazy_range ($min,$max,$step=1) :prototype($$@) {
         return $current;
     } $min;
 }
+
+
+sub lazy_range :prototype($$@) { goto &_lazy_range }
 
 sub lazy_fixed_list {
     my @list = @_;
@@ -237,7 +242,7 @@ List::Lazy - Generate lists lazily
 
 =head1 VERSION
 
-version 0.3.0
+version 0.3.1
 
 =head1 SYNOPSIS
 
@@ -436,7 +441,7 @@ Yanick Champoux <yanick@babyl.dyndns.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Yanick Champoux.
+This software is copyright (c) 2018, 2017, 2016 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

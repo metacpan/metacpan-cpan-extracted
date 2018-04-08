@@ -37,8 +37,7 @@ my %v;
 	}
     }
 
-sub AnsiTypeToDb
-{
+sub AnsiTypeToDb {
     my ($type, $size) = @_;
     my $uctype = uc $type;
 
@@ -65,8 +64,7 @@ sub AnsiTypeToDb
 #   COL_NULLABLE - true, if this column may contain NULL's
 #   COL_KEY      - true, if this column is part of the table's primary key
 
-sub TableDefinition
-{
+sub TableDefinition {
     my ($tablename, @cols) = @_;
 
     my @keys = ();
@@ -87,8 +85,7 @@ sub TableDefinition
     } # TableDefinition
 
 # This function generates a list of tables associated to a given DSN.
-sub ListTables
-{
+sub ListTables {
     my $dbh = shift or return;
 
     my @tables = $dbh->func ("list_tables");
@@ -97,8 +94,7 @@ sub ListTables
     @tables;
     } # ListTables
 
-sub DbCleanup
-{
+sub DbCleanup {
     chdir $base_dir;
     -d $testname or return;
     chdir $testname or BAIL_OUT ("Cleanup failed");
@@ -138,8 +134,7 @@ END { DbCleanup (); }
 	} # FindNewTable
     }
 
-sub isSaneCase
-{
+sub isSaneCase {
     my @f = glob "??????.???";
     foreach my $try (qw( FrUbLl BlURgH wOngOs )) {
 	my $fn = "$try.csv";
@@ -154,13 +149,11 @@ sub isSaneCase
     return 0;
     } # isSaneCase
 
-sub ServerError
-{
+sub ServerError {
     die "# Cannot connect: $DBI::errstr\n";
     } # ServerError
 
-sub Connect
-{
+sub Connect {
     my $attr = @_ && ref $_[-1] eq "HASH" ? pop @_ : {};
     my ($dsn, $usr, $pass) = @_;
     $dsn  ||= $test_dsn;
@@ -170,14 +163,12 @@ sub Connect
     $dbh;
     } # Connect
 
-sub DbDir
-{
+sub DbDir {
     @_ and $test_dir = File::Spec->catdir ($base_dir, shift);
     $test_dir;
     } # DbDir
 
-sub DbFile
-{
+sub DbFile {
     my $file = shift or return;
     File::Spec->catdir ($test_dir, $file);
     } # DbFile

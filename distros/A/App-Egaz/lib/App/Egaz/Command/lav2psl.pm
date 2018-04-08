@@ -6,7 +6,9 @@ use autodie;
 use App::Egaz -command;
 use App::Egaz::Common;
 
-use constant abstract => 'convert .lav files to .psl files';
+sub abstract {
+    return 'convert .lav files to .psl files';
+}
 
 sub opt_spec {
     return ( [ "outfile|o=s", "Output filename. [stdout] for screen", { default => "stdout" }, ],
@@ -85,20 +87,12 @@ sub execute {
 
         $s_lines[0] =~ /\s*\"?(.+?)\-?\"? \s+ (\d+) \s+ (\d+) \s+ (\d+) \s+ (\d+)/x;
         my ( $t_file, $t_seq_start, $t_seq_stop, $t_strand, $t_contig ) = ( $1, $2, $3, $4, $5 );
-        if ( !-e $t_file ) {
-            $t_file = App::Egaz::Common::resolve_file( $t_file,
-                Path::Tiny::path( $args->[0] )->parent(), "." );
-        }
         if ( $t_seq_start != 1 ) {
             Carp::croak "Target sequence doesn't start at 1\n";
         }
 
         $s_lines[1] =~ /\s*\"?(.+?)\-?\"? \s+ (\d+) \s+ (\d+) \s+ (\d+) \s+ (\d+)/x;
         my ( $q_file, $q_seq_start, $q_seq_stop, $q_strand, $q_contig ) = ( $1, $2, $3, $4, $5 );
-        if ( !-e $q_file ) {
-            $q_file = App::Egaz::Common::resolve_file( $q_file,
-                Path::Tiny::path( $args->[0] )->parent(), "." );
-        }
         if ( $q_seq_start != 1 ) {
             Carp::croak "Query sequence doesn't start at 1\n";
         }

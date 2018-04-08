@@ -1,15 +1,12 @@
 #!/usr/bin/perl
 
-# This shows a slide show on ALL available framebuffers
-
 use strict;
-use threads;
-use threads::shared;
 
 use Graphics::Framebuffer;
 use Time::HiRes qw(sleep time);
 use List::Util qw(shuffle);
-use Getopts::Long;
+use Getopt::Long;
+use Pod::Usage;
 
 # use Data::Dumper::Simple;
 
@@ -17,111 +14,74 @@ my $path;
 my $errors     = 0;
 my $auto       = 0;
 my $fullscreen = 0;
+my $showall    = 0;
+my $help       = 0;
 
 GetOptions(
-    'auto'   => \$auto,
-    'errors' => \$errors,
-    'full'   => \$fullscreen,
-    'path=s' => \$path,
+    'auto'        => \$auto,
+    'errors'      => \$errors,
+    'full'        => \$fullscreen,
+    'showall|all' => \$showall,
+    'help'        => \$help,
 );
 
-my @fbs;
-
-# We show images on all devices
-foreach my $p (qw(/dev/graphics/fb /dev/fb)) {
-    foreach my $b (0 .. 31) {
-        push(@fbs, "$p$b") if (-e "$p$b");
-    }
+if (scalar(@ARGV) && ! $help) {
+    $path = $ARGV[-1];
+} else {
+    $help = 2;
 }
 
-my @thr;
-my $RUNNING : shared = 1;
-$SIG{'QUIT'} = sub {
-    print STDERR "\nExiting..\n";
-    $RUNNING = 0;
-    sleep 1;
-    exec('reset');
-};
-$SIG{'INT'} = sub {
-    print STDERR "\nExiting..\n";
-    $RUNNING = 0;
-    sleep 1;
-    exec('reset');
-};
-
-our @pics;
-
-my @f;
-foreach my $fb (@fbs) {
-    push(
-        @f,
-        Graphics::Framebuffer->new(
-            'FB_DEVICE'   => $fb,
-            'SPLASH'      => 0,
-            'SHOW_ERRORS' => $errors,
-            'RESET'       => 0,
-        )
-    );
-} ## end foreach my $fb (@fbs)
-
-gather($path);
-
-# print STDERR Dumper(\@pics);exit;
-
-foreach my $F (@f) {
-    push(
-        @thr,
-        threads->create(
-            sub {
-                local $SIG{'INT'}  = undef;
-                local $SIG{'QUIT'} = undef;
-                my $FB = shift;
-                my $p  = shift;
-                system('clear');
-                $FB->cls('OFF');
-
-                show($FB, $p);
-                $FB->cls('ON');
-            },
-            $F,
-            scalar(@pics)
-        )
-    );
-} ## end foreach my $F (@f)
-while ($RUNNING) {
-    sleep 1;
+if ($help) {
+    pod2usage('-exitstatus' => 0,'-verbose' => $help);
 }
-# map { $_->cls('ON') } @f;
 
-foreach my $t (@thr) {
-    $t->detach();
-}
+my $FB = Graphics::Framebuffer->new(
+    'SHOW_ERRORS' => $errors,
+    'RESET'       => 1,
+);
+my $p = gather($FB,$path);
+
+system('clear');
+$FB->cls('OFF');
+
+show($FB, $p);
 
 exit(0);
 
 sub gather {
+    my $FB = shift;
     my $path = shift;
+    my @pics;
     chop($path) if ($path =~ /\/$/);
-    opendir(my $DIR, $path);
+    $FB->rbox({'x' => 0, 'y' => 0, 'width' => $FB->{'XRES'}, 'height' => 32, 'filled' => 1, 'gradient' => {'direction' => 'vertical', 'colors' => {'red' => [0,0], 'green' => [0,0], 'blue' => [64,128]}}});
+    print_it($FB,"Scanning - $path");
+    opendir(my $DIR, "$path") || die "Problem reading $path directory";
     chomp(my @dir = readdir($DIR));
     closedir($DIR);
-    return if (grep(/\.nopmedia/, @dir));
+
+    return if (! $showall && grep(/^\.nomedia$/, @dir));
     foreach my $file (@dir) {
         next if ($file =~ /^\.+/);
         if (-d "$path/$file") {
-            gather("$path/$file");
+            my $r = gather($FB,"$path/$file");
+            if (defined($r)) {
+                @pics = (@pics,@{$r});
+            }
         } elsif (-f "$path/$file" && $file =~ /\.(jpg|jpeg|gif|tiff|bmp|png)$/i) {
             push(@pics, "$path/$file");
         }
     }
+    return(\@pics);
 }
 
 sub show {
     my $FB  = shift;
-    my $p   = shift;
+    my $ps  = shift;
+    my @pics = shuffle(@{$ps});
+    my $p = scalar(@pics);
     my $idx = 0;
-    @pics = shuffle(@pics);
-    while ($RUNNING) {
+
+    while ($idx < $p) {
         my $name = $pics[$idx];
         print_it($FB, "Loading image $name");
         my $image;
@@ -146,20 +106,12 @@ sub show {
         } ## end else
 
         #        warn Dumper($image);exit;
-        last unless ($RUNNING);
         if (defined($image)) {
             $FB->cls();
             if (ref($image) eq 'ARRAY') {
                 my $s = time + 8;
                 while (time <= $s) {
-                    last unless ($RUNNING);
-                    foreach my $frame (0 .. (scalar(@{$image}) - 1)) {
-                        last unless ($RUNNING);
-                        my $begin = time;
-                        $FB->blit_write($image->[$frame]);
-                        my $delay = ($image->[$frame]->{'tags'}->{'gif_delay'} / 100) - (time - $begin);
-                        sleep $delay if ($delay > 0);
-                    } ## end foreach my $frame (0 .. (scalar...))
+                    $FB->play_animation($image,1);
                 } ## end while (time <= $s)
             } else {
                 $FB->cls();
@@ -168,7 +120,7 @@ sub show {
             }
         } ## end if (defined($image))
         $idx++;
-        $idx = 0 if ($idx >= $p);
+#        $idx = 0 if ($idx >= $p);
     } ## end while ($RUNNING)
 } ## end sub show
 
@@ -182,7 +134,7 @@ sub print_it {
         my $b = $fb->ttf_print(
             {
                 'x'            => 5,
-                'y'            => 20,
+                'y'            => 32,
                 'height'       => 20,
                 'color'        => 'FFFFFFFF',
                 'text'         => $message,
@@ -204,33 +156,29 @@ Slide Show
 
 =head1 DESCRIPTION
 
-Multi-threaded, multi-framebuffer Slide Show
+Framebuffer Slide Show
 
-This automatically detects all of the framebuffer devices in your system, and shows the images in the images path, in a random order, on all devices.
+This automatically detects all of the framebuffer devices in your system, and shows the images in the images path, in a random order, on the primary framebuffer device (the first it finds).
 
 =head1 SYNOPSIS
 
- perl slideshow [file] [auto] [full] [errors] "path to images"
+ perl slideshow [options] "/path/to/scan"
 
 =head2 OPTIONS
 
 =over 2
 
-=item C<auto>
+=item C<--auto>
 
 Turns on auto color level mode.  Sometimes this yields great results... and sometimes it totally ugly's things up
 
-=item C<errors>
+=item C<--errors>
 
 Allows the module to print errors to STDERR
 
-=item C<file>
+=item C<--full>
 
-Makes the module render in file handle mode instead of memory mapped string mode.
-
-=item C<full>
-
-Scales all images (and animations) to full screen (proportionally).
+Scales all images (and animations) to full screen (proportionally).  Images are always scaled down, if they are too big for the screen, regardless of this option.
 
 =back
 

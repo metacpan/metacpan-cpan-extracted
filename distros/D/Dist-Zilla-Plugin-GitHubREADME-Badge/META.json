@@ -57,7 +57,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::GitHubREADME::Badge" : {
          "file" : "lib/Dist/Zilla/Plugin/GitHubREADME/Badge.pm",
-         "version" : "0.23"
+         "version" : "0.26"
       }
    },
    "release_status" : "stable",
@@ -72,8 +72,9 @@
          "web" : "https://github.com/fayland/perl-Dist-Zilla-Plugin-GitHubREADME-Badge"
       }
    },
-   "version" : "0.23",
+   "version" : "0.26",
    "x_contributors" : [
+      "Alex Efros <powerman@powerman.name>",
       "Nikolay Mishin <mi@ya.ru>",
       "Paul Cochrane <paul@liekut.de>",
       "Randy Stauner <randy@magnificent-tears.com>",

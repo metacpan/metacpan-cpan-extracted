@@ -1,0 +1,248 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Memorator - Remind of events via Minion
+
+=head1 VERSION
+
+This document describes Memorator version 0.006.
+
+=begin html
+
+<a href="https://travis-ci.org/polettix/Memorator">
+<img alt="Build Status" src="https://travis-ci.org/polettix/Memorator.svg?branch=master">
+</a>
+<a href="https://www.perl.org/">
+<img alt="Perl Version" src="https://img.shields.io/badge/perl-5.10+-brightgreen.svg">
+</a>
+<a href="https://badge.fury.io/pl/Memorator">
+<img alt="Current CPAN version" src="https://badge.fury.io/pl/Memorator.svg">
+</a>
+<a href="http://cpants.cpanauthors.org/dist/Memorator">
+<img alt="Kwalitee" src="http://cpants.cpanauthors.org/dist/Memorator.png">
+</a>
+<a href="http://www.cpantesters.org/distro/M/Memorator.html?distmat=1">
+<img alt="CPAN Testers" src="https://img.shields.io/badge/cpan-testers-blue.svg">
+</a>
+<a href="http://matrix.cpantesters.org/?dist=Memorator">
+<img alt="CPAN Testers Matrix" src="https://img.shields.io/badge/matrix-@testers-blue.svg">
+</a>
+
+=end html
+
+=head1 SYNOPSIS
+
+   use Minion;
+   my $minion = Minion->new(...);
+
+   use Memorator;
+   my $memorator = Memorator->create(
+      alert_callback => sub {
+         my $id = shift;
+         print "notification for id <$id>\n";
+         return;
+      },
+      minion => $minion,
+      name => 'memorator', # this is the default
+   );
+
+   $minion->enqueue(memorator_process_update =>
+      {
+         id => 'id-001',       # identifier meaningful for you
+         epoch => (time + 30), # when you want the alert
+         attempts => 5,        # how many retries before giving up
+      }
+   );
+
+=head1 DESCRIPTION
+
+=over
+
+=over
+
+=item I<< B<< memorātor >> >>
+
+=over
+
+=item *
+
+imperative passive future of verb I<memorāre>, can be translated like
+I<you will be reminded> (see L<https://en.wiktionary.org/wiki/memoro>,
+expand section on I<Inflection>).
+
+=item *
+
+nominative singular of I<memorātor>, male third descension, can be
+translated like I<someone who mentions> (see
+L<https://en.wiktionary.org/wiki/memorator>)
+
+=back
+
+=back
+
+=back
+
+This module allows you to set alerts for some events you need to be warned
+of. It's as simple as asking an alarm to ring at a certain date/time.
+
+The module leverages on L<Minion> for the heavylifting. It's actually
+a thin API on top of it, installing two I<tasks> which by default go under
+the names C<memorator_process_update> and C<memorator_process_alert>
+(although you can change the C<memorator> part using L</name>).
+
+The interaction model is simple:
+
+=over
+
+=item *
+
+you create an object with an L</alert_callback> and a C<minion> object
+that will do the hard work. The L</alert_callback> is where you will
+implement your logic for when the alert expires;
+
+=item *
+
+you enqueue I<updates> to set new alarms or modify existing ones, based on
+an I<identifier> that is meaningful for you;
+
+=item *
+
+at the expiration of the alarm time, the L</alert_callback> is called with
+the specific I<identifier>, so that you can figure out what has to be done
+next.
+
+=back
+
+To add a new reminder, or change an existing one, you use
+C<memorator_process_update> passing a hash reference like this:
+
+   $minion->enqueue(memorator_process_update =>
+      {
+         eid => 'id-001',      # identifier meaningful for you
+         epoch => (time + 30), # when you want the alert
+         attempts => 5,        # how many retries before giving up
+      }
+   );
+
+You can also set alerts directly, without the mediation of L<Minion>,
+using L</set_alert>:
+
+   $memorator->set_alert(\%same_hashref_as_before);
+
+See L</set_alert> for the allowed keys.
+
+=head1 METHODS
+
+=head2 B<< alert_callback >>
+
+   my $sub_reference = $obj->alert_callback;
+   $obj->alert_callback(sub {...});
+
+accessor for the callback to be run when an alert has to be sent. It is
+mandatory to set this before the first alert is sent. Can be set in the
+constructor.
+
+The callback will be invoked like follows:
+
+   $callback->($identifier);
+
+where C<$identifier> is a meaningful identifier for your applications
+(which is also the identifier passed upon creation of the event).
+
+=head2 B<< minion >>
+
+   my $minion = $obj->minion;
+   $obj->minion($minion_instance);
+
+accessor for the L<Minion> used behind the scenes. Note that in callbacks
+called in jobs the minion instance will be drawn from the jobs themselves,
+as it might prove to be I<fresher>.
+
+=head2 B<< name >>
+
+   my $name = $obj->name;
+   $obj->name($new_name);
+
+accessor for a name for generating local names of tables in the database,
+as well as task names in L<Minion>. This allows you to have more instances
+living inside the same L<Minion>, should you ever need to do this.
+Defaults to C<memorator>. Can be set in the constructor.
+
+=head2 B<< new >>
+
+   my $obj = Memorator->new(%args);
+   my $obj = Memorator->new(\%args);
+
+constructor. The recognized keys in C<%args> correspond to accessors
+L</alert_callback> (mandatory), L</minion> (mandatory) and L</name>
+(optional).
+
+=head2 B<< remove_alert >>
+
+   $obj->remove_alert(\%hashref); # OR
+   $obj->remove_alert($eid);
+
+remove an alert. You can pass either a hash reference compatible with
+L</set_alert>, or the external identifier for which you don't need the
+alert any more. Returns nothing.
+
+=head2 B<< set_alert >>
+
+   $obj->set_alert(\%hashref);
+
+Set an alert. The following keys are supported:
+
+=over
+
+=item C<attempts>
+
+how many times L<Minion> will retry upon failure of your callback. In this
+case, I<failure> means I<thrown exception>.
+
+=item C<epoch>
+
+the UTC epoch at which you want the alert callback to be triggered. If
+this field is missing, the alert will be I<removed>.
+
+=item C<id>
+
+the L<identifier> for your event, which can help you retrieve the details
+of your event somewhere else. It has a textual form, so you might want to
+abuse it to store more data (e.g. some JSON data); just keep in mind that
+it is treated as an I<opaque identifier>, i.e. a string that is compared
+to other strings for equality.
+
+=back
+
+You don't need to call this directly if you use L<Minion> for enqueuing
+alerts via C<memorator_process_update> (or whatever name the task has,
+based on L</name>).
+
+
+=head1 BUGS AND LIMITATIONS
+
+Report bugs through GitHub (patches welcome).
+
+=head1 SEE ALSO
+
+L<Minion>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2018 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

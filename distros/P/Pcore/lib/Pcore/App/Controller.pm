@@ -8,6 +8,10 @@ has path => ( is => 'ro', isa => Str,                       required => 1 );    
 
 requires qw[run];
 
+sub get_nginx_cfg ($self) {
+    return;
+}
+
 sub return_static ( $self, $req ) {
     if ( $req->{path_tail} && $req->{path_tail}->is_file ) {
         if ( my $path = $ENV->share->get( $req->{path} . $req->{path_tail}, storage => 'www' ) ) {

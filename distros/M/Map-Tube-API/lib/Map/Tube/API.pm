@@ -1,6 +1,6 @@
 package Map::Tube::API;
 
-$Map::Tube::API::VERSION   = '0.03';
+$Map::Tube::API::VERSION   = '0.04';
 $Map::Tube::API::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::API - Interface to Map::Tube REST API.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -122,7 +122,7 @@ Returns list of stations for the shortest route.The parameters should be as belo
     +-------+-------------------------------------------------------------------+
     | map   | A valid map name.                                                 |
     | start | A valid start station name in the given map.                      |
-    | stop  | A valid end station name in the give map.                         |
+    | end   | A valid end station name in the give map.                         |
     +-------+-------------------------------------------------------------------+
 
     use strict; use warnings;

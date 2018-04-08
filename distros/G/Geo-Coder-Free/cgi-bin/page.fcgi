@@ -258,7 +258,7 @@ sub doit
 
 	$geocoder ||= Geo::Coder::Free->new(
 		openaddr => $config->OPENADDR_HOME(),
-		cache => create_disc_cache(config => $config, logger => $logger, namespace => $script_name, root_dir => $cachedir)
+		cache => create_memory_cache(config => $config, logger => $logger, namespace => $script_name, root_dir => $cachedir)
 	);
 
 	my $display;
@@ -329,7 +329,7 @@ sub doit
 				"Pragma: no-cache\n\n";
 
 			unless($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
-				print "There is a problem with your connection. Please contact your ISP.\n";
+				print $error;
 			}
 		}
 		throw Error::Simple($error ? $error : $info->as_string());

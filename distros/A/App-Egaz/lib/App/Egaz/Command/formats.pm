@@ -6,7 +6,9 @@ use autodie;
 use App::Egaz -command;
 use App::Egaz::Common;
 
-use constant abstract => 'formats of files use in this project';
+sub abstract {
+    return 'formats of files use in this project';
+}
 
 sub opt_spec {
     return ( [ "outfile|o=s", "Output filename. [stdout] for screen", { default => "stdout" }, ],
@@ -36,6 +38,7 @@ sub execute {
     }
 
     my $desc .= <<MARKDOWN;
+
 * [lav format](http://www.bx.psu.edu/miller_lab/dist/lav_format.html)
 
     Here <start> and <stop> are origin 1 (i.e. the first base in the original
@@ -64,6 +67,13 @@ sub execute {
     If the strand value is '-', the values of the aligning organism's start
     and end fields are relative to the reverse-complemented coordinates of
     its chromosome.
+
+* [maf format](https://genome.ucsc.edu/FAQ/FAQformat.html#format5)
+
+    The "s" lines together with the "a" lines define a multiple alignment.
+
+    * start -- is a zero-based number. If the strand field is "-" then this is
+        the start relative to the reverse-complemented source sequence.
 
 * [chain format](https://genome.ucsc.edu/goldenPath/help/chain.html)
 

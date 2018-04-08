@@ -1,4 +1,14 @@
 Revision history for Device-Chip-Adapter-CH341A
 
+0.02    2018-04-02 19:01:19
+        [CHANGES]
+         * Simplify the implementation by building on
+           Device::Chip::ProtocolBase::SPI
+         * Reject attempts to set a wordsize other than 8
+         * Correctly split packets into MAX_PACKETLEN chunks
+
+        [BUGFIXES]
+         * Declare dependency on D:C:A itself (RT124608)
+
 0.01    2018-02-26 23:04:08
         First version, released on an unsuspecting world.

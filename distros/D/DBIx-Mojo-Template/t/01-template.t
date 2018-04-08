@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 use DBIx::Mojo::Template;
-use Mojo::Util qw(dumper);
+#~ use Mojo::Util qw(dumper);
 binmode STDERR, ":utf8";
 
 my $t = DBIx::Mojo::Template->new(__PACKAGE__, vars=>{'фу'=>'фу1', 'бар'=>'бар1'}, mt=>{tag_start=>'{%', tag_end=>'%}',});

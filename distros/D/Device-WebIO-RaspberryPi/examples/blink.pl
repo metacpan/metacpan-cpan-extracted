@@ -3,7 +3,7 @@ use v5.14;
 use Device::WebIO;
 use Device::WebIO::RaspberryPi;
 
-use constant OUTPUT_PIN => 17;
+use constant OUTPUT_PIN => 12;
 
 
 my $rpi = Device::WebIO::RaspberryPi->new;

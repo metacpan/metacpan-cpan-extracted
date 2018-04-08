@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Reader;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 sub input { return $_[0]->{input} }
 sub set_input { $_[0]->{input} = $_[1] }
@@ -34,10 +34,13 @@ package YAML::PP::Reader::File;
 
 our @ISA = qw/ YAML::PP::Reader /;
 
+use Carp qw/ croak /;
+
 sub open_handle {
     my $fh;
     unless ($fh) {
-        open $fh, '<:encoding(UTF-8)', $_[0]->{input};
+        open $fh, '<:encoding(UTF-8)', $_[0]->{input}
+            or croak "Could not open '$_[0]->{input}' for reading: $!";
     }
     return $fh;
 }

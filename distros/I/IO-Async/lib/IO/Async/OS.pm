@@ -8,7 +8,7 @@ package IO::Async::OS;
 use strict;
 use warnings;
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 our @ISA = qw( IO::Async::OS::_Base );
 
@@ -305,7 +305,7 @@ and C<write_handle> parameters should always be used.
 
  my ( $childRd, $myWr, $myRd, $childWr ) = IO::Async::OS->pipequad;
 
- IO::Async::OS->open_child(
+ $loop->open_process(
     stdin  => $childRd,
     stdout => $childWr,
     ...
@@ -316,7 +316,7 @@ and C<write_handle> parameters should always be used.
     write_handle => $myWr,
     ...
  );
- IO::Async::OS->add( $str );
+ $loop->add( $str );
 
 =cut
 

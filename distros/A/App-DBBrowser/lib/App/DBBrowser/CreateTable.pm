@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.009';
+our $VERSION = '2.012';
 
 use File::Basename qw( basename );
 use List::Util     qw( none any );
@@ -22,7 +22,7 @@ use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;
 use App::DBBrowser::Opt;
 use App::DBBrowser::Table;
-use App::DBBrowser::Table::Insert;
+#use App::DBBrowser::Table::Insert; # "require"(d)
 
 
 sub new {
@@ -38,22 +38,33 @@ sub new {
 sub delete_table {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $lyt_3 = Term::Choose->new( $sf->{i}{lyt_3} );
     my $sql = {};
+    $ax->reset_sql( $sql );
     my $prompt = $sf->{d}{db_string} . "\n" . 'Drop table';
     # Choose
-    my $table = $lyt_3->choose( #
+    my $table = choose( #
         [ undef, map { "- $_" } @{$sf->{d}{user_tables}} ],
-        { prompt => $prompt }
+        { %{$sf->{i}{lyt_3}}, prompt => $prompt }
     );
     if ( ! defined $table || ! length $table ) {
         return;
     }
     $table =~ s/\-\s//;
     $sql->{table} = $ax->quote_table( $sf->{d}{tables_info}{$table} );
+    my $Drop_table = 'Drop_table';
+    $ax->print_sql( $sql, [ $Drop_table ] );
+    my $prompt = 'Choose:';
+    # Choose
+    my $ok = choose( #
+        [ undef, $sf->{i}{_confirm} . ' Stmt'],
+        { %{$sf->{i}{lyt_stmt_v}}, prompt => $prompt }
+    );
+    if ( ! $ok ) {
+        return;
+    }
     my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sql->{table} );
     $sth->execute();
-    my $col_names = $sth->{NAME}; # mysql: before fetchall_arrayref
+    my $col_names = $sth->{NAME}; # mysql: $sth->{NAME} before fetchall_arrayref
     my $all_arrayref = $sth->fetchall_arrayref;
     my $row_count = @$all_arrayref;
     unshift @$all_arrayref, $col_names;
@@ -66,24 +77,14 @@ sub delete_table {
     # Choose
     my $choice = choose( #
         [ undef, 'YES' ],
-        { %{$sf->{i}{lyt_m}}, prompt => $prompt, undef => 'NO' }
+        { %{$sf->{i}{lyt_m}}, prompt => $prompt, undef => 'NO', clear_screen => 1 }
     );
     if ( defined $choice && $choice eq 'YES' ) {
-        $sf->{d}{dbh}->do( "DROP TABLE $sql->{table}" ) or die "DROP TABLE $sql->{table} failed!";
+        my $stmt = $ax->get_stmt( $sql, $Drop_table, 'prepare' );
+        $sf->{d}{dbh}->do( $stmt ) or die "$stmt failed!";
         return 1;
     }
     return;
-}
-
-
-
-
-sub __reset_create_table_sql { ###
-    my ( $sf, $sql ) = @_;
-    $sql->{table} = undef;
-    $sql->{insert_into_args} = [];
-    $sql->{insert_into_cols} = [];
-    $sql->{create_table_cols} = [];
 }
 
 
@@ -91,7 +92,7 @@ sub create_new_table {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $sql = {};
-    $sf->__reset_create_table_sql( $sql );
+    $ax->reset_sql( $sql );
     my @cu_keys = ( qw/create_table_plain create_table_form_copy create_table_form_file settings/ );
     my %cu = ( create_table_plain      => '- plain',
                create_table_form_copy  => '- Copy & Paste',
@@ -101,6 +102,10 @@ sub create_new_table {
     my $old_idx = 0;
 
     MENU: while ( 1 ) {
+        $sql->{table} = '';
+        $sql->{insert_into_args} = [];
+        $sql->{insert_into_cols} = [];
+        $sql->{create_table_cols} = [];
         my $stmt_typeS = [ 'Create_table' ];
         my $choices = [ undef, @cu{@cu_keys} ];
         my $prompt = $sf->{d}{db_string} . "\n" . 'Create table';
@@ -127,26 +132,25 @@ sub create_new_table {
             $opt->config_insert();
             next MENU;
         }
-        $ax->reset_sql( $sql ); ##
         $sf->{auto_inc_col_name} = $sf->{d}{driver} eq 'SQLite' ? $sf->{o}{create}{auto_inc_col_name} : '';
         if ( $custom eq $cu{create_table_plain} ) {
             $sql->{insert_into_args} = [];
         }
         elsif ( $custom eq $cu{create_table_form_copy} ) {
             push @$stmt_typeS, 'Insert';
+            require App::DBBrowser::Table::Insert;
             my $tbl_in = App::DBBrowser::Table::Insert->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $ok = $tbl_in->from_copy_and_paste( $sql, $stmt_typeS );
             if ( ! $ok ) {
-                $sf->__reset_create_table_sql( $sql );
                 next MENU;
             }
         }
         elsif ( $custom eq $cu{create_table_form_file} ) {
             push @$stmt_typeS, 'Insert';
+            require App::DBBrowser::Table::Insert;
             my $tbl_in = App::DBBrowser::Table::Insert->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $file_name = $tbl_in->from_file( $sql, $stmt_typeS );
             if ( ! $file_name ) {
-                $sf->__reset_create_table_sql( $sql );
                 next MENU;
             }
             $sf->{d}{file_name} = $file_name;
@@ -154,14 +158,12 @@ sub create_new_table {
 
         my $ok_table_name = $sf->__set_table_name( $sql, $stmt_typeS );
         if ( ! $ok_table_name ) {
-            $sf->__reset_create_table_sql( $sql );
             next MENU;
         }
         $ax->print_sql( $sql, $stmt_typeS );
 
         my $ok_columns = $sf->__set_columns( $sql, $stmt_typeS );
         if ( ! $ok_columns ) {
-            $sf->__reset_create_table_sql( $sql );
             next MENU;
         }
         if ( any { ! length } @{$sql->{insert_into_cols}} ) {
@@ -173,7 +175,6 @@ sub create_new_table {
 
         my $ok_data_types = $sf->__set_data_types( $sql, $stmt_typeS );
         if ( ! $ok_data_types ) {
-            $sf->__reset_create_table_sql( $sql );
             next MENU;
         }
 
@@ -186,11 +187,10 @@ sub create_new_table {
             { %{$sf->{i}{lyt_m}}, prompt => "Create table $qt_table?", undef => 'NO', index => 1 }
         );
         if ( ! defined $create_table_ok || ! $create_table_ok ) {
-            $sf->__reset_create_table_sql( $sql );
             next MENU;
         }
-        my $ct = sprintf "CREATE TABLE $qt_table (%s)", join( ', ', @{$sql->{create_table_cols}} );
-        $sf->{d}{dbh}->do( $ct ) or die "$ct failed!";
+        my $stmt = $ax->get_stmt( $sql, 'Create_table', 'prepare' );
+        $sf->{d}{dbh}->do( $stmt ) or die "$stmt failed!";
         delete $sql->{create_table_cols};
         my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM $qt_table LIMIT 0" );
         $sth->execute() if $sf->{d}{driver} ne 'SQLite';
@@ -225,6 +225,7 @@ sub __set_table_name {
             $info = sprintf "File: '%s'\n", $file;
             ( $default = $file ) =~ s/\.[^.]{1,3}\z//;
         }
+        $ax->print_sql( $sql, $stmt_typeS );
         # Readline
         $table = $trs->readline( 'Table name: ', { info => $info, default => $default } );
         if ( ! length $table ) {
@@ -253,7 +254,7 @@ sub __set_columns {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     if ( ! @{$sql->{insert_into_args}} ) {
         $ax->print_sql( $sql, $stmt_typeS );
-        my $col_count = choose_a_number( 3, { small => 1, confirm => 'Confirm', mouse => $sf->{o}{table}{mouse},
+        my $col_count = choose_a_number( 3, { small_on_top => 1, confirm => 'Confirm', mouse => $sf->{o}{table}{mouse},
                                             back => 'Back', name => 'Number of columns: ', clear_screen => 0 } );
         if ( ! $col_count ) {
             return;
@@ -279,7 +280,6 @@ sub __set_columns {
             { %{$sf->{i}{lyt_stmt_v}}, prompt => 'Header:' }
         );
         if ( ! defined $choice ) {
-            $sf->__reset_create_table_sql( $sql );
             return;
         }
         if ( $choice eq $first_row ) {
@@ -289,6 +289,7 @@ sub __set_columns {
             my $c = 0;
             $sql->{insert_into_cols} = [ map { 'c' . ++$c } @{$sql->{insert_into_args}->[0]} ]; # not quoted
         }
+        $sql->{create_table_cols} = [ @{$sql->{insert_into_cols}} ];
         my $c = 0;
         my $fields = [ map { [ ++$c, defined $_ ? "$_" : '' ] } @{$sql->{insert_into_cols}} ];
         #if ( $sf->{d}{driver} eq 'SQLite' ) {
@@ -303,7 +304,6 @@ sub __set_columns {
             { prompt => 'Col names:', auto_up => 2, confirm => '  CONFIRM', back => '  BACK   ' }
         );
         if ( ! $form ) {
-            $sf->__reset_create_table_sql( $sql );
             return;
         }
         #if ( $sf->{d}{driver} eq 'SQLite' ) {
@@ -335,7 +335,6 @@ sub __set_data_types {
             confirm => 'CONFIRM', back => 'BACK        ' }
     );
     if ( ! $col_name_and_type ) {
-        $sf->__reset_create_table_sql( $sql );
         return;
     }
     $sql->{create_table_cols} = [ map { join ' ', @$_ }  @$col_name_and_type ];

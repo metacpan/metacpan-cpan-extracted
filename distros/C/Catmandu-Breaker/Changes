@@ -1,5 +1,8 @@
 Revision history for Catmandu-Breaker
 
+0.12  2018-04-03 09:23:48 CEST
+  - Fixing bug in --fields option
+
 0.11  2018-02-08 10:14:32 CET
   - Adding PICA breaker (Jakob Voss)
   - Adding more tests

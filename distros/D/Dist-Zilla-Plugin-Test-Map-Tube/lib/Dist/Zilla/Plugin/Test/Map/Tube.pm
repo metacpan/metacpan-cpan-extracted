@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::Test::Map::Tube;
-$Dist::Zilla::Plugin::Test::Map::Tube::VERSION = '0.26';
+$Dist::Zilla::Plugin::Test::Map::Tube::VERSION = '0.27';
 $Dist::Zilla::Plugin::Test::Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -8,7 +8,7 @@ Dist::Zilla::Plugin::Test::Map::Tube - Provides release test for Test::Map::Tube
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =cut
 
@@ -47,7 +47,7 @@ The routes file should be structured as below:
 
 =cut
 
-our $MIN_VER = '0.39';
+our $MIN_VER = '0.40';
 has 'routes' => (is => 'ro', required => 0);
 
 sub register_prereqs {
@@ -83,7 +83,7 @@ use utf8;\n",
                                $Dist::Zilla::Plugin::Test::Map::Tube::VERSION);
     $file_content .= lc('U').lc('S').lc('E'). " Test::More;\n";
     $file_content .= sprintf("
-my \$min_tmt = %s;
+my \$min_tmt = '%s';
 eval \"use Test::Map::Tube \$min_tmt tests => %s\";
 plan skip_all => \"Test::Map::Tube \$min_tmt required\" if \$\@;", $MIN_VER, $min_tests);
 

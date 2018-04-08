@@ -5,34 +5,20 @@ use warnings;
 
 package Comics::Plugin::Lectrr;
 
-use parent qw(Comics::Fetcher::Cascade);
+use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "0.01";
+our $VERSION = "1.01";
 
-sub register {
-    shift->SUPER::register
-      ( { name    => "Lectrr",
-	  url     => "http://www.lectrr.be/nl/",
-	  pats    =>
-	   [
-	    qr{ <ul \s+
-		 class="toonlink"> \s*
-		<li> \s*
-		<a \s+
-		 href="(?<url>/nl/cartoon/.*?)">
-		(?<title>.*?)</a> \s*
-		</li>
-	      }six,
-	    qr{ <article \s+
-		 id="cartoon" \s+
-		 class="bigcartoon"> \s*
+our $name    = "Lectrr";
+our $url     = "http://www.lectrr.be/nl/";
+our $pattern =
+	    qr{ <div \s+  class="daily-cartoon-slide" .*?> \s*
+		<div \s+ class="slide-v-allign"> \s*
+		<a \s+ .*? class="image"> \s*
 		<img \s+
 		 src="(?<url>/files/attachments/.*?/(?<image>.*?\.\w+))" \s+
 		 title="(?<title>.*?)"
-	      }six,
-	   ],
-	} );
-}
+	      }six;
 
 # Important: Return the package name!
 __PACKAGE__;

@@ -1,0 +1,54 @@
+#  
+# VARIABLES in template_toolkit are constants used in <link href=...> 
+#   and <script src=...> 
+#
+#  This makes it easy to change sources depending on http or https to avoid CORS
+#
+
+template: "template_toolkit"
+engines:
+  template:
+    template_toolkit:
+      start_tag:    '[%'
+      end_tag:      '%]'
+      CACHE_SIZE:   64
+      PRE_CHOMP:    2
+      POST_CHOMP:   2
+      TRIM:         1
+      EVAL_PERL:    0
+      ANYCASE:      1
+      ENCODING:     'utf8'
+# Items used in templates
+      VARIABLES:
+        jq_url:        '//ajax.googleapis.com/ajax/libs/jquery/1.11.2'
+# 3.3.1
+        bs_url:        '//maxcdn.bootstrapcdn.com/bootstrap/3.3.6'
+# 1.5.0
+        bs_tbl_url:    '//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.9.1'
+        bs_xedt_url:   '//cdnjs.cloudflare.com/ajax/libs/x-editable/1.9.1/bootstrap3-editable'
+        bs_bbox_url:   '//cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js'
+        site_url:      'http://examples.com'
+        app_host_url:  'http://app.examples.com'
+        app_host_lib:  'http://app.examples.com/libs'
+
+plugins:
+  Tail:
+    update_interval: 3000
+    tmpdir:   '/tmp'
+    data:
+      method: 'get'
+      url:    '/tail/read'
+    display:     
+      method:   'get'
+      url:      '/tail/display'
+      template: 'tail.tt'
+      layout:   'nomenu.tt'
+    files:
+      id1:    
+        heading:  'Apache Access Log'
+        path:     '/var/log/httpd/access_log'
+      id2:    
+        heading:  'Apache Error Log'
+        path:     '/var/log/httpd/error_log'
+
+

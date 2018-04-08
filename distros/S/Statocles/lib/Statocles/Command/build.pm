@@ -1,5 +1,5 @@
 package Statocles::Command::build;
-our $VERSION = '0.092';
+our $VERSION = '0.093';
 # ABSTRACT: Build the site in a directory
 
 use Statocles::Base 'Command';
@@ -9,6 +9,7 @@ sub run {
     my %build_opt;
     GetOptionsFromArray( \@argv, \%build_opt,
         'date|d=s',
+        'base_url|base=s',
     );
 
     my $path = Path::Tiny->new( $argv[0] // '.statocles/build' );
@@ -22,7 +23,7 @@ sub run {
 
     my @pages = $self->site->pages( %build_opt );
     for my $page ( @pages ) {
-        $store->write_file( $page->path, $page->render );
+        $store->write_file( $page->path, $page->has_dom ? $page->dom : $page->render );
     }
 
     return 0;
@@ -42,7 +43,7 @@ Statocles::Command::build - Build the site in a directory
 
 =head1 VERSION
 
-version 0.092
+version 0.093
 
 =head1 AUTHOR
 

@@ -7,13 +7,12 @@ plan skip_all => 'set env TEST_PG="DBI:Pg:dbname=<...>/<pg_user>/<passwd>" to en
 my ($dsn, $user, $pw) = split m|[/]|, $ENV{TEST_PG};
 
 use Mojo::Pg::Che;
-#~ use Scalar::Util 'refaddr';
 
 my $class = 'Mojo::Pg::Che';
 my $results_class = 'Mojo::Pg::Che::Results';
 
 # 1
-my $pg = $class->connect($dsn, $user, $pw,);
+my $pg = $class->connect($dsn, $user, $pw,)->max_connections(20);
 
 $pg->on(connection=>sub {shift; shift->do('set datestyle to "DMY, ISO";');});
 
@@ -30,7 +29,6 @@ for (13..17) {
 
 
 {
-  #~ my $db = $pg->db;
   my $sth = $pg->prepare('select ?::date as d');
 
   for (13..17) {
@@ -44,13 +42,10 @@ for (13..17) {
 {
   my @results;
   my $cb = sub {
-    #~ warn 'Non-block done';
     my ($db, $err, $results) = @_;
     die $err if $err;
     push @results, $results;
   };
-  
-  #~ my $sth = $pg->prepare('select ?::date as d, pg_sleep(?::int)', {Cached=>1,},);# DBD::Pg::st execute failed: Cannot execute until previous async query has finished
 
   $pg->query('select ?::date as d, pg_sleep(?::int)', {Cached=>1,}, ("$_/06/2016", 1), $cb)
     for (13..17);
@@ -59,27 +54,17 @@ for (13..17) {
     for @results;
 };
 
+{
 
-$result = undef;
+  my $cb = $pg->db->query('select pg_sleep(?::int), now() as now', {Async=>1}, 3);
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+  like $$cb->()->hash->{now}, qr/\d{4}-\d{2}-\d{2}/, 'now non-block-query ok';
 
-my $cb = sub {
-  #~ warn 'Non-block done';
-  my ($db, $err, $results) = @_;
-  die $err if $err;
-  $result = $results;
-};
+  my $die = 'OUH, BUHHH!';
+  my $rc = $pg->query('select ?::date as d, pg_sleep(?::int)', undef, ("01/06/2016", 2), sub {die $die});
 
-$result = $pg->db->query('select pg_sleep(?::int), now() as now', undef, 2, $cb);
-Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
-like $result->hash->{now}, qr/\d{4}-\d{2}-\d{2}/, 'now non-block-query ok';
-
-my $die = 'OUH, BUHHH!';
-my $rc = $pg->query('select ?::date as d, pg_sleep(?::int)', {Async=>1,}, ("01/06/2016", 2), sub {die $die});
-isa_ok $rc, 'Mojo::Reactor::Poll';
-like $rc->{cb_error}, qr/$die/;
-
-my $sth = $pg->prepare('select 10/?::int');
-$result = eval { $pg->query($sth, undef, (0)) };
-like $@, qr/execute failed:/, 'handler err';
-
+  my $sth = $pg->prepare('select 10/?::int');
+  $result = eval { $pg->query($sth, undef, (0)) };
+  like $@, qr/execute failed:/, 'handler err';
+}
 done_testing();

@@ -1,10 +1,7 @@
 # -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
 # vim:ts=8:sw=2:et:sta:sts=2
 #########
-# Author:        rmp
-# Last Modified: $Date: 2013-04-28 23:35:11 +0100 (Sun, 28 Apr 2013) $
-# Id:            $Id: ADIF.pm 160 2013-04-28 22:35:11Z rmp $
-# $HeadURL: svn+ssh://psyphi.net/repository/svn/iotamarathon/trunk/lib/Ham/ADIF.pm $
+# Author: rmp
 #
 package Ham::ADIF;
 use strict;
@@ -13,7 +10,7 @@ use Carp;
 use Ham::ADIF::ADX;
 use Ham::ADIF::ADI;
 
-our $VERSION = q[1.5.1];
+our $VERSION = q[2018.03.31];
 
 sub new {
   my ($class, $ref) = @_;
@@ -60,7 +57,7 @@ __END__
 
 =head1 NAME
 
-Ham::ADIF
+Ham::ADIF - an interface to ADI and ADX common Ham Radio logging formats
 
 =head1 VERSION
 

@@ -58,7 +58,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-CmdLine-cryp"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

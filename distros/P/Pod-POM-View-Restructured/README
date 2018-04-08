@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
      use Pod::POM::View::Restructured;
      
- my $view = Pod::POM::View::Restructured->new;
+     my $view = Pod::POM::View::Restructured->new;
      my $parser = Pod::POM->new;
      my $pom = $parser->parse_file("$top_dir/lib/Pod/POM/View/Restructured.pm");
      my $out = $pom->present($view);
@@ -90,14 +90,13 @@ METHODS
 
      my $conv = Pod::POM::View::Restructured->new;
      
- my $files = [
+     my $files = [
                   { source_file => "$base_dir/Restructured.pm" },
                   { source_file => "$base_dir/DWIW.pm" },
                   { source_file => "$base_dir/Wrapper.pm" },
                  ];
      
- 
- my $rv = $conv->convert_files($files, "$dest_dir/index.rst", 'My Big Test', $dest_dir);
+     my $rv = $conv->convert_files($files, "$dest_dir/index.rst", 'My Big Test', $dest_dir);
 
 POD commands specifically for reStructuredText
     The following sequences can be used in POD to request actions
@@ -147,6 +146,8 @@ LICENSE AND COPYRIGHT
     Copyright (c) 2010 Don Owens <don@regexguy.com>. All rights reserved.
     Copyright (c) 2016 Jeff Fearn <Jeff.Fearn@gmail.com>. All rights
     reserved.
+    Copyright (c) 2016-2018 Alex Muntada <alexm@cpan.org>. All rights
+    reserved.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as Perl itself. See perlartistic.
@@ -168,7 +169,3 @@ SEE ALSO
 
     Pygments (used by Sphinx for syntax highlighting):
     <http://pygments.org/>
-
-VERSION
-    0.03
-

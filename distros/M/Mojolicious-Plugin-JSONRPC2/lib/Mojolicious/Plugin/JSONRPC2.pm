@@ -3,7 +3,7 @@ package Mojolicious::Plugin::JSONRPC2;
 use Mojo::Base 'Mojolicious::Plugin';
 use Carp;
 
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use JSON::XS;
 # to ensure callback runs on notification
@@ -87,22 +87,24 @@ Mojolicious::Plugin::JSONRPC2 - JSON-RPC 2.0 over HTTP
 
 =head1 VERSION
 
-This document describes Mojolicious::Plugin::JSONRPC2 version v2.0.0
+This document describes Mojolicious::Plugin::JSONRPC2 version v2.0.1
 
 
 =head1 SYNOPSIS
 
     use JSON::RPC2::Server;
 
-  # in Mojolicious app
-  sub startup {
-    my $app = shift;
-    $app->plugin('JSONRPC2');
+    # in Mojolicious app
+    sub startup {
+        my $app = shift;
+        $app->plugin('JSONRPC2');
 
-    my $server = JSON::RPC2::Server->new();
+        my $server = JSON::RPC2::Server->new();
 
-    $r->jsonrpc2('/rpc', $server);
-    $r->jsonrpc2_get('/rpc', $server)->over(headers => { $app->jsonrpc2_headers });
+        $r->jsonrpc2('/rpc', $server);
+        $r->jsonrpc2_get('/rpc', $server)->over(
+            headers => { $app->jsonrpc2_headers }
+        );
 
 
 =head1 DESCRIPTION
@@ -115,13 +117,15 @@ The "pipelined Requests/Responses" is not supported yet.
 
 =head1 INTERFACE
 
-=over
+=head2 defaults
 
-=item $app->defaults( 'jsonrpc2.timeout' => 300 )
+    $app->defaults( 'jsonrpc2.timeout' => 300 );
 
 Configure timeout for RPC requests in seconds (default value 5 minutes).
 
-=item $r->jsonrpc2($path, $server)
+=head2 jsonrpc2
+
+    $app->routes->jsonrpc2( $path, $server );
 
 Add handler for JSON-RPC 2.0 over HTTP protocol on C<$path>
 (with C<< format=>0 >>) using C<POST> method.
@@ -131,7 +135,9 @@ own parameters (provided with RPC request) - if they will need access to
 Mojolicious app you'll have to provide it manually (using global vars or
 closures).
 
-=item $r->jsonrpc2_get($path, $server_safe_idempotent)
+=head2 jsonrpc2_get
+
+    $app->routes->jsonrpc2_get( $path, $server_safe_idempotent );
 
 B<WARNING!> In most cases you don't need it. In other cases usually you'll
 have to use different C<$server> objects for C<POST> and C<GET> because
@@ -146,7 +152,9 @@ own parameters (provided with RPC request) - if they will need access to
 Mojolicious app you'll have to provide it manually (using global vars or
 closures).
 
-=item $r->over(headers => { $app->jsonrpc2_headers })
+=head2 jsonrpc2_headers
+
+    $app->routes->over(headers => { $app->jsonrpc2_headers });
 
 You can use this condition to distinguish between JSON-RPC 2.0 and other
 request types on same C<$path> - for example if you want to serve web page
@@ -158,8 +166,6 @@ and RPC on same url you can do this:
 
 If you don't use this condition and plugin's handler will get request with
 wrong headers it will reply with C<415 Unsupported Media Type>.
-
-=back
 
 
 =head1 OPTIONS
@@ -236,7 +242,7 @@ Alex Efros E<lt>powerman@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+This software is Copyright (c) 2014- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
 
 This is free software, licensed under:
 

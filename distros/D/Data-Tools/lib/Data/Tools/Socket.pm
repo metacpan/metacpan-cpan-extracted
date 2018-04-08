@@ -1,7 +1,7 @@
 ##############################################################################
 #
-#  Data::Tools perl module
-#  (c) Vladi Belperchinov-Shabanski "Cade" 2013-2016
+#  Data::Tools::Socket perl module
+#  (c) Vladi Belperchinov-Shabanski "Cade" 2013-2017
 #  http://cade.datamax.bg
 #  <cade@bis.bg> <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
 #
@@ -11,7 +11,6 @@
 package Data::Tools::Socket;
 use strict;
 use Exporter;
-use IO::Select;
 use Time::HiRes qw( time );
 
 our $VERSION = '1.14';
@@ -24,6 +23,9 @@ our @EXPORT = qw(
 
                   socket_read_message
                   socket_write_message
+                  
+                  socket_can_write
+                  socket_can_read
                 );
 
 ##############################################################################
@@ -36,16 +38,13 @@ sub socket_read
    my $timeout = shift || undef;
    
    my $stime = time();
+   $$data = undef;
 
-   my $iosel = IO::Select->new();
-   $iosel->add( $sock );
-   
    my $rlen = $readlen;
 #print STDERR "SOCKET_READ: rlen [$rlen]\n";
    while( $rlen > 0 )
      {
-     my @ready = $iosel->can_read( $timeout );
-     return undef if @ready == 0 or ( $timeout > 0 and time() - $stime > $timeout );
+     return undef if ! socket_can_read( $sock ) or ( $timeout > 0 and time() - $stime > $timeout );
      
      my $part;
      my $plen = $sock->sysread( $part, $rlen );
@@ -71,15 +70,11 @@ sub socket_write
    
    my $stime = time();
 
-   my $iosel = IO::Select->new();
-   $iosel->add( $sock );
-   
 #print STDERR "SOCKET_WRITE: outgoing data [$data]\n";
    my $wpos = 0;
    while( $wpos < $writelen )
      {
-     my @ready = $iosel->can_write( $timeout );
-     return undef if @ready == 0 or ( $timeout > 0 and time() - $stime > $timeout );
+     return undef if ! socket_can_write( $sock ) or ( $timeout > 0 and time() - $stime > $timeout );
  
      my $part;
      my $plen = $sock->syswrite( $data, $writelen - $wpos, $wpos );
@@ -155,6 +150,28 @@ sub socket_write_message
     }
 
   return 1;
+}
+
+##############################################################################
+
+sub socket_can_write
+{
+  my $sock    = shift;
+  my $timeout = shift;
+
+  my $win;
+  vec( $win, fileno( $sock ), 1 ) = 1;
+  return select( undef, $win, undef, $timeout ) > 0;
+}
+
+sub socket_can_read
+{
+  my $sock    = shift;
+  my $timeout = shift;
+
+  my $rin;
+  vec( $rin, fileno( $sock ), 1 ) = 1;
+  return select( $rin, undef, undef, $timeout ) > 0;
 }
 
 ##############################################################################
@@ -235,7 +252,7 @@ $timeout is optional, it is in seconds and can be less than 1 second.
 
 =head1 REQUIRED MODULES
 
-Data::Tools::Time uses:
+Data::Tools::Socket uses:
 
   * IO::Select
   * Time::HiRes

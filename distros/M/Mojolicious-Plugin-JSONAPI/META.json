@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.004"
+            "perl" : "5.010"
          }
       },
       "develop" : {
@@ -38,6 +38,7 @@
          "requires" : {
             "Mojolicious::Lite" : "0",
             "Test::CPAN::Changes" : "0",
+            "Test::MockObject" : "0",
             "Test::Mojo" : "0",
             "Test::Most" : "0",
             "Test::Pod" : "0",
@@ -48,7 +49,7 @@
    "provides" : {
       "Mojolicious::Plugin::JSONAPI" : {
          "file" : "lib/Mojolicious/Plugin/JSONAPI.pm",
-         "version" : "0.4"
+         "version" : "1.0"
       }
    },
    "release_status" : "stable",
@@ -58,7 +59,7 @@
          "web" : "https://github.com/ziali088/mojolicious-plugin-jsonapi.git"
       }
    },
-   "version" : "0.4",
+   "version" : "1.0",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],

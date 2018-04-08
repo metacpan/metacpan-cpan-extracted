@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model;
-$Config::Model::VERSION = '2.118';
+$Config::Model::VERSION = '2.120';
 use strict ;
 use warnings;
 use 5.10.1;
@@ -514,8 +514,8 @@ sub normalize_class_parameters {
             my $implicit = defined $name_match->{name_match} ? '' : 'implicit ';
             unshift @$accept_info, $name_match;    # put data back in list
             $name_match = delete $name_match->{name_match} || '.*';
-            warn "class $config_class_name: name_match ($implicit$name_match)",
-                " in accept is deprecated\n";
+            $logger->warn("class $config_class_name: name_match ($implicit$name_match)",
+                " in accept is deprecated");
         }
 
         push @accept_list, $name_match;
@@ -1846,7 +1846,7 @@ Config::Model - Create tools to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.118
+version 2.120
 
 =head1 SYNOPSIS
 

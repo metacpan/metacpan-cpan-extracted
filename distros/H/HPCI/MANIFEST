@@ -46,4 +46,5 @@ t/18-required_output_files.t
 t/19-env_key.t
 t/20-skipstage.t
 t/21-checksum.t
+t/22-file_params.t
 TODO

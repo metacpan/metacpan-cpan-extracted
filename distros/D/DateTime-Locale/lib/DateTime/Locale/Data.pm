@@ -20,11 +20,11 @@ use namespace::autoclean;
 
 use File::ShareDir qw( dist_file );
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 #<<<
 ### :start CLDRVersion:
-our $CLDRVersion = 32;
+our $CLDRVersion = 33;
 ### :end CLDRVersion:
 #>>>
 
@@ -1800,8 +1800,6 @@ our %NativeNames = (
   "Ti\N{U+1ebf}ng Vi\N{U+1ec7}t Vi\N{U+1ec7}t Nam" => "vi-VN",
   Tshiluba => "lu",
   "Tshiluba Ditunga wa Kongu" => "lu-CD",
-  "T\N{U+00fc}rkmen dili" => "tk",
-  "T\N{U+00fc}rkmen dili T\N{U+00fc}rkmenistan" => "tk-TM",
   "T\N{U+00fc}rk\N{U+00e7}e" => "tr",
   "T\N{U+00fc}rk\N{U+00e7}e K\N{U+0131}br\N{U+0131}s" => "tr-CY",
   "T\N{U+00fc}rk\N{U+00e7}e T\N{U+00fc}rkiye" => "tr-TR",
@@ -2038,9 +2036,10 @@ our %NativeNames = (
   "svenska Finland" => "sv-FI",
   "svenska Sverige" => "sv-SE",
   "svenska \N{U+00c5}land" => "sv-AX",
+  "t\N{U+00fc}rkmen dili" => "tk",
+  "t\N{U+00fc}rkmen dili T\N{U+00fc}rkmenistan" => "tk-TM",
   vo => "vo",
   "vo 001" => "vo-001",
-  yue => "yue",
   "\N{U+00c8}d\N{U+00e8} Yor\N{U+00f9}b\N{U+00e1}" => "yo",
   "\N{U+00c8}d\N{U+00e8} Yor\N{U+00f9}b\N{U+00e1} Or\N{U+00ed}l\N{U+025b}\N{U+0301}\N{U+00e8}de B\N{U+025b}\N{U+0300}n\N{U+025b}\N{U+0300}" => "yo-BJ",
   "\N{U+00c8}d\N{U+00e8} Yor\N{U+00f9}b\N{U+00e1} Or\N{U+00ed}l\N{U+1eb9}\N{U+0301}\N{U+00e8}de N\N{U+00e0}\N{U+00ec}j\N{U+00ed}r\N{U+00ed}\N{U+00e0}" => "yo-NG",
@@ -2172,7 +2171,7 @@ our %NativeNames = (
   "\N{U+0939}\N{U+093f}\N{U+0928}\N{U+094d}\N{U+0926}\N{U+0940}" => "hi",
   "\N{U+0939}\N{U+093f}\N{U+0928}\N{U+094d}\N{U+0926}\N{U+0940} \N{U+092d}\N{U+093e}\N{U+0930}\N{U+0924}" => "hi-IN",
   "\N{U+0985}\N{U+09b8}\N{U+09ae}\N{U+09c0}\N{U+09af}\N{U+09bc}\N{U+09be}" => "as",
-  "\N{U+0985}\N{U+09b8}\N{U+09ae}\N{U+09c0}\N{U+09af}\N{U+09bc}\N{U+09be} \N{U+09ad}\N{U+09be}\N{U+09b0}\N{U+09a4}" => "as-IN",
+  "\N{U+0985}\N{U+09b8}\N{U+09ae}\N{U+09c0}\N{U+09af}\N{U+09bc}\N{U+09be} \N{U+09ad}\N{U+09be}\N{U+09f0}\N{U+09a4}" => "as-IN",
   "\N{U+09ac}\N{U+09be}\N{U+0982}\N{U+09b2}\N{U+09be}" => "bn",
   "\N{U+09ac}\N{U+09be}\N{U+0982}\N{U+09b2}\N{U+09be} \N{U+09ac}\N{U+09be}\N{U+0982}\N{U+09b2}\N{U+09be}\N{U+09a6}\N{U+09c7}\N{U+09b6}" => "bn-BD",
   "\N{U+09ac}\N{U+09be}\N{U+0982}\N{U+09b2}\N{U+09be} \N{U+09ad}\N{U+09be}\N{U+09b0}\N{U+09a4}" => "bn-IN",
@@ -2237,6 +2236,7 @@ our %NativeNames = (
   "\N{U+65e5}\N{U+672c}\N{U+8a9e} \N{U+65e5}\N{U+672c}" => "ja-JP",
   "\N{U+7ca4}\N{U+8bed} \N{U+4e2d}\N{U+534e}\N{U+4eba}\N{U+6c11}\N{U+5171}\N{U+548c}\N{U+56fd} \N{U+7b80}\N{U+4f53}" => "yue-Hans-CN",
   "\N{U+7ca4}\N{U+8bed} \N{U+7b80}\N{U+4f53}" => "yue-Hans",
+  "\N{U+7cb5}\N{U+8a9e}" => "yue",
   "\N{U+7cb5}\N{U+8a9e} \N{U+4e2d}\N{U+83ef}\N{U+4eba}\N{U+6c11}\N{U+5171}\N{U+548c}\N{U+570b}\N{U+9999}\N{U+6e2f}\N{U+7279}\N{U+5225}\N{U+884c}\N{U+653f}\N{U+5340} \N{U+7e41}\N{U+9ad4}" => "yue-Hant-HK",
   "\N{U+7cb5}\N{U+8a9e} \N{U+7e41}\N{U+9ad4}" => "yue-Hant",
   "\N{U+a188}\N{U+a320}\N{U+a259}" => "ii",
@@ -3112,7 +3112,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 32,
+    version => 33,
   },
   en => {
     am_pm_abbreviated => [
@@ -3384,7 +3384,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 32,
+    version => 33,
   },
   "en-CA" => {
     am_pm_abbreviated => [
@@ -3445,8 +3445,8 @@ my %LocaleData = (
       "yMd-alt-variant" => "d/M/y",
       yQQQ => "QQQ y",
       yQQQQ => "QQQQ y",
-      "yw-count-one" => "'week' w 'of' Y",
-      "yw-count-other" => "'week' w 'of' Y",
+      "yw-count-one" => "'week' w 'of' y",
+      "yw-count-other" => "'week' w 'of' y",
     },
     code => "en-CA",
     date_format_full => "EEEE, MMMM d, y",
@@ -3663,7 +3663,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 32,
+    version => 33,
   },
   "en-US" => {
     am_pm_abbreviated => [
@@ -3935,7 +3935,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 32,
+    version => 33,
   },
   es => {
     am_pm_abbreviated => [
@@ -4000,8 +4000,8 @@ my %LocaleData = (
       yMd => "d/M/y",
       yQQQ => "QQQ y",
       yQQQQ => "QQQQ 'de' y",
-      "yw-count-one" => "'semana' w 'de' Y",
-      "yw-count-other" => "'semana' w 'de' Y",
+      "yw-count-one" => "'semana' w 'de' y",
+      "yw-count-other" => "'semana' w 'de' y",
     },
     code => "es",
     date_format_full => "EEEE, d 'de' MMMM 'de' y",
@@ -4218,7 +4218,7 @@ my %LocaleData = (
     time_format_medium => "H:mm:ss",
     time_format_short => "H:mm",
     variant => undef,
-    version => 32,
+    version => 33,
   },
   "fr-FR" => {
     am_pm_abbreviated => [
@@ -4490,7 +4490,7 @@ my %LocaleData = (
     time_format_medium => "HH:mm:ss",
     time_format_short => "HH:mm",
     variant => undef,
-    version => 32,
+    version => 33,
   },
   hi => {
     am_pm_abbreviated => [
@@ -4766,7 +4766,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 32,
+    version => 33,
   },
   "ja-JP" => {
     am_pm_abbreviated => [
@@ -5043,7 +5043,7 @@ my %LocaleData = (
     time_format_medium => "H:mm:ss",
     time_format_short => "H:mm",
     variant => undef,
-    version => 32,
+    version => 33,
   },
   "pt-BR" => {
     am_pm_abbreviated => [
@@ -5320,7 +5320,7 @@ my %LocaleData = (
     time_format_medium => "HH:mm:ss",
     time_format_short => "HH:mm",
     variant => undef,
-    version => 32,
+    version => 33,
   },
   "zh-Hans-CN" => {
     am_pm_abbreviated => [
@@ -5592,7 +5592,7 @@ my %LocaleData = (
     time_format_medium => "ah:mm:ss",
     time_format_short => "ah:mm",
     variant => undef,
-    version => 32,
+    version => 33,
   },
   "zh-Hant-TW" => {
     am_pm_abbreviated => [
@@ -5864,7 +5864,7 @@ my %LocaleData = (
     time_format_medium => "ah:mm:ss",
     time_format_short => "ah:mm",
     variant => undef,
-    version => 32,
+    version => 33,
   },
 );
 ### :end LocaleData:
@@ -5902,7 +5902,7 @@ DateTime::Locale::Data - Locale data generated from CLDR
 
 =head1 VERSION
 
-version 1.17
+version 1.18
 
 =head1 DESCRIPTION
 
@@ -5927,7 +5927,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2003 - 2017 by Dave Rolsky.
+This software is copyright (c) 2003 - 2018 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

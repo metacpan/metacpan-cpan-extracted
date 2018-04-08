@@ -1,0 +1,4 @@
+<:
+%post = (Foo => 'ok');
+print join "\n", @post{'Foo', 'foo', '@Foo'};
+print scalar keys %post;

@@ -10,23 +10,24 @@ cli::tsv::util - The great new cli::tsv::util!
 
 =head1 VERSION
 
-Version 0.51
+Version 0.512
 
 =cut
 
-our $VERSION = '0.51';
+our $VERSION = '0.512';
 
 
 =head1 SYNOPSIS
 
-The following 5 files (each with function explanation after ":" )
+The following 6 files (each with function explanation after ":" )
 will be installed by folloinwg INSTALLATION instruction.
 
-   1. csv2tsv  : Converting CSV format into TSV (Tab-Seprated Variable).
+   1. colsummary : A great table decipher by looking into each coloumns.
    2. colgrep  : Extension of "grep" command searching on specified columns.
    3. colsplit  : Splitting a TSV file into files of the each column.
    4. colwidth   : Extracting `column width' informations.
    5. latextable  : Useful when you need latex tables from Excel/SQL results.
+   6. csv2tsv 
 
   The function detail can be shown by --help after each command but 
   as of 2018.03.25, most of them is written in Japanese. Sorry. 

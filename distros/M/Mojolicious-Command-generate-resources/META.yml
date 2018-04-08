@@ -28,5 +28,5 @@ resources:
   homepage: https://github.com/kberov/Mojolicious-Command-generate-resources
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/kberov/Mojolicious-Command-generate-resources.git
-version: '0.15'
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

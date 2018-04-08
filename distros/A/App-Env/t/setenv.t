@@ -1,8 +1,8 @@
 #!perl
 
-use Test::More tests => 2;
+use Test2::V0;
 
-use lib 't';
+use Test::Lib;
 use App::Env;
 
 my $env = App::Env->new( 'App1' );
@@ -12,3 +12,5 @@ is( $env->env( 'Site1_App1' ), 'fooey', 'set' );
 
 $env->setenv( 'Site1_App1' );
 is( $env->env( 'Site1_App1' ), undef, 'delete' );
+
+done_testing;

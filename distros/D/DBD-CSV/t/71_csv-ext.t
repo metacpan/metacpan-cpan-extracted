@@ -18,8 +18,7 @@ my @ext = ("", ".csv", ".foo", ".txt");
 sub DbFile;
 
 my $usr = eval { getpwuid $< } || $ENV{USERNAME} || "";
-sub Tables
-{
+sub Tables {
     my @tbl = $dbh->tables ();
     if ($usr) {
 	s/^['"]*$usr["']*\.//i for @tbl;

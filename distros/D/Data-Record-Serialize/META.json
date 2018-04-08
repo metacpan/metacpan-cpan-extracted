@@ -112,7 +112,7 @@
             "SQL::Translator::Schema" : "0",
             "Type::Library" : "0",
             "Type::Utils" : "0",
-            "Types::Standard" : "1.000005",
+            "Types::Standard" : "1.002001",
             "YAML::Any" : "0",
             "custom::failures" : "0",
             "namespace::clean" : "0",
@@ -149,63 +149,63 @@
    "provides" : {
       "Data::Record::Serialize" : {
          "file" : "lib/Data/Record/Serialize.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Data::Record::Serialize::Encode::dbi" : {
          "file" : "lib/Data/Record/Serialize/Encode/dbi.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Data::Record::Serialize::Encode::ddump" : {
          "file" : "lib/Data/Record/Serialize/Encode/ddump.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Data::Record::Serialize::Encode::json" : {
          "file" : "lib/Data/Record/Serialize/Encode/json.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Data::Record::Serialize::Encode::null" : {
          "file" : "lib/Data/Record/Serialize/Encode/null.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Data::Record::Serialize::Encode::rdb" : {
          "file" : "lib/Data/Record/Serialize/Encode/rdb.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Data::Record::Serialize::Encode::yaml" : {
          "file" : "lib/Data/Record/Serialize/Encode/yaml.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Data::Record::Serialize::Error" : {
          "file" : "lib/Data/Record/Serialize/Error.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Data::Record::Serialize::Role::Base" : {
          "file" : "lib/Data/Record/Serialize/Role/Base.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Data::Record::Serialize::Role::Default" : {
          "file" : "lib/Data/Record/Serialize/Role/Default.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Data::Record::Serialize::Role::Encode" : {
          "file" : "lib/Data/Record/Serialize/Role/Encode.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Data::Record::Serialize::Role::Sink" : {
          "file" : "lib/Data/Record/Serialize/Role/Sink.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Data::Record::Serialize::Sink::null" : {
          "file" : "lib/Data/Record/Serialize/Sink/null.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Data::Record::Serialize::Sink::stream" : {
          "file" : "lib/Data/Record/Serialize/Sink/stream.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Data::Record::Serialize::Types" : {
          "file" : "lib/Data/Record/Serialize/Types.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
@@ -220,7 +220,7 @@
          "web" : "https://github.com/djerius/data-record-serialize"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

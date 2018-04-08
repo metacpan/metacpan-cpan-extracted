@@ -1,3 +1,10 @@
+0.031   2018-04-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace nonnegint with uint.
+
+
 0.030   2018-01-17 (PERLANCAR)
 
         - Add utilities: ppgrep, proc-table.

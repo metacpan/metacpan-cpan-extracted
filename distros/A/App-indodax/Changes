@@ -1,0 +1,160 @@
+0.023   2018-04-06 (PERLANCAR)
+
+        - Add new pairs: ada_idr, bcd_idr.
+
+        - Rename dist/module from App-btcindo to App-indodax.
+
+
+0.022   2018-03-07 (PERLANCAR)
+
+	- [Bugfix] ticker didn't respect the --pair option.
+
+
+0.021   2018-03-06 (PERLANCAR)
+
+        - Add subcommands: public, private.
+
+        - ticker, trades, depth: Add 'pair' argument. Finally pairs other than
+          'btc_idr' are supported by the public API.
+
+
+0.020   2018-02-17 (PERLANCAR)
+
+	- Add pair: ten_idr.
+
+
+0.019   2018-02-01 (PERLANCAR)
+
+	- ticker: Remove --pair argument because the API only provides
+	  btc_idr.
+
+
+0.018   2018-02-01 (PERLANCAR)
+
+	- Make currencies/markets data available to outside package.
+
+	- Move code to module, add subcommand 'pairs'.
+
+
+0.017   2018-01-05 (PERLANCAR)
+
+	- Add market: ignis_idr.
+
+	- Add subcommand: trade-history-total (name?).
+
+
+0.016   2017-12-27 (PERLANCAR)
+
+	- Handle NEM <-> XEM symbol confusion (we use XEM at the CLI level,
+	  but the JSON API & TAPI still use NEM).
+
+
+0.015   2017-12-25 (PERLANCAR)
+
+	- Handle DASH <-> DRK symbol confusion (we use DASH at the CLI
+	  level, but the JSON API & TAPI still use DRK).
+
+
+0.014   2017-12-09 (PERLANCAR)
+
+	- balance: Show percentage of value (in IDR) of each currency, add
+          formatting/alignments.
+
+	- hold-details: Show price.
+
+
+0.013   2017-12-09 (PERLANCAR)
+
+	- Handle XLM <-> STR symbol confusion (we use XLM at the CLI level,
+	  but the JSON API & TAPI still use STR).
+
+
+0.012   2017-12-05 (PERLANCAR)
+
+	- Add market pair: nxt_idr.
+
+
+0.011   2017-11-24 (PERLANCAR)
+
+	- [Bugfix] balance: Fix logic error and don't die if a balance is
+	  not in either IDR/BTC market e.g. STR but just ignore it.
+
+
+0.010   2017-11-24 (PERLANCAR)
+
+	- [ux] balance: Add -e as shortcut for --with-idr-estimates.
+
+	- Forgot to add pair: btg_idr.
+
+
+0.009   2017-11-24 (PERLANCAR)
+
+	- Tweak Abstract.
+
+	- [Bugfix] Forgot to pass 'pair' argument to cancel_order()
+	  function.
+
+
+0.008   2017-11-24 (PERLANCAR)
+
+	- Add subcommands: cancel-orders, cancel-all-orders.
+
+	- open-orders: By default now show open orders from all markets, unless
+          filtered by --pair. Add filter --type.
+
+	- cancel-order: Add dry-run mode.
+
+	- [Bugfix] Reenable xlm_idr, VIP reports some markets as invalid in
+	  get_open_orders() but they exist nevertheless.
+
+
+0.007   2017-11-24 (PERLANCAR)
+
+        - Disable market pair xlm_idr because VIP currently reports 'Invalid
+          pair' for it.
+
+        - Add subcommand: hold-details.
+
+        - [doc] Fix typo. Thanks MANWAR.
+
+
+0.006   2017-11-23 (PERLANCAR)
+
+        - Add currency: BTG (bitcoin gold).
+
+
+0.005   2017-11-19 (PERLANCAR)
+
+	- Update currencies: +BCH (bitcoin cash), -CRAVE, +ETC (Ethereum
+	  Classic), -NBT (NuBits), -SDC (ShadowCash), +WAVES, -XPY
+	  (PayCoin), +XZC (ZCoin).
+
+	- Update pairs.
+
+	- balance: remove --hold option, include both available + held balances
+          (as well as total), include IDR estimates.
+
+	- ticker: Add option --pair.
+
+
+0.004   2017-06-03 (PERLANCAR)
+
+	- Adjust to Finance::BTCIndo 0.005 (new period argument for
+	  'price-history').
+
+
+0.003   2017-06-01 (PERLANCAR)
+
+	- Add subcommands: depth, price-history.
+
+
+0.002   2017-05-31 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Add more examples in Synopsis.
+
+
+0.001   2017-05-31 (PERLANCAR)
+
+        - First release.

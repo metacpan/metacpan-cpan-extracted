@@ -1,6 +1,7 @@
 use warnings;
 use strict;
-use t::share;
+use lib 't';
+use share;
 
 # Use case: HTTP/1.1 Pipelining: GET all without EOF
 my $request = "GET / HTTP/1.1\nHost: localhost\n\n";

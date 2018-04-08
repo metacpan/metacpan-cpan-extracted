@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v3.0.0';
+our $VERSION = 'v3.0.1';
 
 use DBI;
 use List::Util qw( any );
@@ -582,7 +582,7 @@ DBIx::SecureCGI - Secure conversion of CGI params hash to SQL
 
 =head1 VERSION
 
-This document describes DBIx::SecureCGI version v3.0.0
+This document describes DBIx::SecureCGI version v3.0.1
 
 
 =head1 SYNOPSIS
@@ -1419,7 +1419,7 @@ Nikita Savin E<lt>asdfgroup@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2002-2014 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+This software is Copyright (c) 2002- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
 
 This is free software, licensed under:
 

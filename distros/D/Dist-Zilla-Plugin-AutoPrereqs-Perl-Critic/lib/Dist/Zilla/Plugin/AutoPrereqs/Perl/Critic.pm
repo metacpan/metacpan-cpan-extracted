@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use Moose;
 with qw(
@@ -113,8 +113,8 @@ sub _get_perl_critic_packages_and_create_cache {
     $self->log("Downloading '$url'...");
     my $res = $ua->get($url);
 
-    if ( $res->{status} ne '200' ) {
-        $self->log_fatal("Unable to download latest package information for Perl::Critic. Please ensure that your system can access '$url' or disable 'remove_core_policies' in your dist.ini");
+    if ( !$res->{success} ) {
+        $self->log_fatal( 'Unable to download latest package information for Perl::Critic: ' . $res->{reason} . ". Please ensure that your system can access '$url' or disable 'remove_core_policies' in your dist.ini" );
     }
 
     my $cache_header = "# This is the cache file from\n# " . ref($self) . q{ } . $self->VERSION() . <<'CACHE_HEADER';
@@ -163,7 +163,7 @@ Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic - automatically extract Perl::Cri
 
 =head1 VERSION
 
-Version 0.005
+Version 0.006
 
 =head1 SYNOPSIS
 
@@ -236,7 +236,7 @@ Sven Kirmess <sven.kirmess@kzone.ch>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Sven Kirmess.
+This software is Copyright (c) 2017-2018 by Sven Kirmess.
 
 This is free software, licensed under:
 

@@ -1,6 +1,6 @@
+use Chart::Plotly;
 use Chart::Plotly::Trace::Scatter;
 use Chart::Plotly::Plot;
-use HTML::Show;
 
 my $x = [1 .. 15];
 my $y = [map {rand 10 } @$x];
@@ -21,7 +21,5 @@ $plot->layout({annotations=> [
     }
   ]});
 
-HTML::Show::show($plot->html);
+Chart::Plotly::show_plot($plot);
 
-# This also works
-# HTML::Show::show(Chart::Plotly::render_full_html(data => $plot));

@@ -1,3 +1,15 @@
+1.041   2018-04-03 (PERLANCAR)
+
+	- Implement import_args & import_args_array.
+
+	- [ux] In multimodver mode, allow if there is only one path/version
+	  of the module.
+
+	- Do not turn on --with-process-size on --module-startup or
+	  --code-startup because they are meaningless, the participant is
+	  of type=command.
+
+
 1.040   2017-07-13 (PERLANCAR)
 
 	- Add code_startup mode.

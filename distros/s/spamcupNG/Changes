@@ -1,10 +1,25 @@
 ==================================================
-Changes from 2017-03-18 00:00:00 +0000 to present.
+Changes from 2017-03-31 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 1.1 at 2018-03-18 20:55:24 +0000
+version 1.2 at 2018-03-31 02:58:08 +0000
 ----------------------------------------
+
+  Change: 87f0eae02d97f8125a43da182c2a865e128cb1f2
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-30 23:56:07 +0000
+
+    End of line for SpamcupNG
+
+    Just added a warn() stating that the distribution will be
+    discontinued inf favor of App::SpamcupNG. Removed all TODOs. 
+
+  Change: a866583b3dfc3ac5105c271153211f615ff5eb53
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-18 19:02:45 +0000
+
+    Marking this distribution name as deprecated 
 
   Change: eee6d23f61ceae7b58edfd5500e601c590cfcd8f
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>

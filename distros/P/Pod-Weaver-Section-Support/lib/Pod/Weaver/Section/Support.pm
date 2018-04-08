@@ -1,5 +1,5 @@
 package Pod::Weaver::Section::Support;
-$Pod::Weaver::Section::Support::VERSION = '1.008';
+$Pod::Weaver::Section::Support::VERSION = '1.010';
 # ABSTRACT: Add a SUPPORT section to your POD
 
 use Moose 1.03;
@@ -257,6 +257,9 @@ sub _add_perldoc {
 
 	# Get the name for the module
 	my $module = PPIx::DocumentName->extract( $ppi_doc );
+
+    # Avoid trailing space and an empty directive
+	return () if ! length $module;
 
 	# TODO add language detection as per RT#63726
 
@@ -646,9 +649,13 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+Pod::Weaver::Section::Support - Add a SUPPORT section to your POD
+
 =head1 VERSION
 
-version 1.008
+version 1.010
 
 =head1 DESCRIPTION
 
@@ -802,6 +809,10 @@ Please put the "{EMAIL}" placeholder somewhere!
 
 The default is a sufficient explanation ( see L</SUPPORT>).
 
+=head1 VERSION
+
+version 1.010
+
 =for stopwords dist dzil repo
 
 =for Pod::Coverage weave_section mvp_multivalue_args
@@ -849,7 +860,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/Pod-Weaver-Section-Support>
+L<https://metacpan.org/release/Pod-Weaver-Section-Support>
 
 =item *
 
@@ -885,14 +896,6 @@ L<http://cpanratings.perl.org/d/Pod-Weaver-Section-Support>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/Pod-Weaver-Section-Support>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -903,7 +906,7 @@ L<http://cpants.cpanauthors.org/dist/Pod-Weaver-Section-Support>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/P/Pod-Weaver-Section-Support>
 

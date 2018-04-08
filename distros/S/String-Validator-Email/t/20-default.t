@@ -29,17 +29,18 @@ $result = $Validator->Check( 'bad@email.fakedomain' ) ;
 is ( $result, 1, 'Should have returned 1 error' ) ;
 
 
-like ( $Validator->Errstr , qr /tldcheck/, "bad\@email.fakedomain Error String should include tldcheck." ) ;
-like ( $Validator->Expound() , qr /The TLD/ ,
+like ( $Validator->Errstr , qr /tldcheck/,
+	"bad\@email.fakedomain Error String should include tldcheck." ) ;
+like ( $Validator->Expound() , qr /Top Level Domain.+not recognized/ ,
         'Expound tells us it didnt recognize tld.') ;
 
 is( $Validator->Is_Valid( 'my.account@[192.168.1.1]' ),
         0, 'IP address not allowed for domain.' ) ;
-TODO: {
-        local $TODO = 'Need to replace Email::Valid for now skip tests.' ;        
+# TODO: {
+        local $TODO = 'Need to replace Email::Valid for now skip tests.' ;
 like ( $Validator->Expound() , qr /The TLD/ ,
         'Expound tells us it didnt recognize tld.') ;
-} #TODO
+# } #TODO
 #note ( 'Internal String ' . $Validator->{ string } ) ;
 #note ( 'Error String ' . $Validator->{ errstring } ) ;
  ;

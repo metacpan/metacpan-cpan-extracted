@@ -1,4 +1,4 @@
-# SMB-Perl library, Copyright (C) 2014 Mikhael Goikhman, migo@cpan.org
+# SMB-Perl library, Copyright (C) 2014-2018 Mikhael Goikhman, migo@cpan.org
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ use constant {
 	ASN1_OID         => 0x06,
 	ASN1_ENUMERATED  => 0x0a,
 	ASN1_SEQUENCE    => 0x30,
+	ASN1_SET         => 0x31,
 	ASN1_APPLICATION => 0x60,
 	ASN1_CONTEXT     => 0xa0,
 };
@@ -254,7 +255,7 @@ sub parse_asn1 {
 	} elsif ($tag == ASN1_ENUMERATED) {
 		die "Unsupported len=$len" unless $len == 1;
 		@contents = map { ord($_) } @bytes;
-	} elsif ($tag == ASN1_SEQUENCE || $tag == ASN1_APPLICATION) {
+	} elsif ($tag == ASN1_SEQUENCE || $tag == ASN1_SET || $tag == ASN1_APPLICATION) {
 		push @contents, parse_asn1(\@bytes)
 			while @bytes;
 	} elsif ($tag >= ASN1_CONTEXT && $tag <= ASN1_CONTEXT + 3) {
@@ -288,7 +289,7 @@ sub generate_asn1 {
 		} split(/\./, $content);
 	} elsif ($tag == ASN1_ENUMERATED) {
 		@bytes = (chr($content));
-	} elsif ($tag == ASN1_SEQUENCE || $tag == ASN1_APPLICATION) {
+	} elsif ($tag == ASN1_SEQUENCE || $tag == ASN1_SET || $tag == ASN1_APPLICATION) {
 		do {
 			push @bytes, @{generate_asn1(@$content)};
 			$content = shift;
@@ -593,8 +594,10 @@ sub generate_spnego ($%) {
 		];
 	} elsif (!defined $self->auth_completed) {
 		$self->auth_completed($self->is_user_authenticated ? 1 : 0);
+		my $mechlist_mic = "\x01\x00\x00\x00\x89\x22\x91\x93\xff\xdb\xcb\x26\x00\x00\x00\x00";  #"\x00" x 16;
 		$struct = [ ASN1_CONTEXT + 1, ASN1_SEQUENCE,
 			[ ASN1_CONTEXT, ASN1_ENUMERATED, SPNEGO_ACCEPT_COMPLETED ],
+			[ ASN1_CONTEXT + 3, ASN1_BINARY, $mechlist_mic ],
 		] if $self->auth_completed;
 	} else {
 		$self->err("generate_spnego called after auth_completed");

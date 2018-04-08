@@ -1,0 +1,17 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>Untitled Document</title>
+<link rev="made" href="mailto:CGI" />
+<link rel="alternate" type="application/atom+xml" href="atom.xml" />
+</head>
+<body>
+<h1>Test Weblog</h1>
+<code>
+# Generated like this:
+perl -MCGI -E 'say CGI-&gt;start_html(-head =&gt; CGI-&gt;Link( {-rel =&gt; q{alternate}, -type =&gt; q{xml/atom}, -href =&gt; q{atom.xml}} )), q{&lt;h3&gt;use Test::More qw(no_plan); Weblog&lt;/h1&gt;}, CGI-&gt;end_html;' &gt; t/samples/link1.html
+</code>
+</body>
+</html>

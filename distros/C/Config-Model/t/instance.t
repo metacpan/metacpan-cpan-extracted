@@ -7,21 +7,13 @@ use Test::More;
 use Test::Warn;
 use Test::Memory::Cycle;
 use Config::Model;
+use Config::Model::Tester::Setup qw/init_test/;
 
 use strict;
 use lib "t/lib";
 
-my $arg = shift || '';
+my ($model, $trace) = init_test();
 
-my $trace = $arg =~ /t/ ? 1 : 0;
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
-
-use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init( $arg =~ /l/ ? $TRACE : $WARN );
-
-ok( 1, "Compilation done" );
-
-my $model = Config::Model->new( legacy => 'ignore', );
 $model->create_config_class(
     name    => "WarnMaster",
     element => [
@@ -57,7 +49,7 @@ is( $inst->data('test'), undef, "test empty private data ..." );
 $inst->data( 'test', 'coucou' );
 is( $inst->data('test'), 'coucou', "retrieve private data" );
 
-is( $inst->root_dir,  'foobar/', "test config root directory" );
+is( $inst->root_dir->stringify,  'foobar', "test config root directory" );
 
 # test if fixes can be applied through the instance
 my $root = $inst->config_root;
@@ -89,8 +81,6 @@ ok( $root2->load( step => $step ), "set up data in tree with '$step'" );
 
 is( $binst->has_warning, 0, "test has_warning with big model" );
 
-Config::Model::Exception::Any->Trace(1) if $trace =~ /e/;
-
-memory_cycle_ok($model);
+memory_cycle_ok($model, "memory cycles");
 
 done_testing;

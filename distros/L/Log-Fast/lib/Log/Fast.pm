@@ -32,7 +32,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use Scalar::Util qw( refaddr );
 use Socket;
@@ -351,7 +351,7 @@ Log::Fast - Fast and flexible logger
 
 =head1 VERSION
 
-This document describes Log::Fast version v2.0.0
+This document describes Log::Fast version v2.0.1
 
 
 =head1 SYNOPSIS
@@ -430,9 +430,9 @@ and slower than L<Log::Syslog::Fast> in about 2 times.
 
 =head1 INTERFACE 
 
-=over
+=head2 global
 
-=item Log::Fast->global()
+    $LOG = Log::Fast->global();
 
 When called first time will create global log object using
 L<default options|/OPTIONS> (you can reconfigure it using C<config()> later).
@@ -445,16 +445,19 @@ objects in each module.
 
 Return global log object.
 
+=head2 new
 
-=item Log::Fast->new( [\%opt] )
+    $LOG = Log::Fast->new();
+    $LOG = Log::Fast->new( \%opt );
 
 Create new log object, configured using L<defaults|/OPTIONS> and
 user-provided options, if any.
 
 Return created log object.
 
+=head2 config
 
-=item $LOG->config( \%opt )
+    $LOG->config( \%opt );
 
 Reconfigure log object. Any options (see L</OPTIONS>) can be changed at
 any time, including changing output B<{type}> or setting options useless
@@ -467,42 +470,46 @@ C<config()>.
 
 Return nothing. Throw exception if unable to connect to syslog.
 
+=head2 level
 
-=item $LOG->level( [$level] )
+    $level = $LOG->level();
+    $level = $LOG->level( $new_level );
 
-If B<$level> given will change current log level.
-This is same as call C<< config({ level=>$level }) >> but much faster.
+If B<$new_level> given will change current log level.
+This is same as call C<< config({ level=>$new_level }) >> but much faster.
 
 Return previous log level.
 
+=head2 ident
 
-=item $LOG->ident( [$ident] )
+    $ident = $LOG->ident();
+    $ident = $LOG->ident( $new_ident );
 
-If B<$ident> given will change current syslog's ident.
-This is same as call C<< config({ ident=>$ident }) >> but much faster.
+If B<$new_ident> given will change current syslog's ident.
+This is same as call C<< config({ ident=>$new_ident }) >> but much faster.
 
 Return previous syslog's ident.
 
+=head2 ERR
 
-=item $LOG->ERR( $message )
+=head2 WARN
 
-=item $LOG->ERR( $format, @list )
+=head2 NOTICE
 
-=item $LOG->WARN( $message )
+=head2 INFO
 
-=item $LOG->WARN( $format, @list )
+=head2 DEBUG
 
-=item $LOG->NOTICE( $message )
-
-=item $LOG->NOTICE( $format, @list )
-
-=item $LOG->INFO( $message )
-
-=item $LOG->INFO( $format, @list )
-
-=item $LOG->DEBUG( $message )
-
-=item $LOG->DEBUG( $format, @list )
+    $LOG->ERR( $message )
+    $LOG->ERR( $format, @list )
+    $LOG->WARN( $message )
+    $LOG->WARN( $format, @list )
+    $LOG->NOTICE( $message )
+    $LOG->NOTICE( $format, @list )
+    $LOG->INFO( $message )
+    $LOG->INFO( $format, @list )
+    $LOG->DEBUG( $message )
+    $LOG->DEBUG( $format, @list )
 
 Output B<$message> to log using different log levels.
 
@@ -512,16 +519,13 @@ C<sprintf($format, @list)> to calculate log message.
 If B<@list> will contain CODEREF, they will be called (in LIST context)
 and returned values will be placed inside B<@list> inplace of CODEREF.
 This can be used to avoid calculating log message (or it part) on disabled
-log levels - these CODEREFs will be executed only on enabled log levels.
+log levels - these CODEREF will be executed only on enabled log levels.
 Example available in L</SYNOPSIS>.
 
 If B<$message> or items in B<@list> will be Unicode strings, they will be
 converted to UTF8 before sending to log.
 
 Return nothing. Throw exception if fail to write message to log.
-
-
-=back
 
 
 =head1 OPTIONS
@@ -588,7 +592,7 @@ When B<{type}> set to C<'fh'> you have to also set B<{fh}> to any open
 filehandle (like C<\*STDERR>).
 
 When B<{type}> set to C<'unix'> you have to also set B<{path}> to path to
-existing unix socket (typically it's C<'/dev/log'>).
+existing UNIX socket (typically it's C<'/dev/log'>).
 
 Luckily, default values for both B<{fh}> and B<{path}> are already provided,
 so usually it's enough to just set B<{type}>.
@@ -711,7 +715,7 @@ Alex Efros E<lt>powerman@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2010-2012 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+This software is Copyright (c) 2010- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
 
 This is free software, licensed under:
 

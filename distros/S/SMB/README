@@ -1,4 +1,4 @@
-Welcome to SMB-Perl 0.06.
+Welcome to SMB-Perl 0.07.
 
 This pure perl library allows to receive and send commands using SMB
 network protocol (also called CIFS - Common Internet File System).
@@ -17,6 +17,7 @@ Usage:
 
 Classes:
 	SMB
+	SMB::Agent
 	SMB::Auth
 	SMB::Client
 	SMB::Command
@@ -32,11 +33,20 @@ Classes:
 	SMB::Time
 	SMB::Tree
 	SMB::v1::Command
-	SMB::v1::Command::*
+	SMB::v1::Command::Negotiate
 	SMB::v1::Commands
 	SMB::v1::Header
 	SMB::v2::Command
-	SMB::v2::Command::*
+	SMB::v2::Command::Close
+	SMB::v2::Command::Create
+	SMB::v2::Command::Negotiate
+	SMB::v2::Command::QueryDirectory
+	SMB::v2::Command::QueryInfo
+	SMB::v2::Command::Read
+	SMB::v2::Command::SessionSetup
+	SMB::v2::Command::SetInfo
+	SMB::v2::Command::TreeConnect
+	SMB::v2::Command::Write
 	SMB::v2::Commands
 	SMB::v2::Header
 

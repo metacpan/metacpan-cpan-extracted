@@ -10,8 +10,30 @@ sub init ( $self, $cb ) {
     return;
 }
 
+# AUTHENTICATE
+sub authenticate ( $self, $user_name_utf8, $token, $cb ) {
+    $cb->( bless { app => $self->{app} }, 'Pcore::App::API::Auth' );
+
+    return;
+}
+
 sub authenticate_private ( $self, $private_token, $cb ) {
-    ...;
+    $cb->( bless { app => $self->{app} }, 'Pcore::App::API::Auth' );
+
+    return;
+}
+
+sub do_authenticate_private ( $self, $private_token, $cb ) {
+    $cb->( result [ 404, 'User not found' ] );
+
+    return;
+}
+
+# USER
+sub create_user ( $self, $user_name, $password, $enabled, $permissions, $cb ) {
+
+    # user already exists
+    $cb->( result [ 400, 'Auth backend is not available' ] );
 
     return;
 }
@@ -23,7 +45,7 @@ sub authenticate_private ( $self, $private_token, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 14                   | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |    3 | 14, 33               | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,0 +1,276 @@
+NAME
+    Finance::Indodax - Trade with Indodax.com using Perl
+
+VERSION
+    This document describes version 0.008 of Finance::Indodax (from Perl
+    distribution Finance-Indodax), released on 2018-04-06.
+
+SYNOPSIS
+     use Finance::Indodax;
+
+     # API key and secret are required unless you only want to access the public
+     # API. They can be retrieved by logging into your Indodax account and
+
+     my $indodax = Finance::Indodax->new(
+         key    => 'Your API key',
+         secret => 'Your API secret',
+     );
+
+     ## public API methods, these do not require API key & secret
+
+     my $ticker = $indodax->get_ticker();
+     # sample result:
+     {
+       ticker => {
+         buy => 34381600,
+         high => 34890000,
+         last => 34381600,
+         low => 34200000,
+         sell => 34431800,
+         server_time => 1496219814,
+         vol_btc => 506.37837851,
+         vol_idr => 17409110187,
+       },
+     }
+
+     my $trades = $indodax->get_trades();
+     # sample result:
+     [
+       {
+         date => 1496220665,
+         price => 34395100,
+         amount => 0.00090000,
+         tid => 2222043,
+         type => "sell",
+       },
+       {
+         date => 1496220574,
+         price => 34422400,
+         amount => 0.00879473,
+         tid => 2222042,
+         type => "buy",
+       },
+       ... # about 148 more
+     ]
+
+     my $depths = $indodax->get_depth();
+     # sample result:
+     {
+       buy => [
+         [34397100,"0.07656322"],
+         [34397000,"0.21483687"],
+         # ... about 148 more
+       ],
+       sell => [
+         [034499900, "0.00150273"],
+         [034500000, "0.94493067"],
+         # ... about 148 more
+       ],
+     }
+
+     my $prices = $indodax->get_price_history();
+     # sample result:
+     {
+       chart => [
+         [1392397200000,8024000,8024000,7580000,7803000,5.90],  # 2014-02-15
+         [1392483600000,7803000,7934000,7257000,7303000,11.35], # 2014-02-16
+         ...
+       ],
+     }
+
+     ## all the methods below requires API key & secret
+
+     $indodax->get_info();
+
+     $indodax->get_tx_history();
+
+     $indodax->get_trade_history(pair => "btc_idr");
+
+     # create buy order of Rp 2,000,000 worth of bitcoins at price Rp 38,400,000/BTC
+     $indodax->create_order(pair => "btc_idr", type => "buy" , price => "38400000", idr => "2000000");
+
+     # create sell order of 0.01 BTC at price Rp 38,700,000/BTC
+     $indodax->create_order(pair => "btc_idr", type => "sell", price => "38700000", btc => 0.01);
+
+     $indodax->cancel_order(type => "sell", order_id => 9038293);
+
+DESCRIPTION
+    Indodax, <https://www.indodax.com> (previously Bitcoin Indonesia,
+    bitcoin.co.id) is an Indonesian Bitcoin exchange. This module provides a
+    Perl wrapper for Indodax's Trade API.
+
+METHODS
+  new
+    Constructor.
+
+  get_ticker
+    Public API. The API method name is "ticker".
+
+    Arguments:
+
+    *   pair => str
+
+        Optional, e.g. eth_btc. Default: btc_idr.
+
+  get_trades
+    Public API. The API method name is "ticker".
+
+    Arguments:
+
+    *   pair => str
+
+        Optional, e.g. eth_btc. Default: btc_idr.
+
+  get_depth
+    Public API. The API method name is "ticker".
+
+    Arguments:
+
+    *   pair => str
+
+        Optional, e.g. eth_btc. Default: btc_idr.
+
+  get_price_history
+    Public API (undocumented). The API method name is either "chartdata" or
+    "chart_1d".
+
+    This function returns an array of records. Each record is an array with
+    the following data:
+
+     [timestamp-in-unix-epoch, open, high, low, close]
+
+    Arguments:
+
+    *   pair => str
+
+        Optional, e.g. eth_btc. Default: btc_idr.
+
+        Note: pairs other than "btc_idr" do not seem to be supported at this
+        time (404 response).
+
+    *   period => str (all|day, default: day)
+
+        Specify period. "all" means since exchange began operation (Feb
+        2014). "day" means in the last ~24h.
+
+  tapi
+    General method to call API methods. Syntax:
+
+     $indodax->tapi($method, %args)
+
+    For example:
+
+     $indodax->tapi("getInfo")
+
+    is equivalent to:
+
+     $indodax->get_info()
+
+  get_info
+    This method give information about balance and server's timestamp. The
+    API method name is "getInfo".
+
+    Arguments:
+
+  get_tx_history
+    This method give information about history of deposit and withdraw. The
+    API method name is "transHistory".
+
+    Arguments:
+
+  get_trade_history
+    This method give information about bitcoin transaction in buying and
+    selling history. The API method name is "tradeHistory".
+
+    Arguments:
+
+    *   count => int
+
+    *   from_id => int
+
+    *   to_id => int
+
+    *   order => "asc" | "desc"
+
+    *   since => epoch
+
+    *   end => epoch
+
+    *   pair => str (required)
+
+  get_open_orders
+    This method give information about existing open order. The API method
+    name is "openOrders".
+
+    Arguments:
+
+    *   pair => str (required)
+
+  create_order
+    This method use to make a new order. The API method name is "trade".
+
+    Arguments:
+
+    *   pair => str (required)
+
+    *   type => str (required)
+
+        Either "buy" or "sell".
+
+    *   price => num (required)
+
+        Price (in Rp) per bitcoin.
+
+    *   idr => num (required when type=buy)
+
+        Amount of IDR you want to buy.
+
+    *   btc => num (required when type=sell)
+
+        Amount of BTC you want to sell.
+
+  cancel_order
+    This method cancel existing open order. The API method name is
+    "cancelOrder".
+
+    Arguments:
+
+    *   pair => pair (required)
+
+    *   type => str (required)
+
+        Either "buy" or "sell".
+
+    *   order_id => num (required)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Finance-Indodax>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Finance-BTCIndo>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Indodax>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    API documentation,
+    <https://vip.bitcoin.co.id/downloads/BITCOINCOID-API-DOCUMENTATION.pdf>
+
+    CLI that uses this module, for more convenience daily usage on the
+    command-line: indodax (from App::indodax distribution).
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

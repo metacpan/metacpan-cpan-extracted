@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use constant FOR_UI => 1;
 
@@ -131,7 +131,7 @@ sub Devel::MAT::SV::CODE::structure_set
 {
    my $cv = shift;
    my @svs = ( $cv, grep { $_ && !$_->immortal }
-      $cv->padlist, $cv->padnames, $cv->pads,
+      $cv->padlist, $cv->padnames_av, $cv->pads,
       $cv->constval, $cv->constants, $cv->globrefs );
    return @svs;
 }

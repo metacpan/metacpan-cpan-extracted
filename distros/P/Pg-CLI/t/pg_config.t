@@ -39,13 +39,16 @@ use Test::More 0.88;
         version => q{PostgreSQL 8.4.5},
     );
 
-    my @output = map {
-        my $key = uc $_;
-        $key = 'INCLUDEDIR-SERVER' if $key eq 'INCLUDEDIR_SERVER';
-        $key . ' = ' . ( defined $config{$_} ? $config{$_} : q{ } ) . "\n"
-    } sort keys %config;
+    my @output;
+    for my $key ( sort keys %config ) {
+        my $uc_key = uc $key;
+        $uc_key = 'INCLUDEDIR-SERVER' if $uc_key eq 'INCLUDEDIR_SERVER';
+        push @output, $uc_key . ' = '
+            . ( defined $config{$key} ? $config{$key} : q{ } ) . "\n";
+    }
 
     no warnings 'redefine';
+    ## no critic (Variables::ProtectPrivateVars)
     local *Pg::CLI::pg_config::_pg_config_output = sub {@output};
 
     for my $key ( keys %config ) {

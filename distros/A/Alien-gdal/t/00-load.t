@@ -8,7 +8,7 @@ BEGIN {
 
 diag(
     sprintf(
-        'Testing Alien::gdal %f, Perl %f, %s',
+        'Testing Alien::gdal %s, Perl %s, %s',
         $Alien::gdal::VERSION, $], $^X
     )
 );

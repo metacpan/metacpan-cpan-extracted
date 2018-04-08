@@ -4,7 +4,7 @@
       "Munenori Sugimura <clicktx@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.2",
+   "generated_by" : "Minilla/v3.0.4",
    "license" : [
       "perl_5"
    ],
@@ -49,8 +49,8 @@
          "requires" : {
             "I18N::LangTags" : "0",
             "I18N::LangTags::Detect" : "0",
-            "Locale::TextDomain::OO" : "1.023",
-            "Mojolicious" : "6.64",
+            "Locale::TextDomain::OO" : "1.033",
+            "Mojolicious" : "7.72",
             "perl" : "5.010"
          }
       },
@@ -63,7 +63,7 @@
    "provides" : {
       "Mojolicious::Plugin::LocaleTextDomainOO" : {
          "file" : "lib/Mojolicious/Plugin/LocaleTextDomainOO.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Mojolicious::Plugin::LocaleTextDomainOO::I18N" : {
          "file" : "lib/Mojolicious/Plugin/LocaleTextDomainOO.pm"
@@ -80,5 +80,5 @@
          "web" : "https://github.com/clicktx/p5-Mojolicious-Plugin-LocaleTextDomainOO"
       }
    },
-   "version" : "0.04"
+   "version" : "0.05"
 }

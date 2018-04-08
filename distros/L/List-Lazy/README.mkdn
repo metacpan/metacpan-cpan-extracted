@@ -4,15 +4,17 @@ List::Lazy - Generate lists lazily
 
 # VERSION
 
-version 0.3.0
+version 0.3.1
 
 # SYNOPSIS
 
-    use List::Lazy qw/ lazy_range /;
+```perl
+use List::Lazy qw/ lazy_range /;
 
-    my $range = lazy_range( 1, undef )->grep(sub{ $_ % 2})->map( sub { '!' x $_ } );
+my $range = lazy_range( 1, undef )->grep(sub{ $_ % 2})->map( sub { '!' x $_ } );
 
-    say $_ for $range->next(3); # prints ! !!! !!!!!
+say $_ for $range->next(3); # prints ! !!! !!!!!
+```
 
 # DESCRIPTION
 
@@ -25,37 +27,49 @@ functions on request.
 
 ## lazy\_list
 
-    my $list  = lazy_list $generator_sub, $state;
+```perl
+my $list  = lazy_list $generator_sub, $state;
+```
 
 A convenience shortcut for the List::Lazy constructor. The `$state` will be available
 (and can be changed) by the generator subroutine. The generator subroutine is expected
 to return a list of one or more next items of the list. Returning an empty list means
 that the list has reached its end.
 
-    my $even_numbers = lazy_list { $_ += 2 } 0; # will return 2, 4, 6, ...
+```perl
+my $even_numbers = lazy_list { $_ += 2 } 0; # will return 2, 4, 6, ...
+```
 
 In additional of regular values, the generator can also return lazy lists,
 which will be seamlessly expanded.
 
-    my $list = lazy_range( 1, undef )->map(sub { lazy_range( 1, $_ ) });
-    # will return 1, 1, 2, 1, 2, 3, 1, 2, 3, 4, ...
+```perl
+my $list = lazy_range( 1, undef )->map(sub { lazy_range( 1, $_ ) });
+# will return 1, 1, 2, 1, 2, 3, 1, 2, 3, 4, ...
+```
 
 ## lazy\_range
 
-    my $range = lazy_range $min, $max, $iterator;
+```perl
+my $range = lazy_range $min, $max, $iterator;
+```
 
 Creates a list iterating over a range of values. `$min` and `$max` are required, but `$max`  can be 
 `undef` (meaning no upper limit). The `$iterator` is optional and defaults to the value `1`. 
 The `$iterator` can be a number, which will be the step at which the numbers are increased, or a coderef that will 
 be passed the previous value as `$_`, and is expected to return the next value.
 
-    my $palinumbers = lazy_range 99, undef, sub { do { $_++ } until $_ eq reverse $_; $_ };
+```perl
+my $palinumbers = lazy_range 99, undef, sub { do { $_++ } until $_ eq reverse $_; $_ };
 
-    say join ' ', $palinumbers->next(3); # 99 101 111
+say join ' ', $palinumbers->next(3); # 99 101 111
+```
 
 ## lazy\_fixed\_list
 
-    my $list = lazy_fixed_list @some_array;
+```perl
+my $list = lazy_fixed_list @some_array;
+```
 
 Creates a lazy list that will returns the values of the given array. 
 
@@ -63,12 +77,14 @@ Creates a lazy list that will returns the values of the given array.
 
 ## new
 
-    my $list = List::Lazy->new(
-        state => 1,
-        generator => sub {
-            $_++;
-        },
-    );
+```perl
+my $list = List::Lazy->new(
+    state => 1,
+    generator => sub {
+        $_++;
+    },
+);
+```
 
 Creates a lazy list.
 
@@ -89,36 +105,48 @@ Returns `true` is the list is exhausted.
 Returns the next `$num` items of the list (or less if the list doesn't have
 that many items left). `$num` defaults to `1`.
 
-    my $range = lazy_range 1, 100;
+```perl
+my $range = lazy_range 1, 100;
 
-    while( my $next = $range->next ) {
-        ...
-    }
+while( my $next = $range->next ) {
+    ...
+}
+```
 
 ## reduce
 
-    my $value = $list->reduce( $reducing_sub, $initial_value );
+```perl
+my $value = $list->reduce( $reducing_sub, $initial_value );
+```
 
 Iterates through the list and reduces its values via the `$reducing_sub`, which
 will be passed the cumulative value and the next item via `$a` and `$b`. 
 If `$initial_value` is not given, it defaults to the first element of the list.
 
-    my $sum = lazy_range( 1, 100 )->reduce( sub { $a + $b } );
+```perl
+my $sum = lazy_range( 1, 100 )->reduce( sub { $a + $b } );
+```
 
 ## batch
 
-    my $new_list = $list->batch($n);
+```perl
+my $new_list = $list->batch($n);
+```
 
 Creates a new list where the items of the original list are batched in groups
 of `$n` (or less for the last batch).
 
-    my $list = lazy_fixed_list( 1..100 )->batch(3);
-    
-    my $x = $list->next;           # $x == [ 1, 2, 3]
+```perl
+my $list = lazy_fixed_list( 1..100 )->batch(3);
+
+my $x = $list->next;           # $x == [ 1, 2, 3]
+```
 
 ## map
 
-    my $new_list = $list->map( $mapper_sub );
+```perl
+my $new_list = $list->map( $mapper_sub );
+```
 
 Creates a new list by applying the transformation given by `$mapper_sub` to the
 original list. The sub ill be passed the original next item via `$_`
@@ -128,12 +156,16 @@ can modify the item, explode it into many items, or suppress it,
 Note that the new list do a deep clone of the original list's state, so reading
 from the new list won't affect the original list.
 
-    my $recount = ( lazy_range 1, 100 )->map( sub { 1..$_ } );
-    # will return 1 1 2 1 2 3 1 2 3 4 ...
+```perl
+my $recount = ( lazy_range 1, 100 )->map( sub { 1..$_ } );
+# will return 1 1 2 1 2 3 1 2 3 4 ...
+```
 
 ## grep
 
-    my $new_list = $list->grep( $filter_sub );
+```perl
+my $new_list = $list->grep( $filter_sub );
+```
 
 Creates a new list by applying the filtering given by `$filter_sub` to the
 original list. The sub will be passed the original next item via `$_`
@@ -142,11 +174,15 @@ and is expected to return a boolean indicating if the item should be kept or not
 Note that the new list do a deep clone of the original list's state, so reading
 from the new list won't affect the original list.
 
-    my $odd = ( lazy_range 1, 100 )->grep( sub { $_ % 2 } );
+```perl
+my $odd = ( lazy_range 1, 100 )->grep( sub { $_ % 2 } );
+```
 
 ## spy
 
-    my $new_list = $list->spy( $sub );
+```perl
+my $new_list = $list->spy( $sub );
+```
 
 Creates a new list that will execute the spy `$sub` for
 every value it sees (with the value assigned to `$_`). 
@@ -155,16 +191,22 @@ If `$sub` is not given, it'll `carp` the values.
 
 ## until
 
-    my $new_list = $list->until( $condition );
+```perl
+my $new_list = $list->until( $condition );
+```
 
 Creates a new list that truncates the original list as soon
 as the condition is met.
 
-    my $to_ten = $list->until(sub{ $_ > 10 });
+```perl
+my $to_ten = $list->until(sub{ $_ > 10 });
+```
 
 ## append
 
-    my $new_list = $list->append( @other_lists );
+```perl
+my $new_list = $list->append( @other_lists );
+```
 
 Creates a new list that will return first the elements of `$list`,
 and those of the `@other_lists`. 
@@ -172,12 +214,16 @@ and those of the `@other_lists`.
 Note that the new list do a deep clone of the original lists's state, so reading
 from the new list won't affect the original lists.
 
-    my $range = lazy_range 1..100;
-    my $twice = $range->append( $range );
+```perl
+my $range = lazy_range 1..100;
+my $twice = $range->append( $range );
+```
 
 ## prepend
 
-    my $new_list = $list->prepend( @other_lists );
+```perl
+my $new_list = $list->prepend( @other_lists );
+```
 
 Like `append`, but prepend the other lists to the current one.
 
@@ -186,7 +232,9 @@ from the new list won't affect the original lists.
 
 ## all
 
-    my @rest = $list->all;
+```perl
+my @rest = $list->all;
+```
 
 Returns all the remaining values of the list. Be careful: if the list is unbounded, 
 calling `all()` on it will result into an infinite loop.
@@ -197,7 +245,7 @@ Yanick Champoux <yanick@babyl.dyndns.org> [![endorse](http://api.coderwall.com/y
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Yanick Champoux.
+This software is copyright (c) 2018, 2017, 2016 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

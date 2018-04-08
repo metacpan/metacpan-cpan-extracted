@@ -25,4 +25,9 @@ __PACKAGE__->has_many(
     'author_id'
 );
 
+__PACKAGE__->has_many(
+    'email_templates' => 'Test::JSONAPI::Schema::Result::EmailTemplate',
+    'author_id'
+);
+
 1;

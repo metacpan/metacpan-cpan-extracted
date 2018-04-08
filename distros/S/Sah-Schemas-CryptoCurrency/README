@@ -2,9 +2,9 @@ NAME
     Sah::Schemas::CryptoCurrency - Various Sah cryptocurrency schemas
 
 VERSION
-    This document describes version 0.004 of Sah::Schemas::CryptoCurrency
+    This document describes version 0.005 of Sah::Schemas::CryptoCurrency
     (from Perl distribution Sah-Schemas-CryptoCurrency), released on
-    2018-03-08.
+    2018-04-06.
 
 HOMEPAGE
     Please visit the project's homepage at

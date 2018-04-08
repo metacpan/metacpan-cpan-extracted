@@ -29,37 +29,37 @@ no_index:
 provides:
   Mojolicious::Plugin::Yancy:
     file: lib/Mojolicious/Plugin/Yancy.pm
-    version: '1.003'
+    version: '1.004'
   Yancy:
     file: lib/Yancy.pm
-    version: '1.003'
+    version: '1.004'
   Yancy::Backend::Dbic:
     file: lib/Yancy/Backend/Dbic.pm
-    version: '1.003'
+    version: '1.004'
   Yancy::Backend::Mysql:
     file: lib/Yancy/Backend/Mysql.pm
-    version: '1.003'
+    version: '1.004'
   Yancy::Backend::Pg:
     file: lib/Yancy/Backend/Pg.pm
-    version: '1.003'
+    version: '1.004'
   Yancy::Backend::Sqlite:
     file: lib/Yancy/Backend/Sqlite.pm
-    version: '1.003'
+    version: '1.004'
   Yancy::Controller::Yancy:
     file: lib/Yancy/Controller/Yancy.pm
-    version: '1.003'
+    version: '1.004'
   Yancy::Controller::Yancy::API:
     file: lib/Yancy/Controller/Yancy/API.pm
-    version: '1.003'
+    version: '1.004'
   Yancy::Controller::Yancy::MultiTenant:
     file: lib/Yancy/Controller/Yancy/MultiTenant.pm
-    version: '1.003'
+    version: '1.004'
   Yancy::Plugin::Auth::Basic:
     file: lib/Yancy/Plugin/Auth/Basic.pm
-    version: '1.003'
+    version: '1.004'
   Yancy::Util:
     file: lib/Yancy/Util.pm
-    version: '1.003'
+    version: '1.004'
 requires:
   Digest: '0'
   Exporter: '0'
@@ -67,7 +67,7 @@ requires:
   FindBin: '0'
   JSON::Validator: '2.05'
   Mojolicious: '7.15'
-  Mojolicious::Plugin::OpenAPI: '1.22'
+  Mojolicious::Plugin::OpenAPI: '1.25'
   Scalar::Util: '0'
   Sys::Hostname: '0'
   Text::Balanced: '0'
@@ -77,7 +77,7 @@ resources:
   bugtracker: https://github.com/preaction/Yancy/issues
   homepage: https://github.com/preaction/Yancy
   repository: https://github.com/preaction/Yancy.git
-version: '1.003'
+version: '1.004'
 x_authority: cpan:PREACTION
 x_contributors:
   - 'Ed J <mohawk2@users.noreply.github.com>'

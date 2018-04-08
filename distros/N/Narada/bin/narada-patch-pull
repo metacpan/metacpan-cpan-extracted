@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-VERSION='v2.3.7'
+VERSION='v2.3.8'
 
 perl -MNarada -E 'Narada::detect(@ARGV)' narada-1 || exit 1
 
@@ -18,7 +18,7 @@ narada-patch-pull - download latests patch files from remote
 
 =head1 VERSION
 
-This document describes narada-patch-pull version v2.3.7
+This document describes narada-patch-pull version v2.3.8
 
 
 =head1 USAGE

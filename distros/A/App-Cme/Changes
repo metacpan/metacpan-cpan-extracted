@@ -1,3 +1,16 @@
+1.027 2018-04-05
+
+  Improve cme run script:
+    * add error message when application param is missing
+    * leave capture parameters alone
+    * add syntax for multi-line instructions
+    * replace_var sub accepts several variabless
+    * fix error message when run is called without argument
+
+  Other:
+    * Using cme option '-file' with value '-' is deprecated
+    * update copyright year in dist.ini
+
 1.026 2017-12-18
 
   New experimental feature:

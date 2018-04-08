@@ -1,4 +1,4 @@
-use t::narada1::share; guard my $guard;
+use lib 't'; use narada1::share; guard my $guard;
 
 require (wd().'/blib/script/narada-setup-qmail');
 

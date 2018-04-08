@@ -1,37 +1,37 @@
 package Devel::IPerl::Plugin::Chart::Plotly;
 
-use 5.022001;
-
 use strict;
 use warnings;
 use utf8;
 
-use English qw(-no_match_vars);
 use Module::Find;
 use namespace::autoclean;
 
-our $VERSION = '0.002';    # VERSION
+our $VERSION = '0.003';    # VERSION
 
 # ABSTRACT: Inline display of plotly charts in Jupyter notebooks using L<Devel::IPerl> kernel
 
-my $require_plotly = '
+my $require_plotly = <<'EOJS';
 <script>
-            if(!window.Plotly) {
+//@ sourceURL=iperl-devel-plugin-chart-plotly.js
+            $('#Plotly').each(function(i, e) { $(e).attr('id', 'plotly') });
+
+            if (!window.Plotly) {
                 requirejs.config({
-                    paths: { 
-                    \'plotly\': [\'https://cdn.plot.ly/plotly-latest.min\']},
+                  paths: {
+                    plotly: ['https://cdn.plot.ly/plotly-latest.min']},
                 });
                 window.Plotly = {
-                    "plot" : function(div, data, layout) {
-                    require([\'plotly\'],
-                    function(plotly) {window.Plotly=plotly;
-                        Plotly.plot(div, data, layout);
-                        });
-                    }
+                  plot : function(div, data, layout) {
+                    require(['plotly'], function(plotly) {
+                      window.Plotly=plotly;
+                      Plotly.plot(div, data, layout);
+                    });
+                  }
                 }
             }
 </script>
-';
+EOJS
 
 sub register {
 
@@ -90,7 +90,7 @@ Devel::IPerl::Plugin::Chart::Plotly - Inline display of plotly charts in Jupyter
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -121,8 +121,6 @@ Plugin to display automatically L<Chart::Plotly> plot objects in Jupyter noteboo
 This method is called automatically by L<Devel::IPerl>. You only need to load the plugin:
 
     IPerl->load_plugin('Chart::Plotly');
-
-=head1 CLASS METHODS
 
 =head1 AUTHOR
 

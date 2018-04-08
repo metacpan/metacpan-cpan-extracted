@@ -11,6 +11,10 @@ has 'pin_desc' => (
         V50 GND GND 0 1 2 3 GND
     }]}
 );
+has 'condvar_for_pin' => (
+    is => 'ro',
+    default => sub {{}},
+);
 
 with 'Device::WebIO::Device::DigitalInputAnyEvent';
 
@@ -43,18 +47,26 @@ sub all_desc
 }
 
 
+sub set_anyevent_condvar
+{
+    my ($self, $pin, $cv) = @_;
+    $self->condvar_for_pin->{$pin} = $cv;
+    return;
+}
+
 sub mock_set_input
 {
     my ($self, $pin, $val) = @_;
     $self->_pin_input->[$pin] = $val;
+    return if ! exists $self->condvar_for_pin->{$pin};
 
-    my $cv = $self->input_condvar;
+    my $cv = $self->condvar_for_pin->{$pin};
     my $old_cb = $cv->cb;
 
-    $self->input_condvar->send( $pin, $val );
+    $cv->send( $pin, $val );
     my $new_cv = AnyEvent->condvar;
     $new_cv->cb( $old_cb );
-    $self->input_condvar( $new_cv );
+    $self->condvar_for_pin->{$pin} = $new_cv;
 
     return $val;
 }

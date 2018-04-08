@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes CGI::Easy::URLconf version v1.0.1
+    This document describes CGI::Easy::URLconf version v2.0.1
 
 SYNOPSIS
 
@@ -133,122 +133,146 @@ DESCRIPTION
 
 INTERFACE
 
-    setup_path( [METHOD =>] MATCH => [CALLBACK => ...] HANDLER, ... )
+ setup_path
 
-      Configure mapping of url's path to handler subroutine (which will be
-      used by path2view()). Can be called multiple times and will just add
-      new mapping rules on each call.
+        setup_path(
+            '/path'             =>              $HANDLER,
+            qr{^/path/(\d+)/$}  => @CALLBACKS,  $HANDLER,
+            ...
+        );
+        setup_path( $METHOD =>
+            '/path'             =>              $HANDLER,
+            qr{^/path/(\d+)/$}  => @CALLBACKS,  $HANDLER,
+            ...
+        );
 
-      If optional METHOD parameter defined, then all mapping rules in this
-      setup_path() call will be applied only for requests with that HTTP
-      method. If METHOD doesn't used, then these rules will be applied to
-      all HTTP methods. If some path match both rules defined for current
-      HTTP method and rules defined for any HTTP methods, will be used rule
-      defined for current HTTP method.
+    Configure mapping of url's path to handler subroutine (which will be
+    used by path2view()). Can be called multiple times and will just add
+    new mapping rules on each call.
 
-      MATCH parameter should be either SCALAR (string equal to url path) or
-      Regexp (which can match any part of url path).
+    If optional METHOD parameter defined, then all mapping rules in this
+    setup_path() call will be applied only for requests with that HTTP
+    method. If METHOD doesn't used, then these rules will be applied to all
+    HTTP methods. If some path match both rules defined for current HTTP
+    method and rules defined for any HTTP methods, will be used rule
+    defined for current HTTP method.
 
-      HANDLER is REF to your subroutine, which will be returned by
-      path2view() when this rule will match current url.
+    MATCH parameter should be either SCALAR (string equal to url path) or
+    Regexp (which can match any part of url path).
 
-      Between MATCH and HANDLER any amount of optional CALLBACK subroutines
-      can be used. These CALLBACKs will be called when MATCH rule matches
-      current url with two parameters: CGI::Easy::Request object and
-      ARRAYREF with contents of all capturing parentheses (when MATCH rule
-      is Regexp with capturing parentheses). Usual task for such CALLBACKs
-      is convert "hidden" CGI parameters included in url path into usual
-      $r->{GET} parameters.
+    HANDLER is REF to your subroutine, which will be returned by
+    path2view() when this rule will match current url.
 
-      Return nothing.
+    Between MATCH and HANDLER any amount of optional CALLBACK subroutines
+    can be used. These CALLBACKS will be called when MATCH rule matches
+    current url with two parameters: CGI::Easy::Request object and ARRAYREF
+    with contents of all capturing parentheses (when MATCH rule is Regexp
+    with capturing parentheses). Usual task for such CALLBACKS is convert
+    "hidden" CGI parameters included in url path into usual $r->{GET}
+    parameters.
 
-    path2view( $r )
+    Return nothing.
 
-      Take CGI::Easy::Request object as parameter, and analyse this request
-      according to rules defined previously using setup_path().
+ path2view
 
-      Return: HANDLER if find rule which match current request, else
-      undef().
+        $handler = path2view( $r );
 
-    set_param( @names )
+    Take CGI::Easy::Request object as parameter, and analyse this request
+    according to rules defined previously using setup_path().
 
-      Take names of {GET} parameters which should be set using parts of url
-      path selected by capturing parentheses in MATCH Regexp.
+    Return: HANDLER if find rule which match current request, else undef().
 
-      Return CALLBACK subroutine suitable for using in setup_path().
+ set_param
 
-    setup_view( HANDLER => PATH, ... )
+        $callback = set_param( @names );
 
-      Configure mapping of handler subroutine to url path (which will be
-      used by view2path()). Can be called multiple times and will just add
-      new mapping rules on each call.
+    Take names of {GET} parameters which should be set using parts of url
+    path selected by capturing parentheses in MATCH Regexp.
 
-      HANDLER must be REF to user's subroutine used to handle requests on
-      PATH.
+    Return CALLBACK subroutine suitable for using in setup_path().
 
-      PATH can be either STRING or ARRAYREF.
+ setup_view
 
-      If PATH is ARRAYREF, then this array should consist of CALLBACK =>
-      TEMPLATE pairs. CALLBACK is subroutine which will be executed by
-      view2path() with single parameter \%params, and should return either
-      FALSE if this CALLBACK unable to handle these %params, or ARRAYREF
-      with values to substitute into path TEMPLATE. TEMPLATE is path STRING
-      which may contain '?' symbols - these will be replaced by values
-      returned in ARRAYREF by CALLBACK which successfully handle %params.
+        setup_view(
+            \&HANDLER1 => $PATH,
+            \&HANDLER2 => \@PATH,
+            ...
+        );
 
-      Example: map \&handler to /first/ or /second/ with 50% probability
+    Configure mapping of handler subroutine to url path (which will be used
+    by view2path()). Can be called multiple times and will just add new
+    mapping rules on each call.
 
-          setup_view(
-              \&handler   => [
-                  sub { return rand < 0.5 ? [] : undef }  => '/first/',
-                  sub { return []                      }  => '/second/',
-              ],
-          );
+    HANDLER must be REF to user's subroutine used to handle requests on
+    PATH.
 
-      Example: map \&handler to random article with id 0-999
+    PATH can be either STRING or ARRAYREF.
 
-          setup_view(
-              \&handler   => [
-                  sub { return [ int rand 1000 ] }    => '/article/?/',
-              ],
-          );
+    If PATH is ARRAYREF, then this array should consist of CALLBACK =>
+    TEMPLATE pairs. CALLBACK is subroutine which will be executed by
+    view2path() with single parameter \%params, and should return either
+    FALSE if this CALLBACK unable to handle these %params, or ARRAYREF with
+    values to substitute into path TEMPLATE. TEMPLATE is path STRING which
+    may contain '?' symbols - these will be replaced by values returned in
+    ARRAYREF by CALLBACK which successfully handle %params.
 
-      Return nothing.
+    Example: map \&handler to /first/ or /second/ with 50% probability
 
-    view2path( HANDLER, %params )
+        setup_view(
+            \&handler   => [
+                sub { return rand < 0.5 ? [] : undef }  => '/first/',
+                sub { return []                      }  => '/second/',
+            ],
+        );
 
-      Take user handler subroutine and it parameters, and convert it to url
-      according to rules defined previously using setup_view().
+    Example: map \&handler to random article with id 0-999
 
-      Example:
+        setup_view(
+            \&handler   => [
+                sub { return [ int rand 1000 ] }    => '/article/?/',
+            ],
+        );
 
-          setup_view(
-              \&handler   => 'index.php',
-          );
-          my $url = view2path(\&handler, a=>'some string', b=>[6,7]);
-          # $url will be: 'index.php?a=some%20string&b=6&b=7'
+    Return nothing.
 
-      If simple mapping from STRING to HANDLER was defined using
-      setup_path(), and this is only mapping to HANDLER defined, then it's
-      not necessary to define reverse mapping using setup_view() - it will
-      be defined automatically.
+ view2path
 
-      Example:
+        $url = view2path( \&HANDLER, %params );
 
-          setup_path(
-              '/articles/'    => \&list_articles,
-          );
-          my $url = view2path(\&list_articles);
-          # $url will be: '/articles/'
+    Take user handler subroutine and it parameters, and convert it to url
+    according to rules defined previously using setup_view().
 
-      Return: url. Throw exception if unable to make url.
+    Example:
 
-    with_params( @names )
+        setup_view(
+            \&handler   => 'index.php',
+        );
+        my $url = view2path(\&handler, a=>'some string', b=>[6,7]);
+        # $url will be: 'index.php?a=some%20string&b=6&b=7'
 
-      Take names of parameters which must exists in %params given to
-      view2path().
+    If simple mapping from STRING to HANDLER was defined using
+    setup_path(), and this is only mapping to HANDLER defined, then it's
+    not necessary to define reverse mapping using setup_view() - it will be
+    defined automatically.
 
-      Return CALLBACK subroutine suitable for using in setup_view().
+    Example:
+
+        setup_path(
+            '/articles/'    => \&list_articles,
+        );
+        my $url = view2path(\&list_articles);
+        # $url will be: '/articles/'
+
+    Return: url. Throw exception if unable to make url.
+
+ with_params
+
+        $callback = with_params( @names );
+
+    Take names of parameters which must exists in %params given to
+    view2path().
+
+    Return CALLBACK subroutine suitable for using in setup_view().
 
 SUPPORT
 
@@ -296,8 +320,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2009-2010 by Alex Efros
-    <powerman@cpan.org>.
+    This software is Copyright (c) 2009- by Alex Efros <powerman@cpan.org>.
 
     This is free software, licensed under:
 

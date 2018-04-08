@@ -9,7 +9,9 @@ use Test::EOL;
 my @files = (
     'lib/Dist/Zilla/Plugin/VersionFromMainModule.pm',
     't/00-report-prereqs.dd',
-    't/00-report-prereqs.t'
+    't/00-report-prereqs.t',
+    't/01-basic.t',
+    't/02-env-v.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

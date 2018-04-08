@@ -1,16 +1,17 @@
 package Pg::CLI::Role::Connects;
-{
-  $Pg::CLI::Role::Connects::VERSION = '0.11';
-}
 
-use Moose::Role;
-
+use strict;
+use warnings;
 use namespace::autoclean;
+
+our $VERSION = '0.13';
 
 use IPC::Run3 qw( run3 );
 use MooseX::Params::Validate qw( validated_hash validated_list );
-use MooseX::SemiAffordanceAccessor;
 use MooseX::Types::Moose qw( ArrayRef Bool Defined Str );
+
+use Moose::Role;
+use MooseX::SemiAffordanceAccessor;
 
 with 'Pg::CLI::Role::HasVersion';
 
@@ -49,7 +50,9 @@ sub run {
             @{$options},
             ( $database && $self->_database_at_end() ? $database : () ),
         ],
-        $stdin, $stdout, $stderr,
+        $stdin,
+        $stdout,
+        $stderr,
     );
 }
 
@@ -110,3 +113,5 @@ sub _connect_options {
 }
 
 1;
+
+=for Pod::Coverage run

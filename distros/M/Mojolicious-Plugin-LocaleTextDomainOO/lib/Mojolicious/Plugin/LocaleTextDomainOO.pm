@@ -9,7 +9,7 @@ use I18N::LangTags::Detect;
 
 use constant DEBUG => $ENV{MOJO_I18N_DEBUG} || 0;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has 'po' => sub { Locale::TextDomain::OO::Lexicon::File::PO->new };
 has 'mo' => sub { Locale::TextDomain::OO::Lexicon::File::MO->new };
@@ -402,6 +402,12 @@ See L<Locale::TextDomain::OO::Plugin::Expand::Gettext>
 
     # In template
     <%= __d 'domain', 'hello' %>
+
+    # begin, end
+    <%= __begin_d 'domain' %>
+        <%= __ 'hello' %>
+        <%= __ 'hello2' %>
+    <%= __end_d %>
 
 See L<Locale::TextDomain::OO::Plugin::Expand::Gettext::DomainAndCategory>
 

@@ -30,7 +30,6 @@ do { my $x = {
                                       'Test::Synopsis' => '0',
                                       'Test::Vars' => '0.009',
                                       'Test::Version' => '2.05',
-                                      'blib' => '1.01',
                                       'perl' => '5.006'
                                     }
                     },

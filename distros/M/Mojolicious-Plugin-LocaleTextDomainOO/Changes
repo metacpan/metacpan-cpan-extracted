@@ -1,5 +1,8 @@
 Revision history for Perl extension Mojolicious-Plugin-LocaleTextDomainOO
 
+0.05 2018-04-05T21:25:22Z
+    - bump version inherits modules
+
 0.04 2016-08-20T01:57:44Z
 
     - fix TextDomain bugfix. (__begin_d, __end_d)

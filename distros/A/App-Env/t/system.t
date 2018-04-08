@@ -1,11 +1,11 @@
 #!perl
 
-use Test::More tests => 12;
+use Test2::V0;
+use Test::Lib;
 
 use strict;
 use warnings;
 
-use lib 't';
 use File::Temp;
 use File::Spec::Functions qw[ catfile ];
 
@@ -31,7 +31,7 @@ my $badscript = catfile( qw [ t script_no_exist ] );
     my $tmp = File::Temp->new;
 
     eval {
-	$app1->system( $^X,  $script, $tmp->filename );
+        $app1->system( $^X,  $script, $tmp->filename );
     };
 
     is( $@, '', 'successful system call: SysFatal' );
@@ -55,7 +55,7 @@ my $badscript = catfile( qw [ t script_no_exist ] );
     my $tmp = File::Temp->new;
 
     eval {
-	$app1->system( $^X,  $badscript, $tmp->filename );
+        $app1->system( $^X,  $badscript, $tmp->filename );
     };
 
     isnt( $@, '', 'unsuccessful system call: SysFatal' );
@@ -100,3 +100,5 @@ my $badscript = catfile( qw [ t script_no_exist ] );
     is( $output, undef, 'qexec: bad script' );
     App::Env::Site1::App1::reset();
 }
+
+done_testing;

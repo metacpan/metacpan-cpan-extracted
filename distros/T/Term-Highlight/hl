@@ -3,7 +3,7 @@
 use Term::Highlight ();
 
 ( $PROGNAME = $0 ) =~ s/.*\///;
-$VERSION = "2.0.0";
+$VERSION = "2.0.2";
 $TAGTYPE = "term";
 $RC_FILE = "$ENV{ HOME }/.hlrc";
 $SNIPPET_PTN = qr/^\s*snippet\s+(\S+)\s+(.*)/;
@@ -167,6 +167,7 @@ sub Flush
 
 push @Hl_args, split '\s+', $ENV{ HL_INITSTRING } if exists
                                                         $ENV{ HL_INITSTRING };
+my $Hl_args = 0;
 
 $TAGTYPE = "none" unless -t STDOUT;
 
@@ -206,7 +207,7 @@ while ( my $arg = shift )
         }
         if ( $arg =~ $CTX_OPT_PTN )
         {
-            my $value = ( $1 eq undef ) ? shift : $1;
+            my $value = $1 eq '' ? shift : $1;
             die "Unrecognized context pattern" unless $value =~ $CTX_PTN;
             $Grep = 1;
             $CtxPre = $1 || 0;
@@ -214,7 +215,7 @@ while ( my $arg = shift )
         }
         if ( $arg =~ $SNIPPET_OPT_PTN )
         {
-            my $snippet = ( $1 eq undef ) ? shift : $1;
+            my $snippet = $1 eq '' ? shift : $1;
             LoadSnippets( $snippet ) unless exists $Snippets{ $snippet };
             die "Snippet '$snippet' failed to load"
                                             unless exists $Snippets{ $snippet };
@@ -257,7 +258,7 @@ if ( $UTF8Support )
 }
 $hl->LoadArgs( \@Hl_args );
 my $Patterns = $hl->GetPatterns();
-my $AlwaysMatches = @$Patterns && $$Patterns[ 0 ][ 0 ] eq undef;
+my $AlwaysMatches = @$Patterns && ! defined $$Patterns[ 0 ][ 0 ];
 
 my @Files = @ARGV;
 my $ManyFiles = @Files > 1;
@@ -359,6 +360,7 @@ if ( $GrepRecursively )
         (
             sub
             {
+                no warnings 'once';     #for $File::Find::name
                 my ( $FullFile, $File, $FileIsBinary ) =
                                             ( $File::Find::name, $_, -B $_ );
                 return unless -f $File;
@@ -382,12 +384,16 @@ if ( $GrepRecursively )
                 while ( <$FileHandle> )
                 {
                     my $matches = $AlwaysMatches;
-                    unless ( $matches )
+                    my ( $line, $end ) = ( $_, '' );
+                    my $was_split = 0;
+                    if ( ! $matches && @$Patterns )
                     {
-                        ( my $stripped_line = $_ ) =~ s/\R$//;
+                        ( $line, $end ) = split( /(?=\R$)/, "x$_", 2 );
+                        substr( $line, 0, 1 ) = '';
+                        $was_split = 1;
                         for my $ptn ( @$Patterns )
                         {
-                            if ( $stripped_line =~ @$ptn[ 0 ] )
+                            if ( $line =~ @$ptn[ 0 ] )
                             {
                                 $matches = 1;
                                 last;
@@ -408,8 +414,17 @@ if ( $GrepRecursively )
                         ! $CheckCtx && ! $matches;
                     $Location = $LineNumbers ? $FullFile . ':' . $. : $FullFile;
                     $hl_loc->Process( \$Location ) if defined $hl_loc;
-                    $hl->Process( \$_ ) if $matches && $_ ne "\n";
-                    print "$Location: $_";
+                    if ( $matches )
+                    {
+                        unless ( $was_split )
+                        {
+                            ( $line, $end ) = split( /(?=\R$)/, "x$_", 2 );
+                            substr( $line, 0, 1 ) = '';
+                        }
+                        $hl->Process( \$line ) if $line ne '';
+                    }
+                    $end //= '';
+                    print "$Location: $line$end";
                     $LastLine = $.;
                 }
                 close $FileHandle;
@@ -466,12 +481,16 @@ else
             #Notice that newline characters get removed from the current line
             #before the check
             my $matches = $AlwaysMatches;
-            unless ( $matches )
+            my ( $line, $end ) = ( $_, '' );
+            my $was_split = 0;
+            if ( ! $matches && @$Patterns )
             {
-                ( my $stripped_line = $_ ) =~ s/\R$//;
+                ( $line, $end ) = split( /(?=\R$)/, "x$_", 2 );
+                substr( $line, 0, 1 ) = '';
+                $was_split = 1;
                 for my $ptn ( @$Patterns )
                 {
-                    if ( $stripped_line =~ @$ptn[ 0 ] )
+                    if ( $line =~ @$ptn[ 0 ] )
                     {
                         $matches = 1;
                         last;
@@ -498,11 +517,20 @@ else
                 $Location .= ': ';
             }
             #call Process() only when line matches and is not empty
-            $hl->Process( \$_ ) if $matches && $_ ne "\n";
+            if ( $matches )
+            {
+                unless ( $was_split )
+                {
+                    ( $line, $end ) = split( /(?=\R$)/, "x$_", 2 );
+                    substr( $line, 0, 1 ) = '';
+                }
+                $hl->Process( \$line ) if $line ne '';
+            }
             #debug purpose
             #print "$_->[ 0 ], $_->[ 1 ], $_->[ 2 ], $_->[ 3 ], ",
-            #      "@${ $_->[ 4 ] }\n" foreach $hl->Process( \$_ );
-            print $Location, $_;
+            #      "@${ $_->[ 4 ] }\n" foreach $hl->Process( \$line );
+            $end //= '';
+            print $Location, "$line$end";
             $LastLine = $.;
         }
         close $FileHandle;
@@ -741,7 +769,7 @@ Alexey Radkov <alexey.radkov@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2016 by A. Radkov.
+Copyright (C) 2008-2018 by A. Radkov.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

@@ -117,8 +117,8 @@ NIR - Northern Ireland
 =head1 GENERATING THE DATA
 
 The source for this package is generated via a script, included with the
-distribution (L<share/generate_date_holidays_gb.pl>). This downloads the
-latest iCal files from L<http://www.gov.uk/>, and could be used to
+distribution (C<share/generate_date_holidays_gb.pl>). This downloads the
+latest JSON files from L<http://www.gov.uk/>, and could be used to
 update/alter the package if necessary.
 
 =head1 SEE ALSO
@@ -135,7 +135,7 @@ L<Date::Holidays::UK> - not currently updated
 
 =item *
 
-L<Date::Holidays::UK::EnglandAndWales> - not currently updated
+L<Date::Holidays::UK::EnglandAndWales> - only England and Wales
 
 =item *
 
@@ -174,7 +174,7 @@ Michael Jemmeson <mjemmeson@cpan.org>
 
 =head1 COPYRIGHT
 
-This software is copyright (c) 2013-2017 by Michael Jemmeson.
+This software is copyright (c) 2013-2018 by Michael Jemmeson.
 
 =head1 LICENSE
 

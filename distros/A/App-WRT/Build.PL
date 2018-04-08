@@ -19,6 +19,7 @@ my $build = Module::Build->new(
     'POSIX'                    => 0,
     'Text::Markdown::Discount' => '0.11',
     'Text::Textile'            => 0,
+    'Time::HiRes'              => 0,
     'XML::Atom::SimpleFeed'    => '0.8',
     'XML::Feed'                => 0,
     'perl'                     => '5.10.0',

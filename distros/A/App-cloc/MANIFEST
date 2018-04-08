@@ -1,6 +1,7 @@
 bin/cloc
 Changes
 lib/App/cloc.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.md

@@ -4,13 +4,13 @@
       "Alex Efros <powerman@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "IO-Stream",
    "no_index" : {
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.15",
+            "Dist::Milla" : "v1.0.18",
             "Test::Distribution" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41"
@@ -61,23 +61,23 @@
    "provides" : {
       "IO::Stream" : {
          "file" : "lib/IO/Stream.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "IO::Stream::EV" : {
          "file" : "lib/IO/Stream/EV.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "IO::Stream::Noop" : {
          "file" : "lib/IO/Stream/Noop.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "IO::Stream::NoopAlias" : {
          "file" : "lib/IO/Stream/NoopAlias.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       },
       "IO::Stream::const" : {
          "file" : "lib/IO/Stream/const.pm",
-         "version" : "v2.0.2"
+         "version" : "v2.0.3"
       }
    },
    "release_status" : "stable",
@@ -92,6 +92,7 @@
          "web" : "https://github.com/powerman/perl-IO-Stream"
       }
    },
-   "version" : "v2.0.2"
+   "version" : "v2.0.3",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

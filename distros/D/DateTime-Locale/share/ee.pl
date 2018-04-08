@@ -51,8 +51,8 @@
     yMd => "M/d/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'k\N{U+0254}si\N{U+0256}a' w 'lia' 'le' '\N{U+0192}e' Y 'me'",
-    "yw-count-other" => "'k\N{U+0254}si\N{U+0256}a' w 'lia' 'le' '\N{U+0192}e' Y 'me'",
+    "yw-count-one" => "'k\N{U+0254}si\N{U+0256}a' w 'lia' 'le' '\N{U+0192}e' y 'me'",
+    "yw-count-other" => "'k\N{U+0254}si\N{U+0256}a' w 'lia' 'le' '\N{U+0192}e' y 'me'",
   },
   code => "ee",
   date_format_full => "EEEE, MMMM d 'lia' y",
@@ -269,5 +269,5 @@
   time_format_medium => "a 'ga' h:mm:ss",
   time_format_short => "a 'ga' h:mm",
   variant => undef,
-  version => 32,
+  version => 33,
 }

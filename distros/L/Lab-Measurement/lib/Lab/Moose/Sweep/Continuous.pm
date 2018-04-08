@@ -1,11 +1,10 @@
 package Lab::Moose::Sweep::Continuous;
-$Lab::Moose::Sweep::Continuous::VERSION = '3.623';
-#ABSTRACT: Base class for continuous sweeps (temperature, magnetic field)
+$Lab::Moose::Sweep::Continuous::VERSION = '3.624';
+#ABSTRACT: Base class for continuous sweeps (time, temperature, magnetic field)
 
 
 use 5.010;
 use Moose;
-use Moose::Util::TypeConstraints 'enum';
 use MooseX::Params::Validate;
 
 # Do not import all functions as they clash with the attribute methods.
@@ -166,11 +165,11 @@ __END__
 
 =head1 NAME
 
-Lab::Moose::Sweep::Continuous - Base class for continuous sweeps (temperature, magnetic field)
+Lab::Moose::Sweep::Continuous - Base class for continuous sweeps (time, temperature, magnetic field)
 
 =head1 VERSION
 
-version 3.623
+version 3.624
 
 =head1 SYNOPSIS
 

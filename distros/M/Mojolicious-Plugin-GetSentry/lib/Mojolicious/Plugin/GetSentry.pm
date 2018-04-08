@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::GetSentry;
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '1.1.4';
+our $VERSION = '1.1.6';
 
 use Data::Dump 'dump';
 use Devel::StackTrace::Extract;
@@ -17,6 +17,15 @@ has 'processors' => sub { [] };
 
 has 'raven' => sub {
     my $self = shift;
+
+    foreach my $processor (@{ $self->processors }) {
+        eval {
+            require $processor;
+            $processor->import;
+        };
+
+        warn $@ if $@;
+    }
 
     return Sentry::Raven->new(
         sentry_dsn  => $self->sentry_dsn,

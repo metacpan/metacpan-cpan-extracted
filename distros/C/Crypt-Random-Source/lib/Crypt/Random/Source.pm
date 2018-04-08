@@ -1,7 +1,7 @@
-package Crypt::Random::Source; # git description: v0.11-3-gecbdd17
+package Crypt::Random::Source; # git description: v0.12-8-g931bd93
 # ABSTRACT: Get weak or strong random data from pluggable sources
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use strict;
 use 5.008;
@@ -46,7 +46,7 @@ Crypt::Random::Source - Get weak or strong random data from pluggable sources
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -93,7 +93,7 @@ Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Di
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Florian Ragwitz Graham Knop David Pottage Max Kanat-Alexander
+=for stopwords Karen Etheridge Florian Ragwitz Graham Knop David Pottage Max Kanat-Alexander Edward Betts
 
 =over 4
 
@@ -116,6 +116,10 @@ David Pottage <spudsoup@cpan.org>
 =item *
 
 Max Kanat-Alexander <mkanat@es-compy.(none)>
+
+=item *
+
+Edward Betts <edward@4angle.com>
 
 =back
 

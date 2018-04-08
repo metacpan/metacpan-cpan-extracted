@@ -7,6 +7,8 @@ META.yml
 Makefile.PL
 README
 dist.ini
+lib/WordList/Bloom/Password/10Million/Top100000.pm
+lib/WordList/Bloom/Password/10Million/Top1000000.pm
 lib/WordList/Password/10Million/Top100000.pm
 lib/WordList/Password/10Million/Top1000000.pm
 lib/WordLists/Password/10Million.pm

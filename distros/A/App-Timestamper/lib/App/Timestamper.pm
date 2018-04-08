@@ -1,5 +1,5 @@
 package App::Timestamper;
-$App::Timestamper::VERSION = '0.0.7';
+$App::Timestamper::VERSION = '0.2.0';
 use 5.014;
 use strict;
 use warnings;
@@ -83,7 +83,7 @@ App::Timestamper - prefix lines with the timestamps of their arrivals.
 
 =head1 VERSION
 
-version 0.0.7
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -145,29 +145,23 @@ Hope it helps.
 
 =encoding utf8
 
+=head1 VERSION
+
+version 0.2.0
+
 =head1 COMMON REQUESTS
 
 =head2 Can you add an option to provide formatting options to the timestamp?
 
 This was requested here -
 L<https://rt.cpan.org/Public/Bug/Display.html?id=106258> - and my reply was
-that it can be easily implemented as a post-processing filter and so may be
+that it may be
 considered unnecessary feature creep, which may also hurt performance.
-However, since this may be a common request, I have added the
-“./contrib/ts-format” program that can be used for that:
 
-    $ export TIMESTAMPER_FORMAT="%Y-%m-%d-%H:%M:%S"
-    $ cat | timestamper | ./contrib/ts-format
-    Hello
-    There
-    Good
-    2015-09-19-14:05:01     Hello
-    2015-09-19-14:05:03     There
-    2015-09-19-14:05:05     Good
+Nevertheless, I implemented a separate CPAN distribution and executable
+to do that - see L<App::Timestamper::Format> .
 
 Enjoy!
-
-I may fork it into its own CPAN distribution in the future.
 
 =head2 I want a Pony!
 
@@ -236,8 +230,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Timestamper or by email to
-bug-app-timestamper@rt.cpan.org.
+L<https://github.com/shlomif/App-Timestamper/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -266,7 +259,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/App-Timestamper>
+L<https://metacpan.org/release/App-Timestamper>
 
 =item *
 
@@ -302,14 +295,6 @@ L<http://cpanratings.perl.org/d/App-Timestamper>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/App-Timestamper>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -320,7 +305,7 @@ L<http://cpants.cpanauthors.org/dist/App-Timestamper>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/A/App-Timestamper>
 
@@ -356,6 +341,6 @@ from your repository :)
 
 L<https://github.com/shlomif/App-Timestamper>
 
-  git clone git://github.com/shlomif/perl-App-Timestamper.git
+  git clone git://github.com/shlomif/App-Timestamper.git
 
 =cut

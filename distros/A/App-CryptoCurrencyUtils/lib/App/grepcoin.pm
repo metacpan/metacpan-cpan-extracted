@@ -1,7 +1,7 @@
 package App::grepcoin;
 
-our $DATE = '2018-03-08'; # DATE
-our $VERSION = '0.011'; # VERSION
+our $DATE = '2018-04-06'; # DATE
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict;
@@ -42,7 +42,7 @@ _
         my @coins;
         my $cat = CryptoCurrency::Catalog->new;
         for ($cat->all_data) {
-            push @coins, "$_->{name} ($_->{symbol})\n";
+            push @coins, "$_->{name} ($_->{code})\n";
         }
 
         $args{_source} = sub {
@@ -72,7 +72,7 @@ App::grepcoin - Grep cryptocurrency coins
 
 =head1 VERSION
 
-This document describes version 0.011 of App::grepcoin (from Perl distribution App-CryptoCurrencyUtils), released on 2018-03-08.
+This document describes version 0.012 of App::grepcoin (from Perl distribution App-CryptoCurrencyUtils), released on 2018-04-06.
 
 =head1 FUNCTIONS
 

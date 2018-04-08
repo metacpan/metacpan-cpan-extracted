@@ -1,4 +1,3 @@
-.DS_Store
 lib/Apache2/AMFWURFLFilter.pm
 lib/Apache2/AMFWURFLFilterMemcached.pm
 lib/Apache2/AMFDetectRightFilter.pm

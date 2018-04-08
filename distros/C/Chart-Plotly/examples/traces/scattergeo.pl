@@ -1,7 +1,7 @@
 use Chart::Plotly;
 use Chart::Plotly::Plot;
 use Chart::Plotly::Trace::Scattergeo;
-use Chart::Plotly::Trace::Attribute::Marker;
+use Chart::Plotly::Trace::Scattergeo::Marker;
 my $scattergeo = Chart::Plotly::Trace::Scattergeo->new(
     mode => 'markers+text',
     text => [ 'Mount Everest', 'K2',      'Kangchenjunga', 'Lhotse', 'Makalu', 'Cho Oyu',
@@ -26,7 +26,7 @@ my $scattergeo = Chart::Plotly::Trace::Scattergeo->new(
                       'bottom center',
                       'top center'
     ],
-    marker => Chart::Plotly::Trace::Attribute::Marker->new(
+    marker => Chart::Plotly::Trace::Scattergeo::Marker->new(
                                                    size  => 7,
                                                    color => [
                                                        '#bebada', '#fdb462', '#fb8072', '#d9d9d9', '#bc80bd', '#b3de69',

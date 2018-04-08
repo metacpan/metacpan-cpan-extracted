@@ -16,9 +16,12 @@ use File::Temp qw/ tempfile tempdir /;
 use FB3::Validator;
 use utf8;
 use Encode qw(encode_utf8 decode_utf8);
-use HTML::Entities;
+use XML::Entities;
+use XML::Entities::Data;
+use Time::HiRes qw(gettimeofday sleep);
+binmode(STDOUT,':utf8');
 
-our $VERSION = 0.03;
+our $VERSION = 0.05;
 
 =head1 NAME
 
@@ -44,7 +47,16 @@ my @BlockLevel =
 ('address','article','aside','blockquote','canvas','dd','div','dl','dt','fieldset','figcaption','figure','footer','form',
 'h1','h2','h3','h4','h5','h6',
 'header','hr','li','main','nav','noscript','ol','output','p','pre','section','table','tfoot','ul','video',
+#формально не блок-левел, но нам их тоже приводить к нормальному виду
+'th','tr','td'
 );
+
+my $AllEntities = XML::Entities::Data::all;
+delete $AllEntities->{'lt'};
+delete $AllEntities->{'gt'};
+delete $AllEntities->{'quot'};
+delete $AllEntities->{'apos'};
+delete $AllEntities->{'amp'};
 
 #Элементы, которые парсим в контенте и сохраняем в структуру 
 our $ElsMainList = {
@@ -55,26 +67,52 @@ our $ElsMainList = {
   'sup'=>undef,
   'code'=>undef,
   'img'=>undef,
-  'u'=>'underline', #переименование дочерней ноды
-  'underline'=>undef, #разрешение переименованной ноды
-  'b'=>'strong', #переименование дочерней ноды
-  'strong'=>undef, #разрешение переименованной ноды
+  'i'=>undef,
+  'u'=>undef,
+  'underline'=>undef,
+  'b'=>undef,
+  'strong'=>undef,
 };
 
+our $ElsMainList2={};
+map {$ElsMainList2->{$_}=undef;} keys %$ElsMainList;
+$ElsMainList2->{p}=undef;
+
 my %AllowElementsMain = (
+  'table' => {
+    'allow_attributes' => ['id'],
+    'allow_elements_inside' => {'tr'=>undef},
+  },
+  'tr' => {
+    'allow_attributes' => ['id','align'],
+    'allow_elements_inside' => {'th'=>undef,'td'=>undef},
+  },
+  'th' => {
+    'allow_attributes' => ['colspan','rowspan','align','valign'],
+    'allow_elements_inside' => $ElsMainList2,
+  },
+  'td' => {
+    'allow_attributes' => ['colspan','rowspan','align','valign'],
+    'allow_elements_inside' => $ElsMainList2,
+  },
+  'i' => {
+    'allow_attributes' => [],
+    'allow_elements_inside' => $ElsMainList,
+  },
   'strong' => {
     'allow_attributes' => ['id'],
     'allow_elements_inside' => $ElsMainList,
   },
   'underline' => {
-    'allow_attributes' => []  
+    'allow_attributes' => ['id'],
+    'allow_elements_inside' => $ElsMainList,
   },
   'em' => {
-    'allow_attributes' => [],
-        'allow_elements_inside' => {span=>undef}
+    'allow_attributes' => ['id'],
+    'allow_elements_inside' => $ElsMainList,
   },
   'u' => {
-    'allow_attributes' => []  
+    'allow_attributes' => ['id']  
   },
   'sup' => {
     'allow_attributes' => ['id']  
@@ -85,6 +123,7 @@ my %AllowElementsMain = (
   'p' => {
     'allow_attributes' => ['id'],
     'allow_elements_inside' => $ElsMainList,
+    'exclude_if_inside' => ['ul','ol','table'], #с этими вариантами лучше схлопнуться родительскому 'p'
   },
   'span' => {
     'allow_attributes' => ['id'],
@@ -125,6 +164,7 @@ my %AllowElementsMain = (
       'h4'=>undef,
       'h5'=>undef,
       'h6'=>undef,
+      'table'=>undef,
       'ul'=>undef, 
       'ol'=>undef, #полноправные элементы корня
       'p'=>undef,  # см. ^^^
@@ -382,6 +422,9 @@ sub new {
   $X->{'allow_elements'} = \%AllowElementsMain;
   $X->{'href_list'} = {}; #собираем ссылки в документе
   $X->{'id_list'} = {}; #собираем ссылки в документе
+  $X->{'bench'} = $Args{'bench'} ? 1 : 0; #бенчмарк режим в stdout
+  $X->{'bench2file'} = $Args{'bench2file'} ? $Args{'bench2file'} : 0; #бенчмарк режим в файл
+  $X->{'bench_list'} = {}; #бенчмарк режим
 
   #Наша внутренняя структура данных конвертора. шаг влево  - расстрел
   $X->{'STRUCTURE'} = {
@@ -486,8 +529,15 @@ sub Reap {
   my $File = $X->{'Source'};
 
   $X->Msg("working with file ".$File."\n",'w',1) if $X->{'showname'} || $X->{'verbose'};
+
+  $X->_bs('unpack','Распаковка Epub');
   $File = $Processor->{class}->_Unpacker($X,$File) if $Processor->{'unpack'};
+  $X->_be('unpack');
+
+  $X->_bs('reap','Потрошение Epub, cборка данных');
   $Processor->{'class'}->Reaper($X, source => ($File || $X->{'Source'}));
+  $X->_be('reap');
+
   return $X->{'STRUCTURE'};
 }
 
@@ -602,6 +652,8 @@ sub FB3Create {
     'xmlns:xlink'=>"http://www.w3.org/1999/xlink",
     'id'=>$GlobalID,
   };
+
+  $X->_bs('Obj2DOM_body','PAGES => DOM');
   my $Body = Obj2DOM($X,
               obj=>{
                 attributes=>{CP_compact=>1},
@@ -609,12 +661,18 @@ sub FB3Create {
               },
               root=>{name=>'fb3-body', attributes=>$BodyAttr}
             );  
+  $X->_be('Obj2DOM_body');
   
   #финальное приведение section к валидному виду
   foreach my $Section ($XC->findnodes( "/fb3-body/section/section", $Body), $XC->findnodes( "/fb3-body/section", $Body)) {
     $Section = $X->Transform2Valid(node=>$Section);
   }
-  
+
+  #финальное приведение table к валидному виду
+  foreach my $Table ($XC->findnodes( "/fb3-body//table", $Body)) {
+    $Table = $X->TransformTable2Valid(node=>$Table);
+  }
+
   open FHbody, ">$FNbody" or die "$FNbody: $!";
   print FHbody $Body->toString(1);
   close FHbody;
@@ -622,8 +680,10 @@ sub FB3Create {
   #Пишем мету
   #Превращаем перл-структуру в DOM
   delete $Structure->{'PAGES'};
+  $X->_bs('Obj2DOM_meta','META => DOM');
   my $Doc = Obj2DOM($X, obj=>$Structure, like_parent=>0, compact=>0 ); 
-  
+  $X->_be('Obj2DOM_meta');
+
   #Пишем rels
   Msg($X,"FB3: Create /fb3/_rels/body.xml.rels\n","w");
   my $FNbodyrels="$FB3Path/fb3/_rels/body.xml.rels";
@@ -687,8 +747,7 @@ sub FB3Create {
     <main>}.$TitleInfo->{'BOOK-TITLE'}.qq{</main>
   </title>
   };
-  
-  
+    
   print FHdesc qq{<fb3-relations>
     };
 
@@ -920,9 +979,6 @@ sub Content2Tree {
       load_ext_dtd => 0, # полный молчок про dtd
   );
 
-  $Content = HTML::Entities::decode_entities($Content);
-  $Content =~ s/\&/&#38;/g;
-
   my $NodeDoc = $XMLDoc->parse_string('<root_fb3_container>'.$Content.'</root_fb3_container>') || die "Can't parse! ".$!;
 
   my $RootEl = $NodeDoc->getDocumentElement;
@@ -1097,6 +1153,7 @@ sub RealPath {
   my $RealPath = undef;
   
   if ($RealPath = Cwd::realpath($Path)) {
+    $RealPath =~ s/%20/ /g;
     my $RealPath2 = $RealPath;
     $RealPath2 =~ s/#.*$//g;
     $RealPath = undef if !-f $RealPath2 && !-d $RealPath2;
@@ -1178,6 +1235,29 @@ sub quot {
   $str  =~ s/"/&apos;/g;
 
   return $str;
+}
+
+sub qent {
+  my $X = shift;
+  my $Str = shift;
+
+  $Str =~ s/&#(0+)?60;/&lt;/g;
+  $Str =~ s/&#(0+)?62;/&gt;/g;
+  $Str =~ s/&#x(0+)?3e;/&gt;/gi;
+  $Str =~ s/&#x(0+)?3c;/&lt;/gi;
+
+  $Str =~ s/&#(0+)?38;/&amp;/g;
+  $Str =~ s/&#x(0+)?26;/&amp;/g;
+
+  $Str =~ s/&#(0+)?34;/&quot;/g;
+  $Str =~ s/&#x(0+)?22;/&quot;/g;
+
+  $Str =~ s/&#(0+)?39;/&apos;/g;
+  $Str =~ s/&#x(0+)?27;/&apos;/g;
+
+  XML::Entities::_decode_entities($Str, $AllEntities, 0);
+  $Str =~ s/&(?!amp;|quot;|apos;|lt;|gt;)/&amp;/gi;
+  return $Str;
 }
 
 sub html_trim {
@@ -1278,6 +1358,23 @@ sub Reaper {
   print "This method in package " . __PACKAGE__ . " and not defined in Processor class\n";
 }
 
+sub TransformTable2Valid {
+  my $X = shift;
+  my %Args = @_;
+  my $Node = $Args{'node'};
+
+  foreach my $TH ($Node->findnodes('./tr/th')) {
+    $TH->addChild(XML::LibXML::Text->new('')) unless $TH->getChildnodes;
+    $X->Transform2Valid(node=>$TH);
+  }
+  foreach my $TD ($Node->findnodes('./tr/td')) {
+    $TD->addChild(XML::LibXML::Text->new('')) unless $TD->getChildnodes;
+    $X->Transform2Valid(node=>$TD);
+  }
+
+  return $Node;
+}
+
 sub Transform2Valid {
   my $X = shift;
   my %Args = @_;
@@ -1291,7 +1388,7 @@ sub Transform2Valid {
   my $Wrap = XML::LibXML::Element->new("p");
 
   foreach my $Child ($Node->getChildnodes) {
-    if ($Child->nodeName =~ /^(p|ul|ol|title|subtitle|section)$/) {
+    if ($Child->nodeName =~ /^(p|table|ul|ol|title|subtitle|section)$/) {
       if ($Wrap->hasChildNodes) {
         #закроем текуший враппер и создадим новый
         $NewNode->addChild($Wrap->cloneNode(1));
@@ -1395,17 +1492,16 @@ sub CutLinkDiez {
 sub CorrectOuterLink{
   my $X = shift;
   my $Str = shift;
-  
+
   unless ($Str =~ /^(http|https|mailto|ftp)\:(.+)/i) {
     $X->Msg("Find not valid Link and delete [$Str]\n");
     return "";
   }
-  
-  
+
   my $Protocol = $1;
   my $Link = $2;
   $Link = $X->trim_soft($Link);
- 
+
   if ($Protocol eq 'mailto') {
     unless (ValidEMAIL($Link)) {
       $X->Msg("Find not valid Email and delete [".$Protocol.":".$Link."]\n");
@@ -1417,7 +1513,7 @@ sub CorrectOuterLink{
       return "";
     }
   }
-    
+
   return $Protocol.':'.$Link;
 }
 
@@ -1450,6 +1546,14 @@ sub ValidEMAIL{
   return 0 unless $Email;
   return 0 if length($Email)>50;
   return $Email=~ /^[-+a-z0-9_]+(\.[-+a-z0-9_]+)*\@([-a-z0-9_]+\.)+[a-z]{2,10}$/i;
+}
+
+sub ShitFix {
+  my $X = shift;
+  my $Str = shift;
+  # /i вызывает невероятные тормоза к сожалению
+  $Str =~ s#<([iI][mM][gG]) ([^>]+?/?)>\s*</\1>#<img $2 />#g; # <img> </img> => <img/>t
+  return $Str;
 }
 
 sub ParseMetaFile {
@@ -1513,6 +1617,88 @@ sub ParseMetaFile {
   }
 
 }
+
+### BENCHMARK
+
+#Точка старта
+sub _bs {
+  my $X = shift;
+  my $Key = shift;
+  my $Desc = shift || undef;
+  return if ( !(exists $X->{'bench'} && $X->{'bench'}) && !(exists $X->{'bench2file'} && $X->{'bench2file'}) );
+
+  $X->Error("Bench: _bs(); key not defined in string format") unless $Key;
+  $X->Error("Bench: _bs(): Key is not a string") if ref $Key;
+
+    $X->{'bench_list'}->{$Key} = {
+      'desc' => $Desc,
+      'timers' => []
+    } unless exists $X->{'bench_list'}->{$Key};
+  
+  my $Timers = $X->{'bench_list'}->{$Key}->{'timers'};
+
+  if (@$Timers) {
+    $X->Error("Bench: last timer don't closed with X->_be('$Key') function")
+      if exists $Timers->[scalar @$Timers - 1]->{'start'} && !exists $Timers->[scalar @$Timers - 1]->{'end'};
+  }
+
+  my $ts = gettimeofday();
+  push @$Timers, {
+    'start' => $ts,
+  };
+}
+
+#Точка окончания
+sub _be {
+  my $X = shift;
+  my $Key = shift;
+  return if ( !(exists $X->{'bench'} && $X->{'bench'}) && !(exists $X->{'bench2file'} && $X->{'bench2file'}) );
+
+  $X->Error("Bench: _be(); key not defined in string format") unless $Key;
+  $X->Error("Bench: _be(): Key is not a string") if ref $Key;
+
+  $X->Error("Bench: _be(); Key '$Key' not exists. Do you make X->_bs($Key)??") unless exists $X->{'bench_list'}->{$Key};
+
+  my $Timers = $X->{'bench_list'}->{$Key}->{'timers'};
+  $X->Error("Bench: _be(): Can't close timer. Two o more calls of _be($Key)??")
+    if exists $Timers->[scalar @$Timers - 1]->{'end'};
+  my $te = gettimeofday();
+  $Timers->[scalar @$Timers - 1]->{'end'} = $te;
+}
+
+#Сброс статистики
+sub _bf {
+  my $X = shift;
+  return if ( !(exists $X->{'bench'} && $X->{'bench'}) && !(exists $X->{'bench2file'} && $X->{'bench2file'}) );
+
+  my $Out = "BENCHMARK ".localtime().":\n\n";
+
+  foreach my $Key (sort keys %{$X->{'bench_list'}}) {
+    my $Item = $X->{'bench_list'}->{$Key};
+    my $Cnt = scalar @{$Item->{'timers'}};
+    my $Summ=0;
+    $Out .= "[key: '$Key'] ";
+    $Out .= "[cnt: $Cnt] ";
+    foreach my $t ( @{$Item->{'timers'}} ) {
+      $Summ += ($t->{'end'} - $t->{'start'});
+    }
+    $Out .= "[time: ".sprintf('%.4f',$Summ)." sec] ";
+    $Out .= "[avg: ".sprintf('%.4f',$Summ/$Cnt)." sec]\n";
+    $Out .= "desc: ".$Item->{'desc'}."\n\n" if $Item->{'desc'};
+  }
+
+  $X->{'bench_list'} = {};
+
+  $X->Msg("\n".$Out,'w',1) if $X->{'bench'};
+
+  if ($X->{'bench2file'}) {
+    open my $F,">>:utf8",$X->{'bench2file'} or die $!;
+    print $F $Out;
+    close $F;
+  }
+
+}
+
 
 =head1 LICENSE AND COPYRIGHT
 

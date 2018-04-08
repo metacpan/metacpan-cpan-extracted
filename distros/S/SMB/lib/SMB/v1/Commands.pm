@@ -1,4 +1,4 @@
-# SMB-Perl library, Copyright (C) 2014 Mikhael Goikhman, migo@cpan.org
+# SMB-Perl library, Copyright (C) 2014-2018 Mikhael Goikhman, migo@cpan.org
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -301,6 +301,7 @@ sub parse ($$) {
 	my $flags2 = $parser->uint16;
 	my $pid_h  = $parser->uint16;
 	my $sign   = $parser->bytes(8);
+	$parser->skip(2);  # reserved
 	my $tid    = $parser->uint16;
 	my $pid_l  = $parser->uint16;
 	my $uid    = $parser->uint16;

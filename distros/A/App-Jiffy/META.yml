@@ -24,8 +24,10 @@ no_index:
     - examples
 requires:
   Dancer: '0'
+  DateTime: '0'
+  DateTime::Format::Strptime: '0'
   JSON::MaybeXS: '0'
-  MongoDB: '0'
+  MongoDB: v1.0.0
   Moo: '0'
   YAML::Any: '0'
   perl: '5.008005'
@@ -33,4 +35,4 @@ resources:
   bugtracker: https://github.com/lejeunerenard/jiffy/issues
   homepage: https://github.com/lejeunerenard/jiffy
   repository: https://github.com/lejeunerenard/jiffy.git
-version: '0.05'
+version: '0.07'

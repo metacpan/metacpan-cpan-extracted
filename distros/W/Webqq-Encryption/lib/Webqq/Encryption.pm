@@ -6,7 +6,7 @@ use Webqq::Encryption::TEA;
 use Webqq::Encryption::RSA;
 our @EXPORT_OK = qw(pwd_encrypt pwd_encrypt_js);
 
-our $VERSION = "1.6";
+our $VERSION = "1.7";
 
 BEGIN{
     eval{require JE;};

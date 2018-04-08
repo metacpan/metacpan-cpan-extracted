@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes IO::Stream::Proxy::SOCKSv5 version v1.0.2
+    This document describes IO::Stream::Proxy::SOCKSv5 version v2.0.1
 
 SYNOPSIS
 
@@ -53,9 +53,14 @@ DESCRIPTION
 
 INTERFACE
 
-    new({ host=>$host, port=>$port })
+ new
 
-      Connect to proxy $host:$port.
+        $plugin = IO::Stream::Proxy::SOCKSv5->new({
+            host => $host,
+            port => $port,
+        });
+
+    Connect to proxy $host:$port.
 
 DIAGNOSTICS
 
@@ -126,7 +131,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2010 by Alex Efros <powerman@cpan.org>.
+    This software is Copyright (c) 2010- by Alex Efros <powerman@cpan.org>.
 
     This is free software, licensed under:
 

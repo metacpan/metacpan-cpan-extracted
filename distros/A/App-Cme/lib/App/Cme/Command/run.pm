@@ -1,7 +1,7 @@
 #
 # This file is part of App-Cme
 #
-# This software is Copyright (c) 2017 by Dominique Dumont.
+# This software is Copyright (c) 2014-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.026';
+$App::Cme::Command::run::VERSION = '1.027';
 use strict;
 use warnings;
 use 5.10.1;
@@ -77,18 +77,19 @@ sub execute {
     # see Debian #839593 and perlunicook(1) section X 13
     @$app_args = map { decode_utf8($_, 1) } @$app_args;
 
-    if ($opt->{list}) {
+    my $script_name = shift @$app_args;
+
+    if ($opt->{list} or not $script_name) {
         my @scripts;
         foreach my $path ( @script_paths ) {
             next unless $path->is_dir;
             push @scripts, grep { ! /~$/ } $path->children();
         }
-        say "Available scripts:";
+        say $opt->{list} ? "Available scripts:" : "Missing script argument. Choose one of:";
         say map {"- ".$_->basename."\n"} @scripts ;
         return;
     }
 
-    my $script_name = shift @$app_args;
     my $script;
 
     if ($script_name =~ m!/!) {
@@ -135,17 +136,21 @@ sub execute {
     tie my %args, 'App::Cme::Run::Var', \%missing, \%default;
     %args = %user_args;
 
+    my $var_pattern = qr~(?<!\\) \$([a-zA-Z]\w+) (?!\s*{)~x;
+
     # replace variables with command arguments or eval'ed variables or env variables
     my $replace_var = sub {
-        # change $var but not \$var
-        $_[0] =~ s~ (?<!\\) \$(\w+) (?!\s*{)
-                  ~ $user_args{$1} // $var{$1} // $ENV{$1} // $default{$1} // '$'.$1 ~xeg;
+        foreach (@_) {
+            # change $var but not \$var, not $var{} and not $1
+            s~ $var_pattern
+             ~ $user_args{$1} // $var{$1} // $ENV{$1} // $default{$1} // '$'.$1 ~xeg;
 
-        # register vars without replacements
-        map { $missing{$_} = 1 ;} ($_[0] =~ m~ (?<!\\) \$(\w+) ~xg);
+            # register vars without replacements
+            map { $missing{$_} = 1 ;} ( m~ $var_pattern ~xg );
 
-        # now change \$var in $var
-        $_[0] =~ s!\\\$!\$!g;
+            # now change \$var in $var
+            s!\\\$!\$!g;
+        }
     };
 
     my @lines =  split /\n/,$content;
@@ -155,36 +160,52 @@ sub execute {
     my $line_nb = 0;
 
     # check content, store app
-    foreach my $line ( @lines ) {
+    while (@lines) {
+        my $line = shift @lines;
         $line_nb++;
         $line =~ s/#.*//; # remove comments
         $line =~ s/^\s+//;
         $line =~ s/\s+$//;
-        my ($key,$value) = split /[\s:]+/, $line, 2;
+        my ($key,@value);
+
+        if ($line =~ /^---\s*(\w+)$/) {
+            $key = $1;
+            while ($lines[0] !~ /^---/) {
+                $lines[0] =~ s/#.*//; # remove comments
+                push @value,  shift @lines;
+            }
+        }
+        elsif ($line eq '---') {
+            next;
+        }
+        else {
+            ($key,@value) = split /[\s:]+/, $line, 2;
+        }
 
         next unless $key ; # empty line
 
-        $replace_var->($value) unless $key eq 'var';
+        $replace_var->(@value) unless $key eq 'var';
 
         if ($key =~ /^app/) {
-            unshift @$app_args, $value;
+            unshift @$app_args, @value;
         }
         elsif ($key eq 'var') {
-            my $res = eval ($value) ;
+            my $res = eval ("@value") ;
             die "Error in var specification line $line_nb: $@\n" if $@;
         }
         elsif ($key eq 'default') {
-            my ($dk, $dv) = split /[\s:=]+/, $value, 2;
+            # multi-line default value is not supported
+            my ($dk, $dv) = split /[\s:=]+/, $value[0], 2;
             $default{$dk} = $dv;
         }
         elsif ($key eq 'doc') {
-            push @doc, $value;
+            push @doc, @value;
         }
         elsif ($key eq 'load') {
-            push @load, $value;
+            push @load, @value;
         }
         elsif ($key eq 'commit') {
-            $commit_msg = $value;
+            $commit_msg = join "\n",@value;
         }
         else {
             die "Error in file $script line $line_nb: unexpected '$key' instruction\n";
@@ -228,7 +249,7 @@ sub execute {
 }
 
 package App::Cme::Run::Var;
-$App::Cme::Run::Var::VERSION = '1.026';
+$App::Cme::Run::Var::VERSION = '1.027';
 require Tie::Hash;
 
 our @ISA = qw(Tie::ExtraHash);
@@ -255,7 +276,7 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.026
+version 1.027
 
 =head1 SYNOPSIS
 
@@ -339,6 +360,14 @@ See L<App::Cme::Command::run> for details.
 The script accepts instructions in the form:
 
  key: value
+
+The key line can be repeated when needed.
+
+Multi line values can also be:
+
+ --- key
+ multi line value
+ ---
 
 The script accepts the following instructions:
 
@@ -433,10 +462,11 @@ See L<cme/"Global Options">.
 
 =head2 update copyright years in C<debian/copyright>
 
- $ cat ~/.cme/scripts/update-copyright
+ $ cme run update-copyright -cat
  app: dpkg-copyright
  load: Files:~ Copyright=~"s/2016,?\s+$name/2017, $name/g"
  commit: updated copyright year of $name
+
  $ cme run update-copyright -arg "name=Dominique Dumont"
  cme: using Dpkg::Copyright model
  Changes applied to dpkg-copyright configuration:
@@ -450,6 +480,54 @@ See L<cme/"Global Options">.
  [master ac2e6410] updated copyright year of Dominique Dumont
   1 file changed, 2 insertions(+), 2 deletions(-)
 
+=head2 update VcsGit in debian/control
+
+ $ cme run set-vcs-git  -cat
+ doc: update control Vcs-Browser and Vcs-git from git remote value
+ doc: parameters: remote (default is origin)
+ doc:
+ doc: example:
+ doc:  cme run set-vcs-git
+ doc:  cme run set-vcs-git -arg remote=debian
+ 
+ app: dpkg-control
+ default: remote: origin
+ 
+ var: chomp ( $var{url} = `git remote get-url $args{remote}` ) ;
+ var: $var{url} =~ s!^git@!https://!;
+ var: $var{url} =~ s!(https?://[\w.]+):!$1/!;
+ var: $var{browser} = $var{url};
+ var: $var{browser} =~ s/.git$//;
+ 
+ load: ! source Vcs-Browser="$browser" Vcs-Git="$url"
+ commit: control: update Vcs-Browser and Vcs-Git
+
+This script can also be written using multi line instructions:
+
+ $ cme run set-vcs-git  -cat
+ --- doc
+ update control Vcs-Browser and Vcs-git from git remote value
+ parameters: remote (default is origin)
+ 
+ example:
+  cme run set-vcs-git
+  cme run set-vcs-git -arg remote=debian
+ ---
+ 
+ app: dpkg-control
+ default: remote: origin
+ 
+ --- var
+ chomp ( $var{url} = `git remote get-url $args{remote}` ) ;
+ $var{url} =~ s!^git@!https://!;
+ $var{url} =~ s!(https?://[\w.]+):!$1/!;
+ $var{browser} = $var{url};
+ $var{browser} =~ s/.git$//;
+ ---
+ 
+ load: ! source Vcs-Browser="$browser" Vcs-Git="$url"
+ commit: control: update Vcs-Browser and Vcs-Git
+
 =head1 SEE ALSO
 
 L<cme>
@@ -460,7 +538,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dominique Dumont.
+This software is Copyright (c) 2014-2018 by Dominique Dumont.
 
 This is free software, licensed under:
 

@@ -1,5 +1,11 @@
 Revision history for System-Command
 
+1.119 Mon Apr 2 2018
+    [TESTS]
+    - Various test fixes for Win32 and "perl in space" (ETJ)
+    [DOCUMENTATION]
+    - document the 'input_record_separator' option to loop_on()
+
 1.118 Thu Jun 2 2016
     [ENHANCEMENTS]
     - Avoid calling waitpid() more than necessary in _reap()

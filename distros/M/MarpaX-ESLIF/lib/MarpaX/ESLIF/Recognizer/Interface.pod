@@ -14,7 +14,7 @@ MarpaX::ESLIF::Recognizer::Interface - MarpaX::ESLIF's recognizer interface
 
 =head1 VERSION
 
-version 2.0.42
+version 2.0.43
 
 =head1 DESCRIPTION
 

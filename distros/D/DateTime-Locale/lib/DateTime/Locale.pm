@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 use DateTime::Locale::Data;
 use DateTime::Locale::FromData;
@@ -362,7 +362,7 @@ DateTime::Locale - Localization support for DateTime.pm
 
 =head1 VERSION
 
-version 1.17
+version 1.18
 
 =head1 SYNOPSIS
 
@@ -548,7 +548,7 @@ yasu47b <nakayamayasuhiro1986@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2003 - 2017 by Dave Rolsky.
+This software is copyright (c) 2003 - 2018 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -16,12 +16,14 @@ use Ref::Util;
 use HTML::Show;
 use UUID::Tiny ':std';
 
-our $VERSION = '0.013';    # VERSION
+our $VERSION = '0.017';    # VERSION
 
 # ABSTRACT: Generate html/javascript charts from perl data using javascript library plotly.js
 
 sub render_full_html {
+## no critic
     my %params = validate( @_, { data => { type => ARRAYREF | OBJECT }, } );
+## use critic
 
     my $data     = $params{'data'};
     my $chart_id = create_uuid_as_string(UUID_TIME);
@@ -59,7 +61,7 @@ sub _render_cell {
     }
     my $template = <<'TEMPLATE';
 <div id="{$chart_id}"></div>
-<script src="https://cdn.plot.ly/plotly-1.21.2.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-{$version}.min.js"></script>
 <script>
 Plotly.plot(document.getElementById('{$chart_id}'),{$data} {$layout});
 </script>
@@ -67,6 +69,7 @@ TEMPLATE
 
     my $template_variables = { data     => $data_string,
                                chart_id => $chart_id,
+                               version  => plotlyjs_version(),
                                defined $layout ? ( layout => $layout ) : ()
     };
     return Text::Template::fill_in_string( $template, HASH => $template_variables );
@@ -110,6 +113,10 @@ sub show_plot {
     HTML::Show::show( html_plot(@_) );
 }
 
+sub plotlyjs_version {
+    return '1.35.2';
+}
+
 1;
 
 __END__
@@ -124,7 +131,7 @@ Chart::Plotly - Generate html/javascript charts from perl data using javascript 
 
 =head1 VERSION
 
-version 0.013
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -138,16 +145,14 @@ version 0.013
  
  show_plot([$data]);
  
- use HTML::Show;
  use aliased 'Chart::Plotly::Trace::Scattergl';
  
  my $big_array = [ 1 .. 10000 ];
  my $scattergl = Scattergl->new( x => $big_array, y => [ map { rand 100 } @$big_array ] );
  
- HTML::Show::show( Chart::Plotly::render_full_html( data => [$scattergl] ) );
+ show_plot([$scattergl]);
 
- use HTML::Show;
- use Chart::Plotly;
+ use Chart::Plotly qw(show_plot);
  use PDL;
  
  use aliased 'Chart::Plotly::Trace::Surface';
@@ -159,7 +164,7 @@ version 0.013
  
  my $surface = Surface->new( x => $x, y => $y, z => $z );
  
- HTML::Show::show( Chart::Plotly::render_full_html( data => [$surface] ) );
+ show_plot([$surface]);
  
  use PDL::Math;
  
@@ -170,7 +175,7 @@ version 0.013
      z => bessj0( rvals( zeroes( $bessel_size, $bessel_size ) ) / 2 )
  );
  
- HTML::Show::show( Chart::Plotly::render_full_html( data => [$bessel] ) );
+ show_plot([$bessel]);
 
 =head1 DESCRIPTION
 
@@ -187,6 +192,14 @@ Example screenshot of plot generated with examples/anscombe.pl:
 </p>
 
 =for markdown ![Anscombe's quartet plotted with plotly](https://raw.githubusercontent.com/pablrod/p5-Chart-Plotly/master/examples/anscombe.png)
+
+Example screenshot of plots generated with examples/traces/*.pl:
+
+=for HTML <p>
+<img src="https://raw.githubusercontent.com/pablrod/p5-Chart-Plotly/master/examples/montage_all_traces.png" alt="Montage of all examples">
+</p>
+
+=for markdown ![Montage of all examples](https://raw.githubusercontent.com/pablrod/p5-Chart-Plotly/master/examples/montage_all_traces.png)
 
 The API is subject to changes.
 
@@ -232,6 +245,10 @@ Opens the plot or plots in a browser locally
 
 Data to be represented. The format is the same as the parameter data in render_full_html. Accepts multiple traces/plots/objects.
 
+=head2 plotlyjs_version
+
+Returns the version of plotly.js using in this version of the perl module as a string
+
 =head1 BUGS
 
 Please report any bugs or feature requests via github: L<https://github.com/pablrod/p5-Chart-Plotly/issues>
@@ -249,7 +266,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2017 by Pablo Rodríguez González.
+This software is Copyright (c) 2017 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

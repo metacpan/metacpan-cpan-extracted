@@ -1,4 +1,6 @@
 Changes
+src/Framebuffer.c
+src/Framebuffer.template.pm
 examples/dump.pl
 examples/fonts.pl
 examples/images/Anime_Red_Head.jpg

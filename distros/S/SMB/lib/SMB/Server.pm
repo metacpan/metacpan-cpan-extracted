@@ -1,4 +1,4 @@
-# SMB Perl library, Copyright (C) 2014 Mikhael Goikhman, migo@cpan.org
+# SMB Perl library, Copyright (C) 2014-2018 Mikhael Goikhman, migo@cpan.org
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -113,8 +113,12 @@ sub on_command ($$$) {
 	$command->{tree} = $tree if $tree;
 
 	if ($command->is_smb1) {
-		if ($command->is('Negotiate') && $command->supports_protocol(2)) {
-			$command = SMB::v2::Command::Negotiate->new_from_v1($command);
+		if ($command->is('Negotiate')) {
+			if ($command->supports_smb_dialect(0x0202)) {
+				$command = SMB::v2::Command::Negotiate->new_from_v1($command);
+			} else {
+				$self->err("Client does not support SMB2, and we do not support SMB1, stopping");
+			}
 		}
 	}
 
@@ -152,7 +156,9 @@ sub on_command ($$$) {
 			my $tree_root = $self->share_roots->{$share};
 			if ($tree_root || $share eq 'IPC$') {
 				my $tid = $command->header->tid(@{$connection->{trees}} + 1);
-				push @{$connection->{trees}}, SMB::Tree->new($share, $tid, root => $tree_root);
+				$tree = SMB::Tree->new($share, $tid, root => $tree_root);
+				push @{$connection->{trees}}, $tree;
+				$command->tree($tree);
 			} else {
 				$error = SMB::STATUS_BAD_NETWORK_NAME;
 			}
@@ -178,17 +184,37 @@ sub on_command ($$$) {
 					$connection->{openfiles}{@$fid} = $openfile;
 					$command->fid($fid);
 					$command->openfile($openfile);
+					$openfile->delete_on_close(1) if $command->requested_delete_on_close;
 				} else {
 					$error = SMB::STATUS_NO_SUCH_FILE;
 				}
 			}
 		}
 		elsif ($command->is('Close')) {
+			if ($openfile->delete_on_close) {
+				my $filename = $openfile->file->filename;
+				$self->msg("Removing $filename");
+				$openfile->file->remove()
+					or $self->err("Failed to remove $filename: $!");
+			}
 			$openfile->close;
 			delete $connection->{openfiles}{@$fid};
 		}
+		elsif ($command->is('SetInfo')) {
+			my $rename_info = $command->requested_rename_info;
+			if ($rename_info) {
+				my $filename1 = $openfile->file->filename;
+				my $filename2 = $rename_info->{new_name} // die;
+				my $replace   = $rename_info->{replace} // die;
+				$self->msg("Renaming $filename1 to $filename2");
+				($error, my $message) = $openfile->file->rename($filename2);
+				$self->err("Failed to rename $filename1 to $filename2: $message")
+					if $error;
+			}
+			$openfile->delete_on_close(1) if $command->requested_delete_on_close;
+		}
 		elsif ($command->is('Read')) {
-			$command->{buffer} = $openfile->file->read(
+			$command->{buffer} = $openfile->read(
 				length => $command->{length},
 				offset => $command->{offset},
 				minlen => $command->{minimum_count},
@@ -239,7 +265,9 @@ sub run ($) {
 			else {
 				my $connection = $self->get_connection($socket)
 					or die "Unexpected data on unmanaged $socket";
-				my $command = $self->recv_command($connection);
+				my $command = $socket->eof
+					? $connection->msg("Connection reset by peer")
+					: $self->recv_command($connection);
 				if (!$command) {
 					$self->on_disconnect($connection);
 					$self->delete_connection($connection);

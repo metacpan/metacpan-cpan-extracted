@@ -1,10 +1,9 @@
 #!perl
 
-use Test::More tests => 13;
+use Test2::V0;
+use Test::Lib;
 
-use lib 't';
-
-BEGIN { use_ok('App::Env') };
+use App::Env;
 
 #############################################################
 
@@ -64,3 +63,5 @@ $app1->setenv( 'AppEnvTestID' => $$ );
     # and make sure its the correct one.
     is( $retrieve->env('CloneTest'), 2, "check cached cloned env" );
 }
+
+done_testing;

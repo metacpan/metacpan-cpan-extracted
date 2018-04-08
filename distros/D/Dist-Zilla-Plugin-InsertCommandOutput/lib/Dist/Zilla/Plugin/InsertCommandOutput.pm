@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::InsertCommandOutput;
 
-our $DATE = '2015-05-05'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2018-04-06'; # DATE
+our $VERSION = '0.050'; # VERSION
 
 use 5.010001;
 use strict;
@@ -31,7 +31,7 @@ sub munge_file {
     my ($self, $file) = @_;
     my $content = $file->content;
     if ($content =~ s{^#\s*COMMAND:\s*(.*)\s*$}{$self->_command_output($1)."\n"}egm) {
-        $self->log(["inserting output of command '%s' in %s", $1, $file->name]);
+        $self->log(["inserting output of command '%s' in %s: '%s'", $1, $file->name, $content]);
         $file->content($content);
     }
 }
@@ -65,7 +65,7 @@ Dist::Zilla::Plugin::InsertCommandOutput - Insert the output of command into you
 
 =head1 VERSION
 
-This document describes version 0.04 of Dist::Zilla::Plugin::InsertCommandOutput (from Perl distribution Dist-Zilla-Plugin-InsertCommandOutput), released on 2015-05-05.
+This document describes version 0.050 of Dist::Zilla::Plugin::InsertCommandOutput (from Perl distribution Dist-Zilla-Plugin-InsertCommandOutput), released on 2018-04-06.
 
 =head1 SYNOPSIS
 
@@ -87,17 +87,6 @@ inserted as-is). If command fails (C<$?> is non-zero), build will be aborted.
 
 =for Pod::Coverage .+
 
-=head1 SEE ALSO
-
-L<Dist::Zilla::Plugin::InsertCodeResult>, which can also be used to accomplish
-the same thing, e.g. with C<# CODE: my $res = `netstat -anp`; die if $?; $res>
-except the DZP::InstallCommandResult plugin is shorter.
-
-L<Dist::Zilla::Plugin::InsertCodeOutput>, which can also be used to accomplish
-the same thing, e.g. with C<# CODE: system "netstat -anp"; die if $?>.
-
-L<Dist::Zilla::Plugin::InsertExample>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla-Plugin-InsertCommandOutput>.
@@ -114,13 +103,24 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Dist::Zilla::Plugin::InsertCodeResult>, which can also be used to accomplish
+the same thing, e.g. with C<# CODE: my $res = `netstat -anp`; die if $?; $res>
+except the DZP::InstallCommandResult plugin is shorter.
+
+L<Dist::Zilla::Plugin::InsertCodeOutput>, which can also be used to accomplish
+the same thing, e.g. with C<# CODE: system "netstat -anp"; die if $?>.
+
+L<Dist::Zilla::Plugin::InsertExample>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

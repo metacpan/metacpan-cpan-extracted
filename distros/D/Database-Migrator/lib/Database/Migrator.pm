@@ -3,7 +3,7 @@ package Database::Migrator;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 1;
 
@@ -21,7 +21,7 @@ Database::Migrator - A system for implementing database migrations
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 DESCRIPTION
 
@@ -207,9 +207,13 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Gregory Oschwald Kevin Phair Olaf Alders
+=for stopwords Florian Ragwitz Gregory Oschwald Kevin Phair Olaf Alders
 
 =over 4
+
+=item *
+
+Florian Ragwitz <rafl@debian.org>
 
 =item *
 
@@ -227,7 +231,7 @@ Olaf Alders <olaf@wundersolutions.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2017 by MaxMind, Inc.
+This software is Copyright (c) 2012 - 2018 by MaxMind, Inc.
 
 This is free software, licensed under:
 

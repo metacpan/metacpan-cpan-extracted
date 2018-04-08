@@ -1,0 +1,3 @@
+<:
+print join "\n", %post;  # expect dummy key on first access
+print scalar keys %post;  # empty now

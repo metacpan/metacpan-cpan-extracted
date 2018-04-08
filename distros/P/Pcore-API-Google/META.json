@@ -48,6 +48,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-api-google/overview"
       }
    },
-   "version" : "v0.8.0",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "v0.8.1",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

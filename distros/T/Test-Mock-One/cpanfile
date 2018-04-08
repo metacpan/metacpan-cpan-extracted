@@ -1,7 +1,10 @@
+requires "Carp" => "0";
+requires "Exporter" => "0";
 requires "List::Util" => "1.33";
 requires "Scalar::Util" => "0";
+requires "Test::Builder" => "0";
 requires "overload" => "0";
-requires "perl" => "5.006";
+requires "perl" => "5.010";
 requires "strict" => "0";
 requires "warnings" => "0";
 
@@ -13,12 +16,13 @@ on 'test' => sub {
   requires "Test::Deep" => "0";
   requires "Test::Exception" => "0";
   requires "Test::More" => "0";
-  requires "perl" => "5.006";
+  requires "lib" => "0";
+  requires "perl" => "5.010";
 };
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
-  requires "perl" => "5.006";
+  requires "perl" => "5.010";
 };
 
 on 'develop' => sub {

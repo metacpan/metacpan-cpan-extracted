@@ -1206,3 +1206,54 @@ Revision history for Graphics-Framebuffer
 
        Runtime diagnostics ALWAYS are shown if there are catastrophic
        failures.
+
+6.04   March 10, 2018
+
+       Cleaned up some documentation
+
+       Removed code to check for current active console.  That's up to you
+       now.
+
+       Modified some of the examples scripts to work with switches.
+
+6.05   March 30, 2018
+
+       Fixed crashes for Intel GPUs (and perhaps others)
+       
+       Updated documentation to help with troubleshooting.
+
+6.06   March 31, 2018
+
+       Moved C routines out of the Perl code and into its own file
+
+       Further improved compatibility with all framebuffer GPUs.  The  "fbset"
+       utility should no longer be needed as a backup.  Now C makes this call
+       instead of Perl.  However, for those not able to compile the C routines,
+       the older Perl logic is still there for compatibility.
+
+       Moved text around a bit for Makefile.PL for easier following on small
+       screens.
+
+6.07   March 31, 2018
+
+       Whoops, 6.06 was broken outside of the install environment.
+       
+       Had to add some clever code to the Makefile.PL script to still be able
+       to have the C code separate.  For me it is easier to have it as a separate
+       file while developing, instead of part of Framebuffer.pm as before.  What
+       happens now is it joins the two files back into one when Makefile.PL is
+       called.  I'm happy, because I can develop easier; and you're happy,
+       because it works again.
+
+       Also fixed "slideshow.pl" as that seemed to be broken.  It no longer uses
+       threads.  It didn't need them.
+
+6.08   March 31, 2018
+
+       Added some code to gather more information about the framebuffer and GPU.
+
+       Fixes to the example scripts.
+
+6.09   April 6, 2018
+
+       Installation instructions update.

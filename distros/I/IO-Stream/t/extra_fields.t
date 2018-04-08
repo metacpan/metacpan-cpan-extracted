@@ -6,7 +6,8 @@
 # - class/method names instead of CODE ref in {cb}
 use warnings;
 use strict;
-use t::share;
+use lib 't';
+use share;
 
 my $SIZE = 204800;
 

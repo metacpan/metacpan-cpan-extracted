@@ -15,8 +15,7 @@ my @tbl_def = (
     [ "name", "CHAR",    64, 0 ],
     );
 
-sub RowCount
-{
+sub RowCount {
     my ($dbh, $tbl) = @_;
 
     if ($nano) {

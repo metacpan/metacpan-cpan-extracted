@@ -4,26 +4,22 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.03';
-
-use Module::Metadata 1.000005;
+our $VERSION = '0.04';
 
 use Moose;
 
-with 'Dist::Zilla::Role::VersionProvider';
+with 'Dist::Zilla::Role::VersionProvider',
+    'Dist::Zilla::Role::ModuleMetadata';
 
 sub provide_version {
     my $self = shift;
 
+    return $ENV{V} if exists $ENV{V};
+
     my $module = $self->zilla->main_module;
     my $name   = $module->name;
-
-    my $content = $module->encoded_content;
-    open my $fh, '<', \$content
-        or die $!;
     my $metadata
-        = Module::Metadata->new_from_handle( $fh, $name, collect_pod => 0 );
-    close $fh or die $!;
+        = $self->module_metadata_for_file( $module, collect_pod => 0 );
 
     my $ver = $metadata->version
         or $self->log_fatal("Unable to get version from $name");
@@ -52,7 +48,7 @@ Dist::Zilla::Plugin::VersionFromMainModule - Set the distribution version from y
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -67,6 +63,9 @@ This plugin is useful if you want to set the C<$VERSION> in your module(s)
 manually or with some sort of post-release "increment the C<$VERSION>" plugin,
 rather than letting dzil add the C<$VERSION> based on a setting in the
 F<dist.ini>.
+
+You can override the distribution version by setting the C<V> environment
+variable, e.g.: C<V=1.23 dzil release>.
 
 =head1 CREDITS
 
@@ -100,9 +99,15 @@ Dave Rolsky <autarch@urth.org>
 
 =back
 
+=head1 CONTRIBUTOR
+
+=for stopwords Karen Etheridge
+
+Karen Etheridge <ether@cpan.org>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2009 - 2017 by Christopher J. Madsen.
+This software is copyright (c) 2009 - 2018 by Christopher J. Madsen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

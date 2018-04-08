@@ -1,7 +1,8 @@
 # Use case: HTTP GET until EOF
 use warnings;
 use strict;
-use t::share;
+use lib 't';
+use share;
 
 plan skip_all => '$TEST_SOCKS5_PROXY_{HOST,PORT} are not configured'
     if !$ENV{TEST_SOCKS5_PROXY_HOST};

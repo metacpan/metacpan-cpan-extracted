@@ -34,7 +34,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK $AUTOLOAD);
 
 use overload (
 	'""'  =>   sub { stringify($_[0]) },
-	'0+'  =>   sub { intify($_[0]) },
+	'0+'  =>   sub { $_[0] >= 0 ? uintify($_[0]) : intify($_[0]) },
 	'bool' =>  sub { $_[0] != 0 },
 
 	'<=>' =>   \&op_spaceship,
@@ -65,7 +65,7 @@ require AutoLoader;
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
 
-our $VERSION = '2.16';
+our $VERSION = '2.19';
 
 
 bootstrap Math::GMP $VERSION;
@@ -118,7 +118,7 @@ Math::GMP - High speed arbitrary size integer math
 
 =head1 VERSION
 
-version 2.16
+version 2.19
 
 =head1 SYNOPSIS
 
@@ -701,8 +701,8 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/turnstep/perl-Math-GMP>
+L<https://github.com/turnstep/Math-GMP>
 
-  git clone https://github.com/turnstep/perl-Math-GMP.git
+  git clone https://github.com/turnstep/Math-GMP.git
 
 =cut

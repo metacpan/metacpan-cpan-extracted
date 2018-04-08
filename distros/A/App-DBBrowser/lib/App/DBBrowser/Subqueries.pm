@@ -6,9 +6,8 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.009';
+our $VERSION = '2.012';
 
-use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile );
 
 use List::MoreUtils qw( any );
@@ -43,7 +42,11 @@ sub choose_subquery {
     my $driver = $sf->{d}{driver};
     my $db = $sf->{d}{db};
     my $saved_subqueries = $h_ref->{$driver}{$db} || []; # reverse
-    my $tmp_subqueries = $sf->__fill_history_stmts( $sf->{i}{stmt_history} );
+    my $tmp_subqueries;
+    for my $stmt ( @{$sf->{i}{stmt_history}} ) {
+        my $filled = $ax->fill_stmt( @$stmt, 1 );
+        push @$tmp_subqueries, $filled if defined $filled;
+    }
     my $choices = [ @pre, map( '  ' . $_, @$saved_subqueries ), map( 't ' . $_, @$tmp_subqueries ) ];
     my $idx = $sf->__choose_see_long( $choices, $sql, $tmp, $stmt_type  );
     if ( ! $idx ) {
@@ -86,22 +89,6 @@ sub __choose_see_long {
         }
         return $idx;
     }
-}
-
-
-sub __fill_history_stmts {
-    my ( $sf, $subqueries ) = @_;
-    my $filled_subqueries = [];
-    for my $e ( @$subqueries ) {
-        my $stmt = $e->[0];
-        my @args = @{$e->[1]};
-        while ( $stmt =~ /(?<=(?:,|\(|\s))\?/ ) {
-            my $arg = $sf->{d}{dbh}->quote( shift @args );
-            $stmt =~ s/(?<=(?:,|\(|\s))\?/$arg/;
-        }
-        push @$filled_subqueries, $stmt;
-    }
-    return $filled_subqueries;
 }
 
 
@@ -150,7 +137,12 @@ sub edit_sq_file {
 
 sub __add_subqueries {
     my ( $sf, $subqueries ) = @_;
-    my $available = $sf->__fill_history_stmts( $sf->{i}{stmt_history} );
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $available;
+    for my $stmt ( @{$sf->{i}{stmt_history}} ) {
+        my $filled = $ax->fill_stmt( @$stmt, 1 );
+        push @$available, $filled if defined $filled;
+    }
     my $readline = '  readline';
     my @pre = ( undef, $sf->{i}{_confirm}, $readline );
     my $bu = [];
@@ -280,7 +272,7 @@ sub __remove_subqueries {
     my $prompt = "\n" . 'Choose:';
     my $idx = choose_a_subset(
         $subqueries,
-        { mouse => $sf->{o}{table}{mouse}, index => 1, show_fmt => 1, keep_chosen => 0, prompt => $prompt,
+        { mouse => $sf->{o}{table}{mouse}, index => 1, fmt_chosen => 1, remove_chosen => 1, prompt => $prompt,
           info => $info, back => '  BACK', confirm => '  CONFRIM', prefix => '- ' }
     );
     if ( ! defined $idx || ! @$idx ) {

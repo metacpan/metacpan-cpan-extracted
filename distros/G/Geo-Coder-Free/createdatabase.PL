@@ -77,6 +77,8 @@ my %global_md5s;
 my %state_md5s;
 my %queued_commits;
 
+exit(0) if($ENV{'AUTOMATED_TESTING'});
+
 if(!-r 'lib/Geo/Coder/Free/MaxMind/databases/cities.sql') {
 	(system('bash bin/createdatabase') == 0)
 		or warn "Can't create the SQLite database - expect poor performance";
@@ -138,8 +140,8 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 				my $query = "INSERT INTO openaddresses('MD5','LAT','LON','STATE','COUNTRY'" .
 					') VALUES (' .
 					"'$digest'," .
-					"'" . $row->{'Latitude'} . "'," .
-					"'" . $row->{'Longitude'} . "'," .
+					$row->{'Latitude'} . ',' .
+					$row->{'Longitude'} . ',' .
 					"'$state','US')";
 				$dbh->prepare($query)->execute();
 				# print "$query\n";
@@ -309,9 +311,10 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 							}
 						}
 						$city =~ s/\.csv$//;
-						$city = uc($city);
 						$city =~ s/_/ /g;
 						$city =~ s/\-/ /g;
+						$city =~ s/\./ /g;
+						$city = uc($city);
 						$city =~ s/\s+BORO$//;
 						$city =~ s/\s+TWP$//;
 						$city =~ s/^TOWN\s+OF\s+//;
@@ -372,6 +375,11 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 								$county = 'ALLEN';
 							} elsif(defined($county) && ($county eq 'LAPORTE')) {
 								$county = 'LA PORTE';
+							}
+						} elsif($state eq 'MO') {
+							if(defined($city) && ($city eq 'SAINT LOUIS')) {
+								$city = 'ST. LOUIS';
+								$county = undef;
 							}
 						}
 						if(($city && ($city !~ /^\s+$/)) || $county) {
@@ -490,9 +498,10 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 							}
 						}
 						$city =~ s/\.csv$//;
-						$city = uc($city);
 						$city =~ s/_/ /g;
 						$city =~ s/\-/ /g;
+						$city =~ s/\./ /g;
+						$city = uc($city);
 						$city =~ s/\s+BORO$//;
 						$city =~ s/\s+TWP$//;
 						$city =~ s/^TOWN\s+OF\s+//;

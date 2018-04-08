@@ -477,7 +477,8 @@ use Math::Trig ();
     ok(r->is->double($x2));
     is_deeply($x2->values, ['NaN']);
   }
-  
+
+=pod TODO
   # Arg - complex, non 0 values
   {
     my $x1 = c_(1 + 1*i_, 2 + 2*i_);
@@ -485,6 +486,7 @@ use Math::Trig ();
     ok(r->is->double($x2));
     is_deeply($x2->values, [r->pi->value / 4, r->pi->value / 4]);
   }
+=cut
   
   # Arg - complex, 0 values
   {

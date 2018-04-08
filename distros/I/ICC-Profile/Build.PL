@@ -1,4 +1,4 @@
-# WBB 2018-03-29
+# WBB 2018-03-31
 
 use 5.006;
 use strict;
@@ -11,7 +11,7 @@ my $builder = Module::Build->new(
     license             => 'GPL_3',
     dist_abstract       => 'A set of object-oriented modules implementing ICC profiles and related color functions',
     dist_author         => q{William B. Birkett <wbirkett@doplganger.com>},
-    dist_version   => '0.605',
+    dist_version   => '0.606',
     release_status      => 'stable',
     configure_requires => {
         'Module::Build' => 0,

@@ -1,0 +1,3 @@
+<:
+use open qw/:std :utf8/;
+print chr 191;

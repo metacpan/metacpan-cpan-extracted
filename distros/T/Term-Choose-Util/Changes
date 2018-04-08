@@ -1,6 +1,11 @@
 Revision history for Term::Choose::Util
 
 
+0.062   2018-04-06
+        - "choose_a_number": new option 'small_on_top'.
+        - "choose_a_subset": new options 'remove_chosen', 'mark', 'fmt_chosen'.
+        - Update documentation.
+
 0.061   2018-03-23
         - Output-format changes.
 

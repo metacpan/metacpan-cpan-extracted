@@ -36,6 +36,8 @@ use Net::ACME2::HTTP_Tiny      ();
 use Net::ACME2::HTTP::Response ();
 use Net::ACME2::X              ();
 
+use constant _CONTENT_TYPE => 'application/jose+json';
+
 #accessed from tests
 our $_NONCE_HEADER = 'replay-nonce';
 
@@ -113,7 +115,12 @@ sub _post {
     return $self->_request_and_set_last_nonce(
         'POST',
         $url,
-        { content => $jws },
+        {
+            content => $jws,
+            headers => {
+                'content-type' => _CONTENT_TYPE,
+            },
+        },
         $opts_hr || (),
     );
 }

@@ -1943,6 +1943,10 @@ Extract the DHCP server lease information
 
 Query the guest OS via an agent
 
+=item Sys::Virt::Domain::INTERFACE_ADDRESSES_SRC_ARP
+
+Extract from the local ARP tables
+
 =back
 
 The returned list will contain one element for each interface.
@@ -2188,11 +2192,15 @@ The USB HID keycode set
 
 The Windows keycode set
 
-=item Sys::Virt::Domain::KEYCODE_SET_RFB
+=item Sys::Virt::Domain::KEYCODE_SET_QNUM
 
 The XT keycode set, with the extended scancodes using the
 high bit of the first byte, instead of the low bit of the
 second byte.
+
+=item Sys::Virt::Domain::KEYCODE_SET_RFB
+
+A deprecated alias for C<Sys::Virt::Domain::KEYCODE_SET_QNUM>
 
 =back
 

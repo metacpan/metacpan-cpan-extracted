@@ -964,7 +964,7 @@ sub manage_verse {
     my ($self, $el) = @_;
     my ($lead, $stanzasep);
     if ($self->is_html) {
-        $lead = "&nbsp;";
+        $lead = '&#160;';
         $stanzasep = "\n<br /><br />\n";
     }
     elsif ($self->is_latex) {

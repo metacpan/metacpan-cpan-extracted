@@ -7,23 +7,19 @@ package Comics::Plugin::SMBC;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "0.02";
+our $VERSION = "1.00";
 
-sub register {
-    shift->SUPER::register
-      ( { name    => "Saturday Morning Breakfast Cereal",
-	  url     => "http://www.smbc-comics.com/",
-	  pat	  =>
+our $name    = "Saturday Morning Breakfast Cereal";
+our $url     = "http://www.smbc-comics.com/";
+our $pattern =
 	    qr{ <img \s+
 	        title="(?<title>.*?)" \s+
-		src="(?<url>http://www.smbc-comics.com/comics/
+		src="(?<url>/comics/
 		  (?<image>[^./]+\.\w+))" \s+
 	        id="cc-comic" \s+
 		border="\d+" \s+
 		/>
-	      }x,
-	} );
-}
+	      }x;
 
 # Important: Return the package name!
 __PACKAGE__;

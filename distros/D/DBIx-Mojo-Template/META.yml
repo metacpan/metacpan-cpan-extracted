@@ -18,8 +18,11 @@ no_index:
     - t
     - inc
 requires:
+  Clone: '0'
   Hash::Merge: '0.2'
   Mojolicious: '6'
   perl: '5.006'
-version: '0.055'
+resources:
+  repository: git://github.com/mche/DBIx-Mojo-Template.git
+version: '0.056'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

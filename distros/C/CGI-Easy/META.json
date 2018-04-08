@@ -4,7 +4,7 @@
       "Alex Efros <powerman@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -31,7 +31,9 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.15",
+            "Dist::Milla" : "v1.0.18",
+            "Test::Distribution" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41"
          }
       },
@@ -45,40 +47,32 @@
          }
       },
       "test" : {
-         "recommends" : {
-            "Pod::Coverage" : "0.18",
-            "Test::CheckManifest" : "0.9",
-            "Test::Perl::Critic" : "0",
-            "Test::Pod" : "1.22",
-            "Test::Pod::Coverage" : "1.08"
-         },
          "requires" : {
             "Test::Exception" : "0",
-            "Test::More" : "0",
-            "Test::Perl::Critic" : "0"
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "CGI::Easy" : {
          "file" : "lib/CGI/Easy.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "CGI::Easy::Headers" : {
          "file" : "lib/CGI/Easy/Headers.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "CGI::Easy::Request" : {
          "file" : "lib/CGI/Easy/Request.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "CGI::Easy::Session" : {
          "file" : "lib/CGI/Easy/Session.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "CGI::Easy::Util" : {
          "file" : "lib/CGI/Easy/Util.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       }
    },
    "release_status" : "stable",
@@ -93,6 +87,7 @@
          "web" : "https://github.com/powerman/perl-CGI-Easy"
       }
    },
-   "version" : "v2.0.0"
+   "version" : "v2.0.1",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

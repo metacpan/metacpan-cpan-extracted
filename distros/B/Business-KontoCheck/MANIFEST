@@ -35,15 +35,10 @@ lib/Business/KontoCheck.pm
 konto_check.c
 konto_check.h
 retvals.h
-konto_check-at.c
-konto_check-at.h
-inpar.dat.gz
 blz.lut
-blz-at.lut
 test2.pl
 mini.pl
 testkonten.txt
-testkonten-at.txt
 lgpl.txt
 zlib/adler32.c
 zlib/algorithm.txt

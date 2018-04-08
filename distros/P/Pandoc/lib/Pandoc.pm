@@ -11,7 +11,7 @@ Pandoc - wrapper for the mighty Pandoc document converter
 
 =cut
 
-our $VERSION = '0.7.0';
+our $VERSION = '0.8.0';
 
 use Pandoc::Version;
 use Carp 'croak';
@@ -46,7 +46,13 @@ sub new {
     my $pandoc = bless { }, shift;
 
     my $bin = (@_ and $_[0] !~ /^-./) ? shift : $PANDOC_PATH;
-    $pandoc->{bin} = which($bin);
+
+    my $bindir = $ENV{HOME}."/.pandoc/bin";
+    if (!-x $bin && $bin =~ /^\d+(\.\d+)*$/ && -x "$bindir/pandoc-$bin") {
+        $pandoc->{bin} = "$bindir/pandoc-$bin";
+    } else {
+        $pandoc->{bin} = which($bin);
+    }
 
     $pandoc->{arguments} = [];
     $pandoc->arguments(@_) if @_;
@@ -268,6 +274,33 @@ sub highlight_languages {
     $_[0]->_list('highlight_languages');
 }
 
+sub extensions {
+    my $pandoc = shift;
+    my $format = shift // '';
+    my $out = "";
+    my %ext;
+
+    if ($pandoc->version < 1.18) {
+        warn "pandoc >= 1.18 required for --list-extensions\n";
+    } else {
+        if ($format) {
+            if ($format =~ /^[a-z0-9_]$/ and $pandoc->version >= '2.0.6') {
+                $format = "=$format";
+            } else {
+                warn "ignoring format argument to Pandoc->extensions\n";
+                $format = '';
+            }
+        }
+        $pandoc->run("--list-extensions$format", { out => \$out });
+        %ext = map {
+          $_ =~ /^([+-]?)\s*([^-+ ]+)\s*([+-]?)$/;
+          ($2 => ($1 || $3) eq '+' ? 1 : 0);
+        } split /\n/, $out;
+    }
+
+    %ext;
+}
+
 sub libs {
     $_[0]->{libs};
 }
@@ -316,14 +349,17 @@ __END__
   say pandoc->libs->{'highlighting-kate'};
 
   # create a new instance with default arguments
-  my $md2latex = Pandoc->new(qw(-f markdown -t latex --smart));
+  my $md2latex = Pandoc->new(qw(-f markdown -t latex --number-sections));
   $md2latex->run({ in => \$markdown, out => \$latex });
+
+  # create a new instance with selected executable
+  my $pandoc = Pandoc->new('bin/pandoc');
+  my $pandoc = Pandoc->new('2.1'); # use ~/.pandoc/bin/pandoc-2.1 if available
 
   # set default arguments on compile time
   use Pandoc qw(-t latex);
-  use Pandoc qw(/usr/bin/pandoc --smart);
-  use Pandoc qw(1.16 --smart);
-
+  use Pandoc qw(/usr/bin/pandoc --number-sections);
+  use Pandoc qw(1.16 --number-sections);
 
   # utility method to convert from string
   $latex = pandoc->convert( 'markdown' => 'latex', '*hello*' );
@@ -416,12 +452,14 @@ references.
 
 =head1 METHODS
 
-=head2 new( [ $executable ] [, @arguments ] )
+=head2 new( [ $executable | $version ] [, @arguments ] )
 
 Create a new instance of class Pandoc or throw an exception if no pandoc
-executable was found. The first argument, if given and not starting with C<->,
-can be used to set the pandoc executable (C<pandoc> by default). Additional
-arguments are passed to the executable on each run.
+executable was found.  The first argument, if given and not starting with C<->,
+can be used to set the pandoc executable (C<pandoc> by default).  If a version
+is specified the executable is also searched in C<~/.pandoc/bin>, e.g.
+C<~/.pandoc/bin/pandoc-2.0> for version C<2.0>.  Additional arguments are
+passed to the executable on each run.
 
 Repeated use of this constructor with same arguments is not recommended because
 C<pandoc --version> is called for every new instance.
@@ -434,7 +472,7 @@ arguments and options. See L<function pandoc|/FUNCTIONS> for usage.
 =head2 convert( $from => $to, $input [, @arguments ] )
 
 Convert a string in format C<$from> to format C<$to>. Additional pandoc options
-such as C<--smart> and C<--standalone> can be passed. The result is returned
+such as C<-N> and C<--standalone> can be passed. The result is returned
 in same utf8 mode (C<utf8::is_unicode>) as the input. To convert from file to
 string use method C<pandoc>/C<run> like this and set input/output format via
 standard pandoc arguments C<-f> and C<-t>:
@@ -444,7 +482,7 @@ standard pandoc arguments C<-f> and C<-t>:
 =head2 parse( $from => $input [, @arguments ] )
 
 Parse a string in format C<$from> to a L<Pandoc::Document> object. Additional
-pandoc options such as C<--smart> and C<--normalize> can be passed. This method
+pandoc options such as C<-N> and C<--normalize> can be passed. This method
 requires at least pandoc version 1.12.1 and the Perl module L<Pandoc::Elements>.
 
 The reverse action is possible with method C<to_pandoc> of L<Pandoc::Document>.
@@ -505,6 +543,12 @@ Return a list of supported output formats.
 Return a list of programming languages which syntax highlighting is supported
 for (via Haskell library highlighting-kate).
 
+=head2 extensions( [ $format ] )
+
+Return a hash of extensions mapped to whether they are enabled by default.
+This method is only available since Pandoc 1.18 and the optional format
+argument since Pandoc 2.0.6.
+
 =head2 libs
 
 Return a hash mapping the names of Haskell libraries compiled into the
@@ -512,15 +556,19 @@ pandoc executable to L<Pandoc::Version> objects.
 
 =head1 SEE ALSO
 
+This package includes L<Pandoc::Version> to compare Pandoc version numbers,
+L<Pandoc::Release> to get Pandoc releases from GitHub, and
+L<App::Prove::Plugin::andoc> to run tests with selected Pandoc executables.
+
 See L<Pandoc::Elements> for a Perl interface to the abstract syntax tree of
 Pandoc documents for more elaborate document processing.
+
+See L<Pod::Pandoc> to parse Plain Old Documentation format (L<perlpod>) for
+processing with Pandoc.
 
 See L<Pandoc wrappers and interfaces|https://github.com/jgm/pandoc/wiki/Pandoc-wrappers-and-interfaces>
 in the Pandoc GitHub Wiki for a list of wrappers in other programming
 languages.
-
-Use L<Pandoc::Release> to get information about and download pandoc releases,
-(for instance to test against multiple pandoc versions).
 
 Other Pandoc related but outdated modules at CPAN include
 L<Orze::Sources::Pandoc> and L<App::PDoc>.

@@ -1,7 +1,8 @@
 # Use case: echo client/server
 use warnings;
 use strict;
-use t::share;
+use lib 't';
+use share;
 
 my $banner  = "Server ready";
 my $msg     = "Test message!\0\n";

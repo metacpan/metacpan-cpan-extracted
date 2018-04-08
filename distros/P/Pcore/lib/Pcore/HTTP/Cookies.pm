@@ -1,177 +1,109 @@
 package Pcore::HTTP::Cookies;
 
-use Pcore -class;
+use Pcore -class, -const;
 use Pcore::Util::Scalar qw[is_ref];
 
 has cookies => ( is => 'ro', isa => HashRef, default => sub { {} } );
 
-sub clear ($self) {
-    $self->{cookies} = {};
+const our $COOKIE_NAME    => 0;
+const our $COOKIE_VAL     => 1;
+const our $COOKIE_EXPIRES => 2;
+const our $COOKIE_SECURE  => 3;
 
-    return;
-}
-
-# COOKIES LIMITATIONS:
-# http://browsercookielimits.squawky.net/
-#
-# RFC 2965 - http://www.ietf.org/rfc/rfc2965.txt;
-# To get a good understanding of cookies read this - http://www.quirksmode.org/js/cookies.html;
-# Cookies are stored as a single string containing name, value, expiry etc.;
-# Size limits apply to the entire cookie, not just its value;
-# If you use characters only in the ASCII range, each character takes 1 byte, so you can typically store 4096 characters;
-# In UTF-8 some characters are more than 1 byte, hence you can not store as many characters in the same amount of bytes;
-# The ';' character is reserved as a separator. Do not use it in the key or value;
-# jQuery Cookie plugin stores the cookie using encodeURIComponent. Hence ÿ is stored as %C3%BF, 6 characters. This works well, as other you would lose the ';' character;
-# You cannot delete cookies with a key that hits the size limit and has a small value. The method to delete a cookie is to set its expiry value, but when the key is large there is not enough room left to do this. Hence I have not tested limitations around key size;
-# It appears that some browsers limit by bytes, while others limit the number of characters;
-
+# https://tools.ietf.org/html/rfc6265#section-4.1.1
 sub parse_cookies ( $self, $url, $set_cookie_header ) {
     $url = P->uri($url) if !is_ref $url;
 
-  COOKIE: for ( $set_cookie_header->@* ) {
-        my ( $kvp, @attrs ) = split /;/sm;
+    my $origin_domain = $url->host->name;
+    my $origin_path   = $url->path->to_string;
 
-        next if !defined $kvp;
+  COOKIE: for my $str ( $set_cookie_header->@* ) {
+        my $is_attr;
 
-        # trim
-        $kvp =~ s/\A\s+//sm;
-        $kvp =~ s/\s+\z//sm;
+        my ( $domain, $path, $cookie );
 
-        next if $kvp eq q[];
+        while ( $str =~ /\G[;\s]*([^=; ]+)\s*/smgc ) {
+            my $key;
 
-        my $origin_domain_name = $url->host->name;
-
-        my $cookie = {
-            domain   => $origin_domain_name,
-            path     => $url->path->to_string,
-            expires  => 0,
-            httponly => 0,
-            secure   => 0,
-        };
-
-        # parse and set key and value
-        if ( ( my $idx = index $kvp, q[=] ) != -1 ) {
-            $cookie->{name} = substr $kvp, 0, $idx;
-
-            $cookie->{val} = substr $kvp, $idx + 1;
-        }
-        else {
-            $cookie->{name} = $kvp;
-
-            $cookie->{val} = q[];
-        }
-
-        # parse attributes
-        for my $attr (@attrs) {
-
-            # trim
-            $attr =~ s/\A\s+//sm;
-            $attr =~ s/\s+\z//sm;
-
-            next if $attr eq q[];
-
-            my ( $k, $v );
-
-            if ( ( my $idx = index $attr, q[=] ) != -1 ) {
-                $k = lc substr $attr, 0, $idx;
-
-                $v = substr $attr, $idx + 1;
+            if ( !defined $is_attr ) {
+                $cookie->[$COOKIE_NAME] = $1;
             }
             else {
-                $k = lc $attr;
-
-                $v = q[];
+                $key = lc $1;
             }
 
-            if ( $k eq 'domain' ) {
-                if ( $v ne q[] ) {
+            if ( $str =~ /\G=\s*(.*?)\s*(?:;|\z)/smgc ) {
+                if ( !defined $is_attr ) {
+                    $cookie->[$COOKIE_VAL] = $1;
+                }
+                else {
+                    if ( $key eq 'domain' ) {
 
-                    # http://bayou.io/draft/cookie.domain.html
-                    # origin domain - domain from the request
-                    # cover domain - domain from cookie attribute
+                        # http://bayou.io/draft/cookie.domain.html
+                        # origin domain - domain from the request
+                        # cover domain - domain from cookie attribute
 
-                    # if a cookie's origin domain is an IP, the cover domain must be null
-                    next COOKIE if $url->host->is_ip;
+                        my $cover_domain = $1;
 
-                    # parse cover domain
-                    my $cover_domain = P->host($v);
+                        # TODO if the origin domain is an IP, the cover domain must be null. A cookie with an IP origin is only applicable to that IP
 
-                    # a cover domain must not be a IP address
-                    next COOKIE if $cover_domain->is_ip;
+                        # a cover domain should not contain a leading dot, like in .cats.com; if it does, the client should remove the leading do
+                        $cover_domain =~ s/\A[.]+//sm;
 
-                    my $cover_domain_name = $cover_domain->name;
+                        if ( $cover_domain ne q[] ) {
 
-                    # if the origin domain is the same domain
-                    if ( $cover_domain_name eq $origin_domain_name ) {
+                            # the cover domain must cover (be a substring) the origin domain
+                            if ( ".$origin_domain" =~ /\Q.$cover_domain\E\z/sm ) {
+                                $domain = ".$cover_domain";
+                            }
+                            else {
 
-                        # permit a public suffix domain to specify itself as the cover domain
-                        # ignore cover domain, if cover domain is pub. suffix
-                        next if $cover_domain->is_pub_suffix;
-                    }
-                    else {
-                        # the cover domain must not be a TLD, a public suffix, or a parent of a public suffix
-                        next COOKIE if $cover_domain->is_pub_suffix;
-
-                        # the cover domain must cover (be a parent) the origin domain
-                        if ( ( my $idx = index $origin_domain_name, q[.] . $cover_domain_name ) > 0 ) {
-                            next COOKIE if length($origin_domain_name) != 1 + $idx + length $cover_domain_name;
-                        }
-                        else {
-                            next COOKIE;
+                                # if a cookie's cover domain is set illegally or incorrectly, the client should ignore the cookie entirely.
+                                next COOKIE;
+                            }
                         }
                     }
+                    elsif ( $key eq 'path' ) {
+                        $path = $1 if $1 ne q[];
+                    }
+                    elsif ( $key eq 'expires' ) {
+                        if ( !defined $cookie->[$COOKIE_EXPIRES] ) {    # do not process expires attribute, if expires is already set by expires or max-age
+                            if ( my $expires = eval { P->date->parse($1) } ) {
+                                $cookie->[$COOKIE_EXPIRES] = $expires->epoch;
+                            }
+                        }
+                    }
+                    elsif ( $key eq 'max-age' ) {
 
-                    # accept cover domain cookie
-                    $cookie->{domain} = q[.] . $cover_domain_name;
-                }
-            }
-            elsif ( $k eq 'path' ) {
-                if ( $v ne q[] ) {
-                    $cookie->{path} = $v;
-                }
-            }
-            elsif ( $k eq 'expires' ) {
-                if ( $v ne q[] ) {
-                    if ( !$cookie->{expires} ) {    # do not process expires attribute, if expires is already set by expires or max-age
-                        if ( my $expires = eval { P->date->parse($v) } ) {
-                            $cookie->{expires} = $expires->epoch;
-                        }
-                        else {
-                            # ignore cookie if expires value is invalid
-                            next COOKIE;
-                        }
+                        # Number of seconds until the cookie expires.
+                        # A zero or negative number will expire the cookie immediately.
+                        # If both (Expires and Max-Age) are set, Max-Age will have precedence.
+                        my $val = $1;
+
+                        $cookie->[$COOKIE_EXPIRES] = time + $val if $val =~ /\A-?\d+\z/sm;
                     }
                 }
             }
 
-            # Number of seconds until the cookie expires.
-            # A zero or negative number will expire the cookie immediately.
-            # If both (Expires and Max-Age) are set, Max-Age will have precedence.
-            # TODO support negative value
-            elsif ( $k eq 'max-age' ) {
-                if ( $v ne q[] ) {
-                    if ( $v =~ /\A\d+\z/sm ) {
-                        $cookie->{expires} = time + $v;
-                    }
-                    else {
-                        # ignore cookie if max-age value is invalid
-                        next COOKIE;
-                    }
-                }
+            if ( !defined $is_attr ) {
+                $is_attr = 1;
             }
-            elsif ( $k eq 'httponly' ) {
-                $cookie->{httponly} = 1;
-            }
-            elsif ( $k eq 'secure' ) {
-                $cookie->{secure} = 1;
+            else {
+                $cookie->[$COOKIE_SECURE] = 1 if $key eq 'secure';
             }
         }
 
-        if ( $cookie->{expires} && $cookie->{expires} <= time ) {
-            $self->remove_cookie( $cookie->{domain}, $cookie->{path}, $cookie->{name} );
+        next if !defined $cookie->[$COOKIE_NAME];
+
+        $cookie->[$COOKIE_VAL] //= q[];
+        $domain                //= $origin_domain;
+        $path                  //= $origin_path;
+
+        if ( defined $cookie->[$COOKIE_EXPIRES] && $cookie->[$COOKIE_EXPIRES] <= time ) {
+            $self->remove_cookie( $domain, $path, $cookie->[$COOKIE_NAME] );
         }
         else {
-            $self->{cookies}->{ $cookie->{domain} }->{ $cookie->{path} }->{ $cookie->{name} } = $cookie;
+            $self->{cookies}->{$domain}->{$path}->{ $cookie->[$COOKIE_NAME] } = $cookie;
         }
     }
 
@@ -179,91 +111,56 @@ sub parse_cookies ( $self, $url, $set_cookie_header ) {
 }
 
 sub get_cookies ( $self, $url ) {
-    state $match_path = sub ( $url_path, $cookie_path ) {
-        return 1 if $cookie_path eq $url_path;
-
-        return 1 if $cookie_path eq q[/];
-
-        if ( $url_path =~ /\A\Q$cookie_path\E(.*)/sm ) {
-            my $rest = $1;
-
-            return 1 if substr( $cookie_path, -1, 1 ) eq q[/];
-
-            return 1 if substr( $rest, 0, 1 ) eq q[/];
-        }
-
-        return;
-    };
-
-    state $match_domain = sub ( $self, $domain, $domain_cookies, $url ) {
-        my $cookies;
-
-        my $time = time;
-
-        for my $cookie_path ( keys $domain_cookies->%* ) {
-            if ( $match_path->( $url->path, $cookie_path ) ) {
-                for my $cookie ( values $domain_cookies->{$cookie_path}->%* ) {
-                    if ( $cookie->{expires} && $cookie->{expires} < $time ) {
-
-                        # remove expired cookie
-                        $self->remove_cookie( $domain, $cookie_path, $cookie->{name} );
-                    }
-                    else {
-                        next if $cookie->{secure} && !$url->is_secure;
-
-                        push $cookies->@*, $cookie->{name} . q[=] . $cookie->{val};
-                    }
-                }
-            }
-        }
-
-        return $cookies;
-    };
-
     $url = P->uri($url) if !is_ref $url;
 
-    my $cookies;
+    my $origin_is_secure = $url->is_secure;
+    my $origin_path      = $url->path->to_string;
 
-    # origin cookie
-    my $origin_domain_name = $url->host->name;
+    my @cookies;
 
-    if ( my $origin_cookies = $self->{cookies}->{$origin_domain_name} ) {
-        if ( my $match_cookies = $match_domain->( $self, $origin_domain_name, $origin_cookies, $url ) ) {
-            push $cookies->@*, $match_cookies->@*;
+    my @origin_domains = ( $url->host->name );
+
+    if ( !$url->host->is_ip ) {
+        my $cover_domain = '.' . $url->host->name;
+
+        push @origin_domains, $cover_domain;
+
+        while ( $cover_domain =~ s/\A[.][^.]+[.]/./sm ) {
+            push @origin_domains, $cover_domain;
         }
     }
 
-    # cover cookies
-    # http://bayou.io/draft/cookie.domain.html#Coverage_Model
-    if ( !$url->host->is_ip ) {
-        my @labels = split /[.]/sm, $url->host->name;
+    for my $origin_domain (@origin_domains) {
+        if ( my $domain = $self->{cookies}->{$origin_domain} ) {
+            for my $path ( keys $domain->%* ) {
+                for my $cookie ( values $domain->{$path}->%* ) {
 
-        my $origin = 1;
+                    # check expire
+                    if ( defined $cookie->[$COOKIE_EXPIRES] && $cookie->[$COOKIE_EXPIRES] <= time ) {
 
-        while ( @labels > 1 ) {
-            my $domain = P->host( join q[.], @labels );
+                        # remove expired cookie
+                        $self->remove_cookie( $domain, $path, $cookie->[$COOKIE_NAME] );
 
-            my $cover_domain_name = q[.] . $domain->name;
+                        next;
+                    }
 
-            if ( my $cover_cookies = $self->{cookies}->{$cover_domain_name} ) {
-                if ( my $match_cookies = $match_domain->( $self, $cover_domain_name, $cover_cookies, $url ) ) {
-                    push $cookies->@*, $match_cookies->@*;
+                    # check secure
+                    next if $cookie->[$COOKIE_SECURE] && !$origin_is_secure;
+
+                    # match path, cookie path must be aa substring of the origin path
+                    push @cookies, $cookie if index( $path, $origin_path ) == 0;
                 }
             }
-
-            last if $domain->is_pub_suffix && !$origin;
-
-            $origin = 0;
-
-            shift @labels;
         }
     }
 
-    return $cookies;
+    return @cookies ? [ map {"$_->[$COOKIE_NAME]=$_->[$COOKIE_VAL]"} @cookies ] : ();
 }
 
 sub remove_cookie ( $self, $domain, $path, $name ) {
-    if ( delete $self->{cookies}->{$domain}->{$path}->{$name} ) {
+    if ( exists $self->{cookies}->{$domain}->{$path}->{$name} ) {
+        delete $self->{cookies}->{$domain}->{$path}->{$name};
+
         delete $self->{cookies}->{$domain}->{$path} if !keys $self->{cookies}->{$domain}->{$path}->%*;
 
         delete $self->{cookies}->{$domain} if !keys $self->{cookies}->{$domain}->%*;
@@ -279,11 +176,9 @@ sub remove_cookie ( $self, $domain, $path, $name ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 28                   | * Subroutine "parse_cookies" with high complexity score (38)                                                   |
-## |      | 181                  | * Subroutine "get_cookies" with high complexity score (23)                                                     |
+## |    3 | 14                   | Subroutines::ProhibitExcessComplexity - Subroutine "parse_cookies" with high complexity score (27)             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 116, 136             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 53, 56, 70, 71       | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----
@@ -299,5 +194,11 @@ Pcore::HTTP::Cookies
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
+
+=head1 ATTRIBUTES
+
+=head1 METHODS
+
+=head1 SEE ALSO
 
 =cut

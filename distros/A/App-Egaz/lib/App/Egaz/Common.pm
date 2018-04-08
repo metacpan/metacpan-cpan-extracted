@@ -3,15 +3,24 @@ use strict;
 use warnings;
 use autodie;
 
-use 5.010001;
+use 5.018001;
 
+use Bio::Phylo qw();
+use Bio::Phylo::IO qw();
 use Carp qw();
+use File::Find::Rule;
 use File::ShareDir qw();
 use IO::Zlib;
 use IPC::Cmd qw();
 use JSON qw();
 use List::Util qw();
+use List::MoreUtils qw();
+use MCE;
+use Number::Format qw();
 use Path::Tiny qw();
+use Set::Scalar;
+use Statistics::R;
+use String::Similarity;
 use Template;
 use YAML::Syck qw();
 
@@ -115,6 +124,44 @@ sub get_size {
     }
 
     return \%length_of;
+}
+
+#----------------------------#
+# parsing tree
+#----------------------------#
+sub ladder {
+    my $file        = shift;
+    my $target_name = shift;
+
+    my $tree = Bio::Phylo::IO::parse( -format => 'newick', -file => $file )->first;
+
+    my $target = $tree->get_by_name($target_name);
+
+    my @ladder = ( [$target_name], );
+    my $set = Set::Scalar->new;
+    $set->insert($target_name);
+
+    my $start = $target;
+    while (1) {
+        my $parent = $start->get_parent;
+        last unless $parent;
+        my @nodes
+            = grep { !$set->has( $_->get_name ) } @{ $parent->get_terminals };
+        $set->insert( $_->get_name ) for @nodes;
+        my $distance_of = {};
+        for my $node (@nodes) {
+            $distance_of->{ $node->get_name } = $node->calc_patristic_distance($target);
+        }
+        my @sorted = map { $_->[0] }
+            sort { $a->[1] <=> $b->[1] }
+            map { [ $_, $distance_of->{$_} ] }
+            keys %{$distance_of};
+        push @ladder, [@sorted];
+
+        $start = $parent;
+    }
+
+    return \@ladder;
 }
 
 sub exec_cmd {

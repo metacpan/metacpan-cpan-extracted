@@ -603,7 +603,7 @@ Igbo locale.
    1995-12-22T09:05:02 = Ọkara 4 1995
   -0010-09-15T04:44:23 = Ọkara 3 -10
 
-=head3 yw-count-other ('week' w 'of' Y)
+=head3 yw-count-other ('week' w 'of' y)
 
    2008-02-05T18:30:30 = week 6 of 2008
    1995-12-22T09:05:02 = week 51 of 1995

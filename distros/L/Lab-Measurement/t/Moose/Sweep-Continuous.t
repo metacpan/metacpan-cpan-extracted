@@ -19,9 +19,10 @@ my $dir = catfile( tempdir(), 'sweep' );
     #
     # Time sweep
     #
-    my $interval = 0.02;
-    my $duration = 0.1;
-    my $sweep    = sweep(
+    my $interval   = 0.1;
+    my $duration   = 1;
+    my $num_points = $duration / $interval + 1;
+    my $sweep      = sweep(
         type     => 'Continuous::Time',
         duration => $duration,
         interval => $interval,
@@ -45,7 +46,6 @@ my $dir = catfile( tempdir(), 'sweep' );
 
         # use default datafile_dim and point_dim
     );
-    warn "start_time: ", $sweep->start_time - $t0;
     my $path = catfile( $sweep->foldername, 'data.dat' );
 
     my @cols = read_gnuplot_format(
@@ -54,9 +54,8 @@ my $dir = catfile( tempdir(), 'sweep' );
 
     );
     my $times = $cols[0]->unpdl();
-    print Dumper $times;
 
-    is( @{$times}, 6, "datafile size" );
+    is( @{$times}, $num_points, "datafile size" );
 
     is_absolute_error(
         $times->[-1], $times->[0] + $duration, $interval,

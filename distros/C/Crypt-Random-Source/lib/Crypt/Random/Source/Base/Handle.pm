@@ -1,7 +1,7 @@
 package Crypt::Random::Source::Base::Handle;
 # ABSTRACT: L<IO::Handle> based random data sources
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Moo;
 use Types::Standard qw(Bool);
@@ -110,7 +110,7 @@ Crypt::Random::Source::Base::Handle - L<IO::Handle> based random data sources
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

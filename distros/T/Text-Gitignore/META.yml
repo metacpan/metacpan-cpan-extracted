@@ -1,0 +1,38 @@
+---
+abstract: 'Match .gitignore patterns'
+author:
+  - 'Viacheslav Tykhanovskyi <viacheslav.t@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Gitignore
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Text::Gitignore:
+    file: lib/Text/Gitignore.pm
+    version: '0.01'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/vti/text-gitignore/issues
+  homepage: https://github.com/vti/text-gitignore
+  repository: git://github.com/vti/text-gitignore.git
+version: '0.01'
+x_authority: cpan:VTI
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

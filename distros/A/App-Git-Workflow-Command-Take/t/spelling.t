@@ -28,5 +28,8 @@ plan skip_all => "spell command required for testing POD spelling" if !$found;
 add_stopwords(qw/
     NSW
     Hornsby
+    eg
+    pom
+    xml
 /);
 all_pod_files_spelling_ok();

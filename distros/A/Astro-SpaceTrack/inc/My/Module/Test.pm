@@ -12,7 +12,7 @@ our @ISA = qw{ Exporter };
 use HTTP::Date;
 use Test::More 0.96;	# For subtest
 
-our $VERSION = '0.104';
+our $VERSION = '0.105';
 
 # Set the following to zero if Space Track (or any other SSL host)
 # starts using a certificate that can not be verified.
@@ -35,6 +35,9 @@ qw{
     throws_exception
     VERIFY_HOSTNAME
 };
+
+use constant HASH_REF	=> ref {};
+use constant REGEXP_REF	=> ref qr{};
 
 use constant NO_SPACE_TRACK_ACCOUNT => 'No Space-Track account provided';
 
@@ -123,7 +126,7 @@ sub not_defined ($$) {	## no critic (ProhibitSubroutinePrototypes)
 
     sub prompt (@) {	## no critic (ProhibitSubroutinePrototypes)
 	my @args = @_;
-	my $opt = 'HASH' eq ref $args[0] ? shift @args : {};
+	my $opt = HASH_REF eq ref $args[0] ? shift @args : {};
 	$readkey_loaded
 	    or not $opt->{password}
 	    or push @args, '(ECHOED)';
@@ -336,7 +339,7 @@ sub throws_exception (@) {	## no critic (RequireArgUnpacking,ProhibitSubroutineP
     my ( $obj, $method, @args ) = @_;
     my $name = pop @args;
     my $exception = pop @args;
-    'Regexp' eq ref $exception
+    REGEXP_REF eq ref $exception
 	or $exception = qr{\A$exception};
     $rslt = eval { $obj->$method( @args ) }
 	and do {

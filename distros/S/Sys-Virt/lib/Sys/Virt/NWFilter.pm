@@ -91,10 +91,8 @@ the network's configuration
 
 =item $filter->undefine()
 
-Remove the configuration associated with a network previously defined
-with the C<define_network> method in L<Sys::Virt>. If the network is
-running, you probably want to use the C<shutdown> or C<destroy>
-methods instead.
+Remove the configuration associated with a network filter previously defined
+with the C<define_nwfilter> method in L<Sys::Virt>.
 
 =cut
 

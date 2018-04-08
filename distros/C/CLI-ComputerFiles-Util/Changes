@@ -1,0 +1,5 @@
+Revision history for CLI-ComputerFiles-Util
+
+0.101    2018-03-30 First version, released on an unsuspecting world.
+0.102    2018-04-02 ヘルプ書換。madeafter に シンボリックリンク先の情報を見る -l を実装。
+

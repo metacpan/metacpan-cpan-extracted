@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes IO::Stream::Proxy::SOCKSv4 version v1.0.2
+    This document describes IO::Stream::Proxy::SOCKSv4 version v2.0.1
 
 SYNOPSIS
 
@@ -51,12 +51,20 @@ DESCRIPTION
 
 INTERFACE
 
-    new({ host=>$host, port=>$port })
+ new
 
-    new({ host=>$host, port=>$port, userid=>$ENV{USER} })
+        $plugin = IO::Stream::Proxy::SOCKSv4->new({
+            host    => $host,
+            port    => $port,
+        });
+        $plugin = IO::Stream::Proxy::SOCKSv4->new({
+            host    => $host,
+            port    => $port,
+            userid  => $ENV{USER},
+        });
 
-      Connect to proxy $host:$port, optionally using given userid (empty by
-      default).
+    Connect to proxy $host:$port, optionally using given userid (empty by
+    default).
 
 DIAGNOSTICS
 
@@ -121,7 +129,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2009 by Alex Efros <powerman@cpan.org>.
+    This software is Copyright (c) 2009- by Alex Efros <powerman@cpan.org>.
 
     This is free software, licensed under:
 

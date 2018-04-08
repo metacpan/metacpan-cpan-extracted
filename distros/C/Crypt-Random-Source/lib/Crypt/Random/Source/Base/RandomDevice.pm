@@ -1,7 +1,7 @@
 package Crypt::Random::Source::Base::RandomDevice;
 # ABSTRACT: Base class for random devices
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Moo;
 
@@ -46,7 +46,7 @@ Crypt::Random::Source::Base::RandomDevice - Base class for random devices
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

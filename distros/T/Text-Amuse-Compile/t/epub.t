@@ -46,8 +46,8 @@ foreach my $file (qw/piece000001.xhtml
                                              $file));
     like $page, qr{<title>.*\&amp\;.*\&amp\;.*</title>}, "Title escaped on $file";
     like $page, qr{\&amp\;.*\&amp\;}, "& escaped on $file";
-    unlike $page, qr{\&amp\;nbsp;};
-    like $page, qr{\&nbsp;};
+    unlike $page, qr{\&amp\;#160\;};
+    like $page, qr{\&#160\;};
     if ($file =~ m/piece000/) {
         like $page, qr{<a id="text-amuse-label}, "Found anchor";
     }

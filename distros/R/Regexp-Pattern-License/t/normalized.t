@@ -68,11 +68,6 @@ Every copy of Aladdin Ghostscript must include a copy of the License, normally i
 The License grants you the right to copy, modify and redistribute Aladdin Ghostscript, but only under certain conditions described in the License.
 Among other things, the License requires that the copyright notice and this notice be preserved on all copies.
 EOF
-	TODO => [
-		qw(
-			subject_license subject_iri
-			)
-	]
 );
 
 license_covered(
@@ -712,7 +707,7 @@ EOF
 license_covered(
 	'llgpl',
 	name => 'Lisp Lesser General Public License',
-	iri => 'https://tldrlegal.com/license/lisp-lesser-general-public-license',
+	iri  => 'http://opensource.franz.com/preamble.html',
 	text => <<EOF,
 as governed by the terms of the Lisp Lesser General Public License
 EOF

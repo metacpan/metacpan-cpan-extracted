@@ -3072,6 +3072,33 @@ subtest 'export_system', sub {
     like( $url_in_response, qr|/api/export/system|, 'requsted URL looks sane' );
 };
 
+subtest 'ignore_xray_alert', sub {
+    my $client = setup();
+    local *{'LWP::UserAgent::post'} = sub {
+        return $mock_responses{http_200};
+    };
+    my $resp = $client->ignore_xray_alert('/foo');
+    is( $resp->code, 200, 'request succeeded' );
+};
+
+subtest 'allow_download_of_blocked_artifacts', sub {
+    my $client = setup();
+    local *{'LWP::UserAgent::post'} = sub {
+        return $mock_responses{http_200};
+    };
+    my $resp = $client->allow_download_of_blocked_artifacts('true');
+    is( $resp->code, 200, 'request succeeded' );
+};
+
+subtest 'allow_download_when_xray_is_unavailable', sub {
+    my $client = setup();
+    local *{'LWP::UserAgent::post'} = sub {
+        return $mock_responses{http_200};
+    };
+    my $resp = $client->allow_download_when_xray_is_unavailable('true');
+    is( $resp->code, 200, 'request succeeded' );
+};
+
 subtest 'create_bundle', sub {
     my $client = setup();
     my %data   = ();

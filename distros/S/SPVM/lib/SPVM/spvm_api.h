@@ -62,7 +62,7 @@ struct SPVM_api {
   void (*set_double_field)(SPVM_API*, SPVM_API_OBJECT*, int32_t, double);
   void (*set_object_field)(SPVM_API*, SPVM_API_OBJECT*, int32_t, SPVM_API_OBJECT*);
   int32_t (*get_sub_id)(SPVM_API*, const char*);
-  int32_t (*get_method_sub_id)(SPVM_API*, SPVM_API_OBJECT* object, const char*);
+  int32_t (*get_sub_id_interface_method)(SPVM_API*, SPVM_API_OBJECT* object, int32_t);
   int32_t (*get_class_method_sub_id)(SPVM_API*, const char*, const char*);
   void (*call_void_sub)(SPVM_API* api, int32_t sub_id, SPVM_API_VALUE* args);
   int8_t (*call_byte_sub)(SPVM_API* api, int32_t sub_id, SPVM_API_VALUE* args);
@@ -81,9 +81,10 @@ struct SPVM_api {
   SPVM_API_OBJECT* (*new_float_array)(SPVM_API*, int32_t);
   SPVM_API_OBJECT* (*new_double_array)(SPVM_API*, int32_t);
   SPVM_API_OBJECT* (*new_object_array)(SPVM_API*, int32_t, int32_t);
-  SPVM_API_OBJECT* (*new_string)(SPVM_API* api, const char* string, int32_t length);
+  SPVM_API_OBJECT* (*new_string)(SPVM_API* api, int8_t* bytes, int32_t length);
+  SPVM_API_OBJECT* (*new_string_chars)(SPVM_API* api, const char* chars);
   int32_t (*get_string_length)(SPVM_API* api, SPVM_API_OBJECT*);
-  char* (*get_string_chars)(SPVM_API* api, SPVM_API_OBJECT*);
+  int8_t* (*get_string_bytes)(SPVM_API* api, SPVM_API_OBJECT*);
   SPVM_API_OBJECT* (*get_exception)(SPVM_API* api);
   void (*set_exception)(SPVM_API* api, SPVM_API_OBJECT* exception);
   int32_t (*get_ref_count)(SPVM_API* api, SPVM_API_OBJECT* base_object);
@@ -96,15 +97,10 @@ struct SPVM_api {
   void (*weaken)(SPVM_API* api, SPVM_API_OBJECT** object_address);
   int32_t (*isweak)(SPVM_API* api, SPVM_API_OBJECT* object);
   void (*unweaken)(SPVM_API* api, SPVM_API_OBJECT** object_address);
-  SPVM_API_OBJECT* (*concat_string_byte)(SPVM_API* api, SPVM_API_OBJECT* string1, int8_t string2);
-  SPVM_API_OBJECT* (*concat_string_short)(SPVM_API* api, SPVM_API_OBJECT* string1, int16_t string2);
-  SPVM_API_OBJECT* (*concat_string_int)(SPVM_API* api, SPVM_API_OBJECT* string1, int32_t string2);
-  SPVM_API_OBJECT* (*concat_string_long)(SPVM_API* api, SPVM_API_OBJECT* string1, int64_t string2);
-  SPVM_API_OBJECT* (*concat_string_float)(SPVM_API* api, SPVM_API_OBJECT* string1, float string2);
-  SPVM_API_OBJECT* (*concat_string_double)(SPVM_API* api, SPVM_API_OBJECT* string1, double string2);
-  SPVM_API_OBJECT* (*concat_string_string)(SPVM_API* api, SPVM_API_OBJECT* string1, SPVM_API_OBJECT* string2);
+  SPVM_API_OBJECT* (*concat)(SPVM_API* api, SPVM_API_OBJECT* string1, SPVM_API_OBJECT* string2);
   void (*weaken_object_field)(SPVM_API* api, SPVM_API_OBJECT* object, int32_t field_id);
   SPVM_API_OBJECT* (*create_exception_stack_trace)(SPVM_API* api, SPVM_API_OBJECT* excetpion, int32_t sub_id, int32_t current_line);
   int32_t (*compile_jit_sub)(SPVM_API* api, int32_t sub_id);
+  int32_t (*check_cast)(SPVM_API* api, int32_t cast_type_id, SPVM_API_OBJECT* object);
 };
 #endif

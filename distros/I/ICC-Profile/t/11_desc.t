@@ -1,12 +1,13 @@
 #!/usr/bin/perl -w
 
-# ICC::Profile::desc test module / 2018-03-27
+# ICC::Profile::desc test module / 2018-03-31
 #
 # Copyright © 2004-2018 by William B. Birkett
 
 use strict;
 
 use File::Spec;
+use File::Temp;
 use t::lib::Boot;
 use Test::More tests => 6;
 
@@ -37,14 +38,14 @@ isa_ok($tag, 'ICC::Profile::desc');
 # test size method
 ok($tag->size == $profile->tag_table->[1][2], 'tag size');
 
-# open temporary file for write-read access
-open($temp, '+>' . File::Spec->catfile('t', 'data', 'temp.dat'));
-
-# set binary mode
-binmode($temp);
+# open temporary file for write-read access, binmode
+$temp = File::Temp::tempfile();
 
 # write tag to temporary file
 $tag->write_fh($profile, $temp, $profile->tag_table->[1]);
+
+# flush buffer
+$temp->flush;
 
 # read profile raw data
 seek($profile->fh, $profile->tag_table->[1][1], 0);
@@ -57,10 +58,8 @@ read($temp, $raw2, $tag->size);
 # test raw data round-trip integrity
 ok($raw1 eq $raw2, 'raw data round-trip');
 
-# close profile
+# close files
 close($profile->fh);
-
-# close temporary file
 close($temp);
 
 ##### more tests needed #####

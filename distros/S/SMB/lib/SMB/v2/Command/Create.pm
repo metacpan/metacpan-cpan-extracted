@@ -1,4 +1,4 @@
-# SMB Perl library, Copyright (C) 2014 Mikhael Goikhman, migo@cpan.org
+# SMB Perl library, Copyright (C) 2014-2018 Mikhael Goikhman, migo@cpan.org
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -167,6 +167,12 @@ sub requested_non_directory ($) {
 	my $self = shift;
 
 	return $self->options & OPTIONS_NON_DIRECTORY_FILE ? 1 : 0;
+}
+
+sub requested_delete_on_close ($) {
+	my $self = shift;
+
+	return $self->options & OPTIONS_DELETE_ON_CLOSE ? 1 : 0;
 }
 
 1;

@@ -1,5 +1,6 @@
 use Mojo::Base -strict;
-use t::problem_start;
+use lib 't';
+use problem_start;
 use MojoX::UserAgent::Throttler;
 
 

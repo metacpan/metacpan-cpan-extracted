@@ -1,6 +1,7 @@
 use warnings;
 use strict;
-use t::share;
+use lib 't';
+use share;
 
 # Use case: HTTP/1.0 Keep-Alive: GET without EOF
 my $request = "GET / HTTP/1.0\nHost: localhost\nConnection: Keep-Alive\n\n";

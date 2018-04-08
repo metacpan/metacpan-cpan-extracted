@@ -68,11 +68,13 @@ my $build = $class->new(
 
   'build_requires' => {
     'Config::Model::Tester' => '2.062',
+    'Config::Model::Tester::Setup' => '0',
     'File::Copy' => '0',
     'Module::Build' => '0.34',
     'Test::Differences' => '0',
     'Test::Exception' => '0',
     'Test::File::Contents' => '0',
+    'Test::Log::Log4perl' => '0',
     'Test::Memory::Cycle' => '0',
     'Test::More' => '0',
     'Test::Warn' => '0.11',

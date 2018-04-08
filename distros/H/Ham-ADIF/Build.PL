@@ -51,6 +51,9 @@ my $builder = $class->new(
                                                  },
                           recommends          => {
                                                  },
+                          configure_requires  => {
+                                                  'Module::Build'           => '0.42',
+                                                 },
                           build_requires      => {
                                                   'Test::More'              => '0.62',
                                                   'TAP::Harness::JUnit'     => '0.41',

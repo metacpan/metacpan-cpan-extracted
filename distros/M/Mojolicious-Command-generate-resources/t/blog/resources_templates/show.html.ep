@@ -1,10 +1,9 @@
 % my $a = shift;
 %% my $title = "$<%= $a->{t} %>->{id} from table <%= $a->{t} %>";
-%% layout 'blog', 
-%%   title => $title;
+%% layout 'blog', title => $title;
 
-<h2><%%= $title %> </h2>
+<h2><%%= $title %></h2>
 %% for my $k ( qw(<%= join ' ', @{$a->{columns}} %>) ) {
-<p><%%= ucfirst $k %>: <%%= $<%= $a->{t} %>->{$k} %></p>
+<p><b><%%= ucfirst $k %>:</b> <%%= $<%= $a->{t} %>->{$k} %></p>
 %% }
 %%= link_to 'Edit' => edit_<%= $a->{t} %> => {id => $<%= $a->{t} %>->{id}}

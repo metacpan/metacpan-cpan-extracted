@@ -19,6 +19,7 @@ t/lib/Test/JSONAPI.pm
 t/lib/Test/JSONAPI/Schema.pm
 t/lib/Test/JSONAPI/Schema/Result/Author.pm
 t/lib/Test/JSONAPI/Schema/Result/Comment.pm
+t/lib/Test/JSONAPI/Schema/Result/EmailTemplate.pm
 t/lib/Test/JSONAPI/Schema/Result/Post.pm
 t/release-check-manifest.t
 t/release-cpan-changes.t

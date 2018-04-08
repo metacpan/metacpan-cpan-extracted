@@ -1,6 +1,13 @@
--   2.17.6 
+
+-   2.17.10 Thu Apr  5 01:57:37 CDT 2018
+
+    Bump version of Module::FromPerlVer
+
+-   2.17.9 Mon Apr  2 12:41:30 CDT 2018
 
     Missing dependencies in Makefile.PL.
+
+    Bump M::FPV version to 0.3.2.
 
 -   2.17.5 Sun Mar 18 17:19:43 CDT 2018
 

@@ -1,4 +1,4 @@
-use t::share; guard my $guard;
+use lib 't'; use share; guard my $guard;
 
 
 plan skip_all => 'OS Inferno not installed'  if !grep {-x "$_/emu-g" && /inferno/} split /:/, $ENV{PATH};
@@ -11,7 +11,7 @@ chomp(my $orig = `which emu-g`);
 open my $f, '>', 'tmp/emu-g'                or die "open: $!";
 printf {$f} "%s\n", '#!/usr/bin/env bash';
 printf {$f} "%s\n", '[ -r /dev/stdin ] && stdin=/dev/stdin || stdin=/dev/null';
-printf {$f} "%s %s\n", $orig, '"$@" <$stdin &';
+printf {$f} "LD_PRELOAD= %s %s\n", $orig, '"$@" <$stdin &';
 printf {$f} "%s\n", 'wait 2>/dev/null';
 close $f                                    or die "close: $!";
 chmod 0755, 'tmp/emu-g'                     or die "chmod: $!";

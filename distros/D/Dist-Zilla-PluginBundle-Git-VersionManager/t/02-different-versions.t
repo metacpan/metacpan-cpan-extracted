@@ -49,6 +49,8 @@ is(
     'build proceeds normally',
 );
 
+is($tzil->version, '0.002', 'version properly extracted from main module');
+
 # it is too complicated to test a release here, what with all the git plugins,
 # so we will trust that BumpVersionAfterRelease properly tested its
 # all_matching option, and just test that we set the option properly.

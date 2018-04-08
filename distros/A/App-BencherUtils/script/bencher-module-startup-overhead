@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/BencherUtils/bencher_module_startup_overhead
-# and generated automatically using Perinci::CmdLine::Gen version 0.484
+# and generated automatically using Perinci::CmdLine::Gen version 0.485
 
-our $DATE = '2018-02-18'; # DATE
+our $DATE = '2018-04-03'; # DATE
 our $DIST = 'App-BencherUtils'; # DIST
-our $VERSION = '0.240'; # VERSION
+our $VERSION = '0.241'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ bencher-module-startup-overhead - Accept a list of module names and perform star
 
 =head1 VERSION
 
-This document describes version 0.240 of bencher-module-startup-overhead (from Perl distribution App-BencherUtils), released on 2018-02-18.
+This document describes version 0.241 of bencher-module-startup-overhead (from Perl distribution App-BencherUtils), released on 2018-04-03.
 
 =head1 SYNOPSIS
 
@@ -64,6 +64,20 @@ is basically a shortcut for creating a scenario like this:
  }
 
 and running that scenario with C<bencher>.
+
+To specify import arguments, you can use:
+
+ % bencher-module-startup-overhead Mod1 Mod2=arg1,arg2
+
+which will translate to this Bencher scenario:
+
+ {
+     module_startup => 1,
+     participants => [
+         {module=>"Mod1"},
+         {module=>"Mod2", import_args=>'arg1,arg2'},
+     ],
+ }
 
 =head1 OPTIONS
 

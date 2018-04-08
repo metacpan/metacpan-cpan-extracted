@@ -5,16 +5,16 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.074 ;
+use IO::Compress::Base 2.080 ;
 
-use IO::Compress::Base::Common  2.074 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Lzma 2.074 ;
+use IO::Compress::Base::Common  2.080 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Lzma 2.080 ;
 
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzmaError);
 
-$VERSION = '2.074';
+$VERSION = '2.080';
 $LzmaError = '';
 
 @ISA    = qw(IO::Compress::Base Exporter);
@@ -119,14 +119,12 @@ __END__
 =head1 NAME
 
 IO::Compress::Lzma - Write lzma files/buffers
- 
- 
 
 =head1 SYNOPSIS
 
     use IO::Compress::Lzma qw(lzma $LzmaError) ;
 
-    my $status = lzma $input => $output [,OPTS] 
+    my $status = lzma $input => $output [,OPTS]
         or die "lzma failed: $LzmaError\n";
 
     my $z = new IO::Compress::Lzma $output [,OPTS]
@@ -146,7 +144,7 @@ IO::Compress::Lzma - Write lzma files/buffers
     $z->autoflush();
     $z->input_line_number();
     $z->newStream( [OPTS] );
-    
+
     $z->close() ;
 
     $LzmaError ;
@@ -161,11 +159,11 @@ IO::Compress::Lzma - Write lzma files/buffers
     binmode $z
     fileno $z
     close $z ;
-    
+ 
 
 =head1 DESCRIPTION
 
-B<WARNING -- This is a Beta release>. 
+B<WARNING -- This is a Beta release>.
 
 =over 5
 
@@ -179,10 +177,10 @@ B<WARNING -- This is a Beta release>.
 
 =back
 
-This module provides a Perl interface that allows writing lzma 
+This module provides a Perl interface that allows writing lzma
 compressed data to files or buffer.
 
-For reading lzma files/buffers, see the companion module 
+For reading lzma files/buffers, see the companion module
 L<IO::Uncompress::UnLzma|IO::Uncompress::UnLzma>.
 
 =head1 Functional Interface
@@ -194,7 +192,7 @@ section.
 
     use IO::Compress::Lzma qw(lzma $LzmaError) ;
 
-    lzma $input_filename_or_reference => $output_filename_or_reference [,OPTS] 
+    lzma $input_filename_or_reference => $output_filename_or_reference [,OPTS]
         or die "lzma failed: $LzmaError\n";
 
 The functional interface needs Perl5.005 or better.
@@ -207,7 +205,7 @@ C<$input_filename_or_reference> and C<$output_filename_or_reference>.
 =head3 The C<$input_filename_or_reference> parameter
 
 The parameter, C<$input_filename_or_reference>, is used to define the
-source of the uncompressed data. 
+source of the uncompressed data.
 
 It can take one of the following forms:
 
@@ -225,17 +223,17 @@ If the C<$input_filename_or_reference> parameter is a filehandle, the input
 data will be read from it.  The string '-' can be used as an alias for
 standard input.
 
-=item A scalar reference 
+=item A scalar reference
 
 If C<$input_filename_or_reference> is a scalar reference, the input data
 will be read from C<$$input_filename_or_reference>.
 
-=item An array reference 
+=item An array reference
 
 If C<$input_filename_or_reference> is an array reference, each element in
 the array must be a filename.
 
-The input data will be read from each file in turn. 
+The input data will be read from each file in turn.
 
 The complete array will be walked to ensure that it only
 contains valid filenames before any data is compressed.
@@ -243,8 +241,8 @@ contains valid filenames before any data is compressed.
 =item An Input FileGlob string
 
 If C<$input_filename_or_reference> is a string that is delimited by the
-characters "<" and ">" C<lzma> will assume that it is an 
-I<input fileglob string>. The input is the list of files that match the 
+characters "<" and ">" C<lzma> will assume that it is an
+I<input fileglob string>. The input is the list of files that match the
 fileglob.
 
 See L<File::GlobMapper|File::GlobMapper> for more details.
@@ -265,7 +263,7 @@ these forms.
 =item A filename
 
 If the C<$output_filename_or_reference> parameter is a simple scalar, it is
-assumed to be a filename.  This file will be opened for writing and the 
+assumed to be a filename.  This file will be opened for writing and the
 compressed data will be written to it.
 
 =item A filehandle
@@ -274,14 +272,14 @@ If the C<$output_filename_or_reference> parameter is a filehandle, the
 compressed data will be written to it.  The string '-' can be used as
 an alias for standard output.
 
-=item A scalar reference 
+=item A scalar reference
 
 If C<$output_filename_or_reference> is a scalar reference, the
 compressed data will be stored in C<$$output_filename_or_reference>.
 
 =item An Array Reference
 
-If C<$output_filename_or_reference> is an array reference, 
+If C<$output_filename_or_reference> is an array reference,
 the compressed data will be pushed onto the array.
 
 =item An Output FileGlob
@@ -319,7 +317,7 @@ L</"Constructor Options"> section below.
 
 =item C<< AutoClose => 0|1 >>
 
-This option applies to any input or output data streams to 
+This option applies to any input or output data streams to
 C<lzma> that are filehandles.
 
 If C<AutoClose> is specified, and the value is true, it will result in all
@@ -361,7 +359,7 @@ written to it.  Otherwise the file pointer will not be moved.
 
 =back
 
-When C<Append> is specified, and set to true, it will I<append> all compressed 
+When C<Append> is specified, and set to true, it will I<append> all compressed
 data to the output data stream.
 
 So when the output is a filehandle it will carry out a seek to the eof
@@ -405,7 +403,7 @@ compressed data to a buffer, C<$buffer>.
     my $input = new IO::File "<file1.txt"
         or die "Cannot open 'file1.txt': $!\n" ;
     my $buffer ;
-    lzma $input => \$buffer 
+    lzma $input => \$buffer
         or die "lzma failed: $LzmaError\n";
 
 To compress all files in the directory "/my/home" that match "*.txt"
@@ -427,7 +425,7 @@ and if you want to compress each file one at a time, this will do the trick
     for my $input ( glob "/my/home/*.txt" )
     {
         my $output = "$input.lzma" ;
-        lzma $input => $output 
+        lzma $input => $output
             or die "Error compressing '$input': $LzmaError\n";
     }
 
@@ -440,14 +438,14 @@ The format of the constructor for C<IO::Compress::Lzma> is shown below
     my $z = new IO::Compress::Lzma $output [,OPTS]
         or die "IO::Compress::Lzma failed: $LzmaError\n";
 
-It returns an C<IO::Compress::Lzma> object on success and undef on failure. 
+It returns an C<IO::Compress::Lzma> object on success and undef on failure.
 The variable C<$LzmaError> will contain an error message on failure.
 
-If you are running Perl 5.005 or better the object, C<$z>, returned from 
-IO::Compress::Lzma can be used exactly like an L<IO::File|IO::File> filehandle. 
-This means that all normal output file operations can be carried out 
-with C<$z>. 
-For example, to write to a compressed file/buffer you can use either of 
+If you are running Perl 5.005 or better the object, C<$z>, returned from
+IO::Compress::Lzma can be used exactly like an L<IO::File|IO::File> filehandle.
+This means that all normal output file operations can be carried out
+with C<$z>.
+For example, to write to a compressed file/buffer you can use either of
 these forms
 
     $z->print("hello world\n");
@@ -470,7 +468,7 @@ If the C<$output> parameter is a filehandle, the compressed data will be
 written to it.
 The string '-' can be used as an alias for standard output.
 
-=item A scalar reference 
+=item A scalar reference
 
 If C<$output> is a scalar reference, the compressed data will be stored
 in C<$$output>.
@@ -497,7 +495,7 @@ This parameter defaults to 0.
 
 =item C<< Append => 0|1 >>
 
-Opens C<$output> in append mode. 
+Opens C<$output> in append mode.
 
 The behaviour of this option is dependent on the type of C<$output>.
 
@@ -543,7 +541,7 @@ This is a placeholder option.
 
 TODO
 
-=head1 Methods 
+=head1 Methods
 
 =head2 print
 
@@ -651,7 +649,7 @@ This is a noop provided for completeness.
 
     $z->opened()
 
-Returns true if the object currently refers to a opened file/buffer. 
+Returns true if the object currently refers to a opened file/buffer.
 
 =head2 autoflush
 
@@ -674,7 +672,7 @@ retrieve the autoflush setting.
     $z->input_line_number()
     $z->input_line_number(EXPR)
 
-This method always returns C<undef> when compressing. 
+This method always returns C<undef> when compressing.
 
 =head2 fileno
 
@@ -693,7 +691,7 @@ C<undef>.
     $z->close() ;
     close $z ;
 
-Flushes any pending compressed data and then closes the output file/buffer. 
+Flushes any pending compressed data and then closes the output file/buffer.
 
 For most versions of Perl this method will be automatically invoked if
 the IO::Compress::Lzma object is destroyed (either explicitly or by the
@@ -726,9 +724,9 @@ the C<$z> object.
 
 See the L</"Constructor Options"> section for more details.
 
-=head1 Importing 
+=head1 Importing
 
-No symbolic constants are required by this IO::Compress::Lzma at present. 
+No symbolic constants are required by this IO::Compress::Lzma at present.
 
 =over 5
 
@@ -738,8 +736,6 @@ Imports C<lzma> and C<$LzmaError>.
 Same as doing this
 
     use IO::Compress::Lzma qw(lzma $LzmaError) ;
-
-    
 
 =back
 
@@ -757,7 +753,7 @@ L<IO::Zlib|IO::Zlib>
 
 =head1 AUTHOR
 
-This module was written by Paul Marquess, C<pmqs@cpan.org>. 
+This module was written by Paul Marquess, C<pmqs@cpan.org>.
 
 =head1 MODIFICATION HISTORY
 
@@ -765,7 +761,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2017 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2018 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

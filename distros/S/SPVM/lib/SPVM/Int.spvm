@@ -1,0 +1,15 @@
+package Int : private {
+  has value : private int;
+  
+  sub new : Int ($class : class, $value : int) {
+    my $self = new Int;
+    
+    $self->{value} = $value;
+    
+    return $self;
+  }
+  
+  sub get_value : int ($self : self) {
+    return $self->{value};
+  }
+}

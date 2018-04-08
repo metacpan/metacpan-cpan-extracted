@@ -4,7 +4,7 @@ use 5.008009;
 use strict;
 use warnings;
 use parent qw/Exporter/;
-our $VERSION = '1.000007';
+our $VERSION = '1.000008';
 our @EXPORT_OK = qw/off/;
 
 our $OFF_URL = 'http://offliberty.com/off04.php';
@@ -71,7 +71,7 @@ Marius Gavrilescu, E<lt>marius@ieval.roE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2017 by Marius Gavrilescu
+Copyright (C) 2013-2018 by Marius Gavrilescu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.1 or,

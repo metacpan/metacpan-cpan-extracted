@@ -58,7 +58,7 @@ printf "<tr><th>%s</th><td>%s</td></tr>\n", @$_ for (
 <:
 s/(?<=,)/<wbr>/g for values %ENV; # allow breaks at commas (HTTP_ACCEPT*)
 printf("<tr><th>%s</th><td>%s</td></tr>\n",
-	$_, defined $ENV{$_} ? $ENV{$_} : "<i>no value</i>"
+	$_, defined $ENV{$_} ? EscapeHTML($ENV{$_}) : "<i>no value</i>"
 ) for sort keys %ENV;
 :></table>
 
@@ -66,9 +66,9 @@ printf("<tr><th>%s</th><td>%s</td></tr>\n",
 
 <table border="1">
 <:
-for my $var qw(get post cookies header) {
+for my $var (qw[ get post cookies header ]) {
 	printf("<tr><th>%s{'%s'}</th><td>%s</td></tr>\n",
-		$var, $_, defined $$var{$_} ? $$var{$_} : "<i>no value</i>"
+		$var, $_, defined $$var{$_} ? EscapeHTML($$var{$_}) : "<i>no value</i>"
 	) for sort keys %$var;
 }
 :></table>

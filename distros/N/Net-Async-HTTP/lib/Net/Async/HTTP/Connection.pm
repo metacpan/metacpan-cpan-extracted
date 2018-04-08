@@ -8,7 +8,7 @@ package Net::Async::HTTP::Connection;
 use strict;
 use warnings;
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 use Carp;
 
@@ -342,7 +342,7 @@ sub _mk_on_read_header
 
       if( length $$buffref >= 4 and $$buffref !~ m/^HTTP/ ) {
          $self->debug_printf( "ERROR fail" );
-         $f->fail( "Did no receive HTTP response from server", http => undef, $req ) unless $f->is_cancelled;
+         $f->fail( "Did not receive HTTP response from server", http => undef, $req ) unless $f->is_cancelled;
          $self->close_now;
       }
 

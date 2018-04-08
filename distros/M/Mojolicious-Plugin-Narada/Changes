@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-Narada
 
+v1.0.1  2018-04-03 20:16:43 EEST
+	- Reformat doc.
+
 v1.0.0  2016-02-19 09:40:05 EET
 	- Switch to Dist::Milla.
 
@@ -36,4 +39,3 @@ v1.0.0  2016-02-19 09:40:05 EET
 
 0.1.0	2013-04-11 15:28:07 EEST
 	- Initial release.
-

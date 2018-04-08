@@ -1,4 +1,4 @@
-Highlight version 2.0.0
+Highlight version 2.0.2
 =======================
 
 INSTALLATION
@@ -16,7 +16,7 @@ This module and script do not require any additional packages.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2008-2016 by A. Radkov
+Copyright (C) 2008-2018 by A. Radkov
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

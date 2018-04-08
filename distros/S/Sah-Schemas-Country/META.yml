@@ -22,7 +22,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Country
   homepage: https://metacpan.org/release/Sah-Schemas-Country
   repository: git://github.com/perlancar/perl-Sah-Schemas-Country.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -30,7 +30,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Sah::Schemas
       name: Sah::Schemas
-      version: '0.010'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:

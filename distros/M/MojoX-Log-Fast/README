@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes MojoX::Log::Fast version v0.1.4
+    This document describes MojoX::Log::Fast version v1.0.1
 
 SYNOPSIS
 
@@ -31,28 +31,34 @@ DESCRIPTION
 
 INTERFACE
 
-    new( [$logfast] )
+ new
 
-      If Log::Fast instance $logfast doesn't provided then
-      Log::Fast->global() will be used by default.
+            $log = MojoX::Log::Fast->new();
+            $log = MojoX::Log::Fast->new( $logfast );
 
-    config( @params )
+    If Log::Fast instance $logfast doesn't provided then
+    Log::Fast->global() will be used by default.
 
-    ident( @params )
+ config
 
-      Proxy these methods with given @params to Log::Fast instance.
+ ident
 
-    handle()
+            $log->config( @params );
+            $log->ident( @params );
 
-    path()
+    Proxy these methods with given @params to Log::Fast instance.
 
-      Not compatible with Log::Fast and thus not supported.
+ handle
 
-    format()
+ path
 
-      Not implemented yet, use much more flexible config() instead.
+    Not compatible with Log::Fast and thus not supported.
 
-      Let me know if anyone need it.
+ format
+
+    Not implemented yet, use much more flexible config() instead.
+
+    Let me know if you needs it.
 
 SUPPORT
 
@@ -100,8 +106,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2013-2015 by Alex Efros
-    <powerman@cpan.org>.
+    This software is Copyright (c) 2013- by Alex Efros <powerman@cpan.org>.
 
     This is free software, licensed under:
 

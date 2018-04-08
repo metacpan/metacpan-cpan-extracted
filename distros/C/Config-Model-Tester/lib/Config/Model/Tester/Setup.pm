@@ -9,7 +9,7 @@
 #
 package Config::Model::Tester::Setup;
 # ABSTRACT: Common test setup functions for Config::Model
-$Config::Model::Tester::Setup::VERSION = '3.004';
+$Config::Model::Tester::Setup::VERSION = '3.005';
 use warnings;
 use strict;
 use locale;
@@ -19,14 +19,7 @@ use 5.10.1;
 use Test::More;
 use Log::Log4perl 1.11 qw(:easy :levels);
 use Path::Tiny;
-#use File::Copy::Recursive qw(fcopy rcopy dircopy);
 use Getopt::Std;
-
-#use Test::Warn;
-#use Test::Exception;
-#use Test::File::Contents ;
-#use Test::Differences;
-#use Test::Memory::Cycle ;
 
 # use eval so this module does not have a "hard" dependency on Config::Model
 # This way, Config::Model can build-depend on Config::Model::Tester without
@@ -88,7 +81,7 @@ Config::Model::Tester::Setup - Common test setup functions for Config::Model
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 
@@ -116,10 +109,9 @@ be used in most test involving L<Config::Model>.
 Scan test command line options and initialise a L<Config::Model> object.
 
 Returns a list containing a L<Config::Model> object and a
-boolean. This boolean is true if option C<-t> was used.
-''t'.
+boolean. This boolean is true if option C<-t> was used on the command line.
 
-Options are:
+Command options are:
 
 =over
 

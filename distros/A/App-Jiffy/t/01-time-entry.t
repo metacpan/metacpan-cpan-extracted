@@ -5,14 +5,20 @@ use Test::More;
 use Test::Deep; # (); # uncomment to stop prototype errors
 use Test::Exception;
 
-use YAML::Any qw( LoadFile );
+use lib 't/lib';
 
-use_ok('App::Jiffy::TimeEntry');
+use MongoDBTest 'test_db_or_skip';
+
+use YAML::Any 'LoadFile';
 
 my $cfg = LoadFile('t/test.yml');
 
+test_db_or_skip($cfg);
+
 my $client = MongoDB::MongoClient->new;
-my $db = $client->get_database( 'jiffy-test' );
+my $db     = $client->get_database($cfg->{db});
+
+use_ok('App::Jiffy::TimeEntry');
 
 subtest 'prep' => sub {
   ok $db->drop, 'cleared db';

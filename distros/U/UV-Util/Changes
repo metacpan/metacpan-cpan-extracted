@@ -1,5 +1,15 @@
 Revision history for Perl extension UV-Util
 
+1.000     2018-04-05
+    - Update to use the cleaned up version of Alien::libuv
+    - Remove the build complexity for windows as that's in Alien::libuv now
+    - Bump the major version to 1.000 to coincide with the Alien::libuv change.
+
+0.010     2018-04-03
+    - Update the tests to pass on cygwin.
+    - Fix unnecessarily added libraries during build on cygwin
+    - Fixup AppVeyor tests some more to expand testing.
+
 0.009     2018-03-08
     - Add AppVeyor tests
     - Move constants out in the same way as with UV

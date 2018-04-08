@@ -1,10 +1,10 @@
 {
    "abstract" : "A simple distributed job scheduler",
    "author" : [
-      "YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>"
+      "IKEDA Kiyoshi <progrhyme@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -51,95 +51,95 @@
    "provides" : {
       "App::Koyomi" : {
          "file" : "lib/App/Koyomi.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::CLI" : {
          "file" : "lib/App/Koyomi/CLI.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::Config" : {
          "file" : "lib/App/Koyomi/Config.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::Context" : {
          "file" : "lib/App/Koyomi/Context.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::DataSource::Job" : {
          "file" : "lib/App/Koyomi/DataSource/Job.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::DataSource::Job::Teng" : {
          "file" : "lib/App/Koyomi/DataSource/Job/Teng.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::DataSource::Job::Teng::Data" : {
          "file" : "lib/App/Koyomi/DataSource/Job/Teng/Data.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::DataSource::Job::Teng::JobTime" : {
          "file" : "lib/App/Koyomi/DataSource/Job/Teng/JobTime.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::DataSource::Job::Teng::Object" : {
          "file" : "lib/App/Koyomi/DataSource/Job/Teng/Object.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::DataSource::Job::Teng::Schema" : {
          "file" : "lib/App/Koyomi/DataSource/Job/Teng/Schema.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::DataSource::Semaphore" : {
          "file" : "lib/App/Koyomi/DataSource/Semaphore.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::DataSource::Semaphore::None" : {
          "file" : "lib/App/Koyomi/DataSource/Semaphore/None.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::DataSource::Semaphore::Teng" : {
          "file" : "lib/App/Koyomi/DataSource/Semaphore/Teng.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::DataSource::Semaphore::Teng::Data" : {
          "file" : "lib/App/Koyomi/DataSource/Semaphore/Teng/Data.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::DataSource::Semaphore::Teng::Object" : {
          "file" : "lib/App/Koyomi/DataSource/Semaphore/Teng/Object.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::DataSource::Semaphore::Teng::Schema" : {
          "file" : "lib/App/Koyomi/DataSource/Semaphore/Teng/Schema.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::Job" : {
          "file" : "lib/App/Koyomi/Job.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::JobTime::Formatter" : {
          "file" : "lib/App/Koyomi/JobTime/Formatter.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::JobTime::Object" : {
          "file" : "lib/App/Koyomi/JobTime/Object.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::Logger" : {
          "file" : "lib/App/Koyomi/Logger.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::Schedule" : {
          "file" : "lib/App/Koyomi/Schedule.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::Semaphore" : {
          "file" : "lib/App/Koyomi/Semaphore.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "App::Koyomi::Worker" : {
          "file" : "lib/App/Koyomi/Worker.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       }
    },
    "release_status" : "stable",
@@ -148,5 +148,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "v0.6.0"
+   "version" : "v0.6.1",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

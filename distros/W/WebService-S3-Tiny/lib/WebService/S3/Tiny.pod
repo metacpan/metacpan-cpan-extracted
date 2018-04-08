@@ -1,0 +1,101 @@
+=encoding UTF-8
+
+=head1 NAME
+
+WebService::S3::Tiny - Perl module for using S3 or compatible APIs
+
+=for html
+<a href=https://travis-ci.org/cv-library/WebService-S3-Tiny>
+    <img src=https://api.travis-ci.org/cv-library/WebService-S3-Tiny.svg>
+</a>
+<a href=https://coveralls.io/r/cv-library/WebService-S3-Tiny>
+    <img src=https://coveralls.io/repos/cv-library/WebService-S3-Tiny/badge.svg>
+</a>
+<a href=https://metacpan.org/pod/WebService::S3::Tiny>
+    <img src=https://badge.fury.io/pl/WebService-S3-Tiny.svg>
+</a>
+<a href=https://github.com/cv-library/WebService-S3-Tiny/issues>
+    <img src=https://img.shields.io/github/issues/cv-library/WebService-S3-Tiny.svg>
+</a>
+
+=head1 SYNOPSIS
+
+ use WebDriver::S3::Tiny;
+
+ my $s3 = WebDriver::S3::Tiny->new(
+     access_key => 'foo',
+     host       => 'http://localhost:1337',
+     secret_key => 'bar',
+ );
+
+=head1 METHODS
+
+=head2 new
+
+ WebDriver::S3::Tiny->new(
+     access_key => ..., # required
+     host       => ..., # required
+     region     => ..., # optional, defaults to "us-east-1"
+     secret_key => ..., # required
+     service    => ..., # optional, defaults to "s3"
+     ua         => ..., # optional, defaults to HTTP::Tiny->new
+ );
+
+=head2 delete_bucket
+
+ $s3->delete_bucket($bucket);
+ $s3->delete_bucket($bucket, \%headers);
+
+=head2 get_bucket
+
+ $s3->get_bucket($bucket);
+ $s3->get_bucket($bucket, \%headers);
+ $s3->get_bucket($bucket, \%headers, \%parameters);
+
+=head2 head_bucket
+
+ $s3->head_bucket($bucket);
+ $s3->head_bucket($bucket, \%headers);
+
+=head2 put_bucket
+
+ $s3->put_bucket($bucket);
+ $s3->put_bucket($bucket, \%headers);
+
+=head2 delete_object
+
+ $s3->delete_object($bucket, $object);
+ $s3->delete_object($bucket, $object, \%headers);
+
+=head2 get_object
+
+ $s3->get_object($bucket, $object);
+ $s3->get_object($bucket, $object, \%headers);
+ $s3->get_object($bucket, $object, \%headers, \%parameters);
+
+=head2 head_object
+
+ $s3->head_object($bucket, $object);
+ $s3->head_object($bucket, $object, \%headers);
+
+=head2 put_object
+
+ $s3->put_object($bucket, $object, $content);
+ $s3->put_object($bucket, $object, $content, \%headers);
+
+ # Set foo/bar to "qux"
+ $s3->put_object('foo', 'bar', 'qux');
+
+ # Copy foo/bar to foo/baz
+ $3->put_object('foo', 'baz', undef, { 'x-amz-copy-source' => 'foo/bar' });
+
+=head2 request
+
+ $s3->request($method, $bucket, $object, $content, \%headers, \%parameters);
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2018 CV-Library Ltd.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.

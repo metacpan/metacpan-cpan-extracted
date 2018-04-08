@@ -1,4 +1,4 @@
-use t::share; guard my $guard;
+use lib 't'; use share; guard my $guard;
 
 
 plan skip_all => 'flock not installed'      if !grep {-x "$_/flock"} split /:/, $ENV{PATH};

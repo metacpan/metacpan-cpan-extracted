@@ -6,6 +6,8 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Device::Chip::Adapter::CH341A',
    requires => {
+      'Device::Chip::Adapter' => 0,
+      'Device::Chip::ProtocolBase::SPI' => 0,
    },
    test_requires => {
       'Test::More' => '0.88',  # done_testing

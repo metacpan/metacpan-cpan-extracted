@@ -23,7 +23,7 @@ SKIP: {
         sub new {
             my $class = shift;
             my $self  = {@_};
-            use base ('String::Validator::Common');
+            use parent ('String::Validator::Common');
             bless $self, $class;
             return $self;
         }

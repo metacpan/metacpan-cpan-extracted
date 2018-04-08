@@ -4,7 +4,7 @@
       "Flavio Poletti <polettix@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.15",
+            "Dist::Milla" : "v1.0.18",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.04"
          }
@@ -50,7 +50,7 @@
    "provides" : {
       "Template::Perlish" : {
          "file" : "lib/Template/Perlish.pm",
-         "version" : "1.52"
+         "version" : "1.54"
       }
    },
    "release_status" : "stable",
@@ -65,9 +65,11 @@
          "web" : "https://github.com/polettix/Template-Perlish"
       }
    },
-   "version" : "1.52",
+   "version" : "1.54",
    "x_contributors" : [
+      "berrak <bkronmailbox-git@yahoo.se>",
       "Flavio Poletti <flavio@polettix.it>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.00"
 }
 

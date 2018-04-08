@@ -1,0 +1,39 @@
+---
+abstract: 'We can access to data using address as the string'
+author:
+  - 'K <x00.x7f@gmail.com>'
+build_requires:
+  Test::LeakTrace: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Pointer
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::Pointer:
+    file: lib/Acme/Pointer.pm
+    version: '0.02'
+requires:
+  perl: '0'
+resources:
+  bugtracker: https://github.com/Code-Hex/p5-Acme-Pointer/issues
+  homepage: https://github.com/Code-Hex/p5-Acme-Pointer
+  repository: git://github.com/Code-Hex/p5-Acme-Pointer.git
+version: '0.02'
+x_authority: cpan:CODEHEX
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

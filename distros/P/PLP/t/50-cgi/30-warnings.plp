@@ -1,0 +1,6 @@
+1<: use warnings :>
+2<: 42 :>
+3<: warn "warning" :>
+4<: include "missinginclude" :>
+5<(missinginclude)>
+6

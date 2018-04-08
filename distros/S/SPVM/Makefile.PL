@@ -19,7 +19,7 @@ my $debug;
 GetOptions('d' => \$debug);
 
 # Edit CCFLAGS
-my $ccflags = "$Config{ccflags} -Wall -Wextra";
+my $ccflags = "$Config{ccflags} -Wall -Wextra -std=c99";
 
 WriteMakefile(
     NAME              => 'SPVM',
@@ -45,13 +45,8 @@ sub MY::postamble {
   my @module_names = qw(
     SPVM::CORE
     SPVM::Math
-    SPVM::Byte
-    SPVM::Short
-    SPVM::Integer
-    SPVM::Long
-    SPVM::Float
-    SPVM::Double
     SPVM::Arrays
+    SPVM::Number::Util
   );
   
   my $make_rule = '';

@@ -7,7 +7,7 @@ use Carp qw/croak/;
 use Mojo::Base -base;
 use Mojo::UserAgent;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 has 'ua' => sub {
     my $ua = Mojo::UserAgent->new;
@@ -15,7 +15,7 @@ has 'ua' => sub {
     return $ua;
 };
 
-has 'url_prefix' => sub { 'https://api.cloudflare.com/client/v4/' };
+has 'url_prefix' => sub { 'https://api.cloudflare.com/client/v4' };
 has 'email';
 has 'key';
 has 'user_service_key';

@@ -23,11 +23,11 @@ Artifactory::Client - Perl client for Artifactory REST API
 
 =head1 VERSION
 
-Version 1.5.2
+Version 1.5.3
 
 =cut
 
-our $VERSION = 'v1.5.2';
+our $VERSION = 'v1.5.3';
 
 =head1 SYNOPSIS
 
@@ -2486,6 +2486,45 @@ Export full system to a server local directory
 sub export_system {
     my ( $self, %args ) = @_;
     return $self->_handle_system_settings( 'export', %args );
+}
+
+=head2 ignore_xray_alert( $path )
+
+Sets an alert to be ignored until next time the repository hosting the artifact about which the alert was issued, is scanned. Note that this endpoint does not
+affect artifacts that are blocked because they have not been scanned at all.
+
+=cut
+
+sub ignore_xray_alert {
+    my ( $self, $path ) = @_;
+    my $url = $self->_api_url() . "/xray/setAlertIgnored?path=$path";
+    return $self->post($url);
+}
+
+=head2 allow_download_of_blocked_artifacts( 'true'|'false' )
+
+When a repository is configured to block downloads of artifacts, you may override that configuration (and allow download of blocked artifacts). Note that this
+setting cannot override the blocking of unscanned artifacts.
+
+=cut
+
+sub allow_download_of_blocked_artifacts {
+    my ( $self, $bool ) = @_;
+    my $url = $self->_api_url() . "/xray/allowBlockedArtifactsDownload?allow=$bool";
+    return $self->post($url);
+}
+
+=head2 allow_download_when_xray_is_unavailable( 'true'|'false' )
+
+You may configure Artifactory to block downloads of artifacts when the connected Xray instance is unavailable. This endpoint lets you override that
+configuration (and allow download of artifacts).
+
+=cut
+
+sub allow_download_when_xray_is_unavailable {
+    my ( $self, $bool ) = @_;
+    my $url = $self->_api_url() . "/xray/allowDownloadWhenUnavailable?allow=$bool";
+    return $self->post($url);
 }
 
 =head2 create_bundle( %hash of data structure )

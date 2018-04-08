@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.80.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,32 +14,32 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA512
 
-SHA1 e9ab158682ae6259ff72997c91749380eb603d76 Changes
+SHA1 d4a9a9b073faebf78d21512c165410a08b8bc581 Changes
 SHA1 fc0e9f7db3b70258faca81bb1a69a88d7ca230e8 MANIFEST
-SHA1 ad7b7382b275ff788cd8ee8a0814bae134312250 META.json
-SHA1 c2d51fda028cc3f586603dcaa9708a2eaeb742b0 META.yml
+SHA1 3f3965562b8841bde19c292fe6c4d4c08c6b0111 META.json
+SHA1 dc1c54ff6d01cb05962b199e07f7800561ebd82d META.yml
 SHA1 8281788d0cb7170f782a64b1ab8f80d2b9ba55e7 Makefile.PL
-SHA1 309558995eb15c8363cb0b07b9d465bee9449ad8 README
-SHA1 50e637a1282b4c7e3bfe5309abbc0ebf3db15f33 lib/WWW/Offliberty.pm
+SHA1 6eadf6aeab1bceb333942b722cce7806325dc54f README
+SHA1 3c39f82b1870c172e26778fce161c76aae72ff40 lib/WWW/Offliberty.pm
 SHA1 6044d06b0558bed63d17ffb62713ba0fc01d8e1a off
 SHA1 7749b74256fbddfe170dada7ee7ad2b5a4c642a1 t/00-load.t
-SHA1 86a6e08618c4fea93a560d9ef23be4e955b3decc t/50-network.t
+SHA1 dcb5829b9faf1f3c5d11caf529923b28e91e06cb t/50-network.t
 SHA1 668edc62795d8e39f03af6fa6bff97f2cfdfba9f t/perlcritic.t
 SHA1 e4e0fd9a5add27aea8ea4b88c780bba779e973f6 t/perlcriticrc
 -----BEGIN PGP SIGNATURE-----
 
-iQJEBAEBCgAuFiEErVNvYICb0H7KK/jxygQ1vl7Bs2IFAlnrc/IQHG1hcml1c0Bp
-ZXZhbC5ybwAKCRDKBDW+XsGzYh2AD/9Ll3JV2FkdYrWNXeWaiKIHkyJvHllio0J4
-tRW84W06myaxpIyoqkl823shLAu81LFyGF/egkucLMRnqaR0p0/n/f8nnMcuGkDZ
-fnkakUyHYYYaj+25p2xEQTVbwHryVdOjBGD/FB8Pxb/H9ozDzKIZehGgiK4mVrVc
-gC/quYp+/UN7Wgv8T/91DJky/iqW7XuHcqST77NyiBILxz98IrCsU4djju7MN8DZ
-sv7rX12pcv8Ywtk3vNiLliNKQoxuyq5EG9pc49RU2WhrrTDsSHONZ7fMDvOoZta7
-guwPRfKkU6I8K0bONYJLZgeqSe+Q3WIsi7gFWjPdhd2bUcsMB73s149MzW5D2UbG
-Z1xUomOMbzt3SSYq0kEFEPLDderdj9OXiYIx1Z6z4cV5N8lWMTi3gFztTTmZ9QJn
-l7UY6ByPcLSmLuPaLW/7eJZMOdzy4uK7rilecxZGcm7JXEHcDdOZLsUN1d8hHrO+
-A/XY4dxd/FwYhuFqO+Z4AU1lKq7xDtkCcs9AsO9J+O8Tpy4b8uXnmhT194jVyJwk
-GvxIQy/wnR9FAVO5z9Ws3tqixkB4CBu/3vocVJVQ2LZUHztGxDtZVmvA72lFUTJB
-pNYwTISY/jK8XpdmmtufMKE17oyTRJu8mnID5yzEYGyiKDPEY+iYYEc8nLwSndTF
-p3La99c9tQ==
-=CI9H
+iQJEBAEBCgAuFiEErVNvYICb0H7KK/jxygQ1vl7Bs2IFAlrJAakQHG1hcml1c0Bp
+ZXZhbC5ybwAKCRDKBDW+XsGzYrC5D/9w/7ibLULtevrEyztfEBZ0yTIJeS6af+DA
+sT66gMHnRl2fbdorJPgExboMvusFmUOiKIpuua0Dbr7Prsd/hZzBXzkmo6IwACSL
+6KQHkKZV2VuaMOAGoC7bol37DQ2ZY/nik4+5MqaEdwZRBVy/DM9WiXCvoBPHLvbZ
+hMR3yDk3PkUsezDMUA68FVHEyWIpcUeEMW8epJwl4zLnxoeZ4wNjdvetnN8BLNTf
+tgliS38/SihtpM+JPT5lQAk4A1SNzuo3Rbnoq8yk3DuLIr1RX6U+JFv/RVu2fsyf
+jV5trnnW9HjU+HFm1DNujCU2kVFv0yL/7yD81CGMOYfmtcxALt2YhLlXi6r5TC/A
+9nOPJKzUMz+1Ox/XcyLea0xcrzDoeKHAgz292HIYrjGUIeE0/iO5OdYpEWlciNcF
+NUCWXiLDSM3vbdNcww54SQAZc15XWX4oSFiF0AwQGsp+FRtkdyPqwMdeGVmcG6dq
+AtmBszZGIjIobwYWa2n4KdTJb5Y4x92WOpGo+EXOHeYJrPT/InqMbwdJAXlboP2B
+DE6vuGX1SK2iHm7crzCZ+GGBuzq/fNYLpZmh0mKYuSqSPgAyM9Q5xGkRJbCcdwyO
+OAFsRj/tLEDzt9/QVG12Qw7gD4Gj0fCg1xkiaVov1tdOdyRB0bBeTVDoS1l9jOKU
+XQ2/jvwWAg==
+=vkFI
 -----END PGP SIGNATURE-----

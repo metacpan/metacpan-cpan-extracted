@@ -1,7 +1,7 @@
 package Sah::Schemas::Country;
 
-our $DATE = '2018-03-25'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-04-08'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Various Sah schemas related to country codes/names
@@ -18,7 +18,7 @@ Sah::Schemas::Country - Various Sah schemas related to country codes/names
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schemas::Country (from Perl distribution Sah-Schemas-Country), released on 2018-03-25.
+This document describes version 0.002 of Sah::Schemas::Country (from Perl distribution Sah-Schemas-Country), released on 2018-04-08.
 
 =head1 HOMEPAGE
 

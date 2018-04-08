@@ -4,7 +4,7 @@ use strict;
 no strict 'refs';
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 =head1 PLP::Tie::Delay
 
@@ -19,15 +19,16 @@ This module is part of the PLP internals and probably not of any use to others.
 
 sub _replace {
 	my ($self) = @_;
-	untie %{ $self->[0] };
 
-	# I'd like to use *{ $self->[0] } = $self->[1]->(); here,
-	# but that causes all sorts of problems. The hash is accessible from
-	# within this sub, but not where its creation was triggered.
-	# Immediately after the triggering statement, the hash becomes available
-	# to all: even the scope where the previous access attempt failed.
-	
-	%{ $self->[0] } = %{ $self->[1]->() }
+	if ($] >= 5.018) {
+		my $code = delete $self->[1] or return;
+		$self->[0] = $code->();
+		return 1;
+	}
+
+	untie %{ $self->[0] };
+	%{ $self->[0] } = %{ $self->[1]->() };  # *{ $self->[0] } = $self->[1]->();
+	return;
 }
 
 sub TIEHASH {
@@ -67,13 +68,12 @@ sub EXISTS {
 
 sub FIRSTKEY {
 	my ($self) = @_;
-	$self->_replace;
-	return 'PLPdummy';
+	$self->_replace and return 'PLPdummy';
+	return each %{$self->[0]};
 }
 
 sub NEXTKEY {
-	# Let's hope this never happens. (It's shouldn't.)
-	return undef;
+	return each %{$_[0]->[0]};
 }
 
 sub UNTIE   { }

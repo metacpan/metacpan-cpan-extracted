@@ -13,14 +13,13 @@ is( $Validator->isa('String::Validator::Common'), 1 ,  'New validator isa String
 
 note( 'Testing Method IsNot_Valid') ;
 
-is ( $Validator->IsNot_Valid( 'aBC123*', 'aBC123*' ), 0,
+is ( $Validator->isnot_valid( 'aBC123*', 'aBC123*' ), 0,
 	'A simple string that passes the default rules' ) ;
-is ( $Validator->Errcnt, 0, 'Error Count should be 0 too.' );
+is ( $Validator->errcnt, 0, 'Error Count should be 0 too.' );
 
 like ( $Validator->IsNot_Valid( 'aBC123*', '1234567689' ),
 	qr /Strings don't match/, 'Mismatched strings fail.' ) ;
 is ( $Validator->Errcnt, 1, 'Error Count should be 1 after the fail.' );
-like ( $Validator->Errstr, qr /Strings don't match/, 'Errstr method returns the same string.' );
-
+like ( $Validator->errstr, qr /Strings don't match/, 'Errstr method returns the same string.' );
 
 done_testing();

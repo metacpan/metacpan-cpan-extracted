@@ -10,7 +10,7 @@ use Moo;
 use namespace::clean;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 ########################################################################
 #
@@ -335,6 +335,10 @@ Calls will throw an exception if something goes awry.
 =item B<divide> I<n1>, I<n2>, ...
 
 Divide the given numbers.
+
+=item B<new>
+
+Constructor. Optionally can be given a custom I<precision> attribute.
 
 =item B<multiply> I<n1>, I<n2>, ...
 

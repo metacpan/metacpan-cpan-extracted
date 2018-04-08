@@ -18,5 +18,9 @@ no_index:
     - t
     - inc
 requires:
+  Data::Dump: '0'
+  Devel::StackTrace::Extract: '0'
+  Mojo::IOLoop: '0'
+  Sentry::Raven: '0'
   perl: '5.006'
-version: v1.1.4
+version: v1.1.6

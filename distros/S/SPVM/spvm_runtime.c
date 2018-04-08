@@ -29,6 +29,7 @@
 #include "spvm_list.h"
 #include "spvm_opcode_array.h"
 #include "spvm_constant.h"
+#include "spvm_hash.h"
 
 SPVM_API_VALUE SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_id, SPVM_API_VALUE* args) {
   (void)api;
@@ -259,6 +260,8 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
   // Call sub arguments
   SPVM_API_VALUE call_sub_args[255];
   
+  char tmp_string[30];
+  
   // Call normal sub
   // If arg is object, increment reference count
   {
@@ -383,6 +386,68 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
       case SPVM_OPCODE_C_ID_LE_DOUBLE:
         condition_flag = *(double*)&vars[opcode->operand0] <= *(double*)&vars[opcode->operand1];
         break;
+      case SPVM_OPCODE_C_ID_ISA:
+      {
+        SPVM_API_OBJECT* object = *(SPVM_API_OBJECT**)&vars[opcode->operand0];
+        int32_t type_id = opcode->operand1;
+        
+        condition_flag = (*(int32_t*)(object + SPVM_RUNTIME_C_OBJECT_TYPE_ID_BYTE_OFFSET) == type_id);
+        
+        break;
+      }
+      case SPVM_OPCODE_C_ID_STRING_EQ:
+      case SPVM_OPCODE_C_ID_STRING_NE:
+      case SPVM_OPCODE_C_ID_STRING_GT:
+      case SPVM_OPCODE_C_ID_STRING_GE:
+      case SPVM_OPCODE_C_ID_STRING_LT:
+      case SPVM_OPCODE_C_ID_STRING_LE:
+      {
+        SPVM_API_OBJECT* string1 = *(SPVM_API_OBJECT**)&vars[opcode->operand0];
+        SPVM_API_OBJECT* string2 = *(SPVM_API_OBJECT**)&vars[opcode->operand1];
+
+        SPVM_API_OBJECT* string1_object = *(SPVM_API_OBJECT**)((intptr_t)string1 + SPVM_RUNTIME_C_OBJECT_HEADER_BYTE_SIZE);
+        SPVM_API_OBJECT* string2_object = *(SPVM_API_OBJECT**)((intptr_t)string2 + SPVM_RUNTIME_C_OBJECT_HEADER_BYTE_SIZE);
+
+        int32_t string1_length = *(SPVM_API_int*)((intptr_t)string1_object + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET);
+        int32_t string2_length = *(SPVM_API_int*)((intptr_t)string2_object + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET);
+        
+        SPVM_API_byte* string1_bytes = (SPVM_API_byte*)((intptr_t)string1_object + SPVM_RUNTIME_C_OBJECT_HEADER_BYTE_SIZE);
+        SPVM_API_byte* string2_bytes = (SPVM_API_byte*)((intptr_t)string2_object + SPVM_RUNTIME_C_OBJECT_HEADER_BYTE_SIZE);
+        
+        int32_t short_string_length = string1_length < string2_length ? string1_length : string2_length;
+        int32_t retval = memcmp(string1_bytes, string2_bytes, short_string_length);
+        int32_t cmp;
+        if (retval) {
+          cmp = retval < 0 ? -1 : 1;
+        } else if (string1_length == string2_length) {
+          cmp = 0;
+        } else {
+          cmp = string1_length < string2_length ? -1 : 1;
+        }
+        
+        switch (opcode->id) {
+          case SPVM_OPCODE_C_ID_STRING_EQ:
+            condition_flag = (cmp == 0);
+            break;
+          case SPVM_OPCODE_C_ID_STRING_NE:
+            condition_flag = (cmp != 0);
+            break;
+          case SPVM_OPCODE_C_ID_STRING_GT:
+            condition_flag = (cmp == 1);
+            break;
+          case SPVM_OPCODE_C_ID_STRING_GE:
+            condition_flag = (cmp >= 0);
+            break;
+          case SPVM_OPCODE_C_ID_STRING_LT:
+            condition_flag = (cmp == -1);
+            break;
+          case SPVM_OPCODE_C_ID_STRING_LE:
+            condition_flag = (cmp <= 0);
+            break;
+        }
+
+        break;
+      }
       case SPVM_OPCODE_C_ID_ADD_INT:
         *(SPVM_API_int*)&vars[opcode->operand0] = *(SPVM_API_int*)&vars[opcode->operand1] + *(SPVM_API_int*)&vars[opcode->operand2];
         break;
@@ -421,7 +486,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         break;
       case SPVM_OPCODE_C_ID_DIVIDE_INT:
         if (__builtin_expect(*(SPVM_API_int*)&vars[opcode->operand2] == 0, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "0 division", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "0 division");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
@@ -432,7 +497,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         break;
       case SPVM_OPCODE_C_ID_DIVIDE_LONG:
         if (__builtin_expect(*(SPVM_API_long*)&vars[opcode->operand2] == 0, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "0 division", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "0 division");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
@@ -451,7 +516,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         break;
       case SPVM_OPCODE_C_ID_REMAINDER_INT:
         if (__builtin_expect(*(SPVM_API_short*)&vars[opcode->operand2] == 0, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "0 division", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "0 division");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
@@ -461,7 +526,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         break;
       case SPVM_OPCODE_C_ID_REMAINDER_LONG:
         if (__builtin_expect(*(SPVM_API_short*)&vars[opcode->operand2] == 0, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "0 division", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "0 division");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
@@ -681,6 +746,40 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
       case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_DOUBLE:
         *(double*)&vars[opcode->operand0] = *(double*)&vars[opcode->operand1];
         break;
+      case SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_STRING:
+      case SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_STRING:
+      case SPVM_OPCODE_C_ID_CONVERT_INT_TO_STRING:
+      case SPVM_OPCODE_C_ID_CONVERT_LONG_TO_STRING:
+      case SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_STRING:
+      case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_STRING:
+      {
+        switch (opcode->id) {
+          case SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_STRING:
+            sprintf(tmp_string, "%" PRId8, *(SPVM_API_byte*)&vars[opcode->operand1]);
+            break;
+          case SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_STRING:
+            sprintf(tmp_string, "%" PRId16, *(SPVM_API_short*)&vars[opcode->operand1]);
+            break;
+          case SPVM_OPCODE_C_ID_CONVERT_INT_TO_STRING:
+            sprintf(tmp_string, "%" PRId32, *(SPVM_API_int*)&vars[opcode->operand1]);
+            break;
+          case SPVM_OPCODE_C_ID_CONVERT_LONG_TO_STRING:
+            sprintf(tmp_string, "%" PRId64, *(SPVM_API_long*)&vars[opcode->operand1]);
+            break;
+          case SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_STRING:
+            sprintf(tmp_string, "%f", *(SPVM_API_float*)&vars[opcode->operand1]);
+            break;
+          case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_STRING:
+            sprintf(tmp_string, "%f", *(SPVM_API_double*)&vars[opcode->operand1]);
+            break;
+        }
+        
+        int32_t string_length = strlen(tmp_string);
+        SPVM_API_OBJECT* string = api->new_string(api, (int8_t*)tmp_string, string_length);
+        *(SPVM_API_OBJECT**)&vars[opcode->operand0] = string;
+
+        break;
+      }
       case SPVM_OPCODE_C_ID_LOAD_UNDEF:
         *(SPVM_API_OBJECT**)&vars[opcode->operand0] = NULL;
         break;
@@ -706,13 +805,13 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* array = *(SPVM_API_OBJECT**)&vars[opcode->operand1];
         int32_t index = *(SPVM_API_int*)&vars[opcode->operand2];
         if (__builtin_expect(array == NULL, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Array must not be undef", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Array must not be undef");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
         else {
           if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
-            SPVM_API_OBJECT* exception = api->new_string(api, "Index is out of range", 0);
+            SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
           }
@@ -726,13 +825,13 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* array = *(SPVM_API_OBJECT**)&vars[opcode->operand1];
         int32_t index = *(SPVM_API_int*)&vars[opcode->operand2];
         if (__builtin_expect(!array, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Array must not be undef", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Array must not be undef");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
         else {
           if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
-            SPVM_API_OBJECT* exception = api->new_string(api, "Index is out of range", 0);
+            SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
           }
@@ -747,13 +846,13 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* array = *(SPVM_API_OBJECT**)&vars[opcode->operand1];
         int32_t index = *(SPVM_API_int*)&vars[opcode->operand2];
         if (__builtin_expect(!array, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Array must not be undef", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Array must not be undef");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
         else {
           if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
-            SPVM_API_OBJECT* exception = api->new_string(api, "Index is out of range", 0);
+            SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
           }
@@ -767,13 +866,13 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* array = *(SPVM_API_OBJECT**)&vars[opcode->operand1];
         int32_t index = *(SPVM_API_int*)&vars[opcode->operand2];
         if (__builtin_expect(!array, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Array must not be undef", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Array must not be undef");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
         else {
           if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
-            SPVM_API_OBJECT* exception = api->new_string(api, "Index is out of range", 0);
+            SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
           }
@@ -787,13 +886,13 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* array = *(SPVM_API_OBJECT**)&vars[opcode->operand1];
         int32_t index = *(SPVM_API_int*)&vars[opcode->operand2];
         if (__builtin_expect(!array, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Array must not be undef", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Array must not be undef");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
         else {
           if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
-            SPVM_API_OBJECT* exception = api->new_string(api, "Index is out of range", 0);
+            SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
           }
@@ -807,13 +906,13 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* array = *(SPVM_API_OBJECT**)&vars[opcode->operand1];
         int32_t index = *(SPVM_API_int*)&vars[opcode->operand2];
         if (__builtin_expect(!array, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Array must not be undef", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Array must not be undef");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
         else {
           if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
-            SPVM_API_OBJECT* exception = api->new_string(api, "Index is out of range", 0);
+            SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
           }
@@ -827,13 +926,13 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* array = *(SPVM_API_OBJECT**)&vars[opcode->operand1];
         int32_t index = *(SPVM_API_int*)&vars[opcode->operand2];
         if (__builtin_expect(!array, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Array must not be undef", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Array must not be undef");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
         else {
           if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
-            SPVM_API_OBJECT* exception = api->new_string(api, "Index is out of range", 0);
+            SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
           }
@@ -847,13 +946,13 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* array = *(SPVM_API_OBJECT**)&vars[opcode->operand0];
         int32_t index = *(SPVM_API_int*)&vars[opcode->operand1];
         if (__builtin_expect(!array, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Array must not be undef", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Array must not be undef");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
         else {
           if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
-            SPVM_API_OBJECT* exception = api->new_string(api, "Index is out of range", 0);
+            SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
           }
@@ -867,13 +966,13 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* array = *(SPVM_API_OBJECT**)&vars[opcode->operand0];
         int32_t index = *(SPVM_API_int*)&vars[opcode->operand1];
         if (__builtin_expect(!array, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Array must not be undef", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Array must not be undef");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
         else {
           if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
-            SPVM_API_OBJECT* exception = api->new_string(api, "Index is out of range", 0);
+            SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
           }
@@ -887,13 +986,13 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* array = *(SPVM_API_OBJECT**)&vars[opcode->operand0];
         int32_t index = *(SPVM_API_int*)&vars[opcode->operand1];
         if (__builtin_expect(!array, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Array must not be undef", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Array must not be undef");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
         else {
           if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
-            SPVM_API_OBJECT* exception = api->new_string(api, "Index is out of range", 0);
+            SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
           }
@@ -907,13 +1006,13 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* array = *(SPVM_API_OBJECT**)&vars[opcode->operand0];
         int32_t index = *(SPVM_API_int*)&vars[opcode->operand1];
         if (__builtin_expect(!array, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Array must not be undef", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Array must not be undef");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
         else {
           if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
-            SPVM_API_OBJECT* exception = api->new_string(api, "Index is out of range", 0);
+            SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
           }
@@ -927,13 +1026,13 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* array = *(SPVM_API_OBJECT**)&vars[opcode->operand0];
         int32_t index = *(SPVM_API_int*)&vars[opcode->operand1];
         if (__builtin_expect(!array, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Array must not be undef", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Array must not be undef");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
         else {
           if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
-            SPVM_API_OBJECT* exception = api->new_string(api, "Index is out of range", 0);
+            SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
           }
@@ -947,13 +1046,13 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* array = *(SPVM_API_OBJECT**)&vars[opcode->operand0];
         int32_t index = *(SPVM_API_int*)&vars[opcode->operand1];
         if (__builtin_expect(!array, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Array must not be undef", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Array must not be undef");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
         else {
           if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
-            SPVM_API_OBJECT* exception = api->new_string(api, "Index is out of range", 0);
+            SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
           }
@@ -968,13 +1067,13 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* array = *(SPVM_API_OBJECT**)&vars[opcode->operand0];
         int32_t index = *(SPVM_API_int*)&vars[opcode->operand1];
         if (__builtin_expect(!array, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Array must not be undef", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Array must not be undef");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
         else {
           if (__builtin_expect(index < 0 || index >= *(SPVM_API_int*)((intptr_t)array + SPVM_RUNTIME_C_OBJECT_LENGTH_BYTE_OFFSET), 0)) {
-            SPVM_API_OBJECT* exception = api->new_string(api, "Index is out of range", 0);
+            SPVM_API_OBJECT* exception = api->new_string_chars(api, "Index is out of range");
             api->set_exception(api, exception);
             croak_flag = 1;
           }
@@ -1159,7 +1258,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_OP* op_constant = SPVM_LIST_fetch(compiler->op_constants, constant_id);
         SPVM_CONSTANT* constant = op_constant->uv.constant;
         
-        SPVM_API_OBJECT* string = api->new_string(api, constant->value.string_value, constant->string_length);
+        SPVM_API_OBJECT* string = api->new_string(api, (int8_t*)constant->value.string_value, constant->string_length);
 
         // Set string
         *(SPVM_API_OBJECT**)&vars[opcode->operand0] = string;
@@ -1167,7 +1266,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
       }
       case SPVM_OPCODE_C_ID_ARRAY_LENGTH:
         if (*(SPVM_API_OBJECT**)&vars[opcode->operand1] == NULL) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Can't get array length of undef value.", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Can't get array length of undef value.");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
@@ -1179,7 +1278,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* object = *(SPVM_API_OBJECT**)&vars[opcode->operand1];
         
         if (__builtin_expect(object == NULL, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Object must be not undef.", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Object must be not undef.");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
@@ -1192,7 +1291,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* object = *(SPVM_API_OBJECT**)&vars[opcode->operand1];
 
         if (__builtin_expect(object == NULL, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Object must be not undef.", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Object must be not undef.");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
@@ -1205,7 +1304,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* object = *(SPVM_API_OBJECT**)&vars[opcode->operand1];
         
         if (__builtin_expect(object == NULL, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Object must be not undef.", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Object must be not undef.");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
@@ -1218,7 +1317,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* object = *(SPVM_API_OBJECT**)&vars[opcode->operand1];
         
         if (__builtin_expect(object == NULL, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Object must be not undef.", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Object must be not undef.");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
@@ -1231,7 +1330,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* object = *(SPVM_API_OBJECT**)&vars[opcode->operand1];
         
         if (__builtin_expect(object == NULL, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Object must be not undef.", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Object must be not undef.");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
@@ -1244,7 +1343,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* object = *(SPVM_API_OBJECT**)&vars[opcode->operand1];
         
         if (__builtin_expect(object == NULL, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Object must be not undef.", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Object must be not undef.");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
@@ -1257,7 +1356,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* object = *(SPVM_API_OBJECT**)&vars[opcode->operand1];
         
         if (__builtin_expect(object == NULL, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Object must be not undef.", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Object must be not undef.");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
@@ -1270,7 +1369,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* object = *(SPVM_API_OBJECT**)&vars[opcode->operand0];
         
         if (__builtin_expect(object == NULL, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Object must be not undef.", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Object must be not undef.");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
@@ -1283,7 +1382,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* object = *(SPVM_API_OBJECT**)&vars[opcode->operand0];
         
         if (__builtin_expect(object == NULL, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Object must be not undef.", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Object must be not undef.");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
@@ -1296,7 +1395,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* object = *(SPVM_API_OBJECT**)&vars[opcode->operand0];
         
         if (__builtin_expect(object == NULL, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Object must be not undef.", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Object must be not undef.");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
@@ -1309,7 +1408,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* object = *(SPVM_API_OBJECT**)&vars[opcode->operand0];
         
         if (__builtin_expect(object == NULL, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Object must be not undef.", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Object must be not undef.");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
@@ -1322,7 +1421,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* object = *(SPVM_API_OBJECT**)&vars[opcode->operand0];
         
         if (__builtin_expect(object == NULL, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Object must be not undef.", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Object must be not undef.");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
@@ -1335,7 +1434,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* object = *(SPVM_API_OBJECT**)&vars[opcode->operand0];
         
         if (__builtin_expect(object == NULL, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Object must be not undef.", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Object must be not undef.");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
@@ -1348,7 +1447,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         SPVM_API_OBJECT* object = *(SPVM_API_OBJECT**)&vars[opcode->operand0];
 
         if (__builtin_expect(object == NULL, 0)) {
-          SPVM_API_OBJECT* exception = api->new_string(api, "Object must be not undef.", 0);
+          SPVM_API_OBJECT* exception = api->new_string_chars(api, "Object must be not undef.");
           api->set_exception(api, exception);
           croak_flag = 1;
         }
@@ -1388,62 +1487,8 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_CONCAT_STRING_STRING: {
-        *(SPVM_API_OBJECT**)&vars[opcode->operand0] = api->concat_string_string(api, *(SPVM_API_OBJECT**)&vars[opcode->operand1], *(SPVM_API_OBJECT**)&vars[opcode->operand2]);
-        
-        if (*(SPVM_API_OBJECT**)&vars[opcode->operand0] == NULL) {
-          croak_flag = 1;
-        }
-        
-        break;
-      }
-      case SPVM_OPCODE_C_ID_CONCAT_STRING_BYTE: {
-        *(SPVM_API_OBJECT**)&vars[opcode->operand0] = api->concat_string_byte(api, *(SPVM_API_OBJECT**)&vars[opcode->operand1], *(SPVM_API_byte*)&vars[opcode->operand2]);
-        
-        if (*(SPVM_API_OBJECT**)&vars[opcode->operand0] == NULL) {
-          croak_flag = 1;
-        }
-
-        break;
-      }
-      case SPVM_OPCODE_C_ID_CONCAT_STRING_SHORT: {
-        *(SPVM_API_OBJECT**)&vars[opcode->operand0] = api->concat_string_short(api, *(SPVM_API_OBJECT**)&vars[opcode->operand1], *(SPVM_API_short*)&vars[opcode->operand2]);
-        
-        if (*(SPVM_API_OBJECT**)&vars[opcode->operand0] == NULL) {
-          croak_flag = 1;
-        }
-        
-        break;
-      }
-      case SPVM_OPCODE_C_ID_CONCAT_STRING_INT: {
-        *(SPVM_API_OBJECT**)&vars[opcode->operand0] = api->concat_string_int(api, *(SPVM_API_OBJECT**)&vars[opcode->operand1], *(SPVM_API_int*)&vars[opcode->operand2]);
-        
-        if (*(SPVM_API_OBJECT**)&vars[opcode->operand0] == NULL) {
-          croak_flag = 1;
-        }
-
-        break;
-      }
-      case SPVM_OPCODE_C_ID_CONCAT_STRING_LONG: {
-        *(SPVM_API_OBJECT**)&vars[opcode->operand0] = api->concat_string_long(api, *(SPVM_API_OBJECT**)&vars[opcode->operand1], *(SPVM_API_long*)&vars[opcode->operand2]);
-        
-        if (*(SPVM_API_OBJECT**)&vars[opcode->operand0] == NULL) {
-          croak_flag = 1;
-        }
-
-        break;
-      }
-      case SPVM_OPCODE_C_ID_CONCAT_STRING_FLOAT: {
-       *(SPVM_API_OBJECT**)&vars[opcode->operand0] = api->concat_string_float(api, *(SPVM_API_OBJECT**)&vars[opcode->operand1], *(float*)&vars[opcode->operand2]);
-        
-        if (*(SPVM_API_OBJECT**)&vars[opcode->operand0] == NULL) {
-          croak_flag = 1;
-        }
-
-        break;
-      }
-      case SPVM_OPCODE_C_ID_CONCAT_STRING_DOUBLE: {
-        *(SPVM_API_OBJECT**)&vars[opcode->operand0] = api->concat_string_double(api, *(SPVM_API_OBJECT**)&vars[opcode->operand1], *(double*)&vars[opcode->operand2]);
+      case SPVM_OPCODE_C_ID_CONCAT: {
+        *(SPVM_API_OBJECT**)&vars[opcode->operand0] = api->concat(api, *(SPVM_API_OBJECT**)&vars[opcode->operand1], *(SPVM_API_OBJECT**)&vars[opcode->operand2]);
         
         if (*(SPVM_API_OBJECT**)&vars[opcode->operand0] == NULL) {
           croak_flag = 1;
@@ -1580,46 +1625,81 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         call_sub_args[call_sub_arg_stack_top] = vars[opcode->operand0];
         
         break;
+      case SPVM_OPCODE_C_ID_CHECK_CAST: {
+        SPVM_API_OBJECT* object = *(SPVM_API_OBJECT**)&vars[opcode->operand1];
+        int32_t object_type_id = *(int32_t*)(object + SPVM_RUNTIME_C_OBJECT_TYPE_ID_BYTE_OFFSET);
+        int32_t cast_type_id = opcode->operand2;
+        
+        if (object_type_id == cast_type_id) {
+          *(SPVM_API_OBJECT**)&vars[opcode->operand0] = object;
+        }
+        else {
+          _Bool can_assign = api->check_cast(api, cast_type_id, object);
+          if (can_assign) {
+            *(SPVM_API_OBJECT**)&vars[opcode->operand0] = object;
+          }
+          else {
+            SPVM_API_OBJECT* exception = api->new_string_chars(api, "Can't cast uncompatible type.");
+            api->set_exception(api, exception);
+            croak_flag = 1;
+          }
+        }
+        
+        break;
+      }
       case SPVM_OPCODE_C_ID_CALL_SUB:
+      case SPVM_OPCODE_C_ID_CALL_INTERFACE_METHOD:
       {
-        // Get subroutine ID
-        int32_t call_sub_id = opcode->operand1;
+        int32_t decl_sub_id = opcode->operand1;
+
+        // Declare subroutine
+        SPVM_OP* op_sub_decl = SPVM_LIST_fetch(compiler->op_subs, decl_sub_id);
+        SPVM_SUB* decl_sub = op_sub_decl->uv.sub;
         
-        // Constant pool sub
-        SPVM_OP* op_call_sub = SPVM_LIST_fetch(compiler->op_subs, call_sub_id);
-        SPVM_SUB* call_sub = op_call_sub->uv.sub;
+        // Declare subroutine return type
+        SPVM_TYPE* decl_sub_return_type = decl_sub->op_return_type->uv.type;
         
-        // Subroutine return type
-        SPVM_TYPE* call_sub_return_type = call_sub->op_return_type->uv.type;
+        // Declare subroutine return type id
+        int32_t decl_sub_return_type_id = decl_sub_return_type->id;
         
-        // Subroutine return type id
-        int32_t call_sub_return_type_id = call_sub_return_type->id;
+        // Declare subroutine argument length
+        int32_t decl_sub_args_length = decl_sub->op_args->length;
         
-        // Subroutine argument length
-        int32_t call_sub_args_length = call_sub->op_args->length;
+        // Call subroutine id
+        int32_t call_sub_id;
+        if (opcode->id == SPVM_OPCODE_C_ID_CALL_SUB) {
+           call_sub_id = decl_sub_id;
+        }
+        else if (opcode->id == SPVM_OPCODE_C_ID_CALL_INTERFACE_METHOD) {
+          SPVM_API_OBJECT* object = *(SPVM_API_OBJECT**)&vars[opcode->operand2];
+          call_sub_id = api->get_sub_id_interface_method(api, object, decl_sub_id);
+        }
+        else {
+          assert(0);
+        }
         
-        call_sub_arg_stack_top -= call_sub_args_length;
+        call_sub_arg_stack_top -= decl_sub_args_length;
         
         // Call subroutine
-        if (call_sub_return_type_id == SPVM_TYPE_C_ID_VOID) {
+        if (decl_sub_return_type_id == SPVM_TYPE_C_ID_VOID) {
           api->call_void_sub(api, call_sub_id, call_sub_args);
         }
-        else if (call_sub_return_type_id == SPVM_TYPE_C_ID_BYTE) {
+        else if (decl_sub_return_type_id == SPVM_TYPE_C_ID_BYTE) {
           *(SPVM_API_byte*)&vars[opcode->operand0] = api->call_byte_sub(api, call_sub_id, call_sub_args);
         }
-        else if (call_sub_return_type_id == SPVM_TYPE_C_ID_SHORT) {
+        else if (decl_sub_return_type_id == SPVM_TYPE_C_ID_SHORT) {
           *(SPVM_API_short*)&vars[opcode->operand0] = api->call_short_sub(api, call_sub_id, call_sub_args);
         }
-        else if (call_sub_return_type_id == SPVM_TYPE_C_ID_INT) {
+        else if (decl_sub_return_type_id == SPVM_TYPE_C_ID_INT) {
           *(SPVM_API_int*)&vars[opcode->operand0] = api->call_int_sub(api, call_sub_id, call_sub_args);
         }
-        else if (call_sub_return_type_id == SPVM_TYPE_C_ID_LONG) {
+        else if (decl_sub_return_type_id == SPVM_TYPE_C_ID_LONG) {
           *(SPVM_API_long*)&vars[opcode->operand0] = api->call_long_sub(api, call_sub_id, call_sub_args);
         }
-        else if (call_sub_return_type_id == SPVM_TYPE_C_ID_FLOAT) {
+        else if (decl_sub_return_type_id == SPVM_TYPE_C_ID_FLOAT) {
           *(float*)&vars[opcode->operand0] = api->call_float_sub(api, call_sub_id, call_sub_args);
         }
-        else if (call_sub_return_type_id == SPVM_TYPE_C_ID_DOUBLE) {
+        else if (decl_sub_return_type_id == SPVM_TYPE_C_ID_DOUBLE) {
           *(double*)&vars[opcode->operand0] = api->call_double_sub(api, call_sub_id, call_sub_args);
         }
         else {
@@ -1629,6 +1709,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub_vm(SPVM_API* api, int32_t sub_id, SPVM_API_
         if (api->get_exception(api)) {
           croak_flag = 1;
         }
+        
         break;
       }
       case SPVM_OPCODE_C_ID_IF_CROAK_CATCH: {

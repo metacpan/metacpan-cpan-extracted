@@ -4,7 +4,8 @@
 #           data copying in proxy.
 use warnings;
 use strict;
-use t::share;
+use lib 't';
+use share;
 BEGIN {
     eval { require Data::Alias; Data::Alias->VERSION('0.08'); Data::Alias->import(); 1 } or plan skip_all => 'Data::Alias required';
 }

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Database::Migrator::Types qw( ArrayRef Bool Dir File Maybe Str );
 use DBI;
@@ -264,6 +264,9 @@ sub _numeric_or_alpha_sort {
     $a_num ||= 0;
     $b_num ||= 0;
 
+    $a_alpha ||= q{};
+    $b_alpha ||= q{};
+
     return ( $a_num <=> $b_num or $a_alpha cmp $b_alpha );
 }
 
@@ -283,7 +286,7 @@ Database::Migrator::Core - Core role for Database::Migrator implementation class
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -430,7 +433,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2017 by MaxMind, Inc.
+This software is Copyright (c) 2012 - 2018 by MaxMind, Inc.
 
 This is free software, licensed under:
 

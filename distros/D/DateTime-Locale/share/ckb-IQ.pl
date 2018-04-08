@@ -50,8 +50,8 @@
     yMd => "d/M/y",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-one" => "\N{U+0647}\N{U+06d5}\N{U+0641}\N{U+062a}\N{U+06d5}\N{U+06cc} w \N{U+06cc} Y",
-    "yw-count-other" => "\N{U+0647}\N{U+06d5}\N{U+0641}\N{U+062a}\N{U+06d5}\N{U+06cc} w \N{U+06cc} Y",
+    "yw-count-one" => "\N{U+0647}\N{U+06d5}\N{U+0641}\N{U+062a}\N{U+06d5}\N{U+06cc} w \N{U+06cc} y",
+    "yw-count-other" => "\N{U+0647}\N{U+06d5}\N{U+0641}\N{U+062a}\N{U+06d5}\N{U+06cc} w \N{U+06cc} y",
   },
   code => "ckb-IQ",
   date_format_full => "y MMMM d, EEEE",
@@ -268,5 +268,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 32,
+  version => 33,
 }

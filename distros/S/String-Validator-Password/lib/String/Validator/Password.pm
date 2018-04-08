@@ -1,22 +1,122 @@
 package String::Validator::Password;
+$String::Validator::Password::VERSION = '2.00';
+# ABSTRACT: String::Validator Password Checking Module.
 
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 no warnings qw(uninitialized) ;
-use String::Validator::Common ;
+use String::Validator::Common 2.00;
 
-our $VERSION = '0.94';
+
+my $password_messages = {
+	password_mintypes => sub {
+		my $self = shift @_;
+		return "Input contained $self->{types_found} types of character, $self->{min_types} are required.";
+	},
+	password_minoftype => sub {
+		my ( $required, $type ) = @_;
+		if ( $type eq 'num') { $type = 'numeric'}
+		return "At least $required characters of type $type is required.";
+	},
+	password_typeprohibit => sub {
+		my $type = shift @_;
+		if ( $type eq 'num') { $type = 'numeric'}
+		return "character type $type is prohibited."
+	},
+};
+
+sub new {
+    my $class = shift ;
+    my $self = { @_ } ;
+    use base ( 'String::Validator::Common' ) ;
+    unless ( defined $self->{ require_lc } )     { $self->{ require_lc } = 0 };
+    unless ( defined $self->{ require_uc } )     { $self->{ require_uc } = 0 };
+    unless ( defined $self->{ require_num } )   { $self->{ require_num } = 0 };
+    unless ( defined $self->{ require_punct } )  { $self->{ require_punct } = 0 };
+    unless ( defined $self->{ deny_punct } ) 	 { $self->{ deny_punct } = 0 };
+    unless ( defined $self->{ deny_lc } )        { $self->{ deny_lc } = 0 };
+    unless ( defined $self->{ deny_uc } )        { $self->{ deny_uc } = 0 };
+    unless ( defined $self->{ deny_num } )      { $self->{ deny_num } = 0 };
+    unless ( defined $self->{ min_types } )	 	 { $self->{ min_types } = 2 };
+    unless ( defined $self->{ min_len } )        { $self->{ min_len } = 6 };
+    unless ( defined $self->{ max_len } )        { $self->{ max_len } = 64 };
+# Not implemented right now.
+#    unless ( defined $self->{ dictionary } )     { $self->{ dictionary } = [ 'default' ] }
+#    unless ( defined $self->{ custom_allow } )   { $self->{ custom_allow } = 0 }
+#    unless ( defined $self->{ custom_deny } )    { $self->{ custom_deny } = 0 }
+    $self->{ string } = '' ;
+    $self->{ error } = 0 ;
+    $self->{errstring} = '' ;
+    bless $self, $class ;
+    $self->{messages}
+        = String::Validator::Common::_Messages(
+        		$password_messages, $self->{language}, $self->{custom_messages} );
+    return $self ;
+}
+
+# Does all the checks and returns the
+# number of errors found. Used by the
+# Is/IsNot_Valid. May be invoked directly.
+sub Check{
+    my ( $self, $string1, $string2 ) = @_ ;
+    if ( $self->Start( $string1, $string2 ) == 99 ) {
+        return $self->{ error } }
+    $self->Length;
+# The match operator cannot be directly used to count matches.
+# substitution does count replacements, and by removing all other
+# other character classes what is left over is "punct".
+	$string2 = $string1 ; # make sure string is in string2.
+    $self->{num_lc} = $string2 =~ s/[a-z]//g || 0;
+    $self->{num_uc} = $string2 =~ s/[A-Z]//g || 0 ;
+    $self->{num_num} = $string2 =~ s/\d//g || 0;
+    $self->{num_punct} = length $string2; #What is left is punct.
+	$self->{ types_found } = 0;
+    for ( qw / num_lc num_uc num_num num_punct / ) {
+        if ( $self->{ $_ } ) { $self->{ types_found }++ }  }
+	if ( $self->{types_found} < $self->{ min_types } ) {
+		$self->IncreaseErr(
+			$self->{messages}{password_mintypes}->( $self ));
+		}
+    foreach my $type ( qw /lc num uc punct/ ) {
+		my $required = 'require_' . $type ;
+		my $denied = 'deny_' . $type ;
+		my $num = 'num_' . $type ;
+		unless ( $self->{ $required } <= $self->{ $num } ) {
+			$self->IncreaseErr(
+				$self->{messages}{password_minoftype}->(
+					$self->{ $required }, $type ) ) }
+		if ( $self->{ $denied }  ) {
+			if ( $self->{ $num } )
+				{ $self->IncreaseErr(
+					$self->{messages}{password_typeprohibit}->($type) ) } }
+		# elsif ( $self->{ $denied } > 1 ) {
+		# 	if ( $self->{ $denied } <= $self->{ $num } ) {
+		# 		$self->IncreaseErr(
+		# 			$self->{messages}{password_typelimit}->(
+		# 				$type, $self->{ $denied } ) )
+		# 	}
+		# }
+	} #foreach ( lc num uc punct ).
+return $self->{ error } ;
+}
+
+
+1; # End of Validator
+
+__END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-String::Validator::Password - Check a string against a number of common password rules.
+String::Validator::Password - String::Validator Password Checking Module.
 
 =head1 VERSION
 
-Version 0.94
+version 2.00
 
 =head1 SYNOPSIS
 
@@ -42,17 +142,17 @@ String::Validator for general documentation.
 SVP knows about four classes of character -- B<uc> (Upper Case), B<lc> (Lower Case),
 B<num> (Digits), and B<punct> (Everything Else). Types can be required or denied.
 Thus these 8 arguments
-B<require_lc>, B<require_uc>, B<require_nums>, B<require_punct>, B<deny_punct>,
-B<deny_lc>, B<deny_uc>, B<deny_nums>, all of which take a numeric argument, and all of
+B<require_lc>, B<require_uc>, B<require_num>, B<require_punct>, B<deny_punct>,
+B<deny_lc>, B<deny_uc>, B<deny_num>, all of which take a numeric argument, and all of
 which default to 0 if omitted.
 
 When requiring and denying classes of characters the values of 0 and 1 work as expected,
 where 0 means not to check this condition at all and 1 means to accept or reject based on
 the presence of just 1 instance of the type. However, when used to set an amount, require
-is interpreted as require at least X of this type, while deny is deny if X or more
-are encountered. require_lc => 2 will result in a string with 2 or more lowercase characters
-passing the test. deny_lc => 2 will result in a string with 2 lowercase characters being
-rejected, but would pass a string with 1 lowercase character.
+is interpreted as require at least X of this type, while deny is deny the character type
+is encountered. require_lc => 2 will result in a string with 2 or more lowercase characters
+passing the test. deny_lc => 2 will result in any string with lowercase characters being
+rejected.
 
 =head3 Minimum number of Classes of Character
 
@@ -102,84 +202,6 @@ Then to check a password you might write something like this:
  if( $Validator->IsNot_Valid( $password1, $passwordconfirm ) ) {
   die $Validator->errstr() ; }
 
-=cut
-
-sub new {
-    my $class = shift ;
-    my $self = { @_ } ;
-    use base ( 'String::Validator::Common' ) ;
-    unless ( defined $self->{ require_lc } )     { $self->{ require_lc } = 0 };
-    unless ( defined $self->{ require_uc } )     { $self->{ require_uc } = 0 };
-    unless ( defined $self->{ require_nums } )   { $self->{ require_nums } = 0 };
-    unless ( defined $self->{ require_punct } )  { $self->{ require_punct } = 0 };
-    unless ( defined $self->{ deny_punct } ) 	 { $self->{ deny_punct } = 0 };
-    unless ( defined $self->{ deny_lc } )        { $self->{ deny_lc } = 0 };
-    unless ( defined $self->{ deny_uc } )        { $self->{ deny_uc } = 0 };
-    unless ( defined $self->{ deny_nums } )      { $self->{ deny_nums } = 0 };
-    unless ( defined $self->{ min_types } )	 	 { $self->{ min_types } = 2 };
-    unless ( defined $self->{ min_len } )        { $self->{ min_len } = 6 };
-    unless ( defined $self->{ max_len } )        { $self->{ max_len } = 64 };
-# Not implemented right now.
-#    unless ( defined $self->{ dictionary } )     { $self->{ dictionary } = [ 'default' ] }
-#    unless ( defined $self->{ custom_allow } )   { $self->{ custom_allow } = 0 }
-#    unless ( defined $self->{ custom_deny } )    { $self->{ custom_deny } = 0 }
-    $self->{ string } = '' ;
-    $self->{ error } = 0 ;
-    $self->{errstring} = '' ;
-    bless $self, $class ;
-    return $self ;
-}
-
-# Does all the checks and returns the
-# number of errors found. Used by the
-# Is/IsNot_Valid. May be invoked directly.
-sub Check{
-    my ( $self, $string1, $string2 ) = @_ ;
-    if ( $self->CheckCommon( $string1, $string2 ) == 99 ) {
-        return $self->{ error } }
-# The match operator cannot be directly used to count matches.
-# substitution does count replacements, and by removing all other
-# other character classes what is left over is "punct".
-	$string2 = $string1 ; # make sure string is in string2.
-    $self->{num_lc} = $string2 =~ s/[a-z]//g || 0;
-    $self->{num_uc} = $string2 =~ s/[A-Z]//g || 0 ;
-    $self->{num_num} = $string2 =~ s/\d//g || 0;
-    $self->{num_punct} = length $string2; #What is left is punct.
-	$self->{ types_found } = 0;
-    for ( qw / num_lc num_uc num_num num_punct / ) {
-        if ( $self->{ $_ } ) { $self->{ types_found }++ }  }
-    if ( $self->{types_found} < $self->{ min_types } ) {
-	$self->IncreaseErr(
-	    "$self->{types_found} types were found, $self->{min_types} required.") ; }
-    foreach my $type ( qw /lc num uc punct/ ) {
-		my $required = 'require_' . $type ;
-		my $denied = 'deny_' . $type ;
-		my $num = 'num_' . $type ;
-		unless ( $self->{ $required } <= $self->{ $num } ) {
-			$self->IncreaseErr(
-			"At least $self->{ $required } of $type is required.") }
-# If denied is 0, all strings are >= 0 not just those where
-# type is present. So don't check if denied is false (0).
-		if ( $self->{ $denied } == 1 ) {
-			if ( $self->{ $num } )
-				{ $self->IncreaseErr( "$type is prohibited.") } }
-		elsif ( $self->{ $denied } > 1 ) {
-			if ( $self->{ $denied } <= $self->{ $num } ) {
-				$self->IncreaseErr( "$type is limited to fewer than " . $self->{ $denied } )
-			}	}
-	} #foreach ( lc num uc punct ).
-
-#     if ( length($string1) < $self->{min_len} ) {
-# 		$self->IncreaseErr( "Password Length of " . length( $string1 ) .
-# 		" Does not meet requirement: Min Length " . $self->{min_len} . "." ) ;
-# 		}
-# 	if ( length($string1) > $self->{max_len} ) {
-# 		$self->IncreaseErr( "Password Length of " . length( $string1 ) .
-# 		" Does not meet requirement: Max Length " . $self->{max_len} . "." ) ;
-# 		}
-return $self->{ error } ;
-}
-
 =head1 TO DO
 
 Provide support for custom regexes, custom allow/deny lists, and checking against weak
@@ -191,46 +213,17 @@ John Karr, C<< <brainbuz at brainbuz.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-string-validator-password at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=String-Validator-Password>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
+Please submit Bug Reports and Patches via https://github.com/brainbuz/String-Validator.
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Validator
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Validator>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Validator>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Validator>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Validator/>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
+    perldoc String::Validator::Password
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 John Karr.
+Copyright 2012, 2018 John Karr.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -246,6 +239,16 @@ A copy of the GNU General Public License is available in the source tree;
 if not, write to the Free Software Foundation, Inc.,
 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-=cut
+=head1 AUTHOR
 
-1; # End of Validator
+John Karr <brainbuz@brainbuz.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014,2018 by John Karr.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

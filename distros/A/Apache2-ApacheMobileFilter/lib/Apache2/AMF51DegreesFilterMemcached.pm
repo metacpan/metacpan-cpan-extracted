@@ -32,7 +32,7 @@ package Apache2::AMF51DegreesFilterMemcached;
 
   use vars qw($VERSION);
   my $CommonLib = new Apache2::AMFCommonLib ();
-  $VERSION= "4.30";;;
+  $VERSION= "4.32";;;
   my %Capability;
   my %Array_fb;
   my %Array_id;

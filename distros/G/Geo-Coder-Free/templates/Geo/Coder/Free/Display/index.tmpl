@@ -20,21 +20,20 @@
 			[% IF title %]
 				[% title %]
 			[% ELSE %]
-				Geocoding website based on openaddresses - alpha test
+				Free Geocoding Website - alpha test
 			[% END %]
 		</title>
 		[% IF description %]
 			<meta name="description" content="[% description %]" />
 		[% ELSE %]
-			<meta name="description" content="Coming Soon - an openaddresses.io based geocoding website" />
+			<meta name="description" content="Coming Soon - an openaddresses.io, Maxmind and Geonames based geocoding website" />
 		[% END %]
 		<link rel="stylesheet" href="/css/style.css">
 	</head>
 	<body onload="document.Filter.q.focus()">
-		<h1>Enter the Location to Search For</h1>
-		<h1>Geocoding website based on openaddresses - alpha test</h1>
+		<h1>Free Geocoding Website - alpha test</h1>
 		<p>Enter the Location to Search For</p>
-		<p>Only US and Canada are currently supported.<p>
+		<p>Only US and Canada are currently supported.</p>
 		<p>Try "1600 Pennsylvania Avenue NW Washington DC USA"</p>
 		<p>Fork me at <a href="https://github.com/nigelhorne/Geo-Coder-Free">GitHub</a>
 		<form method="post" action="/cgi-bin/page.fcgi?page=query" onsubmit="return isNotEmpty(this.q)" name="Filter">

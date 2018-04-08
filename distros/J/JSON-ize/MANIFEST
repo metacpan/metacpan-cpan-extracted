@@ -1,4 +1,5 @@
 Build.PL
+Changes
 README.md
 lib/JSON/ize.pm
 MANIFEST

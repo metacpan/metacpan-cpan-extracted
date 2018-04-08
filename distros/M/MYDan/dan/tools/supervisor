@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use MYDan::Util::OptConf;
+use MYDan::Util::Supervisor;
+
+$| ++;
+
+=head1 SYNOPSIS
+
+ $0 --cmd ./myserver --log /tmp/mylog/path [--size 10000000 ] [--keep 5] [--name myprocname]
+
+ $0 --cmd ./myserver --log /tmp/mylog/path --http http://127.0.0.1:8080
+
+ $0 --cmd ./myserver --log /tmp/mylog/path --http http://127.0.0.1:8080 --check OK
+
+=cut
+
+my $option = MYDan::Util::OptConf->load();
+
+my %o = $option->get( qw( cmd=s log=s http=s check=s size=i keep=i name=s ) )->dump();
+
+$option->assert( 'cmd', 'log' );
+
+$0 = $o{name} if $o{name};
+
+MYDan::Util::Supervisor->new( %o )->run( %o );

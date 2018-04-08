@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.009';
+our $VERSION = '2.012';
 
 use Scalar::Util qw( looks_like_number );
 
@@ -254,10 +254,6 @@ sub epoch_to_date {
 }
 
 
-
-
-
-
 sub truncate {
     my ( $sf, $col, $precision ) = @_;
 
@@ -304,7 +300,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.009
+Version 2.012
 
 =head1 DESCRIPTION
 

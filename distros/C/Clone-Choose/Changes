@@ -1,5 +1,10 @@
 Revision history for Clone-Choose
 
+0.009   2018-04-07
+    - Added testcase for importing an unsupported backend function.
+    - Added testcase for the get_backends() function.
+    - Added testcase for when Module::Runtime is not available.
+
 0.008   2017-10-27
     - Prove whether all prerequisites are available for a particular
       backend before the test starts.

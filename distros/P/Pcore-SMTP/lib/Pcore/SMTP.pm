@@ -1,4 +1,4 @@
-package Pcore::SMTP v0.5.5;
+package Pcore::SMTP v0.5.6;
 
 use Pcore -dist, -const, -class, -result;
 use Pcore::AE::Handle qw[:TLS_CTX];

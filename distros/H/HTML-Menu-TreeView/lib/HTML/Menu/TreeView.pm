@@ -6,7 +6,7 @@ use 5.00600;
 use utf8;
 use vars
   qw($DefaultClass %EXPORT_TAGS @EXPORT_OK @ISA %anker @TreeView %openArrays @caption $columns $clasic $ffirst $sort $border $orderby $size $style $orderbyColumn $prefix $bTrOver $desc %anker %ankerG $lang);
-$HTML::Menu::TreeView::VERSION = '1.20';
+$HTML::Menu::TreeView::VERSION = '1.21';
 @ISA                           = qw(Exporter);
 @HTML::Menu::TreeView::EXPORT_OK =
   qw(border Tree css columns jscript setStyle setDocumentRoot getDocumentRoot setSize setClasic clasic preload help folderFirst size style Style documentRoot loadTree saveTree  %anker %ankerG sortTree orderBy orderByColumn prefix setModern border TrOver desc language);
@@ -388,7 +388,6 @@ sub preload {
     my $preload;
 
     foreach my $l (@lines) {
-        $l =~ s?/style/?style/?g;
         $preload .= $l;
     }
     return $preload;

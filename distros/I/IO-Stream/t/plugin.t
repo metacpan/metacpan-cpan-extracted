@@ -1,7 +1,8 @@
 # No-op plugins in action.
 use warnings;
 use strict;
-use t::share;
+use lib 't';
+use share;
 use IO::Stream::Noop;
 
 

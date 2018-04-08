@@ -4,21 +4,23 @@ NAME
 
 VERSION
 
-    This document describes Mojolicious::Plugin::JSONRPC2 version v1.1.2
+    This document describes Mojolicious::Plugin::JSONRPC2 version v2.0.1
 
 SYNOPSIS
 
         use JSON::RPC2::Server;
     
-      # in Mojolicious app
-      sub startup {
-        my $app = shift;
-        $app->plugin('JSONRPC2');
+        # in Mojolicious app
+        sub startup {
+            my $app = shift;
+            $app->plugin('JSONRPC2');
     
-        my $server = JSON::RPC2::Server->new();
+            my $server = JSON::RPC2::Server->new();
     
-        $r->jsonrpc2('/rpc', $server);
-        $r->jsonrpc2_get('/rpc', $server)->over(headers => { $app->jsonrpc2_headers });
+            $r->jsonrpc2('/rpc', $server);
+            $r->jsonrpc2_get('/rpc', $server)->over(
+                headers => { $app->jsonrpc2_headers }
+            );
 
 DESCRIPTION
 
@@ -31,48 +33,56 @@ DESCRIPTION
 
 INTERFACE
 
-    $app->defaults( 'jsonrpc2.timeout' => 300 )
+ defaults
 
-      Configure timeout for RPC requests in seconds (default value 5
-      minutes).
+        $app->defaults( 'jsonrpc2.timeout' => 300 );
 
-    $r->jsonrpc2($path, $server)
+    Configure timeout for RPC requests in seconds (default value 5
+    minutes).
 
-      Add handler for JSON-RPC 2.0 over HTTP protocol on $path (with
-      format=>0) using POST method.
+ jsonrpc2
 
-      RPC functions registered with $server will be called only with their
-      own parameters (provided with RPC request) - if they will need access
-      to Mojolicious app you'll have to provide it manually (using global
-      vars or closures).
+        $app->routes->jsonrpc2( $path, $server );
 
-    $r->jsonrpc2_get($path, $server_safe_idempotent)
+    Add handler for JSON-RPC 2.0 over HTTP protocol on $path (with
+    format=>0) using POST method.
 
-      WARNING! In most cases you don't need it. In other cases usually
-      you'll have to use different $server objects for POST and GET because
-      using GET you can provide only safe and idempotent RPC functions
-      (because of GET semantic, caching/proxies, etc.).
+    RPC functions registered with $server will be called only with their
+    own parameters (provided with RPC request) - if they will need access
+    to Mojolicious app you'll have to provide it manually (using global
+    vars or closures).
 
-      Add handler for JSON-RPC 2.0 over HTTP protocol on $path (with
-      format=>0) using GET method.
+ jsonrpc2_get
 
-      RPC functions registered with $server_safe_idempotent will be called
-      only with their own parameters (provided with RPC request) - if they
-      will need access to Mojolicious app you'll have to provide it
-      manually (using global vars or closures).
+        $app->routes->jsonrpc2_get( $path, $server_safe_idempotent );
 
-    $r->over(headers => { $app->jsonrpc2_headers })
+    WARNING! In most cases you don't need it. In other cases usually you'll
+    have to use different $server objects for POST and GET because using
+    GET you can provide only safe and idempotent RPC functions (because of
+    GET semantic, caching/proxies, etc.).
 
-      You can use this condition to distinguish between JSON-RPC 2.0 and
-      other request types on same $path - for example if you want to serve
-      web page and RPC on same url you can do this:
+    Add handler for JSON-RPC 2.0 over HTTP protocol on $path (with
+    format=>0) using GET method.
 
-          my $r = $app->routes;
-          $r->jsonrpc2_get('/', $server)->over(headers=>{$app->jsonrpc2_headers});
-          $r->get('/')->to('controller#action');
+    RPC functions registered with $server_safe_idempotent will be called
+    only with their own parameters (provided with RPC request) - if they
+    will need access to Mojolicious app you'll have to provide it manually
+    (using global vars or closures).
 
-      If you don't use this condition and plugin's handler will get request
-      with wrong headers it will reply with 415 Unsupported Media Type.
+ jsonrpc2_headers
+
+        $app->routes->over(headers => { $app->jsonrpc2_headers });
+
+    You can use this condition to distinguish between JSON-RPC 2.0 and
+    other request types on same $path - for example if you want to serve
+    web page and RPC on same url you can do this:
+
+        my $r = $app->routes;
+        $r->jsonrpc2_get('/', $server)->over(headers=>{$app->jsonrpc2_headers});
+        $r->get('/')->to('controller#action');
+
+    If you don't use this condition and plugin's handler will get request
+    with wrong headers it will reply with 415 Unsupported Media Type.
 
 OPTIONS
 
@@ -139,7 +149,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2014 by Alex Efros <powerman@cpan.org>.
+    This software is Copyright (c) 2014- by Alex Efros <powerman@cpan.org>.
 
     This is free software, licensed under:
 

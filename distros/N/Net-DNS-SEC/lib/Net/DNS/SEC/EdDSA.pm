@@ -1,9 +1,9 @@
 package Net::DNS::SEC::EdDSA;
 
 #
-# $Id: EdDSA.pm 1646 2018-03-12 12:52:45Z willem $
+# $Id: EdDSA.pm 1660 2018-04-03 14:12:42Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1646 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1660 $)[1];
 
 
 =head1 NAME
@@ -47,16 +47,8 @@ use warnings;
 use MIME::Base64;
 
 my %EdDSA = (
-	15 => [ sub { Net::DNS::SEC::libcrypto::ED25519_sign(@_) },
-		sub { Net::DNS::SEC::libcrypto::ED25519_verify(@_) },
-		sub { Net::DNS::SEC::libcrypto::ED25519_public_from_private(@_) },
-		32
-		],
-	16 => [ sub { Net::DNS::SEC::libcrypto::ED448_sign(@_) },
-		sub { Net::DNS::SEC::libcrypto::ED448_verify(@_) },
-		sub { Net::DNS::SEC::libcrypto::ED448_public_from_private(@_) },
-		57
-		],
+	15 => [ 1087, 32, 64 ],
+	16 => [ 1088, 57, 114 ],
 	);
 
 
@@ -64,13 +56,12 @@ sub sign {
 	my ( $class, $sigdata, $private ) = @_;
 
 	my $algorithm = $private->algorithm;
-	my ( $sign, $verify, $private2public, $keylen ) = @{$EdDSA{$algorithm} || []};
+	my ( $nid, $keylen ) = @{$EdDSA{$algorithm} || []};
 	die 'private key not EdDSA' unless $keylen;
 
-	my $key = decode_base64( $private->PrivateKey );	# private key
-	my $pub = &$private2public($key);			# public key
+	my $private_key = pack "a$keylen", decode_base64( $private->PrivateKey );
 
-	&$sign( $sigdata, $pub, $key );
+	Net::DNS::SEC::libcrypto::EdDSA_sign( $nid, $sigdata, $private_key );
 }
 
 
@@ -78,17 +69,15 @@ sub verify {
 	my ( $class, $sigdata, $keyrr, $signature ) = @_;
 
 	my $algorithm = $keyrr->algorithm;
-	my ( $sign, $verify, $private2public, $keylen ) = @{$EdDSA{$algorithm} || []};
+	my ( $nid, $keylen, $siglen ) = @{$EdDSA{$algorithm} || []};
 	die 'public key not EdDSA' unless $keylen;
 
 	return unless $signature;
 
-	my $keybin = pack "a$keylen", $keyrr->keybin;		# public key
-
-	my $siglen = $keylen << 1;
+	my $keybin = pack "a$keylen", $keyrr->keybin;
 	my $sigbin = pack "a$siglen", $signature;
 
-	&$verify( $sigdata, $sigbin, $keybin );
+	Net::DNS::SEC::libcrypto::EdDSA_verify( $nid, $sigdata, $sigbin, $keybin );
 }
 
 

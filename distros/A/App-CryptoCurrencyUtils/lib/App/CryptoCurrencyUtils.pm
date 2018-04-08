@@ -1,7 +1,7 @@
 package App::CryptoCurrencyUtils;
 
-our $DATE = '2018-03-08'; # DATE
-our $VERSION = '0.011'; # VERSION
+our $DATE = '2018-04-06'; # DATE
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict;
@@ -415,7 +415,7 @@ App::CryptoCurrencyUtils - CLI utilities related to cryptocurrencies
 
 =head1 VERSION
 
-This document describes version 0.011 of App::CryptoCurrencyUtils (from Perl distribution App-CryptoCurrencyUtils), released on 2018-03-08.
+This document describes version 0.012 of App::CryptoCurrencyUtils (from Perl distribution App-CryptoCurrencyUtils), released on 2018-04-06.
 
 =head1 DESCRIPTION
 

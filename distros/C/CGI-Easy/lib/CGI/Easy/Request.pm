@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use CGI::Easy::Util qw( uri_unescape_plus burst_urlencoded burst_multipart );
 use URI::Escape qw( uri_unescape );
@@ -227,7 +227,7 @@ CGI::Easy::Request - parse CGI params
 
 =head1 VERSION
 
-This document describes CGI::Easy::Request version v2.0.0
+This document describes CGI::Easy::Request version v2.0.1
 
 
 =head1 SYNOPSIS
@@ -303,9 +303,10 @@ params for all other methods (including unknown) will be placed in C<< {GET} >>.
 
 =head1 INTERFACE 
 
-=over
+=head2 new
 
-=item new( [\%opt] )
+    $r = CGI::Easy::Request->new();
+    $r = CGI::Easy::Request->new( \%opt );
 
 Parse CGI request from %ENV and STDIN.
 
@@ -544,10 +545,11 @@ error message if HTTP request was formed incorrectly. Possible errors are:
 
 Return created CGI::Easy::Request object.
 
+=head2 param
 
-=item param( )
-
-=item param( $name )
+    @all_param_names = $r->param();
+    $first_value = $r->param( $name );
+    @all_values  = $r->param( $name );
 
 This method shouldn't be called if you modified format of C<< {GET} >> or
 C<< {POST} >> fields.
@@ -560,9 +562,6 @@ POST parameter if it exists, or from GET if it doesn't exist in POST parameters)
 All stored values (see C<< keep_all_values >> option) for this parameter
 will be returned in ARRAY context, and only first value will be returned
 in SCALAR context.
-
-
-=back
 
 
 =head1 SUPPORT
@@ -617,7 +616,7 @@ Alex Efros E<lt>powerman@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2009-2010 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+This software is Copyright (c) 2009- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
 
 This is free software, licensed under:
 

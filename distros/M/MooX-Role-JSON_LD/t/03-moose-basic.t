@@ -6,11 +6,7 @@ use lib "$Bin/lib";
 
 use Test::More;
 
-eval { use MooseTester; };
-
-if ($@) {
-  plan skip_all => 'Moose not installed';
-}
+use MooseTester;
 
 ok(my $obj = MooseTester->new, 'Got an object');
 isa_ok($obj, 'MooseTester');

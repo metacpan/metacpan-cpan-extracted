@@ -23,10 +23,14 @@ const our $DEF_PAGE_SIZE => 250;
 
 const our $BUILD_STATUS_TEXT => {
     -4 => 'cancelled',
+    -2 => 'error',
     -1 => 'error',
     0  => 'queued',
+    1  => 'queued',
+    2  => 'building',
     3  => 'building',
     10 => 'success',
+    11 => 'queued',
 };
 
 sub BUILDARGS ( $self, $args = undef ) {
@@ -613,12 +617,12 @@ sub trigger_autobuild_by_tag_name ( $self, $repo_id, $autobuild_tag_name, $cb = 
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 77, 186, 320, 330,   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |      | 346, 374, 378, 413,  |                                                                                                                |
-## |      | 485, 504, 508, 552,  |                                                                                                                |
-## |      | 565                  |                                                                                                                |
+## |    3 | 81, 190, 324, 334,   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |      | 350, 378, 382, 417,  |                                                                                                                |
+## |      | 489, 508, 512, 556,  |                                                                                                                |
+## |      | 569                  |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 164                  | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
+## |    1 | 168                  | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

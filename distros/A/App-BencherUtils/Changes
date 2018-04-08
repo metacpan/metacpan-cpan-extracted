@@ -1,3 +1,8 @@
+0.241   2018-04-03 (PERLANCAR)
+
+	- bencher-module-startup-overhead: Allow imports.
+
+
 0.240   2018-02-18 (PERLANCAR)
 
 	- Add utility: bencher-for.

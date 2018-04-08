@@ -4,13 +4,13 @@
       "Alex Efros <powerman@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "IO-Stream-MatrixSSL",
    "no_index" : {
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.15",
+            "Dist::Milla" : "v1.0.18",
             "Test::Distribution" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41"
@@ -60,19 +60,19 @@
    "provides" : {
       "IO::Stream::MatrixSSL" : {
          "file" : "lib/IO/Stream/MatrixSSL.pm",
-         "version" : "v2.0.1"
+         "version" : "v2.0.2"
       },
       "IO::Stream::MatrixSSL::Client" : {
          "file" : "lib/IO/Stream/MatrixSSL/Client.pm",
-         "version" : "v2.0.1"
+         "version" : "v2.0.2"
       },
       "IO::Stream::MatrixSSL::Server" : {
          "file" : "lib/IO/Stream/MatrixSSL/Server.pm",
-         "version" : "v2.0.1"
+         "version" : "v2.0.2"
       },
       "IO::Stream::MatrixSSL::const" : {
          "file" : "lib/IO/Stream/MatrixSSL/const.pm",
-         "version" : "v2.0.1"
+         "version" : "v2.0.2"
       }
    },
    "release_status" : "stable",
@@ -87,6 +87,7 @@
          "web" : "https://github.com/powerman/perl-IO-Stream-MatrixSSL"
       }
    },
-   "version" : "v2.0.1"
+   "version" : "v2.0.2",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

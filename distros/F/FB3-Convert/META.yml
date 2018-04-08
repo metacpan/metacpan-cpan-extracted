@@ -16,7 +16,7 @@ name: FB3-Convert
 provides:
   FB3::Convert:
     file: lib/FB3/Convert.pm
-    version: '0.03'
+    version: '0.05'
   FB3::Convert::Epub:
     file: lib/FB3/Convert/Epub.pm
 requires:
@@ -24,14 +24,15 @@ requires:
   Clone: '0'
   FB3: '0'
   File::ShareDir: '1.00'
-  HTML::Entities: '0'
   Hash::Merge: '0'
   UUID::Tiny: '0'
   XML::Diff: '0'
+  XML::Entities: '0'
+  XML::Entities::Data: '0'
   XML::LibXML: '0'
   XML::LibXSLT: '0'
   perl: '5.014'
 resources:
   license: http://opensource.org/licenses/lgpl-license.php
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

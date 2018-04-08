@@ -603,13 +603,13 @@ Asturian locale.
    1995-12-22T09:05:02 = 4u trimestre de 1995
   -0010-09-15T04:44:23 = 3er trimestre de -10
 
-=head3 yw-count-one ('selmana' w 'de' Y)
+=head3 yw-count-one ('selmana' w 'de' y)
 
    2008-02-05T18:30:30 = selmana 6 de 2008
    1995-12-22T09:05:02 = selmana 51 de 1995
   -0010-09-15T04:44:23 = selmana 37 de -10
 
-=head3 yw-count-other ('selmana' w 'de' Y)
+=head3 yw-count-other ('selmana' w 'de' y)
 
    2008-02-05T18:30:30 = selmana 6 de 2008
    1995-12-22T09:05:02 = selmana 51 de 1995

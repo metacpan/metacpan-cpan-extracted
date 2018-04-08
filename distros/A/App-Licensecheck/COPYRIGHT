@@ -236,13 +236,13 @@ Files: dist.ini
 Copyright: Copyright 2016 Jonas Smedegaard.
 License: GPL-3.0
 
-Files: t/devscripts/artistic-2-0-modules.pm
-Copyright: Copyright (C) 2009 by Moritz Lenz and the SVG::Plot contributors (see file.
-License: Artistic-2.0
-
 Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
+
+Files: t/devscripts/artistic-2-0-modules.pm
+Copyright: Copyright (C) 2009 by Moritz Lenz and the SVG::Plot contributors (see file.
+License: Artistic-2.0
 
 License: GPL-3.0
  This software is Copyright (c) 2018 by Jonas Smedegaard.

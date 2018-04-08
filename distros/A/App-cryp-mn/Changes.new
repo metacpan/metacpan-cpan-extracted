@@ -1,0 +1,22 @@
+0.003   2018-04-06 (PERLANCAR)
+
+	- [Incompatible change] Rename subcommand ls to ls-masternodes
+
+	- Add subcommand: ls-coins
+
+	- ls-masternodes: Add coin filtering options --include-coin (-I),
+	  --exclude-coin (-X).
+
+	- Add shcompgen hint to CLI.
+
+
+0.002   2018-04-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix wording and copy-paste mistake.
+
+
+0.001   2018-04-03 (PERLANCAR)
+
+        - First, early release.

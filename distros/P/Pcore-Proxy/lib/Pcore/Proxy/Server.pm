@@ -5,7 +5,7 @@ use Pcore::Proxy;
 use Pcore::AE::Handle;
 use Pcore::Util::Scalar qw[weaken];
 
-has host => ( is => 'ro', isa => Str, default => '127.0.0.1' );
+has host      => ( is => 'ro',   isa => Str, default => '127.0.0.1' );
 has port      => ( is => 'lazy', isa => PositiveInt );
 has key_file  => ( is => 'lazy', isa => Str );
 has cert_file => ( is => 'lazy', isa => Str );
@@ -42,80 +42,78 @@ sub _on_accept ( $self, $fh, $host, $port ) {
             return;
         },
         on_connect => sub ( $h1, @ ) {
-            $h1->on_read(
-                sub ($h) {
-                    $h->read_http_req_headers(
-                        sub ( $h, $env, $error ) {
-                            if ( $env->{REQUEST_METHOD} eq 'CONNECT' ) {
-                                my $host = $env->{HTTP_HOST};
+            $h1->on_read( sub ($h) {
+                $h->read_http_req_headers(
+                    sub ( $h, $env, $error ) {
+                        if ( $env->{REQUEST_METHOD} eq 'CONNECT' ) {
+                            my $host = $env->{HTTP_HOST};
 
-                                $h->push_write("HTTP/1.1 200 OK${CRLF}${CRLF}");
+                            $h->push_write("HTTP/1.1 200 OK${CRLF}${CRLF}");
 
-                                $h->starttls(
-                                    'accept',
-                                    {   cache           => 1,
-                                        verify          => undef,
-                                        verify_peername => undef,
-                                        sslv2           => 1,
-                                        dh              => undef,              # Diffie-Hellman is disabled
-                                        key_file        => $self->key_file,
-                                        cert_file       => $self->cert_file,
-                                    }
-                                );
+                            $h->starttls(
+                                'accept',
+                                {   cache           => 1,
+                                    verify          => undef,
+                                    verify_peername => undef,
+                                    sslv2           => 1,
+                                    dh              => undef,              # Diffie-Hellman is disabled
+                                    key_file        => $self->key_file,
+                                    cert_file       => $self->cert_file,
+                                }
+                            );
 
-                                $h->read_http_req_headers(
-                                    sub ( $h, $env, $error ) {
-                                        $self->_read_body(
-                                            $h, $env,
-                                            sub ($body) {
-                                                $self->_proxy_req(
-                                                    "https://${host}$env->{REQUEST_URI}",
-                                                    $env, $body,
-                                                    sub ($res) {
-                                                        $self->_return_res( $h, $res );
+                            $h->read_http_req_headers(
+                                sub ( $h, $env, $error ) {
+                                    $self->_read_body(
+                                        $h, $env,
+                                        sub ($body) {
+                                            $self->_proxy_req(
+                                                "https://${host}$env->{REQUEST_URI}",
+                                                $env, $body,
+                                                sub ($res) {
+                                                    $self->_return_res( $h, $res );
 
-                                                        undef $h1;
+                                                    undef $h1;
 
-                                                        return;
-                                                    }
-                                                );
+                                                    return;
+                                                }
+                                            );
 
-                                                return;
-                                            }
-                                        );
+                                            return;
+                                        }
+                                    );
 
-                                        return;
-                                    }
-                                );
-                            }
-                            else {
-                                $self->_read_body(
-                                    $h, $env,
-                                    sub ($body) {
-                                        $self->_proxy_req(
-                                            $env->{REQUEST_URI},
-                                            $env, $body,
-                                            sub ($res) {
-                                                $self->_return_res( $h, $res );
-
-                                                undef $h1;
-
-                                                return;
-                                            }
-                                        );
-
-                                        return;
-                                    }
-                                );
-                            }
-
-                            return;
+                                    return;
+                                }
+                            );
                         }
-                    );
+                        else {
+                            $self->_read_body(
+                                $h, $env,
+                                sub ($body) {
+                                    $self->_proxy_req(
+                                        $env->{REQUEST_URI},
+                                        $env, $body,
+                                        sub ($res) {
+                                            $self->_return_res( $h, $res );
 
-                    return;
-                }
-            );
+                                            undef $h1;
+
+                                            return;
+                                        }
+                                    );
+
+                                    return;
+                                }
+                            );
+                        }
+
+                        return;
+                    }
+                );
+
+                return;
+            } );
 
             return;
         }
@@ -151,15 +149,13 @@ sub _read_body ( $self, $h, $env, $cb ) {
     if ( $self->{client_body_timeout} ) {
         $h->rtimeout_reset;
         $h->rtimeout( $self->{client_body_timeout} );
-        $h->on_rtimeout(
-            sub ($h) {
+        $h->on_rtimeout( sub ($h) {
 
-                # client body read timeout
-                $self->return_xxx( $h, 408 );
+            # client body read timeout
+            $self->return_xxx( $h, 408 );
 
-                return;
-            }
-        );
+            return;
+        } );
     }
 
     $h->read_http_body(

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes CGI::Easy version v1.0.1
+    This document describes CGI::Easy version v2.0.1
 
 SYNOPSIS
 
@@ -126,7 +126,7 @@ DESCRIPTION
       sending to browser.
 
       There one exception: value for key 'Set-Cookie' is ARRAYREF with
-      HASHREFs, where each HASHREF keep cookie details:
+      HASHREF, where each HASHREF keep cookie details:
 
           $h->{'Set-Cookie'} = [
               { name=>'mycookie1', value=>'myvalue1' },
@@ -353,8 +353,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2009-2010 by Alex Efros
-    <powerman@cpan.org>.
+    This software is Copyright (c) 2009- by Alex Efros <powerman@cpan.org>.
 
     This is free software, licensed under:
 

@@ -19,8 +19,12 @@ use Time::HiRes qw(sleep);
 use RPC::Switch::Client;
 
 my @actions = (
-	# [ actionname, callback, mode, filter ]
-	['add', \&do_add, 'async'],
+	# [ actionname, callback, mode, filter, doc ]
+	['add', \&do_add, 'async', undef, {
+		inputs => 'counter, step',
+		outputs => 'counter',
+		description => 'adds step to counter and returns counter; step defaults to 1'
+	}],
 	#['square', \&do_square2, 'subproc'],
 	#['square', \&do_square, 'async', {foo => 'bar'}],
 	['square', \&do_square, 'async'],
@@ -54,12 +58,13 @@ sub main {
 	die 'no client?' unless $client;
 
 	for (@actions) {
-		my ($method, $cb, $mode, $filter) = @$_;
+		my ($method, $cb, $mode, $filter, $doc) = @$_;
 		my $err = $client->announce(
 			method => "bar.$method",
 			cb => $cb,
 			mode => $mode,
 			filter => $filter,
+			doc => $doc,
 		);
 		die "could not announce $method: $err" if $err;
 	}

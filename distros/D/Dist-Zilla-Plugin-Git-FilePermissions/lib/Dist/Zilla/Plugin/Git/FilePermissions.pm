@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';
+our $VERSION = '1.000';
 
 use Moose;
 
@@ -153,7 +153,7 @@ Dist::Zilla::Plugin::Git::FilePermissions - fix the file permissions in your Git
 
 =head1 VERSION
 
-Version 0.004
+Version 1.000
 
 =head1 SYNOPSIS
 

@@ -21,6 +21,8 @@ t/html/s5-expected.html
 t/html/s5.html
 t/html/s6-expected.html
 t/html/s6.html
+t/html/s7-expected.html
+t/html/s7.html
 t/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

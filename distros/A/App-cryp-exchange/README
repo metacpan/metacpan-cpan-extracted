@@ -1,0 +1,142 @@
+NAME
+    App::cryp::exchange - Interact with cryptoexchanges
+
+VERSION
+    This document describes version 0.001 of App::cryp::exchange (from Perl
+    distribution App-cryp-exchange), released on 2018-04-04.
+
+SYNOPSIS
+    Please see included script cryp-exchange.
+
+FUNCTIONS
+  get_order_book
+    Usage:
+
+     get_order_book(%args) -> [status, msg, result, meta]
+
+    Get order book on an exchange.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   exchange* => *str*
+
+    *   pair* => *str*
+
+    *   type => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_accounts
+    Usage:
+
+     list_accounts(%args) -> [status, msg, result, meta]
+
+    List exchange accounts.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_exchanges
+    Usage:
+
+     list_exchanges(%args) -> [status, msg, result, meta]
+
+    List supported exchanges.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_pairs
+    Usage:
+
+     list_pairs(%args) -> [status, msg, result, meta]
+
+    List pairs supported by exchange.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+    *   exchange* => *str*
+
+    *   native => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-cryp-exchange>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-cryp-exchange>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-cryp-exchange>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Other "App::cryp::*" modules.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

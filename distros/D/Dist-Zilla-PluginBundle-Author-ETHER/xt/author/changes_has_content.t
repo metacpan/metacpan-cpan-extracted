@@ -6,7 +6,7 @@ plan skip_all => 'xt/release/changes_has_content.t is missing' if not -e 'xt/rel
 
 my $branch_name = $ENV{TRAVIS_BRANCH};
 chomp($branch_name = `git rev-parse --abbrev-ref HEAD`) if not $branch_name;
-local $TODO = 'Changes need not have content for this release yet if this is only the master branch'
+$TODO = 'Changes need not have content for this release yet if this is only the master branch'
     if ($branch_name || '') eq 'master';
 
 do './xt/release/changes_has_content.t';

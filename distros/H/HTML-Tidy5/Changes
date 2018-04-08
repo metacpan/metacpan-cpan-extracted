@@ -1,6 +1,25 @@
 Revision history for Perl extension HTML::Tidy5.
 
-The HTML::Tidy5 module is an HTML5-compatible upgrade from the HTML::Tidy module.
+The HTML::Tidy5 module is an HTML5-compatible upgrade from the HTML::Tidy
+module.
+
+
+1.02    Wed Apr  4 15:06:44 CDT 2018
+====================================
+[FIXES]
+html_tidy_ok() now clears the messages in a passed-in HTML::Tidy5 object
+before using it to validate the HTML.
+
+
+1.01_01 Mon Mar 26 16:37:13 CDT 2018
+====================================
+[ENHANCEMENTS]
+Add Test::HTML::Tidy5 and the html_tidy_ok() function for testing HTML
+in your .t files.
+
+[FIXES]
+Fixed test failure.
+
 
 1.00    Tue Mar 20 16:51:52 CDT 2018
 ====================================

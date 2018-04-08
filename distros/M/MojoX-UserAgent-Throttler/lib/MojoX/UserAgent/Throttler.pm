@@ -2,7 +2,7 @@ package MojoX::UserAgent::Throttler;
 
 use Mojo::Base -strict;
 
-our $VERSION = 'v1.0.2';
+our $VERSION = 'v1.0.3';
 
 use Mojo::UserAgent;
 use Mojo::Util qw( monkey_patch );
@@ -109,7 +109,7 @@ MojoX::UserAgent::Throttler - add throttling support to Mojo::UserAgent
 
 =head1 VERSION
 
-This document describes MojoX::UserAgent::Throttler version v1.0.2
+This document describes MojoX::UserAgent::Throttler version v1.0.3
 
 
 =head1 SYNOPSIS

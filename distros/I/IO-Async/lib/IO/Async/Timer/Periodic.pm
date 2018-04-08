@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( IO::Async::Timer );
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 use Carp;
 
@@ -185,7 +185,7 @@ sub _reschedule
    }
    elsif( $resched eq "skip" ) {
       # How many ticks are needed?
-      my $ticks = POSIX::ceil( $now - $self->{next_time} );
+      my $ticks = POSIX::ceil( ( $now - $self->{next_time} ) / $next_interval );
       # $self->{last_ticks} = $ticks;
       $self->{next_time} += $next_interval * $ticks;
    }

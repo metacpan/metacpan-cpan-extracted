@@ -1,0 +1,9 @@
+Revision history for Perl extension Acme-Pointer
+
+0.02 2018-04-04T00:30:25Z
+    - Fixed to build fail on thread perl
+
+0.01 2018-04-01T05:10:17Z
+
+    - original version
+

@@ -1,3 +1,19 @@
+0.092   2018-04-08 (PERLANCAR)
+
+	- No functional changes.
+
+	- Remove unneeded dependency on Data::Clean::JSON.
+
+	- [doc] Mention Business::ID::NKK.
+
+
+0.091   2018-04-08 (PERLANCAR)
+
+        - No functional changes.
+
+	- [doc] Mention Business::ID::NKK.
+
+
 0.090   2018-02-07 (PERLANCAR)
 
 	- [Incompatible change] parse_nik() no longer exported by default.

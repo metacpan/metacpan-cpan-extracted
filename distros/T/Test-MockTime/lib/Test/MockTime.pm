@@ -12,7 +12,7 @@ our @EXPORT_OK = qw(
   restore_time
 );
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK, );
-our $VERSION     = '0.16';
+our $VERSION     = '0.17';
 our $offset      = 0;
 our $fixed       = undef;
 
@@ -108,7 +108,7 @@ Test::MockTime - Replaces actual time with simulated time
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =head1 SYNOPSIS
 

@@ -2,6 +2,7 @@ package Pcore::Util::File::Tree;
 
 use Pcore -class;
 use Pcore::Util::File::Tree::File;
+use Pcore::Util::Scalar qw[is_plain_coderef];
 
 has files => ( is => 'lazy', isa => HashRef [ InstanceOf ['Pcore::Util::File::Tree::File'] ], default => sub { {} }, init_arg => undef );
 
@@ -51,6 +52,27 @@ sub move_file ( $self, $path, $target_path ) {
         $file->{path} = $target_path;
 
         $self->files->{$target_path} = $file;
+    }
+
+    return;
+}
+
+sub move_tree ( $self, $source_path, $target_path ) {
+    for my $old_path ( keys $self->files->%* ) {
+        my $new_path;
+
+        if ( is_plain_coderef $target_path ) {
+            if ( $old_path =~ /\A\Q$source_path\E/sm ) {
+                $new_path = $target_path->($old_path);
+
+                $self->move_file( $old_path, $new_path ) if defined $new_path;
+            }
+        }
+        else {
+            $new_path = $old_path;
+
+            $self->move_file( $old_path, $new_path ) if $new_path =~ s/$source_path/$target_path/sm;
+        }
     }
 
     return;

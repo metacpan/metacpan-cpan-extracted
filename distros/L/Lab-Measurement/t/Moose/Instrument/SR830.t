@@ -40,8 +40,8 @@ is_absolute_error( $rphi->{phi}, 0, 180,   "phi is in [-180,180]" );
 # Set/Get reference frequency
 
 set_get_test(
-    instr => $lia, getter => 'get_freq', setter => 'set_freq',
-    cache => 'cached_freq', values => [qw/1 10 1000 100000/]
+    instr => $lia, getter => 'get_frq', setter => 'set_frq',
+    cache => 'cached_frq', values => [qw/1 10 1000 100000/]
 );
 
 # Amplitude

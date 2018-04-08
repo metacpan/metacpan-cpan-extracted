@@ -4,13 +4,13 @@
       "A. U. Thor <kimoto@sakura.ne.jp>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "SPVM",
    "no_index" : {
@@ -35,6 +35,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.0318",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.0324"
 }

@@ -1,6 +1,6 @@
 #!perl -T
 
-use Test::More tests => 27;
+use Test::More tests => 31;
 
 BEGIN {
     use_ok( 'String::Validator::Password' ) || print "Bail out!\n";
@@ -65,9 +65,21 @@ is ( $Validator->Check( $twoofeach ), 0, 'twoofeach string passes' ) ;
 note('Setting deny_xx to a value greater than 1 should set that as the maximum') ;
 $Validator = String::Validator::Password->new(
 	deny_num => 4 , min_types => 0 , min_len => 0 ) ;
-is ( $Validator->Check( $numeric ), 1, 'num 4. numeric string rejected (10 digit). ' ) ;
-is ( $Validator->Check( $twoofeach ), 0, 'num 4. twoofeach string accepted. (2 digit)' ) ;
+is ( $Validator->Check( $numeric ), 1, 'numeric string rejected (10 digit). ' ) ;
 
-
+$Validator = String::Validator::Password->new( min_types => 4 ) ;
+is ( $Validator->Check( 'THREE3type' ), 1, 	'THREE3type  fails with types set to 4.' ) ;
+like ( $Validator->Errstr(), qr/Input contained 3 types of character, 4 are required./,
+	'Errstr: Input contained 3 types of character, 4 are required.');
+# deny_nums
+$Validator = String::Validator::Password->new( deny_num => 1, min_len => 5  ) ;
+like ( $Validator->IsNot_Valid( 'THREE3type' ), qr/character type numeric is prohibited/,
+	'Errstr: numbers are probited.');
+$Validator = String::Validator::Password->new( require_num => 4, min_len => 5  ) ;
+like ( $Validator->IsNot_Valid( 'NoNUMS???' ), qr/At least 4 characters of type numeric is required./,
+	'Errstr: numbers are requried.');
+$Validator = String::Validator::Password->new( deny_punct => 1, min_len => 5  ) ;
+like ( $Validator->IsNot_Valid( 'PUNCTUAT3d!' ), qr/punct is prohibited/,
+	'Errstr: punctuation is probited.');
 
 done_testing();

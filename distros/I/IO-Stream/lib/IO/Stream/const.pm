@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use Carp;
 
-our $VERSION = 'v2.0.2';
+our $VERSION = 'v2.0.3';
 
 use Scalar::Util qw( dualvar );
 use Errno qw( EAGAIN );

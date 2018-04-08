@@ -14,12 +14,14 @@ my $port           = 1234;
 my $auto_port      = 0;
 my $serve_multiple = 0;
 my $serve_self     = 0;
+my $uuid           = '';
 
 GetOptions(
     'auto'     => \$auto_port,
     'port=i'   => \$port,
     'multiple' => \$serve_multiple,
     'self'     => \$serve_self,
+    'uuid=s'   => \$uuid,
     'help'     => sub { pod2usage(1) } ) or pod2usage(2);
 
 unshift @ARGV, __FILE__ if $serve_self;
@@ -43,8 +45,8 @@ eval { require Term::ProgressBar; $opt_depend{progress}   = 1 };
 my $type     = get_file_type($file);
 my $size     = -s $file;
 my $filename = fileparse($file);
-my $uuid     = gen_uniq_string();
 my $ip       = get_local_ip();
+$uuid      ||= gen_uniq_string();
 my $path     = "/$uuid/" . check_escape($filename);
 
 my $server;
@@ -189,6 +191,11 @@ Auto port selection.  Increments specified port until successful.
 =item B<--port=N> or B<-p N>
 
 Use specified port, defaults to 1234.
+
+=item B<--uuid=string> or B<-u string>
+
+Use specified string in place of an UUID. Useful when using this script to serve
+a file to yourself on another machinee and you must manually type the URL.
 
 =item B<--multiple> or B<-m>
 

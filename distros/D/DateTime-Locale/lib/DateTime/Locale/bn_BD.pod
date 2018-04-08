@@ -642,7 +642,7 @@ No
 
 =head3 Local first day of the week
 
-5 (শুক্রবার)
+7 (রবিবার)
 
 =head1 SUPPORT
 

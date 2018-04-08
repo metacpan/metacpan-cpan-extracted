@@ -22,11 +22,13 @@ See also L<Mojo::Pg::Database#SYNOPSIS>
     # DBI style
     my $now = $db->selectrow_hashref('select now() as now')->{now};
     
-    my $now = $db->selectrow_array('select now() as now', {Async=>1,});
+    my $cb = $db->query('select now() as now', {Async=>1,});
+    Mojo::IOLoop->start;
+    $now = $$cb->()->hash;
     
-    $db->query('select pg_sleep(?::int), now() as now', undef, 2, $cb);
-    
-    $db->do('set ...');
+    $db->select('select pg_sleep(?::int), now() as now', undef, 2, $cb);
+    Mojo::IOLoop->start;
+    $now = $$cb->()->fetchrow_hashref;
 
 =head2 Transaction syntax
 

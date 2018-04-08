@@ -7,7 +7,7 @@ use utf8;
 use Test::BDD::Cucumber::Definitions qw(Given When Then);
 use Test::BDD::Cucumber::Definitions::Struct qw(:util);
 
-our $VERSION = '0.29';
+our $VERSION = '0.31';
 
 ## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
 ## no critic [RegularExpressions::RequireExtendedFormatting]
@@ -18,6 +18,11 @@ sub import {
     #       http response content read JSON
     When qr/http response content read JSON/, sub {
         http_response_content_read_json();
+    };
+
+    #       file content read JSON
+    When qr/file content read JSON/, sub {
+        file_content_read_json();
     };
 
     #       zip archive members read list
@@ -48,6 +53,16 @@ sub import {
     #       struct data array "(.+?)" count "(.*)"
     Then qr/struct data array "(.+?)" count "(.*)"/, sub {
         struct_data_array_count( $1, $2 );
+    };
+
+    #       struct data element "(.+?)" key "(.*)"
+    Then qr/struct data element "(.+?)" key "(.*)"/, sub {
+        struct_data_element_key( $1, $2 );
+    };
+
+    #       struct data list "(.+?)" all key "(.*)"
+    Then qr/struct data list "(.+?)" all key "(.*)"/, sub {
+        struct_data_list_all_key( $1, $2 );
     };
 
     return;

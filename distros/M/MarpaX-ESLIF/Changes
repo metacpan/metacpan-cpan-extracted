@@ -1,6 +1,12 @@
 Changelog for MarpaX-ESLIF
 
-2.0.42 2018-03-21T06:36:16
+2.0.43 2018-04-04T05:36:13
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Version 2.0.43 [ci skip]
+ - Bug fix in _marpaESLIFRecognizer_encoding_eqb, take into account that
+   stream can move when doing exception or discard checks
+
+2.0.42 2018-03-21T06:36:16Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - Version 2.0.42 [ci skip]
  - isCanContinue API doc [ci skip]

@@ -42,7 +42,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CryptoCurrencyUtils
   homepage: https://metacpan.org/release/App-CryptoCurrencyUtils
   repository: git://github.com/perlancar/perl-App-CryptoCurrencyUtils.git
-version: '0.011'
+version: '0.012'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

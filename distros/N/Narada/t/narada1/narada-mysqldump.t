@@ -1,4 +1,4 @@
-use t::narada1::share; guard my $guard;
+use lib 't'; use narada1::share; guard my $guard;
 use DBI;
 use Test::Database;
 use Narada::Config qw( set_config );

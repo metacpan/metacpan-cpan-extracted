@@ -1,7 +1,8 @@
 # Use case: HTTP GET until EOF
 use warnings;
 use strict;
-use t::share;
+use lib 't';
+use share;
 
 plan skip_all => '$TEST_HTTPS_PROXY_{HOST,PORT,USER,PASS} are not configured'
     if !$ENV{TEST_HTTPS_PROXY_HOST};

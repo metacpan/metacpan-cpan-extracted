@@ -1,7 +1,7 @@
 {
   am_pm_abbreviated => [
     "\N{U+13cc}\N{U+13be}\N{U+13b4}",
-    "\N{U+13d2}\N{U+13af}\N{U+13f1}\N{U+13a2}\N{U+13d7}\N{U+13e2}",
+    "\N{U+13d2}\N{U+13af}\N{U+13f1}\N{U+13a2}",
   ],
   available_formats => {
     Bh => "h B",
@@ -268,5 +268,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 32,
+  version => 33,
 }

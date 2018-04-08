@@ -1,7 +1,8 @@
 # EAGAIN in sysread/syswrite
 use warnings;
 use strict;
-use t::share;
+use lib 't';
+use share;
 
 @CheckPoint = (
     [ 'timeout_write'   ], 'force EAGAIN in syswrite',

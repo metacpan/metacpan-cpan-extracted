@@ -411,37 +411,15 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
 
                     SPVM_OPCODE_BUILDER_push_inc_opcode(compiler, opcode_array, op_assign_from, -1);
                   }
-                  else if (op_assign_from->id == SPVM_OP_C_ID_CONCAT_STRING) {
-                    
+                  else if (op_assign_from->id == SPVM_OP_C_ID_CONCAT) {
                     
                     SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_assign_from->first);
                     assert(first_type->id == SPVM_TYPE_C_ID_STRING);
-                    SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_assign_from->last);
                     
                     SPVM_OPCODE opcode;
                     memset(&opcode, 0, sizeof(SPVM_OPCODE));
-                    if (last_type->id == SPVM_TYPE_C_ID_STRING) {
-                      opcode.id = SPVM_OPCODE_C_ID_CONCAT_STRING_STRING;
-                    }
-                    else if (last_type->id == SPVM_TYPE_C_ID_BYTE) {
-                      opcode.id = SPVM_OPCODE_C_ID_CONCAT_STRING_BYTE;
-                    }
-                    else if (last_type->id == SPVM_TYPE_C_ID_SHORT) {
-                      opcode.id = SPVM_OPCODE_C_ID_CONCAT_STRING_SHORT;
-                    }
-                    else if (last_type->id == SPVM_TYPE_C_ID_INT) {
-                      opcode.id = SPVM_OPCODE_C_ID_CONCAT_STRING_INT;
-                    }
-                    else if (last_type->id == SPVM_TYPE_C_ID_LONG) {
-                      opcode.id = SPVM_OPCODE_C_ID_CONCAT_STRING_LONG;
-                    }
-                    else if (last_type->id == SPVM_TYPE_C_ID_FLOAT) {
-                      opcode.id = SPVM_OPCODE_C_ID_CONCAT_STRING_FLOAT;
-                    }
-                    else if (last_type->id == SPVM_TYPE_C_ID_DOUBLE) {
-                      opcode.id = SPVM_OPCODE_C_ID_CONCAT_STRING_DOUBLE;
-                    }
-
+                    opcode.id = SPVM_OPCODE_C_ID_CONCAT;
+                    
                     int32_t index_out = SPVM_OP_get_my_index(compiler, op_assign_to);
                     int32_t index_in1 = SPVM_OP_get_my_index(compiler, op_assign_from->first);
                     int32_t index_in2 = SPVM_OP_get_my_index(compiler, op_assign_from->last);
@@ -468,12 +446,13 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                   else if (op_assign_from->id == SPVM_OP_C_ID_CALL_SUB) {
                     
                     SPVM_CALL_SUB* call_sub = op_assign_from->uv.call_sub;
-                    const char* call_sub_name = call_sub->sub->abs_name;
+                    const char* call_sub_abs_name = call_sub->sub->abs_name;
                     
-                    SPVM_OP* op_sub_call_sub = SPVM_HASH_search(compiler->op_sub_symtable, call_sub_name, strlen(call_sub_name));
+                    SPVM_OP* op_sub_call_sub = SPVM_HASH_search(compiler->op_sub_symtable, call_sub_abs_name, strlen(call_sub_abs_name));
                     SPVM_SUB* sub_call_sub = op_sub_call_sub->uv.sub;
 
                     // Push args
+                    int32_t first_arg_index = -1;
                     SPVM_OP* op_args = op_assign_from->last;
                     SPVM_OP* op_arg = op_args->first;
                     while ((op_arg = SPVM_OP_sibling(compiler, op_arg))) {
@@ -509,19 +488,29 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       
                       opcode.operand0 = index_arg;
                       
+                      if (first_arg_index == -1) {
+                        first_arg_index = index_arg;
+                      }
                       SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                     }
+
+                    int32_t index_out = SPVM_OP_get_my_index(compiler, op_assign_to);
 
                     // Call subroutine
                     SPVM_OPCODE opcode;
                     memset(&opcode, 0, sizeof(SPVM_OPCODE));
-                    opcode.id = SPVM_OPCODE_C_ID_CALL_SUB;
-
-                    int32_t index_out = SPVM_OP_get_my_index(compiler, op_assign_to);
-                    int32_t id = sub_call_sub->id;
-
+                    
                     opcode.operand0 = index_out;
-                    opcode.operand1 = id;
+
+                    if (sub_call_sub->op_package->uv.package->is_interface) {
+                      opcode.id = SPVM_OPCODE_C_ID_CALL_INTERFACE_METHOD;
+                      opcode.operand1 = sub_call_sub->id;
+                      opcode.operand2 = first_arg_index;
+                    }
+                    else {
+                      opcode.id = SPVM_OPCODE_C_ID_CALL_SUB;
+                      opcode.operand1 = sub_call_sub->id;
+                    }
 
                     SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
 
@@ -1183,6 +1172,9 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       else if (dist_type->id == SPVM_TYPE_C_ID_DOUBLE) {
                         opcode.id = SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_DOUBLE;
                       }
+                      else if (dist_type->id == SPVM_TYPE_C_ID_STRING) {
+                        opcode.id = SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_STRING;
+                      }
                       else {
                         assert(0);
                       }
@@ -1205,6 +1197,9 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       }
                       else if (dist_type->id == SPVM_TYPE_C_ID_DOUBLE) {
                         opcode.id = SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_DOUBLE;
+                      }
+                      else if (dist_type->id == SPVM_TYPE_C_ID_STRING) {
+                        opcode.id = SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_STRING;
                       }
                       else {
                         assert(0);
@@ -1229,6 +1224,9 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       else if (dist_type->id == SPVM_TYPE_C_ID_DOUBLE) {
                         opcode.id = SPVM_OPCODE_C_ID_CONVERT_INT_TO_DOUBLE;
                       }
+                      else if (dist_type->id == SPVM_TYPE_C_ID_STRING) {
+                        opcode.id = SPVM_OPCODE_C_ID_CONVERT_INT_TO_STRING;
+                      }
                       else {
                         assert(0);
                       }
@@ -1251,6 +1249,9 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       }
                       else if (dist_type->id == SPVM_TYPE_C_ID_DOUBLE) {
                         opcode.id = SPVM_OPCODE_C_ID_CONVERT_LONG_TO_DOUBLE;
+                      }
+                      else if (dist_type->id == SPVM_TYPE_C_ID_STRING) {
+                        opcode.id = SPVM_OPCODE_C_ID_CONVERT_LONG_TO_STRING;
                       }
                       else {
                         assert(0);
@@ -1275,6 +1276,9 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       else if (dist_type->id == SPVM_TYPE_C_ID_DOUBLE) {
                         opcode.id = SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_DOUBLE;
                       }
+                      else if (dist_type->id == SPVM_TYPE_C_ID_STRING) {
+                        opcode.id = SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_STRING;
+                      }
                       else {
                         assert(0);
                       }
@@ -1298,14 +1302,21 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       else if (dist_type->id == SPVM_TYPE_C_ID_DOUBLE) {
                         opcode.id = SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_DOUBLE;
                       }
+                      else if (dist_type->id == SPVM_TYPE_C_ID_STRING) {
+                        opcode.id = SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_STRING;
+                      }
                       else {
                         assert(0);
                       }
                     }
+                    // Check cast
                     else {
-                        assert(0);
+                      SPVM_TYPE* dist_base_type = dist_type->base_type;
+                      
+                      opcode.id = SPVM_OPCODE_C_ID_CHECK_CAST;
+                      opcode.operand2 = dist_base_type->id;
                     }
-                    
+
                     int32_t index_out = SPVM_OP_get_my_index(compiler, op_dist_term);
                     int32_t index_in = SPVM_OP_get_my_index(compiler, op_src_term);
                     
@@ -2535,6 +2546,65 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                 }
                 break;
               }
+              case SPVM_OP_C_ID_ISA: {
+                SPVM_OPCODE opcode;
+                memset(&opcode, 0, sizeof(SPVM_OPCODE));
+                
+                opcode.id = SPVM_OPCODE_C_ID_ISA;
+                
+                int32_t index_in1 = SPVM_OP_get_my_index(compiler, op_cur->first);
+                SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_cur->last);
+                
+                opcode.operand0 = index_in1;
+                opcode.operand1 = type->id;
+                
+                SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
+                
+                break;
+              }
+              case SPVM_OP_C_ID_STRING_EQ:
+              case SPVM_OP_C_ID_STRING_NE:
+              case SPVM_OP_C_ID_STRING_GT:
+              case SPVM_OP_C_ID_STRING_GE:
+              case SPVM_OP_C_ID_STRING_LT:
+              case SPVM_OP_C_ID_STRING_LE:
+              {
+                SPVM_OPCODE opcode;
+                memset(&opcode, 0, sizeof(SPVM_OPCODE));
+                
+                switch (op_cur->id) {
+                  case SPVM_OP_C_ID_STRING_EQ:
+                    opcode.id = SPVM_OPCODE_C_ID_STRING_EQ;
+                    break;
+                  case SPVM_OP_C_ID_STRING_NE:
+                    opcode.id = SPVM_OPCODE_C_ID_STRING_NE;
+                    break;
+                  case SPVM_OP_C_ID_STRING_GT:
+                    opcode.id = SPVM_OPCODE_C_ID_STRING_GT;
+                    break;
+                  case SPVM_OP_C_ID_STRING_GE:
+                    opcode.id = SPVM_OPCODE_C_ID_STRING_GE;
+                    break;
+                  case SPVM_OP_C_ID_STRING_LT:
+                    opcode.id = SPVM_OPCODE_C_ID_STRING_LE;
+                    break;
+                  case SPVM_OP_C_ID_STRING_LE:
+                    opcode.id = SPVM_OPCODE_C_ID_STRING_LE;
+                    break;
+                  default:
+                    assert(0);
+                }
+                
+                int32_t index_in1 = SPVM_OP_get_my_index(compiler, op_cur->first);
+                int32_t index_in2 = SPVM_OP_get_my_index(compiler, op_cur->last);
+                
+                opcode.operand0 = index_in1;
+                opcode.operand1 = index_in2;
+                
+                SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
+                
+                break;
+              }
               case  SPVM_OP_C_ID_BOOL: {
                 SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_cur->first);
                 
@@ -2575,13 +2645,16 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                 break;
               }
               case SPVM_OP_C_ID_CALL_SUB: {
+                
                 SPVM_CALL_SUB* call_sub = op_cur->uv.call_sub;
-                const char* sub_name = call_sub->sub->abs_name;
+                const char* call_sub_abs_name = call_sub->sub->abs_name;
                 
-                SPVM_OP* op_sub = SPVM_HASH_search(compiler->op_sub_symtable, sub_name, strlen(sub_name));
-                SPVM_SUB* sub = op_sub->uv.sub;
+                SPVM_OP* op_sub_call_sub = SPVM_HASH_search(compiler->op_sub_symtable, call_sub_abs_name, strlen(call_sub_abs_name));
+                SPVM_SUB* sub_call_sub = op_sub_call_sub->uv.sub;
                 
-                if (sub->op_return_type->uv.type->id == SPVM_TYPE_C_ID_VOID) {
+                if (sub_call_sub->op_return_type->uv.type->id == SPVM_TYPE_C_ID_VOID) {
+                  int32_t first_arg_index = -1;
+
                   // Push args
                   SPVM_OP* op_args = op_cur->last;
                   SPVM_OP* op_arg = op_args->first;
@@ -2616,20 +2689,29 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
 
                     int32_t index_arg = SPVM_OP_get_my_index(compiler, op_arg);
                     opcode.operand0 = index_arg;
+                    if (first_arg_index == -1) {
+                      first_arg_index = index_arg;
+                    }
                     SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                   }
                   
+
+                  // CALL_SUB opcode
                   SPVM_OPCODE opcode;
                   memset(&opcode, 0, sizeof(SPVM_OPCODE));
-
-                  // Call subroutine
-                  opcode.id = SPVM_OPCODE_C_ID_CALL_SUB;
                   
-                  int32_t id = sub->id;
-                  opcode.operand1 = id;
-
+                  if (sub_call_sub->op_package->uv.package->is_interface) {
+                    opcode.id = SPVM_OPCODE_C_ID_CALL_INTERFACE_METHOD;
+                    opcode.operand1 = sub_call_sub->id;
+                    opcode.operand2 = first_arg_index;
+                  }
+                  else {
+                    opcode.id = SPVM_OPCODE_C_ID_CALL_SUB;
+                    opcode.operand1 = sub_call_sub->id;
+                  }
+                  
                   SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
-
+                  
                   SPVM_OPCODE_BUILDER_push_if_croak(compiler, opcode_array, push_eval_opcode_index_stack, if_croak_catch_goto_opcode_index_stack, if_croak_return_goto_opcode_index_stack, sub->id, op_cur->line);
                 }
                 

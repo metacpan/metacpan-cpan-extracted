@@ -175,7 +175,7 @@ sub parse_maf_block {
     tie my %info_of, "Tie::IxHash";
 
     for my $sline (@lines) {
-        my ( undef, $src, $start, $size, $strand, undef, $text ) = split /\s+/, $sline;
+        my ( undef, $src, $start, $size, $strand, $srcSize, $text ) = split /\s+/, $sline;
 
         my ( $species, $chr_name ) = split /\./, $src;
         $chr_name = $species if !defined $chr_name;
@@ -183,11 +183,19 @@ sub parse_maf_block {
         # adjust coordinates to be one-based inclusive
         $start = $start + 1;
 
+        my $end = $start + $size - 1;
+
+        if ( $strand eq "-" ) {
+            $start = $srcSize - $start + 1;
+            $end   = $srcSize - $end + 1;
+            ( $start, $end ) = ( $end, $start );
+        }
+
         $info_of{$species} = {
             name   => $species,
             chr    => $chr_name,
             start  => $start,
-            end    => $start + $size - 1,
+            end    => $end,
             strand => $strand,
             seq    => $text,
         };

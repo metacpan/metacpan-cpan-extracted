@@ -16,7 +16,8 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "WordLists::Password::10Million",
   "PREREQ_PM" => {
-    "WordList" => "0.2.0"
+    "WordList" => "0.3.0",
+    "parent" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -24,7 +25,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,7 +37,8 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Test::More" => 0,
-  "WordList" => "0.2.0"
+  "WordList" => "0.3.0",
+  "parent" => 0
 );
 
 

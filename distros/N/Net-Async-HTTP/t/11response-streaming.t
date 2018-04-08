@@ -33,144 +33,187 @@ local *IO::Async::Handle::connect = sub {
    return Future->new->done( $self );
 };
 
-my $header;
-my $body;
-my $body_is_done;
+{
+   my $header;
+   my $body;
+   my $body_is_done;
 
-$http->do_request(
-   uri => URI->new( "http://my.server/here" ),
+   $http->do_request(
+      uri => URI->new( "http://my.server/here" ),
 
-   on_header => sub {
-      ( $header ) = @_;
-      $body = "";
-      return sub {
-         @_ ? $body .= $_[0] : $body_is_done++;
-      }
-   },
-   on_error => sub { die "Test died early - $_[0]" },
-);
+      on_header => sub {
+         ( $header ) = @_;
+         $body = "";
+         return sub {
+            @_ ? $body .= $_[0] : $body_is_done++;
+         }
+      },
+      on_error => sub { die "Test died early - $_[0]" },
+   );
 
-# Wait for request but don't really care what it actually is
-my $request_stream = "";
-wait_for_stream { $request_stream =~ m/$CRLF$CRLF/ } $peersock => $request_stream;
+   # Wait for request but don't really care what it actually is
+   my $request_stream = "";
+   wait_for_stream { $request_stream =~ m/$CRLF$CRLF/ } $peersock => $request_stream;
 
-$peersock->syswrite( "HTTP/1.1 200 OK$CRLF" .
-                     "Content-Length: 15$CRLF" .
-                     "Content-Type: text/plain$CRLF" .
-                     "Connection: Keep-Alive$CRLF" .
-                     "$CRLF" );
+   $peersock->syswrite( "HTTP/1.1 200 OK$CRLF" .
+                        "Content-Length: 15$CRLF" .
+                        "Content-Type: text/plain$CRLF" .
+                        "Connection: Keep-Alive$CRLF" .
+                        "$CRLF" );
 
-wait_for { defined $header };
+   wait_for { defined $header };
 
-isa_ok( $header, "HTTP::Response", '$header for Content-Length' );
-is( $header->content_length, 15, '$header->content_length' );
-is( $header->content_type, "text/plain", '$header->content_type' );
+   isa_ok( $header, "HTTP::Response", '$header for Content-Length' );
+   is( $header->content_length, 15, '$header->content_length' );
+   is( $header->content_type, "text/plain", '$header->content_type' );
 
-$peersock->syswrite( "Hello, " );
+   $peersock->syswrite( "Hello, " );
 
-wait_for { length $body == 7 };
+   wait_for { length $body == 7 };
 
-is( $body, "Hello, ", '$body partial Content-Length' );
+   is( $body, "Hello, ", '$body partial Content-Length' );
 
-$peersock->syswrite( "world!$CRLF" );
+   $peersock->syswrite( "world!$CRLF" );
 
-wait_for { $body_is_done };
-is( $body, "Hello, world!$CRLF", '$body' );
+   wait_for { $body_is_done };
+   is( $body, "Hello, world!$CRLF", '$body' );
+}
 
-undef $header;
-undef $body;
-undef $body_is_done;
+{
+   my $header;
+   my $body;
+   my $body_is_done;
 
-$http->do_request(
-   uri => URI->new( "http://my.server/here" ),
+   $http->do_request(
+      uri => URI->new( "http://my.server/here" ),
 
-   on_header => sub {
-      ( $header ) = @_;
-      $body = "";
-      return sub {
-         @_ ? $body .= $_[0] : $body_is_done++;
-      }
-   },
-   on_error => sub { die "Test died early - $_[0]" },
-);
+      on_header => sub {
+         ( $header ) = @_;
+         $body = "";
+         return sub {
+            @_ ? $body .= $_[0] : $body_is_done++;
+         }
+      },
+      on_error => sub { die "Test died early - $_[0]" },
+   );
 
-# Wait for request but don't really care what it actually is
-$request_stream = "";
-wait_for_stream { $request_stream =~ m/$CRLF$CRLF/ } $peersock => $request_stream;
+   # Wait for request but don't really care what it actually is
+   my $request_stream = "";
+   wait_for_stream { $request_stream =~ m/$CRLF$CRLF/ } $peersock => $request_stream;
 
-$peersock->syswrite( "HTTP/1.1 200 OK$CRLF" .
-                     "Content-Length: 15$CRLF" .
-                     "Content-Type: text/plain$CRLF" .
-                     "Connection: Keep-Alive$CRLF" .
-                     "Transfer-Encoding: chunked$CRLF" .
-                     "$CRLF" );
+   $peersock->syswrite( "HTTP/1.1 200 OK$CRLF" .
+                        "Content-Length: 15$CRLF" .
+                        "Content-Type: text/plain$CRLF" .
+                        "Connection: Keep-Alive$CRLF" .
+                        "Transfer-Encoding: chunked$CRLF" .
+                        "$CRLF" );
 
-wait_for { defined $header };
+   wait_for { defined $header };
 
-isa_ok( $header, "HTTP::Response", '$header for chunked' );
-is( $header->content_length, 15, '$header->content_length' );
-is( $header->content_type, "text/plain", '$header->content_type' );
+   isa_ok( $header, "HTTP::Response", '$header for chunked' );
+   is( $header->content_length, 15, '$header->content_length' );
+   is( $header->content_type, "text/plain", '$header->content_type' );
 
-$peersock->syswrite( "7$CRLF" . "Hello, " . $CRLF );
+   $peersock->syswrite( "7$CRLF" . "Hello, " . $CRLF );
 
-wait_for { length $body == 7 };
-is( $body, "Hello, ", '$body partial chunked' );
+   wait_for { length $body == 7 };
+   is( $body, "Hello, ", '$body partial chunked' );
 
-$peersock->syswrite( "8$CRLF" . "world!$CRLF" . $CRLF );
+   $peersock->syswrite( "8$CRLF" . "world!$CRLF" . $CRLF );
 
-wait_for { length $body == 15 };
-is( $body, "Hello, world!$CRLF", '$body partial(2) chunked' );
+   wait_for { length $body == 15 };
+   is( $body, "Hello, world!$CRLF", '$body partial(2) chunked' );
 
-$peersock->syswrite( "0$CRLF" . $CRLF );
+   $peersock->syswrite( "0$CRLF" . $CRLF );
 
-wait_for { $body_is_done };
-is( $body, "Hello, world!$CRLF", '$body chunked' );
+   wait_for { $body_is_done };
+   is( $body, "Hello, world!$CRLF", '$body chunked' );
+}
 
-undef $header;
-undef $body;
-undef $body_is_done;
+{
+   my $header;
+   my $body;
+   my $body_is_done;
 
-$http->do_request(
-   uri => URI->new( "http://my.server/here" ),
+   $http->do_request(
+      uri => URI->new( "http://my.server/here" ),
 
-   on_header => sub {
-      ( $header ) = @_;
-      $body = "";
-      return sub {
-         @_ ? $body .= $_[0] : $body_is_done++;
-      }
-   },
-   on_error => sub { die "Test died early - $_[0]" },
-);
+      on_header => sub {
+         ( $header ) = @_;
+         $body = "";
+         return sub {
+            @_ ? $body .= $_[0] : $body_is_done++;
+         }
+      },
+      on_error => sub { die "Test died early - $_[0]" },
+   );
 
-# Wait for request but don't really care what it actually is
-$request_stream = "";
-wait_for_stream { $request_stream =~ m/$CRLF$CRLF/ } $peersock => $request_stream;
+   # Wait for request but don't really care what it actually is
+   my $request_stream = "";
+   wait_for_stream { $request_stream =~ m/$CRLF$CRLF/ } $peersock => $request_stream;
 
-$peersock->syswrite( "HTTP/1.0 200 OK$CRLF" .
-                     "Content-Type: text/plain$CRLF" .
-                     "Connection: close$CRLF" .
-                     "$CRLF" );
+   $peersock->syswrite( "HTTP/1.0 200 OK$CRLF" .
+                        "Content-Type: text/plain$CRLF" .
+                        "Connection: close$CRLF" .
+                        "$CRLF" );
 
-wait_for { defined $header };
+   wait_for { defined $header };
 
-isa_ok( $header, "HTTP::Response", '$header for EOF' );
-is( $header->content_type, "text/plain", '$header->content_type' );
+   isa_ok( $header, "HTTP::Response", '$header for EOF' );
+   is( $header->content_type, "text/plain", '$header->content_type' );
 
-$peersock->syswrite( "Hello, " );
+   $peersock->syswrite( "Hello, " );
 
-wait_for { length $body == 7 };
+   wait_for { length $body == 7 };
 
-is( $body, "Hello, ", '$body partial EOF' );
+   is( $body, "Hello, ", '$body partial EOF' );
 
-$peersock->syswrite( "world!$CRLF" );
+   $peersock->syswrite( "world!$CRLF" );
 
-wait_for { length $body == 15 };
+   wait_for { length $body == 15 };
 
-is( $body, "Hello, world!$CRLF", '$body' );
+   is( $body, "Hello, world!$CRLF", '$body' );
 
-$peersock->close;
+   $peersock->close;
 
-wait_for { $body_is_done };
+   wait_for { $body_is_done };
+}
+
+# on_header should see a redirect once we run out of indirections (RT124920)
+{
+   my $header;
+
+   $http->do_request(
+      uri => URI->new( "http://my.server.here/" ),
+      max_redirects => 1,
+
+      on_header => sub {
+         ( $header ) = @_;
+         return sub {};
+      },
+      on_error => sub { die "Test died early - $_[0]" },
+   );
+
+   # Wait for request but don't really care what it actually is
+   my $request_stream = "";
+   wait_for_stream { $request_stream =~ m/$CRLF$CRLF/ } $peersock => $request_stream;
+
+   $peersock->syswrite( "HTTP/1.1 301 Moved Permanently$CRLF" .
+                        "Content-Length: 0$CRLF" .
+                        "Location: http://my.server.here/elsewhere$CRLF" .
+                        "Connection: Keep-Alive$CRLF" .
+                        "$CRLF" );
+
+   $request_stream = "";
+   wait_for_stream { $request_stream =~ m/$CRLF$CRLF/ } $peersock => $request_stream;
+
+   $peersock->syswrite( "HTTP/1.1 301 Moved Permanently$CRLF" .
+                        "Content-Length: 0$CRLF" .
+                        "Location: http://my.server.here/try-again$CRLF" .
+                        "Connection: Keep-Alive$CRLF" .
+                        "$CRLF" );
+
+   wait_for { defined $header };
+}
 
 done_testing;

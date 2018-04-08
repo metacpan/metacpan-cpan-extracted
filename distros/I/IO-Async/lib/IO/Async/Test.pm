@@ -8,7 +8,7 @@ package IO::Async::Test;
 use strict;
 use warnings;
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 use Exporter 'import';
 our @EXPORT = qw(
@@ -102,26 +102,37 @@ sub testing_loop
 
 =head2 wait_for
 
-   wait_for { COND }
+   wait_for { COND } OPTS
 
 Repeatedly call the C<loop_once> method on the underlying loop (given to the
 C<testing_loop> function), until the given condition function callback
 returns true.
 
-To guard against stalled scripts, if the loop indicates a timeout for 10
-consequentive seconds, then an error is thrown.
+To guard against stalled scripts, if the loop indicates a timeout for (a
+default of) 10 consequentive seconds, then an error is thrown.
+
+Takes the following named options:
+
+=over 4
+
+=item timeout => NUM
+
+The time in seconds to wait before giving up the test as being stalled.
+Defaults to 10 seconds.
+
+=back
 
 =cut
 
-sub wait_for(&)
+sub wait_for(&@)
 {
-   my ( $cond ) = @_;
+   my ( $cond, %opts ) = @_;
 
    my ( undef, $callerfile, $callerline ) = caller;
 
    my $timedout = 0;
    my $timerid = $loop->watch_time(
-      after => 10,
+      after => $opts{timeout} // 10,
       code => sub { $timedout = 1 },
    );
 

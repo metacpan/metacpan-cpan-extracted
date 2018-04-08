@@ -1,11 +1,11 @@
 #!perl
 
-use Test::More tests => 7;
+use Test2::V0;
+use Test::Lib;
 
 use strict;
 use warnings;
 
-use lib 't';
 use File::Temp;
 use File::Spec::Functions qw[ catfile ];
 
@@ -34,7 +34,7 @@ my $script = catfile( qw [ t capture.pl ] );
     my $app1 = App::Env->new( 'App1', { Cache => 0, SysFatal => 1 } );
 
     eval {
-	my ($stdout, $stderr ) = $app1->capture( $^X,  $script, 'exit' );
+        my ($stdout, $stderr ) = $app1->capture( $^X,  $script, 'exit' );
     };
     isnt( $@, '', 'unsuccessful system call: SysFatal' );
 }
@@ -48,6 +48,8 @@ my $script = catfile( qw [ t capture.pl ] );
 
     my @stdout = $app1->qexec( $^X,  $script, 'a', 'b' );
 
-    is_deeply( \@stdout, [ "a\n", "b\n" ], "qexec list" );
+    is( \@stdout, [ "a\n", "b\n" ], "qexec list" );
 
 }
+
+done_testing;

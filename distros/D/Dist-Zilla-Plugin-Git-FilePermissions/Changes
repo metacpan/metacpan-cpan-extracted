@@ -1,11 +1,15 @@
 Revision history for Dist-Zilla-Plugin-Git-FilePermissions
 
+1.000  2018-04-02 22:38:46 UTC
+
+  - No code changes
+  - Distribution cleanup
+  - Bumped dependency on Moose to 2.1203
+
 0.004  2018-02-11 18:47:41 UTC
 
   - Ignore files that don't exist or where Git thinks they are a file but
     they are something else (e.g. submodules)
-  - Replaced plugin bundle Author::SKIRMESS with an inline bundle through
-    a Git submodule on https://github.com/skirmess/dzil-inc
 
 0.003  2017-10-20 23:39:10 UTC
 

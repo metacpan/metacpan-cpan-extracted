@@ -10,10 +10,12 @@ $app->deb_fmt(1);
 
 # TODO: make naming scheme configurable
 # TODO: Detect MPL-1.0 version on separate line
+# TODO: Report SPDX bug: Missing versioning
 my %Debian2SPDX = (
 	'AGPL-1'       => 'AGPL-1.0',
 	'AGPL-3'       => 'AGPL-3.0',
 	'AGPL-3+'      => 'AGPL-3.0',
+	'Aladdin-8'    => 'Aladdin',
 	'Artistic'     => 'Artistic-1.0',
 	'BSD-2-clause' => 'BSD-2-Clause',
 	'BSD-3-clause' => 'BSD-3-Clause',

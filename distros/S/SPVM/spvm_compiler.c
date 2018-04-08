@@ -59,8 +59,8 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
   compiler->op_constants = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
   compiler->op_subs = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
 
-  compiler->sub_names = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
-  compiler->sub_name_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, compiler->allocator, 0);
+  compiler->method_signatures = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
+  compiler->method_signature_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, compiler->allocator, 0);
 
   compiler->package_load_path_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, compiler->allocator, 0);
 
@@ -82,9 +82,12 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
       if (type_id >= SPVM_TYPE_C_ID_BYTE_ARRAY && type_id <= SPVM_TYPE_C_ID_DOUBLE_ARRAY) {
         type->dimension++;
         type->base_type = SPVM_LIST_fetch(compiler->types, type_id - SPVM_TYPE_C_ARRAY_SHIFT);
+        SPVM_TYPE* base_type = type->base_type;
+        type->base_type_name = base_type->name;
       }
       else {
         type->base_type = type;
+        type->base_type_name = type->name;
       }
       SPVM_LIST_push(compiler->types, type);
       SPVM_HASH_insert(compiler->type_symtable, name, strlen(name), type);
@@ -114,16 +117,21 @@ int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler) {
     compiler->entry_point_sub_name = entry_point_sub_name;
   }
   
-  // use std module
-  SPVM_OP* op_use_std = SPVM_OP_new_op_use_from_package_name(compiler, "CORE", "CORE", 0);
-  SPVM_LIST_push(compiler->op_use_stack, op_use_std);
-  SPVM_HASH_insert(compiler->op_use_symtable, "CORE", strlen("CORE"), op_use_std);
+  // use CORE module
+  SPVM_OP* op_use_core = SPVM_OP_new_op_use_from_package_name(compiler, "CORE", "CORE", 0);
+  SPVM_LIST_push(compiler->op_use_stack, op_use_core);
+  SPVM_HASH_insert(compiler->op_use_symtable, "CORE", strlen("CORE"), op_use_core);
   
   // use String module
   SPVM_OP* op_use_string = SPVM_OP_new_op_use_from_package_name(compiler, "String", "CORE", 0);
   SPVM_LIST_push(compiler->op_use_stack, op_use_string);
   SPVM_HASH_insert(compiler->op_use_symtable, "String", strlen("String"), op_use_string);
-  
+
+  // use Object module
+  SPVM_OP* op_use_object = SPVM_OP_new_op_use_from_package_name(compiler, "Object", "CORE", 0);
+  SPVM_LIST_push(compiler->op_use_stack, op_use_object);
+  SPVM_HASH_insert(compiler->op_use_symtable, "Object", strlen("Object"), op_use_object);
+
   /* call SPVM_yyparse */
   int32_t parse_success = SPVM_yyparse(compiler);
   

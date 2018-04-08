@@ -8,7 +8,7 @@ cpanfile.snapshot
 lib/Facebook/OpenGraph.pm
 lib/Facebook/OpenGraph/Response.pm
 minil.toml
-t/000_combile.t
+t/000_compile.t
 t/001_basic/01_initialize.t
 t/001_basic/02_uri.t
 t/001_basic/03_video_uri.t

@@ -1,7 +1,9 @@
 package Pg::CLI;
-{
-  $Pg::CLI::VERSION = '0.11';
-}
+
+use strict;
+use warnings;
+
+our $VERSION = '0.13';
 
 1;
 
@@ -11,13 +13,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Pg::CLI - Run Postgres CLI utilities
 
 =head1 VERSION
 
-version 0.11
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -51,12 +55,15 @@ classes:
 
 =back
 
-=head1 BUGS
+=head1 SUPPORT
 
-Please report any bugs or feature requests to C<bug-pg-cli@rt.cpan.org>, or
-through the web interface at L<http://rt.cpan.org>.  I will be notified, and
-then you'll automatically be notified of progress on your bug as I make
-changes.
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Pg-CLI> or via email to L<bug-pg-cli@rt.cpan.org|mailto:bug-pg-cli@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Pg-CLI can be found at L<https://github.com/houseabsolute/Pg-CLI>.
 
 =head1 DONATIONS
 
@@ -70,21 +77,30 @@ inasmuch as I have in the past, for as long as it interests me.
 
 Similarly, a donation made in this way will probably not make me work on this
 software much more, unless I get so many donations that I can consider working
-on free software full time, which seems unlikely at best.
+on free software full time (let's all have a chuckle at that together).
 
-To donate, log into PayPal and send money to autarch@urth.org or use the
-button on this page: L<http://www.urth.org/~autarch/fs-donation.html>
+To donate, log into PayPal and send money to autarch@urth.org, or use the
+button at L<http://www.urth.org/~autarch/fs-donation.html>.
 
 =head1 AUTHOR
 
 Dave Rolsky <autarch@urth.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Gregory Oschwald
+
+Gregory Oschwald <goschwald@maxmind.com>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by Dave Rolsky.
+This software is Copyright (c) 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

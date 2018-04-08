@@ -1,0 +1,6 @@
+name = "Acme-ZeroWidth"
+# badges = ["travis"]
+authority="cpan:VTI"
+
+module_maker="ModuleBuildTiny"
+

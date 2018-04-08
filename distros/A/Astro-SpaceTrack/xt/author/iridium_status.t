@@ -3,7 +3,7 @@ package main;
 use strict;
 use warnings;
 
-use Astro::SpaceTrack;
+use Astro::SpaceTrack qw{ :ref };
 use Test::More 0.96;	# Because of subtest().
 
 use lib qw{ inc };
@@ -32,6 +32,9 @@ my %known_inconsistent = (
 				# Sladen Failed 17-Nov-2017
     24796 => { sladen => 1 },	# Kelso: failed 20-Oct-2012;
 				# Sladen: still operational.
+    24837 => { sladen => 1 },	# Kelso: Spare 23-Mar-2018
+				# Sladen: Failed 24-Mar-2018
+    24840 => { sladen => 1 },	# Sladen: failed 17-Mar-2018
     24869 => { sladen => 1 },	# Sladen: failed 14-May-2017
     24872 => { sladen => 1 },	# Sladen: failed 19-May-2017
     24904 => { sladen => 1 },	# Kelso: spare 08-Feb-2018
@@ -39,6 +42,7 @@ my %known_inconsistent = (
     24905 => { sladen => 1 },	# Kelso: spare 08-Feb-2018
     24906 => { sladen => 1 },	# Kelso: spare 08-Feb-2018
 				# Sladen: failed 14-May-2918
+				# Decayed: 28-Mar-2018
     24907 => { sladen => 1 },	# Kelso: failed 19-Dec-2017
 #   24949 => { sladen => 1 },	# Sladen: failed 23-Oct-2017
 				# Kelso: gone 16-Nov-2017
@@ -59,12 +63,13 @@ my %known_inconsistent = (
     25272 => { sladen => 1 },	# 14-Aug-2017: Sladen tumbling.
     25274 => { sladen => 1 },	# about 28-Aug-2017: Sladen declares failed.
 #   25431 => { sladen => 1 },	# 21-Jan-2018: Sladen failed.
-    25468 => { sladen => 1 },	# Sladen: failed 14-May-2017
-    27374 => { sladen => 1 },	# 16-Nov-2012 Sladen: operational;
-				# 18-Feb-2014 McCants: operational;
-				#             others: spare
-    27376 => { sladen => 1 },	# Sladen: failed 22-Dec-2017
     25431 => { sladen => 1 },	# Sladen: failed 09-Feb-2018
+    25432 => { sladen => 1 },	# 10-Mar-2018: Sladen failed.
+    25468 => { sladen => 1 },	# Sladen: failed 14-May-2017
+    27373 => { sladen => 1 },	# 10-Mar-2018: Sladen failed.
+    27374 => { sladen => 1 },	# 02-Mar-2018 Kelso: partly operationsl
+    27376 => { sladen => 1 },	# Sladen: failed 22-Dec-2017
+    27450 => { sladen => 1 },	# 10-Mar-2018: Sladen failed.
 );
 
 =begin comment
@@ -93,7 +98,7 @@ foreach my $src (@sources) {
     if ($rslt->is_success) {
 	$text{$src} = $rslt->content;
 	my %sts;
-	ref $data eq 'ARRAY'
+	ARRAY_REF eq ref $data
 	    and %sts = map {$_->[0] => $_->[4]} @$data;
 	$status{$src} = \%sts;
 	foreach (@$data) {
@@ -128,9 +133,9 @@ foreach (
  24795   Iridium 5      [-]      Tumbling
  24796   Iridium 4      [-]      Tumbling
  24836   Iridium 914    [-]      Tumbling
- 24837   Iridium 12     [+]      
+ 24837   Iridium 12     [P]      
  24839   Iridium 10     [+]      
- 24840   Iridium 13     [+]      
+ 24840   Iridium 13     [P]      
  24841   Iridium 16     [-]      Tumbling
  24842   Iridium 911    [-]      Tumbling
  24869   Iridium 15     [+]      
@@ -188,7 +193,7 @@ foreach (
  25343   Iridium 72     [+]      
  25344   Iridium 73     [-]      Tumbling
  25346   Iridium 75     [+]      
- 25432   Iridium 76     [+]      
+ 25432   Iridium 76     [P]      
  25467   Iridium 82     [-]      Tumbling
  25468   Iridium 81     [+]      
  25469   Iridium 80     [+]      
@@ -202,7 +207,7 @@ foreach (
  25778   Iridium 21     [+]      
  27372   Iridium 91     [+]      
  27373   Iridium 90     [B]      
- 27374   Iridium 94     [+]      
+ 27374   Iridium 94     [P]      
  27375   Iridium 95     [+]      
  27376   Iridium 96     [P]      
  27450   Iridium 97     [+]      
@@ -214,9 +219,9 @@ KELSO
  24795   Iridium 5      [-]      Plane 4 - Failed on station?
  24796   Iridium 4      [-]      Plane 4 - Failed on station?
  24836   Iridium 914    [-]      Plane 5
- 24837   Iridium 12     [+]      Plane 5
+ 24837   Iridium 12     [-]      Plane 5
  24839   Iridium 10     [+]      Plane 5
- 24840   Iridium 13     [+]      Plane 5
+ 24840   Iridium 13     [-]      Plane 5 - Failed on station?
  24841   Iridium 16     [-]      Plane 5
  24842   Iridium 911    [-]      Plane 5
  24869   Iridium 15     [-]      Plane 6
@@ -227,7 +232,6 @@ KELSO
  24903   Iridium 26     [-]      Plane 2 - Failed on station?
  24904   Iridium 25     [-]      Plane 2
  24905   Iridium 46     [-]      Plane 2 - Failed on station?
- 24906   Iridium 23     [-]      Plane 2 - Failed on station?
  24907   Iridium 22     [-]      Plane 2 - Failed on station?
  24925   Dummy mass 1   [-]      Dummy
  24926   Dummy mass 2   [-]      Dummy
@@ -274,7 +278,7 @@ KELSO
  25343   Iridium 72     [+]      Plane 1
  25344   Iridium 73     [-]      Plane 1
  25346   Iridium 75     [+]      Plane 1
- 25432   Iridium 76     [+]      Plane 2
+ 25432   Iridium 76     [-]      Plane 2
  25467   Iridium 82     [-]      Plane 6 - Failed on station?
  25468   Iridium 81     [-]      Plane 6
  25469   Iridium 80     [+]      Plane 6
@@ -287,11 +291,11 @@ KELSO
  25777   Iridium 14     [+]      Plane 1
  25778   Iridium 21     [+]      Plane 1
  27372   Iridium 91     [+]      Plane 3
- 27373   Iridium 90     [S]      Plane 5
- 27374   Iridium 94     [+]      Plane 2
+ 27373   Iridium 90     [-]      Plane 5 - Failed on station?
+ 27374   Iridium 94     [-]      Plane 2 - Failed on station?
  27375   Iridium 95     [+]      Plane 3
  27376   Iridium 96     [-]      Plane 4 - Failed on station?
- 27450   Iridium 97     [+]      Plane 4
+ 27450   Iridium 97     [-]      Plane 4
  27451   Iridium 98     [+]      Plane 6
 SLADEN
         $space_track_skip ? () :
@@ -317,7 +321,7 @@ SLADEN
  24903   Iridium 26     [?]      SpaceTrack
  24904   Iridium 25     [?]      SpaceTrack
  24905   Iridium 46     [?]      SpaceTrack
- 24906   Iridium 23     [?]      SpaceTrack
+ 24906   Iridium 23     [D]      Decayed 2018-03-28
  24907   Iridium 22     [?]      SpaceTrack
  24944   Iridium 29     [?]      SpaceTrack
  24945   Iridium 32     [?]      SpaceTrack

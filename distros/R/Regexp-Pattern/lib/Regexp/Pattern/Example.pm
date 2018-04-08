@@ -1,7 +1,7 @@
 package Regexp::Pattern::Example;
 
-our $DATE = '2018-03-24'; # DATE
-our $VERSION = '0.2.2'; # VERSION
+our $DATE = '2018-04-03'; # DATE
+our $VERSION = '0.2.3'; # VERSION
 
 # BEGIN_BLOCK: def
 
@@ -67,7 +67,7 @@ Regexp::Pattern::Example - An example Regexp::Pattern::* module
 
 =head1 VERSION
 
-This document describes version 0.2.2 of Regexp::Pattern::Example (from Perl distribution Regexp-Pattern), released on 2018-03-24.
+This document describes version 0.2.3 of Regexp::Pattern::Example (from Perl distribution Regexp-Pattern), released on 2018-04-03.
 
 =head1 SYNOPSIS
 

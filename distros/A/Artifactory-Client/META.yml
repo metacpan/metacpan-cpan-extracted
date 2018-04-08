@@ -27,5 +27,5 @@ requires:
   URI::Escape: '0'
   namespace::autoclean: '0'
   perl: '5.006'
-version: v1.5.2
+version: v1.5.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

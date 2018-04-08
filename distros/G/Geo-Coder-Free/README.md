@@ -10,7 +10,7 @@ Provides a geocoding functionality using free databases
 
 # VERSION
 
-Version 0.06
+Version 0.07
 
 # SYNOPSIS
 
@@ -49,8 +49,8 @@ If that parameter isn't given, the module will attempt to find the databases, bu
 
     $location = $geocoder->geocode(location => $location);
 
-    print 'Latitude: ', $location->{'latt'}, "\n";
-    print 'Longitude: ', $location->{'longt'}, "\n";
+    print 'Latitude: ', $location->{'latitude'}, "\n";
+    print 'Longitude: ', $location->{'longitude'}, "\n";
 
     # TODO:
     # @locations = $geocoder->geocode('Portland, USA');
@@ -65,6 +65,12 @@ To be done.
 ## ua
 
 Does nothing, here for compatibility with other geocoders
+
+## run
+
+You can also run this module from the command line:
+
+    perl lib/Geo/Coder/Free.pm 1600 Pennsylvania Avenue NW, Washington DC
 
 # AUTHOR
 

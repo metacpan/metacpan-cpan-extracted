@@ -18,7 +18,7 @@ lib/Pcore/Ext/Context/Func.pm
 lib/Pcore/Ext/Context/L10N.pm
 lib/Pcore/Ext/Context/Raw.pm
 share/dist-id.json
-share/dist.perl
+share/dist.yaml
 share/l10n/l10n.pot
 share/l10n/ru.po
 share/tmpl/ext/index.html

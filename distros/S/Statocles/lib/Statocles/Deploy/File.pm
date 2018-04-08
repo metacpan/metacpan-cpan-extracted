@@ -1,10 +1,10 @@
 package Statocles::Deploy::File;
-our $VERSION = '0.092';
+our $VERSION = '0.093';
 # ABSTRACT: Deploy a site to a folder on the filesystem
 
 use Statocles::Base 'Class';
 with 'Statocles::Deploy';
-use Statocles::Store;
+use Statocles::Util qw( dircopy );
 
 #pod =attr path
 #pod
@@ -21,9 +21,9 @@ has path => (
 
 #pod =method deploy
 #pod
-#pod     my @paths = $deploy->deploy( $pages, %options );
+#pod     my @paths = $deploy->deploy( $source_path, %options );
 #pod
-#pod Deploy the site, rendering the given pages.
+#pod Deploy the site, copying from the given source path.
 #pod
 #pod Possible options are:
 #pod
@@ -39,7 +39,7 @@ has path => (
 #pod =cut
 
 sub deploy {
-    my ( $self, $pages, %options ) = @_;
+    my ( $self, $source_path, %options ) = @_;
 
     die sprintf 'Deploy directory "%s" does not exist (did you forget to make it?)',
         $self->path
@@ -49,14 +49,8 @@ sub deploy {
         $_->remove_tree for $self->path->children;
     }
 
-    my $store = Statocles::Store->new( path => $self->path );
-    $self->site->log->info( "Writing pages to deploy dir" );
-    for my $page ( @$pages ) {
-        my $path = $page->path;
-        #; say "Path: " . $path;
-        #; say "To: " . $self->path->child( $path );
-        $store->write_file( $page->path, $page->render );
-    }
+    my $src = Path->coercion->( $source_path );
+    dircopy $src, $self->path;
 }
 
 1;
@@ -73,7 +67,7 @@ Statocles::Deploy::File - Deploy a site to a folder on the filesystem
 
 =head1 VERSION
 
-version 0.092
+version 0.093
 
 =head1 DESCRIPTION
 
@@ -91,9 +85,9 @@ The path to deploy to.
 
 =head2 deploy
 
-    my @paths = $deploy->deploy( $pages, %options );
+    my @paths = $deploy->deploy( $source_path, %options );
 
-Deploy the site, rendering the given pages.
+Deploy the site, copying from the given source path.
 
 Possible options are:
 

@@ -1,5 +1,5 @@
 package Statocles::Deploy::Git;
-our $VERSION = '0.092';
+our $VERSION = '0.093';
 # ABSTRACT: Deploy a site to a Git repository
 
 use Statocles::Base 'Class';
@@ -39,9 +39,9 @@ has remote => (
 
 #pod =method deploy
 #pod
-#pod     my @paths = $deploy->deploy( $pages, %options );
+#pod     my @paths = $deploy->deploy( $source_path, %options );
 #pod
-#pod Deploy the site, rendering the given pages.
+#pod Deploy the site, copying from the given source path.
 #pod
 #pod Possible options are:
 #pod
@@ -61,8 +61,8 @@ has remote => (
 #pod =cut
 
 around 'deploy' => sub {
-    my ( $orig, $self, $pages, %options ) = @_;
-
+    my ( $orig, $self, $source_path, %options ) = @_;
+    $source_path = Path->coercion->( $source_path );
     my $deploy_dir = $self->path;
 
     # Find the repository root
@@ -93,6 +93,7 @@ around 'deploy' => sub {
         $self->_run( $git, 'rm', '-r', '-f', '.' );
     }
     else {
+        #; say "Switching branches to " . $self->branch;
         $self->_run( $git, checkout => $self->branch );
     }
 
@@ -106,7 +107,7 @@ around 'deploy' => sub {
     }
 
     # Copy the files
-    $self->$orig( $pages, %options );
+    $self->$orig( $source_path, %options );
 
     # Check to see which files were changed
     # --porcelain was added in 1.7.0
@@ -124,13 +125,12 @@ around 'deploy' => sub {
     #; say Dumper \%in_status;
 
     # Commit the files
-    #; say "Copied files: " . join "; ", map { $_->path } @$pages;
-    my @files = grep { $in_status{ $_ } }
-                map { Path::Tiny->new( $rel_path, $_->path ) }
-                @$pages;
-    #; say "Files in git status: " . join "; ", @files;
+    my @files = map { $_->[0] }
+                grep { $source_path->child( $_->[1] )->exists }
+                map { [ $_, Path::Tiny->new( $_ )->relative( $rel_path ) ] }
+                keys %in_status;
 
-    #; say "Committing: " . Dumper \@files;
+    #; say "Files to commit: " . join "; ", @files;
     if ( @files ) {
         $self->site->log->info( sprintf 'Deploying %d changed files', scalar @files );
         $self->_run( $git, add => @files );
@@ -215,7 +215,7 @@ Statocles::Deploy::Git - Deploy a site to a Git repository
 
 =head1 VERSION
 
-version 0.092
+version 0.093
 
 =head1 DESCRIPTION
 
@@ -243,9 +243,9 @@ The name of the remote to deploy to. Defaults to 'origin'.
 
 =head2 deploy
 
-    my @paths = $deploy->deploy( $pages, %options );
+    my @paths = $deploy->deploy( $source_path, %options );
 
-Deploy the site, rendering the given pages.
+Deploy the site, copying from the given source path.
 
 Possible options are:
 

@@ -32,8 +32,8 @@ $model_to_test = "MiniPlain";
         my $self = shift;
         my %args = @_;
 
-        my $dir = $args{root}.$args{config_dir};
-        foreach my $file (path($dir)->children()) {
+        my $dir = $args{root}->child($args{config_dir});
+        foreach my $file ($dir->children()) {
             my_log("dummy read file $file");
             my ($key,$elt) = split /\./,$file->basename;
             $args{object}->load("$elt:$key");
@@ -66,14 +66,14 @@ $model->create_config_class(
         }
     ],
     name => 'PlainTest::Class',
-    read_config => [{
+    rw_config => {
         auto_create => '1',
         auto_delete => '1',
         backend => 'PlainFile',
         config_dir => 'debian',
         file_mode => '0755',
         file => '&index(-).&element(-).&element'
-    }]
+    }
 );
 
 $model->create_config_class(
@@ -91,11 +91,11 @@ $model->create_config_class(
         },
     ],
 
-    read_config => [{
+    rw_config => {
         backend    => 'MyReader',
         config_dir => 'debian',
         auto_delete => '1',
-    }],
+    },
 );
 
 

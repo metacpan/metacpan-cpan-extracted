@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Int - Sah schemas for various integers
 
 VERSION
-    This document describes version 0.070 of Sah::Schemas::Int (from Perl
-    distribution Sah-Schemas-Int), released on 2017-08-19.
+    This document describes version 0.071 of Sah::Schemas::Int (from Perl
+    distribution Sah-Schemas-Int), released on 2018-04-03.
 
 SAH SCHEMAS
     *   byte
@@ -57,7 +57,9 @@ SAH SCHEMAS
 
     *   nonnegint
 
-        Non-negative integer (0, 1, 2, ...).
+        Non-negative integer (0, 1, 2, ...) [DEPRECATED].
+
+        This schema is DEPRECATED. Please use the new name "uint".
 
         See also "posint" for integers that start from 1.
 
@@ -79,6 +81,12 @@ SAH SCHEMAS
     *   posodd
 
         Positive odd number.
+
+    *   uint
+
+        Non-negative integer (0, 1, 2, ...).
+
+        See also "posint" for integers that start from 1.
 
     *   uint128
 
@@ -124,7 +132,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2014 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2016, 2014 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

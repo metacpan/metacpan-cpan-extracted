@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Oct 21 09:18:23 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Oct 25 14:28:02 2017
-# Update Count    : 369
+# Last Modified On: Thu Nov 23 11:41:12 2017
+# Update Count    : 386
 # Status          : Unknown, Use with caution!
 
 use 5.012;
@@ -15,7 +15,9 @@ use Carp;
 
 package Comics;
 
-our $VERSION = "1.07";
+use Comics::Version;
+
+our $VERSION = $Comics::Version::VERSION;
 
 package main;
 
@@ -185,6 +187,9 @@ sub load_plugins {
 
 	debug("Loading $m...");
 	$m =~ s/\.pm$//;
+	# If the module is already loaded, remove it first.
+	# Otherwise the require won't produce the __PACKAGE__ result.
+	delete $INC{"Comics/Plugin/$m.pm"};
 	my $pkg = eval { require "Comics/Plugin/$m.pm" };
 	die("Comics/Plugin/$m.pm: $@\n") unless $pkg;
 	unless ( $pkg eq "Comics::Plugin::$m" ) {
@@ -310,7 +315,8 @@ sub run_plugins {
 	unless ( eval { $comic->fetch; 1 } ) {
 	    $comic->{state}->{fail} = $@;
 	    debug($comic->{state}->{fail});
-	    push( @{ $stats->{fail} }, $comic->{name} );
+	    push( @{ $stats->{fail} },
+		  [ $comic->{name}, $comic->{state}->{fail} ] );
 	}
     }
 }
@@ -417,7 +423,7 @@ sub htmlstats {
 <table width="100%" class="toontable" cellpadding="5" cellspacing="0">
   <tr><td nowrap align="center">
 <p style="margin-left:5px"><a href="http://johan.vromans.org/software/sw_comics.html" target="_blank"><img src="comics.png" width="100" height="100" alt="[Comics]" align="middle"><font size="+4"><bold>Comics</bold></font></a><br>
-<font size="-2">Comics $VERSION, last run: @{[ "".localtime() ]}<br>@{[ statmsg() ]}</font><br>
+<font size="-2">Comics $VERSION, last run: @{[ "".localtime() ]}<br>@{[ statmsg(1) ]}</font><br>
 </p>      </td>
   </tr>
 </table>
@@ -432,6 +438,7 @@ sub statistics {
 }
 
 sub statmsg {
+    my ( $html ) = @_;
     my $loaded = $stats->{loaded};
     my $tally = $stats->{tally};
     my $uptodate = $stats->{uptodate};
@@ -444,7 +451,20 @@ sub statmsg {
 	"$uptodate uptodate";
     $res .= ", $disabled disabled" if $disabled;
     $res .= ", $excluded excluded" if $excluded;
-    $res .= ", $fail fail" if $fail;
+    if ( $fail ) {
+	if ( $html ) {
+	    $res .= ", <span title=\"";
+	    for ( @{ $stats->{fail} } ) {
+		my $t = $_->[1];
+		$t =~ s/ at .*//s;
+		$res .= $_->[0] . " ($t)&#10;";
+	    }
+	    $res .= "\">$fail fail</span>";
+	}
+	else {
+	    $res .= ", $fail fail";
+	}
+    }
     return "$res)";
 }
 

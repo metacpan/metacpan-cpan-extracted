@@ -173,4 +173,8 @@ cmp_deeply(
     'filter data.[0] = 1'
 );
 
+$q->fields([qw(data.[1])]);
+
+cmp_deeply($q->get_all(), [{'data.[1]' => 'd1_2'}]);
+
 done_testing();

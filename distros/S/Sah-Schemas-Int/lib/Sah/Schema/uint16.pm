@@ -1,7 +1,7 @@
 package Sah::Schema::uint16;
 
-our $DATE = '2017-08-19'; # DATE
-our $VERSION = '0.070'; # VERSION
+our $DATE = '2018-04-03'; # DATE
+our $VERSION = '0.071'; # VERSION
 
 our $schema = [int => {
     summary => '16-bit unsigned integer',
@@ -24,7 +24,7 @@ Sah::Schema::uint16 - 16-bit unsigned integer
 
 =head1 VERSION
 
-This document describes version 0.070 of Sah::Schema::uint16 (from Perl distribution Sah-Schemas-Int), released on 2017-08-19.
+This document describes version 0.071 of Sah::Schema::uint16 (from Perl distribution Sah-Schemas-Int), released on 2018-04-03.
 
 =head1 HOMEPAGE
 
@@ -48,7 +48,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,8 @@
 # Use case: HTTP GET until EOF
 use warnings;
 use strict;
-use t::share;
+use lib 't';
+use share;
 
 IO::Stream->new({
 #    fh          => tcp_client('www.google.com', 443),

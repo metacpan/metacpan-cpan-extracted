@@ -1,3 +1,8 @@
+0.003   2018-04-02 (PERLANCAR)
+
+        - Add bloom filters.
+
+
 0.002   2018-03-19 (PERLANCAR)
 
 	- Rename dist WordLists{C,}-Password-10Million.

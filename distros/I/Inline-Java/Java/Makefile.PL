@@ -113,10 +113,11 @@ if ($build_jni){
 
 		# Cygwin: create gcc-compatible library wrapper for jvm.dll
 		if ($^O eq 'cygwin') {
-			my $dll = File::Spec->catfile($jdk_dir, 'lib', 'libjvm.dll.a') ;
-			print "Creating '$dll' for cygwin.\n\n" ;
-			system("/usr/bin/dlltool --input-def jvm.def --kill-at --dllname jvm.dll --output-lib '$dll'") 
-				and print "Error attempting to create '$jdk_dir/lib/libjvm.dll.a'\n" ;
+			my $lib = File::Spec->catfile(Cwd::cwd, 'libjvm.dll.a') ;
+			my $dll = File::Spec->catfile($files->{$jvm_so}->{selected}, 'jvm.dll') ;
+			print "Creating '$lib' for cygwin.\n\n" ;
+			system("/usr/bin/dlltool --kill-at --dllname jvm.dll --output-lib '$lib' '$dll'") 
+				and print "Error attempting to create '$lib'\n" ;
 		}
 
 		print "Building with:\n" ;
@@ -137,6 +138,9 @@ if ($build_jni){
 				($files->{'jni.h'}->{selected}, $files->{'jni_md.h'}->{selected}) ;
 			@main::L = map { Inline::Java::Portable::portable('SUB_FIX_MAKE_QUOTES', "-L$_") }
 				($files->{$jvm_lib}->{selected}) ;
+			if ($^O eq 'cygwin') {
+				push @main::L, Inline::Java::Portable::portable('SUB_FIX_MAKE_QUOTES', '-L' . Cwd::cwd);
+			}
 
 			my $DIR = [] ;
 			if (! defined($build_perl_interpreter)){

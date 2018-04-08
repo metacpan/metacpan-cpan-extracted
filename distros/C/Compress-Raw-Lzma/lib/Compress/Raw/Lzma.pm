@@ -12,7 +12,7 @@ use Carp ;
 use bytes ;
 our ($VERSION, $XS_VERSION, @ISA, @EXPORT, $AUTOLOAD);
 
-$VERSION = '2.074';
+$VERSION = '2.080';
 $XS_VERSION = $VERSION; 
 $VERSION = eval $VERSION;
 
@@ -1023,7 +1023,7 @@ Compress::Raw::Lzma - Low-Level Interface to lzma compression library
 =head1 DESCRIPTION
 
 C<Compress::Raw::Lzma> provides an interface to the in-memory
-compression/uncompression functions from the lzma compression library. 
+compression/uncompression functions from the lzma compression library.
 
 Although the primary purpose for the existence of C<Compress::Raw::Lzma> is
 for use by the  C<IO::Compress::Lzma>, C<IO::Uncompress::UnLzma>,
@@ -1052,7 +1052,7 @@ There are four compression interfaces available in this module.
 
 =head2 ($z, $status) = new Compress::Raw::Lzma::EasyEncoder [OPTS];
 
-Creates a new I<xz> compression object. 
+Creates a new I<xz> compression object.
 
 If successful, it will return the initialised compression object, C<$z>
 and a C<$status> of C<LZMA_OK> in a list context. In scalar context it
@@ -1131,7 +1131,7 @@ Below is a list of the valid options:
 =item B<< Filter => $filter >>
 
 The C< $filter > option must be an object of type C<Lzma::Filter::Lzma1>.
-See L<Compress::Raw::Lzma/Lzma::Filter::Lzma> for a definition 
+See L<Compress::Raw::Lzma/Lzma::Filter::Lzma> for a definition
 of C<Lzma::Filter::Lzma1>.
 
 If this option is not present an C<Lzma::Filter::Lzma1> object with default
@@ -1158,7 +1158,7 @@ Defaults to 16k.
 
 =head2 ($z, $status) = new Compress::Raw::Lzma::StreamEncoder [OPTS];
 
-Creates a I<xz> compression object. 
+Creates a I<xz> compression object.
 
 If successful, it will return the initialised compression object, C<$z>
 and a C<$status> of C<LZMA_OK> in a list context. In scalar context it
@@ -1180,7 +1180,7 @@ during compression. See L</Filters> for more details on the available
 filters.
 
 If this option is present it must either contain a single
-C<Lzma::Filter::Lzma> filter object or an array reference containing between 
+C<Lzma::Filter::Lzma> filter object or an array reference containing between
 one and C<LZMA_FILTERS_MAX> filter objects.
 
 If this option is not present an C<Lzma::Filter::Lzma2> object with default
@@ -1237,7 +1237,7 @@ during compression. See L</Filters> for more details on the available
 filters.
 
 If this option is present it must either contain a single
-C<Lzma::Filter::Lzma> filter object or an array reference containing between 
+C<Lzma::Filter::Lzma> filter object or an array reference containing between
 one and C<LZMA_FILTERS_MAX> filter objects.
 
 If this option is not present an C<Lzma::Filter::Lzma2> object with default
@@ -1362,7 +1362,7 @@ This option defaults to true.
 
 The C<LimitOutput> option changes the behavior of the C<< $i->code >>
 method so that the amount of memory used by the output buffer can be
-limited. 
+limited.
 
 When C<LimitOutput> is used the size of the output buffer used will either
 be the value of the C<Bufsize> option or the amount of memory already
@@ -1440,7 +1440,7 @@ This option defaults to true.
 
 The C<LimitOutput> option changes the behavior of the C<< $i->code >>
 method so that the amount of memory used by the output buffer can be
-limited. 
+limited.
 
 When C<LimitOutput> is used the size of the output buffer used will either
 be the value of the C<Bufsize> option or the amount of memory already
@@ -1463,7 +1463,7 @@ needed and how to use it.
 
 =head2 $status = $z->code($input, $output);
 
-Uncompresses C<$input> and writes the uncompressed data to C<$output>. 
+Uncompresses C<$input> and writes the uncompressed data to C<$output>.
 
 Returns C<LZMA_OK> if the uncompression was successful, but the end of the
 compressed data stream has not been reached. Returns C<LZMA_STREAM_END> on
@@ -1498,7 +1498,7 @@ All Lzma Filters are sub-classed from the C<Lzma::Filter> base-class.
 The C<Lzma::Filter::Lzma> class is used to... TODO - more here
 
 There are two subclasses of C<Lzma::Filter::Lzma>, namely
-C<Lzma::Filter::Lzma1> and C<Lzma::Filter::Lzma2>. 
+C<Lzma::Filter::Lzma1> and C<Lzma::Filter::Lzma2>.
 
 The former is typically used with C<Compress::Raw::Lzma::AloneEncoder>.
 The latter with C<Compress::Raw::Lzma::StreamEncoder>.
@@ -1513,7 +1513,7 @@ The C<Lzma::Filter::Lzma> construction takes the following options.
 
 =item DictSize => $value
 
-Dictionary size in bytes. This controls 
+Dictionary size in bytes. This controls
 how many bytes of the recently processed
 uncompressed data is kept in memory. The size of the dictionary must be at
 least C<LZMA_DICT_SIZE_MIN>.
@@ -1530,7 +1530,7 @@ account when predicting the bits of the next literal.
 
 C<$value> must be a number between C<LZMA_LCLP_MIN> and
 C<LZMA_LCLP_MAX>.
-	 
+
 Note the sum of the C<Lc> and C<Lp> options cannot exceed 4.
 
 Defaults to C<LZMA_LC_DEFAULT>.
@@ -1593,7 +1593,7 @@ Defaults to 0.
 
 The sub-classes of C<Lzma::Filter::BCJ> are the
 Branch/Call/Jump conversion filters. These filters are used to rewrite
-executable binary code for a number of processor architectures. 
+executable binary code for a number of processor architectures.
 None of these classes take any options.
 
 =over 5
@@ -1687,7 +1687,7 @@ L<IO::Zlib|IO::Zlib>
 
 =head1 AUTHOR
 
-This module was written by Paul Marquess, C<pmqs@cpan.org>. 
+This module was written by Paul Marquess, C<pmqs@cpan.org>.
 
 =head1 MODIFICATION HISTORY
 
@@ -1695,7 +1695,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2017 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2018 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

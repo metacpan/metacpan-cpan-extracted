@@ -2,8 +2,9 @@
 use 5.010001;
 use warnings;
 use strict;
+use utf8;
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 use File::Temp qw( tempdir );
 use Getopt::Long qw(:config bundling);
@@ -286,7 +287,7 @@ sub quote_path {
 }
 
 
-1;
+1; # Magic true value required at end of module
 __END__
 
 =encoding utf8
@@ -296,9 +297,14 @@ __END__
 powerdiff - Prepare a diff between two given directories
 
 
-=head1 SYNOPSIS
+=head1 VERSION
 
-  powerdiff [options] /dir1 /dir2
+This document describes powerdiff version v1.0.1
+
+
+=head1 USAGE
+
+    powerdiff [options] /dir1 /dir2
 
 
 =head1 DESCRIPTION
@@ -314,7 +320,7 @@ This combination of files allows to store differences in any possible
 directory content in ease to review and apply format.
 
 This tool was designed to support any possible file/dir attributes - empty
-files and directories, their permissions, special files like fifo, etc.
+files and directories, their permissions, special files like FIFO, etc.
 
 
 =head1 OPTIONS
@@ -381,14 +387,11 @@ Alex Efros E<lt>powerman@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2009-2013 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+This software is Copyright (c) 2009- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
 
 This is free software, licensed under:
 
   The MIT (X11) License
-
-
-=head1 SEE ALSO
 
 
 =cut

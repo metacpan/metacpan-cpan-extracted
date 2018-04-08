@@ -1,10 +1,11 @@
 use strict;
 use warnings;
 use Test::More;
+use IO::Pipely 'pipely';
 use Mojo::IOLoop;
 use Mojo::IOLoop::Stream;
 
-pipe my $read, my $write or die "Failed to open pipe: $!";
+my ($read, $write) = pipely or die "Failed to open pipe: $!";
 
 my @lines;
 my $reader = Mojo::IOLoop::Stream->with_roles('+LineBuffer')->new($read)->watch_lines;

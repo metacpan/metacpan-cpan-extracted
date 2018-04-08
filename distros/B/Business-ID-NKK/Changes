@@ -1,0 +1,11 @@
+0.002   2018-04-08 (PERLANCAR)
+
+	- Remove dependency to Data::Clean::JSON.
+
+	- Return key 'entry_date' as 'YYYY-MM-DD' string instead of
+	  DateTime object.
+
+
+0.001   2018-04-08 (PERLANCAR)
+
+        - First release.

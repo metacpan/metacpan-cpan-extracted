@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/CLI/ComputerFiles/Util.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+scripts/madeafter
+scripts/dirhier
+META.yml
+META.json

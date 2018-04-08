@@ -24,11 +24,12 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Mojolicious::Lite" => 0,
     "Test::CPAN::Changes" => 0,
+    "Test::MockObject" => 0,
     "Test::Mojo" => 0,
     "Test::Most" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "0.4",
+  "VERSION" => "1.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +42,7 @@ my %FallbackPrereqs = (
   "Mojo::Base" => 0,
   "Mojolicious::Lite" => 0,
   "Test::CPAN::Changes" => 0,
+  "Test::MockObject" => 0,
   "Test::Mojo" => 0,
   "Test::Most" => 0,
   "Test::Pod" => 0

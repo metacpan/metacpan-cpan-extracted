@@ -6,7 +6,7 @@ build_requires:
   List::Util: '1.20'
   Test::Most: '0.30'
 configure_requires:
-  ExtUtils::MakeMaker: '6.52'
+  ExtUtils::MakeMaker: '4.52'
   Inline::MakeMaker: '0.45'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
@@ -29,4 +29,4 @@ requires:
   Math::Trig: '1.10'
   Sys::Mmap: '0.16'
   perl: '5.008'
-version: '6.04'
+version: '6.09'

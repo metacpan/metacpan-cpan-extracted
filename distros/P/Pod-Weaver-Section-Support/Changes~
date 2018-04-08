@@ -1,5 +1,13 @@
 Revision history for Pod::Weaver::Section::Support
 
+1.010 2018-03-31
+ - Remove the perldoc section if it contains trailing whitespace.
+
+1.009 2017-11-21
+ - Manually apply a patch from Debian to add a =head1 NAME section to the POD.
+  - See https://github.com/shlomif/perl-pod-weaver-section-support/issues/1
+  - Thanks!
+
 1.008 2017-10-18
  - Maintenance resumed by SHLOMIF .
  - Use https:// for MetaCPAN ( thanks DOLMEN! )

@@ -1,11 +1,13 @@
 Changes
 examples/README
+INSTALL.SKIP
 lib/Object/Iterate.pm
 lib/Object/Iterate/Tester.pm
 LICENSE
 Makefile.PL
-MANIFEST
-README
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
 t/check_arg.t
 t/final.t
 t/grep.t
@@ -16,8 +18,8 @@ t/load.t
 t/map.t
 t/pod.t
 t/pod_coverage.t
-t/prereq.t
 t/test_manifest
 t/tester.t
+xt/changes.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

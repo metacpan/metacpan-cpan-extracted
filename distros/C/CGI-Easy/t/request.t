@@ -1,10 +1,11 @@
 use warnings;
 use strict;
+use lib 't';
 use Test::More;
 
 plan tests=>73;
 
-use t::share;
+use share;
 use CGI::Easy::Request;
 use URI::Escape qw( uri_escape );
 use MIME::Base64;

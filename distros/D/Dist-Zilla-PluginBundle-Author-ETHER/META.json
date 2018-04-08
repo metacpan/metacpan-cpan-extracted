@@ -39,7 +39,7 @@
       },
       "develop" : {
          "recommends" : {
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.136",
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.137",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.005"
          },
          "requires" : {
@@ -324,15 +324,15 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::Author::ETHER" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Author/ETHER.pm",
-         "version" : "0.136"
+         "version" : "0.137"
       },
       "Dist::Zilla::PluginBundle::Author::ETHER" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/ETHER.pm",
-         "version" : "0.136"
+         "version" : "0.137"
       },
       "Pod::Weaver::PluginBundle::Author::ETHER" : {
          "file" : "lib/Pod/Weaver/PluginBundle/Author/ETHER.pm",
-         "version" : "0.136"
+         "version" : "0.137"
       }
    },
    "release_status" : "stable",
@@ -350,10 +350,10 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "0.136",
+   "version" : "0.137",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.027009"
+         "version" : "5.027010"
       },
       "plugins" : [
          {
@@ -1145,7 +1145,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20180220"
+                  "Module::CoreList" : "5.20180221"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1362,7 +1362,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.136",
+                  "tag" : "v0.137",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v%t"
                },
@@ -1619,7 +1619,7 @@
       "Roy Ivy III <rivy@cpan.org>",
       "\u0421\u0435\u0440\u0433\u0435\u0439 \u0420\u043e\u043c\u0430\u043d\u043e\u0432 <sromanov@cpan.org>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
    "x_static_install" : 0,
    "x_use_unsafe_inc" : 0
 }

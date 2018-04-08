@@ -3,12 +3,11 @@ abstract: 'Access data from Garmin Connect'
 author:
   - 'Joel Loudermilk <joel@loudermilk.org>'
 build_requires:
-  Data::Dumper: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,6 +15,7 @@ meta-spec:
 name: WebService-GarminConnect
 requires:
   Carp: '0'
+  Data::Dumper: '0'
   JSON: '0'
   LWP::UserAgent: '0'
   URI: '0'
@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/jlouder/garmin-connect-perl/issues
   homepage: https://github.com/jlouder/garmin-connect-perl
   repository: https://github.com/jlouder/garmin-connect-perl.git
-version: 1.0.5
+version: 1.0.6
 x_serialization_backend: 'YAML::Tiny version 1.70'

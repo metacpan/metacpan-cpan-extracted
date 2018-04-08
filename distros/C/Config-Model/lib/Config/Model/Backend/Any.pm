@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Any;
-$Config::Model::Backend::Any::VERSION = '2.118';
+$Config::Model::Backend::Any::VERSION = '2.120';
 use Carp;
 use strict;
 use warnings;
@@ -31,10 +31,6 @@ has 'node' => (
 );
 
 sub skip_open { return 0; }
-
-sub suffix {
-    return undef;
-}
 
 sub read {
     my $self = shift;
@@ -193,7 +189,7 @@ Config::Model::Backend::Any - Virtual class for other backends
 
 =head1 VERSION
 
-version 2.118
+version 2.120
 
 =head1 SYNOPSIS
 

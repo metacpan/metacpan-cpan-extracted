@@ -153,6 +153,7 @@ sub ansi_numbers {
 use constant {
     CSI   => "\e[",
     RESET => "\e[m",
+    EL    => "\e[K",
 };
 
 my %csi_terminator = (
@@ -204,18 +205,19 @@ sub ansi_code {
 
 sub ansi_pair {
     my $spec = shift;
-    my $start = ansi_code $spec;
-    my $end = RESET if $start;
-
-    ##
-    ## XXX: This is necessary to keep the effect of EL when the text
-    ## is wrappted to next line.  Looks for better solution.
-    ##
-    if ($start =~ /(\e\[[0;]*K)$/) {
-	$end = $1 . $end;
-    }
-
-    ($start // '', $end // '');
+    my $start = ansi_code $spec // '';
+    my $end = $start eq '' ? '' : do {
+	if ($start =~ /(.*)(\e\[[0;]*K)(.*)/) {
+	    if ($3) {
+		$1 . EL . RESET;
+	    } else {
+		EL . RESET;
+	    }
+	} else {
+	    RESET . EL;
+	}
+    };
+    ($start, $end);
 }
 
 my %colorcache;
@@ -407,13 +409,13 @@ with other special effects :
 
     E    Erase Line
 
-    ;  No effect
-    X  No effect
+    ;    No effect
+    X    No effect
 
-If the spec includes C</>, left side is considered as foreground color
-and right side as background.  If multiple colors are given in same
-spec, all indicators are produced in the order of their presence.
-Consequently, the last one takes effect.
+At first the color is considered as foreground, and slash (C</>)
+switches foreground and background.  If multiple colors are given in
+the same spec, all indicators are produced in the order of their
+presence.  Consequently, the last one takes effect.
 
 Effect characters are case insensitive, and can be found anywhere and
 in any order in color spec string.  Because C<X> and C<;> takes no
@@ -434,9 +436,10 @@ C<$COLOR_RGB24> module variable to enable it.
 
 Character "E" is abbreviation for "{EL}", and it clears the line from
 cursor to the end of the line.  At this time, background color is set
-to the area.  When this code is found at the end of start sequence, it
-is copied to just before ending reset sequence, to keep the effect
-even when the text is wrapped to multiple lines.
+to the area.  When this code is found in the start sequence, it is
+copied to just before ending reset sequence, with preceding sequence
+if necessary, to keep the effect even when the text is wrapped to
+multiple lines.
 
 Other ANSI CSI sequences are also available in the form of "{NAME}",
 despite there are few reasons to use them.

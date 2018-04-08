@@ -5,7 +5,9 @@ use lib 't/lib';
 use Test::Most;
 use Test::JSONAPI;
 
-my $t = Test::JSONAPI->new();
+throws_ok { Test::JSONAPI->new(); } qr/Missing required arguments: api_url/, 'throws without api_url';
+
+my $t = Test::JSONAPI->new({ api_url => 'http://example.com/api' });
 
 ok( $t->schema, 'schema is available' );
 

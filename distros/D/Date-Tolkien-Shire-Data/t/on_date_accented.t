@@ -111,7 +111,7 @@ $events{3} = { 1  => "Aragorn meets Gandalf the White, and they set out for Edor
 	       27 => "Bard II and Thorin III Stonehelm drive the enemy from Dale, 1419.\n",
 	       28 => "Celeborn crosses the Anduin and begins destruction of Dol Guldur, 1419.\n"
 	       };
-$events{4} = { 6  => "The mallorn tree flowers in the party field, 1420.\n",
+$events{4} = { 6  => "The mallorn tree flowers in the Party Field, 1420.\n",
 	       8  => "Ring bearers are honored on the Field of Cormallen, 1419.\n",
 	       12 => "Gandalf arrives in Hobbiton, 1418\n"
 	       };

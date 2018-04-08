@@ -1,7 +1,7 @@
 package Perinci::CmdLine::cryp;
 
-our $DATE = '2018-03-06'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-04-03'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,13 +13,34 @@ use parent 'Perinci::CmdLine::Lite';
 sub hook_config_file_section {
     my ($self, $r, $section_name, $section_content) = @_;
 
-    if ($section_name =~ m!\A(exchange|wallet)\s*/\s*(\S+)(?:\s*/\s*(.+))?\z!) {
-        my $entity = $1;
-        my $xchg = $2;
-        my $nick = $3 // 'default';
+    if ($section_name =~ m!\Aexchange\s*/\s*([^/]+)(?:\s*/\s*(.+))?\z!) {
+        my $xchg = $1;
+        my $nick = $2 // 'default';
         $r->{_cryp}{exchanges}{$xchg}{$nick} //= {};
         for (keys %$section_content) {
             $r->{_cryp}{exchanges}{$xchg}{$nick}{$_} =
+                $section_content->{$_};
+        }
+        return [204];
+    }
+
+    if ($section_name =~ m!\Awallet\s*/\s*([^/]+)(?:\s*/\s*(.+))?\z!) {
+        my $coin = $1;
+        my $nick = $2 // 'default';
+        $r->{_cryp}{wallets}{$coin}{$nick} //= {};
+        for (keys %$section_content) {
+            $r->{_cryp}{wallets}{$coin}{$nick}{$_} =
+                $section_content->{$_};
+        }
+        return [204];
+    }
+
+    if ($section_name =~ m!\Amasternode\s*/\s*([^/]++)(?:\s*/\s*(.+))?\z!) {
+        my $coin = $1;
+        my $nick = $2 // 'default';
+        $r->{_cryp}{masternodes}{$coin}{$nick} //= {};
+        for (keys %$section_content) {
+            $r->{_cryp}{masternodes}{$coin}{$nick}{$_} =
                 $section_content->{$_};
         }
         return [204];
@@ -43,7 +64,7 @@ Perinci::CmdLine::cryp - Perinci::CmdLine::Lite subclass to read entities from c
 
 =head1 VERSION
 
-This document describes version 0.003 of Perinci::CmdLine::cryp (from Perl distribution Perinci-CmdLine-cryp), released on 2018-03-06.
+This document describes version 0.004 of Perinci::CmdLine::cryp (from Perl distribution Perinci-CmdLine-cryp), released on 2018-04-03.
 
 =head1 HOMEPAGE
 

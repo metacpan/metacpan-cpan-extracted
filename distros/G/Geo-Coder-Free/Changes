@@ -1,5 +1,11 @@
 Revision history for Geo-Coder-Free
 
+0.07	Tue Apr  3 07:40:46 EDT 2018
+	Stash results in cache, workaround for very slow libpostal load
+		(minutes!!) on scaleway machines
+	Fix search for just state/province
+	Added the run method
+
 0.06	Thu Mar 29 09:12:56 EDT 2018
 	Fix Github issue 14
 	Updated to latest MaxMind databases

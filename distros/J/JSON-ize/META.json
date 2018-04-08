@@ -27,20 +27,21 @@
       },
       "runtime" : {
          "requires" : {
-            "JSON" : "2"
+            "JSON" : "2",
+            "perl" : "v5.8.0"
          }
       }
    },
    "provides" : {
       "JSON::ize" : {
          "file" : "lib/JSON/ize.pm",
-         "version" : "0.102"
+         "version" : "0.103"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=JSONize"
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=JSON::ize"
       },
       "license" : [
          "http://www.apache.org/licenses/LICENSE-2.0.txt"
@@ -49,6 +50,6 @@
          "url" : "https://github.com/majensen/jsonize"
       }
    },
-   "version" : "0.102",
+   "version" : "0.103",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

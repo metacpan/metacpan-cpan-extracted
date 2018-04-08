@@ -1,0 +1,42 @@
+{
+   "abstract" : "The module is work for windows platform for collection email number by folder and date. output sample:       Folder      Total      Today  Yesterday   ThisWeek   LastWeek  ThisMonth  LastMonth   ThisYear  LastsYear        Inbox        480         19         15         42         90         42        391        451         29        Cloud        243          0          0          0          2          0          9         85        158         None         35          0          0          0          0          0          0         12         23           IT        242          2          1          5          8          5         81        180         62      Systems        732          2          6         15         49         15        177        378        354       Devops        293          0          0          0          0          0          1        122        171           DB         67          0          0          0          0          0          0          8         59     Security        411          2          2          5          3          5         31        149        262      Manager        104          0          0          0          2          0         11         34         70           RM        146          0          0          0          0          0          3         38        108  Application        348          0          0          0          0          0          8        139        209           HR          0          0          0          0          0         10         61        130           QA        628          0          0          0          0          0          5        164        464         O-IT       1286          5          3         11         28         11         87        417        869           ME          1          0          1          1          0          1          0          1          0",
+   "author" : [
+      "Linus Yuan <yuan_shijiang@163.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Outlook-Mail-Count",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

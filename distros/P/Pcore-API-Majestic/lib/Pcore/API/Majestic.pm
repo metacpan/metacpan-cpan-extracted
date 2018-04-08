@@ -1,4 +1,4 @@
-package Pcore::API::Majestic v0.12.1;
+package Pcore::API::Majestic v0.12.2;
 
 use Pcore -dist, -class, -const, -result, -export => { CONST => [qw[$MAJESTIC_INDEX_FRESH $MAJESTIC_INDEX_HISTORIC]] };
 use IO::Uncompress::Unzip qw[];

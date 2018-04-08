@@ -2,11 +2,13 @@ package App::powerdiff;
 use 5.010001;
 use warnings;
 use strict;
+use utf8;
+use Carp;
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 
-1;
+1; # Magic true value required at end of module
 __END__
 
 =encoding utf8
@@ -16,9 +18,14 @@ __END__
 App::powerdiff - Prepare a diff between two given directories
 
 
+=head1 VERSION
+
+This document describes App::powerdiff version v1.0.1
+
+
 =head1 SYNOPSIS
 
-  powerdiff --help
+    powerdiff --help
 
 
 =head1 DESCRIPTION
@@ -78,14 +85,11 @@ Alex Efros E<lt>powerman@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2009-2013 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+This software is Copyright (c) 2009- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
 
 This is free software, licensed under:
 
   The MIT (X11) License
-
-
-=head1 SEE ALSO
 
 
 =cut

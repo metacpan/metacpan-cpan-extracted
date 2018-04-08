@@ -35,5 +35,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-Amazon-EC2
   homepage: https://metacpan.org/dist/Net-Amazon-EC2
   repository: git://github.com/mrallen1/net-amazon-ec2.git
-version: '0.35'
+version: '0.36'
 x_serialization_backend: 'YAML::Tiny version 1.70'

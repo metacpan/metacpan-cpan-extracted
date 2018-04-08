@@ -8,13 +8,16 @@ with qw[Pcore::Core::CLI::Cmd];
 
 # CLI
 sub CLI ($self) {
+    my $tmpl_cfg = P->cfg->load( $ENV->share->get( 'cfg.ini', storage => 'dist-tmpl', lib => 'Pcore' ) );
+
     return {
         abstract => 'create new distribution',
         name     => 'new',
         opt      => {
-            cpan => {
-                desc    => 'create CPAN distribution',
-                default => 0,
+            tmpl => {
+                desc => 'template name:' . $LF . join( $LF, map {"\t\t$_\t$tmpl_cfg->{$_}->{desc}"} keys $tmpl_cfg->%* ),
+                isa  => [ keys $tmpl_cfg->%* ],
+                min  => 1,
             },
             hosting => {
                 short   => 'H',
@@ -56,7 +59,7 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
     my $status = Pcore::Dist::Build->new->create( {
         base_path               => $ENV->{START_DIR},
         dist_namespace          => $arg->{dist_namespace},
-        is_cpan                 => $opt->{cpan},
+        tmpl                    => $opt->{tmpl},
         upstream_hosting        => $opt->{hosting},
         is_private              => $opt->{private},
         upstream_scm_type       => $opt->{scm},

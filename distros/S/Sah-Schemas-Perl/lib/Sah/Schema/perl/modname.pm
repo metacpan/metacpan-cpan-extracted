@@ -1,11 +1,22 @@
 package Sah::Schema::perl::modname;
 
-our $DATE = '2018-01-14'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2018-04-03'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 our $schema = [str => {
     summary => 'Perl module name',
+    description => <<'_',
+
+Perl module name, e.g. `Foo`, `Foo::Bar`.
+
+Contains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, or
+`Foo/Bar.pm` and it will be normalized into `Foo::Bar`.
+
+See also: `perl::modargs`.
+
+_
     match => '\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\z',
+
     'x.perl.coerce_rules' => [
         'str_normalize_perl_modname',
     ],
@@ -30,7 +41,16 @@ Sah::Schema::perl::modname - Perl module name
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::Schema::perl::modname (from Perl distribution Sah-Schemas-Perl), released on 2018-01-14.
+This document describes version 0.011 of Sah::Schema::perl::modname (from Perl distribution Sah-Schemas-Perl), released on 2018-04-03.
+
+=head1 DESCRIPTION
+
+Perl module name, e.g. C<Foo>, C<Foo::Bar>.
+
+Contains coercion rule so you can also input C<Foo-Bar>, C<Foo/Bar>, or
+C<Foo/Bar.pm> and it will be normalized into C<Foo::Bar>.
+
+See also: C<perl::modargs>.
 
 =head1 HOMEPAGE
 

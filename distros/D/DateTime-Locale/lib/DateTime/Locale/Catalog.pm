@@ -3,7 +3,7 @@ package DateTime::Locale::Catalog;
 use strict;
 use warnings;
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 1;
 
@@ -21,7 +21,7 @@ DateTime::Locale::Catalog - Provides a catalog of all valid locale names
 
 =head1 VERSION
 
-version 1.17
+version 1.18
 
 =head1 DESCRIPTION
 
@@ -88,7 +88,7 @@ The available locales are:
  ar-TN            Arabic Tunisia                              العربية تونس
  ar-YE            Arabic Yemen                                العربية اليمن
  as               Assamese                                    অসমীয়া
- as-IN            Assamese India                              অসমীয়া ভারত
+ as-IN            Assamese India                              অসমীয়া ভাৰত
  asa              Asu                                         Kipare
  asa-TZ           Asu Tanzania                                Kipare Tadhania
  ast              Asturian                                    asturianu
@@ -714,8 +714,8 @@ The available locales are:
  ti               Tigrinya                                    ትግርኛ
  ti-ER            Tigrinya Eritrea                            ትግርኛ ኤርትራ
  ti-ET            Tigrinya Ethiopia                           ትግርኛ ኢትዮጵያ
- tk               Turkmen                                     Türkmen dili
- tk-TM            Turkmen Turkmenistan                        Türkmen dili Türkmenistan
+ tk               Turkmen                                     türkmen dili
+ tk-TM            Turkmen Turkmenistan                        türkmen dili Türkmenistan
  to               Tongan                                      lea fakatonga
  to-TO            Tongan Tonga                                lea fakatonga Tonga
  tr               Turkish                                     Türkçe
@@ -765,7 +765,7 @@ The available locales are:
  yo               Yoruba                                      Èdè Yorùbá
  yo-BJ            Yoruba Benin                                Èdè Yorùbá Orílɛ́ède Bɛ̀nɛ̀
  yo-NG            Yoruba Nigeria                              Èdè Yorùbá Orílẹ́ède Nàìjíríà
- yue              Cantonese                                   yue
+ yue              Cantonese                                   粵語
  yue-Hans         Cantonese Simplified                        粤语 简体
  yue-Hans-CN      Cantonese China Simplified                  粤语 中华人民共和国 简体
  yue-Hant         Cantonese Traditional                       粵語 繁體
@@ -804,7 +804,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2003 - 2017 by Dave Rolsky.
+This software is copyright (c) 2003 - 2018 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

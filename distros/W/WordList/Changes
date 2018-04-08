@@ -1,3 +1,27 @@
+0.4.1   2018-04-03 (PERLANCAR)
+
+	- Define non-deterministic wordlist (DYNAMIC=2).
+
+	- Remove todo list entries: no longer planned to provide random
+	  pick from a subset, already provide interface for faster lookup
+	  via WordList::Mod.
+
+
+0.4.0   2018-04-02 (PERLANCAR)
+
+        - Define dynamic wordlist.
+
+        - Namespace: Add wordlist namespaces: WordList::Dynamic,
+          WordList::Number.
+
+
+0.3.2   2018-04-02 (PERLANCAR)
+
+	- No spec changes.
+
+	- Namespace: Replace WordList::Role::* with WordList::Mod::*.
+
+
 0.3.1   2018-03-23 (PERLANCAR)
 
 	- Add WordList::Bloom::* to non-wordlist namespace.

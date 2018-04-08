@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.009';
+our $VERSION = '2.012';
 
 use File::Basename        qw( fileparse );
 use File::Spec::Functions qw( catfile );
@@ -117,13 +117,13 @@ sub __menu_insert {
     my ( $sf, $group ) = @_;
     my $menu_insert = {
         main_insert => [
-#            { name => 'files_dir',             text => "- File Dir",         section => 'insert' },
-            { name => '_parse_mode',           text => "- Parse Tool",     section => 'insert' },
-            { name => '_module_Text_CSV',      text => "- Text::CSV config", section => 'csv'    },
-            { name => '_parse_with_split',     text => "- 'split'   config",   section => 'split'  },
-            { name => 'file_encoding',         text => "- File Encoding",    section => 'insert' },
-            { name => 'max_files',             text => "- File History",     section => 'insert' },
-            { name => '_create_table',         text => "- Create-table",     section => 'create' }, ##
+#            { name => 'files_dir',         text => "- File Dir",         section => 'insert' },
+            { name => '_parse_with_split', text => "- 'split'   config", section => 'split'  },
+            { name => '_module_Text_CSV',  text => "- Text::CSV config", section => 'csv'    },
+            { name => '_parse_mode',       text => "- Parse Tool",       section => 'insert' },
+            { name => 'file_encoding',     text => "- File Encoding",    section => 'insert' },
+            { name => 'max_files',         text => "- File History",     section => 'insert' },
+            { name => '_create_table',     text => "- Create-table",     section => 'create' }, ##
         ],
         _module_Text_CSV => [
             { name => '_csv_char',    text => "- *_char attributes", section => 'csv' },
@@ -249,8 +249,8 @@ sub config_insert {
             }
             elsif ( $opt eq '_create_table' ) {
                 my $items = [
-                    { name => 'auto_inc_col_name', prompt => "Auto-increment column name" },
-                    { name => 'default_data_type', prompt => "Default data type" },
+                    { name => 'auto_inc_col_name', prompt => "Auto incr col name" },
+                    { name => 'default_data_type', prompt => "Default data type " },
                 ];
                 my $prompt = 'Create-table defaults';
                 $sf->__group_readline( $section, $items, $prompt );
@@ -275,8 +275,8 @@ sub __menus {
             { name => 'config_insert',   text => "- Insert" },
         ],
         config_database => [
-            { name => '_db_defaults', text => "- DB Settings"                },
             { name => 'plugins',      text => "- DB Plugins", section => 'G' },
+            { name => '_db_defaults', text => "- DB Settings"                },
         ],
         config_menu => [
             { name => '_menu_memory',  text => "- Menu Memory", section => 'G'     },
@@ -285,12 +285,14 @@ sub __menus {
         ],
         config_sql => [
             { name => 'max_rows',           text => "- Auto Limit",   section => 'G' },
+            { name => 'lock_stmt',          text => "- Lock Mode",    section => 'G' },
             { name => 'meta',               text => "- Metadata",     section => 'G' },
             { name => 'operators',          text => "- Operators",    section => 'G' },
-            { name => 'lock_stmt',          text => "- Lock Mode",    section => 'G' },
-            { name => '_expert',            text => "- Expert",       section => 'G' },
+            { name => 'alias',              text => "- Alias",        section => 'G' },
+            { name => '_subqueries',        text => "- Subqueries",   section => 'G' },
             { name => '_sql_identifiers',   text => "- Identifiers",  section => 'G' },
             { name => '_write_access',      text => "- Write access", section => 'G' },
+            { name => 'parentheses',        text => "- Parentheses",  section => 'G' },
         ],
         config_output => [
             { name => 'min_col_width', text => "- Colwidth",      section => 'table' },
@@ -469,16 +471,26 @@ sub set_options {
                 my $sub_menu = [ [ $opt, "  Add metadata", $list ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
-            elsif ( $opt eq '_expert' ) {
+            elsif ( $opt eq '_subqueries' ) {
                 my $sub_menu = [
-                    [ 'subqueries_select', "- Subqueries in SELECT",    [ 'NO', 'YES' ] ],
-                    [ 'subqueries_w_h',    "- Subqueries in WHERE",     [ 'NO', 'YES' ] ], # docu
-                    [ 'subqueries_set',    "- Subqueries as SET value", [ 'NO', 'YES' ] ],
-                    [ 'subqueries_table',  "- Subqueries as table",     [ 'NO', 'YES' ] ], # docu
-                    [ 'alias',             "- Alias for complex cols",  [ 'NO', 'YES' ] ],
-                    [ 'parentheses',       "- Parentheses",             [ 'NO', 'YES' ] ],
+                    [ 'subqueries_select', "- Subqueries in SELECT",       [ 'NO', 'YES' ] ],
+                    [ 'subqueries_w_h',    "- Subqueries in WHERE/HAVING", [ 'NO', 'YES' ] ],
+                    [ 'subqueries_set',    "- Subqueries as SET value",    [ 'NO', 'YES' ] ],
+                    [ 'subqueries_table',  "- Subqueries as table",        [ 'NO', 'YES' ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu );
+            }
+            elsif ( $opt eq 'parentheses' ) {
+                my $prompt = 'Parentheses in WHERE/HAVING';
+                my $list = [ 'NO', 'YES' ];
+                my $sub_menu = [ [ $opt, "  Enable parentheses", $list ] ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
+            elsif ( $opt eq 'alias' ) {
+                my $prompt = 'For complex columns:';
+                my $list = [ 'NO', 'YES' ];
+                my $sub_menu = [ [ $opt, "  Add alias", $list ] ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'operators' ) {
                 my $prompt = 'Choose operators:';
@@ -536,6 +548,7 @@ sub __settings_menu_wrap {
     $sf->{write_config}++;
 }
 
+
 sub __choose_a_subset_wrap {
     my ( $sf, $section, $opt, $available, $prompt ) = @_;
     my $current = $sf->{o}{$section}{$opt};
@@ -544,8 +557,8 @@ sub __choose_a_subset_wrap {
     my $name = 'New> ';
     my $list = choose_a_subset(
         $available,
-        { info => $info, name => $name, prompt => $prompt, prefix => '- ', index => 0,
-          clear_screen => 1, mouse => $sf->{o}{table}{mouse} }
+        { info => $info, name => $name, prompt => $prompt, prefix => '- ', index => 0, remove_chosen => 1,
+          clear_screen => 1, mouse => $sf->{o}{table}{mouse}, back => '  BACK', confirm => '  CONFIRM' }
     );
     return if ! defined $list;
     return if ! @$list;
@@ -553,6 +566,7 @@ sub __choose_a_subset_wrap {
     $sf->{write_config}++;
     return;
 }
+
 
 sub __choose_a_number_wrap {
     my ( $sf, $section, $opt, $prompt, $digits ) = @_;
@@ -569,6 +583,7 @@ sub __choose_a_number_wrap {
     $sf->{write_config}++;
     return;
 }
+
 
 sub __group_readline {
     my ( $sf, $section, $items, $prompt ) = @_;
@@ -590,6 +605,7 @@ sub __group_readline {
         $sf->{write_config}++;
     }
 }
+
 
 sub __choose_a_dir_wrap {
     my ( $sf, $section, $opt ) = @_;
@@ -618,6 +634,7 @@ sub __write_config_files {
     my $file_name = $sf->{i}{file_settings};
     $ax->write_json( $file_name, $tmp  );
 }
+
 
 sub read_config_files {
     my ( $sf ) = @_;

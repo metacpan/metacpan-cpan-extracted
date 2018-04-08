@@ -4,29 +4,33 @@
       "Timm Murray <tmurray@wumpus-cave.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "bsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Device-WebIO-RaspberryPi",
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "AnyEvent" : "7.07",
-            "Device::WebIO" : "0.009",
+            "Device::WebIO" : "0.022",
             "GStreamer1" : "0.002",
-            "HiPi" : "0",
-            "Moo" : "0",
-            "namespace::clean" : "0"
+            "Moo" : "2.003004",
+            "RPi::Const" : "1.02",
+            "RPi::I2C" : "2.3605",
+            "RPi::Pin" : "2.3604",
+            "RPi::SPI" : "2.3608",
+            "RPi::WiringPi" : "2.3622",
+            "namespace::clean" : "0.27"
          }
       },
       "test" : {
@@ -44,6 +48,7 @@
          "web" : "https://github.com/frezik/Device-WebIO-RaspberryPi"
       }
    },
-   "version" : "0.009"
+   "version" : "0.900",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

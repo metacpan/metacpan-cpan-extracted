@@ -1,15 +1,15 @@
 
                             Compress-Raw-Bzip2
 
-                         Version 2.074
+                         Version 2.080
 
-                            19th February 2017
+                            21st November 2017
 
-       Copyright (c) 2005-2017 Paul Marquess. All rights reserved.
+       Copyright (c) 2005-2018 Paul Marquess. All rights reserved.
           This program is free software; you can redistribute it
            and/or modify it under the same terms as Perl itself.
 
-             The directory bzip2-src contains a subset of the 
+             The directory bzip2-src contains a subset of the
           source files copied directly from bzip2 version 1.0.6.
            These files are Copyright(C) 1996-2010 Julian Seward.
     See the file bzip2-src/LICENSE for licence details for these files.
@@ -17,8 +17,8 @@
                            http://www.bzip.org/
 
     Note that the files bzip2.c, bzip2recover.c, bzlib.c & decompress.c
-      have been modified to allow them to build with a C++ compiler. 
-           The file bzip2-src/bzip2-cpp.patch contains the patch 
+      have been modified to allow them to build with a C++ compiler.
+           The file bzip2-src/bzip2-cpp.patch contains the patch
                that was used to modify the original source.
 
 DESCRIPTION
@@ -35,7 +35,7 @@ installed on your system:
 
     * A C compiler
 
-    * Perl 5.006 or better. 
+    * Perl 5.006 or better.
 
 BUILDING THE MODULE
 -------------------
@@ -142,16 +142,16 @@ To help me help you, I need all of the following information:
     This includes:
 
      a. The *complete* output from running this
-     
+ 
             perl -V
-     
+ 
         Do not edit the output in any way.
         Note, I want you to run "perl -V" and NOT "perl -v".
-     
+ 
         If your perl does not understand the "-V" option it is too
-        old. This module needs Perl version 5.004 or better.     
+        old. This module needs Perl version 5.004 or better.
 
-     b. The version of Compress-Raw-Bzip2 you have. 
+     b. The version of Compress-Raw-Bzip2 you have.
         If you have successfully installed Compress-Raw-Bzip2, this one-liner
         will tell you:
 
@@ -164,15 +164,15 @@ To help me help you, I need all of the following information:
         If you haven't installed Compress-Raw-Bzip2 then search Compress::Raw::Bzip2.pm
         for a line like this:
 
-          $VERSION = "2.074" ;
+          $VERSION = "2.080" ;
 
      c. The version of bzip2 you have used.
         If you have successfully installed Compress-Raw-Bzip2, this one-liner
         will tell you:
 
-          perl -MCompress::Raw::Bzip2 -e "print q[bzip2 ver ]. Compress::Raw::Bzip2::ZLIB_VERSION.qq[\n]" 
+          perl -MCompress::Raw::Bzip2 -e "print q[bzip2 ver ]. Compress::Raw::Bzip2::ZLIB_VERSION.qq[\n]"
 
-        If not, look at the beginning of the file zlib.h. 
+        If not, look at the beginning of the file zlib.h.
 
  2. If you are having problems building Compress-Raw-Bzip2, send me a
     complete log of what happened. Start by unpacking the Compress-Raw-Bzip2
@@ -181,6 +181,6 @@ To help me help you, I need all of the following information:
         [edit config.in, if necessary]
         perl Makefile.PL
         make
-        make test TEST_VERBOSE=1          
+        make test TEST_VERBOSE=1
 
 Paul Marquess <pmqs@cpan.org>

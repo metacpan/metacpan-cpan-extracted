@@ -1,7 +1,7 @@
 package WordList::Namespace;
 
-our $DATE = '2018-03-23'; # DATE
-our $VERSION = '0.3.1'; # VERSION
+our $DATE = '2018-04-03'; # DATE
+our $VERSION = '0.4.1'; # VERSION
 
 use strict;
 use warnings;
@@ -14,9 +14,11 @@ our %WordList_Modules = (
 
 our %WordList_Namespaces = (
     'WordList::Char'            => 1,
-    'WordList::Phrase'          => 1,
-    'WordList::Password'        => 1,
+    'WordList::Dynamic'         => 1,
     'WordList::MetaSyntactic'   => 1,
+    'WordList::Number'          => 1,
+    'WordList::Password'        => 1,
+    'WordList::Phrase'          => 1,
 );
 
 our $WordList_Namespaces_RE = join(
@@ -27,13 +29,13 @@ $WordList_Namespaces_RE =
 
 our %Non_WordList_Modules = (
     'WordList'                  => 1,
-    'WordList::Namespace'       => 1, # us!
     'WordList::MetaSyntactic'   => 1, # base class for WordList::MetaSyntactic::*
+    'WordList::Namespace'       => 1, # us!
 );
 
 our %Non_WordList_Namespaces = (
-    'WordList::Role'            => 1, # addons/roles
     'WordList::Bloom'           => 1, # to store bloom filters
+    'WordList::Mod'             => 1, # mods
 );
 
 our $Non_WordList_Namespaces_RE = join(
@@ -68,7 +70,7 @@ WordList::Namespace - Catalog of WordList::* namespaces
 
 =head1 VERSION
 
-This document describes version 0.3.1 of WordList::Namespace (from Perl distribution WordList), released on 2018-03-23.
+This document describes version 0.4.1 of WordList::Namespace (from Perl distribution WordList), released on 2018-04-03.
 
 =head1 SYNOPSIS
 

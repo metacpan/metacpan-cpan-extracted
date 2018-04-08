@@ -13,9 +13,10 @@ sub all($self, $opts = {}) {
   $opts->{limit} = 100 unless $opts->{limit} =~/^\d+$/;
   $opts->{offset} //= 0;
   $opts->{offset} = 0 unless $opts->{offset} =~/^\d+$/;
-  my $sql = $self-><%= $a->{db_helper} %>->abstract->select('<%= $a->{t} %>', '*');
+  state $abstract = $self-><%= $a->{db_helper} %>->abstract;
+  my ($sql, @bind) = $abstract->select('<%= $a->{t} %>', '*', $opts->{where}//());
   $sql .= " LIMIT $opts->{limit}" . ($opts->{offset} ? " OFFSET $opts->{offset}" : '');
-  return $self-><%= $a->{db_helper} %>->db->query($sql)->hashes->to_array;
+  return $self-><%= $a->{db_helper} %>->db->query($sql, @bind)->hashes->to_array;
 }
 
 sub find($self, $id) {
@@ -23,11 +24,11 @@ sub find($self, $id) {
 }
 
 sub remove($self, $id) {
-  $self-><%= $a->{db_helper} %>->db->delete('<%= $a->{t} %>', {id => $id});
+  return $self-><%= $a->{db_helper} %>->db->delete('<%= $a->{t} %>', {id => $id});
 }
 
 sub save($self, $id, $row) {
-  $self-><%= $a->{db_helper} %>->db->update('<%= $a->{t} %>', $row, {id => $id});
+  return $self-><%= $a->{db_helper} %>->db->update('<%= $a->{t} %>', $row, {id => $id});
 }
 
 1;

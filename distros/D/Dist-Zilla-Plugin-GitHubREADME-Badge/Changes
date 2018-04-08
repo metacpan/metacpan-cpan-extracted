@@ -1,5 +1,14 @@
 Revision history for Dist-Zilla-Plugin-GitHubREADME-Badge
 
+0.26  2018-04-04 20:37:17 CST
+        - Fix github url for docker badge (powerman)
+
+0.25  2018-04-04 12:02:43 CST
+        - Fix docker badges to use lower case (powerman)
+
+0.24  2018-04-04 08:05:10 CST
+        - Added support for Docker automated and build badges (powerman)
+
 0.23  2018-02-18 10:19:37 CST
         - add a filemunge phase (yanick)
 

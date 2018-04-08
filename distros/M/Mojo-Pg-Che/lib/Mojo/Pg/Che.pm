@@ -22,11 +22,11 @@ See L<Mojo::Pg>
 
 =head1 VERSION
 
-Version 0.800
+Version 0.850
 
 =cut
 
-our $VERSION = '0.800';
+our $VERSION = '0.850';
 
 
 =head1 SYNOPSIS
@@ -56,19 +56,21 @@ our $VERSION = '0.800';
     # prepare sth
     my $sth = $pg->prepare('select ...');
     
-    # cached sth
-    my $sth = $pg->prepare_cached('select ...');
+    # cached async sth
+    my $sth = $pg->prepare_cached('select ...', {Async => 1,},);
     
-    # Non-blocking query sth
-    my $r = $pg->query($sth, undef, @bind, sub {my ($db, $err, $result) = @_; ...});
+    # Non-blocking query for async sth
+    $pg->query($sth, undef, @bind, sub {my ($db, $err, $result) = @_; ...});
     Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
     
-    # Result non-blocking query sth
-    my $result = $pg->query($sth, {Async => 1,}, @bind,);
+    
+    # Result non-blocking query for async sth
+    my $ref_cb = $pg->query($sth, {Async => 1,}, @bind,);
+    Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
     # Mojo::Pg::Results style
-    $result->hash->{...}
-    # DBI style
-    $result->fetchrow_hashref->{...};
+    my res = $$ref_cb->()->hash;
+    # same DBI style
+    my $res  = $$ref_cb->()->fetchrow_hashref;
     
     # Mojo::Pg style
     my $now = $pg->db->query('select now() as now')->hash->{now};
@@ -102,9 +104,17 @@ our $VERSION = '0.800';
 
 Depends on $attr->{Async} and callback:
 
-1. $attr->{Async} set to 1. None $cb. Callback will create and Mojo::IOLoop will auto start. Method C<< ->query() >> will return result object. Methods C<<->select...()>> will return there perl structures.
+1. $attr->{Async} set to 1. None $cb pass. Callback will create inside methods C<< ->query() >> C<< ->select...() >> and will returns ref on that callback. You need start Mojo::IOLoop:
 
-2. $attr->{Async} not set. $cb defined. All ->query() and ->select...() methods will return reactor object and results pass to $cb. You need start Mojo::IOLoop:
+  # async sth
+  my $sth = $pg->prepare('select ...', {Async => 1,},);
+  # Result non-blocking query for async sth
+  my $res_cb = $pg->query($sth, {Async => 1,}, @bind,);
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+  # Mojo::Pg::Results style
+  my res = $$res_cb->()->hash;
+
+2. $attr->{Async} not set. $cb defined. Results pass to $cb. You need start Mojo::IOLoop:
 
   my @results;
   my $cb = sub {
@@ -119,7 +129,7 @@ Depends on $attr->{Async} and callback:
     for @results;
 
 
-3. $attr->{Async} set to 1. $cb defined. Mojo::IOLoop will auto start. Results pass to $cb.
+3. $attr->{Async} set to 1. $cb defined. Results pass to $cb. You need start Mojo::IOLoop.
 
 
 =head1 METHODS
@@ -149,6 +159,10 @@ Like L<Mojo::Pg::Database#query> but input params - L<Mojo::Pg::Che#Params-for-q
 Blocking query without attr B<Async> or callback.
 
 Non-blocking query with attr B<Async> or callback.
+
+=head2 select
+
+Same method C<query>.
 
 =head2 selectrow_array
 
@@ -234,10 +248,9 @@ has [qw(password username)] => '';
 has pubsub => sub {
   require Mojo::Pg::PubSub;
   my $pubsub = Mojo::Pg::PubSub->new(pg => shift);
-  #~ weaken $pubsub->{pg};#???
+  weaken $pubsub->{pg};#???
 #Mojo::Reactor::EV: Timer failed: Can't call method "db" on an undefined value at t/06-pubsub.t line 21.
 #EV: error in callback (ignoring): Can't call method "db" on an undefined value at Mojo/Pg/PubSub.pm line 44.
-
   return $pubsub;
 };
 

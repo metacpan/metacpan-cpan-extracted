@@ -1,4 +1,11 @@
-0.66 - bug in 0.65 fix, fully tested now
+0.69 - converted rename files directive to use new HPCI::File methods
+
+0.68 - ouch Path::Class::File method resolve throws an exception if the file
+       file does not exists, instead of just resolving any synlinks, etc.
+
+0.67 - bug in 0.65 for delete files, fully tested now
+
+0.66 - bug in 0.65 fix
 
 0.65 - allow files arguments to be Path::Class::File or similar objects that
        stringify to the pathname

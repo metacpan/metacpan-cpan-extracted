@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ name: Perl-Critic-Git
 provides:
   Perl::Critic::Git:
     file: lib/Perl/Critic/Git.pm
-    version: v1.3.0
+    version: v1.3.1
 requires:
   Carp: '0'
   Data::Dumper: '0'
@@ -34,6 +34,6 @@ requires:
 resources:
   bugtracker: https://github.com/guillaumeaubert/Perl-Critic-Git/issues
   homepage: https://metacpan.org/release/Perl-Critic-Git
-  license: http://dev.perl.org/licenses/
   repository: https://github.com/guillaumeaubert/Perl-Critic-Git
-version: v1.3.0
+version: v1.3.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

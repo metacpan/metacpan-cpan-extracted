@@ -5,16 +5,16 @@ use warnings;
 require Exporter ;
 use bytes;
 
-use IO::Compress::Base 2.074 ;
+use IO::Compress::Base 2.080 ;
 
-use IO::Compress::Base::Common  2.074 qw(isaScalar createSelfTiedObject);
-use IO::Compress::Adapter::LZO  2.074 ;
+use IO::Compress::Base::Common  2.080 qw(isaScalar createSelfTiedObject);
+use IO::Compress::Adapter::LZO  2.080 ;
 use Compress::LZO qw(crc32 adler32 LZO_VERSION);
-use IO::Compress::Lzop::Constants  2.074 ;
+use IO::Compress::Lzop::Constants  2.080 ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzopError);
 
-$VERSION = '2.074';
+$VERSION = '2.080';
 $LzopError = '';
 
 @ISA    = qw( IO::Compress::Base Exporter );
@@ -208,14 +208,12 @@ __END__
 =head1 NAME
 
 IO::Compress::Lzop - Write lzop files/buffers
- 
- 
 
 =head1 SYNOPSIS
 
     use IO::Compress::Lzop qw(lzop $LzopError) ;
 
-    my $status = lzop $input => $output [,OPTS] 
+    my $status = lzop $input => $output [,OPTS]
         or die "lzop failed: $LzopError\n";
 
     my $z = new IO::Compress::Lzop $output [,OPTS]
@@ -235,7 +233,7 @@ IO::Compress::Lzop - Write lzop files/buffers
     $z->autoflush();
     $z->input_line_number();
     $z->newStream( [OPTS] );
-    
+
     $z->close() ;
 
     $LzopError ;
@@ -250,14 +248,14 @@ IO::Compress::Lzop - Write lzop files/buffers
     binmode $z
     fileno $z
     close $z ;
-    
+ 
 
 =head1 DESCRIPTION
 
-This module provides a Perl interface that allows writing lzop 
+This module provides a Perl interface that allows writing lzop
 compressed data to files or buffer.
 
-For reading lzop files/buffers, see the companion module 
+For reading lzop files/buffers, see the companion module
 L<IO::Uncompress::UnLzop|IO::Uncompress::UnLzop>.
 
 =head1 Functional Interface
@@ -269,7 +267,7 @@ section.
 
     use IO::Compress::Lzop qw(lzop $LzopError) ;
 
-    lzop $input_filename_or_reference => $output_filename_or_reference [,OPTS] 
+    lzop $input_filename_or_reference => $output_filename_or_reference [,OPTS]
         or die "lzop failed: $LzopError\n";
 
 The functional interface needs Perl5.005 or better.
@@ -282,7 +280,7 @@ C<$input_filename_or_reference> and C<$output_filename_or_reference>.
 =head3 The C<$input_filename_or_reference> parameter
 
 The parameter, C<$input_filename_or_reference>, is used to define the
-source of the uncompressed data. 
+source of the uncompressed data.
 
 It can take one of the following forms:
 
@@ -300,17 +298,17 @@ If the C<$input_filename_or_reference> parameter is a filehandle, the input
 data will be read from it.  The string '-' can be used as an alias for
 standard input.
 
-=item A scalar reference 
+=item A scalar reference
 
 If C<$input_filename_or_reference> is a scalar reference, the input data
 will be read from C<$$input_filename_or_reference>.
 
-=item An array reference 
+=item An array reference
 
 If C<$input_filename_or_reference> is an array reference, each element in
 the array must be a filename.
 
-The input data will be read from each file in turn. 
+The input data will be read from each file in turn.
 
 The complete array will be walked to ensure that it only
 contains valid filenames before any data is compressed.
@@ -318,8 +316,8 @@ contains valid filenames before any data is compressed.
 =item An Input FileGlob string
 
 If C<$input_filename_or_reference> is a string that is delimited by the
-characters "<" and ">" C<lzop> will assume that it is an 
-I<input fileglob string>. The input is the list of files that match the 
+characters "<" and ">" C<lzop> will assume that it is an
+I<input fileglob string>. The input is the list of files that match the
 fileglob.
 
 See L<File::GlobMapper|File::GlobMapper> for more details.
@@ -329,7 +327,7 @@ See L<File::GlobMapper|File::GlobMapper> for more details.
 If the C<$input_filename_or_reference> parameter is any other type,
 C<undef> will be returned.
 
-In addition, if C<$input_filename_or_reference> is a simple filename, 
+In addition, if C<$input_filename_or_reference> is a simple filename,
 the default values for
 the C<Name> and C<Time> options will be sourced from that file.
 
@@ -348,7 +346,7 @@ these forms.
 =item A filename
 
 If the C<$output_filename_or_reference> parameter is a simple scalar, it is
-assumed to be a filename.  This file will be opened for writing and the 
+assumed to be a filename.  This file will be opened for writing and the
 compressed data will be written to it.
 
 =item A filehandle
@@ -357,14 +355,14 @@ If the C<$output_filename_or_reference> parameter is a filehandle, the
 compressed data will be written to it.  The string '-' can be used as
 an alias for standard output.
 
-=item A scalar reference 
+=item A scalar reference
 
 If C<$output_filename_or_reference> is a scalar reference, the
 compressed data will be stored in C<$$output_filename_or_reference>.
 
 =item An Array Reference
 
-If C<$output_filename_or_reference> is an array reference, 
+If C<$output_filename_or_reference> is an array reference,
 the compressed data will be pushed onto the array.
 
 =item An Output FileGlob
@@ -402,7 +400,7 @@ L</"Constructor Options"> section below.
 
 =item C<< AutoClose => 0|1 >>
 
-This option applies to any input or output data streams to 
+This option applies to any input or output data streams to
 C<lzop> that are filehandles.
 
 If C<AutoClose> is specified, and the value is true, it will result in all
@@ -444,7 +442,7 @@ written to it.  Otherwise the file pointer will not be moved.
 
 =back
 
-When C<Append> is specified, and set to true, it will I<append> all compressed 
+When C<Append> is specified, and set to true, it will I<append> all compressed
 data to the output data stream.
 
 So when the output is a filehandle it will carry out a seek to the eof
@@ -488,7 +486,7 @@ compressed data to a buffer, C<$buffer>.
     my $input = new IO::File "<file1.txt"
         or die "Cannot open 'file1.txt': $!\n" ;
     my $buffer ;
-    lzop $input => \$buffer 
+    lzop $input => \$buffer
         or die "lzop failed: $LzopError\n";
 
 To compress all files in the directory "/my/home" that match "*.txt"
@@ -510,7 +508,7 @@ and if you want to compress each file one at a time, this will do the trick
     for my $input ( glob "/my/home/*.txt" )
     {
         my $output = "$input.lzo" ;
-        lzop $input => $output 
+        lzop $input => $output
             or die "Error compressing '$input': $LzopError\n";
     }
 
@@ -523,14 +521,14 @@ The format of the constructor for C<IO::Compress::Lzop> is shown below
     my $z = new IO::Compress::Lzop $output [,OPTS]
         or die "IO::Compress::Lzop failed: $LzopError\n";
 
-It returns an C<IO::Compress::Lzop> object on success and undef on failure. 
+It returns an C<IO::Compress::Lzop> object on success and undef on failure.
 The variable C<$LzopError> will contain an error message on failure.
 
-If you are running Perl 5.005 or better the object, C<$z>, returned from 
-IO::Compress::Lzop can be used exactly like an L<IO::File|IO::File> filehandle. 
-This means that all normal output file operations can be carried out 
-with C<$z>. 
-For example, to write to a compressed file/buffer you can use either of 
+If you are running Perl 5.005 or better the object, C<$z>, returned from
+IO::Compress::Lzop can be used exactly like an L<IO::File|IO::File> filehandle.
+This means that all normal output file operations can be carried out
+with C<$z>.
+For example, to write to a compressed file/buffer you can use either of
 these forms
 
     $z->print("hello world\n");
@@ -553,7 +551,7 @@ If the C<$output> parameter is a filehandle, the compressed data will be
 written to it.
 The string '-' can be used as an alias for standard output.
 
-=item A scalar reference 
+=item A scalar reference
 
 If C<$output> is a scalar reference, the compressed data will be stored
 in C<$$output>.
@@ -580,7 +578,7 @@ This parameter defaults to 0.
 
 =item C<< Append => 0|1 >>
 
-Opens C<$output> in append mode. 
+Opens C<$output> in append mode.
 
 The behaviour of this option is dependent on the type of C<$output>.
 
@@ -610,7 +608,7 @@ This parameter defaults to 0.
 
 =item C<< Name => $string >>
 
-Stores the contents of C<$string> in the name field lzop header. 
+Stores the contents of C<$string> in the name field lzop header.
 
 If C<Name> is not specified, no gzip NAME field will be created.
 
@@ -653,7 +651,7 @@ This is a placeholder option.
 
 TODO
 
-=head1 Methods 
+=head1 Methods
 
 =head2 print
 
@@ -763,7 +761,7 @@ This is a noop provided for completeness.
 
     $z->opened()
 
-Returns true if the object currently refers to a opened file/buffer. 
+Returns true if the object currently refers to a opened file/buffer.
 
 =head2 autoflush
 
@@ -786,7 +784,7 @@ retrieve the autoflush setting.
     $z->input_line_number()
     $z->input_line_number(EXPR)
 
-This method always returns C<undef> when compressing. 
+This method always returns C<undef> when compressing.
 
 =head2 fileno
 
@@ -805,7 +803,7 @@ C<undef>.
     $z->close() ;
     close $z ;
 
-Flushes any pending compressed data and then closes the output file/buffer. 
+Flushes any pending compressed data and then closes the output file/buffer.
 
 For most versions of Perl this method will be automatically invoked if
 the IO::Compress::Lzop object is destroyed (either explicitly or by the
@@ -838,9 +836,9 @@ the C<$z> object.
 
 See the L</"Constructor Options"> section for more details.
 
-=head1 Importing 
+=head1 Importing
 
-No symbolic constants are required by this IO::Compress::Lzop at present. 
+No symbolic constants are required by this IO::Compress::Lzop at present.
 
 =over 5
 
@@ -850,8 +848,6 @@ Imports C<lzop> and C<$LzopError>.
 Same as doing this
 
     use IO::Compress::Lzop qw(lzop $LzopError) ;
-
-    
 
 =back
 
@@ -869,7 +865,7 @@ L<IO::Zlib|IO::Zlib>
 
 =head1 AUTHOR
 
-This module was written by Paul Marquess, C<pmqs@cpan.org>. 
+This module was written by Paul Marquess, C<pmqs@cpan.org>.
 
 =head1 MODIFICATION HISTORY
 
@@ -877,7 +873,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2017 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2018 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

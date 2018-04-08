@@ -1,10 +1,9 @@
 #!perl
 
-use Test::More tests => 10;
+use Test2::V0;
+use Test::Lib;
 
-use lib 't';
-
-BEGIN { use_ok('App::Env') };
+use App::Env;
 
 #############################################################
 
@@ -47,3 +46,5 @@ $app1->setenv( 'AppEnvTestID' => $$ );
     is( $app2->_opt->{SysFatal}, 1, "clone SysFatal" );
 
 }
+
+done_testing;

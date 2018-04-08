@@ -125,7 +125,7 @@ my $tdir = tempdir(CLEANUP => 1);
 
     {
         local $@;
-        my $d = catfile($sampledir, 'bom');
+        my $d = catdir($sampledir, 'bom');
         my $e = catdir($d, 'lib');
         my $path_to_perl = catfile($d, 'bin', 'perl');
         eval {
@@ -136,12 +136,12 @@ my $tdir = tempdir(CLEANUP => 1);
             } );
         };
         like($@, qr/Could not locate '$e'/,
-            "Got expected error message: Could not locate appropriate 'lib/' directory");
+            "Got expected error message: Could not locate directory '$e'");
     }
 
     {
         local $@;
-        my $d = catfile($sampledir, 'boo');
+        my $d = catdir($sampledir, 'boo');
         my $e = catdir($d, 'lib');
         my $path_to_perl = catfile($d, 'bin', 'perl');
         eval {
@@ -157,7 +157,7 @@ my $tdir = tempdir(CLEANUP => 1);
 
     {
         local $@;
-        my $d = catfile($sampledir, 'boq');
+        my $d = catdir($sampledir, 'boq');
         my $e = catdir($d, 'lib');
         my $path_to_perl = catfile($d, 'bin', 'perl');
         eval {
@@ -173,9 +173,9 @@ my $tdir = tempdir(CLEANUP => 1);
 
     {
         local $@;
-        my $d = catfile($sampledir, 'bos');
+        my $d = catdir($sampledir, 'bos');
         my $e = catdir($d, 'lib');
-        my $bin_dir = catfile($d, 'bin');
+        my $bin_dir = catdir($d, 'bin');
         my $path_to_perl = catfile($bin_dir, 'perl');
         my $path_to_cpanm = catfile($bin_dir, 'cpanm');
         eval {

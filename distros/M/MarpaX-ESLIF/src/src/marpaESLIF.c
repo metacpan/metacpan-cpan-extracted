@@ -5804,6 +5804,8 @@ static inline short _marpaESLIFRecognizer_resume_oneb(marpaESLIFRecognizer_t *ma
   short                            rcMatcherb;
   short                            canContinueb;
   short                            isExhaustedb;
+  char                            *previnputs;
+  size_t                           offsetl;
 
   /* This macro is to avoid the memcpy() of *grammarp which have a true cost in this method */
   /* We fake a marpaESLIFGrammar using grammar sent in the stack */
@@ -5910,7 +5912,14 @@ static inline short _marpaESLIFRecognizer_resume_oneb(marpaESLIFRecognizer_t *ma
       exceptionMaxStartCompletionsi = -1;
     exception_again:
       MARPAESLIFRECOGNIZER_TRACEF(marpaESLIFRecognizerp, funcs, "Symbol match on %ld bytes using %d completions", (unsigned long) marpaESLIFValueResult.sizel, numberOfStartCompletionsi);
+      previnputs = marpaESLIF_streamp->inputs;
+      offsetl = ((char *) marpaESLIFValueResult.u.p) - previnputs;
+      /* Take care: this may move the stream */
       rcMatcherb = _marpaESLIFRecognizer_symbol_matcherb(marpaESLIFRecognizerp, exceptionp, &exceptionRci, &exceptionMarpaESLIFValueResult, exceptionMaxStartCompletionsi, &lastSizeBeforeCompletionl, &numberOfExceptionCompletionsi);
+      if ((marpaESLIFRecognizerp->parentRecognizerp == NULL) && (marpaESLIF_streamp->inputs != previnputs) && (symbolp->type == MARPAESLIF_SYMBOL_TYPE_META)) {
+        /* Stream have moved and marpaESLIFValueResult.u.p is a pointer within the stream... */
+        marpaESLIFValueResult.u.p = marpaESLIF_streamp->inputs + offsetl;
+      }
       if (rcMatcherb < 0) {
         goto err;
       }
@@ -5942,7 +5951,13 @@ static inline short _marpaESLIFRecognizer_resume_oneb(marpaESLIFRecognizer_t *ma
 	      } else {
 		while (--symbolMaxStartCompletionsi > 0) {
 		  MARPAESLIFRECOGNIZER_TRACEF(marpaESLIFRecognizerp, funcs, "Exception match on %ld bytes: asking for %d symbol start completions", (unsigned long) exceptionMarpaESLIFValueResult.sizel, symbolMaxStartCompletionsi);
+                  previnputs = marpaESLIF_streamp->inputs;
+                  offsetl = ((char *) marpaESLIFValueResult.u.p) - previnputs;
 		  rcMatcherb = _marpaESLIFRecognizer_symbol_matcherb(marpaESLIFRecognizerp, symbolp, &rci, &marpaESLIFValueResult, symbolMaxStartCompletionsi, NULL /* lastSizeBeforeCompletionlp */, NULL /* numberOfStartCompletionsi */);
+                  if ((marpaESLIFRecognizerp->parentRecognizerp == NULL) && (marpaESLIF_streamp->inputs != previnputs) && (symbolp->type == MARPAESLIF_SYMBOL_TYPE_META)) {
+                    /* Stream have moved and marpaESLIFValueResult.u.p is a pointer within the stream... */
+                    marpaESLIFValueResult.u.p = marpaESLIF_streamp->inputs + offsetl;
+                  }
 		  if (rcMatcherb < 0) {
 		    goto err;
 		  }
@@ -11054,8 +11069,8 @@ static inline short _marpaESLIFRecognizer_encoding_eqb(marpaESLIFRecognizer_t *m
   static const char         *funcs                    = "_marpaESLIFRecognizer_encoding_eqb";
   marpaESLIF_t              *marpaESLIFp              = marpaESLIFRecognizerParentp->marpaESLIFp;
   marpaESLIF_stream_t       *marpaESLIF_parentStreamp = marpaESLIFRecognizerParentp->marpaESLIF_streamp;
-  marpaESLIFRecognizer_t    *marpaESLIFRecognizerp = NULL;
-  char                      *utf8s;
+  marpaESLIFRecognizer_t    *marpaESLIFRecognizerp    = NULL;
+  char                      *utf8s                    = NULL;
   size_t                     utf8l;
   marpaESLIFGrammar_t        marpaESLIFGrammar;
   marpaESLIF_matcher_value_t rci;
@@ -11071,7 +11086,8 @@ static inline short _marpaESLIFRecognizer_encoding_eqb(marpaESLIFRecognizer_t *m
   if (marpaESLIF_parentStreamp->lastFroms != NULL) {
     if (marpaESLIF_parentStreamp->lastFroml == inputl) {
       if (memcmp(marpaESLIF_parentStreamp->lastFroms, inputs, inputl) == 0) {
-        goto immediate_return;
+        rcb = 1;
+        goto done;
       }
     }
   }
@@ -11122,7 +11138,6 @@ static inline short _marpaESLIFRecognizer_encoding_eqb(marpaESLIFRecognizer_t *m
   }
   marpaESLIFRecognizer_freev(marpaESLIFRecognizerp);
 
- immediate_return:
 #ifndef MARPAESLIF_NTRACE
   MARPAESLIFRECOGNIZER_TRACEF(marpaESLIFRecognizerParentp, funcs, "return %d", (int) rcb);
   marpaESLIFRecognizerParentp->callstackCounteri--;

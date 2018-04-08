@@ -3,7 +3,7 @@ package Mojolicious::Plugin::SecureCORS;
 use Mojo::Base 'Mojolicious::Plugin';
 use Carp;
 
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use List::MoreUtils qw( any none );
 
@@ -199,36 +199,36 @@ Mojolicious::Plugin::SecureCORS - Complete control over CORS
 
 =head1 VERSION
 
-This document describes Mojolicious::Plugin::SecureCORS version v2.0.0
+This document describes Mojolicious::Plugin::SecureCORS version v2.0.1
 
 
 =head1 SYNOPSIS
 
-  # in Mojolicious app
-  sub startup {
-    my $app = shift;
-    …
+    # in Mojolicious app
+    sub startup {
+        my $app = shift;
+        …
 
-    # load and configure
-    $app->plugin('SecureCORS');
-    $app->plugin('SecureCORS', { max_age => undef });
+        # load and configure
+        $app->plugin('SecureCORS');
+        $app->plugin('SecureCORS', { max_age => undef });
 
-    # set app-wide CORS defaults
-    $app->routes->to('cors.credentials'=>1);
+        # set app-wide CORS defaults
+        $app->routes->to('cors.credentials'=>1);
 
-    # set default CORS options for nested routes
-    $r = $r->under(…, {'cors.origin' => '*'}, …);
+        # set default CORS options for nested routes
+        $r = $r->under(…, {'cors.origin' => '*'}, …);
 
-    # set CORS options for this route (at least "origin" option must be
-    # defined to allow CORS, either here or in parent routes)
-    $r->get(…, {'cors.origin' => '*'}, …);
-    $r->route(…)->to('cors.origin' => '*');
+        # set CORS options for this route (at least "origin" option must be
+        # defined to allow CORS, either here or in parent routes)
+        $r->get(…, {'cors.origin' => '*'}, …);
+        $r->route(…)->to('cors.origin' => '*');
 
-    # allow non-simple (with preflight) CORS on this route
-    $r->cors(…);
+        # allow non-simple (with preflight) CORS on this route
+        $r->cors(…);
 
-    # create under to protect all nested routes
-    $r = $app->routes->under_strict_cors('/resource');
+        # create under to protect all nested routes
+        $r = $app->routes->under_strict_cors('/resource');
 
 
 =head1 DESCRIPTION
@@ -255,9 +255,7 @@ Consider using C<under_strict_cors()> - it won't "save" you but may helps.
 
 =head1 INTERFACE
 
-=over
-
-=item CORS options
+=head2 CORS options
 
 To allow CORS on some route you should define relevant CORS options for
 that route. These options will be processed automatically using
@@ -296,7 +294,7 @@ route).
 =item C<< 'cors.credentials' => undef >> (default)
 
 While handling preflight request true/false value will tell browser to
-send or not send credentials (cookies, http auth, ssl certificate) with
+send or not send credentials (cookies, http auth, SSL certificate) with
 actual request.
 
 While handling simple/actual request if set to false and browser has sent
@@ -340,7 +338,9 @@ handling preflight - see below for example.
 
 =back
 
-=item $r->cors(…)
+=head2 cors
+
+    $app->routes->cors(...);
 
 Accept same params as L<Mojolicious::Routes::Route/"route">.
 
@@ -388,7 +388,9 @@ This route use "headers" condition, so you can add your own handler for
 OPTIONS method on same path after this one, to handle non-CORS OPTIONS
 requests on same path.
 
-=item $route = $r->under_strict_cors(…)
+=head2 under_strict_cors
+
+    $route = $app->routes->under_strict_cors(...)
 
 Accept same params as L<Mojolicious::Routes::Route/"under">.
 
@@ -399,8 +401,6 @@ will be rendered as "403 Forbidden".
 This feature should make it harder to attack your site by injecting
 JavaScript into the victim's browser on vulnerable website. More details:
 L<https://code.google.com/p/html5security/wiki/CrossOriginRequestSecurity#Processing_rogue_COR:>.
-
-=back
 
 
 =head1 OPTIONS
@@ -487,7 +487,7 @@ Alex Efros E<lt>powerman@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Alex Efros E<lt>powerman@cpan.orgE<gt>.
+This software is Copyright (c) 2014- by Alex Efros E<lt>powerman@cpan.orgE<gt>.
 
 This is free software, licensed under:
 

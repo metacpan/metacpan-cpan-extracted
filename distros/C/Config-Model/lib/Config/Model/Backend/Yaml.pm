@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Yaml;
-$Config::Model::Backend::Yaml::VERSION = '2.118';
+$Config::Model::Backend::Yaml::VERSION = '2.120';
 use 5.10.1;
 use Carp;
 use strict;
@@ -23,10 +23,12 @@ my $logger = get_logger("Backend::Yaml");
 
 sub load_yaml_parser {
     my $self = shift;
-    my $file = my $class = shift // 'YAML::Tiny';
-    $file =~ s!::!/!g;
-    require "$file.pm" || die "cannot load YAML parser $class";
-    import $class;
+    if (not $self->can('Load')) {
+        my $file = my $class = shift // 'YAML::Tiny';
+        $file =~ s!::!/!g;
+        require "$file.pm" || die "cannot load YAML parser $class";
+        import $class;
+    }
 }
 
 sub single_element {
@@ -127,7 +129,7 @@ Config::Model::Backend::Yaml - Read and write config as a YAML data structure
 
 =head1 VERSION
 
-version 2.118
+version 2.120
 
 =head1 SYNOPSIS
 

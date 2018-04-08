@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use List::Util qw( max );
 
@@ -77,6 +77,25 @@ sub run
       Devel::MAT::Cmd->printf( "  named as %s\n",
          Devel::MAT::Cmd->format_symbol( $symname )
       );
+   }
+
+   foreach my $magic ( $sv->magic ) {
+      my $type = $magic->type;
+      $type = "^" . chr( 0x40 + ord $type ) if ord $type < 0x20;
+
+      Devel::MAT::Cmd->printf( "  has %s magic",
+         Devel::MAT::Cmd->format_note( $type, 1 ),
+      );
+
+      Devel::MAT::Cmd->printf( " with object at %s",
+         Devel::MAT::Cmd->format_sv( $magic->obj )
+      ) if $magic->obj;
+
+      Devel::MAT::Cmd->printf( " with pointer at %s",
+         Devel::MAT::Cmd->format_sv( $magic->ptr )
+      ) if $magic->ptr;
+
+      Devel::MAT::Cmd->printf( "\n" );
    }
 
    my $type = ref $sv; $type =~ s/^Devel::MAT::SV:://;
@@ -242,7 +261,7 @@ sub show_PAD
          Devel::MAT::Cmd->printf( "  [%3d/%-*s]=%s\n",
             $padix,
             $maxname, Devel::MAT::Cmd->format_note( $padnames[$padix], 1 ),
-            ( $sv ? Devel::MAT::Cmd->format_sv( $sv ) : "NULL" ),
+            ( $sv ? Devel::MAT::Cmd->format_sv_with_value( $sv ) : "NULL" ),
          );
       }
       else {
@@ -271,7 +290,7 @@ sub show_PADNAMES
    foreach my $padix ( 1 .. $#elems ) {
       my $slot = $elems[$padix];
       if( $slot and $slot->type eq "SCALAR" ) {
-         Devel::MAT::Cmd->printf( "  [%d] is %s\n", $padix, $slot->pv );
+         Devel::MAT::Cmd->printf( "  [%d] is %s\n", $padix, Devel::MAT::Cmd->format_note( $slot->pv, 1 ) );
       }
    }
 }

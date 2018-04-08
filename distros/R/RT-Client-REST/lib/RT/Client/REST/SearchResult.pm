@@ -1,13 +1,12 @@
-# RT::Client::REST::SearchResult -- search results object.
-
-package RT::Client::REST::SearchResult;
+#!perl
+# PODNAME: RT::Client::REST::SearchResult
+# ABSTRACT: search results object.
 
 use strict;
 use warnings;
 
-use vars qw($VERSION);
-$VERSION = 0.03;
-
+package RT::Client::REST::SearchResult;
+$RT::Client::REST::SearchResult::VERSION = '0.52';
 sub new {
     my $class = shift;
 
@@ -57,9 +56,17 @@ sub get_iterator {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-RT::Client::REST::SearchResult -- Search results representation.
+RT::Client::REST::SearchResult - search results object.
+
+=head1 VERSION
+
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -136,8 +143,45 @@ completeness, here are the arguments:
 
 L<RT::Client::REST::Object>, L<RT::Client::REST>.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Abhijit Menon-Sen <ams@wiw.org>
+
+=item *
 
 Dmitri Tikhonov <dtikhonov@yahoo.com>
+
+=item *
+
+Damien "dams" Krotkine <dams@cpan.org>
+
+=item *
+
+Dean Hamstead <dean@bytefoundry.com.au>
+
+=item *
+
+Miquel Ruiz <mruiz@cpan.org>
+
+=item *
+
+JLMARTIN
+
+=item *
+
+SRVSH
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Dmitri Tikhonov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

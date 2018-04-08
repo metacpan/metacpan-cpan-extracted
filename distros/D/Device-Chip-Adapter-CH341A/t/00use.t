@@ -5,7 +5,6 @@ use warnings;
 
 use Test::More;
 
-use_ok( 'Device::Chip' );
-use_ok( 'Device::Chip::Adapter' );
+use_ok( 'Device::Chip::Adapter::CH341A' );
 
 done_testing;

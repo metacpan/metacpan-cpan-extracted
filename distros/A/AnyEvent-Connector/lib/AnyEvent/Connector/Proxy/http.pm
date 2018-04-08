@@ -50,9 +50,9 @@ sub establish_proxy {
             $ah->destroy();
             undef $ah;
             $cb->(1);
-        }else {
-            $ah->push_read(line => $header_reader);
+            return;
         }
+        $ah->push_read(line => $header_reader);
     };
     $ah->push_read(line => sub {
         my ($h, $line) = @_;
@@ -60,12 +60,14 @@ sub establish_proxy {
             $ah->destroy();
             undef $ah;
             $cb->(0);
+            return;
         }
         my $status = $1;
         if(int($status / 100) != 2) {
             $ah->destroy();
             undef $ah;
             $cb->(0);
+            return;
         }
         $ah->push_read(line => $header_reader);
     });

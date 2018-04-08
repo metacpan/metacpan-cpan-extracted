@@ -7,7 +7,6 @@ use Mojo::IOLoop;
 use Mojo::Pg::Che::Results;
 use Mojo::Pg::Transaction;
 use Scalar::Util 'weaken';
-#~ use Mojo::JSON 'to_json';
 
 my $handler_err = sub {$_[0] = shortmess $_[0]; 0;};
 has handler_err => sub {$handler_err};
@@ -84,14 +83,12 @@ sub execute_sth {
     if $self->{waiting};
   
   local $sth->{HandleError} = $self->handler_err;
-  $sth->{pg_async} = $cb ? PG_ASYNC : 0; # $self->dbh->{pg_async_status} == 1 ? PG_OLDQUERY_WAIT : PG_ASYNC # 
   
-  #~ $sth->execute(map { _json($_) ? to_json $_->{json} : $_ } @_);
   eval {$sth->execute(@_)}#binds
     or die "Bad statement: ", $@, $sth->{Statement};
   
   # Blocking
-  unless ($cb) {
+  unless ($cb) {#
     $self->_notifications;
     return $self->results_class->new(sth => $sth);
   }
@@ -117,10 +114,13 @@ sub prepare {
   
   my $dbh = $self->dbh;
   
+  $attrs->{pg_async} = PG_ASYNC
+    if delete $attrs->{Async};
+  
   return $dbh->prepare_cached($query, $attrs, $flag)
     if delete $attrs->{Cached};
   
-  return $dbh->prepare($query, $attrs,);
+  return $dbh->prepare($query, $attrs);
   
 }
 
@@ -149,7 +149,6 @@ sub rollback {
   my $self = shift;
   my $tx = delete $self->{tx}
     or return;
-  #~ warn "TX destroy";
   $tx = undef;# DESTROY
   
 }
@@ -182,52 +181,56 @@ sub _DBH_METHOD {
   push @to_fetch, shift # $key_field 
     if $method eq 'selectall_hashref' && ! ref $_[0];
   
-  my $attrs = shift;
-  
+  my $attrs = shift || {};
   
   $to_fetch[0] = delete $attrs->{KeyField}
       if exists $attrs->{KeyField};
   
-  #~ if ($method eq 'selectall_arrayref') {
   for (qw(Slice MaxRows)) {
     push @to_fetch, delete $attrs->{$_}
       if exists $attrs->{$_};
   }
   $to_fetch[0] = delete $attrs->{Columns}
     if exists $attrs->{Columns};
-  #~ }
   
   my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
   
-  my $async = delete $attrs->{Async} || delete $attrs->{pg_async};
+  $attrs->{pg_async} = PG_ASYNC
+    if $cb || delete $attrs->{Async};
+  
+  $sth->{pg_async} = PG_ASYNC
+    if $sth && $attrs->{pg_async};
 
   $sth ||= $self->prepare($query, $attrs, 3,);
-  my $result;
-  $cb ||= sub {
-    my ($db, $err) = map shift, 1..2;
-    croak "Error on non-blocking $method: ",$err
-      if $err;
-    $result = shift;
-    
-  } if $async;
+  
+  $cb ||= $self->_async_cb()
+    if $attrs->{pg_async};
   
   my @bind = @_;
   
-  $result = $self->execute_sth($sth, @bind, $cb ? ($cb) : ());
-  
-  Mojo::IOLoop->start
-    if $async && ! Mojo::IOLoop->is_running;
+  my @result = $self->execute_sth($sth, @bind, $cb ? ($cb) : ());# 
   
   (my $fetch_method = $method) =~ s/select/fetch/;
   
-  return $result->$fetch_method(@to_fetch)
-    if ref $result eq $self->results_class && $result->can($fetch_method);
+  return $result[0]->$fetch_method(@to_fetch)
+    if ref $result[0] eq $self->results_class && $result[0]->can($fetch_method);
   
-  return $result;
+  return wantarray ? @result : shift @result;
   
 }
 
-#Patch parent meth for $self->results_class
+sub _async_cb {
+  my $self = shift;
+  my ($result, $err);
+  return sub {
+    return wantarray ? ($result, $err) : $result
+      unless @_;
+    my $db = shift;
+    ($err, $result) = @_;
+  };
+}
+
+
 sub _watch {
   my $self = shift;
 
@@ -237,28 +240,31 @@ sub _watch {
   unless ($self->{handle}) {
     open $self->{handle}, '<&', $dbh->{pg_socket} or die "Can't dup: $!";
   }
+  
+  my ($sth, $cb);
+  
   Mojo::IOLoop->singleton->reactor->io(
     $self->{handle} => sub {
-      #~ die 146;
       my $reactor = shift;
 
       $self->_unwatch if !eval { $self->_notifications; 1 };
-      #~ warn '_Watch', $self->{waiting};
       return unless $self->{waiting} && $dbh->pg_ready;
-      my ($sth, $cb) = @{delete $self->{waiting}}{qw(sth cb)};
-
+      ($sth, $cb) = @{delete $self->{waiting}}{qw(sth cb)};
+      
       # Do not raise exceptions inside the event loop
       my $result = do { local $dbh->{RaiseError} = 0; $dbh->pg_result };
       my $err = defined $result ? undef : $dbh->errstr;
 
       eval { $self->$cb($err, $self->results_class->new(sth => $sth)); };
-      warn "Non-blocking callback result error: ", $@
-        and $reactor->{cb_error} = $@
-        if $@;
+      #~ warn "Non-blocking callback result error: ", $@
+      #~ $reactor->{cb_error} = $@
+        #~ if $@;
       
       $self->_unwatch unless $self->{waiting} || $self->is_listening;
     }
   )->watch($self->{handle}, 1, 0);
+  
+  return \$cb, \$sth;
 }
 
 sub _unwatch {#  copy/paste Mojo::Pg::Database
@@ -274,7 +280,12 @@ sub DESTROY {#  copy/paste Mojo::Pg::Database + rollback
   $self->rollback;
   
   my $waiting = $self->{waiting};
-  $waiting->{cb}($self, 'Premature connection close', undef) if $waiting->{cb};
+  if (my $cb = $waiting->{cb}) {
+    $self->$cb('Premature connection close', undef)
+      if ref $cb eq 'CODE';
+    
+  }
+  #~ $waiting->{cb}($self, 'Premature connection close', undef) ;
 
   return unless (my $pg = $self->pg) && (my $dbh = $self->dbh);
   $pg->_enqueue($dbh);

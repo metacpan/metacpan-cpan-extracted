@@ -16,20 +16,34 @@ has is_authenticated => ( is => 'ro', isa => Bool, required => 1 );
 
 has private_token => ( is => 'ro', isa => Maybe [ArrayRef] );    # [ $token_type, $token_id, $token_hash ]
 
-has is_user   => ( is => 'ro', isa => Bool );
 has is_root   => ( is => 'ro', isa => Bool );
 has user_id   => ( is => 'ro', isa => Maybe [Str] );
 has user_name => ( is => 'ro', isa => Maybe [Str] );
-
-has is_app          => ( is => 'ro', isa => Bool );
-has app_id          => ( is => 'ro', isa => Maybe [Str] );
-has app_instance_id => ( is => 'ro', isa => Maybe [Str] );
 
 has permissions => ( is => 'ro', isa => Maybe [HashRef] );
 has depends_on  => ( is => 'ro', isa => Maybe [ArrayRef] );
 
 sub TO_DATA ($self) {
     die q[Direct auth object serialization is impossible for security reasons];
+}
+
+sub TO_DUMP ( $self, $dumper, @ ) {
+    my %args = (
+        path => undef,
+        splice @_, 2,
+    );
+
+    my $tags;
+
+    my $res;
+
+    my %attrs = $self->%*;
+
+    delete $attrs{app};
+
+    $res .= $dumper->_dump( \%attrs, path => $args{path} );
+
+    return $res, $tags;
 }
 
 sub api_can_call ( $self, $method_id, $cb ) {

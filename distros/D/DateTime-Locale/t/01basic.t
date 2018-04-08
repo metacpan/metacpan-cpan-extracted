@@ -118,7 +118,7 @@ sub test_one_locale {
             locale_method => 'era_narrow',
             count         => 2,
         },
-        ) {
+    ) {
         check_array( locale => $locale, %{$test} );
     }
 

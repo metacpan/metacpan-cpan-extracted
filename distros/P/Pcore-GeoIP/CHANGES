@@ -1,3 +1,6 @@
+v1.2.1 2018-04-05T06:38:44Z
+ - dist.perl renamed to dist.yaml
+
 v1.2.0 2017-05-20T20:36:58Z
  - No issues on bugtracker were closed since the last release
  - util and mod_share removed from dist config

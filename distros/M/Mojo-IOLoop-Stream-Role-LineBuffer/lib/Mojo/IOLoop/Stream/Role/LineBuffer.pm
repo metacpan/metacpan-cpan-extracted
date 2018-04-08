@@ -2,7 +2,7 @@ package Mojo::IOLoop::Stream::Role::LineBuffer;
 
 use Mojo::Base -role;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 has 'read_line_separator' => sub { qr/\x0D?\x0A/ };
 has 'write_line_separator' => "\x0D\x0A";

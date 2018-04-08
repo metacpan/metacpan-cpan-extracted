@@ -7,6 +7,8 @@ use IO::Async::Stream;
 
 my $loop = IO::Async::Loop->new;
 $loop->connect(
+	handle     => IO::Async::Stream->new,
+
 	extensions => [qw(SOCKS)],
 	SOCKS_host => 'localhost',
 	SOCKS_port => '9020',

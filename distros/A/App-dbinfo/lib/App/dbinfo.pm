@@ -1,7 +1,7 @@
 package App::dbinfo;
 
-our $DATE = '2017-10-30'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-04-03'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -186,11 +186,11 @@ our %args_dump_table = (
         cmdline_aliases => {w=>{}},
     },
     limit_number => {
-        schema => 'nonnegint*',
+        schema => 'uint*',
         cmdline_aliases => {n=>{}},
     },
     limit_offset => {
-        schema => 'nonnegint*',
+        schema => 'uint*',
         cmdline_aliases => {o=>{}},
     },
 );
@@ -304,7 +304,7 @@ App::dbinfo - Get/extract information from database
 
 =head1 VERSION
 
-This document describes version 0.003 of App::dbinfo (from Perl distribution App-dbinfo), released on 2017-10-30.
+This document describes version 0.004 of App::dbinfo (from Perl distribution App-dbinfo), released on 2018-04-03.
 
 =head1 SYNOPSIS
 
@@ -361,9 +361,9 @@ DBI data source, e.g. "dbi:SQLite:dbname=/path/to/db.db".
 
 =item * B<include_columns> => I<array[str]>
 
-=item * B<limit_number> => I<nonnegint>
+=item * B<limit_number> => I<uint>
 
-=item * B<limit_offset> => I<nonnegint>
+=item * B<limit_offset> => I<uint>
 
 =item * B<password> => I<str>
 
@@ -527,7 +527,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -16,7 +16,7 @@ sub tempdir {
 
 # Install the app to a temporary path
 sub install_app {
-  my $MOJO_HOME = tempdir . "/blog";
+  my $MOJO_HOME = path(tempdir)->child("blog")->to_string;
 
   # idempotent
   path($MOJO_HOME)->remove_tree->make_path({mode => 0700});

@@ -603,13 +603,13 @@ Uzbek Uzbekistan Latin locale.
    1995-12-22T09:05:02 = 1995, 4-chorak
   -0010-09-15T04:44:23 = -10, 3-chorak
 
-=head3 yw-count-one (Y, w-'hafta')
+=head3 yw-count-one (y, w-'hafta')
 
    2008-02-05T18:30:30 = 2008, 6-hafta
    1995-12-22T09:05:02 = 1995, 51-hafta
   -0010-09-15T04:44:23 = -10, 37-hafta
 
-=head3 yw-count-other (Y, w-'hafta')
+=head3 yw-count-other (y, w-'hafta')
 
    2008-02-05T18:30:30 = 2008, 6-hafta
    1995-12-22T09:05:02 = 1995, 51-hafta

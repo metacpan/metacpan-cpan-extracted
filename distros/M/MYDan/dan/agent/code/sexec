@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YAML::XS;
+
+local $/ = undef;
+
+my %param = %{ YAML::XS::Load( <STDIN> ) };
+my $cmd = $param{argv}->[0];
+
+map{ 
+    $cmd =~ s/$_/$param{$_}/g if $_ =~ /^__.+/ && ! ref $param{$_} && $param{$_} !~ /'/; 
+}keys %param if defined $cmd && $cmd !~ /^__/;
+
+exec $cmd;
+
+exit 1;
