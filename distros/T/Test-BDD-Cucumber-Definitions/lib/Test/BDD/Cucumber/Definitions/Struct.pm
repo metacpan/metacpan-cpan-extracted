@@ -13,49 +13,31 @@ use Test::BDD::Cucumber::Definitions::Validator qw(:all);
 use Test::More;
 use Try::Tiny;
 
-our $VERSION = '0.31';
+our $VERSION = '0.34';
 
-our @EXPORT_OK = qw(
-    http_response_content_read_json
-    file_content_read_json
-    zip_archive_members_read_list
-    struct_data_element_eq struct_data_array_any_eq
-    struct_data_element_re struct_data_array_any_re
-    struct_data_element_key struct_data_list_all_key
-    struct_data_element
-    struct_data_array_count
-);
-our %EXPORT_TAGS = (
-    util => [
-        qw(
-            http_response_content_read_json
-            file_content_read_json
-            zip_archive_members_read_list
-            struct_data_element_eq struct_data_array_any_eq
-            struct_data_element_re struct_data_array_any_re
-            struct_data_element_key struct_data_list_all_key
-            struct_data_element
-            struct_data_array_count
-            )
-    ]
-);
+our @EXPORT_OK = qw(Struct);
 
 # Enable JSONPath Embedded Perl Expressions
 $JSON::Path::Safe = 0;    ## no critic (Variables::ProhibitPackageVars)
 
 ## no critic [Subroutines::RequireArgUnpacking]
 
-sub http_response_content_read_json {
+sub Struct {
+    return __PACKAGE__;
+}
+
+sub read_http_response_content_as_json {
+    my $self = shift;
+
+    S->{Struct} = __PACKAGE__;
 
     # Clean data
-    S->{struct}->{data} = undef;
+    S->{_Struct}->{data} = undef;
 
     my $error;
 
-    my $decoded_content = S->{http}->{response_object}->decoded_content();
-
-    S->{struct}->{data} = try {
-        decode_json($decoded_content);
+    S->{_Struct}->{data} = try {
+        decode_json( S->{HTTP}->content() );
     }
     catch {
         $error = "Could not read http response content as JSON: $_[0]";
@@ -63,28 +45,28 @@ sub http_response_content_read_json {
         return;
     };
 
-    if ($error) {
-        fail(qq{Http response content was read as JSON});
+    if ( !ok( !$error, qq{Http response content was read as JSON} ) ) {
         diag($error);
-    }
-    else {
-        pass(qq{Http response content was read as JSON});
+        diag( 'Http response content = ' . np S->{HTTP}->content );
+
+        return;
     }
 
-    diag( 'Http response content = ' . np $decoded_content );
-
-    return;
+    return 1;
 }
 
-sub file_content_read_json {
+sub read_file_content_as_json {
+    my $self = shift;
+
+    S->{Struct} = __PACKAGE__;
 
     # Clean data
-    S->{struct}->{data} = undef;
+    S->{_Struct}->{data} = undef;
 
     my $error;
 
-    S->{struct}->{data} = try {
-        decode_json( S->{file}->content );
+    S->{_Struct}->{data} = try {
+        decode_json( S->{File}->content );
     }
     catch {
         $error = "Could not read file content as JSON: $_[0]";
@@ -94,60 +76,65 @@ sub file_content_read_json {
 
     if ( !ok( !$error, qq{File content was read as JSON} ) ) {
         diag($error);
+        diag( 'File content = ' . np S->{File}->content );
 
         return;
     }
 
-    diag( 'File content = ' . np S->{file}->{content} );
+    return 1;
+}
+
+sub read_zip_archive_members_as_list {
+    my $self = shift;
+
+    S->{Struct} = __PACKAGE__;
+
+    # Clean data
+    S->{_Struct}->{data} = undef;
+
+    my @members = S->{Zip}->member_names();
+
+    S->{_Struct}->{data} = \@members;
+
+    pass('Zip archive members was read as list');
 
     return 1;
 }
 
-sub zip_archive_members_read_list {
-
-    # Clean data
-    S->{struct}->{data} = undef;
-
-    my @members = S->{zip}->{archive}->memberNames();
-
-    S->{struct}->{data} = \@members;
-
-    pass('Zip archive members was read as list');
-
-    return;
-}
-
-sub struct_data_element_eq {
+sub data_element_eq {
+    my $self = shift;
     my ( $jsonpath, $value ) = validator_ns->(@_);
 
-    my $result = jpath1( S->{struct}->{data}, $jsonpath );
+    my $result = jpath1( S->{_Struct}->{data}, $jsonpath );
 
     is( $result, $value, qq{Struct data element "$jsonpath" eq "$value"} );
 
-    diag( 'Data = ' . np S->{struct}->{data} );
+    diag( 'Data = ' . np S->{_Struct}->{data} );
 
     return;
 }
 
-sub struct_data_array_any_eq {
+sub data_list_any_eq {
+    my $self = shift;
     my ( $jsonpath, $value ) = validator_ns->(@_);
 
-    my @result = jpath( S->{struct}->{data}, $jsonpath );
+    my @result = jpath( S->{_Struct}->{data}, $jsonpath );
 
     my $ok = any { $_ eq $value } @result;
 
-    ok( $ok, qq{Struct data array "$jsonpath" any eq "$value"} );
+    ok( $ok, qq{Struct data list "$jsonpath" any eq "$value"} );
 
-    diag( 'Find = ' . np @result );
-    diag( 'Data = ' . np S->{struct}->{data} );
+    diag( 'List = ' . np @result );
+    diag( 'Data = ' . np S->{_Struct}->{data} );
 
     return;
 }
 
-sub struct_data_element_re {
+sub data_element_re {
+    my $self = shift;
     my ( $jsonpath, $regexp ) = validator_nr->(@_);
 
-    my $result = jpath1( S->{struct}->{data}, $jsonpath );
+    my $result = jpath1( S->{_Struct}->{data}, $jsonpath );
 
     like(
         $result,
@@ -155,43 +142,46 @@ sub struct_data_element_re {
         qq{Struct data element "$jsonpath" re "$regexp"}
     );
 
-    diag( 'Data = ' . np S->{struct}->{data} );
+    diag( 'Data = ' . np S->{_Struct}->{data} );
 
     return;
 }
 
-sub struct_data_array_any_re {
+sub data_list_any_re {
+    my $self = shift;
     my ( $jsonpath, $regexp ) = validator_nr->(@_);
 
-    my @result = jpath( S->{struct}->{data}, $jsonpath );
+    my @result = jpath( S->{_Struct}->{data}, $jsonpath );
 
     my $ok = any {/$regexp/x} @result;
 
-    ok( $ok, qq{Struct data array "$jsonpath" any re "$regexp"} );
+    ok( $ok, qq{Struct data list "$jsonpath" any re "$regexp"} );
 
-    diag( 'Find = ' . np @result );
-    diag( 'Data = ' . np S->{struct}->{data} );
+    diag( 'List = ' . np @result );
+    diag( 'Data = ' . np S->{_Struct}->{data} );
 
     return;
 }
 
-sub struct_data_array_count {
+sub data_list_count {
+    my $self = shift;
     my ( $jsonpath, $count ) = validator_ni->(@_);
 
-    my @result = jpath( S->{struct}->{data}, $jsonpath );
+    my @result = jpath( S->{_Struct}->{data}, $jsonpath );
 
-    is( scalar @result, $count, qq{Struct data array "$jsonpath" count "$count"} );
+    is( scalar @result, $count, qq{Struct data list "$jsonpath" count "$count"} );
 
-    diag( 'Find = ' . np @result );
-    diag( 'Data = ' . np S->{struct}->{data} );
+    diag( 'List = ' . np @result );
+    diag( 'Data = ' . np S->{_Struct}->{data} );
 
     return;
 }
 
-sub struct_data_element_key {
+sub data_element_key {
+    my $self = shift;
     my ( $jsonpath, $value ) = validator_ns->(@_);
 
-    my $result = jpath1( S->{struct}->{data}, $jsonpath );
+    my $result = jpath1( S->{_Struct}->{data}, $jsonpath );
 
     if (   ok( $result, qq{Struct data element "$jsonpath" exists} )
         && is( ref $result, 'HASH', qq{Struct data element "$jsonpath" is a hash} )
@@ -201,15 +191,16 @@ sub struct_data_element_key {
     }
 
     diag( "Element = " . np $result );
-    diag( 'Data = ' . np S->{struct}->{data} );
+    diag( 'Data = ' . np S->{_Struct}->{data} );
 
     return;
 }
 
-sub struct_data_list_all_key {
+sub data_list_all_key {
+    my $self = shift;
     my ( $jsonpath, $value ) = validator_ns->(@_);
 
-    my @result = jpath( S->{struct}->{data}, $jsonpath );
+    my @result = jpath( S->{_Struct}->{data}, $jsonpath );
 
     if (   ok( @result, qq{Struct data list "$jsonpath" is not empty} )
         && ok( ( all { ref $_ eq 'HASH' } @result ),    qq{Struct data list "$jsonpath" is a list of hashes} )
@@ -219,15 +210,16 @@ sub struct_data_list_all_key {
     }
 
     diag( "List = " . np @result );
-    diag( 'Data = ' . np S->{struct}->{data} );
+    diag( 'Data = ' . np S->{_Struct}->{data} );
 
     return;
 }
 
-sub struct_data_element {
+sub data_element {
+    my $self = shift;
     my ($jsonpath) = validator_n->(@_);
 
-    return jpath1( S->{struct}->{data}, $jsonpath );
+    return jpath1( S->{_Struct}->{data}, $jsonpath );
 }
 
 1;

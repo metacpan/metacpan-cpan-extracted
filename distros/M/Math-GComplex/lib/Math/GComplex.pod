@@ -6,11 +6,9 @@ Math::GComplex - Generic complex number library.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =head1 SYNOPSIS
-
-Math::GComplex provides a generic interface to complex number operations, accepting any type of number as a component of a complex number, including native Perl numbers and numerical objects provided by other mathematical libraries, such as L<Math::AnyNum>.
 
     use 5.014;
     use Math::GComplex;
@@ -26,11 +24,11 @@ Math::GComplex provides a generic interface to complex number operations, accept
 
 =head1 DESCRIPTION
 
-Math::GComplex is a lightweight library, which focuses primarily on providing a friendly interface to complex number operations and good performance.
+B<Math::GComplex> is a lightweight library, providing a generic interface to complex number operations, accepting any type of number as a component of a complex number, including native Perl numbers and numerical objects provided by other mathematical libraries, such as L<Math::AnyNum>.
 
-In most cases, it can be used as drop-in replacement for L<Math::Complex>.
+In most cases, it can be used as a drop-in replacement for L<Math::Complex>.
 
-Due to its simple and elegant design, this library is between 2x up to 8x faster than L<Math::Complex>.
+Due to its simple and elegant design, Math::GComplex is between 2x up to 8x faster than L<Math::Complex>.
 
 =head1 EXPORT
 
@@ -50,7 +48,7 @@ The following functions are exportable:
 
     :misc
         cplx abs acmp sgn conj norm
-        inv real imag reals
+        inv real imag reals floor ceil
 
 Each function can be exported individually, as:
 
@@ -535,11 +533,15 @@ Example:
 Being a generic interface, it assumes that all the special cases (such as division by zero) are handled by the library of which type the components of a complex number are.
 
 When the components of a complex number are native Perl numbers, the "division by zero" and the "logarithm of zero" cases are implicitly handled by this library.
-However the user may still encounter incorrect results due to overflow or underflow in some special cases (such as C<coth(1e6) = (NaN NaN)> and C<cosh(1e6) = (NaN NaN)>).
+
+However the user may still encounter incorrect results due to rounding errors and/or overflow/underflow in some special cases, such as:
+
+    coth(1e6) = (NaN NaN)
+    cosh(1e6) = (NaN NaN)
 
 =head1 AUTHOR
 
-Daniel "Trizen" Șuteu, C<< <trizen at protonmail.com> >>
+Daniel Șuteu, C<< <trizen at protonmail.com> >>
 
 =head1 BUGS
 
@@ -598,7 +600,7 @@ L<Math::Complex> - complex numbers and associated mathematical functions.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Daniel "Trizen" Șuteu.
+Copyright 2018 Daniel Șuteu.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

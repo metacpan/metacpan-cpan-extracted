@@ -7,38 +7,40 @@ use Carp;
 
 require Exporter;
 
-our @ISA = qw(Exporter);
-our $VERSION = '0.42';
+our @ISA     = qw(Exporter);
+our $VERSION = '0.43';
 
 use Crypt::U2F::Server;
 
 my $refCount = 0;
-my $errstr = '';
+my $errstr   = '';
 
-our %EXPORT_TAGS = ( 'all' => [ qw() ] );
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-our @EXPORT = qw();
+our %EXPORT_TAGS = ( 'all' => [qw()] );
+our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
+our @EXPORT      = qw();
 
 my $maxStringLength = 10_000;
 
 sub new {
-    my ($proto, %config) = @_;
+    my ( $proto, %config ) = @_;
     my $class = ref($proto) || $proto;
 
     foreach my $key (qw[appId origin]) {
-        if(!defined($config{$key})) {
+        if ( !defined( $config{$key} ) ) {
             croak("$key not defined!");
         }
-        if(!length($config{$key})) {
+        if ( !length( $config{$key} ) ) {
             croak("$key must not be empty!");
         }
     }
 
     my $self = bless \%config, $class;
 
-    if(!$refCount) {
-        my $rc = Crypt::U2F::Server::u2fclib_init(0);
-        if(!$rc) {
+    $config{debug} //= 0;
+
+    if ( !$refCount ) {
+        my $rc = Crypt::U2F::Server::u2fclib_init( $config{debug} );
+        if ( !$rc ) {
             $errstr = Crypt::U2F::Server::u2fclib_getError();
             return;
         }
@@ -46,39 +48,41 @@ sub new {
     }
 
     my $ctx = Crypt::U2F::Server::u2fclib_get_context();
-    if(!defined($ctx) || !$ctx) {
+    if ( !defined($ctx) || !$ctx ) {
         $errstr = Crypt::U2F::Server::u2fclib_getError();
         return;
     }
     $self->{ctx} = $ctx;
 
     {
-        my $rc = Crypt::U2F::Server::u2fclib_setAppID($self->{ctx}, $self->{appId});
-        if(!$rc) {
+        my $rc =
+          Crypt::U2F::Server::u2fclib_setAppID( $self->{ctx}, $self->{appId} );
+        if ( !$rc ) {
             $errstr = Crypt::U2F::Server::u2fclib_getError();
             return;
         }
     }
 
     {
-        my $rc = Crypt::U2F::Server::u2fclib_setOrigin($self->{ctx}, $self->{origin});
-        if(!$rc) {
+        my $rc = Crypt::U2F::Server::u2fclib_setOrigin( $self->{ctx},
+            $self->{origin} );
+        if ( !$rc ) {
             $errstr = Crypt::U2F::Server::u2fclib_getError();
             return;
         }
     }
 
-    if(defined($self->{keyHandle})) {
+    if ( defined( $self->{keyHandle} ) ) {
         my $rc = $self->setKeyHandle;
-        if(!$rc) {
+        if ( !$rc ) {
             $errstr = Crypt::U2F::Server::u2fclib_getError();
             return;
         }
     }
 
-    if(defined($self->{publicKey})) {
+    if ( defined( $self->{publicKey} ) ) {
         my $rc = $self->setPublicKey;
-        if(!$rc) {
+        if ( !$rc ) {
             $errstr = Crypt::U2F::Server::u2fclib_getError();
             return;
         }
@@ -94,8 +98,9 @@ sub lastError {
 sub registrationChallenge {
     my ($self) = @_;
 
-    my $rc = Crypt::U2F::Server::u2fclib_calcRegistrationChallenge($self->{ctx});
-    if(!defined($rc) || !length($rc)) {
+    my $rc =
+      Crypt::U2F::Server::u2fclib_calcRegistrationChallenge( $self->{ctx} );
+    if ( !defined($rc) || !length($rc) ) {
         $errstr = Crypt::U2F::Server::u2fclib_getError();
         return;
     }
@@ -104,40 +109,45 @@ sub registrationChallenge {
 }
 
 sub registrationVerify {
-    my ($self, $registration) = @_;
+    my ( $self, $registration ) = @_;
 
-    if(length($registration) >= $maxStringLength) {
+    if ( length($registration) >= $maxStringLength ) {
         $errstr = "Registration string too long!";
         return;
     }
 
-    ($self->{publicKey}, $self->{keyHandle}) = Crypt::U2F::Server::u2fclib_verifyRegistration($self->{ctx}, $registration);
-    if(not(defined($self->{publicKey}) and defined($self->{keyHandle}))) {
+    ( $self->{publicKey}, $self->{keyHandle} ) =
+      Crypt::U2F::Server::u2fclib_verifyRegistration( $self->{ctx},
+        $registration );
+    if (
+        not( defined( $self->{publicKey} ) and defined( $self->{keyHandle} ) ) )
+    {
         $errstr = Crypt::U2F::Server::u2fclib_getError();
         return;
     }
 
-    return ($self->{keyHandle}, $self->{publicKey});
+    return ( $self->{keyHandle}, $self->{publicKey} );
 }
 
 sub setKeyHandle {
-    my ($self, $keyHandle) = @_;
+    my ( $self, $keyHandle ) = @_;
 
-    if(!defined($keyHandle) && !defined($self->{keyHandle})) {
+    if ( !defined($keyHandle) && !defined( $self->{keyHandle} ) ) {
         $errstr = "No keyHandle given!";
         return 0;
     }
-    if(defined($keyHandle)) {
+    if ( defined($keyHandle) ) {
         $self->{keyHandle} = $keyHandle;
     }
 
-    if(length($self->{keyHandle}) >= $maxStringLength) {
+    if ( length( $self->{keyHandle} ) >= $maxStringLength ) {
         $errstr = "keyHandle string too long!";
         return 0;
     }
 
-    my $rc = Crypt::U2F::Server::u2fclib_setKeyHandle($self->{ctx}, $self->{keyHandle});
-    if(!defined($rc) || !$rc) {
+    my $rc = Crypt::U2F::Server::u2fclib_setKeyHandle( $self->{ctx},
+        $self->{keyHandle} );
+    if ( !defined($rc) || !$rc ) {
         $errstr = Crypt::U2F::Server::u2fclib_getError();
         return;
     }
@@ -146,23 +156,24 @@ sub setKeyHandle {
 }
 
 sub setPublicKey {
-    my ($self, $publicKey) = @_;
+    my ( $self, $publicKey ) = @_;
 
-    if(!defined($publicKey) && !defined($self->{publicKey})) {
+    if ( !defined($publicKey) && !defined( $self->{publicKey} ) ) {
         $errstr = "No publicKey given!";
         return 0;
     }
-    if(defined($publicKey)) {
+    if ( defined($publicKey) ) {
         $self->{publicKey} = $publicKey;
     }
 
-    if(length($self->{publicKey}) >= $maxStringLength) {
+    if ( length( $self->{publicKey} ) >= $maxStringLength ) {
         $errstr = "publicKey string too long!";
         return 0;
     }
 
-    my $rc = Crypt::U2F::Server::u2fclib_setPublicKey($self->{ctx}, $self->{publicKey});
-    if(!defined($rc) || !$rc) {
+    my $rc = Crypt::U2F::Server::u2fclib_setPublicKey( $self->{ctx},
+        $self->{publicKey} );
+    if ( !defined($rc) || !$rc ) {
         $errstr = Crypt::U2F::Server::u2fclib_getError();
         return;
     }
@@ -171,23 +182,24 @@ sub setPublicKey {
 }
 
 sub setChallenge {
-    my ($self, $challenge) = @_;
+    my ( $self, $challenge ) = @_;
 
-    if(!defined($challenge) && !defined($self->{challenge})) {
+    if ( !defined($challenge) && !defined( $self->{challenge} ) ) {
         $errstr = "No challenge given!";
         return 0;
     }
-    if(defined($challenge)) {
+    if ( defined($challenge) ) {
         $self->{challenge} = $challenge;
     }
 
-    if(length($self->{challenge}) >= $maxStringLength) {
+    if ( length( $self->{challenge} ) >= $maxStringLength ) {
         $errstr = "challenge string too long!";
         return 0;
     }
 
-    my $rc = Crypt::U2F::Server::u2fclib_setChallenge($self->{ctx}, $self->{challenge});
-    if(!defined($rc) || !$rc) {
+    my $rc = Crypt::U2F::Server::u2fclib_setChallenge( $self->{ctx},
+        $self->{challenge} );
+    if ( !defined($rc) || !$rc ) {
         $errstr = Crypt::U2F::Server::u2fclib_getError();
         return;
     }
@@ -198,12 +210,13 @@ sub setChallenge {
 sub authenticationChallenge {
     my ($self) = @_;
 
-    if(!$self->setKeyHandle || !$self->setPublicKey) {
+    if ( !$self->setKeyHandle || !$self->setPublicKey ) {
         return;
     }
 
-    my $rc = Crypt::U2F::Server::u2fclib_calcAuthenticationChallenge($self->{ctx});
-    if(!defined($rc) || !length($rc)) {
+    my $rc =
+      Crypt::U2F::Server::u2fclib_calcAuthenticationChallenge( $self->{ctx} );
+    if ( !defined($rc) || !length($rc) ) {
         $errstr = Crypt::U2F::Server::u2fclib_getError();
         return;
     }
@@ -212,14 +225,15 @@ sub authenticationChallenge {
 }
 
 sub authenticationVerify {
-    my ($self, $authentication) = @_;
+    my ( $self, $authentication ) = @_;
 
-    if(!$self->setKeyHandle || !$self->setPublicKey) {
+    if ( !$self->setKeyHandle || !$self->setPublicKey ) {
         return 0;
     }
 
-    my $rc = Crypt::U2F::Server::u2fclib_verifyAuthentication($self->{ctx}, $authentication);
-    if(!defined($rc) || !$rc) {
+    my $rc = Crypt::U2F::Server::u2fclib_verifyAuthentication( $self->{ctx},
+        $authentication );
+    if ( !defined($rc) || !$rc ) {
         $errstr = Crypt::U2F::Server::u2fclib_getError();
         return 0;
     }
@@ -230,20 +244,19 @@ sub authenticationVerify {
 sub DESTROY {
     my ($self) = @_;
 
-    Crypt::U2F::Server::u2fclib_free_context($self->{ctx});
+    Crypt::U2F::Server::u2fclib_free_context( $self->{ctx} );
 
     $refCount--;
-    if($refCount < 0) {
+    if ( $refCount < 0 ) {
         croak("refCount error! Aborting everything!");
     }
 
-    if(!$refCount) {
+    if ( !$refCount ) {
         Crypt::U2F::Server::u2fclib_deInit();
     }
 
     return;
 }
-
 
 1;
 __END__
@@ -255,21 +268,24 @@ Crypt::U2F::Server::Simple - Register and Authenticate U2F compatible security d
 =head1 SYNOPSIS
 
   use Crypt::U2F::Server:Simple;
-
-  my $crypter = Crypt::U2F::Server::Simple->new(appId => 'Perl', origin='http://search.cpan.org');
-
+  
+  my $crypter = Crypt::U2F::Server::Simple->new(
+      appId  => 'Perl',
+      origin => 'http://search.cpan.org'
+  );
+  
   # Generate a registration request
   my $registerRequest = $crypter->registrationChallenge();
-
+  
   # Give $registerRequest to client, receive $registrationData from client
   # NB: if Crypt::U2F::Server::Simple has been recreated (web process for example), challenge
   #     value must be restored (value only, not JSON blob):
   #$crypter->setChallenge($challenge)
   my ($keyHandle, $userKey) = $crypter->registrationVerify($registrationData)
-
+  
   # Generate an authentication request (using the previously generated key handle and user key)
   my $authrequest = $crypter->authenticationChallenge();
-
+  
   # Send $authrequest to client, receive $authSignature
   # NB: if Crypt::U2F::Server::Simple has been recreated (web process for example), challenge
   #     value must be restored (value only, not JSON blob):
@@ -298,7 +314,7 @@ project page at L<https://developers.yubico.com/libu2f-server/> on how to do tha
 
 The way this is currently implemented, i doubt very much that multithreadingm will work.
 Multi-Forking should be OK as long as you only call new() B<after> forking, though. Also
-using more than one instance of this module in your program. This isn't really tested 
+using more than one instance of this module in your program. This isn't really tested
 at the moment, though...
 
 =head1 ALPHA WARNING
@@ -336,20 +352,32 @@ This comes in two forms, depending if you do authentication in the same instance
 
 The simple form (only registration or registration+authentication) only requires the arguments appId and origin:
 
-    my $auth = Crypt::U2F::Server::Simple->new(appId => 'Perl', 
-                                       origin='http://search.cpan.org');
+    my $auth = Crypt::U2F::Server::Simple->new(
+        appId  => 'Perl',
+        origin => 'http://search.cpan.org'
+    );
 
 If you only do authentication, you have to supply the keyHandle and publicKey data as well:
 
 
-    my $auth = Crypt::U2F::Server::Simple->new(appId => 'Perl', 
-                                       origin='http://search.cpan.org',
-                                       keyHandle=$keyHandleData
-                                       publicKey=$publicKeyData);
+    my $auth = Crypt::U2F::Server::Simple->new(
+        appId     => 'Perl',
+        origin    => 'http://search.cpan.org',
+        keyHandle => $keyHandleData
+        publicKey => $publicKeyData
+    );
 
 For security, i would recommend creating a new instance for each and every authentication request.
 
 If something goes wrong during initialization, $auth will be I<undef>.
+
+To enable Yubico library debug, set debug to 1:
+
+    my $auth = Crypt::U2F::Server::Simple->new(
+        appId  => 'Perl',
+        origin => 'http://search.cpan.org',
+        debug  => 1
+    );
 
 =head2 registrationChallenge()
 
@@ -376,7 +404,7 @@ $challenge is a JSON blob that contains a hash. Here are the main keys
 
     my ($keyHandle, $publicKey) = $auth->registrationVerify($reply);
 
-If the client (the "host") accepts the challenge, it will send you another JSON blob ($reply). 
+If the client (the "host") accepts the challenge, it will send you another JSON blob ($reply).
 
 If everything goes well and registration succeeds, you will get the key handle and public key of, well
 client key. If it fails, you will get I<undef>.

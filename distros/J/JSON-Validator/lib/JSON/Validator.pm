@@ -16,16 +16,17 @@ use Mojo::Util qw(url_unescape sha1_sum);
 use Scalar::Util qw(blessed refaddr);
 use Time::Local ();
 
-use constant COLORS => eval { require Term::ANSIColor };
-use constant DEBUG  => $ENV{JSON_VALIDATOR_DEBUG};
-use constant REPORT => $ENV{JSON_VALIDATOR_REPORT} // $ENV{JSON_VALIDATOR_DEBUG};
-use constant RECURSION_LIMIT => $ENV{JSON_VALIDATOR_RECURSION_LIMIT} || 100;
+use constant CASE_TOLERANT     => File::Spec->case_tolerant;
+use constant COLORS            => eval { require Term::ANSIColor };
+use constant DEBUG             => $ENV{JSON_VALIDATOR_DEBUG};
+use constant REPORT            => $ENV{JSON_VALIDATOR_REPORT} // $ENV{JSON_VALIDATOR_DEBUG};
+use constant RECURSION_LIMIT   => $ENV{JSON_VALIDATOR_RECURSION_LIMIT} || 100;
 use constant SPECIFICATION_URL => 'http://json-schema.org/draft-04/schema#';
 use constant VALIDATE_HOSTNAME => eval 'require Data::Validate::Domain;1';
 use constant VALIDATE_IP       => eval 'require Data::Validate::IP;1';
 
 our $ERR;    # ugly hack to improve validation errors
-our $VERSION = '2.05';
+our $VERSION = '2.06';
 our @EXPORT_OK = qw(joi validate_json);
 
 my $BUNDLED_CACHE_DIR = path(path(__FILE__)->dirname, qw(Validator cache));
@@ -243,7 +244,7 @@ sub _load_schema {
   if (-e $file) {
     $file = $file->realpath;
     warn "[JSON::Validator] Loading schema from file: $file\n" if DEBUG;
-    return $self->_load_schema_from_text(\$file->slurp), $file;
+    return $self->_load_schema_from_text(\$file->slurp), CASE_TOLERANT ? lc $file : $file;
   }
   elsif ($file =~ m!^/!) {
     warn "[JSON::Validator] Loading schema from URL $url\n" if DEBUG;
@@ -431,7 +432,7 @@ sub _resolve_ref {
     ($base, $pointer) = split /#/, $fqn, 2;
     $other = $self->_resolve($base);
 
-    if (length $pointer) {
+    if (defined $pointer and length $pointer) {
       $other = Mojo::JSON::Pointer->new($other)->get($pointer)
         or confess qq[Possibly a typo in schema? Could not find "$pointer" in "$base" ($ref)];
     }
@@ -1010,7 +1011,7 @@ JSON::Validator - Validate data against a JSON schema
 
 =head1 VERSION
 
-2.05
+2.06
 
 =head1 SYNOPSIS
 
@@ -1309,18 +1310,11 @@ Default is to use the value from the L</schema> attribute.
 
   $self = $self->coerce(booleans => 1, numbers => 1, strings => 1);
   $self = $self->coerce({booleans => 1, numbers => 1, strings => 1});
-  $self = $self->coerce(1) # enable all
   $hash = $self->coerce;
 
 Set the given type to coerce. Before enabling coercion this module is very
 strict when it comes to validating types. Example: The string C<"1"> is not
 the same as the number C<1>, unless you have coercion enabled.
-
-WARNING! Enabling coercion might hide bugs in your api, which would have been
-detected if you were strict. For example JavaScript is very picky on a number
-being an actual number. This module tries it best to convert the data on the
-fly into the proper value, but this means that you unit tests might be ok,
-but the client side libraries (that care about types) might break.
 
 Loading a YAML document will enable "booleans" automatically. This feature is
 experimental, but was added since YAML has no real concept of booleans, such

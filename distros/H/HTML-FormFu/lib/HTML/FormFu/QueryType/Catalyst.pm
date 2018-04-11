@@ -1,18 +1,19 @@
-package HTML::FormFu::QueryType::Catalyst;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::QueryType::Catalyst;
+$HTML::FormFu::QueryType::Catalyst::VERSION = '2.06';
+# ABSTRACT: uploaded file
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 
 extends 'HTML::FormFu::Upload';
 
 use IO::File ();
 use Scalar::Util qw( weaken );
 
-has basename => ( is => 'rw', traits => ['FormFuChained'] );
-has tempname => ( is => 'rw', traits => ['FormFuChained'] );
+has basename => ( is => 'rw', traits => ['Chained'] );
+has tempname => ( is => 'rw', traits => ['Chained'] );
 
 sub parse_uploads {
     my ( $class, $form, $name ) = @_;
@@ -32,8 +33,8 @@ sub parse_uploads {
     }
 
     for my $upload (@uploads) {
-        my $param = $class->new( {
-                parent   => $form,
+        my $param = $class->new(
+            {   parent   => $form,
                 basename => $upload->basename,
                 headers  => $upload->headers,
                 filename => $upload->filename,
@@ -73,13 +74,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::QueryType::Catalyst - uploaded file
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 DESCRIPTION
 
@@ -138,5 +143,16 @@ Carl Franks, C<cfranks@cpan.org>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

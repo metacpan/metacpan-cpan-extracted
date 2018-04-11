@@ -50,6 +50,7 @@ t/TestDummies/DummyStaticTools.pm
 t/TestDummies/DummyStaticToolsUser.pm
 t/TestDummies/DummyStaticToolsUser_Static.pm
 t/TestDummies/FakeModuleForMockifyTest.pm
+t/TestDummies/FakeModuleForMockifyTest_alterantiveConstructorName.pm
 t/TestDummies/FakeModuleWithoutNew.pm
 t/Tools/Error.t
 t/Tools/ExistsMethod.t

@@ -1,6 +1,6 @@
 #pragma once
 
-#if __cplusplus > 201402L
+#if __cpp_lib_string_view >= 201603L
 #  include <string_view>
 #else
 #  include <panda/lib/hash.h>

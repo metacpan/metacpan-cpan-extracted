@@ -40,9 +40,9 @@ my $mon   = $today->mon;
 my $day   = sprintf "%02d", $today->mday;
 my $mday  = $today->mday;
 
-like $content, qr/selected="selected" value="$year">$year</;
-like $content, qr/selected="selected" value="$month">$mon</;
-like $content, qr/selected="selected" value="$day">$mday</;
+like $content, qr/selected value="$year">$year</;
+like $content, qr/selected value="$month">$mon</;
+like $content, qr/selected value="$day">$mday</;
 
 done_testing();
 

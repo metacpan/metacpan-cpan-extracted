@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Taxonomy::Classifier;
 # ABSTRACT: Helper class for multiple-criterion classifier based on taxonomy
-$Bio::MUST::Core::Taxonomy::Classifier::VERSION = '0.180630';
+$Bio::MUST::Core::Taxonomy::Classifier::VERSION = '0.181000';
 use Moose;
 use namespace::autoclean;
 
@@ -22,14 +22,6 @@ has 'categories' => (
 sub classify {
     my $self     = shift;
     my $listable = shift;
-
-    # hack allowing us to classify a single seq_id (or full_id)
-    # this is useful for building legacy .nom files from .fra files
-    unless ( ref $listable && $listable->can('all_seq_ids') ) {
-        $listable = $listable->full_id
-            if ref $listable && $listable->can('full_id');
-        $listable = IdList->new( ids => [ $listable ] );
-    }
 
     # loop through cats and return the first one matching input
     # this means that the cat order may affect the classification
@@ -54,7 +46,7 @@ Bio::MUST::Core::Taxonomy::Classifier - Helper class for multiple-criterion clas
 
 =head1 VERSION
 
-version 0.180630
+version 0.181000
 
 =head1 SYNOPSIS
 

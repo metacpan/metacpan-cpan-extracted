@@ -30,7 +30,7 @@ sub sqrt_convergents {
     return @convergents;
 }
 
-sub cfrac_denominator {
+sub cfrac_numerator {
     my (@cfrac) = @_;
 
     my ($f1, $f2) = (0, 1);
@@ -51,12 +51,12 @@ sub solve_pell {
 
     my @solutions;
 
-    my $x = cfrac_denominator($k, @period);
+    my $x = cfrac_numerator($k, @period);
     my $p1 = 4 * $d * ($x * $x + 1);
 
     if (is_square($p1)) {
         push @solutions, [$x, isqrt($p1) / (2 * $d)];
-        $x = cfrac_denominator($k, @period, @period);
+        $x = cfrac_numerator($k, @period, @period);
     }
 
     my $p2 = 4 * $d * ($x * $x - 1);

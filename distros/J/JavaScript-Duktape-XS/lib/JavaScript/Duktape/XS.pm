@@ -6,7 +6,7 @@ use warnings;
 use XSLoader;
 use parent 'Exporter';
 
-our $VERSION = '0.000036';
+our $VERSION = '0.000038';
 XSLoader::load( __PACKAGE__, $VERSION );
 
 our @EXPORT_OK = qw[];
@@ -26,16 +26,23 @@ engine
 
 =head1 VERSION
 
-Version 0.000036
+Version 0.000038
 
 =head1 SYNOPSIS
 
     my $duk = JavaScript::Duktape::XS->new();
+
     $duk->set('global_name', [1, 2, 3]);
     $duk->set('my.object.slot', { foo => [ 4, 5 ] });
     $duk->set('function_name', sub { my @args = @_; return \@args; });
+
     my $aref = $duk->get('global_name');
+
     my $returned = $duk->eval('function_name(my.object.slot)');
+
+    $duk->dispatch_function_in_event_loop('function_name');
+
+    my $stats = $duk->get_stats(); # returns a hashref
 
 =head1 DESCRIPTION
 
@@ -52,6 +59,8 @@ This module provides an XS wrapper to call Duktape from Perl.
 =head2 eval
 
 =head2 dispatch_function_in_event_loop
+
+=head2 get_stats
 
 =head1 SEE ALSO
 

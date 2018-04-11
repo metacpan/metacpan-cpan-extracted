@@ -58,7 +58,7 @@
          "web" : "https://github.com/pablrod/p5-Devel-IPerl-Plugin-Chart-Plotly"
       }
    },
-   "version" : "0.003",
+   "version" : "0.005",
    "x_contributors" : [
       "Roy Storey <kiwiroy@users.noreply.github.com>"
    ]

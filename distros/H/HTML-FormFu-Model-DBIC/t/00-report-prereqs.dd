@@ -1,0 +1,48 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::More' => '0.88',
+                                      'Test::PAUSE::Permissions' => '0',
+                                      'Test::Perl::Critic' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'DBD::SQLite' => '0',
+                                      'DBIx::Class' => '0.08108',
+                                      'HTML::FormFu' => '2.00',
+                                      'List::MoreUtils' => '0',
+                                      'MooseX::Attribute::Chained' => 'v1.0.2',
+                                      'Storable' => '0',
+                                      'Task::Weaken' => '0',
+                                      'perl' => '5.008001'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'DateTime::Format::SQLite' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Locale::Maketext' => '0',
+                                   'SQL::Translator' => '0.11016',
+                                   'Test::More' => '0.99'
+                                 }
+                 }
+     };
+  $x;
+ }

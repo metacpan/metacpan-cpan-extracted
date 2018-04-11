@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.6
+    version 1.7
 
 SYNOPSIS
 
@@ -12,7 +12,7 @@ SYNOPSIS
     
         my $jira = JIRA::Client::Automated->new($url, $user, $password);
     
-        # If your JIRA instance does not use username/password for authorization 
+        # If your JIRA instance does not use username/password for authorization
         my $jira = JIRA::Client::Automated->new($url);
     
         my $jira_ua = $jira->ua(); # to add in a proxy
@@ -84,7 +84,7 @@ large and a little complex for the beginner. Reading their tutorials is
 *highly* recommended before you start making hashes to update or transition
 issues.
 
-    https://developer.atlassian.com/display/JIRADEV/JIRA+REST+APIs
+    https://developer.atlassian.com/cloud/jira/platform/rest/#about
 
     This module was designed for the JIRA 5.2.11 REST API, as of March
     2013, but it works fine with JIRA 6.0 as well. Your mileage may vary
@@ -95,7 +95,8 @@ JIRA ISSUE HASH FORMAT
     When you work with an issue in JIRA's REST API, it gives you a JSON
     file that follows this spec:
 
-    https://developer.atlassian.com/display/JIRADEV/The+Shape+of+an+Issue+in+JIRA+REST+APIs
+    https://developer.atlassian.com/cloud/jira/platform/rest/#api-api-2-iss
+    ue-post
 
     JIRA::Client::Automated tries to be nice to you and not make you deal
     directly with JSON. When you create a new issue, you can pass in just
@@ -212,7 +213,8 @@ METHODS
         }
 
     See also
-    https://developer.atlassian.com/display/JIRADEV/JIRA+REST+API+Example+-+Create+Issue
+    https://developer.atlassian.com/cloud/jira/platform/rest/#api-api-2-iss
+    ue-post
 
  create_issue
 
@@ -272,8 +274,7 @@ METHODS
 
     For more information see:
 
-        https://developer.atlassian.com/display/JIRADEV/JIRA+REST+API+Example+-+Edit+issues
-        https://developer.atlassian.com/display/JIRADEV/Updating+an+Issue+via+the+JIRA+REST+APIs
+        L<https://developer.atlassian.com/cloud/jira/platform/rest/#api-api-2-issue-issueIdOrKey-put>
 
  get_issue
 
@@ -577,6 +578,8 @@ CREDITS
     Roy Lyons <Roy.Lyons@cmegroup.com>
 
     Neil Hemingway <hemingway@cpan.org>
+
+    Andreas Mager <amager@barracuda.com>
 
 COPYRIGHT AND LICENSE
 

@@ -44,10 +44,10 @@ no_index:
 provides:
   Dist::Zilla::Plugin::MetaProvides::Update:
     file: lib/Dist/Zilla/Plugin/MetaProvides/Update.pm
-    version: '0.006'
+    version: '0.007'
   Dist::Zilla::PluginBundle::Git::VersionManager:
     file: lib/Dist/Zilla/PluginBundle/Git/VersionManager.pm
-    version: '0.006'
+    version: '0.007'
 requires:
   CPAN::Meta::Requirements: '0'
   Dist::Zilla::Plugin::BumpVersionAfterRelease: '0.016'
@@ -79,7 +79,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Git-VersionManager
   homepage: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Git-VersionManager
   repository: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Git-VersionManager.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.027010'
@@ -454,7 +454,7 @@ x_Dist_Zilla:
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000033'
-          version: '0.005'
+          version: '0.006'
       name: '@Author::ETHER/MetaProvides::Package'
       version: '2.004003'
     -
@@ -564,7 +564,7 @@ x_Dist_Zilla:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000033'
-          version: '0.005'
+          version: '0.006'
       name: '@Author::ETHER/CheckSelfDependency'
       version: '0.011'
     -
@@ -724,7 +724,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaProvides::Update
       name: '@Author::ETHER/@Git::VersionManager/MetaProvides::Update'
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -764,7 +764,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.006
+          tag: v0.007
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -906,7 +906,7 @@ x_Dist_Zilla:
           no_forced_deps: 0
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000033'
-          version: '0.005'
+          version: '0.006'
       name: Test::CheckBreaks
       version: '0.019'
     -

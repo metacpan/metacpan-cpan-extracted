@@ -12,32 +12,28 @@ use Test::BDD::Cucumber::Definitions::Validator qw(:all);
 use Test::More;
 use Try::Tiny;
 
-our $VERSION = '0.31';
+our $VERSION = '0.34';
 
-our @EXPORT_OK = qw(
-    http_response_content_read_zip
-);
-our %EXPORT_TAGS = (
-    util => [
-        qw(
-            http_response_content_read_zip
-            )
-    ]
-);
+our @EXPORT_OK = qw(Zip);
 
 ## no critic [Subroutines::RequireArgUnpacking]
 
-sub http_response_content_read_zip {
+sub Zip {
+    return __PACKAGE__;
+}
+
+sub read_http_response_content_as_zip {
+    my $self = shift;
+
+    S->{Zip} = __PACKAGE__;
 
     # Clean archive
-    S->{zip}->{archive} = undef;
+    S->{_Zip}->{archive} = undef;
 
     my $error;
 
-    my $decoded_content = S->{http}->{response_object}->decoded_content();
-
-    S->{zip}->{archive} = try {
-        my $fh = IO::String->new( \$decoded_content );
+    S->{_Zip}->{archive} = try {
+        my $fh = IO::String->new( \S->{HTTP}->content() );
 
         # The default error handler is the Carp::carp function (warning, not an exception)
         Archive::Zip::setErrorHandler( sub { die @_ } );    ## no critic [ErrorHandling::RequireCarping]
@@ -53,17 +49,20 @@ sub http_response_content_read_zip {
         return;
     };
 
-    if ($error) {
-        fail(qq{Http response content was read as Zip});
+    if ( !ok( !$error, qq{Http response content was read as Zip} ) ) {
         diag($error);
-    }
-    else {
-        pass(qq{Http response content was read as Zip});
+        diag( 'Http response content = ' . np S->{HTTP}->content );
+
+        return;
     }
 
-    diag( 'Http response content = ' . np $decoded_content );
+    return 1;
+}
 
-    return;
+sub member_names {
+    my $self = shift;
+
+    return S->{_Zip}->{archive}->memberNames();
 }
 
 1;

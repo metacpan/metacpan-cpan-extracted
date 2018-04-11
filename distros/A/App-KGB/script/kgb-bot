@@ -1649,7 +1649,9 @@ sub webhook_request {
 
     # form a CGI-like param hash
     my $param = { map( ( $_ => [] ), @array_webhook_params ) };
-    $param->{always_squash_branch} = [ qw( upstream upstream/master ) ];
+    $param->{always_squash_branch} = [qw( upstream upstream/master )];
+    $param->{shorten_urls}         = 1;
+    $param->{use_irc_notices}      = 1;
     my $uri = URI->new( $request->url );
     my @query = $request->uri->query_form;
     while ( my( $key, $value ) = splice( @query, 0, 2 ) ) {
@@ -1660,8 +1662,6 @@ sub webhook_request {
             $param->{$key} = $value;
         }
     }
-
-    $param->{use_irc_notices} = 1 unless exists $param->{use_irc_notices};
 
     my @channels = @{ $param->{channel} };
     s/^(?!#)/#/ for @channels;
@@ -1696,6 +1696,9 @@ my $shortener_loaded = 0;
 
 sub shorten_url {
     my $url = shift;
+    my $opts = shift;
+
+    return monkey_shorten_git_hashes($url) unless $opts->{shorten_urls};
 
     my $service = $KGB::config->{short_url_service}
         or return monkey_shorten_git_hashes($url);
@@ -1875,6 +1878,36 @@ sub gitlab_webhook_push {
         if exists $opts->{use_color}
         and not $opts->{use_color};
 
+    my $branch = $body->{ref};
+    $branch =~ s{^refs/heads/}{};
+
+    my $rev_prefix = $opts->{rev_prefix} // '';
+
+    if ( $body->{after} =~ /^0+$/ ) {
+        # branch deleted
+        my @info;
+        push @info, colorize( author => $body->{user_name} )
+            if $body->{user_name};
+        push @info, colorize( branch => $branch ) if $branch;
+        push @info,
+            "$rev_prefix"
+            . colorize( revision => substr( $body->{before}, 0, 7 ) )
+            if $body->{before};
+        push @info, colorize( module => $module ) if $module ne '';
+        push @info, colorize( deletion => '.' );
+        push @info, colorize( separator => '*' ), 'branch deleted';
+
+        to_irc(
+            {   kernel     => $kernel,
+                strings    => [ join( ' ', @info ) ],
+                repository => $body->{project}{namespace},
+                opts       => $opts,
+            }
+        );
+
+        return;
+    }
+
     unless ($body->{commits}
         and ref( $body->{commits} )
         and ref( $body->{commits} ) eq 'ARRAY'
@@ -1883,11 +1916,6 @@ sub gitlab_webhook_push {
         KGB->out("Got invalid or empty 'commits' for module '$module'");
         return;
     }
-
-    my $branch = $body->{ref};
-    $branch =~ s{^refs/heads/}{};
-
-    my $rev_prefix = $opts->{rev_prefix} // '';
 
     my $max_commits = $opts->{squash_threshold} // 20;
     $max_commits = 20 unless $max_commits and $max_commits =~ /^\d\d?$/;
@@ -1927,7 +1955,8 @@ sub gitlab_webhook_push {
                     '%s/compare/%s...%s',
                     $body->{project}{homepage}, $body->{before},
                     $body->{after},
-                )
+                ),
+                $opts
             )
             );
 
@@ -2008,7 +2037,7 @@ sub gitlab_webhook_push {
 
         my $web_string =
             $commit->{url}
-            ? colorize( web => shorten_url( $commit->{url} ) )
+            ? colorize( web => shorten_url( $commit->{url}, $opts ) )
             : undef;
 
         my @log = split( /\n/, $commit->{message} );
@@ -2078,7 +2107,8 @@ sub gitlab_webhook_wiki_page {
 
     my @string = join( ' ', @info );
 
-    my $web_string = $url ? colorize( web => shorten_url($url) ) : undef;
+    my $web_string =
+        $url ? colorize( web => shorten_url( $url, $opts ) ) : undef;
 
     my @log = split( /\n/, $body->{object_attributes}{message} // '' );
     # for multi-line commit log, emit only the first line if the second one
@@ -2131,23 +2161,36 @@ sub gitlab_webhook_tag_push {
     $branch = 'signed tags'
         if $message =~ s/-----BEGIN PGP SIGNATURE-----.*//s;
 
+    my $rev = $body->{after};
+    my $web_string;
+    my $action;
+
+    if ( $rev =~ /^0+$/ ) {
+        $action = 'deletion';
+        $message = 'tag deleted';
+        $rev = $body->{before};
+    }
+    else {
+        $action = 'addition';
+        $web_string = $body->{project}{homepage}
+            ? colorize(
+            web => shorten_url(
+                sprintf( '%s/tags/%s', $body->{project}{homepage}, $tag ), $opts
+            )
+            )
+            : undef;
+    }
+
     my @info;
 
     push @info, colorize( author => $body->{user_name} );
     push @info, colorize( branch => $branch );
     push @info,
-        $rev_prefix . colorize( revision => substr( $body->{after}, 0, 7 ) );
+        $rev_prefix . colorize( revision => substr( $rev, 0, 7 ) );
     push @info, colorize( module => $module ) if $module ne '';
-    push @info, colorize( addition => $tag ) if $tag ne '';
+    push @info, colorize( $action => $tag ) if $tag ne '';
 
     my @string = join( ' ', @info );
-
-    my $web_string =
-        $body->{project}{homepage}
-        ? colorize( web => shorten_url(
-            sprintf( '%s/tags/%s', $body->{project}{homepage}, $tag )
-        ) )
-        : undef;
 
     my @log = split( /\n/, $message );
     # for multi-line commit log, emit only the first line if the second one
@@ -2229,7 +2272,8 @@ sub gitlab_webhook_issue {
     else {
         push @string, @log;
     }
-    my $web_string = $url ? colorize( web => shorten_url($url) ) : undef;
+    my $web_string =
+        $url ? colorize( web => shorten_url( $url, $opts ) ) : undef;
 
     $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $web_string
         if defined($web_string);
@@ -2293,7 +2337,8 @@ sub gitlab_webhook_note {
 
     my @string = join( ' ', @info );
 
-    my $web_string = $url ? colorize( web => shorten_url($url) ) : undef;
+    my $web_string =
+        $url ? colorize( web => shorten_url( $url, $opts ) ) : undef;
 
     $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $web_string
         if defined($web_string);
@@ -2319,10 +2364,10 @@ sub gitlab_webhook_merge_request {
 
     my $url = $body->{object_attributes}{url};
 
-    my $log =
-          $body->{object_attributes}{action}
-        . ' of merge request !'
-        . $body->{object_attributes}{iid};
+    my $action = $body->{object_attributes}{action} || 'unspecified action';
+
+    my $log = sprintf( '[%s] merge request !%s',
+        $action, $body->{object_attributes}{iid} );
 
     my @info;
 
@@ -2330,13 +2375,12 @@ sub gitlab_webhook_merge_request {
     push @info, colorize( branch => $body->{object_attributes}{target_branch} )
         if $body->{object_attributes}{target_branch};
     push @info, colorize( module => $module ) if $module ne '';
-    push @info, colorize( revision => '!' . $body->{object_attributes}{iid} )
-        if $body->{object_attributes}{iid};
     push @info, colorize( separator => '*' ) . ' ' . $log;
 
     my @string = join( ' ', @info );
 
-    my $web_string = $url ? colorize( web => shorten_url($url) ) : undef;
+    my $web_string =
+        $url ? colorize( web => shorten_url( $url, $opts ) ) : undef;
 
     $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $web_string
         if defined($web_string);

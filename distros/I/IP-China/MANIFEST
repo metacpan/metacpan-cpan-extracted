@@ -2,7 +2,6 @@ block-china-data.c
 block-china-data.h
 Changes
 China.xs
-clean.pl
 examples/synopsis.pl
 ip-tools.c
 ip-tools.h

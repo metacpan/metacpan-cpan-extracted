@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 2.05
+    version 2.06
 
 SYNOPSIS
 
@@ -35,7 +35,7 @@ SYNOPSIS
         use Moose;
         extends 'Catalyst::Controller::HTML::FormFu';
     
-        sub user : FormFuChained CaptureArgs(1) {
+        sub user : Chained CaptureArgs(1) {
             my ( $self, $c, $id ) = @_;
     
             my $rs = $c->model('Schema')->resultset('User');
@@ -45,7 +45,7 @@ SYNOPSIS
             return;
         }
     
-        sub edit : FormFuChained('user') Args(0) FormConfig {
+        sub edit : Chained('user') Args(0) FormConfig {
             my ( $self, $c ) = @_;
     
             my $form = $c->stash->{form};
@@ -1985,7 +1985,7 @@ SUPPORT
 BUGS
 
     Please submit bugs / feature requests to
-    http://code.google.com/p/html-formfu/issues/list (preferred) or
+    https://github.com/FormFu/HTML-FormFu/issues (preferred) or
     http://rt.perl.org.
 
 PATCHES
@@ -1999,9 +1999,9 @@ PATCHES
 GITHUB REPOSITORY
 
     This module's sourcecode is maintained in a git repository at
-    git://github.com/fireartist/HTML-FormFu.git
+    git://github.com/FormFu/HTML-FormFu.git
 
-    The project page is https://github.com/fireartist/HTML-FormFu
+    The project page is https://github.com/FormFu/HTML-FormFu
 
 SEE ALSO
 
@@ -2010,10 +2010,6 @@ SEE ALSO
     Catalyst::Controller::HTML::FormFu
 
     HTML::FormFu::Model::DBIC
-
-AUTHORS
-
-    Carl Franks
 
 CONTRIBUTORS
 
@@ -2048,12 +2044,14 @@ CONTRIBUTORS
     Based on the original source code of HTML::Widget, by Sebastian Riedel,
     sri@oook.de.
 
-LICENSE
+AUTHOR
 
-    This library is free software, you can redistribute it and/or modify it
-    under the same terms as Perl itself.
+    Carl Franks <cpan@fireartist.com>
 
-PERL GAME
+COPYRIGHT AND LICENSE
 
-    Play the MMO written in perl: http://www.lacunaexpanse.com!
+    This software is copyright (c) 2018 by Carl Franks.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

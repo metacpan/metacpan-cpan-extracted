@@ -30,6 +30,9 @@ verify the interactions with your mocks. Use L<Test::Mockify::Sut|Test::Mockify:
 
 You can find a Example Project in L<ExampleProject|https://github.com/ChristianBreitkreutz/Mockify/tree/master/t/ExampleProject>
 
+It is possible to use alternative constructor name
+  my $MockObjectBuilder = Test::Mockify->new('SampleLogger', [], 'create');
+
 =head1 METHODS
 
 =cut
@@ -46,23 +49,24 @@ use Sub::Override;
 
 use strict;
 
-our $VERSION = '2.2';
+our $VERSION = '2.3';
 
 sub new {
     my $class = shift;
-    my ( $FakeModulePath, $aFakeParams ) = @_;
+    my ( $FakeModulePath, $aFakeParams, $AlternativeConstructorName ) = @_;
 
     my $self = bless {}, $class;
 
+    $AlternativeConstructorName //= 'new';
     LoadPackage( $FakeModulePath );
-    if(!$FakeModulePath->can('new')){
+    if(!$FakeModulePath->can($AlternativeConstructorName)){
         if(defined $aFakeParams ){
             Error("'$FakeModulePath' have no constructor. If you like to create a mock of a package without constructor please use it without parameter list");
         }else{
             $self->{'MockStaticModule'} = 1;
         }
     }
-    my $FakeClass = $aFakeParams ? $FakeModulePath->new( @{$aFakeParams} ) : $FakeModulePath;
+    my $FakeClass = $aFakeParams ? $FakeModulePath->$AlternativeConstructorName( @{$aFakeParams} ) : $FakeModulePath;
     $self->_mockedModulePath($FakeModulePath);
     $self->_mockedSelf(Test::MockObject::Extends->new( $FakeClass ));
     $self->_initMockedModule();
@@ -156,6 +160,7 @@ sub mock {
 
     my $ParameterAmount = scalar @Parameters;
     if($ParameterAmount == 1 && IsString($Parameters[0]) ){
+        $self->{'__UsedSubMock'} = 1;
         return $self->_addMockWithMethod($Parameters[0]);
     }else{
         Error('"mock" Needs to be called with one Parameter which needs to be a String. ');
@@ -292,7 +297,9 @@ sub _buildMockSub{
     # So the $MockedSelf needs to be resolved outside of the sub lexical scope.
     my $MethodCallCounter = \$MockedSelf->{'__MethodCallCounter'};
     my $MockifyParamsStore = \$MockedSelf->{$MethodName.'_MockifyParams'};
+    my $MustUseShift = $self->{'__UsedSubMock'};
     return sub {
+            shift @_ if($MustUseShift);
             ${$MethodCallCounter}->increment( $MethodName );
             my @MockedParameters = @_;
             push( @{${$MockifyParamsStore}}, \@MockedParameters );
@@ -325,7 +332,7 @@ sub _overrideInternalFunction {
     my ($MethodName, $MockedMethodBody) = @_;
 
     my $FullyQualifiedMethodName = sprintf('%s::%s', $self->_mockedModulePath(), $MethodName);
-    $self->_replaceWithPrototype($FullyQualifiedMethodName, $self->$MockedMethodBody);
+    $self->_replaceWithPrototype($FullyQualifiedMethodName, $MockedMethodBody);
 
     return;
 }

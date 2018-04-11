@@ -1,5 +1,11 @@
 Revision history for Perl extension X11::Xlib.
 
+0.17 - 2018-04-10
+    - If Xrender.h is not available, fall back to local definitions
+      (allows XRenderPictFormat module even if header isn't installed)
+    - Another tweak for window properties
+    - Doc improvements
+
 0.16 - 2017-07-16
     - Tweak testcases for window properties, which failed on some systems
 

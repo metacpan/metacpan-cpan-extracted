@@ -33,15 +33,17 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "7.71",
+            "Mojo::SQLite" : "3.000",
+            "Mojolicious" : "7.74",
+            "Mojolicious::Plugin::Authentication" : "1.32",
+            "Mojolicious::Plugin::OpenAPI" : "1.25",
+            "Mojolicious::Plugin::RoutesConfig" : "0.05",
+            "Role::Tiny" : "2.000006",
             "perl" : "5.020000"
          }
       },
       "test" : {
-         "requires" : {
-            "Mojo::SQLite" : "3.000",
-            "Mojolicious::Plugin::OpenAPI" : "1.25"
-         }
+         "requires" : {}
       }
    },
    "release_status" : "stable",
@@ -59,6 +61,6 @@
          "web" : "https://github.com/kberov/Slovo"
       }
    },
-   "version" : "v2018.03.24",
+   "version" : "v2018.04.09",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

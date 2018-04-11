@@ -10,6 +10,8 @@ use FindBin;
 use lib $FindBin::Bin;
 
 # JIPS(J)
+require 'JIPS/JIPSJ_by_CP932.pl';
+require 'Unicode/Unicode_by_CP932.pl';
 require 'JIS/JIS78GL_by_JIS83GL.pl';
 require 'JIS/JISX0208GL_by_SJIS.pl';
 require 'JIS/JISX0208GL_by_CP932.pl';
@@ -178,6 +180,7 @@ my %JIPSJ_by_Unicode_OVERRIDE = (
 );
 
 my %unicode = map { $_ => 1 } (
+    (map { Unicode_by_CP932($_) } keys_of_JIPSJ_by_CP932()),
     keys_of_NEC_CP932_by_Unicode(),
     keys_of_JIPSJ_by_Unicode_CultiCoLtd(),
     keys %JIPSJ_by_Unicode_OVERRIDE,
@@ -192,34 +195,43 @@ for my $unicode (sort { (length($a) <=> length($b)) || ($a cmp $b) } keys %unico
 
     my $char = pack('H*',CP932_by_Unicode($unicode));
 
+    # NEC Corporation Standard character set dictionary <BASIC>
+    # Document number ZBB10-3
+    # NEC Corporation Standard character set dictionary <EXTENSION>
+    # Document number ZBB11-2
+    if ((JIPSJ_by_CP932(CP932_by_Unicode($unicode)) ne '') and not $done{JIPSJ_by_CP932(CP932_by_Unicode($unicode))}) {
+        $done{$JIPSJ_by_Unicode{$unicode} = JIPSJ_by_CP932(CP932_by_Unicode($unicode))} = 1;
+printf DUMP "%-4s %-9s %-4s %-4s %-4s %-4s %-4s %-4s $char\n", JIPSJ_by_CP932(CP932_by_Unicode($unicode)), $unicode, JIPSJ_by_CP932(CP932_by_Unicode($unicode)), '----', '----', '----', '----', '----', '----', '----', '----';
+    }
+
     # override (not defined)
-    if (exists($JIPSJ_by_Unicode_OVERRIDE{$unicode}) and ($JIPSJ_by_Unicode_OVERRIDE{$unicode} eq '')) {
+    elsif (exists($JIPSJ_by_Unicode_OVERRIDE{$unicode}) and ($JIPSJ_by_Unicode_OVERRIDE{$unicode} eq '')) {
         $done{$JIPSJ_by_Unicode_OVERRIDE{$unicode}} = 1;
-printf DUMP "%-4s %-9s %-4s %-4s %-4s %-4s %-4s %-4s $char\n", $JIPSJ_by_Unicode{$unicode}, $unicode, $JIPSJ_by_Unicode_OVERRIDE{$unicode}, '----', '----', '----', '----', '----';
+printf DUMP "%-4s %-9s %-4s %-4s %-4s %-4s %-4s %-4s $char\n", $JIPSJ_by_Unicode{$unicode}, $unicode, '----', $JIPSJ_by_Unicode_OVERRIDE{$unicode}, '----', '----', '----', '----', '----', '----', '----';
     }
 
     # override (defined)
     elsif (($JIPSJ_by_Unicode_OVERRIDE{$unicode} ne '') and not $done{$JIPSJ_by_Unicode_OVERRIDE{$unicode}}) {
         $done{$JIPSJ_by_Unicode{$unicode} = $JIPSJ_by_Unicode_OVERRIDE{$unicode}} = 1;
-printf DUMP "%-4s %-9s %-4s %-4s %-4s %-4s %-4s %-4s $char\n", $JIPSJ_by_Unicode{$unicode}, $unicode, '----', $JIPSJ_by_Unicode_OVERRIDE{$unicode}, '----', '----', '----', '----';
+printf DUMP "%-4s %-9s %-4s %-4s %-4s %-4s %-4s %-4s $char\n", $JIPSJ_by_Unicode{$unicode}, $unicode, '----', '----', $JIPSJ_by_Unicode_OVERRIDE{$unicode}, '----', '----', '----', '----', '----', '----';
     }
 
     # JIS78 <-> JIS83
     elsif ((JIS78GL_by_JIS83GL(JISX0208GL_by_SJIS(NEC_CP932_by_Unicode($unicode))) ne '') and not $done{JIS78GL_by_JIS83GL(JISX0208GL_by_SJIS(NEC_CP932_by_Unicode($unicode)))}) {
         $done{$JIPSJ_by_Unicode{$unicode} = JIS78GL_by_JIS83GL(JISX0208GL_by_SJIS(NEC_CP932_by_Unicode($unicode)))} = 1;
-printf DUMP "%-4s %-9s %-4s %-4s %-4s %-4s %-4s %-4s $char\n", $JIPSJ_by_Unicode{$unicode}, $unicode, '----', '----', JIS78GL_by_JIS83GL(JISX0208GL_by_SJIS(NEC_CP932_by_Unicode($unicode))), JISX0208GL_by_SJIS(NEC_CP932_by_Unicode($unicode)), JISX0208GL_by_CP932(NEC_CP932_by_Unicode($unicode)), JIPSJ_by_Unicode_CultiCoLtd($unicode);
+printf DUMP "%-4s %-9s %-4s %-4s %-4s %-4s %-4s %-4s $char\n", $JIPSJ_by_Unicode{$unicode}, $unicode, '----', '----', '----', JIS78GL_by_JIS83GL(JISX0208GL_by_SJIS(NEC_CP932_by_Unicode($unicode))), JISX0208GL_by_SJIS(NEC_CP932_by_Unicode($unicode)), JISX0208GL_by_CP932(NEC_CP932_by_Unicode($unicode)), JIPSJ_by_Unicode_CultiCoLtd($unicode), '----', '----';
     }
 
     # JIS C 6226-1978 by SJIS
     elsif ((JISX0208GL_by_SJIS(NEC_CP932_by_Unicode($unicode)) ne '') and not $done{JISX0208GL_by_SJIS(NEC_CP932_by_Unicode($unicode))}) {
         $done{$JIPSJ_by_Unicode{$unicode} = JISX0208GL_by_SJIS(NEC_CP932_by_Unicode($unicode))} = 1;
-printf DUMP "%-4s %-9s %-4s %-4s %-4s %-4s %-4s %-4s $char\n", $JIPSJ_by_Unicode{$unicode}, $unicode, '----', '----', JIS78GL_by_JIS83GL(JISX0208GL_by_SJIS(NEC_CP932_by_Unicode($unicode))), JISX0208GL_by_SJIS(NEC_CP932_by_Unicode($unicode)), JISX0208GL_by_CP932(NEC_CP932_by_Unicode($unicode)), JIPSJ_by_Unicode_CultiCoLtd($unicode);
+printf DUMP "%-4s %-9s %-4s %-4s %-4s %-4s %-4s %-4s $char\n", $JIPSJ_by_Unicode{$unicode}, $unicode, '----', '----', '----', '----', JIS78GL_by_JIS83GL(JISX0208GL_by_SJIS(NEC_CP932_by_Unicode($unicode))), JISX0208GL_by_SJIS(NEC_CP932_by_Unicode($unicode)), JISX0208GL_by_CP932(NEC_CP932_by_Unicode($unicode)), JIPSJ_by_Unicode_CultiCoLtd($unicode), '----';
     }
 
     # JIS X 0213:2004
     elsif ((JIPSJ_by_Unicode_CultiCoLtd($unicode) ne '') and not $done{JIPSJ_by_Unicode_CultiCoLtd($unicode)}) {
         $done{$JIPSJ_by_Unicode{$unicode} = JIPSJ_by_Unicode_CultiCoLtd($unicode)} = 1;
-printf DUMP "%-4s %-9s %-4s %-4s %-4s %-4s %-4s %-4s $char\n", $JIPSJ_by_Unicode{$unicode}, $unicode, '----', '----', JIS78GL_by_JIS83GL(JISX0208GL_by_SJIS(NEC_CP932_by_Unicode($unicode))), JISX0208GL_by_SJIS(NEC_CP932_by_Unicode($unicode)), JISX0208GL_by_CP932(NEC_CP932_by_Unicode($unicode)), JIPSJ_by_Unicode_CultiCoLtd($unicode);
+printf DUMP "%-4s %-9s %-4s %-4s %-4s %-4s %-4s %-4s $char\n", $JIPSJ_by_Unicode{$unicode}, $unicode, '----', '----', '----', '----', '----', JIS78GL_by_JIS83GL(JISX0208GL_by_SJIS(NEC_CP932_by_Unicode($unicode))), JISX0208GL_by_SJIS(NEC_CP932_by_Unicode($unicode)), JISX0208GL_by_CP932(NEC_CP932_by_Unicode($unicode)), JIPSJ_by_Unicode_CultiCoLtd($unicode);
     }
 }
 

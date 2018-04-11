@@ -54,10 +54,9 @@ $chart->set_chartarea(
     fill   => { color => '#92D050' }
 );
 
-# This should be ignored for a pie chart.
 $chart->set_plotarea(
-    border => { dash_type => 'dash_dot' },
-    fill   => { color     => '#FFC000' }
+    border => { dash_type => 'square_dot' },
+    fill   => { color     => '#FF0000' }
 );
 
 $worksheet->insert_chart( 'E9', $chart );

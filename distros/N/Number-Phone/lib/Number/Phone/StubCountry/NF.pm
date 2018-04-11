@@ -22,25 +22,22 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200235;
+our $VERSION = 1.20180410221547;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2',
                   'leading_digits' => '1',
+                  'format' => '$1 $2',
                   'pattern' => '(\\d{2})(\\d{4})'
                 },
                 {
                   'leading_digits' => '3',
-                  'pattern' => '(\\d)(\\d{5})',
-                  'format' => '$1 $2'
+                  'format' => '$1 $2',
+                  'pattern' => '(\\d)(\\d{5})'
                 }
               ];
 
 my $validators = {
-                'mobile' => '3[58]\\d{4}',
-                'personal_number' => '',
-                'specialrate' => '',
                 'toll_free' => '',
                 'fixed_line' => '
           (?:
@@ -53,6 +50,9 @@ my $validators = {
             3[012]\\d
           )\\d{3}
         ',
+                'voip' => '',
+                'mobile' => '3[58]\\d{4}',
+                'specialrate' => '',
                 'geographic' => '
           (?:
             1(?:
@@ -64,8 +64,8 @@ my $validators = {
             3[012]\\d
           )\\d{3}
         ',
-                'pager' => '',
-                'voip' => ''
+                'personal_number' => '',
+                'pager' => ''
               };
 
     sub new {
@@ -73,6 +73,6 @@ my $validators = {
       my $number = shift;
       $number =~ s/(^\+672|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
-  return $self->is_valid() ? $self : undef;
-}
+        return $self->is_valid() ? $self : undef;
+    }
 1;

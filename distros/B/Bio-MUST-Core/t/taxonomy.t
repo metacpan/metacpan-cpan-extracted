@@ -109,26 +109,26 @@ my @valid_ids = (
 
     # valid ids with merged taxon_ids in NCBI Taxonomy
     [ 'Synedra acus_191585@123456',
-        'cellular organisms; Eukaryota; Stramenopiles; Bacillariophyta; Fragilariophyceae; Fragilariophycidae; Fragilariales; Fragilariaceae; Ulnaria; Ulnaria acus',
-        'cellular organisms; Eukaryota; Stramenopiles; Bacillariophyta; Fragilariophyceae; Fragilariophycidae; Fragilariales; Fragilariaceae; Ulnaria; Ulnaria acus',
-       ('cellular organisms; Eukaryota; Stramenopiles; Bacillariophyta; Fragilariophyceae; Fragilariophycidae; Fragilariales; Fragilariaceae; Ulnaria; Ulnaria acus') x 3,
+        'cellular organisms; Eukaryota; Stramenopiles; Bacillariophyta; Fragilariophyceae; Fragilariophycidae; Licmophorales; Ulnariaceae; Ulnaria; Ulnaria acus',
+        'cellular organisms; Eukaryota; Stramenopiles; Bacillariophyta; Fragilariophyceae; Fragilariophycidae; Licmophorales; Ulnariaceae; Ulnaria; Ulnaria acus',
+       ('cellular organisms; Eukaryota; Stramenopiles; Bacillariophyta; Fragilariophyceae; Fragilariophycidae; Licmophorales; Ulnariaceae; Ulnaria; Ulnaria acus') x 3,
         q{'Ulnaria acus'},
         q{'Ulnaria acus [123456]'} ],
     [ 'Oscillatoriales cyanobacterium_627090@ABCDEF',
-        'cellular organisms; Bacteria; Terrabacteria group; Cyanobacteria/Melainabacteria group; Cyanobacteria; Synechococcales; Leptolyngbyaceae; Leptolyngbya; Leptolyngbya sp. JSC-1',
+        'cellular organisms; Bacteria; Terrabacteria group; Cyanobacteria/Melainabacteria group; Cyanobacteria; unclassified Cyanobacteria; [Leptolyngbya] sp. JSC-1',
         '',
-       ('cellular organisms; Bacteria; Terrabacteria group; Cyanobacteria/Melainabacteria group; Cyanobacteria; Synechococcales; Leptolyngbyaceae; Leptolyngbya; Leptolyngbya sp. JSC-1') x 3,
-        q{'Leptolyngbya sp. JSC-1'},
-        q{'Leptolyngbya sp. JSC-1 [ABCDEF]'} ],
+       ('cellular organisms; Bacteria; Terrabacteria group; Cyanobacteria/Melainabacteria group; Cyanobacteria; unclassified Cyanobacteria; [Leptolyngbya] sp. JSC-1') x 3,
+        q{'[Leptolyngbya] sp. JSC-1'},
+        q{'[Leptolyngbya] sp. JSC-1 [ABCDEF]'} ],
     [ 'Fistulifera sp._880758@xyz789',
         'cellular organisms; Eukaryota; Stramenopiles; Bacillariophyta; Bacillariophyceae; Bacillariophycidae; Naviculales; Naviculaceae; Fistulifera; Fistulifera solaris',
-        '',
+        'cellular organisms; Eukaryota; Stramenopiles; Bacillariophyta; Bacillariophyceae; Bacillariophycidae; Naviculales; Naviculaceae; Fistulifera; Fistulifera sp.',
        ('cellular organisms; Eukaryota; Stramenopiles; Bacillariophyta; Bacillariophyceae; Bacillariophycidae; Naviculales; Naviculaceae; Fistulifera; Fistulifera solaris') x 3,
         q{'Fistulifera solaris'},
         q{'Fistulifera solaris [xyz789]'} ],
 
     # valid ids normally not found in NCBI Taxonomy (but that work due to greedy behavior)
-    [ 'Bostrichobranchus pilularis@123456',
+    [ 'Bostrichobranchus mypilularis@123456',   # mypilularis because pilularis now exists!
         '',
         '',
        ('cellular organisms; Eukaryota; Opisthokonta; Metazoa; Eumetazoa; Bilateria; Deuterostomia; Chordata; Tunicata; Ascidiacea; Stolidobranchia; Molgulidae; Bostrichobranchus') x 3,
@@ -670,6 +670,38 @@ SKIP: {
 
     is_deeply \@got_taxa, \@exp_taxa,
         'got expected taxa for seq_ids compared to a systematic frame';
+}
+
+my @lcas = (
+    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae; Streptophyta; Streptophytina; Embryophyta; Tracheophyta; Euphyllophyta; Spermatophyta; Magnoliophyta; Mesangiospermae; eudicotyledons; Gunneridae; Pentapetalae; rosids; malvids; Brassicales; Brassicaceae; Camelineae; Arabidopsis; Arabidopsis thaliana', 1 ],
+    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae; Streptophyta; Streptophytina; Embryophyta; Tracheophyta; Euphyllophyta; Spermatophyta; Magnoliophyta; Mesangiospermae; eudicotyledons; Gunneridae; Pentapetalae; rosids; malvids; Brassicales', 1 ],
+    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae; Streptophyta; Streptophytina; Embryophyta; Tracheophyta; Euphyllophyta; Spermatophyta; Magnoliophyta; Mesangiospermae; eudicotyledons', 1 ],
+    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae; Streptophyta; Streptophytina; Embryophyta', 1 ],
+    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae; Streptophyta; Streptophytina', 1 ],
+    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae; Streptophyta', 0 ],
+    [ 'Arabidopsis thaliana_3702@1', 'cellular organisms; Eukaryota; Viridiplantae', 0 ],
+);
+
+{
+    my $frfile = file('test', 'debrief42-accurate.fra');
+
+    # TODO: fix warnings due to residual dupes
+    # Warning: Actinobacteria is taxonomically ambiguous in tax_filter! at constructor Bio::MUST::Core::Taxonomy::Filter::new (defined at /Users/denis/Dropbox/Private/Development/Perl/Bio-MUST-Core/lib/Bio/MUST/Core/Taxonomy/Filter.pm line 125) line 64.
+    # Warning: Elusimicrobia is taxonomically ambiguous in tax_filter! at constructor Bio::MUST::Core::Taxonomy::Filter::new (defined at /Users/denis/Dropbox/Private/Development/Perl/Bio-MUST-Core/lib/Bio/MUST/Core/Taxonomy/Filter.pm line 125) line 64.
+    # Warning: Thermotogae is taxonomically ambiguous in tax_filter! at constructor Bio::MUST::Core::Taxonomy::Filter::new (defined at /Users/denis/Dropbox/Private/Development/Perl/Bio-MUST-Core/lib/Bio/MUST/Core/Taxonomy/Filter.pm line 125) line 64.
+    # Warning: Aquificae is taxonomically ambiguous in tax_filter! at constructor Bio::MUST::Core::Taxonomy::Filter::new (defined at /Users/denis/Dropbox/Private/Development/Perl/Bio-MUST-Core/lib/Bio/MUST/Core/Taxonomy/Filter.pm line 125) line 64.
+    # Warning: Chrysiogenetes is taxonomically ambiguous in tax_filter! at constructor Bio::MUST::Core::Taxonomy::Filter::new (defined at /Users/denis/Dropbox/Private/Development/Perl/Bio-MUST-Core/lib/Bio/MUST/Core/Taxonomy/Filter.pm line 125) line 64.
+    # Warning: Deferribacteres is taxonomically ambiguous in tax_filter! at constructor Bio::MUST::Core::Taxonomy::Filter::new (defined at /Users/denis/Dropbox/Private/Development/Perl/Bio-MUST-Core/lib/Bio/MUST/Core/Taxonomy/Filter.pm line 125) line 64.
+    # Warning: Thermodesulfobacteria is taxonomically ambiguous in tax_filter! at constructor Bio::MUST::Core::Taxonomy::Filter::new (defined at /Users/denis/Dropbox/Private/Development/Perl/Bio-MUST-Core/lib/Bio/MUST/Core/Taxonomy/Filter.pm line 125) line 64.
+    # Warning: Gemmatimonadetes is taxonomically ambiguous in tax_filter! at constructor Bio::MUST::Core::Taxonomy::Filter::new (defined at /Users/denis/Dropbox/Private/Development/Perl/Bio-MUST-Core/lib/Bio/MUST/Core/Taxonomy/Filter.pm line 125) line 64.
+
+    my $classifier = $tax->classifier_from_systematic_frame($frfile);
+
+    for my $exp_row (@lcas) {
+        my ($org, $lca, $exp) = @{$exp_row}[0..2];
+        cmp_ok $tax->eq_tax($org, $lca, $classifier), '==', $exp,
+            "got expected result for eq_tax with $lca";
+    }
 }
 
 # {

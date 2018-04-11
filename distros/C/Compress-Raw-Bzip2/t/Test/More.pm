@@ -17,7 +17,7 @@ sub _carp {
 
 
 require Exporter;
-our ($VERSION, @ISA, @EXPORT, %EXPORT_TAGS, $TODO);
+use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS $TODO);
 $VERSION = '0.60';
 $VERSION = eval $VERSION;    # make the alpha version come out as a number
 
@@ -1003,7 +1003,7 @@ along these lines.
 
 =cut
 
-our (@Data_Stack, %Refs_Seen);
+use vars qw(@Data_Stack %Refs_Seen);
 my $DNE = bless [], 'Does::Not::Exist';
 sub is_deeply {
     unless( @_ == 2 or @_ == 3 ) {

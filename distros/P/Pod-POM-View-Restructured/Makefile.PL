@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.006000;
 
 use ExtUtils::MakeMaker;
 
@@ -17,16 +17,45 @@ my %WriteMakefileArgs = (
     "bin/pod2rst"
   ],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.006000",
   "NAME" => "Pod::POM::View::Restructured",
-  "PREREQ_PM" => {},
-  "VERSION" => "1.000",
+  "PREREQ_PM" => {
+    "Carp" => 0,
+    "Data::Dumper" => 0,
+    "ExtUtils::MakeMaker" => "6.48",
+    "Getopt::Long" => 0,
+    "Pod::POM" => 0,
+    "Pod::POM::View::Text" => 0,
+    "base" => 0,
+    "bytes" => 0,
+    "strict" => 0,
+    "warnings" => 0
+  },
+  "TEST_REQUIRES" => {
+    "File::Spec" => 0,
+    "Test::More" => 0
+  },
+  "VERSION" => "1.000001",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "Carp" => 0,
+  "Data::Dumper" => 0,
+  "ExtUtils::MakeMaker" => "6.48",
+  "File::Spec" => 0,
+  "Getopt::Long" => 0,
+  "Pod::POM" => 0,
+  "Pod::POM::View::Text" => 0,
+  "Test::More" => 0,
+  "base" => 0,
+  "bytes" => 0,
+  "strict" => 0,
+  "warnings" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

@@ -25,13 +25,14 @@ requires:
   Carp: '0'
   Digest::MD5: '0'
   HTTP::Method: '0'
+  HTTP::Status: '6.16'
   List::MoreUtils: '0'
-  Monkey::Patch::Action: '0'
   Moo: '0'
   MooX::Types::MooseLike::Base: '0'
   Time::HiRes: '0'
+  URI: '0'
   perl: '5.006'
 resources:
   repository: https://github.com/THEMA-MEDIA/HTTP-Caching.git
-version: '0.11'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

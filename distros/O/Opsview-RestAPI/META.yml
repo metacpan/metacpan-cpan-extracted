@@ -6,6 +6,7 @@ build_requires:
   File::Basename: '0'
   File::Temp: '0'
   FindBin: '0'
+  POSIX: '0'
   Storable: '0'
   Test::Deep: '0'
   Test::More: '0'
@@ -30,5 +31,5 @@ requires:
   perl: v5.12.1
   strict: '0'
   warnings: '0'
-version: '1.180580'
+version: '1.181000'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,7 +1,8 @@
-package HTML::FormFu::Element::Number;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Element::Number;
+$HTML::FormFu::Element::Number::VERSION = '2.06';
+# ABSTRACT: Number element with formatting
 
 use Moose;
 
@@ -35,13 +36,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Element::Number - Number element with formatting
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -51,7 +56,6 @@ version 2.05
       locale: de_DE
       precision: 2
       trailing_zeroes: 1
-
 
 =head1 DESCRIPTION
 
@@ -93,3 +97,16 @@ L<HTML::FormFu/locale>
 =head1 AUTHOR
 
 Moritz Onken C< onken at houseofdesign.de >
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

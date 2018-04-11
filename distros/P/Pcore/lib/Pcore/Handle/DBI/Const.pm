@@ -262,16 +262,26 @@ sub get_query ( $self, $dbh, $final, $i ) {
 
         # ScalarRef value is processed as parameter
         elsif ( is_plain_scalarref $token ) {
-            push @sql, '$' . $i->$*++;
+            if ( defined $i ) {
+                push @sql, '$' . $i->$*++;
 
-            push @bind, $token->$*;
+                push @bind, $token->$*;
+            }
+            else {
+                push @sql, $dbh->quote( $token->$* );
+            }
         }
 
         # ArrayRef value is processed as parameter with type
         elsif ( is_arrayref $token ) {
-            push @sql, '$' . $i->$*++;
+            if ( defined $i ) {
+                push @sql, '$' . $i->$*++;
 
-            push @bind, $token;
+                push @bind, $token;
+            }
+            else {
+                push @sql, $dbh->quote($token);
+            }
         }
         else {
             die 'Unsupported ref type';
@@ -284,6 +294,12 @@ sub get_query ( $self, $dbh, $final, $i ) {
     else {
         return join( q[ ], @sql ), \@bind;
     }
+}
+
+sub get_quoted ( $self, $dbh ) {
+    my ( $sql, $bind ) = $self->get_query( $dbh, 0, undef );
+
+    return $sql;
 }
 
 # SET
@@ -360,7 +376,7 @@ sub get_query ( $self, $dbh, $final, $i ) {
 package Pcore::Handle::DBI::_VALUES;
 
 use Pcore -class;
-use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_arrayref is_plain_arrayref is_plain_hashref];
+use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_arrayref is_plain_arrayref is_plain_hashref is_blessed_hashref];
 
 has _buf => ( is => 'ro', isa => ArrayRef, required => 1 );
 
@@ -384,6 +400,11 @@ sub get_query ( $self, $dbh, $final, $i ) {
                 if ( !is_ref $token->{$field} || is_arrayref $token->{$field} ) {
                     push @row, $dbh->quote( $token->{$field} );
                 }
+
+                # object
+                elsif ( is_blessed_hashref $token->{$field} ) {
+                    push @row, $token->{$field}->get_quoted($dbh);
+                }
                 else {
                     die 'Unsupported ref type';
                 }
@@ -402,6 +423,11 @@ sub get_query ( $self, $dbh, $final, $i ) {
                 # Scalar or ArrayRef value is processed as parameter
                 if ( !is_ref $field || is_arrayref $field ) {
                     push @row, $dbh->quote($field);
+                }
+
+                # object
+                elsif ( is_blessed_hashref $field ) {
+                    push @row, $field->get_quoted($dbh);
                 }
                 else {
                     die 'Unsupported ref type';
@@ -727,9 +753,9 @@ sub get_query ( $self, $dbh, $final, $i ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 185                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 500                  | Subroutines::ProhibitExcessComplexity - Subroutine "get_query" with high complexity score (34)                 |
+## |    3 | 526                  | Subroutines::ProhibitExcessComplexity - Subroutine "get_query" with high complexity score (34)                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 582                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 608                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

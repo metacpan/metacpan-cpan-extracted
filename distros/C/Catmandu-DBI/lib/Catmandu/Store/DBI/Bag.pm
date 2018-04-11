@@ -5,7 +5,7 @@ use Moo;
 use Catmandu::Store::DBI::Iterator;
 use namespace::clean;
 
-our $VERSION = "0.0701";
+our $VERSION = "0.0702";
 
 my $default_mapping = {
     _id => {
@@ -246,8 +246,8 @@ Catmandu::Store::DBI::Bag - implementation of a Catmandu::Bag for DBI
         #But this does not
         my $iterator2 = $iterator->select( title => "Hello world" );
 
-        #'title' does not have a corresponding table column, so it uses $iterator as iterator,
-        #and loops over every record
+        #'title' does not have a corresponding table column, so it falls back to the default implementation,
+        #and loops over every record.
 
     }
     {
@@ -263,7 +263,7 @@ Catmandu::Store::DBI::Bag - implementation of a Catmandu::Bag for DBI
         #   the select statement of $iterator creates a specialized query, and so reduces the amount of records to loop over.
         #   $iterator is a L<Catmandu::Store::DBI::Iterator>.
 
-        #   the select statement of $iterator2 does not have a specialized query, so its a generic L<Catmandu::Iterator>.
+        #   the select statement of $iterator2 does not have a specialized query, so it's a generic L<Catmandu::Iterator>.
         #   the second select statement of $iterator2 receives this generic object as its source, and can only loop over its records.
 
     }

@@ -1,5 +1,5 @@
 package Test::BDD::Cucumber::I18n;
-$Test::BDD::Cucumber::I18n::VERSION = '0.53';
+$Test::BDD::Cucumber::I18n::VERSION = '0.54';
 =encoding utf8
 
 =head1 NAME
@@ -8,7 +8,7 @@ Test::BDD::Cucumber::I18N - Internationalization
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 DESCRIPTION
 

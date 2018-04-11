@@ -33,7 +33,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-DBI/issues
   homepage: https://github.com/LibreCat/Catmandu-DBI
   repository: https://github.com/LibreCat/Catmandu-DBI.git
-version: '0.0701'
+version: '0.0702'
 x_contributors:
   - 'Jakob Voss <jakob@nichtich.de>'
   - 'Nicolas Franck <nicolas.franck@ugent.be>'

@@ -1,14 +1,12 @@
 CallbackDispatcher.xsi
 Changes
 Lib.xs
-Lib.xs.orig
 lib/Panda/Lib.pm
 lib/Panda/Lib.pod
+Logger.xsi
 Makefile.PL
-Makefile.PL.orig
 MANIFEST			This list of files
 misc/mytest.plx
-misc/mytest.plx.orig
 NativeCallbackDispatcher.xsi
 src/xs/lib/clone.cc
 src/xs/lib/clone.h

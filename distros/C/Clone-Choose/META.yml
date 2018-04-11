@@ -29,5 +29,5 @@ resources:
   homepage: https://metacpan.org/release/Clone-Choose
   license: http://dev.perl.org/licenses/
   repository: https://github.com:perl5-utils/Clone-Choose.git
-version: '0.009'
+version: '0.010'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

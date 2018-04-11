@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Authen::U2F::Tester::Role::Keystore;
-$Authen::U2F::Tester::Role::Keystore::VERSION = '0.02';
+$Authen::U2F::Tester::Role::Keystore::VERSION = '0.03';
 # ABSTRACT: U2F Tester Keystore Role.
 
 use Moose::Role;
@@ -27,7 +27,7 @@ Authen::U2F::Tester::Role::Keystore - U2F Tester Keystore Role.
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -94,13 +94,17 @@ Remove the given key handle from the key store.
 
 =head1 SOURCE
 
-The development version is on github at L<https://github.com/mschout/perl-authen-u2f-tester>
-and may be cloned from L<git://github.com/mschout/perl-authen-u2f-tester.git>
+The development version is on github at L<http://https://github.com/mschout/perl-authen-u2f-tester>
+and may be cloned from L<git://https://github.com/mschout/perl-authen-u2f-tester.git>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to bug-authen-u2f-tester@rt.cpan.org or through the web interface at:
- http://rt.cpan.org/Public/Dist/Display.html?Name=Authen-U2F-Tester
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/mschout/perl-authen-u2f-tester/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 

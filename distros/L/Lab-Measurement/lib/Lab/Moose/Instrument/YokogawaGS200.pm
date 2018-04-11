@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::YokogawaGS200;
-$Lab::Moose::Instrument::YokogawaGS200::VERSION = '3.624';
+$Lab::Moose::Instrument::YokogawaGS200::VERSION = '3.630';
 #ABSTRACT: YokogawaGS200 voltage/current source.
 
 use 5.010;
@@ -189,7 +189,6 @@ sub active {
 
     my $status = $self->get_status(%args);
     if ( $status->{'EES'} == 1 ) {
-        say "not active";
         return 0;
     }
     return 1;
@@ -258,7 +257,7 @@ Lab::Moose::Instrument::YokogawaGS200 - YokogawaGS200 voltage/current source.
 
 =head1 VERSION
 
-version 3.624
+version 3.630
 
 =head1 SYNOPSIS
 
@@ -290,8 +289,11 @@ Used roles:
 =over
 
 =item L<Lab::Moose::Instrument::Common>
+
 =item L<Lab::Moose::Instrument::SCPI::Source::Function>
+
 =item L<Lab::Moose::Instrument::SCPI::Source::Range>
+
 =item L<Lab::Moose::Instrument::LinearStepSweep>
 
 =back

@@ -1,15 +1,16 @@
-package HTML::FormFu::Filter::Encode;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Filter::Encode;
+$HTML::FormFu::Filter::Encode::VERSION = '2.06';
+# ABSTRACT: Encode/Decode Submitted Values
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 extends 'HTML::FormFu::Filter';
 
 use Encode qw(encode decode FB_CROAK);
 
-has encode_to => ( is => 'rw', traits => ['FormFuChained'] );
+has encode_to => ( is => 'rw', traits => ['Chained'] );
 
 has _candidates => ( is => 'rw' );
 
@@ -87,13 +88,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Filter::Encode - Encode/Decode Submitted Values
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -125,5 +130,16 @@ All rights reserved.
 
 This library is free software, you can redistribute it and/or modify it
 under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

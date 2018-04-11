@@ -5,9 +5,9 @@ use warnings;
 
 require 5.006;
 
-use IO::Compress::Zip 2.061 qw(:all);
-use IO::Compress::Base::Common  2.061 ();
-use IO::Compress::Adapter::Deflate 2.061 ;
+use IO::Compress::Zip 2.081 qw(:all);
+use IO::Compress::Base::Common  2.081 ();
+use IO::Compress::Adapter::Deflate 2.081 ;
 
 use Fcntl ();
 use File::Spec ();
@@ -19,7 +19,7 @@ require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $SimpleZipError);
 
 $SimpleZipError= '';
-$VERSION = "0.010";
+$VERSION = "0.022";
 
 @ISA = qw(Exporter);
 @EXPORT_OK = qw( $SimpleZipError ) ;
@@ -772,7 +772,8 @@ Archive::Zip::SimpleZip - Create Zip Archives
 =head1 DESCRIPTION
 
 Archive::Zip::SimpleZip is a module that allows the creation of Zip
-archives. 
+archives. For reading Zip archives, there is a companion module, called L<Archive::Zip::SimpleUnzip>, 
+that can read Zip archives.
 
 The module allows Zip archives to be written to a named file, a filehandle
 or stored in-memory.
@@ -1733,7 +1734,7 @@ archive. For 64-bit it is 24 bytes per file.
 =head1 SEE ALSO
 
 
-L<IO::Compress::Zip>, L<Archive::Zip>, L<IO::Uncompress::UnZip>
+L<Archive::Zip::SimpleUnzip>, L<IO::Compress::Zip>, L<Archive::Zip>, L<IO::Uncompress::UnZip>
 
 
 =head1 AUTHOR
@@ -1746,7 +1747,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2012-2017 Paul Marquess. All rights reserved.
+Copyright (c) 2012-2018 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

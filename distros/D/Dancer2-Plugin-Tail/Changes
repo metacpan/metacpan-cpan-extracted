@@ -1,5 +1,9 @@
 Revision history for Dancer2-Plugin-Tail
 
+0.016   Sun Apr  8 04:59:52 GMT 2018
+        Changes to Tail.pm
+        Cleanup unit tests
+
 0.015   Thu Apr  5 07:11:34 GMT 2018
         Fixed minor changes in samples
 

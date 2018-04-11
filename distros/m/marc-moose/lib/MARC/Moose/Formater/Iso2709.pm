@@ -1,6 +1,6 @@
 package MARC::Moose::Formater::Iso2709;
 # ABSTRACT: MARC::Moose record formater into ISO 2709 format
-$MARC::Moose::Formater::Iso2709::VERSION = '1.0.34';
+$MARC::Moose::Formater::Iso2709::VERSION = '1.0.35';
 use Moose;
 use Modern::Perl;
 
@@ -27,11 +27,11 @@ override 'format' => sub {
                 $str = $field->ind1 . $field->ind2 . $str . "\x1E";
             }
         };
-        utf8::encode($str) unless utf8::is_utf8($str);
+        #utf8::encode($str) unless utf8::is_utf8($str);
         $fields .= $str;
         #FIXME: Which of this lines is the correct one?
-        my $len = bytes::length($str);
-        #my $len = length($str);
+        #my $len = bytes::length($str);
+        my $len = length($str);
         $directory .= sprintf( "%03s%04d%05d", $field->tag, $len, $from );
         $from += $len;
     }
@@ -61,7 +61,7 @@ MARC::Moose::Formater::Iso2709 - MARC::Moose record formater into ISO 2709 forma
 
 =head1 VERSION
 
-version 1.0.34
+version 1.0.35
 
 =head1 AUTHOR
 
@@ -69,7 +69,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Frédéric Demians.
+This software is copyright (c) 2018 by Frédéric Demians.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

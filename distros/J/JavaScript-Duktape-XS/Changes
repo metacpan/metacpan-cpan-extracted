@@ -1,3 +1,10 @@
+0.000038    2018-04-10
+            * Add support for JS console.
+
+0.000037    2018-04-10
+            * Split JS code compilation and running.
+            * Add some performance stats, retrievable with get_stats().
+
 0.000036    2018-04-04
             * Add a native function timestamp_ms() callable from JS.
             * Add some more tests.

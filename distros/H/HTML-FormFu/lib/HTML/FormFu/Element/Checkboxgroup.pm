@@ -1,10 +1,11 @@
-package HTML::FormFu::Element::Checkboxgroup;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Element::Checkboxgroup;
+$HTML::FormFu::Element::Checkboxgroup::VERSION = '2.06';
+# ABSTRACT: Group of checkbox form fields
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 extends 'HTML::FormFu::Element';
 
 with 'HTML::FormFu::Role::Element::Group';
@@ -17,12 +18,12 @@ has input_type => (
     is      => 'rw',
     default => 'checkbox',
     lazy    => 1,
-    traits  => ['FormFuChained'],
+    traits  => ['Chained'],
 );
 
 has reverse_group => (
     is     => 'rw',
-    traits => ['FormFuChained'],
+    traits => ['Chained'],
 );
 
 after BUILD => sub {
@@ -35,13 +36,7 @@ after BUILD => sub {
     $self->reverse_group(1);
     $self->input_type('checkbox');
 
-    $self->layout( [
-        'label',
-        'errors',
-        'field',
-        'comment',
-        'javascript',
-    ] );
+    $self->layout( [ 'label', 'errors', 'field', 'comment', 'javascript', ] );
 
     return;
 };
@@ -134,8 +129,8 @@ sub _prepare_attrs {
 sub render_data_non_recursive {
     my ( $self, $args ) = @_;
 
-    my $render = $self->SUPER::render_data_non_recursive( {
-            field_filename => $self->field_filename,
+    my $render = $self->SUPER::render_data_non_recursive(
+        {   field_filename => $self->field_filename,
             reverse_group  => $self->reverse_group,
             input_type     => $self->input_type,
             $args ? %$args : (),
@@ -239,13 +234,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Element::Checkboxgroup - Group of checkbox form fields
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -325,5 +324,16 @@ Carl Franks, C<cfranks@cpan.org>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

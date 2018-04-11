@@ -1,7 +1,9 @@
 package Mojolicious::Plugin::FormFieldsFromJSON::Date;
+
+use v5.10;
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.03';
+our $VERSION = '1.00';
 
 use Time::Piece;
 
@@ -70,14 +72,12 @@ sub Mojolicious::Plugin::FormFieldsFromJSON::_date {
 sub _day_dropdown {
     my ($c, %params) = @_;
 
-    my @days = map{
-        my %opts = ( $_ == $params{day} ) ?
-            ('selected' => 'selected') :
-            ();
-        [ $_ => sprintf("%02d", $_) , %opts ]
-    }(1 .. 31);
-
     $c->param( $params{name}, '' );
+
+    my @days = map{
+        $c->param( $params{name} => sprintf("%02d", $_) ) if $_ == $params{day};
+        [ $_ => sprintf("%02d", $_) ]
+    }(1 .. 31);
 
     my $select = $c->select_field(
         $params{name},
@@ -90,14 +90,12 @@ sub _day_dropdown {
 sub _month_dropdown {
     my ($c, %params) = @_;
 
-    my @months = map{
-        my %opts = ( $_ == $params{month} ) ?
-            ('selected' => 'selected') :
-            ();
-        [ $_ => sprintf("%02d", $_), %opts ]
-    }(1 .. 12);
-
     $c->param( $params{name}, '' );
+
+    my @months = map{
+        $c->param( $params{name} => sprintf("%02d", $_) ) if $_ == $params{month};
+        [ $_ => sprintf("%02d", $_) ]
+    }(1 .. 12);
 
     my $select = $c->select_field(
         $params{name},
@@ -120,10 +118,8 @@ sub _year_dropdown {
     my $has_year;
     my @years = map{
         $has_year++ if $_ == $params{year};
-        my %opts = ( $_ == $params{year} ) ?
-            ('selected' => 'selected') :
-            ();
-        [ $_ => $_, %opts ]
+        $c->param( $params{name} => $params{year} ) if $_ == $params{year};
+        [ $_ => $_ ]
     }($start .. $stop);
 
     if ( !$has_year ) {
@@ -152,7 +148,7 @@ Mojolicious::Plugin::FormFieldsFromJSON::Date
 
 =head1 VERSION
 
-version 0.03
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -244,7 +240,7 @@ Renee Baecker <reneeb@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Renee Baecker.
+This software is Copyright (c) 2018 by Renee Baecker.
 
 This is free software, licensed under:
 

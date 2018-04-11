@@ -51,7 +51,7 @@ sub write_makefile
         'parent'                => 0.221,
     );
 
-    WriteMakefile( VERSION         => '0.9918',
+    WriteMakefile( VERSION         => '0.9920',
                    NAME            => 'version',
                    LICENSE         => 'perl',
                    MIN_PERL_VERSION=> 5.006002,

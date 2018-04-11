@@ -1,13 +1,15 @@
 #!/usr/bin/perl
+
 use strict;
 use warnings;
 use Config::Any;
 use Data::Dumper ();
 use Regexp::Assemble;
 
-our $VERSION = '2.05'; # VERSION
+# PODNAME: html_formfu_dumpconf.pl
+# ABSTRACT: dump configuration files
 
-if ( @ARGV == 1 && $ARGV[0] =~ /\A --? h(?:elp)? \z/ix) {
+if ( @ARGV == 1 && $ARGV[0] =~ m/\A --? h(?:elp)? \z/ix) {
     help();
     exit;
 }
@@ -52,7 +54,7 @@ if ( @ARGV == 1 ) {
     print $dumper->Dump;
 }
 else {
-    die <<ERROR;
+    die <<'ERROR';
 html_formfu_dumpconf.pl: requires a single filename argument.
 Try "--help" for help.
 ERROR
@@ -80,13 +82,17 @@ HELP
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 html_formfu_dumpconf.pl - dump configuration files
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -101,3 +107,16 @@ Uses Config::Any and Data::Dumper to display how your config file is parsed.
 =head1 SEE ALSO
 
 Config::Any, Data::Dumper
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

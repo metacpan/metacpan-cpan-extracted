@@ -13,11 +13,11 @@ Dancer2::Plugin::Tail - Tail a file from Dancer2
 
 =head1 VERSION
 
-Version 0.015
+Version 0.016
 
 =cut
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 
 =head1 SYNOPSIS
@@ -301,7 +301,7 @@ sub display_tail {
   $plugin->app->log( debug => $params );
 
   my $tail_file_id = $params->{'tail_file_id'};        ### ID in config
-  my $curr_pos     = $params->{'curr_pos'};    ### Current position to read from
+  my $curr_pos     = $params->{'curr_pos'} || 0;    ### Current position to read from
 
   my $tail_id      = 'tail-' . $tail_file_id;  ### ID from session
 
@@ -339,7 +339,7 @@ sub display_tail {
   } 
 
   $app->template($plugin->display_template, 
-                  { id                => $file_id,
+                  { tail_file_id      => $tail_file_id,
                     curr_pos          => $curr_pos,
                     heading           => $tail_heading,
                     data_method       => $plugin->data_method,    

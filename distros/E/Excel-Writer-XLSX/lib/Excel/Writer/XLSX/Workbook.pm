@@ -7,7 +7,7 @@ package Excel::Writer::XLSX::Workbook;
 #
 # Used in conjunction with Excel::Writer::XLSX
 #
-# Copyright 2000-2017, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2018, John McNamara, jmcnamara@cpan.org
 #
 # Documentation after __END__
 #
@@ -33,7 +33,7 @@ use Excel::Writer::XLSX::Package::XMLwriter;
 use Excel::Writer::XLSX::Utility qw(xl_cell_to_rowcol xl_rowcol_to_cell);
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 
 ###############################################################################
@@ -141,6 +141,9 @@ sub new {
     else {
         $self->add_format( xf_index => 0 );
     }
+
+    # Add a default URL format.
+    $self->{_default_url_format} = $self->add_format( hyperlink => 1 );
 
     # Check for a filename unless it is an existing filehandle
     if ( not ref $self->{_filename} and $self->{_filename} eq '' ) {
@@ -369,7 +372,7 @@ sub add_worksheet {
         $self->{_optimization},
         $self->{_tempdir},
         $self->{_excel2003_style},
-
+        $self->{_default_url_format},
     );
 
     my $worksheet = Excel::Writer::XLSX::Worksheet->new( @init_data );
@@ -1023,6 +1026,22 @@ sub set_calc_mode {
 
 ###############################################################################
 #
+# get_default_url_format()
+#
+# Get the default url format used when a user defined format isn't specified
+# with write_url(). The format is the hyperlink style defined by Excel for the
+# default theme.
+#
+sub get_default_url_format {
+
+    my $self    = shift;
+
+    return $self->{_default_url_format};
+}
+
+
+###############################################################################
+#
 # _store_workbook()
 #
 # Assemble worksheets into a workbook.
@@ -1217,6 +1236,9 @@ sub _prepare_formats {
 sub _set_default_xf_indices {
 
     my $self = shift;
+
+    # Delete the default url format.
+    splice @{ $self->{_formats} }, 1, 1;
 
     for my $format ( @{ $self->{_formats} } ) {
         $format->get_xf_index();
@@ -2708,6 +2730,6 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-(c) MM-MMXVII, John McNamara.
+(c) MM-MMXVIII, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.

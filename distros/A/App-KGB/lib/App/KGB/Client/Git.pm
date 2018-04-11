@@ -2,6 +2,7 @@
 #
 # KGB - an IRC bot helping collaboration
 # Copyright © 2009,2013 Damyan Ivanov
+# Copyright © 2018 Colin Finck <colin@reactos.org>
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -431,10 +432,21 @@ sub _describe_ref {
     my @parents;
     my $author_login;
     my $author_name;
+    my $author_via;
     while (<$fh>) {
         if ( /^author (.+) <([^>]+)@[^>]+>/ ) {
             utf8::decode( $author_name  = $1 );
             utf8::decode( $author_login = $2 );
+            next;
+        }
+        if ( /^committer (.+) <([^>]+)@[^>]+>/ ) {
+            my $committer_name;
+            utf8::decode( $committer_name  = $1 );
+            if ($committer_name ne $author_name) {
+                $author_via = $author_name . ' (via ' . $committer_name . ')';
+            } else {
+                $author_via = $author_name;
+            }
             next;
         }
         push( @parents, substr( $1, 0, 7 ) ), next if /^parent\s+(\S+)/;
@@ -480,6 +492,7 @@ sub _describe_ref {
         id     => substr( $new, 0, 7 ),
         author => $author_login,
         author_name => $author_name,
+        author_via => $author_via,
         log     => join( "\n", @log ),
         changes => \@changes,
         parents => \@parents,

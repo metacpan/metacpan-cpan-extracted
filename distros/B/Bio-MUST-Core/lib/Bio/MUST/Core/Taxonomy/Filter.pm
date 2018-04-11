@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Taxonomy::Filter;
 # ABSTRACT: Helper class for filtering seqs according to taxonomy
-$Bio::MUST::Core::Taxonomy::Filter::VERSION = '0.180630';
+$Bio::MUST::Core::Taxonomy::Filter::VERSION = '0.181000';
 use Moose;
 use namespace::autoclean;
 
@@ -9,6 +9,7 @@ use feature qw(say);
 
 use Smart::Comments;
 
+use Carp;
 use Const::Fast;
 use List::AllUtils;
 
@@ -22,6 +23,7 @@ has '_tax' => (
     required => 1,
     handles  => {
         _fetch_lineage => 'get_taxonomy_from_seq_id',       # private method
+         is_dupe       => 'is_dupe',
     },
 );
 
@@ -62,6 +64,12 @@ sub BUILD {
     my @unwanted = map { $_ =~ $UNWANTED ? $1 : () } $self->all_specs;
 
     # TODO: allow using MUST baseid specifications?
+
+    # warn in case of ambiguous taxa
+    for my $taxon (@wanted, @unwanted) {
+        carp "Warning: $taxon is taxonomically ambiguous in tax_filter!"
+            if $self->is_dupe($taxon);
+    }
 
     # build filtering hashes from wanted and unwanted arrays
     # Note: we want no virus by default but exclude nothing
@@ -121,7 +129,7 @@ Bio::MUST::Core::Taxonomy::Filter - Helper class for filtering seqs according to
 
 =head1 VERSION
 
-version 0.180630
+version 0.181000
 
 =head1 SYNOPSIS
 

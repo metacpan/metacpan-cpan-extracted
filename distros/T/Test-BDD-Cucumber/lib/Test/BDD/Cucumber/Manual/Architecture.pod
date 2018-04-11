@@ -6,7 +6,7 @@ Test::BDD::Cucumber::Manual::Architecture - Structural Overview
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 INTRODUCTION
 

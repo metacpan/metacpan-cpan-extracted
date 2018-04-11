@@ -1,6 +1,6 @@
 package Lab::Connection::GPIB;
 #ABSTRACT: GPIB Connection base class
-$Lab::Connection::GPIB::VERSION = '3.624';
+$Lab::Connection::GPIB::VERSION = '3.630';
 #
 # This is the GPIB Connection base class. It provides the interface definition for all
 # connections implementing the GPIB protocol.
@@ -117,7 +117,7 @@ Lab::Connection::GPIB - GPIB Connection base class
 
 =head1 VERSION
 
-version 3.624
+version 3.630
 
 =head1 SYNOPSIS
 

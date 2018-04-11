@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Extension;
-$Test::BDD::Cucumber::Extension::VERSION = '0.53';
+$Test::BDD::Cucumber::Extension::VERSION = '0.54';
 =head1 NAME
 
 Test::BDD::Cucumber::Extension - Abstract superclass for extensions
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 DESCRIPTION
 

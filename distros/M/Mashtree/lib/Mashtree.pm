@@ -25,7 +25,7 @@ local $0=basename $0;
 ######
 # CONSTANTS
 
-our $VERSION = "0.29";
+our $VERSION = "0.32";
 our $MASHTREE_VERSION=$VERSION;
 our @fastqExt=qw(.fastq.gz .fastq .fq .fq.gz);
 our @fastaExt=qw(.fasta .fna .faa .mfa .fas .fsa .fa);
@@ -96,9 +96,9 @@ sub _truncateFilename{
   # One more extension
   $name=basename($name,@fastqExt,@richseqExt,@fastaExt);
   # Truncate
-  $name=substr($name,0,$$settings{truncLength}); 
+  #$name=substr($name,0,$$settings{truncLength}); 
   # Add in padding
-  $name.=" " x ($$settings{truncLength}-length($name)); 
+  #$name.=" " x ($$settings{truncLength}-length($name)); 
   return $name;
 }
 
@@ -143,7 +143,7 @@ sub distancesToPhylip{
     } else {
       my ($reference,$distance)=split(/\t/,$_);
       $reference=_truncateFilename($reference,$settings);
-      $distance=sprintf("%0.8f",$distance);
+      $distance=sprintf("%0.10f",$distance);
       $m[$name{$query}][$name{$reference}]=$distance;
       $m[$name{$reference}][$name{$query}]=$distance;
     }
@@ -198,6 +198,7 @@ sub createTreeFromPhylip{
   my $quicktreePath=`which quicktree 2>/dev/null`;
   # bioperl if there was an error with which quicktree
   if($?){
+    logmsg "DEPRECATION WARNING: CANNOT FIND QUICKTREE IN YOUR PATH. I will use BioPerl to make the tree this time, but it will be removed in the next version.";
     logmsg "Creating tree with BioPerl";
     my $dfactory = Bio::Tree::DistanceFactory->new(-method=>"NJ");
     my $matrix   = Bio::Matrix::IO->new(-format=>"phylip", -file=>$phylip)->next_matrix;

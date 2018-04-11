@@ -1,5 +1,5 @@
 package DateTime::TimeZone::Local::Win32;
-$DateTime::TimeZone::Local::Win32::VERSION = '2.00';
+$DateTime::TimeZone::Local::Win32::VERSION = '2.01';
 use 5.006;
 
 use strict;
@@ -175,6 +175,7 @@ sub EnvVars { return 'TZ' }
         'Sakhalin Standard Time'          => 'Asia/Sakhalin',
         'Samoa'                           => 'Pacific/Apia',
         'Samoa Standard Time'             => 'Pacific/Apia',
+        'Sao Tome Standard Time'          => 'Africa/Sao_Tome',
         'Saratov Standard Time'           => 'Europe/Saratov',
         'Saudi Arabia'                    => 'Asia/Riyadh',
         'Saudi Arabia Standard Time'      => 'Asia/Riyadh',
@@ -318,7 +319,7 @@ DateTime::TimeZone::Local::Win32 - Determine the local system's time zone on Win
 
 =head1 VERSION
 
-version 2.00
+version 2.01
 
 =head1 SYNOPSIS
 

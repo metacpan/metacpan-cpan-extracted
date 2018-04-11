@@ -31,25 +31,25 @@ my @TESTS = (
     },
     {
         a       => [],
-        b       => [1],
+        b       => [0],
         name    => 'empty_list_vs_list_with_one_item',
-        diff    => {D => [{A => 1}]},
+        diff    => {D => [{A => 0}]},
     },
     {
         a       => [],
-        b       => [1],
+        b       => [0],
         name    => 'empty_list_vs_list_with_one_item_noA',
         diff    => {},
         opts    => {noA => 1},
     },
     {
-        a       => [1],
+        a       => [0],
         b       => [],
         name    => 'list_with_one_item_vs_empty_list',
-        diff    => {D => [{R => 1}]},
+        diff    => {D => [{R => 0}]},
     },
     {
-        a       => [1],
+        a       => [0],
         b       => [],
         name    => 'list_with_one_item_vs_empty_list_noR',
         diff    => {},
@@ -128,10 +128,51 @@ my @TESTS = (
         opts    => {noU => 1},
     },
     {
+        a       => [0, 1, 2],
+        b       => [0, 9, 2],
+        name    => 'one_item_changed_in_the_middle_of_list',
+        diff    => {D => [{U => 0},{N => 9,O => 1},{U => 2}]},
+    },
+    {
+        a       => [0, 1, 2],
+        b       => [0, 9, 2],
+        name    => 'one_item_changed_in_the_middle_of_list_noN',
+        diff    => {D => [{U => 0},{O => 1},{U => 2}]},
+        opts    => {noN => 1},
+    },
+    {
+        a       => [0, 1, 2],
+        b       => [0, 9, 2],
+        name    => 'one_item_changed_in_the_middle_of_list_noO',
+        diff    => {D => [{U => 0},{N => 9},{U => 2}]},
+        opts    => {noO => 1},
+    },
+    {
+        a       => [0, 1, 2],
+        b       => [0, 9, 2],
+        name    => 'one_item_changed_in_the_middle_of_list_noNO',
+        diff    => {D => [{U => 0},{I => 2,U => 2}]},
+        opts    => {noN => 1,noO => 1},
+    },
+    {
+        a       => [0, 1, 2],
+        b       => [0, 9, 2],
+        name    => 'one_item_changed_in_the_middle_of_list_noU',
+        diff    => {D => [{I => 1,N => 9,O => 1}]},
+        opts    => {noU => 1},
+    },
+    {
         a       => [0, 2],
         b       => [0, 1, 2],
         name    => 'one_item_inserted_in_the_middle_of_list',
         diff    => {D => [{U => 0},{A => 1},{U => 2}]},
+    },
+    {
+        a       => [0, 2],
+        b       => [0, 1, 2],
+        name    => 'one_item_inserted_in_the_middle_of_list_noA',
+        diff    => {D => [{U => 0},{I => 1,U => 2}]},
+        opts    => {noA => 1},
     },
     {
         a       => [0, 2],
@@ -145,6 +186,13 @@ my @TESTS = (
         b       => [0, 2],
         name    => 'one_item_removed_from_the_middle_of_list',
         diff    => {D => [{U => 0},{R => 1},{U => 2}]},
+    },
+    {
+        a       => [0, 1, 2],
+        b       => [0, 2],
+        name    => 'one_item_removed_from_the_middle_of_list_noR',
+        diff    => {D => [{U => 0},{I => 2,U => 2}]},
+        opts    => {noR => 1},
     },
     {
         a       => [0, 1, 2],
@@ -256,8 +304,8 @@ my @TESTS = (
             D => [
                 {A => 0},
                 {A => 1},
-                {A => 4,I => 4},
-                {A => 6,I => 6},
+                {A => 4,I => 2},
+                {A => 6,I => 3},
                 {A => 7}
             ]
         },
@@ -370,14 +418,30 @@ my @TESTS = (
             D => [
                 {R => 'a'},
                 {A => 'd',I => 3},
-                {I => 5,N => 'f',O => 'h'},
-                {A => 'k',I => 7},
-                {I => 10,N => 'r',O => 'n'},
+                {I => 4,N => 'f',O => 'h'},
+                {A => 'k',I => 6},
+                {I => 8,N => 'r',O => 'n'},
                 {N => 's',O => 'p'},
                 {A => 't'}
             ]
         },
         opts    => {noU => 1},
+    },
+    {
+        a       => [ qw(a b c e h j l m n p) ],
+        b       => [ qw(b c d e f j k l m r s t) ],
+        name    => 'lists_LCS_complex_onlyU',
+        diff    => {
+            D => [
+                {I => 1,U => 'b'},
+                {U => 'c'},
+                {I => 3,U => 'e'},
+                {I => 5,U => 'j'},
+                {I => 6,U => 'l'},
+                {U => 'm'}
+            ]
+        },
+        opts    => {noA => 1, noN => 1, noO => 1, noR => 1},
     },
     {
         a       => $one = [ 0, 1, 2 ],
@@ -412,7 +476,7 @@ my @TESTS = (
             D => [
                 {
                     D => [
-                        {I => 1,N => 31,O => 30}
+                        {I => 1,N => '31',O => '30'}
                     ],
                     I => 2
                 },

@@ -1,24 +1,23 @@
-package HTML::FormFu::Exception::Input;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
 
+package HTML::FormFu::Exception::Input;
+$HTML::FormFu::Exception::Input::VERSION = '2.06';
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 extends 'HTML::FormFu::Exception';
 
 use HTML::FormFu::Attribute qw( mk_attrs );
 use HTML::FormFu::Util qw( append_xml_attribute literal xml_escape );
 
-has processor => ( is => 'rw', traits => ['FormFuChained'] );
-has forced    => ( is => 'rw', traits => ['FormFuChained'] );
+has processor => ( is => 'rw', traits => ['Chained'] );
+has forced    => ( is => 'rw', traits => ['Chained'] );
 
 __PACKAGE__->mk_attrs(qw( attributes ));
 
 sub BUILD {
     my ( $self, $args ) = @_;
 
-    $self->attributes({});
+    $self->attributes( {} );
 
     return;
 }
@@ -77,14 +76,14 @@ sub clone {
 around render_data_non_recursive => sub {
     my ( $orig, $self, $args ) = @_;
 
-    my $render = $self->$orig( {
-            processor => $self->processor,
+    my $render = $self->$orig(
+        {   processor => $self->processor,
             forced    => $self->forced,
             name      => $self->name,
             message   => $self->message,
             type      => $self->type,
             $args ? %$args : (),
-        });
+        } );
 
     $self->_render_attributes($render);
 
@@ -120,3 +119,30 @@ sub _render_attributes {
 __PACKAGE__->meta->make_immutable;
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::FormFu::Exception::Input
+
+=head1 VERSION
+
+version 2.06
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -7,16 +7,8 @@
 # DESCRIPTION: Generate C source for fast keyword tokenizer
 #
 ################################################################################
-#
-# $Project: /Devel-Tokenizer-C $
-# $Author: mhx $
-# $Date: 2008/12/13 16:03:38 +0100 $
-# $Revision: 16 $
-# $Source: /lib/Devel/Tokenizer/C.pm $
-#
-################################################################################
 # 
-# Copyright (c) 2002-2008 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2002-2018 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 # 
@@ -29,7 +21,7 @@ use strict;
 use Carp;
 use vars '$VERSION';
 
-$VERSION = do { my @r = '$Snapshot: /Devel-Tokenizer-C/0.08 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
+$VERSION = '0.09';
 
 my %DEF = (
   CaseSensitive => 1,
@@ -217,8 +209,8 @@ sub __makeit__
   }
 
   for my $n (keys %$t) {
-    my $c = __quotechar__(substr $n, (defined $order ? $order->[$level] : $level), 1)
-            or defined $self->{TokenEnd} or next;
+    my $c = __quotechar__(substr $n, (defined $order ? $order->[$level] : $level), 1);
+    next if $c eq '' and not defined $self->{TokenEnd};
     $tok{$c ne '' ? ($self->{CaseSensitive} || $c !~ /^[a-zA-Z]$/ ? "'$c'" : "'\U$c\E'")
                   : $self->{TokenEnd}}{$n} = $t->{$n};
   }
@@ -233,7 +225,7 @@ sub __makeit__
       my $cmp = join " &&\n$IND$I$I",
                 map { $_->[1] } sort { $a->[0] <=> $b->[0] }
                 @{$self->{__backup__}};
-      
+
       $rvs .= $IND."if ($cmp)\n".$IND."{\n";
       $bke = "$IND}\n";
 

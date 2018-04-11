@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200235;
+our $VERSION = 1.20180410221547;
 
 my $formatters = [
                 {
@@ -31,27 +31,30 @@ my $formatters = [
                   'pattern' => '(2\\d)(\\d{3})(\\d{4})'
                 },
                 {
-                  'pattern' => '([2-46-9]\\d{2})(\\d{3})(\\d{3})',
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             2[3-9]|
             [346-9]
           ',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '([2-46-9]\\d{2})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'voip' => '30\\d{7}',
-                'mobile' => '
-          9(?:
-            [1236]\\d{2}|
-            480
-          )\\d{5}
-        ',
-                'personal_number' => '884[0-4689]\\d{5}',
-                'toll_free' => '80[02]\\d{6}',
                 'fixed_line' => '
+          2(?:
+            [12]\\d|
+            [35][1-689]|
+            4[1-59]|
+            6[1-35689]|
+            7[1-9]|
+            8[1-69]|
+            9[1256]
+          )\\d{6}
+        ',
+                'toll_free' => '80[02]\\d{6}',
+                'voip' => '30\\d{7}',
+                'geographic' => '
           2(?:
             [12]\\d|
             [35][1-689]|
@@ -85,17 +88,14 @@ my $validators = {
             )
           )\\d{5}
         )',
-                'geographic' => '
-          2(?:
-            [12]\\d|
-            [35][1-689]|
-            4[1-59]|
-            6[1-35689]|
-            7[1-9]|
-            8[1-69]|
-            9[1256]
-          )\\d{6}
-        '
+                'mobile' => '
+          9(?:
+            [1236]\\d{2}|
+            480
+          )\\d{5}
+        ',
+                'pager' => '',
+                'personal_number' => '884[0-4689]\\d{5}'
               };
 my %areanames = (
   35121 => "Lisbon",
@@ -155,6 +155,6 @@ my %areanames = (
       my $number = shift;
       $number =~ s/(^\+351|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-  return $self->is_valid() ? $self : undef;
-}
+        return $self->is_valid() ? $self : undef;
+    }
 1;

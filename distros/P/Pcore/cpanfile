@@ -31,6 +31,7 @@ requires 'Type::Tiny::XS';
 # AnyEvent
 requires 'EV';
 requires 'AnyEvent';
+requires 'Coro';
 requires 'Net::DNS::Resolver';
 requires 'Guard';
 feature linux => sub {

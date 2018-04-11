@@ -1,5 +1,5 @@
 package GitLab::API::v4::Config;
-$GitLab::API::v4::Config::VERSION = '0.05';
+$GitLab::API::v4::Config::VERSION = '0.06';
 =head1 NAME
 
 GitLab::API::v4::Config - Load configuration from a file, environment,

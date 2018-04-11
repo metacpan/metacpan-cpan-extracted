@@ -3,21 +3,21 @@ abstract: 'No-fuss instantiation of Moose objects using a single argument.'
 author:
   - 'Aran Deltac <bluefeet@gmail.com>'
 build_requires:
-  Test::Fatal: 0.001
-  Test::Simple: 0.94
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: MooseX-SingleArg
-requires:
-  Moose: 1.23
-  MooseX::ClassAttribute: 0.24
 resources:
   bugtracker: https://github.com/bluefeet/MooseX-SingleArg/issues
-  repository: git://github.com/bluefeet/MooseX-SingleArg.git
-version: 0.04
+  homepage: https://github.com/bluefeet/MooseX-SingleArg
+  repository: https://github.com/bluefeet/MooseX-SingleArg.git
+version: '0.05'
+x_serialization_backend: 'YAML::Tiny version 1.69'

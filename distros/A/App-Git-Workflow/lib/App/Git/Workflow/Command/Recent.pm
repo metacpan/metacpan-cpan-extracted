@@ -16,7 +16,7 @@ use English qw/ -no_match_vars /;
 use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION  = 1.0.5;
+our $VERSION  = 1.0.6;
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -159,6 +159,8 @@ sub recent_commits {
 sub changed_from_shas {
     my ($self, @commits) = @_;
     my %changed;
+    my $count = 0;
+    print {*STDERR} '.' if $option{verbose};
 
     for my $sha (@commits) {
         my $changed = $workflow->commit_details($sha, branches => 1, files => 1, user => 1);
@@ -173,6 +175,8 @@ sub changed_from_shas {
                 %{ $changed->{branches} },
             };
         }
+
+        print {*STDERR} '.' if $option{verbose} && ++$count % 10 == 0;
     }
 
     for my $type (keys %changed) {
@@ -194,7 +198,7 @@ git-recent - Find what files have been changed recently in a repository
 
 =head1 VERSION
 
-This documentation refers to git-recent version 1.0.5
+This documentation refers to git-recent version 1.0.6
 
 =head1 SYNOPSIS
 

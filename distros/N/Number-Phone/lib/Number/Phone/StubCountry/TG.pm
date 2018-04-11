@@ -22,48 +22,48 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200236;
+our $VERSION = 1.20180410221547;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2 $3 $4',
                   'leading_digits' => '[279]',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
-                  'format' => '$1 $2 $3 $4'
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'voip' => '',
-                'personal_number' => '',
+                'specialrate' => '',
                 'mobile' => '
           (?:
-            70|
+            7[09]|
             9[0-36-9]
           )\\d{6}
-        ',
-                'toll_free' => '',
-                'specialrate' => '',
-                'fixed_line' => '
-          2(?:
-            2[2-7]|
-            3[23]|
-            44|
-            55|
-            66|
-            77
-          )\\d{5}
         ',
                 'geographic' => '
           2(?:
             2[2-7]|
             3[23]|
-            44|
+            4[45]|
             55|
-            66|
+            6[67]|
             77
           )\\d{5}
-        '
+        ',
+                'personal_number' => '',
+                'pager' => '',
+                'toll_free' => '',
+                'fixed_line' => '
+          2(?:
+            2[2-7]|
+            3[23]|
+            4[45]|
+            55|
+            6[67]|
+            77
+          )\\d{5}
+        ',
+                'voip' => ''
               };
 my %areanames = (
   22822 => "Lome",
@@ -78,6 +78,6 @@ my %areanames = (
       my $number = shift;
       $number =~ s/(^\+228|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-  return $self->is_valid() ? $self : undef;
-}
+        return $self->is_valid() ? $self : undef;
+    }
 1;

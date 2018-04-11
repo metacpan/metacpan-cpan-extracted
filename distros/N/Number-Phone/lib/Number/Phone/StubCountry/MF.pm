@@ -22,22 +22,11 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200235;
+our $VERSION = 1.20180410221547;
 
 my $formatters = [];
 
 my $validators = {
-                'personal_number' => '',
-                'mobile' => '
-          69(?:
-            0\\d{2}|
-            1(?:
-              2[29]|
-              3[0-5]
-            )
-          )\\d{4}
-        ',
-                'specialrate' => '',
                 'fixed_line' => '
           590(?:
             0[079]|
@@ -51,6 +40,7 @@ my $validators = {
           )\\d{4}
         ',
                 'toll_free' => '',
+                'voip' => '',
                 'geographic' => '
           590(?:
             0[079]|
@@ -63,8 +53,18 @@ my $validators = {
             87
           )\\d{4}
         ',
+                'mobile' => '
+          69(?:
+            0\\d{2}|
+            1(?:
+              2[29]|
+              3[0-5]
+            )
+          )\\d{4}
+        ',
+                'specialrate' => '',
                 'pager' => '',
-                'voip' => ''
+                'personal_number' => ''
               };
 
     sub new {
@@ -72,13 +72,9 @@ my $validators = {
       my $number = shift;
       $number =~ s/(^\+590|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
-  
       return $self if ($self->is_valid());
-      {
-        no warnings 'uninitialized';
-        $number =~ s/^(?:0)//;
-      }
+      $number =~ s/^(?:0)//;
       $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
-    return $self->is_valid() ? $self : undef;
-}
+      return $self->is_valid() ? $self : undef;
+    }
 1;

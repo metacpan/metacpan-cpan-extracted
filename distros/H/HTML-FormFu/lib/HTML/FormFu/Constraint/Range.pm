@@ -1,10 +1,11 @@
-package HTML::FormFu::Constraint::Range;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Constraint::Range;
+$HTML::FormFu::Constraint::Range::VERSION = '2.06';
+# ABSTRACT: Numerical Range Constraint
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 use MooseX::Aliases;
 
 extends 'HTML::FormFu::Constraint';
@@ -14,13 +15,13 @@ use Scalar::Util qw( looks_like_number );
 has minimum => (
     is     => 'rw',
     alias  => 'min',
-    traits => ['FormFuChained'],
+    traits => ['Chained'],
 );
 
 has maximum => (
     is     => 'rw',
     alias  => 'max',
-    traits => ['FormFuChained'],
+    traits => ['Chained'],
 );
 
 sub constrain_value {
@@ -53,13 +54,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Constraint::Range - Numerical Range Constraint
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -105,5 +110,16 @@ Carl Franks C<cfranks@cpan.org>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

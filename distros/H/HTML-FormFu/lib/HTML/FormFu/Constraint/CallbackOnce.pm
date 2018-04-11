@@ -1,13 +1,14 @@
-package HTML::FormFu::Constraint::CallbackOnce;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Constraint::CallbackOnce;
+$HTML::FormFu::Constraint::CallbackOnce::VERSION = '2.06';
+# ABSTRACT: Code Callback Constraint
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 extends 'HTML::FormFu::Constraint';
 
-has callback => ( is => 'rw', traits => ['FormFuChained'] );
+has callback => ( is => 'rw', traits => ['Chained'] );
 
 sub process {
     my ( $self, $params ) = @_;
@@ -24,8 +25,8 @@ sub process {
 
     my $ok = eval { $callback->( $value, $params ) };
 
-    return $self->mk_errors( {
-            pass => ( $@ or !$ok ) ? 0 : 1,
+    return $self->mk_errors(
+        {   pass => ( $@ or !$ok ) ? 0 : 1,
             message => $@,
         } );
 }
@@ -36,13 +37,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Constraint::CallbackOnce - Code Callback Constraint
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -90,5 +95,16 @@ Carl Franks C<cfranks@cpan.org>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

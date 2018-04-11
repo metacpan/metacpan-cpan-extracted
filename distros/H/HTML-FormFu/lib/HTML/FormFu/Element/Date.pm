@@ -1,10 +1,11 @@
-package HTML::FormFu::Element::Date;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Element::Date;
+$HTML::FormFu::Element::Date::VERSION = '2.06';
+# ABSTRACT: 3 select menu multi-field
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 
 extends 'HTML::FormFu::Element::Multi';
 
@@ -20,12 +21,12 @@ use Carp qw( croak );
 
 __PACKAGE__->mk_attrs(qw( day  month  year ));
 
-has auto_inflate          => ( is => 'rw', traits => ['FormFuChained'] );
-has default_natural       => ( is => 'rw', traits => ['FormFuChained'] );
-has default_datetime_args => ( is => 'rw', traits => ['FormFuChained'] );
-has printf_day            => ( is => 'rw', traits => ['FormFuChained'] );
-has printf_month          => ( is => 'rw', traits => ['FormFuChained'] );
-has printf_year           => ( is => 'rw', traits => ['FormFuChained'] );
+has auto_inflate          => ( is => 'rw', traits => ['Chained'] );
+has default_natural       => ( is => 'rw', traits => ['Chained'] );
+has default_datetime_args => ( is => 'rw', traits => ['Chained'] );
+has printf_day            => ( is => 'rw', traits => ['Chained'] );
+has printf_month          => ( is => 'rw', traits => ['Chained'] );
+has printf_year           => ( is => 'rw', traits => ['Chained'] );
 
 has _known_fields => ( is => 'rw' );
 
@@ -33,7 +34,7 @@ has strftime => (
     is      => 'rw',
     default => '%d-%m-%Y',
     lazy    => 1,
-    traits  => ['FormFuChained'],
+    traits  => ['Chained'],
 );
 
 *default = \&value;
@@ -80,8 +81,8 @@ after BUILD => sub {
 
     $self->month( { prefix => [], } );
 
-    $self->year( {
-            prefix  => [],
+    $self->year(
+        {   prefix  => [],
             less    => 0,
             plus    => 10,
             reverse => 0,
@@ -226,8 +227,8 @@ sub _add_day {
 
     @day_prefix = map { [ '', $_ ] } @day_prefix;
 
-    my $element = $self->element( {
-            type       => 'Select',
+    my $element = $self->element(
+        {   type       => 'Select',
             name       => $day_name,
             options    => [ @day_prefix, map { [ $_, $_ ] } 1 .. 31 ],
             attributes => $day->{attributes},
@@ -265,8 +266,8 @@ sub _add_month {
 
     my $options = [ @month_prefix, map { [ $_ + 1, $months[$_] ] } 0 .. 11 ];
 
-    my $element = $self->element( {
-            type       => 'Select',
+    my $element = $self->element(
+        {   type       => 'Select',
             name       => $month_name,
             options    => $options,
             attributes => $month->{attributes},
@@ -314,8 +315,8 @@ sub _add_year {
 
     @year_prefix = map { [ '', $_ ] } @year_prefix;
 
-    my $element = $self->element( {
-            type       => 'Select',
+    my $element = $self->element(
+        {   type       => 'Select',
             name       => $year_name,
             options    => [ @year_prefix, map { [ $_, $_ ] } @years ],
             attributes => $year->{attributes},
@@ -391,8 +392,8 @@ sub _build_name {
 sub _add_inflator {
     my ($self) = @_;
 
-    $self->inflator( {
-            type     => "DateTime",
+    $self->inflator(
+        {   type     => "DateTime",
             parser   => { strptime => $self->strftime, },
             strptime => $self->strftime,
         } );
@@ -479,8 +480,8 @@ sub render_data {
 sub render_data_non_recursive {
     my ( $self, $args ) = @_;
 
-    my $render = $self->SUPER::render_data_non_recursive( {
-            elements => [ map { $_->render_data } @{ $self->_elements } ],
+    my $render = $self->SUPER::render_data_non_recursive(
+        {   elements => [ map { $_->render_data } @{ $self->_elements } ],
             $args ? %$args : (),
         } );
 
@@ -493,13 +494,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Element::Date - 3 select menu multi-field
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -517,7 +522,6 @@ version 2.05
           less: 70
           plus: 0
         auto_inflate: 1
-
 
 =head1 DESCRIPTION
 
@@ -808,5 +812,16 @@ Carl Franks, C<cfranks@cpan.org>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

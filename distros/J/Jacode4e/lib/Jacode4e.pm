@@ -5,7 +5,7 @@ package Jacode4e;
 #
 # Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
-$VERSION = '2.13.6.4';
+$VERSION = '2.13.6.5';
 $VERSION = $VERSION;
 
 use strict;
@@ -100,7 +100,7 @@ Jacode4e - jacode.pl-like program for enterprise
   use FindBin;
   use lib "$FindBin::Bin/lib";
   use Jacode4e;
-  Jacode4e::VERSION('2.13.6.1');
+  Jacode4e::VERSION('2.13.6.5');
   while (<>) {
       $return =
       Jacode4e::convert(\$_, 'cp932x', 'cp00930', {
@@ -112,22 +112,16 @@ Jacode4e - jacode.pl-like program for enterprise
       print $_;
   }
 
+=head1 AUTHOR
+
+INABA Hitoshi E<lt>ina@cpan.orgE<gt> in a CPAN
+
+This project was originated by INABA Hitoshi.
+
 =head1 LICENSE AND COPYRIGHT
 
-This software is free software;
-
-Copyright (c) 2018 INABA Hitoshi E<lt>ina@cpan.org>E<gt> in a CPAN
-
-The latest version is available here:
-
-L<http://search.cpan.org/dist/jacode4e/>
-
-Use and redistribution for ANY PURPOSE are granted as long as all
-copyright notices are retained.  Redistribution with modification
-is allowed provided that you make your modified version obviously
-distinguishable from the original one.  THIS SOFTWARE IS PROVIDED
-BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES ARE
-DISCLAIMED.
+This software is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
 
 This software is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of

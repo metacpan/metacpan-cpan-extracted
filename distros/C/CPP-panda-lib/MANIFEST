@@ -1,4 +1,5 @@
 Changes
+lib.xs
 lib/CPP/panda/lib.pm
 lib/CPP/panda/lib.pod
 Makefile.PL
@@ -37,13 +38,13 @@ t/from_chars.cc
 t/function.cc
 t/iptr.cc
 t/owning_list.cc
-t/src/test.h.orig
-t/src/test_dispatcher.o
-t/src/test_function.o
-t/src/test_owning_list.o
-t/string.cc
 t/string.xsi
+t/string_char.cc
+t/string_char16.cc
+t/string_char32.cc
 t/string_containers.cc
+t/string_test.h
+t/string_wchar.cc
 t/test.cc
 t/test.h
 t/to_chars.cc

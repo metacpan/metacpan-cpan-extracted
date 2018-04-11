@@ -1,6 +1,26 @@
 CHANGES
 -------
 
+  0.022 10 April 2018
+
+      *  t/010main-unzip.t 
+        Fixed failure on Windows
+
+  0.021 8 April 2018
+
+      * Makefile.PL
+        Fixed PREREQ_PM on IO::Compress::Zip  - should be version 2.081
+        [#125043]
+
+      *  t/010main-unzip.t 
+         test may fail with non-English locale
+         [# 125044]
+  
+
+  0.020 2 April 2018
+
+      * added Archive::Zip::SimpleUnzip
+
   0.010 10 April 2017
   
       * Makefile.PL

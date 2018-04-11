@@ -38,8 +38,9 @@ use Cwd;
 my $R = getcwd;
 
 my $ua = LWP::UserAgent->new();
-my $webhook_url = sprintf( 'http://%s:%d/webhook/?channel=test&network=local',
-    $test_bot->addr, $test_bot->port );
+my $webhook_url = sprintf( 'http://%s:%d/webhook/?%s',
+    $test_bot->addr, $test_bot->port,
+    join( '&', 'channel=test', 'network=local', 'shorten_urls=0' ) );
 
 sub webhook_post {
     my $response = $ua->post(
@@ -55,6 +56,7 @@ my $resp = webhook_post(
         user_name     => 'Unused Test User',
         user_username => 'ser',
         project       => { name => 'test-repo', },
+        after         => '284ffdd4c525547f6ae848d768fff92ff9a89743',
         commits       => [
             {   id      => 'b9b55876e288bba29d1579d308eea5758bc148ef',
                 message => "Commit three files (add, mod, rm)",
@@ -96,6 +98,27 @@ TestBot->expect(
         '* 14http://git/284ffdd' )
 );
 
+$resp = webhook_post(
+    {   object_kind   => 'push',
+        ref           => 'refs/heads/old_branch',
+        user_name     => 'Test User',
+        user_username => 'ser',
+        project       => { name => 'test-repo', },
+        before        => '284ffdd4c525547f6ae848d768fff92ff9a89743',
+        after         => '0000000000000000000000000000000000000000',
+        commits       => [ ],
+    }
+);
+
+is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
+
+TestBot->expect(
+    join( ' ',
+        '#test 03Test User',
+        '05old_branch 284ffdd 06test-repo',
+        '04.',
+        '* branch deleted' )
+);
 diag `cat t/bot/kgb-bot.log`;
 
 my $output = $test_bot->get_output;

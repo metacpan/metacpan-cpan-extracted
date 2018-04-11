@@ -14,21 +14,6 @@ template <typename Ret, typename... Args>
 class function;
 
 template <typename Ret, typename... Args>
-inline shared_ptr<Ifunction<Ret, Args...>> make_abstract_function(function<Ret(Args...)>&& f) {
-    return f.func;
-}
-
-template <typename Ret, typename... Args>
-inline shared_ptr<Ifunction<Ret, Args...>> make_abstract_function(function<Ret(Args...)>& f) {
-    return f.func;
-}
-
-template <typename Ret, typename... Args>
-inline shared_ptr<Ifunction<Ret, Args...>> make_abstract_function(const function<Ret(Args...)>& f) {
-    return f.func;
-}
-
-template <typename Ret, typename... Args>
 class function {
 public:
     using Func = shared_ptr<Ifunction<Ret, Args...>>;
@@ -47,6 +32,7 @@ public:
     function(F&&... f)
         : func(make_abstract_function<Ret, Args...>(std::forward<F>(f)...))
     {}
+
 
 
     function(Func func) : func(func) {};

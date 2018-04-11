@@ -1,6 +1,10 @@
 CHANGES
 -------
 
+  2.081 4 April 2018
+
+      * previous release used $^W instead of use warnings. Fixed.
+
   2.080 2 April 2018
 
       * No Changes

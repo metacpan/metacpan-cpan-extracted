@@ -22,32 +22,32 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200234;
+our $VERSION = 1.20180410221546;
 
 my $formatters = [
                 {
-                  'national_rule' => '(0$1)',
                   'leading_digits' => '7',
-                  'pattern' => '(\\d)(\\d{6,7})',
-                  'format' => '$1 $2'
+                  'national_rule' => '(0$1)',
+                  'format' => '$1 $2',
+                  'pattern' => '(\\d)(\\d{6,7})'
                 },
                 {
                   'leading_digits' => '[2-4]',
-                  'pattern' => '(\\d{2})(\\d{4,6})',
+                  'national_rule' => '(0$1)',
                   'format' => '$1 $2',
-                  'national_rule' => '(0$1)'
+                  'pattern' => '(\\d{2})(\\d{4,6})'
                 },
                 {
+                  'format' => '$1 $2',
                   'national_rule' => '0$1',
-                  'pattern' => '(\\d)(\\d{7})',
                   'leading_digits' => '5',
-                  'format' => '$1 $2'
+                  'pattern' => '(\\d)(\\d{7})'
                 }
               ];
 
 my $validators = {
+                'pager' => '',
                 'personal_number' => '',
-                'mobile' => '5\\d{7}',
                 'geographic' => '
           2[1-4]\\d{5,6}|
           3(?:
@@ -61,7 +61,9 @@ my $validators = {
           )|
           7\\d{6,7}
         ',
-                'toll_free' => '',
+                'specialrate' => '',
+                'mobile' => '5\\d{7}',
+                'voip' => '',
                 'fixed_line' => '
           2[1-4]\\d{5,6}|
           3(?:
@@ -75,9 +77,7 @@ my $validators = {
           )|
           7\\d{6,7}
         ',
-                'specialrate' => '',
-                'pager' => '',
-                'voip' => ''
+                'toll_free' => ''
               };
 my %areanames = (
   5321 => "Guantánamo\ Province",
@@ -101,13 +101,9 @@ my %areanames = (
       my $number = shift;
       $number =~ s/(^\+53|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-  
       return $self if ($self->is_valid());
-      {
-        no warnings 'uninitialized';
-        $number =~ s/^(?:0)//;
-      }
+      $number =~ s/^(?:0)//;
       $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-    return $self->is_valid() ? $self : undef;
-}
+      return $self->is_valid() ? $self : undef;
+    }
 1;

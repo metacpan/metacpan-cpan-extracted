@@ -1,17 +1,18 @@
-package HTML::FormFu::Constraint::Regex;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Constraint::Regex;
+$HTML::FormFu::Constraint::Regex::VERSION = '2.06';
+# ABSTRACT: Regex Constraint
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 extends 'HTML::FormFu::Constraint';
 
 use Regexp::Common;
 
-has common   => ( is => 'rw', traits => ['FormFuChained'] );
-has regex    => ( is => 'rw', traits => ['FormFuChained'] );
-has anchored => ( is => 'rw', traits => ['FormFuChained'] );
+has common   => ( is => 'rw', traits => ['Chained'] );
+has regex    => ( is => 'rw', traits => ['Chained'] );
+has anchored => ( is => 'rw', traits => ['Chained'] );
 
 sub constrain_value {
     my ( $self, $value ) = @_;
@@ -55,13 +56,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Constraint::Regex - Regex Constraint
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 DESCRIPTION
 
@@ -114,5 +119,16 @@ Sebastian Riedel, C<sri@oook.de>.
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

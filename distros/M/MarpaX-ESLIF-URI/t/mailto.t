@@ -14,9 +14,9 @@ my %DATA =
    #
    # Adapted from http://www.scottseverance.us/mailto.html
    #
-   "mailto:bogus\@email.com,bogus2\@email.com" => {
+   "mailto:bogus\@email.COM,bogus2\@email.com" => {
        scheme    => { origin => "mailto",                                 decoded => "mailto",                                 normalized => "mailto" },
-       to        => { origin => ["bogus\@email.com","bogus2\@email.com"], decoded => ["bogus\@email.com","bogus2\@email.com"], normalized => ["bogus\@email.com","bogus2\@email.com"]},
+       to        => { origin => ["bogus\@email.COM","bogus2\@email.com"], decoded => ["bogus\@email.COM","bogus2\@email.com"], normalized => ["bogus\@email.com","bogus2\@email.com"]},
    },
    "mailto:bogus\@email.com,bogus2\@email.com?subject=test" => {
        scheme    => { origin => "mailto",                                 decoded => "mailto",                                 normalized => "mailto" },

@@ -1,11 +1,11 @@
-package HTML::FormFu::Role::Element::Field;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Role::Element::Field;
+$HTML::FormFu::Role::Element::Field::VERSION = '2.06';
+# ABSTRACT: Role for all form-field elements
 
 use Moose::Role;
 use MooseX::Aliases;
-use MooseX::Attribute::FormFuChained;
 
 with 'HTML::FormFu::Role::ContainsElementsSharedWithField',
     'HTML::FormFu::Role::NestedHashUtils',
@@ -35,28 +35,28 @@ __PACKAGE__->mk_attrs( qw(
         error_container_attributes
 ) );
 
-has _constraints         => ( is => 'rw', traits => ['FormFuChained'] );
-has _filters             => ( is => 'rw', traits => ['FormFuChained'] );
-has _inflators           => ( is => 'rw', traits => ['FormFuChained'] );
-has _deflators           => ( is => 'rw', traits => ['FormFuChained'] );
-has _validators          => ( is => 'rw', traits => ['FormFuChained'] );
-has _transformers        => ( is => 'rw', traits => ['FormFuChained'] );
-has _plugins             => ( is => 'rw', traits => ['FormFuChained'] );
-has _errors              => ( is => 'rw', traits => ['FormFuChained'] );
-has container_tag        => ( is => 'rw', traits => ['FormFuChained'] );
-has field_filename       => ( is => 'rw', traits => ['FormFuChained'] );
-has label_filename       => ( is => 'rw', traits => ['FormFuChained'] );
-has label_tag            => ( is => 'rw', traits => ['FormFuChained'] );
-has retain_default       => ( is => 'rw', traits => ['FormFuChained'] );
-has force_default        => ( is => 'rw', traits => ['FormFuChained'] );
-has javascript           => ( is => 'rw', traits => ['FormFuChained'] );
-has non_param            => ( is => 'rw', traits => ['FormFuChained'] );
-has reverse_single       => ( is => 'rw', traits => ['FormFuChained'] );
-has reverse_multi        => ( is => 'rw', traits => ['FormFuChained'] );
-has multi_value          => ( is => 'rw', traits => ['FormFuChained'] );
-has original_name        => ( is => 'rw', traits => ['FormFuChained'] );
-has original_nested_name => ( is => 'rw', traits => ['FormFuChained'] );
-has default_empty_value  => ( is => 'rw', traits => ['FormFuChained'] );
+has _constraints         => ( is => 'rw', traits => ['Chained'] );
+has _filters             => ( is => 'rw', traits => ['Chained'] );
+has _inflators           => ( is => 'rw', traits => ['Chained'] );
+has _deflators           => ( is => 'rw', traits => ['Chained'] );
+has _validators          => ( is => 'rw', traits => ['Chained'] );
+has _transformers        => ( is => 'rw', traits => ['Chained'] );
+has _plugins             => ( is => 'rw', traits => ['Chained'] );
+has _errors              => ( is => 'rw', traits => ['Chained'] );
+has container_tag        => ( is => 'rw', traits => ['Chained'] );
+has field_filename       => ( is => 'rw', traits => ['Chained'] );
+has label_filename       => ( is => 'rw', traits => ['Chained'] );
+has label_tag            => ( is => 'rw', traits => ['Chained'] );
+has retain_default       => ( is => 'rw', traits => ['Chained'] );
+has force_default        => ( is => 'rw', traits => ['Chained'] );
+has javascript           => ( is => 'rw', traits => ['Chained'] );
+has non_param            => ( is => 'rw', traits => ['Chained'] );
+has reverse_single       => ( is => 'rw', traits => ['Chained'] );
+has reverse_multi        => ( is => 'rw', traits => ['Chained'] );
+has multi_value          => ( is => 'rw', traits => ['Chained'] );
+has original_name        => ( is => 'rw', traits => ['Chained'] );
+has original_nested_name => ( is => 'rw', traits => ['Chained'] );
+has default_empty_value  => ( is => 'rw', traits => ['Chained'] );
 
 __PACKAGE__->mk_output_accessors(qw( comment label value ));
 
@@ -495,8 +495,8 @@ sub process_value {
 around render_data_non_recursive => sub {
     my ( $orig, $self, $args ) = @_;
 
-    my $render = $self->$orig( {
-            nested_name          => xml_escape( $self->nested_name ),
+    my $render = $self->$orig(
+        {   nested_name          => xml_escape( $self->nested_name ),
             comment_attributes   => xml_escape( $self->comment_attributes ),
             container_attributes => xml_escape( $self->container_attributes ),
             label_attributes     => xml_escape( $self->label_attributes ),
@@ -545,10 +545,9 @@ sub _render_label {
         $render->{label} = $self->form->localize($label);
     }
 
-    if (    defined $render->{label}
-         && defined $self->auto_label_class
-         && length $self->auto_label_class
-        )
+    if (   defined $render->{label}
+        && defined $self->auto_label_class
+        && length $self->auto_label_class )
     {
         my $form_name
             = defined $self->form->id
@@ -572,14 +571,12 @@ sub _render_label {
         my $class = $self->auto_label_class;
         $class =~ s/%([fnt])/$string{$1}/g;
 
-        append_xml_attribute( $render->{label_attributes},
-            'class', $class );
+        append_xml_attribute( $render->{label_attributes}, 'class', $class );
     }
 
-    if (    defined $render->{label}
-         && defined $self->auto_container_label_class
-         && length $self->auto_container_label_class
-        )
+    if (   defined $render->{label}
+        && defined $self->auto_container_label_class
+        && length $self->auto_container_label_class )
     {
         my $form_name
             = defined $self->form->id
@@ -621,10 +618,9 @@ sub _render_label {
 sub _render_comment_class {
     my ( $self, $render ) = @_;
 
-    if (    defined $render->{comment}
-         && defined $self->auto_comment_class
-         && length $self->auto_comment_class
-        )
+    if (   defined $render->{comment}
+        && defined $self->auto_comment_class
+        && length $self->auto_comment_class )
     {
         my $form_name
             = defined $self->form->id
@@ -644,14 +640,12 @@ sub _render_comment_class {
         my $class = $self->auto_comment_class;
         $class =~ s/%([fn])/$string{$1}/g;
 
-        append_xml_attribute( $render->{comment_attributes},
-            'class', $class );
+        append_xml_attribute( $render->{comment_attributes}, 'class', $class );
     }
 
-    if (    defined $render->{comment}
-         && defined $self->auto_container_comment_class
-         && length $self->auto_container_comment_class
-        )
+    if (   defined $render->{comment}
+        && defined $self->auto_container_comment_class
+        && length $self->auto_container_comment_class )
     {
         my $form_name
             = defined $self->form->id
@@ -692,8 +686,8 @@ sub _render_value {
     {
         if ( $self->render_processed_value ) {
             $input
-                = $self->get_nested_hash_value( $form->_processed_params, $name,
-                );
+                = $self->get_nested_hash_value( $form->_processed_params,
+                $name, );
         }
         else {
             $input = $self->get_nested_hash_value( $form->input, $name, );
@@ -740,9 +734,8 @@ sub _render_value {
 sub _render_container_class {
     my ( $self, $render ) = @_;
 
-    if (    defined $self->auto_container_class
-         && length $self->auto_container_class
-        )
+    if ( defined $self->auto_container_class
+        && length $self->auto_container_class )
     {
         my $form_name
             = defined $self->form->id
@@ -896,6 +889,20 @@ sub _render_error_class {
 
     $render->{errors} = \@errors;
 
+    # auto_error_field_class
+    my $field_class = $self->auto_error_field_class;
+
+    if ( defined $field_class && length $field_class ) {
+        my %string = (
+            f => sub { defined $self->form->id ? $self->form->id : '' },
+            n => sub { defined $render->{name} ? $render->{name} : '' },
+        );
+
+        $field_class =~ s/%([fn])/$string{$1}->()/ge;
+
+        append_xml_attribute( $render->{attributes}, 'class', $field_class );
+    }
+
     my @container_class;
 
     # auto_container_error_class
@@ -903,8 +910,8 @@ sub _render_error_class {
 
     if ( defined $auto_class && length $auto_class ) {
         my %string = (
-            f => sub { defined $self->form->id ? $self->form->id   : '' },
-            n => sub { defined $render->{name} ? $render->{name}   : '' },
+            f => sub { defined $self->form->id ? $self->form->id : '' },
+            n => sub { defined $render->{name} ? $render->{name} : '' },
         );
 
         $auto_class =~ s/%([fn])/$string{$1}->()/ge;
@@ -918,8 +925,8 @@ sub _render_error_class {
     if ( defined $item_class && length $item_class ) {
         for my $error (@errors) {
             my %string = (
-                f => sub { defined $self->form->id ? $self->form->id   : '' },
-                n => sub { defined $render->{name} ? $render->{name}   : '' },
+                f => sub { defined $self->form->id ? $self->form->id : '' },
+                n => sub { defined $render->{name} ? $render->{name} : '' },
                 s => sub { $error->{stage} },
                 t => sub { lc $error->{type} },
             );
@@ -931,9 +938,8 @@ sub _render_error_class {
         }
     }
 
-    map {
-        append_xml_attribute( $render->{container_attributes}, 'class', $_ )
-    } uniq @container_class;
+    map { append_xml_attribute( $render->{container_attributes}, 'class', $_ ) }
+        uniq @container_class;
 
     my @error_container_class;
 
@@ -944,8 +950,8 @@ sub _render_error_class {
 
         if ( defined $auto_class && length $auto_class ) {
             my %string = (
-                f => sub { defined $self->form->id ? $self->form->id   : '' },
-                n => sub { defined $render->{name} ? $render->{name}   : '' },
+                f => sub { defined $self->form->id ? $self->form->id : '' },
+                n => sub { defined $render->{name} ? $render->{name} : '' },
             );
 
             $auto_class =~ s/%([fn])/$string{$1}->()/ge;
@@ -959,8 +965,8 @@ sub _render_error_class {
         if ( defined $item_class && length $item_class ) {
             for my $error (@errors) {
                 my %string = (
-                    f => sub { defined $self->form->id ? $self->form->id   : '' },
-                    n => sub { defined $render->{name} ? $render->{name}   : '' },
+                    f => sub { defined $self->form->id ? $self->form->id : '' },
+                    n => sub { defined $render->{name} ? $render->{name} : '' },
                     s => sub { $error->{stage} },
                     t => sub { lc $error->{type} },
                 );
@@ -972,8 +978,9 @@ sub _render_error_class {
             }
         }
 
-         map {
-            append_xml_attribute( $render->{error_container_attributes}, 'class', $_ )
+        map {
+            append_xml_attribute( $render->{error_container_attributes},
+                'class', $_ )
         } uniq @error_container_class;
     }
 
@@ -985,7 +992,7 @@ sub render_label {
 
     my $render = $self->render_data;
 
-    return $self->_string_label( $render );
+    return $self->_string_label($render);
 }
 
 sub render_field {
@@ -993,7 +1000,7 @@ sub render_field {
 
     my $render = $self->render_data;
 
-    return $self->_string_field( $render );
+    return $self->_string_field($render);
 }
 
 sub _string_field_start {
@@ -1013,7 +1020,7 @@ sub _string_field_start {
         $html .= sprintf "\n%s", $self->_string_label($render);
     }
 
-    $html .= $self->_string_errors( $render );
+    $html .= $self->_string_errors($render);
 
     if (   defined $render->{label}
         && $render->{label_tag} ne 'legend'
@@ -1137,13 +1144,17 @@ around clone => sub {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Role::Element::Field - Role for all form-field elements
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 DESCRIPTION
 
@@ -1538,7 +1549,6 @@ Defaults to C<span>.
 
 Is an L<inheriting accessor|HTML::FormFu/INHERITING ACCESSORS>.
 
-
 =head3 auto_error_message
 
 Default Value: 'form_%s_%t'
@@ -1563,6 +1573,12 @@ Is an L<inheriting accessor|HTML::FormFu/INHERITING ACCESSORS>.
 Set attributes on the tag of each error message.
 
 Is an L<attribute accessor|HTML::FormFu/ATTRIBUTE ACCESSOR>.
+
+=head3 auto_error_field_class
+
+Upon error, add a class name firectly to the field tag (e.g. C<input>, C<select> tag).
+
+Supports L<substitutions|HTML::FormFu/ATTRIBUTE SUBSTITUTIONS>: C<%f>, C<%n>.
 
 =head3 auto_error_class
 
@@ -1893,5 +1909,16 @@ Carl Franks, C<cfranks@cpan.org>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -1,10 +1,11 @@
-package HTML::FormFu::Element::ComboBox;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Element::ComboBox;
+$HTML::FormFu::Element::ComboBox::VERSION = '2.06';
+# ABSTRACT: Select / Text hybrid
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 extends 'HTML::FormFu::Element::Multi';
 
 with 'HTML::FormFu::Role::Element::ProcessOptionsFromModel';
@@ -21,11 +22,11 @@ our @DEFER_TO_SELECT = qw(
 );
 
 for my $name (@DEFER_TO_SELECT) {
-    has $name => ( is => 'rw', traits => ['FormFuChained'] );
+    has $name => ( is => 'rw', traits => ['Chained'] );
 }
 
-has select => ( is => 'rw', traits => ['FormFuChained'], default => sub { {} } );
-has text   => ( is => 'rw', traits => ['FormFuChained'], default => sub { {} } );
+has select => ( is => 'rw', traits => ['Chained'], default => sub { {} } );
+has text   => ( is => 'rw', traits => ['Chained'], default => sub { {} } );
 
 *default = \&value;
 
@@ -158,8 +159,8 @@ sub _add_select {
 
     my $select_name = _build_field_name( $self, 'select' );
 
-    my $select_element = $self->element( {
-            type => 'Select',
+    my $select_element = $self->element(
+        {   type => 'Select',
             name => $select_name,
         } );
 
@@ -193,8 +194,8 @@ sub _add_text {
 
     my $text_name = _build_field_name( $self, 'text' );
 
-    my $text_element = $self->element( {
-            type => 'Text',
+    my $text_element = $self->element(
+        {   type => 'Text',
             name => $text_name,
         } );
 
@@ -264,8 +265,8 @@ sub process_input {
         );
     }
     elsif ( defined $select_value && length $select_value ) {
-        $self->set_nested_hash_value( $input, $self->nested_name, $select_value,
-        );
+        $self->set_nested_hash_value( $input, $self->nested_name,
+            $select_value, );
     }
 
     return $self->SUPER::process_input($input);
@@ -278,8 +279,8 @@ sub render_data {
 sub render_data_non_recursive {
     my ( $self, $args ) = @_;
 
-    my $render = $self->SUPER::render_data_non_recursive( {
-            elements => [ map { $_->render_data } @{ $self->_elements } ],
+    my $render = $self->SUPER::render_data_non_recursive(
+        {   elements => [ map { $_->render_data } @{ $self->_elements } ],
             $args ? %$args : (),
         } );
 
@@ -292,13 +293,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Element::ComboBox - Select / Text hybrid
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -310,7 +315,6 @@ version 2.05
         values:
           - yes
           - no
-
 
 =head1 DESCRIPTION
 
@@ -410,5 +414,16 @@ Carl Franks, C<cfranks@cpan.org>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

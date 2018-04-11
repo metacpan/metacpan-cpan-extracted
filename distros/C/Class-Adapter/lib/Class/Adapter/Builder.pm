@@ -1,151 +1,145 @@
 package Class::Adapter::Builder;
+# ABSTRACT: Generate Class::Adapter classes
 
-=pod
-
-=head1 NAME
-
-Class::Adapter::Builder - Generate Class::Adapter classes
-
-=head1 SYNOPSIS
-
-  package My::Adapter;
-  
-  use strict;
-  use Class::Adapter::Builder
-      ISA     => 'Specific::API',
-      METHODS => [ qw{foo bar baz} ],
-      method  => 'different_method';
-  
-  1;
-
-=head1 DESCRIPTION
-
-C<Class::Adapter::Builder> is another mechanism for letting you create
-I<Adapter> classes of your own.
-
-It is intended to act as a toolkit for generating the guts of many varied
-and different types of I<Adapter> classes.
-
-For a simple base class you can inherit from and change a specific method,
-see L<Class::Adapter::Clear>.
-
-=head2 The Pragma Interface
-
-The most common method for defining I<Adapter> classes, as shown in the
-synopsis, is the pragma interface.
-
-This consists of a set of key/value pairs provided when you load the module.
-
-  # The format for building Adapter classes
-  use Class::Adapter::Builder PARAM => VALUE, ...
-
-=over 4
-
-=item ISA
-
-The C<ISA> param is provided as either a single value, or a reference
-to an C<ARRAY> containing is list of classes.
-
-Normally this is just a straight list of classes. However, if the value
-for C<ISA> is set to C<'_OBJECT_'> the object will identify itself as
-whatever is contained in it when the C<-E<gt>isa> and C<-E<gt>can> method
-are called on it.
-
-=item NEW
-
-Normally, you need to create your C<Class::Adapter> objects separately:
-
-  # Create the object
-  my $query = CGI->new( 'param1', 'param2' );
-  
-  # Create the Decorator
-  my $object = My::Adapter->new( $query );
-
-If you provide a class name as the C<NEW> param, the Decorator will
-do this for you, passing on any constructor arguments.
-
-  # Assume we provided the following
-  # NEW => 'CGI',
-  
-  # We can now do the above in one step
-  my $object = My::Adapter->new( 'param1', 'param2' );
-
-=item AUTOLOAD
-
-By default, a C<Class::Adapter> does not pass on any methods, with the
-methods to be passed on specified explicitly with the C<'METHODS'>
-param.
-
-By setting C<AUTOLOAD> to true, the C<Adapter> will be given the
-standard C<AUTOLOAD> function to to pass through all unspecified
-methods to the parent object.
-
-By default the AUTOLOAD will pass through any and all calls, including
-calls to private methods.
-
-If the AUTOLOAD is specifically set to 'PUBLIC', the AUTOLOAD setting
-will ONLY apply to public methods, and any private methods will not
-be passed through.
-
-=item METHODS
-
-The C<METHODS> param is provided as a reference to an array of all
-the methods that are to be passed through to the parent object as is.
-
-=back
-
-Any params other than the ones specified above are taken as translated
-methods.
-
-  # If you provide the following
-  # foo => bar
-  
-  # It the following are equivalent
-  $decorator->foo;
-  $decorator->_OBJECT_->bar;
-
-This capability is provided primarily because in Perl one of the main
-situations in which you hit the limits of Perl's inheritance model is
-when your class needs to inherit from multiple different classes that
-containing clashing methods.
-
-For example:
-
-  # If your class is like this
-  package Foo;
-  
-  use base 'This', 'That';
-  
-  1;
-
-If both C<This-E<gt>method> exists and C<That-E<gt>method> exists,
-and both mean different things, then C<Foo-E<gt>method> becomes
-ambiguous.
-
-A C<Class::Adapter> could be used to wrap your C<Foo> object, with
-the C<Class::Adapter> becoming the C<That> sub-class, and passing
-C<$decorator-E<gt>method> through to C<$object-E<gt>that_method>.
-
-=head1 METHODS
-
-Yes, C<Class::Adapter::Builder> has public methods and later on you will
-be able to access them directly, but for now they are remaining
-undocumented, so that I can shuffle things around for another few
-versions.
-
-Just stick to the pragma interface for now.
-
-=cut
+#pod =pod
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod   package My::Adapter;
+#pod   
+#pod   use strict;
+#pod   use Class::Adapter::Builder
+#pod       ISA     => 'Specific::API',
+#pod       METHODS => [ qw{foo bar baz} ],
+#pod       method  => 'different_method';
+#pod   
+#pod   1;
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod C<Class::Adapter::Builder> is another mechanism for letting you create
+#pod I<Adapter> classes of your own.
+#pod
+#pod It is intended to act as a toolkit for generating the guts of many varied
+#pod and different types of I<Adapter> classes.
+#pod
+#pod For a simple base class you can inherit from and change a specific method,
+#pod see L<Class::Adapter::Clear>.
+#pod
+#pod =head2 The Pragma Interface
+#pod
+#pod The most common method for defining I<Adapter> classes, as shown in the
+#pod synopsis, is the pragma interface.
+#pod
+#pod This consists of a set of key/value pairs provided when you load the module.
+#pod
+#pod   # The format for building Adapter classes
+#pod   use Class::Adapter::Builder PARAM => VALUE, ...
+#pod
+#pod =over 4
+#pod
+#pod =item ISA
+#pod
+#pod The C<ISA> param is provided as either a single value, or a reference
+#pod to an C<ARRAY> containing is list of classes.
+#pod
+#pod Normally this is just a straight list of classes. However, if the value
+#pod for C<ISA> is set to C<'_OBJECT_'> the object will identify itself as
+#pod whatever is contained in it when the C<-E<gt>isa> and C<-E<gt>can> method
+#pod are called on it.
+#pod
+#pod =item NEW
+#pod
+#pod Normally, you need to create your C<Class::Adapter> objects separately:
+#pod
+#pod   # Create the object
+#pod   my $query = CGI->new( 'param1', 'param2' );
+#pod   
+#pod   # Create the Decorator
+#pod   my $object = My::Adapter->new( $query );
+#pod
+#pod If you provide a class name as the C<NEW> param, the Decorator will
+#pod do this for you, passing on any constructor arguments.
+#pod
+#pod   # Assume we provided the following
+#pod   # NEW => 'CGI',
+#pod   
+#pod   # We can now do the above in one step
+#pod   my $object = My::Adapter->new( 'param1', 'param2' );
+#pod
+#pod =item AUTOLOAD
+#pod
+#pod By default, a C<Class::Adapter> does not pass on any methods, with the
+#pod methods to be passed on specified explicitly with the C<'METHODS'>
+#pod param.
+#pod
+#pod By setting C<AUTOLOAD> to true, the C<Adapter> will be given the
+#pod standard C<AUTOLOAD> function to to pass through all unspecified
+#pod methods to the parent object.
+#pod
+#pod By default the AUTOLOAD will pass through any and all calls, including
+#pod calls to private methods.
+#pod
+#pod If the AUTOLOAD is specifically set to 'PUBLIC', the AUTOLOAD setting
+#pod will ONLY apply to public methods, and any private methods will not
+#pod be passed through.
+#pod
+#pod =item METHODS
+#pod
+#pod The C<METHODS> param is provided as a reference to an array of all
+#pod the methods that are to be passed through to the parent object as is.
+#pod
+#pod =back
+#pod
+#pod Any params other than the ones specified above are taken as translated
+#pod methods.
+#pod
+#pod   # If you provide the following
+#pod   # foo => bar
+#pod   
+#pod   # It the following are equivalent
+#pod   $decorator->foo;
+#pod   $decorator->_OBJECT_->bar;
+#pod
+#pod This capability is provided primarily because in Perl one of the main
+#pod situations in which you hit the limits of Perl's inheritance model is
+#pod when your class needs to inherit from multiple different classes that
+#pod containing clashing methods.
+#pod
+#pod For example:
+#pod
+#pod   # If your class is like this
+#pod   package Foo;
+#pod   
+#pod   use base 'This', 'That';
+#pod   
+#pod   1;
+#pod
+#pod If both C<This-E<gt>method> exists and C<That-E<gt>method> exists,
+#pod and both mean different things, then C<Foo-E<gt>method> becomes
+#pod ambiguous.
+#pod
+#pod A C<Class::Adapter> could be used to wrap your C<Foo> object, with
+#pod the C<Class::Adapter> becoming the C<That> sub-class, and passing
+#pod C<$decorator-E<gt>method> through to C<$object-E<gt>that_method>.
+#pod
+#pod =head1 METHODS
+#pod
+#pod Yes, C<Class::Adapter::Builder> has public methods and later on you will
+#pod be able to access them directly, but for now they are remaining
+#pod undocumented, so that I can shuffle things around for another few
+#pod versions.
+#pod
+#pod Just stick to the pragma interface for now.
+#pod
+#pod =cut
 
 use 5.005;
 use strict;
 use Carp           ();
 use Class::Adapter ();
 
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '1.07';
-}
+our $VERSION = '1.09';
 
 
 
@@ -437,32 +431,167 @@ END_AUTOLOAD
 
 1;
 
+__END__
+
 =pod
 
-=head1 SUPPORT
+=encoding UTF-8
 
-Bugs should be reported via the CPAN bug tracker at
+=head1 NAME
 
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Class-Adapter>
+Class::Adapter::Builder - Generate Class::Adapter classes
 
-For other issues, contact the author.
+=head1 VERSION
 
-=head1 AUTHOR
+version 1.09
 
-Adam Kennedy E<lt>adamk@cpan.orgE<gt>
+=head1 SYNOPSIS
+
+  package My::Adapter;
+  
+  use strict;
+  use Class::Adapter::Builder
+      ISA     => 'Specific::API',
+      METHODS => [ qw{foo bar baz} ],
+      method  => 'different_method';
+  
+  1;
+
+=head1 DESCRIPTION
+
+C<Class::Adapter::Builder> is another mechanism for letting you create
+I<Adapter> classes of your own.
+
+It is intended to act as a toolkit for generating the guts of many varied
+and different types of I<Adapter> classes.
+
+For a simple base class you can inherit from and change a specific method,
+see L<Class::Adapter::Clear>.
+
+=head2 The Pragma Interface
+
+The most common method for defining I<Adapter> classes, as shown in the
+synopsis, is the pragma interface.
+
+This consists of a set of key/value pairs provided when you load the module.
+
+  # The format for building Adapter classes
+  use Class::Adapter::Builder PARAM => VALUE, ...
+
+=over 4
+
+=item ISA
+
+The C<ISA> param is provided as either a single value, or a reference
+to an C<ARRAY> containing is list of classes.
+
+Normally this is just a straight list of classes. However, if the value
+for C<ISA> is set to C<'_OBJECT_'> the object will identify itself as
+whatever is contained in it when the C<-E<gt>isa> and C<-E<gt>can> method
+are called on it.
+
+=item NEW
+
+Normally, you need to create your C<Class::Adapter> objects separately:
+
+  # Create the object
+  my $query = CGI->new( 'param1', 'param2' );
+  
+  # Create the Decorator
+  my $object = My::Adapter->new( $query );
+
+If you provide a class name as the C<NEW> param, the Decorator will
+do this for you, passing on any constructor arguments.
+
+  # Assume we provided the following
+  # NEW => 'CGI',
+  
+  # We can now do the above in one step
+  my $object = My::Adapter->new( 'param1', 'param2' );
+
+=item AUTOLOAD
+
+By default, a C<Class::Adapter> does not pass on any methods, with the
+methods to be passed on specified explicitly with the C<'METHODS'>
+param.
+
+By setting C<AUTOLOAD> to true, the C<Adapter> will be given the
+standard C<AUTOLOAD> function to to pass through all unspecified
+methods to the parent object.
+
+By default the AUTOLOAD will pass through any and all calls, including
+calls to private methods.
+
+If the AUTOLOAD is specifically set to 'PUBLIC', the AUTOLOAD setting
+will ONLY apply to public methods, and any private methods will not
+be passed through.
+
+=item METHODS
+
+The C<METHODS> param is provided as a reference to an array of all
+the methods that are to be passed through to the parent object as is.
+
+=back
+
+Any params other than the ones specified above are taken as translated
+methods.
+
+  # If you provide the following
+  # foo => bar
+  
+  # It the following are equivalent
+  $decorator->foo;
+  $decorator->_OBJECT_->bar;
+
+This capability is provided primarily because in Perl one of the main
+situations in which you hit the limits of Perl's inheritance model is
+when your class needs to inherit from multiple different classes that
+containing clashing methods.
+
+For example:
+
+  # If your class is like this
+  package Foo;
+  
+  use base 'This', 'That';
+  
+  1;
+
+If both C<This-E<gt>method> exists and C<That-E<gt>method> exists,
+and both mean different things, then C<Foo-E<gt>method> becomes
+ambiguous.
+
+A C<Class::Adapter> could be used to wrap your C<Foo> object, with
+the C<Class::Adapter> becoming the C<That> sub-class, and passing
+C<$decorator-E<gt>method> through to C<$object-E<gt>that_method>.
+
+=head1 METHODS
+
+Yes, C<Class::Adapter::Builder> has public methods and later on you will
+be able to access them directly, but for now they are remaining
+undocumented, so that I can shuffle things around for another few
+versions.
+
+Just stick to the pragma interface for now.
 
 =head1 SEE ALSO
 
 L<Class::Adapter>, L<Class::Adapter::Clear>
 
-=head1 COPYRIGHT
+=head1 SUPPORT
 
-Copyright 2005 - 2011 Adam Kennedy.
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Adapter>
+(or L<bug-Class-Adapter@rt.cpan.org|mailto:bug-Class-Adapter@rt.cpan.org>).
 
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
+=head1 AUTHOR
 
-The full text of the license can be found in the
-LICENSE file included with this module.
+Adam Kennedy <adamk@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2005 by Adam Kennedy.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

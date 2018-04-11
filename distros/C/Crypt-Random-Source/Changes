@@ -1,5 +1,11 @@
 Revision history for Crypt-Random-Source
 
+0.14      2018-04-10 02:57:33Z
+          - remove Crypt::Random::Source::Weak::rand from list of backends in
+            Factory.pm, which would could have resulted in runtime errors after
+            its removal in 0.13
+          - Document issues with rand() in previous release
+
 0.13      2018-04-08 01:07:39Z
           - remove rand() fallback, which could be used by get_weak and is not safe
             for cryptographic applications

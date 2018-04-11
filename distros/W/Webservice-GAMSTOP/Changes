@@ -1,4 +1,8 @@
+0.003     2018-04-10 05:38:13+00:00 UTC
+  Remove name validations
+
 0.002     2018-03-21 03:45:41+00:00 UTC
+  Fix failing test
 
 0.001     2018-03-08 02:18:35+00:00 UTC
   Initial release

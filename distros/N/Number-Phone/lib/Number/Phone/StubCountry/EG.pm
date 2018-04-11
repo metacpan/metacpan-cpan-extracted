@@ -22,16 +22,18 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200234;
+our $VERSION = 1.20180410221546;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2',
                   'pattern' => '(\\d)(\\d{7,8})',
+                  'format' => '$1 $2',
                   'leading_digits' => '[23]',
                   'national_rule' => '0$1'
                 },
                 {
+                  'pattern' => '(\\d{2})(\\d{6,7})',
+                  'format' => '$1 $2',
                   'leading_digits' => '
             1(?:
               3|
@@ -40,60 +42,22 @@ my $formatters = [
             [4-6]|
             [89][2-9]
           ',
-                  'pattern' => '(\\d{2})(\\d{6,7})',
-                  'format' => '$1 $2',
                   'national_rule' => '0$1'
                 },
                 {
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             1[0-25]|
             [89]00
           ',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
-                  'format' => '$1 $2 $3',
                   'national_rule' => '0$1'
                 }
               ];
 
 my $validators = {
-                'geographic' => '
-          (?:
-            1(?:
-              3[23]\\d|
-              5(?:
-                [23]|
-                9\\d
-              )
-            )|
-            2[2-4]\\d{2}|
-            3\\d{2}|
-            4(?:
-              0[2-5]|
-              [578][23]|
-              64
-            )\\d|
-            5(?:
-              0[2-7]|
-              5\\d|
-              7[23]
-            )\\d|
-            6[24-689]3\\d|
-            8(?:
-              2[2-57]|
-              4[26]|
-              6[237]|
-              8[2-4]
-            )\\d|
-            9(?:
-              2[27]|
-              3[24]|
-              52|
-              6[2356]|
-              7[2-4]
-            )\\d
-          )\\d{5}
-        ',
-                'specialrate' => '(900\\d{7})',
+                'voip' => '',
+                'toll_free' => '800\\d{7}',
                 'fixed_line' => '
           (?:
             1(?:
@@ -131,11 +95,47 @@ my $validators = {
             )\\d
           )\\d{5}
         ',
-                'toll_free' => '800\\d{7}',
                 'personal_number' => '',
+                'pager' => '',
+                'specialrate' => '(900\\d{7})',
                 'mobile' => '1[0125]\\d{8}',
-                'voip' => '',
-                'pager' => ''
+                'geographic' => '
+          (?:
+            1(?:
+              3[23]\\d|
+              5(?:
+                [23]|
+                9\\d
+              )
+            )|
+            2[2-4]\\d{2}|
+            3\\d{2}|
+            4(?:
+              0[2-5]|
+              [578][23]|
+              64
+            )\\d|
+            5(?:
+              0[2-7]|
+              5\\d|
+              7[23]
+            )\\d|
+            6[24-689]3\\d|
+            8(?:
+              2[2-57]|
+              4[26]|
+              6[237]|
+              8[2-4]
+            )\\d|
+            9(?:
+              2[27]|
+              3[24]|
+              52|
+              6[2356]|
+              7[2-4]
+            )\\d
+          )\\d{5}
+        '
               };
 my %areanames = (
   2013 => "Banha",
@@ -172,13 +172,9 @@ my %areanames = (
       my $number = shift;
       $number =~ s/(^\+20|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-  
       return $self if ($self->is_valid());
-      {
-        no warnings 'uninitialized';
-        $number =~ s/^(?:0)//;
-      }
+      $number =~ s/^(?:0)//;
       $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-    return $self->is_valid() ? $self : undef;
-}
+      return $self->is_valid() ? $self : undef;
+    }
 1;

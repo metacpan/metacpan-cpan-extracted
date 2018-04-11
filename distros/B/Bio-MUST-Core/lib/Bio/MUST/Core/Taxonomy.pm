@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.180630';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.181000';
 use Moose;
 use namespace::autoclean;
 
@@ -162,11 +162,11 @@ sub _build_ncbi_tax {
     my @names_files = ($names_txid, $names_gca);
     my @nodes_files = ($nodes_txid, $nodes_gca);
 
-    # TODO: improve warning suppression
-    # cat: .../taxdump/gca*names.dmp: No such file or directory
-    # cat: .../taxdump/gca*nodes.dmp: No such file or directory
-    open my $names_fh, '-|', "cat @names_files 2> /dev/null";
-    open my $nodes_fh, '-|', "cat @nodes_files 2> /dev/null";
+    # Note: names.dmp files are reordered on-the-fly so as scientific names
+    # get precedence over other names (e.g., synonyms) in case of duplicates
+    my $ol = q{'if (index($_, "scientific name") == -1) { print } else { push @sns, $_ } END{ print for @sns }'};
+    open my $names_fh, '-|', qq{perl -nle $ol @names_files 2> /dev/null};
+    open my $nodes_fh, '-|', qq{cat @nodes_files 2> /dev/null};
 
     return MooseNCBI->new(
         names => $names_fh,
@@ -324,7 +324,8 @@ sub _build_strain_taxid_for {
     my $names_txid = file($self->tax_dir, 'names*.dmp'   );
     my $names_gca  = file($self->tax_dir, 'gca*names.dmp');
 
-    my @names_files = ($names_txid, $names_gca);
+    # Note: taxid files are loaded last to get precedence over gca numbers
+    my @names_files = ($names_gca, $names_txid);
     open my $names_fh, '-|', "cat @names_files";
 
     my %strain_taxid_for;
@@ -453,6 +454,22 @@ around qr{ _from_seq_id \z | _from_legacy_seq_id \z }xms => sub {
     return $self->$method($seq_id, @_);
 };
 
+around qr{ _from_name \z }xms => sub {
+    my $method = shift;
+    my $self   = shift;
+    my $name   = shift;
+
+    # avoid issue with undefined names
+    return undef unless $name;      ## no critic (ProhibitExplicitReturnUndef)
+
+    if ( $self->is_dupe($name) ) {
+        carp "Warning: $name is taxonomically ambiguous; returning undef!";
+        return undef;               ## no critic (ProhibitExplicitReturnUndef)
+    }
+
+    return $self->$method($name);
+};
+
 around qw( get_taxonomy get_taxonomy_with_levels get_term_at_level ) => sub {
     my $method   = shift;
     my $self     = shift;
@@ -517,14 +534,9 @@ sub get_taxid_from_seq_id {
         return $taxon_id if $taxon_id;
     }
 
-    # 6. tries to recover organism genus in NCBI Taxonomy...
-    # ... but not if genus is corresponds to multiple lineages
-    my $genus = $seq_id->genus;
-    if ( $self->is_dupe($genus) ) {
-        carp "Warning: $genus is taxonomically ambiguous; returning undef!";
-        return undef                ## no critic (ProhibitExplicitReturnUndef)
-    }
-    return $self->get_taxid_from_name($genus);
+    # 6. tries to recover organism genus in NCBI Taxonomy
+    # this may fail if genus is ambiguous (see around method modifier)
+    return $self->get_taxid_from_name( $seq_id->genus );
 }
 
 
@@ -1019,7 +1031,7 @@ sub _taxids_from_gis {
 
             # stop trying if batch_size falls to zero
             unless ($batch_size) {
-                carp 'Warning: No answer from NCBI E-utilities; dropping GIs!';
+                carp 'Warning: no answer from NCBI E-utilities; dropping GIs!';
                 last ESUMMARY;
             }
         }
@@ -1239,6 +1251,25 @@ sub tax_classifier {
 #               ]
 
 
+sub eq_tax {
+    my $self       = shift;
+    my $got        = shift;
+    my $expect     = shift;
+    my $classifier = shift;
+
+    # compute LCA between got org and expected lineage
+    my $lca = $self->get_common_taxonomy_from_seq_ids($got, $expect);
+
+    # classify got org...
+    # ... and use got taxon as a tax_filter...
+    my $taxon = $classifier->classify($got);
+    my $tax_filter = $self->tax_filter( [ '+' . $taxon ] );
+
+    # then apply tax_filter to computed LCA
+    return $tax_filter->is_allowed($lca);
+}
+
+
 # I/O METHODS
 
 const my $CACHEDB => 'cachedb.bin';
@@ -1320,18 +1351,23 @@ sub setup_taxdir {
         }
     }
 
+    # delete gca files if any
+    my $gcanamefile = file($tax_dir, 'gca0-names.dmp');
+    my $gcanodefile = file($tax_dir, 'gca0-nodes.dmp');
+    $gcanamefile->remove if -e $gcanamefile;
+    $gcanodefile->remove if -e $gcanodefile;
+
     #... second, the accession_id version
     $class->_make_gca_files($tax_dir);
 
     # return true on success (only check main files)
-    if ( -r file($tax_dir, 'gca0-names.dmp') &&
-         -r file($tax_dir, 'gca0-nodes.dmp') ) {
+    if ( -r $gcanamefile && -r $gcanodefile ) {
         ### Successfully wrote GCA-based files!
     }
 
     # delete cache if any
     my $cachefile = file($tax_dir, $CACHEDB);
-    unlink $cachefile if -e $cachefile;
+    $cachefile->remove if -e $cachefile;
 
     # optionally build binary GI mapper from GI-to-taxid flat files
     if ($gi_mapper) {
@@ -1424,6 +1460,7 @@ sub _make_gca_files {
             # fetch taxonomy and org using taxon_id
             # Note: we try to deal with occasionally out-of-sync NCBI files
             # that spew a lot of undef warnings in Bio::LITE::Taxonomy
+            # Note: should be fixed by the removal of existing gca files
             my @taxonomy;
             try_fatal_warnings { @taxonomy = $tax->get_taxonomy($taxon_id) };
             unless (@taxonomy) {
@@ -1577,7 +1614,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.180630
+version 0.181000
 
 =head1 SYNOPSIS
 
@@ -1622,6 +1659,8 @@ version 0.180630
 =head2 tax_category
 
 =head2 tax_classifier
+
+=head2 eq_tax
 
 =head2 setup_taxdir
 

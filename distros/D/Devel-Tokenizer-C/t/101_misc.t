@@ -2,7 +2,7 @@
 #
 # $Project: /Devel-Tokenizer-C $
 # $Author: mhx $
-# $Date: 2008/04/13 13:30:59 +0200 $
+# $Date: 2008/04/13 12:30:59 +0100 $
 # $Revision: 3 $
 # $Source: /t/101_misc.t $
 #
@@ -58,3 +58,13 @@ eval {
 ok( $@, '', "unexpected error" );
 ok( $c ne '' );
 
+my $num = 0;
+
+Devel::Tokenizer::C->new(
+    StringLength  => 'len',
+    TokenEnd =>  undef,
+    UnknownCode   => 'return 0;',
+    TokenFunc => sub { $num++; "return $_[0];\n" })
+  ->add_tokens('n1', 'n0')->generate;
+
+ok($num, 2);

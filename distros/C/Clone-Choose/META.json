@@ -81,6 +81,6 @@
          "web" : "https://github.com/perl5-utils/Clone-Choose"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_serialization_backend" : "JSON::PP version 2.97000"
 }

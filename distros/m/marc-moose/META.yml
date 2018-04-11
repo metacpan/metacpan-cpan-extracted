@@ -8,10 +8,10 @@ build_requires:
   Test::More: '0'
   Time::HiRes: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
-  File::ShareDir::Install: '0.03'
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -45,4 +45,4 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 1.0.34
+version: 1.0.35

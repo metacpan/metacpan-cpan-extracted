@@ -7,7 +7,7 @@ package MarpaX::ESLIF::URI::file;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Class::Tiny::Antlers;
 use Class::Method::Modifiers qw/around/;
@@ -75,11 +75,11 @@ MarpaX::ESLIF::URI::file - URI::file syntax as per RFC8089
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SUBROUTINES/METHODS
 
-MarpaX::ESLIF::URI::file inherits, and eventually overwrites some, methods or MarpaX::ESLIF::URI::_generic.
+MarpaX::ESLIF::URI::file inherits, and eventually overwrites some, methods of MarpaX::ESLIF::URI::_generic.
 
 =head2 $class->bnf
 

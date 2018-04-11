@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Types;
 # ABSTRACT: Distribution-wide Moose types for Bio::MUST::Core
-$Bio::MUST::Core::Types::VERSION = '0.180630';
+$Bio::MUST::Core::Types::VERSION = '0.181000';
 use Moose::Util::TypeConstraints;
 
 use autodie;
@@ -121,8 +121,11 @@ class_type('File::Temp');
 # useful in Bio::MUST::Drivers modules
 
 coerce 'Bio::MUST::Core::Ali'
+    => from 'Bio::MUST::Core::Ali::Stash'
+    => via { Bio::MUST::Core::Ali->new( seqs => $_->seqs, guessing => 1 ) }
+
     => from 'ArrayRef[Bio::MUST::Core::Seq]'
-    => via { Bio::MUST::Core::Ali->new( seqs => $_, guessing => 1 ) }
+    => via { Bio::MUST::Core::Ali->new( seqs => $_,       guessing => 1 ) }
 
     => from 'Path::Class::File'
     => via { Bio::MUST::Core::Ali->load( $_->stringify ) }
@@ -225,7 +228,7 @@ Bio::MUST::Core::Types - Distribution-wide Moose types for Bio::MUST::Core
 
 =head1 VERSION
 
-version 0.180630
+version 0.181000
 
 =head1 SYNOPSIS
 

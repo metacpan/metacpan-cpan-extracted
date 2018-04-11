@@ -1,10 +1,11 @@
-package HTML::FormFu;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu;
+$HTML::FormFu::VERSION = '2.06';
+# ABSTRACT: HTML Form Creation, Rendering and Validation Framework
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 
 with 'HTML::FormFu::Role::Render',
     'HTML::FormFu::Role::CreateChildren',
@@ -36,7 +37,7 @@ use HTML::FormFu::ObjectUtil qw(
     form
     load_config_file            load_config_filestem
     clone                       stash
-    constraints_from_dbic       parent
+    parent
     _load_file
 );
 use HTML::FormFu::Util qw(
@@ -86,7 +87,7 @@ has languages => (
     default => sub { ['en'] },
     lazy    => 1,
     isa     => 'ArrayRef',
-    traits  => ['FormFuChained'],
+    traits  => ['Chained'],
 );
 
 has input => (
@@ -94,7 +95,7 @@ has input => (
     default => sub { {} },
     lazy    => 1,
     isa     => 'HashRef',
-    traits  => ['FormFuChained'],
+    traits  => ['Chained'],
 );
 
 has _processed_params => (
@@ -110,7 +111,7 @@ has form_error_message_class => (
     lazy    => 1,
 );
 
-our @MULTIFORM_SHARED = (qw(
+our @MULTIFORM_SHARED = ( qw(
         javascript
         javascript_src
         indicator
@@ -124,17 +125,17 @@ our @MULTIFORM_SHARED = (qw(
         default_model
         tmp_upload_dir
         params_ignore_underscore
-));
+) );
 
 for (@MULTIFORM_SHARED) {
     has $_ => (
         is     => 'rw',
-        traits => ['FormFuChained'],
+        traits => ['Chained'],
     );
 }
 
-has submitted => ( is => 'rw', traits => ['FormFuChained'] );
-has query     => ( is => 'rw', traits => ['FormFuChained'] );
+has submitted => ( is => 'rw', traits => ['Chained'] );
+has query     => ( is => 'rw', traits => ['Chained'] );
 
 has _auto_fieldset => ( is => 'rw' );
 
@@ -228,8 +229,8 @@ sub model {
 
     require_class($class);
 
-    my $model = $class->new( {
-            type   => $model_name,
+    my $model = $class->new(
+        {   type   => $model_name,
             parent => $self,
         } );
 
@@ -414,7 +415,7 @@ sub _build_params {
 
         next
             if !$self->nested_hash_key_exists( $self->input, $name )
-                && !$field->default_empty_value;
+            && !$field->default_empty_value;
 
         my $input = $self->get_nested_hash_value( $self->input, $name );
 
@@ -969,8 +970,8 @@ around render => sub {
 sub render_data {
     my ( $self, $args ) = @_;
 
-    my $render = $self->render_data_non_recursive( {
-            elements => [ map { $_->render_data } @{ $self->_elements } ],
+    my $render = $self->render_data_non_recursive(
+        {   elements => [ map { $_->render_data } @{ $self->_elements } ],
             $args ? %$args : (),
         } );
 
@@ -1010,7 +1011,7 @@ sub string {
 
     $args_ref ||= {};
 
-    my $html = $self->_string_form_start( $args_ref );
+    my $html = $self->_string_form_start($args_ref);
 
     # form template
 
@@ -1027,7 +1028,7 @@ sub string {
         }
     }
 
-    $html .= $self->_string_form_end( $args_ref );
+    $html .= $self->_string_form_end($args_ref);
     $html .= "\n";
 
     return $html;
@@ -1076,7 +1077,7 @@ sub _string_form_start {
 }
 
 sub _string_form_end {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
     # end_form template
 
@@ -1087,13 +1088,13 @@ sub start {
     my $self = shift;
 
     if ( 'tt' eq $self->render_method ) {
-        return $self->tt( {
-                filename    => 'start_form',
+        return $self->tt(
+            {   filename    => 'start_form',
                 render_data => $self->render_data_non_recursive,
             } );
-        }
+    }
     else {
-        return $self->_string_form_start( @_ );
+        return $self->_string_form_start(@_);
     }
 }
 
@@ -1101,13 +1102,13 @@ sub end {
     my $self = shift;
 
     if ( 'tt' eq $self->render_method ) {
-        return $self->tt( {
-                filename    => 'end_form',
+        return $self->tt(
+            {   filename    => 'end_form',
                 render_data => $self->render_data_non_recursive,
             } );
     }
     else {
-        return $self->_string_form_end( @_ );
+        return $self->_string_form_end(@_);
     }
 }
 
@@ -1171,8 +1172,8 @@ sub _require_output_processor {
 
     require_class($class);
 
-    my $object = $class->new( {
-            type   => $type,
+    my $object = $class->new(
+        {   type   => $type,
             parent => $self,
         } );
 
@@ -1216,13 +1217,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu - HTML Form Creation, Rendering and Validation Framework
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -1253,7 +1258,7 @@ If you're using L<Catalyst>, a more suitable example might be:
     use Moose;
     extends 'Catalyst::Controller::HTML::FormFu';
 
-    sub user : FormFuChained CaptureArgs(1) {
+    sub user : Chained CaptureArgs(1) {
         my ( $self, $c, $id ) = @_;
 
         my $rs = $c->model('Schema')->resultset('User');
@@ -1263,7 +1268,7 @@ If you're using L<Catalyst>, a more suitable example might be:
         return;
     }
 
-    sub edit : FormFuChained('user') Args(0) FormConfig {
+    sub edit : Chained('user') Args(0) FormConfig {
         my ( $self, $c ) = @_;
 
         my $form = $c->stash->{form};
@@ -1417,7 +1422,6 @@ L</load_config_file>:
         s/\.yml/.yaml/;
       }
     });
-
 
 Default Value: not defined
 
@@ -2616,7 +2620,6 @@ would normally be passed onto the C<string> or C<tt> render-methods.
 As with L</render>, you must call L</process> once after building the form,
 and before calling L</render_data>.
 
-
 =head2 render_data_non_recursive
 
 Like L</render_data>, but doesn't include the data for any child-elements.
@@ -3200,7 +3203,7 @@ between January and May 2007 also contain discussion regarding HTML::FormFu.
 =head1 BUGS
 
 Please submit bugs / feature requests to
-L<http://code.google.com/p/html-formfu/issues/list> (preferred) or
+L<https://github.com/FormFu/HTML-FormFu/issues> (preferred) or
 L<http://rt.perl.org>.
 
 =head1 PATCHES
@@ -3213,9 +3216,9 @@ Mailing list messages are limited to 256KB, so gzip the patch if necessary.
 =head1 GITHUB REPOSITORY
 
 This module's sourcecode is maintained in a git repository at
-L<git://github.com/fireartist/HTML-FormFu.git>
+L<git://github.com/FormFu/HTML-FormFu.git>
 
-The project page is L<https://github.com/fireartist/HTML-FormFu>
+The project page is L<https://github.com/FormFu/HTML-FormFu>
 
 =head1 SEE ALSO
 
@@ -3224,10 +3227,6 @@ L<HTML::FormFu::Imager>
 L<Catalyst::Controller::HTML::FormFu>
 
 L<HTML::FormFu::Model::DBIC>
-
-=head1 AUTHORS
-
-Carl Franks
 
 =head1 CONTRIBUTORS
 
@@ -3262,13 +3261,15 @@ Nigel Metheringham
 Based on the original source code of L<HTML::Widget>, by Sebastian Riedel,
 C<sri@oook.de>.
 
-=head1 LICENSE
+=head1 AUTHOR
 
-This library is free software, you can redistribute it and/or modify it under
-the same terms as Perl itself.
+Carl Franks <cpan@fireartist.com>
 
-=head1 PERL GAME
+=head1 COPYRIGHT AND LICENSE
 
-Play the MMO written in perl: L<http://www.lacunaexpanse.com>!
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

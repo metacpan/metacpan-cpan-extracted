@@ -1,5 +1,5 @@
 package String::Validator::Email;
-$String::Validator::Email::VERSION = '2.00';
+$String::Validator::Email::VERSION = '2.01';
 use 5.008;
 use strict;
 use warnings;
@@ -18,7 +18,6 @@ my $email_messages = {
     email_tld         => 'This TLD (Top Level Domain) is not recognized.',
     email_nomx1       => 'Mail Exchanger for ',
     email_nomx2       => ' is missing from Public DNS. Mail cannot be delivered.',
-
 };
 
 sub new {
@@ -144,7 +143,7 @@ String::Validator::Email - String::Validator for checking Email Addresses.
 
 =head1 VERSION
 
-version 2.00
+version 2.01
 
 =head1 SYNOPSIS
 

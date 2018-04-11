@@ -5,10 +5,11 @@ filesystem for storage, security and to prevent race conditions via atomic
 operations. It focuses on simplicity, robustness and scalability.
 
 This module allows multiple concurrent readers and writers to interact with
-the same queue. A Python implementation of the same algorithm is available
-at https://github.com/cern-mig/python-dirq and a Java implementation at
-https://github.com/cern-mig/java-dirq so readers and writers can be
-written in different programming languages.
+the same queue. A Python implementation of the same algorithm is available at
+https://github.com/cern-mig/python-dirq, a Java implementation at
+https://github.com/cern-mig/java-dirq and a C implementation at
+https://github.com/cern-mig/c-dirq so readers and writers can be written in
+different programming languages.
 
 INSTALLATION
 
@@ -32,7 +33,7 @@ perldoc command.
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) CERN 2010-2015
+Copyright (C) CERN 2010-2018
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

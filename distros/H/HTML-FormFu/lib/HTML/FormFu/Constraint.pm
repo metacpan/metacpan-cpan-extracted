@@ -1,10 +1,11 @@
-package HTML::FormFu::Constraint;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Constraint;
+$HTML::FormFu::Constraint::VERSION = '2.06';
+# ABSTRACT: Constrain User Input
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 extends 'HTML::FormFu::Processor';
 
 use HTML::FormFu::Exception::Constraint;
@@ -18,10 +19,10 @@ use Carp qw( croak );
 use List::Util 1.33 qw( any all first );
 use Scalar::Util qw( reftype blessed );
 
-has not          => ( is => 'rw', traits => ['FormFuChained'] );
-has force_errors => ( is => 'rw', traits => ['FormFuChained'] );
-has when         => ( is => 'rw', traits => ['FormFuChained'] );
-has only_on_reps => ( is => 'rw', traits => ['FormFuChained'] );
+has not          => ( is => 'rw', traits => ['Chained'] );
+has force_errors => ( is => 'rw', traits => ['Chained'] );
+has when         => ( is => 'rw', traits => ['Chained'] );
+has only_on_reps => ( is => 'rw', traits => ['Chained'] );
 
 sub repeatable_repeat {
     my ( $self, $repeatable, $new_block ) = @_;
@@ -81,8 +82,8 @@ sub process {
 
         if ($@) {
             push @errors,
-                $self->mk_errors( {
-                    pass    => 0,
+                $self->mk_errors(
+                {   pass    => 0,
                     message => $@,
                 } );
         }
@@ -94,8 +95,8 @@ sub process {
         DEBUG_CONSTRAINTS && debug( '$@' => $@ );
 
         push @errors,
-            $self->mk_errors( {
-                pass => ( $@ || !$ok ) ? 0 : 1,
+            $self->mk_errors(
+            {   pass => ( $@ || !$ok ) ? 0 : 1,
                 message => $@,
             } );
     }
@@ -167,8 +168,8 @@ sub constrain_values {
         DEBUG_CONSTRAINTS && debug( '$@' => $@ );
 
         push @errors,
-            $self->mk_errors( {
-                pass => ( $@ || !$ok ) ? 0 : 1,
+            $self->mk_errors(
+            {   pass => ( $@ || !$ok ) ? 0 : 1,
                 message => $@,
             } );
     }
@@ -273,7 +274,8 @@ sub _process_when {
             if defined $value;
     }
 
-    DEBUG_CONSTRAINTS_WHEN && debug( 'WHEN_FIELDS_VALUES' => \@when_fields_value );
+    DEBUG_CONSTRAINTS_WHEN
+        && debug( 'WHEN_FIELDS_VALUES' => \@when_fields_value );
 
     if ( !@when_fields_value ) {
         DEBUG_CONSTRAINTS_WHEN
@@ -317,13 +319,13 @@ sub _process_when {
 }
 
 sub fetch_error_message {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
-    my $error = HTML::FormFu::Exception::Constraint->new({
-        form      => $self->form,
-        parent    => $self->parent,
-        processor => $self,
-    });
+    my $error = HTML::FormFu::Exception::Constraint->new(
+        {   form      => $self->form,
+            parent    => $self->parent,
+            processor => $self,
+        } );
 
     return $error->message;
 }
@@ -346,13 +348,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Constraint - Constrain User Input
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -596,6 +602,8 @@ error is not known without actually fully processing a form submission.
 
 =item L<HTML::FormFu::Constraint::Integer>
 
+=item L<HTML::FormFu::Constraint::JSON>
+
 =item L<HTML::FormFu::Constraint::Length>
 
 =item L<HTML::FormFu::Constraint::MaxLength>
@@ -651,5 +659,16 @@ Sebastian Riedel, C<sri@oook.de>.
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

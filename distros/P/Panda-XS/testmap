@@ -35,6 +35,8 @@ MixPluginA*            T_OEXT
 MixPluginB*            T_OEXT
 MyBaseAV*              T_OEXT_AV
 MyBaseHV*              T_OEXT_HV
+MyNBaseAV*              T_OEXT_AV
+MyNBaseHV*              T_OEXT_HV
 MyThreadSafe*          PXS_MYTHREAD_SAFE
 WBase*                 PXS_WRAPPED
 WChild*                PXS_WRAPPED_CHILD

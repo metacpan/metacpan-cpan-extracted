@@ -12,14 +12,16 @@ use _common qw(sdump);
 my ($frst, $scnd, @list, $frozen);
 
 ### arrays ###
-$frst = [0, [1]];
-$scnd = [0, [0]];
+$frst = [0, [1], [3]];
+$scnd = [0, [2], [4]];
 @list = list_diff(diff($frst, $scnd, noU => 1));
 is_deeply(
     \@list,
     [
         [[1],[0]],
-            \{N => 0,O => 1}
+            \{N => 2,O => 1},
+        [[2],[0]],
+            \{N => 4,O => 3}
     ],
     "provided index must be picked for path, when common items omitted"
 ) or diag sdump \@list;

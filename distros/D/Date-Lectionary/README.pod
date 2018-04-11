@@ -4,7 +4,7 @@ Date::Lectionary - Readings for the Christian Lectionary
 
 =head1 VERSION
 
-Version 1.20180314
+Version 1.20180410
 
 
 =cut

@@ -2,7 +2,7 @@
 #
 # $Project: /Devel-Tokenizer-C $
 # $Author: mhx $
-# $Date: 2008/04/13 13:31:00 +0200 $
+# $Date: 2008/04/13 12:31:00 +0100 $
 # $Revision: 3 $
 # $Source: /t/001_init.t $
 #

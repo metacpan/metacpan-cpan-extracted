@@ -6,11 +6,11 @@ HTTP::Caching - The RFC 7234 compliant brains to do caching right
 
 =head1 VERSION
 
-Version 0.11
+Version 0.13
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.15';
 
 use strict;
 use warnings;
@@ -20,7 +20,6 @@ use Digest::MD5;
 use HTTP::Method;
 use HTTP::Status ':constants';
 use List::MoreUtils qw{ any };
-use Monkey::Patch::Action;
 use Time::HiRes;
 use URI;
 
@@ -140,7 +139,7 @@ breakage
 
 Sorry for any inconvenience
 
-=head 1 ADVICE
+=head1 ADVICE
 
 Please use L<LPW::UserAgent::Caching> or <LWP::UserAgent::Caching::Simple>.
 
@@ -1062,29 +1061,5 @@ sub _may_reuse_from_cache {
     };
     
 }
-
-# HTTP::Status::is_cacheable_by_default
-#
-# that subroutine is missing. Until it's added there, it's been monkey-patched
-# here.
-#
-#                            RFC 7231 - HTTP/1.1 Semantics and Content
-#                            Section 6.1. Overview of Status Codes
-#
-#   Responses with status codes that are defined as cacheable by default
-#   (e.g., 200, 203, 204, 206, 300, 301, 404, 405, 410, 414, and 501 in
-#   this specification) can be reused by a cache with heuristic
-#   expiration unless otherwise indicated by the method definition or
-#   explicit cache controls [RFC7234]; all other status codes are not
-#   cacheable by default.
-#
-my $handle = Monkey::Patch::Action::patch_package (
-    'HTTP::Status', 'is_cacheable_by_default', 'add', sub {
-        my $code = shift;
-        $code = $code +0;
-        
-        return any {$_ == $code} (200,203,204,206,300,301,404,405,410,414,501)
-    }
-);
 
 1;

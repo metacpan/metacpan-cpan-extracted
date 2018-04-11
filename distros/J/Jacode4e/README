@@ -19,8 +19,8 @@ ABSTRACT
 
     JIS X 0213 contains almost all of the characters used in everyday life in
     Japan. In addition, JIS X 0213 was designed with consideration for use
-    in Shift_JIS environment. However, because it did not consider CP932, it
-    is not very popular.
+    in Shift_JIS environment. However, because it did not consider CP932 and
+    GAIJI, it is not very popular.
 
     "JIS X 0213 bridge" needs last one meter.
 
@@ -30,9 +30,6 @@ ABSTRACT
 
     We can continue to use CP932 data, application programs, databases, and
     networks using CP932X.
-
-    This software doesn't support JIPS(J) and JIPS(E) officially. Because I
-    have no official documents about JIPS(J) and JIPS(E) by NEC Corporation.
 
     This software can convert the following encodings to each other.
 
@@ -78,25 +75,6 @@ INSTALLATION
 DEPENDENCIES
 
     This software requires perl 5.00503 or later.
-
-AUTHOR
-
-    Copyright (c) 2018 INABA Hitoshi
-
-LICENSE AND COPYRIGHT
-
-    This software is free software;
-
-    Use and redistribution for ANY PURPOSE are granted as long as all
-    copyright notices are retained.  Redistribution with modification
-    is allowed provided that you make your modified version obviously
-    distinguishable from the original one.  THIS SOFTWARE IS PROVIDED
-    BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES ARE
-    DISCLAIMED.
-
-    This software is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 SEE ALSO
 

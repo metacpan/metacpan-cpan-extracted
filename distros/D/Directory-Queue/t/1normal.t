@@ -6,28 +6,34 @@ use Encode;
 use Directory::Queue::Normal qw();
 use File::Temp qw(tempdir);
 use No::Worries::Dir qw(dir_read);
+use No::Worries::File qw(file_read);
 use POSIX qw(:errno_h :fcntl_h);
-use Test::More tests => 45;
+use Test::More tests => 49;
 
-use constant STR_ISO     => "Théâtre Français";
+use constant STR_ISO8859 => "Th\xe9\xe2tre Fran\xe7ais";
 use constant STR_UNICODE => "is \x{263A}?";
 
 our($tmpdir, $dq, $elt, @list, $time, $tmp);
 
-sub contents ($) {
-    my($path) = @_;
-    my($fh, $contents, $done);
+sub test_field ($$$) {
+    my($field, $tag, $exp) = @_;
+    my($hash);
 
-    sysopen($fh, $path, O_RDONLY) or die("cannot sysopen($path): $!\n");
-    binmode($fh) or die("cannot binmode($path): $!\n");
-    $contents = "";
-    $done = -1;
-    while ($done) {
-	$done = sysread($fh, $contents, 8192, length($contents));
-	die("cannot sysread($path): $!\n") unless defined($done);
+    $dq->lock($elt);
+    $hash = $dq->get($elt);
+    $dq->unlock($elt);
+    if ($dq->{ref}{$field}) {
+        is(${ $hash->{$field} }, $exp, "$field $tag (get by reference)");
+    } else {
+        is($hash->{$field}, $exp, "$field $tag (get)");
     }
-    close($fh) or die("cannot close($path): $!\n");
-    return($contents);
+    if ($dq->{type}{$field} eq "binary") {
+        is(file_read("$tmpdir/$elt/$field"), $exp, "$field $tag (file)");
+    } elsif ($dq->{type}{$field} eq "string") {
+        is(file_read("$tmpdir/$elt/$field"), encode("UTF-8", $exp), "$field $tag (file)");
+    } else {
+        fail("unexpected field type: $dq->{type}{$field}");
+    }
 }
 
 $tmpdir = tempdir(CLEANUP => 1);
@@ -40,16 +46,16 @@ $dq = Directory::Queue::Normal->new(path => $tmpdir, schema => { string => "stri
 @list = sort(dir_read($tmpdir));
 is("@list", "obsolete temporary", "empty queue");
 
-$elt = $dq->add(string => STR_ISO);
+$elt = $dq->add(string => STR_ISO8859);
 @list = sort(dir_read($tmpdir));
 is("@list", "00000000 obsolete temporary", "non-empty queue");
 @list = dir_read("$tmpdir/00000000");
 is("00000000/@list", $elt, "one element");
-is(contents("$tmpdir/$elt/string"), encode("UTF-8", STR_ISO), "ISO-8859-1 string");
+test_field("string", "ISO-8859-1", STR_ISO8859);
 is($dq->count(), 1, "count 1");
 
 $elt = $dq->add(string => STR_UNICODE);
-is(contents("$tmpdir/$elt/string"), encode("UTF-8", STR_UNICODE), "Unicode string");
+test_field("string", "Unicode", STR_UNICODE);
 is($dq->count(), 2, "count 2");
 
 $elt = $dq->first();
@@ -76,17 +82,17 @@ eval { $dq->remove($elt) };
 is($@, "", "remove 3");
 is($dq->count(), 0, "count 0");
 
-$dq = Directory::Queue::Normal->new(path => $tmpdir, schema => { string => "binary" });
-$elt = $dq->add(string => STR_ISO);
-is(contents("$tmpdir/$elt/string"), STR_ISO, "ISO-8859-1 binary");
+$dq = Directory::Queue::Normal->new(path => $tmpdir, schema => { binary => "binary" });
+$elt = $dq->add(binary => STR_ISO8859);
+test_field("binary", "ISO-8859-1", STR_ISO8859);
 
 $tmp = "foobar";
-$dq = Directory::Queue::Normal->new(path => $tmpdir, schema => { string => "binary*" });
-eval { $elt = $dq->add(string => $tmp) };
+$dq = Directory::Queue::Normal->new(path => $tmpdir, schema => { binary => "binary*" });
+eval { $elt = $dq->add(binary => $tmp) };
 like($@, qr/unexpected/, "add by reference 1");
-eval { $elt = $dq->add(string => \$tmp) };
+eval { $elt = $dq->add(binary => \$tmp) };
 is($@, "", "add by reference 2");
-is(contents("$tmpdir/$elt/string"), $tmp, "binary by reference");
+test_field("binary", "by reference", $tmp);
 
 $tmp = $dq->count();
 $dq = Directory::Queue::Normal->new(path => $tmpdir, schema => { string => "binary" }, maxelts => $tmp);

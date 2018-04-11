@@ -14,7 +14,7 @@ use Redis;
 use Storable qw/nfreeze thaw/;
 use Try::Tiny;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 __PACKAGE__->mk_classdata(qw/_session_redis_storage/);
 
@@ -98,6 +98,9 @@ sub _verify_redis_connection {
                 reconnect => $cfg->{redis_reconnect} || 0
             )
         );
+        if ($c->_session_redis_storage && $cfg->{redis_db}) {
+            $c->_session_redis_storage->select($cfg->{redis_db});
+        }
     };
 }
 
@@ -115,7 +118,7 @@ Catalyst::Plugin::Session::Store::Redis - Redis Session store for Catalyst
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -128,8 +131,9 @@ version 0.07
     MyApp->config->{Plugin::Session} = {
         expires => 3600,
         redis_server => '127.0.0.1:6379',
-        redis_debug => 0 # or 1!
-        redis_reconnect => 0 # or 1
+        redis_debug => 0, # or 1!
+        redis_reconnect => 0, # or 1
+        redis_db => 5, # or 0 by default
     };
 
     # ... in an action:

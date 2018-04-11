@@ -1,11 +1,11 @@
 # mashtree
 Create a tree using Mash distances.
 
-For simple usage, see `mashtree.pl`.  For advanced options, look at `mashtree_wrapper.pl`.
+For simple usage, see `mashtree`.  For advanced options, look at `mashtree_wrapper.pl`.
 
 ## Examples
 
-    mashtree.pl --numcpus 12 *.fastq.gz [*.fasta] > mashtree.dnd
+    mashtree --numcpus 12 *.fastq.gz [*.fasta] > mashtree.dnd
 
 **Note**: fastq files are interpreted as raw read files. Fasta,
 GenBank, and EMBL files are interpreted as genome
@@ -21,7 +21,7 @@ above file types.  You can compress with gz, bz2, or zip.
 
 ## Usage
 
-    Usage: mashtree.pl [options] *.fastq *.fasta *.gbk *.msh > tree.dnd
+    Usage: mashtree [options] *.fastq *.fasta *.gbk *.msh > tree.dnd
     NOTE: fastq files are read as raw reads;
           fasta, gbk, and embl files are read as assemblies;
           Input files can be gzipped.
@@ -61,10 +61,7 @@ Also see `mashtree_wrapper.pl` for advanced usage. Run either script with
   * multithreading 
   * BioPerl library
   * `DBD::SQLite`
-
-### Optional Requirements
-
-* QuickTree - makes tree inference about 100x faster.
+* Quicktree.  **Note**: Quicktree version 2.3 has been redistributed in this repo.  This version of Quicktree has been modified to increase the precision from 5 digits to 10 digits.
 
 ## Installation
 
@@ -84,7 +81,7 @@ Installing from CPAN installs the latest stable version of Mashtree.  This metho
 
     $ cpanm -L ~ Mashtree
     $ export PERL5LIB=$PERL5LIB:$HOME/lib/perl5
-    $ mashtree.pl --help # verify it shows usage and not an error
+    $ mashtree --help # verify it shows usage and not an error
 
 ### Alternate method of installing from CPAN
 
@@ -92,7 +89,7 @@ Installing from CPAN installs the latest stable version of Mashtree.  This metho
     cpan[1]> install Mashtree
     cpan[2]> exit
     $ export PERL5LIB=$PERL5LIB:$HOME/lib/perl5
-    $ mashtree.pl --help # verify it shows usage and not an error
+    $ mashtree --help # verify it shows usage and not an error
 
 ### Uninstallation from CPAN
 

@@ -18,10 +18,10 @@ my %WriteMakefileArgs = (
   "NAME" => "Text::TFIDF::Ngram",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Lingua::EN::Ngram" => 0,
+    "Lingua::EN::Ngram" => "0.03",
     "Lingua::StopWords" => 0,
     "List::Util" => "1.30",
-    "Moo" => 0,
+    "Moo" => 2,
     "namespace::clean" => 0,
     "strictures" => 2
   },
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0206",
+  "VERSION" => "0.0207",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,10 +46,10 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Lingua::EN::Ngram" => 0,
+  "Lingua::EN::Ngram" => "0.03",
   "Lingua::StopWords" => 0,
   "List::Util" => "1.30",
-  "Moo" => 0,
+  "Moo" => 2,
   "Test::Exception" => 0,
   "Test::More" => 0,
   "namespace::clean" => 0,

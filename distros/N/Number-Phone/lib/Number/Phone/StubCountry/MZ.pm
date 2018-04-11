@@ -22,37 +22,27 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200235;
+our $VERSION = 1.20180410221547;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             2|
             8[2-7]
           ',
+                  'format' => '$1 $2 $3',
                   'pattern' => '([28]\\d)(\\d{3})(\\d{3,4})'
                 },
                 {
                   'leading_digits' => '80',
-                  'pattern' => '(80\\d)(\\d{3})(\\d{3})',
-                  'format' => '$1 $2 $3'
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(80\\d)(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
                 'pager' => '',
-                'specialrate' => '',
-                'fixed_line' => '
-          2(?:
-            [1346]\\d|
-            5[0-2]|
-            [78][12]|
-            93
-          )\\d{5}
-        ',
-                'toll_free' => '800\\d{6}',
+                'personal_number' => '',
                 'geographic' => '
           2(?:
             [1346]\\d|
@@ -61,8 +51,18 @@ my $validators = {
             93
           )\\d{5}
         ',
+                'specialrate' => '',
                 'mobile' => '8[2-7]\\d{7}',
-                'personal_number' => ''
+                'voip' => '',
+                'fixed_line' => '
+          2(?:
+            [1346]\\d|
+            5[0-2]|
+            [78][12]|
+            93
+          )\\d{5}
+        ',
+                'toll_free' => '800\\d{6}'
               };
 my %areanames = (
   25821 => "Maputo",
@@ -82,6 +82,6 @@ my %areanames = (
       my $number = shift;
       $number =~ s/(^\+258|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-  return $self->is_valid() ? $self : undef;
-}
+        return $self->is_valid() ? $self : undef;
+    }
 1;

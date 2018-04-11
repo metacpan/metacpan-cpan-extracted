@@ -1,0 +1,15 @@
+Revision history for Date::Lectionary
+
+1.20180313 2018-03-13
+
+ - Switched from Try::Tiny to Try::Catch & Try::Tiny::Tiny
+
+1.20180314 2018-03-14
+
+ - Corrected issue with Manifest file
+ - Corrected issue with tarball
+
+1.20180410 2018-04-10
+
+ - Added author tests to ensure better distribution quality
+ - Tidied up the code a little bit

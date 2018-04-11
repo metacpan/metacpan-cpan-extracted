@@ -5,13 +5,27 @@ use utf8;
 use Moose::Role;
 use namespace::autoclean;
 
-our $VERSION = '0.003';    # VERSION
+our $VERSION = '0.004';    # VERSION
+
+requires 'execute_command';
+
+requires 'execute_for_command';
+
+1;
+
+__END__
+
+=pod
 
 =encoding utf-8
 
 =head1 NAME
 
-Bat::Interpreter::Role::Executor - Role for executing the commands in the bat files
+Bat::Interpreter::Role::Executor
+
+=head1 VERSION
+
+version 0.004
 
 =head1 DESCRIPTION
 
@@ -21,6 +35,10 @@ machine (via SSH, RPC, or whatever).
 
 See Bat::Interpreter::Delegate::Executor::DryRunner or Bat::Interpreter::Delegate::Executor::PartialDryRunner
 for an example of implementation
+
+=head1 NAME
+
+Bat::Interpreter::Role::Executor - Role for executing the commands in the bat files
 
 =head1 METHODS
 
@@ -34,10 +52,16 @@ implement some logic inside the bat/cmd file.
 
 Execute general commands
 
+=head1 AUTHOR
+
+Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Pablo Rodríguez González.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
 =cut
-
-requires 'execute_command';
-
-requires 'execute_for_command';
-
-1;

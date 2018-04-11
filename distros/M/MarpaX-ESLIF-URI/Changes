@@ -1,6 +1,17 @@
 Changelog for MarpaX-ESLIF-URI
 
-0.004 2018-01-16T06:00:35
+0.005 2018-04-11T04:24:24
+ [Jean-Damien Durand]
+ - Fix general typo "methods or MarpaX::ESLIF::URI::_generic"
+ - Mention MarpaX::ESLIF::URI::tag in the top package
+ - dzil xtest
+ - tag scheme and its test suite
+ - URI/mailto.pm: removed a comment
+ - tag scheme dev+
+ - mailto and lowercased normalized domain
+ - In mailto scheme, normalize domain to lower case
+
+0.004 2018-01-16T06:00:35Z
  [Jean-Damien Durand]
  - t/*.t: use Data::Dumper::OneLine
 

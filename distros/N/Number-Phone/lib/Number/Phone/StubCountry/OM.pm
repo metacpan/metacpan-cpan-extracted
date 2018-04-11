@@ -22,30 +22,30 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200235;
+our $VERSION = 1.20180410221547;
 
 my $formatters = [
                 {
-                  'pattern' => '(2\\d)(\\d{6})',
                   'leading_digits' => '2',
-                  'format' => '$1 $2'
+                  'format' => '$1 $2',
+                  'pattern' => '(2\\d)(\\d{6})'
                 },
                 {
-                  'leading_digits' => '[79]',
                   'pattern' => '([79]\\d{3})(\\d{4})',
+                  'leading_digits' => '[79]',
                   'format' => '$1 $2'
                 },
                 {
                   'format' => '$1 $2',
-                  'pattern' => '([58]00)(\\d{4,6})',
-                  'leading_digits' => '[58]00'
+                  'leading_digits' => '[58]00',
+                  'pattern' => '([58]00)(\\d{4,6})'
                 }
               ];
 
 my $validators = {
                 'pager' => '',
-                'voip' => '',
                 'personal_number' => '',
+                'geographic' => '2[2-6]\\d{6}',
                 'mobile' => '
           7[19]\\d{6}|
           9(?:
@@ -53,13 +53,13 @@ my $validators = {
             [1-9]\\d
           )\\d{5}
         ',
-                'geographic' => '2[2-6]\\d{6}',
                 'specialrate' => '(900\\d{5})',
+                'voip' => '',
+                'fixed_line' => '2[2-6]\\d{6}',
                 'toll_free' => '
           8007\\d{4,5}|
           500\\d{4}
-        ',
-                'fixed_line' => '2[2-6]\\d{6}'
+        '
               };
 my %areanames = (
   96823 => "Dhofar\ \&\ Al\ Wusta",
@@ -72,6 +72,6 @@ my %areanames = (
       my $number = shift;
       $number =~ s/(^\+968|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-  return $self->is_valid() ? $self : undef;
-}
+        return $self->is_valid() ? $self : undef;
+    }
 1;

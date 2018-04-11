@@ -1,7 +1,7 @@
-package Crypt::Random::Source; # git description: v0.12-8-g931bd93
+package Crypt::Random::Source; # git description: v0.13-4-g0edcf44
 # ABSTRACT: Get weak or strong random data from pluggable sources
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use strict;
 use 5.008;
@@ -46,7 +46,7 @@ Crypt::Random::Source - Get weak or strong random data from pluggable sources
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -77,6 +77,18 @@ These functions delegate to a source chosen by an instance of
 L<Crypt::Random::Source::Factory>, calling get
 
 =back
+
+=head1 CAVEATS
+
+In versions prior to 0.13, C<rand> could be used as a result of calling
+C<get_weak>, or C<get>, if no random device was available. This implies that
+not explicitly asking for C<get_strong> on a non POSIX operating system (e.g.
+Win32 without the Win32 backend) could have resulted in non cryptographically
+random data.
+
+Relatedly, the characterization of C<urandom> as a weak source of randomness is
+also largely a misconception, see L<https://www.2uo.de/myths-about-urandom/>
+for example.
 
 =head1 SEE ALSO
 

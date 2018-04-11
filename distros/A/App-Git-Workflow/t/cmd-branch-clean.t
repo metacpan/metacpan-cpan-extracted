@@ -19,10 +19,10 @@ sub run {
             mock => [
                 { config => undef },
                 { branch => [map {"  $_"} qw{master feature1 feature2}] },
-                { 'rev-list' => [time . ' 1111111111111111111111111111111111111111'] },
+                { log    => time . "\x{1}1111111111111111111111111111111111111111" },
                 { branch => [map {"  $_"} qw{master feature1}] },
                 { branch => undef },
-                { 'rev-list' => [time . ' 2222222222222222222222222222222222222222'] },
+                { log    => time . "\x{1}2222222222222222222222222222222222222222" },
                 { branch => [map {"  $_"} qw{feature2}] },
             ],
             STD => {
@@ -59,9 +59,9 @@ sub run {
             mock => [
                 { config => 200 },
                 { branch => [map {"  $_"} qw{origin/master origin/feature1 origin/feature2}] },
-                { 'rev-list' => [time . ' 1111111111111111111111111111111111111111'] },
+                { log    => time . "\x{1}1111111111111111111111111111111111111111" },
                 { branch => [map {"  $_"} qw{origin/feature1}] },
-                { 'rev-list' => [time . ' 2222222222222222222222222222222222222222'] },
+                { log    => time . "\x{1}2222222222222222222222222222222222222222" },
                 { branch => [map {"  $_"} qw{origin/master origin/feature2}] },
                 { push   => undef },
             ],
@@ -85,9 +85,9 @@ sub run {
             },
             mock => [
                 { branch => [map {"  $_"} qw{master origin/master young origin/old}] },
-                { 'rev-list' => [(time - 60*60*24*50) . ' 1111111111111111111111111111111111111111'] },
+                { log    => (time - 60*60*24*50) . "\x{1}1111111111111111111111111111111111111111" },
                 { push    => undef },
-                { 'rev-list' => [(time - 60*60*24*5) . ' 2222222222222222222222222222222222222222'] },
+                { log    => (time - 60*60*24*5) . "\x{1}2222222222222222222222222222222222222222" },
             ],
             STD => {
                 OUT => qr//,
@@ -110,9 +110,9 @@ sub run {
             },
             mock => [
                 { branch => [map {"  $_"} qw{master origin/master young origin/old}] },
-                { 'rev-list' => [(time - 60*60*24*50) . ' 1111111111111111111111111111111111111111'] },
+                { log    => (time - 60*60*24*50) . "\x{1}1111111111111111111111111111111111111111" },
                 { branch => [map {"  $_"} qw{origin/feature1}] },
-                { 'rev-list' => [(time - 60*60*24*5) . ' 2222222222222222222222222222222222222222'] },
+                { log    => (time - 60*60*24*5) . "\x{1}2222222222222222222222222222222222222222" },
             ],
             STD => {
                 OUT => qr//,
@@ -133,9 +133,9 @@ sub run {
             mock => [
                 { config => undef },
                 { branch => [map {"  $_"} qw{master feature old_project}] },
-                { 'rev-list' => [(time - 60*60*24*50) . ' 1111111111111111111111111111111111111111'] },
+                { log    => (time - 60*60*24*50) . "\x{1}1111111111111111111111111111111111111111" },
                 { branch => [map {"  $_"} qw{master feature}] },
-                { 'rev-list' => [(time - 60*60*24*50) . ' 1111111111111111111111111111111111111111'] },
+                { log    => (time - 60*60*24*50) . "\x{1}1111111111111111111111111111111111111111" },
             ],
             STD => {
                 OUT => qr//,
@@ -156,11 +156,11 @@ sub run {
             mock => [
                 { config => undef },
                 { branch => [map {"  $_"} qw{master feature old_project}] },
-                { 'rev-list' => [(time - 60*60*24*50) . ' 1111111111111111111111111111111111111111'] },
+                { log    => (time - 60*60*24*50) . "\x{1}1111111111111111111111111111111111111111" },
                 { branch => [map {"  $_"} qw{master feature}] },
                 { tag    => undef },
                 { branch => undef },
-                { 'rev-list' => [(time - 60*60*24*50) . ' 1111111111111111111111111111111111111111'] },
+                { log    => (time - 60*60*24*50) . "\x{1}1111111111111111111111111111111111111111" },
                 { tag    => undef },
                 { branch => undef },
             ],
@@ -183,7 +183,7 @@ sub run {
             mock => [
                 { config => undef },
                 { branch => [map {"  $_"} qw{master feature exclude_me}] },
-                { 'rev-list' => [(time - 60*60*24*50) . ' 1111111111111111111111111111111111111111'] },
+                { log    => (time - 60*60*24*50) . "\x{1}1111111111111111111111111111111111111111" },
                 { branch => [map {"  $_"} qw{master}] },
                 { branch => undef },
             ],
@@ -205,7 +205,7 @@ sub run {
             mock => [
                 { config => undef },
                 { branch => [map {"  $_"} qw{master feature}] },
-                { 'rev-list' => [(time - 60*60*24*50) . ' 1111111111111111111111111111111111111111'] },
+                { log    => (time - 60*60*24*50) . "\x{1}1111111111111111111111111111111111111111" },
                 { branch => [map {"  $_"} qw{master}] },
                 { tag    => undef },
                 { branch => undef },
@@ -228,9 +228,9 @@ sub run {
             mock => [
                 { config => undef },
                 { branch => [map {"  $_"} qw{master feature project_master}] },
-                { 'rev-list' => [(time - 60*60*24*50) . ' 1111111111111111111111111111111111111111'] },
+                { log    => (time - 60*60*24*50) . "\x{1}1111111111111111111111111111111111111111" },
                 { branch => [map {"  $_"} qw{feature project_master}] },
-                { 'rev-list' => [(time - 60*60*24*5) . ' 2222222222222222222222222222222222222222'] },
+                { log    => (time - 60*60*24*5) . "\x{1}2222222222222222222222222222222222222222" },
                 { branch => [map {"  $_"} qw{project_master}] },
             ],
             STD => {

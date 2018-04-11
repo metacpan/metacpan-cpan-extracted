@@ -24,7 +24,7 @@ name: DateTime-TimeZone-Local-Win32
 provides:
   DateTime::TimeZone::Local::Win32:
     file: lib/DateTime/TimeZone/Local/Win32.pm
-    version: '2.00'
+    version: '2.01'
 requires:
   Try::Tiny: '0'
   Win32::TieRegistry: '0.27'
@@ -34,7 +34,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/dapink/DateTime-TimeZone-Local-Win32
-version: '2.00'
+version: '2.01'
 x_Dist_Zilla:
   perl:
     version: '5.020001'

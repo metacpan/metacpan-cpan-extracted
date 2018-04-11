@@ -1,6 +1,13 @@
 Revision history for Perl module Debuggit
 
 
+2.07 Apr  9, 2018
+    - update to work with Data::Printer 0.36 and above
+	- lots of misc POD tweaks
+    - distro fixes:
+        - make it so an old version of Data::Printer fails a unit test
+          (instead of generating a FAIL report from CPAN Testers)
+
 2.06 Mar 31, 2015
     - fix warnings in newer versions of Perl
         - thanks to ANDK for the patch

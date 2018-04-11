@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.80.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,23 +14,23 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA256
 
-SHA1 421aadca1cf071a7cedeb0c9b445aefa0e17d18a Changes
+SHA1 c3f4b6153264781aea1dd757636da46615de13a4 Changes
 SHA1 dd31f242fe1032bc39b741771b08dfff7a396aaf LICENSE
-SHA1 c2ed3cc7be51e74c7dd1b5546be9c53c665c0ce0 MANIFEST
+SHA1 e87bbed81df0ed8e0610cfd07366e288d4173b56 MANIFEST
 SHA1 4b1a15af25c0544e1c14951c0ca4c0faf2f5fe72 MANIFEST.SKIP
-SHA1 d1e797089a6a0d60cfe72800d2f699a4f2a86c4b META.json
-SHA1 2e532bd1d641d368d3177b4ef692740a5e952a69 META.yml
-SHA1 7652fa6412a57bec85fc0c1fe15ed950b19dc31c Makefile.PL
-SHA1 328b446f8ad1ef55591c449269bf0889d57a18e0 README
-SHA1 afba920244fa1531dbb22d4660e3a1bc922cba93 lib/Authen/U2F/Tester.pm
-SHA1 1148a9ec23a6c74e302c3ddfa66b8702112f5f4d lib/Authen/U2F/Tester/Const.pm
-SHA1 69669fab35c79208bb924cf0f8171384e356a250 lib/Authen/U2F/Tester/Error.pm
-SHA1 10dfffabb55d2c897daf39c661acea1c102afa66 lib/Authen/U2F/Tester/Keypair.pm
-SHA1 8717aaba46b7aa48fab84cb4bf0c31a9879fb372 lib/Authen/U2F/Tester/Keystore/Wrapped.pm
-SHA1 6cb1f2fe64db0ed4267d85336a74af9a05187272 lib/Authen/U2F/Tester/RegisterResponse.pm
-SHA1 94a49ff2fb7c7f31f08cd22538452747954a520a lib/Authen/U2F/Tester/Role/Keystore.pm
-SHA1 b3accb074cef25e3c22bcd0a05fab2f31bae81d3 lib/Authen/U2F/Tester/Role/Response.pm
-SHA1 97c713919affb50b6e34bb73b39d4b343858aa5b lib/Authen/U2F/Tester/SignResponse.pm
+SHA1 fc899ee1dfd295d1c5ada043d39a470b3da32e58 META.json
+SHA1 90e8989d3fff4df3ecf518953179cb894e3e2385 META.yml
+SHA1 d4dc6e816de7ea32d5f04a7d0922e4010404dfe0 Makefile.PL
+SHA1 e70f8bc4bd22d4c43e884a4ebcf5daa8e58d8384 README
+SHA1 0c80518a2b98fb923e69fb570a2064a9447aade8 lib/Authen/U2F/Tester.pm
+SHA1 98e8477445a6301416b8a19965af42cee3c0603a lib/Authen/U2F/Tester/Const.pm
+SHA1 a4502be77cc6d7d57dc82dd2f195cf1c23231bb0 lib/Authen/U2F/Tester/Error.pm
+SHA1 44f52307ddf2b657ed8eef2efd98c3a2e06c979d lib/Authen/U2F/Tester/Keypair.pm
+SHA1 ad68e85602d0641579da272785c95e6371c34d21 lib/Authen/U2F/Tester/Keystore/Wrapped.pm
+SHA1 44bb70b5a21beb8b44ca2e5d62ec5e14c7133433 lib/Authen/U2F/Tester/RegisterResponse.pm
+SHA1 b481732558b8a0f57abc5ae3f8d59aaedd88908b lib/Authen/U2F/Tester/Role/Keystore.pm
+SHA1 1b00cb534ef5ac48c877f96bb1dffc0e91e01c53 lib/Authen/U2F/Tester/Role/Response.pm
+SHA1 934a3939a24ad07c0a459e7826e5f0540bcd5c08 lib/Authen/U2F/Tester/SignResponse.pm
 SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
 SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
 SHA1 19cc343f8a85c6805bbeb02580487483a6283887 t/author-signature.t
@@ -39,19 +39,19 @@ SHA1 ab5a292fd7c239a304ded84bf13052aeb33c391d t/smoke.t
 SHA1 d47eec3a73827e0840255794214630e37aebcc11 t/ssl/cert.pem
 SHA1 161e39a64d86f1afd6762619bc892689b588f235 t/ssl/key.pem
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iQIVAwUBWlE9u0QM7y65VM2OAQgupA//ddFChu6C3tykQpZ5iw/8A/KZLXgCKmJb
-TBwgtxzIs+sr9FX0Ld31YaQw0v20ZxGMnI62JGRKAxQ2iidz/9qFqcf5B/kwQ5/S
-+YsQbFvfrx8SW1H1roPqoGobYY0XzLs17EWD/5Ik84/vzVudtu0MWfWLRl/h5iiL
-G8+2pgnd24eowkDm45QWff2gBFkIsytXamSF1IxmEHkXcFBmBo9zrERtjrcDbyAE
-p19dfuGLp+g80WFYL/nqoivm7wzmsfwhdBCblaC/CyN18Y/mmVZMQ1XKDoxUxSXS
-mv/phLkClqIFH9nxaSRabYGdiWvCuJSOAMyy5iIFI9e2rgfrnScBEK9yDE/FOIEv
-kMYGMJJViKMJfpjbeKzXdOTnEmPqs6IrLMxWfuzR6R8chG6WWc7AbIyjKbOGGfhe
-U1Ktf8/GeIJqGHw/lVlUx5+35g/iq07Ni6nuykQw6WYci1hU04xM4E0sYiHRc9wW
-2GbgMqOgiDGLDu9m2L5D7uMTvEM4QVR+fjJyiJ4SYdNPWTJ4ZWnhvXVCj+KFG2G2
-bIL0gVBAenRtIDhAwX3qYAsUioD4CSlYczeuOvTPJxmOmtxOwGBuW6LAYqZ5IL2O
-nMs6YiCVddOMFniP8ngIdF0OQBrfLqBITDSgeG3ADENoRo+HKS4Khf2zXdMBjyQ1
-mbxvgnYKx64=
-=CYn8
+iQJFBAEBCAAvFiEE2EtuRfhGgngE8PsARAzvLrlUzY4FAlrLnO8RHG1zY2hvdXRA
+Y3Bhbi5vcmcACgkQRAzvLrlUzY6mshAArfl8xEXHovWBfHR1CwFlqBnIy4NnYTJh
+IqzurxO6sQDx40wNUrXgS+2zFQMmXtrHEJr19vN9UkZ0krcbX++m5R59thtKkxyF
+4OgHycFp1nLWLSNPOlfNsR4oC9L5vHlI77UblV8PJdrgQ9Tx+G7sgwx/b4nuvXhf
+pN/Vez0CDrn+Aw+D7jKBTCf4UFZnrzUuAHTWosWzDsmXDGz3lHzDA48gZihIgmQa
+6hS2YO44lTAkJP/lUC6rHANHsewfXKPyoSIcUPI4q9+5+xYLjlYHUm48vv5gSVtT
+vzAIVhkDOi9pCIsF3+m+X7r1ba5p8yio64ufhZhBKP90ieeOEL6lKDIUg12Bjyuv
+RBj2PEx8Op3hWSUa171Vy92c7Rxgf2XBEHxvhJDbzR7IlxaGQDpi7eH/1Dk0UL17
+pmJcjxNadiBAK9P/38fUuPLZbD0eissyFIYYy0/MyMX5LIf1anALXGCYK/zw716H
+2v0e+0rgURCeEcH72SvjewhdTWCsmY+4E6VoC1L4GwjZiKXN+rXjqnAo+E2a2Snm
+21vl9QQc0OflYHSjQpVaRB9vDRJzNwVsv101CQq18MVbAXiyyRaA00DCPuMzP/3R
+WAVI9kxTjuMxtgJvU39/o7Xkfmz+RaWSniFNJ4os66IZCdxWwj/loPKrwkC6RGf5
+Y/BG9Pz2KOE=
+=NtrI
 -----END PGP SIGNATURE-----

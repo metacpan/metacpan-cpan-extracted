@@ -10,9 +10,31 @@ use Test::Exception 0.31                            ;
 
 BEGIN
 {
-    my $error = system("perl -MData::Printer -le 1 2>/dev/null");
+    my $error = system("$^X -MData::Printer -le 1 2>/dev/null");
     plan skip_all => "Data::Printer required for testing pretty dumping" if $error;
 }
+
+
+# If we have Data::Printer, but the version is too old, just check to make sure
+# we throw an appropriate error, then call it a day.
+BEGIN
+{
+	# Remember: we can't actually _load_ Data::Printer here, or it will throw
+	# off the later tests.
+	my $error = cmd_stderr({ perl => 'use Data::Printer; Data::Printer->VERSION("0.36")' });
+	if ($error)
+	{
+		my $cmd = q{
+			use Debuggit(DataPrinter => 1, DEBUG => 2);
+			debuggit(DUMP => "test");
+		};
+		cmd_stderr_like({ perl => $cmd }, qr/Data::Printer version 0.36 required--this is only version/,
+				"correctly identified old (bad) version of Data::Printer");
+		done_testing;
+		exit;
+	}
+}
+
 
 use Debuggit(DataPrinter => 1, DEBUG => 2);
 
@@ -30,7 +52,7 @@ my $cmd = <<'END';
     my $testhash = eval do { local $/; <IN> };
     close(IN);
 
-    print Data::Printer::p($testhash, colored => 1, hash_separator => " => ", print_escapes => 1);
+    print Data::Printer::np($testhash, colored => 1, hash_separator => " => ", print_escapes => 1);
 END
 
 # get dumped output without actually loading Data::Printer
@@ -38,7 +60,7 @@ my $dump = cmd_stdout({ perl => $cmd });
 # make sure we actually _got_ some output
 isnt $dump, '', "test dump returned some output";
 # and make sure we didn't actually load Data::Printer
-throws_ok { print Data::Printer::p() } qr/^Undefined subroutine &Data::Printer::p called/,
+throws_ok { print &Data::Printer::p() } qr/^Undefined subroutine &Data::Printer::p called/,
         'Data::Printer not loaded';
 
 my $output = 'test is';

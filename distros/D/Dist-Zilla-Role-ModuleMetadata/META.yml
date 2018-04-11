@@ -8,7 +8,7 @@ build_requires:
   Dist::Zilla::Role::MetaProvider: '0'
   Dist::Zilla::Role::Plugin: '0'
   File::Spec: '0'
-  Module::Metadata: '1.000022'
+  Module::Metadata: '1.000005'
   Moose: '0'
   Path::Tiny: '0'
   Scalar::Util: '0'
@@ -48,10 +48,10 @@ no_index:
 provides:
   Dist::Zilla::Role::ModuleMetadata:
     file: lib/Dist/Zilla/Role/ModuleMetadata.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Digest::MD5: '0'
-  Module::Metadata: '1.000022'
+  Module::Metadata: '1.000005'
   Moose::Role: '0'
   namespace::autoclean: '0'
   perl: '5.010'
@@ -63,7 +63,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Role-ModuleMetadata
   homepage: https://github.com/karenetheridge/Dist-Zilla-Role-ModuleMetadata
   repository: https://github.com/karenetheridge/Dist-Zilla-Role-ModuleMetadata.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.027010'
@@ -450,7 +450,7 @@ x_Dist_Zilla:
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000033'
-          version: '0.005'
+          version: '0.006'
       name: '@Author::ETHER/MetaProvides::Package'
       version: '2.004003'
     -
@@ -562,7 +562,7 @@ x_Dist_Zilla:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000033'
-          version: '0.005'
+          version: '0.006'
       name: '@Author::ETHER/CheckSelfDependency'
       version: '0.011'
     -
@@ -722,7 +722,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaProvides::Update
       name: '@Author::ETHER/@Git::VersionManager/MetaProvides::Update'
-      version: '0.005'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -762,7 +762,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.005
+          tag: v0.006
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -892,7 +892,7 @@ x_Dist_Zilla:
           no_forced_deps: 0
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000033'
-          version: '0.005'
+          version: '0.006'
       name: Test::CheckBreaks
       version: '0.019'
     -

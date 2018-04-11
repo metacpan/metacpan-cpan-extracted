@@ -7,7 +7,7 @@ use 5.006;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Manipulate the position of notes in a scale",
+  "ABSTRACT" => "Manipulate the position of a note in a scale",
   "AUTHOR" => "Gene Boggs <gene\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0302",
+  "VERSION" => "0.0303",
   "test" => {
     "TESTS" => "t/*.t"
   }

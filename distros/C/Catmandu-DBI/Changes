@@ -1,5 +1,8 @@
 Revision history for Catmandu-DBI
 
+0.0702  2018-04-10 11:30:09 CEST
+  - document index option
+
 0.0701  2017-11-13 09:05:26 CET
   - fix utf8 string bug
 

@@ -13,7 +13,7 @@ Lab::XPRESS::Examples::Example4_3d_scan - XPRESS for DUMMIES - Example 4
 
 =head1 VERSION
 
-version 3.624
+version 3.630
 
 =head1 Abstract
 

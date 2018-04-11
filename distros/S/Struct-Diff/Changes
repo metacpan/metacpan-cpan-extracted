@@ -1,6 +1,12 @@
 Revision history for Struct-Diff
 
-0.95    2017-03-10
+0.96    2018-04-08
+        - 'I' indexes now related to first structure
+        - 'I' indexes fixed for cases when U op enabled only
+        - global var Freezer renamed to FREEZER to avoid mess in mod namespace
+        - omitted arrays indexes fixed in list_diff()
+
+0.95    2018-03-10
         - path format fixed in valid_diff()
         - refactoring (ref() calls reduced)
         - docs improved a bit

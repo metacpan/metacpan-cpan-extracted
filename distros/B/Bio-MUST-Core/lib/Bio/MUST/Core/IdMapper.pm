@@ -1,6 +1,6 @@
 package Bio::MUST::Core::IdMapper;
 # ABSTRACT: Id mapper for translating sequence ids
-$Bio::MUST::Core::IdMapper::VERSION = '0.180630';
+$Bio::MUST::Core::IdMapper::VERSION = '0.181000';
 use Moose;
 use namespace::autoclean;
 
@@ -184,7 +184,7 @@ Bio::MUST::Core::IdMapper - Id mapper for translating sequence ids
 
 =head1 VERSION
 
-version 0.180630
+version 0.181000
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,10 @@
-package HTML::FormFu::Role::Element::Group;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Role::Element::Group;
+$HTML::FormFu::Role::Element::Group::VERSION = '2.06';
+# ABSTRACT: Role for grouped form fields
 
 use Moose::Role;
-use MooseX::Attribute::FormFuChained;
 
 with 'HTML::FormFu::Role::Element::Field',
     'HTML::FormFu::Role::Element::SingleValueField',
@@ -18,7 +18,7 @@ use List::Util 1.33 qw( none );
 use Scalar::Util qw( reftype );
 use Carp qw( croak );
 
-has empty_first => ( is => 'rw', traits => ['FormFuChained'] );
+has empty_first => ( is => 'rw', traits => ['Chained'] );
 
 __PACKAGE__->mk_output_accessors(qw( empty_first_label ));
 
@@ -254,8 +254,8 @@ sub values {
         @values = @$arg;
     }
 
-    my @new = map { {
-            value                => $_,
+    my @new = map {
+        {   value                => $_,
             label                => ucfirst $_,
             attributes           => {},
             container_attributes => {},
@@ -348,8 +348,8 @@ before prepare_attrs => sub {
 around render_data_non_recursive => sub {
     my ( $orig, $self, $args ) = @_;
 
-    my $render = $self->$orig( {
-            options => Clone::clone( $self->_options ),
+    my $render = $self->$orig(
+        {   options => Clone::clone( $self->_options ),
             $args ? %$args : (),
         } );
 
@@ -389,13 +389,17 @@ around clone => sub {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Role::Element::Group - Role for grouped form fields
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 DESCRIPTION
 
@@ -540,5 +544,16 @@ Carl Franks, C<cfranks@cpan.org>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

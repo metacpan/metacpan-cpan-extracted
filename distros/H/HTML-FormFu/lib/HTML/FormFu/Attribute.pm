@@ -1,9 +1,10 @@
-package HTML::FormFu::Attribute;
-
 use strict;
-use warnings;
 
-our $VERSION = '2.05'; # VERSION
+package HTML::FormFu::Attribute;
+$HTML::FormFu::Attribute::VERSION = '2.06';
+# ABSTRACT: accessor class
+
+use warnings;
 
 use Exporter qw( import );
 use Carp qw( croak );
@@ -52,8 +53,8 @@ sub mk_attrs {
         my $xml_sub = sub {
             my ( $self, $attrs ) = @_;
 
-            return $self->$name( {
-                    map { $_, literal( $attrs->{$_} ) }
+            return $self->$name(
+                {   map { $_, literal( $attrs->{$_} ) }
                         keys %$attrs
                 } );
         };
@@ -159,8 +160,8 @@ sub mk_attr_accessors {
                 ( $mess, @args ) = ( @$mess, @args );
             }
 
-            return $self->attributes->{$name} =
-                literal( $self->form->localize( $mess, @args ) );
+            return $self->attributes->{$name}
+                = literal( $self->form->localize( $mess, @args ) );
         };
 
         my $loc_method = Class::MOP::Method->wrap(
@@ -203,8 +204,8 @@ sub mk_add_attrs {
 
             my $method = "add_$name";
 
-            return $self->$method( {
-                    map { $_, literal( $attrs->{$_} ) }
+            return $self->$method(
+                {   map { $_, literal( $attrs->{$_} ) }
                         keys %$attrs
                 } );
         };
@@ -293,8 +294,8 @@ sub mk_del_attrs {
 
             my $method = "del_$name";
 
-            return $self->$method( {
-                    map { $_, literal( $attrs->{$_} ) }
+            return $self->$method(
+                {   map { $_, literal( $attrs->{$_} ) }
                         keys %$attrs
                 } );
         };
@@ -403,7 +404,7 @@ sub mk_inherited_accessors {
             package_name => $class,
         );
 
-        $class->meta->add_method( $name, $method );
+        $class->meta->add_method( $name,                $method );
         $class->meta->add_method( "${name}_no_inherit", $no_inherit_method );
     }
 
@@ -518,19 +519,21 @@ sub mk_attr_bool_accessors {
             my ( $self, $attr ) = @_;
 
             if ( @_ == 1 ) {
+
                 # Getter
                 return undef    ## no critic (ProhibitExplicitReturnUndef);
                     if !exists $self->attributes->{$name};
 
-                return $self->attributes->{$name} ? $self->attributes->{$name}
-                                                  : undef;
+                return $self->attributes->{$name}
+                    ? $self->attributes->{$name}
+                    : undef;
             }
 
             # Any true value sets a bool attribute, e.g.
             #     required="required"
             # Any false value deletes the attribute
 
-            if ( $attr ) {
+            if ($attr) {
                 $self->attributes->{$name} = $name;
             }
             else {
@@ -546,16 +549,19 @@ sub mk_attr_bool_accessors {
             package_name => $class,
         );
 
-        $class->meta->add_method( $name,         $method );
+        $class->meta->add_method( $name, $method );
     }
 
     return;
 }
 
-
 1;
 
 __END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -563,7 +569,7 @@ HTML::FormFu::Attribute - accessor class
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -582,5 +588,16 @@ Sebastian Riedel, C<sri@oook.de>.
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

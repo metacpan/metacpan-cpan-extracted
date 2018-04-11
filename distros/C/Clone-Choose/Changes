@@ -1,5 +1,9 @@
 Revision history for Clone-Choose
 
+0.010   2018-04-09
+    - Fix test if Module::Runtime not installed. Should fix RT#125045
+      reported by Slaven Rezić.
+
 0.009   2018-04-07
     - Added testcase for importing an unsupported backend function.
     - Added testcase for the get_backends() function.

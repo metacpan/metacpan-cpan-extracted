@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200232;
+our $VERSION = 1.20180410221544;
 
 my $formatters = [
                 {
@@ -31,19 +31,16 @@ my $formatters = [
                   'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
-                  'format' => '$1-$2-$3-$4',
+                  'pattern' => '(0)(800)(\\d{4})(\\d{3})',
                   'leading_digits' => '0800',
-                  'pattern' => '(0)(800)(\\d{4})(\\d{3})'
+                  'format' => '$1-$2-$3-$4'
                 }
               ];
 
 my $validators = {
                 'pager' => '',
-                'voip' => '',
-                'mobile' => '6[0-35-7]\\d{5}',
                 'personal_number' => '',
-                'toll_free' => '0800\\d{7}',
-                'fixed_line' => '
+                'geographic' => '
           (?:
             2(?:
               [02]\\d|
@@ -57,7 +54,9 @@ my $validators = {
           )\\d{4}
         ',
                 'specialrate' => '',
-                'geographic' => '
+                'mobile' => '6[0-35-7]\\d{5}',
+                'voip' => '',
+                'fixed_line' => '
           (?:
             2(?:
               [02]\\d|
@@ -69,7 +68,8 @@ my $validators = {
               32
             )
           )\\d{4}
-        '
+        ',
+                'toll_free' => '0800\\d{7}'
               };
 my %areanames = (
   5012 => "Belize\ District",
@@ -84,6 +84,6 @@ my %areanames = (
       my $number = shift;
       $number =~ s/(^\+501|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-  return $self->is_valid() ? $self : undef;
-}
+        return $self->is_valid() ? $self : undef;
+    }
 1;

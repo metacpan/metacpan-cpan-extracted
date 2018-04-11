@@ -19,13 +19,15 @@ my $dir = catfile( tempdir(), 'sweep' );
     #
     # Time sweep
     #
-    my $interval   = 0.1;
-    my $duration   = 1;
-    my $num_points = $duration / $interval + 1;
-    my $sweep      = sweep(
-        type     => 'Continuous::Time',
-        duration => $duration,
-        interval => $interval,
+    my @intervals = ( 0.1, 0.2 );
+    my @durations = ( 0.5, 0.6 );
+
+    my $num_points0 = $durations[0] / $intervals[0] + 1;
+    my $num_points1 = $durations[1] / $intervals[1] + 1;
+    my $sweep       = sweep(
+        type      => 'Continuous::Time',
+        durations => [@durations],
+        intervals => [@intervals],
     );
 
     my $datafile = sweep_datafile( columns => [qw/time value/] );
@@ -54,12 +56,18 @@ my $dir = catfile( tempdir(), 'sweep' );
 
     );
     my $times = $cols[0]->unpdl();
-
-    is( @{$times}, $num_points, "datafile size" );
+    print Dumper $times;
+    is( @{$times}, $num_points0 + $num_points1, "datafile size" );
 
     is_absolute_error(
-        $times->[-1], $times->[0] + $duration, $interval,
-        "duration is withing error bounds"
+        $times->[ $num_points0 - 1 ],
+        $times->[0] + $durations[0], $intervals[0],
+        "first sweep segment look ok"
+    );
+
+    is_absolute_error(
+        $times->[-1],  $times->[$num_points0] + $durations[1],
+        $intervals[1], "second sweep segment look ok"
     );
 }
 

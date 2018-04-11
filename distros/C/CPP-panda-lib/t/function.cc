@@ -16,7 +16,8 @@ namespace test {
 void void_func(){}
 void void_func2(){}
 
-int foo2() {return 1;};
+int foo2() {return 1;}
+int plus_one(int a) { return a + 1;}
 
 class Test {
 public:
@@ -42,8 +43,15 @@ TEST_CASE("simplest function", "[function]") {
 }
 
 TEST_CASE("simplest function call", "[function]") {
-    function<int(void)> f = &foo2;
-    REQUIRE(f() == 1);
+    function<int(int)> f;
+    f = &plus_one;
+    REQUIRE(f(1) == 2);
+}
+
+TEST_CASE("function by reference call", "[function]") {
+    function<int(int)> f;
+    f = plus_one;
+    REQUIRE(f(1) == 2);
 }
 
 TEST_CASE("simplest lambda call", "[function]") {

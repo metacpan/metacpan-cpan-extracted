@@ -4,6 +4,10 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.630 2018-04-09
+
+  * Enable continuous sweeps with multiple sections having different rates
+
 3.624 2018-03-30
 
   * Also distribute META.yml

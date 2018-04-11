@@ -41,14 +41,17 @@ around run => sub ( $orig, $self, $cb = undef ) {
         $self->$orig( sub {
 
             # start HTTP server
-            $self->{server} = Pcore::HTTP::Server->new( {
-                $self->{app_cfg}->{server}->%*,    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
-                app => $self->{router}
-            } );
+            if ( defined $self->{app_cfg}->{server}->{listen} ) {
+                $self->{server} = Pcore::HTTP::Server->new( {
+                    $self->{app_cfg}->{server}->%*,    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+                    app => $self->{router}
+                } );
 
-            $self->{server}->run;
+                $self->{server}->run;
 
-            say qq[Listen: $self->{app_cfg}->{server}->{listen}];
+                say qq[Listen: $self->{app_cfg}->{server}->{listen}];
+            }
+
             say qq[App "@{[ref $self]}" started];
 
             $cb->($self) if $cb;
@@ -92,10 +95,12 @@ sub api_call ( $self, @args ) {
 }
 
 sub nginx_cfg ($self) {
+    my $www_storage = $ENV->share->get_storage('www');
+
     my $params = {
         name              => lc( ref $self ) =~ s/::/-/smgr,
         data_dir          => $ENV->{DATA_DIR},
-        www_root_dir      => $ENV->share->get_storage('www')->[0],          # TODO
+        www_root_dir      => $www_storage ? $www_storage->[0] : undef,      # TODO
         default_server    => 1,                                             # generate default server config
         nginx_default_key => $ENV->share->get('/data/nginx/default.key'),
         nginx_default_pem => $ENV->share->get('/data/nginx/default.pem'),

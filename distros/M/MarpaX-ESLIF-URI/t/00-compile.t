@@ -2,11 +2,11 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.057
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
-plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'MarpaX/ESLIF/URI.pm',
@@ -17,7 +17,8 @@ my @module_files = (
     'MarpaX/ESLIF/URI/ftp.pm',
     'MarpaX/ESLIF/URI/http.pm',
     'MarpaX/ESLIF/URI/https.pm',
-    'MarpaX/ESLIF/URI/mailto.pm'
+    'MarpaX/ESLIF/URI/mailto.pm',
+    'MarpaX/ESLIF/URI/tag.pm'
 );
 
 

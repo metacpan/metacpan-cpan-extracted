@@ -1,0 +1,17 @@
+requires "Carp" => "0";
+requires "Class::Tiny" => "0";
+requires "JSON::XS" => "0";
+requires "LWP::UserAgent" => "0";
+requires "MIME::Base64" => "0";
+requires "POSIX" => "0";
+requires "Sub::Name" => "0";
+requires "Sys::Hostname" => "0";
+requires "strict" => "0";
+
+on 'test' => sub {
+  requires "Test::More" => "0";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};

@@ -7,13 +7,13 @@ use utf8;
 use Module::Find;
 use namespace::autoclean;
 
-our $VERSION = '0.003';    # VERSION
+our $VERSION = '0.005';    # VERSION
 
 # ABSTRACT: Inline display of plotly charts in Jupyter notebooks using L<Devel::IPerl> kernel
 
 my $require_plotly = <<'EOJS';
 <script>
-//@ sourceURL=iperl-devel-plugin-chart-plotly.js
+//# sourceURL=iperl-devel-plugin-chart-plotly.js
             $('#Plotly').each(function(i, e) { $(e).attr('id', 'plotly') });
 
             if (!window.Plotly) {
@@ -55,7 +55,8 @@ sub register {
 
     sub iperl_data_representations {
         my ($plot) = @_;
-        Devel::IPerl::Display::HTML->new( $require_plotly . $plot->html )->iperl_data_representations;
+        Devel::IPerl::Display::HTML->new( $require_plotly . $plot->html( load_plotly_using_script_tag => 0 ) )
+          ->iperl_data_representations;
     }
 
 }
@@ -71,7 +72,8 @@ sub register {
         require Chart::Plotly::Plot;
         my ($trace) = @_;
         my $plot = Chart::Plotly::Plot->new( traces => [$trace] );
-        Devel::IPerl::Display::HTML->new( $require_plotly . $plot->html )->iperl_data_representations;
+        Devel::IPerl::Display::HTML->new( $require_plotly . $plot->html( load_plotly_using_script_tag => 0 ) )
+          ->iperl_data_representations;
     }
 
 }
@@ -90,7 +92,7 @@ Devel::IPerl::Plugin::Chart::Plotly - Inline display of plotly charts in Jupyter
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -114,6 +116,8 @@ version 0.003
 
 Plugin to display automatically L<Chart::Plotly> plot objects in Jupyter notebooks using kernel L<Devel::IPerl>
 
+The example above can be viewed in L<nbviewer|http://nbviewer.jupyter.org/github/pablrod/p5-Devel-IPerl-Plugin-Chart-Plotly/blob/master/examples/PlotlyPlugin.ipynb>
+
 =head1 INSTANCE METHODS
 
 =head2 register
@@ -128,10 +132,16 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Pablo Rodríguez González.
+This software is Copyright (c) 2018 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 
   The MIT (X11) License
+
+=head1 CONTRIBUTOR
+
+=for stopwords Roy Storey
+
+Roy Storey <kiwiroy@users.noreply.github.com>
 
 =cut

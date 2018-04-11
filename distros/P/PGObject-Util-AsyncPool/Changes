@@ -1,0 +1,9 @@
+Revision history for PGObject-Util-AsyncPool
+
+0.02	2018-04-11
+	Fixed packaging bug regarding test dependency on Test::Exception
+	Added additional precondition checks to constructor
+
+0.01    2018-04-10
+        First version, released on an unsuspecting world.
+

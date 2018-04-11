@@ -1,7 +1,8 @@
-package HTML::FormFu::Element::Fieldset;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Element::Fieldset;
+$HTML::FormFu::Element::Fieldset::VERSION = '2.06';
+# ABSTRACT: Fieldset element
 
 use Moose;
 extends 'HTML::FormFu::Element::Block';
@@ -23,8 +24,8 @@ after BUILD => sub {
 sub render_data_non_recursive {
     my ( $self, $args ) = @_;
 
-    my $render = $self->SUPER::render_data_non_recursive( {
-            legend            => $self->legend,
+    my $render = $self->SUPER::render_data_non_recursive(
+        {   legend            => $self->legend,
             legend_attributes => xml_escape( $self->legend_attributes ),
             $args ? %$args : (),
         } );
@@ -38,13 +39,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Element::Fieldset - Fieldset element
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -83,5 +88,16 @@ Carl Franks, C<cfranks@cpan.org>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

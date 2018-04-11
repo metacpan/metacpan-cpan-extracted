@@ -5,9 +5,9 @@ use warnings;
 use utf8;
 
 use Test::BDD::Cucumber::Definitions qw(Given When Then);
-use Test::BDD::Cucumber::Definitions::Zip qw(:util);
+use Test::BDD::Cucumber::Definitions::Zip qw(Zip);
 
-our $VERSION = '0.31';
+our $VERSION = '0.34';
 
 ## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
 ## no critic [RegularExpressions::RequireExtendedFormatting]
@@ -41,7 +41,7 @@ Test::BDD::Cucumber::Definitions::Zip::Ru - Шаги на русском язы�
 
     Scenario: HTTP->Zip
         When HTTP-запрос "GET" отправлен на "http://example.com/test.zip"
-        When содержимое HTTP-ответа прочитано как Zip
+        Given содержимое HTTP-ответа прочитано как Zip
 
 =head1 ИСТОЧНИКИ ДАННЫХ
 
@@ -63,13 +63,13 @@ sub import {
 Прочитать данные из L<содержимого HTTP-ответа|Test::BDD::Cucumber::Definitions::HTTP::Ru>
 в L<архив Zip|Test::BDD::Cucumber::Definitions::Zip::Ru>:
 
-    When содержимое HTTP-ответа прочитано как Zip
+    Given содержимое HTTP-ответа прочитано как Zip
 
 =cut
 
-    #       http response content read Zip
-    When qr/содержимое HTTP-ответа прочитано как Zip/, sub {
-        http_response_content_read_zip();
+    #        read http response content as Zip
+    Given qr/содержимое HTTP-ответа прочитано как Zip/, sub {
+        Zip->read_http_response_content_as_zip();
     };
 
     return;

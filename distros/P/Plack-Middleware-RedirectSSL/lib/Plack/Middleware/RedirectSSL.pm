@@ -1,7 +1,7 @@
 use 5.006; use strict; use warnings;
 
 package Plack::Middleware::RedirectSSL;
-$Plack::Middleware::RedirectSSL::VERSION = '1.300';
+$Plack::Middleware::RedirectSSL::VERSION = '1.301';
 # ABSTRACT: force all requests to use in-/secure connections
 
 use parent 'Plack::Middleware';
@@ -121,7 +121,7 @@ Plack::Middleware::RedirectSSL - force all requests to use in-/secure connection
 
 =head1 VERSION
 
-version 1.300
+version 1.301
 
 =head1 SYNOPSIS
 
@@ -144,9 +144,11 @@ and redirects them to the same URI under respective other scheme.
 
 =item C<ssl>
 
-Specifies the direction of redirects. If true or not specified, requests using
-C<http> will be redirected to C<https>. If false, requests using C<https> will
-be redirected to plain C<http>.
+Specifies the direction of redirects.
+If true, requests using C<http> will be redirected to C<https>.
+If false, requests using C<https> will be redirected to plain C<http>.
+
+Defaults to true if not specified during construction.
 
 =item C<hsts_header>
 
@@ -158,17 +160,19 @@ If false, no such header will be sent.
 Specifies a value to pass to C<L</render_sts_policy>>
 and updates the C<hsts_header> option with the returned value.
 
-Defaults to an HSTS policy with default values.
+ enable 'RedirectSSL', hsts_policy => { include_subdomains => 1 };
+
+Defaults to an HSTS policy with default values,
+which is a C<max-age> of 26E<nbsp>weeks and no other directives.
 
 =item C<hsts>
 
 Use of this option is L<discouraged|perlpolicy/discouraged>.
 
-Specifies a C<max-age> value for the current HSTS policy (preserving all other directives)
-or creates a new one (containing no other directives)
-and updates the C<hsts_header> option to reflect it.
-If undef, sets a C<hsts_header> to a C<max-age> of 26E<nbsp>weeks.
-If otherwise false, sets C<hsts_header> to C<undef>.
+Specifies a C<max-age> value for the C<hsts_policy> option,
+preserving all other existing C<hsts_policy> directives, if any.
+If undef, uses a C<max-age> of 26E<nbsp>weeks.
+If otherwise false, sets C<hsts_policy> to C<undef>.
 (If you really want a C<max-age> value of 0, use C<'00'>, C<'0E0'> or C<'0 but true'>.)
 
 =back
@@ -179,8 +183,21 @@ If otherwise false, sets C<hsts_header> to C<undef>.
 
 Takes either a hash reference containing an HSTS policy or C<undef>,
 and returns the corresponding C<Strict-Transport-Security> header value.
+
+ my $policy = { include_subdomains => 1 };
+ printf "Strict-Transport-Security: %s\n", render_sts_policy $policy;
+ # Strict-Transport-Security: max-age=15724800; includeSubDomains
+
 As a side effect, validates the policy and
 updates the hash with the ultimate value of every directive after computing defaults.
+
+ use Data::Dumper; local $Data::Dumper::Terse = 1;
+ print +Dumper $policy;
+ # {
+ #   'max_age' => 15724800,
+ #   'include_subdomains' => 1,
+ #   'preload' => ''
+ # }
 
 The following directives are supported:
 
@@ -218,11 +235,22 @@ Boolean; whether to include the C<preload> directive.
 
 =item *
 
+L<Plack::Middleware::ReverseProxy>
+
+If your L<PSGI> application runs behind a reverse proxy that unwraps SSL connections
+then you will need to put this middleware in front of RedirectSSL.
+
+=item *
+
 L<RFCE<nbsp>6797, I<HTTP Strict Transport Security>|http://tools.ietf.org/html/rfc6797>
 
 =item *
 
-L<HSTS preload list|https://hstspreload.org/>
+L<HSTS preload|https://hstspreload.org/>
+
+Specification of the C<preload> directive
+and submission form for inclusion into the Google Chrome preload list
+(also used by most other browsers)
 
 =back
 

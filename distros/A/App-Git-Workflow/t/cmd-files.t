@@ -19,7 +19,7 @@ sub run {
             mock => [
                 { config => undef },
                 { branch => [map {"  $_"} qw{master origin/master}] },
-                { 'rev-list' => [(time - 60*60*24*5) . ' 1111111111111111111111111111111111111111'] },
+                { log    => time . "\x{1}1111111111111111111111111111111111111111" },
                 { branch => [map {"  $_"} qw{master origin/master}] },
                 { 'rev-list' =>  [
                     '1111111111111111111111111111111111111111',
@@ -62,7 +62,7 @@ sub run {
             mock => [
                 { config => undef },
                 { branch => [map {"  $_"} qw{master origin/master}] },
-                { 'rev-list' => [(time - 60*60*24*5) . ' 1111111111111111111111111111111111111111'] },
+                { log    => (time - 60*60*24*5) . "\x{1}1111111111111111111111111111111111111111" },
                 { branch => [map {"  $_"} qw{master origin/master}] },
                 { 'rev-list' =>  [
                     '1111111111111111111111111111111111111111',
@@ -99,7 +99,7 @@ sub run {
             mock => [
                 { config => undef },
                 { branch => [map {"  $_"} qw{master origin/master}] },
-                { 'rev-list' => [(time - 60*60*24*5) . ' 1111111111111111111111111111111111111111'] },
+                { log    => (time - 60*60*24*5) . "\x{1}1111111111111111111111111111111111111111" },
                 { branch => [map {"  $_"} qw{master origin/master}] },
                 { diff   => [qw/file1 file2/] },
                 { 'rev-list' =>  [
@@ -216,7 +216,7 @@ STDOUT
             mock => [
                 { config => undef },
                 { branch => [map {"  $_"} qw{master origin/master}] },
-                { 'rev-list' => [(time - 60*60*24*5) . ' 1111111111111111111111111111111111111111'] },
+                { log    => (time - 60*60*24*5) . "\x{1}1111111111111111111111111111111111111111" },
                 { branch => [map {"  $_"} qw{master origin/master}] },
                 { diff   => [qw{file1 file2}] },
                 { 'rev-list' => [] },
@@ -237,7 +237,7 @@ STDOUT
             mock => [
                 { config => undef },
                 { branch => [map {"  $_"} qw{master origin/master}] },
-                { 'rev-list' => [(time - 60*60*24*5) . ' 1111111111111111111111111111111111111111'] },
+                { log    => (time - 60*60*24*5) . "\x{1}1111111111111111111111111111111111111111" },
                 { branch => [map {"  $_"} qw{master origin/master}] },
                 { diff   => [qw{file1 file2}] },
                 { 'rev-list' =>  [
@@ -338,7 +338,7 @@ STDOUT
             mock => [
                 { config => undef },
                 { branch => [map {"  $_"} qw{master origin/master}] },
-                { 'rev-list' => [(time - 60*60*24*5) . ' 1111111111111111111111111111111111111111'] },
+                { log    => (time - 60*60*24*5) . "\x{1}1111111111111111111111111111111111111111" },
                 { branch => [map {"  $_"} qw{master origin/master}] },
                 { diff   => [qw{file1 file2}] },
                 { 'rev-list' =>  [
@@ -455,7 +455,7 @@ STDOUT
             mock => [
                 { config => undef },
                 { branch => [map {"  $_"} qw{master origin/master}] },
-                { 'rev-list' => [(time - 60*60*24*5) . ' 1111111111111111111111111111111111111111'] },
+                { log    => (time - 60*60*24*5) . "\x{1}1111111111111111111111111111111111111111" },
                 { branch => [map {"  $_"} qw{master origin/master}] },
                 { diff   => [qw{file1 file2}] },
                 { 'rev-list' =>  [

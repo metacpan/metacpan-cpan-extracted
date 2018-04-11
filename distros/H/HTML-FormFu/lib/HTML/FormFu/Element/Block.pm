@@ -1,10 +1,11 @@
-package HTML::FormFu::Element::Block;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Element::Block;
+$HTML::FormFu::Element::Block::VERSION = '2.06';
+# ABSTRACT: Block element
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 
 extends 'HTML::FormFu::Element';
 
@@ -21,10 +22,10 @@ use Clone ();
 use List::Util 1.45 qw( uniq );
 use Carp qw( croak );
 
-has tag                  => ( is => 'rw', traits => ['FormFuChained'] );
-has nested_name          => ( is => 'rw', traits => ['FormFuChained'] );
-has original_nested_name => ( is => 'rw', traits => ['FormFuChained'] );
-has auto_block_id        => ( is => 'rw', traits => ['FormFuChained'] );
+has tag                  => ( is => 'rw', traits => ['Chained'] );
+has nested_name          => ( is => 'rw', traits => ['Chained'] );
+has original_nested_name => ( is => 'rw', traits => ['Chained'] );
+has auto_block_id        => ( is => 'rw', traits => ['Chained'] );
 
 has _elements => (
     is      => 'rw',
@@ -130,8 +131,8 @@ sub render_data {
 sub render_data_non_recursive {
     my ( $self, $args ) = @_;
 
-    my $render = $self->SUPER::render_data_non_recursive( {
-            tag     => $self->tag,
+    my $render = $self->SUPER::render_data_non_recursive(
+        {   tag     => $self->tag,
             content => xml_escape( $self->content ),
             $args ? %$args : (),
         } );
@@ -228,8 +229,8 @@ sub string {
 sub start {
     my ($self) = @_;
 
-    return $self->tt( {
-            filename    => 'start_block',
+    return $self->tt(
+        {   filename    => 'start_block',
             render_data => $self->render_data_non_recursive,
         } );
 }
@@ -237,8 +238,8 @@ sub start {
 sub end {
     my ($self) = @_;
 
-    return $self->tt( {
-            filename    => 'end_block',
+    return $self->tt(
+        {   filename    => 'end_block',
             render_data => $self->render_data_non_recursive,
         } );
 }
@@ -263,13 +264,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Element::Block - Block element
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -399,6 +404,10 @@ Unlike most other auto_* methods, this is not an 'inherited accessor'.
 =head2 auto_label
 
 See L<HTML::FormFu/auto_label> for details.
+
+=head2 auto_error_field_class
+
+See L<HTML::FormFu/auto_error_field_class> for details.
 
 =head2 auto_error_class
 
@@ -534,5 +543,16 @@ Carl Franks, C<cfranks@cpan.org>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

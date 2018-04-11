@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Email::Valid" => 0,
     "Net::DNS" => 0,
+    "Net::Domain::TLD" => "1.75",
     "Regexp::Common" => 0,
     "String::Validator::Common" => "2.00",
     "base" => 0,
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "2.00",
+  "VERSION" => "2.01",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,6 +39,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Email::Valid" => 0,
   "Net::DNS" => 0,
+  "Net::Domain::TLD" => "1.75",
   "Regexp::Common" => 0,
   "String::Validator::Common" => "2.00",
   "Test::More" => 0,

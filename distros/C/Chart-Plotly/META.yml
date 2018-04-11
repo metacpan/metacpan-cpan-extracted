@@ -42,6 +42,6 @@ resources:
   bugtracker: https://github.com/pablrod/p5-Chart-Plotly/issues
   homepage: https://github.com/pablrod/p5-Chart-Plotly
   repository: https://github.com/pablrod/p5-Chart-Plotly.git
-version: '0.017'
+version: '0.018'
 x_contributors:
   - 'weatherwax <s.g.lobo@hotmail.com>'

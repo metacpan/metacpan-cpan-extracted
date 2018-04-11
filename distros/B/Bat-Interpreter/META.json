@@ -67,6 +67,10 @@
          "web" : "https://github.com/pablrod/p5-Bat-Interpreter"
       }
    },
-   "version" : "0.003"
+   "version" : "0.004",
+   "x_contributors" : [
+      "eva.dominguez <eva.dominguez@meteologica.com>",
+      "pablo.rodriguez <pablo.rodriguez@meteologica.com>"
+   ]
 }
 

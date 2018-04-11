@@ -1,14 +1,9 @@
 package Pcore::HTTP::Cookies;
 
-use Pcore -class, -const;
+use Pcore -class;
 use Pcore::Util::Scalar qw[is_ref];
 
 has cookies => ( is => 'ro', isa => HashRef, default => sub { {} } );
-
-const our $COOKIE_NAME    => 0;
-const our $COOKIE_VAL     => 1;
-const our $COOKIE_EXPIRES => 2;
-const our $COOKIE_SECURE  => 3;
 
 # https://tools.ietf.org/html/rfc6265#section-4.1.1
 sub parse_cookies ( $self, $url, $set_cookie_header ) {
@@ -26,7 +21,7 @@ sub parse_cookies ( $self, $url, $set_cookie_header ) {
             my $key;
 
             if ( !defined $is_attr ) {
-                $cookie->[$COOKIE_NAME] = $1;
+                $cookie->{name} = $1;
             }
             else {
                 $key = lc $1;
@@ -34,7 +29,7 @@ sub parse_cookies ( $self, $url, $set_cookie_header ) {
 
             if ( $str =~ /\G=\s*(.*?)\s*(?:;|\z)/smgc ) {
                 if ( !defined $is_attr ) {
-                    $cookie->[$COOKIE_VAL] = $1;
+                    $cookie->{val} = $1;
                 }
                 else {
                     if ( $key eq 'domain' ) {
@@ -67,9 +62,9 @@ sub parse_cookies ( $self, $url, $set_cookie_header ) {
                         $path = $1 if $1 ne q[];
                     }
                     elsif ( $key eq 'expires' ) {
-                        if ( !defined $cookie->[$COOKIE_EXPIRES] ) {    # do not process expires attribute, if expires is already set by expires or max-age
+                        if ( !defined $cookie->{expires} ) {    # do not process expires attribute, if expires is already set by expires or max-age
                             if ( my $expires = eval { P->date->parse($1) } ) {
-                                $cookie->[$COOKIE_EXPIRES] = $expires->epoch;
+                                $cookie->{expires} = $expires->epoch;
                             }
                         }
                     }
@@ -80,7 +75,7 @@ sub parse_cookies ( $self, $url, $set_cookie_header ) {
                         # If both (Expires and Max-Age) are set, Max-Age will have precedence.
                         my $val = $1;
 
-                        $cookie->[$COOKIE_EXPIRES] = time + $val if $val =~ /\A-?\d+\z/sm;
+                        $cookie->{expires} = time + $val if $val =~ /\A-?\d+\z/sm;
                     }
                 }
             }
@@ -89,21 +84,21 @@ sub parse_cookies ( $self, $url, $set_cookie_header ) {
                 $is_attr = 1;
             }
             else {
-                $cookie->[$COOKIE_SECURE] = 1 if $key eq 'secure';
+                $cookie->{secure} = 1 if $key eq 'secure';
             }
         }
 
-        next if !defined $cookie->[$COOKIE_NAME];
+        next if !defined $cookie->{name};
 
-        $cookie->[$COOKIE_VAL] //= q[];
-        $domain                //= $origin_domain;
-        $path                  //= $origin_path;
+        $cookie->{val} //= q[];
+        $domain        //= $origin_domain;
+        $path          //= $origin_path;
 
-        if ( defined $cookie->[$COOKIE_EXPIRES] && $cookie->[$COOKIE_EXPIRES] <= time ) {
-            $self->remove_cookie( $domain, $path, $cookie->[$COOKIE_NAME] );
+        if ( defined $cookie->{expires} && $cookie->{expires} <= time ) {
+            $self->remove_cookie( $domain, $path, $cookie->{name} );
         }
         else {
-            $self->{cookies}->{$domain}->{$path}->{ $cookie->[$COOKIE_NAME] } = $cookie;
+            $self->{cookies}->{$domain}->{$path}->{ $cookie->{name} } = $cookie;
         }
     }
 
@@ -136,25 +131,25 @@ sub get_cookies ( $self, $url ) {
                 for my $cookie ( values $domain->{$path}->%* ) {
 
                     # check expire
-                    if ( defined $cookie->[$COOKIE_EXPIRES] && $cookie->[$COOKIE_EXPIRES] <= time ) {
+                    if ( defined $cookie->{expires} && $cookie->{expires} <= time ) {
 
                         # remove expired cookie
-                        $self->remove_cookie( $domain, $path, $cookie->[$COOKIE_NAME] );
+                        $self->remove_cookie( $domain, $path, $cookie->{expires} );
 
                         next;
                     }
 
                     # check secure
-                    next if $cookie->[$COOKIE_SECURE] && !$origin_is_secure;
+                    next if $cookie->{secure} && !$origin_is_secure;
 
                     # match path, cookie path must be aa substring of the origin path
-                    push @cookies, $cookie if index( $path, $origin_path ) == 0;
+                    push @cookies, $cookie if index( $origin_path, $path ) == 0;
                 }
             }
         }
     }
 
-    return @cookies ? [ map {"$_->[$COOKIE_NAME]=$_->[$COOKIE_VAL]"} @cookies ] : ();
+    return @cookies ? [ map {"$_->{name}=$_->{val}"} @cookies ] : ();
 }
 
 sub remove_cookie ( $self, $domain, $path, $name ) {
@@ -176,9 +171,9 @@ sub remove_cookie ( $self, $domain, $path, $name ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 14                   | Subroutines::ProhibitExcessComplexity - Subroutine "parse_cookies" with high complexity score (27)             |
+## |    3 | 9                    | Subroutines::ProhibitExcessComplexity - Subroutine "parse_cookies" with high complexity score (27)             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 53, 56, 70, 71       | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 48, 51, 65, 66       | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -6,7 +6,7 @@ use warnings;
 use Const::Fast;
 use DDP ( show_unicode => 1 );
 use Exporter qw(import);
-use File::Slurper qw(read_text read_binary);
+use File::Slurper;
 use File::Spec::Functions qw(catdir splitdir);
 use File::Basename qw(dirname);
 use IO::Capture::Stderr;
@@ -16,30 +16,11 @@ use Test::BDD::Cucumber::Definitions::Validator qw(:all);
 use Test::More;
 use Try::Tiny;
 
-our $VERSION = '0.31';
+our $VERSION = '0.34';
 
-our @EXPORT_OK = qw(
-    file_path_set
-    file_read_text
-    file_read_binary
-    file_exists
-    file_noexists
-    file_type_is
-);
-our %EXPORT_TAGS = (
-    util => [
-        qw(
-            file_path_set
-            file_read_text
-            file_read_binary
-            file_exists
-            file_noexists
-            file_type_is
-            )
-    ]
-);
+our @EXPORT_OK = qw(File);
 
-const my %types => (
+const my %TYPES => (
     'regular file'           => sub { return -f $_[0] },
     'directory'              => sub { return -d $_[0] },
     'symbolic link'          => sub { return -l $_[0] },
@@ -51,16 +32,25 @@ const my %types => (
 
 ## no critic [Subroutines::RequireArgUnpacking]
 
-sub file_path_set {
+sub File {
+    return __PACKAGE__;
+}
+
+sub path_set {
+    my $self = shift;
     my ($path) = validator_n->(@_);
 
-    S->{file} = Test::BDD::Cucumber::Definitions::File::Object->new( path => $path );
+    S->{File} = __PACKAGE__;
+
+    S->{_File}->{path} = $path;
 
     return 1;
 }
 
-sub file_exists {
-    my @dirs = splitdir( dirname( S->{file}->path ) );
+sub exists_yes {
+    my $self = shift;
+
+    my @dirs = splitdir( dirname( S->{_File}->{path} ) );
 
     my $dirname = q{};
 
@@ -89,8 +79,8 @@ sub file_exists {
 
     pass('Intermediate directories exist and are available');
 
-    if ( !ok( -e S->{file}->path, "File exists" ) ) {
-        diag( sprintf( q{File '%s': %s}, S->{file}->path, $! ) );
+    if ( !ok( -e S->{_File}->{path}, "File exists" ) ) {
+        diag( sprintf( q{File '%s': %s}, S->{_File}->{path}, $! ) );
 
         return;
     }
@@ -98,8 +88,10 @@ sub file_exists {
     return 1;
 }
 
-sub file_noexists {
-    my @dirs = splitdir( dirname( S->{file}->path ) );
+sub exists_no {
+    my $self = shift;
+
+    my @dirs = splitdir( dirname( S->{_File}->{path} ) );
 
     my $dirname = q{};
 
@@ -108,7 +100,7 @@ sub file_noexists {
 
         # intermediate dir no exists
         if ( !-e $dirname ) {
-            pass('Intermediate directory no exists');
+            pass('Intermediate directory not exists');
             diag( sprintf( q{Missing directory '%s': %s}, $dirname, $! ) );
 
             return 1;
@@ -127,26 +119,27 @@ sub file_noexists {
 
     pass('Intermediate catalogs (if any) are available');
 
-    return if ( !ok( !-e S->{file}->path, 'File no exists' ) );
+    return if ( !ok( !-e S->{_File}->{path}, 'File not exists' ) );
 
     return 1;
 }
 
-sub file_type_is {
+sub type_is {
+    my $self = shift;
     my ($type) = validator_n->(@_);
 
-    return if !file_exists();
+    return if !File->exists_yes();
 
-    if ( !ok( exists $types{$type}, 'A valid file type is specified' ) ) {
+    if ( !ok( exists $TYPES{$type}, 'A valid file type is specified' ) ) {
         diag( 'Unknown file type ' . np $type);
 
         return;
     }
 
-    if ( !ok( $types{$type}->( S->{file}->path ), "File type is a $type" ) ) {
+    if ( !ok( $TYPES{$type}->( S->{_File}->{path} ), "File type is a $type" ) ) {
         diag( sprintf( q{ Error: %s}, $! ) );
 
-        _stat( S->{file}->path );
+        _stat( S->{_File}->{path} );
 
         return;
     }
@@ -154,17 +147,26 @@ sub file_type_is {
     return 1;
 }
 
-sub file_read_text {
+sub read_text {
+    my $self = shift;
     my ($encoding) = validator_n->(@_);
 
-    return _file_read($encoding);
+    return _read($encoding);
 }
 
-sub file_read_binary {
-    return _file_read();
+sub read_binary {
+    my $self = shift;
+
+    return _read();
 }
 
-sub _file_read {
+sub content {
+    my $self = shift;
+
+    return S->{_File}->{content};
+}
+
+sub _read {
     my ($encoding) = @_;
 
     my $error;
@@ -173,21 +175,19 @@ sub _file_read {
 
     $capture->start();
 
-    S->{file}->content(
-        try {
-            if ( defined $encoding ) {
-                return read_text( S->{file}->path, $encoding );
-            }
-            else {
-                return read_binary( S->{file}->path );
-            }
+    S->{_File}->{content} = try {
+        if ( defined $encoding ) {
+            return File::Slurper::read_text( S->{_File}->{path}, $encoding );
         }
-        catch {
-            $error = $_[0];
+        else {
+            return File::Slurper::read_binary( S->{_File}->{path} );
+        }
+    }
+    catch {
+        $error = $_[0];
 
-            return;
-        }
-    );
+        return;
+    };
 
     $capture->stop();
 
@@ -225,23 +225,5 @@ sub _dirpath {
 
     return $dirname;
 }
-
-## no critic [Modules::ProhibitMultiplePackages]
-package Test::BDD::Cucumber::Definitions::File::Object;
-
-use Moose;
-use namespace::autoclean;
-
-has path => (
-    is  => 'ro',
-    isa => 'Str',
-);
-
-has content => (
-    is  => 'rw',
-    isa => 'Str',
-);
-
-__PACKAGE__->meta->make_immutable;
 
 1;

@@ -1,4 +1,4 @@
-duk_context * O_SESSION
+Duk* O_SESSION
 
 ######################################################################
 OUTPUT
@@ -21,7 +21,7 @@ O_SESSION
         if (sv_isobject($arg) && SvTYPE(SvRV($arg)) == SVt_PVMG &&
             (mg = mg_findext(SvRV($arg), PERL_MAGIC_ext, &session_magic_vtbl)) != 0)
         {
-            $var = (duk_context*) mg->mg_ptr;
+            $var = (Duk*) mg->mg_ptr;
         } else {
             croak(\"${Package}::$func_name() -- $var is not a valid JavaScript::Duktape::XS object\");
         }

@@ -14,8 +14,11 @@ perlcritic.rc
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
+t/downtime.t
 t/exception.t
 t/file_upload.t
+t/host.t
 t/lib/ORA_Test.pm
 t/opsview.t
+t/reload.t
 weaver.ini

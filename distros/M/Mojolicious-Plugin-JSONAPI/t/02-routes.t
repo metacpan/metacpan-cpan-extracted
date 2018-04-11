@@ -43,7 +43,7 @@ foreach my $test (@tests) {
 
     my $t = Test::Mojo->new();
 
-    $t->app->plugin( 'JSONAPI', { namespace => $namespace } );
+    $t->app->plugin( 'JSONAPI', { namespace => $namespace, data_dir => 't/share' } );
 
     $t->app->hook(
         before_render => sub {

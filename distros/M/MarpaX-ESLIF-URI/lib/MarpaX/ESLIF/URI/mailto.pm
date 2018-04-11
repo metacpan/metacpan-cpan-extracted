@@ -7,7 +7,7 @@ package MarpaX::ESLIF::URI::mailto;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Class::Tiny::Antlers;
 use MarpaX::ESLIF;
@@ -106,6 +106,17 @@ sub __hfname {
   $rc
 }
 
+sub __domain {
+  my ($self, @args) = @_;
+
+  #
+  # <domain> is case-insensitive.
+  #
+  my $rc = $self->__concat(@args);
+  $rc->{normalized} = lc($rc->{normalized});
+  $rc
+}
+
 # -------------
 # Normalization
 # -------------
@@ -123,11 +134,11 @@ MarpaX::ESLIF::URI::mailto - URI::mailto syntax as per RFC6068
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SUBROUTINES/METHODS
 
-MarpaX::ESLIF::URI::mailto inherits, and eventually overwrites some, methods or MarpaX::ESLIF::URI::_generic.
+MarpaX::ESLIF::URI::mailto inherits, and eventually overwrites some, methods of MarpaX::ESLIF::URI::_generic.
 
 =head2 $class->bnf
 
@@ -197,8 +208,8 @@ __DATA__
                             | <quoted string>
 
 <dtext no obs any>        ::= <dtext no obs>*
-<domain>                  ::= <dot atom text>
-                            | "[" <dtext no obs any> "]"
+<domain>                  ::= <dot atom text>                                                   action => __domain
+                            | "[" <dtext no obs any> "]"                                        action => __domain
 <dtext no obs>            ::= [\x{21}-\x{5A}\x{5E}-\x{7E}] # Printable US-ASCII or characters not including "[", "]", or "\"
 <hfname char>             ::= <unreserved>
                             | <hfname some delims>

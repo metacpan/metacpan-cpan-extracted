@@ -34,6 +34,7 @@ do { my $x = {
                                       'Class::Load' => '0',
                                       'Class::Method::Modifiers' => '0',
                                       'Class::Tiny::Antlers' => '0',
+                                      'DateTime' => '0',
                                       'Log::Any' => '0',
                                       'MarpaX::ESLIF' => '0',
                                       'Net::servent' => '0',

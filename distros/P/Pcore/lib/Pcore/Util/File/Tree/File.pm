@@ -37,7 +37,7 @@ sub write_to ( $self, $target_path ) {
     P->file->mkpath( $target_path->dirname );
 
     if ( $self->has_content ) {
-        P->file->write_bin( $target_path, $self->content );
+        P->file->write_bin( $target_path, P->text->encode_utf8( $self->content->$* ) );
     }
     else {
         P->file->copy( $self->source_path, $target_path );

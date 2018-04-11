@@ -22,59 +22,13 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200235;
+our $VERSION = 1.20180410221547;
 
 my $formatters = [];
 
 my $validators = {
-                'mobile' => '
-          (?:
-            6(?:
-              200[01]|
-              30[01]\\d
-            )|
-            7(?:
-              200[01]|
-              3(?:
-                0[0-5]\\d|
-                140
-              )
-            )
-          )\\d{3}
-        ',
+                'pager' => '',
                 'personal_number' => '',
-                'toll_free' => '',
-                'fixed_line' => '
-          (?:
-            [24]\\d|
-            3[1-9]|
-            50|
-            8[0-5]
-          )\\d{3}|
-          (?:
-            65(?:
-              02[12]|
-              12[56]|
-              22[89]|
-              [3-5]00
-            )|
-            7(?:
-              27\\d{2}|
-              3100|
-              5(?:
-                02[12]|
-                12[56]|
-                22[89]|
-                [34](?:
-                  00|
-                  81
-                )|
-                500
-              )
-            )
-          )\\d{3}
-        ',
-                'specialrate' => '',
                 'geographic' => '
           (?:
             [24]\\d|
@@ -105,7 +59,22 @@ my $validators = {
             )
           )\\d{3}
         ',
-                'pager' => '',
+                'specialrate' => '',
+                'mobile' => '
+          (?:
+            6(?:
+              200[01]|
+              30[01]\\d
+            )|
+            7(?:
+              200[01]|
+              3(?:
+                0[0-5]\\d|
+                140
+              )
+            )
+          )\\d{3}
+        ',
                 'voip' => '
           30(?:
             0[01]\\d{2}|
@@ -114,7 +83,38 @@ my $validators = {
               20
             )
           )\\d{2}
-        '
+        ',
+                'fixed_line' => '
+          (?:
+            [24]\\d|
+            3[1-9]|
+            50|
+            8[0-5]
+          )\\d{3}|
+          (?:
+            65(?:
+              02[12]|
+              12[56]|
+              22[89]|
+              [3-5]00
+            )|
+            7(?:
+              27\\d{2}|
+              3100|
+              5(?:
+                02[12]|
+                12[56]|
+                22[89]|
+                [34](?:
+                  00|
+                  81
+                )|
+                500
+              )
+            )
+          )\\d{3}
+        ',
+                'toll_free' => ''
               };
 my %areanames = (
   68621 => "Bairiki",
@@ -178,6 +178,6 @@ my %areanames = (
       my $number = shift;
       $number =~ s/(^\+686|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-  return $self->is_valid() ? $self : undef;
-}
+        return $self->is_valid() ? $self : undef;
+    }
 1;

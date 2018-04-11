@@ -7,7 +7,7 @@ package MarpaX::ESLIF::URI;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Carp qw/croak/;
 use Class::Load qw/load_class/;
@@ -57,7 +57,7 @@ MarpaX::ESLIF::URI - URI as per RFC3986/RFC6874
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -105,7 +105,7 @@ Percent-encoded characters are decoded to ASCII characters corresponding to ever
 
 =head1 SEE ALSO
 
-L<MarpaX::ESLIF::URI::_generic>, L<MarpaX::ESLIF::URI::file>, L<MarpaX::ESLIF::URI::ftp>, L<MarpaX::ESLIF::URI::http>, L<MarpaX::ESLIF::URI::https>, L<MarpaX::ESLIF::URI::mailto>
+L<MarpaX::ESLIF::URI::_generic>, L<MarpaX::ESLIF::URI::file>, L<MarpaX::ESLIF::URI::ftp>, L<MarpaX::ESLIF::URI::http>, L<MarpaX::ESLIF::URI::https>, L<MarpaX::ESLIF::URI::mailto>, L<MarpaX::ESLIF::URI::tag>
 
 =head1 AUTHOR
 

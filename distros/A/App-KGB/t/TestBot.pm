@@ -96,12 +96,19 @@ webhook:
  enabled: 1
  allowed_networks:
   - $addr
+short_url_service: DummyShortener
 EOF
     chmod 0600, $fh;
     close($fh);
 
     my $bot_script =
         $ENV{KGB_BOT_SCRIPT} || File::Spec->catfile( 'script', 'kgb-bot' );
+
+    my $t_dir = File::Spec->catdir(getcwd, 't');
+    my $dirs = $ENV{PERL5LIB};
+    if ($dir) { $dirs .= ":$t_dir" }
+    else      { $dirs = $t_dir }
+    $ENV{PERL5LIB} = $dirs;
 
     system( $bot_script,
         '--config', $conf_file, '--simulate', $self->output_file,

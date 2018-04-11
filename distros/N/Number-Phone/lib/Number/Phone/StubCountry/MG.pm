@@ -22,20 +22,22 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200235;
+our $VERSION = 1.20180410221547;
 
 my $formatters = [
                 {
                   'pattern' => '([23]\\d)(\\d{2})(\\d{3})(\\d{2})',
+                  'national_rule' => '0$1',
                   'leading_digits' => '[23]',
-                  'format' => '$1 $2 $3 $4',
-                  'national_rule' => '0$1'
+                  'format' => '$1 $2 $3 $4'
                 }
               ];
 
 my $validators = {
-                'voip' => '22\\d{7}',
+                'personal_number' => '',
                 'pager' => '',
+                'specialrate' => '',
+                'mobile' => '3[2-49]\\d{7}',
                 'geographic' => '
           20(?:
             2\\d{2}|
@@ -50,6 +52,8 @@ my $validators = {
             9[245]\\d
           )\\d{4}
         ',
+                'voip' => '22\\d{7}',
+                'toll_free' => '',
                 'fixed_line' => '
           20(?:
             2\\d{2}|
@@ -63,11 +67,7 @@ my $validators = {
             8[268]\\d|
             9[245]\\d
           )\\d{4}
-        ',
-                'specialrate' => '',
-                'toll_free' => '',
-                'personal_number' => '',
-                'mobile' => '3[2-49]\\d{7}'
+        '
               };
 my %areanames = (
   2612022 => "Antananarivo",
@@ -98,13 +98,9 @@ my %areanames = (
       my $number = shift;
       $number =~ s/(^\+261|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-  
       return $self if ($self->is_valid());
-      {
-        no warnings 'uninitialized';
-        $number =~ s/^(?:0)//;
-      }
+      $number =~ s/^(?:0)//;
       $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-    return $self->is_valid() ? $self : undef;
-}
+      return $self->is_valid() ? $self : undef;
+    }
 1;

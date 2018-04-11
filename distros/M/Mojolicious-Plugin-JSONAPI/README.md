@@ -4,7 +4,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 # VERSION
 
-version 1.0
+version 1.1
 
 # SYNOPSIS
 
@@ -15,7 +15,10 @@ version 1.0
     sub startup {
         my ($self) = @_;
 
-        $self->plugin('JSONAPI', { namespace => 'api' });
+        $self->plugin('JSONAPI', {
+            namespace => 'api',
+            data_dir => '/path/to/data/dir',
+        });
 
         $self->resource_routes({
             resource => 'post',
@@ -45,7 +48,7 @@ version 1.0
         # PATCH '/api/posts/:post_id/relationships/email-templates' -> to('api-posts#patch_related_email_templates')
         # DELETE '/api/posts/:post_id/relationships/email-templates' -> to('api-posts#delete_related_email_templates')
 
-        # If your not in production mode, your $app->log will show the created routes. Useful!
+        # If you're in development mode (e.g. MOJO_MODE eq 'development'), your $app->log will show the created routes. Useful!
 
         # You can use the following helpers too:
 
@@ -65,6 +68,11 @@ specification, along with supplying helper methods to use when responding to req
 See [http://jsonapi.org/](http://jsonapi.org/) for the JSON API specification. At the time of writing, the version was 1.0.
 
 # OPTIONS
+
+- `data_dir`
+
+    Required; This should be a path to a directory which is not version controlled (if you use stuff like that). Used
+    by `JSONAPI::Document` to store computed document types.
 
 - `namespace`
 

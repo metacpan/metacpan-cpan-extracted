@@ -72,7 +72,7 @@ strings.
 =cut
 
 use base 'Class::Accessor::Fast';
-__PACKAGE__->mk_accessors( qw( id changes log author author_name branch module ) );
+__PACKAGE__->mk_accessors( qw( id changes log author author_name author_via branch module ) );
 
 use Carp qw(confess);
 

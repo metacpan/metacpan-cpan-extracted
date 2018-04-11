@@ -1,5 +1,9 @@
 Revision history for Catalyst-Plugin-Session-Store-Redis
 
+0.08    2018-04-10T11:33:57
+    - Make redis database configurable (Andreas Granig)
+
+
 0.07    2016-09-06T19:12:46
     - new maintainer: domm
     - some doc changes

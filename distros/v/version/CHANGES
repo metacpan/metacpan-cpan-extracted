@@ -4,6 +4,16 @@ This is not a complete list of changes.  See repository for full details:
 
     https://bitbucket.org/jpeacock/version (primary)
 
+0.9920 - 2018-04-08
+
+  * Backwards compatible locale handling
+	https://rt.cpan.org/Ticket/Display.html?id=125042
+
+0.9919 - 2018-04-08
+
+  * Core improvements to locale handling
+	https://rt.cpan.org/Ticket/Display.html?id=124563
+
 0.9918 - 2017-04-15
 
   * Fix compiling under C++11

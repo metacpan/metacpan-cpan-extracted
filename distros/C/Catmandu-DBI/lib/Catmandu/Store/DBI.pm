@@ -7,7 +7,7 @@ use Catmandu::Store::DBI::Bag;
 use Moo;
 use namespace::clean;
 
-our $VERSION = "0.0701";
+our $VERSION = "0.0702";
 
 with 'Catmandu::Store';
 with 'Catmandu::Transactional';
@@ -306,6 +306,10 @@ Boolean option, default is C<0>. Note that this options is only supported for Po
 =item unique
 
 Boolean option, default is C<0>.
+
+=item index
+
+Boolean option, default is C<0>. Ignored if C<unique> is true.
 
 =item required
 

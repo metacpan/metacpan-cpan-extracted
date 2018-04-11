@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep;
-$Lab::Moose::Sweep::VERSION = '3.624';
+$Lab::Moose::Sweep::VERSION = '3.630';
 #ABSTRACT: Base class for high level sweeps
 
 # Step/List and Continuous sweep are implemented as subclasses
@@ -337,9 +337,11 @@ sub _start {
         filename_extensions => { isa => 'ArrayRef[Str]' },
     );
 
-    my $slave = $self->slave();
+    my $slave                    = $self->slave();
+    my $create_datafiles         = $self->create_datafiles;
+    my $push_filename_extensions = not defined $datafiles;
 
-    if ( $self->create_datafiles and defined $datafiles ) {
+    if ( $create_datafiles and defined $datafiles ) {
         croak "should not get datafile arg";
     }
 
@@ -354,11 +356,15 @@ sub _start {
         $self->go_to_next_point();
         sleep( $self->delay_in_loop );
         my @filename_extensions = @{$filename_extensions};
-        push @filename_extensions,
-            $self->filename_extension . $self->get_value();
+
+        # Only call get_value if we have to
+        if ($push_filename_extensions) {
+            push @filename_extensions,
+                $self->filename_extension . $self->get_value();
+        }
 
         # Create new datafile?
-        if ( $self->create_datafiles ) {
+        if ($create_datafiles) {
             for my $handle ( @{ $self->datafile_params } ) {
                 my %params   = %{ $handle->params };
                 my $filename = delete $params{filename};
@@ -463,7 +469,7 @@ Lab::Moose::Sweep - Base class for high level sweeps
 
 =head1 VERSION
 
-version 3.624
+version 3.630
 
 =head1 DESCRIPTION
 

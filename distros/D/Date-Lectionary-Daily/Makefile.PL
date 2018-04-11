@@ -20,10 +20,17 @@ WriteMakefile(
         'File::ShareDir::Install' => '0.11'
     },
     BUILD_REQUIRES => {
-        'Test::More'          => '1.302130',
-        'Test::CheckManifest' => '1.33',
-        'Test::Exception'     => '0.43',
-        'Pod::Markdown'       => '3.005',
+        'Test::More'            => '1.302130',
+        'Test::DistManifest'    => '1.014',
+        'Test::Exception'       => '0.43',
+        'Pod::Markdown'         => '3.005',
+        'Test::Pod'             => '1.51',
+        'Test::Pod::Coverage'   => '1.10',
+        'Test::MinimumVersion'  => '0.101082',
+        'Test::Kwalitee::Extra' => '0.4.0',
+        'Test::Kwalitee'        => '1.27',
+        'Test::CPAN::Changes'   => '0.400002',
+        'Test::Version'         => '2.07',
     },
     PREREQ_PM => {
         'Carp'                         => '1.38',
@@ -43,6 +50,7 @@ WriteMakefile(
         'File::Share'                  => '0.25',
         'XML::LibXML'                  => '2.0132',
         'MooseX::StrictConstructor'    => '0.21',
+        'version'                      => '0.9920',
     },
     META_MERGE => {
         "meta-spec" => { version => 2 },
@@ -56,7 +64,7 @@ WriteMakefile(
         provides => {
             'Date::Lectionary::Daily' => {
                 file    => 'lib/Date/Lectionary/Daily.pm',
-                version => '1.20180316',
+                version => '1.20180410',
             },
         },
         keywords  => [qw/ lectionary rcl acna readings christian liturgical /],

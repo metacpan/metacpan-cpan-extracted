@@ -1,10 +1,8 @@
-# NAME
-
 Date::Lectionary::Daily - Daily Readings for the Christian Lectionary
 
 # VERSION
 
-Version 1.20180316
+Version 1.20180410
 
 # SYNOPSIS
 
@@ -131,7 +129,7 @@ You can also look for information at:
 
 Many thanks to my beautiful wife, Jennifer, my amazing daughter, Rosemary, and my sweet  son, Oliver.  But, above all, SOLI DEO GLORIA!
 
-# LICENSE
+# LICENSE BSD-2-Clause 
 
 Copyright 2017-2018 MICHAEL WAYNE ARNOLD
 
@@ -142,11 +140,3 @@ Redistribution and use in source and binary forms, with or without modification,
 2\. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 64:
-
-    Non-ASCII character seen before =encoding in '—'. Assuming UTF-8

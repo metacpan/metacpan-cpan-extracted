@@ -1,18 +1,21 @@
 Revision history for Perl extension Class-Adapter
 
-1.08 Thu 24 Mar 2011
+1.09      2018-04-10 05:27:07Z
+        - switch packaging to Dist::Zilla (resolves RT#121115)
+
+1.08      2011-03-24
 	- Upgrading to Module::Install 1.00
 	- Fixed #56492: [PATCH] Fix spelling error
 
-1.07 Mon 12 Apr 2010
+1.07      2010-04-12
 	- Upgrading to Module::Install 0.95
 	- I accidentally deleted Class::Adapter from the CPAN. erk!
 
-1.06 Mon 23 Nov 2009
+1.06      2009-11-23
 	- Upgrading to Module::Install 0.91
 	- Allow class methods to be passed through
 
-1.05 Wed 10 Sep 2008
+1.05      2008-09-10
 	- Upgrading to Module::Install 0.77
 	- Refactoring the DESTROY method to be more paranoidly correct
 	- Updating the test scripts to newer style
@@ -20,31 +23,31 @@ Revision history for Perl extension Class-Adapter
 	- Adding support for wrapping around packages that aren't in their
 	  own module file.
 
-1.04 Wed 14 Nov 2007
+1.04      2007-11-14
 	- No functional changes
 	- Upgrading to Module::Install 0.68
 
-1.03 Thu Jun 29 2007
+1.03      2007-06-29
 	- No functional changes
 	- Upgrading to Module::Install 0.65
 
-1.02 Wed May 24 2006
+1.02      2006-05-24
 	- Fixed static method calls
 	- Fixed a bad ->can case
 	- Fixed ISA => 'class'
 	- Upgrading to Module::Install 0.62
 
-1.01 Sat Jan 28 2005
+1.01      2005-01-28
 	- Updating to a newer Module::Install
 	- Fixed support for Cygwin in doing so
 
-1.00 Mon Dec 26 2005
+1.00      2005-12-26
 	- Added the AUTOLOAD => 'PUBLIC' options
 	- Implemented it and added comprehensive AUTOLOAD testing
 	- Fixed a number of other bugs, and cleaned up the docs a bit
 	- Set to 1.00 as I consider it ready for production use.
 
-0.02 Sat Apr 16 2005
+0.02      2005-04-16
 	- Research Decorator more, realised this actually implements
 	  the Adapter pattern.
 	- Renamed to from Decorator to Class::Adapter
@@ -52,5 +55,5 @@ Revision history for Perl extension Class-Adapter
 	- Added Class::Adapter::Clear
 	- Added first attempt at Class::Adapter::Builder attempt
 
-0.01 Fri Apr 15 2005
+0.01      2005-05-15
 	- original version

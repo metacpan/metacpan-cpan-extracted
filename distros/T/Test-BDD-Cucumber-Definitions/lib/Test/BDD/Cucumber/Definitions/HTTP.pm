@@ -13,29 +13,9 @@ use Test::BDD::Cucumber::Definitions qw(S);
 use Test::BDD::Cucumber::Definitions::Validator qw(:all);
 use Test::More;
 
-our $VERSION = '0.31';
+our $VERSION = '0.34';
 
-our @EXPORT_OK = qw(
-    http_request_header_set
-    http_request_content_set
-    http_request_send
-    http_response_code_eq
-    http_response_header_eq http_response_header_re
-    http_response_content_eq http_response_content_re
-);
-
-our %EXPORT_TAGS = (
-    util => [
-        qw(
-            http_request_header_set
-            http_request_content_set
-            http_request_send
-            http_response_code_eq
-            http_response_header_eq http_response_header_re
-            http_response_content_eq http_response_content_re
-            )
-    ]
-);
+our @EXPORT_OK = qw(HTTP);
 
 my $http = HTTP::Tiny->new();
 
@@ -45,106 +25,132 @@ const my $HTTP_INTERNAL_EXCEPTION => 599;
 
 ## no critic [Subroutines::RequireArgUnpacking]
 
-sub http_request_header_set {
+sub HTTP {
+    return __PACKAGE__;
+}
+
+sub request_header_set {
+    my $self = shift;
     my ( $header, $value ) = validator_ns->(@_);
 
-    S->{http}->{request}->{headers}->{$header} = $value;
+    S->{HTTP} = __PACKAGE__;
+
+    S->{_HTTP}->{request}->{headers}->{$header} = $value;
 
     return;
 }
 
-sub http_request_content_set {
+sub request_content_set {
+    my $self = shift;
     my ($content) = validator_s->(@_);
 
-    S->{http}->{request}->{content} = $content;
+    S->{HTTP} = __PACKAGE__;
+
+    S->{_HTTP}->{request}->{content} = $content;
 
     return;
 }
 
-sub http_request_send {
+sub request_send {
+    my $self = shift;
     my ( $method, $url ) = validator_nn->(@_);
 
+    S->{HTTP} = __PACKAGE__;
+
     my $options = {
-        headers => S->{http}->{request}->{headers},
-        content => _encode_utf8( S->{http}->{request}->{content} ),
+        headers => S->{_HTTP}->{request}->{headers},
+        content => $self->_encode_utf8( S->{_HTTP}->{request}->{content} ),
     };
 
-    S->{http}->{response} = $http->request( $method, $url, $options );
+    S->{_HTTP}->{response} = $http->request( $method, $url, $options );
 
-    if ( S->{http}->{response}->{status} == $HTTP_INTERNAL_EXCEPTION ) {
+    if ( S->{_HTTP}->{response}->{status} == $HTTP_INTERNAL_EXCEPTION ) {
         fail('Http request was sent');
-        diag( S->{http}->{response}->{content} );
+        diag( S->{_HTTP}->{response}->{content} );
     }
 
     diag( 'Http request method = ' . np $method);
     diag( 'Http request url = ' . np $url );
-    diag( 'Http request headers = ' . np S->{http}->{request}->{headers} );
-    diag( 'Http request content = ' . np S->{http}->{request}->{content} );
+    diag( 'Http request headers = ' . np S->{_HTTP}->{request}->{headers} );
+    diag( 'Http request content = ' . np S->{_HTTP}->{request}->{content} );
 
     # Clean http request
-    S->{http}->{request} = undef;
+    S->{_HTTP}->{request} = undef;
 
-    S->{http}->{response_object} = HTTP::Response->new(
-        S->{http}->{response}->{status},
-        S->{http}->{response}->{reason},
-        [ Hash::MultiValue->from_mixed( S->{http}->{response}->{headers} )->flatten ],
-        S->{http}->{response}->{content},
+    S->{_HTTP}->{response_object} = HTTP::Response->new(
+        S->{_HTTP}->{response}->{status},
+        S->{_HTTP}->{response}->{reason},
+        [ Hash::MultiValue->from_mixed( S->{_HTTP}->{response}->{headers} )->flatten ],
+        S->{_HTTP}->{response}->{content},
     );
 
     return;
 }
 
-sub http_response_code_eq {
+sub response_code_eq {
+    my $self = shift;
     my ($code) = validator_i->(@_);
 
-    is( S->{http}->{response}->{status}, $code, qq{Http response code eq "$code"} );
+    is( S->{_HTTP}->{response}->{status}, $code, qq{Http response code eq "$code"} );
 
-    diag( sprintf 'Http response status = "%s %s"', S->{http}->{response}->{status}, S->{http}->{response}->{reason} );
+    diag( sprintf 'Http response status = "%s %s"', S->{_HTTP}->{response}->{status},
+        S->{_HTTP}->{response}->{reason} );
 
     return;
 }
 
-sub http_response_header_eq {
+sub response_header_eq {
+    my $self = shift;
     my ( $header, $value ) = validator_ns->(@_);
 
-    is( S->{http}->{response}->{headers}->{ lc $header }, $value, qq{Http response header "$header" eq "$value"} );
+    is( S->{_HTTP}->{response}->{headers}->{ lc $header }, $value, qq{Http response header "$header" eq "$value"} );
 
-    diag( 'Http response headers = ' . np S->{http}->{response}->{headers} );
+    diag( 'Http response headers = ' . np S->{_HTTP}->{response}->{headers} );
 
     return;
 }
 
-sub http_response_header_re {
+sub response_header_re {
+    my $self = shift;
     my ( $header, $value ) = validator_nr->(@_);
 
-    like( S->{http}->{response}->{headers}->{ lc $header }, $value, qq{Http response header "$header" re "$value"} );
+    like( S->{_HTTP}->{response}->{headers}->{ lc $header }, $value, qq{Http response header "$header" re "$value"} );
 
-    diag( 'Http response headers = ' . np S->{http}->{response}->{headers} );
+    diag( 'Http response headers = ' . np S->{_HTTP}->{response}->{headers} );
 
     return;
 }
 
-sub http_response_content_eq {
+sub response_content_eq {
+    my $self = shift;
     my ($content) = validator_s->(@_);
 
-    is( S->{http}->{response_object}->decoded_content(), $content, qq{Http response content eq "$content"} );
+    is( S->{_HTTP}->{response_object}->decoded_content(), $content, qq{Http response content eq "$content"} );
 
-    diag( 'Http response charset = ' . np S->{http}->{response_object}->headers->content_type_charset );
+    diag( 'Http response charset = ' . np S->{_HTTP}->{response_object}->headers->content_type_charset );
 
     return;
 }
 
-sub http_response_content_re {
+sub response_content_re {
+    my $self = shift;
     my ($content) = validator_r->(@_);
 
-    like( S->{http}->{response_object}->decoded_content(), $content, qq{Http response content re "$content"} );
+    like( S->{_HTTP}->{response_object}->decoded_content(), $content, qq{Http response content re "$content"} );
 
-    diag( 'Http response charset = ' . np S->{http}->{response_object}->headers->content_type_charset );
+    diag( 'Http response charset = ' . np S->{_HTTP}->{response_object}->headers->content_type_charset );
 
     return;
+}
+
+sub content {
+    my $self = shift;
+
+    return S->{_HTTP}->{response_object}->decoded_content;
 }
 
 sub _encode_utf8 {
+    my $self = shift;
     my ($str) = @_;
 
     if ( utf8::is_utf8 $str ) {

@@ -7,7 +7,7 @@ package MarpaX::ESLIF::URI::ftp;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Class::Tiny::Antlers;
 use Class::Method::Modifiers qw/around/;
@@ -96,11 +96,11 @@ MarpaX::ESLIF::URI::ftp - URI::ftp syntax as per RFC1738
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SUBROUTINES/METHODS
 
-MarpaX::ESLIF::URI::ftp inherits, and eventually overwrites some, methods or MarpaX::ESLIF::URI::_generic.
+MarpaX::ESLIF::URI::ftp inherits, and eventually overwrites some, methods of MarpaX::ESLIF::URI::_generic.
 
 =head2 $class->bnf
 

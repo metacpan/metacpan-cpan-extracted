@@ -1,0 +1,103 @@
+[![Build Status](https://travis-ci.org/reneeb/Mojolicious-Plugin-FormFieldsFromJSON-Date.svg?branch=master)](https://travis-ci.org/reneeb/Mojolicious-Plugin-FormFieldsFromJSON-Date)
+[![Kwalitee status](http://cpants.cpanauthors.org/dist/Mojolicious-Plugin-FormFieldsFromJSON-Date.png)](http://cpants.charsbar.org/dist/overview/Mojolicious-Plugin-FormFieldsFromJSON-Date)
+[![GitHub issues](https://img.shields.io/github/issues/reneeb/Mojolicious-Plugin-FormFieldsFromJSON-Date.svg)](https://github.com/reneeb/Mojolicious-Plugin-FormFieldsFromJSON-Date/issues)
+
+# NAME
+
+Mojolicious::Plugin::FormFieldsFromJSON::Date
+
+# VERSION
+
+version 1.00
+
+# SYNOPSIS
+
+    # Mojolicious
+    $self->plugin('FormFieldsFromJSON::Date');
+    $self->plugin('FormFieldsFromJSON' => {
+      types => {
+        date => 1,
+      },
+    });
+
+    # Mojolicious::Lite
+    plugin 'FormFieldsFromJSON::Date';
+    plugin 'FormFieldsFromJSON' => {
+      types => {
+        date => 1,
+      },
+    };
+
+# DESCRIPTION
+
+[Mojolicious::Plugin::FormFieldsFromJSON::Date](https://metacpan.org/pod/Mojolicious::Plugin::FormFieldsFromJSON::Date) is an extension for
+[Mojolicious::Plugin::FormFieldsFromJSON](https://metacpan.org/pod/Mojolicious::Plugin::FormFieldsFromJSON) to create date fields.
+
+# NAME
+
+Mojolicious::Plugin::FormFieldsFromJSON::Date - Mojolicious Plugin
+
+# CONFIGURATION
+
+You can configure several things for the date fields:
+
+- selected
+
+    The date selected. Must be in ISO format, e.g.
+
+        2014-12-29
+
+    Default: "today"
+
+- format
+
+    Defines the order of the dropdowns.
+
+        %Y-%m-%d
+
+    is the default and this will create the "year"-dropdown first, then
+    the "month"-dropdown and finally the "day"-dropdown.
+
+- future
+
+    Defines how many years in the future should be available. (Default: 5)
+
+- past
+
+    Defines how many years in the past should be available. (Default: 1)
+
+# DATE FIELDS
+
+The date fields is a collection of dropdowns to select a date.
+
+## A simple date field
+
+This is an example for a very simple date field
+
+Configuration:
+
+    [
+      {
+        "name":"start",
+        "future": 2,
+        "past": 0,
+        "format":"%d-%m-%Y"
+      }
+    ]
+
+# SEE ALSO
+
+[Mojolicious](https://metacpan.org/pod/Mojolicious), [Mojolicious::Guides](https://metacpan.org/pod/Mojolicious::Guides), [http://mojolicio.us](http://mojolicio.us),
+[Mojolicious::Plugin::FormFieldsFromJSON](https://metacpan.org/pod/Mojolicious::Plugin::FormFieldsFromJSON).
+
+# AUTHOR
+
+Renee Baecker &lt;reneeb@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Renee Baecker.
+
+This is free software, licensed under:
+
+    The Artistic License 2.0 (GPL Compatible)

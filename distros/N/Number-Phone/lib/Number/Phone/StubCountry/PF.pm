@@ -22,33 +22,25 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200235;
+our $VERSION = 1.20180410221547;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
+                  'format' => '$1 $2 $3 $4',
                   'leading_digits' => '
             4[09]|
             8[79]
           ',
-                  'format' => '$1 $2 $3 $4'
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 },
                 {
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '44',
+                  'format' => '$1 $2 $3',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})'
                 }
               ];
 
 my $validators = {
-                'toll_free' => '',
-                'fixed_line' => '
-          4(?:
-            [09][45689]\\d|
-            4
-          )\\d{4}
-        ',
-                'specialrate' => '',
                 'geographic' => '
           4(?:
             [09][45689]\\d|
@@ -56,9 +48,17 @@ my $validators = {
           )\\d{4}
         ',
                 'mobile' => '8[79]\\d{6}',
+                'specialrate' => '',
+                'pager' => '',
                 'personal_number' => '',
-                'voip' => '',
-                'pager' => ''
+                'fixed_line' => '
+          4(?:
+            [09][45689]\\d|
+            4
+          )\\d{4}
+        ',
+                'toll_free' => '',
+                'voip' => ''
               };
 
     sub new {
@@ -66,6 +66,6 @@ my $validators = {
       my $number = shift;
       $number =~ s/(^\+689|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
-  return $self->is_valid() ? $self : undef;
-}
+        return $self->is_valid() ? $self : undef;
+    }
 1;

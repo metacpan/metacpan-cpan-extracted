@@ -16,6 +16,7 @@ my @files = (
     't/03-version-override.t',
     't/04-munge-installer.t',
     't/05-plugin-prereqs.t',
+    't/06-bundle-override.t',
     't/lib/Helper.pm',
     't/zzz-check-breaks.t',
     'xt/author/00-compile.t',

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Manipulate the position of notes in a scale",
+   "abstract" : "Manipulate the position of a note in a scale",
    "author" : [
       "Gene Boggs <gene@cpan.org>"
    ],
@@ -68,7 +68,7 @@
          "web" : "https://github.com/ology/Music-ScaleNote"
       }
    },
-   "version" : "0.0302",
+   "version" : "0.0303",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"

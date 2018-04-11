@@ -1,10 +1,11 @@
-package HTML::FormFu::Constraint::MinMaxFields;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Constraint::MinMaxFields;
+$HTML::FormFu::Constraint::MinMaxFields::VERSION = '2.06';
+# ABSTRACT: Min/Max Multi-field Constraint
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 use MooseX::Aliases;
 extends 'HTML::FormFu::Constraint';
 
@@ -15,13 +16,13 @@ use HTML::FormFu::Util qw( DEBUG_CONSTRAINTS debug );
 has minimum => (
     is     => 'rw',
     alias  => 'min',
-    traits => ['FormFuChained'],
+    traits => ['Chained'],
 );
 
 has maximum => (
     is     => 'rw',
     alias  => 'max',
-    traits => ['FormFuChained'],
+    traits => ['Chained'],
 );
 
 after BUILD => sub {
@@ -82,8 +83,8 @@ sub process {
 
     my $pass = ( $count < $min || $count > $max ) ? 0 : 1;
 
-    return $self->mk_errors( {
-            pass   => $pass,
+    return $self->mk_errors(
+        {   pass   => $pass,
             failed => $pass ? [] : \@names,
             names  => \@names,
         } );
@@ -104,13 +105,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Constraint::MinMaxFields - Min/Max Multi-field Constraint
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -171,5 +176,16 @@ Mario Minati C<mario.minati@googlemail.com>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -13,15 +13,17 @@
 package Directory::Queue::Normal;
 use strict;
 use warnings;
-our $VERSION  = "1.9";
-our $REVISION = sprintf("%d.%02d", q$Revision: 1.13 $ =~ /(\d+)\.(\d+)/);
+our $VERSION  = "2.0";
+our $REVISION = sprintf("%d.%02d", q$Revision: 1.14 $ =~ /(\d+)\.(\d+)/);
 
 #
 # used modules
 #
 
-use Directory::Queue qw(_name _touch /Regexp/ /file/ /special/);
+use Directory::Queue qw(_create _name _touch /Regexp/ /special/);
+use Encode qw(encode decode FB_CROAK LEAVE_SRC);
 use No::Worries::Die qw(dief);
+use No::Worries::File qw(file_read file_write);
 use No::Worries::Stat qw(ST_MTIME ST_NLINK);
 use No::Worries::Warn qw(warnf);
 use POSIX qw(:errno_h);
@@ -246,7 +248,7 @@ sub new : method {
     }
     # create directories
     foreach my $name (TEMPORARY_DIRECTORY, OBSOLETE_DIRECTORY) {
-        $path = $self->{path} . "/" . $name;
+        $path = $self->{path}."/".$name;
         _special_mkdir($path, $self->{umask}) unless -d $path;
     }
     # so far so good...
@@ -268,7 +270,7 @@ sub count : method {
     }
     # count sub-directories
     foreach my $name (@list) {
-        $subdirs = $_SubDirs->($self->{path} . "/" . $name);
+        $subdirs = $_SubDirs->($self->{path}."/".$name);
         $count += $subdirs if $subdirs;
     }
     # that's all
@@ -285,8 +287,8 @@ sub _is_locked ($$;$) {
     my($self, $name, $time) = @_;
     my($path, @stat);
 
-    $path = $self->{path} . "/" . $name;
-    return(0) unless -d $path . "/" . LOCKED_DIRECTORY;
+    $path = $self->{path}."/".$name;
+    return(0) unless -d $path."/".LOCKED_DIRECTORY;
     return(1) unless defined($time);
     @stat = lstat($path);
     unless (@stat) {
@@ -319,7 +321,7 @@ sub lock : method { ## no critic 'ProhibitBuiltinHomonyms'
 
     _check_element($element);
     $permissive = 1 unless defined($permissive);
-    $path = $self->{path} . "/" . $element . "/" . LOCKED_DIRECTORY;
+    $path = $self->{path}."/".$element."/".LOCKED_DIRECTORY;
     if (defined($self->{umask})) {
         $oldumask = umask($self->{umask});
         $success = mkdir($path);
@@ -337,7 +339,7 @@ sub lock : method { ## no critic 'ProhibitBuiltinHomonyms'
         # otherwise this is unexpected...
         dief("cannot mkdir(%s): %s", $path, $!);
     }
-    $path = $self->{path} . "/" . $element;
+    $path = $self->{path}."/".$element;
     unless (lstat($path)) {
         if ($permissive and $! == ENOENT) {
             # RACE: the element directory does not exist anymore
@@ -371,7 +373,7 @@ sub unlock : method {
     my($path);
 
     _check_element($element);
-    $path = $self->{path} . "/" . $element . "/" . LOCKED_DIRECTORY;
+    $path = $self->{path}."/".$element."/".LOCKED_DIRECTORY;
     unless (rmdir($path)) {
         if ($permissive) {
             # RACE: the element directory or its lock does not exist anymore
@@ -391,7 +393,7 @@ sub unlock : method {
 sub touch : method {
     my($self, $element) = @_;
 
-    _touch($self->{"path"} . "/" . $element);
+    _touch($self->{"path"}."/".$element);
 }
 
 #
@@ -406,11 +408,11 @@ sub remove : method {
     dief("cannot remove %s: not locked", $element)
         unless _is_locked($self, $element);
     # move the element out of its intermediate directory
-    $path = $self->{path} . "/" . $element;
+    $path = $self->{path}."/".$element;
     while (1) {
         $temp = $self->{path}
-            . "/" . OBSOLETE_DIRECTORY
-            . "/" . _name($self->{rndhex});
+           ."/".OBSOLETE_DIRECTORY
+           ."/"._name($self->{rndhex});
         rename($path, $temp) and last;
         dief("cannot rename(%s, %s): %s", $path, $temp, $!)
             unless $! == ENOTEMPTY or $! == EEXIST;
@@ -420,7 +422,7 @@ sub remove : method {
     foreach my $name (_special_getdir($temp, "strict")) {
         next if $name eq LOCKED_DIRECTORY;
         if ($name =~ /^($_FileRegexp)$/o) {
-            $path = $temp . "/" . $1; # untaint
+            $path = $temp."/".$1; # untaint
         } else {
             dief("unexpected file in %s: %s", $temp, $name);
         }
@@ -428,7 +430,7 @@ sub remove : method {
         dief("cannot unlink(%s): %s", $path, $!);
     }
     # remove the locked directory
-    $path = $temp . "/" . LOCKED_DIRECTORY;
+    $path = $temp."/".LOCKED_DIRECTORY;
     while (1) {
         rmdir($path) or dief("cannot rmdir(%s): %s", $path, $!);
         rmdir($temp) and return;
@@ -438,6 +440,36 @@ sub remove : method {
         # while it was being removed (see the comment in the lock() method)
         # so we try to remove the lock again and again...
     }
+}
+
+#
+# read a binary file and return a reference to the corresponding data
+#
+
+sub _file_read_bin ($) {
+    my($path) = @_;
+    my($data);
+
+    file_read($path, data => \$data);
+    return(\$data);
+}
+
+#
+# read a UTF-8 encoded file and return a reference to the corresponding string
+#
+
+sub _file_read_utf8 ($) {
+    my($path) = @_;
+    my($data, $string);
+
+    file_read($path, data => \$data);
+    eval {
+        local $SIG{__WARN__} = sub { die($_[0]) };
+        $string = decode("UTF-8", $data, FB_CROAK);
+    };
+    return(\$string) unless $@;
+    $@ =~ s/\s+at\s.+?\sline\s+\d+\.?$//;
+    dief("cannot UTF-8 decode %s: %s", $path, $@);
 }
 
 #
@@ -497,13 +529,13 @@ sub _insertion_directory ($) {
     # handle the case with no directories yet
     unless (@list) {
         $new = sprintf("%08x", 0);
-        _special_mkdir($self->{path} . "/" . $new, $self->{umask});
+        _special_mkdir($self->{path}."/".$new, $self->{umask});
         return($new);
     }
     # check the last directory
     @list = sort(@list);
     $new = pop(@list);
-    $subdirs = $_SubDirs->($self->{path} . "/" . $new);
+    $subdirs = $_SubDirs->($self->{path}."/".$new);
     if (defined($subdirs)) {
         return($new) if $subdirs < $self->{maxelts};
         # this last directory is now full... create a new one
@@ -514,7 +546,7 @@ sub _insertion_directory ($) {
     }
     # we need a new directory
     $new = sprintf("%08x", hex($new) + 1);
-    _special_mkdir($self->{path} . "/" . $new, $self->{umask});
+    _special_mkdir($self->{path}."/".$new, $self->{umask});
     return($new);
 }
 
@@ -523,8 +555,8 @@ sub _insertion_directory ($) {
 #
 
 sub _add_data ($$$) {
-    my($self, $data, $temp) = @_;
-    my($ref, $utf8);
+    my($self, $data, $tempdir) = @_;
+    my($ref, $utf8, $tmp, $path, $fh);
 
     foreach my $name (keys(%{ $data })) {
         dief("unexpected data: %s", $name) unless $self->{type}{$name};
@@ -551,17 +583,19 @@ sub _add_data ($$$) {
             dief("unexpected data type in %s: %s",
                  $name, $self->{type}{$name});
         }
-        eval {
-            _file_write("$temp/$name", $utf8, $self->{umask}, $ref);
-        };
-        if ($@) {
-            if ($@ =~ /^Wide character in /) {
-                dief("unexpected wide character in %s: %s",
-                     $name, $data->{$name});
-            } else {
-                die($@);
+        if ($utf8) {
+            eval {
+                $tmp = encode("UTF-8", ${ $ref }, FB_CROAK|LEAVE_SRC);
+            };
+            if ($@) {
+                $@ =~ s/\s+at\s.+?\sline\s+\d+\.?$//;
+                dief("unexpected character in %s: %s", $name, $@);
             }
+            $ref = \$tmp;
         }
+        $path = "$tempdir/$name";
+        $fh = _create($path, $self->{umask}, "strict");
+        file_write($path, handle => $fh, data => $ref);
     }
 }
 
@@ -572,13 +606,11 @@ sub _add_data ($$$) {
 #  - the destination directory must _not_ be created beforehand as it would
 #    be seen as a valid (but empty) element directory by an other process,
 #    we therefor use rename() from a temporary directory
-#  - syswrite() used in _file_write() may die with a "Wide character"
-#    "severe warning", we trap it here to provide better information
 #
 
 sub add : method {
     my($self, @data) = @_;
-    my($data, $temp, $dir, $new, $path, $ref, $utf8);
+    my($data, $tempdir, $dir, $new, $path, $ref, $utf8);
 
     dief("unknown schema") unless $self->{type};
     if (@data == 1) {
@@ -591,18 +623,18 @@ sub add : method {
             unless defined($data->{$name});
     }
     while (1) {
-        $temp = $self->{path}
-            . "/" . TEMPORARY_DIRECTORY
-            . "/" . _name($self->{rndhex});
-        last if _special_mkdir($temp, $self->{umask});
+        $tempdir = $self->{path}
+           ."/".TEMPORARY_DIRECTORY
+           ."/"._name($self->{rndhex});
+        last if _special_mkdir($tempdir, $self->{umask});
     }
-    _add_data($self, $data, $temp);
+    _add_data($self, $data, $tempdir);
     $dir = _insertion_directory($self);
     while (1) {
-        $new = $dir . "/" . _name($self->{rndhex});
-        $path = $self->{path} . "/" . $new;
-        rename($temp, $path) and return($new);
-        dief("cannot rename(%s, %s): %s", $temp, $path, $!)
+        $new = $dir."/"._name($self->{rndhex});
+        $path = $self->{path}."/".$new;
+        rename($tempdir, $path) and return($new);
+        dief("cannot rename(%s, %s): %s", $tempdir, $path, $!)
             unless $! == ENOTEMPTY or $! == EEXIST;
         # RACE: the target directory was already present...
     }
@@ -618,12 +650,12 @@ sub _volatile ($) {
 
     foreach my $name (_special_getdir($self->{path} .
                                       "/" . TEMPORARY_DIRECTORY)) {
-        push(@list, TEMPORARY_DIRECTORY . "/" . $1)
+        push(@list, TEMPORARY_DIRECTORY."/".$1)
             if $name =~ /^($_ElementRegexp)$/o; # untaint
     }
     foreach my $name (_special_getdir($self->{path} .
                                       "/" . OBSOLETE_DIRECTORY)) {
-        push(@list, OBSOLETE_DIRECTORY . "/" . $1)
+        push(@list, OBSOLETE_DIRECTORY."/".$1)
             if $name =~ /^($_ElementRegexp)$/o; # untaint
     }
     return(@list);
@@ -639,11 +671,11 @@ sub _destroy_dir ($) {
 
     foreach my $name (_special_getdir($dir)) {
         next if $name eq LOCKED_DIRECTORY;
-        $path = $dir . "/" . $name;
+        $path = $dir."/".$name;
         unlink($path) and next;
         dief("cannot unlink(%s): %s", $path, $!) unless $! == ENOENT;
     }
-    _special_rmdir($dir . "/" . LOCKED_DIRECTORY);
+    _special_rmdir($dir."/".LOCKED_DIRECTORY);
     _special_rmdir($dir);
 }
 
@@ -679,7 +711,7 @@ sub purge : method {
         @list = sort(@list);
         pop(@list);
         foreach my $name (@list) {
-            $path = $self->{path} . "/" . $name;
+            $path = $self->{path}."/".$name;
             $subdirs = $_SubDirs->($path);
             next if $subdirs or not defined($subdirs);
             _special_rmdir($path);
@@ -689,7 +721,7 @@ sub purge : method {
     if ($option{maxtemp}) {
         $oldtime = time() - $option{maxtemp};
         foreach my $name (_volatile($self)) {
-            $path = $self->{path} . "/" . $name;
+            $path = $self->{path}."/".$name;
             next unless _older($path, $oldtime);
             warnf("removing too old volatile element: %s", $name);
             _destroy_dir($path);
@@ -1010,4 +1042,4 @@ L<Directory::Queue>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2010-2015
+Copyright (C) CERN 2010-2018

@@ -41,7 +41,7 @@ use Exception::Class (
 	},
 );
 
-our $VERSION = '2.16';
+our $VERSION = '2.17';
 
 sub set_time {
 	my ( $self, %conf ) = @_;
@@ -92,6 +92,13 @@ sub date {
 	my ( $self, $date ) = @_;
 
 	my ( $day, $month, $year ) = split( /[.]/, $date );
+
+	if ( $date eq 'tomorrow' ) {
+		( undef, undef, undef, $day, $month, $year )
+		  = localtime( time + 86400 );
+		$month += 1;
+		$year  += 1900;
+	}
 
 	if (
 		not(    defined $day
@@ -984,7 +991,7 @@ Travel::Routing::DE::EFA - unofficial interface to EFA-based itinerary services
 
 =head1 VERSION
 
-version 2.16
+version 2.17
 
 =head1 DESCRIPTION
 
@@ -1079,7 +1086,7 @@ Journey start time.  Default: now
 
 =item B<date> => I<DD.MM.>[I<YYYY>]
 
-Journey date.  Default: today
+Journey date.  Also accepts the string B<tomorrow>.  Default: today
 
 =item B<exclude> => \@exclude
 
@@ -1255,7 +1262,7 @@ None known.
 
 =head1 AUTHOR
 
-Copyright (C) 2009-2015 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2009-2018 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

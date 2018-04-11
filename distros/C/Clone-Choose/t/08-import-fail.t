@@ -3,10 +3,10 @@
 use strict;
 use warnings;
 use Test::More;
-use Module::Runtime qw(use_module);
 
-eval "use Clone;";
-$@ and plan skip_all => "No Clone found. Can't prove load successfull with :Clone.";
+eval "use Module::Runtime;";
+$@ and plan skip_all => "Module::Runtime not found. Skipping test.";
+Module::Runtime->import("use_module");
 
 eval { use_module("Clone::Choose")->import("no_clone"); };
 my $e = $@;

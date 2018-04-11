@@ -1,3 +1,5 @@
+2.1.10 15.03.2018
+           - fix T_OEXT_AV/T_OEXT_HV typemaps to correctly upgrade their input
 2.1.9  15.01.2018
            - fix build for perl with threads (PERL_IMPLICIT_CONTEXT)
 2.1.8  12.01.2018

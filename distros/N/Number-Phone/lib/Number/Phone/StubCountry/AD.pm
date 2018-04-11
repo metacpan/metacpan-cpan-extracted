@@ -22,34 +22,37 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200231;
+our $VERSION = 1.20180410221544;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2',
                   'pattern' => '(\\d{3})(\\d{3})',
+                  'format' => '$1 $2',
                   'leading_digits' => '
             [137-9]|
             6[0-8]
           '
                 },
                 {
-                  'format' => '$1 $2',
                   'pattern' => '(\\d{4})(\\d{4})',
+                  'format' => '$1 $2',
                   'leading_digits' => '180[02]'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '690',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
+                'voip' => '',
+                'fixed_line' => '[78]\\d{5}',
+                'toll_free' => '180[02]\\d{4}',
+                'pager' => '',
+                'personal_number' => '',
                 'geographic' => '[78]\\d{5}',
                 'specialrate' => '([19]\\d{5})',
-                'toll_free' => '180[02]\\d{4}',
-                'fixed_line' => '[78]\\d{5}',
                 'mobile' => '
           (?:
             3\\d|
@@ -58,10 +61,7 @@ my $validators = {
               90\\d{2}
             )
           )\\d{4}
-        ',
-                'personal_number' => '',
-                'voip' => '',
-                'pager' => ''
+        '
               };
 
     sub new {
@@ -69,6 +69,6 @@ my $validators = {
       my $number = shift;
       $number =~ s/(^\+376|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
-  return $self->is_valid() ? $self : undef;
-}
+        return $self->is_valid() ? $self : undef;
+    }
 1;

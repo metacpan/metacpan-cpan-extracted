@@ -5,7 +5,7 @@ use warnings;
 use Directory::Queue::Simple qw();
 use File::Temp qw(tempdir);
 use No::Worries::Dir qw(dir_read);
-use Test::More tests => 20;
+use Test::More tests => 22;
 
 our($tmpdir, $dq, $elt, @list, $time, $tmp);
 
@@ -26,6 +26,14 @@ is(scalar(@list), 1, "queue one element (3)");
 like($list[0], qr/^[0-9a-f]{14}$/, "queue one element (4)");
 is($dq->count(), 1, "queue one element (5)");
 
+$elt = $dq->first();
+ok($dq->lock($elt), "lock");
+$tmp = $dq->get($elt);
+is($tmp, "hello world", "get");
+$tmp = $dq->get_ref($elt);
+is(${$tmp}, "hello world", "get_ref");
+ok($dq->unlock($elt), "unlock");
+
 foreach (1 .. 12) {
     $elt = $dq->add($_);
 }
@@ -35,9 +43,6 @@ $elt = $dq->first();
 ok($elt, "first");
 $elt = $dq->next();
 ok($elt, "next");
-
-ok($dq->lock($elt), "lock");
-ok($dq->unlock($elt), "unlock");
 
 ok($dq->lock($elt), "lock");
 eval { $dq->remove($elt) };

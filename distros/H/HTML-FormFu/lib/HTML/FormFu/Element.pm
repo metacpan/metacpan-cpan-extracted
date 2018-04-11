@@ -1,10 +1,11 @@
-package HTML::FormFu::Element;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Element;
+$HTML::FormFu::Element::VERSION = '2.06';
+# ABSTRACT: Element Base Class
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 
 with 'HTML::FormFu::Role::Render',
     'HTML::FormFu::Role::FormAndElementMethods',
@@ -27,7 +28,8 @@ use HTML::FormFu::ObjectUtil qw(
     parent
     get_parent
 );
-use HTML::FormFu::Util qw( require_class xml_escape process_attrs _merge_hashes );
+use HTML::FormFu::Util
+    qw( require_class xml_escape process_attrs _merge_hashes );
 use Clone ();
 use Scalar::Util qw( weaken );
 use Carp qw( croak );
@@ -42,11 +44,11 @@ use overload (
 
 __PACKAGE__->mk_attr_accessors(qw( id ));
 
-has type          => ( is => 'rw', traits => ['FormFuChained'] );
-has filename      => ( is => 'rw', traits => ['FormFuChained'] );
-has is_field      => ( is => 'rw', traits => ['FormFuChained'] );
-has is_block      => ( is => 'rw', traits => ['FormFuChained'] );
-has is_repeatable => ( is => 'rw', traits => ['FormFuChained'] );
+has type          => ( is => 'rw', traits => ['Chained'] );
+has filename      => ( is => 'rw', traits => ['Chained'] );
+has is_field      => ( is => 'rw', traits => ['Chained'] );
+has is_block      => ( is => 'rw', traits => ['Chained'] );
+has is_repeatable => ( is => 'rw', traits => ['Chained'] );
 
 after BUILD => sub {
     my ( $self, $args ) = @_;
@@ -135,25 +137,28 @@ sub _match_default_args {
 
     return {} if !$defaults || !%$defaults;
 
-    # apply any starting with 'Block', 'Field', 'Input' first, each longest first
-    my @block = sort { length $a <=> length $b } grep { $_ =~ /^Block/ } keys %$defaults;
-    my @field = sort { length $a <=> length $b } grep { $_ =~ /^Field/ } keys %$defaults;
-    my @input = sort { length $a <=> length $b } grep { $_ =~ /^Input/ } keys %$defaults;
+   # apply any starting with 'Block', 'Field', 'Input' first, each longest first
+    my @block = sort { length $a <=> length $b }
+        grep { $_ =~ /^Block/ } keys %$defaults;
+    my @field = sort { length $a <=> length $b }
+        grep { $_ =~ /^Field/ } keys %$defaults;
+    my @input = sort { length $a <=> length $b }
+        grep { $_ =~ /^Input/ } keys %$defaults;
 
     my %others = map { $_ => 1 } keys %$defaults;
-    map {
-        delete $others{$_}
-    } @block, @field, @input;
+    map { delete $others{$_} } @block, @field, @input;
 
     # apply remaining keys, longest first
     my $arg = {};
 
 KEY:
-    for my $key ( @block, @field, @input, sort { length $a <=> length $b } keys %others ) {
+    for my $key ( @block, @field, @input,
+        sort { length $a <=> length $b } keys %others )
+    {
         my @type = split qr{\|}, $key;
         my $match;
 
-TYPE:
+    TYPE:
         for my $type (@type) {
             my $not_in;
             my $is_in;
@@ -167,7 +172,7 @@ TYPE:
             my $check_parents = $not_in || $is_in;
 
             if ( $self->_match_default_args_type( $type, $check_parents ) ) {
-                if ( $not_in ) {
+                if ($not_in) {
                     next KEY;
                 }
                 else {
@@ -177,7 +182,7 @@ TYPE:
             }
         }
 
-        if ( $match ) {
+        if ($match) {
             $arg = _merge_hashes( $arg, $defaults->{$key} );
         }
     }
@@ -189,9 +194,9 @@ sub _match_default_args_type {
     my ( $self, $type, $check_parents ) = @_;
 
     my @target;
-    if ( $check_parents ) {
+    if ($check_parents) {
         my $self = $self;
-        while ( defined ( my $parent = $self->parent ) ) {
+        while ( defined( my $parent = $self->parent ) ) {
             last if !$parent->isa('HTML::FormFu::Element');
             push @target, $parent;
             $self = $parent;
@@ -202,6 +207,7 @@ sub _match_default_args_type {
     }
 
     for my $target (@target) {
+
         # handle Block default_args
         if ( 'Block' eq $type
             && $target->isa('HTML::FormFu::Element::Block') )
@@ -279,13 +285,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Element - Element Base Class
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -670,5 +680,16 @@ Carl Franks, C<cfranks@cpan.org>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -22,40 +22,40 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200233;
+our $VERSION = 1.20180410221545;
 
 my $formatters = [
                 {
                   'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
-                  'leading_digits' => '801',
-                  'format' => '$1 $2 $3 $4'
+                  'format' => '$1 $2 $3 $4',
+                  'leading_digits' => '801'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '[02]',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '800',
-                  'pattern' => '(\\d)(\\d{4})(\\d{4})',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(\\d)(\\d{4})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'voip' => '',
-                'mobile' => '0[14-6]\\d{7}',
                 'personal_number' => '',
+                'pager' => '',
+                'mobile' => '0[14-6]\\d{7}',
                 'specialrate' => '(
           80(?:
             0\\d{2}|
-            11[01]
+            11[0-4]
           )\\d{4}
         )',
-                'fixed_line' => '222[1-589]\\d{5}',
+                'geographic' => '222[1-589]\\d{5}',
+                'voip' => '',
                 'toll_free' => '',
-                'geographic' => '222[1-589]\\d{5}'
+                'fixed_line' => '222[1-589]\\d{5}'
               };
 my %areanames = (
   2422221 => "Cuvette",
@@ -71,6 +71,6 @@ my %areanames = (
       my $number = shift;
       $number =~ s/(^\+242|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-  return $self->is_valid() ? $self : undef;
-}
+        return $self->is_valid() ? $self : undef;
+    }
 1;

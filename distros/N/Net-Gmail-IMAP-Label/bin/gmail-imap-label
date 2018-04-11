@@ -1,4 +1,7 @@
 #!/usr/bin/env perl
+# PODNAME: gmail-imap-label
+# ABSTRACT: IMAP proxy for Google's Gmail that retrieves message labels
+
 use strict;
 use warnings;
 use FindBin qw($Bin);
@@ -7,17 +10,29 @@ use Net::Gmail::IMAP::Label 'run';
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 gmail-imap-label - IMAP proxy for Google's Gmail that retrieves message labels
 
+=head1 VERSION
+
+version 0.008
+
 =head1 SYNOPSIS
 
-  gmail-imap-label [-?hpv] [long options...]
+    gmail-imap-label [-?hpv] [long options...]
 
-    -p --port       local port to connect to (default: 10143)
-    -v --verbose    increase verbosity (multiple flags for more verbosity)
-    -? -h --help    print usage message and exit
+      -p --port       local port to connect to (default: 10143)
+      -v --verbose    increase verbosity (multiple flags for more verbosity)
+      -? -h --help    print usage message and exit
+
+=head1 NAME
+
+gmail-imap-label - IMAP proxy for Google's Gmail that retrieves message labels
 
 =head1 OPTIONS
 
@@ -40,7 +55,18 @@ Print a brief help message and exits.
 
 =head1 SEE ALSO
 
-Description of proxy available in L<Net::Gmail::IMAP::Label>
+Description of proxy available in L<Net::Gmail::IMAP::Label>.
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by Zakariyya Mughal <zmughal@cpan.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut
-

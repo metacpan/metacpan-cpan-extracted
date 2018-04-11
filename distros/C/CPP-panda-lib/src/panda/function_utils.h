@@ -172,7 +172,8 @@ auto tmp_abstract_function(Ret (*f)(Args...)) -> abstract_function<Ret (*)(Args.
 template <typename Ret, typename... Args,
           typename Functor, bool IsComp = is_comparable<typename std::remove_reference<Functor>::type>::value,
           typename DeFunctor = typename std::remove_reference<Functor>::type,
-          typename Check = decltype(std::declval<Functor>()(std::declval<Args>()...))>
+          typename Check = decltype(std::declval<Functor>()(std::declval<Args>()...)),
+          typename = typename std::enable_if<!std::is_same<Functor, Ret(&)(Args...)>::value>::type>
 shared_ptr<abstract_function<DeFunctor, Ret, IsComp, Args...>> make_abstract_function(Functor&& f, Check(*)() = 0) {
     return panda::make_shared<abstract_function<DeFunctor, Ret, IsComp, Args...>>(std::forward<Functor>(f));
 }
@@ -180,7 +181,8 @@ shared_ptr<abstract_function<DeFunctor, Ret, IsComp, Args...>> make_abstract_fun
 template <typename Ret, typename... Args,
           typename Functor, bool IsComp = is_comparable<typename std::remove_reference<Functor>::type>::value,
           typename DeFunctor = typename std::remove_reference<Functor>::type,
-          typename Check = decltype(std::declval<Functor>()(std::declval<Args>()...))>
+          typename Check = decltype(std::declval<Functor>()(std::declval<Args>()...)),
+          typename = typename std::enable_if<!std::is_same<Functor, Ret(&)(Args...)>::value>::type>
 abstract_function<DeFunctor, Ret, IsComp, Args...> tmp_abstract_function(Functor&& f, Check(*)() = 0) {
     return abstract_function<DeFunctor, Ret, IsComp, Args...>(std::forward<Functor>(f));
 }

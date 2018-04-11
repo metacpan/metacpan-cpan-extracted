@@ -5,6 +5,7 @@ use PXSTest 'full';
 
 # Class with wrapper
 
+dcnt(0);
 my $obj = new Panda::XS::Test::MyBaseAV(777);
 is(ref $obj, 'Panda::XS::Test::MyBaseAV', "output OEXT_AV returns object");
 $obj->[1] = 10;
@@ -14,11 +15,39 @@ undef $obj;
 is(dcnt(), 1, 'obj OEXT_AV desctructors called');
 
 dcnt(0);
+$obj = new Panda::XS::Test::MyNBaseAV(1);
+$obj->[1] = 10;
+is($obj->[1], 10, "OEXT_AV object is an ARRAYREF");
+undef $obj;
+is(dcnt(), 1, 'obj OEXT_AV desctructors called');
+
+dcnt(0);
+$obj = new Panda::XS::Test::MyNBaseAV(2);
+$obj->[1] = 10;
+is($obj->[1], 10, "OEXT_AV object is an ARRAYREF");
+undef $obj;
+is(dcnt(), 1, 'obj OEXT_AV desctructors called');
+
+dcnt(0);
 $obj = new Panda::XS::Test::MyBaseHV(888);
 is(ref $obj, 'Panda::XS::Test::MyBaseHV', "output OEXT_HV returns object");
 $obj->{abc} = 22;
 is($obj->{abc}, 22, "OEXT_HV object is a HASHREF");
 is($obj->val, 888, "input OEXT_HV works");
+undef $obj;
+is(dcnt(), 1, 'obj OEXT_HV desctructors called');
+
+dcnt(0);
+$obj = new Panda::XS::Test::MyNBaseHV(1);
+$obj->{abc} = 22;
+is($obj->{abc}, 22, "OEXT_HV object is a HASHREF");
+undef $obj;
+is(dcnt(), 1, 'obj OEXT_HV desctructors called');
+
+dcnt(0);
+$obj = new Panda::XS::Test::MyNBaseHV(2);
+$obj->{abc} = 22;
+is($obj->{abc}, 22, "OEXT_HV object is a HASHREF");
 undef $obj;
 is(dcnt(), 1, 'obj OEXT_HV desctructors called');
 

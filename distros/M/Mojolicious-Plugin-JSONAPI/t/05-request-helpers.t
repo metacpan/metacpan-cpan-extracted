@@ -6,7 +6,7 @@ use Test::Mojo;
 
 use_ok('Mojolicious::Plugin::JSONAPI');
 
-plugin 'JSONAPI';
+plugin 'JSONAPI', { data_dir => 't/share' };
 
 my $test = []; # modified in each subtest for different scenarios
 

@@ -9,7 +9,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 use Chart::Plotly::Trace::Scatter3d::Marker::Colorbar;
 use Chart::Plotly::Trace::Scatter3d::Marker::Line;
 
-our $VERSION = '0.017';    # VERSION
+our $VERSION = '0.018';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scatter3d.
 
@@ -170,7 +170,7 @@ Chart::Plotly::Trace::Scatter3d::Marker - This attribute is one of the possible 
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -299,7 +299,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Pablo Rodríguez González.
+This software is Copyright (c) 2018 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

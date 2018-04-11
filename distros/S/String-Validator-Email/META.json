@@ -29,6 +29,7 @@
          "requires" : {
             "Email::Valid" : "0",
             "Net::DNS" : "0",
+            "Net::Domain::TLD" : "1.75",
             "Regexp::Common" : "0",
             "String::Validator::Common" : "2.00",
             "base" : "0",
@@ -56,7 +57,7 @@
          "web" : "https://github.com/brainbuz/String-Validator"
       }
    },
-   "version" : "2.00",
+   "version" : "2.01",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"
 }
 

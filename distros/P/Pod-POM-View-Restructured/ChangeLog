@@ -1,3 +1,6 @@
+Version 1.000001
+	* Fix kwalitee issues
+
 Version 1.000
 	* Generate version number in code and POD automatically
 	* Update authors and copyright

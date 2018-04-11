@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::JSONAPI;
-$Mojolicious::Plugin::JSONAPI::VERSION = '1.0';
+$Mojolicious::Plugin::JSONAPI::VERSION = '1.1';
 use Mojo::Base 'Mojolicious::Plugin';
 
 use JSONAPI::Document;
@@ -24,6 +24,10 @@ sub register {
     if (defined($args->{attributes_via})) {
         $jsonapi_args{attributes_via} = $args->{attributes_via};
     }
+    unless ($args->{data_dir}) {
+        Carp::confess('Argument missing: data_dir');
+    }
+    $jsonapi_args{data_dir} = $args->{data_dir};
 
     # Detect application/vnd.api+json content type, fallback to application/json
     $app->types->type(
@@ -38,7 +42,7 @@ sub register {
 sub create_route_helpers {
     my ( $self, $app, $namespace ) = @_;
 
-    my $DEV_MODE = $app->mode ne 'production';
+    my $DEV_MODE = $app->mode eq 'development';
 
     $app->helper(
         resource_routes => sub {
@@ -178,7 +182,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 SYNOPSIS
 
@@ -189,7 +193,10 @@ version 1.0
     sub startup {
         my ($self) = @_;
 
-        $self->plugin('JSONAPI', { namespace => 'api' });
+        $self->plugin('JSONAPI', {
+            namespace => 'api',
+            data_dir => '/path/to/data/dir',
+        });
 
         $self->resource_routes({
             resource => 'post',
@@ -219,7 +226,7 @@ version 1.0
         # PATCH '/api/posts/:post_id/relationships/email-templates' -> to('api-posts#patch_related_email_templates')
         # DELETE '/api/posts/:post_id/relationships/email-templates' -> to('api-posts#delete_related_email_templates')
 
-        # If your not in production mode, your $app->log will show the created routes. Useful!
+        # If you're in development mode (e.g. MOJO_MODE eq 'development'), your $app->log will show the created routes. Useful!
 
         # You can use the following helpers too:
 
@@ -241,6 +248,11 @@ See L<http://jsonapi.org/> for the JSON API specification. At the time of writin
 =head1 OPTIONS
 
 =over
+
+=item C<data_dir>
+
+Required; This should be a path to a directory which is not version controlled (if you use stuff like that). Used
+by C<JSONAPI::Document> to store computed document types.
 
 =item C<namespace>
 

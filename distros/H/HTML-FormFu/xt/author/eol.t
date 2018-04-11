@@ -27,6 +27,7 @@ my @files = (
     'lib/HTML/FormFu/Constraint/File/MinSize.pm',
     'lib/HTML/FormFu/Constraint/File/Size.pm',
     'lib/HTML/FormFu/Constraint/Integer.pm',
+    'lib/HTML/FormFu/Constraint/JSON.pm',
     'lib/HTML/FormFu/Constraint/Length.pm',
     'lib/HTML/FormFu/Constraint/MaxLength.pm',
     'lib/HTML/FormFu/Constraint/MaxRange.pm',
@@ -121,6 +122,7 @@ my @files = (
     'lib/HTML/FormFu/I18N/pt_pt.pm',
     'lib/HTML/FormFu/I18N/ro.pm',
     'lib/HTML/FormFu/I18N/ru.pm',
+    'lib/HTML/FormFu/I18N/tr.pm',
     'lib/HTML/FormFu/I18N/ua.pm',
     'lib/HTML/FormFu/I18N/zh_cn.pm',
     'lib/HTML/FormFu/Inflator.pm',
@@ -174,10 +176,7 @@ my @files = (
     'lib/HTML/FormFu/UploadParam.pm',
     'lib/HTML/FormFu/Util.pm',
     'lib/HTML/FormFu/Validator.pm',
-    'lib/HTML/FormFu/Validator/Callback.pm',
-    'lib/MooseX/Attribute/FormFuChained.pm',
-    'lib/MooseX/FormFuChainedAccessors.pm',
-    'lib/MooseX/Traits/Attribute/FormFuChained.pm'
+    'lib/HTML/FormFu/Validator/Callback.pm'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

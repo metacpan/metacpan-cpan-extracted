@@ -6,7 +6,7 @@ use 5.010;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '2.16';
+our $VERSION = '2.17';
 
 Travel::Routing::DE::EFA::Route::Part->mk_ro_accessors(
 	qw(arrival_platform arrival_stop
@@ -82,6 +82,15 @@ sub footpath_parts {
 	return;
 }
 
+sub is_cancelled {
+	my ($self) = @_;
+
+	if ( $self->{delay} and $self->{delay} eq '-9999' ) {
+		return 1;
+	}
+	return;
+}
+
 # DEPRECATED
 sub extra {
 	my ($self) = @_;
@@ -145,7 +154,7 @@ points, without interchanges
 
 =head1 VERSION
 
-version 2.16
+version 2.17
 
 =head1 DESCRIPTION
 
@@ -286,6 +295,12 @@ type of this footpath, passed through from the EFA backend. The value
 connection between two stops), so the B<footpath> accessors contain redundant
 information. Other values such as "BEFORE" may also be returned, but this is
 unknown at this point.
+
+=item $part->is_cancelled
+
+Returns true if this part of the route has been cancelled (i.e., the entire
+route is probably useless), false otherwise.  For unknown reasons, EFA may
+sometimes return routes which contain cancelled departures.
 
 =item $part->regular_notes
 

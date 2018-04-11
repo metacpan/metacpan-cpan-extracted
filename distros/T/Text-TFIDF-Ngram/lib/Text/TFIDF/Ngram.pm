@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute the TF-IDF measure for ngram phrases
 
-our $VERSION = '0.0206';
+our $VERSION = '0.0207';
 
 use Moo;
 use strictures 2;
@@ -67,7 +67,7 @@ sub _process_ngrams {
 
     my $stop = getStopWords('en');
 
-    my $hash;
+    my $counts;
 
     for my $p ( keys %$phrase ) {
         next if $self->stopwords
@@ -75,17 +75,17 @@ sub _process_ngrams {
 
         $p =~ s/[\-?;:!,."\(\)]//g; # Remove unwanted punctuation
 
-        # XXX Why are there are blanks in the returned phrases??
+        # XXX Why are there blanks in the returned phrases??
         my @p = grep { $_ } split /\s/, $p;
         next unless @p == $size;
 
         # Skip a lone single quote (allowed above)
         next if grep { $_ eq "'" } @p;
 
-        $hash->{$p} = $phrase->{$p};
+        $counts->{$p} = $phrase->{$p};
     }
 
-	$self->{counts}{$file} = $hash;
+	$self->{counts}{$file} = $counts;
 }
 
 
@@ -154,7 +154,7 @@ Text::TFIDF::Ngram - Compute the TF-IDF measure for ngram phrases
 
 =head1 VERSION
 
-version 0.0206
+version 0.0207
 
 =head1 SYNOPSIS
 

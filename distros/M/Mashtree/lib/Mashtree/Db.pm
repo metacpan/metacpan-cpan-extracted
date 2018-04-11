@@ -149,6 +149,21 @@ sub findDistances{
   while(my @row=$sth->fetchrow_array()){
     $distance{$row[0]}=$row[1];
   }
+
+  # Find it in GENOME2 also
+  my $sth2=$dbh->prepare(qq(SELECT GENOME1,DISTANCE 
+    FROM DISTANCE 
+    WHERE GENOME2=?
+    ORDER BY GENOME1
+  ));
+  my $rv2 = $sth2->execute( $genome1 ) or die $DBI::errstr;
+  if($rv2 < 0){
+    die $DBI::errstr;
+  }
+  while(my @row=$sth2->fetchrow_array()){
+    $distance{$row[0]}=$row[1];
+  }
+
   return \%distance;
 }
 
@@ -168,6 +183,18 @@ sub findDistance{
   my $distance;
   while(my @row=$sth->fetchrow_array()){
     ($distance)=@row;
+  }
+
+  # Look in reverse order too if we haven't found a value
+  if(!defined $distance){
+    my $sth2=$dbh->prepare(qq(SELECT DISTANCE FROM DISTANCE WHERE GENOME1=? AND GENOME2=?));
+    my $rv2 = $sth2->execute( $genome2, $genome1 ) or die $DBI::errstr;
+    if($rv2 < 0){
+      die $DBI::errstr;
+    }
+    while(my @row=$sth2->fetchrow_array()){
+      ($distance)=@row;
+    }
   }
   return $distance;
 }
@@ -313,7 +340,7 @@ sub toString_phylip{
     my $distanceHash=$self->findDistances($name[$i]);
 
     for(my $j=0;$j<$numGenomes;$j++){
-      $str.=sprintf("%0.4f  ",$$distanceHash{$name[$j]});
+      $str.=sprintf("%0.10f  ",$$distanceHash{$name[$j]});
     }
     $str=~s/ +$/\n/; # replace that trailing whitespace with a newline
   }

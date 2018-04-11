@@ -15,7 +15,7 @@ use Pod::POM;
 
 package Pod::POM::View::Restructured;
 
-our $VERSION = '1.000'; # VERSION
+our $VERSION = '1.000001'; # VERSION
 
 use base 'Pod::POM::View::Text';
 
@@ -718,6 +718,6 @@ This software is available under the same terms as the perl 5 programming langua
 
 =head1 VERSION
 
-1.000
+1.000001
 
 =cut

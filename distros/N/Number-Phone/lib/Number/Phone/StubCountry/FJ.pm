@@ -22,32 +22,29 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200234;
+our $VERSION = 1.20180410221546;
 
 my $formatters = [
                 {
                   'pattern' => '(\\d{3})(\\d{4})',
-                  'leading_digits' => '[2-9]',
-                  'format' => '$1 $2'
+                  'format' => '$1 $2',
+                  'leading_digits' => '[2-9]'
                 },
                 {
-                  'pattern' => '(\\d{4})(\\d{3})(\\d{4})',
-                  'format' => '$1 $2 $3'
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{4})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'fixed_line' => '
+                'mobile' => '
           (?:
-            3[0-5]\\d|
-            6(?:
-              03|
-              [25-7]\\d
-            )|
-            8[58]\\d
-          )\\d{4}
+            [279]\\d|
+            45|
+            5[01568]|
+            8[034679]
+          )\\d{5}
         ',
-                'toll_free' => '0800\\d{7}',
                 'specialrate' => '',
                 'geographic' => '
           (?:
@@ -59,17 +56,20 @@ my $validators = {
             8[58]\\d
           )\\d{4}
         ',
-                'mobile' => '
-          (?:
-            [279]\\d|
-            45|
-            5[01568]|
-            8[034679]
-          )\\d{5}
-        ',
                 'personal_number' => '',
-                'voip' => '',
-                'pager' => ''
+                'pager' => '',
+                'toll_free' => '0800\\d{7}',
+                'fixed_line' => '
+          (?:
+            3[0-5]\\d|
+            6(?:
+              03|
+              [25-7]\\d
+            )|
+            8[58]\\d
+          )\\d{4}
+        ',
+                'voip' => ''
               };
 
     sub new {
@@ -77,6 +77,6 @@ my $validators = {
       my $number = shift;
       $number =~ s/(^\+679|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
-  return $self->is_valid() ? $self : undef;
-}
+        return $self->is_valid() ? $self : undef;
+    }
 1;

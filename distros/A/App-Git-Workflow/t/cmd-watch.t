@@ -56,20 +56,8 @@ sub run {
                     '1111111 Message1',
                     '0000000 Message0',
                 ]},
-                { 'rev-list' => [time . ' aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'] },
+                { log    => time . "\x{1}aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\x{1}Ivan Wills\x{1}ivan.wills\@example.com\x{1}file1\nfile2\n" },
                 { branch => ["  master"] },
-                { show => <<'SHOW' },
-commit 1111111111111111111111111111111111111111
-Author: Ivan Wills <ivan.wills@gmail.com>
-Date:   Wed Sep 24 18:16:18 2014 +1000
-
-    Message10
-
-M   file1
-M   file2
-SHOW
-                { log    => ['Ivan Wills'] },
-                { log    => ['ivan.wills@example.com'] },
             ],
             STD => {
                 OUT => <<'STDOUT',
@@ -117,20 +105,8 @@ STDOUT
                     '1111111 Message1',
                     '0000000 Message0',
                 ]},
-                { 'rev-list' => [time . ' aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'] },
+                { log    => time . "\x{1}aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\x{1}Ivan Wills\x{1}ivan.wills\@example.com\x{1}file1\nfile2\n" },
                 { branch => ["  master"] },
-                { show => <<'SHOW' },
-commit 1111111111111111111111111111111111111111
-Author: Ivan Wills <ivan.wills@gmail.com>
-Date:   Wed Sep 24 18:16:18 2014 +1000
-
-    Message10
-
-M   file1
-M   file2
-SHOW
-                { log    => ['Ivan Wills'] },
-                { log    => ['ivan.wills@example.com'] },
             ],
             STD => {
                 OUT => <<'STDOUT',
@@ -178,20 +154,8 @@ STDOUT
                     '1111111 Message1',
                     '0000000 Message0',
                 ]},
-                { 'rev-list' => ['1411592689 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'] },
+                { log    => "1411592689\x{1}aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\x{1}Ivan Wills\x{1}ivan.wills\@example.com\x{1}file1\nfile2\n" },
                 { branch => ["  master"] },
-                { show => <<'SHOW' },
-commit 1111111111111111111111111111111111111111
-Author: Ivan Wills <ivan.wills@gmail.com>
-Date:   Wed Sep 24 18:16:18 2014 +1000
-
-    Message10
-
-M   file1
-M   file2
-SHOW
-                { log    => ['Ivan Wills'] },
-                { log    => ['ivan.wills@example.com'] },
             ],
             STD => {
                 OUT => <<"STDOUT",
@@ -244,20 +208,8 @@ STDOUT
                     '1111111 Message1',
                     '0000000 Message0',
                 ]},
-                { 'rev-list' => ['1411592689 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'] },
+                { log    => "1411592689\x{1}aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\x{1}Ivan Wills\x{1}ivan.wills\@example.com\x{1}file1\nfile2\n" },
                 { branch => ["  master"] },
-                { show => <<'SHOW' },
-commit 1111111111111111111111111111111111111111
-Author: Ivan Wills <ivan.wills@gmail.com>
-Date:   Wed Sep 24 18:16:18 2014 +1000
-
-    Message10
-
-M   file1
-M   file2
-SHOW
-                { log    => ['Ivan Wills'] },
-                { log    => ['ivan.wills@example.com'] },
             ],
             STD => {
                 OUT => <<"STDOUT",
@@ -304,20 +256,8 @@ STDOUT
                     '1111111 Message1',
                     '0000000 Message0',
                 ]},
-                { 'rev-list' => [time . ' aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'] },
+                { log    => time . "\x{1}aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\x{1}Ivan Wills\x{1}ivan.wills\@example.com\x{1}file1\nfile2\n" },
                 { branch => ["  master"] },
-                { show => <<'SHOW' },
-commit 1111111111111111111111111111111111111111
-Author: Ivan Wills <ivan.wills@gmail.com>
-Date:   Wed Sep 24 18:16:18 2014 +1000
-
-    Message10
-
-M   file1
-M   file2
-SHOW
-                { log    => ['Ivan Wills'] },
-                { log    => ['ivan.wills@example.com'] },
             ],
             STD => {
                 OUT => qr/^\n?$/,
@@ -345,7 +285,7 @@ SHOW
                 ]},
                 { fetch => undef },
                 { 'rev-list' =>  [
-                    '6666666666666666666666666666666666666666',
+                    '1666666666666666666666666666666666666666',
                     '5555555555555555555555555555555555555555',
                     '4444444444444444444444444444444444444444',
                     '3333333333333333333333333333333333333333',
@@ -353,37 +293,14 @@ SHOW
                     '1111111111111111111111111111111111111111',
                     '0000000000000000000000000000000000000000',
                 ]},
-                { 'rev-list' => [time . ' 6666666666666666666666666666666666666666'] },
+                { log    => time . "\x{1}1666666666666666666666666666666666666666\x{1}Some One\x{1}some.one\@example.com\x{1}file3\n" },
                 { branch => [map {"  $_"} qw/master other/] },
-                { show => <<'SHOW' },
-commit 6666666666666666666666666666666666666666
-Author: Some One <some.one@example.com>
-Date:   Wed Sep 24 18:17:18 2014 +1000
-
-    Message10
-
-M   file3
-SHOW
-                { log    => ['Some One'] },
-                { log    => ['some.one@example.com'] },
-                { 'rev-list' => [time . ' 5555555555555555555555555555555555555555'] },
+                { log    => time . "\x{1}5555555555555555555555555555555555555555\x{1}Ivan Wills\x{1}ivan.wills\@example.com\x{1}file1\nfile2\n" },
                 { branch => ["  master"] },
-                { show => <<'SHOW' },
-commit 5555555555555555555555555555555555555555
-Author: Ivan Wills <ivan.wills@gmail.com>
-Date:   Wed Sep 24 18:16:18 2014 +1000
-
-    Message10
-
-M   file1
-M   file2
-SHOW
-                { log    => ['Ivan Wills'] },
-                { log    => ['ivan.wills@example.com'] },
             ],
             STD => {
                 OUT => <<'STDOUT',
-6666666666666666666666666666666666666666
+1666666666666666666666666666666666666666
   Branches: master, other
   Files:    file1, file2, file3
   Users:    Ivan Wills, Some One
@@ -414,7 +331,7 @@ STDOUT
                 ]},
                 { fetch => undef },
                 { 'rev-list' =>  [
-                    '6666666666666666666666666666666666666666',
+                    '2666666666666666666666666666666666666666',
                     '5555555555555555555555555555555555555555',
                     '4444444444444444444444444444444444444444',
                     '3333333333333333333333333333333333333333',
@@ -422,33 +339,10 @@ STDOUT
                     '1111111111111111111111111111111111111111',
                     '0000000000000000000000000000000000000000',
                 ]},
-                { 'rev-list' => [time . ' 6666666666666666666666666666666666666666'] },
+                { log    => time . "\x{1}2666666666666666666666666666666666666666\x{1}Some One\x{1}some.one\@example.com\x{1}file3\n" },
                 { branch => [map {"  $_"} qw/master ~ther/] },
-                { show => <<'SHOW' },
-commit 6666666666666666666666666666666666666666
-Author: Some One <some.one@example.com>
-Date:   Wed Sep 24 18:17:18 2014 +1000
-
-    Message10
-
-M   file3
-SHOW
-                { log    => ['Some One'] },
-                { log    => ['some.one@example.com'] },
-                { 'rev-list' => [time . ' 5555555555555555555555555555555555555555'] },
+                { log    => time . "\x{1}5555555555555555555555555555555555555555\x{1}Ivan Wills\x{1}ivan.wills\@example.com\x{1}file1\nfile2\n" },
                 { branch => ["  master"] },
-                { show => <<'SHOW' },
-commit 5555555555555555555555555555555555555555
-Author: Ivan Wills <ivan.wills@gmail.com>
-Date:   Wed Sep 24 18:16:18 2014 +1000
-
-    Message10
-
-M   file1
-M   file2
-SHOW
-                { log    => ['Ivan Wills'] },
-                { log    => ['ivan.wills@example.com'] },
             ],
             STD => {
                 OUT => '',
@@ -476,7 +370,7 @@ SHOW
                 ]},
                 { fetch => undef },
                 { 'rev-list' =>  [
-                    '6666666666666666666666666666666666666666',
+                    '3666666666666666666666666666666666666666',
                     '5555555555555555555555555555555555555555',
                     '4444444444444444444444444444444444444444',
                     '3333333333333333333333333333333333333333',
@@ -484,37 +378,14 @@ SHOW
                     '1111111111111111111111111111111111111111',
                     '0000000000000000000000000000000000000000',
                 ]},
-                { 'rev-list' => [time . ' 6666666666666666666666666666666666666666'] },
+                { log    => time . "\x{1}3666666666666666666666666666666666666666\x{1}Some One\x{1}some.one\@example.com\x{1}file3\n" },
                 { branch => [map {"  $_"} qw/master other/] },
-                { show => <<'SHOW' },
-commit 6666666666666666666666666666666666666666
-Author: Some One <some.one@example.com>
-Date:   Wed Sep 24 18:17:18 2014 +1000
-
-    Message10
-
-M   file3
-SHOW
-                { log    => ['Some One'] },
-                { log    => ['some.one@example.com'] },
-                { 'rev-list' => [time . ' 5555555555555555555555555555555555555555'] },
+                { log    => time . "\x{1}5555555555555555555555555555555555555555\x{1}Ivan Wills\x{1}ivan.wills\@example.com\x{1}file1\nfile2\n" },
                 { branch => ["  master"] },
-                { show => <<'SHOW' },
-commit 5555555555555555555555555555555555555555
-Author: Ivan Wills <ivan.wills@gmail.com>
-Date:   Wed Sep 24 18:16:18 2014 +1000
-
-    Message10
-
-M   file1
-M   file2
-SHOW
-                { log    => ['Ivan Wills'] },
-                { log    => ['ivan.wills@example.com'] },
             ],
             STD => {
                 OUT => <<'STDOUT',
-6666666666666666666666666666666666666666
+3666666666666666666666666666666666666666
   Branches: master, other
   Files:    file1, file2, file3
   Users:    Ivan Wills, Some One
@@ -545,7 +416,7 @@ STDOUT
                 ]},
                 { fetch => undef },
                 { 'rev-list' =>  [
-                    '6666666666666666666666666666666666666666',
+                    '4666666666666666666666666666666666666666',
                     '5555555555555555555555555555555555555555',
                     '4444444444444444444444444444444444444444',
                     '3333333333333333333333333333333333333333',
@@ -553,33 +424,9 @@ STDOUT
                     '1111111111111111111111111111111111111111',
                     '0000000000000000000000000000000000000000',
                 ]},
-                { 'rev-list' => [time . ' 6666666666666666666666666666666666666666'] },
-                { branch => [map {"  $_"} qw/master other/] },
-                { show => <<'SHOW' },
-commit 6666666666666666666666666666666666666666
-Author: Some One <some.one@example.com>
-Date:   Wed Sep 24 18:17:18 2014 +1000
-
-    Message10
-
-M   file3
-SHOW
-                { log    => ['Some One'] },
-                { log    => ['some.one@example.com'] },
-                { 'rev-list' => [time . ' 5555555555555555555555555555555555555555'] },
-                { branch => ["  master"] },
-                { show => <<'SHOW' },
-commit 5555555555555555555555555555555555555555
-Author: Ivan Wills <ivan.wills@gmail.com>
-Date:   Wed Sep 24 18:16:18 2014 +1000
-
-    Message10
-
-M   file1
-M   file2
-SHOW
-                { log    => ['Ivan Wills'] },
-                { log    => ['ivan.wills@example.com'] },
+                { log    => time . "\x{1}4666666666666666666666666666666666666666\x{1}Some One\x{1}some.one\@example.com\x{1}file3\n" },
+                { branch => [map {"  $_"} qw/master ~ther/] },
+                { log    => time . "\x{1}5555555555555555555555555555555555555555\x{1}Ivan Wills\x{1}ivan.wills\@example.com\x{1}file1\nfile2\n" },
             ],
             STD => {
                 OUT => '',

@@ -173,13 +173,18 @@ If you'd like to fiddle with the default parameters to Data::Printer, do it this
         {
             require Data::Printer;
             shift;
-            return Data::Printer::p(shift, colored => 1, quote_keys => 1);
+            return &Data::Printer::np(shift, colored => 1, quote_keys => 1);
         });
     }
 
 Note the following things about the latter example:
 
 =over
+
+=item *
+
+We've used Data::Printer's C<np> function, which is the proper way to do it for the later versions
+of Data::Printer.  For versions prior to 0.36, use C<p> instead.
 
 =item *
 
@@ -205,6 +210,12 @@ would go back to being spaces.
 
 Remember that Debuggit is dealing only with strings until the very end, and then it uses its own
 output function.  Thus, setting Data::Printer's C<output> parameter wouldn't have any effect.
+
+=item *
+
+The seemingly extraneous C<&> before the function call disables any potential prototype
+Data::Printer is using.  It might not be necessary (depending on your DP version), but it won't hurt
+anything, and better safe than sorry.
 
 =back
 

@@ -1,6 +1,6 @@
 package MARC::Moose::Reader::String::Iso2709;
 # ABSTRACT: File reader for MARC::Moose record from ISO2709 string
-$MARC::Moose::Reader::String::Iso2709::VERSION = '1.0.34';
+$MARC::Moose::Reader::String::Iso2709::VERSION = '1.0.35';
 use Moose;
 
 use Carp;
@@ -63,7 +63,7 @@ MARC::Moose::Reader::String::Iso2709 - File reader for MARC::Moose record from I
 
 =head1 VERSION
 
-version 1.0.34
+version 1.0.35
 
 =head1 AUTHOR
 
@@ -71,7 +71,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Frédéric Demians.
+This software is copyright (c) 2018 by Frédéric Demians.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

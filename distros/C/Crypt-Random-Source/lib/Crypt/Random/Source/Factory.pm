@@ -1,7 +1,7 @@
 package Crypt::Random::Source::Factory;
 # ABSTRACT: Load and instantiate sources of random data
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Moo;
 use Carp qw(croak);
@@ -114,7 +114,6 @@ sub _build_weak_sources {
         return [qw(
             Crypt::Random::Source::Weak::devurandom
             Crypt::Random::Source::Weak::openssl
-            Crypt::Random::Source::Weak::rand
         )];
     }
 }
@@ -181,7 +180,7 @@ Crypt::Random::Source::Factory - Load and instantiate sources of random data
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 

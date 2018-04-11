@@ -18,13 +18,16 @@ use namespace::autoclean;
 use Moose::Util::TypeConstraints;
 use MooseX::StrictConstructor;
 
+use version; our $VERSION = version->declare("v1.20180410");
+
+=encoding utf8
 =head1 NAME
 
 Date::Lectionary::Daily - Daily Readings for the Christian Lectionary
 
 =head1 VERSION
 
-Version 1.20180316
+Version 1.20180410
 
 =cut
 
@@ -86,8 +89,6 @@ Returns `secular` for daily lectionaries based on the secular/civil calendar and
 A hasref of the readings for the day.
 
 =cut
-
-our $VERSION = '1.20180316';
 
 enum 'DailyLectionary', [qw(acna-sec acna-xian)];
 enum 'Tradition',       [qw(acna)];
@@ -420,7 +421,7 @@ L<http://search.cpan.org/dist/Date-Lectionary-Daily/>
 
 Many thanks to my beautiful wife, Jennifer, my amazing daughter, Rosemary, and my sweet  son, Oliver.  But, above all, SOLI DEO GLORIA!
 
-=head1 LICENSE
+=head1 LICENSE BSD-2-Clause 
 
 Copyright 2017-2018 MICHAEL WAYNE ARNOLD
 

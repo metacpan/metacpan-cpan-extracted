@@ -1,4 +1,7 @@
+1.1       2018-04-08 15:01:24+00:00 UTC
+
 1.0       2018-04-08 00:55:28+00:00 UTC
+- namespace the CHI keys by this package name
 
 0.9       2018-04-08 00:46:13+00:00 UTC
 - Use Lingua::EN::Segment to split the pluralised document type correctly into a hyphenated string

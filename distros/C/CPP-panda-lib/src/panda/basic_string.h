@@ -70,6 +70,30 @@ struct DefaultStaticAllocator {
     }
 };
 
+namespace {
+template <typename S>
+class _mutable_charref {
+public:
+    using value_type = typename S::value_type;
+    using size_type = typename S::size_type;
+
+    _mutable_charref(S& string, size_type pos): _string(string), _pos(pos) {}
+
+    template <typename Arg, typename = typename std::enable_if<std::is_convertible<Arg, value_type>::value> >
+    _mutable_charref& operator= (Arg&& value) {
+        _string._detach();
+        _string._str[_pos] = std::forward<Arg>(value);
+        return *this;
+    }
+    operator value_type() const { return _string._str[_pos]; }
+private:
+    S& _string;
+    size_type _pos;
+};
+
+} // end of anonymous namespace
+
+
 template <class CharT>
 class _basic_string_base {
 protected:
@@ -97,6 +121,7 @@ protected:
 template <class CharT, class Traits = std::char_traits<CharT>, class Alloc = DefaultStaticAllocator<CharT>>
 class basic_string : private _basic_string_base<CharT> {
 public:
+    class iterator;
     typedef Traits                                     traits_type;
     typedef Alloc                                      allocator_type;
     typedef std::allocator_traits<allocator_type>      allocator_traits;
@@ -105,7 +130,6 @@ public:
     typedef const value_type&                          const_reference;
     typedef typename allocator_traits::pointer         pointer;
     typedef typename allocator_traits::const_pointer   const_pointer;
-    typedef CharT*                                     iterator;
     typedef const CharT*                               const_iterator;
     typedef std::reverse_iterator<iterator>            reverse_iterator;
     typedef std::reverse_iterator<const_iterator>      const_reverse_iterator;
@@ -120,6 +144,7 @@ private:
     using typename _basic_string_base<CharT>::Buffer;
 
     template <class C, class T, class A> friend class basic_string;
+    friend class _mutable_charref<basic_string>;
 
     union {
         CharT*       _str;
@@ -222,6 +247,50 @@ public:
         return *this;
     }
 
+    class iterator {
+    public:
+        using size_type         = typename basic_string::size_type;
+        using value_type        = typename basic_string::value_type;
+        using reference         = _mutable_charref<basic_string>;
+        using pointer           = _mutable_charref<basic_string>;
+        using difference_type   = std::ptrdiff_t;
+        using iterator_category = std::random_access_iterator_tag;
+        using const_iterator    = typename basic_string::const_iterator;
+
+        iterator(basic_string& string, size_type pos): _string(string), _pos(pos) {}
+
+        iterator& operator++()                      { ++_pos; return *this; }
+        iterator operator++(int)                    { iterator copy{_string, _pos }; ++_pos; return copy; }
+        iterator& operator--()                      { --_pos; return *this; }
+        iterator operator--(int)                    { iterator copy{_string, _pos }; --_pos; return copy; }
+        iterator& operator+=(int delta)             { _pos += delta; return *this; }
+        iterator& operator-=(int delta)             { _pos -= delta; return *this; }
+        reference operator*()                       { return reference{_string, _pos}; }
+        reference operator->()                      { return reference{_string, _pos}; }
+        reference operator[](size_type i)           { return reference{_string, i + _pos}; }
+
+        difference_type operator-(const iterator& rhs) const { return static_cast<difference_type>(_pos - rhs._pos); }
+
+        bool operator==(const iterator& rhs) { return _pos == rhs._pos; }
+        bool operator!=(const iterator& rhs) { return _pos != rhs._pos; }
+        bool operator< (const iterator& rhs) { return rhs._pos - _pos > 0; }
+        bool operator> (const iterator& rhs) { return _pos - rhs._pos > 0; }
+        bool operator<=(const iterator& rhs) { return rhs._pos - _pos >= 0; }
+        bool operator>=(const iterator& rhs) { return _pos - rhs._pos >= 0; }
+
+        operator const_iterator() { return _string.data() + _pos; }
+
+        friend inline iterator operator+(int delta, const iterator& it) { return iterator{it._string, it._pos + delta}; }
+        friend inline iterator operator+(const iterator& it, int delta) { return iterator{it._string, it._pos + delta}; }
+        friend inline iterator operator-(int delta, const iterator& it) { return iterator{it._string, it._pos - delta}; }
+        friend inline iterator operator-(const iterator& it, int delta) { return iterator{it._string, it._pos - delta}; }
+
+    private:
+        basic_string& _string;
+        size_type _pos;
+    };
+
+
     template<class _CharT, typename = typename std::enable_if<std::is_same<_CharT, CharT>::value>::type>
     basic_string& assign (const _CharT* const& str) {
         return assign(str, traits_type::length(str));
@@ -320,8 +389,8 @@ public:
         return _str;
     }
 
-    iterator         begin   () { return buf(); }
-    iterator         end     () { return buf() + _length; }
+    iterator         begin   () { return iterator(*this, 0); }
+    iterator         end     () { return iterator(*this, _length); }
     reverse_iterator rbegin  () { return reverse_iterator(end()); }
     reverse_iterator rend    () { return reverse_iterator(begin()); }
 
@@ -345,19 +414,18 @@ public:
         return _str[pos];
     }
 
-    CharT& at (size_type pos) {
+    _mutable_charref<basic_string> at (size_type pos) {
         if (pos >= _length) throw std::out_of_range("basic_string::at");
-        _detach();
-        return _str[pos];
+        return _mutable_charref<basic_string>{ *this, pos };
     }
 
     constexpr const CharT& operator[] (size_type pos) const { return _str[pos]; }
-    CharT& operator[] (size_type pos) { _detach(); return _str[pos]; }
+    _mutable_charref<basic_string> operator[] (size_type pos) { return _mutable_charref<basic_string>{ *this, pos }; }
 
     constexpr const CharT& front () const { return _str[0]; }
     constexpr const CharT& back  () const { return _str[_length-1]; }
-    CharT& front () { _detach(); return _str[0]; }
-    CharT& back  () { _detach(); return _str[_length-1]; }
+    _mutable_charref<basic_string> front () { return _mutable_charref<basic_string>{ *this, 0 }; }
+    _mutable_charref<basic_string> back  () { return _mutable_charref<basic_string>{ *this, _length-1 }; }
 
     size_type capacity () const {
         switch (_state) {
@@ -903,13 +971,13 @@ public:
     iterator insert (const_iterator it, size_type count, CharT ch) {
         size_type pos = it - cbegin();
         insert(pos, count, ch);
-        return _str + pos;
+        return iterator{*this, pos};
     }
 
     iterator insert (const_iterator it, CharT ch) {
         size_type pos = it - cbegin();
         insert(pos, 1, ch);
-        return _str + pos;
+        return iterator{*this, pos};
     }
 
     basic_string& insert (const_iterator it, std::initializer_list<CharT> ilist) {

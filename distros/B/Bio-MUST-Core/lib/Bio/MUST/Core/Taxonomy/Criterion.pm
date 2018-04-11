@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Taxonomy::Criterion;
 # ABSTRACT: Helper class for multiple-criterion classifier based on taxonomy
-$Bio::MUST::Core::Taxonomy::Criterion::VERSION = '0.180630';
+$Bio::MUST::Core::Taxonomy::Criterion::VERSION = '0.181000';
 use Moose;
 use namespace::autoclean;
 
@@ -32,12 +32,25 @@ has $_ => (
          min_org_count max_org_count
          min_copy_mean max_copy_mean
 );
- 
+
 
 
 sub matches {
     my $self     = shift;
     my $listable = shift;
+
+    # case 1: handle classification of single ids
+
+    # this should work for:
+    # - SeqId objects
+    # - stringified lineages
+    # - mere strings
+    unless ( ref $listable && $listable->can('all_seq_ids') ) {
+        # TODO: make this robust to ArrayRef[] (via coercion)
+        return $self->is_allowed($listable);
+    }
+
+    # case 2: handle "true" listable objects
 
     # get seq_ids passing tax_filter
     my @seq_ids = grep { $self->is_allowed($_) } $listable->all_seq_ids;
@@ -54,7 +67,7 @@ sub matches {
         unless defined $self->min_org_count || defined $self->max_org_count
             || defined $self->min_copy_mean || defined $self->max_copy_mean
     ;
-        
+
     # compute #orgs, #seqs/org and mean(copy/org)
     # these statistics only pertain to seq_ids having passed tax_filter
     my %count_for;
@@ -63,7 +76,7 @@ sub matches {
     # this implies that each taxon_id must correspond to a single org
     my $org_n = keys %count_for;
     my $cpy_n = (sum values %count_for) / $org_n;
-    
+
     # return failure unless #orgs within allowed bounds
     # by default there is no lower nor upper bound on #seqs
     return 0 if defined $self->min_org_count && $org_n < $self->min_org_count;
@@ -73,7 +86,7 @@ sub matches {
     # by default there is no lower nor upper bound on mean(copy/org)
     return 0 if defined $self->min_copy_mean && $cpy_n < $self->min_copy_mean;
     return 0 if defined $self->max_copy_mean && $cpy_n > $self->max_copy_mean;
-    
+
     # return success
     return 1;
 }
@@ -91,7 +104,7 @@ Bio::MUST::Core::Taxonomy::Criterion - Helper class for multiple-criterion class
 
 =head1 VERSION
 
-version 0.180630
+version 0.181000
 
 =head1 SYNOPSIS
 

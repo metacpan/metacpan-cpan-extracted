@@ -9,22 +9,39 @@ use Pcore::Util::Data qw[:CONST];
 use Pcore::Util::Scalar qw[weaken];
 
 has proc => ( is => 'ro', isa =>, InstanceOf ['Pcore::Util::PM::Proc'], init_arg => undef );
-has listen => ( is => 'ro', isa => Str, init_arg => undef );    # RPC server listen addr.
 has on_finish => ( is => 'rw', isa => Maybe [CodeRef] );
 
-around new => sub ( $orig, $self, @ ) {
+has conn => ( is => 'ro', isa => HashRef, init_arg => undef );
+
+around new => sub ( $orig, $self, $type, % ) {
     my %args = (
         listen    => undef,    # RPC server listen
         token     => undef,
-        class     => undef,    # mandatory
         buildargs => undef,    # class constructor arguments
         on_ready  => undef,
         on_finish => undef,
-        @_[ 2 .. $#_ ],
+        @_[ 3 .. $#_ ],
     );
 
     # create self instance
     $self = $self->$orig( { on_finish => $args{on_finish} } );
+
+    if ($Pcore::RPC::Tmpl::CPID) {
+        Pcore::RPC::Tmpl::run(
+            $type,
+            {   listen    => $args{listen},
+                token     => $args{token},
+                buildargs => $args{buildargs},
+            },
+            sub ($proc) {
+                $args{on_ready}->($proc);
+
+                return;
+            }
+        );
+
+        return;
+    }
 
     # create handles
     my ( $ctrl_r, $ctrl_w ) = portable_socketpair();
@@ -62,10 +79,10 @@ around new => sub ( $orig, $self, @ ) {
     my $cmd = [];
 
     if ($MSWIN) {
-        push $cmd->@*, $perl, "-M$args{class}";
+        push $cmd->@*, $perl, "-M$type";
     }
     else {
-        push $cmd->@*, $perl, "-M$args{class}";
+        push $cmd->@*, $perl, "-M$type";
     }
 
     my $weaken_self = $self;
@@ -117,13 +134,15 @@ sub _handshake ( $self, $ctrl_fh, $cb ) {
                     # destroy control fh
                     $h->destroy;
 
-                    if ( $line =~ /\ALISTEN:(.+)\z/sm ) {
-                        $self->{listen} = $1;
+                    my $conn = eval { P->data->from_cbor($line) };
 
-                        $cb->();
+                    if ($@) {
+                        die 'RPC handshake error';
                     }
                     else {
-                        die 'RPC handshake error';
+                        $self->{conn} = $conn;
+
+                        $cb->();
                     }
 
                     return;

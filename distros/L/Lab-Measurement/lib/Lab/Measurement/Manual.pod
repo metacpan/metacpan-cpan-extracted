@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation for Lab::Measurement
 
 =head1 VERSION
 
-version 3.624
+version 3.630
 
 =head1 OVERVIEW
 
@@ -376,6 +376,8 @@ can be used with XPRESS, just like the Lab::Instrument drivers.
 =item * L<Lab::Moose::Sweep::Continuous::Time>
 
 =item * L<Lab::Moose::Sweep::Continuous::Magnet>
+
+=item * L<Lab::Moose::Sweep::Continuous::Voltage>
 
 =back
 

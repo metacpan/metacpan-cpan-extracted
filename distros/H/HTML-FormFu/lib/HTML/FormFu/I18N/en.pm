@@ -1,9 +1,8 @@
-package HTML::FormFu::I18N::en;
-
-use utf8;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::I18N::en;
+$HTML::FormFu::I18N::en::VERSION = '2.06';
+use utf8;
 
 use Moose;
 extends 'HTML::FormFu::I18N';
@@ -11,12 +10,12 @@ extends 'HTML::FormFu::I18N';
 our %Lexicon = (
     form_error_message =>
         'There were errors with your submission, see below for details',
-    form_constraint_allornone => 'Error',
-    form_constraint_ascii     => 'Field contains non-ASCII characters',
-    form_constraint_autoset   => 'Field contains an invalid choice',
-    form_constraint_bool      => 'Field must be a boolean value',
-    form_constraint_callback  => 'Invalid input',
-    form_constraint_datetime  => 'Invalid date',
+    form_constraint_allornone   => 'Error',
+    form_constraint_ascii       => 'Field contains non-ASCII characters',
+    form_constraint_autoset     => 'Field contains an invalid choice',
+    form_constraint_bool        => 'Field must be a boolean value',
+    form_constraint_callback    => 'Invalid input',
+    form_constraint_datetime    => 'Invalid date',
     form_constraint_dbic_unique => 'Value already exists in database',
     form_constraint_dependon =>
         "This field is required if field '[_1]' is filled in",
@@ -29,6 +28,7 @@ our %Lexicon = (
     form_constraint_file_size =>
         'File-size must be between [_1] and [_2] bytes',
     form_constraint_integer => 'This field must be an integer',
+    form_constraint_json    => 'This field must be a valid JSON string',
     form_constraint_length  => 'Must be between [_1] and [_2] characters long',
     form_constraint_minlength    => 'Must be at least [_1] characters long',
     form_constraint_minrange     => 'Must be at least [_1]',
@@ -40,9 +40,10 @@ our %Lexicon = (
     form_constraint_range     => 'Must be between [_1] and [_2]',
     form_constraint_recaptcha => 'reCAPTCHA error',
     form_constraint_regex     => 'Invalid input',
-    form_constraint_repeatable_any => "At least one of the '[_1]' fields is required",
-    form_constraint_required  => 'This field is required',
-    form_constraint_set       => 'Field contains an invalid choice',
+    form_constraint_repeatable_any =>
+        "At least one of the '[_1]' fields is required",
+    form_constraint_required       => 'This field is required',
+    form_constraint_set            => 'Field contains an invalid choice',
     form_constraint_singlevalue    => 'This field only accepts a single value',
     form_constraint_word           => 'Field contains non-word characters',
     form_inflator_compounddatetime => 'Invalid date',
@@ -58,3 +59,30 @@ our %Lexicon = (
 __PACKAGE__->meta->make_immutable( inline_constructor => 0 );
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::FormFu::I18N::en
+
+=head1 VERSION
+
+version 2.06
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

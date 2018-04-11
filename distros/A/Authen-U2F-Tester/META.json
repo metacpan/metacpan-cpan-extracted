@@ -4,7 +4,7 @@
       "Michael Schout <mschout@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -64,20 +64,57 @@
          }
       }
    },
+   "provides" : {
+      "Authen::U2F::Tester" : {
+         "file" : "lib/Authen/U2F/Tester.pm",
+         "version" : "0.03"
+      },
+      "Authen::U2F::Tester::Const" : {
+         "file" : "lib/Authen/U2F/Tester/Const.pm",
+         "version" : "0.03"
+      },
+      "Authen::U2F::Tester::Error" : {
+         "file" : "lib/Authen/U2F/Tester/Error.pm",
+         "version" : "0.03"
+      },
+      "Authen::U2F::Tester::Keypair" : {
+         "file" : "lib/Authen/U2F/Tester/Keypair.pm",
+         "version" : "0.03"
+      },
+      "Authen::U2F::Tester::Keystore::Wrapped" : {
+         "file" : "lib/Authen/U2F/Tester/Keystore/Wrapped.pm",
+         "version" : "0.03"
+      },
+      "Authen::U2F::Tester::RegisterResponse" : {
+         "file" : "lib/Authen/U2F/Tester/RegisterResponse.pm",
+         "version" : "0.03"
+      },
+      "Authen::U2F::Tester::Role::Keystore" : {
+         "file" : "lib/Authen/U2F/Tester/Role/Keystore.pm",
+         "version" : "0.03"
+      },
+      "Authen::U2F::Tester::Role::Response" : {
+         "file" : "lib/Authen/U2F/Tester/Role/Response.pm",
+         "version" : "0.03"
+      },
+      "Authen::U2F::Tester::SignResponse" : {
+         "file" : "lib/Authen/U2F/Tester/SignResponse.pm",
+         "version" : "0.03"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-authen-u2f-tester at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Authen-U2F-Tester"
+         "web" : "https://github.com/mschout/perl-authen-u2f-tester/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/Authen-U2F-Tester/",
+      "homepage" : "https://github.com/mschout/perl-authen-u2f-tester",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/mschout/perl-authen-u2f-tester.git",
+         "url" : "https://github.com/mschout/perl-authen-u2f-tester.git",
          "web" : "https://github.com/mschout/perl-authen-u2f-tester"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "0.03",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

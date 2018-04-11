@@ -8,8 +8,8 @@ use Carp;
 require Exporter;
 use AutoLoader;
 
-our @ISA = qw(Exporter);
-our $VERSION = '0.42';
+our @ISA     = qw(Exporter);
+our $VERSION = '0.43';
 
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
@@ -18,48 +18,54 @@ our $VERSION = '0.42';
 # This allows declaration	use Crypt::U2F ':all';
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(
-	u2fclib_calcAuthenticationChallenge
-	u2fclib_calcRegistrationChallenge
-	u2fclib_deInit
-	u2fclib_free_context
-	u2fclib_getError
-	u2fclib_get_context
-	u2fclib_init
-	u2fclib_setAppID
-	u2fclib_setChallenge
-	u2fclib_setKeyHandle
-	u2fclib_setOrigin
-	u2fclib_setPublicKey
-	u2fclib_verifyAuthentication
-	u2fclib_verifyRegistration
-) ] );
+our %EXPORT_TAGS = (
+    'all' => [
+        qw(
+          u2fclib_calcAuthenticationChallenge
+          u2fclib_calcRegistrationChallenge
+          u2fclib_deInit
+          u2fclib_free_context
+          u2fclib_getError
+          u2fclib_get_context
+          u2fclib_init
+          u2fclib_setAppID
+          u2fclib_setChallenge
+          u2fclib_setKeyHandle
+          u2fclib_setOrigin
+          u2fclib_setPublicKey
+          u2fclib_verifyAuthentication
+          u2fclib_verifyRegistration
+          )
+    ]
+);
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw(
-	
+
 );
 
 sub AUTOLOAD {
+
     # This AUTOLOAD is used to 'autoload' constants from the constant()
     # XS function.
 
     my $constname;
     our $AUTOLOAD;
-    ($constname = $AUTOLOAD) =~ s/.*:://;
-    croak "&Crypt::U2F::Server::constant not defined" if $constname eq 'constant';
-    my ($error, $val) = constant($constname);
+    ( $constname = $AUTOLOAD ) =~ s/.*:://;
+    croak "&Crypt::U2F::Server::constant not defined"
+      if $constname eq 'constant';
+    my ( $error, $val ) = constant($constname);
     if ($error) { croak $error; }
     {
-	no strict 'refs';
-	    *$AUTOLOAD = sub { $val };
+        no strict 'refs';
+        *$AUTOLOAD = sub { $val };
     }
     goto &$AUTOLOAD;
 }
 
 require XSLoader;
-XSLoader::load('Crypt::U2F::Server', $VERSION);
+XSLoader::load( 'Crypt::U2F::Server', $VERSION );
 
 # Preloaded methods go here.
 
@@ -67,6 +73,7 @@ XSLoader::load('Crypt::U2F::Server', $VERSION);
 
 1;
 __END__
+
 # Below is stub documentation for your module. You'd better edit it!
 
 =head1 NAME

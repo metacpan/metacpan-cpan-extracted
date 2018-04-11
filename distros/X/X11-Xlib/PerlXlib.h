@@ -48,10 +48,33 @@ extern void PerlXlib_XSizeHints_pack(XSizeHints *s, HV *fields, Bool consume);
 extern void PerlXlib_XSizeHints_unpack(XSizeHints *s, HV *fields);
 extern void PerlXlib_XRectangle_pack(XRectangle *s, HV *fields, Bool consume);
 extern void PerlXlib_XRectangle_unpack(XRectangle *s, HV *fields);
-#ifdef HAVE_XRENDER
+#ifndef HAVE_XRENDER
+/* Copied from X11/extensions/Xrender.h because I decided it was better to define the struct
+   than to have the perl interface change depending on whether it found a header file or not.
+   (imagine, installing this module when Xrender.h was not found but then installing a
+    dependent module after Xrender.h was installed)
+*/
+typedef XID PictFormat;
+typedef struct {
+    short   red;
+    short   redMask;
+    short   green;
+    short   greenMask;
+    short   blue;
+    short   blueMask;
+    short   alpha;
+    short   alphaMask;
+} XRenderDirectFormat;
+typedef struct {
+    PictFormat          id;
+    int                 type;
+    int                 depth;
+    XRenderDirectFormat direct;
+    Colormap            colormap;
+} XRenderPictFormat;
+#endif
 extern void PerlXlib_XRenderPictFormat_pack(XRenderPictFormat *s, HV *fields, Bool consume);
 extern void PerlXlib_XRenderPictFormat_unpack(XRenderPictFormat *s, HV *fields);
-#endif
 
 /* Keysym/unicode utility functions */
 extern int PerlXlib_keysym_to_codepoint(KeySym keysym);

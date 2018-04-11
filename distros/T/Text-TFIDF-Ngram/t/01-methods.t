@@ -120,11 +120,11 @@ $filename = 't/3.txt';
 $term     = 'as snow';
 
 $expected = {
-    'mary had'    => 1,
+    'Mary had'    => 1,
     'had a'       => 1,
     'a little'    => 1,
     'little lamb' => 1,
-    'its fleece'  => 1,
+    'Its fleece'  => 1,
     'fleece was'  => 1,
     'was white'   => 1,
     'white as'    => 1,

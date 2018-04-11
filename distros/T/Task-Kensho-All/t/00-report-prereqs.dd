@@ -1,0 +1,47 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Task::Kensho::Async' => '0.39',
+                                      'Task::Kensho::CLI' => '0.39',
+                                      'Task::Kensho::Config' => '0.39',
+                                      'Task::Kensho::DBDev' => '0.39',
+                                      'Task::Kensho::Dates' => '0.39',
+                                      'Task::Kensho::Email' => '0.39',
+                                      'Task::Kensho::ExcelCSV' => '0.39',
+                                      'Task::Kensho::Exceptions' => '0.39',
+                                      'Task::Kensho::Hackery' => '0.39',
+                                      'Task::Kensho::Logging' => '0.39',
+                                      'Task::Kensho::ModuleDev' => '0.39',
+                                      'Task::Kensho::OOP' => '0.39',
+                                      'Task::Kensho::Scalability' => '0.39',
+                                      'Task::Kensho::Testing' => '0.39',
+                                      'Task::Kensho::Toolchain' => '0.39',
+                                      'Task::Kensho::WebCrawling' => '0.39',
+                                      'Task::Kensho::WebDev' => '0.39',
+                                      'Task::Kensho::XML' => '0.39',
+                                      'perl' => '5.010001'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

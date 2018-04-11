@@ -4,7 +4,7 @@ package Excel::Writer::XLSX;
 #
 # Excel::Writer::XLSX - Create a new file in the Excel 2007+ XLSX format.
 #
-# Copyright 2000-2017, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2018, John McNamara, jmcnamara@cpan.org
 #
 # Documentation after __END__
 #
@@ -18,7 +18,7 @@ use strict;
 use Excel::Writer::XLSX::Workbook;
 
 our @ISA     = qw(Excel::Writer::XLSX::Workbook Exporter);
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 
 ###############################################################################
@@ -75,6 +75,7 @@ To write a string, a formatted string, a number and a formula to the first works
     $worksheet->write( 'A3', 1.2345 );
     $worksheet->write( 'A4', '=SIN(PI()/4)' );
 
+    $workbook->close();
 
 
 
@@ -104,13 +105,15 @@ The main advantage of the XLSX format over the XLS format is that it allows a la
 
 =head1 QUICK START
 
-Excel::Writer::XLSX tries to provide an interface to as many of Excel's features as possible. As a result there is a lot of documentation to accompany the interface and it can be difficult at first glance to see what it important and what is not. So for those of you who prefer to assemble Ikea furniture first and then read the instructions, here are three easy steps:
+Excel::Writer::XLSX tries to provide an interface to as many of Excel's features as possible. As a result there is a lot of documentation to accompany the interface and it can be difficult at first glance to see what it important and what is not. So for those of you who prefer to assemble Ikea furniture first and then read the instructions, here are four easy steps:
 
 1. Create a new Excel I<workbook> (i.e. file) using C<new()>.
 
 2. Add a worksheet to the new workbook using C<add_worksheet()>.
 
 3. Write to the worksheet using C<write()>.
+
+4. C<close()> the file.
 
 Like this:
 
@@ -119,6 +122,9 @@ Like this:
     my $workbook = Excel::Writer::XLSX->new( 'perl.xlsx' );    # Step 1
     $worksheet = $workbook->add_worksheet();                   # Step 2
     $worksheet->write( 'A1', 'Hi Excel!' );                    # Step 3
+
+    $workbook->close();                                        # Step 4
+
 
 This will create an Excel file called C<perl.xlsx> with a single worksheet and the text C<'Hi Excel!'> in the relevant cell. And that's it. Okay, so there is actually a zeroth step as well, but C<use module> goes without saying. There are many examples that come with the distribution and which you can use to get you started. See L</EXAMPLES>.
 
@@ -149,6 +155,7 @@ The Excel::Writer::XLSX module provides an object oriented interface to a new Ex
     set_1904()
     set_optimization()
     set_calc_mode()
+    get_default_url_format()
 
 If you are unfamiliar with object oriented interfaces or the way that they are implemented in Perl have a look at C<perlobj> and C<perltoot> in the main Perl documentation.
 
@@ -162,6 +169,8 @@ A new Excel workbook is created using the C<new()> constructor which accepts eit
     my $workbook  = Excel::Writer::XLSX->new( 'filename.xlsx' );
     my $worksheet = $workbook->add_worksheet();
     $worksheet->write( 0, 0, 'Hi Excel!' );
+    $workbook->close();
+
 
 Here are some other examples of using C<new()> with filenames:
 
@@ -387,9 +396,13 @@ The C<set_vba_name()> method can be used to set the VBA codename for the workboo
 
 =head2 close()
 
-In general your Excel file will be closed automatically when your program ends or when the Workbook object goes out of scope, however the C<close()> method can be used to explicitly close an Excel file.
+In general your Excel file will be closed automatically when your program ends or when the Workbook object goes out of scope. However it is recommended to explicitly call the C<close()> method close the Excel file and avoid the potential issues outlined below. The C<close()> method is called like this:
 
     $workbook->close();
+
+The return value of C<close()> is the same as that returned by perl when it closes the file created by C<new()>. This allows you to handle error conditions in the usual way:
+
+    $workbook->close() or die "Error closing file: $!";
 
 An explicit C<close()> is required if the file must be closed prior to performing some external action on it such as copying it, reading its size or attaching it to an email.
 
@@ -409,11 +422,7 @@ If the C<new()>, C<add_worksheet()> or C<add_format()> methods are called in sub
 
 The reason for this is that Excel::Writer::XLSX relies on Perl's C<DESTROY> mechanism to trigger destructor methods in a specific sequence. This may not happen in cases where the Workbook, Worksheet and Format variables are not lexically scoped or where they have different lexical scopes.
 
-In general, if you create a file with a size of 0 bytes or you fail to create a file you need to call C<close()>.
-
-The return value of C<close()> is the same as that returned by perl when it closes the file created by C<new()>. This allows you to handle error conditions in the usual way:
-
-    $workbook->close() or die "Error closing file: $!";
+To avoid these issues it is recommended that you always close the Excel::Writer::XLSX filehandle using C<close()>.
 
 
 
@@ -644,6 +653,18 @@ Only re-calculate formulas when the user requires it. Generally by pressing F9.
 Excel will automatically re-calculate formulas except for tables.
 
 =back
+
+
+
+
+=head2 get_default_url_format()
+
+The C<get_default_url_format()> method gets a copy of the default url format used when a user defined format isn't specified with the worksheet C<write_url()> method. The format is the hyperlink style defined by Excel for the default theme:
+
+    my $url_format = $workbook->get_default_url_format();
+
+
+
 
 =head1 WORKSHEET METHODS
 
@@ -1109,6 +1130,7 @@ The C<write_row()> method allows the following idiomatic conversion of a text fi
 
     $worksheet->write( $. -1, 0, [split] ) while <INPUT>;
 
+    $workbook->close();
 
 
 
@@ -1209,42 +1231,40 @@ See also the date_time.pl program in the C<examples> directory of the distro.
 
 Write a hyperlink to a URL in the cell specified by C<$row> and C<$column>. The hyperlink is comprised of two elements: the visible label and the invisible link. The visible label is the same as the link unless an alternative label is specified. The C<$label> parameter is optional. The label is written using the C<write()> method. Therefore it is possible to write strings, numbers or formulas as labels.
 
-The C<$format> parameter is also optional, however, without a format the link won't look like a link.
+The C<$format> parameter is also optional and the default Excel hyperlink style will be used if it isn't specified. If required you can access the default url format using the Workbook C<get_default_url_format> method:
 
-The suggested format is:
-
-    my $format = $workbook->add_format( color => 'blue', underline => 1 );
-
-B<Note>, this behaviour is different from Spreadsheet::WriteExcel which provides a default hyperlink format if one isn't specified by the user.
+    my $url_format = $workbook->get_default_url_format();
 
 There are four web style URI's supported: C<http://>, C<https://>, C<ftp://> and C<mailto:>:
 
-    $worksheet->write_url( 0, 0, 'ftp://www.perl.org/',       $format );
-    $worksheet->write_url( 'A3', 'http://www.perl.com/',      $format );
-    $worksheet->write_url( 'A4', 'mailto:jmcnamara@cpan.org', $format );
+    $worksheet->write_url( 0, 0, 'ftp://www.perl.org/' );
+    $worksheet->write_url( 'A3', 'http://www.perl.com/' );
+    $worksheet->write_url( 'A4', 'mailto:jmcnamara@cpan.org' );
 
 You can display an alternative string using the C<$label> parameter:
 
-    $worksheet->write_url( 1, 0, 'http://www.perl.com/', $format, 'Perl' );
+    $worksheet->write_url( 1, 0, 'http://www.perl.com/', undef, 'Perl' );
 
 If you wish to have some other cell data such as a number or a formula you can overwrite the cell using another call to C<write_*()>:
 
     $worksheet->write_url( 'A1', 'http://www.perl.com/' );
 
     # Overwrite the URL string with a formula. The cell is still a link.
-    $worksheet->write_formula( 'A1', '=1+1', $format );
+    # Note the use of the default url format for consistency with other links.
+    my $url_format = $workbook->get_default_url_format();
+    $worksheet->write_formula( 'A1', '=1+1', $url_format );
 
 There are two local URIs supported: C<internal:> and C<external:>. These are used for hyperlinks to internal worksheet references or external workbook and worksheet references:
 
-    $worksheet->write_url( 'A6',  'internal:Sheet2!A1',              $format );
-    $worksheet->write_url( 'A7',  'internal:Sheet2!A1',              $format );
-    $worksheet->write_url( 'A8',  'internal:Sheet2!A1:B2',           $format );
-    $worksheet->write_url( 'A9',  q{internal:'Sales Data'!A1},       $format );
-    $worksheet->write_url( 'A10', 'external:c:\temp\foo.xlsx',       $format );
-    $worksheet->write_url( 'A11', 'external:c:\foo.xlsx#Sheet2!A1',  $format );
-    $worksheet->write_url( 'A12', 'external:..\foo.xlsx',            $format );
-    $worksheet->write_url( 'A13', 'external:..\foo.xlsx#Sheet2!A1',  $format );
-    $worksheet->write_url( 'A13', 'external:\\\\NET\share\foo.xlsx', $format );
+    $worksheet->write_url( 'A6',  'internal:Sheet2!A1' );
+    $worksheet->write_url( 'A7',  'internal:Sheet2!A1' );
+    $worksheet->write_url( 'A8',  'internal:Sheet2!A1:B2' );
+    $worksheet->write_url( 'A9',  q{internal:'Sales Data'!A1} );
+    $worksheet->write_url( 'A10', 'external:c:\temp\foo.xlsx' );
+    $worksheet->write_url( 'A11', 'external:c:\foo.xlsx#Sheet2!A1' );
+    $worksheet->write_url( 'A12', 'external:..\foo.xlsx' );
+    $worksheet->write_url( 'A13', 'external:..\foo.xlsx#Sheet2!A1' );
+    $worksheet->write_url( 'A13', 'external:\\\\NET\share\foo.xlsx' );
 
 All of the these URI types are recognised by the C<write()> method, see above.
 
@@ -1416,6 +1436,8 @@ Most of these options are quite specific and in general the default comment beha
     start_col
     x_offset
     y_offset
+    font
+    font_size
 
 
 =over 4
@@ -1513,6 +1535,18 @@ This option is used to change the x offset, in pixels, of a comment within a cel
 This option is used to change the y offset, in pixels, of a comment within a cell:
 
     $worksheet->write_comment('C3', $comment, x_offset => 30);
+
+=item Option: font
+
+This option is used to change the font used in the comment from 'Tahoma' which is the default.
+
+    $worksheet->write_comment('C3', $comment, font => 'Calibri');
+
+=item Option: font_size
+
+This option is used to change the font size used in the comment from 8 which is the default.
+
+    $worksheet->write_comment('C3', $comment, font_size => 20);
 
 
 =back
@@ -2051,7 +2085,7 @@ The C<$hidden> parameter should be set to 1 if you wish to hide a row. This can 
 
 The C<$level> parameter is used to set the outline level of the row. Outlines are described in L</OUTLINES AND GROUPING IN EXCEL>. Adjacent rows with the same outline level are grouped together into a single outline.
 
-The following example sets an outline level of 1 for rows 1 and 2 (zero-indexed):
+The following example sets an outline level of 1 for rows 2 and 3 (zero-indexed):
 
     $worksheet->set_row( 1, undef, undef, 0, 1 );
     $worksheet->set_row( 2, undef, undef, 0, 1 );
@@ -3995,6 +4029,7 @@ A date or time in Excel is just like any other number. To have the number displa
     my $format7 = $workbook->add_format( num_format => 'mmm d yyyy hh:mm AM/PM' );
     $worksheet->write('A7', $number , $format7);     #  Feb 28 2008 12:00 PM
 
+    $workbook->close();
 
 =head2 Excel::Writer::XLSX doesn't automatically convert date/time strings
 
@@ -4061,6 +4096,8 @@ Here is an example:
         }
         $row++;
     }
+
+    $workbook->close();
 
     __DATA__
     Item    Cost    Date
@@ -4145,7 +4182,7 @@ Grouping in C<Excel::Writer::XLSX> is achieved by setting the outline level via 
     set_row( $row, $height, $format, $hidden, $level, $collapsed )
     set_column( $first_col, $last_col, $width, $format, $hidden, $level, $collapsed )
 
-The following example sets an outline level of 1 for rows 1 and 2 (zero-indexed) and columns B to G. The parameters C<$height> and C<$XF> are assigned default values since they are undefined:
+The following example sets an outline level of 1 for rows 2 and 3 (zero-indexed) and columns B to G. The parameters C<$height> and C<$XF> are assigned default values since they are undefined:
 
     $worksheet->set_row( 1, undef, undef, 0, 1 );
     $worksheet->set_row( 2, undef, undef, 0, 1 );
@@ -4638,11 +4675,24 @@ Other, less commonly used parameters are:
     mid_color
     max_color
     bar_color
-    stop_if_true
+    bar_only
+    bar_solid
+    bar_negative_color
+    bar_border_color
+    bar_negative_border_color
+    bar_negative_color_same
+    bar_negative_border_color_same
+    bar_no_border
+    bar_direction
+    bar_axis_position
+    bar_axis_color
+    data_bar_2010
     icon_style
     icons
     reverse_icons
     icons_only
+    stop_if_true
+    multi_range
 
 Additional parameters which are used for specific conditional format types are shown in the relevant sections below.
 
@@ -4658,52 +4708,89 @@ The C<type> parameter is used to set the type of conditional formatting that you
                     value
                     minimum
                     maximum
+                    format
 
     date            criteria
                     value
                     minimum
                     maximum
+                    format
 
     time_period     criteria
+                    format
 
     text            criteria
                     value
+                    format
 
     average         criteria
+                    format
 
-    duplicate       (none)
+    duplicate       format
 
-    unique          (none)
+    unique          format
 
     top             criteria
                     value
+                    format
 
     bottom          criteria
                     value
+                    format
 
-    blanks          (none)
+    blanks          format
 
-    no_blanks       (none)
+    no_blanks       format
 
-    errors          (none)
+    errors          format
 
-    no_errors       (none)
-
-    2_color_scale   (none)
-
-    3_color_scale   (none)
-
-    data_bar        (none)
+    no_errors       format
 
     formula         criteria
+                    format
+
+    2_color_scale   min_type
+                    max_type
+                    min_value
+                    max_value
+                    min_color
+                    max_color
+
+    3_color_scale   min_type
+                    mid_type
+                    max_type
+                    min_value
+                    mid_value
+                    max_value
+                    min_color
+                    mid_color
+                    max_color
+
+    data_bar        min_type
+                    max_type
+                    min_value
+                    max_value
+                    bar_only
+                    bar_color
+                    bar_solid*
+                    bar_negative_color*
+                    bar_border_color*
+                    bar_negative_border_color*
+                    bar_negative_color_same*
+                    bar_negative_border_color_same*
+                    bar_no_border*
+                    bar_direction*
+                    bar_axis_position*
+                    bar_axis_color*
+                    data_bar_2010*
 
     icon_set        icon_style
                     reverse_icons
                     icons
                     icons_only
 
+Data bar parameters marked with (*) are only available in Excel 2010 and later. Files that use these properties can still be opened in Excel 2007 but the data bars will be displayed without them.
 
-All conditional formatting types, apart from C<icon_set> have a C<format> parameter, see below.
 
 =head2 type => 'cell'
 
@@ -5014,6 +5101,22 @@ The C<no_errors> type is used to highlight non error cells in a range:
     );
 
 
+
+=head2 type => 'formula'
+
+The C<formula> type is used to specify a conditional format based on a user defined formula:
+
+    $worksheet->conditional_formatting( 'A1:A4',
+        {
+            type     => 'formula',
+            criteria => '=$A$1 > 5',
+            format   => $format,
+        }
+    );
+
+The formula is specified in the C<criteria>.
+
+
 =head2 type => '2_color_scale'
 
 The C<2_color_scale> type is used to specify Excel's "2 Color Scale" style conditional format.
@@ -5050,23 +5153,30 @@ The C<data_bar> type is used to specify Excel's "Data Bar" style conditional for
         }
     );
 
-This conditional type can be modified with C<min_type>, C<max_type>, C<min_value>, C<max_value> and C<bar_color>, see below.
+This data bar conditional type can be modified with the following parameters, which are explained in the sections below. These properties were available in the original xlsx file specification used in Excel 2007::
 
+    min_type
+    max_type
+    min_value
+    max_value
+    bar_color
+    bar_only
 
+In Excel 2010 additional data bar properties were added such as solid (non-gradient) bars and control over how negative values are displayed. These properties can be set using the following parameters:
 
-=head2 type => 'formula'
+    bar_solid
+    bar_negative_color
+    bar_border_color
+    bar_negative_border_color
+    bar_negative_color_same
+    bar_negative_border_color_same
+    bar_no_border
+    bar_direction
+    bar_axis_position
+    bar_axis_color
+    data_bar_2010
 
-The C<formula> type is used to specify a conditional format based on a user defined formula:
-
-    $worksheet->conditional_formatting( 'A1:A4',
-        {
-            type     => 'formula',
-            criteria => '=$A$1 > 5',
-            format   => $format,
-        }
-    );
-
-The formula is specified in the C<criteria>.
+Files that use these Excel 2010 properties can still be opened in Excel 2007 but the data bars will be displayed without them.
 
 
 
@@ -5212,7 +5322,135 @@ The C<min_color> and C<max_color> properties are available when the conditional 
         }
     );
 
-The color can be specifies as an Excel::Writer::XLSX color index or, more usefully, as a HTML style RGB hex number, as shown above.
+The color can be specified as an Excel::Writer::XLSX color index or, more usefully, as a HTML style RGB hex number, as shown above.
+
+
+=head2 bar_only
+
+The C<bar_only> parameter property displays a bar data but not the data in the cells:
+
+    $worksheet->conditional_formatting( 'D3:D14',
+        {
+            type     => 'data_bar',
+            bar_only => 1
+        }
+    );
+
+
+=head2 bar_solid
+
+The C<bar_solid> parameter turns on a solid (non-gradient) fill for data bars:
+
+
+    $worksheet->conditional_formatting( 'H3:H14',
+        {
+            type      => 'data_bar',
+            bar_solid => 1
+        }
+    );
+
+Note, this property is only visible in Excel 2010 and later.
+
+
+=head2 bar_negative_color
+
+The C<bar_negative_color> parameter is used to set the color fill for the negative portion of a data bar.
+
+The color can be specified as an Excel::Writer::XLSX color index or as a HTML style RGB hex number, as shown in the other examples.
+
+Note, this property is only visible in Excel 2010 and later.
+
+
+=head2 bar_border_color
+
+The C<bar_border_color> parameter is used to set the border color of a data bar.
+
+The color can be specified as an Excel::Writer::XLSX color index or as a HTML style RGB hex number, as shown in the other examples.
+
+Note, this property is only visible in Excel 2010 and later.
+
+
+=head2 bar_negative_border_color
+
+The C<bar_negative_border_color> parameter is used to set the border color of the negative portion of a data bar.
+
+The color can be specified as an Excel::Writer::XLSX color index or as a HTML style RGB hex number, as shown in the other examples.
+
+Note, this property is only visible in Excel 2010 and later.
+
+
+=head2 bar_negative_color_same
+
+The C<bar_negative_color_same> parameter sets the fill color for the negative portion of a data bar to be the same as the fill color for the positive portion of the data bar:
+
+    $worksheet->conditional_formatting( 'N3:N14',
+        {
+            type                           => 'data_bar',
+            bar_negative_color_same        => 1,
+            bar_negative_border_color_same => 1
+        }
+    );
+
+Note, this property is only visible in Excel 2010 and later.
+
+
+=head2 bar_negative_border_color_same
+
+The C<bar_negative_border_color_same> parameter sets the border color for the negative portion of a data bar to be the same as the border color for the positive portion of the data bar.
+
+Note, this property is only visible in Excel 2010 and later.
+
+
+=head2 bar_no_border
+
+The C<bar_no_border> parameter turns off the border of a data bar.
+
+
+Note, this property is only visible in Excel 2010 and later, however the default in Excel 2007 is not to have a border.
+
+
+=head2 bar_direction
+
+The C<bar_direction> parameter sets the direction for data bars. This property can be either C<left> for left-to-right or C<right> for right-to-left. If the property isn't set then Excel will adjust the position automatically based on the context:
+
+    $worksheet->conditional_formatting( 'J3:J14',
+        {
+            type          => 'data_bar',
+            bar_direction => 'right'
+        }
+    );
+
+Note, this property is only visible in Excel 2010 and later.
+
+
+=head2 bar_axis_position
+
+The C<bar_axis_position> parameter sets the position within the cells for the axis that is shown in data bars when there are negative values to display. The property can be either C<middle> or C<none>. If the property isn't set then Excel will position the axis based on the range of positive and negative values.
+
+Note, this property is only visible in Excel 2010 and later.
+
+
+=head2 bar_axis_color
+
+The C<bar_axis_color> parameter sets the color for the axis that is shown in data bars when there are negative values to display.
+
+The color can be specified as an Excel::Writer::XLSX color index or as a HTML style RGB hex number, as shown in the other examples.
+
+Note, this property is only visible in Excel 2010 and later.
+
+
+=head2 data_bar_2010
+
+The C<data_bar_2010> parameter sets Excel 2010 style data bars even when Excel 2010 specific properties aren't used. This can be used to create consistency across all the data bar formatting in a worksheet:
+
+    $worksheet->conditional_formatting( 'L3:L14',
+        {
+            type          => 'data_bar',
+            data_bar_2010 => 1
+        }
+    );
+
+Note, this property is only visible in Excel 2010 and later.
 
 
 =head2 stop_if_true
@@ -6396,6 +6634,7 @@ The following example shows some of the basic features of Excel::Writer::XLSX.
 
     $worksheet->write( 10, 0, 'http://www.perl.com/', $hyperlink_format );
 
+    $workbook->close();
 
 =begin html
 
@@ -6449,6 +6688,7 @@ The following is a general example which demonstrates some features of working w
     # Set the active cell
     $south->set_selection( 0, 1 );
 
+    $workbook->close();
 
 =begin html
 
@@ -6531,6 +6771,7 @@ Example of how to add conditional formatting to an Excel::Writer::XLSX file. The
         }
     );
 
+    $workbook->close();
 
 =begin html
 
@@ -6608,6 +6849,7 @@ The following is a simple example of using functions.
     $worksheet->write( 10, 0, 'Kurtosis', $format );
     $worksheet->write( 10, 1, '=KURT(B2:I2)' );
 
+    $workbook->close();
 
 =begin html
 
@@ -6649,6 +6891,7 @@ The following example converts a tab separated file called C<tab.txt> into an Ex
         $row++;
     }
 
+    $workbook->close();
 
 NOTE: This is a simple conversion program for illustrative purposes only. For converting a CSV or Tab separated or any other type of delimited text file to Excel I recommend the more rigorous csv2xls program that is part of H.Merijn Brand's L<Text::CSV_XS> module distro.
 
@@ -7241,6 +7484,6 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright MM-MMXVII, John McNamara.
+Copyright MM-MMXVIII, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.

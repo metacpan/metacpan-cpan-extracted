@@ -7,7 +7,7 @@ package Excel::Writer::XLSX::Format;
 #
 # Used in conjunction with Excel::Writer::XLSX
 #
-# Copyright 2000-2017, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2018, John McNamara, jmcnamara@cpan.org
 #
 # Documentation after __END__
 #
@@ -20,7 +20,7 @@ use Carp;
 
 
 our @ISA     = qw(Exporter);
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 our $AUTOLOAD;
 
 
@@ -40,28 +40,29 @@ sub new {
         _xf_index           => undef,
         _dxf_index          => undef,
 
-        _num_format       => 0,
-        _num_format_index => 0,
-        _font_index       => 0,
-        _has_font         => 0,
-        _has_dxf_font     => 0,
-        _font             => 'Calibri',
-        _size             => 11,
-        _bold             => 0,
-        _italic           => 0,
-        _color            => 0x0,
-        _underline        => 0,
-        _font_strikeout   => 0,
-        _font_outline     => 0,
-        _font_shadow      => 0,
-        _font_script      => 0,
-        _font_family      => 2,
-        _font_charset     => 0,
-        _font_scheme      => 'minor',
-        _font_condense    => 0,
-        _font_extend      => 0,
-        _theme            => 0,
-        _hyperlink        => 0,
+        _num_format        => 0,
+        _num_format_index  => 0,
+        _font_index        => 0,
+        _has_font          => 0,
+        _has_dxf_font      => 0,
+        _font              => 'Calibri',
+        _size              => 11,
+        _bold              => 0,
+        _italic            => 0,
+        _color             => 0x0,
+        _underline         => 0,
+        _font_strikeout    => 0,
+        _font_outline      => 0,
+        _font_shadow       => 0,
+        _font_script       => 0,
+        _font_family       => 2,
+        _font_charset      => 0,
+        _font_scheme       => 'minor',
+        _font_condense     => 0,
+        _font_extend       => 0,
+        _theme             => 0,
+        _hyperlink         => 0,
+        _xf_id             => 0,
 
         _hidden => 0,
         _locked => 1,
@@ -289,6 +290,7 @@ sub get_font_key {
         $self->{_italic},
         $self->{_size},
         $self->{_underline},
+        $self->{_theme},
 
     );
 
@@ -678,18 +680,19 @@ sub set_rotation {
 #
 # set_hyperlink()
 #
-# Set the properties for the hyperlink style. TODO. This doesn't currently
-# work. Fix it when styles are supported.
+# Set the properties for the hyperlink style. This isn't a public method. To
+# be fixed when styles are supported.
 #
 sub set_hyperlink {
 
-    my $self = shift;
+    my $self      = shift;
+    my $hyperlink = shift;
 
-    $self->{_hyperlink} = 1;
+    $self->{_xf_id} = 1;
 
     $self->set_underline( 1 );
     $self->set_theme( 10 );
-    $self->set_align( 'top' );
+    $self->{_hyperlink} = $hyperlink;
 }
 
 
@@ -809,6 +812,6 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-(c) MM-MMXVII, John McNamara.
+(c) MM-MMXVIII, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.

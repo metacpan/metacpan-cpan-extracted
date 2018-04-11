@@ -17,6 +17,8 @@ sub testPlan {
     $self->test_ModulWithConstructor();
     $self->test_ModulWithConstructor_emptyParameterList();
     $self->test_ModulWithConstructor_butIgnore();
+    $self->test_ModulWithAlternativeConstructorName();
+    $self->test_ModulWithAlternativeConstructorName_butIgnore();
 
     $self->test_ModulWithoutConstructor();
     $self->test_ModulWithoutConstructor_ParameterListError();
@@ -49,6 +51,32 @@ sub test_ModulWithConstructor_butIgnore {
     my $SubTestName = (caller(0))[3];
 
     my $Mockify = Test::Mockify->new('TestDummies::FakeModuleForMockifyTest');
+    $Mockify->mock('DummyMethodForTestOverriding')->when()->thenReturn('Injected');
+    my $FakeModuleForMockifyTest = $Mockify->getMockObject();
+    is($FakeModuleForMockifyTest->DummyMethodForTestOverriding(), 'Injected', "$SubTestName - Prove that the mock still works");
+    is($FakeModuleForMockifyTest->returnParameterListNew(), undef, "$SubTestName - Prove that the parameters was never used.");
+
+    return;
+}
+#----------------------------------------------------------------------------------------
+sub test_ModulWithAlternativeConstructorName {
+    my $self = shift;
+    my $SubTestName = (caller(0))[3];
+
+    my $Mockify = Test::Mockify->new('TestDummies::FakeModuleForMockifyTest_alterantiveConstructorName',[],'create');
+    $Mockify->mock('DummyMethodForTestOverriding')->when()->thenReturn('Injected');
+    my $FakeModuleForMockifyTest = $Mockify->getMockObject();
+    is($FakeModuleForMockifyTest->DummyMethodForTestOverriding(), 'Injected', "$SubTestName - Prove that the mock still works");
+    is($FakeModuleForMockifyTest->returnParameterListNew(), undef, "$SubTestName - Prove that the parameters was never used.");
+
+    return;
+}
+#----------------------------------------------------------------------------------------
+sub test_ModulWithAlternativeConstructorName_butIgnore {
+    my $self = shift;
+    my $SubTestName = (caller(0))[3];
+
+    my $Mockify = Test::Mockify->new('TestDummies::FakeModuleForMockifyTest_alterantiveConstructorName', undef, 'build');
     $Mockify->mock('DummyMethodForTestOverriding')->when()->thenReturn('Injected');
     my $FakeModuleForMockifyTest = $Mockify->getMockObject();
     is($FakeModuleForMockifyTest->DummyMethodForTestOverriding(), 'Injected', "$SubTestName - Prove that the mock still works");

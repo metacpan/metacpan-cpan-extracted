@@ -11,7 +11,7 @@ use lib "t";
 use _common;
 
 # Data::Dumper as serializer (Storable fails on regexps)
-$Struct::Diff::Freezer = sub {
+$Struct::Diff::FREEZER = sub {
     local $Data::Dumper::Deparse    = 1;
     local $Data::Dumper::Indent     = 0;
     local $Data::Dumper::Pair       = '';

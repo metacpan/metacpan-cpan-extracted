@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Barcelona
 
+0.57  Mon Apr 09 11:35:00 2018
+      - Updated dependency on Map::Tube v3.49.
+
 0.56  Thu Mar 29 22:35:00 2018
       - Making use of 'lazy' of Moo.
 

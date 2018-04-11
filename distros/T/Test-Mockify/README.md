@@ -29,6 +29,9 @@ verify the interactions with your mocks. Use [Test::Mockify::Sut](https://metacp
 
 You can find a Example Project in [ExampleProject](https://github.com/ChristianBreitkreutz/Mockify/tree/master/t/ExampleProject)
 
+It is possible to use alternative constructor name
+  my $MockObjectBuilder = Test::Mockify->new('SampleLogger', \[\], 'create');
+
 # METHODS
 
 ## getMockObject

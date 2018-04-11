@@ -1,10 +1,19 @@
+# PODNAME: HTML::FormFu::Manual::Cookbook
+# ABSTRACT: Cooking with HTML::FormFu
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Manual::Cookbook - Cooking with HTML::FormFu
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 DESCRIPTION
 
@@ -69,8 +78,7 @@ You can run the following script to quickly view a form's markup - replace
 the contents of the C<__DATA__> section with your own YAML config.
 
     #!/usr/bin/perl
-    use strict;
-    use warnings;
+        use warnings;
     use HTML::FormFu;
     use YAML::XS qw( LoadFile );
 
@@ -279,7 +287,6 @@ only if the value of another field contains a pattern
         }
     }
 
-
 Please read L<HTML::FormFu::Constraint> for further information.
 
 =head1 HTML MARKUP
@@ -474,7 +481,6 @@ we load this in the top-most auto action:
         }
     }
 
-
 Any other page that wants to load another form, can now do so freely:
 
     package MyApp::Controller::Foo;
@@ -586,5 +592,16 @@ Carl Franks C<cfranks@cpan.org>
 
 This document is free, you can redistribute it and/or modify it
 under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

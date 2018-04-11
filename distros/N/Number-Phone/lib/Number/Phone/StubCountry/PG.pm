@@ -22,37 +22,34 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200235;
+our $VERSION = 1.20180410221547;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2',
-                  'pattern' => '(\\d{3})(\\d{4})',
                   'leading_digits' => '
             [13-689]|
             27
-          '
+          ',
+                  'format' => '$1 $2',
+                  'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
+                  'pattern' => '(\\d{4})(\\d{4})',
                   'leading_digits' => '
             20|
             7
           ',
-                  'pattern' => '(\\d{4})(\\d{4})',
                   'format' => '$1 $2'
                 }
               ];
 
 my $validators = {
-                'mobile' => '
-          7(?:
-            [0-689]\\d|
-            75
-          )\\d{5}
+                'voip' => '
+          2(?:
+            0[0-47]|
+            7[568]
+          )\\d{4}
         ',
-                'personal_number' => '',
-                'toll_free' => '180\\d{4}',
-                'specialrate' => '',
                 'fixed_line' => '
           (?:
             3[0-2]\\d|
@@ -67,6 +64,9 @@ my $validators = {
             9[78]\\d
           )\\d{4}
         ',
+                'toll_free' => '180\\d{4}',
+                'pager' => '',
+                'personal_number' => '',
                 'geographic' => '
           (?:
             3[0-2]\\d|
@@ -81,12 +81,12 @@ my $validators = {
             9[78]\\d
           )\\d{4}
         ',
-                'pager' => '',
-                'voip' => '
-          2(?:
-            0[0-47]|
-            7[568]
-          )\\d{4}
+                'specialrate' => '',
+                'mobile' => '
+          7(?:
+            [0-689]\\d|
+            75
+          )\\d{5}
         '
               };
 my %areanames = (
@@ -105,6 +105,6 @@ my %areanames = (
       my $number = shift;
       $number =~ s/(^\+675|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-  return $self->is_valid() ? $self : undef;
-}
+        return $self->is_valid() ? $self : undef;
+    }
 1;

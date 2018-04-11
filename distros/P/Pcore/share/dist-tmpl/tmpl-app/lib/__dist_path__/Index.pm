@@ -5,7 +5,7 @@ use Pcore -class;
 with qw[Pcore::App::Controller::Index];
 
 sub run ( $self, $req ) {
-    $req->( 200, [ 'Conten-Type' => 'text/html' ], 'Pcore application template' )->finish;
+    $req->( 200, [ 'Content-Type' => 'text/html' ], $self->{app}->{util}->{tmpl}->render('index.html') )->finish;
 
     return;
 }

@@ -19,14 +19,14 @@ WriteMakefile(
     (
       $ENV{SKIP_FOR_CORE}
         ? ()
-	    : (PREREQ_PM   => { 'IO::Compress::Zip' => 2.060,
+	    : (PREREQ_PM   => { 'IO::Compress::Base' => 2.081,
                           }
 	      )
     ),
        
     (
     $] >= 5.005
-        ? (ABSTRACT => 'Create Zip Archives',
+        ? (ABSTRACT => 'Create and Read Zip Archives',
             AUTHOR  => 'Paul Marquess <pmqs@cpan.org>')
         : ()
     ),

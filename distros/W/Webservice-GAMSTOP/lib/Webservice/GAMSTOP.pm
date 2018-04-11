@@ -10,7 +10,7 @@ use Mojo::UserAgent;
 
 use Webservice::GAMSTOP::Response;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 =head1 NAME
 
@@ -151,8 +151,6 @@ sub get_exclusion_for {
     die "Missing required parameter: postcode."      unless (exists $args{postcode});
 
     # validate args
-    die 'Invalid first name.' unless $args{first_name} =~ /^[\p{L}\s'.-]{2,50}$/;
-    die 'Invalid last name.'  unless $args{last_name} =~ /^[\p{L}\s'.-]{2,50}$/;
     die 'Invalid date of birth. Date of birth should be in ISO format (yyyy-mm-dd)'
         unless $args{'date_of_birth'} =~ /^(?:\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))$/;
     die 'Invalid email.' unless Email::Valid->address($args{email});

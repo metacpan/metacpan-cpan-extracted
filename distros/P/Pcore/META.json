@@ -80,6 +80,7 @@
             "Compress::Zlib" : "0",
             "Const::Fast" : "0",
             "Convert::Ascii85" : "0",
+            "Coro" : "0",
             "Cpanel::JSON::XS" : "0",
             "Crypt::Argon2" : "0",
             "Crypt::CBC" : "0",
@@ -160,6 +161,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v0.59.1",
+   "version" : "v0.60.0",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

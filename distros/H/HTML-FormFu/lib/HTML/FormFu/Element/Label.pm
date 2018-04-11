@@ -1,10 +1,11 @@
-package HTML::FormFu::Element::Label;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Element::Label;
+$HTML::FormFu::Element::Label::VERSION = '2.06';
+# ABSTRACT: field for displaying only
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 
 extends "HTML::FormFu::Element";
 
@@ -15,13 +16,13 @@ with 'HTML::FormFu::Role::Element::Field',
 use HTML::FormFu::Util qw( process_attrs );
 use List::Util 1.33 qw( none );
 
-has field_type => ( is => 'rw', traits => ['FormFuChained'] );
+has field_type => ( is => 'rw', traits => ['Chained'] );
 
 has tag => (
     is      => 'rw',
     default => 'span',
     lazy    => 1,
-    traits  => ['FormFuChained'],
+    traits  => ['Chained'],
 );
 
 after BUILD => sub {
@@ -78,8 +79,8 @@ sub process_input {
 sub render_data_non_recursive {
     my ( $self, $args ) = @_;
 
-    my $render = $self->SUPER::render_data_non_recursive( {
-            tag => $self->tag,
+    my $render = $self->SUPER::render_data_non_recursive(
+        {   tag => $self->tag,
             $args ? %$args : (),
         } );
 
@@ -92,13 +93,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Element::Label - field for displaying only
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 DESCRIPTION
 
@@ -130,3 +135,16 @@ Moritz Onken, C<< onken at houseofdesign.de >>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

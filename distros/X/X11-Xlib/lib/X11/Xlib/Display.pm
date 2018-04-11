@@ -244,7 +244,7 @@ Generate a fake mouse button press or release.
 
   $display->fake_key($key_code, $is_press, $send_delay = 10);
 
-Generate a fake key press or release.
+Generate a fake key press or release.  See L<X11::Xlib::Keymap/EXAMPLES>.
 
 =cut
 

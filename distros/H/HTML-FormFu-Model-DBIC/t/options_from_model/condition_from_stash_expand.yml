@@ -1,0 +1,11 @@
+---
+auto_fieldset: 1
+
+elements:
+  - type: Select
+    name: user
+    model_config:
+      resultset: User
+      condition_from_stash:
+        master: foo.bar.0
+      expand_stash_dots: 1

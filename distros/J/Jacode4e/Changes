@@ -1,5 +1,11 @@
 Revision history for this software.
 
+2.13.6.5 2018/04/09 00:00:00
+  - add known license
+  - support JIPS(J) and JIPS(E)
+  - add JIPSJ_by_CP932.pl
+  - created by INABA Hitoshi
+
 2.13.6.4 2018/03/06 00:00:00
   - add Jacode4e.pm
   - change t/*.t, and xt/*.t as Perl5 module

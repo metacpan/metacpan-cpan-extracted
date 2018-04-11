@@ -70,9 +70,7 @@ sub run {
             mock => [
                 { branch => [map {"  $_"} qw/master /] },
                 { branch => [map {"  $_"} qw{origin/master origin/abc_123}] },
-                { 'rev-list' => ['1416341516 75c7e676ea83792dafd918c4213ebbdb292299ce'] },
-                { log    => ['Test User'] },
-                { log    => ['test.user@example.com'] },
+                { log    => "1416341516\x{1}75c7e676ea83792dafd918c4213ebbdb292299ce\x{1}Test User\x{1}test.user\@example.com" },
             ],
             STD => {
                 OUT => qr{^origin/abc_123 [(]Test User at [^)]+[)]$},
@@ -125,9 +123,7 @@ sub run {
             ARGV => [qw/ABC-124 --list/],
             mock => [
                 { branch => [map {"  $_"} qw/master abc_124/] },
-                { 'rev-list' => ['1416341516 75c7e676ea83792dafd918c4213ebbdb292299ce'] },
-                { log    => ['Test User'] },
-                { log    => ['test.user@example.com'] },
+                { log    => "1416341516\x{1}75c7e676ea83792dafd918c4213ebbdb292299ce\x{1}Test User\x{1}test.user\@example.com" },
             ],
             STD => {
                 OUT => qr/^abc_124 [(]Test User at [^)]+[)]$/,
@@ -140,12 +136,8 @@ sub run {
             ARGV => [qw/ABC-124 --list --all/],
             mock => [
                 { branch => [map {"  $_"} qw{master abc_124 remotes/origin/master remotes/origin/abc_124}] },
-                { 'rev-list' => ['1416341516 75c7e676ea83792dafd918c4213ebbdb292299ce'] },
-                { log    => ['Test User'] },
-                { log    => ['test.user@example.com'] },
-                { 'rev-list' => ['1416341516 75c7e676ea83792dafd918c4213ebbdb292299ce'] },
-                { log    => ['Test User'] },
-                { log    => ['test.user@example.com'] },
+                { log    => "1416341516\x{1}75c7e676ea83792dafd918c4213ebbdb292299ce\x{1}Test User\x{1}test.user\@example.com" },
+                { log    => "1416341516\x{1}75c7e676ea83792dafd918c4213ebbdb292299ce\x{1}Test User\x{1}test.user\@example.com" },
             ],
             STD => {
                 OUT => qr{^origin/abc_124 [(]Test User at [^)]+[)]$}ms,
@@ -158,9 +150,7 @@ sub run {
             ARGV => [qw/ABC-124 --list --remote/],
             mock => [
                 { branch => [map {"  $_"} qw{origin/master origin/abc_124}] },
-                { 'rev-list' => ['1416341516 75c7e676ea83792dafd918c4213ebbdb292299ce'] },
-                { log    => ['Test User'] },
-                { log    => ['test.user@example.com'] },
+                { log    => "1416341516\x{1}75c7e676ea83792dafd918c4213ebbdb292299ce\x{1}Test User\x{1}test.user\@example.com" },
             ],
             STD => {
                 OUT => qr{^origin/abc_124 [(]Test User at [^)]+[)]$},
@@ -185,12 +175,8 @@ sub run {
             ARGV => [qw/ABC-123/],
             mock => [
                 { branch => [map {"  $_"} qw/master abc_123 abc_123_v2/] },
-                { 'rev-list' => ['1416341516 0000000000000000000000000000000000000000'] },
-                { log    => ['Test User'] },
-                { log    => ['test.user@example.com'] },
-                { 'rev-list' => ['1416345516 1111111111111111111111111111111111111111'] },
-                { log    => ['Test User'] },
-                { log    => ['test.user@example.com'] },
+                { log    => "1416341516\x{1}0000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com" },
+                { log    => "1416341516\x{1}1111111111111111111111111111111111111111\x{1}Test User\x{1}test.user\@example.com" },
                 { checkout => undef },
             ],
             STD => {
@@ -205,12 +191,8 @@ sub run {
             ARGV => [qw/ABC-123/],
             mock => [
                 { branch => [map {"  $_"} qw/master abc_123 abc_123_v2/] },
-                { 'rev-list' => ['1416341516 0000000000000000000000000000000000000000'] },
-                { log    => ['Test User'] },
-                { log    => ['test.user@example.com'] },
-                { 'rev-list' => ['1416345516 1111111111111111111111111111111111111111'] },
-                { log    => ['Test User'] },
-                { log    => ['test.user@example.com'] },
+                { log    => "1416341516\x{1}0000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com" },
+                { log    => "1416341516\x{1}1111111111111111111111111111111111111111\x{1}Test User\x{1}test.user\@example.com" },
                 { checkout => undef },
             ],
             STD => {
@@ -225,12 +207,8 @@ sub run {
             ARGV => [qw/ABC-123/],
             mock => [
                 { branch => [map {"  $_"} qw/master abc_123 abc_123_v2/] },
-                { 'rev-list' => ['1416341516 0000000000000000000000000000000000000000'] },
-                { log    => ['Test User'] },
-                { log    => ['test.user@example.com'] },
-                { 'rev-list' => ['1416345516 1111111111111111111111111111111111111111'] },
-                { log    => ['Test User'] },
-                { log    => ['test.user@example.com'] },
+                { log    => "1416341516\x{1}0000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com" },
+                { log    => "1416341516\x{1}1111111111111111111111111111111111111111\x{1}Test User\x{1}test.user\@example.com" },
             ],
             STD => {
                 OUT => qr/^$/,

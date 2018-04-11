@@ -2,11 +2,11 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.054
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
-plan tests => 172;
+plan tests => 171;
 
 my @module_files = (
     'HTML/FormFu.pm',
@@ -29,6 +29,7 @@ my @module_files = (
     'HTML/FormFu/Constraint/File/MinSize.pm',
     'HTML/FormFu/Constraint/File/Size.pm',
     'HTML/FormFu/Constraint/Integer.pm',
+    'HTML/FormFu/Constraint/JSON.pm',
     'HTML/FormFu/Constraint/Length.pm',
     'HTML/FormFu/Constraint/MaxLength.pm',
     'HTML/FormFu/Constraint/MaxRange.pm',
@@ -123,6 +124,7 @@ my @module_files = (
     'HTML/FormFu/I18N/pt_pt.pm',
     'HTML/FormFu/I18N/ro.pm',
     'HTML/FormFu/I18N/ru.pm',
+    'HTML/FormFu/I18N/tr.pm',
     'HTML/FormFu/I18N/ua.pm',
     'HTML/FormFu/I18N/zh_cn.pm',
     'HTML/FormFu/Inflator.pm',
@@ -174,10 +176,7 @@ my @module_files = (
     'HTML/FormFu/UploadParam.pm',
     'HTML/FormFu/Util.pm',
     'HTML/FormFu/Validator.pm',
-    'HTML/FormFu/Validator/Callback.pm',
-    'MooseX/Attribute/FormFuChained.pm',
-    'MooseX/FormFuChainedAccessors.pm',
-    'MooseX/Traits/Attribute/FormFuChained.pm'
+    'HTML/FormFu/Validator/Callback.pm'
 );
 
 my @scripts = (
@@ -187,7 +186,9 @@ my @scripts = (
 
 # no fake home requested
 
-my $inc_switch = -d 'blib' ? '-Mblib' : '-Ilib';
+my @switches = (
+    -d 'blib' ? '-Mblib' : '-Ilib',
+);
 
 use File::Spec;
 use IPC::Open3;
@@ -201,14 +202,18 @@ for my $lib (@module_files)
     # see L<perlfaq8/How can I capture STDERR from an external command?>
     my $stderr = IO::Handle->new;
 
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, '-e', "require q[$lib]");
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+            $^X, @switches, '-e', "require q[$lib]"))
+        if $ENV{PERL_COMPILE_TEST_DEBUG};
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-e', "require q[$lib]");
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {
@@ -223,18 +228,25 @@ foreach my $file (@scripts)
     my $line = <$fh>;
 
     close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
-    my @flags = $1 ? split(' ', $1) : ();
+    @switches = (@switches, split(' ', $1)) if $1;
+
+    close $fh and skip("$file uses -T; not testable with PERL5LIB", 1)
+        if grep { $_ eq '-T' } @switches and $ENV{PERL5LIB};
 
     my $stderr = IO::Handle->new;
 
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, @flags, '-c', $file);
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+            $^X, @switches, '-c', $file))
+        if $ENV{PERL_COMPILE_TEST_DEBUG};
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-c', $file);
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);
     is($?, 0, "$file compiled ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     # in older perls, -c output is simply the file portion of the path being tested
     if (@_warnings = grep { !/\bsyntax OK$/ }

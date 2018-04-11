@@ -1783,7 +1783,6 @@ void PerlXlib_XRectangle_unpack(XRectangle *s, HV *fields) {
 
 /* END GENERATED X11_Xlib_XRectangle */
 /*--------------------------------------------------------------------------*/
-#ifdef HAVE_XRENDER
 /* BEGIN GENERATED X11_Xlib_XRenderPictFormat */
 
 void PerlXlib_XRenderPictFormat_pack(XRenderPictFormat *s, HV *fields, Bool consume) {
@@ -1852,5 +1851,4 @@ void PerlXlib_XRenderPictFormat_unpack(XRenderPictFormat *s, HV *fields) {
 }
 
 /* END GENERATED X11_Xlib_XRenderPictFormat */
-#endif
 /*--------------------------------------------------------------------------*/

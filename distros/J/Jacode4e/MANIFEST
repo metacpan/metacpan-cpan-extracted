@@ -23,12 +23,13 @@ make__DATA__/EBCDIC/ftp.__ftp.software.ibm.com_software_globalization_gcoc_attac
 make__DATA__/JEF/JEF_by_CP932.pl
 make__DATA__/JEF/JEF_by_Unicode_CultiCoLtd.pl
 make__DATA__/JEF/make_JEF.pl
+make__DATA__/JIPS/JIPSJ_by_CP932.pl
 make__DATA__/JIPS/JIPSJ_by_Unicode_CultiCoLtd.pl
 make__DATA__/JIPS/NEC_CP932_by_Unicode.pl
 make__DATA__/JIPS/ftp.__ftp.unicode.org_Public_MAPPINGS_VENDORS_MICSFT_WINDOWS_CP932.TXT
-make__DATA__/JIPS/prb-conversion-problem-between-shift-jis-and-unicode.txt
 make__DATA__/JIPS/make_JIPSE.pl
 make__DATA__/JIPS/make_JIPSJ.pl
+make__DATA__/JIPS/prb-conversion-problem-between-shift-jis-and-unicode.txt
 make__DATA__/JIS/JIS78GL_by_JIS83GL.pl
 make__DATA__/JIS/JIS78GR_by_JIS83GR.pl
 make__DATA__/JIS/JISX0208GL_by_CP932.pl

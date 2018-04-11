@@ -102,8 +102,8 @@ my $git = 'Git'->repository($local);
 ok( $git, 'local repository allocated' );
 isa_ok( $git, 'Git' );
 
-$git->command( 'config', 'user.name', 'Test U. Ser' );
-$git->command( 'config', 'user.email', 'ser@example.neverland' );
+my $ign = $git->command( 'config', 'user.name', 'Test U. Ser' );
+$ign = $git->command( 'config', 'user.email', 'ser@example.neverland' );
 
 write_tmp 'reflog', '';
 
@@ -142,7 +142,7 @@ sub push_ok {
 
 my %commits;
 sub do_commit {
-    $git->command_oneline( 'commit', '-m', shift ) =~ /\[(\w+).*\s+(\w+)\]/;
+    my $ignore = $git->command_oneline( 'commit', '-m', shift ) =~ /\[(\w+).*\s+(\w+)\]/;
     push @{ $commits{$1} }, $2;
     diag "commit $2 in branch $1" unless $tmp_cleanup;
 }
@@ -151,9 +151,9 @@ my $commit;
 
 ###### first commit
 w( 'old', 'content' );
-$git->command( 'add', '.' );
+$ign = $git->command( 'add', '.' );
 do_commit('import old content');
-$git->command( 'remote', 'add', 'origin', "file://$remote" );
+$ign = $git->command( 'remote', 'add', 'origin', "file://$remote" );
 push_ok;
 
 $commit = $c->describe_commit;
@@ -167,27 +167,27 @@ TestBot->expect( "#test 03Test U. Ser (03ser) 05master "
 
 #### branch, two changes, merge. then the changes should be reported only once
 my $b1 = 'a-new';
-$git->command( [ 'checkout', '-b', $b1, 'master' ],
+$ign = $git->command( [ 'checkout', '-b', $b1, 'master' ],
     { STDERR => 0 } );
 w( 'new', 'content' );
-$git->command( 'add', 'new' );
-$git->command( 'commit', '-m', 'created new content' );
+$ign = $git->command( 'add', 'new' );
+$ign = $git->command( 'commit', '-m', 'created new content' );
 w( 'new', 'more content' );
-$git->command( 'commit', '-a', '-m', 'updated new content' );
-$git->command( 'checkout', '-q', 'master' );
-$git->command( 'merge', '--no-ff', '-m', "merge '$b1' into master", $b1 );
+$ign = $git->command( 'commit', '-a', '-m', 'updated new content' );
+$ign = $git->command( 'checkout', '-q', 'master' );
+$ign = $git->command( 'merge', '--no-ff', '-m', "merge '$b1' into master", $b1 );
 
 # same with a branch name sorting after 'master'
 my $b2 = 'new-content';
-$git->command( [ 'checkout', '-b', $b2, 'master' ],
+$ign = $git->command( [ 'checkout', '-b', $b2, 'master' ],
     { STDERR => 0 } );
 w( 'new', 'content' );
-$git->command( 'add', 'new' );
-$git->command( 'commit', '-m', 'created new content' );
+$ign = $git->command( 'add', 'new' );
+$ign = $git->command( 'commit', '-m', 'created new content' );
 w( 'new', 'more content' );
-$git->command( 'commit', '-a', '-m', 'updated new content' );
-$git->command( 'checkout', '-q', 'master' );
-$git->command( 'merge', '--no-ff', '-m', "merge '$b2' into master", $b2 );
+$ign = $git->command( 'commit', '-a', '-m', 'updated new content' );
+$ign = $git->command( 'checkout', '-q', 'master' );
+$ign = $git->command( 'merge', '--no-ff', '-m', "merge '$b2' into master", $b2 );
 push_ok();
 
 $commit = $c->describe_commit;

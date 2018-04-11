@@ -16,7 +16,7 @@ use constant {
               LONG_MIN  => Math::GMPq::_long_min(),
              };
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -87,12 +87,12 @@ use overload
                 );
 
     my %trig = (
-        sin => sub (_) { goto &sin },    # built-in function
+        sin   => sub (_) { goto &sin },    # built-in function
         sinh  => \&sinh,
         asin  => \&asin,
         asinh => \&asinh,
 
-        cos => sub (_) { goto &cos },    # built-in function
+        cos   => sub (_) { goto &cos },    # built-in function
         cosh  => \&cosh,
         acos  => \&acos,
         acosh => \&acosh,
@@ -150,11 +150,11 @@ use overload
         cbrt => \&cbrt,
         root => \&root,
 
-        exp => sub (_) { goto &exp },      # built-in function
+        exp   => sub (_) { goto &exp },    # built-in function
         exp2  => \&exp2,
         exp10 => \&exp10,
 
-        ln => sub ($) { goto &ln },        # used in overloading
+        ln    => sub ($) { goto &ln },     # used in overloading
         log   => \&log,                    # built-in function
         log2  => \&log2,
         log10 => \&log10,
@@ -259,15 +259,15 @@ use overload
 
         popcount => \&popcount,
 
-        neg => sub ($) { goto &neg },    # used in overloading
-        inv => \&inv,
+        neg   => sub ($) { goto &neg },    # used in overloading
+        inv   => \&inv,
         conj  => \&conj,
         real  => \&real,
         imag  => \&imag,
         reals => \&reals,
 
-        int => sub (_) { goto &int },    # built-in function
-        rat => \&rat,
+        int     => sub (_) { goto &int },    # built-in function
+        rat     => \&rat,
         float   => \&float,
         complex => \&complex,
 
@@ -283,6 +283,11 @@ use overload
         as_int  => \&as_int,
         as_frac => \&as_frac,
         as_dec  => \&as_dec,
+
+        setbit   => \&setbit,
+        getbit   => \&getbit,
+        flipbit  => \&flipbit,
+        clearbit => \&clearbit,
 
         rat_approx => \&rat_approx,
 
@@ -1616,6 +1621,7 @@ sub add {    # used in overloading
 
     if (!ref($y)) {
         if (CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
+
             if (ref($x) eq 'Math::GMPq') {
                 my $r = Math::GMPq::Rmpq_init();
                 $y < 0
@@ -1653,6 +1659,7 @@ sub sub {    # used in overloading
 
     if (!ref($y)) {
         if (CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
+
             if (ref($x) eq 'Math::GMPq') {
                 my $r = Math::GMPq::Rmpq_init();
                 $y < 0
@@ -1687,6 +1694,7 @@ sub mul {    # used in overloading
 
     if (!ref($y)) {
         if (CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
+
             if (ref($x) eq 'Math::GMPq') {
                 my $r = Math::GMPq::Rmpq_init();
                 $y < 0
@@ -1724,6 +1732,7 @@ sub div {    # used in overloading
 
     if (!ref($y)) {
         if (CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN and CORE::int($y)) {
+
             if (ref($x) eq 'Math::GMPq') {
                 my $r = Math::GMPq::Rmpq_init();
                 $y < 0
@@ -1755,7 +1764,7 @@ sub iadd ($$) {
 
     $x = _star2mpz($x) // goto &nan;
 
-    if (!ref($y) and CORE::int($y) eq $y and CORE::abs($y) < ULONG_MAX) {
+    if (!ref($y) and CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
         my $r = Math::GMPz::Rmpz_init();
         $y < 0
           ? Math::GMPz::Rmpz_sub_ui($r, $x, -$y)
@@ -1779,7 +1788,7 @@ sub isub ($$) {
 
     $x = _star2mpz($x) // goto &nan;
 
-    if (!ref($y) and CORE::int($y) eq $y and CORE::abs($y) < ULONG_MAX) {
+    if (!ref($y) and CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
         my $r = Math::GMPz::Rmpz_init();
         $y < 0
           ? Math::GMPz::Rmpz_add_ui($r, $x, -$y)
@@ -1807,9 +1816,9 @@ sub imul ($$) {
 
     $x = _star2mpz($x) // goto &nan;
 
-    if (!ref($y) and CORE::int($y) eq $y and CORE::abs($y) < ULONG_MAX) {
+    if (!ref($y) and CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
         my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_mul_ui($r, $x, CORE::abs($y));
+        Math::GMPz::Rmpz_mul_ui($r, $x, $y < 0 ? -$y : $y);
         Math::GMPz::Rmpz_neg($r, $r) if $y < 0;
         return bless \$r;
     }
@@ -1830,9 +1839,9 @@ sub idiv ($$) {
 
     $x = _star2mpz($x) // goto &nan;
 
-    if (!ref($y) and CORE::int($y) eq $y and CORE::int($y) and CORE::abs($y) < ULONG_MAX) {
+    if (!ref($y) and CORE::int($y) eq $y and CORE::int($y) and $y < ULONG_MAX and $y > LONG_MIN) {
         my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_tdiv_q_ui($r, $x, CORE::abs($y));
+        Math::GMPz::Rmpz_tdiv_q_ui($r, $x, $y < 0 ? -$y : $y);
         Math::GMPz::Rmpz_neg($r, $r) if $y < 0;
         return bless \$r;
     }
@@ -1911,7 +1920,7 @@ sub ipow ($$) {
 
     $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // (goto &nan);
 
-    if (!ref($y) and CORE::int($y) eq $y and CORE::abs($y) < ULONG_MAX) {
+    if (!ref($y) and CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
         ## `y` is already a native integer
     }
     else {
@@ -1919,7 +1928,7 @@ sub ipow ($$) {
     }
 
     my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_pow_ui($r, $x, CORE::abs($y));
+    Math::GMPz::Rmpz_pow_ui($r, $x, $y < 0 ? -$y : $y);
 
     if ($y < 0) {
         Math::GMPz::Rmpz_sgn($r) || goto &inf;    # 0^(-y) = Inf
@@ -2061,7 +2070,7 @@ sub iroot ($$) {
 
     $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // goto &nan;
 
-    if (!ref($y) and CORE::int($y) eq $y and CORE::abs($y) < ULONG_MAX) {
+    if (!ref($y) and CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
         ## `y`is native integer
     }
     elsif (ref($y) eq __PACKAGE__) {
@@ -2238,7 +2247,7 @@ sub imod ($$) {
 
     $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // (goto &nan);
 
-    if (!ref($y) and CORE::int($y) eq $y and CORE::abs($y) < ULONG_MAX) {
+    if (!ref($y) and CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
 
         CORE::int($y) || goto &nan;
 
@@ -2337,8 +2346,8 @@ sub is_div ($$) {
                 return (Math::GMPz::Rmpz_divisible_p($$x, $$y) && Math::GMPz::Rmpz_sgn($$y));
             }
         }
-        elsif (CORE::int($y) eq $y and $y and CORE::abs($y) < ULONG_MAX) {
-            return Math::GMPz::Rmpz_divisible_ui_p($$x, CORE::abs($y));
+        elsif (CORE::int($y) eq $y and $y and $y < ULONG_MAX and $y > LONG_MIN) {
+            return Math::GMPz::Rmpz_divisible_ui_p($$x, $y < 0 ? -$y : $y);
         }
     }
 
@@ -3297,12 +3306,12 @@ sub falling_factorial ($$) {
     my $r = Math::GMPz::Rmpz_init_set($x);
 
     if ($y < 0) {
-        Math::GMPz::Rmpz_add_ui($r, $r, CORE::abs($y));
+        Math::GMPz::Rmpz_add_ui($r, $r, -$y);
     }
 
     Math::GMPz::Rmpz_fits_ulong_p($r)
-      ? Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($r), CORE::abs($y))
-      : Math::GMPz::Rmpz_bin_ui($r, $r, CORE::abs($y));
+      ? Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($r), $y < 0 ? -$y : $y)
+      : Math::GMPz::Rmpz_bin_ui($r, $r, $y < 0 ? -$y : $y);
 
     Math::GMPz::Rmpz_sgn($r) || do {
         $y < 0
@@ -3311,7 +3320,7 @@ sub falling_factorial ($$) {
     };
 
     state $t = Math::GMPz::Rmpz_init_nobless();
-    Math::GMPz::Rmpz_fac_ui($t, CORE::abs($y));
+    Math::GMPz::Rmpz_fac_ui($t, $y < 0 ? -$y : $y);
     Math::GMPz::Rmpz_mul($r, $r, $t);
 
     if ($y < 0) {
@@ -3344,16 +3353,16 @@ sub rising_factorial ($$) {
     }
 
     my $r = Math::GMPz::Rmpz_init_set($x);
-    Math::GMPz::Rmpz_add_ui($r, $r, CORE::abs($y));
+    Math::GMPz::Rmpz_add_ui($r, $r, $y < 0 ? -$y : $y);
     Math::GMPz::Rmpz_sub_ui($r, $r, 1);
 
     if ($y < 0) {
-        Math::GMPz::Rmpz_sub_ui($r, $r, CORE::abs($y));
+        Math::GMPz::Rmpz_sub_ui($r, $r, $y < 0 ? -$y : $y);
     }
 
     Math::GMPz::Rmpz_fits_ulong_p($r)
-      ? Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($r), CORE::abs($y))
-      : Math::GMPz::Rmpz_bin_ui($r, $r, CORE::abs($y));
+      ? Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($r), $y < 0 ? -$y : $y)
+      : Math::GMPz::Rmpz_bin_ui($r, $r, $y < 0 ? -$y : $y);
 
     Math::GMPz::Rmpz_sgn($r) || do {
         $y < 0
@@ -3362,7 +3371,7 @@ sub rising_factorial ($$) {
     };
 
     state $t = Math::GMPz::Rmpz_init_nobless();
-    Math::GMPz::Rmpz_fac_ui($t, CORE::abs($y));
+    Math::GMPz::Rmpz_fac_ui($t, $y < 0 ? -$y : $y);
     Math::GMPz::Rmpz_mul($r, $r, $t);
 
     if ($y < 0) {
@@ -3390,8 +3399,8 @@ sub gcd ($$) {
 
     my $r = Math::GMPz::Rmpz_init();
 
-    if (!ref($y) and CORE::int($y) eq $y and CORE::abs($y) < ULONG_MAX) {
-        Math::GMPz::Rmpz_gcd_ui($r, $x, CORE::abs($y));
+    if (!ref($y) and CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
+        Math::GMPz::Rmpz_gcd_ui($r, $x, $y < 0 ? -$y : $y);
     }
     else {
         $y = (ref($y) eq __PACKAGE__ ? _any2mpz($$y) : _star2mpz($y)) // (goto &nan);
@@ -3416,8 +3425,8 @@ sub lcm ($$) {
 
     my $r = Math::GMPz::Rmpz_init();
 
-    if (!ref($y) and CORE::int($y) eq $y and CORE::abs($y) < ULONG_MAX) {
-        Math::GMPz::Rmpz_lcm_ui($r, $x, CORE::abs($y));
+    if (!ref($y) and CORE::int($y) eq $y and $y < ULONG_MAX and $y > LONG_MIN) {
+        Math::GMPz::Rmpz_lcm_ui($r, $x, $y < 0 ? -$y : $y);
     }
     else {
         $y = (ref($y) eq __PACKAGE__ ? _any2mpz($$y) : _star2mpz($y)) // (goto &nan);
@@ -3488,7 +3497,7 @@ sub is_coprime ($$) {
 }
 
 #
-## Returns a true value if all the divisors of `x` are <= n.
+## Returns a true value if all the prime factors of `x` are <= n.
 #
 
 sub is_smooth ($$) {
@@ -4268,6 +4277,92 @@ sub not {    # used in overloading
 }
 
 #
+## TEST BIT (true if bit $y is 1, false otherwise)
+#
+
+sub getbit ($$) {
+    my ($x, $y) = @_;
+
+    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // return undef;
+
+    if (!ref($y) and CORE::int($y) eq $y and $y >= 0 and $y < ULONG_MAX) {
+        ## `y` is a native integer
+    }
+    else {
+        $y = (ref($y) eq __PACKAGE__ ? _any2ui($$y) : _any2ui(_star2obj($y))) // return undef;
+    }
+
+    Math::GMPz::Rmpz_tstbit($x, $y);
+}
+
+#
+## SET BIT (set bit $y to 1)
+#
+
+sub setbit ($$) {
+    my ($x, $y) = @_;
+
+    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // goto &nan;
+
+    if (!ref($y) and CORE::int($y) eq $y and $y >= 0 and $y < ULONG_MAX) {
+        ## `y` is a native integer
+    }
+    else {
+        $y = (ref($y) eq __PACKAGE__ ? _any2ui($$y) : _any2ui(_star2obj($y))) // goto &nan;
+    }
+
+    my $r = Math::GMPz::Rmpz_init_set($x);
+    Math::GMPz::Rmpz_setbit($r, $y);
+    bless \$r;
+}
+
+#
+## FLIP-BIT (XOR)
+#
+
+sub flipbit ($$) {
+    my ($x, $y) = @_;
+
+    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // goto &nan;
+
+    if (!ref($y) and CORE::int($y) eq $y and $y >= 0 and $y < ULONG_MAX) {
+        ## `y` is a native integer
+    }
+    else {
+        $y = (ref($y) eq __PACKAGE__ ? _any2ui($$y) : _any2ui(_star2obj($y))) // goto &nan;
+    }
+
+    my $r = Math::GMPz::Rmpz_init_set($x);
+
+    Math::GMPz::Rmpz_tstbit($r, $y)
+      ? Math::GMPz::Rmpz_clrbit($r, $y)
+      : Math::GMPz::Rmpz_setbit($r, $y);
+
+    bless \$r;
+}
+
+#
+## CLEAR BIT (set bit $y to 0)
+#
+
+sub clearbit ($$) {
+    my ($x, $y) = @_;
+
+    $x = (ref($x) eq __PACKAGE__ ? _any2mpz($$x) : _star2mpz($x)) // goto &nan;
+
+    if (!ref($y) and CORE::int($y) eq $y and $y >= 0 and $y < ULONG_MAX) {
+        ## `y` is a native integer
+    }
+    else {
+        $y = (ref($y) eq __PACKAGE__ ? _any2ui($$y) : _any2ui(_star2obj($y))) // goto &nan;
+    }
+
+    my $r = Math::GMPz::Rmpz_init_set($x);
+    Math::GMPz::Rmpz_clrbit($r, $y);
+    bless \$r;
+}
+
+#
 ## LEFT SHIFT
 #
 
@@ -4537,9 +4632,7 @@ sub digits ($;$) {
         return @digits;
     }
 
-    my @digits;
-    my $t = Math::GMPz::Rmpz_init_set($x);
-
+    my $t   = Math::GMPz::Rmpz_init_set($x);
     my $sgn = Math::GMPz::Rmpz_sgn($t);
 
     if ($sgn == 0) {
@@ -4548,6 +4641,8 @@ sub digits ($;$) {
     elsif ($sgn < 0) {
         Math::GMPz::Rmpz_abs($t, $t);
     }
+
+    my @digits;
 
     while (Math::GMPz::Rmpz_sgn($t) > 0) {
         my $m = Math::GMPz::Rmpz_init();

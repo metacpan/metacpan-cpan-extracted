@@ -8,7 +8,7 @@ use Number::Phone::Country qw(noexport);
 use Number::Phone::StubCountry;
 
 # MUST be in format N.NNNN, see https://github.com/DrHyde/perl-modules-Number-Phone/issues/58
-our $VERSION = '3.4003';
+our $VERSION = '3.4004';
 
 my $NOSTUBS = 0;
 sub import {
@@ -148,6 +148,17 @@ warnings. All code to support those calling conventions has now been removed.
 Until 2017 we ued KOS for the country code for Kosovo, that has now changed to
 XK. See L<Number::Phone::Country>.
 
+From version 3.4000 to 3.4003 inclusive we accepted any old garbage after
++383 as being valid, as the Kosovo numbering plan had not been published.
+Now that that has been published, we use libphonenumber data, and validate
+against it.
+
+The prefix codes in 3.4003 and earlier were managed by hand and so got out
+of date. After that release they are mostly derived from libphonenumber.
+libphonenumber's data includes carrier selection codes when they are
+mandatory for dialling so those are now included. This sometimes means that
+some random carrier has been arbitrarily priveleged over others.
+
 =head1 COMPATIBILTY WITH libphonenumber
 
 libphonenumber is a similar project for other languages, maintained
@@ -168,16 +179,6 @@ you should use the L<Number::Phone::Lib> module instead. This is a subclass
 of Number::Phone that will use the libphonenumber-derived stub classes even
 when extra data is available in, for example, Number::Phone::UK. You might
 want to do this for compatibility or performance. Number::Phone::UK is quite slow, because it uses a huge database for some of its features.
-
-=head1 SPECIAL CASE FOR KOSOVO
-
-Kosovo has been allocated country code +383, and it is apparently in use as of
-March 2017, but no number plan has been published and libphonenumber has no
-data. Therefore *all* +383 numbers will be considered valid. This is strictly
-speaking the wrong thing to do, but the alternative is to consider them all
-invalid, which is just as wrong. This will no doubt change in the future.
-See L<https://github.com/DrHyde/perl-modules-Number-Phone/issues/66> and
-L<https://github.com/googlei18n/libphonenumber/issues/1486>.
 
 =cut
 
@@ -235,8 +236,7 @@ sub _make_stub_object {
       return bless({
           country_code => $country_idd,
           country      => $country_name,
-          # Kosovo special case
-          is_valid     => ($country_idd eq '383') ? 1 : undef,
+          is_valid     => undef,
           number       => $local_number,
       }, 'Number::Phone::StubCountry');
   }

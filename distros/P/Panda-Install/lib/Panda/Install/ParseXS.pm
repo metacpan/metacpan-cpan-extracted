@@ -540,7 +540,7 @@ BEGIN {
 
 
 sub merge {
-    local $Panda::Install::ParseXS::top_typemaps = $_[0];
+    $Panda::Install::ParseXS::top_typemaps = $_[0];
     return $orig_merge->(@_);
 }
 

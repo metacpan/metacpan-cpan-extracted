@@ -84,7 +84,7 @@ TestBot->expect(
         'master b9b5587 test-repo',
         'mod-one file-one rm-one',
         '* Commit three files (add, mod, rm)',
-        '* http://git/b9b5587' )
+        '* http://l.nk/0' )
 );
 
 diag `cat t/bot/kgb-bot.log`;

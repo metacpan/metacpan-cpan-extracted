@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d5c6411c366b130deddbfe2ddaaba465331bf0d4 Changes
+SHA1 5c67ae1f730d63cf3674a9f6489808ba48e306bf LICENSE
+SHA1 53060a61979bf014a042ec1f1788a3092d63aa39 MANIFEST
+SHA1 44e04d7935c4ee395c07730c65daf2ba32ba1c9f META.json
+SHA1 51d4a974b2344c59c619bb5b0bf611fe7429acb1 META.yml
+SHA1 370652051de54ee0a183a65bbd64fe63d037f685 Makefile.PL
+SHA1 bef948712496e8bbb1191835b6a9b941fdce8ce9 README
+SHA1 0af016780a09f0823ed2bae6f95d498c9d41d201 lib/Game/TextPatterns.pm
+SHA1 77cca8e488d59db60136b8094fbce3a8725f1925 t/00-load.t
+SHA1 30506e7b4dd83b82c6185fa03ea22af52fd8acee t/Game-TextPatterns.t
+SHA1 7e2102430eb7778966a29a963d273543509698d6 t/pod-coverage.t
+SHA1 6d6ee1e914426c6c5e16f4487578c610f0cdbce6 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJazC+oAAoJEIGZLuHhLAOFgI8IAIBe2W8p7nkipvtnWASZY3M9
+gLk+RB7RUJh8S2IvPvMUC9Sg329bVzkzrKQt/ygQpKdUQeUW50D4bzfsHtbzQfeR
+InfAYj/WCtpTpmwqc1DxOfjdj4J2xSFKjmnHVkl9t+ij6gVt83g85MBV1PlinwdY
+Uf/sh4GuqS7JMkaXySJn0w8KdmWX5tu8X3J5MetqzgZax9TFof1pMPPcWzL7zTOX
+rtwQBCajXJOcvfsOUshyo2UlVTZU7I17+mnJ3gg0iiQYdecakwXHSWAO/F+OIUbM
+nA7rOsS5kMxeylgomHCcOcgPTOzRoJi6S95tqTn7GDHpef5x/wBk/thd2g6wAmc=
+=E8cL
+-----END PGP SIGNATURE-----

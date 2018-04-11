@@ -1,0 +1,52 @@
+{
+   "abstract" : "Mojolicious Plugin",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-FormFieldsFromJSON-Date",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "5.73",
+            "Mojolicious::Plugin::FormFieldsFromJSON" : "1.00",
+            "Time::Piece" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::FormFieldsFromJSON::Date" : {
+         "file" : "lib/Mojolicious/Plugin/FormFieldsFromJSON/Date.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/Mojolicious-Plugin-FormFieldsFromJSON-Date/issues"
+      },
+      "homepage" : "http://github.com/reneeb/Mojolicious-Plugin-FormFieldsFromJSON-Date",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/reneeb/Mojolicious-Plugin-FormFieldsFromJSON-Date.git",
+         "web" : "http://github.com/reneeb/Mojolicious-Plugin-FormFieldsFromJSON-Date"
+      }
+   },
+   "version" : "1.00",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+}
+

@@ -72,4 +72,5 @@ t/perlcriticrc
 t/pod-coverage.t
 t/pod.t
 t/TestBot.pm
+t/WWW/Shorten/DummyShortener.pm
 TODO

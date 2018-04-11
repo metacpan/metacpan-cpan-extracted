@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 
 use Test::BDD::Cucumber::Definitions qw(C Given When Then);
-use Test::BDD::Cucumber::Definitions::HTTP qw(:util);
+use Test::BDD::Cucumber::Definitions::HTTP qw(HTTP);
 
 =encoding utf8
 
@@ -16,7 +16,7 @@ Test::BDD::Cucumber::Definitions::HTTP::Ru - Шаги на русском язы
 
 =cut
 
-our $VERSION = '0.31';
+our $VERSION = '0.34';
 
 ## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
 ## no critic [RegularExpressions::RequireExtendedFormatting]
@@ -56,13 +56,13 @@ sub import {
 
 Задать любой заголовок запроса с любым значением:
 
-    When заголовок HTTP-запроса "User-Agent" установлен в значение "TBCD"
+    Given заголовок HTTP-запроса "User-Agent" установлен в значение "TBCD"
 
 =cut
 
-    #       http request header "(.+?)" set "(.*)"
-    When qr/заголовок HTTP-запроса "(.+?)" установлен в значение "(.*)"/, sub {
-        http_request_header_set( $1, $2 );
+    #        http request header "(.+?)" set "(.*)"
+    Given qr/заголовок HTTP-запроса "(.+?)" установлен в значение "(.*)"/, sub {
+        HTTP->request_header_set( $1, $2 );
     };
 
 =pod
@@ -70,7 +70,7 @@ sub import {
 Использовать в запросе данные произвольного вида и размера (предполагается
 отправка POST-запросом):
 
-    When тело HTTP-запроса заполнено данными
+    Given тело HTTP-запроса заполнено данными
         """
         какие-то
         данные
@@ -79,9 +79,9 @@ sub import {
 
 =cut
 
-    #       http request content set
-    When qr/тело HTTP-запроса заполнено данными/, sub {
-        http_request_content_set( C->data() );
+    #        http request content set
+    Given qr/тело HTTP-запроса заполнено данными/, sub {
+        HTTP->request_content_set( C->data() );
     };
 
 =head2 Отправка запроса
@@ -97,7 +97,7 @@ sub import {
 
     #       http request "(.+?)" send "(.+)"
     When qr/HTTP-запрос "(.+?)" отправлен на "(.+)"/, sub {
-        http_request_send( $1, $2 );
+        HTTP->request_send( $1, $2 );
     };
 
 =head2 Проверка ответа
@@ -112,7 +112,7 @@ sub import {
 
     #       http response code eq "(.+)"
     Then qr/код HTTP-ответа равен "(.+)"/, sub {
-        http_response_code_eq($1);
+        HTTP->response_code_eq($1);
     };
 
 =pod
@@ -125,7 +125,7 @@ sub import {
 
     #       http response header "(.+?)" eq "(.*)"
     Then qr/заголовок HTTP-ответа "(.+?)" равен "(.*)"/, sub {
-        http_response_header_eq( $1, $2 );
+        HTTP->response_header_eq( $1, $2 );
     };
 
 =pod
@@ -138,7 +138,7 @@ sub import {
 
     #       http response header "(.+?)" re "(.+)"
     Then qr/заголовок HTTP-ответа "(.+?)" совпадает с "(.+)"/, sub {
-        http_response_header_re( $1, $2 );
+        HTTP->response_header_re( $1, $2 );
     };
 
 =pod
@@ -151,7 +151,7 @@ sub import {
 
     #       http response content eq "(.*)"
     Then qr/содержимое HTTP-ответа равно "(.*)"/, sub {
-        http_response_content_eq($1);
+        HTTP->response_content_eq($1);
     };
 
 =pod
@@ -164,7 +164,7 @@ sub import {
 
     #       http response content re "(.+)"
     Then qr/содержимое HTTP-ответа совпадает с "(.+)"/, sub {
-        http_response_content_re($1);
+        HTTP->response_content_re($1);
     };
 
     return;

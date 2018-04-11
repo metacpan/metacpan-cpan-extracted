@@ -27,8 +27,6 @@ if ($ENV{TEST_FULL}) {
     $params{XS}{'t/xs.xs'} = 't/xs.cc';
     ($params{CCFLAGS}||='') .= ' -fsanitize=undefined';
     push @{$params{LIBS}||=[]}, '-lubsan'; #sanitizer
-    ($params{BIN_SHARE}{CCFLAGS}||='') .= ' -fsanitize=undefined -fno-sanitize=alignment';
-    push @{$params{BIN_SHARE}{LIBS}||=[]}, '-lubsan'; #sanitizer
 }
 
 write_makefile(%params);

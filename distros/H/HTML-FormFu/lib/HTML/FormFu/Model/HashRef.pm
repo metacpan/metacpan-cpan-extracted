@@ -1,10 +1,11 @@
-package HTML::FormFu::Model::HashRef;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Model::HashRef;
+$HTML::FormFu::Model::HashRef::VERSION = '2.06';
+# ABSTRACT: handle hashrefs
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 
 extends 'HTML::FormFu::Model';
 
@@ -14,21 +15,21 @@ use Scalar::Util qw(blessed);
 has flatten => ( is => 'rw' );
 has options => ( is => 'rw' );
 
-has _repeatable => ( is => 'rw', traits => ['FormFuChained'] );
-has _multi      => ( is => 'rw', traits => ['FormFuChained'] );
+has _repeatable => ( is => 'rw', traits => ['Chained'] );
+has _multi      => ( is => 'rw', traits => ['Chained'] );
 
 has deflators => (
     is      => 'rw',
     default => 1,
     lazy    => 1,
-    traits  => ['FormFuChained'],
+    traits  => ['Chained'],
 );
 
 has inflators => (
     is      => 'rw',
     default => 1,
     lazy    => 1,
-    traits  => ['FormFuChained'],
+    traits  => ['Chained'],
 );
 
 sub default_values {
@@ -311,13 +312,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Model::HashRef - handle hashrefs
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -402,7 +407,6 @@ a counter is added. The above example would result in a hash like this using C</
   { 'select_0' => 1,
     'select_1' => 2 }
 
-
 =head2 update
 
 Alias for L</create>.
@@ -440,3 +444,16 @@ L<HTML::FormFu>, L<Hash::Flatten>
 =head1 AUTHOR
 
 Moritz Onken, C<< onken@houseofdesign.de >>
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

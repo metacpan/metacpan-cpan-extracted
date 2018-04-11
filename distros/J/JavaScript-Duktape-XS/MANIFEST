@@ -7,6 +7,8 @@ duktape.h
 c_eventloop.c
 c_eventloop.h
 c_eventloop.js
+duk_console.c
+duk_console.h
 lib/JavaScript/Duktape/XS.pm
 LICENSE
 MANIFEST
@@ -18,6 +20,8 @@ t/00_basic.t
 t/01_timeout.t
 t/02_now.t
 t/03_eval_in_loop.t
+t/04_console.t
+t/05_stats.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

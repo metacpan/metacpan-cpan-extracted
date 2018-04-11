@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Executor;
-$Test::BDD::Cucumber::Executor::VERSION = '0.53';
+$Test::BDD::Cucumber::Executor::VERSION = '0.54';
 =head1 NAME
 
 Test::BDD::Cucumber::Executor - Run through Feature and Harness objects
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 DESCRIPTION
 
@@ -482,6 +482,10 @@ sub dispatch {
     $tb_return->{'builder'}->output( \$output );
     $tb_return->{'builder'}->failure_output( \$output );
     $tb_return->{'builder'}->todo_output( \$output );
+
+    binmode($tb_return->{'builder'}->output(), ':utf8');
+    binmode($tb_return->{'builder'}->failure_output(), ':utf8');
+    binmode($tb_return->{'builder'}->todo_output(), ':utf8');
 
     # Make a minimum pass
     $tb_return->{'builder'}

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200234;
+our $VERSION = 1.20180410221546;
 
 my $formatters = [
                 {
@@ -32,34 +32,6 @@ my $formatters = [
               ];
 
 my $validators = {
-                'mobile' => '[23679]\\d{6}',
-                'personal_number' => '',
-                'geographic' => '
-          (?:
-            4(?:
-              [23]\\d{2}|
-              4(?:
-                1[024679]|
-                [6-9]\\d
-              )
-            )|
-            5(?:
-              54[0-7]|
-              6(?:
-                [67]\\d
-              )|
-              7(?:
-                1[04]|
-                2[035]|
-                3[58]|
-                48
-              )
-            )|
-            8\\d{3}
-          )\\d{3}
-        ',
-                'toll_free' => '',
-                'specialrate' => '',
                 'fixed_line' => '
           (?:
             4(?:
@@ -84,8 +56,36 @@ my $validators = {
             8\\d{3}
           )\\d{3}
         ',
+                'toll_free' => '',
+                'voip' => '',
+                'geographic' => '
+          (?:
+            4(?:
+              [23]\\d{2}|
+              4(?:
+                1[024679]|
+                [6-9]\\d
+              )
+            )|
+            5(?:
+              54[0-7]|
+              6(?:
+                [67]\\d
+              )|
+              7(?:
+                1[04]|
+                2[035]|
+                3[58]|
+                48
+              )
+            )|
+            8\\d{3}
+          )\\d{3}
+        ',
+                'specialrate' => '',
+                'mobile' => '[23679]\\d{6}',
                 'pager' => '',
-                'voip' => ''
+                'personal_number' => ''
               };
 my %areanames = (
   22042 => "Banjul",
@@ -136,6 +136,6 @@ my %areanames = (
       my $number = shift;
       $number =~ s/(^\+220|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-  return $self->is_valid() ? $self : undef;
-}
+        return $self->is_valid() ? $self : undef;
+    }
 1;

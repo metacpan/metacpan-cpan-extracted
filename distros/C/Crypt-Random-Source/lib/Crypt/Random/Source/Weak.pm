@@ -1,7 +1,7 @@
 package Crypt::Random::Source::Weak;
 # ABSTRACT: Abstract base class for weak random data sources
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Moo;
 use namespace::clean;
@@ -20,7 +20,7 @@ Crypt::Random::Source::Weak - Abstract base class for weak random data sources
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 

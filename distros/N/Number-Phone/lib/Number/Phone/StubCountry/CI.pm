@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200233;
+our $VERSION = 1.20180410221545;
 
 my $formatters = [
                 {
@@ -32,25 +32,8 @@ my $formatters = [
               ];
 
 my $validators = {
-                'fixed_line' => '
-          (?:
-            2(?:
-              0[023]|
-              1[02357]|
-              [23][045]|
-              4[03-5]
-            )|
-            3(?:
-              0[06]|
-              1[069]|
-              [2-4][07]|
-              5[09]|
-              6[08]
-            )
-          )\\d{5}
-        ',
-                'specialrate' => '',
-                'toll_free' => '',
+                'pager' => '',
+                'personal_number' => '',
                 'geographic' => '
           (?:
             2(?:
@@ -68,18 +51,35 @@ my $validators = {
             )
           )\\d{5}
         ',
+                'specialrate' => '',
                 'mobile' => '
           (?:
             0[1-9]|
-            4\\d|
-            5[14-9]|
-            6[015-79]|
-            [78][4-9]
+            [45]\\d|
+            6[014-9]|
+            7[124-9]|
+            8[4-9]
           )\\d{6}
         ',
-                'personal_number' => '',
                 'voip' => '',
-                'pager' => ''
+                'fixed_line' => '
+          (?:
+            2(?:
+              0[023]|
+              1[02357]|
+              [23][045]|
+              4[03-5]
+            )|
+            3(?:
+              0[06]|
+              1[069]|
+              [2-4][07]|
+              5[09]|
+              6[08]
+            )
+          )\\d{5}
+        ',
+                'toll_free' => ''
               };
 my %areanames = (
   22520 => "Plateau",
@@ -100,6 +100,6 @@ my %areanames = (
       my $number = shift;
       $number =~ s/(^\+225|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-  return $self->is_valid() ? $self : undef;
-}
+        return $self->is_valid() ? $self : undef;
+    }
 1;

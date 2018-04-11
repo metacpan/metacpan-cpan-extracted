@@ -22,30 +22,44 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200236;
+our $VERSION = 1.20180410221548;
 
 my $formatters = [
                 {
-                  'national_rule' => '0$1',
                   'pattern' => '([1-7])(\\d{3})(\\d{3,4})',
                   'leading_digits' => '
             [1-6]|
             7[24-68]
           ',
+                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'national_rule' => '0$1',
-                  'pattern' => '(7\\d{2})(\\d{3})(\\d{3})',
                   'leading_digits' => '7[0137]',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(7\\d{2})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
                 'voip' => '',
-                'mobile' => '7[0137]\\d{7}',
+                'fixed_line' => '
+          (?:
+            1(?:
+              7\\d|
+              [2-68]
+            )|
+            2[2-68]|
+            3[2358]|
+            4[2-58]|
+            5[2-6]|
+            6[3-58]|
+            7[24-68]
+          )\\d{5}
+        ',
+                'toll_free' => '',
+                'pager' => '',
                 'personal_number' => '',
                 'geographic' => '
           (?:
@@ -61,22 +75,8 @@ my $validators = {
             7[24-68]
           )\\d{5}
         ',
-                'toll_free' => '',
                 'specialrate' => '',
-                'fixed_line' => '
-          (?:
-            1(?:
-              7\\d|
-              [2-68]
-            )|
-            2[2-68]|
-            3[2358]|
-            4[2-58]|
-            5[2-6]|
-            6[3-58]|
-            7[24-68]
-          )\\d{5}
-        '
+                'mobile' => '7[0137]\\d{7}'
               };
 
     sub new {
@@ -84,13 +84,9 @@ my $validators = {
       my $number = shift;
       $number =~ s/(^\+967|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
-  
       return $self if ($self->is_valid());
-      {
-        no warnings 'uninitialized';
-        $number =~ s/^(?:0)//;
-      }
+      $number =~ s/^(?:0)//;
       $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
-    return $self->is_valid() ? $self : undef;
-}
+      return $self->is_valid() ? $self : undef;
+    }
 1;

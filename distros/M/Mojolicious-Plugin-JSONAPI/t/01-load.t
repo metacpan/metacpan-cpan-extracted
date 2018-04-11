@@ -7,7 +7,7 @@ use Test::Mojo;
 
 use_ok('Mojolicious::Plugin::JSONAPI');
 
-plugin 'JSONAPI';
+plugin 'JSONAPI', { data_dir => 't/share' };
 
 my $t = Test::Mojo->new();
 

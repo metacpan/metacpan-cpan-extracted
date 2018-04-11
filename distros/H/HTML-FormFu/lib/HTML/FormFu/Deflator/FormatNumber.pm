@@ -1,10 +1,11 @@
-package HTML::FormFu::Deflator::FormatNumber;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Deflator::FormatNumber;
+$HTML::FormFu::Deflator::FormatNumber::VERSION = '2.06';
+# ABSTRACT: Format a number for a locale
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 extends 'HTML::FormFu::Deflator';
 
 use Number::Format;
@@ -15,7 +16,7 @@ has precision => (
     default => 2,
     lazy    => 1,
     isa     => 'Int',
-    traits  => ['FormFuChained'],
+    traits  => ['Chained'],
 );
 
 has trailing_zeroes => (
@@ -23,7 +24,7 @@ has trailing_zeroes => (
     default => 0,
     lazy    => 1,
     isa     => 'Int',
-    traits  => ['FormFuChained'],
+    traits  => ['Chained'],
 );
 
 sub deflator {
@@ -57,13 +58,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Deflator::FormatNumber - Format a number for a locale
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -112,3 +117,16 @@ Copyright 2008 Moritz Onken, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

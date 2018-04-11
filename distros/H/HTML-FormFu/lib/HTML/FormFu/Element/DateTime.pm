@@ -1,10 +1,11 @@
-package HTML::FormFu::Element::DateTime;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Element::DateTime;
+$HTML::FormFu::Element::DateTime::VERSION = '2.06';
+# ABSTRACT: Date / Time combo field
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 extends 'HTML::FormFu::Element::Date';
 
 use Moose::Util qw( apply_all_roles );
@@ -21,7 +22,7 @@ for my $name ( qw(
         is      => 'rw',
         default => '%02d',
         lazy    => 1,
-        traits  => ['FormFuChained'],
+        traits  => ['Chained'],
     );
 }
 
@@ -68,8 +69,8 @@ sub _add_hour {
 
     @hour_prefix = map { [ '', $_ ] } @hour_prefix;
 
-    my $element = $self->element( {
-            type    => 'Select',
+    my $element = $self->element(
+        {   type    => 'Select',
             name    => $hour_name,
             options => [
                 @hour_prefix,
@@ -110,8 +111,8 @@ sub _add_minute {
 
     my @minutes = $self->_build_number_list( 0, 59, $minute->{interval} );
 
-    my $element = $self->element( {
-            type    => 'Select',
+    my $element = $self->element(
+        {   type    => 'Select',
             name    => $minute_name,
             options => [
                 @minute_prefix,
@@ -152,8 +153,8 @@ sub _add_second {
 
     my @seconds = $self->_build_number_list( 0, 59, $second->{interval} );
 
-    my $element = $self->element( {
-            type    => 'Select',
+    my $element = $self->element(
+        {   type    => 'Select',
             name    => $second_name,
             options => [
                 @second_prefix,
@@ -177,13 +178,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Element::DateTime - Date / Time combo field
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -193,7 +198,6 @@ version 2.05
         name: start_datetime
         label: 'Start:'
         auto_inflate: 1
-
 
 =head1 DESCRIPTION
 
@@ -365,3 +369,16 @@ Carl Franks, C<cfranks@cpan.org>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

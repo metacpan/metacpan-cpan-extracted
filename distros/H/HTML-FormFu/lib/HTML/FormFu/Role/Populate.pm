@@ -1,8 +1,7 @@
-package HTML::FormFu::Role::Populate;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
 
+package HTML::FormFu::Role::Populate;
+$HTML::FormFu::Role::Populate::VERSION = '2.06';
 use Moose::Role;
 
 use Scalar::Util qw( reftype );
@@ -14,12 +13,10 @@ after BUILD => sub {
     $args ||= {};
 
     # get args handled by Moose so they aren't set twice
-    my %init_args =
-        map { $_->{init_arg} => 1 }
-        grep { defined $_->{init_arg} }
-            $self->meta->get_all_attributes;
+    my %init_args = map { $_->{init_arg} => 1 }
+        grep { defined $_->{init_arg} } $self->meta->get_all_attributes;
 
-    # remove defaults set in HTML::FormFu::BUILD because they need to be set for a third time
+# remove defaults set in HTML::FormFu::BUILD because they need to be set for a third time
     delete @init_args{ keys %{$HTML::FormFu::build_defaults} };
     my %args
         = map { $_ => $args->{$_} } grep { !exists $init_args{$_} } keys %$args;
@@ -57,6 +54,7 @@ sub populate {
         load_config_file
         element elements
         default_values
+        constraints_from_dbic
         filter              filters
         constraint          constraints
         inflator            inflators
@@ -76,8 +74,8 @@ sub populate {
     }
 
     eval {
-        if ( $roles ) {
-            $self->roles( $roles );
+        if ($roles) {
+            $self->roles($roles);
         }
 
         map { $self->$_( delete $args{$_} ) } keys %args;
@@ -91,3 +89,30 @@ sub populate {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::FormFu::Role::Populate
+
+=head1 VERSION
+
+version 2.06
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

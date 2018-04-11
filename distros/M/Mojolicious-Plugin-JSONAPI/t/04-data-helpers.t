@@ -25,7 +25,7 @@ $mock_obj->fake_module(
 
 use_ok('Mojolicious::Plugin::JSONAPI');
 
-plugin 'JSONAPI';
+plugin 'JSONAPI', { data_dir => 't/share' };
 
 get '/' => sub {
 	my ($c) = @_;

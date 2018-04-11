@@ -18,6 +18,7 @@ name: String-Validator-Email
 requires:
   Email::Valid: '0'
   Net::DNS: '0'
+  Net::Domain::TLD: '1.75'
   Regexp::Common: '0'
   String::Validator::Common: '2.00'
   base: '0'
@@ -28,5 +29,5 @@ resources:
   bugtracker: https://github.com/brainbuz/String-Validator/issues
   homepage: https://github.com/brainbuz/String-Validator
   repository: https://github.com/brainbuz/String-Validator.git
-version: '2.00'
+version: '2.01'
 x_serialization_backend: 'YAML::Tiny version 1.70'

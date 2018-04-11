@@ -3,14 +3,14 @@ use warnings;
 use 5.010;
 
 package JIRA::Client::Automated;
-$JIRA::Client::Automated::VERSION = '1.6';
+$JIRA::Client::Automated::VERSION = '1.7';
 =head1 NAME
 
 JIRA::Client::Automated - A JIRA REST Client for automated scripts
 
 =head1 VERSION
 
-version 1.6
+version 1.7
 
 =head1 SYNOPSIS
 
@@ -18,7 +18,7 @@ version 1.6
 
     my $jira = JIRA::Client::Automated->new($url, $user, $password);
 
-    # If your JIRA instance does not use username/password for authorization 
+    # If your JIRA instance does not use username/password for authorization
     my $jira = JIRA::Client::Automated->new($url);
 
     my $jira_ua = $jira->ua(); # to add in a proxy
@@ -90,7 +90,7 @@ JIRA. By virtue of being complete it is also somewhat large and a little
 complex for the beginner. Reading their tutorials is *highly* recommended
 before you start making hashes to update or transition issues.
 
-L<https://developer.atlassian.com/display/JIRADEV/JIRA+REST+APIs>
+L<https://developer.atlassian.com/cloud/jira/platform/rest/#about>
 
 This module was designed for the JIRA 5.2.11 REST API, as of March 2013, but it
 works fine with JIRA 6.0 as well. Your mileage may vary with future versions.
@@ -100,7 +100,7 @@ works fine with JIRA 6.0 as well. Your mileage may vary with future versions.
 When you work with an issue in JIRA's REST API, it gives you a JSON file that
 follows this spec:
 
-L<https://developer.atlassian.com/display/JIRADEV/The+Shape+of+an+Issue+in+JIRA+REST+APIs>
+L<https://developer.atlassian.com/cloud/jira/platform/rest/#api-api-2-issue-post>
 
 JIRA::Client::Automated tries to be nice to you and not make you deal directly
 with JSON. When you create a new issue, you can pass in just the pieces you
@@ -178,7 +178,7 @@ are the ones you set up at the very beginning of the registration process and
 then never used again because Google logged you in.
 
 If you have other ways of authorization, like GSSAPI based authorization, do
-not provide username or password. 
+not provide username or password.
 
     my $jira = JIRA::Client::Automated->new($url);
 
@@ -270,12 +270,22 @@ sub _handle_error_response {
     my ($self, $response, $request) = @_;
 
     my $msg = $response->status_line;
-    $msg .= pp($self->{_json}->decode($response->decoded_content))
-        if $response->decoded_content;
+    if ($response->decoded_content) {
+        if ($response->content_type eq 'application/json') {
+            $msg .= pp($self->{_json}->decode($response->decoded_content));
+        } else {
+            $msg .= $response->decoded_content;
+        }
+    }
 
     $msg .= "\n\nfor request:\n";
-    $msg .= pp($self->{_json}->decode($request->decoded_content))
-        if $request->decoded_content;
+    if ($request->decoded_content) {
+        if ($request->content_type eq 'application/json') {
+            $msg .= pp($self->{_json}->decode($request->decoded_content));
+        } else {
+            $msg .= $request->decoded_content;
+        }
+    }
 
     croak sprintf "Unable to %s %s: %s",
         $request->method, $request->uri->path, $msg;
@@ -341,7 +351,7 @@ dies if there is an error. The hash looks like:
         self => "https://example.atlassian.net/rest/api/latest/issue/24066"
     }
 
-See also L<https://developer.atlassian.com/display/JIRADEV/JIRA+REST+API+Example+-+Create+Issue>
+See also L<https://developer.atlassian.com/cloud/jira/platform/rest/#api-api-2-issue-post>
 
 =cut
 
@@ -472,9 +482,11 @@ sub _convert_from_customfields {
             my $value = $fields->{$cfname};
             my $converted_value;
             if (ref $value eq 'ARRAY') {
-                $converted_value = [ map { $_->{value} } @$value ];
-            } else {
+                $converted_value = [ map { ref $_ eq 'HASH' ? $_->{value} : $_ } @$value ];
+            } elsif (ref $value eq 'HASH') {
                 $converted_value = $value->{value};
+            } else {
+                $converted_value = $value;
             }
             $converted_fields->{$english_name} = $converted_value;
         } else {
@@ -599,8 +611,7 @@ The two forms of update can be combined in a single call.
 
 For more information see:
 
-    https://developer.atlassian.com/display/JIRADEV/JIRA+REST+API+Example+-+Edit+issues
-    https://developer.atlassian.com/display/JIRADEV/Updating+an+Issue+via+the+JIRA+REST+APIs
+    L<https://developer.atlassian.com/cloud/jira/platform/rest/#api-api-2-issue-issueIdOrKey-put>
 
 =cut
 
@@ -1376,6 +1387,12 @@ Thanks very much to:
 =over 4
 
 =item Neil Hemingway <hemingway@cpan.org>
+
+=back
+
+=over 4
+
+=item Andreas Mager <amager@barracuda.com>
 
 =back
 

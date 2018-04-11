@@ -1,12 +1,12 @@
 package Pcore::Core::Exception;
 
-use Pcore -export => {    #
+use Pcore -result, -export => {    #
     DEFAULT => [qw[croak cluck]],
 };
 use Carp qw[];
 use Pcore::Core::Exception::Object;
 
-our $IGNORE_ERRORS = 1;    # do not write errors to error log channel by default
+our $IGNORE_ERRORS = 1;            # do not write errors to error log channel by default
 
 # needed to properly destruct TEMP_DIR
 $SIG->{INT} = AE::signal INT => \&SIGINT;
@@ -14,12 +14,42 @@ $SIG->{INT} = AE::signal INT => \&SIGINT;
 # required for properly remove TEMP_DIR
 $SIG->{TERM} = AE::signal TERM => \&SIGTERM;
 
-$SIG{__DIE__} = \&SIGDIE;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+$SIG{__DIE__} = \&SIGDIE;          ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 
-$SIG{__WARN__} = \&SIGWARN;  ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+$SIG{__WARN__} = \&SIGWARN;        ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 
 # we don't need stacktrace from Error::TypeTiny exceptions
 $Error::TypeTiny::StackTrace = 0;
+
+$Coro::State::DIEHOOK = sub {
+
+    # not in eval
+    if ( !$^S ) {
+        my $e = Pcore::Core::Exception::Object->new( $_[0], level => 'ERROR', skip_frames => 1, with_trace => 1 );
+
+        {
+            local $@;
+
+            eval { $e->sendlog('FATAL') };
+        }
+
+        $Coro::current->cancel( result 500 );
+    }
+
+    return;
+};
+
+$Coro::State::WARNHOOK = sub {
+    my $e = Pcore::Core::Exception::Object->new( $_[0], level => 'ERROR', skip_frames => 1, with_trace => 1 );
+
+    {
+        local $@;
+
+        eval { $e->sendlog('FATAL') };
+    }
+
+    return;
+};
 
 # redefine Carp::longmess, Carp::shotmess, disable stack trace
 {
@@ -152,9 +182,10 @@ sub cluck {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 53, 64, 75, 92       | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |    3 | 31, 46, 83, 94, 105, | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |      |  122                 |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 55, 66, 77           | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 33, 48, 85, 96, 107  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

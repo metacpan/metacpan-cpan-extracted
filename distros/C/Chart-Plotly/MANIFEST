@@ -585,8 +585,6 @@ t/author-pod-syntax.t
 t/author-synopsis.t
 template/attribute.tmpl
 template/trace.tmpl
-tool/dump.js
-tool/generate.pl
 tool/generate_from_schema.pl
 tool/generate_images_from_examples.pl
 weaver.ini

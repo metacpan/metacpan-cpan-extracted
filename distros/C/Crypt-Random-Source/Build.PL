@@ -87,7 +87,7 @@ EOW
         "\x{5d9}\x{5d5}\x{5d1}\x{5dc} \x{5e7}\x{5d5}\x{5d2}'\x{5de}\x{5df} (Yuval Kogman) <nothingmuch\@woobling.org>"
       ],
       "dist_name" => "Crypt-Random-Source",
-      "dist_version" => "0.13",
+      "dist_version" => "0.14",
       "license" => "perl",
       "module_name" => "Crypt::Random::Source",
       "recursive_test_files" => 1,

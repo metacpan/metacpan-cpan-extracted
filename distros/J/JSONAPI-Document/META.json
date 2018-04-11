@@ -50,7 +50,7 @@
    "provides" : {
       "JSONAPI::Document" : {
          "file" : "lib/JSONAPI/Document.pm",
-         "version" : "1.0"
+         "version" : "1.1"
       }
    },
    "release_status" : "stable",
@@ -60,7 +60,7 @@
          "web" : "https://github.com/ziali088/jsonapi-document.git"
       }
    },
-   "version" : "1.0",
+   "version" : "1.1",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],

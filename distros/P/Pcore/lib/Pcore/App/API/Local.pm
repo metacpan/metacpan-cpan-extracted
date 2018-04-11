@@ -99,6 +99,72 @@ sub init ( $self, $cb ) {
     return;
 }
 
+sub init_coro ( $self, $cb ) {
+    use Coro;
+
+    $self->{_hash_cache} = P->hash->limited( $self->{_hash_cache_size} );
+
+    # create DBH
+    $self->{dbh} = P->handle( $self->{app}->{app_cfg}->{api}->{connect} );
+
+    # update schema
+    $self->_db_add_schema_patch( $self->{dbh} );
+
+    print 'Upgrading API DB schema ... ';
+
+    my $coro = async {
+        $self->{dbh}->upgrade_schema(rouse_cb);
+
+        return $res unless my $res = rouse_wait;
+
+        my $roles = do {
+            no strict qw[refs];
+
+            ${ ref( $self->{app} ) . '::APP_API_ROLES' };
+        };
+
+        # add api roles
+        $self->_db_add_roles( $self->{dbh}, $roles, rouse_cb );
+
+        # failed to add roles
+        return $res unless $res = rouse_wait;
+
+        # run hash RPC
+        print 'Starting API RPC ... ';
+
+        P->pm->run_rpc(
+            'Pcore::App::API::RPC::Hash',
+            workers   => $self->{app}->{app_cfg}->{api}->{rpc}->{workers},
+            buildargs => $self->{app}->{app_cfg}->{api}->{rpc}->{argon},
+            on_ready  => rouse_cb,
+        );
+
+        $self->{_hash_rpc} = rouse_wait;
+
+        $self->{_hash_rpc}->connect_rpc( on_connect => rouse_cb );
+
+        rouse_wait;
+
+        say 'done';
+
+        print 'Creating root user ... ';
+
+        my $root_password = P->random->bytes_hex(32);
+
+        $self->create_user( 'root', $root_password, 1, undef, rouse_cb );
+
+        $res = rouse_wait;
+
+        say $res . ( $res ? ", password: $root_password" : q[] );
+
+        return result 200;
+    };
+
+    $coro->on_destroy( sub { $cb->(@_) } );
+
+    return;
+}
+
 # AUTHENTICATE
 sub do_authenticate_private ( $self, $private_token, $cb ) {
     if ( $private_token->[0] == $TOKEN_TYPE_USER_PASSWORD ) {
@@ -1127,8 +1193,8 @@ SQL
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 131, 153, 203, 311,  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |      | 517, 729, 1091       |                                                                                                                |
+## |    3 | 197, 219, 269, 377,  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |      | 583, 795, 1157       |                                                                                                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

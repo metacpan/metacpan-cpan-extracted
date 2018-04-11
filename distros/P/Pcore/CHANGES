@@ -1,3 +1,18 @@
+v0.60.0 2018-04-09T05:05:08Z
+ - bash source wget updated to return false in case of HTTP error
+ - app fix www storage undef value
+ - app template updated
+ - RPC handshake protocol updated
+ - RPC hub
+ - check defined
+ - typo
+ - pcore start rpc template on -rpc pragma
+ - RPC template
+ - promise removed
+ - coro
+ - cookies path comparison fixed
+ - cookies fixed
+
 v0.59.1 2018-04-05T22:04:21Z
  - docker build status text updated
  - make usage of Pcore::Share::WWW conditional

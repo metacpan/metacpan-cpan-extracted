@@ -1,19 +1,20 @@
-package HTML::FormFu::Filter::HTMLScrubber;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Filter::HTMLScrubber;
+$HTML::FormFu::Filter::HTMLScrubber::VERSION = '2.06';
+# ABSTRACT: filter removing HTML markup
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 extends 'HTML::FormFu::Filter';
 
 use Clone ();
 
-has allow   => ( is => 'rw', traits => ['FormFuChained'] );
-has comment => ( is => 'rw', traits => ['FormFuChained'] );
-has default => ( is => 'rw', traits => ['FormFuChained'] );
-has rules   => ( is => 'rw', traits => ['FormFuChained'] );
-has script  => ( is => 'rw', traits => ['FormFuChained'] );
+has allow   => ( is => 'rw', traits => ['Chained'] );
+has comment => ( is => 'rw', traits => ['Chained'] );
+has default => ( is => 'rw', traits => ['Chained'] );
+has rules   => ( is => 'rw', traits => ['Chained'] );
+has script  => ( is => 'rw', traits => ['Chained'] );
 
 use HTML::Scrubber;
 
@@ -50,13 +51,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Filter::HTMLScrubber - filter removing HTML markup
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 DESCRIPTION
 
@@ -84,5 +89,16 @@ Lyo Kato, C<lyo.kato@gmail.com>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

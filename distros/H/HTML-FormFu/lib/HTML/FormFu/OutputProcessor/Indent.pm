@@ -1,10 +1,11 @@
-package HTML::FormFu::OutputProcessor::Indent;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::OutputProcessor::Indent;
+$HTML::FormFu::OutputProcessor::Indent::VERSION = '2.06';
+# ABSTRACT: Nicely Indent HTML Output
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 extends 'HTML::FormFu::OutputProcessor';
 
 use HTML::FormFu::Constants qw( $EMPTY_STR $SPACE );
@@ -15,14 +16,14 @@ has indent => (
     is      => 'rw',
     default => "\t",
     lazy    => 1,
-    traits  => ['FormFuChained'],
+    traits  => ['Chained'],
 );
 
 has preserve_tags => (
     is      => 'rw',
     default => sub { [qw( pre textarea )] },
     lazy    => 1,
-    traits  => ['FormFuChained'],
+    traits  => ['Chained'],
 );
 
 sub process {
@@ -102,13 +103,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::OutputProcessor::Indent - Nicely Indent HTML Output
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -148,5 +153,16 @@ Carl Franks C<cfranks@cpan.org>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

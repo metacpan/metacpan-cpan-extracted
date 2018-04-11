@@ -6,7 +6,7 @@ pherkin - Execute tests written using Test::BDD::Cucumber
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 SYNOPSIS
 

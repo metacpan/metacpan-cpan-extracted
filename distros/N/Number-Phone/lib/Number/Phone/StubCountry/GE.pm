@@ -22,20 +22,20 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200234;
+our $VERSION = 1.20180410221546;
 
 my $formatters = [
                 {
-                  'national_rule' => '0$1',
-                  'leading_digits' => '[348]',
                   'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
+                  'leading_digits' => '[348]',
+                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3 $4'
                 },
                 {
-                  'leading_digits' => '7',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1'
+                  'leading_digits' => '7',
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3'
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
@@ -46,6 +46,8 @@ my $formatters = [
 
 my $validators = {
                 'personal_number' => '',
+                'pager' => '',
+                'specialrate' => '',
                 'mobile' => '
           5(?:
             [14]4|
@@ -72,7 +74,7 @@ my $validators = {
             )
           )\\d{6}
         ',
-                'specialrate' => '',
+                'voip' => '706\\d{6}',
                 'toll_free' => '800\\d{6}',
                 'fixed_line' => '
           (?:
@@ -90,9 +92,7 @@ my $validators = {
               9[1-7]
             )
           )\\d{6}
-        ',
-                'pager' => '',
-                'voip' => '706\\d{6}'
+        '
               };
 
     sub new {
@@ -100,13 +100,9 @@ my $validators = {
       my $number = shift;
       $number =~ s/(^\+995|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
-  
       return $self if ($self->is_valid());
-      {
-        no warnings 'uninitialized';
-        $number =~ s/^(?:0)//;
-      }
+      $number =~ s/^(?:0)//;
       $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
-    return $self->is_valid() ? $self : undef;
-}
+      return $self->is_valid() ? $self : undef;
+    }
 1;

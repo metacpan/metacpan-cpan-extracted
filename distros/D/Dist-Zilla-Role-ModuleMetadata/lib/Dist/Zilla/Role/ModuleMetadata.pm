@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Role::ModuleMetadata; # git description: v0.004-8-g57345e4
+package Dist::Zilla::Role::ModuleMetadata; # git description: v0.005-3-g1691291
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A role for plugins that use Module::Metadata
 # KEYWORDS: zilla distribution plugin role metadata cache packages versions
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use Moose::Role;
 use Module::Metadata 1.000005;
@@ -74,7 +74,7 @@ Dist::Zilla::Role::ModuleMetadata - A role for plugins that use Module::Metadata
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

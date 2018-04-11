@@ -1,5 +1,5 @@
 {
-   "abstract" : "Create Zip Archives",
+   "abstract" : "Create and Read Zip Archives",
    "author" : [
       "Paul Marquess <pmqs@cpan.org>"
    ],
@@ -34,11 +34,11 @@
       },
       "runtime" : {
          "requires" : {
-            "IO::Compress::Zip" : "2.06"
+            "IO::Compress::Base" : "2.081"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.010",
+   "version" : "0.022",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

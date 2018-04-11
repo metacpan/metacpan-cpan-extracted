@@ -12,7 +12,7 @@ sub test_now {
 
     my $expected = Time::HiRes::gettimeofday() * 1000.0;
     my $got = $duk->eval('timestamp_ms()');
-    my $margin = 0.2;
+    my $margin = 0.9;
     my $delta = abs($got - $expected);
     ok($delta < $margin, "got correct JS timestamp within $margin ms");
 

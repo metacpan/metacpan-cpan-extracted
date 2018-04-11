@@ -7,7 +7,7 @@ use Test::Mojo;
 
 use Data::Dumper;
 
-plugin 'JSONAPI';
+plugin 'JSONAPI', { data_dir => 't/share' };
 
 get '/' => sub {
     my $c = shift;

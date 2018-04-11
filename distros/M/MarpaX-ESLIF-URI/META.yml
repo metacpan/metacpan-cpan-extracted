@@ -16,7 +16,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,27 +29,31 @@ no_index:
 provides:
   MarpaX::ESLIF::URI:
     file: lib/MarpaX/ESLIF/URI.pm
-    version: '0.004'
+    version: '0.005'
   MarpaX::ESLIF::URI::file:
     file: lib/MarpaX/ESLIF/URI/file.pm
-    version: '0.004'
+    version: '0.005'
   MarpaX::ESLIF::URI::ftp:
     file: lib/MarpaX/ESLIF/URI/ftp.pm
-    version: '0.004'
+    version: '0.005'
   MarpaX::ESLIF::URI::http:
     file: lib/MarpaX/ESLIF/URI/http.pm
-    version: '0.004'
+    version: '0.005'
   MarpaX::ESLIF::URI::https:
     file: lib/MarpaX/ESLIF/URI/https.pm
-    version: '0.004'
+    version: '0.005'
   MarpaX::ESLIF::URI::mailto:
     file: lib/MarpaX/ESLIF/URI/mailto.pm
-    version: '0.004'
+    version: '0.005'
+  MarpaX::ESLIF::URI::tag:
+    file: lib/MarpaX/ESLIF/URI/tag.pm
+    version: '0.005'
 requires:
   Carp: '0'
   Class::Load: '0'
   Class::Method::Modifiers: '0'
   Class::Tiny::Antlers: '0'
+  DateTime: '0'
   Log::Any: '0'
   MarpaX::ESLIF: '0'
   Net::servent: '0'
@@ -63,8 +67,8 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MarpaX-ESLIF-URI
   homepage: https://metacpan.org/release/MarpaX-ESLIF-URI
   repository: git://github.com/jddurand/perl-marpax-eslif-uri.git
-version: '0.004'
+version: '0.005'
 x_authority: cpan:JDDPAUSE
 x_contributors:
   - 'Jean-Damien Durand <Jean-Damien.Durand@newaccess.ch>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.73'

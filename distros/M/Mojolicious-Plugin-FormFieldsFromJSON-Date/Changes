@@ -1,6 +1,15 @@
 Release history for Mojolicious::Plugin::FormFieldsFromJSON::Date
 =================================================================
 
+1.00 2018-04-10 08:58:00
+
+  [BUGFIX]
+  * Fixed tests as Mojolicious changed the "selected" attribute a long time ago (thanks, Paul Cochrane)
+
+  [IMPROVEMENTS]
+  * Paul Cochrane did a lot of work to improve the quality, like
+    adding META information
+
 0.03 2015-01-01
 
   [BUGFIX]

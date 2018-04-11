@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Authen::U2F::Tester;
-$Authen::U2F::Tester::VERSION = '0.02';
+$Authen::U2F::Tester::VERSION = '0.03';
 # ABSTRACT: FIDO/U2F Authentication Test Client
 
 use Moose;
@@ -139,14 +139,14 @@ sub sign {
     # generate the signature
     my $sign_data = pack 'a32 a N a32',
         sha256($app_id),            # 32 byte SHA256 application parameter
-        chr(0x00),                  # 1 byte user presence
+        chr(0x01),                  # 1 byte user presence
         $counter,                   # 4 byte counter
         sha256($client_data);       # 32 byte SHA256 of client data JSON
 
     my $signature = $pkec->sign_hash(sha256($sign_data));
 
     my $response = pack 'a N a*',
-        chr(0x00),
+        chr(0x01),
         $counter,
         $signature;
 
@@ -169,7 +169,7 @@ Authen::U2F::Tester - FIDO/U2F Authentication Test Client
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -395,13 +395,17 @@ Example:
 
 =head1 SOURCE
 
-The development version is on github at L<https://github.com/mschout/perl-authen-u2f-tester>
-and may be cloned from L<git://github.com/mschout/perl-authen-u2f-tester.git>
+The development version is on github at L<http://https://github.com/mschout/perl-authen-u2f-tester>
+and may be cloned from L<git://https://github.com/mschout/perl-authen-u2f-tester.git>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to bug-authen-u2f-tester@rt.cpan.org or through the web interface at:
- http://rt.cpan.org/Public/Dist/Display.html?Name=Authen-U2F-Tester
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/mschout/perl-authen-u2f-tester/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 

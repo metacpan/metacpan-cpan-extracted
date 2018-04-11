@@ -22,32 +22,31 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200236;
+our $VERSION = 1.20180410221548;
 
 my $formatters = [
                 {
-                  'pattern' => '([49])(\\d{3})(\\d{2,4})',
+                  'national_rule' => '0$1',
                   'leading_digits' => '
             4|
             9[2-9]
           ',
                   'format' => '$1 $2 $3',
-                  'national_rule' => '0$1'
+                  'pattern' => '([49])(\\d{3})(\\d{2,4})'
                 },
                 {
-                  'format' => '$1 $2 $3',
                   'pattern' => '(7\\d)(\\d{3})(\\d{4})',
-                  'leading_digits' => '7',
-                  'national_rule' => '0$1'
-                },
-                {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '86[24]',
-                  'pattern' => '(86\\d{2})(\\d{3})(\\d{3})',
-                  'national_rule' => '0$1'
+                  'national_rule' => '0$1',
+                  'leading_digits' => '7'
                 },
                 {
-                  'pattern' => '([2356]\\d{2})(\\d{3,5})',
+                  'pattern' => '(86\\d{2})(\\d{3})(\\d{3})',
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1',
+                  'leading_digits' => '86[24]'
+                },
+                {
                   'leading_digits' => '
             2(?:
               0[45]|
@@ -70,11 +69,11 @@ my $formatters = [
               75
             )
           ',
+                  'national_rule' => '0$1',
                   'format' => '$1 $2',
-                  'national_rule' => '0$1'
+                  'pattern' => '([2356]\\d{2})(\\d{3,5})'
                 },
                 {
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             2(?:
               1[39]|
@@ -86,10 +85,13 @@ my $formatters = [
             )|
             329
           ',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3,4})',
-                  'national_rule' => '0$1'
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3,4})'
                 },
                 {
+                  'format' => '$1 $2',
+                  'national_rule' => '0$1',
                   'leading_digits' => '
             1[3-9]|
             2[02569]|
@@ -97,53 +99,41 @@ my $formatters = [
             5[05689]|
             6
           ',
-                  'pattern' => '([1-356]\\d)(\\d{3,5})',
-                  'format' => '$1 $2',
-                  'national_rule' => '0$1'
+                  'pattern' => '([1-356]\\d)(\\d{3,5})'
                 },
                 {
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
                   'pattern' => '([235]\\d)(\\d{3})(\\d{3,4})',
                   'leading_digits' => '
             [23]9|
             54
-          '
+          ',
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3'
                 },
                 {
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2',
                   'pattern' => '([25]\\d{3})(\\d{3,5})',
                   'leading_digits' => '
             258[23]|
             5483
-          '
+          ',
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2'
                 },
                 {
-                  'format' => '$1 $2',
+                  'national_rule' => '0$1',
                   'leading_digits' => '86',
-                  'pattern' => '(8\\d{3})(\\d{6})',
-                  'national_rule' => '0$1'
+                  'format' => '$1 $2',
+                  'pattern' => '(8\\d{3})(\\d{6})'
                 },
                 {
                   'pattern' => '(80\\d)(\\d{4})',
-                  'leading_digits' => '80',
                   'format' => '$1 $2',
-                  'national_rule' => '0$1'
+                  'national_rule' => '0$1',
+                  'leading_digits' => '80'
                 }
               ];
 
 my $validators = {
-                'voip' => '
-          86(?:
-            1[12]|
-            30|
-            55|
-            77|
-            8[368]
-          )\\d{6}
-        ',
-                'pager' => '',
                 'fixed_line' => '
           (?:
             2(?:
@@ -246,13 +236,21 @@ my $validators = {
             9[2-9]\\d{4,5}
           )
         ',
-                'specialrate' => '',
                 'toll_free' => '
           80(?:
             [01]\\d|
             20|
             8[0-8]
           )\\d{3}
+        ',
+                'voip' => '
+          86(?:
+            1[12]|
+            30|
+            55|
+            77|
+            8[368]
+          )\\d{6}
         ',
                 'geographic' => '
           (?:
@@ -356,7 +354,6 @@ my $validators = {
             9[2-9]\\d{4,5}
           )
         ',
-                'personal_number' => '',
                 'mobile' => '
           (?:
             7(?:
@@ -367,7 +364,10 @@ my $validators = {
             )|
             8644
           )\\d{6}
-        '
+        ',
+                'specialrate' => '',
+                'pager' => '',
+                'personal_number' => ''
               };
 my %areanames = (
   26313 => "Victoria\ Falls",
@@ -542,13 +542,9 @@ my %areanames = (
       my $number = shift;
       $number =~ s/(^\+263|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-  
       return $self if ($self->is_valid());
-      {
-        no warnings 'uninitialized';
-        $number =~ s/^(?:0)//;
-      }
+      $number =~ s/^(?:0)//;
       $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-    return $self->is_valid() ? $self : undef;
-}
+      return $self->is_valid() ? $self : undef;
+    }
 1;

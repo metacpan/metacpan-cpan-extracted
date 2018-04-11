@@ -157,6 +157,7 @@ test/complete.fasta
 test/cyano.org-idm
 test/cyanos.arb
 test/cyanos_taxa.tre
+test/debrief42-accurate.fra
 test/empty_seqs.ali
 test/euka-adl.cls
 test/fetch-tax-baseid.idl
@@ -340,9 +341,9 @@ test/tab_mapper_mustids.tsv
 test/tab_mapper_with_idm.idm
 test/tab_mapper_with_idm.tsv
 test/taxdump/gc.prt
-test/taxdump/misleading.dmp
-test/taxdump/names_u1.dmp
-test/taxdump/nodes_u1.dmp
+test/taxdump/misleading.dmp.unused
+test/taxdump/names_u1.dmp.unused
+test/taxdump/nodes_u1.dmp.unused
 test/temp.fasta
 test/temp_degap.fasta
 test/temp_degap_nowrap.fasta

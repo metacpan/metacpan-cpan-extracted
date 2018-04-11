@@ -7,7 +7,7 @@
       ]
    },
    "resources" : {
-      "homepage" : "https://github.com/barefootcoder/debuggit/tree",
+      "homepage" : "https://github.com/barefootcoder/debuggit/",
       "repository" : "git://github.com/barefootcoder/debuggit.git",
       "license" : "http://opensource.org/licenses/artistic-license.php"
    },
@@ -15,9 +15,9 @@
       "version" : 1.4,
       "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
    },
-   "generated_by" : "Module::Install version 1.06 using Module::Install::JSONMETA version 7.001",
+   "generated_by" : "Module::Install version 1.18 using Module::Install::JSONMETA version 7.001",
    "distribution_type" : "module",
-   "version" : "2.06",
+   "version" : "2.07",
    "name" : "Debuggit",
    "author" : [
       "Buddy Burden"

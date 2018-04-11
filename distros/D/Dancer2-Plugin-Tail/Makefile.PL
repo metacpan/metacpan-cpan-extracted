@@ -22,7 +22,7 @@ WriteMakefile(
         'Dancer2'              => 0,
         'Dancer2::Core::Types' => 0,
         'Dancer2::Plugin'      => 0,
-        'Moo'                  => 0,
+        "Moo"                  => "2.000000",
         'Moo::Role'            => 0,
         'YAML'                 => 0, 
         'Session::Token'       => 0,
@@ -38,4 +38,11 @@ WriteMakefile(
         },
     },
 );
+
+
+
+
+
+
+
 

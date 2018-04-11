@@ -81,7 +81,12 @@ sub fire_remote_event ( $self, $key, $data = undef ) {
     return;
 }
 
+# TODO not quite correct, need to set listeners AFTER connection will be established
 sub forward_remote_event ( $self, $ev ) {
+
+    # TODO workaround for not quite correct, need to set listeners AFTER connection will be established
+    return if !defined $self->{h};
+
     my $msg = {
         type => $TX_TYPE_EVENT,
         ev   => $ev,
@@ -92,6 +97,7 @@ sub forward_remote_event ( $self, $ev ) {
     return;
 }
 
+# TODO not quite correct, need to set listeners AFTER connection will be established
 sub before_connect_server ( $self, $env, $args ) {
     if ( $env->{HTTP_PCORE_LISTEN_EVENTS} ) {
         my $masks = [ map { trim $_} split /,/sm, $env->{HTTP_PCORE_LISTEN_EVENTS} ];
@@ -203,7 +209,7 @@ sub _set_listeners ( $self, $masks ) {
         $self->{_listeners}->{$mask} = P->listen_events(
             $mask,
             sub ( $ev ) {
-                $self->forward_remote_event($ev) if $self;
+                $self->forward_remote_event($ev) if defined $self;
 
                 return;
             }
@@ -279,7 +285,7 @@ sub _on_message ( $self, $msg, $is_json ) {
                         weaken $weak_self;
 
                         $req->{_cb} = sub ($res) {
-                            return if !$weak_self;
+                            return if !defined $weak_self;
 
                             my $result;
 
@@ -339,9 +345,9 @@ sub _on_message ( $self, $msg, $is_json ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 216                  | Subroutines::ProhibitExcessComplexity - Subroutine "_on_message" with high complexity score (27)               |
+## |    3 | 222                  | Subroutines::ProhibitExcessComplexity - Subroutine "_on_message" with high complexity score (27)               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 264, 286, 301        | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 270, 292, 307        | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

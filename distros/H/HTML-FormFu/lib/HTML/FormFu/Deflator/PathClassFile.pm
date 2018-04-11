@@ -1,15 +1,16 @@
-package HTML::FormFu::Deflator::PathClassFile;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Deflator::PathClassFile;
+$HTML::FormFu::Deflator::PathClassFile::VERSION = '2.06';
+# ABSTRACT: Deflator for Path::Class::File objects
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 extends 'HTML::FormFu::Deflator';
 
-has relative => ( is => 'rw', traits => ['FormFuChained'] );
-has absolute => ( is => 'rw', traits => ['FormFuChained'] );
-has basename => ( is => 'rw', traits => ['FormFuChained'] );
+has relative => ( is => 'rw', traits => ['Chained'] );
+has absolute => ( is => 'rw', traits => ['Chained'] );
+has basename => ( is => 'rw', traits => ['Chained'] );
 
 sub deflator {
     my ( $self, $value ) = @_;
@@ -41,13 +42,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Deflator::PathClassFile - Deflator for Path::Class::File objects
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -90,7 +95,6 @@ Set this to 1 to get the name of the file without the directory portion.
 As you cannot set values for a File element, this deflator will only work
 on regular form elements.
 
-
 =head1 AUTHOR
 
 Moritz Onken, C<onken@houseofdesign.de>
@@ -99,5 +103,16 @@ Moritz Onken, C<onken@houseofdesign.de>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

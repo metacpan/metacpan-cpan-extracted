@@ -1,17 +1,18 @@
-package HTML::FormFu::Element::Repeatable;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Element::Repeatable;
+$HTML::FormFu::Element::Repeatable::VERSION = '2.06';
+# ABSTRACT: repeatable block element
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 extends 'HTML::FormFu::Element::Block';
 
 use HTML::FormFu::Util qw( DEBUG_PROCESS debug );
 use List::Util qw( first );
 use Carp qw( croak );
 
-has counter_name => ( is => 'rw', traits => ['FormFuChained'] );
+has counter_name => ( is => 'rw', traits => ['Chained'] );
 
 has _original_elements => ( is => 'rw' );
 
@@ -19,7 +20,7 @@ has increment_field_names => (
     is      => 'rw',
     default => 1,
     lazy    => 1,
-    traits  => ['FormFuChained'],
+    traits  => ['Chained'],
 );
 
 # This attribute is currently not documented as FF::Model::HashRef
@@ -29,7 +30,7 @@ has repeatable_delimiter => (
     is      => 'rw',
     default => '_',
     lazy    => 1,
-    traits  => ['FormFuChained'],
+    traits  => ['Chained'],
 );
 
 after BUILD => sub {
@@ -325,13 +326,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Element::Repeatable - repeatable block element
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -485,7 +490,6 @@ Calling C<< $element->repeat(2) >> would result in the following markup:
         <input name="my_rep_2.bar" type="text" />
     </div>
 
-
 Because this is an 'inherited accessor' available on all elements, it can be
 used to determine whether any element is a child of a Repeatable element.
 
@@ -603,5 +607,16 @@ Carl Franks, C<cfranks@cpan.org>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

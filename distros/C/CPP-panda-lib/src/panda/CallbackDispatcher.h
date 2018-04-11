@@ -19,10 +19,10 @@ public:
         Callback real;
         SimpleCallback simple;
 
-        Wrapper(Callback real, SimpleCallback simple = nullptr) : real(real), simple(simple) {}
+        explicit Wrapper(Callback real, SimpleCallback simple = nullptr) : real(real), simple(simple) {}
 
         template <typename... RealArgs>
-        RetType operator()(RealArgs&&... args) {
+        auto operator()(RealArgs&&... args) -> decltype(real(args...)) {
             return real(args...);
         }
 
@@ -43,7 +43,7 @@ public:
             }
         }
 
-        template <typename T, typename Check = decltype(real == std::declval<T>())>
+        template <typename T, typename Check = decltype(real == std::declval<const T&>())>
         bool equal(const T& oth, Check* = nullptr) {
             return real == oth;
         }
@@ -64,14 +64,23 @@ public:
 
 
     void add(const Callback& callback) {
+        if (!callback) {
+            return;
+        }
         listeners.push_back(Wrapper(callback));
     }
 
     void add(Callback&& callback) {
+        if (!callback) {
+            return;
+        }
         listeners.push_back(Wrapper(std::forward<Callback>(callback)));
     }
 
     void add(const SimpleCallback& callback) {
+        if (!callback) {
+            return;
+        }
         auto wrapper = [callback](Event& e, Args... args) -> RetType {
             callback(std::forward<Args>(args)...);
             return e.next(std::forward<Args>(args)...);
@@ -83,8 +92,8 @@ public:
         listeners.push_back(Wrapper(wrapper, callback));
     }
 
-    template <typename... RealArgs>
-    RetType operator()(RealArgs&&... args) {
+    template <typename... RealArgs >
+    auto/*RetType*/ operator()(RealArgs&&... args) -> decltype(std::declval<Wrapper>()(std::declval<Event>(), std::forward<RealArgs>(args)...)) {
         auto iter = listeners.begin();
         if (iter == listeners.end()) return optional_tools<Ret>::default_value();
 

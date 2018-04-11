@@ -38,7 +38,7 @@ is( $n, 11, '11 bytes' );
 is( $remaining, 0, 'no missing bytes' );
 is( $data, 'Hello World', 'correct string' );
 XDeleteProperty($dpy, $win_id, $netwmname);
-is_deeply( [ XListProperties($dpy, $win_id) ], \@initial_properties, 'deleted title property' );
+is( scalar(grep { $_ == $netwmname } XListProperties($dpy, $win_id)), 0, 'deleted title property' );
 
 # Now check OO interface
 my $win= $dpy->get_cached_window($win_id);

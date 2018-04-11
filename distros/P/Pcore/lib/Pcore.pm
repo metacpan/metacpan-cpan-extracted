@@ -1,4 +1,4 @@
-package Pcore v0.59.1;
+package Pcore v0.60.0;
 
 use v5.26.1;
 use common::header;
@@ -80,33 +80,43 @@ sub import {
         require B::Hooks::EndOfScope::XS;
         require EV;
         require AnyEvent;
+        require Coro;
 
         # install run-time hook to caller package
         B::Hooks::AtRuntime::at_runtime( \&Pcore::_CORE_RUN );
 
         # detect RPC server
-        if ( $import->{pragma}->{rpc} && $0 eq '-' ) {
+        if ( $import->{pragma}->{rpc} ) {
+            if ( $0 eq '-' ) {
 
-            # read and unpack boot args from STDIN
-            my $RPC_BOOT_ARGS = <>;
+                # read and unpack boot args from STDIN
+                my $RPC_BOOT_ARGS = <>;
 
-            chomp $RPC_BOOT_ARGS;
+                chomp $RPC_BOOT_ARGS;
 
-            require CBOR::XS;
+                require CBOR::XS;
 
-            $RPC_BOOT_ARGS = CBOR::XS::decode_cbor( pack 'H*', $RPC_BOOT_ARGS );
+                $RPC_BOOT_ARGS = CBOR::XS::decode_cbor( pack 'H*', $RPC_BOOT_ARGS );
 
-            # init RPC environment
-            $SCRIPT_PATH   = $RPC_BOOT_ARGS->{script_path};
-            $main::VERSION = version->new( $RPC_BOOT_ARGS->{version} );
+                # init RPC environment
+                $SCRIPT_PATH   = $RPC_BOOT_ARGS->{script_path};
+                $main::VERSION = version->new( $RPC_BOOT_ARGS->{version} );
 
-            B::Hooks::AtRuntime::after_runtime( sub {
-                require Pcore::RPC::Server;
+                B::Hooks::AtRuntime::after_runtime( sub {
+                    require Pcore::RPC::Server;
 
-                Pcore::RPC::Server::run( $caller, $RPC_BOOT_ARGS );
+                    Pcore::RPC::Server::run( $caller, $RPC_BOOT_ARGS );
 
-                exit;
-            } );
+                    exit;
+                } );
+            }
+            elsif ( !$MSWIN ) {
+                B::Hooks::AtRuntime::at_runtime( sub {
+                    require Pcore::RPC::Tmpl;
+
+                    return;
+                } );
+            }
         }
 
         _CORE_INIT();
@@ -639,25 +649,25 @@ sub sendlog ( $self, $key, $title, $data = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 64                   | Subroutines::ProhibitExcessComplexity - Subroutine "import" with high complexity score (22)                    |
+## |    3 | 64                   | Subroutines::ProhibitExcessComplexity - Subroutine "import" with high complexity score (23)                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 85                   | Variables::ProtectPrivateVars - Private variable used                                                          |
+## |    3 | 86                   | Variables::ProtectPrivateVars - Private variable used                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 248                  | BuiltinFunctions::ProhibitComplexMappings - Map blocks should have a single statement                          |
+## |    3 | 258                  | BuiltinFunctions::ProhibitComplexMappings - Map blocks should have a single statement                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 323                  | * Private subroutine/method '_apply_roles' declared but not used                                               |
-## |      | 443                  | * Private subroutine/method '_CORE_RUN' declared but not used                                                  |
+## |      | 333                  | * Private subroutine/method '_apply_roles' declared but not used                                               |
+## |      | 453                  | * Private subroutine/method '_CORE_RUN' declared but not used                                                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 355, 384, 387, 391,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
-## |      | 425, 428, 433, 436,  |                                                                                                                |
-## |      | 461, 487, 623        |                                                                                                                |
+## |    3 | 365, 394, 397, 401,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
+## |      | 435, 438, 443, 446,  |                                                                                                                |
+## |      | 471, 497, 633        |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 549                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 559                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 258                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
+## |    2 | 268                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 359                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
+## |    1 | 369                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

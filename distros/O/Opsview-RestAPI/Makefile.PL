@@ -30,13 +30,14 @@ my %WriteMakefileArgs = (
     "File::Basename" => 0,
     "File::Temp" => 0,
     "FindBin" => 0,
+    "POSIX" => 0,
     "Storable" => 0,
     "Test::Deep" => 0,
     "Test::More" => 0,
     "Test::Trap" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.180580",
+  "VERSION" => "1.181000",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +51,7 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "FindBin" => 0,
   "JSON" => 0,
+  "POSIX" => 0,
   "REST::Client" => 0,
   "Storable" => 0,
   "Test::Deep" => 0,

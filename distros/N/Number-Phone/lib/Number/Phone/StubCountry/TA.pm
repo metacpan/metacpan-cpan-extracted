@@ -22,19 +22,19 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200236;
+our $VERSION = 1.20180410221547;
 
 my $formatters = [];
 
 my $validators = {
-                'geographic' => '8\\d{3}',
-                'fixed_line' => '8\\d{3}',
-                'specialrate' => '',
-                'toll_free' => '',
-                'personal_number' => '',
-                'mobile' => '',
                 'voip' => '',
-                'pager' => ''
+                'toll_free' => '',
+                'fixed_line' => '8\\d{3}',
+                'personal_number' => '',
+                'pager' => '',
+                'mobile' => '',
+                'specialrate' => '',
+                'geographic' => '8\\d{3}'
               };
 my %areanames = (
   29022 => "Jamestown",
@@ -49,6 +49,6 @@ my %areanames = (
       my $number = shift;
       $number =~ s/(^\+290|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-  return $self->is_valid() ? $self : undef;
-}
+        return $self->is_valid() ? $self : undef;
+    }
 1;

@@ -22,6 +22,12 @@ This module requires these other libraries:
     Xtest
     Xext
 
+and has support for these optional libraries:
+
+    Xcomposite
+    Xfixes
+    Xrender
+
 COPYRIGHT AND LICENSE
 
 Copyright (C) 2009-2010 by Olivier Thauvin

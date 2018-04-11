@@ -1,7 +1,5 @@
 package MooseX::SingleArg;
-{
-  $MooseX::SingleArg::VERSION = '0.04';
-}
+$MooseX::SingleArg::VERSION = '0.05';
 use Moose ();
 use Moose::Exporter;
 
@@ -26,7 +24,7 @@ MooseX::SingleArg - No-fuss instantiation of Moose objects using a single argume
 =head1 DESCRIPTION
 
 This module allows Moose instances to be constructed with a single argument.
-Your class or role must use this module and then use the single_arg method to
+Your class or role must use this module and then use the single_arg sugar to
 declare which attribute will be assigned the single argument value.
 
 If the class is constructed using the typical argument list name/value pairs,
@@ -105,7 +103,7 @@ __END__
 =head1 SEE ALSO
 
 L<MooseX::OneArgNew> solves the same problem that this module solves.  I considered using OneArgNew
-for my own needs, but found it oddly combersom and confusing.  Maybe thats just me, but I hope that
+for my own needs, but found it oddly combersom and confusing.  Maybe that's just me, but I hope that
 this module's design is much simpler to comprehend and more natural to use.
 
 =head1 AUTHOR

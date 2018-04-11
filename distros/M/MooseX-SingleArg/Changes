@@ -1,16 +1,26 @@
 Revision history for Perl extension MooseX::SingleArg.
 
-0.04      2012-04-16
+0.05 2018-04-09
+
+ - Minor doc updates.
+ - As of 0.04 we are no longer using MooseX::ClassAttribute, so removing
+   it from the prereqs.
+
+0.04 2012-04-16
+
  - Use Moose's meta traits more effectively so that single args may be
    declared in roles.
 
-0.03      2012-03-20
+0.03 2012-03-20
+
  - Comment on MooseX::OneArgNew.
  - Add force option.
 
-0.02      2012-03-19
+0.02 2012-03-19
+
  - Fix prereqs.
 
-0.01      2012-03-19
+0.01 2012-03-19
+
  - First release.
 

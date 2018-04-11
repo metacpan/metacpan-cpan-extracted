@@ -20,19 +20,8 @@ sub run {
                 { 'rev-list' =>  [
                     '0000000000000000000000000000000000000000',
                 ]},
-                { 'rev-list' => ['1414997088 0000000000000000000000000000000000000000',] },
+                { log    => "1414997088\x{1}0000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
                 { branch => ['  master'] },
-                { show   => <<'SHOW_0' },
-commit 0000000000000000000000000000000000000000
-Author: Test User <test.user@example.com>
-Date:   Mon Nov 3 17:44:48 2014 +1100
-
-    Remember lists are 0 based!
-
-M   file1
-SHOW_0
-                { log    => [q{Test User}] },
-                { log    => [q{test.user@example.com}] },
             ],
             STD => {
                 OUT => <<'OUT',
@@ -51,19 +40,8 @@ OUT
                 { 'rev-list' =>  [
                     '0000000000000000000000000000000000000000',
                 ]},
-                { 'rev-list' => ['1414997088 0000000000000000000000000000000000000000',] },
+                { log    => "1414997088\x{1}0000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
                 { branch => ['  master'] },
-                { show   => <<'SHOW_0' },
-commit 0000000000000000000000000000000000000000
-Author: Test User <test.user@example.com>
-Date:   Mon Nov 3 17:44:48 2014 +1100
-
-    Remember lists are 0 based!
-
-M   file1
-SHOW_0
-                { log    => [q{Test User}] },
-                { log    => [q{test.user@example.com}] },
             ],
             STD => {
                 OUT => <<'OUT',
@@ -82,19 +60,8 @@ OUT
                 { 'rev-list' =>  [
                     '0000000000000000000000000000000000000000',
                 ]},
-                { 'rev-list' => ['1414997088 0000000000000000000000000000000000000000',] },
+                { log    => "1414997088\x{1}0000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
                 { branch => ['  master'] },
-                { show   => <<'SHOW_0' },
-commit 0000000000000000000000000000000000000000
-Author: Test User <test.user@example.com>
-Date:   Mon Nov 3 17:44:48 2014 +1100
-
-    Remember lists are 0 based!
-
-M   file1
-SHOW_0
-                { log    => [q{Test User}] },
-                { log    => [q{test.user@example.com}] },
             ],
             STD => {
                 OUT => {
@@ -116,19 +83,8 @@ SHOW_0
                 { 'rev-list' =>  [
                     '0000000000000000000000000000000000000000',
                 ]},
-                { 'rev-list' => ['1414997088 0000000000000000000000000000000000000000',] },
+                { log    => "1414997088\x{1}0000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
                 { branch => ['  master'] },
-                { show   => <<'SHOW_0' },
-commit 0000000000000000000000000000000000000000
-Author: Test User <test.user@example.com>
-Date:   Mon Nov 3 17:44:48 2014 +1100
-
-    Remember lists are 0 based!
-
-M   file1
-SHOW_0
-                { log    => [q{Test User}] },
-                { log    => [q{test.user@example.com}] },
             ],
             STD => {
                 OUT => {
@@ -149,19 +105,8 @@ SHOW_0
                 { 'rev-list' =>  [
                     '0000000000000000000000000000000000000000',
                 ]},
-                { 'rev-list' => ['1414997088 0000000000000000000000000000000000000000',] },
+                { log    => "1414997088\x{1}0000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
                 { branch => ['  master'] },
-                { show   => <<'SHOW_0' },
-commit 0000000000000000000000000000000000000000
-Author: Test User <test.user@example.com>
-Date:   Mon Nov 3 17:44:48 2014 +1100
-
-    Remember lists are 0 based!
-
-M   file1
-SHOW_0
-                { log    => [q{Test User}] },
-                { log    => [q{test.user@example.com}] },
             ],
             STD => {
                 OUT => '',
@@ -176,19 +121,8 @@ SHOW_0
                 { 'rev-list' =>  [
                     '0000000000000000000000000000000000000000',
                 ]},
-                { 'rev-list' => ['1414997088 0000000000000000000000000000000000000000',] },
+                { log    => "1414997088\x{1}0000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
                 { branch => ['  master'] },
-                { show   => <<'SHOW_0' },
-commit 0000000000000000000000000000000000000000
-Author: Test User <test.user@example.com>
-Date:   Mon Nov 3 17:44:48 2014 +1100
-
-    Remember lists are 0 based!
-
-M   file1
-SHOW_0
-                { log    => [q{Test User}] },
-                { log    => [q{test.user@example.com}] },
             ],
             STD => {
                 OUT => {
@@ -213,19 +147,8 @@ SHOW_0
                 { 'rev-list' =>  [
                     '0000000000000000000000000000000000000000',
                 ]},
-                { 'rev-list' => ['1414997088 0000000000000000000000000000000000000000',] },
+                { log    => "1414997088\x{1}0000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
                 { branch => ['  master'] },
-                { show   => <<'SHOW_0' },
-commit 0000000000000000000000000000000000000000
-Author: Test User <test.user@example.com>
-Date:   Mon Nov 3 17:44:48 2014 +1100
-
-    Remember lists are 0 based!
-
-M   file1
-SHOW_0
-                { log    => [q{Test User}] },
-                { log    => [q{test.user@example.com}] },
             ],
             STD => {
                 OUT => {
@@ -251,32 +174,10 @@ SHOW_0
                     '0000000000000000000000000000000000000000',
                     '1111111111111111111111111111111111111111',
                 ]},
-                { 'rev-list' => ['1414997088 0000000000000000000000000000000000000000',] },
+                { log    => "1414997088\x{1}0000000000000000000000000000000000000000\x{1}Test User\x{1}test.user\@example.com\x{1}file1\n" },
                 { branch => ['  master'] },
-                { show   => <<'SHOW_0' },
-commit 0000000000000000000000000000000000000000
-Author: Test User <test.user@example.com>
-Date:   Mon Nov 3 17:44:48 2014 +1100
-
-    Remember lists are 0 based!
-
-M   file1
-SHOW_0
-                { log    => [q{Test User}] },
-                { log    => [q{test.user@example.com}] },
-                { 'rev-list' => ['1414997089 1111111111111111111111111111111111111111',] },
+                { log    => "1414997088\x{1}1111111111111111111111111111111111111111\x{1}Test Other\x{1}test.other\@example.com\x{1}file1\n" },
                 { branch => ['  master'] },
-                { show   => <<'SHOW_0' },
-commit 1111111111111111111111111111111111111111
-Author: Test Other <test.other@example.com>
-Date:   Mon Nov 4 17:44:48 2014 +1100
-
-    Remember lists are 0 based!
-
-M   file1
-SHOW_0
-                { log    => [q{Test Other}] },
-                { log    => [q{test.other@example.com}] },
             ],
             STD => {
                 OUT => {

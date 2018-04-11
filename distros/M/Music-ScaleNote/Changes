@@ -1,5 +1,8 @@
 Revision history for Music-ScaleNote
 
+0.0303 2018-04-09 14:49:54
+    - Improve the documentation ever so slightly.
+
 0.0302 2018-04-08 02:59:27
     - Allow default note_format and offset values to be set in the constructor.
 

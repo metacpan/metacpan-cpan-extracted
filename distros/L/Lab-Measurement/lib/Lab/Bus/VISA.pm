@@ -1,6 +1,6 @@
 package Lab::Bus::VISA;
 #ABSTRACT: National Instruments VISA bus
-$Lab::Bus::VISA::VERSION = '3.624';
+$Lab::Bus::VISA::VERSION = '3.630';
 use strict;
 use Lab::VISA;
 use Scalar::Util qw(weaken);
@@ -379,7 +379,7 @@ Lab::Bus::VISA - National Instruments VISA bus
 
 =head1 VERSION
 
-version 3.624
+version 3.630
 
 =head1 SYNOPSIS
 

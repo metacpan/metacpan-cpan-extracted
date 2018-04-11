@@ -20,6 +20,10 @@ void create_constant  (pTHX_ HV* stash, const char* name, const char* value, AV*
 void create_constant  (pTHX_ HV* stash, const char* name, int64_t     value, AV* stash_constants_list = NULL);
 void create_constant  (pTHX_ HV* stash, constant_t constant, AV* stash_constants_list = NULL);
 
+void register_export (pTHX_ HV* stash, CV* sub);
+void register_export (pTHX_ HV* stash, SV* sub);
+void register_export (pTHX_ HV* stash, const char* name);
+
 void export_constants (pTHX_ HV* from, HV* to);
 void export_subs      (pTHX_ HV* from, HV* to, SV** list, size_t items);
 void export_subs      (pTHX_ HV* from, HV* to, const char** list, size_t items = MAX_ITEMS);

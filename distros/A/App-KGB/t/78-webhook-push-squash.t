@@ -43,8 +43,8 @@ my $webhook_url = sprintf(
     $test_bot->addr,
     $test_bot->port,
     join( '&',
-        'channel=test',       'network=local',
-        'squash_threshold=1', 'use_color=0' ),
+        'channel=test', 'network=local', 'squash_threshold=1',
+        'use_color=0',  'shorten_urls=0' ),
 );
 
 sub webhook_post {

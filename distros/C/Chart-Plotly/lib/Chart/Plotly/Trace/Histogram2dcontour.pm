@@ -15,7 +15,7 @@ use Chart::Plotly::Trace::Histogram2dcontour::Stream;
 use Chart::Plotly::Trace::Histogram2dcontour::Xbins;
 use Chart::Plotly::Trace::Histogram2dcontour::Ybins;
 
-our $VERSION = '0.017';    # VERSION
+our $VERSION = '0.018';    # VERSION
 
 # ABSTRACT: The sample data from which statistics are computed is set in `x` and `y` (where `x` and `y` represent marginal distributions, binning is set in `xbins` and `ybins` in this case) or `z` (where `z` represent the 2D distribution and binning set, binning is set by `x` and `y` in this case). The resulting distribution is visualized as a contour plot.
 
@@ -322,7 +322,7 @@ Chart::Plotly::Trace::Histogram2dcontour - The sample data from which statistics
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -555,7 +555,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Pablo Rodríguez González.
+This software is Copyright (c) 2018 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

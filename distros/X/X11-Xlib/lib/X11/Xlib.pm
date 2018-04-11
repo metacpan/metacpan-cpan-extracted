@@ -8,7 +8,7 @@ use base qw(Exporter DynaLoader);
 use Carp;
 use Try::Tiny;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 sub dl_load_flags { 1 } # Make PerlXLib.c functions available to other XS modules
 
@@ -1061,6 +1061,8 @@ and C<$pressed> indicates if the key was pressed or released.
 The optional C<$EventSendDelay> parameter specifies the number of milliseconds to wait
 before sending the event. The default is 10 milliseconds.
 
+See L<X11::Xlib::Keymap/EXAMPLES>.
+
 =head2 KEYSYM FUNCTIONS
 
 These utility functions help identify and convert KeySym values, and do not
@@ -1135,7 +1137,7 @@ Return true if C<$keysym> is on numeric keypad.
 
   IsMiscFunctionKey($keysym)
 
-Return true is key if... honestly don't know :\
+Return true if key is... no clue :/ and not documented anywhere??
 
 =head3 IsModifierKey
 
@@ -1171,7 +1173,7 @@ focused, or PointerRoot to actively track the root window of whatever screen
 the pointer moves to.
 
 Once the target window becomes un-viewable, the C<$revert_to> setting takes
-effect, and can be RevertToParent, RevertToPointerRoot, or RevertToNone.
+effect, and can be C<RevertToParent>, C<RevertToPointerRoot>, or C<RevertToNone>.
 
 =head3 XQueryKeymap
 
@@ -1303,7 +1305,7 @@ only elements C<($min_key .. $max_key)> be sent to the X server.
 Each element of the inner array can be an integer KeySym, or a KeySym name
 recognized by L</XStringToKeysym>, or a single unicode character.
 If the KeySym is an integer, it must be at least two integer digits, which
-all real KeySyms should be (other that NoSymbol which has the value 0, and
+all real KeySyms should be (other than C<NoSymbol> which has the value 0, and
 should be represented by C<undef>) to avoid ambiguity with the characters of
 the number keys.  i.e. "4" means "the KeySym for the character 4" rather than
 the KeySym value 4.
@@ -1366,6 +1368,7 @@ module was installed, then the following functions will be available.
 None of these functions are exportable.
 
   sudo apt-get install libxcomposite-dev   # Debian/Mint/Ubuntu
+  sudo yum install libXcomposite-devel     # Fedora/RHEL
 
 =head3 XCompositeVersion
 
@@ -1421,6 +1424,7 @@ module was installed, then the following functions will be available.
 None of these functions are exportable.
 
   sudo apt-get install libxrender-dev   # Debian/Mint/Ubuntu
+  sudo yum install libXrender-devel     # Fedora/RHEL
 
 =head3 XRenderQueryExtension
 
@@ -1548,11 +1552,15 @@ files needed for this module.  Try the following:
 
 =item Debian (Ubuntu, Mint)
 
-sudo apt-get install libxtst-dev
+  sudo apt-get install libxtst-dev
+  # and you probably want the optional deps, too
+  sudo apt-get install libxcomposite-dev libxrender-dev libxfixes-dev
 
 =item Fedora
 
-sudo yum install libXtst-devel
+  sudo yum install libXtst-devel
+  # and you probably want the optional deps, too
+  sudo yum install libXcomposite-devel libXrender-devel libXfixes-devel
 
 =back
 

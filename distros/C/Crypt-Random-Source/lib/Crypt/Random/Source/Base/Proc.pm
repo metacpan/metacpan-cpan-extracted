@@ -1,7 +1,7 @@
 package Crypt::Random::Source::Base::Proc;
 # ABSTRACT: Base class for helper processes (e.g. C<openssl>)
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Moo;
 
@@ -66,7 +66,7 @@ Crypt::Random::Source::Base::Proc - Base class for helper processes (e.g. C<open
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 

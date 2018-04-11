@@ -1,6 +1,9 @@
 package <: $module_name ~ "::Const" :>;
 
-use Pcore -const;
+use Pcore -const, -export => { CONST => [qw[$USER_ACTION_TOKEN_EMAIL $USER_ACTION_TOKEN_PASSWORD]] };
+
+const our $USER_ACTION_TOKEN_EMAIL    => 1;
+const our $USER_ACTION_TOKEN_PASSWORD => 2;
 
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
@@ -11,7 +14,7 @@ use Pcore -const;
 ## |======+======================+================================================================================================================|
 ## |    3 | 1                    | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 19                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 23 does not match the package declaration       |
+## |    1 | 22                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 26 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

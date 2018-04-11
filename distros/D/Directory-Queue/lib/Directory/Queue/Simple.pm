@@ -13,15 +13,16 @@
 package Directory::Queue::Simple;
 use strict;
 use warnings;
-our $VERSION  = "1.9";
-our $REVISION = sprintf("%d.%02d", q$Revision: 1.18 $ =~ /(\d+)\.(\d+)/);
+our $VERSION  = "2.0";
+our $REVISION = sprintf("%d.%02d", q$Revision: 1.19 $ =~ /(\d+)\.(\d+)/);
 
 #
 # used modules
 #
 
-use Directory::Queue qw(_name _touch SYSBUFSIZE /Regexp/ /file/ /special/);
+use Directory::Queue qw(_create _name _touch SYSBUFSIZE /Regexp/ /special/);
 use No::Worries::Die qw(dief);
+use No::Worries::File qw(file_read file_write);
 use No::Worries::Stat qw(ST_MTIME);
 use No::Worries::Warn qw(warnf);
 use POSIX qw(:errno_h);
@@ -86,27 +87,19 @@ sub _add_dir ($) {
 
 sub _add_data ($$) {
     my($self, $dataref) = @_;
-    my($dir, $name, $tmp, $fh, $length, $offset, $done);
+    my($dir, $name, $path, $fh);
 
     $dir = _add_dir($self);
     while (1) {
         $name = _name($self->{rndhex});
-        $tmp = $self->{path} . "/" . $dir . "/" . $name . TEMPORARY_SUFFIX;
-        $fh = _file_create($tmp, $self->{umask});
+        $path = $self->{path}."/".$dir."/".$name . TEMPORARY_SUFFIX;
+        $fh = _create($path, $self->{umask});
         last if $fh;
-        _special_mkdir($self->{path} . "/" . $dir, $self->{umask})
+        _special_mkdir($self->{path}."/".$dir, $self->{umask})
             if $! == ENOENT;
     }
-    $length = length(${ $dataref });
-    $offset = 0;
-    while ($length) {
-        $done = syswrite($fh, ${ $dataref }, SYSBUFSIZE, $offset);
-        dief("cannot syswrite(%s): %s", $tmp, $!) unless defined($done);
-        $length -= $done;
-        $offset += $done;
-    }
-    close($fh) or dief("cannot close(%s): %s", $tmp, $!);
-    return($dir, $tmp);
+    file_write($path, handle => $fh, data => $dataref);
+    return($dir, $path);
 }
 
 sub _add_path ($$$) {
@@ -115,11 +108,11 @@ sub _add_path ($$$) {
 
     while (1) {
         $name = _name($self->{rndhex});
-        $new = $self->{path} . "/" . $dir . "/" . $name;
+        $new = $self->{path}."/".$dir."/".$name;
         # N.B. we use link() + unlink() to make sure $new is never overwritten
         if (link($tmp, $new)) {
             unlink($tmp) or dief("cannot unlink(%s): %s", $tmp, $!);
-            return($dir . "/" . $name);
+            return($dir."/".$name);
         }
         dief("cannot link(%s, %s): %s", $tmp, $new, $!) unless $! == EEXIST;
     }
@@ -150,7 +143,7 @@ sub add_path : method {
     my($dir);
 
     $dir = _add_dir($self);
-    _special_mkdir($self->{path} . "/" . $dir, $self->{umask});
+    _special_mkdir($self->{path}."/".$dir, $self->{umask});
     return(_add_path($self, $path, $dir));
 }
 
@@ -161,19 +154,20 @@ sub add_path : method {
 sub get : method {
     my($self, $name) = @_;
 
-    return(${ _file_read_bin($self->{path} . "/" . $name . LOCKED_SUFFIX) });
+    return(file_read($self->{path}."/".$name . LOCKED_SUFFIX));
 }
 
 sub get_ref : method {
     my($self, $name) = @_;
+    my($data);
 
-    return(_file_read_bin($self->{path} . "/" . $name . LOCKED_SUFFIX));
+    return(file_read($self->{path}."/".$name . LOCKED_SUFFIX, data => \$data));
 }
 
 sub get_path : method {
     my($self, $name) = @_;
 
-    return($self->{path} . "/" . $name . LOCKED_SUFFIX);
+    return($self->{path}."/".$name . LOCKED_SUFFIX);
 }
 
 #
@@ -187,7 +181,7 @@ sub lock : method {  ## no critic 'ProhibitBuiltinHomonyms'
     my($path, $lock, $time, $ignored);
 
     $permissive = 1 unless defined($permissive);
-    $path = $self->{path} . "/" . $name;
+    $path = $self->{path}."/".$name;
     $lock = $path . LOCKED_SUFFIX;
     unless (link($path, $lock)) {
         return(0) if $permissive and ($! == EEXIST or $! == ENOENT);
@@ -222,7 +216,7 @@ sub unlock : method {
     my($path, $lock);
 
     $permissive = 0 unless defined($permissive);
-    $path = $self->{path} . "/" . $name;
+    $path = $self->{path}."/".$name;
     $lock = $path . LOCKED_SUFFIX;
     return(1) if unlink($lock);
     return(0) if $permissive and $! == ENOENT;
@@ -236,7 +230,7 @@ sub unlock : method {
 sub touch : method {
     my($self, $element) = @_;
 
-    _touch($self->{"path"} . "/" . $element);
+    _touch($self->{"path"}."/".$element);
 }
 
 #
@@ -247,7 +241,7 @@ sub remove : method {
     my($self, $name) = @_;
     my($path, $lock);
 
-    $path = $self->{path} . "/" . $name;
+    $path = $self->{path}."/".$name;
     $lock = $path . LOCKED_SUFFIX;
     unlink($path) or dief("cannot unlink(%s): %s", $path, $!);
     unlink($lock) or dief("cannot unlink(%s): %s", $lock, $!);
@@ -269,7 +263,7 @@ sub count : method {
     # count the elements inside
     foreach my $name (@list) {
         $count += grep(/^(?:$_ElementRegexp)$/o,
-                       _special_getdir($self->{path} . "/" . $name));
+                       _special_getdir($self->{path}."/".$name));
     }
     # that's all
     return($count);
@@ -284,7 +278,7 @@ sub _purge_dir ($$$) {
     my($path, @stat);
 
     foreach my $name (grep(/\./, _special_getdir($dir))) {
-        $path = $dir . "/" . $name;
+        $path = $dir."/".$name;
         @stat = stat($path);
         unless (@stat) {
             dief("cannot stat(%s): %s", $path, $!) unless $! == ENOENT;
@@ -328,7 +322,7 @@ sub purge : method {
     $oldlock = time() - $option{maxlock} if $option{maxlock};
     if ($oldtemp or $oldlock) {
         foreach my $name (@list) {
-            _purge_dir($self->{path} . "/" . $name, $oldtemp, $oldlock);
+            _purge_dir($self->{path}."/".$name, $oldtemp, $oldlock);
         }
     }
     # try to purge all but the last intermediate directory
@@ -336,7 +330,7 @@ sub purge : method {
         @list = sort(@list);
         pop(@list);
         foreach my $name (@list) {
-            $path = $self->{path} . "/" . $name;
+            $path = $self->{path}."/".$name;
             _special_rmdir($path) unless _special_getdir($path);
         }
     }
@@ -546,7 +540,7 @@ The toplevel directory contains intermediate directories that contain the
 stored elements, each of them in a file.
 
 The names of the intermediate directories are time based: the element
-insertion time is used to create a 8-digits long hexadecimal number.  The
+insertion time is used to create a 8-digits long hexadecimal number. The
 granularity (see the new() method) is used to limit the number of new
 directories. For instance, with a granularity of 60 (the default), new
 directories will be created at most once per minute.
@@ -589,4 +583,4 @@ L<Directory::Queue>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2010-2015
+Copyright (C) CERN 2010-2018

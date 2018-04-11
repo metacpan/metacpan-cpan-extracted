@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200234;
+our $VERSION = 1.20180410221546;
 
 my $formatters = [
                 {
@@ -32,24 +32,24 @@ my $formatters = [
               ];
 
 my $validators = {
-                'mobile' => '77\\d{6}',
-                'personal_number' => '',
-                'toll_free' => '',
                 'fixed_line' => '
           2(?:
             1[2-5]|
             7[45]
           )\\d{5}
         ',
-                'specialrate' => '',
+                'toll_free' => '',
+                'voip' => '',
                 'geographic' => '
           2(?:
             1[2-5]|
             7[45]
           )\\d{5}
         ',
+                'mobile' => '77\\d{6}',
+                'specialrate' => '',
                 'pager' => '',
-                'voip' => ''
+                'personal_number' => ''
               };
 
     sub new {
@@ -57,6 +57,6 @@ my $validators = {
       my $number = shift;
       $number =~ s/(^\+253|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
-  return $self->is_valid() ? $self : undef;
-}
+        return $self->is_valid() ? $self : undef;
+    }
 1;

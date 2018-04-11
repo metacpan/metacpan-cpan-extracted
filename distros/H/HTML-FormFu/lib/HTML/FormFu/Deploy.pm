@@ -1,9 +1,8 @@
-package HTML::FormFu::Deploy;
-
 use strict;
-use warnings;
 
-our $VERSION = '2.05'; # VERSION
+package HTML::FormFu::Deploy;
+$HTML::FormFu::Deploy::VERSION = '2.06';
+use warnings;
 
 use HTML::FormFu::Constants qw( $EMPTY_STR );
 use Cwd qw( getcwd );
@@ -17,8 +16,7 @@ use Carp qw( croak );
 our $SHARE_DIR;
 
 if ( -f 'MANIFEST.SKIP' && -d 'share/templates/tt/xhtml' ) {
-    warn
-        "Running as a developer, using the local, not installed templates\n\n"
+    warn "Running as a developer, using the local, not installed templates\n\n"
         unless ( $ENV{HARNESS_ACTIVE} );
 
     my $cwd = getcwd();
@@ -111,3 +109,30 @@ sub deploy {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::FormFu::Deploy
+
+=head1 VERSION
+
+version 2.06
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

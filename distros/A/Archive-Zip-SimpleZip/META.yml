@@ -1,5 +1,5 @@
 ---
-abstract: 'Create Zip Archives'
+abstract: 'Create and Read Zip Archives'
 author:
   - 'Paul Marquess <pmqs@cpan.org>'
 build_requires:
@@ -20,6 +20,6 @@ no_index:
     - t
     - private
 requires:
-  IO::Compress::Zip: '2.06'
-version: '0.010'
+  IO::Compress::Base: '2.081'
+version: '0.022'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

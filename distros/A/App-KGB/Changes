@@ -1,3 +1,24 @@
+1.47 (2018-04-10)
+  [ Damyan Ivanov ]
+  * webhook/merge request: drop "revision" output and put the action in square
+    brackets
+  * set default params in one place
+  * add shorten_urls webhook parameter, defaults to 1
+
+  [ James Clarke ]
+  * webhook:
+    + Better tag deletion messages
+    + Show branch deletions (Closes: #895283)
+
+  [ Damyan Ivanov ]
+  * fix warning about double "my" in 70-webhook-push.t
+  * fix 52-client-git.t and 53-client-git-merges.t with Git 1.17.
+    (Closes: 894775)
+
+  [ Colin Finck ]
+  * Git client: Support an "author-via" placeholder in the message template,
+    which shows the author and committer name if both are different.
+
 1.46 (2018-03-08)
   [ Damyan Ivanov ]
   * webhook/push: add always_squash_branch parameter, 

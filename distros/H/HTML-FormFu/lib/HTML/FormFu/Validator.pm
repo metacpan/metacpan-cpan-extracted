@@ -1,7 +1,8 @@
-package HTML::FormFu::Validator;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Validator;
+$HTML::FormFu::Validator::VERSION = '2.06';
+# ABSTRACT: Validator Base Class
 
 use Moose;
 extends 'HTML::FormFu::Processor';
@@ -57,7 +58,8 @@ sub return_error {
     my ( $self, $err ) = @_;
 
     if ( !blessed $err || !$err->isa('HTML::FormFu::Exception::Validator') ) {
-        $err = HTML::FormFu::Exception::Validator->new( $err ? { message => $err } : () );
+        $err = HTML::FormFu::Exception::Validator->new(
+            $err ? { message => $err } : () );
     }
 
     return $err;
@@ -69,13 +71,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Validator - Validator Base Class
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -110,10 +116,8 @@ Then, the form config file would just need:
 And the class would be something like this:
 
     package HTML::FormFu::Validator::MyApp::SomeValidator;
-    use strict;
-# VERSION
 
-use Moose;
+    use Moose;
     extends 'HTML::FormFu::Validator';
 
     sub validate_value {
@@ -141,5 +145,16 @@ Carl Franks, C<cfranks@cpan.org>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

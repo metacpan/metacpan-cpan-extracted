@@ -1,8 +1,6 @@
 package Net::Gmail::IMAP::Label::Proxy;
-{
-  $Net::Gmail::IMAP::Label::Proxy::VERSION = '0.007';
-}
-
+# ABSTRACT: Implementation of proxy logic for FETCH X-GM-LABELS
+$Net::Gmail::IMAP::Label::Proxy::VERSION = '0.008';
 use warnings;
 use strict;
 use POE qw(Component::Server::TCP Component::Client::TCP
@@ -145,7 +143,7 @@ sub put_label {
 	my $data = shift;
 	my $fetch_re = qr/^\* \d+ FETCH.*{\d+}$/;
 	my $label_re = qr/(?:[^() "]+)|$RE{delimited}{-delim=>'"'}/;
-	my $fetch_gm_label = qr/^(\* \d+ FETCH.*)(X-GM-LABELS \((?:(?:$label_re\s+)*$label_re)?\) ?)(.*){(\d+)}$/;
+	my $fetch_gm_label = qr/^(\* \d+ FETCH.*)(X-GM-LABELS \((?:(?:$label_re\s+)*$label_re)?\) ?)(.*)\{(\d+)\}$/;
 	if( $data =~ $fetch_gm_label ) {
 		my $octets = $4;
 		my $new_fetch = "$1$3";
@@ -179,3 +177,31 @@ sub put_label {
 1;
 
 # vim:ts=4:sw=4
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Net::Gmail::IMAP::Label::Proxy - Implementation of proxy logic for FETCH X-GM-LABELS
+
+=head1 VERSION
+
+version 0.008
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by Zakariyya Mughal <zmughal@cpan.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

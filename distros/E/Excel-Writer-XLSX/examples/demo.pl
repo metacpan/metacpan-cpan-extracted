@@ -37,12 +37,6 @@ my $heading = $workbook->add_format(
     align => 'vcenter',
 );
 
-my $hyperlink_format = $workbook->add_format(
-    color => 'blue',
-    underline => 1,
-);
-
-
 my @headings = ( 'Features of Excel::Writer::XLSX', '' );
 $worksheet->write_row( 'A1', \@headings, $heading );
 
@@ -97,7 +91,7 @@ $worksheet->write( 'B8', '=SIN(PI()/4)' );
 # Hyperlinks
 #
 $worksheet->write( 'A9', "Hyperlinks" );
-$worksheet->write( 'B9', 'http://www.perl.com/', $hyperlink_format );
+$worksheet->write( 'B9', 'http://www.perl.com/' );
 
 
 #######################################################################
@@ -114,5 +108,7 @@ $worksheet->insert_image( 'B10', 'republic.png', 16, 8 );
 #
 $worksheet->write( 'A18', "Page/printer setup" );
 $worksheet->write( 'A19', "Multiple worksheets" );
+
+$workbook->close();
 
 __END__

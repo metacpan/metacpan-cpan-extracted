@@ -22,19 +22,26 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200236;
+our $VERSION = 1.20180410221547;
 
 my $formatters = [];
 
 my $validators = {
-                'pager' => '',
                 'voip' => '55\\d{8}',
+                'toll_free' => '
+          80(?:
+            0\\d{6}|
+            3\\d{3}
+          )
+        ',
+                'fixed_line' => '06698\\d{5}',
                 'personal_number' => '
           1(?:
             78\\d|
             99
           )\\d{6}
         ',
+                'pager' => '',
                 'mobile' => '
           3(?:
             [12457-9]\\d{8}|
@@ -42,8 +49,6 @@ my $validators = {
             3\\d{7,9}
           )
         ',
-                'geographic' => '06698\\d{5}',
-                'fixed_line' => '06698\\d{5}',
                 'specialrate' => '(
           84(?:
             [08]\\d{6}|
@@ -68,12 +73,7 @@ my $validators = {
             9\\d{6}
           )
         )',
-                'toll_free' => '
-          80(?:
-            0\\d{6}|
-            3\\d{3}
-          )
-        '
+                'geographic' => '06698\\d{5}'
               };
 my %areanames = (
   39010 => "Genoa",
@@ -202,6 +202,6 @@ my %areanames = (
       my $number = shift;
       $number =~ s/(^\+39|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-  return $self->is_valid() ? $self : undef;
-}
+        return $self->is_valid() ? $self : undef;
+    }
 1;

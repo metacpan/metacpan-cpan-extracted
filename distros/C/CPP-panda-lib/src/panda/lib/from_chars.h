@@ -1,6 +1,6 @@
 #pragma once
-#if __cplusplus > 201402L
-#  include <utility>
+#if __cpp_lib_to_chars >= 201611L
+#  include <charconv>
 #else
 #  include <cmath>
 #  include <limits>

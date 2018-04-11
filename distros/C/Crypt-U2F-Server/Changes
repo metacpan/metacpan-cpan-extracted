@@ -1,5 +1,9 @@
 Revision history for Perl extension Crypt::U2F::Server.
 
+0.43  Mon Apr 18 14:21:25 2018 (GMT +2)
+	- Fix typo in POD
+	- Add "debug" option
+
 0.42  Fri Mar 30 06:55:34 2018 (GMT +2)
 	- Fix tests dependencies (RT#124973, RT#124974)
 

@@ -1,0 +1,44 @@
+{
+   "abstract" : "An Async Connection Pooler for PGObject",
+   "author" : [
+      "Chris Travers <chris.travers@adjust.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PGObject-Util-AsyncPool",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::Pg" : "2",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

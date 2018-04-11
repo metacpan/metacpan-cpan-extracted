@@ -6,7 +6,7 @@ package Excel::Writer::XLSX::Package::Styles;
 #
 # Used in conjunction with Excel::Writer::XLSX
 #
-# Copyright 2000-2017, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2018, John McNamara, jmcnamara@cpan.org
 #
 # Documentation after __END__
 #
@@ -20,7 +20,7 @@ use Carp;
 use Excel::Writer::XLSX::Package::XMLwriter;
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 
 ###############################################################################
@@ -42,14 +42,16 @@ sub new {
     my $fh    = shift;
     my $self  = Excel::Writer::XLSX::Package::XMLwriter->new( $fh );
 
-    $self->{_xf_formats}       = undef;
-    $self->{_palette}          = [];
-    $self->{_font_count}       = 0;
-    $self->{_num_format_count} = 0;
-    $self->{_border_count}     = 0;
-    $self->{_fill_count}       = 0;
-    $self->{_custom_colors}    = [];
-    $self->{_dxf_formats}      = [];
+    $self->{_xf_formats}         = undef;
+    $self->{_palette}            = [];
+    $self->{_font_count}         = 0;
+    $self->{_num_format_count}   = 0;
+    $self->{_border_count}       = 0;
+    $self->{_fill_count}         = 0;
+    $self->{_custom_colors}      = [];
+    $self->{_dxf_formats}        = [];
+    $self->{_has_hyperlink}      = 0;
+    $self->{_hyperlink_font_id}  = 0;
 
     bless $self, $class;
 
@@ -120,14 +122,14 @@ sub _set_style_properties {
 
     my $self = shift;
 
-    $self->{_xf_formats}       = shift;
-    $self->{_palette}          = shift;
-    $self->{_font_count}       = shift;
-    $self->{_num_format_count} = shift;
-    $self->{_border_count}     = shift;
-    $self->{_fill_count}       = shift;
-    $self->{_custom_colors}    = shift;
-    $self->{_dxf_formats}      = shift;
+    $self->{_xf_formats}         = shift;
+    $self->{_palette}            = shift;
+    $self->{_font_count}         = shift;
+    $self->{_num_format_count}   = shift;
+    $self->{_border_count}       = shift;
+    $self->{_fill_count}         = shift;
+    $self->{_custom_colors}      = shift;
+    $self->{_dxf_formats}        = shift;
 }
 
 
@@ -386,6 +388,14 @@ sub _write_font {
                 'scheme',
                 'val' => $format->{_font_scheme}
             );
+        }
+
+        if ( $format->{_hyperlink} ) {
+            $self->{_has_hyperlink} = 1;
+
+            if ( !$self->{_hyperlink_font_id} ) {
+                $self->{_hyperlink_font_id} = $format->{_font_index};
+            }
         }
     }
 
@@ -759,12 +769,20 @@ sub _write_cell_style_xfs {
     my $self  = shift;
     my $count = 1;
 
+    if ( $self->{_has_hyperlink} ) {
+        $count = 2;
+    }
+
     my @attributes = ( 'count' => $count );
 
     $self->xml_start_tag( 'cellStyleXfs', @attributes );
 
     # Write the style_xf element.
-    $self->_write_style_xf();
+    $self->_write_style_xf( 0, 0 );
+
+    if ( $self->{_has_hyperlink} ) {
+        $self->_write_style_xf( 1, $self->{_hyperlink_font_id} );
+    }
 
     $self->xml_end_tag( 'cellStyleXfs' );
 }
@@ -811,11 +829,12 @@ sub _write_cell_xfs {
 #
 sub _write_style_xf {
 
-    my $self       = shift;
-    my $num_fmt_id = 0;
-    my $font_id    = 0;
-    my $fill_id    = 0;
-    my $border_id  = 0;
+    my $self          = shift;
+    my $has_hyperlink = shift;
+    my $font_id       = shift;
+    my $num_fmt_id    = 0;
+    my $fill_id       = 0;
+    my $border_id     = 0;
 
     my @attributes = (
         'numFmtId' => $num_fmt_id,
@@ -824,7 +843,21 @@ sub _write_style_xf {
         'borderId' => $border_id,
     );
 
-    $self->xml_empty_tag( 'xf', @attributes );
+    if ( $has_hyperlink ) {
+        push @attributes, ( 'applyNumberFormat' => 0 );
+        push @attributes, ( 'applyFill'         => 0 );
+        push @attributes, ( 'applyBorder'       => 0 );
+        push @attributes, ( 'applyAlignment'    => 0 );
+        push @attributes, ( 'applyProtection'   => 0 );
+
+        $self->xml_start_tag( 'xf', @attributes );
+        $self->xml_empty_tag( 'alignment',  ( 'vertical', 'top' ) );
+        $self->xml_empty_tag( 'protection', ( 'locked',   0 ) );
+        $self->xml_end_tag( 'xf' );
+    }
+    else {
+        $self->xml_empty_tag( 'xf', @attributes );
+    }
 }
 
 
@@ -842,7 +875,7 @@ sub _write_xf {
     my $font_id     = $format->{_font_index};
     my $fill_id     = $format->{_fill_index};
     my $border_id   = $format->{_border_index};
-    my $xf_id       = 0;
+    my $xf_id       = $format->{_xf_id};
     my $has_align   = 0;
     my $has_protect = 0;
 
@@ -860,7 +893,7 @@ sub _write_xf {
     }
 
     # Add applyFont attribute if XF format uses a font element.
-    if ( $format->{_font_index} > 0 ) {
+    if ( $format->{_font_index} > 0 && !$format->{_hyperlink} ) {
         push @attributes, ( 'applyFont' => 1 );
     }
 
@@ -881,16 +914,19 @@ sub _write_xf {
     $has_align = 1 if $apply_align && @align;
 
     # We can also have applyAlignment without a sub-element.
-    if ( $apply_align ) {
+    if ( $apply_align || $format->{_hyperlink} ) {
         push @attributes, ( 'applyAlignment' => 1 );
     }
 
     # Check for cell protection properties.
     my @protection = $format->get_protection_properties();
 
-    if ( @protection ) {
+    if ( @protection || $format->{_hyperlink} ) {
         push @attributes, ( 'applyProtection' => 1 );
-        $has_protect = 1;
+
+        if ( !$format->{_hyperlink} ) {
+            $has_protect = 1;
+        }
     }
 
     # Write XF with sub-elements if required.
@@ -917,12 +953,20 @@ sub _write_cell_styles {
     my $self  = shift;
     my $count = 1;
 
+    if ( $self->{_has_hyperlink} ) {
+        $count = 2;
+    }
+
     my @attributes = ( 'count' => $count );
 
     $self->xml_start_tag( 'cellStyles', @attributes );
 
     # Write the cellStyle element.
-    $self->_write_cell_style();
+    if ( $self->{_has_hyperlink} ) {
+        $self->_write_cell_style('Hyperlink', 1, 8);
+    }
+
+    $self->_write_cell_style('Normal', 0, 0);
 
     $self->xml_end_tag( 'cellStyles' );
 }
@@ -937,9 +981,9 @@ sub _write_cell_styles {
 sub _write_cell_style {
 
     my $self       = shift;
-    my $name       = 'Normal';
-    my $xf_id      = 0;
-    my $builtin_id = 0;
+    my $name       = shift;
+    my $xf_id      = shift;
+    my $builtin_id = shift;
 
     my @attributes = (
         'name'      => $name,
@@ -1122,7 +1166,7 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-(c) MM-MMXVII, John McNamara.
+(c) MM-MMXVIII, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.
 

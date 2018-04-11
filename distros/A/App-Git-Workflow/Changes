@@ -1,5 +1,15 @@
 Revision history for git-workflow-tools
 
+1.0.6   2018-04-10
+        Updating for release of version 1.0.6
+        Fixed the rest of the tests (Ivan Wills)
+        More simple fixes (Ivan Wills)
+        Fixing many tests (Ivan Wills)
+        Added missing new line (Ivan Wills)
+        Fixed function return to be cleaner (Ivan Wills)
+        Improving speed of getting commit details (Ivan Wills)
+        Added verbose options to show progress (Ivan Wills)
+
 1.0.5   2018-03-26
         Updating for release of version 1.0.5
         Adding YAML to dependencies (Ivan Wills)

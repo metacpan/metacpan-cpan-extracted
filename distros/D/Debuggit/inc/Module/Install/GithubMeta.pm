@@ -7,7 +7,7 @@ use Cwd;
 use base qw(Module::Install::Base);
 use vars qw($VERSION);
 
-$VERSION = '0.26';
+$VERSION = '0.30';
 
 sub githubmeta {
   my $self = shift;
@@ -15,13 +15,14 @@ sub githubmeta {
   return unless _under_git();
   return unless $self->can_run('git');
   my $remote = shift || 'origin';
+  local $ENV{LC_ALL}='C';
   local $ENV{LANG}='C';
   return unless my ($git_url) = `git remote show -n $remote` =~ /URL: (.*)$/m;
   return unless $git_url =~ /github\.com/; # Not a Github repository
   my $http_url = $git_url;
   $git_url =~ s![\w\-]+\@([^:]+):!git://$1/!;
   $http_url =~ s![\w\-]+\@([^:]+):!https://$1/!;
-  $http_url =~ s!\.git$!/tree!;
+  $http_url =~ s!\.git$!/!;
   $self->repository( $git_url );
   $self->homepage( $http_url ) unless $self->homepage();
   return 1;
@@ -49,4 +50,4 @@ sub _under_git {
 'Github';
 __END__
 
-#line 112
+#line 113

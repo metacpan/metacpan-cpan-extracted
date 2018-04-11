@@ -160,16 +160,36 @@ __T_OANY
     $arg = $out_call;
     $backref_post
     $skip_out_label
-    
+
 T_OPTR : __T_OANY(object_base=pointer)
 T_OEXT : __T_OANY(object_base=magic)
     INIT { SV* self = NULL; }
-    
+
 T_OEXT_AV : T_OEXT
-    if (!self && $var) self = (SV*)newAV();
-    
+    if ($var) {
+        SV* unref_self = (self && SvROK(self)) ? SvRV(self) : self;
+
+        if (!unref_self || unref_self == &PL_sv_undef) {
+            self = (SV*)newAV();
+        } else if (!SvOK(unref_self)) {
+            sv_upgrade(unref_self, SVt_PVAV);
+        } else if (SvTYPE(unref_self) != SVt_PVAV) {
+            croak("Can't cast $var for T_OEXT_AV typemap");
+        }
+    }
+
 T_OEXT_HV : T_OEXT
-    if (!self && $var) self = (SV*)newHV();
+    if ($var) {
+        SV* unref_self = (self && SvROK(self)) ? SvRV(self) : self;
+
+        if (!unref_self || unref_self == &PL_sv_undef) {
+            self = (SV*)newHV();
+        } else if (!SvOK(unref_self)) {
+            sv_upgrade(unref_self, SVt_PVHV);
+        } else if (SvTYPE(unref_self) != SVt_PVHV) {
+            croak("Can't cast $var for T_OEXT_HV typemap");
+        }
+    }
 
 T_OWRAPPER
     ${ $basetype ||= $type; \""; }

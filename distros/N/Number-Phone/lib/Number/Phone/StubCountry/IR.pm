@@ -22,65 +22,61 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200235;
+our $VERSION = 1.20180410221546;
 
 my $formatters = [
                 {
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
                   'leading_digits' => '[1-8]',
+                  'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{4})(\\d{4})'
                 },
                 {
-                  'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{4,5})',
-                  'leading_digits' => '[1-8]',
-                  'format' => '$1 $2'
+                  'format' => '$1 $2',
+                  'national_rule' => '0$1',
+                  'leading_digits' => '[1-8]'
                 },
                 {
                   'format' => '$1',
-                  'pattern' => '(\\d{4,5})',
                   'leading_digits' => '96',
-                  'national_rule' => '0$1'
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{4,5})'
                 },
                 {
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3,4})',
-                  'leading_digits' => '9'
+                  'leading_digits' => '9',
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3'
                 }
               ];
 
 my $validators = {
                 'specialrate' => '',
-                'fixed_line' => '
-          (?:
-            (?:
-              1[137]|
-              2[13-68]|
-              3[1458]|
-              4[145]|
-              5[1468]|
-              6[16]|
-              7[1467]|
-              8[13467]
-            )(?:
-              \\d{8}|
-              (?:
-                [16]|
-                [289]\\d?
-              )\\d{3}
+                'mobile' => '
+          9(?:
+            0(?:
+              [1-35]\\d{2}|
+              44\\d
+            )|
+            [13]\\d{3}|
+            2[0-2]\\d{2}|
+            9(?:
+              [01]\\d{2}|
+              44\\d|
+              8(?:
+                10|
+                88
+              )|
+              9(?:
+                0[013]|
+                1[134]|
+                21|
+                9[89]
+              )
             )
-          )|
-          94(?:
-            000|
-            11[0-7]|
-            2\\d{2}|
-            30[01]|
-            440
           )\\d{5}
         ',
-                'toll_free' => '',
                 'geographic' => '
           (?:
             (?:
@@ -105,28 +101,42 @@ my $validators = {
             11[0-7]|
             2\\d{2}|
             30[01]|
-            440
+            4(?:
+              11|
+              40
+            )
           )\\d{5}
         ',
                 'personal_number' => '',
-                'mobile' => '
-          9(?:
-            0(?:
-              [1-35]\\d{2}|
-              44\\d
-            )|
-            [13]\\d{3}|
-            2[0-2]\\d{2}|
-            9(?:
-              [01]\\d{2}|
-              44\\d|
-              810|
-              9(?:
-                0[013]|
-                1[134]|
-                21|
-                9[89]
-              )
+                'pager' => '',
+                'toll_free' => '',
+                'fixed_line' => '
+          (?:
+            (?:
+              1[137]|
+              2[13-68]|
+              3[1458]|
+              4[145]|
+              5[1468]|
+              6[16]|
+              7[1467]|
+              8[13467]
+            )(?:
+              \\d{8}|
+              (?:
+                [16]|
+                [289]\\d?
+              )\\d{3}
+            )
+          )|
+          94(?:
+            000|
+            11[0-7]|
+            2\\d{2}|
+            30[01]|
+            4(?:
+              11|
+              40
             )
           )\\d{5}
         ',
@@ -135,8 +145,7 @@ my $validators = {
             [2-6]0\\d|
             993
           )\\d{7}
-        ',
-                'pager' => ''
+        '
               };
 my %areanames = (
   9811 => "Mazandaran",
@@ -176,13 +185,9 @@ my %areanames = (
       my $number = shift;
       $number =~ s/(^\+98|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-  
       return $self if ($self->is_valid());
-      {
-        no warnings 'uninitialized';
-        $number =~ s/^(?:0)//;
-      }
+      $number =~ s/^(?:0)//;
       $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-    return $self->is_valid() ? $self : undef;
-}
+      return $self->is_valid() ? $self : undef;
+    }
 1;

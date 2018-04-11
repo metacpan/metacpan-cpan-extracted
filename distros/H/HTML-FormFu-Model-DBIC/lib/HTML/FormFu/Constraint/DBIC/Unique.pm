@@ -1,10 +1,10 @@
 package HTML::FormFu::Constraint::DBIC::Unique;
 
 use strict;
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 
 extends 'HTML::FormFu::Constraint';
 
@@ -12,13 +12,13 @@ use Carp qw( carp croak );
 
 use HTML::FormFu::Util qw( DEBUG_CONSTRAINTS debug );
 
-has model          => ( is => 'rw', traits  => ['FormFuChained'] );
-has resultset      => ( is => 'rw', traits  => ['FormFuChained'] );
-has column         => ( is => 'rw', traits  => ['FormFuChained'] );
-has method_name    => ( is => 'rw', traits  => ['FormFuChained'] );
-has self_stash_key => ( is => 'rw', traits  => ['FormFuChained'] );
-has others         => ( is => 'rw', traits  => ['FormFuChained'] );
-has id_field       => ( is => 'rw', traits  => ['FormFuChained'] );
+has model          => ( is => 'rw', traits  => ['Chained'] );
+has resultset      => ( is => 'rw', traits  => ['Chained'] );
+has column         => ( is => 'rw', traits  => ['Chained'] );
+has method_name    => ( is => 'rw', traits  => ['Chained'] );
+has self_stash_key => ( is => 'rw', traits  => ['Chained'] );
+has others         => ( is => 'rw', traits  => ['Chained'] );
+has id_field       => ( is => 'rw', traits  => ['Chained'] );
 
 sub constrain_value {
     my ( $self, $value ) = @_;
@@ -168,7 +168,7 @@ HTML::FormFu::Constraint::DBIC::Unique - unique constraint for HTML::FormFu::Mod
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS
 

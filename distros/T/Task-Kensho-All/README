@@ -1,0 +1,34 @@
+NAME
+
+    Task::Kensho::All - Install all of Task::Kensho
+
+SYNOPSIS
+
+      cpanm Task::Kensho::All
+
+DESCRIPTION
+
+    Installs every sub-task of Task::Kensho, a list of modules recommended
+    by the Enlightened Perl Organisation <https://www.enlightenedperl.org>.
+    Don't use this unless you really want everything.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Task::Kensho
+

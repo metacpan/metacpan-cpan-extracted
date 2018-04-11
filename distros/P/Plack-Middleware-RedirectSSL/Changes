@@ -1,5 +1,9 @@
 Revision history for Plack-Middleware-RedirectSSL
 
+1.301 Tue 10 Apr 2018
+	- No functional changes
+	- Documentation corrections and additions
+
 1.300 Sat 24 Mar 2018
 	- Fix for subtle runtime mutator usage compat breakage in 1.200
 	- Arbitrary HSTS header value support

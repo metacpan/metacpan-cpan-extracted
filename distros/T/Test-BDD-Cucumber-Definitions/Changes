@@ -1,5 +1,27 @@
 Revision history for Test-BDD-Cucumber-Definitions
 
+0.34 2018-04-10T20:09:17Z
+
+    [ Zip ]
+    - Module "Zip" is rewritten in object-oriented style
+    - The Zip::member_names function was added
+
+0.33 2018-04-10T19:29:27Z
+
+    [ HTTP ]
+    - Module "HTTP" is rewritten in object-oriented style
+    - The HTTP::content function was added
+
+0.32 2018-04-09T18:00:19Z
+
+    [ File ]
+    - Module "File" is rewritten in object-oriented style
+    - The File::content function was added
+
+    [ Struct ]
+    - Module "Struct" is rewritten in object-oriented style
+    - The expression "array" is replaced with "list"
+
 0.31 2018-04-03T20:24:27Z
 
     [ Struct ]

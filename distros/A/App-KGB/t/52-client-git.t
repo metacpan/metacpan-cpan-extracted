@@ -104,8 +104,8 @@ my $git = 'Git'->repository($local);
 ok( $git, 'local repository allocated' );
 isa_ok( $git, 'Git' );
 
-$git->command( 'config', 'user.name', 'Test U. Ser' );
-$git->command( 'config', 'user.email', 'ser@example.neverland' );
+my $ign = $git->command( 'config', 'user.name', 'Test U. Ser' );
+$ign = $git->command( 'config', 'user.email', 'ser@example.neverland' );
 
 write_tmp 'reflog', '';
 
@@ -133,8 +133,8 @@ sub push_ok {
     write_tmp 'reflog', '';
     unlink $hook_log if $hook_log and -s $hook_log;
 
-    my $ignore = $git->command( [qw( push origin --all )], { STDERR => 0 } );
-    $ignore = $git->command( [qw( push origin --tags )], { STDERR => 0 } );
+    my $ign = $git->command( [qw( push origin --all )], { STDERR => 0 } );
+    $ign = $git->command( [qw( push origin --tags )], { STDERR => 0 } );
 
     $c->_reset;
     $c->_detect_commits;
@@ -144,7 +144,7 @@ sub push_ok {
 
 my %commits;
 sub do_commit {
-    $git->command_oneline( 'commit', '-m', shift ) =~ /\[(\w+).*\s+(\w+)\]/;
+    my $ign = $git->command_oneline( 'commit', '-m', shift ) =~ /\[(\w+).*\s+(\w+)\]/;
     push @{ $commits{$1} }, $2;
     #diag "commit $2 in branch $1" unless $tmp_cleanup;
 }
@@ -153,9 +153,9 @@ sub do_commit {
 
 ###### first commit
 w( 'a', 'some content' );
-$git->command( 'add', '.' );
+$ign = $git->command( 'add', '.' );
 do_commit('initial import');
-$git->command( 'remote', 'add', 'origin', "file://$remote" );
+$ign = $git->command( 'remote', 'add', 'origin', "file://$remote" );
 push_ok;
 
 # now "$dir/reflog" shall have some refs
@@ -185,7 +185,7 @@ TestBot->expect( '#test 03Test U. Ser (03ser) 05master '
 a 'a', 'some other content';
 w 'b', 'some other content';
 
-$git->command( 'add', '.' );
+$ign = $git->command( 'add', '.' );
 do_commit('some changes');
 push_ok();
 
@@ -207,15 +207,15 @@ TestBot->expect( '#test 03Test U. Ser (03ser) 05master '
         . '' );
 
 ##### remove, banch, modyfy, add, tag; batch send
-$git->command( 'rm', 'a' );
+$ign = $git->command( 'rm', 'a' );
 do_commit('a removed');
 
-$git->command( 'checkout', '-q', '-b', 'other', 'master' );
+$ign = $git->command( 'checkout', '-q', '-b', 'other', 'master' );
 w 'c', 'a new file was born';
 w 'b', 'new content';
-$git->command( 'add', '.' );
+$ign = $git->command( 'add', '.' );
 do_commit('a change in the other branch');
-$git->command( 'tag', '1.0-beta' );
+$ign = $git->command( 'tag', '1.0-beta' );
 push_ok();
 
 my $other_branch_point = $commits{master}[0];
@@ -270,9 +270,9 @@ mkdir( File::Spec->catdir($local, 'debian') );
 
 w( File::Spec->catfile( 'debian', 'README' ),
     'You read this!? Good boy/girl.' );
-$git->command( 'add', 'debian' );
+$ign = $git->command( 'add', 'debian' );
 do_commit( "add README for release\n\nas everybody knows, releases have to have READMEs\nHello, hi!" );
-$git->command( 'tag', '-a', '-m', 'Release 1.0', '1.0-release' );
+$ign = $git->command( 'tag', '-a', '-m', 'Release 1.0', '1.0-release' );
 push_ok();
 
 $c1 = $commit = $c->describe_commit;
@@ -312,7 +312,7 @@ TestBot->expect( '#test 03Test U. Ser (03ser) 05tags '
 
 # a hollow branch
 
-$git->command('branch', 'hollow');
+$ign = $git->command('branch', 'hollow');
 push_ok();
 
 # hollow branches are not detected for now
@@ -335,7 +335,7 @@ ok( !defined($commit), 'hollow branch has no commits' );
 
 # some UTF-8
 w 'README', 'You dont read this!? Bad!';
-$git->command( 'add', '.' );
+$ign = $git->command( 'add', '.' );
 do_commit( "update readme with an über cléver cómmít with cyrillics: привет" );
 push_ok();
 
@@ -354,10 +354,10 @@ TestBot->expect( '#test 03Test U. Ser (03ser) 05other '
 
 # parent-less branch
     write_tmp 'reflog', '';
-$git->command( [ 'checkout', '--orphan', 'allnew' ], { STDERR => 0 } );
-$git->command( 'rm', '-rf', '.' );
-$git->command( 'commit', '--allow-empty', '-m', 'created empty branch allnew' );
-$git->command( [ 'push', '-u', 'origin', 'allnew' ], { STDERR => 0 } );
+$ign = $git->command( [ 'checkout', '--orphan', 'allnew' ], { STDERR => 0 } );
+$ign = $git->command( 'rm', '-rf', '.' );
+$ign = $git->command( 'commit', '--allow-empty', '-m', 'created empty branch allnew' );
+$ign = $git->command( [ 'push', '-u', 'origin', 'allnew' ], { STDERR => 0 } );
     $c->_reset;
     $c->_detect_commits;
 
@@ -377,14 +377,14 @@ $commit = $c->describe_commit;
 is( $commit, undef );
 
 # now the same on the master branch
-$git->command( [ 'checkout', '-q', 'master' ], { STDERR => 0 } );
+$ign = $git->command( [ 'checkout', '-q', 'master' ], { STDERR => 0 } );
 ( my $gitversion = Git::command_oneline('version') ) =~ s/^git version\s*//;
 my ( $major, $minor, $patch, $ignored ) = split( /\./, $gitversion );
 note "Git version $major $minor";
 if ( $major > 2 or $major == 2 and $minor >= 9 ) {  # 2.9.0+
-    $git->command( 'merge', 'allnew', '--allow-unrelated-histories' );
+    $ign = $git->command( 'merge', 'allnew', '--allow-unrelated-histories' );
 } else {
-    $git->command( 'merge', 'allnew' );
+    $ign = $git->command( 'merge', 'allnew' );
 }
 push_ok();
 $c2 = $commit = $c->describe_commit;
@@ -398,14 +398,14 @@ TestBot->expect( '#test 03Test U. Ser (03ser) 05master '
         . $c2->id
         . '' );
 
-$git->command( checkout => '-q', 'other' );
+$ign = $git->command( checkout => '-q', 'other' );
 mkdir( File::Spec->catdir( $local, 'debian', 'patches' ) );
 
 w( File::Spec->catfile( 'debian', 'patches', 'series' ), 'some.patch' );
 w( File::Spec->catfile( 'debian', 'patches', 'some.patch' ), 'This is a patch' );
 
-$git->command( add => 'debian' );
-$git->command( commit => -m => 'A change in two files' );
+$ign = $git->command( add => 'debian' );
+$ign = $git->command( commit => -m => 'A change in two files' );
 push_ok();
 
 $commit = $c->describe_commit;

@@ -1,6 +1,7 @@
 Revision history for String-Validator-Email
 
-2.00    4 April 2018
+2.01    4 April 2018
+	Add Net::Domain::TLD as explicit pre-req github issue #2.
 1.97    1 April 2018
 	Prepping for release 2.0
 0.99	30 March 2018

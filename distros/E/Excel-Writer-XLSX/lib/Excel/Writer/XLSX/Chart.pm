@@ -7,7 +7,7 @@ package Excel::Writer::XLSX::Chart;
 #
 # Used in conjunction with Excel::Writer::XLSX.
 #
-# Copyright 2000-2017, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2018, John McNamara, jmcnamara@cpan.org
 #
 # Documentation after __END__
 #
@@ -27,7 +27,7 @@ use Excel::Writer::XLSX::Utility qw(xl_cell_to_rowcol
   quote_sheetname );
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 
 ###############################################################################
@@ -6476,6 +6476,8 @@ To create a simple Excel file with a chart using Excel::Writer::XLSX:
         values     => '=Sheet1!$B$2:$B$7',
     );
 
+    $workbook->close();
+
     __END__
 
 
@@ -8395,6 +8397,8 @@ Here is a complete example that demonstrates some of the available features when
     # Insert the chart into the worksheet (with an offset).
     $worksheet->insert_chart( 'D2', $chart, 25, 10 );
 
+    $workbook->close();
+
     __END__
 
 =begin html
@@ -8495,6 +8499,8 @@ It is possible to add a secondary axis of the same type to a chart by setting th
     # Insert the chart into the worksheet.
     $worksheet->insert_chart( 'D2', $chart );
 
+    $workbook->close();
+
     __END__
 
 It is also possible to have a secondary, combined, chart either with a shared or secondary axis, see below.
@@ -8570,6 +8576,8 @@ Here is a simpler example:
 
     # Insert the chart into the worksheet
     $worksheet->insert_chart( 'E2', $column_chart );
+
+    $workbook->close();
 
 =begin html
 
@@ -8651,6 +8659,6 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright MM-MMXVII, John McNamara.
+Copyright MM-MMXVIII, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.

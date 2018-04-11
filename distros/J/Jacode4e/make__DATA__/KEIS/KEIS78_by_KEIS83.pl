@@ -16,7 +16,12 @@ if ($0 eq __FILE__) {
     binmode(DUMP);
 }
 
-my %KEIS78_by_KEIS83 = ();
+my %KEIS78_by_KEIS83 = (qw(
+    C4CD 5CC4
+    5CC7 C4CD
+    B9B7 60AE
+    60B6 B9B7
+));
 
 for my $file (qw(
     http.__itdoc.hitachi.co.jp_manuals_3020_3020759580_G5950334.HTM_table_B3.txt
@@ -50,8 +55,8 @@ printf DUMP "%-4s %-4s \n", $keis83, $keis78;
 
 close(DUMP);
 
-if (scalar(keys %KEIS78_by_KEIS83) != (25*2+18*2-14)) {
-    die sprintf "scalar(keys %KEIS78_by_KEIS83) != (25*2+18*2-14) only (%d)\n", scalar(keys %KEIS78_by_KEIS83);
+if (scalar(keys %KEIS78_by_KEIS83) != (4+25*2+18*2-14)) {
+    die sprintf "scalar(keys %KEIS78_by_KEIS83) != (4+25*2+18*2-14) only (%d)\n", scalar(keys %KEIS78_by_KEIS83);
 }
 
 sub KEIS78_by_KEIS83 {

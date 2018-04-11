@@ -14,7 +14,7 @@ Lab::Moose::Sweep::Tutorial - Documentation of high-level sweep framework
 
 =head1 VERSION
 
-version 3.624
+version 3.630
 
 =head1 Datafiles and datafolders
 
@@ -430,7 +430,10 @@ finishes after 60 seconds:
      duration => 60
  );
 
-=head2 Magnet sweeps
+=head2 Configuration of continuous sweeps
+
+In this example we sweep a magnet field with the C<Continuous::Magnet> sweep
+class. All subclasses of C<Continuous> work like this.
 
 Note that the rate is given in Tesla/min.
 
@@ -443,6 +446,26 @@ Note that the rate is given in Tesla/min.
      start_rate => 1, # (optional, rate to approach start point)
      interval => 0.5, # one measurement every 0.5 seconds
  );
+
+If the sweep should use different rates in different sections, use the
+C<points>, C<rates>, and C<intervals> arguments:
+
+ my $sweep = sweep(
+     type => 'Continuous::Magnet',
+     instrument => $ips,
+     points => [-1, -0.1, 0.1, 1],
+     # start rate: 1
+     # use slow rate 0.01 between points -0.1 and 0.1
+     rates => [1, 0.1, 0.01, 0.1], 
+     intervals => [0.5], # one measurement every 0.5 seconds
+ );
+
+If the C<rates> array contains fewer elements than the C<points> array, it will
+be filled with the last value.
+
+If no C<interval> or C<intervals> parameter is provided a default of 0 is used.
+With an interval of 0, as many data points as possible are recorded without any
+delay between the measurement points.
 
 =head1 Further customization
 

@@ -23,21 +23,49 @@ AV* constants_list (pTHX_ HV* stash) {
     return ret;
 }
 
-void create_constant (pTHX_ HV* stash, SV* name, SV* value, AV* stash_constants_list) {
+static SV* push_export (pTHX_ HV* stash, SV* name, AV* stash_constants_list = NULL, bool need_inc = false) {
     if (!stash_constants_list) stash_constants_list = constants_list(aTHX_ stash);
+
+    if (!SvPOK(name)) EX_CROAK_BADNAME(HvNAME(stash), SvPV_nolen(name));
+    if (!SvCUR(name)) EX_CROAK_NONAME(HvNAME(stash));
+
+    if (need_inc) {
+        if (SvIsCOW_shared_hash(name)) SvREFCNT_inc(name);
+        else name = newSVpvn_share(SvPVX_const(name), SvCUR(name), 0);
+    }
+
+    av_push(stash_constants_list, name);
+    return name;
+}
+
+void register_export (pTHX_ HV* stash, CV* sub) {
+    HEK* hek = CvNAMED(sub) ? CvNAME_HEK(sub) : GvNAME_HEK(CvGV(sub));
+    if (!hek) EX_CROAK_NONAME(HvNAME(stash));
+
+    SV* name = newSVhek(hek);
+    assert(SvIsCOW_shared_hash(name));
+
+    push_export(aTHX_ stash, name);
+}
+
+void register_export (pTHX_ HV* stash, SV* name) {
+    push_export(aTHX_ stash, name, NULL, true);
+}
+
+void register_export (pTHX_ HV* stash, const char* name) {
+    SV* sv_name = newSVpvn_share(name, strlen(name), 0);
+    push_export(aTHX_ stash, sv_name);
+}
+
+void create_constant (pTHX_ HV* stash, SV* name, SV* value, AV* stash_constants_list) {
     if (!name) EX_CROAK_NONAME(HvNAME(stash));
 
     // check that we won't redefine any subroutine
     HE* sym_he = hv_fetch_ent(stash, name, 0, 0);
     if (sym_he && HeVAL(sym_he) && isGV(HeVAL(sym_he)) && GvCV(HeVAL(sym_he))) EX_CROAK_EXISTS(HvNAME(stash), SvPV_nolen(name));
 
-    if (!SvPOK(name)) EX_CROAK_BADNAME(HvNAME(stash), SvPV_nolen(name));
-    if (!SvCUR(name)) EX_CROAK_NONAME(HvNAME(stash));
-
-    if (SvIsCOW_shared_hash(name)) SvREFCNT_inc(name);
-    else name = newSVpvn_share(SvPVX_const(name), SvCUR(name), 0);
-
-    av_push(stash_constants_list, name);
+    /* gets name as a shared PV */
+    name = push_export(aTHX_ stash, name, stash_constants_list, true);
 
     if (value) SvREFCNT_inc(value);
     else value = newSV(0);

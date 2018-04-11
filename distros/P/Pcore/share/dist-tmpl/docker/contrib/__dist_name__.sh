@@ -15,4 +15,4 @@ DOCKER_CONTAINER_ARGS="
     -p 443:443/tcp \
 "
 
-source <( wget -q -O - https://bitbucket.org/softvisio/scripts/raw/tip/docker.sh ) "$@"
+source <( wget -q -O - https://bitbucket.org/softvisio/scripts/raw/tip/docker.sh || echo false ) "$@"

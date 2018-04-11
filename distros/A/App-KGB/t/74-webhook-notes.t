@@ -42,9 +42,13 @@ use Cwd;
 my $R = getcwd;
 
 my $ua = LWP::UserAgent->new();
-my $webhook_url =
-    sprintf( 'http://%s:%d/webhook/?channel=test&network=local&use_color=0',
-    $test_bot->addr, $test_bot->port );
+my $webhook_url = sprintf(
+    'http://%s:%d/webhook/?%s',
+    $test_bot->addr,
+    $test_bot->port,
+    join( '&',
+        'channel=test', 'network=local', 'use_color=0', 'shorten_urls=0' )
+);
 
 sub webhook_post {
     return $ua->post(

@@ -9,7 +9,7 @@ my $a = {
     b => [1, 2]
 };
 my $b = [1 .. 10];
-my $c = sub { ... };
+my $c = sub { 1 };
 my $d = \"Hello";
 
 for my $ref ($a, $b, $c, $d) {

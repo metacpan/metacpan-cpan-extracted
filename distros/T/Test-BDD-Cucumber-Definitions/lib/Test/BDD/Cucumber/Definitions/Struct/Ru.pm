@@ -5,9 +5,9 @@ use warnings;
 use utf8;
 
 use Test::BDD::Cucumber::Definitions qw(Given When Then);
-use Test::BDD::Cucumber::Definitions::Struct qw(:util);
+use Test::BDD::Cucumber::Definitions::Struct qw(Struct);
 
-our $VERSION = '0.31';
+our $VERSION = '0.34';
 
 ## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
 ## no critic [RegularExpressions::RequireExtendedFormatting]
@@ -41,7 +41,7 @@ Test::BDD::Cucumber::Definitions::Struct::Ru - Шаги на русском яз
 
     Scenario: HTTP->JSON->Struct
         When HTTP-запрос "GET" отправлен на "https://fastapi.metacpan.org/v1/distribution/Test-BDD-Cucumber-Definitions"
-        When содержимое HTTP-ответа прочитано как JSON
+        Given содержимое HTTP-ответа прочитано как JSON
         Then элемент структуры данных "$.name" совпадает с "Test-BDD-Cucumber-Definitions"
 
 =head1 ИСТОЧНИКИ ДАННЫХ
@@ -64,13 +64,13 @@ sub import {
 Прочитать JSON из L<HTTP-ответа|Test::BDD::Cucumber::Definitions::HTTP::Ru>
 в perl-структуру:
 
-    When содержимое HTTP-ответа прочитано как JSON
+    Given содержимое HTTP-ответа прочитано как JSON
 
 =cut
 
-    #       http response content read JSON
-    When qr/содержимое HTTP-ответа прочитано как JSON/, sub {
-        http_response_content_read_json();
+    #        read http response content as JSON
+    Given qr/содержимое HTTP-ответа прочитано как JSON/, sub {
+        Struct->read_http_response_content_as_json();
     };
 
 =pod
@@ -78,13 +78,13 @@ sub import {
 Прочитать JSON из L<Файла|Test::BDD::Cucumber::Definitions::File::Ru>
 в perl-структуру:
 
-    When содержимое файла прочитано как JSON
+    Given содержимое файла прочитано как JSON
 
 =cut
 
-    #       file content read JSON
-    When qr/содержимое файла прочитано как JSON/, sub {
-        file_content_read_json();
+    #        read file content as JSON
+    Given qr/содержимое файла прочитано как JSON/, sub {
+        Struct->read_file_content_as_json();
     };
 
 =pod
@@ -92,13 +92,13 @@ sub import {
 Прочитать список файлов L<Zip-архива|Test::BDD::Cucumber::Definitions::HTTP::Ru>
 в perl-структуру
 
-    When перечень файлов Zip-архива прочитан как список
+    Given перечень файлов Zip-архива прочитан как список
 
 =cut
 
-    #       zip archive members read list
-    When qr/перечень файлов Zip-архива прочитан как список/, sub {
-        zip_archive_members_read_list();
+    #        read zip archive members as list
+    Given qr/перечень файлов Zip-архива прочитан как список/, sub {
+        Struct->read_zip_archive_members_as_list();
     };
 
 =head2 Проверка данных
@@ -116,7 +116,7 @@ L<JSON::Path>.
 
     #       struct data element "(.+?)" eq "(.*)"
     Then qr/элемент структуры данных "(.+?)" равен "(.*)"/, sub {
-        struct_data_element_eq( $1, $2 );
+        Struct->data_element_eq( $1, $2 );
     };
 
 =pod
@@ -127,10 +127,10 @@ L<JSON::Path>.
 
 =cut
 
-    #       struct data array "(.+?)" any eq "(.*)"
+    #       struct data list "(.+?)" any eq "(.*)"
     Then qr/массив структур данных "(.+?)" содержит элемент, равный "(.*)"/,
         sub {
-        struct_data_array_any_eq( $1, $2 );
+        Struct->data_list_any_eq( $1, $2 );
         };
 
 =pod
@@ -143,7 +143,7 @@ L<JSON::Path>.
 
     #       struct data element "(.+?)" re "(.*)"
     Then qr/элемент структуры данных "(.+?)" совпадает с "(.*)"/, sub {
-        struct_data_element_re( $1, $2 );
+        Struct->data_element_re( $1, $2 );
     };
 
 =pod
@@ -154,11 +154,11 @@ L<JSON::Path>.
 
 =cut
 
-    #       struct data array "(.+?)" any re "(.*)"
+    #       struct data list "(.+?)" any re "(.*)"
     Then
         qr/массив структур данных "(.+?)" содержит элемент, совпадающий с "(.*)"/,
         sub {
-        struct_data_array_any_re( $1, $2 );
+        Struct->data_list_any_re( $1, $2 );
         };
 
 =pod
@@ -171,10 +171,10 @@ L<JSON::Path>.
 
 =cut
 
-    #       struct data array "(.+?)" count "(.*)"
+    #       struct data list "(.+?)" count "(.*)"
     Then qr/массив структур данных "(.+?)" содержит "(.*)" элемент(?:а|ов)?/,
         sub {
-        struct_data_array_count( $1, $2 );
+        Struct->data_list_count( $1, $2 );
         };
 
 =pod
@@ -187,7 +187,7 @@ L<JSON::Path>.
 
     #       struct data element "(.+?)" key "(.*)"
     Then qr/элемент структуры данных "(.+?)" содержит ключ "(.*)"/, sub {
-        struct_data_element_key( $1, $2 );
+        Struct->data_element_key( $1, $2 );
     };
 
 =pod
@@ -199,9 +199,11 @@ L<JSON::Path>.
 =cut
 
     #       struct data list "(.+?)" all key "(.*)"
-    Then qr/все элементы в списке структур данных "(.+?)" содержат ключ "(.*)"/, sub {
-        struct_data_list_all_key( $1, $2 );
-    };
+    Then
+        qr/все элементы в списке структур данных "(.+?)" содержат ключ "(.*)"/,
+        sub {
+        Struct->data_list_all_key( $1, $2 );
+        };
 
     return;
 }

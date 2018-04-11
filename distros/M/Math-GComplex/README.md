@@ -4,7 +4,9 @@ A generic complex number library for Perl 5.
 
 # DESCRIPTION
 
-Math::GComplex provides a generic interface to complex number operations, accepting any type of number as a component of a complex number, including native Perl numbers and numerical objects provided by other mathematical libraries, such as [Math::AnyNum](https://metacpan.org/release/Math-AnyNum).
+[Math::GComplex](https://metacpan.org/pod/Math::GComplex) is a lightweight library, providing a generic interface to complex number operations, accepting any type of number as a component of a complex number, including native Perl numbers and numerical objects provided by other mathematical libraries, such as [Math::AnyNum](https://metacpan.org/pod/Math::AnyNum).
+
+In most cases, it can be used as a drop-in replacement for [Math::Complex](https://metacpan.org/pod/Math::Complex).
 
 # SYNOPSIS
 

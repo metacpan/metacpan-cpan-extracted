@@ -1,14 +1,14 @@
-package HTML::FormFu::Role::Element::NonBlock;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Role::Element::NonBlock;
+$HTML::FormFu::Role::Element::NonBlock::VERSION = '2.06';
+# ABSTRACT: base class for single-tag elements
 
 use Moose::Role;
-use MooseX::Attribute::FormFuChained;
 
 use HTML::FormFu::Util qw( process_attrs );
 
-has tag => ( is => 'rw', traits => ['FormFuChained'] );
+has tag => ( is => 'rw', traits => ['Chained'] );
 
 after BUILD => sub {
     my $self = shift;
@@ -21,8 +21,8 @@ after BUILD => sub {
 around render_data_non_recursive => sub {
     my ( $orig, $self, $args ) = @_;
 
-    my $render = $self->$orig( {
-            tag => $self->tag,
+    my $render = $self->$orig(
+        {   tag => $self->tag,
             $args ? %$args : (),
         } );
 
@@ -53,13 +53,17 @@ sub string {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Role::Element::NonBlock - base class for single-tag elements
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 DESCRIPTION
 
@@ -83,5 +87,16 @@ Carl Franks, C<cfranks@cpan.org>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

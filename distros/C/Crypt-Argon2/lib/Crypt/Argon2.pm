@@ -1,10 +1,13 @@
 package Crypt::Argon2;
-$Crypt::Argon2::VERSION = '0.003';
+$Crypt::Argon2::VERSION = '0.004';
 use strict;
 use warnings;
 
 use Exporter 5.57 'import';
-our @EXPORT_OK = qw/argon2i_raw argon2i_pass argon2i_verify argon2d_raw/;
+our @EXPORT_OK = qw/
+	argon2id_raw argon2id_pass argon2id_verify
+	argon2i_raw argon2i_pass argon2i_verify
+	argon2d_raw/;
 use XSLoader;
 XSLoader::load(__PACKAGE__, __PACKAGE__->VERSION || 0);
 
@@ -24,23 +27,23 @@ Crypt::Argon2 - Perl interface to the Argon2 key derivation functions
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
- use Crypt::Argon2 qw/argon2i_pass argon2i_verify/;
+ use Crypt::Argon2 qw/argon2id_pass argon2id_verify/;
 
  sub add_pass {
    my ($user, $password) = @_;
    my $salt = get_random(16);
-   my $encoded = argon2i_pass($password, $salt, 3, '32M', 1, 16);
+   my $encoded = argon2id_pass($password, $salt, 3, '32M', 1, 16);
    store_password($user, $encoded);
  }
 
  sub check_password {
    my ($user, $password) = @_;
    my $encoded = fetch_encoded($user);
-   return argon2i_verify($encoded, $password);
+   return argon2id_verify($encoded, $password);
  }
 
 =head1 DESCRIPTION

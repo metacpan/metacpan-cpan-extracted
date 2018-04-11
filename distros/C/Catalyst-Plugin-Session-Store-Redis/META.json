@@ -4,7 +4,7 @@
       "Thomas Klausner <domm@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -38,6 +38,7 @@
          "web" : "https://github.com/domm/Catalyst-Plugin-Session-Store-Redis"
       }
    },
-   "version" : "0.07"
+   "version" : "0.08",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0104"
 }
 

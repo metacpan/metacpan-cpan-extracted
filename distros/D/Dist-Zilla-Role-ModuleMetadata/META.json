@@ -40,7 +40,7 @@
       "develop" : {
          "recommends" : {
             "Dist::Zilla::PluginBundle::Author::ETHER" : "0.137",
-            "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.005"
+            "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.006"
          },
          "requires" : {
             "Encode" : "0",
@@ -70,7 +70,7 @@
       "runtime" : {
          "requires" : {
             "Digest::MD5" : "0",
-            "Module::Metadata" : "1.000022",
+            "Module::Metadata" : "1.000005",
             "Moose::Role" : "0",
             "namespace::autoclean" : "0",
             "perl" : "5.010",
@@ -88,7 +88,7 @@
             "Dist::Zilla::Role::MetaProvider" : "0",
             "Dist::Zilla::Role::Plugin" : "0",
             "File::Spec" : "0",
-            "Module::Metadata" : "1.000022",
+            "Module::Metadata" : "1.000005",
             "Moose" : "0",
             "Path::Tiny" : "0",
             "Scalar::Util" : "0",
@@ -187,7 +187,7 @@
    "provides" : {
       "Dist::Zilla::Role::ModuleMetadata" : {
          "file" : "lib/Dist/Zilla/Role/ModuleMetadata.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -205,7 +205,7 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027010"
@@ -701,7 +701,7 @@
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
                   "Module::Metadata" : "1.000033",
-                  "version" : "0.005"
+                  "version" : "0.006"
                }
             },
             "name" : "@Author::ETHER/MetaProvides::Package",
@@ -854,7 +854,7 @@
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
                   "Module::Metadata" : "1.000033",
-                  "version" : "0.005"
+                  "version" : "0.006"
                }
             },
             "name" : "@Author::ETHER/CheckSelfDependency",
@@ -1068,7 +1068,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaProvides::Update",
             "name" : "@Author::ETHER/@Git::VersionManager/MetaProvides::Update",
-            "version" : "0.005"
+            "version" : "0.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyFilesFromRelease",
@@ -1121,7 +1121,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.005",
+                  "tag" : "v0.006",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v%t"
                },
@@ -1298,7 +1298,7 @@
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
                   "Module::Metadata" : "1.000033",
-                  "version" : "0.005"
+                  "version" : "0.006"
                }
             },
             "name" : "Test::CheckBreaks",

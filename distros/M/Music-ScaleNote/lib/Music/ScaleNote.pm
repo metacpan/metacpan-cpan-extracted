@@ -1,9 +1,9 @@
 package Music::ScaleNote;
 our $AUTHORITY = 'cpan:GENE';
 
-# ABSTRACT: Manipulate the position of notes in a scale
+# ABSTRACT: Manipulate the position of a note in a scale
 
-our $VERSION = '0.0302';
+our $VERSION = '0.0303';
 
 use Carp;
 use Moo;
@@ -55,7 +55,7 @@ sub get_offset {
 
     my $rev;  # Going in reverse?
 
-    my $note  = Music::Note->new( $args{note_name}, $args{note_format} );
+    my $note = Music::Note->new( $args{note_name}, $args{note_format} );
 
     my $equiv;
     if ( $note->format('isobase') =~ /b/ || $note->format('isobase') =~ /#/ ) {
@@ -103,8 +103,9 @@ sub get_offset {
     }
 
     $note = Music::Note->new( $scale[ $args{offset} % @scale ] . $octave, 'ISO' );
+
     warn sprintf "\tNew offset: %d, ISO: %s, Formatted: %s\n",
-        $args{offset}, $note->format('ISO'), $note->format($args{note_format})
+        $args{offset}, $note->format('ISO'), $note->format( $args{note_format} )
         if $self->verbose;
 
     return $note;
@@ -120,15 +121,16 @@ __END__
 
 =head1 NAME
 
-Music::ScaleNote - Manipulate the position of notes in a scale
+Music::ScaleNote - Manipulate the position of a note in a scale
 
 =head1 VERSION
 
-version 0.0302
+version 0.0303
 
 =head1 SYNOPSIS
 
   use Music::ScaleNote;
+  use Music::Note;
   my $msn = Music::ScaleNote->new(
     scale_note => 'C',
     scale_name => 'pminor',
@@ -143,7 +145,7 @@ version 0.0302
 
 =head1 DESCRIPTION
 
-A C<Music::ScaleNote> object manipulates the position of notes in a given scale.
+A C<Music::ScaleNote> object manipulates the position of a note in a scale.
 
 Given a scale, a starting note, a scale note, and a scale position offset, this
 module computes the new note.

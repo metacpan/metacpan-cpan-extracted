@@ -1,9 +1,8 @@
-package HTML::FormFu::ObjectUtil;
-
 use strict;
-use warnings;
 
-our $VERSION = '2.05'; # VERSION
+package HTML::FormFu::ObjectUtil;
+$HTML::FormFu::ObjectUtil::VERSION = '2.06';
+use warnings;
 
 use Exporter qw( import );
 
@@ -28,7 +27,6 @@ our @EXPORT_OK = ( qw(
         clone
         name
         stash
-        constraints_from_dbic
         parent
         nested_name             nested_names
         remove_element
@@ -101,8 +99,8 @@ sub _load_config {
                 $fullpath = $file;
             }
 
-            my $config = Config::Any->$config_any_method( {
-                    $config_any_arg => [$fullpath],
+            my $config = Config::Any->$config_any_method(
+                {   $config_any_arg => [$fullpath],
                     use_ext         => 1,
                     driver_args => { General => { -UTF8 => 1 }, },
                 } );
@@ -212,102 +210,6 @@ sub stash {
     return $self;
 }
 
-sub constraints_from_dbic {
-    my ( $self, $source, $map ) = @_;
-
-    $map ||= {};
-
-    $source = _result_source($source);
-
-    for my $col ( $source->columns ) {
-        _add_constraints( $self, $col, $source->column_info($col) );
-    }
-
-    for my $col ( keys %$map ) {
-        my $source = _result_source( $map->{$col} );
-
-        _add_constraints( $self, $col, $source->column_info($col) );
-    }
-
-    return $self;
-}
-
-sub _result_source {
-    my ($source) = @_;
-
-    if ( blessed $source ) {
-        $source = $source->result_source;
-    }
-
-    return $source;
-}
-
-sub _add_constraints {
-    my ( $self, $col, $info ) = @_;
-
-    return if !defined $self->get_field($col);
-
-    return if !defined $info->{data_type};
-
-    my $type = lc $info->{data_type};
-
-    if ( $type =~ /(char|text|binary)\z/ && defined $info->{size} ) {
-
-        # char, varchar, *text, binary, varbinary
-        _add_constraint_max_length( $self, $col, $info );
-    }
-    elsif ( $type =~ /int/ ) {
-        _add_constraint_integer( $self, $col, $info );
-
-        if ( $info->{extra}{unsigned} ) {
-            _add_constraint_unsigned( $self, $col, $info );
-        }
-
-    }
-    elsif ( $type =~ /enum|set/ && defined $info->{extra}{list} ) {
-        _add_constraint_set( $self, $col, $info );
-    }
-}
-
-sub _add_constraint_max_length {
-    my ( $self, $col, $info ) = @_;
-
-    $self->constraint( {
-            type => 'MaxLength',
-            name => $col,
-            max  => $info->{size},
-        } );
-}
-
-sub _add_constraint_integer {
-    my ( $self, $col, $info ) = @_;
-
-    $self->constraint( {
-            type => 'Integer',
-            name => $col,
-        } );
-}
-
-sub _add_constraint_unsigned {
-    my ( $self, $col, $info ) = @_;
-
-    $self->constraint( {
-            type => 'Range',
-            name => $col,
-            min  => 0,
-        } );
-}
-
-sub _add_constraint_set {
-    my ( $self, $col, $info ) = @_;
-
-    $self->constraint( {
-            type => 'Set',
-            name => $col,
-            set  => $info->{extra}{list},
-        } );
-}
-
 sub parent {
     my $self = shift;
 
@@ -366,3 +268,30 @@ sub _object_equals {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::FormFu::ObjectUtil
+
+=head1 VERSION
+
+version 2.06
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

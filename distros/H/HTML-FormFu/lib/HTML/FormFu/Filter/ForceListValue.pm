@@ -1,7 +1,8 @@
-package HTML::FormFu::Filter::ForceListValue;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Filter::ForceListValue;
+$HTML::FormFu::Filter::ForceListValue::VERSION = '2.06';
+# ABSTRACT: convert a single value into a 1-item-list
 
 use Moose;
 extends 'HTML::FormFu::Filter';
@@ -15,9 +16,15 @@ sub process {
     return if 'ARRAY' eq ref $value;
 
     $self->set_nested_hash_value( $params, $name, [$value] );
-};
+}
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -25,7 +32,7 @@ HTML::FormFu::Filter::ForceListValue - convert a single value into a 1-item-list
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -65,5 +72,16 @@ Carl Franks
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

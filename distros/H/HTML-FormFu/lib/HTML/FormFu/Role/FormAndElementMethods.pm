@@ -1,8 +1,7 @@
-package HTML::FormFu::Role::FormAndElementMethods;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
 
+package HTML::FormFu::Role::FormAndElementMethods;
+$HTML::FormFu::Role::FormAndElementMethods::VERSION = '2.06';
 use Moose::Role;
 
 use HTML::FormFu::Attribute qw(
@@ -20,32 +19,27 @@ use Scalar::Util qw( blessed refaddr );
 
 my @ATTRS = (qw( attributes ));
 
-__PACKAGE__->mk_attrs( @ATTRS );
+__PACKAGE__->mk_attrs(@ATTRS);
 
 my @ATTR_ACCESSOR = (qw( title ));
 
-__PACKAGE__->mk_attr_accessors( @ATTR_ACCESSOR );
+__PACKAGE__->mk_attr_accessors(@ATTR_ACCESSOR);
 
 my @INHERITED = qw(
     render_method
     config_file_path
 );
 
-__PACKAGE__->mk_inherited_accessors( @INHERITED );
+__PACKAGE__->mk_inherited_accessors(@INHERITED);
 
 my @MERGING = qw(
     tt_args
     config_callback
 );
 
-__PACKAGE__->mk_inherited_merging_accessors( @MERGING );
+__PACKAGE__->mk_inherited_merging_accessors(@MERGING);
 
-our @MULTIFORM_SHARED = (
-    @ATTRS,
-    @ATTR_ACCESSOR,
-    @INHERITED,
-    @MERGING,
-);
+our @MULTIFORM_SHARED = ( @ATTRS, @ATTR_ACCESSOR, @INHERITED, @MERGING, );
 
 sub _require_deflator {
     my ( $self, $type, $opt ) = @_;
@@ -64,8 +58,8 @@ sub _require_deflator {
 
     require_class($class);
 
-    my $object = $class->new( {
-            type   => $type,
+    my $object = $class->new(
+        {   type   => $type,
             parent => $self,
         } );
 
@@ -99,8 +93,8 @@ sub _require_filter {
 
     require_class($class);
 
-    my $object = $class->new( {
-            type   => $type,
+    my $object = $class->new(
+        {   type   => $type,
             parent => $self,
         } );
 
@@ -133,8 +127,8 @@ sub _require_inflator {
 
     require_class($class);
 
-    my $object = $class->new( {
-            type   => $type,
+    my $object = $class->new(
+        {   type   => $type,
             parent => $self,
         } );
 
@@ -168,8 +162,8 @@ sub _require_validator {
 
     require_class($class);
 
-    my $object = $class->new( {
-            type   => $type,
+    my $object = $class->new(
+        {   type   => $type,
             parent => $self,
         } );
 
@@ -202,8 +196,8 @@ sub _require_transformer {
 
     require_class($class);
 
-    my $object = $class->new( {
-            type   => $type,
+    my $object = $class->new(
+        {   type   => $type,
             parent => $self,
         } );
 
@@ -212,8 +206,8 @@ sub _require_transformer {
 
     if ( exists $parent->default_args->{transformers}{$type} ) {
         $opt
-            = _merge_hashes( $parent->default_args->{transformers}{$type}, $opt,
-            );
+            = _merge_hashes( $parent->default_args->{transformers}{$type},
+            $opt, );
     }
 
     $object->populate($opt);
@@ -229,7 +223,7 @@ sub _require_plugin {
     eval { my %x = %$arg };
     croak "options argument must be hash-ref" if $@;
 
-    my $abs = $type =~ s/^\+//;
+    my $abs   = $type =~ s/^\+//;
     my $class = $type;
 
     if ( !$abs ) {
@@ -240,8 +234,8 @@ sub _require_plugin {
 
     require_class($class);
 
-    my $plugin = $class->new( {
-            type   => $type,
+    my $plugin = $class->new(
+        {   type   => $type,
             parent => $self,
         } );
 
@@ -333,3 +327,30 @@ sub _object_equals {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::FormFu::Role::FormAndElementMethods
+
+=head1 VERSION
+
+version 2.06
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,43 @@
+MODULE = Panda::Lib                PACKAGE = Panda::Lib::Logger
+PROTOTYPES: DISABLE
+
+BOOT {
+    xs::register_package(aTHX_ "Panda::Lib::Logger", "Panda::Lib");
+    xs::inherit_package(aTHX_ "Panda::Lib::Logger", "Panda::Lib");
+
+    constant_t clist_main[] = {
+        {"LOG_EMERGENCY",   Level::EMERGENCY,       NULL},
+        {"LOG_CRITICAL",    Level::CRITICAL,        NULL},
+        {"LOG_WARNING",     Level::WARNING,         NULL},
+        {"LOG_INFO",        Level::INFO,            NULL},
+        {"LOG_VERBOSE",     Level::VERBOSE,         NULL},
+        {"LOG_DEBUG",       Level::DEBUG,           NULL},
+        {NULL, 0, NULL}
+    };
+    HV* plib_stash = gv_stashpvs("Panda::Lib::Logger", GV_ADD);
+    create_constants(aTHX_ plib_stash, clist_main);
+
+    register_export(aTHX_ plib_stash, "set_log_level");
+    register_export(aTHX_ plib_stash, "set_native_logger");
+}
+
+void set_log_level(int level) {
+    panda::Log::set_max_level((Level)level);
+}
+
+void set_native_logger(CV* cb) {
+    xs::SvIntrPtr cb_ptr(cb);
+    struct CatchLogger : panda::logger::ILogger {
+        xs::SvIntrPtr cb;
+
+        virtual void log(panda::logger::Level l, panda::logger::CodePoint cp, const std::string& s) override {
+            dTHX;
+            auto cp_str = cp.to_string();
+            SV* args[] = {newSViv(l), newSVpv(cp_str.c_str(), cp_str.size()), newSVpv(s.c_str(), s.size())};
+            xs::call_sub_void(aTHX_ cb.get<CV>(), args, 3);
+        }
+    };
+    auto log = new CatchLogger;
+    log->cb = cb_ptr;
+    panda::Log::logger().reset(log);
+}

@@ -1,10 +1,10 @@
-package HTML::FormFu::Role::Constraint::Others;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Role::Constraint::Others;
+$HTML::FormFu::Role::Constraint::Others::VERSION = '2.06';
+# ABSTRACT: Base class for constraints needing others() method
 
 use Moose::Role;
-use MooseX::Attribute::FormFuChained;
 
 use HTML::FormFu::Util qw(
     DEBUG_CONSTRAINTS_OTHERS
@@ -13,11 +13,11 @@ use HTML::FormFu::Util qw(
 use Clone ();
 use List::Util 1.33 qw( any none );
 
-has others                  => ( is => 'rw', traits => ['FormFuChained'] );
-has other_siblings          => ( is => 'rw', traits => ['FormFuChained'] );
-has attach_errors_to        => ( is => 'rw', traits => ['FormFuChained'] );
-has attach_errors_to_base   => ( is => 'rw', traits => ['FormFuChained'] );
-has attach_errors_to_others => ( is => 'rw', traits => ['FormFuChained'] );
+has others                  => ( is => 'rw', traits => ['Chained'] );
+has other_siblings          => ( is => 'rw', traits => ['Chained'] );
+has attach_errors_to        => ( is => 'rw', traits => ['Chained'] );
+has attach_errors_to_base   => ( is => 'rw', traits => ['Chained'] );
+has attach_errors_to_others => ( is => 'rw', traits => ['Chained'] );
 
 sub pre_process {
     my ($self) = @_;
@@ -184,7 +184,8 @@ sub mk_errors {
         $error->parent($field);
 
         if ( !grep { $name eq $_ } @has_error ) {
-            DEBUG_CONSTRAINTS_OTHERS && debug("setting '$name' error forced(1)");
+            DEBUG_CONSTRAINTS_OTHERS
+                && debug("setting '$name' error forced(1)");
 
             $error->forced(1);
         }
@@ -211,13 +212,17 @@ around clone => sub {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Role::Constraint::Others - Base class for constraints needing others() method
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 METHODS
 
@@ -278,3 +283,16 @@ Carl Franks C<cfranks@cpan.org>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

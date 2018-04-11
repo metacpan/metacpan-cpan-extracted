@@ -1,0 +1,65 @@
+
+0.15  2018-04-09 VANHOESEL
+
+      - fix Changes file
+
+0.14  2018-04-09 VANHOESEL
+
+      - fix release version and dependencies
+
+      [ Merge pull request #21 from manwar/tidy-up-manifest ]
+      - Tidied up MANIFEST file as reported by CPANTS.
+
+0.13  2018-04-09 VANHOESEL
+
+      - fix release version and dependencies
+
+      [ Merge pull request #20 from manwar/fix-pod-error ]
+      - Fixed pod error as reported by CPANTS
+
+0.12  2018-04-08 VANHOESEL
+
+      [ Merge pull request #19 from THEMA-MEDIA/RT-124849_latest_HTTP_Message ]
+      - fix cpanfile to match with `HTTP::Status` version 6.16
+      - remove monkey patched method `is_cacheable_by_default`
+
+0.11  2018-03-03 VANHOESEL
+
+      [ Merge pull request #17 from THEMA-MEDIA/deprecation_warning ]
+      - Deprecation warning looks good
+      - add note about HTTP_CACHING_DEPRECATION_WARNING_HIDE
+      - hide redundant deprecation warnings during test with ':hide'
+      - show deprecation warning once
+      - add POD for deprecation
+      - update README
+
+      [ Merge pull request #16 from manwar/add-github-repo-details ]
+      - Added GitHub repository details.
+
+0.10  2018-03-03 VANHOESEL
+
+      - fix max-stale
+
+0.09  2016-12-22 VANHOESEL
+
+      [ Merge pull request #15 from THEMA-MEDIA/fix/cache_controle-directives ]
+      - cache-control directives Maybe ['Str']
+
+0.08  2016-12-19 VANHOESEL
+
+      - minor changes: missing Monkey::Patch::Action
+
+0.07  2016-12-02 VANHOESEL
+
+      - adding lazy build meta cache
+
+0.06  2016-12-02 VANHOESEL
+
+      - adding invalidation of unsafe requests
+
+0.05  2016-08-24 VANHOESEL
+
+0.04  2016-08-24 VANHOESEL
+
+0.03  2016-08-24 VANHOESEL
+

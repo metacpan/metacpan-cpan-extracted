@@ -22,28 +22,19 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200235;
+our $VERSION = 1.20180410221547;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2 $3',
                   'national_rule' => '0$1',
                   'leading_digits' => '[45]',
-                  'pattern' => '([45]\\d)(\\d{2})(\\d{2})',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '([45]\\d)(\\d{2})(\\d{2})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
                 'voip' => '',
-                'personal_number' => '',
-                'mobile' => '
-          (?:
-            4[02-4]|
-            5[05]
-          )\\d{4}
-        ',
-                'specialrate' => '',
                 'fixed_line' => '
           (?:
             4[1-3]|
@@ -51,12 +42,21 @@ my $validators = {
           )\\d{4}
         ',
                 'toll_free' => '',
+                'pager' => '',
+                'personal_number' => '',
                 'geographic' => '
           (?:
             4[1-3]|
             50
           )\\d{4}
-        '
+        ',
+                'mobile' => '
+          (?:
+            4[02-4]|
+            5[05]
+          )\\d{4}
+        ',
+                'specialrate' => ''
               };
 
     sub new {
@@ -64,13 +64,9 @@ my $validators = {
       my $number = shift;
       $number =~ s/(^\+508|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
-  
       return $self if ($self->is_valid());
-      {
-        no warnings 'uninitialized';
-        $number =~ s/^(?:0)//;
-      }
+      $number =~ s/^(?:0)//;
       $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
-    return $self->is_valid() ? $self : undef;
-}
+      return $self->is_valid() ? $self : undef;
+    }
 1;

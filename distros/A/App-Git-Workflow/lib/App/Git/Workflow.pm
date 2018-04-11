@@ -15,7 +15,7 @@ use English qw/ -no_match_vars /;
 use App::Git::Workflow::Repository qw//;
 use base qw/Exporter/;
 
-our $VERSION   = 1.0.5;
+our $VERSION   = 1.0.6;
 
 sub _alphanum_sort {
     no warnings qw/once/;
@@ -171,18 +171,24 @@ sub releases {
 
 sub commit_details {
     my ($self, $name, %options) = @_;
-    my ($log) = $self->git->rev_list(qw/-1 --timestamp/, $name);
-    chomp $log;
-    my ($time, $sha) = split /\s+/, $log;
+    my $split = "\1";
+    my $fmt = $options{user} ? "%ct$split%H$split%an$split%ae$split" : "%ct$split%H$split$split$split";
+    my ($time, $sha, $user, $email, $files)
+        = split /$split/, $self->git->log(
+            "--format=format:$fmt",
+            -1,
+            ($options{files} ? '--name-only' : ()),
+            $name
+        );
 
     return {
         name     => $name,
         sha      => $sha,
         time     => $time,
+        user     => $user,
+        email    => $email,
+        files    => { map {$_ => 1} grep {$_} split "\n", $files || '' },
         branches => $options{branches} ? { map { $_ => 1 } $self->branches('both', $sha) } : {},
-        files    => $options{files}    ? $self->files_from_sha($sha) : {},
-        user     => $options{user}     ? $self->git->log(qw/--format=format:%an -1/, $name) : '',
-        email    => $options{user}     ? $self->git->log(qw/--format=format:%ae -1/, $name) : '',
     };
 }
 
@@ -270,7 +276,7 @@ App::Git::Workflow - Git workflow tools
 
 =head1 VERSION
 
-This documentation refers to App::Git::Workflow version 1.0.5
+This documentation refers to App::Git::Workflow version 1.0.6
 
 =head1 SYNOPSIS
 

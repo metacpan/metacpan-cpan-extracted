@@ -1,5 +1,9 @@
 Revision history for Directory-Queue:
 
+2.0	Tue Apr 10 2018
+	* Added link to the C implementation.
+	* Now using No::Worries::File for all file read/write operations.
+
 1.9	Fri Oct 30 2015
 	* The queue constructors now have new maxlock and maxtemp options
           specifying the default values to be used by the purge() method.

@@ -1,0 +1,150 @@
+==================================================
+Changes from 2017-04-10 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.01 at 2018-04-10 06:07:18 +0000
+-----------------------------------------
+
+  Change: 0875c7c997cda4c208632e0cecee3bbe0895f213
+  Author: ÐÐ»ÐµÐºÑÐ°Ð½Ð´Ñ ÐÐ°Ð»Ð¾Ð±Ð¸Ð½ <nalobin@reg.ru>
+  Date : 2018-04-09 04:24:32 +0000
+
+    Merge branch 'K5256_distini_fix' into 'master'
+
+    K5256 Fixed dist.ini
+
+    See merge request regru/sentry-perl!3 
+
+  Change: 596e3735fe8fc18d54c3fedd3cf443f60c085bac
+  Author: Pavel P Serikov <pavelsr@cpan.org>
+  Date : 2018-04-09 06:11:03 +0000
+
+    K5256 Fixed dist.ini 
+
+  Change: ee7afaa9681c3c0d26176a9f227b08e43bc4d567
+  Author: ÐÐ»ÐµÐºÑÐ°Ð½Ð´Ñ ÐÐ°Ð»Ð¾Ð±Ð¸Ð½ <nalobin@reg.ru>
+  Date : 2018-04-06 08:20:38 +0000
+
+    Merge branch 'K5256-doc-fix' into 'master'
+
+    Fixed links in README.md
+
+    See merge request regru/sentry-perl!2 
+
+  Change: 8e866d0ce6feea34465a6400496b74aea226a71b
+  Author: ÐÐ°Ð²ÐµÐ» Ð¡ÐµÑÐ¸ÐºÐ¾Ð² <serikov@reg.ru>
+  Date : 2018-04-06 11:18:33 +0000
+
+    Fixed links in README.md 
+
+  Change: ee5aa1ab86acfb4fc219bfeb82d99a6f3c2af1cb
+  Author: ÐÐ»ÐµÐºÑÐ°Ð½Ð´Ñ ÐÐ°Ð»Ð¾Ð±Ð¸Ð½ <nalobin@reg.ru>
+  Date : 2018-04-05 10:03:07 +0000
+
+    Merge branch 'K5256' into 'master'
+
+    K5256: ÐÐ¾Ð´ÑÐ»Ñ Ð¿Ð¾ Ð¾ÑÐ¿ÑÐ°Ð²ÐºÐµ ÑÐ¾Ð¾Ð±ÑÐµÐ½Ð¸Ð¹ Ð²
+    Sentry
+
+    See merge request regru/reg-sentry-perl!1 
+
+  Change: 420b73a6aa9a4e2412419b023a859ada3cebcdb1
+  Author: Alexander Nalobin <nalobin@reg.ru>
+  Date : 2018-04-05 15:02:43 +0000
+
+    Sentry_modile 
+
+  Change: 154048e3132e9c1ba2dcf6209387e3e6689bb9af
+  Author: ÐÐ°Ð²ÐµÐ» Ð¡ÐµÑÐ¸ÐºÐ¾Ð² <serikov@reg.ru>
+  Date : 2018-04-05 12:12:54 +0000
+
+    K5256 refectoring from WWW::Sentry to Sentry 
+
+  Change: 07493cb4056d615df83ddfc9e2f7f259c026a2d6
+  Author: ÐÐ°Ð²ÐµÐ» Ð¡ÐµÑÐ¸ÐºÐ¾Ð² <serikov@reg.ru>
+  Date : 2018-04-05 10:16:09 +0000
+
+    K5256 Fixed README.md 
+
+  Change: 5a32696f8216604a0a2ae2ecdfcb5e21c7bd56f8
+  Author: ÐÐ°Ð²ÐµÐ» Ð¡ÐµÑÐ¸ÐºÐ¾Ð² <serikov@reg.ru>
+  Date : 2018-04-04 18:20:11 +0000
+
+    K5256 Fixed sentry_version issue and misprint 
+
+  Change: 79b256cf452a898fcb7b1b32242ea75ff892419e
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-04-02 18:10:42 +0000
+
+    K5256 Fixed business lo\gic, docs, added tests 
+
+  Change: 5e745d6a8b816b0cca3fe258e0cc6100722acee7
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-04-02 17:05:46 +0000
+
+    K5256 Fixed docs 
+
+  Change: 6f2637ac83ef04ad922ad34ab490535acc603c88
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-04-02 17:05:21 +0000
+
+    K5256 Fixed namespace 
+
+  Change: 4b266f5a1aac32385e68ecc2d6d3dd245487fc75
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-04-02 16:05:49 +0000
+
+    K5256 Added simple test 
+
+  Change: 498e4f8cd935df79e11e61fa5abbd866575519cd
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-04-02 15:58:20 +0000
+
+    K5256 Ready for publishing 
+
+  Change: 4e6f6dce49451e080fa658714e829706d243c5b3
+  Author: ÐÐ°Ð²ÐµÐ» Ð¡ÐµÑÐ¸ÐºÐ¾Ð² <serikov@reg.ru>
+  Date : 2018-03-29 19:53:09 +0000
+
+    WIP: K5256 
+
+  Change: 4a034a6cedcd89c11e987aa4489337ef44d6845e
+  Author: ÐÐ°Ð²ÐµÐ» Ð¡ÐµÑÐ¸ÐºÐ¾Ð² <serikov@reg.ru>
+  Date : 2018-03-29 19:16:22 +0000
+
+    WIP: K5256 
+
+  Change: 340eeb2c566f78194c7b2bcd313a2055bfa27233
+  Author: ÐÐ°Ð²ÐµÐ» Ð¡ÐµÑÐ¸ÐºÐ¾Ð² <serikov@reg.ru>
+  Date : 2018-03-28 21:08:20 +0000
+
+    Added WWW::Sentry 
+
+  Change: 1a637c7273ed7b106bd6e9d94ac8508bcc6f0c68
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-03-28 01:41:23 +0000
+
+    Truing to use code base from SRS::Comm::Sentry 
+
+  Change: c08ebb8f70d45c62dbbd1d3e9f24ca11dba5119e
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-03-27 00:33:01 +0000
+
+    K5256 Some changes in Sentry.pm 
+
+  Change: a97ff59434e5e04186062270c1955e8d2535a450
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-03-22 02:04:27 +0000
+
+    K5256 WIP Initial commit 
+
+  Change: 446e10606d0f9c66c9a422d48016d16c1bfffb17
+  Author: Alexander Nalobin <nalobin@reg.ru>
+  Date : 2018-02-28 18:20:49 +0000
+
+    add README 
+
+================
+End of releases.
+================

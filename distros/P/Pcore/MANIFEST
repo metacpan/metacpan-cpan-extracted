@@ -128,8 +128,10 @@ lib/Pcore/Handle/DBI.pm
 lib/Pcore/Handle/DBI/Const.pm
 lib/Pcore/Handle/DBI/STH.pm
 lib/Pcore/RPC.pm
+lib/Pcore/RPC/Hub.pm
 lib/Pcore/RPC/Proc.pm
 lib/Pcore/RPC/Server.pm
+lib/Pcore/RPC/Tmpl.pm
 lib/Pcore/Src.pm
 lib/Pcore/Src/File.pm
 lib/Pcore/Src/Filter.pm
@@ -165,8 +167,6 @@ lib/Pcore/Util/Path.pm
 lib/Pcore/Util/Perl.pm
 lib/Pcore/Util/Perl/Module.pm
 lib/Pcore/Util/Perl/Moo.pm
-lib/Pcore/Util/Promise.pm
-lib/Pcore/Util/Promise/Request.pm
 lib/Pcore/Util/Random.pm
 lib/Pcore/Util/Regexp.pm
 lib/Pcore/Util/Result.pm
@@ -227,10 +227,6 @@ share/dist-tmpl/docker/share/docker.json
 share/dist-tmpl/git/.gitignore
 share/dist-tmpl/hg/.hgignore
 share/dist-tmpl/par/share/par.ini
-share/dist-tmpl/tmpl-app-ext/Dockerfile
-share/dist-tmpl/tmpl-app-ext/lib/__dist_path__/Index/Admin.pm
-share/dist-tmpl/tmpl-app-ext/lib/__dist_path__/Index/ChangePassword.pm
-share/dist-tmpl/tmpl-app-ext/lib/__dist_path__/Index/ConfirmEmail.pm
 share/dist-tmpl/tmpl-app/Dockerfile
 share/dist-tmpl/tmpl-app/bin/main.pl
 share/dist-tmpl/tmpl-app/cpanfile
@@ -240,6 +236,16 @@ share/dist-tmpl/tmpl-app/lib/__dist_path__/API/v1/Auth.pm
 share/dist-tmpl/tmpl-app/lib/__dist_path__/Const.pm
 share/dist-tmpl/tmpl-app/lib/__dist_path__/Index.pm
 share/dist-tmpl/tmpl-app/lib/__dist_path__/Index/API.pm
+share/dist-tmpl/tmpl-app/lib/__dist_path__/Index/Admin.pm
+share/dist-tmpl/tmpl-app/lib/__dist_path__/Index/ChangePassword.pm
+share/dist-tmpl/tmpl-app/lib/__dist_path__/Index/ConfirmEmail.pm
+share/dist-tmpl/tmpl-app/lib/__dist_path__/RPC.pm
+share/dist-tmpl/tmpl-app/lib/__dist_path__/RPC/Log.pm
+share/dist-tmpl/tmpl-app/lib/__dist_path__/RPC/RPC1.pm
+share/dist-tmpl/tmpl-app/lib/__dist_path__/Util.pm
+share/dist-tmpl/tmpl-app/share/tmpl/email/confirm-email.txt
+share/dist-tmpl/tmpl-app/share/tmpl/email/recover-password.txt
+share/dist-tmpl/tmpl-app/share/tmpl/index.html
 share/dist-tmpl/tmpl-app/share/www/static/README.md
 share/dist-tmpl/tmpl-dist/CHANGES
 share/dist-tmpl/tmpl-dist/TODO.txt

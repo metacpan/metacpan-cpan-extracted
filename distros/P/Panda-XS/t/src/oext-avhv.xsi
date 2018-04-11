@@ -12,6 +12,15 @@ int MyBaseAV::val () {
 
 void MyBaseAV::DESTROY ()
 
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::MyNBaseAV
+PROTOTYPES: DISABLE
+
+MyNBaseAV* MyNBaseAV::new (SV* mode) {
+    self = xs::call_next_maybe(cv, &mode, 1);
+    RETVAL = new MyBase(42);
+}
+
+void MyNBaseAV::DESTROY ()
 
 MODULE = Panda::XS                PACKAGE = Panda::XS::Test::MyBaseHV
 PROTOTYPES: DISABLE
@@ -26,3 +35,13 @@ int MyBaseHV::val () {
 }
 
 void MyBaseHV::DESTROY ()
+
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::MyNBaseHV
+PROTOTYPES: DISABLE
+
+MyNBaseHV* MyNBaseHV::new (SV* mode) {
+    self = xs::call_next_maybe(cv, &mode, 1);
+    RETVAL = new MyBase(42);
+}
+
+void MyNBaseAV::DESTROY ()

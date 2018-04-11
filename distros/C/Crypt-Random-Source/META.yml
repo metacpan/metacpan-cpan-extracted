@@ -28,37 +28,37 @@ no_index:
 provides:
   Crypt::Random::Source:
     file: lib/Crypt/Random/Source.pm
-    version: '0.13'
+    version: '0.14'
   Crypt::Random::Source::Base:
     file: lib/Crypt/Random/Source/Base.pm
-    version: '0.13'
+    version: '0.14'
   Crypt::Random::Source::Base::File:
     file: lib/Crypt/Random/Source/Base/File.pm
-    version: '0.13'
+    version: '0.14'
   Crypt::Random::Source::Base::Handle:
     file: lib/Crypt/Random/Source/Base/Handle.pm
-    version: '0.13'
+    version: '0.14'
   Crypt::Random::Source::Base::Proc:
     file: lib/Crypt/Random/Source/Base/Proc.pm
-    version: '0.13'
+    version: '0.14'
   Crypt::Random::Source::Base::RandomDevice:
     file: lib/Crypt/Random/Source/Base/RandomDevice.pm
-    version: '0.13'
+    version: '0.14'
   Crypt::Random::Source::Factory:
     file: lib/Crypt/Random/Source/Factory.pm
-    version: '0.13'
+    version: '0.14'
   Crypt::Random::Source::Strong:
     file: lib/Crypt/Random/Source/Strong.pm
-    version: '0.13'
+    version: '0.14'
   Crypt::Random::Source::Strong::devrandom:
     file: lib/Crypt/Random/Source/Strong/devrandom.pm
-    version: '0.13'
+    version: '0.14'
   Crypt::Random::Source::Weak:
     file: lib/Crypt/Random/Source/Weak.pm
-    version: '0.13'
+    version: '0.14'
   Crypt::Random::Source::Weak::devurandom:
     file: lib/Crypt/Random/Source/Weak/devurandom.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   Capture::Tiny: '0.08'
   Carp: '0'
@@ -78,7 +78,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-Random-Source
   homepage: https://github.com/karenetheridge/Crypt-Random-Source
   repository: https://github.com/karenetheridge/Crypt-Random-Source.git
-version: '0.13'
+version: '0.14'
 x_Dist_Zilla:
   perl:
     version: '5.027010'
@@ -433,7 +433,7 @@ x_Dist_Zilla:
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000033'
-          version: '0.005'
+          version: '0.006'
       name: '@Author::ETHER/MetaProvides::Package'
       version: '2.004003'
     -
@@ -537,7 +537,7 @@ x_Dist_Zilla:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000033'
-          version: '0.005'
+          version: '0.006'
       name: '@Author::ETHER/CheckSelfDependency'
       version: '0.011'
     -
@@ -737,7 +737,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.13
+          tag: v0.14
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

@@ -1,8 +1,15 @@
+2.01    2018-04-09
+
+    - Add new time zone for Sao Tome Standard Time.
+
+    - Mark Morocco Standard Time as a known bad time zone for author testing due to the
+      way Microsoft implements time changes for Ramadan when testing future times in August.
+
 2.00    2018-02-27
 
     - Remove Namibia Standard Time and Turks And Caicos Standard Time from the list
       of known bad time zones now that Microsoft has released updates to those zones.
-      
+
     - Calculate Windows times in tests using using TZI registry value for time changes
       before comparing to the same time changes calculated in IANA.
 

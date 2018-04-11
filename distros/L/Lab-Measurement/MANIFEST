@@ -220,6 +220,7 @@ lib/Lab/Moose/Sweep.pm
 lib/Lab/Moose/Sweep/Continuous.pm
 lib/Lab/Moose/Sweep/Continuous/Magnet.pm
 lib/Lab/Moose/Sweep/Continuous/Time.pm
+lib/Lab/Moose/Sweep/Continuous/Voltage.pm
 lib/Lab/Moose/Sweep/DataFile.pm
 lib/Lab/Moose/Sweep/Step.pm
 lib/Lab/Moose/Sweep/Step/Frequency.pm

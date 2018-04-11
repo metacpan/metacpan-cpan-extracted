@@ -1,8 +1,7 @@
-package HTML::FormFu::Role::CreateChildren;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
 
+package HTML::FormFu::Role::CreateChildren;
+$HTML::FormFu::Role::CreateChildren::VERSION = '2.06';
 use Moose::Role;
 
 use HTML::FormFu::Util qw( _merge_hashes require_class );
@@ -139,21 +138,22 @@ sub _require_element {
 
     require_class($class);
 
-    my $element = $class->new( {
-            type   => $type,
+    my $element = $class->new(
+        {   type   => $type,
             parent => $self,
         } );
 
     my $default_args = $self->default_args;
 
-    if ( %$default_args ) {
+    if (%$default_args) {
         if ( $element->can('default_args') ) {
-            $element->default_args( Clone::clone( $default_args ) );
+            $element->default_args( Clone::clone($default_args) );
         }
 
-        $default_args = $element->_match_default_args( Clone::clone( $default_args->{elements} ) );
+        $default_args = $element->_match_default_args(
+            Clone::clone( $default_args->{elements} ) );
 
-        if ( %$default_args ) {
+        if (%$default_args) {
             $arg = _merge_hashes( $arg, $default_args );
         }
     }
@@ -434,3 +434,30 @@ sub _single_transformer {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::FormFu::Role::CreateChildren
+
+=head1 VERSION
+
+version 2.06
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

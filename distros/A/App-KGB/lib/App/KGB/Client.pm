@@ -13,6 +13,7 @@ our $VERSION = '1.34';
 # KGB - an IRC bot helping collaboration
 # Copyright © 2008 Martín Ferrari
 # Copyright © 2009,2010,2011,2012,2013 Damyan Ivanov
+# Copyright © 2018 Colin Finck <colin@reactos.org>
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -230,6 +231,11 @@ The login of the author (e.g. "joe").
 =item ${author_name}
 
 The name of the commit author (e.g. "Joe Random")
+
+=item ${author_via}
+
+The name of the commit author, plus the name of the committer if that is
+different (e.g. "Joe Random" or "Joe Random (via Max Random)")
 
 =item ${branch}
 
@@ -810,12 +816,14 @@ sub format_message {
     if ($commit) {
         $p{author_login} = $commit->author if ($commit->author);
         $p{author_name} = $commit->author_name if ($commit->author_name);
+        $p{author_via} = $commit->author_via if ($commit->author_via);
         $p{branch} = $commit->branch if ($commit->branch);
         $p{commit_id} = $commit->id if ($commit->id);
         $p{log} = $commit->log if ($commit->log);
     }
     $p{author_name} ||= $p{author_login};
     $p{author_login} ||= $p{author_name};
+    $p{author_via} ||= $p{author_name};
     if (defined($self->module)) {
         $p{module} = $self->module;
     } elsif ($commit and defined($commit->module)) {
@@ -838,6 +846,9 @@ sub format_message {
         }
         elsif ( $token eq 'author-name' ) {
             push @r, author => $p{author_name};
+        }
+        elsif ( $token eq 'author-via' ) {
+            push @r, author => $p{author_via};
         }
         elsif ( $token eq 'branch' ) {
             push @r, branch => $p{branch};

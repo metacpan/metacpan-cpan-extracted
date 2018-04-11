@@ -1,5 +1,9 @@
 Revision history for Perl module MARC::Moose
 
+1.0.35 2018-03-09
+
+  - Fix bug encoding in ISO2709 Formater
+
 1.0.34 2017-05-24
 
   - Fix bug in linting

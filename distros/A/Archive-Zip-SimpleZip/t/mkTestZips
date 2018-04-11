@@ -1,0 +1,177 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Archive::Zip::SimpleZip qw(:all);
+use IO::Compress::Zip ;
+
+sub writeFile
+{
+    my $filename = shift;
+    my $content = shift;
+
+    open my $fh, ">$filename";
+    print $fh $content;
+}
+
+my $testZips = "./test-zips";
+mkdir $testZips;
+
+if (1)
+{
+ 
+    # Create a zip file that has exactly 64k members
+    # but is not a zip64 archive
+
+    my $filename = "$testZips/test64k-notzip64.zip";
+    my @files;
+    for my $name (1 .. 0xFFFF)
+    {
+        writeFile($name, $name);
+        push @files, $name;
+
+        if ($name % 1024 == 0)
+        {
+            system "zip $filename @files";
+            unlink @files;
+            @files = ();
+        }
+    }
+
+    if (@files)
+    {
+        system "zip -9 $filename @files";
+        unlink @files;
+    }
+
+}
+
+if (1)
+{
+    # Create a zip file that has exactly 64k members
+    # and is a Zip84 archive.
+
+    my $filename = "$testZips/test64k.zip" ;
+
+    my $z = new Archive::Zip::SimpleZip $filename, Zip64 => 0, Minimal => 1 ;
+    
+    for my $name (1 .. 0xFFFF )
+    {     
+        $z->addString($name, Name => $name, Method => ZIP_CM_STORE);
+    }
+    $z->close() ;
+}
+
+if (1)
+{
+    # Create a zip file that has 64k + 1 members
+
+    my $filename = "$testZips/test64k-plus1.zip" ;
+
+    my $z = new Archive::Zip::SimpleZip $filename, Zip64 => 1, Minimal => 1 ;
+    
+    for my $name (1 .. 0xFFFF + 1 )
+    {     
+        $z->addString($name, Name => $name, Method => ZIP_CM_STORE);
+    }
+    $z->close() ;
+}
+
+if (1)
+{
+    # make a zip file where size of first member is > 0xFFFFFFFF
+    # Note this is a sparse file.
+
+    use constant MAX_32BIT => 0xFFFFFFFF ;
+    use constant HI_1      => MAX_32BIT + 1 ;
+
+    # for my $size (MAX_32BIT - 1, MAX_32BIT, MAX_32BIT + 1)
+    for my $size (MAX_32BIT + 1)
+    {
+        my $zipfile = "$testZips/big1.zip";
+        my $zip = new IO::Compress::Zip $zipfile,
+                                    Name => "first", 
+                                    Stream => 0,
+                                    Sparse => $size,
+                                    Method => ZIP_CM_STORE,
+                                    Zip64 => 1,
+                                    ZipComment => "zipcomment";
+        # isa_ok $zip, "IO::Compress::Zip";
+        $zip->newStream(Name => "second", Sparse => 0, Comment => "c2");
+        print $zip "data";
+        $zip->close();    
+    }
+}
+
+if (1)
+{
+
+    # no single member > 0xFFFFFFFF, but sum is.
+    # Note this is a sparse file.
+
+    use constant MAX_32BIT => 0xFFFFFFFF ;
+    use constant HI_1      => MAX_32BIT + 1 ;
+
+    # for my $size (MAX_32BIT - 1, MAX_32BIT, MAX_32BIT + 1)
+    for my $size (0x80000000)
+    {
+        my $zipfile = "$testZips/big2.zip";
+        my $zip = new IO::Compress::Zip $zipfile,
+                                    Name => "first", 
+                                    Stream => 0,
+                                    Sparse => $size,
+                                    Method => ZIP_CM_STORE,
+                                    Zip64 => 1;
+        # isa_ok $zip, "IO::Compress::Zip";
+        $zip->newStream(Name => "second", Sparse => 0);
+        print $zip "data";
+        $zip->newStream(Name => "third", Sparse => $size);
+        $zip->newStream(Name => "fourth", Sparse => 0);
+        print $zip "fore";        
+        $zip->close();    
+    }
+}
+
+if (1)
+{
+    # compressed < 0xFFFFFFF
+    # uncompressed > 0xFFFFFFFF
+
+    my $filename = "$testZips/big3.zip";
+    unlink $filename;
+    my $datafile = "zeros";
+    open my $out, ">$datafile";
+    seek $out, 0xFFFFFFFF + 1, 0 ;
+    print $out "\x00" x 100;
+    close $out;
+    system "zip -9 -X $filename $datafile";
+    unlink $datafile;
+}
+
+{
+    # Empty Zip file
+    # Contents will be the end of central dirctory header
+    print "Create empty zip\n";
+
+    my $zipfile = "$testZips/empty.zip";
+    my $filename = "empty";
+    writeFile($filename, $filename);
+    unlink $zipfile;
+    system("zip $zipfile $filename");
+    system("zip -d -X $zipfile $filename");
+    unlink $filename;
+
+}
+
+{
+    print "Create empty zip with a comment\n";
+    # Empty Zip file
+    my $zipfile = "$testZips/empty-with-comment.zip";
+    my $filename = "empty";
+    writeFile($filename, $filename);
+    unlink $zipfile;
+    system("echo zipcomment | zip -z $zipfile $filename");
+    system("zip -d -X $zipfile $filename");
+    unlink $filename;
+}

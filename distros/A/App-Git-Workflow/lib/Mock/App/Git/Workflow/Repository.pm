@@ -13,7 +13,7 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use base qw/Exporter/;
 
-our $VERSION     = 1.0.5;
+our $VERSION     = 1.0.6;
 our @EXPORT_OK   = qw//;
 our %EXPORT_TAGS = ();
 #our @EXPORT      = qw//;
@@ -39,6 +39,7 @@ sub mock_add {
     confess "Data not Hashes!\n" . Dumper(\@_) if @_ && ref $_[0] ne 'HASH';
     push @{ $self->{data} }, @_;
 }
+
 sub mock_reset {
     my $self = shift;
     @{ $self->{data} } = ();
@@ -94,7 +95,7 @@ Mock::App::Git::Workflow::Repository - Mock of a git repository
 
 =head1 VERSION
 
-This documentation refers to Mock::App::Git::Workflow::Repository version 1.0.5
+This documentation refers to Mock::App::Git::Workflow::Repository version 1.0.6
 
 =head1 SYNOPSIS
 

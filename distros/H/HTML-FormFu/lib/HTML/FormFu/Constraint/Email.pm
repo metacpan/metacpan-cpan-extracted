@@ -1,16 +1,17 @@
-package HTML::FormFu::Constraint::Email;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Constraint::Email;
+$HTML::FormFu::Constraint::Email::VERSION = '2.06';
+# ABSTRACT: Email Address Constraint
 
 use Moose;
-use MooseX::Attribute::FormFuChained;
+use MooseX::Attribute::Chained;
 
 extends 'HTML::FormFu::Constraint';
 
 use Email::Valid;
 
-has options => ( is => 'rw', traits => ['FormFuChained'] );
+has options => ( is => 'rw', traits => ['Chained'] );
 
 sub constrain_value {
     my ( $self, $value ) = @_;
@@ -19,33 +20,34 @@ sub constrain_value {
 
     my %options = ( -address => $value );
 
-    if (defined $self->options) {
+    if ( defined $self->options ) {
 
-       if (ref $self->options eq 'ARRAY') {
+        if ( ref $self->options eq 'ARRAY' ) {
 
-          for my $foo (@{ $self->options }) {
-              next if $foo eq 'address';
-              $options{ '-' . $foo } = 1
-          }
+            for my $foo ( @{ $self->options } ) {
+                next if $foo eq 'address';
+                $options{ '-' . $foo } = 1;
+            }
 
-       }
-       elsif (ref $self->options eq 'HASH') {
+        }
+        elsif ( ref $self->options eq 'HASH' ) {
 
-          for my $foo (keys %{ $self->options }) {
-              next if $foo eq 'address';
-              $options{ '-' . $foo } = $self->options->{$foo}
-          }
+            for my $foo ( keys %{ $self->options } ) {
+                next if $foo eq 'address';
+                $options{ '-' . $foo } = $self->options->{$foo};
+            }
 
-       }
-       else {
+        }
+        else {
 
-           $options{ '-' . $self->options } = 1
+            $options{ '-' . $self->options } = 1;
 
-       }
+        }
 
     }
 
-    my $ok = Email::Valid->address( %options );
+    my $validated_address = ( Email::Valid->address(%options) // '' );
+    my $ok                = $value eq $validated_address;
 
     return $ok;
 }
@@ -56,13 +58,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Constraint::Email - Email Address Constraint
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 DESCRIPTION
 
@@ -81,7 +87,7 @@ Arguments: \%keypairs
 
 Options are passed to L<Email::Valid>. An array or single option is
 passd through with each option as 'true'. Using a hash instead, you
-can pass through more specific key pair options. Remeber in both
+can pass through more specific key pair options. Remember in both
 cases to omitted the leading dash that you would otherwise need if
 using L<Email::Valid> directly.
 
@@ -108,5 +114,16 @@ Carl Franks C<cfranks@cpan.org>, Dean Hamstead C<dean@bytefoundry.com.au>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

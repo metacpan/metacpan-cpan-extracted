@@ -14,7 +14,7 @@ use Chart::Plotly::Trace::Scatterternary::Stream;
 use Chart::Plotly::Trace::Scatterternary::Textfont;
 use Chart::Plotly::Trace::Scatterternary::Unselected;
 
-our $VERSION = '0.017';    # VERSION
+our $VERSION = '0.018';    # VERSION
 
 # ABSTRACT: Provides similar functionality to the *scatter* type but on a ternary phase diagram. The data is provided by at least two arrays out of `a`, `b`, `c` triplets.
 
@@ -296,7 +296,7 @@ Chart::Plotly::Trace::Scatterternary - Provides similar functionality to the *sc
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -501,7 +501,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Pablo Rodríguez González.
+This software is Copyright (c) 2018 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

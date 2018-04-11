@@ -3,7 +3,7 @@ package Debuggit;
 use strict;
 use warnings;
 
-our $VERSION = '2.06';
+our $VERSION = '2.07';
 
 
 #################### main pod documentation begin ###################
@@ -226,8 +226,9 @@ sub _setup_funcs
             add_func(DUMP => 1, sub
             {
                 require Data::Printer;
+                Data::Printer->VERSION("0.36");
                 shift;
-                return &Data::Printer::p(shift, colored => 1, hash_separator => ' => ', print_escapes => 1);
+                return &Data::Printer::np(shift, colored => 1, hash_separator => ' => ', print_escapes => 1);
             });
         }
         else
@@ -259,11 +260,12 @@ sub _setup_funcs
 =head2 debuggit
 
 Use this function to conditionally print debugging output.  If the first argument is a positive
-integer, the output is printed only if DEBUG is set to that number or higher.  The remaining
-arguments are concatenated with spaces, a newline is appended, and the results are printed to
-STDERR.  Some minor formatting is done to help distinguish C<undef> values and values with leading
-or trailing spaces.  To get further details, or to learn how to override any of those things, see
-L<Debuggit::Manual/"The debuggit function">.
+integer, the output is printed only if DEBUG is set to that number or higher.  If the first argument
+is I<not> a positive integer, the output is printed if DEBUG is non-zero (so omitting the debugging
+leve is the same as setting it to 1).  The remaining arguments are concatenated with spaces, a
+newline is appended, and the results are printed to STDERR.  Some minor formatting is done to help
+distinguish C<undef> values and values with leading or trailing spaces.  To get further details, or
+to learn how to override any of those things, see L<Debuggit::Manual/"The debuggit function">.
 
 =head2 default_formatter
 
@@ -470,8 +472,8 @@ is equivalent to:
 
     debuggit(1 => "vars are", DUMP => $var2);
 
-which is probably not going to do what you want, assuming the default functions are still in place.
-See L<Debuggit::Manual/"IMPORTANT CAVEAT!"> for full details.
+which is probably not what you wanted, assuming the default functions are still in place.  See
+L<Debuggit::Manual/"IMPORTANT CAVEAT!"> for full details.
 
 =item *
 
@@ -495,7 +497,7 @@ That's all I know of.  However, lacking omniscience, I welcome bug reports.
 
 Debuggit is on GitHub at barefootcoder/debuggit.  Feel free to fork and submit patches.  Please note
 that I develop via TDD (Test-Driven Development), so a patch that includes a failing test is much
-more likely to get accepted (or least likely to get accepted more quickly).
+more likely to get accepted (or at least likely to get accepted more quickly).
 
 If you just want to report a problem or request a feature, that's okay too.  You can create an issue
 on GitHub, or a bug in CPAN's RT (at http://rt.cpan.org).  Or just send an email to

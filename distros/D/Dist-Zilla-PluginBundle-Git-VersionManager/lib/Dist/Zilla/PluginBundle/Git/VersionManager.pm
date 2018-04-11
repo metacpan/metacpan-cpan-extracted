@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Git::VersionManager; # git description: v0.005-10-gee115ef
+package Dist::Zilla::PluginBundle::Git::VersionManager; # git description: v0.006-2-g9bdb4fe
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle that manages your version in git
 # KEYWORDS: bundle distribution git version Changes increment
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use Moose;
 with
@@ -98,7 +98,12 @@ sub configure
             # i.e. Git::NextVersion.foo = ... in dist.ini is rewritten in the payload as
             # RewriteVersion::Transitional.foo = ... so it can override defaults passed in by the caller
             # (a wrapper plugin bundle.)
-            : [ 'RewriteVersion::Transitional' => { ':version' => '0.004', $self->_payload_for($fallback_version_provider), $self->_payload_for('RewriteVersion') } ],
+            : [ 'RewriteVersion::Transitional' => {
+                    ':version' => '0.004',
+                    $self->_payload_for('RewriteVersion::Transitional'),,
+                    $self->_payload_for('RewriteVersion'),
+                    $self->_payload_for($fallback_version_provider),
+                } ],
 
         [ 'MetaProvides::Update' ],
 
@@ -209,7 +214,7 @@ Dist::Zilla::PluginBundle::Git::VersionManager - A plugin bundle that manages yo
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

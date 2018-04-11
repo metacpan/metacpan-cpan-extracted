@@ -1,4 +1,3 @@
-build\.pl
 blib/.*
 .gitignore
 Makefile$
@@ -15,4 +14,4 @@ IP-China-[0-9\.]+\/
 ^xt/.*$
 ^\.perlcriticrc$
 ^examples/.*-out\.txt$
-^make-pod\.pl$
+^(make-pod|build|clean)\.pl$

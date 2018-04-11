@@ -30,4 +30,4 @@ requires:
 resources:
   bugtracker: https://github.com/nanardon/X11-Xlib/issues
   repository: https://github.com/nanardon/X11-Xlib.git
-version: '0.16'
+version: '0.17'

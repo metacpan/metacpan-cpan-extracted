@@ -16,7 +16,7 @@ use Exception::Class;
 use Getopt::Long qw/:config no_ignore_case/;
 use List::Util qw(first);
 
-our $VERSION = '2.16';
+our $VERSION = '2.17';
 my $ignore_info;
 my $efa;
 my $efa_url = 'http://efa.vrr.de/vrr/XSLT_TRIP_REQUEST2';
@@ -214,7 +214,10 @@ sub display_routes {
 sub display_connection {
 	my ($c) = @_;
 
-	if ( $c->delay ) {
+	if ( $c->is_cancelled ) {
+		say '# FAHRT FÄLLT AUS';
+	}
+	elsif ( $c->delay ) {
 		printf( "# +%d,  Plan: %s -> %s\n",
 			$c->delay, $c->departure_stime, $c->arrival_stime );
 	}
@@ -455,7 +458,7 @@ efa - Command line client for EFA-based public transit routing services
 
 =head1 VERSION
 
-version 2.16
+version 2.17
 
 =head1 DESCRIPTION
 
@@ -518,7 +521,7 @@ route has bike support.
 
 =item B<-d>|B<--date> I<dd>.I<mm>.[I<yyyy>]
 
-Journey date
+Journey date. Also accepts the shortcut B<tomorrow>.
 
 =item B<-D>|B<--discover>
 
@@ -767,7 +770,7 @@ to to request via -> to.
 
 =head1 AUTHOR
 
-Copyright (C) 2009-2015 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2009-2018 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

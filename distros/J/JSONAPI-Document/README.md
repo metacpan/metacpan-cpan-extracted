@@ -4,7 +4,7 @@ JSONAPI::Document - Turn DBIx results into JSON API documents.
 
 # VERSION
 
-version 1.0
+version 1.1
 
 # SYNOPSIS
 
@@ -43,6 +43,11 @@ of the result row. The type is also pluralised using [Linua::EN::Inflexion](http
 while keeping relationship names intact (i.e. an 'author' relationship will still be called 'author', with the type 'authors').
 
 # ATTRIBUTES
+
+## data\_dir
+
+Required; Directory string where this module can store computed document type strings. This should be
+a directory that's ignored by your VCS.
 
 ## api\_url
 
@@ -114,8 +119,8 @@ View the resource document specification [here](http://jsonapi.org/format/#docum
 
 Uses [Lingua::EN::Segment](https://metacpan.org/pod/metacpan.org#pod-Lingua::EN::Segment) to set the appropriate type of the
 document. This is a bit expensive, but it ensures that your schema results source name gets hyphenated
-appropriately when converted into its plural form. The resulting type is cached eternally into memory
-(sorry) to minimize the need to re-compute the document type.
+appropriately when converted into its plural form. The resulting type is cached into the `data_dir`
+to minimize the need to re-compute the document type.
 
 The following options can be given:
 

@@ -49,14 +49,19 @@ sub display {
 =head2 keymap
 
 Arrayref that maps from a key code (byte) to an arrayref of KeySyms.
-The meaning of the positions of the arrayref roughly correspond to
 
-  [ $normal_key, $key_with_shift, $mode2_normal_key, $mode2_key_with_shift ]
+  [
+    ...
+    [ $normal_key, $key_with_shift, $mode2_normal_key, $mode2_key_with_shift, ... ]
+    ...
+  ]
 
+Each KeyCode (up to 255 of them) is used as an index into the outer array,
+and the inner array's elements correspond to different shift/mode states,
 where "mode2" indicates a dynamic switch of key layout of some sort.
-Additional elements of the array are vendor-specific.
+Each key's array can contain additonal vendor-specific elements.
 
-This table is exactly as loaded from the X11 server
+This table is stored exactly as loaded from the X11 server.
 
 =head2 rkeymap
 
@@ -436,6 +441,19 @@ sub save {
 1;
 
 __END__
+
+=head1 EXAMPLES
+
+=head2 Press a Key
+
+Suppose you've got an old DOS game that you're playing in Dosbox, and you
+find a neat trick to level up your character by pressing 'R' repeatedly.
+You might bang out a quick perl one-liner like this:
+
+  perl -e 'use X11::Xlib; $d= X11::Xlib->new;
+     $r= $d->keymap->find_keycode("R") or die "No R key?";
+     while (1) { $d->fake_key($r, 1); $d->fake_key($r, 0);
+      $d->flush; sleep 1; }'
 
 =head1 AUTHOR
 

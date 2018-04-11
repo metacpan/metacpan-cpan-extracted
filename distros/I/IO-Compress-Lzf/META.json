@@ -35,12 +35,12 @@
       "runtime" : {
          "requires" : {
             "Compress::LZF" : "0",
-            "IO::Compress::Base" : "2.080",
-            "IO::Uncompress::Base" : "2.080"
+            "IO::Compress::Base" : "2.081",
+            "IO::Uncompress::Base" : "2.081"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "2.080",
+   "version" : "2.081",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

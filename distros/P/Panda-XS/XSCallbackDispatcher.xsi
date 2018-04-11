@@ -1,5 +1,0 @@
-MODULE = Panda::XS             PACKAGE = Panda::XSCallbackDispatcher
-
-void xs::XSCallbackDispatcher::add(CV* cv)
-
-void xs::XSCallbackDispatcher::remove(CV* cv)

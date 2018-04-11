@@ -10,4 +10,5 @@ t/201_pod.t
 t/202_podcov.t
 t/301_build.t
 t/common.sub
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

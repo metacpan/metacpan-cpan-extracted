@@ -35,3 +35,5 @@ static MyBaseSSP st_mybase_ssp;
 
 typedef MyBase  MyBaseAV;
 typedef MyBase  MyBaseHV;
+typedef MyBase  MyNBaseAV;
+typedef MyBase  MyNBaseHV;

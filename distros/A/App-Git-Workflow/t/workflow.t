@@ -177,7 +177,7 @@ sub test_releases {
         [
             [
                 { tag    => [qw/not-release v3.0 v1.0 v1.1 v2.0/] },
-                { 'rev-list' => ['1405968782 55d0295a1227f591afc683dd12e43823cd2e404d'] },
+                { log    => "1405968782\x{1}55d0295a1227f591afc683dd12e43823cd2e404d" },
                 { branch => [map {"  $_"} qw{master origin/master}] },
             ],
             { tag => '^v\d+(?:[.]\d+)*$' },
@@ -188,10 +188,10 @@ sub test_releases {
                         'origin/master' => 1
                     },
                     files => {},
-                    user  => '',
+                    user  => undef,
                     time  => '1405968782',
                     name  => 'v3.0',
-                    email => '',
+                    email => undef,
                     sha   => '55d0295a1227f591afc683dd12e43823cd2e404d'
                 }
             ],
@@ -199,7 +199,7 @@ sub test_releases {
         [
             [
                 { branch => [map {"  $_"} qw{master origin/master origin/R1.0 origin/R2.0 origin/R3.0}] },
-                { 'rev-list' => ['1405968782 55d0295a1227f591afc683dd12e43823cd2e404d'] },
+                { log    => "1405968782\x{1}55d0295a1227f591afc683dd12e43823cd2e404d" },
                 { branch => [map {"  $_"} qw{origin/R1.0 origin/R2.0 origin/R3.0}] },
             ],
             { branch => '^origin/R\d+(?:[.]\d+)*$' },
@@ -209,10 +209,10 @@ sub test_releases {
                         map {$_ => 1} qw{origin/R1.0 origin/R2.0 origin/R3.0},
                     },
                     files => {},
-                    user  => '',
+                    user  => undef,
                     time  => '1405968782',
                     name  => 'origin/R3.0',
-                    email => '',
+                    email => undef,
                     sha   => '55d0295a1227f591afc683dd12e43823cd2e404d'
                 }
             ],
@@ -221,7 +221,7 @@ sub test_releases {
             [
                 { config => undef },
                 { branch => [map {"  $_"} qw{master origin/master origin/R1.0 origin/R2.0 origin/R3.0}] },
-                { 'rev-list' => ['1405968782 55d0295a1227f591afc683dd12e43823cd2e404d'] },
+                { log    => "1405968782\x{1}55d0295a1227f591afc683dd12e43823cd2e404d" },
                 { branch => [map {"  $_"} qw{master origin/master origin/R1.0 origin/R2.0}] },
             ],
             { local => 1 },
@@ -231,10 +231,10 @@ sub test_releases {
                         map {$_ => 1} qw{master origin/master origin/R1.0 origin/R2.0},
                     },
                     files => {},
-                    user  => '',
+                    user  => undef,
                     time  => '1405968782',
                     name  => 'master',
-                    email => '',
+                    email => undef,
                     sha   => '55d0295a1227f591afc683dd12e43823cd2e404d'
                 }
             ],
@@ -243,7 +243,7 @@ sub test_releases {
             [
                 { config => '?' },
                 { branch => [map {"  $_"} qw{master origin/master origin/R1.0 origin/R2.0 origin/R3.0}] },
-                { 'rev-list' => ['1405968782 55d0295a1227f591afc683dd12e43823cd2e404d'] },
+                { log    => "1405968782\x{1}55d0295a1227f591afc683dd12e43823cd2e404d" },
                 { branch => [map {"  $_"} qw{master origin/master origin/R1.0}] },
             ],
             { local => 1 },
@@ -253,10 +253,10 @@ sub test_releases {
                         map {$_ => 1} qw{master origin/master origin/R1.0},
                     },
                     files => {},
-                    user  => '',
+                    user  => undef,
                     time  => '1405968782',
                     name  => 'origin/master',
-                    email => '',
+                    email => undef,
                     sha   => '55d0295a1227f591afc683dd12e43823cd2e404d'
                 }
             ],

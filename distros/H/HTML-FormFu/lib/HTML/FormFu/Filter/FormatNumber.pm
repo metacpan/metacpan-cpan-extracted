@@ -1,7 +1,8 @@
-package HTML::FormFu::Filter::FormatNumber;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Filter::FormatNumber;
+$HTML::FormFu::Filter::FormatNumber::VERSION = '2.06';
+# ABSTRACT: Convert a formatted number from a known locale
 
 use Moose;
 extends 'HTML::FormFu::Filter';
@@ -41,13 +42,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Filter::FormatNumber - Convert a formatted number from a known locale
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -96,3 +101,16 @@ Copyright 2008 Moritz Onken, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

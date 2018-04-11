@@ -5,9 +5,9 @@ use warnings;
 use utf8;
 
 use Test::BDD::Cucumber::Definitions qw(Given When Then);
-use Test::BDD::Cucumber::Definitions::File qw(:util);
+use Test::BDD::Cucumber::Definitions::File qw(File);
 
-our $VERSION = '0.31';
+our $VERSION = '0.34';
 
 ## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
 ## no critic [RegularExpressions::RequireExtendedFormatting]
@@ -17,32 +17,32 @@ sub import {
 
     #        file path set "(.*)"
     Given qr/file path set "(.*)"/, sub {
-        file_path_set($1);
+        File->path_set($1);
     };
 
     #       file read text "(.*)"
     When qr/file read text "(.*)"/, sub {
-        file_read_text($1);
+        File->read_text($1);
     };
 
     #       file read binary
     When qr/file read binary/, sub {
-        file_read_binary();
+        File->read_binary();
     };
 
     #       file exists
     Then qr/file exists/, sub {
-        file_exists();
+        File->exists_yes();
     };
 
-    #       file no exists
-    Then qr/file no exists/, sub {
-        file_noexists();
+    #       file not exists
+    Then qr/file not exists/, sub {
+        File->exists_no();
     };
 
     #       file type is "(.*)"
     Then qr/file type is "(.*)"/, sub {
-        file_type_is($1);
+        File->type_is($1);
     };
 
     return;

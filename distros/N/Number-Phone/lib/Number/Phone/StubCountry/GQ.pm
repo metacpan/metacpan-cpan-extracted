@@ -22,29 +22,29 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200234;
+our $VERSION = 1.20180410221546;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '[235]',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 },
                 {
+                  'leading_digits' => '[89]',
                   'format' => '$1 $2',
-                  'pattern' => '(\\d{3})(\\d{6})',
-                  'leading_digits' => '[89]'
+                  'pattern' => '(\\d{3})(\\d{6})'
                 }
               ];
 
 my $validators = {
+                'specialrate' => '(90\\d[1-9]\\d{5})',
                 'mobile' => '
           (?:
             222|
             55[15]
           )\\d{6}
         ',
-                'personal_number' => '',
                 'geographic' => '
           3(?:
             3(?:
@@ -54,7 +54,8 @@ my $validators = {
             5\\d{2}[7-9]
           )\\d{4}
         ',
-                'specialrate' => '(90\\d[1-9]\\d{5})',
+                'personal_number' => '',
+                'pager' => '',
                 'toll_free' => '80\\d[1-9]\\d{5}',
                 'fixed_line' => '
           3(?:
@@ -65,7 +66,6 @@ my $validators = {
             5\\d{2}[7-9]
           )\\d{4}
         ',
-                'pager' => '',
                 'voip' => ''
               };
 my %areanames = (
@@ -605,6 +605,6 @@ my %areanames = (
       my $number = shift;
       $number =~ s/(^\+240|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-  return $self->is_valid() ? $self : undef;
-}
+        return $self->is_valid() ? $self : undef;
+    }
 1;

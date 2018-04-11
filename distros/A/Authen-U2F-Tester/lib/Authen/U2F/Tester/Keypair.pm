@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Authen::U2F::Tester::Keypair;
-$Authen::U2F::Tester::Keypair::VERSION = '0.02';
+$Authen::U2F::Tester::Keypair::VERSION = '0.03';
 # ABSTRACT: Authen::U2F::Tester Keypair Object
 
 use Moose;
@@ -56,7 +56,7 @@ Authen::U2F::Tester::Keypair - Authen::U2F::Tester Keypair Object
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -98,13 +98,17 @@ Get the private key (in C<DER> format) for this keypair.
 
 =head1 SOURCE
 
-The development version is on github at L<https://github.com/mschout/perl-authen-u2f-tester>
-and may be cloned from L<git://github.com/mschout/perl-authen-u2f-tester.git>
+The development version is on github at L<http://https://github.com/mschout/perl-authen-u2f-tester>
+and may be cloned from L<git://https://github.com/mschout/perl-authen-u2f-tester.git>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to bug-authen-u2f-tester@rt.cpan.org or through the web interface at:
- http://rt.cpan.org/Public/Dist/Display.html?Name=Authen-U2F-Tester
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/mschout/perl-authen-u2f-tester/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 

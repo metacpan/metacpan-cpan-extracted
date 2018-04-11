@@ -50,5 +50,6 @@ SEE ALSO
 
     MarpaX::ESLIF::URI::_generic, MarpaX::ESLIF::URI::file,
     MarpaX::ESLIF::URI::ftp, MarpaX::ESLIF::URI::http,
-    MarpaX::ESLIF::URI::https, MarpaX::ESLIF::URI::mailto
+    MarpaX::ESLIF::URI::https, MarpaX::ESLIF::URI::mailto,
+    MarpaX::ESLIF::URI::tag
 

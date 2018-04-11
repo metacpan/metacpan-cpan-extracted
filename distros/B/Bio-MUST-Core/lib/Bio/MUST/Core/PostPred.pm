@@ -1,6 +1,6 @@
 package Bio::MUST::Core::PostPred;
 # ABSTRACT: Posterior predictive tests for sequences
-$Bio::MUST::Core::PostPred::VERSION = '0.180630';
+$Bio::MUST::Core::PostPred::VERSION = '0.181000';
 use Moose;
 use namespace::autoclean;
 
@@ -119,7 +119,7 @@ Bio::MUST::Core::PostPred - Posterior predictive tests for sequences
 
 =head1 VERSION
 
-version 0.180630
+version 0.181000
 
 =head1 SYNOPSIS
 

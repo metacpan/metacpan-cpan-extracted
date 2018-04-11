@@ -4,7 +4,7 @@
       "K <x00.x7f@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.14",
+   "generated_by" : "Minilla/v3.0.16",
    "license" : [
       "perl_5"
    ],
@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "0"
+            "perl" : "5.008001"
          }
       },
       "test" : {
@@ -55,7 +55,7 @@
    "provides" : {
       "Acme::Pointer" : {
          "file" : "lib/Acme/Pointer.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -69,7 +69,7 @@
          "web" : "https://github.com/Code-Hex/p5-Acme-Pointer"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:CODEHEX",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200232;
+our $VERSION = 1.20180410221544;
 
 my $formatters = [
                 {
@@ -36,12 +36,12 @@ my $formatters = [
             2[4-9]|
             [34]
           ',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})',
-                  'format' => '$1 $2-$3-$4'
+                  'format' => '$1 $2-$3-$4',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})'
                 },
                 {
-                  'national_rule' => '8 0$1',
                   'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
+                  'format' => '$1 $2-$3-$4',
                   'leading_digits' => '
             1(?:
               5[24]|
@@ -61,11 +61,9 @@ my $formatters = [
               3[26]
             )
           ',
-                  'format' => '$1 $2-$3-$4'
+                  'national_rule' => '8 0$1'
                 },
                 {
-                  'format' => '$1 $2-$3',
-                  'pattern' => '(\\d{4})(\\d{2})(\\d{3})',
                   'leading_digits' => '
             1(?:
               5[169]|
@@ -86,40 +84,48 @@ my $formatters = [
               3[3-5]
             )
           ',
-                  'national_rule' => '8 0$1'
+                  'national_rule' => '8 0$1',
+                  'format' => '$1 $2-$3',
+                  'pattern' => '(\\d{4})(\\d{2})(\\d{3})'
                 },
                 {
-                  'national_rule' => '8 $1',
                   'pattern' => '([89]\\d{2})(\\d{3})(\\d{4})',
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             8[01]|
             9
           ',
-                  'format' => '$1 $2 $3'
-                },
-                {
-                  'national_rule' => '8 $1',
-                  'leading_digits' => '82',
-                  'pattern' => '(82\\d)(\\d{4})(\\d{4})',
-                  'format' => '$1 $2 $3'
-                },
-                {
-                  'format' => '$1 $2',
-                  'pattern' => '(800)(\\d{3})',
-                  'leading_digits' => '800',
                   'national_rule' => '8 $1'
                 },
                 {
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '82',
                   'national_rule' => '8 $1',
+                  'pattern' => '(82\\d)(\\d{4})(\\d{4})'
+                },
+                {
                   'leading_digits' => '800',
+                  'national_rule' => '8 $1',
+                  'format' => '$1 $2',
+                  'pattern' => '(800)(\\d{3})'
+                },
+                {
                   'pattern' => '(800)(\\d{2})(\\d{2,4})',
+                  'leading_digits' => '800',
+                  'national_rule' => '8 $1',
                   'format' => '$1 $2 $3'
                 }
               ];
 
 my $validators = {
+                'personal_number' => '',
                 'pager' => '',
-                'voip' => '249\\d{6}',
+                'specialrate' => '(
+          (?:
+            810|
+            902
+          )\\d{7}
+        )',
                 'mobile' => '
           (?:
             2(?:
@@ -130,7 +136,6 @@ my $validators = {
             44\\d
           )\\d{6}
         ',
-                'personal_number' => '',
                 'geographic' => '
           (?:
             1(?:
@@ -165,12 +170,7 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'specialrate' => '(
-          (?:
-            810|
-            902
-          )\\d{7}
-        )',
+                'voip' => '249\\d{6}',
                 'toll_free' => '
           8(?:
             0[13]|
@@ -339,13 +339,9 @@ my %areanames = (
       my $number = shift;
       $number =~ s/(^\+375|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-  
       return $self if ($self->is_valid());
-      {
-        no warnings 'uninitialized';
-        $number =~ s/^(?:8?0?)//;
-      }
+      $number =~ s/^(?:8?0?)//;
       $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-    return $self->is_valid() ? $self : undef;
-}
+      return $self->is_valid() ? $self : undef;
+    }
 1;

@@ -36,11 +36,8 @@ $worksheet->write( 8, 0, '=IF(A5>3,"Yes", "No")' );
 
 
 # Write a hyperlink
-my $hyperlink_format = $workbook->add_format(
-    color     => 'blue',
-    underline => 1,
-);
+$worksheet->write( 10, 0, 'http://www.perl.com/' );
 
-$worksheet->write( 10, 0, 'http://www.perl.com/', $hyperlink_format );
+$workbook->close();
 
 __END__

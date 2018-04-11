@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =head1 SYNOPSIS
 
@@ -112,7 +112,7 @@ The following functions are exportable:
         as_oct as_int as_dec as_frac is_pos is_neg is_int
         is_rat is_real is_imag is_complex is_inf is_ninf
         is_nan is_zero is_one is_mone is_even is_odd is_div
-        rat_approx acmp
+        getbit setbit flipbit clearbit acmp rat_approx
 
 Each function can be exported individually, as:
 
@@ -1095,7 +1095,7 @@ See also:
 
 =over 4
 
-=item * https://en.wikipedia.org/wiki/Multinomial_theorem
+=item * L<https://en.wikipedia.org/wiki/Multinomial_theorem>
 
 =back
 
@@ -1401,6 +1401,50 @@ Returns the population count of the positive integer part of C<x>, which is the 
 its binary representation.
 
 This value is also known as the Hamming weight.
+
+=head2 getbit
+
+    getbit(n, k)                                 #=> Bool
+
+Verifies C<n>'s k-th bit and returns a true value if the bit is set to 1. False otherwise.
+
+Example:
+
+    getbit(0b1001, 0) = 1
+    getbit(0b1000, 0) = 0
+
+=head2 setbit
+
+    setbit(n, k)                                  #=> Int
+
+Sets C<n>'s k-th bit to 1 (without modifying C<n> in-place).
+
+Example:
+
+    setbit(0b1000, 0) = 0b1001
+    setbit(0b1000, 2) = 0b1100
+
+=head2 flipbit
+
+    flipbit(n, k)                                 #=> Int
+
+Flips C<n>'s k-th bit from 1 to 0, and viceversa (without modifying C<n> in-place).
+
+Example:
+
+    flipbit(0b1000, 0) = 0b1001
+    flipbit(0b1001, 0) = 0b1000
+
+=head2 clearbit
+
+    clearbit(n, k)                                #=> Int
+
+Clears C<n>'s k-th bit, by setting it to 0 (without modifying C<n> in-place).
+
+Example:
+
+    clearbit(0b1001, 0) = 0b1000
+    clearbit(0b1100, 2) = 0b1000
 
 =head1 * Introspection
 

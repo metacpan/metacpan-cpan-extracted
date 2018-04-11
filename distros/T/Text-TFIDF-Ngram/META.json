@@ -34,10 +34,10 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Lingua::EN::Ngram" : "0",
+            "Lingua::EN::Ngram" : "0.03",
             "Lingua::StopWords" : "0",
             "List::Util" : "1.30",
-            "Moo" : "0",
+            "Moo" : "2",
             "namespace::clean" : "0",
             "perl" : "5.006",
             "strictures" : "2"
@@ -67,7 +67,7 @@
          "web" : "https://github.com/ology/Text-TFIDF-Ngram"
       }
    },
-   "version" : "0.0206",
+   "version" : "0.0207",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"

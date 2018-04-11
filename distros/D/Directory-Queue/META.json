@@ -4,7 +4,7 @@
       "Lionel Cons <lionel.cons@cern.ch>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140",
+   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "perl_5"
    ],
@@ -34,12 +34,12 @@
       },
       "runtime" : {
          "requires" : {
-            "No::Worries" : "1.1",
+            "No::Worries" : "1.4",
             "POSIX" : "0",
             "Time::HiRes" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.9"
+   "version" : "2.0"
 }

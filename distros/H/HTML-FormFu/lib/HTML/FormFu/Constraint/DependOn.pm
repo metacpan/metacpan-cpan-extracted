@@ -1,7 +1,8 @@
-package HTML::FormFu::Constraint::DependOn;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Constraint::DependOn;
+$HTML::FormFu::Constraint::DependOn::VERSION = '2.06';
+# ABSTRACT: Multi-field Dependency Constraint
 
 use Moose;
 extends 'HTML::FormFu::Constraint';
@@ -57,8 +58,8 @@ sub process {
         }
     }
 
-    return $self->mk_errors( {
-            pass => @failed ? 0 : 1,
+    return $self->mk_errors(
+        {   pass   => @failed ? 0 : 1,
             failed => \@failed,
             names  => [ $self->nested_name, @names ],
         } );
@@ -84,13 +85,17 @@ __PACKAGE__->meta->make_immutable;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Constraint::DependOn - Multi-field Dependency Constraint
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 SYNOPSIS
 
@@ -128,5 +133,16 @@ Carl Franks C<cfranks@cpan.org>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

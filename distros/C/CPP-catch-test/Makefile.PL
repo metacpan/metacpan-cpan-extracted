@@ -1,4 +1,4 @@
-use 5.018;
+use 5.012;
 use Config;
 use Panda::Install;
 

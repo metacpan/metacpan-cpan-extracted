@@ -13,8 +13,8 @@
 package Directory::Queue;
 use strict;
 use warnings;
-our $VERSION  = "1.9";
-our $REVISION = sprintf("%d.%02d", q$Revision: 1.50 $ =~ /(\d+)\.(\d+)/);
+our $VERSION  = "2.0";
+our $REVISION = sprintf("%d.%02d", q$Revision: 1.52 $ =~ /(\d+)\.(\d+)/);
 
 #
 # used modules
@@ -165,57 +165,6 @@ sub _special_getdir ($;$) {
 }
 
 #
-# read from a binary file:
-#  - return a reference to the file contents (bytes)
-#  - we use stat() to avoid calling sysread() one extra time at EOF
-#
-
-sub _file_read_bin ($) {
-    my($path) = @_;
-    my($fh, @stat, $data, $done, $todo);
-
-    sysopen($fh, $path, O_RDONLY)
-        or dief("cannot sysopen(%s, O_RDONLY): %s", $path, $!);
-    binmode($fh)
-        or dief("cannot binmode(%s): %s", $path, $!);
-    @stat = stat($fh)
-        or dief("cannot stat(%s): %s", $path, $!);
-    $todo = $stat[ST_SIZE];
-    $data = "";
-    while ($todo) {
-        $done = sysread($fh, $data, $todo, length($data));
-        dief("cannot sysread(%s): %s", $path, $!) unless defined($done);
-        $todo -= $done;
-    }
-    close($fh) or dief("cannot close(%s): %s", $path, $!);
-    return(\$data);
-}
-
-#
-# read from a UTF-8 encoded file:
-#  - return a reference to the file contents (characters)
-#  - we do not use stat() as the file size is not the string length
-#
-
-sub _file_read_utf8 ($) {
-    my($path) = @_;
-    my($fh, $data, $done, $todo);
-
-    sysopen($fh, $path, O_RDONLY)
-        or dief("cannot sysopen(%s, O_RDONLY): %s", $path, $!);
-    binmode($fh, ":encoding(utf8)")
-        or dief("cannot binmode(%s, :encoding(utf8)): %s", $path, $!);
-    $data = "";
-    $done = -1;
-    while ($done) {
-        $done = sysread($fh, $data, SYSBUFSIZE, length($data));
-        dief("cannot sysread(%s): %s", $path, $!) unless defined($done);
-    }
-    close($fh) or dief("cannot close(%s): %s", $path, $!);
-    return(\$data);
-}
-
-#
 # create a file:
 #  - return the file handle on success
 #  - tolerate some errors unless the optional third argument is true
@@ -223,7 +172,7 @@ sub _file_read_utf8 ($) {
 #  - handle an optional umask
 #
 
-sub _file_create ($$;$) {
+sub _create ($$;$) {
     my($path, $umask, $strict) = @_;
     my($fh, $oldumask, $success);
 
@@ -240,37 +189,6 @@ sub _file_create ($$;$) {
     # RACE: someone else may have created the file (EEXIST)
     # RACE: the containing directory may be mising (ENOENT)
     return(0);
-}
-
-#
-# write to a file:
-#  - the file must not exist beforehand
-#  - this function must be given a reference to the file contents
-#  - handle an optional umask
-#  - handle optional UTF-8 decoding
-#
-
-sub _file_write ($$$$) {
-    my($path, $utf8, $umask, $dataref) = @_;
-    my($fh, $length, $offset, $done);
-
-    $fh = _file_create($path, $umask, "strict");
-    if ($utf8) {
-        binmode($fh, ":encoding(utf8)")
-            or dief("cannot binmode(%s, :encoding(utf8)): %s", $path, $!);
-    } else {
-        binmode($fh)
-            or dief("cannot binmode(%s): %s", $path, $!);
-    }
-    $length = length(${ $dataref });
-    $offset = 0;
-    while ($length) {
-        $done = syswrite($fh, ${ $dataref }, SYSBUFSIZE, $offset);
-        dief("cannot syswrite(%s): %s", $path, $!) unless defined($done);
-        $length -= $done;
-        $offset += $done;
-    }
-    close($fh) or dief("cannot close(%s): %s", $path, $!);
 }
 
 #
@@ -473,8 +391,7 @@ sub import : method {
     $pkg = shift(@_);
     foreach my $name (
         qw(SYSBUFSIZE _name $_DirectoryRegexp $_ElementRegexp
-           _file_create _file_read_bin _file_read_utf8 _file_write
-           _special_getdir _special_mkdir _special_rmdir _touch)) {
+           _special_getdir _special_mkdir _special_rmdir _create _touch)) {
         $exported{$name}++;
     }
     export_control(scalar(caller()), $pkg, \%exported, @_);
@@ -523,8 +440,9 @@ operations. It focuses on simplicity, robustness and scalability.
 
 This module allows multiple concurrent readers and writers to interact with
 the same queue. A Python implementation of the same algorithm is available at
-L<https://github.com/cern-mig/python-dirq> and a Java implementation at
-L<https://github.com/cern-mig/java-dirq> so readers and writers can be written
+L<https://github.com/cern-mig/python-dirq>, a Java implementation at
+L<https://github.com/cern-mig/java-dirq> and a C implementation at
+L<https://github.com/cern-mig/c-dirq> so readers and writers can be written
 in different programming languages.
 
 There is no knowledge of priority within a queue. If multiple priorities are
@@ -739,4 +657,4 @@ L<Directory::Queue::Simple>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2010-2015
+Copyright (C) CERN 2010-2018

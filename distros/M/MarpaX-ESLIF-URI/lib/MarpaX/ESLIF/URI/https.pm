@@ -7,7 +7,7 @@ package MarpaX::ESLIF::URI::https;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Carp qw/croak/;
 use Class::Tiny::Antlers;
@@ -87,11 +87,11 @@ MarpaX::ESLIF::URI::https - URI::https syntax as per RFC7230
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SUBROUTINES/METHODS
 
-MarpaX::ESLIF::URI::https inherits, and eventually overwrites some, methods or MarpaX::ESLIF::URI::_generic.
+MarpaX::ESLIF::URI::https inherits, and eventually overwrites some, methods of MarpaX::ESLIF::URI::_generic.
 
 =head2 $class->bnf
 

@@ -1,12 +1,12 @@
-package HTML::FormFu::Role::Filter::Compound;
-
 use strict;
-our $VERSION = '2.05'; # VERSION
+
+package HTML::FormFu::Role::Filter::Compound;
+$HTML::FormFu::Role::Filter::Compound::VERSION = '2.06';
+# ABSTRACT: Role for Compound filters
 
 use Moose::Role;
-use MooseX::Attribute::FormFuChained;
 
-has field_order => ( is => 'rw', traits => ['FormFuChained'] );
+has field_order => ( is => 'rw', traits => ['Chained'] );
 
 sub _get_values {
     my ( $self, $value ) = @_;
@@ -38,13 +38,17 @@ sub _get_values {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::FormFu::Role::Filter::Compound - Role for Compound filters
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =head1 METHODS
 
@@ -79,5 +83,16 @@ Carl Franks, C<cfranks@cpan.org>
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

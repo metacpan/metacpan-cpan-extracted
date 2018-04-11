@@ -5,9 +5,9 @@ use warnings;
 use utf8;
 use DDP;
 use Test::BDD::Cucumber::Definitions qw(Given When Then);
-use Test::BDD::Cucumber::Definitions::File qw(:util);
+use Test::BDD::Cucumber::Definitions::File qw(File);
 
-our $VERSION = '0.31';
+our $VERSION = '0.34';
 
 ## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
 ## no critic [RegularExpressions::RequireExtendedFormatting]
@@ -84,7 +84,7 @@ sub import {
 
     #        file path set "(.*)"
     Given qr/задан путь к файлу "(.*)"/, sub {
-        file_path_set($1);
+        File->path_set($1);
     };
 
 =head2 Действия
@@ -99,7 +99,7 @@ sub import {
 
     #       file read text "(.*)"
     When qr/прочитан текстовый файл в кодировке "(.*)"/, sub {
-        file_read_text($1);
+        File->read_text($1);
     };
 
 =pod
@@ -112,7 +112,7 @@ sub import {
 
     #       file read binary
     When qr/прочитан двоичный файл/, sub {
-        file_read_binary();
+        File->read_binary();
     };
 
 =head2 Проверки
@@ -127,7 +127,7 @@ sub import {
 
     #       file exists
     Then qr/файл существует/, sub {
-        file_exists();
+        File->exists_yes();
     };
 
 =pod
@@ -138,9 +138,9 @@ sub import {
 
 =cut
 
-    #       file no exists
+    #       file not exists
     Then qr/файл не существует/, sub {
-        file_noexists();
+        File->exists_no();
     };
 
 =pod
@@ -153,7 +153,7 @@ sub import {
 
     #       file type is "(.*)"
     Then qr/файл имеет тип "(.*)"/, sub {
-        file_type_is($1);
+        File->type_is($1);
     };
 
     return;

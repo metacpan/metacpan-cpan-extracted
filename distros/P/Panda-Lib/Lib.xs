@@ -4,6 +4,7 @@
 #include <xs/lib/cmp.h>
 #include <xs/lib/clone.h>
 #include <xs/lib/merge.h>
+#include <xs/export.h>
 #include <panda/string.h>
 #include <panda/log.h>
 #include <xs/lib/XSCallbackDispatcher.h>
@@ -12,6 +13,8 @@
 using namespace panda::lib;
 using namespace panda;
 using namespace xs::lib;
+using namespace xs::exp;
+using panda::logger::Level;
 using xs::SvIntrPtr;
 
 MODULE = Panda::Lib                PACKAGE = Panda::Lib
@@ -83,23 +86,8 @@ bool compare (SV* first, SV* second) {
     RETVAL = sv_compare(aTHX_ first, second);
 }
 
-void set_native_logger(CV* cb) {
-    xs::SvIntrPtr cb_ptr(cb);
-    struct CatchLogger : panda::logger::ILogger {
-        xs::SvIntrPtr cb;
-    
-        virtual void log(panda::logger::Level l, panda::logger::CodePoint cp, const std::string& s) override {
-            dTHX;
-            auto cp_str = cp.to_string();
-            SV* args[] = {newSViv(l), newSVpv(cp_str.c_str(), cp_str.size()), newSVpv(s.c_str(), s.size())};
-            xs::call_sub_void(aTHX_ cb.get<CV>(), args, 3);
-        }
-    };
-    auto log = new CatchLogger;
-    log->cb = cb_ptr;
-    panda::Log::logger().reset(log);
-}
-
 INCLUDE: CallbackDispatcher.xsi
 
 INCLUDE: NativeCallbackDispatcher.xsi
+
+INCLUDE: Logger.xsi

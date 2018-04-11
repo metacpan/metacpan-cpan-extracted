@@ -1,6 +1,6 @@
 #pragma once
 
-#if __cplusplus > 201402L
+#if __cpp_lib_optional >= 201603L
 #  include <optional>
 namespace panda {
   template <typename T>

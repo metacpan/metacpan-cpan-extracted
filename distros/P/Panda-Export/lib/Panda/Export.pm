@@ -1,7 +1,7 @@
 package Panda::Export;
 use 5.012;
 
-our $VERSION = '2.2.6';
+our $VERSION = '2.2.7';
 
 =head1 NAME
 
@@ -221,6 +221,15 @@ Exports contants/subs with names in C<list>. You must pass the size of C<list> i
 
 Exports contants/subs with names in C<list>. Stops processing list if discovered NULL value in list.
 Therefore you must either pass a valid C<items>, or end your list with NULL value.
+
+=head4 void register_export (HV* stash, CV* sub) [pTHX]
+
+=head4 void register_export (HV* stash, SV* sub) [pTHX]
+
+=head4 void register_export (HV* stash, const char* name) [pTHX]
+
+Forces an export of a function with specified name. Useful when you
+don't want to create a separate .pm file.
 
 =head4 AV* constants_list (HV* stash) [pTHX]
 

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200236;
+our $VERSION = 1.20180410221547;
 
 my $formatters = [
                 {
@@ -31,38 +31,38 @@ my $formatters = [
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 },
                 {
-                  'intl_format' => '($1) $2',
-                  'format' => '$1 $2',
                   'leading_digits' => '0549',
+                  'format' => '$1 $2',
+                  'intl_format' => '($1) $2',
                   'pattern' => '(0549)(\\d{6})'
                 },
                 {
                   'leading_digits' => '[89]',
-                  'pattern' => '(\\d{6})',
+                  'intl_format' => '(0549) $1',
                   'format' => '0549 $1',
-                  'intl_format' => '(0549) $1'
+                  'pattern' => '(\\d{6})'
                 }
               ];
 
 my $validators = {
-                'mobile' => '6[16]\\d{6}',
-                'personal_number' => '',
-                'geographic' => '
-          0549(?:
-            8[0157-9]|
-            9\\d
-          )\\d{4}
-        ',
-                'toll_free' => '',
-                'specialrate' => '(7[178]\\d{6})',
                 'fixed_line' => '
           0549(?:
             8[0157-9]|
             9\\d
           )\\d{4}
         ',
+                'toll_free' => '',
+                'voip' => '5[158]\\d{6}',
+                'geographic' => '
+          0549(?:
+            8[0157-9]|
+            9\\d
+          )\\d{4}
+        ',
+                'specialrate' => '(7[178]\\d{6})',
+                'mobile' => '6[16]\\d{6}',
                 'pager' => '',
-                'voip' => '5[158]\\d{6}'
+                'personal_number' => ''
               };
 
     sub new {
@@ -70,13 +70,17 @@ my $validators = {
       my $number = shift;
       $number =~ s/(^\+378|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
-  
       return $self if ($self->is_valid());
-      {
+      my $prefix = qr/^(?:([89]\d{5}))/;
+      my @matches = $number =~ /$prefix/;
+      if (defined $matches[-1]) {
         no warnings 'uninitialized';
-        $number =~ s/^(?:([89]\d{5}))/0549$1/;
+        $number =~ s/$prefix/0549$1/;
+      }
+      else {
+        $number =~ s/$prefix//;
       }
       $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
-    return $self->is_valid() ? $self : undef;
-}
+      return $self->is_valid() ? $self : undef;
+    }
 1;

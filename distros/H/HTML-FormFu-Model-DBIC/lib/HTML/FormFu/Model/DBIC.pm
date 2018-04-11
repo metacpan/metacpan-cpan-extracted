@@ -4,12 +4,12 @@ use strict;
 use warnings;
 use base 'HTML::FormFu::Model';
 
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 use HTML::FormFu::Util qw( _merge_hashes );
 use List::MoreUtils qw( none notall );
 use List::Util qw( first );
-use Scalar::Util qw( blessed );
+use Scalar::Util qw( blessed reftype );
 use Storable qw( dclone );
 use Carp qw( croak );
 
@@ -61,8 +61,12 @@ sub options_from_model {
             : {};    # avoid overwriting attrs->{condition}
         for my $name ( keys %$from_stash ) {
             croak "config value must not be a reference" if ref $from_stash->{$name};
-            my $value = $form->stash->{ $from_stash->{$name} };
-            $condition->{$name} = $value;
+            if ( $attrs->{expand_stash_dots} ) {
+                $condition->{$name} = $self->_get_stash_value( $form->stash, $from_stash->{$name} );
+            }
+            else {
+                $condition->{$name} = $form->stash->{ $from_stash->{$name} };
+            }
         }
     }
 
@@ -92,6 +96,30 @@ sub options_from_model {
     }
 
     return @defaults;
+}
+
+sub _get_stash_value {
+    my ( $self, $stash, $key ) = @_;
+    my $base = $stash;
+
+    if ( $key =~ /\./ ) {
+        for my $part ( grep {length} split qr/\./, $key ) {
+            if ( blessed($base) && $base->can($part) ) {
+                $base = $base->$part;
+            }
+            elsif ( 'HASH' eq reftype($base) ) {
+                $base = $base->{$part};
+            }
+            elsif ( 'ARRAY' eq reftype($base) && $key =~ /^[0-9]+\z/ ) {
+                $base = $base->[$key];
+            }
+            else {
+                croak "don't know what to do with part '$part' in key '$key'";
+            }
+        }
+    }
+
+    return $base;
 }
 
 sub _get_resultset {
@@ -1144,7 +1172,7 @@ HTML::FormFu::Model::DBIC - Integrate HTML::FormFu with DBIx::Class
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS
 
@@ -1814,6 +1842,37 @@ Is comparable to:
             }
         }
     })
+
+If the value in the stash is nested in a data-structure, you can access it by
+setting C<expand_stash_dots>. As you can see in the example below, it
+automatically handles calling methods on objects, accessing hash-keys on
+hash-references, and accessing array-slots on array references.
+
+    element:
+      - type: Select
+        name: foo
+        model_config:
+          resultset: TableClass
+          condition_from_stash:
+            key: foo.bar.0
+          expand_stash_dots: 1
+
+Is comparable to:
+
+    $form->element({
+        type => 'Select',
+        name => 'foo',
+        model_config => {
+            resultset => 'TableClass',
+            condition => {
+                key => $form->stash->{foo}->bar->[0];
+            }
+        }
+    })
+    # Where stash returns a hashref.
+    # The 'foo' hash-key returns an object.
+    # The object-method 'bar' returns an arrayref.
+    # The first array slot returns the value used in the query.
 
 You can set C<attributes>, which will be passed as the 2nd argument to
 L<DBIx::Class::ResultSet/search>.

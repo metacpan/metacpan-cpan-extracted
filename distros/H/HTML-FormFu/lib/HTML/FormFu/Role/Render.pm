@@ -1,11 +1,10 @@
-package HTML::FormFu::Role::Render;
+use strict;
 
+package HTML::FormFu::Role::Render;
+$HTML::FormFu::Role::Render::VERSION = '2.06';
 use HTML::FormFu::Util qw( process_attrs );
 use Carp qw( croak );
 use Scalar::Util qw( reftype );
-
-use strict;
-our $VERSION = '2.05'; # VERSION
 
 use Moose::Role;
 
@@ -58,7 +57,7 @@ sub tt {
 
     $tt_module = $ENV{HTML_FORMFU_TT_MODULE}
         if defined $ENV{HTML_FORMFU_TT_MODULE}
-            && length $ENV{HTML_FORMFU_TT_MODULE};
+        && length $ENV{HTML_FORMFU_TT_MODULE};
 
     my $class = $tt_module;
     $class =~ s|::|/|g;
@@ -133,3 +132,30 @@ sub _share_dir {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::FormFu::Role::Render
+
+=head1 VERSION
+
+version 2.06
+
+=head1 AUTHOR
+
+Carl Franks <cpan@fireartist.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Carl Franks.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

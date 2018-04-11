@@ -38,8 +38,13 @@ use Cwd;
 my $R = getcwd;
 
 my $ua = LWP::UserAgent->new();
-my $webhook_url = sprintf( 'http://%s:%d/webhook/?channel=test&network=local&use_color=0',
-    $test_bot->addr, $test_bot->port );
+my $webhook_url = sprintf(
+    'http://%s:%d/webhook/?'
+        . join( '&',
+        'channel=test', 'network=local', 'use_color=0', 'shorten_urls=0' ),
+    $test_bot->addr,
+    $test_bot->port
+);
 
 sub webhook_post {
     my $response = $ua->post(
@@ -90,6 +95,27 @@ TestBot->expect(
         'v5.8-plus',
         '* Tagging v5.8-plus',
         '* http://git/project/tags/v5.8-plus',
+    )
+);
+
+is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
+
+$resp = webhook_post(
+    {   object_kind => 'tag_push',
+        ref         => 'refs/tags/v5.8-plus',
+        before      => '470fc2f92766368cd72e2796db89360fe8e81637',
+        after       => '0000000000000000000000000000000000000000',
+        user_name => 'Test User',
+        project => { name => 'test-repo', homepage => 'http://git/project', },
+    }
+);
+
+TestBot->expect(
+    join( ' ',
+        '#test Test User',
+        'tags 470fc2f test-repo',
+        'v5.8-plus',
+        '* tag deleted',
     )
 );
 

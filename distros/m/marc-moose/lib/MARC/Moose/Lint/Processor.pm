@@ -1,6 +1,6 @@
 package MARC::Moose::Lint::Processor;
 # ABSTRACT: Processor to lint a biblio records file
-$MARC::Moose::Lint::Processor::VERSION = '1.0.34';
+$MARC::Moose::Lint::Processor::VERSION = '1.0.35';
 use Moose;
 use Modern::Perl;
 use MARC::Moose::Reader::File::Iso2709;
@@ -114,7 +114,7 @@ MARC::Moose::Lint::Processor - Processor to lint a biblio records file
 
 =head1 VERSION
 
-version 1.0.34
+version 1.0.35
 
 =head1 ATTRIBUTES
 
@@ -233,7 +233,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Frédéric Demians.
+This software is copyright (c) 2018 by Frédéric Demians.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

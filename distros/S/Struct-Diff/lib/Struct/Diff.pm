@@ -5,9 +5,9 @@ use strict;
 use warnings FATAL => 'all';
 use parent qw(Exporter);
 
+use Algorithm::Diff qw(LCSidx);
 use Scalar::Util qw(looks_like_number);
 use Storable 2.05 qw(freeze);
-use Algorithm::Diff qw(sdiff);
 
 our @EXPORT_OK = qw(
     diff
@@ -31,11 +31,11 @@ Struct::Diff - Recursive diff for nested perl structures
 
 =head1 VERSION
 
-Version 0.95
+Version 0.96
 
 =cut
 
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 =head1 SYNOPSIS
 
@@ -164,7 +164,7 @@ Drop removed item's data.
 
 =cut
 
-our $Freezer = sub {
+our $FREEZER = sub {
     local $Storable::canonical = 1; # for equal snapshots for equal by data hashes
     local $Storable::Deparse = 1;   # for coderefs
 
@@ -174,7 +174,7 @@ our $Freezer = sub {
 sub diff($$;@) {
     my ($x, $y, %opts) = @_;
 
-    $opts{freezer} = $Freezer unless (exists $opts{freezer});
+    $opts{freezer} = $FREEZER unless (exists $opts{freezer});
 
     _diff($x, $y, %opts);
 }
@@ -190,37 +190,36 @@ sub _diff($$;@) {
         $d->{O} = $x unless ($opts{noO});
         $d->{N} = $y unless ($opts{noN});
     } elsif ($type eq 'ARRAY' and $x != $y) {
-        return $opts{noU} ? {} : { U => [] } unless (@{$x} or @{$y});
+        my ($lcs, $stat) = _lcs_diff($x, $y, $opts{freezer});
 
-        my ($i, $I) = (-1, -1);
-        for (sdiff($x, $y, $opts{freezer})) {
-            $i++;
+        if ($stat->{U} * 3 == @{$lcs}) {
+            $d->{U} = $y unless ($opts{noU});
+        } else {
+            my ($I, $xi, $yi, $op, $sd) = 0;
 
-            if ($_->[0] eq 'u') {
-                unless ($opts{noU}) {
-                    if (exists $d->{D}) {
-                        push @{$d->{D}}, { U => $_->[1] };
-                    } else { # nobody else - fill U version
-                        push @{$d->{U}}, $_->[1];
-                    }
+            while (@{$lcs}) {
+                ($op, $xi, $yi) = splice @{$lcs}, 0, 3;
+
+                if ($op eq 'U') {
+                    if ($opts{noU}) { $I++; next }
+                    push @{$d->{D}}, { U => $y->[$yi] };
+                } elsif ($op eq 'D') {
+                    $sd = _diff($x->[$xi], $y->[$yi], %opts);
+                    unless (keys %{$sd}) { $I++; next }
+                    push @{$d->{D}}, $sd;
+                } elsif ($op eq 'A') {
+                    if ($opts{noA}) { $I++; next }
+                    push @{$d->{D}}, { A => $y->[$yi] };
+                } else {
+                    if ($opts{noR}) { $I++; next }
+                    push @{$d->{D}}, { R => $opts{trimR} ? undef : $x->[$xi] };
                 }
-                next;
-            } elsif (exists $d->{U}) { # diff should be converted to D type
-                map { push @{$d->{D}}, { U => $_ } } @{delete $d->{U}};
-            }
 
-            if ($_->[0] eq 'c') {
-                my $sd = _diff($_->[1], $_->[2], %opts);
-                push @{$d->{D}}, $sd if (keys %{$sd});
-            } elsif ($_->[0] eq '+') {
-                push @{$d->{D}}, { A => $_->[2] } unless ($opts{noA});
-            } else { # '-'
-                push @{$d->{D}}, { R => $opts{trimR} ? undef : $_->[1] }
-                    unless ($opts{noR});
+                if ($I) {
+                    $d->{D}->[-1]->{I} = $xi;
+                    $I = 0;
+                }
             }
-
-            $d->{D}->[-1]->{I} = $I = $i
-                if (exists $d->{D} and $#{$d->{D}} != $i and ++$I != $i);
         }
     } elsif ($type eq 'HASH' and $x != $y) {
         my @keys = keys %{{ %{$x}, %{$y} }}; # uniq keys for both hashes
@@ -234,10 +233,7 @@ sub _diff($$;@) {
                     my $sd = _diff($x->{$k}, $y->{$k}, %opts);
                     $d->{D}->{$k} = $sd if (keys %{$sd});
                 }
-                next;
-            }
-
-            if (exists $x->{$k}) {
+            } elsif (exists $x->{$k}) {
                 $d->{D}->{$k}->{R} = $opts{trimR} ? undef : $x->{$k}
                     unless ($opts{noR});
             } else {
@@ -259,9 +255,43 @@ sub _diff($$;@) {
     return $d;
 }
 
+sub _lcs_diff {
+    my ($xm, $ym) = LCSidx(@_);
+    my ($xi, $yi, @diff, %stat) = (0, 0);
+
+    # additional unchanged items to collect trailing non-matched
+    push @{$xm}, scalar @{$_[0]};
+    push @{$ym}, scalar @{$_[1]};
+
+    while (@{$xm}) {
+        if ($xi == $xm->[0] and $yi == $ym->[0]) {
+            push @diff, 'U', shift @{$xm}, shift @{$ym};
+            $xi++; $yi++;
+            $stat{U}++;
+        } elsif ($xi < $xm->[0] and $yi < $ym->[0]) {
+            push @diff, 'D', $xi++, $yi++;
+            $stat{N}++;
+        } elsif ($xi < $xm->[0]) {
+            push @diff, 'R', $xi++, $yi;
+            $stat{R}++;
+        } else {
+            push @diff, 'A', $xi, $yi++;
+            $stat{A}++;
+        }
+    }
+
+    $stat{O} = $stat{N} if (exists $stat{N});
+
+    # remove added above trailing item
+    splice @diff, -3, 3;
+    $stat{U}--;
+
+    return \@diff, \%stat;
+}
+
 =head2 list_diff
 
-List pairs (path_to_subdiff, ref_to_subdiff)) for provided diff. See
+List all pairs (path_to_subdiff, ref_to_subdiff) for provided diff. See
 L<Struct::Path/ADDRESSING SCHEME> for path format specification.
 
     @list = list_diff($diff);
@@ -272,7 +302,7 @@ L<Struct::Path/ADDRESSING SCHEME> for path format specification.
 
 =item depth C<< <int> >>
 
-Don't dive deeper than defined number of levels. C<undef> used by default
+Don't dive deeper than defined number of levels; C<undef> used by default
 (unlimited).
 
 =item sort C<< <sub|true|false> >>
@@ -288,31 +318,27 @@ lexically sorted if set to some other true value.
 sub list_diff($;@) {
     my @stack = ([], \shift); # init: (path, diff)
     my %opts = @_;
-    my ($diff, @list, $path);
+    my ($diff, @list, $path, $I);
 
     while (@stack) {
-        ($path, $diff) = splice @stack, 0, 2;
+        ($path, $diff) = splice @stack, -2, 2;
 
         if (!exists ${$diff}->{D} or $opts{depth} and @{$path} >= $opts{depth}) {
-            push @list, $path, $diff;
+            unshift @list, $path, $diff;
         } elsif (ref ${$diff}->{D} eq 'ARRAY') {
-            map {
-                unshift @stack,
-                    [@{$path},
-                        [exists ${$diff}->{D}->[$_]->{I}
-                            ? ${$diff}->{D}->[$_]->{I} # use provided index
-                            : $_
-                        ]
-                    ],
-                    \${$diff}->{D}->[$_]
-            } reverse 0 .. $#{${$diff}->{D}};
+            $I = 0;
+            for (@{${$diff}->{D}}) {
+                $I = $_->{I} if (exists $_->{I}); # use provided index
+                push @stack, [@{$path}, [$I]], \$_;
+                $I++;
+            }
         } else { # HASH
             map {
-                unshift @stack, [@{$path}, {K => [$_]}], \${$diff}->{D}->{$_}
+                push @stack, [@{$path}, {K => [$_]}], \${$diff}->{D}->{$_}
             } $opts{sort}
                 ? ref $opts{sort} eq 'CODE'
-                    ? reverse $opts{sort}(keys %{${$diff}->{D}})
-                    : reverse sort keys %{${$diff}->{D}}
+                    ? $opts{sort}(keys %{${$diff}->{D}})
+                    : sort keys %{${$diff}->{D}}
                 : keys %{${$diff}->{D}};
         }
     }
@@ -379,19 +405,19 @@ sub patch($$) {
 
         if (exists $d->{D}) {
             if (ref $d->{D} eq 'ARRAY') {
-                my ($i, $r) = (0, 0); # struct array idx, removed items counter
+                my ($i, $j) = (0, 0); # target array idx, jitter
 
                 for (@{$d->{D}}) {
-                    $i = $_->{I} - $r if (exists $_->{I});
+                    $i = $_->{I} + $j if (exists $_->{I});
 
                     if (exists $_->{D} or exists $_->{N}) {
                         push @stack, \${$s}->[$i], $_;
                     } elsif (exists $_->{A}) {
-                        splice @{${$s}}, $i, 1,
-                            (@{${$s}} > $i ? ($_->{A}, ${$s}->[$i]) : $_->{A});
+                        splice @{${$s}}, $i, 0, $_->{A};
+                        $j++;
                     } elsif (exists $_->{R}) {
                         splice @{${$s}}, $i, 1;
-                        $r++;
+                        $j--;
                         next; # don't increment $i
                     }
 
@@ -476,15 +502,17 @@ sub valid_diff($) {
 
 =over 4
 
-=item $Struct::Diff::Freezer
+=item $Struct::Diff::FREEZER
 
 Contains reference to default serialization function (C<diff()> rely on it
 to determine data equivalency). L<Storable/freeze> with enabled
 C<$Storable::canonical> and C<$Storable::Deparse> opts used by default.
 
-L<Data::Dumper> is suitable for structures containing regular experrions:
+L<Data::Dumper> is suitable for structures with regular expressions:
 
-    $Struct::Diff::Freezer = sub {
+    use Data::Dumper;
+
+    $Struct::Diff::FREEZER = sub {
         local $Data::Dumper::Deparse    = 1;
         local $Data::Dumper::Sortkeys   = 1;
         local $Data::Dumper::Terse      = 1;
@@ -492,15 +520,15 @@ L<Data::Dumper> is suitable for structures containing regular experrions:
         return Dumper @_;
     }
 
-But, comparing to C<Storable> it has two another issues: speed and unability
+But comparing to L<Storable> it has two other issues: speed and unability
 to distinguish numbers from their string representations.
 
 =back
 
 =head1 LIMITATIONS
 
-Only arrays and hashes traversed. All other data types compared by reference
-addresses and content.
+Only arrays and hashes traversed. All other types compared by reference address
+and serialized content.
 
 L<Storable/freeze> (serializer used by default) will fail serializing compiled
 regexps, so, consider to use other serializer if data contains regular

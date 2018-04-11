@@ -22,13 +22,13 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180203200236;
+our $VERSION = 1.20180410221547;
 
 my $formatters = [
                 {
                   'intl_format' => 'NA',
-                  'pattern' => '(\\d{3})(\\d{4})',
-                  'format' => '$1-$2'
+                  'format' => '$1-$2',
+                  'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
@@ -39,14 +39,6 @@ my $formatters = [
 
 my $validators = {
                 'voip' => '',
-                'pager' => '',
-                'geographic' => '
-          7215(?:
-            4[2-8]|
-            8[239]|
-            9[056]
-          )\\d{4}
-        ',
                 'toll_free' => '
           8(?:
             00|
@@ -58,20 +50,11 @@ my $validators = {
             88
           )[2-9]\\d{6}
         ',
-                'specialrate' => '(900[2-9]\\d{6})',
                 'fixed_line' => '
           7215(?:
             4[2-8]|
             8[239]|
             9[056]
-          )\\d{4}
-        ',
-                'mobile' => '
-          7215(?:
-            1[02]|
-            2\\d|
-            5[034679]|
-            8[014-8]
           )\\d{4}
         ',
                 'personal_number' => '
@@ -87,6 +70,23 @@ my $validators = {
             )[2-9]|
             21[23]
           )\\d{6}
+        ',
+                'pager' => '',
+                'mobile' => '
+          7215(?:
+            1[02]|
+            2\\d|
+            5[034679]|
+            8[014-8]
+          )\\d{4}
+        ',
+                'specialrate' => '(900[2-9]\\d{6})',
+                'geographic' => '
+          7215(?:
+            4[2-8]|
+            8[239]|
+            9[056]
+          )\\d{4}
         '
               };
 use Number::Phone::NANP::Data;
@@ -100,6 +100,6 @@ Number::Phone::NANP::Data::_areaname('1'.shift()->{number}); }
       my $number = shift;
       $number =~ s/(^\+1|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
-  return $self->is_valid() ? $self : undef;
-}
+        return $self->is_valid() ? $self : undef;
+    }
 1;
